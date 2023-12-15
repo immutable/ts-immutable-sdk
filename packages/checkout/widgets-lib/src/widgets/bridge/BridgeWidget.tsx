@@ -1,6 +1,7 @@
 import {
   BridgeWidgetParams,
   Checkout,
+  IMTBLWidgetEvents,
 } from '@imtbl/checkout-sdk';
 import {
   useCallback,
@@ -25,6 +26,8 @@ import {
 } from '@imtbl/bridge-sdk';
 import { getL1ChainId, getL2ChainId } from 'lib';
 import { Transactions } from 'components/Transactions/Transactions';
+import { UserJourney } from 'context/analytics-provider/SegmentAnalyticsProvider';
+import { TopUpView } from 'views/top-up/TopUpView';
 import {
   ViewActions,
   ViewContext,
@@ -59,9 +62,14 @@ export function BridgeWidget({
   web3Provider,
   config,
   amount,
-  contractAddress,
+  tokenAddress,
 }: BridgeWidgetInputs) {
-  const { environment } = config;
+  const {
+    environment,
+    isOnRampEnabled,
+    isSwapEnabled,
+    isBridgeEnabled,
+  } = config;
   const errorText = text.views[SharedViews.ERROR_VIEW];
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
   const bridgeFailureText = text.views[BridgeWidgetViews.BRIDGE_FAILURE];
@@ -161,7 +169,7 @@ export function BridgeWidget({
             <WalletNetworkSelectionView />
           )}
           {viewState.view.type === BridgeWidgetViews.BRIDGE_FORM && (
-            <Bridge amount={amount} contractAddress={contractAddress} />
+            <Bridge amount={amount} tokenAddress={tokenAddress} />
           )}
           {viewState.view.type === BridgeWidgetViews.BRIDGE_REVIEW && (
             <BridgeReview />
@@ -203,6 +211,18 @@ export function BridgeWidget({
               actionText={errorText.actionText}
               onActionClick={goBackToWalletNetworkSelector}
               onCloseClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
+            />
+          )}
+          {viewState.view.type === SharedViews.TOP_UP_VIEW && (
+            <TopUpView
+              analytics={{ userJourney: UserJourney.BRIDGE }}
+              widgetEvent={IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT}
+              checkout={checkout}
+              provider={web3Provider}
+              showOnrampOption={isOnRampEnabled}
+              showSwapOption={isSwapEnabled}
+              showBridgeOption={isBridgeEnabled}
+              onCloseButtonClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
             />
           )}
         </CryptoFiatProvider>

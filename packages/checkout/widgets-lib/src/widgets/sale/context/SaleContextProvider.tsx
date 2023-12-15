@@ -41,7 +41,7 @@ type SaleContextProps = {
   environmentId: string;
   items: SaleItem[];
   amount: string;
-  fromContractAddress: string;
+  fromTokenAddress: string;
   provider: ConnectLoaderState['provider'];
   checkout: ConnectLoaderState['checkout'];
   passport?: Passport;
@@ -76,7 +76,7 @@ type SaleContextValues = SaleContextProps & {
 const SaleContext = createContext<SaleContextValues>({
   items: [],
   amount: '',
-  fromContractAddress: '',
+  fromTokenAddress: '',
   provider: undefined,
   checkout: undefined,
   environmentId: '',
@@ -119,7 +119,7 @@ export function SaleContextProvider(props: {
       environmentId,
       items,
       amount,
-      fromContractAddress,
+      fromTokenAddress,
       provider,
       checkout,
       passport,
@@ -182,7 +182,7 @@ export function SaleContextProvider(props: {
   } = useSignOrder({
     items,
     provider,
-    fromContractAddress,
+    fromTokenAddress,
     recipientAddress,
     environmentId,
     env,
@@ -254,7 +254,7 @@ export function SaleContextProvider(props: {
     checkout,
     items,
     amount,
-    contractAddress: fromContractAddress,
+    tokenAddress: fromTokenAddress,
   });
 
   useEffect(() => {
@@ -320,7 +320,7 @@ export function SaleContextProvider(props: {
       config,
       items,
       amount,
-      fromContractAddress,
+      fromTokenAddress,
       sign,
       signResponse,
       signError,
@@ -349,7 +349,7 @@ export function SaleContextProvider(props: {
       environmentId,
       items,
       amount,
-      fromContractAddress,
+      fromTokenAddress,
       provider,
       checkout,
       recipientAddress,

@@ -30,7 +30,7 @@ export interface SaleWidgetProps {
   config: StrongCheckoutWidgetsConfig;
   amount: string;
   items: SaleItem[];
-  fromContractAddress: string;
+  fromTokenAddress: string;
   environmentId: string;
 }
 
@@ -39,7 +39,7 @@ export function SaleWidget(props: SaleWidgetProps) {
     config,
     amount,
     items,
-    fromContractAddress,
+    fromTokenAddress,
     environmentId,
   } = props;
 
@@ -85,7 +85,7 @@ export function SaleWidget(props: SaleWidgetProps) {
           config,
           items,
           amount,
-          fromContractAddress,
+          fromTokenAddress,
           env: checkout!.config.environment ?? Environment.SANDBOX,
           environmentId,
           provider,

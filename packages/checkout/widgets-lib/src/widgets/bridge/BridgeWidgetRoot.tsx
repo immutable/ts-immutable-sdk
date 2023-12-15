@@ -45,10 +45,10 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
       validatedParams.amount = '';
     }
 
-    if (!isValidAddress(params.contractAddress)) {
+    if (!isValidAddress(params.tokenAddress)) {
       // eslint-disable-next-line no-console
-      console.warn('[IMTBL]: invalid "contractAddress" widget input');
-      validatedParams.contractAddress = '';
+      console.warn('[IMTBL]: invalid "tokenAddress" widget input');
+      validatedParams.tokenAddress = '';
     }
 
     return validatedParams;
@@ -63,7 +63,7 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
             checkout={this.checkout}
             config={this.strongConfig()}
             web3Provider={this.web3Provider}
-            contractAddress={this.parameters.contractAddress}
+            tokenAddress={this.parameters.tokenAddress}
             amount={this.parameters.amount}
             walletProviderName={this.parameters.walletProviderName}
           />

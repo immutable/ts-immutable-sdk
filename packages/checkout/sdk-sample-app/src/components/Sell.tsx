@@ -21,7 +21,7 @@ export default function Sell({ checkout, provider }: SellProps) {
   const [listingTypeError, setListingTypeError] = useState<string>('');
   const [amount, setAmount] = useState<string>('');
   const [amountError, setAmountError] = useState<string>('');
-  const [contractAddress, setContractAddress] = useState<string>('');
+  const [tokenAddress, setContractAddress] = useState<string>('');
   const [contractAddressError, setContractAddressError] = useState<string>('');
   const [error, setError] = useState<any>(null);
   const [success, setSuccess] = useState<boolean>(false);
@@ -37,7 +37,7 @@ export default function Sell({ checkout, provider }: SellProps) {
     return {
       type: ItemType.ERC20,
       amount,
-      contractAddress,
+      tokenAddress,
     };
   }
 
@@ -57,14 +57,14 @@ export default function Sell({ checkout, provider }: SellProps) {
     if (listingType === ItemType.ERC20 && !amount) {
       setAmountError('Please enter the amount of ERC20 tokens to sell the ERC721 for');
     }
-    if (listingType === ItemType.ERC20 && !contractAddress) {
+    if (listingType === ItemType.ERC20 && !tokenAddress) {
       setContractAddressError('Please enter the contract address for the ERC20');
     }
     if (!id ||
       !collectionAddress ||
       !amount ||
       !listingType ||
-      (listingType === ItemType.ERC20 && !contractAddress)) {
+      (listingType === ItemType.ERC20 && !tokenAddress)) {
       return;
     }
     if (!checkout) {
@@ -191,7 +191,7 @@ export default function Sell({ checkout, provider }: SellProps) {
             {listingType === ItemType.ERC20 && <td>
               <FormControl validationStatus={contractAddressError ? 'error' : 'success'}>
                 <TextInput
-                  value={contractAddress}
+                  value={tokenAddress}
                   disabled={disableContractAddress}
                   onChange={(event: any) => {
                     setContractAddress(event.target.value);

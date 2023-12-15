@@ -272,6 +272,7 @@ export function WalletBalances({
           onCloseDrawer={() => setShowNotEnoughGasDrawer(false)}
           walletAddress={walletAddress}
           showAdjustAmount={false}
+          tokenSymbol={ETH_TOKEN_SYMBOL}
         />
       </Box>
     </SimpleLayout>
