@@ -791,6 +791,7 @@ export class TokenBridge {
           const contract = new ethers.Contract(
             this.config.bridgeContracts.rootERC20BridgeFlowRate,
             ROOT_ERC20_BRIDGE_FLOW_RATE,
+            this.config.rootProvider,
           );
           return contract;
         },
@@ -858,9 +859,7 @@ export class TokenBridge {
         };
       }
 
-      console.log('txItem.receiver', txItem.receiver);
-
-      let flowRatePromiseIndex: number = -1;
+      let flowRatePromiseIndex: number;
       if (metaStatus === StatusResponse.COMPLETE
         && isWithdraw && txItem.receiver) {
         // consolodate the calls we have to make to the flow rate by receiver
@@ -870,8 +869,8 @@ export class TokenBridge {
           flowRatePromiseIndex = flowRatePromisesReceivers.length - 1;
         } else {
           flowRatePromiseIndex = flowRatePromisesReceivers.findIndex((el) => el === txItem.receiver);
-          txItem.data.flowRatePromiseIndex = flowRatePromiseIndex;
         }
+        txItem.data.flowRatePromiseIndex = flowRatePromiseIndex;
       }
 
       txStatusResponse.transactions.push(txItem);
@@ -892,14 +891,14 @@ export class TokenBridge {
     for (const txStatusRes of txStatusResponse.transactions) {
       if (txStatusRes.data.flowRatePromiseIndex !== -1 && flowRateResponses[txStatusRes.data.flowRatePromiseIndex]) {
         const flowRatedTx = flowRateResponses[txStatusRes.data.flowRatePromiseIndex].find((el) => (
-          el.amount === txStatusRes.amount.toString()
+          el.amount.toString() === txStatusRes.amount.toString()
           && el.token === txStatusRes.token
           && el.withdrawer === txStatusRes.sender
         ));
         if (flowRatedTx) {
           txStatusRes.status = StatusResponse.FLOW_RATE_CONTROLLED;
           txStatusRes.data = {
-            timestamp: flowRatedTx.timestamp,
+            timestamp: flowRatedTx.timestamp.toString(),
           };
         }
       }
