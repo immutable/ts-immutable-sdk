@@ -1,9 +1,11 @@
 import {
+  Accordion,
+  Body,
   Box,
   Button,
   Heading,
-  MenuItem,
   OptionKey,
+  PriceDisplay,
 } from '@biom3/react';
 import {
   GasEstimateBridgeToL2Result,
@@ -36,6 +38,7 @@ import {
   bridgeFormButtonContainerStyles,
   bridgeFormWrapperStyles,
   formInputsContainerStyles,
+  gasAmountAccordionStyles,
   gasAmountHeadingStyles,
 } from './BridgeFormStyles';
 import { CoinSelectorOptionProps } from '../../../components/CoinSelector/CoinSelectorOption';
@@ -456,19 +459,23 @@ export function BridgeForm(props: BridgeFormProps) {
         )}
         {gasFee && (
           <Box sx={{ paddingY: 'base.spacing.x2' }}>
-            <MenuItem testId="bridge-gas-fee" emphasized size="small">
-              <MenuItem.Label sx={gasAmountHeadingStyles}>
-                {fees.title}
-              </MenuItem.Label>
-              <MenuItem.PriceDisplay
-                fiatAmount={`${fees.fiatPricePrefix} ${gasFeeFiatValue}`}
-                price={`${estimates?.token?.symbol} ${tokenValueFormat(gasFee)}`}
-              />
-              <MenuItem.StatefulButtCon
-                icon="ChevronExpand"
-                onClick={() => setShowFeeBreakdown(true)}
-              />
-            </MenuItem>
+            <Accordion
+              testId="bridge-gas-fee"
+              targetClickOveride={() => setShowFeeBreakdown(true)}
+              sx={gasAmountAccordionStyles}
+            >
+              <Accordion.TargetLeftSlot>
+                <Body size="medium" sx={gasAmountHeadingStyles}>
+                  {fees.title}
+                </Body>
+              </Accordion.TargetLeftSlot>
+              <Accordion.TargetRightSlot>
+                <PriceDisplay
+                  fiatAmount={`${fees.fiatPricePrefix} ${gasFeeFiatValue}`}
+                  price={`${estimates?.token?.symbol} ${tokenValueFormat(gasFee)}`}
+                />
+              </Accordion.TargetRightSlot>
+            </Accordion>
           </Box>
         )}
       </Box>
