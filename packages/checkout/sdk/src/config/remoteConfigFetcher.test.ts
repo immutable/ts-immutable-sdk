@@ -39,6 +39,7 @@ describe('RemoteConfig', () => {
           isProduction: env !== ENV_DEVELOPMENT && env === Environment.PRODUCTION,
         });
 
+        expect(fetcher.isLoaded()).toBe(false);
         expect(await fetcher.getConfig()).toEqual({
           dex: {
             overrides: {
@@ -47,6 +48,7 @@ describe('RemoteConfig', () => {
           },
           allowedNetworks: [ChainId.SEPOLIA],
         });
+        expect(fetcher.isLoaded()).toBe(true);
         expect(await fetcher.getConfig()).toEqual({
           dex: {
             overrides: {
@@ -124,12 +126,14 @@ describe('RemoteConfig', () => {
           isProduction: env !== ENV_DEVELOPMENT && env === Environment.PRODUCTION,
         });
 
+        expect(fetcher.isLoaded()).toBe(false);
         await expect(fetcher.getConfig()).rejects.toThrow(
           new CheckoutError(
             'Error fetching from api: error message',
             CheckoutErrorType.API_ERROR,
           ),
         );
+        expect(fetcher.isLoaded()).toBe(false);
       });
     });
 

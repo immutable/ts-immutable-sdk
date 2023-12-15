@@ -9,7 +9,7 @@ import { StrongCheckoutWidgetsConfig } from 'lib/withDefaultWidgetConfig';
 import { Passport } from '@imtbl/passport';
 import { BigNumber } from 'ethers';
 import { TokenBridge } from '@imtbl/bridge-sdk';
-import { WidgetContainer } from 'components/WidgetContainer/WidgetContainer';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { BridgeWidget } from './BridgeWidget';
 import { text } from '../../resources/text/textConfig';
 
@@ -118,9 +118,9 @@ describe('BridgeWidget', () => {
       } as SwitchNetworkResult);
 
       mount(
-        <WidgetContainer id="test" config={widgetConfig}>
+        <ViewContextTestComponent theme={widgetConfig.theme}>
           <BridgeWidget checkout={checkout} config={widgetConfig} />
-        </WidgetContainer>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('wallet-network-selector-from-wallet-select__target').click();
@@ -143,9 +143,9 @@ describe('BridgeWidget', () => {
       connectStub.resolves({ provider: mockPassportProvider });
 
       mount(
-        <WidgetContainer id="test" config={widgetConfig}>
+        <ViewContextTestComponent theme={widgetConfig.theme}>
           <BridgeWidget checkout={checkout} config={widgetConfig} />
-        </WidgetContainer>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('wallet-network-selector-from-wallet-select__target').click();
@@ -164,9 +164,9 @@ describe('BridgeWidget', () => {
       connectStub.resolves({ provider: mockPassportProvider });
 
       mount(
-        <WidgetContainer id="test" config={widgetConfig}>
+        <ViewContextTestComponent theme={widgetConfig.theme}>
           <BridgeWidget checkout={checkout} config={widgetConfig} />
-        </WidgetContainer>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('wallet-network-selector-from-wallet-select__target').click();
@@ -203,9 +203,9 @@ describe('BridgeWidget', () => {
       } as SwitchNetworkResult);
 
       mount(
-        <WidgetContainer id="test" config={widgetConfig}>
+        <ViewContextTestComponent theme={widgetConfig.theme}>
           <BridgeWidget checkout={checkout} config={widgetConfig} />
-        </WidgetContainer>,
+        </ViewContextTestComponent>,
       );
 
       // Choose from Passport
@@ -237,9 +237,9 @@ describe('BridgeWidget', () => {
       } as SwitchNetworkResult);
 
       mount(
-        <WidgetContainer id="test" config={widgetConfig}>
+        <ViewContextTestComponent theme={widgetConfig.theme}>
           <BridgeWidget checkout={checkout} config={widgetConfig} />
-        </WidgetContainer>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('wallet-network-selector-from-wallet-select__target').click();
@@ -271,9 +271,9 @@ describe('BridgeWidget', () => {
       } as SwitchNetworkResult);
 
       mount(
-        <WidgetContainer id="test" config={widgetConfig}>
+        <ViewContextTestComponent theme={widgetConfig.theme}>
           <BridgeWidget checkout={checkout} config={widgetConfig} />
-        </WidgetContainer>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('wallet-network-selector-from-wallet-select__target').click();
@@ -309,9 +309,9 @@ describe('BridgeWidget', () => {
       } as SwitchNetworkResult);
 
       mount(
-        <WidgetContainer id="test" config={widgetConfig}>
+        <ViewContextTestComponent theme={widgetConfig.theme}>
           <BridgeWidget checkout={checkout} config={widgetConfig} />
-        </WidgetContainer>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('wallet-network-selector-from-wallet-select__target').click();
@@ -351,9 +351,9 @@ describe('BridgeWidget', () => {
         } as SwitchNetworkResult);
 
       mount(
-        <WidgetContainer id="test" config={widgetConfig}>
+        <ViewContextTestComponent theme={widgetConfig.theme}>
           <BridgeWidget checkout={checkout} config={widgetConfig} />
-        </WidgetContainer>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('wallet-network-selector-from-wallet-select__target').click();
@@ -393,9 +393,9 @@ describe('BridgeWidget', () => {
       } as SwitchNetworkResult);
 
       mount(
-        <WidgetContainer id="test" config={widgetConfig}>
+        <ViewContextTestComponent theme={widgetConfig.theme}>
           <BridgeWidget checkout={checkout} config={widgetConfig} />
-        </WidgetContainer>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('wallet-network-selector-from-wallet-select__target').click();
@@ -412,9 +412,9 @@ describe('BridgeWidget', () => {
 
     it('should not show when from wallet is not selected', () => {
       mount(
-        <WidgetContainer id="test" config={widgetConfig}>
+        <ViewContextTestComponent theme={widgetConfig.theme}>
           <BridgeWidget checkout={checkout} config={widgetConfig} />
-        </WidgetContainer>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('wallet-network-selector-submit-button').should('not.exist');
@@ -431,9 +431,9 @@ describe('BridgeWidget', () => {
       } as SwitchNetworkResult);
 
       mount(
-        <WidgetContainer id="test" config={widgetConfig}>
+        <ViewContextTestComponent theme={widgetConfig.theme}>
           <BridgeWidget checkout={checkout} config={widgetConfig} />
-        </WidgetContainer>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('wallet-network-selector-from-wallet-select__target').click();
@@ -455,9 +455,9 @@ describe('BridgeWidget', () => {
       } as SwitchNetworkResult);
 
       mount(
-        <WidgetContainer id="test" config={widgetConfig}>
+        <ViewContextTestComponent theme={widgetConfig.theme}>
           <BridgeWidget checkout={checkout} config={widgetConfig} />
-        </WidgetContainer>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('wallet-network-selector-from-wallet-select__target').click();
@@ -538,9 +538,9 @@ describe('BridgeWidget', () => {
       } as SwitchNetworkResult);
 
       mount(
-        <WidgetContainer id="test" config={widgetConfig}>
+        <ViewContextTestComponent theme={widgetConfig.theme}>
           <BridgeWidget checkout={checkout} config={widgetConfig} />
-        </WidgetContainer>,
+        </ViewContextTestComponent>,
       );
 
       // Wallet & Network Selector
@@ -646,9 +646,9 @@ describe('BridgeWidget', () => {
       } as SwitchNetworkResult);
 
       mount(
-        <WidgetContainer id="test" config={widgetConfig}>
+        <ViewContextTestComponent theme={widgetConfig.theme}>
           <BridgeWidget checkout={checkout} config={widgetConfig} />
-        </WidgetContainer>,
+        </ViewContextTestComponent>,
       );
 
       // Wallet & Network Selector

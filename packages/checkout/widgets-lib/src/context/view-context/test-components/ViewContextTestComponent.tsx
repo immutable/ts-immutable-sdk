@@ -1,7 +1,8 @@
 import React from 'react';
-import { WidgetContainer } from 'components/WidgetContainer/WidgetContainer';
+import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
 import { withDefaultWidgetConfigs } from 'lib/withDefaultWidgetConfig';
-import { WidgetTheme } from '@imtbl/checkout-sdk';
+import { Checkout, WidgetTheme } from '@imtbl/checkout-sdk';
+import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
 
 export interface TestProps {
   children: React.ReactNode;
@@ -13,16 +14,18 @@ export function ViewContextTestComponent({ children, theme }: TestProps) {
     theme: theme ?? WidgetTheme.DARK,
   });
   return (
-    <WidgetContainer
-      id="test"
-      config={config}
-      globalSx={{
-        body: {
-          bg: 'base.color.neutral.800',
-        },
-      }}
-    >
-      {children}
-    </WidgetContainer>
+    <CustomAnalyticsProvider checkout={{} as Checkout}>
+      <ThemeProvider
+        id="test"
+        config={config}
+        globalSx={{
+          body: {
+            bg: 'base.color.neutral.800',
+          },
+        }}
+      >
+        {children}
+      </ThemeProvider>
+    </CustomAnalyticsProvider>
   );
 }
