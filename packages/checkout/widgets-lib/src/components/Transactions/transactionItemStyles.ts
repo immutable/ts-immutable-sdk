@@ -1,9 +1,9 @@
 export const containerStyles = {
-  pt: '1px',
+  py: '1px',
+  px: 'base.spacing.x2',
   bg: 'base.color.translucent.emphasis.100',
   borderRadius: 'base.borderRadius.x4',
-  mb: 'base.spacing.x1',
-  pb: '1px',
+  my: 'base.spacing.x2',
 };
 
 export const actionsContainerStyles = {

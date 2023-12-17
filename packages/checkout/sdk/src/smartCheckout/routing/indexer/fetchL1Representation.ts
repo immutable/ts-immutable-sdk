@@ -1,16 +1,16 @@
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../../config';
 import { createBlockchainDataInstance } from '../../../instance';
 import { NATIVE } from '../../../env';
-import { ChainId, ImxAddressConfig } from '../../../types';
+import { ChainId, ChainSlug, ImxAddressConfig } from '../../../types';
 import { isNativeToken } from '../../../tokens';
 
 // If the root address evaluates to this then its ETH
 export const INDEXER_ETH_ROOT_CONTRACT_ADDRESS = '0x0000000000000000000000000000000000000eee';
 
 const getIndexerChainName = (chainId: ChainId): string => {
-  if (chainId === ChainId.IMTBL_ZKEVM_MAINNET) return 'imtbl-zkevm-mainnet';
-  if (chainId === ChainId.IMTBL_ZKEVM_TESTNET) return 'imtbl-zkevm-testnet';
-  if (chainId === ChainId.IMTBL_ZKEVM_DEVNET) return 'imtbl-zkevm-devent';
+  if (chainId === ChainId.IMTBL_ZKEVM_MAINNET) return ChainSlug.IMTBL_ZKEVM_MAINNET;
+  if (chainId === ChainId.IMTBL_ZKEVM_TESTNET) return ChainSlug.IMTBL_ZKEVM_TESTNET;
+  if (chainId === ChainId.IMTBL_ZKEVM_DEVNET) return ChainSlug.IMTBL_ZKEVM_DEVNET;
   return '';
 };
 

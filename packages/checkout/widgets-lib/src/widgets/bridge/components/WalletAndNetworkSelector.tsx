@@ -16,7 +16,7 @@ import {
 import { Web3Provider } from '@ethersproject/providers';
 import { createAndConnectToProvider, isPassportProvider } from 'lib/providerUtils';
 import { getL1ChainId, getL2ChainId } from 'lib';
-import { getChainNameById } from 'lib/chainName';
+import { getChainNameById } from 'lib/chains';
 import { ViewActions, ViewContext } from 'context/view-context/ViewContext';
 import { abbreviateAddress } from 'lib/addressUtils';
 import {

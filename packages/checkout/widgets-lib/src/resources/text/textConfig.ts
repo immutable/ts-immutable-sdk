@@ -386,7 +386,7 @@ export const text = {
       },
       fees: {
         title: 'Gas Fee',
-        fiatPricePrefix: '~ USD $',
+        fiatPricePrefix: '≈ USD $',
       },
       content: {
         title: 'How much would you like to move?',
@@ -422,7 +422,7 @@ export const text = {
       submitButton: {
         buttonText: 'Confirm move',
       },
-      fiatPricePrefix: '~ USD $',
+      fiatPricePrefix: '≈ USD $',
     },
     [BridgeWidgetViews.BRIDGE_FAILURE]: {
       statusText: 'Transaction failed',
@@ -460,7 +460,7 @@ export const text = {
           },
         },
       },
-      fiatPricePrefix: '~ USD $',
+      fiatPricePrefix: '≈ USD $',
       support: {
         body1: 'Need help?',
         body2: ' Contact ',

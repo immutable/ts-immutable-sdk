@@ -36,6 +36,15 @@ export const DEFAULT_BALANCE_RETRY_POLICY: RetryType = {
 };
 
 /**
+ * Default retry policy for fetching transactions from remote.
+ */
+export const DEFAULT_TRANSACTIONS_RETRY_POLICY: RetryType = {
+  retryIntervalMs: DEFAULT_RETRY_DELAY,
+  retries: 60,
+  nonRetryableSilently: (err: any) => !!err,
+};
+
+/**
  * Checkout Widget default env
  */
 export const DEFAULT_ENV = Environment.SANDBOX;

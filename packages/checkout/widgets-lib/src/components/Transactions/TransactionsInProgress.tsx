@@ -3,18 +3,37 @@ import {
 } from '@biom3/react';
 import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { text } from 'resources/text/textConfig';
-import { ChainId, Checkout } from '@imtbl/checkout-sdk';
-import { useEffect, useState } from 'react';
+import { ChainSlug, Checkout } from '@imtbl/checkout-sdk';
+import { useContext, useEffect, useState } from 'react';
 import { AXELAR_SCAN_URL } from 'lib';
+import { Transaction } from 'lib/clients';
+import { getChainIdBySlug } from 'lib/chains';
+import { ethers } from 'ethers';
+import { CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext';
+import { calculateCryptoToFiat } from 'lib/utils';
 import { TransactionItem } from './TransactionItem';
 import { containerStyles } from './transactionItemStyles';
+import { KnownNetworkMap } from './transactionsType';
 
 type TransactionsInProgressProps = {
   checkout: Checkout,
+  transactions: Transaction[],
+  knownTokenMap: KnownNetworkMap
 };
 
-export function TransactionsInProgress({ checkout }: TransactionsInProgressProps) {
-  const { status: { inProgress }, fiatPricePrefix } = text.views[BridgeWidgetViews.TRANSACTIONS];
+export function TransactionsInProgress({
+  checkout,
+  transactions,
+  knownTokenMap,
+}: TransactionsInProgressProps) {
+  const { cryptoFiatState } = useContext(CryptoFiatContext);
+
+  const {
+    status: {
+      inProgress: { stepInfo, heading },
+    },
+    fiatPricePrefix,
+  } = text.views[BridgeWidgetViews.TRANSACTIONS];
 
   const [link, setLink] = useState('');
 
@@ -25,32 +44,31 @@ export function TransactionsInProgress({ checkout }: TransactionsInProgressProps
 
   return (
     <>
-      <Divider size="xSmall">{inProgress.heading}</Divider>
+      <Divider size="xSmall">{heading}</Divider>
       <Box sx={containerStyles}>
-        <TransactionItem
-          label="zkTKN"
-          details={{
-            text: inProgress.stepInfo,
-            link,
-            hash: '0xd53c37d7575df21f5d6a0f61449ad3fa5d75e400c5ee2bb4fab3245267f648d3',
-          }}
-          fiatAmount={`${fiatPricePrefix}12345.12`}
-          amount="1835.1234"
-          fromChain={ChainId.IMTBL_ZKEVM_TESTNET}
-          toChain={ChainId.SEPOLIA}
-        />
-        <TransactionItem
-          label="zkTKN"
-          details={{
-            text: inProgress.stepInfo,
-            link,
-            hash: '0x812d9ee12e7ef0365181acf4b21be86beb2f72a6f085b3831df01cfa55492150',
-          }}
-          fiatAmount={`${fiatPricePrefix}12345.12`}
-          amount="1835.1234"
-          fromChain={ChainId.IMTBL_ZKEVM_TESTNET}
-          toChain={ChainId.SEPOLIA}
-        />
+        {transactions.map((t) => {
+          const tokens = knownTokenMap[t.details.from_chain];
+          if (!tokens) return <Box />;
+
+          const token = tokens[t.details.from_token_address.toLowerCase()];
+          if (!token) return <Box />;
+
+          const amount = ethers.utils.formatUnits(t.details.amount, token.decimals);
+          const fiat = calculateCryptoToFiat(amount, token.symbol, cryptoFiatState.conversions);
+
+          const hash = t.blockchain_metadata.transaction_hash;
+          return (
+            <TransactionItem
+              key={hash}
+              label={token.name}
+              details={{ text: stepInfo, link, hash }}
+              fiatAmount={`${fiatPricePrefix}${fiat}`}
+              amount={amount}
+              fromChain={getChainIdBySlug(t.details.from_chain as ChainSlug)}
+              toChain={getChainIdBySlug(t.details.to_chain as ChainSlug)}
+            />
+          );
+        })}
       </Box>
     </>
   );

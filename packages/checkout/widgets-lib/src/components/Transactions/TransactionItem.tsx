@@ -46,7 +46,6 @@ export function TransactionItem({
 
   return (
     <Box sx={action ? containerStyles : {}}>
-
       {action !== undefined && (
         <Box sx={actionsContainerStyles}>
           <Box sx={actionsLayoutStyles}>
@@ -105,16 +104,14 @@ export function TransactionItem({
         <Accordion.ExpandedContent sx={{
           pr: '0',
           pl: '0',
-          mb: 'base.spacing.x2',
+          mb: 'base.spacing.x3',
           gap: '0',
         }}
         >
           <Divider
             size="xSmall"
             sx={{
-              pt: 'base.spacing.x2',
-              pr: 'base.spacing.x2',
-              pl: 'base.spacing.x2',
+              px: 'base.spacing.x2',
             }}
           />
           <Box sx={{
