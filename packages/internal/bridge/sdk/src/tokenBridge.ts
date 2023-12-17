@@ -3,8 +3,13 @@ import axios, { AxiosResponse } from 'axios';
 import {
   ETH_MAINNET_TO_ZKEVM_MAINNET, ETH_SEPOLIA_TO_ZKEVM_TESTNET, axelarAPIEndpoints, axelarChains, bridgeMethods,
 } from 'constants/bridges';
-import { BridgeConfiguration } from 'config';
 import { ethers } from 'ethers';
+import { ROOT_ERC20_BRIDGE_FLOW_RATE } from 'contracts/ABIs/RootERC20BridgeFlowRate';
+import { ERC20 } from 'contracts/ABIs/ERC20';
+import { BridgeError, BridgeErrorType, withBridgeError } from 'errors';
+import { CHILD_ERC20_BRIDGE } from 'contracts/ABIs/ChildERC20Bridge';
+import { getGasPriceInWei } from 'lib/gasPriceInWei';
+import { BridgeConfiguration } from './config';
 import {
   BridgeFeeRequest,
   BridgeFeeResponse,
@@ -28,12 +33,7 @@ import {
   FlowRateWithdrawResponse,
   FlowRateInfoRequest,
   CalculateBridgeFeeResponse,
-} from 'types';
-import { ROOT_ERC20_BRIDGE_FLOW_RATE } from 'contracts/ABIs/RootERC20BridgeFlowRate';
-import { ERC20 } from 'contracts/ABIs/ERC20';
-import { BridgeError, BridgeErrorType, withBridgeError } from 'errors';
-import { CHILD_ERC20_BRIDGE } from 'contracts/ABIs/ChildERC20Bridge';
-import { getGasPriceInWei } from 'lib/gasPriceInWei';
+} from './types';
 
 /**
  * Represents a token bridge, which manages asset transfers between two chains.
