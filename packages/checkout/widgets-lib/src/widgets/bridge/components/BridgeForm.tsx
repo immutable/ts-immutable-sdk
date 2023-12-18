@@ -463,7 +463,6 @@ export function BridgeForm(props: BridgeFormProps) {
         {gasFee && (
           <Box sx={{ paddingY: 'base.spacing.x2' }}>
             <Accordion
-              testId="bridge-gas-fee"
               targetClickOveride={() => setShowFeeBreakdown(true)}
               sx={gasAmountAccordionStyles}
             >
@@ -474,6 +473,7 @@ export function BridgeForm(props: BridgeFormProps) {
               </Accordion.TargetLeftSlot>
               <Accordion.TargetRightSlot>
                 <PriceDisplay
+                  testId="bridge-gas-fee__priceDisplay"
                   fiatAmount={`${fees.fiatPricePrefix} ${gasFeeFiatValue}`}
                   price={`${estimates?.token?.symbol} ${tokenValueFormat(gasFee)}`}
                 />

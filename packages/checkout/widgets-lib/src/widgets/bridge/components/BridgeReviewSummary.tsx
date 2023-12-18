@@ -282,7 +282,6 @@ export function BridgeReviewSummary() {
       </MenuItem>
       {gasFee && (
         <Accordion
-          testId={`${testId}-gas-amount`}
           targetClickOveride={() => setShowFeeBreakdown(true)}
           sx={bottomMenuItemStyles}
         >
@@ -293,6 +292,7 @@ export function BridgeReviewSummary() {
           </Accordion.TargetLeftSlot>
           <Accordion.TargetRightSlot>
             <PriceDisplay
+              testId={`${testId}-gas-amount__priceDisplay`}
               fiatAmount={`${fiatPricePrefix}${gasFeeFiatValue}`}
               price={`${estimates?.token?.symbol} ${tokenValueFormat(gasFee)}` ?? '-'}
             />
