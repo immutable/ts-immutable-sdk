@@ -426,14 +426,13 @@ export function BridgeForm(props: BridgeFormProps) {
         >
           {content.title}
         </Heading>
-        {isTokenBalancesLoading && (
-          <TokenSelectShimmer sx={formInputsContainerStyles} />
-        )}
-        {!isTokenBalancesLoading && (
+        {/* If no token set OR if form token set and balances not loading, render form */}
+        {(!formToken || (formToken && !isTokenBalancesLoading)) && (
           <Box sx={formInputsContainerStyles}>
             <SelectForm
               testId="bridge-token"
               options={tokensOptions}
+              optionsLoading={isTokenBalancesLoading}
               coinSelectorHeading={bridgeForm.from.selectorTitle}
               selectedOption={selectedOption}
               subtext={tokenBalanceSubtext}
@@ -456,6 +455,10 @@ export function BridgeForm(props: BridgeFormProps) {
               disabled={isFetching}
             />
           </Box>
+        )}
+        {/* Token set and loading, render select shimmer */}
+        {formToken && isTokenBalancesLoading && (
+          <TokenSelectShimmer sx={formInputsContainerStyles} />
         )}
         {gasFee && (
           <Box sx={{ paddingY: 'base.spacing.x2' }}>
@@ -518,10 +521,10 @@ export function BridgeForm(props: BridgeFormProps) {
           walletAddress={walletAddress}
           showAdjustAmount={isNativeToken(formToken?.token.address)}
           tokenSymbol={
-            from?.network === getL1ChainId(checkout?.config)
-              ? ETH_TOKEN_SYMBOL
-              : IMX_TOKEN_SYMBOL
-          }
+              from?.network === getL1ChainId(checkout?.config)
+                ? ETH_TOKEN_SYMBOL
+                : IMX_TOKEN_SYMBOL
+            }
           onAddCoinsClick={() => {
             viewDispatch({
               payload: {
