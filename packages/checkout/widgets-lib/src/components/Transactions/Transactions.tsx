@@ -35,6 +35,7 @@ import { EmptyStateNotConnected } from './EmptyStateNotConnected';
 import { SupportMessage } from './SupportMessage';
 import { KnownNetworkMap } from './transactionsType';
 import { TransactionsInProgress } from './TransactionsInProgress';
+import { NoTransactions } from './NoTransactions';
 
 type TransactionsProps = {
   checkout: Checkout
@@ -239,24 +240,35 @@ export function Transactions({ checkout }: TransactionsProps) {
     >
       <Box sx={transactionsContainerStyle}>
         <Box sx={transactionsListContainerStyle}>
-          {
-            (!txs || !knownTokenMap)
-              ? (
-                <EmptyStateNotConnected
-                  checkout={checkout}
-                  updateProvider={updateAndConnectProvider}
-                />
-              )
-              : (
-                <Box sx={transactionsListStyle(isPassport)}>
-                  {loading
-                    ? <Shimmer />
-                    : <TransactionsInProgress checkout={checkout} transactions={txs} knownTokenMap={knownTokenMap} />}
-                </Box>
-              )
-          }
+          {!provider && (
+            <EmptyStateNotConnected
+              checkout={checkout}
+              updateProvider={updateAndConnectProvider}
+            />
+          )}
+          {provider && loading
+            && (
+              <Box sx={transactionsListStyle(isPassport)}>
+                <Shimmer />
+              </Box>
+            )}
+          {provider && !loading && txs.length > 0 && knownTokenMap && (
+            <Box sx={transactionsListStyle(isPassport)}>
+              <TransactionsInProgress
+                checkout={checkout}
+                transactions={txs}
+                knownTokenMap={knownTokenMap}
+              />
+            </Box>
+          )}
+          {provider && !loading && txs.length === 0 && (
+            <NoTransactions
+              checkout={checkout}
+              isPassport={isPassport}
+            />
+          )}
         </Box>
-        {provider && (
+        {provider && txs.length > 0 && (
           <Box sx={supportBoxContainerStyle}>
             <SupportMessage
               checkout={checkout}

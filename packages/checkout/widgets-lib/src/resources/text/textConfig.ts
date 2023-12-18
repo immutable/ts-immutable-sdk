@@ -459,6 +459,13 @@ export const text = {
             body: 'Connect your wallet to view the transactions',
           },
         },
+        noTransactions: {
+          body: "You're all done here.",
+          passport: {
+            body: 'View your completed transactions in ',
+            link: 'Passport',
+          },
+        },
       },
       fiatPricePrefix: '≈ USD $',
       support: {

@@ -4,7 +4,7 @@ import { text } from 'resources/text/textConfig';
 import { Checkout } from '@imtbl/checkout-sdk';
 import { PASSPORT_URL } from 'lib';
 import { useState, useEffect } from 'react';
-import { supportMessageBoxStyle } from './SupportMessageStyles';
+import { supportMessageBoxStyle, bodyStyle } from './SupportMessageStyles';
 
 type SupportMessageProps = {
   checkout: Checkout,
@@ -50,9 +50,7 @@ export function SupportMessage({
           </Body>
           <Body
             size="small"
-            sx={{
-              color: 'base.color.text.secondary',
-            }}
+            sx={bodyStyle}
           >
             {body2}
             <Link
@@ -66,9 +64,7 @@ export function SupportMessage({
         {isPassport && (
           <Body
             size="small"
-            sx={{
-              color: 'base.color.text.secondary',
-            }}
+            sx={bodyStyle}
           >
             {passport.body1}
             {' '}

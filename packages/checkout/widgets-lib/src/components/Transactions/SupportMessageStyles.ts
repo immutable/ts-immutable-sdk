@@ -4,3 +4,7 @@ export const supportMessageBoxStyle = {
   p: 'base.spacing.x5',
   borderRadius: 'base.borderRadius.x6',
 };
+
+export const bodyStyle = {
+  color: 'base.color.text.secondary',
+};
