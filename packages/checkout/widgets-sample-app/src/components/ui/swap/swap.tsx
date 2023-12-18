@@ -11,7 +11,7 @@ function SwapUI() {
   const updateTheme = (theme: WidgetTheme) => swap.update({config: {theme}});
   
   useEffect(() => {
-    swap.mount(SWAP_TARGET_ID,{amount: '10', fromContractAddress: 'native', toContractAddress: "0xb95B75B4E4c09F04d5DA6349861BF1b6F163D78c"});
+    swap.mount(SWAP_TARGET_ID,{amount: '10', fromTokenAddress: 'native', toTokenAddress: "0xb95B75B4E4c09F04d5DA6349861BF1b6F163D78c"});
     swap.addListener(SwapEventType.SUCCESS, (data: SwapSuccess) => {
     })
     swap.addListener(SwapEventType.FAILURE, (data: any) => {

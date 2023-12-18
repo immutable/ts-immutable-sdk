@@ -44,10 +44,10 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
       validatedParams.amount = '';
     }
 
-    if (!isValidAddress(params.contractAddress)) {
+    if (!isValidAddress(params.tokenAddress)) {
       // eslint-disable-next-line no-console
-      console.warn('[IMTBL]: invalid "contractAddress" widget input');
-      validatedParams.contractAddress = '';
+      console.warn('[IMTBL]: invalid "tokenAddress" widget input');
+      validatedParams.tokenAddress = '';
     }
 
     return validatedParams;
@@ -73,7 +73,7 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
             closeEvent={() => sendOnRampWidgetCloseEvent(window)}
           >
             <OnRampWidget
-              contractAddress={this.parameters.contractAddress}
+              tokenAddress={this.parameters.tokenAddress}
               amount={this.parameters.amount}
               config={this.strongConfig()}
             />

@@ -5,12 +5,14 @@ import {
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { StandardAnalyticsControlTypes } from '@imtbl/react-analytics';
 import {
+  Checkout,
   GasEstimateBridgeToL2Result,
   GasEstimateType,
   IMTBLWidgetEvents,
 } from '@imtbl/checkout-sdk';
 import { DEFAULT_TOKEN_SYMBOLS } from 'context/crypto-fiat-context/CryptoFiatProvider';
-import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
+import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
+import { Web3Provider } from '@ethersproject/providers';
 import { FooterLogo } from '../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
@@ -27,7 +29,6 @@ import {
   getOnRampFeeEstimation,
 } from '../../lib/feeEstimation';
 import { CryptoFiatActions, CryptoFiatContext } from '../../context/crypto-fiat-context/CryptoFiatContext';
-import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { isPassportProvider } from '../../lib/providerUtils';
 import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextTypes';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
@@ -35,6 +36,8 @@ import { TopUpMenuItem } from './TopUpMenuItem';
 
 interface TopUpViewProps {
   widgetEvent: IMTBLWidgetEvents,
+  checkout?: Checkout,
+  provider?: Web3Provider,
   showOnrampOption: boolean,
   showSwapOption: boolean,
   showBridgeOption: boolean,
@@ -49,6 +52,8 @@ interface TopUpViewProps {
 
 export function TopUpView({
   widgetEvent,
+  checkout,
+  provider,
   showOnrampOption,
   showSwapOption,
   showBridgeOption,
@@ -60,9 +65,6 @@ export function TopUpView({
 }: TopUpViewProps) {
   const { userJourney } = analytics;
 
-  const { connectLoaderState } = useContext(ConnectLoaderContext);
-
-  const { checkout, provider } = connectLoaderState;
   const { header, topUpOptions } = text.views[SharedViews.TOP_UP_VIEW];
   const { onramp, swap, bridge } = topUpOptions;
 
@@ -143,9 +145,9 @@ export function TopUpView({
   const onClickSwap = () => {
     if (widgetEvent === IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT) {
       const data = {
-        toContractAddress: '',
+        toTokenAddress: '',
         fromAmount: '',
-        fromContractAddress: '',
+        fromTokenAddress: '',
       };
 
       viewDispatch({
@@ -173,7 +175,7 @@ export function TopUpView({
   const onClickBridge = () => {
     if (widgetEvent === IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT) {
       const data = {
-        fromContractAddress: '',
+        fromTokenAddress: '',
         fromAmount: '',
       };
 
@@ -181,7 +183,7 @@ export function TopUpView({
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
-            type: XBridgeWidgetViews.WALLET_NETWORK_SELECTION,
+            type: BridgeWidgetViews.WALLET_NETWORK_SELECTION,
             data,
           },
         },
@@ -201,7 +203,7 @@ export function TopUpView({
   const onClickOnRamp = () => {
     if (widgetEvent === IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT) {
       const data = {
-        contractAddress: '',
+        tokenAddress: '',
         amount: '',
       };
 

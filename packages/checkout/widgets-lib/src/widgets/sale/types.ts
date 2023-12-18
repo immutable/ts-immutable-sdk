@@ -13,7 +13,7 @@ export type SignedOrderProduct = {
   name: string;
   description: string;
   amount: number[];
-  tokenId: number[];
+  tokenId: string[];
   currency: string;
   collectionAddress: string;
 };
@@ -28,7 +28,7 @@ export type SignedOrder = {
 };
 
 export type SignedTransaction = {
-  contractAddress: string;
+  tokenAddress: string;
   gasEstimate: number;
   methodCall: string;
   params: {
@@ -47,7 +47,7 @@ export type SignResponse = {
 export type SignOrderInput = {
   provider: Web3Provider | undefined;
   items: SaleItem[];
-  fromContractAddress: string;
+  fromTokenAddress: string;
   recipientAddress: string;
   env: string;
   environmentId: string;
@@ -70,7 +70,7 @@ export type ExecutedTransaction = {
 
 export type ExecuteOrderResponse = {
   done: boolean;
-  transactions:ExecutedTransaction[]
+  transactions: ExecutedTransaction[];
 };
 
 export enum SaleErrorTypes {

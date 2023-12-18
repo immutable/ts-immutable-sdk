@@ -56,12 +56,12 @@ export const getBalance = async (
 export async function getERC20Balance(
   web3Provider: Web3Provider,
   walletAddress: string,
-  contractAddress: string,
+  tokenAddress: string,
 ) {
   return await withCheckoutError<GetBalanceResult>(
     async () => {
       const contract = new Contract(
-        contractAddress,
+        tokenAddress,
         JSON.stringify(ERC20ABI),
         web3Provider,
       );
@@ -81,7 +81,7 @@ export async function getERC20Balance(
               name,
               symbol,
               decimals,
-              address: contractAddress,
+              address: tokenAddress,
             },
           } as GetBalanceResult;
         });

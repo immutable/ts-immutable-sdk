@@ -215,14 +215,16 @@ export function WalletWidget(props: WalletWidgetInputs) {
           />
           )}
           {viewState.view.type === SharedViews.TOP_UP_VIEW && (
-          <TopUpView
-            analytics={{ userJourney: UserJourney.WALLET }}
-            widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
-            showOnrampOption={isOnRampEnabled}
-            showSwapOption={isSwapEnabled}
-            showBridgeOption={isBridgeEnabled}
-            onCloseButtonClick={() => sendWalletWidgetCloseEvent(eventTarget)}
-          />
+            <TopUpView
+              analytics={{ userJourney: UserJourney.WALLET }}
+              widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
+              checkout={checkout}
+              provider={provider}
+              showOnrampOption={isOnRampEnabled}
+              showSwapOption={isSwapEnabled}
+              showBridgeOption={isBridgeEnabled}
+              onCloseButtonClick={() => sendWalletWidgetCloseEvent(eventTarget)}
+            />
           )}
         </WalletContext.Provider>
       </CryptoFiatProvider>

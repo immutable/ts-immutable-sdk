@@ -6,7 +6,7 @@ import { CheckoutErrorType } from '../../errors';
 jest.mock('../../instance');
 jest.mock('../actions');
 
-describe.only('orderbook fees', () => {
+describe('orderbook fees', () => {
   it('should calculate the fees as a percentageDecimal', async () => {
     const decimals = 18;
     const amount = utils.parseUnits('10', 18).toString();
