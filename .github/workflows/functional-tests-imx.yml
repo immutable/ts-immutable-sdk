@@ -1,7 +1,7 @@
 name: Functional Tests (IMX)
 on:
   push:
-    branches: [ main, DX-2552/port-zkevm-tests ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 jobs:
