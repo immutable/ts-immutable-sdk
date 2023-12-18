@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 /* eslint-disable no-console */
 import {
   providers, Wallet, utils, BigNumber,
