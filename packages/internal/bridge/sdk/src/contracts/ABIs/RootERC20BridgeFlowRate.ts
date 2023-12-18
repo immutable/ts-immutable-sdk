@@ -1,5 +1,16 @@
 export const ROOT_ERC20_BRIDGE_FLOW_RATE = [
   {
+    inputs: [
+      {
+        internalType: 'address',
+        name: '_initializerAddress',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'nonpayable',
+    type: 'constructor',
+  },
+  {
     inputs: [],
     name: 'AlreadyMapped',
     type: 'error',
@@ -147,6 +158,16 @@ export const ROOT_ERC20_BRIDGE_FLOW_RATE = [
       },
     ],
     name: 'TokenIsZero',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'TokenNotSupported',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'UnauthorizedInitializer',
     type: 'error',
   },
   {
@@ -1570,6 +1591,19 @@ export const ROOT_ERC20_BRIDGE_FLOW_RATE = [
     name: 'initialize',
     outputs: [],
     stateMutability: 'pure',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'initializerAddress',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
     type: 'function',
   },
   {

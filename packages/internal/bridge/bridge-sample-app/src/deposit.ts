@@ -16,6 +16,7 @@ import {
     TxStatusResponse,
     TxStatusRequest,
     StatusResponse,
+    BridgeMethodsGasLimit,
 } from '@imtbl/bridge-sdk';
 
 // @ts-ignore
@@ -80,7 +81,7 @@ async function deposit() {
     console.log('approvalNonce', approvalNonce);
     console.log('approvalGasPrice', approvalGasPrice);
 
-    approvalRes!.unsignedTx.gasLimit = 1000000;
+    approvalRes!.unsignedTx.gasLimit = BridgeMethodsGasLimit.DEPOSIT_SOURCE;
     approvalRes!.unsignedTx.nonce = approvalNonce;
     approvalRes!.unsignedTx.gasPrice = approvalGasPrice.mul(2);
 
@@ -127,7 +128,7 @@ async function deposit() {
   const depositNonce = await params.rootWallet.getTransactionCount();
   const depositGasPrice = await params.rootProvider.getGasPrice();
 
-  depositRes!.unsignedTx.gasLimit = 1000000;
+  depositRes!.unsignedTx.gasLimit = BridgeMethodsGasLimit.DEPOSIT_SOURCE;
   depositRes!.unsignedTx.nonce = depositNonce;
   depositRes!.unsignedTx.gasPrice = depositGasPrice.mul(2);
 

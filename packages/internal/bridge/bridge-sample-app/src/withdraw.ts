@@ -16,13 +16,14 @@ import {
     TxStatusResponse,
     TxStatusRequest,
     StatusResponse,
+    BridgeMethodsGasLimit,
 } from '@imtbl/bridge-sdk';
 
 // @ts-ignore
 import { setupForBridge } from './lib/utils.ts';
 import { delay, getContract, waitForReceipt } from './lib/helpers.js';
 
-async function withdraw() {
+export async function withdraw() {
 
   const params = await setupForBridge();
 
@@ -80,7 +81,7 @@ async function withdraw() {
     console.log('approvalNonce', approvalNonce);
     console.log('approvalGasPrice', approvalGasPrice);
 
-    approvalRes!.unsignedTx.gasLimit = 1000000;
+    approvalRes!.unsignedTx.gasLimit = BridgeMethodsGasLimit.WITHDRAW_SOURCE;
     approvalRes!.unsignedTx.nonce = approvalNonce;
     approvalRes!.unsignedTx.gasPrice = approvalGasPrice.mul(2);
 
@@ -129,7 +130,7 @@ async function withdraw() {
   const withdrawNonce = await params.childWallet.getTransactionCount();
   const withdrawGasPrice = await params.childProvider.getGasPrice();
 
-  withdrawRes!.unsignedTx.gasLimit = 1000000;
+  withdrawRes!.unsignedTx.gasLimit = BridgeMethodsGasLimit.WITHDRAW_SOURCE;
   withdrawRes!.unsignedTx.nonce = withdrawNonce;
   withdrawRes!.unsignedTx.gasPrice = withdrawGasPrice.mul(2);
 
