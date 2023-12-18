@@ -1,5 +1,6 @@
 import {
-  Box, Divider,
+  Body,
+  Box, Caption,
 } from '@biom3/react';
 import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { text } from 'resources/text/textConfig';
@@ -12,7 +13,7 @@ import { ethers } from 'ethers';
 import { CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext';
 import { calculateCryptoToFiat } from 'lib/utils';
 import { TransactionItem } from './TransactionItem';
-import { containerStyles } from './transactionItemStyles';
+import { containerStyles, headingStyles } from './transactionItemStyles';
 import { KnownNetworkMap } from './transactionsType';
 
 type TransactionsInProgressProps = {
@@ -30,7 +31,7 @@ export function TransactionsInProgress({
 
   const {
     status: {
-      inProgress: { stepInfo, heading },
+      inProgress: { stepInfo, heading, txnEstimate },
     },
     fiatPricePrefix,
   } = text.views[BridgeWidgetViews.TRANSACTIONS];
@@ -44,7 +45,12 @@ export function TransactionsInProgress({
 
   return (
     <>
-      <Divider size="xSmall">{heading}</Divider>
+      <Box sx={headingStyles}>
+        <Caption sx={{ color: 'base.color.translucent.standard.900', fontSize: '12px' }}>
+          {heading.toUpperCase()}
+        </Caption>
+        <Body size="xSmall" sx={{ color: 'base.color.text.secondary' }}>{txnEstimate}</Body>
+      </Box>
       <Box sx={containerStyles}>
         {transactions.map((t) => {
           const tokens = knownTokenMap[t.details.from_chain];
