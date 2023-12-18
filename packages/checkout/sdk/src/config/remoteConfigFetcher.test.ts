@@ -7,12 +7,14 @@ import {
   CHECKOUT_CDN_BASE_URL,
   ENV_DEVELOPMENT,
 } from '../env';
+import { HttpClient } from '../api/http';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('RemoteConfig', () => {
   const version = 'v1';
+  const mockedHttpClient = new HttpClient();
 
   afterEach(() => {
     jest.clearAllMocks();
@@ -34,7 +36,7 @@ describe('RemoteConfig', () => {
         };
         mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
-        const fetcher = new RemoteConfigFetcher({
+        const fetcher = new RemoteConfigFetcher(mockedHttpClient, {
           isDevelopment: env === ENV_DEVELOPMENT,
           isProduction: env !== ENV_DEVELOPMENT && env === Environment.PRODUCTION,
         });
@@ -77,7 +79,7 @@ describe('RemoteConfig', () => {
         };
         mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
-        const fetcher = new RemoteConfigFetcher({
+        const fetcher = new RemoteConfigFetcher(mockedHttpClient, {
           isDevelopment: env === ENV_DEVELOPMENT,
           isProduction: env !== ENV_DEVELOPMENT && env === Environment.PRODUCTION,
         });
@@ -91,7 +93,7 @@ describe('RemoteConfig', () => {
         };
         mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
-        const fetcher = new RemoteConfigFetcher({
+        const fetcher = new RemoteConfigFetcher(mockedHttpClient, {
           isDevelopment: env === ENV_DEVELOPMENT,
           isProduction: env !== ENV_DEVELOPMENT && env === Environment.PRODUCTION,
         });
@@ -106,7 +108,7 @@ describe('RemoteConfig', () => {
         };
         mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
-        const fetcher = new RemoteConfigFetcher({
+        const fetcher = new RemoteConfigFetcher(mockedHttpClient, {
           isDevelopment: env === ENV_DEVELOPMENT,
           isProduction: env !== ENV_DEVELOPMENT && env === Environment.PRODUCTION,
         });
@@ -119,7 +121,7 @@ describe('RemoteConfig', () => {
           message: 'error message',
         });
 
-        const fetcher = new RemoteConfigFetcher({
+        const fetcher = new RemoteConfigFetcher(mockedHttpClient, {
           isDevelopment: env === ENV_DEVELOPMENT,
           isProduction: env !== ENV_DEVELOPMENT && env === Environment.PRODUCTION,
         });
@@ -162,7 +164,7 @@ describe('RemoteConfig', () => {
         };
         mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
-        const fetcher = new RemoteConfigFetcher({
+        const fetcher = new RemoteConfigFetcher(mockedHttpClient, {
           isDevelopment: env === ENV_DEVELOPMENT,
           isProduction: env !== ENV_DEVELOPMENT && env === Environment.PRODUCTION,
         });
@@ -182,7 +184,7 @@ describe('RemoteConfig', () => {
         };
         mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
-        const fetcher = new RemoteConfigFetcher({
+        const fetcher = new RemoteConfigFetcher(mockedHttpClient, {
           isDevelopment: env === ENV_DEVELOPMENT,
           isProduction: env !== ENV_DEVELOPMENT && env === Environment.PRODUCTION,
         });
@@ -197,7 +199,7 @@ describe('RemoteConfig', () => {
         };
         mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
-        const fetcher = new RemoteConfigFetcher({
+        const fetcher = new RemoteConfigFetcher(mockedHttpClient, {
           isDevelopment: env === ENV_DEVELOPMENT,
           isProduction: env !== ENV_DEVELOPMENT && env === Environment.PRODUCTION,
         });
@@ -217,7 +219,7 @@ describe('RemoteConfig', () => {
           message: 'error message',
         });
 
-        const fetcher = new RemoteConfigFetcher({
+        const fetcher = new RemoteConfigFetcher(new HttpClient(), {
           isDevelopment: env === ENV_DEVELOPMENT,
           isProduction: env !== ENV_DEVELOPMENT && env === Environment.PRODUCTION,
         });

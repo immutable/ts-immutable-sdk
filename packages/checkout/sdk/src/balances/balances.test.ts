@@ -25,9 +25,11 @@ import {
   BlockscoutToken,
   BlockscoutTokens,
   BlockscoutTokenType,
-} from '../client';
+} from '../api/blockscout';
 import { ERC20ABI, NATIVE } from '../env';
+import { HttpClient } from '../api/http';
 
+jest.mock('../api/http');
 jest.mock('../tokens');
 jest.mock('../client');
 jest.mock('ethers', () => ({
@@ -37,7 +39,13 @@ jest.mock('ethers', () => ({
 }));
 
 describe('balances', () => {
-  const testCheckoutConfig = new CheckoutConfiguration({ baseConfig: { environment: Environment.PRODUCTION } });
+  const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
+  const testCheckoutConfig = new CheckoutConfiguration(
+    {
+      baseConfig: { environment: Environment.PRODUCTION },
+    },
+    mockedHttpClient,
+  );
   const currentBalance = BigNumber.from('1000000000000000000');
   const formattedBalance = '1.0';
   const mockGetBalance = jest.fn().mockResolvedValue(currentBalance);
@@ -516,7 +524,12 @@ describe('balances', () => {
               blockscout: true,
             }),
           },
-          networkMap: new CheckoutConfiguration({ baseConfig: { environment: Environment.SANDBOX } }).networkMap,
+          networkMap: new CheckoutConfiguration(
+            {
+              baseConfig: { environment: Environment.SANDBOX },
+            },
+            mockedHttpClient,
+          ).networkMap,
         } as unknown as CheckoutConfiguration,
         jest.fn() as unknown as Web3Provider,
         'abc123',

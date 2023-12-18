@@ -18,7 +18,7 @@ import {
   BlockscoutToken,
   BlockscoutTokens,
   BlockscoutTokenType,
-} from '../client';
+} from '../api/blockscout';
 import {
   DEFAULT_TOKEN_DECIMALS, ERC20ABI, NATIVE,
 } from '../env';
@@ -96,6 +96,7 @@ const blockscoutClientMap: Map<ChainId, Blockscout> = new Map();
 export const resetBlockscoutClientMap = () => blockscoutClientMap.clear();
 
 export const getIndexerBalance = async (
+  config: CheckoutConfiguration,
   walletAddress: string,
   chainId: ChainId,
   filterTokens: TokenInfo[] | undefined,
@@ -111,7 +112,8 @@ export const getIndexerBalance = async (
   // Get blockscout client for the given chain
   let blockscoutClient = blockscoutClientMap.get(chainId);
   if (!blockscoutClient) {
-    blockscoutClient = new Blockscout({ chainId });
+    const httpClient = config.remote.getHttpClient();
+    blockscoutClient = new Blockscout(httpClient, chainId);
     blockscoutClientMap.set(chainId, blockscoutClient);
   }
 
@@ -296,7 +298,7 @@ export const getAllBalances = async (
     return await measureAsyncExecution<GetAllBalancesResult>(
       config,
       `Time to fetch balances using blockscout for ${chainId}`,
-      getIndexerBalance(address!, chainId, isL1Chain ? tokens : undefined),
+      getIndexerBalance(config, address!, chainId, isL1Chain ? tokens : undefined),
     );
   }
 

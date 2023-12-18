@@ -83,7 +83,7 @@ describe('network functions', () => {
 
     testCheckoutConfiguration = new CheckoutConfiguration({
       baseConfig: { environment: Environment.SANDBOX },
-    });
+    }, new HttpClient());
   });
 
   describe('switchWalletNetwork()', () => {

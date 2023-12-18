@@ -1,9 +1,8 @@
 import axios, {
   AxiosError,
-  AxiosResponse,
   HttpStatusCode,
 } from 'axios';
-import { ChainId } from '../types';
+import { ChainId } from '../../types';
 import {
   BlockscoutNativeTokenData,
   BlockscoutToken,
@@ -11,7 +10,8 @@ import {
   BlockscoutTokens,
   BlockscoutTokenType,
 } from './blockscoutType';
-import { BLOCKSCOUT_CHAIN_URL_MAP } from '../env';
+import { BLOCKSCOUT_CHAIN_URL_MAP } from '../../env';
+import { HttpClient } from '../http';
 
 type CacheData = {
   data: any,
@@ -34,9 +34,7 @@ export class Blockscout {
 
   private cacheMap: { [key: string]: CacheData };
 
-  private static async makeHttpRequest(url: string): Promise<AxiosResponse> {
-    return axios.get(url);
-  }
+  private httpClient: HttpClient;
 
   private setCache(key: string, data: any) {
     this.cacheMap[key] = { data, ttl: new Date().getTime() + this.ttl * 1000 };
@@ -50,14 +48,17 @@ export class Blockscout {
 
   /**
    * Blockscout constructor
+   * @param httpClient Client used for http requests
    * @param chainId target chain
    * @param ttl cache TTL
    */
-  constructor(params: {
-    chainId: ChainId;
-    ttl?: number
-  }) {
-    this.chainId = params.chainId;
+  constructor(
+    httpClient: HttpClient,
+    chainId: ChainId,
+    ttl?: number,
+  ) {
+    this.httpClient = httpClient;
+    this.chainId = chainId;
     this.url = BLOCKSCOUT_CHAIN_URL_MAP[this.chainId].url;
 
     const native = BLOCKSCOUT_CHAIN_URL_MAP[this.chainId].nativeToken;
@@ -69,7 +70,7 @@ export class Blockscout {
     };
 
     this.cacheMap = {};
-    this.ttl = params.ttl !== undefined ? params.ttl : CACHE_DATA_TTL;
+    this.ttl = ttl !== undefined ? ttl : CACHE_DATA_TTL;
   }
 
   /**
@@ -104,7 +105,7 @@ export class Blockscout {
       const cached = this.getCache(url);
       if (cached) return Promise.resolve(cached);
 
-      const response = await Blockscout.makeHttpRequest(url);
+      const response = await this.httpClient.get(url);
       if (response.status >= 400) {
         return Promise.reject({
           code: response.status,
@@ -150,7 +151,7 @@ export class Blockscout {
       const cached = this.getCache(url);
       if (cached) return Promise.resolve(cached);
 
-      const response = await Blockscout.makeHttpRequest(url);
+      const response = await this.httpClient.get(url);
       if (response.status >= 400) {
         return Promise.reject({
           code: response.status,

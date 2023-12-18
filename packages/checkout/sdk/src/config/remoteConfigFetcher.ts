@@ -1,4 +1,3 @@
-import axios, { AxiosResponse } from 'axios';
 import { Environment } from '@imtbl/config';
 import {
   ChainId,
@@ -6,8 +5,8 @@ import {
   RemoteConfiguration,
   ChainTokensConfig,
 } from '../types';
-import { CheckoutError, CheckoutErrorType } from '../errors';
 import { CHECKOUT_CDN_BASE_URL, ENV_DEVELOPMENT } from '../env';
+import { HttpClient } from '../api/http';
 
 export type RemoteConfigParams = {
   isDevelopment: boolean;
@@ -15,6 +14,8 @@ export type RemoteConfigParams = {
 };
 
 export class RemoteConfigFetcher {
+  private httpClient: HttpClient;
+
   private isDevelopment: boolean;
 
   private isProduction: boolean;
@@ -25,28 +26,10 @@ export class RemoteConfigFetcher {
 
   private version: string = 'v1';
 
-  constructor(params: RemoteConfigParams) {
+  constructor(httpClient: HttpClient, params: RemoteConfigParams) {
     this.isDevelopment = params.isDevelopment;
     this.isProduction = params.isProduction;
-  }
-
-  private static async makeHttpRequest(url: string): Promise<AxiosResponse> {
-    let response;
-
-    try {
-      response = await axios.get(url);
-    } catch (error: any) {
-      throw new CheckoutError(`Error fetching from api: ${error.message}`, CheckoutErrorType.API_ERROR);
-    }
-
-    if (response.status !== 200) {
-      throw new CheckoutError(
-        `Error fetching from api: ${response.status} ${response.statusText}`,
-        CheckoutErrorType.API_ERROR,
-      );
-    }
-
-    return response;
+    this.httpClient = httpClient;
   }
 
   private getEndpoint = () => {
@@ -58,7 +41,7 @@ export class RemoteConfigFetcher {
   private async loadConfig(): Promise<RemoteConfiguration | undefined> {
     if (this.configCache) return this.configCache;
 
-    const response = await RemoteConfigFetcher.makeHttpRequest(
+    const response = await this.httpClient.get(
       `${this.getEndpoint()}/${this.version}/config`,
     );
     this.configCache = response.data;
@@ -69,7 +52,7 @@ export class RemoteConfigFetcher {
   private async loadConfigTokens(): Promise<ChainsTokensConfig | undefined> {
     if (this.tokensCache) return this.tokensCache;
 
-    const response = await RemoteConfigFetcher.makeHttpRequest(
+    const response = await this.httpClient.get(
       `${this.getEndpoint()}/${this.version}/config/tokens`,
     );
     this.tokensCache = response.data;
@@ -95,4 +78,6 @@ export class RemoteConfigFetcher {
     if (!config || !config[chainId]) return {};
     return config[chainId] ?? [];
   }
+
+  public getHttpClient = () => this.httpClient;
 }
