@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "image": "https://assets.hv-mtl.com/evo1/1_legendary_evo1.png",
+  "attributes": [
+    {
+      "value": "Legendary",
+      "trait_type": "HV Type"
+    },
+    {
+      "value": "EVO-1",
+      "trait_type": "HV Version"
+    },
+    {
+      "value": "Yes",
+      "trait_type": "Companion"
+    },
+    {
+      "value": "1 of 1",
+      "trait_type": "Legendary"
+    },
+    {
+      "value": 487,
+      "trait_type": "Base Power Score"
+    },
+    {
+      "display_type": "boost_percentage",
+      "value": 14,
+      "trait_type": "Shard Leaderboard Modifier"
+    },
+    {
+      "display_type": "boost_percentage",
+      "value": 5,
+      "trait_type": "Maximum Energy Cap Modifier"
+    },
+    {
+      "value": 580,
+      "trait_type": "Effective Power Score"
+    }
+  ],
+  "description": "HV-MTL is a dynamic NFT collection consisting of mechs summoned through a space-time rift that has opened up outside the Bored Ape Yacht Club. Every HV (pronounced: Heavy) starts as a Core. Once unlocked, each Core transforms into a one-of-a-kind mech designed to evolve in the right environment.",
+  "id": 1,
+  "nftLicenseTerms": "https://mdvmm.xyz/hvmtl-license"
+}

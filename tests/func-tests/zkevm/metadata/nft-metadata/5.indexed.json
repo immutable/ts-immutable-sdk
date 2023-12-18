@@ -1,0 +1,55 @@
+{
+  "animation_url": null,
+  "attributes": [
+    {
+      "trait_type": "Back Attachment",
+      "value": "Rorschach Wings"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Arachnid Claws"
+    },
+    {
+      "trait_type": "Companion",
+      "value": "Yes"
+    },
+    {
+      "trait_type": "Crest",
+      "value": "Ice Flame"
+    },
+    {
+      "trait_type": "Faceplate",
+      "value": "Moon Frames"
+    },
+    {
+      "trait_type": "HV Type",
+      "value": "Holo"
+    },
+    {
+      "trait_type": "HV Version",
+      "value": "EVO-1"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Full Glow Helm"
+    },
+    {
+      "trait_type": "Weapon System",
+      "value": "Kaleido Scorpion"
+    }
+  ],
+  "chain": {
+    "id": "eip155:13433",
+    "name": "imtbl-zkevm-devnet"
+  },
+  "contract_address": "0x64fb5ec859ffa42055728f8cb39a206721bd7c94",
+  "description": "HV-MTL is a dynamic NFT collection consisting of mechs summoned through a space-time rift that has opened up outside the Bored Ape Yacht Club. Every HV (pronounced: Heavy) starts as a Core. Once unlocked, each Core transforms into a one-of-a-kind mech designed to evolve in the right environment.",
+  "external_link": null,
+  "image": "https://assets.hv-mtl.com/evo1/5_holo_rorschach-wings_arachnid-claws_ice-flame_moon-frames_full-glow-helm_kaleido-scorpion.png",
+  "indexed_at": "2023-08-18T07:23:15.28994Z",
+  "metadata_synced_at": "2023-08-18T07:23:18.37971Z",
+  "mint_activity_id": "018a0786-e3c1-0a9f-0539-7920a745cefd",
+  "name": null,
+  "token_id": "5",
+  "youtube_url": null
+}

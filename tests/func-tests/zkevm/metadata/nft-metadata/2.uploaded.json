@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "image": "https://assets.hv-mtl.com/evo1/2_holo_galaxy-rings_aurora-tile_hv-holo-snapback_cross-eyed_cube-glow-helmet_prismic-axe.png",
+  "attributes": [
+    {
+      "value": "Galaxy Rings",
+      "trait_type": "Back Attachment"
+    },
+    {
+      "value": "Holo",
+      "trait_type": "HV Type"
+    },
+    {
+      "value": "Aurora Tile",
+      "trait_type": "Body"
+    },
+    {
+      "value": "HV Holo Snapback",
+      "trait_type": "Crest"
+    },
+    {
+      "value": "Cross Eyed",
+      "trait_type": "Faceplate"
+    },
+    {
+      "value": "Cube Glow Helmet",
+      "trait_type": "Head"
+    },
+    {
+      "value": "Prismic Axe",
+      "trait_type": "Weapon System"
+    },
+    {
+      "value": "EVO-1",
+      "trait_type": "HV Version"
+    },
+    {
+      "value": "Yes",
+      "trait_type": "Companion"
+    },
+    {
+      "value": 433,
+      "trait_type": "Base Power Score"
+    },
+    {
+      "display_type": "boost_percentage",
+      "value": 0,
+      "trait_type": "Shard Leaderboard Modifier"
+    },
+    {
+      "display_type": "boost_percentage",
+      "value": 0,
+      "trait_type": "Maximum Energy Cap Modifier"
+    },
+    {
+      "value": 433,
+      "trait_type": "Effective Power Score"
+    }
+  ],
+  "description": "HV-MTL is a dynamic NFT collection consisting of mechs summoned through a space-time rift that has opened up outside the Bored Ape Yacht Club. Every HV (pronounced: Heavy) starts as a Core. Once unlocked, each Core transforms into a one-of-a-kind mech designed to evolve in the right environment.",
+  "id": 2,
+  "nftLicenseTerms": "https://mdvmm.xyz/hvmtl-license"
+}

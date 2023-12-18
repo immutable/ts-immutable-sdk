@@ -1,0 +1,55 @@
+{
+  "animation_url": null,
+  "attributes": [
+    {
+      "trait_type": "Back Attachment",
+      "value": "X Ray Gears"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Chained Glow"
+    },
+    {
+      "trait_type": "Companion",
+      "value": "Yes"
+    },
+    {
+      "trait_type": "Crest",
+      "value": "Heart Float"
+    },
+    {
+      "trait_type": "Faceplate",
+      "value": "Barbed Cyclops"
+    },
+    {
+      "trait_type": "HV Type",
+      "value": "Holo"
+    },
+    {
+      "trait_type": "HV Version",
+      "value": "EVO-1"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Beamed Bloom"
+    },
+    {
+      "trait_type": "Weapon System",
+      "value": "Prismic Axe"
+    }
+  ],
+  "chain": {
+    "id": "eip155:13433",
+    "name": "imtbl-zkevm-devnet"
+  },
+  "contract_address": "0x64fb5ec859ffa42055728f8cb39a206721bd7c94",
+  "description": "HV-MTL is a dynamic NFT collection consisting of mechs summoned through a space-time rift that has opened up outside the Bored Ape Yacht Club. Every HV (pronounced: Heavy) starts as a Core. Once unlocked, each Core transforms into a one-of-a-kind mech designed to evolve in the right environment.",
+  "external_link": null,
+  "image": "https://assets.hv-mtl.com/evo1/6_holo_x-ray-gears_chained-glow_heart-float_barbed-cyclops_beamed-bloom_prismic-axe.png",
+  "indexed_at": "2023-08-18T07:23:15.288051Z",
+  "metadata_synced_at": "2023-08-18T07:23:18.083003Z",
+  "mint_activity_id": "018a0786-e3c0-269c-6624-1eb18675871a",
+  "name": null,
+  "token_id": "6",
+  "youtube_url": null
+}

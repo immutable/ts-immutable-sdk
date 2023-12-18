@@ -1,0 +1,56 @@
+{
+  "animation_url": null,
+  "attributes": [
+    {
+      "value": "Holo Fanned Wing",
+      "trait_type": "Back Attachment"
+    },
+    {
+      "value": "Holo",
+      "trait_type": "HV Type"
+    },
+    {
+      "value": "Hologram Can",
+      "trait_type": "Body"
+    },
+    {
+      "value": "Holo Tentacle",
+      "trait_type": "Crest"
+    },
+    {
+      "value": "Static Smile",
+      "trait_type": "Faceplate"
+    },
+    {
+      "value": "Cube Glow Helmet",
+      "trait_type": "Head"
+    },
+    {
+      "value": "Sky Globes",
+      "trait_type": "Weapon System"
+    },
+    {
+      "value": "EVO-1",
+      "trait_type": "HV Version"
+    },
+    {
+      "value": "Yes",
+      "trait_type": "Companion"
+    }
+  ],
+  "chain": {
+    "id": "eip155:13433",
+    "name": "imtbl-zkevm-devnet"
+  },
+  "contract_address": "0x64fb5ec859ffa42055728f8cb39a206721bd7c94",
+  "description": "HV-MTL is a dynamic NFT collection consisting of mechs summoned through a space-time rift that has opened up outside the Bored Ape Yacht Club. Every HV (pronounced: Heavy) starts as a Core. Once unlocked, each Core transforms into a one-of-a-kind mech designed to evolve in the right environment.",
+  "external_link": null,
+  "image": "https://assets.hv-mtl.com/evo1/7_holo_holo-fanned-wing_hologram-can_holo-tentacle_static-smile_cube-glow-helmet_sky-globes.png",
+  "indexed_at": "2023-08-18T07:23:15.288051Z",
+  "metadata_synced_at": "2023-08-18T07:23:18.083003Z",
+  "mint_activity_id": "018a0786-e3c0-269c-6624-1eb18675871a",
+  "name": null,
+  "token_id": "7",
+  "youtube_url": null
+}
+

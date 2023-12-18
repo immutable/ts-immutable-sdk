@@ -1,0 +1,55 @@
+{
+  "animation_url": null,
+  "attributes": [
+    {
+      "value": "X Ray Gears",
+      "trait_type": "Back Attachment"
+    },
+    {
+      "value": "Holo",
+      "trait_type": "HV Type"
+    },
+    {
+      "value": "Holo Shards",
+      "trait_type": "Body"
+    },
+    {
+      "value": "Triangle of Madness",
+      "trait_type": "Crest"
+    },
+    {
+      "value": "Geared Goggles",
+      "trait_type": "Faceplate"
+    },
+    {
+      "value": "Daggered Glow Helm",
+      "trait_type": "Head"
+    },
+    {
+      "value": "Holo Tape",
+      "trait_type": "Weapon System"
+    },
+    {
+      "value": "EVO-1",
+      "trait_type": "HV Version"
+    },
+    {
+      "value": "Yes",
+      "trait_type": "Companion"
+    }
+  ],
+  "chain": {
+    "id": "eip155:13433",
+    "name": "imtbl-zkevm-devnet"
+  },
+  "contract_address": "0x64fb5ec859ffa42055728f8cb39a206721bd7c94",
+  "description": "HV-MTL is a dynamic NFT collection consisting of mechs summoned through a space-time rift that has opened up outside the Bored Ape Yacht Club. Every HV (pronounced: Heavy) starts as a Core. Once unlocked, each Core transforms into a one-of-a-kind mech designed to evolve in the right environment.",
+  "external_link": null,
+  "image": "https://assets.hv-mtl.com/evo1/8_holo_x-ray-gears_holo-shards_triangle-of-madness_geared-goggles_daggered-glow-helm_holo-tape.png",
+  "indexed_at": "2023-08-18T07:23:15.288051Z",
+  "metadata_synced_at": "2023-08-18T07:23:18.083003Z",
+  "mint_activity_id": "018a82db-f48c-1712-83f9-15f0a5b02bc9",
+  "name": null,
+  "token_id": "8",
+  "youtube_url": null
+}
