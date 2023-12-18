@@ -53,7 +53,7 @@ const zkevmNetworkInfo = {
   },
 };
 
-jest.mock('./api/http', () => ({
+jest.mock('../api/http', () => ({
   // eslint-disable-next-line @typescript-eslint/naming-convention
   HttpClient: jest.fn().mockImplementation(() => ({
     get: jest.fn(),

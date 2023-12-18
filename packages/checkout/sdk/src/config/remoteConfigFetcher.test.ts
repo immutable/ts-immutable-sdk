@@ -14,10 +14,14 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('RemoteConfig', () => {
   const version = 'v1';
-  const mockedHttpClient = new HttpClient();
+  let mockedHttpClient: jest.Mocked<HttpClient>;
 
   afterEach(() => {
     jest.clearAllMocks();
+  });
+
+  beforeEach(() => {
+    mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
   });
 
   [Environment.PRODUCTION, Environment.SANDBOX, ENV_DEVELOPMENT].forEach((env) => {
