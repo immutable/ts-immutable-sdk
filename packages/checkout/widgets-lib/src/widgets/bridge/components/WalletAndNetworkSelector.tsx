@@ -14,7 +14,9 @@ import {
   ChainId,
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
-import { createAndConnectToProvider, isPassportProvider } from 'lib/providerUtils';
+import {
+  createAndConnectToProvider, isMetaMaskProvider, isPassportProvider,
+} from 'lib/providerUtils';
 import { getL1ChainId, getL2ChainId } from 'lib';
 import { getChainNameById } from 'lib/chains';
 import { ViewActions, ViewContext } from 'context/view-context/ViewContext';
@@ -346,13 +348,23 @@ export function WalletAndNetworkSelector() {
       track({
         userJourney: UserJourney.BRIDGE,
         screen: 'WalletAndNetwork',
-        control: 'Submit',
+        control: 'Next',
         controlType: 'Button',
         extras: {
           fromWalletAddress,
           fromNetwork,
+          fromWallet: {
+            address: fromWalletAddress,
+            isPassportWallet: isPassportProvider(fromWalletWeb3Provider),
+            isMetaMask: isMetaMaskProvider(fromWalletWeb3Provider),
+          },
           toWalletAddress,
           toNetwork,
+          toWallet: {
+            address: toWalletAddress,
+            isPassportWallet: isPassportProvider(toWalletWeb3Provider),
+            isMetaMask: isMetaMaskProvider(toWalletWeb3Provider),
+          },
         },
       });
 
@@ -431,7 +443,7 @@ export function WalletAndNetworkSelector() {
         </Box>
       )}
 
-      {/** From Network Selector, we programatically open this so there is no target */}
+      {/** From Network Selector, we programmatically open this so there is no target */}
       <Drawer
         headerBarTitle={fromFormInput.networkSelectorHeading}
         size="full"

@@ -17,7 +17,7 @@ import {
 } from '@imtbl/checkout-sdk';
 import { abbreviateAddress } from 'lib/addressUtils';
 import { CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext';
-import { isPassportProvider } from 'lib/providerUtils';
+import { isMetaMaskProvider, isPassportProvider } from 'lib/providerUtils';
 import { calculateCryptoToFiat, tokenValueFormat } from 'lib/utils';
 import { Web3Provider } from '@ethersproject/providers';
 import { DEFAULT_QUOTE_REFRESH_INTERVAL, DEFAULT_TOKEN_DECIMALS } from 'lib';
@@ -182,10 +182,20 @@ export function BridgeReviewSummary() {
       control: 'Submit',
       controlType: 'Button',
       extras: {
-        fromAddress,
+        fromWalletAddress: fromAddress,
         fromNetwork,
-        toAddress,
+        fromWallet: {
+          address: fromAddress,
+          isPassportWallet: isPassportProvider(from?.web3Provider),
+          isMetaMask: isMetaMaskProvider(from?.web3Provider),
+        },
+        toWalletAddress: toAddress,
         toNetwork,
+        toWallet: {
+          address: toAddress,
+          isPassportWallet: isPassportProvider(to?.web3Provider),
+          isMetaMask: isMetaMaskProvider(to?.web3Provider),
+        },
         amount,
         tokenAddress: token?.address,
       },
