@@ -11,9 +11,9 @@ export function getEnv(name: string, defaultValue?: string): string {
 
 export const env = {
   mnemonic: getEnv('TEST_ZKEVM_WALLET_MNEMONIC'),
-  bankerPrivateKey: getEnv('BANKER_PRIVATE_KEY'),
+  bankerPrivateKey: getEnv('TEST_ZKEVM_WALLET_BANKER_PRIVATE_KEY'),
   apiRateLimitBypassKey: getEnv('TEST_ZKEVM_API_RATE_LIMIT_BYPASS_KEY'),
-  privateKey: getEnv('BANKER_PRIVATE_KEY'),
+  privateKey: getEnv('TEST_ZKEVM_WALLET_BANKER_PRIVATE_KEY'),
   chainName: getEnv('CHAIN_NAME'),
   apiUrl: getEnv('API_URL'),
   rpcUrl: getEnv('RPC_URL'),

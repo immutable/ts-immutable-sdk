@@ -10,6 +10,7 @@ export class Chains {
   public async listChains() {
     await repeatCheck(60)(async () => {
       const chains = await this.sharedState.blockchainData.listChains({});
+      // eslint-disable-next-line no-console
       console.log(JSON.stringify(chains.result, null, 2));
       assert.ok(chains.result);
     });

@@ -1,7 +1,7 @@
+/* eslint-disable no-console */
 import {
   providers, Wallet, utils, BigNumber,
 } from 'ethers';
-import { NonceManager } from '@ethersproject/experimental';
 
 import { assert } from 'chai';
 import { env } from '../config/env';
