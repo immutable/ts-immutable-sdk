@@ -11,7 +11,7 @@ import {
 } from '../types';
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 import { getNetworkInfo } from '../network';
-import { getTokenAllowList } from '../tokens';
+import { getERC20TokenInfo, getTokenAllowList } from '../tokens';
 import { CheckoutConfiguration, getL1ChainId } from '../config';
 import {
   Blockscout,
@@ -67,20 +67,18 @@ export async function getERC20Balance(
       );
 
       return Promise.all([
-        contract.name(),
-        contract.symbol(),
+        getERC20TokenInfo(web3Provider, tokenAddress),
         contract.balanceOf(walletAddress),
-        contract.decimals(),
       ])
-        .then(([name, symbol, balance, decimals]) => {
-          const formattedBalance = utils.formatUnits(balance, decimals);
+        .then(([tokenInfo, balance]) => {
+          const formattedBalance = utils.formatUnits(balance, tokenInfo.decimals);
           return {
             balance,
             formattedBalance,
             token: {
-              name,
-              symbol,
-              decimals,
+              name: tokenInfo.name,
+              symbol: tokenInfo.symbol,
+              decimals: tokenInfo.decimals,
               address: tokenAddress,
             },
           } as GetBalanceResult;
@@ -216,6 +214,9 @@ export const getBalances = async (
   const allBalancePromises: Promise<GetBalanceResult>[] = [];
   tokens
     .forEach((token: TokenInfo) => {
+      // For some reason isNativeToken always returns undefined.
+      // We have spent way too much time figuring out why this is happening.
+      // That we have given up -- keep it as it is for now.
       if (!token.address || token.address.toLocaleLowerCase() === NATIVE) {
         allBalancePromises.push(
           getBalance(config, web3Provider, walletAddress),
@@ -231,7 +232,15 @@ export const getBalances = async (
   const balances = (balanceResults.filter(
     (result) => result.status === 'fulfilled',
   ) as PromiseFulfilledResult<GetBalanceResult>[]
-  ).map((result) => result.value);
+  ).map((result) => {
+    const resp = result;
+    const { token } = resp.value;
+    // For some reason isNativeToken always returns undefined.
+    // We have spent way too much time figuring out why this is happening.
+    // That we have given up -- keep it as it is for now.
+    if (!token.address || token.address.toLocaleLowerCase() === NATIVE) resp.value.token.address = NATIVE;
+    return resp.value;
+  });
 
   return { balances };
 };
