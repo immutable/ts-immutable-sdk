@@ -44,14 +44,18 @@ async function deposit() {
   let rootBridgeChildAddress = await rootBridge.rootTokenToChildToken(params.sepoliaToken);
   let childBridgeChildAddress = await childBridge.rootTokenToChildToken(params.sepoliaToken);
 
-  if (rootBridgeChildAddress === ethers.constants.AddressZero
-    || childBridgeChildAddress === ethers.constants.AddressZero) {
+  if (rootBridgeChildAddress === ethers.constants.AddressZero) {
     console.log('token not mapped, please map token before depositing');
     return;
   }
 
   if (childBridgeChildAddress === ethers.constants.AddressZero) {
-    console.log('token mappinng incomplete, please wait for token to map to childBridge before depositing');
+    console.log('token mapping incomplete, please wait for token to map to childBridge before depositing');
+    return;
+  }
+
+  if (rootBridgeChildAddress !== childBridgeChildAddress) {
+    console.log(`token mappings mismatch on rootBridge (${rootBridgeChildAddress}) & childBridge (${childBridgeChildAddress}).`, );
     return;
   }
 
@@ -164,8 +168,9 @@ async function deposit() {
     console.log(util.inspect(txStatusRes, {showHidden: false, depth: null, colors: true}));
     if (txStatusRes.transactions[0].status === StatusResponse.COMPLETE) {
       complete = true;
+    } else {
+      await delay(10000);
     }
-    await delay(10000);
   }
   
 }

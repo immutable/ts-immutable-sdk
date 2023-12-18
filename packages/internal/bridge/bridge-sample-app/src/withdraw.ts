@@ -44,14 +44,18 @@ export async function withdraw() {
   let rootBridgeChildAddress = await rootBridge.rootTokenToChildToken(params.sepoliaToken);
   let childBridgeChildAddress = await childBridge.rootTokenToChildToken(params.sepoliaToken);
 
-  if (rootBridgeChildAddress === ethers.constants.AddressZero
-    || childBridgeChildAddress === ethers.constants.AddressZero) {
+  if (rootBridgeChildAddress === ethers.constants.AddressZero) {
     console.log('token not mapped, please map token before withdrawing');
     return;
   }
 
   if (childBridgeChildAddress === ethers.constants.AddressZero) {
     console.log('token mappinng incomplete, please wait for token to map to childBridge before withdrawing');
+    return;
+  }
+
+  if (rootBridgeChildAddress !== childBridgeChildAddress) {
+    console.log(`token mappings mismatch on rootBridge (${rootBridgeChildAddress}) & childBridge (${childBridgeChildAddress}).`, );
     return;
   }
 
@@ -167,12 +171,13 @@ export async function withdraw() {
     const txStatusRes: TxStatusResponse = await tokenBridge.getTransactionStatus(txStatusReq);
     console.log(`TxStatusResponse attempt: ${attempts}`);
     console.log(util.inspect(txStatusRes, {showHidden: false, depth: null, colors: true}));
-    if (txStatusRes.transactions[0].status === StatusResponse.COMPLETE) {
+    if (txStatusRes.transactions[0].status === StatusResponse.COMPLETE
+      || txStatusRes.transactions[0].status === StatusResponse.FLOW_RATE_CONTROLLED) {
       complete = true;
+    } else {
+      await delay(10000);
     }
-    await delay(10000);
-  }
-  
+  }  
 }
 
 (async () => {

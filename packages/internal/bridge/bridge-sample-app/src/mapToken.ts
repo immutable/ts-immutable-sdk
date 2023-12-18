@@ -65,7 +65,9 @@ async function mapToken() {
     attempts++;
     childTokenAddress = await childBridge.rootTokenToChildToken(rootCustomTokenAddress);
       console.log(`waiting for mapping to complete on childBridge attempt: ${attempts}`);
-      await delay(10000);
+      if (childTokenAddress == ethers.constants.AddressZero) {
+        await delay(10000);
+      }
   }
   childCustomToken = getContract("ChildERC20", childTokenAddress, params.childProvider);
 
