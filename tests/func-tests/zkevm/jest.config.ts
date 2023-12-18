@@ -14,6 +14,7 @@ const config: Config = {
     "@imtbl/sdk/provider": "<rootDir>/../../../node_modules/@imtbl/sdk/dist/provider",
     "@imtbl/sdk/config": "<rootDir>/../../../node_modules/@imtbl/sdk/dist/config",
     "@imtbl/sdk/immutablex_client": "<rootDir>/../../../node_modules/@imtbl/sdk/dist/immutablex_client",
+    "@imtbl/sdk/blockchain_data": "<rootDir>/../../../node_modules/@imtbl/sdk/dist/blockchain_data",
   },
   transform: {
     "^.+\\.(t|j)sx?$": "@swc/jest"
