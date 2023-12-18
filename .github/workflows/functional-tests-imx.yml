@@ -1,4 +1,4 @@
-name: Functional Tests
+name: Functional Tests (IMX)
 on:
   push:
     branches: [ main, DX-2552/port-zkevm-tests ]
