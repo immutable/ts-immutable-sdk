@@ -25,6 +25,7 @@ import { useInterval } from 'lib/hooks/useInterval';
 import { FeesBreakdown } from 'components/FeesBreakdown/FeesBreakdown';
 import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
 import { utils } from 'ethers';
+import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { networkIconStyles } from './WalletNetworkButtonStyles';
 import {
   arrowIconStyles,
@@ -71,6 +72,8 @@ export function BridgeReviewSummary() {
       amount,
     },
   } = useContext(BridgeContext);
+
+  const { track } = useAnalytics();
 
   const { cryptoFiatState } = useContext(CryptoFiatContext);
   const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
@@ -172,6 +175,22 @@ export function BridgeReviewSummary() {
 
   const submitBridge = useCallback(async () => {
     if (!approveTransaction || !transaction) return;
+
+    track({
+      userJourney: UserJourney.BRIDGE,
+      screen: 'Summary',
+      control: 'Submit',
+      controlType: 'Button',
+      extras: {
+        fromAddress,
+        fromNetwork,
+        toAddress,
+        toNetwork,
+        amount,
+        tokenAddress: token?.address,
+      },
+    });
+
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
