@@ -24,4 +24,11 @@ jobs:
       run: cd tests/func-tests/zkevm && yarn install --no-immutable
 
     - name: Run tests
+      env:
+        CHAIN_NAME: imtbl-zkevm-devnet
+        API_URL: https://api.dev.immutable.com
+        RPC_URL: https://rpc.dev.immutable.com
+        TEST_ZKEVM_WALLET_MNEMONIC: ${{ secrets.TEST_ZKEVM_WALLET_MNEMONIC }}
+        TEST_ZKEVM_API_RATE_LIMIT_BYPASS_KEY: ${{ secrets.TEST_ZKEVM_API_RATE_LIMIT_BYPASS_KEY }}
+        TEST_ZKEVM_PROJECT_HUB_GENERATED_API_KEY: ${{ secrets.TEST_ZKEVM_PROJECT_HUB_GENERATED_API_KEY }}
       run: cd tests/func-tests/zkevm && yarn test:ci
