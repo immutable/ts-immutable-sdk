@@ -125,15 +125,12 @@ export function Transactions({ checkout }: TransactionsProps) {
 
     // Fetch the data for the missing tokens: tokensWithChainSlug
     const missingTokens: { [k:string]:string } = {};
-
     Object.entries(tokensWithChainSlug).forEach(
       ([key, value]) => {
         if ((tokensWithChainSlug[key] === rootChainName && !rootData[key])
         || (tokensWithChainSlug[key] === childChainName && !childData[key])) missingTokens[key] = value;
-        missingTokens[key] = value;
       },
     );
-    console.log('missingTokens:', missingTokens);
     // Root provider is always L1
     const rootProvider = new JsonRpcProvider(
       checkout.config.networkMap.get(getL1ChainId(checkout.config))?.rpcUrls[0],
@@ -144,28 +141,44 @@ export function Transactions({ checkout }: TransactionsProps) {
       checkout.config.networkMap.get(getL2ChainId(checkout.config))?.rpcUrls[0],
     );
 
-    const tokenInfoPromises: Promise<TokenInfo | undefined>[] = [];
+    const rootTokenInfoPromises: Promise<TokenInfo | undefined>[] = [];
+    const childTokenInfoPromises: Promise<TokenInfo | undefined>[] = [];
 
-    // eslint-disable-next-line no-console
-    if (!tokensWithChainSlug['<tokenAddress>']) {
-      if (tokensWithChainSlug['<tokenAddress>'] === rootChainName) {
-        // Root provider
-        tokenInfoPromises.push(
-          checkout.getTokenInfo({
-            provider: rootProvider,
-            tokenAddress: '<tokenAddress>',
-          }),
-        );
-      } else {
-        // child provider
-        tokenInfoPromises.push(
-          checkout.getTokenInfo({
-            provider: childProvider,
-            tokenAddress: '<tokenAddress>',
-          }),
-        );
-      }
-    }
+    Object.entries(missingTokens).forEach(
+      ([tokenAddress, chainName]) => {
+        if (chainName === rootChainName) {
+          // Root provider
+          rootTokenInfoPromises.push(
+            checkout.getTokenInfo({
+              provider: rootProvider,
+              tokenAddress,
+            }),
+          );
+        } else {
+          // child provider
+          childTokenInfoPromises.push(
+            checkout.getTokenInfo({
+              provider: childProvider,
+              tokenAddress,
+            }),
+          );
+        }
+      },
+    );
+    const rootTokenInfo = await Promise.allSettled(rootTokenInfoPromises);
+    const childTokenInfo = await Promise.allSettled(childTokenInfoPromises);
+
+    ((rootTokenInfo.filter((result) => result.status === 'fulfilled')) as PromiseFulfilledResult<TokenInfo>[])
+      .forEach((result) => {
+        const resp = result;
+        rootData[resp.value.address!.toLowerCase()] = resp.value;
+      });
+
+    ((childTokenInfo.filter((result) => result.status === 'fulfilled')) as PromiseFulfilledResult<TokenInfo>[])
+      .forEach((result) => {
+        const resp = result;
+        childData[resp.value.address!.toLowerCase()] = resp.value;
+      });
 
     const allTokenSymbols: string[] = [];
     Object.values(rootData).forEach((token) => allTokenSymbols.push((token as TokenInfo).symbol.toLowerCase()));
@@ -192,11 +205,11 @@ export function Transactions({ checkout }: TransactionsProps) {
 
     const localTxs = await getTransactionsDetails(checkout.config.environment, address);
 
-    const tokens:{ [k:string]:string } = {};
+    const tokensWithChainSlug:{ [k:string]:string } = {};
     localTxs.result.forEach((txn) => {
-      tokens[txn.details.from_token_address] = txn.details.from_chain;
+      tokensWithChainSlug[txn.details.from_token_address] = txn.details.from_chain;
     });
-    return { tokens: await getTokensDetails(tokens), transactions: localTxs.result };
+    return { tokens: await getTokensDetails(tokensWithChainSlug), transactions: localTxs.result };
   };
 
   // Fetch all the data at once
