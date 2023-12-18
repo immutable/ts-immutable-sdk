@@ -99,12 +99,12 @@ export enum BridgeFeeActions {
  * @property {string} FINALISE_WITHDRAWAL - The gas required to finalise a withdrawal from the flow rate queue.
  */
 export enum BridgeMethodsGasLimit { // @TODO test methods on chain and put correct values here
-  DEPOSIT_SOURCE = 500000,
-  DEPOSIT_DESTINATION = 700000,
-  WITHDRAW_SOURCE = 400000,
-  WITHDRAW_DESTINATION = 700000,
-  MAP_TOKEN_SOURCE = 300000,
-  MAP_TOKEN_DESTINATION = 700000,
+  DEPOSIT_SOURCE = 200000,
+  DEPOSIT_DESTINATION = 200000,
+  WITHDRAW_SOURCE = 200000,
+  WITHDRAW_DESTINATION = 200000,
+  MAP_TOKEN_SOURCE = 200000,
+  MAP_TOKEN_DESTINATION = 200000,
   FINALISE_WITHDRAWAL = 200000,
 }
 

@@ -152,15 +152,12 @@ export class TokenBridge {
         BridgeMethodsGasLimit[`${req.action}_SOURCE`],
       );
 
-      console.log('sourceChainGas', sourceChainGas.toString());
-
       const feeResult = await this.calculateBridgeFee(
         req.sourceChainId,
         req.destinationChainId,
         BridgeMethodsGasLimit[`${req.action}_DESTINATION`],
         req.gasMultiplier,
       );
-      console.log('feeResult', feeResult.bridgeFee.toString());
 
       bridgeFee = feeResult.bridgeFee;
     }
@@ -731,8 +728,6 @@ export class TokenBridge {
         BridgeErrorType.AXELAR_GAS_ESTIMATE_FAILED,
       );
     }
-
-    console.log('axiosResponse.data', axiosResponse.data);
 
     try {
       return {
