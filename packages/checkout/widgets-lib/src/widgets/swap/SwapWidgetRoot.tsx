@@ -148,8 +148,8 @@ export class Swap extends Base<WidgetType.SWAP> {
                     closeEvent={() => sendSwapWidgetCloseEvent(window)}
                   >
                     <SwapWidget
-                      fromContractAddress={this.parameters.fromContractAddress}
-                      toContractAddress={this.parameters.toContractAddress}
+                      fromTokenAddress={this.parameters.fromTokenAddress}
+                      toTokenAddress={this.parameters.toTokenAddress}
                       amount={this.parameters.amount}
                       config={this.strongConfig()}
                     />

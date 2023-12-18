@@ -97,7 +97,7 @@ export class Sale extends Base<WidgetType.SALE> {
       <React.StrictMode>
         <CustomAnalyticsProvider checkout={this.checkout}>
           <ThemeProvider id="sale-container" config={this.strongConfig()}>
-          <ConnectLoader
+            <ConnectLoader
               widgetConfig={this.strongConfig()}
               params={connectLoaderParams}
               closeEvent={() => {
@@ -108,7 +108,7 @@ export class Sale extends Base<WidgetType.SALE> {
                 config={this.strongConfig()}
                 amount={this.parameters.amount!}
                 items={this.parameters.items!}
-                fromContractAddress={this.parameters.fromContractAddress!}
+                fromTokenAddress={this.parameters.fromTokenAddress!}
                 environmentId={this.parameters.environmentId!}
               />
             </ConnectLoader>
