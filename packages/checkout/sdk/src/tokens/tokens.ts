@@ -1,3 +1,5 @@
+import { Web3Provider } from '@ethersproject/providers';
+import { Contract } from 'ethers';
 import {
   ChainId,
   DexConfig,
@@ -8,7 +10,8 @@ import {
   TokenInfo,
 } from '../types';
 import { CheckoutConfiguration, getL1ChainId } from '../config';
-import { NATIVE } from '../env';
+import { ERC20ABI, NATIVE } from '../env';
+import { CheckoutErrorType, withCheckoutError } from '../errors';
 
 type TokenAllowListParams = {
   type: TokenFilterTypes;
@@ -57,3 +60,28 @@ export const getTokenAllowList = async (
 export const isNativeToken = (
   address: string | undefined,
 ): boolean => !address || address.toLocaleLowerCase() === NATIVE;
+
+export async function getERC20TokenInfo(
+  web3Provider: Web3Provider,
+  tokenAddress: string,
+) {
+  return await withCheckoutError<TokenInfo>(
+    async () => {
+      const contract = new Contract(tokenAddress, JSON.stringify(ERC20ABI), web3Provider);
+
+      const [name, symbol, decimals] = await Promise.all([
+        contract.name(),
+        contract.symbol(),
+        contract.decimals(),
+      ]);
+
+      return {
+        name,
+        symbol,
+        decimals,
+        address: tokenAddress,
+      };
+    },
+    { type: CheckoutErrorType.GET_ERC20_INFO_ERROR },
+  );
+}

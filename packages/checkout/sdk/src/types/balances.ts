@@ -15,11 +15,6 @@ export interface GetBalanceParams {
   tokenAddress?: string;
 }
 
-export interface GetTokenInfoParams {
-  provider: Web3Provider;
-  tokenAddress: string;
-}
-
 /**
  * Interface representing the result of {@link Checkout.getBalance}.
  * @property {BigNumber} balance - The balance of the wallet for the token.
