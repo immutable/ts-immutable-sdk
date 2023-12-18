@@ -385,7 +385,7 @@ export const text = {
         title: 'Move coins',
       },
       fees: {
-        title: 'Gas Fee',
+        title: 'Estimated fees',
         fiatPricePrefix: '~ USD $',
       },
       content: {
@@ -417,7 +417,7 @@ export const text = {
         heading: 'To',
       },
       fees: {
-        heading: 'Gas fee',
+        heading: 'Estimated fees',
       },
       submitButton: {
         buttonText: 'Confirm move',
