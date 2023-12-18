@@ -53,6 +53,8 @@ import {
   CancelResult,
   BuyResult,
   SellResult,
+  TokenInfo,
+  GetTokenInfoParams,
 } from './types';
 import { CheckoutConfiguration } from './config';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
@@ -214,6 +216,15 @@ export class Checkout {
     );
 
     return switchNetworkRes;
+  }
+
+  public async getTokenInfo(param: GetTokenInfoParams): Promise<TokenInfo | undefined> {
+    return {
+      name: 'Immutable',
+      symbol: 'imx',
+      decimals: 18,
+      address: param.tokenAddress,
+    };
   }
 
   /**

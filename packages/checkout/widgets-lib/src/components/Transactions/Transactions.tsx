@@ -113,14 +113,14 @@ export function Transactions({ checkout }: TransactionsProps) {
   }, [checkout]);
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
-  const getTokensDetails = async (checkout: Checkout, txsTokens: string[]) => {
+  const getTokensDetails = async (checkout: Checkout, tokensWithChainSlug: { [key: string]: string }) => {
     const rootChainName = getChainSlugById(getL1ChainId(checkout.config));
     const childChainName = getChainSlugById(getL2ChainId(checkout.config));
 
     const [rootData, childData] = await Promise.all([rootChainTokensHashmap(), childChainTokensHashmap()]);
 
     // eslint-disable-next-line no-console
-    console.log(txsTokens);
+    console.log(tokensWithChainSlug);
     // Fetch the data for the missing tokens: txsTokens
 
     const allTokenSymbols: string[] = [];
@@ -148,9 +148,11 @@ export function Transactions({ checkout }: TransactionsProps) {
 
     const localTxs = await getTransactionsDetails(checkout.config.environment, address);
 
-    const tokens = localTxs.result.map((t) => t.details.from_token_address);
+    const tokensWithChainSlug = localTxs.result.map((t) => ({
+      [t.details.from_token_address]: t.details.from_chain,
+    }));
 
-    return { tokens: await getTokensDetails(checkout, tokens), transactions: localTxs.result };
+    return { tokens: await getTokensDetails(checkout, tokensWithChainSlug), transactions: localTxs.result };
   };
 
   // Fetch all the data at once
