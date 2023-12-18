@@ -90,7 +90,7 @@ export class RemoteConfigFetcher {
     return config[key];
   }
 
-  public async isLoaded() {
+  public isLoaded(): boolean {
     return this.configCache !== undefined;
   }
 
