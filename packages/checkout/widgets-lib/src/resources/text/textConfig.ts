@@ -452,6 +452,7 @@ export const text = {
       status: {
         inProgress: {
           heading: 'In Progress',
+          txnEstimate: 'Usually takes 20 mins',
           stepInfo: 'View Details',
         },
         emptyState: {

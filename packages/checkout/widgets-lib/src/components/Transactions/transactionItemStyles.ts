@@ -1,3 +1,10 @@
+export const headingStyles = {
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  paddingLeft: 'base.spacing.x2',
+  alignItems: 'center',
+};
 export const containerStyles = {
   py: '1px',
   px: 'base.spacing.x2',
