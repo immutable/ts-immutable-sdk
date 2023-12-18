@@ -9,7 +9,7 @@ import { text } from 'resources/text/textConfig';
 import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { Box } from '@biom3/react';
 import { createAndConnectToProvider, isPassportProvider } from 'lib/providerUtils';
-import { Web3Provider } from '@ethersproject/providers';
+import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import {
   Checkout,
   TokenInfo,
@@ -112,16 +112,60 @@ export function Transactions({ checkout }: TransactionsProps) {
     }
   }, [checkout]);
 
-  // eslint-disable-next-line @typescript-eslint/no-shadow
-  const getTokensDetails = async (checkout: Checkout, tokensWithChainSlug: { [key: string]: string }) => {
+  const getTokensDetails = async (
+    tokensWithChainSlug: { [p: string]: string },
+  ) => {
     const rootChainName = getChainSlugById(getL1ChainId(checkout.config));
     const childChainName = getChainSlugById(getL2ChainId(checkout.config));
 
-    const [rootData, childData] = await Promise.all([rootChainTokensHashmap(), childChainTokensHashmap()]);
+    const [rootData, childData] = await Promise.all([
+      rootChainTokensHashmap(),
+      childChainTokensHashmap(),
+    ]);
+
+    // Fetch the data for the missing tokens: tokensWithChainSlug
+    const missingTokens: { [k:string]:string } = {};
+
+    Object.entries(tokensWithChainSlug).forEach(
+      ([key, value]) => {
+        if ((tokensWithChainSlug[key] === rootChainName && !rootData[key])
+        || (tokensWithChainSlug[key] === childChainName && !childData[key])) missingTokens[key] = value;
+        missingTokens[key] = value;
+      },
+    );
+    console.log('missingTokens:', missingTokens);
+    // Root provider is always L1
+    const rootProvider = new JsonRpcProvider(
+      checkout.config.networkMap.get(getL1ChainId(checkout.config))?.rpcUrls[0],
+    );
+
+    // Child provider is always L2
+    const childProvider = new JsonRpcProvider(
+      checkout.config.networkMap.get(getL2ChainId(checkout.config))?.rpcUrls[0],
+    );
+
+    const tokenInfoPromises: Promise<TokenInfo | undefined>[] = [];
 
     // eslint-disable-next-line no-console
-    console.log(tokensWithChainSlug);
-    // Fetch the data for the missing tokens: txsTokens
+    if (!tokensWithChainSlug['<tokenAddress>']) {
+      if (tokensWithChainSlug['<tokenAddress>'] === rootChainName) {
+        // Root provider
+        tokenInfoPromises.push(
+          checkout.getTokenInfo({
+            provider: rootProvider,
+            tokenAddress: '<tokenAddress>',
+          }),
+        );
+      } else {
+        // child provider
+        tokenInfoPromises.push(
+          checkout.getTokenInfo({
+            provider: childProvider,
+            tokenAddress: '<tokenAddress>',
+          }),
+        );
+      }
+    }
 
     const allTokenSymbols: string[] = [];
     Object.values(rootData).forEach((token) => allTokenSymbols.push((token as TokenInfo).symbol.toLowerCase()));
@@ -148,11 +192,11 @@ export function Transactions({ checkout }: TransactionsProps) {
 
     const localTxs = await getTransactionsDetails(checkout.config.environment, address);
 
-    const tokensWithChainSlug = localTxs.result.map((t) => ({
-      [t.details.from_token_address]: t.details.from_chain,
-    }));
-
-    return { tokens: await getTokensDetails(checkout, tokensWithChainSlug), transactions: localTxs.result };
+    const tokens:{ [k:string]:string } = {};
+    localTxs.result.forEach((txn) => {
+      tokens[txn.details.from_token_address] = txn.details.from_chain;
+    });
+    return { tokens: await getTokensDetails(tokens), transactions: localTxs.result };
   };
 
   // Fetch all the data at once

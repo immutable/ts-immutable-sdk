@@ -81,6 +81,7 @@ export type {
   GetNetworkAllowListParams,
   GetNetworkAllowListResult,
   GetNetworkParams,
+  GetTokenInfoParams,
   GetTokenAllowListParams,
   GetTokenAllowListResult,
   GetWalletAllowListParams,
