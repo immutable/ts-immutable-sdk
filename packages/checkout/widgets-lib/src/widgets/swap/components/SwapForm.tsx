@@ -242,8 +242,6 @@ export function SwapForm({ data }: SwapFromProps) {
         toToken,
       );
 
-      console.log('result ', result);
-
       // Prevent to silently fetch and set a new quote
       // if the user has updated and the widget is already
       // fetching or the user is updating the inputs.
