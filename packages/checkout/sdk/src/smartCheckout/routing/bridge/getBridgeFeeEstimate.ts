@@ -21,7 +21,7 @@ export const getBridgeFeeEstimate = async (
   );
 
   try {
-    const fee = await bridge.getFee(
+    const bridgeFeeResponse = await bridge.getFee(
       {
         action: BridgeFeeActions.DEPOSIT,
         gasMultiplier: 1.1,
@@ -30,9 +30,10 @@ export const getBridgeFeeEstimate = async (
       },
     );
 
-    fee.approvalGas = BigNumber.from(0);
-
-    return fee;
+    return {
+      ...bridgeFeeResponse,
+      approvalGas: BigNumber.from(0),
+    };
   } catch (err: any) {
     throw new CheckoutError(
       'Error estimating gas for bridge',
