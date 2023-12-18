@@ -51,7 +51,7 @@ export async function withdraw() {
   }
 
   if (childBridgeChildAddress === ethers.constants.AddressZero) {
-    console.log('token mappinng incomplete, please wait for token to map to childBridge before withdrawing');
+    console.log('token mapping incomplete, please wait for token to map to childBridge before withdrawing');
     return;
   }
 
