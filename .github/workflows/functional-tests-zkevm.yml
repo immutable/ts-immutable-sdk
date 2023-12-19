@@ -23,6 +23,10 @@ jobs:
     - name: Install functional tests dependencies
       run: cd tests/func-tests/zkevm && yarn install --no-immutable
 
+    - name: Compile contracts
+      run: cd tests/func-tests/zkevm && yarn hardhat compile
+
+
     - name: Run tests
       env:
         CHAIN_NAME: imtbl-zkevm-devnet

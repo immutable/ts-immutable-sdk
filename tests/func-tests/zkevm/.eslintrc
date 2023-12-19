@@ -1,0 +1,14 @@
+{
+  "root": true,
+  // "extends": ["airbnb", "airbnb-typescript"],
+  "ignorePatterns": [
+    "jest.config.*",
+    "node_modules/",
+    "dist/"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "./tsconfig.json",
+    "tsconfigRootDir": "."
+  }
+}

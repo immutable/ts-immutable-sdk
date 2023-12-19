@@ -1,15 +1,14 @@
-import { HardhatUserConfig } from 'hardhat/config';
-import '@nomicfoundation/hardhat-toolbox';
-import '@typechain/hardhat';
-import '@nomiclabs/hardhat-ethers';
+require('@nomicfoundation/hardhat-toolbox');
+require('@typechain/hardhat');
+require('@nomiclabs/hardhat-ethers');
 
-import * as dotenv from 'dotenv';
+const dotenv = require('dotenv');
 
 dotenv.config();
 
-const config: HardhatUserConfig = {
+const config/*: HardhatUserConfig */ = {
   solidity: {
-    version: '0.8.17',
+    version: '0.8.19',
     settings: {
       optimizer: {
         enabled: true,
@@ -46,4 +45,4 @@ const config: HardhatUserConfig = {
   },
 };
 
-export default config;
+module.exports = config;

@@ -1,11 +1,13 @@
+/* eslint-disable no-console */
 import { strict as assert } from 'assert';
 import { ethers } from 'hardhat';
 
 import { SharedState } from './shared-state';
-import {repeatCheck300, repeatCheck, defaultGasOverrides} from '../lib/utils';
+import { repeatCheck300, repeatCheck, defaultGasOverrides } from '../lib/utils';
 
 export class Tokens {
   constructor(protected sharedState: SharedState) {}
+
   // @when(
   //   'deployer deploys an ERC20 contract {string} with symbol {string}',
   //   undefined,
@@ -31,10 +33,11 @@ export class Tokens {
   //   undefined,
   //   DEFAULT_TIMEOUT,
   // )
-  public async checkDeployedERC20Contract() {
+  public async checkDeployedERC20Contract() : Promise<undefined> {
     const { chainName, deployedContractAddress } = this.sharedState;
-    if (!deployedContractAddress)
+    if (!deployedContractAddress) {
       return assert.fail('No deployed contract address');
+    }
 
     await repeatCheck300(async () => {
       const token = await this.sharedState.blockchainData.getToken({
@@ -47,6 +50,7 @@ export class Tokens {
       assert.ok(token.result.name);
       assert.ok(token.result.symbol);
     });
+    return undefined;
   }
 
   // @then('sdk should list tokens')
