@@ -26,7 +26,7 @@ import {
   BlockscoutTokens,
   BlockscoutTokenType,
 } from '../client';
-import { BLOCKSCOUT_CHAIN_URL_MAP, ERC20ABI, NATIVE } from '../env';
+import { ERC20ABI, NATIVE } from '../env';
 
 jest.mock('../tokens');
 jest.mock('../client');
@@ -427,8 +427,6 @@ describe('balances', () => {
         getNativeTokenByWalletAddress: getNativeTokenByWalletAddressMock,
       });
 
-      const chainId = Object.keys(BLOCKSCOUT_CHAIN_URL_MAP)[0] as unknown as ChainId;
-
       const getAllBalancesResult = await getAllBalances(
         {
           remote: {
@@ -440,7 +438,7 @@ describe('balances', () => {
         } as unknown as CheckoutConfiguration,
         jest.fn() as unknown as Web3Provider,
         'abc123',
-        chainId,
+        ChainId.ETHEREUM,
       );
 
       expect(getNativeTokenByWalletAddressMock).toHaveBeenCalledTimes(1);
@@ -518,7 +516,7 @@ describe('balances', () => {
               blockscout: true,
             }),
           },
-          networkMap: testCheckoutConfig.networkMap,
+          networkMap: new CheckoutConfiguration({ baseConfig: { environment: Environment.SANDBOX } }).networkMap,
         } as unknown as CheckoutConfiguration,
         jest.fn() as unknown as Web3Provider,
         'abc123',
@@ -551,8 +549,6 @@ describe('balances', () => {
         getNativeTokenByWalletAddress: getNativeTokenByWalletAddressMock,
       });
 
-      const chainId = Object.keys(BLOCKSCOUT_CHAIN_URL_MAP)[0] as unknown as ChainId;
-
       const getAllBalancesResult = await getAllBalances(
         {
           remote: {
@@ -564,7 +560,7 @@ describe('balances', () => {
         } as unknown as CheckoutConfiguration,
         jest.fn() as unknown as Web3Provider,
         'abc123',
-        chainId,
+        ChainId.ETHEREUM,
       );
 
       expect(getNativeTokenByWalletAddressMock).toHaveBeenCalledTimes(1);
@@ -611,8 +607,6 @@ describe('balances', () => {
         getNativeTokenByWalletAddress: getNativeTokenByWalletAddressMock,
       });
 
-      const chainId = Object.keys(BLOCKSCOUT_CHAIN_URL_MAP)[0] as unknown as ChainId;
-
       const getAllBalancesResult = await getAllBalances(
         {
           remote: {
@@ -624,7 +618,7 @@ describe('balances', () => {
         } as unknown as CheckoutConfiguration,
         jest.fn() as unknown as Web3Provider,
         'abc123',
-        chainId,
+        ChainId.ETHEREUM,
       );
 
       expect(getNativeTokenByWalletAddressMock).toHaveBeenCalledTimes(1);
@@ -659,8 +653,6 @@ describe('balances', () => {
         getNativeTokenByWalletAddress: getNativeTokenByWalletAddressMock,
       });
 
-      const chainId = Object.keys(BLOCKSCOUT_CHAIN_URL_MAP)[0] as unknown as ChainId;
-
       const getAllBalancesResult = await getAllBalances(
         {
           remote: {
@@ -672,7 +664,7 @@ describe('balances', () => {
         } as unknown as CheckoutConfiguration,
         jest.fn() as unknown as Web3Provider,
         'abc123',
-        chainId,
+        ChainId.ETHEREUM,
       );
 
       expect(getNativeTokenByWalletAddressMock).toHaveBeenCalledTimes(1);
@@ -705,7 +697,6 @@ describe('balances', () => {
           getNativeTokenByWalletAddress: getNativeTokenByWalletAddressMock,
         });
 
-        const chainId = Object.keys(BLOCKSCOUT_CHAIN_URL_MAP)[0] as unknown as ChainId;
         let message;
         let type;
         let data;
@@ -721,7 +712,7 @@ describe('balances', () => {
             } as unknown as CheckoutConfiguration,
             jest.fn() as unknown as Web3Provider,
             '0xabc123', // use unique wallet address to prevent cached data
-            chainId,
+            ChainId.ETHEREUM,
           );
         } catch (err: any) {
           message = err.message;
@@ -738,6 +729,32 @@ describe('balances', () => {
           message: testCase.errorMessage,
         });
       });
+    });
+
+    it('should fail if unsupported chain is provided', async () => {
+      let message;
+      let type;
+      try {
+        await getAllBalances(
+          {
+            remote: {
+              getTokensConfig: () => ({
+                blockscout: true,
+              }),
+            },
+            networkMap: testCheckoutConfig.networkMap,
+          } as unknown as CheckoutConfiguration,
+          jest.fn() as unknown as Web3Provider,
+          '0xabc123', // use unique wallet address to prevent cached data
+          ChainId.SEPOLIA,
+        );
+      } catch (err: any) {
+        message = err.message;
+        type = err.type;
+      }
+
+      expect(message).toEqual(`chain ID ${ChainId.SEPOLIA} not supported by the environment`);
+      expect(type).toEqual(CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR);
     });
   });
 
