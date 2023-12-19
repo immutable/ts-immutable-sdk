@@ -2,7 +2,7 @@ import { HeaderNavigation } from 'components/Header/HeaderNavigation';
 import { SimpleLayout } from 'components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from 'components/Footer/FooterLogo';
 import {
-  useCallback, useContext, useEffect, useState,
+  useCallback, useContext, useEffect, useMemo, useState,
 } from 'react';
 import { EventTargetContext } from 'context/event-target-context/EventTargetContext';
 import { text } from 'resources/text/textConfig';
@@ -55,6 +55,9 @@ export function Transactions({ checkout }: TransactionsProps) {
 
   const walletAddress = useCallback(async () => await provider?.getSigner().getAddress(), [provider]);
   const isPassport = isPassportProvider(provider);
+
+  const txnsListStyle = useMemo(() => transactionsListStyle(isPassport), []);
+  // getStyles({ isPassport }), [something]);
 
   // Fetch the tokens for the root chain using the allowed tokens.
   // In case this list does not have all the tokens, there is logic
@@ -248,12 +251,12 @@ export function Transactions({ checkout }: TransactionsProps) {
           )}
           {provider && loading
             && (
-              <Box sx={transactionsListStyle(isPassport)}>
+              <Box sx={txnsListStyle}>
                 <Shimmer />
               </Box>
             )}
           {provider && !loading && txs.length > 0 && knownTokenMap && (
-            <Box sx={transactionsListStyle(isPassport)}>
+            <Box sx={txnsListStyle}>
               <TransactionsInProgress
                 checkout={checkout}
                 transactions={txs}
