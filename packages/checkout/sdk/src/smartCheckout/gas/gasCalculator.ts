@@ -36,7 +36,7 @@ export const getGasItemRequirement = (
   return {
     type: ItemType.ERC20,
     amount: gas,
-    contractAddress: transactionOrGas.gasToken.tokenAddress,
+    tokenAddress: transactionOrGas.gasToken.tokenAddress,
     spenderAddress: '',
   };
 };

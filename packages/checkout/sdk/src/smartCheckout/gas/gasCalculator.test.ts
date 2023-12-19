@@ -44,7 +44,7 @@ describe('gasCalculator', () => {
             delta: BigNumber.from(100000),
             itemRequirement: {
               type: ItemType.ERC20,
-              contractAddress: '0xERC20',
+              tokenAddress: '0xERC20',
               amount: BigNumber.from(100000),
               spenderAddress: '0xSEAPORT',
             },
@@ -95,7 +95,7 @@ describe('gasCalculator', () => {
             delta: BigNumber.from(100000),
             itemRequirement: {
               type: ItemType.ERC20,
-              contractAddress: '0xERC20',
+              tokenAddress: '0xERC20',
               amount: BigNumber.from(100000),
               spenderAddress: '0xSEAPORT',
             },
@@ -147,7 +147,7 @@ describe('gasCalculator', () => {
             delta: BigNumber.from(100000),
             itemRequirement: {
               type: ItemType.ERC20,
-              contractAddress: '0xERC20',
+              tokenAddress: '0xERC20',
               amount: BigNumber.from(100000),
               spenderAddress: '0xSEAPORT',
             },

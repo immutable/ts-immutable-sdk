@@ -252,7 +252,7 @@ export type ERC20ItemRequirement = {
   /** The type to indicate this is a ERC20 item requirement. */
   type: ItemType.ERC20;
   /** The amount of the item. */
-  contractAddress: string;
+  tokenAddress: string;
   /** The contract address of the ERC20. */
   amount: string;
   /** The contract address of the approver. */
@@ -319,7 +319,7 @@ export type ERC20Item = {
   /**  The type to indicate this is an ERC20 item. */
   type: ItemType.ERC20;
   /** The contract address of the ERC20. */
-  contractAddress: string;
+  tokenAddress: string;
   /** The amount of the item. */
   amount: BigNumber;
   /** The contract address of the approver. */

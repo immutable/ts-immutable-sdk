@@ -108,6 +108,7 @@ export const bridgeRoute = async (
   tokenBalanceResults: Map<ChainId, TokenBalanceResult>,
 ): Promise<BridgeFundingStep | undefined> => {
   if (!availableRoutingOptions.bridge) return undefined;
+  console.log('Bridge Routes');
   const l1ChainId = getL1ChainId(config);
   const l2ChainId = getL2ChainId(config);
   const nativeToken = config.networkMap.get(l1ChainId)?.nativeCurrency;
