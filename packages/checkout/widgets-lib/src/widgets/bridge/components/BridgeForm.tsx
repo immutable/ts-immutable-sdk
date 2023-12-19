@@ -426,8 +426,7 @@ export function BridgeForm(props: BridgeFormProps) {
         >
           {content.title}
         </Heading>
-        {/* If no token set OR if form token set and balances not loading, render form */}
-        {(!formToken || (formToken && !isTokenBalancesLoading)) && (
+        {(!defaultTokenAddress || !isTokenBalancesLoading) && (
           <Box sx={formInputsContainerStyles}>
             <SelectForm
               testId="bridge-token"
@@ -456,8 +455,7 @@ export function BridgeForm(props: BridgeFormProps) {
             />
           </Box>
         )}
-        {/* Token set and loading, render select shimmer */}
-        {formToken && isTokenBalancesLoading && (
+        {defaultTokenAddress && isTokenBalancesLoading && (
           <TokenSelectShimmer sx={formInputsContainerStyles} />
         )}
         {gasFee && (
