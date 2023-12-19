@@ -53,6 +53,8 @@ import {
   CancelResult,
   BuyResult,
   SellResult,
+  TokenInfo,
+  GetTokenInfoParams,
 } from './types';
 import { CheckoutConfiguration } from './config';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
@@ -216,6 +218,21 @@ export class Checkout {
     );
 
     return switchNetworkRes;
+  }
+
+  /**
+   * Retrieves the token information given the token address. This function makes RPC calls to
+   * ERC20 contracts to fetch the main contract information (e.g. symbol).
+   * @param {GetTokenInfoParams} params - The parameters for retrieving the token information.
+   * @returns {Promise<TokenInfo>} - A promise that resolves to the token info request.
+   */
+  public async getTokenInfo(
+    params: GetTokenInfoParams,
+  ): Promise<TokenInfo> {
+    return await tokens.getERC20TokenInfo(
+      params.provider,
+      params.tokenAddress,
+    );
   }
 
   /**

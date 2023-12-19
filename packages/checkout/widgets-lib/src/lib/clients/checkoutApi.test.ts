@@ -29,6 +29,9 @@ describe('CheckoutApi', () => {
                   to_address: '0x1e8dc77bed0da06621e819fa0afb59d50f76cfdf',
                   to_chain: 'sepolia',
                   to_token_address: '0x60466acb9e525ae1e9978fd14197c8c419ba65e6',
+                  current_status: {
+                    status: 'in_progress',
+                  },
                 },
                 blockchain_metadata: {
                   transaction_hash: '0x68d9eac5e3b3c3580404989a4030c948a78e1b07b2b5ea5688d8c38a6c61c93e',
@@ -52,6 +55,7 @@ describe('CheckoutApi', () => {
       ).toEqual('0x68d9eac5e3b3c3580404989a4030c948a78e1b07b2b5ea5688d8c38a6c61c93e');
       expect(resp.result[0].details.from_address).toEqual('0x1234567890');
       expect(resp.result[0].details.from_chain).toEqual('imtbl-zkevm-testnet');
+      expect(resp.result[0].details.current_status.status).toEqual('in_progress');
 
       expect(mockedAxios.get).toHaveBeenNthCalledWith(
         1,
