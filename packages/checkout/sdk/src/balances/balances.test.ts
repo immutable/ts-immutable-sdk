@@ -305,7 +305,7 @@ describe('balances', () => {
       } catch (e: any) {
         message = e.message;
       }
-      expect(message).toContain('both walletAddress and provider as missing');
+      expect(message).toContain('both walletAddress and provider are missing');
     });
 
     it('should fail if no provider is given and indexer is disabled', async () => {
