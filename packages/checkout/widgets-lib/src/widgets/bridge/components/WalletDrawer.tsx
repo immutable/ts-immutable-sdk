@@ -2,14 +2,15 @@ import { Drawer, Select } from '@biom3/react';
 import { FormControlWrapper } from 'components/FormComponents/FormControlWrapper/FormControlWrapper';
 import { WalletProviderName } from '@imtbl/checkout-sdk';
 import { useState } from 'react';
-import { text } from 'resources/text/textConfig';
-import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { WalletItem } from './WalletItem';
 import { walletItemListStyles } from './WalletDrawerStyles';
 
 interface WalletDrawerProps {
   testId: string;
-  type: 'to' | 'from',
+  drawerText: {
+    heading: string;
+    defaultText?: string;
+  },
   showWalletSelectorTarget: boolean;
   walletOptions: WalletProviderName[];
   showDrawer: boolean;
@@ -18,16 +19,16 @@ interface WalletDrawerProps {
 }
 export function WalletDrawer({
   testId,
-  type,
+  drawerText,
   walletOptions,
   showWalletSelectorTarget,
   showDrawer,
   setShowDrawer,
   onWalletItemClick,
 }: WalletDrawerProps) {
-  const { toFormInput, fromFormInput } = text.views[BridgeWidgetViews.WALLET_NETWORK_SELECTION];
-  const walletSelectorText = type === 'from' ? fromFormInput : toFormInput;
   const [walletItemLoading, setWalletItemLoading] = useState(false);
+
+  const { heading, defaultText } = drawerText;
 
   const handleWalletItemClick = async (name: WalletProviderName) => {
     setWalletItemLoading(true);
@@ -43,7 +44,7 @@ export function WalletDrawer({
 
   return (
     <Drawer
-      headerBarTitle={walletSelectorText.walletSelectorHeading}
+      headerBarTitle={heading}
       size="full"
       onCloseDrawer={() => {
         if (walletItemLoading) return;
@@ -55,12 +56,12 @@ export function WalletDrawer({
           && (
           <Drawer.Target>
             <FormControlWrapper
-              testId={`${testId}-${type}-wallet-form-control`}
+              testId={`${testId}-wallet-form-control`}
               textAlign="left"
             >
               <Select
-                testId={`${testId}-${type}-wallet-select`}
-                defaultLabel={walletSelectorText.selectDefaultText}
+                testId={`${testId}-wallet-select`}
+                defaultLabel={defaultText ?? ''}
                 size="large"
                 targetClickOveride={() => setShowDrawer(true)}
               />
@@ -71,7 +72,7 @@ export function WalletDrawer({
         {walletOptions.map((walletProviderName) => (
           <WalletItem
             key={walletProviderName}
-            testId={`${testId}-${type}`}
+            testId={testId}
             loading={walletItemLoading}
             walletProviderName={walletProviderName}
             onWalletClick={handleWalletItemClick}
