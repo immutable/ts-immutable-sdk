@@ -602,7 +602,7 @@ describe('Token Bridge', () => {
     const amount = ethers.BigNumber.from(1000);
     const token = '0x40b87d235A5B010a20A241F15797C9debf1ecd01';
     const sender = '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772';
-    const receiver = '0xA383968dC8711FFE8A7353AdE9feF7Ddcb1473a0';
+    const recipient = '0xA383968dC8711FFE8A7353AdE9feF7Ddcb1473a0';
 
     const abiCoder = new ethers.utils.AbiCoder();
     const mockDepositPayload = abiCoder.encode(
@@ -611,7 +611,7 @@ describe('Token Bridge', () => {
         DEPOSIT_SIG,
         token,
         sender,
-        receiver,
+        recipient,
         amount,
       ],
     );
@@ -621,7 +621,7 @@ describe('Token Bridge', () => {
         WITHDRAW_SIG,
         token,
         sender,
-        receiver,
+        recipient,
         amount,
       ],
     );
@@ -697,7 +697,7 @@ describe('Token Bridge', () => {
       expect(result.transactions[0].txHash).toBe(txHash);
       expect(result.transactions[0].token).toBe(token);
       expect(result.transactions[0].sender).toBe(sender);
-      expect(result.transactions[0].receiver).toBe(receiver);
+      expect(result.transactions[0].recipient).toBe(recipient);
       expect(result.transactions[0].amount).toStrictEqual(amount);
     });
     it('returns the PROCESSING status for a deposit', async () => {
@@ -729,7 +729,7 @@ describe('Token Bridge', () => {
       expect(result.transactions[0].txHash).toBe(txHash);
       expect(result.transactions[0].token).toBe(token);
       expect(result.transactions[0].sender).toBe(sender);
-      expect(result.transactions[0].receiver).toBe(receiver);
+      expect(result.transactions[0].recipient).toBe(recipient);
       expect(result.transactions[0].amount).toStrictEqual(amount);
     });
     it('returns the COMPLETE status for a deposit', async () => {
@@ -761,7 +761,7 @@ describe('Token Bridge', () => {
       expect(result.transactions[0].txHash).toBe(txHash);
       expect(result.transactions[0].token).toBe(token);
       expect(result.transactions[0].sender).toBe(sender);
-      expect(result.transactions[0].receiver).toBe(receiver);
+      expect(result.transactions[0].recipient).toBe(recipient);
       expect(result.transactions[0].amount).toStrictEqual(amount);
     });
     it('returns the ERROR status for a deposit', async () => {
@@ -793,7 +793,7 @@ describe('Token Bridge', () => {
       expect(result.transactions[0].txHash).toBe(txHash);
       expect(result.transactions[0].token).toBe(token);
       expect(result.transactions[0].sender).toBe(sender);
-      expect(result.transactions[0].receiver).toBe(receiver);
+      expect(result.transactions[0].recipient).toBe(recipient);
       expect(result.transactions[0].amount).toStrictEqual(amount);
     });
     it('returns the RETRY status for a deposit', async () => {
@@ -825,7 +825,7 @@ describe('Token Bridge', () => {
       expect(result.transactions[0].txHash).toBe(txHash);
       expect(result.transactions[0].token).toBe(token);
       expect(result.transactions[0].sender).toBe(sender);
-      expect(result.transactions[0].receiver).toBe(receiver);
+      expect(result.transactions[0].recipient).toBe(recipient);
       expect(result.transactions[0].amount).toStrictEqual(amount);
     });
     it('returns the PENDING status for a withdrawal', async () => {
@@ -857,7 +857,7 @@ describe('Token Bridge', () => {
       expect(result.transactions[0].txHash).toBe(txHash);
       expect(result.transactions[0].token).toBe(token);
       expect(result.transactions[0].sender).toBe(sender);
-      expect(result.transactions[0].receiver).toBe(receiver);
+      expect(result.transactions[0].recipient).toBe(recipient);
       expect(result.transactions[0].amount).toStrictEqual(amount);
     });
     it('returns the PROCESSING status for a withdrawal', async () => {
@@ -889,7 +889,7 @@ describe('Token Bridge', () => {
       expect(result.transactions[0].txHash).toBe(txHash);
       expect(result.transactions[0].token).toBe(token);
       expect(result.transactions[0].sender).toBe(sender);
-      expect(result.transactions[0].receiver).toBe(receiver);
+      expect(result.transactions[0].recipient).toBe(recipient);
       expect(result.transactions[0].amount).toStrictEqual(amount);
     });
     it('returns the COMPLETE status for a withdrawal', async () => {
@@ -921,7 +921,7 @@ describe('Token Bridge', () => {
       expect(result.transactions[0].txHash).toBe(txHash);
       expect(result.transactions[0].token).toBe(token);
       expect(result.transactions[0].sender).toBe(sender);
-      expect(result.transactions[0].receiver).toBe(receiver);
+      expect(result.transactions[0].recipient).toBe(recipient);
       expect(result.transactions[0].amount).toStrictEqual(amount);
     });
     it('returns the FLOW_RATE_CONTROLLED status for a withdrawal', async () => {
@@ -955,7 +955,7 @@ describe('Token Bridge', () => {
       expect(result.transactions[0].txHash).toBe(txHash);
       expect(result.transactions[0].token).toBe(token);
       expect(result.transactions[0].sender).toBe(sender);
-      expect(result.transactions[0].receiver).toBe(receiver);
+      expect(result.transactions[0].recipient).toBe(recipient);
       expect(result.transactions[0].amount).toStrictEqual(amount);
     });
     it('returns the ERROR status for a withdrawal', async () => {
@@ -987,7 +987,7 @@ describe('Token Bridge', () => {
       expect(result.transactions[0].txHash).toBe(txHash);
       expect(result.transactions[0].token).toBe(token);
       expect(result.transactions[0].sender).toBe(sender);
-      expect(result.transactions[0].receiver).toBe(receiver);
+      expect(result.transactions[0].recipient).toBe(recipient);
       expect(result.transactions[0].amount).toStrictEqual(amount);
     });
     it('returns the RETRY status for a withdrawal', async () => {
@@ -1019,8 +1019,135 @@ describe('Token Bridge', () => {
       expect(result.transactions[0].txHash).toBe(txHash);
       expect(result.transactions[0].token).toBe(token);
       expect(result.transactions[0].sender).toBe(sender);
-      expect(result.transactions[0].receiver).toBe(receiver);
+      expect(result.transactions[0].recipient).toBe(recipient);
       expect(result.transactions[0].amount).toStrictEqual(amount);
+    });
+  });
+
+  describe('getFlowRateWithdrawTx', () => {
+    let tokenBridge: TokenBridge;
+
+    const recipient = '0xA383968dC8711FFE8A7353AdE9feF7Ddcb1473a0';
+    const token = '0x40b87d235A5B010a20A241F15797C9debf1ecd01';
+    const amount = ethers.BigNumber.from(1000);
+
+    const defaultTimestamp = ethers.BigNumber.from(1000);
+
+    const mockERC20ContractFlowRate = {
+      allowance: jest.fn(),
+      interface: {
+        encodeFunctionData: jest.fn().mockResolvedValue('0xdata'),
+      },
+      getPendingWithdrawals: jest.fn().mockImplementation(async () => [
+        {
+          withdrawer: recipient,
+          token,
+          amount,
+          timestamp: defaultTimestamp,
+        },
+      ]),
+    };
+
+    const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
+    const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
+
+    const bridgeConfig = new BridgeConfiguration({
+      baseConfig: new ImmutableConfiguration({
+        environment: Environment.SANDBOX,
+      }),
+      bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+      rootProvider: voidRootProvider,
+      childProvider: voidChildProvider,
+    });
+
+    beforeEach(() => {
+      jest.spyOn(TokenBridge.prototype as any, 'validateChainConfiguration')
+        .mockImplementation(async () => 'Valid');
+      jest.spyOn(TokenBridge.prototype as any, 'validateDepositArgs')
+        .mockImplementation(async () => 'Valid');
+      tokenBridge = new TokenBridge(bridgeConfig);
+    });
+
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+    it('returns the flowRate withdraw transaction when the index and recipient are valid', async () => {
+      expect.assertions(10);
+      const req = {
+        recipient,
+        index: 0,
+      };
+
+      jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRate as any);
+
+      const result = await tokenBridge.getFlowRateWithdrawTx(req);
+
+      expect(result.unsignedTx).toBeDefined();
+      expect(result.unsignedTx?.data).toBe('0xdata');
+      expect(result.unsignedTx?.to).toBe(bridgeConfig.bridgeContracts.rootERC20BridgeFlowRate);
+      expect(result.unsignedTx?.value).toBe(0);
+      expect(result.pendingWithdrawal.canWithdraw).toBe(true);
+      expect(result.pendingWithdrawal.withdrawer).toBe(recipient);
+      expect(result.pendingWithdrawal.token).toBe(token);
+      expect(result.pendingWithdrawal.amount).toBe(amount);
+      expect(result.pendingWithdrawal.timeoutStart).toBe(defaultTimestamp.toNumber());
+      expect(result.pendingWithdrawal.timeoutEnd).toBe(defaultTimestamp.toNumber() + (60 * 60 * 24));
+    });
+
+    it('throws an error when the index is not valid', async () => {
+      expect.assertions(2);
+      const req = {
+        recipient,
+        index: 100,
+      };
+
+      jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRate as any);
+
+      try {
+        await tokenBridge.getFlowRateWithdrawTx(req);
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(BridgeError);
+        expect(error.type).toBe(BridgeErrorType.FLOW_RATE_ERROR);
+      }
+    });
+
+    it('returns the flowRate info if the transcation is not ready to be withdrawn', async () => {
+      expect.assertions(7);
+      const req = {
+        recipient,
+        index: 0,
+      };
+
+      const timestampNow = Math.floor(Date.now() / 1000);
+
+      const timestamp = ethers.BigNumber.from(timestampNow + (60 * 60 * 12));
+
+      const mockERC20ContractFlowRateNotReady = {
+        allowance: jest.fn(),
+        interface: {
+          encodeFunctionData: jest.fn().mockResolvedValue('0xdata'),
+        },
+        getPendingWithdrawals: jest.fn().mockImplementation(async () => [
+          {
+            withdrawer: recipient,
+            token,
+            amount,
+            timestamp,
+          },
+        ]),
+      };
+
+      jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRateNotReady as any);
+
+      const result = await tokenBridge.getFlowRateWithdrawTx(req);
+
+      expect(result.unsignedTx).toBeNull();
+      expect(result.pendingWithdrawal.canWithdraw).toBe(false);
+      expect(result.pendingWithdrawal.withdrawer).toBe(recipient);
+      expect(result.pendingWithdrawal.token).toBe(token);
+      expect(result.pendingWithdrawal.amount).toBe(amount);
+      expect(result.pendingWithdrawal.timeoutStart).toBe(timestamp.toNumber());
+      expect(result.pendingWithdrawal.timeoutEnd).toBe(timestamp.toNumber() + (60 * 60 * 24));
     });
   });
 

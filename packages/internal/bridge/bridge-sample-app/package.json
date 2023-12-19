@@ -25,7 +25,8 @@
     "lint": "eslint ./src --ext .ts --max-warnings=0",
     "mapToken": "ts-node --esm ./src/mapToken.ts",
     "status": "ts-node --esm ./src/status.ts",
-    "withdraw": "ts-node --esm ./src/withdraw.ts"
+    "withdraw": "ts-node --esm ./src/withdraw.ts",
+    "withdrawTx": "ts-node --esm ./src/withdrawTx.ts"
   },
   "type": "module"
 }

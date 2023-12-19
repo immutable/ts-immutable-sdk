@@ -849,21 +849,21 @@ export class TokenBridge {
           ...txItem,
           token: decodedData[1],
           sender: decodedData[2],
-          receiver: decodedData[3],
+          recipient: decodedData[3],
           amount: decodedData[4],
         };
       }
 
       let flowRatePromiseIndex: number;
       if (metaStatus === StatusResponse.COMPLETE
-        && isWithdraw && txItem.receiver) {
+        && isWithdraw && txItem.recipient) {
         // consolodate the calls we have to make to the flow rate by receiver
-        if (!flowRatePromisesReceivers.includes(txItem.receiver)) {
-          flowRatePromises.push(rootBridge!.getPendingWithdrawals(txItem.receiver, [0]));
-          flowRatePromisesReceivers.push(txItem.receiver);
+        if (!flowRatePromisesReceivers.includes(txItem.recipient)) {
+          flowRatePromises.push(rootBridge!.getPendingWithdrawals(txItem.recipient, [0]));
+          flowRatePromisesReceivers.push(txItem.recipient);
           flowRatePromiseIndex = flowRatePromisesReceivers.length - 1;
         } else {
-          flowRatePromiseIndex = flowRatePromisesReceivers.findIndex((el) => el === txItem.receiver);
+          flowRatePromiseIndex = flowRatePromisesReceivers.findIndex((el) => el === txItem.recipient);
         }
         txItem.data.flowRatePromiseIndex = flowRatePromiseIndex;
       }
@@ -939,7 +939,7 @@ export class TokenBridge {
   }
 
   /**
- * Queries the status of a bridge transaction.
+ * Fetches the pending withdrawals for a given address.
  *
  * @param {PendingWithdrawalsRequest} req - The request object containing the reciever address.
  * @returns {Promise<PendingWithdrawalsResponse>} - A promise that resolves to an object containing the child token address.
@@ -954,7 +954,7 @@ export class TokenBridge {
         canWithdraw: true,
         withdrawer: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
         token: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-        amount: ethers.utils.parseUnits('1', 18).toString(),
+        amount: ethers.utils.parseUnits('1', 18),
         timeoutStart: 1698502429,
         timeoutEnd: 1701227629,
       },
@@ -962,7 +962,7 @@ export class TokenBridge {
         canWithdraw: false,
         withdrawer: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
         token: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-        amount: ethers.utils.parseUnits('2', 18).toString(),
+        amount: ethers.utils.parseUnits('2', 18),
         timeoutStart: 1698416029,
         timeoutEnd: 1698502429,
       }],
@@ -979,12 +979,90 @@ export class TokenBridge {
  */
   public async getFlowRateWithdrawTx(req:FlowRateWithdrawRequest): Promise<FlowRateWithdrawResponse> {
     // eslint-disable-next-line no-console
-    console.log('stubbed response with req', req);
+
+    if (!req.recipient) {
+      throw new BridgeError(
+        `invalid recipient ${req.recipient}`,
+        BridgeErrorType.INVALID_RECIPIENT,
+      );
+    }
+
+    if (req.index < 0) {
+      throw new BridgeError(
+        `invalid index ${req.index}`,
+        BridgeErrorType.INVALID_FLOWRATE_INDEX,
+      );
+    }
+
+    const rootBridge = await withBridgeError<ethers.Contract>(
+      async () => {
+        const contract = new ethers.Contract(
+          this.config.bridgeContracts.rootERC20BridgeFlowRate,
+          ROOT_ERC20_BRIDGE_FLOW_RATE,
+          this.config.rootProvider,
+        );
+        return contract;
+      },
+      BridgeErrorType.INTERNAL_ERROR,
+    );
+
+    const pending:Array<RootBridgePendingWithdrawal> = await rootBridge.getPendingWithdrawals(req.recipient, [0]);
+
+    if (pending.length === 0) {
+      throw new BridgeError(
+        `no pending withdrawals found for ${req.recipient}`,
+        BridgeErrorType.FLOW_RATE_ERROR,
+      );
+    }
+
+    if (!pending[req.index]) {
+      throw new BridgeError(
+        `invalid index ${req.index}`,
+        BridgeErrorType.FLOW_RATE_ERROR,
+      );
+    }
+
+    console.log('pending[req.index].timestamp', pending[req.index].timestamp);
+    console.log('Date.now()', Date.now());
+    console.log(pending[req.index].timestamp.gt(Math.floor(Date.now() / 1000)));
+
+    // @TODO query timeout from contract (SMR-2090)
+    const timeoutEnd = pending[req.index].timestamp.toNumber() + (60 * 60 * 24);
+    const timestampNow = Math.floor(Date.now() / 1000);
+
+    if (timeoutEnd > timestampNow) {
+      return {
+        pendingWithdrawal: {
+          canWithdraw: false,
+          withdrawer: pending[req.index].withdrawer,
+          token: pending[req.index].token,
+          amount: pending[req.index].amount,
+          timeoutStart: pending[req.index].timestamp.toNumber(),
+          timeoutEnd,
+        },
+        unsignedTx: null,
+      };
+    }
+
+    const data:string = await withBridgeError<string>(async () => rootBridge.interface.encodeFunctionData(
+      'finaliseQueuedWithdrawal',
+      [req.recipient, req.index],
+    ), BridgeErrorType.INTERNAL_ERROR);
+
     return {
+      pendingWithdrawal: {
+        canWithdraw: true,
+        withdrawer: pending[req.index].withdrawer,
+        token: pending[req.index].token,
+        amount: pending[req.index].amount,
+        timeoutStart: pending[req.index].timestamp.toNumber(),
+        timeoutEnd,
+      },
       unsignedTx: {
-        data: 'stubbed flow rate withdrawal data',
-        to: '0x0',
+        data,
+        to: this.config.bridgeContracts.rootERC20BridgeFlowRate,
         value: 0,
+        chainId: parseInt(this.config.bridgeInstance.rootChainID, 10),
       },
     };
   }
