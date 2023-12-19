@@ -425,7 +425,6 @@ export class Checkout {
     try {
       itemRequirements = await getItemRequirementsFromRequirements(web3Provider, params.itemRequirements);
     } catch (error) {
-      console.error(error);
       throw new CheckoutError('Failed to map item requirements', CheckoutErrorType.ITEM_REQUIREMENTS_ERROR);
     }
 
