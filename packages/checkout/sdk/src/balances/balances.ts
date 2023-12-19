@@ -244,7 +244,7 @@ export const getAllBalances = async (
 ): Promise<GetAllBalancesResult> => {
   if (!walletAddress && !web3Provider) {
     throw new CheckoutError(
-      'both walletAddress and provider as missing. At least one must be provided.',
+      'both walletAddress and provider are missing. At least one must be provided.',
       CheckoutErrorType.MISSING_PARAMS,
     );
   }
