@@ -222,7 +222,7 @@ export class Checkout {
    * Retrieves the token information given the token address. This function makes RPC calls to
    * ERC20 contracts to fetch the main contract information (e.g. symbol).
    * @param {GetTokenInfoParams} params - The parameters for retrieving the token information.
-   * @returns {Promise<TokenInfo | undefined>} - A promise that resolves to the token info request.
+   * @returns {Promise<TokenInfo>} - A promise that resolves to the token info request.
    */
   public async getTokenInfo(
     params: GetTokenInfoParams,
