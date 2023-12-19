@@ -90,10 +90,6 @@ export class RemoteConfigFetcher {
     return config[key];
   }
 
-  public isLoaded(): boolean {
-    return this.configCache !== undefined;
-  }
-
   public async getTokensConfig(chainId: ChainId): Promise<ChainTokensConfig> {
     const config = await this.loadConfigTokens();
     if (!config || !config[chainId]) return {};
