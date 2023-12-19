@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import { AxelarChainDetails, BridgeInstance } from 'types';
+import { AxelarChainDetails, BridgeInstance } from '../types';
 
 /**
  * @constant {string} ETH_SEPOLIA_CHAIN_ID - The chain ID for the Ethereum Sepolia testnet (EIP-155 compatible format).

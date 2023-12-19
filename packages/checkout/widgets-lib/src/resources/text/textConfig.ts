@@ -385,8 +385,8 @@ export const text = {
         title: 'Move coins',
       },
       fees: {
-        title: 'Gas Fee',
-        fiatPricePrefix: '≈ USD $',
+        title: 'Estimated fees',
+        fiatPricePrefix: '~ USD $',
       },
       content: {
         title: 'How much would you like to move?',
@@ -417,12 +417,12 @@ export const text = {
         heading: 'To',
       },
       fees: {
-        heading: 'Gas fee',
+        heading: 'Estimated fees',
       },
       submitButton: {
         buttonText: 'Confirm move',
       },
-      fiatPricePrefix: '≈ USD $',
+      fiatPricePrefix: '~ USD $',
     },
     [BridgeWidgetViews.BRIDGE_FAILURE]: {
       statusText: 'Transaction failed',

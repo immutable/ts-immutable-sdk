@@ -22,7 +22,6 @@
     "@next/eslint-plugin-next": "^13.4.7",
     "@types/node": "^18.14.2",
     "@types/react": "^18.0.28",
-    "@types/react-bootstrap": "^0.32.32",
     "@types/react-dom": "^18.0.11",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",

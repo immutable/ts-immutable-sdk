@@ -1,9 +1,11 @@
 import {
+  Accordion,
+  Body,
   Box,
   Button,
   Heading,
-  MenuItem,
   OptionKey,
+  PriceDisplay,
 } from '@biom3/react';
 import {
   GasEstimateBridgeToL2Result,
@@ -36,6 +38,7 @@ import {
   bridgeFormButtonContainerStyles,
   bridgeFormWrapperStyles,
   formInputsContainerStyles,
+  gasAmountAccordionStyles,
   gasAmountHeadingStyles,
 } from './BridgeFormStyles';
 import { CoinSelectorOptionProps } from '../../../components/CoinSelector/CoinSelectorOption';
@@ -232,8 +235,8 @@ export function BridgeForm(props: BridgeFormProps) {
     const gasEstimate = await tokenBridge!.getFee({
       action: bridgeFeeAction,
       gasMultiplier: 1.1,
-      sourceChainId: from?.network.toString(),
-      destinationChainId: to?.network.toString(),
+      sourceChainId: from?.network.toString() ?? '',
+      destinationChainId: to?.network.toString() ?? '',
     });
 
     const gasEstimateResult = {
@@ -423,14 +426,12 @@ export function BridgeForm(props: BridgeFormProps) {
         >
           {content.title}
         </Heading>
-        {isTokenBalancesLoading && (
-          <TokenSelectShimmer sx={formInputsContainerStyles} />
-        )}
-        {!isTokenBalancesLoading && (
+        {(!defaultTokenAddress || !isTokenBalancesLoading) && (
           <Box sx={formInputsContainerStyles}>
             <SelectForm
               testId="bridge-token"
               options={tokensOptions}
+              optionsLoading={isTokenBalancesLoading}
               coinSelectorHeading={bridgeForm.from.selectorTitle}
               selectedOption={selectedOption}
               subtext={tokenBalanceSubtext}
@@ -454,21 +455,28 @@ export function BridgeForm(props: BridgeFormProps) {
             />
           </Box>
         )}
+        {defaultTokenAddress && isTokenBalancesLoading && (
+          <TokenSelectShimmer sx={formInputsContainerStyles} />
+        )}
         {gasFee && (
           <Box sx={{ paddingY: 'base.spacing.x2' }}>
-            <MenuItem testId="bridge-gas-fee" emphasized size="small">
-              <MenuItem.Label sx={gasAmountHeadingStyles}>
-                {fees.title}
-              </MenuItem.Label>
-              <MenuItem.PriceDisplay
-                fiatAmount={`${fees.fiatPricePrefix} ${gasFeeFiatValue}`}
-                price={`${estimates?.token?.symbol} ${tokenValueFormat(gasFee)}`}
-              />
-              <MenuItem.StatefulButtCon
-                icon="ChevronExpand"
-                onClick={() => setShowFeeBreakdown(true)}
-              />
-            </MenuItem>
+            <Accordion
+              targetClickOveride={() => setShowFeeBreakdown(true)}
+              sx={gasAmountAccordionStyles}
+            >
+              <Accordion.TargetLeftSlot>
+                <Body size="medium" sx={gasAmountHeadingStyles}>
+                  {fees.title}
+                </Body>
+              </Accordion.TargetLeftSlot>
+              <Accordion.TargetRightSlot>
+                <PriceDisplay
+                  testId="bridge-gas-fee__priceDisplay"
+                  fiatAmount={`${fees.fiatPricePrefix} ${gasFeeFiatValue}`}
+                  price={`${estimates?.token?.symbol} ${tokenValueFormat(gasFee)}`}
+                />
+              </Accordion.TargetRightSlot>
+            </Accordion>
           </Box>
         )}
       </Box>
@@ -511,10 +519,10 @@ export function BridgeForm(props: BridgeFormProps) {
           walletAddress={walletAddress}
           showAdjustAmount={isNativeToken(formToken?.token.address)}
           tokenSymbol={
-            from?.network === getL1ChainId(checkout?.config)
-              ? ETH_TOKEN_SYMBOL
-              : IMX_TOKEN_SYMBOL
-          }
+              from?.network === getL1ChainId(checkout?.config)
+                ? ETH_TOKEN_SYMBOL
+                : IMX_TOKEN_SYMBOL
+            }
           onAddCoinsClick={() => {
             viewDispatch({
               payload: {
