@@ -81,6 +81,6 @@ async function mapToken() {
         await mapToken()
         console.log('Exiting successfully');
     } catch(err) {
-        console.log('Exiting with error', err)
+        console.error('Exiting with error', err)
     }
 })();

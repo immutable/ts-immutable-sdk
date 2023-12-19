@@ -45,7 +45,7 @@ async function getBridgeFees() {
     const depositRes: BridgeFeeResponse = await tokenBridge.getFee(depositReq);
     console.log('depositRes', depositRes);
   } catch(err) {
-    console.log('depositErr', err);
+    console.error('depositErr', err);
   }
 
   const withdrawReq: BridgeFeeRequest = {
@@ -61,7 +61,7 @@ async function getBridgeFees() {
     const withdrawRes: BridgeFeeResponse = await tokenBridge.getFee(withdrawReq);
     console.log('withdrawRes', withdrawRes);
   } catch(err) {
-    console.log('withdrawErr', err);
+    console.error('withdrawErr', err);
   }
 
   const finalizeReq: BridgeFeeRequest = {
@@ -75,7 +75,7 @@ async function getBridgeFees() {
     const finalizeRes: BridgeFeeResponse = await tokenBridge.getFee(finalizeReq);
     console.log('finalizeRes', finalizeRes);
   } catch(err) {
-    console.log('finalizeErr', err);
+    console.error('finalizeErr', err);
   }
 }
 
@@ -84,6 +84,6 @@ async function getBridgeFees() {
         await getBridgeFees()
         console.log('Exiting successfully');
     } catch(err) {
-        console.log('Exiting with error', err)
+        console.error('Exiting with error', err)
     }
 })();

@@ -13,7 +13,9 @@ export async function waitForReceipt(txHash: string, provider: providers.JsonRpc
         attempt++;
         console.log('waiting for receipt attempt: ', attempt);
         receipt = await provider.getTransactionReceipt(txHash)
-        await delay(1000);
+        if (receipt == null) {
+            await delay(1000);
+        }
     }
     console.log("Receipt: " + JSON.stringify(receipt, null, 2));
     if (receipt.status != 1) {
@@ -59,7 +61,9 @@ export async function waitUntilSucceed(axelarURL: string, txHash: any) {
             method: 'POST',
             body: req,
             headers: {'Content-Type': 'application/json; charset=UTF-8'} });
-        if (!response.ok) {}
+        if (!response.ok) {
+            console.error('Bad Response: ', response)
+        }
         if (response.body !== null) {
             const asString = new TextDecoder("utf-8").decode(await response.arrayBuffer());
             const asJSON = JSON.parse(asString);

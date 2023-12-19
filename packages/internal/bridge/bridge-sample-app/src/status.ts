@@ -62,6 +62,6 @@ async function status() {
         await status()
         console.log('Exiting successfully');
     } catch(err) {
-        console.log('Exiting with error', err)
+        console.error('Exiting with error', err)
     }
 })();

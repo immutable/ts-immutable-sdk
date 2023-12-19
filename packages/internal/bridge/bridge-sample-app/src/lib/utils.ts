@@ -16,11 +16,11 @@ export async function setupForBridge() {
       if (!process.env.RECIPIENT_ADDRESS) {
         throw new Error('RECIPIENT_ADDRESS not set');
       }
-      if (!process.env.SEPOLIA_TOKEN_ADDRESS) {
-        throw new Error('SEPOLIA_TOKEN_ADDRESS not set');
+      if (!process.env.ROOT_TOKEN_ADDRESS) {
+        throw new Error('ROOT_TOKEN_ADDRESS not set');
       }
-      if (!process.env.ZKEVM_TESTNET_TOKEN_ADDRESS) {
-        throw new Error('ZKEVM_TESTNET_TOKEN_ADDRESS not set');
+      if (!process.env.CHILD_TOKEN_ADDRESS) {
+        throw new Error('CHILD_TOKEN_ADDRESS not set');
       }
       if (!process.env.SEND_AMOUNT) {
         throw new Error('SEND_AMOUNT not set');
@@ -65,8 +65,8 @@ export async function setupForBridge() {
         childProvider,
         sender: process.env.SENDER_ADDRESS,
         recipient: process.env.RECIPIENT_ADDRESS,
-        sepoliaToken: process.env.SEPOLIA_TOKEN_ADDRESS,
-        zkevmTestnetToken: process.env.ZKEVM_TESTNET_TOKEN_ADDRESS,
+        rootToken: process.env.ROOT_TOKEN_ADDRESS,
+        childToken: process.env.CHILD_TOKEN_ADDRESS,
         amount,
         rootWallet,
         childWallet,

@@ -33,7 +33,7 @@ async function getApprovalTxs() {
 
     const depositReq: ApproveBridgeRequest = {
       senderAddress: params.sender,
-      token: params.sepoliaToken,
+      token: params.rootToken,
       amount: params.amount,
       sourceChainId: ETH_SEPOLIA_CHAIN_ID,
       destinationChainId: ZKEVM_TESTNET_CHAIN_ID,
@@ -45,7 +45,7 @@ async function getApprovalTxs() {
       const depositRes: ApproveBridgeResponse = await tokenBridge.getUnsignedApproveBridgeTx(depositReq);
       console.log('depositRes', depositRes);
     } catch(err) {
-      console.log('depositErr', err);
+      console.error('depositErr', err);
     }
 
     const depositNativeReq: ApproveBridgeRequest = {
@@ -62,12 +62,12 @@ async function getApprovalTxs() {
       const depositNativeRes: ApproveBridgeResponse = await tokenBridge.getUnsignedApproveBridgeTx(depositNativeReq);
       console.log('depositNativeRes', depositNativeRes);
     } catch(err) {
-      console.log('depositNativeErr', err);
+      console.error('depositNativeErr', err);
     }
 
     const withdrawReq: ApproveBridgeRequest = {
       senderAddress: params.sender,
-      token: params.zkevmTestnetToken,
+      token: params.childToken,
       amount: params.amount,
       sourceChainId: ZKEVM_TESTNET_CHAIN_ID,
       destinationChainId: ETH_SEPOLIA_CHAIN_ID,
@@ -79,7 +79,7 @@ async function getApprovalTxs() {
       const withdrawRes: ApproveBridgeResponse = await tokenBridge.getUnsignedApproveBridgeTx(withdrawReq);
       console.log('withdrawRes', withdrawRes);
     } catch(err) {
-      console.log('withdrawErr', err);
+      console.error('withdrawErr', err);
     }
 
     const withdrawNativeReq: ApproveBridgeRequest = {
@@ -96,7 +96,7 @@ async function getApprovalTxs() {
       const withdrawNativeRes: ApproveBridgeResponse = await tokenBridge.getUnsignedApproveBridgeTx(withdrawNativeReq);
       console.log('withdrawNativeRes', withdrawNativeRes);
     } catch(err) {
-      console.log('withdrawNativeErr', err);
+      console.error('withdrawNativeErr', err);
     }
 }
 
@@ -105,6 +105,6 @@ async function getApprovalTxs() {
         await getApprovalTxs()
         console.log('Exiting successfully');
     } catch(err) {
-        console.log('Exiting with error', err)
+        console.error('Exiting with error', err)
     }
 })();
