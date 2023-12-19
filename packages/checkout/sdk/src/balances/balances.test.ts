@@ -203,7 +203,7 @@ describe('balances', () => {
     });
   });
 
-  describe.only('getAllBalances()', () => {
+  describe('getAllBalances()', () => {
     let mockProviderForAllBalances: jest.Mock;
     let balanceOfMock: jest.Mock;
     let decimalsMock: jest.Mock;

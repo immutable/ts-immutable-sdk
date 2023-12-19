@@ -30,7 +30,7 @@ export interface GetBalanceResult {
 /**
  * Interface representing the parameters for {@link Checkout.getAllBalances}.
  * @property {Web3Provider} provider - The provider used to get the balances, it is a required parameter if no walletAddress is provided.
- * @property {string} walletAddress - The wallet address, , it is a required parameter if no provider is provided.
+ * @property {string} walletAddress - The wallet address, it is a required parameter if no provider is provided.
  * @property {ChainId} chainId - The ID of the network.
  */
 export interface GetAllBalancesParams {
