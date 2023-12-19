@@ -247,12 +247,16 @@ export const getBalances = async (
 
 export const getAllBalances = async (
   config: CheckoutConfiguration,
-  web3Provider: Web3Provider,
-  walletAddress: string,
-  chainId?: ChainId,
+  web3Provider: Web3Provider | undefined,
+  walletAddress: string | undefined,
+  chainId: ChainId,
 ): Promise<GetAllBalancesResult> => {
-  // eslint-disable-next-line no-param-reassign
-  chainId ||= await web3Provider.getSigner().getChainId();
+  if (!walletAddress && !web3Provider) {
+    throw new CheckoutError(
+      'both walletAddress and provider are missing. At least one must be provided.',
+      CheckoutErrorType.MISSING_PARAMS,
+    );
+  }
 
   const { tokens } = await getTokenAllowList(
     config,
@@ -273,6 +277,7 @@ export const getAllBalances = async (
     console.error(err);
   }
 
+  let address = walletAddress;
   if (flag && Blockscout.isChainSupported(chainId)) {
     // This is a hack because the widgets are still using the tokens symbol
     // to drive the conversions. If we remove all the token symbols from e.g. zkevm
@@ -280,19 +285,28 @@ export const getAllBalances = async (
     // Please remove this hack once https://immutable.atlassian.net/browse/WT-1710
     // is done.
     const isL1Chain = getL1ChainId(config) === chainId;
+    if (!address) address = await web3Provider?.getSigner().getAddress();
     return await measureAsyncExecution<GetAllBalancesResult>(
       config,
       `Time to fetch balances using blockscout for ${chainId}`,
-      getIndexerBalance(walletAddress, chainId, isL1Chain ? tokens : undefined),
+      getIndexerBalance(address!, chainId, isL1Chain ? tokens : undefined),
+    );
+  }
+
+  if (!web3Provider) {
+    throw new CheckoutError(
+      'indexer is disabled for this chain, you must provide a provider.',
+      CheckoutErrorType.MISSING_PARAMS,
     );
   }
 
   // This fallback to use ERC20s calls which is a best effort solution
   // Fails in fetching data from the RCP calls might result in some
   // missing data.
+  address ||= await web3Provider.getSigner().getAddress();
   return await measureAsyncExecution<GetBalancesResult>(
     config,
     `Time to fetch balances using RPC for ${chainId}`,
-    getBalances(config, web3Provider, walletAddress, tokens),
+    getBalances(config, web3Provider, address, tokens),
   );
 };
