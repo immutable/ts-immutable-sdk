@@ -353,6 +353,7 @@ describe('balances', () => {
             getTokensConfig: () => ({
               blockscout: false,
             }),
+            getHttpClient: () => mockedHttpClient,
           },
           networkMap: testCheckoutConfig.networkMap,
         } as unknown as CheckoutConfiguration,
@@ -441,6 +442,7 @@ describe('balances', () => {
             getTokensConfig: () => ({
               blockscout: true,
             }),
+            getHttpClient: () => mockedHttpClient,
           },
           networkMap: testCheckoutConfig.networkMap,
         } as unknown as CheckoutConfiguration,
@@ -523,6 +525,7 @@ describe('balances', () => {
             getTokensConfig: () => ({
               blockscout: true,
             }),
+            getHttpClient: () => mockedHttpClient,
           },
           networkMap: new CheckoutConfiguration(
             {
@@ -568,6 +571,7 @@ describe('balances', () => {
             getTokensConfig: () => ({
               blockscout: true,
             }),
+            getHttpClient: () => mockedHttpClient,
           },
           networkMap: testCheckoutConfig.networkMap,
         } as unknown as CheckoutConfiguration,
@@ -626,6 +630,7 @@ describe('balances', () => {
             getTokensConfig: () => ({
               blockscout: true,
             }),
+            getHttpClient: () => mockedHttpClient,
           },
           networkMap: testCheckoutConfig.networkMap,
         } as unknown as CheckoutConfiguration,
@@ -672,6 +677,7 @@ describe('balances', () => {
             getTokensConfig: () => ({
               blockscout: true,
             }),
+            getHttpClient: () => mockedHttpClient,
           },
           networkMap: testCheckoutConfig.networkMap,
         } as unknown as CheckoutConfiguration,
@@ -720,6 +726,7 @@ describe('balances', () => {
                 getTokensConfig: () => ({
                   blockscout: true,
                 }),
+                getHttpClient: () => mockedHttpClient,
               },
               networkMap: testCheckoutConfig.networkMap,
             } as unknown as CheckoutConfiguration,

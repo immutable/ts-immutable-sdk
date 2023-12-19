@@ -25,6 +25,7 @@ import {
 import { BuyOrder, OrderFee } from '../../types';
 import { SignTransactionStatusType } from '../actions/types';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from '../routing/indexer/fetchL1Representation';
+import { HttpClient } from '../../api/http';
 
 jest.mock('../../instance');
 jest.mock('../smartCheckout');
@@ -33,9 +34,11 @@ jest.mock('../actions');
 describe('buy', () => {
   const gasLimit = constants.estimatedFulfillmentGasGwei;
   const seaportContractAddress = '0xSEAPORT';
+  let mockedHttpClient: jest.Mocked<HttpClient>;
 
   beforeEach(() => {
     jest.spyOn(console, 'info').mockImplementation(() => {});
+    mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
   });
 
   describe('buy', () => {
@@ -51,7 +54,7 @@ describe('buy', () => {
 
       config = new CheckoutConfiguration({
         baseConfig: { environment: Environment.SANDBOX },
-      });
+      }, mockedHttpClient);
     });
 
     it('should call smart checkout with item requirements and execute transactions', async () => {
@@ -1213,7 +1216,7 @@ describe('buy', () => {
 
       config = new CheckoutConfiguration({
         baseConfig: { environment: Environment.SANDBOX },
-      });
+      }, mockedHttpClient);
     });
     const nativeOrderTakerFeeTestCases = [
       {

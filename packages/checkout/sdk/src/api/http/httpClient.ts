@@ -31,7 +31,7 @@ export class HttpClient {
   private setupInterceptors() {
     this.axiosInstance.interceptors.request.use(
       (config) => {
-        const publishableKey = this.config.baseConfig?.publishableKey;
+        const publishableKey = this.config?.baseConfig?.publishableKey;
         if (publishableKey && this.shouldAddPublishableKey(config.url || '')) {
           if (!publishableKey.startsWith(PUBLISHABLE_KEY_PREFIX)) {
             throw new Error(
@@ -53,6 +53,7 @@ export class HttpClient {
 
   // eslint-disable-next-line class-methods-use-this
   private processResponse(response: AxiosResponse) {
+    console.log('Process Response..', response);
     if (response?.status !== 200) {
       throw new CheckoutError(
         `Error fetching from api: ${response.status} ${response.statusText}`,
