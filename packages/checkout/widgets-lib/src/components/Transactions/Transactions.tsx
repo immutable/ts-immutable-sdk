@@ -57,7 +57,6 @@ export function Transactions({ checkout }: TransactionsProps) {
   const isPassport = isPassportProvider(provider);
 
   const txnsListStyle = useMemo(() => transactionsListStyle(isPassport), []);
-  // getStyles({ isPassport }), [something]);
 
   // Fetch the tokens for the root chain using the allowed tokens.
   // In case this list does not have all the tokens, there is logic
