@@ -114,7 +114,7 @@ export function BridgeReviewSummary() {
     const [unsignedApproveTransaction, unsignedTransaction] = await Promise.all([
       tokenBridge!.getUnsignedApproveBridgeTx({
         senderAddress: fromAddress,
-        token: token?.address,
+        token: token.address ?? '',
         amount: utils.parseUnits(amount, token.decimals),
         sourceChainId: from?.network.toString(),
         destinationChainId: to?.network.toString(),
@@ -122,7 +122,7 @@ export function BridgeReviewSummary() {
       tokenBridge!.getUnsignedBridgeTx({
         senderAddress: fromAddress,
         recipientAddress: toAddress,
-        token: token?.address,
+        token: token.address ?? '',
         amount: utils.parseUnits(amount, token.decimals),
         sourceChainId: from?.network.toString(),
         destinationChainId: to?.network.toString(),

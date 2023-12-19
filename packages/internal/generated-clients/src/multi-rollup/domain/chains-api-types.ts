@@ -35,7 +35,7 @@ export { ListChainsResult } from '../models';
  * @export
  * @interface ListChainsRequest
  */
-export interface ListChainsRequest {
+export interface ListChainsRequestParams {
     /**
      * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
      * @type {string}
