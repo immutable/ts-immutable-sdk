@@ -232,8 +232,8 @@ export function BridgeForm(props: BridgeFormProps) {
     const gasEstimate = await tokenBridge!.getFee({
       action: bridgeFeeAction,
       gasMultiplier: 1.1,
-      sourceChainId: from?.network.toString(),
-      destinationChainId: to?.network.toString(),
+      sourceChainId: from?.network.toString() ?? '',
+      destinationChainId: to?.network.toString() ?? '',
     });
 
     const gasEstimateResult = {
