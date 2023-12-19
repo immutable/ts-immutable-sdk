@@ -23,14 +23,16 @@ import {
   ItemType,
 } from '../../../types';
 import { quoteFetcher } from './quoteFetcher';
+import { HttpClient } from '../../../api/http';
 
 jest.mock('../../../config/remoteConfigFetcher');
 jest.mock('./quoteFetcher');
 
 describe('swapRoute', () => {
+  const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
   const config = new CheckoutConfiguration({
     baseConfig: { environment: Environment.SANDBOX },
-  });
+  }, mockedHttpClient);
 
   const dexQuotes: DexQuotes = new Map<string, DexQuote>(
     [

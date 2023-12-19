@@ -19,6 +19,7 @@ import { CheckoutErrorType } from '../../../errors';
 import { allowListCheckForBridge } from '../../allowList/allowListCheck';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from '../indexer/fetchL1Representation';
 import { DEFAULT_TOKEN_DECIMALS } from '../../../env';
+import { HttpClient } from '../../../api/http';
 
 jest.mock('../../../gasEstimate');
 jest.mock('../../../instance');
@@ -26,9 +27,10 @@ jest.mock('./getBridgeFeeEstimate');
 jest.mock('../../allowList/allowListCheck');
 
 describe('bridgeRoute', () => {
+  const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
   const config = new CheckoutConfiguration({
     baseConfig: { environment: Environment.SANDBOX },
-  });
+  }, mockedHttpClient);
 
   const readonlyProviders = new Map<ChainId, JsonRpcProvider>([
     [ChainId.SEPOLIA, {} as JsonRpcProvider],

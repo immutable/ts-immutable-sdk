@@ -10,6 +10,7 @@ import { CheckoutConfiguration } from '../../config';
 import { getAllBalances } from '../../balances';
 import { BalanceCheckResult } from './types';
 import { DEFAULT_TOKEN_DECIMALS } from '../../env';
+import { HttpClient } from '../../api/http';
 
 jest.mock('../../balances');
 jest.mock('ethers', () => ({
@@ -33,9 +34,10 @@ describe('balanceCheck', () => {
       },
     } as unknown as Web3Provider;
 
+    const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
     config = new CheckoutConfiguration({
       baseConfig: { environment: Environment.SANDBOX },
-    });
+    }, mockedHttpClient);
   });
 
   describe('when NATIVE tokens are required', () => {

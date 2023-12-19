@@ -9,6 +9,7 @@ import { createOrderbookInstance } from '../../instance';
 import { signFulfillmentTransactions } from '../actions';
 import { CheckoutStatus } from '../../types';
 import { SignTransactionStatusType } from '../actions/types';
+import { HttpClient } from '../../api/http';
 
 jest.mock('../../instance');
 jest.mock('../actions');
@@ -25,9 +26,10 @@ describe('cancel', () => {
         }),
       } as unknown as Web3Provider;
 
+      const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
       config = new CheckoutConfiguration({
         baseConfig: { environment: Environment.SANDBOX },
-      });
+      }, mockedHttpClient);
 
       jest.spyOn(console, 'info').mockImplementation(() => {});
     });
