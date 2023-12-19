@@ -177,7 +177,7 @@ describe('gasCalculator', () => {
 
       expect(items).toEqual({
         type: ItemType.ERC20,
-        contractAddress: '0xERC20',
+        tokenAddress: '0xERC20',
         amount: BigNumber.from(400000),
         spenderAddress: '',
       });
@@ -296,7 +296,7 @@ describe('gasCalculator', () => {
       expect(item).toEqual({
         type: ItemType.ERC20,
         amount: BigNumber.from(100000),
-        contractAddress: '0xERC20',
+        tokenAddress: '0xERC20',
         spenderAddress: '',
       });
     });

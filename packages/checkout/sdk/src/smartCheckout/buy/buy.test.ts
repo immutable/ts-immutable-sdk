@@ -267,7 +267,7 @@ describe('buy', () => {
               {
                 type: 'ERC20',
                 amount: '1000000000000000000',
-                tokenAddress: '0xCONTRACTADDRESS',
+                contractAddress: '0xCONTRACTADDRESS',
               },
             ],
             fees: [
@@ -438,7 +438,7 @@ describe('buy', () => {
                 {
                   type: 'ERC20',
                   amount: '1000000000000000000',
-                  tokenAddress: '0xCONTRACTADDRESS',
+                  contractAddress: '0xCONTRACTADDRESS',
                 },
               ],
               fees: [
@@ -582,7 +582,7 @@ describe('buy', () => {
               {
                 type: 'ERC20',
                 amount: '1000000000000000000',
-                tokenAddress: '0x123',
+                contractAddress: '0x123',
               },
             ],
             fees: [
@@ -1017,7 +1017,7 @@ describe('buy', () => {
               {
                 type: 'ERC721',
                 tokenId: '1',
-                tokenAddress: '0x123',
+                contractAddress: '0x123',
               },
             ],
             fees: [
@@ -1555,7 +1555,7 @@ describe('buy', () => {
                 {
                   type: 'ERC20',
                   amount: '1000000',
-                  tokenAddress: '0xCONTRACTADDRESS',
+                  contractAddress: '0xCONTRACTADDRESS',
                 },
               ],
               fees: [

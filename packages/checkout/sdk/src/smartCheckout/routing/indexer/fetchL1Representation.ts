@@ -32,7 +32,6 @@ export const fetchL1Representation = async (
   config: CheckoutConfiguration,
   l2address: string,
 ): Promise<L1ToL2TokenAddressMapping | undefined> => {
-  console.log('fetchL1Representation::', l2address, config);
   if (isNativeToken(l2address)) {
     return {
       l1address: await getImxL1Representation(getL1ChainId(config), config),
