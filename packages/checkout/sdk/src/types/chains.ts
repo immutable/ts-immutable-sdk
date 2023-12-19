@@ -46,5 +46,5 @@ export enum ChainSlug {
   SEPOLIA = 'sepolia',
   IMTBL_ZKEVM_MAINNET = 'imtbl-zkevm-mainnet',
   IMTBL_ZKEVM_TESTNET = 'imtbl-zkevm-testnet',
-  IMTBL_ZKEVM_DEVNET = 'imtbl-zkevm-devent',
+  IMTBL_ZKEVM_DEVNET = 'imtbl-zkevm-devnet',
 }
