@@ -800,7 +800,7 @@ export class TokenBridge {
     for (let i = 0, l = statusResponses.length; i < l; i++) {
       let metaStatus: StatusResponse;
 
-      // consolodate axelar statuses to our own simplified metaStatus
+      // consolidate axelar statuses to our own simplified metaStatus
       switch (statusResponses[i].status) {
         case GMPStatus.CANNOT_FETCH_STATUS:
           metaStatus = StatusResponse.PENDING;
@@ -857,7 +857,7 @@ export class TokenBridge {
       let flowRatePromiseIndex: number;
       if (metaStatus === StatusResponse.COMPLETE
         && isWithdraw && txItem.receiver) {
-        // consolodate the calls we have to make to the flow rate by receiver
+        // consolidate the calls we have to make to the flow rate by receiver
         if (!flowRatePromisesReceivers.includes(txItem.receiver)) {
           flowRatePromises.push(rootBridge!.getPendingWithdrawals(txItem.receiver, [0]));
           flowRatePromisesReceivers.push(txItem.receiver);
