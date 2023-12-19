@@ -5,7 +5,7 @@
 First copy the ``.example.env`` file to `.env` and fill it out with your own private key and deposit/recipient addresses.
 
 ```
-# SDK METHOD TESTS -------------------------------------------------
+# REQUIRED -----------------------------------------------------------------
 
 # RPC URL for the root chain, i.e. L1
 ROOT_PROVIDER_RPC=https://1rpc.io/sepolia
@@ -13,27 +13,36 @@ ROOT_PROVIDER_RPC=https://1rpc.io/sepolia
 CHILD_PROVIDER_RPC=https://rpc.testnet.immutable.com
 # Private key of the depositor
 PRIVATE_KEY=XXX
-# Address of the depositor
-DEPOSITOR_ADDRESS=XXX
+# Address of the sender
+SENDER_ADDRESS=0xEac347177DbA4a190B632C7d9b8da2AbfF57c772
 # Address of the desired recipient on L2
-RECIPIENT_ADDRESS=XXX
+RECIPIENT_ADDRESS=0xEac347177DbA4a190B632C7d9b8da2AbfF57c772
 # Token address to be deposited
-SEPOLIA_TOKEN_ADDRESS=0x741185AEFC3E539c1F42c1d6eeE8bFf1c89D70FE
+SEPOLIA_TOKEN_ADDRESS=0x40b87d235A5B010a20A241F15797C9debf1ecd01
 # Token address to be withdawn
-ZKEVM_TESTNET_TOKEN_ADDRESS=0xaC953a0d7B67Fae17c87abf79f09D0f818AC66A2
+ZKEVM_TESTNET_TOKEN_ADDRESS=0x3B2d8A1931736Fc321C24864BceEe981B11c3c57
 # Depsit amount (amount will be multiplied by 10^18)
-DEPOSIT_AMOUNT=0.001
-
-# MAP TOKEN (OPTIONAL) -----------------------------------------------
-
+SEND_AMOUNT=0.001
+# Deposit token decimals
+SEND_DECIMALS=6
 # Address of the root bridge 
-ROOT_BRIDGE_ADDRESS=0x8d4528775a4406Def316DC2b450eE539750F8FAA
+ROOT_BRIDGE_ADDRESS=0x0D3C59c779Fd552C27b23F723E80246c840100F5
 # Address of the child bridge
-CHILD_BRIDGE_ADDRESS=0xb0f971e2d11A4D410148af51b170D64E725c0bB9
+CHILD_BRIDGE_ADDRESS=0x0D3C59c779Fd552C27b23F723E80246c840100F5
+
+# MAP TOKEN ----------------------------------------------------------------
+
 # Used to map a token from root -> child
-ROOT_TOKEN_TO_MAP=XXX
+ROOT_TOKEN_TO_MAP=0x40b87d235A5B010a20A241F15797C9debf1ecd01
 # Used to check on mapped token status
 AXELAR_API_URL=https://testnet.api.gmp.axelarscan.io
+
+# STATUS -------------------------------------------------------------------
+
+# Transaction hash to check the status of
+STATUS_TX_HASH=0x89d9a95ccdb7d4370f86fd9a6680d141367e5c24b2d111ec1fc6c87037ecfddb
+# Chain ID of the source chain where the bridge tx to check originated from
+STATUS_SOURCE_CHAIN_ID=13473
 ```
 
 The params under `SDK METHOD TESTS` are required to run the smoke tests.

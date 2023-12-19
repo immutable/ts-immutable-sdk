@@ -1,18 +1,25 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/dot-notation */
 /* eslint-disable @typescript-eslint/naming-convention */
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { TokenBridge } from 'tokenBridge';
 import { BridgeConfiguration } from 'config';
 import { ETH_SEPOLIA_TO_ZKEVM_DEVNET } from 'constants/bridges';
-import { BridgeFeeActions, BridgeTxRequest, BridgeTxResponse } from 'types';
+import {
+  BridgeFeeActions, BridgeTxRequest, BridgeTxResponse, StatusResponse,
+} from 'types';
 import { ethers } from 'ethers';
 import { BridgeError, BridgeErrorType } from 'errors';
+import { GMPStatus, GasPaidStatus } from 'types/axelar';
+import { queryTransactionStatus } from 'lib/gmpRecovery';
 
 jest.mock('axios', () => ({
   post: jest.fn().mockReturnValue({
     data: '100000000',
   }),
 }));
+
+jest.mock('lib/gmpRecovery');
 
 describe('Token Bridge', () => {
   it('Constructor works correctly', async () => {
@@ -583,6 +590,437 @@ describe('Token Bridge', () => {
       expect(result.bridgeFee).toStrictEqual(bridgeFee);
       expect(result.imtblFee).toStrictEqual(imtblFee);
       expect(result.totalFees).toStrictEqual(totalFees);
+    });
+  });
+
+  describe('getTransactionStatus', () => {
+    let tokenBridge: TokenBridge;
+
+    const DEPOSIT_SIG = ethers.utils.keccak256(ethers.utils.toUtf8Bytes('DEPOSIT'));
+    const WITHDRAW_SIG = ethers.utils.keccak256(ethers.utils.toUtf8Bytes('WITHDRAW'));
+
+    const amount = ethers.BigNumber.from(1000);
+    const token = '0x40b87d235A5B010a20A241F15797C9debf1ecd01';
+    const sender = '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772';
+    const receiver = '0xA383968dC8711FFE8A7353AdE9feF7Ddcb1473a0';
+
+    const abiCoder = new ethers.utils.AbiCoder();
+    const mockDepositPayload = abiCoder.encode(
+      ['bytes32', 'address', 'address', 'address', 'uint256'],
+      [
+        DEPOSIT_SIG,
+        token,
+        sender,
+        receiver,
+        amount,
+      ],
+    );
+    const mockWithdrawPayload = abiCoder.encode(
+      ['bytes32', 'address', 'address', 'address', 'uint256'],
+      [
+        WITHDRAW_SIG,
+        token,
+        sender,
+        receiver,
+        amount,
+      ],
+    );
+
+    const mockERC20ContractFlowRate = {
+      allowance: jest.fn(),
+      interface: {
+        encodeFunctionData: jest.fn(),
+      },
+      getPendingWithdrawals: jest.fn().mockImplementation(async () => [
+        {
+          withdrawer: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
+          token: '0x40b87d235A5B010a20A241F15797C9debf1ecd01',
+          amount,
+          timestamp: ethers.BigNumber.from(1000),
+        },
+      ]),
+    };
+
+    const mockERC20Contract = {
+      allowance: jest.fn(),
+      interface: {
+        encodeFunctionData: jest.fn(),
+      },
+      getPendingWithdrawals: jest.fn().mockImplementation(async () => []),
+    };
+
+    beforeEach(() => {
+      const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
+      const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
+      const bridgeConfig = new BridgeConfiguration({
+        baseConfig: new ImmutableConfiguration({
+          environment: Environment.SANDBOX,
+        }),
+        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+        rootProvider: voidRootProvider,
+        childProvider: voidChildProvider,
+      });
+      jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20Contract as any);
+      tokenBridge = new TokenBridge(bridgeConfig);
+    });
+
+    afterEach(() => {
+      jest.clearAllMocks();
+      // TokenBridge.prototype['queryTransactionStatus'] = originalQueryTransactionStatus;
+    });
+    it('returns the PENDING status for a deposit', async () => {
+      expect.assertions(8);
+
+      (queryTransactionStatus as jest.Mock).mockReturnValue({
+        status: GMPStatus.CANNOT_FETCH_STATUS,
+        gasPaidInfo: {
+          status: GasPaidStatus.GAS_PAID,
+        },
+        callTx: {
+          returnValues: {
+            payload: mockDepositPayload,
+          },
+        },
+      });
+
+      const txHash = '0x5c192bf2b3be59de3a69877f6c71fd0affe6e1a1c05a75f51d4a60692001d8f3';
+      const result = await tokenBridge.getTransactionStatus({
+        transactions: [{
+          txHash,
+        }],
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+      });
+
+      expect(result).not.toBeNull();
+      expect(result.transactions.length).toBe(1);
+      expect(result.transactions[0].status).toBe(StatusResponse.PENDING);
+      expect(result.transactions[0].txHash).toBe(txHash);
+      expect(result.transactions[0].token).toBe(token);
+      expect(result.transactions[0].sender).toBe(sender);
+      expect(result.transactions[0].receiver).toBe(receiver);
+      expect(result.transactions[0].amount).toStrictEqual(amount);
+    });
+    it('returns the PROCESSING status for a deposit', async () => {
+      expect.assertions(8);
+
+      (queryTransactionStatus as jest.Mock).mockReturnValue({
+        status: GMPStatus.SRC_GATEWAY_CALLED,
+        gasPaidInfo: {
+          status: GasPaidStatus.GAS_PAID,
+        },
+        callTx: {
+          returnValues: {
+            payload: mockDepositPayload,
+          },
+        },
+      });
+
+      const txHash = '0x5c192bf2b3be59de3a69877f6c71fd0affe6e1a1c05a75f51d4a60692001d8f3';
+      const result = await tokenBridge.getTransactionStatus({
+        transactions: [{
+          txHash,
+        }],
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+      });
+
+      expect(result).not.toBeNull();
+      expect(result.transactions.length).toBe(1);
+      expect(result.transactions[0].status).toBe(StatusResponse.PROCESSING);
+      expect(result.transactions[0].txHash).toBe(txHash);
+      expect(result.transactions[0].token).toBe(token);
+      expect(result.transactions[0].sender).toBe(sender);
+      expect(result.transactions[0].receiver).toBe(receiver);
+      expect(result.transactions[0].amount).toStrictEqual(amount);
+    });
+    it('returns the COMPLETE status for a deposit', async () => {
+      expect.assertions(8);
+
+      (queryTransactionStatus as jest.Mock).mockReturnValue({
+        status: GMPStatus.DEST_EXECUTED,
+        gasPaidInfo: {
+          status: GasPaidStatus.GAS_PAID,
+        },
+        callTx: {
+          returnValues: {
+            payload: mockDepositPayload,
+          },
+        },
+      });
+
+      const txHash = '0x5c192bf2b3be59de3a69877f6c71fd0affe6e1a1c05a75f51d4a60692001d8f3';
+      const result = await tokenBridge.getTransactionStatus({
+        transactions: [{
+          txHash,
+        }],
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+      });
+
+      expect(result).not.toBeNull();
+      expect(result.transactions.length).toBe(1);
+      expect(result.transactions[0].status).toBe(StatusResponse.COMPLETE);
+      expect(result.transactions[0].txHash).toBe(txHash);
+      expect(result.transactions[0].token).toBe(token);
+      expect(result.transactions[0].sender).toBe(sender);
+      expect(result.transactions[0].receiver).toBe(receiver);
+      expect(result.transactions[0].amount).toStrictEqual(amount);
+    });
+    it('returns the ERROR status for a deposit', async () => {
+      expect.assertions(8);
+
+      (queryTransactionStatus as jest.Mock).mockReturnValue({
+        status: GMPStatus.UNKNOWN_ERROR,
+        gasPaidInfo: {
+          status: GasPaidStatus.GAS_PAID,
+        },
+        callTx: {
+          returnValues: {
+            payload: mockDepositPayload,
+          },
+        },
+      });
+
+      const txHash = '0x5c192bf2b3be59de3a69877f6c71fd0affe6e1a1c05a75f51d4a60692001d8f3';
+      const result = await tokenBridge.getTransactionStatus({
+        transactions: [{
+          txHash,
+        }],
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+      });
+
+      expect(result).not.toBeNull();
+      expect(result.transactions.length).toBe(1);
+      expect(result.transactions[0].status).toBe(StatusResponse.ERROR);
+      expect(result.transactions[0].txHash).toBe(txHash);
+      expect(result.transactions[0].token).toBe(token);
+      expect(result.transactions[0].sender).toBe(sender);
+      expect(result.transactions[0].receiver).toBe(receiver);
+      expect(result.transactions[0].amount).toStrictEqual(amount);
+    });
+    it('returns the RETRY status for a deposit', async () => {
+      expect.assertions(8);
+
+      (queryTransactionStatus as jest.Mock).mockReturnValue({
+        status: GMPStatus.NOT_EXECUTED,
+        gasPaidInfo: {
+          status: GasPaidStatus.GAS_PAID,
+        },
+        callTx: {
+          returnValues: {
+            payload: mockDepositPayload,
+          },
+        },
+      });
+
+      const txHash = '0x5c192bf2b3be59de3a69877f6c71fd0affe6e1a1c05a75f51d4a60692001d8f3';
+      const result = await tokenBridge.getTransactionStatus({
+        transactions: [{
+          txHash,
+        }],
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+      });
+
+      expect(result).not.toBeNull();
+      expect(result.transactions.length).toBe(1);
+      expect(result.transactions[0].status).toBe(StatusResponse.RETRY);
+      expect(result.transactions[0].txHash).toBe(txHash);
+      expect(result.transactions[0].token).toBe(token);
+      expect(result.transactions[0].sender).toBe(sender);
+      expect(result.transactions[0].receiver).toBe(receiver);
+      expect(result.transactions[0].amount).toStrictEqual(amount);
+    });
+    it('returns the PENDING status for a withdrawal', async () => {
+      expect.assertions(8);
+
+      (queryTransactionStatus as jest.Mock).mockReturnValue({
+        status: GMPStatus.CANNOT_FETCH_STATUS,
+        gasPaidInfo: {
+          status: GasPaidStatus.GAS_PAID,
+        },
+        callTx: {
+          returnValues: {
+            payload: mockWithdrawPayload,
+          },
+        },
+      });
+
+      const txHash = '0x5c192bf2b3be59de3a69877f6c71fd0affe6e1a1c05a75f51d4a60692001d8f3';
+      const result = await tokenBridge.getTransactionStatus({
+        transactions: [{
+          txHash,
+        }],
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+      });
+
+      expect(result).not.toBeNull();
+      expect(result.transactions.length).toBe(1);
+      expect(result.transactions[0].status).toBe(StatusResponse.PENDING);
+      expect(result.transactions[0].txHash).toBe(txHash);
+      expect(result.transactions[0].token).toBe(token);
+      expect(result.transactions[0].sender).toBe(sender);
+      expect(result.transactions[0].receiver).toBe(receiver);
+      expect(result.transactions[0].amount).toStrictEqual(amount);
+    });
+    it('returns the PROCESSING status for a withdrawal', async () => {
+      expect.assertions(8);
+
+      (queryTransactionStatus as jest.Mock).mockReturnValue({
+        status: GMPStatus.SRC_GATEWAY_CALLED,
+        gasPaidInfo: {
+          status: GasPaidStatus.GAS_PAID,
+        },
+        callTx: {
+          returnValues: {
+            payload: mockWithdrawPayload,
+          },
+        },
+      });
+
+      const txHash = '0x5c192bf2b3be59de3a69877f6c71fd0affe6e1a1c05a75f51d4a60692001d8f3';
+      const result = await tokenBridge.getTransactionStatus({
+        transactions: [{
+          txHash,
+        }],
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+      });
+
+      expect(result).not.toBeNull();
+      expect(result.transactions.length).toBe(1);
+      expect(result.transactions[0].status).toBe(StatusResponse.PROCESSING);
+      expect(result.transactions[0].txHash).toBe(txHash);
+      expect(result.transactions[0].token).toBe(token);
+      expect(result.transactions[0].sender).toBe(sender);
+      expect(result.transactions[0].receiver).toBe(receiver);
+      expect(result.transactions[0].amount).toStrictEqual(amount);
+    });
+    it('returns the COMPLETE status for a withdrawal', async () => {
+      expect.assertions(8);
+
+      (queryTransactionStatus as jest.Mock).mockReturnValue({
+        status: GMPStatus.DEST_EXECUTED,
+        gasPaidInfo: {
+          status: GasPaidStatus.GAS_PAID,
+        },
+        callTx: {
+          returnValues: {
+            payload: mockWithdrawPayload,
+          },
+        },
+      });
+
+      const txHash = '0x5c192bf2b3be59de3a69877f6c71fd0affe6e1a1c05a75f51d4a60692001d8f3';
+      const result = await tokenBridge.getTransactionStatus({
+        transactions: [{
+          txHash,
+        }],
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+      });
+
+      expect(result).not.toBeNull();
+      expect(result.transactions.length).toBe(1);
+      expect(result.transactions[0].status).toBe(StatusResponse.COMPLETE);
+      expect(result.transactions[0].txHash).toBe(txHash);
+      expect(result.transactions[0].token).toBe(token);
+      expect(result.transactions[0].sender).toBe(sender);
+      expect(result.transactions[0].receiver).toBe(receiver);
+      expect(result.transactions[0].amount).toStrictEqual(amount);
+    });
+    it('returns the FLOW_RATE_CONTROLLED status for a withdrawal', async () => {
+      expect.assertions(8);
+
+      jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRate as any);
+
+      (queryTransactionStatus as jest.Mock).mockReturnValue({
+        status: GMPStatus.DEST_EXECUTED,
+        gasPaidInfo: {
+          status: GasPaidStatus.GAS_PAID,
+        },
+        callTx: {
+          returnValues: {
+            payload: mockWithdrawPayload,
+          },
+        },
+      });
+
+      const txHash = '0x5c192bf2b3be59de3a69877f6c71fd0affe6e1a1c05a75f51d4a60692001d8f3';
+      const result = await tokenBridge.getTransactionStatus({
+        transactions: [{
+          txHash,
+        }],
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+      });
+
+      expect(result).not.toBeNull();
+      expect(result.transactions.length).toBe(1);
+      expect(result.transactions[0].status).toBe(StatusResponse.FLOW_RATE_CONTROLLED);
+      expect(result.transactions[0].txHash).toBe(txHash);
+      expect(result.transactions[0].token).toBe(token);
+      expect(result.transactions[0].sender).toBe(sender);
+      expect(result.transactions[0].receiver).toBe(receiver);
+      expect(result.transactions[0].amount).toStrictEqual(amount);
+    });
+    it('returns the ERROR status for a withdrawal', async () => {
+      expect.assertions(8);
+
+      (queryTransactionStatus as jest.Mock).mockReturnValue({
+        status: GMPStatus.UNKNOWN_ERROR,
+        gasPaidInfo: {
+          status: GasPaidStatus.GAS_PAID,
+        },
+        callTx: {
+          returnValues: {
+            payload: mockWithdrawPayload,
+          },
+        },
+      });
+
+      const txHash = '0x5c192bf2b3be59de3a69877f6c71fd0affe6e1a1c05a75f51d4a60692001d8f3';
+      const result = await tokenBridge.getTransactionStatus({
+        transactions: [{
+          txHash,
+        }],
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+      });
+
+      expect(result).not.toBeNull();
+      expect(result.transactions.length).toBe(1);
+      expect(result.transactions[0].status).toBe(StatusResponse.ERROR);
+      expect(result.transactions[0].txHash).toBe(txHash);
+      expect(result.transactions[0].token).toBe(token);
+      expect(result.transactions[0].sender).toBe(sender);
+      expect(result.transactions[0].receiver).toBe(receiver);
+      expect(result.transactions[0].amount).toStrictEqual(amount);
+    });
+    it('returns the RETRY status for a withdrawal', async () => {
+      expect.assertions(8);
+
+      (queryTransactionStatus as jest.Mock).mockReturnValue({
+        status: GMPStatus.NOT_EXECUTED,
+        gasPaidInfo: {
+          status: GasPaidStatus.GAS_PAID,
+        },
+        callTx: {
+          returnValues: {
+            payload: mockWithdrawPayload,
+          },
+        },
+      });
+
+      const txHash = '0x5c192bf2b3be59de3a69877f6c71fd0affe6e1a1c05a75f51d4a60692001d8f3';
+      const result = await tokenBridge.getTransactionStatus({
+        transactions: [{
+          txHash,
+        }],
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+      });
+
+      expect(result).not.toBeNull();
+      expect(result.transactions.length).toBe(1);
+      expect(result.transactions[0].status).toBe(StatusResponse.RETRY);
+      expect(result.transactions[0].txHash).toBe(txHash);
+      expect(result.transactions[0].token).toBe(token);
+      expect(result.transactions[0].sender).toBe(sender);
+      expect(result.transactions[0].receiver).toBe(receiver);
+      expect(result.transactions[0].amount).toStrictEqual(amount);
     });
   });
 
