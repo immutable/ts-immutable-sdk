@@ -61,7 +61,7 @@ export const getBuyToken = (
   return {
     type: ItemType.ERC20,
     amount: bnAmount.toString(),
-    contractAddress: buyToken.contractAddress,
+    contractAddress: buyToken.tokenAddress,
   };
 };
 
@@ -87,7 +87,7 @@ export const sell = async (
   if (buyToken.type === ItemType.ERC20) {
     // get this from the allowed list
     const buyTokenContract = new Contract(
-      buyToken.contractAddress,
+      buyToken.tokenAddress,
       JSON.stringify(ERC20ABI),
       provider,
     );

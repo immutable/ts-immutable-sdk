@@ -170,7 +170,7 @@ describe('gasCalculator', () => {
           gasToken: {
             type: GasTokenType.ERC20,
             limit: BigNumber.from('100000'),
-            contractAddress: '0xERC20',
+            tokenAddress: '0xERC20',
           },
         },
       );
@@ -288,7 +288,7 @@ describe('gasCalculator', () => {
           gasToken: {
             type: GasTokenType.ERC20,
             limit: BigNumber.from(100000),
-            contractAddress: '0xERC20',
+            tokenAddress: '0xERC20',
           },
         },
       );

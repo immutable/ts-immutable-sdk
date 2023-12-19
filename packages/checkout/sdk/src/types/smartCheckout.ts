@@ -198,8 +198,8 @@ export type ERC20BuyToken = {
   type: ItemType.ERC20;
   /** The amount of native token. */
   amount: string;
-  /** The contract address of the ERC20. */
-  contractAddress: string;
+  /** The token address of the ERC20. */
+  tokenAddress: string;
 };
 
 /**
@@ -410,14 +410,14 @@ export type NativeGas = {
 /**
  * Represents an ERC20 gas token.
  * @property {GasTokenType} type
- * @property {string} contractAddress
+ * @property {string} tokenAddress
  * @property {BigNumber} limit
  */
 export type ERC20Gas = {
   /** The type to indicate this is an ERC20 gas token. */
   type: GasTokenType.ERC20,
   /** The contract address of the ERC20. */
-  contractAddress: string;
+  tokenAddress: string;
   /** The gas limit. */
   limit: BigNumber;
 };
