@@ -187,7 +187,7 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
     updateItemRequirements({
       type: ItemType.ERC20,
       amount,
-      tokenAddress,
+      contractAddress: tokenAddress,
       spenderAddress,
     });
   }
@@ -208,7 +208,7 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
     updateItemRequirements({
       type: ItemType.ERC721,
       id,
-      tokenAddress,
+      contractAddress: tokenAddress,
       spenderAddress,
     });
   }
@@ -248,7 +248,7 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
             <td>{item.type}</td>
             <td>{item.amount}</td>
             <td></td>
-            <td>{item.tokenAddress}</td>
+            <td>{item.contractAddress}</td>
             <td>{item.spenderAddress}</td>
           </tr>
         );
@@ -258,7 +258,7 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
             <td>{item.type}</td>
             <td></td>
             <td>{item.id}</td>
-            <td>{item.tokenAddress}</td>
+            <td>{item.contractAddress}</td>
             <td>{item.spenderAddress}</td>
           </tr>
         )
