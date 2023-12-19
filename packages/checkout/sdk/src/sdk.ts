@@ -107,6 +107,10 @@ export class Checkout {
    */
   public async widgets(init: WidgetsInit): Promise<ImmutableCheckoutWidgets.WidgetsFactory> {
     const checkout = this;
+
+    // Preload the configurations
+    await checkout.config.remote.getConfig();
+
     const factory = new Promise<ImmutableCheckoutWidgets.WidgetsFactory>((resolve, reject) => {
       function checkForWidgetsBundleLoaded() {
         if (typeof ImmutableCheckoutWidgets !== 'undefined') {
@@ -122,8 +126,6 @@ export class Checkout {
       try {
         const script = loadUnresolved(init.version);
         if (script.loaded && typeof ImmutableCheckoutWidgets !== 'undefined') {
-          // eslint-disable-next-line no-console
-          console.warn('Checkout widgets script is already loaded');
           resolve(new ImmutableCheckoutWidgets.WidgetsFactory(checkout, init.config));
         } else {
           checkForWidgetsBundleLoaded();

@@ -5,7 +5,7 @@ import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { Environment } from '@imtbl/config';
 import { Web3Provider } from '@ethersproject/providers';
-import { WidgetContainer } from 'components/WidgetContainer/WidgetContainer';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { ConnectLoader, ConnectLoaderParams } from './ConnectLoader';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
@@ -36,7 +36,7 @@ describe('ConnectLoader', () => {
       checkout,
     } as ConnectLoaderParams;
     mount(
-      <WidgetContainer id="test" config={config}>
+      <ViewContextTestComponent theme={config.theme}>
         <ConnectLoader
           widgetConfig={config}
           params={params}
@@ -45,7 +45,7 @@ describe('ConnectLoader', () => {
           <div id="inner-widget">Inner Widget</div>
         </ConnectLoader>
         ,
-      </WidgetContainer>,
+      </ViewContextTestComponent>,
     );
     cySmartGet('wallet-list-metamask').should('be.visible');
     cy.get('#inner-widget').should('not.exist');
@@ -73,7 +73,7 @@ describe('ConnectLoader', () => {
       });
 
     mount(
-      <WidgetContainer id="test" config={config}>
+      <ViewContextTestComponent theme={config.theme}>
         <ConnectLoader
           widgetConfig={config}
           params={params}
@@ -81,7 +81,7 @@ describe('ConnectLoader', () => {
         >
           <div id="inner-widget">Inner Widget</div>
         </ConnectLoader>
-      </WidgetContainer>,
+      </ViewContextTestComponent>,
     );
 
     cySmartGet('footer-button').should('have.text', 'Ready to connect');
@@ -132,7 +132,7 @@ describe('ConnectLoader', () => {
       });
 
     mount(
-      <WidgetContainer id="test" config={config}>
+      <ViewContextTestComponent theme={config.theme}>
         <ConnectLoader
           widgetConfig={config}
           params={params}
@@ -140,7 +140,7 @@ describe('ConnectLoader', () => {
         >
           <div id="inner-widget">Inner Widget</div>
         </ConnectLoader>
-      </WidgetContainer>,
+      </ViewContextTestComponent>,
     );
 
     cySmartGet('switch-network-view').should('be.visible');
@@ -216,7 +216,7 @@ describe('ConnectLoader', () => {
       });
 
     mount(
-      <WidgetContainer id="test" config={config}>
+      <ViewContextTestComponent theme={config.theme}>
         <ConnectLoader
           widgetConfig={config}
           params={params}
@@ -224,7 +224,7 @@ describe('ConnectLoader', () => {
         >
           <div id="inner-widget">Inner Widget</div>
         </ConnectLoader>
-      </WidgetContainer>,
+      </ViewContextTestComponent>,
     );
 
     cySmartGet('footer-button').click();
@@ -288,7 +288,7 @@ describe('ConnectLoader', () => {
       });
 
     mount(
-      <WidgetContainer id="test" config={config}>
+      <ViewContextTestComponent theme={config.theme}>
         <ConnectLoader
           widgetConfig={config}
           params={params}
@@ -296,7 +296,7 @@ describe('ConnectLoader', () => {
         >
           <div id="inner-widget">Inner Widget</div>
         </ConnectLoader>
-      </WidgetContainer>,
+      </ViewContextTestComponent>,
     );
 
     cy.get('#inner-widget').should('be.visible');
@@ -358,7 +358,7 @@ describe('ConnectLoader', () => {
   //       });
 
   //     mount(
-  //       <WidgetContainer id="test" config={config}>
+  //       <ViewContextTestComponent theme={config.theme}>
   //         <ConnectLoader
   //           widgetConfig={config}
   //           params={params}
@@ -366,7 +366,7 @@ describe('ConnectLoader', () => {
   //         >
   //           <div id="inner-widget">Inner Widget</div>
   //         </ConnectLoader>
-  //       </WidgetContainer>,
+  //       </ViewContextTestComponent>,
   //     );
 
   //     cy.get('#inner-widget').should('be.visible');

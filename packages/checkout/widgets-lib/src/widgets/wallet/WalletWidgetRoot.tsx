@@ -12,7 +12,8 @@ import { Base } from 'widgets/BaseWidgetRoot';
 import { ConnectLoader, ConnectLoaderParams } from 'components/ConnectLoader/ConnectLoader';
 import { getL1ChainId, getL2ChainId } from 'lib';
 import { isValidWalletProvider } from 'lib/validations/widgetValidators';
-import { WidgetContainer } from 'components/WidgetContainer/WidgetContainer';
+import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
+import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
 import { WalletWidget } from './WalletWidget';
 import { sendWalletWidgetCloseEvent } from './WalletWidgetEvents';
 
@@ -59,17 +60,19 @@ export class Wallet extends Base<WidgetType.WALLET> {
 
     this.reactRoot.render(
       <React.StrictMode>
-        <WidgetContainer id="wallet-container" config={this.strongConfig()}>
-          <ConnectLoader
-            widgetConfig={this.strongConfig()}
-            params={connectLoaderParams}
-            closeEvent={() => sendWalletWidgetCloseEvent(window)}
-          >
-            <WalletWidget
-              config={this.strongConfig()}
-            />
-          </ConnectLoader>
-        </WidgetContainer>
+        <CustomAnalyticsProvider checkout={this.checkout}>
+          <ThemeProvider id="wallet-container" config={this.strongConfig()}>
+            <ConnectLoader
+              widgetConfig={this.strongConfig()}
+              params={connectLoaderParams}
+              closeEvent={() => sendWalletWidgetCloseEvent(window)}
+            >
+              <WalletWidget
+                config={this.strongConfig()}
+              />
+            </ConnectLoader>
+          </ThemeProvider>
+        </CustomAnalyticsProvider>
       </React.StrictMode>,
     );
   }
