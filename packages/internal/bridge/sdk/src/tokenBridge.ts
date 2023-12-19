@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 /* eslint-disable class-methods-use-this */
 import axios, { AxiosResponse } from 'axios';
+import { ethers } from 'ethers';
 import {
   ETH_MAINNET_TO_ZKEVM_MAINNET,
   ETH_SEPOLIA_TO_ZKEVM_TESTNET,
@@ -10,9 +11,13 @@ import {
   axelarAPIEndpoints,
   axelarChains,
   bridgeMethods,
-} from 'constants/bridges';
-import { BridgeConfiguration } from 'config';
-import { ethers } from 'ethers';
+} from './constants/bridges';
+import { ROOT_ERC20_BRIDGE_FLOW_RATE } from './contracts/ABIs/RootERC20BridgeFlowRate';
+import { ERC20 } from './contracts/ABIs/ERC20';
+import { BridgeError, BridgeErrorType, withBridgeError } from './errors';
+import { CHILD_ERC20_BRIDGE } from './contracts/ABIs/ChildERC20Bridge';
+import { getGasPriceInWei } from './lib/gasPriceInWei';
+import { BridgeConfiguration } from './config';
 import {
   BridgeFeeRequest,
   BridgeFeeResponse,
@@ -39,14 +44,9 @@ import {
   Address,
   RootBridgePendingWithdrawal,
   TxStatusResponseItem,
-} from 'types';
-import { ROOT_ERC20_BRIDGE_FLOW_RATE } from 'contracts/ABIs/RootERC20BridgeFlowRate';
-import { ERC20 } from 'contracts/ABIs/ERC20';
-import { BridgeError, BridgeErrorType, withBridgeError } from 'errors';
-import { CHILD_ERC20_BRIDGE } from 'contracts/ABIs/ChildERC20Bridge';
-import { getGasPriceInWei } from 'lib/gasPriceInWei';
-import { GMPStatus, GMPStatusResponse, GasPaidStatus } from 'types/axelar';
-import { queryTransactionStatus } from 'lib/gmpRecovery';
+} from './types';
+import { GMPStatus, GMPStatusResponse, GasPaidStatus } from './types/axelar';
+import { queryTransactionStatus } from './lib/gmpRecovery';
 
 /**
  * Represents a token bridge, which manages asset transfers between two chains.
