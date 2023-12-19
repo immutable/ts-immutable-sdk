@@ -747,7 +747,7 @@ describe('balances', () => {
         type = err.type;
       }
 
-      expect(message).toEqual(`${ChainId.SEPOLIA} not supported by the environment`);
+      expect(message).toEqual(`chain ID ${ChainId.SEPOLIA} not supported by the environment`);
       expect(type).toEqual(CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR);
     });
   });
