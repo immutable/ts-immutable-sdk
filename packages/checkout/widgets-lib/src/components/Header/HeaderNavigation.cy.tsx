@@ -3,9 +3,11 @@ import { describe, it } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { WidgetTheme } from '@imtbl/checkout-sdk';
+import { ButtCon } from '@biom3/react';
 import { cySmartGet } from '../../lib/testUtils';
 import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from './HeaderNavigation';
+import { ButtonNavigationStyles } from './HeaderStyles';
 
 describe('HeaderNavigation', () => {
   describe('configurable buttons and title', () => {
@@ -47,8 +49,15 @@ describe('HeaderNavigation', () => {
           <SimpleLayout
             header={(
               <HeaderNavigation
-                showSettings
-                onSettingsClick={() => console.log('test settings')}
+                rightActions={(
+                  <ButtCon
+                    icon="SettingsCog"
+                    sx={ButtonNavigationStyles()}
+                    iconVariant="bold"
+                    onClick={() => console.log('test settings')}
+                    testId="settings-button"
+                  />
+                )}
               />
             )}
           />

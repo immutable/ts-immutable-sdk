@@ -10,7 +10,8 @@ import {
 import { Base } from 'widgets/BaseWidgetRoot';
 import { isValidWalletProvider, isValidAmount, isValidAddress } from 'lib/validations/widgetValidators';
 import { BridgeWidget } from 'widgets/bridge/BridgeWidget';
-import { WidgetContainer } from 'components/WidgetContainer/WidgetContainer';
+import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
+import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
 
 export class Bridge extends Base<WidgetType.BRIDGE> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT;
@@ -58,16 +59,18 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
     if (!this.reactRoot) return;
     this.reactRoot.render(
       <React.StrictMode>
-        <WidgetContainer id="bridge-container" config={this.strongConfig()}>
-          <BridgeWidget
-            checkout={this.checkout}
-            config={this.strongConfig()}
-            web3Provider={this.web3Provider}
-            tokenAddress={this.parameters.tokenAddress}
-            amount={this.parameters.amount}
-            walletProviderName={this.parameters.walletProviderName}
-          />
-        </WidgetContainer>
+        <CustomAnalyticsProvider checkout={this.checkout}>
+          <ThemeProvider id="bridge-container" config={this.strongConfig()}>
+            <BridgeWidget
+              checkout={this.checkout}
+              config={this.strongConfig()}
+              web3Provider={this.web3Provider}
+              tokenAddress={this.parameters.tokenAddress}
+              amount={this.parameters.amount}
+              walletProviderName={this.parameters.walletProviderName}
+            />
+          </ThemeProvider>
+        </CustomAnalyticsProvider>
       </React.StrictMode>,
     );
   }

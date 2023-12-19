@@ -1,14 +1,23 @@
 import { Environment } from '@imtbl/config';
-import { ChainId, TokenFilterTypes } from '../types';
-import { getTokenAllowList, isNativeToken } from './tokens';
+import { Contract } from 'ethers';
+import { Web3Provider } from '@ethersproject/providers';
+import { ChainId, ChainName, TokenFilterTypes } from '../types';
+import { getERC20TokenInfo, getTokenAllowList, isNativeToken } from './tokens';
 import { RemoteConfigFetcher } from '../config/remoteConfigFetcher';
 import { CheckoutConfiguration } from '../config';
-import { NATIVE } from '../env';
+import { ERC20ABI, NATIVE } from '../env';
+import { CheckoutError, CheckoutErrorType } from '../errors';
 
 jest.mock('../config/remoteConfigFetcher');
+jest.mock('ethers', () => ({
+  ...jest.requireActual('ethers'),
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  Contract: jest.fn(),
+}));
 
 describe('token related functions', () => {
   let config: CheckoutConfiguration;
+  const mockProvider = jest.fn().mockImplementation(() => ({} as unknown as Web3Provider));
 
   describe('when tokens are not configured', () => {
     it('should return the empty list of tokens', async () => {
@@ -229,6 +238,77 @@ describe('token related functions', () => {
 
     it('should return false if address is not NATIVE', () => {
       expect(isNativeToken('0x123')).toBeFalsy();
+    });
+  });
+
+  describe('getERC20TokenInfo()', () => {
+    let decimalsMock: jest.Mock;
+    let nameMock: jest.Mock;
+    let symbolMock: jest.Mock;
+
+    beforeEach(() => {
+      jest.restoreAllMocks();
+
+      decimalsMock = jest.fn().mockResolvedValue(18);
+      nameMock = jest.fn().mockResolvedValue(ChainName.ETHEREUM);
+      symbolMock = jest.fn().mockResolvedValue('ETH');
+      (Contract as unknown as jest.Mock).mockReturnValue({
+        decimals: decimalsMock,
+        name: nameMock,
+        symbol: symbolMock,
+      });
+    });
+
+    it('should call functions on contract and return the token information', async () => {
+      const testContractAddress = '0x10c';
+      const tokenInfo = await getERC20TokenInfo(mockProvider(), testContractAddress);
+
+      expect(decimalsMock).toBeCalledTimes(1);
+      expect(nameMock).toBeCalledTimes(1);
+      expect(symbolMock).toBeCalledTimes(1);
+      expect(tokenInfo).toEqual({
+        name: ChainName.ETHEREUM,
+        symbol: 'ETH',
+        decimals: 18,
+        address: testContractAddress,
+      });
+    });
+
+    it('should throw error if call to the contract fails', async () => {
+      (Contract as unknown as jest.Mock).mockReturnValue({
+        decimals: decimalsMock,
+        name: jest
+          .fn()
+          .mockRejectedValue(new Error('Error getting name from contract')),
+        symbol: symbolMock,
+      });
+
+      await expect(
+        getERC20TokenInfo(mockProvider(), 'abc123'),
+      ).rejects.toThrow(
+        new CheckoutError(
+          '[GET_ERC20_INFO_ERROR] Cause:Error getting name from contract',
+          CheckoutErrorType.GET_ERC20_INFO_ERROR,
+        ),
+      );
+    });
+
+    it('should throw an error if the contract address is invalid', async () => {
+      (Contract as unknown as jest.Mock).mockImplementation(() => {
+        const contract = jest.requireActual('ethers').Contract;
+        // eslint-disable-next-line new-cap
+        return new contract(mockProvider(), JSON.stringify(ERC20ABI), null);
+      });
+
+      await expect(
+        getERC20TokenInfo(mockProvider(), 'abc123'),
+      ).rejects.toThrow(
+        new CheckoutError(
+          // eslint-disable-next-line max-len
+          '[GET_ERC20_INFO_ERROR] Cause:invalid contract address or ENS name (argument="addressOrName", value=undefined, code=INVALID_ARGUMENT, version=contracts/5.7.0)',
+          CheckoutErrorType.GET_ERC20_INFO_ERROR,
+        ),
+      );
     });
   });
 });

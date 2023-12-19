@@ -4,7 +4,6 @@ import { BigNumber } from 'ethers';
 import { ExternalProvider, TransactionRequest, Web3Provider } from '@ethersproject/providers';
 import { Checkout, CheckoutErrorType } from '@imtbl/checkout-sdk';
 import { Quote } from '@imtbl/dex-sdk';
-import { Environment } from '@imtbl/config';
 import { ApproveERC20Onboarding } from './ApproveERC20Onboarding';
 import { cyIntercept, cySmartGet } from '../../../lib/testUtils';
 import { text } from '../../../resources/text/textConfig';
@@ -19,7 +18,6 @@ import { ConnectLoaderState, ConnectionStatus } from '../../../context/connect-l
 import {
   ConnectLoaderTestComponent,
 } from '../../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
-import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 import { CustomAnalyticsProvider } from '../../../context/analytics-provider/CustomAnalyticsProvider';
 
 describe('Approve ERC20 Onboarding', () => {
@@ -100,7 +98,7 @@ describe('Approve ERC20 Onboarding', () => {
   describe('Approve Spending Step', () => {
     it('should request user to approve spending transaction on button click', () => {
       mount(
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <CustomAnalyticsProvider checkout={{} as Checkout}>
           <ConnectLoaderTestComponent
             initialStateOverride={connectLoaderState}
           >
@@ -128,7 +126,7 @@ describe('Approve ERC20 Onboarding', () => {
       });
       const { approveSwap, approveSpending } = text.views[SwapWidgetViews.APPROVE_ERC20];
       mount(
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <CustomAnalyticsProvider checkout={{} as Checkout}>
           <ConnectLoaderTestComponent
             initialStateOverride={connectLoaderState}
           >
@@ -160,7 +158,7 @@ describe('Approve ERC20 Onboarding', () => {
       });
       const { approveSwap, approveSpending } = text.views[SwapWidgetViews.APPROVE_ERC20];
       mount(
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <CustomAnalyticsProvider checkout={{} as Checkout}>
           <ConnectLoaderTestComponent
             initialStateOverride={
             {
@@ -192,7 +190,7 @@ describe('Approve ERC20 Onboarding', () => {
 
     it('should show correct approval spending hint (amount and symbol) in body', () => {
       mount(
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <CustomAnalyticsProvider checkout={{} as Checkout}>
           <ConnectLoaderTestComponent
             initialStateOverride={connectLoaderState}
           >
@@ -210,7 +208,7 @@ describe('Approve ERC20 Onboarding', () => {
       sendTransactionStub.rejects({ type: CheckoutErrorType.USER_REJECTED_REQUEST_ERROR });
       const { footer } = text.views[SwapWidgetViews.APPROVE_ERC20].approveSpending;
       mount(
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <CustomAnalyticsProvider checkout={{} as Checkout}>
           <ConnectLoaderTestComponent
             initialStateOverride={connectLoaderState}
           >
@@ -234,7 +232,7 @@ describe('Approve ERC20 Onboarding', () => {
         transactionResponse: { wait: () => Promise.resolve({ status: 1 }) },
       });
       mount(
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <CustomAnalyticsProvider checkout={{} as Checkout}>
           <ConnectLoaderTestComponent
             initialStateOverride={connectLoaderState}
           >

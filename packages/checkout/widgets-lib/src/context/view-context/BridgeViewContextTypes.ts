@@ -8,6 +8,7 @@ export enum BridgeWidgetViews {
   IN_PROGRESS = 'IN_PROGRESS',
   BRIDGE_FAILURE = 'BRIDGE_FAILURE',
   APPROVE_TRANSACTION = 'APPROVE_TRANSACTION',
+  TRANSACTIONS = 'TRANSACTIONS',
 }
 
 export type BridgeWidgetView =
@@ -16,7 +17,8 @@ export type BridgeWidgetView =
   | BridgeReview
   | BridgeInProgress
   | BridgeFailure
-  | BridgeApproveTransaction;
+  | BridgeApproveTransaction
+  | BridgeTransactions;
 
 interface BridgeCrossWalletSelection extends ViewType {
   type: BridgeWidgetViews.WALLET_NETWORK_SELECTION,
@@ -44,4 +46,8 @@ interface BridgeApproveTransaction extends ViewType {
   type: BridgeWidgetViews.APPROVE_TRANSACTION,
   approveTransaction: ApproveBridgeResponse;
   transaction: BridgeTxResponse;
+}
+
+interface BridgeTransactions extends ViewType {
+  type: BridgeWidgetViews.TRANSACTIONS,
 }
