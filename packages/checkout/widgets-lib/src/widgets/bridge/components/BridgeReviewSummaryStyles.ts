@@ -9,6 +9,7 @@ export const topMenuItemStyles = {
 export const bottomMenuItemStyles = {
   borderTopLeftRadius: '0px',
   borderTopRightRadius: '0px',
+  backgroundColor: 'base.color.translucent.emphasis.100',
 };
 
 export const bridgeReviewWrapperStyles = {
