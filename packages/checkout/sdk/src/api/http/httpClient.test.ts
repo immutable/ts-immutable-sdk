@@ -40,6 +40,35 @@ describe('HttpClient', () => {
     expect(mockedAxiosInstance.interceptors.request.use).toBeCalledTimes(1);
   });
 
+  it('uses publishable-key header from publishableKey in config', async () => {
+    mockedAxiosInstance.request.mockResolvedValue({
+      status: 200,
+      headers: {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        'x-immutable-publishable-key': 'pk_imapik-1234',
+      },
+    });
+    const requestConfig = {
+      url: 'https://checkout-api.dev.immutable.com',
+      headers: {},
+    };
+
+    const testCheckoutConfigWithKey = {
+      baseConfig: {
+        environment: Environment.PRODUCTION,
+        publishableKey: 'pk_imapik-1234',
+      },
+    } as CheckoutModuleConfiguration;
+    const httpClient = new HttpClient(testCheckoutConfigWithKey);
+
+    const response = await httpClient.request(requestConfig);
+    expect(response.status).toEqual(200);
+    expect(response.headers).toEqual({
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      'x-immutable-publishable-key': 'pk_imapik-1234',
+    });
+  });
+
   it('throws an error for an invalid publishable key', async () => {
     const requestConfig = {
       url: 'https://checkout-api.dev.immutable.com',
