@@ -137,13 +137,13 @@ export const getIndexerBalance = async (
         items.push(...resp.items);
       } while (resp.next_page_params);
     } catch (err: any) {
-    // In case of a 404, the wallet is a new wallet that hasn't been indexed by
-    // the Blockscout just yet. This happens when a wallet hasn't had any
-    // activity on the chain. In this case, simply ignore the error and return
-    // no currencies.
-    // In case of a malformed wallet address, Blockscout returns a 422, which
-    // means we are safe to assume that a 404 is a missing wallet due to inactivity
-    // or simply an incorrect wallet address was provided.
+      // In case of a 404, the wallet is a new wallet that hasn't been indexed by
+      // the Blockscout just yet. This happens when a wallet hasn't had any
+      // activity on the chain. In this case, simply ignore the error and return
+      // no currencies.
+      // In case of a malformed wallet address, Blockscout returns a 422, which
+      // means we are safe to assume that a 404 is a missing wallet due to inactivity
+      // or simply an incorrect wallet address was provided.
       if (err?.code !== HttpStatusCode.NotFound) {
         throw new CheckoutError(
           err.message || 'InternalServerError | getTokensByWalletAddress',
