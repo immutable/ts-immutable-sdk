@@ -55,7 +55,7 @@ export { RefreshCollectionMetadataResult } from '../models';
  * @export
  * @interface GetCollectionRequest
  */
-export interface GetCollectionRequest {
+export interface GetCollectionRequestParams {
     /**
      * The address contract
      * @type {string}
@@ -76,7 +76,7 @@ export interface GetCollectionRequest {
  * @export
  * @interface ListCollectionsRequest
  */
-export interface ListCollectionsRequest {
+export interface ListCollectionsRequestParams {
     /**
      * The name of chain
      * @type {string}
@@ -118,7 +118,7 @@ export interface ListCollectionsRequest {
  * @export
  * @interface ListCollectionsByNFTOwnerRequest
  */
-export interface ListCollectionsByNFTOwnerRequest {
+export interface ListCollectionsByNFTOwnerRequestParams {
     /**
      * Account address
      * @type {string}
@@ -153,7 +153,7 @@ export interface ListCollectionsByNFTOwnerRequest {
  * @export
  * @interface RefreshCollectionMetadataRequest
  */
-export interface RefreshCollectionMetadataRequest {
+export interface RefreshCollectionMetadataRequestParams {
     /**
      * The address contract
      * @type {string}

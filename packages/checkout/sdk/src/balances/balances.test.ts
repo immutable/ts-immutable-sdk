@@ -286,6 +286,50 @@ describe('balances', () => {
       });
     });
 
+    it('should fail if no wallet address or provider are given', async () => {
+      let message;
+      try {
+        await getAllBalances(
+          {
+            remote: {
+              getTokensConfig: () => ({
+                blockscout: false,
+              }),
+            },
+            networkMap: testCheckoutConfig.networkMap,
+          } as unknown as CheckoutConfiguration,
+          undefined,
+          undefined,
+          ChainId.ETHEREUM,
+        );
+      } catch (e: any) {
+        message = e.message;
+      }
+      expect(message).toContain('both walletAddress and provider are missing');
+    });
+
+    it('should fail if no provider is given and indexer is disabled', async () => {
+      let message;
+      try {
+        await getAllBalances(
+          {
+            remote: {
+              getTokensConfig: () => ({
+                blockscout: false,
+              }),
+            },
+            networkMap: testCheckoutConfig.networkMap,
+          } as unknown as CheckoutConfiguration,
+          undefined,
+          'wallet-address',
+          ChainId.ETHEREUM,
+        );
+      } catch (e: any) {
+        message = e.message;
+      }
+      expect(message).toContain('indexer is disabled for this chain, you must provide a provider');
+    });
+
     it('should call getBalance and getERC20Balance functions with native and ERC20 tokens', async () => {
       const getAllBalancesResult = await getAllBalances(
         {

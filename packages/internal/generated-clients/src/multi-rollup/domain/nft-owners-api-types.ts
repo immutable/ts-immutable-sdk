@@ -39,7 +39,7 @@ export { ListNFTOwnersResult } from '../models';
  * @export
  * @interface ListAllNFTOwnersRequest
  */
-export interface ListAllNFTOwnersRequest {
+export interface ListAllNFTOwnersRequestParams {
     /**
      * The name of chain
      * @type {string}
@@ -74,7 +74,7 @@ export interface ListAllNFTOwnersRequest {
  * @export
  * @interface ListNFTOwnersRequest
  */
-export interface ListNFTOwnersRequest {
+export interface ListNFTOwnersRequestParams {
     /**
      * The address of contract
      * @type {string}
@@ -116,7 +116,7 @@ export interface ListNFTOwnersRequest {
  * @export
  * @interface ListOwnersByContractAddressRequest
  */
-export interface ListOwnersByContractAddressRequest {
+export interface ListOwnersByContractAddressRequestParams {
     /**
      * The address of contract
      * @type {string}

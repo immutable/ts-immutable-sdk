@@ -253,14 +253,9 @@ export class Checkout {
   public async getAllBalances(
     params: GetAllBalancesParams,
   ): Promise<GetAllBalancesResult> {
-    const web3Provider = await provider.validateProvider(
-      this.config,
-      params.provider,
-    );
-
     return balances.getAllBalances(
       this.config,
-      web3Provider,
+      params.provider,
       params.walletAddress,
       params.chainId,
     );

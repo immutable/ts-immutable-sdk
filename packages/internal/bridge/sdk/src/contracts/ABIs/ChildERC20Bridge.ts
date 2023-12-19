@@ -1,5 +1,16 @@
 export const CHILD_ERC20_BRIDGE = [
   {
+    inputs: [
+      {
+        internalType: 'address',
+        name: '_initializerAddress',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'nonpayable',
+    type: 'constructor',
+  },
+  {
     inputs: [],
     name: 'AlreadyMapped',
     type: 'error',
@@ -99,6 +110,11 @@ export const CHILD_ERC20_BRIDGE = [
   {
     inputs: [],
     name: 'TransferWIMXFailed',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'UnauthorizedInitializer',
     type: 'error',
   },
   {
@@ -853,6 +869,19 @@ export const CHILD_ERC20_BRIDGE = [
     name: 'initialize',
     outputs: [],
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'initializerAddress',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
     type: 'function',
   },
   {

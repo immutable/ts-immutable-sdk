@@ -2,6 +2,7 @@
  * Enum representing different types of errors that can occur during the checkout process.
  */
 export enum CheckoutErrorType {
+  MISSING_PARAMS = 'MISSING_PARAMS',
   WEB3_PROVIDER_ERROR = 'WEB3_PROVIDER_ERROR',
   PROVIDER_ERROR = 'PROVIDER_ERROR',
   DEFAULT_PROVIDER_ERROR = 'DEFAULT_PROVIDER_ERROR',

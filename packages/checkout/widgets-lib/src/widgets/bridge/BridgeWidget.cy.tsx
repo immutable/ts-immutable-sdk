@@ -554,14 +554,12 @@ describe('BridgeWidget', () => {
       cySmartGet('bridge-token-select__target').click();
       cySmartGet('bridge-token-coin-selector__option-imx').click();
       cySmartGet('bridge-amount-text__input').type('1').blur();
-      cySmartGet('bridge-gas-fee__priceDisplay__price').should('have.text', 'IMX 0.210000');
+      cySmartGet('bridge-gas-fee__priceDisplay').should('have.text', 'IMX 0.210000~ USD $ 0.32');
       cySmartGet('bridge-form-button').click();
 
       // Review screen
-      cySmartGet('bridge-review-summary-from-amount__priceDisplay__price').should('have.text', 'IMX 1');
-      cySmartGet('bridge-review-summary-from-amount__priceDisplay__fiatAmount').should('have.text', '~ USD $1.50');
-      cySmartGet('bridge-review-summary-gas-amount__priceDisplay__price').should('have.text', 'IMX 0.210000');
-      cySmartGet('bridge-review-summary-gas-amount__priceDisplay__fiatAmount').should('have.text', '~ USD $0.32');
+      cySmartGet('bridge-review-summary-from-amount__priceDisplay').should('have.text', 'IMX 1~ USD $1.50');
+      cySmartGet('bridge-review-summary-gas-amount__priceDisplay').should('have.text', 'IMX 0.210000~ USD $0.32');
       cySmartGet('bridge-review-summary-from-address__label').should('include.text', '0x0987...4321');
       cySmartGet('bridge-review-summary-to-address__label').should('include.text', '0x1234...7890');
       cySmartGet('bridge-review-summary__submit-button').click();
@@ -663,14 +661,12 @@ describe('BridgeWidget', () => {
       cySmartGet('bridge-token-select__target').click();
       cySmartGet('bridge-token-coin-selector__option-eth').click();
       cySmartGet('bridge-amount-text__input').type('0.1').blur();
-      cySmartGet('bridge-gas-fee__priceDisplay__price').should('have.text', 'ETH 0.002100');
+      cySmartGet('bridge-gas-fee__priceDisplay').should('have.text', 'ETH 0.002100~ USD $ 4.20');
       cySmartGet('bridge-form-button').click();
 
       // // Review screen
-      cySmartGet('bridge-review-summary-from-amount__priceDisplay__price').should('have.text', 'ETH 0.1');
-      cySmartGet('bridge-review-summary-from-amount__priceDisplay__fiatAmount').should('have.text', '~ USD $200.00');
-      cySmartGet('bridge-review-summary-gas-amount__priceDisplay__price').should('have.text', 'ETH 0.002100');
-      cySmartGet('bridge-review-summary-gas-amount__priceDisplay__fiatAmount').should('have.text', '~ USD $4.20');
+      cySmartGet('bridge-review-summary-from-amount__priceDisplay').should('have.text', 'ETH 0.1~ USD $200.00');
+      cySmartGet('bridge-review-summary-gas-amount__priceDisplay').should('have.text', 'ETH 0.002100~ USD $4.20');
       cySmartGet('bridge-review-summary-from-address__label').should('include.text', '0x1234...7890');
       cySmartGet('bridge-review-summary-to-address__label').should('include.text', '0x0987...4321');
       cySmartGet('bridge-review-summary__submit-button').click();
