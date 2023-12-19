@@ -11,13 +11,12 @@ import {
 } from 'react';
 import {
   WalletProviderName,
-  CheckoutErrorType,
   ChainId,
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
-import { isPassportProvider } from 'lib/providerUtils';
+import { createAndConnectToProvider, isPassportProvider } from 'lib/providerUtils';
 import { getL1ChainId, getL2ChainId } from 'lib';
-import { getChainNameById } from 'lib/chainName';
+import { getChainNameById } from 'lib/chains';
 import { ViewActions, ViewContext } from 'context/view-context/ViewContext';
 import { abbreviateAddress } from 'lib/addressUtils';
 import {
@@ -35,7 +34,9 @@ const testId = 'wallet-network-selector';
 export function WalletAndNetworkSelector() {
   const {
     bridgeState: {
-      checkout, from, to,
+      checkout,
+      from,
+      to,
     }, bridgeDispatch,
   } = useContext(BridgeContext);
   const { viewDispatch } = useContext(ViewContext);
@@ -122,48 +123,22 @@ export function WalletAndNetworkSelector() {
     });
   }, [from, to]);
 
-  async function createProviderAndConnect(walletProviderName: WalletProviderName): Promise<Web3Provider | undefined> {
-    let provider: Web3Provider;
+  const createProviderAndConnect = useCallback(async (
+    walletProviderName: WalletProviderName,
+  ): Promise<Web3Provider | undefined> => {
+    let web3Provider: Web3Provider;
     try {
-      const createResult = await checkout.createProvider({ walletProviderName });
-      provider = createResult.provider;
+      web3Provider = await createAndConnectToProvider(checkout, walletProviderName);
       if (walletProviderName === WalletProviderName.PASSPORT) {
-        passportCache.current = provider;
+        passportCache.current = web3Provider;
       }
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(`Failed to create ${walletProviderName} provider`);
-      throw error;
-    }
-
-    let connected = false;
-    try {
-      const { isConnected } = await checkout.checkIsWalletConnected({ provider });
-      connected = isConnected;
+      return web3Provider;
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error(error);
       throw error;
     }
-
-    if (!connected) {
-      try {
-        const { provider: connectedProvider } = await checkout.connect({ provider });
-        provider = connectedProvider;
-        connected = true;
-      } catch (error: any) {
-        if (error.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
-          // eslint-disable-next-line no-console
-          console.log('User rejected request');
-        }
-        // eslint-disable-next-line no-console
-        console.error(error);
-        throw error;
-      }
-    }
-
-    return provider;
-  }
+  }, [checkout]);
 
   function clearToWalletSelections() {
     setToWalletWeb3Provider(null);
@@ -347,8 +322,11 @@ export function WalletAndNetworkSelector() {
       <Heading size="xSmall" sx={{ paddingBottom: 'base.spacing.x2' }}>{fromFormInput.heading}</Heading>
       {/* Show the from wallet target (select box) if no selections have been made yet */}
       <WalletDrawer
-        testId={testId}
-        type="from"
+        testId={`${testId}-from`}
+        drawerText={{
+          heading: fromFormInput.walletSelectorHeading,
+          defaultText: fromFormInput.selectDefaultText,
+        }}
         showWalletSelectorTarget={!isFromWalletAndNetworkSelected}
         walletOptions={fromWalletSelectorOptions}
         showDrawer={fromWalletDrawerOpen}
@@ -373,8 +351,11 @@ export function WalletAndNetworkSelector() {
           <Box>
             <Heading size="xSmall" sx={{ paddingBottom: 'base.spacing.x2' }}>{toFormInput.heading}</Heading>
             <WalletDrawer
-              testId={testId}
-              type="to"
+              testId={`${testId}-to`}
+              drawerText={{
+                heading: toFormInput.walletSelectorHeading,
+                defaultText: toFormInput.selectDefaultText,
+              }}
               showWalletSelectorTarget={!isToWalletAndNetworkSelected}
               walletOptions={toWalletSelectorOptions}
               showDrawer={toWalletDrawerOpen}

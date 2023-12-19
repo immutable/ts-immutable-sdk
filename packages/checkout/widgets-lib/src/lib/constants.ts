@@ -36,6 +36,15 @@ export const DEFAULT_BALANCE_RETRY_POLICY: RetryType = {
 };
 
 /**
+ * Default retry policy for fetching transactions from remote.
+ */
+export const DEFAULT_TRANSACTIONS_RETRY_POLICY: RetryType = {
+  retryIntervalMs: DEFAULT_RETRY_DELAY,
+  retries: 60,
+  nonRetryableSilently: (err: any) => !!err,
+};
+
+/**
  * Checkout Widget default env
  */
 export const DEFAULT_ENV = Environment.SANDBOX;
@@ -77,4 +86,22 @@ export const CHECKOUT_CDN_BASE_URL = {
   [ENV_DEVELOPMENT]: 'https://checkout-cdn.dev.immutable.com',
   [Environment.SANDBOX]: 'https://checkout-cdn.sandbox.immutable.com',
   [Environment.PRODUCTION]: 'https://checkout-cdn.immutable.com',
+};
+
+/**
+ * URL for axelar scan based on the environment
+ */
+export const AXELAR_SCAN_URL = {
+  [ENV_DEVELOPMENT]: 'https://testnet.axelarscan.io/gmp/',
+  [Environment.SANDBOX]: 'https://testnet.axelarscan.io/gmp/',
+  [Environment.PRODUCTION]: 'https://axelarscan.io/gmp/',
+};
+
+/**
+ * URL for passport based on environment
+ */
+export const PASSPORT_URL = {
+  [ENV_DEVELOPMENT]: 'https://passport.sandbox.immutable.com/',
+  [Environment.SANDBOX]: 'https://passport.sandbox.immutable.com/',
+  [Environment.PRODUCTION]: 'https://passport.immutable.com/',
 };

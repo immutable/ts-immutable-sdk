@@ -41,8 +41,8 @@ export async function withdraw() {
   const rootBridge: ethers.Contract = getContract("RootERC20BridgeFlowRate", params.rootBridgeAddress, params.rootProvider);
   const childBridge: ethers.Contract = getContract("ChildERC20Bridge", params.childBridgeAddress, params.childProvider);
 
-  let rootBridgeChildAddress = await rootBridge.rootTokenToChildToken(params.sepoliaToken);
-  let childBridgeChildAddress = await childBridge.rootTokenToChildToken(params.sepoliaToken);
+  let rootBridgeChildAddress = await rootBridge.rootTokenToChildToken(params.rootToken);
+  let childBridgeChildAddress = await childBridge.rootTokenToChildToken(params.rootToken);
 
   if (rootBridgeChildAddress === ethers.constants.AddressZero) {
     console.log('token not mapped, please map token before withdrawing');
@@ -61,7 +61,7 @@ export async function withdraw() {
 
   const approvalReq: ApproveBridgeRequest = {
     senderAddress: params.sender,
-    token: params.zkevmTestnetToken,
+    token: params.childToken,
     amount: params.amount,
     sourceChainId: ZKEVM_TESTNET_CHAIN_ID,
     destinationChainId: ETH_SEPOLIA_CHAIN_ID,
@@ -74,7 +74,7 @@ export async function withdraw() {
     approvalRes = await tokenBridge.getUnsignedApproveBridgeTx(approvalReq);
     console.log('approvalRes', approvalRes);
   } catch(err) {
-    console.log('approvalErr', err);
+    console.error('approvalErr', err);
     return
   }
 
@@ -107,7 +107,7 @@ export async function withdraw() {
   const withdrawReq: BridgeTxRequest = {
     senderAddress: params.sender,
     recipientAddress: params.recipient,
-    token: params.zkevmTestnetToken,
+    token: params.childToken,
     amount: params.amount,
     sourceChainId: ZKEVM_TESTNET_CHAIN_ID,
     destinationChainId: ETH_SEPOLIA_CHAIN_ID,
@@ -120,7 +120,7 @@ export async function withdraw() {
     withdrawRes = await tokenBridge.getUnsignedBridgeTx(withdrawReq);
     console.log('withdrawRes', withdrawRes);
   } catch(err) {
-    console.log('withdrawErr', err);
+    console.error('withdrawErr', err);
     return
   }
 
@@ -172,7 +172,8 @@ export async function withdraw() {
     console.log(`TxStatusResponse attempt: ${attempts}`);
     console.log(util.inspect(txStatusRes, {showHidden: false, depth: null, colors: true}));
     if (txStatusRes.transactions[0].status === StatusResponse.COMPLETE
-      || txStatusRes.transactions[0].status === StatusResponse.FLOW_RATE_CONTROLLED) {
+      || txStatusRes.transactions[0].status === StatusResponse.FLOW_RATE_CONTROLLED
+      || txStatusRes.transactions[0].status === StatusResponse.ERROR) {
       complete = true;
     } else {
       await delay(10000);
@@ -185,6 +186,6 @@ export async function withdraw() {
         await withdraw()
         console.log('Exiting successfully');
     } catch(err) {
-        console.log('Exiting with error', err)
+        console.error('Exiting with error', err)
     }
 })();

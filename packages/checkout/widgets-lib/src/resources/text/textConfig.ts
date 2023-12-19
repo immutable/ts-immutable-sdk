@@ -385,7 +385,7 @@ export const text = {
         title: 'Move coins',
       },
       fees: {
-        title: 'Gas Fee',
+        title: 'Estimated fees',
         fiatPricePrefix: '~ USD $',
       },
       content: {
@@ -417,7 +417,7 @@ export const text = {
         heading: 'To',
       },
       fees: {
-        heading: 'Gas fee',
+        heading: 'Estimated fees',
       },
       submitButton: {
         buttonText: 'Confirm move',
@@ -445,6 +445,43 @@ export const text = {
       heading: 'Move in progress',
       body1: (symbol: string) => `Less than 3 mins until your ${symbol} lands on zkEVM.`,
       body2: 'You can close this window, the transaction will be reflected in your wallet once complete.',
+    },
+    [BridgeWidgetViews.TRANSACTIONS]: {
+      layoutHeading: 'In progress',
+      passportDashboard: 'View the full transaction history in your',
+      status: {
+        inProgress: {
+          heading: 'In Progress',
+          txnEstimate: 'Usually takes 20 mins',
+          stepInfo: 'View Details',
+        },
+        emptyState: {
+          notConnected: {
+            body: 'Connect your wallet to view the transactions',
+          },
+        },
+        noTransactions: {
+          body: "You're all done here.",
+          passport: {
+            body: 'View your completed transactions in ',
+            link: 'Passport',
+          },
+        },
+      },
+      fiatPricePrefix: '≈ USD $',
+      support: {
+        body1: 'Need help?',
+        body2: ' Contact ',
+        body3: 'support',
+        supportLink: 'https://support.immutable.com/en/',
+        passport: {
+          body1: 'Or view completed transactions in your ',
+          body2: 'Passport',
+        },
+      },
+      walletSelection: {
+        heading: 'Choose a wallet to view',
+      },
     },
   },
   footers: {

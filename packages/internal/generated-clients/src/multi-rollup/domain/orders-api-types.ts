@@ -83,7 +83,7 @@ export { TradeResult } from '../models';
  * @export
  * @interface CancelOrdersRequest
  */
-export interface CancelOrdersRequest {
+export interface CancelOrdersRequestParams {
     /**
      * 
      * @type {string}
@@ -104,7 +104,7 @@ export interface CancelOrdersRequest {
  * @export
  * @interface CreateListingRequest
  */
-export interface CreateListingRequest {
+export interface CreateListingRequestParams {
     /**
      * 
      * @type {string}
@@ -125,7 +125,7 @@ export interface CreateListingRequest {
  * @export
  * @interface FulfillmentDataRequest
  */
-export interface FulfillmentDataRequest {
+export interface FulfillmentDataRequestParams {
     /**
      * 
      * @type {string}
@@ -146,7 +146,7 @@ export interface FulfillmentDataRequest {
  * @export
  * @interface GetListingRequest
  */
-export interface GetListingRequest {
+export interface GetListingRequestParams {
     /**
      * 
      * @type {string}
@@ -167,7 +167,7 @@ export interface GetListingRequest {
  * @export
  * @interface GetTradeRequest
  */
-export interface GetTradeRequest {
+export interface GetTradeRequestParams {
     /**
      * 
      * @type {string}
@@ -188,7 +188,7 @@ export interface GetTradeRequest {
  * @export
  * @interface ListListingsRequest
  */
-export interface ListListingsRequest {
+export interface ListListingsRequestParams {
     /**
      * 
      * @type {string}
@@ -279,7 +279,7 @@ export interface ListListingsRequest {
  * @export
  * @interface ListTradesRequest
  */
-export interface ListTradesRequest {
+export interface ListTradesRequestParams {
     /**
      * 
      * @type {string}

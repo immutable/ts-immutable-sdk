@@ -41,8 +41,8 @@ async function deposit() {
   const rootBridge: ethers.Contract = getContract("RootERC20BridgeFlowRate", params.rootBridgeAddress, params.rootProvider);
   const childBridge: ethers.Contract = getContract("ChildERC20Bridge", params.childBridgeAddress, params.childProvider);
 
-  let rootBridgeChildAddress = await rootBridge.rootTokenToChildToken(params.sepoliaToken);
-  let childBridgeChildAddress = await childBridge.rootTokenToChildToken(params.sepoliaToken);
+  let rootBridgeChildAddress = await rootBridge.rootTokenToChildToken(params.rootToken);
+  let childBridgeChildAddress = await childBridge.rootTokenToChildToken(params.rootToken);
 
   if (rootBridgeChildAddress === ethers.constants.AddressZero) {
     console.log('token not mapped, please map token before depositing');
@@ -61,7 +61,7 @@ async function deposit() {
 
   const approvalReq: ApproveBridgeRequest = {
     senderAddress: params.sender,
-    token: params.sepoliaToken,
+    token: params.rootToken,
     amount: params.amount,
     sourceChainId: ETH_SEPOLIA_CHAIN_ID,
     destinationChainId: ZKEVM_TESTNET_CHAIN_ID,
@@ -74,7 +74,7 @@ async function deposit() {
     approvalRes = await tokenBridge.getUnsignedApproveBridgeTx(approvalReq);
     console.log('approvalRes', approvalRes);
   } catch(err) {
-    console.log('approvalErr', err);
+    console.error('approvalErr', err);
     return
   }
 
@@ -107,7 +107,7 @@ async function deposit() {
   const depositReq: BridgeTxRequest = {
     senderAddress: params.sender,
     recipientAddress: params.recipient,
-    token: params.sepoliaToken,
+    token: params.rootToken,
     amount: params.amount,
     sourceChainId: ETH_SEPOLIA_CHAIN_ID,
     destinationChainId: ZKEVM_TESTNET_CHAIN_ID,
@@ -120,7 +120,7 @@ async function deposit() {
     depositRes = await tokenBridge.getUnsignedBridgeTx(depositReq);
     console.log('depositRes', depositRes);
   } catch(err) {
-    console.log('depositErr', err);
+    console.error('depositErr', err);
     return
   }
 
@@ -166,7 +166,8 @@ async function deposit() {
     const txStatusRes: TxStatusResponse = await tokenBridge.getTransactionStatus(txStatusReq);
     console.log(`TxStatusResponse attempt: ${attempts}`);
     console.log(util.inspect(txStatusRes, {showHidden: false, depth: null, colors: true}));
-    if (txStatusRes.transactions[0].status === StatusResponse.COMPLETE) {
+    if (txStatusRes.transactions[0].status === StatusResponse.COMPLETE
+      || txStatusRes.transactions[0].status === StatusResponse.ERROR) {
       complete = true;
     } else {
       await delay(10000);
@@ -180,6 +181,6 @@ async function deposit() {
         await deposit()
         console.log('Exiting successfully');
     } catch(err) {
-        console.log('Exiting with error', err)
+        console.error('Exiting with error', err)
     }
 })();

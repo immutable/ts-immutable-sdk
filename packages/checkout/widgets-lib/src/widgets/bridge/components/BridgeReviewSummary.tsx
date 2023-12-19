@@ -8,8 +8,9 @@ import {
 } from 'react';
 import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import {
+  Accordion,
   Body,
-  Box, Button, Heading, Icon, MenuItem,
+  Box, Button, Heading, Icon, MenuItem, PriceDisplay,
 } from '@biom3/react';
 import {
   ChainId, GasEstimateBridgeToL2Result, GasEstimateType, WalletProviderName,
@@ -113,7 +114,7 @@ export function BridgeReviewSummary() {
     const [unsignedApproveTransaction, unsignedTransaction] = await Promise.all([
       tokenBridge!.getUnsignedApproveBridgeTx({
         senderAddress: fromAddress,
-        token: token?.address,
+        token: token.address ?? '',
         amount: utils.parseUnits(amount, token.decimals),
         sourceChainId: from?.network.toString(),
         destinationChainId: to?.network.toString(),
@@ -121,7 +122,7 @@ export function BridgeReviewSummary() {
       tokenBridge!.getUnsignedBridgeTx({
         senderAddress: fromAddress,
         recipientAddress: toAddress,
-        token: token?.address,
+        token: token.address ?? '',
         amount: utils.parseUnits(amount, token.decimals),
         sourceChainId: from?.network.toString(),
         destinationChainId: to?.network.toString(),
@@ -280,28 +281,23 @@ export function BridgeReviewSummary() {
         )}
       </MenuItem>
       {gasFee && (
-        <MenuItem
-          testId={`${testId}-gas-amount`}
-          size="small"
-          emphasized
+        <Accordion
+          targetClickOveride={() => setShowFeeBreakdown(true)}
           sx={bottomMenuItemStyles}
         >
-          <MenuItem.Label
-            size="small"
-            sx={gasAmountHeadingStyles}
-          >
-            {fees.heading}
-          </MenuItem.Label>
-          <MenuItem.PriceDisplay
-            use={<Body size="xSmall" />}
-            price={`${estimates?.token?.symbol} ${tokenValueFormat(gasFee)}` ?? '-'}
-            fiatAmount={`${fiatPricePrefix}${gasFeeFiatValue}`}
-          />
-          <MenuItem.StatefulButtCon
-            icon="ChevronExpand"
-            onClick={() => setShowFeeBreakdown(true)}
-          />
-        </MenuItem>
+          <Accordion.TargetLeftSlot>
+            <Body size="medium" sx={gasAmountHeadingStyles}>
+              {fees.heading}
+            </Body>
+          </Accordion.TargetLeftSlot>
+          <Accordion.TargetRightSlot>
+            <PriceDisplay
+              testId={`${testId}-gas-amount__priceDisplay`}
+              fiatAmount={`${fiatPricePrefix}${gasFeeFiatValue}`}
+              price={`${estimates?.token?.symbol} ${tokenValueFormat(gasFee)}` ?? '-'}
+            />
+          </Accordion.TargetRightSlot>
+        </Accordion>
       )}
       <Box
         sx={{

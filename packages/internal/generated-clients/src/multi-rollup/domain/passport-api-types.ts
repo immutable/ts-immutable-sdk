@@ -75,7 +75,7 @@ export { GetLinkedAddressesResDeprecated } from '../models';
  * @export
  * @interface CreateCounterfactualAddressRequest
  */
-export interface CreateCounterfactualAddressRequest {
+export interface CreateCounterfactualAddressRequestParams {
     /**
      * 
      * @type {string}
@@ -96,7 +96,7 @@ export interface CreateCounterfactualAddressRequest {
  * @export
  * @interface CreateCounterfactualAddressDeprecatedRequest
  */
-export interface CreateCounterfactualAddressDeprecatedRequest {
+export interface CreateCounterfactualAddressDeprecatedRequestParams {
     /**
      * 
      * @type {CreateCounterfactualAddressRequestDeprecated}
@@ -110,7 +110,7 @@ export interface CreateCounterfactualAddressDeprecatedRequest {
  * @export
  * @interface GetContractAbiRequest
  */
-export interface GetContractAbiRequest {
+export interface GetContractAbiRequestParams {
     /**
      * 
      * @type {string}
@@ -138,7 +138,7 @@ export interface GetContractAbiRequest {
  * @export
  * @interface GetLinkedAddressesRequest
  */
-export interface GetLinkedAddressesRequest {
+export interface GetLinkedAddressesRequestParams {
     /**
      * The user\&#39;s userId
      * @type {string}
@@ -159,7 +159,7 @@ export interface GetLinkedAddressesRequest {
  * @export
  * @interface GetLinkedAddressesDeprecatedRequest
  */
-export interface GetLinkedAddressesDeprecatedRequest {
+export interface GetLinkedAddressesDeprecatedRequestParams {
     /**
      * The user\&#39;s userId
      * @type {string}

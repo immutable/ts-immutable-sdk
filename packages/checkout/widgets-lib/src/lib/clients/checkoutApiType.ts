@@ -7,6 +7,10 @@ export type Transactions = {
   result: Transaction[]
 };
 
+export type CurrentStatus = {
+  status: string;
+};
+
 export type TransactionDetails = {
   amount: string
   from_address: string
@@ -15,6 +19,7 @@ export type TransactionDetails = {
   to_address: string
   to_chain: string
   to_token_address: string
+  current_status: CurrentStatus
 };
 
 export type BlockchainMetadata = {
@@ -25,5 +30,5 @@ export type Transaction = {
   tx_type: TransactionType
   details: TransactionDetails
   blockchain_metadata: BlockchainMetadata
-  updated_at: string
+  created_at: string
 };
