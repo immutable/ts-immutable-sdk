@@ -32,3 +32,12 @@ See [CONTRIBUTING.md](https://github.com/immutable/ts-immutable-sdk/blob/main/CO
 Internal maintainers' guide is available at Immutable's wiki `UnifiedSDK Internal Development Guide`
 - In the .github/CODEOWNERS file add your github team to the corresponding subfolder that your team will be responsible for.
 - [Example from GitHub](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners#example-of-a-codeowners-file)
+
+# Functional tests
+
+You can find the functional tests in the `tests/func_tests` folder.
+These are Gherkin tests that are run against the built SDK. 
+
+Instructions: 
+* [zkevm tests](./tests/func-tests/zkevm/README.md)
+* [imx tests](./tests/func-tests/imx/README.md)

@@ -12,7 +12,7 @@ Functional tests using Cucumber and Gherkin
 
 ## Running the tests
 
-1. Copy the .env.example file to .env and fill in the values (Immutable teams can use these: [sandbox](https://start.1password.com/open/i?a=CAJRPPG6M5BATGL7DATCR564CM&v=hn6z3wqnqrmqybiw43itbshigq&i=ojwubt5jhmzfjlwcu3fdsybgby&h=imtbl.1password.com) and [dev](https://start.1password.com/open/i?a=CAJRPPG6M5BATGL7DATCR564CM&v=hn6z3wqnqrmqybiw43itbshigq&i=abhpqgjt53ordt7fbe3ky3pr4m&h=imtbl.1password.com))
+1. Copy the .env.example file to .env and fill in the values
 2. Run the tests: `yarn test`
 
 **Note:** Certain tests are skipped on CI because of the time they take to run. To run only these, use `yarn test:ci`
