@@ -1022,10 +1022,6 @@ export class TokenBridge {
       );
     }
 
-    console.log('pending[req.index].timestamp', pending[req.index].timestamp);
-    console.log('Date.now()', Date.now());
-    console.log(pending[req.index].timestamp.gt(Math.floor(Date.now() / 1000)));
-
     // @TODO query timeout from contract (SMR-2090)
     const timeoutEnd = pending[req.index].timestamp.toNumber() + (60 * 60 * 24);
     const timestampNow = Math.floor(Date.now() / 1000);
