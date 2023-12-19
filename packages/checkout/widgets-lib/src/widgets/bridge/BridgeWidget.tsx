@@ -25,6 +25,7 @@ import {
   TokenBridge,
 } from '@imtbl/bridge-sdk';
 import { getL1ChainId, getL2ChainId } from 'lib';
+import { Transactions } from 'components/Transactions/Transactions';
 import { UserJourney } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { TopUpView } from 'views/top-up/TopUpView';
 import {
@@ -201,6 +202,9 @@ export function BridgeWidget({
               approveTransaction={viewState.view.approveTransaction}
               transaction={viewState.view.transaction}
             />
+          )}
+          {viewState.view.type === BridgeWidgetViews.TRANSACTIONS && (
+            <Transactions checkout={checkout} />
           )}
           {viewState.view.type === SharedViews.ERROR_VIEW && (
             <ErrorView

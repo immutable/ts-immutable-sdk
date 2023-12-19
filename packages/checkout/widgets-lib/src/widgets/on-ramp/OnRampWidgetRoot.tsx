@@ -12,7 +12,8 @@ import { Base } from 'widgets/BaseWidgetRoot';
 import { ConnectLoader, ConnectLoaderParams } from 'components/ConnectLoader/ConnectLoader';
 import { getL1ChainId, getL2ChainId } from 'lib';
 import { isValidAddress, isValidAmount } from 'lib/validations/widgetValidators';
-import { WidgetContainer } from 'components/WidgetContainer/WidgetContainer';
+import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
+import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
 import { OnRampWidget } from './OnRampWidget';
 import { sendOnRampWidgetCloseEvent } from './OnRampWidgetEvents';
 
@@ -66,19 +67,21 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
 
     this.reactRoot.render(
       <React.StrictMode>
-        <WidgetContainer id="onramp-container" config={this.strongConfig()}>
-          <ConnectLoader
-            widgetConfig={this.strongConfig()}
-            params={connectLoaderParams}
-            closeEvent={() => sendOnRampWidgetCloseEvent(window)}
-          >
-            <OnRampWidget
-              tokenAddress={this.parameters.tokenAddress}
-              amount={this.parameters.amount}
-              config={this.strongConfig()}
-            />
-          </ConnectLoader>
-        </WidgetContainer>
+        <CustomAnalyticsProvider checkout={this.checkout}>
+          <ThemeProvider id="onramp-container" config={this.strongConfig()}>
+            <ConnectLoader
+              widgetConfig={this.strongConfig()}
+              params={connectLoaderParams}
+              closeEvent={() => sendOnRampWidgetCloseEvent(window)}
+            >
+              <OnRampWidget
+                tokenAddress={this.parameters.tokenAddress}
+                amount={this.parameters.amount}
+                config={this.strongConfig()}
+              />
+            </ConnectLoader>
+          </ThemeProvider>
+        </CustomAnalyticsProvider>
       </React.StrictMode>,
     );
   }

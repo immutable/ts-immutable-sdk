@@ -35,7 +35,7 @@ import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
 import { checkIsWalletConnected, connectSite } from './connect';
 import * as network from './network';
 import { createProvider, isWeb3Provider, validateProvider } from './provider';
-import { getTokenAllowList } from './tokens';
+import { getERC20TokenInfo, getTokenAllowList } from './tokens';
 import { getWalletAllowList } from './wallet';
 import { buy } from './smartCheckout/buy';
 import { sell } from './smartCheckout/sell';
@@ -143,6 +143,23 @@ describe('Connect', () => {
     expect(getBalance).toBeCalledTimes(0);
     expect(getERC20Balance).toBeCalledTimes(1);
     expect(getERC20Balance).toBeCalledWith(provider, '0x123', '0x456');
+  });
+
+  it('should call getTokenInfo', async () => {
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.PRODUCTION },
+    });
+
+    const provider = new Web3Provider(providerMock, ChainId.ETHEREUM);
+    (getERC20TokenInfo as jest.Mock).mockResolvedValue({});
+
+    await checkout.getTokenInfo({
+      provider,
+      tokenAddress: '0x456',
+    });
+
+    expect(getERC20TokenInfo).toBeCalledTimes(1);
+    expect(getERC20TokenInfo).toBeCalledWith(provider, '0x456');
   });
 
   it('should call the switchWalletNetwork function', async () => {
