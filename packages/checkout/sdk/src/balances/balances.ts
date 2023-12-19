@@ -249,6 +249,13 @@ export const getAllBalances = async (
     );
   }
 
+  if (!config.networkMap.get(chainId)) {
+    throw new CheckoutError(
+      `${chainId} not supported by the environment`,
+      CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR,
+    );
+  }
+
   const { tokens } = await getTokenAllowList(
     config,
     {
