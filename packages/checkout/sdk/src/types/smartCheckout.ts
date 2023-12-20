@@ -539,6 +539,8 @@ export type FundingRoute = {
  * @property {TokenInfo | undefined} token
  */
 export type Fee = {
+  /** The type of fee */
+  type: FeeType;
   /** The amount of the fee */
   amount: BigNumber;
   /** The formatted amount of the fee */
@@ -546,6 +548,21 @@ export type Fee = {
   /** The token info for the fee */
   token?: TokenInfo;
 };
+
+/**
+ * An enum representing the funding step types
+ * @enum {string}
+ * @property {string} GAS - If the fee is a gas fee.
+ * @property {string} BRIDGE_FEE - If the fee is a bridge fee.
+ * @property {string} SWAP_FEE - If the fee is a swap fee.
+ * @property {string} IMMUTABLE_FEE - If the fee is an immutable fee.
+ */
+export enum FeeType {
+  GAS = 'GAS',
+  BRIDGE_FEE = 'BRIDGE_FEE',
+  SWAP_FEE = 'SWAP_FEE',
+  IMMUTABLE_FEE = 'IMMUTABLE_FEE',
+}
 
 /*
 * Type representing the various funding steps
@@ -572,15 +589,15 @@ export type BridgeFundingStep = {
 
 /**
  * Represents the fees for a bridge funding step
- * @property {Fee} approvalGasFees
- * @property {Fee} bridgeGasFees
+ * @property {Fee} approvalGasFee
+ * @property {Fee} bridgeGasFee
  * @property {Fee[]} bridgeFees
  */
 export type BridgeFees = {
-  /** The approval gas fees for the bridge */
-  approvalGasFees: Fee,
-  /** The bridge gas fees for the bridge */
-  bridgeGasFees: Fee,
+  /** The approval gas fee for the bridge */
+  approvalGasFee: Fee,
+  /** The bridge gas fee for the bridge */
+  bridgeGasFee: Fee,
   /** Additional bridge fees for the bridge */
   bridgeFees: Fee[],
 };
@@ -605,15 +622,15 @@ export type SwapFundingStep = {
 
 /**
  * Represents the fees for a swap funding step
- * @property {Fee} approvalGasFees
- * @property {Fee} swapGasFees
+ * @property {Fee} approvalGasFee
+ * @property {Fee} swapGasFee
  * @property {Fee[]} swapFees
  */
 export type SwapFees = {
-  /** The approval gas fees for the swap */
-  approvalGasFees: Fee,
-  /** The swap gas fees for the swap */
-  swapGasFees: Fee,
+  /** The approval gas fee for the swap */
+  approvalGasFee: Fee,
+  /** The swap gas fee for the swap */
+  swapGasFee: Fee,
   /** Additional swap fees for the swap */
   swapFees: Fee[],
 };
