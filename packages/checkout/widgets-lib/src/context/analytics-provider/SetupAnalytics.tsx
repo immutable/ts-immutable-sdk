@@ -27,7 +27,7 @@ export function SetupAnalytics(
     (async () => {
       const config = await telemetry() as TelemetryConfig;
       if (!config) return;
-      updateWriteKey(config.publishableApiKey);
+      updateWriteKey(config.segmentPublishableKey);
     })();
   }, [telemetry]);
 
