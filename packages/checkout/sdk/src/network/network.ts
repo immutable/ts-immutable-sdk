@@ -70,6 +70,7 @@ export async function getNetworkAllowList(
     'allowedNetworks',
   )) as AllowedNetworkConfig[];
   if (!allowedNetworkConfig) {
+    // eslint-disable-next-line no-console
     console.warn('No allowed networks configured');
   }
 
