@@ -4,6 +4,7 @@ import { CheckoutConfiguration, getL2ChainId } from '../../../config';
 import {
   AvailableRoutingOptions,
   ChainId,
+  FeeType,
   FundingStepType,
   GetBalanceResult,
   ItemType,
@@ -17,41 +18,42 @@ import { quoteFetcher } from './quoteFetcher';
 import { isNativeToken } from '../../../tokens';
 
 const constructFees = (
-  approvalGasFees: Amount | null | undefined,
-  swapGasFees: Amount | null,
+  approvalGasFee: Amount | null | undefined,
+  swapGasFee: Amount | null,
   swapFees: Fee[],
 ): SwapFees => {
   let approvalGasFeeAmount = BigNumber.from(0);
   let approvalGasFeeFormatted = '0';
   let approvalToken: TokenInfo | undefined;
-  if (approvalGasFees) {
-    approvalGasFeeAmount = approvalGasFees.value;
-    approvalGasFeeFormatted = utils.formatUnits(approvalGasFees.value, approvalGasFees.token.decimals);
+  if (approvalGasFee) {
+    approvalGasFeeAmount = approvalGasFee.value;
+    approvalGasFeeFormatted = utils.formatUnits(approvalGasFee.value, approvalGasFee.token.decimals);
     approvalToken = {
-      name: approvalGasFees.token.name ?? '',
-      symbol: approvalGasFees.token.symbol ?? '',
-      address: approvalGasFees.token.address,
-      decimals: approvalGasFees.token.decimals,
+      name: approvalGasFee.token.name ?? '',
+      symbol: approvalGasFee.token.symbol ?? '',
+      address: approvalGasFee.token.address,
+      decimals: approvalGasFee.token.decimals,
     };
   }
 
   let swapGasFeeAmount = BigNumber.from(0);
   let swapGasFeeFormatted = '0';
   let swapGasToken: TokenInfo | undefined;
-  if (swapGasFees) {
-    swapGasFeeAmount = swapGasFees.value;
-    swapGasFeeFormatted = utils.formatUnits(swapGasFees.value, swapGasFees.token.decimals);
+  if (swapGasFee) {
+    swapGasFeeAmount = swapGasFee.value;
+    swapGasFeeFormatted = utils.formatUnits(swapGasFee.value, swapGasFee.token.decimals);
     swapGasToken = {
-      name: swapGasFees.token.name ?? '',
-      symbol: swapGasFees.token.symbol ?? '',
-      address: swapGasFees.token.address,
-      decimals: swapGasFees.token.decimals,
+      name: swapGasFee.token.name ?? '',
+      symbol: swapGasFee.token.symbol ?? '',
+      address: swapGasFee.token.address,
+      decimals: swapGasFee.token.decimals,
     };
   }
 
   const fees = [];
   for (const swapFee of swapFees) {
     fees.push({
+      type: FeeType.SWAP_FEE,
       amount: swapFee.amount.value,
       formattedAmount: utils.formatUnits(swapFee.amount.value, swapFee.amount.token.decimals),
       token: {
@@ -64,12 +66,14 @@ const constructFees = (
   }
 
   return {
-    approvalGasFees: {
+    approvalGasFee: {
+      type: FeeType.GAS,
       amount: approvalGasFeeAmount,
       formattedAmount: approvalGasFeeFormatted,
       token: approvalToken,
     },
-    swapGasFees: {
+    swapGasFee: {
+      type: FeeType.GAS,
       amount: swapGasFeeAmount,
       formattedAmount: swapGasFeeFormatted,
       token: swapGasToken,
@@ -192,7 +196,7 @@ export const checkUserCanCoverApprovalFees = (
 export const checkUserCanCoverSwapFees = (
   l2Balances: GetBalanceResult[],
   approvalFees: SufficientApprovalFees,
-  swapGasFees: Amount | null,
+  swapGasFee: Amount | null,
   swapFees: Fee[],
   tokenBeingSwapped: { amount: BigNumber, address: string },
 ): boolean => {
@@ -205,12 +209,12 @@ export const checkUserCanCoverSwapFees = (
   }
 
   // Add the swap gas fee to list of fees
-  if (swapGasFees) {
-    const fee = feeMap.get(swapGasFees.token.address);
+  if (swapGasFee) {
+    const fee = feeMap.get(swapGasFee.token.address);
     if (fee) {
-      feeMap.set(swapGasFees.token.address, fee.add(swapGasFees.value));
+      feeMap.set(swapGasFee.token.address, fee.add(swapGasFee.value));
     } else {
-      feeMap.set(swapGasFees.token.address, swapGasFees.value);
+      feeMap.set(swapGasFee.token.address, swapGasFee.value);
     }
   }
 
