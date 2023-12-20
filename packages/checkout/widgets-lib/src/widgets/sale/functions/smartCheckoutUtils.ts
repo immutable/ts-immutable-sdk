@@ -85,7 +85,6 @@ export const fundingRouteFees = (
   }
 
   let totalUsd: number = 0;
-  console.log(fees);
   for (const fee of fees) {
     if (fee.token) {
       const feeUsd = calculateCryptoToFiat(fee.formattedAmount, fee.token.symbol, conversions);
