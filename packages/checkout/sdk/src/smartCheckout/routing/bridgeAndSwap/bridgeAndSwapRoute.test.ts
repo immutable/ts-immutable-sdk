@@ -5,6 +5,7 @@ import { Quote } from '@imtbl/dex-sdk';
 import { CheckoutConfiguration } from '../../../config';
 import {
   ChainId,
+  FeeType,
   FundingStepType,
   ItemType,
   TokenInfo,
@@ -215,15 +216,18 @@ describe('bridgeAndSwapRoute', () => {
             },
           },
           fees: {
-            approvalGasFees: {
+            approvalGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(0),
               formattedAmount: '0',
             },
-            bridgeGasFees: {
+            bridgeGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(0),
               formattedAmount: '0',
             },
             bridgeFees: [{
+              type: FeeType.BRIDGE_FEE,
               amount: BigNumber.from(0),
               formattedAmount: '0',
             }],
@@ -251,15 +255,18 @@ describe('bridgeAndSwapRoute', () => {
             },
           },
           fees: {
-            approvalGasFees: {
+            approvalGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(0),
               formattedAmount: '0',
             },
-            bridgeGasFees: {
+            bridgeGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(0),
               formattedAmount: '0',
             },
             bridgeFees: [{
+              type: FeeType.BRIDGE_FEE,
               amount: BigNumber.from(0),
               formattedAmount: '0',
             }],
@@ -289,15 +296,18 @@ describe('bridgeAndSwapRoute', () => {
             },
           },
           fees: {
-            approvalGasFees: {
+            approvalGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(0),
               formattedAmount: '0',
             },
-            swapGasFees: {
+            swapGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(0),
               formattedAmount: '0',
             },
             swapFees: [{
+              type: FeeType.SWAP_FEE,
               amount: BigNumber.from(0),
               formattedAmount: '0',
             }],
@@ -324,15 +334,18 @@ describe('bridgeAndSwapRoute', () => {
             },
           },
           fees: {
-            approvalGasFees: {
+            approvalGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(0),
               formattedAmount: '0',
             },
-            swapGasFees: {
+            swapGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(0),
               formattedAmount: '0',
             },
             swapFees: [{
+              type: FeeType.SWAP_FEE,
               amount: BigNumber.from(0),
               formattedAmount: '0',
             }],
@@ -449,15 +462,18 @@ describe('bridgeAndSwapRoute', () => {
               },
             },
             fees: {
-              approvalGasFees: {
+              approvalGasFee: {
+                type: FeeType.GAS,
                 amount: BigNumber.from(0),
                 formattedAmount: '0',
               },
-              bridgeGasFees: {
+              bridgeGasFee: {
+                type: FeeType.GAS,
                 amount: BigNumber.from(0),
                 formattedAmount: '0',
               },
               bridgeFees: [{
+                type: FeeType.BRIDGE_FEE,
                 amount: BigNumber.from(0),
                 formattedAmount: '0',
               }],
@@ -484,15 +500,18 @@ describe('bridgeAndSwapRoute', () => {
               },
             },
             fees: {
-              approvalGasFees: {
+              approvalGasFee: {
+                type: FeeType.GAS,
                 amount: BigNumber.from(0),
                 formattedAmount: '0',
               },
-              swapGasFees: {
+              swapGasFee: {
+                type: FeeType.GAS,
                 amount: BigNumber.from(0),
                 formattedAmount: '0',
               },
               swapFees: [{
+                type: FeeType.SWAP_FEE,
                 amount: BigNumber.from(0),
                 formattedAmount: '0',
               }],
@@ -520,15 +539,18 @@ describe('bridgeAndSwapRoute', () => {
               },
             },
             fees: {
-              approvalGasFees: {
+              approvalGasFee: {
+                type: FeeType.GAS,
                 amount: BigNumber.from(0),
                 formattedAmount: '0',
               },
-              bridgeGasFees: {
+              bridgeGasFee: {
+                type: FeeType.GAS,
                 amount: BigNumber.from(0),
                 formattedAmount: '0',
               },
               bridgeFees: [{
+                type: FeeType.BRIDGE_FEE,
                 amount: BigNumber.from(0),
                 formattedAmount: '0',
               }],
@@ -555,15 +577,18 @@ describe('bridgeAndSwapRoute', () => {
               },
             },
             fees: {
-              approvalGasFees: {
+              approvalGasFee: {
+                type: FeeType.GAS,
                 amount: BigNumber.from(0),
                 formattedAmount: '0',
               },
-              swapGasFees: {
+              swapGasFee: {
+                type: FeeType.GAS,
                 amount: BigNumber.from(0),
                 formattedAmount: '0',
               },
               swapFees: [{
+                type: FeeType.SWAP_FEE,
                 amount: BigNumber.from(0),
                 formattedAmount: '0',
               }],

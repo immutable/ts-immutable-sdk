@@ -19,6 +19,7 @@ import {
 } from '../types';
 import {
   ChainId,
+  FeeType,
   FundingStepType,
   ItemType,
 } from '../../../types';
@@ -249,7 +250,8 @@ describe('swapRoute', () => {
             },
           },
           fees: {
-            approvalGasFees: {
+            approvalGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(1),
               formattedAmount: utils.formatUnits(BigNumber.from(1), 18),
               token: {
@@ -258,7 +260,8 @@ describe('swapRoute', () => {
                 symbol: 'IMX',
               },
             },
-            swapGasFees: {
+            swapGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(2),
               formattedAmount: utils.formatUnits(BigNumber.from(2), 18),
               token: {
@@ -268,6 +271,7 @@ describe('swapRoute', () => {
               },
             },
             swapFees: [{
+              type: FeeType.SWAP_FEE,
               amount: BigNumber.from(3),
               formattedAmount: utils.formatUnits(BigNumber.from(3), 18),
               token: {
@@ -366,7 +370,8 @@ describe('swapRoute', () => {
             },
           },
           fees: {
-            approvalGasFees: {
+            approvalGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(1),
               formattedAmount: utils.formatUnits(BigNumber.from(1), 18),
               token: {
@@ -375,7 +380,8 @@ describe('swapRoute', () => {
                 symbol: 'IMX',
               },
             },
-            swapGasFees: {
+            swapGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(2),
               formattedAmount: utils.formatUnits(BigNumber.from(2), 18),
               token: {
@@ -385,6 +391,7 @@ describe('swapRoute', () => {
               },
             },
             swapFees: [{
+              type: FeeType.SWAP_FEE,
               amount: BigNumber.from(3),
               formattedAmount: utils.formatUnits(BigNumber.from(3), 18),
               token: {
@@ -505,7 +512,8 @@ describe('swapRoute', () => {
             },
           },
           fees: {
-            approvalGasFees: {
+            approvalGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(1),
               formattedAmount: utils.formatUnits(BigNumber.from(1), 18),
               token: {
@@ -514,7 +522,8 @@ describe('swapRoute', () => {
                 symbol: 'IMX',
               },
             },
-            swapGasFees: {
+            swapGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(2),
               formattedAmount: utils.formatUnits(BigNumber.from(2), 18),
               token: {
@@ -524,6 +533,7 @@ describe('swapRoute', () => {
               },
             },
             swapFees: [{
+              type: FeeType.SWAP_FEE,
               amount: BigNumber.from(3),
               formattedAmount: utils.formatUnits(BigNumber.from(3), 18),
               token: {
@@ -555,7 +565,8 @@ describe('swapRoute', () => {
             },
           },
           fees: {
-            approvalGasFees: {
+            approvalGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(1),
               formattedAmount: utils.formatUnits(BigNumber.from(1), 18),
               token: {
@@ -564,7 +575,8 @@ describe('swapRoute', () => {
                 symbol: 'IMX',
               },
             },
-            swapGasFees: {
+            swapGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(2),
               formattedAmount: utils.formatUnits(BigNumber.from(2), 18),
               token: {
@@ -574,6 +586,7 @@ describe('swapRoute', () => {
               },
             },
             swapFees: [{
+              type: FeeType.SWAP_FEE,
               amount: BigNumber.from(3),
               formattedAmount: utils.formatUnits(BigNumber.from(3), 18),
               token: {
@@ -1112,15 +1125,18 @@ describe('swapRoute', () => {
         },
       };
       const fees = {
-        approvalGasFees: {
+        approvalGasFee: {
+          type: FeeType.GAS,
           amount: BigNumber.from(1),
           formattedAmount: '1',
         },
-        swapGasFees: {
+        swapGasFee: {
+          type: FeeType.GAS,
           amount: BigNumber.from(2),
           formattedAmount: '2',
         },
         swapFees: [{
+          type: FeeType.SWAP_FEE,
           amount: BigNumber.from(3),
           formattedAmount: '3',
         }],
@@ -1166,15 +1182,18 @@ describe('swapRoute', () => {
         },
       };
       const fees = {
-        approvalGasFees: {
+        approvalGasFee: {
+          type: FeeType.GAS,
           amount: BigNumber.from(1),
           formattedAmount: '1',
         },
-        swapGasFees: {
+        swapGasFee: {
+          type: FeeType.GAS,
           amount: BigNumber.from(2),
           formattedAmount: '2',
         },
         swapFees: [{
+          type: FeeType.SWAP_FEE,
           amount: BigNumber.from(3),
           formattedAmount: '3',
         }],
@@ -1466,7 +1485,7 @@ describe('swapRoute', () => {
         approvalGasTokenAddress: '',
       };
 
-      const swapGasFees = {
+      const swapGasFee = {
         token: {
           chainId: ChainId.IMTBL_ZKEVM_TESTNET,
           address: '',
@@ -1483,7 +1502,7 @@ describe('swapRoute', () => {
       const canCoverSwapFees = checkUserCanCoverSwapFees(
         l2Balances,
         approvalFees,
-        swapGasFees,
+        swapGasFee,
         swapFees,
         tokenBeingSwapped,
       );
@@ -1527,7 +1546,7 @@ describe('swapRoute', () => {
         approvalGasTokenAddress: '',
       };
 
-      const swapGasFees = {
+      const swapGasFee = {
         token: {
           chainId: ChainId.IMTBL_ZKEVM_TESTNET,
           address: '',
@@ -1544,7 +1563,7 @@ describe('swapRoute', () => {
       const canCoverSwapFees = checkUserCanCoverSwapFees(
         l2Balances,
         approvalFees,
-        swapGasFees,
+        swapGasFee,
         swapFees,
         tokenBeingSwapped,
       );
@@ -1588,7 +1607,7 @@ describe('swapRoute', () => {
         approvalGasTokenAddress: '',
       };
 
-      const swapGasFees = {
+      const swapGasFee = {
         token: {
           chainId: ChainId.IMTBL_ZKEVM_TESTNET,
           address: '',
@@ -1605,7 +1624,7 @@ describe('swapRoute', () => {
       const canCoverSwapFees = checkUserCanCoverSwapFees(
         l2Balances,
         approvalFees,
-        swapGasFees,
+        swapGasFee,
         swapFees,
         tokenBeingSwapped,
       );
@@ -1701,7 +1720,7 @@ describe('swapRoute', () => {
           approvalGasTokenAddress: '0xERC20_1',
         };
 
-        const swapGasFees = {
+        const swapGasFee = {
           token: {
             chainId: ChainId.IMTBL_ZKEVM_TESTNET,
             address: '0xERC20_1',
@@ -1718,7 +1737,7 @@ describe('swapRoute', () => {
         const canCoverSwapFees = checkUserCanCoverSwapFees(
           l2Balances,
           approvalFees,
-          swapGasFees,
+          swapGasFee,
           swapFees,
           tokenBeingSwapped,
         );
@@ -1749,7 +1768,7 @@ describe('swapRoute', () => {
         approvalGasTokenAddress: '',
       };
 
-      const swapGasFees = {
+      const swapGasFee = {
         token: {
           chainId: ChainId.IMTBL_ZKEVM_TESTNET,
           address: '',
@@ -1766,7 +1785,7 @@ describe('swapRoute', () => {
       const canCoverSwapFees = checkUserCanCoverSwapFees(
         l2Balances,
         approvalFees,
-        swapGasFees,
+        swapGasFee,
         swapFees,
         tokenBeingSwapped,
       );
@@ -1811,7 +1830,7 @@ describe('swapRoute', () => {
         approvalGasTokenAddress: '',
       };
 
-      const swapGasFees = {
+      const swapGasFee = {
         token: {
           chainId: ChainId.IMTBL_ZKEVM_TESTNET,
           address: '',
@@ -1828,7 +1847,7 @@ describe('swapRoute', () => {
       const canCoverSwapFees = checkUserCanCoverSwapFees(
         l2Balances,
         approvalFees,
-        swapGasFees,
+        swapGasFee,
         swapFees,
         tokenBeingSwapped,
       );
@@ -1866,7 +1885,7 @@ describe('swapRoute', () => {
         },
       ];
 
-      const swapGasFees = {
+      const swapGasFee = {
         token: {
           chainId: ChainId.IMTBL_ZKEVM_TESTNET,
           address: '',
@@ -1889,7 +1908,7 @@ describe('swapRoute', () => {
       const canCoverSwapFees = checkUserCanCoverSwapFees(
         l2Balances,
         approvalFees,
-        swapGasFees,
+        swapGasFee,
         swapFees,
         tokenBeingSwapped,
       );
@@ -1934,7 +1953,7 @@ describe('swapRoute', () => {
         approvalGasTokenAddress: '',
       };
 
-      const swapGasFees = {
+      const swapGasFee = {
         token: {
           chainId: ChainId.IMTBL_ZKEVM_TESTNET,
           address: '',
@@ -1951,7 +1970,7 @@ describe('swapRoute', () => {
       const canCoverSwapFees = checkUserCanCoverSwapFees(
         l2Balances,
         approvalFees,
-        swapGasFees,
+        swapGasFee,
         swapFees,
         tokenBeingSwapped,
       );

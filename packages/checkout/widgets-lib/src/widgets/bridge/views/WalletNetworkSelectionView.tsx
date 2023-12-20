@@ -1,13 +1,14 @@
 import { HeaderNavigation } from 'components/Header/HeaderNavigation';
 import { SimpleLayout } from 'components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from 'components/Footer/FooterLogo';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { EventTargetContext } from 'context/event-target-context/EventTargetContext';
 import { text } from 'resources/text/textConfig';
 import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { ButtonNavigationStyles } from 'components/Header/HeaderStyles';
 import { ButtCon } from '@biom3/react';
 import { ViewActions, ViewContext } from 'context/view-context/ViewContext';
+import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
 import { WalletAndNetworkSelector } from '../components/WalletAndNetworkSelector';
 
@@ -16,6 +17,15 @@ export function WalletNetworkSelectionView() {
 
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
   const { layoutHeading } = text.views[BridgeWidgetViews.WALLET_NETWORK_SELECTION];
+
+  const { page } = useAnalytics();
+
+  useEffect(() => {
+    page({
+      userJourney: UserJourney.BRIDGE,
+      screen: 'WalletNetworkSelection',
+    });
+  }, []);
 
   return (
     <SimpleLayout

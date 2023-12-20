@@ -1105,7 +1105,7 @@ describe('sell', () => {
       const buyToken: BuyToken = {
         type: ItemType.ERC20,
         amount: '1',
-        contractAddress: '0xERC20',
+        tokenAddress: '0xERC20',
       };
 
       const result = getBuyToken(buyToken);
@@ -1121,7 +1121,7 @@ describe('sell', () => {
       const buyToken: BuyToken = {
         type: ItemType.ERC20,
         amount: '1',
-        contractAddress: '0xERC20',
+        tokenAddress: '0xERC20',
       };
 
       const result = getBuyToken(buyToken, 6);

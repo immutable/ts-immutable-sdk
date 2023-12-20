@@ -14,6 +14,7 @@ import {
 import { bridgeRoute } from './bridge/bridgeRoute';
 import {
   ChainId,
+  FeeType,
   FundingStepType,
   ItemType,
   RoutingOutcomeType,
@@ -184,15 +185,18 @@ describe('routingCalculator', () => {
         },
       },
       fees: {
-        approvalGasFees: {
+        approvalGasFee: {
+          type: FeeType.GAS,
           amount: BigNumber.from(0),
           formattedAmount: '0',
         },
-        bridgeGasFees: {
+        bridgeGasFee: {
+          type: FeeType.GAS,
           amount: BigNumber.from(0),
           formattedAmount: '0',
         },
         bridgeFees: [{
+          type: FeeType.BRIDGE_FEE,
           amount: BigNumber.from(0),
           formattedAmount: '0',
         }],
@@ -805,15 +809,18 @@ describe('routingCalculator', () => {
         },
       },
       fees: {
-        approvalGasFees: {
+        approvalGasFee: {
+          type: FeeType.GAS,
           amount: BigNumber.from(0),
           formattedAmount: '0',
         },
-        bridgeGasFees: {
+        bridgeGasFee: {
+          type: FeeType.GAS,
           amount: BigNumber.from(0),
           formattedAmount: '0',
         },
         bridgeFees: [{
+          type: FeeType.BRIDGE_FEE,
           amount: BigNumber.from(0),
           formattedAmount: '0',
         }],

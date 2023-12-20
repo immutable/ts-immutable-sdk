@@ -18,6 +18,7 @@ export {
   ChainSlug,
   CheckoutStatus,
   ExchangeType,
+  FeeType,
   FundingStepType,
   GasEstimateType,
   GasTokenType,

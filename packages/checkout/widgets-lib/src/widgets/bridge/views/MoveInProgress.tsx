@@ -1,5 +1,6 @@
 import { useContext, useEffect } from 'react';
 import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
+import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { RocketHero } from '../../../components/Hero/RocketHero';
@@ -16,6 +17,7 @@ export interface MoveInProgressProps {
 
 export function MoveInProgress({ transactionHash }: MoveInProgressProps) {
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+  const { page } = useAnalytics();
 
   const { heading, body2 } = text.views[BridgeWidgetViews.IN_PROGRESS];
   const {
@@ -27,6 +29,10 @@ export function MoveInProgress({ transactionHash }: MoveInProgressProps) {
       eventTarget,
       transactionHash,
     );
+    page({
+      userJourney: UserJourney.BRIDGE,
+      screen: 'InProgress',
+    });
   }, []);
 
   return (

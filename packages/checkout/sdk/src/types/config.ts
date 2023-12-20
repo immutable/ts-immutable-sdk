@@ -155,10 +155,10 @@ export type ImxAddressConfig = {
 
 /**
  * A type representing the telemetry configurations.
- * @property {string} publishableApiKey
+ * @property {string} segmentPublishableKey
  */
 export type TelemetryConfig = {
-  publishableApiKey: string
+  segmentPublishableKey: string
 };
 
 /**
