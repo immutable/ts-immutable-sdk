@@ -265,7 +265,7 @@ describe('orderbook fees', () => {
     const amount = {
       type: ItemType.ERC20,
       amount: '10',
-      contractAddress: '0x111',
+      tokenAddress: '0x111',
     } as BuyToken;
     const makerFees = [{
       amount: { percentageDecimal: 0.025 },
