@@ -44,7 +44,7 @@ describe('gasCalculator', () => {
             delta: BigNumber.from(100000),
             itemRequirement: {
               type: ItemType.ERC20,
-              contractAddress: '0xERC20',
+              tokenAddress: '0xERC20',
               amount: BigNumber.from(100000),
               spenderAddress: '0xSEAPORT',
             },
@@ -95,7 +95,7 @@ describe('gasCalculator', () => {
             delta: BigNumber.from(100000),
             itemRequirement: {
               type: ItemType.ERC20,
-              contractAddress: '0xERC20',
+              tokenAddress: '0xERC20',
               amount: BigNumber.from(100000),
               spenderAddress: '0xSEAPORT',
             },
@@ -147,7 +147,7 @@ describe('gasCalculator', () => {
             delta: BigNumber.from(100000),
             itemRequirement: {
               type: ItemType.ERC20,
-              contractAddress: '0xERC20',
+              tokenAddress: '0xERC20',
               amount: BigNumber.from(100000),
               spenderAddress: '0xSEAPORT',
             },
@@ -170,14 +170,14 @@ describe('gasCalculator', () => {
           gasToken: {
             type: GasTokenType.ERC20,
             limit: BigNumber.from('100000'),
-            contractAddress: '0xERC20',
+            tokenAddress: '0xERC20',
           },
         },
       );
 
       expect(items).toEqual({
         type: ItemType.ERC20,
-        contractAddress: '0xERC20',
+        tokenAddress: '0xERC20',
         amount: BigNumber.from(400000),
         spenderAddress: '',
       });
@@ -288,7 +288,7 @@ describe('gasCalculator', () => {
           gasToken: {
             type: GasTokenType.ERC20,
             limit: BigNumber.from(100000),
-            contractAddress: '0xERC20',
+            tokenAddress: '0xERC20',
           },
         },
       );
@@ -296,7 +296,7 @@ describe('gasCalculator', () => {
       expect(item).toEqual({
         type: ItemType.ERC20,
         amount: BigNumber.from(100000),
-        contractAddress: '0xERC20',
+        tokenAddress: '0xERC20',
         spenderAddress: '',
       });
     });
