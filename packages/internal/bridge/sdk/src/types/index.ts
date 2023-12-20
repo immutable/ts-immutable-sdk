@@ -99,12 +99,12 @@ export enum BridgeFeeActions {
  * @property {string} FINALISE_WITHDRAWAL - The gas required to finalise a withdrawal from the flow rate queue.
  */
 export enum BridgeMethodsGasLimit { // @TODO test methods on chain and put correct values here
-  DEPOSIT_SOURCE = 500000,
-  DEPOSIT_DESTINATION = 700000,
-  WITHDRAW_SOURCE = 400000,
-  WITHDRAW_DESTINATION = 700000,
-  MAP_TOKEN_SOURCE = 300000,
-  MAP_TOKEN_DESTINATION = 700000,
+  DEPOSIT_SOURCE = 200000,
+  DEPOSIT_DESTINATION = 200000,
+  WITHDRAW_SOURCE = 200000,
+  WITHDRAW_DESTINATION = 250000,
+  MAP_TOKEN_SOURCE = 200000,
+  MAP_TOKEN_DESTINATION = 200000,
   FINALISE_WITHDRAWAL = 200000,
 }
 
@@ -247,17 +247,22 @@ export interface BridgeTxResponse {
 
 /**
  * @typedef {Object} TxStatusRequest
+ * @property {string} sourceChainId - The chain ID of the source chain.
  * @property {Array<TxStatusRequestItem>} transactions - The transaction items to query the status for.
  */
 export interface TxStatusRequest {
   transactions: Array<TxStatusRequestItem>
+  sourceChainId: string;
 }
 
 /**
  * @typedef {Object} TxStatusRequestItem
- * @property {string} transactionHash - The transaction hash on the source chain of the bridge transaction.
- * @property {string} sourceChainId - The source chainId.
- */
+ * @property {string} txHash - The transaction hash on the source chain of the bridge transaction.
+ * @property {Address} sender - The address of the sender on the source chain.
+ * @property {Address} receiver - The address of the receiver on the destination chain.
+ * @property {FungibleToken} token - The address of the receiver on the destination chain.
+ * @property {ethers.BigNumber} amount - The address of the receiver on the destination chain.
+*/
 export interface TxStatusRequestItem {
   txHash: string;
 }
@@ -272,16 +277,26 @@ export interface TxStatusResponse {
 
 /**
  * @typedef {Object} TxStatusResponseItem
- * @property {string} transactionHash - The transaction hash on the source chain of the bridge transaction.
- * @property {string} sourceChainId - The source chainId.
- */
+ * @property {string} txHash - The transaction hash on the source chain of the bridge transaction.
+ * @property {Address} sender - The address of the sender on the source chain.
+ * @property {Address} receiver - The address of the receiver on the destination chain.
+ * @property {FungibleToken} token - The address of the receiver on the destination chain.
+ * @property {ethers.BigNumber} amount - The amount of the transaction.
+ * @property {StatusResponse} status - The status of the transaction.
+ * @property {any} data - Any extra data relevant to the transaction.
+*/
 export interface TxStatusResponseItem {
-  transactionHash: string;
+  txHash: string;
+  sender: Address;
+  receiver: Address;
+  token: FungibleToken;
+  amount: ethers.BigNumber;
   status: StatusResponse;
   data: any;
 }
 
 export enum StatusResponse {
+  PENDING = 'PENDING',
   PROCESSING = 'PROCESSING',
   COMPLETE = 'COMPLETE',
   RETRY = 'RETRY',
@@ -348,6 +363,13 @@ export interface PendingWithdrawals {
   amount: string,
   timeoutStart: number,
   timeoutEnd: number,
+}
+
+export interface RootBridgePendingWithdrawal {
+  withdrawer: Address,
+  token: FungibleToken,
+  amount: string,
+  timestamp: string,
 }
 
 /**
