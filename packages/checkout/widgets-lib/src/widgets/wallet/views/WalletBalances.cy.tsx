@@ -9,7 +9,6 @@ import { BigNumber } from 'ethers';
 import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
 import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
-import { WidgetContainer } from 'components/WidgetContainer/WidgetContainer';
 import { WalletBalances } from './WalletBalances';
 import { WalletContext, WalletState } from '../context/WalletContext';
 import { cyIntercept, cySmartGet } from '../../../lib/testUtils';
@@ -96,7 +95,7 @@ describe('WalletBalances', () => {
 
     it('should show balances', () => {
       mount(
-        <WidgetContainer id="test" config={config}>
+        <ViewContextTestComponent theme={config.theme}>
           <ConnectLoaderTestComponent
             initialStateOverride={connectLoaderState}
           >
@@ -107,7 +106,7 @@ describe('WalletBalances', () => {
               <WalletBalances balancesLoading={false} setBalancesLoading={() => {}} />
             </WalletWidgetTestComponent>
           </ConnectLoaderTestComponent>
-        </WidgetContainer>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('balance-item-IMX').should('exist');
@@ -116,7 +115,7 @@ describe('WalletBalances', () => {
 
     it('should show shimmer while waiting for balances to load', () => {
       mount(
-        <WidgetContainer id="test" config={config}>
+        <ViewContextTestComponent theme={config.theme}>
           <ConnectLoaderTestComponent
             initialStateOverride={connectLoaderState}
           >
@@ -127,7 +126,7 @@ describe('WalletBalances', () => {
               <WalletBalances balancesLoading setBalancesLoading={() => {}} />
             </WalletWidgetTestComponent>
           </ConnectLoaderTestComponent>
-        </WidgetContainer>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('balance-item-shimmer--1__shimmer').should('be.visible');
@@ -138,7 +137,7 @@ describe('WalletBalances', () => {
 
     it('should not show shimmers once balances has loaded', () => {
       mount(
-        <WidgetContainer id="test" config={config}>
+        <ViewContextTestComponent theme={config.theme}>
           <ConnectLoaderTestComponent
             initialStateOverride={connectLoaderState}
           >
@@ -149,7 +148,7 @@ describe('WalletBalances', () => {
               <WalletBalances balancesLoading={false} setBalancesLoading={() => {}} />
             </WalletWidgetTestComponent>
           </ConnectLoaderTestComponent>
-        </WidgetContainer>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('balance-item-shimmer--1__shimmer').should('not.exist');
@@ -160,7 +159,7 @@ describe('WalletBalances', () => {
 
     it('should show no balances', () => {
       mount(
-        <WidgetContainer id="test" config={config}>
+        <ViewContextTestComponent theme={config.theme}>
           <ConnectLoaderTestComponent
             initialStateOverride={connectLoaderState}
           >
@@ -171,7 +170,7 @@ describe('WalletBalances', () => {
               <WalletBalances balancesLoading={false} setBalancesLoading={() => {}} />
             </WalletWidgetTestComponent>
           </ConnectLoaderTestComponent>
-        </WidgetContainer>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('no-tokens-found').should('exist');
@@ -218,16 +217,7 @@ describe('WalletBalances', () => {
 
     it('should show not enough gas drawer when trying to bridge to L2 with 0 eth balance', () => {
       mount(
-        <WidgetContainer
-          config={{
-            environment: Environment.SANDBOX,
-            theme: WidgetTheme.DARK,
-            isBridgeEnabled: true,
-            isSwapEnabled: true,
-            isOnRampEnabled: true,
-          }}
-          id="test"
-        >
+        <ViewContextTestComponent theme={WidgetTheme.DARK}>
           <ConnectLoaderTestComponent
             initialStateOverride={connectLoaderState}
           >
@@ -238,7 +228,7 @@ describe('WalletBalances', () => {
               <WalletBalances balancesLoading={false} setBalancesLoading={() => {}} />
             </WalletWidgetTestComponent>
           </ConnectLoaderTestComponent>
-        </WidgetContainer>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('token-menu').first().click();
@@ -255,8 +245,8 @@ describe('WalletBalances', () => {
         .as('gasEstimateStub')
         .resolves({
           gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-          gasFee: {
-            estimatedAmount: BigNumber.from('10000000000000000'),
+          fees: {
+            totalFees: BigNumber.from('10000000000000000'),
           },
         });
 
@@ -289,7 +279,7 @@ describe('WalletBalances', () => {
       };
 
       mount(
-        <WidgetContainer id="test" config={config}>
+        <ViewContextTestComponent theme={config.theme}>
           <ConnectLoaderTestComponent
             initialStateOverride={connectLoaderState}
           >
@@ -300,7 +290,7 @@ describe('WalletBalances', () => {
               <WalletBalances balancesLoading={false} setBalancesLoading={() => {}} />
             </WalletWidgetTestComponent>
           </ConnectLoaderTestComponent>
-        </WidgetContainer>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('token-menu').click();
@@ -350,7 +340,7 @@ describe('WalletBalances', () => {
       };
 
       mount(
-        <WidgetContainer id="test" config={config}>
+        <ViewContextTestComponent theme={config.theme}>
           <ConnectLoaderTestComponent
             initialStateOverride={connectLoaderState}
           >
@@ -361,7 +351,7 @@ describe('WalletBalances', () => {
               <WalletBalances balancesLoading={false} setBalancesLoading={() => {}} />
             </WalletWidgetTestComponent>
           </ConnectLoaderTestComponent>
-        </WidgetContainer>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('token-menu').click();
@@ -420,7 +410,7 @@ describe('WalletBalances', () => {
         };
         mount(
           <ViewContextTestComponent>
-            <WidgetContainer id="test" config={config}>
+            <ViewContextTestComponent theme={config.theme}>
               <ConnectLoaderTestComponent
                 initialStateOverride={connectLoaderState}
               >
@@ -430,7 +420,7 @@ describe('WalletBalances', () => {
                   <WalletBalances balancesLoading={false} setBalancesLoading={() => {}} />
                 </WalletContext.Provider>
               </ConnectLoaderTestComponent>
-            </WidgetContainer>
+            </ViewContextTestComponent>
           </ViewContextTestComponent>,
         );
         cySmartGet('add-coins').should('exist');
@@ -448,7 +438,7 @@ describe('WalletBalances', () => {
       };
       mount(
         <ViewContextTestComponent>
-          <WidgetContainer id="test" config={config}>
+          <ViewContextTestComponent theme={config.theme}>
             <ConnectLoaderTestComponent
               initialStateOverride={connectLoaderState}
             >
@@ -458,7 +448,7 @@ describe('WalletBalances', () => {
                 <WalletBalances balancesLoading={false} setBalancesLoading={() => {}} />
               </WalletContext.Provider>
             </ConnectLoaderTestComponent>
-          </WidgetContainer>
+          </ViewContextTestComponent>
         </ViewContextTestComponent>,
       );
       cySmartGet('add-coins').should('not.exist');
@@ -482,7 +472,7 @@ describe('WalletBalances', () => {
       };
       mount(
         <ViewContextTestComponent>
-          <WidgetContainer id="test" config={config}>
+          <ViewContextTestComponent theme={config.theme}>
             <ConnectLoaderTestComponent
               initialStateOverride={connectLoaderState}
             >
@@ -492,7 +482,7 @@ describe('WalletBalances', () => {
                 <WalletBalances balancesLoading={false} setBalancesLoading={() => {}} />
               </WalletContext.Provider>
             </ConnectLoaderTestComponent>
-          </WidgetContainer>
+          </ViewContextTestComponent>
         </ViewContextTestComponent>,
       );
       cySmartGet('add-coins').should('not.exist');

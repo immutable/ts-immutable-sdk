@@ -1,4 +1,4 @@
-import { Box, MenuItem } from '@biom3/react';
+import { Box, ButtCon, MenuItem } from '@biom3/react';
 import {
   useContext, useEffect, useMemo, useState,
 } from 'react';
@@ -6,6 +6,7 @@ import { GasEstimateType, IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
 import { utils } from 'ethers';
 import { fetchTokenSymbols } from 'lib/fetchTokenSymbols';
 import { CryptoFiatActions, CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext';
+import { ButtonNavigationStyles } from 'components/Header/HeaderStyles';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -141,18 +142,17 @@ export function WalletBalances({
       }
 
       try {
-        const { gasFee } = await checkout.gasEstimate({
+        const { fees } = await checkout.gasEstimate({
           gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-          isSpendingCapApprovalRequired: false,
         });
 
-        if (!gasFee.estimatedAmount) {
+        if (!fees.totalFees) {
           setInsufficientFundsForBridgeToL2Gas(false);
           return;
         }
 
         setInsufficientFundsForBridgeToL2Gas(
-          gasFee.estimatedAmount.gt(utils.parseUnits(ethBalance.balance, DEFAULT_TOKEN_DECIMALS)),
+          fees.totalFees.gt(utils.parseUnits(ethBalance.balance, DEFAULT_TOKEN_DECIMALS)),
         );
       } catch {
         setInsufficientFundsForBridgeToL2Gas(false);
@@ -205,21 +205,28 @@ export function WalletBalances({
       header={(
         <HeaderNavigation
           title={header.title}
-          showSettings
-          onSettingsClick={() => {
-            track({
-              userJourney: UserJourney.WALLET,
-              screen: 'WalletBalances',
-              control: 'Settings',
-              controlType: 'Button',
-            });
-            viewDispatch({
-              payload: {
-                type: ViewActions.UPDATE_VIEW,
-                view: { type: WalletWidgetViews.SETTINGS },
-              },
-            });
-          }}
+          rightActions={(
+            <ButtCon
+              icon="SettingsCog"
+              sx={ButtonNavigationStyles()}
+              iconVariant="bold"
+              onClick={() => {
+                track({
+                  userJourney: UserJourney.WALLET,
+                  screen: 'WalletBalances',
+                  control: 'Settings',
+                  controlType: 'Button',
+                });
+                viewDispatch({
+                  payload: {
+                    type: ViewActions.UPDATE_VIEW,
+                    view: { type: WalletWidgetViews.SETTINGS },
+                  },
+                });
+              }}
+              testId="settings-button"
+            />
+          )}
           onCloseButtonClick={() => sendWalletWidgetCloseEvent(eventTarget)}
         />
       )}
@@ -265,6 +272,7 @@ export function WalletBalances({
           onCloseDrawer={() => setShowNotEnoughGasDrawer(false)}
           walletAddress={walletAddress}
           showAdjustAmount={false}
+          tokenSymbol={ETH_TOKEN_SYMBOL}
         />
       </Box>
     </SimpleLayout>

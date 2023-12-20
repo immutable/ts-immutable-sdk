@@ -24,8 +24,8 @@ describe('SwapInProgress View', () => {
           } as unknown as TransactionResponse}
           swapForm={{
             fromAmount: '',
-            fromContractAddress: '',
-            toContractAddress: '',
+            fromTokenAddress: '',
+            toTokenAddress: '',
           }}
         />
       </SwapWidgetTestComponent>,

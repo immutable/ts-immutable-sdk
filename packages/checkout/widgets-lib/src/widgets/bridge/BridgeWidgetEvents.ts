@@ -5,12 +5,12 @@ import {
   WidgetType,
 } from '@imtbl/checkout-sdk';
 
-export const sendBridgeSuccessEvent = (eventTarget: Window | EventTarget, transactionHash: string) => {
-  const successEvent = new CustomEvent<WidgetEvent<WidgetType.BRIDGE, BridgeEventType.SUCCESS>>(
+export const sendBridgeTransactionSentEvent = (eventTarget: Window | EventTarget, transactionHash: string) => {
+  const successEvent = new CustomEvent<WidgetEvent<WidgetType.BRIDGE, BridgeEventType.TRANSACTION_SENT>>(
     IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT,
     {
       detail: {
-        type: BridgeEventType.SUCCESS,
+        type: BridgeEventType.TRANSACTION_SENT,
         data: {
           transactionHash,
         },

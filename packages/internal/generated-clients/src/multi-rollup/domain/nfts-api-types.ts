@@ -22,7 +22,7 @@ import { APIError500 } from '../models';
 // @ts-ignore
 import { GetNFTResult } from '../models';
 // @ts-ignore
-import { ListNFTOwnersResult } from '../models';
+import { ListNFTsByOwnerResult } from '../models';
 // @ts-ignore
 import { ListNFTsResult } from '../models';
 // @ts-ignore
@@ -34,7 +34,7 @@ export { APIError500 } from '../models';
 // @ts-ignore
 export { GetNFTResult } from '../models';
 // @ts-ignore
-export { ListNFTOwnersResult } from '../models';
+export { ListNFTsByOwnerResult } from '../models';
 // @ts-ignore
 export { ListNFTsResult } from '../models';
 
@@ -43,7 +43,7 @@ export { ListNFTsResult } from '../models';
  * @export
  * @interface GetNFTRequest
  */
-export interface GetNFTRequest {
+export interface GetNFTRequestParams {
     /**
      * The address of NFT contract
      * @type {string}
@@ -67,46 +67,11 @@ export interface GetNFTRequest {
 }
 
 /**
- * Request parameters for listAllNFTOwners operation in NftsApi.
- * @export
- * @interface ListAllNFTOwnersRequest
- */
-export interface ListAllNFTOwnersRequest {
-    /**
-     * The name of chain
-     * @type {string}
-     * @memberof ListAllNFTOwners
-     */
-    readonly chainName: string
-
-    /**
-     * Datetime to use as the oldest updated timestamp
-     * @type {string}
-     * @memberof ListAllNFTOwners
-     */
-    readonly fromUpdatedAt: string
-
-    /**
-     * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
-     * @type {string}
-     * @memberof ListAllNFTOwners
-     */
-    readonly pageCursor?: string
-
-    /**
-     * Maximum number of items to return
-     * @type {number}
-     * @memberof ListAllNFTOwners
-     */
-    readonly pageSize?: number
-}
-
-/**
  * Request parameters for listAllNFTs operation in NftsApi.
  * @export
  * @interface ListAllNFTsRequest
  */
-export interface ListAllNFTsRequest {
+export interface ListAllNFTsRequestParams {
     /**
      * The name of chain
      * @type {string}
@@ -141,7 +106,7 @@ export interface ListAllNFTsRequest {
  * @export
  * @interface ListNFTsRequest
  */
-export interface ListNFTsRequest {
+export interface ListNFTsRequestParams {
     /**
      * Contract address
      * @type {string}
@@ -183,7 +148,7 @@ export interface ListNFTsRequest {
  * @export
  * @interface ListNFTsByAccountAddressRequest
  */
-export interface ListNFTsByAccountAddressRequest {
+export interface ListNFTsByAccountAddressRequestParams {
     /**
      * Account address
      * @type {string}

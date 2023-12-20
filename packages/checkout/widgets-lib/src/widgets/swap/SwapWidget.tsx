@@ -49,10 +49,7 @@ import { ApproveERC20Onboarding } from './views/ApproveERC20Onboarding';
 import { TopUpView } from '../../views/top-up/TopUpView';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
-import {
-  GetAllowedBalancesResultType,
-  getAllowedBalances,
-} from '../../lib/balance';
+import { getAllowedBalances } from '../../lib/balance';
 import { UserJourney, useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 
 export type SwapWidgetInputs = SwapWidgetParams & {
@@ -61,8 +58,8 @@ export type SwapWidgetInputs = SwapWidgetParams & {
 
 export function SwapWidget({
   amount,
-  fromContractAddress,
-  toContractAddress,
+  fromTokenAddress,
+  toTokenAddress,
   config,
 }: SwapWidgetInputs) {
   const { success, failed, rejected } = text.views[SwapWidgetViews.SWAP];
@@ -129,16 +126,16 @@ export function SwapWidget({
     if (!checkout) throw new Error('loadBalances: missing checkout');
     if (!provider) throw new Error('loadBalances: missing provider');
 
-    let tokensAndBalances: GetAllowedBalancesResultType = {
-      allowList: { tokens: [] },
-      allowedBalances: [],
-    };
     try {
-      tokensAndBalances = await getAllowedBalances({
+      const tokensAndBalances = await getAllowedBalances({
         checkout,
         provider,
         allowTokenListType: TokenFilterTypes.SWAP,
       });
+
+      // Why? Check getAllowedBalances
+      if (tokensAndBalances === undefined) return false;
+
       swapDispatch({
         payload: {
           type: SwapActions.SET_ALLOWED_TOKENS,
@@ -219,12 +216,12 @@ export function SwapWidget({
           <SwapCoins
             theme={theme}
             fromAmount={viewState.view.data?.fromAmount ?? amount}
-            fromContractAddress={
-                  viewState.view.data?.fromContractAddress
-                  ?? fromContractAddress
+            fromTokenAddress={
+                  viewState.view.data?.fromTokenAddress
+                  ?? fromTokenAddress
                 }
-            toContractAddress={
-                  viewState.view.data?.toContractAddress ?? toContractAddress
+            toTokenAddress={
+                  viewState.view.data?.toTokenAddress ?? toTokenAddress
                 }
           />
           )}
@@ -335,14 +332,16 @@ export function SwapWidget({
           />
           )}
           {viewState.view.type === SharedViews.TOP_UP_VIEW && (
-          <TopUpView
-            analytics={{ userJourney: UserJourney.SWAP }}
-            widgetEvent={IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT}
-            showOnrampOption={isOnRampEnabled}
-            showSwapOption={isSwapEnabled}
-            showBridgeOption={isBridgeEnabled}
-            onCloseButtonClick={() => sendSwapWidgetCloseEvent(eventTarget)}
-          />
+            <TopUpView
+              analytics={{ userJourney: UserJourney.SWAP }}
+              checkout={checkout}
+              provider={provider}
+              widgetEvent={IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT}
+              showOnrampOption={isOnRampEnabled}
+              showSwapOption={isSwapEnabled}
+              showBridgeOption={isBridgeEnabled}
+              onCloseButtonClick={() => sendSwapWidgetCloseEvent(eventTarget)}
+            />
           )}
         </CryptoFiatProvider>
       </SwapContext.Provider>

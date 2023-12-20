@@ -61,9 +61,9 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
   // Get symbol from swap info for approve amount text
   const fromToken = useMemo(
     () => allowedTokens.find(
-      (token: TokenInfo) => token.address === data.swapFormInfo.fromContractAddress,
+      (token: TokenInfo) => token.address === data.swapFormInfo.fromTokenAddress,
     ),
-    [allowedTokens, data.swapFormInfo.fromContractAddress],
+    [allowedTokens, data.swapFormInfo.fromTokenAddress],
   );
 
   // Common error view function

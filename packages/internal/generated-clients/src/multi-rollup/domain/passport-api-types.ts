@@ -20,6 +20,8 @@ import { APIError401 } from '../models';
 // @ts-ignore
 import { APIError403 } from '../models';
 // @ts-ignore
+import { APIError404 } from '../models';
+// @ts-ignore
 import { APIError429 } from '../models';
 // @ts-ignore
 import { APIError500 } from '../models';
@@ -34,6 +36,8 @@ import { CreateCounterfactualAddressRes } from '../models';
 // @ts-ignore
 import { CreateCounterfactualAddressResDeprecated } from '../models';
 // @ts-ignore
+import { GetContractAbiRes } from '../models';
+// @ts-ignore
 import { GetLinkedAddressesRes } from '../models';
 // @ts-ignore
 import { GetLinkedAddressesResDeprecated } from '../models';
@@ -44,17 +48,23 @@ export { APIError401 } from '../models';
 // @ts-ignore
 export { APIError403 } from '../models';
 // @ts-ignore
+export { APIError404 } from '../models';
+// @ts-ignore
 export { APIError429 } from '../models';
 // @ts-ignore
 export { APIError500 } from '../models';
 // @ts-ignore
 export { BasicAPIError } from '../models';
 // @ts-ignore
+export { CreateCounterfactualAddressRequest } from '../models';
+// @ts-ignore
 export { CreateCounterfactualAddressRequestDeprecated } from '../models';
 // @ts-ignore
 export { CreateCounterfactualAddressRes } from '../models';
 // @ts-ignore
 export { CreateCounterfactualAddressResDeprecated } from '../models';
+// @ts-ignore
+export { GetContractAbiRes } from '../models';
 // @ts-ignore
 export { GetLinkedAddressesRes } from '../models';
 // @ts-ignore
@@ -65,16 +75,16 @@ export { GetLinkedAddressesResDeprecated } from '../models';
  * @export
  * @interface CreateCounterfactualAddressRequest
  */
-export interface CreateCounterfactualAddressRequest {
+export interface CreateCounterfactualAddressRequestParams {
     /**
-     *
+     * 
      * @type {string}
      * @memberof CreateCounterfactualAddress
      */
     readonly chainName: string
 
     /**
-     *
+     * 
      * @type {CreateCounterfactualAddressRequest}
      * @memberof CreateCounterfactualAddress
      */
@@ -86,9 +96,9 @@ export interface CreateCounterfactualAddressRequest {
  * @export
  * @interface CreateCounterfactualAddressDeprecatedRequest
  */
-export interface CreateCounterfactualAddressDeprecatedRequest {
+export interface CreateCounterfactualAddressDeprecatedRequestParams {
     /**
-     *
+     * 
      * @type {CreateCounterfactualAddressRequestDeprecated}
      * @memberof CreateCounterfactualAddressDeprecated
      */
@@ -96,11 +106,39 @@ export interface CreateCounterfactualAddressDeprecatedRequest {
 }
 
 /**
+ * Request parameters for getContractAbi operation in PassportApi.
+ * @export
+ * @interface GetContractAbiRequest
+ */
+export interface GetContractAbiRequestParams {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetContractAbi
+     */
+    readonly chainName: string
+
+    /**
+     * contract address
+     * @type {string}
+     * @memberof GetContractAbi
+     */
+    readonly contractAddress: string
+
+    /**
+     * method id
+     * @type {string}
+     * @memberof GetContractAbi
+     */
+    readonly methodId: string
+}
+
+/**
  * Request parameters for getLinkedAddresses operation in PassportApi.
  * @export
  * @interface GetLinkedAddressesRequest
  */
-export interface GetLinkedAddressesRequest {
+export interface GetLinkedAddressesRequestParams {
     /**
      * The user\&#39;s userId
      * @type {string}
@@ -109,7 +147,7 @@ export interface GetLinkedAddressesRequest {
     readonly userId: string
 
     /**
-     *
+     * 
      * @type {string}
      * @memberof GetLinkedAddresses
      */
@@ -121,7 +159,7 @@ export interface GetLinkedAddressesRequest {
  * @export
  * @interface GetLinkedAddressesDeprecatedRequest
  */
-export interface GetLinkedAddressesDeprecatedRequest {
+export interface GetLinkedAddressesDeprecatedRequestParams {
     /**
      * The user\&#39;s userId
      * @type {string}

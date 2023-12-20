@@ -112,7 +112,7 @@ export function OnRampMain({
             type: OnRampWidgetViews.ONRAMP,
             data: {
               amount: viewState.view.data?.amount ?? tokenAmount,
-              contractAddress: viewState.view.data?.contractAddress ?? tokenAddress,
+              tokenAddress: viewState.view.data?.tokenAddress ?? tokenAddress,
             },
           },
         },
@@ -172,7 +172,7 @@ export function OnRampMain({
             type: OnRampWidgetViews.FAIL,
             data: {
               amount: tokenAmount,
-              contractAddress: tokenAddress,
+              tokenAddress,
             },
             reason: `Transaction failed: ${event.data.statusReason}`,
           },

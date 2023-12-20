@@ -1,23 +1,17 @@
 import React from 'react';
 import {
   BridgeWidgetParams,
-  ConnectTargetLayer,
   IMTBLWidgetEvents,
-  WalletProviderName,
   WidgetConfiguration,
   WidgetProperties,
   WidgetTheme,
   WidgetType,
 } from '@imtbl/checkout-sdk';
 import { Base } from 'widgets/BaseWidgetRoot';
-import { ConnectLoader, ConnectLoaderParams } from 'components/ConnectLoader/ConnectLoader';
-import { getL1ChainId } from 'lib';
-import { isPassportProvider } from 'lib/providerUtils';
 import { isValidWalletProvider, isValidAmount, isValidAddress } from 'lib/validations/widgetValidators';
-import { WidgetContainer } from 'components/WidgetContainer/WidgetContainer';
-import { BridgeComingSoon } from './views/BridgeComingSoon';
-import { sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
-import { BridgeWidget } from './BridgeWidget';
+import { BridgeWidget } from 'widgets/bridge/BridgeWidget';
+import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
+import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
 
 export class Bridge extends Base<WidgetType.BRIDGE> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT;
@@ -52,10 +46,10 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
       validatedParams.amount = '';
     }
 
-    if (!isValidAddress(params.fromContractAddress)) {
+    if (!isValidAddress(params.tokenAddress)) {
       // eslint-disable-next-line no-console
-      console.warn('[IMTBL]: invalid "fromContractAddress" widget input');
-      validatedParams.fromContractAddress = '';
+      console.warn('[IMTBL]: invalid "tokenAddress" widget input');
+      validatedParams.tokenAddress = '';
     }
 
     return validatedParams;
@@ -63,39 +57,20 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
 
   protected render() {
     if (!this.reactRoot) return;
-
-    const connectLoaderParams: ConnectLoaderParams = {
-      targetLayer: ConnectTargetLayer.LAYER1,
-      walletProviderName: this.parameters.walletProviderName,
-      web3Provider: this.web3Provider,
-      checkout: this.checkout,
-      allowedChains: [getL1ChainId(this.checkout.config)],
-    };
-
-    const showBridgeComingSoonScreen = isPassportProvider(this.web3Provider)
-      || this.parameters.walletProviderName === WalletProviderName.PASSPORT;
-
     this.reactRoot.render(
       <React.StrictMode>
-        <WidgetContainer id="bridge-container" config={this.strongConfig()}>
-          {showBridgeComingSoonScreen && (
-          <BridgeComingSoon onCloseEvent={() => sendBridgeWidgetCloseEvent(window)} />
-
-          )}
-          {!showBridgeComingSoonScreen && (
-          <ConnectLoader
-            params={connectLoaderParams}
-            closeEvent={() => sendBridgeWidgetCloseEvent(window)}
-            widgetConfig={this.strongConfig()}
-          >
+        <CustomAnalyticsProvider checkout={this.checkout}>
+          <ThemeProvider id="bridge-container" config={this.strongConfig()}>
             <BridgeWidget
-              amount={this.parameters.amount}
-              fromContractAddress={this.parameters.fromContractAddress}
+              checkout={this.checkout}
               config={this.strongConfig()}
+              web3Provider={this.web3Provider}
+              tokenAddress={this.parameters.tokenAddress}
+              amount={this.parameters.amount}
+              walletProviderName={this.parameters.walletProviderName}
             />
-          </ConnectLoader>
-          )}
-        </WidgetContainer>
+          </ThemeProvider>
+        </CustomAnalyticsProvider>
       </React.StrictMode>,
     );
   }

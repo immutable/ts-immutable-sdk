@@ -3,7 +3,7 @@ import {
   FundingStepType,
   BridgeEventType,
   BridgeFailed,
-  BridgeSuccess,
+  BridgeTransactionSent,
   BridgeWidgetParams,
   ConnectEventType,
   ConnectionSuccess,
@@ -19,6 +19,7 @@ import {
   useContext,
   useEffect, useMemo, useReducer, useRef, useState,
 } from 'react';
+import { BridgeWidget } from 'widgets/bridge/BridgeWidget';
 import {
   ConnectLoaderActions,
   ConnectLoaderContext,
@@ -32,7 +33,6 @@ import { ViewActions, ViewContext } from '../../../../context/view-context/ViewC
 import { getL1ChainId, getL2ChainId } from '../../../../lib/networkUtils';
 import { text as textConfig } from '../../../../resources/text/textConfig';
 import { LoadingView } from '../../../../views/loading/LoadingView';
-import { BridgeWidget } from '../../../bridge/BridgeWidget';
 import { ConnectWidget } from '../../../connect/ConnectWidget';
 import { SwapWidget } from '../../../swap/SwapWidget';
 import { useSaleContext } from '../../context/SaleContextProvider';
@@ -53,7 +53,7 @@ enum FundingRouteExecuteViews {
 
 export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }: FundingRouteExecuteProps) {
   const {
-    config, provider, checkout, fromContractAddress: requiredTokenAddress,
+    config, provider, checkout, fromTokenAddress: requiredTokenAddress,
   } = useSaleContext();
   const { viewDispatch } = useContext(ViewContext);
 
@@ -66,7 +66,7 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
   const [view, setView] = useState<FundingRouteExecuteViews>(FundingRouteExecuteViews.LOADING);
   const nextView = useRef<FundingRouteExecuteViews | false>(false);
 
-  const stepSuccess = useRef<BridgeSuccess | SwapSuccess | undefined>(undefined);
+  const stepSuccess = useRef<BridgeTransactionSent | SwapSuccess | undefined>(undefined);
   const stepFailed = useRef<BridgeFailed | SwapFailed | undefined>(undefined);
 
   const [eventTargetState, eventTargetDispatch] = useReducer(eventTargetReducer, initialEventTargetState);
@@ -100,7 +100,7 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
 
     if (step.type === FundingStepType.BRIDGE) {
       setBridgeParams({
-        fromContractAddress: step.fundingItem.token.address,
+        tokenAddress: step.fundingItem.token.address,
         amount: step.fundingItem.fundsRequired.formattedAmount,
       });
       if (network.chainId === getL1ChainId(checkout!.config)) {
@@ -114,8 +114,8 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
     if (step.type === FundingStepType.SWAP) {
       setSwapParams({
         amount: step.fundingItem.fundsRequired.formattedAmount,
-        fromContractAddress: step.fundingItem.token.address,
-        toContractAddress: requiredTokenAddress,
+        fromTokenAddress: step.fundingItem.token.address,
+        toTokenAddress: requiredTokenAddress,
       });
       if (network.chainId === getL2ChainId(checkout!.config)) {
         setView(FundingRouteExecuteViews.EXECUTE_SWAP);
@@ -151,9 +151,9 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
 
   const handleCustomEvent = (event) => {
     switch (event.detail.type) {
-      case BridgeEventType.SUCCESS:
+      case BridgeEventType.TRANSACTION_SENT:
       case SwapEventType.SUCCESS: {
-        const successEvent = event.detail.data as (SwapSuccess | BridgeSuccess);
+        const successEvent = event.detail.data as (SwapSuccess | BridgeTransactionSent);
         stepSuccess.current = successEvent;
         break;
       }
@@ -235,6 +235,7 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
         <BridgeWidget
           {...bridgeParams!}
           config={config}
+          checkout={checkout!}
         />
       )}
       {view === FundingRouteExecuteViews.EXECUTE_SWAP && (

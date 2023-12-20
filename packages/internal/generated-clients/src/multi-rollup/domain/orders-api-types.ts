@@ -83,7 +83,7 @@ export { TradeResult } from '../models';
  * @export
  * @interface CancelOrdersRequest
  */
-export interface CancelOrdersRequest {
+export interface CancelOrdersRequestParams {
     /**
      * 
      * @type {string}
@@ -104,7 +104,7 @@ export interface CancelOrdersRequest {
  * @export
  * @interface CreateListingRequest
  */
-export interface CreateListingRequest {
+export interface CreateListingRequestParams {
     /**
      * 
      * @type {string}
@@ -125,7 +125,7 @@ export interface CreateListingRequest {
  * @export
  * @interface FulfillmentDataRequest
  */
-export interface FulfillmentDataRequest {
+export interface FulfillmentDataRequestParams {
     /**
      * 
      * @type {string}
@@ -146,7 +146,7 @@ export interface FulfillmentDataRequest {
  * @export
  * @interface GetListingRequest
  */
-export interface GetListingRequest {
+export interface GetListingRequestParams {
     /**
      * 
      * @type {string}
@@ -167,7 +167,7 @@ export interface GetListingRequest {
  * @export
  * @interface GetTradeRequest
  */
-export interface GetTradeRequest {
+export interface GetTradeRequestParams {
     /**
      * 
      * @type {string}
@@ -188,7 +188,7 @@ export interface GetTradeRequest {
  * @export
  * @interface ListListingsRequest
  */
-export interface ListListingsRequest {
+export interface ListListingsRequestParams {
     /**
      * 
      * @type {string}
@@ -218,11 +218,32 @@ export interface ListListingsRequest {
     readonly buyItemContractAddress?: string
 
     /**
+     * The account address of the user who created the listing
+     * @type {string}
+     * @memberof ListListings
+     */
+    readonly accountAddress?: string
+
+    /**
+     * The metadata_id of the sell item
+     * @type {string}
+     * @memberof ListListings
+     */
+    readonly sellItemMetadataId?: string
+
+    /**
      * Sell item token identifier to filter by
      * @type {string}
      * @memberof ListListings
      */
     readonly sellItemTokenId?: string
+
+    /**
+     * From updated at including given date
+     * @type {string}
+     * @memberof ListListings
+     */
+    readonly fromUpdatedAt?: string
 
     /**
      * Maximum number of orders to return per page
@@ -258,7 +279,7 @@ export interface ListListingsRequest {
  * @export
  * @interface ListTradesRequest
  */
-export interface ListTradesRequest {
+export interface ListTradesRequestParams {
     /**
      * 
      * @type {string}
@@ -272,6 +293,13 @@ export interface ListTradesRequest {
      * @memberof ListTrades
      */
     readonly accountAddress?: string
+
+    /**
+     * From indexed at including given date
+     * @type {string}
+     * @memberof ListTrades
+     */
+    readonly fromIndexedAt?: string
 
     /**
      * Maximum number of trades to return per page

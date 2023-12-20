@@ -7,7 +7,7 @@ import {
   ChainTokensConfig,
 } from '../types';
 import { CheckoutError, CheckoutErrorType } from '../errors';
-import { CHECKOUT_API_BASE_URL, ENV_DEVELOPMENT } from '../env';
+import { CHECKOUT_CDN_BASE_URL, ENV_DEVELOPMENT } from '../env';
 
 export type RemoteConfigParams = {
   isDevelopment: boolean;
@@ -50,9 +50,9 @@ export class RemoteConfigFetcher {
   }
 
   private getEndpoint = () => {
-    if (this.isDevelopment) return CHECKOUT_API_BASE_URL[ENV_DEVELOPMENT];
-    if (this.isProduction) return CHECKOUT_API_BASE_URL[Environment.PRODUCTION];
-    return CHECKOUT_API_BASE_URL[Environment.SANDBOX];
+    if (this.isDevelopment) return CHECKOUT_CDN_BASE_URL[ENV_DEVELOPMENT];
+    if (this.isProduction) return CHECKOUT_CDN_BASE_URL[Environment.PRODUCTION];
+    return CHECKOUT_CDN_BASE_URL[Environment.SANDBOX];
   };
 
   private async loadConfig(): Promise<RemoteConfiguration | undefined> {

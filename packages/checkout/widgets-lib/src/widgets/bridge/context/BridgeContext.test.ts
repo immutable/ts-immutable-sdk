@@ -1,6 +1,6 @@
-import { WalletProviderName } from '@imtbl/checkout-sdk';
+import { Checkout, WalletProviderName } from '@imtbl/checkout-sdk';
 import {
-  BridgeActions, SetWalletProviderNamePayload, bridgeReducer, initialBridgeState,
+  BridgeActions, SetWalletProviderNamePayload, initialBridgeState, bridgeReducer,
 } from './BridgeContext';
 
 describe('BridgeContext', () => {
@@ -10,8 +10,11 @@ describe('BridgeContext', () => {
       walletProviderName: WalletProviderName.METAMASK,
     };
 
+    const checkout = {} as Checkout;
+    const bridgeState = { ...initialBridgeState, checkout };
+
     expect(initialBridgeState.walletProviderName).toEqual(null);
-    const { walletProviderName } = bridgeReducer(initialBridgeState, {
+    const { walletProviderName } = bridgeReducer(bridgeState, {
       payload: setWalletProviderNamePayload,
     });
     expect(walletProviderName).toEqual(WalletProviderName.METAMASK);

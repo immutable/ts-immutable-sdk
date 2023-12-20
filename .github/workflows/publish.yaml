@@ -32,7 +32,7 @@ jobs:
     name: Publish Workflow
     runs-on: ubuntu-latest-4-cores
     env:
-      GH_TOKEN: ${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}
+      GH_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
       NODE_OPTIONS: --max-old-space-size=14366
       SDK_PUBLISH_SLACK_WEBHOOK: ${{ secrets.SDK_PUBLISH_SLACK_WEBHOOK }}
     steps:
@@ -110,7 +110,7 @@ jobs:
         id: pre_release
         uses: JS-DevTools/npm-publish@v3
         with:
-          token: ${{ secrets.PLATFORM_SA_NPM_TOKEN }}
+          token: ${{ secrets.TS_IMMUTABLE_SDK_NPM_TOKEN }}
           access: public
           package: ./sdk/package.json
           tag: ${{ contains(github.event.inputs.release_type, 'alpha') && 'alpha' }}
@@ -118,17 +118,17 @@ jobs:
 
       - name: Authenticate NPM
         if: contains(github.event.inputs.release_type, 'release')
-        run: npm config set //registry.npmjs.org/:_authToken ${{ secrets.PLATFORM_SA_NPM_TOKEN }}
+        run: npm config set //registry.npmjs.org/:_authToken ${{ secrets.TS_IMMUTABLE_SDK_NPM_TOKEN }}
 
       - name: Release
         id: npm_release
         if: contains(github.event.inputs.release_type, 'release')
-        run: yarn release --ci --no-increment -c .release-it.json $( ${{ github.event.inputs.dry_run }} && echo "--dry-run" || echo "") --github.tokenRef=${{ secrets.RELEASE_TOKEN }}
+        run: yarn release --ci --no-increment -c .release-it.json $( ${{ github.event.inputs.dry_run }} && echo "--dry-run" || echo "") --github.tokenRef=${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
 
-      # Wait for 60 seconds to make sure the tag is available on GitHub
+      # Wait for 30 seconds to make sure the tag is available on GitHub
       - uses: GuillaumeFalourd/wait-sleep-action@v1
         with:
-          time: '60'
+          time: '30'
 
       - name: Create GitHub Release
         id: gh_release
