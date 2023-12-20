@@ -30,8 +30,8 @@ import { ERC20ABI, NATIVE } from '../env';
 import { HttpClient } from '../api/http';
 
 jest.mock('../api/http');
+jest.mock('../api/blockscout');
 jest.mock('../tokens');
-jest.mock('../client');
 jest.mock('ethers', () => ({
   ...jest.requireActual('ethers'),
   // eslint-disable-next-line @typescript-eslint/naming-convention
