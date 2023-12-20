@@ -1151,6 +1151,158 @@ describe('Token Bridge', () => {
     });
   });
 
+  describe('getPendingWithdrawals', () => {
+    let tokenBridge: TokenBridge;
+
+    const recipient = '0xA383968dC8711FFE8A7353AdE9feF7Ddcb1473a0';
+    const token = '0x40b87d235A5B010a20A241F15797C9debf1ecd01';
+    const amount = ethers.BigNumber.from(1000);
+
+    const defaultTimestamp = ethers.BigNumber.from(1000);
+    const futureTimestamp = ethers.BigNumber.from(1000000000000);
+
+    const mockERC20ContractFlowRate = {
+      allowance: jest.fn(),
+      interface: {
+        encodeFunctionData: jest.fn().mockResolvedValue('0xdata'),
+      },
+      getPendingWithdrawals: jest.fn().mockImplementation(async () => [
+        {
+          withdrawer: recipient,
+          token,
+          amount,
+          timestamp: defaultTimestamp,
+        },
+      ]),
+    };
+
+    const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
+    const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
+
+    const bridgeConfig = new BridgeConfiguration({
+      baseConfig: new ImmutableConfiguration({
+        environment: Environment.SANDBOX,
+      }),
+      bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+      rootProvider: voidRootProvider,
+      childProvider: voidChildProvider,
+    });
+
+    beforeEach(() => {
+      jest.spyOn(TokenBridge.prototype as any, 'validateChainConfiguration')
+        .mockImplementation(async () => 'Valid');
+      jest.spyOn(TokenBridge.prototype as any, 'validateDepositArgs')
+        .mockImplementation(async () => 'Valid');
+      tokenBridge = new TokenBridge(bridgeConfig);
+    });
+
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+    it('returns the flowRate pending withdrawals [1] when the recipient is valid', async () => {
+      expect.assertions(8);
+      const req = {
+        recipient,
+      };
+
+      jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRate as any);
+
+      const result = await tokenBridge.getPendingWithdrawals(req);
+
+      expect(result.pending).toBeDefined();
+      expect(result.pending.length).toBe(1);
+      expect(result.pending[0].canWithdraw).toBe(true);
+      expect(result.pending[0].withdrawer).toBe(recipient);
+      expect(result.pending[0].token).toBe(token);
+      expect(result.pending[0].amount).toBe(amount);
+      expect(result.pending[0].timeoutStart).toBe(defaultTimestamp.toNumber());
+      expect(result.pending[0].timeoutEnd).toBe(defaultTimestamp.toNumber() + (60 * 60 * 24));
+    });
+
+    it('returns the flowRate pending withdrawals [3] when the recipient is valid', async () => {
+      expect.assertions(20);
+      const req = {
+        recipient,
+      };
+
+      const mockERC20ContractFlowRateThree = {
+        allowance: jest.fn(),
+        interface: {
+          encodeFunctionData: jest.fn().mockResolvedValue('0xdata'),
+        },
+        getPendingWithdrawals: jest.fn().mockImplementation(async () => [
+          {
+            withdrawer: `${recipient}1`,
+            token: `${token}1`,
+            amount: amount.mul(1),
+            timestamp: defaultTimestamp.mul(1),
+          },
+          {
+            withdrawer: `${recipient}2`,
+            token: `${token}2`,
+            amount: amount.mul(2),
+            timestamp: futureTimestamp,
+          },
+          {
+            withdrawer: `${recipient}3`,
+            token: `${token}3`,
+            amount: amount.mul(3),
+            timestamp: defaultTimestamp.mul(3),
+          },
+        ]),
+      };
+
+      jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRateThree as any);
+
+      const result = await tokenBridge.getPendingWithdrawals(req);
+
+      expect(result.pending).toBeDefined();
+      expect(result.pending.length).toBe(3);
+      expect(result.pending[0].canWithdraw).toBe(true);
+      expect(result.pending[0].withdrawer).toBe(`${recipient}1`);
+      expect(result.pending[0].token).toBe(`${token}1`);
+      expect(result.pending[0].amount).toStrictEqual(amount.mul(1));
+      expect(result.pending[0].timeoutStart).toBe(defaultTimestamp.mul(1).toNumber());
+      expect(result.pending[0].timeoutEnd).toBe(defaultTimestamp.mul(1).toNumber() + (60 * 60 * 24));
+      expect(result.pending[1].canWithdraw).toBe(false);
+      expect(result.pending[1].withdrawer).toBe(`${recipient}2`);
+      expect(result.pending[1].token).toBe(`${token}2`);
+      expect(result.pending[1].amount).toStrictEqual(amount.mul(2));
+      expect(result.pending[1].timeoutStart).toBe(futureTimestamp.toNumber());
+      expect(result.pending[1].timeoutEnd).toBe(futureTimestamp.toNumber() + (60 * 60 * 24));
+      expect(result.pending[2].canWithdraw).toBe(true);
+      expect(result.pending[2].withdrawer).toBe(`${recipient}3`);
+      expect(result.pending[2].token).toBe(`${token}3`);
+      expect(result.pending[2].amount).toStrictEqual(amount.mul(3));
+      expect(result.pending[2].timeoutStart).toBe(defaultTimestamp.mul(3).toNumber());
+      expect(result.pending[2].timeoutEnd).toBe(defaultTimestamp.mul(3).toNumber() + (60 * 60 * 24));
+    });
+
+    it('returns the flowRate pending withdrawals when the recipient is valid', async () => {
+      expect.assertions(2);
+      const req = {
+        recipient,
+      };
+
+      const mockERC20ContractFlowRateNone = {
+        allowance: jest.fn(),
+        interface: {
+          encodeFunctionData: jest.fn().mockResolvedValue('0xdata'),
+        },
+        getPendingWithdrawals: jest.fn().mockImplementation(async () => []),
+      };
+
+      jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRateNone as any);
+
+      try {
+        await tokenBridge.getPendingWithdrawals(req);
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(BridgeError);
+        expect(error.type).toBe(BridgeErrorType.FLOW_RATE_ERROR);
+      }
+    });
+  });
+
   describe('calculateBridgeFee', () => {
     let tokenBridge: TokenBridge;
     beforeEach(() => {
