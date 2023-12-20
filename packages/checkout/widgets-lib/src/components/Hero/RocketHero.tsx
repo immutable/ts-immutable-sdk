@@ -1,12 +1,8 @@
 import { Box } from '@biom3/react';
 import { Fit, Layout, useRive } from '@rive-app/react-canvas';
 import { Environment } from '@imtbl/config';
+import { CHECKOUT_CDN_BASE_URL } from 'lib';
 import { heroBackGroundStyles, heroImageStyles } from './HeroImageStyles';
-
-const rocketHeroUrl = {
-  [Environment.PRODUCTION]: 'https://checkout-api.immutable.com/v1/blob/img/rocket.riv',
-  [Environment.SANDBOX]: 'https://checkout-cdn.sandbox.immutable.com/v1/blob/img/rocket.riv',
-};
 
 interface RocketHeroProps {
   environment: Environment
@@ -16,9 +12,10 @@ export function RocketHero({
   environment,
 }: RocketHeroProps) {
   const { RiveComponent } = useRive({
-    src: rocketHeroUrl[environment],
+    src: `${CHECKOUT_CDN_BASE_URL[environment]}/v1/blob/img/rocket.riv`,
     autoplay: true,
     layout: new Layout({ fit: Fit.Cover }),
+    stateMachines: 'State Machine 1',
   });
 
   return (

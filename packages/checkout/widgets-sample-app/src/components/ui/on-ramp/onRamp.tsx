@@ -8,7 +8,7 @@ function OnRampUI() {
 
   const unmount = () => {onRamp.unmount()}
   const mount = () => {
-    onRamp.mount('onramp', {amount: '55', contractAddress: '0x0000000000000000000000000000000000001010'})}
+    onRamp.mount('onramp', {amount: '55', tokenAddress: '0x0000000000000000000000000000000000001010'})}
   const update = (theme: WidgetTheme) => {onRamp.update({config: {theme}})}
 
   useEffect(() => {

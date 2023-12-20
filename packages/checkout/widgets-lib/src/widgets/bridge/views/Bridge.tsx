@@ -1,43 +1,62 @@
-import { useCallback, useContext } from 'react';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { TokenFilterTypes } from '@imtbl/checkout-sdk';
+import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
+import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { BridgeForm } from '../components/BridgeForm';
 import { text } from '../../../resources/text/textConfig';
-import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
 import { BridgeActions, BridgeContext } from '../context/BridgeContext';
 import { useInterval } from '../../../lib/hooks/useInterval';
-import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { getAllowedBalances } from '../../../lib/balance';
 
 const REFRESH_TOKENS_INTERVAL_MS = 10000;
 
 export interface BridgeProps {
-  amount: string | undefined;
-  fromContractAddress?: string;
+  amount?: string;
+  tokenAddress?: string;
 }
 
-export function Bridge({ amount, fromContractAddress }: BridgeProps) {
-  const { header } = text.views[BridgeWidgetViews.BRIDGE];
-  const { bridgeDispatch } = useContext(BridgeContext);
-  const { connectLoaderState } = useContext(ConnectLoaderContext);
-  const { checkout, provider } = connectLoaderState;
+export function Bridge({ amount, tokenAddress }: BridgeProps) {
+  const { header } = text.views[BridgeWidgetViews.BRIDGE_FORM];
+  const { bridgeState, bridgeDispatch } = useContext(BridgeContext);
+  const { checkout, from } = bridgeState;
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+  const [isTokenBalancesLoading, setIsTokenBalancesLoading] = useState(false);
+  const showBackButton = true;
+
+  const { page } = useAnalytics();
+
+  useEffect(() => {
+    if (amount || tokenAddress) {
+      page({
+        userJourney: UserJourney.BRIDGE,
+        screen: 'TokenAmount',
+        extras: {
+          amount,
+          tokenAddress,
+        },
+      });
+    }
+  }, []);
 
   // This is used to refresh the balances after the Bridge widget
   // has been loaded so that processing transfers will be eventually
   // reflected.
   const refreshBalances = useCallback(async () => {
-    if (!checkout) return;
-    if (!provider) return;
-
+    if (!checkout || !from?.web3Provider) return;
     try {
       const tokensAndBalances = await getAllowedBalances({
         checkout,
-        provider,
+        provider: from.web3Provider,
         allowTokenListType: TokenFilterTypes.BRIDGE,
         // Skip retry given that in this case it is not needed;
         // refreshBalances will be, automatically, called again
@@ -45,37 +64,55 @@ export function Bridge({ amount, fromContractAddress }: BridgeProps) {
         retryPolicy: { retryIntervalMs: 0, retries: 0 },
       });
 
+      // Why? Check getAllowedBalances
+      if (tokensAndBalances === undefined) return;
+
       bridgeDispatch({
         payload: {
           type: BridgeActions.SET_TOKEN_BALANCES,
           tokenBalances: tokensAndBalances.allowedBalances,
         },
       });
+
+      bridgeDispatch({
+        payload: {
+          type: BridgeActions.SET_ALLOWED_TOKENS,
+          allowedTokens: tokensAndBalances.allowList.tokens,
+        },
+      });
+
       // Ignore errors given that this is a background refresh
       // and the logic will retry anyways.
     } catch (e: any) {
       // eslint-disable-next-line no-console
       console.debug(e);
     }
-  }, [checkout, provider]);
+  }, [checkout, from?.web3Provider]);
   useInterval(refreshBalances, REFRESH_TOKENS_INTERVAL_MS);
+
+  useEffect(() => {
+    if (!checkout || !from?.web3Provider) return;
+    setIsTokenBalancesLoading(true);
+    refreshBalances().finally(() => setIsTokenBalancesLoading(false));
+  }, [checkout, from?.web3Provider]);
 
   return (
     <SimpleLayout
       testId="bridge-view"
       header={(
         <HeaderNavigation
+          showBack={showBackButton}
           title={header.title}
           onCloseButtonClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
         />
       )}
       footer={<FooterLogo />}
-      footerBackgroundColor="base.color.translucent.emphasis.200"
     >
       <BridgeForm
         testId="bridge-form"
         defaultAmount={amount}
-        defaultFromContractAddress={fromContractAddress}
+        defaultTokenAddress={tokenAddress}
+        isTokenBalancesLoading={isTokenBalancesLoading}
       />
     </SimpleLayout>
   );

@@ -13,7 +13,8 @@ import { Base } from 'widgets/BaseWidgetRoot';
 import { ConnectLoader, ConnectLoaderParams } from 'components/ConnectLoader/ConnectLoader';
 import { getL2ChainId } from 'lib';
 import { isValidAmount, isValidWalletProvider } from 'lib/validations/widgetValidators';
-import { WidgetContainer } from 'components/WidgetContainer/WidgetContainer';
+import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
+import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
 import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
 import { SaleWidget } from './SaleWidget';
 
@@ -71,10 +72,10 @@ export class Sale extends Base<WidgetType.SALE> {
       validatedParams.environmentId = '';
     }
 
-    if (!params.fromContractAddress) {
+    if (!params.fromTokenAddress) {
       // eslint-disable-next-line no-console
-      console.warn('[IMTBL]: invalid "fromContractAddress" widget input');
-      validatedParams.fromContractAddress = '';
+      console.warn('[IMTBL]: invalid "fromTokenAddress" widget input');
+      validatedParams.fromTokenAddress = '';
     }
 
     return validatedParams;
@@ -94,23 +95,25 @@ export class Sale extends Base<WidgetType.SALE> {
 
     this.reactRoot.render(
       <React.StrictMode>
-        <WidgetContainer id="sale-container" config={this.strongConfig()}>
-          <ConnectLoader
-            widgetConfig={this.strongConfig()}
-            params={connectLoaderParams}
-            closeEvent={() => {
-              sendSaleWidgetCloseEvent(window);
-            }}
-          >
-            <SaleWidget
-              config={this.strongConfig()}
-              amount={this.parameters.amount!}
-              items={this.parameters.items!}
-              fromContractAddress={this.parameters.fromContractAddress!}
-              environmentId={this.parameters.environmentId!}
-            />
-          </ConnectLoader>
-        </WidgetContainer>
+        <CustomAnalyticsProvider checkout={this.checkout}>
+          <ThemeProvider id="sale-container" config={this.strongConfig()}>
+            <ConnectLoader
+              widgetConfig={this.strongConfig()}
+              params={connectLoaderParams}
+              closeEvent={() => {
+                sendSaleWidgetCloseEvent(window);
+              }}
+            >
+              <SaleWidget
+                config={this.strongConfig()}
+                amount={this.parameters.amount!}
+                items={this.parameters.items!}
+                fromTokenAddress={this.parameters.fromTokenAddress!}
+                environmentId={this.parameters.environmentId!}
+              />
+            </ConnectLoader>
+          </ThemeProvider>
+        </CustomAnalyticsProvider>
       </React.StrictMode>,
     );
   }

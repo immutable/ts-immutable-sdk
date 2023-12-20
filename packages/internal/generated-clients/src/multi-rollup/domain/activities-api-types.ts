@@ -43,7 +43,7 @@ export { ListActivitiesResult } from '../models';
  * @export
  * @interface GetActivityRequest
  */
-export interface GetActivityRequest {
+export interface GetActivityRequestParams {
     /**
      * The name of chain
      * @type {string}
@@ -64,7 +64,7 @@ export interface GetActivityRequest {
  * @export
  * @interface ListActivitiesRequest
  */
-export interface ListActivitiesRequest {
+export interface ListActivitiesRequestParams {
     /**
      * The name of chain
      * @type {string}
@@ -101,20 +101,6 @@ export interface ListActivitiesRequest {
     readonly activityType?: ActivityType
 
     /**
-     * From indexed at including given date
-     * @type {string}
-     * @memberof ListActivities
-     */
-    readonly fromIndexedAt?: string
-
-    /**
-     * To indexed at including given date
-     * @type {string}
-     * @memberof ListActivities
-     */
-    readonly toIndexedAt?: string
-
-    /**
      * The transaction hash of activity
      * @type {string}
      * @memberof ListActivities
@@ -132,6 +118,55 @@ export interface ListActivitiesRequest {
      * Maximum number of items to return
      * @type {number}
      * @memberof ListActivities
+     */
+    readonly pageSize?: number
+}
+
+/**
+ * Request parameters for listActivityHistory operation in ActivitiesApi.
+ * @export
+ * @interface ListActivityHistoryRequest
+ */
+export interface ListActivityHistoryRequestParams {
+    /**
+     * The name of chain
+     * @type {string}
+     * @memberof ListActivityHistory
+     */
+    readonly chainName: string
+
+    /**
+     * From indexed at including given date
+     * @type {string}
+     * @memberof ListActivityHistory
+     */
+    readonly fromUpdatedAt: string
+
+    /**
+     * To indexed at including given date
+     * @type {string}
+     * @memberof ListActivityHistory
+     */
+    readonly toUpdatedAt?: string
+
+    /**
+     * The contract address of the collection
+     * @type {string}
+     * @memberof ListActivityHistory
+     */
+    readonly contractAddress?: string
+
+    /**
+     * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+     * @type {string}
+     * @memberof ListActivityHistory
+     */
+    readonly pageCursor?: string
+
+    /**
+     * Maximum number of items to return
+     * @type {number}
+     * @memberof ListActivityHistory
      */
     readonly pageSize?: number
 }

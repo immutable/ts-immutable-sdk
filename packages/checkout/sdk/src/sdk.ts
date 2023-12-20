@@ -53,6 +53,8 @@ import {
   CancelResult,
   BuyResult,
   SellResult,
+  TokenInfo,
+  GetTokenInfoParams,
 } from './types';
 import { CheckoutConfiguration } from './config';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
@@ -105,6 +107,10 @@ export class Checkout {
    */
   public async widgets(init: WidgetsInit): Promise<ImmutableCheckoutWidgets.WidgetsFactory> {
     const checkout = this;
+
+    // Preload the configurations
+    await checkout.config.remote.getConfig();
+
     const factory = new Promise<ImmutableCheckoutWidgets.WidgetsFactory>((resolve, reject) => {
       function checkForWidgetsBundleLoaded() {
         if (typeof ImmutableCheckoutWidgets !== 'undefined') {
@@ -120,8 +126,6 @@ export class Checkout {
       try {
         const script = loadUnresolved(init.version);
         if (script.loaded && typeof ImmutableCheckoutWidgets !== 'undefined') {
-          // eslint-disable-next-line no-console
-          console.warn('Checkout widgets script is already loaded');
           resolve(new ImmutableCheckoutWidgets.WidgetsFactory(checkout, init.config));
         } else {
           checkForWidgetsBundleLoaded();
@@ -217,6 +221,21 @@ export class Checkout {
   }
 
   /**
+   * Retrieves the token information given the token address. This function makes RPC calls to
+   * ERC20 contracts to fetch the main contract information (e.g. symbol).
+   * @param {GetTokenInfoParams} params - The parameters for retrieving the token information.
+   * @returns {Promise<TokenInfo>} - A promise that resolves to the token info request.
+   */
+  public async getTokenInfo(
+    params: GetTokenInfoParams,
+  ): Promise<TokenInfo> {
+    return await tokens.getERC20TokenInfo(
+      params.provider,
+      params.tokenAddress,
+    );
+  }
+
+  /**
    * Retrieves the balance of a wallet address.
    * @param {GetBalanceParams} params - The parameters for retrieving the balance.
    * @returns {Promise<GetBalanceResult>} - A promise that resolves to the balance result.
@@ -229,7 +248,7 @@ export class Checkout {
       params.provider,
     );
 
-    if (!params.contractAddress || params.contractAddress === '') {
+    if (!params.tokenAddress || params.tokenAddress === '') {
       return await balances.getBalance(
         this.config,
         web3Provider,
@@ -239,7 +258,7 @@ export class Checkout {
     return await balances.getERC20Balance(
       web3Provider,
       params.walletAddress,
-      params.contractAddress,
+      params.tokenAddress,
     );
   }
 
@@ -251,14 +270,9 @@ export class Checkout {
   public async getAllBalances(
     params: GetAllBalancesParams,
   ): Promise<GetAllBalancesResult> {
-    const web3Provider = await provider.validateProvider(
-      this.config,
-      params.provider,
-    );
-
     return balances.getAllBalances(
       this.config,
-      web3Provider,
+      params.provider,
       params.walletAddress,
       params.chainId,
     );

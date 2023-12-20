@@ -3,6 +3,7 @@ export const bridgeFormWrapperStyles = {
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-between',
+  paddingTop: 'base.spacing.x10',
 };
 
 export const formInputsContainerStyles = {
@@ -16,5 +17,17 @@ export const bridgeFormButtonContainerStyles = {
   flexDirection: 'column',
   paddingY: 'base.spacing.x6',
   paddingX: 'base.spacing.x4',
-  backgroundColor: 'base.color.translucent.emphasis.200',
+};
+
+export const gasAmountAccordionStyles = {
+  backgroundColor: 'base.color.translucent.emphasis.100',
+};
+
+export const gasAmountHeadingStyles = {
+  marginBottom: 'base.spacing.x4',
+  color: 'base.color.text.secondary',
+};
+
+export const bridgeButtonIconLoadingStyle = {
+  width: 'base.icon.size.400',
 };

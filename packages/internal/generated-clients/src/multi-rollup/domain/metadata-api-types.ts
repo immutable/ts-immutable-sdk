@@ -63,7 +63,7 @@ export { RefreshNFTMetadataByTokenIDRequest } from '../models';
  * @export
  * @interface GetMetadataRequest
  */
-export interface GetMetadataRequest {
+export interface GetMetadataRequestParams {
     /**
      * The name of chain
      * @type {string}
@@ -91,7 +91,7 @@ export interface GetMetadataRequest {
  * @export
  * @interface ListMetadataRequest
  */
-export interface ListMetadataRequest {
+export interface ListMetadataRequestParams {
     /**
      * The name of chain
      * @type {string}
@@ -129,11 +129,46 @@ export interface ListMetadataRequest {
 }
 
 /**
+ * Request parameters for listMetadataForChain operation in MetadataApi.
+ * @export
+ * @interface ListMetadataForChainRequest
+ */
+export interface ListMetadataForChainRequestParams {
+    /**
+     * The name of chain
+     * @type {string}
+     * @memberof ListMetadataForChain
+     */
+    readonly chainName: string
+
+    /**
+     * Datetime to use as the oldest updated timestamp
+     * @type {string}
+     * @memberof ListMetadataForChain
+     */
+    readonly fromUpdatedAt?: string
+
+    /**
+     * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+     * @type {string}
+     * @memberof ListMetadataForChain
+     */
+    readonly pageCursor?: string
+
+    /**
+     * Maximum number of items to return
+     * @type {number}
+     * @memberof ListMetadataForChain
+     */
+    readonly pageSize?: number
+}
+
+/**
  * Request parameters for refreshMetadataByID operation in MetadataApi.
  * @export
  * @interface RefreshMetadataByIDRequest
  */
-export interface RefreshMetadataByIDRequest {
+export interface RefreshMetadataByIDRequestParams {
     /**
      * The name of chain
      * @type {string}
@@ -161,7 +196,7 @@ export interface RefreshMetadataByIDRequest {
  * @export
  * @interface RefreshNFTMetadataByTokenIDRequest
  */
-export interface RefreshNFTMetadataByTokenIDRequest {
+export interface RefreshNFTMetadataByTokenIDRequestParams {
     /**
      * The address of contract
      * @type {string}

@@ -31,13 +31,13 @@ const useParams = () => {
   const login = urlParams.get('login') as string;
   const amount = urlParams.get('amount') as string;
   const environmentId = urlParams.get('environmentId') as string;
-  const fromContractAddress = urlParams.get('fromContractAddress') as string;
+  const fromTokenAddress = urlParams.get('fromTokenAddress') as string;
 
   return {
     login,
     amount,
     environmentId,
-    fromContractAddress,
+    fromTokenAddress,
   };
 };
 
@@ -72,7 +72,7 @@ const usePassportInstance = (passportConfig: any) => {
 export function SaleUI() {
   const params = useParams();
   const {
-    login, amount, environmentId, fromContractAddress,
+    login, amount, environmentId, fromTokenAddress,
   } = params;
   const [passportConfig, setPassportConfig] = useState(
     JSON.stringify(defaultPassportConfig, null, 2),
@@ -83,7 +83,7 @@ export function SaleUI() {
   const checkout = useMemo(() => new Checkout({baseConfig: {environment: Environment.SANDBOX}, passport: passportInstance as unknown as Passport}), [passportInstance])
   const factory = useMemo(() => new WidgetsFactory(checkout, {theme: WidgetTheme.DARK}), [checkout])
   const saleWidget = useMemo(() => factory.create(WidgetType.SALE, { config: { theme: WidgetTheme.DARK } }), 
-  [factory, amount, environmentId, fromContractAddress, defaultItems]
+  [factory, amount, environmentId, fromTokenAddress, defaultItems]
   )
 
   // mount sale widget and subscribe to close event
@@ -91,7 +91,7 @@ export function SaleUI() {
     saleWidget.mount("sale", {
       amount, 
       environmentId, 
-      fromContractAddress, 
+      fromTokenAddress, 
       items: defaultItems
     });
     saleWidget.addListener(SaleEventType.CLOSE_WIDGET, () => { saleWidget.unmount()})
@@ -157,7 +157,7 @@ export function SaleUI() {
     <button onClick={() => saleWidget.mount('sale', {
       amount, 
       environmentId, 
-      fromContractAddress, 
+      fromTokenAddress, 
       items: defaultItems
     })}>Mount</button>
     <button onClick={() => saleWidget.unmount()}>Unmount</button>

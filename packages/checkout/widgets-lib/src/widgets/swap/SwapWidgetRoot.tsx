@@ -16,7 +16,8 @@ import { isPassportProvider } from 'lib/providerUtils';
 import { ServiceUnavailableErrorView } from 'views/error/ServiceUnavailableErrorView';
 import { ServiceType } from 'views/error/serviceTypes';
 import { isValidAddress, isValidAmount, isValidWalletProvider } from 'lib/validations/widgetValidators';
-import { WidgetContainer } from 'components/WidgetContainer/WidgetContainer';
+import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
+import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
 import { topUpBridgeOption, topUpOnRampOption } from './helpers';
 import { sendSwapWidgetCloseEvent } from './SwapWidgetEvents';
 import { SwapWidget } from './SwapWidget';
@@ -53,16 +54,16 @@ export class Swap extends Base<WidgetType.SWAP> {
       validatedParams.amount = '';
     }
 
-    if (!isValidAddress(params.fromContractAddress)) {
+    if (!isValidAddress(params.fromTokenAddress)) {
       // eslint-disable-next-line no-console
-      console.warn('[IMTBL]: invalid "fromContractAddress" widget input');
-      validatedParams.fromContractAddress = '';
+      console.warn('[IMTBL]: invalid "fromTokenAddress" widget input');
+      validatedParams.fromTokenAddress = '';
     }
 
-    if (!isValidAddress(params.toContractAddress)) {
+    if (!isValidAddress(params.toTokenAddress)) {
       // eslint-disable-next-line no-console
-      console.warn('[IMTBL]: invalid "toContractAddress" widget input');
-      validatedParams.toContractAddress = '';
+      console.warn('[IMTBL]: invalid "toTokenAddress" widget input');
+      validatedParams.toTokenAddress = '';
     }
 
     return validatedParams;
@@ -112,48 +113,50 @@ export class Swap extends Base<WidgetType.SWAP> {
       .finally(() => {
         this.reactRoot!.render(
           <React.StrictMode>
-            <WidgetContainer id="swap-container" config={this.strongConfig()}>
-              {!isSwapAvailable && (
-              <ServiceUnavailableErrorView
-                service={ServiceType.SWAP}
-                onCloseClick={() => sendSwapWidgetCloseEvent(window)}
-                primaryActionText={
+            <CustomAnalyticsProvider checkout={this.checkout}>
+              <ThemeProvider id="swap-container" config={this.strongConfig()}>
+                {!isSwapAvailable && (
+                <ServiceUnavailableErrorView
+                  service={ServiceType.SWAP}
+                  onCloseClick={() => sendSwapWidgetCloseEvent(window)}
+                  primaryActionText={
                         topUpOptions && topUpOptions?.length > 0
                           ? topUpOptions[0].text
                           : undefined
                       }
-                onPrimaryButtonClick={
+                  onPrimaryButtonClick={
                         topUpOptions && topUpOptions?.length > 0
                           ? topUpOptions[0].action
                           : undefined
                       }
-                secondaryActionText={
+                  secondaryActionText={
                         topUpOptions?.length === 2
                           ? topUpOptions[1].text
                           : undefined
                       }
-                onSecondaryButtonClick={
+                  onSecondaryButtonClick={
                         topUpOptions?.length === 2
                           ? topUpOptions[1].action
                           : undefined
                       }
-              />
-              )}
-              {isSwapAvailable && (
-              <ConnectLoader
-                params={connectLoaderParams}
-                widgetConfig={this.strongConfig()}
-                closeEvent={() => sendSwapWidgetCloseEvent(window)}
-              >
-                <SwapWidget
-                  fromContractAddress={this.parameters.fromContractAddress}
-                  toContractAddress={this.parameters.toContractAddress}
-                  amount={this.parameters.amount}
-                  config={this.strongConfig()}
                 />
-              </ConnectLoader>
-              )}
-            </WidgetContainer>
+                )}
+                {isSwapAvailable && (
+                  <ConnectLoader
+                    params={connectLoaderParams}
+                    widgetConfig={this.strongConfig()}
+                    closeEvent={() => sendSwapWidgetCloseEvent(window)}
+                  >
+                    <SwapWidget
+                      fromTokenAddress={this.parameters.fromTokenAddress}
+                      toTokenAddress={this.parameters.toTokenAddress}
+                      amount={this.parameters.amount}
+                      config={this.strongConfig()}
+                    />
+                  </ConnectLoader>
+                )}
+              </ThemeProvider>
+            </CustomAnalyticsProvider>
           </React.StrictMode>,
         );
       });

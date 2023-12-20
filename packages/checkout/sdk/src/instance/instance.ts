@@ -14,12 +14,12 @@ import { CheckoutError, CheckoutErrorType } from '../errors';
 import { ChainId, DexConfig } from '../types';
 import { CheckoutConfiguration } from '../config';
 
-export async function createBridgeInstance(
+export function createBridgeInstance(
   fromChainId: ChainId,
   toChainId: ChainId,
   readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
   config: CheckoutConfiguration,
-): Promise<TokenBridge> {
+): TokenBridge {
   const rootChainProvider = readOnlyProviders.get(fromChainId);
   const childChainProvider = readOnlyProviders.get(toChainId);
 

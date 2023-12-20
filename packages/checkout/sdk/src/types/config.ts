@@ -51,6 +51,7 @@ export interface CheckoutModuleConfiguration extends ModuleConfiguration<Checkou
  * @property {AllowedNetworkConfig[]} allowedNetworks
  * @property {GasEstimateTokenConfig | undefined} gasEstimateTokens
  * @property {ImxAddressConfig | undefined} imxAddressMapping
+ * @property {TelemetryConfig | undefined} telemetry
  */
 export type RemoteConfiguration = {
   /** The config used for the DEX. */
@@ -65,6 +66,8 @@ export type RemoteConfiguration = {
   gasEstimateTokens?: GasEstimateTokenConfig;
   /** The IMX address mappings across available networks. */
   imxAddressMapping?: ImxAddressConfig;
+  /** Telemetry config. */
+  telemetry?: TelemetryConfig;
 };
 
 /**
@@ -145,6 +148,14 @@ export type AllowedNetworkConfig = {
  */
 export type ImxAddressConfig = {
   [chainId: string]: string;
+};
+
+/**
+ * A type representing the telemetry configurations.
+ * @property {string} segmentPublishableKey
+ */
+export type TelemetryConfig = {
+  segmentPublishableKey: string
 };
 
 /**

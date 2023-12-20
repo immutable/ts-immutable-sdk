@@ -38,5 +38,5 @@ export interface OnRampFailView extends ViewType {
 }
 interface PrefilledOnRampData {
   amount?: string;
-  contractAddress?: string;
+  tokenAddress?: string;
 }

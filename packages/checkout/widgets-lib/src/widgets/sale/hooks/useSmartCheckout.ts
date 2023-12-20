@@ -15,11 +15,11 @@ type UseSmartCheckoutInput = {
   provider: Web3Provider | undefined;
   items: SaleItem[],
   amount: string,
-  contractAddress: string,
+  tokenAddress: string,
 };
 
 export const useSmartCheckout = ({
-  checkout, provider, items, amount, contractAddress,
+  checkout, provider, items, amount, tokenAddress,
 }: UseSmartCheckoutInput) => {
   const [smartCheckoutResult, setSmartCheckoutResult] = useState<SmartCheckoutResult | undefined>(
     undefined,
@@ -35,7 +35,7 @@ export const useSmartCheckout = ({
 
       const userFractionalBalanceBlocked = await isUserFractionalBalanceBlocked(
         spenderAddress,
-        contractAddress,
+        tokenAddress,
         amount,
         checkout,
         provider,
@@ -44,7 +44,7 @@ export const useSmartCheckout = ({
         throw new Error(SmartCheckoutErrorTypes.FRACTIONAL_BALANCE_BLOCKED);
       }
 
-      const itemRequirements = getItemRequirements(amount, spenderAddress, contractAddress);
+      const itemRequirements = getItemRequirements(amount, spenderAddress, tokenAddress);
       const gasEstimate = getGasEstimate();
       const res = await checkout?.smartCheckout(
         {
@@ -66,7 +66,7 @@ export const useSmartCheckout = ({
       });
     }
     return undefined;
-  }, [checkout, provider, items, amount, contractAddress]);
+  }, [checkout, provider, items, amount, tokenAddress]);
 
   return {
     smartCheckout, smartCheckoutResult, smartCheckoutError,

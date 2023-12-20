@@ -3,17 +3,28 @@ import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 
-export default {
-  input: './src/index.ts',
-  output: {
-    dir: 'dist',
+export default [{
+    input: './src/index.ts',
+    output: {
+      file: 'dist/index.js',
+    },
+    plugins: [
+      json(),
+      commonjs(),
+      nodeResolve(),
+      typescript(),
+    ],
   },
-  plugins: [
-    json(),
-    commonjs(),
-    nodeResolve(),
-    typescript({
-      exclude: [],
-    }),
-  ],
-};
+  {
+    input: './src/index.ts',
+    output: {
+      file: 'dist/index.browser.js',
+    },
+    plugins: [
+      json(),
+      commonjs(),
+      nodeResolve({ browser: true }), 
+      typescript(),
+    ],
+  }
+];

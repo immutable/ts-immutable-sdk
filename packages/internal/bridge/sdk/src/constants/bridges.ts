@@ -1,4 +1,6 @@
-import { BridgeInstance } from 'types';
+/* eslint-disable @typescript-eslint/naming-convention */
+
+import { AxelarChainDetails, BridgeInstance } from '../types';
 
 /**
  * @constant {string} ETH_SEPOLIA_CHAIN_ID - The chain ID for the Ethereum Sepolia testnet (EIP-155 compatible format).
@@ -11,7 +13,7 @@ export const ETH_MAINNET_CHAIN_ID = '1';
 /**
  * @constant {string} ZKEVM_DEVNET_CHAIN_ID - The chain ID for the zkEVM devnet (EIP-155 compatible format).
  */
-export const ZKEVM_DEVNET_CHAIN_ID = '13473';
+export const ZKEVM_DEVNET_CHAIN_ID = '15003';
 /**
  * @constant {string} ZKEVM_TESTNET_CHAIN_ID - The chain ID for the zkEVM testnet (EIP-155 compatible format).
  */
@@ -19,25 +21,17 @@ export const ZKEVM_TESTNET_CHAIN_ID = '13473';
 /**
  * @constant {string} ZKEVM_MAINNET_CHAIN_ID - The chain ID for the zkEVM mainnet (EIP-155 compatible format).
  */
-export const ZKEVM_MAINNET_CHAIN_ID = '13371';
+export const ZKEVM_MAINNET_CHAIN_ID = '13371'; // @TODO confirm this is still correct
+
+/**
+ * @constant {string} IMTBL_ZKEVM_NATIVE_TOKEN_ADDRESS - Address of the native token on the child chain.
+ */
+export const IMTBL_ZKEVM_NATIVE_TOKEN_ADDRESS = '0x0000000000000000000000000000000000000fff';
 
 /**
  * @constant {string} CHILD_CHAIN_NATIVE_TOKEN_ADDRESS - Address of the native token on the child chain.
  */
-export const CHILD_CHAIN_NATIVE_TOKEN_ADDRESS = '0x0000000000000000000000000000000000001010';
-
-/**
- * @constant {string} L2_STATE_SENDER_ADDRESS - Address of bridge contract to the rootchain
- */
-export const L2_STATE_SENDER_ADDRESS = '0x0000000000000000000000000000000000001002';
-
-/**
- * The constant value representing the native token in the token bridge context.
- * The key is used to indicate the native token of a blockchain network (like Ether in Ethereum)
- *  in methods that normally require a token address.
- * @constant {string}
- */
-export const NATIVE_TOKEN_BRIDGE_KEY = '0x0000000000000000000000000000000000000001';
+export const ETHEREUM_NATIVE_TOKEN_ADDRESS = '0x0000000000000000000000000000000000000eee';
 
 /**
  * @constant {BridgeInstance} ETH_SEPOLIA_TO_ZKEVM_DEVNET - A bridge instance configuration for bridging between
@@ -64,4 +58,60 @@ export const ETH_SEPOLIA_TO_ZKEVM_TESTNET: BridgeInstance = {
 export const ETH_MAINNET_TO_ZKEVM_MAINNET: BridgeInstance = {
   rootChainID: ETH_MAINNET_CHAIN_ID,
   childChainID: ZKEVM_MAINNET_CHAIN_ID,
+};
+
+/**
+ * @typedef {Object} axelarAPIEndpoints - API endpoints for the testnet & mainnet Axelar environment configurations
+ */
+export const axelarAPIEndpoints:Record<string, string> = {
+  testnet: 'https://testnet.api.gmp.axelarscan.io',
+  mainnet: 'https://api.gmp.axelarscan.io',
+  devnet: '',
+};
+
+/**
+ * @typedef {Object} axelarChains
+ * @property {AxelarChainDetails} [chainId] - Mapping of the ChainId to the Axelar chain id string and symbol.
+ */
+export const axelarChains:Record<string, AxelarChainDetails> = {
+  11155111: {
+    id: 'ethereum-sepolia',
+    symbol: 'ETH',
+  }, // ethereum testnet
+  1: {
+    id: 'ethereum',
+    symbol: 'ETH',
+  }, // ethereum mainnet
+  15003: {
+    id: 'immutable',
+    symbol: 'IMX',
+  }, // immutable zkevm devnet
+  13473: {
+    id: 'immutable',
+    symbol: 'IMX',
+  }, // immutable zkevm testnet
+  13371: {
+    id: 'immutable',
+    symbol: 'IMX',
+  }, // immutable zkevm mainnet
+};
+
+/**
+ * @typedef {Object} bridgeMethods
+ * @property {string} deposit - The set of contract methods for depositing.
+ * @property {string} withdraw - The set of contract methods for withdrawing.
+ */
+export const bridgeMethods = {
+  deposit: {
+    token: 'deposit',
+    tokenTo: 'depositTo',
+    native: 'depositETH',
+    nativeTo: 'depositToETH',
+  },
+  withdraw: {
+    token: 'withdraw',
+    tokenTo: 'withdrawTo',
+    native: 'withdrawIMX',
+    nativeTo: 'withdrawIMXTo',
+  },
 };

@@ -10,7 +10,6 @@ import { BigNumber } from 'ethers';
 import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import { UserJourney } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
-import { StrongCheckoutWidgetsConfig } from 'lib/withDefaultWidgetConfig';
 import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { TopUpView } from './TopUpView';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
@@ -40,7 +39,7 @@ describe('Top Up View', () => {
     it('should render the top up view', () => {
       mount(
         <ViewContextTestComponent>
-          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <CustomAnalyticsProvider checkout={{} as Checkout}>
             <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
               <TopUpView
                 analytics={{ userJourney: UserJourney.WALLET }}
@@ -62,7 +61,7 @@ describe('Top Up View', () => {
     it('should hide onramp option', () => {
       mount(
         <ViewContextTestComponent>
-          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <CustomAnalyticsProvider checkout={{} as Checkout}>
             <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
               <TopUpView
                 analytics={{ userJourney: UserJourney.WALLET }}
@@ -84,7 +83,7 @@ describe('Top Up View', () => {
     it('should hide swap option', () => {
       mount(
         <ViewContextTestComponent>
-          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <CustomAnalyticsProvider checkout={{} as Checkout}>
             <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
               <TopUpView
                 analytics={{ userJourney: UserJourney.WALLET }}
@@ -106,7 +105,7 @@ describe('Top Up View', () => {
     it('should hide bridge option', () => {
       mount(
         <ViewContextTestComponent>
-          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <CustomAnalyticsProvider checkout={{} as Checkout}>
             <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
               <TopUpView
                 analytics={{ userJourney: UserJourney.WALLET }}
@@ -128,7 +127,7 @@ describe('Top Up View', () => {
     it('should hide bridge option when provider is Passport', () => {
       mount(
         <ViewContextTestComponent>
-          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <CustomAnalyticsProvider checkout={{} as Checkout}>
             <ConnectLoaderTestComponent
               initialStateOverride={{
                 ...connectLoaderState,
@@ -158,7 +157,7 @@ describe('Top Up View', () => {
       const closeFunction = cy.stub().as('closeFunction');
       mount(
         <ViewContextTestComponent>
-          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <CustomAnalyticsProvider checkout={{} as Checkout}>
             <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
               <TopUpView
                 analytics={{ userJourney: UserJourney.WALLET }}
@@ -186,7 +185,7 @@ describe('Top Up View', () => {
 
       mount(
         <ViewContextTestComponent>
-          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <CustomAnalyticsProvider checkout={{} as Checkout}>
             <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
               <TopUpView
                 analytics={{ userJourney: UserJourney.WALLET }}
@@ -218,7 +217,7 @@ describe('Top Up View', () => {
 
       mount(
         <ViewContextTestComponent>
-          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <CustomAnalyticsProvider checkout={{} as Checkout}>
             <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
               <TopUpView
                 analytics={{ userJourney: UserJourney.WALLET }}
@@ -291,7 +290,7 @@ describe('Top Up View', () => {
 
         mount(
           <ViewContextTestComponent>
-            <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+            <CustomAnalyticsProvider checkout={{} as Checkout}>
               <ConnectLoaderTestComponent
                 initialStateOverride={connectLoaderState}
               >
@@ -351,26 +350,18 @@ describe('Top Up View', () => {
         .onFirstCall()
         .resolves({
           gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-          gasFee: {
-            estimatedAmount: BigNumber.from(1000000000000000),
-            token: {
-              name: 'Ethereum',
-              symbol: 'ETH',
-              decimals: 18,
-            },
+          fees: {
+            totalFees: BigNumber.from(1000000000000000),
           },
-          bridgeFee: {
-            estimatedAmount: BigNumber.from(1000000000000000),
-            token: {
-              name: 'Ethereum',
-              symbol: 'ETH',
-              decimals: 18,
-            },
+          token: {
+            name: 'Ethereum',
+            symbol: 'ETH',
+            decimals: 18,
           },
         });
 
       mount(
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <CustomAnalyticsProvider checkout={{} as Checkout}>
           <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
             <WalletWidgetTestComponent
               initialStateOverride={baseWalletState}
@@ -397,7 +388,7 @@ describe('Top Up View', () => {
       cySmartGet('menu-item-caption-bridge').contains(
         'From the coins I have on a different network',
       );
-      cySmartGet('menu-item-caption-bridge').contains('$4.00 USD');
+      cySmartGet('menu-item-caption-bridge').contains('$2.00 USD');
 
       cySmartGet('menu-item-caption-onramp').contains(
         'Google pay & Apple pay available. Minimum $5.',
@@ -429,26 +420,18 @@ describe('Top Up View', () => {
         .as('gasEstimateStub')
         .resolves({
           gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-          gasFee: {
-            estimatedAmount: BigNumber.from(100000000000000),
-            token: {
-              name: 'Ethereum',
-              symbol: 'ETH',
-              decimals: 18,
-            },
+          fees: {
+            totalFees: BigNumber.from(100000000000000),
           },
-          bridgeFee: {
-            estimatedAmount: BigNumber.from(100000000000000),
-            token: {
-              name: 'Ethereum',
-              symbol: 'ETH',
-              decimals: 18,
-            },
+          token: {
+            name: 'Ethereum',
+            symbol: 'ETH',
+            decimals: 18,
           },
         });
 
       mount(
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <CustomAnalyticsProvider checkout={{} as Checkout}>
           <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
             <WalletWidgetTestComponent
               initialStateOverride={baseWalletState}
@@ -474,7 +457,7 @@ describe('Top Up View', () => {
       cySmartGet('menu-item-caption-bridge').contains(
         'From the coins I have on a different network',
       );
-      cySmartGet('menu-item-caption-bridge').contains('$0.40 USD');
+      cySmartGet('menu-item-caption-bridge').contains('$0.20 USD');
 
       cySmartGet('menu-item-caption-onramp').contains(
         'Google pay & Apple pay available. Minimum $5.',

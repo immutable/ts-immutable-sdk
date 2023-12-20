@@ -1,6 +1,7 @@
 import {
   Drawer, Box, Divider,
 } from '@biom3/react';
+import { tokenValueFormat } from 'lib/utils';
 import { feeItemContainerStyles, feesBreakdownContentStyles } from './FeesBreakdownStyles';
 import { FeeItem } from './FeeItem';
 import { text } from '../../resources/text/textConfig';
@@ -19,10 +20,17 @@ type FeesBreakdownProps = {
   visible?: boolean;
   totalFiatAmount: string;
   totalAmount: string;
+  tokenSymbol: string;
 };
 
 export function FeesBreakdown({
-  fees, children, onCloseDrawer, visible, totalFiatAmount, totalAmount,
+  fees,
+  children,
+  visible,
+  onCloseDrawer,
+  totalFiatAmount,
+  totalAmount,
+  tokenSymbol,
 }: FeesBreakdownProps) {
   return (
     <Drawer
@@ -39,16 +47,23 @@ export function FeesBreakdown({
           <FeeItem
             key={text.drawers.feesBreakdown.total}
             label={text.drawers.feesBreakdown.total}
-            amount={totalAmount}
+            amount={tokenValueFormat(totalAmount)}
             fiatAmount={totalFiatAmount}
+            tokenSymbol={tokenSymbol}
             boldLabel
           />
           <Divider size="xSmall" />
           {
-              fees.map(({ label, amount, fiatAmount }) => (
-                <FeeItem key={label} label={label} amount={amount} fiatAmount={fiatAmount} />
-              ))
-            }
+            fees.map(({ label, amount, fiatAmount }) => (
+              <FeeItem
+                key={label}
+                label={label}
+                amount={tokenValueFormat(amount)}
+                fiatAmount={fiatAmount}
+                tokenSymbol={tokenSymbol}
+              />
+            ))
+          }
         </Box>
         <FooterLogo />
       </Drawer.Content>

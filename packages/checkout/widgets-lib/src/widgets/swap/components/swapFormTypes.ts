@@ -1,8 +1,8 @@
 export interface SwapFormData {
   fromAmount?: string;
   toAmount?: string;
-  fromContractAddress?: string;
-  toContractAddress?: string;
+  fromTokenAddress?: string;
+  toTokenAddress?: string;
   fromTokenSymbol?: string;
   toTokenSymbol?: string;
 }

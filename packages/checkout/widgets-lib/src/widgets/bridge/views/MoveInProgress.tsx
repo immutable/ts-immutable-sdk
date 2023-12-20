@@ -1,87 +1,39 @@
-import { TokenInfo } from '@imtbl/checkout-sdk';
-import { TransactionResponse } from '@ethersproject/providers';
 import { useContext, useEffect } from 'react';
-import { CompletionStatus, WaitForDepositResponse } from '@imtbl/bridge-sdk';
+import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
+import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
-import { BridgeHero } from '../../../components/Hero/BridgeHero';
+import { RocketHero } from '../../../components/Hero/RocketHero';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { text } from '../../../resources/text/textConfig';
-import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
+import { sendBridgeTransactionSentEvent, sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
-import { BridgeWidgetViews, PrefilledBridgeForm } from '../../../context/view-context/BridgeViewContextTypes';
-import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
-import { BridgeContext } from '../context/BridgeContext';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
+import { BridgeContext } from '../context/BridgeContext';
 
-interface MoveInProgressProps {
-  token: TokenInfo,
-  transactionResponse: TransactionResponse,
-  bridgeForm: PrefilledBridgeForm,
+export interface MoveInProgressProps {
+  transactionHash: string;
 }
 
-export function MoveInProgress({ token, transactionResponse, bridgeForm }: MoveInProgressProps) {
-  const { viewDispatch } = useContext(ViewContext);
+export function MoveInProgress({ transactionHash }: MoveInProgressProps) {
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+  const { page } = useAnalytics();
 
-  const { heading, body1, body2 } = text.views[BridgeWidgetViews.IN_PROGRESS];
+  const { heading, body2 } = text.views[BridgeWidgetViews.IN_PROGRESS];
   const {
-    bridgeState: {
-      tokenBridge,
-    },
+    bridgeState: { checkout },
   } = useContext(BridgeContext);
 
   useEffect(() => {
-    if (!tokenBridge) return;
-
-    (async () => {
-      try {
-        const receipt = await transactionResponse.wait();
-
-        if (receipt.status === 1) {
-          const bridgeResult: WaitForDepositResponse = await tokenBridge.waitForDeposit({
-            transactionHash: receipt.transactionHash,
-          });
-
-          if (bridgeResult.status === CompletionStatus.SUCCESS) {
-            viewDispatch({
-              payload: {
-                type: ViewActions.UPDATE_VIEW,
-                view: {
-                  type: BridgeWidgetViews.SUCCESS,
-                  data: {
-                    transactionHash: receipt.transactionHash,
-                  },
-                },
-              },
-            });
-            return;
-          }
-        }
-
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: {
-              type: BridgeWidgetViews.FAIL,
-              data: bridgeForm,
-            },
-          },
-        });
-      } catch (err) {
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: {
-              type: BridgeWidgetViews.FAIL,
-              data: bridgeForm,
-              reason: 'Transaction failed',
-            },
-          },
-        });
-      }
-    })();
-  }, [transactionResponse, tokenBridge]);
+    sendBridgeTransactionSentEvent(
+      eventTarget,
+      transactionHash,
+    );
+    page({
+      userJourney: UserJourney.BRIDGE,
+      screen: 'InProgress',
+    });
+  }, []);
 
   return (
     <SimpleLayout
@@ -95,13 +47,10 @@ export function MoveInProgress({ token, transactionResponse, bridgeForm }: MoveI
       footer={(
         <FooterLogo />
       )}
-      heroContent={<BridgeHero />}
+      heroContent={<RocketHero environment={checkout.config.environment} />}
       floatHeader
     >
       <SimpleTextBody heading={heading}>
-        {body1(token?.symbol)}
-        <br />
-        <br />
         {body2}
       </SimpleTextBody>
     </SimpleLayout>
