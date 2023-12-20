@@ -58,7 +58,6 @@ const getFileBuild = (inputFilename) => [
         preventAssignment: true,
         __SDK_VERSION__: pkg.version,
       }),
-      terser(),
     ],
   },
   {
