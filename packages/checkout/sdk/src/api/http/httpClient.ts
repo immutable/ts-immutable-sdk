@@ -4,7 +4,7 @@ import { CheckoutError, CheckoutErrorType } from '../../errors';
 
 const PUBLISHABLE_KEY_PREFIX = 'pk_imapik-';
 
-const publishableKeyWhitelistedDomain = [
+const publishableKeyDomainAllowlist = [
   'https://checkout-api.dev.immutable.com',
   'https://checkout-api.sandbox.immutable.com',
   'https://checkout-api.immutable.com',
@@ -25,7 +25,7 @@ export class HttpClient {
   // eslint-disable-next-line class-methods-use-this
   private shouldAddPublishableKey(url: string): boolean {
     // Check if the request is going to a whitelisted domain
-    return publishableKeyWhitelistedDomain.some((domain) => url.startsWith(domain));
+    return publishableKeyDomainAllowlist.some((domain) => url.startsWith(domain));
   }
 
   private setupInterceptors() {
