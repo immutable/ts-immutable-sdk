@@ -457,12 +457,27 @@ describe('network functions', () => {
   });
 
   describe('getNetworkAllowList()', () => {
+    it('should return an empty list if no configuration is provided', async () => {
+      (RemoteConfigFetcher as unknown as jest.Mock).mockReturnValue({
+        getConfig: jest.fn().mockResolvedValue(undefined),
+      });
+
+      const emptyCheckoutConfiguration = new CheckoutConfiguration({
+        baseConfig: { environment: Environment.SANDBOX },
+      });
+      const allowListResult = await getNetworkAllowList(emptyCheckoutConfiguration, {
+        type: NetworkFilterTypes.ALL,
+      });
+      expect(allowListResult).toEqual({
+        networks: [],
+      });
+    });
+
     it('should return all the networks if no exclude filter is provided', async () => {
-      await expect(
-        await getNetworkAllowList(testCheckoutConfiguration, {
-          type: NetworkFilterTypes.ALL,
-        }),
-      ).toEqual({
+      const allowListResult = await getNetworkAllowList(testCheckoutConfiguration, {
+        type: NetworkFilterTypes.ALL,
+      });
+      expect(allowListResult).toEqual({
         networks: [
           {
             name: ChainName.SEPOLIA,
@@ -489,12 +504,11 @@ describe('network functions', () => {
     });
 
     it('should exclude the right networks if an exclude filter is provided', async () => {
-      await expect(
-        await getNetworkAllowList(testCheckoutConfiguration, {
-          type: NetworkFilterTypes.ALL,
-          exclude: [{ chainId: ChainId.IMTBL_ZKEVM_TESTNET }],
-        }),
-      ).toEqual({
+      const allowListResult = await getNetworkAllowList(testCheckoutConfiguration, {
+        type: NetworkFilterTypes.ALL,
+        exclude: [{ chainId: ChainId.IMTBL_ZKEVM_TESTNET }],
+      });
+      expect(allowListResult).toEqual({
         networks: [
           {
             name: ChainName.SEPOLIA,
