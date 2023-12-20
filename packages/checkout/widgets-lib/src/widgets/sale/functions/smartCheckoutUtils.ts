@@ -71,20 +71,21 @@ export const fundingRouteFees = (
   for (const step of fundingRoute.steps) {
     switch (step.type) {
       case FundingStepType.BRIDGE:
-        fees.push(step.fees.approvalGasFees);
+        fees.push(step.fees.approvalGasFee);
         fees.push(...step.fees.bridgeFees);
-        fees.push(step.fees.bridgeGasFees);
+        fees.push(step.fees.bridgeGasFee);
         break;
       case FundingStepType.SWAP:
-        fees.push(step.fees.approvalGasFees);
+        fees.push(step.fees.approvalGasFee);
         fees.push(...step.fees.swapFees);
-        fees.push(step.fees.swapGasFees);
+        fees.push(step.fees.swapGasFee);
         break;
       default:
     }
   }
 
   let totalUsd: number = 0;
+  console.log(fees);
   for (const fee of fees) {
     if (fee.token) {
       const feeUsd = calculateCryptoToFiat(fee.formattedAmount, fee.token.symbol, conversions);
