@@ -18,6 +18,7 @@ import {
 import { BigNumber, utils } from 'ethers';
 import { FeesBreakdown } from 'components/FeesBreakdown/FeesBreakdown';
 import { BridgeFeeActions } from '@imtbl/bridge-sdk';
+import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { amountInputValidation } from '../../../lib/validations/amountInputValidations';
 import { BridgeActions, BridgeContext } from '../context/BridgeContext';
 import {
@@ -91,6 +92,8 @@ export function BridgeForm(props: BridgeFormProps) {
     content,
     bridgeForm,
   } = text.views[BridgeWidgetViews.BRIDGE_FORM];
+
+  const { track } = useAnalytics();
 
   // Form state
   const [formAmount, setFormAmount] = useState<string>(defaultAmount || '');
@@ -384,6 +387,17 @@ export function BridgeForm(props: BridgeFormProps) {
       return;
     }
 
+    track({
+      userJourney: UserJourney.BRIDGE,
+      screen: 'TokenAmount',
+      control: 'Review',
+      controlType: 'Button',
+      extras: {
+        tokenAddress: formToken.token.address,
+        amount: formAmount,
+      },
+    });
+
     bridgeDispatch({
       payload: {
         type: BridgeActions.SET_TOKEN_AND_AMOUNT,
@@ -405,7 +419,8 @@ export function BridgeForm(props: BridgeFormProps) {
     from?.web3Provider,
     bridgeFormValidator,
     insufficientFundsForGas,
-    formToken]);
+    formToken,
+  ]);
 
   const retrySubmitBridge = async () => {
     setShowTxnRejectedState(false);

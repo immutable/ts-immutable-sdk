@@ -26,7 +26,7 @@ import {
 } from '@imtbl/bridge-sdk';
 import { getL1ChainId, getL2ChainId } from 'lib';
 import { Transactions } from 'components/Transactions/Transactions';
-import { UserJourney } from 'context/analytics-provider/SegmentAnalyticsProvider';
+import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { TopUpView } from 'views/top-up/TopUpView';
 import {
   ViewActions,
@@ -73,6 +73,8 @@ export function BridgeWidget({
   const errorText = text.views[SharedViews.ERROR_VIEW];
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
   const bridgeFailureText = text.views[BridgeWidgetViews.BRIDGE_FAILURE];
+
+  const { page } = useAnalytics();
 
   const [viewState, viewDispatch] = useReducer(
     viewReducer,
@@ -192,6 +194,15 @@ export function BridgeWidget({
                   if (viewState.view.type === BridgeWidgetViews.BRIDGE_FAILURE) {
                     reason = viewState.view.reason;
                   }
+
+                  page({
+                    userJourney: UserJourney.BRIDGE,
+                    screen: 'Failed',
+                    extras: {
+                      reason,
+                    },
+                  });
+
                   sendBridgeFailedEvent(eventTarget, reason);
                 }}
               />
@@ -211,6 +222,12 @@ export function BridgeWidget({
               actionText={errorText.actionText}
               onActionClick={goBackToWalletNetworkSelector}
               onCloseClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
+              errorEventAction={() => {
+                page({
+                  userJourney: UserJourney.BRIDGE,
+                  screen: 'Error',
+                });
+              }}
             />
           )}
           {viewState.view.type === SharedViews.TOP_UP_VIEW && (
