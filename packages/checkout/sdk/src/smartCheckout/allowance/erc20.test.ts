@@ -135,7 +135,7 @@ describe('allowance', () => {
         },
         {
           type: ItemType.ERC20,
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           amount: BigNumber.from(2),
           spenderAddress: '0xSEAPORT',
         },
@@ -171,7 +171,7 @@ describe('allowance', () => {
         },
         {
           type: ItemType.ERC20,
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           amount: BigNumber.from(1),
           spenderAddress: '0xSEAPORT',
         },
@@ -204,19 +204,19 @@ describe('allowance', () => {
         },
         {
           type: ItemType.ERC20,
-          contractAddress: '0xERC20a',
+          tokenAddress: '0xERC20a',
           amount: BigNumber.from(2),
           spenderAddress: '0xSEAPORT',
         },
         {
           type: ItemType.ERC20,
-          contractAddress: '0xERC20b',
+          tokenAddress: '0xERC20b',
           amount: BigNumber.from(1),
           spenderAddress: '0xSEAPORT',
         },
         {
           type: ItemType.ERC20,
-          contractAddress: '0xERC20c',
+          tokenAddress: '0xERC20c',
           amount: BigNumber.from(2),
           spenderAddress: '0xSEAPORT',
         },

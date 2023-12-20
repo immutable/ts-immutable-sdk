@@ -19,7 +19,7 @@ describe('balanceRequirement', () => {
         },
         {
           type: ItemType.ERC20,
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           amount: BigNumber.from('1000000000000000000'),
           spenderAddress: '0xSEAPORT',
         },
@@ -190,7 +190,7 @@ describe('balanceRequirement', () => {
     it('should return sufficient true if meets requirements for ERC20', () => {
       const itemRequirement: ERC20Item = {
         type: ItemType.ERC20,
-        contractAddress: '0xERC20',
+        tokenAddress: '0xERC20',
         amount: BigNumber.from('1000000000000000000'),
         spenderAddress: '0xSEAPORT',
       };
@@ -304,7 +304,7 @@ describe('balanceRequirement', () => {
     it('should return sufficient false if requirements not met for ERC20', () => {
       const itemRequirement: ERC20Item = {
         type: ItemType.ERC20,
-        contractAddress: '0xERC20',
+        tokenAddress: '0xERC20',
         amount: BigNumber.from('1000000000000000000'),
         spenderAddress: '0xSEAPORT',
       };
