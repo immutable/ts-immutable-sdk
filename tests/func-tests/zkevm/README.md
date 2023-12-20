@@ -12,8 +12,7 @@ Functional tests using Cucumber and Gherkin
 
 ## Running the tests
 
-1. Copy the .env.example file to .env and fill in the values
-2. Run the tests: `yarn test`
+1. Run the tests: `yarn test`
 
 **Note:** Certain tests are skipped on CI because of the time they take to run. To run only these, use `yarn test:ci`
 
