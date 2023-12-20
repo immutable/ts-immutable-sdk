@@ -127,7 +127,7 @@ describe('balanceCheck', () => {
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(10),
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
         },
       ];
@@ -157,7 +157,7 @@ describe('balanceCheck', () => {
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(10),
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
         },
       ];
@@ -241,13 +241,13 @@ describe('balanceCheck', () => {
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(10),
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(10),
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
         },
       ];
@@ -338,7 +338,7 @@ describe('balanceCheck', () => {
         {
           type: ItemType.ERC20,
           amount: BigNumber.from('10'),
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
         },
         {
@@ -394,13 +394,13 @@ describe('balanceCheck', () => {
         {
           type: ItemType.ERC20,
           amount: BigNumber.from('10'),
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from('10'),
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
         },
         {

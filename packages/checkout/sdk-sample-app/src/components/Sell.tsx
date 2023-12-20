@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
 import { Box, FormControl, Select, TextInput, Option, OptionKey, Body } from '@biom3/react';
 import { utils } from 'ethers';
+import { ERC20BuyToken } from '@imtbl/checkout-sdk/dist/types';
 
 interface SellProps {
   checkout: Checkout;
@@ -21,7 +22,7 @@ export default function Sell({ checkout, provider }: SellProps) {
   const [listingTypeError, setListingTypeError] = useState<string>('');
   const [amount, setAmount] = useState<string>('');
   const [amountError, setAmountError] = useState<string>('');
-  const [tokenAddress, setContractAddress] = useState<string>('');
+  const [tokenAddress, setTokenAddress] = useState<string>('');
   const [contractAddressError, setContractAddressError] = useState<string>('');
   const [error, setError] = useState<any>(null);
   const [success, setSuccess] = useState<boolean>(false);
@@ -134,7 +135,7 @@ export default function Sell({ checkout, provider }: SellProps) {
         setListingType(ItemType.NATIVE);
         setDisabledContractAddress(true);
         setListingTypeError('');
-        setContractAddress('');
+        setTokenAddress('');
         setContractAddressError('');
         break;
       case 'erc20':
@@ -170,7 +171,7 @@ export default function Sell({ checkout, provider }: SellProps) {
                   <Option optionKey="erc20">
                     <Option.Label>ERC20</Option.Label>
                   </Option>
-                </Select> 
+                </Select>
                 {listingTypeError && (
                   <FormControl.Validation>{listingTypeError}</FormControl.Validation>
                 )}
@@ -194,7 +195,7 @@ export default function Sell({ checkout, provider }: SellProps) {
                   value={tokenAddress}
                   disabled={disableContractAddress}
                   onChange={(event: any) => {
-                    setContractAddress(event.target.value);
+                    setTokenAddress(event.target.value);
                     setContractAddressError('');
                   }}
                 />

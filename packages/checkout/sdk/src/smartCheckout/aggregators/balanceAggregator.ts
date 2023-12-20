@@ -42,8 +42,8 @@ export const erc20BalanceAggregator = (
       return;
     }
 
-    const { contractAddress, amount } = itemRequirement;
-    const key = `${contractAddress}`;
+    const { tokenAddress, amount } = itemRequirement;
+    const key = `${tokenAddress}`;
     const aggregateItem = aggregatedMap.get(key);
     if (aggregateItem && aggregateItem.type === ItemType.ERC20) {
       aggregateItem.amount = BigNumber.from(aggregateItem.amount).add(amount);

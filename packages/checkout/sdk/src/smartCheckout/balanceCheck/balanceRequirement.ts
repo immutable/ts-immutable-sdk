@@ -21,15 +21,21 @@ import { isNativeToken } from '../../tokens';
 
 export const getTokensFromRequirements = (itemRequirements: ItemRequirement[]): TokenInfo[] => itemRequirements
   .map((itemRequirement) => {
-    if (itemRequirement.type === ItemType.NATIVE) {
-      return {
-        address: NATIVE,
-      } as TokenInfo;
+    switch (itemRequirement.type) {
+      case ItemType.ERC20:
+        return {
+          address: itemRequirement.tokenAddress,
+        } as TokenInfo;
+      case ItemType.NATIVE:
+        return {
+          address: NATIVE,
+        } as TokenInfo;
+      case ItemType.ERC721:
+      default:
+        return {
+          address: itemRequirement.contractAddress,
+        } as TokenInfo;
     }
-
-    return {
-      address: itemRequirement.contractAddress,
-    } as TokenInfo;
   });
 
 /**
@@ -90,7 +96,7 @@ export const getTokenBalanceRequirement = (
   // Get the requirements related balance
   if (itemRequirement.type === ItemType.ERC20) {
     itemBalanceResult = balances.find((balance) => {
-      return (balance as TokenBalance).token?.address === itemRequirement.contractAddress;
+      return (balance as TokenBalance).token?.address === itemRequirement.tokenAddress;
     });
   } else if (itemRequirement.type === ItemType.NATIVE) {
     itemBalanceResult = balances.find((balance) => {
@@ -158,7 +164,7 @@ export const getTokenBalanceRequirement = (
       token: {
         name,
         symbol,
-        address: itemRequirement.contractAddress,
+        address: itemRequirement.tokenAddress,
         decimals,
       },
     };

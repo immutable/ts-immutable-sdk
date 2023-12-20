@@ -17,7 +17,7 @@ import {
 } from '@imtbl/checkout-sdk';
 import { abbreviateAddress } from 'lib/addressUtils';
 import { CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext';
-import { isPassportProvider } from 'lib/providerUtils';
+import { isMetaMaskProvider, isPassportProvider } from 'lib/providerUtils';
 import { calculateCryptoToFiat, tokenValueFormat } from 'lib/utils';
 import { Web3Provider } from '@ethersproject/providers';
 import { DEFAULT_QUOTE_REFRESH_INTERVAL, DEFAULT_TOKEN_DECIMALS } from 'lib';
@@ -25,6 +25,7 @@ import { useInterval } from 'lib/hooks/useInterval';
 import { FeesBreakdown } from 'components/FeesBreakdown/FeesBreakdown';
 import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
 import { utils } from 'ethers';
+import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { networkIconStyles } from './WalletNetworkButtonStyles';
 import {
   arrowIconStyles,
@@ -71,6 +72,8 @@ export function BridgeReviewSummary() {
       amount,
     },
   } = useContext(BridgeContext);
+
+  const { track } = useAnalytics();
 
   const { cryptoFiatState } = useContext(CryptoFiatContext);
   const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
@@ -172,6 +175,32 @@ export function BridgeReviewSummary() {
 
   const submitBridge = useCallback(async () => {
     if (!approveTransaction || !transaction) return;
+
+    track({
+      userJourney: UserJourney.BRIDGE,
+      screen: 'Summary',
+      control: 'Submit',
+      controlType: 'Button',
+      extras: {
+        fromWalletAddress: fromAddress,
+        fromNetwork,
+        fromWallet: {
+          address: fromAddress,
+          isPassportWallet: isPassportProvider(from?.web3Provider),
+          isMetaMask: isMetaMaskProvider(from?.web3Provider),
+        },
+        toWalletAddress: toAddress,
+        toNetwork,
+        toWallet: {
+          address: toAddress,
+          isPassportWallet: isPassportProvider(to?.web3Provider),
+          isMetaMask: isMetaMaskProvider(to?.web3Provider),
+        },
+        amount,
+        tokenAddress: token?.address,
+      },
+    });
+
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
