@@ -14,11 +14,14 @@ import {
   ChainId,
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
-import { createAndConnectToProvider, isPassportProvider } from 'lib/providerUtils';
+import {
+  createAndConnectToProvider, isMetaMaskProvider, isPassportProvider,
+} from 'lib/providerUtils';
 import { getL1ChainId, getL2ChainId } from 'lib';
 import { getChainNameById } from 'lib/chains';
 import { ViewActions, ViewContext } from 'context/view-context/ViewContext';
 import { abbreviateAddress } from 'lib/addressUtils';
+import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import {
   bridgeHeadingStyles,
   brigdeWalletWrapperStyles,
@@ -43,6 +46,8 @@ export function WalletAndNetworkSelector() {
   const {
     heading, fromFormInput, toFormInput, submitButton,
   } = text.views[BridgeWidgetViews.WALLET_NETWORK_SELECTION];
+
+  const { track } = useAnalytics();
 
   // calculating l1/l2 chains to work with based on Checkout environment
   const l1NetworkChainId = getL1ChainId(checkout.config);
@@ -105,11 +110,60 @@ export function WalletAndNetworkSelector() {
   useEffect(() => {
     if (!from || !to) return;
 
+    if (fromWalletAddress !== from?.walletAddress) {
+      track({
+        userJourney: UserJourney.BRIDGE,
+        screen: 'WalletAndNetwork',
+        control: 'FromWallet',
+        controlType: 'Select',
+        extras: {
+          walletAddress: from?.walletAddress,
+        },
+      });
+    }
+
+    if (fromNetwork !== from?.network) {
+      track({
+        userJourney: UserJourney.BRIDGE,
+        screen: 'WalletAndNetwork',
+        control: 'FromNetwork',
+        controlType: 'Select',
+        extras: {
+          chainId: from?.network,
+        },
+      });
+    }
+
+    if (toWalletAddress !== to?.walletAddress) {
+      track({
+        userJourney: UserJourney.BRIDGE,
+        screen: 'WalletAndNetwork',
+        control: 'ToWallet',
+        controlType: 'Select',
+        extras: {
+          walletAddress: to?.walletAddress,
+        },
+      });
+    }
+
+    if (toNetwork !== to?.network) {
+      track({
+        userJourney: UserJourney.BRIDGE,
+        screen: 'WalletAndNetwork',
+        control: 'ToNetwork',
+        controlType: 'Select',
+        extras: {
+          chainId: to?.network,
+        },
+      });
+    }
+
     // add local state from context values
     // if user has clicked back button
     setFromWalletWeb3Provider(from.web3Provider);
     setFromWalletAddress(from.walletAddress);
     setFromNetwork(from.network);
+
     setToWalletWeb3Provider(to.web3Provider);
     setToWalletAddress(to.walletAddress);
     setToNetwork(to.network);
@@ -291,6 +345,29 @@ export function WalletAndNetworkSelector() {
         },
       });
 
+      track({
+        userJourney: UserJourney.BRIDGE,
+        screen: 'WalletAndNetwork',
+        control: 'Next',
+        controlType: 'Button',
+        extras: {
+          fromWalletAddress,
+          fromNetwork,
+          fromWallet: {
+            address: fromWalletAddress,
+            isPassportWallet: isPassportProvider(fromWalletWeb3Provider),
+            isMetaMask: isMetaMaskProvider(fromWalletWeb3Provider),
+          },
+          toWalletAddress,
+          toNetwork,
+          toWallet: {
+            address: toWalletAddress,
+            isPassportWallet: isPassportProvider(toWalletWeb3Provider),
+            isMetaMask: isMetaMaskProvider(toWalletWeb3Provider),
+          },
+        },
+      });
+
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -366,7 +443,7 @@ export function WalletAndNetworkSelector() {
         </Box>
       )}
 
-      {/** From Network Selector, we programatically open this so there is no target */}
+      {/** From Network Selector, we programmatically open this so there is no target */}
       <Drawer
         headerBarTitle={fromFormInput.networkSelectorHeading}
         size="full"

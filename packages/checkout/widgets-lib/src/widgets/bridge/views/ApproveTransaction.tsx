@@ -2,10 +2,12 @@ import { Box } from '@biom3/react';
 import {
   useCallback,
   useContext,
+  useEffect,
   useState,
 } from 'react';
 import { CheckoutErrorType } from '@imtbl/checkout-sdk';
 import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
+import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
@@ -34,6 +36,15 @@ export function ApproveTransaction({ approveTransaction, transaction }: ApproveT
   const { viewDispatch } = useContext(ViewContext);
   const { loadingView, content, footer } = text.views[BridgeWidgetViews.APPROVE_TRANSACTION];
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+
+  const { page } = useAnalytics();
+
+  useEffect(() => {
+    page({
+      userJourney: UserJourney.BRIDGE,
+      screen: 'ApproveTransaction',
+    });
+  }, []);
 
   // Local state
   const [actionDisabled, setActionDisabled] = useState(false);
