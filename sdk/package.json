@@ -103,7 +103,7 @@
       "types": "./provider.d.ts",
       "import": "./provider.js"
     },
-    "./checkout_sdk": {
+    "./checkout": {
       "types": "./checkout.d.ts",
       "import": "./checkout.js"
     }
