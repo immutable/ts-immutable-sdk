@@ -633,7 +633,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/design-tokens@npm:*":
+"@biom3/design-tokens@npm:*, @biom3/design-tokens@npm:0.2.9":
   version: 0.2.9
   resolution: "@biom3/design-tokens@npm:0.2.9"
   dependencies:
@@ -642,26 +642,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/design-tokens@npm:0.2.4-beta":
-  version: 0.2.4-beta
-  resolution: "@biom3/design-tokens@npm:0.2.4-beta"
-  dependencies:
-    lodash.get: ^4.4.2
-  checksum: a68500472c922c5456ce19ab8d3676e72a11cc92e165291f5bf985e77b8095eddf1b93504ae16150171dfe800c84612e46df5d91f2b343efa5ee4d647c9aa0f4
-  languageName: node
-  linkType: hard
-
-"@biom3/react@npm:^0.10.12":
-  version: 0.10.15
-  resolution: "@biom3/react@npm:0.10.15"
+"@biom3/react@npm:^0.19.22":
+  version: 0.19.29
+  resolution: "@biom3/react@npm:0.19.29"
   dependencies:
     "@biom3/design-tokens": "*"
     "@emotion/css": ^11.11.2
     "@emotion/react": ^11.11.1
-    "@rive-app/react-canvas": ^4.1.4
+    "@rive-app/react-canvas": ^4.5.0
     buffer: ^6.0.3
     csstype: ^3.1.2
     framer-motion: ^10.12.12
+    localstorage-slim: ^2.7.0
     lodash.debounce: ^4.0.8
     lodash.get: ^4.4.2
     lodash.isequal: ^4.5.0
@@ -669,8 +661,9 @@ __metadata:
     react: ^18.2.0
     react-dom: ^18.2.0
     react-is: ^18.2.0
+    react-keyed-flatten-children: ^3.0.0
     ts-deepmerge: ^6.2.0
-  checksum: 6a01a5db727cf7b3bf99d083d08dd6f580d202f9916f2fe08dc99881fb65699c3f06e6ca081991de173a9bbfe1cd568baaf0db0bef8d4da8efbf2c77cb67c179
+  checksum: c3e11a700b1d97de1d65cd6186807a227b3102fbcd08ff37ec65f94a2c03814b9f7f84723a1660fcca545eda205db642fe02ac9d18f8f8fa1c9ae8c07fb0c6c7
   languageName: node
   linkType: hard
 
@@ -1349,12 +1342,12 @@ __metadata:
 
 "@imtbl/sdk@file:../../../sdk::locator=ts-immutable-sample%40workspace%3A.":
   version: 0.0.0
-  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=49f46d&locator=ts-immutable-sample%40workspace%3A."
+  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=c2918e&locator=ts-immutable-sample%40workspace%3A."
   dependencies:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
-    "@biom3/design-tokens": 0.2.4-beta
-    "@biom3/react": ^0.10.12
+    "@biom3/design-tokens": 0.2.9
+    "@biom3/react": ^0.19.22
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
     "@ethersproject/providers": ^5.7.2
@@ -1387,7 +1380,7 @@ __metadata:
   peerDependencies:
     react: ^18.2.0
     react-dom: ^18.2.0
-  checksum: 958bddf209356ef9200caef2b684730dd95b462fd4b90e4ecf8e48d534c5db66015fb5537288ff2b7facf49d0c7878bec771534f5c1260a4579d9321cc5276a9
+  checksum: 77edab6a2063b8721cf842333288417a5ec3fde98c0f2de11ad1bda5f7376d4d932ede5558896d8ea8c48e07f873e06514638280858a0a519999b74dfa519a29
   languageName: node
   linkType: hard
 
@@ -2837,21 +2830,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rive-app/canvas@npm:2.7.3":
-  version: 2.7.3
-  resolution: "@rive-app/canvas@npm:2.7.3"
-  checksum: 054571d2335d17a0831b6408482930115bf00a70b638ce6f8fd8bb6eda003325e187b2d8a85dd419fa68d1fe55066c523c0093819a4e90c9ff7cb39a604340e8
+"@rive-app/canvas@npm:2.8.3":
+  version: 2.8.3
+  resolution: "@rive-app/canvas@npm:2.8.3"
+  checksum: 1318aecc3256279b806828c53ddd4d18e3967a61a19563af2d9d86e251b5dc105d8a4839ed191da7cd4eb42f5f2f4456d85c91df35bfbf1d49c75da58a064c87
   languageName: node
   linkType: hard
 
-"@rive-app/react-canvas@npm:^4.1.4":
-  version: 4.5.3
-  resolution: "@rive-app/react-canvas@npm:4.5.3"
+"@rive-app/react-canvas@npm:^4.5.0":
+  version: 4.6.2
+  resolution: "@rive-app/react-canvas@npm:4.6.2"
   dependencies:
-    "@rive-app/canvas": 2.7.3
+    "@rive-app/canvas": 2.8.3
   peerDependencies:
     react: ^16.8.0 || ^17.0.0 || ^18.0.0
-  checksum: 281941f2ff39ff6671d2cb60b24dacd275c4fa90313416ffa8f07e4d06da3da00e3fe2a53f5c0178cb295210420688ea50587dff4931a4718450c09ab6e53c3b
+  checksum: 61180635fe7ca6bd60ee99a176fefcdca7a5c3475fd9dd7d263a809c062b1ea1168fec6902326272107afe70eae62917bf65d2e5d5073c40dbaad3baed295598
   languageName: node
   linkType: hard
 
@@ -9183,6 +9176,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"localstorage-slim@npm:^2.7.0":
+  version: 2.7.0
+  resolution: "localstorage-slim@npm:2.7.0"
+  checksum: eaa52251005baca503d28818dcde89c3c4e72c3617497a3bf2f990636c92a1f112c4a67d8eba8a2b70e40c994abe791df5043983e67585455c74d1e0fee58986
+  languageName: node
+  linkType: hard
+
 "locate-path@npm:^5.0.0":
   version: 5.0.0
   resolution: "locate-path@npm:5.0.0"
@@ -10515,6 +10515,17 @@ __metadata:
   version: 18.2.0
   resolution: "react-is@npm:18.2.0"
   checksum: e72d0ba81b5922759e4aff17e0252bd29988f9642ed817f56b25a3e217e13eea8a7f2322af99a06edb779da12d5d636e9fda473d620df9a3da0df2a74141d53e
+  languageName: node
+  linkType: hard
+
+"react-keyed-flatten-children@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "react-keyed-flatten-children@npm:3.0.0"
+  dependencies:
+    react-is: ^18.2.0
+  peerDependencies:
+    react: ">=15.0.0"
+  checksum: 07c216e7420c3830969097bc7bdedaf50ae944f59540123680b99be7da3faecb6eda9edc71243f3f88696e93c4823646c609d774eee5116bdc348a7f53909b43
   languageName: node
   linkType: hard
 
