@@ -11,8 +11,7 @@ const config = {
   testEnvironment: "jsdom",
   moduleDirectories: ["node_modules", "<rootDir>/src"],
   moduleNameMapper: {
-    "@imtbl/sdk/config": "<rootDir>/node_modules/@imtbl/sdk/dist/config",
-    "@imtbl/sdk/passport": "<rootDir>/node_modules/@imtbl/sdk/dist/passport",
+    "^@imtbl/sdk/(.*)$": "<rootDir>/node_modules/@imtbl/sdk/$1",
     "@/lib/env": "<rootDir>/src/lib/env",
   },
   modulePathIgnorePatterns: ["<rootDir>/tests/", "<rootDir>/tests-examples"],
