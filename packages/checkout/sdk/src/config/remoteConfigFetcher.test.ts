@@ -131,6 +131,23 @@ describe('RemoteConfig', () => {
           ),
         );
       });
+
+      it('should throw error when configuration is invalid JSON', async () => {
+        const mockInvalidJSONResponse = {
+          status: 200,
+          data: 'invalid json',
+        };
+        mockedAxios.get.mockResolvedValue(mockInvalidJSONResponse);
+
+        const fetcher = new RemoteConfigFetcher({
+          isDevelopment: env === ENV_DEVELOPMENT,
+          isProduction: env !== ENV_DEVELOPMENT && env === Environment.PRODUCTION,
+        });
+
+        await expect(fetcher.getConfig()).rejects.toThrowError(
+          new Error('Invalid configuration: SyntaxError: Unexpected token i in JSON at position 0'),
+        );
+      });
     });
 
     describe('tokens', () => {

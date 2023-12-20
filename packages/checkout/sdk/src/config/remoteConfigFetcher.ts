@@ -55,13 +55,29 @@ export class RemoteConfigFetcher {
     return CHECKOUT_CDN_BASE_URL[Environment.SANDBOX];
   };
 
+  // eslint-disable-next-line class-methods-use-this
+  private parseResponse<T>(response: AxiosResponse<any, any>): T {
+    let responseData: T = response.data;
+    if (response.data && typeof response.data !== 'object') {
+      try {
+        responseData = JSON.parse(response.data);
+      } catch (jsonError) {
+        throw new CheckoutError(`Invalid configuration: ${jsonError}`, CheckoutErrorType.API_ERROR);
+      }
+    }
+
+    return responseData!;
+  }
+
   private async loadConfig(): Promise<RemoteConfiguration | undefined> {
     if (this.configCache) return this.configCache;
 
     const response = await RemoteConfigFetcher.makeHttpRequest(
       `${this.getEndpoint()}/${this.version}/config`,
     );
-    this.configCache = response.data;
+
+    // Ensure that the configuration is valid
+    this.configCache = this.parseResponse<RemoteConfiguration>(response);
 
     return this.configCache;
   }
@@ -72,7 +88,9 @@ export class RemoteConfigFetcher {
     const response = await RemoteConfigFetcher.makeHttpRequest(
       `${this.getEndpoint()}/${this.version}/config/tokens`,
     );
-    this.tokensCache = response.data;
+
+    // Ensure that the configuration is valid
+    this.tokensCache = this.parseResponse<ChainsTokensConfig>(response);
 
     return this.tokensCache;
   }
