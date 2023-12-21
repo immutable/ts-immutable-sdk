@@ -4,6 +4,7 @@ import { isWeb3Provider, validateProvider } from './validateProvider';
 import { ChainId } from '../types';
 import { CheckoutConfiguration } from '../config';
 import { RemoteConfigFetcher } from '../config/remoteConfigFetcher';
+import { HttpClient } from '../api/http';
 
 jest.mock('../config/remoteConfigFetcher');
 
@@ -59,9 +60,10 @@ describe('provider validation', () => {
         ]),
       });
 
+      const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
       testCheckoutConfig = new CheckoutConfiguration({
         baseConfig: { environment: Environment.PRODUCTION },
-      });
+      }, mockedHttpClient);
     });
 
     it('should not throw an error when valid web3provider', async () => {

@@ -33,6 +33,7 @@ import { onRampRoute } from './onRamp';
 import { bridgeAndSwapRoute } from './bridgeAndSwap/bridgeAndSwapRoute';
 import { RoutingTokensAllowList } from '../allowList/types';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from './indexer/fetchL1Representation';
+import { HttpClient } from '../../api/http';
 
 jest.mock('./tokenBalances');
 jest.mock('./bridge/bridgeRoute');
@@ -52,9 +53,10 @@ describe('routingCalculator', () => {
   ]);
 
   beforeEach(() => {
+    const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
     config = new CheckoutConfiguration({
       baseConfig: { environment: Environment.SANDBOX },
-    });
+    }, mockedHttpClient);
     jest.spyOn(console, 'info').mockImplementation(() => {});
   });
 

@@ -5,13 +5,15 @@ import { getDexQuotes } from './getDexQuotes';
 import { BalanceNativeRequirement } from '../../balanceCheck/types';
 import { quoteFetcher } from '../swap/quoteFetcher';
 import { ChainId } from '../../../types';
+import { HttpClient } from '../../../api/http';
 
 jest.mock('../swap/quoteFetcher');
 
 describe('getDexQuotes', () => {
+  const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
   const config = new CheckoutConfiguration({
     baseConfig: { environment: Environment.SANDBOX },
-  });
+  }, mockedHttpClient);
 
   it('should send token addresses to the quote fetcher', async () => {
     (quoteFetcher as jest.Mock).mockResolvedValue({});
