@@ -6,7 +6,7 @@ import { fetchGasPrice } from 'lib/transactionUtils/gas';
 import { getApproval, prepareApproval } from 'lib/transactionUtils/approval';
 import { getOurQuoteReqAmount, prepareUserQuote } from 'lib/transactionUtils/getQuote';
 import { Fees } from 'lib/fees';
-import { Multicall__factory, SecondaryFee__factory } from 'contracts/types';
+import { Multicall__factory, ImmutableSwapProxy__factory } from 'contracts/types';
 import { NativeTokenService } from 'lib/nativeTokenService';
 import { DEFAULT_MAX_HOPS, DEFAULT_SLIPPAGE, MAX_MAX_HOPS, MIN_MAX_HOPS } from './constants';
 import { Router } from './lib/router';
@@ -120,7 +120,7 @@ export class Exchange {
       return [];
     }
 
-    const secondaryFeeContract = SecondaryFee__factory.connect(this.secondaryFeeContractAddress, provider);
+    const secondaryFeeContract = ImmutableSwapProxy__factory.connect(this.secondaryFeeContractAddress, provider);
 
     if (await secondaryFeeContract.paused()) {
       // Do not use secondary fees if the contract is paused

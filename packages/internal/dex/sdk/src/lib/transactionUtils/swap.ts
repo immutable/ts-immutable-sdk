@@ -1,14 +1,14 @@
 import { Trade, toHex, encodeRouteToPath, Route } from '@uniswap/v3-sdk';
 import { PaymentsExtended, SwapRouter } from '@uniswap/router-sdk';
 import * as Uniswap from '@uniswap/sdk-core';
-import { SecondaryFee__factory } from 'contracts/types';
-import { ISecondaryFee, SecondaryFeeInterface } from 'contracts/types/SecondaryFee';
 import { Fees } from 'lib/fees';
 import { isNative, toCurrencyAmount, toPublicAmount } from 'lib/utils';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
 import { NativeTokenService, canUnwrapToken } from 'lib/nativeTokenService';
 import { Coin, CoinAmount, Native } from 'types';
 import { Interface } from 'ethers/lib/utils';
+import { IImmutableSwapProxy, ImmutableSwapProxyInterface } from 'contracts/types/ImmutableSwapProxy';
+import { ImmutableSwapProxy__factory } from 'contracts/types';
 import { SecondaryFee, TransactionDetails } from '../../types';
 import { calculateGasFee } from './gas';
 import { slippageToFraction } from './slippage';
@@ -92,10 +92,10 @@ function buildSinglePoolSwapWithFees(
   amountIn: string,
   amountOut: string,
   secondaryFees: SecondaryFee[],
-  secondaryFeeContract: SecondaryFeeInterface,
+  secondaryFeeContract: ImmutableSwapProxyInterface,
   tokenOut: Coin,
 ) {
-  const secondaryFeeValues: ISecondaryFee.SecondaryFeeParamsStruct[] = secondaryFees.map((fee) => ({
+  const secondaryFeeValues: IImmutableSwapProxy.SecondaryFeeParamsStruct[] = secondaryFees.map((fee) => ({
     feeBasisPoints: fee.basisPoints,
     recipient: fee.recipient,
   }));
@@ -210,12 +210,12 @@ function buildMultiPoolSwapWithFees(
   amountIn: string,
   amountOut: string,
   secondaryFees: SecondaryFee[],
-  secondaryFeeContract: SecondaryFeeInterface,
+  secondaryFeeContract: ImmutableSwapProxyInterface,
   tokenOut: Coin,
 ) {
   const path: string = encodeRouteToPath(route, trade.tradeType === Uniswap.TradeType.EXACT_OUTPUT);
 
-  const secondaryFeeValues: ISecondaryFee.SecondaryFeeParamsStruct[] = secondaryFees.map((fee) => ({
+  const secondaryFeeValues: IImmutableSwapProxy.SecondaryFeeParamsStruct[] = secondaryFees.map((fee) => ({
     feeBasisPoints: fee.basisPoints,
     recipient: fee.recipient,
   }));
@@ -279,7 +279,7 @@ function buildSwapParameters(
   recipient: string,
   trade: Trade<Uniswap.Token, Uniswap.Token, Uniswap.TradeType>,
   secondaryFees: SecondaryFee[],
-  secondaryFeeContract: SecondaryFeeInterface,
+  secondaryFeeContract: ImmutableSwapProxyInterface,
   routerContract: Interface,
   paymentsContract: Interface,
   maximumAmountIn: string,
@@ -355,7 +355,7 @@ function createSwapCallParameters(
   maximumAmountIn: string,
   minimumAmountOut: string,
 ): string {
-  const secondaryFeeContract = SecondaryFee__factory.createInterface();
+  const secondaryFeeContract = ImmutableSwapProxy__factory.createInterface();
   const routerContract = SwapRouter.INTERFACE;
   const paymentsContract = PaymentsExtended.INTERFACE;
 
