@@ -11,6 +11,7 @@ import {
 } from '@biom3/react';
 import { ChainId } from '@imtbl/checkout-sdk';
 import { logoColour, networkIcon, networkName } from 'lib';
+import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import {
   containerStyles, actionsBadgeStyles, actionsContainerStyles, actionsLayoutStyles,
 } from './transactionItemStyles';
@@ -43,6 +44,22 @@ export function TransactionItem({
   // use for future reference.
   // https://immutable.atlassian.net/browse/WT-2007
   const action = undefined;
+
+  const { track } = useAnalytics();
+
+  const handleDetailsLinkClick = (linkDetail: { text: string, link: string, hash: string }) => {
+    track({
+      userJourney: UserJourney.BRIDGE,
+      screen: 'TransactionItem',
+      control: 'Details',
+      controlType: 'Link',
+      extras: {
+        details,
+      },
+    });
+
+    window.open(`${linkDetail.link}${linkDetail.hash}`);
+  };
 
   return (
     <Box sx={action ? containerStyles : {}}>
@@ -80,6 +97,15 @@ export function TransactionItem({
             pr: 'base.spacing.x10',
           },
         }}
+        onExpandChange={
+          (expanded) => expanded
+            && track({
+              userJourney: UserJourney.BRIDGE,
+              screen: 'TransactionItem',
+              control: 'Accordion',
+              controlType: 'Button',
+            })
+        }
       >
         <Accordion.TargetLeftSlot sx={{ pr: 'base.spacing.x2' }}>
           <MenuItem size="xSmall">
@@ -90,7 +116,14 @@ export function TransactionItem({
             <MenuItem.Caption>
               <Link
                 size="xSmall"
-                rc={<a target="_blank" href={`${details.link}${details.hash}`} rel="noreferrer" />}
+                rc={(
+                  <a
+                    target="_blank"
+                    href="#"
+                    rel="noreferrer"
+                    onClick={() => handleDetailsLinkClick(details)}
+                  />
+                )}
               >
                 {details.text}
               </Link>
