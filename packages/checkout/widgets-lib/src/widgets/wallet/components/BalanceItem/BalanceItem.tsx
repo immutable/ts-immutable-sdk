@@ -60,7 +60,8 @@ export function BalanceItem({
       && (supportedTopUps?.isOnRampEnabled ?? true);
     setIsOnRampEnabled(enableAddCoin);
 
-    const enableMoveCoin = network.chainId === getL1ChainId(checkout.config)
+    const enableMoveCoin = (network.chainId === getL1ChainId(checkout.config)
+    || network.chainId === getL2ChainId(checkout.config))
       && (supportedTopUps?.isBridgeEnabled ?? true)
       && !isPassport;
     setIsBridgeEnabled(enableMoveCoin);
