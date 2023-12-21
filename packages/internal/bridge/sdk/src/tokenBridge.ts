@@ -982,10 +982,11 @@ export class TokenBridge {
       pending: [],
     };
 
-    for (let i = 0, l = pending.length; i < l; i++) {
-      const timeoutEnd = pending[i].timestamp.toNumber() + (60 * 60 * 24);
-      const timestampNow = Math.floor(Date.now() / 1000);
+    const timestampNow = Math.floor(Date.now() / 1000);
 
+    for (let i = 0, l = pending.length; i < l; i++) {
+      // @TODO query timeout from contract (SMR-2090)
+      const timeoutEnd = pending[i].timestamp.toNumber() + (60 * 60 * 24);
       if (timeoutEnd > timestampNow) {
         pendingWithdrawals.pending[i] = {
           canWithdraw: false,
