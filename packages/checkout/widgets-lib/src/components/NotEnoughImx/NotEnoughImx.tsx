@@ -2,6 +2,7 @@ import {
   Body,
   Drawer, Box, Button, FramedImage, Heading, Logo,
 } from '@biom3/react';
+import { useTranslation } from 'react-i18next';
 import {
   containerStyles,
   contentTextStyles,
@@ -9,7 +10,6 @@ import {
   actionButtonContainerStyles,
   logoContainerStyles,
 } from './NotEnoughImxStyles';
-import { text } from '../../resources/text/textConfig';
 
 type NotEnoughImxProps = {
   visible: boolean;
@@ -22,8 +22,8 @@ type NotEnoughImxProps = {
 export function NotEnoughImx({
   visible, showAdjustAmount, hasZeroImx, onCloseDrawer, onAddCoinsClick,
 }: NotEnoughImxProps) {
-  const { content, buttons } = text.drawers.notEnoughImx;
-  const { noImx, insufficientImx } = content;
+  const { t } = useTranslation();
+  // const { noImx, insufficientImx } = content;
 
   const imxLogo = 'https://design-system.immutable.com/hosted-for-ds/currency-icons/currency--imx.svg';
 
@@ -49,10 +49,10 @@ export function NotEnoughImx({
             sx={contentTextStyles}
             testId="not-enough-gas-heading"
           >
-            {hasZeroImx ? noImx.heading : insufficientImx.heading}
+            {t(`drawers.notEnoughImx.content.${hasZeroImx ? 'noImx' : 'insufficientImx'}.heading`)}
           </Heading>
           <Body sx={contentTextStyles}>
-            {hasZeroImx ? noImx.body : insufficientImx.body}
+            {t(`drawers.notEnoughImx.content.${hasZeroImx ? 'noImx' : 'insufficientImx'}.body`)}
           </Body>
           <Box sx={actionButtonContainerStyles}>
             {showAdjustAmount && (
@@ -62,7 +62,7 @@ export function NotEnoughImx({
                 variant="tertiary"
                 onClick={onCloseDrawer}
               >
-                {buttons.adjustAmount}
+                {t('drawers.notEnoughImx.buttons.adjustAmount')}
               </Button>
             )}
             <Button
@@ -71,7 +71,7 @@ export function NotEnoughImx({
               variant="tertiary"
               onClick={onAddCoinsClick}
             >
-              {buttons.addMoreImx}
+              {t('drawers.notEnoughImx.buttons.addMoreImx')}
             </Button>
             <Button
               sx={actionButtonStyles}
@@ -79,7 +79,7 @@ export function NotEnoughImx({
               onClick={onCloseDrawer}
               testId="not-enough-gas-cancel-button"
             >
-              {buttons.cancel}
+              {t('drawers.notEnoughImx.buttons.cancel')}
             </Button>
           </Box>
           <Box sx={logoContainerStyles}>

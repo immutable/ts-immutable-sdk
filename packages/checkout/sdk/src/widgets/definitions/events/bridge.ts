@@ -5,6 +5,7 @@ export enum BridgeEventType {
   CLOSE_WIDGET = 'close-widget',
   FAILURE = 'failure',
   TRANSACTION_SENT = 'transaction-sent',
+  LANGUAGE_CHANGED = 'language-changed',
 }
 
 /**

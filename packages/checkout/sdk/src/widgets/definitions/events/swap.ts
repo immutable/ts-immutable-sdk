@@ -6,6 +6,7 @@ export enum SwapEventType {
   SUCCESS = 'success',
   FAILURE = 'failure',
   REJECTED = 'rejected',
+  LANGUAGE_CHANGED = 'language-changed',
 }
 
 /**

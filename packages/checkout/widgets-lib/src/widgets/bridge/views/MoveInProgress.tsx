@@ -1,11 +1,10 @@
 import { useContext, useEffect } from 'react';
-import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
+import { useTranslation } from 'react-i18next';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { RocketHero } from '../../../components/Hero/RocketHero';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import { text } from '../../../resources/text/textConfig';
 import { sendBridgeTransactionSentEvent, sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
@@ -16,10 +15,10 @@ export interface MoveInProgressProps {
 }
 
 export function MoveInProgress({ transactionHash }: MoveInProgressProps) {
+  const { t } = useTranslation();
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
   const { page } = useAnalytics();
 
-  const { heading, body2 } = text.views[BridgeWidgetViews.IN_PROGRESS];
   const {
     bridgeState: { checkout },
   } = useContext(BridgeContext);
@@ -50,8 +49,8 @@ export function MoveInProgress({ transactionHash }: MoveInProgressProps) {
       heroContent={<RocketHero environment={checkout.config.environment} />}
       floatHeader
     >
-      <SimpleTextBody heading={heading}>
-        {body2}
+      <SimpleTextBody heading={t('views.IN_PROGRESS.heading')}>
+        {t('views.IN_PROGRESS.body2')}
       </SimpleTextBody>
     </SimpleLayout>
   );

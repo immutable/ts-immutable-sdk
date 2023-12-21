@@ -3,15 +3,14 @@ import { SimpleLayout } from 'components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from 'components/Footer/FooterLogo';
 import { useContext, useEffect } from 'react';
 import { EventTargetContext } from 'context/event-target-context/EventTargetContext';
-import { text } from 'resources/text/textConfig';
-import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
+import { useTranslation } from 'react-i18next';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
 import { BridgeReviewSummary } from '../components/BridgeReviewSummary';
 
 export function BridgeReview() {
+  const { t } = useTranslation();
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
-  const { layoutHeading } = text.views[BridgeWidgetViews.BRIDGE_REVIEW];
 
   const { page } = useAnalytics();
 
@@ -28,7 +27,7 @@ export function BridgeReview() {
       header={(
         <HeaderNavigation
           showBack
-          title={layoutHeading}
+          title={t('views.BRIDGE_REVIEW.layoutHeading')}
           onCloseButtonClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
         />
       )}

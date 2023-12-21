@@ -12,8 +12,8 @@ import {
   SwitchNetworkParams,
 } from '@imtbl/checkout-sdk';
 import { logoColour, networkIcon } from 'lib';
+import { useTranslation } from 'react-i18next';
 import { WalletContext } from '../../context/WalletContext';
-import { text } from '../../../../resources/text/textConfig';
 import { sendNetworkSwitchEvent } from '../../WalletWidgetEvents';
 import {
   activeNetworkButtonStyle,
@@ -28,7 +28,6 @@ import {
   ViewActions,
   SharedViews,
 } from '../../../../context/view-context/ViewContext';
-import { WalletWidgetViews } from '../../../../context/view-context/WalletViewContextTypes';
 import {
   ConnectLoaderContext,
 } from '../../../../context/connect-loader-context/ConnectLoaderContext';
@@ -40,12 +39,12 @@ export interface NetworkMenuProps {
 }
 
 export function NetworkMenu({ setBalancesLoading }: NetworkMenuProps) {
+  const { t } = useTranslation();
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
   const { checkout, provider } = connectLoaderState;
   const { viewDispatch } = useContext(ViewContext);
   const { walletState, walletDispatch } = useContext(WalletContext);
-  const { networkStatus } = text.views[WalletWidgetViews.WALLET_BALANCES];
   const { network } = walletState;
   const [allowedNetworks, setNetworks] = useState<NetworkInfo[] | undefined>(
     [],
@@ -107,7 +106,7 @@ export function NetworkMenu({ setBalancesLoading }: NetworkMenuProps) {
   return (
     <Box testId="network-menu" sx={networkMenuStyles}>
       <Body testId="network-heading" size="medium" sx={networkHeadingStyle}>
-        {networkStatus.heading}
+        {t('views.WALLET_BALANCES.networkStatus.heading')}
       </Body>
       <HorizontalMenu>
         {checkout
