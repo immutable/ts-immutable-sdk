@@ -6,6 +6,10 @@
         "content": "購入、販売、取引、およびコインとコレクティブルを保存するには、デジタルウォレットを接続または作成する必要があります。"
       }
     },
+    "CONNECT_SUCCESS": {
+      "status": "接続が安全です",
+      "action": "続ける"
+    },
     "READY_TO_CONNECT": {
       "header": {
         "title": "接続する"
@@ -76,7 +80,8 @@
       },
       "tokenBalancesList": {
         "noTokensFound": "トークンが見つかりません"
-      }
+      },
+      "addCoins": "コインを追加"
     },
     "SETTINGS": {
       "header": {

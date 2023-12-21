@@ -6,6 +6,10 @@
         "content": "您需要连接或创建数字钱包以购买、出售、交易和存储您的硬币和收藏品。"
       }
     },
+    "CONNECT_SUCCESS": {
+      "status": "连接安全",
+      "action": "继续"
+    },
     "READY_TO_CONNECT": {
       "header": {
         "title": "连接"
@@ -76,7 +80,8 @@
       },
       "tokenBalancesList": {
         "noTokensFound": "未发现代币"
-      }
+      },
+      "addCoins": "添加硬币"
     },
     "SETTINGS": {
       "header": {

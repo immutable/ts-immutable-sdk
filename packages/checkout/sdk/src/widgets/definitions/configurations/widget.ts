@@ -7,5 +7,5 @@ import { WidgetTheme } from './theme';
 export type WidgetConfiguration = {
   /** The theme of the Checkout Widget (default: "DARK") */
   theme?: WidgetTheme;
-  language?: 'en' | 'ja';
+  language?: 'en' | 'ja' | 'ko' | 'zh'
 };

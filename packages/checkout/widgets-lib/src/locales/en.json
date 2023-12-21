@@ -6,6 +6,10 @@
         "content": "You'll need to connect or create a digital wallet to buy, sell, trade and store your coins and collectibles."
       }
     },
+    "CONNECT_SUCCESS": {
+      "status": "Connection secure",
+      "action": "Continue"
+    },
     "READY_TO_CONNECT": {
       "header": {
         "title": "Connect"
@@ -76,7 +80,8 @@
       },
       "tokenBalancesList": {
         "noTokensFound": "No tokens found"
-      }
+      },
+      "addCoins": "Add coins"
     },
     "SETTINGS": {
       "header": {

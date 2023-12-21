@@ -15,10 +15,11 @@ import {
   SwapEventType,
   WalletEventType,
   WalletNetworkSwitch,
-  WidgetTheme, WidgetType, ProviderEventType, ProviderUpdated
+  WidgetTheme, WidgetType, ProviderEventType, ProviderUpdated, WidgetConfiguration, WidgetProperties
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { passport } from './passport';
+import { LanguageSelector } from './LanguageSelector';
 
 // Create one instance of Checkout and inject Passport
 const checkout = new Checkout({
@@ -43,6 +44,7 @@ export const MainPage = () => {
 
   // local state for enabling/disabling and changing buttons
   const [doneSwap, setDoneSwap] = useState<boolean>(false);
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('en');
   const [web3Provider, setWeb3Provider] = useState<Web3Provider | undefined>(undefined);
 
   useEffect(() => {
@@ -107,6 +109,16 @@ export const MainPage = () => {
     await passport.logout();
   }, [passport])
 
+  const updateLanguage = useCallback((language: string) => {
+    setSelectedLanguage(language);
+    const languageUpdate: WidgetProperties<any> = { config: { language } } as WidgetProperties<any>;
+    connectWidget.update(languageUpdate);
+    walletWidget.update(languageUpdate);
+    bridgeWidget.update(languageUpdate);
+    swapWidget.update(languageUpdate);
+    onRampWidget.update(languageUpdate);
+  }, [onRampWidget, web3Provider])
+
   return (
     <Box sx={{ minWidth: '100vw', minHeight: '100vh', width: '100%', height: '100%', backgroundColor: 'base.color.brand.6' }}>
       <Box sx={{ width: '100%', padding: 'base.spacing.x4', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -117,6 +129,7 @@ export const MainPage = () => {
           <Button onClick={openSwapWidget}>Swap</Button>
           <Button onClick={openBridgeWidget}>Bridge</Button>
           <Button onClick={openOnRampWidget}>On-ramp</Button>
+          <LanguageSelector onLanguageChange={(language: string) => updateLanguage(language)} language={selectedLanguage} />
         </Box>
         {passport && web3Provider && (web3Provider.provider as any)?.isPassport && <Button onClick={logout}>Passport Logout</Button>}
       </Box>

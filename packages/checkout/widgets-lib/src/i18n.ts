@@ -5,6 +5,8 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import { initReactI18next } from 'react-i18next';
 import enTranslations from './locales/en.json';
 import jaTranslations from './locales/ja.json';
+import koTranslations from './locales/ko.json';
+import zhTranslations from './locales/zh.json';
 
 const resources: Resource = {
   en: {
@@ -12,6 +14,12 @@ const resources: Resource = {
   },
   ja: {
     translation: jaTranslations,
+  },
+  ko: {
+    translation: koTranslations,
+  },
+  zh: {
+    translation: zhTranslations,
   },
 };
 
