@@ -2,7 +2,7 @@ import {
   ETH_MAINNET_TO_ZKEVM_MAINNET, 
   ETH_SEPOLIA_TO_ZKEVM_DEVNET, 
   ETH_SEPOLIA_TO_ZKEVM_TESTNET 
-} from '@imtbl/bridge-sdk/constants/bridges';
+} from '@imtbl/bridge-sdk';
 import { ethers } from 'ethers';
 
 export async function setupForBridge() {
