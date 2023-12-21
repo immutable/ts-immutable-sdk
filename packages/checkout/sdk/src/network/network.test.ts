@@ -464,7 +464,7 @@ describe('network functions', () => {
 
       const emptyCheckoutConfiguration = new CheckoutConfiguration({
         baseConfig: { environment: Environment.SANDBOX },
-      });
+      }, mockedHttpClient);
       const allowListResult = await getNetworkAllowList(emptyCheckoutConfiguration, {
         type: NetworkFilterTypes.ALL,
       });
