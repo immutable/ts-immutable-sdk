@@ -19,7 +19,7 @@ jest.mock('ethers', () => ({
 describe('erc721', () => {
   const mockProvider = {} as unknown as Web3Provider;
 
-  describe('getERC20Allowance', () => {
+  describe('getERC721ApprovedAddress', () => {
     it('should get the allowance from the contract', async () => {
       const getApprovedMock = jest.fn().mockResolvedValue('0xSEAPORT');
       (Contract as unknown as jest.Mock).mockReturnValue({
@@ -29,10 +29,10 @@ describe('erc721', () => {
       const address = await getERC721ApprovedAddress(
         mockProvider,
         '0xERC721',
-        0,
+        BigNumber.from(0),
       );
       expect(address).toEqual('0xSEAPORT');
-      expect(getApprovedMock).toBeCalledWith(0);
+      expect(getApprovedMock).toBeCalledWith(BigNumber.from(0));
     });
 
     it('should throw checkout error when getApproved call errors', async () => {
@@ -49,7 +49,7 @@ describe('erc721', () => {
         await getERC721ApprovedAddress(
           mockProvider,
           '0xERC721',
-          0,
+          BigNumber.from(0),
         );
       } catch (err: any) {
         message = err.message;
@@ -63,7 +63,7 @@ describe('erc721', () => {
         id: '0',
         contractAddress: '0xERC721',
       });
-      expect(getApprovedMock).toBeCalledWith(0);
+      expect(getApprovedMock).toBeCalledWith(BigNumber.from(0));
     });
   });
 
@@ -81,10 +81,10 @@ describe('erc721', () => {
         '0xADDRESS',
         '0xERC721',
         '0xSEAPORT',
-        0,
+        BigNumber.from(0),
       );
       expect(approvalTransaction).toEqual({ from: '0xADDRESS', data: '0xDATA' });
-      expect(approveMock).toBeCalledWith('0xSEAPORT', 0);
+      expect(approveMock).toBeCalledWith('0xSEAPORT', BigNumber.from(0));
     });
 
     it('should throw checkout error if call to approve fails', async () => {
@@ -105,7 +105,7 @@ describe('erc721', () => {
           '0xADDRESS',
           '0xERC721',
           '0xSEAPORT',
-          0,
+          BigNumber.from(0),
         );
       } catch (err: any) {
         message = err.message;
@@ -121,7 +121,7 @@ describe('erc721', () => {
         spenderAddress: '0xSEAPORT',
         ownerAddress: '0xADDRESS',
       });
-      expect(approveMock).toBeCalledWith('0xSEAPORT', 0);
+      expect(approveMock).toBeCalledWith('0xSEAPORT', BigNumber.from(0));
     });
   });
 
@@ -476,7 +476,7 @@ describe('erc721', () => {
     it('should converts a valid string ID to a number', () => {
       const id = '123';
       const result = convertIdToNumber(id, '0xERC721');
-      expect(result).toBe(123);
+      expect(result.toNumber()).toBe(123);
     });
 
     it('should throw checkout error an error for invalid string ID', () => {

@@ -1,5 +1,5 @@
 import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
-import { Contract } from 'ethers';
+import { BigNumber, Contract } from 'ethers';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { ItemRequirement, ItemType } from '../../types';
 import { Allowance, InsufficientERC721 } from './types';
@@ -34,7 +34,7 @@ export const getApproveTransaction = async (
   ownerAddress: string,
   contractAddress: string,
   spenderAddress: string,
-  id: number,
+  id: BigNumber,
 ): Promise<TransactionRequest | undefined> => {
   try {
     const contract = new Contract(
@@ -61,7 +61,7 @@ export const getApproveTransaction = async (
 export const getERC721ApprovedAddress = async (
   provider: Web3Provider,
   contractAddress: string,
-  id: number,
+  id: BigNumber,
 ): Promise<string> => {
   try {
     const contract = new Contract(
@@ -79,18 +79,16 @@ export const getERC721ApprovedAddress = async (
   }
 };
 
-export const convertIdToNumber = (id: string, contractAddress: string): number => {
-  const parsedId = parseInt(id, 10);
-
-  if (Number.isNaN(parsedId)) {
+export const convertIdToNumber = (id: string, contractAddress: string): BigNumber => {
+  try {
+    return BigNumber.from(id);
+  } catch (e) {
     throw new CheckoutError(
       'Invalid ERC721 ID',
       CheckoutErrorType.GET_ERC721_ALLOWANCE_ERROR,
       { id, contractAddress },
     );
   }
-
-  return parsedId;
 };
 
 export const getApprovedCollections = async (
