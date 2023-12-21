@@ -258,12 +258,12 @@
         "heading": "How would you like to pay?"
       },
       "options": {
-        "CRYPTO": {
+        "crypto": {
           "heading": "Coins",
           "caption": "Using the coins balance in your wallet",
           "disabledCaption": "We can't see enough coins in your balance"
         },
-        "FIAT": {
+        "fiat": {
           "heading": "Card",
           "caption": "GooglePay also available with Transak",
           "disabledCaption": null
@@ -332,7 +332,7 @@
           "primaryAction": "Try again",
           "secondaryAction": "Cancel"
         },
-        "DEFAULT": {
+        "DEFAULT_ERROR": {
           "description": "Sorry, something went wrong. Please try again.",
           "primaryAction": "Try again",
           "secondaryAction": "Dismiss"

@@ -258,12 +258,12 @@
         "heading": "어떤 방법으로 결제하시겠습니까?"
       },
       "options": {
-        "CRYPTO": {
+        "crypto": {
           "heading": "코인",
           "caption": "지갑에 있는 코인 잔액을 이용하여",
           "disabledCaption": "지갑의 충분한 코인을 볼 수 없습니다"
         },
-        "FIAT": {
+        "fiat": {
           "heading": "카드",
           "caption": "Transak에서 GooglePay도 이용 가능합니다",
           "disabledCaption": ""
@@ -332,7 +332,7 @@
           "primaryAction": "다시 시도",
           "secondaryAction": "취소"
         },
-        "DEFAULT": {
+        "DEFAULT_ERROR": {
           "description": "죄송합니다, 문제가 발생했습니다. 다시 시도하세요.",
           "primaryAction": "다시 시도",
           "secondaryAction": "닫기"
