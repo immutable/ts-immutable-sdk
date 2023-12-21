@@ -116,7 +116,7 @@ describe('RemoteConfig', () => {
         });
 
         await expect(fetcher.getConfig()).rejects.toThrowError(
-          new Error('Invalid configuration: SyntaxError: Unexpected token i in JSON at position 0'),
+          new Error('Invalid configuration'),
         );
       });
     });
