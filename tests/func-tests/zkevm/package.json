@@ -1,5 +1,5 @@
 {
-  "name": "func-tests",
+  "name": "func-tests-imx",
   "packageManager": "yarn@3.6.1",
   "devDependencies": {
     "@swc/jest": "^0.2.29",
@@ -15,16 +15,12 @@
   "scripts": {
     "test": "jest",
     "test:ci": "TAGS=\"not @skip and not @slow\" jest",
-    "postinstall": "cd ../.. && husky install",
+    "postinstall": "cd ../../.. && husky install",
     "prepack": "pinst --disable",
     "postpack": "pinst --enable"
   },
   "dependencies": {
-    "@ethersproject/providers": "^5.7.2",
-    "@ethersproject/units": "^5.7.0",
-    "@ethersproject/wallet": "^5.7.0",
-    "@imtbl/core-sdk": "^2.4.1",
-    "@imtbl/sdk": "file:../../sdk",
+    "@imtbl/sdk": "file:../../../sdk",
     "dotenv": "^16.3.1"
   }
 }
