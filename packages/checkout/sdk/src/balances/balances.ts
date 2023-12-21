@@ -18,7 +18,7 @@ import {
   BlockscoutToken,
   BlockscoutTokens,
   BlockscoutTokenType,
-} from '../client';
+} from '../api/blockscout';
 import {
   DEFAULT_TOKEN_DECIMALS, ERC20ABI, NATIVE,
 } from '../env';
@@ -96,6 +96,7 @@ const blockscoutClientMap: Map<ChainId, Blockscout> = new Map();
 export const resetBlockscoutClientMap = () => blockscoutClientMap.clear();
 
 export const getIndexerBalance = async (
+  config: CheckoutConfiguration,
   walletAddress: string,
   chainId: ChainId,
   filterTokens: TokenInfo[] | undefined,
@@ -111,7 +112,8 @@ export const getIndexerBalance = async (
   // Get blockscout client for the given chain
   let blockscoutClient = blockscoutClientMap.get(chainId);
   if (!blockscoutClient) {
-    blockscoutClient = new Blockscout({ chainId });
+    const httpClient = config.remote.getHttpClient();
+    blockscoutClient = new Blockscout(httpClient, chainId);
     blockscoutClientMap.set(chainId, blockscoutClient);
   }
 
@@ -135,13 +137,13 @@ export const getIndexerBalance = async (
         items.push(...resp.items);
       } while (resp.next_page_params);
     } catch (err: any) {
-    // In case of a 404, the wallet is a new wallet that hasn't been indexed by
-    // the Blockscout just yet. This happens when a wallet hasn't had any
-    // activity on the chain. In this case, simply ignore the error and return
-    // no currencies.
-    // In case of a malformed wallet address, Blockscout returns a 422, which
-    // means we are safe to assume that a 404 is a missing wallet due to inactivity
-    // or simply an incorrect wallet address was provided.
+      // In case of a 404, the wallet is a new wallet that hasn't been indexed by
+      // the Blockscout just yet. This happens when a wallet hasn't had any
+      // activity on the chain. In this case, simply ignore the error and return
+      // no currencies.
+      // In case of a malformed wallet address, Blockscout returns a 422, which
+      // means we are safe to assume that a 404 is a missing wallet due to inactivity
+      // or simply an incorrect wallet address was provided.
       if (err?.code !== HttpStatusCode.NotFound) {
         throw new CheckoutError(
           err.message || 'InternalServerError | getTokensByWalletAddress',
@@ -296,7 +298,7 @@ export const getAllBalances = async (
     return await measureAsyncExecution<GetAllBalancesResult>(
       config,
       `Time to fetch balances using blockscout for ${chainId}`,
-      getIndexerBalance(address!, chainId, isL1Chain ? tokens : undefined),
+      getIndexerBalance(config, address!, chainId, isL1Chain ? tokens : undefined),
     );
   }
 

@@ -26,5 +26,8 @@
     "@imtbl/core-sdk": "^2.4.1",
     "@imtbl/sdk": "file:../../sdk",
     "dotenv": "^16.3.1"
+  },
+  "resolutions": {
+    "@openzeppelin/contracts": "3.4.2-solc-0.7"
   }
 }

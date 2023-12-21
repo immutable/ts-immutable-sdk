@@ -1,7 +1,7 @@
 import { WalletProviderName } from '@imtbl/checkout-sdk';
 import { MenuItem } from '@biom3/react';
 import { useState } from 'react';
-import { text } from '../../../resources/text/textConfig';
+import { useTranslation } from 'react-i18next';
 import { walletItemLogoStyles } from './WalletItemStyles';
 
 export interface WalletItemProps {
@@ -16,7 +16,7 @@ export function WalletItem({
   onWalletClick,
   loading,
 }: WalletItemProps) {
-  const { wallets } = text;
+  const { t } = useTranslation();
   const [showLoadingIcon, setShowLoadingIcon] = useState(false);
 
   const logo = {
@@ -45,7 +45,7 @@ export function WalletItem({
         sx={walletItemLogoStyles}
       />
       <MenuItem.Label size="medium">
-        {wallets[walletProviderName].heading}
+        {t(`wallets.${walletProviderName}.heading`)}
       </MenuItem.Label>
       {showLoadingIcon && (<MenuItem.StatefulButtCon state="loading" icon="Loading" />)}
     </MenuItem>

@@ -3,12 +3,11 @@ import {
   useContext, useEffect, useMemo, useState,
 } from 'react';
 import { WidgetTheme } from '@imtbl/checkout-sdk';
+import { useTranslation } from 'react-i18next';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { QuickswapFooter } from '../../../components/Footer/QuickswapFooter';
 import { sendSwapWidgetCloseEvent } from '../SwapWidgetEvents';
-import { text } from '../../../resources/text/textConfig';
-import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import { SwapForm } from '../components/SwapForm';
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { hasZeroBalance } from '../../../lib/gasBalanceCheck';
@@ -33,7 +32,7 @@ export function SwapCoins({
   fromTokenAddress,
   toTokenAddress,
 }: SwapCoinsProps) {
-  const { header } = text.views[SwapWidgetViews.SWAP];
+  const { t } = useTranslation();
   const { viewState, viewDispatch } = useContext(ViewContext);
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
@@ -74,7 +73,7 @@ export function SwapCoins({
       header={(
         <HeaderNavigation
           showBack={showBackButton}
-          title={header.title}
+          title={t('views.SWAP.header.title')}
           onCloseButtonClick={() => sendSwapWidgetCloseEvent(eventTarget)}
         />
       )}

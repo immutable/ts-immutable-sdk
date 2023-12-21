@@ -7,10 +7,10 @@ import { utils } from 'ethers';
 import { fetchTokenSymbols } from 'lib/fetchTokenSymbols';
 import { CryptoFiatActions, CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext';
 import { ButtonNavigationStyles } from 'components/Header/HeaderStyles';
+import { useTranslation } from 'react-i18next';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import { text } from '../../../resources/text/textConfig';
 import { TotalTokenBalance } from '../components/TotalTokenBalance/TotalTokenBalance';
 import { TokenBalanceList } from '../components/TokenBalanceList/TokenBalanceList';
 import { NetworkMenu } from '../components/NetworkMenu/NetworkMenu';
@@ -51,6 +51,7 @@ export function WalletBalances({
   balancesLoading,
   setBalancesLoading,
 }: WalletBalancesProps) {
+  const { t } = useTranslation();
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
@@ -59,7 +60,6 @@ export function WalletBalances({
 
   const { viewDispatch } = useContext(ViewContext);
   const [totalFiatAmount, setTotalFiatAmount] = useState(0.0);
-  const { header } = text.views[WalletWidgetViews.WALLET_BALANCES];
   const {
     network,
     supportedTopUps,
@@ -204,7 +204,7 @@ export function WalletBalances({
       testId="wallet-balances"
       header={(
         <HeaderNavigation
-          title={header.title}
+          title={t('views.WALLET_BALANCES.header.title')}
           rightActions={(
             <ButtCon
               icon="SettingsCog"
@@ -263,7 +263,7 @@ export function WalletBalances({
             onClick={handleAddCoinsClick}
           >
             <MenuItem.FramedIcon icon="Add" />
-            <MenuItem.Label>Add coins</MenuItem.Label>
+            <MenuItem.Label>{t('views.WALLET_BALANCES.addCoins')}</MenuItem.Label>
           </MenuItem>
         )}
         <NotEnoughGas

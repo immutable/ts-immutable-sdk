@@ -7,6 +7,7 @@ export enum WalletEventType {
   CLOSE_WIDGET = 'close-widget',
   NETWORK_SWITCH = 'network-switch',
   DISCONNECT_WALLET = 'disconnect-wallet',
+  LANGUAGE_CHANGED = 'language-changed',
 }
 
 /**

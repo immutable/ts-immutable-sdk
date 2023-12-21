@@ -177,9 +177,9 @@ describe('fundingRouteFees', () => {
         {
           type: FundingStepType.BRIDGE,
           fees: {
-            approvalGasFees: ethFee,
+            approvalGasFee: ethFee,
             bridgeFees: [ethFee, ethFee],
-            bridgeGasFees: ethFee,
+            bridgeGasFee: ethFee,
 
           },
         },
@@ -197,9 +197,9 @@ describe('fundingRouteFees', () => {
         {
           type: FundingStepType.SWAP,
           fees: {
-            approvalGasFees: imxFee,
+            approvalGasFee: imxFee,
             swapFees: [imxFee, imxFee],
-            swapGasFees: imxFee,
+            swapGasFee: imxFee,
 
           },
         },
@@ -217,18 +217,18 @@ describe('fundingRouteFees', () => {
         {
           type: FundingStepType.BRIDGE,
           fees: {
-            approvalGasFees: ethFee,
+            approvalGasFee: ethFee,
             bridgeFees: [ethFee, ethFee],
-            bridgeGasFees: ethFee,
+            bridgeGasFee: ethFee,
 
           },
         },
         {
           type: FundingStepType.SWAP,
           fees: {
-            approvalGasFees: imxFee,
+            approvalGasFee: imxFee,
             swapFees: [imxFee, imxFee],
-            swapGasFees: imxFee,
+            swapGasFee: imxFee,
 
           },
         },

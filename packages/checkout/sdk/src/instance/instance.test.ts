@@ -7,6 +7,7 @@ import { ChainId } from '../types';
 import { createBridgeInstance, createExchangeInstance, createOrderbookInstance } from './instance';
 import { CheckoutConfiguration } from '../config';
 import { RemoteConfigFetcher } from '../config/remoteConfigFetcher';
+import { HttpClient } from '../api/http';
 
 jest.mock('../instance');
 jest.mock('../config/remoteConfigFetcher');
@@ -34,9 +35,10 @@ describe('instance', () => {
     }),
   });
 
+  const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
   const config: CheckoutConfiguration = new CheckoutConfiguration({
     baseConfig: { environment: Environment.SANDBOX },
-  });
+  }, mockedHttpClient);
 
   describe('createBridgeInstance', () => {
     const readOnlyProviders = new Map<

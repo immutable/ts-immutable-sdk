@@ -2,13 +2,15 @@ import { Environment } from '@imtbl/config';
 import { CheckoutConfiguration } from '../../../config';
 import { fetchL1Representation } from '../indexer/fetchL1Representation';
 import { fetchL1ToL2Mappings } from './fetchL1ToL2Mappings';
+import { HttpClient } from '../../../api/http';
 
 jest.mock('../indexer/fetchL1Representation');
 
 describe('fetchL1ToL2Mappings', () => {
+  const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
   const config = new CheckoutConfiguration({
     baseConfig: { environment: Environment.SANDBOX },
-  });
+  }, mockedHttpClient);
 
   it('should fetch the l1 to l2 token mapping', async () => {
     (fetchL1Representation as jest.Mock)

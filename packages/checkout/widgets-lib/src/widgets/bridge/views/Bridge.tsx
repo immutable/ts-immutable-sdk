@@ -5,14 +5,13 @@ import {
   useState,
 } from 'react';
 import { TokenFilterTypes } from '@imtbl/checkout-sdk';
-import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
+import { useTranslation } from 'react-i18next';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { BridgeForm } from '../components/BridgeForm';
-import { text } from '../../../resources/text/textConfig';
 import { BridgeActions, BridgeContext } from '../context/BridgeContext';
 import { useInterval } from '../../../lib/hooks/useInterval';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
@@ -26,7 +25,7 @@ export interface BridgeProps {
 }
 
 export function Bridge({ amount, tokenAddress }: BridgeProps) {
-  const { header } = text.views[BridgeWidgetViews.BRIDGE_FORM];
+  const { t } = useTranslation();
   const { bridgeState, bridgeDispatch } = useContext(BridgeContext);
   const { checkout, from } = bridgeState;
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
@@ -102,7 +101,7 @@ export function Bridge({ amount, tokenAddress }: BridgeProps) {
       header={(
         <HeaderNavigation
           showBack={showBackButton}
-          title={header.title}
+          title={t('views.BRIDGE_FORM.header.title')}
           onCloseButtonClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
         />
       )}
