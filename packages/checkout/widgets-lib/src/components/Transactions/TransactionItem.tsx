@@ -54,7 +54,7 @@ export function TransactionItem({
       control: 'Details',
       controlType: 'Link',
       extras: {
-        details,
+        linkDetail,
       },
     });
 
