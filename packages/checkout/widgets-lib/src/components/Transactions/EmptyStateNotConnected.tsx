@@ -4,6 +4,7 @@ import { text } from 'resources/text/textConfig';
 import { Checkout, WalletProviderName } from '@imtbl/checkout-sdk';
 import { WalletDrawer } from 'widgets/bridge/components/WalletDrawer';
 import { useMemo, useState } from 'react';
+import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { containerStyle } from './EmptyStateNotConnectedStyles';
 
 type EmptyStateNotConnectedProps = {
@@ -12,6 +13,8 @@ type EmptyStateNotConnectedProps = {
 };
 
 export function EmptyStateNotConnected({ checkout, updateProvider }: EmptyStateNotConnectedProps) {
+  const { track } = useAnalytics();
+
   const {
     status: { emptyState },
     walletSelection: { heading },
@@ -28,6 +31,15 @@ export function EmptyStateNotConnected({ checkout, updateProvider }: EmptyStateN
   }, [checkout]);
 
   const handleProviderSelected = async (walletProviderName: WalletProviderName) => {
+    track({
+      userJourney: UserJourney.BRIDGE,
+      screen: 'EmptyStateNotConnected',
+      control: 'WalletProvider',
+      controlType: 'Select',
+      extras: {
+        walletProviderName,
+      },
+    });
     await updateProvider(walletProviderName);
   };
 
