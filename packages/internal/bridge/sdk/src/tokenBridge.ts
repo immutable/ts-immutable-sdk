@@ -41,7 +41,6 @@ import {
   FlowRateWithdrawResponse,
   FlowRateInfoRequest,
   CalculateBridgeFeeResponse,
-  Address,
   RootBridgePendingWithdrawal,
   TxStatusResponseItem,
   PendingWithdrawal,
@@ -796,7 +795,9 @@ export class TokenBridge {
     }
 
     const flowRatePromises:Array<Promise<any>> = [];
-    const flowRatePromisesReceivers: Array<Address> = [];
+    const flowRateLengthPromises:Array<Promise<any>> = [];
+
+    const flowRatePromisesReceivers: Array<string> = [];
 
     for (let i = 0, l = statusResponses.length; i < l; i++) {
       let metaStatus: StatusResponse;
@@ -855,22 +856,39 @@ export class TokenBridge {
         };
       }
 
-      let flowRatePromiseIndex: number;
+      let flowRatePromiseIndex: number = flowRatePromisesReceivers.findIndex((el) => el === txItem.recipient);
       if (metaStatus === StatusResponse.COMPLETE
         && isWithdraw && txItem.recipient) {
         // consolidate the calls we have to make to the flow rate by receiver
-        if (!flowRatePromisesReceivers.includes(txItem.recipient)) {
-          flowRatePromises.push(rootBridge!.getPendingWithdrawals(txItem.recipient, [0]));
+        if (flowRatePromiseIndex === -1) {
           flowRatePromisesReceivers.push(txItem.recipient);
           flowRatePromiseIndex = flowRatePromisesReceivers.length - 1;
-        } else {
-          flowRatePromiseIndex = flowRatePromisesReceivers.findIndex((el) => el === txItem.recipient);
         }
         txItem.data.flowRatePromiseIndex = flowRatePromiseIndex;
       }
 
       txStatusResponse.transactions.push(txItem);
     }// for
+
+    for (const flowRateReceiver of flowRatePromisesReceivers) {
+      flowRateLengthPromises.push(rootBridge!.getPendingWithdrawalsLength(flowRateReceiver));
+    }
+
+    let flowRateLengthResponses:Array<number> = [];
+
+    try {
+      flowRateLengthResponses = await Promise.all(flowRateLengthPromises);
+    } catch (err) {
+      throw new BridgeError(
+        `Failed to fetch the Flow Rate pending lengths with the reason: ${err}`,
+        BridgeErrorType.FLOW_RATE_ERROR,
+      );
+    }
+
+    for (let i = 0, l = flowRatePromisesReceivers.length; i < l; i++) {
+      const indices: Array<number> = [...Array(flowRateLengthResponses[i]).keys()];
+      flowRatePromises.push(rootBridge!.getPendingWithdrawals(flowRatePromisesReceivers[i], indices));
+    }
 
     let flowRateResponses:Array<Array<RootBridgePendingWithdrawal>> = [];
     if (flowRatePromises.length > 0) {
@@ -969,18 +987,19 @@ export class TokenBridge {
       BridgeErrorType.INTERNAL_ERROR,
     );
 
-    const pending:Array<RootBridgePendingWithdrawal> = await rootBridge.getPendingWithdrawals(req.recipient, [0]);
-
-    if (pending.length === 0) {
-      throw new BridgeError(
-        `no pending withdrawals found for ${req.recipient}`,
-        BridgeErrorType.FLOW_RATE_ERROR,
-      );
-    }
+    const pendingLength: ethers.BigNumber = await rootBridge.getPendingWithdrawalsLength(req.recipient);
 
     const pendingWithdrawals: PendingWithdrawalsResponse = {
       pending: [],
     };
+
+    if (pendingLength.toNumber() === 0) {
+      return pendingWithdrawals;
+    }
+
+    const indices: Array<number> = [...Array(pendingLength).keys()];
+
+    const pending:Array<RootBridgePendingWithdrawal> = await rootBridge.getPendingWithdrawals(req.recipient, indices);
 
     const timestampNow = Math.floor(Date.now() / 1000);
 
@@ -1043,34 +1062,31 @@ export class TokenBridge {
       BridgeErrorType.INTERNAL_ERROR,
     );
 
-    const pending:Array<RootBridgePendingWithdrawal> = await rootBridge.getPendingWithdrawals(req.recipient, [0]);
+    const pending:Array<RootBridgePendingWithdrawal> = await
+    rootBridge.getPendingWithdrawals(req.recipient, [req.index]);
 
-    if (pending.length === 0) {
+    if (pending[0].withdrawer === ethers.constants.AddressZero
+      || pending[0].token === ethers.constants.AddressZero
+      || pending[0].amount === ethers.BigNumber.from(0)
+      || pending[0].timestamp === ethers.BigNumber.from(0)) {
       throw new BridgeError(
-        `no pending withdrawals found for ${req.recipient}`,
-        BridgeErrorType.FLOW_RATE_ERROR,
-      );
-    }
-
-    if (!pending[req.index]) {
-      throw new BridgeError(
-        `invalid index ${req.index}`,
+        `pending withdrawal not found for ${req.recipient} at index ${req.index}`,
         BridgeErrorType.FLOW_RATE_ERROR,
       );
     }
 
     // @TODO query timeout from contract (SMR-2090)
-    const timeoutEnd = pending[req.index].timestamp.toNumber() + (60 * 60 * 24);
+    const timeoutEnd = pending[0].timestamp.toNumber() + (60 * 60 * 24);
     const timestampNow = Math.floor(Date.now() / 1000);
 
     if (timeoutEnd > timestampNow) {
       return {
         pendingWithdrawal: {
           canWithdraw: false,
-          withdrawer: pending[req.index].withdrawer,
-          token: pending[req.index].token,
-          amount: pending[req.index].amount,
-          timeoutStart: pending[req.index].timestamp.toNumber(),
+          withdrawer: pending[0].withdrawer,
+          token: pending[0].token,
+          amount: pending[0].amount,
+          timeoutStart: pending[0].timestamp.toNumber(),
           timeoutEnd,
         },
         unsignedTx: null,
@@ -1085,10 +1101,10 @@ export class TokenBridge {
     return {
       pendingWithdrawal: {
         canWithdraw: true,
-        withdrawer: pending[req.index].withdrawer,
-        token: pending[req.index].token,
-        amount: pending[req.index].amount,
-        timeoutStart: pending[req.index].timestamp.toNumber(),
+        withdrawer: pending[0].withdrawer,
+        token: pending[0].token,
+        amount: pending[0].amount,
+        timeoutStart: pending[0].timestamp.toNumber(),
         timeoutEnd,
       },
       unsignedTx: {

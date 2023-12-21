@@ -639,6 +639,7 @@ describe('Token Bridge', () => {
           timestamp: ethers.BigNumber.from(1000),
         },
       ]),
+      getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => ethers.BigNumber.from(1)),
     };
 
     const mockERC20Contract = {
@@ -647,6 +648,7 @@ describe('Token Bridge', () => {
         encodeFunctionData: jest.fn(),
       },
       getPendingWithdrawals: jest.fn().mockImplementation(async () => []),
+      getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => ethers.BigNumber.from(0)),
     };
 
     beforeEach(() => {
@@ -1046,6 +1048,7 @@ describe('Token Bridge', () => {
           timestamp: defaultTimestamp,
         },
       ]),
+      getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => ethers.BigNumber.from(1)),
     };
 
     const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
@@ -1101,7 +1104,23 @@ describe('Token Bridge', () => {
         index: 100,
       };
 
-      jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRate as any);
+      const mockERC20ContractFlowRateNotFound = {
+        allowance: jest.fn(),
+        interface: {
+          encodeFunctionData: jest.fn().mockResolvedValue('0xdata'),
+        },
+        getPendingWithdrawals: jest.fn().mockImplementation(async () => [
+          {
+            withdrawer: ethers.constants.AddressZero,
+            token: ethers.constants.AddressZero,
+            amount: ethers.BigNumber.from(0),
+            timestamp: ethers.BigNumber.from(0),
+          },
+        ]),
+        getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => ethers.BigNumber.from(0)),
+      };
+
+      jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRateNotFound as any);
 
       try {
         await tokenBridge.getFlowRateWithdrawTx(req);
@@ -1174,6 +1193,7 @@ describe('Token Bridge', () => {
           timestamp: defaultTimestamp,
         },
       ]),
+      getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => ethers.BigNumber.from(1)),
     };
 
     const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
@@ -1250,6 +1270,8 @@ describe('Token Bridge', () => {
             timestamp: defaultTimestamp.mul(3),
           },
         ]),
+        getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => ethers.BigNumber.from(3)),
+
       };
 
       jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRateThree as any);
@@ -1278,7 +1300,7 @@ describe('Token Bridge', () => {
       expect(result.pending[2].timeoutEnd).toBe(defaultTimestamp.mul(3).toNumber() + (60 * 60 * 24));
     });
 
-    it('returns the flowRate pending withdrawals when the recipient is valid', async () => {
+    it('returns empty pending array when no flowRated transactions found', async () => {
       expect.assertions(2);
       const req = {
         recipient,
@@ -1289,17 +1311,24 @@ describe('Token Bridge', () => {
         interface: {
           encodeFunctionData: jest.fn().mockResolvedValue('0xdata'),
         },
-        getPendingWithdrawals: jest.fn().mockImplementation(async () => []),
+        getPendingWithdrawals: jest.fn().mockImplementation(async () => [
+          {
+            withdrawer: ethers.constants.AddressZero,
+            token: ethers.constants.AddressZero,
+            amount: ethers.BigNumber.from(0),
+            timestamp: ethers.BigNumber.from(0),
+          },
+        ]),
+        getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => ethers.BigNumber.from(0)),
+
       };
 
       jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRateNone as any);
 
-      try {
-        await tokenBridge.getPendingWithdrawals(req);
-      } catch (error: any) {
-        expect(error).toBeInstanceOf(BridgeError);
-        expect(error.type).toBe(BridgeErrorType.FLOW_RATE_ERROR);
-      }
+      const result = await tokenBridge.getPendingWithdrawals(req);
+
+      expect(result.pending).toBeDefined();
+      expect(result.pending.length).toBe(0);
     });
   });
 
