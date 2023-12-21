@@ -17,6 +17,7 @@ import {
   sendProviderUpdatedEvent,
   addProviderListenersForWidgetRoot,
 } from './lib';
+import './i18n';
 
 export class WidgetsFactory implements IWidgetsFactory {
   private sdk: Checkout;

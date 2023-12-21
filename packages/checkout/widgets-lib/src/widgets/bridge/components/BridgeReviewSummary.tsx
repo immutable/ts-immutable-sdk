@@ -1,4 +1,3 @@
-import { text } from 'resources/text/textConfig';
 import {
   useCallback,
   useContext,
@@ -26,6 +25,7 @@ import { FeesBreakdown } from 'components/FeesBreakdown/FeesBreakdown';
 import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
 import { utils } from 'ethers';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
+import { useTranslation } from 'react-i18next';
 import { networkIconStyles } from './WalletNetworkButtonStyles';
 import {
   arrowIconStyles,
@@ -57,10 +57,8 @@ const logo = {
 const testId = 'bridge-review-summary';
 
 export function BridgeReviewSummary() {
+  const { t } = useTranslation();
   const { viewDispatch } = useContext(ViewContext);
-  const {
-    heading, fromLabel, toLabel, fees, fiatPricePrefix, submitButton,
-  } = text.views[BridgeWidgetViews.BRIDGE_REVIEW];
 
   const {
     bridgeState: {
@@ -221,7 +219,7 @@ export function BridgeReviewSummary() {
         weight="regular"
         sx={bridgeReviewHeadingStyles}
       >
-        {heading}
+        {t('views.BRIDGE_REVIEW.heading')}
       </Heading>
 
       {/* From review */}
@@ -232,13 +230,13 @@ export function BridgeReviewSummary() {
         sx={topMenuItemStyles}
       >
         <MenuItem.Label size="small" sx={{ marginBottom: 'base.spacing.x4', fontWeight: 'bold' }}>
-          {fromLabel.amountHeading}
+          {t('views.BRIDGE_REVIEW.fromLabel.amountHeading')}
         </MenuItem.Label>
         <MenuItem.Caption />
         <MenuItem.PriceDisplay
           use={<Heading size="xSmall" weight="light" />}
           price={displayAmount ?? '-'}
-          fiatAmount={`${fiatPricePrefix}${fromFiatAmount}`}
+          fiatAmount={`${t('views.BRIDGE_REVIEW.fiatPricePrefix')}${fromFiatAmount}`}
         />
       </MenuItem>
       <MenuItem
@@ -254,7 +252,7 @@ export function BridgeReviewSummary() {
           />
         )}
         <MenuItem.Label>
-          <strong>{fromLabel.heading}</strong>
+          <strong>{t('views.BRIDGE_REVIEW.fromLabel.heading')}</strong>
           {' '}
           <Body
             size="small"
@@ -291,7 +289,7 @@ export function BridgeReviewSummary() {
           />
         )}
         <MenuItem.Label>
-          <strong>{toLabel.heading}</strong>
+          <strong>{t('views.BRIDGE_REVIEW.toLabel.heading')}</strong>
           {' '}
           <Body
             size="small"
@@ -316,13 +314,13 @@ export function BridgeReviewSummary() {
         >
           <Accordion.TargetLeftSlot>
             <Body size="medium" sx={gasAmountHeadingStyles}>
-              {fees.heading}
+              {t('views.BRIDGE_REVIEW.fees.heading')}
             </Body>
           </Accordion.TargetLeftSlot>
           <Accordion.TargetRightSlot>
             <PriceDisplay
               testId={`${testId}-gas-amount__priceDisplay`}
-              fiatAmount={`${fiatPricePrefix}${gasFeeFiatValue}`}
+              fiatAmount={`${t('views.BRIDGE_REVIEW.fiatPricePrefix')}${gasFeeFiatValue}`}
               price={`${estimates?.token?.symbol} ${tokenValueFormat(gasFee)}` ?? '-'}
             />
           </Accordion.TargetRightSlot>
@@ -347,17 +345,17 @@ export function BridgeReviewSummary() {
         >
           {loading ? (
             <Button.Icon icon="Loading" sx={bridgeButtonIconLoadingStyle} />
-          ) : submitButton.buttonText}
+          ) : t('views.BRIDGE_REVIEW.submitButton.buttonText')}
         </Button>
       </Box>
       <FeesBreakdown
-        totalFiatAmount={`${fiatPricePrefix}${gasFeeFiatValue}`}
+        totalFiatAmount={`${t('views.BRIDGE_REVIEW.fiatPricePrefix')}${gasFeeFiatValue}`}
         totalAmount={gasFee}
         tokenSymbol={estimates?.token?.symbol || ''}
         fees={[
           {
-            label: text.drawers.feesBreakdown.fees.gas.label,
-            fiatAmount: `${fiatPricePrefix}${gasFeeFiatValue}`,
+            label: t('drawers.feesBreakdown.fees.gas.label'),
+            fiatAmount: `${t('views.BRIDGE_REVIEW.fiatPricePrefix')}${gasFeeFiatValue}`,
             amount: gasFee,
           },
         ]}

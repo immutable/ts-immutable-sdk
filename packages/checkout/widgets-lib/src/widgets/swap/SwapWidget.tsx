@@ -11,6 +11,7 @@ import {
 } from '@imtbl/checkout-sdk';
 import { ImmutableConfiguration } from '@imtbl/config';
 import { Exchange, ExchangeOverrides } from '@imtbl/dex-sdk';
+import { useTranslation } from 'react-i18next';
 import { SwapCoins } from './views/SwapCoins';
 import { LoadingView } from '../../views/loading/LoadingView';
 import {
@@ -36,7 +37,6 @@ import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { DEFAULT_BALANCE_RETRY_POLICY, getL2ChainId } from '../../lib';
 import { StatusView } from '../../components/Status/StatusView';
 import { StatusType } from '../../components/Status/StatusType';
-import { text } from '../../resources/text/textConfig';
 import { ErrorView } from '../../views/error/ErrorView';
 import {
   sendSwapFailedEvent,
@@ -62,10 +62,7 @@ export function SwapWidget({
   toTokenAddress,
   config,
 }: SwapWidgetInputs) {
-  const { success, failed, rejected } = text.views[SwapWidgetViews.SWAP];
-  const loadingText = text.views[SharedViews.LOADING_VIEW].text;
-  const { actionText } = text.views[SharedViews.ERROR_VIEW];
-
+  const { t } = useTranslation();
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
@@ -210,7 +207,7 @@ export function SwapWidget({
       <SwapContext.Provider value={swapReducerValues}>
         <CryptoFiatProvider environment={environment}>
           {viewState.view.type === SharedViews.LOADING_VIEW && (
-          <LoadingView loadingText={loadingText} />
+          <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
           )}
           {viewState.view.type === SwapWidgetViews.SWAP && (
           <SwapCoins
@@ -236,8 +233,8 @@ export function SwapWidget({
           )}
           {viewState.view.type === SwapWidgetViews.SUCCESS && (
           <StatusView
-            statusText={success.text}
-            actionText={success.actionText}
+            statusText={t('views.SWAP.success.text')}
+            actionText={t('views.SWAP.success.actionText')}
             onRenderEvent={() => {
               page({
                 userJourney: UserJourney.SWAP,
@@ -255,8 +252,8 @@ export function SwapWidget({
           )}
           {viewState.view.type === SwapWidgetViews.FAIL && (
           <StatusView
-            statusText={failed.text}
-            actionText={failed.actionText}
+            statusText={t('views.SWAP.failed.text')}
+            actionText={t('views.SWAP.failed.actionText')}
             onRenderEvent={() => {
               page({
                 userJourney: UserJourney.SWAP,
@@ -284,8 +281,8 @@ export function SwapWidget({
           )}
           {viewState.view.type === SwapWidgetViews.PRICE_SURGE && (
           <StatusView
-            statusText={rejected.text}
-            actionText={rejected.actionText}
+            statusText={t('views.SWAP.rejected.text')}
+            actionText={t('views.SWAP.rejected.actionText')}
             onRenderEvent={() => {
               page({
                 userJourney: UserJourney.SWAP,
@@ -313,7 +310,7 @@ export function SwapWidget({
           )}
           {viewState.view.type === SharedViews.ERROR_VIEW && (
           <ErrorView
-            actionText={actionText}
+            actionText={t('views.ERROR_VIEW.actionText')}
             onActionClick={async () => {
               setErrorViewLoading(true);
               const data = viewState.view as ErrorViewType;

@@ -28,6 +28,7 @@ import { getL1ChainId, getL2ChainId } from 'lib';
 import { Transactions } from 'components/Transactions/Transactions';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { TopUpView } from 'views/top-up/TopUpView';
+import { useTranslation } from 'react-i18next';
 import {
   ViewActions,
   ViewContext,
@@ -47,7 +48,6 @@ import { BridgeReview } from './views/BridgeReview';
 import { MoveInProgress } from './views/MoveInProgress';
 import { ApproveTransaction } from './views/ApproveTransaction';
 import { ErrorView } from '../../views/error/ErrorView';
-import { text } from '../../resources/text/textConfig';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { sendBridgeFailedEvent, sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
 
@@ -64,15 +64,14 @@ export function BridgeWidget({
   amount,
   tokenAddress,
 }: BridgeWidgetInputs) {
+  const { t } = useTranslation();
   const {
     environment,
     isOnRampEnabled,
     isSwapEnabled,
     isBridgeEnabled,
   } = config;
-  const errorText = text.views[SharedViews.ERROR_VIEW];
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
-  const bridgeFailureText = text.views[BridgeWidgetViews.BRIDGE_FAILURE];
 
   const { page } = useAnalytics();
 
@@ -185,8 +184,8 @@ export function BridgeWidget({
             && (
               <StatusView
                 testId="bridge-fail"
-                statusText={bridgeFailureText.statusText}
-                actionText={bridgeFailureText.actionText}
+                statusText={t('views.BRIDGE_FAILURE.bridgeFailureText.statusText')}
+                actionText={t('views.BRIDGE_FAILURE.bridgeFailureText.actionText')}
                 onActionClick={goBackToReview}
                 statusType={StatusType.FAILURE}
                 onRenderEvent={() => {
@@ -219,7 +218,7 @@ export function BridgeWidget({
           )}
           {viewState.view.type === SharedViews.ERROR_VIEW && (
             <ErrorView
-              actionText={errorText.actionText}
+              actionText={t('views.ERROR_VIEW.errorText.actionText')}
               onActionClick={goBackToWalletNetworkSelector}
               onCloseClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
               errorEventAction={() => {

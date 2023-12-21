@@ -8,11 +8,11 @@ import {
 import { CheckoutErrorType } from '@imtbl/checkout-sdk';
 import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
+import { useTranslation } from 'react-i18next';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
 import { FooterButton } from '../../../components/Footer/FooterButton';
-import { text } from '../../../resources/text/textConfig';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { LoadingView } from '../../../views/loading/LoadingView';
@@ -28,13 +28,13 @@ export interface ApproveTransactionProps {
 }
 
 export function ApproveTransaction({ approveTransaction, transaction }: ApproveTransactionProps) {
+  const { t } = useTranslation();
   const { bridgeState } = useContext(BridgeContext);
   const {
     checkout,
     from,
   } = bridgeState;
   const { viewDispatch } = useContext(ViewContext);
-  const { loadingView, content, footer } = text.views[BridgeWidgetViews.APPROVE_TRANSACTION];
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const { page } = useAnalytics();
@@ -214,7 +214,7 @@ export function ApproveTransaction({ approveTransaction, transaction }: ApproveT
 
   return (
     <>
-      {loading && (<LoadingView loadingText={loadingView.text} showFooterLogo />)}
+      {loading && (<LoadingView loadingText={t('views.APPROVE_TRANSACTION.loadingView.text')} showFooterLogo />)}
       {!loading && (
         <SimpleLayout
           header={(
@@ -231,17 +231,15 @@ export function ApproveTransaction({ approveTransaction, transaction }: ApproveT
             <Box sx={{ width: '100%', flexDirection: 'column' }}>
               <FooterButton
                 loading={txProcessing}
-                actionText={rejectedBridge
-                  ? footer.retryText
-                  : footer.buttonText}
+                actionText={t(`views.APPROVE_TRANSACTION.${rejectedBridge ? 'footer.retryText' : 'footer.buttonText'}`)}
                 onActionClick={handleApproveBridgeClick}
               />
               <FooterLogo />
             </Box>
           )}
         >
-          <SimpleTextBody heading={content.heading}>
-            <Box>{content.body}</Box>
+          <SimpleTextBody heading={t('views.APPROVE_TRANSACTION.content.heading')}>
+            <Box>{t('views.APPROVE_TRANSACTION.content.body')}</Box>
           </SimpleTextBody>
         </SimpleLayout>
       )}

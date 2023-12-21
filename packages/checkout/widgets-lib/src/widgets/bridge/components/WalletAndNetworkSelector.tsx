@@ -4,7 +4,6 @@ import {
   Button,
   Heading,
 } from '@biom3/react';
-import { text } from 'resources/text/textConfig';
 import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import {
   useCallback, useContext, useEffect, useMemo, useRef, useState,
@@ -22,6 +21,7 @@ import { getChainNameById } from 'lib/chains';
 import { ViewActions, ViewContext } from 'context/view-context/ViewContext';
 import { abbreviateAddress } from 'lib/addressUtils';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
+import { useTranslation } from 'react-i18next';
 import {
   bridgeHeadingStyles,
   brigdeWalletWrapperStyles,
@@ -35,6 +35,7 @@ import { WalletDrawer } from './WalletDrawer';
 const testId = 'wallet-network-selector';
 
 export function WalletAndNetworkSelector() {
+  const { t } = useTranslation();
   const {
     bridgeState: {
       checkout,
@@ -43,9 +44,6 @@ export function WalletAndNetworkSelector() {
     }, bridgeDispatch,
   } = useContext(BridgeContext);
   const { viewDispatch } = useContext(ViewContext);
-  const {
-    heading, fromFormInput, toFormInput, submitButton,
-  } = text.views[BridgeWidgetViews.WALLET_NETWORK_SELECTION];
 
   const { track } = useAnalytics();
 
@@ -393,16 +391,18 @@ export function WalletAndNetworkSelector() {
         weight="regular"
         sx={bridgeHeadingStyles}
       >
-        {heading}
+        {t('views.WALLET_NETWORK_SELECTION.heading')}
       </Heading>
 
-      <Heading size="xSmall" sx={{ paddingBottom: 'base.spacing.x2' }}>{fromFormInput.heading}</Heading>
+      <Heading size="xSmall" sx={{ paddingBottom: 'base.spacing.x2' }}>
+        {t('views.WALLET_NETWORK_SELECTION.fromFormInput.heading')}
+      </Heading>
       {/* Show the from wallet target (select box) if no selections have been made yet */}
       <WalletDrawer
         testId={`${testId}-from`}
         drawerText={{
-          heading: fromFormInput.walletSelectorHeading,
-          defaultText: fromFormInput.selectDefaultText,
+          heading: t('views.WALLET_NETWORK_SELECTION.fromFormInput.walletSelectorHeading'),
+          defaultText: t('views.WALLET_NETWORK_SELECTION.fromFormInput.selectDefaultText'),
         }}
         showWalletSelectorTarget={!isFromWalletAndNetworkSelected}
         walletOptions={fromWalletSelectorOptions}
@@ -426,12 +426,14 @@ export function WalletAndNetworkSelector() {
           />
 
           <Box>
-            <Heading size="xSmall" sx={{ paddingBottom: 'base.spacing.x2' }}>{toFormInput.heading}</Heading>
+            <Heading size="xSmall" sx={{ paddingBottom: 'base.spacing.x2' }}>
+              {t('views.WALLET_NETWORK_SELECTION.toFormInput.heading')}
+            </Heading>
             <WalletDrawer
               testId={`${testId}-to`}
               drawerText={{
-                heading: toFormInput.walletSelectorHeading,
-                defaultText: toFormInput.selectDefaultText,
+                heading: t('views.WALLET_NETWORK_SELECTION.toFormInput.walletSelectorHeading'),
+                defaultText: t('views.WALLET_NETWORK_SELECTION.toFormInput.selectDefaultText'),
               }}
               showWalletSelectorTarget={!isToWalletAndNetworkSelected}
               walletOptions={toWalletSelectorOptions}
@@ -445,7 +447,7 @@ export function WalletAndNetworkSelector() {
 
       {/** From Network Selector, we programmatically open this so there is no target */}
       <Drawer
-        headerBarTitle={fromFormInput.networkSelectorHeading}
+        headerBarTitle={t('views.WALLET_NETWORK_SELECTION.fromFormInput.networkSelectorHeading')}
         size="full"
         onCloseDrawer={() => {
           setFromNetworkDrawerOpen(false);
@@ -501,7 +503,7 @@ export function WalletAndNetworkSelector() {
               size="large"
               onClick={handleSubmitDetails}
             >
-              {submitButton.text}
+              {t('views.WALLET_NETWORK_SELECTION.submitButton.text')}
             </Button>
           </Box>
         </Box>

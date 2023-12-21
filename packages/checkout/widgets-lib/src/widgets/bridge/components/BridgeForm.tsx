@@ -19,6 +19,7 @@ import { BigNumber, utils } from 'ethers';
 import { FeesBreakdown } from 'components/FeesBreakdown/FeesBreakdown';
 import { BridgeFeeActions } from '@imtbl/bridge-sdk';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
+import { useTranslation } from 'react-i18next';
 import { amountInputValidation } from '../../../lib/validations/amountInputValidations';
 import { BridgeActions, BridgeContext } from '../context/BridgeContext';
 import {
@@ -27,7 +28,6 @@ import {
   SharedViews,
 } from '../../../context/view-context/ViewContext';
 import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
-import { text } from '../../../resources/text/textConfig';
 import { TextInputForm } from '../../../components/FormComponents/TextInputForm/TextInputForm';
 import {
   calculateCryptoToFiat, formatZeroAmount, isNativeToken, tokenValueFormat,
@@ -65,6 +65,7 @@ interface BridgeFormProps {
 }
 
 export function BridgeForm(props: BridgeFormProps) {
+  const { t } = useTranslation();
   const {
     bridgeDispatch,
     bridgeState: {
@@ -87,11 +88,6 @@ export function BridgeForm(props: BridgeFormProps) {
     defaultTokenAddress,
     isTokenBalancesLoading,
   } = props;
-  const {
-    fees,
-    content,
-    bridgeForm,
-  } = text.views[BridgeWidgetViews.BRIDGE_FORM];
 
   const { track } = useAnalytics();
 
@@ -105,7 +101,7 @@ export function BridgeForm(props: BridgeFormProps) {
   const [loading, setLoading] = useState(false);
   const hasSetDefaultState = useRef(false);
   const tokenBalanceSubtext = formToken
-    ? `${content.availableBalancePrefix} ${tokenValueFormat(formToken?.formattedBalance)}`
+    ? `${t('views.BRIDGE_FORM.content.availableBalancePrefix')} ${tokenValueFormat(formToken?.formattedBalance)}`
     : '';
 
   // Fee estimates & transactions
@@ -128,7 +124,7 @@ export function BridgeForm(props: BridgeFormProps) {
     return `${symbol.toLowerCase()}-${address.toLowerCase()}`;
   }, []);
 
-  const gasFiatAmount = `${fees.fiatPricePrefix} ${gasFeeFiatValue}`;
+  const gasFiatAmount = `${t('views.BRIDGE_FORM.fees.fiatPricePrefix')} ${gasFeeFiatValue}`;
 
   useEffect(() => {
     if (tokenBalances.length === 0) return;
@@ -137,19 +133,19 @@ export function BridgeForm(props: BridgeFormProps) {
     const options = tokenBalances
       .filter((tokenBalance) => tokenBalance.balance.gt(0))
       .map(
-        (t) => ({
-          id: formatTokenOptionsId(t.token.symbol, t.token.address),
-          name: t.token.name,
-          symbol: t.token.symbol,
-          icon: t.token.icon,
+        (tokenBalance) => ({
+          id: formatTokenOptionsId(tokenBalance.token.symbol, tokenBalance.token.address),
+          name: tokenBalance.token.name,
+          symbol: tokenBalance.token.symbol,
+          icon: tokenBalance.token.icon,
           balance: {
             formattedFiatAmount: cryptoFiatState.conversions.size === 0 ? formatZeroAmount('')
               : calculateCryptoToFiat(
-                t.formattedBalance,
-                t.token.symbol,
+                tokenBalance.formattedBalance,
+                tokenBalance.token.symbol,
                 cryptoFiatState.conversions,
               ),
-            formattedAmount: tokenValueFormat(t.formattedBalance),
+            formattedAmount: tokenValueFormat(tokenBalance.formattedBalance),
           },
         } as CoinSelectorOptionProps),
       );
@@ -329,7 +325,9 @@ export function BridgeForm(props: BridgeFormProps) {
   };
 
   const handleSelectTokenChange = (value: OptionKey) => {
-    const selected = tokenBalances.find((t) => value === formatTokenOptionsId(t.token.symbol, t.token.address));
+    const selected = tokenBalances.find((tokenBalance) => (
+      value === formatTokenOptionsId(tokenBalance.token.symbol, tokenBalance.token.address)
+    ));
     if (!selected) return;
 
     setFormToken(selected);
@@ -439,7 +437,7 @@ export function BridgeForm(props: BridgeFormProps) {
           weight="regular"
           sx={{ paddingBottom: 'base.spacing.x4' }}
         >
-          {content.title}
+          {t('views.BRIDGE_FORM.content.title')}
         </Heading>
         {(!defaultTokenAddress || !isTokenBalancesLoading) && (
           <Box sx={formInputsContainerStyles}>
@@ -447,7 +445,7 @@ export function BridgeForm(props: BridgeFormProps) {
               testId="bridge-token"
               options={tokensOptions}
               optionsLoading={isTokenBalancesLoading}
-              coinSelectorHeading={bridgeForm.from.selectorTitle}
+              coinSelectorHeading={t('views.BRIDGE_FORM.bridgeForm.from.selectorTitle')}
               selectedOption={selectedOption}
               subtext={tokenBalanceSubtext}
               textAlign="left"
@@ -458,8 +456,8 @@ export function BridgeForm(props: BridgeFormProps) {
             <TextInputForm
               testId="bridge-amount"
               value={formAmount}
-              placeholder={bridgeForm.from.inputPlaceholder}
-              subtext={`${content.fiatPricePrefix} $${formatZeroAmount(amountFiatValue, true)}`}
+              placeholder={t('views.BRIDGE_FORM.bridgeForm.from.inputPlaceholder')}
+              subtext={`${t('views.BRIDGE_FORM.content.fiatPricePrefix')} $${formatZeroAmount(amountFiatValue, true)}`}
               validator={amountInputValidation}
               onTextInputFocus={onTextInputFocus}
               onTextInputChange={(value) => handleBridgeAmountChange(value)}
@@ -481,13 +479,13 @@ export function BridgeForm(props: BridgeFormProps) {
             >
               <Accordion.TargetLeftSlot>
                 <Body size="medium" sx={gasAmountHeadingStyles}>
-                  {fees.title}
+                  {t('views.BRIDGE_FORM.fees.title')}
                 </Body>
               </Accordion.TargetLeftSlot>
               <Accordion.TargetRightSlot>
                 <PriceDisplay
                   testId="bridge-gas-fee__priceDisplay"
-                  fiatAmount={`${fees.fiatPricePrefix} ${gasFeeFiatValue}`}
+                  fiatAmount={`${t('views.BRIDGE_FORM.fees.fiatPricePrefix')} ${gasFeeFiatValue}`}
                   price={`${estimates?.token?.symbol} ${tokenValueFormat(gasFee)}`}
                 />
               </Accordion.TargetRightSlot>
@@ -501,7 +499,7 @@ export function BridgeForm(props: BridgeFormProps) {
         tokenSymbol={estimates?.token?.symbol ?? ''}
         fees={[
           {
-            label: text.drawers.feesBreakdown.fees.gas.label,
+            label: t('views.drawers.feesBreakdown.fees.gas.label'),
             fiatAmount: gasFiatAmount,
             amount: gasFee,
           },
@@ -519,7 +517,7 @@ export function BridgeForm(props: BridgeFormProps) {
         >
           {loading ? (
             <Button.Icon icon="Loading" sx={bridgeButtonIconLoadingStyle} />
-          ) : bridgeForm.buttonText}
+          ) : t('views.BRIDGE_FORM.bridgeForm.buttonText')}
         </Button>
         <TransactionRejected
           visible={showTxnRejectedState}

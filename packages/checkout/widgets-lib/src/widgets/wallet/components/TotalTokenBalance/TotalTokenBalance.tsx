@@ -2,6 +2,7 @@ import {
   Body, Box, ButtCon,
 } from '@biom3/react';
 import { useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   coinInfoButtonStyle,
   totalTokenBalanceStyle,
@@ -12,7 +13,6 @@ import {
   ViewContext,
 } from '../../../../context/view-context/ViewContext';
 import { WalletWidgetViews } from '../../../../context/view-context/WalletViewContextTypes';
-import { text } from '../../../../resources/text/textConfig';
 
 interface TotalTokenBalanceProps {
   totalBalance: number;
@@ -20,13 +20,13 @@ interface TotalTokenBalanceProps {
 }
 
 export function TotalTokenBalance(props: TotalTokenBalanceProps) {
+  const { t } = useTranslation();
   const { viewDispatch } = useContext(ViewContext);
-  const { totalTokenBalance } = text.views[WalletWidgetViews.WALLET_BALANCES];
   const { totalBalance, loading } = props;
   return (
     <Box sx={totalTokenBalanceStyle}>
       <Box sx={totalTokenBalanceValueStyle}>
-        <Body size="medium">{totalTokenBalance.heading}</Body>
+        <Body size="medium">{t('views.WALLET_BALANCES.totalTokenBalance.heading')}</Body>
         <Box sx={{ pl: 'base.spacing.x1' }}>
           <ButtCon
             testId="coin-info-icon"
@@ -44,7 +44,7 @@ export function TotalTokenBalance(props: TotalTokenBalanceProps) {
       </Box>
       <Box sx={totalTokenBalanceValueStyle}>
         <Body testId="total-token-balance-value" weight="bold" shimmer={loading ? 1 : 0} shimmerSx={{ minw: '100px' }}>
-          {totalTokenBalance.totalHeading}
+          {t('views.WALLET_BALANCES.totalTokenBalance.totalHeading')}
         </Body>
         {!loading && (
         <Body testId="total-token-balance" weight="bold">

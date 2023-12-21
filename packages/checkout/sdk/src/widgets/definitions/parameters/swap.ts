@@ -1,4 +1,5 @@
 import { WalletProviderName } from '../../../types';
+import { WidgetLanguage } from '../configurations';
 
 /**
  * Swap Widget parameters
@@ -16,4 +17,6 @@ export type SwapWidgetParams = {
   toTokenAddress?: string;
   /** The wallet provider name to use for the swap widget */
   walletProviderName?: WalletProviderName;
+  /** The language to use for the swap widget */
+  language?: WidgetLanguage;
 };
