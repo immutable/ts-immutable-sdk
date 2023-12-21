@@ -13,6 +13,7 @@ import {
   PRODUCTION_CHAIN_ID_NETWORK_MAP,
   SANDBOX_CHAIN_ID_NETWORK_MAP,
 } from '../env';
+import { HttpClient } from '../api/http/httpClient';
 
 export class CheckoutConfigurationError extends Error {
   public message: string;
@@ -70,7 +71,7 @@ export class CheckoutConfiguration {
 
   readonly networkMap: NetworkMap;
 
-  constructor(config: CheckoutModuleConfiguration) {
+  constructor(config: CheckoutModuleConfiguration, httpClient: HttpClient) {
     if (!Object.values(Environment).includes(config.baseConfig.environment)) {
       throw new CheckoutConfigurationError(
         'Invalid checkout configuration of environment',
@@ -90,7 +91,7 @@ export class CheckoutConfiguration {
       this.isDevelopment,
     );
 
-    this.remote = new RemoteConfigFetcher({
+    this.remote = new RemoteConfigFetcher(httpClient, {
       isDevelopment: this.isDevelopment,
       isProduction: this.isProduction,
     });

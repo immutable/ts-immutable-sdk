@@ -7,6 +7,7 @@ import { RemoteConfigFetcher } from '../config/remoteConfigFetcher';
 import { CheckoutConfiguration } from '../config';
 import { ERC20ABI, NATIVE } from '../env';
 import { CheckoutError, CheckoutErrorType } from '../errors';
+import { HttpClient } from '../api/http';
 
 jest.mock('../config/remoteConfigFetcher');
 jest.mock('ethers', () => ({
@@ -18,6 +19,7 @@ jest.mock('ethers', () => ({
 describe('token related functions', () => {
   let config: CheckoutConfiguration;
   const mockProvider = jest.fn().mockImplementation(() => ({} as unknown as Web3Provider));
+  const mockedHttpClient: jest.Mocked<HttpClient> = new HttpClient() as jest.Mocked<HttpClient>;
 
   describe('when tokens are not configured', () => {
     it('should return the empty list of tokens', async () => {
@@ -26,7 +28,7 @@ describe('token related functions', () => {
       });
       config = new CheckoutConfiguration({
         baseConfig: { environment: Environment.SANDBOX },
-      });
+      }, mockedHttpClient);
       await expect(
         await getTokenAllowList(config, {
           type: TokenFilterTypes.ALL,
@@ -204,7 +206,7 @@ describe('token related functions', () => {
         (RemoteConfigFetcher as unknown as jest.Mock).mockReturnValue(testcase.remoteConfigMockReturn);
         config = new CheckoutConfiguration({
           baseConfig: { environment: Environment.SANDBOX },
-        });
+        }, mockedHttpClient);
 
         await expect(
           await getTokenAllowList(config, {

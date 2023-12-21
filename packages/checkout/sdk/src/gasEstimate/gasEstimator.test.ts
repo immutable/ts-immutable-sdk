@@ -14,6 +14,7 @@ import {
 import { createBridgeInstance, createExchangeInstance } from '../instance';
 import { CheckoutConfiguration } from '../config';
 import { RemoteConfigFetcher } from '../config/remoteConfigFetcher';
+import { HttpClient } from '../api/http';
 
 jest.mock('../instance');
 
@@ -72,9 +73,10 @@ describe('gasServiceEstimator', () => {
       }),
     });
 
+    const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
     config = new CheckoutConfiguration({
       baseConfig: { environment: Environment.SANDBOX },
-    });
+    }, mockedHttpClient);
   });
 
   describe('swap', () => {

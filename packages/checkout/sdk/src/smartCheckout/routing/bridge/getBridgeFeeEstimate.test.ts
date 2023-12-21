@@ -5,15 +5,17 @@ import { getBridgeFeeEstimate } from './getBridgeFeeEstimate';
 import { CheckoutConfiguration } from '../../../config';
 import { CheckoutErrorType } from '../../../errors';
 import { createBridgeInstance } from '../../../instance';
+import { HttpClient } from '../../../api/http';
 
 jest.mock('../../../gasEstimate');
 jest.mock('../../../instance');
 
 describe('getBridgeFeeEstimate', () => {
   const readOnlyProviders = new Map<ChainId, ethers.providers.JsonRpcProvider>([]);
+  const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
   const config = new CheckoutConfiguration({
     baseConfig: { environment: Environment.SANDBOX },
-  });
+  }, mockedHttpClient);
 
   it('should return the total fees for the bridge', async () => {
     (createBridgeInstance as jest.Mock).mockReturnValue({

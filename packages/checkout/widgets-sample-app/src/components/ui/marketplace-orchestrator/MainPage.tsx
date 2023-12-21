@@ -23,7 +23,10 @@ import { LanguageSelector } from './LanguageSelector';
 
 // Create one instance of Checkout and inject Passport
 const checkout = new Checkout({
-  baseConfig: { environment: Environment.SANDBOX },
+  baseConfig: {
+    environment: Environment.SANDBOX,
+    publishableKey: 'pk_imapik-test-pCHFU0GpQImZx9UzSnU3',
+  },
   passport,
 })
 

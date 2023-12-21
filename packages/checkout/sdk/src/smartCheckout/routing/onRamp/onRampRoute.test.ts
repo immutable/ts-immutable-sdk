@@ -10,13 +10,15 @@ import {
 import { allowListCheckForOnRamp } from '../../allowList';
 import { onRampRoute } from './onRampRoute';
 import { BalanceERC20Requirement, BalanceERC721Requirement } from '../../balanceCheck/types';
+import { HttpClient } from '../../../api/http';
 
 jest.mock('../../allowList/allowListCheck');
 
 describe('onRampRoute', () => {
+  const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
   const config = new CheckoutConfiguration({
     baseConfig: { environment: Environment.SANDBOX },
-  });
+  }, mockedHttpClient);
 
   beforeEach(() => {
     (allowListCheckForOnRamp as jest.Mock).mockResolvedValue({
