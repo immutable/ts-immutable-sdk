@@ -1,4 +1,4 @@
-name: Functional Tests
+name: Functional Tests (IMX)
 on:
   push:
     branches: [ main ]
@@ -21,7 +21,7 @@ jobs:
       run: yarn build
 
     - name: Install functional tests dependencies
-      run: cd tests/func-tests && yarn install --no-immutable
+      run: cd tests/func-tests/imx && yarn install --no-immutable
 
     - name: Run tests
       env:
@@ -38,4 +38,4 @@ jobs:
         TEST_WALLET_BANKER_PRIVATE_KEY: ${{ secrets.TEST_WALLET_BANKER_PRIVATE_KEY }}
         TEST_WALLET_BANKER_STARK_PRIVATE_KEY: ${{ secrets.TEST_WALLET_BANKER_STARK_PRIVATE_KEY }}
         TEST_STARKEX_BATCH_SIZE: 500
-      run: cd tests/func-tests && yarn test:ci
+      run: cd tests/func-tests/imx && yarn test:ci
