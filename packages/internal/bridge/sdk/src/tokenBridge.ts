@@ -857,7 +857,7 @@ export class TokenBridge {
       let flowRatePromiseIndex: number;
       if (metaStatus === StatusResponse.COMPLETE
         && isWithdraw && txItem.recipient) {
-        // consolodate the calls we have to make to the flow rate by receiver
+        // consolidate the calls we have to make to the flow rate by receiver
         if (!flowRatePromisesReceivers.includes(txItem.recipient)) {
           flowRatePromises.push(rootBridge!.getPendingWithdrawals(txItem.recipient, [0]));
           flowRatePromisesReceivers.push(txItem.recipient);
