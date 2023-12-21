@@ -6,7 +6,6 @@ import { ImmutableConfiguration, Environment } from '@imtbl/config';
 import { 
     TokenBridge, 
     BridgeConfiguration, 
-    ETH_SEPOLIA_TO_ZKEVM_TESTNET,
     FlowRateWithdrawRequest,
     FlowRateWithdrawResponse,
 } from '@imtbl/bridge-sdk';
@@ -26,7 +25,7 @@ async function getFlowRateWithdrawTx() {
       baseConfig: new ImmutableConfiguration({
         environment: Environment.SANDBOX,
       }),
-      bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
+      bridgeInstance: params.bridgeInstance,
       rootProvider: params.rootProvider,
       childProvider: params.childProvider,
     });
@@ -44,8 +43,8 @@ async function getFlowRateWithdrawTx() {
       const flowRateWithdrawRes: FlowRateWithdrawResponse = await tokenBridge.getFlowRateWithdrawTx(flowRateWithdrawReq);
       console.log('flowRateWithdrawRes', flowRateWithdrawRes);
     } catch(err) {
-      console.log('flowRateWithdrawErr', err);
-      return;
+      console.error('flowRateWithdrawErr', err);
+      throw(err);
     }
 
 }
@@ -55,6 +54,6 @@ async function getFlowRateWithdrawTx() {
         await getFlowRateWithdrawTx()
         console.log('Exiting successfully');
     } catch(err) {
-        console.log('Exiting with error', err)
+        console.error('Exiting with error', err)
     }
 })();
