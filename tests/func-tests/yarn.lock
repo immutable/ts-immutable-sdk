@@ -572,6 +572,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/runtime@npm:^7.22.5, @babel/runtime@npm:^7.23.2":
+  version: 7.23.6
+  resolution: "@babel/runtime@npm:7.23.6"
+  dependencies:
+    regenerator-runtime: ^0.14.0
+  checksum: 1a8eaf3d3a103ef5227b60ca7ab5c589118c36ca65ef2d64e65380b32a98a3f3b5b3ef96660fa0471b079a18b619a8317f3e7f03ab2b930c45282a8b69ed9a16
+  languageName: node
+  linkType: hard
+
 "@babel/template@npm:^7.22.15, @babel/template@npm:^7.3.3":
   version: 7.22.15
   resolution: "@babel/template@npm:7.22.15"
@@ -619,7 +628,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/design-tokens@npm:*":
+"@biom3/design-tokens@npm:*, @biom3/design-tokens@npm:0.2.9":
   version: 0.2.9
   resolution: "@biom3/design-tokens@npm:0.2.9"
   dependencies:
@@ -628,26 +637,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/design-tokens@npm:0.2.4-beta":
-  version: 0.2.4-beta
-  resolution: "@biom3/design-tokens@npm:0.2.4-beta"
-  dependencies:
-    lodash.get: ^4.4.2
-  checksum: a68500472c922c5456ce19ab8d3676e72a11cc92e165291f5bf985e77b8095eddf1b93504ae16150171dfe800c84612e46df5d91f2b343efa5ee4d647c9aa0f4
-  languageName: node
-  linkType: hard
-
-"@biom3/react@npm:^0.10.12":
-  version: 0.10.15
-  resolution: "@biom3/react@npm:0.10.15"
+"@biom3/react@npm:^0.19.22":
+  version: 0.19.31
+  resolution: "@biom3/react@npm:0.19.31"
   dependencies:
     "@biom3/design-tokens": "*"
     "@emotion/css": ^11.11.2
     "@emotion/react": ^11.11.1
-    "@rive-app/react-canvas": ^4.1.4
+    "@rive-app/react-canvas": ^4.5.0
     buffer: ^6.0.3
     csstype: ^3.1.2
     framer-motion: ^10.12.12
+    localstorage-slim: ^2.7.0
     lodash.debounce: ^4.0.8
     lodash.get: ^4.4.2
     lodash.isequal: ^4.5.0
@@ -655,8 +656,9 @@ __metadata:
     react: ^18.2.0
     react-dom: ^18.2.0
     react-is: ^18.2.0
+    react-keyed-flatten-children: ^3.0.0
     ts-deepmerge: ^6.2.0
-  checksum: 6a01a5db727cf7b3bf99d083d08dd6f580d202f9916f2fe08dc99881fb65699c3f06e6ca081991de173a9bbfe1cd568baaf0db0bef8d4da8efbf2c77cb67c179
+  checksum: 5a8c088472f35b2ca609b6cd863de5109f17411d48953ace861875b3e8d51920ee6e8190532ae7e28b13b31e8cb4d285038aeb7995b5834f513abfe6cc521a5d
   languageName: node
   linkType: hard
 
@@ -1311,14 +1313,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@imtbl/sdk@file:../sdk::locator=func-tests%40workspace%3A.":
+"@imtbl/sdk@file:../../sdk::locator=func-tests%40workspace%3A.":
   version: 0.0.0
-  resolution: "@imtbl/sdk@file:../sdk#../sdk::hash=00cd64&locator=func-tests%40workspace%3A."
+  resolution: "@imtbl/sdk@file:../../sdk#../../sdk::hash=4b6a5f&locator=func-tests%40workspace%3A."
   dependencies:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
-    "@biom3/design-tokens": 0.2.4-beta
-    "@biom3/react": ^0.10.12
+    "@biom3/design-tokens": 0.2.9
+    "@biom3/react": ^0.19.22
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
     "@ethersproject/providers": ^5.7.2
@@ -1340,18 +1342,21 @@ __metadata:
     enc-utils: ^3.0.0
     ethers: ^5.7.2
     https-browserify: ^1.0.0
+    i18next: ^23.7.6
+    i18next-browser-languagedetector: ^7.2.0
     jwt-decode: ^3.1.2
     magic-sdk: ^21.2.0
     oidc-client-ts: ^2.2.1
     os-browserify: ^0.3.0
     pako: ^2.1.0
+    react-i18next: ^13.5.0
     stream-browserify: ^3.0.0
     stream-http: ^3.2.0
     url: ^0.11.0
   peerDependencies:
     react: ^18.2.0
     react-dom: ^18.2.0
-  checksum: 5287f2974256f1f343cf36f57d0253969a2083ca781c0745b22fa979a796a4beefc4b5aa2334a346b7a6784390358329ca8f96351895c2be65bad854d420e99d
+  checksum: 5664f0f397eaa003d970e8477509cced506995c3be49a0c5fc80ae3dfceaca89a712a1df38cf9a0d4a6661786832f23fcd351574b064baf185866ee8056cb50f
   languageName: node
   linkType: hard
 
@@ -2004,13 +2009,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openzeppelin/contracts@npm:3.4.1-solc-0.7-2":
-  version: 3.4.1-solc-0.7-2
-  resolution: "@openzeppelin/contracts@npm:3.4.1-solc-0.7-2"
-  checksum: 3608a4065f65946117caa543ef72477ce637bd5cc4f4853303b5f5b6c26516f8b50898ea3a8486e2877689cae81453ce22c72c8624c77c363c63f019b4086ffa
-  languageName: node
-  linkType: hard
-
 "@openzeppelin/contracts@npm:3.4.2-solc-0.7":
   version: 3.4.2-solc-0.7
   resolution: "@openzeppelin/contracts@npm:3.4.2-solc-0.7"
@@ -2098,21 +2096,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rive-app/canvas@npm:2.7.6":
-  version: 2.7.6
-  resolution: "@rive-app/canvas@npm:2.7.6"
-  checksum: 23ad4546937961af503814888ab6dadc1e08bd88b4b8a350e5f286708c8668c696bb6cdc9ebb0421cb0605d6bca51dd53f84f3d32d3a2e4ab5f3dc220c04b01a
+"@rive-app/canvas@npm:2.8.3":
+  version: 2.8.3
+  resolution: "@rive-app/canvas@npm:2.8.3"
+  checksum: 1318aecc3256279b806828c53ddd4d18e3967a61a19563af2d9d86e251b5dc105d8a4839ed191da7cd4eb42f5f2f4456d85c91df35bfbf1d49c75da58a064c87
   languageName: node
   linkType: hard
 
-"@rive-app/react-canvas@npm:^4.1.4":
-  version: 4.5.6
-  resolution: "@rive-app/react-canvas@npm:4.5.6"
+"@rive-app/react-canvas@npm:^4.5.0":
+  version: 4.6.2
+  resolution: "@rive-app/react-canvas@npm:4.6.2"
   dependencies:
-    "@rive-app/canvas": 2.7.6
+    "@rive-app/canvas": 2.8.3
   peerDependencies:
     react: ^16.8.0 || ^17.0.0 || ^18.0.0
-  checksum: 22ec5f473f5fc9b70fed53e889e6044985dcd0fe3425b27a8308ad383a4552beffd30dd093ad9ca3c0f5fa8226daa9da881dc55cbee8a0b5f2f87f0e30adeede
+  checksum: 61180635fe7ca6bd60ee99a176fefcdca7a5c3475fd9dd7d263a809c062b1ea1168fec6902326272107afe70eae62917bf65d2e5d5073c40dbaad3baed295598
   languageName: node
   linkType: hard
 
@@ -6111,7 +6109,7 @@ __metadata:
     "@ethersproject/units": ^5.7.0
     "@ethersproject/wallet": ^5.7.0
     "@imtbl/core-sdk": ^2.4.1
-    "@imtbl/sdk": "file:../sdk"
+    "@imtbl/sdk": "file:../../sdk"
     "@swc/jest": ^0.2.29
     "@types/node": ^20.10.1
     dotenv: ^16.3.1
@@ -6444,6 +6442,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"html-parse-stringify@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "html-parse-stringify@npm:3.0.1"
+  dependencies:
+    void-elements: 3.1.0
+  checksum: 334fdebd4b5c355dba8e95284cead6f62bf865a2359da2759b039db58c805646350016d2017875718bc3c4b9bf81a0d11be5ee0cf4774a3a5a7b97cde21cfd67
+  languageName: node
+  linkType: hard
+
 "http-cache-semantics@npm:^4.1.1":
   version: 4.1.1
   resolution: "http-cache-semantics@npm:4.1.1"
@@ -6526,6 +6533,24 @@ __metadata:
   bin:
     husky: lib/bin.js
   checksum: 837bc7e4413e58c1f2946d38fb050f5d7324c6f16b0fd66411ffce5703b294bd21429e8ba58711cd331951ee86ed529c5be4f76805959ff668a337dbfa82a1b0
+  languageName: node
+  linkType: hard
+
+"i18next-browser-languagedetector@npm:^7.2.0":
+  version: 7.2.0
+  resolution: "i18next-browser-languagedetector@npm:7.2.0"
+  dependencies:
+    "@babel/runtime": ^7.23.2
+  checksum: 757845c7ae7dfc541f5150855c3a3e4f6d29bcee113796d44dc781594abc7f16f2750a2a70d786904c16d23ba952eba2741c0bcfeaa381016669522a6236998f
+  languageName: node
+  linkType: hard
+
+"i18next@npm:^23.7.6":
+  version: 23.7.11
+  resolution: "i18next@npm:23.7.11"
+  dependencies:
+    "@babel/runtime": ^7.23.2
+  checksum: 50aeaa279f95d27ea9a6a0bf58e28ef883c0056b89e17fd21e252287269e9a8debbdbcb753047c03ceabbb2b240a9cf668f820c9306cedbe54957e2e64ea1c87
   languageName: node
   linkType: hard
 
@@ -8111,6 +8136,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"localstorage-slim@npm:^2.7.0":
+  version: 2.7.0
+  resolution: "localstorage-slim@npm:2.7.0"
+  checksum: eaa52251005baca503d28818dcde89c3c4e72c3617497a3bf2f990636c92a1f112c4a67d8eba8a2b70e40c994abe791df5043983e67585455c74d1e0fee58986
+  languageName: node
+  linkType: hard
+
 "locate-path@npm:^5.0.0":
   version: 5.0.0
   resolution: "locate-path@npm:5.0.0"
@@ -9316,6 +9348,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-i18next@npm:^13.5.0":
+  version: 13.5.0
+  resolution: "react-i18next@npm:13.5.0"
+  dependencies:
+    "@babel/runtime": ^7.22.5
+    html-parse-stringify: ^3.0.1
+  peerDependencies:
+    i18next: ">= 23.2.3"
+    react: ">= 16.8.0"
+  peerDependenciesMeta:
+    react-dom:
+      optional: true
+    react-native:
+      optional: true
+  checksum: 2f68ccd24daf72ddd2d11a526fb3c2b66c11ea4fcd2e24ac7aed42bf57ec7bffa7455ad1dc93679968ff629e9b1896465cdf6d1a61c29b92138ef88098e8dcba
+  languageName: node
+  linkType: hard
+
 "react-is@npm:^16.7.0":
   version: 16.13.1
   resolution: "react-is@npm:16.13.1"
@@ -9334,6 +9384,17 @@ __metadata:
   version: 18.2.0
   resolution: "react-is@npm:18.2.0"
   checksum: e72d0ba81b5922759e4aff17e0252bd29988f9642ed817f56b25a3e217e13eea8a7f2322af99a06edb779da12d5d636e9fda473d620df9a3da0df2a74141d53e
+  languageName: node
+  linkType: hard
+
+"react-keyed-flatten-children@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "react-keyed-flatten-children@npm:3.0.0"
+  dependencies:
+    react-is: ^18.2.0
+  peerDependencies:
+    react: ">=15.0.0"
+  checksum: 07c216e7420c3830969097bc7bdedaf50ae944f59540123680b99be7da3faecb6eda9edc71243f3f88696e93c4823646c609d774eee5116bdc348a7f53909b43
   languageName: node
   linkType: hard
 
@@ -10738,6 +10799,13 @@ __metadata:
     spdx-correct: ^3.0.0
     spdx-expression-parse: ^3.0.0
   checksum: 35703ac889d419cf2aceef63daeadbe4e77227c39ab6287eeb6c1b36a746b364f50ba22e88591f5d017bc54685d8137bc2d328d0a896e4d3fd22093c0f32a9ad
+  languageName: node
+  linkType: hard
+
+"void-elements@npm:3.1.0":
+  version: 3.1.0
+  resolution: "void-elements@npm:3.1.0"
+  checksum: 0390f818107fa8fce55bb0a5c3f661056001c1d5a2a48c28d582d4d847347c2ab5b7f8272314cac58acf62345126b6b09bea623a185935f6b1c3bbce0dfd7f7f
   languageName: node
   linkType: hard
 
