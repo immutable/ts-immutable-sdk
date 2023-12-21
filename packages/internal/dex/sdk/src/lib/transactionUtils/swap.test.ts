@@ -129,7 +129,7 @@ describe('getSwap', () => {
         slippagePercentage,
         deadline,
         makeAddr('routerContract'),
-        makeAddr('secondaryFeeContract'),
+        makeAddr('swapProxyContract'),
         newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
         [],
       );
@@ -153,7 +153,7 @@ describe('getSwap', () => {
         slippagePercentage,
         deadline,
         makeAddr('routerContract'),
-        makeAddr('secondaryFeeContract'),
+        makeAddr('swapProxyContract'),
         newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
         [],
       );
@@ -179,7 +179,7 @@ describe('getSwap', () => {
           slippagePercentage,
           deadline,
           makeAddr('routerContract'),
-          makeAddr('secondaryFeeContract'),
+          makeAddr('swapProxyContract'),
           newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
           [],
         );
@@ -203,7 +203,7 @@ describe('getSwap', () => {
           slippagePercentage,
           deadline,
           makeAddr('routerContract'),
-          makeAddr('secondaryFeeContract'),
+          makeAddr('swapProxyContract'),
           newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
           [],
         );
@@ -227,7 +227,7 @@ describe('getSwap', () => {
           slippagePercentage,
           deadline,
           makeAddr('routerContract'),
-          makeAddr('secondaryFeeContract'),
+          makeAddr('swapProxyContract'),
           newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
           [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
         );
@@ -235,7 +235,7 @@ describe('getSwap', () => {
         expectToBeDefined(swap.transaction.data);
         const { swapParams } = decodeMulticallExactInputSingleWithFees(swap.transaction.data);
         expectToBeString(swapParams.recipient);
-        expect(swapParams.recipient.toLowerCase()).toEqual(makeAddr('secondaryFeeContract'));
+        expect(swapParams.recipient.toLowerCase()).toEqual(makeAddr('swapProxyContract'));
       });
     });
   });
@@ -253,7 +253,7 @@ describe('getSwap', () => {
         slippagePercentage,
         deadline,
         makeAddr('routerContract'),
-        makeAddr('secondaryFeeContract'),
+        makeAddr('swapProxyContract'),
         newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
         [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
       );
@@ -277,7 +277,7 @@ describe('getSwap', () => {
         slippagePercentage,
         deadline,
         makeAddr('routerContract'),
-        makeAddr('secondaryFeeContract'),
+        makeAddr('swapProxyContract'),
         newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
         [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
       );
@@ -305,7 +305,7 @@ describe('getSwap', () => {
         slippagePercentage,
         deadline,
         makeAddr('routerContract'),
-        makeAddr('secondaryFeeContract'),
+        makeAddr('swapProxyContract'),
         newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
         [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
       );
@@ -328,7 +328,7 @@ describe('getSwap', () => {
         slippagePercentage,
         deadline,
         makeAddr('routerContract'),
-        makeAddr('secondaryFeeContract'),
+        makeAddr('swapProxyContract'),
         newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
         [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
       );
@@ -350,7 +350,7 @@ describe('getSwap', () => {
         slippagePercentage,
         deadline,
         makeAddr('routerContract'),
-        makeAddr('secondaryFeeContract'),
+        makeAddr('swapProxyContract'),
         newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
         [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
       );
@@ -374,7 +374,7 @@ describe('getSwap', () => {
         slippagePercentage,
         deadline,
         makeAddr('routerContract'),
-        makeAddr('secondaryFeeContract'),
+        makeAddr('swapProxyContract'),
         newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
         [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
       );
@@ -400,7 +400,7 @@ describe('getSwap', () => {
         slippagePercentage,
         deadline,
         makeAddr('routerContract'),
-        makeAddr('secondaryFeeContract'),
+        makeAddr('swapProxyContract'),
         newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
         [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
       );
@@ -423,7 +423,7 @@ describe('getSwap', () => {
         slippagePercentage,
         deadline,
         makeAddr('routerContract'),
-        makeAddr('secondaryFeeContract'),
+        makeAddr('swapProxyContract'),
         newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
         [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
       );
@@ -444,7 +444,7 @@ describe('getSwap', () => {
         slippagePercentage,
         deadline,
         makeAddr('routerContract'),
-        makeAddr('secondaryFeeContract'),
+        makeAddr('swapProxyContract'),
         newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
         [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
       );
@@ -467,7 +467,7 @@ describe('getSwap', () => {
         slippagePercentage,
         deadline,
         makeAddr('routerContract'),
-        makeAddr('secondaryFeeContract'),
+        makeAddr('swapProxyContract'),
         newAmount(BigNumber.from(0), NATIVE_TEST_TOKEN),
         [{ basisPoints: 100, recipient: makeAddr('feeRecipient') }],
       );
