@@ -12,7 +12,6 @@ import {
   WidgetParameters,
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
-import i18next from 'i18next';
 import { StrongCheckoutWidgetsConfig, withDefaultWidgetConfigs } from '../lib/withDefaultWidgetConfig';
 import { addProviderListenersForWidgetRoot, baseWidgetProviderEvent } from '../lib';
 
@@ -99,12 +98,6 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
     if (props.provider) {
       // eslint-disable-next-line no-console
       console.warn('Updating a widget provider through the update() method is not supported yet');
-    }
-
-    if (props.config?.language) {
-      i18next.changeLanguage(props.config.language).then(() => {
-        console.log('language changed!', props.config?.language);
-      });
     }
 
     this.render();
