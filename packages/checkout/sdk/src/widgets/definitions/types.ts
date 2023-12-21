@@ -60,8 +60,6 @@ export enum WidgetType {
   SALE = 'sale',
 }
 
-export type WidgetLanguage = 'en' | 'ja';
-
 /**
  * Widget properties definition for each widget. Used for creating and updating widgets
  */

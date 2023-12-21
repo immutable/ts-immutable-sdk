@@ -1,5 +1,6 @@
 /* eslint-disable max-len */
 import { WalletProviderName } from '../../../types';
+import { WidgetLanguage } from '../configurations';
 
 /**
  * Bridge Widget parameters
@@ -14,5 +15,6 @@ export type BridgeWidgetParams = {
   amount?: string;
   /** The wallet provider name to use for the bridge widget */
   walletProviderName?: WalletProviderName;
-  language?: 'en' | 'ja';
+  /** The language to use for the bridge widget */
+  language?: WidgetLanguage;
 };

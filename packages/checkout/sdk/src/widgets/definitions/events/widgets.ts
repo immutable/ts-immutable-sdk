@@ -1,4 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
+import { WidgetLanguage } from '../configurations';
 
 /**
  * Enum representing the events emitted by the widgets.
@@ -27,6 +28,9 @@ export type ProviderUpdated = {
   provider: Web3Provider;
 };
 
+/**
+ * Payload type for the LANGUAGE_CHANGED event
+ */
 export type LanguageChanged = {
-  language: 'en' | 'ja';
+  language: WidgetLanguage;
 };
