@@ -874,7 +874,7 @@ export class TokenBridge {
       flowRateLengthPromises.push(rootBridge!.getPendingWithdrawalsLength(flowRateReceiver));
     }
 
-    let flowRateLengthResponses:Array<number> = [];
+    let flowRateLengthResponses:Array<ethers.BigNumber> = [];
 
     try {
       flowRateLengthResponses = await Promise.all(flowRateLengthPromises);
@@ -886,7 +886,11 @@ export class TokenBridge {
     }
 
     for (let i = 0, l = flowRatePromisesReceivers.length; i < l; i++) {
-      const indices: Array<number> = [...Array(flowRateLengthResponses[i]).keys()];
+      const indices: Array<number> = [];
+      const indicesLength = flowRateLengthResponses[i].toNumber();
+      for (let j = 0; j < indicesLength; j++) {
+        indices.push(j);
+      }
       flowRatePromises.push(rootBridge!.getPendingWithdrawals(flowRatePromisesReceivers[i], indices));
     }
 
@@ -997,7 +1001,10 @@ export class TokenBridge {
       return pendingWithdrawals;
     }
 
-    const indices: Array<number> = [...Array(pendingLength).keys()];
+    const indices: Array<number> = [];
+    for (let i = 0; i < pendingLength.toNumber(); i++) {
+      indices.push(i);
+    }
 
     const pending:Array<RootBridgePendingWithdrawal> = await rootBridge.getPendingWithdrawals(req.recipient, indices);
 
