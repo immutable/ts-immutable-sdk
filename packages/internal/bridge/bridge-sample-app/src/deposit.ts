@@ -6,11 +6,8 @@ import { ImmutableConfiguration, Environment } from '@imtbl/config';
 import { 
     TokenBridge, 
     BridgeConfiguration, 
-    ETH_SEPOLIA_TO_ZKEVM_TESTNET,
     ApproveBridgeRequest,
     ApproveBridgeResponse,
-    ETH_SEPOLIA_CHAIN_ID,
-    ZKEVM_TESTNET_CHAIN_ID,
     BridgeTxRequest,
     BridgeTxResponse,
     TxStatusResponse,
@@ -31,7 +28,7 @@ async function deposit() {
     baseConfig: new ImmutableConfiguration({
       environment: Environment.SANDBOX,
     }),
-    bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
+    bridgeInstance: params.bridgeInstance,
     rootProvider: params.rootProvider,
     childProvider: params.childProvider,
   });
@@ -63,8 +60,8 @@ async function deposit() {
     senderAddress: params.sender,
     token: params.rootToken,
     amount: params.amount,
-    sourceChainId: ETH_SEPOLIA_CHAIN_ID,
-    destinationChainId: ZKEVM_TESTNET_CHAIN_ID,
+    sourceChainId: bridgeConfig.bridgeInstance.rootChainID,
+    destinationChainId: bridgeConfig.bridgeInstance.childChainID,
   }
 
   console.log('approvalReq', approvalReq);
@@ -109,8 +106,8 @@ async function deposit() {
     recipientAddress: params.recipient,
     token: params.rootToken,
     amount: params.amount,
-    sourceChainId: ETH_SEPOLIA_CHAIN_ID,
-    destinationChainId: ZKEVM_TESTNET_CHAIN_ID,
+    sourceChainId: bridgeConfig.bridgeInstance.rootChainID,
+    destinationChainId: bridgeConfig.bridgeInstance.childChainID,
     gasMultiplier: 1.1,
   }
 
@@ -153,7 +150,7 @@ async function deposit() {
   console.log('Deposit submitted txHash:',sendDepositRes.hash);
 
   const txStatusReq:TxStatusRequest = {
-    sourceChainId: ETH_SEPOLIA_CHAIN_ID,
+    sourceChainId: bridgeConfig.bridgeInstance.rootChainID,
     transactions: [{
       txHash: sendDepositRes.hash
     }]

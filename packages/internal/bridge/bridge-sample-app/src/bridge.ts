@@ -6,11 +6,6 @@ import { ImmutableConfiguration, Environment } from '@imtbl/config';
 import { 
     TokenBridge, 
     BridgeConfiguration, 
-    ETH_SEPOLIA_TO_ZKEVM_TESTNET,
-    ETH_SEPOLIA_CHAIN_ID,
-    ZKEVM_TESTNET_CHAIN_ID,
-    ApproveBridgeRequest,
-    ApproveBridgeResponse,
     BridgeTxRequest,
     BridgeTxResponse,
 } from '@imtbl/bridge-sdk';
@@ -26,7 +21,7 @@ async function getBridgeTxs() {
       baseConfig: new ImmutableConfiguration({
         environment: Environment.SANDBOX,
       }),
-      bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
+      bridgeInstance: params.bridgeInstance,
       rootProvider: params.rootProvider,
       childProvider: params.childProvider,
     });
@@ -38,8 +33,8 @@ async function getBridgeTxs() {
       recipientAddress: params.recipient,
       token: params.rootToken,
       amount: params.amount,
-      sourceChainId: ETH_SEPOLIA_CHAIN_ID,
-      destinationChainId: ZKEVM_TESTNET_CHAIN_ID,
+      sourceChainId: bridgeConfig.bridgeInstance.rootChainID,
+      destinationChainId: bridgeConfig.bridgeInstance.childChainID,
       gasMultiplier: 1.1,
     }
 
@@ -57,8 +52,8 @@ async function getBridgeTxs() {
       recipientAddress: params.recipient,
       token: 'NATIVE',
       amount: params.amount,
-      sourceChainId: ETH_SEPOLIA_CHAIN_ID,
-      destinationChainId: ZKEVM_TESTNET_CHAIN_ID,
+      sourceChainId: bridgeConfig.bridgeInstance.rootChainID,
+      destinationChainId: bridgeConfig.bridgeInstance.childChainID,
       gasMultiplier: 1.1,
     }
 
@@ -76,8 +71,8 @@ async function getBridgeTxs() {
       recipientAddress: params.recipient,
       token: params.rootToken,
       amount: params.amount,
-      sourceChainId: ZKEVM_TESTNET_CHAIN_ID,
-      destinationChainId: ETH_SEPOLIA_CHAIN_ID,
+      sourceChainId: bridgeConfig.bridgeInstance.childChainID,
+      destinationChainId: bridgeConfig.bridgeInstance.rootChainID,
       gasMultiplier: 1.1,
     }
 
@@ -95,8 +90,8 @@ async function getBridgeTxs() {
       recipientAddress: params.recipient,
       token: 'NATIVE',
       amount: params.amount,
-      sourceChainId: ZKEVM_TESTNET_CHAIN_ID,
-      destinationChainId: ETH_SEPOLIA_CHAIN_ID,
+      sourceChainId: bridgeConfig.bridgeInstance.childChainID,
+      destinationChainId: bridgeConfig.bridgeInstance.rootChainID,
       gasMultiplier: 1.1,
     }
 

@@ -41,9 +41,9 @@ import {
   FlowRateWithdrawResponse,
   FlowRateInfoRequest,
   CalculateBridgeFeeResponse,
-  Address,
   RootBridgePendingWithdrawal,
   TxStatusResponseItem,
+  PendingWithdrawal,
 } from './types';
 import { GMPStatus, GMPStatusResponse, GasPaidStatus } from './types/axelar';
 import { queryTransactionStatus } from './lib/gmpRecovery';
@@ -795,7 +795,9 @@ export class TokenBridge {
     }
 
     const flowRatePromises:Array<Promise<any>> = [];
-    const flowRatePromisesReceivers: Array<Address> = [];
+    const flowRateLengthPromises:Array<Promise<any>> = [];
+
+    const flowRatePromisesReceivers: Array<string> = [];
 
     for (let i = 0, l = statusResponses.length; i < l; i++) {
       let metaStatus: StatusResponse;
@@ -849,27 +851,44 @@ export class TokenBridge {
           ...txItem,
           token: decodedData[1],
           sender: decodedData[2],
-          receiver: decodedData[3],
+          recipient: decodedData[3],
           amount: decodedData[4],
         };
       }
 
-      let flowRatePromiseIndex: number;
+      let flowRatePromiseIndex: number = flowRatePromisesReceivers.findIndex((el) => el === txItem.recipient);
       if (metaStatus === StatusResponse.COMPLETE
-        && isWithdraw && txItem.receiver) {
+        && isWithdraw && txItem.recipient) {
         // consolidate the calls we have to make to the flow rate by receiver
-        if (!flowRatePromisesReceivers.includes(txItem.receiver)) {
-          flowRatePromises.push(rootBridge!.getPendingWithdrawals(txItem.receiver, [0]));
-          flowRatePromisesReceivers.push(txItem.receiver);
+        if (flowRatePromiseIndex === -1) {
+          flowRatePromisesReceivers.push(txItem.recipient);
           flowRatePromiseIndex = flowRatePromisesReceivers.length - 1;
-        } else {
-          flowRatePromiseIndex = flowRatePromisesReceivers.findIndex((el) => el === txItem.receiver);
         }
         txItem.data.flowRatePromiseIndex = flowRatePromiseIndex;
       }
 
       txStatusResponse.transactions.push(txItem);
     }// for
+
+    for (const flowRateReceiver of flowRatePromisesReceivers) {
+      flowRateLengthPromises.push(rootBridge!.getPendingWithdrawalsLength(flowRateReceiver));
+    }
+
+    let flowRateLengthResponses:Array<number> = [];
+
+    try {
+      flowRateLengthResponses = await Promise.all(flowRateLengthPromises);
+    } catch (err) {
+      throw new BridgeError(
+        `Failed to fetch the Flow Rate pending lengths with the reason: ${err}`,
+        BridgeErrorType.FLOW_RATE_ERROR,
+      );
+    }
+
+    for (let i = 0, l = flowRatePromisesReceivers.length; i < l; i++) {
+      const indices: Array<number> = [...Array(flowRateLengthResponses[i]).keys()];
+      flowRatePromises.push(rootBridge!.getPendingWithdrawals(flowRatePromisesReceivers[i], indices));
+    }
 
     let flowRateResponses:Array<Array<RootBridgePendingWithdrawal>> = [];
     if (flowRatePromises.length > 0) {
@@ -939,7 +958,7 @@ export class TokenBridge {
   }
 
   /**
- * Queries the status of a bridge transaction.
+ * Fetches the pending withdrawals for a given address.
  *
  * @param {PendingWithdrawalsRequest} req - The request object containing the reciever address.
  * @returns {Promise<PendingWithdrawalsResponse>} - A promise that resolves to an object containing the child token address.
@@ -948,25 +967,62 @@ export class TokenBridge {
  */
   public async getPendingWithdrawals(req: PendingWithdrawalsRequest): Promise<PendingWithdrawalsResponse> {
     // eslint-disable-next-line no-console
-    console.log('stubbed response with req', req);
-    return {
-      pending: [{
-        canWithdraw: true,
-        withdrawer: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
-        token: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-        amount: ethers.utils.parseUnits('1', 18).toString(),
-        timeoutStart: 1698502429,
-        timeoutEnd: 1701227629,
+
+    if (!req.recipient) {
+      throw new BridgeError(
+        `invalid recipient ${req.recipient}`,
+        BridgeErrorType.INVALID_RECIPIENT,
+      );
+    }
+
+    const rootBridge = await withBridgeError<ethers.Contract>(
+      async () => {
+        const contract = new ethers.Contract(
+          this.config.bridgeContracts.rootERC20BridgeFlowRate,
+          ROOT_ERC20_BRIDGE_FLOW_RATE,
+          this.config.rootProvider,
+        );
+        return contract;
       },
-      {
-        canWithdraw: false,
-        withdrawer: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
-        token: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-        amount: ethers.utils.parseUnits('2', 18).toString(),
-        timeoutStart: 1698416029,
-        timeoutEnd: 1698502429,
-      }],
+      BridgeErrorType.INTERNAL_ERROR,
+    );
+
+    const pendingLength: ethers.BigNumber = await rootBridge.getPendingWithdrawalsLength(req.recipient);
+
+    const pendingWithdrawals: PendingWithdrawalsResponse = {
+      pending: [],
     };
+
+    if (pendingLength.toNumber() === 0) {
+      return pendingWithdrawals;
+    }
+
+    const indices: Array<number> = [...Array(pendingLength).keys()];
+
+    const pending:Array<RootBridgePendingWithdrawal> = await rootBridge.getPendingWithdrawals(req.recipient, indices);
+
+    const timestampNow = Math.floor(Date.now() / 1000);
+
+    for (let i = 0, l = pending.length; i < l; i++) {
+      // @TODO query timeout from contract (SMR-2090)
+      const timeoutEnd = pending[i].timestamp.toNumber() + (60 * 60 * 24);
+      if (timeoutEnd > timestampNow) {
+        pendingWithdrawals.pending[i] = {
+          canWithdraw: false,
+        } as PendingWithdrawal;
+      } else {
+        pendingWithdrawals.pending[i] = {
+          canWithdraw: true,
+        } as PendingWithdrawal;
+      }
+      pendingWithdrawals.pending[i].withdrawer = pending[i].withdrawer;
+      pendingWithdrawals.pending[i].token = pending[i].token;
+      pendingWithdrawals.pending[i].amount = pending[i].amount;
+      pendingWithdrawals.pending[i].timeoutStart = pending[i].timestamp.toNumber();
+      pendingWithdrawals.pending[i].timeoutEnd = timeoutEnd;
+    }
+
+    return pendingWithdrawals;
   }
 
   /**
@@ -979,12 +1035,83 @@ export class TokenBridge {
  */
   public async getFlowRateWithdrawTx(req:FlowRateWithdrawRequest): Promise<FlowRateWithdrawResponse> {
     // eslint-disable-next-line no-console
-    console.log('stubbed response with req', req);
+
+    if (!req.recipient) {
+      throw new BridgeError(
+        `invalid recipient ${req.recipient}`,
+        BridgeErrorType.INVALID_RECIPIENT,
+      );
+    }
+
+    if (req.index < 0) {
+      throw new BridgeError(
+        `invalid index ${req.index}`,
+        BridgeErrorType.INVALID_FLOWRATE_INDEX,
+      );
+    }
+
+    const rootBridge = await withBridgeError<ethers.Contract>(
+      async () => {
+        const contract = new ethers.Contract(
+          this.config.bridgeContracts.rootERC20BridgeFlowRate,
+          ROOT_ERC20_BRIDGE_FLOW_RATE,
+          this.config.rootProvider,
+        );
+        return contract;
+      },
+      BridgeErrorType.INTERNAL_ERROR,
+    );
+
+    const pending:Array<RootBridgePendingWithdrawal> = await
+    rootBridge.getPendingWithdrawals(req.recipient, [req.index]);
+
+    if (pending[0].withdrawer === ethers.constants.AddressZero
+      || pending[0].token === ethers.constants.AddressZero
+      || pending[0].amount === ethers.BigNumber.from(0)
+      || pending[0].timestamp === ethers.BigNumber.from(0)) {
+      throw new BridgeError(
+        `pending withdrawal not found for ${req.recipient} at index ${req.index}`,
+        BridgeErrorType.FLOW_RATE_ERROR,
+      );
+    }
+
+    // @TODO query timeout from contract (SMR-2090)
+    const timeoutEnd = pending[0].timestamp.toNumber() + (60 * 60 * 24);
+    const timestampNow = Math.floor(Date.now() / 1000);
+
+    if (timeoutEnd > timestampNow) {
+      return {
+        pendingWithdrawal: {
+          canWithdraw: false,
+          withdrawer: pending[0].withdrawer,
+          token: pending[0].token,
+          amount: pending[0].amount,
+          timeoutStart: pending[0].timestamp.toNumber(),
+          timeoutEnd,
+        },
+        unsignedTx: null,
+      };
+    }
+
+    const data:string = await withBridgeError<string>(async () => rootBridge.interface.encodeFunctionData(
+      'finaliseQueuedWithdrawal',
+      [req.recipient, req.index],
+    ), BridgeErrorType.INTERNAL_ERROR);
+
     return {
+      pendingWithdrawal: {
+        canWithdraw: true,
+        withdrawer: pending[0].withdrawer,
+        token: pending[0].token,
+        amount: pending[0].amount,
+        timeoutStart: pending[0].timestamp.toNumber(),
+        timeoutEnd,
+      },
       unsignedTx: {
-        data: 'stubbed flow rate withdrawal data',
-        to: '0x0',
+        data,
+        to: this.config.bridgeContracts.rootERC20BridgeFlowRate,
         value: 0,
+        chainId: parseInt(this.config.bridgeInstance.rootChainID, 10),
       },
     };
   }

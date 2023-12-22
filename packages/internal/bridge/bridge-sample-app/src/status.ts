@@ -1,21 +1,12 @@
 /* eslint-disable no-console */
 import 'dotenv/config';
-import { ethers } from "ethers";
 import util from 'util';
 import { ImmutableConfiguration, Environment } from '@imtbl/config';
 import { 
     TokenBridge, 
     BridgeConfiguration, 
-    ETH_SEPOLIA_TO_ZKEVM_TESTNET,
-    ApproveBridgeRequest,
-    ApproveBridgeResponse,
-    ETH_SEPOLIA_CHAIN_ID,
-    ZKEVM_TESTNET_CHAIN_ID,
-    BridgeTxRequest,
-    BridgeTxResponse,
     TxStatusResponse,
     TxStatusRequest,
-    StatusResponse,
 } from '@imtbl/bridge-sdk';
 
 // @ts-ignore
@@ -38,7 +29,7 @@ async function status() {
     baseConfig: new ImmutableConfiguration({
       environment: Environment.SANDBOX,
     }),
-    bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
+    bridgeInstance: params.bridgeInstance,
     rootProvider: params.rootProvider,
     childProvider: params.childProvider,
   });

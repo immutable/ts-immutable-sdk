@@ -6,9 +6,6 @@ import { ImmutableConfiguration, Environment } from '@imtbl/config';
 import { 
     TokenBridge, 
     BridgeConfiguration, 
-    ETH_SEPOLIA_TO_ZKEVM_TESTNET,
-    ETH_SEPOLIA_CHAIN_ID,
-    ZKEVM_TESTNET_CHAIN_ID,
     ApproveBridgeRequest,
     ApproveBridgeResponse,
 } from '@imtbl/bridge-sdk';
@@ -24,7 +21,7 @@ async function getApprovalTxs() {
       baseConfig: new ImmutableConfiguration({
         environment: Environment.SANDBOX,
       }),
-      bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
+      bridgeInstance: params.bridgeInstance,
       rootProvider: params.rootProvider,
       childProvider: params.childProvider,
     });
@@ -35,8 +32,8 @@ async function getApprovalTxs() {
       senderAddress: params.sender,
       token: params.rootToken,
       amount: params.amount,
-      sourceChainId: ETH_SEPOLIA_CHAIN_ID,
-      destinationChainId: ZKEVM_TESTNET_CHAIN_ID,
+      sourceChainId: bridgeConfig.bridgeInstance.rootChainID,
+      destinationChainId: bridgeConfig.bridgeInstance.childChainID,
     }
 
     console.log('depositReq', depositReq)
@@ -52,8 +49,8 @@ async function getApprovalTxs() {
       senderAddress: params.sender,
       token: 'NATIVE',
       amount: params.amount,
-      sourceChainId: ETH_SEPOLIA_CHAIN_ID,
-      destinationChainId: ZKEVM_TESTNET_CHAIN_ID,
+      sourceChainId: bridgeConfig.bridgeInstance.rootChainID,
+      destinationChainId: bridgeConfig.bridgeInstance.childChainID,
     }
 
     console.log('depositNativeReq', depositNativeReq)
@@ -69,8 +66,8 @@ async function getApprovalTxs() {
       senderAddress: params.sender,
       token: params.childToken,
       amount: params.amount,
-      sourceChainId: ZKEVM_TESTNET_CHAIN_ID,
-      destinationChainId: ETH_SEPOLIA_CHAIN_ID,
+      sourceChainId: bridgeConfig.bridgeInstance.childChainID,
+      destinationChainId: bridgeConfig.bridgeInstance.rootChainID,
     }
 
     console.log('withdrawReq', withdrawReq)
@@ -86,8 +83,8 @@ async function getApprovalTxs() {
       senderAddress: params.sender,
       token: 'NATIVE',
       amount: params.amount,
-      sourceChainId: ZKEVM_TESTNET_CHAIN_ID,
-      destinationChainId: ETH_SEPOLIA_CHAIN_ID,
+      sourceChainId: bridgeConfig.bridgeInstance.childChainID,
+      destinationChainId: bridgeConfig.bridgeInstance.rootChainID,
     }
 
     console.log('withdrawNativeReq', withdrawNativeReq)

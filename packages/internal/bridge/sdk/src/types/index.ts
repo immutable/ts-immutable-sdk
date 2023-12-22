@@ -258,10 +258,6 @@ export interface TxStatusRequest {
 /**
  * @typedef {Object} TxStatusRequestItem
  * @property {string} txHash - The transaction hash on the source chain of the bridge transaction.
- * @property {Address} sender - The address of the sender on the source chain.
- * @property {Address} receiver - The address of the receiver on the destination chain.
- * @property {FungibleToken} token - The address of the receiver on the destination chain.
- * @property {ethers.BigNumber} amount - The address of the receiver on the destination chain.
 */
 export interface TxStatusRequestItem {
   txHash: string;
@@ -279,8 +275,8 @@ export interface TxStatusResponse {
  * @typedef {Object} TxStatusResponseItem
  * @property {string} txHash - The transaction hash on the source chain of the bridge transaction.
  * @property {Address} sender - The address of the sender on the source chain.
- * @property {Address} receiver - The address of the receiver on the destination chain.
- * @property {FungibleToken} token - The address of the receiver on the destination chain.
+ * @property {Address} recipient - The address of the recipient on the destination chain.
+ * @property {FungibleToken} token - The token being bridged.
  * @property {ethers.BigNumber} amount - The amount of the transaction.
  * @property {StatusResponse} status - The status of the transaction.
  * @property {any} data - Any extra data relevant to the transaction.
@@ -288,7 +284,7 @@ export interface TxStatusResponse {
 export interface TxStatusResponseItem {
   txHash: string;
   sender: Address;
-  receiver: Address;
+  recipient: Address;
   token: FungibleToken;
   amount: ethers.BigNumber;
   status: StatusResponse;
@@ -341,10 +337,10 @@ export interface FlowRateInfoItem {
 
 /**
  * @typedef {Object} PendingWithdrawalsRequest
- * @property {Address} receiver - The address for which the pending withdrawals should be retrieved.
+ * @property {Address} recipient - The address for which the pending withdrawals should be retrieved.
  */
 export interface PendingWithdrawalsRequest {
-  receiver: Address;
+  recipient: Address;
 }
 
 /**
@@ -353,14 +349,14 @@ export interface PendingWithdrawalsRequest {
  * @property {Address} childToken - The address of the corresponding token on the child chain.
  */
 export interface PendingWithdrawalsResponse {
-  pending: Array<PendingWithdrawals>;
+  pending: Array<PendingWithdrawal>;
 }
 
-export interface PendingWithdrawals {
+export interface PendingWithdrawal {
   canWithdraw: boolean,
   withdrawer: Address,
   token: FungibleToken,
-  amount: string,
+  amount: ethers.BigNumber,
   timeoutStart: number,
   timeoutEnd: number,
 }
@@ -368,16 +364,18 @@ export interface PendingWithdrawals {
 export interface RootBridgePendingWithdrawal {
   withdrawer: Address,
   token: FungibleToken,
-  amount: string,
-  timestamp: string,
+  amount: ethers.BigNumber,
+  timestamp: ethers.BigNumber,
 }
 
 /**
  * @typedef {Object} FlowRateWithdrawRequest
- * @property {FungibleToken} receiver - The address for which the flow rate withdrawal transaction should be constructed.
+ * @property {FungibleToken} recipient - The address for which the flow rate withdrawal transaction should be constructed.
+ * @property {number} index - The index of the flow rate withdrawal to be processed.
  */
 export interface FlowRateWithdrawRequest {
-  receiver: Address;
+  recipient: Address;
+  index: number;
 }
 
 /**
@@ -385,7 +383,8 @@ export interface FlowRateWithdrawRequest {
  * @property {ethers.providers.TransactionRequest} unsignedTx - The unsigned transaction for the flow rate withdrawal.
  */
 export interface FlowRateWithdrawResponse {
-  unsignedTx: ethers.providers.TransactionRequest;
+  pendingWithdrawal: PendingWithdrawal,
+  unsignedTx: ethers.providers.TransactionRequest | null;
 }
 
 /**
