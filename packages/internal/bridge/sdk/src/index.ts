@@ -37,7 +37,7 @@ export type {
   FlowRateInfoItem,
   PendingWithdrawalsRequest,
   PendingWithdrawalsResponse,
-  PendingWithdrawals,
+  PendingWithdrawal,
   FlowRateWithdrawRequest,
   FlowRateWithdrawResponse,
   TokenMappingRequest,

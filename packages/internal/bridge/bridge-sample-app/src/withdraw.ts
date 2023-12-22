@@ -6,11 +6,8 @@ import { ImmutableConfiguration, Environment } from '@imtbl/config';
 import { 
     TokenBridge, 
     BridgeConfiguration, 
-    ETH_SEPOLIA_TO_ZKEVM_TESTNET,
     ApproveBridgeRequest,
     ApproveBridgeResponse,
-    ETH_SEPOLIA_CHAIN_ID,
-    ZKEVM_TESTNET_CHAIN_ID,
     BridgeTxRequest,
     BridgeTxResponse,
     TxStatusResponse,
@@ -31,7 +28,7 @@ export async function withdraw() {
     baseConfig: new ImmutableConfiguration({
       environment: Environment.SANDBOX,
     }),
-    bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
+    bridgeInstance: params.bridgeInstance,
     rootProvider: params.rootProvider,
     childProvider: params.childProvider,
   });
@@ -63,8 +60,8 @@ export async function withdraw() {
     senderAddress: params.sender,
     token: params.childToken,
     amount: params.amount,
-    sourceChainId: ZKEVM_TESTNET_CHAIN_ID,
-    destinationChainId: ETH_SEPOLIA_CHAIN_ID,
+    sourceChainId: bridgeConfig.bridgeInstance.childChainID,
+    destinationChainId: bridgeConfig.bridgeInstance.rootChainID,
   }
 
   console.log('approvalReq', approvalReq);
@@ -109,8 +106,8 @@ export async function withdraw() {
     recipientAddress: params.recipient,
     token: params.childToken,
     amount: params.amount,
-    sourceChainId: ZKEVM_TESTNET_CHAIN_ID,
-    destinationChainId: ETH_SEPOLIA_CHAIN_ID,
+    sourceChainId: bridgeConfig.bridgeInstance.childChainID,
+    destinationChainId: bridgeConfig.bridgeInstance.rootChainID,
     gasMultiplier: 1.1,
   }
 
@@ -158,7 +155,7 @@ export async function withdraw() {
   console.log('Withdraw submitted txHash:',sendWithdrawtRes.hash);
 
   const txStatusReq:TxStatusRequest = {
-    sourceChainId: ZKEVM_TESTNET_CHAIN_ID,
+    sourceChainId: bridgeConfig.bridgeInstance.childChainID,
     transactions: [{
       txHash: sendWithdrawtRes.hash
     }]
