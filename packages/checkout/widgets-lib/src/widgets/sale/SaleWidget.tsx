@@ -4,6 +4,7 @@ import {
 
 import { SaleItem } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
+import { useTranslation } from 'react-i18next';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import {
   SharedViews,
@@ -13,7 +14,6 @@ import {
   viewReducer,
 } from '../../context/view-context/ViewContext';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { text } from '../../resources/text/textConfig';
 import { LoadingView } from '../../views/loading/LoadingView';
 import { SaleWidgetViews } from '../../context/view-context/SaleViewContextTypes';
 import { widgetTheme } from '../../lib/theme';
@@ -35,6 +35,7 @@ export interface SaleWidgetProps {
 }
 
 export function SaleWidget(props: SaleWidgetProps) {
+  const { t } = useTranslation();
   const {
     config,
     amount,
@@ -53,7 +54,7 @@ export function SaleWidget(props: SaleWidgetProps) {
   const viewReducerValues = useMemo(() => ({ viewState, viewDispatch }), [viewState, viewDispatch]);
 
   const loadingText = viewState.view.data?.loadingText
-    || text.views[SharedViews.LOADING_VIEW].text;
+    || t('views.LOADING_VIEW.text');
 
   const mounted = useRef(false);
   const onMount = useCallback(() => {

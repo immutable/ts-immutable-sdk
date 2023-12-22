@@ -5,6 +5,7 @@ import {
 } from '@biom3/react';
 import { FundingRoute } from '@imtbl/checkout-sdk';
 import { useContext, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FooterLogo } from '../../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../../components/SimpleLayout/SimpleLayout';
@@ -16,7 +17,6 @@ import { ViewActions, ViewContext } from '../../../../context/view-context/ViewC
 import { FundingRouteMenuItem } from '../FundingRouteMenuItem/FundingRouteMenuItem';
 import { FundingRouteDrawer } from '../FundingRouteSelectDrawer/FundingRouteDrawer';
 import { PurchaseMenuItem } from '../PurchaseMenuItem/PurchaseMenuItem';
-import { text } from '../../../../resources/text/textConfig';
 import { sendSaleWidgetCloseEvent } from '../../SaleWidgetEvents';
 import { EventTargetContext } from '../../../../context/event-target-context/EventTargetContext';
 import { useSaleContext } from '../../context/SaleContextProvider';
@@ -27,7 +27,7 @@ type FundingRouteSelectProps = {
 };
 
 export function FundingRouteSelect({ fundingRoutes, onFundingRouteSelected }: FundingRouteSelectProps) {
-  const textConfig = text.views[SaleWidgetViews.FUND_WITH_SMART_CHECKOUT];
+  const { t } = useTranslation();
   const [smartCheckoutDrawerVisible, setSmartCheckoutDrawerVisible] = useState(false);
   const [activeFundingRouteIndex, setActiveFundingRouteIndex] = useState(0);
   const { viewDispatch } = useContext(ViewContext);
@@ -75,16 +75,16 @@ export function FundingRouteSelect({ fundingRoutes, onFundingRouteSelected }: Fu
       >
 
         <Heading size="small">
-          {textConfig.fundingRouteSelect.heading}
+          {t('views.FUND_WITH_SMART_CHECKOUT.fundingRouteSelect.heading')}
         </Heading>
 
         {fundingRoutes.length === 0
           ? [
             <Body key="noRoutesAvailableText" size="small">
-              {textConfig.fundingRouteSelect.noRoutesAvailable}
+              {t('views.FUND_WITH_SMART_CHECKOUT.fundingRouteSelect.noRoutesAvailable')}
             </Body>,
             <Button key="payWithCardButton" variant="tertiary">
-              {textConfig.fundingRouteSelect.payWithCard}
+              {t('views.FUND_WITH_SMART_CHECKOUT.fundingRouteSelect.payWithCard')}
             </Button>,
           ]
           : [
@@ -98,10 +98,10 @@ export function FundingRouteSelect({ fundingRoutes, onFundingRouteSelected }: Fu
             />,
             <PurchaseMenuItem key="purchaseMenuItem" fundingRoute={fundingRoutes[activeFundingRouteIndex]} />,
             <Button key="continueButton" sx={{ mt: 'auto' }} variant="primary" onClick={onClickContinue}>
-              {textConfig.fundingRouteSelect.continue}
+              {t('views.FUND_WITH_SMART_CHECKOUT.fundingRouteSelect.continue')}
             </Button>,
             <Button key="payWithCardButton" variant="tertiary" onClick={() => goBackToPaymentMethods()}>
-              {textConfig.fundingRouteSelect.payWithCardInstead}
+              {t('views.FUND_WITH_SMART_CHECKOUT.fundingRouteSelect.payWithCardInstead')}
             </Button>,
           ] }
 

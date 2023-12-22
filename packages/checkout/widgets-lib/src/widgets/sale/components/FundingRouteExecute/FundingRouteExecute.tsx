@@ -20,6 +20,7 @@ import {
   useEffect, useMemo, useReducer, useRef, useState,
 } from 'react';
 import { BridgeWidget } from 'widgets/bridge/BridgeWidget';
+import { useTranslation } from 'react-i18next';
 import {
   ConnectLoaderActions,
   ConnectLoaderContext,
@@ -31,7 +32,6 @@ import { ConnectWidgetViews } from '../../../../context/view-context/ConnectView
 import { SaleWidgetViews } from '../../../../context/view-context/SaleViewContextTypes';
 import { ViewActions, ViewContext } from '../../../../context/view-context/ViewContext';
 import { getL1ChainId, getL2ChainId } from '../../../../lib/networkUtils';
-import { text as textConfig } from '../../../../resources/text/textConfig';
 import { LoadingView } from '../../../../views/loading/LoadingView';
 import { ConnectWidget } from '../../../connect/ConnectWidget';
 import { SwapWidget } from '../../../swap/SwapWidget';
@@ -52,13 +52,13 @@ enum FundingRouteExecuteViews {
 }
 
 export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }: FundingRouteExecuteProps) {
+  const { t } = useTranslation();
   const {
     config, provider, checkout, fromTokenAddress: requiredTokenAddress,
   } = useSaleContext();
   const { viewDispatch } = useContext(ViewContext);
 
   const { connectLoaderDispatch } = useContext(ConnectLoaderContext);
-  const text = textConfig.views[SaleWidgetViews.FUND_WITH_SMART_CHECKOUT];
 
   const [swapParams, setSwapParams] = useState<SwapWidgetParams | undefined>(undefined);
   const [bridgeParams, setBridgeParams] = useState<BridgeWidgetParams | undefined>(undefined);
@@ -229,7 +229,7 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
   return (
     <EventTargetContext.Provider value={eventTargetReducerValues}>
       {view === FundingRouteExecuteViews.LOADING && (
-        <LoadingView loadingText={text.loading.checkingBalances} />
+        <LoadingView loadingText={t('views.FUND_WITH_SMART_CHECKOUT.loading.checkingBalances')} />
       )}
       {view === FundingRouteExecuteViews.EXECUTE_BRIDGE && (
         <BridgeWidget

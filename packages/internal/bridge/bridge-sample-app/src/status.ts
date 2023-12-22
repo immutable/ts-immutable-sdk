@@ -42,6 +42,8 @@ async function status() {
       txHash: process.env.STATUS_TX_HASH
     }]
   }
+
+  console.log('txStatusReq', txStatusReq);
   
   const txStatusRes: TxStatusResponse = await tokenBridge.getTransactionStatus(txStatusReq);
   console.log('txStatusRes');
