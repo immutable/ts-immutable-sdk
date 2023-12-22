@@ -36,7 +36,7 @@ export const TEST_SECONDARY_FEE_ADDRESS = '0x8dBE1f0900C5e92ad87A54521902a33ba15
 
 export const TEST_ROUTING_CONTRACTS: RoutingContracts = {
   coreFactory: TEST_V3_CORE_FACTORY_ADDRESS,
-  quoterV2: TEST_QUOTER_ADDRESS,
+  quoter: TEST_QUOTER_ADDRESS,
   multicall: TEST_MULTICALL_ADDRESS,
 };
 
@@ -107,8 +107,8 @@ export const TEST_DEX_CONFIGURATION: ExchangeModuleConfiguration = {
     exchangeContracts: {
       multicall: TEST_MULTICALL_ADDRESS,
       coreFactory: TEST_V3_CORE_FACTORY_ADDRESS,
-      quoterV2: TEST_QUOTER_ADDRESS,
-      peripheryRouter: TEST_ROUTER_ADDRESS,
+      quoter: TEST_QUOTER_ADDRESS,
+      swapRouter: TEST_ROUTER_ADDRESS,
       secondaryFee: TEST_SECONDARY_FEE_ADDRESS,
     },
     commonRoutingTokens: [],
