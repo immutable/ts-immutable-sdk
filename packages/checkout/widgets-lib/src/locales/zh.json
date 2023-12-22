@@ -258,12 +258,12 @@
         "heading": "您希望如何支付？"
       },
       "options": {
-        "CRYPTO": {
+        "crypto": {
           "heading": "硬币",
           "caption": "使用您钱包中的硬币余额",
           "disabledCaption": "我们看不到您余额中有足够多的硬币"
         },
-        "FIAT": {
+        "fiat": {
           "heading": "卡",
           "caption": "Transak也支持使用GooglePay",
           "disabledCaption": null
@@ -332,7 +332,7 @@
           "primaryAction": "再试一次",
           "secondaryAction": "取消"
         },
-        "DEFAULT": {
+        "DEFAULT_ERROR": {
           "description": "抱歉，出了点问题。请再试一次。",
           "primaryAction": "再试一次",
           "secondaryAction": "关闭"
