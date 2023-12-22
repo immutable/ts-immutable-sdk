@@ -51,6 +51,8 @@ async function pending() {
     recipient: params.recipient,
   }
 
+  console.log('pendingReq', pendingReq);
+
   const pendingRes: PendingWithdrawalsResponse = await tokenBridge.getPendingWithdrawals(pendingReq);
   console.log('pendingRes');
   console.log(util.inspect(pendingRes, {showHidden: false, depth: null, colors: true}));  
