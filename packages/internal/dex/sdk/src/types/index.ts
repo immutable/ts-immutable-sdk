@@ -6,7 +6,7 @@ export type ExchangeContracts = {
   coreFactory: string;
   quoterV2: string;
   peripheryRouter: string;
-  secondaryFee: string;
+  immutableSwapProxy: string;
 };
 
 /**
