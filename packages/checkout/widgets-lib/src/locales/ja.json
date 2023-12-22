@@ -261,12 +261,12 @@
         "heading": "どのようにして支払いますか？"
       },
       "options": {
-        "CRYPTO": {
+        "crypto": {
           "heading": "コイン",
           "caption": "ウォレットのコイン残高を使用して",
           "disabledCaption": "残高に十分なコインが見当たりません"
         },
-        "FIAT": {
+        "fiat": {
           "heading": "カード",
           "caption": "GooglePayもTransakで利用可能",
           "disabledCaption": ""
@@ -335,7 +335,7 @@
           "primaryAction": "もう一度試す",
           "secondaryAction": "キャンセル"
         },
-        "DEFAULT": {
+        "DEFAULT_ERROR": {
           "description": "申し訳ありませんが、何かがうまくいかなかったようです。もう一度お試しください。",
           "primaryAction": "もう一度試す",
           "secondaryAction": "閉じる"
