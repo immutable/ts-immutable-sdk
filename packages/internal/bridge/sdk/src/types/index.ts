@@ -329,10 +329,10 @@ export interface FlowRateInfoResponse {
  * @property {string} refillRate - The number of tokens added per second.
  */
 export interface FlowRateInfoItem {
-  capacity: string;
-  depth: string;
+  capacity: ethers.BigNumber;
+  depth: ethers.BigNumber;
   refillTime: number;
-  refillRate: string;
+  refillRate: ethers.BigNumber;
 }
 
 /**

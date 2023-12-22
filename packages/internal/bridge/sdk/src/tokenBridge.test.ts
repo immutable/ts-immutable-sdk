@@ -1049,6 +1049,7 @@ describe('Token Bridge', () => {
         },
       ]),
       getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => ethers.BigNumber.from(1)),
+      withdrawalDelay: jest.fn().mockImplementation(async () => ethers.BigNumber.from(60 * 60 * 24)),
     };
 
     const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
@@ -1118,6 +1119,7 @@ describe('Token Bridge', () => {
           },
         ]),
         getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => ethers.BigNumber.from(0)),
+        withdrawalDelay: jest.fn().mockImplementation(async () => ethers.BigNumber.from(60 * 60 * 24)),
       };
 
       jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRateNotFound as any);
@@ -1154,6 +1156,7 @@ describe('Token Bridge', () => {
             timestamp,
           },
         ]),
+        withdrawalDelay: jest.fn().mockImplementation(async () => ethers.BigNumber.from(60 * 60 * 24)),
       };
 
       jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRateNotReady as any);
@@ -1194,6 +1197,7 @@ describe('Token Bridge', () => {
         },
       ]),
       getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => ethers.BigNumber.from(1)),
+      withdrawalDelay: jest.fn().mockImplementation(async () => ethers.BigNumber.from(60 * 60 * 24)),
     };
 
     const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
@@ -1271,6 +1275,7 @@ describe('Token Bridge', () => {
           },
         ]),
         getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => ethers.BigNumber.from(3)),
+        withdrawalDelay: jest.fn().mockImplementation(async () => ethers.BigNumber.from(60 * 60 * 24)),
 
       };
 
@@ -1320,7 +1325,7 @@ describe('Token Bridge', () => {
           },
         ]),
         getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => ethers.BigNumber.from(0)),
-
+        withdrawalDelay: jest.fn().mockImplementation(async () => ethers.BigNumber.from(60 * 60 * 24)),
       };
 
       jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRateNone as any);
@@ -1329,6 +1334,153 @@ describe('Token Bridge', () => {
 
       expect(result.pending).toBeDefined();
       expect(result.pending.length).toBe(0);
+    });
+  });
+
+  describe('getFlowRateInfo', () => {
+    let tokenBridge: TokenBridge;
+
+    const token = '0x40b87d235A5B010a20A241F15797C9debf1ecd01';
+    const capacity = ethers.BigNumber.from(500000);
+    const depth = ethers.BigNumber.from(300000);
+    const refillTime = ethers.BigNumber.from(5000);
+    const refillRate = ethers.BigNumber.from(100000);
+    const withdrawalDelay = ethers.BigNumber.from(60 * 60 * 24);
+
+    const mockERC20ContractFlowRate = {
+      withdrawalQueueActivated: jest.fn().mockImplementation(async () => false),
+      withdrawalDelay: jest.fn().mockImplementation(async () => withdrawalDelay),
+      flowRateBuckets: jest.fn().mockImplementation(async () => ({
+        capacity,
+        depth,
+        refillTime,
+        refillRate,
+      })),
+    };
+
+    const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
+    const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
+
+    const bridgeConfig = new BridgeConfiguration({
+      baseConfig: new ImmutableConfiguration({
+        environment: Environment.SANDBOX,
+      }),
+      bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+      rootProvider: voidRootProvider,
+      childProvider: voidChildProvider,
+    });
+
+    beforeEach(() => {
+      tokenBridge = new TokenBridge(bridgeConfig);
+    });
+
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+    it('returns the flow rate info for a specific token', async () => {
+      expect.assertions(7);
+      const req = {
+        tokens: [token],
+      };
+
+      jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRate as any);
+
+      const result = await tokenBridge.getFlowRateInfo(req);
+
+      expect(result).toBeDefined();
+      expect(result.withdrawalQueueActivated).toBe(false);
+      expect(result.withdrawalDelay).toBe(withdrawalDelay.toNumber());
+      expect(result.tokens[token].capacity).toStrictEqual(capacity);
+      expect(result.tokens[token].depth).toStrictEqual(depth);
+      expect(result.tokens[token].refillTime).toBe(refillTime.toNumber());
+      expect(result.tokens[token].refillRate).toStrictEqual(refillRate);
+    });
+
+    it('returns the flow rate info for the NATIVE token', async () => {
+      expect.assertions(7);
+      const req = {
+        tokens: ['NATIVE'],
+      };
+
+      jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRate as any);
+
+      const result = await tokenBridge.getFlowRateInfo(req);
+
+      expect(result).toBeDefined();
+      expect(result.withdrawalQueueActivated).toBe(false);
+      expect(result.withdrawalDelay).toBe(withdrawalDelay.toNumber());
+      expect(result.tokens['NATIVE'].capacity).toStrictEqual(capacity);
+      expect(result.tokens['NATIVE'].depth).toStrictEqual(depth);
+      expect(result.tokens['NATIVE'].refillTime).toBe(refillTime.toNumber());
+      expect(result.tokens['NATIVE'].refillRate).toStrictEqual(refillRate);
+    });
+
+    it('returns the flow rate info for the multiple tokens', async () => {
+      expect.assertions(15);
+      const otherToken = '0x12345';
+      const req = {
+        tokens: ['NATIVE', token, otherToken],
+      };
+
+      const mockERC20ContractFlowRateMultiToken = {
+        withdrawalQueueActivated: jest.fn().mockImplementation(async () => false),
+        withdrawalDelay: jest.fn().mockImplementation(async () => withdrawalDelay),
+        flowRateBuckets: jest.fn().mockImplementation(async () => ({
+          capacity,
+          depth,
+          refillTime,
+          refillRate,
+        })),
+      };
+
+      jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRateMultiToken as any);
+
+      const result = await tokenBridge.getFlowRateInfo(req);
+
+      expect(result).toBeDefined();
+      expect(result.withdrawalQueueActivated).toBe(false);
+      expect(result.withdrawalDelay).toBe(withdrawalDelay.toNumber());
+      expect(result.tokens['NATIVE'].capacity).toStrictEqual(capacity);
+      expect(result.tokens['NATIVE'].depth).toStrictEqual(depth);
+      expect(result.tokens['NATIVE'].refillTime).toBe(refillTime.toNumber());
+      expect(result.tokens['NATIVE'].refillRate).toStrictEqual(refillRate);
+      expect(result.tokens[token].capacity).toStrictEqual(capacity);
+      expect(result.tokens[token].depth).toStrictEqual(depth);
+      expect(result.tokens[token].refillTime).toBe(refillTime.toNumber());
+      expect(result.tokens[token].refillRate).toStrictEqual(refillRate);
+      expect(result.tokens[otherToken].capacity).toStrictEqual(capacity);
+      expect(result.tokens[otherToken].depth).toStrictEqual(depth);
+      expect(result.tokens[otherToken].refillTime).toBe(refillTime.toNumber());
+      expect(result.tokens[otherToken].refillRate).toStrictEqual(refillRate);
+    });
+    it('returns the withdrawalQueueActivated as true ', async () => {
+      expect.assertions(7);
+      const req = {
+        tokens: ['NATIVE'],
+      };
+
+      const mockERC20ContractFlowRateMultiToken = {
+        withdrawalQueueActivated: jest.fn().mockImplementation(async () => true),
+        withdrawalDelay: jest.fn().mockImplementation(async () => withdrawalDelay),
+        flowRateBuckets: jest.fn().mockImplementation(async () => ({
+          capacity,
+          depth,
+          refillTime,
+          refillRate,
+        })),
+      };
+
+      jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRateMultiToken as any);
+
+      const result = await tokenBridge.getFlowRateInfo(req);
+
+      expect(result).toBeDefined();
+      expect(result.withdrawalQueueActivated).toBe(true);
+      expect(result.withdrawalDelay).toBe(withdrawalDelay.toNumber());
+      expect(result.tokens['NATIVE'].capacity).toStrictEqual(capacity);
+      expect(result.tokens['NATIVE'].depth).toStrictEqual(depth);
+      expect(result.tokens['NATIVE'].refillTime).toBe(refillTime.toNumber());
+      expect(result.tokens['NATIVE'].refillRate).toStrictEqual(refillRate);
     });
   });
 

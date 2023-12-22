@@ -957,6 +957,7 @@ export class TokenBridge {
     const contractPromises: Array<Promise<any>> = [];
     contractPromises.push(rootBridge.withdrawalQueueActivated());
     contractPromises.push(rootBridge.withdrawalDelay());
+
     for (let token of req.tokens) {
       if (token.toUpperCase() === 'NATIVE') {
         token = ETHEREUM_NATIVE_TOKEN_ADDRESS;
@@ -973,8 +974,6 @@ export class TokenBridge {
       );
     }
 
-    console.log('contractPromisesRes', contractPromisesRes);
-
     const tokensRes: Record<FungibleToken, FlowRateInfoItem> = {};
 
     // @note it's i + 2 because the first 2 promises are not token buckets
@@ -982,7 +981,7 @@ export class TokenBridge {
       tokensRes[req.tokens[i]] = {
         capacity: contractPromisesRes[i + 2].capacity,
         depth: contractPromisesRes[i + 2].depth,
-        refillTime: contractPromisesRes[i + 2].refillTime,
+        refillTime: contractPromisesRes[i + 2].refillTime.toNumber(),
         refillRate: contractPromisesRes[i + 2].refillRate,
       };
     }
