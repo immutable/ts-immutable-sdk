@@ -23,6 +23,7 @@ import { Environment } from '@imtbl/config';
 import { retry } from 'lib/retry';
 import { getChainSlugById } from 'lib/chains';
 import { CryptoFiatActions, CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext';
+import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { sendBridgeWidgetCloseEvent } from '../../widgets/bridge/BridgeWidgetEvents';
 import { Shimmer } from './Shimmer';
 import {
@@ -45,6 +46,7 @@ export function Transactions({ checkout }: TransactionsProps) {
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const { cryptoFiatDispatch } = useContext(CryptoFiatContext);
+  const { page } = useAnalytics();
 
   const { layoutHeading } = text.views[BridgeWidgetViews.TRANSACTIONS];
 
@@ -227,6 +229,13 @@ export function Transactions({ checkout }: TransactionsProps) {
       setLoading(false);
     })();
   }, [walletAddress, checkout]);
+
+  useEffect(() => {
+    page({
+      userJourney: UserJourney.BRIDGE,
+      screen: 'Transactions',
+    });
+  }, []);
 
   return (
     <SimpleLayout

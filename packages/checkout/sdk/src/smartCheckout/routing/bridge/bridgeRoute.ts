@@ -137,8 +137,8 @@ export const bridgeRoute = async (
   if (tokenBalanceResult === undefined || tokenBalanceResult.success === false) return undefined;
 
   // todo: revert this back to using the allowlist
-  const allowedTokenList = await allowListCheckForBridge(config, tokenBalanceResults, availableRoutingOptions);
-  if (allowedTokenList.length === 0) return undefined;
+  const allowedL1TokenList = await allowListCheckForBridge(config, tokenBalanceResults, availableRoutingOptions);
+  if (allowedL1TokenList.length === 0) return undefined;
 
   const l1RepresentationResult = await fetchL1Representation(config, bridgeRequirement.l2address);
   if (!l1RepresentationResult) return undefined;
@@ -146,8 +146,8 @@ export const bridgeRoute = async (
   // Ensure l1address is in the allowed token list
   const { l1address } = l1RepresentationResult as L1ToL2TokenAddressMapping;
   if (isNativeToken(l1address)) {
-    if (!allowedTokenList.find((token) => !('address' in token))) return undefined;
-  } else if (!allowedTokenList.find((token) => token.address === l1address)) {
+    if (!allowedL1TokenList.find((token) => isNativeToken(token.address))) return undefined;
+  } else if (!allowedL1TokenList.find((token) => token.address === l1address)) {
     return undefined;
   }
 
