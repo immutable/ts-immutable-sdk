@@ -3,6 +3,7 @@
 import axios, { AxiosResponse } from 'axios';
 import { ethers } from 'ethers';
 import {
+  ETHEREUM_NATIVE_TOKEN_ADDRESS,
   ETH_MAINNET_TO_ZKEVM_MAINNET,
   ETH_SEPOLIA_TO_ZKEVM_TESTNET,
   ZKEVM_DEVNET_CHAIN_ID,
@@ -44,6 +45,8 @@ import {
   RootBridgePendingWithdrawal,
   TxStatusResponseItem,
   PendingWithdrawal,
+  FungibleToken,
+  FlowRateInfoItem,
 } from './types';
 import { GMPStatus, GMPStatusResponse, GasPaidStatus } from './types/axelar';
 import { queryTransactionStatus } from './lib/gmpRecovery';
@@ -931,29 +934,64 @@ export class TokenBridge {
  * @throws {BridgeError} - If an error occurs during the query, a BridgeError will be thrown with a specific error type.
  * @dev this SDK method is currently stubbed
  */
-  public async getFlowRateInfo(req: FlowRateInfoRequest = {}): Promise<FlowRateInfoResponse> {
-    // eslint-disable-next-line no-console
-    console.log('stubbed response with req', req);
+  public async getFlowRateInfo(req: FlowRateInfoRequest): Promise<FlowRateInfoResponse> {
+    if (!req.tokens || req.tokens.length === 0) {
+      throw new BridgeError(
+        `invalid tokens array ${req.tokens}`,
+        BridgeErrorType.INVALID_TOKEN,
+      );
+    }
+
+    const rootBridge = await withBridgeError<ethers.Contract>(
+      async () => {
+        const contract = new ethers.Contract(
+          this.config.bridgeContracts.rootERC20BridgeFlowRate,
+          ROOT_ERC20_BRIDGE_FLOW_RATE,
+          this.config.rootProvider,
+        );
+        return contract;
+      },
+      BridgeErrorType.INTERNAL_ERROR,
+    );
+
+    const contractPromises: Array<Promise<any>> = [];
+    contractPromises.push(rootBridge.withdrawalQueueActivated());
+    contractPromises.push(rootBridge.withdrawalDelay());
+    for (let token of req.tokens) {
+      if (token.toUpperCase() === 'NATIVE') {
+        token = ETHEREUM_NATIVE_TOKEN_ADDRESS;
+      }
+      contractPromises.push(rootBridge.flowRateBuckets(token));
+    }
+    let contractPromisesRes:Array<any>;
+    try {
+      contractPromisesRes = await Promise.all(contractPromises);
+    } catch (err) {
+      throw new BridgeError(
+        'unable to query contract for flowrate info',
+        BridgeErrorType.INTERNAL_ERROR,
+      );
+    }
+
+    console.log('contractPromisesRes', contractPromisesRes);
+
+    const tokensRes: Record<FungibleToken, FlowRateInfoItem> = {};
+
+    // @note it's i + 2 because the first 2 promises are not token buckets
+    for (let i = 0, l = req.tokens.length; i < l; i++) {
+      tokensRes[req.tokens[i]] = {
+        capacity: contractPromisesRes[i + 2].capacity,
+        depth: contractPromisesRes[i + 2].depth,
+        refillTime: contractPromisesRes[i + 2].refillTime,
+        refillRate: contractPromisesRes[i + 2].refillRate,
+      };
+    }
+
     // Return the token mappings
     return {
-      withdrawalQueueActivated: false,
-      withdrawalDelay: 86400,
-      tokens: {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        NATIVE: {
-          capacity: ethers.utils.parseUnits('10', 18).toString(),
-          depth: ethers.utils.parseUnits('10', 18).toString(),
-          refillTime: 1701227629,
-          refillRate: ethers.utils.parseUnits('10', 18).toString(),
-        },
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF': {
-          capacity: ethers.utils.parseUnits('10', 18).toString(),
-          depth: ethers.utils.parseUnits('10', 18).toString(),
-          refillTime: 1701227629,
-          refillRate: ethers.utils.parseUnits('10', 18).toString(),
-        },
-      },
+      withdrawalQueueActivated: contractPromisesRes[0],
+      withdrawalDelay: contractPromisesRes[1].toNumber(),
+      tokens: tokensRes,
     };
   }
 
@@ -1003,9 +1041,10 @@ export class TokenBridge {
 
     const timestampNow = Math.floor(Date.now() / 1000);
 
+    const withdrawalDelay:ethers.BigNumber = await rootBridge.withdrawalDelay();
+
     for (let i = 0, l = pending.length; i < l; i++) {
-      // @TODO query timeout from contract (SMR-2090)
-      const timeoutEnd = pending[i].timestamp.toNumber() + (60 * 60 * 24);
+      const timeoutEnd = pending[i].timestamp.add(withdrawalDelay).toNumber();
       if (timeoutEnd > timestampNow) {
         pendingWithdrawals.pending[i] = {
           canWithdraw: false,
@@ -1075,8 +1114,8 @@ export class TokenBridge {
       );
     }
 
-    // @TODO query timeout from contract (SMR-2090)
-    const timeoutEnd = pending[0].timestamp.toNumber() + (60 * 60 * 24);
+    const withdrawalDelay:ethers.BigNumber = await rootBridge.withdrawalDelay();
+    const timeoutEnd = pending[0].timestamp.add(withdrawalDelay).toNumber();
     const timestampNow = Math.floor(Date.now() / 1000);
 
     if (timeoutEnd > timestampNow) {

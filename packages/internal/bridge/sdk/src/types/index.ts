@@ -306,7 +306,7 @@ export enum StatusResponse {
  * @property {FungibleToken} token - Optional param to filter the flowRate info by. If not specified info for all tokens will be returned.
 */
 export interface FlowRateInfoRequest {
-  token?: FungibleToken;
+  tokens: Array<FungibleToken>;
 }
 
 /**
