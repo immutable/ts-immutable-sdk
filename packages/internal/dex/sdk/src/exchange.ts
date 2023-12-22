@@ -6,7 +6,7 @@ import { fetchGasPrice } from 'lib/transactionUtils/gas';
 import { getApproval, prepareApproval } from 'lib/transactionUtils/approval';
 import { getOurQuoteReqAmount, prepareUserQuote } from 'lib/transactionUtils/getQuote';
 import { Fees } from 'lib/fees';
-import { Multicall__factory, SecondaryFee__factory } from 'contracts/types';
+import { Multicall__factory, ImmutableSwapProxy__factory } from 'contracts/types';
 import { NativeTokenService } from 'lib/nativeTokenService';
 import { DEFAULT_MAX_HOPS, DEFAULT_SLIPPAGE, MAX_MAX_HOPS, MIN_MAX_HOPS } from './constants';
 import { Router } from './lib/router';
@@ -63,7 +63,7 @@ export class Exchange {
 
   private nativeTokenService: NativeTokenService;
 
-  private secondaryFeeContractAddress: string;
+  private swapProxyContractAddress: string;
 
   private routerContractAddress: string;
 
@@ -76,7 +76,7 @@ export class Exchange {
     this.nativeTokenService = new NativeTokenService(this.nativeToken, this.wrappedNativeToken);
     this.secondaryFees = config.secondaryFees;
     this.routerContractAddress = config.chain.contracts.peripheryRouter;
-    this.secondaryFeeContractAddress = config.chain.contracts.secondaryFee;
+    this.swapProxyContractAddress = config.chain.contracts.secondaryFee;
 
     this.provider = new ethers.providers.StaticJsonRpcProvider({
       url: config.chain.rpcUrl,
@@ -120,9 +120,9 @@ export class Exchange {
       return [];
     }
 
-    const secondaryFeeContract = SecondaryFee__factory.connect(this.secondaryFeeContractAddress, provider);
+    const swapProxyContract = ImmutableSwapProxy__factory.connect(this.swapProxyContractAddress, provider);
 
-    if (await secondaryFeeContract.paused()) {
+    if (await swapProxyContract.paused()) {
       // Do not use secondary fees if the contract is paused
       return [];
     }
@@ -196,7 +196,7 @@ export class Exchange {
       slippagePercent,
       deadline,
       this.routerContractAddress,
-      this.secondaryFeeContractAddress,
+      this.swapProxyContractAddress,
       gasPrice,
       secondaryFees,
     );
@@ -214,7 +214,7 @@ export class Exchange {
       quotedAmountWithMaxSlippage,
       {
         routerAddress: this.routerContractAddress,
-        secondaryFeeAddress: this.secondaryFeeContractAddress,
+        secondaryFeeAddress: this.swapProxyContractAddress,
       },
       secondaryFees,
     );
