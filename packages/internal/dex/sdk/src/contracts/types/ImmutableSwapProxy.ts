@@ -28,7 +28,7 @@ import type {
   PromiseOrValue,
 } from "./common";
 
-export declare namespace ISecondaryFee {
+export declare namespace IImmutableSwapProxy {
   export type SecondaryFeeParamsStruct = {
     recipient: PromiseOrValue<string>;
     feeBasisPoints: PromiseOrValue<BigNumberish>;
@@ -136,7 +136,7 @@ export declare namespace IV3SwapRouter {
   };
 }
 
-export interface SecondaryFeeInterface extends utils.Interface {
+export interface ImmutableSwapProxyInterface extends utils.Interface {
   functions: {
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
     "exactInputSingleWithSecondaryFee((address,uint256)[],(address,address,uint24,address,uint256,uint256,uint160))": FunctionFragment;
@@ -189,28 +189,28 @@ export interface SecondaryFeeInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "exactInputSingleWithSecondaryFee",
     values: [
-      ISecondaryFee.SecondaryFeeParamsStruct[],
+      IImmutableSwapProxy.SecondaryFeeParamsStruct[],
       IV3SwapRouter.ExactInputSingleParamsStruct
     ]
   ): string;
   encodeFunctionData(
     functionFragment: "exactInputWithSecondaryFee",
     values: [
-      ISecondaryFee.SecondaryFeeParamsStruct[],
+      IImmutableSwapProxy.SecondaryFeeParamsStruct[],
       IV3SwapRouter.ExactInputParamsStruct
     ]
   ): string;
   encodeFunctionData(
     functionFragment: "exactOutputSingleWithSecondaryFee",
     values: [
-      ISecondaryFee.SecondaryFeeParamsStruct[],
+      IImmutableSwapProxy.SecondaryFeeParamsStruct[],
       IV3SwapRouter.ExactOutputSingleParamsStruct
     ]
   ): string;
   encodeFunctionData(
     functionFragment: "exactOutputWithSecondaryFee",
     values: [
-      ISecondaryFee.SecondaryFeeParamsStruct[],
+      IImmutableSwapProxy.SecondaryFeeParamsStruct[],
       IV3SwapRouter.ExactOutputParamsStruct
     ]
   ): string;
@@ -422,12 +422,12 @@ export type UnpausedEvent = TypedEvent<[string], UnpausedEventObject>;
 
 export type UnpausedEventFilter = TypedEventFilter<UnpausedEvent>;
 
-export interface SecondaryFee extends BaseContract {
+export interface ImmutableSwapProxy extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: SecondaryFeeInterface;
+  interface: ImmutableSwapProxyInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -452,25 +452,25 @@ export interface SecondaryFee extends BaseContract {
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
     exactInputSingleWithSecondaryFee(
-      secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+      secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
       swapParams: IV3SwapRouter.ExactInputSingleParamsStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
     exactInputWithSecondaryFee(
-      secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+      secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
       swapParams: IV3SwapRouter.ExactInputParamsStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
     exactOutputSingleWithSecondaryFee(
-      secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+      secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
       swapParams: IV3SwapRouter.ExactOutputSingleParamsStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
     exactOutputWithSecondaryFee(
-      secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+      secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
       swapParams: IV3SwapRouter.ExactOutputParamsStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
@@ -550,25 +550,25 @@ export interface SecondaryFee extends BaseContract {
   DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
   exactInputSingleWithSecondaryFee(
-    secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+    secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
     swapParams: IV3SwapRouter.ExactInputSingleParamsStruct,
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
   exactInputWithSecondaryFee(
-    secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+    secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
     swapParams: IV3SwapRouter.ExactInputParamsStruct,
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
   exactOutputSingleWithSecondaryFee(
-    secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+    secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
     swapParams: IV3SwapRouter.ExactOutputSingleParamsStruct,
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
   exactOutputWithSecondaryFee(
-    secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+    secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
     swapParams: IV3SwapRouter.ExactOutputParamsStruct,
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
@@ -648,25 +648,25 @@ export interface SecondaryFee extends BaseContract {
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
     exactInputSingleWithSecondaryFee(
-      secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+      secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
       swapParams: IV3SwapRouter.ExactInputSingleParamsStruct,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     exactInputWithSecondaryFee(
-      secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+      secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
       swapParams: IV3SwapRouter.ExactInputParamsStruct,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     exactOutputSingleWithSecondaryFee(
-      secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+      secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
       swapParams: IV3SwapRouter.ExactOutputSingleParamsStruct,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     exactOutputWithSecondaryFee(
-      secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+      secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
       swapParams: IV3SwapRouter.ExactOutputParamsStruct,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -796,25 +796,25 @@ export interface SecondaryFee extends BaseContract {
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
     exactInputSingleWithSecondaryFee(
-      secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+      secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
       swapParams: IV3SwapRouter.ExactInputSingleParamsStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     exactInputWithSecondaryFee(
-      secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+      secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
       swapParams: IV3SwapRouter.ExactInputParamsStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     exactOutputSingleWithSecondaryFee(
-      secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+      secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
       swapParams: IV3SwapRouter.ExactOutputSingleParamsStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     exactOutputWithSecondaryFee(
-      secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+      secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
       swapParams: IV3SwapRouter.ExactOutputParamsStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
@@ -897,25 +897,25 @@ export interface SecondaryFee extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     exactInputSingleWithSecondaryFee(
-      secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+      secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
       swapParams: IV3SwapRouter.ExactInputSingleParamsStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     exactInputWithSecondaryFee(
-      secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+      secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
       swapParams: IV3SwapRouter.ExactInputParamsStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     exactOutputSingleWithSecondaryFee(
-      secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+      secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
       swapParams: IV3SwapRouter.ExactOutputSingleParamsStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     exactOutputWithSecondaryFee(
-      secondaryFees: ISecondaryFee.SecondaryFeeParamsStruct[],
+      secondaryFees: IImmutableSwapProxy.SecondaryFeeParamsStruct[],
       swapParams: IV3SwapRouter.ExactOutputParamsStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
