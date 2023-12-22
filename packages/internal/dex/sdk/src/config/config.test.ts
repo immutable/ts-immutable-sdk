@@ -24,8 +24,8 @@ describe('ExchangeConfiguration', () => {
   const contractOverrides: ExchangeContracts = {
     multicall: test.TEST_MULTICALL_ADDRESS,
     coreFactory: test.TEST_V3_CORE_FACTORY_ADDRESS,
-    quoterV2: test.TEST_QUOTER_ADDRESS,
-    peripheryRouter: test.TEST_ROUTER_ADDRESS,
+    quoter: test.TEST_QUOTER_ADDRESS,
+    swapRouter: test.TEST_ROUTER_ADDRESS,
     secondaryFee: test.TEST_SECONDARY_FEE_ADDRESS,
   };
 
