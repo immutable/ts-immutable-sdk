@@ -39,7 +39,10 @@ export interface AxelarChainDetails {
 export type BridgeContracts = {
   rootERC20BridgeFlowRate: Address;
   childERC20Bridge: Address;
-  wrappedIMX: Address;
+  rootChainIMX: Address;
+  rootChainWrappedETH: Address;
+  childChainWrappedETH: Address;
+  childChainWrappedIMX: Address;
 };
 
 /**
