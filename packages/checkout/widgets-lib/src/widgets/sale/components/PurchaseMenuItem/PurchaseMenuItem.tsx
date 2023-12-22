@@ -1,10 +1,9 @@
 import { Heading, MenuItem } from '@biom3/react';
 import { FundingRoute } from '@imtbl/checkout-sdk';
 import { useContext, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSaleContext } from '../../context/SaleContextProvider';
 import { calculateCryptoToFiat, tokenValueFormat } from '../../../../lib/utils';
-import { text } from '../../../../resources/text/textConfig';
-import { SaleWidgetViews } from '../../../../context/view-context/SaleViewContextTypes';
 import { CryptoFiatContext } from '../../../../context/crypto-fiat-context/CryptoFiatContext';
 
 type PurchaseMenuItemProps = {
@@ -12,7 +11,7 @@ type PurchaseMenuItemProps = {
 };
 
 export function PurchaseMenuItem({ fundingRoute }: PurchaseMenuItemProps) {
-  const textConfig = text.views[SaleWidgetViews.FUND_WITH_SMART_CHECKOUT];
+  const { t } = useTranslation();
   const { items } = useSaleContext();
   const firstItem = items[0];
   const firstFundingStep = fundingRoute.steps[0];
@@ -53,7 +52,7 @@ export function PurchaseMenuItem({ fundingRoute }: PurchaseMenuItemProps) {
         use={<Heading size="xSmall" />}
         price={`${firstFundingStep?.fundingItem.token.symbol} 
           ${tokenValueFormat(firstFundingStep.fundingItem.fundsRequired.formattedAmount)}`}
-        fiatAmount={`${textConfig.currency.usdEstimate}${usdPurchaseAmount}`}
+        fiatAmount={`${t('views.FUND_WITH_SMART_CHECKOUT.currency.usdEstimate')}${usdPurchaseAmount}`}
       />
       <MenuItem.Label>
         {firstItem?.name}

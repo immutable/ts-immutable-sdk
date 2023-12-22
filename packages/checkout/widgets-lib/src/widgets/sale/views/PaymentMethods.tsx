@@ -1,12 +1,11 @@
 import { Banner, Box, Heading } from '@biom3/react';
 import { useContext, useEffect } from 'react';
 
+import { useTranslation } from 'react-i18next';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { FundWithSmartCheckoutSubViews, SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
-import { text as textConfig } from '../../../resources/text/textConfig';
-
 import {
   SharedViews,
   ViewActions,
@@ -14,13 +13,12 @@ import {
 } from '../../../context/view-context/ViewContext';
 
 import { PaymentOptions } from '../components/PaymentOptions';
-
 import { useSaleContext } from '../context/SaleContextProvider';
 import { useSaleEvent } from '../hooks/useSaleEvents';
 import { PaymentTypes } from '../types';
 
 export function PaymentMethods() {
-  const text = { methods: textConfig.views[SaleWidgetViews.PAYMENT_METHODS] };
+  const { t } = useTranslation();
   const { viewState, viewDispatch } = useContext(ViewContext);
   const {
     paymentMethod, setPaymentMethod, sign, disabledPaymentTypes,
@@ -51,7 +49,7 @@ export function PaymentMethods() {
           type: ViewActions.UPDATE_VIEW,
           view: {
             type: SharedViews.LOADING_VIEW,
-            data: { loadingText: text.methods.loading.ready },
+            data: { loadingText: t('views.PAYMENT_METHODS.loading.ready') },
           },
         },
       });
@@ -75,7 +73,7 @@ export function PaymentMethods() {
       <Banner>
         <Banner.Icon icon="InformationCircle" />
         <Banner.Caption>
-          {text.methods.insufficientCoinsBanner.caption}
+          {t('views.PAYMENT_METHODS.insufficientCoinsBanner.caption')}
         </Banner.Caption>
       </Banner>
     </Box>
@@ -108,7 +106,7 @@ export function PaymentMethods() {
             paddingX: 'base.spacing.x4',
           }}
         >
-          {text.methods.header.heading}
+          {t('views.PAYMENT_METHODS.header.heading')}
         </Heading>
         <Box sx={{ paddingX: 'base.spacing.x2' }}>
           <PaymentOptions disabledOptions={disabledPaymentTypes} onClick={handleOptionClick} />
