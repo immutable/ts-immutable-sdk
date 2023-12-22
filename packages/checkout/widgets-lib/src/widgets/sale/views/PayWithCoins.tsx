@@ -1,15 +1,13 @@
 import { useEffect, useRef } from 'react';
-
-import { text as textConfig } from '../../../resources/text/textConfig';
+import { useTranslation } from 'react-i18next';
 import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 import { useSaleContext } from '../context/SaleContextProvider';
 import { LoadingView } from '../../../views/loading/LoadingView';
 import { useSaleEvent } from '../hooks/useSaleEvents';
 
 export function PayWithCoins() {
+  const { t } = useTranslation();
   const processing = useRef(false);
-  const text = textConfig.views[SaleWidgetViews.PAYMENT_METHODS];
-
   const { sendPageView, sendTransactionSuccessEvent } = useSaleEvent();
   const {
     execute, signResponse, executeResponse, goToSuccessView,
@@ -17,12 +15,12 @@ export function PayWithCoins() {
   const expectedTxns = signResponse?.transactions.length || 0;
   const executedTxns = executeResponse?.transactions.length || 0;
 
-  let loadingText = text.loading.ready;
+  let loadingText = t('views.PAYMENT_METHODS.loading.ready');
 
   if (signResponse !== undefined) {
-    loadingText = text.loading.confirm;
+    loadingText = t('views.PAYMENT_METHODS.loading.confirm');
   } else if (executedTxns > 0 && executedTxns === expectedTxns) {
-    loadingText = text.loading.processing;
+    loadingText = t('views.PAYMENT_METHODS.loading.processing');
   }
 
   if (signResponse !== undefined) {

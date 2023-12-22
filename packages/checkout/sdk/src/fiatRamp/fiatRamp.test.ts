@@ -3,6 +3,7 @@ import { CheckoutConfiguration } from '../config';
 import { RemoteConfigFetcher } from '../config/remoteConfigFetcher';
 import { FiatRampService, FiatRampWidgetParams } from './fiatRamp';
 import { ExchangeType, OnRampProvider } from '../types';
+import { HttpClient } from '../api/http';
 
 const defaultWidgetUrl = 'https://global-stg.transak.com?apiKey=mock-api-key'
 + '&network=immutablezkevm&defaultPaymentMethod=credit_debit_card&disablePaymentMethods=sepa_bank_transfer,'
@@ -14,6 +15,11 @@ jest.mock('../config/remoteConfigFetcher');
 describe('FiatRampService', () => {
   let config: CheckoutConfiguration;
   let fiatRampService: FiatRampService;
+  let mockedHttpClient: jest.Mocked<HttpClient>;
+
+  beforeEach(() => {
+    mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
+  });
 
   describe('feeEstimate', () => {
     it('should return transak fees', async () => {
@@ -31,7 +37,7 @@ describe('FiatRampService', () => {
         baseConfig: {
           environment: Environment.SANDBOX,
         },
-      });
+      }, mockedHttpClient);
       fiatRampService = new FiatRampService(config);
 
       const result = await fiatRampService.feeEstimate();
@@ -58,7 +64,7 @@ describe('FiatRampService', () => {
         baseConfig: {
           environment: Environment.SANDBOX,
         },
-      });
+      }, mockedHttpClient);
       fiatRampService = new FiatRampService(config);
 
       const result = await fiatRampService.feeEstimate();
@@ -83,7 +89,7 @@ describe('FiatRampService', () => {
         baseConfig: {
           environment: Environment.SANDBOX,
         },
-      });
+      }, mockedHttpClient);
       fiatRampService = new FiatRampService(config);
     });
     it('should return widget url with non-configurable query params when onRampProvider is Transak', async () => {

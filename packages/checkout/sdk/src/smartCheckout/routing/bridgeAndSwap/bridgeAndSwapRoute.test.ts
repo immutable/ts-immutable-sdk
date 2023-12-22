@@ -5,6 +5,7 @@ import { Quote } from '@imtbl/dex-sdk';
 import { CheckoutConfiguration } from '../../../config';
 import {
   ChainId,
+  FeeType,
   FundingStepType,
   ItemType,
   TokenInfo,
@@ -20,6 +21,7 @@ import { swapRoute } from '../swap/swapRoute';
 import { getDexQuotes } from './getDexQuotes';
 import { constructBridgeRequirements } from './constructBridgeRequirements';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from '../indexer/fetchL1Representation';
+import { HttpClient } from '../../../api/http';
 
 jest.mock('./fetchL1ToL2Mappings');
 jest.mock('./getDexQuotes');
@@ -28,9 +30,10 @@ jest.mock('../swap/swapRoute');
 jest.mock('./constructBridgeRequirements');
 
 describe('bridgeAndSwapRoute', () => {
+  const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
   const config = new CheckoutConfiguration({
     baseConfig: { environment: Environment.SANDBOX },
-  });
+  }, mockedHttpClient);
 
   const readonlyProviders = new Map<ChainId, JsonRpcProvider>([
     [ChainId.SEPOLIA, {} as JsonRpcProvider],
@@ -213,15 +216,18 @@ describe('bridgeAndSwapRoute', () => {
             },
           },
           fees: {
-            approvalGasFees: {
+            approvalGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(0),
               formattedAmount: '0',
             },
-            bridgeGasFees: {
+            bridgeGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(0),
               formattedAmount: '0',
             },
             bridgeFees: [{
+              type: FeeType.BRIDGE_FEE,
               amount: BigNumber.from(0),
               formattedAmount: '0',
             }],
@@ -249,15 +255,18 @@ describe('bridgeAndSwapRoute', () => {
             },
           },
           fees: {
-            approvalGasFees: {
+            approvalGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(0),
               formattedAmount: '0',
             },
-            bridgeGasFees: {
+            bridgeGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(0),
               formattedAmount: '0',
             },
             bridgeFees: [{
+              type: FeeType.BRIDGE_FEE,
               amount: BigNumber.from(0),
               formattedAmount: '0',
             }],
@@ -287,15 +296,18 @@ describe('bridgeAndSwapRoute', () => {
             },
           },
           fees: {
-            approvalGasFees: {
+            approvalGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(0),
               formattedAmount: '0',
             },
-            swapGasFees: {
+            swapGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(0),
               formattedAmount: '0',
             },
             swapFees: [{
+              type: FeeType.SWAP_FEE,
               amount: BigNumber.from(0),
               formattedAmount: '0',
             }],
@@ -322,15 +334,18 @@ describe('bridgeAndSwapRoute', () => {
             },
           },
           fees: {
-            approvalGasFees: {
+            approvalGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(0),
               formattedAmount: '0',
             },
-            swapGasFees: {
+            swapGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(0),
               formattedAmount: '0',
             },
             swapFees: [{
+              type: FeeType.SWAP_FEE,
               amount: BigNumber.from(0),
               formattedAmount: '0',
             }],
@@ -447,15 +462,18 @@ describe('bridgeAndSwapRoute', () => {
               },
             },
             fees: {
-              approvalGasFees: {
+              approvalGasFee: {
+                type: FeeType.GAS,
                 amount: BigNumber.from(0),
                 formattedAmount: '0',
               },
-              bridgeGasFees: {
+              bridgeGasFee: {
+                type: FeeType.GAS,
                 amount: BigNumber.from(0),
                 formattedAmount: '0',
               },
               bridgeFees: [{
+                type: FeeType.BRIDGE_FEE,
                 amount: BigNumber.from(0),
                 formattedAmount: '0',
               }],
@@ -482,15 +500,18 @@ describe('bridgeAndSwapRoute', () => {
               },
             },
             fees: {
-              approvalGasFees: {
+              approvalGasFee: {
+                type: FeeType.GAS,
                 amount: BigNumber.from(0),
                 formattedAmount: '0',
               },
-              swapGasFees: {
+              swapGasFee: {
+                type: FeeType.GAS,
                 amount: BigNumber.from(0),
                 formattedAmount: '0',
               },
               swapFees: [{
+                type: FeeType.SWAP_FEE,
                 amount: BigNumber.from(0),
                 formattedAmount: '0',
               }],
@@ -518,15 +539,18 @@ describe('bridgeAndSwapRoute', () => {
               },
             },
             fees: {
-              approvalGasFees: {
+              approvalGasFee: {
+                type: FeeType.GAS,
                 amount: BigNumber.from(0),
                 formattedAmount: '0',
               },
-              bridgeGasFees: {
+              bridgeGasFee: {
+                type: FeeType.GAS,
                 amount: BigNumber.from(0),
                 formattedAmount: '0',
               },
               bridgeFees: [{
+                type: FeeType.BRIDGE_FEE,
                 amount: BigNumber.from(0),
                 formattedAmount: '0',
               }],
@@ -553,15 +577,18 @@ describe('bridgeAndSwapRoute', () => {
               },
             },
             fees: {
-              approvalGasFees: {
+              approvalGasFee: {
+                type: FeeType.GAS,
                 amount: BigNumber.from(0),
                 formattedAmount: '0',
               },
-              swapGasFees: {
+              swapGasFee: {
+                type: FeeType.GAS,
                 amount: BigNumber.from(0),
                 formattedAmount: '0',
               },
               swapFees: [{
+                type: FeeType.SWAP_FEE,
                 amount: BigNumber.from(0),
                 formattedAmount: '0',
               }],

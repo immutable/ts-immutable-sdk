@@ -17,6 +17,7 @@ import {
 } from '../../types';
 import { TokenBalanceResult } from '../routing/types';
 import { RemoteConfigFetcher } from '../../config/remoteConfigFetcher';
+import { HttpClient } from '../../api/http';
 
 jest.mock('../../config/remoteConfigFetcher');
 
@@ -26,9 +27,11 @@ describe('allowListCheck', () => {
   let bridgeConfig: BridgeConfig;
   let onRampConfig: OnRampConfig;
   let balances: Map<ChainId, TokenBalanceResult>;
+  let mockedHttpClient: jest.Mocked<HttpClient>;
 
   beforeEach(() => {
     jest.resetAllMocks();
+    mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
     (RemoteConfigFetcher as unknown as jest.Mock).mockReturnValue({
       getConfig: jest.fn().mockImplementation((key) => {
         let remoteConfig: any;
@@ -50,7 +53,7 @@ describe('allowListCheck', () => {
 
     config = new CheckoutConfiguration({
       baseConfig: { environment: Environment.SANDBOX },
-    });
+    }, mockedHttpClient);
 
     dexConfig = {
       tokens: [{

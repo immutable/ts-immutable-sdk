@@ -1,4 +1,5 @@
 import { WalletProviderName } from '../../../types';
+import { WidgetLanguage } from '../configurations';
 /**
  * OnRamp Widget parameters
  * @property {string | undefined} tokenAddress
@@ -12,4 +13,6 @@ export type OnRampWidgetParams = {
   amount?: string;
   /** The wallet provider name to use for the onramp widget */
   walletProviderName?: WalletProviderName;
+  /** The language to use for the onramp widget */
+  language?: WidgetLanguage;
 };

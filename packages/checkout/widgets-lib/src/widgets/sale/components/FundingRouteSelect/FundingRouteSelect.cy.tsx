@@ -1,6 +1,6 @@
 import {
   BridgeFundingStep,
-  ChainId, Checkout, FundingRoute, FundingStepType, ItemType, SwapFundingStep,
+  ChainId, Checkout, FeeType, FundingRoute, FundingStepType, ItemType, SwapFundingStep,
 } from '@imtbl/checkout-sdk';
 import { mount } from 'cypress/react18';
 import { BigNumber, utils } from 'ethers';
@@ -36,15 +36,18 @@ describe('FundingRouteSelect View', () => {
       },
     },
     fees: {
-      approvalGasFees: {
+      approvalGasFee: {
+        type: FeeType.GAS,
         amount: BigNumber.from(0),
         formattedAmount: '0',
       },
-      bridgeGasFees: {
+      bridgeGasFee: {
+        type: FeeType.GAS,
         amount: BigNumber.from(0),
         formattedAmount: '0',
       },
       bridgeFees: [{
+        type: FeeType.BRIDGE_FEE,
         amount: BigNumber.from(0),
         formattedAmount: '0',
       }],
@@ -72,15 +75,18 @@ describe('FundingRouteSelect View', () => {
       },
     },
     fees: {
-      approvalGasFees: {
+      approvalGasFee: {
+        type: FeeType.GAS,
         amount: BigNumber.from(0),
         formattedAmount: '0',
       },
-      swapGasFees: {
+      swapGasFee: {
+        type: FeeType.GAS,
         amount: BigNumber.from(0),
         formattedAmount: '0',
       },
       swapFees: [{
+        type: FeeType.SWAP_FEE,
         amount: BigNumber.from(0),
         formattedAmount: '0',
       }],

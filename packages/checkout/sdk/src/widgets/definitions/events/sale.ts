@@ -7,6 +7,7 @@ export enum SaleEventType {
   FAILURE = 'failure',
   REJECTED = 'rejected',
   TRANSACTION_SUCCESS = 'transaction-success',
+  LANGUAGE_CHANGED = 'language-changed',
 }
 
 /**

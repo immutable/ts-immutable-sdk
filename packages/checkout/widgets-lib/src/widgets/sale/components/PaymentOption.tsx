@@ -1,7 +1,5 @@
 import { IconProps, MenuItem } from '@biom3/react';
-
-import { text } from '../../../resources/text/textConfig';
-import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
+import { useTranslation } from 'react-i18next';
 import { PaymentTypes } from '../types';
 
 export interface PaymentOptionProps {
@@ -11,16 +9,14 @@ export interface PaymentOptionProps {
 }
 
 export function PaymentOption(props: PaymentOptionProps) {
+  const { t } = useTranslation();
   const { type, onClick, disabled } = props;
-  const { options } = text.views[SaleWidgetViews.PAYMENT_METHODS];
-  const optionText = options[type];
+  // const optionText = options[type];
 
   const icon: Record<string, IconProps['icon']> = {
     [PaymentTypes.CRYPTO]: 'Coins',
     [PaymentTypes.FIAT]: 'BankCard',
   };
-
-  if (!optionText) return null;
 
   const handleClick = () => onClick(type);
 
@@ -36,10 +32,10 @@ export function PaymentOption(props: PaymentOptionProps) {
       disabled={disabled}
     >
       <MenuItem.FramedIcon icon={icon[type]} />
-      <MenuItem.Label size="medium">{optionText.heading}</MenuItem.Label>
+      <MenuItem.Label size="medium">{t(`views.PAYMENT_METHODS.options.${type}.heading`)}</MenuItem.Label>
       {!disabled && <MenuItem.IntentIcon />}
       <MenuItem.Caption>
-        {disabled ? optionText.disabledCaption : optionText.caption}
+        {t(`views.PAYMENT_METHODS.options.${type}.${disabled ? 'disabledCaption' : 'caption'}`)}
       </MenuItem.Caption>
     </MenuItem>
   );

@@ -66,6 +66,7 @@ import { CheckoutError, CheckoutErrorType } from './errors';
 import { AvailabilityService, availabilityService } from './availability';
 import { loadUnresolved } from './widgets/load';
 import { WidgetsInit } from './types/widgets';
+import { HttpClient } from './api/http';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
@@ -78,6 +79,8 @@ const WIDGETS_SCRIPT_TIMEOUT = 100;
 // Checkout SDK
 export class Checkout {
   private readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>;
+
+  private httpClient: HttpClient;
 
   readonly config: CheckoutConfiguration;
 
@@ -94,7 +97,8 @@ export class Checkout {
   constructor(
     config: CheckoutModuleConfiguration = SANDBOX_CONFIGURATION,
   ) {
-    this.config = new CheckoutConfiguration(config);
+    this.httpClient = new HttpClient(config);
+    this.config = new CheckoutConfiguration(config, this.httpClient);
     this.fiatRampService = new FiatRampService(this.config);
     this.readOnlyProviders = new Map<ChainId, ethers.providers.JsonRpcProvider>();
     this.availability = availabilityService(this.config.isDevelopment, this.config.isProduction);

@@ -1,5 +1,6 @@
 import { TransactionResponse } from '@ethersproject/providers';
 import { useContext, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   ViewActions,
   ViewContext,
@@ -9,7 +10,6 @@ import {
   SwapWidgetViews,
 } from '../../../context/view-context/SwapViewContextTypes';
 import { LoadingView } from '../../../views/loading/LoadingView';
-import { text } from '../../../resources/text/textConfig';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 interface SwapInProgressProps {
@@ -18,8 +18,8 @@ interface SwapInProgressProps {
 }
 
 export function SwapInProgress({ transactionResponse, swapForm }: SwapInProgressProps) {
+  const { t } = useTranslation();
   const { viewDispatch } = useContext(ViewContext);
-  const { IN_PROGRESS: { loading } } = text.views[SwapWidgetViews.SWAP];
 
   const { page } = useAnalytics();
 
@@ -79,6 +79,6 @@ export function SwapInProgress({ transactionResponse, swapForm }: SwapInProgress
   }, [transactionResponse]);
 
   return (
-    <LoadingView loadingText={loading.text} showFooterLogo />
+    <LoadingView loadingText={t('views.SWAP.IN_PROGRESS.loading.text')} showFooterLogo />
   );
 }

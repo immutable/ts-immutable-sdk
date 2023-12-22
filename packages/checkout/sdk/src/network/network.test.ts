@@ -8,6 +8,7 @@ import {
   getNetworkInfo,
   switchWalletNetwork,
 } from './network';
+import { HttpClient } from '../api/http';
 import {
   ChainId,
   WalletProviderName,
@@ -52,6 +53,13 @@ const zkevmNetworkInfo = {
   },
 };
 
+jest.mock('../api/http', () => ({
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  HttpClient: jest.fn().mockImplementation(() => ({
+    get: jest.fn(),
+  })),
+}));
+
 jest.mock('@ethersproject/providers', () => ({
   // eslint-disable-next-line @typescript-eslint/naming-convention
   Web3Provider: jest.fn(),
@@ -63,10 +71,12 @@ jest.mock('../provider/getUnderlyingProvider');
 
 describe('network functions', () => {
   let testCheckoutConfiguration: CheckoutConfiguration;
+  let mockedHttpClient: jest.Mocked<HttpClient>;
 
   beforeEach(() => {
     jest.clearAllMocks();
 
+    mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
     (RemoteConfigFetcher as unknown as jest.Mock).mockReturnValue({
       getConfig: jest.fn().mockResolvedValue([
         {
@@ -83,7 +93,7 @@ describe('network functions', () => {
 
     testCheckoutConfiguration = new CheckoutConfiguration({
       baseConfig: { environment: Environment.SANDBOX },
-    });
+    }, mockedHttpClient);
   });
 
   describe('switchWalletNetwork()', () => {
@@ -114,7 +124,7 @@ describe('network functions', () => {
       const switchNetworkResult = await switchWalletNetwork(
         new CheckoutConfiguration({
           baseConfig: { environment: Environment.PRODUCTION },
-        }),
+        }, mockedHttpClient),
         provider,
         ChainId.ETHEREUM,
       );
@@ -447,12 +457,27 @@ describe('network functions', () => {
   });
 
   describe('getNetworkAllowList()', () => {
+    it('should return an empty list if no configuration is provided', async () => {
+      (RemoteConfigFetcher as unknown as jest.Mock).mockReturnValue({
+        getConfig: jest.fn().mockResolvedValue(undefined),
+      });
+
+      const emptyCheckoutConfiguration = new CheckoutConfiguration({
+        baseConfig: { environment: Environment.SANDBOX },
+      }, mockedHttpClient);
+      const allowListResult = await getNetworkAllowList(emptyCheckoutConfiguration, {
+        type: NetworkFilterTypes.ALL,
+      });
+      expect(allowListResult).toEqual({
+        networks: [],
+      });
+    });
+
     it('should return all the networks if no exclude filter is provided', async () => {
-      await expect(
-        await getNetworkAllowList(testCheckoutConfiguration, {
-          type: NetworkFilterTypes.ALL,
-        }),
-      ).toEqual({
+      const allowListResult = await getNetworkAllowList(testCheckoutConfiguration, {
+        type: NetworkFilterTypes.ALL,
+      });
+      expect(allowListResult).toEqual({
         networks: [
           {
             name: ChainName.SEPOLIA,
@@ -479,12 +504,11 @@ describe('network functions', () => {
     });
 
     it('should exclude the right networks if an exclude filter is provided', async () => {
-      await expect(
-        await getNetworkAllowList(testCheckoutConfiguration, {
-          type: NetworkFilterTypes.ALL,
-          exclude: [{ chainId: ChainId.IMTBL_ZKEVM_TESTNET }],
-        }),
-      ).toEqual({
+      const allowListResult = await getNetworkAllowList(testCheckoutConfiguration, {
+        type: NetworkFilterTypes.ALL,
+        exclude: [{ chainId: ChainId.IMTBL_ZKEVM_TESTNET }],
+      });
+      expect(allowListResult).toEqual({
         networks: [
           {
             name: ChainName.SEPOLIA,

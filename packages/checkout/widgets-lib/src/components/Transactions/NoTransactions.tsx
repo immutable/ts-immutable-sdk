@@ -3,6 +3,7 @@ import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { text } from 'resources/text/textConfig';
 import { Checkout } from '@imtbl/checkout-sdk';
 import { useState, useEffect } from 'react';
+import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { PASSPORT_URL } from 'lib';
 import { containerStyle, noTransactionsBodyStyle, passportBodyStyle } from './noTransactionStyles';
 
@@ -17,6 +18,8 @@ export function NoTransactions(
     isPassport,
   }: NoTransactionsProps,
 ) {
+  const { page } = useAnalytics();
+
   const {
     status: { noTransactions },
   } = text.views[BridgeWidgetViews.TRANSACTIONS];
@@ -27,6 +30,13 @@ export function NoTransactions(
     if (!checkout) return;
     setPassportLink(PASSPORT_URL[checkout.config.environment]);
   }, [checkout]);
+
+  useEffect(() => {
+    page({
+      userJourney: UserJourney.BRIDGE,
+      screen: 'NoTransactions',
+    });
+  }, []);
 
   return (
     <Box sx={containerStyle}>
