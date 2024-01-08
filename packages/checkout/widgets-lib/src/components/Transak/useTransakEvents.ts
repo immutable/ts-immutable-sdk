@@ -3,6 +3,7 @@ import {
 } from 'react';
 import { StandardAnalyticsActions } from '@imtbl/react-analytics';
 
+import * as url from 'url';
 import { TransakEvent, TransakEvents, TransakStatuses } from './TransakEvents';
 import {
   AnalyticsControlTypes,
@@ -148,7 +149,7 @@ export const useTransakEvents = (props: UseTransakEventsProps) => {
   const handleMessageEvent = useCallback(
     (event: MessageEvent) => {
       const isTransakEvent = event.source === ref?.current?.contentWindow
-        && event.origin.toLowerCase().includes(TRANSAK_ORIGIN);
+        && url.parse(event.origin)?.host?.toLowerCase().includes(TRANSAK_ORIGIN);
 
       if (!isTransakEvent) return;
 

@@ -4,6 +4,7 @@ import {
   useContext, useEffect, useMemo, useState,
 } from 'react';
 import { ExchangeType } from '@imtbl/checkout-sdk';
+import url from 'url';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { sendOnRampWidgetCloseEvent } from '../OnRampWidgetEvents';
@@ -215,7 +216,7 @@ export function OnRampMain({
       if (!domIframe) return;
 
       if (event.source === domIframe.contentWindow
-        && event.origin.toLowerCase().includes(transakOrigin)) {
+        && url.parse(event.origin)?.host?.toLowerCase().includes(transakOrigin)) {
         trackSegmentEvents(event.data, userWalletAddress, userEmail);
         transakEventHandler(event.data);
       }
