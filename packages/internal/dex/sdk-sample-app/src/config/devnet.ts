@@ -15,8 +15,8 @@ const immutableConfig = new ImmutableConfiguration({
 const contractOverrides: ExchangeContracts = {
   multicall: '0x9482D1727424B6C3EeaA22B037FFBC3ae6748f66',
   coreFactory: '0x8081d5F526b7Aaf4868e6C53Aa8a9d9D93c10562',
-  quoterV2: '0xC12B5c73951CFD922979638b5d19C593ac51dcDA',
-  peripheryRouter: '0x8089b5D6fa3f19C64081d5050c5CA3a66f34C5af',
+  quoter: '0xC12B5c73951CFD922979638b5d19C593ac51dcDA',
+  swapRouter: '0x8089b5D6fa3f19C64081d5050c5CA3a66f34C5af',
   secondaryFee: '0x8089b5D6fa3f19C64081d5050c5CA3a66f34C5af', // not deployed currently
 };
 
