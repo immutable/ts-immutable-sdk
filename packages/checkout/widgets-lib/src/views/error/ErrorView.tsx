@@ -46,8 +46,8 @@ export function ErrorView({
       floatHeader
       testId="error-view"
     >
-      <SimpleTextBody heading={t('views.ERROR_VIEW.errorText.heading')}>
-        {t('views.ERROR_VIEW.errorText.body', { returnObjects: true })[0]}
+      <SimpleTextBody heading={t('views.ERROR_VIEW.heading')}>
+        {t('views.ERROR_VIEW.body', { returnObjects: true })[0]}
         {' '}
         <Link
           size="small"
@@ -55,10 +55,10 @@ export function ErrorView({
             <a href="https://support.immutable.com/en/" />
           }
         >
-          {t('views.ERROR_VIEW.errorText.body', { returnObjects: true })[1]}
+          {t('views.ERROR_VIEW.body', { returnObjects: true })[1]}
         </Link>
         {' '}
-        {t('views.ERROR_VIEW.errorText.body', { returnObjects: true })[2]}
+        {t('views.ERROR_VIEW.body', { returnObjects: true })[2]}
       </SimpleTextBody>
     </SimpleLayout>
   );

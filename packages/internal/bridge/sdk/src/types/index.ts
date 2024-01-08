@@ -39,7 +39,10 @@ export interface AxelarChainDetails {
 export type BridgeContracts = {
   rootERC20BridgeFlowRate: Address;
   childERC20Bridge: Address;
-  wrappedIMX: Address;
+  rootChainIMX: Address;
+  rootChainWrappedETH: Address;
+  childChainWrappedETH: Address;
+  childChainWrappedIMX: Address;
 };
 
 /**
@@ -306,7 +309,7 @@ export enum StatusResponse {
  * @property {FungibleToken} token - Optional param to filter the flowRate info by. If not specified info for all tokens will be returned.
 */
 export interface FlowRateInfoRequest {
-  token?: FungibleToken;
+  tokens: Array<FungibleToken>;
 }
 
 /**
@@ -329,10 +332,10 @@ export interface FlowRateInfoResponse {
  * @property {string} refillRate - The number of tokens added per second.
  */
 export interface FlowRateInfoItem {
-  capacity: string;
-  depth: string;
+  capacity: ethers.BigNumber;
+  depth: ethers.BigNumber;
   refillTime: number;
-  refillRate: string;
+  refillRate: ethers.BigNumber;
 }
 
 /**
