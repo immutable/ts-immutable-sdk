@@ -11,7 +11,7 @@ import {
   useAnalytics,
 } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 
-export const TRANSAK_ORIGIN = 'transak.com';
+export const TRANSAK_ORIGIN = ['global.transak.com', 'global-stg.transak.com'];
 const FAILED_TO_LOAD_TIMEOUT_IN_MS = 10000;
 
 export type TransakEventHandlers = {
