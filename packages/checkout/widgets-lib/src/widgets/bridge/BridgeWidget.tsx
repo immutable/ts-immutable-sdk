@@ -218,7 +218,7 @@ export function BridgeWidget({
           )}
           {viewState.view.type === SharedViews.ERROR_VIEW && (
             <ErrorView
-              actionText={t('views.ERROR_VIEW.errorText.actionText')}
+              actionText={t('views.ERROR_VIEW.actionText')}
               onActionClick={goBackToWalletNetworkSelector}
               onCloseClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
               errorEventAction={() => {
