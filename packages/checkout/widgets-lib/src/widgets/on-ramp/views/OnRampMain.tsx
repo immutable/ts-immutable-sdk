@@ -18,9 +18,9 @@ import {
 import { TransakEventData, TransakEvents, TransakStatuses } from '../TransakEvents';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
+import { TRANSAK_ORIGIN } from '../../../components/Transak/useTransakEvents';
 
 const transakIframeId = 'transak-iframe';
-const transakOrigin = 'transak.com';
 const IN_PROGRESS_VIEW_DELAY_MS = 1200;
 interface OnRampProps {
   showIframe: boolean;
@@ -215,8 +215,9 @@ export function OnRampMain({
     const handleTransakEvents = (event: any) => {
       if (!domIframe) return;
 
+      const host = url.parse(event.origin)?.host?.toLowerCase();
       if (event.source === domIframe.contentWindow
-        && url.parse(event.origin)?.host?.toLowerCase().includes(transakOrigin)) {
+        && host && TRANSAK_ORIGIN.includes(host)) {
         trackSegmentEvents(event.data, userWalletAddress, userEmail);
         transakEventHandler(event.data);
       }

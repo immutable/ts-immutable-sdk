@@ -11,7 +11,7 @@ import {
   useAnalytics,
 } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 
-const TRANSAK_ORIGIN = 'transak.com';
+export const TRANSAK_ORIGIN = 'transak.com';
 const FAILED_TO_LOAD_TIMEOUT_IN_MS = 10000;
 
 export type TransakEventHandlers = {
@@ -148,8 +148,9 @@ export const useTransakEvents = (props: UseTransakEventsProps) => {
 
   const handleMessageEvent = useCallback(
     (event: MessageEvent) => {
+      const host = url.parse(event.origin)?.host?.toLowerCase();
       const isTransakEvent = event.source === ref?.current?.contentWindow
-        && url.parse(event.origin)?.host?.toLowerCase().includes(TRANSAK_ORIGIN);
+        && host && TRANSAK_ORIGIN.includes(host);
 
       if (!isTransakEvent) return;
 
