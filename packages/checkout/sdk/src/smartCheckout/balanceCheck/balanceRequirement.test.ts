@@ -365,7 +365,7 @@ describe('balanceRequirement', () => {
       });
     });
 
-    it('should return balance requirements when address matches with different casing', () => {
+    it('should return sufficient true when different address casing but user has sufficient balance', () => {
       const itemRequirement: ERC20Item = {
         type: ItemType.ERC20,
         tokenAddress: '0xTOKENADDRESS',
