@@ -1313,9 +1313,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@imtbl/sdk@file:../../sdk::locator=func-tests%40workspace%3A.":
+"@imtbl/sdk@file:../../../sdk::locator=func-tests-imx%40workspace%3A.":
   version: 0.0.0
-  resolution: "@imtbl/sdk@file:../../sdk#../../sdk::hash=4b6a5f&locator=func-tests%40workspace%3A."
+  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=b21acb&locator=func-tests-imx%40workspace%3A."
   dependencies:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
@@ -1335,7 +1335,7 @@ __metadata:
     "@uniswap/sdk-core": ^3.0.1
     "@uniswap/v3-sdk": ^3.9.0
     assert: ^2.0.0
-    axios: ^1.3.5
+    axios: ^1.6.5
     bn.js: ^5.2.1
     buffer: ^6.0.3
     crypto-browserify: ^3.12.0
@@ -1356,7 +1356,7 @@ __metadata:
   peerDependencies:
     react: ^18.2.0
     react-dom: ^18.2.0
-  checksum: 5664f0f397eaa003d970e8477509cced506995c3be49a0c5fc80ae3dfceaca89a712a1df38cf9a0d4a6661786832f23fcd351574b064baf185866ee8056cb50f
+  checksum: 77e17c152c5e176584b1280ade9b5e75a88a45a2328ae5123111bf96233c2c26a14f4b86de22e231f9b97b997975fbeb942aae9aa64f21e48ce50536044e9f1c
   languageName: node
   linkType: hard
 
@@ -4170,14 +4170,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.3.5":
-  version: 1.6.2
-  resolution: "axios@npm:1.6.2"
+"axios@npm:^1.6.5":
+  version: 1.6.5
+  resolution: "axios@npm:1.6.5"
   dependencies:
-    follow-redirects: ^1.15.0
+    follow-redirects: ^1.15.4
     form-data: ^4.0.0
     proxy-from-env: ^1.1.0
-  checksum: 4a7429e2b784be0f2902ca2680964391eae7236faa3967715f30ea45464b98ae3f1c6f631303b13dfe721b17126b01f486c7644b9ef276bfc63112db9fd379f8
+  checksum: e28d67b2d9134cb4608c44d8068b0678cfdccc652742e619006f27264a30c7aba13b2cd19c6f1f52ae195b5232734925928fb192d5c85feea7edd2f273df206d
   languageName: node
   linkType: hard
 
@@ -5969,13 +5969,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.14.8, follow-redirects@npm:^1.15.0":
-  version: 1.15.3
-  resolution: "follow-redirects@npm:1.15.3"
+"follow-redirects@npm:^1.14.8, follow-redirects@npm:^1.15.4":
+  version: 1.15.4
+  resolution: "follow-redirects@npm:1.15.4"
   peerDependenciesMeta:
     debug:
       optional: true
-  checksum: 584da22ec5420c837bd096559ebfb8fe69d82512d5585004e36a3b4a6ef6d5905780e0c74508c7b72f907d1fa2b7bd339e613859e9c304d0dc96af2027fd0231
+  checksum: e178d1deff8b23d5d24ec3f7a94cde6e47d74d0dc649c35fc9857041267c12ec5d44650a0c5597ef83056ada9ea6ca0c30e7c4f97dbf07d035086be9e6a5b7b6
   languageName: node
   linkType: hard
 
@@ -6101,15 +6101,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"func-tests@workspace:.":
+"func-tests-imx@workspace:.":
   version: 0.0.0-use.local
-  resolution: "func-tests@workspace:."
+  resolution: "func-tests-imx@workspace:."
   dependencies:
     "@ethersproject/providers": ^5.7.2
     "@ethersproject/units": ^5.7.0
     "@ethersproject/wallet": ^5.7.0
     "@imtbl/core-sdk": ^2.4.1
-    "@imtbl/sdk": "file:../../sdk"
+    "@imtbl/sdk": "file:../../../sdk"
     "@swc/jest": ^0.2.29
     "@types/node": ^20.10.1
     dotenv: ^16.3.1
