@@ -32,7 +32,7 @@ export const getTokenAllowList = async (
   let onRampConfig: OnRampConfig;
   let onBridgeConfig: BridgeConfig;
 
-  const localChainId = chainId ?? getL1ChainId(config);
+  const targetChainId = chainId ?? getL1ChainId(config);
 
   switch (type) {
     case TokenFilterTypes.SWAP:
@@ -44,25 +44,19 @@ export const getTokenAllowList = async (
       break;
     case TokenFilterTypes.ONRAMP:
       onRampConfig = (await config.remote.getConfig('onramp')) as OnRampConfig;
-      // Only using Transak as it's the only on-ramp provider at the moment
-      if (!onRampConfig) {
-        tokens = [];
-      }
+      if (!onRampConfig) tokens = [];
+
       tokens = onRampConfig[OnRampProvider.TRANSAK]?.tokens || [];
       break;
     case TokenFilterTypes.BRIDGE:
       onBridgeConfig = ((await config.remote.getConfig('bridge')) as BridgeConfig);
+      if (!onBridgeConfig) tokens = [];
 
-      // Only using Transak as it's the only on-ramp provider at the moment
-      if (!onBridgeConfig) {
-        tokens = [];
-      }
-
-      tokens = onBridgeConfig[localChainId]?.tokens || [];
+      tokens = onBridgeConfig[targetChainId]?.tokens || [];
       break;
     case TokenFilterTypes.ALL:
     default:
-      tokens = (await config.remote.getTokensConfig(localChainId)).allowed as TokenInfo[];
+      tokens = (await config.remote.getTokensConfig(targetChainId)).allowed as TokenInfo[];
   }
 
   if (!exclude || exclude?.length === 0) return { tokens };
