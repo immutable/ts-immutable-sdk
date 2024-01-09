@@ -26,7 +26,6 @@ describe('ExchangeConfiguration', () => {
     coreFactory: test.TEST_V3_CORE_FACTORY_ADDRESS,
     quoter: test.TEST_QUOTER_ADDRESS,
     swapRouter: test.TEST_ROUTER_ADDRESS,
-    quoterV2: test.TEST_QUOTER_ADDRESS,
     immutableSwapProxy: test.TEST_SWAP_PROXY_ADDRESS,
   };
 
@@ -164,7 +163,6 @@ describe('ExchangeConfiguration', () => {
         coreFactory: test.TEST_V3_CORE_FACTORY_ADDRESS,
         quoter: test.TEST_QUOTER_ADDRESS,
         swapRouter: test.TEST_ROUTER_ADDRESS,
-        quoterV2: test.TEST_QUOTER_ADDRESS,
         immutableSwapProxy: test.TEST_SWAP_PROXY_ADDRESS,
       };
 
