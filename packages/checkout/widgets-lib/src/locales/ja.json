@@ -38,7 +38,7 @@
     "SWITCH_NETWORK": {
       "eth": {
         "heading": "コインを移動するには、セポリアネットワークに切り替える必要があります",
-        "body": "MetaMaskでネットワークを切り替えるように求められます。必要に応じて後で切り替えることができます。",
+        "body": "MetaMaskでネットワークを切り替えるように求められます。必要に応じて後で切り替えを元に戻すことができます。",
         "button": {
           "text": "切り替えの準備ができました",
           "retryText": "再試行する"
@@ -54,7 +54,7 @@
       }
     },
     "ERROR_VIEW": {
-      "heading": "何かがうまくいかない",
+      "heading": "何かがうまくいきません",
       "body": ["もう一度やってみるか、", "サポート", "に連絡して助けを求めることができます。"],
       "actionText": "もう一度試す"
     },
@@ -94,7 +94,7 @@
     "COIN_INFO": {
       "metamask": {
         "heading": "コインとコレクティブルはネットワーク固有です",
-        "body": "コインを追加したり、ネットワーク間でコインを移動したりするには、ネットワークを切り替えることができます"
+        "body": "ネットワークを切り替えることで、コインを追加したり、ネットワーク間でコインを移動したりすることができます"
       },
       "passport": {
         "heading": "コインとコレクティブルはネットワーク固有です",
@@ -109,17 +109,17 @@
       },
       "content": {
         "title": "何をスワップしたいですか？",
-        "fiatPricePrefix": "約USD",
-        "availableBalancePrefix": "利用可能"
+        "fiatPricePrefix": "USD",
+        "availableBalancePrefix": "利用可能です"
       },
       "swapForm": {
         "from": {
-          "label": "出金元",
+          "label": "交換元",
           "inputPlaceholder": "0",
           "selectorTitle": "何からスワップしたいですか？"
         },
         "to": {
-          "label": "宛先",
+          "label": "交換先",
           "inputPlaceholder": "0",
           "selectorTitle": "何にスワップしたいですか？"
         },
@@ -130,13 +130,13 @@
       },
       "validation": {
         "noAmountInputted": "金額を入力してください",
-        "insufficientBalance": "残高不足",
+        "insufficientBalance": "残高不足です",
         "noFromTokenSelected": "スワップするコインを選択してください",
         "noToTokenSelected": "受け取るコインを選択してください"
       },
       "success": {
         "text": "成功",
-        "actionText": "続行"
+        "actionText": "続ける"
       },
       "failed": {
         "text": "トランザクションが拒否されました",
@@ -155,7 +155,7 @@
     "APPROVE_ERC20": {
       "approveSwap": {
         "content": {
-          "heading": "これでトランザクションを承認する必要があります",
+          "heading": "トランザクションを承認する必要があります",
           "body": "ウォレットのプロンプトに従ってください。"
         },
         "footer": {
@@ -168,8 +168,7 @@
           "metamask": {
             "heading": "このトランザクションのために支出上限を設定するように求められます",
             "body": [
-              "少なくとも入力してください",
-              "このトランザクションおよび将来のトランザクションのために、その後、プロンプトに従ってください。"
+              "少なくともこのトランザクションおよび将来のトランザクションのために{{amount}}を入力してください。その後、プロンプトに従ってください。"
             ]
           },
           "passport": {
@@ -178,7 +177,7 @@
           }
         },
         "footer": {
-          "buttonText": "了解",
+          "buttonText": "了解です",
           "retryText": "もう一度試す"
         },
         "loading": {
@@ -204,8 +203,8 @@
         }
       },
       "SUCCESS": {
-        "text": "コインが途中にあります",
-        "actionText": "完了"
+        "text": "コインが移動中です",
+        "actionText": "完了しました"
       },
       "FAIL": {
         "text": "トランザクションが失敗しました",
@@ -251,7 +250,7 @@
       "fundingRouteSelect": {
         "heading": "で支払う",
         "noRoutesAvailable": "コインの残高が不足しています。代わりにカードで続行してください。",
-        "continue": "続行",
+        "continue": "続行する",
         "payWithCardInstead": "いいえ、カードで支払います",
         "payWithCard": "カードで支払う"
       }
@@ -261,14 +260,14 @@
         "heading": "どのようにして支払いますか？"
       },
       "options": {
-        "crypto": {
+        "CRYPTO": {
           "heading": "コイン",
           "caption": "ウォレットのコイン残高を使用して",
           "disabledCaption": "残高に十分なコインが見当たりません"
         },
-        "fiat": {
+        "FIAT": {
           "heading": "カード",
-          "caption": "GooglePayもTransakで利用可能",
+          "caption": "GooglePayもTransakで利用可能です",
           "disabledCaption": ""
         }
       },
@@ -283,7 +282,7 @@
     },
     "PAY_WITH_COINS": {
       "header": {
-        "heading": "あなたので支払う",
+        "heading": "あなたの{{caption}}支払う",
         "caption": "ウォレットのコイン残高を使用して"
       },
       "button": {
@@ -335,7 +334,7 @@
           "primaryAction": "もう一度試す",
           "secondaryAction": "キャンセル"
         },
-        "DEFAULT_ERROR": {
+        "DEFAULT": {
           "description": "申し訳ありませんが、何かがうまくいかなかったようです。もう一度お試しください。",
           "primaryAction": "もう一度試す",
           "secondaryAction": "閉じる"
@@ -352,13 +351,13 @@
       "fromFormInput": {
         "heading": "From",
         "selectDefaultText": "ウォレットとネットワークを選択",
-        "walletSelectorHeading": "From wallet",
-        "networkSelectorHeading": "From network"
+        "walletSelectorHeading": "移動元ウォレット",
+        "networkSelectorHeading": "移動元ネットワーク"
       },
       "toFormInput": {
         "heading": "To",
         "selectDefaultText": "ウォレットとネットワークを選択",
-        "walletSelectorHeading": "To wallet"
+        "walletSelectorHeading": "送付先ウォレット"
       },
       "submitButton": {
         "text": "次へ"
@@ -374,8 +373,8 @@
       },
       "content": {
         "title": "いくら移動しますか？",
-        "fiatPricePrefix": "約USD",
-        "availableBalancePrefix": "利用可能"
+        "fiatPricePrefix": "約{{ amount }}USD",
+        "availableBalancePrefix": "利用可能です"
       },
       "bridgeForm": {
         "from": {
@@ -395,10 +394,10 @@
       "heading": "これはどう見えますか？",
       "fromLabel": {
         "amountHeading": "移動中",
-        "heading": "From"
+        "heading": "移動元"
       },
       "toLabel": {
-        "heading": "To"
+        "heading": "移動先"
       },
       "fees": {
         "heading": "ガス手数料"
@@ -418,7 +417,7 @@
         "body": "ウォレットのポップアップで表示されるプロンプトに従って承認してください。"
       },
       "footer": {
-        "buttonText": "OK",
+        "buttonText": "OKです",
         "retryText": "もう一度試す"
       },
       "loadingView": {
@@ -427,7 +426,7 @@
     },
     "IN_PROGRESS": {
       "heading": "移動進行中",
-      "body1": "あなたの${symbol}がzkEVMに着陸するまで3分未満。",
+      "body1": "あなたの${symbol}がzkEVMに到着するまで3分未満。",
       "body2": "このウィンドウを閉じても、トランザクションは完了したらウォレットに反映されます。"
     }
   },
@@ -465,7 +464,7 @@
         "body2": "トランザクションに署名してください"
       },
       "buttons": {
-        "retry": "了解",
+        "retry": "了解です",
         "cancel": "閉じる"
       }
     },
@@ -478,7 +477,7 @@
     "notEnoughGas": {
       "content": {
         "heading": "残高が低すぎます",
-        "body": "この移動のガス手数料をカバーするには、ETH残高が不足しています。MetaMaskを使用して直接ウォレットにETHを送金することができます。"
+        "body": "この移動のガス手数料をカバーするためのETH残高が不足しています。MetaMaskを使用して直接ウォレットにETHを送金することができます。"
       },
       "buttons": {
         "adjustAmount": "金額を調整",
@@ -489,7 +488,7 @@
     "notEnoughImx": {
       "content": {
         "noImx": {
-          "heading": "IMXコインが必要です",
+          "heading": "スワップするためにIMXコインが必要です",
           "body": "スワップ手数料はIMXコインで支払われるため、スワップする前にこれを追加する必要があります。"
         },
         "insufficientImx": {
