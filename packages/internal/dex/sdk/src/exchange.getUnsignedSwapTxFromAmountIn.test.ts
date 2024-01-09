@@ -19,7 +19,7 @@ import {
   TEST_TRANSACTION_GAS_USAGE,
   TEST_FEE_RECIPIENT,
   TEST_MAX_FEE_BASIS_POINTS,
-  TEST_SECONDARY_FEE_ADDRESS,
+  TEST_SWAP_PROXY_ADDRESS,
   decodePathForExactInput,
   decodeMulticallExactInputSingleWithFees,
   decodeMulticallExactInputWithFees,
@@ -339,7 +339,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(formatEther(swapParams.amountOutMinimum)).toBe('961.165048543689320388'); // swap.amountOutMinimum = ourQuoteRes.amountOut - slippage
       expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0');
 
-      expect(swap.transaction.to).toBe(TEST_SECONDARY_FEE_ADDRESS);
+      expect(swap.transaction.to).toBe(TEST_SWAP_PROXY_ADDRESS);
       expect(swap.transaction.from).toBe(params.fromAddress);
       expect(swap.transaction.value).toBe('0x00');
     });
@@ -725,7 +725,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
         const decodedPath = decodePathForExactInput(swapParams.path.toString());
 
-        expect(swap.transaction.to).toBe(TEST_SECONDARY_FEE_ADDRESS); // to address
+        expect(swap.transaction.to).toBe(TEST_SWAP_PROXY_ADDRESS); // to address
         expect(swap.transaction.from).toBe(params.fromAddress); // from address
         expect(swap.transaction.value).toBe('0x00'); // refers to 0 amount of the native token
 
@@ -853,7 +853,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         const { swapParams } = decodeMulticallExactInputSingleWithFees(data);
 
         expect(formatEther(swapParams.amountOutMinimum)).toBe(formatEther(quote.amountWithMaxSlippage.value));
-        expect(swap.transaction.to).toBe(TEST_SECONDARY_FEE_ADDRESS); // expect the secondary fee contract to be used
+        expect(swap.transaction.to).toBe(TEST_SWAP_PROXY_ADDRESS); // expect the secondary fee contract to be used
       });
     });
   });
