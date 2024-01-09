@@ -499,7 +499,7 @@ export function BridgeForm(props: BridgeFormProps) {
         tokenSymbol={estimates?.token?.symbol ?? ''}
         fees={[
           {
-            label: t('views.drawers.feesBreakdown.fees.gas.label'),
+            label: t('drawers.feesBreakdown.fees.gas.label'),
             fiatAmount: gasFiatAmount,
             amount: gasFee,
           },

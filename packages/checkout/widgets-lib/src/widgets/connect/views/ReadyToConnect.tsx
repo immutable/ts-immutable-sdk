@@ -142,6 +142,8 @@ export function ReadyToConnect({ targetChainId, allowedChains }: ReadyToConnectP
       });
       handleConnectViewUpdate(provider);
     } catch (err: any) {
+      // eslint-disable-next-line no-console
+      console.error(err);
       setLoading(false);
       setFooterButtonTextKey(`${textView()}.footer.buttonText2`);
     }
