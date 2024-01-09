@@ -105,13 +105,7 @@ export class Blockscout {
       const cached = this.getCache(url);
       if (cached) return Promise.resolve(cached);
 
-      const response = await this.httpClient.get(url);
-      // if (response.status >= 400) {
-      //   return Promise.reject({
-      //     code: response.status,
-      //     message: response.statusText,
-      //   });
-      // }
+      const response = await this.httpClient.get(url); // success if 2XX response otherwise throw error
 
       // To get around an issue with native tokens being an ERC-20, there is the need
       // to remove IMX from `resp` and add it back in using getNativeTokenByWalletAddress.
@@ -151,13 +145,7 @@ export class Blockscout {
       const cached = this.getCache(url);
       if (cached) return Promise.resolve(cached);
 
-      const response = await this.httpClient.get(url);
-      // if (response.status >= 400) {
-      //   return Promise.reject({
-      //     code: response.status,
-      //     message: response.statusText,
-      //   });
-      // }
+      const response = await this.httpClient.get(url); // success if 2XX response otherwise throw error
 
       const data = {
         token: this.nativeToken,
