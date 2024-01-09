@@ -5,3 +5,4 @@ export * as passport from './passport';
 export * as orderbook from './orderbook';
 export * as provider from './provider';
 export * as checkout from './checkout';
+export * as x from './x';

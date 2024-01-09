@@ -56,6 +56,7 @@
     "@imtbl/passport": "0.0.0",
     "@imtbl/provider": "0.0.0",
     "@imtbl/version-check": "0.0.0",
+    "@imtbl/x": "0.0.0",
     "@rollup/plugin-commonjs": "^24.0.1",
     "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-node-resolve": "^15.0.2",
@@ -109,6 +110,10 @@
     "./checkout": {
       "types": "./dist/checkout.d.ts",
       "import": "./dist/checkout.js"
+    },
+    "./x": {
+      "types": "./dist/x.d.ts",
+      "import": "./dist/x.js"
     }
   },
   "files": [
@@ -131,7 +136,7 @@
     "@openzeppelin/contracts": "3.4.2-solc-0.7"
   },
   "scripts": {
-    "build": "yarn packageList && yarn updateDependencies && yarn regenModules && rm -rf dist && NODE_ENV=production rollup --config rollup.config.js && rm -rf dist/types",
+    "build": "yarn packageList && yarn updateDependencies && yarn regenModules && rm -rf dist && NODE_ENV=production rollup --config rollup.config.js",
     "build:only": "rm -rf dist && NODE_ENV=production rollup --config rollup.config.js && rm -rf dist/types",
     "copyBrowserBundles": "node scripts/copyBrowserBundles.js",
     "generateIndex": "node scripts/generateIndex.js",

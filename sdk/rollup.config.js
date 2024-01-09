@@ -43,12 +43,13 @@ const getFileBuild = (inputFilename) => [
       dir: 'dist',
       format: 'es',
     },
+    treeshake: false,
     plugins: [
       nodeResolve({
         resolveOnly: getPackages(),
       }),
-      commonJs(),
       json(),
+      commonJs(),
       typescript({
         declaration: true,
         declarationDir: './dist/types',

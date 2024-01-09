@@ -88,7 +88,8 @@
       "packages/blockchain-data/sdk",
       "packages/blockchain-data/sample-app",
       "packages/game-bridge",
-      "packages/internal/economy-building-blocks/playground"
+      "packages/internal/economy-building-blocks/playground",
+      "packages/x"
     ],
     "nohoist": [
       "samples/**"
