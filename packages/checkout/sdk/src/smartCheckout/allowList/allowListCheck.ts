@@ -6,7 +6,7 @@ import {
   TokenFilterTypes,
 } from '../../types';
 import { TokenBalanceResult, TokenBalances } from '../routing/types';
-import { OnRampTokensAllowList, RoutingTokensAllowList } from './types';
+import { RoutingTokensAllowList } from './types';
 
 const filterTokens = (allowedTokens: TokenInfo[], balances: TokenBalanceResult | undefined) => {
   if (balances && balances.success) {
@@ -24,19 +24,13 @@ const filterTokens = (allowedTokens: TokenInfo[], balances: TokenBalanceResult |
 export const allowListCheckForOnRamp = async (
   config: CheckoutConfiguration,
   availableRoutingOptions: AvailableRoutingOptions,
-) : Promise<OnRampTokensAllowList> => {
+) : Promise<TokenInfo[]> => {
   if (availableRoutingOptions.onRamp) {
     const onRampOptions = (await getTokenAllowList(config, { type: TokenFilterTypes.ONRAMP }));
-    const onRampAllowList: OnRampTokensAllowList = {};
-    Object.entries(onRampOptions)
-      .forEach(([onRampProvider, onRampProviderConfig]) => {
-        // Allowed list per onRamp provider
-        onRampAllowList[onRampProvider] = onRampProviderConfig.tokens ?? [];
-      });
-    return onRampAllowList;
+    return onRampOptions.tokens;
   }
 
-  return {};
+  return [];
 };
 
 export const allowListCheckForBridge = async (

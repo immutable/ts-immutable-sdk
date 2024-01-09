@@ -17,10 +17,11 @@ export const onRampRoute = async (
   const { required, current, delta } = balanceRequirement;
 
   let hasAllowList = false;
-  const onRampProvidersAllowList = await allowListCheckForOnRamp(config, availableRoutingOptions);
-  Object.values(onRampProvidersAllowList).forEach((onRampAllowList) => {
-    if (onRampAllowList.length > 0 && !hasAllowList) {
-      hasAllowList = !!onRampAllowList.find((token) => token.address === required.token?.address);
+  const onRampAllowList = await allowListCheckForOnRamp(config, availableRoutingOptions);
+
+  onRampAllowList.forEach((token) => {
+    if (token.address === required.token?.address) {
+      hasAllowList = true;
     }
   });
 

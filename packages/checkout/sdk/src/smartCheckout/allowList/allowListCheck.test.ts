@@ -361,25 +361,23 @@ describe('allowListCheck', () => {
   describe('allowListCheckForOnRamp', () => {
     it('should return onRamp allowlist', async () => {
       const result = await allowListCheckForOnRamp(config, { onRamp: true });
-      expect(result).toEqual({
-        [OnRampProvider.TRANSAK]: [{
-          decimals: 18,
-          symbol: 'IMX',
-          name: 'IMX',
-        }],
-      });
+      expect(result).toEqual([{
+        decimals: 18,
+        symbol: 'IMX',
+        name: 'IMX',
+      }]);
     });
 
-    it('should return an empty object if onRamp option is disabled', async () => {
+    it('should return an empty array if onRamp option is disabled', async () => {
       const result = await allowListCheckForOnRamp(config, { onRamp: false });
-      expect(result).toEqual({});
+      expect(result).toEqual([]);
     });
 
-    it('should return an empty object if no onRamp providers configured', async () => {
+    it('should return an empty array if no onRamp providers configured', async () => {
       onRampConfig = {};
 
       const result = await allowListCheckForOnRamp(config, { onRamp: true });
-      expect(result).toEqual({});
+      expect(result).toEqual([]);
     });
 
     it('should return an empty array if onRamp allowlist is empty', async () => {
@@ -392,9 +390,7 @@ describe('allowListCheck', () => {
       };
 
       const result = await allowListCheckForOnRamp(config, { onRamp: true });
-      expect(result).toEqual({
-        [OnRampProvider.TRANSAK]: [],
-      });
+      expect(result).toEqual([]);
     });
   });
 });
