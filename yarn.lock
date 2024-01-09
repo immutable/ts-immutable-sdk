@@ -26045,6 +26045,7 @@ __metadata:
     node-gyp: ^9.3.1
     release-it: ^16.1.3
     syncpack: ^9.8.4
+    tslib: ^2.6.2
     typedoc: ^0.24.8
     wsrun: ^5.2.4
   languageName: unknown
@@ -26170,7 +26171,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2.4.1":
+"tslib@npm:^2.4.1, tslib@npm:^2.6.2":
   version: 2.6.2
   resolution: "tslib@npm:2.6.2"
   checksum: 329ea56123005922f39642318e3d1f0f8265d1e7fcb92c633e0809521da75eeaca28d2cf96d7248229deb40e5c19adf408259f4b9640afd20d13aecc1430f3ad
