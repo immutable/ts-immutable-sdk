@@ -12,7 +12,7 @@ const config: Config = {
     '@imtbl/blockchain-data': '<rootDir>../../blockchain-data/sdk/src',
     '@imtbl/generated-clients': '<rootDir>../../internal/generated-clients/src'
   },
-  testEnvironment: 'node',
+  testEnvironment: 'jsdom',
   transform: {
     '^.+\\.(t|j)sx?$': '@swc/jest',
   },
