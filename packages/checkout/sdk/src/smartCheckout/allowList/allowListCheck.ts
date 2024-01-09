@@ -1,9 +1,9 @@
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../config';
+import { getTokenAllowList } from '../../tokens';
 import {
-  BridgeConfig,
-  DexConfig, OnRampConfig,
   AvailableRoutingOptions,
   TokenInfo,
+  TokenFilterTypes,
 } from '../../types';
 import { TokenBalanceResult, TokenBalances } from '../routing/types';
 import { OnRampTokensAllowList, RoutingTokensAllowList } from './types';
@@ -26,7 +26,7 @@ export const allowListCheckForOnRamp = async (
   availableRoutingOptions: AvailableRoutingOptions,
 ) : Promise<OnRampTokensAllowList> => {
   if (availableRoutingOptions.onRamp) {
-    const onRampOptions = await config.remote.getConfig('onramp') as OnRampConfig;
+    const onRampOptions = (await getTokenAllowList(config, { type: TokenFilterTypes.ONRAMP }));
     const onRampAllowList: OnRampTokensAllowList = {};
     Object.entries(onRampOptions)
       .forEach(([onRampProvider, onRampProviderConfig]) => {
@@ -45,8 +45,9 @@ export const allowListCheckForBridge = async (
   availableRoutingOptions: AvailableRoutingOptions,
 ) : Promise<TokenInfo[]> => {
   if (availableRoutingOptions.bridge) {
-    const allowedTokens = ((await config.remote.getConfig('bridge')) as BridgeConfig)?.tokens ?? [];
-    const balances = tokenBalances.get(getL1ChainId(config));
+    const chainId = getL1ChainId(config);
+    const allowedTokens = (await getTokenAllowList(config, { type: TokenFilterTypes.BRIDGE, chainId })).tokens;
+    const balances = tokenBalances.get(chainId);
     return filterTokens(allowedTokens, balances);
   }
 
@@ -59,7 +60,7 @@ export const allowListCheckForSwap = async (
   availableRoutingOptions: AvailableRoutingOptions,
 ) : Promise<TokenInfo[]> => {
   if (availableRoutingOptions.swap) {
-    const allowedTokens = ((await config.remote.getConfig('dex')) as DexConfig)?.tokens ?? [];
+    const allowedTokens = (await getTokenAllowList(config, { type: TokenFilterTypes.SWAP })).tokens;
     const balances = tokenBalances.get(getL2ChainId(config));
     return filterTokens(allowedTokens, balances);
   }

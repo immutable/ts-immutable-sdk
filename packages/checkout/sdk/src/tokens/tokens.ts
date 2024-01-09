@@ -1,6 +1,7 @@
 import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { Contract } from 'ethers';
 import {
+  BridgeConfig,
   ChainId,
   DexConfig,
   GetTokenAllowListResult,
@@ -22,11 +23,16 @@ type TokenAllowListParams = {
 export const getTokenAllowList = async (
   config: CheckoutConfiguration,
   {
-    type = TokenFilterTypes.ALL, chainId, exclude,
+    type = TokenFilterTypes.ALL,
+    chainId,
+    exclude,
   }: TokenAllowListParams,
 ): Promise<GetTokenAllowListResult> => {
   let tokens: TokenInfo[] = [];
   let onRampConfig: OnRampConfig;
+  let onBridgeConfig: BridgeConfig;
+
+  const localChainId = chainId ?? getL1ChainId(config);
 
   switch (type) {
     case TokenFilterTypes.SWAP:
@@ -45,9 +51,18 @@ export const getTokenAllowList = async (
       tokens = onRampConfig[OnRampProvider.TRANSAK]?.tokens || [];
       break;
     case TokenFilterTypes.BRIDGE:
+      onBridgeConfig = ((await config.remote.getConfig('bridge')) as BridgeConfig);
+
+      // Only using Transak as it's the only on-ramp provider at the moment
+      if (!onBridgeConfig) {
+        tokens = [];
+      }
+
+      tokens = onBridgeConfig[localChainId]?.tokens || [];
+      break;
     case TokenFilterTypes.ALL:
     default:
-      tokens = (await config.remote.getTokensConfig(chainId || getL1ChainId(config))).allowed as TokenInfo[];
+      tokens = (await config.remote.getTokensConfig(localChainId)).allowed as TokenInfo[];
   }
 
   if (!exclude || exclude?.length === 0) return { tokens };

@@ -63,11 +63,13 @@ describe('allowListCheck', () => {
       }],
     };
     bridgeConfig = {
-      tokens: [{
-        decimals: 18,
-        symbol: 'ETH',
-        name: 'Ethereum',
-      }],
+      [ChainId.IMTBL_ZKEVM_TESTNET]: {
+        tokens: [{
+          decimals: 18,
+          symbol: 'ETH',
+          name: 'Ethereum',
+        }],
+      },
     };
     onRampConfig = {
       [OnRampProvider.TRANSAK]: {
@@ -245,17 +247,19 @@ describe('allowListCheck', () => {
       ]);
 
       bridgeConfig = {
-        tokens: [{
-          address: '0x0000000',
-          decimals: 18,
-          symbol: 'MEGA',
-          name: 'Mega',
+        [ChainId.IMTBL_ZKEVM_TESTNET]: {
+          tokens: [{
+            address: '0x0000000',
+            decimals: 18,
+            symbol: 'MEGA',
+            name: 'Mega',
+          },
+          {
+            decimals: 18,
+            symbol: 'ETH',
+            name: 'Ethereum',
+          }],
         },
-        {
-          decimals: 18,
-          symbol: 'ETH',
-          name: 'Ethereum',
-        }],
       };
 
       const result = await allowListCheckForBridge(config, balances, { bridge: true });
@@ -284,7 +288,9 @@ describe('allowListCheck', () => {
 
     it('should return an empty array if bridge allowlist is empty', async () => {
       bridgeConfig = {
-        tokens: [],
+        [ChainId.IMTBL_ZKEVM_TESTNET]: {
+          tokens: [],
+        },
       };
 
       const result = await allowListCheckForBridge(config, balances, { bridge: true });
@@ -293,12 +299,14 @@ describe('allowListCheck', () => {
 
     it('should return an empty array if allowlist tokens have no balance', async () => {
       bridgeConfig = {
-        tokens: [{
-          address: '0x0000000',
-          decimals: 18,
-          symbol: 'MEGA',
-          name: 'Mega',
-        }],
+        [ChainId.IMTBL_ZKEVM_TESTNET]: {
+          tokens: [{
+            address: '0x0000000',
+            decimals: 18,
+            symbol: 'MEGA',
+            name: 'Mega',
+          }],
+        },
       };
 
       const result = await allowListCheckForBridge(config, balances, { bridge: true });
