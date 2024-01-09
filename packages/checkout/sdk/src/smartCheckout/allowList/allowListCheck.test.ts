@@ -63,7 +63,7 @@ describe('allowListCheck', () => {
       }],
     };
     bridgeConfig = {
-      [ChainId.IMTBL_ZKEVM_TESTNET]: {
+      [ChainId.SEPOLIA]: {
         tokens: [{
           decimals: 18,
           symbol: 'ETH',
@@ -139,13 +139,13 @@ describe('allowListCheck', () => {
           symbol: 'ETH',
           decimals: 18,
         }],
-        onRamp: {
-          [OnRampProvider.TRANSAK]: [{
+        onRamp: [
+          {
             decimals: 18,
             symbol: 'IMX',
             name: 'IMX',
-          }],
-        },
+          },
+        ],
       });
     });
 
@@ -159,7 +159,7 @@ describe('allowListCheck', () => {
           symbol: 'ETH',
           decimals: 18,
         }],
-        onRamp: {},
+        onRamp: [],
         swap: [],
       });
     });
@@ -170,7 +170,7 @@ describe('allowListCheck', () => {
       const allowList = await allowListCheck(config, balances, availableRoutingOptions);
       expect(allowList).toEqual({
         bridge: [],
-        onRamp: {},
+        onRamp: [],
         swap: [{
           decimals: 18,
           symbol: 'IMX',
@@ -185,13 +185,13 @@ describe('allowListCheck', () => {
       const allowList = await allowListCheck(config, balances, availableRoutingOptions);
       expect(allowList).toEqual({
         bridge: [],
-        onRamp: {
-          [OnRampProvider.TRANSAK]: [{
+        onRamp: [
+          {
             decimals: 18,
             symbol: 'IMX',
             name: 'IMX',
-          }],
-        },
+          },
+        ],
         swap: [],
       });
     });
@@ -202,7 +202,7 @@ describe('allowListCheck', () => {
       const allowList = await allowListCheck(config, balances, availableRoutingOptions);
       expect(allowList).toEqual({
         bridge: [],
-        onRamp: {},
+        onRamp: [],
         swap: [],
       });
     });
@@ -247,7 +247,7 @@ describe('allowListCheck', () => {
       ]);
 
       bridgeConfig = {
-        [ChainId.IMTBL_ZKEVM_TESTNET]: {
+        [ChainId.SEPOLIA]: {
           tokens: [{
             address: '0x0000000',
             decimals: 18,
