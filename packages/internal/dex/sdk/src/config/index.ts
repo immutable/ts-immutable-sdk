@@ -17,7 +17,7 @@ export const CONTRACTS_FOR_CHAIN_ID: Record<number, ExchangeContracts> = {
     coreFactory: '0x56c2162254b0E4417288786eE402c2B41d4e181e',
     quoter: '0xF6Ad3CcF71Abb3E12beCf6b3D2a74C963859ADCd',
     swapRouter: '0x0b012055F770AE7BB7a8303968A7Fb6088A2296e',
-    secondaryFee: '0xDdBDa144cEbe1cCd68E746CDff8a6e4Be51A9e98',
+    immutableSwapProxy: '0xDdBDa144cEbe1cCd68E746CDff8a6e4Be51A9e98',
   },
 };
 
