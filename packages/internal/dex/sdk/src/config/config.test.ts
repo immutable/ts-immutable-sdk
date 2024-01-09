@@ -26,7 +26,7 @@ describe('ExchangeConfiguration', () => {
     coreFactory: test.TEST_V3_CORE_FACTORY_ADDRESS,
     quoterV2: test.TEST_QUOTER_ADDRESS,
     peripheryRouter: test.TEST_ROUTER_ADDRESS,
-    secondaryFee: test.TEST_SECONDARY_FEE_ADDRESS,
+    immutableSwapProxy: test.TEST_SWAP_PROXY_ADDRESS,
   };
 
   describe('when given sandbox environment with supported chain id', () => {
@@ -163,7 +163,7 @@ describe('ExchangeConfiguration', () => {
         coreFactory: test.TEST_V3_CORE_FACTORY_ADDRESS,
         quoterV2: test.TEST_QUOTER_ADDRESS,
         peripheryRouter: test.TEST_ROUTER_ADDRESS,
-        secondaryFee: test.TEST_SECONDARY_FEE_ADDRESS,
+        immutableSwapProxy: test.TEST_SWAP_PROXY_ADDRESS,
       };
 
       const rpcURL = 'https://anrpcurl.net';
