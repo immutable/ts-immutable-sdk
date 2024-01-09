@@ -112,7 +112,7 @@ export class PassportConfiguration {
           this.magicProviderId = 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=';
           this.passportDomain = 'https://passport.immutable.com';
           this.imxPublicApiDomain = 'https://api.immutable.com';
-          this.zkEvmRpcUrl = ''; // TODO: ID-785 Update once mainnet has been deployed
+          this.zkEvmRpcUrl = 'https://rpc.immutable.com';
           this.relayerUrl = 'https://api.immutable.com/relayer-mr';
           this.multiRollupConfig = multiRollupConfig.getProduction();
           break;
