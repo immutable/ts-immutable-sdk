@@ -18,7 +18,7 @@ export function SwitchNetworkZkEVM() {
   const { viewDispatch } = useContext(ViewContext);
   const { connectDispatch, connectState } = useContext(ConnectContext);
   const { checkout, provider, sendCloseEvent } = connectState;
-  const [buttonTextKey, setButtonTextKey] = useState('views.SWITCH_NETWORK.zkEVM.button.text');
+  const [buttonTextKey, setButtonTextKey] = useState(t('views.SWITCH_NETWORK.zkEVM.button.text'));
   const { page, track } = useAnalytics();
 
   useEffect(() => {
@@ -59,7 +59,7 @@ export function SwitchNetworkZkEVM() {
         },
       });
     } catch (err: any) {
-      setButtonTextKey('views.SWITCH_NETWORK.zkEVM.button.retryText');
+      setButtonTextKey(t('views.SWITCH_NETWORK.zkEVM.button.retryText'));
     }
   }, [provider, checkout]);
 

@@ -21,7 +21,7 @@ export function SwitchNetworkEth() {
   const { viewDispatch } = useContext(ViewContext);
   const { connectDispatch, connectState } = useContext(ConnectContext);
   const { checkout, provider, sendCloseEvent } = connectState;
-  const [buttonTextKey, setButtonTextKey] = useState('views.SWITCH_NETWORK.eth.button.text');
+  const [buttonTextKey, setButtonTextKey] = useState(t('views.SWITCH_NETWORK.eth.button.text'));
 
   const { page, track } = useAnalytics();
 
@@ -63,7 +63,7 @@ export function SwitchNetworkEth() {
         },
       });
     } catch (err: any) {
-      setButtonTextKey('views.SWITCH_NETWORK.eth.button.retryText');
+      setButtonTextKey(t('views.SWITCH_NETWORK.eth.button.retryText'));
     }
   }, [provider, checkout, track]);
 
