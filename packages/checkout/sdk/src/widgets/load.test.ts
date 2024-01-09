@@ -1,4 +1,3 @@
-/** @jest-environment jsdom */
 import { SDK_VERSION_MARKER } from '../env';
 import { loadUnresolved } from './load';
 
