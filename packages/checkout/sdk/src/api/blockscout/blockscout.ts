@@ -105,7 +105,7 @@ export class Blockscout {
       const cached = this.getCache(url);
       if (cached) return Promise.resolve(cached);
 
-      const response = await this.httpClient.get(url);
+      const response = await this.httpClient.get(url, { validateStatus: (status) => status < 500 });
       if (response.status >= 400) {
         return Promise.reject({
           code: response.status,
@@ -151,7 +151,7 @@ export class Blockscout {
       const cached = this.getCache(url);
       if (cached) return Promise.resolve(cached);
 
-      const response = await this.httpClient.get(url);
+      const response = await this.httpClient.get(url, { validateStatus: (status) => status < 500 });
       if (response.status >= 400) {
         return Promise.reject({
           code: response.status,
