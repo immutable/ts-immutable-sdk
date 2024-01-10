@@ -17,7 +17,7 @@ const config: Config = {
     '^.+\\.(t|j)sx?$': '@swc/jest',
   },
   transformIgnorePatterns: [],
-  setupFiles: ['./test/__mocks__/window.ts'],
+  setupFiles: [],
 };
 
 export default config;
