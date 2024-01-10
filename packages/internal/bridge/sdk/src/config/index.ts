@@ -19,7 +19,7 @@ const SUPPORTED_SANDBOX_BRIDGES: BridgeInstance[] = [ETH_SEPOLIA_TO_ZKEVM_DEVNET
 /**
  * @constant {BridgeInstance[]} SUPPORTED_PRODUCTION_BRIDGES - An array of supported bridge instances for the production environment.
  */
-const SUPPORTED_PRODUCTION_BRIDGES: BridgeInstance[] = [];
+const SUPPORTED_PRODUCTION_BRIDGES: BridgeInstance[] = [ETH_MAINNET_TO_ZKEVM_MAINNET];
 
 /**
  * @constant {Object} SUPPORTED_BRIDGES_FOR_ENVIRONMENT - An object mapping environment types to their supported bridge instances.
