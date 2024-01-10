@@ -8,7 +8,6 @@ import { PassportImxProviderFactory } from './starkEx';
 import { PassportConfiguration } from './config';
 import {
   DeviceConnectResponse,
-  Networks,
   PassportEventMap,
   PassportEvents,
   PassportModuleConfiguration,
@@ -70,10 +69,6 @@ export class Passport {
   }
 
   public connectEvm(): Provider {
-    if (this.config.network === Networks.PRODUCTION) {
-      throw new Error('EVM is not supported on production network');
-    }
-
     return new ZkEvmProvider({
       passportEventEmitter: this.passportEventEmitter,
       authManager: this.authManager,

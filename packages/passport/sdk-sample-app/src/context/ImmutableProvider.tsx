@@ -2,7 +2,7 @@ import React, {
   createContext, useContext, useEffect, useMemo, useState,
 } from 'react';
 import { Config, ImmutableX } from '@imtbl/core-sdk';
-import { Networks, Passport, PassportModuleConfiguration } from '@imtbl/passport';
+import { Passport, PassportModuleConfiguration } from '@imtbl/passport';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 import {
@@ -76,7 +76,6 @@ const getPassportConfig = (environment: EnvironmentNames): PassportModuleConfigu
         baseConfig,
         clientId: 'pCtSnHovRnPiQuBcFkXAnbCNqNVcDM3m',
         overrides: {
-          network: Networks.SANDBOX,
           authenticationDomain: 'https://auth.dev.immutable.com',
           magicPublishableApiKey: 'pk_live_4058236363130CA9',
           magicProviderId: 'C9odf7hU4EQ5EufcfgYfcBaT5V6LhocXyiPRhIjw2EY=',
