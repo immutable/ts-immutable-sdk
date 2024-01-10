@@ -12,7 +12,7 @@ import type { Multicall } from '../contracts/types';
 export type RoutingContracts = {
   multicall: string;
   coreFactory: string;
-  quoterV2: string;
+  quoter: string;
 };
 
 export class Router {
@@ -72,7 +72,7 @@ export class Router {
   ): Promise<QuoteResult> {
     const quotes = await getQuotesForRoutes(
       this.provider,
-      this.routingContracts.quoterV2,
+      this.routingContracts.quoter,
       routes,
       amountSpecified,
       tradeType,
