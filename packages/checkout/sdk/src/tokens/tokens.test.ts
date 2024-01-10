@@ -169,25 +169,27 @@ describe('token related functions', () => {
         chainId: ChainId.IMTBL_ZKEVM_DEVNET,
         result: [
           {
-            address: '0x1',
-            decimals: 18,
-            name: 'token-aa-testnet',
-            symbol: 'AA',
-          },
-          {
-            address: '0x2',
-            decimals: 18,
-            name: 'token-bb-testnet',
-            symbol: 'BB',
-          },
-          {
             address: '',
             decimals: 18,
             name: 'token-cc-testnet',
             symbol: 'CC',
           },
         ],
-        remoteConfigMockReturn,
+        remoteConfigMockReturn: {
+          ...remoteConfigMockReturn,
+          getConfig: jest.fn().mockResolvedValue({
+            [ChainId.IMTBL_ZKEVM_DEVNET]: {
+              tokens: [
+                {
+                  address: '',
+                  decimals: 18,
+                  name: 'token-cc-testnet',
+                  symbol: 'CC',
+                },
+              ],
+            },
+          }),
+        },
       },
       {
         text: 'undefined SWAP tokens list',

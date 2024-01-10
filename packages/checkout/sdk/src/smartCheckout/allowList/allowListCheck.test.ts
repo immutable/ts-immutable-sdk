@@ -63,11 +63,13 @@ describe('allowListCheck', () => {
       }],
     };
     bridgeConfig = {
-      tokens: [{
-        decimals: 18,
-        symbol: 'ETH',
-        name: 'Ethereum',
-      }],
+      [ChainId.SEPOLIA]: {
+        tokens: [{
+          decimals: 18,
+          symbol: 'ETH',
+          name: 'Ethereum',
+        }],
+      },
     };
     onRampConfig = {
       [OnRampProvider.TRANSAK]: {
@@ -137,13 +139,13 @@ describe('allowListCheck', () => {
           symbol: 'ETH',
           decimals: 18,
         }],
-        onRamp: {
-          [OnRampProvider.TRANSAK]: [{
+        onRamp: [
+          {
             decimals: 18,
             symbol: 'IMX',
             name: 'IMX',
-          }],
-        },
+          },
+        ],
       });
     });
 
@@ -157,7 +159,7 @@ describe('allowListCheck', () => {
           symbol: 'ETH',
           decimals: 18,
         }],
-        onRamp: {},
+        onRamp: [],
         swap: [],
       });
     });
@@ -168,7 +170,7 @@ describe('allowListCheck', () => {
       const allowList = await allowListCheck(config, balances, availableRoutingOptions);
       expect(allowList).toEqual({
         bridge: [],
-        onRamp: {},
+        onRamp: [],
         swap: [{
           decimals: 18,
           symbol: 'IMX',
@@ -183,13 +185,13 @@ describe('allowListCheck', () => {
       const allowList = await allowListCheck(config, balances, availableRoutingOptions);
       expect(allowList).toEqual({
         bridge: [],
-        onRamp: {
-          [OnRampProvider.TRANSAK]: [{
+        onRamp: [
+          {
             decimals: 18,
             symbol: 'IMX',
             name: 'IMX',
-          }],
-        },
+          },
+        ],
         swap: [],
       });
     });
@@ -200,7 +202,7 @@ describe('allowListCheck', () => {
       const allowList = await allowListCheck(config, balances, availableRoutingOptions);
       expect(allowList).toEqual({
         bridge: [],
-        onRamp: {},
+        onRamp: [],
         swap: [],
       });
     });
@@ -245,17 +247,19 @@ describe('allowListCheck', () => {
       ]);
 
       bridgeConfig = {
-        tokens: [{
-          address: '0x0000000',
-          decimals: 18,
-          symbol: 'MEGA',
-          name: 'Mega',
+        [ChainId.SEPOLIA]: {
+          tokens: [{
+            address: '0x0000000',
+            decimals: 18,
+            symbol: 'MEGA',
+            name: 'Mega',
+          },
+          {
+            decimals: 18,
+            symbol: 'ETH',
+            name: 'Ethereum',
+          }],
         },
-        {
-          decimals: 18,
-          symbol: 'ETH',
-          name: 'Ethereum',
-        }],
       };
 
       const result = await allowListCheckForBridge(config, balances, { bridge: true });
@@ -284,7 +288,9 @@ describe('allowListCheck', () => {
 
     it('should return an empty array if bridge allowlist is empty', async () => {
       bridgeConfig = {
-        tokens: [],
+        [ChainId.IMTBL_ZKEVM_TESTNET]: {
+          tokens: [],
+        },
       };
 
       const result = await allowListCheckForBridge(config, balances, { bridge: true });
@@ -293,12 +299,14 @@ describe('allowListCheck', () => {
 
     it('should return an empty array if allowlist tokens have no balance', async () => {
       bridgeConfig = {
-        tokens: [{
-          address: '0x0000000',
-          decimals: 18,
-          symbol: 'MEGA',
-          name: 'Mega',
-        }],
+        [ChainId.IMTBL_ZKEVM_TESTNET]: {
+          tokens: [{
+            address: '0x0000000',
+            decimals: 18,
+            symbol: 'MEGA',
+            name: 'Mega',
+          }],
+        },
       };
 
       const result = await allowListCheckForBridge(config, balances, { bridge: true });
@@ -353,25 +361,23 @@ describe('allowListCheck', () => {
   describe('allowListCheckForOnRamp', () => {
     it('should return onRamp allowlist', async () => {
       const result = await allowListCheckForOnRamp(config, { onRamp: true });
-      expect(result).toEqual({
-        [OnRampProvider.TRANSAK]: [{
-          decimals: 18,
-          symbol: 'IMX',
-          name: 'IMX',
-        }],
-      });
+      expect(result).toEqual([{
+        decimals: 18,
+        symbol: 'IMX',
+        name: 'IMX',
+      }]);
     });
 
-    it('should return an empty object if onRamp option is disabled', async () => {
+    it('should return an empty array if onRamp option is disabled', async () => {
       const result = await allowListCheckForOnRamp(config, { onRamp: false });
-      expect(result).toEqual({});
+      expect(result).toEqual([]);
     });
 
-    it('should return an empty object if no onRamp providers configured', async () => {
+    it('should return an empty array if no onRamp providers configured', async () => {
       onRampConfig = {};
 
       const result = await allowListCheckForOnRamp(config, { onRamp: true });
-      expect(result).toEqual({});
+      expect(result).toEqual([]);
     });
 
     it('should return an empty array if onRamp allowlist is empty', async () => {
@@ -384,9 +390,7 @@ describe('allowListCheck', () => {
       };
 
       const result = await allowListCheckForOnRamp(config, { onRamp: true });
-      expect(result).toEqual({
-        [OnRampProvider.TRANSAK]: [],
-      });
+      expect(result).toEqual([]);
     });
   });
 });
