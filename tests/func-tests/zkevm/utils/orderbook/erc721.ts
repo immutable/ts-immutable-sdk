@@ -5,12 +5,14 @@ import { randomBytes } from 'crypto';
 import hre from 'hardhat'
 import { OperatorAllowlist__factory, TestToken, TestToken__factory } from '../../typechain-types';
 
-export interface TestTokenContract {
-  contract: TestToken;
-}
-
 export function getRandomTokenId(): string {
   return BigInt('0x' + randomBytes(4).toString('hex')).toString(10);
+}
+
+export async function connectToTestToken(deployer: Wallet, tokenAddress: string): Promise<TestToken> {
+  const hreEthers = (hre as any).ethers;
+  const testTokenContractFactory = await hreEthers.getContractFactory("TestToken") as TestToken__factory;
+  return testTokenContractFactory.connect(deployer).attach(tokenAddress) as unknown as TestToken
 }
 
 /**
@@ -18,7 +20,7 @@ export function getRandomTokenId(): string {
  *
  * @returns the TestToken contract
  */
-export async function deployTestToken(deployer: Wallet, seaportAddress: string, royaltyAddress?: string): Promise<TestTokenContract> {
+export async function deployTestToken(deployer: Wallet, seaportAddress: string, royaltyAddress?: string): Promise<void> {
   const hreEthers = (hre as any).ethers;
   const deployerAddress = await deployer.getAddress();
 
@@ -30,10 +32,10 @@ export async function deployTestToken(deployer: Wallet, seaportAddress: string, 
 
   await allowlist.deployed();
 
-  const regTx = await allowlist.grantRegistrarRole(deployerAddress);
+  const regTx = await allowlist.grantRegistrarRole(deployerAddress, GAS_OVERRIDES);
   await regTx.wait(1);
 
-  const tx = await allowlist.addAddressToAllowlist([seaportAddress]);
+  const tx = await allowlist.addAddressToAllowlist([seaportAddress], GAS_OVERRIDES);
   await tx.wait(1);
 
   const testTokenContractFactory = await hreEthers.getContractFactory("TestToken") as TestToken__factory;
@@ -52,10 +54,8 @@ export async function deployTestToken(deployer: Wallet, seaportAddress: string, 
   await testTokenContract.deployed();
   console.log(`Test token contract deployed: ${testTokenContract.address}`)
 
-  const minterRoleTx = await testTokenContract.grantMinterRole(deployerAddress);
+  const minterRoleTx = await testTokenContract.grantMinterRole(deployerAddress, GAS_OVERRIDES);
   await minterRoleTx.wait()
 
-  return {
-    contract: testTokenContract,
-  };
+  console.log(`Minter role granted to ${deployerAddress}`)
 }
