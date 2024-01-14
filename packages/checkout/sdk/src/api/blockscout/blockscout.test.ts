@@ -5,7 +5,7 @@ import {
   BlockscoutError,
   BlockscoutTokenType,
 } from './blockscoutType';
-import { BLOCKSCOUT_CHAIN_URL_MAP } from '../../env';
+import { BLOCKSCOUT_CHAIN_URL_MAP, NATIVE } from '../../env';
 import { ChainId } from '../../types';
 import { HttpClient } from '../http';
 
@@ -267,7 +267,7 @@ describe('Blockscout', () => {
       );
 
       expect(resp.value).toEqual('55290000000000000000');
-      expect(resp.token.address).toEqual('');
+      expect(resp.token.address).toEqual(NATIVE);
 
       expect(mockedHttpClient.get).toHaveBeenNthCalledWith(
         1,

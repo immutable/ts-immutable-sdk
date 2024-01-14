@@ -23,7 +23,7 @@ import { CheckoutConfiguration } from '../config';
 import { RemoteConfigFetcher } from '../config/remoteConfigFetcher';
 import { getUnderlyingChainId } from '../provider/getUnderlyingProvider';
 import {
-  PRODUCTION_CHAIN_ID_NETWORK_MAP, SANDBOX_CHAIN_ID_NETWORK_MAP,
+  PRODUCTION_CHAIN_ID_NETWORK_MAP, SANDBOX_CHAIN_ID_NETWORK_MAP, ZKEVM_NATIVE_TOKEN,
 } from '../env';
 
 let windowSpy: any;
@@ -46,11 +46,7 @@ const ethNetworkInfo = {
 const zkevmNetworkInfo = {
   name: ChainName.IMTBL_ZKEVM_TESTNET,
   chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-  nativeCurrency: {
-    name: 'IMX',
-    symbol: 'IMX',
-    decimals: 18,
-  },
+  nativeCurrency: ZKEVM_NATIVE_TOKEN,
 };
 
 jest.mock('../api/http', () => ({
@@ -493,11 +489,7 @@ describe('network functions', () => {
             name: ChainName.IMTBL_ZKEVM_TESTNET,
             chainId: ChainId.IMTBL_ZKEVM_TESTNET,
             isSupported: true,
-            nativeCurrency: {
-              name: 'IMX',
-              symbol: 'IMX',
-              decimals: 18,
-            },
+            nativeCurrency: ZKEVM_NATIVE_TOKEN,
           },
         ],
       });
