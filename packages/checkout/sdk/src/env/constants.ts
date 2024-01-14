@@ -14,6 +14,7 @@ export const ZKEVM_NATIVE_TOKEN = {
   name: 'IMX',
   symbol: 'IMX',
   decimals: DEFAULT_TOKEN_DECIMALS,
+  address: NATIVE,
 };
 
 /**

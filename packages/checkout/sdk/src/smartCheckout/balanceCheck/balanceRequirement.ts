@@ -16,7 +16,7 @@ import {
   BalanceERC721Requirement,
   BalanceNativeRequirement,
 } from './types';
-import { DEFAULT_TOKEN_DECIMALS, NATIVE } from '../../env';
+import { DEFAULT_TOKEN_DECIMALS, NATIVE, ZKEVM_NATIVE_TOKEN } from '../../env';
 import { isNativeToken } from '../../tokens';
 
 export const getTokensFromRequirements = (itemRequirements: ItemRequirement[]): TokenInfo[] => itemRequirements
@@ -127,11 +127,7 @@ export const getTokenBalanceRequirement = (
         type: ItemType.NATIVE,
         balance: BigNumber.from(0),
         formattedBalance: '0',
-        token: {
-          name,
-          symbol,
-          decimals: DEFAULT_TOKEN_DECIMALS,
-        },
+        token: ZKEVM_NATIVE_TOKEN,
       };
     }
 
