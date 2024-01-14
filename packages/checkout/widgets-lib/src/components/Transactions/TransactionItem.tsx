@@ -8,6 +8,7 @@ import {
   Icon,
   MenuItem,
   Link,
+  EllipsizedText,
 } from '@biom3/react';
 import { ChainId } from '@imtbl/checkout-sdk';
 import { logoColour, networkIcon, networkName } from 'lib';
@@ -27,6 +28,8 @@ type TransactionItemProps = {
   amount: string
   fromChain: ChainId
   toChain: ChainId
+  fromAddress: string
+  toAddress: string
   // action: () => void
 };
 
@@ -37,6 +40,8 @@ export function TransactionItem({
   amount,
   fromChain,
   toChain,
+  fromAddress,
+  toAddress,
   // action
 }: TransactionItemProps) {
   // The action prop is designed for injecting the action to perform
@@ -172,7 +177,7 @@ export function TransactionItem({
               <Body size="xxSmall" sx={{ color: 'base.color.translucent.standard.900' }}>
                 {networkName[fromChain]}
               </Body>
-              <Body size="xxSmall" sx={{ color: 'base.color.translucent.standard.600' }}>0x1E8d...CfDf</Body>
+              <EllipsizedText size="xxSmall" sx={{ color: 'base.color.translucent.standard.600' }} text={fromAddress} />
             </Box>
             <Box sx={{ flexGrow: '1' }} />
             <Icon
@@ -202,7 +207,7 @@ export function TransactionItem({
               <Body size="xxSmall" sx={{ color: 'base.color.translucent.standard.900' }}>
                 {networkName[toChain]}
               </Body>
-              <Body size="xxSmall" sx={{ color: 'base.color.translucent.standard.600' }}>0x1E8d...CfDf</Body>
+              <EllipsizedText size="xxSmall" sx={{ color: 'base.color.translucent.standard.600' }} text={toAddress} />
             </Box>
           </Box>
         </Accordion.ExpandedContent>
