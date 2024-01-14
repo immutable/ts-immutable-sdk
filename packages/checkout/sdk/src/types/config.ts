@@ -1,5 +1,5 @@
 import { ModuleConfiguration } from '@imtbl/config';
-import { ExchangeOverrides } from '@imtbl/dex-sdk';
+import { ExchangeOverrides, SecondaryFee } from '@imtbl/dex-sdk';
 import { Passport } from '@imtbl/passport';
 import { TokenInfo } from './tokenInfo';
 import { ChainId } from './chains';
@@ -125,6 +125,8 @@ export type DexConfig = {
   overrides?: ExchangeOverrides;
   /** An array of tokens compatible with the DEX. */
   tokens?: TokenInfo[];
+  /** An array of secondary fees to be applied to swaps */
+  secondaryFees?: SecondaryFee[];
 };
 
 /**
