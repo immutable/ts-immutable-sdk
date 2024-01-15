@@ -135,10 +135,15 @@ export class Passport {
   }
 
   public async logout(): Promise<void> {
-    await this.confirmationScreen.logout();
-    await this.authManager.logout();
-    // Code after this point is only executed if the logout mode is silent
-    await this.magicAdapter.logout();
+    try {
+      await this.confirmationScreen.logout();
+    } catch (err) {
+      console.error('Failed to logout from confirmation screen', err);
+    }
+    await Promise.allSettled([
+      this.authManager.logout(),
+      this.magicAdapter.logout(),
+    ]);
     this.passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
   }
 
