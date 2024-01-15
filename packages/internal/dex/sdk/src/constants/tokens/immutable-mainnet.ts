@@ -1,5 +1,5 @@
 import { IMMUTABLE_MAINNET_CHAIN_ID } from 'constants/chains';
-import { ERC20, Native } from 'types';
+import { ERC20, Native } from '../../types';
 
 export const NATIVE_IMX_IMMUTABLE_MAINNET: Native = {
   chainId: IMMUTABLE_MAINNET_CHAIN_ID,
