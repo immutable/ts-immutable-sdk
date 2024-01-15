@@ -3882,7 +3882,7 @@ __metadata:
   version: 1.0.0
   resolution: "@uniswap/v3-staker@npm:1.0.0"
   dependencies:
-    "@openzeppelin/contracts": 3.4.1-solc-0.7-2
+    "@openzeppelin/contracts": 3.4.2-solc-0.7-2
     "@uniswap/v3-core": 1.0.0
     "@uniswap/v3-periphery": ^1.0.1
   checksum: 5a68e59f33d4761956ad735c8ce5ea6e566076bd260ea0a0bb4b3a0db237719e39f21a22eb0a5a231141efdf0154bfe03f690612d632898f33192b4442c888b3
