@@ -1,6 +1,12 @@
 import fs from 'fs';
 import path from 'path';
 
+const deprecateMessage = (message) => (
+`/**
+ * @deprecated ${message}
+ */\n`
+);
+
 const dirname = path.dirname(new URL(import.meta.url).pathname);
 
 // Read the JSON file
@@ -12,8 +18,17 @@ const moduleData = JSON.parse(fileData);
 // Get the release type from the environment variable or default to 'alpha'
 const releaseType = process.env.RELEASE_TYPE || 'alpha';
 
+
+let indexFileContent = `import * as imxClient from './immutablex_client';
+import * as imxProvider from './provider';
+
+export const x = {
+  client: imxClient,
+  provider: imxProvider,
+};
+`;
+
 // Generate the index.ts file contents based on the release type
-let indexFileContent = '';
 Object.keys(moduleData.modules).forEach((moduleName) => {
   const moduleReleaseType = moduleData.modules[moduleName];
 
@@ -30,6 +45,13 @@ Object.keys(moduleData.modules).forEach((moduleName) => {
         return part.charAt(0).toUpperCase() + part.slice(1);
       })
       .join('');
+
+    if (moduleName === 'immutablex_client') {
+      indexFileContent += deprecateMessage(`Use x.client or /x/client instead.`);
+    };
+    if (moduleName === 'provider') {
+      indexFileContent += deprecateMessage(`Use x.provider or /x/provider instead.`);
+    };
 
     const modulePath = `./${moduleName}`;
     const exportStatement = `export * as ${moduleNameCapitalized} from '${modulePath}';\n`;
