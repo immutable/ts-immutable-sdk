@@ -5,7 +5,8 @@ import {
   Heading,
   Logo,
 } from '@biom3/react';
-import { ChainId, ChainName, WalletProviderName } from '@imtbl/checkout-sdk';
+import { ChainId, WalletProviderName } from '@imtbl/checkout-sdk';
+import { getChainNameById } from 'lib/chains';
 import {
   networkButtonStyles,
   networkIconStyles,
@@ -45,8 +46,7 @@ export function WalletNetworkButton({
   onWalletClick,
   onNetworkClick,
 }: WalletNetworkButtonProps) {
-  // need to support multiple environments/networks
-  const networkName = ChainId.SEPOLIA === chainId ? ChainName.SEPOLIA : ChainName.IMTBL_ZKEVM_TESTNET;
+  const networkName = getChainNameById(chainId);
   const walletHeading = walletName === WalletProviderName.METAMASK ? 'Metamask' : 'Passport';
 
   return (

@@ -12,7 +12,7 @@ import {
   TEST_ROUTER_ADDRESS,
   TEST_DEX_CONFIGURATION,
   TEST_FEE_RECIPIENT,
-  TEST_SECONDARY_FEE_ADDRESS,
+  TEST_SWAP_PROXY_ADDRESS,
   decodeMulticallExactOutputSingleWithFees,
   decodeMulticallExactOutputSingleWithoutFees,
   TEST_MAX_FEE_BASIS_POINTS,
@@ -119,7 +119,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       expect(swapParams.tokenOut).toBe(params.outputToken);
       expect(swapParams.fee).toBe(10000);
       expect(swapParams.recipient).toBe(params.fromAddress);
-      expect(swap.transaction.to).toBe(TEST_SECONDARY_FEE_ADDRESS);
+      expect(swap.transaction.to).toBe(TEST_SWAP_PROXY_ADDRESS);
       expect(swap.transaction.from).toBe(params.fromAddress);
       expect(swap.transaction.value).toBe('0x00'); // // expect 0 native tokens to be transferred
       expect(formatEther(swapParams.amountOut)).toBe('1000.0');
@@ -183,7 +183,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       const decodedResults = erc20ContractInterface.decodeFunctionData('approve', approval.transaction.data);
       const spenderAddress: string = decodedResults[0].toString();
 
-      expect(spenderAddress).toEqual(TEST_SECONDARY_FEE_ADDRESS);
+      expect(spenderAddress).toEqual(TEST_SWAP_PROXY_ADDRESS);
     });
 
     it('returns valid swap quote', async () => {
@@ -534,7 +534,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
 
       const decodedPath = decodePathForExactOutput(swapParams.path.toString());
 
-      expect(swap.transaction.to).toBe(TEST_SECONDARY_FEE_ADDRESS);
+      expect(swap.transaction.to).toBe(TEST_SWAP_PROXY_ADDRESS);
       expect(swap.transaction.from).toBe(params.fromAddress);
       expect(swap.transaction.value).toBe('0x00'); // expect 0 native tokens to be transferred
 
