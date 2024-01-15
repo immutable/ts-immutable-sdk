@@ -130,10 +130,18 @@ export type DexConfig = {
 };
 
 /**
+ * A type representing the configuration for the Bridge for all the supported chains.
+ */
+export type BridgeConfig = {
+  /** An object containing the bridge configuration per chain */
+  [chainId: string]: BridgeChainConfig;
+};
+
+/**
  * A type representing the configuration for the Bridge.
  * @property {TokenInfo[] | undefined} tokens
  */
-export type BridgeConfig = {
+export type BridgeChainConfig = {
   /** An array of tokens compatible with the Bridge. */
   tokens?: TokenInfo[];
 };

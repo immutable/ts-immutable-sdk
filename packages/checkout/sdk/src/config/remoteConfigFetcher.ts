@@ -57,9 +57,17 @@ export class RemoteConfigFetcher {
   private async loadConfig(): Promise<RemoteConfiguration | undefined> {
     if (this.configCache) return this.configCache;
 
-    const response = await this.httpClient.get(
-      `${this.getEndpoint()}/${this.version}/config`,
-    );
+    let response: AxiosResponse;
+    try {
+      response = await this.httpClient.get(
+        `${this.getEndpoint()}/${this.version}/config`,
+      );
+    } catch (err: any) {
+      throw new CheckoutError(
+        `Error: ${err.message}`,
+        CheckoutErrorType.API_ERROR,
+      );
+    }
 
     // Ensure that the configuration is valid
     this.configCache = this.parseResponse<RemoteConfiguration>(response);
@@ -70,9 +78,17 @@ export class RemoteConfigFetcher {
   private async loadConfigTokens(): Promise<ChainsTokensConfig | undefined> {
     if (this.tokensCache) return this.tokensCache;
 
-    const response = await this.httpClient.get(
-      `${this.getEndpoint()}/${this.version}/config/tokens`,
-    );
+    let response: AxiosResponse;
+    try {
+      response = await this.httpClient.get(
+        `${this.getEndpoint()}/${this.version}/config/tokens`,
+      );
+    } catch (err: any) {
+      throw new CheckoutError(
+        `Error: ${err.message}`,
+        CheckoutErrorType.API_ERROR,
+      );
+    }
 
     // Ensure that the configuration is valid
     this.tokensCache = this.parseResponse<ChainsTokensConfig>(response);

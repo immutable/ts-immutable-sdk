@@ -9,7 +9,7 @@ import { balanceCheck } from './balanceCheck';
 import { CheckoutConfiguration } from '../../config';
 import { getAllBalances } from '../../balances';
 import { BalanceCheckResult } from './types';
-import { DEFAULT_TOKEN_DECIMALS } from '../../env';
+import { DEFAULT_TOKEN_DECIMALS, ZKEVM_NATIVE_TOKEN } from '../../env';
 import { HttpClient } from '../../api/http';
 
 jest.mock('../../balances');
@@ -273,11 +273,7 @@ describe('balanceCheck', () => {
               type: ItemType.NATIVE,
               balance: BigNumber.from(0),
               formattedBalance: '0',
-              token: {
-                decimals: DEFAULT_TOKEN_DECIMALS,
-                name: '',
-                symbol: '',
-              },
+              token: ZKEVM_NATIVE_TOKEN,
             },
             delta: {
               balance: BigNumber.from(2),
@@ -287,11 +283,7 @@ describe('balanceCheck', () => {
               type: ItemType.NATIVE,
               balance: BigNumber.from(2),
               formattedBalance: '0.000000000000000002',
-              token: {
-                decimals: DEFAULT_TOKEN_DECIMALS,
-                name: '',
-                symbol: '',
-              },
+              token: ZKEVM_NATIVE_TOKEN,
             },
             sufficient: false,
             type: ItemType.NATIVE,

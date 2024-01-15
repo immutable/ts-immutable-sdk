@@ -1,6 +1,10 @@
 import { ethers } from 'ethers';
 import { useState } from 'react';
-import { Exchange, TransactionDetails, TransactionResponse } from '@imtbl/dex-sdk';
+import {
+  Exchange,
+  TransactionDetails,
+  TransactionResponse,
+} from '@imtbl/dex-sdk';
 import { configuration } from '../config';
 import { ConnectAccount } from './ConnectAccount';
 import { AmountInput, AmountOutput } from './AmountInput';
@@ -31,7 +35,10 @@ const allTokens: Token[] = [
   { symbol: 'zkYEET', address: '0x8AC26EfCbf5D700b37A27aA00E6934e6904e7B8e' },
 ];
 
-const buildExchange = (secondaryFeeRecipient: string, secondaryFeePercentage: number) => {
+const buildExchange = (
+  secondaryFeeRecipient: string,
+  secondaryFeePercentage: number
+) => {
   if (secondaryFeeRecipient && secondaryFeePercentage) {
     return new Exchange({
       ...configuration,
@@ -52,11 +59,13 @@ export function Example() {
   const [isFetching, setIsFetching] = useState(false);
   const [inputAmount, setInputAmount] = useState<string>('0');
   const [outputAmount, setOutputAmount] = useState<string>('0');
-  const [swapTransaction, setSwapTransaction] = useState<ethers.providers.TransactionReceipt | null>(null);
+  const [swapTransaction, setSwapTransaction] =
+    useState<ethers.providers.TransactionReceipt | null>(null);
   const [approved, setApproved] = useState<boolean>(false);
   const [result, setResult] = useState<TransactionResponse | null>();
   const [error, setError] = useState<string | null>(null);
-  const [secondaryFeeRecipient, setSecondaryFeeRecipient] = useState<string>('');
+  const [secondaryFeeRecipient, setSecondaryFeeRecipient] =
+    useState<string>('');
   const [secondaryFeePercentage, setFeePercentage] = useState<number>(0);
 
   const [tradeType, setTradeType] = useState<TradeType>('exactInput');
@@ -75,9 +84,13 @@ export function Example() {
   const getQuote = async (tokenInAddress: string, tokenOutAddress: string) => {
     setIsFetching(true);
     setError(null);
+    setApproved(false);
 
     try {
-      const exchange = buildExchange(secondaryFeeRecipient, secondaryFeePercentage);
+      const exchange = buildExchange(
+        secondaryFeeRecipient,
+        secondaryFeePercentage
+      );
 
       const txn =
         tradeType === 'exactInput'
@@ -85,13 +98,13 @@ export function Example() {
               ethereumAccount,
               tokenInAddress,
               tokenOutAddress,
-              ethers.utils.parseEther(`${inputAmount}`),
+              ethers.utils.parseEther(`${inputAmount}`)
             )
           : await exchange.getUnsignedSwapTxFromAmountOut(
               ethereumAccount,
               tokenInAddress,
               tokenOutAddress,
-              ethers.utils.parseEther(`${outputAmount}`),
+              ethers.utils.parseEther(`${outputAmount}`)
             );
 
       setResult(txn);
@@ -111,14 +124,18 @@ export function Example() {
   const performSwap = async (result: TransactionResponse) => {
     setSwapTransaction(null);
     setIsFetching(true);
-    const provider = new ethers.providers.Web3Provider((window as any).ethereum);
+    const provider = new ethers.providers.Web3Provider(
+      (window as any).ethereum
+    );
     const signer = provider.getSigner();
 
     // Approve the ERC20 spend
     if (!approved) {
       try {
         // Send the Approve transaction
-        const approveReceipt = await signer.sendTransaction(result.approval!.transaction);
+        const approveReceipt = await signer.sendTransaction(
+          result.approval!.transaction
+        );
 
         // Wait for the Approve transaction to complete
         await provider.waitForTransaction(approveReceipt.hash, 1);
@@ -151,7 +168,9 @@ export function Example() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <h3 style={{ marginBottom: '12px' }}>Your wallet address: {ethereumAccount}</h3>
+      <h3 style={{ marginBottom: '12px' }}>
+        Your wallet address: {ethereumAccount}
+      </h3>
 
       <div style={{ display: 'flex', flexDirection: 'row' }}>
         <div style={{ width: 150 }}>
@@ -224,12 +243,21 @@ export function Example() {
 
       <hr className='my-4' />
 
-      <SecondaryFeeInput setSecondaryFeeRecipient={setSecondaryFeeRecipient} setFeePercentage={setFeePercentage} />
+      <SecondaryFeeInput
+        setSecondaryFeeRecipient={setSecondaryFeeRecipient}
+        setFeePercentage={setFeePercentage}
+      />
       {tradeType === 'exactInput' && inputToken && (
-        <AmountInput tokenSymbol={inputToken.symbol} setAmount={setInputAmount} />
+        <AmountInput
+          tokenSymbol={inputToken.symbol}
+          setAmount={setInputAmount}
+        />
       )}
       {tradeType === 'exactOutput' && outputToken && (
-        <AmountOutput tokenSymbol={outputToken.symbol} setAmount={setOutputAmount} />
+        <AmountOutput
+          tokenSymbol={outputToken.symbol}
+          setAmount={setOutputAmount}
+        />
       )}
 
       {inputToken && outputToken && (
@@ -246,20 +274,30 @@ export function Example() {
       {result && (
         <>
           <h3>
-            Expected amount: {ethers.utils.formatEther(result.quote.amount.value)}{' '}
+            Expected amount:{' '}
+            {ethers.utils.formatEther(result.quote.amount.value)}{' '}
             {`${addressToSymbolMapping[result.quote.amount.token.address]}`}
           </h3>
           <h3>
             {tradeType === 'exactInput' ? 'Minimum' : 'Maximum'} amount:{' '}
             {ethers.utils.formatEther(result.quote.amountWithMaxSlippage.value)}{' '}
-            {`${addressToSymbolMapping[result.quote.amountWithMaxSlippage.token.address]}`}
+            {`${
+              addressToSymbolMapping[
+                result.quote.amountWithMaxSlippage.token.address
+              ]
+            }`}
           </h3>
 
           <h3>Slippage: {result.quote.slippage}%</h3>
-          {result.approval && <h3>Approval Gas Estimate: {showGasEstimate(result.approval)}</h3>}
+          {result.approval && (
+            <h3>Approval Gas Estimate: {showGasEstimate(result.approval)}</h3>
+          )}
           <h3>Swap Gas estimate: {showGasEstimate(result.swap)}</h3>
 
-          <FeeBreakdown fees={result.quote.fees} addressMap={addressToSymbolMapping} />
+          <FeeBreakdown
+            fees={result.quote.fees}
+            addressMap={addressToSymbolMapping}
+          />
 
           <>
             <button
@@ -272,7 +310,8 @@ export function Example() {
             {swapTransaction && (
               <>
                 <h3 style={{ marginTop: '12px' }}>
-                  Swap successful! Check your metamask to see updated token balances
+                  Swap successful! Check your metamask to see updated token
+                  balances
                 </h3>
                 <a
                   className='underline text-blue-600 hover:text-blue-800 visited:text-purple-600'
@@ -290,7 +329,9 @@ export function Example() {
 }
 
 const showGasEstimate = (txn: TransactionDetails) =>
-  txn.gasFeeEstimate ? `${ethers.utils.formatEther(txn.gasFeeEstimate.value)} IMX` : 'No gas estimate available';
+  txn.gasFeeEstimate
+    ? `${ethers.utils.formatEther(txn.gasFeeEstimate.value)} IMX`
+    : 'No gas estimate available';
 
 const ErrorMessage = ({ message }: { message: string }) => {
   return (
