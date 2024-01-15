@@ -285,7 +285,7 @@ describe('swapRoute', () => {
       ]);
     });
 
-    xit('should recommend swap route for NATIVE', async () => {
+    it('should recommend swap route for NATIVE', async () => {
       const balanceRequirement = {
         type: ItemType.NATIVE,
         sufficient: false,
@@ -326,6 +326,16 @@ describe('swapRoute', () => {
                 name: 'IMX',
                 symbol: 'IMX',
                 decimals: 18,
+              },
+            },
+            {
+              balance: BigNumber.from(10),
+              formattedBalance: '10',
+              token: {
+                name: 'ERC20',
+                symbol: 'ERC20',
+                decimals: 18,
+                address: '0xERC20_2',
               },
             },
           ],
