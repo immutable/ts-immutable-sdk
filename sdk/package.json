@@ -109,6 +109,14 @@
     "./checkout": {
       "types": "./dist/checkout.d.ts",
       "import": "./dist/checkout.js"
+    },
+    "./x/client": {
+      "types": "./dist/immutablex_client.d.ts",
+      "import": "./dist/immutablex_client.js"
+    },
+    "./x/provider": {
+      "types": "./dist/provider.d.ts",
+      "import": "./dist/provider.js"
     }
   },
   "files": [
