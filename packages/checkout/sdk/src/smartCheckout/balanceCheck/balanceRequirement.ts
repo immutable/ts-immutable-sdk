@@ -18,6 +18,7 @@ import {
 } from './types';
 import { DEFAULT_TOKEN_DECIMALS, NATIVE, ZKEVM_NATIVE_TOKEN } from '../../env';
 import { isNativeToken } from '../../tokens';
+import { isMatchingAddress } from '../utils/utils';
 
 export const getTokensFromRequirements = (itemRequirements: ItemRequirement[]): TokenInfo[] => itemRequirements
   .map((itemRequirement) => {
@@ -50,7 +51,7 @@ export const getERC721BalanceRequirement = (
   // Find the requirements related balance
   const itemBalanceResult = balances.find((balance) => {
     const balanceERC721Result = balance as ERC721Balance;
-    return balanceERC721Result.contractAddress === itemRequirement.contractAddress
+    return isMatchingAddress(balanceERC721Result.contractAddress, itemRequirement.contractAddress)
       && balanceERC721Result.id === itemRequirement.id;
   });
 
@@ -96,7 +97,7 @@ export const getTokenBalanceRequirement = (
   // Get the requirements related balance
   if (itemRequirement.type === ItemType.ERC20) {
     itemBalanceResult = balances.find((balance) => {
-      return (balance as TokenBalance).token?.address?.toLowerCase() === itemRequirement.tokenAddress.toLowerCase();
+      return isMatchingAddress((balance as TokenBalance).token?.address, itemRequirement.tokenAddress);
     });
   } else if (itemRequirement.type === ItemType.NATIVE) {
     itemBalanceResult = balances.find((balance) => {

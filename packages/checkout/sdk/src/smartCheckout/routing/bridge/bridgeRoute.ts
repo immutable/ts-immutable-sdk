@@ -24,6 +24,7 @@ import {
 } from '../indexer/fetchL1Representation';
 import { DEFAULT_TOKEN_DECIMALS } from '../../../env';
 import { isNativeToken } from '../../../tokens';
+import { isMatchingAddress } from '../../utils/utils';
 
 export const hasSufficientL1Eth = (
   tokenBalanceResult: TokenBalanceResult,
@@ -147,7 +148,7 @@ export const bridgeRoute = async (
   const { l1address } = l1RepresentationResult as L1ToL2TokenAddressMapping;
   if (isNativeToken(l1address)) {
     if (!allowedL1TokenList.find((token) => isNativeToken(token.address))) return undefined;
-  } else if (!allowedL1TokenList.find((token) => token.address === l1address)) {
+  } else if (!allowedL1TokenList.find((token) => isMatchingAddress(token.address, l1address))) {
     return undefined;
   }
 
@@ -191,7 +192,9 @@ export const bridgeRoute = async (
   }
 
   // Find the balance of the L1 representation of the token and check if the balance covers the delta
-  const erc20balance = tokenBalanceResult.balances.find((balance) => balance.token.address === l1address);
+  const erc20balance = tokenBalanceResult.balances.find(
+    (balance) => isMatchingAddress(balance.token.address, l1address),
+  );
 
   if (erc20balance && erc20balance.balance.gte(
     bridgeRequirement.amount,

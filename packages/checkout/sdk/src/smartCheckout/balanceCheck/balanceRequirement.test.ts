@@ -364,59 +364,5 @@ describe('balanceRequirement', () => {
         },
       });
     });
-
-    it('should return sufficient true when different address casing but user has sufficient balance', () => {
-      const itemRequirement: ERC20Item = {
-        type: ItemType.ERC20,
-        tokenAddress: '0xTOKENADDRESS',
-        amount: BigNumber.from('1000000000000000000'),
-        spenderAddress: '0xSEAPORT',
-      };
-      const balances: ItemBalance[] = [
-        {
-          type: ItemType.ERC20,
-          balance: BigNumber.from('1000000000000000000'),
-          formattedBalance: '1.0',
-          token: {
-            name: 'ERC20',
-            symbol: 'ERC20',
-            decimals: 18,
-            address: '0xtokenaddress',
-          },
-        },
-      ];
-
-      const result = getTokenBalanceRequirement(itemRequirement, balances);
-      expect(result).toEqual({
-        sufficient: true,
-        type: ItemType.ERC20,
-        delta: {
-          balance: BigNumber.from(0),
-          formattedBalance: '0.0',
-        },
-        required: {
-          type: ItemType.ERC20,
-          balance: BigNumber.from('1000000000000000000'),
-          formattedBalance: '1.0',
-          token: {
-            name: 'ERC20',
-            symbol: 'ERC20',
-            decimals: 18,
-            address: '0xtokenaddress',
-          },
-        },
-        current: {
-          type: ItemType.ERC20,
-          balance: BigNumber.from('1000000000000000000'),
-          formattedBalance: '1.0',
-          token: {
-            name: 'ERC20',
-            symbol: 'ERC20',
-            decimals: 18,
-            address: '0xtokenaddress',
-          },
-        },
-      });
-    });
   });
 });

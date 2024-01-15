@@ -16,6 +16,7 @@ import { BalanceCheckResult, BalanceRequirement } from '../../balanceCheck/types
 import { TokenBalanceResult } from '../types';
 import { quoteFetcher } from './quoteFetcher';
 import { isNativeToken } from '../../../tokens';
+import { isMatchingAddress } from '../../utils/utils';
 
 const constructFees = (
   approvalGasFee: Amount | null | undefined,
@@ -175,7 +176,7 @@ export const checkUserCanCoverApprovalFees = (
   const l2BalanceOfApprovalToken = l2Balances.find(
     (balance) => (
       isNativeToken(balance.token.address) && isNativeToken(approvalGasTokenAddress))
-    || balance.token.address === approvalGasTokenAddress,
+    || isMatchingAddress(balance.token.address, approvalGasTokenAddress),
   );
 
   if (!l2BalanceOfApprovalToken) return { sufficient: false, approvalGasFee, approvalGasTokenAddress };
@@ -244,7 +245,7 @@ export const checkUserCanCoverSwapFees = (
     const l2BalanceOfFeeToken = l2Balances.find(
       (balance) => (
         isNativeToken(balance.token.address) && isNativeToken(tokenAddress))
-        || balance.token.address === tokenAddress,
+        || isMatchingAddress(balance.token.address, tokenAddress),
     );
     if (!l2BalanceOfFeeToken) {
       return false;
@@ -276,7 +277,10 @@ export const checkIfUserCanCoverRequirement = (
 
   balanceRequirements.balanceRequirements.forEach((requirement) => {
     if (requirement.type === ItemType.NATIVE || requirement.type === ItemType.ERC20) {
-      if (requirement.required.token.address === quoteTokenAddress) {
+      if (
+        requirement.required.token.address
+        && isMatchingAddress(requirement.required.token.address, quoteTokenAddress)
+      ) {
         balanceRequirementToken = requirement.required.token.address;
         requirementExists = true;
         // Get the balance that would remain if the requirement was removed from the users balance
@@ -289,13 +293,13 @@ export const checkIfUserCanCoverRequirement = (
   if (!requirementExists) return true;
 
   // Remove approval fees from the remainder if token matches as these need to be taken out to cover the swap
-  if (approvalFees.approvalGasTokenAddress === balanceRequirementToken) {
+  if (isMatchingAddress(approvalFees.approvalGasTokenAddress, balanceRequirementToken)) {
     remainingBalance = remainingBalance.sub(approvalFees.approvalGasFee);
   }
 
   // Remove swap fees from the remainder if token matches as these need to be taken out to cover the swap
   for (const swapFee of swapFees) {
-    if (swapFee.amount.token.address === balanceRequirementToken) {
+    if (isMatchingAddress(swapFee.amount.token.address, balanceRequirementToken)) {
       remainingBalance = remainingBalance.sub(swapFee.amount.value);
     }
   }
@@ -340,7 +344,9 @@ export const swapRoute = async (
     const quote = quotes.get(quoteTokenAddress);
     if (!quote) continue;
     // Find the balance the user has for this quoted token
-    const userBalanceOfQuotedToken = l2Balances.find((balance) => balance.token.address === quoteTokenAddress);
+    const userBalanceOfQuotedToken = l2Balances.find(
+      (balance) => isMatchingAddress(balance.token.address, quoteTokenAddress),
+    );
     // If no balance found on L2 for this quoted token then continue
     if (!userBalanceOfQuotedToken) continue;
     // Check the amount of quoted token required against the user balance

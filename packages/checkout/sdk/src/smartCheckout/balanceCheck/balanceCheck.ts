@@ -22,6 +22,7 @@ import {
   getTokensFromRequirements,
 } from './balanceRequirement';
 import { ERC721ABI, NATIVE } from '../../env';
+import { isMatchingAddress } from '../utils/utils';
 
 /**
  * Gets the balances for all NATIVE and ERC20 balance requirements.
@@ -85,7 +86,7 @@ const getERC721Balances = async (
     erc721Owners.forEach((erc721OwnerAddress, index) => {
       const itemRequirement = erc721s.get(erc721OwnersPromiseIds[index]);
       let itemCount = 0;
-      if (itemRequirement && ownerAddress === erc721OwnerAddress) {
+      if (itemRequirement && isMatchingAddress(ownerAddress, erc721OwnerAddress)) {
         itemCount = 1;
       }
       erc721Balances.push({

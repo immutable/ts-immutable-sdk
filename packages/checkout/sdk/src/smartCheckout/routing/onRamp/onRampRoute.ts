@@ -7,6 +7,7 @@ import {
 import { BalanceERC20Requirement, BalanceNativeRequirement, BalanceRequirement } from '../../balanceCheck/types';
 import { allowListCheckForOnRamp } from '../../allowList';
 import { isNativeToken } from '../../../tokens';
+import { isMatchingAddress } from '../../utils/utils';
 
 export const onRampRoute = async (
   config: CheckoutConfiguration,
@@ -26,7 +27,7 @@ export const onRampRoute = async (
     if (!required.token) return;
     if (
       isNativeToken(required.token.address)
-      || token.address.toLowerCase() === required.token.address?.toLowerCase()
+      || isMatchingAddress(token.address, required.token.address)
     ) {
       hasAllowList = true;
     }

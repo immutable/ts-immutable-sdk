@@ -6,13 +6,17 @@ import {
   TokenFilterTypes,
 } from '../../types';
 import { TokenBalanceResult, TokenBalances } from '../routing/types';
+import { isMatchingAddress } from '../utils/utils';
 import { RoutingTokensAllowList } from './types';
 
 const filterTokens = (allowedTokens: TokenInfo[], balances: TokenBalanceResult | undefined) => {
   if (balances && balances.success) {
     return allowedTokens.filter((token) => {
       if ('address' in token) {
-        return balances.balances.find((balance) => balance.token.address === token.address && balance.balance.gt(0));
+        return balances.balances.find(
+          (balance) => isMatchingAddress(balance.token.address, token.address)
+          && balance.balance.gt(0),
+        );
       }
       return balances.balances.find((balance) => !('address' in balance.token) && balance.balance.gt(0));
     });
