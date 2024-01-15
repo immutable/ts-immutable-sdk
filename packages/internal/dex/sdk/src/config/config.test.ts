@@ -24,9 +24,9 @@ describe('ExchangeConfiguration', () => {
   const contractOverrides: ExchangeContracts = {
     multicall: test.TEST_MULTICALL_ADDRESS,
     coreFactory: test.TEST_V3_CORE_FACTORY_ADDRESS,
-    quoterV2: test.TEST_QUOTER_ADDRESS,
-    peripheryRouter: test.TEST_ROUTER_ADDRESS,
-    secondaryFee: test.TEST_SECONDARY_FEE_ADDRESS,
+    quoter: test.TEST_QUOTER_ADDRESS,
+    swapRouter: test.TEST_ROUTER_ADDRESS,
+    immutableSwapProxy: test.TEST_SWAP_PROXY_ADDRESS,
   };
 
   describe('when given sandbox environment with supported chain id', () => {
@@ -129,8 +129,8 @@ describe('ExchangeConfiguration', () => {
       // contracts
       expect(config.chain.contracts.coreFactory).toBe(contractOverrides.coreFactory);
       expect(config.chain.contracts.multicall).toBe(contractOverrides.multicall);
-      expect(config.chain.contracts.peripheryRouter).toBe(contractOverrides.peripheryRouter);
-      expect(config.chain.contracts.quoterV2).toBe(contractOverrides.quoterV2);
+      expect(config.chain.contracts.swapRouter).toBe(contractOverrides.swapRouter);
+      expect(config.chain.contracts.quoter).toBe(contractOverrides.quoter);
       // tokens
       expect(config.chain.commonRoutingTokens[0].address.toLocaleLowerCase()).toEqual(
         commonRoutingTokens[0].address.toLocaleLowerCase(),
@@ -161,9 +161,9 @@ describe('ExchangeConfiguration', () => {
       const invalidContractOverrides: ExchangeContracts = {
         multicall: '',
         coreFactory: test.TEST_V3_CORE_FACTORY_ADDRESS,
-        quoterV2: test.TEST_QUOTER_ADDRESS,
-        peripheryRouter: test.TEST_ROUTER_ADDRESS,
-        secondaryFee: test.TEST_SECONDARY_FEE_ADDRESS,
+        quoter: test.TEST_QUOTER_ADDRESS,
+        swapRouter: test.TEST_ROUTER_ADDRESS,
+        immutableSwapProxy: test.TEST_SWAP_PROXY_ADDRESS,
       };
 
       const rpcURL = 'https://anrpcurl.net';

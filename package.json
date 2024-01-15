@@ -82,16 +82,15 @@
       "packages/checkout/sdk-sample-app",
       "packages/checkout/widgets-sample-app",
       "packages/checkout/widgets-lib",
-      "packages/economy/sdk",
-      "packages/economy/playground",
-      "packages/economy/services",
       "packages/blockchain-data/sdk",
       "packages/blockchain-data/sample-app",
-      "packages/game-bridge",
-      "packages/internal/economy-building-blocks/playground"
+      "packages/game-bridge"
     ],
     "nohoist": [
       "samples/**"
     ]
+  },
+  "dependencies": {
+    "tslib": "^2.6.2"
   }
 }

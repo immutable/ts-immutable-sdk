@@ -13,11 +13,11 @@ import {
 
 export const CONTRACTS_FOR_CHAIN_ID: Record<number, ExchangeContracts> = {
   [IMMUTABLE_TESTNET_CHAIN_ID]: {
-    multicall: '0x4DB567A44451b27C1fAd7f52e1cDf64b915d62f9',
-    coreFactory: '0xb18c44b211065E69844FbA9AE146DA362104AfBf',
-    quoterV2: '0x87854A7D4b9BaC3D37f4516A1Ac7F36fB5ad539f',
-    peripheryRouter: '0x786ec643F231960D4C1A4E336990F8E7bF8f1277',
-    secondaryFee: '0xCe11A21e7b6B4650C3B6363446fa1aa486A5146A',
+    multicall: '0x4857Dfd11c712e862eC362cEee29F7974B70EfcD',
+    coreFactory: '0x56c2162254b0E4417288786eE402c2B41d4e181e',
+    quoter: '0xF6Ad3CcF71Abb3E12beCf6b3D2a74C963859ADCd',
+    swapRouter: '0x0b012055F770AE7BB7a8303968A7Fb6088A2296e',
+    immutableSwapProxy: '0xDdBDa144cEbe1cCd68E746CDff8a6e4Be51A9e98',
   },
 };
 
