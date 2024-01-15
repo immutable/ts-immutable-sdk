@@ -30,14 +30,11 @@
     "*": "yarn scan:secrets",
     "*.{js,jsx,ts,tsx}": "eslint"
   },
-  "overrides": {
-    "@openzeppelin/contracts": "3.4.2-solc-0.7"
-  },
   "packageManager": "yarn@3.6.1",
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "resolutions": {
-    "@openzeppelin/contracts": "3.4.2-solc-0.7"
+    "responselike": "^2.0.0"
   },
   "scripts": {
     "build": "NODE_OPTIONS=--max-old-space-size=14366 wsrun -y 4 -p @imtbl/sdk -p @imtbl/checkout-widgets-lib -e -r --serial build && yarn syncpack:format && yarn wsrun -p @imtbl/sdk -a -m copyBrowserBundles",
@@ -85,16 +82,15 @@
       "packages/checkout/sdk-sample-app",
       "packages/checkout/widgets-sample-app",
       "packages/checkout/widgets-lib",
-      "packages/economy/sdk",
-      "packages/economy/playground",
-      "packages/economy/services",
       "packages/blockchain-data/sdk",
       "packages/blockchain-data/sample-app",
-      "packages/game-bridge",
-      "packages/internal/economy-building-blocks/playground"
+      "packages/game-bridge"
     ],
     "nohoist": [
       "samples/**"
     ]
+  },
+  "dependencies": {
+    "tslib": "^2.6.2"
   }
 }

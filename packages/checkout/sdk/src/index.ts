@@ -15,8 +15,10 @@ export { IMMUTABLE_API_BASE_URL } from './env';
 export {
   ChainId,
   ChainName,
+  ChainSlug,
   CheckoutStatus,
   ExchangeType,
+  FeeType,
   FundingStepType,
   GasEstimateType,
   GasTokenType,
@@ -80,6 +82,7 @@ export type {
   GetNetworkAllowListParams,
   GetNetworkAllowListResult,
   GetNetworkParams,
+  GetTokenInfoParams,
   GetTokenAllowListParams,
   GetTokenAllowListResult,
   GetWalletAllowListParams,

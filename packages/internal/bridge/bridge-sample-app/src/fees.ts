@@ -6,12 +6,9 @@ import { ImmutableConfiguration, Environment } from '@imtbl/config';
 import { 
     TokenBridge, 
     BridgeConfiguration, 
-    ETH_SEPOLIA_TO_ZKEVM_TESTNET,
     BridgeFeeRequest, 
     BridgeFeeResponse,
     BridgeFeeActions,
-    ETH_SEPOLIA_CHAIN_ID,
-    ZKEVM_TESTNET_CHAIN_ID,
 } from '@imtbl/bridge-sdk';
 
 // @ts-ignore
@@ -25,7 +22,7 @@ async function getBridgeFees() {
     baseConfig: new ImmutableConfiguration({
       environment: Environment.SANDBOX,
     }),
-    bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
+    bridgeInstance: params.bridgeInstance,
     rootProvider: params.rootProvider,
     childProvider: params.childProvider,
   });
@@ -35,8 +32,8 @@ async function getBridgeFees() {
   const depositReq: BridgeFeeRequest = {
     action: BridgeFeeActions.DEPOSIT,
     gasMultiplier: 1.1,
-    sourceChainId: ETH_SEPOLIA_CHAIN_ID,
-    destinationChainId: ZKEVM_TESTNET_CHAIN_ID,
+    sourceChainId: bridgeConfig.bridgeInstance.rootChainID,
+    destinationChainId: bridgeConfig.bridgeInstance.childChainID,
   }
 
   console.log('depositReq', depositReq)
@@ -45,14 +42,14 @@ async function getBridgeFees() {
     const depositRes: BridgeFeeResponse = await tokenBridge.getFee(depositReq);
     console.log('depositRes', depositRes);
   } catch(err) {
-    console.log('depositErr', err);
+    console.error('depositErr', err);
   }
 
   const withdrawReq: BridgeFeeRequest = {
     action: BridgeFeeActions.WITHDRAW,
     gasMultiplier: 1.1,
-    sourceChainId: ZKEVM_TESTNET_CHAIN_ID,
-    destinationChainId: ETH_SEPOLIA_CHAIN_ID,
+    sourceChainId: bridgeConfig.bridgeInstance.childChainID,
+    destinationChainId: bridgeConfig.bridgeInstance.rootChainID,
   }
 
   console.log('withdrawReq', withdrawReq)
@@ -61,12 +58,12 @@ async function getBridgeFees() {
     const withdrawRes: BridgeFeeResponse = await tokenBridge.getFee(withdrawReq);
     console.log('withdrawRes', withdrawRes);
   } catch(err) {
-    console.log('withdrawErr', err);
+    console.error('withdrawErr', err);
   }
 
   const finalizeReq: BridgeFeeRequest = {
     action: BridgeFeeActions.FINALISE_WITHDRAWAL,
-    sourceChainId: ETH_SEPOLIA_CHAIN_ID,
+    sourceChainId: bridgeConfig.bridgeInstance.rootChainID,
   }
 
   console.log('finalizeReq', finalizeReq)
@@ -75,7 +72,7 @@ async function getBridgeFees() {
     const finalizeRes: BridgeFeeResponse = await tokenBridge.getFee(finalizeReq);
     console.log('finalizeRes', finalizeRes);
   } catch(err) {
-    console.log('finalizeErr', err);
+    console.error('finalizeErr', err);
   }
 }
 
@@ -84,6 +81,6 @@ async function getBridgeFees() {
         await getBridgeFees()
         console.log('Exiting successfully');
     } catch(err) {
-        console.log('Exiting with error', err)
+        console.error('Exiting with error', err)
     }
 })();

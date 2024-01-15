@@ -1,4 +1,5 @@
 import { WalletProviderName } from '../../../types';
+import { WidgetLanguage } from '../configurations';
 
 // Fixme: In SaleWidgetParams pass environmentId through from sdk when it is sorted with hub
 
@@ -6,7 +7,7 @@ import { WalletProviderName } from '../../../types';
  * Sale Widget parameters
  * @property {string} amount
  * @property {string} environmentId
- * @property {string} fromContractAddress
+ * @property {string} fromTokenAddress
  * @property {SaleItem[]} items
  * @property {WalletProviderName | undefined} walletProviderName
  */
@@ -14,11 +15,13 @@ export type SaleWidgetParams = {
   /** The total price to pay for the items in the sale */
   amount?: string;
   environmentId?: string;
-  fromContractAddress?: string;
+  fromTokenAddress?: string;
   /** The list of products to be purchased */
   items?: SaleItem[];
   /** The wallet provider name to default to if no web3Provider is passed */
   walletProviderName?: WalletProviderName;
+  /** The language to use for the sales widget */
+  language?: WidgetLanguage;
 };
 
 /**

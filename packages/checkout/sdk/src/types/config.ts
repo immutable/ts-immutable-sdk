@@ -4,7 +4,8 @@ import { Passport } from '@imtbl/passport';
 import { TokenInfo } from './tokenInfo';
 import { ChainId } from './chains';
 
-export interface CheckoutOverrides {}
+export interface CheckoutOverrides {
+}
 
 interface CheckoutFeatureConfiguration {
   enable: boolean;
@@ -34,12 +35,14 @@ export interface CheckoutBridgeConfiguration extends CheckoutFeatureConfiguratio
  * @property {CheckoutSwapConfiguration} swap - To configure the swap feature.
  * @property {CheckoutBridgeConfiguration} bridge - To configure the bridge feature.
  * @property {Passport} passport - To enable passport wallet integration.
+ * @property {string} publishableKey - To identify your integration for tracking and analytics purposes.
 */
 export interface CheckoutModuleConfiguration extends ModuleConfiguration<CheckoutOverrides> {
   onRamp?: CheckoutOnRampConfiguration;
   swap?: CheckoutSwapConfiguration;
   bridge?: CheckoutBridgeConfiguration;
   passport?: Passport;
+  publishableKey?: string;
 }
 
 /**
@@ -51,6 +54,7 @@ export interface CheckoutModuleConfiguration extends ModuleConfiguration<Checkou
  * @property {AllowedNetworkConfig[]} allowedNetworks
  * @property {GasEstimateTokenConfig | undefined} gasEstimateTokens
  * @property {ImxAddressConfig | undefined} imxAddressMapping
+ * @property {TelemetryConfig | undefined} telemetry
  */
 export type RemoteConfiguration = {
   /** The config used for the DEX. */
@@ -65,6 +69,8 @@ export type RemoteConfiguration = {
   gasEstimateTokens?: GasEstimateTokenConfig;
   /** The IMX address mappings across available networks. */
   imxAddressMapping?: ImxAddressConfig;
+  /** Telemetry config. */
+  telemetry?: TelemetryConfig;
 };
 
 /**
@@ -122,10 +128,18 @@ export type DexConfig = {
 };
 
 /**
+ * A type representing the configuration for the Bridge for all the supported chains.
+ */
+export type BridgeConfig = {
+  /** An object containing the bridge configuration per chain */
+  [chainId: string]: BridgeChainConfig;
+};
+
+/**
  * A type representing the configuration for the Bridge.
  * @property {TokenInfo[] | undefined} tokens
  */
-export type BridgeConfig = {
+export type BridgeChainConfig = {
   /** An array of tokens compatible with the Bridge. */
   tokens?: TokenInfo[];
 };
@@ -145,6 +159,14 @@ export type AllowedNetworkConfig = {
  */
 export type ImxAddressConfig = {
   [chainId: string]: string;
+};
+
+/**
+ * A type representing the telemetry configurations.
+ * @property {string} segmentPublishableKey
+ */
+export type TelemetryConfig = {
+  segmentPublishableKey: string
 };
 
 /**

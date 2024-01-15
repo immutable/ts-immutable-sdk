@@ -6,7 +6,7 @@ import { CheckoutErrorType } from '../../errors';
 jest.mock('../../instance');
 jest.mock('../actions');
 
-describe.only('orderbook fees', () => {
+describe('orderbook fees', () => {
   it('should calculate the fees as a percentageDecimal', async () => {
     const decimals = 18;
     const amount = utils.parseUnits('10', 18).toString();
@@ -265,7 +265,7 @@ describe.only('orderbook fees', () => {
     const amount = {
       type: ItemType.ERC20,
       amount: '10',
-      contractAddress: '0x111',
+      tokenAddress: '0x111',
     } as BuyToken;
     const makerFees = [{
       amount: { percentageDecimal: 0.025 },

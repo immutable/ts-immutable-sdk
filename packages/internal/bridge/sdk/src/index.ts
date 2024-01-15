@@ -2,6 +2,7 @@ export * from './tokenBridge';
 export * from './constants/bridges';
 export * from './errors/index';
 export * from './config/index';
+export * from './types/axelar';
 export {
   CompletionStatus,
   BridgeFeeActions,
@@ -36,7 +37,7 @@ export type {
   FlowRateInfoItem,
   PendingWithdrawalsRequest,
   PendingWithdrawalsResponse,
-  PendingWithdrawals,
+  PendingWithdrawal,
   FlowRateWithdrawRequest,
   FlowRateWithdrawResponse,
   TokenMappingRequest,

@@ -42,7 +42,7 @@ import { debugLogger, measureAsyncExecution } from '../../logger/debugLogger';
 
 export const getItemRequirement = (
   type: ItemType,
-  contractAddress: string,
+  tokenAddress: string,
   amount: BigNumber,
   spenderAddress: string,
 ): ItemRequirement => {
@@ -51,7 +51,7 @@ export const getItemRequirement = (
       return {
         type,
         amount,
-        contractAddress,
+        tokenAddress,
         spenderAddress,
       };
     case ItemType.NATIVE:

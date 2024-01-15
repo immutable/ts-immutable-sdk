@@ -6,9 +6,6 @@ import { ImmutableConfiguration, Environment } from '@imtbl/config';
 import { 
     TokenBridge, 
     BridgeConfiguration, 
-    ETH_SEPOLIA_TO_ZKEVM_TESTNET,
-    ETH_SEPOLIA_CHAIN_ID,
-    ZKEVM_TESTNET_CHAIN_ID,
     ApproveBridgeRequest,
     ApproveBridgeResponse,
 } from '@imtbl/bridge-sdk';
@@ -24,7 +21,7 @@ async function getApprovalTxs() {
       baseConfig: new ImmutableConfiguration({
         environment: Environment.SANDBOX,
       }),
-      bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
+      bridgeInstance: params.bridgeInstance,
       rootProvider: params.rootProvider,
       childProvider: params.childProvider,
     });
@@ -32,11 +29,11 @@ async function getApprovalTxs() {
     const tokenBridge = new TokenBridge(bridgeConfig);
 
     const depositReq: ApproveBridgeRequest = {
-      senderAddress: params.depositor,
-      token: params.sepoliaToken,
+      senderAddress: params.sender,
+      token: params.rootToken,
       amount: params.amount,
-      sourceChainId: ETH_SEPOLIA_CHAIN_ID,
-      destinationChainId: ZKEVM_TESTNET_CHAIN_ID,
+      sourceChainId: bridgeConfig.bridgeInstance.rootChainID,
+      destinationChainId: bridgeConfig.bridgeInstance.childChainID,
     }
 
     console.log('depositReq', depositReq)
@@ -45,15 +42,15 @@ async function getApprovalTxs() {
       const depositRes: ApproveBridgeResponse = await tokenBridge.getUnsignedApproveBridgeTx(depositReq);
       console.log('depositRes', depositRes);
     } catch(err) {
-      console.log('depositErr', err);
+      console.error('depositErr', err);
     }
 
     const depositNativeReq: ApproveBridgeRequest = {
-      senderAddress: params.depositor,
+      senderAddress: params.sender,
       token: 'NATIVE',
       amount: params.amount,
-      sourceChainId: ETH_SEPOLIA_CHAIN_ID,
-      destinationChainId: ZKEVM_TESTNET_CHAIN_ID,
+      sourceChainId: bridgeConfig.bridgeInstance.rootChainID,
+      destinationChainId: bridgeConfig.bridgeInstance.childChainID,
     }
 
     console.log('depositNativeReq', depositNativeReq)
@@ -62,15 +59,15 @@ async function getApprovalTxs() {
       const depositNativeRes: ApproveBridgeResponse = await tokenBridge.getUnsignedApproveBridgeTx(depositNativeReq);
       console.log('depositNativeRes', depositNativeRes);
     } catch(err) {
-      console.log('depositNativeErr', err);
+      console.error('depositNativeErr', err);
     }
 
     const withdrawReq: ApproveBridgeRequest = {
-      senderAddress: params.depositor,
-      token: params.zkevmTestnetToken,
+      senderAddress: params.sender,
+      token: params.childToken,
       amount: params.amount,
-      sourceChainId: ZKEVM_TESTNET_CHAIN_ID,
-      destinationChainId: ETH_SEPOLIA_CHAIN_ID,
+      sourceChainId: bridgeConfig.bridgeInstance.childChainID,
+      destinationChainId: bridgeConfig.bridgeInstance.rootChainID,
     }
 
     console.log('withdrawReq', withdrawReq)
@@ -79,15 +76,15 @@ async function getApprovalTxs() {
       const withdrawRes: ApproveBridgeResponse = await tokenBridge.getUnsignedApproveBridgeTx(withdrawReq);
       console.log('withdrawRes', withdrawRes);
     } catch(err) {
-      console.log('withdrawErr', err);
+      console.error('withdrawErr', err);
     }
 
     const withdrawNativeReq: ApproveBridgeRequest = {
-      senderAddress: params.depositor,
+      senderAddress: params.sender,
       token: 'NATIVE',
       amount: params.amount,
-      sourceChainId: ZKEVM_TESTNET_CHAIN_ID,
-      destinationChainId: ETH_SEPOLIA_CHAIN_ID,
+      sourceChainId: bridgeConfig.bridgeInstance.childChainID,
+      destinationChainId: bridgeConfig.bridgeInstance.rootChainID,
     }
 
     console.log('withdrawNativeReq', withdrawNativeReq)
@@ -96,7 +93,7 @@ async function getApprovalTxs() {
       const withdrawNativeRes: ApproveBridgeResponse = await tokenBridge.getUnsignedApproveBridgeTx(withdrawNativeReq);
       console.log('withdrawNativeRes', withdrawNativeRes);
     } catch(err) {
-      console.log('withdrawNativeErr', err);
+      console.error('withdrawNativeErr', err);
     }
 }
 
@@ -105,6 +102,6 @@ async function getApprovalTxs() {
         await getApprovalTxs()
         console.log('Exiting successfully');
     } catch(err) {
-        console.log('Exiting with error', err)
+        console.error('Exiting with error', err)
     }
 })();

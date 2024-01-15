@@ -1,6 +1,7 @@
 import {
   Body, Drawer, Box, Button, Heading, Icon, Logo,
 } from '@biom3/react';
+import { useTranslation } from 'react-i18next';
 import {
   containerStyles,
   contentTextStyles,
@@ -9,7 +10,6 @@ import {
   logoContainerStyles,
   statusStyles,
 } from './UnableToSwapStyles';
-import { text } from '../../../resources/text/textConfig';
 
 type UnableToSwapProps = {
   visible: boolean;
@@ -17,7 +17,7 @@ type UnableToSwapProps = {
 };
 
 export function UnableToSwap({ visible, onCloseDrawer }: UnableToSwapProps) {
-  const { heading, body, buttons } = text.drawers.unableToSwap;
+  const { t } = useTranslation();
 
   return (
     <Drawer
@@ -39,10 +39,10 @@ export function UnableToSwap({ visible, onCloseDrawer }: UnableToSwapProps) {
             sx={contentTextStyles}
             testId="unable-to-swap-heading"
           >
-            {heading}
+            {t('drawers.unableToSwap.heading')}
           </Heading>
           <Body sx={contentTextStyles}>
-            {body}
+            {t('drawers.unableToSwap.body')}
           </Body>
           <Box sx={actionButtonContainerStyles}>
             <Button
@@ -51,7 +51,7 @@ export function UnableToSwap({ visible, onCloseDrawer }: UnableToSwapProps) {
               onClick={onCloseDrawer}
               testId="unable-to-swap-cancel-button"
             >
-              {buttons.cancel}
+              {t('drawers.unableToSwap.buttons.cancel')}
             </Button>
           </Box>
           <Box sx={logoContainerStyles}>

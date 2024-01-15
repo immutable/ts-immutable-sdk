@@ -7,7 +7,7 @@ import {
   UpdateViewPayload,
   SharedViews,
 } from './ViewContext';
-import { XBridgeWidgetViews } from './XBridgeViewContextTypes';
+import { BridgeWidgetViews } from './BridgeViewContextTypes';
 
 describe('view-context', () => {
   describe('UPDATE_VIEW', () => {
@@ -186,34 +186,34 @@ describe('view-context', () => {
       const state = viewReducer(
         {
           view: {
-            type: XBridgeWidgetViews.BRIDGE_FAILURE,
+            type: BridgeWidgetViews.BRIDGE_FAILURE,
             reason: 'Transaction failed',
           },
           history: [
-            { type: XBridgeWidgetViews.WALLET_NETWORK_SELECTION },
-            { type: XBridgeWidgetViews.BRIDGE_FORM },
-            { type: XBridgeWidgetViews.BRIDGE_REVIEW },
+            { type: BridgeWidgetViews.WALLET_NETWORK_SELECTION },
+            { type: BridgeWidgetViews.BRIDGE_FORM },
+            { type: BridgeWidgetViews.BRIDGE_REVIEW },
             {
-              type: XBridgeWidgetViews.IN_PROGRESS,
+              type: BridgeWidgetViews.IN_PROGRESS,
               transactionHash: '',
             },
             {
-              type: XBridgeWidgetViews.BRIDGE_FAILURE,
+              type: BridgeWidgetViews.BRIDGE_FAILURE,
               reason: 'Transaction failed',
             },
           ],
         },
-        { payload: { type: ViewActions.GO_BACK_TO, view: { type: XBridgeWidgetViews.BRIDGE_REVIEW } } },
+        { payload: { type: ViewActions.GO_BACK_TO, view: { type: BridgeWidgetViews.BRIDGE_REVIEW } } },
       );
 
       expect(state).toEqual({
         view: {
-          type: XBridgeWidgetViews.BRIDGE_REVIEW,
+          type: BridgeWidgetViews.BRIDGE_REVIEW,
         },
         history: [
-          { type: XBridgeWidgetViews.WALLET_NETWORK_SELECTION },
-          { type: XBridgeWidgetViews.BRIDGE_FORM },
-          { type: XBridgeWidgetViews.BRIDGE_REVIEW },
+          { type: BridgeWidgetViews.WALLET_NETWORK_SELECTION },
+          { type: BridgeWidgetViews.BRIDGE_FORM },
+          { type: BridgeWidgetViews.BRIDGE_REVIEW },
         ],
       });
     });
@@ -222,36 +222,36 @@ describe('view-context', () => {
       const state = viewReducer(
         {
           view: {
-            type: XBridgeWidgetViews.BRIDGE_FAILURE,
+            type: BridgeWidgetViews.BRIDGE_FAILURE,
             reason: 'Transaction failed',
           },
           history: [
-            { type: XBridgeWidgetViews.WALLET_NETWORK_SELECTION },
-            { type: XBridgeWidgetViews.BRIDGE_REVIEW },
-            { type: XBridgeWidgetViews.BRIDGE_FORM },
-            { type: XBridgeWidgetViews.BRIDGE_REVIEW },
+            { type: BridgeWidgetViews.WALLET_NETWORK_SELECTION },
+            { type: BridgeWidgetViews.BRIDGE_REVIEW },
+            { type: BridgeWidgetViews.BRIDGE_FORM },
+            { type: BridgeWidgetViews.BRIDGE_REVIEW },
             {
-              type: XBridgeWidgetViews.IN_PROGRESS,
+              type: BridgeWidgetViews.IN_PROGRESS,
               transactionHash: '',
             },
             {
-              type: XBridgeWidgetViews.BRIDGE_FAILURE,
+              type: BridgeWidgetViews.BRIDGE_FAILURE,
               reason: 'Transaction failed',
             },
           ],
         },
-        { payload: { type: ViewActions.GO_BACK_TO, view: { type: XBridgeWidgetViews.BRIDGE_REVIEW } } },
+        { payload: { type: ViewActions.GO_BACK_TO, view: { type: BridgeWidgetViews.BRIDGE_REVIEW } } },
       );
 
       expect(state).toEqual({
         view: {
-          type: XBridgeWidgetViews.BRIDGE_REVIEW,
+          type: BridgeWidgetViews.BRIDGE_REVIEW,
         },
         history: [
-          { type: XBridgeWidgetViews.WALLET_NETWORK_SELECTION },
-          { type: XBridgeWidgetViews.BRIDGE_REVIEW },
-          { type: XBridgeWidgetViews.BRIDGE_FORM },
-          { type: XBridgeWidgetViews.BRIDGE_REVIEW },
+          { type: BridgeWidgetViews.WALLET_NETWORK_SELECTION },
+          { type: BridgeWidgetViews.BRIDGE_REVIEW },
+          { type: BridgeWidgetViews.BRIDGE_FORM },
+          { type: BridgeWidgetViews.BRIDGE_REVIEW },
         ],
       });
     });
@@ -260,19 +260,19 @@ describe('view-context', () => {
       const state = viewReducer(
         {
           view: {
-            type: XBridgeWidgetViews.BRIDGE_FAILURE,
+            type: BridgeWidgetViews.BRIDGE_FAILURE,
             reason: 'Transaction failed',
           },
           history: [
-            { type: XBridgeWidgetViews.WALLET_NETWORK_SELECTION },
-            { type: XBridgeWidgetViews.BRIDGE_FORM },
-            { type: XBridgeWidgetViews.BRIDGE_REVIEW },
+            { type: BridgeWidgetViews.WALLET_NETWORK_SELECTION },
+            { type: BridgeWidgetViews.BRIDGE_FORM },
+            { type: BridgeWidgetViews.BRIDGE_REVIEW },
             {
-              type: XBridgeWidgetViews.IN_PROGRESS,
+              type: BridgeWidgetViews.IN_PROGRESS,
               transactionHash: '',
             },
             {
-              type: XBridgeWidgetViews.BRIDGE_FAILURE,
+              type: BridgeWidgetViews.BRIDGE_FAILURE,
               reason: 'Transaction failed',
             },
           ],
@@ -282,19 +282,19 @@ describe('view-context', () => {
 
       expect(state).toEqual({
         view: {
-          type: XBridgeWidgetViews.BRIDGE_FAILURE,
+          type: BridgeWidgetViews.BRIDGE_FAILURE,
           reason: 'Transaction failed',
         },
         history: [
-          { type: XBridgeWidgetViews.WALLET_NETWORK_SELECTION },
-          { type: XBridgeWidgetViews.BRIDGE_FORM },
-          { type: XBridgeWidgetViews.BRIDGE_REVIEW },
+          { type: BridgeWidgetViews.WALLET_NETWORK_SELECTION },
+          { type: BridgeWidgetViews.BRIDGE_FORM },
+          { type: BridgeWidgetViews.BRIDGE_REVIEW },
           {
-            type: XBridgeWidgetViews.IN_PROGRESS,
+            type: BridgeWidgetViews.IN_PROGRESS,
             transactionHash: '',
           },
           {
-            type: XBridgeWidgetViews.BRIDGE_FAILURE,
+            type: BridgeWidgetViews.BRIDGE_FAILURE,
             reason: 'Transaction failed',
           },
         ],

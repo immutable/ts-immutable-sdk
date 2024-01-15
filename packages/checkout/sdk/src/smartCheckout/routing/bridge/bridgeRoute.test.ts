@@ -9,6 +9,7 @@ import {
 import { CheckoutConfiguration } from '../../../config';
 import {
   ChainId,
+  FeeType,
   FundingStepType,
   ItemType,
 } from '../../../types';
@@ -19,6 +20,7 @@ import { CheckoutErrorType } from '../../../errors';
 import { allowListCheckForBridge } from '../../allowList/allowListCheck';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from '../indexer/fetchL1Representation';
 import { DEFAULT_TOKEN_DECIMALS } from '../../../env';
+import { HttpClient } from '../../../api/http';
 
 jest.mock('../../../gasEstimate');
 jest.mock('../../../instance');
@@ -26,9 +28,10 @@ jest.mock('./getBridgeFeeEstimate');
 jest.mock('../../allowList/allowListCheck');
 
 describe('bridgeRoute', () => {
+  const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
   const config = new CheckoutConfiguration({
     baseConfig: { environment: Environment.SANDBOX },
-  });
+  }, mockedHttpClient);
 
   const readonlyProviders = new Map<ChainId, JsonRpcProvider>([
     [ChainId.SEPOLIA, {} as JsonRpcProvider],
@@ -130,7 +133,8 @@ describe('bridgeRoute', () => {
             },
           },
           fees: {
-            approvalGasFees: {
+            approvalGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(0),
               formattedAmount: utils.formatUnits(BigNumber.from(0), DEFAULT_TOKEN_DECIMALS),
               token: {
@@ -139,7 +143,8 @@ describe('bridgeRoute', () => {
                 decimals: 18,
               },
             },
-            bridgeGasFees: {
+            bridgeGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(2),
               formattedAmount: utils.formatUnits(BigNumber.from(2), DEFAULT_TOKEN_DECIMALS),
               token: {
@@ -150,6 +155,7 @@ describe('bridgeRoute', () => {
             },
             bridgeFees: [
               {
+                type: FeeType.BRIDGE_FEE,
                 amount: BigNumber.from(3),
                 formattedAmount: utils.formatUnits(BigNumber.from(3), DEFAULT_TOKEN_DECIMALS),
                 token: {
@@ -159,6 +165,7 @@ describe('bridgeRoute', () => {
                 },
               },
               {
+                type: FeeType.IMMUTABLE_FEE,
                 amount: BigNumber.from(4),
                 formattedAmount: utils.formatUnits(BigNumber.from(4), DEFAULT_TOKEN_DECIMALS),
                 token: {
@@ -221,7 +228,8 @@ describe('bridgeRoute', () => {
             },
           },
           fees: {
-            approvalGasFees: {
+            approvalGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(0),
               formattedAmount: utils.formatUnits(BigNumber.from(0), DEFAULT_TOKEN_DECIMALS),
               token: {
@@ -230,7 +238,8 @@ describe('bridgeRoute', () => {
                 decimals: 18,
               },
             },
-            bridgeGasFees: {
+            bridgeGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(2),
               formattedAmount: utils.formatUnits(BigNumber.from(2), DEFAULT_TOKEN_DECIMALS),
               token: {
@@ -241,6 +250,7 @@ describe('bridgeRoute', () => {
             },
             bridgeFees: [
               {
+                type: FeeType.BRIDGE_FEE,
                 amount: BigNumber.from(3),
                 formattedAmount: utils.formatUnits(BigNumber.from(3), DEFAULT_TOKEN_DECIMALS),
                 token: {
@@ -250,6 +260,7 @@ describe('bridgeRoute', () => {
                 },
               },
               {
+                type: FeeType.IMMUTABLE_FEE,
                 amount: BigNumber.from(4),
                 formattedAmount: utils.formatUnits(BigNumber.from(4), DEFAULT_TOKEN_DECIMALS),
                 token: {
@@ -432,7 +443,8 @@ describe('bridgeRoute', () => {
             },
           },
           fees: {
-            approvalGasFees: {
+            approvalGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(1),
               formattedAmount: utils.formatUnits(BigNumber.from(1), DEFAULT_TOKEN_DECIMALS),
               token: {
@@ -441,7 +453,8 @@ describe('bridgeRoute', () => {
                 decimals: 18,
               },
             },
-            bridgeGasFees: {
+            bridgeGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(2),
               formattedAmount: utils.formatUnits(BigNumber.from(2), DEFAULT_TOKEN_DECIMALS),
               token: {
@@ -452,6 +465,7 @@ describe('bridgeRoute', () => {
             },
             bridgeFees: [
               {
+                type: FeeType.BRIDGE_FEE,
                 amount: BigNumber.from(3),
                 formattedAmount: utils.formatUnits(BigNumber.from(3), DEFAULT_TOKEN_DECIMALS),
                 token: {
@@ -461,6 +475,7 @@ describe('bridgeRoute', () => {
                 },
               },
               {
+                type: FeeType.IMMUTABLE_FEE,
                 amount: BigNumber.from(4),
                 formattedAmount: utils.formatUnits(BigNumber.from(4), DEFAULT_TOKEN_DECIMALS),
                 token: {
@@ -533,7 +548,8 @@ describe('bridgeRoute', () => {
             },
           },
           fees: {
-            approvalGasFees: {
+            approvalGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(1),
               formattedAmount: utils.formatUnits(BigNumber.from(1), DEFAULT_TOKEN_DECIMALS),
               token: {
@@ -542,7 +558,8 @@ describe('bridgeRoute', () => {
                 decimals: 18,
               },
             },
-            bridgeGasFees: {
+            bridgeGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(2),
               formattedAmount: utils.formatUnits(BigNumber.from(2), DEFAULT_TOKEN_DECIMALS),
               token: {
@@ -553,6 +570,7 @@ describe('bridgeRoute', () => {
             },
             bridgeFees: [
               {
+                type: FeeType.BRIDGE_FEE,
                 amount: BigNumber.from(3),
                 formattedAmount: utils.formatUnits(BigNumber.from(3), DEFAULT_TOKEN_DECIMALS),
                 token: {
@@ -562,6 +580,7 @@ describe('bridgeRoute', () => {
                 },
               },
               {
+                type: FeeType.IMMUTABLE_FEE,
                 amount: BigNumber.from(4),
                 formattedAmount: utils.formatUnits(BigNumber.from(4), DEFAULT_TOKEN_DECIMALS),
                 token: {

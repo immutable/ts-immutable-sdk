@@ -17,13 +17,18 @@
   },
   "private": true,
   "scripts": {
-    "approval": "ts-node --esm ./src/approval.ts",
-    "bridge": "ts-node --esm ./src/bridge.ts",
+    "approval": "node --loader ts-node/esm ./src/approval.ts",
+    "bridge": "node --loader ts-node/esm ./src/bridge.ts",
     "build": "",
-    "deposit": "ts-node --esm ./src/deposit.ts",
-    "fees": "ts-node --esm ./src/fees.ts",
+    "deposit": "node --loader ts-node/esm ./src/deposit.ts",
+    "fees": "node --loader ts-node/esm ./src/fees.ts",
+    "flowRateInfo": "node --loader ts-node/esm ./src/flowRateInfo.ts",
     "lint": "eslint ./src --ext .ts --max-warnings=0",
-    "withdraw": "ts-node --esm ./src/withdraw.ts"
+    "mapToken": "node --loader ts-node/esm ./src/mapToken.ts",
+    "pending": "node --loader ts-node/esm ./src/pending.ts",
+    "status": "node --loader ts-node/esm ./src/status.ts",
+    "withdraw": "node --loader ts-node/esm ./src/withdraw.ts",
+    "withdrawTx": "node --loader ts-node/esm ./src/withdrawTx.ts"
   },
   "type": "module"
 }

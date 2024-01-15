@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import { WalletProviderName } from '@imtbl/checkout-sdk';
-import { XBridgeWidgetViews } from 'context/view-context/XBridgeViewContextTypes';
+import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
 import { SharedViews } from '../../context/view-context/ViewContext';
@@ -56,7 +56,7 @@ export const text = {
       },
       zkEVM: {
         heading: 'You’ll be asked to switch to the Immutable zkEVM network',
-        body: "Check for the pop-up from MetaMask and 'Approve' to switch. If this is the first time, MetaMask will also ask you to add the network.",
+        body: 'Check for the pop-up from MetaMask to switch the network. If this is the first time, MetaMask will also ask you to add the network.',
         button: {
           text: 'Ready to Switch',
           retryText: 'Try Again',
@@ -362,7 +362,7 @@ export const text = {
       text: 'Order completed',
       actionText: 'Continue',
     },
-    [XBridgeWidgetViews.WALLET_NETWORK_SELECTION]: {
+    [BridgeWidgetViews.WALLET_NETWORK_SELECTION]: {
       layoutHeading: 'Move',
       heading: 'Where would you like to move funds between?',
       fromFormInput: {
@@ -380,12 +380,12 @@ export const text = {
         text: 'Next',
       },
     },
-    [XBridgeWidgetViews.BRIDGE_FORM]: {
+    [BridgeWidgetViews.BRIDGE_FORM]: {
       header: {
         title: 'Move coins',
       },
       fees: {
-        title: 'Gas Fee',
+        title: 'Estimated fees',
         fiatPricePrefix: '~ USD $',
       },
       content: {
@@ -406,7 +406,7 @@ export const text = {
         noTokenSelected: 'Select a coin to move',
       },
     },
-    [XBridgeWidgetViews.BRIDGE_REVIEW]: {
+    [BridgeWidgetViews.BRIDGE_REVIEW]: {
       layoutHeading: 'Move',
       heading: 'Ok, how does this look?',
       fromLabel: {
@@ -417,18 +417,18 @@ export const text = {
         heading: 'To',
       },
       fees: {
-        heading: 'Gas fee',
+        heading: 'Estimated fees',
       },
       submitButton: {
         buttonText: 'Confirm move',
       },
       fiatPricePrefix: '~ USD $',
     },
-    [XBridgeWidgetViews.BRIDGE_FAILURE]: {
+    [BridgeWidgetViews.BRIDGE_FAILURE]: {
       statusText: 'Transaction failed',
       actionText: 'Review & Try again',
     },
-    [XBridgeWidgetViews.APPROVE_TRANSACTION]: {
+    [BridgeWidgetViews.APPROVE_TRANSACTION]: {
       content: {
         heading: 'Approve the transaction in your wallet',
         body: 'Follow the prompts in your wallet popup to confirm.',
@@ -441,10 +441,47 @@ export const text = {
         text: 'Initiating move',
       },
     },
-    [XBridgeWidgetViews.IN_PROGRESS]: {
+    [BridgeWidgetViews.IN_PROGRESS]: {
       heading: 'Move in progress',
       body1: (symbol: string) => `Less than 3 mins until your ${symbol} lands on zkEVM.`,
       body2: 'You can close this window, the transaction will be reflected in your wallet once complete.',
+    },
+    [BridgeWidgetViews.TRANSACTIONS]: {
+      layoutHeading: 'In progress',
+      passportDashboard: 'View the full transaction history in your',
+      status: {
+        inProgress: {
+          heading: 'In Progress',
+          txnEstimate: 'Usually takes 20 mins',
+          stepInfo: 'View Details',
+        },
+        emptyState: {
+          notConnected: {
+            body: 'Connect your wallet to view the transactions',
+          },
+        },
+        noTransactions: {
+          body: "You're all done here.",
+          passport: {
+            body: 'View your completed transactions in ',
+            link: 'Passport',
+          },
+        },
+      },
+      fiatPricePrefix: '≈ USD $',
+      support: {
+        body1: 'Need help?',
+        body2: ' Contact ',
+        body3: 'support',
+        supportLink: 'https://support.immutable.com/en/',
+        passport: {
+          body1: 'Or view completed transactions in your ',
+          body2: 'Passport',
+        },
+      },
+      walletSelection: {
+        heading: 'Choose a wallet to view',
+      },
     },
   },
   footers: {
@@ -494,12 +531,19 @@ export const text = {
     },
     notEnoughGas: {
       content: {
-        heading: 'Balance too low',
-        body: "You're ETH balance is too low to cover the gas fee on this move. You could transfer more ETH into your wallet using MetaMask directly.",
+        eth: {
+          heading: 'Balance too low',
+          body: 'Your ETH balance is too low to cover the gas fee on this move. You could transfer more ETH into your wallet using MetaMask directly.',
+        },
+        imx: {
+          heading: "You'll need more IMX coins",
+          body: "In order to cover the fees for the amount specified, you'll need to add more IMX coins.",
+        },
       },
       buttons: {
         adjustAmount: 'Adjust amount',
         copyAddress: 'Copy wallet address',
+        addMoreImx: 'Add IMX coins',
         cancel: 'Dismiss',
       },
     },

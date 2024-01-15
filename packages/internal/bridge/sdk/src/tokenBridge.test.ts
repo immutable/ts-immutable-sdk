@@ -1,18 +1,25 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/dot-notation */
 /* eslint-disable @typescript-eslint/naming-convention */
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { TokenBridge } from 'tokenBridge';
 import { BridgeConfiguration } from 'config';
 import { ETH_SEPOLIA_TO_ZKEVM_DEVNET } from 'constants/bridges';
-import { BridgeFeeActions, BridgeTxRequest, BridgeTxResponse } from 'types';
+import {
+  BridgeFeeActions, BridgeTxRequest, BridgeTxResponse, StatusResponse,
+} from 'types';
 import { ethers } from 'ethers';
 import { BridgeError, BridgeErrorType } from 'errors';
+import { GMPStatus, GasPaidStatus } from 'types/axelar';
+import { queryTransactionStatus } from 'lib/gmpRecovery';
 
 jest.mock('axios', () => ({
   post: jest.fn().mockReturnValue({
     data: '100000000',
   }),
 }));
+
+jest.mock('lib/gmpRecovery');
 
 describe('Token Bridge', () => {
   it('Constructor works correctly', async () => {
@@ -583,6 +590,897 @@ describe('Token Bridge', () => {
       expect(result.bridgeFee).toStrictEqual(bridgeFee);
       expect(result.imtblFee).toStrictEqual(imtblFee);
       expect(result.totalFees).toStrictEqual(totalFees);
+    });
+  });
+
+  describe('getTransactionStatus', () => {
+    let tokenBridge: TokenBridge;
+
+    const DEPOSIT_SIG = ethers.utils.keccak256(ethers.utils.toUtf8Bytes('DEPOSIT'));
+    const WITHDRAW_SIG = ethers.utils.keccak256(ethers.utils.toUtf8Bytes('WITHDRAW'));
+
+    const amount = ethers.BigNumber.from(1000);
+    const token = '0x40b87d235A5B010a20A241F15797C9debf1ecd01';
+    const sender = '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772';
+    const recipient = '0xA383968dC8711FFE8A7353AdE9feF7Ddcb1473a0';
+
+    const abiCoder = new ethers.utils.AbiCoder();
+    const mockDepositPayload = abiCoder.encode(
+      ['bytes32', 'address', 'address', 'address', 'uint256'],
+      [
+        DEPOSIT_SIG,
+        token,
+        sender,
+        recipient,
+        amount,
+      ],
+    );
+    const mockWithdrawPayload = abiCoder.encode(
+      ['bytes32', 'address', 'address', 'address', 'uint256'],
+      [
+        WITHDRAW_SIG,
+        token,
+        sender,
+        recipient,
+        amount,
+      ],
+    );
+
+    const mockERC20ContractFlowRate = {
+      allowance: jest.fn(),
+      interface: {
+        encodeFunctionData: jest.fn(),
+      },
+      getPendingWithdrawals: jest.fn().mockImplementation(async () => [
+        {
+          withdrawer: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
+          token: '0x40b87d235A5B010a20A241F15797C9debf1ecd01',
+          amount,
+          timestamp: ethers.BigNumber.from(1000),
+        },
+      ]),
+      getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => ethers.BigNumber.from(1)),
+    };
+
+    const mockERC20Contract = {
+      allowance: jest.fn(),
+      interface: {
+        encodeFunctionData: jest.fn(),
+      },
+      getPendingWithdrawals: jest.fn().mockImplementation(async () => []),
+      getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => ethers.BigNumber.from(0)),
+    };
+
+    beforeEach(() => {
+      const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
+      const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
+      const bridgeConfig = new BridgeConfiguration({
+        baseConfig: new ImmutableConfiguration({
+          environment: Environment.SANDBOX,
+        }),
+        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+        rootProvider: voidRootProvider,
+        childProvider: voidChildProvider,
+      });
+      jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20Contract as any);
+      tokenBridge = new TokenBridge(bridgeConfig);
+    });
+
+    afterEach(() => {
+      jest.clearAllMocks();
+      // TokenBridge.prototype['queryTransactionStatus'] = originalQueryTransactionStatus;
+    });
+    it('returns the PENDING status for a deposit', async () => {
+      expect.assertions(8);
+
+      (queryTransactionStatus as jest.Mock).mockReturnValue({
+        status: GMPStatus.CANNOT_FETCH_STATUS,
+        gasPaidInfo: {
+          status: GasPaidStatus.GAS_PAID,
+        },
+        callTx: {
+          returnValues: {
+            payload: mockDepositPayload,
+          },
+        },
+      });
+
+      const txHash = '0x5c192bf2b3be59de3a69877f6c71fd0affe6e1a1c05a75f51d4a60692001d8f3';
+      const result = await tokenBridge.getTransactionStatus({
+        transactions: [{
+          txHash,
+        }],
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+      });
+
+      expect(result).not.toBeNull();
+      expect(result.transactions.length).toBe(1);
+      expect(result.transactions[0].status).toBe(StatusResponse.PENDING);
+      expect(result.transactions[0].txHash).toBe(txHash);
+      expect(result.transactions[0].token).toBe(token);
+      expect(result.transactions[0].sender).toBe(sender);
+      expect(result.transactions[0].recipient).toBe(recipient);
+      expect(result.transactions[0].amount).toStrictEqual(amount);
+    });
+    it('returns the PROCESSING status for a deposit', async () => {
+      expect.assertions(8);
+
+      (queryTransactionStatus as jest.Mock).mockReturnValue({
+        status: GMPStatus.SRC_GATEWAY_CALLED,
+        gasPaidInfo: {
+          status: GasPaidStatus.GAS_PAID,
+        },
+        callTx: {
+          returnValues: {
+            payload: mockDepositPayload,
+          },
+        },
+      });
+
+      const txHash = '0x5c192bf2b3be59de3a69877f6c71fd0affe6e1a1c05a75f51d4a60692001d8f3';
+      const result = await tokenBridge.getTransactionStatus({
+        transactions: [{
+          txHash,
+        }],
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+      });
+
+      expect(result).not.toBeNull();
+      expect(result.transactions.length).toBe(1);
+      expect(result.transactions[0].status).toBe(StatusResponse.PROCESSING);
+      expect(result.transactions[0].txHash).toBe(txHash);
+      expect(result.transactions[0].token).toBe(token);
+      expect(result.transactions[0].sender).toBe(sender);
+      expect(result.transactions[0].recipient).toBe(recipient);
+      expect(result.transactions[0].amount).toStrictEqual(amount);
+    });
+    it('returns the COMPLETE status for a deposit', async () => {
+      expect.assertions(8);
+
+      (queryTransactionStatus as jest.Mock).mockReturnValue({
+        status: GMPStatus.DEST_EXECUTED,
+        gasPaidInfo: {
+          status: GasPaidStatus.GAS_PAID,
+        },
+        callTx: {
+          returnValues: {
+            payload: mockDepositPayload,
+          },
+        },
+      });
+
+      const txHash = '0x5c192bf2b3be59de3a69877f6c71fd0affe6e1a1c05a75f51d4a60692001d8f3';
+      const result = await tokenBridge.getTransactionStatus({
+        transactions: [{
+          txHash,
+        }],
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+      });
+
+      expect(result).not.toBeNull();
+      expect(result.transactions.length).toBe(1);
+      expect(result.transactions[0].status).toBe(StatusResponse.COMPLETE);
+      expect(result.transactions[0].txHash).toBe(txHash);
+      expect(result.transactions[0].token).toBe(token);
+      expect(result.transactions[0].sender).toBe(sender);
+      expect(result.transactions[0].recipient).toBe(recipient);
+      expect(result.transactions[0].amount).toStrictEqual(amount);
+    });
+    it('returns the ERROR status for a deposit', async () => {
+      expect.assertions(8);
+
+      (queryTransactionStatus as jest.Mock).mockReturnValue({
+        status: GMPStatus.UNKNOWN_ERROR,
+        gasPaidInfo: {
+          status: GasPaidStatus.GAS_PAID,
+        },
+        callTx: {
+          returnValues: {
+            payload: mockDepositPayload,
+          },
+        },
+      });
+
+      const txHash = '0x5c192bf2b3be59de3a69877f6c71fd0affe6e1a1c05a75f51d4a60692001d8f3';
+      const result = await tokenBridge.getTransactionStatus({
+        transactions: [{
+          txHash,
+        }],
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+      });
+
+      expect(result).not.toBeNull();
+      expect(result.transactions.length).toBe(1);
+      expect(result.transactions[0].status).toBe(StatusResponse.ERROR);
+      expect(result.transactions[0].txHash).toBe(txHash);
+      expect(result.transactions[0].token).toBe(token);
+      expect(result.transactions[0].sender).toBe(sender);
+      expect(result.transactions[0].recipient).toBe(recipient);
+      expect(result.transactions[0].amount).toStrictEqual(amount);
+    });
+    it('returns the RETRY status for a deposit', async () => {
+      expect.assertions(8);
+
+      (queryTransactionStatus as jest.Mock).mockReturnValue({
+        status: GMPStatus.NOT_EXECUTED,
+        gasPaidInfo: {
+          status: GasPaidStatus.GAS_PAID,
+        },
+        callTx: {
+          returnValues: {
+            payload: mockDepositPayload,
+          },
+        },
+      });
+
+      const txHash = '0x5c192bf2b3be59de3a69877f6c71fd0affe6e1a1c05a75f51d4a60692001d8f3';
+      const result = await tokenBridge.getTransactionStatus({
+        transactions: [{
+          txHash,
+        }],
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+      });
+
+      expect(result).not.toBeNull();
+      expect(result.transactions.length).toBe(1);
+      expect(result.transactions[0].status).toBe(StatusResponse.RETRY);
+      expect(result.transactions[0].txHash).toBe(txHash);
+      expect(result.transactions[0].token).toBe(token);
+      expect(result.transactions[0].sender).toBe(sender);
+      expect(result.transactions[0].recipient).toBe(recipient);
+      expect(result.transactions[0].amount).toStrictEqual(amount);
+    });
+    it('returns the PENDING status for a withdrawal', async () => {
+      expect.assertions(8);
+
+      (queryTransactionStatus as jest.Mock).mockReturnValue({
+        status: GMPStatus.CANNOT_FETCH_STATUS,
+        gasPaidInfo: {
+          status: GasPaidStatus.GAS_PAID,
+        },
+        callTx: {
+          returnValues: {
+            payload: mockWithdrawPayload,
+          },
+        },
+      });
+
+      const txHash = '0x5c192bf2b3be59de3a69877f6c71fd0affe6e1a1c05a75f51d4a60692001d8f3';
+      const result = await tokenBridge.getTransactionStatus({
+        transactions: [{
+          txHash,
+        }],
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+      });
+
+      expect(result).not.toBeNull();
+      expect(result.transactions.length).toBe(1);
+      expect(result.transactions[0].status).toBe(StatusResponse.PENDING);
+      expect(result.transactions[0].txHash).toBe(txHash);
+      expect(result.transactions[0].token).toBe(token);
+      expect(result.transactions[0].sender).toBe(sender);
+      expect(result.transactions[0].recipient).toBe(recipient);
+      expect(result.transactions[0].amount).toStrictEqual(amount);
+    });
+    it('returns the PROCESSING status for a withdrawal', async () => {
+      expect.assertions(8);
+
+      (queryTransactionStatus as jest.Mock).mockReturnValue({
+        status: GMPStatus.SRC_GATEWAY_CALLED,
+        gasPaidInfo: {
+          status: GasPaidStatus.GAS_PAID,
+        },
+        callTx: {
+          returnValues: {
+            payload: mockWithdrawPayload,
+          },
+        },
+      });
+
+      const txHash = '0x5c192bf2b3be59de3a69877f6c71fd0affe6e1a1c05a75f51d4a60692001d8f3';
+      const result = await tokenBridge.getTransactionStatus({
+        transactions: [{
+          txHash,
+        }],
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+      });
+
+      expect(result).not.toBeNull();
+      expect(result.transactions.length).toBe(1);
+      expect(result.transactions[0].status).toBe(StatusResponse.PROCESSING);
+      expect(result.transactions[0].txHash).toBe(txHash);
+      expect(result.transactions[0].token).toBe(token);
+      expect(result.transactions[0].sender).toBe(sender);
+      expect(result.transactions[0].recipient).toBe(recipient);
+      expect(result.transactions[0].amount).toStrictEqual(amount);
+    });
+    it('returns the COMPLETE status for a withdrawal', async () => {
+      expect.assertions(8);
+
+      (queryTransactionStatus as jest.Mock).mockReturnValue({
+        status: GMPStatus.DEST_EXECUTED,
+        gasPaidInfo: {
+          status: GasPaidStatus.GAS_PAID,
+        },
+        callTx: {
+          returnValues: {
+            payload: mockWithdrawPayload,
+          },
+        },
+      });
+
+      const txHash = '0x5c192bf2b3be59de3a69877f6c71fd0affe6e1a1c05a75f51d4a60692001d8f3';
+      const result = await tokenBridge.getTransactionStatus({
+        transactions: [{
+          txHash,
+        }],
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+      });
+
+      expect(result).not.toBeNull();
+      expect(result.transactions.length).toBe(1);
+      expect(result.transactions[0].status).toBe(StatusResponse.COMPLETE);
+      expect(result.transactions[0].txHash).toBe(txHash);
+      expect(result.transactions[0].token).toBe(token);
+      expect(result.transactions[0].sender).toBe(sender);
+      expect(result.transactions[0].recipient).toBe(recipient);
+      expect(result.transactions[0].amount).toStrictEqual(amount);
+    });
+    it('returns the FLOW_RATE_CONTROLLED status for a withdrawal', async () => {
+      expect.assertions(8);
+
+      jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRate as any);
+
+      (queryTransactionStatus as jest.Mock).mockReturnValue({
+        status: GMPStatus.DEST_EXECUTED,
+        gasPaidInfo: {
+          status: GasPaidStatus.GAS_PAID,
+        },
+        callTx: {
+          returnValues: {
+            payload: mockWithdrawPayload,
+          },
+        },
+      });
+
+      const txHash = '0x5c192bf2b3be59de3a69877f6c71fd0affe6e1a1c05a75f51d4a60692001d8f3';
+      const result = await tokenBridge.getTransactionStatus({
+        transactions: [{
+          txHash,
+        }],
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+      });
+
+      expect(result).not.toBeNull();
+      expect(result.transactions.length).toBe(1);
+      expect(result.transactions[0].status).toBe(StatusResponse.FLOW_RATE_CONTROLLED);
+      expect(result.transactions[0].txHash).toBe(txHash);
+      expect(result.transactions[0].token).toBe(token);
+      expect(result.transactions[0].sender).toBe(sender);
+      expect(result.transactions[0].recipient).toBe(recipient);
+      expect(result.transactions[0].amount).toStrictEqual(amount);
+    });
+    it('returns the ERROR status for a withdrawal', async () => {
+      expect.assertions(8);
+
+      (queryTransactionStatus as jest.Mock).mockReturnValue({
+        status: GMPStatus.UNKNOWN_ERROR,
+        gasPaidInfo: {
+          status: GasPaidStatus.GAS_PAID,
+        },
+        callTx: {
+          returnValues: {
+            payload: mockWithdrawPayload,
+          },
+        },
+      });
+
+      const txHash = '0x5c192bf2b3be59de3a69877f6c71fd0affe6e1a1c05a75f51d4a60692001d8f3';
+      const result = await tokenBridge.getTransactionStatus({
+        transactions: [{
+          txHash,
+        }],
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+      });
+
+      expect(result).not.toBeNull();
+      expect(result.transactions.length).toBe(1);
+      expect(result.transactions[0].status).toBe(StatusResponse.ERROR);
+      expect(result.transactions[0].txHash).toBe(txHash);
+      expect(result.transactions[0].token).toBe(token);
+      expect(result.transactions[0].sender).toBe(sender);
+      expect(result.transactions[0].recipient).toBe(recipient);
+      expect(result.transactions[0].amount).toStrictEqual(amount);
+    });
+    it('returns the RETRY status for a withdrawal', async () => {
+      expect.assertions(8);
+
+      (queryTransactionStatus as jest.Mock).mockReturnValue({
+        status: GMPStatus.NOT_EXECUTED,
+        gasPaidInfo: {
+          status: GasPaidStatus.GAS_PAID,
+        },
+        callTx: {
+          returnValues: {
+            payload: mockWithdrawPayload,
+          },
+        },
+      });
+
+      const txHash = '0x5c192bf2b3be59de3a69877f6c71fd0affe6e1a1c05a75f51d4a60692001d8f3';
+      const result = await tokenBridge.getTransactionStatus({
+        transactions: [{
+          txHash,
+        }],
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+      });
+
+      expect(result).not.toBeNull();
+      expect(result.transactions.length).toBe(1);
+      expect(result.transactions[0].status).toBe(StatusResponse.RETRY);
+      expect(result.transactions[0].txHash).toBe(txHash);
+      expect(result.transactions[0].token).toBe(token);
+      expect(result.transactions[0].sender).toBe(sender);
+      expect(result.transactions[0].recipient).toBe(recipient);
+      expect(result.transactions[0].amount).toStrictEqual(amount);
+    });
+  });
+
+  describe('getFlowRateWithdrawTx', () => {
+    let tokenBridge: TokenBridge;
+
+    const recipient = '0xA383968dC8711FFE8A7353AdE9feF7Ddcb1473a0';
+    const token = '0x40b87d235A5B010a20A241F15797C9debf1ecd01';
+    const amount = ethers.BigNumber.from(1000);
+
+    const defaultTimestamp = ethers.BigNumber.from(1000);
+
+    const mockERC20ContractFlowRate = {
+      allowance: jest.fn(),
+      interface: {
+        encodeFunctionData: jest.fn().mockResolvedValue('0xdata'),
+      },
+      getPendingWithdrawals: jest.fn().mockImplementation(async () => [
+        {
+          withdrawer: recipient,
+          token,
+          amount,
+          timestamp: defaultTimestamp,
+        },
+      ]),
+      getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => ethers.BigNumber.from(1)),
+      withdrawalDelay: jest.fn().mockImplementation(async () => ethers.BigNumber.from(60 * 60 * 24)),
+    };
+
+    const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
+    const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
+
+    const bridgeConfig = new BridgeConfiguration({
+      baseConfig: new ImmutableConfiguration({
+        environment: Environment.SANDBOX,
+      }),
+      bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+      rootProvider: voidRootProvider,
+      childProvider: voidChildProvider,
+    });
+
+    beforeEach(() => {
+      jest.spyOn(TokenBridge.prototype as any, 'validateChainConfiguration')
+        .mockImplementation(async () => 'Valid');
+      jest.spyOn(TokenBridge.prototype as any, 'validateDepositArgs')
+        .mockImplementation(async () => 'Valid');
+      tokenBridge = new TokenBridge(bridgeConfig);
+    });
+
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+    it('returns the flowRate withdraw transaction when the index and recipient are valid', async () => {
+      expect.assertions(10);
+      const req = {
+        recipient,
+        index: 0,
+      };
+
+      jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRate as any);
+
+      const result = await tokenBridge.getFlowRateWithdrawTx(req);
+
+      expect(result.unsignedTx).toBeDefined();
+      expect(result.unsignedTx?.data).toBe('0xdata');
+      expect(result.unsignedTx?.to).toBe(bridgeConfig.bridgeContracts.rootERC20BridgeFlowRate);
+      expect(result.unsignedTx?.value).toBe(0);
+      expect(result.pendingWithdrawal.canWithdraw).toBe(true);
+      expect(result.pendingWithdrawal.withdrawer).toBe(recipient);
+      expect(result.pendingWithdrawal.token).toBe(token);
+      expect(result.pendingWithdrawal.amount).toBe(amount);
+      expect(result.pendingWithdrawal.timeoutStart).toBe(defaultTimestamp.toNumber());
+      expect(result.pendingWithdrawal.timeoutEnd).toBe(defaultTimestamp.toNumber() + (60 * 60 * 24));
+    });
+
+    it('throws an error when the index is not valid', async () => {
+      expect.assertions(2);
+      const req = {
+        recipient,
+        index: 100,
+      };
+
+      const mockERC20ContractFlowRateNotFound = {
+        allowance: jest.fn(),
+        interface: {
+          encodeFunctionData: jest.fn().mockResolvedValue('0xdata'),
+        },
+        getPendingWithdrawals: jest.fn().mockImplementation(async () => [
+          {
+            withdrawer: ethers.constants.AddressZero,
+            token: ethers.constants.AddressZero,
+            amount: ethers.BigNumber.from(0),
+            timestamp: ethers.BigNumber.from(0),
+          },
+        ]),
+        getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => ethers.BigNumber.from(0)),
+        withdrawalDelay: jest.fn().mockImplementation(async () => ethers.BigNumber.from(60 * 60 * 24)),
+      };
+
+      jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRateNotFound as any);
+
+      try {
+        await tokenBridge.getFlowRateWithdrawTx(req);
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(BridgeError);
+        expect(error.type).toBe(BridgeErrorType.FLOW_RATE_ERROR);
+      }
+    });
+
+    it('returns the flowRate info if the transcation is not ready to be withdrawn', async () => {
+      expect.assertions(7);
+      const req = {
+        recipient,
+        index: 0,
+      };
+
+      const timestampNow = Math.floor(Date.now() / 1000);
+
+      const timestamp = ethers.BigNumber.from(timestampNow + (60 * 60 * 12));
+
+      const mockERC20ContractFlowRateNotReady = {
+        allowance: jest.fn(),
+        interface: {
+          encodeFunctionData: jest.fn().mockResolvedValue('0xdata'),
+        },
+        getPendingWithdrawals: jest.fn().mockImplementation(async () => [
+          {
+            withdrawer: recipient,
+            token,
+            amount,
+            timestamp,
+          },
+        ]),
+        withdrawalDelay: jest.fn().mockImplementation(async () => ethers.BigNumber.from(60 * 60 * 24)),
+      };
+
+      jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRateNotReady as any);
+
+      const result = await tokenBridge.getFlowRateWithdrawTx(req);
+
+      expect(result.unsignedTx).toBeNull();
+      expect(result.pendingWithdrawal.canWithdraw).toBe(false);
+      expect(result.pendingWithdrawal.withdrawer).toBe(recipient);
+      expect(result.pendingWithdrawal.token).toBe(token);
+      expect(result.pendingWithdrawal.amount).toBe(amount);
+      expect(result.pendingWithdrawal.timeoutStart).toBe(timestamp.toNumber());
+      expect(result.pendingWithdrawal.timeoutEnd).toBe(timestamp.toNumber() + (60 * 60 * 24));
+    });
+  });
+
+  describe('getPendingWithdrawals', () => {
+    let tokenBridge: TokenBridge;
+
+    const recipient = '0xA383968dC8711FFE8A7353AdE9feF7Ddcb1473a0';
+    const token = '0x40b87d235A5B010a20A241F15797C9debf1ecd01';
+    const amount = ethers.BigNumber.from(1000);
+
+    const defaultTimestamp = ethers.BigNumber.from(1000);
+    const futureTimestamp = ethers.BigNumber.from(1000000000000);
+
+    const mockERC20ContractFlowRate = {
+      allowance: jest.fn(),
+      interface: {
+        encodeFunctionData: jest.fn().mockResolvedValue('0xdata'),
+      },
+      getPendingWithdrawals: jest.fn().mockImplementation(async () => [
+        {
+          withdrawer: recipient,
+          token,
+          amount,
+          timestamp: defaultTimestamp,
+        },
+      ]),
+      getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => ethers.BigNumber.from(1)),
+      withdrawalDelay: jest.fn().mockImplementation(async () => ethers.BigNumber.from(60 * 60 * 24)),
+    };
+
+    const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
+    const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
+
+    const bridgeConfig = new BridgeConfiguration({
+      baseConfig: new ImmutableConfiguration({
+        environment: Environment.SANDBOX,
+      }),
+      bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+      rootProvider: voidRootProvider,
+      childProvider: voidChildProvider,
+    });
+
+    beforeEach(() => {
+      jest.spyOn(TokenBridge.prototype as any, 'validateChainConfiguration')
+        .mockImplementation(async () => 'Valid');
+      jest.spyOn(TokenBridge.prototype as any, 'validateDepositArgs')
+        .mockImplementation(async () => 'Valid');
+      tokenBridge = new TokenBridge(bridgeConfig);
+    });
+
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+    it('returns the flowRate pending withdrawals [1] when the recipient is valid', async () => {
+      expect.assertions(8);
+      const req = {
+        recipient,
+      };
+
+      jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRate as any);
+
+      const result = await tokenBridge.getPendingWithdrawals(req);
+
+      expect(result.pending).toBeDefined();
+      expect(result.pending.length).toBe(1);
+      expect(result.pending[0].canWithdraw).toBe(true);
+      expect(result.pending[0].withdrawer).toBe(recipient);
+      expect(result.pending[0].token).toBe(token);
+      expect(result.pending[0].amount).toBe(amount);
+      expect(result.pending[0].timeoutStart).toBe(defaultTimestamp.toNumber());
+      expect(result.pending[0].timeoutEnd).toBe(defaultTimestamp.toNumber() + (60 * 60 * 24));
+    });
+
+    it('returns the flowRate pending withdrawals [3] when the recipient is valid', async () => {
+      expect.assertions(20);
+      const req = {
+        recipient,
+      };
+
+      const mockERC20ContractFlowRateThree = {
+        allowance: jest.fn(),
+        interface: {
+          encodeFunctionData: jest.fn().mockResolvedValue('0xdata'),
+        },
+        getPendingWithdrawals: jest.fn().mockImplementation(async () => [
+          {
+            withdrawer: `${recipient}1`,
+            token: `${token}1`,
+            amount: amount.mul(1),
+            timestamp: defaultTimestamp.mul(1),
+          },
+          {
+            withdrawer: `${recipient}2`,
+            token: `${token}2`,
+            amount: amount.mul(2),
+            timestamp: futureTimestamp,
+          },
+          {
+            withdrawer: `${recipient}3`,
+            token: `${token}3`,
+            amount: amount.mul(3),
+            timestamp: defaultTimestamp.mul(3),
+          },
+        ]),
+        getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => ethers.BigNumber.from(3)),
+        withdrawalDelay: jest.fn().mockImplementation(async () => ethers.BigNumber.from(60 * 60 * 24)),
+
+      };
+
+      jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRateThree as any);
+
+      const result = await tokenBridge.getPendingWithdrawals(req);
+
+      expect(result.pending).toBeDefined();
+      expect(result.pending.length).toBe(3);
+      expect(result.pending[0].canWithdraw).toBe(true);
+      expect(result.pending[0].withdrawer).toBe(`${recipient}1`);
+      expect(result.pending[0].token).toBe(`${token}1`);
+      expect(result.pending[0].amount).toStrictEqual(amount.mul(1));
+      expect(result.pending[0].timeoutStart).toBe(defaultTimestamp.mul(1).toNumber());
+      expect(result.pending[0].timeoutEnd).toBe(defaultTimestamp.mul(1).toNumber() + (60 * 60 * 24));
+      expect(result.pending[1].canWithdraw).toBe(false);
+      expect(result.pending[1].withdrawer).toBe(`${recipient}2`);
+      expect(result.pending[1].token).toBe(`${token}2`);
+      expect(result.pending[1].amount).toStrictEqual(amount.mul(2));
+      expect(result.pending[1].timeoutStart).toBe(futureTimestamp.toNumber());
+      expect(result.pending[1].timeoutEnd).toBe(futureTimestamp.toNumber() + (60 * 60 * 24));
+      expect(result.pending[2].canWithdraw).toBe(true);
+      expect(result.pending[2].withdrawer).toBe(`${recipient}3`);
+      expect(result.pending[2].token).toBe(`${token}3`);
+      expect(result.pending[2].amount).toStrictEqual(amount.mul(3));
+      expect(result.pending[2].timeoutStart).toBe(defaultTimestamp.mul(3).toNumber());
+      expect(result.pending[2].timeoutEnd).toBe(defaultTimestamp.mul(3).toNumber() + (60 * 60 * 24));
+    });
+
+    it('returns empty pending array when no flowRated transactions found', async () => {
+      expect.assertions(2);
+      const req = {
+        recipient,
+      };
+
+      const mockERC20ContractFlowRateNone = {
+        allowance: jest.fn(),
+        interface: {
+          encodeFunctionData: jest.fn().mockResolvedValue('0xdata'),
+        },
+        getPendingWithdrawals: jest.fn().mockImplementation(async () => [
+          {
+            withdrawer: ethers.constants.AddressZero,
+            token: ethers.constants.AddressZero,
+            amount: ethers.BigNumber.from(0),
+            timestamp: ethers.BigNumber.from(0),
+          },
+        ]),
+        getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => ethers.BigNumber.from(0)),
+        withdrawalDelay: jest.fn().mockImplementation(async () => ethers.BigNumber.from(60 * 60 * 24)),
+      };
+
+      jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRateNone as any);
+
+      const result = await tokenBridge.getPendingWithdrawals(req);
+
+      expect(result.pending).toBeDefined();
+      expect(result.pending.length).toBe(0);
+    });
+  });
+
+  describe('getFlowRateInfo', () => {
+    let tokenBridge: TokenBridge;
+
+    const token = '0x40b87d235A5B010a20A241F15797C9debf1ecd01';
+    const capacity = ethers.BigNumber.from(500000);
+    const depth = ethers.BigNumber.from(300000);
+    const refillTime = ethers.BigNumber.from(5000);
+    const refillRate = ethers.BigNumber.from(100000);
+    const withdrawalDelay = ethers.BigNumber.from(60 * 60 * 24);
+
+    const mockERC20ContractFlowRate = {
+      withdrawalQueueActivated: jest.fn().mockImplementation(async () => false),
+      withdrawalDelay: jest.fn().mockImplementation(async () => withdrawalDelay),
+      flowRateBuckets: jest.fn().mockImplementation(async () => ({
+        capacity,
+        depth,
+        refillTime,
+        refillRate,
+      })),
+    };
+
+    const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
+    const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
+
+    const bridgeConfig = new BridgeConfiguration({
+      baseConfig: new ImmutableConfiguration({
+        environment: Environment.SANDBOX,
+      }),
+      bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+      rootProvider: voidRootProvider,
+      childProvider: voidChildProvider,
+    });
+
+    beforeEach(() => {
+      tokenBridge = new TokenBridge(bridgeConfig);
+    });
+
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+    it('returns the flow rate info for a specific token', async () => {
+      expect.assertions(7);
+      const req = {
+        tokens: [token],
+      };
+
+      jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRate as any);
+
+      const result = await tokenBridge.getFlowRateInfo(req);
+
+      expect(result).toBeDefined();
+      expect(result.withdrawalQueueActivated).toBe(false);
+      expect(result.withdrawalDelay).toBe(withdrawalDelay.toNumber());
+      expect(result.tokens[token].capacity).toStrictEqual(capacity);
+      expect(result.tokens[token].depth).toStrictEqual(depth);
+      expect(result.tokens[token].refillTime).toBe(refillTime.toNumber());
+      expect(result.tokens[token].refillRate).toStrictEqual(refillRate);
+    });
+
+    it('returns the flow rate info for the NATIVE token', async () => {
+      expect.assertions(7);
+      const req = {
+        tokens: ['NATIVE'],
+      };
+
+      jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRate as any);
+
+      const result = await tokenBridge.getFlowRateInfo(req);
+
+      expect(result).toBeDefined();
+      expect(result.withdrawalQueueActivated).toBe(false);
+      expect(result.withdrawalDelay).toBe(withdrawalDelay.toNumber());
+      expect(result.tokens['NATIVE'].capacity).toStrictEqual(capacity);
+      expect(result.tokens['NATIVE'].depth).toStrictEqual(depth);
+      expect(result.tokens['NATIVE'].refillTime).toBe(refillTime.toNumber());
+      expect(result.tokens['NATIVE'].refillRate).toStrictEqual(refillRate);
+    });
+
+    it('returns the flow rate info for the multiple tokens', async () => {
+      expect.assertions(15);
+      const otherToken = '0x12345';
+      const req = {
+        tokens: ['NATIVE', token, otherToken],
+      };
+
+      const mockERC20ContractFlowRateMultiToken = {
+        withdrawalQueueActivated: jest.fn().mockImplementation(async () => false),
+        withdrawalDelay: jest.fn().mockImplementation(async () => withdrawalDelay),
+        flowRateBuckets: jest.fn().mockImplementation(async () => ({
+          capacity,
+          depth,
+          refillTime,
+          refillRate,
+        })),
+      };
+
+      jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRateMultiToken as any);
+
+      const result = await tokenBridge.getFlowRateInfo(req);
+
+      expect(result).toBeDefined();
+      expect(result.withdrawalQueueActivated).toBe(false);
+      expect(result.withdrawalDelay).toBe(withdrawalDelay.toNumber());
+      expect(result.tokens['NATIVE'].capacity).toStrictEqual(capacity);
+      expect(result.tokens['NATIVE'].depth).toStrictEqual(depth);
+      expect(result.tokens['NATIVE'].refillTime).toBe(refillTime.toNumber());
+      expect(result.tokens['NATIVE'].refillRate).toStrictEqual(refillRate);
+      expect(result.tokens[token].capacity).toStrictEqual(capacity);
+      expect(result.tokens[token].depth).toStrictEqual(depth);
+      expect(result.tokens[token].refillTime).toBe(refillTime.toNumber());
+      expect(result.tokens[token].refillRate).toStrictEqual(refillRate);
+      expect(result.tokens[otherToken].capacity).toStrictEqual(capacity);
+      expect(result.tokens[otherToken].depth).toStrictEqual(depth);
+      expect(result.tokens[otherToken].refillTime).toBe(refillTime.toNumber());
+      expect(result.tokens[otherToken].refillRate).toStrictEqual(refillRate);
+    });
+    it('returns the withdrawalQueueActivated as true ', async () => {
+      expect.assertions(7);
+      const req = {
+        tokens: ['NATIVE'],
+      };
+
+      const mockERC20ContractFlowRateMultiToken = {
+        withdrawalQueueActivated: jest.fn().mockImplementation(async () => true),
+        withdrawalDelay: jest.fn().mockImplementation(async () => withdrawalDelay),
+        flowRateBuckets: jest.fn().mockImplementation(async () => ({
+          capacity,
+          depth,
+          refillTime,
+          refillRate,
+        })),
+      };
+
+      jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRateMultiToken as any);
+
+      const result = await tokenBridge.getFlowRateInfo(req);
+
+      expect(result).toBeDefined();
+      expect(result.withdrawalQueueActivated).toBe(true);
+      expect(result.withdrawalDelay).toBe(withdrawalDelay.toNumber());
+      expect(result.tokens['NATIVE'].capacity).toStrictEqual(capacity);
+      expect(result.tokens['NATIVE'].depth).toStrictEqual(depth);
+      expect(result.tokens['NATIVE'].refillTime).toBe(refillTime.toNumber());
+      expect(result.tokens['NATIVE'].refillRate).toStrictEqual(refillRate);
     });
   });
 

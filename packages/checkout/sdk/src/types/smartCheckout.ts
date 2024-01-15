@@ -191,15 +191,15 @@ export type NativeBuyToken = {
  * Represents a ERC20 buy token
  * @property {ItemType} type
  * @property {string} amount
- * @property {string} contractAddress
+ * @property {string} tokenAddress
  */
 export type ERC20BuyToken = {
   /** The type indicate this is a ERC20 token. */
   type: ItemType.ERC20;
   /** The amount of native token. */
   amount: string;
-  /** The contract address of the ERC20. */
-  contractAddress: string;
+  /** The token address of the ERC20. */
+  tokenAddress: string;
 };
 
 /**
@@ -244,16 +244,16 @@ export type NativeItemRequirement = {
 /**
  * Represents an ERC20 item requirement for a transaction.
  * @property {ItemType.ERC20} type
+ * @property {string} tokenAddress
  * @property {string} amount
- * @property {string} contractAddress
  * @property {string} spenderAddress
  */
 export type ERC20ItemRequirement = {
   /** The type to indicate this is a ERC20 item requirement. */
   type: ItemType.ERC20;
+  /** The token address of the ERC20. */
+  tokenAddress: string;
   /** The amount of the item. */
-  contractAddress: string;
-  /** The contract address of the ERC20. */
   amount: string;
   /** The contract address of the approver. */
   spenderAddress: string,
@@ -311,15 +311,15 @@ export type NativeItem = {
 /**
  * Represents an ERC20 item.
  * @property {ItemType} type
- * @property {string} contractAddress
+ * @property {string} tokenAddress
  * @property {BigNumber} amount
  * @property {string} spenderAddress
  */
 export type ERC20Item = {
   /**  The type to indicate this is an ERC20 item. */
   type: ItemType.ERC20;
-  /** The contract address of the ERC20. */
-  contractAddress: string;
+  /** The token address of the ERC20. */
+  tokenAddress: string;
   /** The amount of the item. */
   amount: BigNumber;
   /** The contract address of the approver. */
@@ -410,14 +410,14 @@ export type NativeGas = {
 /**
  * Represents an ERC20 gas token.
  * @property {GasTokenType} type
- * @property {string} contractAddress
+ * @property {string} tokenAddress
  * @property {BigNumber} limit
  */
 export type ERC20Gas = {
   /** The type to indicate this is an ERC20 gas token. */
   type: GasTokenType.ERC20,
-  /** The contract address of the ERC20. */
-  contractAddress: string;
+  /** The token address of the ERC20. */
+  tokenAddress: string;
   /** The gas limit. */
   limit: BigNumber;
 };
@@ -539,6 +539,8 @@ export type FundingRoute = {
  * @property {TokenInfo | undefined} token
  */
 export type Fee = {
+  /** The type of fee */
+  type: FeeType;
   /** The amount of the fee */
   amount: BigNumber;
   /** The formatted amount of the fee */
@@ -546,6 +548,21 @@ export type Fee = {
   /** The token info for the fee */
   token?: TokenInfo;
 };
+
+/**
+ * An enum representing the funding step types
+ * @enum {string}
+ * @property {string} GAS - If the fee is a gas fee.
+ * @property {string} BRIDGE_FEE - If the fee is a bridge fee.
+ * @property {string} SWAP_FEE - If the fee is a swap fee.
+ * @property {string} IMMUTABLE_FEE - If the fee is an immutable fee.
+ */
+export enum FeeType {
+  GAS = 'GAS',
+  BRIDGE_FEE = 'BRIDGE_FEE',
+  SWAP_FEE = 'SWAP_FEE',
+  IMMUTABLE_FEE = 'IMMUTABLE_FEE',
+}
 
 /*
 * Type representing the various funding steps
@@ -572,15 +589,15 @@ export type BridgeFundingStep = {
 
 /**
  * Represents the fees for a bridge funding step
- * @property {Fee} approvalGasFees
- * @property {Fee} bridgeGasFees
+ * @property {Fee} approvalGasFee
+ * @property {Fee} bridgeGasFee
  * @property {Fee[]} bridgeFees
  */
 export type BridgeFees = {
-  /** The approval gas fees for the bridge */
-  approvalGasFees: Fee,
-  /** The bridge gas fees for the bridge */
-  bridgeGasFees: Fee,
+  /** The approval gas fee for the bridge */
+  approvalGasFee: Fee,
+  /** The bridge gas fee for the bridge */
+  bridgeGasFee: Fee,
   /** Additional bridge fees for the bridge */
   bridgeFees: Fee[],
 };
@@ -605,15 +622,15 @@ export type SwapFundingStep = {
 
 /**
  * Represents the fees for a swap funding step
- * @property {Fee} approvalGasFees
- * @property {Fee} swapGasFees
+ * @property {Fee} approvalGasFee
+ * @property {Fee} swapGasFee
  * @property {Fee[]} swapFees
  */
 export type SwapFees = {
-  /** The approval gas fees for the swap */
-  approvalGasFees: Fee,
-  /** The swap gas fees for the swap */
-  swapGasFees: Fee,
+  /** The approval gas fee for the swap */
+  approvalGasFee: Fee,
+  /** The swap gas fee for the swap */
+  swapGasFee: Fee,
   /** Additional swap fees for the swap */
   swapFees: Fee[],
 };

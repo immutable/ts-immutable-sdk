@@ -69,8 +69,12 @@ export async function getNetworkAllowList(
   const allowedNetworkConfig = (await config.remote.getConfig(
     'allowedNetworks',
   )) as AllowedNetworkConfig[];
+  if (!allowedNetworkConfig) {
+    // eslint-disable-next-line no-console
+    console.warn('No allowed networks configured');
+  }
 
-  const list = allowedNetworkConfig.filter((network) => {
+  const list = (allowedNetworkConfig || []).filter((network) => {
     const allowAllTokens = type === NetworkFilterTypes.ALL;
     const networkNotExcluded = !(exclude || [])
       .map((exc) => exc.chainId)

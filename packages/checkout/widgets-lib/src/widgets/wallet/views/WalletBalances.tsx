@@ -1,4 +1,4 @@
-import { Box, MenuItem } from '@biom3/react';
+import { Box, ButtCon, MenuItem } from '@biom3/react';
 import {
   useContext, useEffect, useMemo, useState,
 } from 'react';
@@ -6,10 +6,11 @@ import { GasEstimateType, IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
 import { utils } from 'ethers';
 import { fetchTokenSymbols } from 'lib/fetchTokenSymbols';
 import { CryptoFiatActions, CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext';
+import { ButtonNavigationStyles } from 'components/Header/HeaderStyles';
+import { useTranslation } from 'react-i18next';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import { text } from '../../../resources/text/textConfig';
 import { TotalTokenBalance } from '../components/TotalTokenBalance/TotalTokenBalance';
 import { TokenBalanceList } from '../components/TokenBalanceList/TokenBalanceList';
 import { NetworkMenu } from '../components/NetworkMenu/NetworkMenu';
@@ -50,6 +51,7 @@ export function WalletBalances({
   balancesLoading,
   setBalancesLoading,
 }: WalletBalancesProps) {
+  const { t } = useTranslation();
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
@@ -58,7 +60,6 @@ export function WalletBalances({
 
   const { viewDispatch } = useContext(ViewContext);
   const [totalFiatAmount, setTotalFiatAmount] = useState(0.0);
-  const { header } = text.views[WalletWidgetViews.WALLET_BALANCES];
   const {
     network,
     supportedTopUps,
@@ -203,22 +204,29 @@ export function WalletBalances({
       testId="wallet-balances"
       header={(
         <HeaderNavigation
-          title={header.title}
-          showSettings
-          onSettingsClick={() => {
-            track({
-              userJourney: UserJourney.WALLET,
-              screen: 'WalletBalances',
-              control: 'Settings',
-              controlType: 'Button',
-            });
-            viewDispatch({
-              payload: {
-                type: ViewActions.UPDATE_VIEW,
-                view: { type: WalletWidgetViews.SETTINGS },
-              },
-            });
-          }}
+          title={t('views.WALLET_BALANCES.header.title')}
+          rightActions={(
+            <ButtCon
+              icon="SettingsCog"
+              sx={ButtonNavigationStyles()}
+              iconVariant="bold"
+              onClick={() => {
+                track({
+                  userJourney: UserJourney.WALLET,
+                  screen: 'WalletBalances',
+                  control: 'Settings',
+                  controlType: 'Button',
+                });
+                viewDispatch({
+                  payload: {
+                    type: ViewActions.UPDATE_VIEW,
+                    view: { type: WalletWidgetViews.SETTINGS },
+                  },
+                });
+              }}
+              testId="settings-button"
+            />
+          )}
           onCloseButtonClick={() => sendWalletWidgetCloseEvent(eventTarget)}
         />
       )}
@@ -255,7 +263,7 @@ export function WalletBalances({
             onClick={handleAddCoinsClick}
           >
             <MenuItem.FramedIcon icon="Add" />
-            <MenuItem.Label>Add coins</MenuItem.Label>
+            <MenuItem.Label>{t('views.WALLET_BALANCES.addCoins')}</MenuItem.Label>
           </MenuItem>
         )}
         <NotEnoughGas
@@ -264,6 +272,7 @@ export function WalletBalances({
           onCloseDrawer={() => setShowNotEnoughGasDrawer(false)}
           walletAddress={walletAddress}
           showAdjustAmount={false}
+          tokenSymbol={ETH_TOKEN_SYMBOL}
         />
       </Box>
     </SimpleLayout>

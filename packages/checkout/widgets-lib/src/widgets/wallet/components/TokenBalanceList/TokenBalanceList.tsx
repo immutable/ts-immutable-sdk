@@ -1,9 +1,8 @@
 import { Body, Box } from '@biom3/react';
+import { useTranslation } from 'react-i18next';
 import { BalanceItem } from '../BalanceItem/BalanceItem';
 import { tokenBalanceListStyle, noTokensStyle } from './TokenBalanceListStyles';
-import { text } from '../../../../resources/text/textConfig';
 import { BalanceInfo } from '../../functions/tokenBalances';
-import { WalletWidgetViews } from '../../../../context/view-context/WalletViewContextTypes';
 import { isNativeToken } from '../../../../lib/utils';
 import { ZERO_BALANCE_STRING } from '../../../../lib';
 
@@ -20,7 +19,7 @@ export function TokenBalanceList({
   balanceInfoItems,
   bridgeToL2OnClick,
 }: TokenBalanceListProps) {
-  const { noTokensFound } = text.views[WalletWidgetViews.WALLET_BALANCES].tokenBalancesList;
+  const { t } = useTranslation();
   const filteredBalances = filterZeroBalances(balanceInfoItems);
 
   return (
@@ -28,7 +27,7 @@ export function TokenBalanceList({
       {filteredBalances.length === 0
       && (
       <Box sx={noTokensStyle}>
-        <Body testId="no-tokens-found">{noTokensFound}</Body>
+        <Body testId="no-tokens-found">{t('views.WALLET_BALANCES.tokenBalancesList.noTokensFound')}</Body>
       </Box>
       )}
       {filteredBalances.map((balance) => (

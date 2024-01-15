@@ -3,11 +3,13 @@ import { Environment } from '@imtbl/config';
 import { ChainId } from '../../../types';
 import { getBalancesByChain } from './getBalancesByChain';
 import { CheckoutConfiguration } from '../../../config';
+import { HttpClient } from '../../../api/http';
 
 describe('getBalancesByChain', () => {
+  const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
   const config = new CheckoutConfiguration({
     baseConfig: { environment: Environment.SANDBOX },
-  });
+  }, mockedHttpClient);
 
   const l1balances = {
     success: true,

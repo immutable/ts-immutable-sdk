@@ -31,13 +31,13 @@ const useParams = () => {
   const login = urlParams.get('login') as string;
   const amount = urlParams.get('amount') as string;
   const environmentId = urlParams.get('environmentId') as string;
-  const fromContractAddress = urlParams.get('fromContractAddress') as string;
+  const fromTokenAddress = urlParams.get('fromTokenAddress') as string;
 
   return {
     login,
     amount,
     environmentId,
-    fromContractAddress,
+    fromTokenAddress,
   };
 };
 
@@ -72,7 +72,7 @@ const usePassportInstance = (passportConfig: any) => {
 export function SaleUI() {
   const params = useParams();
   const {
-    login, amount, environmentId, fromContractAddress,
+    login, amount, environmentId, fromTokenAddress,
   } = params;
   const [passportConfig, setPassportConfig] = useState(
     JSON.stringify(defaultPassportConfig, null, 2),
@@ -82,16 +82,16 @@ export function SaleUI() {
   const passportInstance = useMemo(() => usePassportInstance(JSON.parse(passportConfig)), []);
   const checkout = useMemo(() => new Checkout({baseConfig: {environment: Environment.SANDBOX}, passport: passportInstance as unknown as Passport}), [passportInstance])
   const factory = useMemo(() => new WidgetsFactory(checkout, {theme: WidgetTheme.DARK}), [checkout])
-  const saleWidget = useMemo(() => factory.create(WidgetType.SALE, { config: { theme: WidgetTheme.DARK } }), 
-  [factory, amount, environmentId, fromContractAddress, defaultItems]
+  const saleWidget = useMemo(() => factory.create(WidgetType.SALE, { config: { theme: WidgetTheme.DARK } }),
+  [factory, amount, environmentId, fromTokenAddress, defaultItems]
   )
 
   // mount sale widget and subscribe to close event
   useEffect(() => {
     saleWidget.mount("sale", {
-      amount, 
-      environmentId, 
-      fromContractAddress, 
+      amount,
+      environmentId,
+      fromTokenAddress,
       items: defaultItems
     });
     saleWidget.addListener(SaleEventType.CLOSE_WIDGET, () => { saleWidget.unmount()})
@@ -155,14 +155,16 @@ export function SaleUI() {
     <>
     <div id="sale"></div>
     <button onClick={() => saleWidget.mount('sale', {
-      amount, 
-      environmentId, 
-      fromContractAddress, 
+      amount,
+      environmentId,
+      fromTokenAddress,
       items: defaultItems
     })}>Mount</button>
     <button onClick={() => saleWidget.unmount()}>Unmount</button>
     <button onClick={() => saleWidget.update({config: {theme: WidgetTheme.LIGHT}})}>Update Config Light</button>
     <button onClick={() => saleWidget.update({config: {theme: WidgetTheme.DARK}})}>Update Config Dark</button>
+    <button onClick={() => saleWidget?.update({ config: { language: 'en'}})}>EN</button>
+    <button onClick={() => saleWidget?.update({ config: { language: 'ja'}})}>JA</button>
       <br />
       <br />
       <br />

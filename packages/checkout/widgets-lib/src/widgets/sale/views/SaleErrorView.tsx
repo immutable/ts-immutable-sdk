@@ -1,9 +1,8 @@
 import { BaseTokens } from '@biom3/design-tokens';
 import { useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 import { StatusType } from '../../../components/Status/StatusType';
 import { StatusView, StatusViewProps } from '../../../components/Status/StatusView';
-import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
-import { text } from '../../../resources/text/textConfig';
 import { PaymentTypes, SaleErrorTypes } from '../types';
 import { useSaleContext } from '../context/SaleContextProvider';
 import { sendSaleWidgetCloseEvent } from '../SaleWidgetEvents';
@@ -16,20 +15,13 @@ interface ErrorHandlerConfig {
   statusIconStyles?: Record<string, string>;
 }
 
-interface ErrorTextConfig {
-  description: string;
-  primaryAction?: string;
-  secondaryAction?: string;
-}
-
-type AllErrorTextConfigs = Record<SaleErrorTypes, ErrorTextConfig>;
-
 type SaleErrorViewProps = {
   errorType: SaleErrorTypes | undefined,
   biomeTheme: BaseTokens
 };
 
 export function SaleErrorView({ errorType = SaleErrorTypes.DEFAULT, biomeTheme }: SaleErrorViewProps) {
+  const { t } = useTranslation();
   const { goBackToPaymentMethods } = useSaleContext();
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
@@ -100,15 +92,14 @@ export function SaleErrorView({ errorType = SaleErrorTypes.DEFAULT, biomeTheme }
   };
 
   const getErrorViewProps = (): StatusViewProps => {
-    const errorTextConfig: AllErrorTextConfigs = text.views[SaleWidgetViews.SALE_FAIL].errors;
     const handlers = errorHandlersConfig[errorType] || {};
 
     return {
       testId: 'fail-view',
-      statusText: errorTextConfig[errorType].description,
-      actionText: errorTextConfig[errorType]?.primaryAction,
+      statusText: t(`views.SALE_FAIL.errors.${errorType}.description`),
+      actionText: t(`views.SALE_FAIL.errors.${errorType}.primaryAction`),
       onActionClick: handlers?.onActionClick,
-      secondaryActionText: errorTextConfig[errorType].secondaryAction,
+      secondaryActionText: t(`views.SALE_FAIL.errors.${errorType}.secondaryAction`),
       onSecondaryActionClick: handlers?.onSecondaryActionClick,
       onCloseClick: closeWidget,
       statusType: handlers.statusType,

@@ -6,11 +6,6 @@ import { ImmutableConfiguration, Environment } from '@imtbl/config';
 import { 
     TokenBridge, 
     BridgeConfiguration, 
-    ETH_SEPOLIA_TO_ZKEVM_TESTNET,
-    ETH_SEPOLIA_CHAIN_ID,
-    ZKEVM_TESTNET_CHAIN_ID,
-    ApproveBridgeRequest,
-    ApproveBridgeResponse,
     BridgeTxRequest,
     BridgeTxResponse,
 } from '@imtbl/bridge-sdk';
@@ -26,7 +21,7 @@ async function getBridgeTxs() {
       baseConfig: new ImmutableConfiguration({
         environment: Environment.SANDBOX,
       }),
-      bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
+      bridgeInstance: params.bridgeInstance,
       rootProvider: params.rootProvider,
       childProvider: params.childProvider,
     });
@@ -34,12 +29,12 @@ async function getBridgeTxs() {
     const tokenBridge = new TokenBridge(bridgeConfig);
 
     const depositReq: BridgeTxRequest = {
-      senderAddress: params.depositor,
+      senderAddress: params.sender,
       recipientAddress: params.recipient,
-      token: params.sepoliaToken,
+      token: params.rootToken,
       amount: params.amount,
-      sourceChainId: ETH_SEPOLIA_CHAIN_ID,
-      destinationChainId: ZKEVM_TESTNET_CHAIN_ID,
+      sourceChainId: bridgeConfig.bridgeInstance.rootChainID,
+      destinationChainId: bridgeConfig.bridgeInstance.childChainID,
       gasMultiplier: 1.1,
     }
 
@@ -49,16 +44,16 @@ async function getBridgeTxs() {
       const depositRes: BridgeTxResponse = await tokenBridge.getUnsignedBridgeTx(depositReq);
       console.log('depositRes', depositRes);
     } catch(err) {
-      console.log('depositErr', err);
+      console.error('depositErr', err);
     }
 
     const depositNativeReq: BridgeTxRequest = {
-      senderAddress: params.depositor,
+      senderAddress: params.sender,
       recipientAddress: params.recipient,
       token: 'NATIVE',
       amount: params.amount,
-      sourceChainId: ETH_SEPOLIA_CHAIN_ID,
-      destinationChainId: ZKEVM_TESTNET_CHAIN_ID,
+      sourceChainId: bridgeConfig.bridgeInstance.rootChainID,
+      destinationChainId: bridgeConfig.bridgeInstance.childChainID,
       gasMultiplier: 1.1,
     }
 
@@ -68,16 +63,16 @@ async function getBridgeTxs() {
       const depositNativeRes: BridgeTxResponse = await tokenBridge.getUnsignedBridgeTx(depositNativeReq);
       console.log('depositNativeRes', depositNativeRes);
     } catch(err) {
-      console.log('depositNativeErr', err);
+      console.error('depositNativeErr', err);
     }
 
     const withdrawReq: BridgeTxRequest = {
-      senderAddress: params.depositor,
+      senderAddress: params.sender,
       recipientAddress: params.recipient,
-      token: params.sepoliaToken,
+      token: params.rootToken,
       amount: params.amount,
-      sourceChainId: ZKEVM_TESTNET_CHAIN_ID,
-      destinationChainId: ETH_SEPOLIA_CHAIN_ID,
+      sourceChainId: bridgeConfig.bridgeInstance.childChainID,
+      destinationChainId: bridgeConfig.bridgeInstance.rootChainID,
       gasMultiplier: 1.1,
     }
 
@@ -87,16 +82,16 @@ async function getBridgeTxs() {
       const withdrawRes: BridgeTxResponse = await tokenBridge.getUnsignedBridgeTx(withdrawReq);
       console.log('withdrawRes', withdrawRes);
     } catch(err) {
-      console.log('withdrawErr', err);
+      console.error('withdrawErr', err);
     }
 
     const withdrawNativeReq: BridgeTxRequest = {
-      senderAddress: params.depositor,
+      senderAddress: params.sender,
       recipientAddress: params.recipient,
       token: 'NATIVE',
       amount: params.amount,
-      sourceChainId: ZKEVM_TESTNET_CHAIN_ID,
-      destinationChainId: ETH_SEPOLIA_CHAIN_ID,
+      sourceChainId: bridgeConfig.bridgeInstance.childChainID,
+      destinationChainId: bridgeConfig.bridgeInstance.rootChainID,
       gasMultiplier: 1.1,
     }
 
@@ -106,7 +101,7 @@ async function getBridgeTxs() {
       const withdrawNativeRes: BridgeTxResponse = await tokenBridge.getUnsignedBridgeTx(withdrawNativeReq);
       console.log('withdrawNativeRes', withdrawNativeRes);
     } catch(err) {
-      console.log('withdrawNativeErr', err);
+      console.error('withdrawNativeErr', err);
     }
 }
 
@@ -115,6 +110,6 @@ async function getBridgeTxs() {
         await getBridgeTxs()
         console.log('Exiting successfully');
     } catch(err) {
-        console.log('Exiting with error', err)
+        console.error('Exiting with error', err)
     }
 })();

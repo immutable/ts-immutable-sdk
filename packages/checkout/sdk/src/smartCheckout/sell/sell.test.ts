@@ -22,6 +22,7 @@ import {
   signMessage,
 } from '../actions';
 import { SignTransactionStatusType } from '../actions/types';
+import { HttpClient } from '../../api/http';
 
 jest.mock('../../instance');
 jest.mock('../smartCheckout');
@@ -39,9 +40,10 @@ describe('sell', () => {
       }),
     } as unknown as Web3Provider;
 
+    const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
     config = new CheckoutConfiguration({
       baseConfig: { environment: Environment.SANDBOX },
-    });
+    }, mockedHttpClient);
 
     jest.spyOn(console, 'info').mockImplementation(() => {});
   });
@@ -1103,7 +1105,7 @@ describe('sell', () => {
       const buyToken: BuyToken = {
         type: ItemType.ERC20,
         amount: '1',
-        contractAddress: '0xERC20',
+        tokenAddress: '0xERC20',
       };
 
       const result = getBuyToken(buyToken);
@@ -1119,7 +1121,7 @@ describe('sell', () => {
       const buyToken: BuyToken = {
         type: ItemType.ERC20,
         amount: '1',
-        contractAddress: '0xERC20',
+        tokenAddress: '0xERC20',
       };
 
       const result = getBuyToken(buyToken, 6);

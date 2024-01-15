@@ -5,22 +5,23 @@ import {
   ChainId,
   FundingStepType,
   ItemType,
-  OnRampProvider,
 } from '../../../types';
 import { allowListCheckForOnRamp } from '../../allowList';
 import { onRampRoute } from './onRampRoute';
 import { BalanceERC20Requirement, BalanceERC721Requirement } from '../../balanceCheck/types';
+import { HttpClient } from '../../../api/http';
 
 jest.mock('../../allowList/allowListCheck');
 
 describe('onRampRoute', () => {
+  const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
   const config = new CheckoutConfiguration({
     baseConfig: { environment: Environment.SANDBOX },
-  });
+  }, mockedHttpClient);
 
   beforeEach(() => {
-    (allowListCheckForOnRamp as jest.Mock).mockResolvedValue({
-      [OnRampProvider.TRANSAK]: [
+    (allowListCheckForOnRamp as jest.Mock).mockResolvedValue(
+      [
         {
           address: '0x65AA7a21B0f3ce9B478aAC3408fE75b423939b1F',
           name: 'Ethereum',
@@ -33,7 +34,7 @@ describe('onRampRoute', () => {
           decimals: 18,
         },
       ],
-    });
+    );
   });
 
   it('should return the onRamp route if the ERC20 balance requirement is in the allowlist', async () => {
@@ -187,9 +188,7 @@ describe('onRampRoute', () => {
       },
     } as BalanceERC20Requirement;
 
-    (allowListCheckForOnRamp as jest.Mock).mockResolvedValue({
-      [OnRampProvider.TRANSAK]: [],
-    });
+    (allowListCheckForOnRamp as jest.Mock).mockResolvedValue([]);
 
     const route = await onRampRoute(
       config,
@@ -226,9 +225,7 @@ describe('onRampRoute', () => {
       },
     } as BalanceERC721Requirement;
 
-    (allowListCheckForOnRamp as jest.Mock).mockResolvedValue({
-      [OnRampProvider.TRANSAK]: [],
-    });
+    (allowListCheckForOnRamp as jest.Mock).mockResolvedValue([]);
 
     const route = await onRampRoute(
       config,

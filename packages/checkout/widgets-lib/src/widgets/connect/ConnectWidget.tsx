@@ -7,6 +7,7 @@ import {
   Checkout, ConnectTargetLayer, ConnectWidgetParams,
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
+import { useTranslation } from 'react-i18next';
 import {
   sendCloseWidgetEvent,
   sendConnectFailedEvent,
@@ -61,6 +62,7 @@ export function ConnectWidget({
   allowedChains,
   deepLink = ConnectWidgetViews.CONNECT_WALLET,
 }: ConnectWidgetInputs) {
+  const { t } = useTranslation();
   const { environment } = config;
 
   const errorText = text.views[SharedViews.ERROR_VIEW].actionText;
@@ -170,8 +172,8 @@ export function ConnectWidget({
           {view.type === ConnectWidgetViews.SUCCESS && provider && (
             <ConnectLoaderSuccess>
               <StatusView
-                statusText="Connection secure"
-                actionText="Continue"
+                statusText={t('views.CONNECT_SUCCESS.status')}
+                actionText={t('views.CONNECT_SUCCESS.action')}
                 onActionClick={() => sendCloseEvent()}
                 onRenderEvent={handleConnectSuccess}
                 statusType={StatusType.SUCCESS}

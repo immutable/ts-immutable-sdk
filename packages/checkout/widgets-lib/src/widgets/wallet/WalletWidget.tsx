@@ -198,31 +198,33 @@ export function WalletWidget(props: WalletWidgetInputs) {
       <CryptoFiatProvider environment={environment}>
         <WalletContext.Provider value={walletReducerValues}>
           {viewState.view.type === SharedViews.LOADING_VIEW && (
-          <LoadingView loadingText={loadingText} />
+            <LoadingView loadingText={loadingText} />
           )}
           {viewState.view.type === WalletWidgetViews.WALLET_BALANCES && (
-          <WalletBalances balancesLoading={balancesLoading} setBalancesLoading={setBalancesLoading} />
+            <WalletBalances balancesLoading={balancesLoading} setBalancesLoading={setBalancesLoading} />
           )}
           {viewState.view.type === WalletWidgetViews.SETTINGS && <Settings />}
           {viewState.view.type === WalletWidgetViews.COIN_INFO && (
-          <CoinInfo />
+            <CoinInfo />
           )}
           {viewState.view.type === SharedViews.ERROR_VIEW && (
-          <ErrorView
-            actionText={errorActionText}
-            onActionClick={errorAction}
-            onCloseClick={() => sendWalletWidgetCloseEvent(eventTarget)}
-          />
+            <ErrorView
+              actionText={errorActionText}
+              onActionClick={errorAction}
+              onCloseClick={() => sendWalletWidgetCloseEvent(eventTarget)}
+            />
           )}
           {viewState.view.type === SharedViews.TOP_UP_VIEW && (
-          <TopUpView
-            analytics={{ userJourney: UserJourney.WALLET }}
-            widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
-            showOnrampOption={isOnRampEnabled}
-            showSwapOption={isSwapEnabled}
-            showBridgeOption={isBridgeEnabled}
-            onCloseButtonClick={() => sendWalletWidgetCloseEvent(eventTarget)}
-          />
+            <TopUpView
+              analytics={{ userJourney: UserJourney.WALLET }}
+              widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
+              checkout={checkout}
+              provider={provider}
+              showOnrampOption={isOnRampEnabled}
+              showSwapOption={isSwapEnabled}
+              showBridgeOption={isBridgeEnabled}
+              onCloseButtonClick={() => sendWalletWidgetCloseEvent(eventTarget)}
+            />
           )}
         </WalletContext.Provider>
       </CryptoFiatProvider>

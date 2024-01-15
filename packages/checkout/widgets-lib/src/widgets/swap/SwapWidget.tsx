@@ -11,6 +11,7 @@ import {
 } from '@imtbl/checkout-sdk';
 import { ImmutableConfiguration } from '@imtbl/config';
 import { Exchange, ExchangeOverrides } from '@imtbl/dex-sdk';
+import { useTranslation } from 'react-i18next';
 import { SwapCoins } from './views/SwapCoins';
 import { LoadingView } from '../../views/loading/LoadingView';
 import {
@@ -36,7 +37,6 @@ import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { DEFAULT_BALANCE_RETRY_POLICY, getL2ChainId } from '../../lib';
 import { StatusView } from '../../components/Status/StatusView';
 import { StatusType } from '../../components/Status/StatusType';
-import { text } from '../../resources/text/textConfig';
 import { ErrorView } from '../../views/error/ErrorView';
 import {
   sendSwapFailedEvent,
@@ -49,10 +49,7 @@ import { ApproveERC20Onboarding } from './views/ApproveERC20Onboarding';
 import { TopUpView } from '../../views/top-up/TopUpView';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
-import {
-  GetAllowedBalancesResultType,
-  getAllowedBalances,
-} from '../../lib/balance';
+import { getAllowedBalances } from '../../lib/balance';
 import { UserJourney, useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 
 export type SwapWidgetInputs = SwapWidgetParams & {
@@ -61,14 +58,11 @@ export type SwapWidgetInputs = SwapWidgetParams & {
 
 export function SwapWidget({
   amount,
-  fromContractAddress,
-  toContractAddress,
+  fromTokenAddress,
+  toTokenAddress,
   config,
 }: SwapWidgetInputs) {
-  const { success, failed, rejected } = text.views[SwapWidgetViews.SWAP];
-  const loadingText = text.views[SharedViews.LOADING_VIEW].text;
-  const { actionText } = text.views[SharedViews.ERROR_VIEW];
-
+  const { t } = useTranslation();
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
@@ -129,16 +123,16 @@ export function SwapWidget({
     if (!checkout) throw new Error('loadBalances: missing checkout');
     if (!provider) throw new Error('loadBalances: missing provider');
 
-    let tokensAndBalances: GetAllowedBalancesResultType = {
-      allowList: { tokens: [] },
-      allowedBalances: [],
-    };
     try {
-      tokensAndBalances = await getAllowedBalances({
+      const tokensAndBalances = await getAllowedBalances({
         checkout,
         provider,
         allowTokenListType: TokenFilterTypes.SWAP,
       });
+
+      // Why? Check getAllowedBalances
+      if (tokensAndBalances === undefined) return false;
+
       swapDispatch({
         payload: {
           type: SwapActions.SET_ALLOWED_TOKENS,
@@ -213,18 +207,18 @@ export function SwapWidget({
       <SwapContext.Provider value={swapReducerValues}>
         <CryptoFiatProvider environment={environment}>
           {viewState.view.type === SharedViews.LOADING_VIEW && (
-          <LoadingView loadingText={loadingText} />
+          <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
           )}
           {viewState.view.type === SwapWidgetViews.SWAP && (
           <SwapCoins
             theme={theme}
             fromAmount={viewState.view.data?.fromAmount ?? amount}
-            fromContractAddress={
-                  viewState.view.data?.fromContractAddress
-                  ?? fromContractAddress
+            fromTokenAddress={
+                  viewState.view.data?.fromTokenAddress
+                  ?? fromTokenAddress
                 }
-            toContractAddress={
-                  viewState.view.data?.toContractAddress ?? toContractAddress
+            toTokenAddress={
+                  viewState.view.data?.toTokenAddress ?? toTokenAddress
                 }
           />
           )}
@@ -239,8 +233,8 @@ export function SwapWidget({
           )}
           {viewState.view.type === SwapWidgetViews.SUCCESS && (
           <StatusView
-            statusText={success.text}
-            actionText={success.actionText}
+            statusText={t('views.SWAP.success.text')}
+            actionText={t('views.SWAP.success.actionText')}
             onRenderEvent={() => {
               page({
                 userJourney: UserJourney.SWAP,
@@ -258,8 +252,8 @@ export function SwapWidget({
           )}
           {viewState.view.type === SwapWidgetViews.FAIL && (
           <StatusView
-            statusText={failed.text}
-            actionText={failed.actionText}
+            statusText={t('views.SWAP.failed.text')}
+            actionText={t('views.SWAP.failed.actionText')}
             onRenderEvent={() => {
               page({
                 userJourney: UserJourney.SWAP,
@@ -287,8 +281,8 @@ export function SwapWidget({
           )}
           {viewState.view.type === SwapWidgetViews.PRICE_SURGE && (
           <StatusView
-            statusText={rejected.text}
-            actionText={rejected.actionText}
+            statusText={t('views.SWAP.rejected.text')}
+            actionText={t('views.SWAP.rejected.actionText')}
             onRenderEvent={() => {
               page({
                 userJourney: UserJourney.SWAP,
@@ -316,7 +310,7 @@ export function SwapWidget({
           )}
           {viewState.view.type === SharedViews.ERROR_VIEW && (
           <ErrorView
-            actionText={actionText}
+            actionText={t('views.ERROR_VIEW.actionText')}
             onActionClick={async () => {
               setErrorViewLoading(true);
               const data = viewState.view as ErrorViewType;
@@ -335,14 +329,16 @@ export function SwapWidget({
           />
           )}
           {viewState.view.type === SharedViews.TOP_UP_VIEW && (
-          <TopUpView
-            analytics={{ userJourney: UserJourney.SWAP }}
-            widgetEvent={IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT}
-            showOnrampOption={isOnRampEnabled}
-            showSwapOption={isSwapEnabled}
-            showBridgeOption={isBridgeEnabled}
-            onCloseButtonClick={() => sendSwapWidgetCloseEvent(eventTarget)}
-          />
+            <TopUpView
+              analytics={{ userJourney: UserJourney.SWAP }}
+              checkout={checkout}
+              provider={provider}
+              widgetEvent={IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT}
+              showOnrampOption={isOnRampEnabled}
+              showSwapOption={isSwapEnabled}
+              showBridgeOption={isBridgeEnabled}
+              onCloseButtonClick={() => sendSwapWidgetCloseEvent(eventTarget)}
+            />
           )}
         </CryptoFiatProvider>
       </SwapContext.Provider>

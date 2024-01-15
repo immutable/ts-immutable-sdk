@@ -5,6 +5,7 @@ export enum OnRampEventType {
   CLOSE_WIDGET = 'close-widget',
   SUCCESS = 'success',
   FAILURE = 'failure',
+  LANGUAGE_CHANGED = 'language-changed',
 }
 
 /**

@@ -12,11 +12,12 @@ import { OnRamp } from 'widgets/on-ramp/OnRampWidgetRoot';
 import { Wallet } from 'widgets/wallet/WalletWidgetRoot';
 import { Sale } from 'widgets/sale/SaleWidgetRoot';
 import { Web3Provider } from '@ethersproject/providers';
-import { XBridge } from 'widgets/x-bridge/XBridgeWidgetRoot';
+import { Bridge } from 'widgets/bridge/BridgeWidgetRoot';
 import {
   sendProviderUpdatedEvent,
   addProviderListenersForWidgetRoot,
 } from './lib';
+import './i18n';
 
 export class WidgetsFactory implements IWidgetsFactory {
   private sdk: Checkout;
@@ -44,7 +45,7 @@ export class WidgetsFactory implements IWidgetsFactory {
         }) as Widget<WidgetType.CONNECT> as Widget<T>;
       }
       case WidgetType.BRIDGE: {
-        return new XBridge(this.sdk, {
+        return new Bridge(this.sdk, {
           config: { ...this.widgetConfig, ...(config) },
           provider,
         }) as Widget<WidgetType.BRIDGE> as Widget<T>;

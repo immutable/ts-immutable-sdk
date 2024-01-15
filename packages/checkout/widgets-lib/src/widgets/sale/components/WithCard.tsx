@@ -1,10 +1,8 @@
 import { useMemo } from 'react';
-
+import { useTranslation } from 'react-i18next';
 import { useSaleContext } from '../context/SaleContextProvider';
 import { TransakIframe } from '../../../components/Transak/TransakIframe';
 import { TransakNFTData } from '../../../components/Transak/TransakTypes';
-import { text as textConfig } from '../../../resources/text/textConfig';
-import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 import { SaleErrorTypes } from '../types';
 
 export interface WithCardProps {
@@ -17,6 +15,7 @@ export interface WithCardProps {
 }
 
 export function WithCard(props: WithCardProps) {
+  const { t } = useTranslation();
   const {
     onInit,
     onOpen,
@@ -25,7 +24,6 @@ export function WithCard(props: WithCardProps) {
     onOrderCompleted,
     onOrderFailed,
   } = props;
-  const { screenTitle, loading } = textConfig.views[SaleWidgetViews.PAY_WITH_CARD];
   const {
     recipientEmail, recipientAddress, isPassportWallet, signResponse, goToErrorView,
   } = useSaleContext();
@@ -59,13 +57,13 @@ export function WithCard(props: WithCardProps) {
       email={recipientEmail}
       walletAddress={recipientAddress}
       isPassportWallet={isPassportWallet}
-      exchangeScreenTitle={screenTitle}
-      loadingText={loading}
+      exchangeScreenTitle={t('views.PAY_WITH_CARD.screenTitle')}
+      loadingText={t('views.PAY_WITH_CARD.loading')}
       nftData={nftData}
       calldata={executeTxn.rawData}
       cryptoCurrencyCode={signResponse.order.currency.name}
       estimatedGasLimit={executeTxn.gasEstimate}
-      smartContractAddress={executeTxn.contractAddress}
+      smartContractAddress={executeTxn.tokenAddress}
       partnerOrderId={executeTxn.params.reference}
       onInit={onInit}
       onOpen={onOpen}

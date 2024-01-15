@@ -4,9 +4,9 @@ import { ModuleConfiguration } from '@imtbl/config';
 export type ExchangeContracts = {
   multicall: string;
   coreFactory: string;
-  quoterV2: string;
-  peripheryRouter: string;
-  secondaryFee: string;
+  quoter: string;
+  swapRouter: string;
+  immutableSwapProxy: string;
 };
 
 /**
@@ -183,7 +183,8 @@ export type ExchangeOverrides = {
  * @property {number} chainId - The chain ID
  * @property {@link SecondaryFee[]} secondaryFees - The secondary fees for a swap
  */
-export interface ExchangeModuleConfiguration extends ModuleConfiguration<ExchangeOverrides> {
+export interface ExchangeModuleConfiguration
+  extends ModuleConfiguration<ExchangeOverrides> {
   chainId: number;
   secondaryFees?: SecondaryFee[];
 }

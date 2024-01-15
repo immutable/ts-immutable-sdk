@@ -39,7 +39,10 @@ export interface AxelarChainDetails {
 export type BridgeContracts = {
   rootERC20BridgeFlowRate: Address;
   childERC20Bridge: Address;
-  wrappedIMX: Address;
+  rootChainIMX: Address;
+  rootChainWrappedETH: Address;
+  childChainWrappedETH: Address;
+  childChainWrappedIMX: Address;
 };
 
 /**
@@ -99,12 +102,12 @@ export enum BridgeFeeActions {
  * @property {string} FINALISE_WITHDRAWAL - The gas required to finalise a withdrawal from the flow rate queue.
  */
 export enum BridgeMethodsGasLimit { // @TODO test methods on chain and put correct values here
-  DEPOSIT_SOURCE = 500000,
-  DEPOSIT_DESTINATION = 700000,
-  WITHDRAW_SOURCE = 400000,
-  WITHDRAW_DESTINATION = 700000,
-  MAP_TOKEN_SOURCE = 300000,
-  MAP_TOKEN_DESTINATION = 700000,
+  DEPOSIT_SOURCE = 200000,
+  DEPOSIT_DESTINATION = 200000,
+  WITHDRAW_SOURCE = 200000,
+  WITHDRAW_DESTINATION = 250000,
+  MAP_TOKEN_SOURCE = 200000,
+  MAP_TOKEN_DESTINATION = 200000,
   FINALISE_WITHDRAWAL = 200000,
 }
 
@@ -247,17 +250,18 @@ export interface BridgeTxResponse {
 
 /**
  * @typedef {Object} TxStatusRequest
+ * @property {string} sourceChainId - The chain ID of the source chain.
  * @property {Array<TxStatusRequestItem>} transactions - The transaction items to query the status for.
  */
 export interface TxStatusRequest {
   transactions: Array<TxStatusRequestItem>
+  sourceChainId: string;
 }
 
 /**
  * @typedef {Object} TxStatusRequestItem
- * @property {string} transactionHash - The transaction hash on the source chain of the bridge transaction.
- * @property {string} sourceChainId - The source chainId.
- */
+ * @property {string} txHash - The transaction hash on the source chain of the bridge transaction.
+*/
 export interface TxStatusRequestItem {
   txHash: string;
 }
@@ -272,16 +276,26 @@ export interface TxStatusResponse {
 
 /**
  * @typedef {Object} TxStatusResponseItem
- * @property {string} transactionHash - The transaction hash on the source chain of the bridge transaction.
- * @property {string} sourceChainId - The source chainId.
- */
+ * @property {string} txHash - The transaction hash on the source chain of the bridge transaction.
+ * @property {Address} sender - The address of the sender on the source chain.
+ * @property {Address} recipient - The address of the recipient on the destination chain.
+ * @property {FungibleToken} token - The token being bridged.
+ * @property {ethers.BigNumber} amount - The amount of the transaction.
+ * @property {StatusResponse} status - The status of the transaction.
+ * @property {any} data - Any extra data relevant to the transaction.
+*/
 export interface TxStatusResponseItem {
-  transactionHash: string;
+  txHash: string;
+  sender: Address;
+  recipient: Address;
+  token: FungibleToken;
+  amount: ethers.BigNumber;
   status: StatusResponse;
   data: any;
 }
 
 export enum StatusResponse {
+  PENDING = 'PENDING',
   PROCESSING = 'PROCESSING',
   COMPLETE = 'COMPLETE',
   RETRY = 'RETRY',
@@ -295,7 +309,7 @@ export enum StatusResponse {
  * @property {FungibleToken} token - Optional param to filter the flowRate info by. If not specified info for all tokens will be returned.
 */
 export interface FlowRateInfoRequest {
-  token?: FungibleToken;
+  tokens: Array<FungibleToken>;
 }
 
 /**
@@ -318,18 +332,18 @@ export interface FlowRateInfoResponse {
  * @property {string} refillRate - The number of tokens added per second.
  */
 export interface FlowRateInfoItem {
-  capacity: string;
-  depth: string;
+  capacity: ethers.BigNumber;
+  depth: ethers.BigNumber;
   refillTime: number;
-  refillRate: string;
+  refillRate: ethers.BigNumber;
 }
 
 /**
  * @typedef {Object} PendingWithdrawalsRequest
- * @property {Address} receiver - The address for which the pending withdrawals should be retrieved.
+ * @property {Address} recipient - The address for which the pending withdrawals should be retrieved.
  */
 export interface PendingWithdrawalsRequest {
-  receiver: Address;
+  recipient: Address;
 }
 
 /**
@@ -338,24 +352,33 @@ export interface PendingWithdrawalsRequest {
  * @property {Address} childToken - The address of the corresponding token on the child chain.
  */
 export interface PendingWithdrawalsResponse {
-  pending: Array<PendingWithdrawals>;
+  pending: Array<PendingWithdrawal>;
 }
 
-export interface PendingWithdrawals {
+export interface PendingWithdrawal {
   canWithdraw: boolean,
   withdrawer: Address,
   token: FungibleToken,
-  amount: string,
+  amount: ethers.BigNumber,
   timeoutStart: number,
   timeoutEnd: number,
 }
 
+export interface RootBridgePendingWithdrawal {
+  withdrawer: Address,
+  token: FungibleToken,
+  amount: ethers.BigNumber,
+  timestamp: ethers.BigNumber,
+}
+
 /**
  * @typedef {Object} FlowRateWithdrawRequest
- * @property {FungibleToken} receiver - The address for which the flow rate withdrawal transaction should be constructed.
+ * @property {FungibleToken} recipient - The address for which the flow rate withdrawal transaction should be constructed.
+ * @property {number} index - The index of the flow rate withdrawal to be processed.
  */
 export interface FlowRateWithdrawRequest {
-  receiver: Address;
+  recipient: Address;
+  index: number;
 }
 
 /**
@@ -363,7 +386,8 @@ export interface FlowRateWithdrawRequest {
  * @property {ethers.providers.TransactionRequest} unsignedTx - The unsigned transaction for the flow rate withdrawal.
  */
 export interface FlowRateWithdrawResponse {
-  unsignedTx: ethers.providers.TransactionRequest;
+  pendingWithdrawal: PendingWithdrawal,
+  unsignedTx: ethers.providers.TransactionRequest | null;
 }
 
 /**

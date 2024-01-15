@@ -14,6 +14,7 @@ export const ZKEVM_NATIVE_TOKEN = {
   name: 'IMX',
   symbol: 'IMX',
   decimals: DEFAULT_TOKEN_DECIMALS,
+  address: NATIVE,
 };
 
 /**
@@ -163,7 +164,7 @@ export const BLOCKSCOUT_CHAIN_URL_MAP: {
     nativeToken: SANDBOX_CHAIN_ID_NETWORK_MAP.get(ChainId.IMTBL_ZKEVM_TESTNET)!.nativeCurrency,
   },
   [ChainId.IMTBL_ZKEVM_MAINNET]: {
-    url: 'https://explorer.mainnet.immutable.com',
+    url: 'https://explorer.immutable.com',
     nativeToken: PRODUCTION_CHAIN_ID_NETWORK_MAP.get(ChainId.IMTBL_ZKEVM_MAINNET)!.nativeCurrency,
   },
   [ChainId.SEPOLIA]: {

@@ -1,15 +1,13 @@
 import {
   BridgeFundingStep,
-  ChainId, FundingRoute, FundingStepType, ItemType, SwapFundingStep, WidgetTheme,
+  ChainId, Checkout, FeeType, FundingRoute, FundingStepType, ItemType, SwapFundingStep,
 } from '@imtbl/checkout-sdk';
-import { Environment } from '@imtbl/config';
 import { mount } from 'cypress/react18';
 import { BigNumber, utils } from 'ethers';
 import { cy, describe } from 'local-cypress';
 import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { CustomAnalyticsProvider } from '../../../../context/analytics-provider/CustomAnalyticsProvider';
 import { cyIntercept, cySmartGet } from '../../../../lib/testUtils';
-import { StrongCheckoutWidgetsConfig } from '../../../../lib/withDefaultWidgetConfig';
 import { FundingRouteSelect } from './FundingRouteSelect';
 
 describe('FundingRouteSelect View', () => {
@@ -17,14 +15,6 @@ describe('FundingRouteSelect View', () => {
     cyIntercept();
     cy.viewport('ipad-2');
   });
-
-  const config: StrongCheckoutWidgetsConfig = {
-    environment: Environment.SANDBOX,
-    theme: WidgetTheme.DARK,
-    isBridgeEnabled: true,
-    isSwapEnabled: true,
-    isOnRampEnabled: true,
-  };
 
   const bridgeFundingStep: BridgeFundingStep = {
     type: FundingStepType.BRIDGE,
@@ -46,15 +36,18 @@ describe('FundingRouteSelect View', () => {
       },
     },
     fees: {
-      approvalGasFees: {
+      approvalGasFee: {
+        type: FeeType.GAS,
         amount: BigNumber.from(0),
         formattedAmount: '0',
       },
-      bridgeGasFees: {
+      bridgeGasFee: {
+        type: FeeType.GAS,
         amount: BigNumber.from(0),
         formattedAmount: '0',
       },
       bridgeFees: [{
+        type: FeeType.BRIDGE_FEE,
         amount: BigNumber.from(0),
         formattedAmount: '0',
       }],
@@ -82,15 +75,18 @@ describe('FundingRouteSelect View', () => {
       },
     },
     fees: {
-      approvalGasFees: {
+      approvalGasFee: {
+        type: FeeType.GAS,
         amount: BigNumber.from(0),
         formattedAmount: '0',
       },
-      swapGasFees: {
+      swapGasFee: {
+        type: FeeType.GAS,
         amount: BigNumber.from(0),
         formattedAmount: '0',
       },
       swapFees: [{
+        type: FeeType.SWAP_FEE,
         amount: BigNumber.from(0),
         formattedAmount: '0',
       }],
@@ -106,7 +102,7 @@ describe('FundingRouteSelect View', () => {
     ];
     beforeEach(() => {
       mount(
-        <CustomAnalyticsProvider widgetConfig={config}>
+        <CustomAnalyticsProvider checkout={{} as Checkout}>
           <ViewContextTestComponent>
             <FundingRouteSelect fundingRoutes={fundingRoutes} onFundingRouteSelected={() => {}} />
           </ViewContextTestComponent>
@@ -141,7 +137,7 @@ describe('FundingRouteSelect View', () => {
     ];
     beforeEach(() => {
       mount(
-        <CustomAnalyticsProvider widgetConfig={config}>
+        <CustomAnalyticsProvider checkout={{} as Checkout}>
           <ViewContextTestComponent>
             <FundingRouteSelect fundingRoutes={fundingRoutes} onFundingRouteSelected={() => {}} />
           </ViewContextTestComponent>

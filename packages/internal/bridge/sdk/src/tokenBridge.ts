@@ -1,10 +1,24 @@
+/* eslint-disable no-console */
 /* eslint-disable class-methods-use-this */
 import axios, { AxiosResponse } from 'axios';
-import {
-  ETH_MAINNET_TO_ZKEVM_MAINNET, ETH_SEPOLIA_TO_ZKEVM_TESTNET, axelarAPIEndpoints, axelarChains, bridgeMethods,
-} from 'constants/bridges';
-import { BridgeConfiguration } from 'config';
 import { ethers } from 'ethers';
+import {
+  ETHEREUM_NATIVE_TOKEN_ADDRESS,
+  ETH_MAINNET_TO_ZKEVM_MAINNET,
+  ETH_SEPOLIA_TO_ZKEVM_TESTNET,
+  ZKEVM_DEVNET_CHAIN_ID,
+  ZKEVM_MAINNET_CHAIN_ID,
+  ZKEVM_TESTNET_CHAIN_ID,
+  axelarAPIEndpoints,
+  axelarChains,
+  bridgeMethods,
+} from './constants/bridges';
+import { ROOT_ERC20_BRIDGE_FLOW_RATE } from './contracts/ABIs/RootERC20BridgeFlowRate';
+import { ERC20 } from './contracts/ABIs/ERC20';
+import { BridgeError, BridgeErrorType, withBridgeError } from './errors';
+import { CHILD_ERC20_BRIDGE } from './contracts/ABIs/ChildERC20Bridge';
+import { getGasPriceInWei } from './lib/gasPriceInWei';
+import { BridgeConfiguration } from './config';
 import {
   BridgeFeeRequest,
   BridgeFeeResponse,
@@ -28,12 +42,14 @@ import {
   FlowRateWithdrawResponse,
   FlowRateInfoRequest,
   CalculateBridgeFeeResponse,
-} from 'types';
-import { ROOT_ERC20_BRIDGE_FLOW_RATE } from 'contracts/ABIs/RootERC20BridgeFlowRate';
-import { ERC20 } from 'contracts/ABIs/ERC20';
-import { BridgeError, BridgeErrorType, withBridgeError } from 'errors';
-import { CHILD_ERC20_BRIDGE } from 'contracts/ABIs/ChildERC20Bridge';
-import { getGasPriceInWei } from 'lib/gasPriceInWei';
+  RootBridgePendingWithdrawal,
+  TxStatusResponseItem,
+  PendingWithdrawal,
+  FungibleToken,
+  FlowRateInfoItem,
+} from './types';
+import { GMPStatus, GMPStatusResponse, GasPaidStatus } from './types/axelar';
+import { queryTransactionStatus } from './lib/gmpRecovery';
 
 /**
  * Represents a token bridge, which manages asset transfers between two chains.
@@ -284,6 +300,7 @@ export class TokenBridge {
       to: req.token,
       value: 0,
       from: req.senderAddress,
+      chainId: parseInt(req.sourceChainId, 10),
     };
 
     return {
@@ -513,6 +530,7 @@ export class TokenBridge {
           data,
           to: contractAddress,
           value: amount.add(fees.bridgeFee).toString(),
+          chainId: parseInt(sourceChainId, 10),
         },
       };
     }
@@ -539,6 +557,7 @@ export class TokenBridge {
         data,
         to: contractAddress,
         value: fees.bridgeFee.toString(),
+        chainId: parseInt(sourceChainId, 10),
       },
     } as BridgeTxResponse;
   }
@@ -641,6 +660,20 @@ export class TokenBridge {
     }
   }
 
+  private getAxelarEndpoint(source:string) {
+    let axelarAPIEndpoint:string;
+    if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
+      || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
+      axelarAPIEndpoint = axelarAPIEndpoints.mainnet;
+    } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
+      || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
+      axelarAPIEndpoint = axelarAPIEndpoints.testnet;
+    } else {
+      axelarAPIEndpoint = axelarAPIEndpoints.devnet;
+    }
+    return axelarAPIEndpoint;
+  }
+
   /**
  * Calculate the gas amount for a transaction using axelarjs-sdk.
  * @param {*} source - The source chainId.
@@ -673,16 +706,7 @@ export class TokenBridge {
       );
     }
 
-    let axelarApiEndpoint:string;
-    if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
-      || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
-      axelarApiEndpoint = axelarAPIEndpoints.mainnet;
-    } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
-      || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
-      axelarApiEndpoint = axelarAPIEndpoints.testnet;
-    } else {
-      axelarApiEndpoint = axelarAPIEndpoints.devnet;
-    }
+    const axelarAPIEndpoint:string = this.getAxelarEndpoint(source);
 
     let axiosResponse:AxiosResponse;
 
@@ -696,7 +720,7 @@ export class TokenBridge {
     };
 
     try {
-      axiosResponse = await axios.post(axelarApiEndpoint, estimateGasReq);
+      axiosResponse = await axios.post(axelarAPIEndpoint, estimateGasReq);
     } catch (error: any) {
       axiosResponse = error.response;
     }
@@ -720,32 +744,190 @@ export class TokenBridge {
     }
   }
 
-  // STUBBED ENDPOINTS FOR PHASE 2 -------------------------------------------
-
   /**
  * Queries the status of a bridge transaction.
  *
- * @param {TokenMappingRequest} req - The request object containing the token, rootChainId and childChainId.
- * @returns {Promise<TokenMappingResponse>} - A promise that resolves to an object containing the token mappings.
+ * @param {TxStatusRequest} req - The request object containing an array of transactions to query.
+ * @returns {Promise<TxStatusResponse>} - A promise that resolves to an array of transaction statuses.
  * @throws {BridgeError} - If an error occurs during the query, a BridgeError will be thrown with a specific error type.
- * @dev this SDK method is currently stubbed
  */
   public async getTransactionStatus(req: TxStatusRequest): Promise<TxStatusResponse> {
-    // eslint-disable-next-line no-console
-    console.log('stubbed response with req', req);
-    // Return the token mappings
-    return {
-      transactions: [{
-        transactionHash: '0x1234....',
-        status: StatusResponse.COMPLETE,
-        data: 'stubbed data',
-      }, {
-        transactionHash: '0xABCD....',
-        status: StatusResponse.PROCESSING,
-        data: 'stubbed data',
-      }],
+    const axelarAPIEndpoint:string = this.getAxelarEndpoint(req.sourceChainId);
 
+    const txStatusResponse:TxStatusResponse = {
+      transactions: [],
     };
+
+    const abiCoder = new ethers.utils.AbiCoder();
+
+    const statusPromises:Array<Promise<GMPStatusResponse>> = [];
+    for (const transaction of req.transactions) {
+      statusPromises.push(queryTransactionStatus(axelarAPIEndpoint, transaction.txHash));
+    }
+
+    let statusResponses:Array<GMPStatusResponse>;
+    try {
+      statusResponses = await Promise.all(statusPromises);
+    } catch (err) {
+      throw new BridgeError(
+        `Failed to fetch the Axelar Status with the reason: ${err}`,
+        BridgeErrorType.AXELAR_GAS_ESTIMATE_FAILED,
+      );
+    }
+
+    const unpaidGasStatus = [GasPaidStatus.GAS_UNPAID, GasPaidStatus.GAS_PAID_NOT_ENOUGH_GAS];
+
+    const isWithdraw = [
+      ZKEVM_DEVNET_CHAIN_ID,
+      ZKEVM_TESTNET_CHAIN_ID,
+      ZKEVM_MAINNET_CHAIN_ID].includes(req.sourceChainId);
+
+    let rootBridge:ethers.Contract;
+    if (isWithdraw) {
+      rootBridge = await withBridgeError<ethers.Contract>(
+        async () => {
+          const contract = new ethers.Contract(
+            this.config.bridgeContracts.rootERC20BridgeFlowRate,
+            ROOT_ERC20_BRIDGE_FLOW_RATE,
+            this.config.rootProvider,
+          );
+          return contract;
+        },
+        BridgeErrorType.INTERNAL_ERROR,
+      );
+    }
+
+    const flowRatePromises:Array<Promise<any>> = [];
+    const flowRateLengthPromises:Array<Promise<any>> = [];
+
+    const flowRatePromisesReceivers: Array<string> = [];
+
+    for (let i = 0, l = statusResponses.length; i < l; i++) {
+      let metaStatus: StatusResponse;
+
+      // consolidate axelar statuses to our own simplified metaStatus
+      switch (statusResponses[i].status) {
+        case GMPStatus.CANNOT_FETCH_STATUS:
+          metaStatus = StatusResponse.PENDING;
+          break;
+        case GMPStatus.SRC_GATEWAY_CALLED:
+        case GMPStatus.DEST_GATEWAY_APPROVED:
+        case GMPStatus.DEST_EXECUTING:
+        case GMPStatus.SRC_GATEWAY_CONFIRMED:
+        case GMPStatus.APPROVING:
+          metaStatus = StatusResponse.PROCESSING;
+          break;
+        case GMPStatus.NOT_EXECUTED:
+          metaStatus = StatusResponse.RETRY;
+          break;
+        case GMPStatus.NOT_EXECUTED_WITHOUT_GAS_PAID:
+        case GMPStatus.INSUFFICIENT_FEE:
+          metaStatus = StatusResponse.NOT_ENOUGH_GAS;
+          break;
+        case GMPStatus.DEST_EXECUTED:
+          metaStatus = StatusResponse.COMPLETE;
+          break;
+        default:
+          metaStatus = StatusResponse.ERROR;
+      }
+      if (statusResponses[i].gasPaidInfo) {
+        if (unpaidGasStatus.includes(statusResponses[i].gasPaidInfo!.status)) {
+          metaStatus = StatusResponse.NOT_ENOUGH_GAS;
+        }
+      }
+
+      let txItem = {
+        txHash: req.transactions[i].txHash,
+        status: metaStatus,
+        data: {
+          gmpResponse: statusResponses[i].status,
+        },
+      } as TxStatusResponseItem;
+
+      let decodedData;
+      if (statusResponses[i]?.callTx?.returnValues?.payload) {
+        decodedData = abiCoder.decode(
+          ['bytes32', 'address', 'address', 'address', 'uint256'],
+          statusResponses[i].callTx.returnValues.payload,
+        );
+        txItem = {
+          ...txItem,
+          token: decodedData[1],
+          sender: decodedData[2],
+          recipient: decodedData[3],
+          amount: decodedData[4],
+        };
+      }
+
+      let flowRatePromiseIndex: number = flowRatePromisesReceivers.findIndex((el) => el === txItem.recipient);
+      if (metaStatus === StatusResponse.COMPLETE
+        && isWithdraw && txItem.recipient) {
+        // consolidate the calls we have to make to the flow rate by receiver
+        if (flowRatePromiseIndex === -1) {
+          flowRatePromisesReceivers.push(txItem.recipient);
+          flowRatePromiseIndex = flowRatePromisesReceivers.length - 1;
+        }
+        txItem.data.flowRatePromiseIndex = flowRatePromiseIndex;
+      }
+
+      txStatusResponse.transactions.push(txItem);
+    }// for
+
+    for (const flowRateReceiver of flowRatePromisesReceivers) {
+      flowRateLengthPromises.push(rootBridge!.getPendingWithdrawalsLength(flowRateReceiver));
+    }
+
+    let flowRateLengthResponses:Array<ethers.BigNumber> = [];
+
+    try {
+      flowRateLengthResponses = await Promise.all(flowRateLengthPromises);
+    } catch (err) {
+      throw new BridgeError(
+        `Failed to fetch the Flow Rate pending lengths with the reason: ${err}`,
+        BridgeErrorType.FLOW_RATE_ERROR,
+      );
+    }
+
+    for (let i = 0, l = flowRatePromisesReceivers.length; i < l; i++) {
+      const indices: Array<number> = [];
+      const indicesLength = flowRateLengthResponses[i].toNumber();
+      for (let j = 0; j < indicesLength; j++) {
+        indices.push(j);
+      }
+      flowRatePromises.push(rootBridge!.getPendingWithdrawals(flowRatePromisesReceivers[i], indices));
+    }
+
+    let flowRateResponses:Array<Array<RootBridgePendingWithdrawal>> = [];
+    if (flowRatePromises.length > 0) {
+      try {
+        flowRateResponses = await Promise.all(flowRatePromises);
+      } catch (err) {
+        throw new BridgeError(
+          `Failed to fetch the Flow Rate statuses with the reason: ${err}`,
+          BridgeErrorType.FLOW_RATE_ERROR,
+        );
+      }
+    }
+
+    for (const txStatusRes of txStatusResponse.transactions) {
+      if (txStatusRes.data.flowRatePromiseIndex !== -1 && flowRateResponses[txStatusRes.data.flowRatePromiseIndex]) {
+        const flowRatedTx = flowRateResponses[txStatusRes.data.flowRatePromiseIndex].find((el) => (
+          el.amount.toString() === txStatusRes.amount.toString()
+          && el.token === txStatusRes.token
+          && el.withdrawer === txStatusRes.sender
+        ));
+        if (flowRatedTx) {
+          txStatusRes.status = StatusResponse.FLOW_RATE_CONTROLLED;
+          txStatusRes.data = {
+            timestamp: flowRatedTx.timestamp.toString(),
+          };
+        }
+      }
+      delete txStatusRes.data.flowRatePromiseIndex;
+    }
+
+    // Return the tx status response
+    return txStatusResponse;
   }
 
   /**
@@ -756,34 +938,68 @@ export class TokenBridge {
  * @throws {BridgeError} - If an error occurs during the query, a BridgeError will be thrown with a specific error type.
  * @dev this SDK method is currently stubbed
  */
-  public async getFlowRateInfo(req: FlowRateInfoRequest = {}): Promise<FlowRateInfoResponse> {
-    // eslint-disable-next-line no-console
-    console.log('stubbed response with req', req);
+  public async getFlowRateInfo(req: FlowRateInfoRequest): Promise<FlowRateInfoResponse> {
+    if (!req.tokens || req.tokens.length === 0) {
+      throw new BridgeError(
+        `invalid tokens array ${req.tokens}`,
+        BridgeErrorType.INVALID_TOKEN,
+      );
+    }
+
+    const rootBridge = await withBridgeError<ethers.Contract>(
+      async () => {
+        const contract = new ethers.Contract(
+          this.config.bridgeContracts.rootERC20BridgeFlowRate,
+          ROOT_ERC20_BRIDGE_FLOW_RATE,
+          this.config.rootProvider,
+        );
+        return contract;
+      },
+      BridgeErrorType.INTERNAL_ERROR,
+    );
+
+    const contractPromises: Array<Promise<any>> = [];
+    contractPromises.push(rootBridge.withdrawalQueueActivated());
+    contractPromises.push(rootBridge.withdrawalDelay());
+
+    for (let token of req.tokens) {
+      if (token.toUpperCase() === 'NATIVE') {
+        token = ETHEREUM_NATIVE_TOKEN_ADDRESS;
+      }
+      contractPromises.push(rootBridge.flowRateBuckets(token));
+    }
+    let contractPromisesRes:Array<any>;
+    try {
+      contractPromisesRes = await Promise.all(contractPromises);
+    } catch (err) {
+      throw new BridgeError(
+        'unable to query contract for flowrate info',
+        BridgeErrorType.INTERNAL_ERROR,
+      );
+    }
+
+    const tokensRes: Record<FungibleToken, FlowRateInfoItem> = {};
+
+    // @note it's i + 2 because the first 2 promises are not token buckets
+    for (let i = 0, l = req.tokens.length; i < l; i++) {
+      tokensRes[req.tokens[i]] = {
+        capacity: contractPromisesRes[i + 2].capacity,
+        depth: contractPromisesRes[i + 2].depth,
+        refillTime: contractPromisesRes[i + 2].refillTime.toNumber(),
+        refillRate: contractPromisesRes[i + 2].refillRate,
+      };
+    }
+
     // Return the token mappings
     return {
-      withdrawalQueueActivated: false,
-      withdrawalDelay: 86400,
-      tokens: {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        NATIVE: {
-          capacity: ethers.utils.parseUnits('10', 18).toString(),
-          depth: ethers.utils.parseUnits('10', 18).toString(),
-          refillTime: 1701227629,
-          refillRate: ethers.utils.parseUnits('10', 18).toString(),
-        },
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF': {
-          capacity: ethers.utils.parseUnits('10', 18).toString(),
-          depth: ethers.utils.parseUnits('10', 18).toString(),
-          refillTime: 1701227629,
-          refillRate: ethers.utils.parseUnits('10', 18).toString(),
-        },
-      },
+      withdrawalQueueActivated: contractPromisesRes[0],
+      withdrawalDelay: contractPromisesRes[1].toNumber(),
+      tokens: tokensRes,
     };
   }
 
   /**
- * Queries the status of a bridge transaction.
+ * Fetches the pending withdrawals for a given address.
  *
  * @param {PendingWithdrawalsRequest} req - The request object containing the reciever address.
  * @returns {Promise<PendingWithdrawalsResponse>} - A promise that resolves to an object containing the child token address.
@@ -792,25 +1008,66 @@ export class TokenBridge {
  */
   public async getPendingWithdrawals(req: PendingWithdrawalsRequest): Promise<PendingWithdrawalsResponse> {
     // eslint-disable-next-line no-console
-    console.log('stubbed response with req', req);
-    return {
-      pending: [{
-        canWithdraw: true,
-        withdrawer: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
-        token: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-        amount: ethers.utils.parseUnits('1', 18).toString(),
-        timeoutStart: 1698502429,
-        timeoutEnd: 1701227629,
+
+    if (!req.recipient) {
+      throw new BridgeError(
+        `invalid recipient ${req.recipient}`,
+        BridgeErrorType.INVALID_RECIPIENT,
+      );
+    }
+
+    const rootBridge = await withBridgeError<ethers.Contract>(
+      async () => {
+        const contract = new ethers.Contract(
+          this.config.bridgeContracts.rootERC20BridgeFlowRate,
+          ROOT_ERC20_BRIDGE_FLOW_RATE,
+          this.config.rootProvider,
+        );
+        return contract;
       },
-      {
-        canWithdraw: false,
-        withdrawer: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
-        token: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-        amount: ethers.utils.parseUnits('2', 18).toString(),
-        timeoutStart: 1698416029,
-        timeoutEnd: 1698502429,
-      }],
+      BridgeErrorType.INTERNAL_ERROR,
+    );
+
+    const pendingLength: ethers.BigNumber = await rootBridge.getPendingWithdrawalsLength(req.recipient);
+
+    const pendingWithdrawals: PendingWithdrawalsResponse = {
+      pending: [],
     };
+
+    if (pendingLength.toNumber() === 0) {
+      return pendingWithdrawals;
+    }
+
+    const indices: Array<number> = [];
+    for (let i = 0; i < pendingLength.toNumber(); i++) {
+      indices.push(i);
+    }
+
+    const pending:Array<RootBridgePendingWithdrawal> = await rootBridge.getPendingWithdrawals(req.recipient, indices);
+
+    const timestampNow = Math.floor(Date.now() / 1000);
+
+    const withdrawalDelay:ethers.BigNumber = await rootBridge.withdrawalDelay();
+
+    for (let i = 0, l = pending.length; i < l; i++) {
+      const timeoutEnd = pending[i].timestamp.add(withdrawalDelay).toNumber();
+      if (timeoutEnd > timestampNow) {
+        pendingWithdrawals.pending[i] = {
+          canWithdraw: false,
+        } as PendingWithdrawal;
+      } else {
+        pendingWithdrawals.pending[i] = {
+          canWithdraw: true,
+        } as PendingWithdrawal;
+      }
+      pendingWithdrawals.pending[i].withdrawer = pending[i].withdrawer;
+      pendingWithdrawals.pending[i].token = pending[i].token;
+      pendingWithdrawals.pending[i].amount = pending[i].amount;
+      pendingWithdrawals.pending[i].timeoutStart = pending[i].timestamp.toNumber();
+      pendingWithdrawals.pending[i].timeoutEnd = timeoutEnd;
+    }
+
+    return pendingWithdrawals;
   }
 
   /**
@@ -823,12 +1080,83 @@ export class TokenBridge {
  */
   public async getFlowRateWithdrawTx(req:FlowRateWithdrawRequest): Promise<FlowRateWithdrawResponse> {
     // eslint-disable-next-line no-console
-    console.log('stubbed response with req', req);
+
+    if (!req.recipient) {
+      throw new BridgeError(
+        `invalid recipient ${req.recipient}`,
+        BridgeErrorType.INVALID_RECIPIENT,
+      );
+    }
+
+    if (req.index < 0) {
+      throw new BridgeError(
+        `invalid index ${req.index}`,
+        BridgeErrorType.INVALID_FLOWRATE_INDEX,
+      );
+    }
+
+    const rootBridge = await withBridgeError<ethers.Contract>(
+      async () => {
+        const contract = new ethers.Contract(
+          this.config.bridgeContracts.rootERC20BridgeFlowRate,
+          ROOT_ERC20_BRIDGE_FLOW_RATE,
+          this.config.rootProvider,
+        );
+        return contract;
+      },
+      BridgeErrorType.INTERNAL_ERROR,
+    );
+
+    const pending:Array<RootBridgePendingWithdrawal> = await
+    rootBridge.getPendingWithdrawals(req.recipient, [req.index]);
+
+    if (pending[0].withdrawer === ethers.constants.AddressZero
+      || pending[0].token === ethers.constants.AddressZero
+      || pending[0].amount === ethers.BigNumber.from(0)
+      || pending[0].timestamp === ethers.BigNumber.from(0)) {
+      throw new BridgeError(
+        `pending withdrawal not found for ${req.recipient} at index ${req.index}`,
+        BridgeErrorType.FLOW_RATE_ERROR,
+      );
+    }
+
+    const withdrawalDelay:ethers.BigNumber = await rootBridge.withdrawalDelay();
+    const timeoutEnd = pending[0].timestamp.add(withdrawalDelay).toNumber();
+    const timestampNow = Math.floor(Date.now() / 1000);
+
+    if (timeoutEnd > timestampNow) {
+      return {
+        pendingWithdrawal: {
+          canWithdraw: false,
+          withdrawer: pending[0].withdrawer,
+          token: pending[0].token,
+          amount: pending[0].amount,
+          timeoutStart: pending[0].timestamp.toNumber(),
+          timeoutEnd,
+        },
+        unsignedTx: null,
+      };
+    }
+
+    const data:string = await withBridgeError<string>(async () => rootBridge.interface.encodeFunctionData(
+      'finaliseQueuedWithdrawal',
+      [req.recipient, req.index],
+    ), BridgeErrorType.INTERNAL_ERROR);
+
     return {
+      pendingWithdrawal: {
+        canWithdraw: true,
+        withdrawer: pending[0].withdrawer,
+        token: pending[0].token,
+        amount: pending[0].amount,
+        timeoutStart: pending[0].timestamp.toNumber(),
+        timeoutEnd,
+      },
       unsignedTx: {
-        data: 'stubbed flow rate withdrawal data',
-        to: '0x0',
+        data,
+        to: this.config.bridgeContracts.rootERC20BridgeFlowRate,
         value: 0,
+        chainId: parseInt(this.config.bridgeInstance.rootChainID, 10),
       },
     };
   }

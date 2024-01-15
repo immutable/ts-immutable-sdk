@@ -7,7 +7,6 @@ import {
   SignResponse,
   SignOrderInput,
   PaymentTypes,
-
   SignedOrderProduct,
   SignOrderError,
   ExecuteOrderResponse,
@@ -99,7 +98,7 @@ const toSignedProduct = (
   currency,
   collectionAddress: product.detail[0]?.collection_address,
   amount: product.detail.map(({ amount }) => amount),
-  tokenId: product.detail.map(({ token_id: tokenId }) => Number(tokenId)),
+  tokenId: product.detail.map(({ token_id: tokenId }) => tokenId),
 });
 
 const toSignResponse = (
@@ -137,7 +136,7 @@ const toSignResponse = (
       totalAmount: Number(order.total_amount),
     },
     transactions: transactions.map((transaction) => ({
-      contractAddress: transaction.contract_address,
+      tokenAddress: transaction.contract_address,
       gasEstimate: transaction.gas_estimate,
       methodCall: transaction.method_call,
       params: {
@@ -154,7 +153,7 @@ export const useSignOrder = (input: SignOrderInput) => {
   const {
     provider,
     items,
-    fromContractAddress,
+    fromTokenAddress,
     recipientAddress,
     env,
     environmentId,
@@ -171,7 +170,10 @@ export const useSignOrder = (input: SignOrderInput) => {
   });
 
   const setExecuteTransactions = (transaction: ExecutedTransaction) => {
-    setExecuteResponse((prev) => ({ ...prev, transactions: [...prev.transactions, transaction] }));
+    setExecuteResponse((prev) => ({
+      ...prev,
+      transactions: [...prev.transactions, transaction],
+    }));
   };
 
   const setExecuteDone = () => setExecuteResponse((prev) => ({ ...prev, done: true }));
@@ -235,7 +237,7 @@ export const useSignOrder = (input: SignOrderInput) => {
           recipient_address: recipientAddress,
           payment_type: paymentType,
           currency_filter: SignCurrencyFilter.CONTRACT_ADDRESS,
-          currency_value: fromContractAddress,
+          currency_value: fromTokenAddress,
           products: items.map((item) => ({
             product_id: item.productId,
             quantity: item.qty,
@@ -265,7 +267,7 @@ export const useSignOrder = (input: SignOrderInput) => {
       }
       return undefined;
     },
-    [items, fromContractAddress, recipientAddress, environmentId, env, provider],
+    [items, fromTokenAddress, recipientAddress, environmentId, env, provider],
   );
 
   const execute = async (
@@ -282,7 +284,7 @@ export const useSignOrder = (input: SignOrderInput) => {
     const execTransactions: ExecutedTransaction[] = [];
     for (const transaction of signData.transactions) {
       const {
-        contractAddress: to,
+        tokenAddress: to,
         rawData: data,
         methodCall: method,
         gasEstimate,

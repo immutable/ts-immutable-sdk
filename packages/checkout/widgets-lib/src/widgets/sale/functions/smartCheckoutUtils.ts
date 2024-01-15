@@ -11,11 +11,11 @@ import { calculateCryptoToFiat, formatFiatString } from '../../../lib/utils';
 
 export const MAX_GAS_LIMIT = '30000000';
 
-export const getItemRequirements = (amount: string, spenderAddress: string, contractAddress: string)
+export const getItemRequirements = (amount: string, spenderAddress: string, tokenAddress: string)
 : ERC20ItemRequirement[] => [
   {
     type: ItemType.ERC20,
-    contractAddress,
+    tokenAddress,
     spenderAddress,
     amount,
   },
@@ -31,7 +31,7 @@ export const getGasEstimate = (): GasAmount => ({
 
 export const isUserFractionalBalanceBlocked = async (
   walletAddress: string,
-  contractAddress: string,
+  tokenAddress: string,
   amount: string,
   checkout?: Checkout,
   provider?: Web3Provider,
@@ -40,7 +40,7 @@ export const isUserFractionalBalanceBlocked = async (
   const balanceResponse = await checkout!.getAllBalances({ provider: provider!, walletAddress, chainId });
   const zero = BigNumber.from('0');
 
-  const purchaseBalance = balanceResponse.balances.find((balance) => balance.token.address === contractAddress);
+  const purchaseBalance = balanceResponse.balances.find((balance) => balance.token.address === tokenAddress);
   if (!purchaseBalance) {
     return false;
   }
@@ -71,14 +71,14 @@ export const fundingRouteFees = (
   for (const step of fundingRoute.steps) {
     switch (step.type) {
       case FundingStepType.BRIDGE:
-        fees.push(step.fees.approvalGasFees);
+        fees.push(step.fees.approvalGasFee);
         fees.push(...step.fees.bridgeFees);
-        fees.push(step.fees.bridgeGasFees);
+        fees.push(step.fees.bridgeGasFee);
         break;
       case FundingStepType.SWAP:
-        fees.push(step.fees.approvalGasFees);
+        fees.push(step.fees.approvalGasFee);
         fees.push(...step.fees.swapFees);
-        fees.push(step.fees.swapGasFees);
+        fees.push(step.fees.swapGasFee);
         break;
       default:
     }

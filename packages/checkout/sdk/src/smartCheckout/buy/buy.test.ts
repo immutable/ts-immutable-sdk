@@ -25,6 +25,7 @@ import {
 import { BuyOrder, OrderFee } from '../../types';
 import { SignTransactionStatusType } from '../actions/types';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from '../routing/indexer/fetchL1Representation';
+import { HttpClient } from '../../api/http';
 
 jest.mock('../../instance');
 jest.mock('../smartCheckout');
@@ -33,9 +34,11 @@ jest.mock('../actions');
 describe('buy', () => {
   const gasLimit = constants.estimatedFulfillmentGasGwei;
   const seaportContractAddress = '0xSEAPORT';
+  let mockedHttpClient: jest.Mocked<HttpClient>;
 
   beforeEach(() => {
     jest.spyOn(console, 'info').mockImplementation(() => {});
+    mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
   });
 
   describe('buy', () => {
@@ -51,7 +54,7 @@ describe('buy', () => {
 
       config = new CheckoutConfiguration({
         baseConfig: { environment: Environment.SANDBOX },
-      });
+      }, mockedHttpClient);
     });
 
     it('should call smart checkout with item requirements and execute transactions', async () => {
@@ -304,7 +307,7 @@ describe('buy', () => {
         {
           type: ItemType.ERC20,
           amount: BigNumber.from('2000000000000000000'),
-          contractAddress: '0xCONTRACTADDRESS',
+          tokenAddress: '0xCONTRACTADDRESS',
           spenderAddress: '0xSEAPORT',
         },
       ];
@@ -474,7 +477,7 @@ describe('buy', () => {
           {
             type: ItemType.ERC20,
             amount: BigNumber.from('2000000000000000000'),
-            contractAddress: '0xCONTRACTADDRESS',
+            tokenAddress: '0xCONTRACTADDRESS',
             spenderAddress: '0xSEAPORT',
           },
         ];
@@ -651,7 +654,7 @@ describe('buy', () => {
         {
           type: ItemType.ERC20,
           amount: BigNumber.from('2000000000000000000'),
-          contractAddress: '0x123',
+          tokenAddress: '0x123',
           spenderAddress: seaportContractAddress,
         },
       ];
@@ -1213,7 +1216,7 @@ describe('buy', () => {
 
       config = new CheckoutConfiguration({
         baseConfig: { environment: Environment.SANDBOX },
-      });
+      }, mockedHttpClient);
     });
     const nativeOrderTakerFeeTestCases = [
       {
@@ -1588,7 +1591,7 @@ describe('buy', () => {
           {
             type: ItemType.ERC20,
             amount: BigNumber.from('2000000'),
-            contractAddress: '0xCONTRACTADDRESS',
+            tokenAddress: '0xCONTRACTADDRESS',
             spenderAddress: '0xSEAPORT',
           },
         ];
@@ -1625,8 +1628,8 @@ describe('buy', () => {
     it('should return type of native and amount', () => {
       const type = ItemType.NATIVE;
       const amount = BigNumber.from('1');
-      const contractAddress = '';
-      const result = getItemRequirement(type, contractAddress, amount, seaportContractAddress);
+      const tokenAddress = '';
+      const result = getItemRequirement(type, tokenAddress, amount, seaportContractAddress);
       expect(result).toEqual({
         type,
         amount,
@@ -1636,12 +1639,12 @@ describe('buy', () => {
     it('should return type of erc20 and amount', () => {
       const type = ItemType.ERC20;
       const amount = BigNumber.from('1');
-      const contractAddress = '0x123';
-      const result = getItemRequirement(type, contractAddress, amount, seaportContractAddress);
+      const tokenAddress = '0x123';
+      const result = getItemRequirement(type, tokenAddress, amount, seaportContractAddress);
       expect(result).toEqual({
         type,
         amount,
-        contractAddress,
+        tokenAddress,
         spenderAddress: seaportContractAddress,
       });
     });
@@ -1659,8 +1662,8 @@ describe('buy', () => {
 
     it('should return type of native and amount for default case', () => {
       const amount = BigNumber.from('1');
-      const contractAddress = '';
-      const result = getItemRequirement('default' as ItemType, contractAddress, amount, seaportContractAddress);
+      const tokenAddress = '';
+      const result = getItemRequirement('default' as ItemType, tokenAddress, amount, seaportContractAddress);
       expect(result).toEqual({
         type: ItemType.NATIVE,
         amount,

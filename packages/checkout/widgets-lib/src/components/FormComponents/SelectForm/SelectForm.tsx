@@ -9,6 +9,7 @@ import { CoinSelectorOptionProps } from '../../CoinSelector/CoinSelectorOption';
 interface SelectFormProps {
   testId: string;
   options: CoinSelectorOptionProps[];
+  optionsLoading?: boolean;
   textAlign?: 'left' | 'right';
   subtext?: string;
   errorMessage?: string;
@@ -21,6 +22,7 @@ interface SelectFormProps {
 export function SelectForm({
   testId,
   options,
+  optionsLoading,
   subtext,
   onSelectChange,
   textAlign,
@@ -52,6 +54,7 @@ export function SelectForm({
       <CoinSelector
         heading={coinSelectorHeading}
         options={coinSelectorOptions}
+        optionsLoading={optionsLoading ?? false}
         visible={coinSelectorOpen}
         onCloseDrawer={() => setCoinSelectorOpen(false)}
       />

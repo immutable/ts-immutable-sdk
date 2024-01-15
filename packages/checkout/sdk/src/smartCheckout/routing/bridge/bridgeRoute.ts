@@ -8,6 +8,7 @@ import {
   AvailableRoutingOptions,
   BridgeFees,
   TokenInfo,
+  FeeType,
 } from '../../../types';
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../../config';
 import {
@@ -33,36 +34,47 @@ export const hasSufficientL1Eth = (
 };
 
 const constructFees = (
-  bridgeGasFees: BigNumber,
+  bridgeGasFee: BigNumber,
   bridgeFee: BigNumber,
   imtblFee: BigNumber,
-  approvalGasFees: BigNumber,
+  approvalGasFee: BigNumber,
   token?: TokenInfo,
 ): BridgeFees => {
   const bridgeFeeDecimals = token?.decimals ?? DEFAULT_TOKEN_DECIMALS;
+  const bridgeFees = [];
+
+  if (bridgeFee.gt(0)) {
+    bridgeFees.push({
+      type: FeeType.BRIDGE_FEE,
+      amount: bridgeFee,
+      formattedAmount: utils.formatUnits(bridgeFee, bridgeFeeDecimals),
+      token,
+    });
+  }
+
+  if (imtblFee.gt(0)) {
+    bridgeFees.push({
+      type: FeeType.IMMUTABLE_FEE,
+      amount: imtblFee,
+      formattedAmount: utils.formatUnits(imtblFee, bridgeFeeDecimals),
+      token,
+    });
+  }
+
   return {
-    approvalGasFees: {
-      amount: approvalGasFees,
-      formattedAmount: utils.formatUnits(approvalGasFees, DEFAULT_TOKEN_DECIMALS),
+    approvalGasFee: {
+      type: FeeType.GAS,
+      amount: approvalGasFee,
+      formattedAmount: utils.formatUnits(approvalGasFee, DEFAULT_TOKEN_DECIMALS),
       token,
     },
-    bridgeGasFees: {
-      amount: bridgeGasFees,
-      formattedAmount: utils.formatUnits(bridgeGasFees, DEFAULT_TOKEN_DECIMALS),
+    bridgeGasFee: {
+      type: FeeType.GAS,
+      amount: bridgeGasFee,
+      formattedAmount: utils.formatUnits(bridgeGasFee, DEFAULT_TOKEN_DECIMALS),
       token,
     },
-    bridgeFees: [
-      {
-        amount: bridgeFee,
-        formattedAmount: utils.formatUnits(bridgeFee, bridgeFeeDecimals),
-        token,
-      },
-      {
-        amount: imtblFee,
-        formattedAmount: utils.formatUnits(imtblFee, bridgeFeeDecimals),
-        token,
-      },
-    ],
+    bridgeFees,
   };
 };
 
@@ -125,8 +137,8 @@ export const bridgeRoute = async (
   if (tokenBalanceResult === undefined || tokenBalanceResult.success === false) return undefined;
 
   // todo: revert this back to using the allowlist
-  const allowedTokenList = await allowListCheckForBridge(config, tokenBalanceResults, availableRoutingOptions);
-  if (allowedTokenList.length === 0) return undefined;
+  const allowedL1TokenList = await allowListCheckForBridge(config, tokenBalanceResults, availableRoutingOptions);
+  if (allowedL1TokenList.length === 0) return undefined;
 
   const l1RepresentationResult = await fetchL1Representation(config, bridgeRequirement.l2address);
   if (!l1RepresentationResult) return undefined;
@@ -134,8 +146,8 @@ export const bridgeRoute = async (
   // Ensure l1address is in the allowed token list
   const { l1address } = l1RepresentationResult as L1ToL2TokenAddressMapping;
   if (isNativeToken(l1address)) {
-    if (!allowedTokenList.find((token) => !('address' in token))) return undefined;
-  } else if (!allowedTokenList.find((token) => token.address === l1address)) {
+    if (!allowedL1TokenList.find((token) => isNativeToken(token.address))) return undefined;
+  } else if (!allowedL1TokenList.find((token) => token.address === l1address)) {
     return undefined;
   }
 

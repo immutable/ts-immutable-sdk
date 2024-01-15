@@ -63,7 +63,7 @@ export { RefreshNFTMetadataByTokenIDRequest } from '../models';
  * @export
  * @interface GetMetadataRequest
  */
-export interface GetMetadataRequest {
+export interface GetMetadataRequestParams {
     /**
      * The name of chain
      * @type {string}
@@ -91,7 +91,7 @@ export interface GetMetadataRequest {
  * @export
  * @interface ListMetadataRequest
  */
-export interface ListMetadataRequest {
+export interface ListMetadataRequestParams {
     /**
      * The name of chain
      * @type {string}
@@ -133,7 +133,7 @@ export interface ListMetadataRequest {
  * @export
  * @interface ListMetadataForChainRequest
  */
-export interface ListMetadataForChainRequest {
+export interface ListMetadataForChainRequestParams {
     /**
      * The name of chain
      * @type {string}
@@ -168,7 +168,7 @@ export interface ListMetadataForChainRequest {
  * @export
  * @interface RefreshMetadataByIDRequest
  */
-export interface RefreshMetadataByIDRequest {
+export interface RefreshMetadataByIDRequestParams {
     /**
      * The name of chain
      * @type {string}
@@ -196,7 +196,7 @@ export interface RefreshMetadataByIDRequest {
  * @export
  * @interface RefreshNFTMetadataByTokenIDRequest
  */
-export interface RefreshNFTMetadataByTokenIDRequest {
+export interface RefreshNFTMetadataByTokenIDRequestParams {
     /**
      * The address of contract
      * @type {string}
