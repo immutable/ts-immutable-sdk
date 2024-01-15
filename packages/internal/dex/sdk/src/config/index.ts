@@ -9,6 +9,11 @@ import {
   MAX_SECONDARY_FEE_BASIS_POINTS,
   WIMX_IMMUTABLE_TESTNET,
   NATIVE_IMX_IMMUTABLE_TESTNET,
+  IMMUTABLE_MAINNET_CHAIN_ID,
+  IMMUTABLE_MAINNET_RPC_URL,
+  NATIVE_IMX_IMMUTABLE_MAINNET,
+  WIMX_IMMUTABLE_MAINNET,
+  IMMUTABLE_MAINNET_COMMON_ROUTING_TOKENS,
 } from '../constants';
 
 export const CONTRACTS_FOR_CHAIN_ID: Record<number, ExchangeContracts> = {
@@ -18,6 +23,13 @@ export const CONTRACTS_FOR_CHAIN_ID: Record<number, ExchangeContracts> = {
     quoter: '0xF6Ad3CcF71Abb3E12beCf6b3D2a74C963859ADCd',
     swapRouter: '0x0b012055F770AE7BB7a8303968A7Fb6088A2296e',
     immutableSwapProxy: '0xDdBDa144cEbe1cCd68E746CDff8a6e4Be51A9e98',
+  },
+  [IMMUTABLE_MAINNET_CHAIN_ID]: {
+    multicall: '0xc7efb32470dEE601959B15f1f923e017C6A918cA',
+    coreFactory: '0x56c2162254b0E4417288786eE402c2B41d4e181e',
+    quoter: '0xF6Ad3CcF71Abb3E12beCf6b3D2a74C963859ADCd',
+    swapRouter: '0xE5a02c2Be08406c3fB36F9Aa29bF7C7A09CAe50B',
+    immutableSwapProxy: '0xD67cc11151dBccCC424A16F8963ece3D0539BD61',
   },
 };
 
@@ -32,7 +44,16 @@ export const SUPPORTED_SANDBOX_CHAINS: Record<number, Chain> = {
   },
 };
 
-export const SUPPORTED_PRODUCTION_CHAINS: Record<number, Chain> = {};
+export const SUPPORTED_PRODUCTION_CHAINS: Record<number, Chain> = {
+  [IMMUTABLE_MAINNET_CHAIN_ID]: {
+    chainId: IMMUTABLE_MAINNET_CHAIN_ID,
+    rpcUrl: IMMUTABLE_MAINNET_RPC_URL,
+    contracts: CONTRACTS_FOR_CHAIN_ID[IMMUTABLE_MAINNET_CHAIN_ID],
+    commonRoutingTokens: IMMUTABLE_MAINNET_COMMON_ROUTING_TOKENS,
+    nativeToken: NATIVE_IMX_IMMUTABLE_MAINNET,
+    wrappedNativeToken: WIMX_IMMUTABLE_MAINNET,
+  },
+};
 
 export const SUPPORTED_CHAIN_IDS_FOR_ENVIRONMENT: Record<Environment, Record<number, Chain>> = {
   [Environment.SANDBOX]: SUPPORTED_SANDBOX_CHAINS,
