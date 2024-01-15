@@ -18,7 +18,13 @@ type mapping = {
   [address: string]: string;
 };
 
-const allTokens: Token[] = [
+const mainnetTokens: Token[] = [
+  { symbol: 'IMX', address: 'native' },
+  { symbol: 'ETH', address: '0x52a6c53869ce09a731cd772f245b97a4401d3348' },
+  { symbol: 'USDC', address: '0x6de8aCC0D406837030CE4dd28e7c08C5a96a30d2' },
+];
+
+const testnetTokens: Token[] = [
   { symbol: 'IMX', address: 'native' },
   { symbol: 'WIMX', address: '0x1CcCa691501174B4A623CeDA58cC8f1a76dc3439' },
   { symbol: 'zkTDR', address: '0x6531F7B9158d78Ca78b46799c4Fd65C2Af8Ae506' },
@@ -30,6 +36,9 @@ const allTokens: Token[] = [
   { symbol: 'zkCATS', address: '0xb95B75B4E4c09F04d5DA6349861BF1b6F163D78c' },
   { symbol: 'zkYEET', address: '0x8AC26EfCbf5D700b37A27aA00E6934e6904e7B8e' },
 ];
+
+/// @dev Update this to change tokens used in the app
+const allTokens = testnetTokens;
 
 const buildExchange = (secondaryFeeRecipient: string, secondaryFeePercentage: number) => {
   if (secondaryFeeRecipient && secondaryFeePercentage) {
@@ -75,6 +84,7 @@ export function Example() {
   const getQuote = async (tokenInAddress: string, tokenOutAddress: string) => {
     setIsFetching(true);
     setError(null);
+    setApproved(false);
 
     try {
       const exchange = buildExchange(secondaryFeeRecipient, secondaryFeePercentage);

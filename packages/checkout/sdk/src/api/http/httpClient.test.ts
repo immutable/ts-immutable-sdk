@@ -1,8 +1,7 @@
 import { Environment } from '@imtbl/config';
-import axios, { AxiosResponse } from 'axios';
+import axios, { AxiosError } from 'axios';
 import { HttpClient } from './httpClient';
 import { CheckoutModuleConfiguration } from '../../types';
-import { CheckoutError, CheckoutErrorType } from '../../errors';
 
 jest.mock('axios', () => ({
   create: jest.fn(),
@@ -93,17 +92,22 @@ describe('HttpClient', () => {
 
   ['get', 'post', 'put'].forEach((method) => {
     describe(method, () => {
-      it(`[${method}] should throw error when non-200 status`, async () => {
-        const mockResponse = {
+      it(`[${method}] should throw error when non-2XX status`, async () => {
+        const mockError = {
+          isAxiosError: true,
           status: 500,
-          statusText: 'error 500 message',
-        } as AxiosResponse;
-        mockedAxiosInstance.request.mockResolvedValueOnce(mockResponse);
+          message: 'Internal Server Error',
+        } as AxiosError;
+        mockedAxiosInstance.request.mockRejectedValue(mockError);
 
         const httpClient = new HttpClient(testCheckoutConfig);
-        await expect((httpClient as any)[method]('/'))
-          .rejects
-          .toThrowError(new Error('Error: 500 error 500 message'));
+        try {
+          await (httpClient as any)[method]('/');
+        } catch (err: any) {
+          expect(err.isAxiosError).toBeTruthy();
+          expect(err.status).toBe(500);
+          expect(err.message).toBe('Internal Server Error');
+        }
       });
 
       it(`[${method}] should throw error when error fetching`, async () => {
@@ -112,12 +116,11 @@ describe('HttpClient', () => {
         });
 
         const httpClient = new HttpClient(testCheckoutConfig);
-        await expect(httpClient.get('/')).rejects.toThrow(
-          new CheckoutError(
-            'error message',
-            CheckoutErrorType.API_ERROR,
-          ),
-        );
+        try {
+          await httpClient.get('/');
+        } catch (error:any) {
+          expect(error.message).toBe('error message');
+        }
       });
     });
   });

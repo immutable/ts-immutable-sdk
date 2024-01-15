@@ -1,6 +1,5 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { CheckoutModuleConfiguration } from '../../types';
-import { CheckoutError, CheckoutErrorType } from '../../errors';
 
 const PUBLISHABLE_KEY_PREFIX = 'pk_imapik-';
 
@@ -51,26 +50,8 @@ export class HttpClient {
     );
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  private processResponse(response: AxiosResponse) {
-    if (response && response?.status !== 200) {
-      throw new CheckoutError(
-        `Error: ${response.status} ${response.statusText}`,
-        CheckoutErrorType.API_ERROR,
-      );
-    }
-  }
-
   public async request(config: AxiosRequestConfig) {
-    let response;
-    try {
-      response = await this.axiosInstance.request(config);
-    } catch (error: any) {
-      throw new CheckoutError(error.message, CheckoutErrorType.API_ERROR);
-    }
-
-    this.processResponse(response);
-    return response;
+    return await this.axiosInstance.request(config);
   }
 
   public async get(url: string, config?: AxiosRequestConfig) {
