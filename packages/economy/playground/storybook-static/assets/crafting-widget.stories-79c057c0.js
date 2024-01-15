@@ -1,0 +1,4 @@
+import{x as d}from"./lit-html-81e8c986.js";const n={title:"Crafting/generic-crafting-widget",args:{gameId:"pokemon",userId:"pokemon_master",walletAddress:"0x"}},g=r=>d`
+    <crafting-widget game-id="${r.gameId}" user-id="${r.userId}" wallet-address="${r.walletAddress}"></crafting-widget>
+  `,e=g.bind({});e.args={};var a,t,s;e.parameters={...e.parameters,docs:{...(a=e.parameters)==null?void 0:a.docs,source:{originalSource:'(args: any) => {\n  return html`\n    <crafting-widget game-id="${args.gameId}" user-id="${args.userId}" wallet-address="${args.walletAddress}"></crafting-widget>\n  `;\n}',...(s=(t=e.parameters)==null?void 0:t.docs)==null?void 0:s.source}}};const o=["Widget"];export{e as Widget,o as __namedExportsOrder,n as default};
+//# sourceMappingURL=crafting-widget.stories-79c057c0.js.map

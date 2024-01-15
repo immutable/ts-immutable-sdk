@@ -1,0 +1,4 @@
+import{x as d}from"./lit-html-81e8c986.js";const g={title:"Crafting/imtbl-crafting-widget",args:{gameId:"pokemon",owner:"pokemon_master",recipeId:"c1da5d0e-f506-4ae4-9d9d-00958be06d58"}},n=r=>d`
+    <imtbl-crafting-widget game-id="${r.gameId}" owner="${r.owner}" recipe-id=${r.recipeId}></imtbl-crafting-widget>
+  `,e=n.bind({});e.args={};var t,a,i;e.parameters={...e.parameters,docs:{...(t=e.parameters)==null?void 0:t.docs,source:{originalSource:'(args: any) => {\n  return html`\n    <imtbl-crafting-widget game-id="${args.gameId}" owner="${args.owner}" recipe-id=${args.recipeId}></imtbl-crafting-widget>\n  `;\n}',...(i=(a=e.parameters)==null?void 0:a.docs)==null?void 0:i.source}}};const m=["Widget"];export{e as Widget,m as __namedExportsOrder,g as default};
+//# sourceMappingURL=imtbl-crafting-widget.stories-4cc00d81.js.map

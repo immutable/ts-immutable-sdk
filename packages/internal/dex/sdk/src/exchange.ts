@@ -75,8 +75,8 @@ export class Exchange {
     this.wrappedNativeToken = config.chain.wrappedNativeToken;
     this.nativeTokenService = new NativeTokenService(this.nativeToken, this.wrappedNativeToken);
     this.secondaryFees = config.secondaryFees;
-    this.routerContractAddress = config.chain.contracts.peripheryRouter;
-    this.swapProxyContractAddress = config.chain.contracts.secondaryFee;
+    this.routerContractAddress = config.chain.contracts.swapRouter;
+    this.swapProxyContractAddress = config.chain.contracts.immutableSwapProxy;
 
     this.provider = new ethers.providers.StaticJsonRpcProvider({
       url: config.chain.rpcUrl,

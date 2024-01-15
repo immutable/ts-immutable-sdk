@@ -12,6 +12,7 @@ import { createAndConnectToProvider, isPassportProvider } from 'lib/providerUtil
 import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import {
   Checkout,
+  TokenFilterTypes,
   TokenInfo,
   WalletProviderName,
 } from '@imtbl/checkout-sdk';
@@ -69,7 +70,9 @@ export function Transactions({ checkout }: TransactionsProps) {
 
     const rootChainId = getL1ChainId(checkout.config);
     try {
-      const tokens = (await checkout.config.remote.getTokensConfig(rootChainId)).allowed ?? [];
+      const tokens = (
+        await checkout.getTokenAllowList({ type: TokenFilterTypes.BRIDGE, chainId: rootChainId })
+      ).tokens ?? [];
       return tokens.reduce((out, current) => {
         // eslint-disable-next-line no-param-reassign
         out[current.address!.toLowerCase()] = current;
