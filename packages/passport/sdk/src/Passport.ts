@@ -1,5 +1,5 @@
 import { IMXProvider } from '@imtbl/provider';
-import { MultiRollupApiClients } from '@imtbl/generated-clients';
+import { ImxApiClients, MultiRollupApiClients } from '@imtbl/generated-clients';
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 import { ChainName } from 'network/chains';
 import AuthManager from './authManager';
@@ -46,6 +46,8 @@ export class Passport {
       });
     this.multiRollupApiClients = new MultiRollupApiClients(this.config.multiRollupConfig);
     this.passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
+    const imxApiClients = new ImxApiClients(this.config.multiRollupConfig.passport);
+
     this.passportImxProviderFactory = new PassportImxProviderFactory({
       authManager: this.authManager,
       config: this.config,
@@ -53,6 +55,7 @@ export class Passport {
       immutableXClient: this.immutableXClient,
       magicAdapter: this.magicAdapter,
       passportEventEmitter: this.passportEventEmitter,
+      imxApiClients,
     });
   }
 
