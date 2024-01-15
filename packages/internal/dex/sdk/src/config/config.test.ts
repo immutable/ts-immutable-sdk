@@ -4,7 +4,7 @@ import * as test from 'test/utils';
 import { ERC20 } from 'types';
 import { ExchangeContracts, ExchangeModuleConfiguration, ExchangeOverrides } from '../types';
 import { ExchangeConfiguration } from './index';
-import { IMMUTABLE_TESTNET_CHAIN_ID } from '../constants/chains';
+import { IMMUTABLE_MAINNET_CHAIN_ID, IMMUTABLE_TESTNET_CHAIN_ID } from '../constants/chains';
 
 describe('ExchangeConfiguration', () => {
   const chainId = 999999999;
@@ -60,6 +60,40 @@ describe('ExchangeConfiguration', () => {
       expect(() => new ExchangeConfiguration(exchangeConfiguration)).toThrow(
         new ChainNotSupportedError(1, Environment.SANDBOX),
       );
+    });
+
+    describe('when given production environment with supported chain id', () => {
+      it('should create successfully', () => {
+        const baseConfig = new ImmutableConfiguration({
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          environment: Environment.PRODUCTION,
+        });
+        const exchangeConfiguration: ExchangeModuleConfiguration = {
+          baseConfig,
+          chainId: IMMUTABLE_MAINNET_CHAIN_ID,
+        };
+
+        const config = new ExchangeConfiguration(exchangeConfiguration);
+        expect(config.chain.chainId).toBe(IMMUTABLE_MAINNET_CHAIN_ID);
+        expect(config.baseConfig.environment).toBe(Environment.PRODUCTION);
+      });
+    });
+
+    describe('when given production environment with unsupported chain id', () => {
+      it('should throw ChainNotSupportedError', () => {
+        const baseConfig = new ImmutableConfiguration({
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          environment: Environment.PRODUCTION,
+        });
+        const exchangeConfiguration: ExchangeModuleConfiguration = {
+          baseConfig,
+          chainId: 1,
+        };
+
+        expect(() => new ExchangeConfiguration(exchangeConfiguration)).toThrow(
+          new ChainNotSupportedError(1, Environment.PRODUCTION),
+        );
+      });
     });
   });
 
