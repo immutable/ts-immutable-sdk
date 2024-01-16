@@ -13,6 +13,7 @@ import {
 import { CheckoutConfiguration, getL1ChainId } from '../config';
 import { ERC20ABI, NATIVE } from '../env';
 import { CheckoutErrorType, withCheckoutError } from '../errors';
+import { isMatchingAddress } from '../utils/utils';
 
 type TokenAllowListParams = {
   type: TokenFilterTypes;
@@ -68,7 +69,7 @@ export const getTokenAllowList = async (
 
 export const isNativeToken = (
   address: string | undefined,
-): boolean => !address || address.toLocaleLowerCase() === NATIVE;
+): boolean => !address || isMatchingAddress(address, NATIVE);
 
 export async function getERC20TokenInfo(
   web3Provider: Web3Provider | JsonRpcProvider,

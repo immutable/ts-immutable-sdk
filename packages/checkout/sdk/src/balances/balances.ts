@@ -23,6 +23,7 @@ import {
   DEFAULT_TOKEN_DECIMALS, ERC20ABI, NATIVE,
 } from '../env';
 import { measureAsyncExecution } from '../logger/debugLogger';
+import { isMatchingAddress } from '../utils/utils';
 
 export const getBalance = async (
   config: CheckoutConfiguration,
@@ -219,7 +220,7 @@ export const getBalances = async (
       // For some reason isNativeToken always returns undefined.
       // We have spent way too much time figuring out why this is happening.
       // That we have given up -- keep it as it is for now.
-      if (!token.address || token.address.toLocaleLowerCase() === NATIVE) {
+      if (!token.address || isMatchingAddress(token.address, NATIVE)) {
         allBalancePromises.push(
           getBalance(config, web3Provider, walletAddress),
         );
@@ -240,7 +241,7 @@ export const getBalances = async (
     // For some reason isNativeToken always returns undefined.
     // We have spent way too much time figuring out why this is happening.
     // That we have given up -- keep it as it is for now.
-    if (!token.address || token.address.toLocaleLowerCase() === NATIVE) resp.value.token.address = NATIVE;
+    if (!token.address || isMatchingAddress(token.address, NATIVE)) resp.value.token.address = NATIVE;
     return resp.value;
   });
 
