@@ -148,7 +148,8 @@ export class Passport {
     try {
       await this.confirmationScreen.logout();
     } catch (err) {
-      console.error('Failed to logout from confirmation screen', err);
+      // eslint-disable-next-line no-console
+      console.warn('Failed to logout from confirmation screen', err);
     }
     await Promise.allSettled([
       this.authManager.logout(),
