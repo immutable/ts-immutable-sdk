@@ -406,8 +406,10 @@
       "fiatPricePrefix": "~ 美元 $"
     },
     "BRIDGE_FAILURE": {
-      "statusText": "交易失败",
-      "actionText": "审查并重试"
+      "bridgeFailureText": {
+        "statusText": "交易失败",
+        "actionText": "审查并重试"
+      }
     },
     "APPROVE_TRANSACTION": {
       "content": {

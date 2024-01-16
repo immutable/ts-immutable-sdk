@@ -72,6 +72,10 @@ export function TransactionsInProgress({
               amount={amount}
               fromChain={getChainIdBySlug(t.details.from_chain as ChainSlug)}
               toChain={getChainIdBySlug(t.details.to_chain as ChainSlug)}
+              fromAddress={t.details.from_address}
+              toAddress={t.details.to_address}
+              // action={() => console.log('action taken!!')}
+              // actionMessage="Action heading"
             />
           );
         })}

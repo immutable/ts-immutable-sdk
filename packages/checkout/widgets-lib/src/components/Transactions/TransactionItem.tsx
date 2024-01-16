@@ -8,6 +8,7 @@ import {
   Icon,
   MenuItem,
   Link,
+  EllipsizedText,
 } from '@biom3/react';
 import { ChainId } from '@imtbl/checkout-sdk';
 import { logoColour, networkIcon, networkName } from 'lib';
@@ -27,7 +28,10 @@ type TransactionItemProps = {
   amount: string
   fromChain: ChainId
   toChain: ChainId
-  // action: () => void
+  fromAddress: string
+  toAddress: string
+  action?: () => void
+  actionMessage?: string
 };
 
 export function TransactionItem({
@@ -37,14 +41,11 @@ export function TransactionItem({
   amount,
   fromChain,
   toChain,
-  // action
+  fromAddress,
+  toAddress,
+  action,
+  actionMessage,
 }: TransactionItemProps) {
-  // The action prop is designed for injecting the action to perform
-  // in case of flow-rate. Keeping this code here even if it isn't currently
-  // use for future reference.
-  // https://immutable.atlassian.net/browse/WT-2007
-  const action = undefined;
-
   const { track } = useAnalytics();
 
   const handleDetailsLinkClick = (linkDetail: { text: string, link: string, hash: string }) => {
@@ -63,7 +64,7 @@ export function TransactionItem({
 
   return (
     <Box sx={action ? containerStyles : {}}>
-      {action !== undefined && (
+      {(action || actionMessage) && (
         <Box sx={actionsContainerStyles}>
           <Box sx={actionsLayoutStyles}>
             <Icon
@@ -71,11 +72,17 @@ export function TransactionItem({
               variant="bold"
               sx={{ fill: 'base.color.status.fatal.bright', w: 'base.icon.size.200' }}
             />
+            {actionMessage && (
             <Body size="xSmall" sx={{ color: 'base.color.text.secondary' }}>
-              Action heading
+              {actionMessage}
             </Body>
+            )}
           </Box>
-          <Button variant="primary" size="small">Action</Button>
+          {action && (
+          <Button variant="primary" size="small" onClick={action}>
+            Action
+          </Button>
+          )}
           <Badge
             isAnimated
             variant="fatal"
@@ -172,7 +179,7 @@ export function TransactionItem({
               <Body size="xxSmall" sx={{ color: 'base.color.translucent.standard.900' }}>
                 {networkName[fromChain]}
               </Body>
-              <Body size="xxSmall" sx={{ color: 'base.color.translucent.standard.600' }}>0x1E8d...CfDf</Body>
+              <EllipsizedText size="xxSmall" sx={{ color: 'base.color.translucent.standard.600' }} text={fromAddress} />
             </Box>
             <Box sx={{ flexGrow: '1' }} />
             <Icon
@@ -202,7 +209,7 @@ export function TransactionItem({
               <Body size="xxSmall" sx={{ color: 'base.color.translucent.standard.900' }}>
                 {networkName[toChain]}
               </Body>
-              <Body size="xxSmall" sx={{ color: 'base.color.translucent.standard.600' }}>0x1E8d...CfDf</Body>
+              <EllipsizedText size="xxSmall" sx={{ color: 'base.color.translucent.standard.600' }} text={toAddress} />
             </Box>
           </Box>
         </Accordion.ExpandedContent>
