@@ -4,6 +4,7 @@ import { BridgeRequirement } from '../bridge/bridgeRoute';
 import { DexQuote, DexQuotes } from '../types';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS, L1ToL2TokenAddressMapping } from '../indexer/fetchL1Representation';
 import { BalanceCheckResult } from '../../balanceCheck/types';
+import { isMatchingAddress } from '../../../utils/utils';
 
 // The dex will return all the fees which is in a particular token (currently always IMX)
 // If any of the fees are in the same token that is trying to be swapped (e.g. trying to swap IMX)
@@ -16,13 +17,13 @@ export const getFeesForTokenAddress = (
   let fees = BigNumber.from(0);
 
   dexQuote.quote.fees.forEach((fee) => {
-    if (fee.amount.token.address === tokenAddress) {
+    if (isMatchingAddress(fee.amount.token.address, tokenAddress)) {
       fees = fees.add(fee.amount.value);
     }
   });
 
   if (dexQuote.approval) {
-    if (dexQuote.approval.token.address === tokenAddress) {
+    if (isMatchingAddress(dexQuote.approval.token.address, tokenAddress)) {
       fees = fees.add(dexQuote.approval.value);
     }
   }
@@ -40,7 +41,7 @@ export const getAmountFromBalanceRequirement = (
   // Find if there is an existing balance requirement of the token attempting to be bridged->swapped
   for (const requirement of balanceRequirements.balanceRequirements) {
     if (requirement.type === ItemType.NATIVE || requirement.type === ItemType.ERC20) {
-      if (requirement.required.token.address === quotedTokenAddress) {
+      if (isMatchingAddress(requirement.required.token.address, quotedTokenAddress)) {
         return requirement.required.balance;
       }
     }
@@ -97,9 +98,9 @@ export const constructBridgeRequirements = (
 
   for (const [tokenAddress, quote] of dexQuotes) {
     // Get the L2 balance for the token address
-    const l2balance = l2balances.find((balance) => balance.token.address === tokenAddress);
+    const l2balance = l2balances.find((balance) => isMatchingAddress(balance.token.address, tokenAddress));
     const l1tol2TokenMapping = l1tol2addresses.find(
-      (token) => token.l2address === tokenAddress,
+      (token) => isMatchingAddress(token.l2address, tokenAddress),
     );
     if (!l1tol2TokenMapping) continue;
 
@@ -109,10 +110,10 @@ export const constructBridgeRequirements = (
     // If the user does not have any L1 balance for this token then cannot bridge
     const l1balance = l1balances.find((balance) => {
       if (balance.token.address === undefined
-        && l1address === INDEXER_ETH_ROOT_CONTRACT_ADDRESS) {
+        && isMatchingAddress(l1address, INDEXER_ETH_ROOT_CONTRACT_ADDRESS)) {
         return true;
       }
-      return balance.token.address === l1address;
+      return isMatchingAddress(balance.token.address, l1address);
     });
     if (!l1balance) continue;
 
