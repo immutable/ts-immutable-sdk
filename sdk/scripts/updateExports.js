@@ -45,6 +45,19 @@ for (const moduleName in moduleData.modules) {
       types: typesPath,
       import: modulePath,
     };
+
+    if (moduleName === 'immutablex_client') {
+      exports['./x/client'] = {
+        types: typesPath,
+        import: modulePath,
+      };
+    }
+    if (moduleName === 'provider') {
+      exports['./x/provider'] = {
+        types: typesPath,
+        import: modulePath,
+      };
+    }
   }
 }
 
