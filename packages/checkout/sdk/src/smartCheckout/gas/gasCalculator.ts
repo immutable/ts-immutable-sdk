@@ -1,5 +1,5 @@
 import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
-import { BigNumber } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 import {
   FulfillmentTransaction, GasAmount, GasTokenType, ItemRequirement, ItemType, TransactionOrGasType,
 } from '../../types';
@@ -12,7 +12,9 @@ export const estimateGas = async (
   transaction: TransactionRequest,
 ): Promise<BigNumber> => {
   try {
-    return await provider.estimateGas(transaction);
+    const gas = await provider.estimateGas(transaction);
+    console.log('gas', gas, utils.formatUnits(gas, 18));
+    return gas;
   } catch (err: any) {
     throw new CheckoutError(
       'Failed to estimate gas for transaction',

@@ -28,7 +28,9 @@ export const smartCheckout = async (
   itemRequirements: ItemRequirement[],
   transactionOrGasAmount: FulfillmentTransaction | GasAmount,
 ): Promise<SmartCheckoutResult> => {
-  const ownerAddress = await provider.getSigner().getAddress();
+  // const ownerAddress = await provider.getSigner().getAddress();
+  // const ownerAddress = '0xa1306b89C64B588347C4CD0248F83b76217e36a0';
+  const ownerAddress = '0x3EF8F7b47861e8e79d66d175F674D5446141Dc3D';
 
   let aggregatedItems = itemAggregator(itemRequirements);
 

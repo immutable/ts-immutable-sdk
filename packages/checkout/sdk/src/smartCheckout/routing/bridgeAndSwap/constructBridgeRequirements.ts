@@ -4,7 +4,7 @@ import { BridgeRequirement } from '../bridge/bridgeRoute';
 import { DexQuote, DexQuotes } from '../types';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS, L1ToL2TokenAddressMapping } from '../indexer/fetchL1Representation';
 import { BalanceCheckResult } from '../../balanceCheck/types';
-import { isMatchingAddress } from '../../utils/utils';
+import { isMatchingAddress } from '../../../utils/utils';
 
 // The dex will return all the fees which is in a particular token (currently always IMX)
 // If any of the fees are in the same token that is trying to be swapped (e.g. trying to swap IMX)

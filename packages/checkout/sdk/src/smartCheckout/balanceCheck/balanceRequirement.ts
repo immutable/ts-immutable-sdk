@@ -18,7 +18,7 @@ import {
 } from './types';
 import { DEFAULT_TOKEN_DECIMALS, NATIVE, ZKEVM_NATIVE_TOKEN } from '../../env';
 import { isNativeToken } from '../../tokens';
-import { isMatchingAddress } from '../utils/utils';
+import { isMatchingAddress } from '../../utils/utils';
 
 export const getTokensFromRequirements = (itemRequirements: ItemRequirement[]): TokenInfo[] => itemRequirements
   .map((itemRequirement) => {

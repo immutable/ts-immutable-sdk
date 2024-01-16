@@ -67,6 +67,7 @@ import { AvailabilityService, availabilityService } from './availability';
 import { loadUnresolved } from './widgets/load';
 import { WidgetsInit } from './types/widgets';
 import { HttpClient } from './api/http';
+import { isMatchingAddress } from './utils/utils';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
@@ -490,7 +491,7 @@ export class Checkout {
     }
 
     const tokenList = await tokens.getTokenAllowList(this.config, { type: TokenFilterTypes.ONRAMP });
-    const token = tokenList.tokens?.find((t) => t.address?.toLowerCase() === params.tokenAddress?.toLowerCase());
+    const token = tokenList.tokens?.find((t) => isMatchingAddress(t.address, params.tokenAddress));
     if (token) {
       tokenAmount = params.tokenAmount;
       tokenSymbol = token.symbol;

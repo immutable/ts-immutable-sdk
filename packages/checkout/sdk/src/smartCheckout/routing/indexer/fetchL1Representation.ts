@@ -3,7 +3,7 @@ import { createBlockchainDataInstance } from '../../../instance';
 import { NATIVE } from '../../../env';
 import { ChainId, ChainSlug, ImxAddressConfig } from '../../../types';
 import { isNativeToken } from '../../../tokens';
-import { isMatchingAddress } from '../../utils/utils';
+import { isMatchingAddress } from '../../../utils/utils';
 
 // If the root address evaluates to this then its ETH
 export const INDEXER_ETH_ROOT_CONTRACT_ADDRESS = '0x0000000000000000000000000000000000000eee';

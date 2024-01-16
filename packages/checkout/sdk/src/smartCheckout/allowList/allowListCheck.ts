@@ -6,7 +6,7 @@ import {
   TokenFilterTypes,
 } from '../../types';
 import { TokenBalanceResult, TokenBalances } from '../routing/types';
-import { isMatchingAddress } from '../utils/utils';
+import { isMatchingAddress } from '../../utils/utils';
 import { RoutingTokensAllowList } from './types';
 
 const filterTokens = (allowedTokens: TokenInfo[], balances: TokenBalanceResult | undefined) => {

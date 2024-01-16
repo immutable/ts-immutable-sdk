@@ -24,7 +24,7 @@ import {
 } from '../indexer/fetchL1Representation';
 import { DEFAULT_TOKEN_DECIMALS } from '../../../env';
 import { isNativeToken } from '../../../tokens';
-import { isMatchingAddress } from '../../utils/utils';
+import { isMatchingAddress } from '../../../utils/utils';
 
 export const hasSufficientL1Eth = (
   tokenBalanceResult: TokenBalanceResult,

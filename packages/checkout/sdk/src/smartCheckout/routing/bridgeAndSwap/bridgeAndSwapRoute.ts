@@ -24,7 +24,7 @@ import { constructBridgeRequirements } from './constructBridgeRequirements';
 import { fetchL1ToL2Mappings } from './fetchL1ToL2Mappings';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS, L1ToL2TokenAddressMapping } from '../indexer/fetchL1Representation';
 import { getDexQuotes } from './getDexQuotes';
-import { isMatchingAddress } from '../../utils/utils';
+import { isMatchingAddress } from '../../../utils/utils';
 
 export const abortBridgeAndSwap = (
   bridgeableTokens: string[],

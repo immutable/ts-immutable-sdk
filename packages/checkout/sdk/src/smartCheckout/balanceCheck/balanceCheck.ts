@@ -22,7 +22,7 @@ import {
   getTokensFromRequirements,
 } from './balanceRequirement';
 import { ERC721ABI, NATIVE } from '../../env';
-import { isMatchingAddress } from '../utils/utils';
+import { isMatchingAddress } from '../../utils/utils';
 
 /**
  * Gets the balances for all NATIVE and ERC20 balance requirements.
