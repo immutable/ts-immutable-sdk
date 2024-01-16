@@ -65,8 +65,6 @@ export function NetworkMenu({ setBalancesLoading }: NetworkMenuProps) {
       });
 
       try {
-        setBalancesLoading(true);
-
         const switchNetworkResult = await checkout.switchNetwork({
           provider,
           chainId,
