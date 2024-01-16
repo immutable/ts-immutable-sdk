@@ -124,20 +124,20 @@ export interface FeeData {
  * @dev Union type of DepositFeeRequest|WithdrawFeeRequest|FinaliseFeeRequest|MapTokenFeeRequest
  * ensures the correct params are supplied when trying to calculate the fees
  */
-export type BridgeFeeRequest = DepositFeeRequest
+export type BridgeFeeRequest = DepositNativeFeeRequest
 | DepositERC20FeeRequest
-| WithdrawFeeRequest
+| WithdrawNativeFeeRequest
 | WithdrawERC20FeeRequest
 | FinaliseFeeRequest;
 
 /**
- * @typedef {Object} DepositFeeRequest
+ * @typedef {Object} DepositNativeFeeRequest
  * @property {BridgeFeeActions} method - The method for which the bridge fee is being requested.
  * @property {number} gasMultiplier - How much buffer to add to the gas fee.
  * @property {string} sourceChainId - The chain ID of the source chain.
  * @property {string} destinationChainId - The chain ID of the destination chain.
  */
-export interface DepositFeeRequest {
+export interface DepositNativeFeeRequest {
   action: BridgeFeeActions.DEPOSIT,
   gasMultiplier: number;
   sourceChainId: string;
@@ -158,18 +158,18 @@ export interface DepositERC20FeeRequest {
   gasMultiplier: number;
   sourceChainId: string;
   destinationChainId: string;
-  token: FungibleToken;
-  amount: ethers.BigNumber;
+  token?: FungibleToken;
+  amount?: ethers.BigNumber;
 }
 
 /**
- * @typedef {Object} WithdrawFeeRequest
+ * @typedef {Object} WithdrawNativeFeeRequest
  * @property {BridgeFeeActions} method - The method for which the bridge fee is being requested.
  * @property {number} gasMultiplier - How much buffer to add to the gas fee.
  * @property {string} sourceChainId - The chain ID of the source chain.
  * @property {string} destinationChainId - The chain ID of the destination chain.
  */
-export interface WithdrawFeeRequest {
+export interface WithdrawNativeFeeRequest {
   action: BridgeFeeActions.WITHDRAW,
   gasMultiplier: number;
   sourceChainId: string;
@@ -190,8 +190,8 @@ export interface WithdrawERC20FeeRequest {
   gasMultiplier: number;
   sourceChainId: string;
   destinationChainId: string;
-  token: FungibleToken;
-  amount: ethers.BigNumber;
+  token?: FungibleToken;
+  amount?: ethers.BigNumber;
 }
 
 /**
