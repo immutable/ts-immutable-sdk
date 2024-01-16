@@ -8,6 +8,7 @@ export enum SaleEventType {
   REJECTED = 'rejected',
   TRANSACTION_SUCCESS = 'transaction-success',
   LANGUAGE_CHANGED = 'language-changed',
+  PAYMENT_METHOD = 'payment-method',
 }
 
 /**
@@ -51,4 +52,13 @@ export type SaleTransactionSuccess = {
     method: string;
     hash: string | undefined;
   }[];
+};
+
+/**
+ * Type representing a Sale Widget with type PAYMENT_METHOD.
+ * @property {Object} transactions
+ */
+export type SalePaymentMethod = {
+  /** The chosen payment method */
+  paymentMethod: string;
 };
