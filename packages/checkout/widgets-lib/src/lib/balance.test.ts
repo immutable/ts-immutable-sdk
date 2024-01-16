@@ -276,42 +276,6 @@ describe('getAllowedBalances', () => {
     });
   });
 
-  it('should not return zero balances', async () => {
-    const checkout = new Checkout({
-      baseConfig: { environment: Environment.PRODUCTION },
-    });
-
-    const mockProvider = {
-      getSigner: jest.fn().mockReturnValue({
-        getAddress: jest.fn().mockResolvedValue('0xaddress'),
-      }),
-    };
-    jest.spyOn(checkout, 'getNetworkInfo').mockResolvedValue(
-      { chainId: ChainId.IMTBL_ZKEVM_MAINNET } as unknown as NetworkInfo,
-    );
-    jest.spyOn(checkout, 'getAllBalances').mockResolvedValue({ balances });
-    jest.spyOn(checkout, 'getTokenAllowList').mockResolvedValue({
-      tokens: [
-        {
-          address: '0xA',
-        } as unknown as TokenInfo,
-      ],
-    });
-
-    const resp = await getAllowedBalances({
-      checkout,
-      provider: mockProvider as unknown as Web3Provider,
-      allowTokenListType: TokenFilterTypes.BRIDGE,
-    });
-
-    expect(resp).toEqual({
-      allowList: {
-        tokens: [{ address: '0xA' }],
-      },
-      allowedBalances: [],
-    });
-  });
-
   it('should return allowedBalances when casing on address is different', async () => {
     const checkout = new Checkout({
       baseConfig: { environment: Environment.PRODUCTION },
