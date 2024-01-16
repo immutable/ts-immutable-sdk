@@ -16,7 +16,7 @@ function SignEtherMail({ disabled, handleExampleSubmitted }: RequestExampleProps
       if (zkEvmProvider) {
         const chainIdHex = await zkEvmProvider.request({ method: 'eth_chainId' });
         const chainId = parseInt(chainIdHex, 16);
-        const etherMailTypedPayload = getEtherMailTypedPayload(chainId);
+        const etherMailTypedPayload = getEtherMailTypedPayload(chainId, address);
 
         setParams([
           address,

@@ -1,14 +1,14 @@
 import { IMXProvider } from '@imtbl/provider';
-import { MultiRollupApiClients } from '@imtbl/generated-clients';
+import { ImxApiClients, imxApiConfig, MultiRollupApiClients } from '@imtbl/generated-clients';
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 import { ChainName } from 'network/chains';
+import { Environment } from '@imtbl/config';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
 import { PassportImxProviderFactory } from './starkEx';
 import { PassportConfiguration } from './config';
 import {
   DeviceConnectResponse,
-  Networks,
   PassportEventMap,
   PassportEvents,
   PassportModuleConfiguration,
@@ -47,6 +47,10 @@ export class Passport {
       });
     this.multiRollupApiClients = new MultiRollupApiClients(this.config.multiRollupConfig);
     this.passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
+    const imxClientConfig = this.config.baseConfig.environment === Environment.PRODUCTION
+      ? imxApiConfig.getProduction() : imxApiConfig.getSandbox();
+    const imxApiClients = new ImxApiClients(imxClientConfig);
+
     this.passportImxProviderFactory = new PassportImxProviderFactory({
       authManager: this.authManager,
       config: this.config,
@@ -54,6 +58,7 @@ export class Passport {
       immutableXClient: this.immutableXClient,
       magicAdapter: this.magicAdapter,
       passportEventEmitter: this.passportEventEmitter,
+      imxApiClients,
     });
   }
 
@@ -70,7 +75,7 @@ export class Passport {
   }
 
   public connectEvm(): Provider {
-    if (this.config.network === Networks.PRODUCTION) {
+    if (this.config.baseConfig.environment === 'production') {
       throw new Error('EVM is not supported on production network');
     }
 
@@ -140,10 +145,16 @@ export class Passport {
   }
 
   public async logout(): Promise<void> {
-    await this.confirmationScreen.logout();
-    await this.authManager.logout();
-    // Code after this point is only executed if the logout mode is silent
-    await this.magicAdapter.logout();
+    try {
+      await this.confirmationScreen.logout();
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.warn('Failed to logout from confirmation screen', err);
+    }
+    await Promise.allSettled([
+      this.authManager.logout(),
+      this.magicAdapter.logout(),
+    ]);
     this.passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
   }
 
