@@ -1,7 +1,8 @@
 import { IMXProvider } from '@imtbl/provider';
-import { ImxApiClients, MultiRollupApiClients } from '@imtbl/generated-clients';
+import { ImxApiClients, imxApiConfig, MultiRollupApiClients } from '@imtbl/generated-clients';
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 import { ChainName } from 'network/chains';
+import { Environment } from '@imtbl/config';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
 import { PassportImxProviderFactory } from './starkEx';
@@ -46,7 +47,9 @@ export class Passport {
       });
     this.multiRollupApiClients = new MultiRollupApiClients(this.config.multiRollupConfig);
     this.passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
-    const imxApiClients = new ImxApiClients(this.config.multiRollupConfig.passport);
+    const imxClientConfig = this.config.baseConfig.environment === Environment.PRODUCTION
+      ? imxApiConfig.getProduction() : imxApiConfig.getSandbox();
+    const imxApiClients = new ImxApiClients(imxClientConfig);
 
     this.passportImxProviderFactory = new PassportImxProviderFactory({
       authManager: this.authManager,
