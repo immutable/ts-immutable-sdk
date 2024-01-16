@@ -11,10 +11,8 @@ describe('availabilityService', () => {
   });
 
   describe('checkDexAvailability', () => {
-    it('should return true when status is 204', async () => {
-      const mockResponse = {
-        status: 204,
-      };
+    it('should return true when status is 2xx', async () => {
+      const mockResponse = {};
       mockedAxios.post.mockResolvedValueOnce(mockResponse);
       const response = await availabilityService(true, false).checkDexAvailability();
 
@@ -26,7 +24,7 @@ describe('availabilityService', () => {
       const mockResponse = {
         status: 403,
       };
-      mockedAxios.post.mockResolvedValueOnce(mockResponse);
+      mockedAxios.post.mockRejectedValueOnce({ response: mockResponse });
       const response = await availabilityService(true, false).checkDexAvailability();
 
       expect(mockedAxios.post).toHaveBeenCalledTimes(1);
@@ -38,7 +36,7 @@ describe('availabilityService', () => {
         status: 500,
         statusText: 'error message',
       };
-      mockedAxios.post.mockResolvedValueOnce(mockResponse);
+      mockedAxios.post.mockRejectedValueOnce({ response: mockResponse });
 
       await expect(availabilityService(true, false).checkDexAvailability())
         .rejects
