@@ -72,9 +72,11 @@ export function TransactionItem({
               variant="bold"
               sx={{ fill: 'base.color.status.fatal.bright', w: 'base.icon.size.200' }}
             />
+            {actionMessage && (
             <Body size="xSmall" sx={{ color: 'base.color.text.secondary' }}>
               {actionMessage}
             </Body>
+            )}
           </Box>
           {action && (
           <Button variant="primary" size="small" onClick={action}>
