@@ -409,8 +409,10 @@
       "fiatPricePrefix": "~ USD $"
     },
     "BRIDGE_FAILURE": {
+      "bridgeFailureText": {
       "statusText": "トランザクションが失敗しました",
       "actionText": "再確認してもう一度試す"
+      }
     },
     "APPROVE_TRANSACTION": {
       "content": {

@@ -406,8 +406,10 @@
       "fiatPricePrefix": "~ USD $"
     },
     "BRIDGE_FAILURE": {
-      "statusText": "Transaction failed",
-      "actionText": "Review & Try again"
+      "bridgeFailureText": {
+        "statusText": "Transaction failed",
+        "actionText": "Review & Try again"
+      }
     },
     "APPROVE_TRANSACTION": {
       "content": {
