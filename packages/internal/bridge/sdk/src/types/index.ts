@@ -158,8 +158,8 @@ export interface DepositERC20FeeRequest {
   gasMultiplier: number;
   sourceChainId: string;
   destinationChainId: string;
-  token?: FungibleToken;
-  amount?: ethers.BigNumber;
+  token: FungibleToken;
+  amount: ethers.BigNumber;
 }
 
 /**
@@ -190,8 +190,8 @@ export interface WithdrawERC20FeeRequest {
   gasMultiplier: number;
   sourceChainId: string;
   destinationChainId: string;
-  token?: FungibleToken;
-  amount?: ethers.BigNumber;
+  token: FungibleToken;
+  amount: ethers.BigNumber;
 }
 
 /**
