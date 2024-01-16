@@ -11,6 +11,7 @@ import {
   sendSaleSuccessEvent,
   sendSaleWidgetCloseEvent,
   sendSaleTransactionSuccessEvent,
+  sendSalePaymentMethodEvent,
 } from '../SaleWidgetEvents';
 import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 import { ExecutedTransaction } from '../types';
@@ -119,6 +120,7 @@ export const useSaleEvent = () => {
         paymentMethod: type,
       },
     });
+    sendSalePaymentMethodEvent(eventTarget, type);
   };
 
   const sendPageView = (screen: string, data?: Record<string, unknown>) => {

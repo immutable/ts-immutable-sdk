@@ -79,7 +79,7 @@ export const sendSaleTransactionSuccessEvent = (
   if (eventTarget !== undefined) eventTarget.dispatchEvent(event);
 };
 
-export const sendSaleTransactionPaymentMethodEvent = (
+export const sendSalePaymentMethodEvent = (
   eventTarget: Window | EventTarget,
   paymentMethod: string,
 ) => {
