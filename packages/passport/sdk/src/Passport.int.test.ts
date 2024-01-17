@@ -20,6 +20,7 @@ jest.mock('./guardian/guardian');
 
 jest.mock('magic-sdk');
 jest.mock('oidc-client-ts');
+jest.mock('@imtbl/immutablex-client');
 
 const mockOidcUser = {
   profile: {

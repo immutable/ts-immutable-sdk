@@ -2,6 +2,7 @@ import { Banner, Box, Heading } from '@biom3/react';
 import { useContext, useEffect } from 'react';
 
 import { useTranslation } from 'react-i18next';
+import { SalePaymentTypes } from '@imtbl/checkout-sdk';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -15,7 +16,6 @@ import {
 import { PaymentOptions } from '../components/PaymentOptions';
 import { useSaleContext } from '../context/SaleContextProvider';
 import { useSaleEvent } from '../hooks/useSaleEvents';
-import { PaymentTypes } from '../types';
 
 export function PaymentMethods() {
   const { t } = useTranslation();
@@ -25,14 +25,14 @@ export function PaymentMethods() {
   } = useSaleContext();
   const { sendPageView, sendCloseEvent, sendSelectedPaymentMethod } = useSaleEvent();
 
-  const handleOptionClick = (type: PaymentTypes) => setPaymentMethod(type);
+  const handleOptionClick = (type: SalePaymentTypes) => setPaymentMethod(type);
 
   useEffect(() => {
     if (paymentMethod) {
       sendSelectedPaymentMethod(paymentMethod, SaleWidgetViews.PAYMENT_METHODS);
     }
 
-    if (paymentMethod === PaymentTypes.FIAT) {
+    if (paymentMethod === SalePaymentTypes.FIAT) {
       sign(paymentMethod, () => {
         viewDispatch({
           payload: {
@@ -55,7 +55,7 @@ export function PaymentMethods() {
       });
     }
 
-    if (paymentMethod === PaymentTypes.CRYPTO) {
+    if (paymentMethod === SalePaymentTypes.CRYPTO) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
