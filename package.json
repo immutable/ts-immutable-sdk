@@ -4,6 +4,9 @@
   "version": "0.0.0",
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
+  "dependencies": {
+    "tslib": "^2.6.2"
+  },
   "devDependencies": {
     "@actions/core": "^1.10.1",
     "@release-it-plugins/workspaces": "^4.0.0",
@@ -89,8 +92,5 @@
     "nohoist": [
       "samples/**"
     ]
-  },
-  "dependencies": {
-    "tslib": "^2.6.2"
   }
 }
