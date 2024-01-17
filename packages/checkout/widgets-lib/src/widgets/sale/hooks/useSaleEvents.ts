@@ -78,6 +78,7 @@ export const useSaleEvent = () => {
         ...userProps,
         transactions: toStringifyTransactions(transactions),
         ...orderProps,
+        paymentMethod,
       },
     });
     sendSaleSuccessEvent(eventTarget, transactions);
@@ -100,6 +101,7 @@ export const useSaleEvent = () => {
         ...details,
         ...orderProps,
         ...userProps,
+        paymentMethod,
         reason,
       },
     });
