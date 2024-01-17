@@ -106,6 +106,27 @@ export interface CreateCounterfactualAddressDeprecatedRequestParams {
 }
 
 /**
+ * Request parameters for createCounterfactualAddressV2 operation in PassportApi.
+ * @export
+ * @interface CreateCounterfactualAddressV2Request
+ */
+export interface CreateCounterfactualAddressV2RequestParams {
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateCounterfactualAddressV2
+     */
+    readonly chainName: string
+
+    /**
+     * 
+     * @type {CreateCounterfactualAddressRequest}
+     * @memberof CreateCounterfactualAddressV2
+     */
+    readonly createCounterfactualAddressRequest: CreateCounterfactualAddressRequest
+}
+
+/**
  * Request parameters for getContractAbi operation in PassportApi.
  * @export
  * @interface GetContractAbiRequest

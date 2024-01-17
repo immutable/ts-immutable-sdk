@@ -56,7 +56,7 @@ export async function createExchangeInstance(
 ): Promise<Exchange> {
   const dexConfig = (await config.remote.getConfig(
     'dex',
-  )) as DexConfig;
+  )) as DexConfig | undefined;
 
   return new Exchange({
     chainId,
@@ -64,6 +64,7 @@ export async function createExchangeInstance(
       environment: config.environment,
     }),
     overrides: dexConfig?.overrides,
+    secondaryFees: dexConfig?.secondaryFees,
   });
 }
 
