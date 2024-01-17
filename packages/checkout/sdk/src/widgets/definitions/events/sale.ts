@@ -16,6 +16,8 @@ export enum SaleEventType {
  * @property {Array} transactions -
  */
 export type SaleSuccess = {
+  /** Chosen payment method */
+  paymentMethod: string | undefined;
   /** The executed transactions */
   transactions: {
     method: string;
@@ -35,6 +37,8 @@ export type SaleFailed = {
   reason: string;
   /** The timestamp of the failed swap. */
   timestamp: number;
+  /** Chosen payment method */
+  paymentMethod: string | undefined;
   /** The executed transactions */
   transactions: {
     method: string;
@@ -59,6 +63,6 @@ export type SaleTransactionSuccess = {
  * @property {Object} transactions
  */
 export type SalePaymentMethod = {
-  /** The chosen payment method */
-  paymentMethod: string;
+  /** Chosen payment method */
+  paymentMethod: string | undefined;
 };

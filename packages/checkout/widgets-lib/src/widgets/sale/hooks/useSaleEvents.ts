@@ -81,7 +81,7 @@ export const useSaleEvent = () => {
         paymentMethod,
       },
     });
-    sendSaleSuccessEvent(eventTarget, transactions);
+    sendSaleSuccessEvent(eventTarget, paymentMethod, transactions);
   };
 
   const sendFailedEvent = (
@@ -105,7 +105,7 @@ export const useSaleEvent = () => {
         reason,
       },
     });
-    sendSaleFailedEvent(eventTarget, reason, transactions);
+    sendSaleFailedEvent(eventTarget, reason, paymentMethod, transactions);
   };
 
   const sendTransactionSuccessEvent = (transactions: ExecutedTransaction[]) => {

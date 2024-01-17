@@ -23,6 +23,7 @@ export const sendSaleWidgetCloseEvent = (eventTarget: Window | EventTarget) => {
 
 export const sendSaleSuccessEvent = (
   eventTarget: Window | EventTarget,
+  paymentMethod: string | undefined,
   transactions: ExecutedTransaction[] = [],
 ) => {
   const event = new CustomEvent<
@@ -31,6 +32,7 @@ export const sendSaleSuccessEvent = (
     detail: {
       type: SaleEventType.SUCCESS,
       data: {
+        paymentMethod,
         transactions,
       },
     },
@@ -43,6 +45,7 @@ export const sendSaleSuccessEvent = (
 export const sendSaleFailedEvent = (
   eventTarget: Window | EventTarget,
   reason: string,
+  paymentMethod: string | undefined,
   transactions: ExecutedTransaction[] = [],
 ) => {
   const event = new CustomEvent<
@@ -53,6 +56,7 @@ export const sendSaleFailedEvent = (
       data: {
         reason,
         timestamp: new Date().getTime(),
+        paymentMethod,
         transactions,
       },
     },
