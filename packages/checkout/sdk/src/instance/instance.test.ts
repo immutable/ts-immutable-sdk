@@ -15,6 +15,10 @@ jest.mock('../config/remoteConfigFetcher');
 describe('instance', () => {
   (RemoteConfigFetcher as unknown as jest.Mock).mockReturnValue({
     getConfig: jest.fn().mockResolvedValue({
+      secondaryFees: [{
+        recipient: '0xa6C368164Eb270C31592c1830Ed25c2bf5D34BAE',
+        basisPoints: 100,
+      }],
       overrides: {
         rpcURL: 'https://test',
         commonRoutingTokens: [

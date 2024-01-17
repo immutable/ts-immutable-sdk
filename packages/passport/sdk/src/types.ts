@@ -41,11 +41,6 @@ export type PassportMetadata = {
   zkevm_user_admin_address: string;
 };
 
-export enum Networks {
-  PRODUCTION = 'mainnet',
-  SANDBOX = 'sepolia',
-}
-
 export interface OidcConfiguration {
   clientId: string;
   logoutRedirectUri?: string;
@@ -56,7 +51,6 @@ export interface OidcConfiguration {
 }
 
 export interface PassportOverrides {
-  network: Networks;
   authenticationDomain: string;
   magicPublishableApiKey: string;
   magicProviderId: string;
