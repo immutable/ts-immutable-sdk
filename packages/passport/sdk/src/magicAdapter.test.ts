@@ -3,7 +3,6 @@ import { Magic } from 'magic-sdk';
 import MagicAdapter from './magicAdapter';
 import { PassportConfiguration } from './config';
 import { PassportError, PassportErrorType } from './errors/passportError';
-import { Networks } from './types';
 
 const loginWithOIDCMock:jest.MockedFunction<(args: LoginWithOpenIdParams) => Promise<void>> = jest.fn();
 
@@ -20,7 +19,6 @@ describe('MagicWallet', () => {
   const apiKey = 'pk_live_A7D9211D7547A338';
   const providerId = 'mPGZAvZsFkyfT6OWfML1HgTKjPqYOPkhhOj-8qCGeqI=';
   const config: PassportConfiguration = {
-    network: Networks.SANDBOX,
     magicPublishableApiKey: apiKey,
     magicProviderId: providerId,
   } as PassportConfiguration;
@@ -90,7 +88,7 @@ describe('MagicWallet', () => {
       const magicProvider = await magicAdapter.login(idToken);
 
       expect(Magic).toHaveBeenCalledWith(apiKey, {
-        network: config.network,
+        network: 'mainnet',
         extensions: [new OpenIdExtension()],
       });
 

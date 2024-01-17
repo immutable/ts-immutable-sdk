@@ -21,7 +21,7 @@ describe('registerZkEvmUser', () => {
   const magicProvider = {};
   const multiRollupApiClients = {
     passportApi: {
-      createCounterfactualAddress: jest.fn(),
+      createCounterfactualAddressV2: jest.fn(),
     },
   };
   const jsonRPCProvider = {
@@ -43,9 +43,9 @@ describe('registerZkEvmUser', () => {
     (signRaw as jest.Mock).mockResolvedValue(ethereumSignature);
   });
 
-  describe('when createCounterfactualAddress doesn\'t return a 201', () => {
+  describe('when createCounterfactualAddressV2 doesn\'t return a 201', () => {
     it('should throw an error', async () => {
-      multiRollupApiClients.passportApi.createCounterfactualAddress.mockImplementation(() => {
+      multiRollupApiClients.passportApi.createCounterfactualAddressV2.mockImplementation(() => {
         throw new Error('Internal server error');
       });
 
@@ -61,7 +61,7 @@ describe('registerZkEvmUser', () => {
 
   describe('when getUser fails to return a user', () => {
     it('should throw an error', async () => {
-      multiRollupApiClients.passportApi.createCounterfactualAddress.mockResolvedValue({
+      multiRollupApiClients.passportApi.createCounterfactualAddressV2.mockResolvedValue({
         status: 201,
       });
 
@@ -79,7 +79,7 @@ describe('registerZkEvmUser', () => {
 
   describe('when getUser returns a user that has not registered with zkEvm', () => {
     it('should throw an error', async () => {
-      multiRollupApiClients.passportApi.createCounterfactualAddress.mockResolvedValue({
+      multiRollupApiClients.passportApi.createCounterfactualAddressV2.mockResolvedValue({
         status: 201,
       });
 
@@ -96,7 +96,7 @@ describe('registerZkEvmUser', () => {
   });
 
   it('should return a user that has registered with zkEvm', async () => {
-    multiRollupApiClients.passportApi.createCounterfactualAddress.mockResolvedValue({
+    multiRollupApiClients.passportApi.createCounterfactualAddressV2.mockResolvedValue({
       status: 201,
     });
 
@@ -111,7 +111,7 @@ describe('registerZkEvmUser', () => {
     });
 
     expect(result).toEqual(mockUserZkEvm);
-    expect(multiRollupApiClients.passportApi.createCounterfactualAddress).toHaveBeenCalledWith({
+    expect(multiRollupApiClients.passportApi.createCounterfactualAddressV2).toHaveBeenCalledWith({
       chainName: ChainName.IMTBL_ZKEVM_TESTNET,
       createCounterfactualAddressRequest: {
         ethereum_address: ethereumAddress,
