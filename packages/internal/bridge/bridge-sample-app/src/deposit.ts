@@ -38,22 +38,24 @@ async function deposit() {
   const rootBridge: ethers.Contract = getContract("RootERC20BridgeFlowRate", params.rootBridgeAddress, params.rootProvider);
   const childBridge: ethers.Contract = getContract("ChildERC20Bridge", params.childBridgeAddress, params.childProvider);
 
-  let rootBridgeChildAddress = await rootBridge.rootTokenToChildToken(params.rootToken);
-  let childBridgeChildAddress = await childBridge.rootTokenToChildToken(params.rootToken);
-
-  if (rootBridgeChildAddress === ethers.constants.AddressZero) {
-    console.log('token not mapped, please map token before depositing');
-    return;
-  }
-
-  if (childBridgeChildAddress === ethers.constants.AddressZero) {
-    console.log('token mapping incomplete, please wait for token to map to childBridge before depositing');
-    return;
-  }
-
-  if (rootBridgeChildAddress !== childBridgeChildAddress) {
-    console.log(`token mappings mismatch on rootBridge (${rootBridgeChildAddress}) & childBridge (${childBridgeChildAddress}).`, );
-    return;
+  if (params.childToken.toUpperCase() !== 'NATIVE' && params.rootToken.toUpperCase() !== 'NATIVE') {
+    let rootBridgeChildAddress = await rootBridge.rootTokenToChildToken(params.rootToken);
+    let childBridgeChildAddress = await childBridge.rootTokenToChildToken(params.rootToken);
+    
+    if (rootBridgeChildAddress === ethers.constants.AddressZero) {
+      console.log('token not mapped, please map token before depositing');
+      return;
+    }
+  
+    if (childBridgeChildAddress === ethers.constants.AddressZero) {
+      console.log('token mapping incomplete, please wait for token to map to childBridge before depositing');
+      return;
+    }
+  
+    if (rootBridgeChildAddress !== childBridgeChildAddress) {
+      console.log(`token mappings mismatch on rootBridge (${rootBridgeChildAddress}) & childBridge (${childBridgeChildAddress}).`, );
+      return;
+    }
   }
 
   const approvalReq: ApproveBridgeRequest = {
@@ -108,7 +110,7 @@ async function deposit() {
     amount: params.amount,
     sourceChainId: bridgeConfig.bridgeInstance.rootChainID,
     destinationChainId: bridgeConfig.bridgeInstance.childChainID,
-    gasMultiplier: 1.1,
+    gasMultiplier: 1.54,
   }
 
   console.log('depositReq', depositReq)
