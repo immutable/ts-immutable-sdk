@@ -82,7 +82,7 @@ export default class ConfirmationScreen {
       if (chainType === TransactionApprovalRequestChainTypeEnum.Starkex) {
         href = this.getHref('transaction', { transactionId, etherAddress, chainType });
       } else {
-        href = this.getHref('zkevm', {
+        href = this.getHref('zkevm/transaction', {
           transactionId, etherAddress, chainType, chainId,
         });
       }
