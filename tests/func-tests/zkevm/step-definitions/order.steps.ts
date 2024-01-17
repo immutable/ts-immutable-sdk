@@ -21,9 +21,9 @@ defineFeature(feature, (test) => {
     then,
     and,
   }) => {
-    const bankerKey = process.env.ORDERBOOK_BANKER;
-    const erc721ContractAddress = process.env.ORDERBOOK_ERC721;
-    const rpcUrl = process.env.RPC_ENDPOINT;
+    const bankerKey = process.env.ZKEVM_ORDERBOOK_BANKER;
+    const erc721ContractAddress = process.env.ZKEVM_ORDERBOOK_ERC721;
+    const rpcUrl = process.env.ZKEVM_RPC_ENDPOINT;
 
     if (!bankerKey || !erc721ContractAddress || !rpcUrl) {
       throw new Error('missing config for orderbook tests');
