@@ -68,6 +68,7 @@ export const sendSaleFailedEvent = (
 
 export const sendSaleTransactionSuccessEvent = (
   eventTarget: Window | EventTarget,
+  paymentMethod: string | undefined,
   transactions: ExecutedTransaction[],
 ) => {
   const event = new CustomEvent<
@@ -75,7 +76,7 @@ export const sendSaleTransactionSuccessEvent = (
   >(IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT, {
     detail: {
       type: SaleEventType.TRANSACTION_SUCCESS,
-      data: { transactions },
+      data: { paymentMethod, transactions },
     },
   });
   // eslint-disable-next-line no-console
@@ -85,7 +86,7 @@ export const sendSaleTransactionSuccessEvent = (
 
 export const sendSalePaymentMethodEvent = (
   eventTarget: Window | EventTarget,
-  paymentMethod: string,
+  paymentMethod: string | undefined,
 ) => {
   const event = new CustomEvent<
   WidgetEvent<WidgetType.SALE, SaleEventType.PAYMENT_METHOD>

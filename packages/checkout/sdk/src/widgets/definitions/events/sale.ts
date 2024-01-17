@@ -51,6 +51,7 @@ export type SaleFailed = {
  * @property {Object} transactions
  */
 export type SaleTransactionSuccess = {
+  paymentMethod: string | undefined;
   /** The executed transactions */
   transactions: {
     method: string;

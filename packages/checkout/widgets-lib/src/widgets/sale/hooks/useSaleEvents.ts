@@ -109,7 +109,7 @@ export const useSaleEvent = () => {
   };
 
   const sendTransactionSuccessEvent = (transactions: ExecutedTransaction[]) => {
-    sendSaleTransactionSuccessEvent(eventTarget, transactions);
+    sendSaleTransactionSuccessEvent(eventTarget, paymentMethod, transactions);
   };
 
   const sendSelectedPaymentMethod = (type: string, screen: string) => {
