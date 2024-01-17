@@ -22,11 +22,18 @@ export default function Sell({ checkout, provider }: SellProps) {
   const [listingTypeError, setListingTypeError] = useState<string>('');
   const [amount, setAmount] = useState<string>('');
   const [amountError, setAmountError] = useState<string>('');
+  const [expiry, setExpiry] = useState<string | undefined>(undefined);
+  const [expiryError, setExpiryError] = useState<string>('');
   const [tokenAddress, setTokenAddress] = useState<string>('');
   const [contractAddressError, setContractAddressError] = useState<string>('');
   const [error, setError] = useState<any>(null);
   const [success, setSuccess] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+
+  const isDateValid = (dateStr: string) => {
+    var dateRegex = /^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}$/;
+    return dateRegex.test(dateStr);
+  }
 
   const getBuyToken = (): BuyToken => {
     if (listingType === ItemType.NATIVE) {
@@ -61,6 +68,9 @@ export default function Sell({ checkout, provider }: SellProps) {
     if (listingType === ItemType.ERC20 && !tokenAddress) {
       setContractAddressError('Please enter the contract address for the ERC20');
     }
+    if (expiry && !isDateValid(expiry)) {
+      setExpiryError('Invalid date - format YYYY-MM-DD');
+    }
     if (!id ||
       !collectionAddress ||
       !amount ||
@@ -89,7 +99,8 @@ export default function Sell({ checkout, provider }: SellProps) {
         makerFees: [{
           amount: { percentageDecimal: 0.025 },
           recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772'
-        }]
+        }],
+        orderExpiry: expiry ? new Date(expiry) : undefined
       }]
 
       const result = await checkout.sell({
@@ -116,6 +127,11 @@ export default function Sell({ checkout, provider }: SellProps) {
   const updateCollectionAddress = (event: any) => {
     setCollectionAddress(event.target.value);
     setCollectionAddressError('');
+  }
+
+  const updateExpiry = (event: any) => {
+    setExpiry(event.target.value);
+    setError('');
   }
 
   const updateAmount = (event: any) => {
@@ -224,6 +240,13 @@ export default function Sell({ checkout, provider }: SellProps) {
         <TextInput onChange={updateCollectionAddress} />
         {collectionAddressError && (
           <FormControl.Validation>{collectionAddressError}</FormControl.Validation>
+        )}
+      </FormControl>
+      <FormControl validationStatus={expiryError ? 'error' : 'success'} >
+        <FormControl.Label>Expiry</FormControl.Label>
+        <TextInput onChange={updateExpiry} />
+        {expiryError && (
+          <FormControl.Validation>{expiryError}</FormControl.Validation>
         )}
       </FormControl>
       {tokenForm()}
