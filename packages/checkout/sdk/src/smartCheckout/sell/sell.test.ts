@@ -30,13 +30,14 @@ jest.mock('../actions');
 
 describe('sell', () => {
   const seaportContractAddress = '0xSEAPORT';
+  const walletAddress = '0xADDRESS';
   let config: CheckoutConfiguration;
   let mockProvider: Web3Provider;
 
   beforeEach(() => {
     mockProvider = {
       getSigner: jest.fn().mockReturnValue({
-        getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
+        getAddress: jest.fn().mockResolvedValue(walletAddress),
       }),
     } as unknown as Web3Provider;
 
@@ -49,7 +50,7 @@ describe('sell', () => {
   });
 
   describe('sell', () => {
-    it('should call smart checkout and execute the transactions', async () => {
+    it.only('should call smart checkout and execute the transactions', async () => {
       const id = '0';
       const contractAddress = '0xERC721';
 
@@ -89,30 +90,35 @@ describe('sell', () => {
           erc721TransactionRequirement,
         ],
       });
+
       const mockCreateListing = jest.fn().mockResolvedValue({
         result: {
           id: '1234',
         },
       });
+
+      const prepareListing = jest.fn().mockResolvedValue({
+        actions: [
+          {
+            type: ActionType.SIGNABLE,
+            purpose: SignablePurpose.CREATE_LISTING,
+            message: {
+              domain: '',
+              types: '',
+              value: '',
+            },
+          },
+        ],
+      });
+
       (createOrderbookInstance as jest.Mock).mockReturnValue({
         config: jest.fn().mockReturnValue({
           seaportContractAddress,
         }),
-        prepareListing: jest.fn().mockResolvedValue({
-          actions: [
-            {
-              type: ActionType.SIGNABLE,
-              purpose: SignablePurpose.CREATE_LISTING,
-              message: {
-                domain: '',
-                types: '',
-                value: '',
-              },
-            },
-          ],
-        }),
+        prepareListing,
         createListing: mockCreateListing,
       });
+
       (getUnsignedMessage as jest.Mock).mockReturnValue(
         {
           orderHash: 'hash',
@@ -136,7 +142,8 @@ describe('sell', () => {
         type: SignTransactionStatusType.SUCCESS,
       });
 
-      const orders:Array<SellOrder> = [{
+      const orderExpiry = new Date('2022-03-25');
+      const order: SellOrder = {
         sellToken: {
           id,
           collectionAddress: contractAddress,
@@ -149,12 +156,13 @@ describe('sell', () => {
           amount: { percentageDecimal: 0.025 },
           recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
         }],
-      }];
+        orderExpiry,
+      };
 
       const result = await sell(
         config,
         mockProvider,
-        orders,
+        [order],
       );
 
       expect(result).toEqual({
@@ -178,6 +186,19 @@ describe('sell', () => {
           },
         },
       );
+      expect(prepareListing).toBeCalledWith({
+        makerAddress: walletAddress,
+        buy: {
+          type: ItemType.NATIVE,
+          amount: '1000000000000000000',
+        },
+        sell: {
+          type: ItemType.ERC721,
+          contractAddress: order.sellToken.collectionAddress,
+          tokenId: order.sellToken.id,
+        },
+        orderExpiry: order.orderExpiry,
+      });
       expect(signMessage).toBeCalledWith(
         mockProvider,
         {
