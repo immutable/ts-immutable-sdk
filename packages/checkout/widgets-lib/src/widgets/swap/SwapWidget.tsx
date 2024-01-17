@@ -10,7 +10,7 @@ import {
   DexConfig, TokenFilterTypes, IMTBLWidgetEvents, SwapWidgetParams,
 } from '@imtbl/checkout-sdk';
 import { ImmutableConfiguration } from '@imtbl/config';
-import { Exchange, ExchangeOverrides } from '@imtbl/dex-sdk';
+import { Exchange } from '@imtbl/dex-sdk';
 import { useTranslation } from 'react-i18next';
 import { SwapCoins } from './views/SwapCoins';
 import { LoadingView } from '../../views/loading/LoadingView';
@@ -166,11 +166,11 @@ export function SwapWidget({
       // connect loader handle the switch network functionality
       if (network.chainId !== getL2ChainId(checkout.config)) return;
 
-      let overrides: ExchangeOverrides | undefined;
+      let dexConfig: DexConfig | undefined;
       try {
-        overrides = (
+        dexConfig = (
           (await checkout.config.remote.getConfig('dex')) as DexConfig
-        ).overrides;
+        );
       } catch (err: any) {
         showErrorView(err);
         return;
@@ -179,7 +179,8 @@ export function SwapWidget({
       const exchange = new Exchange({
         chainId: network.chainId,
         baseConfig: new ImmutableConfiguration({ environment }),
-        overrides,
+        secondaryFees: dexConfig.secondaryFees,
+        overrides: dexConfig.overrides,
       });
 
       swapDispatch({
