@@ -35,7 +35,10 @@ export function OnRampWidget({
   const {
     isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
   } = config;
-  const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
+  const [viewState, viewDispatch] = useReducer(viewReducer, {
+    ...initialViewState,
+    history: [],
+  });
   const viewReducerValues = useMemo(() => ({ viewState, viewDispatch }), [viewState, viewReducer]);
 
   const { connectLoaderState } = useContext(ConnectLoaderContext);
