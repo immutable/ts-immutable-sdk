@@ -75,6 +75,7 @@ export const useTransakIframe = (props: UseTransakIframeProps) => {
       nftData: btoa(JSON.stringify(nftData)),
       estimatedGasLimit: gasLimit.toString(),
       ...restTransakParams,
+      themeColor: '0D0D0D',
     };
 
     const baseUrl = `${TRANSAK_API_BASE_URL[environment]}?`;
