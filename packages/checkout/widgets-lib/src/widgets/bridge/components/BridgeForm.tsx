@@ -15,7 +15,7 @@ import {
 import {
   useCallback, useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
-import { BigNumber, utils } from 'ethers';
+import { BigNumber, ethers, utils } from 'ethers';
 import { FeesBreakdown } from 'components/FeesBreakdown/FeesBreakdown';
 import { BridgeFeeActions } from '@imtbl/bridge-sdk';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
@@ -236,6 +236,8 @@ export function BridgeForm(props: BridgeFormProps) {
       gasMultiplier: 1.1,
       sourceChainId: from?.network.toString() ?? '',
       destinationChainId: to?.network.toString() ?? '',
+      token: 'NATIVE',
+      amount: ethers.BigNumber.from(1000),
     });
 
     const gasEstimateResult = {
