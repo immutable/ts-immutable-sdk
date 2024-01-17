@@ -11,6 +11,7 @@ import {
   sendSaleSuccessEvent,
   sendSaleWidgetCloseEvent,
   sendSaleTransactionSuccessEvent,
+  sendSalePaymentMethodEvent,
 } from '../SaleWidgetEvents';
 import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 import { ExecutedTransaction } from '../types';
@@ -77,9 +78,10 @@ export const useSaleEvent = () => {
         ...userProps,
         transactions: toStringifyTransactions(transactions),
         ...orderProps,
+        paymentMethod,
       },
     });
-    sendSaleSuccessEvent(eventTarget, transactions);
+    sendSaleSuccessEvent(eventTarget, paymentMethod, transactions);
   };
 
   const sendFailedEvent = (
@@ -99,14 +101,15 @@ export const useSaleEvent = () => {
         ...details,
         ...orderProps,
         ...userProps,
+        paymentMethod,
         reason,
       },
     });
-    sendSaleFailedEvent(eventTarget, reason, transactions);
+    sendSaleFailedEvent(eventTarget, reason, paymentMethod, transactions);
   };
 
   const sendTransactionSuccessEvent = (transactions: ExecutedTransaction[]) => {
-    sendSaleTransactionSuccessEvent(eventTarget, transactions);
+    sendSaleTransactionSuccessEvent(eventTarget, paymentMethod, transactions);
   };
 
   const sendSelectedPaymentMethod = (type: string, screen: string) => {
@@ -119,6 +122,7 @@ export const useSaleEvent = () => {
         paymentMethod: type,
       },
     });
+    sendSalePaymentMethodEvent(eventTarget, type);
   };
 
   const sendPageView = (screen: string, data?: Record<string, unknown>) => {
