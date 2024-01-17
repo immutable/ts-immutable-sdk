@@ -80,7 +80,8 @@ export function BridgeWidget({
     {
       ...initialViewState,
       view: { type: BridgeWidgetViews.WALLET_NETWORK_SELECTION },
-      history: initialViewState.history[initialViewState.history.length - 1].type === SharedViews.TOP_UP_VIEW
+      history: initialViewState.history.length > 0
+      && initialViewState.history[initialViewState.history.length - 1].type === SharedViews.TOP_UP_VIEW
         ? [{ type: SharedViews.TOP_UP_VIEW }, { type: BridgeWidgetViews.WALLET_NETWORK_SELECTION }]
         : [{ type: BridgeWidgetViews.WALLET_NETWORK_SELECTION }],
     },
