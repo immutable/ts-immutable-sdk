@@ -50,7 +50,7 @@ describe('sell', () => {
   });
 
   describe('sell', () => {
-    it.only('should call smart checkout and execute the transactions', async () => {
+    it('should call smart checkout and execute the transactions', async () => {
       const id = '0';
       const contractAddress = '0xERC721';
 
