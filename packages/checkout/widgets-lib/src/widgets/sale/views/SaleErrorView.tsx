@@ -1,9 +1,13 @@
 import { BaseTokens } from '@biom3/design-tokens';
 import { useContext } from 'react';
 import { useTranslation } from 'react-i18next';
+import { SalePaymentTypes } from '@imtbl/checkout-sdk';
 import { StatusType } from '../../../components/Status/StatusType';
-import { StatusView, StatusViewProps } from '../../../components/Status/StatusView';
-import { PaymentTypes, SaleErrorTypes } from '../types';
+import {
+  StatusView,
+  StatusViewProps,
+} from '../../../components/Status/StatusView';
+import { SaleErrorTypes } from '../types';
 import { useSaleContext } from '../context/SaleContextProvider';
 import { sendSaleWidgetCloseEvent } from '../SaleWidgetEvents';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
@@ -16,14 +20,19 @@ interface ErrorHandlerConfig {
 }
 
 type SaleErrorViewProps = {
-  errorType: SaleErrorTypes | undefined,
-  biomeTheme: BaseTokens
+  errorType: SaleErrorTypes | undefined;
+  biomeTheme: BaseTokens;
 };
 
-export function SaleErrorView({ errorType = SaleErrorTypes.DEFAULT, biomeTheme }: SaleErrorViewProps) {
+export function SaleErrorView({
+  errorType = SaleErrorTypes.DEFAULT,
+  biomeTheme,
+}: SaleErrorViewProps) {
   const { t } = useTranslation();
   const { goBackToPaymentMethods } = useSaleContext();
-  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+  const {
+    eventTargetState: { eventTarget },
+  } = useContext(EventTargetContext);
 
   const closeWidget = () => {
     sendSaleWidgetCloseEvent(eventTarget);
@@ -69,7 +78,7 @@ export function SaleErrorView({ errorType = SaleErrorTypes.DEFAULT, biomeTheme }
     },
     [SaleErrorTypes.WALLET_REJECTED]: {
       onActionClick: () => {
-        goBackToPaymentMethods(PaymentTypes.CRYPTO);
+        goBackToPaymentMethods(SalePaymentTypes.CRYPTO);
       },
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
@@ -99,7 +108,9 @@ export function SaleErrorView({ errorType = SaleErrorTypes.DEFAULT, biomeTheme }
       statusText: t(`views.SALE_FAIL.errors.${errorType}.description`),
       actionText: t(`views.SALE_FAIL.errors.${errorType}.primaryAction`),
       onActionClick: handlers?.onActionClick,
-      secondaryActionText: t(`views.SALE_FAIL.errors.${errorType}.secondaryAction`),
+      secondaryActionText: t(
+        `views.SALE_FAIL.errors.${errorType}.secondaryAction`,
+      ),
       onSecondaryActionClick: handlers?.onSecondaryActionClick,
       onCloseClick: closeWidget,
       statusType: handlers.statusType,
@@ -110,7 +121,5 @@ export function SaleErrorView({ errorType = SaleErrorTypes.DEFAULT, biomeTheme }
       },
     };
   };
-  return (
-    <StatusView {...getErrorViewProps()} />
-  );
+  return <StatusView {...getErrorViewProps()} />;
 }

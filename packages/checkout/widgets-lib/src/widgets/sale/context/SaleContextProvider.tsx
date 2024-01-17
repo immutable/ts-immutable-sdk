@@ -3,6 +3,7 @@ import {
   SaleItem,
   RoutingOutcomeType,
   SmartCheckoutResult,
+  SalePaymentTypes,
 } from '@imtbl/checkout-sdk';
 import { Passport } from '@imtbl/passport';
 import {
@@ -16,7 +17,10 @@ import {
   useState,
 } from 'react';
 import { ConnectLoaderState } from '../../../context/connect-loader-context/ConnectLoaderContext';
-import { FundWithSmartCheckoutSubViews, SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
+import {
+  FundWithSmartCheckoutSubViews,
+  SaleWidgetViews,
+} from '../../../context/view-context/SaleViewContextTypes';
 import {
   ViewActions,
   ViewContext,
@@ -26,7 +30,6 @@ import { useSignOrder } from '../hooks/useSignOrder';
 import {
   ExecuteOrderResponse,
   ExecutedTransaction,
-  PaymentTypes,
   SaleErrorTypes,
   SignOrderError,
   SignResponse,
@@ -49,7 +52,7 @@ type SaleContextProps = {
 
 type SaleContextValues = SaleContextProps & {
   sign: (
-    paymentType: PaymentTypes,
+    paymentType: SalePaymentTypes,
     callback?: (response: SignResponse | undefined) => void
   ) => Promise<SignResponse | undefined>;
   execute: (
@@ -61,15 +64,19 @@ type SaleContextValues = SaleContextProps & {
   signError: SignOrderError | undefined;
   executeResponse: ExecuteOrderResponse | undefined;
   isPassportWallet: boolean;
-  paymentMethod: PaymentTypes | undefined;
-  setPaymentMethod: (paymentMethod: PaymentTypes | undefined) => void;
-  goBackToPaymentMethods: (paymentMethod?: PaymentTypes | undefined) => void;
+  paymentMethod: SalePaymentTypes | undefined;
+  setPaymentMethod: (paymentMethod: SalePaymentTypes | undefined) => void;
+  goBackToPaymentMethods: (
+    paymentMethod?: SalePaymentTypes | undefined
+  ) => void;
   goToErrorView: (type: SaleErrorTypes, data?: Record<string, unknown>) => void;
   goToSuccessView: (data?: Record<string, unknown>) => void;
-  querySmartCheckout: ((callback?: (r?: SmartCheckoutResult) => void) => Promise<SmartCheckoutResult | undefined>);
+  querySmartCheckout: (
+    callback?: (r?: SmartCheckoutResult) => void
+  ) => Promise<SmartCheckoutResult | undefined>;
   smartCheckoutResult: SmartCheckoutResult | undefined;
   fundingRoutes: FundingRoute[];
-  disabledPaymentTypes: PaymentTypes[]
+  disabledPaymentTypes: SalePaymentTypes[];
 };
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -136,15 +143,20 @@ export function SaleContextProvider(props: {
     recipientAddress: '',
   });
 
-  const [paymentMethod, setPaymentMethod] = useState<PaymentTypes | undefined>(
-    undefined,
-  );
+  const [paymentMethod, setPaymentMethod] = useState<
+  SalePaymentTypes | undefined
+  >(undefined);
 
   const [fundingRoutes, setFundingRoutes] = useState<FundingRoute[]>([]);
-  const [disabledPaymentTypes, setDisabledPaymentTypes] = useState<PaymentTypes[]>([]);
+  const [disabledPaymentTypes, setDisabledPaymentTypes] = useState<
+  SalePaymentTypes[]
+  >([]);
 
   const goBackToPaymentMethods = useCallback(
-    (type?: PaymentTypes | undefined, showInsufficientCoinsBanner?: boolean) => {
+    (
+      type?: SalePaymentTypes | undefined,
+      showInsufficientCoinsBanner?: boolean,
+    ) => {
       setPaymentMethod(type);
       viewDispatch({
         payload: {
@@ -190,7 +202,7 @@ export function SaleContextProvider(props: {
 
   const sign = useCallback(
     async (
-      type: PaymentTypes,
+      type: SalePaymentTypes,
       callback?: (r?: SignResponse) => void,
     ): Promise<SignResponse | undefined> => {
       const response = await signOrder(type);
@@ -228,21 +240,24 @@ export function SaleContextProvider(props: {
     [paymentMethod, setPaymentMethod, executeResponse],
   );
 
-  const goToSuccessView = useCallback((data?: Record<string, unknown>) => {
-    viewDispatch({
-      payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: {
-          type: SaleWidgetViews.SALE_SUCCESS,
-          data: {
-            paymentMethod,
-            transactions: executeResponse.transactions,
-            ...data,
+  const goToSuccessView = useCallback(
+    (data?: Record<string, unknown>) => {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SaleWidgetViews.SALE_SUCCESS,
+            data: {
+              paymentMethod,
+              transactions: executeResponse.transactions,
+              ...data,
+            },
           },
         },
-      },
-    });
-  }, [[paymentMethod, executeResponse]]);
+      });
+    },
+    [[paymentMethod, executeResponse]],
+  );
 
   useEffect(() => {
     if (!signError) return;
@@ -259,26 +274,32 @@ export function SaleContextProvider(props: {
 
   useEffect(() => {
     if (!smartCheckoutError) return;
-    if ((smartCheckoutError.data?.error as Error)?.message === SmartCheckoutErrorTypes.FRACTIONAL_BALANCE_BLOCKED) {
-      setDisabledPaymentTypes([PaymentTypes.CRYPTO]);
+    if (
+      (smartCheckoutError.data?.error as Error)?.message
+      === SmartCheckoutErrorTypes.FRACTIONAL_BALANCE_BLOCKED
+    ) {
+      setDisabledPaymentTypes([SalePaymentTypes.CRYPTO]);
       goBackToPaymentMethods(undefined, true);
       return;
     }
     goToErrorView(smartCheckoutError.type, smartCheckoutError.data);
   }, [smartCheckoutError]);
 
-  const querySmartCheckout = useCallback(async (callback?: (r?: SmartCheckoutResult) => void) => {
-    const result = await smartCheckout();
-    callback?.(result);
-    return result;
-  }, [smartCheckout]);
+  const querySmartCheckout = useCallback(
+    async (callback?: (r?: SmartCheckoutResult) => void) => {
+      const result = await smartCheckout();
+      callback?.(result);
+      return result;
+    },
+    [smartCheckout],
+  );
 
   useEffect(() => {
     if (!smartCheckoutResult) {
       return;
     }
     if (smartCheckoutResult.sufficient) {
-      sign(PaymentTypes.CRYPTO);
+      sign(SalePaymentTypes.CRYPTO);
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -291,7 +312,9 @@ export function SaleContextProvider(props: {
     if (!smartCheckoutResult.sufficient) {
       switch (smartCheckoutResult.router.routingOutcome.type) {
         case RoutingOutcomeType.ROUTES_FOUND:
-          setFundingRoutes(smartCheckoutResult.router.routingOutcome.fundingRoutes);
+          setFundingRoutes(
+            smartCheckoutResult.router.routingOutcome.fundingRoutes,
+          );
           viewDispatch({
             payload: {
               type: ViewActions.UPDATE_VIEW,
@@ -308,7 +331,7 @@ export function SaleContextProvider(props: {
         default:
           setFundingRoutes([]);
           setPaymentMethod(undefined);
-          setDisabledPaymentTypes([PaymentTypes.CRYPTO]);
+          setDisabledPaymentTypes([SalePaymentTypes.CRYPTO]);
           goBackToPaymentMethods(undefined, true);
           break;
       }

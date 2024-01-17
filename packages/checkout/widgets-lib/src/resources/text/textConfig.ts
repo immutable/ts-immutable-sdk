@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { WalletProviderName } from '@imtbl/checkout-sdk';
+import { SalePaymentTypes, WalletProviderName } from '@imtbl/checkout-sdk';
 import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
@@ -7,7 +7,7 @@ import { SharedViews } from '../../context/view-context/ViewContext';
 import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
 import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextTypes';
 import { SaleWidgetViews } from '../../context/view-context/SaleViewContextTypes';
-import { SaleErrorTypes, PaymentTypes } from '../../widgets/sale/types';
+import { SaleErrorTypes } from '../../widgets/sale/types';
 import { ServiceType } from '../../views/error/serviceTypes';
 
 export const text = {
@@ -211,8 +211,10 @@ export const text = {
       [OnRampWidgetViews.IN_PROGRESS]: {
         content: {
           heading: 'Order in progress',
-          body1: 'You’ll receive an email from Transak when complete. This can take up to 3 mins.',
-          body2: 'You can close this window, the transaction will be reflected in your wallet once complete.',
+          body1:
+            'You’ll receive an email from Transak when complete. This can take up to 3 mins.',
+          body2:
+            'You can close this window, the transaction will be reflected in your wallet once complete.',
         },
       },
       [OnRampWidgetViews.SUCCESS]: {
@@ -262,7 +264,8 @@ export const text = {
       },
       fundingRouteSelect: {
         heading: 'Pay with your',
-        noRoutesAvailable: 'Insufficient coin balance. Please proceed with card instead.',
+        noRoutesAvailable:
+          'Insufficient coin balance. Please proceed with card instead.',
         continue: 'Continue',
         payWithCardInstead: "No thanks, I'll pay with card",
         payWithCard: 'Pay with card',
@@ -273,12 +276,12 @@ export const text = {
         heading: 'How would you like to pay?',
       },
       options: {
-        [PaymentTypes.CRYPTO]: {
+        [SalePaymentTypes.CRYPTO]: {
           heading: 'Coins',
           caption: 'Using the coins balance in your wallet',
           disabledCaption: "We can't see enough coins in your balance",
         },
-        [PaymentTypes.FIAT]: {
+        [SalePaymentTypes.FIAT]: {
           heading: 'Card',
           caption: 'GooglePay also available with Transak',
           disabledCaption: undefined,
@@ -444,7 +447,8 @@ export const text = {
     [BridgeWidgetViews.IN_PROGRESS]: {
       heading: 'Move in progress',
       body1: (symbol: string) => `Less than 3 mins until your ${symbol} lands on zkEVM.`,
-      body2: 'You can close this window, the transaction will be reflected in your wallet once complete.',
+      body2:
+        'You can close this window, the transaction will be reflected in your wallet once complete.',
     },
     [BridgeWidgetViews.TRANSACTIONS]: {
       layoutHeading: 'In progress',
@@ -486,7 +490,8 @@ export const text = {
   },
   footers: {
     quickswapFooter: {
-      disclaimerText: 'Quickswap is a third party app. Immutable neither builds, owns, operates or deploys Quickswap. For further info, refer to Quickswap’s website.',
+      disclaimerText:
+        'Quickswap is a third party app. Immutable neither builds, owns, operates or deploys Quickswap. For further info, refer to Quickswap’s website.',
     },
   },
   wallets: {

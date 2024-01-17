@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { useCallback, useState } from 'react';
-import { SaleItem } from '@imtbl/checkout-sdk';
+import { SaleItem, SalePaymentTypes } from '@imtbl/checkout-sdk';
 
 import { Environment } from '@imtbl/config';
 import {
   SignResponse,
   SignOrderInput,
-  PaymentTypes,
   SignedOrderProduct,
   SignOrderError,
   ExecuteOrderResponse,
@@ -15,10 +14,8 @@ import {
 } from '../types';
 
 const PRIMARY_SALES_API_BASE_URL = {
-  [Environment.SANDBOX]:
-    'https://api.sandbox.immutable.com/v1/primary-sales',
-  [Environment.PRODUCTION]:
-    'https://api.immutable.com/v1/primary-sales',
+  [Environment.SANDBOX]: 'https://api.sandbox.immutable.com/v1/primary-sales',
+  [Environment.PRODUCTION]: 'https://api.immutable.com/v1/primary-sales',
 };
 
 type SignApiTransaction = {
@@ -231,7 +228,9 @@ export const useSignOrder = (input: SignOrderInput) => {
   );
 
   const sign = useCallback(
-    async (paymentType: PaymentTypes): Promise<SignResponse | undefined> => {
+    async (
+      paymentType: SalePaymentTypes,
+    ): Promise<SignResponse | undefined> => {
       try {
         const data: SignApiRequest = {
           recipient_address: recipientAddress,

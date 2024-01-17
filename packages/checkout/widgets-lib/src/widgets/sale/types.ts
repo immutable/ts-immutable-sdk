@@ -1,11 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { SaleItem } from '@imtbl/checkout-sdk';
 
-export enum PaymentTypes {
-  CRYPTO = 'crypto',
-  FIAT = 'fiat',
-}
-
 export type SignedOrderProduct = {
   productId: string;
   qty: number;

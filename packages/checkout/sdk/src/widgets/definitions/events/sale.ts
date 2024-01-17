@@ -67,3 +67,8 @@ export type SalePaymentMethod = {
   /** Chosen payment method */
   paymentMethod: string | undefined;
 };
+
+export enum SalePaymentTypes {
+  CRYPTO = 'crypto',
+  FIAT = 'fiat',
+}
