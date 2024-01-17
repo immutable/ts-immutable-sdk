@@ -237,7 +237,7 @@ export function BridgeForm(props: BridgeFormProps) {
       sourceChainId: from?.network.toString() ?? '',
       destinationChainId: to?.network.toString() ?? '',
       token: 'NATIVE',
-      amount: ethers.BigNumber.from(1000),
+      amount: ethers.BigNumber.from(0),
     });
 
     const gasEstimateResult = {

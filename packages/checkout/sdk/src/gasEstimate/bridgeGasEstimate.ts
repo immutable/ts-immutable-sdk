@@ -23,6 +23,6 @@ export async function getBridgeFeeEstimate(
     sourceChainId: fromChainId.toString(),
     destinationChainId: toChainId.toString(),
     token: 'NATIVE',
-    amount: ethers.BigNumber.from(1000),
+    amount: ethers.BigNumber.from(0),
   });
 }
