@@ -1,9 +1,10 @@
 import { BaseTokens } from '@biom3/design-tokens';
 import { useContext } from 'react';
 import { useTranslation } from 'react-i18next';
+import { SalePaymentTypes } from '@imtbl/checkout-sdk';
 import { StatusType } from '../../../components/Status/StatusType';
 import { StatusView, StatusViewProps } from '../../../components/Status/StatusView';
-import { PaymentTypes, SaleErrorTypes } from '../types';
+import { SaleErrorTypes } from '../types';
 import { useSaleContext } from '../context/SaleContextProvider';
 import { sendSaleWidgetCloseEvent } from '../SaleWidgetEvents';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
@@ -69,7 +70,7 @@ export function SaleErrorView({ errorType = SaleErrorTypes.DEFAULT, biomeTheme }
     },
     [SaleErrorTypes.WALLET_REJECTED]: {
       onActionClick: () => {
-        goBackToPaymentMethods(PaymentTypes.CRYPTO);
+        goBackToPaymentMethods(SalePaymentTypes.CRYPTO);
       },
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,

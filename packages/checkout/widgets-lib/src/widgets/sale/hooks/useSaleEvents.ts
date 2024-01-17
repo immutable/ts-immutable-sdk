@@ -1,5 +1,6 @@
 import { useContext } from 'react';
 import { StandardAnalyticsActions } from '@imtbl/react-analytics';
+import { SalePaymentTypes } from '@imtbl/checkout-sdk';
 import {
   UserJourney,
   useAnalytics,
@@ -112,7 +113,7 @@ export const useSaleEvent = () => {
     sendSaleTransactionSuccessEvent(eventTarget, paymentMethod, transactions);
   };
 
-  const sendSelectedPaymentMethod = (type: string, screen: string) => {
+  const sendSelectedPaymentMethod = (type: SalePaymentTypes, screen: string) => {
     track({
       ...commonProps,
       screen: toPascalCase(screen),

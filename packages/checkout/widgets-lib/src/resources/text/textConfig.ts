@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { WalletProviderName } from '@imtbl/checkout-sdk';
+import { SalePaymentTypes, WalletProviderName } from '@imtbl/checkout-sdk';
 import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
@@ -7,7 +7,7 @@ import { SharedViews } from '../../context/view-context/ViewContext';
 import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
 import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextTypes';
 import { SaleWidgetViews } from '../../context/view-context/SaleViewContextTypes';
-import { SaleErrorTypes, PaymentTypes } from '../../widgets/sale/types';
+import { SaleErrorTypes } from '../../widgets/sale/types';
 import { ServiceType } from '../../views/error/serviceTypes';
 
 export const text = {
@@ -273,12 +273,12 @@ export const text = {
         heading: 'How would you like to pay?',
       },
       options: {
-        [PaymentTypes.CRYPTO]: {
+        [SalePaymentTypes.CRYPTO]: {
           heading: 'Coins',
           caption: 'Using the coins balance in your wallet',
           disabledCaption: "We can't see enough coins in your balance",
         },
-        [PaymentTypes.FIAT]: {
+        [SalePaymentTypes.FIAT]: {
           heading: 'Card',
           caption: 'GooglePay also available with Transak',
           disabledCaption: undefined,
