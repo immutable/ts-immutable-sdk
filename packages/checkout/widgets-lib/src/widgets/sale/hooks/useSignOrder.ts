@@ -252,16 +252,38 @@ export const useSignOrder = (input: SignOrderInput) => {
           body: JSON.stringify(data),
         });
 
-        if (!response.ok) {
-          const { code, message } = (await response.json()) as SignApiError;
-          throw new Error(code, { cause: message });
+        const { ok, status } = response;
+        if (!ok) {
+          const { code } = (await response.json()) as SignApiError;
+          let errorType: SaleErrorTypes;
+          switch (status) {
+            case 400:
+              errorType = SaleErrorTypes.SERVICE_BREAKDOWN;
+              break;
+            case 404:
+              if (code === 'insufficient_stock') {
+                errorType = SaleErrorTypes.INSUFFICIENT_STOCK;
+              } else {
+                errorType = SaleErrorTypes.PRODUCT_NOT_FOUND;
+              }
+              break;
+            case 429:
+            case 500:
+              errorType = SaleErrorTypes.DEFAULT;
+              break;
+            default:
+              throw new Error('Unknown error');
+          }
+
+          setSignError({ type: errorType });
+          return undefined;
         }
 
         const responseData = toSignResponse(await response.json(), items);
         setSignResponse(responseData);
 
         return responseData;
-      } catch (e) {
+      } catch (e: any) {
         setSignError({ type: SaleErrorTypes.DEFAULT, data: { error: e } });
       }
       return undefined;

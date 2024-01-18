@@ -48,6 +48,20 @@ export function SaleErrorView({ errorType = SaleErrorTypes.DEFAULT, biomeTheme }
         fill: biomeTheme.color.status.fatal.dim,
       },
     },
+    [SaleErrorTypes.PRODUCT_NOT_FOUND]: {
+      onSecondaryActionClick: closeWidget,
+      statusType: StatusType.INFORMATION,
+      statusIconStyles: {
+        fill: biomeTheme.color.status.fatal.dim,
+      },
+    },
+    [SaleErrorTypes.INSUFFICIENT_STOCK]: {
+      onSecondaryActionClick: closeWidget,
+      statusType: StatusType.INFORMATION,
+      statusIconStyles: {
+        fill: biomeTheme.color.status.fatal.dim,
+      },
+    },
     [SaleErrorTypes.TRANSAK_FAILED]: {
       onActionClick: () => {
         /* TODO: start over the transak flow */
