@@ -43,18 +43,15 @@ async function deposit() {
     let childBridgeChildAddress = await childBridge.rootTokenToChildToken(params.rootToken);
     
     if (rootBridgeChildAddress === ethers.constants.AddressZero) {
-      console.log('token not mapped, please map token before depositing');
-      return;
+      throw new Error('token not mapped, please map token before depositing');
     }
   
     if (childBridgeChildAddress === ethers.constants.AddressZero) {
-      console.log('token mapping incomplete, please wait for token to map to childBridge before depositing');
-      return;
+      throw new Error('token mapping incomplete, please wait for token to map to childBridge before depositing');
     }
   
     if (rootBridgeChildAddress !== childBridgeChildAddress) {
-      console.log(`token mappings mismatch on rootBridge (${rootBridgeChildAddress}) & childBridge (${childBridgeChildAddress}).`, );
-      return;
+      throw new Error(`token mappings mismatch on rootBridge (${rootBridgeChildAddress}) & childBridge (${childBridgeChildAddress}).`, );
     }
   }
 
