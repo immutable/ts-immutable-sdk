@@ -606,4 +606,45 @@ describe('balanceCheck', () => {
         ]));
     });
   });
+
+  describe('when requesting a cache reset', () => {
+    const itemRequirements: ItemRequirement[] = [
+      {
+        type: ItemType.NATIVE,
+        amount: BigNumber.from(1),
+      },
+    ];
+    const getBalancesResult = {
+      balances:
+        [
+          {
+            balance: BigNumber.from(1),
+            formattedBalance: '1',
+            token: {
+              name: '',
+              symbol: '',
+              decimals: 18,
+            },
+          },
+        ],
+    };
+    it('should call getAllBalances with forceFetch = false when flag false or not provided', async () => {
+      (getAllBalances as jest.Mock).mockResolvedValue(getBalancesResult);
+
+      await balanceCheck(config, mockProvider, '0xADDRESS', itemRequirements);
+      expect((getAllBalances as jest.Mock))
+        .toHaveBeenCalledWith(config, mockProvider, '0xADDRESS', expect.anything(), false);
+
+      await balanceCheck(config, mockProvider, '0xADDRESS', itemRequirements, false);
+      expect((getAllBalances as jest.Mock))
+        .toHaveBeenLastCalledWith(config, mockProvider, '0xADDRESS', expect.anything(), false);
+    });
+    it('should call getAllBalances with forceFetch = true when flag true', async () => {
+      (getAllBalances as jest.Mock).mockResolvedValue(getBalancesResult);
+
+      await balanceCheck(config, mockProvider, '0xADDRESS', itemRequirements, true);
+      expect((getAllBalances as jest.Mock))
+        .toHaveBeenCalledWith(config, mockProvider, '0xADDRESS', expect.anything(), true);
+    });
+  });
 });

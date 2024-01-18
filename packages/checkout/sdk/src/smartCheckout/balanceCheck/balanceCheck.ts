@@ -42,7 +42,7 @@ const getTokenBalances = async (
         tokenMap.set(item.address.toLocaleLowerCase(), item);
       },
     );
-    const { balances } = await getAllBalances(config, provider, ownerAddress, getL2ChainId(config), forceFetch);
+    const { balances } = await getAllBalances(config, provider, ownerAddress, getL2ChainId(config), !!forceFetch);
     return balances.filter(
       (balance) => tokenMap.get((balance.token.address || NATIVE).toLocaleLowerCase()),
     ) as TokenBalance[];
