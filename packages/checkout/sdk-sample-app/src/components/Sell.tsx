@@ -31,7 +31,7 @@ export default function Sell({ checkout, provider }: SellProps) {
   const [loading, setLoading] = useState<boolean>(false);
 
   const isDateValid = (dateStr: string) => {
-    var dateRegex = /^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}$/;
+    var dateRegex = /^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}):(\d{2})Z)?$/;
     return dateRegex.test(dateStr);
   }
 
@@ -52,24 +52,31 @@ export default function Sell({ checkout, provider }: SellProps) {
   async function sellClick() {
     if (!id) {
       setIdError('Please enter the ID of the ERC721');
+      return
     }
     if (!collectionAddress) {
       setCollectionAddressError('Please enter the collection address for the ERC721');
+      return
     }
     if (!listingType) {
       setListingTypeError('Please select the listing type');
+      return
     }
     if (listingType === ItemType.NATIVE && !amount) {
       setAmountError('Please enter the amount of NATIVE tokens to sell the ERC721 for');
+      return
     }
     if (listingType === ItemType.ERC20 && !amount) {
       setAmountError('Please enter the amount of ERC20 tokens to sell the ERC721 for');
+      return
     }
     if (listingType === ItemType.ERC20 && !tokenAddress) {
       setContractAddressError('Please enter the contract address for the ERC20');
+      return
     }
     if (expiry && !isDateValid(expiry)) {
-      setExpiryError('Invalid date - format YYYY-MM-DD');
+      setExpiryError('Invalid date - format YYYY-MM-DD or YYYY-MM-DDTHH:MM:SSZ');
+      return
     }
     if (!id ||
       !collectionAddress ||
