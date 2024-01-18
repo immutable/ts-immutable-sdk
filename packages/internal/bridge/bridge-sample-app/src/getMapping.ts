@@ -32,17 +32,53 @@ async function status() {
 
   const tokenBridge = new TokenBridge(bridgeConfig);
 
-  const tokenMappingRootReq:TokenMappingRequest = {
+  const tokenMappingReq:TokenMappingRequest = {
     rootToken: process.env.GET_MAPPING_ROOT_TOKEN,
     rootChainId: bridgeConfig.bridgeInstance.rootChainID,
     childChainId: bridgeConfig.bridgeInstance.childChainID,
   }
 
-  console.log('tokenMappingRootReq', tokenMappingRootReq);
+  console.log('tokenMappingReq', tokenMappingReq);
   
-  const tokenMappingRootRes: TokenMappingResponse = await tokenBridge.getTokenMapping(tokenMappingRootReq);
+  const tokenMappingRes: TokenMappingResponse = await tokenBridge.getTokenMapping(tokenMappingReq);
   console.log('tokenMappingRootRes');
-  console.log(util.inspect(tokenMappingRootRes, {showHidden: false, depth: null, colors: true}));  
+  console.log(util.inspect(tokenMappingRes, {showHidden: false, depth: null, colors: true}));  
+
+  const tokenMappingETHReq:TokenMappingRequest = {
+    rootToken: 'NATIVE',
+    rootChainId: bridgeConfig.bridgeInstance.rootChainID,
+    childChainId: bridgeConfig.bridgeInstance.childChainID,
+  }
+
+  console.log('tokenMappingETHReq', tokenMappingETHReq);
+  
+  const tokenMappingETHRes: TokenMappingResponse = await tokenBridge.getTokenMapping(tokenMappingETHReq);
+  console.log('tokenMappingETHRes');
+  console.log(util.inspect(tokenMappingETHRes, {showHidden: false, depth: null, colors: true}));  
+
+  const tokenMappingWETHReq:TokenMappingRequest = {
+    rootToken: bridgeConfig.bridgeContracts.rootChainWrappedETH,
+    rootChainId: bridgeConfig.bridgeInstance.rootChainID,
+    childChainId: bridgeConfig.bridgeInstance.childChainID,
+  }
+
+  console.log('tokenMappingWETHReq', tokenMappingWETHReq);
+  
+  const tokenMappingWETHRes: TokenMappingResponse = await tokenBridge.getTokenMapping(tokenMappingWETHReq);
+  console.log('tokenMappingWETHRes');
+  console.log(util.inspect(tokenMappingWETHRes, {showHidden: false, depth: null, colors: true}));  
+
+  const tokenMappingIMXReq:TokenMappingRequest = {
+    rootToken: bridgeConfig.bridgeContracts.rootChainIMX,
+    rootChainId: bridgeConfig.bridgeInstance.rootChainID,
+    childChainId: bridgeConfig.bridgeInstance.childChainID,
+  }
+
+  console.log('tokenMappingIMXReq', tokenMappingIMXReq);
+  
+  const tokenMappingIMXRes: TokenMappingResponse = await tokenBridge.getTokenMapping(tokenMappingIMXReq);
+  console.log('tokenMappingIMXRes');
+  console.log(util.inspect(tokenMappingIMXRes, {showHidden: false, depth: null, colors: true}));  
 
 }
 
