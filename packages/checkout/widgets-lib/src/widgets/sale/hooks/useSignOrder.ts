@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { useCallback, useState } from 'react';
-import { SaleItem } from '@imtbl/checkout-sdk';
+import { SaleItem, SalePaymentTypes } from '@imtbl/checkout-sdk';
 
 import { Environment } from '@imtbl/config';
 import {
   SignResponse,
   SignOrderInput,
-  PaymentTypes,
   SignedOrderProduct,
   SignOrderError,
   ExecuteOrderResponse,
@@ -15,10 +14,8 @@ import {
 } from '../types';
 
 const PRIMARY_SALES_API_BASE_URL = {
-  [Environment.SANDBOX]:
-    'https://api.sandbox.immutable.com/v1/primary-sales',
-  [Environment.PRODUCTION]:
-    'https://api.immutable.com/v1/primary-sales',
+  [Environment.SANDBOX]: 'https://api.sandbox.immutable.com/v1/primary-sales',
+  [Environment.PRODUCTION]: 'https://api.immutable.com/v1/primary-sales',
 };
 
 type SignApiTransaction = {
@@ -200,15 +197,13 @@ export const useSignOrder = (input: SignOrderInput) => {
         setExecuteTransactions({ method, hash: txnResponse?.hash });
         await txnResponse?.wait(1);
 
-        transactionHash = txnResponse?.hash;
+        transactionHash = txnResponse?.hash || '';
         return transactionHash;
       } catch (e) {
-        // TODO: check error type to send
-        // SaleErrorTypes.WALLET_REJECTED or SaleErrorTypes.WALLET_REJECTED_NO_FUNDS
+        const reason = `${(e as any)?.reason || (e as any)?.message || ''}`.toLowerCase();
+        transactionHash = (e as any)?.transactionHash;
 
-        const reason = typeof e === 'string' ? e : (e as any).reason || '';
-        let errorType = SaleErrorTypes.TRANSACTION_FAILED;
-
+        let errorType = SaleErrorTypes.DEFAULT;
         if (reason.includes('rejected') && reason.includes('user')) {
           errorType = SaleErrorTypes.WALLET_REJECTED;
         }
@@ -218,6 +213,10 @@ export const useSignOrder = (input: SignOrderInput) => {
           && reason.includes('highest gas limit')
         ) {
           errorType = SaleErrorTypes.WALLET_REJECTED_NO_FUNDS;
+        }
+
+        if (reason.includes('status failed') || reason.includes('transaction failed')) {
+          errorType = SaleErrorTypes.TRANSACTION_FAILED;
         }
 
         setSignError({
@@ -231,7 +230,7 @@ export const useSignOrder = (input: SignOrderInput) => {
   );
 
   const sign = useCallback(
-    async (paymentType: PaymentTypes): Promise<SignResponse | undefined> => {
+    async (paymentType: SalePaymentTypes): Promise<SignResponse | undefined> => {
       try {
         const data: SignApiRequest = {
           recipient_address: recipientAddress,
@@ -253,16 +252,38 @@ export const useSignOrder = (input: SignOrderInput) => {
           body: JSON.stringify(data),
         });
 
-        if (!response.ok) {
-          const { code, message } = (await response.json()) as SignApiError;
-          throw new Error(code, { cause: message });
+        const { ok, status } = response;
+        if (!ok) {
+          const { code } = (await response.json()) as SignApiError;
+          let errorType: SaleErrorTypes;
+          switch (status) {
+            case 400:
+              errorType = SaleErrorTypes.SERVICE_BREAKDOWN;
+              break;
+            case 404:
+              if (code === 'insufficient_stock') {
+                errorType = SaleErrorTypes.INSUFFICIENT_STOCK;
+              } else {
+                errorType = SaleErrorTypes.PRODUCT_NOT_FOUND;
+              }
+              break;
+            case 429:
+            case 500:
+              errorType = SaleErrorTypes.DEFAULT;
+              break;
+            default:
+              throw new Error('Unknown error');
+          }
+
+          setSignError({ type: errorType });
+          return undefined;
         }
 
         const responseData = toSignResponse(await response.json(), items);
         setSignResponse(responseData);
 
         return responseData;
-      } catch (e) {
+      } catch (e: any) {
         setSignError({ type: SaleErrorTypes.DEFAULT, data: { error: e } });
       }
       return undefined;
