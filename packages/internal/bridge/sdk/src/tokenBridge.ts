@@ -967,6 +967,7 @@ export class TokenBridge {
         token = ETHEREUM_NATIVE_TOKEN_ADDRESS;
       }
       contractPromises.push(rootBridge.flowRateBuckets(token));
+      contractPromises.push(rootBridge.largeTransferThresholds(token));
     }
     let contractPromisesRes:Array<any>;
     try {
@@ -980,13 +981,15 @@ export class TokenBridge {
 
     const tokensRes: Record<FungibleToken, FlowRateInfoItem> = {};
 
-    // @note it's i + 2 because the first 2 promises are not token buckets
+    // @note we use the shifter to navigate the promise all response correctly
     for (let i = 0, l = req.tokens.length; i < l; i++) {
+      const shifter = (i + 1) * 2;
       tokensRes[req.tokens[i]] = {
-        capacity: contractPromisesRes[i + 2].capacity,
-        depth: contractPromisesRes[i + 2].depth,
-        refillTime: contractPromisesRes[i + 2].refillTime.toNumber(),
-        refillRate: contractPromisesRes[i + 2].refillRate,
+        capacity: contractPromisesRes[shifter].capacity,
+        depth: contractPromisesRes[shifter].depth,
+        refillTime: contractPromisesRes[shifter].refillTime.toNumber(),
+        refillRate: contractPromisesRes[shifter].refillRate,
+        largeTransferThreshold: contractPromisesRes[shifter + 1],
       };
     }
 
