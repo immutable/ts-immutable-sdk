@@ -201,7 +201,7 @@ export function WalletWidget(props: WalletWidgetInputs) {
             <LoadingView loadingText={loadingText} />
           )}
           {viewState.view.type === WalletWidgetViews.WALLET_BALANCES && (
-            <WalletBalances balancesLoading={balancesLoading} setBalancesLoading={setBalancesLoading} />
+            <WalletBalances balancesLoading={balancesLoading} />
           )}
           {viewState.view.type === WalletWidgetViews.SETTINGS && <Settings />}
           {viewState.view.type === WalletWidgetViews.COIN_INFO && (
