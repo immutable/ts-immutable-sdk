@@ -1,4 +1,4 @@
-import './App.css';
+import "./App.css";
 
 function App() {
   return (
@@ -8,31 +8,37 @@ function App() {
         <p>Choose a widget from the list below</p>
         <br />
         <div>
-          <a href={'/connect'}>Connect Widget</a>
+          <a href={"/connect"}>Connect Widget</a>
         </div>
         <br />
         <div>
-          <a href={'/wallet'}>Wallet Widget</a>
+          <a href={"/wallet"}>Wallet Widget</a>
         </div>
         <br />
         <div>
-          <a href={'/swap'}>Swap Widget</a>
+          <a href={"/swap"}>Swap Widget</a>
         </div>
         <br />
         <div>
-          <a href={'/bridge'}>Bridge Widget</a>
+          <a href={"/bridge"}>Bridge Widget</a>
         </div>
         <br />
         <div>
-          <a href={'/on-ramp'}>On-ramp Widget</a>
+          <a href={"/on-ramp"}>On-ramp Widget</a>
         </div>
         <br />
         <div>
-          <a href={'/sale?amount=0.01&fromTokenAddress=0x21B51Ec6fB7654B7e59e832F9e9687f29dF94Fb8&environmentId=4dfc4bec-1867-49aa-ad35-d8a13b206c94'}>Sale Widget</a>
+          <a
+            href={
+              "/sale?amount=1&fromTokenAddress=0x21B51Ec6fB7654B7e59e832F9e9687f29dF94Fb8&environmentId=249d9b0b-ee16-4dd5-91ee-96bece3b0473&collectionName=Iguanas"
+            }
+          >
+            Sale Widget
+          </a>
         </div>
         <br />
         <div>
-          <a href={'/marketplace-orchestrator'}>Marketplace Orchestrator</a>
+          <a href={"/marketplace-orchestrator"}>Marketplace Orchestrator</a>
         </div>
         <br />
       </main>

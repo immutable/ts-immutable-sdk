@@ -1,6 +1,12 @@
 import {
   BridgeFundingStep,
-  ChainId, Checkout, FeeType, FundingRoute, FundingStepType, ItemType, SwapFundingStep,
+  ChainId,
+  Checkout,
+  FeeType,
+  FundingRoute,
+  FundingStepType,
+  ItemType,
+  SwapFundingStep,
 } from '@imtbl/checkout-sdk';
 import { mount } from 'cypress/react18';
 import { BigNumber, utils } from 'ethers';
@@ -46,11 +52,13 @@ describe('FundingRouteSelect View', () => {
         amount: BigNumber.from(0),
         formattedAmount: '0',
       },
-      bridgeFees: [{
-        type: FeeType.BRIDGE_FEE,
-        amount: BigNumber.from(0),
-        formattedAmount: '0',
-      }],
+      bridgeFees: [
+        {
+          type: FeeType.BRIDGE_FEE,
+          amount: BigNumber.from(0),
+          formattedAmount: '0',
+        },
+      ],
     },
   };
 
@@ -85,11 +93,13 @@ describe('FundingRouteSelect View', () => {
         amount: BigNumber.from(0),
         formattedAmount: '0',
       },
-      swapFees: [{
-        type: FeeType.SWAP_FEE,
-        amount: BigNumber.from(0),
-        formattedAmount: '0',
-      }],
+      swapFees: [
+        {
+          type: FeeType.SWAP_FEE,
+          amount: BigNumber.from(0),
+          formattedAmount: '0',
+        },
+      ],
     },
   };
 
@@ -104,10 +114,13 @@ describe('FundingRouteSelect View', () => {
       mount(
         <CustomAnalyticsProvider checkout={{} as Checkout}>
           <ViewContextTestComponent>
-            <FundingRouteSelect fundingRoutes={fundingRoutes} onFundingRouteSelected={() => {}} />
+            <FundingRouteSelect
+              fundingRoutes={fundingRoutes}
+              collectionName=""
+              onFundingRouteSelected={() => {}}
+            />
           </ViewContextTestComponent>
         </CustomAnalyticsProvider>,
-
       );
     });
     it('should display first option, without chevron', () => {
@@ -139,10 +152,13 @@ describe('FundingRouteSelect View', () => {
       mount(
         <CustomAnalyticsProvider checkout={{} as Checkout}>
           <ViewContextTestComponent>
-            <FundingRouteSelect fundingRoutes={fundingRoutes} onFundingRouteSelected={() => {}} />
+            <FundingRouteSelect
+              fundingRoutes={fundingRoutes}
+              onFundingRouteSelected={() => {}}
+              collectionName=""
+            />
           </ViewContextTestComponent>
         </CustomAnalyticsProvider>,
-
       );
     });
     it('should display first option, with chevron', () => {
@@ -163,23 +179,35 @@ describe('FundingRouteSelect View', () => {
       cySmartGet('funding-route-menu-item').click();
 
       cySmartGet('Drawer__container').should('exist');
-      cySmartGet('Drawer__container').find('[data-testId="funding-route-menu-item"]').should('have.length', 2);
-      cySmartGet('Drawer__container').find('[data-testId="funding-route-menu-item"]')
-        .eq(0).should('have.class', 'selected');
-      cySmartGet('Drawer__container').find('[data-testId="funding-route-menu-item"]')
-        .eq(1).should('not.have.class', 'selected');
-      cySmartGet('Drawer__container').find('[data-testId="funding-route-menu-item"]')
-        .eq(1).click();
+      cySmartGet('Drawer__container')
+        .find('[data-testId="funding-route-menu-item"]')
+        .should('have.length', 2);
+      cySmartGet('Drawer__container')
+        .find('[data-testId="funding-route-menu-item"]')
+        .eq(0)
+        .should('have.class', 'selected');
+      cySmartGet('Drawer__container')
+        .find('[data-testId="funding-route-menu-item"]')
+        .eq(1)
+        .should('not.have.class', 'selected');
+      cySmartGet('Drawer__container')
+        .find('[data-testId="funding-route-menu-item"]')
+        .eq(1)
+        .click();
 
       cySmartGet('Drawer__container').should('not.exist');
 
       cySmartGet('funding-route-menu-item').should('contain.text', 'USDC');
 
       cySmartGet('funding-route-menu-item').click();
-      cySmartGet('Drawer__container').find('[data-testId="funding-route-menu-item"]')
-        .eq(0).should('not.have.class', 'selected');
-      cySmartGet('Drawer__container').find('[data-testId="funding-route-menu-item"]')
-        .eq(1).should('have.class', 'selected');
+      cySmartGet('Drawer__container')
+        .find('[data-testId="funding-route-menu-item"]')
+        .eq(0)
+        .should('not.have.class', 'selected');
+      cySmartGet('Drawer__container')
+        .find('[data-testId="funding-route-menu-item"]')
+        .eq(1)
+        .should('have.class', 'selected');
     });
   });
 });

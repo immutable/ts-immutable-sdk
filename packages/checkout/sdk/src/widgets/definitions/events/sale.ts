@@ -17,7 +17,7 @@ export enum SaleEventType {
  */
 export type SaleSuccess = {
   /** Chosen payment method */
-  paymentMethod: string | undefined;
+  paymentMethod: SalePaymentTypes | undefined;
   /** The executed transactions */
   transactions: {
     method: string;
@@ -38,7 +38,7 @@ export type SaleFailed = {
   /** The timestamp of the failed swap. */
   timestamp: number;
   /** Chosen payment method */
-  paymentMethod: string | undefined;
+  paymentMethod: SalePaymentTypes | undefined;
   /** The executed transactions */
   transactions: {
     method: string;
@@ -51,7 +51,7 @@ export type SaleFailed = {
  * @property {Object} transactions
  */
 export type SaleTransactionSuccess = {
-  paymentMethod: string | undefined;
+  paymentMethod: SalePaymentTypes | undefined;
   /** The executed transactions */
   transactions: {
     method: string;
@@ -65,5 +65,13 @@ export type SaleTransactionSuccess = {
  */
 export type SalePaymentMethod = {
   /** Chosen payment method */
-  paymentMethod: string | undefined;
+  paymentMethod: SalePaymentTypes | undefined;
 };
+
+/**
+ * Enum representing Sale Widget available payment types.
+ */
+export enum SalePaymentTypes {
+  CRYPTO = 'crypto',
+  FIAT = 'fiat',
+}
