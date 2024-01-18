@@ -81,7 +81,12 @@ export const sell = async (
     );
   }
 
-  const { buyToken, sellToken, makerFees } = orders[0];
+  const {
+    buyToken,
+    sellToken,
+    makerFees,
+    orderExpiry,
+  } = orders[0];
 
   let decimals = 18;
   if (buyToken.type === ItemType.ERC20) {
@@ -121,6 +126,7 @@ export const sell = async (
           contractAddress: sellToken.collectionAddress,
           tokenId: sellToken.id,
         },
+        orderExpiry,
       }),
     );
   } catch (err: any) {
