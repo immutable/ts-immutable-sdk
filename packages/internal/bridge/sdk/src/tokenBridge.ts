@@ -1173,10 +1173,57 @@ export class TokenBridge {
  */
   public async getTokenMapping(req: TokenMappingRequest): Promise<TokenMappingResponse> {
     // eslint-disable-next-line no-console
-    console.log('stubbed response with req', req);
+
+    if (req.rootToken.toUpperCase() === 'NATIVE'
+    || req.rootToken === this.config.bridgeContracts.rootChainWrappedETH) {
+      const childBridge = await withBridgeError<ethers.Contract>(
+        async () => {
+          const contract = new ethers.Contract(
+            this.config.bridgeContracts.childERC20Bridge,
+            CHILD_ERC20_BRIDGE,
+            this.config.childProvider,
+          );
+          return contract;
+        },
+        BridgeErrorType.INTERNAL_ERROR,
+      );
+      const childETHToken = await childBridge.childETHToken();
+
+      return {
+        rootToken: req.rootToken,
+        childToken: childETHToken,
+      };
+    }
+
+    const rootBridge = await withBridgeError<ethers.Contract>(
+      async () => {
+        const contract = new ethers.Contract(
+          this.config.bridgeContracts.rootERC20BridgeFlowRate,
+          ROOT_ERC20_BRIDGE_FLOW_RATE,
+          this.config.rootProvider,
+        );
+        return contract;
+      },
+      BridgeErrorType.INTERNAL_ERROR,
+    );
+    const rootTokenChildAddress = await rootBridge.rootTokenToChildToken(req.rootToken);
+
+    if (rootTokenChildAddress === ethers.constants.AddressZero) {
+      return {
+        rootToken: req.rootToken,
+        childToken: null,
+      };
+    }
+
+    if (rootTokenChildAddress === req.rootToken) {
+      return {
+        rootToken: req.rootToken,
+        childToken: 'NATIVE',
+      };
+    }
     return {
-      rootToken: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-      childToken: 'NATIVE',
+      rootToken: req.rootToken,
+      childToken: rootTokenChildAddress,
     };
   }
 }

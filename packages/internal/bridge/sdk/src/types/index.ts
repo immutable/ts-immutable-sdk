@@ -395,7 +395,7 @@ export interface FlowRateWithdrawResponse {
  * @property {FungibleToken} rootToken - The token on the root chain for which the corresponding token on the child chain is required.
  */
 export interface TokenMappingRequest {
-  token: { rootToken: FungibleToken } | { childToken: FungibleToken };
+  rootToken: FungibleToken;
   rootChainId: string;
   childChainId: string;
 }
@@ -407,5 +407,5 @@ export interface TokenMappingRequest {
  */
 export interface TokenMappingResponse {
   rootToken: FungibleToken;
-  childToken: FungibleToken;
+  childToken: FungibleToken | null;
 }
