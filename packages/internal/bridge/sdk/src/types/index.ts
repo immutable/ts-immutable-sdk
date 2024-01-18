@@ -275,7 +275,7 @@ export interface TxStatusResponse {
 }
 
 /**
- * @typedef {Object} TxStatusResponse
+ * @typedef {Object} AxelarStatusResponse
  * @property {Array<TxStatusResponseItem>} txStatusItems - The status items of the requested transactions.
  * @property {Array<string>} uniqueReceivers - The unique receivers to look up in the flow rate queue.
  */
