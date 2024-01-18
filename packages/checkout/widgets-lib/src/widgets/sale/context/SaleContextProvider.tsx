@@ -41,6 +41,7 @@ type SaleContextProps = {
   environmentId: string;
   items: SaleItem[];
   amount: string;
+  collectionName: string;
   fromTokenAddress: string;
   provider: ConnectLoaderState['provider'];
   checkout: ConnectLoaderState['checkout'];
@@ -77,6 +78,7 @@ const SaleContext = createContext<SaleContextValues>({
   items: [],
   amount: '',
   fromTokenAddress: '',
+  collectionName: '',
   provider: undefined,
   checkout: undefined,
   environmentId: '',
@@ -123,6 +125,7 @@ export function SaleContextProvider(props: {
       provider,
       checkout,
       passport,
+      collectionName,
     },
   } = props;
 
@@ -327,6 +330,7 @@ export function SaleContextProvider(props: {
       execute,
       executeResponse,
       environmentId,
+      collectionName,
       env,
       provider,
       checkout,
@@ -350,6 +354,7 @@ export function SaleContextProvider(props: {
       items,
       amount,
       fromTokenAddress,
+      collectionName,
       provider,
       checkout,
       recipientAddress,
