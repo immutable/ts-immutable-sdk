@@ -8,7 +8,7 @@ import { Passport } from '@imtbl/passport';
 
 const defaultPassportConfig = {
   environment: 'sandbox',
-  clientId: 'XuGsHvMqMJrb73diq1fCswWwn4AYhcM6',
+  clientId: 'q4gEET7vAKD5jsBWV6j8eoYNKEYpOOw1',
   redirectUri: 'http://localhost:3000/sale?login=true',
   logoutRedirectUri: 'http://localhost:3000/sale?logout=true',
   audience: 'platform_api',

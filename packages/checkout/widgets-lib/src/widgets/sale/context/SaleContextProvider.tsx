@@ -17,7 +17,10 @@ import {
   useState,
 } from 'react';
 import { ConnectLoaderState } from '../../../context/connect-loader-context/ConnectLoaderContext';
-import { FundWithSmartCheckoutSubViews, SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
+import {
+  FundWithSmartCheckoutSubViews,
+  SaleWidgetViews,
+} from '../../../context/view-context/SaleViewContextTypes';
 import {
   ViewActions,
   ViewContext,
@@ -67,7 +70,9 @@ type SaleContextValues = SaleContextProps & {
   goBackToPaymentMethods: (paymentMethod?: SalePaymentTypes | undefined) => void;
   goToErrorView: (type: SaleErrorTypes, data?: Record<string, unknown>) => void;
   goToSuccessView: (data?: Record<string, unknown>) => void;
-  querySmartCheckout: ((callback?: (r?: SmartCheckoutResult) => void) => Promise<SmartCheckoutResult | undefined>);
+  querySmartCheckout: (
+    callback?: (r?: SmartCheckoutResult) => void
+  ) => Promise<SmartCheckoutResult | undefined>;
   smartCheckoutResult: SmartCheckoutResult | undefined;
   fundingRoutes: FundingRoute[];
   disabledPaymentTypes: SalePaymentTypes[]
@@ -231,21 +236,24 @@ export function SaleContextProvider(props: {
     [paymentMethod, setPaymentMethod, executeResponse],
   );
 
-  const goToSuccessView = useCallback((data?: Record<string, unknown>) => {
-    viewDispatch({
-      payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: {
-          type: SaleWidgetViews.SALE_SUCCESS,
-          data: {
-            paymentMethod,
-            transactions: executeResponse.transactions,
-            ...data,
+  const goToSuccessView = useCallback(
+    (data?: Record<string, unknown>) => {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SaleWidgetViews.SALE_SUCCESS,
+            data: {
+              paymentMethod,
+              transactions: executeResponse.transactions,
+              ...data,
+            },
           },
         },
-      },
-    });
-  }, [[paymentMethod, executeResponse]]);
+      });
+    },
+    [[paymentMethod, executeResponse]],
+  );
 
   useEffect(() => {
     if (!signError) return;
@@ -270,11 +278,14 @@ export function SaleContextProvider(props: {
     goToErrorView(smartCheckoutError.type, smartCheckoutError.data);
   }, [smartCheckoutError]);
 
-  const querySmartCheckout = useCallback(async (callback?: (r?: SmartCheckoutResult) => void) => {
-    const result = await smartCheckout();
-    callback?.(result);
-    return result;
-  }, [smartCheckout]);
+  const querySmartCheckout = useCallback(
+    async (callback?: (r?: SmartCheckoutResult) => void) => {
+      const result = await smartCheckout();
+      callback?.(result);
+      return result;
+    },
+    [smartCheckout],
+  );
 
   useEffect(() => {
     if (!smartCheckoutResult) {
@@ -294,7 +305,9 @@ export function SaleContextProvider(props: {
     if (!smartCheckoutResult.sufficient) {
       switch (smartCheckoutResult.router.routingOutcome.type) {
         case RoutingOutcomeType.ROUTES_FOUND:
-          setFundingRoutes(smartCheckoutResult.router.routingOutcome.fundingRoutes);
+          setFundingRoutes(
+            smartCheckoutResult.router.routingOutcome.fundingRoutes,
+          );
           viewDispatch({
             payload: {
               type: ViewActions.UPDATE_VIEW,
