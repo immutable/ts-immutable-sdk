@@ -236,7 +236,7 @@ export function BridgeForm(props: BridgeFormProps) {
       gasMultiplier: 1.1,
       sourceChainId: from?.network.toString() ?? '',
       destinationChainId: to?.network.toString() ?? '',
-      token: 'NATIVE',
+      token: NATIVE.toUpperCase(),
       amount: ethers.BigNumber.from(0),
     });
 

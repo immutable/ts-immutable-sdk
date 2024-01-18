@@ -6,6 +6,7 @@ import {
 import { ethers } from 'ethers';
 import { CheckoutConfiguration, getL1ChainId } from '../config';
 import { ChainId } from '../types';
+import { NATIVE } from '../env/constants';
 
 export async function getBridgeFeeEstimate(
   tokenBridge: TokenBridge,
@@ -22,7 +23,7 @@ export async function getBridgeFeeEstimate(
     gasMultiplier: 1.1,
     sourceChainId: fromChainId.toString(),
     destinationChainId: toChainId.toString(),
-    token: 'NATIVE',
+    token: NATIVE.toUpperCase(),
     amount: ethers.BigNumber.from(0),
   });
 }
