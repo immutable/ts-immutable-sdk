@@ -50,7 +50,7 @@ describe('Network Menu', () => {
         <ConnectLoaderTestComponent
           initialStateOverride={connectLoaderState}
         >
-          <NetworkMenu setBalancesLoading={() => {}} />
+          <NetworkMenu />
         </ConnectLoaderTestComponent>
       </ViewContextTestComponent>,
     );
@@ -75,7 +75,7 @@ describe('Network Menu', () => {
           <WalletContext.Provider
             value={{ walletState, walletDispatch: () => {} }}
           >
-            <NetworkMenu setBalancesLoading={() => {}} />
+            <NetworkMenu />
           </WalletContext.Provider>
         </ConnectLoaderTestComponent>
       </ViewContextTestComponent>,
@@ -119,7 +119,7 @@ describe('Network Menu', () => {
           <WalletContext.Provider
             value={{ walletState, walletDispatch: () => {} }}
           >
-            <NetworkMenu setBalancesLoading={() => {}} />
+            <NetworkMenu />
           </WalletContext.Provider>
         </ConnectLoaderTestComponent>
       </ViewContextTestComponent>,
