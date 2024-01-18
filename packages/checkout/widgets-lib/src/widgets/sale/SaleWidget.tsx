@@ -2,7 +2,7 @@ import {
   useCallback, useContext, useEffect, useMemo, useReducer, useRef,
 } from 'react';
 
-import { SaleItem } from '@imtbl/checkout-sdk';
+import { SaleWidgetParams } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { useTranslation } from 'react-i18next';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
@@ -26,12 +26,8 @@ import { SaleErrorView } from './views/SaleErrorView';
 import { SaleSuccessView } from './views/SaleSuccessView';
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 
-export interface SaleWidgetProps {
+export interface SaleWidgetProps extends Required<Omit<SaleWidgetParams, 'walletProviderName'>> {
   config: StrongCheckoutWidgetsConfig;
-  amount: string;
-  items: SaleItem[];
-  fromTokenAddress: string;
-  environmentId: string;
 }
 
 export function SaleWidget(props: SaleWidgetProps) {
@@ -40,8 +36,9 @@ export function SaleWidget(props: SaleWidgetProps) {
     config,
     amount,
     items,
-    fromTokenAddress,
     environmentId,
+    fromTokenAddress,
+    collectionName,
   } = props;
 
   const { connectLoaderState } = useContext(ConnectLoaderContext);
@@ -92,6 +89,7 @@ export function SaleWidget(props: SaleWidgetProps) {
           provider,
           checkout,
           passport: checkout?.passport,
+          collectionName,
         }}
       >
         <CryptoFiatProvider environment={config.environment}>
