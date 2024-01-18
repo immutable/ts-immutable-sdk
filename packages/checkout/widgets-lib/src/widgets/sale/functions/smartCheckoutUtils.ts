@@ -1,7 +1,8 @@
 import { Web3Provider } from '@ethersproject/providers';
 import {
   Checkout, ERC20ItemRequirement, Fee, FundingRoute,
-  FundingStepType, GasAmount, GasTokenType, ItemType, RoutingOutcomeType, SmartCheckoutResult, TokenBalance,
+  FundingStepType, GasAmount, GasTokenType, ItemType, RoutingOutcome, RoutingOutcomeType,
+  SmartCheckoutResult, TokenBalance,
   TransactionOrGasType,
 } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
@@ -117,4 +118,34 @@ export const smartCheckoutTokensList = (
     }
   }
   return tokenSymbols;
+};
+
+export const filterSmartCheckoutResult = (smartCheckoutResult: SmartCheckoutResult): SmartCheckoutResult => {
+  if (smartCheckoutResult.sufficient
+    || smartCheckoutResult.router.routingOutcome.type !== RoutingOutcomeType.ROUTES_FOUND) {
+    return smartCheckoutResult;
+  }
+
+  const filteredFundingRoutes = smartCheckoutResult.router.routingOutcome.fundingRoutes
+    .filter((route) => !route.steps.some((step) => step.type !== FundingStepType.SWAP));
+
+  let routingOutcome: RoutingOutcome;
+  if (filteredFundingRoutes.length === 0) {
+    routingOutcome = {
+      type: RoutingOutcomeType.NO_ROUTES_FOUND,
+      message: 'Smart Checkout did not find any Swap routes to fulfill the transaction',
+    };
+  } else {
+    routingOutcome = {
+      type: RoutingOutcomeType.ROUTES_FOUND,
+      fundingRoutes: filteredFundingRoutes,
+    };
+  }
+  return {
+    ...smartCheckoutResult,
+    router: {
+      ...smartCheckoutResult.router,
+      routingOutcome,
+    },
+  };
 };
