@@ -275,6 +275,16 @@ export interface TxStatusResponse {
 }
 
 /**
+ * @typedef {Object} AxelarStatusResponse
+ * @property {Array<TxStatusResponseItem>} txStatusItems - The status items of the requested transactions.
+ * @property {Array<string>} uniqueReceivers - The unique receivers to look up in the flow rate queue.
+ */
+export interface AxelarStatusResponse {
+  txStatusItems: Array<TxStatusResponseItem>,
+  uniqueReceivers: Array<string>,
+}
+
+/**
  * @typedef {Object} TxStatusResponseItem
  * @property {string} txHash - The transaction hash on the source chain of the bridge transaction.
  * @property {Address} sender - The address of the sender on the source chain.
@@ -358,6 +368,7 @@ export interface PendingWithdrawalsResponse {
 export interface PendingWithdrawal {
   canWithdraw: boolean,
   withdrawer: Address,
+  recipient: Address,
   token: FungibleToken,
   amount: ethers.BigNumber,
   timeoutStart: number,
