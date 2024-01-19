@@ -63,6 +63,7 @@ describe('getSignedTypedData', () => {
       // and so its signature should be FIRST in the combined signature
       const lowAddressSigner = new Wallet('0xdac4f6ad57b2977b13c57b65ee7c98d07f4e4afccdf04849e7df7da03fa928be');
       const signMessageSpy = jest.spyOn(lowAddressSigner, 'signMessage');
+
       const result = await getSignedTypedData(
         typedDataPayload,
         relayerSignature,
@@ -70,6 +71,7 @@ describe('getSignedTypedData', () => {
         walletAddress,
         lowAddressSigner,
       );
+
       const eoaSignature = await signMessageSpy.mock.results[0].value;
       const eoaSignatureWithoutPrefix = eoaSignature.slice(2); // Remove leading `0x`
       expect(result).toEqual([
@@ -87,6 +89,7 @@ describe('getSignedTypedData', () => {
       // The wallet used here has an address of `0x7E...` which is GREATER than the relayer address (`0x1B...`),
       // and so its signature should be LAST in the combined signature
       const signMessageSpy = jest.spyOn(signer, 'signMessage');
+
       const result = await getSignedTypedData(
         typedDataPayload,
         relayerSignature,
@@ -94,6 +97,7 @@ describe('getSignedTypedData', () => {
         walletAddress,
         signer,
       );
+
       const eoaSignature = await signMessageSpy.mock.results[0].value;
       const eoaSignatureWithoutPrefix = eoaSignature.slice(2); // Remove leading `0x`
       expect(result).toEqual([
