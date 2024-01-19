@@ -1,0 +1,54 @@
+{
+  "name": "@imtbl/link",
+  "description": "Immutable X Link SDK",
+  "version": "0.0.0",
+  "author": "Immutable",
+  "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
+  "dependencies": {
+    "@ethersproject/address": "^5.6.0",
+    "@ethersproject/bignumber": "^5.6.0",
+    "@ethersproject/contracts": "^5.6.0",
+    "bn.js": "^5.2.0",
+    "fp-ts": "2.9.3",
+    "io-ts": "2.2.13",
+    "io-ts-types": "^0.5.16",
+    "monocle-ts": "2.3.13",
+    "newtype-ts": "^0.3.4",
+    "query-string": "^7.0.1"
+  },
+  "devDependencies": {
+    "@babel/plugin-transform-runtime": "^7.12.10",
+    "@babel/preset-env": "^7.12.7",
+    "@babel/preset-typescript": "^7.12.7",
+    "@rollup/plugin-babel": "^6.0.3",
+    "@rollup/plugin-typescript": "^11.0.0",
+    "@rollup/plugin-url": "^8.0.1",
+    "@testing-library/jest-dom": "^5.14.1",
+    "@types/jest": "^27.0.6",
+    "babel-jest": "^27.0.6",
+    "eslint": "^8.40.0",
+    "jest": "^27.0.6",
+    "jest-environment-jsdom": "^27.0.6",
+    "rollup": "^3.17.2",
+    "ts-jest": "^27.0.6",
+    "typescript": "^4.9.5"
+  },
+  "engines": {
+    "node": ">=16.11.0"
+  },
+  "files": [
+    "dist"
+  ],
+  "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
+  "license": "Apache-2.0",
+  "main": "dist/index.js",
+  "private": true,
+  "repository": "immutable/ts-immutable-sdk.git",
+  "scripts": {
+    "build": "rollup --config rollup.config.mjs",
+    "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
+    "test": "jest",
+    "typecheck": "tsc --noEmit --jsx preserve"
+  },
+  "types": "dist/index.d.ts"
+}
