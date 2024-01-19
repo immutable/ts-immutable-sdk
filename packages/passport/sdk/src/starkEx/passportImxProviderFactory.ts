@@ -1,5 +1,5 @@
-import { ImmutableXClient } from '@imtbl/immutablex-client';
-import { IMXProvider } from '@imtbl/provider';
+import { ImmutableXClient } from '@imtbl/x-client';
+import { IMXProvider } from '@imtbl/x-provider';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import { PassportConfiguration } from '../config';
 import AuthManager from '../authManager';

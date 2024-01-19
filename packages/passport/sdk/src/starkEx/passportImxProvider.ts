@@ -18,8 +18,8 @@ import {
   UnsignedOrderRequest,
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
-import { ImmutableXClient } from '@imtbl/immutablex-client';
-import { IMXProvider } from '@imtbl/provider';
+import { ImmutableXClient } from '@imtbl/x-client';
+import { IMXProvider } from '@imtbl/x-provider';
 import AuthManager from 'authManager';
 import TypedEventEmitter from 'utils/typedEventEmitter';
 import { Web3Provider } from '@ethersproject/providers';

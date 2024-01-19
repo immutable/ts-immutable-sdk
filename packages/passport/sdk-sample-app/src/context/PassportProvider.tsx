@@ -1,7 +1,7 @@
 import React, {
   createContext, useCallback, useContext, useMemo, useState,
 } from 'react';
-import { IMXProvider } from '@imtbl/provider';
+import { IMXProvider } from '@imtbl/x-provider';
 import { Provider, UserProfile } from '@imtbl/passport';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { useStatusProvider } from '@/context/StatusProvider';

@@ -1,6 +1,6 @@
-import { IMXProvider } from '@imtbl/provider';
+import { IMXProvider } from '@imtbl/x-provider';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
-import { ImmutableXClient } from '@imtbl/immutablex-client';
+import { ImmutableXClient } from '@imtbl/x-client';
 import { ChainName } from 'network/chains';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';

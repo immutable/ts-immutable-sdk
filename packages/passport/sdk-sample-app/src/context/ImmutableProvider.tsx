@@ -4,7 +4,7 @@ import React, {
 import { Config, ImmutableX } from '@imtbl/core-sdk';
 import { Networks, Passport, PassportModuleConfiguration } from '@imtbl/passport';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { ImmutableXClient } from '@imtbl/immutablex-client';
+import { ImmutableXClient } from '@imtbl/x-client';
 import {
   AUDIENCE,
   LOGOUT_REDIRECT_URI,

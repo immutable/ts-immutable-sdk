@@ -1,5 +1,5 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { ImmutableXClient } from '@imtbl/immutablex-client';
+import { ImmutableXClient } from '@imtbl/x-client';
 import {
   CancelOrderResponse,
   CreateOrderResponse,

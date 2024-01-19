@@ -1,4 +1,4 @@
-import { ImmutableXClient } from '@imtbl/immutablex-client';
+import { ImmutableXClient } from '@imtbl/x-client';
 import { ConfirmationScreen } from '../confirmation';
 import registerPassportStarkEx from './workflows/registration';
 import { PassportImxProviderFactory } from './passportImxProviderFactory';

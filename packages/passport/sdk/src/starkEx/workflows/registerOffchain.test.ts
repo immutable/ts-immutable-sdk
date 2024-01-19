@@ -1,4 +1,4 @@
-import { ImmutableXClient } from '@imtbl/immutablex-client';
+import { ImmutableXClient } from '@imtbl/x-client';
 import { Web3Provider } from '@ethersproject/providers';
 import { Signer } from 'ethers';
 import AuthManager from 'authManager';
