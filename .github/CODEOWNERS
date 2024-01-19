@@ -12,4 +12,5 @@
 /packages/checkout @immutable/wallets
 /packages/checkout/widgets-lib @immutable/wallets @immutable/primary-revenue
 /packages/blockchain-data @immutable/assets
+/packages/game-bridge @immutable/sdk
 /samples @immutable/sdk
