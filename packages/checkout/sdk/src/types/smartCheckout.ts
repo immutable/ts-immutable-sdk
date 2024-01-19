@@ -2,11 +2,16 @@ import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import { TokenInfo } from './tokenInfo';
 import { OrderFee } from './fees';
+import { SendTransactionResult } from './transaction';
 
 /*
 * Type representing the result of the buy
 */
-export type BuyResult = BuyResultSuccess | BuyResultFailed | BuyResultInsufficientFunds;
+export type BuyResult =
+  BuyResultSuccess |
+  BuyResultFailed |
+  BuyResultFulfillmentsUnsettled |
+  BuyResultInsufficientFunds;
 
 /**
  * Represents the result of {@link Checkout.buy}
@@ -36,6 +41,21 @@ export type BuyResultFailed = {
   reason: string,
   /** The sufficient result of smart checkout */
   smartCheckoutResult: SmartCheckoutSufficient
+};
+
+/**
+ * Represents the result of {@link Checkout.buy}
+ * @property {CheckoutStatus.FULFILLMENTS_UNSETTLED} status
+ * @property {SmartCheckoutSufficient} smartCheckoutResult
+ * @property {SendTransactionResult[]} transactions
+ */
+export type BuyResultFulfillmentsUnsettled = {
+  /** The status to indicate success */
+  status: CheckoutStatus.FULFILLMENTS_UNSETTLED,
+  /** The sufficient result of smart checkout */
+  smartCheckoutResult: SmartCheckoutSufficient,
+  /** Array of transaction results */
+  transactions: SendTransactionResult[],
 };
 
 /**
@@ -135,11 +155,13 @@ export type CancelResultFailed = {
  * @property {string} SUCCESS - If checkout succeeded as the transactions were able to be processed
  * @property {string} FAILED - If checkout failed due to transactions not settling on chain
  * @property {string} INSUFFICIENT_FUNDS - If checkout failed due to insufficient funds
+ * @property {string} FULFILLMENTS_UNSETTLED - If checkout succeeded but the fulfillments are not yet settled
  */
 export enum CheckoutStatus {
   SUCCESS = 'SUCCESS',
   FAILED = 'FAILED',
   INSUFFICIENT_FUNDS = 'INSUFFICIENT_FUNDS',
+  FULFILLMENTS_UNSETTLED = 'FULFILLMENTS_UNSETTLED',
 }
 
 /**
