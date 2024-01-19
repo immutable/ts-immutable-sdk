@@ -125,14 +125,27 @@ defineFeature(feature, (test) => {
     });
 
     and(/^the trade data should be available$/, async () => {
-      const trades = await sdk.listTrades({
-        accountAddress: fulfiller.address,
-        sortBy: 'indexed_at',
-        sortDirection: 'desc',
-        pageSize: 10,
-      });
+      let attempt = 0;
+      let targetTrade: orderbook.Trade | undefined;
+      while (attempt < 5 && !targetTrade) {
+        // eslint-disable-next-line no-await-in-loop
+        const trades = await sdk.listTrades({
+          accountAddress: fulfiller.address,
+          sortBy: 'indexed_at',
+          sortDirection: 'desc',
+          pageSize: 10,
+        });
 
-      const targetTrade = trades.result.find((t) => t.orderId === listingId);
+        // eslint-disable-next-line @typescript-eslint/no-loop-func
+        targetTrade = trades.result.find((t) => t.orderId === listingId);
+        if (!targetTrade) {
+          // eslint-disable-next-line no-await-in-loop, no-promise-executor-return
+          await new Promise((resolve) => setTimeout(resolve, 5_000));
+        }
+
+        attempt++;
+      }
+
       expect(targetTrade).toBeDefined();
     });
   }, 120_000);
