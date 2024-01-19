@@ -15,7 +15,7 @@
   "scripts": {
     "compile": "npx hardhat compile",
     "test": "yarn compile && jest",
-    "test:ci": "TAGS=\"not @skip and not @slow\" jest",
+    "test:ci": "yarn compile && TAGS=\"not @skip and not @slow\" jest",
     "postinstall": "cd ../../.. && husky install",
     "prepack": "pinst --disable",
     "postpack": "pinst --enable"
