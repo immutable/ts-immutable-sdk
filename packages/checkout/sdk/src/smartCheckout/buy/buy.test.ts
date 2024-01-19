@@ -31,6 +31,7 @@ import { sendTransaction } from '../../transaction';
 jest.mock('../../instance');
 jest.mock('../smartCheckout');
 jest.mock('../actions');
+jest.mock('../../transaction');
 
 describe('buy', () => {
   const gasLimit = constants.estimatedFulfillmentGasGwei;
@@ -423,7 +424,9 @@ describe('buy', () => {
         ],
       });
 
-      (sendTransaction as jest.Mock).mockResolvedValue({ hash: '0xTRANSACTION' });
+      (sendTransaction as jest.Mock).mockResolvedValue({
+        transactionResponse: { hash: '0xTRANSACTION' },
+      });
       (smartCheckout as jest.Mock).mockResolvedValue(smartCheckoutResult);
       (createBlockchainDataInstance as jest.Mock).mockReturnValue({
         getToken: jest.fn().mockResolvedValue({
@@ -465,9 +468,6 @@ describe('buy', () => {
       (signApprovalTransactions as jest.Mock).mockResolvedValue({
         type: SignTransactionStatusType.SUCCESS,
       });
-      (signFulfillmentTransactions as jest.Mock).mockResolvedValue({
-        type: SignTransactionStatusType.SUCCESS,
-      });
 
       const order: BuyOrder = {
         id: '1',
@@ -505,12 +505,13 @@ describe('buy', () => {
       expect(buyResult).toEqual({
         status: CheckoutStatus.FULFILLMENTS_UNSETTLED,
         smartCheckoutResult,
-        transactions: [{ from: '0xTRANSACTION' }],
+        transactions: [{
+          transactionResponse: { hash: '0xTRANSACTION' },
+        }],
       });
       expect(getUnsignedERC20ApprovalTransactions).toBeCalledTimes(1);
       expect(getUnsignedFulfillmentTransactions).toBeCalledTimes(2);
       expect(signApprovalTransactions).toBeCalledWith(mockProvider, [{ from: '0xAPPROVAL' }]);
-      expect(signFulfillmentTransactions).toBeCalledWith(mockProvider, [{ from: '0xTRANSACTION' }]);
       expect(fulfillOrderMock).toBeCalledWith(
         order.id,
         '0xADDRESS',
