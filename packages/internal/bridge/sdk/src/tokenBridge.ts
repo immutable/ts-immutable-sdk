@@ -981,9 +981,15 @@ export class TokenBridge {
 
     const tokensRes: Record<FungibleToken, FlowRateInfoItem> = {};
 
-    // @note we use the shifter to navigate the promise all response correctly
+    const withdrawalQueueActivated = contractPromisesRes[0];
+    const withdrawalDelay = contractPromisesRes[1].toNumber();
+
+    // remove first 2 items from promise all response
+    contractPromisesRes.splice(0, 2);
+
+    // the remaining items should be sets of 2 per token
     for (let i = 0, l = req.tokens.length; i < l; i++) {
-      const shifter = (i + 1) * 2;
+      const shifter = i * 2;
       tokensRes[req.tokens[i]] = {
         capacity: contractPromisesRes[shifter].capacity,
         depth: contractPromisesRes[shifter].depth,
@@ -995,8 +1001,8 @@ export class TokenBridge {
 
     // Return the token mappings
     return {
-      withdrawalQueueActivated: contractPromisesRes[0],
-      withdrawalDelay: contractPromisesRes[1].toNumber(),
+      withdrawalQueueActivated,
+      withdrawalDelay,
       tokens: tokensRes,
     };
   }
