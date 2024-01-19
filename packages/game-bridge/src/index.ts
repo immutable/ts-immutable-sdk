@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import * as passport from '@imtbl/passport';
 import * as config from '@imtbl/config';
-import * as provider from '@imtbl/provider';
+import * as provider from '@imtbl/x-provider';
 import { gameBridgeVersionCheck } from '@imtbl/version-check';
 
 /* eslint-disable no-undef */
@@ -17,7 +17,7 @@ const keyData = 'data';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const sdkVersionTag = '__SDK_VERSION__';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const sdkVersionSha = '__SDK_VERSION_SHA__';
+const sdkVersionSha = 'b79090b40ba7bb37db027040c2764093c26b2e79';
 
 const PASSPORT_FUNCTIONS = {
   init: 'init',
