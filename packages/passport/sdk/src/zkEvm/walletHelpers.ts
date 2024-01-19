@@ -142,7 +142,6 @@ export const getSignedTypedData = async (
       address: await signer.getAddress(),
     },
   ];
-  console.log('combinedSigners', combinedSigners);
   const sortedSigners = combinedSigners.sort((a, b) => {
     const bigA = BigNumber.from(a.address);
     const bigB = BigNumber.from(b.address);
