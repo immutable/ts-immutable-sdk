@@ -17,7 +17,7 @@ const keyData = 'data';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const sdkVersionTag = '__SDK_VERSION__';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const sdkVersionSha = 'b79090b40ba7bb37db027040c2764093c26b2e79';
+const sdkVersionSha = '__SDK_VERSION_SHA__';
 
 const PASSPORT_FUNCTIONS = {
   init: 'init',
