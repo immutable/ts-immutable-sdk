@@ -32,7 +32,7 @@ const getTokenBalances = async (
   provider: Web3Provider,
   ownerAddress: string,
   itemRequirements: ItemRequirement[],
-  forceFetch: boolean,
+  forceFetch: boolean = false,
 ) : Promise<ItemBalance[]> => {
   try {
     const tokenMap = new Map<string, TokenInfo>();

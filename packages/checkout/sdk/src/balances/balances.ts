@@ -253,7 +253,7 @@ export const getAllBalances = async (
   web3Provider: Web3Provider | undefined,
   walletAddress: string | undefined,
   chainId: ChainId,
-  forceFetch?: boolean,
+  forceFetch: boolean = false,
 ): Promise<GetAllBalancesResult> => {
   if (!walletAddress && !web3Provider) {
     throw new CheckoutError(
