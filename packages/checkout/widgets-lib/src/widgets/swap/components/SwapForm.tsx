@@ -244,7 +244,7 @@ export function SwapForm({ data }: SwapFromProps) {
     if (!toToken) return;
 
     try {
-      setSwapFromToConversionText('');
+      if (!silently) setSwapFromToConversionText('');
 
       const quoteResultPromise = quotesProcessor.fromAmountIn(
         exchange,
@@ -332,7 +332,7 @@ export function SwapForm({ data }: SwapFromProps) {
     if (!toToken) return;
 
     try {
-      setSwapFromToConversionText('');
+      if (!silently) setSwapFromToConversionText('');
 
       const quoteResultPromise = quotesProcessor.fromAmountOut(
         exchange,
