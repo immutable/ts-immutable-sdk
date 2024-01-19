@@ -1,11 +1,10 @@
-import {
-  EthSigner, RegisterUserResponse, StarkSigner, UsersApi,
-} from '@imtbl/core-sdk';
+import { EthSigner, RegisterUserResponse, StarkSigner } from '@imtbl/core-sdk';
 import AuthManager from 'authManager';
 import { PassportErrorType, withPassportError } from 'errors/passportError';
 import { retryWithDelay } from 'network/retry';
 import { User } from 'types';
 import axios from 'axios';
+import { ImxApiClients } from '@imtbl/generated-clients';
 import registerPassportStarkEx from './registration';
 
 async function forceUserRefresh(authManager: AuthManager) {
@@ -23,7 +22,7 @@ export default async function registerOffchain(
   starkSigner: StarkSigner,
   unregisteredUser: User,
   authManager: AuthManager,
-  usersApi: UsersApi,
+  imxApiClients: ImxApiClients,
 ) {
   return withPassportError<RegisterUserResponse>(async () => {
     try {
@@ -31,7 +30,7 @@ export default async function registerOffchain(
         {
           ethSigner: userAdminKeySigner,
           starkSigner,
-          usersApi,
+          imxApiClients,
         },
         unregisteredUser.accessToken,
       );

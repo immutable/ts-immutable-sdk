@@ -165,8 +165,10 @@ export type SellOrder = {
   sellToken: SellToken,
   /** the token info of the price of the item */
   buyToken: BuyToken,
-  /** option array of makerFees to be applied to the listing */
+  /** optional array of makerFees to be applied to the listing */
   makerFees?: OrderFee[],
+  /** optional order expiry date. Default order expiry to 2 years from now */
+  orderExpiry?: Date;
 };
 
 /**

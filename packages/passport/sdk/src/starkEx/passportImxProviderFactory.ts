@@ -1,14 +1,12 @@
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 import { IMXProvider } from '@imtbl/provider';
+import { ImxApiClients } from '@imtbl/generated-clients';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import { PassportConfiguration } from '../config';
 import AuthManager from '../authManager';
 import { ConfirmationScreen } from '../confirmation';
 import MagicAdapter from '../magicAdapter';
-import {
-  PassportEventMap,
-  User,
-} from '../types';
+import { PassportEventMap, User } from '../types';
 import TypedEventEmitter from '../utils/typedEventEmitter';
 import { PassportImxProvider } from './passportImxProvider';
 
@@ -19,6 +17,7 @@ export type PassportImxProviderFactoryInput = {
   immutableXClient: ImmutableXClient;
   magicAdapter: MagicAdapter;
   passportEventEmitter: TypedEventEmitter<PassportEventMap>;
+  imxApiClients: ImxApiClients;
 };
 
 export class PassportImxProviderFactory {
@@ -34,6 +33,8 @@ export class PassportImxProviderFactory {
 
   private readonly passportEventEmitter: TypedEventEmitter<PassportEventMap>;
 
+  private readonly imxApiClients: ImxApiClients;
+
   constructor({
     authManager,
     config,
@@ -41,6 +42,7 @@ export class PassportImxProviderFactory {
     immutableXClient,
     magicAdapter,
     passportEventEmitter,
+    imxApiClients,
   }: PassportImxProviderFactoryInput) {
     this.authManager = authManager;
     this.config = config;
@@ -48,6 +50,7 @@ export class PassportImxProviderFactory {
     this.immutableXClient = immutableXClient;
     this.magicAdapter = magicAdapter;
     this.passportEventEmitter = passportEventEmitter;
+    this.imxApiClients = imxApiClients;
   }
 
   public async getProvider(): Promise<IMXProvider> {
@@ -88,6 +91,7 @@ export class PassportImxProviderFactory {
       confirmationScreen: this.confirmationScreen,
       passportEventEmitter: this.passportEventEmitter,
       magicAdapter: this.magicAdapter,
+      imxApiClients: this.imxApiClients,
     });
   }
 }

@@ -2369,7 +2369,7 @@
     },
     "/passport-mr/v1/counterfactual-address": {
       "post": {
-        "summary": "Create a counterfactual address",
+        "summary": "Deprecated Create a counterfactual address",
         "description": "Create a counterfactual address for a user based on their Ethereum address",
         "tags": [
           "passport"
@@ -2468,7 +2468,7 @@
     },
     "/passport-mr/v1/users/{userId}/linked-addresses": {
       "get": {
-        "summary": "Get Ethereum linked addresses for a user",
+        "summary": "Deprecated Get Ethereum linked addresses for a user",
         "description": "Get all the Ethereum linked addresses for a user based on its userId",
         "tags": [
           "passport"
@@ -2574,6 +2574,115 @@
           "passport"
         ],
         "operationId": "createCounterfactualAddress",
+        "security": [
+          {
+            "BearerAuth": [
+              "transact"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "chain_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCounterfactualAddressRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Counterfactual address created response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateCounterfactualAddressRes"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "TooManyRequestsError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError429"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicAPIError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/chains/{chain_name}/passport/counterfactual-address": {
+      "post": {
+        "summary": "Create a counterfactual address v2",
+        "description": "Create a counterfactual address for a user based on their Ethereum address",
+        "tags": [
+          "passport"
+        ],
+        "operationId": "createCounterfactualAddressV2",
         "security": [
           {
             "BearerAuth": [
@@ -3963,14 +4072,14 @@
           "name": {
             "type": "string",
             "nullable": true,
-            "example": "Sword",
-            "description": "The name of the NFT"
+            "description": "The name of the NFT",
+            "example": "Sword"
           },
           "description": {
             "type": "string",
             "nullable": true,
-            "example": "2022-08-16T17:43:26.991388Z",
-            "description": "The description of the NFT"
+            "description": "The description of the NFT",
+            "example": "This is a super awesome sword"
           },
           "image": {
             "type": "string",
@@ -4554,19 +4663,19 @@
             "type": "string",
             "nullable": true,
             "description": "The name of the collection",
-            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+            "example": "Gigantic Lizards"
           },
           "symbol": {
             "type": "string",
             "nullable": true,
             "description": "The symbol of contract",
-            "example": "BASP"
+            "example": "GLZ"
           },
           "description": {
             "type": "string",
             "nullable": true,
             "description": "The description of collection",
-            "example": "Some description"
+            "example": "This is the Gigantic Lizards collection"
           },
           "image": {
             "type": "string",
@@ -4978,6 +5087,12 @@
           "order_id": {
             "type": "string",
             "format": "uuid"
+          },
+          "taker_address": {
+            "type": "string",
+            "description": "Address of the intended account fulfilling the order",
+            "example": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+            "pattern": "^0x[a-fA-F0-9]{40}$"
           },
           "fees": {
             "type": "array",
