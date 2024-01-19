@@ -302,6 +302,14 @@
           "description": "죄송합니다, 현재 지불 처리가 불가능합니다. 몇 분 후에 다시 시도하세요.",
           "secondaryAction": "닫기"
         },
+        "PRODUCT_NOT_FOUND": {
+          "description": "죄송합니다, 이 상품은 더 이상 구매할 수 없습니다.",
+          "secondaryAction": "닫기"
+        },
+        "INSUFFICIENT_STOCK": {
+          "description": "죄송합니다. 요청하신 수량은 재고가 없습니다. 더 적은 수량을 고려해 주십시오.",
+          "secondaryAction": "닫기"
+        },
         "TRANSAK_FAILED": {
           "description": "죄송합니다, 문제가 발생했습니다. 다시 시도하세요.",
           "primaryAction": "다시 시도",

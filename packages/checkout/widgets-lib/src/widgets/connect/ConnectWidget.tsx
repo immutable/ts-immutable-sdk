@@ -72,7 +72,10 @@ export function ConnectWidget({
   const [connectState, connectDispatch] = useReducer(connectReducer, initialConnectState);
   const { sendCloseEvent, provider, walletProviderName } = connectState;
 
-  const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
+  const [viewState, viewDispatch] = useReducer(viewReducer, {
+    ...initialViewState,
+    history: [],
+  });
   const { view } = viewState;
 
   const connectReducerValues = useMemo(

@@ -318,6 +318,14 @@ export const text = {
             "Sorry, we're unable to process your payment right now. Please try again in a few minutes.",
           secondaryAction: 'Dismiss',
         },
+        [SaleErrorTypes.PRODUCT_NOT_FOUND]: {
+          description: 'Sorry, this item is no longer available',
+          secondaryAction: 'Dismiss',
+        },
+        [SaleErrorTypes.INSUFFICIENT_STOCK]: {
+          description: 'Sorry, the requested quantity is not in stock. Consider buying a smaller quantity.',
+          secondaryAction: 'Dismiss',
+        },
         [SaleErrorTypes.TRANSAK_FAILED]: {
           description: 'Sorry, something went wrong. Please try again.',
           primaryAction: 'Try again',
