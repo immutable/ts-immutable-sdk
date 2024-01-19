@@ -69,7 +69,7 @@ const swapValuesToText = ({
   if (swapFromAmount && swapFromToken && swapToToken) {
     const formattedConversion = formatZeroAmount(tokenValueFormat(
       utils.formatUnits(conversion, swapToToken.decimals),
-    ), true); // todo - decimals
+    ), true);
 
     resp.fromToConversion = `1 ${swapFromToken.symbol} ≈ ${
       formatZeroAmount(formattedConversion, true)
