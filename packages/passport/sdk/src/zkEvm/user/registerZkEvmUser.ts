@@ -35,9 +35,9 @@ export async function registerZkEvmUser({
 
   const { chainId } = await jsonRpcProvider.ready;
   const eipChainId = getEip155ChainId(chainId);
-  const chainList = (await multiRollupApiClients.chainsApi.listChains()).data.result;
 
   try {
+    const chainList = (await multiRollupApiClients.chainsApi.listChains()).data.result;
     const chainName = chainList.find((chain) => chain.id === eipChainId)?.name;
     if (!chainName) {
       throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, `Chain name does not exist on for chain id ${chainId}`);

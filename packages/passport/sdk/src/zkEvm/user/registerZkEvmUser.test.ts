@@ -4,7 +4,7 @@ import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { ChainId, ChainName } from 'network/chains';
 import { registerZkEvmUser } from './registerZkEvmUser';
 import AuthManager from '../../authManager';
-import { mockUser, mockUserZkEvm } from '../../test/mocks';
+import { mockListChains, mockUser, mockUserZkEvm } from '../../test/mocks';
 
 jest.mock('@ethersproject/providers');
 jest.mock('@imtbl/toolkit');
@@ -22,6 +22,9 @@ describe('registerZkEvmUser', () => {
   const multiRollupApiClients = {
     passportApi: {
       createCounterfactualAddressV2: jest.fn(),
+    },
+    chainsApi: {
+      listChains: jest.fn(),
     },
   };
   const jsonRPCProvider = {
@@ -41,6 +44,7 @@ describe('registerZkEvmUser', () => {
     getSignerMock.mockReturnValue(ethSignerMock);
     ethSignerMock.getAddress.mockResolvedValue(ethereumAddress);
     (signRaw as jest.Mock).mockResolvedValue(ethereumSignature);
+    multiRollupApiClients.chainsApi.listChains.mockImplementation(() => mockListChains);
   });
 
   describe('when createCounterfactualAddressV2 doesn\'t return a 201', () => {
@@ -48,7 +52,6 @@ describe('registerZkEvmUser', () => {
       multiRollupApiClients.passportApi.createCounterfactualAddressV2.mockImplementation(() => {
         throw new Error('Internal server error');
       });
-
       await expect(async () => registerZkEvmUser({
         authManager: authManager as unknown as AuthManager,
         magicProvider,

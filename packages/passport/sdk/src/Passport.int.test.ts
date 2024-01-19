@@ -139,6 +139,7 @@ describe('Passport', () => {
           mockSigninSilent.mockResolvedValueOnce(mockOidcUserZkevm);
           useMswHandlers([
             mswHandlers.counterfactualAddress.success,
+            mswHandlers.api.chains.success,
           ]);
 
           const zkEvmProvider = getZkEvmProvider();
@@ -160,6 +161,7 @@ describe('Passport', () => {
             mockSigninSilent.mockResolvedValue(mockOidcUserZkevm);
             useMswHandlers([
               mswHandlers.counterfactualAddress.internalServerError,
+              mswHandlers.api.chains.success,
             ]);
 
             const zkEvmProvider = getZkEvmProvider();

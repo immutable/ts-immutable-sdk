@@ -58,3 +58,15 @@ export const mockLinkedAddresses = {
     ],
   },
 };
+
+export const mockListChains = {
+  data: {
+    result: [
+      {
+        id: 'eip155:13473',
+        name: 'Immutable zkEVM Test',
+        rpc_url: 'https://rpc.testnet.immutable.com',
+      },
+    ],
+  },
+};
