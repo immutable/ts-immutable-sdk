@@ -56,7 +56,7 @@ export const smartCheckout = async (
   const balanceCheckResult = await measureAsyncExecution<BalanceCheckResult>(
     config,
     'Time to run balance checks',
-    balanceCheck(config, provider, ownerAddress, aggregatedItems),
+    balanceCheck(config, provider, ownerAddress, aggregatedItems, true),
   );
 
   const { sufficient } = balanceCheckResult;
