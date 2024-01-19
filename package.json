@@ -4,6 +4,9 @@
   "version": "0.0.0",
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
+  "dependencies": {
+    "tslib": "^2.6.2"
+  },
   "devDependencies": {
     "@actions/core": "^1.10.1",
     "@release-it-plugins/workspaces": "^4.0.0",
@@ -60,11 +63,11 @@
     "packages": [
       "sdk",
       "packages/config",
-      "packages/immutablex_client",
+      "packages/x-client",
+      "packages/x-provider",
+      "packages/x-provider/src/sample-app",
       "packages/passport/sdk",
       "packages/passport/sdk-sample-app",
-      "packages/provider",
-      "packages/provider/src/sample-app",
       "packages/orderbook",
       "packages/internal/version-check",
       "packages/internal/contracts",
@@ -89,8 +92,5 @@
     "nohoist": [
       "samples/**"
     ]
-  },
-  "dependencies": {
-    "tslib": "^2.6.2"
   }
 }
