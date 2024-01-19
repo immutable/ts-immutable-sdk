@@ -94,10 +94,6 @@
       "types": "./dist/immutablex_client.d.ts",
       "import": "./dist/immutablex_client.js"
     },
-    "./x/client": {
-      "types": "./dist/immutablex_client.d.ts",
-      "import": "./dist/immutablex_client.js"
-    },
     "./passport": {
       "types": "./dist/passport.d.ts",
       "import": "./dist/passport.js"
@@ -107,10 +103,6 @@
       "import": "./dist/orderbook.js"
     },
     "./provider": {
-      "types": "./dist/provider.d.ts",
-      "import": "./dist/provider.js"
-    },
-    "./x/provider": {
       "types": "./dist/provider.d.ts",
       "import": "./dist/provider.js"
     },
