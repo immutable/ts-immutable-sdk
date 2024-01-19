@@ -71,10 +71,6 @@ const swapValuesToText = ({
       utils.formatUnits(conversion, swapToToken.decimals),
     ), true); // todo - decimals
 
-    console.log('Swap number division', {
-      formattedConversion,
-    });
-
     resp.fromToConversion = `1 ${swapFromToken.symbol} ≈ ${
       formatZeroAmount(formattedConversion, true)
     } ${swapToToken.symbol}`;
