@@ -32,7 +32,7 @@ const getTokenBalances = async (
   provider: Web3Provider,
   ownerAddress: string,
   itemRequirements: ItemRequirement[],
-  forceFetch?: boolean,
+  forceFetch: boolean,
 ) : Promise<ItemBalance[]> => {
   try {
     const tokenMap = new Map<string, TokenInfo>();
@@ -42,7 +42,7 @@ const getTokenBalances = async (
         tokenMap.set(item.address.toLocaleLowerCase(), item);
       },
     );
-    const { balances } = await getAllBalances(config, provider, ownerAddress, getL2ChainId(config), !!forceFetch);
+    const { balances } = await getAllBalances(config, provider, ownerAddress, getL2ChainId(config), forceFetch);
     return balances.filter(
       (balance) => tokenMap.get((balance.token.address || NATIVE).toLocaleLowerCase()),
     ) as TokenBalance[];
@@ -116,7 +116,7 @@ export const balanceCheck = async (
   provider: Web3Provider,
   ownerAddress: string,
   itemRequirements: ItemRequirement[],
-  forceFetch?: boolean,
+  forceFetch: boolean = false,
 ) : Promise<BalanceCheckResult> => {
   const aggregatedItems = balanceAggregator(itemRequirements);
 
