@@ -305,6 +305,14 @@
           "description": "申し訳ありませんが、現在お支払いを処理できません。数分後にもう一度お試しください。",
           "secondaryAction": "閉じる"
         },
+        "PRODUCT_NOT_FOUND": {
+          "description": "申し訳ありませんが、このアイテムはもう利用できません。",
+          "secondaryAction": "閉じる"
+        },
+        "INSUFFICIENT_STOCK": {
+          "description": "申し訳ありませんが、ご希望の数量は在庫がありません。少ない数量の購入をご検討ください。",
+          "secondaryAction": "閉じる"
+        },
         "TRANSAK_FAILED": {
           "description": "申し訳ありませんが、何かがうまくいかなかったようです。もう一度お試しください。",
           "primaryAction": "もう一度試す",
@@ -409,8 +417,10 @@
       "fiatPricePrefix": "~ USD $"
     },
     "BRIDGE_FAILURE": {
+      "bridgeFailureText": {
       "statusText": "トランザクションが失敗しました",
       "actionText": "再確認してもう一度試す"
+      }
     },
     "APPROVE_TRANSACTION": {
       "content": {

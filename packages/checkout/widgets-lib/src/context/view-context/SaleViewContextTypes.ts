@@ -41,6 +41,7 @@ interface SaleFailView extends ViewType {
   type: SaleWidgetViews.SALE_FAIL;
   data?: {
     errorType: SaleErrorTypes;
+    transactionHash?: string;
     [key: string]: unknown;
   };
 }

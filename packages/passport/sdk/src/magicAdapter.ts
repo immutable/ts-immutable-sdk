@@ -8,6 +8,8 @@ import { lazyDocumentReady } from './utils/lazyLoad';
 
 type MagicClient = InstanceWithExtensions<SDKBase, [OpenIdExtension]>;
 
+const MAINNET = 'mainnet';
+
 export default class MagicAdapter {
   private readonly config: PassportConfiguration;
 
@@ -19,7 +21,7 @@ export default class MagicAdapter {
       this.lazyMagicClient = lazyDocumentReady<MagicClient>(() => {
         const client = new Magic(this.config.magicPublishableApiKey, {
           extensions: [new OpenIdExtension()],
-          network: this.config.network,
+          network: MAINNET, // We always connect to mainnet to ensure addresses are the same across envs
         });
         client.preload();
         return client;

@@ -8,7 +8,7 @@ import { Passport } from '@imtbl/passport';
 
 const defaultPassportConfig = {
   environment: 'sandbox',
-  clientId: 'XuGsHvMqMJrb73diq1fCswWwn4AYhcM6',
+  clientId: 'q4gEET7vAKD5jsBWV6j8eoYNKEYpOOw1',
   redirectUri: 'http://localhost:3000/sale?login=true',
   logoutRedirectUri: 'http://localhost:3000/sale?logout=true',
   audience: 'platform_api',
@@ -17,11 +17,11 @@ const defaultPassportConfig = {
 
 const defaultItems: SaleItem[] = [
   {
-    productId: '645',
-    qty: 3,
-    name: 'Landorus',
+    productId: 'lab',
+    qty: 2,
+    name: 'Lab Iguana',
     image: 'https://pokemon-nfts.mystagingwebsite.com/wp-content/uploads/2023/11/645-300x300.png',
-    description: 'Landorus',
+    description: 'Lab Iguana',
   },
 ];
 
@@ -32,12 +32,14 @@ const useParams = () => {
   const amount = urlParams.get('amount') as string;
   const environmentId = urlParams.get('environmentId') as string;
   const fromTokenAddress = urlParams.get('fromTokenAddress') as string;
+  const collectionName = urlParams.get('collectionName') as string;
 
   return {
     login,
     amount,
     environmentId,
     fromTokenAddress,
+    collectionName,
   };
 };
 
@@ -71,8 +73,8 @@ const usePassportInstance = (passportConfig: any) => {
 
 export function SaleUI() {
   const params = useParams();
-  const {
-    login, amount, environmentId, fromTokenAddress,
+  const { 
+    login, amount, environmentId, fromTokenAddress, collectionName
   } = params;
   const [passportConfig, setPassportConfig] = useState(
     JSON.stringify(defaultPassportConfig, null, 2),
@@ -83,7 +85,7 @@ export function SaleUI() {
   const checkout = useMemo(() => new Checkout({baseConfig: {environment: Environment.SANDBOX}, passport: passportInstance as unknown as Passport}), [passportInstance])
   const factory = useMemo(() => new WidgetsFactory(checkout, {theme: WidgetTheme.DARK}), [checkout])
   const saleWidget = useMemo(() => factory.create(WidgetType.SALE, { config: { theme: WidgetTheme.DARK } }),
-  [factory, amount, environmentId, fromTokenAddress, defaultItems]
+  [factory, amount, environmentId, fromTokenAddress, collectionName, defaultItems]
   )
 
   // mount sale widget and subscribe to close event
@@ -92,6 +94,7 @@ export function SaleUI() {
       amount,
       environmentId,
       fromTokenAddress,
+      collectionName,
       items: defaultItems
     });
     saleWidget.addListener(SaleEventType.CLOSE_WIDGET, () => { saleWidget.unmount()})
@@ -158,6 +161,7 @@ export function SaleUI() {
       amount,
       environmentId,
       fromTokenAddress,
+      collectionName,
       items: defaultItems
     })}>Mount</button>
     <button onClick={() => saleWidget.unmount()}>Unmount</button>

@@ -3,6 +3,7 @@ import { createBlockchainDataInstance } from '../../../instance';
 import { NATIVE } from '../../../env';
 import { ChainId, ChainSlug, ImxAddressConfig } from '../../../types';
 import { isNativeToken } from '../../../tokens';
+import { isMatchingAddress } from '../../../utils/utils';
 
 // If the root address evaluates to this then its ETH
 export const INDEXER_ETH_ROOT_CONTRACT_ADDRESS = '0x0000000000000000000000000000000000000eee';
@@ -46,9 +47,8 @@ export const fetchL1Representation = async (
     contractAddress: l2address,
   });
 
-  // TODO: When bridge is ready we need to understand how L2 ETH will be mapped back to L1 ETH
   const l1address = tokenData.result.root_contract_address;
-  if (l1address === INDEXER_ETH_ROOT_CONTRACT_ADDRESS) {
+  if (isMatchingAddress(l1address ?? '', INDEXER_ETH_ROOT_CONTRACT_ADDRESS)) {
     return {
       l1address: 'native',
       l2address,

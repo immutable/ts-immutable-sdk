@@ -45,11 +45,9 @@ import { BalanceInfo, mapTokenBalancesWithConversions } from '../functions/token
 
 type WalletBalancesProps = {
   balancesLoading: boolean;
-  setBalancesLoading: (balances: boolean) => void;
 };
 export function WalletBalances({
   balancesLoading,
-  setBalancesLoading,
 }: WalletBalancesProps) {
   const { t } = useTranslation();
   const { connectLoaderState } = useContext(ConnectLoaderContext);
@@ -236,7 +234,7 @@ export function WalletBalances({
         sx={walletBalanceOuterContainerStyles}
       >
         <Box sx={walletBalanceContainerStyles}>
-          {showNetworkMenu && <NetworkMenu setBalancesLoading={setBalancesLoading} />}
+          {showNetworkMenu && <NetworkMenu />}
           <TotalTokenBalance totalBalance={totalFiatAmount} loading={balancesLoading} />
           <Box
             sx={walletBalanceListContainerStyles(showNetworkMenu, showAddCoins)}
