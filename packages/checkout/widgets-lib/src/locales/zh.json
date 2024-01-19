@@ -302,6 +302,14 @@
           "description": "抱歉，我们现在无法处理您的付款。请几分钟后再试。",
           "secondaryAction": "关闭"
         },
+        "PRODUCT_NOT_FOUND": {
+          "description": "抱歉，所请求的数量缺货。请考虑购买较少数量。",
+          "secondaryAction": "关闭"
+        },
+        "INSUFFICIENT_STOCK": {
+          "description": "抱歉，库存不足。请考虑购买较少数量。",
+          "secondaryAction": "关闭"
+        },
         "TRANSAK_FAILED": {
           "description": "抱歉，出了点问题。请再试一次。",
           "primaryAction": "再试一次",
