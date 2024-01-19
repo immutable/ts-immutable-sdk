@@ -107,7 +107,7 @@ export async function withdraw() {
     amount: params.amount,
     sourceChainId: bridgeConfig.bridgeInstance.childChainID,
     destinationChainId: bridgeConfig.bridgeInstance.rootChainID,
-    gasMultiplier: 1.4,
+    gasMultiplier: params.gasMultiplier,
   }
 
   console.log('withdrawReq', withdrawReq)

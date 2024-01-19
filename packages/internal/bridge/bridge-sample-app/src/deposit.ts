@@ -107,7 +107,7 @@ async function deposit() {
     amount: params.amount,
     sourceChainId: bridgeConfig.bridgeInstance.rootChainID,
     destinationChainId: bridgeConfig.bridgeInstance.childChainID,
-    gasMultiplier: 1.54,
+    gasMultiplier: params.gasMultiplier,
   }
 
   console.log('depositReq', depositReq)
