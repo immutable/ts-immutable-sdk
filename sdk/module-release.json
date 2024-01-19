@@ -13,7 +13,8 @@
     "passport": "prod",
     "orderbook": "prod",
     "provider": "prod",
-    "checkout": "prod"
+    "checkout": "prod",
+    "link": "alpha"
   },
   "fileCopy": [
     {
