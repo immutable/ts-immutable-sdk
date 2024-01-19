@@ -121,11 +121,12 @@ export const getSignedTypedData = async (
 
   // Hash the EIP712 payload and generate the complete payload
   const { _TypedDataEncoder: typedDataEncoder } = ethers.utils;
-  const digest = typedDataEncoder.hash(typedData.domain, types, typedData.message);
-  const completePayload = encodeMessageSubDigest(chainId, walletAddress, digest);
-  const hash = ethers.utils.keccak256(completePayload);
+  const typedDataHash = typedDataEncoder.hash(typedData.domain, types, typedData.message);
+  const messageSubDigest = encodeMessageSubDigest(chainId, walletAddress, typedDataHash);
+  const hash = ethers.utils.keccak256(messageSubDigest);
 
-  // Sign the complete payload
+  // Sign the sub digest
+  // https://github.com/immutable/wallet-contracts/blob/7824b5f24b2e0eb2dc465ecb5cd71f3984556b73/src/contracts/modules/commons/ModuleAuth.sol#L155
   const hashArray = ethers.utils.arrayify(hash);
   const ethsigNoType = await signer.signMessage(hashArray);
   const signedDigest = `${ethsigNoType}${ETH_SIGN_FLAG}`;
