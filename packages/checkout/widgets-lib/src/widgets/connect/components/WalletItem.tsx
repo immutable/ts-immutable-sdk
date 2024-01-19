@@ -22,15 +22,7 @@ export function WalletItem(props: WalletProps) {
       onClick={() => onWalletClick(wallet.walletProviderName)}
       sx={{ marginBottom: 'base.spacing.x1' }}
     >
-      <MenuItem.FramedLogo
-        logo={logo[wallet.walletProviderName] as any}
-        sx={{
-          minWidth: 'base.icon.size.500',
-          padding: 'base.spacing.x1',
-          backgroundColor: 'base.color.translucent.standard.100',
-          borderRadius: 'base.borderRadius.x2',
-        }}
-      />
+      <MenuItem.FramedLogo logo={logo[wallet.walletProviderName] as any} />
       <MenuItem.Label size="medium">
         {t(`wallets.${wallet.walletProviderName}.heading`)}
       </MenuItem.Label>

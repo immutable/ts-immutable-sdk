@@ -2,7 +2,6 @@ import { WalletProviderName } from '@imtbl/checkout-sdk';
 import { MenuItem } from '@biom3/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { walletItemLogoStyles } from './WalletItemStyles';
 
 export interface WalletItemProps {
   testId: string;
@@ -40,10 +39,7 @@ export function WalletItem({
         }
       }}
     >
-      <MenuItem.FramedLogo
-        logo={logo[walletProviderName] as any}
-        sx={walletItemLogoStyles}
-      />
+      <MenuItem.FramedLogo logo={logo[walletProviderName] as any} />
       <MenuItem.Label size="medium">
         {t(`wallets.${walletProviderName}.heading`)}
       </MenuItem.Label>
