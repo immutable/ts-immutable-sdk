@@ -1315,7 +1315,7 @@ __metadata:
 
 "@imtbl/sdk@file:../../../sdk::locator=func-tests-imx%40workspace%3A.":
   version: 0.0.0
-  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=7193ab&locator=func-tests-imx%40workspace%3A."
+  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=12d5b1&locator=func-tests-imx%40workspace%3A."
   dependencies:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
@@ -1356,7 +1356,7 @@ __metadata:
   peerDependencies:
     react: ^18.2.0
     react-dom: ^18.2.0
-  checksum: 690823733cb9ce36119b6c77f086e1da5f4c39cf5d86092ad430e7a845e9141351786ba4c811c824522313f459db4550c01ea0b7d023681afd2cdba068e10f51
+  checksum: f6af9b408e6eefe66178f2713cc622a720843eed3f027a58c20c82ed86c771be2f867d56eed596dd66ee71cf1572c5ac1e4a6d678428a3ba56aee69771593080
   languageName: node
   linkType: hard
 

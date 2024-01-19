@@ -1,8 +1,8 @@
-import { GenericIMXProvider, ProviderConfiguration } from '@imtbl/sdk/provider';
+import { GenericIMXProvider, ProviderConfiguration } from '@imtbl/sdk/x_provider';
 import { parseUnits } from '@ethersproject/units';
 import { repeatCheck30, repeatCheck300 } from 'common';
 import { strict as assert } from 'assert';
-import { ImmutableXClient, ImxClientModuleConfiguration } from '@imtbl/sdk/immutablex_client';
+import { ImmutableXClient, ImxClientModuleConfiguration } from '@imtbl/sdk/x_client';
 import { configuration, StepSharedState } from './stepSharedState';
 
 export class Withdrawal {

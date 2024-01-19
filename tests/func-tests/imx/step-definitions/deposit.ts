@@ -1,7 +1,7 @@
 import { strict as assert } from 'assert';
 import { formatEther, parseEther } from '@ethersproject/units';
-import { ImmutableXClient, ImxClientModuleConfiguration } from '@imtbl/sdk/immutablex_client';
-import { GenericIMXProvider, ProviderConfiguration } from '@imtbl/sdk/provider';
+import { ImmutableXClient, ImxClientModuleConfiguration } from '@imtbl/sdk/x_client';
+import { GenericIMXProvider, ProviderConfiguration } from '@imtbl/sdk/x_provider';
 import { StepSharedState, configuration } from './stepSharedState';
 import {
   env, getProvider, repeatCheck600, waitForTransactionResponse,

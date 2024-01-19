@@ -1,15 +1,18 @@
-import { configuration, StepSharedState } from './stepSharedState';
+/* eslint-disable @typescript-eslint/naming-convention */
 import { MintFee, MintTokenDataV2 } from '@imtbl/core-sdk';
-import { env, repeatCheck300 } from '../common';
 import * as assert from 'assert';
-import { ImmutableXClient, ImxClientModuleConfiguration } from '@imtbl/sdk/immutablex_client';
+import { ImmutableXClient, ImxClientModuleConfiguration } from '@imtbl/sdk/x_client';
+import { env, repeatCheck300 } from '../common';
+import { configuration, StepSharedState } from './stepSharedState';
 
 // @binding([StepSharedState])
 export class Minting {
   constructor(protected stepSharedState: StepSharedState) {}
+
   config: ImxClientModuleConfiguration = {
     baseConfig: { environment: configuration.environment },
   };
+
   client = new ImmutableXClient(this.config);
 
   // @given('randomly L2 minted to {string} of {string}', undefined, 10000)
@@ -24,7 +27,8 @@ export class Minting {
       // Mint params
       const royalties: MintFee[] = [];
 
-      const tokens: MintTokenDataV2[] = [...Array(mintCount).keys()].map(_ => ({
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const tokens: MintTokenDataV2[] = [...Array(mintCount).keys()].map((_) => ({
         id: `${Math.ceil(10000000000 * Math.random())}`,
         blueprint: '{onchain-metadata}',
         ...(royalties.length > 0 && { royalties }),
@@ -52,12 +56,11 @@ export class Minting {
         contract_address: contractAddress,
       });
 
-      console.log('Mint result',apiResult);
+      console.log('Mint result', apiResult);
 
-      const asset =
-        apiResult.results && apiResult.results.length > 0
-          ? apiResult.results[0]
-          : undefined;
+      const asset = apiResult.results && apiResult.results.length > 0
+        ? apiResult.results[0]
+        : undefined;
       assert.ok(asset !== undefined, 'No asset');
       this.stepSharedState.tokens[assetVar] = asset;
       this.stepSharedState.nfts[assetVar] = {

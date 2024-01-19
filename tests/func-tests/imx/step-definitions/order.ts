@@ -1,7 +1,7 @@
 import { UnsignedOrderRequest } from '@imtbl/core-sdk';
 import { parseEther } from '@ethersproject/units';
-import { ImmutableXClient, ImxClientModuleConfiguration } from '@imtbl/sdk/immutablex_client';
-import { GenericIMXProvider, ProviderConfiguration } from '@imtbl/sdk/provider';
+import { ImmutableXClient, ImxClientModuleConfiguration } from '@imtbl/sdk/x_client';
+import { GenericIMXProvider, ProviderConfiguration } from '@imtbl/sdk/x_provider';
 import { configuration, StepSharedState } from './stepSharedState';
 
 // @binding([StepSharedState])

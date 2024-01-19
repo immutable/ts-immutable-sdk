@@ -1,13 +1,14 @@
-import { env, getProvider, repeatCheck20 } from '../common';
 import { strict as assert } from 'assert';
 import { parseEther } from '@ethersproject/units';
+import { ImmutableXClient, ImxClientModuleConfiguration } from '@imtbl/sdk/x_client';
+import { ProviderConfiguration } from '@imtbl/sdk/x_provider';
 import { configuration, StepSharedState } from './stepSharedState';
-import { ImmutableXClient, ImxClientModuleConfiguration } from '@imtbl/sdk/immutablex_client';
-import { ProviderConfiguration } from '@imtbl/sdk/provider';
+import { env, getProvider, repeatCheck20 } from '../common';
 
 // @binding([StepSharedState])
 export class Trading {
   constructor(protected stepSharedState: StepSharedState) {}
+
   config: ImxClientModuleConfiguration = {
     baseConfig: { environment: configuration.environment },
   };
@@ -61,7 +62,7 @@ export class Trading {
     await repeatCheck20(async () => {
       const owner = await user.ethSigner.getAddress();
       const result = await this.client.getBalance({
-        owner: owner,
+        owner,
         address: 'eth',
       });
       // TODO update code gen of API Spec
@@ -148,7 +149,8 @@ export class Trading {
         );
         return orderDetails;
       },
-      order => order.status === status,
+      // eslint-disable-next-line @typescript-eslint/no-shadow
+      (order) => order.status === status,
     );
   }
 
