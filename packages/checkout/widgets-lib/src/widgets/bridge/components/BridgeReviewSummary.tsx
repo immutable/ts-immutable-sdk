@@ -245,7 +245,10 @@ export function BridgeReviewSummary() {
         sx={bottomMenuItemStyles}
       >
         {fromWalletProviderName && (
-          <MenuItem.FramedLogo logo={logo[fromWalletProviderName] as any} />
+          <MenuItem.FramedLogo
+            logo={logo[fromWalletProviderName] as any}
+            sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
+          />
         )}
         <MenuItem.Label>
           <strong>{t('views.BRIDGE_REVIEW.fromLabel.heading')}</strong>
@@ -279,7 +282,10 @@ export function BridgeReviewSummary() {
         sx={topMenuItemStyles}
       >
         {toWalletProviderName && (
-          <MenuItem.FramedLogo logo={logo[toWalletProviderName] as any} />
+          <MenuItem.FramedLogo
+            logo={logo[toWalletProviderName] as any}
+            sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
+          />
         )}
         <MenuItem.Label>
           <strong>{t('views.BRIDGE_REVIEW.toLabel.heading')}</strong>

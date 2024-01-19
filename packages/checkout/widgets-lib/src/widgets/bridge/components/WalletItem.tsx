@@ -39,7 +39,10 @@ export function WalletItem({
         }
       }}
     >
-      <MenuItem.FramedLogo logo={logo[walletProviderName] as any} />
+      <MenuItem.FramedLogo
+        logo={logo[walletProviderName] as any}
+        sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
+      />
       <MenuItem.Label size="medium">
         {t(`wallets.${walletProviderName}.heading`)}
       </MenuItem.Label>
