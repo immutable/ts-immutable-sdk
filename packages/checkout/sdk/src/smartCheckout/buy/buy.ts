@@ -26,7 +26,7 @@ import {
   BuyResult,
   CheckoutStatus,
   BuyOrder,
-  SmartCheckoutResult,
+  SmartCheckoutResult, BuyOverrides,
 } from '../../types/smartCheckout';
 import { smartCheckout } from '..';
 import {
@@ -89,9 +89,7 @@ export const buy = async (
   config: CheckoutConfiguration,
   provider: Web3Provider,
   orders: Array<BuyOrder>,
-  overrides: {
-    waitFulfillmentSettlements?: boolean;
-  } = {
+  overrides: BuyOverrides = {
     waitFulfillmentSettlements: true,
   },
 ): Promise<BuyResult> => {

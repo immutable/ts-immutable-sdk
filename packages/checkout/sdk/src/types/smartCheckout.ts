@@ -70,6 +70,15 @@ export type BuyResultInsufficientFunds = {
   smartCheckoutResult: SmartCheckoutInsufficient
 };
 
+/**
+ * Represents the overrides available for {@link Checkout.buy}
+ * @property {boolean} waitFulfillmentSettlements
+ */
+export type BuyOverrides = {
+  /** If the buy should wait for the fulfillment transactions to settle */
+  waitFulfillmentSettlements?: boolean;
+};
+
 /*
 * Type representing the result of the sell
 */
@@ -155,7 +164,7 @@ export type CancelResultFailed = {
  * @property {string} SUCCESS - If checkout succeeded as the transactions were able to be processed
  * @property {string} FAILED - If checkout failed due to transactions not settling on chain
  * @property {string} INSUFFICIENT_FUNDS - If checkout failed due to insufficient funds
- * @property {string} FULFILLMENTS_UNSETTLED - If checkout succeeded but the fulfillments are not yet settled
+ * @property {string} FULFILLMENTS_UNSETTLED - If checkout succeeded but the fulfillment transactions are not yet settled
  */
 export enum CheckoutStatus {
   SUCCESS = 'SUCCESS',
