@@ -13,5 +13,10 @@
     "declaration": false,
     "resolveJsonModule": true,
     "skipLibCheck": true
+  },
+  "ts-node": {
+    "compilerOptions": {
+      "module": "commonjs"
+    }
   }
 }
