@@ -60,13 +60,13 @@ export const getAllowedBalances = async ({
   });
 
   const tokensAddresses = new Map();
-  allowList.tokens.forEach((token) => tokensAddresses.set(token.address || NATIVE, true));
+  allowList.tokens.forEach((token) => tokensAddresses.set(token.address?.toLowerCase() || NATIVE, true));
 
   const allowedBalances = tokenBalances.balances.filter((balance) => {
     // Balance is <= 0 and it is not allow to have zeros
     if (balance.balance.lte(0) && !allowZero) return false;
 
-    return tokensAddresses.get(balance.token.address || NATIVE);
+    return tokensAddresses.get(balance.token.address?.toLowerCase() || NATIVE);
   }) ?? [];
 
   return { allowList, allowedBalances };

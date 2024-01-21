@@ -23,6 +23,7 @@ import { IMXProvider } from '@imtbl/x-provider';
 import AuthManager from 'authManager';
 import TypedEventEmitter from 'utils/typedEventEmitter';
 import { Web3Provider } from '@ethersproject/providers';
+import { ImxApiClients } from '@imtbl/generated-clients';
 import GuardianClient from '../guardian/guardian';
 import {
   PassportEventMap, PassportEvents, UserImx, User, IMXSigners,
@@ -44,6 +45,7 @@ export interface PassportImxProviderOptions {
   config: PassportConfiguration;
   passportEventEmitter: TypedEventEmitter<PassportEventMap>;
   magicAdapter: MagicAdapter;
+  imxApiClients: ImxApiClients;
 }
 
 type AuthenticatedUserAndSigners = {
@@ -65,6 +67,8 @@ export class PassportImxProvider implements IMXProvider {
 
   protected readonly guardianClient: GuardianClient;
 
+  protected readonly imxApiClients: ImxApiClients;
+
   protected magicAdapter: MagicAdapter;
 
   /**
@@ -84,6 +88,7 @@ export class PassportImxProvider implements IMXProvider {
     config,
     passportEventEmitter,
     magicAdapter,
+    imxApiClients,
   }: PassportImxProviderOptions) {
     this.authManager = authManager;
     this.immutableXClient = immutableXClient;
@@ -92,6 +97,7 @@ export class PassportImxProvider implements IMXProvider {
       config,
     });
     this.magicAdapter = magicAdapter;
+    this.imxApiClients = imxApiClients;
     this.initialiseSigners();
 
     passportEventEmitter.on(PassportEvents.LOGGED_OUT, this.handleLogout);
@@ -192,7 +198,7 @@ export class PassportImxProvider implements IMXProvider {
       starkSigner,
       user,
       this.authManager,
-      this.immutableXClient.usersApi,
+      this.imxApiClients,
     );
   }
 

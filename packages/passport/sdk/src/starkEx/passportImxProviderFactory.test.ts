@@ -1,4 +1,5 @@
 import { ImmutableXClient } from '@imtbl/x-client';
+import { ImxApiClients } from '@imtbl/generated-clients';
 import { ConfirmationScreen } from '../confirmation';
 import registerPassportStarkEx from './workflows/registration';
 import { PassportImxProviderFactory } from './passportImxProviderFactory';
@@ -12,6 +13,7 @@ import { PassportImxProvider } from './passportImxProvider';
 
 jest.mock('./workflows/registration');
 jest.mock('./passportImxProvider');
+jest.mock('@imtbl/generated-clients');
 
 describe('PassportImxProviderFactory', () => {
   const mockAuthManager = {
@@ -19,6 +21,8 @@ describe('PassportImxProviderFactory', () => {
     forceUserRefresh: jest.fn(),
     login: jest.fn(),
   };
+  const imxApiClients = new ImxApiClients({} as any);
+
   const mockMagicAdapter = {};
   const immutableXClient = {
     usersApi: {},
@@ -33,6 +37,7 @@ describe('PassportImxProviderFactory', () => {
     authManager: mockAuthManager as unknown as AuthManager,
     magicAdapter: mockMagicAdapter as unknown as MagicAdapter,
     passportEventEmitter,
+    imxApiClients,
   });
   const mockPassportImxProvider = {};
 
@@ -74,7 +79,6 @@ describe('PassportImxProviderFactory', () => {
       mockAuthManager.login.mockResolvedValue(mockUserImx);
       mockAuthManager.getUser.mockRejectedValue(new Error('error'));
       mockAuthManager.login.mockResolvedValue(mockUserImx);
-
       const result = await passportImxProviderFactory.getProvider();
 
       expect(result).toBe(mockPassportImxProvider);
@@ -88,6 +92,7 @@ describe('PassportImxProviderFactory', () => {
         config,
         confirmationScreen,
         passportEventEmitter,
+        imxApiClients: new ImxApiClients({} as any),
       });
     });
   });

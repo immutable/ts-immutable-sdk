@@ -6,7 +6,7 @@ import MagicAdapter from './magicAdapter';
 import { ConfirmationScreen } from './confirmation';
 import { Passport } from './Passport';
 import { PassportImxProvider, PassportImxProviderFactory } from './starkEx';
-import { Networks, OidcConfiguration } from './types';
+import { OidcConfiguration } from './types';
 import { mockUser, mockLinkedAddresses, mockUserImx } from './test/mocks';
 
 jest.mock('./authManager');
@@ -102,7 +102,6 @@ describe('Passport', () => {
             imxPublicApiDomain: 'guardianDomain123',
             magicProviderId: 'providerId123',
             magicPublishableApiKey: 'publishableKey123',
-            network: Networks.SANDBOX,
             passportDomain: 'customDomain123',
             relayerUrl: 'relayerUrl123',
             zkEvmRpcUrl: 'zkEvmRpcUrl123',

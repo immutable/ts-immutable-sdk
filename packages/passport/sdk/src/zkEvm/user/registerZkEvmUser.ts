@@ -40,7 +40,7 @@ export async function registerZkEvmUser({
     if (!chainName) {
       throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, `Chain name does not exist on for chain id ${chainId}`);
     }
-    await multiRollupApiClients.passportApi.createCounterfactualAddress({
+    await multiRollupApiClients.passportApi.createCounterfactualAddressV2({
       chainName,
       createCounterfactualAddressRequest: {
         ethereum_address: ethereumAddress,

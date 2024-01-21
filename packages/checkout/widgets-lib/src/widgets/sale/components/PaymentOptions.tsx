@@ -1,17 +1,16 @@
 import { Box } from '@biom3/react';
 
+import { SalePaymentTypes } from '@imtbl/checkout-sdk';
 import { PaymentOption } from './PaymentOption';
 
-import { PaymentTypes } from '../types';
-
-const defaultPaymentOptions: PaymentTypes[] = [
-  PaymentTypes.FIAT,
-  PaymentTypes.CRYPTO,
+const defaultPaymentOptions: SalePaymentTypes[] = [
+  SalePaymentTypes.FIAT,
+  SalePaymentTypes.CRYPTO,
 ];
 
 export interface PaymentOptionsProps {
-  onClick: (type: PaymentTypes) => void;
-  disabledOptions?: PaymentTypes[];
+  onClick: (type: SalePaymentTypes) => void;
+  disabledOptions?: SalePaymentTypes[];
 }
 
 export function PaymentOptions(props: PaymentOptionsProps) {

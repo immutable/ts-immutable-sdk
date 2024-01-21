@@ -20,6 +20,7 @@ import {
   RequestWalletEvent,
   SaleEventType,
   SaleFailed,
+  SalePaymentMethod,
   SaleSuccess,
   SaleTransactionSuccess,
   SwapEventType,
@@ -154,7 +155,8 @@ export type WidgetEventData = {
     [SaleEventType.FAILURE]: SaleFailed,
     [SaleEventType.REJECTED]: any,
     [SaleEventType.CLOSE_WIDGET]: {},
-    [SaleEventType.TRANSACTION_SUCCESS]: SaleTransactionSuccess
+    [SaleEventType.TRANSACTION_SUCCESS]: SaleTransactionSuccess,
+    [SaleEventType.PAYMENT_METHOD]: SalePaymentMethod,
   } & OrchestrationMapping & ProviderEventMapping
 };
 

@@ -2169,9 +2169,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.19.22":
-  version: 0.19.22
-  resolution: "@biom3/react@npm:0.19.22"
+"@biom3/react@npm:^0.19.34":
+  version: 0.19.34
+  resolution: "@biom3/react@npm:0.19.34"
   dependencies:
     "@biom3/design-tokens": "*"
     "@emotion/css": ^11.11.2
@@ -2180,7 +2180,7 @@ __metadata:
     buffer: ^6.0.3
     csstype: ^3.1.2
     framer-motion: ^10.12.12
-    localstorage-slim: ^2.7.0
+    localforage: ^1.10.0
     lodash.debounce: ^4.0.8
     lodash.get: ^4.4.2
     lodash.isequal: ^4.5.0
@@ -2188,8 +2188,9 @@ __metadata:
     react: ^18.2.0
     react-dom: ^18.2.0
     react-is: ^18.2.0
+    react-keyed-flatten-children: ^3.0.0
     ts-deepmerge: ^6.2.0
-  checksum: 2805f7ea8b4e9b61f98a29b903acaf65d36a16f9adee3cc116a9084f58f351331d4a493ddc722738fa470db2458908407d8355a653ab06dbf8a827f45f84df43
+  checksum: bb0005a870342636e921423d6604b11a3d4dca490a31b5e29230d2a0a94e2f219fbd85d3c6886ba7ed9f92b5a4ea81f5d430cfdd788318ade3bacdba827db13c
   languageName: node
   linkType: hard
 
@@ -3296,7 +3297,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-sdk-sample-app@workspace:packages/checkout/sdk-sample-app"
   dependencies:
-    "@biom3/react": ^0.19.22
+    "@biom3/react": ^0.19.34
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
@@ -3369,7 +3370,7 @@ __metadata:
   resolution: "@imtbl/checkout-widgets-sample-app@workspace:packages/checkout/widgets-sample-app"
   dependencies:
     "@biom3/design-tokens": 0.2.9
-    "@biom3/react": ^0.19.22
+    "@biom3/react": ^0.19.34
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
@@ -3398,7 +3399,7 @@ __metadata:
   resolution: "@imtbl/checkout-widgets@workspace:packages/checkout/widgets-lib"
   dependencies:
     "@biom3/design-tokens": 0.2.9
-    "@biom3/react": ^0.19.22
+    "@biom3/react": ^0.19.34
     "@ethersproject/providers": ^5.7.2
     "@imtbl/bridge-sdk": 0.0.0
     "@imtbl/checkout-sdk": 0.0.0
@@ -3645,7 +3646,7 @@ __metadata:
   resolution: "@imtbl/passport-sdk-sample-app@workspace:packages/passport/sdk-sample-app"
   dependencies:
     "@biom3/design-tokens": 0.2.9
-    "@biom3/react": ^0.19.22
+    "@biom3/react": ^0.19.34
     "@imtbl/config": 0.0.0
     "@imtbl/core-sdk": ^2.4.0
     "@imtbl/passport": 0.0.0
@@ -3733,7 +3734,7 @@ __metadata:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
     "@biom3/design-tokens": 0.2.9
-    "@biom3/react": ^0.19.22
+    "@biom3/react": ^0.19.34
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
     "@ethersproject/providers": ^5.7.2
@@ -19535,19 +19536,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"localforage@npm:^1.7.4":
+"localforage@npm:^1.10.0, localforage@npm:^1.7.4":
   version: 1.10.0
   resolution: "localforage@npm:1.10.0"
   dependencies:
     lie: 3.1.1
   checksum: f2978b434dafff9bcb0d9498de57d97eba165402419939c944412e179cab1854782830b5ec196212560b22712d1dd03918939f59cf1d4fc1d756fca7950086cf
-  languageName: node
-  linkType: hard
-
-"localstorage-slim@npm:^2.7.0":
-  version: 2.7.0
-  resolution: "localstorage-slim@npm:2.7.0"
-  checksum: eaa52251005baca503d28818dcde89c3c4e72c3617497a3bf2f990636c92a1f112c4a67d8eba8a2b70e40c994abe791df5043983e67585455c74d1e0fee58986
   languageName: node
   linkType: hard
 
@@ -23198,6 +23192,17 @@ __metadata:
   version: 18.2.0
   resolution: "react-is@npm:18.2.0"
   checksum: e72d0ba81b5922759e4aff17e0252bd29988f9642ed817f56b25a3e217e13eea8a7f2322af99a06edb779da12d5d636e9fda473d620df9a3da0df2a74141d53e
+  languageName: node
+  linkType: hard
+
+"react-keyed-flatten-children@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "react-keyed-flatten-children@npm:3.0.0"
+  dependencies:
+    react-is: ^18.2.0
+  peerDependencies:
+    react: ">=15.0.0"
+  checksum: 07c216e7420c3830969097bc7bdedaf50ae944f59540123680b99be7da3faecb6eda9edc71243f3f88696e93c4823646c609d774eee5116bdc348a7f53909b43
   languageName: node
   linkType: hard
 
@@ -27938,7 +27943,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "x-provider-sample-app@workspace:packages/x-provider/src/sample-app"
   dependencies:
-    "@biom3/react": ^0.19.22
+    "@biom3/react": ^0.19.34
     "@imtbl/core-sdk": ^2.4.0
     "@imtbl/sdk": 0.0.0
     "@svgr/webpack": ^8.0.1

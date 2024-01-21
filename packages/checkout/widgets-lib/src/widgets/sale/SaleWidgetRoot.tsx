@@ -53,6 +53,7 @@ export class Sale extends Base<WidgetType.SALE> {
       console.warn('[IMTBL]: invalid "walletProviderName" widget input');
       validatedParams.walletProviderName = undefined;
     }
+
     if (!isValidAmount(params.amount)) {
       // eslint-disable-next-line no-console
       console.warn('[IMTBL]: invalid "amount" widget input');
@@ -76,6 +77,12 @@ export class Sale extends Base<WidgetType.SALE> {
       // eslint-disable-next-line no-console
       console.warn('[IMTBL]: invalid "fromTokenAddress" widget input');
       validatedParams.fromTokenAddress = '';
+    }
+
+    if (!params.collectionName) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "collectionName" widget input');
+      validatedParams.collectionName = '';
     }
 
     return validatedParams;
@@ -110,6 +117,8 @@ export class Sale extends Base<WidgetType.SALE> {
                 items={this.parameters.items!}
                 fromTokenAddress={this.parameters.fromTokenAddress!}
                 environmentId={this.parameters.environmentId!}
+                collectionName={this.parameters.collectionName!}
+                language="en"
               />
             </ConnectLoader>
           </ThemeProvider>
