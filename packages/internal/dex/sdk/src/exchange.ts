@@ -2,7 +2,7 @@ import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
 import assert from 'assert';
 import { DuplicateAddressesError, InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError } from 'errors';
-import { fetchGasPrice } from 'lib/transactionUtils/gas';
+import { calculateGasFee, fetchGasPrice } from 'lib/transactionUtils/gas';
 import { getApproval, prepareApproval } from 'lib/transactionUtils/approval';
 import { getOurQuoteReqAmount, prepareUserQuote } from 'lib/transactionUtils/getQuote';
 import { Fees } from 'lib/fees';
@@ -26,10 +26,12 @@ import {
   Native,
   Quote,
   SecondaryFee,
+  TransactionDetails,
   TransactionResponse,
 } from './types';
 import { getSwap, adjustQuoteWithFees } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
+import WethAbi from './abi/WethAbi.json';
 
 const toPublicQuote = (
   amount: CoinAmount<Coin>,
@@ -143,6 +145,85 @@ export class Exchange {
     };
   }
 
+  private async getUnsignedWrapTx(
+    tokenIn: Coin,
+    tokenSpecified: Coin,
+    otherToken: Coin,
+    amountSpecified: CoinAmount<Coin>,
+    fromAddress: string,
+    gasPrice: CoinAmount<Native> | null,
+    amount: ethers.BigNumber,
+  ): Promise<TransactionResponse> {
+    const isWrap = tokenIn === this.nativeToken;
+    const otherTokenCoinAmount = {
+      token: otherToken,
+      value: amountSpecified.value,
+    };
+
+    // 1. Get the quote. This is always 1:1 (0 {price impact, slippage}) when wrapping/unwrapping.
+    const quote: Quote = {
+      amount: toPublicAmount(otherTokenCoinAmount),
+      amountWithMaxSlippage: toPublicAmount(otherTokenCoinAmount),
+      slippage: 0,
+      fees: [],
+    };
+
+    const wethInterface = new ethers.utils.Interface(WethAbi);
+    let calldata;
+    let gasEstimate;
+    let approval = null;
+    if (isWrap) {
+      calldata = wethInterface.encodeFunctionData('deposit');
+      gasEstimate = ethers.BigNumber.from('45038'); // TODO how can we make better? If we need to at all
+    } else {
+      calldata = wethInterface.encodeFunctionData('withdraw', [amount]);
+      gasEstimate = ethers.BigNumber.from('35216');
+      // Need to convert to CoinAmount<ERC20> from CoinAmount<Coin>
+      const erc20CoinAmount: CoinAmount<ERC20> = {
+        token: tokenSpecified as ERC20,
+        value: amountSpecified.value,
+      };
+      // 2. Optionally get the approval. You don't need to approve if wrapping native.
+      approval = await getApproval(
+        this.provider,
+        fromAddress,
+        {
+          spender: this.wrappedNativeToken.address, amount: erc20CoinAmount,
+        },
+        gasPrice,
+      );
+    }
+
+    const gasFeeEstimate = gasPrice ? toPublicAmount(calculateGasFee(gasPrice, gasEstimate)) : null;
+    // 3. Get the transaction details. This is calling `deposit` or `withdraw` on the WETH/WIMX contract.
+    const transactionDetails: TransactionDetails = {
+      transaction: {
+        data: calldata,
+        to: this.wrappedNativeToken.address, // wrapping and unwrapping is done on the WETH/WIMX contract itself
+        value: tokenIn.type === 'native' ? ethers.BigNumber.from(amount) : 0, // Wrapping involves sending the native asset as TX.value
+        from: fromAddress,
+      },
+      gasFeeEstimate,
+    };
+
+    return { quote, approval, swap: transactionDetails };
+  }
+
+  private isWrapOrUnwrap(tokenIn: Coin, tokenOut: Coin): boolean {
+    return (
+      (
+        tokenIn === this.nativeToken && (
+          tokenOut.type === 'erc20' && tokenOut.address === this.wrappedNativeToken.address
+        )
+      ) ||
+      (
+        (
+          tokenIn.type === 'erc20' && tokenIn.address === this.wrappedNativeToken.address
+        ) && tokenOut === this.nativeToken
+      )
+    );
+  }
+
   private async getUnsignedSwapTx(
     fromAddress: string,
     tokenInLiteral: string,
@@ -173,6 +254,20 @@ export class Exchange {
       tradeType === TradeType.EXACT_INPUT ? [tokenIn, tokenOut] : [tokenOut, tokenIn];
 
     const amountSpecified = newAmount(amount, tokenSpecified);
+
+    if (this.isWrapOrUnwrap(tokenIn, tokenOut)) {
+      // If the user is swapping between the native token and the wrapped native token,
+      // we want to just wrap/unwrap the native token instead of swapping
+      return this.getUnsignedWrapTx(
+        tokenIn,
+        tokenSpecified,
+        otherToken,
+        amountSpecified,
+        fromAddress,
+        gasPrice,
+        amount,
+      );
+    }
 
     const fees = new Fees(secondaryFees, tokenIn);
 

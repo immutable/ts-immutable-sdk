@@ -1,9 +1,10 @@
 import { JsonRpcProvider, JsonRpcBatchProvider } from '@ethersproject/providers';
 import { Contract } from '@ethersproject/contracts';
 import { BigNumber } from '@ethersproject/bignumber';
-import { ethers } from 'ethers';
+import { ethers, utils } from 'ethers';
 import { ERC20__factory } from 'contracts/types';
 import { SwapRouter, PaymentsExtended } from '@uniswap/router-sdk';
+import { newAmount } from 'lib/utils';
 import { SecondaryFee } from './types';
 import { Exchange } from './exchange';
 import {
@@ -39,6 +40,7 @@ import {
   TEST_BASE_FEE,
   TEST_MAX_PRIORITY_FEE_PER_GAS,
 } from './test/utils';
+import WethAbi from './abi/WethAbi.json';
 
 jest.mock('@ethersproject/providers');
 jest.mock('@ethersproject/contracts');
@@ -80,6 +82,130 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         }
       }),
     })) as unknown as JsonRpcProvider;
+  });
+
+  describe('Wrapping native asset', () => {
+    it('should wrap the amount in the transaction', async () => {
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+      const amountOut = newAmountFromString('1', nativeTokenService.nativeToken);
+      const { swap } = await exchange.getUnsignedSwapTxFromAmountOut(
+        TEST_FROM_ADDRESS,
+        'native',
+        nativeTokenService.wrappedToken.address,
+        amountOut.value,
+      );
+
+      expectToBeDefined(swap.transaction.value);
+      expect(swap.transaction.value).toEqual(amountOut.value);
+    });
+
+    it('should send a call to deposit', async () => {
+      const wethInterface = new utils.Interface(WethAbi);
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+      const amountOut = newAmountFromString('1', nativeTokenService.nativeToken);
+      const { swap } = await exchange.getUnsignedSwapTxFromAmountOut(
+        TEST_FROM_ADDRESS,
+        'native',
+        nativeTokenService.wrappedToken.address,
+        amountOut.value,
+      );
+
+      expectToBeDefined(swap.transaction.data);
+      // As long as decoding with deposit() succeeds, we know that the call is to deposit()
+      const decoded = wethInterface.decodeFunctionData('deposit()', swap.transaction.data);
+      expect(decoded).toEqual([]);
+    });
+
+    it('should have no approval', async () => {
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+      const amountOut = newAmountFromString('1', nativeTokenService.nativeToken);
+      const { approval } = await exchange.getUnsignedSwapTxFromAmountOut(
+        TEST_FROM_ADDRESS,
+        'native',
+        nativeTokenService.wrappedToken.address,
+        amountOut.value,
+      );
+
+      expect(approval).toBeNull();
+    });
+
+    it('should return a quote with the input amount', async () => {
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+      const amountOut = newAmountFromString('1', nativeTokenService.nativeToken);
+      const { quote } = await exchange.getUnsignedSwapTxFromAmountOut(
+        TEST_FROM_ADDRESS,
+        'native',
+        nativeTokenService.wrappedToken.address,
+        amountOut.value,
+      );
+
+      expect(quote.amount.token.address).toEqual('native');
+      expect(quote.amount.token.chainId).toEqual(nativeTokenService.nativeToken.chainId);
+      expect(quote.amount.token.decimals).toEqual(nativeTokenService.nativeToken.decimals);
+      expect(quote.amount.value).toEqual(amountOut.value);
+    });
+  });
+
+  describe('Unwrapping native asset', () => {
+    it('should unwrap the amount in the transaction', async () => {
+      const wethInterface = new utils.Interface(WethAbi);
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+      const amountOut = newAmountFromString('1', nativeTokenService.wrappedToken);
+      const { swap } = await exchange.getUnsignedSwapTxFromAmountOut(
+        TEST_FROM_ADDRESS,
+        nativeTokenService.wrappedToken.address,
+        'native',
+        amountOut.value,
+      );
+
+      expectToBeDefined(swap.transaction.value);
+      expect(swap.transaction.value).toEqual(0);
+      expectToBeDefined(swap.transaction.data);
+      const decoded = wethInterface.decodeFunctionData('withdraw(uint256)', swap.transaction.data);
+      expect(decoded.toString()).toEqual([amountOut.value].toString());
+    });
+
+    it('should have approval if not already approved', async () => {
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+      const amountOut = newAmountFromString('1', nativeTokenService.wrappedToken);
+      const { approval } = await exchange.getUnsignedSwapTxFromAmountOut(
+        TEST_FROM_ADDRESS,
+        nativeTokenService.wrappedToken.address,
+        'native',
+        amountOut.value,
+      );
+
+      expectToBeDefined(approval);
+    });
+
+    it('should have no approval if already approved', async () => {
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+      const amountOut = newAmount(BigNumber.from(APPROVED_AMOUNT), nativeTokenService.wrappedToken);
+      const { approval } = await exchange.getUnsignedSwapTxFromAmountOut(
+        TEST_FROM_ADDRESS,
+        nativeTokenService.wrappedToken.address,
+        'native',
+        amountOut.value,
+      );
+
+      expect(approval).toBeNull();
+    });
+
+    it('should return a quote with the input amount', async () => {
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+      const amountOut = newAmountFromString('1', nativeTokenService.wrappedToken);
+      const { quote } = await exchange.getUnsignedSwapTxFromAmountOut(
+        TEST_FROM_ADDRESS,
+        nativeTokenService.wrappedToken.address,
+        'native',
+        amountOut.value,
+      );
+
+      expect(quote.amount.token.address).toEqual(nativeTokenService.wrappedToken.address);
+      expect(quote.amount.token.chainId).toEqual(nativeTokenService.wrappedToken.chainId);
+      expect(quote.amount.token.decimals).toEqual(nativeTokenService.wrappedToken.decimals);
+      expect(quote.amount.value).toEqual(amountOut.value);
+    });
   });
 
   describe('Swap with single pool with fees', () => {
