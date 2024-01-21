@@ -505,9 +505,7 @@ describe('buy', () => {
       expect(buyResult).toEqual({
         status: CheckoutStatus.FULFILLMENTS_UNSETTLED,
         smartCheckoutResult,
-        transactions: [{
-          transactionResponse: { hash: '0xTRANSACTION' },
-        }],
+        transactions: [{ hash: '0xTRANSACTION' }],
       });
       expect(getUnsignedERC20ApprovalTransactions).toBeCalledTimes(1);
       expect(getUnsignedFulfillmentTransactions).toBeCalledTimes(2);

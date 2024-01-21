@@ -1,4 +1,4 @@
-import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
+import { TransactionRequest, TransactionResponse, Web3Provider } from '@ethersproject/providers';
 import {
   BigNumber,
 } from 'ethers';
@@ -40,7 +40,6 @@ import { calculateFees } from '../fees/fees';
 import { getAllBalances, resetBlockscoutClientMap } from '../../balances';
 import { debugLogger, measureAsyncExecution } from '../../logger/debugLogger';
 import { sendTransaction } from '../../transaction';
-import { SendTransactionResult } from '../../types';
 
 export const getItemRequirement = (
   type: ItemType,
@@ -316,11 +315,12 @@ export const buy = async (
       };
     }
 
-    let transactions: SendTransactionResult[];
+    let transactions: TransactionResponse[];
     try {
-      transactions = await Promise.all(unsignedFulfillmentTransactions.map(
+      const response = await Promise.all(unsignedFulfillmentTransactions.map(
         (transaction) => sendTransaction(provider, transaction),
       ));
+      transactions = response.map((result) => result.transactionResponse);
     } catch (err: any) {
       throw new CheckoutError(
         'An error occurred while executing the fulfillment transaction',

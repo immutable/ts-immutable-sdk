@@ -1,8 +1,7 @@
-import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
+import { TransactionRequest, TransactionResponse, Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import { TokenInfo } from './tokenInfo';
 import { OrderFee } from './fees';
-import { SendTransactionResult } from './transaction';
 
 /*
 * Type representing the result of the buy
@@ -55,7 +54,7 @@ export type BuyResultFulfillmentsUnsettled = {
   /** The sufficient result of smart checkout */
   smartCheckoutResult: SmartCheckoutSufficient,
   /** Array of transaction results */
-  transactions: SendTransactionResult[],
+  transactions: TransactionResponse[],
 };
 
 /**
