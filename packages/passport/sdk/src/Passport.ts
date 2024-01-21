@@ -49,7 +49,8 @@ export class Passport {
     this.passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
     const imxClientConfig = this.config.baseConfig.environment === Environment.PRODUCTION
       ? imxApiConfig.getProduction() : imxApiConfig.getSandbox();
-    const imxApiClients = new ImxApiClients(imxClientConfig);
+    const imxApiClients = passportModuleConfiguration.overrides?.imxApiClients
+    || new ImxApiClients(imxClientConfig);
 
     this.passportImxProviderFactory = new PassportImxProviderFactory({
       authManager: this.authManager,
