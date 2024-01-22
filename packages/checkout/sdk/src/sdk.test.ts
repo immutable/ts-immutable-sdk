@@ -563,6 +563,7 @@ describe('Connect', () => {
       checkout.config,
       provider,
       ['1234'],
+      undefined,
     );
   });
 
