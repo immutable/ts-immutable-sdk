@@ -651,9 +651,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.19.22":
-  version: 0.19.33
-  resolution: "@biom3/react@npm:0.19.33"
+"@biom3/react@npm:^0.19.34":
+  version: 0.19.40
+  resolution: "@biom3/react@npm:0.19.40"
   dependencies:
     "@biom3/design-tokens": "*"
     "@emotion/css": ^11.11.2
@@ -672,7 +672,7 @@ __metadata:
     react-is: ^18.2.0
     react-keyed-flatten-children: ^3.0.0
     ts-deepmerge: ^6.2.0
-  checksum: 63619b6cd00d066305bac98a1fc2c0a4538b2cd2b9a4a33d4ad267e911783b72524bcce4fd0b7e37d210adefcdfbec513686f1bf64c142f9e95b289c00ac605a
+  checksum: cfd094f9276e517a5ff8264214ba0efa04a06734ccc2843691d8288705727a170b4ffd2fafb0f4644baa042b46b5fac3d6e98cf86826f458870b8cece4a0861d
   languageName: node
   linkType: hard
 
@@ -1351,12 +1351,12 @@ __metadata:
 
 "@imtbl/sdk@file:../../../sdk::locator=ts-immutable-sample%40workspace%3A.":
   version: 0.0.0
-  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=7193ab&locator=ts-immutable-sample%40workspace%3A."
+  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=e92fea&locator=ts-immutable-sample%40workspace%3A."
   dependencies:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
     "@biom3/design-tokens": 0.2.9
-    "@biom3/react": ^0.19.22
+    "@biom3/react": ^0.19.34
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
     "@ethersproject/providers": ^5.7.2
@@ -1392,7 +1392,7 @@ __metadata:
   peerDependencies:
     react: ^18.2.0
     react-dom: ^18.2.0
-  checksum: 690823733cb9ce36119b6c77f086e1da5f4c39cf5d86092ad430e7a845e9141351786ba4c811c824522313f459db4550c01ea0b7d023681afd2cdba068e10f51
+  checksum: e6477c69a8f80aa4a66c93b7d3ab3264624b102eaebf741a159822dfff9d0032db256af2104ed22e61ae236fa0a6d74330e0c4cb1ac8964fae5f246657c4b13e
   languageName: node
   linkType: hard
 
