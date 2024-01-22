@@ -15,7 +15,7 @@ import {
   SwapEventType,
   WalletEventType,
   WalletNetworkSwitch,
-  WidgetTheme, WidgetType, ProviderEventType, ProviderUpdated, WidgetConfiguration, WidgetProperties
+  WidgetTheme, WidgetType, ProviderEventType, ProviderUpdated, WidgetConfiguration, WidgetProperties, CheckoutErrorType, CheckoutError
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { passport } from './passport';
@@ -122,6 +122,21 @@ export const MainPage = () => {
     onRampWidget.update(languageUpdate);
   }, [onRampWidget, web3Provider])
 
+  const buy = useCallback(async () => {
+    if (!web3Provider) return;
+
+    try {
+      await checkout.buy({
+        provider: web3Provider,
+        orders: [{
+          id: "018d3004-f869-dbe8-cb4d-25e02954a6f2"
+        }]
+      })
+    } catch (err: any) {
+      console.log(err.data)
+    }
+  }, [web3Provider])
+
   return (
     <Box sx={{ minWidth: '100vw', minHeight: '100vh', width: '100%', height: '100%', backgroundColor: 'base.color.brand.6' }}>
       <Box sx={{ width: '100%', padding: 'base.spacing.x4', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -142,6 +157,7 @@ export const MainPage = () => {
         <div id="swap-target"></div>
         <div id="bridge-target"></div>
         <div id="onramp-target"></div>
+        <Button onClick={buy}>Buy</Button>
       </Box>
     </Box>
   );

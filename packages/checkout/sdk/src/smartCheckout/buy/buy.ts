@@ -132,8 +132,8 @@ export const buy = async (
       'An error occurred while getting the order listing',
       CheckoutErrorType.GET_ORDER_LISTING_ERROR,
       {
+        error: err,
         orderId: id,
-        message: err.message,
       },
     );
   }
@@ -199,7 +199,7 @@ export const buy = async (
         CheckoutErrorType.FULFILL_ORDER_LISTING_ERROR,
         {
           orderId: id,
-          message: err.message,
+          error: err,
         },
       );
     }
@@ -289,9 +289,7 @@ export const buy = async (
       throw new CheckoutError(
         'Error fetching fulfillment transaction',
         CheckoutErrorType.FULFILL_ORDER_LISTING_ERROR,
-        {
-          message: err.message,
-        },
+        { error: err },
       );
     }
 
