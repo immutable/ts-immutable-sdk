@@ -76,10 +76,6 @@ export class Passport {
   }
 
   public connectEvm(): Provider {
-    if (this.config.baseConfig.environment === 'production') {
-      throw new Error('EVM is not supported on production network');
-    }
-
     return new ZkEvmProvider({
       passportEventEmitter: this.passportEventEmitter,
       authManager: this.authManager,
