@@ -139,8 +139,16 @@ export class TokenBridge {
     }
 
     let sourceChainGas: ethers.BigNumber = ethers.BigNumber.from(0);
+    let approvalFee: ethers.BigNumber = ethers.BigNumber.from(0);
     let bridgeFee: ethers.BigNumber = ethers.BigNumber.from(0);
     const imtblFee: ethers.BigNumber = ethers.BigNumber.from(0);
+
+    if ('token' in req && req.token !== 'NATIVE') {
+      approvalFee = await this.getGasEstimates(
+        this.config.rootProvider,
+        BridgeMethodsGasLimit.APPROVE_TOKEN,
+      );
+    }
 
     if (req.action === BridgeFeeActions.FINALISE_WITHDRAWAL) {
       sourceChainGas = await this.getGasEstimates(
@@ -166,10 +174,11 @@ export class TokenBridge {
       bridgeFee = feeResult.bridgeFee;
     }
 
-    const totalFees: ethers.BigNumber = sourceChainGas.add(bridgeFee).add(imtblFee);
+    const totalFees: ethers.BigNumber = sourceChainGas.add(approvalFee).add(bridgeFee).add(imtblFee);
 
     return {
       sourceChainGas,
+      approvalFee,
       bridgeFee,
       imtblFee, // no network fee charged currently
       totalFees,
@@ -498,6 +507,8 @@ export class TokenBridge {
       gasMultiplier,
       sourceChainId,
       destinationChainId,
+      token,
+      amount,
     });
 
     const canReceive:boolean = await this.checkReceiver(provider, recipient);

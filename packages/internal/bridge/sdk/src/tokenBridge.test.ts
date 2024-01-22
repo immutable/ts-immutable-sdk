@@ -539,6 +539,7 @@ describe('Token Bridge', () => {
     const originalCalculateBridgeFee = TokenBridge.prototype['calculateBridgeFee'];
 
     const sourceChainGas:ethers.BigNumber = ethers.utils.parseUnits('0.000001', 18);
+    const approavalGas:ethers.BigNumber = ethers.utils.parseUnits('0.000001', 18);
     const destinationChainGas:ethers.BigNumber = ethers.utils.parseUnits('0.000001', 18);
     const validatorFee:ethers.BigNumber = ethers.utils.parseUnits('0.0001', 18);
     const bridgeFee:ethers.BigNumber = destinationChainGas.add(validatorFee);
@@ -574,7 +575,7 @@ describe('Token Bridge', () => {
       TokenBridge.prototype['getGasEstimates'] = originalGetGasEstimates;
       TokenBridge.prototype['calculateBridgeFee'] = originalCalculateBridgeFee;
     });
-    it('returns the deposit fees', async () => {
+    it('returns the deposit fees for native tokens', async () => {
       expect.assertions(5);
       const result = await tokenBridge.getFee(
         {
@@ -590,6 +591,27 @@ describe('Token Bridge', () => {
       expect(result.bridgeFee).toStrictEqual(bridgeFee);
       expect(result.imtblFee).toStrictEqual(imtblFee);
       expect(result.totalFees).toStrictEqual(totalFees);
+    });
+
+    it('returns the deposit fees for ERC20 tokens', async () => {
+      expect.assertions(6);
+      const result = await tokenBridge.getFee(
+        {
+          action: BridgeFeeActions.DEPOSIT,
+          gasMultiplier: 1.1,
+          sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+          destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+          token: '0x40b87d235A5B010a20A241F15797C9debf1ecd01',
+          amount: ethers.BigNumber.from(1000),
+        },
+      );
+
+      expect(result).not.toBeNull();
+      expect(result.sourceChainGas).toStrictEqual(sourceChainGas);
+      expect(result.approvalFee).toStrictEqual(approavalGas);
+      expect(result.bridgeFee).toStrictEqual(bridgeFee);
+      expect(result.imtblFee).toStrictEqual(imtblFee);
+      expect(result.totalFees).toStrictEqual(totalFees.add(approavalGas));
     });
   });
 
