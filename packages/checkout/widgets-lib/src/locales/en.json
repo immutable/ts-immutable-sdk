@@ -323,7 +323,7 @@
         "WALLET_REJECTED_NO_FUNDS": {
           "description": "Sorry, something went wrong. Please try again.",
           "primaryAction": "Go back",
-          "secondaryAction": "Cancel"
+          "secondaryAction": "Dismiss"
         },
         "WALLET_REJECTED": {
           "description": "You'll need to approve the transaction in your wallet to proceed.",
