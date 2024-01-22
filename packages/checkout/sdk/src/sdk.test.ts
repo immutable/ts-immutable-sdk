@@ -499,7 +499,7 @@ describe('Connect', () => {
     });
 
     expect(buy).toBeCalledTimes(1);
-    expect(buy).toBeCalledWith(checkout.config, provider, [{ id: '1', takerFees: [] }]);
+    expect(buy).toBeCalledWith(checkout.config, provider, [{ id: '1', takerFees: [] }], undefined);
   });
 
   it('should call sell function', async () => {
