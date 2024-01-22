@@ -8,7 +8,7 @@ import { Passport } from '@imtbl/passport';
 
 const defaultPassportConfig = {
   environment: 'sandbox',
-  clientId: 'XuGsHvMqMJrb73diq1fCswWwn4AYhcM6',
+  clientId: 'q4gEET7vAKD5jsBWV6j8eoYNKEYpOOw1',
   redirectUri: 'http://localhost:3000/sale?login=true',
   logoutRedirectUri: 'http://localhost:3000/sale?logout=true',
   audience: 'platform_api',
@@ -18,7 +18,7 @@ const defaultPassportConfig = {
 const defaultItems: SaleItem[] = [
   {
     productId: 'lab',
-    qty: 3,
+    qty: 2,
     name: 'Lab Iguana',
     image: 'https://pokemon-nfts.mystagingwebsite.com/wp-content/uploads/2023/11/645-300x300.png',
     description: 'Lab Iguana',

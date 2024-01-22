@@ -640,6 +640,30 @@ describe('Token Bridge', () => {
         },
       ]),
       getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => ethers.BigNumber.from(1)),
+      withdrawalDelay: jest.fn().mockImplementation(async () => ethers.BigNumber.from(60 * 60 * 24)),
+    };
+
+    const mockERC20ContractFlowRateMultiple = {
+      allowance: jest.fn(),
+      interface: {
+        encodeFunctionData: jest.fn(),
+      },
+      getPendingWithdrawals: jest.fn().mockImplementation(async () => [
+        {
+          withdrawer: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
+          token: '0x40b87d235A5B010a20A241F15797C9debf1ecd01',
+          amount,
+          timestamp: ethers.BigNumber.from(1000),
+        },
+        {
+          withdrawer: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
+          token: '0x40b87d235A5B010a20A241F15797C9debf1ecd01',
+          amount,
+          timestamp: ethers.BigNumber.from(1001),
+        },
+      ]),
+      getPendingWithdrawalsLength: jest.fn().mockImplementation(async () => ethers.BigNumber.from(1)),
+      withdrawalDelay: jest.fn().mockImplementation(async () => ethers.BigNumber.from(60 * 60 * 24)),
     };
 
     const mockERC20Contract = {
@@ -959,6 +983,51 @@ describe('Token Bridge', () => {
       expect(result.transactions[0].sender).toBe(sender);
       expect(result.transactions[0].recipient).toBe(recipient);
       expect(result.transactions[0].amount).toStrictEqual(amount);
+    });
+
+    it('returns the FLOW_RATE_CONTROLLED status for multiple withdrawals', async () => {
+      expect.assertions(14);
+
+      jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRateMultiple as any);
+
+      (queryTransactionStatus as jest.Mock).mockReturnValue({
+        status: GMPStatus.DEST_EXECUTED,
+        gasPaidInfo: {
+          status: GasPaidStatus.GAS_PAID,
+        },
+        callTx: {
+          returnValues: {
+            payload: mockWithdrawPayload,
+          },
+        },
+      });
+
+      const txHash1 = '0x5c192bf2b3be59de3a69877f6c71fd0affe6e1a1c05a75f51d4a60692001d8f3';
+      const txHash2 = '0x5c192bf2b3be59de3a69877f6c71fd0affe6e1a1c05a75f51d4a60692001d8f3';
+
+      const result = await tokenBridge.getTransactionStatus({
+        transactions: [{
+          txHash: txHash1,
+        }, {
+          txHash: txHash2,
+        }],
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+      });
+
+      expect(result).not.toBeNull();
+      expect(result.transactions.length).toBe(2);
+      expect(result.transactions[0].status).toBe(StatusResponse.FLOW_RATE_CONTROLLED);
+      expect(result.transactions[0].txHash).toBe(txHash1);
+      expect(result.transactions[0].token).toBe(token);
+      expect(result.transactions[0].sender).toBe(sender);
+      expect(result.transactions[0].recipient).toBe(recipient);
+      expect(result.transactions[0].amount).toStrictEqual(amount);
+      expect(result.transactions[1].status).toBe(StatusResponse.FLOW_RATE_CONTROLLED);
+      expect(result.transactions[1].txHash).toBe(txHash2);
+      expect(result.transactions[1].token).toBe(token);
+      expect(result.transactions[1].sender).toBe(sender);
+      expect(result.transactions[1].recipient).toBe(recipient);
+      expect(result.transactions[1].amount).toStrictEqual(amount);
     });
     it('returns the ERROR status for a withdrawal', async () => {
       expect.assertions(8);
@@ -1346,6 +1415,7 @@ describe('Token Bridge', () => {
     const refillTime = ethers.BigNumber.from(5000);
     const refillRate = ethers.BigNumber.from(100000);
     const withdrawalDelay = ethers.BigNumber.from(60 * 60 * 24);
+    const largeTxThreshold = ethers.BigNumber.from(300000);
 
     const mockERC20ContractFlowRate = {
       withdrawalQueueActivated: jest.fn().mockImplementation(async () => false),
@@ -1356,6 +1426,7 @@ describe('Token Bridge', () => {
         refillTime,
         refillRate,
       })),
+      largeTransferThresholds: jest.fn().mockImplementation(async () => largeTxThreshold),
     };
 
     const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
@@ -1431,6 +1502,7 @@ describe('Token Bridge', () => {
           refillTime,
           refillRate,
         })),
+        largeTransferThresholds: jest.fn().mockImplementation(async () => largeTxThreshold),
       };
 
       jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRateMultiToken as any);
@@ -1468,6 +1540,8 @@ describe('Token Bridge', () => {
           refillTime,
           refillRate,
         })),
+        largeTransferThresholds: jest.fn().mockImplementation(async () => largeTxThreshold),
+
       };
 
       jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20ContractFlowRateMultiToken as any);
