@@ -3,7 +3,7 @@ import {
   BridgeFeeResponse,
   TokenBridge,
 } from '@imtbl/bridge-sdk';
-import { ethers } from 'ethers';
+import { BigNumber } from 'ethers';
 import { CheckoutConfiguration, getL1ChainId } from '../config';
 import { ChainId } from '../types';
 import { NATIVE } from '../env/constants';
@@ -24,6 +24,6 @@ export async function getBridgeFeeEstimate(
     sourceChainId: fromChainId.toString(),
     destinationChainId: toChainId.toString(),
     token: NATIVE.toUpperCase(),
-    amount: ethers.BigNumber.from(0),
+    amount: BigNumber.from(0),
   });
 }
