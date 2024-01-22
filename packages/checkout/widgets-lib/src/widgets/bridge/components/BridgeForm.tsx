@@ -15,7 +15,7 @@ import {
 import {
   useCallback, useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
-import { BigNumber, ethers, utils } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 import { FeesBreakdown } from 'components/FeesBreakdown/FeesBreakdown';
 import { BridgeFeeActions } from '@imtbl/bridge-sdk';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
