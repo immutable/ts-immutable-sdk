@@ -1,4 +1,4 @@
-import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
+import { TransactionRequest, TransactionResponse, Web3Provider } from '@ethersproject/providers';
 import {
   BigNumber,
 } from 'ethers';
@@ -26,7 +26,7 @@ import {
   BuyResult,
   CheckoutStatus,
   BuyOrder,
-  SmartCheckoutResult,
+  SmartCheckoutResult, BuyOverrides,
 } from '../../types/smartCheckout';
 import { smartCheckout } from '..';
 import {
@@ -39,6 +39,7 @@ import { SignTransactionStatusType } from '../actions/types';
 import { calculateFees } from '../fees/fees';
 import { getAllBalances, resetBlockscoutClientMap } from '../../balances';
 import { debugLogger, measureAsyncExecution } from '../../logger/debugLogger';
+import { sendTransaction } from '../../transaction';
 
 export const getItemRequirement = (
   type: ItemType,
@@ -87,6 +88,9 @@ export const buy = async (
   config: CheckoutConfiguration,
   provider: Web3Provider,
   orders: Array<BuyOrder>,
+  overrides: BuyOverrides = {
+    waitFulfillmentSettlements: true,
+  },
 ): Promise<BuyResult> => {
   if (orders.length === 0) {
     throw new CheckoutError(
@@ -292,20 +296,42 @@ export const buy = async (
         { error: err },
       );
     }
+    if (overrides.waitFulfillmentSettlements) {
+      const fulfillmentResult = await signFulfillmentTransactions(provider, unsignedFulfillmentTransactions);
+      if (fulfillmentResult.type === SignTransactionStatusType.FAILED) {
+        return {
+          status: CheckoutStatus.FAILED,
+          transactionHash: fulfillmentResult.transactionHash,
+          reason: fulfillmentResult.reason,
+          smartCheckoutResult,
+        };
+      }
 
-    const fulfillmentResult = await signFulfillmentTransactions(provider, unsignedFulfillmentTransactions);
-    if (fulfillmentResult.type === SignTransactionStatusType.FAILED) {
       return {
-        status: CheckoutStatus.FAILED,
-        transactionHash: fulfillmentResult.transactionHash,
-        reason: fulfillmentResult.reason,
+        status: CheckoutStatus.SUCCESS,
         smartCheckoutResult,
       };
     }
 
+    let transactions: TransactionResponse[];
+    try {
+      const response = await Promise.all(unsignedFulfillmentTransactions.map(
+        (transaction) => sendTransaction(provider, transaction),
+      ));
+      transactions = response.map((result) => result.transactionResponse);
+    } catch (err: any) {
+      throw new CheckoutError(
+        'An error occurred while executing the fulfillment transaction',
+        CheckoutErrorType.EXECUTE_FULFILLMENT_TRANSACTION_ERROR,
+        {
+          message: err.message,
+        },
+      );
+    }
     return {
-      status: CheckoutStatus.SUCCESS,
+      status: CheckoutStatus.FULFILLMENTS_UNSETTLED,
       smartCheckoutResult,
+      transactions,
     };
   }
 

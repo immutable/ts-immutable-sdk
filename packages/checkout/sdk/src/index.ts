@@ -38,6 +38,7 @@ export type {
   BridgeFundingStep,
   BuyOrder,
   BuyParams,
+  BuyOverrides,
   BuyResult,
   BuyResultFailed,
   BuyResultInsufficientFunds,
