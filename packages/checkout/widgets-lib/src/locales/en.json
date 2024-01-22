@@ -323,22 +323,22 @@
         "WALLET_REJECTED_NO_FUNDS": {
           "description": "Sorry, something went wrong. Please try again.",
           "primaryAction": "Go back",
-          "secondaryAction": "Dismiss"
+          "secondaryAction": "Cancel"
         },
         "WALLET_REJECTED": {
           "description": "You'll need to approve the transaction in your wallet to proceed.",
           "primaryAction": "Try again",
-          "secondaryAction": "Dismiss"
+          "secondaryAction": "Cancel"
         },
         "SMART_CHECKOUT_ERROR": {
           "description": "Unable to check your wallets balance. Please try again.",
           "primaryAction": "Try again",
-          "secondaryAction": "Dismiss"
+          "secondaryAction": "Cancel"
         },
         "SMART_CHECKOUT_EXECUTE_ERROR": {
           "description": "Sorry, something went wrong while moving funds. Please try again.",
           "primaryAction": "Try again",
-          "secondaryAction": "Dismiss"
+          "secondaryAction": "Cancel"
         },
         "DEFAULT_ERROR": {
           "description": "Sorry, something went wrong. Please try again.",
