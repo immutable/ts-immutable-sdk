@@ -71,9 +71,7 @@ const swapValuesToText = ({
       utils.formatUnits(conversion, swapToToken.decimals),
     ), true);
 
-    resp.fromToConversion = `1 ${swapFromToken.symbol} ≈ ${
-      formatZeroAmount(formattedConversion, true)
-    } ${swapToToken.symbol}`;
+    resp.fromToConversion = `1 ${swapFromToken.symbol} ≈ ${formattedConversion} ${swapToToken.symbol}`;
   }
 
   return resp;
