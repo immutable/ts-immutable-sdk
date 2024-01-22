@@ -346,6 +346,7 @@ export interface FlowRateInfoItem {
   depth: ethers.BigNumber;
   refillTime: number;
   refillRate: ethers.BigNumber;
+  largeTransferThreshold: ethers.BigNumber;
 }
 
 /**
