@@ -49,7 +49,7 @@ export const cancel = async (
       CheckoutErrorType.CANCEL_ORDER_LISTING_ERROR,
       {
         orderId,
-        message: err.message,
+        error: err,
       },
     );
   }

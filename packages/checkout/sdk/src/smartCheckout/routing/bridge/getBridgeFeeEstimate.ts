@@ -38,7 +38,7 @@ export const getBridgeFeeEstimate = async (
     throw new CheckoutError(
       'Error estimating gas for bridge',
       CheckoutErrorType.BRIDGE_GAS_ESTIMATE_ERROR,
-      { message: err.message },
+      { error: err },
     );
   }
 };

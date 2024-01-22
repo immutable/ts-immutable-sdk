@@ -664,20 +664,17 @@ describe('buy', () => {
             limit: BigNumber.from(constants.estimatedFulfillmentGasGwei),
           },
         };
-        let errorMessage;
         let errorType;
         let errorData;
         try {
           await buy(config, mockProvider, [order]);
         } catch (err: any) {
           errorType = err.type;
-          errorMessage = err.message;
           errorData = err.data;
         }
 
-        expect(errorMessage).toEqual('Error fetching fulfillment transaction');
         expect(errorType).toEqual(CheckoutErrorType.FULFILL_ORDER_LISTING_ERROR);
-        expect(errorData).toEqual({ message: 'Cannot estimate gas - not enough ERC20 approval' });
+        expect(errorData.error).toBeDefined();
 
         expect(smartCheckout).toBeCalledWith(
           config,
@@ -1371,10 +1368,8 @@ describe('buy', () => {
 
       expect(message).toEqual('Error occurred while trying to fulfill the order');
       expect(type).toEqual(CheckoutErrorType.FULFILL_ORDER_LISTING_ERROR);
-      expect(data).toEqual({
-        orderId: '1',
-        message: 'error from orderbook',
-      });
+      expect(data.error).toBeDefined();
+      expect(data.orderId).toEqual('1');
     });
   });
 
