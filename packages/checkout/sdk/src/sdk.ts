@@ -367,7 +367,7 @@ export class Checkout {
       params.provider,
     );
 
-    return await buy.buy(this.config, web3Provider, params.orders);
+    return await buy.buy(this.config, web3Provider, params.orders, params.overrides);
   }
 
   /**
