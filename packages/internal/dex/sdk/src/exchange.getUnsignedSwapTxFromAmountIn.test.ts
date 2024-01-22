@@ -8,6 +8,7 @@ import { SecondaryFee } from 'types';
 import { Environment } from '@imtbl/config';
 import { Router, addAmount, newAmount } from 'lib';
 import { PaymentsExtended, SwapRouter } from '@uniswap/router-sdk';
+import { WIMX__factory } from 'contracts/types';
 import { IMMUTABLE_TESTNET_CHAIN_ID } from './constants';
 import { Exchange } from './exchange';
 import {
@@ -46,7 +47,6 @@ import {
   TEST_MAX_PRIORITY_FEE_PER_GAS,
   TEST_BASE_FEE,
 } from './test/utils';
-import WethAbi from './abi/WethAbi.json';
 
 jest.mock('@ethersproject/providers');
 jest.mock('@ethersproject/contracts');
@@ -64,22 +64,6 @@ jest.mock('./lib/utils', () => ({
 const HIGHER_SLIPPAGE = 0.2;
 const APPROVED_AMOUNT = newAmountFromString('1', USDC_TEST_TOKEN);
 const APPROVE_GAS_ESTIMATE = BigNumber.from('100000'); // gas units
-
-/*
- Test:
-  AmountIn:
-    - Wrap
-      - Approval not needed
-    - Unwrap
-      - Approval needed
-      - Approval not needed
-  AmountOut:
-    - Wrap
-      - Approval not needed
-    - Unwrap
-      - Approval needed
-      - Approval not needed
-*/
 
 describe('getUnsignedSwapTxFromAmountIn', () => {
   let erc20Contract: jest.Mock<any, any, any>;
@@ -124,7 +108,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
     });
 
     it('should send a call to deposit', async () => {
-      const wethInterface = new utils.Interface(WethAbi);
+      const wimxInterface = WIMX__factory.createInterface();
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
       const amountIn = newAmountFromString('1', nativeTokenService.nativeToken);
       const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
@@ -136,7 +120,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       expectToBeDefined(swap.transaction.data);
       // As long as decoding with deposit() succeeds, we know that the call is to deposit()
-      const decoded = wethInterface.decodeFunctionData('deposit()', swap.transaction.data);
+      const decoded = wimxInterface.decodeFunctionData('deposit()', swap.transaction.data);
       expect(decoded).toEqual([]);
     });
 
@@ -172,7 +156,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
   describe('Unwrapping native asset', () => {
     it('should unwrap the amount in the transaction', async () => {
-      const wethInterface = new utils.Interface(WethAbi);
+      const wimxInterface = WIMX__factory.createInterface();
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
       const amountIn = newAmountFromString('1', nativeTokenService.wrappedToken);
       const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
@@ -182,10 +166,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         amountIn.value,
       );
 
-      expectToBeDefined(swap.transaction.value);
-      expect(swap.transaction.value).toEqual(0);
       expectToBeDefined(swap.transaction.data);
-      const decoded = wethInterface.decodeFunctionData('withdraw(uint256)', swap.transaction.data);
+      const decoded = wimxInterface.decodeFunctionData('withdraw(uint256)', swap.transaction.data);
       expect(decoded.toString()).toEqual([amountIn.value].toString());
     });
 
@@ -200,6 +182,12 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       );
 
       expectToBeDefined(approval);
+      expect(approval.transaction.value).toEqual(0);
+      expectToBeDefined(approval.transaction.data);
+      const erc20Interface = ERC20__factory.createInterface();
+      const decoded = erc20Interface.decodeFunctionData('approve(address,uint256)', approval.transaction.data);
+      expect(decoded[0]).toEqual(nativeTokenService.wrappedToken.address);
+      expect(decoded[1]).toEqual(amountIn.value);
     });
 
     it('should have no approval if already approved', async () => {

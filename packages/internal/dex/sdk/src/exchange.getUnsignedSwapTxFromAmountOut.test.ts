@@ -1,8 +1,8 @@
 import { JsonRpcProvider, JsonRpcBatchProvider } from '@ethersproject/providers';
 import { Contract } from '@ethersproject/contracts';
 import { BigNumber } from '@ethersproject/bignumber';
-import { ethers, utils } from 'ethers';
-import { ERC20__factory } from 'contracts/types';
+import { ethers } from 'ethers';
+import { ERC20__factory, WIMX__factory } from 'contracts/types';
 import { SwapRouter, PaymentsExtended } from '@uniswap/router-sdk';
 import { newAmount } from 'lib/utils';
 import { SecondaryFee } from './types';
@@ -40,7 +40,6 @@ import {
   TEST_BASE_FEE,
   TEST_MAX_PRIORITY_FEE_PER_GAS,
 } from './test/utils';
-import WethAbi from './abi/WethAbi.json';
 
 jest.mock('@ethersproject/providers');
 jest.mock('@ethersproject/contracts');
@@ -100,7 +99,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
     });
 
     it('should send a call to deposit', async () => {
-      const wethInterface = new utils.Interface(WethAbi);
+      const wimxInterface = WIMX__factory.createInterface();
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
       const amountOut = newAmountFromString('1', nativeTokenService.nativeToken);
       const { swap } = await exchange.getUnsignedSwapTxFromAmountOut(
@@ -112,7 +111,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
 
       expectToBeDefined(swap.transaction.data);
       // As long as decoding with deposit() succeeds, we know that the call is to deposit()
-      const decoded = wethInterface.decodeFunctionData('deposit()', swap.transaction.data);
+      const decoded = wimxInterface.decodeFunctionData('deposit()', swap.transaction.data);
       expect(decoded).toEqual([]);
     });
 
@@ -148,7 +147,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
 
   describe('Unwrapping native asset', () => {
     it('should unwrap the amount in the transaction', async () => {
-      const wethInterface = new utils.Interface(WethAbi);
+      const wimxInterface = WIMX__factory.createInterface();
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
       const amountOut = newAmountFromString('1', nativeTokenService.wrappedToken);
       const { swap } = await exchange.getUnsignedSwapTxFromAmountOut(
@@ -158,10 +157,9 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         amountOut.value,
       );
 
-      expectToBeDefined(swap.transaction.value);
-      expect(swap.transaction.value).toEqual(0);
+      expect(swap.transaction.value).toBeUndefined();
       expectToBeDefined(swap.transaction.data);
-      const decoded = wethInterface.decodeFunctionData('withdraw(uint256)', swap.transaction.data);
+      const decoded = wimxInterface.decodeFunctionData('withdraw(uint256)', swap.transaction.data);
       expect(decoded.toString()).toEqual([amountOut.value].toString());
     });
 

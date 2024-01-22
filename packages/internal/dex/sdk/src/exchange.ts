@@ -6,7 +6,7 @@ import { calculateGasFee, fetchGasPrice } from 'lib/transactionUtils/gas';
 import { getApproval, prepareApproval } from 'lib/transactionUtils/approval';
 import { getOurQuoteReqAmount, prepareUserQuote } from 'lib/transactionUtils/getQuote';
 import { Fees } from 'lib/fees';
-import { Multicall__factory, ImmutableSwapProxy__factory } from 'contracts/types';
+import { Multicall__factory, ImmutableSwapProxy__factory, WIMX__factory } from 'contracts/types';
 import { NativeTokenService } from 'lib/nativeTokenService';
 import { DEFAULT_MAX_HOPS, DEFAULT_SLIPPAGE, MAX_MAX_HOPS, MIN_MAX_HOPS } from './constants';
 import { Router } from './lib/router';
@@ -28,10 +28,10 @@ import {
   SecondaryFee,
   TransactionDetails,
   TransactionResponse,
+  WrapUnwrapTransactionDetails,
 } from './types';
 import { getSwap, adjustQuoteWithFees } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
-import WethAbi from './abi/WethAbi.json';
 
 const toPublicQuote = (
   amount: CoinAmount<Coin>,
@@ -145,54 +145,26 @@ export class Exchange {
     };
   }
 
-  private async getUnsignedWrapTx(
-    tokenIn: Coin,
-    tokenSpecified: Coin,
-    otherToken: Coin,
-    amountSpecified: CoinAmount<Coin>,
+  private async getUnwrapTransaction(
     fromAddress: string,
+    tokenAmount: CoinAmount<ERC20>,
+    wimxInterface: ethers.utils.Interface,
     gasPrice: CoinAmount<Native> | null,
-    amount: ethers.BigNumber,
-  ): Promise<TransactionResponse> {
-    const isWrap = tokenIn === this.nativeToken;
-    const otherTokenCoinAmount = {
-      token: otherToken,
-      value: amountSpecified.value,
-    };
+  ) : Promise<WrapUnwrapTransactionDetails> {
+    const calldata = wimxInterface.encodeFunctionData('withdraw', [tokenAmount.value]);
+    // 35216 is the upper bound of the gas estimate for the withdraw function.
+    // The differenfce between upper and normal is less than 0.0001 IMX, so we just use the upper bound
+    // to avoid an extra remote call.
+    const gasEstimate = ethers.BigNumber.from('35216');
 
-    // 1. Get the quote. This is always 1:1 (0 {price impact, slippage}) when wrapping/unwrapping.
-    const quote: Quote = {
-      amount: toPublicAmount(otherTokenCoinAmount),
-      amountWithMaxSlippage: toPublicAmount(otherTokenCoinAmount),
-      slippage: 0,
-      fees: [],
-    };
-
-    const wethInterface = new ethers.utils.Interface(WethAbi);
-    let calldata;
-    let gasEstimate;
-    let approval = null;
-    if (isWrap) {
-      calldata = wethInterface.encodeFunctionData('deposit');
-      gasEstimate = ethers.BigNumber.from('45038'); // TODO how can we make better? If we need to at all
-    } else {
-      calldata = wethInterface.encodeFunctionData('withdraw', [amount]);
-      gasEstimate = ethers.BigNumber.from('35216');
-      // Need to convert to CoinAmount<ERC20> from CoinAmount<Coin>
-      const erc20CoinAmount: CoinAmount<ERC20> = {
-        token: tokenSpecified as ERC20,
-        value: amountSpecified.value,
-      };
-      // 2. Optionally get the approval. You don't need to approve if wrapping native.
-      approval = await getApproval(
-        this.provider,
-        fromAddress,
-        {
-          spender: this.wrappedNativeToken.address, amount: erc20CoinAmount,
-        },
-        gasPrice,
-      );
-    }
+    const approval = await getApproval(
+      this.provider,
+      fromAddress,
+      {
+        spender: this.wrappedNativeToken.address, amount: tokenAmount,
+      },
+      gasPrice,
+    );
 
     const gasFeeEstimate = gasPrice ? toPublicAmount(calculateGasFee(gasPrice, gasEstimate)) : null;
     // 3. Get the transaction details. This is calling `deposit` or `withdraw` on the WETH/WIMX contract.
@@ -200,13 +172,89 @@ export class Exchange {
       transaction: {
         data: calldata,
         to: this.wrappedNativeToken.address, // wrapping and unwrapping is done on the WETH/WIMX contract itself
-        value: tokenIn.type === 'native' ? ethers.BigNumber.from(amount) : 0, // Wrapping involves sending the native asset as TX.value
         from: fromAddress,
       },
       gasFeeEstimate,
     };
 
-    return { quote, approval, swap: transactionDetails };
+    return {
+      transaction: transactionDetails,
+      approval,
+    };
+  }
+
+  private getWrapTransaction(
+    fromAddress: string,
+    tokenAmount: CoinAmount<ERC20>,
+    wimxInterface: ethers.utils.Interface,
+    gasPrice: CoinAmount<Native> | null,
+  ) : WrapUnwrapTransactionDetails {
+    const calldata = wimxInterface.encodeFunctionData('deposit');
+    // 45038 is the upper bound of the gas estimate for the deposit function.
+    // This upper bound is reached when a user is wrapping for the first time (cold + unused storage slot)
+    // The lower bound is 27,938, so the difference is 17,100 gas. If transactions are 10 gwei IMX,
+    // this is about 0.000171 IMX difference. In order to avoid an extra remote call, we just use the upper bound instead.
+    const gasEstimate = ethers.BigNumber.from('45038');
+
+    const gasFeeEstimate = gasPrice ? toPublicAmount(calculateGasFee(gasPrice, gasEstimate)) : null;
+    // Get the transaction details. This is calling `deposit` or `withdraw` on the WETH/WIMX contract.
+    const transactionDetails: TransactionDetails = {
+      transaction: {
+        data: calldata,
+        to: this.wrappedNativeToken.address, // wrapping and unwrapping is done on the WETH/WIMX contract itself
+        value: ethers.BigNumber.from(tokenAmount.value), // Wrapping involves sending the native asset as TX.value
+        from: fromAddress,
+      },
+      gasFeeEstimate,
+    };
+
+    return {
+      transaction: transactionDetails,
+      approval: null,
+    };
+  }
+
+  private async getUnsignedWrapUnwrapTx(
+    tokenIn: Coin,
+    otherToken: Coin,
+    amountSpecified: CoinAmount<Coin>,
+    fromAddress: string,
+    gasPrice: CoinAmount<Native> | null,
+  ): Promise<TransactionResponse> {
+    const isWrap = tokenIn === this.nativeToken;
+    const otherTokenCoinAmount = {
+      token: otherToken,
+      value: amountSpecified.value,
+    };
+
+    // The quote is always 1:1 (0 {price impact, slippage}) when wrapping/unwrapping.
+    const quote: Quote = {
+      amount: toPublicAmount(otherTokenCoinAmount),
+      amountWithMaxSlippage: toPublicAmount(otherTokenCoinAmount),
+      slippage: 0,
+      fees: [],
+    };
+
+    const wimxInterface = WIMX__factory.createInterface();
+    let transactionDetails;
+
+    if (isWrap) {
+      transactionDetails = this.getWrapTransaction(
+        fromAddress,
+        otherTokenCoinAmount as CoinAmount<ERC20>,
+        wimxInterface,
+        gasPrice,
+      );
+    } else {
+      transactionDetails = await this.getUnwrapTransaction(
+        fromAddress,
+        otherTokenCoinAmount as CoinAmount<ERC20>,
+        wimxInterface,
+        gasPrice,
+      );
+    }
+
+    return { quote, approval: transactionDetails.approval, swap: transactionDetails.transaction };
   }
 
   private isWrapOrUnwrap(tokenIn: Coin, tokenOut: Coin): boolean {
@@ -258,14 +306,12 @@ export class Exchange {
     if (this.isWrapOrUnwrap(tokenIn, tokenOut)) {
       // If the user is swapping between the native token and the wrapped native token,
       // we want to just wrap/unwrap the native token instead of swapping
-      return this.getUnsignedWrapTx(
+      return this.getUnsignedWrapUnwrapTx(
         tokenIn,
-        tokenSpecified,
         otherToken,
         amountSpecified,
         fromAddress,
         gasPrice,
-        amount,
       );
     }
 
