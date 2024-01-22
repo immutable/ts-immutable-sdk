@@ -364,10 +364,6 @@ export const text = {
           primaryAction: 'Try again',
           secondaryAction: 'Dismiss',
         },
-        [SaleErrorTypes.INVALID_PARAMETERS]: {
-          description: 'Sorry, we\'re unable to process your order. Missing information from client',
-          secondaryAction: 'Dismiss',
-        },
       },
     },
     [SaleWidgetViews.SALE_SUCCESS]: {
