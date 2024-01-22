@@ -204,7 +204,7 @@ describe('balances', () => {
       ).rejects.toThrow(
         new CheckoutError(
           // eslint-disable-next-line max-len
-          '[GET_ERC20_BALANCE_ERROR] Cause:invalid contract address or ENS name (argument="addressOrName", value=undefined, code=INVALID_ARGUMENT, version=contracts/5.7.0)',
+          '[GET_ERC20_BALANCE_ERROR] Cause:provider is required to use ENS name as contract address (operation="new Contract", code=UNSUPPORTED_OPERATION, version=contracts/5.7.0)',
           CheckoutErrorType.GET_ERC20_BALANCE_ERROR,
         ),
       );
