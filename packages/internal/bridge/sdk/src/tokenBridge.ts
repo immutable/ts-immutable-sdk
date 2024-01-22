@@ -959,6 +959,7 @@ export class TokenBridge {
         token = ETHEREUM_NATIVE_TOKEN_ADDRESS;
       }
       contractPromises.push(rootBridge.flowRateBuckets(token));
+      contractPromises.push(rootBridge.largeTransferThresholds(token));
     }
     let contractPromisesRes:Array<any>;
     try {
@@ -972,20 +973,28 @@ export class TokenBridge {
 
     const tokensRes: Record<FungibleToken, FlowRateInfoItem> = {};
 
-    // @note it's i + 2 because the first 2 promises are not token buckets
+    const withdrawalQueueActivated = contractPromisesRes[0];
+    const withdrawalDelay = contractPromisesRes[1].toNumber();
+
+    // remove first 2 items from promise all response
+    contractPromisesRes.splice(0, 2);
+
+    // the remaining items should be sets of 2 per token
     for (let i = 0, l = req.tokens.length; i < l; i++) {
+      const shifter = i * 2;
       tokensRes[req.tokens[i]] = {
-        capacity: contractPromisesRes[i + 2].capacity,
-        depth: contractPromisesRes[i + 2].depth,
-        refillTime: contractPromisesRes[i + 2].refillTime.toNumber(),
-        refillRate: contractPromisesRes[i + 2].refillRate,
+        capacity: contractPromisesRes[shifter].capacity,
+        depth: contractPromisesRes[shifter].depth,
+        refillTime: contractPromisesRes[shifter].refillTime.toNumber(),
+        refillRate: contractPromisesRes[shifter].refillRate,
+        largeTransferThreshold: contractPromisesRes[shifter + 1],
       };
     }
 
     // Return the token mappings
     return {
-      withdrawalQueueActivated: contractPromisesRes[0],
-      withdrawalDelay: contractPromisesRes[1].toNumber(),
+      withdrawalQueueActivated,
+      withdrawalDelay,
       tokens: tokensRes,
     };
   }
