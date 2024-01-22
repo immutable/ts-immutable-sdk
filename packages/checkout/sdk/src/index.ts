@@ -127,6 +127,6 @@ export type {
 
 export type { ErrorType } from './errors';
 
-export { CheckoutErrorType, CheckoutError } from './errors';
+export { CheckoutErrorType } from './errors';
 export { CheckoutConfiguration } from './config';
 export { BlockExplorerService } from './blockExplorer';
