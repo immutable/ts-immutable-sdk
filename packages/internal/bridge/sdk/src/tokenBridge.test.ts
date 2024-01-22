@@ -4,7 +4,7 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { TokenBridge } from 'tokenBridge';
 import { BridgeConfiguration } from 'config';
-import { ETH_SEPOLIA_TO_ZKEVM_DEVNET } from 'constants/bridges';
+import { ETH_SEPOLIA_TO_ZKEVM_DEVNET, ETH_SEPOLIA_TO_ZKEVM_TESTNET } from 'constants/bridges';
 import {
   BridgeFeeActions, BridgeTxRequest, BridgeTxResponse, StatusResponse,
 } from 'types';
@@ -1636,6 +1636,130 @@ describe('Token Bridge', () => {
         expect(error).toBeInstanceOf(BridgeError);
         expect(error.type).toBe(BridgeErrorType.AXELAR_CHAIN_NOT_FOUND);
       }
+    });
+  });
+
+  describe('getTokenMapping', () => {
+    let tokenBridge: TokenBridge;
+
+    const childETHToken = '0x111';
+    const childUSDCToken = '0x222';
+    const rootUSDCToken = '0x333';
+
+    const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
+    const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
+
+    const bridgeConfig = new BridgeConfiguration({
+      baseConfig: new ImmutableConfiguration({
+        environment: Environment.SANDBOX,
+      }),
+      bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
+      rootProvider: voidRootProvider,
+      childProvider: voidChildProvider,
+    });
+
+    const mockChildBridge = {
+      childETHToken: jest.fn().mockImplementation(async () => childETHToken),
+    };
+
+    const mockRootBridgeIMX = {
+      rootTokenToChildToken: jest.fn().mockImplementation(async () => bridgeConfig.bridgeContracts.rootChainIMX),
+    };
+
+    const mockRootBridgeUSDC = {
+      rootTokenToChildToken: jest.fn().mockImplementation(async () => childUSDCToken),
+    };
+
+    beforeEach(() => {
+      tokenBridge = new TokenBridge(bridgeConfig);
+    });
+
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+    it('returns the mapping for Native ETH', async () => {
+      expect.assertions(3);
+      const req = {
+        rootToken: 'NATIVE',
+        rootChainId: bridgeConfig.bridgeInstance.rootChainID,
+        childChainId: bridgeConfig.bridgeInstance.childChainID,
+      };
+
+      jest.spyOn(ethers, 'Contract').mockReturnValue(mockChildBridge as any);
+
+      const result = await tokenBridge.getTokenMapping(req);
+
+      expect(result).toBeDefined();
+      expect(result.rootToken).toBe('NATIVE');
+      expect(result.childToken).toBe(childETHToken);
+    });
+
+    it('returns the mapping for wETH', async () => {
+      expect.assertions(3);
+      const req = {
+        rootToken: bridgeConfig.bridgeContracts.rootChainWrappedETH,
+        rootChainId: bridgeConfig.bridgeInstance.rootChainID,
+        childChainId: bridgeConfig.bridgeInstance.childChainID,
+      };
+
+      jest.spyOn(ethers, 'Contract').mockReturnValue(mockChildBridge as any);
+
+      const result = await tokenBridge.getTokenMapping(req);
+
+      expect(result).toBeDefined();
+      expect(result.rootToken).toBe(bridgeConfig.bridgeContracts.rootChainWrappedETH);
+      expect(result.childToken).toBe(childETHToken);
+    });
+
+    it('returns the mapping for wETH', async () => {
+      expect.assertions(3);
+      const req = {
+        rootToken: bridgeConfig.bridgeContracts.rootChainWrappedETH,
+        rootChainId: bridgeConfig.bridgeInstance.rootChainID,
+        childChainId: bridgeConfig.bridgeInstance.childChainID,
+      };
+
+      jest.spyOn(ethers, 'Contract').mockReturnValue(mockChildBridge as any);
+
+      const result = await tokenBridge.getTokenMapping(req);
+
+      expect(result).toBeDefined();
+      expect(result.rootToken).toBe(bridgeConfig.bridgeContracts.rootChainWrappedETH);
+      expect(result.childToken).toBe(childETHToken);
+    });
+
+    it('returns the mapping for IMX', async () => {
+      expect.assertions(3);
+      const req = {
+        rootToken: bridgeConfig.bridgeContracts.rootChainIMX,
+        rootChainId: bridgeConfig.bridgeInstance.rootChainID,
+        childChainId: bridgeConfig.bridgeInstance.childChainID,
+      };
+
+      jest.spyOn(ethers, 'Contract').mockReturnValue(mockRootBridgeIMX as any);
+
+      const result = await tokenBridge.getTokenMapping(req);
+
+      expect(result).toBeDefined();
+      expect(result.rootToken).toBe(bridgeConfig.bridgeContracts.rootChainIMX);
+      expect(result.childToken).toBe('NATIVE');
+    });
+
+    it('returns the mapping for USDC', async () => {
+      expect.assertions(3);
+      const req = {
+        rootToken: rootUSDCToken,
+        rootChainId: bridgeConfig.bridgeInstance.rootChainID,
+        childChainId: bridgeConfig.bridgeInstance.childChainID,
+      };
+
+      jest.spyOn(ethers, 'Contract').mockReturnValue(mockRootBridgeUSDC as any);
+
+      const result = await tokenBridge.getTokenMapping(req);
+
+      expect(result).toBeDefined();
+      expect(result.rootToken).toBe(rootUSDCToken);
+      expect(result.childToken).toBe(childUSDCToken);
     });
   });
 });
