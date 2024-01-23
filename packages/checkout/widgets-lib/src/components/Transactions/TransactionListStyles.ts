@@ -1,16 +1,3 @@
-export const transactionsContainerStyle = {
-  px: 'base.spacing.x4',
-  display: 'flex',
-  flexDirection: 'column',
-  height: '100%',
-};
-
-export const transactionsListContainerStyle = {
-  flexGrow: '1',
-  flexShrink: '0',
-  flexBasis: '0',
-};
-
 export const transactionsListStyle = (showPassportLink: boolean) => {
   let height = 440;
 
@@ -30,8 +17,12 @@ export const transactionsListStyle = (showPassportLink: boolean) => {
   };
 };
 
-export const supportBoxContainerStyle = {
-  flexGrow: '0',
-  flexShrink: '1',
-  mt: 'base.spacing.x2',
+export const headingStyles = {
+  p: 'base.spacing.x2',
+};
+export const containerStyles = {
+  borderRadius: 'base.borderRadius.x4',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 'base.spacing.x5',
 };

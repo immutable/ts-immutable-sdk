@@ -3,12 +3,18 @@ export enum TransactionType {
   BRIDGE = 'bridge',
 }
 
+export const TransactionStatus = {
+  IN_PROGRESS: 'in_progress',
+  WITHDRAWAL_PENDING: 'withdrawal_pending',
+} as const;
+
 export type Transactions = {
   result: Transaction[]
 };
 
 export type CurrentStatus = {
   status: string;
+  withdrawal_ready_at?: string;
 };
 
 export type TransactionDetails = {

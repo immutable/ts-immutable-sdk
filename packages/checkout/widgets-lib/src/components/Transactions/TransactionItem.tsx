@@ -1,6 +1,5 @@
 import {
   Accordion,
-  Badge,
   Body,
   Box,
   Button,
@@ -10,12 +9,15 @@ import {
   Link,
   EllipsizedText,
 } from '@biom3/react';
-import { ChainId } from '@imtbl/checkout-sdk';
+import { ChainSlug } from '@imtbl/checkout-sdk';
 import { logoColour, networkIcon, networkName } from 'lib';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
-import {
-  containerStyles, actionsBadgeStyles, actionsContainerStyles, actionsLayoutStyles,
-} from './transactionItemStyles';
+import { text } from 'resources/text/textConfig';
+import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
+import { Transaction, TransactionStatus } from 'lib/clients/checkoutApiType';
+import { getChainIdBySlug } from 'lib/chains';
+import { MouseEvent, useMemo } from 'react';
+import { actionsContainerStyles, actionsLayoutStyles, containerStyles } from './transactionItemStyles';
 
 type TransactionItemProps = {
   label: string
@@ -23,32 +25,54 @@ type TransactionItemProps = {
     text: string,
     link: string,
     hash: string,
-  }
+  },
+  transaction: Transaction,
+  // token: TokenInfo,
   fiatAmount: string
   amount: string
-  fromChain: ChainId
-  toChain: ChainId
-  fromAddress: string
-  toAddress: string
-  action?: () => void
-  actionMessage?: string
 };
 
 export function TransactionItem({
   label,
   details,
+  transaction,
   fiatAmount,
   amount,
-  fromChain,
-  toChain,
-  fromAddress,
-  toAddress,
-  action,
-  actionMessage,
 }: TransactionItemProps) {
   const { track } = useAnalytics();
+  const { status: { withdrawalPending } } = text.views[BridgeWidgetViews.TRANSACTIONS];
 
-  const handleDetailsLinkClick = (linkDetail: { text: string, link: string, hash: string }) => {
+  const fromChain = getChainIdBySlug(transaction.details.from_chain as ChainSlug);
+  const toChain = getChainIdBySlug(transaction.details.to_chain as ChainSlug);
+
+  const dateNow = new Date().getTime();
+  const withdrawalReadyDate = useMemo(
+    () => (transaction.details.current_status.withdrawal_ready_at
+      ? new Date(transaction.details.current_status.withdrawal_ready_at)
+      : undefined),
+    [transaction],
+  );
+
+  const requiresWithdrawalClaim = transaction.details.current_status.status === TransactionStatus.WITHDRAWAL_PENDING;
+
+  // TODO: consider extracting this to datetime utils
+  const delayTimeHours = requiresWithdrawalClaim && withdrawalReadyDate !== undefined
+    ? Math.ceil((withdrawalReadyDate.getTime() - dateNow) / (60 * 60 * 1000))
+    : 0;
+
+  const withdrawalReadyToClaim = withdrawalReadyDate ? withdrawalReadyDate.getTime() < dateNow : false;
+  const actionMessage = withdrawalReadyToClaim === true
+    ? withdrawalPending.withdrawalReadyText
+    // eslint-disable-next-line max-len
+    : `${withdrawalPending.withdrawalDelayText} ${delayTimeHours} ${delayTimeHours > 1 ? 'hours' : 'hour'}`;
+
+  const handleDetailsLinkClick = (
+    e: MouseEvent<HTMLAnchorElement>,
+    linkDetail: { text: string, link: string, hash: string },
+  ) => {
+    e.preventDefault(); // prevent default opening of link
+    e.stopPropagation(); // prevent expanding accordian
+
     track({
       userJourney: UserJourney.BRIDGE,
       screen: 'TransactionItem',
@@ -62,41 +86,53 @@ export function TransactionItem({
     window.open(`${linkDetail.link}${linkDetail.hash}`);
   };
 
+  const handleWithdrawalClaimClick = () => {
+    // WT-2053 - https://immutable.atlassian.net/browse/WT-2053
+    // entrypoint for claim withdrawal
+  };
+
   return (
-    <Box sx={action ? containerStyles : {}}>
-      {(action || actionMessage) && (
-        <Box sx={actionsContainerStyles}>
-          <Box sx={actionsLayoutStyles}>
-            <Icon
-              icon="Alert"
-              variant="bold"
-              sx={{ fill: 'base.color.status.fatal.bright', w: 'base.icon.size.200' }}
-            />
-            {actionMessage && (
-            <Body size="xSmall" sx={{ color: 'base.color.text.secondary' }}>
-              {actionMessage}
-            </Body>
+    <Box testId={`transaction-item-${transaction.blockchain_metadata.transaction_hash}`} sx={containerStyles}>
+      {requiresWithdrawalClaim && (
+        <>
+          <Box sx={actionsContainerStyles}>
+            <Box sx={actionsLayoutStyles}>
+              <Icon
+                icon="Alert"
+                variant="bold"
+                sx={{
+                  fill: withdrawalReadyToClaim
+                    ? 'base.color.status.fatal.bright'
+                    : 'base.color.status.attention.bright',
+                  w: 'base.icon.size.200',
+                }}
+              />
+              <Body
+                testId={`transaction-item-${transaction.blockchain_metadata.transaction_hash}-action-message`}
+                size="xSmall"
+                sx={{ color: 'base.color.text.secondary' }}
+              >
+                {actionMessage}
+              </Body>
+            </Box>
+            {requiresWithdrawalClaim && withdrawalReadyToClaim && (
+              <Button
+                testId={`transaction-item-${transaction.blockchain_metadata.transaction_hash}-action-button`}
+                variant="primary"
+                size="small"
+                onClick={handleWithdrawalClaimClick}
+              >
+                {withdrawalPending.actionButtonText}
+              </Button>
             )}
           </Box>
-          {action && (
-          <Button variant="primary" size="small" onClick={action}>
-            Action
-          </Button>
-          )}
-          <Badge
-            isAnimated
-            variant="fatal"
-            sx={actionsBadgeStyles}
-          />
-        </Box>
+          <Divider size="small" sx={{ color: 'base.color.translucent.emphasis.300', opacity: 0.1 }} />
+        </>
       )}
 
       <Accordion
-        emphasized
         chevronSide="right"
         sx={{
-          my: 'base.spacing.x2',
-          mx: action ? 'base.spacing.x2' : '0',
           button: {
             p: 'base.spacing.x1',
           },
@@ -121,19 +157,21 @@ export function TransactionItem({
               {label}
             </MenuItem.Label>
             <MenuItem.Caption>
-              <Link
-                size="xSmall"
-                rc={(
-                  <a
-                    target="_blank"
-                    href="#"
-                    rel="noreferrer"
-                    onClick={() => handleDetailsLinkClick(details)}
-                  />
-                )}
-              >
-                {details.text}
-              </Link>
+              {!requiresWithdrawalClaim && (
+                <Link
+                  size="xSmall"
+                  rc={(
+                    <a
+                      target="_blank"
+                      href="#"
+                      rel="noreferrer"
+                      onClick={(e) => handleDetailsLinkClick(e, details)}
+                    />
+                  )}
+                >
+                  {details.text}
+                </Link>
+              )}
             </MenuItem.Caption>
             <MenuItem.PriceDisplay
               fiatAmount={fiatAmount}
@@ -161,7 +199,7 @@ export function TransactionItem({
           }}
           >
             <Icon
-            // @ts-ignore
+              // @ts-ignore
               icon={networkIcon[fromChain]}
               sx={{
                 w: 'base.icon.size.250',
@@ -179,7 +217,11 @@ export function TransactionItem({
               <Body size="xxSmall" sx={{ color: 'base.color.translucent.standard.900' }}>
                 {networkName[fromChain]}
               </Body>
-              <EllipsizedText size="xxSmall" sx={{ color: 'base.color.translucent.standard.600' }} text={fromAddress} />
+              <EllipsizedText
+                size="xxSmall"
+                sx={{ color: 'base.color.translucent.standard.600' }}
+                text={transaction.details.from_address}
+              />
             </Box>
             <Box sx={{ flexGrow: '1' }} />
             <Icon
@@ -191,7 +233,7 @@ export function TransactionItem({
             />
             <Box sx={{ flexGrow: '1' }} />
             <Icon
-            // @ts-ignore
+              // @ts-ignore
               icon={networkIcon[toChain]}
               sx={{
                 w: 'base.icon.size.250',
@@ -209,7 +251,11 @@ export function TransactionItem({
               <Body size="xxSmall" sx={{ color: 'base.color.translucent.standard.900' }}>
                 {networkName[toChain]}
               </Body>
-              <EllipsizedText size="xxSmall" sx={{ color: 'base.color.translucent.standard.600' }} text={toAddress} />
+              <EllipsizedText
+                size="xxSmall"
+                sx={{ color: 'base.color.translucent.standard.600' }}
+                text={transaction.details.to_address}
+              />
             </Box>
           </Box>
         </Accordion.ExpandedContent>

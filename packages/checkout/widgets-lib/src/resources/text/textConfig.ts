@@ -458,6 +458,11 @@ export const text = {
       layoutHeading: 'In progress',
       passportDashboard: 'View the full transaction history in your',
       status: {
+        withdrawalPending: {
+          actionButtonText: 'Proceed',
+          withdrawalDelayText: 'This move has been paused, please return in',
+          withdrawalReadyText: 'Action required to receive your coins',
+        },
         inProgress: {
           heading: 'In Progress',
           txnEstimate: 'Usually takes 20 mins',
