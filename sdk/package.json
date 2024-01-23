@@ -90,10 +90,6 @@
       "types": "./dist/blockchain_data.d.ts",
       "import": "./dist/blockchain_data.js"
     },
-    "./x_client": {
-      "types": "./dist/x_client.d.ts",
-      "import": "./dist/x_client.js"
-    },
     "./passport": {
       "types": "./dist/passport.d.ts",
       "import": "./dist/passport.js"
@@ -102,13 +98,13 @@
       "types": "./dist/orderbook.d.ts",
       "import": "./dist/orderbook.js"
     },
-    "./x_provider": {
-      "types": "./dist/x_provider.d.ts",
-      "import": "./dist/x_provider.js"
-    },
     "./checkout": {
       "types": "./dist/checkout.d.ts",
       "import": "./dist/checkout.js"
+    },
+    "./x": {
+      "types": "./dist/x.d.ts",
+      "import": "./dist/x.js"
     }
   },
   "files": [
