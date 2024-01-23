@@ -344,6 +344,10 @@
           "description": "Sorry, something went wrong. Please try again.",
           "primaryAction": "Try again",
           "secondaryAction": "Dismiss"
+        },
+        "INVALID_PARAMETERS": {
+          "description": "Sorry, we're unable to process your order. Missing information from client",
+          "secondaryAction": "Dismiss"
         }
       }
     },
