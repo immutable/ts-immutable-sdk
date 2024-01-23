@@ -131,7 +131,7 @@ export type SellResultInsufficientFunds = {
 /*
 * Type representing the result of the cancel
 */
-export type CancelResult = CancelResultSuccess | CancelResultFailed;
+export type CancelResult = CancelResultSuccess | CancelResultFailed | CancelResultFulfillmentsUnsettled;
 
 /**
  * Represents the result of {@link Checkout.cancel}
@@ -155,6 +155,27 @@ export type CancelResultFailed = {
   transactionHash: string,
   /** The reason for the failure */
   reason: string,
+};
+
+/**
+ * Represents the result of {@link Checkout.cancel}
+ * @property {CheckoutStatus.FULFILLMENTS_UNSETTLED} status
+ * @property {SendTransactionResult[]} transactions
+ */
+export type CancelResultFulfillmentsUnsettled = {
+  /** The status to indicate success */
+  status: CheckoutStatus.FULFILLMENTS_UNSETTLED,
+  /** Array of transaction results */
+  transactions: TransactionResponse[],
+};
+
+/**
+ * Represents the overrides available for {@link Checkout.cancel}
+ * @property {boolean} waitFulfillmentSettlements
+ */
+export type CancelOverrides = {
+  /** If the buy should wait for the fulfillment transactions to settle */
+  waitFulfillmentSettlements?: boolean;
 };
 
 /**
