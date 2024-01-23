@@ -1,4 +1,4 @@
-import { ImmutableXClient } from '@imtbl/x-client';
+import { IMXClient } from '@imtbl/x-client';
 import { ImxApiClients } from '@imtbl/generated-clients';
 import { ConfirmationScreen } from '../confirmation';
 import registerPassportStarkEx from './workflows/registration';
@@ -26,7 +26,7 @@ describe('PassportImxProviderFactory', () => {
   const mockMagicAdapter = {};
   const immutableXClient = {
     usersApi: {},
-  } as ImmutableXClient;
+  } as IMXClient;
   const confirmationScreen = {} as ConfirmationScreen;
   const config = testConfig;
   const passportEventEmitter = new TypedEventEmitter<PassportEventMap>();

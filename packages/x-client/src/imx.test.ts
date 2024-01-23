@@ -1,16 +1,16 @@
-import { ImmutableXClient } from 'index';
+import { IMXClient } from 'index';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { Config } from '@imtbl/core-sdk';
 import { AxiosRequestConfig } from 'axios';
 import { ImxConfiguration, ImxModuleConfiguration, createImmutableXConfiguration } from './config';
 
-describe('ImmutableXClient', () => {
-  it('should instantiate a SANDBOX ImmutableXClient', async () => {
+describe('IMXClient', () => {
+  it('should instantiate a SANDBOX IMXClient', async () => {
     const imtblConfig = new ImmutableConfiguration({
       environment: Environment.SANDBOX,
     });
 
-    const client = new ImmutableXClient({
+    const client = new IMXClient({
       baseConfig: imtblConfig,
     });
 
@@ -32,11 +32,11 @@ describe('ImmutableXClient', () => {
     expect(axiosRequest.headers?.['x-sdk-version']).toEqual('ts-immutable-sdk-__SDK_VERSION__');
   });
 
-  it('should instantiate a PRODUCTION ImmutableXClient', async () => {
+  it('should instantiate a PRODUCTION IMXClient', async () => {
     const config = new ImxConfiguration({
       baseConfig: { environment: Environment.PRODUCTION },
     });
-    const { assetApi } = new ImmutableXClient(config);
+    const { assetApi } = new IMXClient(config);
     const assetsResponse = await assetApi.listAssets();
 
     expect(assetsResponse.status).toEqual(200);
@@ -45,7 +45,7 @@ describe('ImmutableXClient', () => {
     );
   });
 
-  it('should instantiate a ImmutableXClient with override and custom version', async () => {
+  it('should instantiate a IMXClient with override and custom version', async () => {
     const immutableXConfig = createImmutableXConfiguration({
       basePath: 'https://api.sandbox.x.immutable.com',
       chainID: 1,
@@ -67,13 +67,13 @@ describe('ImmutableXClient', () => {
       baseConfig: { environment: Environment.PRODUCTION },
       overrides: { immutableXConfig },
     };
-    const { assetApi } = new ImmutableXClient(config);
+    const { assetApi } = new IMXClient(config);
     const assetsResponse = await assetApi.listAssets();
 
     expect(assetsResponse.status).toEqual(200);
   });
 
-  it('should instantiate a ImmutableXClient with override and custom SDK version', async () => {
+  it('should instantiate a IMXClient with override and custom SDK version', async () => {
     const sdkVersion = 'ts-immutable-sdk-0.0.1';
 
     const immutableXConfig = Config.createConfig({
@@ -98,7 +98,7 @@ describe('ImmutableXClient', () => {
       overrides: { immutableXConfig },
     };
 
-    const { assetApi } = new ImmutableXClient(config);
+    const { assetApi } = new IMXClient(config);
     const assetsResponse = await assetApi.listAssets();
 
     expect(assetsResponse.status).toEqual(200);

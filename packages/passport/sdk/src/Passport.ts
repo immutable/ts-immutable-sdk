@@ -1,6 +1,6 @@
 import { IMXProvider } from '@imtbl/x-provider';
 import { ImxApiClients, imxApiConfig, MultiRollupApiClients } from '@imtbl/generated-clients';
-import { ImmutableXClient } from '@imtbl/x-client';
+import { IMXClient } from '@imtbl/x-client';
 import { ChainName } from 'network/chains';
 import { Environment } from '@imtbl/config';
 import AuthManager from './authManager';
@@ -26,7 +26,7 @@ export class Passport {
 
   private readonly confirmationScreen: ConfirmationScreen;
 
-  private readonly immutableXClient: ImmutableXClient;
+  private readonly immutableXClient: IMXClient;
 
   private readonly magicAdapter: MagicAdapter;
 
@@ -42,7 +42,7 @@ export class Passport {
     this.magicAdapter = new MagicAdapter(this.config);
     this.confirmationScreen = new ConfirmationScreen(this.config);
     this.immutableXClient = passportModuleConfiguration.overrides?.immutableXClient
-      || new ImmutableXClient({
+      || new IMXClient({
         baseConfig: passportModuleConfiguration.baseConfig,
       });
     this.multiRollupApiClients = new MultiRollupApiClients(this.config.multiRollupConfig);

@@ -1,4 +1,4 @@
-import { ImmutableXClient } from '@imtbl/x-client';
+import { IMXClient } from '@imtbl/x-client';
 import { IMXProvider } from '@imtbl/x-provider';
 import { ImxApiClients } from '@imtbl/generated-clients';
 import { PassportError, PassportErrorType } from '../errors/passportError';
@@ -14,7 +14,7 @@ export type PassportImxProviderFactoryInput = {
   authManager: AuthManager;
   config: PassportConfiguration;
   confirmationScreen: ConfirmationScreen;
-  immutableXClient: ImmutableXClient;
+  immutableXClient: IMXClient;
   magicAdapter: MagicAdapter;
   passportEventEmitter: TypedEventEmitter<PassportEventMap>;
   imxApiClients: ImxApiClients;
@@ -27,7 +27,7 @@ export class PassportImxProviderFactory {
 
   private readonly confirmationScreen: ConfirmationScreen;
 
-  private readonly immutableXClient: ImmutableXClient;
+  private readonly immutableXClient: IMXClient;
 
   private readonly magicAdapter: MagicAdapter;
 

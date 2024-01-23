@@ -1,5 +1,5 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { ImmutableXClient } from '@imtbl/x-client';
+import { IMXClient } from '@imtbl/x-client';
 import {
   CancelOrderResponse,
   CreateOrderResponse,
@@ -42,7 +42,7 @@ describe('PassportImxProvider', () => {
 
   let passportImxProvider: PassportImxProvider;
 
-  const immutableXClient = new ImmutableXClient({
+  const immutableXClient = new IMXClient({
     baseConfig: new ImmutableConfiguration({
       environment: Environment.SANDBOX,
     }),

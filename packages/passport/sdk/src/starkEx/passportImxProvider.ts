@@ -18,7 +18,7 @@ import {
   UnsignedOrderRequest,
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
-import { ImmutableXClient } from '@imtbl/x-client';
+import { IMXClient } from '@imtbl/x-client';
 import { IMXProvider } from '@imtbl/x-provider';
 import AuthManager from 'authManager';
 import TypedEventEmitter from 'utils/typedEventEmitter';
@@ -40,7 +40,7 @@ import { getStarkSigner } from './getStarkSigner';
 
 export interface PassportImxProviderOptions {
   authManager: AuthManager;
-  immutableXClient: ImmutableXClient;
+  immutableXClient: IMXClient;
   confirmationScreen: ConfirmationScreen;
   config: PassportConfiguration;
   passportEventEmitter: TypedEventEmitter<PassportEventMap>;
@@ -63,7 +63,7 @@ type RegisteredUserAndSigners = {
 export class PassportImxProvider implements IMXProvider {
   protected readonly authManager: AuthManager;
 
-  private readonly immutableXClient: ImmutableXClient;
+  private readonly immutableXClient: IMXClient;
 
   protected readonly guardianClient: GuardianClient;
 
