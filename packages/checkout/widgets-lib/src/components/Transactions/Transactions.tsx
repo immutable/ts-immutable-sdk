@@ -234,24 +234,6 @@ export function Transactions({ checkout }: TransactionsProps) {
     })();
   }, [walletAddress, checkout]);
 
-  // const getPendingWithdrawalsForReceipient = useCallback(async () => {
-  //   if (!tokenBridge) return;
-  //   try {
-  //     const address = await provider?.getSigner().getAddress();
-  //     if (!address) return;
-  //     const pendingWithdrawals = await tokenBridge.getPendingWithdrawals({
-  //       recipient: address,
-  //     });
-  //     console.log(`pendingWithdrawals for receipient ${address}: `, pendingWithdrawals);
-  //   } catch (err: any) {
-  //     console.error(err);
-  //   }
-  // }, [provider, tokenBridge]);
-
-  // useEffect(() => {
-  //   getPendingWithdrawalsForReceipient();
-  // }, [getPendingWithdrawalsForReceipient]);
-
   useEffect(() => {
     page({
       userJourney: UserJourney.BRIDGE,
