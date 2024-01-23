@@ -270,8 +270,10 @@
         }
       },
       "insufficientCoinsBanner": {
-        "caption": "코인 잔액이 부족합니다. 대신 카드로 진행하세요."
-      },
+        "caption": "코인 잔액이 부족합니다. 계속 진행하려면 카드로 결제하거나",
+        "captionEnd": "다시 시도하십시오.",
+        "captionCTA": "코인 추가"
+      },            
       "loading": {
         "ready": "구매 준비됨",
         "confirm": "지갑에서 확인하세요",
