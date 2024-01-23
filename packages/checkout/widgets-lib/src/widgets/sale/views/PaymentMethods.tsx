@@ -80,7 +80,7 @@ export function PaymentMethods() {
         <Banner.Caption>
           {t('views.PAYMENT_METHODS.insufficientCoinsBanner.caption')}
           <Link
-            sx={{ mx: 'base.spacing.x2' }}
+            sx={{ mx: 'base.spacing.x1' }}
             onClick={
               () => orchestrationEvents
                 .sendRequestBridgeEvent(eventTarget, IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT, {
