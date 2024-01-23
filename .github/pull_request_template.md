@@ -1,12 +1,10 @@
 # Summary
-<!--- A short summary. This PR description is publicly viewable and will be part of Changelog on NPM -->
+<!-- A short summary. This PR's description is publicly viewable and will be part of the Changelog on NPM -->
 
 
 # Impact of Change
 <!-- How this change will impact users and projects that integrate using this SDK? -->
-
-
-<!-- Remove the H2 sections that are not applicable -->
+<!-- Remove sections below that are not applicable -->
 ## Added 
 <!-- Section for new features. -->
 
@@ -31,8 +29,8 @@
 <!-- Section in case of vulnerabilities. -->
 
 
-# Anything else worth calling out
-<!--- Useful tips, gotchas, trade-offs made to the reviewers. -->
+# Other things worth calling out
+<!-- Useful tips, gotchas, trade-offs made to the reviewers. -->
 
 
 # Before submitting the PR, follow these steps:
