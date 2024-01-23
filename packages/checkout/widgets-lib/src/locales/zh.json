@@ -270,8 +270,10 @@
         }
       },
       "insufficientCoinsBanner": {
-        "caption": "硬币余额不足。请继续用卡支付。"
-      },
+        "caption": "硬币余额不足。请用卡支付以继续，或者",
+        "captionEnd": "再次尝试。",
+        "captionCTA": "添加硬币"
+      },                 
       "loading": {
         "ready": "准备购买",
         "confirm": "在您的钱包中确认",
