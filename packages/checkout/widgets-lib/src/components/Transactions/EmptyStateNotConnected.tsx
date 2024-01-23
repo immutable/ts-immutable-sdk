@@ -49,7 +49,15 @@ export function EmptyStateNotConnected({ checkout, updateProvider }: EmptyStateN
     <>
       <Box sx={containerStyle}>
         <Body sx={{ mb: 'base.spacing.x8' }}>{emptyState.notConnected.body}</Body>
-        <Button variant="secondary" size="medium" onClick={openWalletDrawer}>Connect</Button>
+        <Button
+          variant="secondary"
+          size="medium"
+          testId="transactions-connect-wallet-button"
+          onClick={openWalletDrawer}
+        >
+          Connect
+
+        </Button>
       </Box>
       <WalletDrawer
         testId="select-wallet-drawer"
