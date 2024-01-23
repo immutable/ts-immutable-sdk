@@ -1,7 +1,10 @@
 import { strict as assert } from 'assert';
 import { parseEther } from '@ethersproject/units';
-import { ImmutableXClient, ImxClientModuleConfiguration } from '@imtbl/sdk/x_client';
-import { ProviderConfiguration } from '@imtbl/sdk/x_provider';
+import {
+  IMXClient,
+  ImxClientModuleConfiguration,
+  ProviderConfiguration,
+} from '@imtbl/sdk/x';
 import { configuration, StepSharedState } from './stepSharedState';
 import { env, getProvider, repeatCheck20 } from '../common';
 
@@ -19,7 +22,7 @@ export class Trading {
     baseConfig: configuration,
   });
 
-  client = new ImmutableXClient(this.config);
+  client = new IMXClient(this.config);
 
   // @then('api should show that {string} owns the NFT {string}', undefined, 20000)
   // public async checkOwnership(ownerVar: string, assetVar: string) {

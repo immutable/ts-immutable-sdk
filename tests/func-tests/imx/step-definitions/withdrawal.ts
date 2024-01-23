@@ -1,8 +1,12 @@
-import { GenericIMXProvider, ProviderConfiguration } from '@imtbl/sdk/x_provider';
+import {
+  IMXClient,
+  ImxClientModuleConfiguration,
+  GenericIMXProvider,
+  ProviderConfiguration,
+} from '@imtbl/sdk/x';
 import { parseUnits } from '@ethersproject/units';
 import { repeatCheck30, repeatCheck300 } from 'common';
 import { strict as assert } from 'assert';
-import { ImmutableXClient, ImxClientModuleConfiguration } from '@imtbl/sdk/x_client';
 import { configuration, StepSharedState } from './stepSharedState';
 
 export class Withdrawal {
@@ -74,7 +78,7 @@ export class Withdrawal {
     const config: ImxClientModuleConfiguration = {
       baseConfig: { environment: configuration.environment },
     };
-    const client = new ImmutableXClient(config);
+    const client = new IMXClient(config);
     await repeatCheckFunction(async () => {
       const withdrawal = await client.getWithdrawal({
         id: id.toString(),

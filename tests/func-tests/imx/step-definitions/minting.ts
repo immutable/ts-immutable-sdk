@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { MintFee, MintTokenDataV2 } from '@imtbl/core-sdk';
 import * as assert from 'assert';
-import { ImmutableXClient, ImxClientModuleConfiguration } from '@imtbl/sdk/x_client';
+import { IMXClient, ImxClientModuleConfiguration } from '@imtbl/sdk/x';
 import { env, repeatCheck300 } from '../common';
 import { configuration, StepSharedState } from './stepSharedState';
 
@@ -13,7 +13,7 @@ export class Minting {
     baseConfig: { environment: configuration.environment },
   };
 
-  client = new ImmutableXClient(this.config);
+  client = new IMXClient(this.config);
 
   // @given('randomly L2 minted to {string} of {string}', undefined, 10000)
   // @when('randomly L2 mint to {string} of {string}', undefined, 10000)

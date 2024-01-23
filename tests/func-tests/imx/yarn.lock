@@ -628,7 +628,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/design-tokens@npm:*, @biom3/design-tokens@npm:0.2.9":
+"@biom3/design-tokens@npm:*":
   version: 0.2.9
   resolution: "@biom3/design-tokens@npm:0.2.9"
   dependencies:
@@ -637,9 +637,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.19.34":
-  version: 0.19.40
-  resolution: "@biom3/react@npm:0.19.40"
+"@biom3/design-tokens@npm:^0.2.10":
+  version: 0.2.11
+  resolution: "@biom3/design-tokens@npm:0.2.11"
+  dependencies:
+    lodash.get: ^4.4.2
+  checksum: eb0d94cdd8820dddda6be407d6dea938b68bb6de0fdda50fa8769f22f82c6196bdb6a3d4dd3a4b30fec0a9f5925657681cfa5b34022b8f83b2683c67aeed3341
+  languageName: node
+  linkType: hard
+
+"@biom3/react@npm:^0.19.40":
+  version: 0.19.42
+  resolution: "@biom3/react@npm:0.19.42"
   dependencies:
     "@biom3/design-tokens": "*"
     "@emotion/css": ^11.11.2
@@ -658,7 +667,7 @@ __metadata:
     react-is: ^18.2.0
     react-keyed-flatten-children: ^3.0.0
     ts-deepmerge: ^6.2.0
-  checksum: cfd094f9276e517a5ff8264214ba0efa04a06734ccc2843691d8288705727a170b4ffd2fafb0f4644baa042b46b5fac3d6e98cf86826f458870b8cece4a0861d
+  checksum: 57fb7545adeab582cdb91e0a1ef896f886166faba1c7409a3fc6c3ae1a23a95ba67662526fddba67f3d01bbe331be41d7c23ab560f8b04603041edd65a96be94
   languageName: node
   linkType: hard
 
@@ -1315,12 +1324,12 @@ __metadata:
 
 "@imtbl/sdk@file:../../../sdk::locator=func-tests-imx%40workspace%3A.":
   version: 0.0.0
-  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=e92fea&locator=func-tests-imx%40workspace%3A."
+  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=ac36b0&locator=func-tests-imx%40workspace%3A."
   dependencies:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
-    "@biom3/design-tokens": 0.2.9
-    "@biom3/react": ^0.19.34
+    "@biom3/design-tokens": ^0.2.10
+    "@biom3/react": ^0.19.40
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
     "@ethersproject/providers": ^5.7.2
@@ -1328,7 +1337,7 @@ __metadata:
     "@imtbl/core-sdk": ^2.4.0
     "@imtbl/react-analytics": 0.2.1-alpha
     "@jest/globals": ^29.5.0
-    "@magic-ext/oidc": ^4.2.0
+    "@magic-ext/oidc": 4.2.0
     "@metamask/detect-provider": ^2.0.0
     "@opensea/seaport-js": 2.0.7
     "@uniswap/router-sdk": ^1.4.0
@@ -1346,7 +1355,7 @@ __metadata:
     i18next-browser-languagedetector: ^7.2.0
     jwt-decode: ^3.1.2
     magic-sdk: ^21.2.0
-    oidc-client-ts: ^2.2.1
+    oidc-client-ts: 2.2.1
     os-browserify: ^0.3.0
     pako: ^2.1.0
     react-i18next: ^13.5.0
@@ -1356,7 +1365,7 @@ __metadata:
   peerDependencies:
     react: ^18.2.0
     react-dom: ^18.2.0
-  checksum: e6477c69a8f80aa4a66c93b7d3ab3264624b102eaebf741a159822dfff9d0032db256af2104ed22e61ae236fa0a6d74330e0c4cb1ac8964fae5f246657c4b13e
+  checksum: 47625219e15e675a1343c489ba0fb348e4d4d5a74d39ffaf967d48c4cc9dfcc43dd0cf659be48e9f19f731b9f8778d4c1baf73f8328218974e30e55c347d7398
   languageName: node
   linkType: hard
 
@@ -1909,10 +1918,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@magic-ext/oidc@npm:^4.2.0":
-  version: 4.3.2
-  resolution: "@magic-ext/oidc@npm:4.3.2"
-  checksum: e179a274531ea62a85b7f78e159eeab6ff16278bcf26421e0bb046e188fcb7b5756a0ef5cc0d3bad317d2a828e225779e1ead2ea35aa8211be3d4a51d51d8022
+"@magic-ext/oidc@npm:4.2.0":
+  version: 4.2.0
+  resolution: "@magic-ext/oidc@npm:4.2.0"
+  checksum: 7bd51bf45168b7456a963f87c9118617f73c9a7e2c427b4bd786775f5fb80c90e90cbb10069e8a670587a8b20871bf4aa706f9fdef7f5981f007550b2adfc947
   languageName: node
   linkType: hard
 
@@ -5100,7 +5109,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"crypto-js@npm:^4.2.0":
+"crypto-js@npm:^4.1.1, crypto-js@npm:^4.2.0":
   version: 4.2.0
   resolution: "crypto-js@npm:4.2.0"
   checksum: f051666dbc077c8324777f44fbd3aaea2986f198fe85092535130d17026c7c2ccf2d23ee5b29b36f7a4a07312db2fae23c9094b644cc35f7858b1b4fcaf27774
@@ -8888,13 +8897,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"oidc-client-ts@npm:^2.2.1":
-  version: 2.4.0
-  resolution: "oidc-client-ts@npm:2.4.0"
+"oidc-client-ts@npm:2.2.1":
+  version: 2.2.1
+  resolution: "oidc-client-ts@npm:2.2.1"
   dependencies:
-    crypto-js: ^4.2.0
+    crypto-js: ^4.1.1
     jwt-decode: ^3.1.2
-  checksum: 8467db689298221f706d3358961efb0ddc789f6bd7d4765e71ae5fe62067999d2ce6e8e7584b9d991b8caa6f7fb383f75841e1cfa9e05808c34632de374f5e68
+  checksum: 83bc815d59a1221bdf2a39aff505941f1bf9aba542a59cc9cbe677b85fc06d4f555d55c1b0a6ad8ca76c57bacc423e1b03de5b7cef3d93c403126143f1152943
   languageName: node
   linkType: hard
 

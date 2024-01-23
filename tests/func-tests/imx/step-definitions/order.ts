@@ -1,7 +1,11 @@
 import { UnsignedOrderRequest } from '@imtbl/core-sdk';
 import { parseEther } from '@ethersproject/units';
-import { ImmutableXClient, ImxClientModuleConfiguration } from '@imtbl/sdk/x_client';
-import { GenericIMXProvider, ProviderConfiguration } from '@imtbl/sdk/x_provider';
+import {
+  IMXClient,
+  ImxClientModuleConfiguration,
+  GenericIMXProvider,
+  ProviderConfiguration,
+} from '@imtbl/sdk/x';
 import { configuration, StepSharedState } from './stepSharedState';
 
 // @binding([StepSharedState])
@@ -16,7 +20,7 @@ export class Order {
     baseConfig: configuration,
   });
 
-  client = new ImmutableXClient(this.config);
+  client = new IMXClient(this.config);
 
   // @when(
   //   '{string} creates sell order {string} of {string} NFT for sell for {string} eth',

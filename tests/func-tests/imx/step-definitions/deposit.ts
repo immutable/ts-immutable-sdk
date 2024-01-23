@@ -1,7 +1,11 @@
 import { strict as assert } from 'assert';
 import { formatEther, parseEther } from '@ethersproject/units';
-import { ImmutableXClient, ImxClientModuleConfiguration } from '@imtbl/sdk/x_client';
-import { GenericIMXProvider, ProviderConfiguration } from '@imtbl/sdk/x_provider';
+import {
+  IMXClient,
+  ImxClientModuleConfiguration,
+  GenericIMXProvider,
+  ProviderConfiguration,
+} from '@imtbl/sdk/x';
 import { StepSharedState, configuration } from './stepSharedState';
 import {
   env, getProvider, repeatCheck600, waitForTransactionResponse,
@@ -22,7 +26,7 @@ export class DepositEth {
   });
 
   // client = new ImmutableX(oldConfig);
-  client = new ImmutableXClient(this.config);
+  client = new IMXClient(this.config);
 
   // @when('banker deposits {string} eth', undefined, 120 * 1000)
   public async bankerDepositEth(amount: string) {

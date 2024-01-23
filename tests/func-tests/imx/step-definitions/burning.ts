@@ -1,12 +1,10 @@
 import { UnsignedTransferRequest } from '@imtbl/core-sdk';
 import {
-  ImmutableXClient,
+  IMXClient,
   ImxClientModuleConfiguration,
-} from '@imtbl/sdk/x_client';
-import {
   GenericIMXProvider,
   ProviderConfiguration,
-} from '@imtbl/sdk/x_provider';
+} from '@imtbl/sdk/x';
 import { configuration, StepSharedState } from './stepSharedState';
 
 export class Burning {
@@ -20,7 +18,7 @@ export class Burning {
     baseConfig: configuration,
   });
 
-  client = new ImmutableXClient(this.config);
+  client = new IMXClient(this.config);
 
   // @when(
   //   '{string} creates burn {string} of {string} NFT to burn address',
