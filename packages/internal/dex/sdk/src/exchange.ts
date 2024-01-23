@@ -29,7 +29,6 @@ import {
   SecondaryFee,
   TransactionDetails,
   TransactionResponse,
-  WrapUnwrapTransactionDetails,
 } from './types';
 import { getSwap, adjustQuoteWithFees } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
@@ -48,6 +47,16 @@ const toPublicQuote = (
     amount: toPublicAmount(fee.amount),
   })),
 });
+
+/**
+ * Type representing the details of a wrap or unwrap transaction
+ * @property {@link TransactionDetails} transaction - The wrap or unwrap transaction
+ * @property {@link TransactionDetails | null} approval - The approval transaction or null if it is not required
+ */
+type WrapUnwrapTransactionDetails = {
+  transaction: TransactionDetails,
+  approval: TransactionDetails | null,
+};
 
 export class Exchange {
   private provider: ethers.providers.StaticJsonRpcProvider;
@@ -148,11 +157,11 @@ export class Exchange {
 
   private async getUnwrapTransaction(
     fromAddress: string,
-    tokenAmount: CoinAmount<ERC20>,
+    tokenAmount: BigNumber,
     wimxInterface: ethers.utils.Interface,
     gasPrice: CoinAmount<Native> | null,
   ) : Promise<WrapUnwrapTransactionDetails> {
-    const calldata = wimxInterface.encodeFunctionData('withdraw', [tokenAmount.value]);
+    const calldata = wimxInterface.encodeFunctionData('withdraw', [tokenAmount]);
     const gasEstimate = ethers.BigNumber.from(IMX_UNWRAP_GAS_COST);
 
     const gasFeeEstimate = gasPrice ? toPublicAmount(calculateGasFee(gasPrice, gasEstimate)) : null;
@@ -200,16 +209,16 @@ export class Exchange {
   }
 
   private async getUnsignedWrapUnwrapTx(
-    tokenIn: Coin,
-    otherToken: Coin,
-    amountSpecified: CoinAmount<Coin>,
+    tokenSpecified: Coin,
+    amountIn: CoinAmount<Coin>,
     fromAddress: string,
     gasPrice: CoinAmount<Native> | null,
   ): Promise<TransactionResponse> {
-    const isWrap = tokenIn === this.nativeToken;
+    const isWrap = amountIn.token.type === 'native';
+    const quoteToken = tokenSpecified.type === 'native' ? this.wrappedNativeToken : this.nativeToken;
     const otherTokenCoinAmount = {
-      token: otherToken,
-      value: amountSpecified.value,
+      token: quoteToken,
+      value: amountIn.value,
     };
 
     // The quote is always 1:1 (0 {price impact, slippage}) when wrapping/unwrapping.
@@ -233,7 +242,7 @@ export class Exchange {
     } else {
       transactionDetails = await this.getUnwrapTransaction(
         fromAddress,
-        otherTokenCoinAmount as CoinAmount<ERC20>,
+        otherTokenCoinAmount.value,
         wimxInterface,
         gasPrice,
       );
@@ -277,9 +286,8 @@ export class Exchange {
       // If the user is swapping between the native token and the wrapped native token,
       // we want to just wrap/unwrap the native token instead of swapping
       return this.getUnsignedWrapUnwrapTx(
-        tokenIn,
-        otherToken,
-        amountSpecified,
+        tokenSpecified,
+        newAmount(amount, tokenIn),
         fromAddress,
         gasPrice,
       );

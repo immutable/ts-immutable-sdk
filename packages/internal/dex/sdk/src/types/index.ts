@@ -98,16 +98,6 @@ export type TransactionResponse = {
 };
 
 /**
- * Type representing the details of a wrap or unwrap transaction
- * @property {@link TransactionDetails} transaction - The wrap or unwrap transaction
- * @property {@link TransactionDetails | null} approval - The approval transaction or null if it is not required
- */
-export type WrapUnwrapTransactionDetails = {
-  transaction: TransactionDetails,
-  approval: TransactionDetails | null,
-};
-
-/**
  * Type representing an ERC20 token
  * @property {string} type - The token type, used to discriminate between {@link ERC20} and {@link Native}
  * @property {number} chainId - The chain ID
