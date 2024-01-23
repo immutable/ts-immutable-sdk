@@ -26,11 +26,12 @@ export function PaymentMethods() {
   const { t } = useTranslation();
   const { viewState, viewDispatch } = useContext(ViewContext);
   const {
+    sign,
     amount,
     fromTokenAddress: tokenAddress,
+    goToErrorView,
     paymentMethod,
     setPaymentMethod,
-    sign,
     disabledPaymentTypes,
     invalidParameters,
   } = useSaleContext();
