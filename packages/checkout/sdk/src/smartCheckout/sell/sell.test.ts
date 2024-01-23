@@ -530,11 +530,9 @@ describe('sell', () => {
 
       expect(message).toEqual('An error occurred while preparing the listing');
       expect(type).toEqual(CheckoutErrorType.PREPARE_ORDER_LISTING_ERROR);
-      expect(data).toEqual({
-        message: 'error from orderbook',
-        id,
-        collectionAddress: contractAddress,
-      });
+      expect(data.error).toBeDefined();
+      expect(data.id).toEqual(id);
+      expect(data.collectionAddress).toEqual(contractAddress);
 
       expect(smartCheckout).toBeCalledTimes(0);
     });
@@ -601,11 +599,9 @@ describe('sell', () => {
 
       expect(message).toEqual('An error occurred while preparing the listing');
       expect(type).toEqual(CheckoutErrorType.PREPARE_ORDER_LISTING_ERROR);
-      expect(data).toEqual({
-        message: 'error from provider',
-        id,
-        collectionAddress: contractAddress,
-      });
+      expect(data.error).toBeDefined();
+      expect(data.id).toEqual(id);
+      expect(data.collectionAddress).toEqual(contractAddress);
 
       expect(smartCheckout).toBeCalledTimes(0);
     });
@@ -1094,11 +1090,9 @@ describe('sell', () => {
 
       expect(message).toEqual('An error occurred while creating the listing');
       expect(type).toEqual(CheckoutErrorType.CREATE_ORDER_LISTING_ERROR);
-      expect(data).toEqual({
-        message: 'error from create listing',
-        collectionId,
-        collectionAddress: contractAddress,
-      });
+      expect(data.error).toBeDefined();
+      expect(data.collectionId).toEqual(collectionId);
+      expect(data.collectionAddress).toEqual(contractAddress);
 
       expect(smartCheckout).toBeCalledTimes(1);
       expect(signMessage).toBeCalledTimes(1);

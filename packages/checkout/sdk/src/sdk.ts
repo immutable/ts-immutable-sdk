@@ -140,7 +140,7 @@ export class Checkout {
           new CheckoutError(
             'Failed to load widgets script',
             CheckoutErrorType.WIDGETS_SCRIPT_LOAD_ERROR,
-            { message: err.message },
+            { error: err },
           ),
         );
       }
@@ -429,8 +429,12 @@ export class Checkout {
     let itemRequirements = [];
     try {
       itemRequirements = await getItemRequirementsFromRequirements(web3Provider, params.itemRequirements);
-    } catch (error) {
-      throw new CheckoutError('Failed to map item requirements', CheckoutErrorType.ITEM_REQUIREMENTS_ERROR);
+    } catch (err: any) {
+      throw new CheckoutError(
+        'Failed to map item requirements',
+        CheckoutErrorType.ITEM_REQUIREMENTS_ERROR,
+        { error: err },
+      );
     }
 
     return await smartCheckout.smartCheckout(

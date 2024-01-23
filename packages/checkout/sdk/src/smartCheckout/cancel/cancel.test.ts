@@ -218,10 +218,8 @@ describe('cancel', () => {
 
       expect(message).toEqual('An error occurred while cancelling the order listing');
       expect(type).toEqual(CheckoutErrorType.CANCEL_ORDER_LISTING_ERROR);
-      expect(data).toEqual({
-        orderId: '1',
-        message: 'An error occurred while cancelling the order listing',
-      });
+      expect(data.error).toBeDefined();
+      expect(data.orderId).toEqual('1');
     });
   });
 });

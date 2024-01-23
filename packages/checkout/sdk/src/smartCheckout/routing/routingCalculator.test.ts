@@ -1122,7 +1122,6 @@ describe('routingCalculator', () => {
     try {
       await routingCalculator(
         config,
-
         '0x123',
         balanceRequirements,
         availableRoutingOptions,
@@ -1133,7 +1132,7 @@ describe('routingCalculator', () => {
     }
 
     expect(type).toEqual(CheckoutErrorType.PROVIDER_ERROR);
-    expect(data).toEqual({ message: 'Error from create readonly providers' });
+    expect(data.error).toBeDefined();
   });
 
   describe('getSwapFundingStep', () => {
