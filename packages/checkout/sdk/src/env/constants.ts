@@ -86,6 +86,7 @@ NetworkDetails
       chainName: ChainName.IMTBL_ZKEVM_MAINNET,
       rpcUrls: ['https://rpc.immutable.com'],
       nativeCurrency: ZKEVM_NATIVE_TOKEN,
+      blockExplorerUrls: ['https://explorer.immutable.com/'],
     },
   ],
 ]);
@@ -117,6 +118,7 @@ NetworkDetails
       chainName: ChainName.IMTBL_ZKEVM_TESTNET,
       rpcUrls: ['https://rpc.testnet.immutable.com'],
       nativeCurrency: ZKEVM_NATIVE_TOKEN,
+      blockExplorerUrls: ['https://explorer.testnet.immutable.com/'],
     },
   ],
 ]);
