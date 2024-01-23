@@ -83,7 +83,7 @@ export default class ConfirmationScreen {
         href = this.getHref('transaction', { transactionId, etherAddress, chainType });
       } else {
         href = this.getHref('zkevm/transaction', {
-          transactionId, etherAddress, chainType, chainId,
+          transactionID: transactionId, etherAddress, chainType, chainID: chainId,
         });
       }
       this.showConfirmationScreen(href, messageHandler, resolve);
