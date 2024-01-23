@@ -460,7 +460,7 @@ export const text = {
       status: {
         withdrawalPending: {
           actionButtonText: 'Proceed',
-          withdrawalDelayText: 'This move has been paused, please return in',
+          withdrawalDelayText: 'This move has been paused, please return ',
           withdrawalReadyText: 'Action required to receive your coins',
         },
         inProgress: {

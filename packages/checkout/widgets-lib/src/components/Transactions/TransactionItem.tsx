@@ -45,7 +45,7 @@ export function TransactionItem({
   const fromChain = getChainIdBySlug(transaction.details.from_chain as ChainSlug);
   const toChain = getChainIdBySlug(transaction.details.to_chain as ChainSlug);
 
-  const dateNow = new Date().getTime();
+  const dateNowUnixMs = useMemo(() => new Date().getTime(), []);
   const withdrawalReadyDate = useMemo(
     () => (transaction.details.current_status.withdrawal_ready_at
       ? new Date(transaction.details.current_status.withdrawal_ready_at)
@@ -55,16 +55,30 @@ export function TransactionItem({
 
   const requiresWithdrawalClaim = transaction.details.current_status.status === TransactionStatus.WITHDRAWAL_PENDING;
 
-  // TODO: consider extracting this to datetime utils
-  const delayTimeHours = requiresWithdrawalClaim && withdrawalReadyDate !== undefined
-    ? Math.ceil((withdrawalReadyDate.getTime() - dateNow) / (60 * 60 * 1000))
-    : 0;
+  const relativeTimeFormat = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
 
-  const withdrawalReadyToClaim = withdrawalReadyDate ? withdrawalReadyDate.getTime() < dateNow : false;
+  const delayTimeString = useMemo(() => {
+    if (!requiresWithdrawalClaim || withdrawalReadyDate === undefined) return '';
+
+    const timeDiffMins = (withdrawalReadyDate!.getTime() - dateNowUnixMs) / (60 * 1000);
+
+    if (timeDiffMins <= 1) return 'in 1 minute';
+
+    if (timeDiffMins < 60) {
+      return relativeTimeFormat.format(Math.ceil(timeDiffMins), 'minute');
+    }
+    const timeDiffHours = timeDiffMins / 60; // hours
+    if (timeDiffMins < 60 * 24) {
+      return relativeTimeFormat.format(Math.ceil(timeDiffHours), 'hour');
+    }
+    const timeDiffDays = timeDiffHours / 24; // days
+    return relativeTimeFormat.format(Math.ceil(timeDiffDays), 'day');
+  }, [dateNowUnixMs]);
+
+  const withdrawalReadyToClaim = withdrawalReadyDate ? withdrawalReadyDate.getTime() < dateNowUnixMs : false;
   const actionMessage = withdrawalReadyToClaim === true
     ? withdrawalPending.withdrawalReadyText
-    // eslint-disable-next-line max-len
-    : `${withdrawalPending.withdrawalDelayText} ${delayTimeHours} ${delayTimeHours > 1 ? 'hours' : 'hour'}`;
+    : `${withdrawalPending.withdrawalDelayText} ${delayTimeString}`;
 
   const handleDetailsLinkClick = (
     e: MouseEvent<HTMLAnchorElement>,
