@@ -1,8 +1,10 @@
-import { Banner, Box, Heading } from '@biom3/react';
+import {
+  Banner, Box, Heading, Link,
+} from '@biom3/react';
 import { useContext, useEffect } from 'react';
 
 import { useTranslation } from 'react-i18next';
-import { SalePaymentTypes } from '@imtbl/checkout-sdk';
+import { IMTBLWidgetEvents, SalePaymentTypes } from '@imtbl/checkout-sdk';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -12,6 +14,8 @@ import {
   ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
+import { orchestrationEvents } from '../../../lib/orchestrationEvents';
+import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 
 import { PaymentOptions } from '../components/PaymentOptions';
 import { useSaleContext } from '../context/SaleContextProvider';
@@ -21,9 +25,10 @@ export function PaymentMethods() {
   const { t } = useTranslation();
   const { viewState, viewDispatch } = useContext(ViewContext);
   const {
-    paymentMethod, setPaymentMethod, sign, disabledPaymentTypes,
+    amount, fromTokenAddress: tokenAddress, paymentMethod, setPaymentMethod, sign, disabledPaymentTypes,
   } = useSaleContext();
   const { sendPageView, sendCloseEvent, sendSelectedPaymentMethod } = useSaleEvent();
+  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const handleOptionClick = (type: SalePaymentTypes) => setPaymentMethod(type);
 
@@ -74,6 +79,18 @@ export function PaymentMethods() {
         <Banner.Icon icon="InformationCircle" />
         <Banner.Caption>
           {t('views.PAYMENT_METHODS.insufficientCoinsBanner.caption')}
+          <Link
+            sx={{ mx: 'base.spacing.x2' }}
+            onClick={
+              () => orchestrationEvents
+                .sendRequestBridgeEvent(eventTarget, IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT, {
+                  amount, tokenAddress,
+                })
+            }
+          >
+            {t('views.PAYMENT_METHODS.insufficientCoinsBanner.captionCTA')}
+          </Link>
+          {t('views.PAYMENT_METHODS.insufficientCoinsBanner.captionEnd')}
         </Banner.Caption>
       </Banner>
     </Box>
