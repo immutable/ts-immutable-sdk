@@ -411,7 +411,7 @@ export class Checkout {
       params.provider,
     );
 
-    return await cancel.cancel(this.config, web3Provider, params.orderIds);
+    return await cancel.cancel(this.config, web3Provider, params.orderIds, params.overrides);
   }
 
   /**
