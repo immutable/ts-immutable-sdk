@@ -153,13 +153,10 @@ export class Exchange {
     gasPrice: CoinAmount<Native> | null,
   ) : Promise<WrapUnwrapTransactionDetails> {
     const calldata = wimxInterface.encodeFunctionData('withdraw', [tokenAmount.value]);
-    // 35216 is the upper bound of the gas estimate for the withdraw function.
-    // The differenfce between upper and normal is less than 0.0001 IMX, so we just use the upper bound
-    // to avoid an extra remote call.
     const gasEstimate = ethers.BigNumber.from(IMX_UNWRAP_GAS_COST);
 
     const gasFeeEstimate = gasPrice ? toPublicAmount(calculateGasFee(gasPrice, gasEstimate)) : null;
-    // 3. Get the transaction details. This is calling `deposit` or `withdraw` on the WETH/WIMX contract.
+    // This transaction is for calling calling `withdraw` on the WETH/WIMX contract.
     const transactionDetails: TransactionDetails = {
       transaction: {
         data: calldata,
@@ -182,14 +179,10 @@ export class Exchange {
     gasPrice: CoinAmount<Native> | null,
   ) : WrapUnwrapTransactionDetails {
     const calldata = wimxInterface.encodeFunctionData('deposit');
-    // 45038 is the upper bound of the gas estimate for the deposit function.
-    // This upper bound is reached when a user is wrapping for the first time (cold + unused storage slot)
-    // The lower bound is 27,938, so the difference is 17,100 gas. If transactions are 10 gwei IMX,
-    // this is about 0.000171 IMX difference. In order to avoid an extra remote call, we just use the upper bound instead.
     const gasEstimate = ethers.BigNumber.from(IMX_WRAP_GAS_COST);
 
     const gasFeeEstimate = gasPrice ? toPublicAmount(calculateGasFee(gasPrice, gasEstimate)) : null;
-    // Get the transaction details. This is calling `deposit` or `withdraw` on the WETH/WIMX contract.
+    // This transaction is for calling calling `deposit` on the WETH/WIMX contract.
     const transactionDetails: TransactionDetails = {
       transaction: {
         data: calldata,
