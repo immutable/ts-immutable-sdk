@@ -10,6 +10,8 @@ export const DEFAULT_TOKEN_DECIMALS = 18;
 
 export const NATIVE = 'native';
 
+export const BRIDGE_GAS_MULTIPLIER = 1.2;
+
 export const ZKEVM_NATIVE_TOKEN = {
   name: 'IMX',
   symbol: 'IMX',

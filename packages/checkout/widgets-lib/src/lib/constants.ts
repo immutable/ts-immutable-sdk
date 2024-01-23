@@ -20,6 +20,8 @@ export const ZERO_BALANCE_STRING = '0.0';
 
 export const FAQS_LINK = 'https://support.immutable.com/en/';
 
+export const BRIDGE_GAS_MULTIPLIER = 1.2;
+
 /**
  * Delay between retries (milliseconds)
  */

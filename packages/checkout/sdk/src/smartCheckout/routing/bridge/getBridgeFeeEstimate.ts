@@ -6,6 +6,7 @@ import {
 import { CheckoutConfiguration } from '../../../config';
 import { CheckoutError, CheckoutErrorType } from '../../../errors';
 import * as instance from '../../../instance';
+import { BRIDGE_GAS_MULTIPLIER } from '../../../env';
 
 export const getBridgeFeeEstimate = async (
   config: CheckoutConfiguration,
@@ -24,7 +25,7 @@ export const getBridgeFeeEstimate = async (
     const bridgeFeeResponse = await bridge.getFee(
       {
         action: BridgeFeeActions.DEPOSIT,
-        gasMultiplier: 1.1,
+        gasMultiplier: BRIDGE_GAS_MULTIPLIER,
         sourceChainId: fromChainId.toString(),
         destinationChainId: toChainId.toString(),
       },

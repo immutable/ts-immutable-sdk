@@ -51,6 +51,7 @@ import {
   getL1ChainId,
   IMX_TOKEN_SYMBOL,
   ETH_TOKEN_SYMBOL,
+  BRIDGE_GAS_MULTIPLIER,
 } from '../../../lib';
 import { TransactionRejected } from '../../../components/TransactionRejected/TransactionRejected';
 import { NotEnoughGas } from '../../../components/NotEnoughGas/NotEnoughGas';
@@ -233,7 +234,7 @@ export function BridgeForm(props: BridgeFormProps) {
 
     const gasEstimate = await tokenBridge!.getFee({
       action: bridgeFeeAction,
-      gasMultiplier: 1.1,
+      gasMultiplier: BRIDGE_GAS_MULTIPLIER,
       sourceChainId: from?.network.toString() ?? '',
       destinationChainId: to?.network.toString() ?? '',
       token: NATIVE.toUpperCase(),

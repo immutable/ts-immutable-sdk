@@ -19,7 +19,7 @@ import { CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext
 import { isMetaMaskProvider, isPassportProvider } from 'lib/providerUtils';
 import { calculateCryptoToFiat, tokenValueFormat } from 'lib/utils';
 import { Web3Provider } from '@ethersproject/providers';
-import { DEFAULT_QUOTE_REFRESH_INTERVAL, DEFAULT_TOKEN_DECIMALS } from 'lib';
+import { BRIDGE_GAS_MULTIPLIER, DEFAULT_QUOTE_REFRESH_INTERVAL, DEFAULT_TOKEN_DECIMALS } from 'lib';
 import { useInterval } from 'lib/hooks/useInterval';
 import { FeesBreakdown } from 'components/FeesBreakdown/FeesBreakdown';
 import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
@@ -126,7 +126,7 @@ export function BridgeReviewSummary() {
         amount: utils.parseUnits(amount, token.decimals),
         sourceChainId: from?.network.toString(),
         destinationChainId: to?.network.toString(),
-        gasMultiplier: 1.1,
+        gasMultiplier: BRIDGE_GAS_MULTIPLIER,
       }),
     ]);
 
