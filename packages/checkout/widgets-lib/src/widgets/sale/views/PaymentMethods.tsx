@@ -20,12 +20,19 @@ import { EventTargetContext } from '../../../context/event-target-context/EventT
 import { PaymentOptions } from '../components/PaymentOptions';
 import { useSaleContext } from '../context/SaleContextProvider';
 import { useSaleEvent } from '../hooks/useSaleEvents';
+import { SaleErrorTypes } from '../types';
 
 export function PaymentMethods() {
   const { t } = useTranslation();
   const { viewState, viewDispatch } = useContext(ViewContext);
   const {
-    amount, fromTokenAddress: tokenAddress, paymentMethod, setPaymentMethod, sign, disabledPaymentTypes,
+    amount,
+    fromTokenAddress: tokenAddress,
+    paymentMethod,
+    setPaymentMethod,
+    sign,
+    disabledPaymentTypes,
+    invalidParameters,
   } = useSaleContext();
   const { sendPageView, sendCloseEvent, sendSelectedPaymentMethod } = useSaleEvent();
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
@@ -97,6 +104,10 @@ export function PaymentMethods() {
   );
 
   useEffect(() => sendPageView(SaleWidgetViews.PAYMENT_METHODS), []);
+  useEffect(() => {
+    if (!invalidParameters) return;
+    goToErrorView(SaleErrorTypes.INVALID_PARAMETERS);
+  }, [invalidParameters]);
 
   return (
     <SimpleLayout

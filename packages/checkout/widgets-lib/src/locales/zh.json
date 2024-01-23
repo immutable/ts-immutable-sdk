@@ -346,6 +346,10 @@
           "description": "抱歉，出了点问题。请再试一次。",
           "primaryAction": "再试一次",
           "secondaryAction": "关闭"
+        },
+        "INVALID_PARAMETERS": {
+          "description": "抱歉，我们无法处理您的订单。客户提供的信息不完整。",
+          "secondaryAction": "关闭"
         }
       }
     },
