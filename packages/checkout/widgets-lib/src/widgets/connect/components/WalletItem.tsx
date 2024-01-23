@@ -12,6 +12,7 @@ export function WalletItem(props: WalletProps) {
   const logo = {
     [WalletProviderName.PASSPORT]: 'PassportSymbolOutlined',
     [WalletProviderName.METAMASK]: 'MetaMaskSymbol',
+    [WalletProviderName.WALLET_CONNECT]: 'WalletConnectSymbol',
   };
 
   return (

@@ -131,6 +131,8 @@ export function ConnectLoader({
     const { isConnected } = await checkout.checkIsWalletConnected({
       provider: localProvider!,
     });
+    console.log('CONNECT LOADER WEB3PROVIDER', localProvider);
+
     if (!isConnected) {
       connectLoaderDispatch({
         payload: {
@@ -172,7 +174,6 @@ export function ConnectLoader({
 
         try {
           const currentNetworkInfo = await checkout.getNetworkInfo({ provider: web3Provider! });
-
           // TODO: do this instead, replace chainId check with below code instead of checkout.getNetworkInfo
           // Also, skip the entire section if it is Passport.
           // const currentChainId = await web3Provider?.getSigner().getChainId();
@@ -222,38 +223,39 @@ export function ConnectLoader({
   return (
     <>
       {(connectionStatus === ConnectionStatus.LOADING) && (
-      <LoadingView loadingText="Loading" />
+        <LoadingView loadingText="Loading" />
       )}
       <ConnectLoaderContext.Provider value={connectLoaderReducerValues}>
         {(connectionStatus === ConnectionStatus.NOT_CONNECTED_NO_PROVIDER
-        || connectionStatus === ConnectionStatus.NOT_CONNECTED
-        || connectionStatus === ConnectionStatus.CONNECTED_WRONG_NETWORK) && (
-          <ConnectWidget
-            config={widgetConfig}
-            targetLayer={networkToSwitchTo}
-            web3Provider={provider}
-            checkout={checkout}
-            deepLink={deepLink}
-            sendCloseEventOverride={closeEvent}
-            allowedChains={allowedChains}
-          />
-        )}
+          || connectionStatus === ConnectionStatus.NOT_CONNECTED
+          || connectionStatus === ConnectionStatus.CONNECTED_WRONG_NETWORK)
+          && (
+            <ConnectWidget
+              config={widgetConfig}
+              targetLayer={networkToSwitchTo}
+              web3Provider={provider}
+              checkout={checkout}
+              deepLink={deepLink}
+              sendCloseEventOverride={closeEvent}
+              allowedChains={allowedChains}
+            />
+          )}
         {/* If the user has connected then render the widget */}
         {connectionStatus === ConnectionStatus.CONNECTED_WITH_NETWORK && (children)}
       </ConnectLoaderContext.Provider>
       {connectionStatus === ConnectionStatus.ERROR && (
-      <ErrorView
-        onCloseClick={closeEvent}
-        onActionClick={() => {
-          connectLoaderDispatch({
-            payload: {
-              type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
-              connectionStatus: ConnectionStatus.NOT_CONNECTED,
-            },
-          });
-        }}
-        actionText="Try Again"
-      />
+        <ErrorView
+          onCloseClick={closeEvent}
+          onActionClick={() => {
+            connectLoaderDispatch({
+              payload: {
+                type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
+                connectionStatus: ConnectionStatus.NOT_CONNECTED,
+              },
+            });
+          }}
+          actionText="Try Again"
+        />
       )}
     </>
   );

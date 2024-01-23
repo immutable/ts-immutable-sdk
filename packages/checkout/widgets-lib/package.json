@@ -25,6 +25,8 @@
     "@imtbl/passport": "0.0.0",
     "@imtbl/react-analytics": "0.2.1-alpha",
     "@imtbl/version-check": "0.0.0",
+    "@walletconnect/ethereum-provider": "^2.11.0",
+    "@walletconnect/modal": "^2.6.2",
     "assert": "^2.0.0",
     "buffer": "^6.0.3",
     "crypto-browserify": "^3.12.0",

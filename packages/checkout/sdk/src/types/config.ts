@@ -43,6 +43,7 @@ export interface CheckoutModuleConfiguration extends ModuleConfiguration<Checkou
   bridge?: CheckoutBridgeConfiguration;
   passport?: Passport;
   publishableKey?: string;
+  walletConnectConfig?: any;
 }
 
 /**

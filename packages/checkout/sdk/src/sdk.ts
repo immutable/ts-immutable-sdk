@@ -68,12 +68,29 @@ import { loadUnresolved } from './widgets/load';
 import { WidgetsInit } from './types/widgets';
 import { HttpClient } from './api/http';
 import { isMatchingAddress } from './utils/utils';
+import { SANDBOX_CHAIN_ID_NETWORK_MAP } from './env';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
     environment: Environment.SANDBOX,
   },
   passport: undefined,
+  walletConnectConfig: {
+    projectId: '45890e806b6248abd01ac1a6e2f46307',
+    showQrModal: true,
+    qrModalOptions: {
+      themeMode: 'dark',
+      themeVariables: {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        '--wcm-background-color': 'black',
+      },
+    },
+    optionalChains: [ChainId.SEPOLIA, ChainId.IMTBL_ZKEVM_TESTNET],
+    rpcMap: {
+      [ChainId.SEPOLIA]: SANDBOX_CHAIN_ID_NETWORK_MAP.get(ChainId.SEPOLIA)!.rpcUrls[0],
+      [ChainId.IMTBL_ZKEVM_TESTNET]: SANDBOX_CHAIN_ID_NETWORK_MAP.get(ChainId.IMTBL_ZKEVM_TESTNET)!.rpcUrls[0],
+    },
+  },
 };
 const WIDGETS_SCRIPT_TIMEOUT = 100;
 
@@ -91,6 +108,8 @@ export class Checkout {
 
   readonly passport?: Passport;
 
+  readonly walletConnectConfig?: any;
+
   /**
    * Constructs a new instance of the CheckoutModule class.
    * @param {CheckoutModuleConfiguration} [config=SANDBOX_CONFIGURATION] - The configuration object for the CheckoutModule.
@@ -104,6 +123,8 @@ export class Checkout {
     this.readOnlyProviders = new Map<ChainId, ethers.providers.JsonRpcProvider>();
     this.availability = availabilityService(this.config.isDevelopment, this.config.isProduction);
     this.passport = config.passport;
+    this.walletConnectConfig = config.walletConnectConfig;
+    console.log('SDK wc chains', config.walletConnectConfig);
   }
 
   /**
@@ -174,7 +195,7 @@ export class Checkout {
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
-      { allowUnsupportedProvider: true } as ValidateProviderOptions,
+      { allowUnsupportedProvider: true, allowMistmatchedChainId: true } as ValidateProviderOptions,
     );
     return connect.checkIsWalletConnected(web3Provider);
   }
@@ -188,10 +209,17 @@ export class Checkout {
   public async connect(
     params: ConnectParams,
   ): Promise<ConnectResult> {
+    if ((params.provider.provider as any)?.isWalletConnect) {
+      await (params.provider.provider as any).disconnect();
+      await (params.provider.provider as any).connect();
+    }
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
-      { allowUnsupportedProvider: true } as ValidateProviderOptions,
+      {
+        allowUnsupportedProvider: true,
+        allowMistmatchedChainId: (params.provider.provider as any)?.isWalletConnect === true,
+      } as ValidateProviderOptions,
     );
 
     await connect.connectSite(web3Provider);
