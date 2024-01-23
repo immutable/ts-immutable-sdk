@@ -270,7 +270,9 @@
         }
       },
       "insufficientCoinsBanner": {
-        "caption": "Insufficient coin balance. Please proceed with card instead."
+        "caption": "Insufficient coin balance. Pay with card to proceed, or",
+        "captionEnd": "and try again.",
+        "captionCTA": "add coins"
       },
       "loading": {
         "ready": "Ready to purchase",
