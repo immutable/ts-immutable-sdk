@@ -270,8 +270,10 @@
         }
       },
       "insufficientCoinsBanner": {
-        "caption": "硬币余额不足。请继续用卡支付。"
-      },
+        "caption": "硬币余额不足。请用卡支付以继续，或者",
+        "captionEnd": "再次尝试。",
+        "captionCTA": "添加硬币"
+      },                 
       "loading": {
         "ready": "准备购买",
         "confirm": "在您的钱包中确认",
@@ -343,6 +345,10 @@
         "DEFAULT_ERROR": {
           "description": "抱歉，出了点问题。请再试一次。",
           "primaryAction": "再试一次",
+          "secondaryAction": "关闭"
+        },
+        "INVALID_PARAMETERS": {
+          "description": "抱歉，我们无法处理您的订单。客户提供的信息不完整。",
           "secondaryAction": "关闭"
         }
       }

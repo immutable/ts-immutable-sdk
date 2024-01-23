@@ -2160,7 +2160,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/design-tokens@npm:*, @biom3/design-tokens@npm:0.2.9":
+"@biom3/design-tokens@npm:*":
   version: 0.2.9
   resolution: "@biom3/design-tokens@npm:0.2.9"
   dependencies:
@@ -2169,9 +2169,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.19.34":
-  version: 0.19.34
-  resolution: "@biom3/react@npm:0.19.34"
+"@biom3/design-tokens@npm:^0.2.10":
+  version: 0.2.10
+  resolution: "@biom3/design-tokens@npm:0.2.10"
+  dependencies:
+    lodash.get: ^4.4.2
+  checksum: f2a3a16087ab7eeb2ebb86d1c97ae3263a20e774cdbcf0d71a1d81d65607e99ff0d2ddb275f71a7334158ac30373fe4ff402a93c8ef206e8d46f5cd9a744c4d2
+  languageName: node
+  linkType: hard
+
+"@biom3/react@npm:^0.19.40":
+  version: 0.19.40
+  resolution: "@biom3/react@npm:0.19.40"
   dependencies:
     "@biom3/design-tokens": "*"
     "@emotion/css": ^11.11.2
@@ -2190,7 +2199,7 @@ __metadata:
     react-is: ^18.2.0
     react-keyed-flatten-children: ^3.0.0
     ts-deepmerge: ^6.2.0
-  checksum: bb0005a870342636e921423d6604b11a3d4dca490a31b5e29230d2a0a94e2f219fbd85d3c6886ba7ed9f92b5a4ea81f5d430cfdd788318ade3bacdba827db13c
+  checksum: cfd094f9276e517a5ff8264214ba0efa04a06734ccc2843691d8288705727a170b4ffd2fafb0f4644baa042b46b5fac3d6e98cf86826f458870b8cece4a0861d
   languageName: node
   linkType: hard
 
@@ -3297,7 +3306,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-sdk-sample-app@workspace:packages/checkout/sdk-sample-app"
   dependencies:
-    "@biom3/react": ^0.19.34
+    "@biom3/react": ^0.19.40
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
@@ -3369,8 +3378,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-widgets-sample-app@workspace:packages/checkout/widgets-sample-app"
   dependencies:
-    "@biom3/design-tokens": 0.2.9
-    "@biom3/react": ^0.19.34
+    "@biom3/design-tokens": ^0.2.10
+    "@biom3/react": ^0.19.40
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
@@ -3398,8 +3407,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-widgets@workspace:packages/checkout/widgets-lib"
   dependencies:
-    "@biom3/design-tokens": 0.2.9
-    "@biom3/react": ^0.19.34
+    "@biom3/design-tokens": ^0.2.10
+    "@biom3/react": ^0.19.40
     "@ethersproject/providers": ^5.7.2
     "@imtbl/bridge-sdk": 0.0.0
     "@imtbl/checkout-sdk": 0.0.0
@@ -3455,7 +3464,7 @@ __metadata:
   resolution: "@imtbl/config@workspace:packages/config"
   dependencies:
     "@imtbl/core-sdk": ^2.4.0
-    "@magic-ext/oidc": ^4.2.0
+    "@magic-ext/oidc": 4.2.0
     "@metamask/detect-provider": ^2.0.0
     "@rollup/plugin-typescript": ^11.0.0
     "@swc/core": ^1.3.36
@@ -3473,7 +3482,7 @@ __metadata:
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
     magic-sdk: ^21.2.0
-    oidc-client-ts: ^2.2.1
+    oidc-client-ts: 2.2.1
     prettier: ^2.8.7
     rollup: ^3.17.2
     ts-node: ^10.9.1
@@ -3645,8 +3654,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/passport-sdk-sample-app@workspace:packages/passport/sdk-sample-app"
   dependencies:
-    "@biom3/design-tokens": 0.2.9
-    "@biom3/react": ^0.19.34
+    "@biom3/design-tokens": ^0.2.10
+    "@biom3/react": ^0.19.40
     "@imtbl/config": 0.0.0
     "@imtbl/core-sdk": ^2.4.0
     "@imtbl/passport": 0.0.0
@@ -3709,7 +3718,7 @@ __metadata:
     jwt-encode: ^1.0.1
     magic-sdk: ^21.2.0
     msw: ^1.2.2
-    oidc-client-ts: ^2.2.1
+    oidc-client-ts: 2.2.1
     prettier: ^2.8.7
     rollup: ^3.17.2
     ts-node: ^10.9.1
@@ -3733,8 +3742,8 @@ __metadata:
   dependencies:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
-    "@biom3/design-tokens": 0.2.9
-    "@biom3/react": ^0.19.34
+    "@biom3/design-tokens": ^0.2.10
+    "@biom3/react": ^0.19.40
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
     "@ethersproject/providers": ^5.7.2
@@ -3754,7 +3763,7 @@ __metadata:
     "@imtbl/x-client": 0.0.0
     "@imtbl/x-provider": 0.0.0
     "@jest/globals": ^29.5.0
-    "@magic-ext/oidc": ^4.2.0
+    "@magic-ext/oidc": 4.2.0
     "@metamask/detect-provider": ^2.0.0
     "@opensea/seaport-js": 2.0.7
     "@rollup/plugin-commonjs": ^24.0.1
@@ -3782,7 +3791,7 @@ __metadata:
     i18next-browser-languagedetector: ^7.2.0
     jwt-decode: ^3.1.2
     magic-sdk: ^21.2.0
-    oidc-client-ts: ^2.2.1
+    oidc-client-ts: 2.2.1
     os-browserify: ^0.3.0
     pako: ^2.1.0
     react-i18next: ^13.5.0
@@ -3808,7 +3817,7 @@ __metadata:
     "@ethersproject/providers": ^5.7.2
     "@ethersproject/wallet": ^5.7.0
     "@imtbl/core-sdk": ^2.4.0
-    "@magic-ext/oidc": ^4.2.0
+    "@magic-ext/oidc": 4.2.0
     "@metamask/detect-provider": ^2.0.0
     "@rollup/plugin-typescript": ^11.0.0
     "@swc/core": ^1.3.36
@@ -3828,7 +3837,7 @@ __metadata:
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
     magic-sdk: ^21.2.0
-    oidc-client-ts: ^2.2.1
+    oidc-client-ts: 2.2.1
     prettier: ^2.8.7
     rollup: ^3.17.2
     ts-node: ^10.9.1
@@ -3877,7 +3886,7 @@ __metadata:
     "@imtbl/config": 0.0.0
     "@imtbl/core-sdk": ^2.4.0
     "@imtbl/toolkit": 0.0.0
-    "@magic-ext/oidc": ^4.2.0
+    "@magic-ext/oidc": 4.2.0
     "@metamask/detect-provider": ^2.0.0
     "@rollup/plugin-typescript": ^11.0.0
     "@swc/core": ^1.3.36
@@ -3895,7 +3904,7 @@ __metadata:
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
     magic-sdk: ^21.2.0
-    oidc-client-ts: ^2.2.1
+    oidc-client-ts: 2.2.1
     prettier: ^2.8.7
     rollup: ^3.17.2
     ts-node: ^10.9.1
@@ -4603,10 +4612,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@magic-ext/oidc@npm:^4.2.0":
+"@magic-ext/oidc@npm:4.2.0":
   version: 4.2.0
   resolution: "@magic-ext/oidc@npm:4.2.0"
   checksum: 7bd51bf45168b7456a963f87c9118617f73c9a7e2c427b4bd786775f5fb80c90e90cbb10069e8a670587a8b20871bf4aa706f9fdef7f5981f007550b2adfc947
+  languageName: node
+  linkType: hard
+
+"@magic-ext/oidc@npm:^4.2.0":
+  version: 4.5.0
+  resolution: "@magic-ext/oidc@npm:4.5.0"
+  checksum: 2188ec50df9ee61ee0890298c2c24479952d0031deb954370dd190effe9811342fe68afc983fa347b2e366d69701c9607d7a40bd79b293f8837c1d3dfb3a72cb
   languageName: node
   linkType: hard
 
@@ -21036,13 +21052,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"oidc-client-ts@npm:^2.2.1":
-  version: 2.2.4
-  resolution: "oidc-client-ts@npm:2.2.4"
+"oidc-client-ts@npm:2.2.1":
+  version: 2.2.1
+  resolution: "oidc-client-ts@npm:2.2.1"
   dependencies:
     crypto-js: ^4.1.1
     jwt-decode: ^3.1.2
-  checksum: fe50944a4141c29f6439581d9850d4d3200a0083ee4e22b15dca8e164a08f53e975d522b1e3aa129b85862e1677c22f789fe90c8668b94482d97c569190657a2
+  checksum: 83bc815d59a1221bdf2a39aff505941f1bf9aba542a59cc9cbe677b85fc06d4f555d55c1b0a6ad8ca76c57bacc423e1b03de5b7cef3d93c403126143f1152943
   languageName: node
   linkType: hard
 
@@ -27943,7 +27959,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "x-provider-sample-app@workspace:packages/x-provider/src/sample-app"
   dependencies:
-    "@biom3/react": ^0.19.34
+    "@biom3/react": ^0.19.40
     "@imtbl/core-sdk": ^2.4.0
     "@imtbl/sdk": 0.0.0
     "@svgr/webpack": ^8.0.1

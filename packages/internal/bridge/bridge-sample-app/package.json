@@ -23,10 +23,12 @@
     "deposit": "node --loader ts-node/esm ./src/deposit.ts",
     "fees": "node --loader ts-node/esm ./src/fees.ts",
     "flowRateInfo": "node --loader ts-node/esm ./src/flowRateInfo.ts",
+    "getMapping": "node --loader ts-node/esm ./src/getMapping.ts",
     "lint": "eslint ./src --ext .ts --max-warnings=0",
     "mapToken": "node --loader ts-node/esm ./src/mapToken.ts",
     "pending": "node --loader ts-node/esm ./src/pending.ts",
     "status": "node --loader ts-node/esm ./src/status.ts",
+    "setFlowRate": "node --loader ts-node/esm ./src/setFlowRate.ts",
     "withdraw": "node --loader ts-node/esm ./src/withdraw.ts",
     "withdrawTx": "node --loader ts-node/esm ./src/withdrawTx.ts"
   },

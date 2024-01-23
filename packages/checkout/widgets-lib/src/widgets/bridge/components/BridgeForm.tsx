@@ -236,6 +236,8 @@ export function BridgeForm(props: BridgeFormProps) {
       gasMultiplier: 1.1,
       sourceChainId: from?.network.toString() ?? '',
       destinationChainId: to?.network.toString() ?? '',
+      token: NATIVE.toUpperCase(),
+      amount: BigNumber.from(0),
     });
 
     const gasEstimateResult = {

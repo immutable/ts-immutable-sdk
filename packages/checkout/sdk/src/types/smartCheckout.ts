@@ -1,4 +1,4 @@
-import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
+import { TransactionRequest, TransactionResponse, Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import { TokenInfo } from './tokenInfo';
 import { OrderFee } from './fees';
@@ -6,7 +6,11 @@ import { OrderFee } from './fees';
 /*
 * Type representing the result of the buy
 */
-export type BuyResult = BuyResultSuccess | BuyResultFailed | BuyResultInsufficientFunds;
+export type BuyResult =
+  BuyResultSuccess |
+  BuyResultFailed |
+  BuyResultFulfillmentsUnsettled |
+  BuyResultInsufficientFunds;
 
 /**
  * Represents the result of {@link Checkout.buy}
@@ -40,6 +44,21 @@ export type BuyResultFailed = {
 
 /**
  * Represents the result of {@link Checkout.buy}
+ * @property {CheckoutStatus.FULFILLMENTS_UNSETTLED} status
+ * @property {SmartCheckoutSufficient} smartCheckoutResult
+ * @property {SendTransactionResult[]} transactions
+ */
+export type BuyResultFulfillmentsUnsettled = {
+  /** The status to indicate success */
+  status: CheckoutStatus.FULFILLMENTS_UNSETTLED,
+  /** The sufficient result of smart checkout */
+  smartCheckoutResult: SmartCheckoutSufficient,
+  /** Array of transaction results */
+  transactions: TransactionResponse[],
+};
+
+/**
+ * Represents the result of {@link Checkout.buy}
  * @property {CheckoutStatus.INSUFFICIENT_FUNDS} status
  * @property {SmartCheckoutInsufficient} smartCheckoutResult
  */
@@ -48,6 +67,15 @@ export type BuyResultInsufficientFunds = {
   status: CheckoutStatus.INSUFFICIENT_FUNDS,
   /** The insufficient result of smart checkout */
   smartCheckoutResult: SmartCheckoutInsufficient
+};
+
+/**
+ * Represents the overrides available for {@link Checkout.buy}
+ * @property {boolean} waitFulfillmentSettlements
+ */
+export type BuyOverrides = {
+  /** If the buy should wait for the fulfillment transactions to settle */
+  waitFulfillmentSettlements?: boolean;
 };
 
 /*
@@ -103,7 +131,7 @@ export type SellResultInsufficientFunds = {
 /*
 * Type representing the result of the cancel
 */
-export type CancelResult = CancelResultSuccess | CancelResultFailed;
+export type CancelResult = CancelResultSuccess | CancelResultFailed | CancelResultFulfillmentsUnsettled;
 
 /**
  * Represents the result of {@link Checkout.cancel}
@@ -130,16 +158,39 @@ export type CancelResultFailed = {
 };
 
 /**
+ * Represents the result of {@link Checkout.cancel}
+ * @property {CheckoutStatus.FULFILLMENTS_UNSETTLED} status
+ * @property {SendTransactionResult[]} transactions
+ */
+export type CancelResultFulfillmentsUnsettled = {
+  /** The status to indicate success */
+  status: CheckoutStatus.FULFILLMENTS_UNSETTLED,
+  /** Array of transaction results */
+  transactions: TransactionResponse[],
+};
+
+/**
+ * Represents the overrides available for {@link Checkout.cancel}
+ * @property {boolean} waitFulfillmentSettlements
+ */
+export type CancelOverrides = {
+  /** If the buy should wait for the fulfillment transactions to settle */
+  waitFulfillmentSettlements?: boolean;
+};
+
+/**
  * An enum representing the checkout status types
  * @enum {string}
  * @property {string} SUCCESS - If checkout succeeded as the transactions were able to be processed
  * @property {string} FAILED - If checkout failed due to transactions not settling on chain
  * @property {string} INSUFFICIENT_FUNDS - If checkout failed due to insufficient funds
+ * @property {string} FULFILLMENTS_UNSETTLED - If checkout succeeded but the fulfillment transactions are not yet settled
  */
 export enum CheckoutStatus {
   SUCCESS = 'SUCCESS',
   FAILED = 'FAILED',
   INSUFFICIENT_FUNDS = 'INSUFFICIENT_FUNDS',
+  FULFILLMENTS_UNSETTLED = 'FULFILLMENTS_UNSETTLED',
 }
 
 /**
