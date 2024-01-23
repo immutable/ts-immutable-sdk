@@ -280,7 +280,7 @@ export class Exchange {
 
     const amountSpecified = newAmount(amount, tokenSpecified);
 
-    if (this.isWrapOrUnwrap(tokenIn, tokenOut)) {
+    if (this.nativeTokenService.isWrapOrUnwrap(tokenIn, tokenOut)) {
       // If the user is swapping between the native token and the wrapped native token,
       // we want to just wrap/unwrap the native token instead of swapping
       return this.getUnsignedWrapUnwrapTx(

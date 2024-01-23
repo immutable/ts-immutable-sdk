@@ -163,19 +163,6 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       expect(decoded.toString()).toEqual([amountOut.value].toString());
     });
 
-    it('should have approval if not already approved', async () => {
-      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
-      const amountOut = newAmountFromString('1', nativeTokenService.wrappedToken);
-      const { approval } = await exchange.getUnsignedSwapTxFromAmountOut(
-        TEST_FROM_ADDRESS,
-        nativeTokenService.wrappedToken.address,
-        'native',
-        amountOut.value,
-      );
-
-      expectToBeDefined(approval);
-    });
-
     it('should have no approval if already approved', async () => {
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
       const amountOut = newAmount(BigNumber.from(APPROVED_AMOUNT), nativeTokenService.wrappedToken);

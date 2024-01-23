@@ -29,7 +29,7 @@ export class NativeTokenService {
     return newAmount(amount.value, this.maybeWrapToken(amount.token));
   }
 
-  private isWrapOrUnwrap(tokenIn: Coin, tokenOut: Coin): boolean {
+  isWrapOrUnwrap(tokenIn: Coin, tokenOut: Coin): boolean {
     return (
       (
         tokenIn === this.nativeToken && (

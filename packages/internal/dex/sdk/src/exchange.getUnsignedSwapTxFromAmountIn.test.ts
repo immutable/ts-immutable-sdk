@@ -171,25 +171,6 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(decoded.toString()).toEqual([amountIn.value].toString());
     });
 
-    it('should have approval if not already approved', async () => {
-      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
-      const amountIn = newAmountFromString('1', nativeTokenService.wrappedToken);
-      const { approval } = await exchange.getUnsignedSwapTxFromAmountIn(
-        TEST_FROM_ADDRESS,
-        nativeTokenService.wrappedToken.address,
-        'native',
-        amountIn.value,
-      );
-
-      expectToBeDefined(approval);
-      expect(approval.transaction.value).toEqual(0);
-      expectToBeDefined(approval.transaction.data);
-      const erc20Interface = ERC20__factory.createInterface();
-      const decoded = erc20Interface.decodeFunctionData('approve(address,uint256)', approval.transaction.data);
-      expect(decoded[0]).toEqual(nativeTokenService.wrappedToken.address);
-      expect(decoded[1]).toEqual(amountIn.value);
-    });
-
     it('should have no approval if already approved', async () => {
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
       const amountIn = newAmount(BigNumber.from(APPROVED_AMOUNT.value), nativeTokenService.wrappedToken);
