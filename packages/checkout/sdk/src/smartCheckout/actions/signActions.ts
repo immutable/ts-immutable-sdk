@@ -24,9 +24,7 @@ export const signApprovalTransactions = async (
     throw new CheckoutError(
       'An error occurred while executing the approval transaction',
       CheckoutErrorType.EXECUTE_APPROVAL_TRANSACTION_ERROR,
-      {
-        message: err.message,
-      },
+      { error: err },
     );
   }
 
@@ -60,9 +58,7 @@ export const signFulfillmentTransactions = async (
     throw new CheckoutError(
       'An error occurred while executing the fulfillment transaction',
       CheckoutErrorType.EXECUTE_FULFILLMENT_TRANSACTION_ERROR,
-      {
-        message: err.message,
-      },
+      { error: err },
     );
   }
 
@@ -101,9 +97,7 @@ export const signMessage = async (
     throw new CheckoutError(
       'An error occurred while signing the message',
       CheckoutErrorType.SIGN_MESSAGE_ERROR,
-      {
-        message: err.message,
-      },
+      { error: err },
     );
   }
 };
