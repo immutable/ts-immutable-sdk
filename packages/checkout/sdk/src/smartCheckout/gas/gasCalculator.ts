@@ -17,6 +17,7 @@ export const estimateGas = async (
     throw new CheckoutError(
       'Failed to estimate gas for transaction',
       CheckoutErrorType.UNPREDICTABLE_GAS_LIMIT,
+      { error: err },
     );
   }
 };
