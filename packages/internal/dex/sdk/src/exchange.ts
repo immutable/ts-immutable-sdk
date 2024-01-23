@@ -1,4 +1,4 @@
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
 import assert from 'assert';
 import { DuplicateAddressesError, InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError } from 'errors';
@@ -8,6 +8,7 @@ import { getOurQuoteReqAmount, prepareUserQuote } from 'lib/transactionUtils/get
 import { Fees } from 'lib/fees';
 import { Multicall__factory, ImmutableSwapProxy__factory, WIMX__factory } from 'contracts/types';
 import { NativeTokenService } from 'lib/nativeTokenService';
+import { IMX_UNWRAP_GAS_COST, IMX_WRAP_GAS_COST } from 'constants/wrapping';
 import { DEFAULT_MAX_HOPS, DEFAULT_SLIPPAGE, MAX_MAX_HOPS, MIN_MAX_HOPS } from './constants';
 import { Router } from './lib/router';
 import {
@@ -155,16 +156,7 @@ export class Exchange {
     // 35216 is the upper bound of the gas estimate for the withdraw function.
     // The differenfce between upper and normal is less than 0.0001 IMX, so we just use the upper bound
     // to avoid an extra remote call.
-    const gasEstimate = ethers.BigNumber.from('35216');
-
-    const approval = await getApproval(
-      this.provider,
-      fromAddress,
-      {
-        spender: this.wrappedNativeToken.address, amount: tokenAmount,
-      },
-      gasPrice,
-    );
+    const gasEstimate = ethers.BigNumber.from(IMX_UNWRAP_GAS_COST);
 
     const gasFeeEstimate = gasPrice ? toPublicAmount(calculateGasFee(gasPrice, gasEstimate)) : null;
     // 3. Get the transaction details. This is calling `deposit` or `withdraw` on the WETH/WIMX contract.
@@ -179,13 +171,13 @@ export class Exchange {
 
     return {
       transaction: transactionDetails,
-      approval,
+      approval: null,
     };
   }
 
   private getWrapTransaction(
     fromAddress: string,
-    tokenAmount: CoinAmount<ERC20>,
+    tokenAmount: BigNumber,
     wimxInterface: ethers.utils.Interface,
     gasPrice: CoinAmount<Native> | null,
   ) : WrapUnwrapTransactionDetails {
@@ -194,7 +186,7 @@ export class Exchange {
     // This upper bound is reached when a user is wrapping for the first time (cold + unused storage slot)
     // The lower bound is 27,938, so the difference is 17,100 gas. If transactions are 10 gwei IMX,
     // this is about 0.000171 IMX difference. In order to avoid an extra remote call, we just use the upper bound instead.
-    const gasEstimate = ethers.BigNumber.from('45038');
+    const gasEstimate = ethers.BigNumber.from(IMX_WRAP_GAS_COST);
 
     const gasFeeEstimate = gasPrice ? toPublicAmount(calculateGasFee(gasPrice, gasEstimate)) : null;
     // Get the transaction details. This is calling `deposit` or `withdraw` on the WETH/WIMX contract.
@@ -202,7 +194,7 @@ export class Exchange {
       transaction: {
         data: calldata,
         to: this.wrappedNativeToken.address, // wrapping and unwrapping is done on the WETH/WIMX contract itself
-        value: ethers.BigNumber.from(tokenAmount.value), // Wrapping involves sending the native asset as TX.value
+        value: tokenAmount, // Wrapping involves sending the native asset as TX.value
         from: fromAddress,
       },
       gasFeeEstimate,
@@ -241,7 +233,7 @@ export class Exchange {
     if (isWrap) {
       transactionDetails = this.getWrapTransaction(
         fromAddress,
-        otherTokenCoinAmount as CoinAmount<ERC20>,
+        otherTokenCoinAmount.value,
         wimxInterface,
         gasPrice,
       );
@@ -255,21 +247,6 @@ export class Exchange {
     }
 
     return { quote, approval: transactionDetails.approval, swap: transactionDetails.transaction };
-  }
-
-  private isWrapOrUnwrap(tokenIn: Coin, tokenOut: Coin): boolean {
-    return (
-      (
-        tokenIn === this.nativeToken && (
-          tokenOut.type === 'erc20' && tokenOut.address === this.wrappedNativeToken.address
-        )
-      ) ||
-      (
-        (
-          tokenIn.type === 'erc20' && tokenIn.address === this.wrappedNativeToken.address
-        ) && tokenOut === this.nativeToken
-      )
-    );
   }
 
   private async getUnsignedSwapTx(
