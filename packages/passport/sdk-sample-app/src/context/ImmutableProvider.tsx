@@ -15,6 +15,7 @@ import {
 } from '@/config';
 import { EnvironmentNames } from '@/types';
 import useLocalStorage from '@/hooks/useLocalStorage';
+import { ImxApiClients, createConfig } from '@imtbl/generated-clients';
 
 const getCoreSdkConfig = (environment: EnvironmentNames) => {
   switch (environment) {
@@ -81,6 +82,9 @@ const getPassportConfig = (environment: EnvironmentNames): PassportModuleConfigu
           magicProviderId: 'C9odf7hU4EQ5EufcfgYfcBaT5V6LhocXyiPRhIjw2EY=',
           passportDomain: 'https://passport.dev.immutable.com',
           imxPublicApiDomain: 'https://api.dev.immutable.com',
+          imxApiClients: new ImxApiClients(createConfig({
+            basePath: 'https://api.dev.immutable.com',
+          })),
           immutableXClient: new ImmutableXClient({
             baseConfig,
             overrides: {
