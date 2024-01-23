@@ -270,8 +270,10 @@
         }
       },
       "insufficientCoinsBanner": {
-        "caption": "硬币余额不足。请继续用卡支付。"
-      },
+        "caption": "硬币余额不足。请用卡支付以继续，或者",
+        "captionEnd": "再次尝试。",
+        "captionCTA": "添加硬币"
+      },                 
       "loading": {
         "ready": "准备购买",
         "confirm": "在您的钱包中确认",
@@ -300,6 +302,14 @@
         },
         "SERVICE_BREAKDOWN": {
           "description": "抱歉，我们现在无法处理您的付款。请几分钟后再试。",
+          "secondaryAction": "关闭"
+        },
+        "PRODUCT_NOT_FOUND": {
+          "description": "抱歉，所请求的数量缺货。请考虑购买较少数量。",
+          "secondaryAction": "关闭"
+        },
+        "INSUFFICIENT_STOCK": {
+          "description": "抱歉，库存不足。请考虑购买较少数量。",
           "secondaryAction": "关闭"
         },
         "TRANSAK_FAILED": {
@@ -335,6 +345,10 @@
         "DEFAULT_ERROR": {
           "description": "抱歉，出了点问题。请再试一次。",
           "primaryAction": "再试一次",
+          "secondaryAction": "关闭"
+        },
+        "INVALID_PARAMETERS": {
+          "description": "抱歉，我们无法处理您的订单。客户提供的信息不完整。",
           "secondaryAction": "关闭"
         }
       }

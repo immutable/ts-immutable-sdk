@@ -270,8 +270,10 @@
         }
       },
       "insufficientCoinsBanner": {
-        "caption": "코인 잔액이 부족합니다. 대신 카드로 진행하세요."
-      },
+        "caption": "코인 잔액이 부족합니다. 계속 진행하려면 카드로 결제하거나",
+        "captionEnd": "다시 시도하십시오.",
+        "captionCTA": "코인 추가"
+      },            
       "loading": {
         "ready": "구매 준비됨",
         "confirm": "지갑에서 확인하세요",
@@ -300,6 +302,14 @@
         },
         "SERVICE_BREAKDOWN": {
           "description": "죄송합니다, 현재 지불 처리가 불가능합니다. 몇 분 후에 다시 시도하세요.",
+          "secondaryAction": "닫기"
+        },
+        "PRODUCT_NOT_FOUND": {
+          "description": "죄송합니다, 이 상품은 더 이상 구매할 수 없습니다.",
+          "secondaryAction": "닫기"
+        },
+        "INSUFFICIENT_STOCK": {
+          "description": "죄송합니다. 요청하신 수량은 재고가 없습니다. 더 적은 수량을 고려해 주십시오.",
           "secondaryAction": "닫기"
         },
         "TRANSAK_FAILED": {
@@ -335,6 +345,10 @@
         "DEFAULT_ERROR": {
           "description": "죄송합니다, 문제가 발생했습니다. 다시 시도하세요.",
           "primaryAction": "다시 시도",
+          "secondaryAction": "닫기"
+        },
+        "INVALID_PARAMETERS": {
+          "description": "죄송합니다. 주문을 처리할 수 없습니다. 고객으로부터의 정보가 누락되었습니다.",
           "secondaryAction": "닫기"
         }
       }

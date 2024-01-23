@@ -23,10 +23,10 @@ export const availabilityService = (
 
     try {
       response = await axios.post(`${postEndpoint()}/v1/availability/checkout/swap`);
-    } catch (error: any) {
+    } catch (err: any) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx
-      response = error.response;
+      response = err.response;
 
       // If 403 then the service is geo-blocked
       if (response.status === 403) return false;
@@ -34,6 +34,7 @@ export const availabilityService = (
       throw new CheckoutError(
         `Error fetching from api: ${response.status} ${response.statusText}`,
         CheckoutErrorType.API_ERROR,
+        { error: err },
       );
     }
 

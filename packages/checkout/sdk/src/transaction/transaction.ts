@@ -31,23 +31,27 @@ export const sendTransaction = async (
       throw new CheckoutError(
         err.message,
         CheckoutErrorType.INSUFFICIENT_FUNDS,
+        { error: err },
       );
     }
     if (err.code === ethers.errors.ACTION_REJECTED) {
       throw new CheckoutError(
         err.message,
         CheckoutErrorType.USER_REJECTED_REQUEST_ERROR,
+        { error: err },
       );
     }
     if (err.code === ethers.errors.UNPREDICTABLE_GAS_LIMIT) {
       throw new CheckoutError(
         err.message,
         CheckoutErrorType.UNPREDICTABLE_GAS_LIMIT,
+        { error: err },
       );
     }
     throw new CheckoutError(
       err.message,
       CheckoutErrorType.TRANSACTION_FAILED,
+      { error: err },
     );
   }
 };
