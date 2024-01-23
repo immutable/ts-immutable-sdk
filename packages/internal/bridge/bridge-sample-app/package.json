@@ -23,6 +23,7 @@
     "deposit": "node --loader ts-node/esm ./src/deposit.ts",
     "fees": "node --loader ts-node/esm ./src/fees.ts",
     "flowRateInfo": "node --loader ts-node/esm ./src/flowRateInfo.ts",
+    "getMapping": "node --loader ts-node/esm ./src/getMapping.ts",
     "lint": "eslint ./src --ext .ts --max-warnings=0",
     "mapToken": "node --loader ts-node/esm ./src/mapToken.ts",
     "pending": "node --loader ts-node/esm ./src/pending.ts",

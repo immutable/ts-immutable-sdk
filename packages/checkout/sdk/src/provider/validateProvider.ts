@@ -54,6 +54,7 @@ export async function validateProvider(
         throw new CheckoutError(
           'Unable to detect the web3Provider network',
           CheckoutErrorType.WEB3_PROVIDER_ERROR,
+          { error: err },
         );
       }
 

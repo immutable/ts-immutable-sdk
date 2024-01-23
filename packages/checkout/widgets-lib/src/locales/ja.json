@@ -347,6 +347,10 @@
           "description": "申し訳ありませんが、何かがうまくいかなかったようです。もう一度お試しください。",
           "primaryAction": "もう一度試す",
           "secondaryAction": "閉じる"
+        },
+        "INVALID_PARAMETERS": {
+          "description": "申し訳ありませんが、ご注文を処理できません。クライアントからの情報が不足しています。",
+          "secondaryAction": "閉じる"
         }
       }
     },
