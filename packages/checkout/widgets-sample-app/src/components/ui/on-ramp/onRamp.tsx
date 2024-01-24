@@ -1,10 +1,9 @@
 import { Checkout, OnRampEventType, WidgetTheme, WidgetType } from "@imtbl/checkout-sdk";
 import { useEffect, useMemo } from "react";
 import { WidgetsFactory } from "@imtbl/checkout-widgets";
-import { Environment } from "@imtbl/config";
 
 function OnRampUI() {
-  const checkout = useMemo(() => new Checkout({ baseConfig: { environment: Environment.SANDBOX } }), [])
+  const checkout = useMemo(() => new Checkout(), [])
   const onRamp = useMemo(() => new WidgetsFactory(checkout, {}).create(WidgetType.ONRAMP), [checkout])
 
   const unmount = () => {onRamp.unmount()}
