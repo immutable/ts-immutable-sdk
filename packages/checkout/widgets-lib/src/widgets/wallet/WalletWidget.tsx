@@ -1,9 +1,10 @@
 import {
-  useCallback,
-  useContext, useEffect, useMemo, useReducer, useState,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
 } from 'react';
-import { GetBalanceResult, IMTBLWidgetEvents, WalletWidgetParams } from '@imtbl/checkout-sdk';
-import { DEFAULT_BALANCE_RETRY_POLICY } from 'lib';
+import { IMTBLWidgetEvents, WalletWidgetParams } from '@imtbl/checkout-sdk';
 import { UserJourney } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import {
   initialWalletState,
@@ -17,11 +18,11 @@ import { LoadingView } from '../../views/loading/LoadingView';
 import { sendWalletWidgetCloseEvent } from './WalletWidgetEvents';
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import {
-  viewReducer,
   initialViewState,
+  SharedViews,
   ViewActions,
   ViewContext,
-  SharedViews,
+  viewReducer,
 } from '../../context/view-context/ViewContext';
 import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
 import { Settings } from './views/Settings';
@@ -31,7 +32,7 @@ import { TopUpView } from '../../views/top-up/TopUpView';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { text } from '../../resources/text/textConfig';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
-import { getTokenBalances } from './functions/tokenBalances';
+import { useBalance } from '../../lib/hooks/useBalance';
 
 export type WalletWidgetInputs = WalletWidgetParams & {
   config: StrongCheckoutWidgetsConfig
@@ -75,7 +76,32 @@ export function WalletWidget(props: WalletWidgetInputs) {
     [viewState, viewDispatch],
   );
 
-  const [balancesLoading, setBalancesLoading] = useState(true);
+  const { balancesLoading, refreshBalances } = useBalance({
+    checkout,
+    provider,
+    refreshCallback: (balances) => {
+      walletDispatch({
+        payload: {
+          type: WalletActions.SET_TOKEN_BALANCES,
+          tokenBalances: balances,
+        },
+      });
+    },
+    errorCallback: (error) => {
+      // eslint-disable-next-line no-console
+      console.error(error);
+
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SharedViews.ERROR_VIEW,
+            error: new Error('Unable to fetch balances'),
+          },
+        },
+      });
+    },
+  });
 
   /* Set Config into WalletState */
   useEffect(() => {
@@ -104,18 +130,6 @@ export function WalletWidget(props: WalletWidgetInputs) {
     })();
   }, [isBridgeEnabled, isSwapEnabled, isOnRampEnabled, environment]);
 
-  const showErrorView = useCallback(() => {
-    viewDispatch({
-      payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: {
-          type: SharedViews.ERROR_VIEW,
-          error: new Error('Unable to fetch balances'),
-        },
-      },
-    });
-  }, [viewDispatch]);
-
   const initialiseWallet = async () => {
     if (!checkout || !provider) return;
 
@@ -131,31 +145,13 @@ export function WalletWidget(props: WalletWidgetInputs) {
       }
 
       /** Fetch the user's balances based on their connected provider and correct network */
-      setBalancesLoading(true);
-
-      /** Go to Wallet Balances view while it is still loading */
+      refreshBalances();
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: { type: WalletWidgetViews.WALLET_BALANCES },
         },
       });
-
-      let balances: GetBalanceResult[] = [];
-      try {
-        balances = await getTokenBalances(checkout, provider, network.chainId);
-        walletDispatch({
-          payload: {
-            type: WalletActions.SET_TOKEN_BALANCES,
-            tokenBalances: balances,
-          },
-        });
-      } catch (error: any) {
-        if (DEFAULT_BALANCE_RETRY_POLICY.nonRetryable!(error)) {
-          showErrorView();
-          return;
-        }
-      }
 
       walletDispatch({
         payload: {
@@ -173,17 +169,12 @@ export function WalletWidget(props: WalletWidgetInputs) {
           },
         },
       });
-    } finally {
-      /** always set balances loading false at the end  */
-      setBalancesLoading(false);
     }
   };
 
   useEffect(() => {
     if (!checkout || !provider) return;
-    (async () => {
-      initialiseWallet();
-    })();
+    initialiseWallet();
   }, [checkout, provider]);
 
   const errorAction = async () => {
