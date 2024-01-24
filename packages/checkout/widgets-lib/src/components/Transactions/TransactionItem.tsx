@@ -123,14 +123,7 @@ export function TransactionItem({
             <MenuItem.Caption>
               <Link
                 size="xSmall"
-                rc={(
-                  <a
-                    target="_blank"
-                    href="#"
-                    rel="noreferrer"
-                    onClick={() => handleDetailsLinkClick(details)}
-                  />
-                )}
+                onClick={() => handleDetailsLinkClick(details)}
               >
                 {details.text}
               </Link>
