@@ -9,11 +9,10 @@
   "modules": {
     "config": "prod",
     "blockchain_data": "prod",
-    "immutablex_client": "prod",
     "passport": "prod",
     "orderbook": "prod",
-    "provider": "prod",
-    "checkout": "prod"
+    "checkout": "prod",
+    "x": "prod"
   },
   "fileCopy": [
     {
