@@ -113,6 +113,15 @@ export class ZkEvmProvider implements Provider {
       && this.guardianClient !== undefined;
   }
 
+  private async refreshUserLogin() {
+    const user = await this.authManager.getUser() as UserZkEvm | null;
+    if (user !== null) {
+      this.user = user;
+    } else {
+      throw new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - attempt to refresh access token failed');
+    }
+  }
+
   private async performRequest(request: RequestArguments): Promise<any> {
     switch (request.method) {
       case 'eth_requestAccounts': {
@@ -147,6 +156,7 @@ export class ZkEvmProvider implements Provider {
         if (!this.isLoggedIn()) {
           throw new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
         }
+        await this.refreshUserLogin();
 
         return sendTransaction({
           params: request.params || [],
@@ -165,6 +175,7 @@ export class ZkEvmProvider implements Provider {
         if (!this.isLoggedIn()) {
           throw new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
         }
+        await this.refreshUserLogin();
 
         return signTypedDataV4({
           method: request.method,

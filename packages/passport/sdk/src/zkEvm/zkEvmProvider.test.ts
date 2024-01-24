@@ -1,4 +1,5 @@
 import { JsonRpcProvider } from '@ethersproject/providers';
+import AuthManager from 'authManager';
 import { ZkEvmProviderInput, ZkEvmProvider } from './zkEvmProvider';
 import { loginZkEvmUser } from './user';
 import { sendTransaction } from './sendTransaction';
@@ -27,6 +28,7 @@ describe('ZkEvmProvider', () => {
   const getProvider = () => {
     const constructorParameters = {
       config: {},
+      authManager: { getUser: jest.fn().mockResolvedValue(mockUserZkEvm) } as unknown as AuthManager,
       passportEventEmitter,
     } as Partial<ZkEvmProviderInput>;
 
