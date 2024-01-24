@@ -3,7 +3,7 @@ import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { SendTransactionResult } from '../types';
 import { IMMUTABLE_ZKVEM_GAS_OVERRIDES } from '../env';
-import { isZkEvmChainId } from '../network';
+import { isZkEvmChainId } from '../utils/utils';
 
 export const setTransactionGasLimits = async (
   web3Provider: Web3Provider,
