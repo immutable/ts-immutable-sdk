@@ -1,7 +1,11 @@
 import { Wallet } from '@ethersproject/wallet';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { ethers } from 'ethers';
-import { imxClientCreateStarkSigner, ImxClientWalletConnection, UnsignedOrderRequest } from '@imtbl/sdk/x_client';
+import {
+  imxClientCreateStarkSigner,
+  ImxClientWalletConnection,
+  UnsignedOrderRequest,
+} from '@imtbl/sdk/x';
 import { Environment, ImmutableConfiguration } from '@imtbl/sdk/config';
 import {
   Balance, CreateTransferResponseV1, CreateWithdrawalResponse, MintResultDetails,

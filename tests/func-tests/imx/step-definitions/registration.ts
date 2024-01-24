@@ -3,8 +3,11 @@ import { Wallet } from '@ethersproject/wallet';
 import {
   generateStarkPrivateKey,
 } from '@imtbl/core-sdk';
-import { ProviderConfiguration, GenericIMXProvider } from '@imtbl/sdk/x_provider';
-import { imxClientCreateStarkSigner } from '@imtbl/sdk/x_client';
+import {
+  ProviderConfiguration,
+  GenericIMXProvider,
+  imxClientCreateStarkSigner,
+} from '@imtbl/sdk/x';
 import { configuration, StepSharedState } from './stepSharedState';
 import { getProvider, env } from '../common';
 

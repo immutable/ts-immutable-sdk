@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { parseEther } from '@ethersproject/units';
-import { ImxClientModuleConfiguration } from '@imtbl/sdk/x_client';
-import { GenericIMXProvider, ProviderConfiguration } from '@imtbl/sdk/x_provider';
+import {
+  ImxClientModuleConfiguration,
+  GenericIMXProvider,
+  ProviderConfiguration,
+} from '@imtbl/sdk/x';
 import { env, getProvider } from 'common';
 import { configuration, StepSharedState } from './stepSharedState';
 
