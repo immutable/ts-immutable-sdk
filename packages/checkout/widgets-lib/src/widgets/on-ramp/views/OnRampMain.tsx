@@ -1,7 +1,7 @@
 import { Passport } from '@imtbl/passport';
 import { Box } from '@biom3/react';
 import {
-  useContext, useEffect, useMemo, useState,
+  useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
 import { ExchangeType } from '@imtbl/checkout-sdk';
 import url from 'url';
@@ -38,6 +38,8 @@ export function OnRampMain({
   const { header } = text.views[OnRampWidgetViews.ONRAMP];
   const { viewState, viewDispatch } = useContext(ViewContext);
   const [widgetUrl, setWidgetUrl] = useState<string>('');
+
+  const eventTimer = useRef<number | undefined>();
 
   const isPassport = !!passport && (provider?.provider as any)?.isPassport;
 
@@ -105,6 +107,8 @@ export function OnRampMain({
     }
   };
   const transakEventHandler = (event: TransakEventData) => {
+    if (eventTimer.current) clearTimeout(eventTimer.current);
+
     if (event.event_id === TransakEvents.TRANSAK_WIDGET_OPEN) {
       viewDispatch({
         payload: {
@@ -134,7 +138,7 @@ export function OnRampMain({
           },
         },
       });
-      setTimeout(() => {
+      eventTimer.current = window.setTimeout(() => {
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,
