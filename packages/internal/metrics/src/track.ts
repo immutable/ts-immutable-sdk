@@ -1,6 +1,4 @@
-import { POLLING_FREQUENCY } from './utils/constants';
 import { initialise, isInitialised } from './initialise';
-import { post } from './utils/request';
 import {
   addEvent,
   flattenProperties,
@@ -9,6 +7,9 @@ import {
   removeSentEvents,
 } from './utils/state';
 import { errorBoundary } from './utils/errorBoundary';
+import { post } from './utils/request';
+import { isTestEnvironment } from './utils/checkEnv';
+import { POLLING_FREQUENCY } from './utils/constants';
 
 // Store the event in the event store
 const trackFn = (
@@ -67,4 +68,6 @@ const flushPoll = async () => {
   setTimeout(flushPoll, POLLING_FREQUENCY);
 };
 // This will get initialised when module is imported.
-errorBoundary(flushPoll)();
+if (!isTestEnvironment()) {
+  errorBoundary(flushPoll)();
+}
