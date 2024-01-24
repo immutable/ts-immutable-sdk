@@ -59,7 +59,7 @@ export function TransactionItem({
       },
     });
 
-    window.open(`${linkDetail.link}${linkDetail.hash}`);
+    window.open(`${linkDetail.link}${linkDetail.hash}`, '_blank');
   };
 
   return (
