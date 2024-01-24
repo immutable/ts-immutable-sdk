@@ -54,9 +54,16 @@ jobs:
       - run: echo "check-result = ${{ steps.check_user_permission.outputs.check-result }}"
       - run: echo "check-result = ${{ steps.check_user_permission.outputs.check-result }}"
 
-      - name: Exit Early
-        if: ${{ github.triggering_actor == 'CodeSchwert' }}
+      - name: Admin Permission Check
+        if: ${{ steps.check_user_permission.outputs.require-result == true }}
+        run: echo "${{ github.triggering_actor }} has admin permission"
+
+      - name: Admin Permission Check - Early Exit
+        if: ${{ steps.check_user_permission.outputs.require-result != true }}
         run: exit 1
+
+      - name: Foo
+        run: echo "Foo"
 
       # - name: Check Public Release Branch
       #   if: contains(github.event.inputs.release_type, 'release') && (github.ref != 'refs/heads/main')
