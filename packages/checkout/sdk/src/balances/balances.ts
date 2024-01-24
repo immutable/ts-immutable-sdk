@@ -253,6 +253,7 @@ export const getAllBalances = async (
   web3Provider: Web3Provider | undefined,
   walletAddress: string | undefined,
   chainId: ChainId,
+  forceFetch: boolean = false,
 ): Promise<GetAllBalancesResult> => {
   if (!walletAddress && !web3Provider) {
     throw new CheckoutError(
@@ -285,6 +286,10 @@ export const getAllBalances = async (
   } catch (err: any) {
     // eslint-disable-next-line no-console
     console.error(err);
+  }
+
+  if (forceFetch) {
+    resetBlockscoutClientMap();
   }
 
   let address = walletAddress;
