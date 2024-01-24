@@ -3,13 +3,20 @@ import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { SendTransactionResult } from '../types';
 import { GAS_OVERRIDES } from '../env';
+import { isZkEvmChainId } from '../utils/utils';
 
-export const setTransactionGasLimits = (
+export const setTransactionGasLimits = async (
+  web3Provider: Web3Provider,
   transaction: TransactionRequest,
-): TransactionRequest => {
+): Promise<TransactionRequest> => {
   const rawTx = transaction;
+
+  const { chainId } = await web3Provider.getNetwork();
+  if (!isZkEvmChainId(chainId)) return rawTx;
+
   rawTx.maxFeePerGas = GAS_OVERRIDES.maxFeePerGas;
   rawTx.maxPriorityFeePerGas = GAS_OVERRIDES.maxPriorityFeePerGas;
+
   return rawTx;
 };
 
@@ -20,7 +27,7 @@ export const sendTransaction = async (
   try {
     const signer = web3Provider.getSigner();
 
-    const rawTx = setTransactionGasLimits(transaction);
+    const rawTx = await setTransactionGasLimits(web3Provider, transaction);
     const transactionResponse = await signer.sendTransaction(rawTx);
 
     return {

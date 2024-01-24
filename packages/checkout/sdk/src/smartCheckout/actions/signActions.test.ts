@@ -6,6 +6,7 @@ import { signApprovalTransactions, signFulfillmentTransactions, signMessage } fr
 import { CheckoutErrorType } from '../../errors';
 import { SignTransactionStatusType, UnsignedMessage } from './types';
 import { GAS_OVERRIDES } from '../../env';
+import { ChainId, NetworkInfo } from '../../types';
 
 describe('signActions', () => {
   let mockProvider: Web3Provider;
@@ -13,6 +14,9 @@ describe('signActions', () => {
   describe('signApprovalTransactions', () => {
     it('should sign approval transactions', async () => {
       mockProvider = {
+        getNetwork: jest.fn().mockReturnValue({
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        } as NetworkInfo),
         getSigner: jest.fn().mockReturnValue({
           sendTransaction: jest.fn().mockResolvedValue({
             wait: jest.fn().mockResolvedValue({
@@ -54,6 +58,9 @@ describe('signActions', () => {
 
     it('should return failed when approval transaction reverted', async () => {
       mockProvider = {
+        getNetwork: jest.fn().mockReturnValue({
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        } as NetworkInfo),
         getSigner: jest.fn().mockReturnValue({
           sendTransaction: jest.fn().mockResolvedValue({
             wait: jest.fn().mockResolvedValue({
@@ -114,6 +121,9 @@ describe('signActions', () => {
   describe('signFulfillmentTransactions', () => {
     it('should sign fulfillment transactions', async () => {
       mockProvider = {
+        getNetwork: jest.fn().mockReturnValue({
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        } as NetworkInfo),
         getSigner: jest.fn().mockReturnValue({
           sendTransaction: jest.fn().mockResolvedValue({
             wait: jest.fn().mockResolvedValue({
@@ -152,6 +162,9 @@ describe('signActions', () => {
 
     it('should return failed when approval transaction reverted', async () => {
       mockProvider = {
+        getNetwork: jest.fn().mockReturnValue({
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        } as NetworkInfo),
         getSigner: jest.fn().mockReturnValue({
           sendTransaction: jest.fn().mockResolvedValue({
             wait: jest.fn().mockResolvedValue({
