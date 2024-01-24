@@ -55,11 +55,11 @@ jobs:
       - run: echo "check-result = ${{ steps.check_user_permission.outputs.check-result }}"
 
       - name: Admin Permission Check
-        if: ${{ steps.check_user_permission.outputs.require-result == true }}
+        if: ${{ steps.check_user_permission.outputs.require-result == 'true' }}
         run: echo "${{ github.triggering_actor }} has admin permission"
 
       - name: Admin Permission Check - Early Exit
-        if: ${{ steps.check_user_permission.outputs.require-result != true }}
+        if: ${{ steps.check_user_permission.outputs.require-result != 'true' }}
         run: exit 1
 
       - name: Foo
