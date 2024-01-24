@@ -5,8 +5,10 @@ import {
   ConfigurationParameters as ApiConfigurationParameters,
 } from '../imx';
 
+const sdkVersion = '__SDK_VERSION__';
+
 // eslint-disable-next-line @typescript-eslint/naming-convention
-const defaultHeaders = { 'x-sdk-version': 'ts-immutable-sdk-__SDK_VERSION__' };
+const defaultHeaders = { 'x-sdk-version': `ts-immutable-sdk-${sdkVersion}` };
 
 /**
  * Configuration for generated clients
