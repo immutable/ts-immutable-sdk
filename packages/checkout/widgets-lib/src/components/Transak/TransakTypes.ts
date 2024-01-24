@@ -2,7 +2,7 @@ export type TransakNFTData = {
   collectionAddress: string;
   imageURL: string;
   nftName: string;
-  nftType: 'ERC721';
+  nftType: string;
   price: number[];
   quantity: number;
   tokenID: string[];

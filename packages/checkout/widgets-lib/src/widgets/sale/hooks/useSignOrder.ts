@@ -36,12 +36,13 @@ type SignApiTransaction = {
 };
 
 type SignApiProduct = {
+  product_id: string;
+  collection_address: string
+  contract_type: string
   detail: {
     amount: number;
-    collection_address: string;
     token_id: string;
   }[];
-  product_id: string;
 };
 
 type SignApiResponse = {
@@ -93,7 +94,8 @@ const toSignedProduct = (
   name: item?.name || '',
   description: item?.description || '',
   currency,
-  collectionAddress: product.detail[0]?.collection_address,
+  contractType: product.contract_type,
+  collectionAddress: product.collection_address,
   amount: product.detail.map(({ amount }) => amount),
   tokenId: product.detail.map(({ token_id: tokenId }) => tokenId),
 });
