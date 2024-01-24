@@ -194,7 +194,11 @@ export class Checkout {
       { allowUnsupportedProvider: true } as ValidateProviderOptions,
     );
 
-    await connect.connectSite(web3Provider);
+    if (params.requestWalletPermissions && !(web3Provider.provider as any)?.isPassport) {
+      await connect.requestPermissions(web3Provider);
+    } else {
+      await connect.connectSite(web3Provider);
+    }
 
     return { provider: web3Provider };
   }
