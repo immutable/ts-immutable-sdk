@@ -50,6 +50,7 @@ import { ApproveTransaction } from './views/ApproveTransaction';
 import { ErrorView } from '../../views/error/ErrorView';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { sendBridgeFailedEvent, sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
+import { ClaimWithdrawal } from './views/ClaimWithdrawal';
 
 export type BridgeWidgetInputs = BridgeWidgetParams & {
   config: StrongCheckoutWidgetsConfig,
@@ -215,6 +216,9 @@ export function BridgeWidget({
           )}
           {viewState.view.type === BridgeWidgetViews.TRANSACTIONS && (
             <Transactions checkout={checkout} />
+          )}
+          {viewState.view.type === BridgeWidgetViews.CLAIM_WITHDRAWAL && (
+            <ClaimWithdrawal transaction={viewState.view.transaction} />
           )}
           {viewState.view.type === SharedViews.ERROR_VIEW && (
             <ErrorView

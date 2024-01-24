@@ -55,7 +55,11 @@
     },
     "ERROR_VIEW": {
       "heading": "Something's gone wrong",
-      "body": ["You can try again or contact", "support", "for help."],
+      "body": [
+        "You can try again or contact",
+        "support",
+        "for help."
+      ],
       "actionText": "Try again"
     },
     "SERVICE_UNAVAILABLE_ERROR_VIEW": {
@@ -442,6 +446,20 @@
       "heading": "Move in progress",
       "body1": "Less than 3 mins until your ${symbol} lands on zkEVM.",
       "body2": "You can close this window, the transaction will be reflected in your wallet once complete."
+    },
+    "CLAIM_WITHDRAWAL": {
+      "content": {
+        "heading": "Follow the prompts to receive your coins on ",
+        "body": "You’ll be asked to pay a small gas fee",
+        "body2": "Destination Wallet address: "
+      },
+      "footer": {
+        "buttonText": "Continue",
+        "retryText": "Try again"
+      },
+      "loadingView": {
+        "text": "Initiating move"
+      }
     }
   },
   "footers": {

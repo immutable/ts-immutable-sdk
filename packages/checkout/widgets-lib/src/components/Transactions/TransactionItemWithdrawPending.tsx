@@ -11,7 +11,8 @@ import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAna
 import { text } from 'resources/text/textConfig';
 import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { Transaction, TransactionStatus } from 'lib/clients/checkoutApiType';
-import { useMemo } from 'react';
+import { useMemo, useContext } from 'react';
+import { ViewActions, ViewContext } from 'context/view-context/ViewContext';
 import { actionsContainerStyles, actionsLayoutStyles, containerStyles } from './transactionItemStyles';
 import { TransactionDetails } from './TransactionDetails';
 
@@ -31,6 +32,7 @@ export function TransactionItemWithdrawPending({
 }: TransactionItemWithdrawPendingProps) {
   const { track } = useAnalytics();
   const { status: { withdrawalPending } } = text.views[BridgeWidgetViews.TRANSACTIONS];
+  const { viewDispatch } = useContext(ViewContext);
 
   const dateNowUnixMs = useMemo(() => new Date().getTime(), []);
   const withdrawalReadyDate = useMemo(
@@ -70,6 +72,16 @@ export function TransactionItemWithdrawPending({
   const handleWithdrawalClaimClick = () => {
     // WT-2053 - https://immutable.atlassian.net/browse/WT-2053
     // entrypoint for claim withdrawal
+
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: BridgeWidgetViews.CLAIM_WITHDRAWAL,
+          transaction,
+        },
+      },
+    });
   };
 
   return (
