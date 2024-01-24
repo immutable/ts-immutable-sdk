@@ -1,16 +1,17 @@
-import { useCallback, useState } from 'react';
-import { GetBalanceResult } from '@imtbl/checkout-sdk';
+import { useCallback, useEffect, useState } from 'react';
+import { Checkout, GetBalanceResult } from '@imtbl/checkout-sdk';
+import { Web3Provider } from '@ethersproject/providers';
 import { getTokenBalances } from '../../widgets/wallet/functions/tokenBalances';
 import { DEFAULT_BALANCE_RETRY_POLICY } from '../constants';
 import { useInterval } from './useInterval';
 
 const REFRESH_BALANCE_INTERVAL_MS = 10000;
 
-export interface RefreshBalancesParams {
-  checkout: any;
-  provider: any,
-  refreshCallback: any;
-  errorCallback: any;
+export interface UseBalanceParams {
+  checkout: Checkout | undefined;
+  provider: Web3Provider | undefined,
+  refreshCallback: (balance: GetBalanceResult[]) => void;
+  errorCallback: (error: Error) => void;
 }
 
 export const useBalance = ({
@@ -18,11 +19,13 @@ export const useBalance = ({
   provider,
   refreshCallback,
   errorCallback,
-}: RefreshBalancesParams) => {
+}: UseBalanceParams) => {
   const [balancesLoading, setBalancesLoading] = useState(true);
 
-  const refreshBalances = useCallback(async (silent: boolean = false) => {
-    console.log('Refresh balances', checkout, provider, `silent: ${silent}`);
+  const refreshBalances = useCallback(async (
+    // If silent is true, the balances will not be set to loading
+    silent: boolean = false,
+  ) => {
     if (!checkout || !provider) return;
     try {
       const network = await checkout.getNetworkInfo({
@@ -48,7 +51,7 @@ export const useBalance = ({
       // and the logic will retry anyways.
     } catch (error: any) {
       if (DEFAULT_BALANCE_RETRY_POLICY.nonRetryable!(error)) {
-        errorCallback();
+        errorCallback(error);
       }
       if (!silent) {
         setBalancesLoading(false);
@@ -56,6 +59,17 @@ export const useBalance = ({
     }
   }, [checkout, provider]);
   useInterval(() => refreshBalances(true), REFRESH_BALANCE_INTERVAL_MS);
+
+  // Listen for window focus event to refresh after a potential interaction with a wallet
+  useEffect(() => {
+    const handleFocus = () => {
+      refreshBalances(true);
+    };
+    window.addEventListener('focus', handleFocus);
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [refreshBalances]);
 
   return {
     balancesLoading,

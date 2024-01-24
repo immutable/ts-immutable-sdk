@@ -18,7 +18,7 @@ type CacheData = {
   ttl: number
 };
 
-const CACHE_DATA_TTL = 10; // seconds
+const CACHE_DATA_TTL = 5; // seconds
 
 /**
  * Blockscout class provides a client abstraction for the Immutable 3rd party indexer.
