@@ -209,3 +209,7 @@ export async function switchWalletNetwork(
     provider: newProvider,
   } as SwitchNetworkResult;
 }
+
+export const isZkEvmChainId = (chainId: ChainId) => chainId === ChainId.IMTBL_ZKEVM_DEVNET
+  || chainId === ChainId.IMTBL_ZKEVM_TESTNET
+  || chainId === ChainId.IMTBL_ZKEVM_MAINNET;

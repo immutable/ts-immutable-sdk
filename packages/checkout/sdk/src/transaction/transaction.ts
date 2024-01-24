@@ -2,8 +2,8 @@ import { ethers } from 'ethers';
 import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { SendTransactionResult } from '../types';
-import { GAS_OVERRIDES } from '../env';
-import { isZkEvmChainId } from '../utils/utils';
+import { IMMUTABLE_ZKVEM_GAS_OVERRIDES } from '../env';
+import { isZkEvmChainId } from '../network';
 
 export const setTransactionGasLimits = async (
   web3Provider: Web3Provider,
@@ -14,8 +14,8 @@ export const setTransactionGasLimits = async (
   const { chainId } = await web3Provider.getNetwork();
   if (!isZkEvmChainId(chainId)) return rawTx;
 
-  rawTx.maxFeePerGas = GAS_OVERRIDES.maxFeePerGas;
-  rawTx.maxPriorityFeePerGas = GAS_OVERRIDES.maxPriorityFeePerGas;
+  rawTx.maxFeePerGas = IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxFeePerGas;
+  rawTx.maxPriorityFeePerGas = IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxPriorityFeePerGas;
 
   return rawTx;
 };

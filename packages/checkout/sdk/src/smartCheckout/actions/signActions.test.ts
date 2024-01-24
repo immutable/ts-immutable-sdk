@@ -5,7 +5,7 @@ import { TypedDataDomain } from 'ethers';
 import { signApprovalTransactions, signFulfillmentTransactions, signMessage } from './signActions';
 import { CheckoutErrorType } from '../../errors';
 import { SignTransactionStatusType, UnsignedMessage } from './types';
-import { GAS_OVERRIDES } from '../../env';
+import { IMMUTABLE_ZKVEM_GAS_OVERRIDES } from '../../env';
 import { ChainId, NetworkInfo } from '../../types';
 
 describe('signActions', () => {
@@ -45,14 +45,14 @@ describe('signActions', () => {
       expect(mockProvider.getSigner().sendTransaction).toHaveBeenCalledWith({
         data: '0xAPPROVAL1',
         to: '0x123',
-        maxFeePerGas: GAS_OVERRIDES.maxFeePerGas,
-        maxPriorityFeePerGas: GAS_OVERRIDES.maxPriorityFeePerGas,
+        maxFeePerGas: IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxFeePerGas,
+        maxPriorityFeePerGas: IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxPriorityFeePerGas,
       });
       expect(mockProvider.getSigner().sendTransaction).toHaveBeenCalledWith({
         data: '0xAPPROVAL2',
         to: '0x123',
-        maxFeePerGas: GAS_OVERRIDES.maxFeePerGas,
-        maxPriorityFeePerGas: GAS_OVERRIDES.maxPriorityFeePerGas,
+        maxFeePerGas: IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxFeePerGas,
+        maxPriorityFeePerGas: IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxPriorityFeePerGas,
       });
     });
 
@@ -149,14 +149,14 @@ describe('signActions', () => {
       expect(mockProvider.getSigner().sendTransaction).toHaveBeenCalledWith({
         data: '0xFULFILLMENT1',
         to: '0x123',
-        maxFeePerGas: GAS_OVERRIDES.maxFeePerGas,
-        maxPriorityFeePerGas: GAS_OVERRIDES.maxPriorityFeePerGas,
+        maxFeePerGas: IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxFeePerGas,
+        maxPriorityFeePerGas: IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxPriorityFeePerGas,
       });
       expect(mockProvider.getSigner().sendTransaction).toHaveBeenCalledWith({
         data: '0xFULFILLMENT2',
         to: '0x123',
-        maxFeePerGas: GAS_OVERRIDES.maxFeePerGas,
-        maxPriorityFeePerGas: GAS_OVERRIDES.maxPriorityFeePerGas,
+        maxFeePerGas: IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxFeePerGas,
+        maxPriorityFeePerGas: IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxPriorityFeePerGas,
       });
     });
 
