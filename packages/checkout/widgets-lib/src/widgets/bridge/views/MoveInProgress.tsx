@@ -81,10 +81,10 @@ export function MoveInProgress({ transactionHash }: MoveInProgressProps) {
       floatHeader
     >
       <SimpleTextBody heading={t('views.IN_PROGRESS.heading')}>
+        {t('views.IN_PROGRESS.body1')}
+        <br />
+        <br />
         {t('views.IN_PROGRESS.body2')}
-        <br />
-        <br />
-        {t('views.IN_PROGRESS.body3')}
       </SimpleTextBody>
     </SimpleLayout>
   );

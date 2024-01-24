@@ -451,9 +451,8 @@ export const text = {
     },
     [BridgeWidgetViews.IN_PROGRESS]: {
       heading: 'Move in progress',
-      body1: (symbol: string) => `Less than 3 mins until your ${symbol} lands on zkEVM.`,
-      body2: "Your funds have been sent, with less than 20 mins remaining until they're received. You can return and view progress by clicking on the rocket icon.",
-      body3: 'You can close this window.',
+      body1: "Your funds have been sent, with less than 20 mins remaining until they're received. You can return and view progress by clicking on the rocket icon.",
+      body2: 'You can close this window.',
     },
     [BridgeWidgetViews.TRANSACTIONS]: {
       layoutHeading: 'In progress',
