@@ -51,11 +51,11 @@
     "@imtbl/cryptofiat": "0.0.0",
     "@imtbl/generated-clients": "0.0.0",
     "@imtbl/guardian": "0.0.0",
-    "@imtbl/immutablex-client": "0.0.0",
     "@imtbl/orderbook": "0.0.0",
     "@imtbl/passport": "0.0.0",
-    "@imtbl/provider": "0.0.0",
     "@imtbl/version-check": "0.0.0",
+    "@imtbl/x-client": "0.0.0",
+    "@imtbl/x-provider": "0.0.0",
     "@rollup/plugin-commonjs": "^24.0.1",
     "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-node-resolve": "^15.0.2",
@@ -90,10 +90,6 @@
       "types": "./dist/blockchain_data.d.ts",
       "import": "./dist/blockchain_data.js"
     },
-    "./immutablex_client": {
-      "types": "./dist/immutablex_client.d.ts",
-      "import": "./dist/immutablex_client.js"
-    },
     "./passport": {
       "types": "./dist/passport.d.ts",
       "import": "./dist/passport.js"
@@ -102,13 +98,13 @@
       "types": "./dist/orderbook.d.ts",
       "import": "./dist/orderbook.js"
     },
-    "./provider": {
-      "types": "./dist/provider.d.ts",
-      "import": "./dist/provider.js"
-    },
     "./checkout": {
       "types": "./dist/checkout.d.ts",
       "import": "./dist/checkout.js"
+    },
+    "./x": {
+      "types": "./dist/x.d.ts",
+      "import": "./dist/x.js"
     }
   },
   "files": [
