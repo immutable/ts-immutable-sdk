@@ -1,31 +1,32 @@
 name: Publish Major Version to NPM
 
 on:
-  workflow_dispatch:
-    inputs:
-      release_type:
-        type: choice
-        description: Release Type
-        options:
-          - alpha
-          - release
-        required: true
-        default: alpha
-      upgrade_type:
-        type: choice
-        description: Upgrade Type
-        options:
-          - none
-          - patch
-          - minor
-          # - major
-        required: false
-        default: none
-      dry_run:
-        type: boolean
-        description: "(Optional) Dry run"
-        required: false
-        default: true
+  push:
+  # workflow_dispatch:
+  #   inputs:
+  #     release_type:
+  #       type: choice
+  #       description: Release Type
+  #       options:
+  #         - alpha
+  #         - release
+  #       required: true
+  #       default: alpha
+  #     upgrade_type:
+  #       type: choice
+  #       description: Upgrade Type
+  #       options:
+  #         - none
+  #         - patch
+  #         - minor
+  #         # - major
+  #       required: false
+  #       default: none
+  #     dry_run:
+  #       type: boolean
+  #       description: "(Optional) Dry run"
+  #       required: false
+  #       default: true
 
 jobs:
   PublishMajorVersion:
