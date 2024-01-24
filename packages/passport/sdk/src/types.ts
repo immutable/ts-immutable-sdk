@@ -1,6 +1,7 @@
 import { ModuleConfiguration } from '@imtbl/config';
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 import { EthSigner, StarkSigner } from '@imtbl/core-sdk';
+import { ImxApiClients } from '@imtbl/generated-clients';
 
 export enum PassportEvents {
   LOGGED_OUT = 'loggedOut',
@@ -57,6 +58,7 @@ export interface PassportOverrides {
   passportDomain: string;
   imxPublicApiDomain: string;
   immutableXClient: ImmutableXClient;
+  imxApiClients: ImxApiClients;
   zkEvmRpcUrl: string;
   relayerUrl: string;
   indexerMrBasePath: string;

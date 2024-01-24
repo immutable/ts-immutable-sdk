@@ -270,7 +270,9 @@
         }
       },
       "insufficientCoinsBanner": {
-        "caption": "Insufficient coin balance. Please proceed with card instead."
+        "caption": "Insufficient coin balance. Pay with card to proceed, or",
+        "captionEnd": "and try again.",
+        "captionCTA": "add coins"
       },
       "loading": {
         "ready": "Ready to purchase",
@@ -343,6 +345,10 @@
         "DEFAULT_ERROR": {
           "description": "Sorry, something went wrong. Please try again.",
           "primaryAction": "Try again",
+          "secondaryAction": "Dismiss"
+        },
+        "INVALID_PARAMETERS": {
+          "description": "Sorry, we're unable to process your order. Missing information from client",
           "secondaryAction": "Dismiss"
         }
       }

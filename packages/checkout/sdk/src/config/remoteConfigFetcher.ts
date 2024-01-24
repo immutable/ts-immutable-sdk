@@ -46,8 +46,12 @@ export class RemoteConfigFetcher {
     if (response.data && typeof response.data !== 'object') {
       try {
         responseData = JSON.parse(response.data);
-      } catch (jsonError) {
-        throw new CheckoutError('Invalid configuration', CheckoutErrorType.API_ERROR);
+      } catch (err: any) {
+        throw new CheckoutError(
+          'Invalid configuration',
+          CheckoutErrorType.API_ERROR,
+          { error: err },
+        );
       }
     }
 
@@ -66,6 +70,7 @@ export class RemoteConfigFetcher {
       throw new CheckoutError(
         `Error: ${err.message}`,
         CheckoutErrorType.API_ERROR,
+        { error: err },
       );
     }
 
@@ -87,6 +92,7 @@ export class RemoteConfigFetcher {
       throw new CheckoutError(
         `Error: ${err.message}`,
         CheckoutErrorType.API_ERROR,
+        { error: err },
       );
     }
 

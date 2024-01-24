@@ -134,7 +134,7 @@ export const sell = async (
       'An error occurred while preparing the listing',
       CheckoutErrorType.PREPARE_ORDER_LISTING_ERROR,
       {
-        message: err.message,
+        error: err,
         id: sellToken.id,
         collectionAddress: sellToken.collectionAddress,
       },
@@ -224,7 +224,7 @@ export const sell = async (
         'An error occurred while creating the listing',
         CheckoutErrorType.CREATE_ORDER_LISTING_ERROR,
         {
-          message: err.message,
+          error: err,
           collectionId: sellToken.id,
           collectionAddress: sellToken.collectionAddress,
         },

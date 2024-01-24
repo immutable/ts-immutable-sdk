@@ -56,7 +56,10 @@ export function WalletWidget(props: WalletWidgetInputs) {
   const {
     connectLoaderState: { checkout, provider },
   } = useContext(ConnectLoaderContext);
-  const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
+  const [viewState, viewDispatch] = useReducer(viewReducer, {
+    ...initialViewState,
+    history: [],
+  });
 
   const [walletState, walletDispatch] = useReducer(
     walletReducer,

@@ -109,6 +109,7 @@ export enum BridgeMethodsGasLimit { // @TODO test methods on chain and put corre
   MAP_TOKEN_SOURCE = 200000,
   MAP_TOKEN_DESTINATION = 200000,
   FINALISE_WITHDRAWAL = 200000,
+  APPROVE_TOKEN = 55000,
 }
 
 export interface FeeData {
@@ -123,18 +124,20 @@ export interface FeeData {
  * @dev Union type of DepositFeeRequest|WithdrawFeeRequest|FinaliseFeeRequest|MapTokenFeeRequest
  * ensures the correct params are supplied when trying to calculate the fees
  */
-export type BridgeFeeRequest = DepositFeeRequest
-| WithdrawFeeRequest
+export type BridgeFeeRequest = DepositNativeFeeRequest
+| DepositERC20FeeRequest
+| WithdrawNativeFeeRequest
+| WithdrawERC20FeeRequest
 | FinaliseFeeRequest;
 
 /**
- * @typedef {Object} DepositFeeRequest
+ * @typedef {Object} DepositNativeFeeRequest
  * @property {BridgeFeeActions} method - The method for which the bridge fee is being requested.
  * @property {number} gasMultiplier - How much buffer to add to the gas fee.
  * @property {string} sourceChainId - The chain ID of the source chain.
  * @property {string} destinationChainId - The chain ID of the destination chain.
  */
-export interface DepositFeeRequest {
+export interface DepositNativeFeeRequest {
   action: BridgeFeeActions.DEPOSIT,
   gasMultiplier: number;
   sourceChainId: string;
@@ -142,17 +145,53 @@ export interface DepositFeeRequest {
 }
 
 /**
- * @typedef {Object} WithdrawFeeRequest
+ * @typedef {Object} DepositERC20FeeRequest
+ * @property {BridgeFeeActions} method - The method for which the bridge fee is being requested.
+ * @property {number} gasMultiplier - How much buffer to add to the gas fee.
+ * @property {string} sourceChainId - The chain ID of the source chain.
+ * @property {string} destinationChainId - The chain ID of the destination chain.
+ * @property {FungibleToken} token - The token to be deposited.
+ * @property {ethers.BigNumber} amount - The amount to be deposited.
+ */
+export interface DepositERC20FeeRequest {
+  action: BridgeFeeActions.DEPOSIT,
+  gasMultiplier: number;
+  sourceChainId: string;
+  destinationChainId: string;
+  token: FungibleToken;
+  amount: ethers.BigNumber;
+}
+
+/**
+ * @typedef {Object} WithdrawNativeFeeRequest
  * @property {BridgeFeeActions} method - The method for which the bridge fee is being requested.
  * @property {number} gasMultiplier - How much buffer to add to the gas fee.
  * @property {string} sourceChainId - The chain ID of the source chain.
  * @property {string} destinationChainId - The chain ID of the destination chain.
  */
-export interface WithdrawFeeRequest {
+export interface WithdrawNativeFeeRequest {
   action: BridgeFeeActions.WITHDRAW,
   gasMultiplier: number;
   sourceChainId: string;
   destinationChainId: string;
+}
+
+/**
+ * @typedef {Object} WithdrawERC20FeeRequest
+ * @property {BridgeFeeActions} method - The method for which the bridge fee is being requested.
+ * @property {number} gasMultiplier - How much buffer to add to the gas fee.
+ * @property {string} sourceChainId - The chain ID of the source chain.
+ * @property {string} destinationChainId - The chain ID of the destination chain.
+ * @property {FungibleToken} token - The token to be withdrawn.
+ * @property {ethers.BigNumber} amount - The amount to be withdrawn.
+ */
+export interface WithdrawERC20FeeRequest {
+  action: BridgeFeeActions.WITHDRAW,
+  gasMultiplier: number;
+  sourceChainId: string;
+  destinationChainId: string;
+  token: FungibleToken;
+  amount: ethers.BigNumber;
 }
 
 /**
@@ -169,17 +208,20 @@ export interface FinaliseFeeRequest {
  * @typedef {Object} BridgeFeeResponse
  * @property {ethers.BigNumber} sourceChainGas - Gas cost to send tokens to the bridge contract on the source chain.
  * - priced in the source chain's native token.
+ * @property {ethers.BigNumber} approvalFee - Gas cost to approve bridge contract to spend tokens on the source chain.
+ * - priced in the source chain's native token.
  * @property {ethers.BigNumber} bridgeFee - destinationChainGas + validatorFee.
  * This will be added to the tx.value of the bridge transaction and forwarded to the Axelar Gas Service contract.
  * - priced in the source chain's native token.
  * @property {ethers.BigNumber} imtblFee - The fee charged by Immutable to facilitate the bridge.
  * - priced in the source chain's native token.
  * @property {ethers.BigNumber} totalFees - The total fees the user will be charged which is;
- * sourceChainGas + bridgeFee + imtblFee.
+ * sourceChainGas + approvalFee + bridgeFee + imtblFee.
  * - priced in the source chain's native token.
  */
 export interface BridgeFeeResponse {
   sourceChainGas: ethers.BigNumber,
+  approvalFee: ethers.BigNumber,
   bridgeFee: ethers.BigNumber,
   imtblFee: ethers.BigNumber,
   totalFees: ethers.BigNumber,
@@ -275,6 +317,16 @@ export interface TxStatusResponse {
 }
 
 /**
+ * @typedef {Object} AxelarStatusResponse
+ * @property {Array<TxStatusResponseItem>} txStatusItems - The status items of the requested transactions.
+ * @property {Array<string>} uniqueReceivers - The unique receivers to look up in the flow rate queue.
+ */
+export interface AxelarStatusResponse {
+  txStatusItems: Array<TxStatusResponseItem>,
+  uniqueReceivers: Array<string>,
+}
+
+/**
  * @typedef {Object} TxStatusResponseItem
  * @property {string} txHash - The transaction hash on the source chain of the bridge transaction.
  * @property {Address} sender - The address of the sender on the source chain.
@@ -336,6 +388,7 @@ export interface FlowRateInfoItem {
   depth: ethers.BigNumber;
   refillTime: number;
   refillRate: ethers.BigNumber;
+  largeTransferThreshold: ethers.BigNumber;
 }
 
 /**
@@ -358,6 +411,7 @@ export interface PendingWithdrawalsResponse {
 export interface PendingWithdrawal {
   canWithdraw: boolean,
   withdrawer: Address,
+  recipient: Address,
   token: FungibleToken,
   amount: ethers.BigNumber,
   timeoutStart: number,
@@ -395,7 +449,7 @@ export interface FlowRateWithdrawResponse {
  * @property {FungibleToken} rootToken - The token on the root chain for which the corresponding token on the child chain is required.
  */
 export interface TokenMappingRequest {
-  token: { rootToken: FungibleToken } | { childToken: FungibleToken };
+  rootToken: FungibleToken;
   rootChainId: string;
   childChainId: string;
 }
@@ -407,5 +461,5 @@ export interface TokenMappingRequest {
  */
 export interface TokenMappingResponse {
   rootToken: FungibleToken;
-  childToken: FungibleToken;
+  childToken: FungibleToken | null;
 }

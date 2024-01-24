@@ -43,7 +43,6 @@ async function getFlowRateInfo() {
       const flowRateInfoRes: FlowRateInfoResponse = await tokenBridge.getFlowRateInfo(flowRateInfoReq);
       console.log('flowRateInfoRes');
       console.log(util.inspect(flowRateInfoRes, {showHidden: false, depth: null, colors: true}));
-
     } catch(err) {
       console.error('flowRateInfoErr', err);
       throw(err);

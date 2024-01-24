@@ -47,11 +47,13 @@ const swapValuesToText = ({
   swapToToken,
   swapFromAmount,
   swapToAmount,
+  conversion,
 }: {
   swapFromToken?: TokenInfo;
   swapFromAmount: string;
   swapToToken?: TokenInfo;
   swapToAmount: string;
+  conversion: BigNumber;
 }): {
   fromToConversion: string,
   swapToAmount: string,
@@ -65,10 +67,11 @@ const swapValuesToText = ({
   resp.swapToAmount = tokenValueFormat(swapToAmount);
 
   if (swapFromAmount && swapFromToken && swapToToken) {
-    const conversionRatio = tokenValueFormat(Number(swapToAmount) / Number(swapFromAmount));
-    resp.fromToConversion = `1 ${swapFromToken.symbol} ≈ ${
-      formatZeroAmount(conversionRatio, true)
-    } ${swapToToken.symbol}`;
+    const formattedConversion = formatZeroAmount(tokenValueFormat(
+      utils.formatUnits(conversion, swapToToken.decimals),
+    ), true);
+
+    resp.fromToConversion = `1 ${swapFromToken.symbol} ≈ ${formattedConversion} ${swapToToken.symbol}`;
   }
 
   return resp;
@@ -110,6 +113,7 @@ export function SwapForm({ data }: SwapFromProps) {
   const [isFetching, setIsFetching] = useState(false);
   const [direction, setDirection] = useState<SwapDirection>(SwapDirection.FROM);
   const [loading, setLoading] = useState(false);
+  const [conversion, setConversion] = useState(BigNumber.from(0));
   const [swapFromToConversionText, setSwapFromToConversionText] = useState('');
   const hasSetDefaultState = useRef(false);
 
@@ -234,23 +238,37 @@ export function SwapForm({ data }: SwapFromProps) {
     if (!toToken) return;
 
     try {
-      const result = await quotesProcessor.fromAmountIn(
+      if (!silently) setSwapFromToConversionText('');
+
+      const quoteResultPromise = quotesProcessor.fromAmountIn(
         exchange,
         provider,
         fromToken,
         fromAmount,
         toToken,
       );
+      const conversionResultPromise = quotesProcessor.fromAmountIn(
+        exchange,
+        provider,
+        fromToken,
+        '1',
+        toToken,
+      );
+
+      const resolved = await Promise.all([quoteResultPromise, conversionResultPromise]);
+      const quoteResult = resolved[0];
+      const conversionResult = resolved[1];
+      setConversion(conversionResult.quote.amount.value);
 
       // Prevent to silently fetch and set a new quote
       // if the user has updated and the widget is already
       // fetching or the user is updating the inputs.
       if (silently && (loading || editing)) return;
 
-      const estimate = result.swap.gasFeeEstimate;
+      const estimate = quoteResult.swap.gasFeeEstimate;
       let gasFeeTotal = BigNumber.from(estimate?.value || 0);
-      if (result.approval?.gasFeeEstimate) {
-        gasFeeTotal = gasFeeTotal.add(result.approval.gasFeeEstimate.value);
+      if (quoteResult.approval?.gasFeeEstimate) {
+        gasFeeTotal = gasFeeTotal.add(quoteResult.approval.gasFeeEstimate.value);
       }
       const gasFee = utils.formatUnits(
         gasFeeTotal,
@@ -262,7 +280,7 @@ export function SwapForm({ data }: SwapFromProps) {
         (token) => token.address?.toLocaleLowerCase() === estimateToken?.address?.toLocaleLowerCase(),
       );
 
-      setQuote(result);
+      setQuote(quoteResult);
       setGasFeeValue(gasFee);
       setGasFeeToken({
         name: gasToken?.name || '',
@@ -281,10 +299,10 @@ export function SwapForm({ data }: SwapFromProps) {
         formatZeroAmount(
           tokenValueFormat(
             utils.formatUnits(
-              result.quote.amount.value,
-              result.quote.amount.token.decimals,
+              quoteResult.quote.amount.value,
+              quoteResult.quote.amount.token.decimals,
             ),
-            result.quote.amount.token.decimals,
+            quoteResult.quote.amount.token.decimals,
           ),
         ),
       );
@@ -308,23 +326,37 @@ export function SwapForm({ data }: SwapFromProps) {
     if (!toToken) return;
 
     try {
-      const result = await quotesProcessor.fromAmountOut(
+      if (!silently) setSwapFromToConversionText('');
+
+      const quoteResultPromise = quotesProcessor.fromAmountOut(
         exchange,
         provider,
         toToken,
         toAmount,
         fromToken,
       );
+      const conversionResultPromise = quotesProcessor.fromAmountIn(
+        exchange,
+        provider,
+        fromToken,
+        '1',
+        toToken,
+      );
+
+      const resolved = await Promise.all([quoteResultPromise, conversionResultPromise]);
+      const quoteResult = resolved[0];
+      const conversionResult = resolved[1];
+      setConversion(conversionResult.quote.amount.value);
 
       // Prevent to silently fetch and set a new quote
       // if the user has updated and the widget is already
       // fetching or the user is updating the inputs.
       if (silently && (loading || editing)) return;
 
-      const estimate = result.swap.gasFeeEstimate;
+      const estimate = quoteResult.swap.gasFeeEstimate;
       let gasFeeTotal = BigNumber.from(estimate?.value || 0);
-      if (result.approval?.gasFeeEstimate) {
-        gasFeeTotal = gasFeeTotal.add(result.approval.gasFeeEstimate.value);
+      if (quoteResult.approval?.gasFeeEstimate) {
+        gasFeeTotal = gasFeeTotal.add(quoteResult.approval.gasFeeEstimate.value);
       }
       const gasFee = utils.formatUnits(
         gasFeeTotal,
@@ -333,7 +365,7 @@ export function SwapForm({ data }: SwapFromProps) {
       const estimateToken = estimate?.token;
 
       const gasToken = allowedTokens.find((token) => token.symbol === estimateToken?.symbol);
-      setQuote(result);
+      setQuote(quoteResult);
       setGasFeeValue(gasFee);
       setGasFeeToken({
         name: gasToken?.name || '',
@@ -352,8 +384,8 @@ export function SwapForm({ data }: SwapFromProps) {
       setFromAmount(
         formatZeroAmount(
           tokenValueFormat(utils.formatUnits(
-            result.quote.amount.value,
-            result.quote.amount.token.decimals,
+            quoteResult.quote.amount.value,
+            quoteResult.quote.amount.token.decimals,
           )),
         ),
       );
@@ -599,13 +631,15 @@ export function SwapForm({ data }: SwapFromProps) {
   };
 
   useEffect(() => {
+    if (!quote || !conversion) return;
     setSwapFromToConversionText(swapValuesToText({
       swapFromToken: fromToken,
       swapFromAmount: fromAmount,
       swapToToken: toToken,
       swapToAmount: toAmount,
+      conversion,
     }).fromToConversion);
-  }, [quote]);
+  }, [quote, conversion]);
 
   return (
     <>

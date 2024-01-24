@@ -38,22 +38,21 @@ export async function withdraw() {
   const rootBridge: ethers.Contract = getContract("RootERC20BridgeFlowRate", params.rootBridgeAddress, params.rootProvider);
   const childBridge: ethers.Contract = getContract("ChildERC20Bridge", params.childBridgeAddress, params.childProvider);
 
-  let rootBridgeChildAddress = await rootBridge.rootTokenToChildToken(params.rootToken);
-  let childBridgeChildAddress = await childBridge.rootTokenToChildToken(params.rootToken);
-
-  if (rootBridgeChildAddress === ethers.constants.AddressZero) {
-    console.log('token not mapped, please map token before withdrawing');
-    return;
-  }
-
-  if (childBridgeChildAddress === ethers.constants.AddressZero) {
-    console.log('token mapping incomplete, please wait for token to map to childBridge before withdrawing');
-    return;
-  }
-
-  if (rootBridgeChildAddress !== childBridgeChildAddress) {
-    console.log(`token mappings mismatch on rootBridge (${rootBridgeChildAddress}) & childBridge (${childBridgeChildAddress}).`, );
-    return;
+  if (params.childToken.toUpperCase() !== 'NATIVE' && params.rootToken.toUpperCase() !== 'NATIVE') {
+    let rootBridgeChildAddress = await rootBridge.rootTokenToChildToken(params.rootToken);
+    let childBridgeChildAddress = await childBridge.rootTokenToChildToken(params.rootToken);
+  
+    if (rootBridgeChildAddress === ethers.constants.AddressZero) {
+      throw new Error('token not mapped, please map token before withdrawing');
+    }
+  
+    if (childBridgeChildAddress === ethers.constants.AddressZero) {
+      throw new Error('token mapping incomplete, please wait for token to map to childBridge before withdrawing');
+    }
+  
+    if (rootBridgeChildAddress !== childBridgeChildAddress) {
+      throw new Error(`token mappings mismatch on rootBridge (${rootBridgeChildAddress}) & childBridge (${childBridgeChildAddress}).`, );
+    }
   }
 
   const approvalReq: ApproveBridgeRequest = {
@@ -108,7 +107,7 @@ export async function withdraw() {
     amount: params.amount,
     sourceChainId: bridgeConfig.bridgeInstance.childChainID,
     destinationChainId: bridgeConfig.bridgeInstance.rootChainID,
-    gasMultiplier: 1.1,
+    gasMultiplier: params.gasMultiplier,
   }
 
   console.log('withdrawReq', withdrawReq)
@@ -125,8 +124,6 @@ export async function withdraw() {
     console.log('unable to generate withdraw tx');
     return
   }
-
-  console.log()
 
   const withdrawNonce = await params.childWallet.getTransactionCount();
   const withdrawGasPrice = await params.childProvider.getGasPrice();

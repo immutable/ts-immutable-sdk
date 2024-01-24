@@ -68,6 +68,6 @@ describe('getBridgeFeeEstimate', () => {
     }
 
     expect(type).toEqual(CheckoutErrorType.BRIDGE_GAS_ESTIMATE_ERROR);
-    expect(data).toEqual({ message: 'error from gas estimator' });
+    expect(data.error).toBeDefined();
   });
 });

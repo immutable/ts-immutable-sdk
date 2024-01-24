@@ -26,6 +26,7 @@ export async function checkIsWalletConnected(
       'Check wallet connection request failed',
       CheckoutErrorType.PROVIDER_REQUEST_FAILED_ERROR,
       {
+        error: err,
         rpcMethod: WalletAction.CHECK_CONNECTION,
       },
     );

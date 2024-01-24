@@ -1,5 +1,6 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { ImmutableXClient } from '@imtbl/immutablex-client';
+import { ImxApiClients } from '@imtbl/generated-clients';
 import { PassportConfiguration } from './config';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import {
@@ -25,6 +26,7 @@ describe('Config', () => {
     zkEvmRpcUrl: 'rpcUrl123',
     relayerUrl: 'relayerUrl123',
     immutableXClient: {} as ImmutableXClient,
+    imxApiClients: {} as ImxApiClients,
     indexerMrBasePath: 'indexerMrBasePath123',
     orderBookMrBasePath: 'orderBookMrBasePath123',
     passportMrBasePath: 'passportMrBasePath123',

@@ -49,7 +49,8 @@ export class Passport {
     this.passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
     const imxClientConfig = this.config.baseConfig.environment === Environment.PRODUCTION
       ? imxApiConfig.getProduction() : imxApiConfig.getSandbox();
-    const imxApiClients = new ImxApiClients(imxClientConfig);
+    const imxApiClients = passportModuleConfiguration.overrides?.imxApiClients
+    || new ImxApiClients(imxClientConfig);
 
     this.passportImxProviderFactory = new PassportImxProviderFactory({
       authManager: this.authManager,
@@ -75,10 +76,6 @@ export class Passport {
   }
 
   public connectEvm(): Provider {
-    if (this.config.baseConfig.environment === 'production') {
-      throw new Error('EVM is not supported on production network');
-    }
-
     return new ZkEvmProvider({
       passportEventEmitter: this.passportEventEmitter,
       authManager: this.authManager,

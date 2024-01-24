@@ -8,12 +8,12 @@
     "@imtbl/config": "0.0.0",
     "@imtbl/core-sdk": "^2.4.0",
     "@imtbl/toolkit": "0.0.0",
-    "@magic-ext/oidc": "^4.2.0",
+    "@magic-ext/oidc": "4.2.0",
     "@metamask/detect-provider": "^2.0.0",
     "axios": "^1.6.5",
     "ethers": "^5.7.2",
     "magic-sdk": "^21.2.0",
-    "oidc-client-ts": "^2.2.1"
+    "oidc-client-ts": "2.2.1"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.0.0",

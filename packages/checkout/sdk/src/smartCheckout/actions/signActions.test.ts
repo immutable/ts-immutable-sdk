@@ -107,9 +107,7 @@ describe('signActions', () => {
 
       expect(message).toEqual('An error occurred while executing the approval transaction');
       expect(type).toEqual(CheckoutErrorType.EXECUTE_APPROVAL_TRANSACTION_ERROR);
-      expect(data).toEqual({
-        message: 'approval error',
-      });
+      expect(data.error).toBeDefined();
     });
   });
 
@@ -207,9 +205,7 @@ describe('signActions', () => {
 
       expect(message).toEqual('An error occurred while executing the fulfillment transaction');
       expect(type).toEqual(CheckoutErrorType.EXECUTE_FULFILLMENT_TRANSACTION_ERROR);
-      expect(data).toEqual({
-        message: 'fulfillment error',
-      });
+      expect(data.error).toBeDefined();
     });
   });
 
@@ -281,9 +277,7 @@ describe('signActions', () => {
 
       expect(message).toEqual('An error occurred while signing the message');
       expect(type).toEqual(CheckoutErrorType.SIGN_MESSAGE_ERROR);
-      expect(data).toEqual({
-        message: 'sign message error',
-      });
+      expect(data.error).toBeDefined();
     });
   });
 });

@@ -149,7 +149,7 @@ export const getIndexerBalance = async (
         throw new CheckoutError(
           err.message || 'InternalServerError | getTokensByWalletAddress',
           CheckoutErrorType.GET_INDEXER_BALANCE_ERROR,
-          err,
+          { error: err },
         );
       }
     }
@@ -172,7 +172,7 @@ export const getIndexerBalance = async (
         throw new CheckoutError(
           err.message || 'InternalServerError | getNativeTokenByWalletAddress',
           CheckoutErrorType.GET_INDEXER_BALANCE_ERROR,
-          err,
+          { error: err },
         );
       }
     }

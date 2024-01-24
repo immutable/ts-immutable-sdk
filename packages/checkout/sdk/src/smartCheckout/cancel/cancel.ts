@@ -1,4 +1,4 @@
-import { Web3Provider } from '@ethersproject/providers';
+import { TransactionResponse, Web3Provider } from '@ethersproject/providers';
 import { PopulatedTransaction } from 'ethers';
 import { CancelOrdersOnChainResponse } from '@imtbl/orderbook';
 import { CheckoutConfiguration } from '../../config';
@@ -6,16 +6,21 @@ import { CheckoutError, CheckoutErrorType } from '../../errors';
 import * as instance from '../../instance';
 import { signFulfillmentTransactions } from '../actions';
 import {
+  CancelOverrides,
   CancelResult,
   CheckoutStatus,
 } from '../../types';
 import { SignTransactionStatusType } from '../actions/types';
 import { measureAsyncExecution } from '../../logger/debugLogger';
+import { sendTransaction } from '../../transaction';
 
 export const cancel = async (
   config: CheckoutConfiguration,
   provider: Web3Provider,
   orderIds: string[],
+  overrides: CancelOverrides = {
+    waitFulfillmentSettlements: true,
+  },
 ): Promise<CancelResult> => {
   let unsignedCancelOrderTransaction: PopulatedTransaction;
   if (orderIds.length === 0) {
@@ -49,21 +54,43 @@ export const cancel = async (
       CheckoutErrorType.CANCEL_ORDER_LISTING_ERROR,
       {
         orderId,
-        message: err.message,
+        error: err,
       },
     );
   }
 
-  const result = await signFulfillmentTransactions(provider, [unsignedCancelOrderTransaction]);
-  if (result.type === SignTransactionStatusType.FAILED) {
+  if (overrides.waitFulfillmentSettlements) {
+    const result = await signFulfillmentTransactions(provider, [unsignedCancelOrderTransaction]);
+    if (result.type === SignTransactionStatusType.FAILED) {
+      return {
+        status: CheckoutStatus.FAILED,
+        transactionHash: result.transactionHash,
+        reason: result.reason,
+      };
+    }
+
     return {
-      status: CheckoutStatus.FAILED,
-      transactionHash: result.transactionHash,
-      reason: result.reason,
+      status: CheckoutStatus.SUCCESS,
     };
   }
 
+  let transactions: TransactionResponse[];
+  try {
+    const response = await Promise.all([unsignedCancelOrderTransaction].map(
+      (transaction) => sendTransaction(provider, transaction),
+    ));
+    transactions = response.map((result) => result.transactionResponse);
+  } catch (err: any) {
+    throw new CheckoutError(
+      'An error occurred while executing the fulfillment transaction',
+      CheckoutErrorType.EXECUTE_FULFILLMENT_TRANSACTION_ERROR,
+      {
+        message: err.message,
+      },
+    );
+  }
   return {
-    status: CheckoutStatus.SUCCESS,
+    status: CheckoutStatus.FULFILLMENTS_UNSETTLED,
+    transactions,
   };
 };

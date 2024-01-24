@@ -8,8 +8,8 @@
   "dependencies": {
     "@0xsequence/abi": "^1.4.3",
     "@0xsequence/core": "^1.4.3",
-    "@biom3/design-tokens": "0.2.9",
-    "@biom3/react": "^0.19.34",
+    "@biom3/design-tokens": "^0.2.11",
+    "@biom3/react": "^0.19.42",
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/abstract-signer": "^5.7.0",
     "@ethersproject/providers": "^5.7.2",
@@ -17,7 +17,7 @@
     "@imtbl/core-sdk": "^2.4.0",
     "@imtbl/react-analytics": "0.2.1-alpha",
     "@jest/globals": "^29.5.0",
-    "@magic-ext/oidc": "^4.2.0",
+    "@magic-ext/oidc": "4.2.0",
     "@metamask/detect-provider": "^2.0.0",
     "@opensea/seaport-js": "2.0.7",
     "@uniswap/router-sdk": "^1.4.0",
@@ -35,7 +35,7 @@
     "i18next-browser-languagedetector": "^7.2.0",
     "jwt-decode": "^3.1.2",
     "magic-sdk": "^21.2.0",
-    "oidc-client-ts": "^2.2.1",
+    "oidc-client-ts": "2.2.1",
     "os-browserify": "^0.3.0",
     "pako": "^2.1.0",
     "react-i18next": "^13.5.0",
@@ -127,7 +127,7 @@
   },
   "repository": "immutable/ts-immutable-sdk.git",
   "resolutions": {
-    "@biom3/design-tokens": "0.2.9",
+    "@biom3/design-tokens": "^0.2.11",
     "@openzeppelin/contracts": "3.4.2-solc-0.7"
   },
   "scripts": {

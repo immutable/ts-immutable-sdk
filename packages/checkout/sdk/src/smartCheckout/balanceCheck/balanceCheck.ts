@@ -46,10 +46,11 @@ const getTokenBalances = async (
     return balances.filter(
       (balance) => tokenMap.get((balance.token.address || NATIVE).toLocaleLowerCase()),
     ) as TokenBalance[];
-  } catch (error: any) {
+  } catch (err: any) {
     throw new CheckoutError(
       'Failed to get balances',
       CheckoutErrorType.GET_BALANCE_ERROR,
+      { error: err },
     );
   }
 };
@@ -98,10 +99,11 @@ const getERC721Balances = async (
         id: (itemRequirement as ERC721Item).id,
       });
     });
-  } catch (error: any) {
+  } catch (err: any) {
     throw new CheckoutError(
       'Failed to get ERC721 balances',
       CheckoutErrorType.GET_ERC721_BALANCE_ERROR,
+      { error: err },
     );
   }
 

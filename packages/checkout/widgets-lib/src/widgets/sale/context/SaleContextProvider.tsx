@@ -76,6 +76,7 @@ type SaleContextValues = SaleContextProps & {
   smartCheckoutResult: SmartCheckoutResult | undefined;
   fundingRoutes: FundingRoute[];
   disabledPaymentTypes: SalePaymentTypes[]
+  invalidParameters: boolean;
 };
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -107,6 +108,7 @@ const SaleContext = createContext<SaleContextValues>({
   smartCheckoutResult: undefined,
   fundingRoutes: [],
   disabledPaymentTypes: [],
+  invalidParameters: false,
 });
 
 SaleContext.displayName = 'SaleSaleContext';
@@ -150,6 +152,8 @@ export function SaleContextProvider(props: {
 
   const [fundingRoutes, setFundingRoutes] = useState<FundingRoute[]>([]);
   const [disabledPaymentTypes, setDisabledPaymentTypes] = useState<SalePaymentTypes[]>([]);
+
+  const [invalidParameters, setInvalidParameters] = useState<boolean>(false);
 
   const goBackToPaymentMethods = useCallback(
     (type?: SalePaymentTypes | undefined, showInsufficientCoinsBanner?: boolean) => {
@@ -233,6 +237,7 @@ export function SaleContextProvider(props: {
         },
       });
     },
+
     [paymentMethod, setPaymentMethod, executeResponse],
   );
 
@@ -331,6 +336,16 @@ export function SaleContextProvider(props: {
     }
   }, [smartCheckoutResult]);
 
+  useEffect(() => {
+    const invalidItems = !items || items.length === 0;
+    const invalidAmount = !amount || amount === '0';
+    const invalidFromTokenAddress = !fromTokenAddress || !fromTokenAddress.startsWith('0x');
+
+    if (invalidItems || invalidAmount || invalidFromTokenAddress || !collectionName || !environmentId) {
+      setInvalidParameters(true);
+    }
+  }, [items, amount, fromTokenAddress, collectionName, environmentId]);
+
   const values = useMemo(
     () => ({
       config,
@@ -359,6 +374,7 @@ export function SaleContextProvider(props: {
       smartCheckoutResult,
       fundingRoutes,
       disabledPaymentTypes,
+      invalidParameters,
     }),
     [
       config,
@@ -384,6 +400,7 @@ export function SaleContextProvider(props: {
       smartCheckoutResult,
       fundingRoutes,
       disabledPaymentTypes,
+      invalidParameters,
     ],
   );
 

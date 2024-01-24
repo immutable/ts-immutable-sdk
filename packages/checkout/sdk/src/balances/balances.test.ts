@@ -744,7 +744,7 @@ describe('balances', () => {
 
         expect(message).toEqual(testCase.expectedErrorMessage);
         expect(type).toEqual(CheckoutErrorType.GET_INDEXER_BALANCE_ERROR);
-        expect(data).toEqual({
+        expect(data.error).toEqual({
           code: HttpStatusCode.Forbidden,
           message: testCase.errorMessage,
         });
