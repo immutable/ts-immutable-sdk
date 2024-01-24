@@ -10,6 +10,7 @@ export type SignedOrderProduct = {
   amount: number[];
   tokenId: string[];
   currency: string;
+  contractType: string;
   collectionAddress: string;
 };
 
