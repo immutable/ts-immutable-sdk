@@ -41,6 +41,7 @@ const getCoreSdkConfig = (environment: EnvironmentNames) => {
 
 const getPassportConfig = (environment: EnvironmentNames): PassportModuleConfiguration => {
   const sharedConfigurationValues = {
+    headers: { 'x-sdk-version': 'ts-immutable-sdk-1.0.0' },
     scope: SCOPE,
     audience: AUDIENCE,
     redirectUri: REDIRECT_URI,

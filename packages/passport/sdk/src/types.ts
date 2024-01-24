@@ -64,6 +64,7 @@ export interface PassportOverrides {
   indexerMrBasePath: string;
   orderBookMrBasePath: string;
   passportMrBasePath: string;
+  headers?: Record<string, string>;
 }
 
 export interface PassportModuleConfiguration extends ModuleConfiguration<PassportOverrides>,

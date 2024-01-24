@@ -96,6 +96,7 @@ export class PassportConfiguration {
         }),
         passport: createConfig({
           basePath: overrides.passportMrBasePath,
+          headers: overrides.headers,
         }),
       };
     } else {
