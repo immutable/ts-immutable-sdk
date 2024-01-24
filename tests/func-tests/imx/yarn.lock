@@ -637,7 +637,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/design-tokens@npm:^0.2.10":
+"@biom3/design-tokens@npm:^0.2.11":
   version: 0.2.11
   resolution: "@biom3/design-tokens@npm:0.2.11"
   dependencies:
@@ -646,9 +646,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.19.40":
-  version: 0.19.42
-  resolution: "@biom3/react@npm:0.19.42"
+"@biom3/react@npm:^0.19.42":
+  version: 0.19.44
+  resolution: "@biom3/react@npm:0.19.44"
   dependencies:
     "@biom3/design-tokens": "*"
     "@emotion/css": ^11.11.2
@@ -667,7 +667,7 @@ __metadata:
     react-is: ^18.2.0
     react-keyed-flatten-children: ^3.0.0
     ts-deepmerge: ^6.2.0
-  checksum: 57fb7545adeab582cdb91e0a1ef896f886166faba1c7409a3fc6c3ae1a23a95ba67662526fddba67f3d01bbe331be41d7c23ab560f8b04603041edd65a96be94
+  checksum: 601dba7d1c7ce9e8218d9ae209ab453ed3cc23f1e708ad23e153856d73af5cef5453f4dcf946e2e78614d58e5a3315106b422a1171c95313fa48d9e1f99451e6
   languageName: node
   linkType: hard
 
@@ -1324,12 +1324,12 @@ __metadata:
 
 "@imtbl/sdk@file:../../../sdk::locator=func-tests-imx%40workspace%3A.":
   version: 0.0.0
-  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=ac36b0&locator=func-tests-imx%40workspace%3A."
+  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=89b382&locator=func-tests-imx%40workspace%3A."
   dependencies:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
-    "@biom3/design-tokens": ^0.2.10
-    "@biom3/react": ^0.19.40
+    "@biom3/design-tokens": ^0.2.11
+    "@biom3/react": ^0.19.42
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
     "@ethersproject/providers": ^5.7.2
@@ -1365,7 +1365,7 @@ __metadata:
   peerDependencies:
     react: ^18.2.0
     react-dom: ^18.2.0
-  checksum: 47625219e15e675a1343c489ba0fb348e4d4d5a74d39ffaf967d48c4cc9dfcc43dd0cf659be48e9f19f731b9f8778d4c1baf73f8328218974e30e55c347d7398
+  checksum: b4bf084c4a3ca0475a8cd6f6a7eb1aec6a7fbb602da1f3ea51f8f984eccd1d5a90fe92e2425887e162ceb6847b51944926acbe4b6fb50ff9e9eab463c6025968
   languageName: node
   linkType: hard
 
@@ -5978,17 +5978,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.14.8":
-  version: 1.15.3
-  resolution: "follow-redirects@npm:1.15.3"
-  peerDependenciesMeta:
-    debug:
-      optional: true
-  checksum: 584da22ec5420c837bd096559ebfb8fe69d82512d5585004e36a3b4a6ef6d5905780e0c74508c7b72f907d1fa2b7bd339e613859e9c304d0dc96af2027fd0231
-  languageName: node
-  linkType: hard
-
-"follow-redirects@npm:^1.15.4":
+"follow-redirects@npm:^1.14.8, follow-redirects@npm:^1.15.4":
   version: 1.15.5
   resolution: "follow-redirects@npm:1.15.5"
   peerDependenciesMeta:
