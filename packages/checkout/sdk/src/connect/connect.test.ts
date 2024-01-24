@@ -155,7 +155,8 @@ describe('connect', () => {
       expect(reqRes?.provider).not.toBe(null);
       expect(reqRes?.provider.request).toBeCalledWith({
         method: WalletAction.REQUEST_PERMISSIONS,
-        params: [{ ethAccounts: {} }],
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        params: [{ eth_accounts: {} }],
       });
     });
 
