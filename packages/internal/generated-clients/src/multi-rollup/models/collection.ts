@@ -103,7 +103,7 @@ export interface Collection {
      * @type {string}
      * @memberof Collection
      */
-    'last_metadata_synced_at': string | null;
+    'metadata_synced_at': string | null;
 }
 
 

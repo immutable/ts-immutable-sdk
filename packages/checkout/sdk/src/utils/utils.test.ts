@@ -1,4 +1,5 @@
-import { isMatchingAddress } from './utils';
+import { ChainId } from '../types';
+import { isMatchingAddress, isZkEvmChainId } from './utils';
 
 describe('utils', () => {
   it('should return true if addresses are the same', () => {
@@ -14,5 +15,27 @@ describe('utils', () => {
   it('should return false if addresses do not match', () => {
     const address = isMatchingAddress('0x123', '0x1234');
     expect(address).toBeFalsy();
+  });
+
+  describe('isZkEvmChainId', () => {
+    it('should return true if devnet zkEVM chain', () => {
+      const chainId = isZkEvmChainId(ChainId.IMTBL_ZKEVM_DEVNET);
+      expect(chainId).toBeTruthy();
+    });
+
+    it('should return true if testnet zkEVM chain', () => {
+      const chainId = isZkEvmChainId(ChainId.IMTBL_ZKEVM_TESTNET);
+      expect(chainId).toBeTruthy();
+    });
+
+    it('should return true if mainnet zkEVM chain', () => {
+      const chainId = isZkEvmChainId(ChainId.IMTBL_ZKEVM_MAINNET);
+      expect(chainId).toBeTruthy();
+    });
+
+    it('should return false if not zkEVM chain', () => {
+      const chainId = isZkEvmChainId(ChainId.SEPOLIA);
+      expect(chainId).toBeFalsy();
+    });
   });
 });

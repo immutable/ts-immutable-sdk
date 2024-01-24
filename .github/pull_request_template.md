@@ -1,12 +1,10 @@
 # Summary
-<!--- A short summary about what this PR is doing. -->
+<!-- A short summary. This PR's description is publicly viewable and will be part of the Changelog on NPM -->
 
 
-# Customer Impact
-<!-- How this change will impact customers. Make sure to highlight any breaking changes. -->
-
-
-<!-- Remove the H2 sections as required -->
+# Impact of Change
+<!-- How this change will impact users and projects that integrate using this SDK? -->
+<!-- Remove sections below that are not applicable -->
 ## Added 
 <!-- Section for new features. -->
 
@@ -31,13 +29,12 @@
 <!-- Section in case of vulnerabilities. -->
 
 
+# Other things worth calling out
+<!-- Useful tips, gotchas, trade-offs made to the reviewers. -->
 
 
-# Things worth calling out
-<!--- Give useful tips/gotchas/trade-offs made to the reviewers. -->
-
-
-# Before submitting the PR, please consider the following:
+# Before submitting the PR, follow these steps:
 <!-- List of things to check before submitting the PR -->
 
 - [ ] Prefix your PR title with `feat: `, `fix: `, `chore: `, `docs:`, or `refactor:`.
+- [ ] Prefix your PR title with `breaking-change:` if you have introduced breaking changes to this SDK. Breaking changes are modification that necessitates immediate adjustments by this SDK's users to their applications, clients, or integrations to avert disruptions to existing features or functionalities. Ensure you write clear summary explain the change.

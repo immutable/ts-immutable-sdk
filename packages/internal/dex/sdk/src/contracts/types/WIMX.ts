@@ -28,7 +28,7 @@ import type {
   PromiseOrValue,
 } from "./common";
 
-export interface WETHInterface extends utils.Interface {
+export interface WIMXInterface extends utils.Interface {
   functions: {
     "name()": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
@@ -169,12 +169,12 @@ export type WithdrawalEvent = TypedEvent<
 
 export type WithdrawalEventFilter = TypedEventFilter<WithdrawalEvent>;
 
-export interface WETH extends BaseContract {
+export interface WIMX extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: WETHInterface;
+  interface: WIMXInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,

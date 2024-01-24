@@ -1,5 +1,5 @@
 {
-  "name": "@imtbl/provider",
+  "name": "@imtbl/x-provider",
   "description": "Provider package for Immutable SDK",
   "version": "0.0.0",
   "author": "Immutable",

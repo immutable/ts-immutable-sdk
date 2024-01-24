@@ -19,18 +19,19 @@ export default function Connect(props: ConnectProps) {
 
   async function connectClick() {
     if (!checkout) {
-      console.error('missing checkout, please connect frist');
+      console.error('missing checkout, please connect first');
       return;
     }
     if (!provider) {
-      console.error('missing provider, please connect frist');
+      console.error('missing provider, please connect first');
       return;
     }
     setError(null);
     setLoading(true);
     try {
       const resp = await checkout.connect({
-        provider 
+        provider,
+        requestWalletPermissions: true,
       });
       setProvider(resp.provider);
       setResult(resp.provider);
@@ -46,7 +47,7 @@ export default function Connect(props: ConnectProps) {
   }
 
   useEffect(() => {
-    // reset state wehn checkout changes from environment switch
+    // reset state when checkout changes from environment switch
     setResult(undefined);
     setError(null);
     setLoading(false);
