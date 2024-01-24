@@ -18,7 +18,6 @@ import { TransactionDetails } from './TransactionDetails';
 type TransactionItemWithdrawPendingProps = {
   label: string
   transaction: Transaction,
-  // token: TokenInfo,
   fiatAmount: string
   amount: string
 };

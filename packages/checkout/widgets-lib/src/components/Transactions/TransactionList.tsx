@@ -85,7 +85,6 @@ export function TransactionList({
                   key={hash}
                   label={token.name}
                   transaction={t}
-                  // token={token}
                   fiatAmount={`${fiatPricePrefix}${fiat}`}
                   amount={amount}
                 />
@@ -98,7 +97,6 @@ export function TransactionList({
                 label={token.name}
                 details={{ text: stepInfo, link, hash }}
                 transaction={t}
-                // token={token}
                 fiatAmount={`${fiatPricePrefix}${fiat}`}
                 amount={amount}
               />

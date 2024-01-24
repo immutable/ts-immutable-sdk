@@ -19,7 +19,6 @@ type TransactionItemProps = {
     hash: string,
   },
   transaction: Transaction,
-  // token: TokenInfo,
   fiatAmount: string
   amount: string
 };
@@ -36,10 +35,10 @@ export function TransactionItem({
   const txnDetailsLink = useMemo(() => `${details.link}${details.hash}`, [details]);
 
   const handleDetailsLinkClick = (
-    e: MouseEvent<HTMLAnchorElement>,
+    event: MouseEvent<HTMLAnchorElement>,
     linkDetail: { text: string, link: string, hash: string },
   ) => {
-    e.stopPropagation(); // prevent expanding accordian
+    event.stopPropagation(); // prevent expanding accordian
 
     track({
       userJourney: UserJourney.BRIDGE,
