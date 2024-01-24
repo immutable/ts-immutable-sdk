@@ -628,7 +628,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/design-tokens@npm:*, @biom3/design-tokens@npm:0.2.9":
+"@biom3/design-tokens@npm:*":
   version: 0.2.9
   resolution: "@biom3/design-tokens@npm:0.2.9"
   dependencies:
@@ -637,9 +637,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.19.22":
-  version: 0.19.31
-  resolution: "@biom3/react@npm:0.19.31"
+"@biom3/design-tokens@npm:^0.2.10":
+  version: 0.2.11
+  resolution: "@biom3/design-tokens@npm:0.2.11"
+  dependencies:
+    lodash.get: ^4.4.2
+  checksum: eb0d94cdd8820dddda6be407d6dea938b68bb6de0fdda50fa8769f22f82c6196bdb6a3d4dd3a4b30fec0a9f5925657681cfa5b34022b8f83b2683c67aeed3341
+  languageName: node
+  linkType: hard
+
+"@biom3/react@npm:^0.19.40":
+  version: 0.19.42
+  resolution: "@biom3/react@npm:0.19.42"
   dependencies:
     "@biom3/design-tokens": "*"
     "@emotion/css": ^11.11.2
@@ -648,7 +657,7 @@ __metadata:
     buffer: ^6.0.3
     csstype: ^3.1.2
     framer-motion: ^10.12.12
-    localstorage-slim: ^2.7.0
+    localforage: ^1.10.0
     lodash.debounce: ^4.0.8
     lodash.get: ^4.4.2
     lodash.isequal: ^4.5.0
@@ -658,7 +667,7 @@ __metadata:
     react-is: ^18.2.0
     react-keyed-flatten-children: ^3.0.0
     ts-deepmerge: ^6.2.0
-  checksum: 5a8c088472f35b2ca609b6cd863de5109f17411d48953ace861875b3e8d51920ee6e8190532ae7e28b13b31e8cb4d285038aeb7995b5834f513abfe6cc521a5d
+  checksum: 57fb7545adeab582cdb91e0a1ef896f886166faba1c7409a3fc6c3ae1a23a95ba67662526fddba67f3d01bbe331be41d7c23ab560f8b04603041edd65a96be94
   languageName: node
   linkType: hard
 
@@ -1315,12 +1324,12 @@ __metadata:
 
 "@imtbl/sdk@file:../../../sdk::locator=func-tests-imx%40workspace%3A.":
   version: 0.0.0
-  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=7193ab&locator=func-tests-imx%40workspace%3A."
+  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=ac36b0&locator=func-tests-imx%40workspace%3A."
   dependencies:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
-    "@biom3/design-tokens": 0.2.9
-    "@biom3/react": ^0.19.22
+    "@biom3/design-tokens": ^0.2.10
+    "@biom3/react": ^0.19.40
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
     "@ethersproject/providers": ^5.7.2
@@ -1328,7 +1337,7 @@ __metadata:
     "@imtbl/core-sdk": ^2.4.0
     "@imtbl/react-analytics": 0.2.1-alpha
     "@jest/globals": ^29.5.0
-    "@magic-ext/oidc": ^4.2.0
+    "@magic-ext/oidc": 4.2.0
     "@metamask/detect-provider": ^2.0.0
     "@opensea/seaport-js": 2.0.7
     "@uniswap/router-sdk": ^1.4.0
@@ -1346,7 +1355,7 @@ __metadata:
     i18next-browser-languagedetector: ^7.2.0
     jwt-decode: ^3.1.2
     magic-sdk: ^21.2.0
-    oidc-client-ts: ^2.2.1
+    oidc-client-ts: 2.2.1
     os-browserify: ^0.3.0
     pako: ^2.1.0
     react-i18next: ^13.5.0
@@ -1356,7 +1365,7 @@ __metadata:
   peerDependencies:
     react: ^18.2.0
     react-dom: ^18.2.0
-  checksum: 690823733cb9ce36119b6c77f086e1da5f4c39cf5d86092ad430e7a845e9141351786ba4c811c824522313f459db4550c01ea0b7d023681afd2cdba068e10f51
+  checksum: 47625219e15e675a1343c489ba0fb348e4d4d5a74d39ffaf967d48c4cc9dfcc43dd0cf659be48e9f19f731b9f8778d4c1baf73f8328218974e30e55c347d7398
   languageName: node
   linkType: hard
 
@@ -1909,10 +1918,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@magic-ext/oidc@npm:^4.2.0":
-  version: 4.3.2
-  resolution: "@magic-ext/oidc@npm:4.3.2"
-  checksum: e179a274531ea62a85b7f78e159eeab6ff16278bcf26421e0bb046e188fcb7b5756a0ef5cc0d3bad317d2a828e225779e1ead2ea35aa8211be3d4a51d51d8022
+"@magic-ext/oidc@npm:4.2.0":
+  version: 4.2.0
+  resolution: "@magic-ext/oidc@npm:4.2.0"
+  checksum: 7bd51bf45168b7456a963f87c9118617f73c9a7e2c427b4bd786775f5fb80c90e90cbb10069e8a670587a8b20871bf4aa706f9fdef7f5981f007550b2adfc947
   languageName: node
   linkType: hard
 
@@ -5100,7 +5109,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"crypto-js@npm:^4.2.0":
+"crypto-js@npm:^4.1.1, crypto-js@npm:^4.2.0":
   version: 4.2.0
   resolution: "crypto-js@npm:4.2.0"
   checksum: f051666dbc077c8324777f44fbd3aaea2986f198fe85092535130d17026c7c2ccf2d23ee5b29b36f7a4a07312db2fae23c9094b644cc35f7858b1b4fcaf27774
@@ -8137,19 +8146,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"localforage@npm:^1.7.4":
+"localforage@npm:^1.10.0, localforage@npm:^1.7.4":
   version: 1.10.0
   resolution: "localforage@npm:1.10.0"
   dependencies:
     lie: 3.1.1
   checksum: f2978b434dafff9bcb0d9498de57d97eba165402419939c944412e179cab1854782830b5ec196212560b22712d1dd03918939f59cf1d4fc1d756fca7950086cf
-  languageName: node
-  linkType: hard
-
-"localstorage-slim@npm:^2.7.0":
-  version: 2.7.0
-  resolution: "localstorage-slim@npm:2.7.0"
-  checksum: eaa52251005baca503d28818dcde89c3c4e72c3617497a3bf2f990636c92a1f112c4a67d8eba8a2b70e40c994abe791df5043983e67585455c74d1e0fee58986
   languageName: node
   linkType: hard
 
@@ -8895,13 +8897,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"oidc-client-ts@npm:^2.2.1":
-  version: 2.4.0
-  resolution: "oidc-client-ts@npm:2.4.0"
+"oidc-client-ts@npm:2.2.1":
+  version: 2.2.1
+  resolution: "oidc-client-ts@npm:2.2.1"
   dependencies:
-    crypto-js: ^4.2.0
+    crypto-js: ^4.1.1
     jwt-decode: ^3.1.2
-  checksum: 8467db689298221f706d3358961efb0ddc789f6bd7d4765e71ae5fe62067999d2ce6e8e7584b9d991b8caa6f7fb383f75841e1cfa9e05808c34632de374f5e68
+  checksum: 83bc815d59a1221bdf2a39aff505941f1bf9aba542a59cc9cbe677b85fc06d4f555d55c1b0a6ad8ca76c57bacc423e1b03de5b7cef3d93c403126143f1152943
   languageName: node
   linkType: hard
 

@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Web3Provider } from '@ethersproject/providers';
-import { WalletAction, CheckConnectionResult } from '../types';
+import {
+  WalletAction, CheckConnectionResult,
+} from '../types';
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 
 export async function checkIsWalletConnected(
@@ -55,6 +57,31 @@ export async function connectSite(web3Provider: Web3Provider): Promise<Web3Provi
       await web3Provider.provider.request({
         method: WalletAction.CONNECT,
         params: [],
+      });
+    },
+    { type: CheckoutErrorType.USER_REJECTED_REQUEST_ERROR },
+  );
+
+  return web3Provider;
+}
+
+export async function requestPermissions(web3Provider: Web3Provider): Promise<Web3Provider> {
+  if (!web3Provider || !web3Provider.provider?.request) {
+    throw new CheckoutError(
+      'Incompatible provider',
+      CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR,
+      { details: 'Attempting to connect with an incompatible provider' },
+    );
+  }
+
+  await withCheckoutError<void>(
+    async () => {
+      if (!web3Provider.provider.request) return;
+
+      await web3Provider.provider.request({
+        method: WalletAction.REQUEST_PERMISSIONS,
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        params: [{ eth_accounts: {} }],
       });
     },
     { type: CheckoutErrorType.USER_REJECTED_REQUEST_ERROR },

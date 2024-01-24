@@ -87,7 +87,7 @@ export {
   NftTransferDetails,
 } from '@imtbl/core-sdk';
 
-export class ImmutableXClient {
+export class IMXClient {
   private immutableX: ImmutableX;
 
   public depositsApi: DepositsApi;

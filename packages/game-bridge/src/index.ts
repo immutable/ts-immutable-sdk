@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import * as passport from '@imtbl/passport';
 import * as config from '@imtbl/config';
-import * as provider from '@imtbl/provider';
+import * as provider from '@imtbl/x-provider';
 import { gameBridgeVersionCheck } from '@imtbl/version-check';
 
 /* eslint-disable no-undef */

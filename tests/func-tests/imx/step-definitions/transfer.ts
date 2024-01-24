@@ -1,9 +1,13 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { parseEther } from '@ethersproject/units';
-import { ImxClientModuleConfiguration } from '@imtbl/sdk/immutablex_client';
-import { GenericIMXProvider, ProviderConfiguration } from '@imtbl/sdk/provider';
+import {
+  ImxClientModuleConfiguration,
+  GenericIMXProvider,
+  ProviderConfiguration,
+} from '@imtbl/sdk/x';
 import { env, getProvider } from 'common';
 import { configuration, StepSharedState } from './stepSharedState';
- 
+
 export class Transfer {
   constructor(protected stepSharedState: StepSharedState) {}
 
@@ -132,9 +136,9 @@ export class Transfer {
         status: response.status,
         time: response.time,
         transfer_id: response.transfer_id,
-      };          
+      };
     } catch (error) {
-      console.log('error', error);      
-    } 
+      console.log('error', error);
+    }
   }
 }
