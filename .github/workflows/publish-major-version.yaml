@@ -55,11 +55,16 @@ jobs:
       - run: echo "check-result = ${{ steps.check_user_permission.outputs.check-result }}"
 
       - name: Admin Permission Check
-        if: ${{ steps.check_user_permission.outputs.require-result == 'true' }}
-        run: echo "${{ github.triggering_actor }} has admin permission"
-
-      - name: Admin Permission Check - Early Exit
         if: ${{ steps.check_user_permission.outputs.require-result != 'true' }}
+        run: exit 1
+
+      - name: Allowed Actors Check
+        id: allowed_actors_check 
+        if: ${{ contains(fromJson('["cajames", "CodeSchwert", "wdinau"]'), github.triggering_actor) }}
+        run: echo "ALLOWED_ACTOR=true" >> $GITHUB_OUTPUT 
+
+      - name: Allowed Actors Filter
+        if: ${{ steps.allowed_actors_check.outputs.ALLOWED_ACTOR != 'true' }}
         run: exit 1
 
       - name: Foo
