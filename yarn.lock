@@ -2179,8 +2179,8 @@ __metadata:
   linkType: hard
 
 "@biom3/react@npm:^0.19.42":
-  version: 0.19.42
-  resolution: "@biom3/react@npm:0.19.42"
+  version: 0.19.44
+  resolution: "@biom3/react@npm:0.19.44"
   dependencies:
     "@biom3/design-tokens": "*"
     "@emotion/css": ^11.11.2
@@ -2199,7 +2199,7 @@ __metadata:
     react-is: ^18.2.0
     react-keyed-flatten-children: ^3.0.0
     ts-deepmerge: ^6.2.0
-  checksum: 57fb7545adeab582cdb91e0a1ef896f886166faba1c7409a3fc6c3ae1a23a95ba67662526fddba67f3d01bbe331be41d7c23ab560f8b04603041edd65a96be94
+  checksum: 601dba7d1c7ce9e8218d9ae209ab453ed3cc23f1e708ad23e153856d73af5cef5453f4dcf946e2e78614d58e5a3315106b422a1171c95313fa48d9e1f99451e6
   languageName: node
   linkType: hard
 
@@ -3452,7 +3452,7 @@ __metadata:
     rollup-plugin-svg: ^2.0.0
     stream-browserify: ^3.0.0
     stream-http: ^3.2.0
-    ts-jest: ^29.1.0
+    ts-jest: ^29.1.1
     typescript: ^4.9.5
     url: ^0.11.0
     web-vitals: ^2.1.4
@@ -3464,6 +3464,7 @@ __metadata:
   resolution: "@imtbl/config@workspace:packages/config"
   dependencies:
     "@imtbl/core-sdk": ^2.4.0
+    "@imtbl/metrics": 0.0.0
     "@magic-ext/oidc": 4.2.0
     "@metamask/detect-provider": ^2.0.0
     "@rollup/plugin-typescript": ^11.0.0
@@ -3623,6 +3624,23 @@ __metadata:
     rollup: ^3.17.2
     ts-node: ^10.9.1
     typechain: ^8.1.1
+    typescript: ^4.9.5
+  languageName: unknown
+  linkType: soft
+
+"@imtbl/metrics@0.0.0, @imtbl/metrics@workspace:packages/internal/metrics":
+  version: 0.0.0-use.local
+  resolution: "@imtbl/metrics@workspace:packages/internal/metrics"
+  dependencies:
+    "@rollup/plugin-typescript": ^11.0.0
+    "@swc/jest": ^0.2.24
+    "@types/jest": ^29.4.3
+    axios: ^1.6.5
+    eslint: ^8.40.0
+    jest: ^29.4.3
+    jest-environment-jsdom: ^29.4.3
+    rollup: ^3.17.2
+    ts-jest: ^29.1.1
     typescript: ^4.9.5
   languageName: unknown
   linkType: soft
@@ -26044,7 +26062,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ts-jest@npm:^29.1.0":
+"ts-jest@npm:^29.1.1":
   version: 29.1.1
   resolution: "ts-jest@npm:29.1.1"
   dependencies:
