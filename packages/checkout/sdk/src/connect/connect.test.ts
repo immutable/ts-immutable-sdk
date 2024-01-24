@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Web3Provider } from '@ethersproject/providers';
-import { checkIsWalletConnected, connectSite } from './connect';
+import { checkIsWalletConnected, connectSite, requestPermissions } from './connect';
 import { WalletAction, WalletProviderName } from '../types';
 import { CheckoutErrorType } from '../errors';
 import { createProvider } from '../provider';
@@ -139,6 +139,60 @@ describe('connect', () => {
 
       try {
         await connectSite(provider);
+      } catch (err: any) {
+        expect(err.message).toEqual('[USER_REJECTED_REQUEST_ERROR] Cause:User rejected request');
+        expect(err.type).toEqual(CheckoutErrorType.USER_REJECTED_REQUEST_ERROR);
+      }
+    });
+  });
+
+  describe('requestPermissions', () => {
+    it('should call the requestPermissions function with metamask and return a Web3Provider', async () => {
+      const { provider } = await createProvider(WalletProviderName.METAMASK);
+      const reqRes = await requestPermissions(provider);
+
+      expect(reqRes).toBeInstanceOf(Web3Provider);
+      expect(reqRes?.provider).not.toBe(null);
+      expect(reqRes?.provider.request).toBeCalledWith({
+        method: WalletAction.REQUEST_PERMISSIONS,
+        params: [{ ethAccounts: {} }],
+      });
+    });
+
+    it('should throw an error if provider missing from web3provider', async () => {
+      try {
+        await requestPermissions({} as Web3Provider);
+      } catch (err: any) {
+        expect(err.message).toEqual('Incompatible provider');
+        expect(err.type).toEqual(CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR);
+        expect(err.data.details).toEqual('Attempting to connect with an incompatible provider');
+      }
+    });
+
+    it('should throw an error if provider.request is not found', async () => {
+      try {
+        await requestPermissions({ provider: {} } as Web3Provider);
+      } catch (err: any) {
+        expect(err.message).toEqual('Incompatible provider');
+        expect(err.type).toEqual(CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR);
+        expect(err.data.details).toEqual('Attempting to connect with an incompatible provider');
+      }
+    });
+
+    it('should throw an error if the user rejects the permission request', async () => {
+      windowSpy.mockImplementation(() => ({
+        ethereum: {
+          request: jest
+            .fn()
+            .mockRejectedValue(new Error('User rejected request')),
+        },
+        removeEventListener: () => {},
+      }));
+
+      const { provider } = await createProvider(WalletProviderName.METAMASK);
+
+      try {
+        await requestPermissions(provider);
       } catch (err: any) {
         expect(err.message).toEqual('[USER_REJECTED_REQUEST_ERROR] Cause:User rejected request');
         expect(err.type).toEqual(CheckoutErrorType.USER_REJECTED_REQUEST_ERROR);
