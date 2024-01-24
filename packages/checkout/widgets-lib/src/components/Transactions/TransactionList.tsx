@@ -17,6 +17,7 @@ import { formatUnits } from 'ethers/lib/utils';
 import { TransactionItem } from './TransactionItem';
 import { KnownNetworkMap } from './transactionsType';
 import { containerStyles, headingStyles, transactionsListStyle } from './TransactionListStyles';
+import { TransactionItemWithdrawPending } from './TransactionItemWithdrawPending';
 
 type TransactionListProps = {
   checkout: Checkout,
@@ -50,7 +51,7 @@ export function TransactionList({
   const sortWithdrawalPendingFirst = useCallback((txnA, txnB) => {
     if (
       txnA.details.current_status.status === TransactionStatus.WITHDRAWAL_PENDING
-      && txnB.details.current_status.status === TransactionStatus.IN_PROGRESS) return -1;
+      && txnB.details.current_status.status !== TransactionStatus.WITHDRAWAL_PENDING) return -1;
     if (txnA.details.current_status.status === txnB.details.current_status.status) return 0;
 
     return 1;
@@ -70,13 +71,26 @@ export function TransactionList({
           .map((t) => {
             const hash = t.blockchain_metadata.transaction_hash;
             const tokens = knownTokenMap[t.details.from_chain];
-            if (!tokens) return <Box key={hash} />;
+            if (!tokens) return false;
 
             const token = tokens[t.details.from_token_address.toLowerCase()];
-            if (!token) return <Box key={hash} />;
+            if (!token) return false;
 
             const amount = formatUnits(t.details.amount, token.decimals);
             const fiat = calculateCryptoToFiat(amount, token.symbol, cryptoFiatState.conversions);
+
+            if (t.details.current_status.status === TransactionStatus.WITHDRAWAL_PENDING) {
+              return (
+                <TransactionItemWithdrawPending
+                  key={hash}
+                  label={token.name}
+                  transaction={t}
+                  // token={token}
+                  fiatAmount={`${fiatPricePrefix}${fiat}`}
+                  amount={amount}
+                />
+              );
+            }
 
             return (
               <TransactionItem
