@@ -26,7 +26,8 @@ Feature: Withdrawal
   #   When user "user1" prepare withdrawal of NFT "minted"
   #   Then NFT "minted" should be in "preparing_withdrawal" status
 
-  @withdrawal @withdrawalETH @onchain @ethSignature @prepareWithdrawal
+  # TODO: DX-2598 - skipping this test for now as it keeps randomly failing in CI
+  @withdrawal @withdrawalETH @onchain @ethSignature @prepareWithdrawal @skip
   Scenario: Withdraw ETH
     Given A new Eth wallet "user1"
     And "user1" is registered
