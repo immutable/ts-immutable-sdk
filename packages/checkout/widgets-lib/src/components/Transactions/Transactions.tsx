@@ -5,8 +5,6 @@ import {
   useCallback, useContext, useEffect, useState,
 } from 'react';
 import { EventTargetContext } from 'context/event-target-context/EventTargetContext';
-import { text } from 'resources/text/textConfig';
-import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { Box } from '@biom3/react';
 import { createAndConnectToProvider, isPassportProvider } from 'lib/providerUtils';
 import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
@@ -25,6 +23,7 @@ import { retry } from 'lib/retry';
 import { getChainSlugById } from 'lib/chains';
 import { CryptoFiatActions, CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
+import { useTranslation } from 'react-i18next';
 import { sendBridgeWidgetCloseEvent } from '../../widgets/bridge/BridgeWidgetEvents';
 import { Shimmer } from './Shimmer';
 import {
@@ -47,8 +46,7 @@ export function Transactions({ checkout }: TransactionsProps) {
 
   const { cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { page } = useAnalytics();
-
-  const { layoutHeading } = text.views[BridgeWidgetViews.TRANSACTIONS];
+  const { t } = useTranslation();
 
   const [loading, setLoading] = useState(true);
   const [provider, setProvider] = useState<Web3Provider | undefined>(undefined);
@@ -247,7 +245,7 @@ export function Transactions({ checkout }: TransactionsProps) {
       header={(
         <HeaderNavigation
           showBack
-          title={layoutHeading}
+          title={t('views.TRANSACTIONS.layoutHeading')}
           onCloseButtonClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
         />
       )}

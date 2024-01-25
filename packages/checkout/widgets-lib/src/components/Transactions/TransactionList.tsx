@@ -14,6 +14,7 @@ import { Transaction, TransactionStatus } from 'lib/clients';
 import { CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext';
 import { calculateCryptoToFiat } from 'lib/utils';
 import { formatUnits } from 'ethers/lib/utils';
+import { useTranslation } from 'react-i18next';
 import { TransactionItem } from './TransactionItem';
 import { KnownNetworkMap } from './transactionsType';
 import { containerStyles, headingStyles, transactionsListStyle } from './TransactionListStyles';
@@ -33,11 +34,9 @@ export function TransactionList({
   isPassport,
 }: TransactionListProps) {
   const { cryptoFiatState } = useContext(CryptoFiatContext);
+  const { t } = useTranslation();
 
   const {
-    status: {
-      inProgress: { stepInfo }, // , heading, txnEstimate
-    },
     fiatPricePrefix,
   } = text.views[BridgeWidgetViews.TRANSACTIONS];
 
@@ -68,23 +67,23 @@ export function TransactionList({
       >
         {transactions
           .sort(sortWithdrawalPendingFirst)
-          .map((t) => {
-            const hash = t.blockchain_metadata.transaction_hash;
-            const tokens = knownTokenMap[t.details.from_chain];
+          .map((transaction) => {
+            const hash = transaction.blockchain_metadata.transaction_hash;
+            const tokens = knownTokenMap[transaction.details.from_chain];
             if (!tokens) return false;
 
-            const token = tokens[t.details.from_token_address.toLowerCase()];
+            const token = tokens[transaction.details.from_token_address.toLowerCase()];
             if (!token) return false;
 
-            const amount = formatUnits(t.details.amount, token.decimals);
+            const amount = formatUnits(transaction.details.amount, token.decimals);
             const fiat = calculateCryptoToFiat(amount, token.symbol, cryptoFiatState.conversions);
 
-            if (t.details.current_status.status === TransactionStatus.WITHDRAWAL_PENDING) {
+            if (transaction.details.current_status.status === TransactionStatus.WITHDRAWAL_PENDING) {
               return (
                 <TransactionItemWithdrawPending
                   key={hash}
                   label={token.name}
-                  transaction={t}
+                  transaction={transaction}
                   fiatAmount={`${fiatPricePrefix}${fiat}`}
                   amount={amount}
                 />
@@ -95,8 +94,8 @@ export function TransactionList({
               <TransactionItem
                 key={hash}
                 label={token.name}
-                details={{ text: stepInfo, link, hash }}
-                transaction={t}
+                details={{ text: t('views.TRANSACTIONS.status.inProgress.stepInfo'), link, hash }}
+                transaction={transaction}
                 fiatAmount={`${fiatPricePrefix}${fiat}`}
                 amount={amount}
               />

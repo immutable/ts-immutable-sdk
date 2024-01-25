@@ -471,6 +471,7 @@ export const text = {
         emptyState: {
           notConnected: {
             body: 'Connect your wallet to view the transactions',
+            buttonText: 'Connect',
           },
         },
         noTransactions: {
