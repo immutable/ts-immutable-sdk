@@ -60,7 +60,7 @@ jobs:
 
       - name: Allowed Actors Check
         id: allowed_actors_check 
-        if: ${{ contains(fromJson('["cajames", "CodeSchwert", "wdinau"]'), github.triggering_actor) }}
+        if: ${{ contains(fromJson('["cajames", "wdinau"]'), github.triggering_actor) }}
         run: echo "ALLOWED_ACTOR=true" >> $GITHUB_OUTPUT 
 
       - name: Allowed Actors Filter
