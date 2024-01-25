@@ -6,6 +6,7 @@ export enum WalletAction {
   ADD_NETWORK = 'wallet_addEthereumChain',
   SWITCH_NETWORK = 'wallet_switchEthereumChain',
   GET_CHAINID = 'eth_chainId',
+  REQUEST_PERMISSIONS = 'wallet_requestPermissions',
 }
 
 /**
