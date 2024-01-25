@@ -1,10 +1,9 @@
 import { Body, Box, Button } from '@biom3/react';
-import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
-import { text } from 'resources/text/textConfig';
 import { Checkout, WalletProviderName } from '@imtbl/checkout-sdk';
 import { WalletDrawer } from 'widgets/bridge/components/WalletDrawer';
 import { useMemo, useState } from 'react';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
+import { useTranslation } from 'react-i18next';
 import { containerStyle } from './EmptyStateNotConnectedStyles';
 
 type EmptyStateNotConnectedProps = {
@@ -14,11 +13,7 @@ type EmptyStateNotConnectedProps = {
 
 export function EmptyStateNotConnected({ checkout, updateProvider }: EmptyStateNotConnectedProps) {
   const { track } = useAnalytics();
-
-  const {
-    status: { emptyState },
-    walletSelection: { heading },
-  } = text.views[BridgeWidgetViews.TRANSACTIONS];
+  const { t } = useTranslation();
 
   const [showWalletDrawer, setShowWalletDrawer] = useState(false);
 
@@ -48,21 +43,20 @@ export function EmptyStateNotConnected({ checkout, updateProvider }: EmptyStateN
   return (
     <>
       <Box sx={containerStyle}>
-        <Body sx={{ mb: 'base.spacing.x8' }}>{emptyState.notConnected.body}</Body>
+        <Body sx={{ mb: 'base.spacing.x8' }}>{t('views.TRANSACTIONS.status.emptyState.notConnected.body')}</Body>
         <Button
           variant="secondary"
           size="medium"
           testId="transactions-connect-wallet-button"
           onClick={openWalletDrawer}
         >
-          Connect
-
+          {t('views.TRANSACTIONS.status.emptyState.notConnected.buttonText')}
         </Button>
       </Box>
       <WalletDrawer
         testId="select-wallet-drawer"
         drawerText={{
-          heading,
+          heading: t('views.TRANSACTIONS.walletSelection.heading'),
         }}
         showWalletSelectorTarget={false}
         walletOptions={walletOptions}

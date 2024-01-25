@@ -444,8 +444,8 @@
     },
     "IN_PROGRESS": {
       "heading": "Move in progress",
-      "body1": "Less than 3 mins until your ${symbol} lands on zkEVM.",
-      "body2": "You can close this window, the transaction will be reflected in your wallet once complete."
+      "body1": "Your funds have been sent, with less than 20 mins remaining until they're received. You can return and view progress by clicking on the rocket icon.",
+      "body2": "You can close this window."
     },
     "CLAIM_WITHDRAWAL": {
       "content": {
@@ -459,87 +459,130 @@
       },
       "loadingView": {
         "text": "Initiating move"
-      }
-    }
-  },
-  "footers": {
-    "quickswapFooter": {
-      "disclaimerText": "Quickswap is a third party app. Immutable neither builds, owns, operates or deploys Quickswap. For further info, refer to Quickswap’s website."
-    }
-  },
-  "wallets": {
-    "passport": {
-      "heading": "Immutable Passport",
-      "accentText": "Recommended",
-      "description": "digital wallet and identity"
-    },
-    "metamask": {
-      "heading": "MetaMask",
-      "description": "Digital wallet for accessing blockchain applications and web3"
-    }
-  },
-  "drawers": {
-    "feesBreakdown": {
-      "heading": "Fee breakdown",
-      "total": "Fees total",
-      "fees": {
-        "gas": {
-          "label": "Gas fee"
-        }
-      }
-    },
-    "transactionFailed": {
-      "content": {
-        "heading1": "We’ll need you to confirm in your",
-        "heading2": "wallet before proceeding",
-        "body1": "When the MetaMask pop up appears, be sure to",
-        "body2": "sign the transaction"
       },
-      "buttons": {
-        "retry": "Got it",
-        "cancel": "Dismiss"
-      }
-    },
-    "coinSelector": {
-      "option": {
-        "fiatPricePrefix": "Approx USD $"
-      },
-      "noCoins": "You have no available coins to select in your wallet."
-    },
-    "notEnoughGas": {
-      "content": {
-        "heading": "Balance too low",
-        "body": "You're ETH balance is too low to cover the gas fee on this move. You could transfer more ETH into your wallet using MetaMask directly."
-      },
-      "buttons": {
-        "adjustAmount": "Adjust amount",
-        "copyAddress": "Copy wallet address",
-        "cancel": "Dismiss"
-      }
-    },
-    "notEnoughImx": {
-      "content": {
-        "noImx": {
-          "heading": "You'll need IMX coins to swap",
-          "body": "Swap fees are paid in IMX coins, so you'll need to add this before you can swap"
+      "TRANSACTIONS": {
+        "layoutHeading": "In progress",
+        "passportDashboard": "View the full transaction history in your",
+        "status": {
+          "withdrawalPending": {
+            "actionButtonText": "Proceed",
+            "withdrawalDelayText": "This move has been paused, please return ",
+            "withdrawalReadyText": "Action required to receive your coins",
+            "caption": "Paused"
+          },
+          "inProgress": {
+            "heading": "In Progress",
+            "txnEstimate": "Usually takes 20 mins",
+            "stepInfo": "View Details"
+          },
+          "emptyState": {
+            "notConnected": {
+              "body": "Connect your wallet to view the transactions",
+              "buttonText": "Connect"
+            }
+          },
+          "noTransactions": {
+            "body": "You're all done here.",
+            "passport": {
+              "body": "View your completed transactions in ",
+              "link": "Passport"
+            }
+          }
         },
-        "insufficientImx": {
-          "heading": "You'll need more IMX coins",
-          "body": "In order to cover the fees for the amount specified, you'll need to add more IMX coins"
+        "fiatPricePrefix": "≈ USD $",
+        "support": {
+          "body1": "Need help?",
+          "body2": " Contact ",
+          "body3": "support",
+          "supportLink": "https://support.immutable.com/en/",
+          "passport": {
+            "body1": "Or view completed transactions in your ",
+            "body2": "Passport"
+          }
+        },
+        "walletSelection": {
+          "heading": "Choose a wallet to view"
         }
-      },
-      "buttons": {
-        "adjustAmount": "Adjust amount",
-        "addMoreImx": "Add IMX coins",
-        "cancel": "Dismiss"
       }
     },
-    "unableToSwap": {
-      "heading": "Unable to swap this coin",
-      "body": "This coin pairing isn't available to swap right now. Try another selection.",
-      "buttons": {
-        "cancel": "Dismiss"
+    "footers": {
+      "quickswapFooter": {
+        "disclaimerText": "Quickswap is a third party app. Immutable neither builds, owns, operates or deploys Quickswap. For further info, refer to Quickswap’s website."
+      }
+    },
+    "wallets": {
+      "passport": {
+        "heading": "Immutable Passport",
+        "accentText": "Recommended",
+        "description": "digital wallet and identity"
+      },
+      "metamask": {
+        "heading": "MetaMask",
+        "description": "Digital wallet for accessing blockchain applications and web3"
+      }
+    },
+    "drawers": {
+      "feesBreakdown": {
+        "heading": "Fee breakdown",
+        "total": "Fees total",
+        "fees": {
+          "gas": {
+            "label": "Gas fee"
+          }
+        }
+      },
+      "transactionFailed": {
+        "content": {
+          "heading1": "We’ll need you to confirm in your",
+          "heading2": "wallet before proceeding",
+          "body1": "When the MetaMask pop up appears, be sure to",
+          "body2": "sign the transaction"
+        },
+        "buttons": {
+          "retry": "Got it",
+          "cancel": "Dismiss"
+        }
+      },
+      "coinSelector": {
+        "option": {
+          "fiatPricePrefix": "Approx USD $"
+        },
+        "noCoins": "You have no available coins to select in your wallet."
+      },
+      "notEnoughGas": {
+        "content": {
+          "heading": "Balance too low",
+          "body": "You're ETH balance is too low to cover the gas fee on this move. You could transfer more ETH into your wallet using MetaMask directly."
+        },
+        "buttons": {
+          "adjustAmount": "Adjust amount",
+          "copyAddress": "Copy wallet address",
+          "cancel": "Dismiss"
+        }
+      },
+      "notEnoughImx": {
+        "content": {
+          "noImx": {
+            "heading": "You'll need IMX coins to swap",
+            "body": "Swap fees are paid in IMX coins, so you'll need to add this before you can swap"
+          },
+          "insufficientImx": {
+            "heading": "You'll need more IMX coins",
+            "body": "In order to cover the fees for the amount specified, you'll need to add more IMX coins"
+          }
+        },
+        "buttons": {
+          "adjustAmount": "Adjust amount",
+          "addMoreImx": "Add IMX coins",
+          "cancel": "Dismiss"
+        }
+      },
+      "unableToSwap": {
+        "heading": "Unable to swap this coin",
+        "body": "This coin pairing isn't available to swap right now. Try another selection.",
+        "buttons": {
+          "cancel": "Dismiss"
+        }
       }
     }
   }
-}

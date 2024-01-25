@@ -8,10 +8,10 @@ import {
   MenuItem,
 } from '@biom3/react';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
-import { text } from 'resources/text/textConfig';
-import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { Transaction, TransactionStatus } from 'lib/clients/checkoutApiType';
-import { useMemo, useContext } from 'react';
+import { useContext, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { ViewActions, ViewContext } from 'context/view-context/ViewContext';
 import { actionsContainerStyles, actionsLayoutStyles, containerStyles } from './transactionItemStyles';
 import { TransactionDetails } from './TransactionDetails';
@@ -19,7 +19,6 @@ import { TransactionDetails } from './TransactionDetails';
 type TransactionItemWithdrawPendingProps = {
   label: string
   transaction: Transaction,
-  // token: TokenInfo,
   fiatAmount: string
   amount: string
 };
@@ -30,9 +29,9 @@ export function TransactionItemWithdrawPending({
   fiatAmount,
   amount,
 }: TransactionItemWithdrawPendingProps) {
-  const { track } = useAnalytics();
-  const { status: { withdrawalPending } } = text.views[BridgeWidgetViews.TRANSACTIONS];
   const { viewDispatch } = useContext(ViewContext);
+  const { track } = useAnalytics();
+  const translation = useTranslation();
 
   const dateNowUnixMs = useMemo(() => new Date().getTime(), []);
   const withdrawalReadyDate = useMemo(
@@ -44,7 +43,7 @@ export function TransactionItemWithdrawPending({
 
   const requiresWithdrawalClaim = transaction.details.current_status.status === TransactionStatus.WITHDRAWAL_PENDING;
 
-  const relativeTimeFormat = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+  const relativeTimeFormat = new Intl.RelativeTimeFormat(translation[1].language || 'en', { numeric: 'auto' });
 
   const delayTimeString = useMemo(() => {
     if (!requiresWithdrawalClaim || withdrawalReadyDate === undefined) return '';
@@ -62,12 +61,15 @@ export function TransactionItemWithdrawPending({
     }
     const timeDiffDays = timeDiffHours / 24; // days
     return relativeTimeFormat.format(Math.ceil(timeDiffDays), 'day');
-  }, [dateNowUnixMs]);
+  }, [dateNowUnixMs, translation[1].language]);
 
   const withdrawalReadyToClaim = withdrawalReadyDate ? withdrawalReadyDate.getTime() < dateNowUnixMs : false;
-  const actionMessage = withdrawalReadyToClaim === true
-    ? withdrawalPending.withdrawalReadyText
-    : `${withdrawalPending.withdrawalDelayText} ${delayTimeString}`;
+  const actionMessage = useMemo(
+    () => (withdrawalReadyToClaim === true
+      ? translation.t('views.TRANSACTIONS.status.withdrawalPending.withdrawalReadyText')
+      : `${translation.t('views.TRANSACTIONS.status.withdrawalPending.withdrawalDelayText')} ${delayTimeString}`),
+    [delayTimeString, translation[1].language],
+  );
 
   const handleWithdrawalClaimClick = () => {
     // WT-2053 - https://immutable.atlassian.net/browse/WT-2053
@@ -85,7 +87,7 @@ export function TransactionItemWithdrawPending({
   };
 
   return (
-    <Box testId={`transaction-item-${transaction.blockchain_metadata.transaction_hash}`} sx={containerStyles}>
+    <Box testId={`transaction - item - ${transaction.blockchain_metadata.transaction_hash} `} sx={containerStyles}>
       {requiresWithdrawalClaim && (
         <>
           <Box sx={actionsContainerStyles}>
@@ -115,7 +117,7 @@ export function TransactionItemWithdrawPending({
                 size="small"
                 onClick={handleWithdrawalClaimClick}
               >
-                {withdrawalPending.actionButtonText}
+                {translation.t('views.TRANSACTIONS.status.withdrawalPending.actionButtonText')}
               </Button>
             )}
           </Box>
@@ -132,6 +134,8 @@ export function TransactionItemWithdrawPending({
           article: {
             pr: 'base.spacing.x10',
           },
+          borderTopRightRadius: '0',
+          borderTopLeftRadius: '0',
         }}
         onExpandChange={
           (expanded) => expanded
@@ -150,7 +154,7 @@ export function TransactionItemWithdrawPending({
               {label}
             </MenuItem.Label>
             <MenuItem.Caption>
-              Paused
+              {translation.t('views.TRANSACTIONS.status.withdrawalPending.caption')}
             </MenuItem.Caption>
             <MenuItem.PriceDisplay
               fiatAmount={fiatAmount}

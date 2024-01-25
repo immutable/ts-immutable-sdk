@@ -668,9 +668,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.19.22":
-  version: 0.19.26
-  resolution: "@biom3/react@npm:0.19.26"
+"@biom3/react@npm:^0.19.34":
+  version: 0.19.40
+  resolution: "@biom3/react@npm:0.19.40"
   dependencies:
     "@biom3/design-tokens": "*"
     "@emotion/css": ^11.11.2
@@ -679,7 +679,7 @@ __metadata:
     buffer: ^6.0.3
     csstype: ^3.1.2
     framer-motion: ^10.12.12
-    localstorage-slim: ^2.7.0
+    localforage: ^1.10.0
     lodash.debounce: ^4.0.8
     lodash.get: ^4.4.2
     lodash.isequal: ^4.5.0
@@ -689,7 +689,7 @@ __metadata:
     react-is: ^18.2.0
     react-keyed-flatten-children: ^3.0.0
     ts-deepmerge: ^6.2.0
-  checksum: 93723988e333ca5df78043eff5c20a70a9ae217b9793fd0abb622e82f7e6b70232db1006e0ca1a0df7af540b2ed8225768b3da0549873bef51fca417b8813525
+  checksum: cfd094f9276e517a5ff8264214ba0efa04a06734ccc2843691d8288705727a170b4ffd2fafb0f4644baa042b46b5fac3d6e98cf86826f458870b8cece4a0861d
   languageName: node
   linkType: hard
 
@@ -1442,12 +1442,12 @@ __metadata:
 
 "@imtbl/sdk@file:../../../sdk::locator=func-tests-imx%40workspace%3A.":
   version: 0.0.0
-  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=cf1c39&locator=func-tests-imx%40workspace%3A."
+  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=e92fea&locator=func-tests-imx%40workspace%3A."
   dependencies:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
     "@biom3/design-tokens": 0.2.9
-    "@biom3/react": ^0.19.22
+    "@biom3/react": ^0.19.34
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
     "@ethersproject/providers": ^5.7.2
@@ -1483,7 +1483,7 @@ __metadata:
   peerDependencies:
     react: ^18.2.0
     react-dom: ^18.2.0
-  checksum: 655509c11bfaac96e6b329b4dbec9a29c10da1466fda20cb887d85c74ee9fcb9b59896d6ead1c2b9ced2f61533af89fd9b2951fc922943b2a143f5f444deb21b
+  checksum: e6477c69a8f80aa4a66c93b7d3ab3264624b102eaebf741a159822dfff9d0032db256af2104ed22e61ae236fa0a6d74330e0c4cb1ac8964fae5f246657c4b13e
   languageName: node
   linkType: hard
 
@@ -11503,19 +11503,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"localforage@npm:^1.7.4":
+"localforage@npm:^1.10.0, localforage@npm:^1.7.4":
   version: 1.10.0
   resolution: "localforage@npm:1.10.0"
   dependencies:
     lie: 3.1.1
   checksum: f2978b434dafff9bcb0d9498de57d97eba165402419939c944412e179cab1854782830b5ec196212560b22712d1dd03918939f59cf1d4fc1d756fca7950086cf
-  languageName: node
-  linkType: hard
-
-"localstorage-slim@npm:^2.7.0":
-  version: 2.7.0
-  resolution: "localstorage-slim@npm:2.7.0"
-  checksum: eaa52251005baca503d28818dcde89c3c4e72c3617497a3bf2f990636c92a1f112c4a67d8eba8a2b70e40c994abe791df5043983e67585455c74d1e0fee58986
   languageName: node
   linkType: hard
 

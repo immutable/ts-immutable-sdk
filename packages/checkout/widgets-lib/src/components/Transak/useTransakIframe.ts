@@ -1,16 +1,8 @@
+import pako from 'pako';
 import { useCallback, useEffect, useState } from 'react';
 import { Environment } from '@imtbl/config';
-import pako from 'pako';
 
-export type TransakNFTData = {
-  imageURL: string;
-  quantity: number;
-  nftName: string;
-  collectionAddress: string;
-  tokenID: Array<string>;
-  price: Array<number>;
-  nftType: 'ERC721';
-};
+import { TransakNFTData } from './TransakTypes';
 
 export type TransakWidgetType = 'on-ramp' | 'nft-checkout';
 
