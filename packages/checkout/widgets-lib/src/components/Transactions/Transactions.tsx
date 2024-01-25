@@ -2,11 +2,9 @@ import { HeaderNavigation } from 'components/Header/HeaderNavigation';
 import { SimpleLayout } from 'components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from 'components/Footer/FooterLogo';
 import {
-  useCallback, useContext, useEffect, useMemo, useState,
+  useCallback, useContext, useEffect, useState,
 } from 'react';
 import { EventTargetContext } from 'context/event-target-context/EventTargetContext';
-import { text } from 'resources/text/textConfig';
-import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { Box } from '@biom3/react';
 import { createAndConnectToProvider, isPassportProvider } from 'lib/providerUtils';
 import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
@@ -25,18 +23,18 @@ import { retry } from 'lib/retry';
 import { getChainSlugById } from 'lib/chains';
 import { CryptoFiatActions, CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
+import { useTranslation } from 'react-i18next';
 import { sendBridgeWidgetCloseEvent } from '../../widgets/bridge/BridgeWidgetEvents';
 import { Shimmer } from './Shimmer';
 import {
   supportBoxContainerStyle,
   transactionsContainerStyle,
   transactionsListContainerStyle,
-  transactionsListStyle,
 } from './TransactionsStyles';
 import { EmptyStateNotConnected } from './EmptyStateNotConnected';
 import { SupportMessage } from './SupportMessage';
 import { KnownNetworkMap } from './transactionsType';
-import { TransactionsInProgress } from './TransactionsInProgress';
+import { TransactionList } from './TransactionList';
 import { NoTransactions } from './NoTransactions';
 
 type TransactionsProps = {
@@ -48,8 +46,7 @@ export function Transactions({ checkout }: TransactionsProps) {
 
   const { cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { page } = useAnalytics();
-
-  const { layoutHeading } = text.views[BridgeWidgetViews.TRANSACTIONS];
+  const { t } = useTranslation();
 
   const [loading, setLoading] = useState(true);
   const [provider, setProvider] = useState<Web3Provider | undefined>(undefined);
@@ -59,11 +56,9 @@ export function Transactions({ checkout }: TransactionsProps) {
   const walletAddress = useCallback(async () => await provider?.getSigner().getAddress(), [provider]);
   const isPassport = isPassportProvider(provider);
 
-  const txnsListStyle = useMemo(() => transactionsListStyle(isPassport), []);
-
   // Fetch the tokens for the root chain using the allowed tokens.
   // In case this list does not have all the tokens, there is logic
-  // built into the <TransactionsInProgress /> component to fetch the
+  // built into the <TransactionsList /> component to fetch the
   // the missing data.
   const rootChainTokensHashmap = useCallback(async () => {
     if (!checkout) return {};
@@ -87,7 +82,7 @@ export function Transactions({ checkout }: TransactionsProps) {
 
   // Fetch the tokens for the root chain using the user balances tokens.
   // In case this list does not have all the tokens, there is logic
-  // built into the <TransactionsInProgress /> component to fetch the
+  // built into the <TransactionsList /> component to fetch the
   // the missing data.
   const childChainTokensHashmap = useCallback(async () => {
     if (!provider) return {};
@@ -132,11 +127,11 @@ export function Transactions({ checkout }: TransactionsProps) {
     ]);
 
     // Fetch the data for the missing tokens: tokensWithChainSlug
-    const missingTokens: { [k:string]:string } = {};
+    const missingTokens: { [k: string]: string } = {};
     Object.entries(tokensWithChainSlug).forEach(
       ([key, value]) => {
         if ((tokensWithChainSlug[key] === rootChainName && !rootData[key])
-        || (tokensWithChainSlug[key] === childChainName && !childData[key])) missingTokens[key] = value;
+          || (tokensWithChainSlug[key] === childChainName && !childData[key])) missingTokens[key] = value;
       },
     );
     // Root provider is always L1
@@ -213,11 +208,15 @@ export function Transactions({ checkout }: TransactionsProps) {
 
     const localTxs = await getTransactionsDetails(checkout.config.environment, address);
 
-    const tokensWithChainSlug:{ [k:string]:string } = {};
+    const tokensWithChainSlug: { [k: string]: string } = {};
     localTxs.result.forEach((txn) => {
       tokensWithChainSlug[txn.details.from_token_address] = txn.details.from_chain;
     });
-    return { tokens: await getTokensDetails(tokensWithChainSlug), transactions: localTxs.result };
+
+    return {
+      tokens: await getTokensDetails(tokensWithChainSlug),
+      transactions: localTxs.result,
+    };
   };
 
   // Fetch all the data at once
@@ -246,7 +245,7 @@ export function Transactions({ checkout }: TransactionsProps) {
       header={(
         <HeaderNavigation
           showBack
-          title={layoutHeading}
+          title={t('views.TRANSACTIONS.layoutHeading')}
           onCloseButtonClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
         />
       )}
@@ -260,20 +259,14 @@ export function Transactions({ checkout }: TransactionsProps) {
               updateProvider={updateAndConnectProvider}
             />
           )}
-          {provider && loading
-            && (
-              <Box sx={txnsListStyle}>
-                <Shimmer />
-              </Box>
-            )}
+          {provider && loading && (<Shimmer />)}
           {provider && !loading && txs.length > 0 && knownTokenMap && (
-            <Box sx={txnsListStyle}>
-              <TransactionsInProgress
-                checkout={checkout}
-                transactions={txs}
-                knownTokenMap={knownTokenMap}
-              />
-            </Box>
+            <TransactionList
+              checkout={checkout}
+              transactions={txs}
+              knownTokenMap={knownTokenMap}
+              isPassport={isPassport}
+            />
           )}
           {provider && !loading && txs.length === 0 && (
             <NoTransactions
