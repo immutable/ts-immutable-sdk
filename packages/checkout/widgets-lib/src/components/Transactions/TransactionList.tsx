@@ -25,6 +25,7 @@ type TransactionListProps = {
   transactions: Transaction[],
   knownTokenMap: KnownNetworkMap,
   isPassport: boolean;
+  walletAddress: string;
 };
 
 export function TransactionList({
@@ -32,6 +33,7 @@ export function TransactionList({
   transactions,
   knownTokenMap,
   isPassport,
+  walletAddress,
 }: TransactionListProps) {
   const { cryptoFiatState } = useContext(CryptoFiatContext);
   const { t } = useTranslation();
@@ -59,7 +61,7 @@ export function TransactionList({
   return (
     <Box sx={transactionsListStyle(isPassport)}>
       <Box sx={headingStyles}>
-        <EllipsizedText leftSideLength={6} rightSideLength={4} text="0x1234567890" />
+        <EllipsizedText leftSideLength={6} rightSideLength={4} text={walletAddress} />
       </Box>
       <Box
         testId="move-transaction-list"
