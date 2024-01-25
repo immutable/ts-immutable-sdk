@@ -11,12 +11,12 @@ type Identity = {
 
 const parseIdentity = (params: Identity) => {
   if (params.passportId) {
-    const key = `passport:${params.passportId}`;
+    const key = `passport:${params.passportId.toLowerCase()}`;
     return key;
   }
 
   if (params.ethAddress) {
-    const key = `ethAddress:${params.ethAddress}`;
+    const key = `ethAddress:${params.ethAddress.toLowerCase()}`;
     return key;
   }
 
