@@ -5,6 +5,7 @@ import {
 import { GetBalanceResult, IMTBLWidgetEvents, WalletWidgetParams } from '@imtbl/checkout-sdk';
 import { DEFAULT_BALANCE_RETRY_POLICY } from 'lib';
 import { UserJourney } from 'context/analytics-provider/SegmentAnalyticsProvider';
+import { useTranslation } from 'react-i18next';
 import {
   initialWalletState,
   WalletActions,
@@ -29,7 +30,6 @@ import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { CoinInfo } from './views/CoinInfo';
 import { TopUpView } from '../../views/top-up/TopUpView';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
-import { text } from '../../resources/text/textConfig';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { getTokenBalances } from './functions/tokenBalances';
 
@@ -38,8 +38,9 @@ export type WalletWidgetInputs = WalletWidgetParams & {
 };
 
 export function WalletWidget(props: WalletWidgetInputs) {
-  const errorActionText = text.views[SharedViews.ERROR_VIEW].actionText;
-  const loadingText = text.views[SharedViews.LOADING_VIEW].text;
+  const { t } = useTranslation();
+  const errorActionText = t('views.ERROR_VIEW.actionText');
+  const loadingText = t('views.LOADING_VIEW.text');
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
