@@ -50,10 +50,10 @@ export function Transactions({ checkout }: TransactionsProps) {
 
   const [loading, setLoading] = useState(true);
   const [provider, setProvider] = useState<Web3Provider | undefined>(undefined);
+  const [walletAddress, setWalletAddress] = useState('');
   const [knownTokenMap, setKnownTokenMap] = useState<KnownNetworkMap | undefined>(undefined);
   const [txs, setTxs] = useState<Transaction[]>([]);
 
-  const walletAddress = useCallback(async () => await provider?.getSigner().getAddress(), [provider]);
   const isPassport = isPassportProvider(provider);
 
   // Fetch the tokens for the root chain using the allowed tokens.
@@ -87,13 +87,12 @@ export function Transactions({ checkout }: TransactionsProps) {
   const childChainTokensHashmap = useCallback(async () => {
     if (!provider) return {};
 
-    const address = await walletAddress();
-    if (!address) return {};
+    if (!walletAddress) return {};
 
     const childChainId = getL2ChainId(checkout.config);
 
     try {
-      const data = await checkout.getAllBalances({ provider, walletAddress: address, chainId: childChainId });
+      const data = await checkout.getAllBalances({ provider, walletAddress, chainId: childChainId });
       return data.balances.reduce((out, current) => {
         // eslint-disable-next-line no-param-reassign
         out[current.token.address!.toLowerCase()] = current.token;
@@ -108,7 +107,10 @@ export function Transactions({ checkout }: TransactionsProps) {
 
   const updateAndConnectProvider = useCallback(async (walletProviderName: WalletProviderName) => {
     try {
-      setProvider(await createAndConnectToProvider(checkout, walletProviderName));
+      const localProvider = await createAndConnectToProvider(checkout, walletProviderName);
+      const address = await localProvider?.getSigner().getAddress() ?? '';
+      setProvider(localProvider);
+      setWalletAddress(address.toLowerCase());
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error(error);
@@ -203,10 +205,9 @@ export function Transactions({ checkout }: TransactionsProps) {
   };
 
   const fetchData = async () => {
-    const address = await walletAddress();
-    if (!address) return undefined;
+    if (!walletAddress) return undefined;
 
-    const localTxs = await getTransactionsDetails(checkout.config.environment, address);
+    const localTxs = await getTransactionsDetails(checkout.config.environment, walletAddress);
 
     const tokensWithChainSlug: { [k: string]: string } = {};
     localTxs.result.forEach((txn) => {
@@ -266,6 +267,7 @@ export function Transactions({ checkout }: TransactionsProps) {
               transactions={txs}
               knownTokenMap={knownTokenMap}
               isPassport={isPassport}
+              walletAddress={walletAddress}
             />
           )}
           {provider && !loading && txs.length === 0 && (
