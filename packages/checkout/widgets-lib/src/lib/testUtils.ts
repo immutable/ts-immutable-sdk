@@ -108,6 +108,64 @@ export const cyIntercept = (overrides?: {
         },
       },
     },
+    bridge: {
+      [ChainId.IMTBL_ZKEVM_TESTNET]: {
+        tokens: [
+          {
+            name: 'IMX',
+            symbol: 'IMX',
+            address: 'native',
+            decimals: 18,
+          },
+          {
+            address: '0xe9E96d1aad82562b7588F03f49aD34186f996478',
+            name: 'ETH',
+            symbol: 'ETH',
+            decimals: 18,
+          },
+          {
+            address: '0x3B2d8A1931736Fc321C24864BceEe981B11c3c57',
+            name: 'USDC',
+            symbol: 'USDC',
+            decimals: 6,
+          },
+          {
+            address: '0xB8EE289C64C1A0DC0311364721aDA8c3180D838C',
+            name: 'GOG',
+            symbol: 'GOG',
+            decimals: 18,
+          },
+        ],
+      },
+      [ChainId.SEPOLIA]: {
+        tokens: [
+          {
+            name: 'Sep Eth',
+            symbol: 'ETH',
+            address: 'native',
+            decimals: 18,
+          },
+          {
+            name: 'IMX',
+            symbol: 'IMX',
+            address: '0xe2629e08f4125d14e446660028bD98ee60EE69F2',
+            decimals: 18,
+          },
+          {
+            name: 'USDC',
+            symbol: 'USDC',
+            address: '0x40b87d235A5B010a20A241F15797C9debf1ecd01',
+            decimals: 6,
+          },
+          {
+            address: '0xFe9dF9eBe5FBd94B00247613B6Cf7629891954E2',
+            name: 'GOG',
+            symbol: 'GOG',
+            decimals: 18,
+          },
+        ],
+      },
+    },
   };
   const defaultTokensConfig = {
     [ChainId.IMTBL_ZKEVM_TESTNET]: {
