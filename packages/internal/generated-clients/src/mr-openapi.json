@@ -3180,6 +3180,30 @@
         "schema": {
           "type": "string"
         }
+      },
+      "MintRequestsLimit": {
+        "description": "The mint requests limit available to the project for each time window.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "MintRequestsLimitReset": {
+        "description": "The expiry date of the current time window.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "MintRequestsLimitRemaining": {
+        "description": "The number of mint requests remaining in the current window.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "MintRequestsRetryAfter": {
+        "description": "The number of seconds until the next refresh request can be made.",
+        "schema": {
+          "type": "string"
+        }
       }
     },
     "schemas": {
@@ -3742,7 +3766,7 @@
             "example": "2022-08-16T17:43:26.991388Z",
             "description": "When the collection was last updated"
           },
-          "last_metadata_synced_at": {
+          "metadata_synced_at": {
             "type": "string",
             "format": "date-time",
             "nullable": true,
@@ -3763,7 +3787,7 @@
           "metadata_uri",
           "indexed_at",
           "updated_at",
-          "last_metadata_synced_at"
+          "metadata_synced_at"
         ]
       },
       "ListCollectionsResult": {
@@ -3921,6 +3945,8 @@
         "properties": {
           "metadata": {
             "type": "array",
+            "maxItems": 10,
+            "minItems": 1,
             "items": {
               "$ref": "#/components/schemas/RefreshMetadataByID"
             }
@@ -4588,6 +4614,8 @@
           "nft_metadata": {
             "type": "array",
             "description": "List of nft metadata to be refreshed",
+            "maxItems": 10,
+            "minItems": 1,
             "items": {
               "$ref": "#/components/schemas/RefreshMetadataByTokenID"
             }
@@ -5112,7 +5140,8 @@
         },
         "required": [
           "order_id",
-          "fees"
+          "fees",
+          "taker_address"
         ]
       },
       "FulfillableOrder": {

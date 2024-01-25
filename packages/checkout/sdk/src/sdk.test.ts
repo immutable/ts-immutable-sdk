@@ -32,7 +32,7 @@ import { getAllBalances, getBalance, getERC20Balance } from './balances';
 import { sendTransaction } from './transaction';
 import { gasEstimator } from './gasEstimate';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
-import { checkIsWalletConnected, connectSite } from './connect';
+import { checkIsWalletConnected, connectSite, requestPermissions } from './connect';
 import * as network from './network';
 import { createProvider, isWeb3Provider, validateProvider } from './provider';
 import { getERC20TokenInfo, getTokenAllowList } from './tokens';
@@ -93,7 +93,7 @@ describe('Connect', () => {
     );
   });
 
-  it('should call the connectWalletProvider function', async () => {
+  it('should call the connectSite function', async () => {
     const checkout = new Checkout({
       baseConfig: { environment: Environment.PRODUCTION },
     });
@@ -103,6 +103,49 @@ describe('Connect', () => {
     });
 
     expect(connectSite).toBeCalledTimes(1);
+  });
+
+  it(`should call the requestPermissions function if requestWalletPermissions is
+  true and provider is not Passport`, async () => {
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.PRODUCTION },
+    });
+
+    const provider = new Web3Provider(providerMock, ChainId.ETHEREUM);
+    (validateProvider as jest.Mock).mockResolvedValue(provider);
+
+    await checkout.connect({
+      provider,
+      requestWalletPermissions: true,
+    });
+
+    expect(connectSite).not.toHaveBeenCalled();
+    expect(requestPermissions).toBeCalledWith(provider);
+  });
+
+  it(`should call the connectSite function if requestWalletPermissions is
+  true and provider is Passport`, async () => {
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.PRODUCTION },
+    });
+
+    const requestMock = jest.fn();
+    providerMock = {
+      isPassport: true,
+      request: requestMock,
+    } as unknown as ExternalProvider;
+    requestMock.mockResolvedValue('0x1');
+
+    const provider = new Web3Provider(providerMock, ChainId.ETHEREUM);
+    (validateProvider as jest.Mock).mockResolvedValue(provider);
+
+    await checkout.connect({
+      provider,
+      requestWalletPermissions: true,
+    });
+
+    expect(connectSite).toBeCalledTimes(1);
+    expect(requestPermissions).not.toBeCalled();
   });
 
   it('should call getBalance when no contract address provided', async () => {
