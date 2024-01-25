@@ -15,7 +15,7 @@ import { POLLING_FREQUENCY } from './utils/constants';
 const trackFn = (
   moduleName: string,
   eventName: string,
-  properties?: Record<string, string | number>,
+  properties?: Record<string, string | number | boolean>,
 ) => {
   const event = {
     event: `${moduleName}.${eventName}`,

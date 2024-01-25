@@ -3589,10 +3589,12 @@ __metadata:
   resolution: "@imtbl/game-bridge@workspace:packages/game-bridge"
   dependencies:
     "@imtbl/config": 0.0.0
+    "@imtbl/metrics": 0.0.0
     "@imtbl/passport": 0.0.0
     "@imtbl/version-check": 0.0.0
     "@imtbl/x-client": 0.0.0
     "@imtbl/x-provider": 0.0.0
+    eslint: ^8.40.0
     parcel: ^2.8.3
   languageName: unknown
   linkType: soft
@@ -3710,6 +3712,7 @@ __metadata:
     "@imtbl/core-sdk": ^2.4.0
     "@imtbl/generated-clients": 0.0.0
     "@imtbl/guardian": 0.0.0
+    "@imtbl/metrics": 0.0.0
     "@imtbl/toolkit": 0.0.0
     "@imtbl/x-client": 0.0.0
     "@imtbl/x-provider": 0.0.0
