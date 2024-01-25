@@ -48,11 +48,8 @@ jobs:
 
       - name: Log User Permission
         run: echo "Check user permissions for triggering actor - ${{ github.triggering_actor }}"
-
       - run: echo "user-permission = ${{ steps.check_user_permission.outputs.user-permission }}"
       - run: echo "require-result = ${{ steps.check_user_permission.outputs.require-result }}"
-      - run: echo "check-result = ${{ steps.check_user_permission.outputs.check-result }}"
-      - run: echo "check-result = ${{ steps.check_user_permission.outputs.check-result }}"
 
       - name: Admin Permission Check
         if: ${{ steps.check_user_permission.outputs.require-result != 'true' }}
@@ -60,38 +57,35 @@ jobs:
 
       - name: Allowed Actors Check
         id: allowed_actors_check 
-        if: ${{ contains(fromJson('["cajames", "wdinau"]'), github.triggering_actor) }}
+        if: ${{ contains(fromJson('["cajames", "CodeSchwert", "wdinau"]'), github.triggering_actor) }}
         run: echo "ALLOWED_ACTOR=true" >> $GITHUB_OUTPUT 
 
       - name: Allowed Actors Filter
         if: ${{ steps.allowed_actors_check.outputs.ALLOWED_ACTOR != 'true' }}
         run: exit 1
 
-      - name: Foo
-        run: echo "Foo"
-
       # - name: Check Public Release Branch
       #   if: contains(github.event.inputs.release_type, 'release') && (github.ref != 'refs/heads/main')
       #   run: failure("Public releases should be only done from main branch, current branch ${{ github.ref }}")
 
-      # - name: Checkout
-      #   uses: actions/checkout@v3
-      #   with:
-      #     fetch-depth: 0
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-      # - name: Setup Github
-      #   run: |
-      #     git config user.name "${GITHUB_ACTOR}"
-      #     git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+      - name: Setup Github
+        run: |
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
 
-      # - name: Get tags
-      #   run: git fetch --tags
+      - name: Get tags
+        run: git fetch --tags
 
-      # - name: Setup Node
-      #   uses: actions/setup-node@v3
-      #   with:
-      #     node-version: lts/*
-      #     cache: 'yarn'
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: lts/*
+          cache: 'yarn'
 
       # - name: Workout next version string
       #   run: |
@@ -105,14 +99,14 @@ jobs:
       #     ./.github/scripts/version-up.sh --${{ github.event.inputs.release_type }} --$upgrade_type --apply $revision_upgrade
       #   shell: bash
 
-      # - name: Install dependencies
-      #   run: yarn install --immutable
+      - name: Install dependencies
+        run: yarn install --immutable
 
-      # - name: Lint
-      #   run: yarn lint
+      - name: Lint
+        run: yarn lint
 
-      # - name: Check Single Package Version Policy
-      #   run: yarn syncpack:check
+      - name: Check Single Package Version Policy
+        run: yarn syncpack:check
 
       # - name: Get next version string
       #   id: version
@@ -124,14 +118,15 @@ jobs:
       #     tmp=$(mktemp)
       #     jq '.version = "${{steps.version.outputs.NEXT_VERSION}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
 
-      # - name: Build
-      #   run: export NODE_OPTIONS=--max-old-space-size=6144 && RELEASE_TYPE=${{ github.event.inputs.release_type }} yarn build
+      - name: Build
+        # run: export NODE_OPTIONS=--max-old-space-size=6144 && RELEASE_TYPE=${{ github.event.inputs.release_type }} yarn build
+        run: export NODE_OPTIONS=--max-old-space-size=6144 && RELEASE_TYPE=release yarn build
 
-      # - name: Typecheck
-      #   run: yarn typecheck
+      - name: Typecheck
+        run: yarn typecheck
 
-      # - name: Test
-      #   run: yarn test
+      - name: Test
+        run: yarn test
 
       # - name: Push tags
       #   # Boolean inputs are not actually booleans, see https://github.com/actions/runner/issues/1483
@@ -185,7 +180,7 @@ jobs:
       #   if: ${{ success() && (steps.npm_release.conclusion == 'success' || steps.pre_release.conclusion == 'success') && github.event.inputs.dry_run == 'false' }}
       #   uses: ./.github/actions/notify-slack-publish-status
       #   with:
-      #     message: "✅ Successfully published SDK version ${{steps.version.outputs.NEXT_VERSION}} to NPM.\n\nhttps://www.npmjs.com/package/@imtbl/sdk/v/${{steps.version.outputs.NEXT_VERSION}}"
+      #     message: "✅ ${{ github.triggering_actor }} successfully published *Major* SDK version ${{steps.version.outputs.NEXT_VERSION}} to NPM.\n\nhttps://www.npmjs.com/package/@imtbl/sdk/v/${{steps.version.outputs.NEXT_VERSION}}"
 
       # - name: Notify SDK Slack Publish Failure
       #   if: ${{ failure() && (steps.npm_release.conclusion == 'failure' || steps.pre_release.conclusion == 'failure' || steps.gh_release.conclusion == 'failure') && github.event.inputs.dry_run == 'false' }}
