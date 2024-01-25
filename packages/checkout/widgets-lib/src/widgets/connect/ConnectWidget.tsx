@@ -38,7 +38,6 @@ import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { getTargetLayerChainId, sendProviderUpdatedEvent } from '../../lib';
 import { SwitchNetworkEth } from './views/SwitchNetworkEth';
 import { ErrorView } from '../../views/error/ErrorView';
-import { text } from '../../resources/text/textConfig';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { UserJourney, useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { identifyUser } from '../../lib/analytics/identifyUser';
@@ -65,7 +64,7 @@ export function ConnectWidget({
   const { t } = useTranslation();
   const { environment } = config;
 
-  const errorText = text.views[SharedViews.ERROR_VIEW].actionText;
+  const errorText = t('views.ERROR_VIEW.actionText');
 
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
