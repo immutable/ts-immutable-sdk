@@ -1,5 +1,10 @@
+### Hi👋, please prefix this PR's title with:
+<!-- This will give consistant Release changelog to the public -->
+- [ ] `breaking-change:` if you have introduced modification that necessitates immediate adjustments by this SDK's users to their applications, clients, or integrations to avert disruptions to existing features or functionalities.
+- [ ] `feat:`, `fix:`, `refactor:`, `docs:`, or `chore:`.
+
 # Summary
-<!-- A short summary. This PR's description is publicly viewable and will be part of the Changelog on NPM -->
+<!-- A short summary. This PR's description is publicly viewable and will form core part of the Changelog / Releases. -->
 
 
 # Impact of Change
@@ -31,10 +36,3 @@
 
 # Other things worth calling out
 <!-- Useful tips, gotchas, trade-offs made to the reviewers. -->
-
-
-# Before submitting the PR, follow these steps:
-<!-- List of things to check before submitting the PR -->
-
-- [ ] Prefix your PR title with `feat: `, `fix: `, `chore: `, `docs:`, or `refactor:`.
-- [ ] Prefix your PR title with `breaking-change:` if you have introduced breaking changes to this SDK. Breaking changes are modification that necessitates immediate adjustments by this SDK's users to their applications, clients, or integrations to avert disruptions to existing features or functionalities. Ensure you write clear summary explain the change.
