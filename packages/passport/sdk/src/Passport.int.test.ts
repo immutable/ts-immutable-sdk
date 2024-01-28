@@ -216,7 +216,7 @@ describe('Passport', () => {
         });
 
         expect(result).toEqual(transactionHash);
-        expect(mockGetUser).toHaveBeenCalledTimes(2);
+        expect(mockGetUser).toHaveBeenCalledTimes(5);
       });
     });
 

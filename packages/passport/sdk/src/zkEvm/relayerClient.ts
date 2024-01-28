@@ -1,5 +1,6 @@
 import { BytesLike } from 'ethers';
 import { JsonRpcProvider } from '@ethersproject/providers';
+import AuthManager from 'authManager';
 import { PassportConfiguration } from '../config';
 import { FeeOption, RelayerTransaction, TypedDataPayload } from './types';
 import { UserZkEvm } from '../types';
@@ -8,7 +9,7 @@ import { getEip155ChainId } from './walletHelpers';
 export type RelayerClientInput = {
   config: PassportConfiguration,
   jsonRpcProvider: JsonRpcProvider,
-  user: UserZkEvm,
+  authManager: AuthManager
 };
 
 // JsonRpc base Types
@@ -80,12 +81,12 @@ export class RelayerClient {
 
   private readonly jsonRpcProvider: JsonRpcProvider;
 
-  private readonly user: UserZkEvm;
+  private readonly authManager: AuthManager;
 
-  constructor({ config, jsonRpcProvider, user }: RelayerClientInput) {
+  constructor({ config, jsonRpcProvider, authManager }: RelayerClientInput) {
     this.config = config;
     this.jsonRpcProvider = jsonRpcProvider;
-    this.user = user;
+    this.authManager = authManager;
   }
 
   private async postToRelayer<T>(request: RelayerTransactionRequest): Promise<T> {
@@ -95,10 +96,12 @@ export class RelayerClient {
       ...request,
     };
 
+    const user = await this.authManager.getUser() as UserZkEvm;
+
     const response = await fetch(`${this.config.relayerUrl}/v1/transactions`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${this.user.accessToken}`,
+        Authorization: `Bearer ${user.accessToken}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),

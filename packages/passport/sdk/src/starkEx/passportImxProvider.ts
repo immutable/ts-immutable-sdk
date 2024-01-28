@@ -95,6 +95,7 @@ export class PassportImxProvider implements IMXProvider {
     this.guardianClient = new GuardianClient({
       confirmationScreen,
       config,
+      authManager,
     });
     this.magicAdapter = magicAdapter;
     this.imxApiClients = imxApiClients;

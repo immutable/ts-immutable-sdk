@@ -1,13 +1,14 @@
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { ExternalProvider, JsonRpcProvider } from '@ethersproject/providers';
 import { registerZkEvmUser } from './registerZkEvmUser';
-import { UserZkEvm } from '../../types';
+import { User, UserZkEvm } from '../../types';
 import AuthManager from '../../authManager';
 import { PassportConfiguration } from '../../config';
 import MagicAdapter from '../../magicAdapter';
 
 type LoginZkEvmUserInput = {
   authManager: AuthManager;
+  existingUser: User | null;
   config: PassportConfiguration;
   magicAdapter: MagicAdapter;
   multiRollupApiClients: MultiRollupApiClients;
@@ -21,17 +22,13 @@ type LoginZkEvmUserOutput = {
 
 export const loginZkEvmUser = async ({
   authManager,
+  existingUser,
   magicAdapter,
   multiRollupApiClients,
   jsonRpcProvider,
 }: LoginZkEvmUserInput): Promise<LoginZkEvmUserOutput> => {
-  let user = null;
-  try {
-    user = await authManager.getUser();
-  } catch (err) {
-    // eslint-disable-next-line no-console
-    console.warn('eth_requestAccounts` failed to retrieve a cached user session:', err);
-  }
+  let user = existingUser;
+
   if (!user) {
     user = await authManager.login();
   }

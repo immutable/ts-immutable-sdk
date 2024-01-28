@@ -14,7 +14,9 @@ import MagicAdapter from '../magicAdapter';
 import TypedEventEmitter from '../utils/typedEventEmitter';
 import { PassportConfiguration } from '../config';
 import { ConfirmationScreen } from '../confirmation';
-import { PassportEventMap, PassportEvents, UserZkEvm } from '../types';
+import {
+  PassportEventMap, PassportEvents, User, UserZkEvm,
+} from '../types';
 import { RelayerClient } from './relayerClient';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
 import { loginZkEvmUser } from './user';
@@ -33,7 +35,6 @@ export type ZkEvmProviderInput = {
 
 type LoggedInZkEvmProvider = {
   magicProvider: ExternalProvider;
-  user: UserZkEvm;
   relayerClient: RelayerClient;
   guardianClient: GuardianClient;
 };
@@ -58,8 +59,6 @@ export class ZkEvmProvider implements Provider {
   protected relayerClient?: RelayerClient;
 
   protected magicProvider?: ExternalProvider; // Used for signing
-
-  protected user?: UserZkEvm;
 
   public readonly isPassport: boolean = true;
 
@@ -96,8 +95,8 @@ export class ZkEvmProvider implements Provider {
   private handleLogout = () => {
     const shouldEmitAccountsChanged = this.isLoggedIn();
 
+    this.authManager.removeUser();
     this.magicProvider = undefined;
-    this.user = undefined;
     this.relayerClient = undefined;
     this.guardianClient = undefined;
 
@@ -106,29 +105,22 @@ export class ZkEvmProvider implements Provider {
     }
   };
 
-  private isLoggedIn(): this is LoggedInZkEvmProvider {
+  private isLoggedIn(user?: User | null): this is LoggedInZkEvmProvider {
     return this.magicProvider !== undefined
-      && this.user !== undefined
+      && user !== null
       && this.relayerClient !== undefined
       && this.guardianClient !== undefined;
-  }
-
-  private async refreshUserLogin() {
-    const user = await this.authManager.getUser() as UserZkEvm | null;
-    if (user !== null) {
-      this.user = user;
-    } else {
-      throw new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - attempt to refresh access token failed');
-    }
   }
 
   private async performRequest(request: RequestArguments): Promise<any> {
     switch (request.method) {
       case 'eth_requestAccounts': {
-        if (this.isLoggedIn()) {
-          return [this.user.zkEvm.ethAddress];
+        const existingUser = await this.authManager.getUser() as UserZkEvm;
+        if (this.isLoggedIn(existingUser)) {
+          return [existingUser.zkEvm.ethAddress];
         }
         const { magicProvider, user } = await loginZkEvmUser({
+          existingUser,
           authManager: this.authManager,
           config: this.config,
           magicAdapter: this.magicAdapter,
@@ -136,54 +128,53 @@ export class ZkEvmProvider implements Provider {
           jsonRpcProvider: this.jsonRpcProvider,
         });
 
-        this.user = user;
         this.magicProvider = magicProvider;
         this.relayerClient = new RelayerClient({
           config: this.config,
           jsonRpcProvider: this.jsonRpcProvider,
-          user: this.user,
+          authManager: this.authManager,
         });
         this.guardianClient = new GuardianClient({
           confirmationScreen: this.confirmationScreen,
           config: this.config,
+          authManager: this.authManager,
         });
 
-        this.eventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [this.user.zkEvm.ethAddress]);
+        this.eventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [user.zkEvm.ethAddress]);
 
-        return [this.user.zkEvm.ethAddress];
+        return [user.zkEvm.ethAddress];
       }
       case 'eth_sendTransaction': {
+        const user = await this.authManager.getUser() as UserZkEvm;
         if (!this.isLoggedIn()) {
           throw new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
         }
-        await this.refreshUserLogin();
-
         return sendTransaction({
           params: request.params || [],
           magicProvider: this.magicProvider,
           guardianClient: this.guardianClient,
           jsonRpcProvider: this.jsonRpcProvider,
           relayerClient: this.relayerClient,
-          user: this.user,
+          user,
         });
       }
       case 'eth_accounts': {
-        return this.isLoggedIn() ? [this.user.zkEvm.ethAddress] : [];
+        const user = await this.authManager.getUser() as UserZkEvm;
+        return this.isLoggedIn() ? [user.zkEvm.ethAddress] : [];
       }
       case 'eth_signTypedData':
       case 'eth_signTypedData_v4': {
+        const user = await this.authManager.getUser() as UserZkEvm;
         if (!this.isLoggedIn()) {
           throw new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
         }
-        await this.refreshUserLogin();
-
         return signTypedDataV4({
           method: request.method,
           params: request.params || [],
           magicProvider: this.magicProvider,
           jsonRpcProvider: this.jsonRpcProvider,
           relayerClient: this.relayerClient,
-          user: this.user,
+          user,
           guardianClient: this.guardianClient,
         });
       }

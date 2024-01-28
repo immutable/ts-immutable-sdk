@@ -28,7 +28,10 @@ describe('ZkEvmProvider', () => {
   const getProvider = () => {
     const constructorParameters = {
       config: {},
-      authManager: { getUser: jest.fn().mockResolvedValue(mockUserZkEvm) } as unknown as AuthManager,
+      authManager: {
+        getUser: jest.fn().mockResolvedValue(mockUserZkEvm),
+        removeUser: jest.fn(),
+      } as unknown as AuthManager,
       passportEventEmitter,
     } as Partial<ZkEvmProviderInput>;
 
@@ -341,7 +344,6 @@ describe('ZkEvmProvider', () => {
 
       const userLoggedInKeys = [
         'magicProvider',
-        'user',
         'relayerClient',
         'guardianClient',
       ];
