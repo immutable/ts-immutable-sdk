@@ -44,11 +44,16 @@ export const removeSentEvents = (numberOfEvents: number) => {
 };
 
 export const flattenProperties = (
-  properties: Record<string, string | number>,
+  properties: Record<string, string | number | boolean>,
 ) => {
   const propertyMap: [string, string][] = [];
   Object.entries(properties).forEach(([key, value]) => {
-    if (typeof value === 'string' || typeof value === 'number') {
+    if (
+      typeof key === 'string'
+      || typeof value === 'string'
+      || typeof value === 'number'
+      || typeof value === 'boolean'
+    ) {
       propertyMap.push([key, value.toString()]);
     }
   });

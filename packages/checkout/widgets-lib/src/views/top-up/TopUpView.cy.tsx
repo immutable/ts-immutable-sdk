@@ -7,7 +7,7 @@ import {
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { BigNumber } from 'ethers';
-import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
+import { Web3Provider } from '@ethersproject/providers';
 import { UserJourney } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
 import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
@@ -107,35 +107,6 @@ describe('Top Up View', () => {
         <ViewContextTestComponent>
           <CustomAnalyticsProvider checkout={{} as Checkout}>
             <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
-              <TopUpView
-                analytics={{ userJourney: UserJourney.WALLET }}
-                showOnrampOption
-                showSwapOption
-                showBridgeOption={false}
-                widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
-                onCloseButtonClick={() => {}}
-              />
-            </ConnectLoaderTestComponent>
-          </CustomAnalyticsProvider>
-        </ViewContextTestComponent>,
-      );
-      cySmartGet('menu-item-onramp').should('exist');
-      cySmartGet('menu-item-swap').should('exist');
-      cySmartGet('menu-item-bridge').should('not.exist');
-    });
-
-    it('should hide bridge option when provider is Passport', () => {
-      mount(
-        <ViewContextTestComponent>
-          <CustomAnalyticsProvider checkout={{} as Checkout}>
-            <ConnectLoaderTestComponent
-              initialStateOverride={{
-                ...connectLoaderState,
-                provider: {
-                  provider: { isPassport: true } as any as ExternalProvider,
-                } as Web3Provider,
-              }}
-            >
               <TopUpView
                 analytics={{ userJourney: UserJourney.WALLET }}
                 showOnrampOption

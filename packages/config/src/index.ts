@@ -18,7 +18,7 @@ export class ImmutableConfiguration {
   constructor(options: { environment: Environment }) {
     this.environment = options.environment;
     setEnvironment(options.environment);
-    track('config', 'load_imtbl_config');
+    track('config', 'created_imtbl_config');
   }
 }
 
