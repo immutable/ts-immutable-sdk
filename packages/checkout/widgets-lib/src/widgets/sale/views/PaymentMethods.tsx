@@ -91,7 +91,7 @@ export function PaymentMethods() {
             sx={{ mx: 'base.spacing.x1' }}
             onClick={
               () => orchestrationEvents
-                .sendRequestBridgeEvent(eventTarget, IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT, {
+                .sendRequestBridgeEvent(eventTarget, IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT, {
                   amount, tokenAddress,
                 })
             }

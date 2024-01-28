@@ -2,6 +2,7 @@
 import * as passport from '@imtbl/passport';
 import * as config from '@imtbl/config';
 import * as provider from '@imtbl/x-provider';
+import { track, identify } from '@imtbl/metrics';
 import { gameBridgeVersionCheck } from '@imtbl/version-check';
 
 /* eslint-disable no-undef */
@@ -12,6 +13,8 @@ const redirectUri = 'https://localhost:3000/'; // Not required
 const keyFunctionName = 'fxName';
 const keyRequestId = 'requestId';
 const keyData = 'data';
+
+const moduleName = 'game_bridge';
 
 // version check placeholders
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -58,10 +61,10 @@ let zkEvmProviderInstance: passport.Provider | null;
 
 declare global {
   interface Window {
-    callFunction: (jsonData: string) => void,
-    ue: any,
+    callFunction: (jsonData: string) => void;
+    ue: any;
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    Unity: any,
+    Unity: any;
   }
 }
 
@@ -87,11 +90,15 @@ const callbackToGame = (data: object) => {
   } else if (window.Unity !== 'undefined') {
     window.Unity.call(message);
   } else {
-    console.error('No available game callbacks to call from ImmutableSDK game-bridge');
+    console.error(
+      'No available game callbacks to call from ImmutableSDK game-bridge',
+    );
   }
 };
 
-const setProvider = (passportProvider: provider.IMXProvider | null): boolean => {
+const setProvider = (
+  passportProvider: provider.IMXProvider | null,
+): boolean => {
   if (passportProvider !== null && passportProvider !== undefined) {
     providerInstance = passportProvider;
     console.log('IMX provider set');
@@ -125,7 +132,12 @@ const getZkEvmProvider = (): passport.Provider => {
   return zkEvmProviderInstance;
 };
 
-window.callFunction = async (jsonData: string) => { // eslint-disable-line no-unused-vars
+track(moduleName, 'load_game_bridge', {
+  sdkVersionTag,
+});
+
+window.callFunction = async (jsonData: string) => {
+  // eslint-disable-line no-unused-vars
   console.log(`Call function ${jsonData}`);
 
   let fxName = null;
@@ -149,11 +161,12 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
             clientId: request.clientId,
             audience,
             scope,
-            redirectUri: (redirect ?? redirectUri),
+            redirectUri: redirect ?? redirectUri,
             logoutRedirectUri: request?.logoutRedirectUri,
             crossSdkBridgeEnabled: true,
           };
           passportClient = new passport.Passport(passportConfig);
+          track(moduleName, 'init_inititalise_passport');
         }
         callbackToGame({
           responseFor: fxName,
@@ -173,6 +186,7 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
         };
         console.log(`Version check: ${JSON.stringify(versionCheckParams)}`);
 
+        track(moduleName, 'complete_init_game_bridge', versionCheckParams);
         gameBridgeVersionCheck(versionCheckParams);
         break;
       }
@@ -190,7 +204,16 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
         break;
       }
       case PASSPORT_FUNCTIONS.relogin: {
-        const userInfo = await passportClient?.login({ useCachedSession: true });
+        const userInfo = await passportClient?.login({
+          useCachedSession: true,
+        });
+        const succeeded = userInfo !== null;
+        if (succeeded) {
+          identify({ passportId: userInfo?.sub });
+        }
+        track(moduleName, 'performed_relogin', {
+          succeeded,
+        });
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -201,11 +224,17 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
       }
       case PASSPORT_FUNCTIONS.reconnect: {
         let providerSet = false;
-        const userInfo = await passportClient?.login({ useCachedSession: true });
+        const userInfo = await passportClient?.login({
+          useCachedSession: true,
+        });
         if (userInfo) {
           const passportProvider = await passportClient?.connectImx();
           providerSet = setProvider(passportProvider);
+          identify({ passportId: userInfo?.sub });
         }
+        track(moduleName, 'performed_reconnect', {
+          succeeded: userInfo !== null,
+        });
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -226,7 +255,12 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
       }
       case PASSPORT_FUNCTIONS.loginPKCE: {
         const request = JSON.parse(data);
-        await passportClient?.loginWithPKCEFlowCallback(request.authorizationCode, request.state);
+        const profile = await passportClient?.loginWithPKCEFlowCallback(
+          request.authorizationCode,
+          request.state,
+        );
+        identify({ passportId: profile.sub });
+        track(moduleName, 'performed_login_pkce');
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -236,9 +270,18 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
       }
       case PASSPORT_FUNCTIONS.connectPKCE: {
         const request = JSON.parse(data);
-        await passportClient?.loginWithPKCEFlowCallback(request.authorizationCode, request.state);
+        const profile = await passportClient?.loginWithPKCEFlowCallback(
+          request.authorizationCode,
+          request.state,
+        );
         const passportProvider = await passportClient?.connectImx();
         const providerSet = setProvider(passportProvider);
+        if (providerSet) {
+          identify({ passportId: profile.sub });
+        }
+        track(moduleName, 'performed_connect_pkce', {
+          succeeded: providerSet,
+        });
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -249,11 +292,15 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
       }
       case PASSPORT_FUNCTIONS.loginConfirmCode: {
         const request = JSON.parse(data);
-        await passportClient?.loginWithDeviceFlowCallback(
+        const profile = await passportClient?.loginWithDeviceFlowCallback(
           request.deviceCode,
           request.interval,
           request.timeoutMs ?? null,
         );
+
+        identify({ passportId: profile.sub });
+        track(moduleName, 'performed_login_confirm_code');
+
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -263,13 +310,22 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
       }
       case PASSPORT_FUNCTIONS.connectConfirmCode: {
         const request = JSON.parse(data);
-        await passportClient?.loginWithDeviceFlowCallback(
+        const profile = await passportClient?.loginWithDeviceFlowCallback(
           request.deviceCode,
           request.interval,
           request.timeoutMs ?? null,
         );
+
         const passportProvider = await passportClient?.connectImx();
         const providerSet = setProvider(passportProvider);
+
+        if (providerSet) {
+          identify({ passportId: profile.sub });
+        }
+        track(moduleName, 'performed_connect_confirm_code', {
+          succeeded: providerSet,
+        });
+
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -378,7 +434,9 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
       }
       case PASSPORT_FUNCTIONS.imx.batchNftTransfer: {
         const nftTransferDetails = JSON.parse(data);
-        const response = await getProvider().batchNftTransfer(nftTransferDetails);
+        const response = await getProvider().batchNftTransfer(
+          nftTransferDetails,
+        );
         callbackToGame({
           ...{
             responseFor: fxName,

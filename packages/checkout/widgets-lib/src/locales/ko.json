@@ -55,7 +55,11 @@
     },
     "ERROR_VIEW": {
       "heading": "문제가 발생했습니다",
-      "body": ["다시 시도하거나", "지원팀에", "도움을 요청하세요."],
+      "body": [
+        "다시 시도하거나",
+        "지원팀에",
+        "도움을 요청하세요."
+      ],
       "actionText": "다시 시도"
     },
     "SERVICE_UNAVAILABLE_ERROR_VIEW": {
@@ -273,7 +277,7 @@
         "caption": "코인 잔액이 부족합니다. 계속 진행하려면 카드로 결제하거나",
         "captionEnd": "다시 시도하십시오.",
         "captionCTA": "코인 추가"
-      },            
+      },
       "loading": {
         "ready": "구매 준비됨",
         "confirm": "지갑에서 확인하세요",
@@ -442,6 +446,50 @@
       "heading": "이동 중",
       "body1": "자금이 송금되었습니다. 수령까지 남은 시간은 20분 미만입니다. 로켓 아이콘을 클릭하여 진행 상황을 확인할 수 있습니다.",
       "body2": "이 창을 닫아도 됩니다."
+    },
+    "TRANSACTIONS": {
+      "layoutHeading": "진행 중",
+      "passportDashboard": "전체 거래 내역을 확인하세요",
+      "status": {
+        "withdrawalPending": {
+          "actionButtonText": "계속",
+          "withdrawalDelayText": "이 이동은 일시 중지되었습니다. 돌아가세요",
+          "withdrawalReadyText": "코인을 받으려면 조치가 필요합니다",
+          "caption": "일시중지됨"
+        },
+        "inProgress": {
+          "heading": "진행 중",
+          "txnEstimate": "보통 20분 소요됩니다",
+          "stepInfo": "세부 정보 보기"
+        },
+        "emptyState": {
+          "notConnected": {
+            "body": "트랜잭션을 보려면 지갑을 연결하세요",
+            "buttonText": "연결하다"
+          }
+        },
+        "noTransactions": {
+          "body": "여기까지 완료되었습니다.",
+          "passport": {
+            "body": "완료된 거래는",
+            "link": "패스포트"
+          }
+        }
+      },
+      "fiatPricePrefix": "≈ USD $",
+      "support": {
+        "body1": "도움이 필요하신가요?",
+        "body2": " 문의하기 ",
+        "body3": "지원팀",
+        "supportLink": "https://support.immutable.com/ko/",
+        "passport": {
+          "body1": "또는 귀하의 ",
+          "body2": "패스포트"
+        }
+      },
+      "walletSelection": {
+        "heading": "보려는 지갑 선택"
+      }
     }
   },
   "footers": {
