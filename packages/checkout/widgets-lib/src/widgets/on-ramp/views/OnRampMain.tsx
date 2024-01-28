@@ -5,12 +5,12 @@ import {
 } from 'react';
 import { ExchangeType } from '@imtbl/checkout-sdk';
 import url from 'url';
+import { useTranslation } from 'react-i18next';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { sendOnRampWidgetCloseEvent } from '../OnRampWidgetEvents';
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { OnRampWidgetViews } from '../../../context/view-context/OnRampViewContextTypes';
-import { text } from '../../../resources/text/textConfig';
 import { boxMainStyle, containerStyle } from './onRampStyles';
 import {
   useAnalytics, UserJourney,
@@ -35,7 +35,7 @@ export function OnRampMain({
   const { checkout, provider } = connectLoaderState;
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
-  const { header } = text.views[OnRampWidgetViews.ONRAMP];
+  const { t } = useTranslation();
   const { viewState, viewDispatch } = useContext(ViewContext);
   const [widgetUrl, setWidgetUrl] = useState<string>('');
 
@@ -234,7 +234,7 @@ export function OnRampMain({
         header={(
           <HeaderNavigation
             showBack={showBackButton}
-            title={header.title}
+            title={t('views.ONRAMP.header.title')}
             onCloseButtonClick={() => sendOnRampWidgetCloseEvent(eventTarget)}
           />
         )}

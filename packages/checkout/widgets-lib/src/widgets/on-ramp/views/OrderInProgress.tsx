@@ -1,6 +1,5 @@
 import { useContext } from 'react';
-import { OnRampWidgetViews } from '../../../context/view-context/OnRampViewContextTypes';
-import { text } from '../../../resources/text/textConfig';
+import { useTranslation } from 'react-i18next';
 import { sendOnRampWidgetCloseEvent } from '../OnRampWidgetEvents';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -11,7 +10,7 @@ import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 
 export function OrderInProgress() {
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
-  const { heading, body1, body2 } = text.views[OnRampWidgetViews.ONRAMP][OnRampWidgetViews.IN_PROGRESS].content;
+  const { t } = useTranslation();
 
   return (
     <SimpleLayout
@@ -28,11 +27,11 @@ export function OrderInProgress() {
       heroContent={<SpendingCapHero />}
       floatHeader
     >
-      <SimpleTextBody heading={heading}>
-        {body1}
+      <SimpleTextBody heading={t('views.ONRAMP.IN_PROGRESS.content.heading')}>
+        {t('views.ONRAMP.IN_PROGRESS.content.body1')}
         <br />
         <br />
-        {body2}
+        {t('views.ONRAMP.IN_PROGRESS.content.body2')}
       </SimpleTextBody>
     </SimpleLayout>
   );
