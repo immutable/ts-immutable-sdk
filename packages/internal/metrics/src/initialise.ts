@@ -4,7 +4,7 @@ import { post } from './utils/request';
 import { flattenProperties, getDetail, storeDetail } from './utils/state';
 
 // WARNING: DO NOT CHANGE THE STRING BELOW. IT GETS REPLACED AT BUILD TIME.
-export const SDK_VERSION = '__SDK_VERSION__';
+const SDK_VERSION = '__SDK_VERSION__';
 
 let initialised = false;
 export const isInitialised = () => initialised;
@@ -35,6 +35,7 @@ const runtimeHost = () => {
 };
 
 type RuntimeDetails = {
+  sdkVersion: string;
   browser: string;
   domain?: string;
   tz?: string;
@@ -42,8 +43,10 @@ type RuntimeDetails = {
 };
 
 const getRuntimeDetails = (): RuntimeDetails => {
+  storeDetail(Detail.SDK_VERSION, SDK_VERSION);
+
   if (isNode()) {
-    return { browser: 'nodejs' };
+    return { browser: 'nodejs', sdkVersion: SDK_VERSION };
   }
 
   const domain = runtimeHost();
@@ -52,6 +55,7 @@ const getRuntimeDetails = (): RuntimeDetails => {
   }
 
   return {
+    sdkVersion: SDK_VERSION,
     browser: window.navigator.userAgent,
     domain,
     tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -65,7 +69,6 @@ type InitialiseResponse = {
 export const initialise = async () => {
   const runtimeDetails = flattenProperties(getRuntimeDetails());
 
-  // Get any existing runtimeId and send it along with the initialise
   const existingRuntimeId = getDetail(Detail.RUNTIME_ID);
 
   const body = {
