@@ -5,7 +5,8 @@ const doesChainSupportEIP1559 = (feeData: FeeData) => !!feeData.maxFeePerGas && 
 
 export const getGasPriceInWei = (feeData: FeeData): BigNumber | null => {
   if (doesChainSupportEIP1559(feeData)) {
-    return BigNumber.from(feeData.maxFeePerGas).add(
+    // EIP1559 we need to add a tip for the miner to the base fee
+    return BigNumber.from(feeData.lastBaseFeePerGas).add(
       BigNumber.from(feeData.maxPriorityFeePerGas),
     );
   }

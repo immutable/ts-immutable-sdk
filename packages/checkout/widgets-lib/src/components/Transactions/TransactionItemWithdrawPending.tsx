@@ -74,7 +74,7 @@ export function TransactionItemWithdrawPending({
   };
 
   return (
-    <Box testId={`transaction - item - ${transaction.blockchain_metadata.transaction_hash} `} sx={containerStyles}>
+    <Box testId={`transaction-item-${transaction.blockchain_metadata.transaction_hash}`} sx={containerStyles}>
       {requiresWithdrawalClaim && (
         <>
           <Box sx={actionsContainerStyles}>
@@ -90,7 +90,7 @@ export function TransactionItemWithdrawPending({
                 }}
               />
               <Body
-                testId={`transaction - item - ${transaction.blockchain_metadata.transaction_hash} -action - message`}
+                testId={`transaction-item-${transaction.blockchain_metadata.transaction_hash}-action-message`}
                 size="xSmall"
                 sx={{ color: 'base.color.text.secondary' }}
               >
@@ -99,7 +99,7 @@ export function TransactionItemWithdrawPending({
             </Box>
             {requiresWithdrawalClaim && withdrawalReadyToClaim && (
               <Button
-                testId={`transaction - item - ${transaction.blockchain_metadata.transaction_hash} -action - button`}
+                testId={`transaction-item-${transaction.blockchain_metadata.transaction_hash}-action-button`}
                 variant="primary"
                 size="small"
                 onClick={handleWithdrawalClaimClick}
