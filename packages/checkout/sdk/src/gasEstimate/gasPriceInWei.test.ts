@@ -2,7 +2,7 @@ import { BigNumber } from 'ethers';
 import { getGasPriceInWei } from './gasPriceInWei';
 
 describe('gasPriceInWei', () => {
-  it('should return gas price in wei using maxFeePerGas and maxPriorityFeePerGas', () => {
+  it('should return gas price in wei using lastBaseFeePerGas and maxPriorityFeePerGas', () => {
     const fee = getGasPriceInWei({
       lastBaseFeePerGas: BigNumber.from(1),
       maxFeePerGas: BigNumber.from(22),
