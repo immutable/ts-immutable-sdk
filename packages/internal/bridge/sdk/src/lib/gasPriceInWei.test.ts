@@ -5,7 +5,7 @@ describe('gasPriceInWei', () => {
   it('should return gas price in wei using maxFeePerGas and maxPriorityFeePerGas', () => {
     const fee = getGasPriceInWei({
       lastBaseFeePerGas: BigNumber.from(1),
-      maxFeePerGas: null,
+      maxFeePerGas: BigNumber.from(22),
       maxPriorityFeePerGas: BigNumber.from(2),
       gasPrice: BigNumber.from(11),
     });
@@ -35,7 +35,7 @@ describe('gasPriceInWei', () => {
   it('should return gas price in wei when maxPriorityFeePerGas missing', () => {
     const fee = getGasPriceInWei({
       lastBaseFeePerGas: BigNumber.from(2),
-      maxFeePerGas: null,
+      maxFeePerGas: BigNumber.from(22),
       maxPriorityFeePerGas: null,
       gasPrice: BigNumber.from(11),
     });
