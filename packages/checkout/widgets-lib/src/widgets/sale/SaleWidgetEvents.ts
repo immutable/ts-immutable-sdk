@@ -46,6 +46,7 @@ export const sendSaleSuccessEvent = (
 export const sendSaleFailedEvent = (
   eventTarget: Window | EventTarget,
   reason: string,
+  error: Record<string, unknown>,
   paymentMethod: SalePaymentTypes | undefined,
   transactions: ExecutedTransaction[] = [],
 ) => {
@@ -56,9 +57,10 @@ export const sendSaleFailedEvent = (
       type: SaleEventType.FAILURE,
       data: {
         reason,
-        timestamp: new Date().getTime(),
+        error,
         paymentMethod,
         transactions,
+        timestamp: new Date().getTime(),
       },
     },
   });
