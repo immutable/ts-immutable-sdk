@@ -22,7 +22,7 @@ describe('gasPriceInWei', () => {
     expect(fee).toEqual(BigNumber.from(11));
   });
 
-  it('should return gas price in wei when maxFeePerGas missing', () => {
+  it('should return gas price in wei when lastBaseFeePerGas missing', () => {
     const fee = getGasPriceInWei({
       lastBaseFeePerGas: null,
       maxFeePerGas: null,
