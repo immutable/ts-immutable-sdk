@@ -80,7 +80,7 @@ describe('gasCalculator', () => {
       const mockProvider = {
         estimateGas: jest.fn().mockResolvedValue(100000),
         getFeeData: jest.fn().mockResolvedValue({
-          maxFeePerGas: '0x1',
+          lastBaseFeePerGas: '0x1',
           maxPriorityFeePerGas: '0x1',
           gasPrice: null,
         }),
@@ -132,7 +132,7 @@ describe('gasCalculator', () => {
       const mockProvider = {
         estimateGas: jest.fn().mockResolvedValue(100000),
         getFeeData: jest.fn().mockResolvedValue({
-          maxFeePerGas: '0x1',
+          lastBaseFeePerGas: '0x1',
           maxPriorityFeePerGas: '0x1',
           gasPrice: null,
         }),
