@@ -9,10 +9,10 @@ import {
 import { Exchange } from '@imtbl/dex-sdk';
 import { Environment } from '@imtbl/config';
 import { SinonStub } from 'cypress/types/sinon';
+import { useTranslation } from 'react-i18next';
 import { cyIntercept, cySmartGet } from '../../../lib/testUtils';
 import { SwapWidgetTestComponent } from '../test-components/SwapWidgetTestComponent';
 import { SwapForm } from './SwapForm';
-import { text } from '../../../resources/text/textConfig';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import { SwapState, initialSwapState } from '../context/SwapContext';
 import { SwapCoins } from '../views/SwapCoins';
@@ -24,6 +24,7 @@ import {
 import { NATIVE } from '../../../lib';
 
 describe('SwapForm', () => {
+  const { t } = useTranslation();
   let testSwapState: SwapState;
   let cryptoConversions;
 
@@ -84,7 +85,6 @@ describe('SwapForm', () => {
       },
     };
   });
-  const { swapForm: { from: fromText, to: toText }, validation } = text.views[SwapWidgetViews.SWAP];
   const connectLoaderState = {
     checkout: new Checkout({
       baseConfig: { environment: Environment.SANDBOX },
@@ -108,11 +108,15 @@ describe('SwapForm', () => {
       cySmartGet('fromTokenInputs-text-form-text')
         .should('be.visible');
       cySmartGet('fromTokenInputs-text-form-text__input')
-        .should('have.attr', 'placeholder', fromText.inputPlaceholder);
+        .should('have.attr', 'placeholder', t('views.SWAP.swapForm.from.inputPlaceholder'));
       cySmartGet('toTokenInputs-select-form-select__target').should('be.visible');
       cySmartGet('toTokenInputs-select-form-select__target').should('have.text', 'Select coin');
       cySmartGet('toTokenInputs-text-form-text').should('be.visible');
-      cySmartGet('toTokenInputs-text-form-text__input').should('have.attr', 'placeholder', toText.inputPlaceholder);
+      cySmartGet('toTokenInputs-text-form-text__input').should(
+        'have.attr',
+        'placeholder',
+        t('views.SWAP.swapForm.to.inputPlaceholder'),
+      );
     });
 
     it('should set native token as from if native token is provided in from address', () => {
@@ -317,19 +321,19 @@ describe('SwapForm', () => {
 
       cySmartGet('fromTokenInputs-select-form-select-control-error')
         .should('exist')
-        .should('have.text', validation.noFromTokenSelected);
+        .should('have.text', t('views.SWAP.validation.noFromTokenSelected'));
 
       cySmartGet('fromTokenInputs-text-form-text-control-error')
         .should('exist')
-        .should('have.text', validation.noAmountInputted);
+        .should('have.text', t('views.SWAP.validation.noAmountInputted'));
 
       cySmartGet('toTokenInputs-select-form-select-control-error')
         .should('exist')
-        .should('have.text', validation.noToTokenSelected);
+        .should('have.text', t('views.SWAP.validation.noToTokenSelected'));
 
       cySmartGet('toTokenInputs-text-form-text-control-error')
         .should('exist')
-        .should('have.text', validation.noAmountInputted);
+        .should('have.text', t('views.SWAP.validation.noAmountInputted'));
     });
 
     it('should show insufficient balance error when swap from amount is larger than token balance', () => {
@@ -351,7 +355,7 @@ describe('SwapForm', () => {
 
       cySmartGet('fromTokenInputs-text-form-text-control-error')
         .should('exist')
-        .should('have.text', validation.insufficientBalance);
+        .should('have.text', t('views.SWAP.validation.insufficientBalance'));
     });
 
     it('should show no amount error when swap from amount missing', () => {
@@ -372,7 +376,7 @@ describe('SwapForm', () => {
 
       cySmartGet('fromTokenInputs-text-form-text-control-error')
         .should('exist')
-        .should('have.text', validation.noAmountInputted);
+        .should('have.text', t('views.SWAP.validation.noAmountInputted'));
     });
 
     it('should remove validation error when swap from amount is fixed', () => {
@@ -392,7 +396,7 @@ describe('SwapForm', () => {
       cySmartGet('swap-button').click();
       cySmartGet('fromTokenInputs-text-form-text-control-error')
         .should('exist')
-        .should('have.text', validation.noAmountInputted);
+        .should('have.text', t('views.SWAP.validation.noAmountInputted'));
 
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').blur();
 
@@ -416,7 +420,7 @@ describe('SwapForm', () => {
       cySmartGet('swap-button').click();
       cySmartGet('fromTokenInputs-select-form-select-control-error')
         .should('exist')
-        .should('have.text', validation.noFromTokenSelected);
+        .should('have.text', t('views.SWAP.validation.noFromTokenSelected'));
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
       cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')

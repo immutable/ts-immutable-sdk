@@ -1,6 +1,5 @@
 import { TokenInfo, IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
-import { text } from '../../resources/text/textConfig';
-import { SharedViews } from '../../context/view-context/ViewContext';
+import { useTranslation } from 'react-i18next';
 import { orchestrationEvents } from '../../lib/orchestrationEvents';
 
 // eslint-disable-next-line max-len
@@ -11,8 +10,9 @@ export const topUpBridgeOption = (
   isNotPassport: boolean,
 ): { text: string, action: () => void } | undefined => {
   if (isBridgeEnabled && isNotPassport) {
+    const { t } = useTranslation();
     return {
-      text: text.views[SharedViews.TOP_UP_VIEW].topUpOptions.bridge.heading,
+      text: t('views.TOP_UP_VIEW.topUpOptions.bridge.heading'),
       action: () => {
         orchestrationEvents.sendRequestBridgeEvent(
           window,
@@ -30,8 +30,9 @@ export const topUpBridgeOption = (
 
 export const topUpOnRampOption = (isOnRampEnabled: boolean): { text: string, action: () => void } | undefined => {
   if (isOnRampEnabled) {
+    const { t } = useTranslation();
     return {
-      text: text.views[SharedViews.TOP_UP_VIEW].topUpOptions.onramp.heading,
+      text: t('views.TOP_UP_VIEW.topUpOptions.onramp.heading'),
       action: () => {
         orchestrationEvents.sendRequestOnrampEvent(
           window,

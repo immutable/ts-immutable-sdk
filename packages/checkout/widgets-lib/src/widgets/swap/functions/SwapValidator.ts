@@ -1,28 +1,27 @@
 import { TokenInfo } from '@imtbl/checkout-sdk';
-import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
-import { text } from '../../../resources/text/textConfig';
+import { useTranslation } from 'react-i18next';
 
 export function validateFromToken(fromToken?: TokenInfo): string {
-  const { validation } = text.views[SwapWidgetViews.SWAP];
-  if (!fromToken) return validation.noFromTokenSelected;
+  const { t } = useTranslation();
+  if (!fromToken) return t('views.SWAP.validation.noFromTokenSelected');
   return '';
 }
 
 export function validateFromAmount(amount: string, balance?: string): string {
-  const { validation } = text.views[SwapWidgetViews.SWAP];
-  if (!amount || parseFloat(amount) === 0) return validation.noAmountInputted;
-  if (balance && Number(amount) > Number(balance)) return validation.insufficientBalance;
+  const { t } = useTranslation();
+  if (!amount || parseFloat(amount) === 0) return t('views.SWAP.validation.noAmountInputted');
+  if (balance && Number(amount) > Number(balance)) return t('views.SWAP.validation.insufficientBalance');
   return '';
 }
 
 export function validateToToken(toToken?: TokenInfo): string {
-  const { validation } = text.views[SwapWidgetViews.SWAP];
-  if (!toToken) return validation.noToTokenSelected;
+  const { t } = useTranslation();
+  if (!toToken) return t('views.SWAP.validation.noToTokenSelected');
   return '';
 }
 
 export function validateToAmount(amount: string): string {
-  const { validation } = text.views[SwapWidgetViews.SWAP];
-  if (!amount || parseFloat(amount) === 0) return validation.noAmountInputted;
+  const { t } = useTranslation();
+  if (!amount || parseFloat(amount) === 0) return t('views.SWAP.validation.noAmountInputted');
   return '';
 }

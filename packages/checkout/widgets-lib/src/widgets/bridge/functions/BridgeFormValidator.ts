@@ -1,16 +1,15 @@
 import { GetBalanceResult } from '@imtbl/checkout-sdk';
-import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
-import { text } from '../../../resources/text/textConfig';
+import { useTranslation } from 'react-i18next';
 
 export function validateToken(fromToken: GetBalanceResult | undefined): string {
-  const { validation } = text.views[BridgeWidgetViews.BRIDGE_FORM];
-  if (!fromToken) return validation.noTokenSelected;
+  const { t } = useTranslation();
+  if (!fromToken) return t('views.BRIDGE_FORM.validation.noTokenSelected');
   return '';
 }
 
 export function validateAmount(amount: string, balance?: string): string {
-  const { validation } = text.views[BridgeWidgetViews.BRIDGE_FORM];
-  if (!amount || parseFloat(amount) === 0) return validation.noAmountInputted;
-  if (balance && Number(amount) > Number(balance)) return validation.insufficientBalance;
+  const { t } = useTranslation();
+  if (!amount || parseFloat(amount) === 0) return t('views.BRIDGE_FORM.validation.noAmountInputted');
+  if (balance && Number(amount) > Number(balance)) return t('views.BRIDGE_FORM.validation.insufficientBalance');
   return '';
 }
