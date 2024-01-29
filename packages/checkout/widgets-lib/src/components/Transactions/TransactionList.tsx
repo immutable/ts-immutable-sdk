@@ -1,5 +1,7 @@
 import {
   Box,
+  Button,
+  Divider,
   EllipsizedText,
 } from '@biom3/react';
 import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
@@ -26,6 +28,7 @@ type TransactionListProps = {
   knownTokenMap: KnownNetworkMap,
   isPassport: boolean;
   walletAddress: string;
+  changeWallet: () => void,
 };
 
 export function TransactionList({
@@ -34,6 +37,7 @@ export function TransactionList({
   knownTokenMap,
   isPassport,
   walletAddress,
+  changeWallet,
 }: TransactionListProps) {
   const { cryptoFiatState } = useContext(CryptoFiatContext);
   const { t } = useTranslation();
@@ -62,7 +66,16 @@ export function TransactionList({
     <Box sx={transactionsListStyle(isPassport)}>
       <Box sx={headingStyles}>
         <EllipsizedText leftSideLength={6} rightSideLength={4} text={walletAddress} />
+        <Button size="small" onClick={changeWallet}>Change wallet</Button>
       </Box>
+      <Divider
+        size="small"
+        sx={{
+          pb: 'base.spacing.x2',
+          color: 'base.color.translucent.emphasis.300',
+          opacity: 0.1,
+        }}
+      />
       <Box
         testId="move-transaction-list"
         sx={containerStyles}

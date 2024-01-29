@@ -494,15 +494,12 @@
     "CLAIM_WITHDRAWAL": {
       "content": {
         "heading": "Follow the prompts to receive your coins on ",
-        "body": "You’ll be asked to pay a small gas fee",
-        "body2": "Destination Wallet address: "
+        "body": "You’ll be asked to pay a small gas fee to claim your withdrawal.",
+        "body2": "Destination wallet address: "
       },
       "footer": {
         "buttonText": "Continue",
         "retryText": "Try again"
-      },
-      "loadingView": {
-        "text": "Initiating move"
       }
     }
   },

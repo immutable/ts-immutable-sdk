@@ -493,6 +493,17 @@
       "walletSelection": {
         "heading": "表示するウォレットを選択"
       }
+    },
+    "CLAIM_WITHDRAWAL": {
+      "content": {
+        "heading": "コインを受け取るためのプロンプトに従ってください",
+        "body": "引き出しを請求するには小額のガス手数料が必要です。",
+        "body2": "目的地ウォレットアドレス："
+      },
+      "footer": {
+        "buttonText": "続行",
+        "retryText": "もう一度試す"
+      }
     }
   },
   "footers": {

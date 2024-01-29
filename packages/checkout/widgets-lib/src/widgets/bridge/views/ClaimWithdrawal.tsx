@@ -1,4 +1,4 @@
-import { Box } from '@biom3/react';
+import { Box, Button, EllipsizedText } from '@biom3/react';
 import {
   useCallback,
   useContext,
@@ -10,24 +10,27 @@ import { useTranslation } from 'react-i18next';
 import { Transaction } from 'lib/clients';
 import { getChainNameById } from 'lib/chains';
 import { getL1ChainId } from 'lib';
+import { isPassportProvider } from 'lib/providerUtils';
+import { TransactionRequest } from '@ethersproject/providers';
+import { WalletProviderName } from '@imtbl/checkout-sdk';
+import { isNativeToken } from 'lib/utils';
+import { BigNumber } from 'ethers';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
-import { FooterButton } from '../../../components/Footer/FooterButton';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
-import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
-import { LoadingView } from '../../../views/loading/LoadingView';
+import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { BridgeContext } from '../context/BridgeContext';
 import { WalletApproveHero } from '../../../components/Hero/WalletApproveHero';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 
 export interface ClaimWithdrawalProps {
-  transaction: Transaction
+  transaction: Transaction,
 }
 export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
   const { t } = useTranslation();
-  const { bridgeState: { checkout, tokenBridge, web3Provider } } = useContext(BridgeContext);
+  const { bridgeState: { checkout, tokenBridge, from } } = useContext(BridgeContext);
   const { viewDispatch } = useContext(ViewContext);
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
@@ -41,23 +44,23 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
   }, []);
 
   // Local state
-  const [actionDisabled, setActionDisabled] = useState(false);
   const [txProcessing, setTxProcessing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [hasWithdrawError, setHasWithdrawError] = useState(false);
+  const [withdrawalTxn, setWithdrawalTxn] = useState<TransactionRequest | null>();
 
-  // Common error view function
-  const showErrorView = useCallback(() => {
-    viewDispatch({
-      payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: {
-          type: SharedViews.ERROR_VIEW,
-          error: new Error('No checkout object or no provider object found'),
-        },
-      },
-    });
-  }, [viewDispatch]);
+  // // Common error view function
+  // const showErrorView = useCallback(() => {
+  //   viewDispatch({
+  //     payload: {
+  //       type: ViewActions.UPDATE_VIEW,
+  //       view: {
+  //         type: SharedViews.ERROR_VIEW,
+  //         error: new Error('No checkout object or no provider object found'),
+  //       },
+  //     },
+  //   });
+  // }, [viewDispatch]);
 
   const goBack = useCallback(() => {
     viewDispatch({
@@ -67,86 +70,186 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
     });
   }, [viewDispatch]);
 
-  const handleWithdrawalClaimClick = async () => {
-    if (!tokenBridge || !web3Provider) return;
+  useEffect(() => {
+    const getWithdrawalTxn = async () => {
+      if (!tokenBridge) return;
+      // get withdrawal transaction from the token bridge by receipient address and index
+      setLoading(true);
+      try {
+        const flowRateWithdrawTxnResponse = await tokenBridge?.getFlowRateWithdrawTx({
+          recipient: transaction.details.to_address,
+          index: 0, // TODO: update index from transaction when it comes through from backend
+        });
+        setWithdrawalTxn(flowRateWithdrawTxnResponse.unsignedTx);
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.log(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    getWithdrawalTxn();
+  }, [tokenBridge]);
+
+  const handleWithdrawalClaimClick = useCallback(async () => {
+    if (!checkout || !tokenBridge || !from?.web3Provider || !withdrawalTxn) return;
+
+    let providerToUse = from?.web3Provider;
+    const l1ChainId = getL1ChainId(checkout.config);
 
     setTxProcessing(true);
 
-    console.log('clicked continue to withdraw claim');
-    console.log('for transaction', transaction);
+    if (isPassportProvider(from?.web3Provider)) {
+      // user should switch to MetaMask
+      try {
+        const createProviderResult = await checkout.createProvider({ walletProviderName: WalletProviderName.METAMASK });
+        const connectResult = await checkout.connect({
+          provider: createProviderResult.provider,
+          requestWalletPermissions: true,
+        });
+        providerToUse = connectResult.provider;
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.log(err);
+        return;
+      }
+    }
 
-    // get withdrawal transaction from the token bridge by receipient address and index
-    let unsignedWithdrawalTxn;
+    let ethGasCostWei: BigNumber | null;
     try {
-      console.log('fetching flow rate withdraw txn');
-      const flowRateWithdrawTxnResponse = await tokenBridge?.getFlowRateWithdrawTx({
-        recipient: transaction.details.to_address,
-        index: 0,
+      const gasEstimate = await providerToUse.estimateGas(withdrawalTxn);
+      const feeData = await providerToUse.getFeeData();
+      let gasPriceInWei: BigNumber | null;
+      if (feeData.lastBaseFeePerGas && feeData.maxFeePerGas && feeData.maxPriorityFeePerGas) {
+        gasPriceInWei = feeData.lastBaseFeePerGas.add(feeData.maxPriorityFeePerGas);
+      } else {
+        gasPriceInWei = feeData.gasPrice;
+      }
+      if (!gasPriceInWei) throw new Error('unable to fetch gas price');
+      ethGasCostWei = gasEstimate.mul(gasPriceInWei);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log(err);
+    }
+
+    // get L1 balances and do check for enough ETH to cover gas
+    try {
+      const balancesResult = await checkout.getAllBalances({
+        provider: providerToUse,
+        chainId: l1ChainId,
       });
 
-      unsignedWithdrawalTxn = flowRateWithdrawTxnResponse.unsignedTx;
-      console.log('unsignedWithdrawalTxn', unsignedWithdrawalTxn);
+      const ethBalance = balancesResult.balances.find((balance) => isNativeToken(balance.token.address));
+
+      if (!ethBalance || ethBalance.balance.lt(ethGasCostWei!)) {
+        // TODO: if eth balance is less than the total gas cost required for the txn then pop up Not enough ETH drawer
+        // eslint-disable-next-line no-console
+        console.log('not enough eth to pay for claim withdrawal txn');
+        setLoading(false);
+        return;
+      }
     } catch (err) {
-      // console.error(
-      //   `Failed to get withdrawal transaction for recipient: ${transaction.details.to_address} and index: 0`,
-      // );
+      // eslint-disable-next-line no-console
+      console.log(err);
       setHasWithdrawError(true);
-      setTxProcessing(false);
+      setLoading(false);
       return;
     }
 
-    setTxProcessing(false);
+    // check that provider is connected to L1
+    const network = await providerToUse.getNetwork();
+
+    if (network.chainId !== l1ChainId) {
+      try {
+        const switchNetworkResult = await checkout.switchNetwork({
+          provider: providerToUse,
+          chainId: l1ChainId,
+        });
+        providerToUse = switchNetworkResult.provider;
+      } catch (err) {
+        setHasWithdrawError(true);
+        // eslint-disable-next-line no-console
+        console.log(err);
+        return;
+      }
+    }
 
     // send transaction to wallet for signing
     try {
-      const response = checkout.sendTransaction({
-        provider: web3Provider,
-        transaction: unsignedWithdrawalTxn,
-      });
-      console.log('response', response);
-    } catch (error) {
-      // console.error(error);
+      // TODO: WT-2054 Update view to go to in progress screens and pass through sendTransaction response
+
+      // const response = await checkout.sendTransaction({
+      //   provider: providerToUse,
+      //   transaction: withdrawalTxn,
+      // });
+
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log(err);
       setHasWithdrawError(true);
+      setTxProcessing(false);
+    } finally {
+      setTxProcessing(false);
     }
-  };
+  }, [tokenBridge, from, withdrawalTxn]);
 
   return (
-    <>
-      {loading && (<LoadingView loadingText={t('views.APPROVE_TRANSACTION.loadingView.text')} showFooterLogo />)}
-      {!loading && (
-        <SimpleLayout
-          header={(
-            <HeaderNavigation
-              transparent
-              showBack
-              onCloseButtonClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
-              onBackButtonClick={goBack}
-            />
-          )}
-          floatHeader
-          heroContent={<WalletApproveHero />}
-          footer={(
-            <Box sx={{ width: '100%', flexDirection: 'column' }}>
-              <FooterButton
-                loading={txProcessing}
-                actionText={t(`views.CLAIM_WITHDRAWAL.${hasWithdrawError ? 'footer.retryText' : 'footer.buttonText'}`)}
-                onActionClick={handleWithdrawalClaimClick}
-                variant="primary"
-              />
-              <FooterLogo />
-            </Box>
-          )}
-        >
-          <SimpleTextBody
-            heading={
-              `${t('views.CLAIM_WITHDRAWAL.content.heading')} ${getChainNameById(getL1ChainId(checkout.config))}`
-            }
-          >
-            <Box>{t('views.CLAIM_WITHDRAWAL.content.body')}</Box>
-            <Box>{`${t('views.CLAIM_WITHDRAWAL.content.body2')} 0x1234...5678`}</Box>
-          </SimpleTextBody>
-        </SimpleLayout>
+    <SimpleLayout
+      testId="claim-withdrawal"
+      header={(
+        <HeaderNavigation
+          transparent
+          showBack
+          onCloseButtonClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
+          onBackButtonClick={goBack}
+        />
       )}
-    </>
+      floatHeader
+      heroContent={<WalletApproveHero />}
+      footer={(
+        <Box sx={{
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+        >
+          <Box sx={{
+            pb: 'base.spacing.x5',
+            px: 'base.spacing.x6',
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+          >
+            <Button
+              testId="claim-withdrawal-continue-button"
+              size="large"
+              variant="primary"
+              disabled={loading}
+              onClick={(txProcessing || loading) ? () => { } : handleWithdrawalClaimClick}
+            >
+              {loading ? (
+                <Button.Icon icon="Loading" sx={{ width: 'base.icon.size.400' }} />
+              ) : t(`views.CLAIM_WITHDRAWAL.${hasWithdrawError ? 'footer.retryText' : 'footer.buttonText'}`)}
+            </Button>
+          </Box>
+          <FooterLogo />
+        </Box>
+      )}
+    >
+      <SimpleTextBody
+        heading={
+          `${t('views.CLAIM_WITHDRAWAL.content.heading')} ${getChainNameById(getL1ChainId(checkout.config))}`
+        }
+      >
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', pb: 'base.spacing.x1' }}>
+          {t('views.CLAIM_WITHDRAWAL.content.body')}
+        </Box>
+        <Box>
+          {t('views.CLAIM_WITHDRAWAL.content.body2')}
+          <EllipsizedText text={transaction.details.to_address.toLowerCase() ?? ''} />
+        </Box>
+      </SimpleTextBody>
+    </SimpleLayout>
   );
 }

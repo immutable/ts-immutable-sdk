@@ -490,6 +490,17 @@
       "walletSelection": {
         "heading": "选择要查看的钱包"
       }
+    },
+    "CLAIM_WITHDRAWAL": {
+      "content": {
+        "heading": "按照提示在此处收取您的硬币",
+        "body": "您将被要求支付一笔小额燃气费以领取您的提款。",
+        "body2": "目标钱包地址："
+      },
+      "footer": {
+        "buttonText": "继续",
+        "retryText": "重试"
+      }
     }
   },
   "footers": {
