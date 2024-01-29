@@ -6,7 +6,7 @@ import {
 } from '../imx';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-const defaultHeaders = { 'x-sdk-version': 'ts-immutable-sdk-0.43.0' };
+const defaultHeaders = { 'x-sdk-version': 'ts-immutable-sdk-__SDK_VERSION__' };
 
 /**
  * Configuration for generated clients
