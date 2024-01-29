@@ -5,6 +5,7 @@ export enum Detail {
   PUBLISHABLE_API_KEY = 'pak',
   IDENTITY = 'uid',
   DOMAIN = 'domain',
+  SDK_VERSION = 'sdkVersion',
 }
 
 export enum Store {
