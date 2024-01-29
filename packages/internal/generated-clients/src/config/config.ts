@@ -6,7 +6,7 @@ import {
 } from '../imx';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-const defaultHeaders = { 'x-sdk-version': 'ts-immutable-sdk-__SDK_VERSION__' };
+const defaultHeaders = { 'x-sdk-version': 'ts-immutable-sdk-0.43.0' };
 
 /**
  * Configuration for generated clients
@@ -61,10 +61,10 @@ export type MultiRollupAPIConfiguration = {
 export const multiRollupConfig = {
   getProduction: (): MultiRollupAPIConfiguration => ({
     indexer: createConfig({
-      basePath: 'https://indexer-mr.imtbl.com',
+      basePath: 'https://api.immutable.com',
     }),
     orderBook: createConfig({
-      basePath: 'https://order-book-mr.imtbl.com',
+      basePath: 'https://api.immutable.com',
     }),
     passport: createConfig({
       basePath: 'https://api.immutable.com',
