@@ -15,7 +15,7 @@ export interface Provider {
 
 export type QuoteResult = {
   route: Route<Token, Token>;
-  gasEstimate: BigNumber
+  gasUnitsEstimate: BigNumber
   amountIn: CoinAmount<ERC20>;
   amountOut: CoinAmount<ERC20>;
   tradeType: TradeType;
@@ -71,7 +71,7 @@ export async function getQuotesForRoutes(
           route: routes[i],
           amountIn: tradeType === TradeType.EXACT_INPUT ? amountSpecified : newAmount(quoteAmount, input),
           amountOut: tradeType === TradeType.EXACT_INPUT ? newAmount(quoteAmount, output) : amountSpecified,
-          gasEstimate: BigNumber.from(decodedQuoteResult[gasEstimateIndex]),
+          gasUnitsEstimate: BigNumber.from(decodedQuoteResult[gasEstimateIndex]),
           tradeType,
         });
       }

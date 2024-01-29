@@ -150,17 +150,18 @@ export const getApproval = async (
     return null;
   }
 
-  const gasEstimate = await getApproveGasEstimate(
+  const gasUnitsEstimate = await getApproveGasEstimate(
     provider,
     ownerAddress,
     preparedApproval.spender,
     preparedApproval.amount.token.address,
   );
 
-  const gasFeeEstimate = gasPrice ? calculateGasFee(gasPrice, gasEstimate) : null;
+  const gasFeeEstimate = gasPrice ? calculateGasFee(gasPrice, gasUnitsEstimate) : null;
 
   return {
     transaction: approveTransaction,
     gasFeeEstimate: gasFeeEstimate ? toPublicAmount(gasFeeEstimate) : null,
+    gasUnitsEstimate,
   };
 };

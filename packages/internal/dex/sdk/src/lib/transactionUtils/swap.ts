@@ -474,7 +474,7 @@ export function getSwap(
   );
 
   // TODO: Add additional gas fee estimates for secondary fees
-  const gasFeeEstimate = gasPrice ? calculateGasFee(gasPrice, adjustedQuote.gasEstimate) : null;
+  const gasFeeEstimate = gasPrice ? calculateGasFee(gasPrice, adjustedQuote.gasUnitsEstimate) : null;
 
   const transactionValue = getTransactionValue(tokenIn, maximumAmountIn);
 
@@ -486,6 +486,7 @@ export function getSwap(
       from: fromAddress,
     },
     gasFeeEstimate: gasFeeEstimate ? toPublicAmount(gasFeeEstimate) : null,
+    gasUnitsEstimate: adjustedQuote.gasUnitsEstimate,
   };
 }
 
@@ -527,7 +528,7 @@ export function adjustQuoteWithFees(
   const adjustedAmountIn = adjustAmountIn(ourQuote, amountSpecified, fees, nativeTokenService);
 
   return {
-    gasEstimate: ourQuote.gasEstimate,
+    gasUnitsEstimate: ourQuote.gasUnitsEstimate,
     route: ourQuote.route,
     amountIn: adjustedAmountIn,
     amountOut: ourQuote.amountOut,
