@@ -6,4 +6,4 @@ export { ImmutableSwapProxy__factory } from "./ImmutableSwapProxy__factory";
 export { Multicall__factory } from "./Multicall__factory";
 export { QuoterV2__factory } from "./QuoterV2__factory";
 export { UniswapV3Pool__factory } from "./UniswapV3Pool__factory";
-export { WETH__factory } from "./WETH__factory";
+export { WIMX__factory } from "./WIMX__factory";

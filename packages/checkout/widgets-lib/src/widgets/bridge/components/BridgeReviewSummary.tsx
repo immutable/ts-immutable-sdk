@@ -36,7 +36,6 @@ import {
   bridgeReviewWrapperStyles,
   gasAmountHeadingStyles,
   topMenuItemStyles,
-  walletLogoStyles,
 } from './BridgeReviewSummaryStyles';
 import { BridgeContext } from '../context/BridgeContext';
 import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
@@ -248,7 +247,7 @@ export function BridgeReviewSummary() {
         {fromWalletProviderName && (
           <MenuItem.FramedLogo
             logo={logo[fromWalletProviderName] as any}
-            sx={walletLogoStyles(fromWalletProviderName)}
+            sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
           />
         )}
         <MenuItem.Label>
@@ -285,7 +284,7 @@ export function BridgeReviewSummary() {
         {toWalletProviderName && (
           <MenuItem.FramedLogo
             logo={logo[toWalletProviderName] as any}
-            sx={walletLogoStyles(toWalletProviderName)}
+            sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
           />
         )}
         <MenuItem.Label>

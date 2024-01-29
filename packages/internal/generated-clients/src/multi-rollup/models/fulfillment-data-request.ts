@@ -34,7 +34,7 @@ export interface FulfillmentDataRequest {
      * @type {string}
      * @memberof FulfillmentDataRequest
      */
-    'taker_address'?: string;
+    'taker_address': string;
     /**
      * 
      * @type {Array<Fee>}

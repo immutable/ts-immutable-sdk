@@ -1,5 +1,3 @@
-import { WalletProviderName } from '@imtbl/checkout-sdk';
-
 export const topMenuItemStyles = {
   borderBottomLeftRadius: '0px',
   borderBottomRightRadius: '0px',
@@ -35,13 +33,6 @@ export const arrowIconStyles = {
   width: 'base.icon.size.300',
   transform: 'rotate(270deg)',
 };
-
-export const walletLogoStyles = (walletName: WalletProviderName) => ({
-  minWidth: 'base.icon.size.400',
-  padding: walletName === WalletProviderName.PASSPORT ? 'base.spacing.x1' : '',
-  backgroundColor: 'base.color.translucent.standard.200',
-  borderRadius: 'base.borderRadius.x2',
-});
 
 export const gasAmountHeadingStyles = {
   marginBottom: 'base.spacing.x4',

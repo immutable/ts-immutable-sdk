@@ -140,7 +140,7 @@ export class Checkout {
           new CheckoutError(
             'Failed to load widgets script',
             CheckoutErrorType.WIDGETS_SCRIPT_LOAD_ERROR,
-            { message: err.message },
+            { error: err },
           ),
         );
       }
@@ -194,7 +194,11 @@ export class Checkout {
       { allowUnsupportedProvider: true } as ValidateProviderOptions,
     );
 
-    await connect.connectSite(web3Provider);
+    if (params.requestWalletPermissions && !(web3Provider.provider as any)?.isPassport) {
+      await connect.requestPermissions(web3Provider);
+    } else {
+      await connect.connectSite(web3Provider);
+    }
 
     return { provider: web3Provider };
   }
@@ -367,7 +371,7 @@ export class Checkout {
       params.provider,
     );
 
-    return await buy.buy(this.config, web3Provider, params.orders);
+    return await buy.buy(this.config, web3Provider, params.orders, params.overrides);
   }
 
   /**
@@ -411,7 +415,7 @@ export class Checkout {
       params.provider,
     );
 
-    return await cancel.cancel(this.config, web3Provider, params.orderIds);
+    return await cancel.cancel(this.config, web3Provider, params.orderIds, params.overrides);
   }
 
   /**
@@ -429,8 +433,12 @@ export class Checkout {
     let itemRequirements = [];
     try {
       itemRequirements = await getItemRequirementsFromRequirements(web3Provider, params.itemRequirements);
-    } catch (error) {
-      throw new CheckoutError('Failed to map item requirements', CheckoutErrorType.ITEM_REQUIREMENTS_ERROR);
+    } catch (err: any) {
+      throw new CheckoutError(
+        'Failed to map item requirements',
+        CheckoutErrorType.ITEM_REQUIREMENTS_ERROR,
+        { error: err },
+      );
     }
 
     return await smartCheckout.smartCheckout(

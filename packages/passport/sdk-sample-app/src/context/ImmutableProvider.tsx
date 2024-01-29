@@ -4,7 +4,7 @@ import React, {
 import { Config, ImmutableX } from '@imtbl/core-sdk';
 import { Passport, PassportModuleConfiguration } from '@imtbl/passport';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { ImmutableXClient } from '@imtbl/immutablex-client';
+import { IMXClient } from '@imtbl/x-client';
 import {
   AUDIENCE,
   LOGOUT_REDIRECT_URI,
@@ -15,6 +15,7 @@ import {
 } from '@/config';
 import { EnvironmentNames } from '@/types';
 import useLocalStorage from '@/hooks/useLocalStorage';
+import { ImxApiClients, createConfig } from '@imtbl/generated-clients';
 
 const getCoreSdkConfig = (environment: EnvironmentNames) => {
   switch (environment) {
@@ -81,7 +82,10 @@ const getPassportConfig = (environment: EnvironmentNames): PassportModuleConfigu
           magicProviderId: 'C9odf7hU4EQ5EufcfgYfcBaT5V6LhocXyiPRhIjw2EY=',
           passportDomain: 'https://passport.dev.immutable.com',
           imxPublicApiDomain: 'https://api.dev.immutable.com',
-          immutableXClient: new ImmutableXClient({
+          imxApiClients: new ImxApiClients(createConfig({
+            basePath: 'https://api.dev.immutable.com',
+          })),
+          immutableXClient: new IMXClient({
             baseConfig,
             overrides: {
               immutableXConfig: getCoreSdkConfig(EnvironmentNames.DEV),

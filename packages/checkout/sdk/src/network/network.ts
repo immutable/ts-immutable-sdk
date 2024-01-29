@@ -181,6 +181,7 @@ export async function switchWalletNetwork(
         throw new CheckoutError(
           'User cancelled add network request',
           CheckoutErrorType.USER_REJECTED_REQUEST_ERROR,
+          { error: err },
         );
       }
     } else {

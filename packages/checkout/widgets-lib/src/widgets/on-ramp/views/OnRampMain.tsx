@@ -1,16 +1,16 @@
 import { Passport } from '@imtbl/passport';
 import { Box } from '@biom3/react';
 import {
-  useContext, useEffect, useMemo, useState,
+  useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
 import { ExchangeType } from '@imtbl/checkout-sdk';
 import url from 'url';
+import { useTranslation } from 'react-i18next';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { sendOnRampWidgetCloseEvent } from '../OnRampWidgetEvents';
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { OnRampWidgetViews } from '../../../context/view-context/OnRampViewContextTypes';
-import { text } from '../../../resources/text/textConfig';
 import { boxMainStyle, containerStyle } from './onRampStyles';
 import {
   useAnalytics, UserJourney,
@@ -21,7 +21,7 @@ import { EventTargetContext } from '../../../context/event-target-context/EventT
 import { TRANSAK_ORIGIN } from '../../../components/Transak/useTransakEvents';
 
 const transakIframeId = 'transak-iframe';
-const IN_PROGRESS_VIEW_DELAY_MS = 1200;
+const IN_PROGRESS_VIEW_DELAY_MS = 6000; // 6 second
 interface OnRampProps {
   showIframe: boolean;
   tokenAmount?: string;
@@ -35,9 +35,11 @@ export function OnRampMain({
   const { checkout, provider } = connectLoaderState;
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
-  const { header } = text.views[OnRampWidgetViews.ONRAMP];
+  const { t } = useTranslation();
   const { viewState, viewDispatch } = useContext(ViewContext);
   const [widgetUrl, setWidgetUrl] = useState<string>('');
+
+  const eventTimer = useRef<number | undefined>();
 
   const isPassport = !!passport && (provider?.provider as any)?.isPassport;
 
@@ -105,6 +107,8 @@ export function OnRampMain({
     }
   };
   const transakEventHandler = (event: TransakEventData) => {
+    if (eventTimer.current) clearTimeout(eventTimer.current);
+
     if (event.event_id === TransakEvents.TRANSAK_WIDGET_OPEN) {
       viewDispatch({
         payload: {
@@ -121,7 +125,11 @@ export function OnRampMain({
       return;
     }
 
-    if (event.event_id === TransakEvents.TRANSAK_ORDER_CREATED) {
+    if (event.event_id === TransakEvents.TRANSAK_ORDER_SUCCESSFUL
+      && event.data.status === TransakStatuses.PROCESSING) {
+      // this handles 3DS -- once the user has completed the verification,
+      // kick off teh loading screen and then fake a IN_PROGRESS_VIEW_DELAY_MS
+      // delay before showing the IN_PROGRESS screen
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -130,12 +138,7 @@ export function OnRampMain({
           },
         },
       });
-      return;
-    }
-
-    if (event.event_id === TransakEvents.TRANSAK_ORDER_SUCCESSFUL
-      && event.data.status === TransakStatuses.PROCESSING) {
-      setTimeout(() => {
+      eventTimer.current = window.setTimeout(() => {
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,
@@ -231,7 +234,7 @@ export function OnRampMain({
         header={(
           <HeaderNavigation
             showBack={showBackButton}
-            title={header.title}
+            title={t('views.ONRAMP.header.title')}
             onCloseButtonClick={() => sendOnRampWidgetCloseEvent(eventTarget)}
           />
         )}

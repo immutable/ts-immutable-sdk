@@ -55,7 +55,11 @@
     },
     "ERROR_VIEW": {
       "heading": "Something's gone wrong",
-      "body": ["You can try again or contact", "support", "for help."],
+      "body": [
+        "You can try again or contact",
+        "support",
+        "for help."
+      ],
       "actionText": "Try again"
     },
     "SERVICE_UNAVAILABLE_ERROR_VIEW": {
@@ -270,7 +274,9 @@
         }
       },
       "insufficientCoinsBanner": {
-        "caption": "Insufficient coin balance. Please proceed with card instead."
+        "caption": "Insufficient coin balance. Pay with card to proceed, or",
+        "captionEnd": "and try again.",
+        "captionCTA": "add coins"
       },
       "loading": {
         "ready": "Ready to purchase",
@@ -343,6 +349,10 @@
         "DEFAULT_ERROR": {
           "description": "Sorry, something went wrong. Please try again.",
           "primaryAction": "Try again",
+          "secondaryAction": "Dismiss"
+        },
+        "INVALID_PARAMETERS": {
+          "description": "Sorry, we're unable to process your order. Missing information from client",
           "secondaryAction": "Dismiss"
         }
       }
@@ -434,8 +444,52 @@
     },
     "IN_PROGRESS": {
       "heading": "Move in progress",
-      "body1": "Less than 3 mins until your ${symbol} lands on zkEVM.",
-      "body2": "You can close this window, the transaction will be reflected in your wallet once complete."
+      "body1": "Your funds have been sent, with less than 20 mins remaining until they're received. You can return and view progress by clicking on the rocket icon.",
+      "body2": "You can close this window."
+    },
+    "TRANSACTIONS": {
+      "layoutHeading": "In progress",
+      "passportDashboard": "View the full transaction history in your",
+      "status": {
+        "withdrawalPending": {
+          "actionButtonText": "Proceed",
+          "withdrawalDelayText": "This move has been paused, please return ",
+          "withdrawalReadyText": "Action required to receive your coins",
+          "caption": "Paused"
+        },
+        "inProgress": {
+          "heading": "In Progress",
+          "txnEstimate": "Usually takes 20 mins",
+          "stepInfo": "View Details"
+        },
+        "emptyState": {
+          "notConnected": {
+            "body": "Connect your wallet to view the transactions",
+            "buttonText": "Connect"
+          }
+        },
+        "noTransactions": {
+          "body": "You're all done here.",
+          "passport": {
+            "body": "View your completed transactions in ",
+            "link": "Passport"
+          }
+        }
+      },
+      "fiatPricePrefix": "≈ USD $",
+      "support": {
+        "body1": "Need help?",
+        "body2": " Contact ",
+        "body3": "support",
+        "supportLink": "https://support.immutable.com/en/",
+        "passport": {
+          "body1": "Or view completed transactions in your ",
+          "body2": "Passport"
+        }
+      },
+      "walletSelection": {
+        "heading": "Choose a wallet to view"
+      }
     }
   },
   "footers": {

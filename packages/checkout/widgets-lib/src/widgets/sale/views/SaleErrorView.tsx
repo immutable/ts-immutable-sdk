@@ -108,6 +108,14 @@ export function SaleErrorView({
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
     },
+    [SaleErrorTypes.INVALID_PARAMETERS]: {
+      onSecondaryActionClick: closeWidget,
+      statusType: StatusType.ALERT,
+      statusIconStyles: {
+        fill: biomeTheme.color.status.attention.dim,
+        transform: 'none',
+      },
+    },
   };
 
   const getErrorViewProps = (): StatusViewProps => {

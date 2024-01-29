@@ -6,4 +6,5 @@ export const containerStyle = {
   justifyContent: 'center',
   flexDirection: 'column',
   height: '100%',
+  px: 'base.spacing.x5',
 };

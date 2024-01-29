@@ -65,12 +65,14 @@ export class CheckoutError extends Error {
 
   public type: CheckoutErrorType;
 
-  public data?: { [key: string]: string };
+  public data?: { [key: string]: any };
 
   constructor(
     message: string,
     type: CheckoutErrorType,
-    data?: { [key: string]: string },
+    data?: {
+      [key: string]: any
+    },
   ) {
     super(message);
     this.message = message;

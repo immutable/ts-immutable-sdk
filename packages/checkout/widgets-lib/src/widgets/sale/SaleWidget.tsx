@@ -132,7 +132,6 @@ export function SaleWidget(props: SaleWidgetProps) {
             <FundWithSmartCheckout subView={viewState.view.subView} />
           )}
         </CryptoFiatProvider>
-
       </SaleContextProvider>
     </ViewContext.Provider>
   );
