@@ -17,7 +17,10 @@ import {
   useState,
 } from 'react';
 import { ConnectLoaderState } from '../../../context/connect-loader-context/ConnectLoaderContext';
-import { FundWithSmartCheckoutSubViews, SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
+import {
+  FundWithSmartCheckoutSubViews,
+  SaleWidgetViews,
+} from '../../../context/view-context/SaleViewContextTypes';
 import {
   ViewActions,
   ViewContext,
@@ -54,7 +57,9 @@ type SaleContextValues = SaleContextProps & {
     callback?: (response: SignResponse | undefined) => void
   ) => Promise<SignResponse | undefined>;
   execute: (
-    signResponse: SignResponse | undefined
+    signResponse: SignResponse | undefined,
+    onTxnSuccess: (txn: ExecutedTransaction) => void,
+    onTxnError: (error: any, txns: ExecutedTransaction[]) => void,
   ) => Promise<ExecutedTransaction[]>;
   recipientAddress: string;
   recipientEmail: string;
@@ -67,10 +72,13 @@ type SaleContextValues = SaleContextProps & {
   goBackToPaymentMethods: (paymentMethod?: SalePaymentTypes | undefined) => void;
   goToErrorView: (type: SaleErrorTypes, data?: Record<string, unknown>) => void;
   goToSuccessView: (data?: Record<string, unknown>) => void;
-  querySmartCheckout: ((callback?: (r?: SmartCheckoutResult) => void) => Promise<SmartCheckoutResult | undefined>);
+  querySmartCheckout: (
+    callback?: (r?: SmartCheckoutResult) => void
+  ) => Promise<SmartCheckoutResult | undefined>;
   smartCheckoutResult: SmartCheckoutResult | undefined;
   fundingRoutes: FundingRoute[];
   disabledPaymentTypes: SalePaymentTypes[]
+  invalidParameters: boolean;
 };
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -102,6 +110,7 @@ const SaleContext = createContext<SaleContextValues>({
   smartCheckoutResult: undefined,
   fundingRoutes: [],
   disabledPaymentTypes: [],
+  invalidParameters: false,
 });
 
 SaleContext.displayName = 'SaleSaleContext';
@@ -145,6 +154,8 @@ export function SaleContextProvider(props: {
 
   const [fundingRoutes, setFundingRoutes] = useState<FundingRoute[]>([]);
   const [disabledPaymentTypes, setDisabledPaymentTypes] = useState<SalePaymentTypes[]>([]);
+
+  const [invalidParameters, setInvalidParameters] = useState<boolean>(false);
 
   const goBackToPaymentMethods = useCallback(
     (type?: SalePaymentTypes | undefined, showInsufficientCoinsBanner?: boolean) => {
@@ -228,24 +239,28 @@ export function SaleContextProvider(props: {
         },
       });
     },
+
     [paymentMethod, setPaymentMethod, executeResponse],
   );
 
-  const goToSuccessView = useCallback((data?: Record<string, unknown>) => {
-    viewDispatch({
-      payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: {
-          type: SaleWidgetViews.SALE_SUCCESS,
-          data: {
-            paymentMethod,
-            transactions: executeResponse.transactions,
-            ...data,
+  const goToSuccessView = useCallback(
+    (data?: Record<string, unknown>) => {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SaleWidgetViews.SALE_SUCCESS,
+            data: {
+              paymentMethod,
+              transactions: executeResponse.transactions,
+              ...data,
+            },
           },
         },
-      },
-    });
-  }, [[paymentMethod, executeResponse]]);
+      });
+    },
+    [[paymentMethod, executeResponse]],
+  );
 
   useEffect(() => {
     if (!signError) return;
@@ -270,11 +285,14 @@ export function SaleContextProvider(props: {
     goToErrorView(smartCheckoutError.type, smartCheckoutError.data);
   }, [smartCheckoutError]);
 
-  const querySmartCheckout = useCallback(async (callback?: (r?: SmartCheckoutResult) => void) => {
-    const result = await smartCheckout();
-    callback?.(result);
-    return result;
-  }, [smartCheckout]);
+  const querySmartCheckout = useCallback(
+    async (callback?: (r?: SmartCheckoutResult) => void) => {
+      const result = await smartCheckout();
+      callback?.(result);
+      return result;
+    },
+    [smartCheckout],
+  );
 
   useEffect(() => {
     if (!smartCheckoutResult) {
@@ -294,7 +312,9 @@ export function SaleContextProvider(props: {
     if (!smartCheckoutResult.sufficient) {
       switch (smartCheckoutResult.router.routingOutcome.type) {
         case RoutingOutcomeType.ROUTES_FOUND:
-          setFundingRoutes(smartCheckoutResult.router.routingOutcome.fundingRoutes);
+          setFundingRoutes(
+            smartCheckoutResult.router.routingOutcome.fundingRoutes,
+          );
           viewDispatch({
             payload: {
               type: ViewActions.UPDATE_VIEW,
@@ -317,6 +337,16 @@ export function SaleContextProvider(props: {
       }
     }
   }, [smartCheckoutResult]);
+
+  useEffect(() => {
+    const invalidItems = !items || items.length === 0;
+    const invalidAmount = !amount || amount === '0';
+    const invalidFromTokenAddress = !fromTokenAddress || !fromTokenAddress.startsWith('0x');
+
+    if (invalidItems || invalidAmount || invalidFromTokenAddress || !collectionName || !environmentId) {
+      setInvalidParameters(true);
+    }
+  }, [items, amount, fromTokenAddress, collectionName, environmentId]);
 
   const values = useMemo(
     () => ({
@@ -346,6 +376,7 @@ export function SaleContextProvider(props: {
       smartCheckoutResult,
       fundingRoutes,
       disabledPaymentTypes,
+      invalidParameters,
     }),
     [
       config,
@@ -371,6 +402,7 @@ export function SaleContextProvider(props: {
       smartCheckoutResult,
       fundingRoutes,
       disabledPaymentTypes,
+      invalidParameters,
     ],
   );
 

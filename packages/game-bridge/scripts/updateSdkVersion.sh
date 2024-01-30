@@ -3,14 +3,17 @@
 set -e
 set -x
 
-# The file to update
-FILE_PATH="./src/index.ts"
+# The files to update
+FILE_PATHS=("./dist/unity/index.html" "./dist/unreal/index.js" "./dist/unreal/index.js.map")
 
-# check file exists
-if [ ! -f "$FILE_PATH" ]; then
-  echo "File not found. Exiting..."
-  exit 1
-fi
+# check files exist
+for FILE_PATH in "${FILE_PATHS[@]}"
+do
+  if [ ! -f "$FILE_PATH" ]; then
+    echo "File $FILE_PATH not found. Exiting..."
+    exit 1
+  fi
+done
 
 # pull down latest tags
 git fetch --tags
@@ -26,11 +29,14 @@ fi
 # get latest commit hash
 LATEST_COMMIT=$(git rev-parse HEAD)
 
-# update variables in file
-if [[ "$OSTYPE" == "darwin"* ]]; then
-  sed -i '' "s/const sdkVersionTag = '__SDK_VERSION__';/const sdkVersionTag = '${LATEST_TAG}';/g" $FILE_PATH
-  sed -i '' "s/const sdkVersionSha = '__SDK_VERSION_SHA__';/const sdkVersionSha = '${LATEST_COMMIT}';/g" $FILE_PATH
-else
-  sed -i "s/const sdkVersionTag = '__SDK_VERSION__';/const sdkVersionTag = '${LATEST_TAG}';/g" $FILE_PATH
-  sed -i "s/const sdkVersionSha = '__SDK_VERSION_SHA__';/const sdkVersionSha = '${LATEST_COMMIT}';/g" $FILE_PATH
-fi
+# update variables in output files
+for FILE_PATH in "${FILE_PATHS[@]}"
+do
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    sed -i '' "s/__SDK_VERSION__/${LATEST_TAG}/g" $FILE_PATH
+    sed -i '' "s/__SDK_VERSION_SHA__/${LATEST_COMMIT}/g" $FILE_PATH
+  else
+    sed -i "s/__SDK_VERSION__/${LATEST_TAG}/g" $FILE_PATH
+    sed -i "s/__SDK_VERSION_SHA__/${LATEST_COMMIT}/g" $FILE_PATH
+  fi
+done

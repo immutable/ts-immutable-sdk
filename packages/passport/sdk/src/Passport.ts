@@ -1,8 +1,15 @@
-import { IMXProvider } from '@imtbl/provider';
-import { ImxApiClients, imxApiConfig, MultiRollupApiClients } from '@imtbl/generated-clients';
-import { ImmutableXClient } from '@imtbl/immutablex-client';
+import { IMXProvider } from '@imtbl/x-provider';
+import {
+  ImxApiClients,
+  imxApiConfig,
+  MultiRollupApiClients,
+} from '@imtbl/generated-clients';
+import { IMXClient } from '@imtbl/x-client';
 import { ChainName } from 'network/chains';
 import { Environment } from '@imtbl/config';
+
+import { setPassportClientId, identify, track } from '@imtbl/metrics';
+
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
 import { PassportImxProviderFactory } from './starkEx';
@@ -26,7 +33,7 @@ export class Passport {
 
   private readonly confirmationScreen: ConfirmationScreen;
 
-  private readonly immutableXClient: ImmutableXClient;
+  private readonly immutableXClient: IMXClient;
 
   private readonly magicAdapter: MagicAdapter;
 
@@ -42,14 +49,18 @@ export class Passport {
     this.magicAdapter = new MagicAdapter(this.config);
     this.confirmationScreen = new ConfirmationScreen(this.config);
     this.immutableXClient = passportModuleConfiguration.overrides?.immutableXClient
-      || new ImmutableXClient({
+      || new IMXClient({
         baseConfig: passportModuleConfiguration.baseConfig,
       });
-    this.multiRollupApiClients = new MultiRollupApiClients(this.config.multiRollupConfig);
+    this.multiRollupApiClients = new MultiRollupApiClients(
+      this.config.multiRollupConfig,
+    );
     this.passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
     const imxClientConfig = this.config.baseConfig.environment === Environment.PRODUCTION
-      ? imxApiConfig.getProduction() : imxApiConfig.getSandbox();
-    const imxApiClients = new ImxApiClients(imxClientConfig);
+      ? imxApiConfig.getProduction()
+      : imxApiConfig.getSandbox();
+    const imxApiClients = passportModuleConfiguration.overrides?.imxApiClients
+      || new ImxApiClients(imxClientConfig);
 
     this.passportImxProviderFactory = new PassportImxProviderFactory({
       authManager: this.authManager,
@@ -60,6 +71,9 @@ export class Passport {
       passportEventEmitter: this.passportEventEmitter,
       imxApiClients,
     });
+
+    setPassportClientId(passportModuleConfiguration.clientId);
+    track('passport', 'initialised');
   }
 
   /**
@@ -75,10 +89,6 @@ export class Passport {
   }
 
   public connectEvm(): Provider {
-    if (this.config.baseConfig.environment === 'production') {
-      throw new Error('EVM is not supported on production network');
-    }
-
     return new ZkEvmProvider({
       passportEventEmitter: this.passportEventEmitter,
       authManager: this.authManager,
@@ -98,7 +108,7 @@ export class Passport {
    * @returns {Promise<UserProfile | null>} the user profile if the user is logged in, otherwise null
    */
   public async login(options?: {
-    useCachedSession: boolean
+    useCachedSession: boolean;
   }): Promise<UserProfile | null> {
     const { useCachedSession = false } = options || {};
     let user = null;
@@ -113,6 +123,12 @@ export class Passport {
     }
     if (!user && !useCachedSession) {
       user = await this.authManager.login();
+    }
+
+    if (user) {
+      identify({
+        passportId: user.profile.sub,
+      });
     }
 
     return user ? user.profile : null;
@@ -131,7 +147,11 @@ export class Passport {
     interval: number,
     timeoutMs?: number,
   ): Promise<UserProfile> {
-    const user = await this.authManager.loginWithDeviceFlowCallback(deviceCode, interval, timeoutMs);
+    const user = await this.authManager.loginWithDeviceFlowCallback(
+      deviceCode,
+      interval,
+      timeoutMs,
+    );
     return user.profile;
   }
 
@@ -139,8 +159,14 @@ export class Passport {
     return this.authManager.getPKCEAuthorizationUrl();
   }
 
-  public async loginWithPKCEFlowCallback(authorizationCode: string, state: string): Promise<UserProfile> {
-    const user = await this.authManager.loginWithPKCEFlowCallback(authorizationCode, state);
+  public async loginWithPKCEFlowCallback(
+    authorizationCode: string,
+    state: string,
+  ): Promise<UserProfile> {
+    const user = await this.authManager.loginWithPKCEFlowCallback(
+      authorizationCode,
+      state,
+    );
     return user.profile;
   }
 
@@ -201,10 +227,13 @@ export class Passport {
       return [];
     }
     const headers = { Authorization: `Bearer ${user.accessToken}` };
-    const linkedAddressesResult = await this.multiRollupApiClients.passportApi.getLinkedAddresses({
-      chainName: ChainName.ETHEREUM,
-      userId: user?.profile.sub,
-    }, { headers });
+    const linkedAddressesResult = await this.multiRollupApiClients.passportApi.getLinkedAddresses(
+      {
+        chainName: ChainName.ETHEREUM,
+        userId: user?.profile.sub,
+      },
+      { headers },
+    );
     return linkedAddressesResult.data.linked_addresses;
   }
 }

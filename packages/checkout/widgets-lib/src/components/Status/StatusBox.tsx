@@ -1,4 +1,7 @@
-import { Body, Box, Icon } from '@biom3/react';
+import {
+  AllIconKeys, Body, Box, Icon,
+} from '@biom3/react';
+
 import { statusBoxStyles, statusLogoFill } from './StatusViewStyles';
 import { StatusType } from './StatusType';
 
@@ -8,11 +11,12 @@ export interface StatusViewProps {
   iconStyles?: Record<string, string>;
 }
 
-const status = {
+const status: Record<StatusType, AllIconKeys> = {
   [StatusType.SUCCESS]: 'TickWithCircle',
   [StatusType.WARNING]: 'Shield',
   [StatusType.FAILURE]: 'CloseWithCircle',
   [StatusType.INFORMATION]: 'InformationCircle',
+  [StatusType.ALERT]: 'Alert',
 };
 
 export function StatusBox({ statusText, statusType, iconStyles }: StatusViewProps) {
@@ -21,8 +25,8 @@ export function StatusBox({ statusText, statusType, iconStyles }: StatusViewProp
   return (
     <Box sx={statusBoxStyles} testId={`${statusType}-box`}>
       <Icon
-        icon={status[statusType] as any}
         testId={`${statusType}-icon`}
+        icon={status[statusType]}
         variant="bold"
         sx={{
           ...statusLogoFill(isSuccess),

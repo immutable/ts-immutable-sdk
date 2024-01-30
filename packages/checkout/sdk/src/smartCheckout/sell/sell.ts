@@ -81,7 +81,12 @@ export const sell = async (
     );
   }
 
-  const { buyToken, sellToken, makerFees } = orders[0];
+  const {
+    buyToken,
+    sellToken,
+    makerFees,
+    orderExpiry,
+  } = orders[0];
 
   let decimals = 18;
   if (buyToken.type === ItemType.ERC20) {
@@ -121,6 +126,7 @@ export const sell = async (
           contractAddress: sellToken.collectionAddress,
           tokenId: sellToken.id,
         },
+        orderExpiry,
       }),
     );
   } catch (err: any) {
@@ -128,7 +134,7 @@ export const sell = async (
       'An error occurred while preparing the listing',
       CheckoutErrorType.PREPARE_ORDER_LISTING_ERROR,
       {
-        message: err.message,
+        error: err,
         id: sellToken.id,
         collectionAddress: sellToken.collectionAddress,
       },
@@ -218,7 +224,7 @@ export const sell = async (
         'An error occurred while creating the listing',
         CheckoutErrorType.CREATE_ORDER_LISTING_ERROR,
         {
-          message: err.message,
+          error: err,
           collectionId: sellToken.id,
           collectionAddress: sellToken.collectionAddress,
         },

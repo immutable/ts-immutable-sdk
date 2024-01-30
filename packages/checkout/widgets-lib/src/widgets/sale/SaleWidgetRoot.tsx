@@ -119,7 +119,6 @@ export class Sale extends Base<WidgetType.SALE> {
                 environmentId={this.parameters.environmentId!}
                 collectionName={this.parameters.collectionName!}
                 language="en"
-
               />
             </ConnectLoader>
           </ThemeProvider>

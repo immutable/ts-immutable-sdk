@@ -55,7 +55,11 @@
     },
     "ERROR_VIEW": {
       "heading": "出了些问题",
-      "body": ["您可以再试一次或联系", "支持", "寻求帮助。"],
+      "body": [
+        "您可以再试一次或联系",
+        "支持",
+        "寻求帮助。"
+      ],
       "actionText": "再试一次"
     },
     "SERVICE_UNAVAILABLE_ERROR_VIEW": {
@@ -270,7 +274,9 @@
         }
       },
       "insufficientCoinsBanner": {
-        "caption": "硬币余额不足。请继续用卡支付。"
+        "caption": "硬币余额不足。请用卡支付以继续，或者",
+        "captionEnd": "再次尝试。",
+        "captionCTA": "添加硬币"
       },
       "loading": {
         "ready": "准备购买",
@@ -300,6 +306,14 @@
         },
         "SERVICE_BREAKDOWN": {
           "description": "抱歉，我们现在无法处理您的付款。请几分钟后再试。",
+          "secondaryAction": "关闭"
+        },
+        "PRODUCT_NOT_FOUND": {
+          "description": "抱歉，所请求的数量缺货。请考虑购买较少数量。",
+          "secondaryAction": "关闭"
+        },
+        "INSUFFICIENT_STOCK": {
+          "description": "抱歉，库存不足。请考虑购买较少数量。",
           "secondaryAction": "关闭"
         },
         "TRANSAK_FAILED": {
@@ -335,6 +349,10 @@
         "DEFAULT_ERROR": {
           "description": "抱歉，出了点问题。请再试一次。",
           "primaryAction": "再试一次",
+          "secondaryAction": "关闭"
+        },
+        "INVALID_PARAMETERS": {
+          "description": "抱歉，我们无法处理您的订单。客户提供的信息不完整。",
           "secondaryAction": "关闭"
         }
       }
@@ -426,8 +444,52 @@
     },
     "IN_PROGRESS": {
       "heading": "转移进行中",
-      "body1": "不到3分钟您的${symbol}就会着陆到zkEVM。",
-      "body2": "您可以关闭这个窗口，一旦交易完成，将会反映在您的钱包中。"
+      "body1": "您的资金已经发送，距离收到不到20分钟。您可以点击火箭图标返回并查看进展。",
+      "body2": "您可以关闭这个窗口。"
+    },
+    "TRANSACTIONS": {
+      "layoutHeading": "进行中",
+      "passportDashboard": "在您的完整交易历史中查看",
+      "status": {
+        "withdrawalPending": {
+          "actionButtonText": "继续",
+          "withdrawalDelayText": "此操作已暂停，请返回",
+          "withdrawalReadyText": "需要采取行动以收取您的硬币",
+          "caption": "已暂停"
+        },
+        "inProgress": {
+          "heading": "进行中",
+          "txnEstimate": "通常需要20分钟",
+          "stepInfo": "查看详情"
+        },
+        "emptyState": {
+          "notConnected": {
+            "body": "连接您的钱包以查看交易",
+            "buttonText": "连接"
+          }
+        },
+        "noTransactions": {
+          "body": "您已完成所有操作。",
+          "passport": {
+            "body": "在",
+            "link": "护照"
+          }
+        }
+      },
+      "fiatPricePrefix": "≈ 美元 $",
+      "support": {
+        "body1": "需要帮助吗？",
+        "body2": " 联系 ",
+        "body3": "支持",
+        "supportLink": "https://support.immutable.com/en/",
+        "passport": {
+          "body1": "或在您的 ",
+          "body2": "护照"
+        }
+      },
+      "walletSelection": {
+        "heading": "选择要查看的钱包"
+      }
     }
   },
   "footers": {

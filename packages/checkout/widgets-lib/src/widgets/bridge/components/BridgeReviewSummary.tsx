@@ -19,7 +19,7 @@ import { CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext
 import { isMetaMaskProvider, isPassportProvider } from 'lib/providerUtils';
 import { calculateCryptoToFiat, tokenValueFormat } from 'lib/utils';
 import { Web3Provider } from '@ethersproject/providers';
-import { DEFAULT_QUOTE_REFRESH_INTERVAL, DEFAULT_TOKEN_DECIMALS } from 'lib';
+import { DEFAULT_QUOTE_REFRESH_INTERVAL, DEFAULT_TOKEN_DECIMALS, NATIVE } from 'lib';
 import { useInterval } from 'lib/hooks/useInterval';
 import { FeesBreakdown } from 'components/FeesBreakdown/FeesBreakdown';
 import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
@@ -36,7 +36,6 @@ import {
   bridgeReviewWrapperStyles,
   gasAmountHeadingStyles,
   topMenuItemStyles,
-  walletLogoStyles,
 } from './BridgeReviewSummaryStyles';
 import { BridgeContext } from '../context/BridgeContext';
 import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
@@ -115,7 +114,7 @@ export function BridgeReviewSummary() {
     const [unsignedApproveTransaction, unsignedTransaction] = await Promise.all([
       tokenBridge!.getUnsignedApproveBridgeTx({
         senderAddress: fromAddress,
-        token: token.address ?? '',
+        token: token.address ?? NATIVE.toUpperCase(),
         amount: utils.parseUnits(amount, token.decimals),
         sourceChainId: from?.network.toString(),
         destinationChainId: to?.network.toString(),
@@ -123,7 +122,7 @@ export function BridgeReviewSummary() {
       tokenBridge!.getUnsignedBridgeTx({
         senderAddress: fromAddress,
         recipientAddress: toAddress,
-        token: token.address ?? '',
+        token: token.address ?? NATIVE.toUpperCase(),
         amount: utils.parseUnits(amount, token.decimals),
         sourceChainId: from?.network.toString(),
         destinationChainId: to?.network.toString(),
@@ -138,13 +137,16 @@ export function BridgeReviewSummary() {
 
     const transactionFeeData = unsignedTransaction.feeData;
 
-    const { totalFees } = transactionFeeData;
+    const { totalFees, approvalFee } = transactionFeeData;
+
+    let rawTotalFees = totalFees;
+    if (!unsignedApproveTransaction.unsignedTx) {
+      rawTotalFees = totalFees.sub(approvalFee);
+    }
 
     const gasEstimateResult = {
       gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-      fees: {
-        totalFees,
-      },
+      fees: { totalFees: rawTotalFees },
       token: checkout.config.networkMap.get(from!.network)?.nativeCurrency,
     } as GasEstimateBridgeToL2Result;
 
@@ -248,7 +250,7 @@ export function BridgeReviewSummary() {
         {fromWalletProviderName && (
           <MenuItem.FramedLogo
             logo={logo[fromWalletProviderName] as any}
-            sx={walletLogoStyles(fromWalletProviderName)}
+            sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
           />
         )}
         <MenuItem.Label>
@@ -285,7 +287,7 @@ export function BridgeReviewSummary() {
         {toWalletProviderName && (
           <MenuItem.FramedLogo
             logo={logo[toWalletProviderName] as any}
-            sx={walletLogoStyles(toWalletProviderName)}
+            sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
           />
         )}
         <MenuItem.Label>

@@ -20,7 +20,7 @@ jest.mock('./guardian/guardian');
 
 jest.mock('magic-sdk');
 jest.mock('oidc-client-ts');
-jest.mock('@imtbl/immutablex-client');
+jest.mock('@imtbl/x-client');
 
 const mockOidcUser = {
   profile: {
@@ -139,6 +139,7 @@ describe('Passport', () => {
           mockSigninSilent.mockResolvedValueOnce(mockOidcUserZkevm);
           useMswHandlers([
             mswHandlers.counterfactualAddress.success,
+            mswHandlers.api.chains.success,
           ]);
 
           const zkEvmProvider = getZkEvmProvider();
@@ -160,6 +161,7 @@ describe('Passport', () => {
             mockSigninSilent.mockResolvedValue(mockOidcUserZkevm);
             useMswHandlers([
               mswHandlers.counterfactualAddress.internalServerError,
+              mswHandlers.api.chains.success,
             ]);
 
             const zkEvmProvider = getZkEvmProvider();

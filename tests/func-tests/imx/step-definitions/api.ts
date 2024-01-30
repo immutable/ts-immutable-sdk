@@ -1,13 +1,17 @@
-import { env, getProvider, repeatCheck20 } from '../common';
 import { strict as assert } from 'assert';
 import { parseEther } from '@ethersproject/units';
+import {
+  IMXClient,
+  ImxClientModuleConfiguration,
+  ProviderConfiguration,
+} from '@imtbl/sdk/x';
 import { configuration, StepSharedState } from './stepSharedState';
-import { ImmutableXClient, ImxClientModuleConfiguration } from '@imtbl/sdk/immutablex_client';
-import { ProviderConfiguration } from '@imtbl/sdk/provider';
+import { env, getProvider, repeatCheck20 } from '../common';
 
 // @binding([StepSharedState])
 export class Trading {
   constructor(protected stepSharedState: StepSharedState) {}
+
   config: ImxClientModuleConfiguration = {
     baseConfig: { environment: configuration.environment },
   };
@@ -18,7 +22,7 @@ export class Trading {
     baseConfig: configuration,
   });
 
-  client = new ImmutableXClient(this.config);
+  client = new IMXClient(this.config);
 
   // @then('api should show that {string} owns the NFT {string}', undefined, 20000)
   // public async checkOwnership(ownerVar: string, assetVar: string) {
@@ -61,7 +65,7 @@ export class Trading {
     await repeatCheck20(async () => {
       const owner = await user.ethSigner.getAddress();
       const result = await this.client.getBalance({
-        owner: owner,
+        owner,
         address: 'eth',
       });
       // TODO update code gen of API Spec
@@ -148,7 +152,8 @@ export class Trading {
         );
         return orderDetails;
       },
-      order => order.status === status,
+      // eslint-disable-next-line @typescript-eslint/no-shadow
+      (order) => order.status === status,
     );
   }
 

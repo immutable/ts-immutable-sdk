@@ -1,7 +1,7 @@
 import { ExternalProvider, JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { signRaw } from '@imtbl/toolkit';
-import { CHAIN_NAME_MAP } from 'network/constants';
+import { getEip155ChainId } from 'zkEvm/walletHelpers';
 import { UserZkEvm } from '../../types';
 import AuthManager from '../../authManager';
 import { JsonRpcError, RpcErrorCode } from '../JsonRpcError';
@@ -34,9 +34,11 @@ export async function registerZkEvmUser({
   const headers = { Authorization: `Bearer ${accessToken}` };
 
   const { chainId } = await jsonRpcProvider.ready;
+  const eipChainId = getEip155ChainId(chainId);
 
   try {
-    const chainName = CHAIN_NAME_MAP.get(chainId);
+    const chainList = (await multiRollupApiClients.chainsApi.listChains()).data.result;
+    const chainName = chainList.find((chain) => chain.id === eipChainId)?.name;
     if (!chainName) {
       throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, `Chain name does not exist on for chain id ${chainId}`);
     }

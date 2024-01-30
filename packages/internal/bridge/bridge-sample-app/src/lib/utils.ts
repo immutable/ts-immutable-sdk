@@ -36,6 +36,9 @@ export async function setupForBridge() {
   if (!process.env.SEND_DECIMALS) {
     throw new Error('SEND_DECIMALS not set');
   }
+  if (!process.env.SEND_GAS_MULTIPLIER) {
+    throw new Error('SEND_GAS_MULTIPLIER not set');
+  }
   if (!process.env.ROOT_BRIDGE_ADDRESS) {
     throw new Error('ROOT_BRIDGE_ADDRESS not set');
   }
@@ -92,6 +95,7 @@ export async function setupForBridge() {
     rootToken: process.env.ROOT_TOKEN_ADDRESS,
     childToken: process.env.CHILD_TOKEN_ADDRESS,
     amount,
+    gasMultiplier:  parseInt(process.env.SEND_GAS_MULTIPLIER,10),
     rootWallet,
     childWallet,
     rootBridgeAddress:  process.env.ROOT_BRIDGE_ADDRESS,

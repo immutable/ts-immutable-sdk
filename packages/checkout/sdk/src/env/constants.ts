@@ -375,8 +375,8 @@ export const ERC721ABI = [
 ];
 
 // Gas overrides -- Anti-spam mechanism for when the baseFee drops low
-// https://github.com/immutable/imx-docs/blob/main/docs/main/zkEVM/overview/gas-configuration.md
-export const GAS_OVERRIDES = {
-  maxFeePerGas: BigNumber.from(102e9),
-  maxPriorityFeePerGas: BigNumber.from(101e9),
+// https://docs.immutable.com/docs/zkEVM/architecture/gas-config
+export const IMMUTABLE_ZKVEM_GAS_OVERRIDES = {
+  maxFeePerGas: BigNumber.from(15e9),
+  maxPriorityFeePerGas: BigNumber.from(10e9),
 };

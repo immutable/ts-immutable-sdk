@@ -1,6 +1,10 @@
 import { UnsignedTransferRequest } from '@imtbl/core-sdk';
-import { ImmutableXClient, ImxClientModuleConfiguration } from '@imtbl/sdk/immutablex_client';
-import { GenericIMXProvider, ProviderConfiguration } from '@imtbl/sdk/provider';
+import {
+  IMXClient,
+  ImxClientModuleConfiguration,
+  GenericIMXProvider,
+  ProviderConfiguration,
+} from '@imtbl/sdk/x';
 import { configuration, StepSharedState } from './stepSharedState';
 
 export class Burning {
@@ -14,7 +18,7 @@ export class Burning {
     baseConfig: configuration,
   });
 
-  client = new ImmutableXClient(this.config);
+  client = new IMXClient(this.config);
 
   // @when(
   //   '{string} creates burn {string} of {string} NFT to burn address',
@@ -32,8 +36,14 @@ export class Burning {
       type: 'ERC721',
       receiver: burnAddress,
     };
-    const imxProvider = new GenericIMXProvider(this.providerConfig, userWalletConnection.ethSigner, userWalletConnection.starkSigner);
+    const imxProvider = new GenericIMXProvider(
+      this.providerConfig,
+      userWalletConnection.ethSigner,
+      userWalletConnection.starkSigner,
+    );
 
-    this.stepSharedState.burns[burnVar] = await imxProvider.transfer(burnRequest);
+    this.stepSharedState.burns[burnVar] = await imxProvider.transfer(
+      burnRequest,
+    );
   }
 }

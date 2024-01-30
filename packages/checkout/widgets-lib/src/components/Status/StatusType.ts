@@ -3,4 +3,5 @@ export enum StatusType {
   FAILURE = 'failure',
   WARNING = 'warning',
   INFORMATION = 'information',
+  ALERT = 'alert',
 }

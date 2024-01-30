@@ -59,6 +59,7 @@ async function bridgeToL2GasEstimator(
       gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
       fees: {
         sourceChainGas: BigNumber.from(0),
+        approvalFee: BigNumber.from(0),
         bridgeFee: BigNumber.from(0),
         imtblFee: BigNumber.from(0),
         totalFees: BigNumber.from(0),

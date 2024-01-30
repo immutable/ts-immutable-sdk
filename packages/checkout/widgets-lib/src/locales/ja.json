@@ -55,7 +55,11 @@
     },
     "ERROR_VIEW": {
       "heading": "何かがうまくいかない",
-      "body": ["もう一度やってみるか、", "サポート", "に連絡して助けを求めることができます。"],
+      "body": [
+        "もう一度やってみるか、",
+        "サポート",
+        "に連絡して助けを求めることができます。"
+      ],
       "actionText": "もう一度試す"
     },
     "SERVICE_UNAVAILABLE_ERROR_VIEW": {
@@ -273,7 +277,9 @@
         }
       },
       "insufficientCoinsBanner": {
-        "caption": "コイン残高が不足しています。カードを使用してください。"
+        "caption": "コイン残高が不足しています。続行するにはカードで支払うか、",
+        "captionEnd": "、再試行してください。",
+        "captionCTA": "コインを追加"
       },
       "loading": {
         "ready": "購入の準備ができました",
@@ -303,6 +309,14 @@
         },
         "SERVICE_BREAKDOWN": {
           "description": "申し訳ありませんが、現在お支払いを処理できません。数分後にもう一度お試しください。",
+          "secondaryAction": "閉じる"
+        },
+        "PRODUCT_NOT_FOUND": {
+          "description": "申し訳ありませんが、このアイテムはもう利用できません。",
+          "secondaryAction": "閉じる"
+        },
+        "INSUFFICIENT_STOCK": {
+          "description": "申し訳ありませんが、ご希望の数量は在庫がありません。少ない数量の購入をご検討ください。",
           "secondaryAction": "閉じる"
         },
         "TRANSAK_FAILED": {
@@ -338,6 +352,10 @@
         "DEFAULT_ERROR": {
           "description": "申し訳ありませんが、何かがうまくいかなかったようです。もう一度お試しください。",
           "primaryAction": "もう一度試す",
+          "secondaryAction": "閉じる"
+        },
+        "INVALID_PARAMETERS": {
+          "description": "申し訳ありませんが、ご注文を処理できません。クライアントからの情報が不足しています。",
           "secondaryAction": "閉じる"
         }
       }
@@ -410,8 +428,8 @@
     },
     "BRIDGE_FAILURE": {
       "bridgeFailureText": {
-      "statusText": "トランザクションが失敗しました",
-      "actionText": "再確認してもう一度試す"
+        "statusText": "トランザクションが失敗しました",
+        "actionText": "再確認してもう一度試す"
       }
     },
     "APPROVE_TRANSACTION": {
@@ -429,8 +447,52 @@
     },
     "IN_PROGRESS": {
       "heading": "移動進行中",
-      "body1": "あなたの${symbol}がzkEVMに着陸するまで3分未満。",
-      "body2": "このウィンドウを閉じても、トランザクションは完了したらウォレットに反映されます。"
+      "body1": "資金は送信されました。受信まで残り20分未満です。進捗状況は、ロケットアイコンをクリックして戻って確認できます。",
+      "body2": "このウィンドウを閉じてもよろしいです。"
+    },
+    "TRANSACTIONS": {
+      "layoutHeading": "進行中",
+      "passportDashboard": "完全な取引履歴を表示する",
+      "status": {
+        "withdrawalPending": {
+          "actionButtonText": "続行",
+          "withdrawalDelayText": "この移動は一時停止されました。戻ってください",
+          "withdrawalReadyText": "コインを受け取るためには行動が必要です",
+          "caption": "一時停止中"
+        },
+        "inProgress": {
+          "heading": "進行中",
+          "txnEstimate": "通常、20分かかります",
+          "stepInfo": "詳細を表示"
+        },
+        "emptyState": {
+          "notConnected": {
+            "body": "トランザクションを表示するにはウォレットを接続してください",
+            "buttonText": "接続する"
+          }
+        },
+        "noTransactions": {
+          "body": "ここで完了しました。",
+          "passport": {
+            "body": "完了した取引は",
+            "link": "パスポート"
+          }
+        }
+      },
+      "fiatPricePrefix": "≈ USD $",
+      "support": {
+        "body1": "サポートが必要ですか？",
+        "body2": " お問い合わせは ",
+        "body3": "サポートへ",
+        "supportLink": "https://support.immutable.com/ja/",
+        "passport": {
+          "body1": "または、完了した取引をご覧になるには ",
+          "body2": "パスポート"
+        }
+      },
+      "walletSelection": {
+        "heading": "表示するウォレットを選択"
+      }
     }
   },
   "footers": {

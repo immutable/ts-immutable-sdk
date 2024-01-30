@@ -8,7 +8,7 @@ import { useSaleEvent } from '../hooks/useSaleEvents';
 export function PayWithCoins() {
   const { t } = useTranslation();
   const processing = useRef(false);
-  const { sendPageView, sendTransactionSuccessEvent } = useSaleEvent();
+  const { sendPageView, sendTransactionSuccessEvent, sendFailedEvent } = useSaleEvent();
   const {
     execute, signResponse, executeResponse, goToSuccessView,
   } = useSaleContext();
@@ -28,10 +28,15 @@ export function PayWithCoins() {
   }
 
   const sendTransaction = async () => {
-    const transactions = await execute(signResponse);
-    if (transactions.length !== expectedTxns) {
-      sendTransactionSuccessEvent(transactions);
-    }
+    execute(
+      signResponse,
+      (txn) => {
+        sendTransactionSuccessEvent(txn);
+      },
+      (error, txns) => {
+        sendFailedEvent(error.toString(), error, txns);
+      },
+    );
   };
 
   useEffect(() => {

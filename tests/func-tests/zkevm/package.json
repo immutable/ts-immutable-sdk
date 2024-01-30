@@ -13,17 +13,31 @@
     "typescript": "^5.3.2"
   },
   "scripts": {
-    "test": "jest",
-    "test:ci": "TAGS=\"not @skip and not @slow\" jest",
+    "compile": "npx hardhat compile",
+    "test": "yarn compile && jest",
+    "test:ci": "yarn compile && TAGS=\"not @skip and not @slow\" jest",
     "postinstall": "cd ../../.. && husky install",
     "prepack": "pinst --disable",
     "postpack": "pinst --enable"
   },
   "dependencies": {
+    "@imtbl/contracts": "^2.1.1",
     "@imtbl/sdk": "file:../../../sdk",
-    "dotenv": "^16.3.1"
-  },
-  "resolutions": {
-    "@openzeppelin/contracts": "3.4.2-solc-0.7"
+    "@nomicfoundation/hardhat-chai-matchers": "^1.0.0",
+    "@nomicfoundation/hardhat-toolbox": "^2.0.2",
+    "@nomicfoundation/hardhat-verify": "^2.0.0",
+    "@nomiclabs/hardhat-ethers": "^2.0.0",
+    "@nomiclabs/hardhat-etherscan": "^3.0.0",
+    "@openzeppelin/contracts": "^4.9.3",
+    "@typechain/ethers-v6": "^0.5.0",
+    "@typechain/hardhat": "^9.0.0",
+    "@types/chai": "^4.2.0",
+    "@types/mocha": ">=9.1.0",
+    "chai": "^4.2.0",
+    "dotenv": "^16.3.1",
+    "ethers": "^5.7.0",
+    "hardhat": "^2.19.4",
+    "hardhat-gas-reporter": "^1.0.8",
+    "solidity-coverage": "^0.8.1"
   }
 }

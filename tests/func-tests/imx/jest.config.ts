@@ -11,9 +11,8 @@ const config: Config = {
   testTimeout: 60000,
   moduleDirectories: ["node_modules", "<rootDir>"],
   moduleNameMapper: {
-    "@imtbl/sdk/provider": "<rootDir>/../../../node_modules/@imtbl/sdk/dist/provider",
     "@imtbl/sdk/config": "<rootDir>/../../../node_modules/@imtbl/sdk/dist/config",
-    "@imtbl/sdk/immutablex_client": "<rootDir>/../../../node_modules/@imtbl/sdk/dist/immutablex_client",
+    "@imtbl/sdk/x": "<rootDir>/../../../node_modules/@imtbl/sdk/dist/x",
   },
   transform: {
     "^.+\\.(t|j)sx?$": "@swc/jest"

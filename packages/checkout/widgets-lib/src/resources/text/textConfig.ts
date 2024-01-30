@@ -318,6 +318,14 @@ export const text = {
             "Sorry, we're unable to process your payment right now. Please try again in a few minutes.",
           secondaryAction: 'Dismiss',
         },
+        [SaleErrorTypes.PRODUCT_NOT_FOUND]: {
+          description: 'Sorry, this item is no longer available',
+          secondaryAction: 'Dismiss',
+        },
+        [SaleErrorTypes.INSUFFICIENT_STOCK]: {
+          description: 'Sorry, the requested quantity is not in stock. Consider buying a smaller quantity.',
+          secondaryAction: 'Dismiss',
+        },
         [SaleErrorTypes.TRANSAK_FAILED]: {
           description: 'Sorry, something went wrong. Please try again.',
           primaryAction: 'Try again',
@@ -443,13 +451,18 @@ export const text = {
     },
     [BridgeWidgetViews.IN_PROGRESS]: {
       heading: 'Move in progress',
-      body1: (symbol: string) => `Less than 3 mins until your ${symbol} lands on zkEVM.`,
-      body2: 'You can close this window, the transaction will be reflected in your wallet once complete.',
+      body1: "Your funds have been sent, with less than 20 mins remaining until they're received. You can return and view progress by clicking on the rocket icon.",
+      body2: 'You can close this window.',
     },
     [BridgeWidgetViews.TRANSACTIONS]: {
       layoutHeading: 'In progress',
       passportDashboard: 'View the full transaction history in your',
       status: {
+        withdrawalPending: {
+          actionButtonText: 'Proceed',
+          withdrawalDelayText: 'This move has been paused, please return ',
+          withdrawalReadyText: 'Action required to receive your coins',
+        },
         inProgress: {
           heading: 'In Progress',
           txnEstimate: 'Usually takes 20 mins',
@@ -458,6 +471,7 @@ export const text = {
         emptyState: {
           notConnected: {
             body: 'Connect your wallet to view the transactions',
+            buttonText: 'Connect',
           },
         },
         noTransactions: {

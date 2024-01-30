@@ -119,31 +119,46 @@ export const getSignedTypedData = async (
   // @ts-ignore
   delete types.EIP712Domain;
 
-  // eslint-disable-next-line no-underscore-dangle
-  const digest = ethers.utils._TypedDataEncoder.hash(typedData.domain, types, typedData.message);
-  const completePayload = encodeMessageSubDigest(chainId, walletAddress, digest);
+  // Hash the EIP712 payload and generate the complete payload
+  const { _TypedDataEncoder: typedDataEncoder } = ethers.utils;
+  const typedDataHash = typedDataEncoder.hash(typedData.domain, types, typedData.message);
+  const messageSubDigest = encodeMessageSubDigest(chainId, walletAddress, typedDataHash);
+  const hash = ethers.utils.keccak256(messageSubDigest);
 
-  const hash = ethers.utils.keccak256(completePayload);
-
-  // Sign the digest
+  // Sign the sub digest
+  // https://github.com/immutable/wallet-contracts/blob/7824b5f24b2e0eb2dc465ecb5cd71f3984556b73/src/contracts/modules/commons/ModuleAuth.sol#L155
   const hashArray = ethers.utils.arrayify(hash);
   const ethsigNoType = await signer.signMessage(hashArray);
   const signedDigest = `${ethsigNoType}${ETH_SIGN_FLAG}`;
 
-  const { signers } = decodeRelayerTypedDataSignature(relayerSignature);
+  // Combine the relayer and user signatures; sort by address to match the imageHash order
+  const { signers: relayerSigners } = decodeRelayerTypedDataSignature(relayerSignature);
+  const combinedSigners = [
+    ...relayerSigners,
+    {
+      isDynamic: false,
+      unrecovered: true,
+      weight: SIGNATURE_WEIGHT,
+      signature: signedDigest,
+      address: await signer.getAddress(),
+    },
+  ];
+  const sortedSigners = combinedSigners.sort((a, b) => {
+    const bigA = BigNumber.from(a.address);
+    const bigB = BigNumber.from(b.address);
+
+    if (bigA.lte(bigB)) {
+      return -1;
+    } if (bigA.eq(bigB)) {
+      return 0;
+    }
+    return 1;
+  });
 
   return sequenceCoreV1.signature.encodeSignature({
     version: 1,
     threshold: EIP712_SIGNATURE_THRESHOLD,
-    signers: [
-      ...signers,
-      {
-        isDynamic: false,
-        unrecovered: true,
-        weight: SIGNATURE_WEIGHT,
-        signature: signedDigest,
-      },
-    ],
+    signers: sortedSigners,
   });
 };
 

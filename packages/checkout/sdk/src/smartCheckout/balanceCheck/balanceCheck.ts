@@ -32,6 +32,7 @@ const getTokenBalances = async (
   provider: Web3Provider,
   ownerAddress: string,
   itemRequirements: ItemRequirement[],
+  forceFetch: boolean = false,
 ) : Promise<ItemBalance[]> => {
   try {
     const tokenMap = new Map<string, TokenInfo>();
@@ -41,14 +42,15 @@ const getTokenBalances = async (
         tokenMap.set(item.address.toLocaleLowerCase(), item);
       },
     );
-    const { balances } = await getAllBalances(config, provider, ownerAddress, getL2ChainId(config));
+    const { balances } = await getAllBalances(config, provider, ownerAddress, getL2ChainId(config), forceFetch);
     return balances.filter(
       (balance) => tokenMap.get((balance.token.address || NATIVE).toLocaleLowerCase()),
     ) as TokenBalance[];
-  } catch (error: any) {
+  } catch (err: any) {
     throw new CheckoutError(
       'Failed to get balances',
       CheckoutErrorType.GET_BALANCE_ERROR,
+      { error: err },
     );
   }
 };
@@ -97,10 +99,11 @@ const getERC721Balances = async (
         id: (itemRequirement as ERC721Item).id,
       });
     });
-  } catch (error: any) {
+  } catch (err: any) {
     throw new CheckoutError(
       'Failed to get ERC721 balances',
       CheckoutErrorType.GET_ERC721_BALANCE_ERROR,
+      { error: err },
     );
   }
 
@@ -115,6 +118,7 @@ export const balanceCheck = async (
   provider: Web3Provider,
   ownerAddress: string,
   itemRequirements: ItemRequirement[],
+  forceFetch: boolean = false,
 ) : Promise<BalanceCheckResult> => {
   const aggregatedItems = balanceAggregator(itemRequirements);
 
@@ -144,7 +148,7 @@ export const balanceCheck = async (
   // Get all ERC20 and NATIVE balances
   const balancePromises: Promise<ItemBalance[]>[] = [];
   if (requiredToken.length > 0) {
-    balancePromises.push(getTokenBalances(config, provider, ownerAddress, aggregatedItems));
+    balancePromises.push(getTokenBalances(config, provider, ownerAddress, aggregatedItems, forceFetch));
   }
 
   // Get all ERC721 balances

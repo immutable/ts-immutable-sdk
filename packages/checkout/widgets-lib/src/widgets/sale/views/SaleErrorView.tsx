@@ -17,11 +17,15 @@ interface ErrorHandlerConfig {
 }
 
 type SaleErrorViewProps = {
-  errorType: SaleErrorTypes | undefined,
   biomeTheme: BaseTokens
+  errorType: SaleErrorTypes | undefined,
+  transactionHash?: string,
+  blockExplorerLink?: string,
 };
 
-export function SaleErrorView({ errorType = SaleErrorTypes.DEFAULT, biomeTheme }: SaleErrorViewProps) {
+export function SaleErrorView({
+  errorType = SaleErrorTypes.DEFAULT, transactionHash, blockExplorerLink, biomeTheme,
+}: SaleErrorViewProps) {
   const { t } = useTranslation();
   const { goBackToPaymentMethods } = useSaleContext();
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
@@ -33,15 +37,29 @@ export function SaleErrorView({ errorType = SaleErrorTypes.DEFAULT, biomeTheme }
   const errorHandlersConfig: Record<SaleErrorTypes, ErrorHandlerConfig> = {
     [SaleErrorTypes.TRANSACTION_FAILED]: {
       onActionClick: goBackToPaymentMethods,
-      onSecondaryActionClick: () => {
-        /* TODO: redirects to Immutascan to check the transaction if has is given */
-      },
+      onSecondaryActionClick: transactionHash ? () => {
+        window.open(blockExplorerLink);
+      } : closeWidget,
       statusType: StatusType.FAILURE,
       statusIconStyles: {
         fill: biomeTheme.color.status.destructive.dim,
       },
     },
     [SaleErrorTypes.SERVICE_BREAKDOWN]: {
+      onSecondaryActionClick: closeWidget,
+      statusType: StatusType.INFORMATION,
+      statusIconStyles: {
+        fill: biomeTheme.color.status.fatal.dim,
+      },
+    },
+    [SaleErrorTypes.PRODUCT_NOT_FOUND]: {
+      onSecondaryActionClick: closeWidget,
+      statusType: StatusType.INFORMATION,
+      statusIconStyles: {
+        fill: biomeTheme.color.status.fatal.dim,
+      },
+    },
+    [SaleErrorTypes.INSUFFICIENT_STOCK]: {
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
       statusIconStyles: {
@@ -90,17 +108,28 @@ export function SaleErrorView({ errorType = SaleErrorTypes.DEFAULT, biomeTheme }
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
     },
+    [SaleErrorTypes.INVALID_PARAMETERS]: {
+      onSecondaryActionClick: closeWidget,
+      statusType: StatusType.ALERT,
+      statusIconStyles: {
+        fill: biomeTheme.color.status.attention.dim,
+        transform: 'none',
+      },
+    },
   };
 
   const getErrorViewProps = (): StatusViewProps => {
     const handlers = errorHandlersConfig[errorType] || {};
+    const secondaryActionText = errorType === SaleErrorTypes.TRANSACTION_FAILED && transactionHash
+      ? t(`views.SALE_FAIL.errors.${SaleErrorTypes.DEFAULT}.secondaryAction`)
+      : t(`views.SALE_FAIL.errors.${errorType}.secondaryAction`);
 
     return {
       testId: 'fail-view',
       statusText: t(`views.SALE_FAIL.errors.${errorType}.description`),
       actionText: t(`views.SALE_FAIL.errors.${errorType}.primaryAction`),
       onActionClick: handlers?.onActionClick,
-      secondaryActionText: t(`views.SALE_FAIL.errors.${errorType}.secondaryAction`),
+      secondaryActionText,
       onSecondaryActionClick: handlers?.onSecondaryActionClick,
       onCloseClick: closeWidget,
       statusType: handlers.statusType,

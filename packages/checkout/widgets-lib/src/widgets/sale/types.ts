@@ -10,6 +10,7 @@ export type SignedOrderProduct = {
   amount: number[];
   tokenId: string[];
   currency: string;
+  contractType: string;
   collectionAddress: string;
 };
 
@@ -70,8 +71,11 @@ export type ExecuteOrderResponse = {
 
 export enum SaleErrorTypes {
   DEFAULT = 'DEFAULT_ERROR',
+  INVALID_PARAMETERS = 'INVALID_PARAMETERS',
   TRANSACTION_FAILED = 'TRANSACTION_FAILED',
   SERVICE_BREAKDOWN = 'SERVICE_BREAK_DOWN',
+  PRODUCT_NOT_FOUND = 'PRODUCT_NOT_FOUND',
+  INSUFFICIENT_STOCK = 'INSUFFICIENT_STOCK',
   TRANSAK_FAILED = 'TRANSAK_FAILED',
   WALLET_FAILED = 'WALLET_FAILED',
   WALLET_REJECTED = 'WALLET_REJECTED',
