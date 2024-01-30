@@ -230,10 +230,6 @@ export function SwapWidget({
           <SwapInProgress
             transactionResponse={viewState.view.data.transactionResponse}
             swapForm={viewState.view.data.swapForm}
-            fromTokenAddress={viewState.view.data.fromTokenAddress}
-            fromAmount={viewState.view.data.fromAmount}
-            toTokenAddress={viewState.view.data.toTokenAddress}
-            toAmount={viewState.view.data.toAmount}
           />
           )}
           {viewState.view.type === SwapWidgetViews.APPROVE_ERC20 && (
