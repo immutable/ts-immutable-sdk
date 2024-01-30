@@ -19,14 +19,6 @@ export const containerStyles = {
   w: '100%',
 };
 
-export const headingStyles = {
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  p: 'base.spacing.x2',
-};
-
 export const noTransactionsContainerStyle = {
   height: '100%',
   display: 'flex',

@@ -2,7 +2,7 @@ import { HeaderNavigation } from 'components/Header/HeaderNavigation';
 import { SimpleLayout } from 'components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from 'components/Footer/FooterLogo';
 import {
-  useCallback, useContext, useEffect, useState,
+  useCallback, useContext, useEffect, useMemo, useState,
 } from 'react';
 import { EventTargetContext } from 'context/event-target-context/EventTargetContext';
 import { Box } from '@biom3/react';
@@ -25,6 +25,7 @@ import { CryptoFiatActions, CryptoFiatContext } from 'context/crypto-fiat-contex
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { useTranslation } from 'react-i18next';
 import { BridgeActions, BridgeContext } from 'widgets/bridge/context/BridgeContext';
+import { WalletDrawer } from 'widgets/bridge/components/WalletDrawer';
 import { sendBridgeWidgetCloseEvent } from '../../widgets/bridge/BridgeWidgetEvents';
 import { Shimmer } from './Shimmer';
 import {
@@ -45,10 +46,12 @@ export function Transactions() {
   const { bridgeDispatch, bridgeState: { checkout, from } } = useContext(BridgeContext);
   const { page } = useAnalytics();
   const { t } = useTranslation();
+  const { track } = useAnalytics();
 
   const [loading, setLoading] = useState(true);
   const [knownTokenMap, setKnownTokenMap] = useState<KnownNetworkMap | undefined>(undefined);
   const [txs, setTxs] = useState<Transaction[]>([]);
+  const [showWalletDrawer, setShowWalletDrawer] = useState(false);
 
   const isPassport = isPassportProvider(from?.web3Provider);
 
@@ -106,9 +109,19 @@ export function Transactions() {
   }, [checkout, from]);
 
   const updateAndConnectProvider = useCallback(async (walletProviderName: WalletProviderName) => {
+    track({
+      userJourney: UserJourney.BRIDGE,
+      screen: 'EmptyStateNotConnected',
+      control: 'WalletProvider',
+      controlType: 'Select',
+      extras: {
+        walletProviderName,
+      },
+    });
     try {
       const localProvider = await createAndConnectToProvider(checkout, walletProviderName, true);
       const address = await localProvider?.getSigner().getAddress() ?? '';
+      setTxs([]);
       bridgeDispatch({
         payload: {
           type: BridgeActions.SET_WALLETS_AND_NETWORKS,
@@ -120,10 +133,11 @@ export function Transactions() {
           to: null,
         },
       });
-      // setWalletAddress(address.toLowerCase());
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error(error);
+    } finally {
+      setShowWalletDrawer(false);
     }
   }, [checkout, from]);
 
@@ -230,16 +244,13 @@ export function Transactions() {
     };
   }, [from, getTransactionsDetails]);
 
-  const changeWallet = useCallback(() => {
-    setTxs([]);
-    bridgeDispatch({
-      payload: {
-        type: BridgeActions.SET_WALLETS_AND_NETWORKS,
-        from: null,
-        to: null,
-      },
-    });
-  }, []);
+  const walletOptions = useMemo(() => {
+    const options = [WalletProviderName.METAMASK];
+    if (checkout.passport) {
+      options.push(WalletProviderName.PASSPORT);
+    }
+    return options;
+  }, [checkout]);
 
   // Fetch all the data at once
   useEffect(() => {
@@ -281,8 +292,7 @@ export function Transactions() {
         <Box sx={transactionsListContainerStyle}>
           {!from?.web3Provider && (
             <EmptyStateNotConnected
-              checkout={checkout}
-              updateProvider={updateAndConnectProvider}
+              openWalletDrawer={() => setShowWalletDrawer(true)}
             />
           )}
           {from?.web3Provider && loading && (<Shimmer />)}
@@ -292,16 +302,14 @@ export function Transactions() {
               transactions={txs}
               knownTokenMap={knownTokenMap}
               isPassport={isPassport}
-              walletAddress={from?.walletAddress}
-              changeWallet={changeWallet}
+              changeWallet={() => setShowWalletDrawer(true)}
             />
           )}
           {from?.web3Provider && !loading && txs.length === 0 && (
             <NoTransactions
               checkout={checkout}
               isPassport={isPassport}
-              walletAddress={from.walletAddress}
-              changeWallet={changeWallet}
+              changeWallet={() => setShowWalletDrawer(true)}
             />
           )}
         </Box>
@@ -313,6 +321,17 @@ export function Transactions() {
             />
           </Box>
         )}
+        <WalletDrawer
+          testId="select-wallet-drawer"
+          drawerText={{
+            heading: t('views.TRANSACTIONS.walletSelection.heading'),
+          }}
+          showWalletSelectorTarget={false}
+          walletOptions={walletOptions}
+          showDrawer={showWalletDrawer}
+          setShowDrawer={(show: boolean) => { setShowWalletDrawer(show); }}
+          onWalletItemClick={updateAndConnectProvider}
+        />
       </Box>
     </SimpleLayout>
   );

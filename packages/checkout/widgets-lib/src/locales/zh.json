@@ -476,6 +476,9 @@
           }
         }
       },
+      "changeWallet": {
+        "buttonText": "更换钱包"
+      },
       "fiatPricePrefix": "≈ 美元 $",
       "support": {
         "body1": "需要帮助吗？",

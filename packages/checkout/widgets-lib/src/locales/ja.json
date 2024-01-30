@@ -479,6 +479,9 @@
           }
         }
       },
+      "changeWallet": {
+        "buttonText": "ウォレットを変更する"
+      },
       "fiatPricePrefix": "≈ USD $",
       "support": {
         "body1": "サポートが必要ですか？",

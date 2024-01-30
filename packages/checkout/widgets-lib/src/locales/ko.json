@@ -476,6 +476,9 @@
           }
         }
       },
+      "changeWallet": {
+        "buttonText": "지갑 변경"
+      },
       "fiatPricePrefix": "≈ USD $",
       "support": {
         "body1": "도움이 필요하신가요?",

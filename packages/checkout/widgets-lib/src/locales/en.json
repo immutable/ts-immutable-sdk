@@ -476,6 +476,9 @@
           }
         }
       },
+      "changeWallet": {
+        "buttonText": "Change wallet"
+      },
       "fiatPricePrefix": "≈ USD $",
       "support": {
         "body1": "Need help?",

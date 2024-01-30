@@ -1,5 +1,5 @@
 import {
-  Box, Body, Link, Button, EllipsizedText, Divider,
+  Box, Body, Link,
 } from '@biom3/react';
 import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { text } from 'resources/text/textConfig';
@@ -8,13 +8,13 @@ import { useState, useEffect } from 'react';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { PASSPORT_URL } from 'lib';
 import {
-  noTransactionsBodyStyle, noTransactionsContainerStyle, passportBodyStyle, containerStyles, headingStyles,
+  noTransactionsBodyStyle, noTransactionsContainerStyle, passportBodyStyle, containerStyles,
 } from './noTransactionStyles';
+import { ChangeWallet } from './ChangeWallet';
 
 type NoTransactionsProps = {
   checkout: Checkout,
   isPassport: boolean,
-  walletAddress: string,
   changeWallet: () => void
 };
 
@@ -22,7 +22,6 @@ export function NoTransactions(
   {
     checkout,
     isPassport,
-    walletAddress,
     changeWallet,
   }: NoTransactionsProps,
 ) {
@@ -48,18 +47,7 @@ export function NoTransactions(
 
   return (
     <Box sx={containerStyles}>
-      <Box sx={headingStyles}>
-        <EllipsizedText leftSideLength={6} rightSideLength={4} text={walletAddress} />
-        <Button size="small" onClick={changeWallet}>Change wallet</Button>
-      </Box>
-      <Divider
-        size="small"
-        sx={{
-          pb: 'base.spacing.x2',
-          color: 'base.color.translucent.emphasis.300',
-          opacity: 0.1,
-        }}
-      />
+      <ChangeWallet onChangeWalletClick={changeWallet} />
       <Box sx={noTransactionsContainerStyle}>
         <Body
           size="small"
