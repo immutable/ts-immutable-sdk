@@ -57,7 +57,9 @@ type SaleContextValues = SaleContextProps & {
     callback?: (response: SignResponse | undefined) => void
   ) => Promise<SignResponse | undefined>;
   execute: (
-    signResponse: SignResponse | undefined
+    signResponse: SignResponse | undefined,
+    onTxnSuccess: (txn: ExecutedTransaction) => void,
+    onTxnError: (error: any, txns: ExecutedTransaction[]) => void,
   ) => Promise<ExecutedTransaction[]>;
   recipientAddress: string;
   recipientEmail: string;
