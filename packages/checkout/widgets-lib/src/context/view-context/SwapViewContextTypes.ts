@@ -55,10 +55,6 @@ interface SwapInProgressView extends ViewType {
   data: {
     transactionResponse: TransactionResponse;
     swapForm: PrefilledSwapForm;
-    fromTokenAddress: string;
-    fromAmount: string;
-    toTokenAddress: string;
-    toAmount: string;
   }
 }
 export interface ApproveERC20SwapData {
@@ -71,4 +67,5 @@ export interface PrefilledSwapForm {
   fromAmount: string;
   fromTokenAddress: string;
   toTokenAddress: string;
+  toAmount?: string;
 }

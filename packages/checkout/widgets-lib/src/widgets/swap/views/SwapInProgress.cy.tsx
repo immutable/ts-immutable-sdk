@@ -26,6 +26,7 @@ describe('SwapInProgress View', () => {
             fromAmount: '',
             fromTokenAddress: '',
             toTokenAddress: '',
+            toAmount: '',
           }}
         />
       </SwapWidgetTestComponent>,

@@ -15,19 +15,11 @@ import { UserJourney, useAnalytics } from '../../../context/analytics-provider/S
 interface SwapInProgressProps {
   transactionResponse: TransactionResponse;
   swapForm: PrefilledSwapForm;
-  fromTokenAddress: string;
-  fromAmount: string;
-  toTokenAddress: string;
-  toAmount: string;
 }
 
 export function SwapInProgress({
   transactionResponse,
   swapForm,
-  fromTokenAddress,
-  fromAmount,
-  toTokenAddress,
-  toAmount,
 }: SwapInProgressProps) {
   const { t } = useTranslation();
   const { viewDispatch } = useContext(ViewContext);
@@ -56,10 +48,10 @@ export function SwapInProgress({
               view: {
                 type: SwapWidgetViews.SUCCESS,
                 data: {
-                  fromTokenAddress,
-                  fromAmount,
-                  toTokenAddress,
-                  toAmount,
+                  fromTokenAddress: swapForm.fromTokenAddress,
+                  fromAmount: swapForm.fromAmount,
+                  toTokenAddress: swapForm.toTokenAddress,
+                  toAmount: swapForm.toAmount || '',
                   transactionHash: receipt.transactionHash,
                 },
               },

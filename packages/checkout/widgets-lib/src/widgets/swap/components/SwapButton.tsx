@@ -70,6 +70,7 @@ export function SwapButton({
         fromAmount: data?.fromAmount || '',
         fromTokenAddress: data?.fromTokenAddress || '',
         toTokenAddress: data?.toTokenAddress || '',
+        toAmount: data?.toAmount || '',
       };
 
       if (transaction.approval) {
@@ -104,10 +105,6 @@ export function SwapButton({
             data: {
               transactionResponse: txn.transactionResponse,
               swapForm: prefilledSwapData as PrefilledSwapForm,
-              fromTokenAddress: data?.fromTokenAddress ?? '',
-              fromAmount: data?.fromAmount ?? '',
-              toTokenAddress: data?.toTokenAddress ?? '',
-              toAmount: data?.toAmount ?? '',
             },
           },
         },
