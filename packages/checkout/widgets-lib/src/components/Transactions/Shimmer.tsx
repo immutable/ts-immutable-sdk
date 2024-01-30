@@ -14,10 +14,7 @@ export function Shimmer() {
         mt: 'base.spacing.x2',
       }}
       />
-      <Box sx={{ mb: 'base.spacing.x5' }}>
-        {' '}
-        <MenuItem shimmer emphasized size="small" />
-      </Box>
+      <Box sx={{ mb: 'base.spacing.x5' }}><MenuItem shimmer emphasized size="small" /></Box>
       <Box sx={{ mb: 'base.spacing.x5' }}><MenuItem shimmer emphasized size="small" /></Box>
       <Box sx={{ mb: 'base.spacing.x5' }}><MenuItem shimmer emphasized size="small" /></Box>
     </Box>

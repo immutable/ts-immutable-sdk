@@ -1,6 +1,5 @@
 import {
   Box,
-  EllipsizedText,
 } from '@biom3/react';
 import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { text } from 'resources/text/textConfig';
@@ -17,15 +16,16 @@ import { formatUnits } from 'ethers/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { TransactionItem } from './TransactionItem';
 import { KnownNetworkMap } from './transactionsType';
-import { containerStyles, headingStyles, transactionsListStyle } from './TransactionListStyles';
+import { containerStyles, transactionsListStyle } from './TransactionListStyles';
 import { TransactionItemWithdrawPending } from './TransactionItemWithdrawPending';
+import { ChangeWallet } from './ChangeWallet';
 
 type TransactionListProps = {
   checkout: Checkout,
   transactions: Transaction[],
   knownTokenMap: KnownNetworkMap,
   isPassport: boolean;
-  walletAddress: string;
+  changeWallet: () => void,
 };
 
 export function TransactionList({
@@ -33,7 +33,7 @@ export function TransactionList({
   transactions,
   knownTokenMap,
   isPassport,
-  walletAddress,
+  changeWallet,
 }: TransactionListProps) {
   const { cryptoFiatState } = useContext(CryptoFiatContext);
   const { t } = useTranslation();
@@ -60,9 +60,7 @@ export function TransactionList({
 
   return (
     <Box sx={transactionsListStyle(isPassport)}>
-      <Box sx={headingStyles}>
-        <EllipsizedText leftSideLength={6} rightSideLength={4} text={walletAddress} />
-      </Box>
+      <ChangeWallet onChangeWalletClick={changeWallet} />
       <Box
         testId="move-transaction-list"
         sx={containerStyles}
