@@ -57,8 +57,9 @@ import {
   sendBridgeWidgetCloseEvent,
 } from './BridgeWidgetEvents';
 import {
-  ClaimWithdrawalSuccess,
+  BridgeClaimWithdrawalSuccess,
 } from '../../context/view-context/BridgeViewContextTypes';
+import { ClaimWithdrawal } from './views/ClaimWithdrawal';
 
 export type BridgeWidgetInputs = BridgeWidgetParams & {
   config: StrongCheckoutWidgetsConfig,
@@ -223,7 +224,10 @@ export function BridgeWidget({
             />
           )}
           {viewState.view.type === BridgeWidgetViews.TRANSACTIONS && (
-            <Transactions checkout={checkout} onBackButtonClick={goBackToWalletNetworkSelector} />
+            <Transactions onBackButtonClick={goBackToWalletNetworkSelector} />
+          )}
+          {viewState.view.type === BridgeWidgetViews.CLAIM_WITHDRAWAL && (
+            <ClaimWithdrawal transaction={viewState.view.transaction} />
           )}
           {viewState.view.type === SharedViews.ERROR_VIEW && (
             <ErrorView
@@ -266,7 +270,7 @@ export function BridgeWidget({
                 });
                 sendBridgeClaimWithdrawalSuccessEvent(
                   eventTarget,
-                  (viewState.view as ClaimWithdrawalSuccess).data.transactionHash,
+                  (viewState.view as BridgeClaimWithdrawalSuccess).data.transactionHash,
                 );
               }}
               onActionClick={() => sendBridgeWidgetCloseEvent(eventTarget)}

@@ -17,9 +17,6 @@ export const transactionsListStyle = (showPassportLink: boolean) => {
   };
 };
 
-export const headingStyles = {
-  p: 'base.spacing.x2',
-};
 export const containerStyles = {
   borderRadius: 'base.borderRadius.x4',
   display: 'flex',

@@ -20,10 +20,6 @@ import mockTransactionInProgress from './test-components/BridgeTransactionInProg
 type CypressStub = Cypress.Agent<sinon.SinonStub<any[], any>>;
 describe('BridgeWidget', () => {
   // Checkout stubs
-  let getNetworkImmutableZkEVMStub;
-  let getNetworkSepoliaStub;
-  let mockMetaMaskProvider;
-  let mockPassportProvider;
   let createProviderStub;
   let checkIsWalletConnectedStub;
   let connectStub;
@@ -32,10 +28,19 @@ describe('BridgeWidget', () => {
   let getAllBalancesStub;
   let sendTransactionStub;
 
+  // provider stubs
+  let mockMetaMaskProvider;
+  let mockPassportProvider;
+  let getNetworkImmutableZkEVMStub;
+  let getNetworkSepoliaStub;
+  let estimateGasStub;
+  let getFeeDataStub;
+
   // TokenBridge stubs
   let getFeeStub: CypressStub;
   let getUnsignedApproveBridgeTxStub;
   let getUnsignedBridgeTxStub;
+  let getFlowRateWithdrawTxStub;
 
   const mockMetaMaskAddress = '0x1234567890123456789012345678901234567890';
   const mockPassportAddress = '0x0987654321098765432109876543210987654321';
@@ -63,10 +68,15 @@ describe('BridgeWidget', () => {
     getFeeStub = cy.stub().as('getFeeStub');
     getUnsignedApproveBridgeTxStub = cy.stub().as('getUnsignedApproveBridgeTxStub');
     getUnsignedBridgeTxStub = cy.stub().as('getUnsignedBridgeTxStub');
+    getFlowRateWithdrawTxStub = cy.stub().as('getFlowRateWithdrawTxStub');
 
     TokenBridge.prototype.getFee = getFeeStub;
     TokenBridge.prototype.getUnsignedApproveBridgeTx = getUnsignedApproveBridgeTxStub;
     TokenBridge.prototype.getUnsignedBridgeTx = getUnsignedBridgeTxStub;
+    TokenBridge.prototype.getFlowRateWithdrawTx = getFlowRateWithdrawTxStub;
+
+    estimateGasStub = cy.stub().as('estimateGasStub');
+    getFeeDataStub = cy.stub().as('getFeeDataStub');
 
     getNetworkSepoliaStub = cy.stub().as('getNetworkSepoliaStub').resolves({ chainId: ChainId.SEPOLIA });
 
@@ -83,6 +93,8 @@ describe('BridgeWidget', () => {
       getSigner: () => ({
         getAddress: () => Promise.resolve(mockMetaMaskAddress),
       }),
+      estimateGas: estimateGasStub,
+      getFeeData: getFeeDataStub,
     };
 
     mockPassportProvider = {
@@ -842,7 +854,7 @@ describe('BridgeWidget', () => {
         );
     });
 
-    it('should show a transaction items with withdrawal pending status first', () => {
+    it('should show transaction items with withdrawal pending status first', () => {
       createProviderStub
         .returns({ provider: mockMetaMaskProvider });
       checkIsWalletConnectedStub.resolves({ isConnected: false });
@@ -922,6 +934,100 @@ describe('BridgeWidget', () => {
           'data-testid',
           `transaction-item-${mockTransactionInProgress.blockchain_metadata.transaction_hash}`,
         );
+    });
+
+    it('should move to claim withdrawal screen when action required button is clicked', () => {
+      createProviderStub
+        .returns({ provider: mockMetaMaskProvider });
+      checkIsWalletConnectedStub.resolves({ isConnected: false });
+      connectStub
+        .returns({ provider: mockMetaMaskProvider });
+
+      getAllBalancesStub.resolves({
+        balances: [
+          {
+            balance: BigNumber.from('2000000000000000000'),
+            formattedBalance: '2.0',
+            token: {
+              name: 'ETH',
+              symbol: 'ETH',
+              decimals: 18,
+              address: '0xe9E96d1aad82562b7588F03f49aD34186f996478',
+            },
+          },
+          {
+            balance: BigNumber.from('2000000000000000000'),
+            formattedBalance: '2.0',
+            token: {
+              name: 'IMX',
+              symbol: 'IMX',
+              decimals: 18,
+              address: 'native',
+            },
+          },
+          {
+            balance: BigNumber.from('2000000000000000000'),
+            formattedBalance: '2.0',
+            token: {
+              name: 'USDC',
+              symbol: 'USDC',
+              decimals: 6,
+              address: '0x3B2d8A1931736Fc321C24864BceEe981B11c3c57',
+            },
+          },
+        ],
+      });
+
+      getFlowRateWithdrawTxStub.resolves({
+        pendingWithdrawal: {
+          canWithdraw: true,
+          withdrawer: '0xf364930c779c6674472e131898c4b3f7aaccf1b7',
+          recipient: '0xe98b61832248c698085ffbc4313deb465be857e7',
+          amount: BigNumber.from('10000000'),
+        },
+        unsignedTx: {
+          to: '0xL1ContractAddress',
+          from: mockMetaMaskAddress,
+          data: 'some-data',
+        },
+      });
+
+      estimateGasStub.resolves(BigNumber.from('90458')); // withdrawal gas limit estimate
+      getFeeDataStub.resolves({
+        lastBaseFeePerGas: BigNumber.from(20e9), // 20 gwei,
+        maxFeePerGas: BigNumber.from(40e9), // 40 gwei,
+        maxPriorityFeePerGas: BigNumber.from(1.5e9), // 1.5 gwei,
+      });
+      sendTransactionStub.resolves({}); // transaction response
+
+      const mockBridgeTransactionsResponse: { result: Transaction[] } = { result: [] };
+      cy.clock(new Date('2024-01-16T00:00:00Z')); // stub date now to day after
+      const mockDateYesterday = new Date('2024-01-15T00:00:00.000Z');
+
+      mockTransactionPending.details.current_status.withdrawal_ready_at = mockDateYesterday.toISOString();
+      mockBridgeTransactionsResponse.result = [
+        mockTransactionPending as Transaction,
+      ];
+
+      cy.intercept(
+        // eslint-disable-next-line max-len
+        `https://api.sandbox.immutable.com/checkout/v1/transactions?from_address=${mockMetaMaskAddress}&tx_type=bridge`,
+        mockBridgeTransactionsResponse,
+      );
+
+      mount(
+        <ViewContextTestComponent theme={widgetConfig.theme}>
+          <BridgeWidget checkout={checkout} config={widgetConfig} />
+        </ViewContextTestComponent>,
+      );
+      cySmartGet('move-transactions-button').click();
+      cySmartGet('transactions-connect-wallet-button').click();
+      cySmartGet('select-wallet-drawer-wallet-list-metamask').click();
+      cySmartGet(
+        `transaction-item-${mockTransactionPending.blockchain_metadata.transaction_hash}-action-button`,
+      ).click();
+      cySmartGet('claim-withdrawal').should('exist');
+      cySmartGet('claim-withdrawal-continue-button').click();
     });
   });
 });

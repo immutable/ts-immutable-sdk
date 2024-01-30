@@ -9,8 +9,10 @@ import {
 } from '@biom3/react';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { Transaction, TransactionStatus } from 'lib/clients/checkoutApiType';
-import { useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
+import { ViewActions, ViewContext } from 'context/view-context/ViewContext';
 import { actionsContainerStyles, actionsLayoutStyles, containerStyles } from './transactionItemStyles';
 import { TransactionDetails } from './TransactionDetails';
 
@@ -27,6 +29,7 @@ export function TransactionItemWithdrawPending({
   fiatAmount,
   amount,
 }: TransactionItemWithdrawPendingProps) {
+  const { viewDispatch } = useContext(ViewContext);
   const { track } = useAnalytics();
   const translation = useTranslation();
 
@@ -69,12 +72,19 @@ export function TransactionItemWithdrawPending({
   );
 
   const handleWithdrawalClaimClick = () => {
-    // WT-2053 - https://immutable.atlassian.net/browse/WT-2053
-    // entrypoint for claim withdrawal
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: BridgeWidgetViews.CLAIM_WITHDRAWAL,
+          transaction,
+        },
+      },
+    });
   };
 
   return (
-    <Box testId={`transaction - item - ${transaction.blockchain_metadata.transaction_hash} `} sx={containerStyles}>
+    <Box testId={`transaction-item-${transaction.blockchain_metadata.transaction_hash}`} sx={containerStyles}>
       {requiresWithdrawalClaim && (
         <>
           <Box sx={actionsContainerStyles}>
@@ -90,7 +100,7 @@ export function TransactionItemWithdrawPending({
                 }}
               />
               <Body
-                testId={`transaction - item - ${transaction.blockchain_metadata.transaction_hash} -action - message`}
+                testId={`transaction-item-${transaction.blockchain_metadata.transaction_hash}-action-message`}
                 size="xSmall"
                 sx={{ color: 'base.color.text.secondary' }}
               >
@@ -99,7 +109,7 @@ export function TransactionItemWithdrawPending({
             </Box>
             {requiresWithdrawalClaim && withdrawalReadyToClaim && (
               <Button
-                testId={`transaction - item - ${transaction.blockchain_metadata.transaction_hash} -action - button`}
+                testId={`transaction-item-${transaction.blockchain_metadata.transaction_hash}-action-button`}
                 variant="primary"
                 size="small"
                 onClick={handleWithdrawalClaimClick}
