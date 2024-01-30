@@ -226,8 +226,18 @@ export function Transactions({ checkout }: TransactionsProps) {
       const data = await retry(fetchData, DEFAULT_TRANSACTIONS_RETRY_POLICY);
       if (!data) return;
 
+      const knownTxs = data.transactions.filter((txn) => {
+        const tokens = data.tokens[txn.details.from_chain];
+        if (!tokens) return false;
+
+        const token = tokens[txn.details.from_token_address.toLowerCase()];
+        if (!token) return false;
+
+        return true;
+      });
+
       setKnownTokenMap(data.tokens);
-      setTxs(data.transactions);
+      setTxs(knownTxs);
 
       setLoading(false);
     })();
