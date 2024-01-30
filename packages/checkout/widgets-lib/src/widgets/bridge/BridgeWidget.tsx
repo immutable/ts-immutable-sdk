@@ -215,7 +215,7 @@ export function BridgeWidget({
             />
           )}
           {viewState.view.type === BridgeWidgetViews.TRANSACTIONS && (
-            <Transactions checkout={checkout} />
+            <Transactions />
           )}
           {viewState.view.type === BridgeWidgetViews.CLAIM_WITHDRAWAL && (
             <ClaimWithdrawal transaction={viewState.view.transaction} />
