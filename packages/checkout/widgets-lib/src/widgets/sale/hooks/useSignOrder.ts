@@ -183,7 +183,7 @@ export const useSignOrder = (input: SignOrderInput) => {
       data: string,
       gasLimit: number,
       method: string,
-    ): Promise<string | undefined> => {
+    ): Promise<[error: any, hash: string | undefined]> => {
       let transactionHash: string | undefined;
 
       try {
@@ -200,7 +200,7 @@ export const useSignOrder = (input: SignOrderInput) => {
         await txnResponse?.wait(1);
 
         transactionHash = txnResponse?.hash || '';
-        return transactionHash;
+        return [undefined, transactionHash];
       } catch (e) {
         const reason = `${(e as any)?.reason || (e as any)?.message || ''}`.toLowerCase();
         transactionHash = (e as any)?.transactionHash;
@@ -225,7 +225,8 @@ export const useSignOrder = (input: SignOrderInput) => {
           type: errorType,
           data: { error: e },
         });
-        return undefined;
+
+        return [e, undefined];
       }
     },
     [provider],
@@ -295,14 +296,18 @@ export const useSignOrder = (input: SignOrderInput) => {
 
   const execute = async (
     signData: SignResponse | undefined,
+    onTxnSuccess: (txn: ExecutedTransaction) => void,
+    onTxnError: (error: any, txns: ExecutedTransaction[]) => void,
   ): Promise<ExecutedTransaction[]> => {
     if (!signData) {
       setSignError({
         type: SaleErrorTypes.DEFAULT,
         data: { reason: 'No sign data' },
       });
+
       return [];
     }
+
     let successful = true;
     const execTransactions: ExecutedTransaction[] = [];
     for (const transaction of signData.transactions) {
@@ -313,19 +318,22 @@ export const useSignOrder = (input: SignOrderInput) => {
         gasEstimate,
       } = transaction;
       // eslint-disable-next-line no-await-in-loop
-      const hash = await sendTransaction(to, data, gasEstimate, method);
+      const [txnError, hash] = await sendTransaction(to, data, gasEstimate, method);
 
-      if (!hash) {
+      if (txnError || !hash) {
         successful = false;
+        onTxnError(txnError, execTransactions);
         break;
       }
 
       execTransactions.push({ method, hash });
+      onTxnSuccess({ method, hash });
     }
 
     if (successful) {
       setExecuteDone();
     }
+
     return execTransactions;
   };
 
