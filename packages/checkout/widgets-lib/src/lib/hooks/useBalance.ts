@@ -5,7 +5,7 @@ import { getTokenBalances } from '../../widgets/wallet/functions/tokenBalances';
 import { DEFAULT_BALANCE_RETRY_POLICY } from '../constants';
 import { useInterval } from './useInterval';
 
-const REFRESH_BALANCE_INTERVAL_MS = 10000;
+const REFRESH_BALANCE_INTERVAL_MS = 30000; // 30 seconds -- keep app less chatty
 
 export interface UseBalanceParams {
   checkout: Checkout | undefined;
