@@ -3,6 +3,8 @@ import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
 import { withDefaultWidgetConfigs } from 'lib/withDefaultWidgetConfig';
 import { Checkout, WidgetTheme } from '@imtbl/checkout-sdk';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
+import { I18nextProvider } from 'react-i18next';
+import i18n from '../../../i18n';
 
 export interface TestProps {
   children: React.ReactNode;
@@ -14,18 +16,20 @@ export function ViewContextTestComponent({ children, theme }: TestProps) {
     theme: theme ?? WidgetTheme.DARK,
   });
   return (
-    <CustomAnalyticsProvider checkout={{} as Checkout}>
-      <ThemeProvider
-        id="test"
-        config={config}
-        globalSx={{
-          body: {
-            bg: 'base.color.neutral.800',
-          },
-        }}
-      >
-        {children}
-      </ThemeProvider>
-    </CustomAnalyticsProvider>
+    <I18nextProvider i18n={i18n}>
+      <CustomAnalyticsProvider checkout={{} as Checkout}>
+        <ThemeProvider
+          id="test"
+          config={config}
+          globalSx={{
+            body: {
+              bg: 'base.color.neutral.800',
+            },
+          }}
+        >
+          {children}
+        </ThemeProvider>
+      </CustomAnalyticsProvider>
+    </I18nextProvider>
   );
 }

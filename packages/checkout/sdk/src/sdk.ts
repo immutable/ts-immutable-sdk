@@ -3,6 +3,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import { ethers } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { Passport } from '@imtbl/passport';
+import { track } from '@imtbl/metrics';
 import * as balances from './balances';
 import * as tokens from './tokens';
 import * as connect from './connect';
@@ -104,6 +105,8 @@ export class Checkout {
     this.readOnlyProviders = new Map<ChainId, ethers.providers.JsonRpcProvider>();
     this.availability = availabilityService(this.config.isDevelopment, this.config.isProduction);
     this.passport = config.passport;
+
+    track('checkout_sdk', 'initialised');
   }
 
   /**
