@@ -151,10 +151,10 @@ jobs:
         if: ${{ success() && (steps.npm_release.conclusion == 'success' || steps.pre_release.conclusion == 'success') && github.event.inputs.dry_run == 'false' }}
         uses: ./.github/actions/notify-slack-publish-status
         with:
-          message: "✅ Successfully published SDK version ${{steps.version.outputs.NEXT_VERSION}} to NPM.\n\nhttps://www.npmjs.com/package/@imtbl/sdk/v/${{steps.version.outputs.NEXT_VERSION}}"
+          message: "✅ ${{ github.triggering_actor }} successfully published SDK version ${{steps.version.outputs.NEXT_VERSION}} to NPM.\n\nhttps://www.npmjs.com/package/@imtbl/sdk/v/${{steps.version.outputs.NEXT_VERSION}}"
 
       - name: Notify SDK Slack Publish Failure
         if: ${{ failure() && (steps.npm_release.conclusion == 'failure' || steps.pre_release.conclusion == 'failure' || steps.gh_release.conclusion == 'failure') && github.event.inputs.dry_run == 'false' }}
         uses: ./.github/actions/notify-slack-publish-status
         with:
-          message: "❌ Failed to publish SDK version ${{steps.version.outputs.NEXT_VERSION}} to NPM. Please check the logs for more details."
+          message: "❌ Failed to publish SDK version ${{steps.version.outputs.NEXT_VERSION}} to NPM. ${{ github.triggering_actor }} please check the logs for more details."

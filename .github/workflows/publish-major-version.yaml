@@ -186,4 +186,4 @@ jobs:
         if: ${{ failure() && (steps.npm_release.conclusion == 'failure' || steps.pre_release.conclusion == 'failure' || steps.gh_release.conclusion == 'failure') && github.event.inputs.dry_run == 'false' }}
         uses: ./.github/actions/notify-slack-publish-status
         with:
-          message: "❌ Failed to publish SDK version ${{steps.version.outputs.NEXT_VERSION}} to NPM. Please check the logs for more details."
+          message: "❌ Failed to publish SDK version ${{steps.version.outputs.NEXT_VERSION}} to NPM. ${{ github.triggering_actor }} please check the logs for more details."
