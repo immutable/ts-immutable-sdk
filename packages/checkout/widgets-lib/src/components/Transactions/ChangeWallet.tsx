@@ -1,5 +1,5 @@
 import {
-  Box, Button, Divider, EllipsizedText, Logo,
+  Box, Button, Caption, Divider, EllipsizedText, Logo,
 } from '@biom3/react';
 import { useContext } from 'react';
 import { BridgeContext } from 'widgets/bridge/context/BridgeContext';
@@ -50,7 +50,7 @@ export function ChangeWallet({
               }
             />
           )}
-          <EllipsizedText leftSideLength={6} rightSideLength={4} text={walletAddress} />
+          <Caption><EllipsizedText leftSideLength={6} rightSideLength={4} text={walletAddress} /></Caption>
         </Box>
         <Button size="small" variant="secondary" onClick={handleChangeWalletClick}>
           {t('views.TRANSACTIONS.changeWallet.buttonText')}

@@ -72,9 +72,6 @@ export function TransactionItemWithdrawPending({
   );
 
   const handleWithdrawalClaimClick = () => {
-    // WT-2053 - https://immutable.atlassian.net/browse/WT-2053
-    // entrypoint for claim withdrawal
-
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,

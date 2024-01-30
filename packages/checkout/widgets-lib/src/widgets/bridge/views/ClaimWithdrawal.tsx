@@ -11,10 +11,10 @@ import { Transaction } from 'lib/clients';
 import { getChainNameById } from 'lib/chains';
 import { getL1ChainId } from 'lib';
 import { isPassportProvider } from 'lib/providerUtils';
-import { TransactionRequest } from '@ethersproject/providers';
 import { WalletProviderName } from '@imtbl/checkout-sdk';
 import { isNativeToken } from 'lib/utils';
 import { BigNumber } from 'ethers';
+import { FlowRateWithdrawResponse } from '@imtbl/bridge-sdk';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
@@ -46,7 +46,7 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
   const [txProcessing, setTxProcessing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [hasWithdrawError, setHasWithdrawError] = useState(false);
-  const [withdrawalTxn, setWithdrawalTxn] = useState<TransactionRequest | null>();
+  const [withdrawalResponse, setWithdrawalResponse] = useState<FlowRateWithdrawResponse | null>();
 
   const goBack = useCallback(() => {
     viewDispatch({
@@ -66,7 +66,7 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
           recipient: transaction.details.to_address,
           index: 0, // TODO: update index from transaction when it comes through from backend
         });
-        setWithdrawalTxn(flowRateWithdrawTxnResponse.unsignedTx);
+        setWithdrawalResponse(flowRateWithdrawTxnResponse);
       } catch (err) {
         // eslint-disable-next-line no-console
         console.log(err);
@@ -78,7 +78,13 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
   }, [tokenBridge]);
 
   const handleWithdrawalClaimClick = useCallback(async () => {
-    if (!checkout || !tokenBridge || !from?.web3Provider || !withdrawalTxn) return;
+    if (!checkout || !tokenBridge || !from?.web3Provider || !withdrawalResponse) return;
+
+    if (!withdrawalResponse.pendingWithdrawal.canWithdraw || !withdrawalResponse.unsignedTx) {
+      // eslint-disable-next-line max-len, no-console
+      console.log(`Unable to process withdrawal transaction as it is not ready yet. Delay timeout at ${withdrawalResponse.pendingWithdrawal.timeoutEnd} `);
+      return;
+    }
 
     let providerToUse = from?.web3Provider;
     const l1ChainId = getL1ChainId(checkout.config);
@@ -103,7 +109,7 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
 
     let ethGasCostWei: BigNumber | null;
     try {
-      const gasEstimate = await providerToUse.estimateGas(withdrawalTxn);
+      const gasEstimate = await providerToUse.estimateGas(withdrawalResponse.unsignedTx);
       const feeData = await providerToUse.getFeeData();
       let gasPriceInWei: BigNumber | null;
       if (feeData.lastBaseFeePerGas && feeData.maxFeePerGas && feeData.maxPriorityFeePerGas) {
@@ -154,6 +160,7 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
         providerToUse = switchNetworkResult.provider;
       } catch (err) {
         setHasWithdrawError(true);
+        setLoading(false);
         // eslint-disable-next-line no-console
         console.log(err);
         return;
@@ -166,7 +173,7 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
 
       // const response = await checkout.sendTransaction({
       //   provider: providerToUse,
-      //   transaction: withdrawalTxn,
+      //   transaction: withdrawalResponse.unsignedTx,
       // });
 
     } catch (err) {
@@ -177,7 +184,7 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
     } finally {
       setTxProcessing(false);
     }
-  }, [tokenBridge, from, withdrawalTxn]);
+  }, [tokenBridge, from, withdrawalResponse]);
 
   return (
     <SimpleLayout
