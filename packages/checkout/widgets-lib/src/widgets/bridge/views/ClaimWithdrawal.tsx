@@ -43,24 +43,10 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
     });
   }, []);
 
-  // Local state
   const [txProcessing, setTxProcessing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [hasWithdrawError, setHasWithdrawError] = useState(false);
   const [withdrawalTxn, setWithdrawalTxn] = useState<TransactionRequest | null>();
-
-  // // Common error view function
-  // const showErrorView = useCallback(() => {
-  //   viewDispatch({
-  //     payload: {
-  //       type: ViewActions.UPDATE_VIEW,
-  //       view: {
-  //         type: SharedViews.ERROR_VIEW,
-  //         error: new Error('No checkout object or no provider object found'),
-  //       },
-  //     },
-  //   });
-  // }, [viewDispatch]);
 
   const goBack = useCallback(() => {
     viewDispatch({
