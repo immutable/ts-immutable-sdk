@@ -39,7 +39,7 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
   useEffect(() => {
     page({
       userJourney: UserJourney.BRIDGE,
-      screen: 'ApproveTransaction',
+      screen: 'ClaimWithdrawal',
     });
   }, []);
 

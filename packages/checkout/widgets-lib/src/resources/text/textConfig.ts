@@ -497,20 +497,6 @@ export const text = {
         heading: 'Choose a wallet to view',
       },
     },
-    [BridgeWidgetViews.CLAIM_WITHDRAWAL]: {
-      content: {
-        heading: 'Follow the prompts to receive your coins on ',
-        body: 'You’ll be asked to pay a small gas fee',
-        body2: 'Destination Wallet address: ',
-      },
-      footer: {
-        buttonText: 'Continue',
-        retryText: 'Try again',
-      },
-      loadingView: {
-        text: 'Initiating move',
-      },
-    },
   },
   footers: {
     quickswapFooter: {
