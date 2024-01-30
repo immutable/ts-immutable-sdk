@@ -6,6 +6,23 @@ import {
   validateToToken,
   validateToAmount,
 } from './SwapValidator';
+import enTranslations from '../../../locales/en.json';
+
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key) => {
+      // Split the key by '.' in case of nested properties
+      const keyParts = key.split('.');
+      let result = { ...enTranslations };
+      for (const part of keyParts) {
+        result = result[part];
+        if (!result) break;
+      }
+
+      return result || key;
+    },
+  }),
+}));
 
 describe('SwapValidator', () => {
   const { t } = useTranslation();
