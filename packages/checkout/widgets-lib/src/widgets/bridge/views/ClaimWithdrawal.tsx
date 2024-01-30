@@ -112,7 +112,7 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
       const gasEstimate = await providerToUse.estimateGas(withdrawalResponse.unsignedTx);
       const feeData = await providerToUse.getFeeData();
       let gasPriceInWei: BigNumber | null;
-      if (feeData.lastBaseFeePerGas && feeData.maxFeePerGas && feeData.maxPriorityFeePerGas) {
+      if (feeData.lastBaseFeePerGas && feeData.maxPriorityFeePerGas) {
         gasPriceInWei = feeData.lastBaseFeePerGas.add(feeData.maxPriorityFeePerGas);
       } else {
         gasPriceInWei = feeData.gasPrice;
