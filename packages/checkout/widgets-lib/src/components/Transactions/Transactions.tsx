@@ -9,7 +9,6 @@ import { Box } from '@biom3/react';
 import { createAndConnectToProvider, isPassportProvider } from 'lib/providerUtils';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import {
-  ChainId,
   TokenFilterTypes,
   TokenInfo,
   WalletProviderName,
@@ -120,6 +119,7 @@ export function Transactions() {
     });
     try {
       const localProvider = await createAndConnectToProvider(checkout, walletProviderName, true);
+      const network = await localProvider.getNetwork();
       const address = await localProvider?.getSigner().getAddress() ?? '';
       setTxs([]);
       bridgeDispatch({
@@ -128,7 +128,7 @@ export function Transactions() {
           from: {
             web3Provider: localProvider,
             walletAddress: address.toLowerCase(),
-            network: ChainId.SEPOLIA, // TODO: figure out what to do with network here
+            network: network.chainId,
           },
           to: null,
         },
