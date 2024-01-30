@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Checkout, GetBalanceResult } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { getTokenBalances } from '../../widgets/wallet/functions/tokenBalances';
@@ -58,18 +58,8 @@ export const useBalance = ({
       }
     }
   }, [checkout, provider]);
-  useInterval(() => refreshBalances(true), REFRESH_BALANCE_INTERVAL_MS);
 
-  // Listen for window focus event to refresh after a potential interaction with a wallet
-  useEffect(() => {
-    const handleFocus = () => {
-      refreshBalances(true);
-    };
-    window.addEventListener('focus', handleFocus);
-    return () => {
-      window.removeEventListener('focus', handleFocus);
-    };
-  }, [refreshBalances]);
+  useInterval(() => refreshBalances(true), REFRESH_BALANCE_INTERVAL_MS);
 
   return {
     balancesLoading,
