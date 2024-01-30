@@ -159,11 +159,11 @@ export function WalletAndNetworkSelector() {
     // add local state from context values
     // if user has clicked back button
     setFromWalletWeb3Provider(from.web3Provider);
-    setFromWalletAddress(from.walletAddress);
+    setFromWalletAddress(from.walletAddress.toLowerCase());
     setFromNetwork(from.network);
 
     setToWalletWeb3Provider(to.web3Provider);
-    setToWalletAddress(to.walletAddress);
+    setToWalletAddress(to.walletAddress.toLowerCase());
     setToNetwork(to.network);
 
     bridgeDispatch({
@@ -216,7 +216,7 @@ export function WalletAndNetworkSelector() {
 
     setFromWalletWeb3Provider(provider);
     const address = await provider!.getSigner().getAddress();
-    setFromWalletAddress(address);
+    setFromWalletAddress(address.toLowerCase());
 
     /** if Passport skip from network selector and default to zkEVM */
     if (isPassportProvider(provider)) {
@@ -279,7 +279,7 @@ export function WalletAndNetworkSelector() {
       // if same from wallet and to wallet, just use the existing fromWalletLocalWeb3Provider
       setToWalletWeb3Provider(fromWalletWeb3Provider);
       const address = await fromWalletWeb3Provider!.getSigner().getAddress();
-      setToWalletAddress(address);
+      setToWalletAddress(address.toLowerCase());
     } else {
       let toWalletProvider;
       if (selectedToWalletProviderName === WalletProviderName.PASSPORT && passportCache.current) {
@@ -294,7 +294,7 @@ export function WalletAndNetworkSelector() {
       }
       setToWalletWeb3Provider(toWalletProvider);
       const address = await toWalletProvider!.getSigner().getAddress();
-      setToWalletAddress(address);
+      setToWalletAddress(address.toLowerCase());
     }
 
     // toNetwork is always the opposite of fromNetwork
@@ -332,12 +332,12 @@ export function WalletAndNetworkSelector() {
           type: BridgeActions.SET_WALLETS_AND_NETWORKS,
           from: {
             web3Provider: fromWalletWeb3Provider,
-            walletAddress: fromWalletAddress,
+            walletAddress: fromWalletAddress.toLowerCase(),
             network: fromNetwork,
           },
           to: {
             web3Provider: toWalletWeb3Provider,
-            walletAddress: toWalletAddress,
+            walletAddress: toWalletAddress.toLowerCase(),
             network: toNetwork,
           },
         },
