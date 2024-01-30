@@ -262,8 +262,18 @@ export function Transactions() {
         return;
       }
 
+      const knownTxs = data.transactions.filter((txn) => {
+        const tokens = data.tokens[txn.details.from_chain];
+        if (!tokens) return false;
+
+        const token = tokens[txn.details.from_token_address.toLowerCase()];
+        if (!token) return false;
+
+        return true;
+      });
+
       setKnownTokenMap(data.tokens);
-      setTxs(data.transactions);
+      setTxs(knownTxs);
 
       setLoading(false);
     })();

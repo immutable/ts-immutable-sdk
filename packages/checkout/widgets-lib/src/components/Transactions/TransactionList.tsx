@@ -70,11 +70,7 @@ export function TransactionList({
           .map((transaction) => {
             const hash = transaction.blockchain_metadata.transaction_hash;
             const tokens = knownTokenMap[transaction.details.from_chain];
-            if (!tokens) return false;
-
             const token = tokens[transaction.details.from_token_address.toLowerCase()];
-            if (!token) return false;
-
             const amount = formatUnits(transaction.details.amount, token.decimals);
             const fiat = calculateCryptoToFiat(amount, token.symbol, cryptoFiatState.conversions);
 
