@@ -87,7 +87,7 @@ export function TransactionItemWithdrawPending({
   };
 
   return (
-    <Box testId={`transaction - item - ${transaction.blockchain_metadata.transaction_hash} `} sx={containerStyles}>
+    <Box testId={`transaction-item-${transaction.blockchain_metadata.transaction_hash}`} sx={containerStyles}>
       {requiresWithdrawalClaim && (
         <>
           <Box sx={actionsContainerStyles}>
