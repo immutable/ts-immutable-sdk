@@ -39,9 +39,10 @@ import { NoTransactions } from './NoTransactions';
 
 type TransactionsProps = {
   checkout: Checkout
+  onBackButtonClick: () => void;
 };
 
-export function Transactions({ checkout }: TransactionsProps) {
+export function Transactions({ checkout, onBackButtonClick }: TransactionsProps) {
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const { cryptoFiatDispatch } = useContext(CryptoFiatContext);
@@ -246,6 +247,7 @@ export function Transactions({ checkout }: TransactionsProps) {
       header={(
         <HeaderNavigation
           showBack
+          onBackButtonClick={onBackButtonClick}
           title={t('views.TRANSACTIONS.layoutHeading')}
           onCloseButtonClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
         />

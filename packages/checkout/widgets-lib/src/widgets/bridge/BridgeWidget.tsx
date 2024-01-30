@@ -223,7 +223,7 @@ export function BridgeWidget({
             />
           )}
           {viewState.view.type === BridgeWidgetViews.TRANSACTIONS && (
-            <Transactions checkout={checkout} />
+            <Transactions checkout={checkout} onBackButtonClick={goBackToWalletNetworkSelector} />
           )}
           {viewState.view.type === SharedViews.ERROR_VIEW && (
             <ErrorView
