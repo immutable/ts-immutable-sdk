@@ -29,6 +29,7 @@ import { Transactions } from 'components/Transactions/Transactions';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { TopUpView } from 'views/top-up/TopUpView';
 import { useTranslation } from 'react-i18next';
+import { ClaimWithdrawalInProgress } from 'components/Transactions/ClaimWithdrawalInProgress';
 import {
   ViewActions,
   ViewContext,
@@ -49,7 +50,15 @@ import { MoveInProgress } from './views/MoveInProgress';
 import { ApproveTransaction } from './views/ApproveTransaction';
 import { ErrorView } from '../../views/error/ErrorView';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
-import { sendBridgeFailedEvent, sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
+import {
+  sendBridgeClaimWithdrawalFailedEvent,
+  sendBridgeClaimWithdrawalSuccessEvent,
+  sendBridgeFailedEvent,
+  sendBridgeWidgetCloseEvent,
+} from './BridgeWidgetEvents';
+import {
+  ClaimWithdrawalSuccess,
+} from '../../context/view-context/BridgeViewContextTypes';
 
 export type BridgeWidgetInputs = BridgeWidgetParams & {
   config: StrongCheckoutWidgetsConfig,
@@ -239,6 +248,65 @@ export function BridgeWidget({
               showSwapOption={isSwapEnabled}
               showBridgeOption={isBridgeEnabled}
               onCloseButtonClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
+            />
+          )}
+          {viewState.view.type === BridgeWidgetViews.CLAIM_WITHDRAWAL_IN_PROGRESS && (
+            <ClaimWithdrawalInProgress
+              transactionResponse={viewState.view.data.transactionResponse}
+            />
+          )}
+          {viewState.view.type === BridgeWidgetViews.CLAIM_WITHDRAWAL_SUCCESS && (
+            <StatusView
+              statusText={t('views.CLAIM_WITHDRAWAL.IN_PROGRESS.success.text')}
+              actionText={t('views.CLAIM_WITHDRAWAL.IN_PROGRESS.success.actionText')}
+              onRenderEvent={() => {
+                page({
+                  userJourney: UserJourney.BRIDGE,
+                  screen: 'ClaimWithdrawalSuccess',
+                });
+                sendBridgeClaimWithdrawalSuccessEvent(
+                  eventTarget,
+                  (viewState.view as ClaimWithdrawalSuccess).data.transactionHash,
+                );
+              }}
+              onActionClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
+              statusType={StatusType.SUCCESS}
+              testId="claim-withdrawal-success-view"
+            />
+          )}
+          {viewState.view.type === BridgeWidgetViews.CLAIM_WITHDRAWAL_FAILURE && (
+            <StatusView
+              statusText={t('views.CLAIM_WITHDRAWAL.IN_PROGRESS.failure.text')}
+              actionText={t('views.CLAIM_WITHDRAWAL.IN_PROGRESS.failure.actionText')}
+              onRenderEvent={() => {
+                let reason = '';
+                if (viewState.view.type === BridgeWidgetViews.CLAIM_WITHDRAWAL_FAILURE) {
+                  reason = viewState.view.reason;
+                }
+                page({
+                  userJourney: UserJourney.BRIDGE,
+                  screen: 'ClaimWithdrawalFailure',
+                  extras: {
+                    reason,
+                  },
+                });
+                sendBridgeClaimWithdrawalFailedEvent(eventTarget, 'Transaction failed');
+              }}
+              onActionClick={() => {
+                if (viewState.view.type === BridgeWidgetViews.CLAIM_WITHDRAWAL_FAILURE) {
+                  viewDispatch({
+                    payload: {
+                      type: ViewActions.UPDATE_VIEW,
+                      view: {
+                        type: BridgeWidgetViews.TRANSACTIONS,
+                      },
+                    },
+                  });
+                }
+              }}
+              statusType={StatusType.FAILURE}
+              onCloseClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
+              testId="claim-withdrawal-fail-view"
             />
           )}
         </CryptoFiatProvider>

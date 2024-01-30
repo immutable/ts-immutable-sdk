@@ -493,6 +493,21 @@
       "walletSelection": {
         "heading": "表示するウォレットを選択"
       }
+    },
+    "CLAIM_WITHDRAWAL": {
+      "IN_PROGRESS": {
+        "loading": {
+          "text": "処理中"
+        },
+        "success": {
+          "text": "成功",
+          "actionText": "完了"
+        },
+        "failure": {
+          "text": "取引失敗",
+          "actionText": "再試行"
+        }
+      }
     }
   },
   "footers": {

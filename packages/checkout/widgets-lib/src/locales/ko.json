@@ -490,6 +490,21 @@
       "walletSelection": {
         "heading": "보려는 지갑 선택"
       }
+    },
+    "CLAIM_WITHDRAWAL": {
+      "IN_PROGRESS": {
+        "loading": {
+          "text": "처리 중"
+        },
+        "success": {
+          "text": "성공",
+          "actionText": "완료"
+        },
+        "failure": {
+          "text": "거래 실패",
+          "actionText": "다시 시도"
+        }
+      }
     }
   },
   "footers": {

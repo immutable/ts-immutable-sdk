@@ -490,6 +490,21 @@
       "walletSelection": {
         "heading": "选择要查看的钱包"
       }
+    },
+    "CLAIM_WITHDRAWAL": {
+      "IN_PROGRESS": {
+        "loading": {
+          "text": "处理中"
+        },
+        "success": {
+          "text": "成功",
+          "actionText": "完成"
+        },
+        "failure": {
+          "text": "交易失败",
+          "actionText": "请重试"
+        }
+      }
     }
   },
   "footers": {

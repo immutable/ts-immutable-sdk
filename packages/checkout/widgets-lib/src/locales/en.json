@@ -490,6 +490,21 @@
       "walletSelection": {
         "heading": "Choose a wallet to view"
       }
+    },
+    "CLAIM_WITHDRAWAL": {
+      "IN_PROGRESS": {
+        "loading": {
+          "text": "Processing"
+        },
+        "success": {
+          "text": "Success",
+          "actionText": "Done"
+        },
+        "failure": {
+          "text": "Transaction failed",
+          "actionText": "Try again"
+        }
+      }
     }
   },
   "footers": {
