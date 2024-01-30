@@ -45,6 +45,10 @@ export function SwapInProgress({ transactionResponse, swapForm }: SwapInProgress
               view: {
                 type: SwapWidgetViews.SUCCESS,
                 data: {
+                  // fromTokenAddress: swapForm.fromTokenAddress,
+                  // fromAmount:swapForm.fromAmount,
+                  // toTokenAddress: swapForm.toTokenAddress,
+                  // toAmount: viewState.view.data?.toAmount,
                   transactionHash: receipt.transactionHash,
                 },
               },
