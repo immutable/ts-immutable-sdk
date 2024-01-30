@@ -66,8 +66,8 @@ export function MoveInProgress({ transactionHash }: MoveInProgressProps) {
                 variant="guidance"
                 sx={{
                   position: 'absolute',
-                  right: 'base.spacing.x16',
-                  top: 'base.spacing.x2',
+                  right: 'base.spacing.x14',
+                  top: 'base.spacing.x1',
                 }}
               />
             </>
