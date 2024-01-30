@@ -267,6 +267,7 @@ export const cyIntercept = (overrides?: {
   cy.intercept(`${checkoutApi}/rpc/eth-sepolia`, {});
   cy.intercept(imtblZkEvmRpcUrl, {});
   cy.intercept('https://image-resizer-cache.dev.immutable.com/*', {});
+  cy.intercept('https://api.x.immutable.com/v1/sdk/metrics', {});
 
   cy.wait(10); // This delay ensures the intercepts are set before the test runs
 };
