@@ -1,6 +1,6 @@
 export * as imx from './imx';
 export * as mr from './multi-rollup';
-export * as BlockchainDataModels from './blockchain-data/models/index';
+export * as BlockchainData from './blockchain-data/index';
 export * as ActivitiesTypes from './multi-rollup/domain/activities-api-types';
 export * as ChainsTypes from './multi-rollup/domain/chains-api-types';
 export * as CollectionsTypes from './multi-rollup/domain/collections-api-types';
