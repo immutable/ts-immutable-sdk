@@ -32,6 +32,8 @@ describe('Config', () => {
     passportMrBasePath: 'passportMrBasePath123',
   };
 
+  const defaultHeaders = { 'x-sdk-version': 'ts-immutable-sdk-__SDK_VERSION__' };
+
   describe('when the baseConfig environment is SANDBOX', () => {
     it('returns a Config', () => {
       const immutableConfig = new ImmutableConfiguration({
@@ -50,6 +52,7 @@ describe('Config', () => {
           oidcConfiguration,
         }),
       );
+      expect(config.multiRollupConfig.passport.baseOptions?.headers).toEqual(defaultHeaders);
     });
   });
 
@@ -71,6 +74,7 @@ describe('Config', () => {
           oidcConfiguration,
         }),
       );
+      expect(config.multiRollupConfig.passport.baseOptions?.headers).toEqual(defaultHeaders);
     });
   });
 
@@ -95,6 +99,7 @@ describe('Config', () => {
             oidcConfiguration,
           }),
         );
+        expect(config.multiRollupConfig.passport.baseOptions?.headers).toEqual(defaultHeaders);
       });
     });
 

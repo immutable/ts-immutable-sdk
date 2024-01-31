@@ -1,0 +1,1 @@
+sed -i '' "s/__SDK_VERSION__/$(git describe --tags --abbrev=0)/g" $1
