@@ -1,11 +1,22 @@
-export const containerStyle = {
-  bg: 'base.color.translucent.emphasis.100',
-  borderRadius: 'base.borderRadius.x4',
+export const containerStyles = {
+  backgroundColor: 'base.color.neutral.800',
+  px: 'base.spacing.x4',
+  pt: 'base.spacing.x5',
+  pb: 'base.spacing.x4',
+  borderRadius: 'base.borderRadius.x6',
+  h: '100%',
+  w: '100%',
   display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
   flexDirection: 'column',
-  height: '100%',
+};
+
+export const noTransactionsContainerStyle = {
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  alignItems: 'center',
+  padding: 'base.spacing.x5',
+  flex: 1,
 };
 
 export const noTransactionsBodyStyle = {
