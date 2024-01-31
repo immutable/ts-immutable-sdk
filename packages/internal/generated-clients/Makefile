@@ -2,7 +2,7 @@
 generate-imx-openapi: get-imx-openapi generate-imx-api-client
 
 .PHONY: generate-mr-openapi
-generate-mr-openapi: get-mr-openapi generate-mr-api-client
+generate-mr-openapi: get-mr-openapi generate-mr-api-client generate-blockchain-data-types
 
 # Note: We generate clients with sandbox spec only as Prod and Sandbox are maintained to be same.
 #.      Prod url is passed in via config to talk to prod API.
