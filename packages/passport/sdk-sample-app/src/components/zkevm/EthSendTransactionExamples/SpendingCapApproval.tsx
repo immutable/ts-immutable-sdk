@@ -1,6 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Accordion, Form } from 'react-bootstrap';
-import InputGroup from 'react-bootstrap/InputGroup';
 import { usePassportProvider } from '@/context/PassportProvider';
 import WorkflowButton from '@/components/WorkflowButton';
 import { RequestExampleProps } from '@/types';
@@ -9,7 +8,7 @@ import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { Environment } from '@imtbl/config';
 
 const getErc20DefaultContractAddress = (environment: string) => {
-  switch (environment) {  
+  switch (environment) {
     case Environment.SANDBOX:
       return '0x100148e9a56e4c29e432beb9d6df4ae74413d3c3';
     case Environment.PRODUCTION:
@@ -20,14 +19,16 @@ const getErc20DefaultContractAddress = (environment: string) => {
 };
 
 function SpendingCapApproval({ disabled, handleExampleSubmitted }: RequestExampleProps) {
-  const abi = [
-    "function approve(address spender, uint256 amount)"
-  ];
   const { environment } = useImmutableProvider();
-  const iface = new Interface(abi);
+  const iface = useMemo(() => {
+    const abi = [
+      'function approve(address spender, uint256 amount)',
+    ];
+    return new Interface(abi);
+  }, []);
   const [fromAddress, setFromAddress] = useState<string>('');
   const [erc20ContractAddress, setErc20ContractAddress] = useState<string>(getErc20DefaultContractAddress(environment));
-  const [spender, setSpender] = useState<string>("0xf419b5a6a3dfbf3d3a6beefff331be38ee464080");
+  const [spender, setSpender] = useState<string>('0xf419b5a6a3dfbf3d3a6beefff331be38ee464080');
   const [amount, setAmount] = useState<string>('1');
   const [amountConvertError, setAmountConvertError] = useState<string>('');
   const [params, setParams] = useState<any[]>([]);
@@ -41,22 +42,22 @@ function SpendingCapApproval({ disabled, handleExampleSubmitted }: RequestExampl
       if (Number(allowAmount) < 0) {
         setAmountConvertError(amountRange);
       }
-      const data = iface.encodeFunctionData("approve", [spender, allowAmount]);
+      const data = iface.encodeFunctionData('approve', [spender, allowAmount]);
       setParams([{
         from: fromAddress,
         to: erc20ContractAddress,
         value: '0',
-        data
+        data,
       }]);
     } catch (err) {
       setParams([{
         from: fromAddress,
         to: erc20ContractAddress,
         value: '0',
-        data: '0x'
+        data: '0x',
       }]);
     }
-  }, [fromAddress, erc20ContractAddress, spender, amount]);
+  }, [fromAddress, erc20ContractAddress, spender, amount, iface]);
 
   useEffect(() => {
     const getAddress = async () => {
@@ -150,7 +151,7 @@ function SpendingCapApproval({ disabled, handleExampleSubmitted }: RequestExampl
               value={amount}
             />
             <Form.Control.Feedback type="invalid" tooltip>
-                {amountConvertError}
+              {amountConvertError}
             </Form.Control.Feedback>
           </Form.Group>
           <WorkflowButton
