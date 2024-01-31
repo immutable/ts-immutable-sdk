@@ -1,10 +1,11 @@
+/* eslint-disable no-console */
 import {
   Banner, Box, Heading, Link,
 } from '@biom3/react';
 import { useContext, useEffect } from 'react';
 
+import { SalePaymentTypes } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
-import { IMTBLWidgetEvents, SalePaymentTypes } from '@imtbl/checkout-sdk';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -14,8 +15,6 @@ import {
   ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
-import { orchestrationEvents } from '../../../lib/orchestrationEvents';
-import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 
 import { PaymentOptions } from '../components/PaymentOptions';
 import { useSaleContext } from '../context/SaleContextProvider';
@@ -27,8 +26,6 @@ export function PaymentMethods() {
   const { viewState, viewDispatch } = useContext(ViewContext);
   const {
     sign,
-    amount,
-    fromTokenAddress: tokenAddress,
     goToErrorView,
     paymentMethod,
     setPaymentMethod,
@@ -36,7 +33,6 @@ export function PaymentMethods() {
     invalidParameters,
   } = useSaleContext();
   const { sendPageView, sendCloseEvent, sendSelectedPaymentMethod } = useSaleEvent();
-  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const handleOptionClick = (type: SalePaymentTypes) => setPaymentMethod(type);
 
@@ -81,6 +77,23 @@ export function PaymentMethods() {
     }
   }, [paymentMethod]);
 
+  const onClickInsufficientCoinsBanner = () => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: SharedViews.TOP_UP_VIEW,
+        },
+      },
+    });
+  };
+
+  /**
+   * ! GPR-385
+   * onClick go to TopUpView
+   * validate where the events go after TopUpView
+   * main page needs to unmount SaleWidget and mount requested Bridge/Swap/OnRamp
+   */
   const insufficientCoinsBanner = (
     <Box sx={{ paddingX: 'base.spacing.x2' }}>
       <Banner>
@@ -90,10 +103,7 @@ export function PaymentMethods() {
           <Link
             sx={{ mx: 'base.spacing.x1' }}
             onClick={
-              () => orchestrationEvents
-                .sendRequestBridgeEvent(eventTarget, IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT, {
-                  amount, tokenAddress,
-                })
+              () => onClickInsufficientCoinsBanner()
             }
           >
             {t('views.PAYMENT_METHODS.insufficientCoinsBanner.captionCTA')}
