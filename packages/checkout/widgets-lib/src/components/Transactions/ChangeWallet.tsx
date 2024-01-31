@@ -1,5 +1,5 @@
 import {
-  Box, Button, Caption, Divider, EllipsizedText, Logo,
+  Box, Button, EllipsizedText, Logo,
 } from '@biom3/react';
 import { useContext } from 'react';
 import { BridgeContext } from 'widgets/bridge/context/BridgeContext';
@@ -35,35 +35,25 @@ export function ChangeWallet({
   };
 
   return (
-    <>
-      <Box sx={headingStyles}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 'base.spacing.x1' }}>
-          {isMetaMask && !isPassport && <Logo logo="MetaMaskSymbol" sx={{ width: 'base.icon.size.400' }} />}
-          {!isMetaMask && isPassport && (
-            <Logo
-              logo="PassportSymbolOutlined"
-              sx={
-                {
-                  width: 'base.icon.size.400',
-                  pr: 'base.spacing.x1',
-                }
+    <Box sx={headingStyles}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 'base.spacing.x1' }}>
+        {isMetaMask && !isPassport && <Logo logo="MetaMaskSymbol" sx={{ width: 'base.icon.size.400' }} />}
+        {!isMetaMask && isPassport && (
+          <Logo
+            logo="PassportSymbolOutlined"
+            sx={
+              {
+                width: 'base.icon.size.400',
+                pr: 'base.spacing.x1',
               }
-            />
-          )}
-          <Caption><EllipsizedText leftSideLength={6} rightSideLength={4} text={walletAddress} /></Caption>
-        </Box>
-        <Button size="small" variant="secondary" onClick={handleChangeWalletClick}>
-          {t('views.TRANSACTIONS.changeWallet.buttonText')}
-        </Button>
+            }
+          />
+        )}
+        <EllipsizedText leftSideLength={6} rightSideLength={4} text={walletAddress} />
       </Box>
-      <Divider
-        size="small"
-        sx={{
-          pb: 'base.spacing.x2',
-          color: 'base.color.translucent.emphasis.300',
-          opacity: 0.1,
-        }}
-      />
-    </>
+      <Button size="small" variant="tertiary" onClick={handleChangeWalletClick}>
+        {t('views.TRANSACTIONS.changeWallet.buttonText')}
+      </Button>
+    </Box>
   );
 }
