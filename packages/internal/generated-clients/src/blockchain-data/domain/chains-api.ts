@@ -1,4 +1,3 @@
-// FOO FOO
 /* tslint:disable */
 /* eslint-disable */
 /**
