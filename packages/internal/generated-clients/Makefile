@@ -42,7 +42,6 @@ generate-mr-api-client:
     -o /app/src/multi-rollup \
     -c /app/config/mr.config.json
 
-# --global-property models,apis,supportingFiles
 .PHONY: generate-blockchain-data-types
 generate-blockchain-data-types:
 	rm -rf src/blockchain-data && \
