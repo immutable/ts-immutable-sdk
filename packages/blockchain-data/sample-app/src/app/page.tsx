@@ -7,6 +7,8 @@ import {
   BlockchainData,
   BlockchainDataModuleConfiguration,
   ChainsTypes,
+  Types,
+  ActivityType,
 } from '@imtbl/blockchain-data';
 import { PageLayout } from '@/components/PageLayout';
 
@@ -28,7 +30,7 @@ export default function Home() {
       const client = new BlockchainData(config);
 
       try {
-        const request: ChainsTypes.ListChainsRequestParams = {};
+        const request: Types.ListChainsResult = {};
         const response = await client.listChains(request);
         setResponse(response);
       } catch (error) {

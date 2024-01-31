@@ -1,0 +1,16 @@
+{
+  "supportsES6": true,
+  "npmVersion": "6.9.0",
+  "typescriptThreePlus": true,
+  "withSeparateModelsAndApi": true,
+  "modelPackage": "models",
+  "apiPackage": "domain",
+  "useSingleRequestParameter": true,
+  "templateDir": "app/templates/mr",
+  "files": {
+    "api-types.mustache": {
+      "templateType": "API",
+      "destinationFilename": "-types.ts"
+    }
+  }
+}
