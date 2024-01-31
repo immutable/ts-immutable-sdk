@@ -13,7 +13,6 @@ describe('ClaimWithdrawalInProgress View', () => {
   });
 
   const { t } = useTranslation();
-  const loadingText = t('views.CLAIM_WITHDRAWAL.IN_PROGRESS.loading.text');
 
   it('should render the ClaimWithdrawalInProgress view', () => {
     mount(
@@ -27,7 +26,7 @@ describe('ClaimWithdrawalInProgress View', () => {
     );
 
     cySmartGet('loading-view').should('exist');
-    cySmartGet('loading-text').should('have.text', loadingText);
+    cySmartGet('loading-text').should('have.text', t('views.CLAIM_WITHDRAWAL.IN_PROGRESS.loading.text'));
     cySmartGet('footer-logo-container').should('exist');
   });
 });
