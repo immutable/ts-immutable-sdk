@@ -256,7 +256,7 @@ export function BridgeWidget({
           )}
           {viewState.view.type === BridgeWidgetViews.CLAIM_WITHDRAWAL_IN_PROGRESS && (
             <ClaimWithdrawalInProgress
-              transactionResponse={viewState.view.data.transactionResponse}
+              transactionResponse={viewState.view.transactionResponse}
             />
           )}
           {viewState.view.type === BridgeWidgetViews.CLAIM_WITHDRAWAL_SUCCESS && (
@@ -294,7 +294,11 @@ export function BridgeWidget({
                     reason,
                   },
                 });
-                sendBridgeClaimWithdrawalFailedEvent(eventTarget, 'Transaction failed');
+                sendBridgeClaimWithdrawalFailedEvent(
+                  eventTarget,
+                  (viewState.view as BridgeClaimWithdrawalSuccess).transactionHash,
+                  'Transaction failed',
+                );
               }}
               onActionClick={() => {
                 if (viewState.view.type === BridgeWidgetViews.CLAIM_WITHDRAWAL_FAILURE) {

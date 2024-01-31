@@ -69,9 +69,7 @@ interface BridgeClaimWithdrawal extends ViewType {
 
 interface BridgeClaimWithdrawalInProgress extends ViewType {
   type: BridgeWidgetViews.CLAIM_WITHDRAWAL_IN_PROGRESS,
-  data: {
-    transactionResponse: TransactionResponse;
-  }
+  transactionResponse: TransactionResponse;
 }
 
 export interface BridgeClaimWithdrawalSuccess extends ViewType {
