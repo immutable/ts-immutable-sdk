@@ -2,19 +2,20 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Accordion, Form } from 'react-bootstrap';
 import { usePassportProvider } from '@/context/PassportProvider';
 import WorkflowButton from '@/components/WorkflowButton';
-import { RequestExampleProps } from '@/types';
+import { RequestExampleProps, EnvironmentNames } from '@/types';
 import { Interface } from 'ethers/lib/utils';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
-import { Environment } from '@imtbl/config';
 
-const getErc20DefaultContractAddress = (environment: string) => {
+const getErc20DefaultContractAddress = (environment: EnvironmentNames) => {
   switch (environment) {
-    case Environment.SANDBOX:
+    case EnvironmentNames.SANDBOX:
       return '0xe9E96d1aad82562b7588F03f49aD34186f996478';
-    case Environment.PRODUCTION:
+    case EnvironmentNames.PRODUCTION:
       return '0x52a6c53869ce09a731cd772f245b97a4401d3348';
-    default:
+    case EnvironmentNames.DEV:
       return '0xba919c45c487c6a7d4e7bc5b42d4ff143a80f041';
+    default:
+      return '';
   }
 };
 
@@ -28,7 +29,7 @@ function SpendingCapApproval({ disabled, handleExampleSubmitted }: RequestExampl
   }, []);
   const [fromAddress, setFromAddress] = useState<string>('');
   const [erc20ContractAddress, setErc20ContractAddress] = useState<string>(getErc20DefaultContractAddress(environment));
-  const [spender, setSpender] = useState<string>('0xf419b5a6a3dfbf3d3a6beefff331be38ee464080');
+  const [spender, setSpender] = useState<string>();
   const [amount, setAmount] = useState<string>('1');
   const [amountConvertError, setAmountConvertError] = useState<string>('');
   const [params, setParams] = useState<any[]>([]);
@@ -86,7 +87,7 @@ function SpendingCapApproval({ disabled, handleExampleSubmitted }: RequestExampl
     <Accordion.Item eventKey="1">
       <Accordion.Header>Spending Cap Approval</Accordion.Header>
       <Accordion.Body>
-        <Form noValidate onSubmit={handleSubmit} className="mb-4">
+        <Form onSubmit={handleSubmit} className="mb-4">
           <Form.Group className="mb-3">
             <Form.Label>
               Preview
@@ -133,6 +134,7 @@ function SpendingCapApproval({ disabled, handleExampleSubmitted }: RequestExampl
               required
               disabled={disabled}
               type="text"
+              placeholder="Spender's Address"
               onChange={(e) => setSpender(e.target.value)}
               value={spender}
             />
