@@ -3,6 +3,7 @@ import {
   IMTBLWidgetEvents,
   SaleEventType,
   WidgetType,
+  SalePaymentTypes,
 } from '@imtbl/checkout-sdk';
 import { ExecutedTransaction } from './types';
 
@@ -23,7 +24,7 @@ export const sendSaleWidgetCloseEvent = (eventTarget: Window | EventTarget) => {
 
 export const sendSaleSuccessEvent = (
   eventTarget: Window | EventTarget,
-  paymentMethod: string | undefined,
+  paymentMethod: SalePaymentTypes | undefined,
   transactions: ExecutedTransaction[] = [],
 ) => {
   const event = new CustomEvent<
@@ -45,7 +46,8 @@ export const sendSaleSuccessEvent = (
 export const sendSaleFailedEvent = (
   eventTarget: Window | EventTarget,
   reason: string,
-  paymentMethod: string | undefined,
+  error: Record<string, unknown>,
+  paymentMethod: SalePaymentTypes | undefined,
   transactions: ExecutedTransaction[] = [],
 ) => {
   const event = new CustomEvent<
@@ -55,9 +57,10 @@ export const sendSaleFailedEvent = (
       type: SaleEventType.FAILURE,
       data: {
         reason,
-        timestamp: new Date().getTime(),
+        error,
         paymentMethod,
         transactions,
+        timestamp: new Date().getTime(),
       },
     },
   });
@@ -68,7 +71,7 @@ export const sendSaleFailedEvent = (
 
 export const sendSaleTransactionSuccessEvent = (
   eventTarget: Window | EventTarget,
-  paymentMethod: string | undefined,
+  paymentMethod: SalePaymentTypes | undefined,
   transactions: ExecutedTransaction[],
 ) => {
   const event = new CustomEvent<
@@ -86,7 +89,7 @@ export const sendSaleTransactionSuccessEvent = (
 
 export const sendSalePaymentMethodEvent = (
   eventTarget: Window | EventTarget,
-  paymentMethod: string | undefined,
+  paymentMethod: SalePaymentTypes | undefined,
 ) => {
   const event = new CustomEvent<
   WidgetEvent<WidgetType.SALE, SaleEventType.PAYMENT_METHOD>

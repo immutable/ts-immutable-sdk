@@ -48,7 +48,10 @@ describe('config', () => {
         bridgeContracts: {
           rootERC20BridgeFlowRate: '0x',
           childERC20Bridge: '0x',
-          wrappedIMX: '0x',
+          rootChainIMX: '0x',
+          rootChainWrappedETH: '0x',
+          childChainWrappedETH: '0x',
+          childChainWrappedIMX: '0x',
         },
       },
       rootProvider: voidRootProvider,

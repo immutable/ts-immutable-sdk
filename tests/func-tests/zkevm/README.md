@@ -10,6 +10,17 @@ Functional tests using Cucumber and Gherkin
 4. cd into `tests/func-tests/zkevm` 
 5. Install dependencies: `yarn` (this also configures husky)
 
+### Required ENV values
+
+ZKEVM_ORDERBOOK_BANKER=0x // banker private key used to fund accounts for listings and trades
+ZKEVM_ORDERBOOK_ERC721=0x // Address of the ERC721 contract that the bank can mint (can be redeployed with `npx ts-node utils/orderbook/deploy-erc721.ts`)
+SEAPORT_CONTRACT_ADDRESS=0x
+ZONE_CONTRACT_ADDRESS=0x
+// The following are devnet values, if running against testnet need to modify
+ZKEVM_RPC_ENDPOINT=https://rpc.dev.immutable.com
+ORDERBOOK_MR_API_URL=https://order-book-mr.dev.imtbl.com
+ZKEVM_CHAIN_NAME=imtbl-zkevm-devnet
+
 ## Running the tests
 
 1. Run the tests: `yarn test`

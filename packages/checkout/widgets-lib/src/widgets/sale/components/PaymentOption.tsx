@@ -1,10 +1,10 @@
 import { IconProps, MenuItem } from '@biom3/react';
+import { SalePaymentTypes } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
-import { PaymentTypes } from '../types';
 
 export interface PaymentOptionProps {
-  type: PaymentTypes;
-  onClick: (type: PaymentTypes) => void;
+  type: SalePaymentTypes;
+  onClick: (type: SalePaymentTypes) => void;
   disabled?: boolean;
 }
 
@@ -14,8 +14,8 @@ export function PaymentOption(props: PaymentOptionProps) {
   // const optionText = options[type];
 
   const icon: Record<string, IconProps['icon']> = {
-    [PaymentTypes.CRYPTO]: 'Coins',
-    [PaymentTypes.FIAT]: 'BankCard',
+    [SalePaymentTypes.CRYPTO]: 'Coins',
+    [SalePaymentTypes.FIAT]: 'BankCard',
   };
 
   const handleClick = () => onClick(type);

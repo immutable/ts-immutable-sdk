@@ -1,16 +1,8 @@
+import pako from 'pako';
 import { useCallback, useEffect, useState } from 'react';
 import { Environment } from '@imtbl/config';
-import pako from 'pako';
 
-export type TransakNFTData = {
-  imageURL: string;
-  quantity: number;
-  nftName: string;
-  collectionAddress: string;
-  tokenID: Array<string>;
-  price: Array<number>;
-  nftType: 'ERC721';
-};
+import { TransakNFTData } from './TransakTypes';
 
 export type TransakWidgetType = 'on-ramp' | 'nft-checkout';
 
@@ -75,6 +67,7 @@ export const useTransakIframe = (props: UseTransakIframeProps) => {
       nftData: btoa(JSON.stringify(nftData)),
       estimatedGasLimit: gasLimit.toString(),
       ...restTransakParams,
+      themeColor: '0D0D0D',
     };
 
     const baseUrl = `${TRANSAK_API_BASE_URL[environment]}?`;

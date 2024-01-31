@@ -38,15 +38,19 @@ export type {
   BridgeFundingStep,
   BuyOrder,
   BuyParams,
+  BuyOverrides,
   BuyResult,
   BuyResultFailed,
   BuyResultInsufficientFunds,
   BuyResultSuccess,
+  BuyResultFulfillmentsUnsettled,
   BuyToken,
   CancelParams,
+  CancelOverrides,
   CancelResult,
   CancelResultFailed,
   CancelResultSuccess,
+  CancelResultFulfillmentsUnsettled,
   CheckConnectionParams,
   CheckConnectionResult,
   CheckoutModuleConfiguration,
@@ -129,3 +133,4 @@ export type { ErrorType } from './errors';
 
 export { CheckoutErrorType } from './errors';
 export { CheckoutConfiguration } from './config';
+export { BlockExplorerService } from './blockExplorer';

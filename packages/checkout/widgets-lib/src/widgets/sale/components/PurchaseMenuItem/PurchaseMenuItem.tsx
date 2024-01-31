@@ -8,18 +8,16 @@ import { CryptoFiatContext } from '../../../../context/crypto-fiat-context/Crypt
 
 type PurchaseMenuItemProps = {
   fundingRoute: FundingRoute;
+  collectionName: string;
 };
 
-export function PurchaseMenuItem({ fundingRoute }: PurchaseMenuItemProps) {
+export function PurchaseMenuItem({ fundingRoute, collectionName }: PurchaseMenuItemProps) {
   const { t } = useTranslation();
   const { items } = useSaleContext();
   const firstItem = items[0];
   const firstFundingStep = fundingRoute.steps[0];
   const { cryptoFiatState } = useContext(CryptoFiatContext);
   const [usdPurchaseAmount, setUsdPurchaseAmount] = useState<string | undefined>(undefined);
-
-  // todo - grab from url params, waiting for changes to how widgets are being loaded wt-1860
-  const collection = 'Metalcore';
 
   useEffect(() => {
     if (!cryptoFiatState.conversions) {
@@ -59,7 +57,7 @@ export function PurchaseMenuItem({ fundingRoute }: PurchaseMenuItemProps) {
         {firstItem?.qty > 1 ? ` x${firstItem.qty}` : null}
       </MenuItem.Label>
       <MenuItem.Caption>
-        {collection}
+        {collectionName}
       </MenuItem.Caption>
     </MenuItem>
   );

@@ -10,9 +10,11 @@ import { signFulfillmentTransactions } from '../actions';
 import { CheckoutStatus } from '../../types';
 import { SignTransactionStatusType } from '../actions/types';
 import { HttpClient } from '../../api/http';
+import { sendTransaction } from '../../transaction';
 
 jest.mock('../../instance');
 jest.mock('../actions');
+jest.mock('../../transaction');
 
 describe('cancel', () => {
   describe('cancel', () => {
@@ -71,6 +73,41 @@ describe('cancel', () => {
           },
         ],
       );
+    });
+
+    it('should return fulfillment transactions when waitFulfillmentSettlements override is false', async () => {
+      const orderId = '1';
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
+        getListing: jest.fn().mockResolvedValue({
+          result: {
+            accountAddress: '0x123',
+            status: { name: OrderStatusName.ACTIVE },
+          },
+        }),
+        cancelOrdersOnChain: jest.fn().mockResolvedValue({
+          cancellationAction: {
+            buildTransaction: async () => ({
+              to: '0xTO',
+              from: '0xFROM',
+              nonce: 1,
+            }) as PopulatedTransaction,
+          },
+        }),
+      });
+      (signFulfillmentTransactions as jest.Mock).mockResolvedValue({
+        type: SignTransactionStatusType.SUCCESS,
+      });
+      (sendTransaction as jest.Mock).mockResolvedValue({
+        transactionResponse: { hash: '0xTRANSACTION' },
+      });
+
+      const result = await cancel(config, mockProvider, [orderId], {
+        waitFulfillmentSettlements: false,
+      });
+      expect(result).toEqual({
+        status: CheckoutStatus.FULFILLMENTS_UNSETTLED,
+        transactions: [{ hash: '0xTRANSACTION' }],
+      });
     });
 
     it('should return failed status when transaction reverts', async () => {
@@ -181,10 +218,8 @@ describe('cancel', () => {
 
       expect(message).toEqual('An error occurred while cancelling the order listing');
       expect(type).toEqual(CheckoutErrorType.CANCEL_ORDER_LISTING_ERROR);
-      expect(data).toEqual({
-        orderId: '1',
-        message: 'An error occurred while cancelling the order listing',
-      });
+      expect(data.error).toBeDefined();
+      expect(data.orderId).toEqual('1');
     });
   });
 });

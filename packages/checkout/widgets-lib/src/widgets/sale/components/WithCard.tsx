@@ -41,7 +41,7 @@ export function WithCard(props: WithCardProps) {
       price: product.amount,
       quantity: product.qty,
       tokenID: product.tokenId,
-      nftType: 'ERC721',
+      nftType: product.contractType || 'ERC721',
     })),
     [signResponse],
   );

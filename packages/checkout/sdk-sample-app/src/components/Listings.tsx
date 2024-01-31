@@ -15,12 +15,17 @@ interface ListingsProps {
 export default function Listings({ checkout, provider }: ListingsProps) {
   const [sellContractAddress, setSellContractAddress] = useState<string>('');
   const [orderIdError, setAddressError] = useState<any>(null);
+
+  const [listingId, setListingId] = useState<string>('');
+  const [listingIdError, setListingIdError] = useState<any>(null);
+  
   const [error, setError] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   async function getListingsClick() {
-    if (!sellContractAddress) {
+    if (!sellContractAddress && !listingId) {
       setAddressError('Please enter an collection address');
+      setListingIdError('Or enter an collection address');
       return;
     }
     if (!checkout) {
@@ -34,12 +39,18 @@ export default function Listings({ checkout, provider }: ListingsProps) {
     setError(null);
     setLoading(true);
     try {
-        const orderBook = new Orderbook({baseConfig: {environment: checkout.config.environment}})
-        const listingsResult = await orderBook.listListings({
+      const orderBook = new Orderbook({baseConfig: {environment: checkout.config.environment}})
+
+      if (listingId) {
+        const result = await orderBook.getListing(listingId)
+        console.log('listings:', result)
+      } else {
+        const result = await orderBook.listListings({
           sellItemContractAddress: sellContractAddress,
           status: OrderStatusName.ACTIVE
         })
-        console.log('listings:', listingsResult)
+        console.log('listings:', result)
+      }
       setLoading(false);
     } catch (err: any) {
       setError(err);
@@ -54,6 +65,13 @@ export default function Listings({ checkout, provider }: ListingsProps) {
   const updateSellContractAddress = (event: any) => {
     setSellContractAddress(event.target.value);
     setAddressError('');
+    setListingIdError('');
+  }
+
+  const updateListingId = (event: any) => {
+    setListingId(event.target.value);
+    setAddressError('');
+    setListingIdError('');
   }
 
   useEffect(() => {
@@ -64,10 +82,18 @@ export default function Listings({ checkout, provider }: ListingsProps) {
   return (
     <Box>
       <FormControl validationStatus={orderIdError ? 'error' : 'success'} >
-        <FormControl.Label>Sell Collection Address</FormControl.Label>
+        <FormControl.Label>Collection Address</FormControl.Label>
         <TextInput onChange={updateSellContractAddress} />
         {orderIdError && (
           <FormControl.Validation>{orderIdError}</FormControl.Validation>
+        )}
+      </FormControl>
+      <br />
+      <FormControl validationStatus={orderIdError ? 'error' : 'success'} >
+        <FormControl.Label>Listing Id (optional)</FormControl.Label>
+        <TextInput onChange={updateListingId} />
+        {listingIdError && (
+          <FormControl.Validation>{listingIdError}</FormControl.Validation>
         )}
       </FormControl>
       <br />

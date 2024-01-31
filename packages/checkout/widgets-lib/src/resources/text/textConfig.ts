@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { WalletProviderName } from '@imtbl/checkout-sdk';
+import { SalePaymentTypes, WalletProviderName } from '@imtbl/checkout-sdk';
 import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
@@ -7,7 +7,7 @@ import { SharedViews } from '../../context/view-context/ViewContext';
 import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
 import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextTypes';
 import { SaleWidgetViews } from '../../context/view-context/SaleViewContextTypes';
-import { SaleErrorTypes, PaymentTypes } from '../../widgets/sale/types';
+import { SaleErrorTypes } from '../../widgets/sale/types';
 import { ServiceType } from '../../views/error/serviceTypes';
 
 export const text = {
@@ -273,12 +273,12 @@ export const text = {
         heading: 'How would you like to pay?',
       },
       options: {
-        [PaymentTypes.CRYPTO]: {
+        [SalePaymentTypes.CRYPTO]: {
           heading: 'Coins',
           caption: 'Using the coins balance in your wallet',
           disabledCaption: "We can't see enough coins in your balance",
         },
-        [PaymentTypes.FIAT]: {
+        [SalePaymentTypes.FIAT]: {
           heading: 'Card',
           caption: 'GooglePay also available with Transak',
           disabledCaption: undefined,
@@ -316,6 +316,14 @@ export const text = {
         [SaleErrorTypes.SERVICE_BREAKDOWN]: {
           description:
             "Sorry, we're unable to process your payment right now. Please try again in a few minutes.",
+          secondaryAction: 'Dismiss',
+        },
+        [SaleErrorTypes.PRODUCT_NOT_FOUND]: {
+          description: 'Sorry, this item is no longer available',
+          secondaryAction: 'Dismiss',
+        },
+        [SaleErrorTypes.INSUFFICIENT_STOCK]: {
+          description: 'Sorry, the requested quantity is not in stock. Consider buying a smaller quantity.',
           secondaryAction: 'Dismiss',
         },
         [SaleErrorTypes.TRANSAK_FAILED]: {
@@ -443,13 +451,18 @@ export const text = {
     },
     [BridgeWidgetViews.IN_PROGRESS]: {
       heading: 'Move in progress',
-      body1: (symbol: string) => `Less than 3 mins until your ${symbol} lands on zkEVM.`,
-      body2: 'You can close this window, the transaction will be reflected in your wallet once complete.',
+      body1: "Your funds have been sent, with less than 20 mins remaining until they're received. You can return and view progress by clicking on the rocket icon.",
+      body2: 'You can close this window.',
     },
     [BridgeWidgetViews.TRANSACTIONS]: {
       layoutHeading: 'In progress',
       passportDashboard: 'View the full transaction history in your',
       status: {
+        withdrawalPending: {
+          actionButtonText: 'Proceed',
+          withdrawalDelayText: 'This move has been paused, please return ',
+          withdrawalReadyText: 'Action required to receive your coins',
+        },
         inProgress: {
           heading: 'In Progress',
           txnEstimate: 'Usually takes 20 mins',
@@ -458,6 +471,7 @@ export const text = {
         emptyState: {
           notConnected: {
             body: 'Connect your wallet to view the transactions',
+            buttonText: 'Connect',
           },
         },
         noTransactions: {

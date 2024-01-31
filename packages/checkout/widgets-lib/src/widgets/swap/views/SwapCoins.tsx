@@ -1,6 +1,8 @@
 import { Box } from '@biom3/react';
 import {
-  useContext, useEffect, useMemo, useState,
+  useContext,
+  useEffect,
+  useState,
 } from 'react';
 import { WidgetTheme } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
@@ -33,11 +35,8 @@ export function SwapCoins({
   toTokenAddress,
 }: SwapCoinsProps) {
   const { t } = useTranslation();
-  const { viewState, viewDispatch } = useContext(ViewContext);
+  const { viewDispatch } = useContext(ViewContext);
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
-
-  const showBackButton = useMemo(() => viewState.history.length > 2
-  && viewState.history[viewState.history.length - 2].type === SharedViews.TOP_UP_VIEW, [viewState.history]);
 
   const {
     swapState: {
@@ -72,7 +71,6 @@ export function SwapCoins({
     <SimpleLayout
       header={(
         <HeaderNavigation
-          showBack={showBackButton}
           title={t('views.SWAP.header.title')}
           onCloseButtonClick={() => sendSwapWidgetCloseEvent(eventTarget)}
         />

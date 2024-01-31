@@ -103,7 +103,7 @@ describe('WalletBalances', () => {
               initialStateOverride={baseWalletState}
               cryptoConversionsOverride={cryptoConversions}
             >
-              <WalletBalances balancesLoading={false} setBalancesLoading={() => {}} />
+              <WalletBalances balancesLoading={false} />
             </WalletWidgetTestComponent>
           </ConnectLoaderTestComponent>
         </ViewContextTestComponent>,
@@ -123,7 +123,7 @@ describe('WalletBalances', () => {
               initialStateOverride={baseWalletState}
               cryptoConversionsOverride={cryptoConversions}
             >
-              <WalletBalances balancesLoading setBalancesLoading={() => {}} />
+              <WalletBalances balancesLoading />
             </WalletWidgetTestComponent>
           </ConnectLoaderTestComponent>
         </ViewContextTestComponent>,
@@ -145,7 +145,7 @@ describe('WalletBalances', () => {
               initialStateOverride={baseWalletState}
               cryptoConversionsOverride={cryptoConversions}
             >
-              <WalletBalances balancesLoading={false} setBalancesLoading={() => {}} />
+              <WalletBalances balancesLoading={false} />
             </WalletWidgetTestComponent>
           </ConnectLoaderTestComponent>
         </ViewContextTestComponent>,
@@ -167,7 +167,7 @@ describe('WalletBalances', () => {
               initialStateOverride={{ ...baseWalletState, tokenBalances: [] }}
               cryptoConversionsOverride={cryptoConversions}
             >
-              <WalletBalances balancesLoading={false} setBalancesLoading={() => {}} />
+              <WalletBalances balancesLoading={false} />
             </WalletWidgetTestComponent>
           </ConnectLoaderTestComponent>
         </ViewContextTestComponent>,
@@ -225,7 +225,7 @@ describe('WalletBalances', () => {
               initialStateOverride={baseWalletState}
               cryptoConversionsOverride={cryptoConversions}
             >
-              <WalletBalances balancesLoading={false} setBalancesLoading={() => {}} />
+              <WalletBalances balancesLoading={false} />
             </WalletWidgetTestComponent>
           </ConnectLoaderTestComponent>
         </ViewContextTestComponent>,
@@ -287,7 +287,7 @@ describe('WalletBalances', () => {
               initialStateOverride={walletState}
               cryptoConversionsOverride={cryptoConversions}
             >
-              <WalletBalances balancesLoading={false} setBalancesLoading={() => {}} />
+              <WalletBalances balancesLoading={false} />
             </WalletWidgetTestComponent>
           </ConnectLoaderTestComponent>
         </ViewContextTestComponent>,
@@ -348,7 +348,7 @@ describe('WalletBalances', () => {
               initialStateOverride={walletState}
               cryptoConversionsOverride={cryptoConversions}
             >
-              <WalletBalances balancesLoading={false} setBalancesLoading={() => {}} />
+              <WalletBalances balancesLoading={false} />
             </WalletWidgetTestComponent>
           </ConnectLoaderTestComponent>
         </ViewContextTestComponent>,
@@ -417,7 +417,7 @@ describe('WalletBalances', () => {
                 <WalletContext.Provider
                   value={{ walletState: testWalletState, walletDispatch: () => {} }}
                 >
-                  <WalletBalances balancesLoading={false} setBalancesLoading={() => {}} />
+                  <WalletBalances balancesLoading={false} />
                 </WalletContext.Provider>
               </ConnectLoaderTestComponent>
             </ViewContextTestComponent>
@@ -445,7 +445,7 @@ describe('WalletBalances', () => {
               <WalletContext.Provider
                 value={{ walletState: testWalletState, walletDispatch: () => {} }}
               >
-                <WalletBalances balancesLoading={false} setBalancesLoading={() => {}} />
+                <WalletBalances balancesLoading={false} />
               </WalletContext.Provider>
             </ConnectLoaderTestComponent>
           </ViewContextTestComponent>
@@ -479,7 +479,7 @@ describe('WalletBalances', () => {
               <WalletContext.Provider
                 value={{ walletState, walletDispatch: () => {} }}
               >
-                <WalletBalances balancesLoading={false} setBalancesLoading={() => {}} />
+                <WalletBalances balancesLoading={false} />
               </WalletContext.Provider>
             </ConnectLoaderTestComponent>
           </ViewContextTestComponent>

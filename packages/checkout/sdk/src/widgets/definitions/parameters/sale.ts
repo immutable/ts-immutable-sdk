@@ -14,10 +14,14 @@ import { WidgetLanguage } from '../configurations';
 export type SaleWidgetParams = {
   /** The total price to pay for the items in the sale */
   amount?: string;
+  /** Environment id from Immutable Hub */
   environmentId?: string;
+  /** Contract address of the token accepted for payments */
   fromTokenAddress?: string;
   /** The list of products to be purchased */
   items?: SaleItem[];
+  /** The name of the NFT collection on sale */
+  collectionName?: string;
   /** The wallet provider name to default to if no web3Provider is passed */
   walletProviderName?: WalletProviderName;
   /** The language to use for the sales widget */

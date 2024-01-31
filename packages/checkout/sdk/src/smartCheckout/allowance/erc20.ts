@@ -23,7 +23,7 @@ export const getERC20Allowance = async (
     throw new CheckoutError(
       'Failed to get the allowance for ERC20',
       CheckoutErrorType.GET_ERC20_ALLOWANCE_ERROR,
-      { contractAddress },
+      { contractAddress, error: err },
     );
   }
 };
@@ -46,11 +46,11 @@ export const getERC20ApprovalTransaction = async (
     const approveTransaction = await contract.populateTransaction.approve(spenderAddress, amount);
     if (approveTransaction) approveTransaction.from = ownerAddress;
     return approveTransaction;
-  } catch {
+  } catch (err: any) {
     throw new CheckoutError(
       'Failed to get the approval transaction for ERC20',
       CheckoutErrorType.GET_ERC20_ALLOWANCE_ERROR,
-      { contractAddress },
+      { contractAddress, error: err },
     );
   }
 };

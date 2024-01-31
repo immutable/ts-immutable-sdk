@@ -31,7 +31,9 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
   FundingRoute | undefined
   >(undefined);
   const [fundingRouteStepIndex, setFundingRouteStepIndex] = useState<number>(0);
-  const { querySmartCheckout, fundingRoutes, smartCheckoutResult } = useSaleContext();
+  const {
+    querySmartCheckout, fundingRoutes, smartCheckoutResult, collectionName,
+  } = useSaleContext();
   const { cryptoFiatDispatch } = useContext(CryptoFiatContext);
 
   const smartCheckoutLoading = useRef(false);
@@ -108,8 +110,9 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
       )}
       {subView === FundWithSmartCheckoutSubViews.FUNDING_ROUTE_SELECT && (
         <FundingRouteSelect
-          onFundingRouteSelected={onFundingRouteSelected}
           fundingRoutes={fundingRoutes}
+          collectionName={collectionName}
+          onFundingRouteSelected={onFundingRouteSelected}
         />
       )}
       {subView === FundWithSmartCheckoutSubViews.FUNDING_ROUTE_EXECUTE && (

@@ -3,6 +3,7 @@ import {
 } from 'react';
 import { IMTBLWidgetEvents, OnRampWidgetParams } from '@imtbl/checkout-sdk';
 import { UserJourney } from 'context/analytics-provider/SegmentAnalyticsProvider';
+import { useTranslation } from 'react-i18next';
 import { NATIVE } from '../../lib';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
@@ -15,7 +16,6 @@ import {
   OnRampWidgetViews,
 } from '../../context/view-context/OnRampViewContextTypes';
 import { LoadingView } from '../../views/loading/LoadingView';
-import { text } from '../../resources/text/textConfig';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { TopUpView } from '../../views/top-up/TopUpView';
 import { sendOnRampFailedEvent, sendOnRampSuccessEvent, sendOnRampWidgetCloseEvent } from './OnRampWidgetEvents';
@@ -35,7 +35,10 @@ export function OnRampWidget({
   const {
     isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
   } = config;
-  const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
+  const [viewState, viewDispatch] = useReducer(viewReducer, {
+    ...initialViewState,
+    history: [],
+  });
   const viewReducerValues = useMemo(() => ({ viewState, viewDispatch }), [viewState, viewReducer]);
 
   const { connectLoaderState } = useContext(ConnectLoaderContext);
@@ -44,9 +47,7 @@ export function OnRampWidget({
 
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
-  const {
-    initialLoadingText, IN_PROGRESS_LOADING, SUCCESS, FAIL,
-  } = text.views[OnRampWidgetViews.ONRAMP];
+  const { t } = useTranslation();
 
   const showIframe = useMemo(
     () => viewState.view.type === OnRampWidgetViews.ONRAMP,
@@ -75,10 +76,10 @@ export function OnRampWidget({
   return (
     <ViewContext.Provider value={viewReducerValues}>
       {viewState.view.type === SharedViews.LOADING_VIEW && (
-      <LoadingView loadingText={initialLoadingText} showFooterLogo />
+      <LoadingView loadingText={t('views.ONRAMP.initialLoadingText')} showFooterLogo />
       )}
       {viewState.view.type === OnRampWidgetViews.IN_PROGRESS_LOADING && (
-      <LoadingView loadingText={IN_PROGRESS_LOADING.loading.text} showFooterLogo />
+      <LoadingView loadingText={t('views.ONRAMP.IN_PROGRESS_LOADING.loading.text')} showFooterLogo />
       )}
       {viewState.view.type === OnRampWidgetViews.IN_PROGRESS && (
       <OrderInProgress />
@@ -86,8 +87,8 @@ export function OnRampWidget({
 
       {viewState.view.type === OnRampWidgetViews.SUCCESS && (
       <StatusView
-        statusText={SUCCESS.text}
-        actionText={SUCCESS.actionText}
+        statusText={t('views.ONRAMP.SUCCESS.text')}
+        actionText={t('views.ONRAMP.SUCCESS.actionText')}
         onRenderEvent={() => sendOnRampSuccessEvent(
           eventTarget,
           (viewState.view as OnRampSuccessView).data.transactionHash,
@@ -100,8 +101,8 @@ export function OnRampWidget({
 
       {viewState.view.type === OnRampWidgetViews.FAIL && (
       <StatusView
-        statusText={FAIL.text}
-        actionText={FAIL.actionText}
+        statusText={t('views.ONRAMP.FAIL.text')}
+        actionText={t('views.ONRAMP.FAIL.actionText')}
         onRenderEvent={() => sendOnRampFailedEvent(
           eventTarget,
           (viewState.view as OnRampFailView).reason

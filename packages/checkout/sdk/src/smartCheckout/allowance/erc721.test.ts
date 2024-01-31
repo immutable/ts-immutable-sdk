@@ -41,9 +41,9 @@ describe('erc721', () => {
         getApproved: getApprovedMock,
       });
 
-      let message = '';
-      let type = '';
-      let data = {};
+      let message;
+      let type;
+      let data;
 
       try {
         await getERC721ApprovedAddress(
@@ -59,10 +59,9 @@ describe('erc721', () => {
 
       expect(message).toEqual('Failed to get approved address for ERC721');
       expect(type).toEqual(CheckoutErrorType.GET_ERC721_ALLOWANCE_ERROR);
-      expect(data).toEqual({
-        id: '0',
-        contractAddress: '0xERC721',
-      });
+      expect(data.error).toBeDefined();
+      expect(data.id).toEqual('0');
+      expect(data.contractAddress).toEqual('0xERC721');
       expect(getApprovedMock).toBeCalledWith(0);
     });
   });
@@ -95,9 +94,9 @@ describe('erc721', () => {
         },
       });
 
-      let message = '';
-      let type = '';
-      let data = {};
+      let message;
+      let type;
+      let data;
 
       try {
         await getApproveTransaction(
@@ -115,12 +114,11 @@ describe('erc721', () => {
 
       expect(message).toEqual('Failed to get the approval transaction for ERC721');
       expect(type).toEqual(CheckoutErrorType.GET_ERC721_ALLOWANCE_ERROR);
-      expect(data).toEqual({
-        id: '0',
-        contractAddress: '0xERC721',
-        spenderAddress: '0xSEAPORT',
-        ownerAddress: '0xADDRESS',
-      });
+      expect(data.error).toBeDefined();
+      expect(data.id).toEqual('0');
+      expect(data.contractAddress).toEqual('0xERC721');
+      expect(data.spenderAddress).toEqual('0xSEAPORT');
+      expect(data.ownerAddress).toEqual('0xADDRESS');
       expect(approveMock).toBeCalledWith('0xSEAPORT', 0);
     });
   });
@@ -148,10 +146,9 @@ describe('erc721', () => {
         isApprovedForAll: isApprovedForAllMock,
       });
 
-      let message = '';
-      let type = '';
-      let data = {};
-
+      let message;
+      let type;
+      let data;
       try {
         await getERC721ApprovedForAll(
           mockProvider,
@@ -167,11 +164,10 @@ describe('erc721', () => {
 
       expect(message).toEqual('Failed to check approval for all ERC721s of collection');
       expect(type).toEqual(CheckoutErrorType.GET_ERC721_ALLOWANCE_ERROR);
-      expect(data).toEqual({
-        ownerAddress: '0xADDRESS',
-        contractAddress: '0xERC721',
-        spenderAddress: '0xSEAPORT',
-      });
+      expect(data.error).toBeDefined();
+      expect(data.ownerAddress).toEqual('0xADDRESS');
+      expect(data.contractAddress).toEqual('0xERC721');
+      expect(data.spenderAddress).toEqual('0xSEAPORT');
       expect(isApprovedForAllMock).toBeCalledWith('0xADDRESS', '0xSEAPORT');
     });
   });

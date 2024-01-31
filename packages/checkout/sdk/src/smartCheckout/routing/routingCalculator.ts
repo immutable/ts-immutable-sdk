@@ -208,7 +208,7 @@ export const routingCalculator = async (
     throw new CheckoutError(
       'Error occurred while creating read only providers',
       CheckoutErrorType.PROVIDER_ERROR,
-      { message: err.message },
+      { error: err },
     );
   }
 

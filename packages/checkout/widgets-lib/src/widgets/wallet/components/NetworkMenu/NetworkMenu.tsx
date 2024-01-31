@@ -34,11 +34,7 @@ import {
 import { EventTargetContext } from '../../../../context/event-target-context/EventTargetContext';
 import { UserJourney, useAnalytics } from '../../../../context/analytics-provider/SegmentAnalyticsProvider';
 
-export interface NetworkMenuProps {
-  setBalancesLoading: (loading: boolean) => void;
-}
-
-export function NetworkMenu({ setBalancesLoading }: NetworkMenuProps) {
+export function NetworkMenu() {
   const { t } = useTranslation();
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
@@ -65,8 +61,6 @@ export function NetworkMenu({ setBalancesLoading }: NetworkMenuProps) {
       });
 
       try {
-        setBalancesLoading(true);
-
         const switchNetworkResult = await checkout.switchNetwork({
           provider,
           chainId,
@@ -74,7 +68,6 @@ export function NetworkMenu({ setBalancesLoading }: NetworkMenuProps) {
 
         sendNetworkSwitchEvent(eventTarget, switchNetworkResult.provider, switchNetworkResult.network);
       } catch (err: any) {
-        setBalancesLoading(false);
         if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
           // ignore error
         } else {

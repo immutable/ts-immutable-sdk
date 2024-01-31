@@ -1,5 +1,6 @@
 import { useContext } from 'react';
 import { StandardAnalyticsActions } from '@imtbl/react-analytics';
+import { SalePaymentTypes } from '@imtbl/checkout-sdk';
 import {
   UserJourney,
   useAnalytics,
@@ -86,9 +87,9 @@ export const useSaleEvent = () => {
 
   const sendFailedEvent = (
     reason: string,
+    error: Record<string, unknown>,
     transactions: ExecutedTransaction[] = [],
     screen: string = defaultView,
-    details?: Record<string, unknown>,
   ) => {
     track({
       ...commonProps,
@@ -98,21 +99,21 @@ export const useSaleEvent = () => {
       action: 'Failed',
       extras: {
         transactions: toStringifyTransactions(transactions),
-        ...details,
+        ...error,
         ...orderProps,
         ...userProps,
         paymentMethod,
         reason,
       },
     });
-    sendSaleFailedEvent(eventTarget, reason, paymentMethod, transactions);
+    sendSaleFailedEvent(eventTarget, reason, error, paymentMethod, transactions);
   };
 
-  const sendTransactionSuccessEvent = (transactions: ExecutedTransaction[]) => {
-    sendSaleTransactionSuccessEvent(eventTarget, paymentMethod, transactions);
+  const sendTransactionSuccessEvent = (transaction: ExecutedTransaction) => {
+    sendSaleTransactionSuccessEvent(eventTarget, paymentMethod, [transaction]);
   };
 
-  const sendSelectedPaymentMethod = (type: string, screen: string) => {
+  const sendSelectedPaymentMethod = (type: SalePaymentTypes, screen: string) => {
     track({
       ...commonProps,
       screen: toPascalCase(screen),

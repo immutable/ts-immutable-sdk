@@ -6,7 +6,7 @@ import {
 import { BigNumber } from 'ethers';
 import { NATIVE } from '../../../lib';
 import {
-  MAX_GAS_LIMIT, fundingRouteFees,
+  MAX_GAS_LIMIT, filterSmartCheckoutResult, fundingRouteFees,
   isUserFractionalBalanceBlocked, smartCheckoutTokensList,
 } from './smartCheckoutUtils';
 
@@ -318,5 +318,156 @@ describe('smartCheckoutTokensList', () => {
 
     const tokens = smartCheckoutTokensList(smartCheckoutResult);
     expect(tokens).toEqual(['IMX', 'zkTKN', 'ETH']);
+  });
+
+  describe('filterSmartCheckoutResult', () => {
+    it('should not filter routes if only swap is returned', () => {
+      const smartCheckoutResult: SmartCheckoutResult = {
+        transactionRequirements: [],
+        router: {
+          routingOutcome: {
+            type: RoutingOutcomeType.ROUTES_FOUND,
+            fundingRoutes: [
+              {
+                steps: [
+                  {
+                    type: 'SWAP',
+                  },
+                ],
+              },
+            ],
+          },
+        },
+      } as unknown as SmartCheckoutResult;
+
+      const filteredSmartCheckoutResult = filterSmartCheckoutResult(smartCheckoutResult);
+
+      expect(filteredSmartCheckoutResult).toEqual(
+        smartCheckoutResult,
+      );
+    });
+    it('should filter any non SWAP funding routes', () => {
+      const smartCheckoutResult: SmartCheckoutResult = {
+        transactionRequirements: [],
+        router: {
+          routingOutcome: {
+            type: RoutingOutcomeType.ROUTES_FOUND,
+            fundingRoutes: [
+              {
+                steps: [
+                  {
+                    type: 'SWAP',
+                  },
+                ],
+              },
+              {
+                steps: [
+                  {
+                    type: 'SWAP',
+                  },
+                ],
+              },
+              {
+                steps: [
+                  {
+                    type: 'BRIDGE',
+                  },
+                ],
+              },
+              {
+                steps: [
+                  {
+                    type: 'ONRAMP',
+                  },
+                ],
+              },
+              {
+                steps: [
+                  {
+                    type: 'BRIDGE',
+                  },
+                  {
+                    type: 'SWAP',
+                  },
+                ],
+              },
+            ],
+          },
+        },
+      } as unknown as SmartCheckoutResult;
+
+      const filteredSmartCheckoutResult = filterSmartCheckoutResult(smartCheckoutResult);
+
+      expect(filteredSmartCheckoutResult).toEqual(
+        {
+          transactionRequirements: [],
+          router: {
+            routingOutcome: {
+              type: RoutingOutcomeType.ROUTES_FOUND,
+              fundingRoutes: [
+                {
+                  steps: [
+                    {
+                      type: 'SWAP',
+                    },
+                  ],
+                },
+                {
+                  steps: [
+                    {
+                      type: 'SWAP',
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+        },
+      );
+    });
+
+    it('should set routingOutcome to NO_ROUTES_FOUND if no routes remain after filtering', () => {
+      const smartCheckoutResult: SmartCheckoutResult = {
+        transactionRequirements: [],
+        router: {
+          routingOutcome: {
+            type: RoutingOutcomeType.ROUTES_FOUND,
+            fundingRoutes: [
+              {
+                steps: [
+                  {
+                    type: 'BRIDGE',
+                  },
+                ],
+              },
+              {
+                steps: [
+                  {
+                    type: 'BRIDGE',
+                  },
+                  {
+                    type: 'SWAP',
+                  },
+                ],
+              },
+            ],
+          },
+        },
+      } as unknown as SmartCheckoutResult;
+
+      const filteredSmartCheckoutResult = filterSmartCheckoutResult(smartCheckoutResult);
+
+      expect(filteredSmartCheckoutResult).toEqual(
+        {
+          transactionRequirements: [],
+          router: {
+            routingOutcome: {
+              type: RoutingOutcomeType.NO_ROUTES_FOUND,
+              message: expect.anything(),
+            },
+          },
+        },
+      );
+    });
   });
 });
