@@ -72,13 +72,18 @@ export const sendBridgeClaimWithdrawalSuccessEvent = (eventTarget: Window | Even
   if (eventTarget !== undefined) eventTarget.dispatchEvent(successEvent);
 };
 
-export const sendBridgeClaimWithdrawalFailedEvent = (eventTarget: Window | EventTarget, reason: string) => {
+export const sendBridgeClaimWithdrawalFailedEvent = (
+  eventTarget: Window | EventTarget,
+  transactionHash: string,
+  reason: string,
+) => {
   const failedEvent = new CustomEvent<WidgetEvent<WidgetType.BRIDGE, BridgeEventType.CLAIM_WITHDRAWAL_FAILURE>>(
     IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT,
     {
       detail: {
         type: BridgeEventType.CLAIM_WITHDRAWAL_FAILURE,
         data: {
+          transactionHash,
           reason,
           timestamp: new Date().getTime(),
         },

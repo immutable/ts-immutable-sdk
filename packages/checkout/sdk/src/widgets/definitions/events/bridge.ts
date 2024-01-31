@@ -42,10 +42,13 @@ export type BridgeClaimWithdrawalSuccess = {
 
 /**
  * Represents a failed bridge claim withdrawal.
+ * @property {string} transactionHash
  * @property {string} reason
  * @property {number} timestamp
  */
 export type BridgeClaimWithdrawalFailed = {
+  /** The hash of the successful transaction. */
+  transactionHash: string;
   /** The reason for the failed transaction. */
   reason: string;
   /** The timestamp of the failed transaction. */
