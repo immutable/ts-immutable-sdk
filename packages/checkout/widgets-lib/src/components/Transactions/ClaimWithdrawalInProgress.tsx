@@ -24,6 +24,8 @@ export function ClaimWithdrawalInProgress({ transactionResponse }: ClaimWithdraw
   }, []);
 
   useEffect(() => {
+    if (!transactionResponse) return;
+
     (async () => {
       try {
         const receipt = await transactionResponse.wait();

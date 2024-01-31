@@ -270,7 +270,7 @@ export function BridgeWidget({
                 });
                 sendBridgeClaimWithdrawalSuccessEvent(
                   eventTarget,
-                  (viewState.view as BridgeClaimWithdrawalSuccess).data.transactionHash,
+                  (viewState.view as BridgeClaimWithdrawalSuccess).transactionHash,
                 );
               }}
               onActionClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
