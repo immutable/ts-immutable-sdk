@@ -6,16 +6,12 @@ import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import {
   BlockchainData,
   BlockchainDataModuleConfiguration,
-  ChainsTypes,
   Types,
-  ActivityType,
 } from '@imtbl/blockchain-data';
 import { PageLayout } from '@/components/PageLayout';
 
 export default function Home() {
-  const [response, setResponse] = useState<ChainsTypes.ListChainsResult | null>(
-    null,
-  );
+  const [response, setResponse] = useState<Types.ListChainsResult | null>(null);
 
   useEffect(() => {
     async function getData() {
@@ -30,7 +26,7 @@ export default function Home() {
       const client = new BlockchainData(config);
 
       try {
-        const request: Types.ListChainsResult = {};
+        const request: Types.ListChainsRequestParams = {};
         const response = await client.listChains(request);
         setResponse(response);
       } catch (error) {
