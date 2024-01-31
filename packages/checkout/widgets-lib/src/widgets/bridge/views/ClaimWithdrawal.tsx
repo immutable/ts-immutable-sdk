@@ -180,9 +180,7 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
           type: ViewActions.UPDATE_VIEW,
           view: {
             type: BridgeWidgetViews.CLAIM_WITHDRAWAL_IN_PROGRESS,
-            data: {
-              transactionResponse: response.transactionResponse,
-            },
+            transactionResponse: response.transactionResponse,
           },
         },
       });
