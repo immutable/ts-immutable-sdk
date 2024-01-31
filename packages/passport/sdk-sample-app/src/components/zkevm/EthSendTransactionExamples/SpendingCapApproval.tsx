@@ -10,9 +10,9 @@ import { Environment } from '@imtbl/config';
 const getErc20DefaultContractAddress = (environment: string) => {
   switch (environment) {
     case Environment.SANDBOX:
-      return '0x100148e9a56e4c29e432beb9d6df4ae74413d3c3';
+      return '0xe9E96d1aad82562b7588F03f49aD34186f996478';
     case Environment.PRODUCTION:
-      return '0x52308d99234c9a413bbbb93c33cff0e86852fa1a';
+      return '0x52a6c53869ce09a731cd772f245b97a4401d3348';
     default:
       return '0xba919c45c487c6a7d4e7bc5b42d4ff143a80f041';
   }
