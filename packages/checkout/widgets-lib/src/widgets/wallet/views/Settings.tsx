@@ -8,7 +8,6 @@ import { sendDisconnectWalletEvent, sendWalletWidgetCloseEvent } from '../Wallet
 import { WalletAddress } from '../components/WalletAddress/WalletAddress';
 import { settingsBoxStyle, settingsDisconnectButtonStyle } from './SettingsStyles';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
-import { isPassportProvider } from '../../../lib/providerUtils';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
@@ -17,8 +16,6 @@ export function Settings() {
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { provider } = connectLoaderState;
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
-
-  const isPassport = isPassportProvider(provider);
 
   const { page } = useAnalytics();
 
@@ -45,7 +42,6 @@ export function Settings() {
         sx={settingsBoxStyle}
       >
         <WalletAddress provider={provider} />
-        {isPassport && (
         <Button
           testId="disconnect-button"
           variant="secondary"
@@ -54,7 +50,6 @@ export function Settings() {
         >
           {t('views.SETTINGS.disconnectButton.label')}
         </Button>
-        )}
       </Box>
     </SimpleLayout>
   );
