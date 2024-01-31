@@ -5,14 +5,28 @@ import { usePassportProvider } from '@/context/PassportProvider';
 import WorkflowButton from '@/components/WorkflowButton';
 import { RequestExampleProps } from '@/types';
 import { Interface } from 'ethers/lib/utils';
+import { useImmutableProvider } from '@/context/ImmutableProvider';
+import { Environment } from '@imtbl/config';
+
+const getErc20DefaultContractAddress = (environment: string) => {
+  switch (environment) {  
+    case Environment.SANDBOX:
+      return '0x100148e9a56e4c29e432beb9d6df4ae74413d3c3';
+    case Environment.PRODUCTION:
+      return '0x52308d99234c9a413bbbb93c33cff0e86852fa1a';
+    default:
+      return '0xba919c45c487c6a7d4e7bc5b42d4ff143a80f041';
+  }
+};
 
 function SpendingCapApproval({ disabled, handleExampleSubmitted }: RequestExampleProps) {
   const abi = [
     "function approve(address spender, uint256 amount)"
   ];
+  const { environment } = useImmutableProvider();
   const iface = new Interface(abi);
   const [fromAddress, setFromAddress] = useState<string>('');
-  const [erc20ContractAddress, setErc20ContractAddress] = useState<string>('0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48');
+  const [erc20ContractAddress, setErc20ContractAddress] = useState<string>(getErc20DefaultContractAddress(environment));
   const [spender, setSpender] = useState<string>("0xf419b5a6a3dfbf3d3a6beefff331be38ee464080");
   const [amount, setAmount] = useState<string>('1');
   const [amountConvertError, setAmountConvertError] = useState<string>('');
@@ -20,7 +34,6 @@ function SpendingCapApproval({ disabled, handleExampleSubmitted }: RequestExampl
   const amountRange = 'Amount should larger than 0';
 
   const { zkEvmProvider } = usePassportProvider();
-
   useEffect(() => {
     setAmountConvertError('');
     const allowAmount = amount.trim() === '' ? '0' : amount;
