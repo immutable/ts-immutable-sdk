@@ -54,3 +54,43 @@ export function sendBridgeWidgetCloseEvent(eventTarget: Window | EventTarget) {
   console.log('bridge close ', eventTarget, closeWidgetEvent);
   if (eventTarget !== undefined) eventTarget.dispatchEvent(closeWidgetEvent);
 }
+
+export const sendBridgeClaimWithdrawalSuccessEvent = (eventTarget: Window | EventTarget, transactionHash: string) => {
+  const successEvent = new CustomEvent<WidgetEvent<WidgetType.BRIDGE, BridgeEventType.CLAIM_WITHDRAWAL_SUCCESS>>(
+    IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT,
+    {
+      detail: {
+        type: BridgeEventType.CLAIM_WITHDRAWAL_SUCCESS,
+        data: {
+          transactionHash,
+        },
+      },
+    },
+  );
+  // eslint-disable-next-line no-console
+  console.log('bridge claim withdrawal success event:', eventTarget, successEvent);
+  if (eventTarget !== undefined) eventTarget.dispatchEvent(successEvent);
+};
+
+export const sendBridgeClaimWithdrawalFailedEvent = (
+  eventTarget: Window | EventTarget,
+  transactionHash: string,
+  reason: string,
+) => {
+  const failedEvent = new CustomEvent<WidgetEvent<WidgetType.BRIDGE, BridgeEventType.CLAIM_WITHDRAWAL_FAILURE>>(
+    IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT,
+    {
+      detail: {
+        type: BridgeEventType.CLAIM_WITHDRAWAL_FAILURE,
+        data: {
+          transactionHash,
+          reason,
+          timestamp: new Date().getTime(),
+        },
+      },
+    },
+  );
+  // eslint-disable-next-line no-console
+  console.log('bridge claim withdrawal failed event:', eventTarget, failedEvent);
+  if (eventTarget !== undefined) eventTarget.dispatchEvent(failedEvent);
+};

@@ -17,6 +17,7 @@ import { BigNumber } from 'ethers';
 import { FlowRateWithdrawResponse } from '@imtbl/bridge-sdk';
 import { NotEnoughEthToWithdraw } from 'components/Transactions/NotEnoughEthToWithdraw';
 import { FeeData } from '@ethersproject/providers';
+import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
@@ -194,8 +195,16 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
         provider: providerToUse,
         transaction: withdrawalResponse.unsignedTx,
       });
-      // eslint-disable-next-line no-console
-      console.log(response);
+
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: BridgeWidgetViews.CLAIM_WITHDRAWAL_IN_PROGRESS,
+            transactionResponse: response.transactionResponse,
+          },
+        },
+      });
     } catch (err) {
       // eslint-disable-next-line no-console
       console.log(err);

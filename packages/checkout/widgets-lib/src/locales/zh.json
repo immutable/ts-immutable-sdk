@@ -503,6 +503,19 @@
       "footer": {
         "buttonText": "继续",
         "retryText": "重试"
+      },
+      "IN_PROGRESS": {
+        "loading": {
+          "text": "处理中"
+        },
+        "success": {
+          "text": "成功",
+          "actionText": "完成"
+        },
+        "failure": {
+          "text": "交易失败",
+          "actionText": "请重试"
+        }
       }
     }
   },

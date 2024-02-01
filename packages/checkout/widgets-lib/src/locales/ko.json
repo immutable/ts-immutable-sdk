@@ -503,6 +503,19 @@
       "footer": {
         "buttonText": "계속",
         "retryText": "다시 시도"
+      },
+      "IN_PROGRESS": {
+        "loading": {
+          "text": "처리 중"
+        },
+        "success": {
+          "text": "성공",
+          "actionText": "완료"
+        },
+        "failure": {
+          "text": "거래 실패",
+          "actionText": "다시 시도"
+        }
       }
     }
   },
