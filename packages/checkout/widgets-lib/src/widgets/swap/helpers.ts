@@ -1,5 +1,4 @@
 import { TokenInfo, IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
-import { useTranslation } from 'react-i18next';
 import { orchestrationEvents } from '../../lib/orchestrationEvents';
 
 // eslint-disable-next-line max-len
@@ -8,11 +7,10 @@ export const alphaSortTokensList = (tokens: TokenInfo[]): TokenInfo[] => tokens.
 export const topUpBridgeOption = (
   isBridgeEnabled: boolean,
   isNotPassport: boolean,
-): { text: string, action: () => void } | undefined => {
+): { textKey: string, action: () => void } | undefined => {
   if (isBridgeEnabled && isNotPassport) {
-    const { t } = useTranslation();
     return {
-      text: t('views.TOP_UP_VIEW.topUpOptions.bridge.heading'),
+      textKey: 'views.TOP_UP_VIEW.topUpOptions.bridge.heading',
       action: () => {
         orchestrationEvents.sendRequestBridgeEvent(
           window,
@@ -28,11 +26,10 @@ export const topUpBridgeOption = (
   return undefined;
 };
 
-export const topUpOnRampOption = (isOnRampEnabled: boolean): { text: string, action: () => void } | undefined => {
+export const topUpOnRampOption = (isOnRampEnabled: boolean): { textKey: string, action: () => void } | undefined => {
   if (isOnRampEnabled) {
-    const { t } = useTranslation();
     return {
-      text: t('views.TOP_UP_VIEW.topUpOptions.onramp.heading'),
+      textKey: 'views.TOP_UP_VIEW.topUpOptions.onramp.heading',
       action: () => {
         orchestrationEvents.sendRequestOnrampEvent(
           window,
