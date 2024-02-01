@@ -66,7 +66,10 @@
       "heading": {
         "swap": "您所在的地区无法使用兑换服务"
       },
-      "body": "很抱歉我们无法在您的地区提供此项服务。"
+      "body": "很抱歉我们无法在您的地区提供此项服务。",
+      "ctaLinkText": "Quickswap’s",
+      "ctaLinkUrl": "https://quickswap.exchange/",
+      "cta": " 更多信息请访问网站。"
     },
     "LOADING_VIEW": {
       "text": "加载中"

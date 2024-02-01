@@ -1,5 +1,5 @@
-import { Box, Button } from '@biom3/react';
 import { useTranslation } from 'react-i18next';
+import { Box, Button, Link } from '@biom3/react';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
 import { SimpleTextBody } from '../../components/Body/SimpleTextBody';
@@ -38,6 +38,13 @@ export function ServiceUnavailableErrorView({
     >
       <SimpleTextBody heading={t(`views.SERVICE_UNAVAILABLE_ERROR_VIEW.heading.${service}`)}>
         {t('views.SERVICE_UNAVAILABLE_ERROR_VIEW.body')}
+        <Link
+          size="small"
+          rc={<a target="_blank" href={t('views.SERVICE_UNAVAILABLE_ERROR_VIEW.ctaLinkUrl')} rel="noreferrer" />}
+        >
+          {t('views.SERVICE_UNAVAILABLE_ERROR_VIEW.ctaLinkText')}
+        </Link>
+        {t('views.SERVICE_UNAVAILABLE_ERROR_VIEW.cta')}
       </SimpleTextBody>
 
       <Box
