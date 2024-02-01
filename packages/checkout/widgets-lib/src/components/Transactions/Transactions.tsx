@@ -38,7 +38,11 @@ import { KnownNetworkMap } from './transactionsType';
 import { TransactionList } from './TransactionList';
 import { NoTransactions } from './NoTransactions';
 
-export function Transactions() {
+type TransactionsProps = {
+  onBackButtonClick: () => void;
+};
+
+export function Transactions({ onBackButtonClick }: TransactionsProps) {
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const { cryptoFiatDispatch } = useContext(CryptoFiatContext);
@@ -292,6 +296,7 @@ export function Transactions() {
       header={(
         <HeaderNavigation
           showBack
+          onBackButtonClick={onBackButtonClick}
           title={t('views.TRANSACTIONS.layoutHeading')}
           onCloseButtonClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
         />

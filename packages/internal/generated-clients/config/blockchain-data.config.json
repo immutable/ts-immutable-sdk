@@ -6,11 +6,15 @@
   "modelPackage": "models",
   "apiPackage": "domain",
   "useSingleRequestParameter": true,
-  "templateDir": "app/src/templates",
+  "templateDir": "app/templates/blockchain-data",
   "files": {
-    "api-types.mustache": {
+    "index.mustache": {
+      "templateType": "SupportingFiles",
+      "destinationFilename": "index.ts"
+    },
+    "apiInner.mustache": {
       "templateType": "API",
-      "destinationFilename": "-types.ts"
+      "destinationFilename": ".ts"
     }
   }
 }
