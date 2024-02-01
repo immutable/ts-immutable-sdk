@@ -476,6 +476,9 @@
           }
         }
       },
+      "changeWallet": {
+        "buttonText": "Change wallet"
+      },
       "fiatPricePrefix": "≈ USD $",
       "support": {
         "body1": "Need help?",
@@ -489,6 +492,30 @@
       },
       "walletSelection": {
         "heading": "Choose a wallet to view"
+      }
+    },
+    "CLAIM_WITHDRAWAL": {
+      "content": {
+        "heading": "Follow the prompts to receive your coins on ",
+        "body": "You’ll be asked to pay a small gas fee to claim your withdrawal.",
+        "body2": "Destination wallet address: "
+      },
+      "footer": {
+        "buttonText": "Continue",
+        "retryText": "Try again"
+      },
+      "IN_PROGRESS": {
+        "loading": {
+          "text": "Processing"
+        },
+        "success": {
+          "text": "Success",
+          "actionText": "Done"
+        },
+        "failure": {
+          "text": "Transaction failed",
+          "actionText": "Try again"
+        }
       }
     }
   },

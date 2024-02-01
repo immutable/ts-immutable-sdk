@@ -479,6 +479,9 @@
           }
         }
       },
+      "changeWallet": {
+        "buttonText": "ウォレットを変更する"
+      },
       "fiatPricePrefix": "≈ USD $",
       "support": {
         "body1": "サポートが必要ですか？",
@@ -492,6 +495,30 @@
       },
       "walletSelection": {
         "heading": "表示するウォレットを選択"
+      }
+    },
+    "CLAIM_WITHDRAWAL": {
+      "content": {
+        "heading": "コインを受け取るためのプロンプトに従ってください",
+        "body": "引き出しを請求するには小額のガス手数料が必要です。",
+        "body2": "目的地ウォレットアドレス："
+      },
+      "footer": {
+        "buttonText": "続行",
+        "retryText": "もう一度試す"
+      },
+      "IN_PROGRESS": {
+        "loading": {
+          "text": "処理中"
+        },
+        "success": {
+          "text": "成功",
+          "actionText": "完了"
+        },
+        "failure": {
+          "text": "取引失敗",
+          "actionText": "再試行"
+        }
       }
     }
   },

@@ -9,8 +9,10 @@ import {
 } from '@biom3/react';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { Transaction, TransactionStatus } from 'lib/clients/checkoutApiType';
-import { useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
+import { ViewActions, ViewContext } from 'context/view-context/ViewContext';
 import { actionsContainerStyles, actionsLayoutStyles, containerStyles } from './transactionItemStyles';
 import { TransactionDetails } from './TransactionDetails';
 
@@ -27,6 +29,7 @@ export function TransactionItemWithdrawPending({
   fiatAmount,
   amount,
 }: TransactionItemWithdrawPendingProps) {
+  const { viewDispatch } = useContext(ViewContext);
   const { track } = useAnalytics();
   const translation = useTranslation();
 
@@ -69,8 +72,15 @@ export function TransactionItemWithdrawPending({
   );
 
   const handleWithdrawalClaimClick = () => {
-    // WT-2053 - https://immutable.atlassian.net/browse/WT-2053
-    // entrypoint for claim withdrawal
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: BridgeWidgetViews.CLAIM_WITHDRAWAL,
+          transaction,
+        },
+      },
+    });
   };
 
   return (

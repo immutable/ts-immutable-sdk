@@ -476,6 +476,9 @@
           }
         }
       },
+      "changeWallet": {
+        "buttonText": "지갑 변경"
+      },
       "fiatPricePrefix": "≈ USD $",
       "support": {
         "body1": "도움이 필요하신가요?",
@@ -489,6 +492,30 @@
       },
       "walletSelection": {
         "heading": "보려는 지갑 선택"
+      }
+    },
+    "CLAIM_WITHDRAWAL": {
+      "content": {
+        "heading": "코인을 받으려면 프롬프트에 따라 진행하십시오",
+        "body": "출금을 청구하려면 소액의 가스 수수료를 지불해야 합니다.",
+        "body2": "목적지 지갑 주소: "
+      },
+      "footer": {
+        "buttonText": "계속",
+        "retryText": "다시 시도"
+      },
+      "IN_PROGRESS": {
+        "loading": {
+          "text": "처리 중"
+        },
+        "success": {
+          "text": "성공",
+          "actionText": "완료"
+        },
+        "failure": {
+          "text": "거래 실패",
+          "actionText": "다시 시도"
+        }
       }
     }
   },
