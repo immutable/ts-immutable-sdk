@@ -212,7 +212,7 @@ export const useSignOrder = (input: SignOrderInput) => {
         }`.toLowerCase();
         transactionHash = (err as any)?.transactionHash;
 
-        let errorType = SaleErrorTypes.DEFAULT;
+        let errorType = SaleErrorTypes.WALLET_FAILED;
         if (reason.includes('rejected') && reason.includes('user')) {
           errorType = SaleErrorTypes.WALLET_REJECTED;
         }
