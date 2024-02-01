@@ -15,6 +15,7 @@ export type Transactions = {
 export type CurrentStatus = {
   status: string;
   withdrawal_ready_at?: string;
+  index?: number;
 };
 
 export type TransactionDetails = {

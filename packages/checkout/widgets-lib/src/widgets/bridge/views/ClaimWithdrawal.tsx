@@ -60,15 +60,20 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
     });
   }, [viewDispatch]);
 
+  /**
+    * This effect should load the transaction that should be ready to be withdrawn.
+    * There should be a receiver -> details.to_address AND
+    * there should be an index ->  details.current_status.index
+    */
   useEffect(() => {
     const getWithdrawalTxn = async () => {
-      if (!tokenBridge) return;
+      if (!tokenBridge || !transaction || !transaction.details.current_status.index) return;
       // get withdrawal transaction from the token bridge by receipient address and index
       setLoading(true);
       try {
         const flowRateWithdrawTxnResponse = await tokenBridge?.getFlowRateWithdrawTx({
           recipient: transaction.details.to_address,
-          index: 0, // TODO: update index from transaction when it comes through from backend
+          index: transaction.details.current_status.index,
         });
         setWithdrawalResponse(flowRateWithdrawTxnResponse);
       } catch (err) {
@@ -79,7 +84,7 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
       }
     };
     getWithdrawalTxn();
-  }, [tokenBridge]);
+  }, [tokenBridge, transaction]);
 
   const handleWithdrawalClaimClick = useCallback(async ({ forceChangeAccount }: { forceChangeAccount: boolean }) => {
     if (!checkout || !tokenBridge || !from?.web3Provider || !withdrawalResponse) return;
