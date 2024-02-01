@@ -461,6 +461,10 @@
     "metamask": {
       "heading": "MetaMask",
       "description": "ブロックチェーンアプリケーションとWeb3へのアクセス用のデジタルウォレット"
+    },
+    "wallet_connect": {
+      "heading": "WalletConnect",
+      "description": "どんなブロックチェーンウォレットにも接続できます"
     }
   },
   "drawers": {

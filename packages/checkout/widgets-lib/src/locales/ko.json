@@ -458,6 +458,10 @@
     "metamask": {
       "heading": "MetaMask",
       "description": "블록체인 애플리케이션 및 웹3에 액세스하기 위한 디지털 지갑"
+    },
+    "wallet_connect": {
+      "heading": "WalletConnect",
+      "description": "어떤 블록체인 지갑과도 연결할 수 있습니다"
     }
   },
   "drawers": {
