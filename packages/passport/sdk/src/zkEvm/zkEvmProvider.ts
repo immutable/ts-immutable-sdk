@@ -95,7 +95,6 @@ export class ZkEvmProvider implements Provider {
   private handleLogout = () => {
     const shouldEmitAccountsChanged = this.isLoggedIn();
 
-    this.authManager.removeUser();
     this.magicProvider = undefined;
     this.relayerClient = undefined;
     this.guardianClient = undefined;
