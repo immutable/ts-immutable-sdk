@@ -11,9 +11,12 @@ import { ethers } from 'ethers';
 
 async function multicall() {
 
-  const params = await setupForBridge();
+  // const params = await setupForBridge();
 
-  const provider = params.rootProvider;
+  // const provider = params.rootProvider;
+
+  const MAINNET_RPC_URL = 'https://eth.llamarpc.com';
+  const provider = new ethers.providers.JsonRpcProvider(MAINNET_RPC_URL);
 
   // Get Multicall contract instance.
   const multicall = new ethers.Contract(MULTICALL_ADDRESS, MULTICALL_ABI_ETHERS, provider);
