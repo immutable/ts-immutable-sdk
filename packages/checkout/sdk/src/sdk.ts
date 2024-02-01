@@ -68,29 +68,13 @@ import { loadUnresolved } from './widgets/load';
 import { WidgetsInit } from './types/widgets';
 import { HttpClient } from './api/http';
 import { isMatchingAddress } from './utils/utils';
-import { SANDBOX_CHAIN_ID_NETWORK_MAP } from './env';
+import { WALLET_CONNECT_PRODUCTION, WALLET_CONNECT_SANDBOX } from './env';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
     environment: Environment.SANDBOX,
   },
   passport: undefined,
-  walletConnectConfig: {
-    projectId: '938b553484e344b1e0b4bb80edf8c362',
-    showQrModal: true,
-    qrModalOptions: {
-      themeMode: 'dark',
-      themeVariables: {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        '--wcm-background-color': 'black',
-      },
-    },
-    optionalChains: [ChainId.SEPOLIA, ChainId.IMTBL_ZKEVM_TESTNET],
-    rpcMap: {
-      [ChainId.SEPOLIA]: SANDBOX_CHAIN_ID_NETWORK_MAP.get(ChainId.SEPOLIA)!.rpcUrls[0],
-      [ChainId.IMTBL_ZKEVM_TESTNET]: SANDBOX_CHAIN_ID_NETWORK_MAP.get(ChainId.IMTBL_ZKEVM_TESTNET)!.rpcUrls[0],
-    },
-  },
 };
 const WIDGETS_SCRIPT_TIMEOUT = 100;
 
@@ -123,8 +107,14 @@ export class Checkout {
     this.readOnlyProviders = new Map<ChainId, ethers.providers.JsonRpcProvider>();
     this.availability = availabilityService(this.config.isDevelopment, this.config.isProduction);
     this.passport = config.passport;
-    this.walletConnectConfig = config.walletConnectConfig;
-    console.log('SDK wc chains', config.walletConnectConfig);
+
+    console.log('environment:', config.baseConfig.environment);
+    if (config.baseConfig.environment === Environment.PRODUCTION) {
+      this.walletConnectConfig = WALLET_CONNECT_PRODUCTION;
+    } else {
+      this.walletConnectConfig = WALLET_CONNECT_SANDBOX;
+    }
+    console.log('SDK wc chains', this.walletConnectConfig);
   }
 
   /**

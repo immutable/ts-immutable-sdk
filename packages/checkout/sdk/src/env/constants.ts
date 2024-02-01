@@ -389,3 +389,37 @@ export const GAS_OVERRIDES = {
   maxFeePerGas: BigNumber.from(102e9),
   maxPriorityFeePerGas: BigNumber.from(101e9),
 };
+
+export const WALLET_CONNECT_PRODUCTION = {
+  projectId: '938b553484e344b1e0b4bb80edf8c362',
+  showQrModal: true,
+  qrModalOptions: {
+    themeMode: 'dark',
+    themeVariables: {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      '--wcm-background-color': 'black',
+    },
+  },
+  optionalChains: [ChainId.ETHEREUM, ChainId.IMTBL_ZKEVM_MAINNET],
+  rpcMap: {
+    [ChainId.ETHEREUM]: PRODUCTION_CHAIN_ID_NETWORK_MAP.get(ChainId.ETHEREUM)!.rpcUrls[0],
+    [ChainId.IMTBL_ZKEVM_MAINNET]: PRODUCTION_CHAIN_ID_NETWORK_MAP.get(ChainId.IMTBL_ZKEVM_MAINNET)!.rpcUrls[0],
+  },
+};
+
+export const WALLET_CONNECT_SANDBOX = {
+  projectId: '938b553484e344b1e0b4bb80edf8c362',
+  showQrModal: true,
+  qrModalOptions: {
+    themeMode: 'dark',
+    themeVariables: {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      '--wcm-background-color': 'black',
+    },
+  },
+  optionalChains: [ChainId.SEPOLIA, ChainId.IMTBL_ZKEVM_TESTNET],
+  rpcMap: {
+    [ChainId.SEPOLIA]: SANDBOX_CHAIN_ID_NETWORK_MAP.get(ChainId.SEPOLIA)!.rpcUrls[0],
+    [ChainId.IMTBL_ZKEVM_TESTNET]: SANDBOX_CHAIN_ID_NETWORK_MAP.get(ChainId.IMTBL_ZKEVM_TESTNET)!.rpcUrls[0],
+  },
+};

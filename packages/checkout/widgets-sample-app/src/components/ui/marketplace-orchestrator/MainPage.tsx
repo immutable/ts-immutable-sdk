@@ -15,13 +15,12 @@ import {
   SwapEventType,
   WalletEventType,
   WalletNetworkSwitch,
-  WidgetTheme, WidgetType, ProviderEventType, ProviderUpdated, WidgetConfiguration, WidgetProperties, ChainId
+  WidgetTheme, WidgetType, WidgetProperties
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { passport } from './passport';
 import { LanguageSelector } from './LanguageSelector';
 import Provider, { EthereumProvider } from '@walletconnect/ethereum-provider';
-import { SANDBOX_CHAIN_ID_NETWORK_MAP } from '@imtbl/checkout-sdk/dist/env';
 
 // Create one instance of Checkout and inject Passport
 const checkout = new Checkout({
@@ -30,21 +29,6 @@ const checkout = new Checkout({
     publishableKey: 'pk_imapik-test-pCHFU0GpQImZx9UzSnU3',
   },
   passport,
-  walletConnectConfig: {
-    projectId: '938b553484e344b1e0b4bb80edf8c362',
-    showQrModal: true,
-    qrModalOptions: {
-      themeMode: 'dark',
-      themeVariables: {
-        '--wcm-background-color': 'black'
-      }
-    },
-    optionalChains: [ChainId.SEPOLIA, ChainId.IMTBL_ZKEVM_TESTNET],
-    rpcMap: {
-      [ChainId.SEPOLIA]: 'https://checkout-api.sandbox.immutable.com/v1/rpc/eth-sepolia',
-      [ChainId.IMTBL_ZKEVM_TESTNET]: 'https://rpc.testnet.immutable.com'
-    }
-  }
 })
 
 export const MainPage = () => {
@@ -129,41 +113,26 @@ export const MainPage = () => {
     await passport.logout();
   }, [passport])
 
-  const initialiseWalletConnect = async () => {
-    const walletConnectProvider = await EthereumProvider.init({
-      projectId: '938b553484e344b1e0b4bb80edf8c362',
-      showQrModal: true,
-      qrModalOptions: {
-        themeMode: 'dark',
-        themeVariables: {
-          '--wcm-background-color': 'black'
-        }
-      },
-      optionalChains: [ChainId.SEPOLIA, ChainId.IMTBL_ZKEVM_TESTNET],
-      rpcMap: {
-        [ChainId.SEPOLIA]: checkout.config.networkMap.get(ChainId.SEPOLIA)!.rpcUrls[0],
-        [ChainId.IMTBL_ZKEVM_TESTNET]: checkout.config.networkMap.get(ChainId.IMTBL_ZKEVM_TESTNET)!.rpcUrls[0]
-      }
-    });
-    console.log("walletConnectProvider", walletConnectProvider);
-    setWcProvider(walletConnectProvider)
+  // const initialiseWalletConnect = async () => {
+  //   const walletConnectProvider = await EthereumProvider.init(checkout.walletConnectConfig);
+  //   console.log("walletConnectProvider", walletConnectProvider);
+  //   setWcProvider(walletConnectProvider)
 
+  //   const accounts = await walletConnectProvider.enable();
+  //   console.log("accounts", accounts);
 
+  //   if (walletConnectProvider) {
+  //     const wrappedWcProvider = new Web3Provider(walletConnectProvider);
+  //     widgetsFactory.updateProvider(wrappedWcProvider);
+  //   }
+  // }
 
-    const accounts = await walletConnectProvider.enable();
-    console.log("accounts", accounts);
-
-    if (walletConnectProvider) {
-      const wrappedWcProvider = new Web3Provider(walletConnectProvider);
-      widgetsFactory.updateProvider(wrappedWcProvider);
-    }
-  }
-
-  const disconnectWalletConnect = async () => {
-    console.log('disconnecting wallet connect provider');
-    await (wcProvider as Provider).disconnect();
-    console.log('disconnected');
-  }
+  // const disconnectWalletConnect = async () => {
+  //   console.log('disconnecting wallet connect provider');
+  //   console.log('wcProvider', wcProvider)
+  //   await (wcProvider as Provider).disconnect();
+  //   console.log('disconnected');
+  // }
 
 
   const updateLanguage = useCallback((language: string) => {
@@ -187,8 +156,8 @@ export const MainPage = () => {
           <Button onClick={openBridgeWidget}>Bridge</Button>
           <Button onClick={openOnRampWidget}>On-ramp</Button>
           <LanguageSelector onLanguageChange={(language: string) => updateLanguage(language)} language={selectedLanguage} />
-          <Button onClick={initialiseWalletConnect}>Wallet Connect</Button>
-          <Button onClick={disconnectWalletConnect}>Disconnect WC</Button>
+          {/* <Button onClick={initialiseWalletConnect}>Wallet Connect</Button> */}
+          {/* <Button onClick={disconnectWalletConnect}>Disconnect WC</Button> */}
         </Box>
         {passport && web3Provider && (web3Provider.provider as any)?.isPassport && <Button onClick={logout}>Passport Logout</Button>}
       </Box>

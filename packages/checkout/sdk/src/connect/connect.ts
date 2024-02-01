@@ -48,6 +48,10 @@ export async function connectSite(web3Provider: Web3Provider): Promise<Web3Provi
     );
   }
 
+  if ((web3Provider.provider as any)?.isWalletConnect) {
+    await (web3Provider.provider as any).disconnect();
+  }
+
   await withCheckoutError<void>(
     async () => {
       if (!web3Provider.provider.request) return;
