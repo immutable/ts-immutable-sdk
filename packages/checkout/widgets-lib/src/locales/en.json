@@ -503,6 +503,19 @@
       "footer": {
         "buttonText": "Continue",
         "retryText": "Try again"
+      },
+      "IN_PROGRESS": {
+        "loading": {
+          "text": "Processing"
+        },
+        "success": {
+          "text": "Success",
+          "actionText": "Done"
+        },
+        "failure": {
+          "text": "Transaction failed",
+          "actionText": "Try again"
+        }
       }
     }
   },

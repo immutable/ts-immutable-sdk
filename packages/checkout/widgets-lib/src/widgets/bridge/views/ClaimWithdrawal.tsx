@@ -15,6 +15,7 @@ import { WalletProviderName } from '@imtbl/checkout-sdk';
 import { isNativeToken } from 'lib/utils';
 import { BigNumber } from 'ethers';
 import { FlowRateWithdrawResponse } from '@imtbl/bridge-sdk';
+import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
@@ -169,13 +170,20 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
 
     // send transaction to wallet for signing
     try {
-      // TODO: WT-2054 Update view to go to in progress screens and pass through sendTransaction response
+      const response = await checkout.sendTransaction({
+        provider: providerToUse,
+        transaction: withdrawalResponse.unsignedTx,
+      });
 
-      // const response = await checkout.sendTransaction({
-      //   provider: providerToUse,
-      //   transaction: withdrawalResponse.unsignedTx,
-      // });
-
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: BridgeWidgetViews.CLAIM_WITHDRAWAL_IN_PROGRESS,
+            transactionResponse: response.transactionResponse,
+          },
+        },
+      });
     } catch (err) {
       // eslint-disable-next-line no-console
       console.log(err);
