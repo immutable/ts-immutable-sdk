@@ -117,46 +117,49 @@ export class Swap extends Base<WidgetType.SWAP> {
           <React.StrictMode>
             <CustomAnalyticsProvider checkout={this.checkout}>
               <ThemeProvider id="swap-container" config={this.strongConfig()}>
-                {!isSwapAvailable && (
-                <ServiceUnavailableErrorView
-                  service={ServiceType.SWAP}
-                  onCloseClick={() => sendSwapWidgetCloseEvent(window)}
-                  primaryActionText={
+                {
+                isSwapAvailable
+                  ? (
+                    <ConnectLoader
+                      params={connectLoaderParams}
+                      widgetConfig={this.strongConfig()}
+                      closeEvent={() => sendSwapWidgetCloseEvent(window)}
+                    >
+                      <SwapWidget
+                        fromTokenAddress={this.parameters.fromTokenAddress}
+                        toTokenAddress={this.parameters.toTokenAddress}
+                        amount={this.parameters.amount}
+                        config={this.strongConfig()}
+                      />
+                    </ConnectLoader>
+                  )
+                  : (
+                    <ServiceUnavailableErrorView
+                      service={ServiceType.SWAP}
+                      onCloseClick={() => sendSwapWidgetCloseEvent(window)}
+                      primaryActionText={
                         topUpOptions && topUpOptions?.length > 0
                           ? t(topUpOptions[0].textKey)
                           : undefined
                       }
-                  onPrimaryButtonClick={
+                      onPrimaryButtonClick={
                         topUpOptions && topUpOptions?.length > 0
                           ? topUpOptions[0].action
                           : undefined
                       }
-                  secondaryActionText={
+                      secondaryActionText={
                         topUpOptions?.length === 2
                           ? t(topUpOptions[1].textKey)
                           : undefined
                       }
-                  onSecondaryButtonClick={
+                      onSecondaryButtonClick={
                         topUpOptions?.length === 2
                           ? topUpOptions[1].action
                           : undefined
                       }
-                />
-                )}
-                {isSwapAvailable && (
-                  <ConnectLoader
-                    params={connectLoaderParams}
-                    widgetConfig={this.strongConfig()}
-                    closeEvent={() => sendSwapWidgetCloseEvent(window)}
-                  >
-                    <SwapWidget
-                      fromTokenAddress={this.parameters.fromTokenAddress}
-                      toTokenAddress={this.parameters.toTokenAddress}
-                      amount={this.parameters.amount}
-                      config={this.strongConfig()}
                     />
-                  </ConnectLoader>
-                )}
+                  )
+                }
               </ThemeProvider>
             </CustomAnalyticsProvider>
           </React.StrictMode>,
