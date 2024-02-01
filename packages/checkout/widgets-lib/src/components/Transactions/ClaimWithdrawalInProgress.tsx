@@ -54,6 +54,7 @@ export function ClaimWithdrawalInProgress({ transactionResponse }: ClaimWithdraw
           },
         });
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error(error);
         viewDispatch({
           payload: {
