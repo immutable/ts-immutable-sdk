@@ -48,6 +48,7 @@ export function ClaimWithdrawalInProgress({ transactionResponse }: ClaimWithdraw
             type: ViewActions.UPDATE_VIEW,
             view: {
               type: BridgeWidgetViews.CLAIM_WITHDRAWAL_FAILURE,
+              transactionHash: receipt.transactionHash,
               reason: 'Transaction failed',
             },
           },

@@ -79,5 +79,6 @@ export interface BridgeClaimWithdrawalSuccess extends ViewType {
 
 interface BridgeClaimWithdrawalFailure extends ViewType {
   type: BridgeWidgetViews.CLAIM_WITHDRAWAL_FAILURE,
+  transactionHash?: string;
   reason: string;
 }
