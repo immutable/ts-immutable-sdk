@@ -23,7 +23,10 @@ const imxApiClients = new ImxApiClients(imxApiConfig.getSandbox());
 ### Immutable Multi-Rollup
 
 ```typescript
-import { MultiRollupApiClients, multiRollupConfig } from '@imtbl/generated-clients';
+import {
+  MultiRollupApiClients,
+  multiRollupConfig,
+} from '@imtbl/generated-clients';
 
 const mrApiClients = new MultiRollupApiClients(multiRollupConfig.sandbox);
 ```
@@ -56,4 +59,12 @@ Run the following command to regenerate the Immutable multi-rollup clients:
 
 ```bash
 make generate-mr-openapi
+```
+
+## View generators
+
+To inspect underlying generator files, run:
+
+```bash
+openapi-generator author template -g typescript-axios -o src/templates
 ```
