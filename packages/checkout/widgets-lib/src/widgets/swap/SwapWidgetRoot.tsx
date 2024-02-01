@@ -117,7 +117,7 @@ export class Swap extends Base<WidgetType.SWAP> {
           <React.StrictMode>
             <CustomAnalyticsProvider checkout={this.checkout}>
               <ThemeProvider id="swap-container" config={this.strongConfig()}>
-                {isSwapAvailable && (
+                {!isSwapAvailable && (
                 <ServiceUnavailableErrorView
                   service={ServiceType.SWAP}
                   onCloseClick={() => sendSwapWidgetCloseEvent(window)}

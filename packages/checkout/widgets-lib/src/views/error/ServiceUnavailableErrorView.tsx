@@ -1,5 +1,5 @@
-import { useTranslation } from 'react-i18next';
 import { Box, Button, Link } from '@biom3/react';
+import { Trans, useTranslation } from 'react-i18next';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
 import { SimpleTextBody } from '../../components/Body/SimpleTextBody';
@@ -37,14 +37,15 @@ export function ServiceUnavailableErrorView({
       testId="service-unavailable-error-view"
     >
       <SimpleTextBody heading={t(`views.SERVICE_UNAVAILABLE_ERROR_VIEW.heading.${service}`)}>
-        {t('views.SERVICE_UNAVAILABLE_ERROR_VIEW.body')}
-        <Link
-          size="small"
-          rc={<a target="_blank" href={t('views.SERVICE_UNAVAILABLE_ERROR_VIEW.ctaLinkUrl')} rel="noreferrer" />}
-        >
-          {t('views.SERVICE_UNAVAILABLE_ERROR_VIEW.ctaLinkText')}
-        </Link>
-        {t('views.SERVICE_UNAVAILABLE_ERROR_VIEW.cta')}
+        <Trans
+          i18nKey={t(`views.SERVICE_UNAVAILABLE_ERROR_VIEW.body.${service}`)}
+          components={{
+            quickswapLink: <Link
+              size="small"
+              rc={<a target="_blank" href="https://quickswap.exchange" rel="noreferrer" />}
+            />,
+          }}
+        />
       </SimpleTextBody>
 
       <Box

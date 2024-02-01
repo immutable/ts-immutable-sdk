@@ -66,10 +66,9 @@
       "heading": {
         "swap": "Swapping is not available in your region"
       },
-      "body": "Please refer to Quickswap’s website for further information.",
-      "ctaLinkText": "Quickswap’s",
-      "ctaLinkUrl": "https://quickswap.exchange/",
-      "cta": " website for further information."
+      "body": {
+        "swap": "Please refer to <quickswapLink>Quickswap’s</quickswapLink> website for further information."
+      }
     },
     "LOADING_VIEW": {
       "text": "Loading"
