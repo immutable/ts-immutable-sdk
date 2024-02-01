@@ -37,7 +37,6 @@ export function NotEnoughGas({
   onAddCoinsClick,
 }:
 NotEnoughGasProps) {
-  // const { content, buttons } = text.drawers.notEnoughGas;
   const { t } = useTranslation();
   const [isCopied, setIsCopied] = useState(false);
 
