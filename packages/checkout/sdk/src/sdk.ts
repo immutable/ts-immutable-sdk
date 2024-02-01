@@ -76,7 +76,7 @@ const SANDBOX_CONFIGURATION = {
   },
   passport: undefined,
   walletConnectConfig: {
-    projectId: '45890e806b6248abd01ac1a6e2f46307',
+    projectId: '938b553484e344b1e0b4bb80edf8c362',
     showQrModal: true,
     qrModalOptions: {
       themeMode: 'dark',
