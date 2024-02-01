@@ -1,21 +1,22 @@
 import {
   Body,
-  Drawer, Box, Button, FramedImage, Heading, Logo,
+  Drawer, Box, Button, Heading, Logo, CloudImage,
 } from '@biom3/react';
 import { useCallback, useState } from 'react';
 import { ETH_TOKEN_SYMBOL } from 'lib';
+import { Environment } from '@imtbl/config';
+import { getEthTokenImage, getImxTokenImage } from 'lib/utils';
 import {
   containerStyles,
   contentTextStyles,
   actionButtonStyles,
   actionButtonContainerStyles,
   logoContainerStyles,
-  ethLogoStyles,
-  imxLogoStyles,
 } from './NotEnoughGasStyles';
 import { text } from '../../resources/text/textConfig';
 
 type NotEnoughGasProps = {
+  environment: Environment;
   visible?: boolean;
   showHeaderBar?: boolean;
   walletAddress: string;
@@ -26,6 +27,7 @@ type NotEnoughGasProps = {
 };
 
 export function NotEnoughGas({
+  environment,
   onCloseDrawer,
   visible,
   showHeaderBar,
@@ -33,14 +35,12 @@ export function NotEnoughGas({
   showAdjustAmount,
   tokenSymbol,
   onAddCoinsClick,
-}:
-NotEnoughGasProps) {
+}: NotEnoughGasProps) {
   const { content, buttons } = text.drawers.notEnoughGas;
 
   const [isCopied, setIsCopied] = useState(false);
-
-  const ethLogo = 'https://design-system.immutable.com/hosted-for-ds/currency-icons/currency--eth.svg';
-  const imxLogo = 'https://design-system.immutable.com/hosted-for-ds/currency-icons/currency--imx.svg';
+  const ethLogo = getEthTokenImage(environment);
+  const imxLogo = getImxTokenImage(environment);
   const heading = tokenSymbol === ETH_TOKEN_SYMBOL ? `${content.eth.heading}` : `${content.imx.heading}`;
   const body = tokenSymbol === ETH_TOKEN_SYMBOL ? `${content.eth.body}` : `${content.imx.body}`;
 
@@ -65,11 +65,15 @@ NotEnoughGasProps) {
     >
       <Drawer.Content>
         <Box testId="not-enough-gas-bottom-sheet" sx={containerStyles}>
-          <FramedImage
-            imageUrl={tokenSymbol === 'ETH' ? ethLogo : imxLogo}
-            circularFrame
-            sx={tokenSymbol === ETH_TOKEN_SYMBOL ? ethLogoStyles : imxLogoStyles}
+          <CloudImage
+            imageUrl={
+              tokenSymbol === ETH_TOKEN_SYMBOL
+                ? ethLogo
+                : imxLogo
+            }
+            sx={{ w: 'base.icon.size.600', h: 'base.icon.size.600' }}
           />
+
           <Heading
             size="small"
             sx={contentTextStyles}

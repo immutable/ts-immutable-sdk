@@ -35,3 +35,8 @@ export const logoContainerStyles = {
   alignItems: 'center',
   paddingTop: 'base.spacing.x6',
 };
+
+export const imxLogoStyles = {
+  height: '110px',
+  width: '64px',
+};

@@ -105,3 +105,5 @@ export const PASSPORT_URL = {
   [Environment.SANDBOX]: 'https://passport.sandbox.immutable.com/',
   [Environment.PRODUCTION]: 'https://passport.immutable.com/',
 };
+
+export const WITHDRAWAL_CLAIM_GAS_LIMIT = 91000;

@@ -591,6 +591,18 @@
         "cancel": "Dismiss"
       }
     },
+    "notEnoughEthWithdrawal": {
+      "content": {
+        "heading1": "不足",
+        "heading2": "用于燃气",
+        "body1": "添加",
+        "body2": "到您的目标账户，或选择另一个账户支付燃气费。您的目标账户将保持不变。"
+      },
+      "buttons": {
+        "retry": "使用另一个账户支付燃气费",
+        "dismiss": "取消"
+      }
+    },
     "unableToSwap": {
       "heading": "Unable to swap this coin",
       "body": "This coin pairing isn't available to swap right now. Try another selection.",

@@ -591,6 +591,18 @@
         "cancel": "취소"
       }
     },
+    "notEnoughEthWithdrawal": {
+      "content": {
+        "heading1": "부족함",
+        "heading2": "가스용",
+        "body1": "추가",
+        "body2": "목적지 계정에 추가하거나 다른 계정을 선택하여 가스를 지불하십시오. 목적지 계정은 그대로 유지됩니다."
+      },
+      "buttons": {
+        "retry": "다른 계정으로 가스 지불",
+        "dismiss": "닫기"
+      }
+    },
     "unableToSwap": {
       "heading": "해당 코인 교환 불가",
       "body": "지금은 이 코인 페어를 교환할 수 없습니다. 다른 선택을 시도해보세요.",
