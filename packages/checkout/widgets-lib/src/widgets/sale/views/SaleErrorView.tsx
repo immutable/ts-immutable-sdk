@@ -67,9 +67,7 @@ export function SaleErrorView({
       },
     },
     [SaleErrorTypes.TRANSAK_FAILED]: {
-      onActionClick: () => {
-        /* TODO: start over the transak flow */
-      },
+      onActionClick: goBackToPaymentMethods,
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
     },
@@ -103,11 +101,6 @@ export function SaleErrorView({
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
     },
-    [SaleErrorTypes.DEFAULT]: {
-      onActionClick: goBackToPaymentMethods,
-      onSecondaryActionClick: closeWidget,
-      statusType: StatusType.INFORMATION,
-    },
     [SaleErrorTypes.INVALID_PARAMETERS]: {
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.ALERT,
@@ -115,6 +108,11 @@ export function SaleErrorView({
         fill: biomeTheme.color.status.attention.dim,
         transform: 'none',
       },
+    },
+    [SaleErrorTypes.DEFAULT]: {
+      onActionClick: goBackToPaymentMethods,
+      onSecondaryActionClick: closeWidget,
+      statusType: StatusType.INFORMATION,
     },
   };
 
