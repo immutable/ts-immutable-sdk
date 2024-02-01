@@ -2,9 +2,10 @@ import {
   Body,
   Box, Button, CloudImage, Drawer, Heading,
 } from '@biom3/react';
-import { CHECKOUT_CDN_BASE_URL } from 'lib';
-import { Environment } from '@imtbl/config';
+import { CHECKOUT_CDN_BASE_URL, ETH_TOKEN_SYMBOL } from 'lib';
 import { useTranslation } from 'react-i18next';
+import { useContext } from 'react';
+import { BridgeContext } from 'widgets/bridge/context/BridgeContext';
 import {
   actionButtonContainerStyles, actionButtonStyles, containerStyles, contentTextStyles,
 } from './NotEnoughEthToWithdrawStyles';
@@ -21,7 +22,8 @@ export function NotEnoughEthToWithdraw({
   onChangeAccount,
 }: NotEnoughEthToWithdrawProps) {
   const { t } = useTranslation();
-  const ethLogo = `${CHECKOUT_CDN_BASE_URL[Environment.PRODUCTION]}/v1/blob/img/tokens/eth.svg`;
+  const { bridgeState: { checkout } } = useContext(BridgeContext);
+  const ethLogo = `${CHECKOUT_CDN_BASE_URL[checkout.config.environment]}/v1/blob/img/tokens/eth.svg`;
 
   return (
     <Drawer
@@ -41,11 +43,11 @@ export function NotEnoughEthToWithdraw({
             testId="not-enough-gas-heading"
           >
             {/* eslint-disable-next-line max-len */}
-            {`${t('drawers.notEnoughEthWithdrawal.content.heading1')} ETH ${t('drawers.notEnoughEthWithdrawal.content.heading2')}`}
+            {`${t('drawers.notEnoughEthWithdrawal.content.heading1')} ${ETH_TOKEN_SYMBOL} ${t('drawers.notEnoughEthWithdrawal.content.heading2')}`}
           </Heading>
           <Body sx={contentTextStyles}>
             {/* eslint-disable-next-line max-len */}
-            {`${t('drawers.notEnoughEthWithdrawal.content.body1')} ETH ${t('drawers.notEnoughEthWithdrawal.content.body2')}`}
+            {`${t('drawers.notEnoughEthWithdrawal.content.body1')} ${ETH_TOKEN_SYMBOL} ${t('drawers.notEnoughEthWithdrawal.content.body2')}`}
           </Body>
           <Box sx={actionButtonContainerStyles}>
             <Button

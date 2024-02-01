@@ -8,6 +8,7 @@ import { fetchTokenSymbols } from 'lib/fetchTokenSymbols';
 import { CryptoFiatActions, CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext';
 import { ButtonNavigationStyles } from 'components/Header/HeaderStyles';
 import { useTranslation } from 'react-i18next';
+import { Environment } from '@imtbl/config';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -163,11 +164,11 @@ export function WalletBalances({
     if (!checkout || !network) return false;
     return (
       network.chainId === getL2ChainId(checkout.config)
-        && Boolean(
-          supportedTopUps?.isBridgeEnabled
-            || supportedTopUps?.isSwapEnabled
-            || supportedTopUps?.isOnRampEnabled,
-        )
+      && Boolean(
+        supportedTopUps?.isBridgeEnabled
+        || supportedTopUps?.isSwapEnabled
+        || supportedTopUps?.isOnRampEnabled,
+      )
     );
   }, [checkout, network, supportedTopUps]);
 
@@ -240,11 +241,11 @@ export function WalletBalances({
             sx={walletBalanceListContainerStyles(showNetworkMenu, showAddCoins)}
           >
             {balancesLoading && (
-            <Box sx={walletBalanceLoadingIconStyles}>
-              <MenuItem shimmer emphasized testId="balance-item-shimmer--1" />
-              <MenuItem shimmer emphasized testId="balance-item-shimmer--2" />
-              <MenuItem shimmer emphasized testId="balance-item-shimmer--3" />
-            </Box>
+              <Box sx={walletBalanceLoadingIconStyles}>
+                <MenuItem shimmer emphasized testId="balance-item-shimmer--1" />
+                <MenuItem shimmer emphasized testId="balance-item-shimmer--2" />
+                <MenuItem shimmer emphasized testId="balance-item-shimmer--3" />
+              </Box>
             )}
             {!balancesLoading && (
               <TokenBalanceList
@@ -265,6 +266,7 @@ export function WalletBalances({
           </MenuItem>
         )}
         <NotEnoughGas
+          environment={checkout?.config.environment ?? Environment.PRODUCTION}
           visible={showNotEnoughGasDrawer}
           showHeaderBar={false}
           onCloseDrawer={() => setShowNotEnoughGasDrawer(false)}

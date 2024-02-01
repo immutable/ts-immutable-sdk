@@ -14,6 +14,7 @@ import {
 } from './NotEnoughImxStyles';
 
 type NotEnoughImxProps = {
+  environment: Environment;
   visible: boolean;
   showAdjustAmount: boolean;
   hasZeroImx: boolean;
@@ -22,11 +23,16 @@ type NotEnoughImxProps = {
 };
 
 export function NotEnoughImx({
-  visible, showAdjustAmount, hasZeroImx, onCloseDrawer, onAddCoinsClick,
+  environment,
+  visible,
+  showAdjustAmount,
+  hasZeroImx,
+  onCloseDrawer,
+  onAddCoinsClick,
 }: NotEnoughImxProps) {
   const { t } = useTranslation();
 
-  const imxLogo = `${CHECKOUT_CDN_BASE_URL[Environment.PRODUCTION]}/v1/blob/img/tokens/imx.svg`;
+  const imxLogo = `${CHECKOUT_CDN_BASE_URL[environment]}/v1/blob/img/tokens/imx.svg`;
 
   return (
     <Drawer

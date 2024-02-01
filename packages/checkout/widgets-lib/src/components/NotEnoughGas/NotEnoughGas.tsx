@@ -15,6 +15,7 @@ import {
 import { text } from '../../resources/text/textConfig';
 
 type NotEnoughGasProps = {
+  environment: Environment;
   visible?: boolean;
   showHeaderBar?: boolean;
   walletAddress: string;
@@ -25,6 +26,7 @@ type NotEnoughGasProps = {
 };
 
 export function NotEnoughGas({
+  environment,
   onCloseDrawer,
   visible,
   showHeaderBar,
@@ -36,8 +38,8 @@ export function NotEnoughGas({
   const { content, buttons } = text.drawers.notEnoughGas;
 
   const [isCopied, setIsCopied] = useState(false);
-  const ethLogo = `${CHECKOUT_CDN_BASE_URL[Environment.PRODUCTION]}/v1/blob/img/tokens/eth.svg`;
-  const imxLogo = `${CHECKOUT_CDN_BASE_URL[Environment.PRODUCTION]}/v1/blob/img/tokens/imx.svg`;
+  const ethLogo = `${CHECKOUT_CDN_BASE_URL[environment]}/v1/blob/img/tokens/eth.svg`;
+  const imxLogo = `${CHECKOUT_CDN_BASE_URL[environment]}/v1/blob/img/tokens/imx.svg`;
   const heading = tokenSymbol === ETH_TOKEN_SYMBOL ? `${content.eth.heading}` : `${content.imx.heading}`;
   const body = tokenSymbol === ETH_TOKEN_SYMBOL ? `${content.eth.body}` : `${content.imx.body}`;
 
