@@ -197,6 +197,7 @@ export function BridgeReviewSummary() {
           isMetaMask: isMetaMaskProvider(to?.web3Provider),
         },
         amount,
+        fiatAmount: fromFiatAmount,
         tokenAddress: token?.address,
       },
     });
