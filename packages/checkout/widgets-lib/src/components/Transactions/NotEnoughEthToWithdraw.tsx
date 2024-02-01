@@ -21,7 +21,7 @@ export function NotEnoughEthToWithdraw({
   onChangeAccount,
 }: NotEnoughEthToWithdrawProps) {
   const { t } = useTranslation();
-  const ethLogo = `${CHECKOUT_CDN_BASE_URL[Environment.SANDBOX]}/v1/blob/img/tokens/eth.svg`;
+  const ethLogo = `${CHECKOUT_CDN_BASE_URL[Environment.PRODUCTION]}/v1/blob/img/tokens/eth.svg`;
 
   return (
     <Drawer
