@@ -3,8 +3,8 @@ import {
   Drawer, Box, Button, Heading, Logo, CloudImage,
 } from '@biom3/react';
 import { useTranslation } from 'react-i18next';
-import { CHECKOUT_CDN_BASE_URL } from '@imtbl/checkout-sdk/dist/env';
 import { Environment } from '@imtbl/config';
+import { getImxTokenImage } from 'lib/utils';
 import {
   containerStyles,
   contentTextStyles,
@@ -32,7 +32,7 @@ export function NotEnoughImx({
 }: NotEnoughImxProps) {
   const { t } = useTranslation();
 
-  const imxLogo = `${CHECKOUT_CDN_BASE_URL[environment]}/v1/blob/img/tokens/imx.svg`;
+  const imxLogo = getImxTokenImage(environment);
 
   return (
     <Drawer

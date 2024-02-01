@@ -2,10 +2,11 @@ import {
   Body,
   Box, Button, CloudImage, Drawer, Heading,
 } from '@biom3/react';
-import { CHECKOUT_CDN_BASE_URL, ETH_TOKEN_SYMBOL } from 'lib';
+import { ETH_TOKEN_SYMBOL } from 'lib';
 import { useTranslation } from 'react-i18next';
 import { useContext } from 'react';
 import { BridgeContext } from 'widgets/bridge/context/BridgeContext';
+import { getEthTokenImage } from 'lib/utils';
 import {
   actionButtonContainerStyles, actionButtonStyles, containerStyles, contentTextStyles,
 } from './NotEnoughEthToWithdrawStyles';
@@ -23,7 +24,7 @@ export function NotEnoughEthToWithdraw({
 }: NotEnoughEthToWithdrawProps) {
   const { t } = useTranslation();
   const { bridgeState: { checkout } } = useContext(BridgeContext);
-  const ethLogo = `${CHECKOUT_CDN_BASE_URL[checkout.config.environment]}/v1/blob/img/tokens/eth.svg`;
+  const ethLogo = getEthTokenImage(checkout.config.environment);
 
   return (
     <Drawer

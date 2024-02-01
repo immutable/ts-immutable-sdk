@@ -3,8 +3,9 @@ import {
   Drawer, Box, Button, Heading, Logo, CloudImage,
 } from '@biom3/react';
 import { useCallback, useState } from 'react';
-import { CHECKOUT_CDN_BASE_URL, ETH_TOKEN_SYMBOL } from 'lib';
+import { ETH_TOKEN_SYMBOL } from 'lib';
 import { Environment } from '@imtbl/config';
+import { getEthTokenImage, getImxTokenImage } from 'lib/utils';
 import {
   containerStyles,
   contentTextStyles,
@@ -38,8 +39,8 @@ export function NotEnoughGas({
   const { content, buttons } = text.drawers.notEnoughGas;
 
   const [isCopied, setIsCopied] = useState(false);
-  const ethLogo = `${CHECKOUT_CDN_BASE_URL[environment]}/v1/blob/img/tokens/eth.svg`;
-  const imxLogo = `${CHECKOUT_CDN_BASE_URL[environment]}/v1/blob/img/tokens/imx.svg`;
+  const ethLogo = getEthTokenImage(environment);
+  const imxLogo = getImxTokenImage(environment);
   const heading = tokenSymbol === ETH_TOKEN_SYMBOL ? `${content.eth.heading}` : `${content.imx.heading}`;
   const body = tokenSymbol === ETH_TOKEN_SYMBOL ? `${content.eth.body}` : `${content.imx.body}`;
 
