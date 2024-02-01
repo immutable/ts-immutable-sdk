@@ -9,7 +9,7 @@ import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAna
 import { useTranslation } from 'react-i18next';
 import { Transaction } from 'lib/clients';
 import { getChainNameById } from 'lib/chains';
-import { getL1ChainId } from 'lib';
+import { WITHDRAWAL_CLAIM_GAS_LIMIT, getL1ChainId } from 'lib';
 import { isPassportProvider } from 'lib/providerUtils';
 import { WalletProviderName } from '@imtbl/checkout-sdk';
 import { isNativeToken } from 'lib/utils';
@@ -113,36 +113,38 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
       }
     }
 
+    /**
+     * Gas fee estimation and balance checks are done on a best effort basis.
+     * If for some reason the balance calls fail or gas fee data calls fail
+     * don't block the transaction from being submitted.
+     */
+
     let gasEstimate: BigNumber;
     let ethGasCostWei: BigNumber | null = null;
     try {
       try {
         gasEstimate = await providerToUse.estimateGas(withdrawalResponse.unsignedTx);
       } catch (err) {
-        gasEstimate = BigNumber.from(91000);
+        gasEstimate = BigNumber.from(WITHDRAWAL_CLAIM_GAS_LIMIT);
       }
 
-      let feeData: FeeData;
+      let feeData: FeeData | null = null;
       try {
         feeData = await providerToUse.getFeeData();
-      } catch {
-        setHasWithdrawError(true);
-        setTxProcessing(false);
-        return;
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.log(err);
       }
 
-      let gasPriceInWei: BigNumber | null;
-      if (feeData.lastBaseFeePerGas && feeData.maxPriorityFeePerGas) {
+      let gasPriceInWei: BigNumber | null = null;
+      if (feeData && feeData.lastBaseFeePerGas && feeData.maxPriorityFeePerGas) {
         gasPriceInWei = feeData.lastBaseFeePerGas.add(feeData.maxPriorityFeePerGas);
-      } else {
+      } else if (feeData && feeData.gasPrice) {
         gasPriceInWei = feeData.gasPrice;
       }
-      if (!gasPriceInWei) {
-        setHasWithdrawError(true);
-        setTxProcessing(false);
-        return;
+      if (gasPriceInWei) {
+        ethGasCostWei = gasEstimate.mul(gasPriceInWei);
       }
-      ethGasCostWei = gasEstimate.mul(gasPriceInWei);
     } catch (err) {
       // eslint-disable-next-line no-console
       console.log(err);
@@ -157,19 +159,14 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
 
       const ethBalance = balancesResult.balances.find((balance) => isNativeToken(balance.token.address));
 
-      if (!ethBalance || !ethGasCostWei || ethBalance.balance.lt(ethGasCostWei!)) {
+      if (!ethBalance || ethBalance.balance.lt(ethGasCostWei!)) {
         setShowNotEnoughEthDrawer(true);
-        // eslint-disable-next-line no-console
-        console.log('not enough eth to pay for claim withdrawal txn');
         setTxProcessing(false);
         return;
       }
     } catch (err) {
       // eslint-disable-next-line no-console
       console.log(err);
-      setHasWithdrawError(true);
-      setTxProcessing(false);
-      return;
     }
 
     // check that provider is connected to L1
