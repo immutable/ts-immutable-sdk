@@ -171,6 +171,7 @@ export class Checkout {
     return await provider.createProvider(
       params.walletProviderName,
       this.passport,
+      this.walletConnectConfig,
     );
   }
 

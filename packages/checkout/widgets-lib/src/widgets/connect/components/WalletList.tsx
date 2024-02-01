@@ -12,7 +12,6 @@ import {
   useCallback,
 } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
-import { EthereumProvider } from '@walletconnect/ethereum-provider';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import {
   ConnectContext,
@@ -77,17 +76,11 @@ export function WalletList(props: WalletListProps) {
     if (checkout) {
       try {
         let web3Provider: Web3Provider | null = null;
-        if (walletProviderName === WalletProviderName.WALLET_CONNECT) {
-          const walletConnectProvider = await EthereumProvider.init(checkout.walletConnectConfig);
-          const accounts = await walletConnectProvider.enable();
-          console.log('wc accounts', accounts);
-          web3Provider = new Web3Provider(walletConnectProvider);
-        } else {
-          const providerResult = await checkout.createProvider({
-            walletProviderName,
-          });
-          web3Provider = providerResult.provider;
-        }
+
+        const providerResult = await checkout.createProvider({
+          walletProviderName,
+        });
+        web3Provider = providerResult.provider;
 
         if (!web3Provider) {
           console.log(`failed to create web3Provider for ${walletProviderName}`);

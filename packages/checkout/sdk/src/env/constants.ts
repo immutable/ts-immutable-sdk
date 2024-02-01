@@ -400,6 +400,8 @@ export const WALLET_CONNECT_PRODUCTION = {
       '--wcm-background-color': 'black',
     },
   },
+  // Included wallet IDs: MetaMask
+  includeWalletIds: ['c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96'],
   optionalChains: [ChainId.ETHEREUM, ChainId.IMTBL_ZKEVM_MAINNET],
   rpcMap: {
     [ChainId.ETHEREUM]: PRODUCTION_CHAIN_ID_NETWORK_MAP.get(ChainId.ETHEREUM)!.rpcUrls[0],
@@ -417,6 +419,8 @@ export const WALLET_CONNECT_SANDBOX = {
       '--wcm-background-color': 'black',
     },
   },
+  // Included wallet IDs: MetaMask
+  includeWalletIds: ['c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96'],
   optionalChains: [ChainId.SEPOLIA, ChainId.IMTBL_ZKEVM_TESTNET],
   rpcMap: {
     [ChainId.SEPOLIA]: SANDBOX_CHAIN_ID_NETWORK_MAP.get(ChainId.SEPOLIA)!.rpcUrls[0],

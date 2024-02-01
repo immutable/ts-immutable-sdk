@@ -2,6 +2,7 @@
 import detectEthereumProvider from '@metamask/detect-provider';
 import { Web3Provider, ExternalProvider } from '@ethersproject/providers';
 import { Passport } from '@imtbl/passport';
+import { EthereumProvider } from '@walletconnect/ethereum-provider';
 import {
   CreateProviderResult,
   WalletProviderName,
@@ -27,6 +28,7 @@ async function getMetaMaskProvider(): Promise<Web3Provider> {
 export async function createProvider(
   walletProviderName: WalletProviderName,
   passport?: Passport,
+  walletConnectConfig?: any,
 ): Promise<CreateProviderResult> {
   let provider: Web3Provider | null = null;
   switch (walletProviderName) {
@@ -47,6 +49,11 @@ export async function createProvider(
     }
     case WalletProviderName.METAMASK: {
       provider = await getMetaMaskProvider();
+      break;
+    }
+    case WalletProviderName.WALLET_CONNECT: {
+      const walletConnectProvider = await EthereumProvider.init(walletConnectConfig);
+      provider = new Web3Provider(walletConnectProvider);
       break;
     }
     default:
