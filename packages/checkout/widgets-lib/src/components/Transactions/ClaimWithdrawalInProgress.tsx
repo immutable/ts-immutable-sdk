@@ -53,12 +53,14 @@ export function ClaimWithdrawalInProgress({ transactionResponse }: ClaimWithdraw
             },
           },
         });
-      } catch {
+      } catch (error) {
+        console.error(error);
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,
             view: {
               type: BridgeWidgetViews.CLAIM_WITHDRAWAL_FAILURE,
+              transactionHash: '',
               reason: 'Transaction failed',
             },
           },

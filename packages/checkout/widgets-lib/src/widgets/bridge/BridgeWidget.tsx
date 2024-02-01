@@ -13,7 +13,7 @@ import {
 import { StrongCheckoutWidgetsConfig } from 'lib/withDefaultWidgetConfig';
 import { CryptoFiatProvider } from 'context/crypto-fiat-context/CryptoFiatProvider';
 import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
-import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
+import { BridgeClaimWithdrawalFailure, BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { StatusView } from 'components/Status/StatusView';
 import { StatusType } from 'components/Status/StatusType';
 import { ImmutableConfiguration } from '@imtbl/config';
@@ -296,7 +296,7 @@ export function BridgeWidget({
                 });
                 sendBridgeClaimWithdrawalFailedEvent(
                   eventTarget,
-                  (viewState.view as BridgeClaimWithdrawalSuccess).transactionHash,
+                  (viewState.view as BridgeClaimWithdrawalFailure).transactionHash,
                   'Transaction failed',
                 );
               }}
