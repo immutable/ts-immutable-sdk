@@ -129,7 +129,7 @@ export function BridgeWidget({
   const viewReducerValues = useMemo(() => ({ viewState, viewDispatch }), [viewState, viewDispatch]);
   const bridgeReducerValues = useMemo(() => ({ bridgeState, bridgeDispatch }), [bridgeState, bridgeDispatch]);
 
-  const goBackToWalletNetworkSelector = useCallback(() => {
+  const goBackToWalletNetworkSelectorClearState = useCallback(() => {
     bridgeDispatch({
       payload: {
         type: BridgeActions.SET_WALLETS_AND_NETWORKS,
@@ -148,6 +148,26 @@ export function BridgeWidget({
       payload: {
         type: ViewActions.GO_BACK_TO,
         view: { type: BridgeWidgetViews.WALLET_NETWORK_SELECTION },
+      },
+    });
+  }, [viewDispatch]);
+
+  const goBackToWalletNetworkSelector = useCallback(() => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.GO_BACK_TO,
+        view: { type: BridgeWidgetViews.WALLET_NETWORK_SELECTION },
+      },
+    });
+  }, [viewDispatch]);
+
+  const updateToTransactionsPage = useCallback(() => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: BridgeWidgetViews.TRANSACTIONS,
+        },
       },
     });
   }, [viewDispatch]);
@@ -232,7 +252,7 @@ export function BridgeWidget({
           {viewState.view.type === SharedViews.ERROR_VIEW && (
             <ErrorView
               actionText={t('views.ERROR_VIEW.actionText')}
-              onActionClick={goBackToWalletNetworkSelector}
+              onActionClick={goBackToWalletNetworkSelectorClearState}
               onCloseClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
               errorEventAction={() => {
                 page({
@@ -273,7 +293,7 @@ export function BridgeWidget({
                   (viewState.view as BridgeClaimWithdrawalSuccess).transactionHash,
                 );
               }}
-              onActionClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
+              onActionClick={updateToTransactionsPage}
               statusType={StatusType.SUCCESS}
               testId="claim-withdrawal-success-view"
             />
@@ -300,18 +320,7 @@ export function BridgeWidget({
                   'Transaction failed',
                 );
               }}
-              onActionClick={() => {
-                if (viewState.view.type === BridgeWidgetViews.CLAIM_WITHDRAWAL_FAILURE) {
-                  viewDispatch({
-                    payload: {
-                      type: ViewActions.UPDATE_VIEW,
-                      view: {
-                        type: BridgeWidgetViews.TRANSACTIONS,
-                      },
-                    },
-                  });
-                }
-              }}
+              onActionClick={updateToTransactionsPage}
               statusType={StatusType.FAILURE}
               onCloseClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
               testId="claim-withdrawal-fail-view"
