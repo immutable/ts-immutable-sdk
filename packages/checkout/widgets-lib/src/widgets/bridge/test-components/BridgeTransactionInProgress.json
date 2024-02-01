@@ -6,8 +6,7 @@
   "details": {
     "amount": "10000000",
     "current_status": {
-      "status": "in_progress",
-      "withdrawal_ready_at": ""
+      "status": "in_progress"
     },
     "from_address": "0xe98b61832248c698085ffbc4313deb465be857e7",
     "from_chain": "sepolia",

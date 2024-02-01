@@ -67,13 +67,13 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
     */
   useEffect(() => {
     const getWithdrawalTxn = async () => {
-      if (!tokenBridge || !transaction || !transaction.details.current_status.index) return;
+      if (!tokenBridge || !transaction || transaction.details.current_status?.index === undefined) return;
       // get withdrawal transaction from the token bridge by receipient address and index
       setLoading(true);
       try {
         const flowRateWithdrawTxnResponse = await tokenBridge?.getFlowRateWithdrawTx({
           recipient: transaction.details.to_address,
-          index: transaction.details.current_status.index,
+          index: transaction.details.current_status.index!,
         });
         setWithdrawalResponse(flowRateWithdrawTxnResponse);
       } catch (err) {
@@ -255,7 +255,7 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
               disabled={loading}
               onClick={() => ((txProcessing || loading)
                 ? undefined
-                : handleWithdrawalClaimClick({ forceChangeAccount: false }))}
+                : handleWithdrawalClaimClick({ forceChangeAccount: true }))}
             >
               {loading || txProcessing ? (
                 <Button.Icon icon="Loading" sx={{ width: 'base.icon.size.400' }} />
