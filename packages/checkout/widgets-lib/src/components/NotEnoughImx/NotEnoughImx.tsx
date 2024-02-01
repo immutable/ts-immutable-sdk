@@ -1,8 +1,10 @@
 import {
   Body,
-  Drawer, Box, Button, FramedImage, Heading, Logo,
+  Drawer, Box, Button, Heading, Logo, CloudImage,
 } from '@biom3/react';
 import { useTranslation } from 'react-i18next';
+import { CHECKOUT_CDN_BASE_URL } from '@imtbl/checkout-sdk/dist/env';
+import { Environment } from '@imtbl/config';
 import {
   containerStyles,
   contentTextStyles,
@@ -23,9 +25,8 @@ export function NotEnoughImx({
   visible, showAdjustAmount, hasZeroImx, onCloseDrawer, onAddCoinsClick,
 }: NotEnoughImxProps) {
   const { t } = useTranslation();
-  // const { noImx, insufficientImx } = content;
 
-  const imxLogo = 'https://design-system.immutable.com/hosted-for-ds/currency-icons/currency--imx.svg';
+  const imxLogo = `${CHECKOUT_CDN_BASE_URL[Environment.PRODUCTION]}/v1/blob/img/tokens/imx.svg`;
 
   return (
     <Drawer
@@ -36,13 +37,9 @@ export function NotEnoughImx({
     >
       <Drawer.Content>
         <Box testId="not-enough-gas-bottom-sheet" sx={containerStyles}>
-          <FramedImage
+          <CloudImage
             imageUrl={imxLogo}
-            circularFrame
-            sx={{
-              height: '110px',
-              width: '64px',
-            }}
+            sx={{ w: 'base.icon.size.600', h: 'base.icon.size.600' }}
           />
           <Heading
             size="small"
