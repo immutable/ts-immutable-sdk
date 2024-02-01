@@ -66,7 +66,7 @@ export function NotEnoughGas({
         <Box testId="not-enough-gas-bottom-sheet" sx={containerStyles}>
           <CloudImage
             imageUrl={
-              tokenSymbol === 'ETH'
+              tokenSymbol === ETH_TOKEN_SYMBOL
                 ? ethLogo
                 : imxLogo
             }
