@@ -15,6 +15,8 @@ import { WalletProviderName } from '@imtbl/checkout-sdk';
 import { isNativeToken } from 'lib/utils';
 import { BigNumber } from 'ethers';
 import { FlowRateWithdrawResponse } from '@imtbl/bridge-sdk';
+import { NotEnoughEthToWithdraw } from 'components/Transactions/NotEnoughEthToWithdraw';
+import { FeeData } from '@ethersproject/providers';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
@@ -47,6 +49,7 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
   const [loading, setLoading] = useState(false);
   const [hasWithdrawError, setHasWithdrawError] = useState(false);
   const [withdrawalResponse, setWithdrawalResponse] = useState<FlowRateWithdrawResponse | null>();
+  const [showNotEnoughEthDrawer, setShowNotEnoughEthDrawer] = useState(false);
 
   const goBack = useCallback(() => {
     viewDispatch({
@@ -77,7 +80,7 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
     getWithdrawalTxn();
   }, [tokenBridge]);
 
-  const handleWithdrawalClaimClick = useCallback(async () => {
+  const handleWithdrawalClaimClick = useCallback(async ({ forceChangeAccount }: { forceChangeAccount: boolean }) => {
     if (!checkout || !tokenBridge || !from?.web3Provider || !withdrawalResponse) return;
 
     if (!withdrawalResponse.pendingWithdrawal.canWithdraw || !withdrawalResponse.unsignedTx) {
@@ -91,7 +94,7 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
 
     setTxProcessing(true);
 
-    if (isPassportProvider(from?.web3Provider)) {
+    if (isPassportProvider(from?.web3Provider) || forceChangeAccount) {
       // user should switch to MetaMask
       try {
         const createProviderResult = await checkout.createProvider({ walletProviderName: WalletProviderName.METAMASK });
@@ -100,24 +103,45 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
           requestWalletPermissions: true,
         });
         providerToUse = connectResult.provider;
+        setShowNotEnoughEthDrawer(false);
       } catch (err) {
         // eslint-disable-next-line no-console
         console.log(err);
+        setHasWithdrawError(true);
+        setTxProcessing(false);
         return;
       }
     }
 
-    let ethGasCostWei: BigNumber | null;
+    let gasEstimate: BigNumber;
+    let ethGasCostWei: BigNumber | null = null;
     try {
-      const gasEstimate = await providerToUse.estimateGas(withdrawalResponse.unsignedTx);
-      const feeData = await providerToUse.getFeeData();
+      try {
+        gasEstimate = await providerToUse.estimateGas(withdrawalResponse.unsignedTx);
+      } catch (err) {
+        gasEstimate = BigNumber.from(91000);
+      }
+
+      let feeData: FeeData;
+      try {
+        feeData = await providerToUse.getFeeData();
+      } catch {
+        setHasWithdrawError(true);
+        setTxProcessing(false);
+        return;
+      }
+
       let gasPriceInWei: BigNumber | null;
       if (feeData.lastBaseFeePerGas && feeData.maxPriorityFeePerGas) {
         gasPriceInWei = feeData.lastBaseFeePerGas.add(feeData.maxPriorityFeePerGas);
       } else {
         gasPriceInWei = feeData.gasPrice;
       }
-      if (!gasPriceInWei) throw new Error('unable to fetch gas price');
+      if (!gasPriceInWei) {
+        setHasWithdrawError(true);
+        setTxProcessing(false);
+        return;
+      }
       ethGasCostWei = gasEstimate.mul(gasPriceInWei);
     } catch (err) {
       // eslint-disable-next-line no-console
@@ -133,18 +157,18 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
 
       const ethBalance = balancesResult.balances.find((balance) => isNativeToken(balance.token.address));
 
-      if (!ethBalance || ethBalance.balance.lt(ethGasCostWei!)) {
-        // TODO: if eth balance is less than the total gas cost required for the txn then pop up Not enough ETH drawer
+      if (!ethBalance || !ethGasCostWei || ethBalance.balance.lt(ethGasCostWei!)) {
+        setShowNotEnoughEthDrawer(true);
         // eslint-disable-next-line no-console
         console.log('not enough eth to pay for claim withdrawal txn');
-        setLoading(false);
+        setTxProcessing(false);
         return;
       }
     } catch (err) {
       // eslint-disable-next-line no-console
       console.log(err);
       setHasWithdrawError(true);
-      setLoading(false);
+      setTxProcessing(false);
       return;
     }
 
@@ -169,13 +193,12 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
 
     // send transaction to wallet for signing
     try {
-      // TODO: WT-2054 Update view to go to in progress screens and pass through sendTransaction response
-
-      // const response = await checkout.sendTransaction({
-      //   provider: providerToUse,
-      //   transaction: withdrawalResponse.unsignedTx,
-      // });
-
+      const response = await checkout.sendTransaction({
+        provider: providerToUse,
+        transaction: withdrawalResponse.unsignedTx,
+      });
+      // eslint-disable-next-line no-console
+      console.log(response);
     } catch (err) {
       // eslint-disable-next-line no-console
       console.log(err);
@@ -219,9 +242,11 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
               size="large"
               variant="primary"
               disabled={loading}
-              onClick={(txProcessing || loading) ? () => { } : handleWithdrawalClaimClick}
+              onClick={() => ((txProcessing || loading)
+                ? undefined
+                : handleWithdrawalClaimClick({ forceChangeAccount: false }))}
             >
-              {loading ? (
+              {loading || txProcessing ? (
                 <Button.Icon icon="Loading" sx={{ width: 'base.icon.size.400' }} />
               ) : t(`views.CLAIM_WITHDRAWAL.${hasWithdrawError ? 'footer.retryText' : 'footer.buttonText'}`)}
             </Button>
@@ -243,6 +268,11 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
           <EllipsizedText text={transaction.details.to_address.toLowerCase() ?? ''} />
         </Box>
       </SimpleTextBody>
+      <NotEnoughEthToWithdraw
+        visible={showNotEnoughEthDrawer}
+        onClose={() => setShowNotEnoughEthDrawer(false)}
+        onChangeAccount={() => handleWithdrawalClaimClick({ forceChangeAccount: true })}
+      />
     </SimpleLayout>
   );
 }

@@ -578,6 +578,18 @@
         "cancel": "Dismiss"
       }
     },
+    "notEnoughEthWithdrawal": {
+      "content": {
+        "heading1": "Insufficient",
+        "heading2": "for gas",
+        "body1": "Add",
+        "body2": "to your destination account, or select another account to pay the gas. Your destination account will remain the same."
+      },
+      "buttons": {
+        "retry": "Pay gas with another account",
+        "dismiss": "Dismiss"
+      }
+    },
     "unableToSwap": {
       "heading": "Unable to swap this coin",
       "body": "This coin pairing isn't available to swap right now. Try another selection.",
