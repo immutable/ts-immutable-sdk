@@ -547,16 +547,17 @@ export function BridgeForm(props: BridgeFormProps) {
           onRetry={retrySubmitBridge}
         />
         <NotEnoughGas
+          environment={checkout.config.environment}
           visible={showNotEnoughGasDrawer}
           showHeaderBar={false}
           onCloseDrawer={() => setShowNotEnoughGasDrawer(false)}
           walletAddress={walletAddress}
           showAdjustAmount={isNativeToken(formToken?.token.address)}
           tokenSymbol={
-              from?.network === getL1ChainId(checkout?.config)
-                ? ETH_TOKEN_SYMBOL
-                : IMX_TOKEN_SYMBOL
-            }
+            from?.network === getL1ChainId(checkout?.config)
+              ? ETH_TOKEN_SYMBOL
+              : IMX_TOKEN_SYMBOL
+          }
           onAddCoinsClick={() => {
             viewDispatch({
               payload: {

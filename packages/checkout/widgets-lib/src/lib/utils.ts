@@ -1,8 +1,10 @@
 import {
   ChainId, CheckoutConfiguration, GetBalanceResult, NetworkInfo,
 } from '@imtbl/checkout-sdk';
+import { Environment } from '@imtbl/config';
 import { getL1ChainId, getL2ChainId } from './networkUtils';
 import {
+  CHECKOUT_CDN_BASE_URL,
   DEFAULT_GT_ONE_TOKEN_FORMATTING_DECIMALS,
   DEFAULT_TOKEN_FORMATTING_DECIMALS,
   NATIVE,
@@ -139,3 +141,15 @@ export const isZkEvmChainId = (chainId: ChainId) => chainId === ChainId.IMTBL_ZK
 export const isNativeToken = (
   address: string | undefined,
 ): boolean => !address || address.toLocaleLowerCase() === NATIVE;
+
+export function getEthTokenImage(environment: Environment) {
+  return `${CHECKOUT_CDN_BASE_URL[environment]}/v1/blob/img/tokens/eth.svg`;
+}
+
+export function getImxTokenImage(environment: Environment) {
+  return `${CHECKOUT_CDN_BASE_URL[environment]}/v1/blob/img/tokens/imx.svg`;
+}
+
+export function getTokenImageByAddress(environment: Environment, address: string) {
+  return `${CHECKOUT_CDN_BASE_URL[environment]}/v1/blob/img/tokens/${address.toLowerCase()}.svg`;
+}

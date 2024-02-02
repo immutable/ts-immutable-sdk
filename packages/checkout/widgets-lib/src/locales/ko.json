@@ -503,6 +503,19 @@
       "footer": {
         "buttonText": "계속",
         "retryText": "다시 시도"
+      },
+      "IN_PROGRESS": {
+        "loading": {
+          "text": "처리 중"
+        },
+        "success": {
+          "text": "성공",
+          "actionText": "완료"
+        },
+        "failure": {
+          "text": "거래 실패",
+          "actionText": "다시 시도"
+        }
       }
     }
   },
@@ -576,6 +589,18 @@
         "adjustAmount": "금액 조정",
         "addMoreImx": "IMX 코인 추가",
         "cancel": "취소"
+      }
+    },
+    "notEnoughEthWithdrawal": {
+      "content": {
+        "heading1": "부족함",
+        "heading2": "가스용",
+        "body1": "추가",
+        "body2": "목적지 계정에 추가하거나 다른 계정을 선택하여 가스를 지불하십시오. 목적지 계정은 그대로 유지됩니다."
+      },
+      "buttons": {
+        "retry": "다른 계정으로 가스 지불",
+        "dismiss": "닫기"
       }
     },
     "unableToSwap": {

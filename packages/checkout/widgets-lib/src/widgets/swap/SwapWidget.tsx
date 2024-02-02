@@ -243,6 +243,12 @@ export function SwapWidget({
               page({
                 userJourney: UserJourney.SWAP,
                 screen: 'SwapSuccess',
+                extras: {
+                  fromTokenAddress: viewState.view.data?.fromTokenAddress,
+                  fromAmount: viewState.view.data?.fromAmount,
+                  toTokenAddress: viewState.view.data?.toTokenAddress,
+                  toAmount: viewState.view.data?.toAmount,
+                },
               });
               sendSwapSuccessEvent(
                 eventTarget,

@@ -503,6 +503,19 @@
       "footer": {
         "buttonText": "继续",
         "retryText": "重试"
+      },
+      "IN_PROGRESS": {
+        "loading": {
+          "text": "处理中"
+        },
+        "success": {
+          "text": "成功",
+          "actionText": "完成"
+        },
+        "failure": {
+          "text": "交易失败",
+          "actionText": "请重试"
+        }
       }
     }
   },
@@ -576,6 +589,18 @@
         "adjustAmount": "Adjust amount",
         "addMoreImx": "Add IMX coins",
         "cancel": "Dismiss"
+      }
+    },
+    "notEnoughEthWithdrawal": {
+      "content": {
+        "heading1": "不足",
+        "heading2": "用于燃气",
+        "body1": "添加",
+        "body2": "到您的目标账户，或选择另一个账户支付燃气费。您的目标账户将保持不变。"
+      },
+      "buttons": {
+        "retry": "使用另一个账户支付燃气费",
+        "dismiss": "取消"
       }
     },
     "unableToSwap": {

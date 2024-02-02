@@ -506,6 +506,19 @@
       "footer": {
         "buttonText": "続行",
         "retryText": "もう一度試す"
+      },
+      "IN_PROGRESS": {
+        "loading": {
+          "text": "処理中"
+        },
+        "success": {
+          "text": "成功",
+          "actionText": "完了"
+        },
+        "failure": {
+          "text": "取引失敗",
+          "actionText": "再試行"
+        }
       }
     }
   },
@@ -579,6 +592,18 @@
         "adjustAmount": "金額を調整",
         "addMoreImx": "IMXコインを追加",
         "cancel": "閉じる"
+      }
+    },
+    "notEnoughEthWithdrawal": {
+      "content": {
+        "heading1": "不足",
+        "heading2": "ガス用",
+        "body1": "追加",
+        "body2": "あなたの宛先アカウントに追加するか、別のアカウントを選択してガスを支払います。宛先アカウントは変更されません。"
+      },
+      "buttons": {
+        "retry": "別のアカウントでガスを支払う",
+        "dismiss": "閉じる"
       }
     },
     "unableToSwap": {
