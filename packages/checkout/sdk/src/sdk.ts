@@ -203,7 +203,6 @@ export class Checkout {
     params: ConnectParams,
   ): Promise<ConnectResult> {
     if ((params.provider.provider as any)?.isWalletConnect) {
-      await (params.provider.provider as any).disconnect();
       await (params.provider.provider as any).connect();
     }
     const web3Provider = await provider.validateProvider(
