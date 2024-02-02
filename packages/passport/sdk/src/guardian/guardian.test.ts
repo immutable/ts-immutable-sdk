@@ -151,7 +151,6 @@ describe('Guardian', () => {
         guardianClient.validateEVMTransaction({
           chainId: 'epi123',
           nonce: '5',
-          user: mockUserZkEvm,
           metaTransactions: [
             {
               data: transactionRequest.data,
@@ -188,7 +187,6 @@ describe('Guardian', () => {
       await guardianClient.validateEVMTransaction({
         chainId: 'epi123',
         nonce: '5',
-        user: mockUserZkEvm,
         metaTransactions: [
           {
             data: transactionRequest.data,
@@ -252,7 +250,6 @@ describe('Guardian', () => {
           guardianClient.validateEVMTransaction({
             chainId: 'epi123',
             nonce: '5',
-            user: mockUserZkEvm,
             metaTransactions: [
               {
                 data: transactionRequest.data,

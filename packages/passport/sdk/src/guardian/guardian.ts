@@ -22,14 +22,12 @@ export type GuardianEvaluateImxTransactionParams = {
 type GuardianEVMValidationParams = {
   chainId: string;
   nonce: string;
-  user: UserZkEvm;
   metaTransactions: MetaTransaction[];
 };
 
 type GuardianMessageValidationParams = {
   chainID: string;
   payload: TypedDataPayload;
-  user: UserZkEvm
 };
 
 const transactionRejectedCrossSdkBridgeError = 'Transaction requires confirmation but this functionality is not'
@@ -161,8 +159,8 @@ export default class GuardianClient {
     chainId,
     nonce,
     metaTransactions,
-    user,
   }: GuardianEVMValidationParams): Promise<TransactionEvaluationResponse> {
+    const user = await this.authManager.getUser() as UserZkEvm;
     const headers = { Authorization: `Bearer ${user.accessToken}` };
     const guardianTransactions = transformGuardianTransactions(metaTransactions);
     try {
@@ -196,11 +194,9 @@ export default class GuardianClient {
     nonce,
     metaTransactions,
   }: GuardianEVMValidationParams): Promise<void> {
-    const user = await this.authManager.getUser() as UserZkEvm;
     const transactionEvaluationResponse = await this.evaluateEVMTransaction({
       chainId,
       nonce,
-      user,
       metaTransactions,
     });
 
@@ -213,6 +209,7 @@ export default class GuardianClient {
     }
 
     if (confirmationRequired && !!transactionId) {
+      const user = await this.authManager.getUser() as UserZkEvm;
       const confirmationResult = await this.confirmationScreen.requestConfirmation(
         transactionId,
         user.zkEvm.ethAddress,
@@ -232,8 +229,9 @@ export default class GuardianClient {
   }
 
   private async evaluateMessage(
-    { chainID, payload, user }:GuardianMessageValidationParams,
+    { chainID, payload }:GuardianMessageValidationParams,
   ): Promise<guardian.MessageEvaluationResponse> {
+    const user = await this.authManager.getUser() as UserZkEvm;
     try {
       const messageEvalResponse = await this.messageAPI.evaluateMessage(
         { messageEvaluationRequest: { chainID, payload } },
@@ -247,12 +245,12 @@ export default class GuardianClient {
   }
 
   public async validateMessage({ chainID, payload }: GuardianMessageValidationParams) {
-    const user = await this.authManager.getUser() as UserZkEvm;
-    const { messageId, confirmationRequired } = await this.evaluateMessage({ chainID, payload, user });
+    const { messageId, confirmationRequired } = await this.evaluateMessage({ chainID, payload });
     if (confirmationRequired && this.crossSdkBridgeEnabled) {
       throw new JsonRpcError(RpcErrorCode.TRANSACTION_REJECTED, transactionRejectedCrossSdkBridgeError);
     }
     if (confirmationRequired && !!messageId) {
+      const user = await this.authManager.getUser() as UserZkEvm;
       const confirmationResult = await this.confirmationScreen.requestMessageConfirmation(
         messageId,
         user.zkEvm.ethAddress,

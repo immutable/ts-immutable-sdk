@@ -15,7 +15,7 @@ import TypedEventEmitter from '../utils/typedEventEmitter';
 import { PassportConfiguration } from '../config';
 import { ConfirmationScreen } from '../confirmation';
 import {
-  PassportEventMap, PassportEvents, User, UserZkEvm,
+  PassportEventMap, PassportEvents, UserZkEvm,
 } from '../types';
 import { RelayerClient } from './relayerClient';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
@@ -37,6 +37,7 @@ type LoggedInZkEvmProvider = {
   magicProvider: ExternalProvider;
   relayerClient: RelayerClient;
   guardianClient: GuardianClient;
+  zkevmAddress: string;
 };
 
 export class ZkEvmProvider implements Provider {
@@ -59,6 +60,8 @@ export class ZkEvmProvider implements Provider {
   protected relayerClient?: RelayerClient;
 
   protected magicProvider?: ExternalProvider; // Used for signing
+
+  protected zkevmAddress?: string;
 
   public readonly isPassport: boolean = true;
 
@@ -104,9 +107,9 @@ export class ZkEvmProvider implements Provider {
     }
   };
 
-  private isLoggedIn(user?: User | null): this is LoggedInZkEvmProvider {
+  private isLoggedIn(): this is LoggedInZkEvmProvider {
     return this.magicProvider !== undefined
-      && user !== null
+      && this.zkevmAddress !== undefined
       && this.relayerClient !== undefined
       && this.guardianClient !== undefined;
   }
@@ -115,7 +118,7 @@ export class ZkEvmProvider implements Provider {
     switch (request.method) {
       case 'eth_requestAccounts': {
         const existingUser = await this.authManager.getUser() as UserZkEvm;
-        if (this.isLoggedIn(existingUser)) {
+        if (this.isLoggedIn()) {
           return [existingUser.zkEvm.ethAddress];
         }
         const { magicProvider, user } = await loginZkEvmUser({
@@ -139,12 +142,13 @@ export class ZkEvmProvider implements Provider {
           authManager: this.authManager,
         });
 
+        this.zkevmAddress = user.zkEvm.ethAddress;
+
         this.eventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [user.zkEvm.ethAddress]);
 
         return [user.zkEvm.ethAddress];
       }
       case 'eth_sendTransaction': {
-        const user = await this.authManager.getUser() as UserZkEvm;
         if (!this.isLoggedIn()) {
           throw new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
         }
@@ -154,16 +158,14 @@ export class ZkEvmProvider implements Provider {
           guardianClient: this.guardianClient,
           jsonRpcProvider: this.jsonRpcProvider,
           relayerClient: this.relayerClient,
-          user,
+          zkevmAddress: this.zkevmAddress,
         });
       }
       case 'eth_accounts': {
-        const user = await this.authManager.getUser() as UserZkEvm;
-        return this.isLoggedIn() ? [user.zkEvm.ethAddress] : [];
+        return this.zkevmAddress ? [this.zkevmAddress] : [];
       }
       case 'eth_signTypedData':
       case 'eth_signTypedData_v4': {
-        const user = await this.authManager.getUser() as UserZkEvm;
         if (!this.isLoggedIn()) {
           throw new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
         }
@@ -173,7 +175,6 @@ export class ZkEvmProvider implements Provider {
           magicProvider: this.magicProvider,
           jsonRpcProvider: this.jsonRpcProvider,
           relayerClient: this.relayerClient,
-          user,
           guardianClient: this.guardianClient,
         });
       }

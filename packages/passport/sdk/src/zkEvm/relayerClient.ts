@@ -3,7 +3,6 @@ import { JsonRpcProvider } from '@ethersproject/providers';
 import AuthManager from 'authManager';
 import { PassportConfiguration } from '../config';
 import { FeeOption, RelayerTransaction, TypedDataPayload } from './types';
-import { UserZkEvm } from '../types';
 import { getEip155ChainId } from './walletHelpers';
 
 export type RelayerClientInput = {
@@ -96,12 +95,12 @@ export class RelayerClient {
       ...request,
     };
 
-    const user = await this.authManager.getUser() as UserZkEvm;
+    const user = await this.authManager.getUser();
 
     const response = await fetch(`${this.config.relayerUrl}/v1/transactions`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${user.accessToken}`,
+        Authorization: `Bearer ${user?.accessToken}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),

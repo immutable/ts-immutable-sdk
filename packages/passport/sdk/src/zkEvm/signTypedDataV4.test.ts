@@ -6,7 +6,6 @@ import {
   chainId,
   chainIdHex,
   chainIdEip155,
-  mockUserZkEvm,
 } from '../test/mocks';
 import { RelayerClient } from './relayerClient';
 import { signTypedDataV4 } from './signTypedDataV4';
@@ -64,7 +63,6 @@ describe('signTypedDataV4', () => {
         magicProvider,
         jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,
-        user: mockUserZkEvm,
         guardianClient: guardianClient as unknown as GuardianClient,
       });
 
@@ -91,7 +89,6 @@ describe('signTypedDataV4', () => {
         magicProvider,
         jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,
-        user: mockUserZkEvm,
         guardianClient: guardianClient as any,
       });
 
@@ -119,7 +116,6 @@ describe('signTypedDataV4', () => {
           magicProvider,
           jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
           relayerClient: relayerClient as unknown as RelayerClient,
-          user: mockUserZkEvm,
           guardianClient: guardianClient as any,
         })
       )).rejects.toThrow(
@@ -137,7 +133,6 @@ describe('signTypedDataV4', () => {
           magicProvider,
           jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
           relayerClient: relayerClient as unknown as RelayerClient,
-          user: mockUserZkEvm,
           guardianClient: guardianClient as any,
         })
       )).rejects.toMatchObject({
@@ -163,7 +158,6 @@ describe('signTypedDataV4', () => {
           magicProvider,
           jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
           relayerClient: relayerClient as unknown as RelayerClient,
-          user: mockUserZkEvm,
           guardianClient: guardianClient as any,
         })
       )).rejects.toThrow(
@@ -189,7 +183,6 @@ describe('signTypedDataV4', () => {
           magicProvider,
           jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
           relayerClient: relayerClient as unknown as RelayerClient,
-          user: mockUserZkEvm,
           guardianClient: guardianClient as any,
         })
       )).rejects.toThrow(
@@ -214,7 +207,6 @@ describe('signTypedDataV4', () => {
       magicProvider,
       jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
-      user: mockUserZkEvm,
       guardianClient: guardianClient as any,
     });
 

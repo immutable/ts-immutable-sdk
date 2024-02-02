@@ -276,7 +276,7 @@ describe('ZkEvmProvider', () => {
         guardianClient: expect.any(GuardianClient),
         jsonRpcProvider: expect.any(Object),
         relayerClient: expect.any(RelayerClient),
-        user: mockUserZkEvm,
+        zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
       });
     });
   });
@@ -318,7 +318,6 @@ describe('ZkEvmProvider', () => {
         magicProvider: mockMagicProvider,
         jsonRpcProvider: expect.any(Object),
         relayerClient: expect.any(RelayerClient),
-        user: mockUserZkEvm,
         guardianClient: expect.any(GuardianClient),
       });
     });

@@ -7,7 +7,6 @@ import { MetaTransaction, RelayerTransactionStatus } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { retryWithDelay } from '../network/retry';
 import { RelayerClient } from './relayerClient';
-import { UserZkEvm } from '../types';
 import GuardianClient, { convertBigNumberishToString } from '../guardian/guardian';
 
 const MAX_TRANSACTION_HASH_RETRIEVAL_RETRIES = 30;
@@ -18,7 +17,7 @@ export type EthSendTransactionParams = {
   jsonRpcProvider: JsonRpcProvider;
   guardianClient: GuardianClient;
   relayerClient: RelayerClient;
-  user: UserZkEvm;
+  zkevmAddress: string,
   params: Array<any>;
 };
 
@@ -73,7 +72,7 @@ export const sendTransaction = ({
   jsonRpcProvider,
   relayerClient,
   guardianClient,
-  user,
+  zkevmAddress,
 }: EthSendTransactionParams): Promise<string> => guardianClient
   .withConfirmationScreen({ width: 480, height: 520 })(async () => {
     const transactionRequest: TransactionRequest = params[0];
@@ -86,7 +85,7 @@ export const sendTransaction = ({
     const magicWeb3Provider = new Web3Provider(magicProvider);
     const signer = magicWeb3Provider.getSigner();
 
-    const nonce = await getNonce(jsonRpcProvider, user.zkEvm.ethAddress);
+    const nonce = await getNonce(jsonRpcProvider, zkevmAddress);
     const metaTransaction: MetaTransaction = {
       to: transactionRequest.to,
       data: transactionRequest.data,
@@ -99,7 +98,7 @@ export const sendTransaction = ({
       metaTransaction,
       nonce,
       chainIdBigNumber,
-      user.zkEvm.ethAddress,
+      zkevmAddress,
       signer,
       relayerClient,
     );
@@ -107,7 +106,6 @@ export const sendTransaction = ({
     await guardianClient.validateEVMTransaction({
       chainId: getEip155ChainId(chainId),
       nonce: convertBigNumberishToString(nonce),
-      user,
       metaTransactions,
     });
 
@@ -117,11 +115,11 @@ export const sendTransaction = ({
       metaTransactions,
       nonce,
       chainIdBigNumber,
-      user.zkEvm.ethAddress,
+      zkevmAddress,
       signer,
     );
 
-    const relayerId = await relayerClient.ethSendTransaction(user.zkEvm.ethAddress, signedTransactions);
+    const relayerId = await relayerClient.ethSendTransaction(zkevmAddress, signedTransactions);
 
     const retrieveRelayerTransaction = async () => {
       const tx = await relayerClient.imGetTransactionByHash(relayerId);
