@@ -16,9 +16,10 @@
   },
   "fileCopy": [
     {
-      "src": "../packages/checkout/widgets-lib/dist/widgets.js",
+      "src": "../packages/checkout/widgets-lib/dist/index.js",
       "dest": "./dist/browser/checkout/widgets.js",
-      "stage": "prod"
+      "stage": "prod",
+      "splitBundle": true
     },
     {
       "src": "../packages/checkout/sdk/dist/browser.js",

@@ -53,6 +53,23 @@ const main = () => {
         // data = findAndReplace(data, <find>, <replace>);
 
         fs.writeFileSync(destPath, data);
+
+        // Copy over all chunks when the splitBundle flag is set
+        if (item.splitBundle) {
+          const srcDirectory = path.dirname(sourceFile);
+          const chunkFiles = fs.readdirSync(srcDirectory);
+          chunkFiles.forEach((chunkFile) => {
+            // Check if the file is a .js file
+            if (path.extname(chunkFile) === '.js') {
+              // Skip copying the original file and only copy .js chunks
+              if (chunkFile !== path.basename(sourceFile)) {
+                const chunkSrcPath = path.join(srcDirectory, chunkFile);
+                const chunkDestPath = path.join(directoryPath, chunkFile);
+                fs.copyFileSync(chunkSrcPath, chunkDestPath);
+              }
+            }
+          });
+        }
       });
     }
   });
