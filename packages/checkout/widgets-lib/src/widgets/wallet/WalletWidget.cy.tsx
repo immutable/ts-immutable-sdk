@@ -10,7 +10,7 @@ import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { CryptoFiat } from '@imtbl/cryptofiat';
 import { useTranslation } from 'react-i18next';
-import { WalletWidget } from './WalletWidget';
+import WalletWidget from './WalletWidget';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {

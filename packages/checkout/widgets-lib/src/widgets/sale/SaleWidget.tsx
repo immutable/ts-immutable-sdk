@@ -30,7 +30,7 @@ export interface SaleWidgetProps extends Required<Omit<SaleWidgetParams, 'wallet
   config: StrongCheckoutWidgetsConfig;
 }
 
-export function SaleWidget(props: SaleWidgetProps) {
+export default function SaleWidget(props: SaleWidgetProps) {
   const { t } = useTranslation();
   const {
     config,

@@ -11,7 +11,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { useTranslation } from 'react-i18next';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
-import { SwapWidget } from './SwapWidget';
+import SwapWidget from './SwapWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { quotesProcessor } from './functions/FetchQuote';
 import { ConnectionStatus } from '../../context/connect-loader-context/ConnectLoaderContext';
