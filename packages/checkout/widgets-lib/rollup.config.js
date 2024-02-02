@@ -12,7 +12,7 @@ const defaultPlugin = [
     preventAssignment: true,
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
   }),
-  typescript(),
+  typescript()
 ]
 
 export default [
@@ -25,7 +25,7 @@ export default [
     },
     plugins: [ 
       ...defaultPlugin
-    ],
+    ]
   },
   {
     watch: false,
@@ -44,7 +44,7 @@ export default [
       nodePolyfills(),
       commonjs(),
       ...defaultPlugin,
-      terser(),
-    ],
-  },
+      terser()
+    ]
+  }
 ]
