@@ -1,9 +1,8 @@
 import { Box, Button } from '@biom3/react';
+import { useTranslation } from 'react-i18next';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
 import { SimpleTextBody } from '../../components/Body/SimpleTextBody';
-import { text } from '../../resources/text/textConfig';
-import { SharedViews } from '../../context/view-context/ViewContext';
 import { NoServiceHero } from '../../components/Hero/NoServiceHero';
 import { FooterLogo } from '../../components/Footer/FooterLogo';
 import { ServiceType } from './serviceTypes';
@@ -25,8 +24,7 @@ export function ServiceUnavailableErrorView({
   secondaryActionText,
   onSecondaryButtonClick,
 }: ServiceUnavailableErrorViewProps) {
-  const errorText = text.views[SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW];
-  const headingText = errorText.heading[service];
+  const { t } = useTranslation();
 
   return (
     <SimpleLayout
@@ -38,7 +36,9 @@ export function ServiceUnavailableErrorView({
       footer={<FooterLogo />}
       testId="service-unavailable-error-view"
     >
-      <SimpleTextBody heading={headingText}>{errorText.body}</SimpleTextBody>
+      <SimpleTextBody heading={t(`views.SERVICE_UNAVAILABLE_ERROR_VIEW.heading.${service}`)}>
+        {t('views.SERVICE_UNAVAILABLE_ERROR_VIEW.body')}
+      </SimpleTextBody>
 
       <Box
         testId="button-container"

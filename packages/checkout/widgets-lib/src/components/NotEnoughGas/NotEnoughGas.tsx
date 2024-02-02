@@ -6,6 +6,7 @@ import { useCallback, useState } from 'react';
 import { ETH_TOKEN_SYMBOL } from 'lib';
 import { Environment } from '@imtbl/config';
 import { getEthTokenImage, getImxTokenImage } from 'lib/utils';
+import { useTranslation } from 'react-i18next';
 import {
   containerStyles,
   contentTextStyles,
@@ -13,7 +14,6 @@ import {
   actionButtonContainerStyles,
   logoContainerStyles,
 } from './NotEnoughGasStyles';
-import { text } from '../../resources/text/textConfig';
 
 type NotEnoughGasProps = {
   environment: Environment;
@@ -35,15 +35,17 @@ export function NotEnoughGas({
   showAdjustAmount,
   tokenSymbol,
   onAddCoinsClick,
-}: NotEnoughGasProps) {
-  const { content, buttons } = text.drawers.notEnoughGas;
-
+}:
+NotEnoughGasProps) {
+  const { t } = useTranslation();
   const [isCopied, setIsCopied] = useState(false);
+
   const ethLogo = getEthTokenImage(environment);
   const imxLogo = getImxTokenImage(environment);
-  const heading = tokenSymbol === ETH_TOKEN_SYMBOL ? `${content.eth.heading}` : `${content.imx.heading}`;
-  const body = tokenSymbol === ETH_TOKEN_SYMBOL ? `${content.eth.body}` : `${content.imx.body}`;
-
+  const heading = tokenSymbol === ETH_TOKEN_SYMBOL
+    ? `${t('drawers.notEnoughGas.content.eth.heading')}` : `${t('drawers.notEnoughGas.content.imx.heading')}`;
+  const body = tokenSymbol === ETH_TOKEN_SYMBOL
+    ? `${t('drawers.notEnoughGas.content.eth.body')}` : `${t('drawers.notEnoughGas.content.imx.body')}`;
   const handleCopy = useCallback(() => {
     if (walletAddress && walletAddress !== '') {
       navigator.clipboard.writeText(walletAddress);
@@ -92,7 +94,7 @@ export function NotEnoughGas({
                 variant="tertiary"
                 onClick={onCloseDrawer}
               >
-                {buttons.adjustAmount}
+                {t('drawers.notEnoughGas.buttons.adjustAmount')}
               </Button>
             )}
             {
@@ -104,7 +106,7 @@ export function NotEnoughGas({
                     variant="tertiary"
                     onClick={handleCopy}
                   >
-                    {buttons.copyAddress}
+                    {t('drawers.notEnoughGas.buttons.copyAddress')}
                     <Button.Icon icon={isCopied ? 'Tick' : 'CopyText'} />
                   </Button>
                 )
@@ -115,7 +117,7 @@ export function NotEnoughGas({
                     variant="tertiary"
                     onClick={onAddCoinsClick}
                   >
-                    {buttons.addMoreImx}
+                    {t('drawers.notEnoughGas.buttons.addMoreImx')}
                   </Button>
                 )
             }
@@ -125,7 +127,7 @@ export function NotEnoughGas({
               onClick={onCloseDrawer}
               testId="not-enough-gas-cancel-button"
             >
-              {buttons.cancel}
+              {t('drawers.notEnoughGas.buttons.cancel')}
             </Button>
           </Box>
           <Box sx={logoContainerStyles}>

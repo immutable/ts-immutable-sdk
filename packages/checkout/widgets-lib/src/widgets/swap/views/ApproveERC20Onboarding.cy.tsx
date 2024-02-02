@@ -4,13 +4,13 @@ import { BigNumber } from 'ethers';
 import { ExternalProvider, TransactionRequest, Web3Provider } from '@ethersproject/providers';
 import { Checkout, CheckoutErrorType } from '@imtbl/checkout-sdk';
 import { Quote } from '@imtbl/dex-sdk';
+import { TFunction } from 'i18next';
+import { useTranslation } from 'react-i18next';
 import { ApproveERC20Onboarding } from './ApproveERC20Onboarding';
 import { cyIntercept, cySmartGet } from '../../../lib/testUtils';
-import { text } from '../../../resources/text/textConfig';
 import {
   ApproveERC20SwapData,
   PrefilledSwapForm,
-  SwapWidgetViews,
 } from '../../../context/view-context/SwapViewContextTypes';
 import { SwapState } from '../context/SwapContext';
 import { SwapWidgetTestComponent } from '../test-components/SwapWidgetTestComponent';
@@ -21,6 +21,7 @@ import {
 import { CustomAnalyticsProvider } from '../../../context/analytics-provider/CustomAnalyticsProvider';
 
 describe('Approve ERC20 Onboarding', () => {
+  let t: TFunction;
   let initialSwapState: SwapState;
   let connectLoaderState: ConnectLoaderState;
   let mockApproveERC20Swap: ApproveERC20SwapData;
@@ -33,6 +34,7 @@ describe('Approve ERC20 Onboarding', () => {
   } as Web3Provider;
 
   beforeEach(() => {
+    t = useTranslation().t;
     cy.viewport('ipad-2');
     cyIntercept();
     sendTransactionStub = cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub');
@@ -124,7 +126,6 @@ describe('Approve ERC20 Onboarding', () => {
       sendTransactionStub.resolves({
         transactionResponse: { wait: () => Promise.resolve({ status: 1 }) },
       });
-      const { approveSwap, approveSpending } = text.views[SwapWidgetViews.APPROVE_ERC20];
       mount(
         <CustomAnalyticsProvider checkout={{} as Checkout}>
           <ConnectLoaderTestComponent
@@ -138,25 +139,29 @@ describe('Approve ERC20 Onboarding', () => {
       );
 
       // assert approve spending copy
-      cySmartGet('simple-text-body__heading').should('have.text', approveSpending.content.metamask.heading);
-      cySmartGet('simple-text-body__body').should('include.text', approveSpending.content.metamask.body[0]);
-      cySmartGet('simple-text-body__body').should('include.text', approveSpending.content.metamask.body[1]);
-      cySmartGet('footer-button').should('have.text', approveSpending.footer.buttonText);
+      cySmartGet('simple-text-body__heading').should(
+        'have.text',
+        t('views.APPROVE_ERC20.approveSpending.content.metamask.heading'),
+      );
+      cySmartGet('simple-text-body__body').should(
+        'include.text',
+        t('views.APPROVE_ERC20.approveSpending.content.metamask.body'),
+      );
+      cySmartGet('footer-button').should('have.text', t('views.APPROVE_ERC20.approveSpending.footer.buttonText'));
 
       // make transaction
       cySmartGet('footer-button').click();
 
       // assert approve swap copy
-      cySmartGet('simple-text-body__heading').should('have.text', approveSwap.content.heading);
-      cySmartGet('simple-text-body__body').should('include.text', approveSwap.content.body[0]);
-      cySmartGet('footer-button').should('have.text', approveSwap.footer.buttonText);
+      cySmartGet('simple-text-body__heading').should('have.text', t('views.APPROVE_ERC20.approveSwap.content.heading'));
+      cySmartGet('simple-text-body__body').should('include.text', t('views.APPROVE_ERC20.approveSwap.content.body'));
+      cySmartGet('footer-button').should('have.text', t('views.APPROVE_ERC20.approveSwap.footer.buttonText'));
     });
 
     it('should move to the approve swap content with Passport', () => {
       sendTransactionStub.resolves({
         transactionResponse: { wait: () => Promise.resolve({ status: 1 }) },
       });
-      const { approveSwap, approveSpending } = text.views[SwapWidgetViews.APPROVE_ERC20];
       mount(
         <CustomAnalyticsProvider checkout={{} as Checkout}>
           <ConnectLoaderTestComponent
@@ -175,17 +180,23 @@ describe('Approve ERC20 Onboarding', () => {
       );
 
       // assert approve spending copy
-      cySmartGet('simple-text-body__heading').should('have.text', approveSpending.content.passport.heading);
-      cySmartGet('simple-text-body__body').should('include.text', approveSpending.content.passport.body);
-      cySmartGet('footer-button').should('have.text', approveSpending.footer.buttonText);
+      cySmartGet('simple-text-body__heading').should(
+        'have.text',
+        t('views.APPROVE_ERC20.approveSpending.content.passport.heading'),
+      );
+      cySmartGet('simple-text-body__body').should(
+        'include.text',
+        t('views.APPROVE_ERC20.approveSpending.content.passport.body'),
+      );
+      cySmartGet('footer-button').should('have.text', t('views.APPROVE_ERC20.approveSpending.footer.buttonText'));
 
       // make transaction
       cySmartGet('footer-button').click();
 
       // assert approve swap copy
-      cySmartGet('simple-text-body__heading').should('have.text', approveSwap.content.heading);
-      cySmartGet('simple-text-body__body').should('include.text', approveSwap.content.body[0]);
-      cySmartGet('footer-button').should('have.text', approveSwap.footer.buttonText);
+      cySmartGet('simple-text-body__heading').should('have.text', t('views.APPROVE_ERC20.approveSwap.content.heading'));
+      cySmartGet('simple-text-body__body').should('include.text', t('views.APPROVE_ERC20.approveSwap.content.body'));
+      cySmartGet('footer-button').should('have.text', t('views.APPROVE_ERC20.approveSwap.footer.buttonText'));
     });
 
     it('should show correct approval spending hint (amount and symbol) in body', () => {
@@ -206,7 +217,6 @@ describe('Approve ERC20 Onboarding', () => {
 
     it('should reset the button text when user rejects request', () => {
       sendTransactionStub.rejects({ type: CheckoutErrorType.USER_REJECTED_REQUEST_ERROR });
-      const { footer } = text.views[SwapWidgetViews.APPROVE_ERC20].approveSpending;
       mount(
         <CustomAnalyticsProvider checkout={{} as Checkout}>
           <ConnectLoaderTestComponent
@@ -218,11 +228,11 @@ describe('Approve ERC20 Onboarding', () => {
           </ConnectLoaderTestComponent>
         </CustomAnalyticsProvider>,
       );
-      cySmartGet('footer-button').should('have.text', footer.buttonText);
+      cySmartGet('footer-button').should('have.text', t('views.APPROVE_ERC20.approveSpending.footer.buttonText'));
 
       cySmartGet('footer-button').click();
 
-      cySmartGet('footer-button').should('have.text', footer.retryText);
+      cySmartGet('footer-button').should('have.text', t('views.APPROVE_ERC20.approveSpending.footer.retryText'));
     });
   });
 

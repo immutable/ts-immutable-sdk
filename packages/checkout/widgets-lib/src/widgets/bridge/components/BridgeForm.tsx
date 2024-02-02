@@ -470,7 +470,7 @@ export function BridgeForm(props: BridgeFormProps) {
               selectedOption={selectedOption}
               subtext={tokenBalanceSubtext}
               textAlign="left"
-              errorMessage={tokenError}
+              errorMessage={t(tokenError)}
               onSelectChange={(option) => handleSelectTokenChange(option)}
               disabled={isFetching}
             />
@@ -484,7 +484,7 @@ export function BridgeForm(props: BridgeFormProps) {
               onTextInputChange={(value) => handleBridgeAmountChange(value)}
               onTextInputBlur={(value) => handleAmountInputBlur(value)}
               textAlign="right"
-              errorMessage={amountError}
+              errorMessage={t(amountError)}
               disabled={isFetching}
             />
           </Box>

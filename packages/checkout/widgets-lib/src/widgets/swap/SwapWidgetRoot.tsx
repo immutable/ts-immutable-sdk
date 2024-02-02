@@ -21,6 +21,7 @@ import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyt
 import { topUpBridgeOption, topUpOnRampOption } from './helpers';
 import { sendSwapWidgetCloseEvent } from './SwapWidgetEvents';
 import { SwapWidget } from './SwapWidget';
+import i18n from '../../i18n';
 
 export class Swap extends Base<WidgetType.SWAP> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT;
@@ -72,19 +73,19 @@ export class Swap extends Base<WidgetType.SWAP> {
   private isNotPassport = !isPassportProvider(this.web3Provider)
     || this.parameters?.walletProviderName !== WalletProviderName.PASSPORT;
 
-  private topUpOptions(): { text: string; action: () => void }[] | undefined {
-    const optionsArray: { text: string; action: () => void }[] = [];
+  private topUpOptions(): { textKey: string; action: () => void }[] | undefined {
+    const optionsArray: { textKey: string; action: () => void }[] = [];
 
     const isOnramp = topUpOnRampOption(this.strongConfig().isOnRampEnabled);
     if (isOnramp) {
-      optionsArray.push({ text: isOnramp.text, action: isOnramp.action });
+      optionsArray.push({ ...isOnramp });
     }
     const isBridge = topUpBridgeOption(
       this.strongConfig().isBridgeEnabled,
       this.isNotPassport,
     );
     if (isBridge) {
-      optionsArray.push({ text: isBridge.text, action: isBridge.action });
+      optionsArray.push({ ...isBridge });
     }
 
     return optionsArray;
@@ -93,6 +94,7 @@ export class Swap extends Base<WidgetType.SWAP> {
   protected render() {
     if (!this.reactRoot) return;
 
+    const { t } = i18n;
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER2,
       walletProviderName: this.parameters.walletProviderName,
@@ -121,7 +123,7 @@ export class Swap extends Base<WidgetType.SWAP> {
                   onCloseClick={() => sendSwapWidgetCloseEvent(window)}
                   primaryActionText={
                         topUpOptions && topUpOptions?.length > 0
-                          ? topUpOptions[0].text
+                          ? t(topUpOptions[0].textKey)
                           : undefined
                       }
                   onPrimaryButtonClick={
@@ -131,7 +133,7 @@ export class Swap extends Base<WidgetType.SWAP> {
                       }
                   secondaryActionText={
                         topUpOptions?.length === 2
-                          ? topUpOptions[1].text
+                          ? t(topUpOptions[1].textKey)
                           : undefined
                       }
                   onSecondaryButtonClick={

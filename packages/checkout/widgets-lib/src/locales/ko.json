@@ -565,8 +565,14 @@
     },
     "notEnoughGas": {
       "content": {
-        "heading": "잔액이 너무 낮습니다",
-        "body": "이 이동에 필요한 가스 수수료를 충당하기에 ETH 잔액이 너무 낮습니다. MetaMask를 직접 사용하여 지갑에 ETH를 더 이전할 수 있습니다."
+        "eth": {
+          "heading": "잔액이 너무 낮습니다",
+          "body": "이 이동에 필요한 가스 수수료를 충당하기에 ETH 잔액이 너무 낮습니다. MetaMask를 직접 사용하여 지갑에 ETH를 더 이전할 수 있습니다."
+        },
+        "imx": {
+          "heading": "더 많은 IMX 코인이 필요할 것입니다",
+          "body": "지정된 금액의 수수료를 커버하기 위해 더 많은 IMX 코인을 추가해야 합니다"
+        }
       },
       "buttons": {
         "adjustAmount": "금액 조정",
