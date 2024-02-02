@@ -12,7 +12,7 @@ import {
   NetworkMap,
   AllowedNetworkConfig,
 } from '../types';
-import { CheckoutConfiguration, getL1ChainId } from '../config';
+import { CheckoutConfiguration } from '../config';
 import { getUnderlyingChainId } from '../provider/getUnderlyingProvider';
 
 const UNRECOGNISED_CHAIN_ERROR_CODE = 4902; // error code (MetaMask)
@@ -168,13 +168,14 @@ export async function switchWalletNetwork(
       CheckoutErrorType.SWITCH_NETWORK_UNSUPPORTED,
     );
   }
-  try {
-    if (chainId !== getL1ChainId(config)) {
-      await addNetworkToWallet(networkMap, web3Provider, chainId);
-    }
-  } catch (err) {
-    console.log(err);
-  }
+
+  // try {
+  //   if (chainId !== getL1ChainId(config)) {
+  //     await addNetworkToWallet(networkMap, web3Provider, chainId);
+  //   }
+  // } catch (err) {
+  //   console.log(err);
+  // }
 
   // WT-1146 - Refer to the README in this folder for explanation on the switch network flow
   try {
