@@ -4,6 +4,7 @@ import {
   WalletFilter,
   WalletInfo,
   WalletProviderName,
+  ChainId,
 } from '@imtbl/checkout-sdk';
 import {
   useContext,
@@ -12,6 +13,8 @@ import {
   useCallback,
 } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
+import { addProviderListenersForWidgetRoot } from 'lib';
+import { identifyUser } from 'lib/analytics/identifyUser';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import {
   ConnectContext,
@@ -29,19 +32,23 @@ import {
 } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 export interface WalletListProps {
+  targetChainId: ChainId;
+  allowedChains: ChainId[];
   walletFilterTypes?: WalletFilterTypes;
   excludeWallets?: WalletFilter[];
 }
 
 export function WalletList(props: WalletListProps) {
-  const { walletFilterTypes, excludeWallets } = props;
+  const {
+    targetChainId, allowedChains, walletFilterTypes, excludeWallets,
+  } = props;
   const {
     connectDispatch,
     connectState: { checkout, passport },
   } = useContext(ConnectContext);
   const { viewDispatch } = useContext(ViewContext);
   const [wallets, setWallets] = useState<WalletInfo[]>([]);
-  const { track } = useAnalytics();
+  const { track, identify } = useAnalytics();
 
   const excludedWallets = useCallback(() => {
     const passportWalletProvider = { walletProviderName: WalletProviderName.PASSPORT };
@@ -99,12 +106,48 @@ export function WalletList(props: WalletListProps) {
             walletProviderName,
           },
         });
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: { type: ConnectWidgetViews.READY_TO_CONNECT },
-          },
-        });
+
+        if (walletProviderName === WalletProviderName.WALLET_CONNECT) {
+          track({
+            userJourney: UserJourney.CONNECT,
+            screen: 'ReadyToConnect',
+            control: 'Connect',
+            controlType: 'Button',
+          });
+          const connectResult = await checkout.connect({
+            provider: web3Provider,
+          });
+
+          // Set up EIP-1193 provider event listeners for widget root instances
+          addProviderListenersForWidgetRoot(connectResult.provider);
+
+          await identifyUser(identify, connectResult.provider);
+
+          const chainId = await web3Provider.getSigner().getChainId();
+          if (chainId !== targetChainId && !allowedChains?.includes(chainId)) {
+            viewDispatch({
+              payload: {
+                type: ViewActions.UPDATE_VIEW,
+                view: { type: ConnectWidgetViews.SWITCH_NETWORK },
+              },
+            });
+            return;
+          }
+
+          viewDispatch({
+            payload: {
+              type: ViewActions.UPDATE_VIEW,
+              view: { type: ConnectWidgetViews.SUCCESS },
+            },
+          });
+        } else {
+          viewDispatch({
+            payload: {
+              type: ViewActions.UPDATE_VIEW,
+              view: { type: ConnectWidgetViews.READY_TO_CONNECT },
+            },
+          });
+        }
       } catch (err: any) {
         viewDispatch({
           payload: {
