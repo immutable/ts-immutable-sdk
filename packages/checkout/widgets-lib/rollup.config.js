@@ -41,19 +41,9 @@ export default [
         browser: true,
         dedupe: ['react', 'react-dom'],
       }),
-      nodePolyfills({
-        include: ['assert', 'events', 'buffer', 'crypto', 'https', 'os', 'stream'],
-        globals: {
-          Buffer: true,
-          global: true,
-          process: true,
-        },
-      }),
+      nodePolyfills(),
       commonjs(),
-      typescript({
-        declaration: false,
-        declarationMap: false,
-      }),
+      typescript(),
       ...defaultPlugin,
       terser(),
     ],
