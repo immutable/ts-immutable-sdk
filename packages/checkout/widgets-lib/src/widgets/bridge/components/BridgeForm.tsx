@@ -17,7 +17,6 @@ import {
 } from 'react';
 import { BigNumber, utils } from 'ethers';
 import { FeesBreakdown } from 'components/FeesBreakdown/FeesBreakdown';
-import { BridgeFeeActions } from '@imtbl/bridge-sdk';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { useTranslation } from 'react-i18next';
 import { amountInputValidation } from '../../../lib/validations/amountInputValidations';
@@ -206,8 +205,8 @@ export function BridgeForm(props: BridgeFormProps) {
     if (parseFloat(formAmount) <= 0) return false;
     if (!formToken) return false;
     if (isFetching) return false;
-    if (!from) return false;
-    if (!to) return false;
+    if (!from || !from.walletAddress) return false;
+    if (!to || !to.walletAddress) return false;
     return true;
   };
 
@@ -227,24 +226,44 @@ export function BridgeForm(props: BridgeFormProps) {
     // fetching or the user is updating the inputs.
     if ((silently && (loading || editing)) || !checkout) return;
 
-    const bridgeFeeAction = from?.network === getL1ChainId(checkout.config)
-      ? BridgeFeeActions.DEPOSIT
-      : BridgeFeeActions.WITHDRAW;
+    const tokenIsNative = isNativeToken(formToken?.token.address);
+    const amountToBridge = tokenIsNative
+      ? utils.parseUnits(formAmount)
+      : utils.parseUnits(formAmount, formToken?.token.decimals);
 
-    const gasEstimate = await tokenBridge!.getFee({
-      action: bridgeFeeAction,
-      gasMultiplier: 1.1,
-      sourceChainId: from?.network.toString() ?? '',
-      destinationChainId: to?.network.toString() ?? '',
-      token: NATIVE.toUpperCase(),
-      amount: BigNumber.from(0),
-    });
+    const tokenAddress = tokenIsNative ? NATIVE.toUpperCase() : formToken?.token.address;
+
+    const [unsignedApproveTransaction, unsignedTransaction] = await Promise.all([
+      tokenBridge!.getUnsignedApproveBridgeTx({
+        senderAddress: from!.walletAddress!,
+        token: tokenAddress ?? NATIVE.toUpperCase(),
+        amount: amountToBridge,
+        sourceChainId: from!.network.toString(),
+        destinationChainId: to!.network.toString(),
+      }),
+      tokenBridge!.getUnsignedBridgeTx({
+        senderAddress: from!.walletAddress!,
+        recipientAddress: to!.walletAddress!,
+        token: tokenAddress ?? NATIVE.toUpperCase(),
+        amount: amountToBridge,
+        sourceChainId: from!.network.toString(),
+        destinationChainId: to!.network.toString(),
+        gasMultiplier: 1.1,
+      }),
+    ]);
+
+    const transactionFeeData = unsignedTransaction.feeData;
+
+    const { totalFees, approvalFee } = transactionFeeData;
+
+    let rawTotalFees = totalFees;
+    if (!unsignedApproveTransaction.unsignedTx) {
+      rawTotalFees = totalFees.sub(approvalFee);
+    }
 
     const gasEstimateResult = {
       gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-      fees: {
-        totalFees: gasEstimate.totalFees,
-      },
+      fees: { totalFees: rawTotalFees },
       token: checkout.config.networkMap.get(from!.network)?.nativeCurrency,
     } as GasEstimateBridgeToL2Result;
 
@@ -528,16 +547,17 @@ export function BridgeForm(props: BridgeFormProps) {
           onRetry={retrySubmitBridge}
         />
         <NotEnoughGas
+          environment={checkout.config.environment}
           visible={showNotEnoughGasDrawer}
           showHeaderBar={false}
           onCloseDrawer={() => setShowNotEnoughGasDrawer(false)}
           walletAddress={walletAddress}
           showAdjustAmount={isNativeToken(formToken?.token.address)}
           tokenSymbol={
-              from?.network === getL1ChainId(checkout?.config)
-                ? ETH_TOKEN_SYMBOL
-                : IMX_TOKEN_SYMBOL
-            }
+            from?.network === getL1ChainId(checkout?.config)
+              ? ETH_TOKEN_SYMBOL
+              : IMX_TOKEN_SYMBOL
+          }
           onAddCoinsClick={() => {
             viewDispatch({
               payload: {

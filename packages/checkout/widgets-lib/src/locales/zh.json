@@ -55,7 +55,11 @@
     },
     "ERROR_VIEW": {
       "heading": "出了些问题",
-      "body": ["您可以再试一次或联系", "支持", "寻求帮助。"],
+      "body": [
+        "您可以再试一次或联系",
+        "支持",
+        "寻求帮助。"
+      ],
       "actionText": "再试一次"
     },
     "SERVICE_UNAVAILABLE_ERROR_VIEW": {
@@ -273,7 +277,7 @@
         "caption": "硬币余额不足。请用卡支付以继续，或者",
         "captionEnd": "再次尝试。",
         "captionCTA": "添加硬币"
-      },                 
+      },
       "loading": {
         "ready": "准备购买",
         "confirm": "在您的钱包中确认",
@@ -440,8 +444,79 @@
     },
     "IN_PROGRESS": {
       "heading": "转移进行中",
-      "body1": "不到3分钟您的${symbol}就会着陆到zkEVM。",
-      "body2": "您可以关闭这个窗口，一旦交易完成，将会反映在您的钱包中。"
+      "body1": "您的资金已经发送，距离收到不到20分钟。您可以点击火箭图标返回并查看进展。",
+      "body2": "您可以关闭这个窗口。"
+    },
+    "TRANSACTIONS": {
+      "layoutHeading": "进行中",
+      "passportDashboard": "在您的完整交易历史中查看",
+      "status": {
+        "withdrawalPending": {
+          "actionButtonText": "继续",
+          "withdrawalDelayText": "此操作已暂停，请返回",
+          "withdrawalReadyText": "需要采取行动以收取您的硬币",
+          "caption": "已暂停"
+        },
+        "inProgress": {
+          "heading": "进行中",
+          "txnEstimate": "通常需要20分钟",
+          "stepInfo": "查看详情"
+        },
+        "emptyState": {
+          "notConnected": {
+            "body": "连接您的钱包以查看交易",
+            "buttonText": "连接"
+          }
+        },
+        "noTransactions": {
+          "body": "您已完成所有操作。",
+          "passport": {
+            "body": "在",
+            "link": "护照"
+          }
+        }
+      },
+      "changeWallet": {
+        "buttonText": "更换钱包"
+      },
+      "fiatPricePrefix": "≈ 美元 $",
+      "support": {
+        "body1": "需要帮助吗？",
+        "body2": " 联系 ",
+        "body3": "支持",
+        "supportLink": "https://support.immutable.com/en/",
+        "passport": {
+          "body1": "或在您的 ",
+          "body2": "护照"
+        }
+      },
+      "walletSelection": {
+        "heading": "选择要查看的钱包"
+      }
+    },
+    "CLAIM_WITHDRAWAL": {
+      "content": {
+        "heading": "按照提示在此处收取您的硬币",
+        "body": "您将被要求支付一笔小额燃气费以领取您的提款。",
+        "body2": "目标钱包地址："
+      },
+      "footer": {
+        "buttonText": "继续",
+        "retryText": "重试"
+      },
+      "IN_PROGRESS": {
+        "loading": {
+          "text": "处理中"
+        },
+        "success": {
+          "text": "成功",
+          "actionText": "完成"
+        },
+        "failure": {
+          "text": "交易失败",
+          "actionText": "请重试"
+        }
+      }
     }
   },
   "footers": {
@@ -518,6 +593,18 @@
         "adjustAmount": "Adjust amount",
         "addMoreImx": "Add IMX coins",
         "cancel": "Dismiss"
+      }
+    },
+    "notEnoughEthWithdrawal": {
+      "content": {
+        "heading1": "不足",
+        "heading2": "用于燃气",
+        "body1": "添加",
+        "body2": "到您的目标账户，或选择另一个账户支付燃气费。您的目标账户将保持不变。"
+      },
+      "buttons": {
+        "retry": "使用另一个账户支付燃气费",
+        "dismiss": "取消"
       }
     },
     "unableToSwap": {

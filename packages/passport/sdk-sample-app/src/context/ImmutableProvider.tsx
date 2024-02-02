@@ -4,7 +4,7 @@ import React, {
 import { Config, ImmutableX } from '@imtbl/core-sdk';
 import { Passport, PassportModuleConfiguration } from '@imtbl/passport';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { ImmutableXClient } from '@imtbl/immutablex-client';
+import { IMXClient } from '@imtbl/x-client';
 import {
   AUDIENCE,
   LOGOUT_REDIRECT_URI,
@@ -85,7 +85,7 @@ const getPassportConfig = (environment: EnvironmentNames): PassportModuleConfigu
           imxApiClients: new ImxApiClients(createConfig({
             basePath: 'https://api.dev.immutable.com',
           })),
-          immutableXClient: new ImmutableXClient({
+          immutableXClient: new IMXClient({
             baseConfig,
             overrides: {
               immutableXConfig: getCoreSdkConfig(EnvironmentNames.DEV),

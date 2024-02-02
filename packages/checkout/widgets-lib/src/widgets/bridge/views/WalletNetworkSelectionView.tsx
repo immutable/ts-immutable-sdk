@@ -46,7 +46,7 @@ export function WalletNetworkSelectionView() {
                   },
                 });
               }}
-              testId="settings-button"
+              testId="move-transactions-button"
             />
           )}
         />

@@ -3,6 +3,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import { ethers } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { Passport } from '@imtbl/passport';
+import { track } from '@imtbl/metrics';
 import * as balances from './balances';
 import * as tokens from './tokens';
 import * as connect from './connect';
@@ -115,6 +116,7 @@ export class Checkout {
       this.walletConnectConfig = WALLET_CONNECT_SANDBOX;
     }
     console.log('SDK wc chains', this.walletConnectConfig);
+    track('checkout_sdk', 'initialised');
   }
 
   /**
@@ -213,7 +215,11 @@ export class Checkout {
       } as ValidateProviderOptions,
     );
 
-    await connect.connectSite(web3Provider);
+    if (params.requestWalletPermissions && !(web3Provider.provider as any)?.isPassport) {
+      await connect.requestPermissions(web3Provider);
+    } else {
+      await connect.connectSite(web3Provider);
+    }
 
     return { provider: web3Provider };
   }

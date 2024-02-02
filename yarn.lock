@@ -2169,18 +2169,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/design-tokens@npm:^0.2.10":
-  version: 0.2.10
-  resolution: "@biom3/design-tokens@npm:0.2.10"
+"@biom3/design-tokens@npm:^0.2.11":
+  version: 0.2.11
+  resolution: "@biom3/design-tokens@npm:0.2.11"
   dependencies:
     lodash.get: ^4.4.2
-  checksum: f2a3a16087ab7eeb2ebb86d1c97ae3263a20e774cdbcf0d71a1d81d65607e99ff0d2ddb275f71a7334158ac30373fe4ff402a93c8ef206e8d46f5cd9a744c4d2
+  checksum: eb0d94cdd8820dddda6be407d6dea938b68bb6de0fdda50fa8769f22f82c6196bdb6a3d4dd3a4b30fec0a9f5925657681cfa5b34022b8f83b2683c67aeed3341
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.19.40":
-  version: 0.19.40
-  resolution: "@biom3/react@npm:0.19.40"
+"@biom3/react@npm:^0.19.42":
+  version: 0.19.44
+  resolution: "@biom3/react@npm:0.19.44"
   dependencies:
     "@biom3/design-tokens": "*"
     "@emotion/css": ^11.11.2
@@ -2199,7 +2199,7 @@ __metadata:
     react-is: ^18.2.0
     react-keyed-flatten-children: ^3.0.0
     ts-deepmerge: ^6.2.0
-  checksum: cfd094f9276e517a5ff8264214ba0efa04a06734ccc2843691d8288705727a170b4ffd2fafb0f4644baa042b46b5fac3d6e98cf86826f458870b8cece4a0861d
+  checksum: 601dba7d1c7ce9e8218d9ae209ab453ed3cc23f1e708ad23e153856d73af5cef5453f4dcf946e2e78614d58e5a3315106b422a1171c95313fa48d9e1f99451e6
   languageName: node
   linkType: hard
 
@@ -3306,7 +3306,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-sdk-sample-app@workspace:packages/checkout/sdk-sample-app"
   dependencies:
-    "@biom3/react": ^0.19.40
+    "@biom3/react": ^0.19.42
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
@@ -3347,6 +3347,7 @@ __metadata:
     "@imtbl/bridge-sdk": 0.0.0
     "@imtbl/config": 0.0.0
     "@imtbl/dex-sdk": 0.0.0
+    "@imtbl/metrics": 0.0.0
     "@imtbl/orderbook": 0.0.0
     "@imtbl/passport": 0.0.0
     "@metamask/detect-provider": ^2.0.0
@@ -3378,8 +3379,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-widgets-sample-app@workspace:packages/checkout/widgets-sample-app"
   dependencies:
-    "@biom3/design-tokens": ^0.2.10
-    "@biom3/react": ^0.19.40
+    "@biom3/design-tokens": ^0.2.11
+    "@biom3/react": ^0.19.42
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
@@ -3409,8 +3410,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-widgets@workspace:packages/checkout/widgets-lib"
   dependencies:
-    "@biom3/design-tokens": ^0.2.10
-    "@biom3/react": ^0.19.40
+    "@biom3/design-tokens": ^0.2.11
+    "@biom3/react": ^0.19.42
     "@ethersproject/providers": ^5.7.2
     "@imtbl/bridge-sdk": 0.0.0
     "@imtbl/checkout-sdk": 0.0.0
@@ -3468,6 +3469,7 @@ __metadata:
   resolution: "@imtbl/config@workspace:packages/config"
   dependencies:
     "@imtbl/core-sdk": ^2.4.0
+    "@imtbl/metrics": 0.0.0
     "@magic-ext/oidc": 4.2.0
     "@metamask/detect-provider": ^2.0.0
     "@rollup/plugin-typescript": ^11.0.0
@@ -3592,10 +3594,12 @@ __metadata:
   resolution: "@imtbl/game-bridge@workspace:packages/game-bridge"
   dependencies:
     "@imtbl/config": 0.0.0
-    "@imtbl/immutablex-client": 0.0.0
+    "@imtbl/metrics": 0.0.0
     "@imtbl/passport": 0.0.0
-    "@imtbl/provider": 0.0.0
     "@imtbl/version-check": 0.0.0
+    "@imtbl/x-client": 0.0.0
+    "@imtbl/x-provider": 0.0.0
+    eslint: ^8.40.0
     parcel: ^2.8.3
   languageName: unknown
   linkType: soft
@@ -3631,19 +3635,19 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/immutablex-client@0.0.0, @imtbl/immutablex-client@workspace:packages/immutablex_client":
+"@imtbl/metrics@0.0.0, @imtbl/metrics@workspace:packages/internal/metrics":
   version: 0.0.0-use.local
-  resolution: "@imtbl/immutablex-client@workspace:packages/immutablex_client"
+  resolution: "@imtbl/metrics@workspace:packages/internal/metrics"
   dependencies:
-    "@imtbl/config": 0.0.0
-    "@imtbl/core-sdk": ^2.4.0
     "@rollup/plugin-typescript": ^11.0.0
     "@swc/jest": ^0.2.24
     "@types/jest": ^29.4.3
+    axios: ^1.6.5
     eslint: ^8.40.0
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
     rollup: ^3.17.2
+    ts-jest: ^29.1.0
     typescript: ^4.9.5
   languageName: unknown
   linkType: soft
@@ -3675,13 +3679,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/passport-sdk-sample-app@workspace:packages/passport/sdk-sample-app"
   dependencies:
-    "@biom3/design-tokens": ^0.2.10
-    "@biom3/react": ^0.19.40
+    "@biom3/design-tokens": ^0.2.11
+    "@biom3/react": ^0.19.42
     "@imtbl/config": 0.0.0
     "@imtbl/core-sdk": ^2.4.0
-    "@imtbl/immutablex-client": 0.0.0
     "@imtbl/passport": 0.0.0
-    "@imtbl/provider": 0.0.0
+    "@imtbl/x-client": 0.0.0
+    "@imtbl/x-provider": 0.0.0
     "@metamask/detect-provider": ^2.0.0
     "@next/eslint-plugin-next": ^13.4.7
     "@types/node": ^18.14.2
@@ -3713,9 +3717,10 @@ __metadata:
     "@imtbl/core-sdk": ^2.4.0
     "@imtbl/generated-clients": 0.0.0
     "@imtbl/guardian": 0.0.0
-    "@imtbl/immutablex-client": 0.0.0
-    "@imtbl/provider": 0.0.0
+    "@imtbl/metrics": 0.0.0
     "@imtbl/toolkit": 0.0.0
+    "@imtbl/x-client": 0.0.0
+    "@imtbl/x-provider": 0.0.0
     "@magic-ext/oidc": 4.2.0
     "@metamask/detect-provider": ^2.0.0
     "@rollup/plugin-typescript": ^11.0.0
@@ -3747,39 +3752,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/provider@0.0.0, @imtbl/provider@workspace:packages/provider":
-  version: 0.0.0-use.local
-  resolution: "@imtbl/provider@workspace:packages/provider"
-  dependencies:
-    "@imtbl/config": 0.0.0
-    "@imtbl/core-sdk": ^2.4.0
-    "@imtbl/toolkit": 0.0.0
-    "@magic-ext/oidc": 4.2.0
-    "@metamask/detect-provider": ^2.0.0
-    "@rollup/plugin-typescript": ^11.0.0
-    "@swc/core": ^1.3.36
-    "@swc/jest": ^0.2.24
-    "@types/axios": ^0.14.0
-    "@types/jest": ^29.4.3
-    "@types/node": ^18.14.2
-    "@types/react": ^18.0.28
-    "@types/react-dom": ^18.0.11
-    "@typescript-eslint/eslint-plugin": ^5.57.1
-    "@typescript-eslint/parser": ^5.57.1
-    axios: ^1.6.5
-    eslint: ^8.40.0
-    ethers: ^5.7.2
-    jest: ^29.4.3
-    jest-environment-jsdom: ^29.4.3
-    magic-sdk: ^21.2.0
-    oidc-client-ts: 2.2.1
-    prettier: ^2.8.7
-    rollup: ^3.17.2
-    ts-node: ^10.9.1
-    typescript: ^4.9.5
-  languageName: unknown
-  linkType: soft
-
 "@imtbl/react-analytics@npm:0.2.1-alpha":
   version: 0.2.1-alpha
   resolution: "@imtbl/react-analytics@npm:0.2.1-alpha"
@@ -3796,8 +3768,8 @@ __metadata:
   dependencies:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
-    "@biom3/design-tokens": ^0.2.10
-    "@biom3/react": ^0.19.40
+    "@biom3/design-tokens": ^0.2.11
+    "@biom3/react": ^0.19.42
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
     "@ethersproject/providers": ^5.7.2
@@ -3810,12 +3782,12 @@ __metadata:
     "@imtbl/cryptofiat": 0.0.0
     "@imtbl/generated-clients": 0.0.0
     "@imtbl/guardian": 0.0.0
-    "@imtbl/immutablex-client": 0.0.0
     "@imtbl/orderbook": 0.0.0
     "@imtbl/passport": 0.0.0
-    "@imtbl/provider": 0.0.0
     "@imtbl/react-analytics": 0.2.1-alpha
     "@imtbl/version-check": 0.0.0
+    "@imtbl/x-client": 0.0.0
+    "@imtbl/x-provider": 0.0.0
     "@jest/globals": ^29.5.0
     "@magic-ext/oidc": 4.2.0
     "@metamask/detect-provider": ^2.0.0
@@ -3829,6 +3801,8 @@ __metadata:
     "@uniswap/router-sdk": ^1.4.0
     "@uniswap/sdk-core": ^3.0.1
     "@uniswap/v3-sdk": ^3.9.0
+    "@walletconnect/ethereum-provider": ^2.11.0
+    "@walletconnect/modal": ^2.6.2
     "@yarnpkg/cli": 3.5.0
     "@yarnpkg/core": 3.5.0
     assert: ^2.0.0
@@ -3912,6 +3886,56 @@ __metadata:
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
     rollup: ^3.17.2
+    typescript: ^4.9.5
+  languageName: unknown
+  linkType: soft
+
+"@imtbl/x-client@0.0.0, @imtbl/x-client@workspace:packages/x-client":
+  version: 0.0.0-use.local
+  resolution: "@imtbl/x-client@workspace:packages/x-client"
+  dependencies:
+    "@imtbl/config": 0.0.0
+    "@imtbl/core-sdk": ^2.4.0
+    "@rollup/plugin-typescript": ^11.0.0
+    "@swc/jest": ^0.2.24
+    "@types/jest": ^29.4.3
+    eslint: ^8.40.0
+    jest: ^29.4.3
+    jest-environment-jsdom: ^29.4.3
+    rollup: ^3.17.2
+    typescript: ^4.9.5
+  languageName: unknown
+  linkType: soft
+
+"@imtbl/x-provider@0.0.0, @imtbl/x-provider@workspace:packages/x-provider":
+  version: 0.0.0-use.local
+  resolution: "@imtbl/x-provider@workspace:packages/x-provider"
+  dependencies:
+    "@imtbl/config": 0.0.0
+    "@imtbl/core-sdk": ^2.4.0
+    "@imtbl/toolkit": 0.0.0
+    "@magic-ext/oidc": 4.2.0
+    "@metamask/detect-provider": ^2.0.0
+    "@rollup/plugin-typescript": ^11.0.0
+    "@swc/core": ^1.3.36
+    "@swc/jest": ^0.2.24
+    "@types/axios": ^0.14.0
+    "@types/jest": ^29.4.3
+    "@types/node": ^18.14.2
+    "@types/react": ^18.0.28
+    "@types/react-dom": ^18.0.11
+    "@typescript-eslint/eslint-plugin": ^5.57.1
+    "@typescript-eslint/parser": ^5.57.1
+    axios: ^1.6.5
+    eslint: ^8.40.0
+    ethers: ^5.7.2
+    jest: ^29.4.3
+    jest-environment-jsdom: ^29.4.3
+    magic-sdk: ^21.2.0
+    oidc-client-ts: 2.2.1
+    prettier: ^2.8.7
+    rollup: ^3.17.2
+    ts-node: ^10.9.1
     typescript: ^4.9.5
   languageName: unknown
   linkType: soft
@@ -25462,34 +25486,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sample-app@workspace:packages/provider/src/sample-app":
-  version: 0.0.0-use.local
-  resolution: "sample-app@workspace:packages/provider/src/sample-app"
-  dependencies:
-    "@biom3/react": ^0.19.40
-    "@imtbl/core-sdk": ^2.4.0
-    "@imtbl/sdk": 0.0.0
-    "@svgr/webpack": ^8.0.1
-    "@testing-library/jest-dom": ^5.16.5
-    "@testing-library/react": ^13.4.0
-    "@testing-library/user-event": ^13.5.0
-    "@types/jest": ^29.4.3
-    "@types/node": ^18.14.2
-    "@types/react": ^18.0.28
-    "@types/react-dom": ^18.0.11
-    assert-browserify: ^2.0.0
-    buffer: ^6.0.3
-    crypto-browserify: ^3.12.0
-    react: ^18.2.0
-    react-app-rewired: ^2.2.1
-    react-dom: ^18.2.0
-    react-scripts: 5.0.1
-    stream-browserify: ^3.0.0
-    typescript: ^4.9.5
-    web-vitals: ^2.1.4
-  languageName: unknown
-  linkType: soft
-
 "sanitize.css@npm:*":
   version: 13.0.0
   resolution: "sanitize.css@npm:13.0.0"
@@ -27492,8 +27488,8 @@ __metadata:
   linkType: hard
 
 "ts-jest@npm:^29.1.0":
-  version: 29.1.1
-  resolution: "ts-jest@npm:29.1.1"
+  version: 29.1.2
+  resolution: "ts-jest@npm:29.1.2"
   dependencies:
     bs-logger: 0.x
     fast-json-stable-stringify: 2.x
@@ -27520,7 +27516,7 @@ __metadata:
       optional: true
   bin:
     ts-jest: cli.js
-  checksum: a8c9e284ed4f819526749f6e4dc6421ec666f20ab44d31b0f02b4ed979975f7580b18aea4813172d43e39b29464a71899f8893dd29b06b4a351a3af8ba47b402
+  checksum: a0ce0affc1b716c78c9ab55837829c42cb04b753d174a5c796bb1ddf9f0379fc20647b76fbe30edb30d9b23181908138d6b4c51ef2ae5e187b66635c295cefd5
   languageName: node
   linkType: hard
 
@@ -29534,6 +29530,34 @@ __metadata:
   checksum: b89cb436c3463e7bd3020cb00f29ae3448f5cf26ad6a0eaaff4733020ae9b1b9080eb85dca86baf2eab6d975a638ab44265f84477621443091af4c27c4b11b19
   languageName: node
   linkType: hard
+
+"x-provider-sample-app@workspace:packages/x-provider/src/sample-app":
+  version: 0.0.0-use.local
+  resolution: "x-provider-sample-app@workspace:packages/x-provider/src/sample-app"
+  dependencies:
+    "@biom3/react": ^0.19.42
+    "@imtbl/core-sdk": ^2.4.0
+    "@imtbl/sdk": 0.0.0
+    "@svgr/webpack": ^8.0.1
+    "@testing-library/jest-dom": ^5.16.5
+    "@testing-library/react": ^13.4.0
+    "@testing-library/user-event": ^13.5.0
+    "@types/jest": ^29.4.3
+    "@types/node": ^18.14.2
+    "@types/react": ^18.0.28
+    "@types/react-dom": ^18.0.11
+    assert-browserify: ^2.0.0
+    buffer: ^6.0.3
+    crypto-browserify: ^3.12.0
+    react: ^18.2.0
+    react-app-rewired: ^2.2.1
+    react-dom: ^18.2.0
+    react-scripts: 5.0.1
+    stream-browserify: ^3.0.0
+    typescript: ^4.9.5
+    web-vitals: ^2.1.4
+  languageName: unknown
+  linkType: soft
 
 "xdg-basedir@npm:^5.0.1, xdg-basedir@npm:^5.1.0":
   version: 5.1.0

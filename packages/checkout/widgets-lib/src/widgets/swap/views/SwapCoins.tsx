@@ -6,6 +6,8 @@ import {
 } from 'react';
 import { WidgetTheme } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
+import { ConnectLoaderContext } from 'context/connect-loader-context/ConnectLoaderContext';
+import { Environment } from '@imtbl/config';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { QuickswapFooter } from '../../../components/Footer/QuickswapFooter';
@@ -43,6 +45,12 @@ export function SwapCoins({
       tokenBalances,
     },
   } = useContext(SwapContext);
+
+  const {
+    connectLoaderState: {
+      checkout,
+    },
+  } = useContext(ConnectLoaderContext);
 
   const [showNotEnoughImxDrawer, setShowNotEnoughImxDrawer] = useState(false);
 
@@ -94,6 +102,7 @@ export function SwapCoins({
         }}
         />
         <NotEnoughImx
+          environment={checkout?.config.environment ?? Environment.PRODUCTION}
           visible={showNotEnoughImxDrawer}
           showAdjustAmount={false}
           hasZeroImx

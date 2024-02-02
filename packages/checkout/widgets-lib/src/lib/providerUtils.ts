@@ -12,6 +12,7 @@ export function isMetaMaskProvider(provider?: Web3Provider | null) {
 export async function createAndConnectToProvider(
   checkout: Checkout,
   walletProviderName: WalletProviderName,
+  changeAccount?: boolean,
 ): Promise<Web3Provider> {
   let provider: Web3Provider;
   try {
@@ -33,9 +34,12 @@ export async function createAndConnectToProvider(
     throw error;
   }
 
-  if (!connected) {
+  if (!connected || changeAccount) {
     try {
-      const { provider: connectedProvider } = await checkout.connect({ provider });
+      const { provider: connectedProvider } = await checkout.connect({
+        provider,
+        requestWalletPermissions: changeAccount,
+      });
       provider = connectedProvider;
       connected = true;
     } catch (error: any) {

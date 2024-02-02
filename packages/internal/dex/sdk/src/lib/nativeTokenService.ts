@@ -28,4 +28,23 @@ export class NativeTokenService {
   maybeWrapAmount(amount: CoinAmount<Coin>): CoinAmount<ERC20> {
     return newAmount(amount.value, this.maybeWrapToken(amount.token));
   }
+
+  private isWrappedNative(token: Coin): boolean {
+    return token.type === 'erc20' && token.address.toLowerCase() === this.wrappedToken.address.toLowerCase();
+  }
+
+  isWrapOrUnwrap(tokenIn: Coin, tokenOut: Coin): boolean {
+    return (
+      (
+        tokenIn === this.nativeToken && (
+          this.isWrappedNative(tokenOut)
+        )
+      ) ||
+      (
+        (
+          this.isWrappedNative(tokenIn)
+        ) && tokenOut === this.nativeToken
+      )
+    );
+  }
 }

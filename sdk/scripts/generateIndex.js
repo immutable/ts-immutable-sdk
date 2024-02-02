@@ -12,8 +12,10 @@ const moduleData = JSON.parse(fileData);
 // Get the release type from the environment variable or default to 'alpha'
 const releaseType = process.env.RELEASE_TYPE || 'alpha';
 
-// Generate the index.ts file contents based on the release type
+
 let indexFileContent = '';
+
+// Generate the index.ts file contents based on the release type
 Object.keys(moduleData.modules).forEach((moduleName) => {
   const moduleReleaseType = moduleData.modules[moduleName];
 
