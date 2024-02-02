@@ -8,11 +8,11 @@ import nodePolyfills from 'rollup-plugin-polyfill-node';
 
 const defaultPlugin = [
   json(),
-  typescript(),
   replace({
     preventAssignment: true,
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
   }),
+  typescript(),
 ]
 
 export default [
