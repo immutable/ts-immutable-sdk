@@ -49,7 +49,6 @@ export async function connectSite(web3Provider: Web3Provider): Promise<Web3Provi
       { details: 'Attempting to connect with an incompatible provider' },
     );
   }
-
   await withCheckoutError<void>(
     async () => {
       if (!web3Provider.provider.request) return;

@@ -253,6 +253,9 @@ export function Transactions({ onBackButtonClick }: TransactionsProps) {
     if (checkout.passport) {
       options.push(WalletProviderName.PASSPORT);
     }
+    if (checkout.walletConnectConfig) {
+      options.push(WalletProviderName.WALLET_CONNECT);
+    }
     return options;
   }, [checkout]);
 

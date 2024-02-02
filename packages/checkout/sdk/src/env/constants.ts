@@ -405,6 +405,7 @@ export const WALLET_CONNECT_PRODUCTION = {
     explorerExcludedWalletIds: 'ALL',
   },
   optionalChains: [ChainId.ETHEREUM, ChainId.IMTBL_ZKEVM_MAINNET],
+  optionalMethods: ['eth_chainId', 'eth_accounts'],
   rpcMap: {
     [ChainId.ETHEREUM]: PRODUCTION_CHAIN_ID_NETWORK_MAP.get(ChainId.ETHEREUM)!.rpcUrls[0],
     [ChainId.IMTBL_ZKEVM_MAINNET]: PRODUCTION_CHAIN_ID_NETWORK_MAP.get(ChainId.IMTBL_ZKEVM_MAINNET)!.rpcUrls[0],
@@ -426,6 +427,7 @@ export const WALLET_CONNECT_SANDBOX = {
     explorerExcludedWalletIds: 'ALL',
   },
   optionalChains: [ChainId.SEPOLIA, ChainId.IMTBL_ZKEVM_TESTNET],
+  optionalMethods: ['eth_chainId', 'eth_accounts'],
   rpcMap: {
     [ChainId.SEPOLIA]: SANDBOX_CHAIN_ID_NETWORK_MAP.get(ChainId.SEPOLIA)!.rpcUrls[0],
     [ChainId.IMTBL_ZKEVM_TESTNET]: SANDBOX_CHAIN_ID_NETWORK_MAP.get(ChainId.IMTBL_ZKEVM_TESTNET)!.rpcUrls[0],

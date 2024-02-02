@@ -7,6 +7,7 @@ import {
 } from '@biom3/react';
 import { ChainId, WalletProviderName } from '@imtbl/checkout-sdk';
 import { getChainNameById } from 'lib/chains';
+import { getWalletDisplayName, getWalletLogoByName } from 'lib/logoUtils';
 import {
   networkButtonStyles,
   networkIconStyles,
@@ -21,11 +22,6 @@ const networkIcon = {
   [ChainId.IMTBL_ZKEVM_TESTNET]: 'Immutable',
   [ChainId.ETHEREUM]: 'EthToken',
   [ChainId.SEPOLIA]: 'EthToken',
-};
-
-const walletLogo = {
-  [WalletProviderName.PASSPORT]: 'PassportSymbolOutlined',
-  [WalletProviderName.METAMASK]: 'MetaMaskSymbol',
 };
 
 interface WalletNetworkButtonProps {
@@ -47,7 +43,8 @@ export function WalletNetworkButton({
   onNetworkClick,
 }: WalletNetworkButtonProps) {
   const networkName = getChainNameById(chainId);
-  const walletHeading = walletName === WalletProviderName.METAMASK ? 'Metamask' : 'Passport';
+  const walletHeading = getWalletDisplayName(walletName);
+  const walletLogo = getWalletLogoByName(walletName);
 
   return (
     <Box
@@ -56,7 +53,7 @@ export function WalletNetworkButton({
       onClick={onWalletClick}
     >
       <Logo
-        logo={walletLogo[walletName] as any}
+        logo={walletLogo as any}
         sx={walletLogoStyles(walletName)}
       />
       <Box sx={{

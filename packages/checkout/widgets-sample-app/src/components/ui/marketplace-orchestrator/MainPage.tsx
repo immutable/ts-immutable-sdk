@@ -147,9 +147,9 @@ export const MainPage = () => {
 
   return (
     <Box sx={{ minWidth: '100vw', minHeight: '100vh', width: '100%', height: '100%', backgroundColor: 'base.color.brand.6' }}>
-      <Box sx={{ width: '100%', padding: 'base.spacing.x4', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Box sx={{ width: '100%', padding: 'base.spacing.x4', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
         <Heading>Immutable Checkout Marketplace</Heading>
-        <Box sx={{ padding: 'base.spacing.x4', display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', gap: 'base.spacing.x6', alignItems: 'center' }}>
+        <Box sx={{ padding: 'base.spacing.x4', display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', gap: 'base.spacing.x6', alignItems: 'center', flexWrap: 'wrap' }}>
           <Button onClick={openConnectWidget}>Connect</Button>
           <Button onClick={openWalletWidget}>Wallet</Button>
           <Button onClick={openSwapWidget}>Swap</Button>

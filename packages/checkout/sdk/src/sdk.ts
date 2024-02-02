@@ -214,7 +214,7 @@ export class Checkout {
       } as ValidateProviderOptions,
     );
 
-    if (params.requestWalletPermissions && !(web3Provider.provider as any)?.isPassport) {
+    if (params.requestWalletPermissions && (web3Provider.provider as any)?.isMetaMask) {
       await connect.requestPermissions(web3Provider);
     } else {
       await connect.connectSite(web3Provider);
@@ -348,11 +348,11 @@ export class Checkout {
   public async sendTransaction(
     params: SendTransactionParams,
   ): Promise<SendTransactionResult> {
-    const web3Provider = await provider.validateProvider(
-      this.config,
-      params.provider,
-    );
-    return await transaction.sendTransaction(web3Provider, params.transaction);
+    // const web3Provider = await provider.validateProvider(
+    //   this.config,
+    //   params.provider,
+    // );
+    return await transaction.sendTransaction(params.provider, params.transaction);
   }
 
   /**
