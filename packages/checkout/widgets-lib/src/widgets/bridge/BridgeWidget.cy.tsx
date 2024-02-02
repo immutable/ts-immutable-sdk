@@ -12,7 +12,7 @@ import { TokenBridge } from '@imtbl/bridge-sdk';
 import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { Transaction } from 'lib/clients';
 import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
-import { BridgeWidget } from './BridgeWidget';
+import BridgeWidget from './BridgeWidget';
 import { text } from '../../resources/text/textConfig';
 import mockTransactionPending from './test-components/BridgeTransactionWithdrawalPending.json';
 import mockTransactionInProgress from './test-components/BridgeTransactionInProgress.json';

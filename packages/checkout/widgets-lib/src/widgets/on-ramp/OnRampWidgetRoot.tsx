@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import {
   ConnectTargetLayer,
   IMTBLWidgetEvents,
@@ -14,8 +14,9 @@ import { getL1ChainId, getL2ChainId } from 'lib';
 import { isValidAddress, isValidAmount } from 'lib/validations/widgetValidators';
 import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
-import { OnRampWidget } from './OnRampWidget';
 import { sendOnRampWidgetCloseEvent } from './OnRampWidgetEvents';
+
+const OnRampWidget = React.lazy(() => import('./OnRampWidget'));
 
 export class OnRamp extends Base<WidgetType.ONRAMP> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT;
@@ -74,11 +75,13 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
               params={connectLoaderParams}
               closeEvent={() => sendOnRampWidgetCloseEvent(window)}
             >
-              <OnRampWidget
-                tokenAddress={this.parameters.tokenAddress}
-                amount={this.parameters.amount}
-                config={this.strongConfig()}
-              />
+              <Suspense fallback={<div />}>
+                <OnRampWidget
+                  tokenAddress={this.parameters.tokenAddress}
+                  amount={this.parameters.amount}
+                  config={this.strongConfig()}
+                />
+              </Suspense>
             </ConnectLoader>
           </ThemeProvider>
         </CustomAnalyticsProvider>

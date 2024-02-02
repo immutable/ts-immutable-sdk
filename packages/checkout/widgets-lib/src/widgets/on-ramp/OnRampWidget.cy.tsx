@@ -6,7 +6,7 @@ import {
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { cySmartGet } from '../../lib/testUtils';
-import { OnRampWidget, OnRampWidgetInputs } from './OnRampWidget';
+import OnRampWidget, { OnRampWidgetInputs } from './OnRampWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
   ConnectLoaderTestComponent,

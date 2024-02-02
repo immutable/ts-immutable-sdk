@@ -10,7 +10,7 @@ import { Environment } from '@imtbl/config';
 import { Web3Provider } from '@ethersproject/providers';
 import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
-import { SwapWidget } from './SwapWidget';
+import SwapWidget from './SwapWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { quotesProcessor } from './functions/FetchQuote';
 import { text } from '../../resources/text/textConfig';

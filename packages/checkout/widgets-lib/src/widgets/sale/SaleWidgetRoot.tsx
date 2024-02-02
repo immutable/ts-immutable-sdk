@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import {
   ConnectTargetLayer,
   IMTBLWidgetEvents,
@@ -16,7 +16,8 @@ import { isValidAmount, isValidWalletProvider } from 'lib/validations/widgetVali
 import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
 import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
-import { SaleWidget } from './SaleWidget';
+
+const SaleWidget = React.lazy(() => import('./SaleWidget'));
 
 export class Sale extends Base<WidgetType.SALE> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT;
@@ -111,15 +112,17 @@ export class Sale extends Base<WidgetType.SALE> {
                 sendSaleWidgetCloseEvent(window);
               }}
             >
-              <SaleWidget
-                config={this.strongConfig()}
-                amount={this.parameters.amount!}
-                items={this.parameters.items!}
-                fromTokenAddress={this.parameters.fromTokenAddress!}
-                environmentId={this.parameters.environmentId!}
-                collectionName={this.parameters.collectionName!}
-                language="en"
-              />
+              <Suspense fallback={<div />}>
+                <SaleWidget
+                  config={this.strongConfig()}
+                  amount={this.parameters.amount!}
+                  items={this.parameters.items!}
+                  fromTokenAddress={this.parameters.fromTokenAddress!}
+                  environmentId={this.parameters.environmentId!}
+                  collectionName={this.parameters.collectionName!}
+                  language="en"
+                />
+              </Suspense>
             </ConnectLoader>
           </ThemeProvider>
         </CustomAnalyticsProvider>

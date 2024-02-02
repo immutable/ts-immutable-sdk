@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import {
   ConnectTargetLayer,
   IMTBLWidgetEvents,
@@ -14,8 +14,9 @@ import { getL1ChainId, getL2ChainId } from 'lib';
 import { isValidWalletProvider } from 'lib/validations/widgetValidators';
 import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
-import { WalletWidget } from './WalletWidget';
 import { sendWalletWidgetCloseEvent } from './WalletWidgetEvents';
+
+const WalletWidget = React.lazy(() => import('./WalletWidget'));
 
 export class Wallet extends Base<WidgetType.WALLET> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT;
@@ -67,9 +68,11 @@ export class Wallet extends Base<WidgetType.WALLET> {
               params={connectLoaderParams}
               closeEvent={() => sendWalletWidgetCloseEvent(window)}
             >
-              <WalletWidget
-                config={this.strongConfig()}
-              />
+              <Suspense fallback={<div />}>
+                <WalletWidget
+                  config={this.strongConfig()}
+                />
+              </Suspense>
             </ConnectLoader>
           </ThemeProvider>
         </CustomAnalyticsProvider>

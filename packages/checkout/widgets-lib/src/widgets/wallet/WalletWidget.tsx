@@ -38,7 +38,7 @@ export type WalletWidgetInputs = WalletWidgetParams & {
   config: StrongCheckoutWidgetsConfig
 };
 
-export function WalletWidget(props: WalletWidgetInputs) {
+export default function WalletWidget(props: WalletWidgetInputs) {
   const { t } = useTranslation();
   const errorActionText = t('views.ERROR_VIEW.actionText');
   const loadingText = t('views.LOADING_VIEW.text');
