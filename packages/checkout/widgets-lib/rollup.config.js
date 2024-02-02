@@ -12,7 +12,6 @@ const defaultPlugin = [
     preventAssignment: true,
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
   }),
-  typescript()
 ]
 
 export default [
@@ -23,16 +22,18 @@ export default [
       dir: 'dist',
       format: 'es'
     },
-    plugins: [...defaultPlugin ],
+    plugins: [ 
+      typescript(),
+      ...defaultPlugin
+    ],
   },
   {
     watch: false,
     input: 'src/index.ts',
     output: {
-      file: 'dist/widgets.js',
-      format: 'umd',
-      name: 'ImmutableCheckoutWidgets',
-      inlineDynamicImports: true
+      dir: 'dist',
+      format: 'es',
+      name: 'ImmutableCheckoutWidgets'
     },
     context: 'window',
     plugins: [
@@ -40,10 +41,21 @@ export default [
         browser: true,
         dedupe: ['react', 'react-dom'],
       }),
-      nodePolyfills(),
+      nodePolyfills({
+        include: ['assert', 'events', 'buffer', 'crypto', 'https', 'os', 'stream'],
+        globals: {
+          Buffer: true,
+          global: true,
+          process: true,
+        },
+      }),
       commonjs(),
+      typescript({
+        declaration: false,
+        declarationMap: false,
+      }),
       ...defaultPlugin,
       terser(),
-    ]
-  }
+    ],
+  },
 ]
