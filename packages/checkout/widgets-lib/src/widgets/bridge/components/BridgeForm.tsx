@@ -34,7 +34,6 @@ import {
 import { SelectForm } from '../../../components/FormComponents/SelectForm/SelectForm';
 import { validateAmount, validateToken } from '../functions/BridgeFormValidator';
 import {
-  bridgeButtonIconLoadingStyle,
   bridgeFormButtonContainerStyles,
   bridgeFormWrapperStyles,
   formInputsContainerStyles,
@@ -472,7 +471,6 @@ export function BridgeForm(props: BridgeFormProps) {
               textAlign="left"
               errorMessage={t(tokenError)}
               onSelectChange={(option) => handleSelectTokenChange(option)}
-              disabled={isFetching}
             />
             <TextInputForm
               testId="bridge-amount"
@@ -485,7 +483,6 @@ export function BridgeForm(props: BridgeFormProps) {
               onTextInputBlur={(value) => handleAmountInputBlur(value)}
               textAlign="right"
               errorMessage={t(amountError)}
-              disabled={isFetching}
             />
           </Box>
         )}
@@ -533,12 +530,9 @@ export function BridgeForm(props: BridgeFormProps) {
           testId={`${testId}-button`}
           variant="primary"
           onClick={submitBridge}
-          disabled={loading}
           size="large"
         >
-          {loading ? (
-            <Button.Icon icon="Loading" sx={bridgeButtonIconLoadingStyle} />
-          ) : t('views.BRIDGE_FORM.bridgeForm.buttonText')}
+          {t('views.BRIDGE_FORM.bridgeForm.buttonText')}
         </Button>
         <TransactionRejected
           visible={showTxnRejectedState}
