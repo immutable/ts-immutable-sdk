@@ -17,7 +17,10 @@ interface SwapInProgressProps {
   swapForm: PrefilledSwapForm;
 }
 
-export function SwapInProgress({ transactionResponse, swapForm }: SwapInProgressProps) {
+export function SwapInProgress({
+  transactionResponse,
+  swapForm,
+}: SwapInProgressProps) {
   const { t } = useTranslation();
   const { viewDispatch } = useContext(ViewContext);
 
@@ -45,6 +48,10 @@ export function SwapInProgress({ transactionResponse, swapForm }: SwapInProgress
               view: {
                 type: SwapWidgetViews.SUCCESS,
                 data: {
+                  fromTokenAddress: swapForm.fromTokenAddress,
+                  fromAmount: swapForm.fromAmount,
+                  toTokenAddress: swapForm.toTokenAddress,
+                  toAmount: swapForm.toAmount || '',
                   transactionHash: receipt.transactionHash,
                 },
               },

@@ -2,7 +2,7 @@ name: Publish SDK Reference Docs
 
 on:
   workflow_run:
-    workflows: ["Publish to NPM"]
+    workflows: ["Publish to NPM", "Publish Major Version to NPM"]
     types:
       - completed
 

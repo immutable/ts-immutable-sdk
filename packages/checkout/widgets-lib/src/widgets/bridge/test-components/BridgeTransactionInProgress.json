@@ -1,0 +1,19 @@
+{
+  "blockchain_metadata": {
+    "transaction_hash": "0x759fe56f17451b14c48443a5f02f8722887c1151defdc6167d3b4a484618e9a0"
+  },
+  "created_at": "2024-01-18T01:07:12Z",
+  "details": {
+    "amount": "10000000",
+    "current_status": {
+      "status": "in_progress"
+    },
+    "from_address": "0xe98b61832248c698085ffbc4313deb465be857e7",
+    "from_chain": "sepolia",
+    "from_token_address": "0x40b87d235a5b010a20a241f15797c9debf1ecd01",
+    "to_address": "0xf364930c779c6674472e131898c4b3f7aaccf1b7",
+    "to_chain": "imtbl-zkevm-testnet",
+    "to_token_address": "0x3b2d8a1931736fc321c24864bceee981b11c3c57"
+  },
+  "tx_type": "bridge"
+}

@@ -70,6 +70,7 @@ export function SwapButton({
         fromAmount: data?.fromAmount || '',
         fromTokenAddress: data?.fromTokenAddress || '',
         toTokenAddress: data?.toTokenAddress || '',
+        toAmount: data?.toAmount || '',
       };
 
       if (transaction.approval) {

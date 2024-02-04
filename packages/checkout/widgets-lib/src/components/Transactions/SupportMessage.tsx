@@ -1,9 +1,8 @@
 import { Body, Box, Link } from '@biom3/react';
-import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
-import { text } from 'resources/text/textConfig';
 import { Checkout } from '@imtbl/checkout-sdk';
 import { PASSPORT_URL } from 'lib';
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supportMessageBoxStyle, bodyStyle } from './SupportMessageStyles';
 
 type SupportMessageProps = {
@@ -15,16 +14,7 @@ export function SupportMessage({
   checkout,
   isPassport,
 }: SupportMessageProps) {
-  const {
-    support: {
-      body1,
-      body2,
-      body3,
-      supportLink,
-      passport,
-    },
-  } = text.views[BridgeWidgetViews.TRANSACTIONS];
-
+  const { t } = useTranslation();
   const [passportLink, setPassportLink] = useState('');
 
   useEffect(() => {
@@ -46,18 +36,18 @@ export function SupportMessage({
           <Body
             size="small"
           >
-            {body1}
+            {t('views.TRANSACTIONS.support.body1')}
           </Body>
           <Body
             size="small"
             sx={bodyStyle}
           >
-            {body2}
+            {t('views.TRANSACTIONS.support.body2')}
             <Link
               size="small"
-              rc={<a target="_blank" href={supportLink} rel="noreferrer" />}
+              rc={<a target="_blank" href={t('views.TRANSACTIONS.support.supportLink')} rel="noreferrer" />}
             >
-              {body3}
+              {t('views.TRANSACTIONS.support.body3')}
             </Link>
           </Body>
         </Box>
@@ -66,13 +56,13 @@ export function SupportMessage({
             size="small"
             sx={bodyStyle}
           >
-            {passport.body1}
+            {t('views.TRANSACTIONS.support.passport.body1')}
             {' '}
             <Link
               size="small"
               rc={<a target="_blank" href={passportLink} rel="noreferrer" />}
             >
-              {passport.body2}
+              {t('views.TRANSACTIONS.support.passport.body2')}
             </Link>
           </Body>
         )}

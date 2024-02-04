@@ -22,6 +22,7 @@ export const transactionsListStyle = (showPassportLink: boolean) => {
     backgroundColor: 'base.color.neutral.800',
     px: 'base.spacing.x4',
     pt: 'base.spacing.x5',
+    pb: 'base.spacing.x4',
     borderRadius: 'base.borderRadius.x6',
     h: `${height}px`,
     w: '100%',

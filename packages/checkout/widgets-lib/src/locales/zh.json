@@ -55,14 +55,20 @@
     },
     "ERROR_VIEW": {
       "heading": "出了些问题",
-      "body": ["您可以再试一次或联系", "支持", "寻求帮助。"],
+      "body": [
+        "您可以再试一次或联系",
+        "支持",
+        "寻求帮助。"
+      ],
       "actionText": "再试一次"
     },
     "SERVICE_UNAVAILABLE_ERROR_VIEW": {
       "heading": {
-        "swap": "您所在的地区无法使用兑换服务"
+        "swap": "您所在的地区不支持兑换"
       },
-      "body": "很抱歉我们无法在您的地区提供此项服务。"
+      "body": {
+        "swap": "请参考<quickswapLink>Quickswap</quickswapLink>的网站了解更多信息。"
+      }
     },
     "LOADING_VIEW": {
       "text": "加载中"
@@ -211,25 +217,25 @@
     },
     "TOP_UP_VIEW": {
       "header": {
-        "title": "您想如何添加硬币？"
+        "title": "您想如何添加代币？"
       },
       "topUpOptions": {
         "onramp": {
-          "heading": "用卡购买",
-          "caption": "支持Google pay与Apple pay。最低5美元。",
+          "heading": "购买",
+          "caption": "可通过卡、谷歌支付或苹果支付。",
           "subcaption": "费用",
           "disabledCaption": ""
         },
         "swap": {
-          "heading": "兑换我的硬币",
-          "caption": "使用我在同一网络上的硬币",
+          "heading": "兑换",
+          "caption": "使用我在余额中的代币。",
           "subcaption": "费用",
-          "disabledCaption": "您所在的区域不可用"
+          "disabledCaption": "您所在的地区不可用"
         },
         "bridge": {
-          "heading": "移动我的硬币",
-          "caption": "从我在不同网络上的硬币中",
-          "subcaption": "费用 ",
+          "heading": "转移",
+          "caption": "我在其他钱包或网络中的代币。",
+          "subcaption": "费用",
           "disabledCaption": ""
         }
       }
@@ -273,7 +279,7 @@
         "caption": "硬币余额不足。请用卡支付以继续，或者",
         "captionEnd": "再次尝试。",
         "captionCTA": "添加硬币"
-      },                 
+      },
       "loading": {
         "ready": "准备购买",
         "confirm": "在您的钱包中确认",
@@ -442,6 +448,77 @@
       "heading": "转移进行中",
       "body1": "您的资金已经发送，距离收到不到20分钟。您可以点击火箭图标返回并查看进展。",
       "body2": "您可以关闭这个窗口。"
+    },
+    "TRANSACTIONS": {
+      "layoutHeading": "进行中",
+      "passportDashboard": "在您的完整交易历史中查看",
+      "status": {
+        "withdrawalPending": {
+          "actionButtonText": "继续",
+          "withdrawalDelayText": "此操作已暂停，请返回",
+          "withdrawalReadyText": "需要采取行动以收取您的硬币",
+          "caption": "已暂停"
+        },
+        "inProgress": {
+          "heading": "进行中",
+          "txnEstimate": "通常需要20分钟",
+          "stepInfo": "查看详情"
+        },
+        "emptyState": {
+          "notConnected": {
+            "body": "连接您的钱包以查看交易",
+            "buttonText": "连接"
+          }
+        },
+        "noTransactions": {
+          "body": "您已完成所有操作。",
+          "passport": {
+            "body": "在",
+            "link": "护照"
+          }
+        }
+      },
+      "changeWallet": {
+        "buttonText": "更换钱包"
+      },
+      "fiatPricePrefix": "≈ 美元 $",
+      "support": {
+        "body1": "需要帮助吗？",
+        "body2": " 联系 ",
+        "body3": "支持",
+        "supportLink": "https://support.immutable.com/en/",
+        "passport": {
+          "body1": "或在您的 ",
+          "body2": "护照"
+        }
+      },
+      "walletSelection": {
+        "heading": "选择要查看的钱包"
+      }
+    },
+    "CLAIM_WITHDRAWAL": {
+      "content": {
+        "heading": "按照提示在此处收取您的硬币",
+        "body": "您将被要求支付一笔小额燃气费以领取您的提款。",
+        "body2": "目标钱包地址："
+      },
+      "footer": {
+        "buttonText": "继续",
+        "retryText": "重试"
+      },
+      "IN_PROGRESS": {
+        "loading": {
+          "text": "处理中"
+        },
+        "success": {
+          "text": "成功",
+          "actionText": "完成"
+        },
+        "failure": {
+          "text": "交易失败",
+          "actionText": "请重试"
+        }
+      }
     }
   },
   "footers": {
@@ -490,37 +567,55 @@
     },
     "notEnoughGas": {
       "content": {
-        "heading": "Balance too low",
-        "body": "You're ETH balance is too low to cover the gas fee on this move. You could transfer more ETH into your wallet using MetaMask directly."
+        "eth": {
+          "heading": "余额过低",
+          "body": "您的ETH余额不足以支付此操作的燃气费。您可以直接使用MetaMask向您的钱包转入更多ETH。"
+        },
+        "imx": {
+          "heading": "您需要更多IMX币",
+          "body": "为了支付指定金额的费用，您需要添加更多IMX币。"
+        }
       },
       "buttons": {
-        "adjustAmount": "Adjust amount",
-        "copyAddress": "Copy wallet address",
-        "cancel": "Dismiss"
+        "adjustAmount": "调整金额",
+        "copyAddress": "复制钱包地址",
+        "cancel": "关闭"
       }
     },
     "notEnoughImx": {
       "content": {
         "noImx": {
-          "heading": "You'll need IMX coins to swap",
-          "body": "Swap fees are paid in IMX coins, so you'll need to add this before you can swap"
+          "heading": "您需要IMX币来兑换",
+          "body": "兑换费用需要用IMX币支付，因此在您可以进行兑换之前需要添加此币"
         },
         "insufficientImx": {
-          "heading": "You'll need more IMX coins",
-          "body": "In order to cover the fees for the amount specified, you'll need to add more IMX coins"
+          "heading": "您需要更多IMX币",
+          "body": "为了支付指定金额的费用，您需要添加更多IMX币"
         }
       },
       "buttons": {
-        "adjustAmount": "Adjust amount",
-        "addMoreImx": "Add IMX coins",
-        "cancel": "Dismiss"
+        "adjustAmount": "调整金额",
+        "addMoreImx": "添加IMX币",
+        "cancel": "关闭"
+      }
+    },
+    "notEnoughEthWithdrawal": {
+      "content": {
+        "heading1": "不足",
+        "heading2": "用于燃气",
+        "body1": "添加",
+        "body2": "到您的目标账户，或选择另一个账户支付燃气费。您的目标账户将保持不变。"
+      },
+      "buttons": {
+        "retry": "使用另一个账户支付燃气费",
+        "dismiss": "取消"
       }
     },
     "unableToSwap": {
-      "heading": "Unable to swap this coin",
-      "body": "This coin pairing isn't available to swap right now. Try another selection.",
+      "heading": "无法兑换此币种",
+      "body": "现在无法兑换这种币对。请尝试选择其他币种。",
       "buttons": {
-        "cancel": "Dismiss"
+        "cancel": "关闭"
       }
     }
   }

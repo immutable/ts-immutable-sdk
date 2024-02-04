@@ -28,7 +28,6 @@ import {
   getOnRampFeeEstimation,
 } from '../../lib/feeEstimation';
 import { CryptoFiatActions, CryptoFiatContext } from '../../context/crypto-fiat-context/CryptoFiatContext';
-import { isPassportProvider } from '../../lib/providerUtils';
 import { OnRampWidgetViews } from '../../context/view-context/OnRampViewContextTypes';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { TopUpMenuItem } from './TopUpMenuItem';
@@ -52,7 +51,8 @@ interface TopUpViewProps {
 export function TopUpView({
   widgetEvent,
   checkout,
-  provider,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  provider, // Keep this for future use
   showOnrampOption,
   showSwapOption,
   showBridgeOption,
@@ -64,9 +64,6 @@ export function TopUpView({
 }: TopUpViewProps) {
   const { t } = useTranslation();
   const { userJourney } = analytics;
-
-  // const { header, topUpOptions } = text.views[SharedViews.TOP_UP_VIEW];
-  // const { onramp, swap, bridge } = topUpOptions;
 
   const { viewDispatch } = useContext(ViewContext);
 
@@ -81,8 +78,6 @@ export function TopUpView({
   const [isSwapAvailable, setIsSwapAvailable] = useState(true);
 
   const { page, track } = useAnalytics();
-
-  const isPassport = isPassportProvider(provider);
 
   useEffect(() => {
     page({
@@ -229,7 +224,7 @@ export function TopUpView({
   };
 
   const renderFees = (txt: string): ReactNode => (
-    <Box sx={{ fontSize: 'base.text.caption.small.regular.fontSize' }}>
+    <Box sx={{ fontSize: 'base.text.caption.small.regular.fontSize', c: 'base.color.translucent.standard.600' }}>
       {txt}
     </Box>
   );
@@ -237,7 +232,7 @@ export function TopUpView({
   const topUpFeatures = [
     {
       testId: 'onramp',
-      icon: 'Wallet',
+      icon: 'BankCard',
       textConfigKey: 'views.TOP_UP_VIEW.topUpOptions.onramp',
       onClickEvent: onClickOnRamp,
       fee: () => renderFees(`${t('views.TOP_UP_VIEW.topUpOptions.onramp.subcaption')} ≈ ${onRampFeesPercentage}%`),
@@ -245,7 +240,7 @@ export function TopUpView({
       isEnabled: showOnrampOption,
     }, {
       testId: 'swap',
-      icon: 'Coins',
+      icon: 'Swap',
       textConfigKey: 'views.TOP_UP_VIEW.topUpOptions.swap',
       onClickEvent: onClickSwap,
       fee: () => renderFees(
@@ -263,7 +258,7 @@ export function TopUpView({
         `${t('views.TOP_UP_VIEW.topUpOptions.bridge.subcaption')} ≈ $${bridgeFeesInFiat} ${fiatSymbol.toUpperCase()}`,
       ),
       isAvailable: true,
-      isEnabled: showBridgeOption && !isPassport,
+      isEnabled: showBridgeOption,
     },
   ];
 

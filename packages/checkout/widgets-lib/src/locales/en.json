@@ -55,14 +55,20 @@
     },
     "ERROR_VIEW": {
       "heading": "Something's gone wrong",
-      "body": ["You can try again or contact", "support", "for help."],
+      "body": [
+        "You can try again or contact",
+        "support",
+        "for help."
+      ],
       "actionText": "Try again"
     },
     "SERVICE_UNAVAILABLE_ERROR_VIEW": {
       "heading": {
         "swap": "Swapping is not available in your region"
       },
-      "body": "We’re sorry we cannot provide this service in your region."
+      "body": {
+        "swap": "Please refer to <quickswapLink>Quickswap’s</quickswapLink> website for further information."
+      }
     },
     "LOADING_VIEW": {
       "text": "Loading"
@@ -215,20 +221,20 @@
       },
       "topUpOptions": {
         "onramp": {
-          "heading": "Buy with card",
-          "caption": "Google pay & Apple pay available. Minimum $5.",
-          "subcaption": "Fees",
+          "heading": "Buy",
+          "caption": "With card, Google pay or Apple pay available.",
+          "subcaption": "Fees ",
           "disabledCaption": ""
         },
         "swap": {
-          "heading": "Swap my coins",
-          "caption": "Using the coins I have on the same network",
+          "heading": "Swap",
+          "caption": "With the coins I have in my balance.",
           "subcaption": "Fees",
           "disabledCaption": "Not available in your region"
         },
         "bridge": {
-          "heading": "Move my coins",
-          "caption": "From the coins I have on a different network",
+          "heading": "Move",
+          "caption": "The coins I have in another wallet or network.",
           "subcaption": "Fees ",
           "disabledCaption": ""
         }
@@ -442,6 +448,77 @@
       "heading": "Move in progress",
       "body1": "Your funds have been sent, with less than 20 mins remaining until they're received. You can return and view progress by clicking on the rocket icon.",
       "body2": "You can close this window."
+    },
+    "TRANSACTIONS": {
+      "layoutHeading": "In progress",
+      "passportDashboard": "View the full transaction history in your",
+      "status": {
+        "withdrawalPending": {
+          "actionButtonText": "Proceed",
+          "withdrawalDelayText": "This move has been paused, please return ",
+          "withdrawalReadyText": "Action required to receive your coins",
+          "caption": "Paused"
+        },
+        "inProgress": {
+          "heading": "In Progress",
+          "txnEstimate": "Usually takes 20 mins",
+          "stepInfo": "View Details"
+        },
+        "emptyState": {
+          "notConnected": {
+            "body": "Connect your wallet to view the transactions",
+            "buttonText": "Connect"
+          }
+        },
+        "noTransactions": {
+          "body": "You're all done here.",
+          "passport": {
+            "body": "View your completed transactions in ",
+            "link": "Passport"
+          }
+        }
+      },
+      "changeWallet": {
+        "buttonText": "Change wallet"
+      },
+      "fiatPricePrefix": "≈ USD $",
+      "support": {
+        "body1": "Need help?",
+        "body2": " Contact ",
+        "body3": "support",
+        "supportLink": "https://support.immutable.com/en/",
+        "passport": {
+          "body1": "Or view completed transactions in your ",
+          "body2": "Passport"
+        }
+      },
+      "walletSelection": {
+        "heading": "Choose a wallet to view"
+      }
+    },
+    "CLAIM_WITHDRAWAL": {
+      "content": {
+        "heading": "Follow the prompts to receive your coins on ",
+        "body": "You’ll be asked to pay a small gas fee to claim your withdrawal.",
+        "body2": "Destination wallet address: "
+      },
+      "footer": {
+        "buttonText": "Continue",
+        "retryText": "Try again"
+      },
+      "IN_PROGRESS": {
+        "loading": {
+          "text": "Processing"
+        },
+        "success": {
+          "text": "Success",
+          "actionText": "Done"
+        },
+        "failure": {
+          "text": "Transaction failed",
+          "actionText": "Try again"
+        }
+      }
     }
   },
   "footers": {
@@ -490,8 +567,14 @@
     },
     "notEnoughGas": {
       "content": {
-        "heading": "Balance too low",
-        "body": "You're ETH balance is too low to cover the gas fee on this move. You could transfer more ETH into your wallet using MetaMask directly."
+        "eth": {
+          "heading": "Balance too low",
+          "body": "You're ETH balance is too low to cover the gas fee on this move. You could transfer more ETH into your wallet using MetaMask directly."
+        },
+        "imx": {
+          "heading": "You'll need more IMX coins",
+          "body": "In order to cover the fees for the amount specified, you'll need to add more IMX coins."
+        }
       },
       "buttons": {
         "adjustAmount": "Adjust amount",
@@ -514,6 +597,18 @@
         "adjustAmount": "Adjust amount",
         "addMoreImx": "Add IMX coins",
         "cancel": "Dismiss"
+      }
+    },
+    "notEnoughEthWithdrawal": {
+      "content": {
+        "heading1": "Insufficient",
+        "heading2": "for gas",
+        "body1": "Add",
+        "body2": "to your destination account, or select another account to pay the gas. Your destination account will remain the same."
+      },
+      "buttons": {
+        "retry": "Pay gas with another account",
+        "dismiss": "Dismiss"
       }
     },
     "unableToSwap": {

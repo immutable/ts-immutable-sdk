@@ -12,6 +12,7 @@
     "@imtbl/core-sdk": "^2.4.0",
     "@imtbl/generated-clients": "0.0.0",
     "@imtbl/guardian": "0.0.0",
+    "@imtbl/metrics": "0.0.0",
     "@imtbl/toolkit": "0.0.0",
     "@imtbl/x-client": "0.0.0",
     "@imtbl/x-provider": "0.0.0",

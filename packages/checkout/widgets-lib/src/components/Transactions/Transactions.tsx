@@ -5,13 +5,10 @@ import {
   useCallback, useContext, useEffect, useMemo, useState,
 } from 'react';
 import { EventTargetContext } from 'context/event-target-context/EventTargetContext';
-import { text } from 'resources/text/textConfig';
-import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { Box } from '@biom3/react';
 import { createAndConnectToProvider, isPassportProvider } from 'lib/providerUtils';
-import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
+import { JsonRpcProvider } from '@ethersproject/providers';
 import {
-  Checkout,
   TokenFilterTypes,
   TokenInfo,
   WalletProviderName,
@@ -25,45 +22,45 @@ import { retry } from 'lib/retry';
 import { getChainSlugById } from 'lib/chains';
 import { CryptoFiatActions, CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
+import { useTranslation } from 'react-i18next';
+import { BridgeActions, BridgeContext } from 'widgets/bridge/context/BridgeContext';
+import { WalletDrawer } from 'widgets/bridge/components/WalletDrawer';
 import { sendBridgeWidgetCloseEvent } from '../../widgets/bridge/BridgeWidgetEvents';
 import { Shimmer } from './Shimmer';
 import {
   supportBoxContainerStyle,
   transactionsContainerStyle,
   transactionsListContainerStyle,
-  transactionsListStyle,
 } from './TransactionsStyles';
 import { EmptyStateNotConnected } from './EmptyStateNotConnected';
 import { SupportMessage } from './SupportMessage';
 import { KnownNetworkMap } from './transactionsType';
-import { TransactionsInProgress } from './TransactionsInProgress';
+import { TransactionList } from './TransactionList';
 import { NoTransactions } from './NoTransactions';
 
 type TransactionsProps = {
-  checkout: Checkout
+  onBackButtonClick: () => void;
 };
 
-export function Transactions({ checkout }: TransactionsProps) {
+export function Transactions({ onBackButtonClick }: TransactionsProps) {
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const { cryptoFiatDispatch } = useContext(CryptoFiatContext);
+  const { bridgeDispatch, bridgeState: { checkout, from } } = useContext(BridgeContext);
   const { page } = useAnalytics();
-
-  const { layoutHeading } = text.views[BridgeWidgetViews.TRANSACTIONS];
+  const { t } = useTranslation();
+  const { track } = useAnalytics();
 
   const [loading, setLoading] = useState(true);
-  const [provider, setProvider] = useState<Web3Provider | undefined>(undefined);
   const [knownTokenMap, setKnownTokenMap] = useState<KnownNetworkMap | undefined>(undefined);
   const [txs, setTxs] = useState<Transaction[]>([]);
+  const [showWalletDrawer, setShowWalletDrawer] = useState(false);
 
-  const walletAddress = useCallback(async () => await provider?.getSigner().getAddress(), [provider]);
-  const isPassport = isPassportProvider(provider);
-
-  const txnsListStyle = useMemo(() => transactionsListStyle(isPassport), []);
+  const isPassport = isPassportProvider(from?.web3Provider);
 
   // Fetch the tokens for the root chain using the allowed tokens.
   // In case this list does not have all the tokens, there is logic
-  // built into the <TransactionsInProgress /> component to fetch the
+  // built into the <TransactionsList /> component to fetch the
   // the missing data.
   const rootChainTokensHashmap = useCallback(async () => {
     if (!checkout) return {};
@@ -87,18 +84,21 @@ export function Transactions({ checkout }: TransactionsProps) {
 
   // Fetch the tokens for the root chain using the user balances tokens.
   // In case this list does not have all the tokens, there is logic
-  // built into the <TransactionsInProgress /> component to fetch the
+  // built into the <TransactionsList /> component to fetch the
   // the missing data.
   const childChainTokensHashmap = useCallback(async () => {
-    if (!provider) return {};
+    if (!from?.web3Provider) return {};
 
-    const address = await walletAddress();
-    if (!address) return {};
+    if (!from?.walletAddress) return {};
 
     const childChainId = getL2ChainId(checkout.config);
 
     try {
-      const data = await checkout.getAllBalances({ provider, walletAddress: address, chainId: childChainId });
+      const data = await checkout.getAllBalances({
+        provider: from?.web3Provider,
+        walletAddress: from?.walletAddress,
+        chainId: childChainId,
+      });
       return data.balances.reduce((out, current) => {
         // eslint-disable-next-line no-param-reassign
         out[current.token.address!.toLowerCase()] = current.token;
@@ -109,16 +109,41 @@ export function Transactions({ checkout }: TransactionsProps) {
       console.error(e);
       return [];
     }
-  }, [checkout, provider, walletAddress]);
+  }, [checkout, from]);
 
   const updateAndConnectProvider = useCallback(async (walletProviderName: WalletProviderName) => {
+    track({
+      userJourney: UserJourney.BRIDGE,
+      screen: 'EmptyStateNotConnected',
+      control: 'WalletProvider',
+      controlType: 'Select',
+      extras: {
+        walletProviderName,
+      },
+    });
     try {
-      setProvider(await createAndConnectToProvider(checkout, walletProviderName));
+      const localProvider = await createAndConnectToProvider(checkout, walletProviderName, true);
+      const network = await localProvider.getNetwork();
+      const address = await localProvider?.getSigner().getAddress() ?? '';
+      setTxs([]);
+      bridgeDispatch({
+        payload: {
+          type: BridgeActions.SET_WALLETS_AND_NETWORKS,
+          from: {
+            web3Provider: localProvider,
+            walletAddress: address.toLowerCase(),
+            network: network.chainId,
+          },
+          to: null,
+        },
+      });
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error(error);
+    } finally {
+      setShowWalletDrawer(false);
     }
-  }, [checkout]);
+  }, [checkout, from]);
 
   const getTokensDetails = async (
     tokensWithChainSlug: { [p: string]: string },
@@ -132,11 +157,11 @@ export function Transactions({ checkout }: TransactionsProps) {
     ]);
 
     // Fetch the data for the missing tokens: tokensWithChainSlug
-    const missingTokens: { [k:string]:string } = {};
+    const missingTokens: { [k: string]: string } = {};
     Object.entries(tokensWithChainSlug).forEach(
       ([key, value]) => {
         if ((tokensWithChainSlug[key] === rootChainName && !rootData[key])
-        || (tokensWithChainSlug[key] === childChainName && !childData[key])) missingTokens[key] = value;
+          || (tokensWithChainSlug[key] === childChainName && !childData[key])) missingTokens[key] = value;
       },
     );
     // Root provider is always L1
@@ -202,36 +227,61 @@ export function Transactions({ checkout }: TransactionsProps) {
     return { [rootChainName]: rootData, [childChainName]: childData };
   };
 
-  const getTransactionsDetails = async (env: Environment, address: string) => {
+  const getTransactionsDetails = useCallback(async (env: Environment, address: string) => {
     const client = new CheckoutApi({ env });
     return client.getTransactions({ txType: TransactionType.BRIDGE, fromAddress: address });
-  };
+  }, []);
 
-  const fetchData = async () => {
-    const address = await walletAddress();
-    if (!address) return undefined;
+  const fetchData = useCallback(async () => {
+    if (!from?.walletAddress) return undefined;
 
-    const localTxs = await getTransactionsDetails(checkout.config.environment, address);
+    const localTxs = await getTransactionsDetails(checkout.config.environment, from?.walletAddress);
 
-    const tokensWithChainSlug:{ [k:string]:string } = {};
+    const tokensWithChainSlug: { [k: string]: string } = {};
     localTxs.result.forEach((txn) => {
       tokensWithChainSlug[txn.details.from_token_address] = txn.details.from_chain;
     });
-    return { tokens: await getTokensDetails(tokensWithChainSlug), transactions: localTxs.result };
-  };
+
+    return {
+      tokens: await getTokensDetails(tokensWithChainSlug),
+      transactions: localTxs.result,
+    };
+  }, [from, getTransactionsDetails]);
+
+  const walletOptions = useMemo(() => {
+    const options = [WalletProviderName.METAMASK];
+    if (checkout.passport) {
+      options.push(WalletProviderName.PASSPORT);
+    }
+    return options;
+  }, [checkout]);
 
   // Fetch all the data at once
   useEffect(() => {
     (async () => {
+      setLoading(true);
       const data = await retry(fetchData, DEFAULT_TRANSACTIONS_RETRY_POLICY);
-      if (!data) return;
+      if (!data) {
+        setLoading(false);
+        return;
+      }
+
+      const knownTxs = data.transactions.filter((txn) => {
+        const tokens = data.tokens[txn.details.from_chain];
+        if (!tokens) return false;
+
+        const token = tokens[txn.details.from_token_address.toLowerCase()];
+        if (!token) return false;
+
+        return true;
+      });
 
       setKnownTokenMap(data.tokens);
-      setTxs(data.transactions);
+      setTxs(knownTxs);
 
       setLoading(false);
     })();
-  }, [walletAddress, checkout]);
+  }, [from?.walletAddress, checkout]);
 
   useEffect(() => {
     page({
@@ -246,7 +296,8 @@ export function Transactions({ checkout }: TransactionsProps) {
       header={(
         <HeaderNavigation
           showBack
-          title={layoutHeading}
+          onBackButtonClick={onBackButtonClick}
+          title={t('views.TRANSACTIONS.layoutHeading')}
           onCloseButtonClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
         />
       )}
@@ -254,35 +305,30 @@ export function Transactions({ checkout }: TransactionsProps) {
     >
       <Box sx={transactionsContainerStyle}>
         <Box sx={transactionsListContainerStyle}>
-          {!provider && (
+          {!from?.web3Provider && (
             <EmptyStateNotConnected
-              checkout={checkout}
-              updateProvider={updateAndConnectProvider}
+              openWalletDrawer={() => setShowWalletDrawer(true)}
             />
           )}
-          {provider && loading
-            && (
-              <Box sx={txnsListStyle}>
-                <Shimmer />
-              </Box>
-            )}
-          {provider && !loading && txs.length > 0 && knownTokenMap && (
-            <Box sx={txnsListStyle}>
-              <TransactionsInProgress
-                checkout={checkout}
-                transactions={txs}
-                knownTokenMap={knownTokenMap}
-              />
-            </Box>
+          {from?.web3Provider && loading && (<Shimmer />)}
+          {from?.web3Provider && !loading && txs.length > 0 && knownTokenMap && (
+            <TransactionList
+              checkout={checkout}
+              transactions={txs}
+              knownTokenMap={knownTokenMap}
+              isPassport={isPassport}
+              changeWallet={() => setShowWalletDrawer(true)}
+            />
           )}
-          {provider && !loading && txs.length === 0 && (
+          {from?.web3Provider && !loading && txs.length === 0 && (
             <NoTransactions
               checkout={checkout}
               isPassport={isPassport}
+              changeWallet={() => setShowWalletDrawer(true)}
             />
           )}
         </Box>
-        {provider && txs.length > 0 && (
+        {from?.web3Provider && txs.length > 0 && (
           <Box sx={supportBoxContainerStyle}>
             <SupportMessage
               checkout={checkout}
@@ -290,6 +336,17 @@ export function Transactions({ checkout }: TransactionsProps) {
             />
           </Box>
         )}
+        <WalletDrawer
+          testId="select-wallet-drawer"
+          drawerText={{
+            heading: t('views.TRANSACTIONS.walletSelection.heading'),
+          }}
+          showWalletSelectorTarget={false}
+          walletOptions={walletOptions}
+          showDrawer={showWalletDrawer}
+          setShowDrawer={(show: boolean) => { setShowWalletDrawer(show); }}
+          onWalletItemClick={updateAndConnectProvider}
+        />
       </Box>
     </SimpleLayout>
   );
