@@ -365,7 +365,6 @@ export function SwapForm({ data }: SwapFromProps) {
       );
       const estimateToken = estimate?.token;
 
-      console.log('estimate', estimate, quoteResult.approval);
       const gasToken = allowedTokens.find((token) => token.symbol === estimateToken?.symbol);
       setQuote(quoteResult);
       setGasFeeValue(gasFee);

@@ -261,7 +261,6 @@ export function BridgeForm(props: BridgeFormProps) {
       token: checkout.config.networkMap.get(from!.network)?.nativeCurrency,
     } as GasEstimateBridgeToL2Result;
 
-    console.log('Setting fee estimates:', gasEstimateResult, 'transactionFeeData', transactionFeeData);
     setEstimates(gasEstimateResult);
     const estimatedAmount = utils.formatUnits(
       gasEstimateResult?.fees?.totalFees || 0,
