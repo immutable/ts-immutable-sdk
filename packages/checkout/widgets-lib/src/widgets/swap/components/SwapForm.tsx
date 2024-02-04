@@ -365,6 +365,7 @@ export function SwapForm({ data }: SwapFromProps) {
       );
       const estimateToken = estimate?.token;
 
+      console.log('estimate', estimate, quoteResult.approval);
       const gasToken = allowedTokens.find((token) => token.symbol === estimateToken?.symbol);
       setQuote(quoteResult);
       setGasFeeValue(gasFee);
@@ -644,7 +645,11 @@ export function SwapForm({ data }: SwapFromProps) {
 
   return (
     <>
-      <Box sx={{ paddingX: 'base.spacing.x4' }}>
+      <Box sx={{
+        paddingX: 'base.spacing.x4',
+        marginBottom: 'base.spacing.x2',
+      }}
+      >
         <Heading
           size="small"
           weight="regular"
@@ -657,6 +662,7 @@ export function SwapForm({ data }: SwapFromProps) {
             display: 'flex',
             flexDirection: 'column',
             rowGap: 'base.spacing.x6',
+            paddingBottom: 'base.spacing.x2',
           }}
         >
 
@@ -751,11 +757,27 @@ export function SwapForm({ data }: SwapFromProps) {
           </Box>
         </Box>
         <Fees
-          title={t('views.SWAP.fees.title')}
-          fiatPricePrefix={t('views.SWAP.content.fiatPricePrefix')}
           gasFeeFiatValue={gasFeeFiatValue}
           gasFeeToken={gasFeeToken}
           gasFeeValue={gasFeeValue}
+          fees={[
+            {
+              label: t('drawers.feesBreakdown.fees.gasFeeSwap.label'),
+              fiatAmount: `~ ${t('drawers.feesBreakdown.fees.fiatPricePrefix')}${gasFeeFiatValue}`,
+              amount: tokenValueFormat(gasFeeValue),
+            },
+          ]}
+          onFeesClick={() => {
+            track({
+              userJourney: UserJourney.SWAP,
+              screen: 'SwapCoins',
+              control: 'ViewFees',
+              controlType: 'Button',
+            });
+          }}
+          sx={{
+            paddingBottom: '0',
+          }}
         />
       </Box>
       <SwapButton

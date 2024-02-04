@@ -581,6 +581,7 @@
       },
       "buttons": {
         "adjustAmount": "金額を調整",
+        "addMoreImx": "IMXコインを追加",
         "copyAddress": "ウォレットアドレスをコピー",
         "cancel": "閉じる"
       }

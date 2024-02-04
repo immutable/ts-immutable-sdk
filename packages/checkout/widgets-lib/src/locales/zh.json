@@ -578,6 +578,7 @@
       },
       "buttons": {
         "adjustAmount": "调整金额",
+        "addMoreImx": "添加IMX币",
         "copyAddress": "复制钱包地址",
         "cancel": "关闭"
       }

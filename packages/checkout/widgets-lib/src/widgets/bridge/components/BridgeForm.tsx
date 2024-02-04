@@ -1,11 +1,8 @@
 import {
-  Accordion,
-  Body,
   Box,
   Button,
   Heading,
   OptionKey,
-  PriceDisplay,
 } from '@biom3/react';
 import {
   GasEstimateBridgeToL2Result,
@@ -16,7 +13,6 @@ import {
   useCallback, useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
 import { BigNumber, utils } from 'ethers';
-import { FeesBreakdown } from 'components/FeesBreakdown/FeesBreakdown';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { useTranslation } from 'react-i18next';
 import { amountInputValidation } from '../../../lib/validations/amountInputValidations';
@@ -38,8 +34,6 @@ import {
   bridgeFormButtonContainerStyles,
   bridgeFormWrapperStyles,
   formInputsContainerStyles,
-  gasAmountAccordionStyles,
-  gasAmountHeadingStyles,
 } from './BridgeFormStyles';
 import { CoinSelectorOptionProps } from '../../../components/CoinSelector/CoinSelectorOption';
 import { useInterval } from '../../../lib/hooks/useInterval';
@@ -55,6 +49,8 @@ import { TransactionRejected } from '../../../components/TransactionRejected/Tra
 import { NotEnoughGas } from '../../../components/NotEnoughGas/NotEnoughGas';
 import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
 import { TokenSelectShimmer } from './TokenSelectShimmer';
+import { Fees } from '../../../components/Fees/Fees';
+import { formatBridgeFees } from '../functions/BridgeFees';
 
 interface BridgeFormProps {
   testId?: string;
@@ -109,7 +105,6 @@ export function BridgeForm(props: BridgeFormProps) {
   const [gasFee, setGasFee] = useState<string>('');
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
   const [tokensOptions, setTokensOptions] = useState<CoinSelectorOptionProps[]>([]);
-  const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
 
   // Not enough ETH to cover gas
   const [showNotEnoughGasDrawer, setShowNotEnoughGasDrawer] = useState(false);
@@ -122,8 +117,6 @@ export function BridgeForm(props: BridgeFormProps) {
     if (!address) return symbol.toLowerCase();
     return `${symbol.toLowerCase()}-${address.toLowerCase()}`;
   }, []);
-
-  const gasFiatAmount = `${t('views.BRIDGE_FORM.fees.fiatPricePrefix')} ${gasFeeFiatValue}`;
 
   useEffect(() => {
     if (tokenBalances.length === 0) return;
@@ -259,14 +252,16 @@ export function BridgeForm(props: BridgeFormProps) {
     let rawTotalFees = totalFees;
     if (!unsignedApproveTransaction.unsignedTx) {
       rawTotalFees = totalFees.sub(approvalFee);
+      transactionFeeData.approvalFee = BigNumber.from(0);
     }
 
     const gasEstimateResult = {
       gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-      fees: { totalFees: rawTotalFees },
+      fees: { ...transactionFeeData, totalFees: rawTotalFees },
       token: checkout.config.networkMap.get(from!.network)?.nativeCurrency,
     } as GasEstimateBridgeToL2Result;
 
+    console.log('Setting fee estimates:', gasEstimateResult, 'transactionFeeData', transactionFeeData);
     setEstimates(gasEstimateResult);
     const estimatedAmount = utils.formatUnits(
       gasEstimateResult?.fees?.totalFees || 0,
@@ -388,6 +383,8 @@ export function BridgeForm(props: BridgeFormProps) {
     })();
   }, [from?.web3Provider, tokenBalances]);
 
+  const formatFeeBreakdown = useCallback((): any => formatBridgeFees(estimates, cryptoFiatState, t), [estimates]);
+
   const bridgeFormValidator = useCallback((): boolean => {
     const validateTokenError = validateToken(formToken);
     const validateAmountError = validateAmount(formAmount, formToken?.formattedBalance);
@@ -493,41 +490,22 @@ export function BridgeForm(props: BridgeFormProps) {
           <TokenSelectShimmer sx={formInputsContainerStyles} />
         )}
         {gasFee && (
-          <Box sx={{ paddingY: 'base.spacing.x2' }}>
-            <Accordion
-              targetClickOveride={() => setShowFeeBreakdown(true)}
-              sx={gasAmountAccordionStyles}
-            >
-              <Accordion.TargetLeftSlot>
-                <Body size="medium" sx={gasAmountHeadingStyles}>
-                  {t('views.BRIDGE_FORM.fees.title')}
-                </Body>
-              </Accordion.TargetLeftSlot>
-              <Accordion.TargetRightSlot>
-                <PriceDisplay
-                  testId="bridge-gas-fee__priceDisplay"
-                  fiatAmount={`${t('views.BRIDGE_FORM.fees.fiatPricePrefix')} ${gasFeeFiatValue}`}
-                  price={`${estimates?.token?.symbol} ${tokenValueFormat(gasFee)}`}
-                />
-              </Accordion.TargetRightSlot>
-            </Accordion>
-          </Box>
+          <Fees
+            gasFeeValue={gasFee}
+            gasFeeFiatValue={gasFeeFiatValue}
+            gasFeeToken={estimates?.token}
+            fees={formatFeeBreakdown()}
+            onFeesClick={() => {
+              track({
+                userJourney: UserJourney.BRIDGE,
+                screen: 'SwapCoins',
+                control: 'ViewFees',
+                controlType: 'Button',
+              });
+            }}
+          />
         )}
       </Box>
-      <FeesBreakdown
-        totalFiatAmount={gasFiatAmount}
-        totalAmount={gasFee}
-        tokenSymbol={estimates?.token?.symbol ?? ''}
-        fees={[
-          {
-            label: t('drawers.feesBreakdown.fees.gas.label'),
-            fiatAmount: gasFiatAmount,
-            amount: gasFee,
-          },
-        ]}
-        visible={showFeeBreakdown}
-        onCloseDrawer={() => setShowFeeBreakdown(false)}
-      />
       <Box sx={bridgeFormButtonContainerStyles}>
         <Button
           testId={`${testId}-button`}

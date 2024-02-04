@@ -1,7 +1,7 @@
 import {
   Drawer, Box, Divider,
 } from '@biom3/react';
-import { tokenValueFormat } from 'lib/utils';
+import { formatZeroAmount, tokenValueFormat } from 'lib/utils';
 import { useTranslation } from 'react-i18next';
 import { feeItemContainerStyles, feesBreakdownContentStyles } from './FeesBreakdownStyles';
 import { FeeItem } from './FeeItem';
@@ -18,8 +18,8 @@ type FeesBreakdownProps = {
   fees: Fee[];
   children?: any;
   visible?: boolean;
-  totalFiatAmount: string;
-  totalAmount: string;
+  totalFiatAmount?: string;
+  totalAmount?: string;
   tokenSymbol: string;
 };
 
@@ -45,26 +45,32 @@ export function FeesBreakdown({
       </Drawer.Target>
       <Drawer.Content testId="fees-breakdown-content" sx={feesBreakdownContentStyles}>
         <Box sx={feeItemContainerStyles}>
-          <FeeItem
-            key={t('drawers.feesBreakdown.total')}
-            label={t('drawers.feesBreakdown.total')}
-            amount={tokenValueFormat(totalAmount)}
-            fiatAmount={totalFiatAmount}
-            tokenSymbol={tokenSymbol}
-            boldLabel
-          />
-          <Divider size="xSmall" />
           {
             fees.map(({ label, amount, fiatAmount }) => (
               <FeeItem
                 key={label}
                 label={label}
-                amount={tokenValueFormat(amount)}
+                amount={amount}
                 fiatAmount={fiatAmount}
                 tokenSymbol={tokenSymbol}
               />
             ))
           }
+          {totalAmount && (
+            <>
+              <Divider size="xSmall" />
+              <FeeItem
+                key={t('drawers.feesBreakdown.total')}
+                label={t('drawers.feesBreakdown.total')}
+                amount={tokenValueFormat(totalAmount)}
+                fiatAmount={totalFiatAmount
+                  ? `~ ${t('drawers.feesBreakdown.fees.fiatPricePrefix')}${totalFiatAmount}`
+                  : formatZeroAmount('0')}
+                tokenSymbol={tokenSymbol}
+                boldLabel
+              />
+            </>
+          )}
         </Box>
         <FooterLogo />
       </Drawer.Content>

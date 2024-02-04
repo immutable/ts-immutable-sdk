@@ -481,7 +481,7 @@
       "changeWallet": {
         "buttonText": "Change wallet"
       },
-      "fiatPricePrefix": "≈ USD $",
+      "fiatPricePrefix": "~ USD $",
       "support": {
         "body1": "Need help?",
         "body2": " Contact ",
@@ -539,11 +539,21 @@
   },
   "drawers": {
     "feesBreakdown": {
-      "heading": "Fee breakdown",
-      "total": "Fees total",
+      "heading": "Fees",
+      "total": "Total fees",
       "fees": {
-        "gas": {
-          "label": "Gas fee"
+        "fiatPricePrefix": "USD $",
+        "gasFeeSwap": {
+          "label": "Gas fee swap"
+        },
+        "gasFeeMove": {
+          "label": "Gas fee move"
+        },
+        "gasFeeApproval": {
+          "label": "Gas fee approval"
+        },
+        "serviceFee": {
+          "label": "Service fee"
         }
       }
     },
@@ -578,6 +588,7 @@
       },
       "buttons": {
         "adjustAmount": "Adjust amount",
+        "addMoreImx": "Add IMX coins",
         "copyAddress": "Copy wallet address",
         "cancel": "Dismiss"
       }
