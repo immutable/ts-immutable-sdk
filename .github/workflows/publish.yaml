@@ -128,7 +128,9 @@ jobs:
       - name: Warm up CDN
         id: warm_up_cdn
         if: contains(github.event.inputs.release_type, 'release')
-        run: wget https://cdn.jsdelivr.net/npm/@imtbl/sdk/dist/browser/checkout.js
+        run: |
+          wget https://cdn.jsdelivr.net/npm/@imtbl/sdk/dist/browser/checkout/widgets.js
+          wget https://cdn.jsdelivr.net/npm/@imtbl/sdk/dist/browser/checkout/sdk.js
 
       # Wait for 30 seconds to make sure the tag is available on GitHub
       - uses: GuillaumeFalourd/wait-sleep-action@v1
