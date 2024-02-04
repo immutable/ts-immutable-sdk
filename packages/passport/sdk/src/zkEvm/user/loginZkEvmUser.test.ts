@@ -34,9 +34,9 @@ describe('loginZkEvmUser', () => {
   const multiRollupApiClients = { } as unknown as MultiRollupApiClients;
 
   it('should return a user that has registered with zkEvm', async () => {
+    getUserMock.mockResolvedValue(mockUserZkEvm);
     const result = await loginZkEvmUser({
       authManager,
-      existingUser: mockUserZkEvm,
       config,
       magicAdapter,
       multiRollupApiClients,
@@ -56,7 +56,6 @@ describe('loginZkEvmUser', () => {
     (registerZkEvmUser as unknown as jest.Mock).mockResolvedValue(mockUserZkEvm);
     const result = await loginZkEvmUser({
       authManager,
-      existingUser: null,
       config,
       magicAdapter,
       multiRollupApiClients,
@@ -75,7 +74,6 @@ describe('loginZkEvmUser', () => {
     (authManager.login as unknown as jest.Mock).mockResolvedValue(mockUserZkEvm);
     const result = await loginZkEvmUser({
       authManager,
-      existingUser: null,
       config,
       magicAdapter,
       multiRollupApiClients,

@@ -1,14 +1,13 @@
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { ExternalProvider, JsonRpcProvider } from '@ethersproject/providers';
 import { registerZkEvmUser } from './registerZkEvmUser';
-import { User, UserZkEvm } from '../../types';
+import { UserZkEvm } from '../../types';
 import AuthManager from '../../authManager';
 import { PassportConfiguration } from '../../config';
 import MagicAdapter from '../../magicAdapter';
 
 type LoginZkEvmUserInput = {
   authManager: AuthManager;
-  existingUser: User | null;
   config: PassportConfiguration;
   magicAdapter: MagicAdapter;
   multiRollupApiClients: MultiRollupApiClients;
@@ -22,12 +21,11 @@ type LoginZkEvmUserOutput = {
 
 export const loginZkEvmUser = async ({
   authManager,
-  existingUser,
   magicAdapter,
   multiRollupApiClients,
   jsonRpcProvider,
 }: LoginZkEvmUserInput): Promise<LoginZkEvmUserOutput> => {
-  let user = existingUser;
+  let user = await authManager.getUser();
 
   if (!user) {
     user = await authManager.login();

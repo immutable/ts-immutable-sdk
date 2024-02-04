@@ -15,7 +15,7 @@ import TypedEventEmitter from '../utils/typedEventEmitter';
 import { PassportConfiguration } from '../config';
 import { ConfirmationScreen } from '../confirmation';
 import {
-  PassportEventMap, PassportEvents, UserZkEvm,
+  PassportEventMap, PassportEvents,
 } from '../types';
 import { RelayerClient } from './relayerClient';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
@@ -117,12 +117,10 @@ export class ZkEvmProvider implements Provider {
   private async performRequest(request: RequestArguments): Promise<any> {
     switch (request.method) {
       case 'eth_requestAccounts': {
-        const existingUser = await this.authManager.getUser() as UserZkEvm;
         if (this.isLoggedIn()) {
-          return [existingUser.zkEvm.ethAddress];
+          return [this.zkevmAddress];
         }
         const { magicProvider, user } = await loginZkEvmUser({
-          existingUser,
           authManager: this.authManager,
           config: this.config,
           magicAdapter: this.magicAdapter,
