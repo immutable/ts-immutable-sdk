@@ -539,7 +539,6 @@ export function BridgeForm(props: BridgeFormProps) {
           {loading ? (
             <Button.Icon icon="Loading" sx={bridgeButtonIconLoadingStyle} />
           ) : t('views.BRIDGE_FORM.bridgeForm.buttonText')}
-          {t('views.BRIDGE_FORM.bridgeForm.buttonText')}
         </Button>
         <TransactionRejected
           visible={showTxnRejectedState}
