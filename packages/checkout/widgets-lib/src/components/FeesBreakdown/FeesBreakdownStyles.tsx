@@ -22,3 +22,9 @@ export const feeItemLabelStyles = (boldLabel?: boolean) => ({
 export const feeItemPriceDisplayStyles = {
   width: '50%',
 };
+
+export const feeItemLoadingStyles = {
+  display: 'flex',
+  flexDirection: 'column',
+  rowGap: 'base.spacing.x2',
+};

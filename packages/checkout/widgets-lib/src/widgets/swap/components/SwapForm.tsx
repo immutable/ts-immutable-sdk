@@ -764,6 +764,7 @@ export function SwapForm({ data }: SwapFromProps) {
               label: t('drawers.feesBreakdown.fees.gasFeeSwap.label'),
               fiatAmount: `~ ${t('drawers.feesBreakdown.fees.fiatPricePrefix')}${gasFeeFiatValue}`,
               amount: tokenValueFormat(gasFeeValue),
+              prefix: '~',
             },
           ]}
           onFeesClick={() => {
@@ -777,6 +778,7 @@ export function SwapForm({ data }: SwapFromProps) {
           sx={{
             paddingBottom: '0',
           }}
+          loading={loading}
         />
       </Box>
       <SwapButton

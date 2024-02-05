@@ -30,6 +30,7 @@ export const formatBridgeFees = (estimates: GasEstimateBridgeToL2Result | undefi
         cryptoFiatState.conversions,
       )}`,
       amount: `${tokenValueFormat(formattedGas)}`,
+      prefix: '~ ',
     });
   }
   if (estimates.fees.approvalFee?.gt(0)) {
@@ -42,6 +43,7 @@ export const formatBridgeFees = (estimates: GasEstimateBridgeToL2Result | undefi
         cryptoFiatState.conversions,
       )}`,
       amount: `${tokenValueFormat(formattedApprovalGas)}`,
+      prefix: '~ ',
     });
   }
 

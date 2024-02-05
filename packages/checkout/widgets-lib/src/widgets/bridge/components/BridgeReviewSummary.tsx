@@ -21,7 +21,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import { DEFAULT_QUOTE_REFRESH_INTERVAL, DEFAULT_TOKEN_DECIMALS, NATIVE } from 'lib';
 import { useInterval } from 'lib/hooks/useInterval';
 import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
-import { utils } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { useTranslation } from 'react-i18next';
 import { networkIconStyles } from './WalletNetworkButtonStyles';
@@ -139,11 +139,15 @@ export function BridgeReviewSummary() {
     let rawTotalFees = totalFees;
     if (!unsignedApproveTransaction.unsignedTx) {
       rawTotalFees = totalFees.sub(approvalFee);
+      transactionFeeData.approvalFee = BigNumber.from(0);
     }
 
     const gasEstimateResult = {
       gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-      fees: { totalFees: rawTotalFees },
+      fees: {
+        ...transactionFeeData,
+        totalFees: rawTotalFees,
+      },
       token: checkout.config.networkMap.get(from!.network)?.nativeCurrency,
     } as GasEstimateBridgeToL2Result;
 
@@ -309,23 +313,22 @@ export function BridgeReviewSummary() {
           />
         )}
       </MenuItem>
-      {gasFee && (
-        <Fees
-          gasFeeValue={gasFee}
-          gasFeeFiatValue={gasFeeFiatValue}
-          gasFeeToken={estimates?.token}
-          fees={formatFeeBreakdown()}
-          onFeesClick={() => {
-            track({
-              userJourney: UserJourney.BRIDGE,
-              screen: 'SwapCoins',
-              control: 'ViewFees',
-              controlType: 'Button',
-            });
-          }}
-          sx={{ borderTopRightRadius: '0', borderTopLeftRadius: '0' }}
-        />
-      )}
+      <Fees
+        gasFeeValue={gasFee}
+        gasFeeFiatValue={gasFeeFiatValue}
+        gasFeeToken={estimates?.token}
+        fees={formatFeeBreakdown()}
+        onFeesClick={() => {
+          track({
+            userJourney: UserJourney.BRIDGE,
+            screen: 'MoveCoins',
+            control: 'ViewFees',
+            controlType: 'Button',
+          });
+        }}
+        sx={{ borderTopRightRadius: '0', borderTopLeftRadius: '0' }}
+        loading={loading}
+      />
       <Box
         sx={{
           flex: 1,

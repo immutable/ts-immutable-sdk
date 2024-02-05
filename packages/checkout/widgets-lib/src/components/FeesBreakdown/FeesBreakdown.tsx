@@ -1,9 +1,9 @@
 import {
-  Drawer, Box, Divider,
+  Drawer, Box, Divider, MenuItem,
 } from '@biom3/react';
 import { formatZeroAmount, tokenValueFormat } from 'lib/utils';
 import { useTranslation } from 'react-i18next';
-import { feeItemContainerStyles, feesBreakdownContentStyles } from './FeesBreakdownStyles';
+import { feeItemContainerStyles, feeItemLoadingStyles, feesBreakdownContentStyles } from './FeesBreakdownStyles';
 import { FeeItem } from './FeeItem';
 import { FooterLogo } from '../Footer/FooterLogo';
 
@@ -11,6 +11,7 @@ type Fee = {
   label: string;
   amount: string;
   fiatAmount: string;
+  prefix?: string;
 };
 
 type FeesBreakdownProps = {
@@ -21,6 +22,7 @@ type FeesBreakdownProps = {
   totalFiatAmount?: string;
   totalAmount?: string;
   tokenSymbol: string;
+  loading?: boolean;
 };
 
 export function FeesBreakdown({
@@ -31,6 +33,7 @@ export function FeesBreakdown({
   totalFiatAmount,
   totalAmount,
   tokenSymbol,
+  loading = false,
 }: FeesBreakdownProps) {
   const { t } = useTranslation();
   return (
@@ -46,13 +49,27 @@ export function FeesBreakdown({
       <Drawer.Content testId="fees-breakdown-content" sx={feesBreakdownContentStyles}>
         <Box sx={feeItemContainerStyles}>
           {
-            fees.map(({ label, amount, fiatAmount }) => (
+            loading && fees.length === 0 && (
+              <Box sx={feeItemLoadingStyles}>
+                <MenuItem shimmer emphasized testId="balance-item-shimmer--1" />
+                <MenuItem shimmer emphasized testId="balance-item-shimmer--2" />
+              </Box>
+            )
+          }
+          {
+            fees.map(({
+              label,
+              amount,
+              fiatAmount,
+              prefix,
+            }) => (
               <FeeItem
                 key={label}
                 label={label}
                 amount={amount}
                 fiatAmount={fiatAmount}
                 tokenSymbol={tokenSymbol}
+                prefix={prefix}
               />
             ))
           }

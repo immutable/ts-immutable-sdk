@@ -496,7 +496,7 @@ export function BridgeForm(props: BridgeFormProps) {
           onFeesClick={() => {
             track({
               userJourney: UserJourney.BRIDGE,
-              screen: 'SwapCoins',
+              screen: 'MoveCoins',
               control: 'ViewFees',
               controlType: 'Button',
             });
