@@ -101,6 +101,7 @@ export default class AuthManager {
     this.userManager = new UserManager(getAuthConfiguration(config));
     this.deviceCredentialsManager = new DeviceCredentialsManager();
     this.logoutMode = config.oidcConfiguration.logoutMode || 'redirect';
+    this.userManager.events.addSilentRenewError(() => this.logout());
   }
 
   private static mapOidcUserToDomainModel = (oidcUser: OidcUser): User => {

@@ -60,7 +60,9 @@ export class Passport {
       ? imxApiConfig.getProduction()
       : imxApiConfig.getSandbox();
     const imxApiClients = passportModuleConfiguration.overrides?.imxApiClients
-      || new ImxApiClients(imxClientConfig);
+      ?? (passportModuleConfiguration.overrides?.imxPublicApiDomain
+        ? new ImxApiClients(createConfig({ basePath: passportModuleConfiguration.overrides.imxPublicApiDomain }))
+        : new ImxApiClients(imxClientConfig));
 
     this.passportImxProviderFactory = new PassportImxProviderFactory({
       authManager: this.authManager,
