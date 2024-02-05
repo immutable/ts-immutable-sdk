@@ -20,12 +20,53 @@ import {
   PassportEventMap,
   PassportEvents,
   PassportModuleConfiguration,
+  PassportOverrides,
   UserProfile,
 } from './types';
 import { ConfirmationScreen } from './confirmation';
 import { ZkEvmProvider } from './zkEvm';
 import { Provider } from './zkEvm/types';
 import TypedEventEmitter from './utils/typedEventEmitter';
+
+const buildImxClientConfig = (environment: Environment, overrides: PassportOverrides | undefined) => {
+  if (overrides) return createConfig({ basePath: overrides.imxPublicApiDomain });
+  if (environment === Environment.SANDBOX) return imxApiConfig.getSandbox();
+  return imxApiConfig.getProduction();
+};
+
+export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConfiguration) => {
+  const config = new PassportConfiguration(passportModuleConfiguration);
+  const imxClientConfig = buildImxClientConfig(config.baseConfig.environment, passportModuleConfiguration.overrides);
+  const authManager = new AuthManager(config);
+  const magicAdapter = new MagicAdapter(config);
+  const confirmationScreen = new ConfirmationScreen(config);
+  const passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
+
+  const immutableXClient = passportModuleConfiguration.overrides
+    ? passportModuleConfiguration.overrides.immutableXClient
+    : new IMXClient({ baseConfig: passportModuleConfiguration.baseConfig });
+
+  const imxApiClients = passportModuleConfiguration.overrides?.imxApiClients ?? new ImxApiClients(imxClientConfig);
+
+  return {
+    config: new PassportConfiguration(passportModuleConfiguration),
+    authManager: new AuthManager(config),
+    magicAdapter: new MagicAdapter(config),
+    confirmationScreen: new ConfirmationScreen(config),
+    immutableXClient,
+    multiRollupApiClients: new MultiRollupApiClients(config.multiRollupConfig),
+    passportEventEmitter,
+    passportImxProviderFactory: new PassportImxProviderFactory({
+      authManager,
+      config,
+      confirmationScreen,
+      immutableXClient,
+      magicAdapter,
+      passportEventEmitter,
+      imxApiClients,
+    }),
+  };
+};
 
 export class Passport {
   private readonly authManager: AuthManager;
@@ -45,35 +86,16 @@ export class Passport {
   private readonly passportEventEmitter: TypedEventEmitter<PassportEventMap>;
 
   constructor(passportModuleConfiguration: PassportModuleConfiguration) {
-    this.config = new PassportConfiguration(passportModuleConfiguration);
-    this.authManager = new AuthManager(this.config);
-    this.magicAdapter = new MagicAdapter(this.config);
-    this.confirmationScreen = new ConfirmationScreen(this.config);
-    this.immutableXClient = passportModuleConfiguration.overrides?.immutableXClient
-      || new IMXClient({
-        baseConfig: passportModuleConfiguration.baseConfig,
-      });
-    this.multiRollupApiClients = new MultiRollupApiClients(
-      this.config.multiRollupConfig,
-    );
-    this.passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
-    const imxClientConfig = this.config.baseConfig.environment === Environment.PRODUCTION
-      ? imxApiConfig.getProduction()
-      : imxApiConfig.getSandbox();
-    const imxApiClients = passportModuleConfiguration.overrides?.imxApiClients
-      || (passportModuleConfiguration.overrides?.imxPublicApiDomain
-        ? new ImxApiClients(createConfig({ basePath: passportModuleConfiguration.overrides.imxPublicApiDomain }))
-        : new ImxApiClients(imxClientConfig));
+    const privateVars = buildPrivateVars(passportModuleConfiguration);
 
-    this.passportImxProviderFactory = new PassportImxProviderFactory({
-      authManager: this.authManager,
-      config: this.config,
-      confirmationScreen: this.confirmationScreen,
-      immutableXClient: this.immutableXClient,
-      magicAdapter: this.magicAdapter,
-      passportEventEmitter: this.passportEventEmitter,
-      imxApiClients,
-    });
+    this.config = privateVars.config;
+    this.authManager = privateVars.authManager;
+    this.magicAdapter = privateVars.magicAdapter;
+    this.confirmationScreen = privateVars.confirmationScreen;
+    this.immutableXClient = privateVars.immutableXClient;
+    this.multiRollupApiClients = privateVars.multiRollupApiClients;
+    this.passportEventEmitter = privateVars.passportEventEmitter;
+    this.passportImxProviderFactory = privateVars.passportImxProviderFactory;
 
     setPassportClientId(passportModuleConfiguration.clientId);
     track('passport', 'initialised');
