@@ -44,8 +44,7 @@ describe('Guardian', () => {
   });
 
   describe('evaluateImxTransaction', () => {
-    afterEach(jest.resetAllMocks);
-    beforeEach(() => {
+    beforeAll(() => {
       guardianClient = new GuardianClient({
         confirmationScreen: mockConfirmationScreen,
         config: new PassportConfiguration({
@@ -57,6 +56,7 @@ describe('Guardian', () => {
         authManager: { getUser: jest.fn().mockResolvedValue(mockUserImx) } as unknown as AuthManager,
       });
     });
+    afterEach(jest.clearAllMocks);
     it('should retry getting transaction details and throw an error when transaction does not exist', async () => {
       mockGetTransactionByID.mockResolvedValue({ data: { id: '1234' } });
       mockEvaluateTransaction.mockResolvedValue({ data: { confirmationRequired: false } });
