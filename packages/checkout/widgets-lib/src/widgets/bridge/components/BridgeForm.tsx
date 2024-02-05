@@ -30,7 +30,6 @@ import {
 import { SelectForm } from '../../../components/FormComponents/SelectForm/SelectForm';
 import { validateAmount, validateToken } from '../functions/BridgeFormValidator';
 import {
-  bridgeButtonIconLoadingStyle,
   bridgeFormButtonContainerStyles,
   bridgeFormWrapperStyles,
   formInputsContainerStyles,
@@ -488,34 +487,30 @@ export function BridgeForm(props: BridgeFormProps) {
         {defaultTokenAddress && isTokenBalancesLoading && (
           <TokenSelectShimmer sx={formInputsContainerStyles} />
         )}
-        {gasFee && (
-          <Fees
-            gasFeeValue={gasFee}
-            gasFeeFiatValue={gasFeeFiatValue}
-            gasFeeToken={estimates?.token}
-            fees={formatFeeBreakdown()}
-            onFeesClick={() => {
-              track({
-                userJourney: UserJourney.BRIDGE,
-                screen: 'SwapCoins',
-                control: 'ViewFees',
-                controlType: 'Button',
-              });
-            }}
-          />
-        )}
+        <Fees
+          gasFeeValue={gasFee}
+          gasFeeFiatValue={gasFeeFiatValue}
+          gasFeeToken={estimates?.token}
+          fees={formatFeeBreakdown()}
+          loading={isFetching}
+          onFeesClick={() => {
+            track({
+              userJourney: UserJourney.BRIDGE,
+              screen: 'SwapCoins',
+              control: 'ViewFees',
+              controlType: 'Button',
+            });
+          }}
+        />
       </Box>
       <Box sx={bridgeFormButtonContainerStyles}>
         <Button
           testId={`${testId}-button`}
           variant="primary"
           onClick={submitBridge}
-          disabled={loading}
           size="large"
         >
-          {loading ? (
-            <Button.Icon icon="Loading" sx={bridgeButtonIconLoadingStyle} />
-          ) : t('views.BRIDGE_FORM.bridgeForm.buttonText')}
+          {t('views.BRIDGE_FORM.bridgeForm.buttonText')}
         </Button>
         <TransactionRejected
           visible={showTxnRejectedState}

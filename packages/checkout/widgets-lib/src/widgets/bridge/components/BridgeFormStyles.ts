@@ -18,7 +18,3 @@ export const bridgeFormButtonContainerStyles = {
   paddingY: 'base.spacing.x6',
   paddingX: 'base.spacing.x4',
 };
-
-export const bridgeButtonIconLoadingStyle = {
-  width: 'base.icon.size.400',
-};
