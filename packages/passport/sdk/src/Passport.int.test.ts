@@ -108,9 +108,7 @@ describe('Passport', () => {
   describe('buildPrivateVars', () => {
     describe('when the env is prod', () => {
       it('sets the prod x URL as the basePath on imxApiClients', () => {
-        const baseConfig = new ImmutableConfiguration({
-          environment: Environment.PRODUCTION,
-        });
+        const baseConfig = new ImmutableConfiguration({ environment: Environment.PRODUCTION });
         const privateVars = buildPrivateVars({
           baseConfig,
           ...oidcConfiguration,
@@ -121,9 +119,7 @@ describe('Passport', () => {
 
     describe('when the env is sandbox', () => {
       it('sets the sandbox x URL as the basePath on imxApiClients', () => {
-        const baseConfig = new ImmutableConfiguration({
-          environment: Environment.SANDBOX,
-        });
+        const baseConfig = new ImmutableConfiguration({ environment: Environment.SANDBOX });
         const privateVars = buildPrivateVars({
           baseConfig,
           ...oidcConfiguration,
@@ -134,30 +130,29 @@ describe('Passport', () => {
 
     describe('when overrides are provided', () => {
       it('sets imxPublicApiDomain as the basePath on imxApiClients', async () => {
-        const baseConfig = new ImmutableConfiguration({
-          environment: Environment.SANDBOX,
-        });
-        const immutableXClient = new IMXClient({
+        const baseConfig = new ImmutableConfiguration({ environment: Environment.SANDBOX });
+        const immutableXClient = new IMXClient({ baseConfig });
+        const overrides = {
+          authenticationDomain: 'authenticationDomain123',
+          imxPublicApiDomain: 'guardianDomain123',
+          magicProviderId: 'providerId123',
+          magicPublishableApiKey: 'publishableKey123',
+          passportDomain: 'customDomain123',
+          relayerUrl: 'relayerUrl123',
+          zkEvmRpcUrl: 'zkEvmRpcUrl123',
+          indexerMrBasePath: 'indexerMrBasePath123',
+          orderBookMrBasePath: 'orderBookMrBasePath123',
+          passportMrBasePath: 'passportMrBasePath123',
+          immutableXClient,
+        };
+
+        const { passportImxProviderFactory } = buildPrivateVars({
           baseConfig,
-        });
-        const privateVars = buildPrivateVars({
-          baseConfig,
-          overrides: {
-            authenticationDomain: 'authenticationDomain123',
-            imxPublicApiDomain: 'guardianDomain123',
-            magicProviderId: 'providerId123',
-            magicPublishableApiKey: 'publishableKey123',
-            passportDomain: 'customDomain123',
-            relayerUrl: 'relayerUrl123',
-            zkEvmRpcUrl: 'zkEvmRpcUrl123',
-            indexerMrBasePath: 'indexerMrBasePath123',
-            orderBookMrBasePath: 'orderBookMrBasePath123',
-            passportMrBasePath: 'passportMrBasePath123',
-            immutableXClient,
-          },
+          overrides,
           ...oidcConfiguration,
         });
-        expect(privateVars.passportImxProviderFactory.imxApiClients.config.basePath).toEqual('guardianDomain123');
+
+        expect(passportImxProviderFactory.imxApiClients.config.basePath).toEqual(overrides.imxPublicApiDomain);
       });
     });
   });
