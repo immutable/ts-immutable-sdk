@@ -23,18 +23,6 @@ export default [
       dir: 'dist',
       format: 'es'
     },
-    plugins: [ 
-      ...defaultPlugin
-    ]
-  },
-  {
-    watch: false,
-    input: 'src/index.ts',
-    output: {
-      dir: 'dist',
-      format: 'es',
-      name: 'ImmutableCheckoutWidgets'
-    },
     context: 'window',
     plugins: [
       resolve({
