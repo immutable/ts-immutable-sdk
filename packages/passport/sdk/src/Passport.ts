@@ -20,7 +20,6 @@ import {
   PassportEventMap,
   PassportEvents,
   PassportModuleConfiguration,
-  PassportOverrides,
   UserProfile,
 } from './types';
 import { ConfirmationScreen } from './confirmation';
@@ -28,10 +27,21 @@ import { ZkEvmProvider } from './zkEvm';
 import { Provider } from './zkEvm/types';
 import TypedEventEmitter from './utils/typedEventEmitter';
 
-const buildImxClientConfig = (environment: Environment, overrides: PassportOverrides | undefined) => {
-  if (overrides) return createConfig({ basePath: overrides.imxPublicApiDomain });
-  if (environment === Environment.SANDBOX) return imxApiConfig.getSandbox();
+const buildImxClientConfig = (passportModuleConfiguration: PassportModuleConfiguration) => {
+  if (passportModuleConfiguration.overrides) {
+    return createConfig({ basePath: passportModuleConfiguration.overrides.imxPublicApiDomain });
+  }
+  if (passportModuleConfiguration.baseConfig.environment === Environment.SANDBOX) {
+    return imxApiConfig.getSandbox();
+  }
   return imxApiConfig.getProduction();
+};
+
+const buildImxApiClients = (passportModuleConfiguration: PassportModuleConfiguration) => {
+  if (passportModuleConfiguration.overrides?.imxApiClients) return passportModuleConfiguration.overrides.imxApiClients;
+
+  const config = buildImxClientConfig(passportModuleConfiguration);
+  return new ImxApiClients(config);
 };
 
 export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConfiguration) => {
@@ -46,8 +56,7 @@ export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConf
     ? passportModuleConfiguration.overrides.immutableXClient
     : new IMXClient({ baseConfig: passportModuleConfiguration.baseConfig });
 
-  const imxClientConfig = buildImxClientConfig(config.baseConfig.environment, passportModuleConfiguration.overrides);
-  const imxApiClients = passportModuleConfiguration.overrides?.imxApiClients ?? new ImxApiClients(imxClientConfig);
+  const imxApiClients = buildImxApiClients(passportModuleConfiguration);
 
   const passportImxProviderFactory = new PassportImxProviderFactory({
     authManager,
