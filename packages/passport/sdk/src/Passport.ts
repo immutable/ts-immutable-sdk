@@ -1,5 +1,6 @@
 import { IMXProvider } from '@imtbl/x-provider';
 import {
+  createConfig,
   ImxApiClients,
   imxApiConfig,
   MultiRollupApiClients,
@@ -60,7 +61,7 @@ export class Passport {
       ? imxApiConfig.getProduction()
       : imxApiConfig.getSandbox();
     const imxApiClients = passportModuleConfiguration.overrides?.imxApiClients
-      ?? (passportModuleConfiguration.overrides?.imxPublicApiDomain
+      || (passportModuleConfiguration.overrides?.imxPublicApiDomain
         ? new ImxApiClients(createConfig({ basePath: passportModuleConfiguration.overrides.imxPublicApiDomain }))
         : new ImxApiClients(imxClientConfig));
 
