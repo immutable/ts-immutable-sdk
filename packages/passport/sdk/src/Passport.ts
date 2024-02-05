@@ -36,35 +36,38 @@ const buildImxClientConfig = (environment: Environment, overrides: PassportOverr
 
 export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConfiguration) => {
   const config = new PassportConfiguration(passportModuleConfiguration);
-  const imxClientConfig = buildImxClientConfig(config.baseConfig.environment, passportModuleConfiguration.overrides);
   const authManager = new AuthManager(config);
   const magicAdapter = new MagicAdapter(config);
   const confirmationScreen = new ConfirmationScreen(config);
+  const multiRollupApiClients = new MultiRollupApiClients(config.multiRollupConfig);
   const passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
 
   const immutableXClient = passportModuleConfiguration.overrides
     ? passportModuleConfiguration.overrides.immutableXClient
     : new IMXClient({ baseConfig: passportModuleConfiguration.baseConfig });
 
+  const imxClientConfig = buildImxClientConfig(config.baseConfig.environment, passportModuleConfiguration.overrides);
   const imxApiClients = passportModuleConfiguration.overrides?.imxApiClients ?? new ImxApiClients(imxClientConfig);
 
-  return {
-    config: new PassportConfiguration(passportModuleConfiguration),
-    authManager: new AuthManager(config),
-    magicAdapter: new MagicAdapter(config),
-    confirmationScreen: new ConfirmationScreen(config),
+  const passportImxProviderFactory = new PassportImxProviderFactory({
+    authManager,
+    config,
+    confirmationScreen,
     immutableXClient,
-    multiRollupApiClients: new MultiRollupApiClients(config.multiRollupConfig),
+    magicAdapter,
     passportEventEmitter,
-    passportImxProviderFactory: new PassportImxProviderFactory({
-      authManager,
-      config,
-      confirmationScreen,
-      immutableXClient,
-      magicAdapter,
-      passportEventEmitter,
-      imxApiClients,
-    }),
+    imxApiClients,
+  });
+
+  return {
+    config,
+    authManager,
+    magicAdapter,
+    confirmationScreen,
+    immutableXClient,
+    multiRollupApiClients,
+    passportEventEmitter,
+    passportImxProviderFactory,
   };
 };
 
