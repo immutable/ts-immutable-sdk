@@ -1,12 +1,13 @@
 import { mount } from 'cypress/react18';
 import { WidgetTheme } from '@imtbl/checkout-sdk';
 import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
+import { useTranslation } from 'react-i18next';
 import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
 import { cySmartGet } from '../../lib/testUtils';
 import { QuickswapFooter } from './QuickswapFooter';
-import { text } from '../../resources/text/textConfig';
 
 describe('Quickswap Footer', () => {
+  const { t } = useTranslation();
   it('should show the Quickswap logo', () => {
     mount(
       <ViewContextTestComponent theme={WidgetTheme.LIGHT}>
@@ -28,7 +29,7 @@ describe('Quickswap Footer', () => {
       'quickswap-footer-disclaimer-text',
     ).should(
       'have.text',
-      text.footers.quickswapFooter.disclaimerText,
+      t('footers.quickswapFooter.disclaimerText'),
     );
   });
 });

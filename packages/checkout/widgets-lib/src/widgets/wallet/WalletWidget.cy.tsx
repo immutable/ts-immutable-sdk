@@ -9,11 +9,10 @@ import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { CryptoFiat } from '@imtbl/cryptofiat';
+import { useTranslation } from 'react-i18next';
 import { WalletWidget } from './WalletWidget';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { text } from '../../resources/text/textConfig';
-import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
 import {
   ConnectLoaderTestComponent,
 } from '../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
@@ -21,6 +20,7 @@ import { ConnectionStatus } from '../../context/connect-loader-context/ConnectLo
 import { NATIVE } from '../../lib';
 
 describe('WalletWidget tests', () => {
+  const { t } = useTranslation();
   beforeEach(() => {
     cy.viewport('ipad-2');
     cyIntercept();
@@ -625,10 +625,9 @@ describe('WalletWidget tests', () => {
           </ConnectLoaderTestComponent>,
         );
 
-        const { metamask: { heading, body } } = text.views[WalletWidgetViews.COIN_INFO];
         cySmartGet('coin-info-icon').click();
-        cy.get('body').contains(body);
-        cy.get('body').contains(heading);
+        cy.get('body').contains(t('views.COIN_INFO.metamask.body'));
+        cy.get('body').contains(t('views.COIN_INFO.metamask.heading'));
         cySmartGet('back-button').should('be.visible');
       });
 
@@ -658,16 +657,11 @@ describe('WalletWidget tests', () => {
           </ConnectLoaderTestComponent>,
         );
 
-        const {
-          passport: {
-            heading, body1, body2, linkText,
-          },
-        } = text.views[WalletWidgetViews.COIN_INFO];
         cySmartGet('coin-info-icon').click();
-        cy.get('body').contains(body1);
-        cy.get('body').contains(body2);
-        cy.get('body').contains(linkText);
-        cy.get('body').contains(heading);
+        cy.get('body').contains(t('views.COIN_INFO.passport.body1'));
+        cy.get('body').contains(t('views.COIN_INFO.passport.body2'));
+        cy.get('body').contains(t('views.COIN_INFO.passport.linkText'));
+        cy.get('body').contains(t('views.COIN_INFO.passport.heading'));
         cySmartGet('back-button').should('be.visible');
       });
     });

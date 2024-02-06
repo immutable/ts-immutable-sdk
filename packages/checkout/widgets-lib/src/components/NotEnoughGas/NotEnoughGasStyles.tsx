@@ -35,15 +35,3 @@ export const logoContainerStyles = {
   alignItems: 'center',
   paddingTop: 'base.spacing.x6',
 };
-
-export const ethLogoStyles = {
-  backgroundColor: 'white',
-  height: '100px',
-  width: '64px',
-  padding: '10px',
-};
-
-export const imxLogoStyles = {
-  height: '110px',
-  width: '64px',
-};

@@ -26,7 +26,6 @@ export function NoTransactions(
 ) {
   const { page } = useAnalytics();
   const { t } = useTranslation();
-
   const [passportLink, setPassportLink] = useState('');
 
   useEffect(() => {

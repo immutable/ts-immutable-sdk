@@ -224,7 +224,7 @@ export function TopUpView({
   };
 
   const renderFees = (txt: string): ReactNode => (
-    <Box sx={{ fontSize: 'base.text.caption.small.regular.fontSize' }}>
+    <Box sx={{ fontSize: 'base.text.caption.small.regular.fontSize', c: 'base.color.translucent.standard.600' }}>
       {txt}
     </Box>
   );
@@ -232,7 +232,7 @@ export function TopUpView({
   const topUpFeatures = [
     {
       testId: 'onramp',
-      icon: 'Wallet',
+      icon: 'BankCard',
       textConfigKey: 'views.TOP_UP_VIEW.topUpOptions.onramp',
       onClickEvent: onClickOnRamp,
       fee: () => renderFees(`${t('views.TOP_UP_VIEW.topUpOptions.onramp.subcaption')} ≈ ${onRampFeesPercentage}%`),
@@ -240,7 +240,7 @@ export function TopUpView({
       isEnabled: showOnrampOption,
     }, {
       testId: 'swap',
-      icon: 'Coins',
+      icon: 'Swap',
       textConfigKey: 'views.TOP_UP_VIEW.topUpOptions.swap',
       onClickEvent: onClickSwap,
       fee: () => renderFees(

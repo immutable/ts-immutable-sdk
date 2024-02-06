@@ -9,12 +9,15 @@ import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAna
 import { useTranslation } from 'react-i18next';
 import { Transaction } from 'lib/clients';
 import { getChainNameById } from 'lib/chains';
-import { getL1ChainId } from 'lib';
+import { WITHDRAWAL_CLAIM_GAS_LIMIT, getL1ChainId } from 'lib';
 import { isPassportProvider } from 'lib/providerUtils';
 import { WalletProviderName } from '@imtbl/checkout-sdk';
 import { isNativeToken } from 'lib/utils';
 import { BigNumber } from 'ethers';
 import { FlowRateWithdrawResponse } from '@imtbl/bridge-sdk';
+import { NotEnoughEthToWithdraw } from 'components/Transactions/NotEnoughEthToWithdraw';
+import { FeeData } from '@ethersproject/providers';
+import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
@@ -47,6 +50,7 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
   const [loading, setLoading] = useState(false);
   const [hasWithdrawError, setHasWithdrawError] = useState(false);
   const [withdrawalResponse, setWithdrawalResponse] = useState<FlowRateWithdrawResponse | null>();
+  const [showNotEnoughEthDrawer, setShowNotEnoughEthDrawer] = useState(false);
 
   const goBack = useCallback(() => {
     viewDispatch({
@@ -56,15 +60,20 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
     });
   }, [viewDispatch]);
 
+  /**
+    * This effect should load the transaction that should be ready to be withdrawn.
+    * There should be a receiver -> details.to_address AND
+    * there should be an index ->  details.current_status.index
+    */
   useEffect(() => {
     const getWithdrawalTxn = async () => {
-      if (!tokenBridge) return;
+      if (!tokenBridge || !transaction || transaction.details.current_status?.index === undefined) return;
       // get withdrawal transaction from the token bridge by receipient address and index
       setLoading(true);
       try {
         const flowRateWithdrawTxnResponse = await tokenBridge?.getFlowRateWithdrawTx({
           recipient: transaction.details.to_address,
-          index: 0, // TODO: update index from transaction when it comes through from backend
+          index: transaction.details.current_status.index!,
         });
         setWithdrawalResponse(flowRateWithdrawTxnResponse);
       } catch (err) {
@@ -75,9 +84,9 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
       }
     };
     getWithdrawalTxn();
-  }, [tokenBridge]);
+  }, [tokenBridge, transaction]);
 
-  const handleWithdrawalClaimClick = useCallback(async () => {
+  const handleWithdrawalClaimClick = useCallback(async ({ forceChangeAccount }: { forceChangeAccount: boolean }) => {
     if (!checkout || !tokenBridge || !from?.web3Provider || !withdrawalResponse) return;
 
     if (!withdrawalResponse.pendingWithdrawal.canWithdraw || !withdrawalResponse.unsignedTx) {
@@ -91,7 +100,7 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
 
     setTxProcessing(true);
 
-    if (isPassportProvider(from?.web3Provider)) {
+    if (isPassportProvider(from?.web3Provider) || forceChangeAccount) {
       // user should switch to MetaMask
       try {
         const createProviderResult = await checkout.createProvider({ walletProviderName: WalletProviderName.METAMASK });
@@ -100,25 +109,48 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
           requestWalletPermissions: true,
         });
         providerToUse = connectResult.provider;
+        setShowNotEnoughEthDrawer(false);
       } catch (err) {
         // eslint-disable-next-line no-console
         console.log(err);
+        setHasWithdrawError(true);
+        setTxProcessing(false);
         return;
       }
     }
 
-    let ethGasCostWei: BigNumber | null;
+    /**
+     * Gas fee estimation and balance checks are done on a best effort basis.
+     * If for some reason the balance calls fail or gas fee data calls fail
+     * don't block the transaction from being submitted.
+     */
+
+    let gasEstimate: BigNumber;
+    let ethGasCostWei: BigNumber | null = null;
     try {
-      const gasEstimate = await providerToUse.estimateGas(withdrawalResponse.unsignedTx);
-      const feeData = await providerToUse.getFeeData();
-      let gasPriceInWei: BigNumber | null;
-      if (feeData.lastBaseFeePerGas && feeData.maxPriorityFeePerGas) {
+      try {
+        gasEstimate = await providerToUse.estimateGas(withdrawalResponse.unsignedTx);
+      } catch (err) {
+        gasEstimate = BigNumber.from(WITHDRAWAL_CLAIM_GAS_LIMIT);
+      }
+
+      let feeData: FeeData | null = null;
+      try {
+        feeData = await providerToUse.getFeeData();
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.log(err);
+      }
+
+      let gasPriceInWei: BigNumber | null = null;
+      if (feeData && feeData.lastBaseFeePerGas && feeData.maxPriorityFeePerGas) {
         gasPriceInWei = feeData.lastBaseFeePerGas.add(feeData.maxPriorityFeePerGas);
-      } else {
+      } else if (feeData && feeData.gasPrice) {
         gasPriceInWei = feeData.gasPrice;
       }
-      if (!gasPriceInWei) throw new Error('unable to fetch gas price');
-      ethGasCostWei = gasEstimate.mul(gasPriceInWei);
+      if (gasPriceInWei) {
+        ethGasCostWei = gasEstimate.mul(gasPriceInWei);
+      }
     } catch (err) {
       // eslint-disable-next-line no-console
       console.log(err);
@@ -134,18 +166,13 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
       const ethBalance = balancesResult.balances.find((balance) => isNativeToken(balance.token.address));
 
       if (!ethBalance || ethBalance.balance.lt(ethGasCostWei!)) {
-        // TODO: if eth balance is less than the total gas cost required for the txn then pop up Not enough ETH drawer
-        // eslint-disable-next-line no-console
-        console.log('not enough eth to pay for claim withdrawal txn');
-        setLoading(false);
+        setShowNotEnoughEthDrawer(true);
+        setTxProcessing(false);
         return;
       }
     } catch (err) {
       // eslint-disable-next-line no-console
       console.log(err);
-      setHasWithdrawError(true);
-      setLoading(false);
-      return;
     }
 
     // check that provider is connected to L1
@@ -169,13 +196,20 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
 
     // send transaction to wallet for signing
     try {
-      // TODO: WT-2054 Update view to go to in progress screens and pass through sendTransaction response
+      const response = await checkout.sendTransaction({
+        provider: providerToUse,
+        transaction: withdrawalResponse.unsignedTx,
+      });
 
-      // const response = await checkout.sendTransaction({
-      //   provider: providerToUse,
-      //   transaction: withdrawalResponse.unsignedTx,
-      // });
-
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: BridgeWidgetViews.CLAIM_WITHDRAWAL_IN_PROGRESS,
+            transactionResponse: response.transactionResponse,
+          },
+        },
+      });
     } catch (err) {
       // eslint-disable-next-line no-console
       console.log(err);
@@ -219,9 +253,11 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
               size="large"
               variant="primary"
               disabled={loading}
-              onClick={(txProcessing || loading) ? () => { } : handleWithdrawalClaimClick}
+              onClick={() => ((txProcessing || loading)
+                ? undefined
+                : handleWithdrawalClaimClick({ forceChangeAccount: true }))}
             >
-              {loading ? (
+              {loading || txProcessing ? (
                 <Button.Icon icon="Loading" sx={{ width: 'base.icon.size.400' }} />
               ) : t(`views.CLAIM_WITHDRAWAL.${hasWithdrawError ? 'footer.retryText' : 'footer.buttonText'}`)}
             </Button>
@@ -243,6 +279,11 @@ export function ClaimWithdrawal({ transaction }: ClaimWithdrawalProps) {
           <EllipsizedText text={transaction.details.to_address.toLowerCase() ?? ''} />
         </Box>
       </SimpleTextBody>
+      <NotEnoughEthToWithdraw
+        visible={showNotEnoughEthDrawer}
+        onClose={() => setShowNotEnoughEthDrawer(false)}
+        onChangeAccount={() => handleWithdrawalClaimClick({ forceChangeAccount: true })}
+      />
     </SimpleLayout>
   );
 }

@@ -1,6 +1,8 @@
 import { Environment } from '@imtbl/config';
 import { Web3Provider } from '@ethersproject/providers';
 import {
+  BridgeClaimWithdrawalFailed,
+  BridgeClaimWithdrawalSuccess,
   BridgeEventType,
   BridgeFailed,
   BridgeTransactionSent,
@@ -142,6 +144,8 @@ export type WidgetEventData = {
     [BridgeEventType.TRANSACTION_SENT]: BridgeTransactionSent,
     [BridgeEventType.FAILURE]: BridgeFailed,
     [BridgeEventType.CLOSE_WIDGET]: {}
+    [BridgeEventType.CLAIM_WITHDRAWAL_SUCCESS]: BridgeClaimWithdrawalSuccess
+    [BridgeEventType.CLAIM_WITHDRAWAL_FAILURE]: BridgeClaimWithdrawalFailed
   } & OrchestrationMapping & ProviderEventMapping,
 
   [WidgetType.ONRAMP]: {

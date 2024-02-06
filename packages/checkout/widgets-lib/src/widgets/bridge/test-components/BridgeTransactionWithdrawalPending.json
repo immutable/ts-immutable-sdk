@@ -7,7 +7,8 @@
     "amount": "10000000",
     "current_status": {
       "status": "withdrawal_pending",
-      "withdrawal_ready_at": "2024-01-22T17:43:26.991388Z"
+      "withdrawal_ready_at": "2024-01-22T17:43:26.991388Z",
+      "index": 0
     },
     "from_address": "0xf364930c779c6674472e131898c4b3f7aaccf1b7",
     "from_chain": "imtbl-zkevm-testnet",

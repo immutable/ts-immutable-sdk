@@ -38,7 +38,11 @@ import { KnownNetworkMap } from './transactionsType';
 import { TransactionList } from './TransactionList';
 import { NoTransactions } from './NoTransactions';
 
-export function Transactions() {
+type TransactionsProps = {
+  onBackButtonClick: () => void;
+};
+
+export function Transactions({ onBackButtonClick }: TransactionsProps) {
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const { cryptoFiatDispatch } = useContext(CryptoFiatContext);
@@ -228,6 +232,31 @@ export function Transactions() {
     return client.getTransactions({ txType: TransactionType.BRIDGE, fromAddress: address });
   }, []);
 
+  const handleBackButtonClick = () => {
+    if (from) {
+      bridgeDispatch({
+        payload: {
+          type: BridgeActions.SET_WALLETS_AND_NETWORKS,
+          from: {
+            web3Provider: from?.web3Provider,
+            walletAddress: from?.walletAddress,
+            network: from?.network,
+          },
+          to: null,
+        },
+      });
+      bridgeDispatch({
+        payload: {
+          type: BridgeActions.SET_TOKEN_AND_AMOUNT,
+          token: null,
+          amount: '',
+        },
+      });
+    }
+
+    onBackButtonClick();
+  };
+
   const fetchData = useCallback(async () => {
     if (!from?.walletAddress) return undefined;
 
@@ -277,7 +306,7 @@ export function Transactions() {
 
       setLoading(false);
     })();
-  }, [from?.walletAddress, checkout]);
+  }, [from, checkout]);
 
   useEffect(() => {
     page({
@@ -292,6 +321,7 @@ export function Transactions() {
       header={(
         <HeaderNavigation
           showBack
+          onBackButtonClick={handleBackButtonClick}
           title={t('views.TRANSACTIONS.layoutHeading')}
           onCloseButtonClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
         />

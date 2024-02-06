@@ -1,10 +1,10 @@
 import { Body, Box, ButtCon } from '@biom3/react';
 import { TokenInfo } from '@imtbl/checkout-sdk';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
+import { useTranslation } from 'react-i18next';
 import { feeBoxStyles, feeContainerStyles } from './FeeStyles';
 import { formatZeroAmount, tokenValueFormat } from '../../lib/utils';
 import { FeesBreakdown } from '../FeesBreakdown/FeesBreakdown';
-import { text } from '../../resources/text/textConfig';
 
 interface FeesProps {
   title: string;
@@ -17,6 +17,7 @@ interface FeesProps {
 export function Fees({
   title, fiatPricePrefix, gasFeeValue, gasFeeToken, gasFeeFiatValue,
 }: FeesProps) {
+  const { t } = useTranslation();
   const { track } = useAnalytics();
 
   if (!gasFeeValue) return <Box />;
@@ -40,7 +41,7 @@ export function Fees({
           tokenSymbol={gasFeeToken?.symbol ?? ''}
           fees={[
             {
-              label: text.drawers.feesBreakdown.fees.gas.label,
+              label: t('drawers.feesBreakdown.fees.gas.label'),
               fiatAmount: `${fiatPricePrefix} $${gasFeeFiatValue}`,
               amount: formattedGasValue,
             },

@@ -470,7 +470,7 @@ export function BridgeForm(props: BridgeFormProps) {
               selectedOption={selectedOption}
               subtext={tokenBalanceSubtext}
               textAlign="left"
-              errorMessage={tokenError}
+              errorMessage={t(tokenError)}
               onSelectChange={(option) => handleSelectTokenChange(option)}
               disabled={isFetching}
             />
@@ -484,7 +484,7 @@ export function BridgeForm(props: BridgeFormProps) {
               onTextInputChange={(value) => handleBridgeAmountChange(value)}
               onTextInputBlur={(value) => handleAmountInputBlur(value)}
               textAlign="right"
-              errorMessage={amountError}
+              errorMessage={t(amountError)}
               disabled={isFetching}
             />
           </Box>
@@ -547,16 +547,17 @@ export function BridgeForm(props: BridgeFormProps) {
           onRetry={retrySubmitBridge}
         />
         <NotEnoughGas
+          environment={checkout.config.environment}
           visible={showNotEnoughGasDrawer}
           showHeaderBar={false}
           onCloseDrawer={() => setShowNotEnoughGasDrawer(false)}
           walletAddress={walletAddress}
           showAdjustAmount={isNativeToken(formToken?.token.address)}
           tokenSymbol={
-              from?.network === getL1ChainId(checkout?.config)
-                ? ETH_TOKEN_SYMBOL
-                : IMX_TOKEN_SYMBOL
-            }
+            from?.network === getL1ChainId(checkout?.config)
+              ? ETH_TOKEN_SYMBOL
+              : IMX_TOKEN_SYMBOL
+          }
           onAddCoinsClick={() => {
             viewDispatch({
               payload: {

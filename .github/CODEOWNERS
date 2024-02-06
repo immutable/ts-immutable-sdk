@@ -3,6 +3,7 @@
 /packages/config @immutable/sdk
 /packages/internal/version-check @immutable/sdk
 /packages/internal/generated-clients @immutable/sdk
+/packages/internal/generated-clients/src/blockchain-data @immutable/assets
 /packages/internal/toolkit @immutable/wallets
 /packages/internal/cryptofiat @immutable/wallets
 /packages/internal/dex @immutable/tokens

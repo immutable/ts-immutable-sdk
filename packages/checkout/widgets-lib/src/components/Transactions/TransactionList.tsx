@@ -1,8 +1,6 @@
 import {
   Box,
 } from '@biom3/react';
-import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
-import { text } from 'resources/text/textConfig';
 import { Checkout } from '@imtbl/checkout-sdk';
 import {
   useCallback,
@@ -37,11 +35,6 @@ export function TransactionList({
 }: TransactionListProps) {
   const { cryptoFiatState } = useContext(CryptoFiatContext);
   const { t } = useTranslation();
-
-  const {
-    fiatPricePrefix,
-  } = text.views[BridgeWidgetViews.TRANSACTIONS];
-
   const [link, setLink] = useState('');
 
   useEffect(() => {
@@ -80,7 +73,7 @@ export function TransactionList({
                   key={hash}
                   label={token.name}
                   transaction={transaction}
-                  fiatAmount={`${fiatPricePrefix}${fiat}`}
+                  fiatAmount={`${t('views.TRANSACTIONS.fiatPricePrefix')}${fiat}`}
                   amount={amount}
                 />
               );
@@ -92,7 +85,7 @@ export function TransactionList({
                 label={token.name}
                 details={{ text: t('views.TRANSACTIONS.status.inProgress.stepInfo'), link, hash }}
                 transaction={transaction}
-                fiatAmount={`${fiatPricePrefix}${fiat}`}
+                fiatAmount={`${t('views.TRANSACTIONS.fiatPricePrefix')}${fiat}`}
                 amount={amount}
               />
             );
