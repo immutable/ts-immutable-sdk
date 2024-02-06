@@ -12,11 +12,10 @@ import {
   NetworkMap,
   AllowedNetworkConfig,
 } from '../types';
-import { CheckoutConfiguration, getL1ChainId } from '../config';
+import { CheckoutConfiguration } from '../config';
 import { getUnderlyingChainId } from '../provider/getUnderlyingProvider';
 
 const UNRECOGNISED_CHAIN_ERROR_CODE = 4902; // error code (MetaMask)
-const UNRECOGNISED_CHAIN_ERROR_CODE_WC = 5000; // error code (MetaMask)
 
 // these functions should not be exported. These functions should be used as part of an exported function e.g switchWalletNetwork() above.
 // make sure to check if(provider.provider?.request) in the exported function and throw an error
@@ -170,26 +169,19 @@ export async function switchWalletNetwork(
     );
   }
 
-  // Wallet Connect investigation
-  /**
-   * always try to add the nwtrok for zkEVM before switching to it.
-   * Don't try to add an L1 chain though. This will throw errors in WC
-   */
-  try {
-    if (chainId !== getL1ChainId(config)) {
-      await addNetworkToWallet(networkMap, web3Provider, chainId);
-    }
-  } catch (err) {
-    console.log(err);
-  }
+  // try {
+  //   if (chainId !== getL1ChainId(config)) {
+  //     await addNetworkToWallet(networkMap, web3Provider, chainId);
+  //   }
+  // } catch (err) {
+  //   console.log(err);
+  // }
 
   // WT-1146 - Refer to the README in this folder for explanation on the switch network flow
   try {
     await switchNetworkInWallet(networkMap, web3Provider, chainId);
   } catch (err: any) {
-    console.log('WALLET CONNECT trying to switch', err);
-    if (err.code === UNRECOGNISED_CHAIN_ERROR_CODE
-      || err.code === UNRECOGNISED_CHAIN_ERROR_CODE_WC) {
+    if (err.code === UNRECOGNISED_CHAIN_ERROR_CODE) {
       try {
         await addNetworkToWallet(networkMap, web3Provider, chainId);
         // eslint-disable-next-line @typescript-eslint/no-shadow

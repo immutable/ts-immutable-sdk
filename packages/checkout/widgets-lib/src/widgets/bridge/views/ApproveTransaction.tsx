@@ -143,10 +143,9 @@ export function ApproveTransaction({ approveTransaction, transaction }: ApproveT
               },
             },
           });
+          return;
         }
       } catch (error: any) {
-        console.log('approve txn');
-        console.log(error);
         setTxProcessing(false);
         if (error.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
           setRejectedBridge(true);
@@ -193,8 +192,6 @@ export function ApproveTransaction({ approveTransaction, transaction }: ApproveT
         },
       });
     } catch (error: any) {
-      console.log('bridge txn');
-      console.log(error);
       if (error.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
         setRejectedBridge(true);
       } else {

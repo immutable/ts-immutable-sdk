@@ -118,12 +118,10 @@ export function WalletList(props: WalletListProps) {
             provider: web3Provider,
           });
 
-          console.log(connectResult);
-
           // Set up EIP-1193 provider event listeners for widget root instances
-          // addProviderListenersForWidgetRoot(connectResult.provider);
+          addProviderListenersForWidgetRoot(connectResult.provider);
 
-          // await identifyUser(identify, connectResult.provider);
+          await identifyUser(identify, connectResult.provider);
 
           const chainId = await web3Provider.getSigner().getChainId();
           if (chainId !== targetChainId && !allowedChains?.includes(chainId)) {

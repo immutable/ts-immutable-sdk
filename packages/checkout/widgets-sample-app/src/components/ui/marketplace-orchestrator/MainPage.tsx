@@ -55,15 +55,6 @@ export const MainPage = () => {
   const [web3Provider, setWeb3Provider] = useState<Web3Provider | undefined>(undefined);
 
   useEffect(() => {
-    if (web3Provider && (web3Provider.provider as any)?.isWalletConnect) {
-      (web3Provider.provider as any)?.on('chainChanged', (e: any) => {
-        console.log('wallet connect chain changed event listener')
-        console.log(e)
-      });
-    }
-  }, [web3Provider])
-
-  useEffect(() => {
     connectWidget.addListener(ConnectEventType.CLOSE_WIDGET, () => connectWidget.unmount());
     connectWidget.addListener(ConnectEventType.SUCCESS, (eventData: ConnectionSuccess) => {
       setWeb3Provider(eventData.provider);
@@ -136,14 +127,12 @@ export const MainPage = () => {
   //   }
   // }
 
-  const disconnectWalletConnect = useCallback(async () => {
-    if ((web3Provider && web3Provider?.provider as any)?.isWalletConnect) {
-      console.log('attempting to disconnect wallet connect provider');
-      console.log('web3Provider', web3Provider)
-      await (web3Provider.provider as Provider).disconnect();
-      console.log('disconnected');
-    }
-  }, [web3Provider])
+  // const disconnectWalletConnect = async () => {
+  //   console.log('disconnecting wallet connect provider');
+  //   console.log('wcProvider', wcProvider)
+  //   await (wcProvider as Provider).disconnect();
+  //   console.log('disconnected');
+  // }
 
 
   const updateLanguage = useCallback((language: string) => {
@@ -167,7 +156,8 @@ export const MainPage = () => {
           <Button onClick={openBridgeWidget}>Bridge</Button>
           <Button onClick={openOnRampWidget}>On-ramp</Button>
           <LanguageSelector onLanguageChange={(language: string) => updateLanguage(language)} language={selectedLanguage} />
-          <Button onClick={disconnectWalletConnect}>Disconnect WC</Button>
+          {/* <Button onClick={initialiseWalletConnect}>Wallet Connect</Button> */}
+          {/* <Button onClick={disconnectWalletConnect}>Disconnect WC</Button> */}
         </Box>
         {passport && web3Provider && (web3Provider.provider as any)?.isPassport && <Button onClick={logout}>Passport Logout</Button>}
       </Box>
