@@ -202,10 +202,10 @@ export class Checkout {
   public async connect(
     params: ConnectParams,
   ): Promise<ConnectResult> {
-    // if provider is wallet connect check eth_accounts first, then skip over disconnect/connect calls
-    if ((params.provider.provider as any)?.isWalletConnect
-      && !this.checkIsWalletConnected({ provider: params.provider })) {
-      await (params.provider.provider as any).disconnect();
+    // if provider is wallet connect check eth_accounts first, then skip over disconnect/connect call
+    if ((params.provider.provider as any)?.isWalletConnect) {
+      // && !this.checkIsWalletConnected({ provider: params.provider })) {
+      // await (params.provider.provider as any).disconnect();
       await (params.provider.provider as any).connect();
     }
     const web3Provider = await provider.validateProvider(

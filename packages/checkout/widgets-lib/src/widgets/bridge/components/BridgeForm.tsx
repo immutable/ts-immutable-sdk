@@ -472,7 +472,7 @@ export function BridgeForm(props: BridgeFormProps) {
               textAlign="left"
               errorMessage={tokenError}
               onSelectChange={(option) => handleSelectTokenChange(option)}
-              disabled={isFetching}
+            // disabled={isFetching}
             />
             <TextInputForm
               testId="bridge-amount"
@@ -485,7 +485,7 @@ export function BridgeForm(props: BridgeFormProps) {
               onTextInputBlur={(value) => handleAmountInputBlur(value)}
               textAlign="right"
               errorMessage={amountError}
-              disabled={isFetching}
+            // disabled={isFetching}
             />
           </Box>
         )}
@@ -533,12 +533,13 @@ export function BridgeForm(props: BridgeFormProps) {
           testId={`${testId}-button`}
           variant="primary"
           onClick={submitBridge}
-          disabled={loading}
+          // disabled={loading}
           size="large"
         >
-          {loading ? (
+          {/* {loading ? (
             <Button.Icon icon="Loading" sx={bridgeButtonIconLoadingStyle} />
-          ) : t('views.BRIDGE_FORM.bridgeForm.buttonText')}
+          ) :  */}
+          t('views.BRIDGE_FORM.bridgeForm.buttonText')}
         </Button>
         <TransactionRejected
           visible={showTxnRejectedState}

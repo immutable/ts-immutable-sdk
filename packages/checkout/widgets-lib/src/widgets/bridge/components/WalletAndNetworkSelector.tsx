@@ -292,7 +292,8 @@ export function WalletAndNetworkSelector() {
       }
       if (!toWalletProvider) {
         try {
-          toWalletProvider = await createProviderAndConnect(selectedToWalletProviderName);
+          toWalletProvider = fromWalletWeb3Provider;
+          // toWalletProvider = await createProviderAndConnect(selectedToWalletProviderName);
         } catch (error) {
           return;
         }
