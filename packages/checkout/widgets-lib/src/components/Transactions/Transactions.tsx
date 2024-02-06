@@ -232,6 +232,31 @@ export function Transactions({ onBackButtonClick }: TransactionsProps) {
     return client.getTransactions({ txType: TransactionType.BRIDGE, fromAddress: address });
   }, []);
 
+  const handleBackButtonClick = () => {
+    if (from) {
+      bridgeDispatch({
+        payload: {
+          type: BridgeActions.SET_WALLETS_AND_NETWORKS,
+          from: {
+            web3Provider: from?.web3Provider,
+            walletAddress: from?.walletAddress,
+            network: from?.network,
+          },
+          to: null,
+        },
+      });
+      bridgeDispatch({
+        payload: {
+          type: BridgeActions.SET_TOKEN_AND_AMOUNT,
+          token: null,
+          amount: '',
+        },
+      });
+    }
+
+    onBackButtonClick();
+  };
+
   const fetchData = useCallback(async () => {
     if (!from?.walletAddress) return undefined;
 
@@ -284,7 +309,7 @@ export function Transactions({ onBackButtonClick }: TransactionsProps) {
 
       setLoading(false);
     })();
-  }, [from?.walletAddress, checkout]);
+  }, [from, checkout]);
 
   useEffect(() => {
     page({
@@ -299,7 +324,7 @@ export function Transactions({ onBackButtonClick }: TransactionsProps) {
       header={(
         <HeaderNavigation
           showBack
-          onBackButtonClick={onBackButtonClick}
+          onBackButtonClick={handleBackButtonClick}
           title={t('views.TRANSACTIONS.layoutHeading')}
           onCloseButtonClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
         />

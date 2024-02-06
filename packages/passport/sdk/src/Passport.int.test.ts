@@ -2,8 +2,10 @@ import { Magic } from 'magic-sdk';
 import { UserManager } from 'oidc-client-ts';
 import { TransactionRequest } from '@ethersproject/providers';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
+import { OidcConfiguration } from 'types';
+import { IMXClient } from '@imtbl/x-client';
 import { mockValidIdToken } from './utils/token.test';
-import { Passport } from './Passport';
+import { buildPrivateVars, Passport } from './Passport';
 import { RequestArguments } from './zkEvm/types';
 import {
   closeMswWorker,
@@ -33,6 +35,7 @@ const mockOidcUser = {
   access_token: 'accessToken123',
   refresh_token: 'refreshToken123',
 };
+
 const mockOidcUserZkevm = {
   ...mockOidcUser,
   profile: {
@@ -42,6 +45,12 @@ const mockOidcUserZkevm = {
       zkevm_user_admin_address: '0x123',
     },
   },
+};
+
+const oidcConfiguration: OidcConfiguration = {
+  clientId: '11111',
+  redirectUri: 'https://test.com',
+  logoutRedirectUri: 'https://test.com',
 };
 
 const getZkEvmProvider = () => {
@@ -94,6 +103,58 @@ describe('Passport', () => {
 
   afterAll(async () => {
     closeMswWorker();
+  });
+
+  describe('buildPrivateVars', () => {
+    describe('when the env is prod', () => {
+      it('sets the prod x URL as the basePath on imxApiClients', () => {
+        const baseConfig = new ImmutableConfiguration({ environment: Environment.PRODUCTION });
+        const privateVars = buildPrivateVars({
+          baseConfig,
+          ...oidcConfiguration,
+        });
+        expect(privateVars.passportImxProviderFactory.imxApiClients.config.basePath).toEqual('https://api.x.immutable.com');
+      });
+    });
+
+    describe('when the env is sandbox', () => {
+      it('sets the sandbox x URL as the basePath on imxApiClients', () => {
+        const baseConfig = new ImmutableConfiguration({ environment: Environment.SANDBOX });
+        const privateVars = buildPrivateVars({
+          baseConfig,
+          ...oidcConfiguration,
+        });
+        expect(privateVars.passportImxProviderFactory.imxApiClients.config.basePath).toEqual('https://api.sandbox.x.immutable.com');
+      });
+    });
+
+    describe('when overrides are provided', () => {
+      it('sets imxPublicApiDomain as the basePath on imxApiClients', async () => {
+        const baseConfig = new ImmutableConfiguration({ environment: Environment.SANDBOX });
+        const immutableXClient = new IMXClient({ baseConfig });
+        const overrides = {
+          authenticationDomain: 'authenticationDomain123',
+          imxPublicApiDomain: 'guardianDomain123',
+          magicProviderId: 'providerId123',
+          magicPublishableApiKey: 'publishableKey123',
+          passportDomain: 'customDomain123',
+          relayerUrl: 'relayerUrl123',
+          zkEvmRpcUrl: 'zkEvmRpcUrl123',
+          indexerMrBasePath: 'indexerMrBasePath123',
+          orderBookMrBasePath: 'orderBookMrBasePath123',
+          passportMrBasePath: 'passportMrBasePath123',
+          immutableXClient,
+        };
+
+        const { passportImxProviderFactory } = buildPrivateVars({
+          baseConfig,
+          overrides,
+          ...oidcConfiguration,
+        });
+
+        expect(passportImxProviderFactory.imxApiClients.config.basePath).toEqual(overrides.imxPublicApiDomain);
+      });
+    });
   });
 
   describe('zkEvm', () => {

@@ -697,8 +697,8 @@ export function SwapForm({ data }: SwapFromProps) {
               onTextInputFocus={onFromTextInputFocus}
               textInputMaxButtonClick={textInputMaxButtonClick}
               onSelectChange={onFromSelectChange}
-              textInputErrorMessage={fromAmountError}
-              selectErrorMessage={fromTokenError}
+              textInputErrorMessage={t(fromAmountError)}
+              selectErrorMessage={t(fromTokenError)}
               selectInputDisabled={isFetching}
               textInputDisabled={isFetching}
               selectedOption={fromToken
@@ -739,8 +739,8 @@ export function SwapForm({ data }: SwapFromProps) {
               onTextInputBlur={(v) => onToTextInputBlur(v)}
               onTextInputFocus={onToTextInputFocus}
               onSelectChange={onToSelectChange}
-              textInputErrorMessage={toAmountError}
-              selectErrorMessage={toTokenError}
+              textInputErrorMessage={t(toAmountError)}
+              selectErrorMessage={t(toTokenError)}
               selectInputDisabled={isFetching}
               textInputDisabled={isFetching}
               selectedOption={toToken

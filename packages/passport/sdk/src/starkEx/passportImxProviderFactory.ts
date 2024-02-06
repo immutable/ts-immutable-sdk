@@ -33,7 +33,7 @@ export class PassportImxProviderFactory {
 
   private readonly passportEventEmitter: TypedEventEmitter<PassportEventMap>;
 
-  private readonly imxApiClients: ImxApiClients;
+  public readonly imxApiClients: ImxApiClients;
 
   constructor({
     authManager,
