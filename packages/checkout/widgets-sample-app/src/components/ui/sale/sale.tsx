@@ -109,7 +109,6 @@ export function SaleUI() {
     saleWidget.addListener(SaleEventType.CLOSE_WIDGET, () => { saleWidget.unmount()})
 
     saleWidget.addListener(SaleEventType.REQUEST_BRIDGE, (event) => {
-      console.log('@@@@ sale.tsx SaleEventType.REQUEST_BRIDGE', event);
       saleWidget.unmount();
 
       bridgeWidget.mount('bridge');
@@ -117,7 +116,6 @@ export function SaleUI() {
       return;
     });
     saleWidget.addListener(SaleEventType.REQUEST_SWAP, (event) => {
-      console.log('@@@@ sale.tsx SaleEventType.REQUEST_SWAP', event);
       saleWidget.unmount();
 
       swapWidget.mount('swap');
@@ -125,7 +123,6 @@ export function SaleUI() {
       return;
     });
     saleWidget.addListener(SaleEventType.REQUEST_ONRAMP, (event) => {
-      console.log('@@@@ sale.tsx SaleEventType.REQUEST_ONRAMP', event);
       saleWidget.unmount();
 
       onrampWidget.mount('onramp');
