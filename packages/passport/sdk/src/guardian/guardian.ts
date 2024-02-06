@@ -2,6 +2,7 @@ import * as guardian from '@imtbl/guardian';
 import { TransactionApprovalRequestChainTypeEnum, TransactionEvaluationResponse } from '@imtbl/guardian';
 import { BigNumber, ethers } from 'ethers';
 import AuthManager from 'authManager';
+import { PassportError, PassportErrorType } from 'errors/passportError';
 import { ConfirmationScreen } from '../confirmation';
 import { retryWithDelay } from '../network/retry';
 import { JsonRpcError, RpcErrorCode } from '../zkEvm/JsonRpcError';
@@ -231,8 +232,11 @@ export default class GuardianClient {
   private async evaluateMessage(
     { chainID, payload }:GuardianMessageValidationParams,
   ): Promise<guardian.MessageEvaluationResponse> {
-    const user = await this.authManager.getUser() as UserZkEvm;
     try {
+      const user = await this.authManager.getUser() as UserZkEvm;
+      if (user === null) {
+        throw new PassportError('evaluateMessage requires a valid ID token or refresh token. Please log in first', PassportErrorType.NOT_LOGGED_IN_ERROR);
+      }
       const messageEvalResponse = await this.messageAPI.evaluateMessage(
         { messageEvaluationRequest: { chainID, payload } },
         { headers: { Authorization: `Bearer ${user.accessToken}` } },
