@@ -18,7 +18,11 @@ import {
   calculateCryptoToFiat, formatZeroAmount, isNativeToken, tokenValueFormat,
 } from '../../../lib/utils';
 import {
-  DEFAULT_TOKEN_DECIMALS, DEFAULT_QUOTE_REFRESH_INTERVAL, NATIVE, DEFAULT_TOKEN_VALIDATION_DECIMALS,
+  DEFAULT_TOKEN_DECIMALS,
+  DEFAULT_QUOTE_REFRESH_INTERVAL,
+  NATIVE,
+  DEFAULT_TOKEN_VALIDATION_DECIMALS,
+  ESTIMATE_DEBOUNCE,
 } from '../../../lib';
 import { quotesProcessor } from '../functions/FetchQuote';
 import { SelectInput } from '../../../components/FormComponents/SelectInput/SelectInput';
@@ -37,6 +41,7 @@ import { NotEnoughImx } from '../../../components/NotEnoughImx/NotEnoughImx';
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { UnableToSwap } from './UnableToSwap';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
+import useDebounce from '../../../lib/hooks/useDebounce';
 
 enum SwapDirection {
   FROM = 'FROM',
@@ -110,8 +115,6 @@ export function SwapForm({ data }: SwapFromProps) {
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { viewDispatch } = useContext(ViewContext);
 
-  const [editing, setEditing] = useState(false);
-  const [isFetching, setIsFetching] = useState(false);
   const [direction, setDirection] = useState<SwapDirection>(SwapDirection.FROM);
   const [loading, setLoading] = useState(false);
   const [conversion, setConversion] = useState(BigNumber.from(0));
@@ -123,11 +126,13 @@ export function SwapForm({ data }: SwapFromProps) {
   // Form State
   const [fromAmount, setFromAmount] = useState<string>(data?.fromAmount || '');
   const [fromAmountError, setFromAmountError] = useState<string>('');
+  const debouncedFromAmount = useDebounce(fromAmount, ESTIMATE_DEBOUNCE);
   const [fromToken, setFromToken] = useState<TokenInfo | undefined>();
   const [fromBalance, setFromBalance] = useState<string>('');
   const [fromTokenError, setFromTokenError] = useState<string>('');
   const [toAmount, setToAmount] = useState<string>(data?.toAmount || '');
   const [toAmountError, setToAmountError] = useState<string>('');
+  const debouncedToAmount = useDebounce(toAmount, ESTIMATE_DEBOUNCE);
   const [toToken, setToToken] = useState<TokenInfo | undefined>();
   const [toTokenError, setToTokenError] = useState<string>('');
   const [fromFiatValue, setFromFiatValue] = useState('');
@@ -232,6 +237,20 @@ export function SwapForm({ data }: SwapFromProps) {
   // ------------------//
   //    FETCH QUOTES   //
   // ------------------//
+  const resetFormErrors = () => {
+    setFromAmountError('');
+    setFromTokenError('');
+    setToAmountError('');
+    setToTokenError('');
+  };
+
+  const resetQuote = () => {
+    setSwapFromToConversionText('');
+    setQuote(null);
+    setGasFeeValue('');
+    setGasFeeFiatValue('');
+  };
+
   const processFetchQuoteFrom = async (silently: boolean = false) => {
     if (!provider) return;
     if (!exchange) return;
@@ -256,15 +275,21 @@ export function SwapForm({ data }: SwapFromProps) {
         toToken,
       );
 
-      const resolved = await Promise.all([quoteResultPromise, conversionResultPromise]);
+      // Track request so it can be cancelled
+      SwapForm.quoteRequestId += 1;
+      console.log('Fetching from with request Id:', SwapForm.quoteRequestId);
+
+      const resolved = await Promise.all([
+        quoteResultPromise,
+        conversionResultPromise,
+        Promise.resolve(SwapForm.quoteRequestId),
+      ]);
       const quoteResult = resolved[0];
       const conversionResult = resolved[1];
-      setConversion(conversionResult.quote.amount.value);
+      console.log('Fetch from quote resolved', resolved[2], 'matches', SwapForm.quoteRequestId);
+      if (resolved[2] !== SwapForm.quoteRequestId) return;
 
-      // Prevent to silently fetch and set a new quote
-      // if the user has updated and the widget is already
-      // fetching or the user is updating the inputs.
-      if (silently && (loading || editing)) return;
+      setConversion(conversionResult.quote.amount.value);
 
       const estimate = quoteResult.swap.gasFeeEstimate;
       let gasFeeTotal = BigNumber.from(estimate?.value || 0);
@@ -317,7 +342,10 @@ export function SwapForm({ data }: SwapFromProps) {
       setShowNotEnoughImxDrawer(false);
       setShowUnableToSwapDrawer(true);
     }
-    setIsFetching(false);
+
+    if (!silently) {
+      setLoading(false);
+    }
   };
 
   const processFetchQuoteTo = async (silently: boolean = false) => {
@@ -344,15 +372,21 @@ export function SwapForm({ data }: SwapFromProps) {
         toToken,
       );
 
-      const resolved = await Promise.all([quoteResultPromise, conversionResultPromise]);
+      // Track request so it can be cancelled
+      console.log('Fetching to', SwapForm.quoteRequestId);
+      SwapForm.quoteRequestId += 1;
+
+      const resolved = await Promise.all([
+        quoteResultPromise,
+        conversionResultPromise,
+        Promise.resolve(SwapForm.quoteRequestId),
+      ]);
       const quoteResult = resolved[0];
       const conversionResult = resolved[1];
-      setConversion(conversionResult.quote.amount.value);
+      console.log('Fetch to quote resolved', resolved[2], 'matches', SwapForm.quoteRequestId);
+      if (resolved[2] !== SwapForm.quoteRequestId) return;
 
-      // Prevent to silently fetch and set a new quote
-      // if the user has updated and the widget is already
-      // fetching or the user is updating the inputs.
-      if (silently && (loading || editing)) return;
+      setConversion(conversionResult.quote.amount.value);
 
       const estimate = quoteResult.swap.gasFeeEstimate;
       let gasFeeTotal = BigNumber.from(estimate?.value || 0);
@@ -391,76 +425,66 @@ export function SwapForm({ data }: SwapFromProps) {
         ),
       );
 
-      setFromAmountError('');
-      setFromTokenError('');
-      setToAmountError('');
-      setToTokenError('');
+      resetFormErrors();
     } catch (error: any) {
       setQuote(null);
       setShowNotEnoughImxDrawer(false);
       setShowUnableToSwapDrawer(true);
     }
 
-    setIsFetching(false);
+    if (!silently) {
+      setLoading(false);
+    }
   };
 
-  const canRunFromQuote = (): boolean => {
+  const canRunFromQuote = (silently: boolean): boolean => {
     if (Number.isNaN(parseFloat(fromAmount))) return false;
     if (parseFloat(fromAmount) <= 0) return false;
     if (!fromToken) return false;
     if (!toToken) return false;
-    if (isFetching) return false;
+    if (silently && loading) return false;
     return true;
   };
 
   const fetchQuoteFrom = async (silently: boolean = false) => {
-    if (!canRunFromQuote()) return;
+    console.log('Fetch Quote From...silently', silently);
+    if (!canRunFromQuote(silently)) return;
 
     // setIsFetching within this if statement
     // to allow the user to edit the form
     // even if a new quote is fetch silently
     if (!silently) {
       setLoading(true);
-      setIsFetching(true);
     }
 
+    console.log('About to Await...');
     await processFetchQuoteFrom(silently);
-
-    if (!silently) {
-      setLoading(false);
-      setIsFetching(false);
-    }
   };
 
-  const canRunToQuote = (): boolean => {
+  const canRunToQuote = (silently): boolean => {
     if (Number.isNaN(parseFloat(toAmount))) return false;
     if (parseFloat(toAmount) <= 0) return false;
     if (!fromToken) return false;
     if (!toToken) return false;
-    if (isFetching) return false;
+    if (silently && loading) return false;
     return true;
   };
 
   const fetchQuoteTo = async (silently: boolean = false) => {
-    if (!canRunToQuote()) return;
+    if (!canRunToQuote(silently)) return;
 
     // setIsFetching within this if statement
     // to allow the user to edit the form
     // even if a new quote is fetch silently
     if (!silently) {
       setLoading(true);
-      setIsFetching(true);
     }
 
     await processFetchQuoteTo(silently);
-
-    if (!silently) {
-      setLoading(false);
-      setIsFetching(false);
-    }
   };
 
   const fetchQuote = async (silently: boolean = false) => {
+    console.log('Fetch Quote...');
     if (direction === SwapDirection.FROM) await fetchQuoteFrom(silently);
     else await fetchQuoteTo(silently);
   };
@@ -470,17 +494,25 @@ export function SwapForm({ data }: SwapFromProps) {
 
   useEffect(() => {
     if (direction === SwapDirection.FROM) {
-      if (editing) return;
+      if (debouncedFromAmount <= 0) {
+        setLoading(false);
+        resetQuote();
+        return;
+      }
       (async () => await fetchQuote())();
     }
-  }, [fromAmount, fromToken, toToken, editing]);
+  }, [debouncedFromAmount, fromToken, toToken]);
 
   useEffect(() => {
     if (direction === SwapDirection.TO) {
-      if (editing) return;
+      if (debouncedToAmount <= 0) {
+        setLoading(false);
+        resetQuote();
+        return;
+      }
       (async () => await fetchQuote())();
     }
-  }, [toAmount, toToken, fromToken, editing]);
+  }, [debouncedToAmount, toToken, fromToken]);
 
   // during swaps, having enough IMX to cover the gas fee means
   // 1. swapping from any token to any token costs IMX - so do a check
@@ -528,25 +560,24 @@ export function SwapForm({ data }: SwapFromProps) {
   }, [toToken]);
 
   const onFromTextInputFocus = () => {
-    setEditing(true);
     setDirection(SwapDirection.FROM);
   };
 
   const onFromTextInputChange = (value) => {
-    setFromAmount(value);
-    setFromAmountError('');
-  };
-
-  const onFromTextInputBlur = (value) => {
-    setEditing(false);
+    resetFormErrors();
+    resetQuote();
+    setToAmount('');
     setFromAmount(value);
   };
 
   const textInputMaxButtonClick = () => {
     if (!fromBalance) return;
     const fromBalanceTruncated = fromBalance.slice(0, fromBalance.indexOf('.') + DEFAULT_TOKEN_VALIDATION_DECIMALS + 1);
-    setFromAmount(fromBalanceTruncated);
+    resetFormErrors();
+    resetQuote();
+    setToAmount('');
     setDirection(SwapDirection.FROM);
+    setFromAmount(fromBalanceTruncated);
     track({
       userJourney: UserJourney.SWAP,
       screen: 'SwapCoins',
@@ -575,17 +606,13 @@ export function SwapForm({ data }: SwapFromProps) {
   }, [fromToken]);
 
   const onToTextInputFocus = () => {
-    setEditing(true);
     setDirection(SwapDirection.TO);
   };
 
   const onToTextInputChange = (value) => {
-    setToAmount(value);
-    setToAmountError('');
-  };
-
-  const onToTextInputBlur = (value) => {
-    setEditing(false);
+    resetFormErrors();
+    resetQuote();
+    setFromAmount('');
     setToAmount(value);
   };
 
@@ -698,14 +725,11 @@ export function SwapForm({ data }: SwapFromProps) {
               textInputTextAlign="right"
               textInputValidator={textInputValidator}
               onTextInputChange={(v) => onFromTextInputChange(v)}
-              onTextInputBlur={(v) => onFromTextInputBlur(v)}
               onTextInputFocus={onFromTextInputFocus}
               textInputMaxButtonClick={textInputMaxButtonClick}
               onSelectChange={onFromSelectChange}
               textInputErrorMessage={t(fromAmountError)}
               selectErrorMessage={t(fromTokenError)}
-              selectInputDisabled={isFetching}
-              textInputDisabled={isFetching}
               selectedOption={fromToken
                 ? formatTokenOptionsId(fromToken.symbol, fromToken.address)
                 : undefined}
@@ -741,13 +765,10 @@ export function SwapForm({ data }: SwapFromProps) {
               textInputTextAlign="right"
               textInputValidator={textInputValidator}
               onTextInputChange={(v) => onToTextInputChange(v)}
-              onTextInputBlur={(v) => onToTextInputBlur(v)}
               onTextInputFocus={onToTextInputFocus}
               onSelectChange={onToSelectChange}
               textInputErrorMessage={t(toAmountError)}
               selectErrorMessage={t(toTokenError)}
-              selectInputDisabled={isFetching}
-              textInputDisabled={isFetching}
               selectedOption={toToken
                 ? formatTokenOptionsId(toToken.symbol, toToken.address)
                 : undefined}
@@ -834,3 +855,5 @@ export function SwapForm({ data }: SwapFromProps) {
     </>
   );
 }
+
+SwapForm.quoteRequestId = 0;

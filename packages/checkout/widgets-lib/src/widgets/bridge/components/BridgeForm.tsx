@@ -42,7 +42,7 @@ import {
   NATIVE,
   getL1ChainId,
   IMX_TOKEN_SYMBOL,
-  ETH_TOKEN_SYMBOL,
+  ETH_TOKEN_SYMBOL, ESTIMATE_DEBOUNCE,
 } from '../../../lib';
 import { TransactionRejected } from '../../../components/TransactionRejected/TransactionRejected';
 import { NotEnoughGas } from '../../../components/NotEnoughGas/NotEnoughGas';
@@ -50,6 +50,7 @@ import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewConte
 import { TokenSelectShimmer } from './TokenSelectShimmer';
 import { Fees } from '../../../components/Fees/Fees';
 import { formatBridgeFees } from '../functions/BridgeFees';
+import useDebounce from '../../../lib/hooks/useDebounce';
 
 interface BridgeFormProps {
   testId?: string;
@@ -88,6 +89,7 @@ export function BridgeForm(props: BridgeFormProps) {
   // Form state
   const [formAmount, setFormAmount] = useState<string>(defaultAmount || '');
   const [amountError, setAmountError] = useState<string>('');
+  const debouncedFormAmount = useDebounce(formAmount, ESTIMATE_DEBOUNCE);
   const [formToken, setFormToken] = useState<GetBalanceResult | undefined>();
   const [tokenError, setTokenError] = useState<string>('');
   const [amountFiatValue, setAmountFiatValue] = useState<string>('');
@@ -196,7 +198,6 @@ export function BridgeForm(props: BridgeFormProps) {
     if (Number.isNaN(parseFloat(formAmount))) return false;
     if (parseFloat(formAmount) <= 0) return false;
     if (!formToken) return false;
-    if (isFetching) return false;
     if (!from || !from.walletAddress) return false;
     if (!to || !to.walletAddress) return false;
     return true;
@@ -218,6 +219,10 @@ export function BridgeForm(props: BridgeFormProps) {
     // fetching or the user is updating the inputs.
     if ((silently && (loading || editing)) || !checkout) return;
 
+    // Track request so it can be cancelled
+    const currentRequestId = BridgeForm.estimateRequestId + 1;
+    BridgeForm.estimateRequestId = currentRequestId;
+
     const tokenIsNative = isNativeToken(formToken?.token.address);
     const amountToBridge = tokenIsNative
       ? utils.parseUnits(formAmount)
@@ -225,7 +230,7 @@ export function BridgeForm(props: BridgeFormProps) {
 
     const tokenAddress = tokenIsNative ? NATIVE.toUpperCase() : formToken?.token.address;
 
-    const [unsignedApproveTransaction, unsignedTransaction] = await Promise.all([
+    const [unsignedApproveTransaction, unsignedTransaction, responseEstimateId] = await Promise.all([
       tokenBridge!.getUnsignedApproveBridgeTx({
         senderAddress: from!.walletAddress!,
         token: tokenAddress ?? NATIVE.toUpperCase(),
@@ -242,7 +247,9 @@ export function BridgeForm(props: BridgeFormProps) {
         destinationChainId: to!.network.toString(),
         gasMultiplier: 1.1,
       }),
+      Promise.resolve(currentRequestId),
     ]);
+    if (responseEstimateId !== BridgeForm.estimateRequestId) return;
 
     const transactionFeeData = unsignedTransaction.feeData;
 
@@ -279,6 +286,15 @@ export function BridgeForm(props: BridgeFormProps) {
     }
   };
 
+  const cancelEstimates = () => {
+    BridgeForm.estimateRequestId = 0;
+    setLoading(false);
+    setIsFetching(false);
+
+    setGasFee('');
+    setGasFeeFiatValue('');
+  };
+
   const insufficientFundsForGas = useMemo(() => {
     const nativeTokenBalance = tokenBalances
       .find((balance) => isNativeToken(balance.token.address));
@@ -299,31 +315,18 @@ export function BridgeForm(props: BridgeFormProps) {
   useInterval(() => fetchEstimates(true), DEFAULT_QUOTE_REFRESH_INTERVAL);
 
   useEffect(() => {
-    if (editing) return;
+    if (debouncedFormAmount <= 0) {
+      cancelEstimates();
+      return;
+    }
     (async () => await fetchEstimates())();
-  }, [formAmount, formToken, editing]);
+  }, [debouncedFormAmount, formToken, editing]);
 
   const onTextInputFocus = () => {
     setEditing(true);
   };
 
   const handleBridgeAmountChange = (value: string) => {
-    setFormAmount(value);
-    if (amountError) {
-      const validateAmountError = validateAmount(value, formToken?.formattedBalance);
-      setAmountError(validateAmountError);
-    }
-
-    if (!formToken) return;
-    setAmountFiatValue(calculateCryptoToFiat(
-      value,
-      formToken.token.symbol,
-      cryptoFiatState.conversions,
-    ));
-  };
-
-  const handleAmountInputBlur = (value: string) => {
-    setEditing(false);
     setFormAmount(value);
     if (amountError) {
       const validateAmountError = validateAmount(value, formToken?.formattedBalance);
@@ -401,6 +404,8 @@ export function BridgeForm(props: BridgeFormProps) {
       return;
     }
 
+    // Clear any pending estimates
+    cancelEstimates();
     track({
       userJourney: UserJourney.BRIDGE,
       screen: 'TokenAmount',
@@ -467,7 +472,6 @@ export function BridgeForm(props: BridgeFormProps) {
               textAlign="left"
               errorMessage={t(tokenError)}
               onSelectChange={(option) => handleSelectTokenChange(option)}
-              disabled={isFetching}
             />
             <TextInputForm
               testId="bridge-amount"
@@ -477,31 +481,32 @@ export function BridgeForm(props: BridgeFormProps) {
               validator={amountInputValidation}
               onTextInputFocus={onTextInputFocus}
               onTextInputChange={(value) => handleBridgeAmountChange(value)}
-              onTextInputBlur={(value) => handleAmountInputBlur(value)}
+              onTextInputBlur={() => false}
               textAlign="right"
               errorMessage={t(amountError)}
-              disabled={isFetching}
             />
           </Box>
         )}
         {defaultTokenAddress && isTokenBalancesLoading && (
           <TokenSelectShimmer sx={formInputsContainerStyles} />
         )}
-        <Fees
-          gasFeeValue={gasFee}
-          gasFeeFiatValue={gasFeeFiatValue}
-          gasFeeToken={estimates?.token}
-          fees={formatFeeBreakdown()}
-          loading={isFetching}
-          onFeesClick={() => {
-            track({
-              userJourney: UserJourney.BRIDGE,
-              screen: 'MoveCoins',
-              control: 'ViewFees',
-              controlType: 'Button',
-            });
-          }}
-        />
+        {(loading || gasFee) && (
+          <Fees
+            gasFeeValue={gasFee}
+            gasFeeFiatValue={gasFeeFiatValue}
+            gasFeeToken={estimates?.token}
+            fees={formatFeeBreakdown()}
+            loading={isFetching}
+            onFeesClick={() => {
+              track({
+                userJourney: UserJourney.BRIDGE,
+                screen: 'MoveCoins',
+                control: 'ViewFees',
+                controlType: 'Button',
+              });
+            }}
+          />
+        )}
       </Box>
       <Box sx={bridgeFormButtonContainerStyles}>
         <Button
@@ -545,3 +550,5 @@ export function BridgeForm(props: BridgeFormProps) {
     </Box>
   );
 }
+
+BridgeForm.estimateRequestId = 0;

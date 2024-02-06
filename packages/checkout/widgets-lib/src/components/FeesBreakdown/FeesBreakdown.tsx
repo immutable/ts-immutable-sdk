@@ -49,7 +49,7 @@ export function FeesBreakdown({
       <Drawer.Content testId="fees-breakdown-content" sx={feesBreakdownContentStyles}>
         <Box sx={feeItemContainerStyles}>
           {
-            loading && fees.length === 0 && (
+            loading && (
               <Box sx={feeItemLoadingStyles}>
                 <MenuItem shimmer emphasized testId="balance-item-shimmer--1" />
                 <MenuItem shimmer emphasized testId="balance-item-shimmer--2" />
@@ -57,7 +57,7 @@ export function FeesBreakdown({
             )
           }
           {
-            fees.map(({
+            !loading && fees.map(({
               label,
               amount,
               fiatAmount,
