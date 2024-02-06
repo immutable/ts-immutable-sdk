@@ -5,6 +5,7 @@ import { ethers } from 'ethers';
 import { ERC20__factory, WIMX__factory } from 'contracts/types';
 import { SwapRouter, PaymentsExtended } from '@uniswap/router-sdk';
 import { newAmount } from 'lib/utils';
+import { AVERAGE_SECONDARY_FEE_EXTRA_GAS } from './constants';
 import { SecondaryFee } from './types';
 import { Exchange } from './exchange';
 import {
@@ -39,6 +40,7 @@ import {
   buildBlock,
   TEST_BASE_FEE,
   TEST_MAX_PRIORITY_FEE_PER_GAS,
+  TEST_TRANSACTION_GAS_USAGE,
 } from './test/utils';
 
 jest.mock('@ethersproject/providers');
@@ -193,7 +195,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
     });
   });
 
-  describe('Swap with single pool with fees', () => {
+  describe('Swap with single pool with secondary fees', () => {
     it('generates valid swap calldata', async () => {
       const secondaryFees: SecondaryFee[] = [
         { recipient: TEST_FEE_RECIPIENT, basisPoints: 100 }, // 1% Fee
@@ -236,6 +238,9 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       expect(formatEther(swapParams.amountOut)).toBe('1000.0');
       expect(formatTokenAmount(swapParams.amountInMaximum, USDC_TEST_TOKEN)).toBe('104.03'); // amount with slippage and fees applied
       expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0');
+      expect(
+        swap.gasFeeEstimate?.value.toString(),
+      ).toBe(TEST_TRANSACTION_GAS_USAGE.add(AVERAGE_SECONDARY_FEE_EXTRA_GAS));
     });
 
     it('uses the amount with slippage and fees for the approval amount', async () => {
