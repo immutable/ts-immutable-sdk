@@ -8,7 +8,9 @@ import { useCallback, useState } from 'react';
 import {
   SaleErrorTypes, SmartCheckoutError, SmartCheckoutErrorTypes,
 } from '../types';
-import { getGasEstimate, getItemRequirements, isUserFractionalBalanceBlocked } from '../functions/smartCheckoutUtils';
+import {
+  filterSmartCheckoutResult, getGasEstimate, getItemRequirements, isUserFractionalBalanceBlocked,
+} from '../functions/smartCheckoutUtils';
 
 type UseSmartCheckoutInput = {
   checkout: Checkout | undefined;
@@ -57,7 +59,8 @@ export const useSmartCheckout = ({
         throw new Error();
       }
       const result = { ...res };
-      setSmartCheckoutResult(result);
+      const filteredSmartCheckoutResult = filterSmartCheckoutResult(result);
+      setSmartCheckoutResult(filteredSmartCheckoutResult);
       return result;
     } catch (err: any) {
       setSmartCheckoutError({

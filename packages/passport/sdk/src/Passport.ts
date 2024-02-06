@@ -1,8 +1,16 @@
 import { IMXProvider } from '@imtbl/x-provider';
-import { ImxApiClients, imxApiConfig, MultiRollupApiClients } from '@imtbl/generated-clients';
+import {
+  createConfig,
+  ImxApiClients,
+  imxApiConfig,
+  MultiRollupApiClients,
+} from '@imtbl/generated-clients';
 import { IMXClient } from '@imtbl/x-client';
 import { ChainName } from 'network/chains';
 import { Environment } from '@imtbl/config';
+
+import { setPassportClientId, identify, track } from '@imtbl/metrics';
+
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
 import { PassportImxProviderFactory } from './starkEx';
@@ -18,6 +26,59 @@ import { ConfirmationScreen } from './confirmation';
 import { ZkEvmProvider } from './zkEvm';
 import { Provider } from './zkEvm/types';
 import TypedEventEmitter from './utils/typedEventEmitter';
+
+const buildImxClientConfig = (passportModuleConfiguration: PassportModuleConfiguration) => {
+  if (passportModuleConfiguration.overrides) {
+    return createConfig({ basePath: passportModuleConfiguration.overrides.imxPublicApiDomain });
+  }
+  if (passportModuleConfiguration.baseConfig.environment === Environment.SANDBOX) {
+    return imxApiConfig.getSandbox();
+  }
+  return imxApiConfig.getProduction();
+};
+
+const buildImxApiClients = (passportModuleConfiguration: PassportModuleConfiguration) => {
+  if (passportModuleConfiguration.overrides?.imxApiClients) return passportModuleConfiguration.overrides.imxApiClients;
+
+  const config = buildImxClientConfig(passportModuleConfiguration);
+  return new ImxApiClients(config);
+};
+
+export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConfiguration) => {
+  const config = new PassportConfiguration(passportModuleConfiguration);
+  const authManager = new AuthManager(config);
+  const magicAdapter = new MagicAdapter(config);
+  const confirmationScreen = new ConfirmationScreen(config);
+  const multiRollupApiClients = new MultiRollupApiClients(config.multiRollupConfig);
+  const passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
+
+  const immutableXClient = passportModuleConfiguration.overrides
+    ? passportModuleConfiguration.overrides.immutableXClient
+    : new IMXClient({ baseConfig: passportModuleConfiguration.baseConfig });
+
+  const imxApiClients = buildImxApiClients(passportModuleConfiguration);
+
+  const passportImxProviderFactory = new PassportImxProviderFactory({
+    authManager,
+    config,
+    confirmationScreen,
+    immutableXClient,
+    magicAdapter,
+    passportEventEmitter,
+    imxApiClients,
+  });
+
+  return {
+    config,
+    authManager,
+    magicAdapter,
+    confirmationScreen,
+    immutableXClient,
+    multiRollupApiClients,
+    passportEventEmitter,
+    passportImxProviderFactory,
+  };
+};
 
 export class Passport {
   private readonly authManager: AuthManager;
@@ -37,30 +98,19 @@ export class Passport {
   private readonly passportEventEmitter: TypedEventEmitter<PassportEventMap>;
 
   constructor(passportModuleConfiguration: PassportModuleConfiguration) {
-    this.config = new PassportConfiguration(passportModuleConfiguration);
-    this.authManager = new AuthManager(this.config);
-    this.magicAdapter = new MagicAdapter(this.config);
-    this.confirmationScreen = new ConfirmationScreen(this.config);
-    this.immutableXClient = passportModuleConfiguration.overrides?.immutableXClient
-      || new IMXClient({
-        baseConfig: passportModuleConfiguration.baseConfig,
-      });
-    this.multiRollupApiClients = new MultiRollupApiClients(this.config.multiRollupConfig);
-    this.passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
-    const imxClientConfig = this.config.baseConfig.environment === Environment.PRODUCTION
-      ? imxApiConfig.getProduction() : imxApiConfig.getSandbox();
-    const imxApiClients = passportModuleConfiguration.overrides?.imxApiClients
-    || new ImxApiClients(imxClientConfig);
+    const privateVars = buildPrivateVars(passportModuleConfiguration);
 
-    this.passportImxProviderFactory = new PassportImxProviderFactory({
-      authManager: this.authManager,
-      config: this.config,
-      confirmationScreen: this.confirmationScreen,
-      immutableXClient: this.immutableXClient,
-      magicAdapter: this.magicAdapter,
-      passportEventEmitter: this.passportEventEmitter,
-      imxApiClients,
-    });
+    this.config = privateVars.config;
+    this.authManager = privateVars.authManager;
+    this.magicAdapter = privateVars.magicAdapter;
+    this.confirmationScreen = privateVars.confirmationScreen;
+    this.immutableXClient = privateVars.immutableXClient;
+    this.multiRollupApiClients = privateVars.multiRollupApiClients;
+    this.passportEventEmitter = privateVars.passportEventEmitter;
+    this.passportImxProviderFactory = privateVars.passportImxProviderFactory;
+
+    setPassportClientId(passportModuleConfiguration.clientId);
+    track('passport', 'initialised');
   }
 
   /**
@@ -95,7 +145,7 @@ export class Passport {
    * @returns {Promise<UserProfile | null>} the user profile if the user is logged in, otherwise null
    */
   public async login(options?: {
-    useCachedSession: boolean
+    useCachedSession: boolean;
   }): Promise<UserProfile | null> {
     const { useCachedSession = false } = options || {};
     let user = null;
@@ -110,6 +160,12 @@ export class Passport {
     }
     if (!user && !useCachedSession) {
       user = await this.authManager.login();
+    }
+
+    if (user) {
+      identify({
+        passportId: user.profile.sub,
+      });
     }
 
     return user ? user.profile : null;
@@ -128,7 +184,11 @@ export class Passport {
     interval: number,
     timeoutMs?: number,
   ): Promise<UserProfile> {
-    const user = await this.authManager.loginWithDeviceFlowCallback(deviceCode, interval, timeoutMs);
+    const user = await this.authManager.loginWithDeviceFlowCallback(
+      deviceCode,
+      interval,
+      timeoutMs,
+    );
     return user.profile;
   }
 
@@ -136,8 +196,14 @@ export class Passport {
     return this.authManager.getPKCEAuthorizationUrl();
   }
 
-  public async loginWithPKCEFlowCallback(authorizationCode: string, state: string): Promise<UserProfile> {
-    const user = await this.authManager.loginWithPKCEFlowCallback(authorizationCode, state);
+  public async loginWithPKCEFlowCallback(
+    authorizationCode: string,
+    state: string,
+  ): Promise<UserProfile> {
+    const user = await this.authManager.loginWithPKCEFlowCallback(
+      authorizationCode,
+      state,
+    );
     return user.profile;
   }
 
@@ -198,10 +264,13 @@ export class Passport {
       return [];
     }
     const headers = { Authorization: `Bearer ${user.accessToken}` };
-    const linkedAddressesResult = await this.multiRollupApiClients.passportApi.getLinkedAddresses({
-      chainName: ChainName.ETHEREUM,
-      userId: user?.profile.sub,
-    }, { headers });
+    const linkedAddressesResult = await this.multiRollupApiClients.passportApi.getLinkedAddresses(
+      {
+        chainName: ChainName.ETHEREUM,
+        userId: user?.profile.sub,
+      },
+      { headers },
+    );
     return linkedAddressesResult.data.linked_addresses;
   }
 }

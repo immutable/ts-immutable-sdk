@@ -115,6 +115,19 @@ export const mswHandlers = {
       success: rest.post('https://api.sandbox.immutable.com/guardian/v1/transactions/evm/evaluate', (req, res, ctx) => res(ctx.status(200))),
     },
   },
+  api: {
+    chains: {
+      success: rest.get('https://api.sandbox.immutable.com/v1/chains', async (req, res, ctx) => res(ctx.json({
+        result: [
+          {
+            id: 'eip155:13473',
+            name: 'Immutable zkEVM Test',
+            rpc_url: 'https://rpc.testnet.immutable.com',
+          },
+        ],
+      }))),
+    },
+  },
 };
 
 let mswWorker: SetupServer;

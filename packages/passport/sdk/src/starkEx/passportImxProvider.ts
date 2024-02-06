@@ -20,10 +20,10 @@ import {
 } from '@imtbl/core-sdk';
 import { IMXClient } from '@imtbl/x-client';
 import { IMXProvider } from '@imtbl/x-provider';
-import AuthManager from 'authManager';
-import TypedEventEmitter from 'utils/typedEventEmitter';
 import { Web3Provider } from '@ethersproject/providers';
 import { ImxApiClients } from '@imtbl/generated-clients';
+import TypedEventEmitter from '../utils/typedEventEmitter';
+import AuthManager from '../authManager';
 import GuardianClient from '../guardian/guardian';
 import {
   PassportEventMap, PassportEvents, UserImx, User, IMXSigners,

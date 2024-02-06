@@ -9,6 +9,9 @@ export enum SaleEventType {
   TRANSACTION_SUCCESS = 'transaction-success',
   LANGUAGE_CHANGED = 'language-changed',
   PAYMENT_METHOD = 'payment-method',
+  REQUEST_BRIDGE = 'request-bridge',
+  REQUEST_ONRAMP = 'request-onramp',
+  REQUEST_SWAP = 'request-swap',
 }
 
 /**
@@ -33,8 +36,10 @@ export type SaleSuccess = {
  * @property {Array} transactions
  */
 export type SaleFailed = {
-  /** The reason why the swap failed. */
+  /** The reason why sale transaction failed. */
   reason: string;
+  /** The error object. */
+  error: Record<string, unknown>;
   /** The timestamp of the failed swap. */
   timestamp: number;
   /** Chosen payment method */

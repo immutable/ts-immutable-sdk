@@ -1,0 +1,20 @@
+{
+  "supportsES6": true,
+  "npmVersion": "6.9.0",
+  "typescriptThreePlus": true,
+  "withSeparateModelsAndApi": true,
+  "modelPackage": "models",
+  "apiPackage": "domain",
+  "useSingleRequestParameter": true,
+  "templateDir": "app/templates/blockchain-data",
+  "files": {
+    "index.mustache": {
+      "templateType": "SupportingFiles",
+      "destinationFilename": "index.ts"
+    },
+    "apiInner.mustache": {
+      "templateType": "API",
+      "destinationFilename": ".ts"
+    }
+  }
+}

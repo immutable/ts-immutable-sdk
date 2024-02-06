@@ -10,7 +10,7 @@ import {
 } from '@imtbl/checkout-sdk';
 import { cy } from 'local-cypress';
 import { Environment } from '@imtbl/config';
-import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
+import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import { BalanceInfo } from 'widgets/wallet/functions/tokenBalances';
 import { WalletState } from '../../context/WalletContext';
@@ -438,63 +438,6 @@ describe('BalanceItem', () => {
     cySmartGet('balance-item-swap-option').should('not.be.visible');
     cySmartGet('balance-item-move-option').should('be.visible');
     cySmartGet('balance-item-move-option').should('have.text', 'Move IMX');
-  });
-
-  it('should NOT show the move option when provider is Passport', () => {
-    cy.stub(Checkout.prototype, 'getTokenAllowList')
-      .as('tokenAllowListStub')
-      .resolves({
-        tokens: [
-          {
-            name: 'tIMX',
-            symbol: 'tIMX',
-            decimals: 18,
-            address: NATIVE,
-          },
-        ],
-      });
-    const testWalletState = {
-      ...baseWalletState,
-      network: {
-        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-        name: ChainName.IMTBL_ZKEVM_TESTNET,
-        nativeCurrency: {
-          name: 'IMX',
-          symbol: 'IMX',
-          decimals: 18,
-        },
-        isSupported: true,
-      },
-      tokenBalances: testTokenBalances,
-      supportedTopUps: {
-        isOnRampEnabled: true,
-        isSwapEnabled: true,
-        isBridgeEnabled: true,
-      },
-    };
-
-    mount(
-      <ConnectLoaderTestComponent
-        initialStateOverride={{
-          ...connectLoaderState,
-          provider: {
-            provider: { isPassport: true } as any as ExternalProvider,
-          } as Web3Provider,
-        }}
-      >
-        <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-          <BalanceItem
-            balanceInfo={testBalanceInfo}
-            bridgeToL2OnClick={() => {}}
-          />
-        </WalletWidgetTestComponent>
-      </ConnectLoaderTestComponent>,
-    );
-    cySmartGet('token-menu').should('exist');
-    cySmartGet('token-menu').click();
-    cySmartGet('balance-item-add-option').should('be.visible');
-    cySmartGet('balance-item-swap-option').should('be.visible');
-    cySmartGet('balance-item-move-option').should('not.be.visible');
   });
 
   it('should NOT show menu options for the token when all top ups are disabled', () => {

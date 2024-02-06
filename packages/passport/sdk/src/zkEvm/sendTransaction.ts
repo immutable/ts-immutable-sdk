@@ -74,7 +74,7 @@ export const sendTransaction = ({
   guardianClient,
   zkevmAddress,
 }: EthSendTransactionParams): Promise<string> => guardianClient
-  .withConfirmationScreen({ width: 480, height: 520 })(async () => {
+  .withConfirmationScreen({ width: 480, height: 720 })(async () => {
     const transactionRequest: TransactionRequest = params[0];
     if (!transactionRequest.to) {
       throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'eth_sendTransaction requires a "to" field');
