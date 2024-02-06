@@ -5,22 +5,13 @@ import {
   validateToToken,
   validateToAmount,
 } from './SwapValidator';
-import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
-import { text } from '../../../resources/text/textConfig';
 
 describe('SwapValidator', () => {
-  const {
-    noAmountInputted,
-    noFromTokenSelected,
-    noToTokenSelected,
-    insufficientBalance,
-  } = text.views[SwapWidgetViews.SWAP].validation;
-
   describe('validateFromToken', () => {
     it('should return error message if fromToken is undefined', () => {
       const fromToken = undefined;
       const result = validateFromToken(fromToken);
-      expect(result).toEqual(noFromTokenSelected);
+      expect(result).toEqual('views.SWAP.validation.noFromTokenSelected');
     });
 
     it('should return empty string if fromToken is available', () => {
@@ -38,26 +29,26 @@ describe('SwapValidator', () => {
     it('should return error message if amount is empty', () => {
       const amount = '';
       const result = validateFromAmount(amount);
-      expect(result).toEqual(noAmountInputted);
+      expect(result).toEqual('views.SWAP.validation.noAmountInputted');
     });
 
     it('should return error message if amount is 0', () => {
       const amount = '0';
       const result = validateFromAmount(amount);
-      expect(result).toEqual(noAmountInputted);
+      expect(result).toEqual('views.SWAP.validation.noAmountInputted');
     });
 
     it('should return error message if amount is 0.00', () => {
       const amount = '0';
       const result = validateFromAmount(amount);
-      expect(result).toEqual(noAmountInputted);
+      expect(result).toEqual('views.SWAP.validation.noAmountInputted');
     });
 
     it('should return error message if amount is greater than balance', () => {
       const amount = '2';
       const balance = '1';
       const result = validateFromAmount(amount, balance);
-      expect(result).toEqual(insufficientBalance);
+      expect(result).toEqual('views.SWAP.validation.insufficientBalance');
     });
 
     it('should return empty string if amount is less than balance', () => {
@@ -85,7 +76,7 @@ describe('SwapValidator', () => {
     it('should return error message if toToken is undefined', () => {
       const toToken = undefined;
       const result = validateToToken(toToken);
-      expect(result).toEqual(noToTokenSelected);
+      expect(result).toEqual('views.SWAP.validation.noToTokenSelected');
     });
 
     it('should return empty string if toToken is available', () => {
@@ -103,19 +94,19 @@ describe('SwapValidator', () => {
     it('should return error message if amount is empty', () => {
       const amount = '';
       const result = validateToAmount(amount);
-      expect(result).toEqual('Please input amount');
+      expect(result).toEqual('views.SWAP.validation.noAmountInputted');
     });
 
     it('should return error message if amount is 0', () => {
       const amount = '0';
       const result = validateToAmount(amount);
-      expect(result).toEqual('Please input amount');
+      expect(result).toEqual('views.SWAP.validation.noAmountInputted');
     });
 
     it('should return error message if amount is 0.00', () => {
       const amount = '0';
       const result = validateToAmount(amount);
-      expect(result).toEqual('Please input amount');
+      expect(result).toEqual('views.SWAP.validation.noAmountInputted');
     });
 
     it('should return empty string if amount is not empty', () => {

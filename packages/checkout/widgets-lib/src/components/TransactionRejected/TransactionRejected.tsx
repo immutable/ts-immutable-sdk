@@ -2,13 +2,13 @@ import {
   Body,
   Drawer, Box, Button, DuoCon, Heading,
 } from '@biom3/react';
+import { useTranslation } from 'react-i18next';
 import {
   transactionRejectedContainerStyles,
   contentTextStyles,
   actionButtonStyles,
   actionButtonContainerStyles,
 } from './TransactionRejectedStyles';
-import { text } from '../../resources/text/textConfig';
 
 type TransactionRejectedProps = {
   onCloseDrawer?: () => void;
@@ -20,7 +20,7 @@ type TransactionRejectedProps = {
 export function TransactionRejected({
   onCloseDrawer, visible, showHeaderBar, onRetry,
 }: TransactionRejectedProps) {
-  const { content, buttons } = text.drawers.transactionFailed;
+  const { t } = useTranslation();
 
   return (
     <Drawer
@@ -42,18 +42,18 @@ export function TransactionRejected({
             sx={contentTextStyles}
             testId="transaction-rejected-heading"
           >
-            {content.heading1}
+            {t('drawers.transactionFailed.content.heading1')}
             <br />
-            {content.heading2}
+            {t('drawers.transactionFailed.content.heading2')}
           </Heading>
           <Body sx={contentTextStyles}>
-            {content.body1}
+            {t('drawers.transactionFailed.content.body1')}
             <br />
-            {content.body2}
+            {t('drawers.transactionFailed.content.body2')}
           </Body>
           <Box sx={actionButtonContainerStyles}>
             <Button sx={actionButtonStyles} variant="tertiary" onClick={onRetry}>
-              {buttons.retry}
+              {t('drawers.transactionFailed.buttons.retry')}
             </Button>
             <Button
               sx={actionButtonStyles}
@@ -61,7 +61,7 @@ export function TransactionRejected({
               onClick={onCloseDrawer}
               testId="transaction-rejected-cancel-button"
             >
-              {buttons.cancel}
+              {t('drawers.transactionFailed.buttons.cancel')}
             </Button>
           </Box>
         </Box>

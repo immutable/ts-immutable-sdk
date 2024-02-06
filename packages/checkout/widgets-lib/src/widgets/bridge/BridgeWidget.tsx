@@ -13,7 +13,7 @@ import {
 import { StrongCheckoutWidgetsConfig } from 'lib/withDefaultWidgetConfig';
 import { CryptoFiatProvider } from 'context/crypto-fiat-context/CryptoFiatProvider';
 import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
-import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
+import { BridgeClaimWithdrawalFailure, BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { StatusView } from 'components/Status/StatusView';
 import { StatusType } from 'components/Status/StatusType';
 import { ImmutableConfiguration } from '@imtbl/config';
@@ -29,6 +29,7 @@ import { Transactions } from 'components/Transactions/Transactions';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { TopUpView } from 'views/top-up/TopUpView';
 import { useTranslation } from 'react-i18next';
+import { ClaimWithdrawalInProgress } from 'components/Transactions/ClaimWithdrawalInProgress';
 import {
   ViewActions,
   ViewContext,
@@ -49,7 +50,15 @@ import { MoveInProgress } from './views/MoveInProgress';
 import { ApproveTransaction } from './views/ApproveTransaction';
 import { ErrorView } from '../../views/error/ErrorView';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
-import { sendBridgeFailedEvent, sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
+import {
+  sendBridgeClaimWithdrawalFailedEvent,
+  sendBridgeClaimWithdrawalSuccessEvent,
+  sendBridgeFailedEvent,
+  sendBridgeWidgetCloseEvent,
+} from './BridgeWidgetEvents';
+import {
+  BridgeClaimWithdrawalSuccess,
+} from '../../context/view-context/BridgeViewContextTypes';
 import { ClaimWithdrawal } from './views/ClaimWithdrawal';
 
 export type BridgeWidgetInputs = BridgeWidgetParams & {
@@ -120,7 +129,7 @@ export function BridgeWidget({
   const viewReducerValues = useMemo(() => ({ viewState, viewDispatch }), [viewState, viewDispatch]);
   const bridgeReducerValues = useMemo(() => ({ bridgeState, bridgeDispatch }), [bridgeState, bridgeDispatch]);
 
-  const goBackToWalletNetworkSelector = useCallback(() => {
+  const goBackToWalletNetworkSelectorClearState = useCallback(() => {
     bridgeDispatch({
       payload: {
         type: BridgeActions.SET_WALLETS_AND_NETWORKS,
@@ -139,6 +148,26 @@ export function BridgeWidget({
       payload: {
         type: ViewActions.GO_BACK_TO,
         view: { type: BridgeWidgetViews.WALLET_NETWORK_SELECTION },
+      },
+    });
+  }, [viewDispatch]);
+
+  const goBackToWalletNetworkSelector = useCallback(() => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.GO_BACK_TO,
+        view: { type: BridgeWidgetViews.WALLET_NETWORK_SELECTION },
+      },
+    });
+  }, [viewDispatch]);
+
+  const updateToTransactionsPage = useCallback(() => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: BridgeWidgetViews.TRANSACTIONS,
+        },
       },
     });
   }, [viewDispatch]);
@@ -215,7 +244,7 @@ export function BridgeWidget({
             />
           )}
           {viewState.view.type === BridgeWidgetViews.TRANSACTIONS && (
-            <Transactions />
+            <Transactions onBackButtonClick={goBackToWalletNetworkSelector} />
           )}
           {viewState.view.type === BridgeWidgetViews.CLAIM_WITHDRAWAL && (
             <ClaimWithdrawal transaction={viewState.view.transaction} />
@@ -223,7 +252,7 @@ export function BridgeWidget({
           {viewState.view.type === SharedViews.ERROR_VIEW && (
             <ErrorView
               actionText={t('views.ERROR_VIEW.actionText')}
-              onActionClick={goBackToWalletNetworkSelector}
+              onActionClick={goBackToWalletNetworkSelectorClearState}
               onCloseClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
               errorEventAction={() => {
                 page({
@@ -243,6 +272,58 @@ export function BridgeWidget({
               showSwapOption={isSwapEnabled}
               showBridgeOption={isBridgeEnabled}
               onCloseButtonClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
+            />
+          )}
+          {viewState.view.type === BridgeWidgetViews.CLAIM_WITHDRAWAL_IN_PROGRESS && (
+            <ClaimWithdrawalInProgress
+              transactionResponse={viewState.view.transactionResponse}
+            />
+          )}
+          {viewState.view.type === BridgeWidgetViews.CLAIM_WITHDRAWAL_SUCCESS && (
+            <StatusView
+              statusText={t('views.CLAIM_WITHDRAWAL.IN_PROGRESS.success.text')}
+              actionText={t('views.CLAIM_WITHDRAWAL.IN_PROGRESS.success.actionText')}
+              onRenderEvent={() => {
+                page({
+                  userJourney: UserJourney.BRIDGE,
+                  screen: 'ClaimWithdrawalSuccess',
+                });
+                sendBridgeClaimWithdrawalSuccessEvent(
+                  eventTarget,
+                  (viewState.view as BridgeClaimWithdrawalSuccess).transactionHash,
+                );
+              }}
+              onActionClick={updateToTransactionsPage}
+              statusType={StatusType.SUCCESS}
+              testId="claim-withdrawal-success-view"
+            />
+          )}
+          {viewState.view.type === BridgeWidgetViews.CLAIM_WITHDRAWAL_FAILURE && (
+            <StatusView
+              statusText={t('views.CLAIM_WITHDRAWAL.IN_PROGRESS.failure.text')}
+              actionText={t('views.CLAIM_WITHDRAWAL.IN_PROGRESS.failure.actionText')}
+              onRenderEvent={() => {
+                let reason = '';
+                if (viewState.view.type === BridgeWidgetViews.CLAIM_WITHDRAWAL_FAILURE) {
+                  reason = viewState.view.reason;
+                }
+                page({
+                  userJourney: UserJourney.BRIDGE,
+                  screen: 'ClaimWithdrawalFailure',
+                  extras: {
+                    reason,
+                  },
+                });
+                sendBridgeClaimWithdrawalFailedEvent(
+                  eventTarget,
+                  (viewState.view as BridgeClaimWithdrawalFailure).transactionHash,
+                  'Transaction failed',
+                );
+              }}
+              onActionClick={updateToTransactionsPage}
+              statusType={StatusType.FAILURE}
+              onCloseClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
+              testId="claim-withdrawal-fail-view"
             />
           )}
         </CryptoFiatProvider>

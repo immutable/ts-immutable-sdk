@@ -2,9 +2,9 @@ import {
   Drawer, Box, Divider,
 } from '@biom3/react';
 import { tokenValueFormat } from 'lib/utils';
+import { useTranslation } from 'react-i18next';
 import { feeItemContainerStyles, feesBreakdownContentStyles } from './FeesBreakdownStyles';
 import { FeeItem } from './FeeItem';
-import { text } from '../../resources/text/textConfig';
 import { FooterLogo } from '../Footer/FooterLogo';
 
 type Fee = {
@@ -32,9 +32,10 @@ export function FeesBreakdown({
   totalAmount,
   tokenSymbol,
 }: FeesBreakdownProps) {
+  const { t } = useTranslation();
   return (
     <Drawer
-      headerBarTitle={text.drawers.feesBreakdown.heading}
+      headerBarTitle={t('drawers.feesBreakdown.heading')}
       size="threeQuarter"
       onCloseDrawer={onCloseDrawer}
       visible={visible}
@@ -45,8 +46,8 @@ export function FeesBreakdown({
       <Drawer.Content testId="fees-breakdown-content" sx={feesBreakdownContentStyles}>
         <Box sx={feeItemContainerStyles}>
           <FeeItem
-            key={text.drawers.feesBreakdown.total}
-            label={text.drawers.feesBreakdown.total}
+            key={t('drawers.feesBreakdown.total')}
+            label={t('drawers.feesBreakdown.total')}
             amount={tokenValueFormat(totalAmount)}
             fiatAmount={totalFiatAmount}
             tokenSymbol={tokenSymbol}

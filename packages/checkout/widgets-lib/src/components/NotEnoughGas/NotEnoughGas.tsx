@@ -1,21 +1,22 @@
 import {
   Body,
-  Drawer, Box, Button, FramedImage, Heading, Logo,
+  Drawer, Box, Button, Heading, Logo, CloudImage,
 } from '@biom3/react';
 import { useCallback, useState } from 'react';
 import { ETH_TOKEN_SYMBOL } from 'lib';
+import { Environment } from '@imtbl/config';
+import { getEthTokenImage, getImxTokenImage } from 'lib/utils';
+import { useTranslation } from 'react-i18next';
 import {
   containerStyles,
   contentTextStyles,
   actionButtonStyles,
   actionButtonContainerStyles,
   logoContainerStyles,
-  ethLogoStyles,
-  imxLogoStyles,
 } from './NotEnoughGasStyles';
-import { text } from '../../resources/text/textConfig';
 
 type NotEnoughGasProps = {
+  environment: Environment;
   visible?: boolean;
   showHeaderBar?: boolean;
   walletAddress: string;
@@ -26,6 +27,7 @@ type NotEnoughGasProps = {
 };
 
 export function NotEnoughGas({
+  environment,
   onCloseDrawer,
   visible,
   showHeaderBar,
@@ -35,15 +37,15 @@ export function NotEnoughGas({
   onAddCoinsClick,
 }:
 NotEnoughGasProps) {
-  const { content, buttons } = text.drawers.notEnoughGas;
-
+  const { t } = useTranslation();
   const [isCopied, setIsCopied] = useState(false);
 
-  const ethLogo = 'https://design-system.immutable.com/hosted-for-ds/currency-icons/currency--eth.svg';
-  const imxLogo = 'https://design-system.immutable.com/hosted-for-ds/currency-icons/currency--imx.svg';
-  const heading = tokenSymbol === ETH_TOKEN_SYMBOL ? `${content.eth.heading}` : `${content.imx.heading}`;
-  const body = tokenSymbol === ETH_TOKEN_SYMBOL ? `${content.eth.body}` : `${content.imx.body}`;
-
+  const ethLogo = getEthTokenImage(environment);
+  const imxLogo = getImxTokenImage(environment);
+  const heading = tokenSymbol === ETH_TOKEN_SYMBOL
+    ? `${t('drawers.notEnoughGas.content.eth.heading')}` : `${t('drawers.notEnoughGas.content.imx.heading')}`;
+  const body = tokenSymbol === ETH_TOKEN_SYMBOL
+    ? `${t('drawers.notEnoughGas.content.eth.body')}` : `${t('drawers.notEnoughGas.content.imx.body')}`;
   const handleCopy = useCallback(() => {
     if (walletAddress && walletAddress !== '') {
       navigator.clipboard.writeText(walletAddress);
@@ -65,11 +67,15 @@ NotEnoughGasProps) {
     >
       <Drawer.Content>
         <Box testId="not-enough-gas-bottom-sheet" sx={containerStyles}>
-          <FramedImage
-            imageUrl={tokenSymbol === 'ETH' ? ethLogo : imxLogo}
-            circularFrame
-            sx={tokenSymbol === ETH_TOKEN_SYMBOL ? ethLogoStyles : imxLogoStyles}
+          <CloudImage
+            imageUrl={
+              tokenSymbol === ETH_TOKEN_SYMBOL
+                ? ethLogo
+                : imxLogo
+            }
+            sx={{ w: 'base.icon.size.600', h: 'base.icon.size.600' }}
           />
+
           <Heading
             size="small"
             sx={contentTextStyles}
@@ -88,7 +94,7 @@ NotEnoughGasProps) {
                 variant="tertiary"
                 onClick={onCloseDrawer}
               >
-                {buttons.adjustAmount}
+                {t('drawers.notEnoughGas.buttons.adjustAmount')}
               </Button>
             )}
             {
@@ -100,7 +106,7 @@ NotEnoughGasProps) {
                     variant="tertiary"
                     onClick={handleCopy}
                   >
-                    {buttons.copyAddress}
+                    {t('drawers.notEnoughGas.buttons.copyAddress')}
                     <Button.Icon icon={isCopied ? 'Tick' : 'CopyText'} />
                   </Button>
                 )
@@ -111,7 +117,7 @@ NotEnoughGasProps) {
                     variant="tertiary"
                     onClick={onAddCoinsClick}
                   >
-                    {buttons.addMoreImx}
+                    {t('drawers.notEnoughGas.buttons.addMoreImx')}
                   </Button>
                 )
             }
@@ -121,7 +127,7 @@ NotEnoughGasProps) {
               onClick={onCloseDrawer}
               testId="not-enough-gas-cancel-button"
             >
-              {buttons.cancel}
+              {t('drawers.notEnoughGas.buttons.cancel')}
             </Button>
           </Box>
           <Box sx={logoContainerStyles}>

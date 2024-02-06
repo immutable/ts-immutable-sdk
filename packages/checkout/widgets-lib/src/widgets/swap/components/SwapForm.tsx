@@ -10,6 +10,7 @@ import { TokenInfo } from '@imtbl/checkout-sdk';
 import { TransactionResponse } from '@imtbl/dex-sdk';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { useTranslation } from 'react-i18next';
+import { Environment } from '@imtbl/config';
 import { amountInputValidation as textInputValidator } from '../../../lib/validations/amountInputValidations';
 import { SwapContext } from '../context/SwapContext';
 import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
@@ -100,7 +101,7 @@ export function SwapForm({ data }: SwapFromProps) {
     },
   } = useContext(SwapContext);
   const { connectLoaderState } = useContext(ConnectLoaderContext);
-  const { provider } = connectLoaderState;
+  const { checkout, provider } = connectLoaderState;
 
   const formatTokenOptionsId = useCallback((symbol: string, address?: string) => (isNativeToken(address)
     ? `${symbol.toLowerCase()}-${NATIVE}`
@@ -134,7 +135,7 @@ export function SwapForm({ data }: SwapFromProps) {
   // Quote
   const [quote, setQuote] = useState<TransactionResponse | null>(null);
   const [gasFeeValue, setGasFeeValue] = useState<string>('');
-  const [gasFeeToken, setGasFeeToken] = useState< TokenInfo | undefined>(undefined);
+  const [gasFeeToken, setGasFeeToken] = useState<TokenInfo | undefined>(undefined);
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
   const [tokensOptionsFrom, setTokensOptionsForm] = useState<CoinSelectorOptionProps[]>([]);
 
@@ -173,15 +174,15 @@ export function SwapForm({ data }: SwapFromProps) {
       if (data?.fromTokenAddress) {
         setFromToken(
           allowedTokens.find((token) => (isNativeToken(token.address)
-              && data?.fromTokenAddress?.toLowerCase() === NATIVE)
-              || token.address?.toLowerCase()
-                === data?.fromTokenAddress?.toLowerCase()),
+            && data?.fromTokenAddress?.toLowerCase() === NATIVE)
+            || token.address?.toLowerCase()
+            === data?.fromTokenAddress?.toLowerCase()),
         );
         setFromBalance(
           tokenBalances.find(
             (tokenBalance) => (
               isNativeToken(tokenBalance.token.address)
-                && data?.fromTokenAddress?.toLowerCase() === NATIVE)
+              && data?.fromTokenAddress?.toLowerCase() === NATIVE)
               || (tokenBalance.token.address?.toLowerCase() === data?.fromTokenAddress?.toLowerCase()),
           )?.formattedBalance ?? '',
         );
@@ -696,8 +697,8 @@ export function SwapForm({ data }: SwapFromProps) {
               onTextInputFocus={onFromTextInputFocus}
               textInputMaxButtonClick={textInputMaxButtonClick}
               onSelectChange={onFromSelectChange}
-              textInputErrorMessage={fromAmountError}
-              selectErrorMessage={fromTokenError}
+              textInputErrorMessage={t(fromAmountError)}
+              selectErrorMessage={t(fromTokenError)}
               selectInputDisabled={isFetching}
               textInputDisabled={isFetching}
               selectedOption={fromToken
@@ -738,8 +739,8 @@ export function SwapForm({ data }: SwapFromProps) {
               onTextInputBlur={(v) => onToTextInputBlur(v)}
               onTextInputFocus={onToTextInputFocus}
               onSelectChange={onToSelectChange}
-              textInputErrorMessage={toAmountError}
-              selectErrorMessage={toTokenError}
+              textInputErrorMessage={t(toAmountError)}
+              selectErrorMessage={t(toTokenError)}
               selectInputDisabled={isFetching}
               textInputDisabled={isFetching}
               selectedOption={toToken
@@ -776,6 +777,7 @@ export function SwapForm({ data }: SwapFromProps) {
         openNotEnoughImxDrawer={openNotEnoughImxDrawer}
       />
       <NotEnoughImx
+        environment={checkout?.config.environment ?? Environment.PRODUCTION}
         visible={showNotEnoughImxDrawer}
         showAdjustAmount={fromToken?.address === NATIVE}
         hasZeroImx={false}
