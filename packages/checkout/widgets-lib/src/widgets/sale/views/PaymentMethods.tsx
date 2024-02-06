@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import {
   Banner, Box, Heading, Link,
 } from '@biom3/react';
@@ -88,12 +87,6 @@ export function PaymentMethods() {
     });
   };
 
-  /**
-   * ! GPR-385
-   * onClick go to TopUpView
-   * validate where the events go after TopUpView
-   * main page needs to unmount SaleWidget and mount requested Bridge/Swap/OnRamp
-   */
   const insufficientCoinsBanner = (
     <Box sx={{ paddingX: 'base.spacing.x2' }}>
       <Banner>
