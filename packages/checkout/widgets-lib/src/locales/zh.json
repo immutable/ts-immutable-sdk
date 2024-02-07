@@ -535,6 +535,10 @@
     "metamask": {
       "heading": "MetaMask",
       "description": "用于访问区块链应用程序和web3的数字钱包"
+    },
+    "walletconnect": {
+      "heading": "其他钱包",
+      "description": "允许您与任何区块链钱包连接，包括 MetaMask。"
     }
   },
   "drawers": {
