@@ -14,7 +14,7 @@ import {
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import {
-  createAndConnectToProvider, isMetaMaskProvider, isPassportProvider,
+  createAndConnectToProvider, getWalletProviderNameByProvider, isMetaMaskProvider, isPassportProvider,
 } from 'lib/providerUtils';
 import { getL1ChainId, getL2ChainId } from 'lib';
 import { getChainNameById } from 'lib/chains';
@@ -74,16 +74,12 @@ export function WalletAndNetworkSelector() {
 
   const fromWalletProviderName = useMemo(() => {
     if (!fromWalletWeb3Provider) return null;
-    return isPassportProvider(fromWalletWeb3Provider)
-      ? WalletProviderName.PASSPORT
-      : WalletProviderName.METAMASK;
+    return getWalletProviderNameByProvider(fromWalletWeb3Provider);
   }, [fromWalletWeb3Provider]);
 
   const toWalletProviderName = useMemo(() => {
-    if (!fromWalletWeb3Provider) return null;
-    return isPassportProvider(toWalletWeb3Provider)
-      ? WalletProviderName.PASSPORT
-      : WalletProviderName.METAMASK;
+    if (!toWalletWeb3Provider) return null;
+    return getWalletProviderNameByProvider(toWalletWeb3Provider);
   }, [toWalletWeb3Provider]);
 
   const fromWalletSelectorOptions = useMemo(() => {
@@ -91,6 +87,7 @@ export function WalletAndNetworkSelector() {
     if (checkout.passport) {
       options.push(WalletProviderName.PASSPORT);
     }
+    options.push(WalletProviderName.WALLET_CONNECT);
     return options;
   }, [checkout]);
 
@@ -102,6 +99,7 @@ export function WalletAndNetworkSelector() {
       && fromWalletProviderName === WalletProviderName.METAMASK) {
       options.push(WalletProviderName.PASSPORT);
     }
+    options.push(WalletProviderName.WALLET_CONNECT);
     return options;
   }, [checkout, fromNetwork, fromWalletProviderName]);
 
@@ -462,8 +460,8 @@ export function WalletAndNetworkSelector() {
             onNetworkClick={handleFromNetworkSelection}
             chainId={imtblZkEvmNetworkChainId}
           />
-          {/** Show L1 option for Metamask only */}
-          {fromWalletProviderName === WalletProviderName.METAMASK && (
+          {/** Show L1 option for non passport wallets */}
+          {fromWalletProviderName !== WalletProviderName.PASSPORT && (
             <NetworkItem
               key={l1NetworkName}
               testId={testId}
