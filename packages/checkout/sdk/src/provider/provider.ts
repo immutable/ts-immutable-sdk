@@ -81,6 +81,8 @@ export async function createProvider(
         projectId: WALLET_CONNECT_PROJECT_ID,
       });
 
+      // TODO: All of the below code for the modal open and getting provider needs proper testing
+
       const existingWCProvider = modal.getWalletProvider();
       if (modal.getIsConnected() && existingWCProvider) {
         provider = new Web3Provider(existingWCProvider);
@@ -88,6 +90,7 @@ export async function createProvider(
         const getProvider = () => new Promise<Web3Provider | null>((resolve, reject) => {
           modal.subscribeProvider((newState) => {
             if (newState.provider) {
+              modal.close();
               resolve(new Web3Provider(newState.provider));
             }
             reject();
