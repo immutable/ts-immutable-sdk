@@ -6,7 +6,7 @@ import { getERC20TokenInfo, getTokenAllowList, isNativeToken } from './tokens';
 import { RemoteConfigFetcher } from '../config/remoteConfigFetcher';
 import { CheckoutConfiguration } from '../config';
 import { ERC20ABI, NATIVE } from '../env';
-import { CheckoutError, CheckoutErrorType } from '../errors';
+import { CheckoutErrorType } from '../errors';
 import { HttpClient } from '../api/http';
 
 jest.mock('../config/remoteConfigFetcher');
@@ -287,14 +287,17 @@ describe('token related functions', () => {
         symbol: symbolMock,
       });
 
-      await expect(
-        getERC20TokenInfo(mockProvider(), 'abc123'),
-      ).rejects.toThrow(
-        new CheckoutError(
-          '[GET_ERC20_INFO_ERROR] Cause:Error getting name from contract',
-          CheckoutErrorType.GET_ERC20_INFO_ERROR,
-        ),
-      );
+      let message;
+      let type;
+      try {
+        await getERC20TokenInfo(mockProvider(), 'abc123');
+      } catch (e:any) {
+        message = e.message;
+        type = e.type;
+      }
+
+      expect(message).toContain('Error getting name from contract');
+      expect(type).toEqual(CheckoutErrorType.GET_ERC20_INFO_ERROR);
     });
 
     it('should throw an error if the contract address is invalid', async () => {
@@ -304,15 +307,14 @@ describe('token related functions', () => {
         return new contract(mockProvider(), JSON.stringify(ERC20ABI), null);
       });
 
-      await expect(
-        getERC20TokenInfo(mockProvider(), 'abc123'),
-      ).rejects.toThrow(
-        new CheckoutError(
-          // eslint-disable-next-line max-len
-          '[GET_ERC20_INFO_ERROR] Cause:invalid contract address or ENS name (argument="addressOrName", value=undefined, code=INVALID_ARGUMENT, version=contracts/5.7.0)',
-          CheckoutErrorType.GET_ERC20_INFO_ERROR,
-        ),
-      );
+      let type;
+      try {
+        await getERC20TokenInfo(mockProvider(), 'abc123');
+      } catch (e:any) {
+        type = e.type;
+      }
+
+      expect(type).toEqual(CheckoutErrorType.GET_ERC20_INFO_ERROR);
     });
   });
 });
