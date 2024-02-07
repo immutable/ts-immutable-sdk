@@ -100,9 +100,9 @@ describe('balances', () => {
       let type;
       try {
         await getBalance(testCheckoutConfig, mockProvider(), '0xAddress');
-      } catch (e:any) {
-        message = e.message;
-        type = e.type;
+      } catch (err: any) {
+        message = err.message;
+        type = err.type;
       }
 
       expect(message).toContain('Error getting balance');
@@ -128,9 +128,9 @@ describe('balances', () => {
         let type;
         try {
           await getBalance(testCheckoutConfig, mockProvider(), '0xAddress');
-        } catch (e:any) {
-          message = e.message;
-          type = e.type;
+        } catch (err: any) {
+          message = err.message;
+          type = err.type;
         }
 
         expect(message).toContain('Chain:0 is not a supported chain');
@@ -195,9 +195,9 @@ describe('balances', () => {
       let type;
       try {
         await getERC20Balance(mockProvider(), 'abc123', '0x10c');
-      } catch (e:any) {
-        message = e.message;
-        type = e.type;
+      } catch (err: any) {
+        message = err.message;
+        type = err.type;
       }
 
       expect(message).toContain('Error getting balance from contract');
@@ -215,8 +215,8 @@ describe('balances', () => {
       let type;
       try {
         await getERC20Balance(mockProvider(), 'abc123', '0x10c');
-      } catch (e:any) {
-        type = e.type;
+      } catch (err: any) {
+        type = err.type;
       }
 
       expect(type).toEqual(CheckoutErrorType.GET_ERC20_BALANCE_ERROR);
@@ -330,8 +330,8 @@ describe('balances', () => {
           undefined,
           ChainId.ETHEREUM,
         );
-      } catch (e: any) {
-        message = e.message;
+      } catch (err: any) {
+        message = err.message;
       }
       expect(message).toContain('both walletAddress and provider are missing');
     });

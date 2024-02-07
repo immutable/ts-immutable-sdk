@@ -291,9 +291,9 @@ describe('token related functions', () => {
       let type;
       try {
         await getERC20TokenInfo(mockProvider(), 'abc123');
-      } catch (e:any) {
-        message = e.message;
-        type = e.type;
+      } catch (err: any) {
+        message = err.message;
+        type = err.type;
       }
 
       expect(message).toContain('Error getting name from contract');
@@ -310,8 +310,8 @@ describe('token related functions', () => {
       let type;
       try {
         await getERC20TokenInfo(mockProvider(), 'abc123');
-      } catch (e:any) {
-        type = e.type;
+      } catch (err: any) {
+        type = err.type;
       }
 
       expect(type).toEqual(CheckoutErrorType.GET_ERC20_INFO_ERROR);
