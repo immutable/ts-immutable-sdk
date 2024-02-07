@@ -11,14 +11,15 @@ import { BigNumber } from 'ethers';
 import { TokenBridge } from '@imtbl/bridge-sdk';
 import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { Transaction } from 'lib/clients';
-import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
+import { useTranslation } from 'react-i18next';
 import { BridgeWidget } from './BridgeWidget';
-import { text } from '../../resources/text/textConfig';
 import mockTransactionPending from './test-components/BridgeTransactionWithdrawalPending.json';
 import mockTransactionInProgress from './test-components/BridgeTransactionInProgress.json';
 
 type CypressStub = Cypress.Agent<sinon.SinonStub<any[], any>>;
 describe('BridgeWidget', () => {
+  const { t } = useTranslation();
+
   // Checkout stubs
   let createProviderStub;
   let checkIsWalletConnectedStub;
@@ -426,7 +427,7 @@ describe('BridgeWidget', () => {
 
       cySmartGet('wallet-network-selector-submit-button')
         .should('be.visible')
-        .should('have.text', text.views.WALLET_NETWORK_SELECTION.submitButton.text);
+        .should('have.text', t('views.WALLET_NETWORK_SELECTION.submitButton.text'));
     });
 
     it('should not show when from wallet is not selected', () => {
@@ -769,7 +770,7 @@ describe('BridgeWidget', () => {
       // eslint-disable-next-line max-len
       cySmartGet(`transaction-item-${mockTransactionPending.blockchain_metadata.transaction_hash}-action-button`).should('exist');
       cySmartGet(`transaction-item-${mockTransactionPending.blockchain_metadata.transaction_hash}-action-message`)
-        .should('have.text', text.views[BridgeWidgetViews.TRANSACTIONS].status.withdrawalPending.withdrawalReadyText);
+        .should('have.text', t('views.TRANSACTIONS.status.withdrawalPending.withdrawalReadyText'));
     });
 
     it('should show a withdrawal transaction with delay text when withdrawal is not ready for claiming', () => {
@@ -850,7 +851,7 @@ describe('BridgeWidget', () => {
       cySmartGet(`transaction-item-${mockTransactionPending.blockchain_metadata.transaction_hash}-action-message`)
         .should(
           'include.text',
-          text.views[BridgeWidgetViews.TRANSACTIONS].status.withdrawalPending.withdrawalDelayText,
+          t('views.TRANSACTIONS.status.withdrawalPending.withdrawalDelayText'),
         );
     });
 

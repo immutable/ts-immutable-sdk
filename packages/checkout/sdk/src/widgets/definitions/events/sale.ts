@@ -9,6 +9,9 @@ export enum SaleEventType {
   TRANSACTION_SUCCESS = 'transaction-success',
   LANGUAGE_CHANGED = 'language-changed',
   PAYMENT_METHOD = 'payment-method',
+  REQUEST_BRIDGE = 'request-bridge',
+  REQUEST_ONRAMP = 'request-onramp',
+  REQUEST_SWAP = 'request-swap',
 }
 
 /**

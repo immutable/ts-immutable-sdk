@@ -66,7 +66,9 @@
       "heading": {
         "swap": "Swapping is not available in your region"
       },
-      "body": "We’re sorry we cannot provide this service in your region."
+      "body": {
+        "swap": "Please refer to <quickswapLink>Quickswap’s</quickswapLink> website for further information."
+      }
     },
     "LOADING_VIEW": {
       "text": "Loading"
@@ -219,20 +221,20 @@
       },
       "topUpOptions": {
         "onramp": {
-          "heading": "Buy with card",
-          "caption": "Google pay & Apple pay available. Minimum $5.",
-          "subcaption": "Fees",
+          "heading": "Buy",
+          "caption": "With card, Google pay or Apple pay available.",
+          "subcaption": "Fees ",
           "disabledCaption": ""
         },
         "swap": {
-          "heading": "Swap my coins",
-          "caption": "Using the coins I have on the same network",
+          "heading": "Swap",
+          "caption": "With the coins I have in my balance.",
           "subcaption": "Fees",
           "disabledCaption": "Not available in your region"
         },
         "bridge": {
-          "heading": "Move my coins",
-          "caption": "From the coins I have on a different network",
+          "heading": "Move",
+          "caption": "The coins I have in another wallet or network.",
           "subcaption": "Fees ",
           "disabledCaption": ""
         }
@@ -565,8 +567,14 @@
     },
     "notEnoughGas": {
       "content": {
-        "heading": "Balance too low",
-        "body": "You're ETH balance is too low to cover the gas fee on this move. You could transfer more ETH into your wallet using MetaMask directly."
+        "eth": {
+          "heading": "Balance too low",
+          "body": "You're ETH balance is too low to cover the gas fee on this move. You could transfer more ETH into your wallet using MetaMask directly."
+        },
+        "imx": {
+          "heading": "You'll need more IMX coins",
+          "body": "In order to cover the fees for the amount specified, you'll need to add more IMX coins."
+        }
       },
       "buttons": {
         "adjustAmount": "Adjust amount",
