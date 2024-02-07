@@ -3,7 +3,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
-import { Box, FormControl, TextInput } from '@biom3/react';
+import { Box, Checkbox, FormControl, TextInput } from '@biom3/react';
 
 interface CancelProps {
   checkout: Checkout;
@@ -13,7 +13,8 @@ interface CancelProps {
 export default function Cancel({ checkout, provider }: CancelProps) {
   const [orderId, setOrderId] = useState<string>('');
   const [orderIdError, setOrderIdError] = useState<any>(null);
-  const [signActions, setSignActions] = useState<boolean>(false);
+  const [useGaslessCancel, setUseGaslessCancel] = useState<boolean>(false);
+  const [waitFulfillmentSettlements, setWaitFulfillmentSettlements] = useState<boolean>(true);
   const [error, setError] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -36,6 +37,10 @@ export default function Cancel({ checkout, provider }: CancelProps) {
       const result = await checkout.cancel({
         provider,
         orderIds: [orderId],
+        overrides: {
+          useGaslessCancel,
+          waitFulfillmentSettlements,
+        }
       });
       console.log('Cancel result', result);
       setLoading(false);
@@ -54,6 +59,14 @@ export default function Cancel({ checkout, provider }: CancelProps) {
     setOrderIdError('');
   }
 
+  const updateUseGasless = (event: any) => {
+    setUseGaslessCancel(event.target.checked);
+  }
+
+  const updateWaitFulfillmentSettlements = (event: any) => {
+    setWaitFulfillmentSettlements(event.target.checked);
+  }
+
   useEffect(() => {
     setError(null);
     setLoading(false);
@@ -67,6 +80,22 @@ export default function Cancel({ checkout, provider }: CancelProps) {
         {orderIdError && (
           <FormControl.Validation>{orderIdError}</FormControl.Validation>
         )}
+      </FormControl>
+      <br />
+      <FormControl>
+        <FormControl.Label>Use gasless cancel</FormControl.Label>
+        <Checkbox
+          checked={useGaslessCancel}
+          onClick={updateUseGasless}
+        />
+      </FormControl>
+      <br />
+      <FormControl>
+        <FormControl.Label>Wait for fullfilment settlements</FormControl.Label>
+        <Checkbox
+          checked={waitFulfillmentSettlements}
+          onClick={updateWaitFulfillmentSettlements}
+        />
       </FormControl>
       <br />
       <LoadingButton onClick={cancelClick} loading={loading}>
