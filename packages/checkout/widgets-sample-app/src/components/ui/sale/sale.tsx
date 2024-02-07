@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Environment } from '@imtbl/config';
 import { config, passport } from '@imtbl/sdk';
 import { WidgetsFactory } from '@imtbl/checkout-widgets';
-import { SaleEventType, SaleItem, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
+import { BridgeEventType, OnRampEventType, SaleEventType, SaleItem, SwapEventType, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
 import { Checkout } from '@imtbl/checkout-sdk';
 import { Passport } from '@imtbl/passport';
 
@@ -86,7 +86,16 @@ export function SaleUI() {
   const factory = useMemo(() => new WidgetsFactory(checkout, {theme: WidgetTheme.DARK}), [checkout])
   const saleWidget = useMemo(() => factory.create(WidgetType.SALE, { config: { theme: WidgetTheme.DARK } }),
   [factory, amount, environmentId, fromTokenAddress, collectionName, defaultItems]
-  )
+  );
+  const bridgeWidget = useMemo(() => factory.create(WidgetType.BRIDGE, { config: { theme: WidgetTheme.DARK } }),
+  [factory, amount, environmentId, fromTokenAddress, collectionName, defaultItems]
+  );
+  const swapWidget = useMemo(() => factory.create(WidgetType.SWAP, { config: { theme: WidgetTheme.DARK } }),
+  [factory, amount, environmentId, fromTokenAddress, collectionName, defaultItems]
+  );
+  const onrampWidget = useMemo(() => factory.create(WidgetType.ONRAMP, { config: { theme: WidgetTheme.DARK } }),
+  [factory, amount, environmentId, fromTokenAddress, collectionName, defaultItems]
+  );
 
   // mount sale widget and subscribe to close event
   useEffect(() => {
@@ -98,7 +107,29 @@ export function SaleUI() {
       items: defaultItems
     });
     saleWidget.addListener(SaleEventType.CLOSE_WIDGET, () => { saleWidget.unmount()})
-  }, [saleWidget])
+
+    saleWidget.addListener(SaleEventType.REQUEST_BRIDGE, (event) => {
+      saleWidget.unmount();
+
+      bridgeWidget.mount('bridge');
+      bridgeWidget.addListener(BridgeEventType.CLOSE_WIDGET, () => { bridgeWidget.unmount()})
+      return;
+    });
+    saleWidget.addListener(SaleEventType.REQUEST_SWAP, (event) => {
+      saleWidget.unmount();
+
+      swapWidget.mount('swap');
+      swapWidget.addListener(SwapEventType.CLOSE_WIDGET, () => { swapWidget.unmount()})
+      return;
+    });
+    saleWidget.addListener(SaleEventType.REQUEST_ONRAMP, (event) => {
+      saleWidget.unmount();
+
+      onrampWidget.mount('onramp');
+      onrampWidget.addListener(OnRampEventType.CLOSE_WIDGET, () => { onrampWidget.unmount()})
+      return;
+    });
+  }, [saleWidget, swapWidget, bridgeWidget, onrampWidget])
 
   const handlePassportConfigChange = (e: any) => {
     setPassportConfig(e.target.value);
@@ -157,6 +188,9 @@ export function SaleUI() {
   return (
     <>
     <div id="sale"></div>
+    <div id="bridge"></div>
+    <div id="swap"></div>
+    <div id="onramp"></div>
     <button onClick={() => saleWidget.mount('sale', {
       amount,
       environmentId,
