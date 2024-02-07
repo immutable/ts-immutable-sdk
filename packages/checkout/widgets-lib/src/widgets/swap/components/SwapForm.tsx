@@ -42,6 +42,7 @@ import { SharedViews, ViewActions, ViewContext } from '../../../context/view-con
 import { UnableToSwap } from './UnableToSwap';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import useDebounce from '../../../lib/hooks/useDebounce';
+import { CancellablePromise } from '../../../lib/async/cancellablePromise';
 
 enum SwapDirection {
   FROM = 'FROM',
@@ -90,6 +91,8 @@ const shouldSetToAddress = (toAddress: string | undefined, fromAddress: string |
   if (fromAddress === toAddress) return false;
   return true;
 };
+
+let quoteRequest: CancellablePromise<any>;
 
 export interface SwapFromProps {
   data?: SwapFormData;
@@ -245,10 +248,12 @@ export function SwapForm({ data }: SwapFromProps) {
   };
 
   const resetQuote = () => {
+    if (quoteRequest) {
+      quoteRequest.cancel();
+    }
     setSwapFromToConversionText('');
-    setQuote(null);
-    setGasFeeValue('');
     setGasFeeFiatValue('');
+    setQuote(null);
   };
 
   const processFetchQuoteFrom = async (silently: boolean = false) => {
@@ -275,20 +280,15 @@ export function SwapForm({ data }: SwapFromProps) {
         toToken,
       );
 
-      // Track request so it can be cancelled
-      SwapForm.quoteRequestId += 1;
-      console.log('Fetching from with request Id:', SwapForm.quoteRequestId);
-
-      const resolved = await Promise.all([
+      const currentQuoteRequest = CancellablePromise.all<any>([
         quoteResultPromise,
         conversionResultPromise,
-        Promise.resolve(SwapForm.quoteRequestId),
       ]);
+      quoteRequest = currentQuoteRequest;
+
+      const resolved = await currentQuoteRequest;
       const quoteResult = resolved[0];
       const conversionResult = resolved[1];
-      console.log('Fetch from quote resolved', resolved[2], 'matches', SwapForm.quoteRequestId);
-      if (resolved[2] !== SwapForm.quoteRequestId) return;
-
       setConversion(conversionResult.quote.amount.value);
 
       const estimate = quoteResult.swap.gasFeeEstimate;
@@ -333,14 +333,13 @@ export function SwapForm({ data }: SwapFromProps) {
         ),
       );
 
-      setFromAmountError('');
-      setFromTokenError('');
-      setToAmountError('');
-      setToTokenError('');
+      resetFormErrors();
     } catch (error: any) {
-      setQuote(null);
-      setShowNotEnoughImxDrawer(false);
-      setShowUnableToSwapDrawer(true);
+      if (!error.cancelled) {
+        resetQuote();
+        setShowNotEnoughImxDrawer(false);
+        setShowUnableToSwapDrawer(true);
+      }
     }
 
     if (!silently) {
@@ -372,20 +371,15 @@ export function SwapForm({ data }: SwapFromProps) {
         toToken,
       );
 
-      // Track request so it can be cancelled
-      console.log('Fetching to', SwapForm.quoteRequestId);
-      SwapForm.quoteRequestId += 1;
-
-      const resolved = await Promise.all([
+      const currentQuoteRequest = CancellablePromise.all<any>([
         quoteResultPromise,
         conversionResultPromise,
-        Promise.resolve(SwapForm.quoteRequestId),
       ]);
+      quoteRequest = currentQuoteRequest;
+      const resolved = await currentQuoteRequest;
+
       const quoteResult = resolved[0];
       const conversionResult = resolved[1];
-      console.log('Fetch to quote resolved', resolved[2], 'matches', SwapForm.quoteRequestId);
-      if (resolved[2] !== SwapForm.quoteRequestId) return;
-
       setConversion(conversionResult.quote.amount.value);
 
       const estimate = quoteResult.swap.gasFeeEstimate;
@@ -427,9 +421,11 @@ export function SwapForm({ data }: SwapFromProps) {
 
       resetFormErrors();
     } catch (error: any) {
-      setQuote(null);
-      setShowNotEnoughImxDrawer(false);
-      setShowUnableToSwapDrawer(true);
+      if (!error.cancelled) {
+        resetQuote();
+        setShowNotEnoughImxDrawer(false);
+        setShowUnableToSwapDrawer(true);
+      }
     }
 
     if (!silently) {
@@ -447,17 +443,17 @@ export function SwapForm({ data }: SwapFromProps) {
   };
 
   const fetchQuoteFrom = async (silently: boolean = false) => {
-    console.log('Fetch Quote From...silently', silently);
     if (!canRunFromQuote(silently)) return;
 
-    // setIsFetching within this if statement
-    // to allow the user to edit the form
-    // even if a new quote is fetch silently
+    // Cancel any existing quote
+    if (quoteRequest) {
+      quoteRequest.cancel();
+    }
+
     if (!silently) {
       setLoading(true);
     }
 
-    console.log('About to Await...');
     await processFetchQuoteFrom(silently);
   };
 
@@ -473,9 +469,11 @@ export function SwapForm({ data }: SwapFromProps) {
   const fetchQuoteTo = async (silently: boolean = false) => {
     if (!canRunToQuote(silently)) return;
 
-    // setIsFetching within this if statement
-    // to allow the user to edit the form
-    // even if a new quote is fetch silently
+    // Cancel any existing quote
+    if (quoteRequest) {
+      quoteRequest.cancel();
+    }
+
     if (!silently) {
       setLoading(true);
     }
@@ -484,7 +482,6 @@ export function SwapForm({ data }: SwapFromProps) {
   };
 
   const fetchQuote = async (silently: boolean = false) => {
-    console.log('Fetch Quote...');
     if (direction === SwapDirection.FROM) await fetchQuoteFrom(silently);
     else await fetchQuoteTo(silently);
   };
@@ -553,7 +550,6 @@ export function SwapForm({ data }: SwapFromProps) {
     if (toToken && value === formatTokenOptionsId(toToken.symbol, toToken?.address)) {
       setToToken(undefined);
     }
-
     setFromToken(selected.token);
     setFromBalance(selected.formattedBalance);
     setFromTokenError('');
@@ -567,6 +563,9 @@ export function SwapForm({ data }: SwapFromProps) {
     resetFormErrors();
     resetQuote();
     setToAmount('');
+    if (canRunFromQuote(false)) {
+      setLoading(true);
+    }
     setFromAmount(value);
   };
 
@@ -612,7 +611,11 @@ export function SwapForm({ data }: SwapFromProps) {
   const onToTextInputChange = (value) => {
     resetFormErrors();
     resetQuote();
+    setFromFiatValue('');
     setFromAmount('');
+    if (canRunToQuote(false)) {
+      setLoading(true);
+    }
     setToAmount(value);
   };
 
@@ -855,5 +858,3 @@ export function SwapForm({ data }: SwapFromProps) {
     </>
   );
 }
-
-SwapForm.quoteRequestId = 0;
