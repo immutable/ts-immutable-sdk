@@ -173,7 +173,7 @@ export type CancelResultFulfillmentsUnsettled = {
 };
 
 /**
- * Represents the result of {@link Checkout.cancel}
+ * Represents the result of {@link Checkout.cancel} when using gasless cancel
  * @property {SuccessfulGaslessCancellation[]} successfulCancellations
  * @property {FailedGaslessCancellation[]} failedCancellations
  * @property {PendingGaslessCancellation[]} pendingCancellations
@@ -184,16 +184,33 @@ export type CancelResultGasless = {
   pendingCancellations: PendingGaslessCancellation[],
 };
 
+/**
+ * Represents a successful gasless cancellation
+ * @property {string} orderId
+ */
 export type SuccessfulGaslessCancellation = {
+  /** The order id of the successful cancellation */
   orderId: string;
 };
 
+/**
+ * Represents a failed gasless cancellation
+ * @property {string} orderId
+ * @property {string} reason
+ */
 export type FailedGaslessCancellation = {
+  /** The order id of the failed cancellation */
   orderId: string;
+  /** The reason for failure */
   reason: string;
 };
 
+/**
+ * Represents a pending gasless cancellation
+ * @property {string} orderId
+ */
 export type PendingGaslessCancellation = {
+  /** The order id of the pending cancellation */
   orderId: string;
 };
 
