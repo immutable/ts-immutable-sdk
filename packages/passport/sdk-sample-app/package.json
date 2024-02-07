@@ -33,6 +33,7 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
+    "update-sdk-version": "scripts/updateSdkVersion.sh ../../internal/generated-clients/src/config/config.ts",
     "export": "next export",
     "lint": "eslint ./src --ext .ts --max-warnings=0",
     "start": "next start"
