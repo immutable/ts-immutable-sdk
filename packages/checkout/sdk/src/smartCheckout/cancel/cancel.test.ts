@@ -257,7 +257,7 @@ describe('cancel', () => {
 
       const result = await cancel(config, mockProvider, [orderId], { useGaslessCancel: true });
       expect(result).toEqual({
-        successResults: [
+        successfulCancellations: [
           {
             orderId: '018a8c71-d7e4-e303-a2ef-318871ef7756',
           },
@@ -265,7 +265,7 @@ describe('cancel', () => {
             orderId: '458a8c71-d7e4-e303-a2ef-318871ef7778',
           },
         ],
-        failedResults: [
+        failedCancellations: [
           {
             orderId: '458a8c71-d7e4-e303-a2ef-318871ef7790',
             reason: 'FILLED',
@@ -275,7 +275,7 @@ describe('cancel', () => {
             reason: 'FILLED',
           },
         ],
-        pendingResults: [
+        pendingCancellations: [
           {
             orderId: '238a8c71-d7e4-e303-a2ef-318871ef7778',
           },

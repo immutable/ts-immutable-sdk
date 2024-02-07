@@ -116,33 +116,33 @@ const gaslessCancel = async (
     );
     const { result } = await orderbook.cancelOrders(orderIds, address, signedMessage);
 
-    const successResults = [];
-    const failedResults = [];
-    const pendingResults = [];
+    const successfulCancellations = [];
+    const failedCancellations = [];
+    const pendingCancellations = [];
 
     for (const success of result.successful_cancellations) {
-      successResults.push({
+      successfulCancellations.push({
         orderId: success,
       });
     }
 
     for (const failed of result.failed_cancellations) {
-      failedResults.push({
+      failedCancellations.push({
         orderId: failed.order,
         reason: failed.reason_code,
       });
     }
 
     for (const pending of result.pending_cancellations) {
-      pendingResults.push({
+      pendingCancellations.push({
         orderId: pending,
       });
     }
 
     return {
-      successResults,
-      failedResults,
-      pendingResults,
+      successfulCancellations,
+      failedCancellations,
+      pendingCancellations,
     };
   } catch (err: any) {
     throw new CheckoutError(

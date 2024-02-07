@@ -174,26 +174,26 @@ export type CancelResultFulfillmentsUnsettled = {
 
 /**
  * Represents the result of {@link Checkout.cancel}
- * @property {GaslessCancelSuccessResult[]} successResults
- * @property {GaslessCancelFailedResult[]} failedResults
- * @property {GaslessCancelPendingResult[]} pendingResults
+ * @property {SuccessfulGaslessCancellation[]} successfulCancellations
+ * @property {FailedGaslessCancellation[]} failedCancellations
+ * @property {PendingGaslessCancellation[]} pendingCancellations
  */
 export type CancelResultGasless = {
-  successResults: GaslessCancelSuccessResult[],
-  failedResults: GaslessCancelFailedResult[],
-  pendingResults: GaslessCancelPendingResult[],
+  successfulCancellations: SuccessfulGaslessCancellation[],
+  failedCancellations: FailedGaslessCancellation[],
+  pendingCancellations: PendingGaslessCancellation[],
 };
 
-export type GaslessCancelSuccessResult = {
+export type SuccessfulGaslessCancellation = {
   orderId: string;
 };
 
-export type GaslessCancelFailedResult = {
+export type FailedGaslessCancellation = {
   orderId: string;
   reason: string;
 };
 
-export type GaslessCancelPendingResult = {
+export type PendingGaslessCancellation = {
   orderId: string;
 };
 
