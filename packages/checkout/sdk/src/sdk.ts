@@ -161,6 +161,7 @@ export class Checkout {
     params: CreateProviderParams,
   ): Promise<CreateProviderResult> {
     return await provider.createProvider(
+      this.config,
       params.walletProviderName,
       this.passport,
     );
@@ -177,7 +178,7 @@ export class Checkout {
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
-      { allowUnsupportedProvider: true } as ValidateProviderOptions,
+      { allowUnsupportedProvider: true, allowMistmatchedChainId: true } as ValidateProviderOptions,
     );
     return connect.checkIsWalletConnected(web3Provider);
   }

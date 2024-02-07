@@ -2,11 +2,22 @@
 import detectEthereumProvider from '@metamask/detect-provider';
 import { Web3Provider, ExternalProvider } from '@ethersproject/providers';
 import { Passport } from '@imtbl/passport';
+import { createWeb3Modal, defaultConfig } from '@web3modal/ethers5';
+import { Environment } from '@imtbl/config';
 import {
   CreateProviderResult,
   WalletProviderName,
 } from '../types';
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
+import {
+  WALLET_CONNECT_ETHEREUM,
+  WALLET_CONNECT_IMTBL_ZKEVM_MAINNET,
+  WALLET_CONNECT_IMTBL_ZKEVM_TESTNET,
+  WALLET_CONNECT_METADATA,
+  WALLET_CONNECT_PROJECT_ID,
+  WALLET_CONNECT_SEPOLIA,
+} from '../env';
+import { CheckoutConfiguration, getL1ChainId } from '../config';
 
 async function getMetaMaskProvider(): Promise<Web3Provider> {
   const provider = await withCheckoutError<ExternalProvider | null>(
@@ -24,7 +35,15 @@ async function getMetaMaskProvider(): Promise<Web3Provider> {
   return new Web3Provider(provider);
 }
 
+function getWalletConnectChainsByEnvironment(environment: Environment): any[] {
+  if (environment === Environment.PRODUCTION) {
+    return [WALLET_CONNECT_ETHEREUM, WALLET_CONNECT_IMTBL_ZKEVM_MAINNET];
+  }
+  return [WALLET_CONNECT_SEPOLIA, WALLET_CONNECT_IMTBL_ZKEVM_TESTNET];
+}
+
 export async function createProvider(
+  checkoutConfig: CheckoutConfiguration,
   walletProviderName: WalletProviderName,
   passport?: Passport,
 ): Promise<CreateProviderResult> {
@@ -47,6 +66,39 @@ export async function createProvider(
     }
     case WalletProviderName.METAMASK: {
       provider = await getMetaMaskProvider();
+      break;
+    }
+    case WalletProviderName.WALLET_CONNECT: {
+      const modal = createWeb3Modal({
+        ethersConfig: defaultConfig({
+          metadata: WALLET_CONNECT_METADATA,
+          defaultChainId: getL1ChainId(checkoutConfig),
+          enableEIP6963: true,
+          enableInjected: true,
+        }),
+        chains: getWalletConnectChainsByEnvironment(checkoutConfig.environment),
+        enableAnalytics: true, // Optional - true by default
+        projectId: WALLET_CONNECT_PROJECT_ID,
+      });
+
+      const existingWCProvider = modal.getWalletProvider();
+      if (modal.getIsConnected() && existingWCProvider) {
+        provider = new Web3Provider(existingWCProvider);
+      } else {
+        const getProvider = () => new Promise<Web3Provider | null>((resolve, reject) => {
+          modal.subscribeProvider((newState) => {
+            if (newState.provider) {
+              resolve(new Web3Provider(newState.provider));
+            }
+            reject();
+          });
+
+          modal.open();
+        });
+        provider = await getProvider();
+      }
+
+      if (!provider) throw new Error('no provider');
       break;
     }
     default:

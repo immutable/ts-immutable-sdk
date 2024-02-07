@@ -4,6 +4,7 @@ import {
   WalletFilter,
   WalletInfo,
   WalletProviderName,
+  ChainId,
 } from '@imtbl/checkout-sdk';
 import {
   useContext,
@@ -11,6 +12,7 @@ import {
   useEffect,
   useCallback,
 } from 'react';
+import { Web3Provider } from '@ethersproject/providers';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import {
   ConnectContext,
@@ -28,12 +30,16 @@ import {
 } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 export interface WalletListProps {
+  targetChainId: ChainId;
+  allowedChains: ChainId[];
   walletFilterTypes?: WalletFilterTypes;
   excludeWallets?: WalletFilter[];
 }
 
 export function WalletList(props: WalletListProps) {
-  const { walletFilterTypes, excludeWallets } = props;
+  const {
+    targetChainId, allowedChains, walletFilterTypes, excludeWallets,
+  } = props;
   const {
     connectDispatch,
     connectState: { checkout, passport },
@@ -74,15 +80,22 @@ export function WalletList(props: WalletListProps) {
     });
     if (checkout) {
       try {
+        let web3Provider: Web3Provider | null = null;
+
         const providerResult = await checkout.createProvider({
           walletProviderName,
         });
-        const web3Provider = providerResult.provider;
+        web3Provider = providerResult.provider;
+
+        if (!web3Provider) {
+          console.log(`failed to create web3Provider for ${walletProviderName}`);
+          return;
+        }
 
         connectDispatch({
           payload: {
             type: ConnectActions.SET_PROVIDER,
-            provider: web3Provider,
+            provider: web3Provider!,
           },
         });
         connectDispatch({
@@ -91,12 +104,40 @@ export function WalletList(props: WalletListProps) {
             walletProviderName,
           },
         });
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: { type: ConnectWidgetViews.READY_TO_CONNECT },
-          },
-        });
+
+        if (walletProviderName === WalletProviderName.WALLET_CONNECT) {
+          track({
+            userJourney: UserJourney.CONNECT,
+            screen: 'ReadyToConnect',
+            control: 'Connect',
+            controlType: 'Button',
+          });
+
+          const chainId = await web3Provider.getSigner().getChainId();
+          if (chainId !== targetChainId && !allowedChains?.includes(chainId)) {
+            viewDispatch({
+              payload: {
+                type: ViewActions.UPDATE_VIEW,
+                view: { type: ConnectWidgetViews.SWITCH_NETWORK },
+              },
+            });
+            return;
+          }
+
+          viewDispatch({
+            payload: {
+              type: ViewActions.UPDATE_VIEW,
+              view: { type: ConnectWidgetViews.SUCCESS },
+            },
+          });
+        } else {
+          viewDispatch({
+            payload: {
+              type: ViewActions.UPDATE_VIEW,
+              view: { type: ConnectWidgetViews.READY_TO_CONNECT },
+            },
+          });
+        }
       } catch (err: any) {
         viewDispatch({
           payload: {

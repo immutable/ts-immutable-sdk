@@ -35,7 +35,7 @@ import {
 import { StatusType } from '../../components/Status/StatusType';
 import { StatusView } from '../../components/Status/StatusView';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { getTargetLayerChainId, sendProviderUpdatedEvent } from '../../lib';
+import { addProviderListenersForWidgetRoot, getTargetLayerChainId, sendProviderUpdatedEvent } from '../../lib';
 import { SwitchNetworkEth } from './views/SwitchNetworkEth';
 import { ErrorView } from '../../views/error/ErrorView';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
@@ -147,6 +147,8 @@ export function ConnectWidget({
       userJourney: UserJourney.CONNECT,
       screen: 'ConnectSuccess',
     });
+    // Set up EIP-1193 provider event listeners for widget root instances
+    addProviderListenersForWidgetRoot(provider);
     await identifyUser(identify, provider);
     sendProviderUpdatedEvent({ provider });
     sendConnectSuccessEvent(eventTarget, provider, walletProviderName ?? undefined);
@@ -160,7 +162,7 @@ export function ConnectWidget({
           <LoadingView loadingText="Loading" />
           )}
           {view.type === ConnectWidgetViews.CONNECT_WALLET && (
-            <ConnectWallet />
+            <ConnectWallet targetChainId={targetChainId} allowedChains={allowedChains ?? [targetChainId]} />
           )}
           {view.type === ConnectWidgetViews.READY_TO_CONNECT && (
             <ReadyToConnect targetChainId={targetChainId} allowedChains={allowedChains ?? [targetChainId]} />

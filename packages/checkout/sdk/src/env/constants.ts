@@ -380,3 +380,44 @@ export const IMMUTABLE_ZKVEM_GAS_OVERRIDES = {
   maxFeePerGas: BigNumber.from(15e9),
   maxPriorityFeePerGas: BigNumber.from(10e9),
 };
+
+export const WALLET_CONNECT_PROJECT_ID = '938b553484e344b1e0b4bb80edf8c362';
+
+export const WALLET_CONNECT_ETHEREUM = {
+  chainId: ChainId.ETHEREUM,
+  name: ChainName.ETHEREUM,
+  currency: 'ETH',
+  explorerUrl: BLOCKSCOUT_CHAIN_URL_MAP[ChainId.ETHEREUM].url,
+  rpcUrl: PRODUCTION_CHAIN_ID_NETWORK_MAP.get(ChainId.ETHEREUM)!.rpcUrls[0],
+};
+
+export const WALLET_CONNECT_SEPOLIA = {
+  chainId: ChainId.SEPOLIA,
+  name: ChainName.SEPOLIA,
+  currency: 'SepoliaETH',
+  explorerUrl: BLOCKSCOUT_CHAIN_URL_MAP[ChainId.SEPOLIA].url,
+  rpcUrl: SANDBOX_CHAIN_ID_NETWORK_MAP.get(ChainId.SEPOLIA)!.rpcUrls[0],
+};
+
+export const WALLET_CONNECT_IMTBL_ZKEVM_MAINNET = {
+  chainId: ChainId.IMTBL_ZKEVM_MAINNET,
+  name: ChainName.IMTBL_ZKEVM_MAINNET,
+  currency: 'IMX',
+  explorerUrl: BLOCKSCOUT_CHAIN_URL_MAP[ChainId.IMTBL_ZKEVM_MAINNET].url,
+  rpcUrl: PRODUCTION_CHAIN_ID_NETWORK_MAP.get(ChainId.IMTBL_ZKEVM_MAINNET)!.rpcUrls[0],
+};
+
+export const WALLET_CONNECT_IMTBL_ZKEVM_TESTNET = {
+  chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+  name: ChainName.IMTBL_ZKEVM_TESTNET,
+  currency: 'tIMX',
+  explorerUrl: BLOCKSCOUT_CHAIN_URL_MAP[ChainId.IMTBL_ZKEVM_TESTNET].url,
+  rpcUrl: SANDBOX_CHAIN_ID_NETWORK_MAP.get(ChainId.IMTBL_ZKEVM_TESTNET)!.rpcUrls[0],
+};
+
+export const WALLET_CONNECT_METADATA = {
+  name: 'Immutable Toolkit',
+  description: 'Immutable Toolkit',
+  url: 'https://toolkit.immutable.com',
+  icons: ['https://avatars.mywebsite.com/'],
+};
