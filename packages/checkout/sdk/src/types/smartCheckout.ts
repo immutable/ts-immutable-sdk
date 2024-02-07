@@ -131,7 +131,10 @@ export type SellResultInsufficientFunds = {
 /*
 * Type representing the result of the cancel
 */
-export type CancelResult = CancelResultSuccess | CancelResultFailed | CancelResultFulfillmentsUnsettled;
+export type CancelResult = CancelResultSuccess |
+CancelResultFailed |
+CancelResultFulfillmentsUnsettled |
+CancelResultGasless;
 
 /**
  * Represents the result of {@link Checkout.cancel}
@@ -163,10 +166,35 @@ export type CancelResultFailed = {
  * @property {SendTransactionResult[]} transactions
  */
 export type CancelResultFulfillmentsUnsettled = {
-  /** The status to indicate success */
+  /** The status to indicate the fulfillments have not yet settled on chain. */
   status: CheckoutStatus.FULFILLMENTS_UNSETTLED,
   /** Array of transaction results */
   transactions: TransactionResponse[],
+};
+
+/**
+ * Represents the result of {@link Checkout.cancel}
+ * @property {GaslessCancelSuccessResult[]} successResults
+ * @property {GaslessCancelFailedResult[]} failedResults
+ * @property {GaslessCancelPendingResult[]} pendingResults
+ */
+export type CancelResultGasless = {
+  successResults: GaslessCancelSuccessResult[],
+  failedResults: GaslessCancelFailedResult[],
+  pendingResults: GaslessCancelPendingResult[],
+};
+
+export type GaslessCancelSuccessResult = {
+  orderId: string;
+};
+
+export type GaslessCancelFailedResult = {
+  orderId: string;
+  reason: string;
+};
+
+export type GaslessCancelPendingResult = {
+  orderId: string;
 };
 
 /**
@@ -174,8 +202,10 @@ export type CancelResultFulfillmentsUnsettled = {
  * @property {boolean} waitFulfillmentSettlements
  */
 export type CancelOverrides = {
-  /** If the buy should wait for the fulfillment transactions to settle */
+  /** If the cancel should wait for the fulfillment transactions to settle */
   waitFulfillmentSettlements?: boolean;
+  /** If the cancel should use the gasless option */
+  useGaslessCancel?: boolean;
 };
 
 /**
@@ -196,7 +226,7 @@ export enum CheckoutStatus {
 /**
  * The type representing the order to buy
  * @property {string} orderId
- * @property {Array<OrderFee>} takerFees
+ * @property {OrderFee[]} takerFees
  */
 export type BuyOrder = {
   /** the id of the order to buy */

@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
 import { OrderStatusName } from '@imtbl/orderbook';
-import { PopulatedTransaction } from 'ethers';
+import { PopulatedTransaction, TypedDataDomain } from 'ethers';
 import { CheckoutConfiguration } from '../../config';
-import { CheckoutError, CheckoutErrorType } from '../../errors';
+import { CheckoutErrorType } from '../../errors';
 import { cancel } from './cancel';
 import { createOrderbookInstance } from '../../instance';
 import { signFulfillmentTransactions } from '../actions';
@@ -17,25 +18,26 @@ jest.mock('../actions');
 jest.mock('../../transaction');
 
 describe('cancel', () => {
-  describe('cancel', () => {
-    let config: CheckoutConfiguration;
-    let mockProvider: Web3Provider;
+  let config: CheckoutConfiguration;
+  let mockProvider: Web3Provider;
 
-    beforeEach(() => {
-      mockProvider = {
-        getSigner: jest.fn().mockReturnValue({
-          getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
-        }),
-      } as unknown as Web3Provider;
+  beforeEach(() => {
+    mockProvider = {
+      getSigner: jest.fn().mockReturnValue({
+        getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
+        _signTypedData: jest.fn().mockResolvedValue('0xSIGNED'),
+      }),
+    } as unknown as Web3Provider;
 
-      const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
-      config = new CheckoutConfiguration({
-        baseConfig: { environment: Environment.SANDBOX },
-      }, mockedHttpClient);
+    const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
+    config = new CheckoutConfiguration({
+      baseConfig: { environment: Environment.SANDBOX },
+    }, mockedHttpClient);
 
-      jest.spyOn(console, 'info').mockImplementation(() => {});
-    });
+    jest.spyOn(console, 'info').mockImplementation(() => {});
+  });
 
+  describe('on chain cancel', () => {
     it('should sign the cancel transaction', async () => {
       const orderId = '1';
       (createOrderbookInstance as jest.Mock).mockReturnValue({
@@ -193,14 +195,7 @@ describe('cancel', () => {
 
       (createOrderbookInstance as jest.Mock).mockReturnValue({
         cancelOrdersOnChain: jest.fn().mockRejectedValue(
-          new CheckoutError(
-            'An error occurred while cancelling the order listing',
-            CheckoutErrorType.CANCEL_ORDER_LISTING_ERROR,
-            {
-              orderId: '1',
-              message: 'An error occurred while cancelling the order listing',
-            },
-          ),
+          new Error('Error from orderbook'),
         ),
       });
 
@@ -218,8 +213,104 @@ describe('cancel', () => {
 
       expect(message).toEqual('An error occurred while cancelling the order listing');
       expect(type).toEqual(CheckoutErrorType.CANCEL_ORDER_LISTING_ERROR);
-      expect(data.error).toBeDefined();
+      expect(data.error.message).toEqual('Error from orderbook');
       expect(data.orderId).toEqual('1');
+    });
+  });
+
+  describe('gasless cancel', () => {
+    it('should call gasless cancel and get the cancellations', async () => {
+      const orderId = '1';
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
+        prepareOrderCancellations: jest.fn().mockResolvedValue({
+          signableAction: {
+            message: {
+              domain: {} as TypedDataDomain,
+              types: { types: [] },
+              value: { values: '' },
+            },
+          },
+        }),
+        cancelOrders: jest.fn().mockResolvedValue({
+          result: {
+            successful_cancellations: [
+              '018a8c71-d7e4-e303-a2ef-318871ef7756',
+              '458a8c71-d7e4-e303-a2ef-318871ef7778',
+            ],
+            failed_cancellations: [
+              {
+                order: '458a8c71-d7e4-e303-a2ef-318871ef7790',
+                reason_code: 'FILLED',
+              },
+              {
+                order: '338a8c71-d7e4-e303-a2ef-318871ef7342',
+                reason_code: 'FILLED',
+              },
+            ],
+            pending_cancellations: [
+              '238a8c71-d7e4-e303-a2ef-318871ef7778',
+              '898a8c71-d7e4-e303-a2ef-318871ef7735',
+            ],
+          },
+        }),
+      });
+
+      const result = await cancel(config, mockProvider, [orderId], { useGaslessCancel: true });
+      expect(result).toEqual({
+        successResults: [
+          {
+            orderId: '018a8c71-d7e4-e303-a2ef-318871ef7756',
+          },
+          {
+            orderId: '458a8c71-d7e4-e303-a2ef-318871ef7778',
+          },
+        ],
+        failedResults: [
+          {
+            orderId: '458a8c71-d7e4-e303-a2ef-318871ef7790',
+            reason: 'FILLED',
+          },
+          {
+            orderId: '338a8c71-d7e4-e303-a2ef-318871ef7342',
+            reason: 'FILLED',
+          },
+        ],
+        pendingResults: [
+          {
+            orderId: '238a8c71-d7e4-e303-a2ef-318871ef7778',
+          },
+          {
+            orderId: '898a8c71-d7e4-e303-a2ef-318871ef7735',
+          },
+        ],
+      });
+    });
+
+    it('should handle errors from orderbook', async () => {
+      const orderId = '1';
+
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
+        prepareOrderCancellations: jest.fn().mockRejectedValue(
+          new Error('Error from orderbook'),
+        ),
+      });
+
+      let message;
+      let type;
+      let data;
+
+      try {
+        await cancel(config, mockProvider, [orderId], { useGaslessCancel: true });
+      } catch (err: any) {
+        message = err.message;
+        type = err.type;
+        data = err.data;
+      }
+
+      expect(message).toEqual('An error occurred while cancelling the order listing');
+      expect(type).toEqual(CheckoutErrorType.CANCEL_ORDER_LISTING_ERROR);
+      expect(data.error.message).toEqual('Error from orderbook');
+      expect(data.orderIds).toEqual([orderId]);
     });
   });
 });
