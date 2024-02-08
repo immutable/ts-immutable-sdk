@@ -97,7 +97,7 @@ describe('Trades', () => {
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
       expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
       expect(mockGuardianClient.evaluateImxTransaction)
-        .toBeCalledWith({ payloadHash: mockPayloadHash, user: mockUserImx });
+        .toBeCalledWith({ payloadHash: mockPayloadHash });
       expect(mockCreateTrade).toBeCalledWith(
         mockCreateTradeRequest,
         mockHeader,
@@ -119,7 +119,7 @@ describe('Trades', () => {
 
       expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
       expect(mockGuardianClient.evaluateImxTransaction)
-        .toBeCalledWith({ payloadHash: mockPayloadHash, user: mockUserImx });
+        .toBeCalledWith({ payloadHash: mockPayloadHash });
     });
 
     it('should return error if failed to call public api', async () => {

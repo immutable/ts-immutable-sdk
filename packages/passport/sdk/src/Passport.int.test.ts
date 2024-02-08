@@ -279,7 +279,7 @@ describe('Passport', () => {
         });
 
         expect(result).toEqual(transactionHash);
-        expect(mockGetUser).toHaveBeenCalledTimes(1);
+        expect(mockGetUser).toHaveBeenCalledTimes(4);
       });
     });
 

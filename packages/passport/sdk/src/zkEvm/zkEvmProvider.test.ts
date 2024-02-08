@@ -1,4 +1,5 @@
 import { JsonRpcProvider } from '@ethersproject/providers';
+import AuthManager from 'authManager';
 import { ZkEvmProviderInput, ZkEvmProvider } from './zkEvmProvider';
 import { loginZkEvmUser } from './user';
 import { sendTransaction } from './sendTransaction';
@@ -27,6 +28,10 @@ describe('ZkEvmProvider', () => {
   const getProvider = () => {
     const constructorParameters = {
       config: {},
+      authManager: {
+        getUser: jest.fn().mockResolvedValue(mockUserZkEvm),
+        removeUser: jest.fn(),
+      } as unknown as AuthManager,
       passportEventEmitter,
     } as Partial<ZkEvmProviderInput>;
 
@@ -271,7 +276,7 @@ describe('ZkEvmProvider', () => {
         guardianClient: expect.any(GuardianClient),
         jsonRpcProvider: expect.any(Object),
         relayerClient: expect.any(RelayerClient),
-        user: mockUserZkEvm,
+        zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
       });
     });
   });
@@ -313,7 +318,6 @@ describe('ZkEvmProvider', () => {
         magicProvider: mockMagicProvider,
         jsonRpcProvider: expect.any(Object),
         relayerClient: expect.any(RelayerClient),
-        user: mockUserZkEvm,
         guardianClient: expect.any(GuardianClient),
       });
     });
@@ -339,7 +343,6 @@ describe('ZkEvmProvider', () => {
 
       const userLoggedInKeys = [
         'magicProvider',
-        'user',
         'relayerClient',
         'guardianClient',
       ];
