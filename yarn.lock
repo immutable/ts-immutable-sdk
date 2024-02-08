@@ -3846,6 +3846,7 @@ __metadata:
     "@uniswap/router-sdk": ^1.4.0
     "@uniswap/sdk-core": ^3.0.1
     "@uniswap/v3-sdk": ^3.9.0
+    "@web3modal/ethers5": ^4.0.0
     "@yarnpkg/cli": 3.5.0
     "@yarnpkg/core": 3.5.0
     assert: ^2.0.0
