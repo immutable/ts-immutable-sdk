@@ -46,6 +46,9 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
+      - name: Update SDK version
+        run: yarn workspace @imtbl/passport-sdk-sample-app update-sdk-version
+
       - name: Build
         run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build
 

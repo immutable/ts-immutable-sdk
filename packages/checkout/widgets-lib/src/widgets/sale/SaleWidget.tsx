@@ -2,7 +2,9 @@ import {
   useCallback, useContext, useEffect, useMemo, useReducer, useRef,
 } from 'react';
 
-import { BlockExplorerService, ChainId, SaleWidgetParams } from '@imtbl/checkout-sdk';
+import {
+  BlockExplorerService, ChainId, IMTBLWidgetEvents, SaleWidgetParams,
+} from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { useTranslation } from 'react-i18next';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
@@ -25,6 +27,10 @@ import { PaymentMethods } from './views/PaymentMethods';
 import { SaleErrorView } from './views/SaleErrorView';
 import { SaleSuccessView } from './views/SaleSuccessView';
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
+import { TopUpView } from '../../views/top-up/TopUpView';
+import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
+import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 
 export interface SaleWidgetProps extends Required<Omit<SaleWidgetParams, 'walletProviderName'>> {
   config: StrongCheckoutWidgetsConfig;
@@ -43,6 +49,10 @@ export default function SaleWidget(props: SaleWidgetProps) {
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
   const chainId = useRef<ChainId>();
+
+  const {
+    eventTargetState: { eventTarget },
+  } = useContext(EventTargetContext);
 
   const { theme } = config;
   const biomeTheme = useMemo(() => widgetTheme(theme), [theme]);
@@ -130,6 +140,18 @@ export default function SaleWidget(props: SaleWidgetProps) {
           )}
           {viewState.view.type === SaleWidgetViews.FUND_WITH_SMART_CHECKOUT && (
             <FundWithSmartCheckout subView={viewState.view.subView} />
+          )}
+          {viewState.view.type === SharedViews.TOP_UP_VIEW && (
+            <TopUpView
+              analytics={{ userJourney: UserJourney.SALE }}
+              widgetEvent={IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT}
+              checkout={checkout}
+              provider={provider}
+              showOnrampOption={config.isOnRampEnabled}
+              showSwapOption={config.isSwapEnabled}
+              showBridgeOption={config.isBridgeEnabled}
+              onCloseButtonClick={() => sendSaleWidgetCloseEvent(eventTarget)}
+            />
           )}
         </CryptoFiatProvider>
       </SaleContextProvider>
