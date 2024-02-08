@@ -578,6 +578,7 @@
       },
       "buttons": {
         "adjustAmount": "금액 조정",
+        "addMoreImx": "IMX 코인 추가",
         "copyAddress": "지갑 주소 복사",
         "cancel": "취소"
       }

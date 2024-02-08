@@ -11,7 +11,7 @@ interface TextInputFormProps {
   disabled?: boolean;
   validator: (value: string) => boolean;
   onTextInputChange: (value: string) => void;
-  onTextInputBlur: (value: string) => void;
+  onTextInputBlur?: (value: string) => void;
   onTextInputFocus?: (value: string) => void;
   maxButtonClick?: () => void;
 }
@@ -41,6 +41,7 @@ export function TextInputForm({
   };
 
   const handleOnBlur = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!onTextInputBlur) return;
     const inputValue = event.target.value;
     if (!validator(inputValue)) return;
     onTextInputBlur(inputValue);

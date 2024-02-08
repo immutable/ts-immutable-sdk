@@ -24,7 +24,7 @@ interface SelectInputProps {
   selectInputDisabled?: boolean;
   textInputValidator: (value: string) => boolean;
   onTextInputChange: (value: string) => void;
-  onTextInputBlur: (value: string) => void;
+  onTextInputBlur?: (value: string) => void;
   onTextInputFocus?: (value: string) => void;
   textInputMaxButtonClick?: () => void;
   onSelectChange: (value: OptionKey) => void;
