@@ -6,6 +6,9 @@ import {
   GetTokenAllowListResult,
   TokenFilterTypes,
 } from '@imtbl/checkout-sdk';
+// import { Environment } from '@imtbl/config';
+// import { isNativeToken } from '@imtbl/checkout-sdk/dist/tokens';
+// import { getTokenImageByAddress } from '@imtbl/checkout-sdk/dist/balances';
 import { RetryType, retry } from './retry';
 import { DEFAULT_BALANCE_RETRY_POLICY, NATIVE } from './constants';
 
@@ -58,6 +61,12 @@ export const getAllowedBalances = async ({
     chainId: currentChainId,
     type: allowTokenListType,
   });
+  // TODO: Map token icon to allow list
+  // allowList.tokens = allowList.tokens.map((token) => ({
+  //   ...token,
+  //   icon: getTokenImageByAddress(checkout.config.environment as Environment, (isNativeToken(token.address)
+  //     ? token.symbol.toLowerCase() : token.address as string)),
+  // }));
 
   const tokensAddresses = new Map();
   allowList.tokens.forEach((token) => tokensAddresses.set(token.address?.toLowerCase() || NATIVE, true));

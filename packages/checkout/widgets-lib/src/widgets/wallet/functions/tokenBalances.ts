@@ -63,4 +63,5 @@ export const mapTokenBalancesWithConversions = (
   symbol: balance.token.symbol,
   address: balance.token.address,
   description: balance.token.name,
+  iconLogo: balance.token.icon,
 }));

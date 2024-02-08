@@ -1,6 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber, Contract, utils } from 'ethers';
 import { HttpStatusCode } from 'axios';
+import { Environment } from '@imtbl/config';
 import {
   ChainId,
   GetAllBalancesResult,
@@ -11,7 +12,7 @@ import {
 } from '../types';
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 import { getNetworkInfo } from '../network';
-import { getERC20TokenInfo, getTokenAllowList } from '../tokens';
+import { getERC20TokenInfo, getTokenAllowList, isNativeToken } from '../tokens';
 import { CheckoutConfiguration, getL1ChainId } from '../config';
 import {
   Blockscout,
@@ -20,10 +21,15 @@ import {
   BlockscoutTokenType,
 } from '../api/blockscout';
 import {
+  CHECKOUT_CDN_BASE_URL,
   DEFAULT_TOKEN_DECIMALS, ERC20ABI, NATIVE,
 } from '../env';
 import { measureAsyncExecution } from '../logger/debugLogger';
 import { isMatchingAddress } from '../utils/utils';
+
+function getTokenImageByAddress(environment: Environment, address: string) {
+  return `${CHECKOUT_CDN_BASE_URL[environment]}/v1/blob/img/tokens/${address.toLowerCase()}.svg`;
+}
 
 export const getBalance = async (
   config: CheckoutConfiguration,
@@ -197,6 +203,8 @@ export const getIndexerBalance = async (
 
     const token = {
       ...tokenData,
+      icon: getTokenImageByAddress(config.environment as Environment, (isNativeToken(tokenData.address)
+        ? tokenData.symbol.toLowerCase() : tokenData.address as string)),
       decimals,
     };
 
