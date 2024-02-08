@@ -86,7 +86,7 @@ export default function Cancel({ checkout, provider }: CancelProps) {
         <FormControl.Label>Use gasless cancel</FormControl.Label>
         <Checkbox
           checked={useGaslessCancel}
-          onClick={updateUseGasless}
+          onChange={updateUseGasless}
         />
       </FormControl>
       <br />
@@ -94,7 +94,7 @@ export default function Cancel({ checkout, provider }: CancelProps) {
         <FormControl.Label>Wait for fullfilment settlements</FormControl.Label>
         <Checkbox
           checked={waitFulfillmentSettlements}
-          onClick={updateWaitFulfillmentSettlements}
+          onChange={updateWaitFulfillmentSettlements}
         />
       </FormControl>
       <br />
