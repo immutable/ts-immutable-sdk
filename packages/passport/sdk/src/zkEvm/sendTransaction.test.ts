@@ -76,7 +76,7 @@ describe('sendTransaction', () => {
       magicProvider,
       jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
-      user: mockUserZkEvm,
+      zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
       guardianClient: guardianClient as unknown as GuardianClient,
     });
 
@@ -108,7 +108,7 @@ describe('sendTransaction', () => {
       magicProvider,
       jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
-      user: mockUserZkEvm,
+      zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
       guardianClient: guardianClient as unknown as GuardianClient,
     });
 
@@ -117,7 +117,6 @@ describe('sendTransaction', () => {
       {
         chainId: chainIdEip155,
         nonce,
-        user: mockUserZkEvm,
         metaTransactions: [
           {
             data: transactionRequest.data,
@@ -148,7 +147,7 @@ describe('sendTransaction', () => {
       magicProvider,
       jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
-      user: mockUserZkEvm,
+      zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
       guardianClient: guardianClient as unknown as GuardianClient,
     });
 
@@ -158,7 +157,6 @@ describe('sendTransaction', () => {
       {
         chainId: chainIdEip155,
         nonce,
-        user: mockUserZkEvm,
         metaTransactions: [
           {
             data: transactionRequest.data,
@@ -194,7 +192,7 @@ describe('sendTransaction', () => {
         magicProvider,
         jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,
-        user: mockUserZkEvm,
+        zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
         guardianClient: guardianClient as unknown as GuardianClient,
       }),
     ).rejects.toThrow(

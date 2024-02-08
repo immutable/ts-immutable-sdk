@@ -14,7 +14,9 @@ import MagicAdapter from '../magicAdapter';
 import TypedEventEmitter from '../utils/typedEventEmitter';
 import { PassportConfiguration } from '../config';
 import { ConfirmationScreen } from '../confirmation';
-import { PassportEventMap, PassportEvents, UserZkEvm } from '../types';
+import {
+  PassportEventMap, PassportEvents,
+} from '../types';
 import { RelayerClient } from './relayerClient';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
 import { loginZkEvmUser } from './user';
@@ -33,9 +35,9 @@ export type ZkEvmProviderInput = {
 
 type LoggedInZkEvmProvider = {
   magicProvider: ExternalProvider;
-  user: UserZkEvm;
   relayerClient: RelayerClient;
   guardianClient: GuardianClient;
+  zkevmAddress: string;
 };
 
 export class ZkEvmProvider implements Provider {
@@ -59,7 +61,7 @@ export class ZkEvmProvider implements Provider {
 
   protected magicProvider?: ExternalProvider; // Used for signing
 
-  protected user?: UserZkEvm;
+  protected zkevmAddress?: string;
 
   public readonly isPassport: boolean = true;
 
@@ -97,7 +99,6 @@ export class ZkEvmProvider implements Provider {
     const shouldEmitAccountsChanged = this.isLoggedIn();
 
     this.magicProvider = undefined;
-    this.user = undefined;
     this.relayerClient = undefined;
     this.guardianClient = undefined;
 
@@ -108,7 +109,7 @@ export class ZkEvmProvider implements Provider {
 
   private isLoggedIn(): this is LoggedInZkEvmProvider {
     return this.magicProvider !== undefined
-      && this.user !== undefined
+      && this.zkevmAddress !== undefined
       && this.relayerClient !== undefined
       && this.guardianClient !== undefined;
   }
@@ -117,7 +118,7 @@ export class ZkEvmProvider implements Provider {
     switch (request.method) {
       case 'eth_requestAccounts': {
         if (this.isLoggedIn()) {
-          return [this.user.zkEvm.ethAddress];
+          return [this.zkevmAddress];
         }
         const { magicProvider, user } = await loginZkEvmUser({
           authManager: this.authManager,
@@ -127,52 +128,51 @@ export class ZkEvmProvider implements Provider {
           jsonRpcProvider: this.jsonRpcProvider,
         });
 
-        this.user = user;
         this.magicProvider = magicProvider;
         this.relayerClient = new RelayerClient({
           config: this.config,
           jsonRpcProvider: this.jsonRpcProvider,
-          user: this.user,
+          authManager: this.authManager,
         });
         this.guardianClient = new GuardianClient({
           confirmationScreen: this.confirmationScreen,
           config: this.config,
+          authManager: this.authManager,
         });
 
-        this.eventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [this.user.zkEvm.ethAddress]);
+        this.zkevmAddress = user.zkEvm.ethAddress;
 
-        return [this.user.zkEvm.ethAddress];
+        this.eventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [user.zkEvm.ethAddress]);
+
+        return [user.zkEvm.ethAddress];
       }
       case 'eth_sendTransaction': {
         if (!this.isLoggedIn()) {
           throw new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
         }
-
         return sendTransaction({
           params: request.params || [],
           magicProvider: this.magicProvider,
           guardianClient: this.guardianClient,
           jsonRpcProvider: this.jsonRpcProvider,
           relayerClient: this.relayerClient,
-          user: this.user,
+          zkevmAddress: this.zkevmAddress,
         });
       }
       case 'eth_accounts': {
-        return this.isLoggedIn() ? [this.user.zkEvm.ethAddress] : [];
+        return this.zkevmAddress ? [this.zkevmAddress] : [];
       }
       case 'eth_signTypedData':
       case 'eth_signTypedData_v4': {
         if (!this.isLoggedIn()) {
           throw new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
         }
-
         return signTypedDataV4({
           method: request.method,
           params: request.params || [],
           magicProvider: this.magicProvider,
           jsonRpcProvider: this.jsonRpcProvider,
           relayerClient: this.relayerClient,
-          user: this.user,
           guardianClient: this.guardianClient,
         });
       }
