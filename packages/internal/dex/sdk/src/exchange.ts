@@ -164,7 +164,7 @@ export class Exchange {
     const calldata = wimxInterface.encodeFunctionData('withdraw', [tokenAmount]);
     const gasEstimate = ethers.BigNumber.from(IMX_UNWRAP_GAS_COST);
 
-    const gasFeeEstimate = gasPrice ? toPublicAmount(calculateGasFee(gasPrice, gasEstimate)) : null;
+    const gasFeeEstimate = gasPrice ? toPublicAmount(calculateGasFee(false, gasPrice, gasEstimate)) : null;
     // This transaction is for calling calling `withdraw` on the WETH/WIMX contract.
     const transactionDetails: TransactionDetails = {
       transaction: {
@@ -190,7 +190,7 @@ export class Exchange {
     const calldata = wimxInterface.encodeFunctionData('deposit');
     const gasEstimate = ethers.BigNumber.from(IMX_WRAP_GAS_COST);
 
-    const gasFeeEstimate = gasPrice ? toPublicAmount(calculateGasFee(gasPrice, gasEstimate)) : null;
+    const gasFeeEstimate = gasPrice ? toPublicAmount(calculateGasFee(false, gasPrice, gasEstimate)) : null;
     // This transaction is for calling calling `deposit` on the WETH/WIMX contract.
     const transactionDetails: TransactionDetails = {
       transaction: {

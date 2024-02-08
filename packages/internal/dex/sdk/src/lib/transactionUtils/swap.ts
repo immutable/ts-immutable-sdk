@@ -473,8 +473,9 @@ export function getSwap(
     secondaryFees,
   );
 
-  // TODO: Add additional gas fee estimates for secondary fees
-  const gasFeeEstimate = gasPrice ? calculateGasFee(gasPrice, adjustedQuote.gasEstimate) : null;
+  const hasSecondaryFees = secondaryFees.length > 0;
+
+  const gasFeeEstimate = gasPrice ? calculateGasFee(hasSecondaryFees, gasPrice, adjustedQuote.gasEstimate) : null;
 
   const transactionValue = getTransactionValue(tokenIn, maximumAmountIn);
 
