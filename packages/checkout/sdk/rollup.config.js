@@ -33,7 +33,8 @@ export default [
     output: {
       file: 'dist/browser.js',
       format: 'umd',
-      name: 'ImmutableCheckout'
+      name: 'ImmutableCheckout',
+      inlineDynamicImports: true,
     },
     context: 'window',
     plugins: [

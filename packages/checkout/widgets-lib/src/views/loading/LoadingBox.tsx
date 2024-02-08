@@ -13,6 +13,7 @@ export function LoadingBox({ loadingText }: LoadingProps) {
         icon="Loading"
         sx={{
           w: 'base.icon.size.500',
+          h: 'base.icon.size.500',
           fill: 'base.color.translucent.inverse.900',
           backgroundColor: 'base.color.translucent.standard.900',
           borderRadius: '50%',

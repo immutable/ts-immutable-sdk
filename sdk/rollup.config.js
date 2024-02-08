@@ -113,6 +113,7 @@ export default [
       format: 'umd',
       sourcemap: true,
       name: 'immutable',
+      inlineDynamicImports: true,
     },
     plugins: [
       nodeResolve({

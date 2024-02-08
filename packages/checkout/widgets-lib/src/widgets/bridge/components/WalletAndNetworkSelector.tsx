@@ -248,6 +248,7 @@ export function WalletAndNetworkSelector() {
 
       const currentNetwork = await fromWalletWeb3Provider?.getNetwork();
       if (currentNetwork?.chainId === chainId) {
+        setFromWalletWeb3Provider(new Web3Provider(fromWalletWeb3Provider.provider));
         setFromNetworkDrawerOpen(false);
         setFromNetwork(chainId);
         return;
