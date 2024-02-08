@@ -1,6 +1,8 @@
 import * as guardian from '@imtbl/guardian';
 import { TransactionApprovalRequestChainTypeEnum, TransactionEvaluationResponse } from '@imtbl/guardian';
 import { BigNumber, ethers } from 'ethers';
+import { PassportError, PassportErrorType } from 'errors/passportError';
+import AuthManager from '../authManager';
 import { ConfirmationScreen } from '../confirmation';
 import { retryWithDelay } from '../network/retry';
 import { JsonRpcError, RpcErrorCode } from '../zkEvm/JsonRpcError';
@@ -11,24 +13,22 @@ import { PassportConfiguration } from '../config';
 export type GuardianClientParams = {
   confirmationScreen: ConfirmationScreen;
   config: PassportConfiguration;
+  authManager: AuthManager;
 };
 
 export type GuardianEvaluateImxTransactionParams = {
   payloadHash: string;
-  user: UserImx;
 };
 
 type GuardianEVMValidationParams = {
   chainId: string;
   nonce: string;
-  user: UserZkEvm;
   metaTransactions: MetaTransaction[];
 };
 
 type GuardianMessageValidationParams = {
   chainID: string;
   payload: TypedDataPayload;
-  user: UserZkEvm
 };
 
 const transactionRejectedCrossSdkBridgeError = 'Transaction requires confirmation but this functionality is not'
@@ -68,12 +68,15 @@ export default class GuardianClient {
 
   private readonly crossSdkBridgeEnabled: boolean;
 
-  constructor({ confirmationScreen, config }: GuardianClientParams) {
+  private readonly authManager: AuthManager;
+
+  constructor({ confirmationScreen, config, authManager }: GuardianClientParams) {
     const guardianConfiguration = new guardian.Configuration({ basePath: config.imxPublicApiDomain });
     this.confirmationScreen = confirmationScreen;
     this.crossSdkBridgeEnabled = config.crossSdkBridgeEnabled;
     this.messageAPI = new guardian.MessagesApi(guardianConfiguration);
     this.transactionAPI = new guardian.TransactionsApi(guardianConfiguration);
+    this.authManager = authManager;
   }
 
   /**
@@ -107,10 +110,11 @@ export default class GuardianClient {
     return this.withConfirmationScreenTask()(task);
   }
 
-  public async evaluateImxTransaction({ payloadHash, user }: GuardianEvaluateImxTransactionParams): Promise<void> {
+  public async evaluateImxTransaction({ payloadHash }: GuardianEvaluateImxTransactionParams): Promise<void> {
     const finallyFn = () => {
       this.confirmationScreen.closeWindow();
     };
+    const user = await this.authManager.getUser() as UserImx;
 
     const headers = { Authorization: `Bearer ${user.accessToken}` };
     const transactionRes = await retryWithDelay(
@@ -155,9 +159,9 @@ export default class GuardianClient {
   private async evaluateEVMTransaction({
     chainId,
     nonce,
-    user,
     metaTransactions,
   }: GuardianEVMValidationParams): Promise<TransactionEvaluationResponse> {
+    const user = await this.authManager.getUser() as UserZkEvm;
     const headers = { Authorization: `Bearer ${user.accessToken}` };
     const guardianTransactions = transformGuardianTransactions(metaTransactions);
     try {
@@ -189,13 +193,11 @@ export default class GuardianClient {
   public async validateEVMTransaction({
     chainId,
     nonce,
-    user,
     metaTransactions,
   }: GuardianEVMValidationParams): Promise<void> {
     const transactionEvaluationResponse = await this.evaluateEVMTransaction({
       chainId,
       nonce,
-      user,
       metaTransactions,
     });
 
@@ -208,6 +210,7 @@ export default class GuardianClient {
     }
 
     if (confirmationRequired && !!transactionId) {
+      const user = await this.authManager.getUser() as UserZkEvm;
       const confirmationResult = await this.confirmationScreen.requestConfirmation(
         transactionId,
         user.zkEvm.ethAddress,
@@ -227,9 +230,13 @@ export default class GuardianClient {
   }
 
   private async evaluateMessage(
-    { chainID, payload, user }:GuardianMessageValidationParams,
+    { chainID, payload }:GuardianMessageValidationParams,
   ): Promise<guardian.MessageEvaluationResponse> {
     try {
+      const user = await this.authManager.getUser() as UserZkEvm;
+      if (user === null) {
+        throw new PassportError('evaluateMessage requires a valid ID token or refresh token. Please log in first', PassportErrorType.NOT_LOGGED_IN_ERROR);
+      }
       const messageEvalResponse = await this.messageAPI.evaluateMessage(
         { messageEvaluationRequest: { chainID, payload } },
         { headers: { Authorization: `Bearer ${user.accessToken}` } },
@@ -241,12 +248,13 @@ export default class GuardianClient {
     }
   }
 
-  public async validateMessage({ chainID, payload, user }: GuardianMessageValidationParams) {
-    const { messageId, confirmationRequired } = await this.evaluateMessage({ chainID, payload, user });
+  public async validateMessage({ chainID, payload }: GuardianMessageValidationParams) {
+    const { messageId, confirmationRequired } = await this.evaluateMessage({ chainID, payload });
     if (confirmationRequired && this.crossSdkBridgeEnabled) {
       throw new JsonRpcError(RpcErrorCode.TRANSACTION_REJECTED, transactionRejectedCrossSdkBridgeError);
     }
     if (confirmationRequired && !!messageId) {
+      const user = await this.authManager.getUser() as UserZkEvm;
       const confirmationResult = await this.confirmationScreen.requestMessageConfirmation(
         messageId,
         user.zkEvm.ethAddress,
