@@ -14,6 +14,7 @@ const keyFunctionName = 'fxName';
 const keyRequestId = 'requestId';
 const keyData = 'data';
 
+const trackFunction = 'track';
 const moduleName = 'game_bridge';
 
 // version check placeholders
@@ -132,7 +133,7 @@ const getZkEvmProvider = (): passport.Provider => {
   return zkEvmProviderInstance;
 };
 
-track(moduleName, 'loadGameBridge', {
+track(moduleName, 'loadedGameBridge', {
   sdkVersionTag,
 });
 
@@ -149,7 +150,7 @@ window.callFunction = async (jsonData: string) => {
     requestId = json[keyRequestId];
     const data = json[keyData];
 
-    track(moduleName, 'startCallFunction', {
+    track(moduleName, 'startedCallFunction', {
       function: fxName,
     });
 
@@ -170,7 +171,7 @@ window.callFunction = async (jsonData: string) => {
             crossSdkBridgeEnabled: true,
           };
           passportClient = new passport.Passport(passportConfig);
-          track(moduleName, 'initInititalisePassport');
+          track(moduleName, 'initialisedPassport');
         }
         callbackToGame({
           responseFor: fxName,
@@ -190,7 +191,7 @@ window.callFunction = async (jsonData: string) => {
         };
         console.log(`Version check: ${JSON.stringify(versionCheckParams)}`);
 
-        track(moduleName, 'completeInitGameBridge', versionCheckParams);
+        track(moduleName, 'completedInitGameBridge', versionCheckParams);
         gameBridgeVersionCheck(versionCheckParams);
         break;
       }
@@ -506,6 +507,17 @@ window.callFunction = async (jsonData: string) => {
           requestId,
           success: true,
           result,
+        });
+        break;
+      }
+      case trackFunction: {
+        const request = JSON.parse(data);
+        const properties = JSON.parse(request.properties);
+        track(request.moduleName, request.eventName, properties);
+        callbackToGame({
+          responseFor: fxName,
+          requestId,
+          success: true,
         });
         break;
       }

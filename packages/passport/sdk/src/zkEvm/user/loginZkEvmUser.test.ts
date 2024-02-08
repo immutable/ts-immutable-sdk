@@ -14,9 +14,10 @@ describe('loginZkEvmUser', () => {
   afterEach(jest.resetAllMocks);
 
   const getUserMock = jest.fn();
+  const authLoginMock = jest.fn();
   const authManager = {
     getUser: getUserMock,
-    login: jest.fn(),
+    login: authLoginMock,
   } as unknown as AuthManager;
   const magicProvider = {};
   const magicAdapter = {
@@ -34,7 +35,6 @@ describe('loginZkEvmUser', () => {
 
   it('should return a user that has registered with zkEvm', async () => {
     getUserMock.mockResolvedValue(mockUserZkEvm);
-
     const result = await loginZkEvmUser({
       authManager,
       config,
@@ -47,13 +47,12 @@ describe('loginZkEvmUser', () => {
       user: mockUserZkEvm,
       magicProvider,
     });
-    expect(getUserMock).toHaveBeenCalledTimes(1);
     expect(authManager.login).toBeCalledTimes(0);
     expect(registerZkEvmUser).toBeCalledTimes(0);
   });
 
   it('should register and return a user if the user has not registered with zkEvm', async () => {
-    getUserMock.mockResolvedValue(mockUser);
+    authLoginMock.mockResolvedValue(mockUser);
     (registerZkEvmUser as unknown as jest.Mock).mockResolvedValue(mockUserZkEvm);
     const result = await loginZkEvmUser({
       authManager,
@@ -67,13 +66,11 @@ describe('loginZkEvmUser', () => {
       user: mockUserZkEvm,
       magicProvider,
     });
-    expect(getUserMock).toHaveBeenCalledTimes(1);
-    expect(authManager.login).toBeCalledTimes(0);
+    expect(authManager.login).toBeCalledTimes(1);
     expect(registerZkEvmUser).toBeCalledTimes(1);
   });
 
   it('should returns a user that has invalid refresh token but login again', async () => {
-    getUserMock.mockRejectedValue(new Error('invalid refresh token'));
     (authManager.login as unknown as jest.Mock).mockResolvedValue(mockUserZkEvm);
     const result = await loginZkEvmUser({
       authManager,
@@ -87,7 +84,6 @@ describe('loginZkEvmUser', () => {
       user: mockUserZkEvm,
       magicProvider,
     });
-    expect(getUserMock).toHaveBeenCalledTimes(1);
     expect(authManager.login).toBeCalledTimes(1);
     expect(registerZkEvmUser).toBeCalledTimes(0);
   });

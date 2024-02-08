@@ -7,9 +7,8 @@ import {
 } from 'react';
 import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import {
-  Accordion,
   Body,
-  Box, Button, Heading, Icon, MenuItem, PriceDisplay,
+  Box, Button, Heading, Icon, MenuItem,
 } from '@biom3/react';
 import {
   ChainId, GasEstimateBridgeToL2Result, GasEstimateType, WalletProviderName,
@@ -17,13 +16,12 @@ import {
 import { abbreviateAddress } from 'lib/addressUtils';
 import { CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext';
 import { isMetaMaskProvider, isPassportProvider } from 'lib/providerUtils';
-import { calculateCryptoToFiat, tokenValueFormat } from 'lib/utils';
+import { calculateCryptoToFiat } from 'lib/utils';
 import { Web3Provider } from '@ethersproject/providers';
 import { DEFAULT_QUOTE_REFRESH_INTERVAL, DEFAULT_TOKEN_DECIMALS, NATIVE } from 'lib';
 import { useInterval } from 'lib/hooks/useInterval';
-import { FeesBreakdown } from 'components/FeesBreakdown/FeesBreakdown';
 import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
-import { utils } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { useTranslation } from 'react-i18next';
 import { networkIconStyles } from './WalletNetworkButtonStyles';
@@ -34,11 +32,12 @@ import {
   bridgeButtonIconLoadingStyle,
   bridgeReviewHeadingStyles,
   bridgeReviewWrapperStyles,
-  gasAmountHeadingStyles,
   topMenuItemStyles,
 } from './BridgeReviewSummaryStyles';
 import { BridgeContext } from '../context/BridgeContext';
 import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import { Fees } from '../../../components/Fees/Fees';
+import { formatBridgeFees } from '../functions/BridgeFees';
 
 const networkIcon = {
   [ChainId.IMTBL_ZKEVM_DEVNET]: 'Immutable',
@@ -73,8 +72,6 @@ export function BridgeReviewSummary() {
   const { track } = useAnalytics();
 
   const { cryptoFiatState } = useContext(CryptoFiatContext);
-  const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
-
   const [loading, setLoading] = useState(false);
   const [estimates, setEstimates] = useState<any | undefined>(undefined);
   const [gasFee, setGasFee] = useState<string>('');
@@ -142,11 +139,15 @@ export function BridgeReviewSummary() {
     let rawTotalFees = totalFees;
     if (!unsignedApproveTransaction.unsignedTx) {
       rawTotalFees = totalFees.sub(approvalFee);
+      transactionFeeData.approvalFee = BigNumber.from(0);
     }
 
     const gasEstimateResult = {
       gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-      fees: { totalFees: rawTotalFees },
+      fees: {
+        ...transactionFeeData,
+        totalFees: rawTotalFees,
+      },
       token: checkout.config.networkMap.get(from!.network)?.nativeCurrency,
     } as GasEstimateBridgeToL2Result;
 
@@ -164,6 +165,8 @@ export function BridgeReviewSummary() {
     ));
   }, [checkout, tokenBridge]);
   useInterval(() => fetchGasEstimate(), DEFAULT_QUOTE_REFRESH_INTERVAL);
+
+  const formatFeeBreakdown = useCallback((): any => formatBridgeFees(estimates, cryptoFiatState, t), [estimates]);
 
   useEffect(() => {
     (async () => {
@@ -310,25 +313,22 @@ export function BridgeReviewSummary() {
           />
         )}
       </MenuItem>
-      {gasFee && (
-        <Accordion
-          targetClickOveride={() => setShowFeeBreakdown(true)}
-          sx={bottomMenuItemStyles}
-        >
-          <Accordion.TargetLeftSlot>
-            <Body size="medium" sx={gasAmountHeadingStyles}>
-              {t('views.BRIDGE_REVIEW.fees.heading')}
-            </Body>
-          </Accordion.TargetLeftSlot>
-          <Accordion.TargetRightSlot>
-            <PriceDisplay
-              testId={`${testId}-gas-amount__priceDisplay`}
-              fiatAmount={`${t('views.BRIDGE_REVIEW.fiatPricePrefix')}${gasFeeFiatValue}`}
-              price={`${estimates?.token?.symbol} ${tokenValueFormat(gasFee)}` ?? '-'}
-            />
-          </Accordion.TargetRightSlot>
-        </Accordion>
-      )}
+      <Fees
+        gasFeeValue={gasFee}
+        gasFeeFiatValue={gasFeeFiatValue}
+        gasFeeToken={estimates?.token}
+        fees={formatFeeBreakdown()}
+        onFeesClick={() => {
+          track({
+            userJourney: UserJourney.BRIDGE,
+            screen: 'MoveCoins',
+            control: 'ViewFees',
+            controlType: 'Button',
+          });
+        }}
+        sx={{ borderTopRightRadius: '0', borderTopLeftRadius: '0' }}
+        loading={loading}
+      />
       <Box
         sx={{
           flex: 1,
@@ -351,20 +351,6 @@ export function BridgeReviewSummary() {
           ) : t('views.BRIDGE_REVIEW.submitButton.buttonText')}
         </Button>
       </Box>
-      <FeesBreakdown
-        totalFiatAmount={`${t('views.BRIDGE_REVIEW.fiatPricePrefix')}${gasFeeFiatValue}`}
-        totalAmount={gasFee}
-        tokenSymbol={estimates?.token?.symbol || ''}
-        fees={[
-          {
-            label: t('drawers.feesBreakdown.fees.gas.label'),
-            fiatAmount: `${t('views.BRIDGE_REVIEW.fiatPricePrefix')}${gasFeeFiatValue}`,
-            amount: gasFee,
-          },
-        ]}
-        visible={showFeeBreakdown}
-        onCloseDrawer={() => setShowFeeBreakdown(false)}
-      />
     </Box>
   );
 }

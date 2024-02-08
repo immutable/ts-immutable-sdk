@@ -125,7 +125,7 @@ describe('order', () => {
       expect(mockGetSignableCreateOrder).toBeCalledWith(mockSignableOrderRequest, mockHeader);
       expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
       expect(mockGuardianClient.evaluateImxTransaction)
-        .toBeCalledWith({ payloadHash: mockSignableOrderResponse.data.payload_hash, user: mockUserImx });
+        .toBeCalledWith({ payloadHash: mockSignableOrderResponse.data.payload_hash });
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
       expect(mockCreateOrder).toBeCalledWith(
         mockCreateOrderRequest,
@@ -187,7 +187,7 @@ describe('order', () => {
       ));
       expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
       expect(mockGuardianClient.evaluateImxTransaction)
-        .toBeCalledWith({ payloadHash: mockSignableOrderResponse.data.payload_hash, user: mockUserImx });
+        .toBeCalledWith({ payloadHash: mockSignableOrderResponse.data.payload_hash });
     });
   });
 
@@ -266,7 +266,7 @@ describe('order', () => {
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
       expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
       expect(mockGuardianClient.evaluateImxTransaction)
-        .toBeCalledWith({ payloadHash: mockPayloadHash, user: mockUserImx });
+        .toBeCalledWith({ payloadHash: mockPayloadHash });
       expect(mockCancelOrder).toBeCalledWith(
         mockCancelOrderRequest,
         mockHeader,
