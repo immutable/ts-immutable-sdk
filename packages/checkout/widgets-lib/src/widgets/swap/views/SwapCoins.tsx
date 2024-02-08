@@ -84,7 +84,6 @@ export function SwapCoins({
         />
       )}
       footer={<QuickswapFooter theme={theme} />}
-      footerBackgroundColor="base.color.translucent.emphasis.200"
     >
       <Box
         sx={{
