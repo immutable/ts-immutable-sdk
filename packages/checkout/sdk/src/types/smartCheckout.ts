@@ -131,7 +131,10 @@ export type SellResultInsufficientFunds = {
 /*
 * Type representing the result of the cancel
 */
-export type CancelResult = CancelResultSuccess | CancelResultFailed | CancelResultFulfillmentsUnsettled;
+export type CancelResult = CancelResultSuccess |
+CancelResultFailed |
+CancelResultFulfillmentsUnsettled |
+CancelResultGasless;
 
 /**
  * Represents the result of {@link Checkout.cancel}
@@ -163,10 +166,52 @@ export type CancelResultFailed = {
  * @property {SendTransactionResult[]} transactions
  */
 export type CancelResultFulfillmentsUnsettled = {
-  /** The status to indicate success */
+  /** The status to indicate the fulfillments have not yet settled on chain. */
   status: CheckoutStatus.FULFILLMENTS_UNSETTLED,
   /** Array of transaction results */
   transactions: TransactionResponse[],
+};
+
+/**
+ * Represents the result of {@link Checkout.cancel} when using gasless cancel
+ * @property {SuccessfulGaslessCancellation[]} successfulCancellations
+ * @property {FailedGaslessCancellation[]} failedCancellations
+ * @property {PendingGaslessCancellation[]} pendingCancellations
+ */
+export type CancelResultGasless = {
+  successfulCancellations: SuccessfulGaslessCancellation[],
+  failedCancellations: FailedGaslessCancellation[],
+  pendingCancellations: PendingGaslessCancellation[],
+};
+
+/**
+ * Represents a successful gasless cancellation
+ * @property {string} orderId
+ */
+export type SuccessfulGaslessCancellation = {
+  /** The order id of the successful cancellation */
+  orderId: string;
+};
+
+/**
+ * Represents a failed gasless cancellation
+ * @property {string} orderId
+ * @property {string} reason
+ */
+export type FailedGaslessCancellation = {
+  /** The order id of the failed cancellation */
+  orderId: string;
+  /** The reason for failure */
+  reason: string;
+};
+
+/**
+ * Represents a pending gasless cancellation
+ * @property {string} orderId
+ */
+export type PendingGaslessCancellation = {
+  /** The order id of the pending cancellation */
+  orderId: string;
 };
 
 /**
@@ -174,8 +219,10 @@ export type CancelResultFulfillmentsUnsettled = {
  * @property {boolean} waitFulfillmentSettlements
  */
 export type CancelOverrides = {
-  /** If the buy should wait for the fulfillment transactions to settle */
+  /** If the cancel should wait for the fulfillment transactions to settle */
   waitFulfillmentSettlements?: boolean;
+  /** If the cancel should use the gasless option */
+  useGaslessCancel?: boolean;
 };
 
 /**
@@ -196,7 +243,7 @@ export enum CheckoutStatus {
 /**
  * The type representing the order to buy
  * @property {string} orderId
- * @property {Array<OrderFee>} takerFees
+ * @property {OrderFee[]} takerFees
  */
 export type BuyOrder = {
   /** the id of the order to buy */
