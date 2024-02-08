@@ -9,7 +9,7 @@ export type FulfillmentDataRequest = {
   /**
    * Address of the intended account fulfilling the order
    */
-  taker_address?: string;
+  taker_address: string;
   fees: Array<Fee>;
 };
 
