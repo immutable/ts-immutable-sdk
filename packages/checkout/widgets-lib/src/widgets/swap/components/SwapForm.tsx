@@ -280,7 +280,7 @@ export function SwapForm({ data }: SwapFromProps) {
         toToken,
       );
 
-      const currentQuoteRequest = CancellablePromise.all<any>([
+      const currentQuoteRequest = CancellablePromise.all<TransactionResponse>([
         quoteResultPromise,
         conversionResultPromise,
       ]);
@@ -371,7 +371,7 @@ export function SwapForm({ data }: SwapFromProps) {
         toToken,
       );
 
-      const currentQuoteRequest = CancellablePromise.all<any>([
+      const currentQuoteRequest = CancellablePromise.all<TransactionResponse>([
         quoteResultPromise,
         conversionResultPromise,
       ]);

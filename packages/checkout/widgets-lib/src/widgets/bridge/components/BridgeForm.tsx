@@ -15,6 +15,7 @@ import {
 import { BigNumber, utils } from 'ethers';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { useTranslation } from 'react-i18next';
+import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
 import { amountInputValidation } from '../../../lib/validations/amountInputValidations';
 import { BridgeActions, BridgeContext } from '../context/BridgeContext';
 import {
@@ -224,7 +225,7 @@ export function BridgeForm(props: BridgeFormProps) {
 
       const tokenAddress = tokenIsNative ? NATIVE.toUpperCase() : formToken?.token.address;
 
-      const currentQuoteRequest = CancellablePromise.all<any>([
+      const currentQuoteRequest = CancellablePromise.all<ApproveBridgeResponse | BridgeTxResponse>([
         tokenBridge!.getUnsignedApproveBridgeTx({
           senderAddress: from!.walletAddress!,
           token: tokenAddress ?? NATIVE.toUpperCase(),
@@ -245,7 +246,7 @@ export function BridgeForm(props: BridgeFormProps) {
       quoteRequest = currentQuoteRequest;
       const [unsignedApproveTransaction, unsignedTransaction] = await currentQuoteRequest;
 
-      const transactionFeeData = unsignedTransaction.feeData;
+      const transactionFeeData = (unsignedTransaction as BridgeTxResponse).feeData;
 
       const { totalFees, approvalFee } = transactionFeeData;
 

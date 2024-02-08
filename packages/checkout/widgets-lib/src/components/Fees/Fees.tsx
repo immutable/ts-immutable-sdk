@@ -31,8 +31,7 @@ export function Fees({
 }: FeesProps) {
   const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
   const { t } = useTranslation();
-  // eslint-disable-next-line no-param-reassign
-  if (!gasFeeValue && !loading) return <Box sx={...sx} />;
+  if (!gasFeeValue && !loading) return <Box />;
 
   const gasFee = formatZeroAmount(tokenValueFormat(gasFeeValue));
   const gasTokenSymbol = gasFeeToken?.symbol;
