@@ -6,9 +6,6 @@ import { flattenProperties, getDetail, storeDetail } from './utils/state';
 // WARNING: DO NOT CHANGE THE STRING BELOW. IT GETS REPLACED AT BUILD TIME.
 const SDK_VERSION = '__SDK_VERSION__';
 
-let initialised = false;
-export const isInitialised = () => initialised;
-
 const getReferrer = () => {
   if (isNode()) {
     return '';
@@ -66,23 +63,29 @@ const getRuntimeDetails = (): RuntimeDetails => {
 type InitialiseResponse = {
   runtimeId: string;
 };
+
+let initialised = false;
+export const isInitialised = () => initialised;
+
 export const initialise = async () => {
-  const runtimeDetails = flattenProperties(getRuntimeDetails());
-
-  const existingRuntimeId = getDetail(Detail.RUNTIME_ID);
-
-  const body = {
-    version: 1,
-    data: {
-      runtimeDetails,
-      runtimeId: existingRuntimeId,
-    },
-  };
-
-  const response = await post<InitialiseResponse>('/v1/sdk/initialise', body);
-
-  // Get runtimeId and store it
-  const { runtimeId } = response;
-  storeDetail(Detail.RUNTIME_ID, runtimeId);
   initialised = true;
+  try {
+    const runtimeDetails = flattenProperties(getRuntimeDetails());
+    const existingRuntimeId = getDetail(Detail.RUNTIME_ID);
+
+    const body = {
+      version: 1,
+      data: {
+        runtimeDetails,
+        runtimeId: existingRuntimeId,
+      },
+    };
+    const response = await post<InitialiseResponse>('/v1/sdk/initialise', body);
+
+    // Get runtimeId and store it
+    const { runtimeId } = response;
+    storeDetail(Detail.RUNTIME_ID, runtimeId);
+  } catch (error) {
+    initialised = false;
+  }
 };
