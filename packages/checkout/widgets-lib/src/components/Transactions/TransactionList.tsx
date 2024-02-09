@@ -89,6 +89,7 @@ export function TransactionList({
                   transaction={transaction}
                   fiatAmount={`${t('views.TRANSACTIONS.fiatPricePrefix')}${fiat}`}
                   amount={amount}
+                  icon={getTransactionItemIcon(transaction)}
                 />
               );
             }
