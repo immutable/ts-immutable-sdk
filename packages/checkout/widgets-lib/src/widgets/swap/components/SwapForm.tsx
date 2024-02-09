@@ -224,7 +224,7 @@ export function SwapForm({ data }: SwapFromProps) {
         id: formatTokenOptionsId(token.symbol, token.address),
         name: token.name,
         symbol: token.symbol,
-        icon: undefined, // todo: add correct image once available on token info
+        icon: token.icon,
       } as CoinSelectorOptionProps),
     ), [allowedTokens, fromToken]);
 

@@ -17,10 +17,11 @@ import { actionsContainerStyles, actionsLayoutStyles, containerStyles } from './
 import { TransactionDetails } from './TransactionDetails';
 
 type TransactionItemWithdrawPendingProps = {
-  label: string
+  label: string,
   transaction: Transaction,
-  fiatAmount: string
-  amount: string
+  fiatAmount: string,
+  amount: string,
+  icon: string,
 };
 
 export function TransactionItemWithdrawPending({
@@ -28,6 +29,7 @@ export function TransactionItemWithdrawPending({
   transaction,
   fiatAmount,
   amount,
+  icon,
 }: TransactionItemWithdrawPendingProps) {
   const { viewDispatch } = useContext(ViewContext);
   const { track } = useAnalytics();
@@ -146,7 +148,7 @@ export function TransactionItemWithdrawPending({
       >
         <Accordion.TargetLeftSlot sx={{ pr: 'base.spacing.x2' }}>
           <MenuItem size="xSmall">
-            <MenuItem.FramedIcon icon="Coins" circularFrame />
+            <MenuItem.FramedImage imageUrl={icon} circularFrame />
             <MenuItem.Label>
               {label}
             </MenuItem.Label>
