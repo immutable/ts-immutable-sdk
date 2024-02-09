@@ -61,8 +61,11 @@ describe('getAllowedBalances', () => {
       tokens: [
         {
           address: '0xQ',
+          symbol: 'QQQ',
         } as unknown as TokenInfo,
-        {} as unknown as TokenInfo, // <<< allows NATIVE -- no address
+        {
+          symbol: 'IMX',
+        } as unknown as TokenInfo, // <<< allows NATIVE -- no address
       ],
     });
 
@@ -75,8 +78,15 @@ describe('getAllowedBalances', () => {
     expect(resp).toEqual({
       allowList: {
         tokens: [
-          { address: tokenInfo.token.address },
-          { address: nativeTokenInfo.token.address },
+          {
+            address: tokenInfo.token.address,
+            symbol: 'QQQ',
+            icon: 'https://checkout-cdn.immutable.com/v1/blob/img/tokens/0xq.svg',
+          },
+          {
+            symbol: 'IMX',
+            icon: 'https://checkout-cdn.immutable.com/v1/blob/img/tokens/imx.svg',
+          },
         ],
       },
       allowedBalances: [
@@ -189,7 +199,10 @@ describe('getAllowedBalances', () => {
 
     expect(resp).toEqual({
       allowList: {
-        tokens: [{ address: tokenInfo.token.address }],
+        tokens: [{
+          address: tokenInfo.token.address,
+          icon: 'https://checkout-cdn.immutable.com/v1/blob/img/tokens/0xq.svg',
+        }],
       },
       allowedBalances: [tokenInfo],
     });
@@ -240,6 +253,53 @@ describe('getAllowedBalances', () => {
     expect(error.data.code).toEqual(12);
   });
 
+  it('should map asset icons to erc20 address and native token symbol', async () => {
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.PRODUCTION },
+    });
+
+    const mockProvider = {
+      getSigner: jest.fn().mockReturnValue({
+        getAddress: jest.fn().mockResolvedValue('0xaddress'),
+      }),
+    };
+    jest.spyOn(checkout, 'getNetworkInfo').mockResolvedValue(
+      { chainId: ChainId.IMTBL_ZKEVM_MAINNET } as unknown as NetworkInfo,
+    );
+    jest.spyOn(checkout, 'getAllBalances').mockResolvedValue({ balances });
+    jest.spyOn(checkout, 'getTokenAllowList').mockResolvedValue({
+      tokens: [
+        {
+          address: '0xA',
+          symbol: 'XAA',
+        } as unknown as TokenInfo,
+        {
+          symbol: 'XBB',
+        } as unknown as TokenInfo,
+      ],
+    });
+
+    const resp = await getAllowedBalances({
+      checkout,
+      provider: mockProvider as unknown as Web3Provider,
+      allowTokenListType: TokenFilterTypes.BRIDGE,
+    });
+
+    expect(resp?.allowList).toEqual({
+      tokens: [
+        {
+          address: '0xA',
+          symbol: 'XAA',
+          icon: 'https://checkout-cdn.immutable.com/v1/blob/img/tokens/0xa.svg',
+        },
+        {
+          symbol: 'XBB',
+          icon: 'https://checkout-cdn.immutable.com/v1/blob/img/tokens/xbb.svg',
+        },
+      ],
+    });
+  });
+
   it('should not return zero balances', async () => {
     const checkout = new Checkout({
       baseConfig: { environment: Environment.PRODUCTION },
@@ -270,7 +330,10 @@ describe('getAllowedBalances', () => {
 
     expect(resp).toEqual({
       allowList: {
-        tokens: [{ address: '0xA' }],
+        tokens: [{
+          address: '0xA',
+          icon: 'https://checkout-cdn.immutable.com/v1/blob/img/tokens/0xa.svg',
+        }],
       },
       allowedBalances: [],
     });
@@ -306,7 +369,10 @@ describe('getAllowedBalances', () => {
 
     expect(resp).toEqual({
       allowList: {
-        tokens: [{ address: '0xD' }],
+        tokens: [{
+          address: '0xD',
+          icon: 'https://checkout-cdn.immutable.com/v1/blob/img/tokens/0xd.svg',
+        }],
       },
       allowedBalances: [{
         balance: BigNumber.from(1),
@@ -346,7 +412,10 @@ describe('getAllowedBalances', () => {
 
     expect(resp).toEqual({
       allowList: {
-        tokens: [{ address: '0xA' }],
+        tokens: [{
+          address: '0xA',
+          icon: 'https://checkout-cdn.immutable.com/v1/blob/img/tokens/0xa.svg',
+        }],
       },
       allowedBalances: [],
     });
