@@ -23,7 +23,7 @@ jobs:
       - name: Checkout Docs Repo
         uses: actions/checkout@v3
         with:
-          repository: immutable/imx-docs
+          repository: immutable/docs
           token: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
           path: imx-docs
           ref: main
@@ -67,8 +67,8 @@ jobs:
       - name: Update version link
         run: ./.github/scripts/update-docs-link.sh
 
-      - name: Push SDK Docs to imx-docs
-        id: docs_push 
+      - name: Push SDK Docs to docs
+        id: docs_push
         run: ./.github/scripts/push-docs.sh
         shell: bash
 
