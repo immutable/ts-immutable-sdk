@@ -4,12 +4,14 @@ import {
 import { Checkout } from '@imtbl/checkout-sdk';
 import {
   useCallback,
-  useContext, useEffect, useState,
+  useContext,
+  useEffect,
+  useState,
 } from 'react';
 import { AXELAR_SCAN_URL } from 'lib';
 import { Transaction, TransactionStatus } from 'lib/clients';
 import { CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext';
-import { calculateCryptoToFiat } from 'lib/utils';
+import { calculateCryptoToFiat, getTokenImageByAddress, isNativeToken } from 'lib/utils';
 import { formatUnits } from 'ethers/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { TransactionItem } from './TransactionItem';
@@ -17,6 +19,7 @@ import { KnownNetworkMap } from './transactionsType';
 import { containerStyles, transactionsListStyle } from './TransactionListStyles';
 import { TransactionItemWithdrawPending } from './TransactionItemWithdrawPending';
 import { ChangeWallet } from './ChangeWallet';
+import { getNativeSymbolByChainSlug } from '../../lib/chains';
 
 type TransactionListProps = {
   checkout: Checkout,
@@ -50,6 +53,17 @@ export function TransactionList({
 
     return 1;
   }, []);
+
+  const getTransactionItemIcon = useCallback((transaction) => {
+    if (isNativeToken(transaction.details.from_token_address)) {
+      // Map transaction chain slug to native symbol icon asset
+      return getTokenImageByAddress(
+        checkout.config.environment,
+        getNativeSymbolByChainSlug(transaction.details.from_chain),
+      );
+    }
+    return getTokenImageByAddress(checkout.config.environment, transaction.details.from_token_address);
+  }, [checkout]);
 
   return (
     <Box sx={transactionsListStyle(isPassport)}>
@@ -87,6 +101,7 @@ export function TransactionList({
                 transaction={transaction}
                 fiatAmount={`${t('views.TRANSACTIONS.fiatPricePrefix')}${fiat}`}
                 amount={amount}
+                icon={getTransactionItemIcon(transaction)}
               />
             );
           })}

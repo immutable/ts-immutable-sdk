@@ -61,7 +61,29 @@ export const getAllowedBalances = async ({
     type: allowTokenListType,
   });
 
-  // Map token icon assets
+  const tokensAddresses = new Map();
+  allowList.tokens.forEach((token) => tokensAddresses.set(token.address?.toLowerCase() || NATIVE, true));
+
+  const allowedBalances = tokenBalances.balances
+    .filter((balance) => {
+      // Balance is <= 0 and it is not allow to have zeros
+      if (balance.balance.lte(0) && !allowZero) return false;
+      return tokensAddresses.get(balance.token.address?.toLowerCase() || NATIVE);
+    })
+    .map((balanceResult) => ({
+      ...balanceResult,
+      token: {
+        ...balanceResult.token,
+        icon: getTokenImageByAddress(
+          checkout.config.environment as Environment,
+          isNativeToken(balanceResult.token.address)
+            ? balanceResult.token.symbol.toLowerCase()
+            : balanceResult.token.address ?? '',
+        ),
+      },
+    })) ?? [];
+
+  // Map token icon assets to allowlist
   allowList.tokens = allowList.tokens.map((token) => ({
     ...token,
     icon: getTokenImageByAddress(
@@ -69,16 +91,6 @@ export const getAllowedBalances = async ({
       isNativeToken(token.address) ? token.symbol.toLowerCase() : token.address ?? '',
     ),
   }));
-
-  const tokensAddresses = new Map();
-  allowList.tokens.forEach((token) => tokensAddresses.set(token.address?.toLowerCase() || NATIVE, true));
-
-  const allowedBalances = tokenBalances.balances.filter((balance) => {
-    // Balance is <= 0 and it is not allow to have zeros
-    if (balance.balance.lte(0) && !allowZero) return false;
-
-    return tokensAddresses.get(balance.token.address?.toLowerCase() || NATIVE);
-  }) ?? [];
 
   return { allowList, allowedBalances };
 };
