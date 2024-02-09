@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { imx } from '@imtbl/generated-clients';
 import { Config, ImmutableXConfiguration } from './index';
-// import { version } from '../../package.json';
-// import { Configuration } from '../api';
 
 const defaultHeaders = { 'x-sdk-version': 'ts-immutable-sdk-__SDK_VERSION__' };
 
