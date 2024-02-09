@@ -1,6 +1,12 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { Checkout, ChainId, GetBalanceResult } from '@imtbl/checkout-sdk';
-import { calculateCryptoToFiat, sortTokensByAmount } from '../../../lib/utils';
+import { Environment } from '@imtbl/config';
+import {
+  calculateCryptoToFiat,
+  getTokenImageByAddress,
+  isNativeToken,
+  sortTokensByAmount,
+} from '../../../lib/utils';
 import { DEFAULT_BALANCE_RETRY_POLICY } from '../../../lib';
 import { retry } from '../../../lib/retry';
 
@@ -11,7 +17,7 @@ export type BalanceInfo = {
   description?: string;
   balance: string;
   fiatAmount: string;
-  iconLogo?: string;
+  icon?: string;
 };
 
 export const getTokenBalances = async (
@@ -38,7 +44,18 @@ export const getTokenBalances = async (
     checkout.config,
     getAllBalancesResult.balances,
     chainId,
-  );
+  ).map((balanceResult) => ({
+    ...balanceResult,
+    token: {
+      ...balanceResult.token,
+      icon: getTokenImageByAddress(
+        checkout.config.environment as Environment,
+        isNativeToken(balanceResult.token.address)
+          ? balanceResult.token.symbol
+          : balanceResult.token.address ?? '',
+      ),
+    },
+  }));
 
   return sortedTokens;
 };
@@ -63,4 +80,5 @@ export const mapTokenBalancesWithConversions = (
   symbol: balance.token.symbol,
   address: balance.token.address,
   description: balance.token.name,
+  icon: balance.token.icon,
 }));
