@@ -1,5 +1,8 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { WalletProviderName, CheckoutErrorType, Checkout } from '@imtbl/checkout-sdk';
+import {
+  WalletProviderName, CheckoutErrorType, Checkout, CreateProviderResult,
+} from '@imtbl/checkout-sdk';
+import { getWalletConnectProvider } from './walletconnect/web3modal';
 
 export function isPassportProvider(provider?: Web3Provider | null) {
   return (provider?.provider as any)?.isPassport === true;
@@ -29,7 +32,13 @@ export async function createAndConnectToProvider(
 ): Promise<Web3Provider> {
   let provider: Web3Provider;
   try {
-    const createResult = await checkout.createProvider({ walletProviderName });
+    let createResult: CreateProviderResult;
+    if (walletProviderName === WalletProviderName.WALLET_CONNECT) {
+      createResult = await getWalletConnectProvider(checkout);
+    } else {
+      createResult = await checkout.createProvider({ walletProviderName });
+    }
+
     provider = createResult.provider;
   } catch (error) {
     // eslint-disable-next-line no-console

@@ -122,6 +122,14 @@ export const MainPage = () => {
     onRampWidget.update(languageUpdate);
   }, [onRampWidget, web3Provider])
 
+  const handleDisconnect = useCallback(async () => {
+    if ((web3Provider?.provider as any)?.isWalletConnect) {
+      console.log('disconnecting wallet connect')
+      await (web3Provider?.provider as any).disconnect();
+      console.log('disconnected')
+    }
+  }, [web3Provider])
+
   return (
     <Box sx={{ minWidth: '100vw', minHeight: '100vh', width: '100%', height: '100%', backgroundColor: 'base.color.brand.6' }}>
       <Box sx={{ width: '100%', padding: 'base.spacing.x4', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
@@ -133,6 +141,7 @@ export const MainPage = () => {
           <Button onClick={openBridgeWidget}>Bridge</Button>
           <Button onClick={openOnRampWidget}>On-ramp</Button>
           <LanguageSelector onLanguageChange={(language: string) => updateLanguage(language)} language={selectedLanguage} />
+          {(web3Provider?.provider as any)?.isWalletConnect && <Button onClick={handleDisconnect}>Disconnect WC</Button>}
         </Box>
         {passport && web3Provider && (web3Provider.provider as any)?.isPassport && <Button onClick={logout}>Passport Logout</Button>}
       </Box>
