@@ -3888,8 +3888,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/x-client@workspace:packages/x-client"
   dependencies:
+    "@ethersproject/abstract-signer": ^5.7.0
     "@imtbl/config": 0.0.0
     "@imtbl/core-sdk": ^2.4.0
+    "@imtbl/generated-clients": 0.0.0
     "@rollup/plugin-typescript": ^11.0.0
     "@swc/jest": ^0.2.24
     "@types/jest": ^29.4.3

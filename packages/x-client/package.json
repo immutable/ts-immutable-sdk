@@ -5,8 +5,10 @@
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
+    "@ethersproject/abstract-signer": "^5.7.0",
     "@imtbl/config": "0.0.0",
-    "@imtbl/core-sdk": "^2.4.0"
+    "@imtbl/core-sdk": "^2.4.0",
+    "@imtbl/generated-clients": "0.0.0"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.0.0",
