@@ -7,10 +7,3 @@ export enum Detail {
   DOMAIN = 'domain',
   SDK_VERSION = 'sdkVersion',
 }
-
-export enum Store {
-  EVENTS = 'events',
-  RUNTIME = 'runtime',
-}
-
-export const POLLING_FREQUENCY = 5000;

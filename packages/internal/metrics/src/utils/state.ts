@@ -1,5 +1,10 @@
 import { getItem, setItem } from './localStorage';
-import { Detail, Store } from './constants';
+import { Detail } from './constants';
+
+export enum Store {
+  EVENTS = 'events',
+  RUNTIME = 'runtime',
+}
 
 // In memory storage for events and other data
 let EVENT_STORE: any[];
