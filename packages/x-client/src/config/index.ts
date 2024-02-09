@@ -1,4 +1,5 @@
-import { ImmutableXConfiguration, Config } from '@imtbl/core-sdk';
+/* eslint-disable @typescript-eslint/naming-convention */
+import { imx } from '@imtbl/generated-clients';
 import {
   Environment,
   ImmutableConfiguration,
@@ -12,6 +13,91 @@ interface ImmutableXConfigurationParams {
   registrationContractAddress: string,
 }
 
+const defaultHeaders = { 'x-sdk-version': 'ts-immutable-sdk-__SDK_VERSION__' };
+
+export interface EthConfiguration {
+  coreContractAddress: string;
+  registrationContractAddress: string;
+  chainID: number;
+}
+
+interface ImxEnvironment extends EthConfiguration {
+  basePath: string;
+  headers?: Record<string, string>;
+  sdkVersion?: string;
+}
+
+export interface ImmutableXConfiguration {
+  /**
+   * The configuration for the API client
+   */
+  apiConfiguration: imx.Configuration;
+  /**
+   * The configuration for the Ethereum network
+   */
+  ethConfiguration: EthConfiguration;
+}
+
+const createConfig = ({
+  coreContractAddress,
+  registrationContractAddress,
+  chainID,
+  basePath,
+  headers,
+  sdkVersion,
+}: ImxEnvironment): ImmutableXConfiguration => {
+  if (!basePath.trim()) {
+    throw Error('basePath can not be empty');
+  }
+
+  if (sdkVersion) {
+    defaultHeaders['x-sdk-version'] = sdkVersion;
+  }
+
+  // eslint-disable-next-line no-param-reassign
+  headers = { ...(headers || {}), ...defaultHeaders };
+  const apiConfigOptions: imx.ConfigurationParameters = {
+    basePath,
+    baseOptions: { headers },
+  };
+
+  return {
+    apiConfiguration: new imx.Configuration(apiConfigOptions),
+    ethConfiguration: {
+      coreContractAddress,
+      registrationContractAddress,
+      chainID,
+    },
+  };
+};
+
+/**
+ * Creates a Configuration for the specified environment
+ * @dev Copied from Core SDK as a convenience for migrating away from Core SDK
+ * @returns an ImmutableXConfiguration
+ */
+export const Config = {
+  get PRODUCTION() {
+    return createConfig({
+      basePath: 'https://api.x.immutable.com',
+      chainID: 1,
+      coreContractAddress: '0x5FDCCA53617f4d2b9134B29090C87D01058e27e9',
+      registrationContractAddress: '0x72a06bf2a1CE5e39cBA06c0CAb824960B587d64c',
+    });
+  },
+
+  get SANDBOX() {
+    return createConfig({
+      basePath: 'https://api.sandbox.x.immutable.com',
+      chainID: 11155111,
+      coreContractAddress: '0x2d5C349fD8464DA06a3f90b4B0E9195F3d1b7F98',
+      registrationContractAddress: '0xDbA6129C02E69405622fAdc3d5A7f8d23eac3b97',
+    });
+  },
+
+  createConfig,
+};
+
 /**
  * createImmutableXConfiguration to create a custom ImmutableXConfiguration
  * other than the production and sandbox defined below.
@@ -21,7 +107,7 @@ export const createImmutableXConfiguration = ({
   chainID,
   coreContractAddress,
   registrationContractAddress,
-}: ImmutableXConfigurationParams): ImmutableXConfiguration => Config.createConfig({
+}: ImmutableXConfigurationParams): ImmutableXConfiguration => createConfig({
   basePath,
   chainID,
   coreContractAddress,
