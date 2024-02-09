@@ -5,14 +5,23 @@
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
+    "@ethersproject/abi": "^5.7.0",
     "@ethersproject/abstract-signer": "^5.7.0",
+    "@ethersproject/providers": "^5.7.2",
+    "@ethersproject/wallet": "^5.7.0",
     "@imtbl/config": "0.0.0",
     "@imtbl/core-sdk": "^2.4.0",
-    "@imtbl/generated-clients": "0.0.0"
+    "@imtbl/generated-clients": "0.0.0",
+    "axios": "^1.6.5",
+    "bn.js": "^5.2.1",
+    "elliptic": "^6.5.4",
+    "enc-utils": "^3.0.0",
+    "ethers": "^5.7.2"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.0.0",
     "@swc/jest": "^0.2.24",
+    "@types/elliptic": "^6.4.14",
     "@types/jest": "^29.4.3",
     "eslint": "^8.40.0",
     "jest": "^29.4.3",
