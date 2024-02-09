@@ -9,13 +9,22 @@ import { getAllowedBalances } from './balance';
 describe('getAllowedBalances', () => {
   const tokenInfo = {
     balance: BigNumber.from(1),
-    token: { symbol: 'QQQ', name: 'QQQ', address: '0xQ' } as TokenInfo,
+    token: {
+      symbol: 'QQQ',
+      name: 'QQQ',
+      address: '0xQ',
+      icon: 'https://checkout-cdn.immutable.com/v1/blob/img/tokens/0xq.svg',
+    } as TokenInfo,
     formattedBalance: '12.34',
   };
 
   const nativeTokenInfo = {
     balance: BigNumber.from(2),
-    token: { symbol: 'AAA', name: 'AAA' } as TokenInfo,
+    token: {
+      symbol: 'AAA',
+      name: 'AAA',
+      icon: 'https://checkout-cdn.immutable.com/v1/blob/img/tokens/aaa.svg',
+    } as TokenInfo,
     formattedBalance: '6.34',
   };
 
@@ -376,7 +385,12 @@ describe('getAllowedBalances', () => {
       },
       allowedBalances: [{
         balance: BigNumber.from(1),
-        token: { symbol: 'DDD', name: 'DDD', address: '0xd' } as TokenInfo,
+        token: {
+          symbol: 'DDD',
+          name: 'DDD',
+          address: '0xd',
+          icon: 'https://checkout-cdn.immutable.com/v1/blob/img/tokens/0xd.svg',
+        } as TokenInfo,
         formattedBalance: '36.34',
       }],
     });
