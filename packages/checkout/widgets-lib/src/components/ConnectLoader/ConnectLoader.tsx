@@ -5,6 +5,7 @@ import {
   WalletProviderName,
   ConnectTargetLayer,
   CheckoutErrorType,
+  CreateProviderResult,
 
 } from '@imtbl/checkout-sdk';
 import React, {
@@ -13,6 +14,7 @@ import React, {
   useReducer,
 } from 'react';
 import { ErrorView } from 'views/error/ErrorView';
+import { getWalletConnectProvider } from 'lib/walletconnect/web3modal';
 import {
   ConnectLoaderActions,
   ConnectLoaderContext,
@@ -91,9 +93,14 @@ export function ConnectLoader({
       // If the wallet provider name was passed through but the provider was
       // not injected then create a provider using the wallet provider name
       if (!localProvider && walletProviderName) {
-        const createProviderResult = await checkout.createProvider({
-          walletProviderName,
-        });
+        // TODO: test here what happens if walletconnect is passed through
+        let createProviderResult: CreateProviderResult;
+        if (walletProviderName === WalletProviderName.WALLET_CONNECT) {
+          createProviderResult = await getWalletConnectProvider(checkout);
+        } else {
+          createProviderResult = await checkout.createProvider({ walletProviderName });
+        }
+
         connectLoaderDispatch({
           payload: {
             type: ConnectLoaderActions.SET_PROVIDER,
@@ -222,38 +229,39 @@ export function ConnectLoader({
   return (
     <>
       {(connectionStatus === ConnectionStatus.LOADING) && (
-      <LoadingView loadingText="Loading" />
+        <LoadingView loadingText="Loading" />
       )}
       <ConnectLoaderContext.Provider value={connectLoaderReducerValues}>
         {(connectionStatus === ConnectionStatus.NOT_CONNECTED_NO_PROVIDER
-        || connectionStatus === ConnectionStatus.NOT_CONNECTED
-        || connectionStatus === ConnectionStatus.CONNECTED_WRONG_NETWORK) && (
-          <ConnectWidget
-            config={widgetConfig}
-            targetLayer={networkToSwitchTo}
-            web3Provider={provider}
-            checkout={checkout}
-            deepLink={deepLink}
-            sendCloseEventOverride={closeEvent}
-            allowedChains={allowedChains}
-          />
-        )}
+          || connectionStatus === ConnectionStatus.NOT_CONNECTED
+          || connectionStatus === ConnectionStatus.CONNECTED_WRONG_NETWORK)
+          && (
+            <ConnectWidget
+              config={widgetConfig}
+              targetLayer={networkToSwitchTo}
+              web3Provider={provider}
+              checkout={checkout}
+              deepLink={deepLink}
+              sendCloseEventOverride={closeEvent}
+              allowedChains={allowedChains}
+            />
+          )}
         {/* If the user has connected then render the widget */}
         {connectionStatus === ConnectionStatus.CONNECTED_WITH_NETWORK && (children)}
       </ConnectLoaderContext.Provider>
       {connectionStatus === ConnectionStatus.ERROR && (
-      <ErrorView
-        onCloseClick={closeEvent}
-        onActionClick={() => {
-          connectLoaderDispatch({
-            payload: {
-              type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
-              connectionStatus: ConnectionStatus.NOT_CONNECTED,
-            },
-          });
-        }}
-        actionText="Try Again"
-      />
+        <ErrorView
+          onCloseClick={closeEvent}
+          onActionClick={() => {
+            connectLoaderDispatch({
+              payload: {
+                type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
+                connectionStatus: ConnectionStatus.NOT_CONNECTED,
+              },
+            });
+          }}
+          actionText="Try Again"
+        />
       )}
     </>
   );

@@ -5,6 +5,7 @@ import {
   WalletInfo,
   WalletProviderName,
   ChainId,
+  CreateProviderResult,
 } from '@imtbl/checkout-sdk';
 import {
   useContext,
@@ -13,6 +14,7 @@ import {
   useCallback,
 } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
+import { getWalletConnectProvider } from 'lib/walletconnect/web3modal';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import {
   ConnectContext,
@@ -82,10 +84,15 @@ export function WalletList(props: WalletListProps) {
       try {
         let web3Provider: Web3Provider | null = null;
 
-        const providerResult = await checkout.createProvider({
-          walletProviderName,
-        });
-        web3Provider = providerResult.provider;
+        let createResult: CreateProviderResult;
+        if (walletProviderName === WalletProviderName.WALLET_CONNECT) {
+          console.log('calling getWalletConnectProvider');
+          createResult = await getWalletConnectProvider(checkout);
+          console.log('createResult is', createResult);
+        } else {
+          createResult = await checkout.createProvider({ walletProviderName });
+        }
+        web3Provider = createResult.provider;
 
         if (!web3Provider) {
           console.log(`failed to create web3Provider for ${walletProviderName}`);

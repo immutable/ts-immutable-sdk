@@ -3407,7 +3407,6 @@ __metadata:
     "@rollup/plugin-replace": ^5.0.2
     "@rollup/plugin-terser": ^0.4.3
     "@rollup/plugin-typescript": ^11.0.0
-    "@web3modal/ethers5": ^4.0.0
     axios: ^1.6.5
     babel-jest: ^29.5.0
     eslint: ^8.40.0
@@ -3482,6 +3481,7 @@ __metadata:
     "@types/node": ^18.14.2
     "@types/react": ^18.0.28
     "@types/react-dom": ^18.0.11
+    "@web3modal/ethers5": ^4.0.1
     assert: ^2.0.0
     buffer: ^6.0.3
     crypto-browserify: ^3.12.0
@@ -10402,6 +10402,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@web3modal/common@npm:4.0.1":
+  version: 4.0.1
+  resolution: "@web3modal/common@npm:4.0.1"
+  dependencies:
+    dayjs: 1.11.10
+  checksum: 5917850724a9c1420a85c1dd8f2f9d340d3c0bfa6320c9011f34d8a14f46253f86fe2b1c7dc4e047a5f6dd69a7b539e1dd940e5f5409616f8f386d252ac36b3f
+  languageName: node
+  linkType: hard
+
 "@web3modal/core@npm:4.0.0":
   version: 4.0.0
   resolution: "@web3modal/core@npm:4.0.0"
@@ -10410,6 +10419,17 @@ __metadata:
     "@web3modal/wallet": 4.0.0
     valtio: 1.11.2
   checksum: 986750e8a87ddea113d8ab2a318bec3ace2ff5c414a324e4f68e93f5e6ad157da63fa7855e1742f71d680c3aa92e3fbc6293c050fde40be1de4fd899c47b75d3
+  languageName: node
+  linkType: hard
+
+"@web3modal/core@npm:4.0.1":
+  version: 4.0.1
+  resolution: "@web3modal/core@npm:4.0.1"
+  dependencies:
+    "@web3modal/common": 4.0.1
+    "@web3modal/wallet": 4.0.1
+    valtio: 1.11.2
+  checksum: 7330d6a05b040c6ad62d7f90eb92e6e51f68bc9411d4b10bde02d80deaeb2227029fb1e2c2607bd72d15e1d90a0ffd5c2eb7c9fa8b4921082470a403fe275520
   languageName: node
   linkType: hard
 
@@ -10457,12 +10477,65 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@web3modal/ethers5@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "@web3modal/ethers5@npm:4.0.1"
+  dependencies:
+    "@coinbase/wallet-sdk": 3.9.1
+    "@walletconnect/ethereum-provider": 2.11.1
+    "@web3modal/polyfills": 4.0.1
+    "@web3modal/scaffold": 4.0.1
+    "@web3modal/scaffold-react": 4.0.1
+    "@web3modal/scaffold-utils": 4.0.1
+    "@web3modal/scaffold-vue": 4.0.1
+    "@web3modal/siwe": 4.0.1
+    react: ">=17"
+    react-dom: ">=17"
+    valtio: 1.11.2
+    vue: ">=3"
+  peerDependencies:
+    "@web3modal/siwe": "*"
+    ethers: ">=5.0.0 <6.0.0"
+    react: ">=17"
+    react-dom: ">=17"
+    vue: ">=3"
+  dependenciesMeta:
+    "@web3modal/siwe":
+      optional: true
+    react:
+      optional: true
+    react-dom:
+      optional: true
+    vue:
+      optional: true
+  peerDependenciesMeta:
+    "@web3modal/siwe":
+      optional: true
+    react:
+      optional: true
+    react-dom:
+      optional: true
+    vue:
+      optional: true
+  checksum: f06fe4078d6703eb00989689e6994580881a0da52c951692821c08c104f3a9c59b0d6de7571a42f370e6a11a89d9dabb1278ac644e7e931bf53f2849ea3e736a
+  languageName: node
+  linkType: hard
+
 "@web3modal/polyfills@npm:4.0.0":
   version: 4.0.0
   resolution: "@web3modal/polyfills@npm:4.0.0"
   dependencies:
     buffer: 6.0.3
   checksum: fa552687d45f424d0a9c5208519d2ab5299de9224ee78adc31d165b55287e9fb3c09336ecfafb2f5e374d21f43392bc8ca6c090743ac3a0726e3f33dd477707b
+  languageName: node
+  linkType: hard
+
+"@web3modal/polyfills@npm:4.0.1":
+  version: 4.0.1
+  resolution: "@web3modal/polyfills@npm:4.0.1"
+  dependencies:
+    buffer: 6.0.3
+  checksum: deaf938b3c9b3e559cb6f021917565d41d0f7cb24ba99ab80f3a333a5a0196cbc72b7d2efa6fbe5472044af1661a44ca06022b9482f63eaa532197e465e9c86c
   languageName: node
   linkType: hard
 
@@ -10478,6 +10551,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@web3modal/scaffold-react@npm:4.0.1":
+  version: 4.0.1
+  resolution: "@web3modal/scaffold-react@npm:4.0.1"
+  dependencies:
+    "@web3modal/scaffold": 4.0.1
+  peerDependencies:
+    react: ">=17"
+    react-dom: ">=17"
+  checksum: 28119afed645e4b9ba398550ad3623d7560fe0930967f0ad0ff9c95a00dc44b92cf046f8f54504b6bc68d5106679ed97573bea745314a086cbd94854cf2f0f2a
+  languageName: node
+  linkType: hard
+
 "@web3modal/scaffold-utils@npm:4.0.0":
   version: 4.0.0
   resolution: "@web3modal/scaffold-utils@npm:4.0.0"
@@ -10486,6 +10571,17 @@ __metadata:
     "@web3modal/scaffold": 4.0.0
     valtio: 1.11.2
   checksum: a3d8e5e7c62a1979c287745cbeb7d32cd9e2e221379cb01d20fde64f9d4d28188bcec55f5445684ee225fee3c69fe22a4da3d69b1d359b4bb6f26eb5b7e40196
+  languageName: node
+  linkType: hard
+
+"@web3modal/scaffold-utils@npm:4.0.1":
+  version: 4.0.1
+  resolution: "@web3modal/scaffold-utils@npm:4.0.1"
+  dependencies:
+    "@web3modal/polyfills": 4.0.1
+    "@web3modal/scaffold": 4.0.1
+    valtio: 1.11.2
+  checksum: e397969cfdff6e4bd3569d8c3661582d434cb18f418def4070db9d332033170d8a3583634884e9476bc317dac5c797cbeaa70a257f908e6342da621136ae2f27
   languageName: node
   linkType: hard
 
@@ -10500,6 +10596,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@web3modal/scaffold-vue@npm:4.0.1":
+  version: 4.0.1
+  resolution: "@web3modal/scaffold-vue@npm:4.0.1"
+  dependencies:
+    "@web3modal/scaffold": 4.0.1
+  peerDependencies:
+    vue: ">=3"
+  checksum: 17a3ed1ea72bbe73f8cfc869a2be70e261a62eb73889f4cc8c36ba3dfdd79eec2766e7553fd7eea0319ab5a55b0608311c41ef84d4c07cbc06b520ca685ce503
+  languageName: node
+  linkType: hard
+
 "@web3modal/scaffold@npm:4.0.0":
   version: 4.0.0
   resolution: "@web3modal/scaffold@npm:4.0.0"
@@ -10509,6 +10616,18 @@ __metadata:
     "@web3modal/ui": 4.0.0
     lit: 3.1.0
   checksum: f2d134349c032ed1b63b43a1dd6d445cdf0989e69054a909c9bffe1428d0fb3f1f9f457e15c4b719fbc0fca004697783437314dd8108cbdaa83547c0337d6905
+  languageName: node
+  linkType: hard
+
+"@web3modal/scaffold@npm:4.0.1":
+  version: 4.0.1
+  resolution: "@web3modal/scaffold@npm:4.0.1"
+  dependencies:
+    "@web3modal/common": 4.0.1
+    "@web3modal/core": 4.0.1
+    "@web3modal/ui": 4.0.1
+    lit: 3.1.0
+  checksum: 9c468a4a9069683c5833edc356bb6ea192007ffc4f47f8174b90395d253984bf853eca65c896f527894790d1112279e2b54e0fc04bf9ae9d53cfac16e45ca4cd
   languageName: node
   linkType: hard
 
@@ -10543,6 +10662,37 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@web3modal/siwe@npm:4.0.1":
+  version: 4.0.1
+  resolution: "@web3modal/siwe@npm:4.0.1"
+  dependencies:
+    "@web3modal/core": 4.0.1
+    "@web3modal/scaffold-utils": 4.0.1
+    react: ">=17"
+    react-dom: ">=17"
+    vue: ">=3"
+  peerDependencies:
+    react: ">=17"
+    react-dom: ">=17"
+    vue: ">=3"
+  dependenciesMeta:
+    react:
+      optional: true
+    react-dom:
+      optional: true
+    vue:
+      optional: true
+  peerDependenciesMeta:
+    react:
+      optional: true
+    react-dom:
+      optional: true
+    vue:
+      optional: true
+  checksum: 6cb311ddfa09497053a776350bd92b38aef38df65f643509285d89cd81cfbd5ec072654d65b1ced3d7a4a9533c827487ad6c707baf4b270744149d6c5bbb1b7c
+  languageName: node
+  linkType: hard
+
 "@web3modal/ui@npm:4.0.0":
   version: 4.0.0
   resolution: "@web3modal/ui@npm:4.0.0"
@@ -10553,12 +10703,31 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@web3modal/ui@npm:4.0.1":
+  version: 4.0.1
+  resolution: "@web3modal/ui@npm:4.0.1"
+  dependencies:
+    lit: 3.1.0
+    qrcode: 1.5.3
+  checksum: b4d2a67c437a728dd89afb7ed1e8b534cc2ac1d1c90aa59d69297fcda9383fed174884618a68d12c7628ddc97363c0d42c66d2e09350bba0af2fba210392eb9e
+  languageName: node
+  linkType: hard
+
 "@web3modal/wallet@npm:4.0.0":
   version: 4.0.0
   resolution: "@web3modal/wallet@npm:4.0.0"
   dependencies:
     zod: 3.22.4
   checksum: 4d94cc008720b54ce79e369a7d84a4183d4583eb32032f46b1f5d5aeb3fa35ad272b52b9a75b7e86528233b6c77bd8f6362edd9220f683fd317697f5d0ccf45f
+  languageName: node
+  linkType: hard
+
+"@web3modal/wallet@npm:4.0.1":
+  version: 4.0.1
+  resolution: "@web3modal/wallet@npm:4.0.1"
+  dependencies:
+    zod: 3.22.4
+  checksum: 9458c2187969f38646db3ecc585e609b3da4cb12fc28c2905af1afc494b4143dc7792b5e48b6b7344aaf85a1bfd4bb1113024f387bd28389aaf90afa2599ae79
   languageName: node
   linkType: hard
 

@@ -161,7 +161,6 @@ export class Checkout {
     params: CreateProviderParams,
   ): Promise<CreateProviderResult> {
     return await provider.createProvider(
-      this.config,
       params.walletProviderName,
       this.passport,
     );
