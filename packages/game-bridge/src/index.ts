@@ -3,7 +3,6 @@ import * as passport from '@imtbl/passport';
 import * as config from '@imtbl/config';
 import * as provider from '@imtbl/x-provider';
 import { track, identify } from '@imtbl/metrics';
-import { gameBridgeVersionCheck } from '@imtbl/version-check';
 
 /* eslint-disable no-undef */
 const scope = 'openid offline_access profile email transact';
@@ -15,7 +14,7 @@ const keyRequestId = 'requestId';
 const keyData = 'data';
 
 const trackFunction = 'track';
-const moduleName = 'game_bridge';
+const moduleName = 'gameBridge';
 
 // version check placeholders
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -188,11 +187,11 @@ window.callFunction = async (jsonData: string) => {
           engineVersion: engineVersion.engineVersion,
           platform: engineVersion.platform,
           platformVersion: engineVersion.platformVersion,
+          deviceModel: engineVersion.deviceModel ?? 'N/A',
         };
         console.log(`Version check: ${JSON.stringify(versionCheckParams)}`);
 
         track(moduleName, 'completedInitGameBridge', versionCheckParams);
-        gameBridgeVersionCheck(versionCheckParams);
         break;
       }
       case PASSPORT_FUNCTIONS.initDeviceFlow: {
