@@ -1,11 +1,10 @@
 import {
-  ChainId, ChainName, Checkout, CreateProviderResult, WalletProviderName,
+  ChainId, ChainName, CreateProviderResult, WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
-import { createWeb3Modal, defaultConfig } from '@web3modal/ethers5';
-import { getL1ChainId } from 'lib/networkUtils';
 import { Web3Provider } from '@ethersproject/providers';
 import { CHECKOUT_CDN_BASE_URL } from 'lib/constants';
+import { Web3Modal } from 'context/web3modal-context/web3ModalTypes';
 
 const SEPOLIA_RPC_URL = 'https://checkout-api.sandbox.immutable.com/v1/rpc/eth-sepolia';
 const IMMUTABLE_ZKEVM_TESTNET_RPC_URL = 'https://rpc.testnet.immutable.com';
@@ -53,58 +52,21 @@ export const WALLET_CONNECT_METADATA = {
 
 export const WALLET_CONNECT_PROJECT_ID = '938b553484e344b1e0b4bb80edf8c362';
 
-function getWalletConnectChainsByEnvironment(environment: Environment): any[] {
+export function getWalletConnectChainsByEnvironment(environment: Environment): any[] {
   if (environment === Environment.PRODUCTION) {
     return [WALLET_CONNECT_ETHEREUM, WALLET_CONNECT_IMTBL_ZKEVM_MAINNET];
   }
   return [WALLET_CONNECT_SEPOLIA, WALLET_CONNECT_IMTBL_ZKEVM_TESTNET];
 }
 
-// function getWeb3Modal(checkout:Checkout) {
-//   return createWeb3Modal({
-//     ethersConfig: defaultConfig({
-//       metadata: WALLET_CONNECT_METADATA,
-//       defaultChainId: getL1ChainId(checkout.config),
-//       enableEIP6963: false,
-//       enableInjected: false,
-//       enableCoinbase: false,
-//     }),
-//     chains: getWalletConnectChainsByEnvironment(checkout.config.environment),
-//     enableAnalytics: true, // Optional - true by default
-//     projectId: WALLET_CONNECT_PROJECT_ID,
-//     featuredWalletIds: [
-//       'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96', // metamask mobile
-//     ],
-//     includeWalletIds: ['c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96'],
-//     excludeWalletIds: ['ALL'],
-//   });
-// }
-
 export const getWalletConnectProvider = async (
-  checkout: Checkout,
+  web3Modal: Web3Modal,
   changeAccount = false,
 ): Promise<CreateProviderResult> => {
-  const modal = createWeb3Modal({
-    ethersConfig: defaultConfig({
-      metadata: WALLET_CONNECT_METADATA,
-      defaultChainId: getL1ChainId(checkout.config),
-      enableEIP6963: false,
-      enableInjected: false,
-      enableCoinbase: false,
-    }),
-    chains: getWalletConnectChainsByEnvironment(checkout.config.environment),
-    enableAnalytics: true, // Optional - true by default
-    projectId: WALLET_CONNECT_PROJECT_ID,
-    featuredWalletIds: [
-      'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96', // metamask mobile
-    ],
-    includeWalletIds: ['c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96'],
-    excludeWalletIds: ['ALL'],
-  });
-
+  console.log('web3Modal', web3Modal);
   if (!changeAccount) {
-    const walletConnectProvider = modal.getWalletProvider();
-    const isConnected = modal.getIsConnected();
+    const walletConnectProvider = web3Modal.getWalletProvider();
+    const isConnected = web3Modal.getIsConnected();
     console.log('walletConnectProvider', walletConnectProvider);
     console.log('isConnected', isConnected);
 
@@ -116,12 +78,8 @@ export const getWalletConnectProvider = async (
     }
   }
 
-  if (modal && typeof modal.disconnect !== 'undefined') {
-    modal.disconnect();
-  }
-
   const getProvider = () => new Promise<CreateProviderResult>((resolve, reject) => {
-    modal!.subscribeProvider((newState) => {
+    web3Modal!.subscribeProvider((newState) => {
       console.log('newState', newState);
       if (newState.provider) {
         const provider = new Web3Provider(newState.provider);
@@ -129,12 +87,13 @@ export const getWalletConnectProvider = async (
           provider,
           walletProviderName: WalletProviderName.WALLET_CONNECT,
         });
+      } else {
+        web3Modal.disconnect().then(() => web3Modal.close());
+        reject(new Error('Failed to create WalletConnect provider'));
       }
-      reject(new Error('Failed to create WalletCOnnect provider'));
     });
 
-    console.log('opening modal');
-    modal!.open();
+    web3Modal!.open({ view: 'Connect' });
   });
 
   return getProvider();

@@ -14,6 +14,7 @@ import { getL1ChainId, getL2ChainId } from 'lib';
 import { isValidWalletProvider } from 'lib/validations/widgetValidators';
 import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
+import { Web3ModalContext } from 'context/web3modal-context';
 import { WalletWidget } from './WalletWidget';
 import { sendWalletWidgetCloseEvent } from './WalletWidgetEvents';
 
@@ -62,15 +63,17 @@ export class Wallet extends Base<WidgetType.WALLET> {
       <React.StrictMode>
         <CustomAnalyticsProvider checkout={this.checkout}>
           <ThemeProvider id="wallet-container" config={this.strongConfig()}>
-            <ConnectLoader
-              widgetConfig={this.strongConfig()}
-              params={connectLoaderParams}
-              closeEvent={() => sendWalletWidgetCloseEvent(window)}
-            >
-              <WalletWidget
-                config={this.strongConfig()}
-              />
-            </ConnectLoader>
+            <Web3ModalContext.Provider value={{ web3Modal: this.web3Modal }}>
+              <ConnectLoader
+                widgetConfig={this.strongConfig()}
+                params={connectLoaderParams}
+                closeEvent={() => sendWalletWidgetCloseEvent(window)}
+              >
+                <WalletWidget
+                  config={this.strongConfig()}
+                />
+              </ConnectLoader>
+            </Web3ModalContext.Provider>
           </ThemeProvider>
         </CustomAnalyticsProvider>
       </React.StrictMode>,

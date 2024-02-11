@@ -159,7 +159,7 @@ export function ConnectWidget({
       <ConnectContext.Provider value={connectReducerValues}>
         <>
           {view.type === SharedViews.LOADING_VIEW && (
-          <LoadingView loadingText="Loading" />
+            <LoadingView loadingText="Loading" />
           )}
           {view.type === ConnectWidgetViews.CONNECT_WALLET && (
             <ConnectWallet targetChainId={targetChainId} allowedChains={allowedChains ?? [targetChainId]} />
@@ -187,22 +187,22 @@ export function ConnectWidget({
           )}
           {((view.type === ConnectWidgetViews.SUCCESS && !provider)
             || view.type === SharedViews.ERROR_VIEW)
-              && (
-                <ErrorView
-                  actionText={errorText}
-                  onActionClick={() => {
-                    viewDispatch({
-                      payload: {
-                        type: ViewActions.UPDATE_VIEW,
-                        view: {
-                          type: ConnectWidgetViews.CONNECT_WALLET,
-                        } as ConnectWidgetView,
-                      },
-                    });
-                  }}
-                  onCloseClick={() => sendCloseEvent()}
-                />
-              )}
+            && (
+              <ErrorView
+                actionText={errorText}
+                onActionClick={() => {
+                  viewDispatch({
+                    payload: {
+                      type: ViewActions.UPDATE_VIEW,
+                      view: {
+                        type: ConnectWidgetViews.CONNECT_WALLET,
+                      } as ConnectWidgetView,
+                    },
+                  });
+                }}
+                onCloseClick={() => sendCloseEvent()}
+              />
+            )}
         </>
       </ConnectContext.Provider>
     </ViewContext.Provider>

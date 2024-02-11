@@ -25,6 +25,7 @@ import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAna
 import { useTranslation } from 'react-i18next';
 import { BridgeActions, BridgeContext } from 'widgets/bridge/context/BridgeContext';
 import { WalletDrawer } from 'widgets/bridge/components/WalletDrawer';
+import { Web3ModalContext } from 'context/web3modal-context';
 import { sendBridgeWidgetCloseEvent } from '../../widgets/bridge/BridgeWidgetEvents';
 import { Shimmer } from './Shimmer';
 import {
@@ -47,6 +48,7 @@ export function Transactions({ onBackButtonClick }: TransactionsProps) {
 
   const { cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { bridgeDispatch, bridgeState: { checkout, from } } = useContext(BridgeContext);
+  const { web3Modal } = useContext(Web3ModalContext);
   const { page } = useAnalytics();
   const { t } = useTranslation();
   const { track } = useAnalytics();
@@ -122,7 +124,7 @@ export function Transactions({ onBackButtonClick }: TransactionsProps) {
       },
     });
     try {
-      const localProvider = await createAndConnectToProvider(checkout, walletProviderName, true);
+      const localProvider = await createAndConnectToProvider(checkout, walletProviderName, web3Modal!, true);
       const network = await localProvider.getNetwork();
       const address = await localProvider?.getSigner().getAddress() ?? '';
       setTxs([]);

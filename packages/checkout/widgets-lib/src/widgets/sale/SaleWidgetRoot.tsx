@@ -15,6 +15,7 @@ import { getL2ChainId } from 'lib';
 import { isValidAmount, isValidWalletProvider } from 'lib/validations/widgetValidators';
 import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
+import { Web3ModalContext } from 'context/web3modal-context';
 import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
 import { SaleWidget } from './SaleWidget';
 
@@ -104,23 +105,25 @@ export class Sale extends Base<WidgetType.SALE> {
       <React.StrictMode>
         <CustomAnalyticsProvider checkout={this.checkout}>
           <ThemeProvider id="sale-container" config={this.strongConfig()}>
-            <ConnectLoader
-              widgetConfig={this.strongConfig()}
-              params={connectLoaderParams}
-              closeEvent={() => {
-                sendSaleWidgetCloseEvent(window);
-              }}
-            >
-              <SaleWidget
-                config={this.strongConfig()}
-                amount={this.parameters.amount!}
-                items={this.parameters.items!}
-                fromTokenAddress={this.parameters.fromTokenAddress!}
-                environmentId={this.parameters.environmentId!}
-                collectionName={this.parameters.collectionName!}
-                language="en"
-              />
-            </ConnectLoader>
+            <Web3ModalContext.Provider value={{ web3Modal: this.web3Modal }}>
+              <ConnectLoader
+                widgetConfig={this.strongConfig()}
+                params={connectLoaderParams}
+                closeEvent={() => {
+                  sendSaleWidgetCloseEvent(window);
+                }}
+              >
+                <SaleWidget
+                  config={this.strongConfig()}
+                  amount={this.parameters.amount!}
+                  items={this.parameters.items!}
+                  fromTokenAddress={this.parameters.fromTokenAddress!}
+                  environmentId={this.parameters.environmentId!}
+                  collectionName={this.parameters.collectionName!}
+                  language="en"
+                />
+              </ConnectLoader>
+            </Web3ModalContext.Provider>
           </ThemeProvider>
         </CustomAnalyticsProvider>
       </React.StrictMode>,

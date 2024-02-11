@@ -18,6 +18,7 @@ import { ServiceType } from 'views/error/serviceTypes';
 import { isValidAddress, isValidAmount, isValidWalletProvider } from 'lib/validations/widgetValidators';
 import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
+import { Web3ModalContext } from 'context/web3modal-context';
 import { topUpBridgeOption, topUpOnRampOption } from './helpers';
 import { sendSwapWidgetCloseEvent } from './SwapWidgetEvents';
 import { SwapWidget } from './SwapWidget';
@@ -117,49 +118,51 @@ export class Swap extends Base<WidgetType.SWAP> {
           <React.StrictMode>
             <CustomAnalyticsProvider checkout={this.checkout}>
               <ThemeProvider id="swap-container" config={this.strongConfig()}>
-                {
-                isSwapAvailable
-                  ? (
-                    <ConnectLoader
-                      params={connectLoaderParams}
-                      widgetConfig={this.strongConfig()}
-                      closeEvent={() => sendSwapWidgetCloseEvent(window)}
-                    >
-                      <SwapWidget
-                        fromTokenAddress={this.parameters.fromTokenAddress}
-                        toTokenAddress={this.parameters.toTokenAddress}
-                        amount={this.parameters.amount}
-                        config={this.strongConfig()}
-                      />
-                    </ConnectLoader>
-                  )
-                  : (
-                    <ServiceUnavailableErrorView
-                      service={ServiceType.SWAP}
-                      onCloseClick={() => sendSwapWidgetCloseEvent(window)}
-                      primaryActionText={
-                        topUpOptions && topUpOptions?.length > 0
-                          ? t(topUpOptions[0].textKey)
-                          : undefined
-                      }
-                      onPrimaryButtonClick={
-                        topUpOptions && topUpOptions?.length > 0
-                          ? topUpOptions[0].action
-                          : undefined
-                      }
-                      secondaryActionText={
-                        topUpOptions?.length === 2
-                          ? t(topUpOptions[1].textKey)
-                          : undefined
-                      }
-                      onSecondaryButtonClick={
-                        topUpOptions?.length === 2
-                          ? topUpOptions[1].action
-                          : undefined
-                      }
-                    />
-                  )
-                }
+                <Web3ModalContext.Provider value={{ web3Modal: this.web3Modal }}>
+                  {
+                    isSwapAvailable
+                      ? (
+                        <ConnectLoader
+                          params={connectLoaderParams}
+                          widgetConfig={this.strongConfig()}
+                          closeEvent={() => sendSwapWidgetCloseEvent(window)}
+                        >
+                          <SwapWidget
+                            fromTokenAddress={this.parameters.fromTokenAddress}
+                            toTokenAddress={this.parameters.toTokenAddress}
+                            amount={this.parameters.amount}
+                            config={this.strongConfig()}
+                          />
+                        </ConnectLoader>
+                      )
+                      : (
+                        <ServiceUnavailableErrorView
+                          service={ServiceType.SWAP}
+                          onCloseClick={() => sendSwapWidgetCloseEvent(window)}
+                          primaryActionText={
+                            topUpOptions && topUpOptions?.length > 0
+                              ? t(topUpOptions[0].textKey)
+                              : undefined
+                          }
+                          onPrimaryButtonClick={
+                            topUpOptions && topUpOptions?.length > 0
+                              ? topUpOptions[0].action
+                              : undefined
+                          }
+                          secondaryActionText={
+                            topUpOptions?.length === 2
+                              ? t(topUpOptions[1].textKey)
+                              : undefined
+                          }
+                          onSecondaryButtonClick={
+                            topUpOptions?.length === 2
+                              ? topUpOptions[1].action
+                              : undefined
+                          }
+                        />
+                      )
+                  }
+                </Web3ModalContext.Provider>
               </ThemeProvider>
             </CustomAnalyticsProvider>
           </React.StrictMode>,

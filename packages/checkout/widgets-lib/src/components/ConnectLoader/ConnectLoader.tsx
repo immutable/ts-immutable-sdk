@@ -9,12 +9,14 @@ import {
 
 } from '@imtbl/checkout-sdk';
 import React, {
+  useContext,
   useEffect,
   useMemo,
   useReducer,
 } from 'react';
 import { ErrorView } from 'views/error/ErrorView';
 import { getWalletConnectProvider } from 'lib/walletconnect/web3modal';
+import { Web3ModalContext } from 'context/web3modal-context';
 import {
   ConnectLoaderActions,
   ConnectLoaderContext,
@@ -70,6 +72,8 @@ export function ConnectLoader({
     connectionStatus, deepLink, provider,
   } = connectLoaderState;
 
+  const { web3Modal } = useContext(Web3ModalContext);
+
   const networkToSwitchTo = targetLayer ?? ConnectTargetLayer.LAYER2;
 
   const { identify } = useAnalytics();
@@ -96,7 +100,7 @@ export function ConnectLoader({
         // TODO: test here what happens if walletconnect is passed through
         let createProviderResult: CreateProviderResult;
         if (walletProviderName === WalletProviderName.WALLET_CONNECT) {
-          createProviderResult = await getWalletConnectProvider(checkout);
+          createProviderResult = await getWalletConnectProvider(web3Modal!);
         } else {
           createProviderResult = await checkout.createProvider({ walletProviderName });
         }
