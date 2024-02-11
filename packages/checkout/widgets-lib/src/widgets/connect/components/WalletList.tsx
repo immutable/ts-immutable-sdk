@@ -15,6 +15,7 @@ import {
 } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import { getWalletConnectProvider } from 'lib/walletconnect/web3modal';
+import { Web3ModalContext } from 'context/web3modal-context';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import {
   ConnectContext,
@@ -47,6 +48,7 @@ export function WalletList(props: WalletListProps) {
     connectState: { checkout, passport },
   } = useContext(ConnectContext);
   const { viewDispatch } = useContext(ViewContext);
+  const { web3Modal } = useContext(Web3ModalContext);
   const [wallets, setWallets] = useState<WalletInfo[]>([]);
   const { track } = useAnalytics();
 
@@ -87,7 +89,7 @@ export function WalletList(props: WalletListProps) {
         let createResult: CreateProviderResult;
         if (walletProviderName === WalletProviderName.WALLET_CONNECT) {
           console.log('calling getWalletConnectProvider');
-          createResult = await getWalletConnectProvider(checkout);
+          createResult = await getWalletConnectProvider(web3Modal!);
           console.log('createResult is', createResult);
         } else {
           createResult = await checkout.createProvider({ walletProviderName });

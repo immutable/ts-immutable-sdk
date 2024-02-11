@@ -13,6 +13,7 @@ import {
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import i18next from 'i18next';
+import { Web3Modal } from 'context/web3modal-context/web3ModalTypes';
 import { StrongCheckoutWidgetsConfig, withDefaultWidgetConfigs } from '../lib/withDefaultWidgetConfig';
 import { addProviderListenersForWidgetRoot, baseWidgetProviderEvent } from '../lib';
 
@@ -37,7 +38,13 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
 
   protected eventTopic: string = '';
 
-  constructor(sdk: Checkout, props: WidgetProperties<T>) {
+  protected web3Modal: Web3Modal;
+
+  constructor(
+    sdk: Checkout,
+    props: WidgetProperties<T>,
+    web3Modal: Web3Modal,
+  ) {
     const validatedProps = this.getValidatedProperties(props);
     this.parameters = {};
 
@@ -48,6 +55,7 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
       addProviderListenersForWidgetRoot(this.web3Provider);
     }
     this.setupProviderUpdatedListener();
+    this.web3Modal = web3Modal;
   }
 
   unmount() {

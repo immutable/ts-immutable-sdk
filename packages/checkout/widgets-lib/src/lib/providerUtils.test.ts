@@ -51,13 +51,15 @@ describe('providerUtils', () => {
   });
 
   describe('createAndConnectToProvider', () => {
+    const mockWeb3Modal = {} as any;
     it('should return provider', () => {
       const mockCheckout = {
         createProvider: jest.fn().mockResolvedValue({ provider: mockPassportWeb3Provider }),
         checkIsWalletConnected: jest.fn().mockResolvedValue({ isConnected: true }),
         connect: jest.fn().mockResolvedValue({ provider: mockPassportWeb3Provider }),
       } as unknown as Checkout;
-      const result = createAndConnectToProvider(mockCheckout, WalletProviderName.PASSPORT);
+
+      const result = createAndConnectToProvider(mockCheckout, WalletProviderName.PASSPORT, mockWeb3Modal);
       expect(result).resolves.toBe(mockPassportWeb3Provider);
     });
 
@@ -65,7 +67,7 @@ describe('providerUtils', () => {
       const mockCheckout = {
         createProvider: jest.fn().mockRejectedValue(new Error('Failed to create provider')),
       } as unknown as Checkout;
-      const result = createAndConnectToProvider(mockCheckout, WalletProviderName.PASSPORT);
+      const result = createAndConnectToProvider(mockCheckout, WalletProviderName.PASSPORT, mockWeb3Modal);
       expect(result).rejects.toThrowError('Failed to create provider');
     });
 
@@ -74,7 +76,7 @@ describe('providerUtils', () => {
         createProvider: jest.fn().mockResolvedValue({ provider: mockPassportWeb3Provider }),
         checkIsWalletConnected: jest.fn().mockRejectedValue(new Error('Failed to checkIsWalletConnected')),
       } as unknown as Checkout;
-      const result = createAndConnectToProvider(mockCheckout, WalletProviderName.PASSPORT);
+      const result = createAndConnectToProvider(mockCheckout, WalletProviderName.PASSPORT, mockWeb3Modal);
       expect(result).rejects.toThrowError('Failed to checkIsWalletConnected');
     });
 
@@ -84,7 +86,7 @@ describe('providerUtils', () => {
         checkIsWalletConnected: jest.fn().mockResolvedValue({ isConnected: false }),
         connect: jest.fn().mockRejectedValue(new Error('Failed to connect')),
       } as unknown as Checkout;
-      const result = createAndConnectToProvider(mockCheckout, WalletProviderName.PASSPORT);
+      const result = createAndConnectToProvider(mockCheckout, WalletProviderName.PASSPORT, mockWeb3Modal);
       expect(result).rejects.toThrowError('Failed to connect');
     });
   });

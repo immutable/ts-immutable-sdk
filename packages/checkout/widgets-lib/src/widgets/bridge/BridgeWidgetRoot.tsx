@@ -12,6 +12,7 @@ import { isValidWalletProvider, isValidAmount, isValidAddress } from 'lib/valida
 import { BridgeWidget } from 'widgets/bridge/BridgeWidget';
 import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
+import { Web3ModalContext } from 'context/web3modal-context';
 
 export class Bridge extends Base<WidgetType.BRIDGE> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT;
@@ -61,14 +62,16 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
       <React.StrictMode>
         <CustomAnalyticsProvider checkout={this.checkout}>
           <ThemeProvider id="bridge-container" config={this.strongConfig()}>
-            <BridgeWidget
-              checkout={this.checkout}
-              config={this.strongConfig()}
-              web3Provider={this.web3Provider}
-              tokenAddress={this.parameters.tokenAddress}
-              amount={this.parameters.amount}
-              walletProviderName={this.parameters.walletProviderName}
-            />
+            <Web3ModalContext.Provider value={{ web3Modal: this.web3Modal }}>
+              <BridgeWidget
+                checkout={this.checkout}
+                config={this.strongConfig()}
+                web3Provider={this.web3Provider}
+                tokenAddress={this.parameters.tokenAddress}
+                amount={this.parameters.amount}
+                walletProviderName={this.parameters.walletProviderName}
+              />
+            </Web3ModalContext.Provider>
           </ThemeProvider>
         </CustomAnalyticsProvider>
       </React.StrictMode>,

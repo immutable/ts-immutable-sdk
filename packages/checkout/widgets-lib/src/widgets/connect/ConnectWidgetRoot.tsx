@@ -4,6 +4,7 @@ import {
 } from '@imtbl/checkout-sdk';
 import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
+import { Web3ModalContext } from 'context/web3modal-context';
 import { ConnectWidget } from './ConnectWidget';
 import { Base } from '../BaseWidgetRoot';
 
@@ -29,10 +30,12 @@ export class Connect extends Base<WidgetType.CONNECT> {
       <React.StrictMode>
         <CustomAnalyticsProvider checkout={this.checkout}>
           <ThemeProvider id="connect-container" config={this.strongConfig()}>
-            <ConnectWidget
-              config={this.strongConfig()}
-              checkout={this.checkout}
-            />
+            <Web3ModalContext.Provider value={{ web3Modal: this.web3Modal }}>
+              <ConnectWidget
+                config={this.strongConfig()}
+                checkout={this.checkout}
+              />
+            </Web3ModalContext.Provider>
           </ThemeProvider>
         </CustomAnalyticsProvider>
       </React.StrictMode>,

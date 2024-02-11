@@ -31,7 +31,10 @@ export function WalletDrawer({
   const { heading, defaultText } = drawerText;
 
   const handleWalletItemClick = async (name: WalletProviderName) => {
-    setWalletItemLoading(true);
+    if (name !== WalletProviderName.WALLET_CONNECT) {
+      setWalletItemLoading(true);
+    }
+
     try {
       await onWalletItemClick(name);
     } catch (err) {
@@ -53,7 +56,7 @@ export function WalletDrawer({
       visible={showDrawer}
     >
       {showWalletSelectorTarget
-          && (
+        && (
           <Drawer.Target>
             <FormControlWrapper
               testId={`${testId}-wallet-form-control`}
@@ -67,7 +70,7 @@ export function WalletDrawer({
               />
             </FormControlWrapper>
           </Drawer.Target>
-          )}
+        )}
       <Drawer.Content sx={walletItemListStyles}>
         {walletOptions.map((walletProviderName) => (
           <WalletItem

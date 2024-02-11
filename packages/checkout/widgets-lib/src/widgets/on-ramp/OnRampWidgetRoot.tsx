@@ -14,6 +14,7 @@ import { getL1ChainId, getL2ChainId } from 'lib';
 import { isValidAddress, isValidAmount } from 'lib/validations/widgetValidators';
 import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
+import { Web3ModalContext } from 'context/web3modal-context';
 import { OnRampWidget } from './OnRampWidget';
 import { sendOnRampWidgetCloseEvent } from './OnRampWidgetEvents';
 
@@ -69,17 +70,19 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
       <React.StrictMode>
         <CustomAnalyticsProvider checkout={this.checkout}>
           <ThemeProvider id="onramp-container" config={this.strongConfig()}>
-            <ConnectLoader
-              widgetConfig={this.strongConfig()}
-              params={connectLoaderParams}
-              closeEvent={() => sendOnRampWidgetCloseEvent(window)}
-            >
-              <OnRampWidget
-                tokenAddress={this.parameters.tokenAddress}
-                amount={this.parameters.amount}
-                config={this.strongConfig()}
-              />
-            </ConnectLoader>
+            <Web3ModalContext.Provider value={{ web3Modal: this.web3Modal }}>
+              <ConnectLoader
+                widgetConfig={this.strongConfig()}
+                params={connectLoaderParams}
+                closeEvent={() => sendOnRampWidgetCloseEvent(window)}
+              >
+                <OnRampWidget
+                  tokenAddress={this.parameters.tokenAddress}
+                  amount={this.parameters.amount}
+                  config={this.strongConfig()}
+                />
+              </ConnectLoader>
+            </Web3ModalContext.Provider>
           </ThemeProvider>
         </CustomAnalyticsProvider>
       </React.StrictMode>,

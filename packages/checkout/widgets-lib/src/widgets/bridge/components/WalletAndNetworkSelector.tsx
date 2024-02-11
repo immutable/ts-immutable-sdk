@@ -22,6 +22,7 @@ import { ViewActions, ViewContext } from 'context/view-context/ViewContext';
 import { abbreviateAddress } from 'lib/addressUtils';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { useTranslation } from 'react-i18next';
+import { Web3ModalContext } from 'context/web3modal-context';
 import {
   bridgeHeadingStyles,
   brigdeWalletWrapperStyles,
@@ -44,6 +45,7 @@ export function WalletAndNetworkSelector() {
     }, bridgeDispatch,
   } = useContext(BridgeContext);
   const { viewDispatch } = useContext(ViewContext);
+  const { web3Modal } = useContext(Web3ModalContext);
 
   const { track } = useAnalytics();
 
@@ -176,9 +178,12 @@ export function WalletAndNetworkSelector() {
   const createProviderAndConnect = useCallback(async (
     walletProviderName: WalletProviderName,
   ): Promise<Web3Provider | undefined> => {
+    if (!web3Modal) {
+      return undefined;
+    }
     let web3Provider: Web3Provider;
     try {
-      web3Provider = await createAndConnectToProvider(checkout, walletProviderName);
+      web3Provider = await createAndConnectToProvider(checkout, walletProviderName, web3Modal!);
       if (walletProviderName === WalletProviderName.PASSPORT) {
         passportCache.current = web3Provider;
       }
@@ -232,7 +237,7 @@ export function WalletAndNetworkSelector() {
 
     setFromWalletDrawerOpen(false);
     setTimeout(() => setFromNetworkDrawerOpen(true), 500);
-  }, [fromWalletProviderName, passportCache.current]);
+  }, [fromWalletProviderName, passportCache.current, web3Modal]);
 
   const handleFromNetworkSelection = useCallback(
     async (chainId: ChainId) => {
@@ -306,6 +311,7 @@ export function WalletAndNetworkSelector() {
     fromNetwork,
     fromWalletWeb3Provider,
     passportCache.current,
+    web3Modal,
   ]);
 
   const handleSubmitDetails = useCallback(
