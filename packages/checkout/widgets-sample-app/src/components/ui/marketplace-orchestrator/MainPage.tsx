@@ -15,7 +15,7 @@ import {
   SwapEventType,
   WalletEventType,
   WalletNetworkSwitch,
-  WidgetTheme, WidgetType, ProviderEventType, ProviderUpdated, WidgetConfiguration, WidgetProperties
+  WidgetTheme, WidgetType, ProviderEventType, ProviderUpdated, WidgetConfiguration, WidgetProperties, SaleWidgetConfiguration, SalePaymentTypes
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { passport } from './passport';
@@ -26,6 +26,15 @@ const checkout = new Checkout({
   baseConfig: {
     environment: Environment.SANDBOX,
     publishableKey: 'pk_imapik-test-pCHFU0GpQImZx9UzSnU3',
+  },
+  sale: {
+    // id: 'sale-id',
+    // currency: 'USD',
+    fiatPayment: {
+      enable: false,
+      // supportedCurrencies: ['USD'],
+    },
+    
   },
   passport,
 })
@@ -38,6 +47,12 @@ export const MainPage = () => {
   const bridgeWidget = useMemo(() => widgetsFactory.create(WidgetType.BRIDGE), [widgetsFactory]);
   const swapWidget = useMemo(() => widgetsFactory.create(WidgetType.SWAP), [widgetsFactory]);
   const onRampWidget = useMemo(() => widgetsFactory.create(WidgetType.ONRAMP), [widgetsFactory]);
+  const saleWidget = useMemo(() => widgetsFactory.create(WidgetType.SALE, {
+    config: {
+      disabledPaymentTypes: [SalePaymentTypes.FIAT]
+    }
+  } 
+  ), [widgetsFactory]);
 
   connectWidget.addListener(ConnectEventType.CLOSE_WIDGET, () => { connectWidget.unmount() });
   walletWidget.addListener(WalletEventType.CLOSE_WIDGET, () => { walletWidget.unmount() });

@@ -3,7 +3,7 @@ import {
 } from 'react';
 
 import {
-  BlockExplorerService, ChainId, IMTBLWidgetEvents, SaleWidgetParams,
+  BlockExplorerService, ChainId, IMTBLWidgetEvents, SaleWidgetParams, WidgetConfigurations, WidgetType,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { useTranslation } from 'react-i18next';
@@ -34,6 +34,7 @@ import { EventTargetContext } from '../../context/event-target-context/EventTarg
 
 export interface SaleWidgetProps extends Required<Omit<SaleWidgetParams, 'walletProviderName'>> {
   config: StrongCheckoutWidgetsConfig;
+  widgetConfig: WidgetConfigurations[WidgetType.SALE];
 }
 
 export function SaleWidget(props: SaleWidgetProps) {
@@ -45,6 +46,7 @@ export function SaleWidget(props: SaleWidgetProps) {
     environmentId,
     fromTokenAddress,
     collectionName,
+    widgetConfig,
   } = props;
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
@@ -109,6 +111,7 @@ export function SaleWidget(props: SaleWidgetProps) {
           checkout,
           passport: checkout?.passport,
           collectionName,
+          disabledPaymentTypes: widgetConfig.disabledPaymentTypes,
         }}
       >
         <CryptoFiatProvider environment={config.environment}>

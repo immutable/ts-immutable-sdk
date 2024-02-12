@@ -49,6 +49,7 @@ type SaleContextProps = {
   provider: ConnectLoaderState['provider'];
   checkout: ConnectLoaderState['checkout'];
   passport?: Passport;
+  disabledPaymentTypes?: SalePaymentTypes[];
 };
 
 type SaleContextValues = SaleContextProps & {
@@ -77,7 +78,6 @@ type SaleContextValues = SaleContextProps & {
   ) => Promise<SmartCheckoutResult | undefined>;
   smartCheckoutResult: SmartCheckoutResult | undefined;
   fundingRoutes: FundingRoute[];
-  disabledPaymentTypes: SalePaymentTypes[]
   invalidParameters: boolean;
 };
 
@@ -153,9 +153,15 @@ export function SaleContextProvider(props: {
   );
 
   const [fundingRoutes, setFundingRoutes] = useState<FundingRoute[]>([]);
-  const [disabledPaymentTypes, setDisabledPaymentTypes] = useState<SalePaymentTypes[]>([]);
+  const [disabledPaymentTypes, setDisabledPaymentTypes] = useState<SalePaymentTypes[]>(
+    props?.value.disabledPaymentTypes || [],
+  );
 
   const [invalidParameters, setInvalidParameters] = useState<boolean>(false);
+
+  const disablePaymentType = (type: SalePaymentTypes) => {
+    setDisabledPaymentTypes((prev) => [...prev, type]);
+  };
 
   const goBackToPaymentMethods = useCallback(
     (type?: SalePaymentTypes | undefined, showInsufficientCoinsBanner?: boolean) => {
@@ -278,7 +284,7 @@ export function SaleContextProvider(props: {
   useEffect(() => {
     if (!smartCheckoutError) return;
     if ((smartCheckoutError.data?.error as Error)?.message === SmartCheckoutErrorTypes.FRACTIONAL_BALANCE_BLOCKED) {
-      setDisabledPaymentTypes([SalePaymentTypes.CRYPTO]);
+      disablePaymentType(SalePaymentTypes.CRYPTO);
       goBackToPaymentMethods(undefined, true);
       return;
     }
@@ -331,7 +337,7 @@ export function SaleContextProvider(props: {
         default:
           setFundingRoutes([]);
           setPaymentMethod(undefined);
-          setDisabledPaymentTypes([SalePaymentTypes.CRYPTO]);
+          disablePaymentType(SalePaymentTypes.CRYPTO);
           goBackToPaymentMethods(undefined, true);
           break;
       }
@@ -347,6 +353,8 @@ export function SaleContextProvider(props: {
       setInvalidParameters(true);
     }
   }, [items, amount, fromTokenAddress, collectionName, environmentId]);
+
+
 
   const values = useMemo(
     () => ({

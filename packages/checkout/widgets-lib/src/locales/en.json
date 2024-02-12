@@ -272,11 +272,13 @@
         "fiat": {
           "heading": "Card",
           "caption": "GooglePay also available with Transak",
-          "disabledCaption": null
+          "disabledCaption": "Not currently available"
         }
       },
       "insufficientCoinsBanner": {
-        "caption": "Insufficient coin balance. Pay with card to proceed, or",
+        "caption": "Insufficient coin balance. ",
+        "captionWithCard": "Pay with card to proceed, or", 
+        "captionWithoutCard": "To proceed please ", 
         "captionEnd": "and try again.",
         "captionCTA": "add coins"
       },

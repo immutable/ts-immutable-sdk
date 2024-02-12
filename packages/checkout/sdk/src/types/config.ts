@@ -41,6 +41,9 @@ export interface CheckoutModuleConfiguration extends ModuleConfiguration<Checkou
   onRamp?: CheckoutOnRampConfiguration;
   swap?: CheckoutSwapConfiguration;
   bridge?: CheckoutBridgeConfiguration;
+  sale?: {
+    fiatPayment?: CheckoutFeatureConfiguration;
+  };
   passport?: Passport;
   publishableKey?: string;
 }

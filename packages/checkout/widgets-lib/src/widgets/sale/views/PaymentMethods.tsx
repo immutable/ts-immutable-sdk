@@ -30,6 +30,7 @@ export function PaymentMethods() {
     setPaymentMethod,
     disabledPaymentTypes,
     invalidParameters,
+    config,
   } = useSaleContext();
   const { sendPageView, sendCloseEvent, sendSelectedPaymentMethod } = useSaleEvent();
 
@@ -93,11 +94,12 @@ export function PaymentMethods() {
         <Banner.Icon icon="InformationCircle" />
         <Banner.Caption>
           {t('views.PAYMENT_METHODS.insufficientCoinsBanner.caption')}
+          {config.isFiatPaymentEnabled
+            ? t('views.PAYMENT_METHODS.insufficientCoinsBanner.captionWithCard')
+            : t('views.PAYMENT_METHODS.insufficientCoinsBanner.captionWithoutCard')}
           <Link
             sx={{ mx: 'base.spacing.x1' }}
-            onClick={
-              () => onClickInsufficientCoinsBanner()
-            }
+            onClick={() => onClickInsufficientCoinsBanner()}
           >
             {t('views.PAYMENT_METHODS.insufficientCoinsBanner.captionCTA')}
           </Link>

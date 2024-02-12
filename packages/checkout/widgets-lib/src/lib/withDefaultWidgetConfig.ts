@@ -5,6 +5,7 @@ import {
   DEFAULT_ENV,
   DEFAULT_ON_RAMP_ENABLED,
   DEFAULT_SWAP_ENABLED,
+  DEFAULT_FIAT_PAYMENT_ENABLED,
   DEFAULT_THEME,
 } from './constants';
 
@@ -14,6 +15,7 @@ export type StrongCheckoutWidgetsConfig = {
   isOnRampEnabled: boolean;
   isSwapEnabled: boolean;
   isBridgeEnabled: boolean;
+  isFiatPaymentEnabled: boolean;
 };
 
 function getValidTheme(theme?: string): WidgetTheme {
@@ -51,5 +53,9 @@ export const withDefaultWidgetConfigs = (
   isBridgeEnabled: getValidBoolean(
     DEFAULT_BRIDGE_ENABLED,
     configs?.isBridgeEnabled?.toString(),
+  ),
+  isFiatPaymentEnabled: getValidBoolean(
+    DEFAULT_FIAT_PAYMENT_ENABLED,
+    configs?.isFiatPaymentEnabled?.toString(),
   ),
 });
