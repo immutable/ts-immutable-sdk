@@ -28,8 +28,8 @@ export function loadUnresolved(
 
   tag.setAttribute('id', scriptId);
   tag.setAttribute('data-version', validVersion);
-  tag.setAttribute('src', cdnUrl);
   tag.setAttribute('type', 'module');
+  tag.setAttribute('src', cdnUrl);
 
   document.head.appendChild(tag);
 
