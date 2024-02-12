@@ -8,7 +8,7 @@
   "dependencies": {
     "@0xsequence/abi": "^1.4.3",
     "@0xsequence/core": "^1.4.3",
-    "@biom3/design-tokens": "^0.3.0",
+    "@biom3/design-tokens": "^0.3.1",
     "@biom3/react": "^0.20.0",
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/abstract-signer": "^5.7.0",
@@ -124,7 +124,7 @@
   },
   "repository": "immutable/ts-immutable-sdk.git",
   "resolutions": {
-    "@biom3/design-tokens": "^0.3.0",
+    "@biom3/design-tokens": "^0.3.1",
     "@openzeppelin/contracts": "3.4.2-solc-0.7"
   },
   "scripts": {

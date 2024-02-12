@@ -2,7 +2,7 @@
   "name": "@imtbl/passport-sdk-sample-app",
   "version": "0.1.0",
   "dependencies": {
-    "@biom3/design-tokens": "^0.3.0",
+    "@biom3/design-tokens": "^0.3.1",
     "@biom3/react": "^0.20.0",
     "@imtbl/config": "0.0.0",
     "@imtbl/core-sdk": "^2.4.0",

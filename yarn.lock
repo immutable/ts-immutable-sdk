@@ -2160,7 +2160,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/design-tokens@npm:^0.3.0, @biom3/design-tokens@npm:~0.3.0":
+"@biom3/design-tokens@npm:^0.3.1":
+  version: 0.3.1
+  resolution: "@biom3/design-tokens@npm:0.3.1"
+  dependencies:
+    lodash.get: ^4.4.2
+  checksum: c69c7905c790e487f8179ba2b3c189da39f2585c97f03fa517b4319d12783e5c9e7be9ef9155a6a3b7258dc6ab7f3f31e360b7523754dde83ac810d83b047764
+  languageName: node
+  linkType: hard
+
+"@biom3/design-tokens@npm:~0.3.0":
   version: 0.3.0
   resolution: "@biom3/design-tokens@npm:0.3.0"
   dependencies:
@@ -3383,7 +3392,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-widgets-sample-app@workspace:packages/checkout/widgets-sample-app"
   dependencies:
-    "@biom3/design-tokens": ^0.3.0
+    "@biom3/design-tokens": ^0.3.1
     "@biom3/react": ^0.20.0
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
@@ -3412,7 +3421,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-widgets@workspace:packages/checkout/widgets-lib"
   dependencies:
-    "@biom3/design-tokens": ^0.3.0
+    "@biom3/design-tokens": ^0.3.1
     "@biom3/react": ^0.20.0
     "@ethersproject/providers": ^5.7.2
     "@imtbl/bridge-sdk": 0.0.0
@@ -3680,7 +3689,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/passport-sdk-sample-app@workspace:packages/passport/sdk-sample-app"
   dependencies:
-    "@biom3/design-tokens": ^0.3.0
+    "@biom3/design-tokens": ^0.3.1
     "@biom3/react": ^0.20.0
     "@imtbl/config": 0.0.0
     "@imtbl/core-sdk": ^2.4.0
@@ -3769,7 +3778,7 @@ __metadata:
   dependencies:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
-    "@biom3/design-tokens": ^0.3.0
+    "@biom3/design-tokens": ^0.3.1
     "@biom3/react": ^0.20.0
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
