@@ -104,7 +104,7 @@ export function TransactionItemWithdrawPending({
               <Body
                 testId={`transaction-item-${transaction.blockchain_metadata.transaction_hash}-action-message`}
                 size="xSmall"
-                sx={{ color: 'base.color.text.secondary' }}
+                sx={{ color: 'base.color.text.body.secondary' }}
               >
                 {actionMessage}
               </Body>

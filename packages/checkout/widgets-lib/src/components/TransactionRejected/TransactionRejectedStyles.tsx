@@ -7,7 +7,7 @@ export const transactionRejectedContainerStyles = {
 };
 
 export const contentTextStyles = {
-  color: 'base.color.text.secondary',
+  color: 'base.color.text.body.secondary',
   fontFamily: 'base.font.family.heading.secondary',
   textAlign: 'center',
   marginTop: '15px',
