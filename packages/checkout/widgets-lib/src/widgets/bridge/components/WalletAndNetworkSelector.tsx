@@ -454,7 +454,7 @@ export function WalletAndNetworkSelector() {
         }}
         visible={fromNetworkDrawerOpen}
       >
-        <Drawer.Content>
+        <Drawer.Content sx={{ paddingX: 'base.spacing.x4' }}>
           <NetworkItem
             key={imtblZkEvmNetworkName}
             testId={testId}
@@ -472,7 +472,6 @@ export function WalletAndNetworkSelector() {
               chainId={l1NetworkChainId}
             />
           )}
-
         </Drawer.Content>
       </Drawer>
 
