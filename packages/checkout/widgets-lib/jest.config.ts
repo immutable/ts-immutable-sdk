@@ -17,10 +17,9 @@ const config: Config = {
   testEnvironment: 'jsdom',
   transform: {
     '^.+\\.(t|j)sx?$': '@swc/jest',
-    '^.+\\.mjs?$': '@swc/jest',
   },
   transformIgnorePatterns: [
-    "node_modules/(?!axios|@biom3/design-tokens)",
+    "node_modules/(?!axios)"
   ],
 };
 

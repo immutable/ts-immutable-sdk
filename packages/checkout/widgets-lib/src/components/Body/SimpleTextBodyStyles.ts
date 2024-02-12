@@ -8,5 +8,5 @@ export const bodyBoxStyle = {
 };
 
 export const bodyStyle = {
-  color: 'base.color.text.body.secondary',
+  color: 'base.color.text.secondary',
 };
