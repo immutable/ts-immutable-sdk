@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "dependencies": {
     "@biom3/design-tokens": "^0.3.1",
-    "@biom3/react": "^0.20.0",
+    "@biom3/react": "^0.20.2",
     "@imtbl/config": "0.0.0",
     "@imtbl/core-sdk": "^2.4.0",
     "@imtbl/passport": "0.0.0",
@@ -33,9 +33,9 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "update-sdk-version": "scripts/updateSdkVersion.sh ../../internal/generated-clients/src/config/config.ts",
     "export": "next export",
     "lint": "eslint ./src --ext .ts --max-warnings=0",
-    "start": "next start"
+    "start": "next start",
+    "update-sdk-version": "scripts/updateSdkVersion.sh ../../internal/generated-clients/src/config/config.ts"
   }
 }
