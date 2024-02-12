@@ -21,9 +21,9 @@ export const noTransactionsContainerStyle = {
 
 export const noTransactionsBodyStyle = {
   mb: 'base.spacing.x8',
-  color: 'base.color.text.secondary',
+  color: 'base.color.text.body.secondary',
 };
 
 export const passportBodyStyle = {
-  color: 'base.color.text.secondary',
+  color: 'base.color.text.body.secondary',
 };
