@@ -23,12 +23,13 @@ export function loadUnresolved(
 
   const tag = document.createElement('script');
 
-  let cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${validVersion}/dist/browser/checkout/widgets.js`;
+  let cdnUrl = 'https://cdn.jsdelivr.net/npm/@imtbl/sdk@1.5.3-alpha.1/dist/browser/checkout/widgets.js';
   if (useLocalBundle()) cdnUrl = `http://${window.location.host}/lib/js/widgets.js`;
 
   tag.setAttribute('id', scriptId);
   tag.setAttribute('data-version', validVersion);
   tag.setAttribute('src', cdnUrl);
+  tag.setAttribute('type', 'module');
 
   document.head.appendChild(tag);
 
