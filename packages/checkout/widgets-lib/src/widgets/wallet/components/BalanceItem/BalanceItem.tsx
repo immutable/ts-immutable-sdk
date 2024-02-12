@@ -84,7 +84,10 @@ export function BalanceItem({
 
   return (
     <MenuItem testId={`balance-item-${balanceInfo.symbol}`} emphasized>
-      <MenuItem.FramedIcon icon="Coins" circularFrame />
+      <MenuItem.FramedImage
+        imageUrl={balanceInfo.icon}
+        circularFrame
+      />
       <MenuItem.Label>{balanceInfo.symbol}</MenuItem.Label>
       <MenuItem.Caption>{balanceInfo.description}</MenuItem.Caption>
       <MenuItem.PriceDisplay

@@ -9,7 +9,12 @@ import {
 import { errorBoundary } from './utils/errorBoundary';
 import { post } from './utils/request';
 import { isTestEnvironment } from './utils/checkEnv';
-import { POLLING_FREQUENCY } from './utils/constants';
+import {
+  getGlobalisedCachedFunction,
+  getGlobalisedValue,
+} from './utils/globalise';
+
+export const POLLING_FREQUENCY = 5000;
 
 // Store the event in the event store
 const trackFn = (
@@ -24,7 +29,9 @@ const trackFn = (
   };
   addEvent(event);
 };
-export const track = errorBoundary(trackFn);
+export const track = errorBoundary(
+  getGlobalisedCachedFunction('track', trackFn),
+);
 
 // Sending events to the server
 const flushFn = async () => {
@@ -60,14 +67,24 @@ const flushFn = async () => {
   // Clear events if successfully posted
   removeSentEvents(numEvents);
 };
-export const flush = errorBoundary(flushFn);
+const flush = errorBoundary(flushFn);
 
 // Flush events every 5 seconds
 const flushPoll = async () => {
   await flush();
   setTimeout(flushPoll, POLLING_FREQUENCY);
 };
+
+let flushingStarted = false;
+const startFlushing = () => {
+  if (flushingStarted) {
+    return;
+  }
+  flushingStarted = true;
+  flushPoll();
+};
+
 // This will get initialised when module is imported.
 if (!isTestEnvironment()) {
-  errorBoundary(flushPoll)();
+  errorBoundary(getGlobalisedValue('startFlushing', startFlushing))();
 }

@@ -32,3 +32,16 @@ export function getChainIdBySlug(chainSlug: ChainSlug): ChainId {
     default: return 0 as ChainId;
   }
 }
+
+export function getNativeSymbolByChainSlug(chainSlug: ChainSlug): string {
+  switch (chainSlug) {
+    case ChainSlug.ETHEREUM:
+    case ChainSlug.SEPOLIA:
+      return 'ETH';
+    case ChainSlug.IMTBL_ZKEVM_TESTNET:
+    case ChainSlug.IMTBL_ZKEVM_MAINNET:
+    case ChainSlug.IMTBL_ZKEVM_DEVNET:
+      return 'IMX';
+    default: return '';
+  }
+}

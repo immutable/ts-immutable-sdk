@@ -6,8 +6,10 @@ import {
   GetTokenAllowListResult,
   TokenFilterTypes,
 } from '@imtbl/checkout-sdk';
+import { Environment } from '@imtbl/config';
 import { RetryType, retry } from './retry';
 import { DEFAULT_BALANCE_RETRY_POLICY, NATIVE } from './constants';
+import { getTokenImageByAddress, isNativeToken } from './utils';
 
 export type GetAllowedBalancesParamsType = {
   checkout: Checkout,
@@ -62,12 +64,33 @@ export const getAllowedBalances = async ({
   const tokensAddresses = new Map();
   allowList.tokens.forEach((token) => tokensAddresses.set(token.address?.toLowerCase() || NATIVE, true));
 
-  const allowedBalances = tokenBalances.balances.filter((balance) => {
-    // Balance is <= 0 and it is not allow to have zeros
-    if (balance.balance.lte(0) && !allowZero) return false;
+  const allowedBalances = tokenBalances.balances
+    .filter((balance) => {
+      // Balance is <= 0 and it is not allow to have zeros
+      if (balance.balance.lte(0) && !allowZero) return false;
+      return tokensAddresses.get(balance.token.address?.toLowerCase() || NATIVE);
+    })
+    .map((balanceResult) => ({
+      ...balanceResult,
+      token: {
+        ...balanceResult.token,
+        icon: getTokenImageByAddress(
+          checkout.config.environment as Environment,
+          isNativeToken(balanceResult.token.address)
+            ? balanceResult.token.symbol
+            : balanceResult.token.address ?? '',
+        ),
+      },
+    })) ?? [];
 
-    return tokensAddresses.get(balance.token.address?.toLowerCase() || NATIVE);
-  }) ?? [];
+  // Map token icon assets to allowlist
+  allowList.tokens = allowList.tokens.map((token) => ({
+    ...token,
+    icon: getTokenImageByAddress(
+      checkout.config.environment as Environment,
+      isNativeToken(token.address) ? token.symbol : token.address ?? '',
+    ),
+  }));
 
   return { allowList, allowedBalances };
 };
