@@ -2,6 +2,7 @@ import { ConfirmationScreen } from 'confirmation';
 import * as guardian from '@imtbl/guardian';
 import { TransactionRequest } from '@ethersproject/providers';
 import { ImmutableConfiguration } from '@imtbl/config';
+import AuthManager from 'authManager';
 import GuardianClient from './guardian';
 import { mockUser, mockUserImx, mockUserZkEvm } from '../test/mocks';
 import { JsonRpcError, RpcErrorCode } from '../zkEvm/JsonRpcError';
@@ -38,15 +39,29 @@ describe('Guardian', () => {
         logoutRedirectUri: 'http://localhost:3000/logout',
         redirectUri: 'http://localhost:3000/redirect',
       }),
+      authManager: { getUser: jest.fn().mockResolvedValue(mockUserImx) } as unknown as AuthManager,
     });
   });
 
   describe('evaluateImxTransaction', () => {
+    beforeAll(() => {
+      guardianClient = new GuardianClient({
+        confirmationScreen: mockConfirmationScreen,
+        config: new PassportConfiguration({
+          baseConfig: {} as ImmutableConfiguration,
+          clientId: 'client123',
+          logoutRedirectUri: 'http://localhost:3000/logout',
+          redirectUri: 'http://localhost:3000/redirect',
+        }),
+        authManager: { getUser: jest.fn().mockResolvedValue(mockUserImx) } as unknown as AuthManager,
+      });
+    });
+    afterEach(jest.clearAllMocks);
     it('should retry getting transaction details and throw an error when transaction does not exist', async () => {
       mockGetTransactionByID.mockResolvedValue({ data: { id: '1234' } });
       mockEvaluateTransaction.mockResolvedValue({ data: { confirmationRequired: false } });
 
-      await guardianClient.evaluateImxTransaction({ payloadHash: 'hash', user: mockUserImx });
+      await guardianClient.evaluateImxTransaction({ payloadHash: 'hash' });
 
       expect(mockConfirmationScreen.requestConfirmation).toBeCalledTimes(0);
       expect(mockEvaluateTransaction).toBeCalledWith({
@@ -61,7 +76,7 @@ describe('Guardian', () => {
       mockGetTransactionByID.mockResolvedValue({ data: { id: '1234' } });
       mockEvaluateTransaction.mockResolvedValue({ data: { confirmationRequired: false } });
 
-      await guardianClient.evaluateImxTransaction({ payloadHash: 'hash', user: mockUserImx });
+      await guardianClient.evaluateImxTransaction({ payloadHash: 'hash' });
 
       expect(mockConfirmationScreen.requestConfirmation).toBeCalledTimes(0);
     });
@@ -72,7 +87,7 @@ describe('Guardian', () => {
         .mockResolvedValueOnce({ data: { confirmationRequired: true } });
       (mockConfirmationScreen.requestConfirmation as jest.Mock).mockResolvedValueOnce({ confirmed: true });
 
-      await guardianClient.evaluateImxTransaction({ payloadHash: 'hash', user: mockUserImx });
+      await guardianClient.evaluateImxTransaction({ payloadHash: 'hash' });
 
       expect(mockConfirmationScreen.requestConfirmation).toHaveBeenCalledWith('hash', mockUserImx.imx.ethAddress, 'starkex');
     });
@@ -83,7 +98,7 @@ describe('Guardian', () => {
         .mockResolvedValueOnce({ data: { confirmationRequired: true } });
       (mockConfirmationScreen.requestConfirmation as jest.Mock).mockResolvedValueOnce({ confirmed: false });
 
-      await expect(guardianClient.evaluateImxTransaction({ payloadHash: 'hash', user: mockUserImx })).rejects.toThrow('Transaction rejected by user');
+      await expect(guardianClient.evaluateImxTransaction({ payloadHash: 'hash' })).rejects.toThrow('Transaction rejected by user');
     });
 
     describe('crossSdkBridgeEnabled', () => {
@@ -101,9 +116,10 @@ describe('Guardian', () => {
             redirectUri: 'http://localhost:3000/redirect',
             crossSdkBridgeEnabled: true,
           }),
+          authManager: { getUser: jest.fn().mockResolvedValue(mockUserImx) } as unknown as AuthManager,
         });
 
-        await expect(guardianClient.evaluateImxTransaction({ payloadHash: 'hash', user: mockUserImx }))
+        await expect(guardianClient.evaluateImxTransaction({ payloadHash: 'hash' }))
           .rejects
           .toThrow('Transaction requires confirmation but this functionality is not supported in this environment. Please contact Immutable support if you need to enable this feature.');
       });
@@ -111,6 +127,19 @@ describe('Guardian', () => {
   });
 
   describe('validateEVMTransaction', () => {
+    afterEach(jest.resetAllMocks);
+    beforeEach(() => {
+      guardianClient = new GuardianClient({
+        confirmationScreen: mockConfirmationScreen,
+        config: new PassportConfiguration({
+          baseConfig: {} as ImmutableConfiguration,
+          clientId: 'client123',
+          logoutRedirectUri: 'http://localhost:3000/logout',
+          redirectUri: 'http://localhost:3000/redirect',
+        }),
+        authManager: { getUser: jest.fn().mockResolvedValue(mockUserZkEvm) } as unknown as AuthManager,
+      });
+    });
     it('throws an error if the request data fails to be parsed', async () => {
       const transactionRequest: TransactionRequest = {
         to: mockUserZkEvm.zkEvm.ethAddress,
@@ -122,7 +151,6 @@ describe('Guardian', () => {
         guardianClient.validateEVMTransaction({
           chainId: 'epi123',
           nonce: '5',
-          user: mockUserZkEvm,
           metaTransactions: [
             {
               data: transactionRequest.data,
@@ -159,7 +187,6 @@ describe('Guardian', () => {
       await guardianClient.validateEVMTransaction({
         chainId: 'epi123',
         nonce: '5',
-        user: mockUserZkEvm,
         metaTransactions: [
           {
             data: transactionRequest.data,
@@ -201,7 +228,6 @@ describe('Guardian', () => {
     describe('crossSdkBridgeEnabled', () => {
       it('throws an error if confirmation is required and the cross sdk bridge flag is enabled', async () => {
         mockEvaluateTransaction.mockResolvedValue({ data: { confirmationRequired: true } });
-
         guardianClient = new GuardianClient({
           confirmationScreen: mockConfirmationScreen,
           config: new PassportConfiguration({
@@ -211,6 +237,7 @@ describe('Guardian', () => {
             redirectUri: 'http://localhost:3000/redirect',
             crossSdkBridgeEnabled: true,
           }),
+          authManager: { getUser: jest.fn().mockResolvedValue(mockUserZkEvm) } as unknown as AuthManager,
         });
 
         const transactionRequest: TransactionRequest = {
@@ -223,7 +250,6 @@ describe('Guardian', () => {
           guardianClient.validateEVMTransaction({
             chainId: 'epi123',
             nonce: '5',
-            user: mockUserZkEvm,
             metaTransactions: [
               {
                 data: transactionRequest.data,
@@ -302,6 +328,19 @@ describe('Guardian', () => {
   });
 
   describe('validateMessage', () => {
+    afterEach(jest.resetAllMocks);
+    beforeEach(() => {
+      guardianClient = new GuardianClient({
+        confirmationScreen: mockConfirmationScreen,
+        config: new PassportConfiguration({
+          baseConfig: {} as ImmutableConfiguration,
+          clientId: 'client123',
+          logoutRedirectUri: 'http://localhost:3000/logout',
+          redirectUri: 'http://localhost:3000/redirect',
+        }),
+        authManager: { getUser: jest.fn().mockResolvedValue(mockUserZkEvm) } as unknown as AuthManager,
+      });
+    });
     const mockPayload = { chainID: '0x1234', payload: {} as guardian.EIP712Message, user: mockUserZkEvm };
     it('surfaces error message if message evaluation fails', async () => {
       mockEvaluateMessage.mockRejectedValueOnce(new Error('401: Unauthorized'));

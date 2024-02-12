@@ -63,7 +63,6 @@ export async function transfer({
       );
 
       await guardianClient.evaluateImxTransaction({
-        user,
         payloadHash: signableResult.data.payload_hash,
       });
 
@@ -142,7 +141,6 @@ export async function batchNftTransfer({
       );
 
       await guardianClient.evaluateImxTransaction({
-        user,
         payloadHash: signableResult.data.signable_responses[0]?.payload_hash,
       });
 
