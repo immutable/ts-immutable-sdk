@@ -76,7 +76,6 @@ const SANDBOX_CONFIGURATION = {
   },
   passport: undefined,
 };
-const WIDGETS_SCRIPT_TIMEOUT = 100;
 
 // Checkout SDK
 export class Checkout {
@@ -119,33 +118,18 @@ export class Checkout {
     // Preload the configurations
     await checkout.config.remote.getConfig();
 
-    const factory = new Promise<ImmutableCheckoutWidgets.WidgetsFactory>((resolve, reject) => {
-      function checkForWidgetsBundleLoaded() {
-        if (typeof ImmutableCheckoutWidgets !== 'undefined') {
-          resolve(new ImmutableCheckoutWidgets.WidgetsFactory(checkout, init.config));
-        } else {
-          // If ImmutableCheckoutWidgets is not defined, wait for set amount of time.
-          // When time has elapsed, check again if ImmutableCheckoutWidgets is defined.
-          // Once it's defined, the promise will resolve and setTimeout won't be called again.
-          setTimeout(checkForWidgetsBundleLoaded, WIDGETS_SCRIPT_TIMEOUT);
-        }
-      }
+    const load = loadUnresolved(init.version);
+    const checkoutWidgetsModule = await import(load.cdnUrl);
 
+    const factory = new Promise<ImmutableCheckoutWidgets.WidgetsFactory>((resolve, reject) => {
       try {
-        const script = loadUnresolved(init.version);
-        if (script.loaded && typeof ImmutableCheckoutWidgets !== 'undefined') {
-          resolve(new ImmutableCheckoutWidgets.WidgetsFactory(checkout, init.config));
+        if (checkoutWidgetsModule && checkoutWidgetsModule.WidgetsFactory) {
+          resolve(new checkoutWidgetsModule.WidgetsFactory(checkout, init.config));
         } else {
-          checkForWidgetsBundleLoaded();
+          throw new Error('WidgetsFactory is not found in the imported module.');
         }
-      } catch (err: any) {
-        reject(
-          new CheckoutError(
-            'Failed to load widgets script',
-            CheckoutErrorType.WIDGETS_SCRIPT_LOAD_ERROR,
-            { error: err },
-          ),
-        );
+      } catch (error) {
+        reject(error);
       }
     });
 

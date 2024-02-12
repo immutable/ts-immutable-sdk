@@ -23,7 +23,6 @@ export default [
       dir: 'dist',
       format: 'es'
     },
-    context: 'window',
     plugins: [
       resolve({
         browser: true,
