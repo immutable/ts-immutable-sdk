@@ -53,7 +53,7 @@ export function ConnectWallet() {
         <Body
           size="small"
           sx={{
-            color: 'base.color.text.secondary',
+            color: 'base.color.text.body.secondary',
             paddingX: 'base.spacing.x4',
           }}
         >

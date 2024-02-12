@@ -263,7 +263,7 @@ export function BridgeReviewSummary() {
           <Body
             size="small"
             sx={{
-              color: 'base.color.text.secondary',
+              color: 'base.color.text.body.secondary',
             }}
           >
             {abbreviateAddress(fromAddress ?? '')}
@@ -300,7 +300,7 @@ export function BridgeReviewSummary() {
           <Body
             size="small"
             sx={{
-              color: 'base.color.text.secondary',
+              color: 'base.color.text.body.secondary',
             }}
           >
             {abbreviateAddress(toAddress ?? '')}

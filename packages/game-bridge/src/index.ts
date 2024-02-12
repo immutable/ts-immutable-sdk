@@ -3,7 +3,6 @@ import * as passport from '@imtbl/passport';
 import * as config from '@imtbl/config';
 import * as provider from '@imtbl/x-provider';
 import { track, identify } from '@imtbl/metrics';
-import { gameBridgeVersionCheck } from '@imtbl/version-check';
 
 /* eslint-disable no-undef */
 const scope = 'openid offline_access profile email transact';
@@ -14,7 +13,8 @@ const keyFunctionName = 'fxName';
 const keyRequestId = 'requestId';
 const keyData = 'data';
 
-const moduleName = 'game_bridge';
+const trackFunction = 'track';
+const moduleName = 'gameBridge';
 
 // version check placeholders
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -132,7 +132,7 @@ const getZkEvmProvider = (): passport.Provider => {
   return zkEvmProviderInstance;
 };
 
-track(moduleName, 'loadGameBridge', {
+track(moduleName, 'loadedGameBridge', {
   sdkVersionTag,
 });
 
@@ -149,7 +149,7 @@ window.callFunction = async (jsonData: string) => {
     requestId = json[keyRequestId];
     const data = json[keyData];
 
-    track(moduleName, 'startCallFunction', {
+    track(moduleName, 'startedCallFunction', {
       function: fxName,
     });
 
@@ -170,7 +170,7 @@ window.callFunction = async (jsonData: string) => {
             crossSdkBridgeEnabled: true,
           };
           passportClient = new passport.Passport(passportConfig);
-          track(moduleName, 'initInititalisePassport');
+          track(moduleName, 'initialisedPassport');
         }
         callbackToGame({
           responseFor: fxName,
@@ -187,11 +187,11 @@ window.callFunction = async (jsonData: string) => {
           engineVersion: engineVersion.engineVersion,
           platform: engineVersion.platform,
           platformVersion: engineVersion.platformVersion,
+          deviceModel: engineVersion.deviceModel ?? 'N/A',
         };
         console.log(`Version check: ${JSON.stringify(versionCheckParams)}`);
 
-        track(moduleName, 'completeInitGameBridge', versionCheckParams);
-        gameBridgeVersionCheck(versionCheckParams);
+        track(moduleName, 'completedInitGameBridge', versionCheckParams);
         break;
       }
       case PASSPORT_FUNCTIONS.initDeviceFlow: {
@@ -506,6 +506,17 @@ window.callFunction = async (jsonData: string) => {
           requestId,
           success: true,
           result,
+        });
+        break;
+      }
+      case trackFunction: {
+        const request = JSON.parse(data);
+        const properties = JSON.parse(request.properties);
+        track(request.moduleName, request.eventName, properties);
+        callbackToGame({
+          responseFor: fxName,
+          requestId,
+          success: true,
         });
         break;
       }
