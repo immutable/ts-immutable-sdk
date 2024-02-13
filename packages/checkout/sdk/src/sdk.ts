@@ -119,7 +119,7 @@ export class Checkout {
     await checkout.config.remote.getConfig();
 
     const load = loadUnresolved(init.version);
-    const checkoutWidgetsModule = await import(load.cdnUrl);
+    const checkoutWidgetsModule = await import(/* webpackIgnore: true */load.cdnUrl);
 
     const factory = new Promise<ImmutableCheckoutWidgets.WidgetsFactory>((resolve, reject) => {
       try {
