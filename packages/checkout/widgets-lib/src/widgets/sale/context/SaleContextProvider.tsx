@@ -37,6 +37,7 @@ import {
 } from '../types';
 
 import { useSmartCheckout } from '../hooks/useSmartCheckout';
+import { useCurrency } from '../hooks/useCurrency';
 
 type SaleContextProps = {
   config: StrongCheckoutWidgetsConfig;
@@ -59,7 +60,7 @@ type SaleContextValues = SaleContextProps & {
   execute: (
     signResponse: SignResponse | undefined,
     onTxnSuccess: (txn: ExecutedTransaction) => void,
-    onTxnError: (error: any, txns: ExecutedTransaction[]) => void,
+    onTxnError: (error: any, txns: ExecutedTransaction[]) => void
   ) => Promise<ExecutedTransaction[]>;
   recipientAddress: string;
   recipientEmail: string;
@@ -69,7 +70,9 @@ type SaleContextValues = SaleContextProps & {
   isPassportWallet: boolean;
   paymentMethod: SalePaymentTypes | undefined;
   setPaymentMethod: (paymentMethod: SalePaymentTypes | undefined) => void;
-  goBackToPaymentMethods: (paymentMethod?: SalePaymentTypes | undefined) => void;
+  goBackToPaymentMethods: (
+    paymentMethod?: SalePaymentTypes | undefined
+  ) => void;
   goToErrorView: (type: SaleErrorTypes, data?: Record<string, unknown>) => void;
   goToSuccessView: (data?: Record<string, unknown>) => void;
   querySmartCheckout: (
@@ -77,7 +80,7 @@ type SaleContextValues = SaleContextProps & {
   ) => Promise<SmartCheckoutResult | undefined>;
   smartCheckoutResult: SmartCheckoutResult | undefined;
   fundingRoutes: FundingRoute[];
-  disabledPaymentTypes: SalePaymentTypes[]
+  disabledPaymentTypes: SalePaymentTypes[];
   invalidParameters: boolean;
 };
 
@@ -148,17 +151,22 @@ export function SaleContextProvider(props: {
     recipientAddress: '',
   });
 
-  const [paymentMethod, setPaymentMethod] = useState<SalePaymentTypes | undefined>(
-    undefined,
-  );
+  const [paymentMethod, setPaymentMethod] = useState<
+  SalePaymentTypes | undefined
+  >(undefined);
 
   const [fundingRoutes, setFundingRoutes] = useState<FundingRoute[]>([]);
-  const [disabledPaymentTypes, setDisabledPaymentTypes] = useState<SalePaymentTypes[]>([]);
+  const [disabledPaymentTypes, setDisabledPaymentTypes] = useState<
+  SalePaymentTypes[]
+  >([]);
 
   const [invalidParameters, setInvalidParameters] = useState<boolean>(false);
 
   const goBackToPaymentMethods = useCallback(
-    (type?: SalePaymentTypes | undefined, showInsufficientCoinsBanner?: boolean) => {
+    (
+      type?: SalePaymentTypes | undefined,
+      showInsufficientCoinsBanner?: boolean,
+    ) => {
       setPaymentMethod(type);
       viewDispatch({
         payload: {
@@ -201,20 +209,6 @@ export function SaleContextProvider(props: {
     environmentId,
     env,
   });
-
-  const sign = useCallback(
-    async (
-      type: SalePaymentTypes,
-      callback?: (r?: SignResponse) => void,
-    ): Promise<SignResponse | undefined> => {
-      const response = await signOrder(type);
-      if (!response) return undefined;
-
-      callback?.(response);
-      return response;
-    },
-    [signOrder],
-  );
 
   const goToErrorView = useCallback(
     (errorType: SaleErrorTypes, data: Record<string, unknown> = {}) => {
@@ -262,6 +256,34 @@ export function SaleContextProvider(props: {
     [[paymentMethod, executeResponse]],
   );
 
+  const { fetchCurrency } = useCurrency({
+    env,
+    environmentId,
+  });
+
+  const sign = useCallback(
+    async (
+      type: SalePaymentTypes,
+      callback?: (r?: SignResponse) => void,
+    ): Promise<SignResponse | undefined> => {
+      const fetchedCurrency = await fetchCurrency();
+
+      if (!fetchedCurrency || fetchedCurrency.length === 0) {
+        goToErrorView(SaleErrorTypes.SERVICE_BREAKDOWN, {
+          error: new Error('Failed to fetch currency data'),
+        });
+        return undefined;
+      }
+
+      const response = await signOrder(type, fetchedCurrency[0].erc20_address);
+      if (!response) return undefined;
+
+      callback?.(response);
+      return response;
+    },
+    [signOrder],
+  );
+
   useEffect(() => {
     if (!signError) return;
     goToErrorView(signError.type, signError.data);
@@ -272,12 +294,16 @@ export function SaleContextProvider(props: {
     checkout,
     items,
     amount,
-    tokenAddress: fromTokenAddress,
+    env,
+    environmentId,
   });
 
   useEffect(() => {
     if (!smartCheckoutError) return;
-    if ((smartCheckoutError.data?.error as Error)?.message === SmartCheckoutErrorTypes.FRACTIONAL_BALANCE_BLOCKED) {
+    if (
+      (smartCheckoutError.data?.error as Error)?.message
+      === SmartCheckoutErrorTypes.FRACTIONAL_BALANCE_BLOCKED
+    ) {
       setDisabledPaymentTypes([SalePaymentTypes.CRYPTO]);
       goBackToPaymentMethods(undefined, true);
       return;
@@ -341,9 +367,8 @@ export function SaleContextProvider(props: {
   useEffect(() => {
     const invalidItems = !items || items.length === 0;
     const invalidAmount = !amount || amount === '0';
-    const invalidFromTokenAddress = !fromTokenAddress || !fromTokenAddress.startsWith('0x');
 
-    if (invalidItems || invalidAmount || invalidFromTokenAddress || !collectionName || !environmentId) {
+    if (invalidItems || invalidAmount || !collectionName || !environmentId) {
       setInvalidParameters(true);
     }
   }, [items, amount, fromTokenAddress, collectionName, environmentId]);
