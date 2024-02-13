@@ -122,6 +122,13 @@ export interface ListNFTsRequestParams {
     readonly chainName: string
 
     /**
+     * List of token IDs to filter by
+     * @type {Array<string>}
+     * @memberof ListNFTs
+     */
+    readonly tokenId?: Array<string>
+
+    /**
      * Datetime to use as the oldest updated timestamp
      * @type {string}
      * @memberof ListNFTs
