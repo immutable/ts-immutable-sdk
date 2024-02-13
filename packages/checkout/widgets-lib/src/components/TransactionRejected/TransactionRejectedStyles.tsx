@@ -2,7 +2,8 @@ export const transactionRejectedContainerStyles = {
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  padding: '50px 0',
+  paddingY: '50px',
+  paddingX: 'base.spacing.x4',
   height: '100%',
 };
 
