@@ -54,17 +54,17 @@ const main = () => {
 
         fs.writeFileSync(destPath, data);
 
-        // Copy over all chunks when the splitBundle flag is set
-        if (item.splitBundle) {
+        // Copy over all js files when the copyAllJsFiles flag is set
+        if (item.copyAllJsFiles) {
           const srcDirectory = path.dirname(sourceFile);
-          const chunkFiles = fs.readdirSync(srcDirectory);
-          chunkFiles.forEach((chunkFile) => {
+          const jsFiles = fs.readdirSync(srcDirectory);
+          jsFiles.forEach((jsFile) => {
             // Check if the file is a .js file
-            if (path.extname(chunkFile) === '.js') {
+            if (path.extname(jsFile) === '.js') {
               // Skip copying the original file and only copy .js chunks
-              if (chunkFile !== path.basename(sourceFile)) {
-                const chunkSrcPath = path.join(srcDirectory, chunkFile);
-                const chunkDestPath = path.join(directoryPath, chunkFile);
+              if (jsFile !== path.basename(sourceFile)) {
+                const chunkSrcPath = path.join(srcDirectory, jsFile);
+                const chunkDestPath = path.join(directoryPath, jsFile);
                 fs.copyFileSync(chunkSrcPath, chunkDestPath);
               }
             }

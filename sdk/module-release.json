@@ -17,9 +17,9 @@
   "fileCopy": [
     {
       "src": "../packages/checkout/widgets-lib/dist/index.js",
-      "dest": "./dist/browser/checkout/widgets.js",
+      "dest": "./dist/browser/checkout/widgets-esm.js",
       "stage": "prod",
-      "splitBundle": true
+      "copyAllJsFiles": true
     },
     {
       "src": "../packages/checkout/sdk/dist/browser.js",

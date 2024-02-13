@@ -7,12 +7,19 @@ import replace from '@rollup/plugin-replace';
 import nodePolyfills from 'rollup-plugin-polyfill-node';
 
 const defaultPlugin = [
+  resolve({
+    browser: true,
+    dedupe: ['react', 'react-dom'],
+  }),
+  nodePolyfills(),
+  commonjs(),
   json(),
   replace({
     preventAssignment: true,
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
   }),
-  typescript()
+  typescript(),
+  terser()
 ]
 
 export default [
@@ -24,14 +31,21 @@ export default [
       format: 'es'
     },
     plugins: [
-      resolve({
-        browser: true,
-        dedupe: ['react', 'react-dom'],
-      }),
-      nodePolyfills(),
-      commonjs(),
       ...defaultPlugin,
-      terser()
+    ]
+  },
+  {
+    watch: false,
+    input: 'src/index.ts',
+    output: {
+      file: 'dist/widgets.js',
+      format: 'umd',
+      name: 'ImmutableCheckoutWidgets',
+      inlineDynamicImports: true
+    },
+    context: 'window',
+    plugins: [
+      ...defaultPlugin,,
     ]
   }
 ]

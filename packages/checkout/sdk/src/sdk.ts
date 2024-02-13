@@ -65,7 +65,7 @@ import { FiatRampService, FiatRampWidgetParams } from './fiatRamp';
 import { getItemRequirementsFromRequirements } from './smartCheckout/itemRequirements';
 import { CheckoutError, CheckoutErrorType } from './errors';
 import { AvailabilityService, availabilityService } from './availability';
-import { loadUnresolved } from './widgets/load';
+import { getCdnUrl, loadUnresolvedBundle } from './widgets/load';
 import { WidgetsInit } from './types/widgets';
 import { HttpClient } from './api/http';
 import { isMatchingAddress } from './utils/utils';
@@ -76,6 +76,7 @@ const SANDBOX_CONFIGURATION = {
   },
   passport: undefined,
 };
+const WIDGETS_SCRIPT_TIMEOUT = 100;
 
 // Checkout SDK
 export class Checkout {
@@ -118,18 +119,55 @@ export class Checkout {
     // Preload the configurations
     await checkout.config.remote.getConfig();
 
-    const load = loadUnresolved(init.version);
-    const checkoutWidgetsModule = await import(/* webpackIgnore: true */load.cdnUrl);
+    // Resolves the factory for the esm build of the widgets
+    if (init.useEsModules) {
+      const cdnUrl = getCdnUrl(init.version);
+      // WebpackIgnore comment required to prevent webpack modifying the import statement and
+      // breaking the dynamic import in certain applications integrating checkout
+      const checkoutWidgetsModule = await import(/* webpackIgnore: true */ cdnUrl);
 
-    const factory = new Promise<ImmutableCheckoutWidgets.WidgetsFactory>((resolve, reject) => {
-      try {
+      const factory = new Promise<ImmutableCheckoutWidgets.WidgetsFactory>((resolve, reject) => {
         if (checkoutWidgetsModule && checkoutWidgetsModule.WidgetsFactory) {
           resolve(new checkoutWidgetsModule.WidgetsFactory(checkout, init.config));
         } else {
-          throw new Error('WidgetsFactory is not found in the imported module.');
+          reject(new CheckoutError(
+            'Unable to resolve the WidgetsFactory from the checkout widgets module',
+            CheckoutErrorType.WIDGETS_SCRIPT_LOAD_ERROR,
+          ));
         }
-      } catch (error) {
-        reject(error);
+      });
+
+      return factory;
+    }
+
+    // Resolves the factory for the umd build of the widgets
+    const factory = new Promise<ImmutableCheckoutWidgets.WidgetsFactory>((resolve, reject) => {
+      function checkForWidgetsBundleLoaded() {
+        if (typeof ImmutableCheckoutWidgets !== 'undefined') {
+          resolve(new ImmutableCheckoutWidgets.WidgetsFactory(checkout, init.config));
+        } else {
+        // If ImmutableCheckoutWidgets is not defined, wait for set amount of time.
+        // When time has elapsed, check again if ImmutableCheckoutWidgets is defined.
+        // Once it's defined, the promise will resolve and setTimeout won't be called again.
+          setTimeout(checkForWidgetsBundleLoaded, WIDGETS_SCRIPT_TIMEOUT);
+        }
+      }
+
+      try {
+        const script = loadUnresolvedBundle(init.version);
+        if (script.loaded && typeof ImmutableCheckoutWidgets !== 'undefined') {
+          resolve(new ImmutableCheckoutWidgets.WidgetsFactory(checkout, init.config));
+        } else {
+          checkForWidgetsBundleLoaded();
+        }
+      } catch (err: any) {
+        reject(
+          new CheckoutError(
+            'Failed to load widgets script',
+            CheckoutErrorType.WIDGETS_SCRIPT_LOAD_ERROR,
+            { error: err },
+          ),
+        );
       }
     });
 
