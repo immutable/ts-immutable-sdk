@@ -76,7 +76,7 @@ export const signTypedDataV4 = async ({
   guardianClient,
   user,
 }: SignTypedDataV4Params): Promise<string> => guardianClient
-  .withConfirmationScreen({ width: 480, height: 730 })(async () => {
+  .withConfirmationScreen({ width: 480, height: 720 })(async () => {
     const fromAddress: string = params[0];
     const typedDataParam: string | object = params[1];
 
