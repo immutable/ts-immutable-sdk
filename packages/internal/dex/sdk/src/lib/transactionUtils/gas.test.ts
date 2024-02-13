@@ -10,7 +10,7 @@ describe('calculateGasFee', () => {
       const gasPrice = newAmount(BigNumber.from('1500000000'), NATIVE_TEST_TOKEN); // 1.5 gwei or 1500000000 wei
 
       const gasUsedInTransaction = BigNumber.from('200000');
-      const gasFeeEstimate = calculateGasFee(false, gasPrice, gasUsedInTransaction);
+      const gasFeeEstimate = calculateGasFee(gasPrice, gasUsedInTransaction);
 
       expectToBeDefined(gasFeeEstimate);
       expect(gasFeeEstimate.value.toString()).toEqual('300000000000000');

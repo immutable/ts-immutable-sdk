@@ -10,7 +10,7 @@ import { Interface } from 'ethers/lib/utils';
 import { IImmutableSwapProxy, ImmutableSwapProxyInterface } from 'contracts/types/ImmutableSwapProxy';
 import { ImmutableSwapProxy__factory } from 'contracts/types';
 import { SecondaryFee, TransactionDetails } from '../../types';
-import { calculateGasFee } from './gas';
+import { calculateGasFee, calculateGasFeeViaSwapProxy } from './gas';
 import { slippageToFraction } from './slippage';
 
 type SwapOptions = {
@@ -475,7 +475,14 @@ export function getSwap(
 
   const hasSecondaryFees = secondaryFees.length > 0;
 
-  const gasFeeEstimate = gasPrice ? calculateGasFee(hasSecondaryFees, gasPrice, adjustedQuote.gasEstimate) : null;
+  let gasFeeEstimate;
+  if (gasPrice) {
+    if (hasSecondaryFees) {
+      gasFeeEstimate = calculateGasFeeViaSwapProxy(gasPrice, adjustedQuote.gasEstimate);
+    } else {
+      gasFeeEstimate = calculateGasFee(gasPrice, adjustedQuote.gasEstimate);
+    }
+  }
 
   const transactionValue = getTransactionValue(tokenIn, maximumAmountIn);
 
