@@ -78,6 +78,12 @@ export const getWalletConnectProvider = async (
     }
   }
 
+  try {
+    await web3Modal.disconnect();
+  } catch (err) {
+    // swallow error
+  }
+
   const getProvider = () => new Promise<CreateProviderResult>((resolve, reject) => {
     web3Modal!.subscribeProvider((newState) => {
       console.log('newState', newState);
@@ -87,10 +93,11 @@ export const getWalletConnectProvider = async (
           provider,
           walletProviderName: WalletProviderName.WALLET_CONNECT,
         });
-      } else {
-        web3Modal.disconnect().then(() => web3Modal.close());
-        reject(new Error('Failed to create WalletConnect provider'));
       }
+      // else {
+      // web3Modal.disconnect().then(() => web3Modal.close());
+      // reject(new Error('Failed to create WalletConnect provider'));
+      // }
     });
 
     web3Modal!.open({ view: 'Connect' });

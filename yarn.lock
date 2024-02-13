@@ -3441,6 +3441,8 @@ __metadata:
     "@types/react": ^18.0.28
     "@types/react-dom": ^18.0.11
     "@vitejs/plugin-react": ^4.2.0
+    "@walletconnect/ethereum-provider": ^2.11.1
+    "@walletconnect/modal": ^2.6.2
     jsbi: ^3.2.1
     react: ^18.2.0
     react-dom: ^18.2.0
@@ -3846,7 +3848,7 @@ __metadata:
     "@uniswap/router-sdk": ^1.4.0
     "@uniswap/sdk-core": ^3.0.1
     "@uniswap/v3-sdk": ^3.9.0
-    "@web3modal/ethers5": ^4.0.0
+    "@web3modal/ethers5": ^4.0.1
     "@yarnpkg/cli": 3.5.0
     "@yarnpkg/core": 3.5.0
     assert: ^2.0.0
@@ -10110,7 +10112,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@walletconnect/ethereum-provider@npm:2.11.1":
+"@walletconnect/ethereum-provider@npm:2.11.1, @walletconnect/ethereum-provider@npm:^2.11.1":
   version: 2.11.1
   resolution: "@walletconnect/ethereum-provider@npm:2.11.1"
   dependencies:
@@ -10393,32 +10395,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@web3modal/common@npm:4.0.0":
-  version: 4.0.0
-  resolution: "@web3modal/common@npm:4.0.0"
-  dependencies:
-    dayjs: 1.11.10
-  checksum: 7e62efc3b715bbdb686a379ed6d11a0169ad66041a8b81ee3b1aa3c98ba45a5478a63ed9c974bffc264cb61728ac891be23c83a2e97ae10c4e634d6b4ecb9c85
-  languageName: node
-  linkType: hard
-
 "@web3modal/common@npm:4.0.1":
   version: 4.0.1
   resolution: "@web3modal/common@npm:4.0.1"
   dependencies:
     dayjs: 1.11.10
   checksum: 5917850724a9c1420a85c1dd8f2f9d340d3c0bfa6320c9011f34d8a14f46253f86fe2b1c7dc4e047a5f6dd69a7b539e1dd940e5f5409616f8f386d252ac36b3f
-  languageName: node
-  linkType: hard
-
-"@web3modal/core@npm:4.0.0":
-  version: 4.0.0
-  resolution: "@web3modal/core@npm:4.0.0"
-  dependencies:
-    "@web3modal/common": 4.0.0
-    "@web3modal/wallet": 4.0.0
-    valtio: 1.11.2
-  checksum: 986750e8a87ddea113d8ab2a318bec3ace2ff5c414a324e4f68e93f5e6ad157da63fa7855e1742f71d680c3aa92e3fbc6293c050fde40be1de4fd899c47b75d3
   languageName: node
   linkType: hard
 
@@ -10430,50 +10412,6 @@ __metadata:
     "@web3modal/wallet": 4.0.1
     valtio: 1.11.2
   checksum: 7330d6a05b040c6ad62d7f90eb92e6e51f68bc9411d4b10bde02d80deaeb2227029fb1e2c2607bd72d15e1d90a0ffd5c2eb7c9fa8b4921082470a403fe275520
-  languageName: node
-  linkType: hard
-
-"@web3modal/ethers5@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "@web3modal/ethers5@npm:4.0.0"
-  dependencies:
-    "@coinbase/wallet-sdk": 3.9.1
-    "@walletconnect/ethereum-provider": 2.11.1
-    "@web3modal/polyfills": 4.0.0
-    "@web3modal/scaffold": 4.0.0
-    "@web3modal/scaffold-react": 4.0.0
-    "@web3modal/scaffold-utils": 4.0.0
-    "@web3modal/scaffold-vue": 4.0.0
-    "@web3modal/siwe": 4.0.0
-    react: ">=17"
-    react-dom: ">=17"
-    valtio: 1.11.2
-    vue: ">=3"
-  peerDependencies:
-    "@web3modal/siwe": "*"
-    ethers: ">=5.0.0 <6.0.0"
-    react: ">=17"
-    react-dom: ">=17"
-    vue: ">=3"
-  dependenciesMeta:
-    "@web3modal/siwe":
-      optional: true
-    react:
-      optional: true
-    react-dom:
-      optional: true
-    vue:
-      optional: true
-  peerDependenciesMeta:
-    "@web3modal/siwe":
-      optional: true
-    react:
-      optional: true
-    react-dom:
-      optional: true
-    vue:
-      optional: true
-  checksum: aa00dc75978a2fdbdd6d6e0aadb1fef0d647c6dcd64460a5169f12d701768dfe38be087a5aa42c410bbccfa741a4c654bf7ede6297cb30bcc91e0af31cbafd89
   languageName: node
   linkType: hard
 
@@ -10521,33 +10459,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@web3modal/polyfills@npm:4.0.0":
-  version: 4.0.0
-  resolution: "@web3modal/polyfills@npm:4.0.0"
-  dependencies:
-    buffer: 6.0.3
-  checksum: fa552687d45f424d0a9c5208519d2ab5299de9224ee78adc31d165b55287e9fb3c09336ecfafb2f5e374d21f43392bc8ca6c090743ac3a0726e3f33dd477707b
-  languageName: node
-  linkType: hard
-
 "@web3modal/polyfills@npm:4.0.1":
   version: 4.0.1
   resolution: "@web3modal/polyfills@npm:4.0.1"
   dependencies:
     buffer: 6.0.3
   checksum: deaf938b3c9b3e559cb6f021917565d41d0f7cb24ba99ab80f3a333a5a0196cbc72b7d2efa6fbe5472044af1661a44ca06022b9482f63eaa532197e465e9c86c
-  languageName: node
-  linkType: hard
-
-"@web3modal/scaffold-react@npm:4.0.0":
-  version: 4.0.0
-  resolution: "@web3modal/scaffold-react@npm:4.0.0"
-  dependencies:
-    "@web3modal/scaffold": 4.0.0
-  peerDependencies:
-    react: ">=17"
-    react-dom: ">=17"
-  checksum: a3ef844b6f84f343aab433391c5d896c2c1e168fa80315b2a750696fddb779cadb5830bfaace079bb3e92347c4516e424ca51f836d9ca2194f7ac1fcdd9737ab
   languageName: node
   linkType: hard
 
@@ -10563,17 +10480,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@web3modal/scaffold-utils@npm:4.0.0":
-  version: 4.0.0
-  resolution: "@web3modal/scaffold-utils@npm:4.0.0"
-  dependencies:
-    "@web3modal/polyfills": 4.0.0
-    "@web3modal/scaffold": 4.0.0
-    valtio: 1.11.2
-  checksum: a3d8e5e7c62a1979c287745cbeb7d32cd9e2e221379cb01d20fde64f9d4d28188bcec55f5445684ee225fee3c69fe22a4da3d69b1d359b4bb6f26eb5b7e40196
-  languageName: node
-  linkType: hard
-
 "@web3modal/scaffold-utils@npm:4.0.1":
   version: 4.0.1
   resolution: "@web3modal/scaffold-utils@npm:4.0.1"
@@ -10582,17 +10488,6 @@ __metadata:
     "@web3modal/scaffold": 4.0.1
     valtio: 1.11.2
   checksum: e397969cfdff6e4bd3569d8c3661582d434cb18f418def4070db9d332033170d8a3583634884e9476bc317dac5c797cbeaa70a257f908e6342da621136ae2f27
-  languageName: node
-  linkType: hard
-
-"@web3modal/scaffold-vue@npm:4.0.0":
-  version: 4.0.0
-  resolution: "@web3modal/scaffold-vue@npm:4.0.0"
-  dependencies:
-    "@web3modal/scaffold": 4.0.0
-  peerDependencies:
-    vue: ">=3"
-  checksum: 1b4513acccec61367e50a8f72b3abe88bb64322e1b444de50174a428d53860fc3a74e6dba6f3be0bf3c48b62446e5b962ef61645c0cb1ee3e4408eb0269bc279
   languageName: node
   linkType: hard
 
@@ -10607,18 +10502,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@web3modal/scaffold@npm:4.0.0":
-  version: 4.0.0
-  resolution: "@web3modal/scaffold@npm:4.0.0"
-  dependencies:
-    "@web3modal/common": 4.0.0
-    "@web3modal/core": 4.0.0
-    "@web3modal/ui": 4.0.0
-    lit: 3.1.0
-  checksum: f2d134349c032ed1b63b43a1dd6d445cdf0989e69054a909c9bffe1428d0fb3f1f9f457e15c4b719fbc0fca004697783437314dd8108cbdaa83547c0337d6905
-  languageName: node
-  linkType: hard
-
 "@web3modal/scaffold@npm:4.0.1":
   version: 4.0.1
   resolution: "@web3modal/scaffold@npm:4.0.1"
@@ -10628,37 +10511,6 @@ __metadata:
     "@web3modal/ui": 4.0.1
     lit: 3.1.0
   checksum: 9c468a4a9069683c5833edc356bb6ea192007ffc4f47f8174b90395d253984bf853eca65c896f527894790d1112279e2b54e0fc04bf9ae9d53cfac16e45ca4cd
-  languageName: node
-  linkType: hard
-
-"@web3modal/siwe@npm:4.0.0":
-  version: 4.0.0
-  resolution: "@web3modal/siwe@npm:4.0.0"
-  dependencies:
-    "@web3modal/core": 4.0.0
-    "@web3modal/scaffold-utils": 4.0.0
-    react: ">=17"
-    react-dom: ">=17"
-    vue: ">=3"
-  peerDependencies:
-    react: ">=17"
-    react-dom: ">=17"
-    vue: ">=3"
-  dependenciesMeta:
-    react:
-      optional: true
-    react-dom:
-      optional: true
-    vue:
-      optional: true
-  peerDependenciesMeta:
-    react:
-      optional: true
-    react-dom:
-      optional: true
-    vue:
-      optional: true
-  checksum: 710c0f100649e92a88eff6a791aa90019a1dfdc3c09ec7a9aaeacab33ce1453cafffe7f0a30c995466aedd5852fdfd40788980af66b5e195f63a3246dacba0d3
   languageName: node
   linkType: hard
 
@@ -10693,16 +10545,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@web3modal/ui@npm:4.0.0":
-  version: 4.0.0
-  resolution: "@web3modal/ui@npm:4.0.0"
-  dependencies:
-    lit: 3.1.0
-    qrcode: 1.5.3
-  checksum: 2ea05551555b07f5aa9cc8af03ddf7f5d399668f0286150ab3f9f8dd5dfadad822182d062dda0d6c6e963554ae0ac47eaa51350ae3ee9d3fdf60c3ad755fd08f
-  languageName: node
-  linkType: hard
-
 "@web3modal/ui@npm:4.0.1":
   version: 4.0.1
   resolution: "@web3modal/ui@npm:4.0.1"
@@ -10710,15 +10552,6 @@ __metadata:
     lit: 3.1.0
     qrcode: 1.5.3
   checksum: b4d2a67c437a728dd89afb7ed1e8b534cc2ac1d1c90aa59d69297fcda9383fed174884618a68d12c7628ddc97363c0d42c66d2e09350bba0af2fba210392eb9e
-  languageName: node
-  linkType: hard
-
-"@web3modal/wallet@npm:4.0.0":
-  version: 4.0.0
-  resolution: "@web3modal/wallet@npm:4.0.0"
-  dependencies:
-    zod: 3.22.4
-  checksum: 4d94cc008720b54ce79e369a7d84a4183d4583eb32032f46b1f5d5aeb3fa35ad272b52b9a75b7e86528233b6c77bd8f6362edd9220f683fd317697f5d0ccf45f
   languageName: node
   linkType: hard
 
