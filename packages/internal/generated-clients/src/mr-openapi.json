@@ -504,6 +504,11 @@
             "ImmutableApiKey": [
               "refresh:metadata"
             ]
+          },
+          {
+            "BearerAuth": [
+              "refresh:metadata"
+            ]
           }
         ],
         "parameters": [
@@ -1060,6 +1065,20 @@
               "testnet": {
                 "value": "imtbl-zkevm-testnet",
                 "summary": "Immutable zkEVM Public Testnet"
+              }
+            }
+          },
+          {
+            "name": "token_id",
+            "in": "query",
+            "required": false,
+            "description": "List of token IDs to filter by",
+            "schema": {
+              "type": "array",
+              "maxItems": 30,
+              "items": {
+                "type": "string",
+                "example": "1"
               }
             }
           },
@@ -4030,6 +4049,13 @@
             "nullable": true,
             "description": "The youtube URL of NFT",
             "example": "https://some-url"
+          },
+          "attributes": {
+            "type": "array",
+            "description": "List of NFT Metadata attributes",
+            "items": {
+              "$ref": "#/components/schemas/NFTMetadataAttribute"
+            }
           }
         },
         "required": [
@@ -4044,7 +4070,8 @@
           "image",
           "external_link",
           "animation_url",
-          "youtube_url"
+          "youtube_url",
+          "attributes"
         ]
       },
       "NFTWithBalance": {
@@ -4131,6 +4158,14 @@
             "description": "The youtube URL of NFT",
             "example": "https://some-url"
           },
+          "attributes": {
+            "type": "array",
+            "description": "List of Metadata attributes",
+            "nullable": false,
+            "items": {
+              "$ref": "#/components/schemas/NFTMetadataAttribute"
+            }
+          },
           "balance": {
             "type": "string",
             "nullable": false,
@@ -4152,7 +4187,8 @@
           "animation_url",
           "youtube_url",
           "balance",
-          "contract_type"
+          "contract_type",
+          "attributes"
         ]
       },
       "NFTMetadataAttribute": {
@@ -4182,22 +4218,6 @@
         "required": [
           "trait_type",
           "value"
-        ]
-      },
-      "NFTMetadataAttributes": {
-        "type": "object",
-        "description": "List of normalized NFT metadata attributes",
-        "properties": {
-          "attributes": {
-            "type": "array",
-            "description": "List of NFT Metadata attributes",
-            "items": {
-              "$ref": "#/components/schemas/NFTMetadataAttribute"
-            }
-          }
-        },
-        "required": [
-          "attributes"
         ]
       },
       "ChainName": {
@@ -4239,24 +4259,12 @@
           "ERC20"
         ]
       },
-      "NFTWithMetadataAttributes": {
-        "description": "A single NFT with metadata attributes",
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/NFT"
-          },
-          {
-            "$ref": "#/components/schemas/NFTMetadataAttributes"
-          }
-        ]
-      },
       "GetNFTResult": {
         "type": "object",
         "description": "Single NFT",
         "properties": {
           "result": {
-            "$ref": "#/components/schemas/NFTWithMetadataAttributes"
+            "$ref": "#/components/schemas/NFT"
           }
         },
         "required": [
@@ -4267,7 +4275,7 @@
         "type": "object",
         "properties": {
           "result": {
-            "description": "List of nfts",
+            "description": "List of NFTs",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/NFT"
@@ -4286,7 +4294,7 @@
         "type": "object",
         "properties": {
           "result": {
-            "description": "List of nfts by owner",
+            "description": "List of NFTs by owner",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/NFTWithBalance"
@@ -4846,6 +4854,18 @@
             "description": "The transaction hash of the activity",
             "example": "0x68d9eac5e3b3c3580404989a4030c948a78e1b07b2b5ea5688d8c38a6c61c93e"
           },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2022-08-16T17:43:26.991388Z",
+            "description": "When the mint request was created"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the mint request was last updated",
+            "example": "2022-08-16T17:43:26.991388Z"
+          },
           "error": {
             "$ref": "#/components/schemas/MintRequestErrorMessage"
           },
@@ -4862,7 +4882,9 @@
           "token_id",
           "transaction_hash",
           "error",
-          "status"
+          "status",
+          "created_at",
+          "updated_at"
         ]
       },
       "MintRequestErrorMessage": {
