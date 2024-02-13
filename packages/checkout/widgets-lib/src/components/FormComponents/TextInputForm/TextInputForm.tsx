@@ -11,8 +11,9 @@ interface TextInputFormProps {
   disabled?: boolean;
   validator: (value: string) => boolean;
   onTextInputChange: (value: string) => void;
-  onTextInputBlur: (value: string) => void;
+  onTextInputBlur?: (value: string) => void;
   onTextInputFocus?: (value: string) => void;
+  onTextInputEnter?: () => void;
   maxButtonClick?: () => void;
 }
 
@@ -25,6 +26,7 @@ export function TextInputForm({
   onTextInputChange,
   onTextInputBlur,
   onTextInputFocus,
+  onTextInputEnter,
   textAlign,
   subtext,
   maxButtonClick,
@@ -41,6 +43,7 @@ export function TextInputForm({
   };
 
   const handleOnBlur = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!onTextInputBlur) return;
     const inputValue = event.target.value;
     if (!validator(inputValue)) return;
     onTextInputBlur(inputValue);
@@ -51,6 +54,13 @@ export function TextInputForm({
     const inputValue = event.target.value;
     if (!validator(inputValue)) return;
     onTextInputFocus(inputValue);
+  };
+
+  const handleOnKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!onTextInputEnter) return;
+    if (event.key === 'Enter') {
+      onTextInputEnter();
+    }
   };
 
   return (
@@ -71,6 +81,7 @@ export function TextInputForm({
         placeholder={placeholder}
         onBlur={handleOnBlur}
         onFocus={handleOnFocus}
+        onKeyDown={handleOnKeyDown}
         disabled={disabled}
         hideClearValueButton
         sx={{ minWidth: '100%' }}

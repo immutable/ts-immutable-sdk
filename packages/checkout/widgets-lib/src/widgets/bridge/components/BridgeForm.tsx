@@ -1,22 +1,15 @@
 import {
-  Accordion,
-  Body,
   Box,
   Button,
   Heading,
   OptionKey,
-  PriceDisplay,
 } from '@biom3/react';
 import {
-  GasEstimateBridgeToL2Result,
-  GasEstimateType,
   GetBalanceResult,
 } from '@imtbl/checkout-sdk';
 import {
   useCallback, useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
-import { BigNumber, utils } from 'ethers';
-import { FeesBreakdown } from 'components/FeesBreakdown/FeesBreakdown';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { useTranslation } from 'react-i18next';
 import { amountInputValidation } from '../../../lib/validations/amountInputValidations';
@@ -34,18 +27,12 @@ import {
 import { SelectForm } from '../../../components/FormComponents/SelectForm/SelectForm';
 import { validateAmount, validateToken } from '../functions/BridgeFormValidator';
 import {
-  bridgeButtonIconLoadingStyle,
   bridgeFormButtonContainerStyles,
   bridgeFormWrapperStyles,
   formInputsContainerStyles,
-  gasAmountAccordionStyles,
-  gasAmountHeadingStyles,
 } from './BridgeFormStyles';
 import { CoinSelectorOptionProps } from '../../../components/CoinSelector/CoinSelectorOption';
-import { useInterval } from '../../../lib/hooks/useInterval';
 import {
-  DEFAULT_TOKEN_DECIMALS,
-  DEFAULT_QUOTE_REFRESH_INTERVAL,
   NATIVE,
   getL1ChainId,
   IMX_TOKEN_SYMBOL,
@@ -68,7 +55,6 @@ export function BridgeForm(props: BridgeFormProps) {
   const {
     bridgeDispatch,
     bridgeState: {
-      tokenBridge,
       tokenBalances,
       allowedTokens,
       checkout,
@@ -96,7 +82,6 @@ export function BridgeForm(props: BridgeFormProps) {
   const [formToken, setFormToken] = useState<GetBalanceResult | undefined>();
   const [tokenError, setTokenError] = useState<string>('');
   const [amountFiatValue, setAmountFiatValue] = useState<string>('');
-  const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const hasSetDefaultState = useRef(false);
   const tokenBalanceSubtext = formToken
@@ -104,12 +89,7 @@ export function BridgeForm(props: BridgeFormProps) {
     : '';
 
   // Fee estimates & transactions
-  const [isFetching, setIsFetching] = useState(false);
-  const [estimates, setEstimates] = useState<GasEstimateBridgeToL2Result | undefined>(undefined);
-  const [gasFee, setGasFee] = useState<string>('');
-  const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
   const [tokensOptions, setTokensOptions] = useState<CoinSelectorOptionProps[]>([]);
-  const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
 
   // Not enough ETH to cover gas
   const [showNotEnoughGasDrawer, setShowNotEnoughGasDrawer] = useState(false);
@@ -122,8 +102,6 @@ export function BridgeForm(props: BridgeFormProps) {
     if (!address) return symbol.toLowerCase();
     return `${symbol.toLowerCase()}-${address.toLowerCase()}`;
   }, []);
-
-  const gasFiatAmount = `${t('views.BRIDGE_FORM.fees.fiatPricePrefix')} ${gasFeeFiatValue}`;
 
   useEffect(() => {
     if (tokenBalances.length === 0) return;
@@ -200,119 +178,22 @@ export function BridgeForm(props: BridgeFormProps) {
     [formToken, tokenBalances, cryptoFiatState.conversions, formatTokenOptionsId],
   );
 
-  const canFetchEstimates = (): boolean => {
+  const canFetchEstimates = (silently: boolean): boolean => {
     if (Number.isNaN(parseFloat(formAmount))) return false;
     if (parseFloat(formAmount) <= 0) return false;
     if (!formToken) return false;
-    if (isFetching) return false;
     if (!from || !from.walletAddress) return false;
     if (!to || !to.walletAddress) return false;
+    if (silently && loading) return false;
+    if (!checkout) return false;
     return true;
-  };
-
-  const fetchEstimates = async (silently: boolean = false) => {
-    if (!canFetchEstimates()) return;
-
-    // setIsFetching within this if statement
-    // to allow the user to edit the form
-    // even if a new quote is fetching silently
-    if (!silently) {
-      setLoading(true);
-      setIsFetching(true);
-    }
-
-    // Prevent silently fetching and set a new fee estimate
-    // if the user has updated and the widget is already
-    // fetching or the user is updating the inputs.
-    if ((silently && (loading || editing)) || !checkout) return;
-
-    const tokenIsNative = isNativeToken(formToken?.token.address);
-    const amountToBridge = tokenIsNative
-      ? utils.parseUnits(formAmount)
-      : utils.parseUnits(formAmount, formToken?.token.decimals);
-
-    const tokenAddress = tokenIsNative ? NATIVE.toUpperCase() : formToken?.token.address;
-
-    const [unsignedApproveTransaction, unsignedTransaction] = await Promise.all([
-      tokenBridge!.getUnsignedApproveBridgeTx({
-        senderAddress: from!.walletAddress!,
-        token: tokenAddress ?? NATIVE.toUpperCase(),
-        amount: amountToBridge,
-        sourceChainId: from!.network.toString(),
-        destinationChainId: to!.network.toString(),
-      }),
-      tokenBridge!.getUnsignedBridgeTx({
-        senderAddress: from!.walletAddress!,
-        recipientAddress: to!.walletAddress!,
-        token: tokenAddress ?? NATIVE.toUpperCase(),
-        amount: amountToBridge,
-        sourceChainId: from!.network.toString(),
-        destinationChainId: to!.network.toString(),
-        gasMultiplier: 1.1,
-      }),
-    ]);
-
-    const transactionFeeData = unsignedTransaction.feeData;
-
-    const { totalFees, approvalFee } = transactionFeeData;
-
-    let rawTotalFees = totalFees;
-    if (!unsignedApproveTransaction.unsignedTx) {
-      rawTotalFees = totalFees.sub(approvalFee);
-    }
-
-    const gasEstimateResult = {
-      gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-      fees: { totalFees: rawTotalFees },
-      token: checkout.config.networkMap.get(from!.network)?.nativeCurrency,
-    } as GasEstimateBridgeToL2Result;
-
-    setEstimates(gasEstimateResult);
-    const estimatedAmount = utils.formatUnits(
-      gasEstimateResult?.fees?.totalFees || 0,
-      DEFAULT_TOKEN_DECIMALS,
-    );
-
-    setGasFee(estimatedAmount);
-    setGasFeeFiatValue(calculateCryptoToFiat(
-      estimatedAmount,
-      gasEstimateResult?.token?.symbol || '',
-      cryptoFiatState.conversions,
-    ));
-
-    if (!silently) {
-      setLoading(false);
-      setIsFetching(false);
-    }
   };
 
   const insufficientFundsForGas = useMemo(() => {
     const nativeTokenBalance = tokenBalances
       .find((balance) => isNativeToken(balance.token.address));
-    if (!nativeTokenBalance) {
-      return true;
-    }
-
-    const tokenIsNative = isNativeToken(formToken?.token.address);
-    const gasAmount = utils.parseUnits(gasFee.length !== 0 ? gasFee : '0');
-    const additionalAmount = tokenIsNative && !Number.isNaN(parseFloat(formAmount))
-      ? utils.parseUnits(formAmount)
-      : BigNumber.from('0');
-
-    return gasAmount.add(additionalAmount).gt(nativeTokenBalance.balance);
-  }, [gasFee, tokenBalances, formToken, formAmount]);
-
-  // Silently refresh the quote
-  useInterval(() => fetchEstimates(true), DEFAULT_QUOTE_REFRESH_INTERVAL);
-
-  useEffect(() => {
-    if (editing) return;
-    (async () => await fetchEstimates())();
-  }, [formAmount, formToken, editing]);
-
-  const onTextInputFocus = () => {
-    setEditing(true);
-  };
+    return !nativeTokenBalance;
+  }, [tokenBalances, formToken, formAmount]);
 
   const handleBridgeAmountChange = (value: string) => {
     setFormAmount(value);
@@ -327,22 +208,9 @@ export function BridgeForm(props: BridgeFormProps) {
       formToken.token.symbol,
       cryptoFiatState.conversions,
     ));
-  };
-
-  const handleAmountInputBlur = (value: string) => {
-    setEditing(false);
-    setFormAmount(value);
-    if (amountError) {
-      const validateAmountError = validateAmount(value, formToken?.formattedBalance);
-      setAmountError(validateAmountError);
+    if (canFetchEstimates(true)) {
+      setLoading(true);
     }
-
-    if (!formToken) return;
-    setAmountFiatValue(calculateCryptoToFiat(
-      value,
-      formToken.token.symbol,
-      cryptoFiatState.conversions,
-    ));
   };
 
   const handleSelectTokenChange = (value: OptionKey) => {
@@ -470,9 +338,8 @@ export function BridgeForm(props: BridgeFormProps) {
               selectedOption={selectedOption}
               subtext={tokenBalanceSubtext}
               textAlign="left"
-              errorMessage={tokenError}
+              errorMessage={t(tokenError)}
               onSelectChange={(option) => handleSelectTokenChange(option)}
-              disabled={isFetching}
             />
             <TextInputForm
               testId="bridge-amount"
@@ -480,65 +347,25 @@ export function BridgeForm(props: BridgeFormProps) {
               placeholder={t('views.BRIDGE_FORM.bridgeForm.from.inputPlaceholder')}
               subtext={`${t('views.BRIDGE_FORM.content.fiatPricePrefix')} $${formatZeroAmount(amountFiatValue, true)}`}
               validator={amountInputValidation}
-              onTextInputFocus={onTextInputFocus}
               onTextInputChange={(value) => handleBridgeAmountChange(value)}
-              onTextInputBlur={(value) => handleAmountInputBlur(value)}
+              onTextInputEnter={submitBridge}
               textAlign="right"
-              errorMessage={amountError}
-              disabled={isFetching}
+              errorMessage={t(amountError)}
             />
           </Box>
         )}
         {defaultTokenAddress && isTokenBalancesLoading && (
           <TokenSelectShimmer sx={formInputsContainerStyles} />
         )}
-        {gasFee && (
-          <Box sx={{ paddingY: 'base.spacing.x2' }}>
-            <Accordion
-              targetClickOveride={() => setShowFeeBreakdown(true)}
-              sx={gasAmountAccordionStyles}
-            >
-              <Accordion.TargetLeftSlot>
-                <Body size="medium" sx={gasAmountHeadingStyles}>
-                  {t('views.BRIDGE_FORM.fees.title')}
-                </Body>
-              </Accordion.TargetLeftSlot>
-              <Accordion.TargetRightSlot>
-                <PriceDisplay
-                  testId="bridge-gas-fee__priceDisplay"
-                  fiatAmount={`${t('views.BRIDGE_FORM.fees.fiatPricePrefix')} ${gasFeeFiatValue}`}
-                  price={`${estimates?.token?.symbol} ${tokenValueFormat(gasFee)}`}
-                />
-              </Accordion.TargetRightSlot>
-            </Accordion>
-          </Box>
-        )}
       </Box>
-      <FeesBreakdown
-        totalFiatAmount={gasFiatAmount}
-        totalAmount={gasFee}
-        tokenSymbol={estimates?.token?.symbol ?? ''}
-        fees={[
-          {
-            label: t('drawers.feesBreakdown.fees.gas.label'),
-            fiatAmount: gasFiatAmount,
-            amount: gasFee,
-          },
-        ]}
-        visible={showFeeBreakdown}
-        onCloseDrawer={() => setShowFeeBreakdown(false)}
-      />
       <Box sx={bridgeFormButtonContainerStyles}>
         <Button
           testId={`${testId}-button`}
           variant="primary"
           onClick={submitBridge}
-          disabled={loading}
           size="large"
         >
-          {loading ? (
-            <Button.Icon icon="Loading" sx={bridgeButtonIconLoadingStyle} />
-          ) : t('views.BRIDGE_FORM.bridgeForm.buttonText')}
+          {t('views.BRIDGE_FORM.bridgeForm.buttonText')}
         </Button>
         <TransactionRejected
           visible={showTxnRejectedState}
@@ -547,16 +374,17 @@ export function BridgeForm(props: BridgeFormProps) {
           onRetry={retrySubmitBridge}
         />
         <NotEnoughGas
+          environment={checkout.config.environment}
           visible={showNotEnoughGasDrawer}
           showHeaderBar={false}
           onCloseDrawer={() => setShowNotEnoughGasDrawer(false)}
           walletAddress={walletAddress}
           showAdjustAmount={isNativeToken(formToken?.token.address)}
           tokenSymbol={
-              from?.network === getL1ChainId(checkout?.config)
-                ? ETH_TOKEN_SYMBOL
-                : IMX_TOKEN_SYMBOL
-            }
+            from?.network === getL1ChainId(checkout?.config)
+              ? ETH_TOKEN_SYMBOL
+              : IMX_TOKEN_SYMBOL
+          }
           onAddCoinsClick={() => {
             viewDispatch({
               payload: {

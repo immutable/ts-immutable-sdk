@@ -9,12 +9,11 @@ import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { Web3Provider } from '@ethersproject/providers';
 import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
+import { useTranslation } from 'react-i18next';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { SwapWidget } from './SwapWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { quotesProcessor } from './functions/FetchQuote';
-import { text } from '../../resources/text/textConfig';
-import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
 import { ConnectionStatus } from '../../context/connect-loader-context/ConnectLoaderContext';
 import {
   ConnectLoaderTestComponent,
@@ -22,6 +21,7 @@ import {
 import { NATIVE } from '../../lib';
 
 describe('SwapWidget tests', () => {
+  const { t } = useTranslation();
   const mockProvider = {
     getSigner: () => ({
       getAddress: () => Promise.resolve('0xwalletAddress'),
@@ -565,8 +565,6 @@ describe('SwapWidget tests', () => {
               },
             });
 
-          const { approveSwap, approveSpending } = text.views[SwapWidgetViews.APPROVE_ERC20];
-
           cySmartGet('fromTokenInputs-select-form-select__target').click();
           cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
             .click();
@@ -580,10 +578,15 @@ describe('SwapWidget tests', () => {
 
           cySmartGet('swap-button').click();
 
-          cySmartGet('simple-text-body__heading').should('have.text', approveSpending.content.metamask.heading);
-          cySmartGet('simple-text-body__body').should('include.text', approveSpending.content.metamask.body[0]);
-          cySmartGet('simple-text-body__body').should('include.text', approveSpending.content.metamask.body[1]);
-          cySmartGet('footer-button').should('have.text', approveSpending.footer.buttonText);
+          cySmartGet('simple-text-body__heading').should(
+            'have.text',
+            t('views.APPROVE_ERC20.approveSpending.content.metamask.heading'),
+          );
+          cySmartGet('simple-text-body__body').should(
+            'include.text',
+            t('views.APPROVE_ERC20.approveSpending.content.metamask.body'),
+          );
+          cySmartGet('footer-button').should('have.text', t('views.APPROVE_ERC20.approveSpending.footer.buttonText'));
 
           // click button for Approval transaction
           cySmartGet('footer-button').click();
@@ -601,9 +604,15 @@ describe('SwapWidget tests', () => {
           cySmartGet('loading-view').should('be.visible');
           cy.wait(1000);
 
-          cySmartGet('simple-text-body__heading').should('have.text', approveSwap.content.heading);
-          cySmartGet('simple-text-body__body').should('include.text', approveSwap.content.body[0]);
-          cySmartGet('footer-button').should('have.text', approveSwap.footer.buttonText);
+          cySmartGet('simple-text-body__heading').should(
+            'have.text',
+            t('views.APPROVE_ERC20.approveSwap.content.heading'),
+          );
+          cySmartGet('simple-text-body__body').should(
+            'include.text',
+            t('views.APPROVE_ERC20.approveSwap.content.body'),
+          );
+          cySmartGet('footer-button').should('have.text', t('views.APPROVE_ERC20.approveSwap.footer.buttonText'));
 
           // click button for Swap transaction
           cySmartGet('footer-button').click();
@@ -646,8 +655,6 @@ describe('SwapWidget tests', () => {
               },
             });
 
-          const { approveSwap, approveSpending } = text.views[SwapWidgetViews.APPROVE_ERC20];
-
           cySmartGet('fromTokenInputs-select-form-select__target').click();
           cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
             .click();
@@ -661,10 +668,15 @@ describe('SwapWidget tests', () => {
 
           cySmartGet('swap-button').click();
 
-          cySmartGet('simple-text-body__heading').should('have.text', approveSpending.content.metamask.heading);
-          cySmartGet('simple-text-body__body').should('include.text', approveSpending.content.metamask.body[0]);
-          cySmartGet('simple-text-body__body').should('include.text', approveSpending.content.metamask.body[1]);
-          cySmartGet('footer-button').should('have.text', approveSpending.footer.buttonText);
+          cySmartGet('simple-text-body__heading').should(
+            'have.text',
+            t('views.APPROVE_ERC20.approveSpending.content.metamask.heading'),
+          );
+          cySmartGet('simple-text-body__body').should(
+            'include.text',
+            t('views.APPROVE_ERC20.approveSpending.content.metamask.body'),
+          );
+          cySmartGet('footer-button').should('have.text', t('views.APPROVE_ERC20.approveSpending.footer.buttonText'));
 
           // click button for Approval transaction
           cySmartGet('footer-button').click();
@@ -682,9 +694,15 @@ describe('SwapWidget tests', () => {
           cySmartGet('loading-view').should('be.visible');
           cy.wait(1000);
 
-          cySmartGet('simple-text-body__heading').should('have.text', approveSwap.content.heading);
-          cySmartGet('simple-text-body__body').should('include.text', approveSwap.content.body[0]);
-          cySmartGet('footer-button').should('have.text', approveSwap.footer.buttonText);
+          cySmartGet('simple-text-body__heading').should(
+            'have.text',
+            t('views.APPROVE_ERC20.approveSwap.content.heading'),
+          );
+          cySmartGet('simple-text-body__body').should(
+            'include.text',
+            t('views.APPROVE_ERC20.approveSwap.content.body'),
+          );
+          cySmartGet('footer-button').should('have.text', t('views.APPROVE_ERC20.approveSwap.footer.buttonText'));
 
           // click button for Swap transaction
           cySmartGet('footer-button').click();

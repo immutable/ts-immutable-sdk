@@ -8,7 +8,7 @@ export const containerStyles = {
 };
 
 export const contentTextStyles = {
-  color: 'base.color.text.secondary',
+  color: 'base.color.text.body.secondary',
   fontFamily: 'base.font.family.heading.secondary',
   textAlign: 'center',
   marginTop: '15px',
@@ -34,16 +34,4 @@ export const logoContainerStyles = {
   justifyContent: 'center',
   alignItems: 'center',
   paddingTop: 'base.spacing.x6',
-};
-
-export const ethLogoStyles = {
-  backgroundColor: 'white',
-  height: '100px',
-  width: '64px',
-  padding: '10px',
-};
-
-export const imxLogoStyles = {
-  height: '110px',
-  width: '64px',
 };

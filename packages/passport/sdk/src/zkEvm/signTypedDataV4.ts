@@ -9,13 +9,11 @@ import { getSignedTypedData } from './walletHelpers';
 import { TypedDataPayload } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { RelayerClient } from './relayerClient';
-import { UserZkEvm } from '../types';
 
 export type SignTypedDataV4Params = {
   magicProvider: ExternalProvider;
   jsonRpcProvider: JsonRpcProvider;
   relayerClient: RelayerClient;
-  user: UserZkEvm;
   method: string;
   params: Array<any>;
   guardianClient: GuardianClient;
@@ -74,7 +72,6 @@ export const signTypedDataV4 = async ({
   jsonRpcProvider,
   relayerClient,
   guardianClient,
-  user,
 }: SignTypedDataV4Params): Promise<string> => guardianClient
   .withConfirmationScreen({ width: 480, height: 720 })(async () => {
     const fromAddress: string = params[0];
@@ -87,7 +84,7 @@ export const signTypedDataV4 = async ({
     const { chainId } = await jsonRpcProvider.ready;
     const typedData = transformTypedData(typedDataParam, chainId);
 
-    await guardianClient.validateMessage({ chainID: String(chainId), payload: typedData, user });
+    await guardianClient.validateMessage({ chainID: String(chainId), payload: typedData });
     const relayerSignature = await relayerClient.imSignTypedData(fromAddress, typedData);
     const magicWeb3Provider = new Web3Provider(magicProvider);
     const signer = magicWeb3Provider.getSigner();

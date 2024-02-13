@@ -10,6 +10,7 @@ import { TokenInfo } from '@imtbl/checkout-sdk';
 import { TransactionResponse } from '@imtbl/dex-sdk';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { useTranslation } from 'react-i18next';
+import { Environment } from '@imtbl/config';
 import { amountInputValidation as textInputValidator } from '../../../lib/validations/amountInputValidations';
 import { SwapContext } from '../context/SwapContext';
 import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
@@ -17,7 +18,11 @@ import {
   calculateCryptoToFiat, formatZeroAmount, isNativeToken, tokenValueFormat,
 } from '../../../lib/utils';
 import {
-  DEFAULT_TOKEN_DECIMALS, DEFAULT_QUOTE_REFRESH_INTERVAL, NATIVE, DEFAULT_TOKEN_VALIDATION_DECIMALS,
+  DEFAULT_TOKEN_DECIMALS,
+  DEFAULT_QUOTE_REFRESH_INTERVAL,
+  NATIVE,
+  DEFAULT_TOKEN_VALIDATION_DECIMALS,
+  ESTIMATE_DEBOUNCE,
 } from '../../../lib';
 import { quotesProcessor } from '../functions/FetchQuote';
 import { SelectInput } from '../../../components/FormComponents/SelectInput/SelectInput';
@@ -36,6 +41,8 @@ import { NotEnoughImx } from '../../../components/NotEnoughImx/NotEnoughImx';
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { UnableToSwap } from './UnableToSwap';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
+import useDebounce from '../../../lib/hooks/useDebounce';
+import { CancellablePromise } from '../../../lib/async/cancellablePromise';
 
 enum SwapDirection {
   FROM = 'FROM',
@@ -85,6 +92,8 @@ const shouldSetToAddress = (toAddress: string | undefined, fromAddress: string |
   return true;
 };
 
+let quoteRequest: CancellablePromise<any>;
+
 export interface SwapFromProps {
   data?: SwapFormData;
 }
@@ -100,7 +109,7 @@ export function SwapForm({ data }: SwapFromProps) {
     },
   } = useContext(SwapContext);
   const { connectLoaderState } = useContext(ConnectLoaderContext);
-  const { provider } = connectLoaderState;
+  const { checkout, provider } = connectLoaderState;
 
   const formatTokenOptionsId = useCallback((symbol: string, address?: string) => (isNativeToken(address)
     ? `${symbol.toLowerCase()}-${NATIVE}`
@@ -109,8 +118,6 @@ export function SwapForm({ data }: SwapFromProps) {
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { viewDispatch } = useContext(ViewContext);
 
-  const [editing, setEditing] = useState(false);
-  const [isFetching, setIsFetching] = useState(false);
   const [direction, setDirection] = useState<SwapDirection>(SwapDirection.FROM);
   const [loading, setLoading] = useState(false);
   const [conversion, setConversion] = useState(BigNumber.from(0));
@@ -122,11 +129,13 @@ export function SwapForm({ data }: SwapFromProps) {
   // Form State
   const [fromAmount, setFromAmount] = useState<string>(data?.fromAmount || '');
   const [fromAmountError, setFromAmountError] = useState<string>('');
+  const debouncedFromAmount = useDebounce(fromAmount, ESTIMATE_DEBOUNCE);
   const [fromToken, setFromToken] = useState<TokenInfo | undefined>();
   const [fromBalance, setFromBalance] = useState<string>('');
   const [fromTokenError, setFromTokenError] = useState<string>('');
   const [toAmount, setToAmount] = useState<string>(data?.toAmount || '');
   const [toAmountError, setToAmountError] = useState<string>('');
+  const debouncedToAmount = useDebounce(toAmount, ESTIMATE_DEBOUNCE);
   const [toToken, setToToken] = useState<TokenInfo | undefined>();
   const [toTokenError, setToTokenError] = useState<string>('');
   const [fromFiatValue, setFromFiatValue] = useState('');
@@ -134,7 +143,7 @@ export function SwapForm({ data }: SwapFromProps) {
   // Quote
   const [quote, setQuote] = useState<TransactionResponse | null>(null);
   const [gasFeeValue, setGasFeeValue] = useState<string>('');
-  const [gasFeeToken, setGasFeeToken] = useState< TokenInfo | undefined>(undefined);
+  const [gasFeeToken, setGasFeeToken] = useState<TokenInfo | undefined>(undefined);
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
   const [tokensOptionsFrom, setTokensOptionsForm] = useState<CoinSelectorOptionProps[]>([]);
 
@@ -173,15 +182,15 @@ export function SwapForm({ data }: SwapFromProps) {
       if (data?.fromTokenAddress) {
         setFromToken(
           allowedTokens.find((token) => (isNativeToken(token.address)
-              && data?.fromTokenAddress?.toLowerCase() === NATIVE)
-              || token.address?.toLowerCase()
-                === data?.fromTokenAddress?.toLowerCase()),
+            && data?.fromTokenAddress?.toLowerCase() === NATIVE)
+            || token.address?.toLowerCase()
+            === data?.fromTokenAddress?.toLowerCase()),
         );
         setFromBalance(
           tokenBalances.find(
             (tokenBalance) => (
               isNativeToken(tokenBalance.token.address)
-                && data?.fromTokenAddress?.toLowerCase() === NATIVE)
+              && data?.fromTokenAddress?.toLowerCase() === NATIVE)
               || (tokenBalance.token.address?.toLowerCase() === data?.fromTokenAddress?.toLowerCase()),
           )?.formattedBalance ?? '',
         );
@@ -215,7 +224,7 @@ export function SwapForm({ data }: SwapFromProps) {
         id: formatTokenOptionsId(token.symbol, token.address),
         name: token.name,
         symbol: token.symbol,
-        icon: undefined, // todo: add correct image once available on token info
+        icon: token.icon,
       } as CoinSelectorOptionProps),
     ), [allowedTokens, fromToken]);
 
@@ -231,6 +240,22 @@ export function SwapForm({ data }: SwapFromProps) {
   // ------------------//
   //    FETCH QUOTES   //
   // ------------------//
+  const resetFormErrors = () => {
+    setFromAmountError('');
+    setFromTokenError('');
+    setToAmountError('');
+    setToTokenError('');
+  };
+
+  const resetQuote = () => {
+    if (quoteRequest) {
+      quoteRequest.cancel();
+    }
+    setSwapFromToConversionText('');
+    setGasFeeFiatValue('');
+    setQuote(null);
+  };
+
   const processFetchQuoteFrom = async (silently: boolean = false) => {
     if (!provider) return;
     if (!exchange) return;
@@ -255,15 +280,16 @@ export function SwapForm({ data }: SwapFromProps) {
         toToken,
       );
 
-      const resolved = await Promise.all([quoteResultPromise, conversionResultPromise]);
+      const currentQuoteRequest = CancellablePromise.all<TransactionResponse>([
+        quoteResultPromise,
+        conversionResultPromise,
+      ]);
+      quoteRequest = currentQuoteRequest;
+
+      const resolved = await currentQuoteRequest;
       const quoteResult = resolved[0];
       const conversionResult = resolved[1];
       setConversion(conversionResult.quote.amount.value);
-
-      // Prevent to silently fetch and set a new quote
-      // if the user has updated and the widget is already
-      // fetching or the user is updating the inputs.
-      if (silently && (loading || editing)) return;
 
       const estimate = quoteResult.swap.gasFeeEstimate;
       let gasFeeTotal = BigNumber.from(estimate?.value || 0);
@@ -307,16 +333,18 @@ export function SwapForm({ data }: SwapFromProps) {
         ),
       );
 
-      setFromAmountError('');
-      setFromTokenError('');
-      setToAmountError('');
-      setToTokenError('');
+      resetFormErrors();
     } catch (error: any) {
-      setQuote(null);
-      setShowNotEnoughImxDrawer(false);
-      setShowUnableToSwapDrawer(true);
+      if (!error.cancelled) {
+        resetQuote();
+        setShowNotEnoughImxDrawer(false);
+        setShowUnableToSwapDrawer(true);
+      }
     }
-    setIsFetching(false);
+
+    if (!silently) {
+      setLoading(false);
+    }
   };
 
   const processFetchQuoteTo = async (silently: boolean = false) => {
@@ -343,15 +371,16 @@ export function SwapForm({ data }: SwapFromProps) {
         toToken,
       );
 
-      const resolved = await Promise.all([quoteResultPromise, conversionResultPromise]);
+      const currentQuoteRequest = CancellablePromise.all<TransactionResponse>([
+        quoteResultPromise,
+        conversionResultPromise,
+      ]);
+      quoteRequest = currentQuoteRequest;
+      const resolved = await currentQuoteRequest;
+
       const quoteResult = resolved[0];
       const conversionResult = resolved[1];
       setConversion(conversionResult.quote.amount.value);
-
-      // Prevent to silently fetch and set a new quote
-      // if the user has updated and the widget is already
-      // fetching or the user is updating the inputs.
-      if (silently && (loading || editing)) return;
 
       const estimate = quoteResult.swap.gasFeeEstimate;
       let gasFeeTotal = BigNumber.from(estimate?.value || 0);
@@ -390,73 +419,66 @@ export function SwapForm({ data }: SwapFromProps) {
         ),
       );
 
-      setFromAmountError('');
-      setFromTokenError('');
-      setToAmountError('');
-      setToTokenError('');
+      resetFormErrors();
     } catch (error: any) {
-      setQuote(null);
-      setShowNotEnoughImxDrawer(false);
-      setShowUnableToSwapDrawer(true);
+      if (!error.cancelled) {
+        resetQuote();
+        setShowNotEnoughImxDrawer(false);
+        setShowUnableToSwapDrawer(true);
+      }
     }
 
-    setIsFetching(false);
+    if (!silently) {
+      setLoading(false);
+    }
   };
 
-  const canRunFromQuote = (): boolean => {
+  const canRunFromQuote = (silently: boolean): boolean => {
     if (Number.isNaN(parseFloat(fromAmount))) return false;
     if (parseFloat(fromAmount) <= 0) return false;
     if (!fromToken) return false;
     if (!toToken) return false;
-    if (isFetching) return false;
+    if (silently && loading) return false;
     return true;
   };
 
   const fetchQuoteFrom = async (silently: boolean = false) => {
-    if (!canRunFromQuote()) return;
+    if (!canRunFromQuote(silently)) return;
 
-    // setIsFetching within this if statement
-    // to allow the user to edit the form
-    // even if a new quote is fetch silently
+    // Cancel any existing quote
+    if (quoteRequest) {
+      quoteRequest.cancel();
+    }
+
     if (!silently) {
       setLoading(true);
-      setIsFetching(true);
     }
 
     await processFetchQuoteFrom(silently);
-
-    if (!silently) {
-      setLoading(false);
-      setIsFetching(false);
-    }
   };
 
-  const canRunToQuote = (): boolean => {
+  const canRunToQuote = (silently): boolean => {
     if (Number.isNaN(parseFloat(toAmount))) return false;
     if (parseFloat(toAmount) <= 0) return false;
     if (!fromToken) return false;
     if (!toToken) return false;
-    if (isFetching) return false;
+    if (silently && loading) return false;
     return true;
   };
 
   const fetchQuoteTo = async (silently: boolean = false) => {
-    if (!canRunToQuote()) return;
+    if (!canRunToQuote(silently)) return;
 
-    // setIsFetching within this if statement
-    // to allow the user to edit the form
-    // even if a new quote is fetch silently
+    // Cancel any existing quote
+    if (quoteRequest) {
+      quoteRequest.cancel();
+    }
+
     if (!silently) {
       setLoading(true);
-      setIsFetching(true);
     }
 
     await processFetchQuoteTo(silently);
-
-    if (!silently) {
-      setLoading(false);
-      setIsFetching(false);
-    }
   };
 
   const fetchQuote = async (silently: boolean = false) => {
@@ -469,17 +491,25 @@ export function SwapForm({ data }: SwapFromProps) {
 
   useEffect(() => {
     if (direction === SwapDirection.FROM) {
-      if (editing) return;
+      if (debouncedFromAmount <= 0) {
+        setLoading(false);
+        resetQuote();
+        return;
+      }
       (async () => await fetchQuote())();
     }
-  }, [fromAmount, fromToken, toToken, editing]);
+  }, [debouncedFromAmount, fromToken, toToken]);
 
   useEffect(() => {
     if (direction === SwapDirection.TO) {
-      if (editing) return;
+      if (debouncedToAmount <= 0) {
+        setLoading(false);
+        resetQuote();
+        return;
+      }
       (async () => await fetchQuote())();
     }
-  }, [toAmount, toToken, fromToken, editing]);
+  }, [debouncedToAmount, toToken, fromToken]);
 
   // during swaps, having enough IMX to cover the gas fee means
   // 1. swapping from any token to any token costs IMX - so do a check
@@ -520,32 +550,33 @@ export function SwapForm({ data }: SwapFromProps) {
     if (toToken && value === formatTokenOptionsId(toToken.symbol, toToken?.address)) {
       setToToken(undefined);
     }
-
     setFromToken(selected.token);
     setFromBalance(selected.formattedBalance);
     setFromTokenError('');
   }, [toToken]);
 
   const onFromTextInputFocus = () => {
-    setEditing(true);
     setDirection(SwapDirection.FROM);
   };
 
   const onFromTextInputChange = (value) => {
-    setFromAmount(value);
-    setFromAmountError('');
-  };
-
-  const onFromTextInputBlur = (value) => {
-    setEditing(false);
+    resetFormErrors();
+    resetQuote();
+    setToAmount('');
+    if (canRunFromQuote(false)) {
+      setLoading(true);
+    }
     setFromAmount(value);
   };
 
   const textInputMaxButtonClick = () => {
     if (!fromBalance) return;
     const fromBalanceTruncated = fromBalance.slice(0, fromBalance.indexOf('.') + DEFAULT_TOKEN_VALIDATION_DECIMALS + 1);
-    setFromAmount(fromBalanceTruncated);
+    resetFormErrors();
+    resetQuote();
+    setToAmount('');
     setDirection(SwapDirection.FROM);
+    setFromAmount(fromBalanceTruncated);
     track({
       userJourney: UserJourney.SWAP,
       screen: 'SwapCoins',
@@ -574,17 +605,17 @@ export function SwapForm({ data }: SwapFromProps) {
   }, [fromToken]);
 
   const onToTextInputFocus = () => {
-    setEditing(true);
     setDirection(SwapDirection.TO);
   };
 
   const onToTextInputChange = (value) => {
-    setToAmount(value);
-    setToAmountError('');
-  };
-
-  const onToTextInputBlur = (value) => {
-    setEditing(false);
+    resetFormErrors();
+    resetQuote();
+    setFromFiatValue('');
+    setFromAmount('');
+    if (canRunToQuote(false)) {
+      setLoading(true);
+    }
     setToAmount(value);
   };
 
@@ -643,7 +674,11 @@ export function SwapForm({ data }: SwapFromProps) {
 
   return (
     <>
-      <Box sx={{ paddingX: 'base.spacing.x4' }}>
+      <Box sx={{
+        paddingX: 'base.spacing.x4',
+        marginBottom: 'base.spacing.x2',
+      }}
+      >
         <Heading
           size="small"
           weight="regular"
@@ -656,6 +691,7 @@ export function SwapForm({ data }: SwapFromProps) {
             display: 'flex',
             flexDirection: 'column',
             rowGap: 'base.spacing.x6',
+            paddingBottom: 'base.spacing.x2',
           }}
         >
 
@@ -692,14 +728,11 @@ export function SwapForm({ data }: SwapFromProps) {
               textInputTextAlign="right"
               textInputValidator={textInputValidator}
               onTextInputChange={(v) => onFromTextInputChange(v)}
-              onTextInputBlur={(v) => onFromTextInputBlur(v)}
               onTextInputFocus={onFromTextInputFocus}
               textInputMaxButtonClick={textInputMaxButtonClick}
               onSelectChange={onFromSelectChange}
-              textInputErrorMessage={fromAmountError}
-              selectErrorMessage={fromTokenError}
-              selectInputDisabled={isFetching}
-              textInputDisabled={isFetching}
+              textInputErrorMessage={t(fromAmountError)}
+              selectErrorMessage={t(fromTokenError)}
               selectedOption={fromToken
                 ? formatTokenOptionsId(fromToken.symbol, fromToken.address)
                 : undefined}
@@ -735,13 +768,10 @@ export function SwapForm({ data }: SwapFromProps) {
               textInputTextAlign="right"
               textInputValidator={textInputValidator}
               onTextInputChange={(v) => onToTextInputChange(v)}
-              onTextInputBlur={(v) => onToTextInputBlur(v)}
               onTextInputFocus={onToTextInputFocus}
               onSelectChange={onToSelectChange}
-              textInputErrorMessage={toAmountError}
-              selectErrorMessage={toTokenError}
-              selectInputDisabled={isFetching}
-              textInputDisabled={isFetching}
+              textInputErrorMessage={t(toAmountError)}
+              selectErrorMessage={t(toTokenError)}
               selectedOption={toToken
                 ? formatTokenOptionsId(toToken.symbol, toToken.address)
                 : undefined}
@@ -750,11 +780,29 @@ export function SwapForm({ data }: SwapFromProps) {
           </Box>
         </Box>
         <Fees
-          title={t('views.SWAP.fees.title')}
-          fiatPricePrefix={t('views.SWAP.content.fiatPricePrefix')}
           gasFeeFiatValue={gasFeeFiatValue}
           gasFeeToken={gasFeeToken}
           gasFeeValue={gasFeeValue}
+          fees={[
+            {
+              label: t('drawers.feesBreakdown.fees.gasFeeSwap.label'),
+              fiatAmount: `~ ${t('drawers.feesBreakdown.fees.fiatPricePrefix')}${gasFeeFiatValue}`,
+              amount: tokenValueFormat(gasFeeValue),
+              prefix: '~',
+            },
+          ]}
+          onFeesClick={() => {
+            track({
+              userJourney: UserJourney.SWAP,
+              screen: 'SwapCoins',
+              control: 'ViewFees',
+              controlType: 'Button',
+            });
+          }}
+          sx={{
+            paddingBottom: '0',
+          }}
+          loading={loading}
         />
       </Box>
       <SwapButton
@@ -776,6 +824,7 @@ export function SwapForm({ data }: SwapFromProps) {
         openNotEnoughImxDrawer={openNotEnoughImxDrawer}
       />
       <NotEnoughImx
+        environment={checkout?.config.environment ?? Environment.PRODUCTION}
         visible={showNotEnoughImxDrawer}
         showAdjustAmount={fromToken?.address === NATIVE}
         hasZeroImx={false}

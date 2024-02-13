@@ -58,6 +58,7 @@ describe('token balance tests', () => {
         balance: '26.34',
         symbol: 'AAA',
         fiatAmount: '266.65',
+        icon: 'https://checkout-cdn.immutable.com/v1/blob/img/tokens/aaa.svg',
       },
       {
         id: '11155111-qqq-0xq',
@@ -66,6 +67,7 @@ describe('token balance tests', () => {
         symbol: 'QQQ',
         fiatAmount: '63.24',
         address: '0xQ',
+        icon: 'https://checkout-cdn.immutable.com/v1/blob/img/tokens/0xq.svg',
       },
     ]);
   });

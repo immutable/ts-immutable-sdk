@@ -64,9 +64,11 @@
     },
     "SERVICE_UNAVAILABLE_ERROR_VIEW": {
       "heading": {
-        "swap": "お使いの地域ではスワッピングは利用できません"
+        "swap": "お住まいの地域では交換が利用できません"
       },
-      "body": "お使いの地域ではこのサービスを提供できないことをお詫び申し上げます。"
+      "body": {
+        "swap": "<quickswapLink>Quickswap</quickswapLink>のウェブサイトで詳細情報をご覧ください。"
+      }
     },
     "LOADING_VIEW": {
       "text": "読み込み中"
@@ -218,25 +220,25 @@
     },
     "TOP_UP_VIEW": {
       "header": {
-        "title": "どのようにしてコインを追加しますか？"
+        "title": "コインを追加する方法は？"
       },
       "topUpOptions": {
         "onramp": {
-          "heading": "カードで購入",
-          "caption": "Google PayおよびApple Payが利用可能です。最低$5。",
+          "heading": "購入",
+          "caption": "カード、Googleペイ、またはAppleペイが利用可能。",
           "subcaption": "手数料",
           "disabledCaption": ""
         },
         "swap": {
-          "heading": "コインをスワップ",
-          "caption": "同じネットワーク上の自分のコインを使用して",
+          "heading": "交換",
+          "caption": "私の残高にあるコインで。",
           "subcaption": "手数料",
-          "disabledCaption": "お使いの地域では利用できません"
+          "disabledCaption": "お住まいの地域では利用できません"
         },
         "bridge": {
-          "heading": "コインを移動",
-          "caption": "異なるネットワーク上の自分のコインから",
-          "subcaption": "手数料 ",
+          "heading": "移動",
+          "caption": "別のウォレットやネットワークにある私のコイン。",
+          "subcaption": "手数料",
           "disabledCaption": ""
         }
       }
@@ -568,11 +570,18 @@
     },
     "notEnoughGas": {
       "content": {
-        "heading": "残高が低すぎます",
-        "body": "この移動のガス手数料をカバーするには、ETH残高が不足しています。MetaMaskを使用して直接ウォレットにETHを送金することができます。"
+        "eth": {
+          "heading": "残高が低すぎます",
+          "body": "この移動のガス手数料をカバーするには、ETH残高が不足しています。MetaMaskを使用して直接ウォレットにETHを送金することができます。"
+        },
+        "imx": {
+          "heading": "もっとIMXコインが必要になるでしょう",
+          "body": "指定された金額の手数料をカバーするために、もっとIMXコインを追加する必要があります"
+        }
       },
       "buttons": {
         "adjustAmount": "金額を調整",
+        "addMoreImx": "IMXコインを追加",
         "copyAddress": "ウォレットアドレスをコピー",
         "cancel": "閉じる"
       }
@@ -592,6 +601,18 @@
         "adjustAmount": "金額を調整",
         "addMoreImx": "IMXコインを追加",
         "cancel": "閉じる"
+      }
+    },
+    "notEnoughEthWithdrawal": {
+      "content": {
+        "heading1": "不足",
+        "heading2": "ガス用",
+        "body1": "追加",
+        "body2": "あなたの宛先アカウントに追加するか、別のアカウントを選択してガスを支払います。宛先アカウントは変更されません。"
+      },
+      "buttons": {
+        "retry": "別のアカウントでガスを支払う",
+        "dismiss": "閉じる"
       }
     },
     "unableToSwap": {

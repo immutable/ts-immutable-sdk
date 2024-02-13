@@ -65,6 +65,7 @@ export class OrdersService {
     chainName,
     status,
     sellItemContractAddress,
+    buyItemType,
     buyItemContractAddress,
     accountAddress,
     sellItemMetadataId,
@@ -84,6 +85,10 @@ export class OrdersService {
      * Sell item contract address to filter by
      */
     sellItemContractAddress?: string,
+    /**
+     * Buy item type to filter by
+     */
+    buyItemType?: 'NATIVE' | 'ERC20',
     /**
      * Buy item contract address to filter by
      */
@@ -130,6 +135,7 @@ export class OrdersService {
       query: {
         'status': status,
         'sell_item_contract_address': sellItemContractAddress,
+        'buy_item_type': buyItemType,
         'buy_item_contract_address': buyItemContractAddress,
         'account_address': accountAddress,
         'sell_item_metadata_id': sellItemMetadataId,

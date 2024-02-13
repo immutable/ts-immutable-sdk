@@ -161,6 +161,9 @@ export type WidgetEventData = {
     [SaleEventType.CLOSE_WIDGET]: {},
     [SaleEventType.TRANSACTION_SUCCESS]: SaleTransactionSuccess,
     [SaleEventType.PAYMENT_METHOD]: SalePaymentMethod,
+    [SaleEventType.REQUEST_BRIDGE]: {},
+    [SaleEventType.REQUEST_SWAP]: {},
+    [SaleEventType.REQUEST_ONRAMP]: {},
   } & OrchestrationMapping & ProviderEventMapping
 };
 

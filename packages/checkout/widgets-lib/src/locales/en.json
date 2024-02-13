@@ -66,7 +66,9 @@
       "heading": {
         "swap": "Swapping is not available in your region"
       },
-      "body": "We’re sorry we cannot provide this service in your region."
+      "body": {
+        "swap": "Please refer to <quickswapLink>Quickswap’s</quickswapLink> website for further information."
+      }
     },
     "LOADING_VIEW": {
       "text": "Loading"
@@ -113,7 +115,7 @@
       },
       "content": {
         "title": "What would you like to swap?",
-        "fiatPricePrefix": "Approx USD",
+        "fiatPricePrefix": "~ USD",
         "availableBalancePrefix": "Available"
       },
       "swapForm": {
@@ -219,20 +221,20 @@
       },
       "topUpOptions": {
         "onramp": {
-          "heading": "Buy with card",
-          "caption": "Google pay & Apple pay available. Minimum $5.",
-          "subcaption": "Fees",
+          "heading": "Buy",
+          "caption": "With card, Google pay or Apple pay available.",
+          "subcaption": "Fees ",
           "disabledCaption": ""
         },
         "swap": {
-          "heading": "Swap my coins",
-          "caption": "Using the coins I have on the same network",
+          "heading": "Swap",
+          "caption": "With the coins I have in my balance.",
           "subcaption": "Fees",
           "disabledCaption": "Not available in your region"
         },
         "bridge": {
-          "heading": "Move my coins",
-          "caption": "From the coins I have on a different network",
+          "heading": "Move",
+          "caption": "The coins I have in another wallet or network.",
           "subcaption": "Fees ",
           "disabledCaption": ""
         }
@@ -389,7 +391,7 @@
       },
       "content": {
         "title": "How much would you like to move?",
-        "fiatPricePrefix": "Approx USD",
+        "fiatPricePrefix": "~ USD",
         "availableBalancePrefix": "Available"
       },
       "bridgeForm": {
@@ -479,7 +481,7 @@
       "changeWallet": {
         "buttonText": "Change wallet"
       },
-      "fiatPricePrefix": "≈ USD $",
+      "fiatPricePrefix": "~ USD $",
       "support": {
         "body1": "Need help?",
         "body2": " Contact ",
@@ -537,11 +539,21 @@
   },
   "drawers": {
     "feesBreakdown": {
-      "heading": "Fee breakdown",
-      "total": "Fees total",
+      "heading": "Fees",
+      "total": "Total fees",
       "fees": {
-        "gas": {
-          "label": "Gas fee"
+        "fiatPricePrefix": "USD $",
+        "gasFeeSwap": {
+          "label": "Gas fee swap"
+        },
+        "gasFeeMove": {
+          "label": "Gas fee move"
+        },
+        "gasFeeApproval": {
+          "label": "Gas fee approval"
+        },
+        "serviceFee": {
+          "label": "Service fee"
         }
       }
     },
@@ -559,17 +571,24 @@
     },
     "coinSelector": {
       "option": {
-        "fiatPricePrefix": "Approx USD $"
+        "fiatPricePrefix": "~ USD $"
       },
       "noCoins": "You have no available coins to select in your wallet."
     },
     "notEnoughGas": {
       "content": {
-        "heading": "Balance too low",
-        "body": "You're ETH balance is too low to cover the gas fee on this move. You could transfer more ETH into your wallet using MetaMask directly."
+        "eth": {
+          "heading": "Balance too low",
+          "body": "You're ETH balance is too low to cover the gas fee on this move. You could transfer more ETH into your wallet using MetaMask directly."
+        },
+        "imx": {
+          "heading": "You'll need more IMX coins",
+          "body": "In order to cover the fees for the amount specified, you'll need to add more IMX coins."
+        }
       },
       "buttons": {
         "adjustAmount": "Adjust amount",
+        "addMoreImx": "Add IMX coins",
         "copyAddress": "Copy wallet address",
         "cancel": "Dismiss"
       }
@@ -589,6 +608,18 @@
         "adjustAmount": "Adjust amount",
         "addMoreImx": "Add IMX coins",
         "cancel": "Dismiss"
+      }
+    },
+    "notEnoughEthWithdrawal": {
+      "content": {
+        "heading1": "Insufficient",
+        "heading2": "for gas",
+        "body1": "Add",
+        "body2": "to your destination account, or select another account to pay the gas. Your destination account will remain the same."
+      },
+      "buttons": {
+        "retry": "Pay gas with another account",
+        "dismiss": "Dismiss"
       }
     },
     "unableToSwap": {

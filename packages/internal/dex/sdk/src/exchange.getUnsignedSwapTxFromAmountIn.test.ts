@@ -9,7 +9,7 @@ import { Environment } from '@imtbl/config';
 import { Router, addAmount, newAmount } from 'lib';
 import { PaymentsExtended, SwapRouter } from '@uniswap/router-sdk';
 import { WIMX__factory } from 'contracts/types';
-import { IMMUTABLE_TESTNET_CHAIN_ID } from './constants';
+import { AVERAGE_SECONDARY_FEE_EXTRA_GAS, IMMUTABLE_TESTNET_CHAIN_ID } from './constants';
 import { Exchange } from './exchange';
 import {
   mockRouterImplementation,
@@ -452,6 +452,9 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(swap.transaction.to).toBe(TEST_SWAP_PROXY_ADDRESS);
       expect(swap.transaction.from).toBe(params.fromAddress);
       expect(swap.transaction.value).toBe('0x00');
+      expect(
+        swap.gasFeeEstimate?.value.toString(),
+      ).toBe((TEST_TRANSACTION_GAS_USAGE.add(AVERAGE_SECONDARY_FEE_EXTRA_GAS)).mul(TEST_GAS_PRICE).toString());
     });
   });
 

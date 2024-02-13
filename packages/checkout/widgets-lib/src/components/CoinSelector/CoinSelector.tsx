@@ -4,9 +4,9 @@ import {
   Box,
   MenuItem,
 } from '@biom3/react';
+import { useTranslation } from 'react-i18next';
 import { CoinSelectorOption, CoinSelectorOptionProps } from './CoinSelectorOption';
 import { selectOptionsContainerStyles, selectOptionsLoadingIconStyles } from './CoinSelectorStyles';
-import { text } from '../../resources/text/textConfig';
 
 type CoinSelectorProps = {
   onCloseDrawer?: () => void;
@@ -20,7 +20,7 @@ type CoinSelectorProps = {
 export function CoinSelector({
   heading, options, optionsLoading, children, onCloseDrawer, visible,
 }: CoinSelectorProps) {
-  const { noCoins } = text.drawers.coinSelector;
+  const { t } = useTranslation();
   return (
     <Drawer headerBarTitle={heading} size="full" onCloseDrawer={onCloseDrawer} visible={visible}>
       <Drawer.Target>
@@ -35,7 +35,11 @@ export function CoinSelector({
               <MenuItem shimmer emphasized testId="balance-item-shimmer--3" />
             </Box>
           )}
-          {!optionsLoading && options.length === 0 && (<Body sx={{ padding: 'base.spacing.x4' }}>{noCoins}</Body>)}
+          {!optionsLoading && options.length === 0 && (
+            <Body sx={{ padding: 'base.spacing.x4' }}>
+              {t('drawers.coinSelector.noCoins')}
+            </Body>
+          )}
           {!optionsLoading && options.map(({
             onClick, icon, name, symbol, balance, id, testId,
           }) => (

@@ -6,5 +6,5 @@ export const supportMessageBoxStyle = {
 };
 
 export const bodyStyle = {
-  color: 'base.color.text.secondary',
+  color: 'base.color.text.body.secondary',
 };

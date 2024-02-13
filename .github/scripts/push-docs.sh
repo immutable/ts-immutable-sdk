@@ -18,7 +18,7 @@ fi
 # Do not remove the trailing period!!!
 # https://dev.to/ackshaey/macos-vs-linux-the-cp-command-will-trip-you-up-2p00
 INPUT_SOURCE_FOLDER="./docs/."
-INPUT_DESTINATION_REPO="immutable/imx-docs"
+INPUT_DESTINATION_REPO="immutable/docs"
 INPUT_DESTINATION_HEAD_BRANCH="ts-immutable-sdk-docs-$VERSION"
 INPUT_DESTINATION_FOLDER="$CLONE_DIR/api-docs/sdk-references/ts-immutable-sdk/$VERSION"
 

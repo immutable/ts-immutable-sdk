@@ -157,7 +157,7 @@ export const getApproval = async (
     preparedApproval.amount.token.address,
   );
 
-  const gasFeeEstimate = gasPrice ? calculateGasFee(gasPrice, gasEstimate) : null;
+  const gasFeeEstimate = gasPrice ? calculateGasFee(false, gasPrice, gasEstimate) : null;
 
   return {
     transaction: approveTransaction,

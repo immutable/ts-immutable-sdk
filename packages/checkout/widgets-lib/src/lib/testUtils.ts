@@ -206,6 +206,8 @@ export const cyIntercept = (overrides?: {
     },
   };
 
+  cy.intercept('https://api.x.immutable.com/v1/sdk/initialise', { success: true });
+
   cy.intercept(
     `${checkoutApi}/config`,
     {

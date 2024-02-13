@@ -18,3 +18,7 @@ export const BASIS_POINT_PRECISION = 10_000;
 
 // 10% maximum secondary fee
 export const MAX_SECONDARY_FEE_BASIS_POINTS = 1000;
+
+// How much more gas does a swap with secondary fees cost?
+// This number is the average difference of a number of different swaps with different hop amounts, etc.
+export const AVERAGE_SECONDARY_FEE_EXTRA_GAS = 50876;

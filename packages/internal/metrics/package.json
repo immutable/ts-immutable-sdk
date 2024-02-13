@@ -5,7 +5,9 @@
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
-    "axios": "^1.6.5"
+    "axios": "^1.6.5",
+    "global-const": "^0.1.2",
+    "lru-memorise": "^0.2.1"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.0.0",

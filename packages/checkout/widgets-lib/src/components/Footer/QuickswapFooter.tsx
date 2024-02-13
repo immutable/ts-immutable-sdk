@@ -1,15 +1,15 @@
 /* eslint-disable max-len */
 import { Body, Box } from '@biom3/react';
 import { WidgetTheme } from '@imtbl/checkout-sdk';
+import { useTranslation } from 'react-i18next';
 import { quickswapFooterStyles, quickswapFooterDisclaimerTextStyles, quickswapFooterLogoStyles } from './FooterStyles';
-import { text } from '../../resources/text/textConfig';
 
 export interface QuickswapFooterProps {
   theme: WidgetTheme;
 }
 
 export function QuickswapFooter({ theme }: QuickswapFooterProps) {
-  const { disclaimerText } = text.footers.quickswapFooter;
+  const { t } = useTranslation();
 
   const quickSwapLogoDark = (
     <svg width="99" height="30" viewBox="0 0 99 30" fill="none" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
@@ -45,7 +45,7 @@ export function QuickswapFooter({ theme }: QuickswapFooterProps) {
         {theme === WidgetTheme.DARK ? quickSwapLogoDark : quickSwapLogoLight}
       </Box>
       <Body testId="quickswap-footer-disclaimer-text" size="xSmall" sx={quickswapFooterDisclaimerTextStyles}>
-        {disclaimerText}
+        {t('footers.quickswapFooter.disclaimerText')}
       </Body>
     </Box>
   );

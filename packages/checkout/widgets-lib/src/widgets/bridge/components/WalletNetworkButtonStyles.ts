@@ -32,7 +32,7 @@ export const walletLogoStyles = (walletName: WalletProviderName) => ({
   borderRadius: 'base.borderRadius.x2',
 });
 
-export const walletCaptionStyles = { color: 'base.color.text.secondary' };
+export const walletCaptionStyles = { color: 'base.color.text.body.secondary' };
 
 export const networkButtonStyles = {
   paddingY: 'base.spacing.x6',

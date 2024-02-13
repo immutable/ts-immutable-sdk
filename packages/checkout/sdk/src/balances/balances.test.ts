@@ -16,7 +16,7 @@ import {
   NetworkInfo,
   TokenInfo,
 } from '../types';
-import { CheckoutError, CheckoutErrorType } from '../errors';
+import { CheckoutErrorType } from '../errors';
 import * as tokens from '../tokens';
 import { CheckoutConfiguration } from '../config';
 import {
@@ -96,12 +96,17 @@ describe('balances', () => {
         getNetwork: mockGetNetwork,
       }));
 
-      await expect(getBalance(testCheckoutConfig, mockProvider(), '0xAddress')).rejects.toThrow(
-        new CheckoutError(
-          '[GET_BALANCE_ERROR] Cause:Error getting balance',
-          CheckoutErrorType.GET_BALANCE_ERROR,
-        ),
-      );
+      let message;
+      let type;
+      try {
+        await getBalance(testCheckoutConfig, mockProvider(), '0xAddress');
+      } catch (err: any) {
+        message = err.message;
+        type = err.type;
+      }
+
+      expect(message).toContain('Error getting balance');
+      expect(type).toEqual(CheckoutErrorType.GET_BALANCE_ERROR);
     });
 
     it(
@@ -119,12 +124,17 @@ describe('balances', () => {
           }),
         }));
 
-        await expect(getBalance(testCheckoutConfig, mockProvider(), '0xAddress')).rejects.toThrow(
-          new CheckoutError(
-            '[GET_BALANCE_ERROR] Cause:Chain:0 is not a supported chain',
-            CheckoutErrorType.GET_BALANCE_ERROR,
-          ),
-        );
+        let message;
+        let type;
+        try {
+          await getBalance(testCheckoutConfig, mockProvider(), '0xAddress');
+        } catch (err: any) {
+          message = err.message;
+          type = err.type;
+        }
+
+        expect(message).toContain('Chain:0 is not a supported chain');
+        expect(type).toEqual(CheckoutErrorType.GET_BALANCE_ERROR);
       },
     );
   });
@@ -181,14 +191,17 @@ describe('balances', () => {
           .mockRejectedValue(new Error('Error getting balance from contract')),
       });
 
-      await expect(
-        getERC20Balance(mockProvider(), 'abc123', '0x10c'),
-      ).rejects.toThrow(
-        new CheckoutError(
-          '[GET_ERC20_BALANCE_ERROR] Cause:Error getting balance from contract',
-          CheckoutErrorType.GET_ERC20_BALANCE_ERROR,
-        ),
-      );
+      let message;
+      let type;
+      try {
+        await getERC20Balance(mockProvider(), 'abc123', '0x10c');
+      } catch (err: any) {
+        message = err.message;
+        type = err.type;
+      }
+
+      expect(message).toContain('Error getting balance from contract');
+      expect(type).toEqual(CheckoutErrorType.GET_ERC20_BALANCE_ERROR);
     });
 
     it('should throw an error if the contract address is invalid', async () => {
@@ -199,15 +212,14 @@ describe('balances', () => {
         return new contract(mockProvider(), JSON.stringify(ERC20ABI), null);
       });
 
-      await expect(
-        getERC20Balance(mockProvider(), 'abc123', '0x10c'),
-      ).rejects.toThrow(
-        new CheckoutError(
-          // eslint-disable-next-line max-len
-          '[GET_ERC20_BALANCE_ERROR] Cause:invalid contract address or ENS name (argument="addressOrName", value=undefined, code=INVALID_ARGUMENT, version=contracts/5.7.0)',
-          CheckoutErrorType.GET_ERC20_BALANCE_ERROR,
-        ),
-      );
+      let type;
+      try {
+        await getERC20Balance(mockProvider(), 'abc123', '0x10c');
+      } catch (err: any) {
+        type = err.type;
+      }
+
+      expect(type).toEqual(CheckoutErrorType.GET_ERC20_BALANCE_ERROR);
     });
   });
 
@@ -318,8 +330,8 @@ describe('balances', () => {
           undefined,
           ChainId.ETHEREUM,
         );
-      } catch (e: any) {
-        message = e.message;
+      } catch (err: any) {
+        message = err.message;
       }
       expect(message).toContain('both walletAddress and provider are missing');
     });

@@ -13,6 +13,8 @@ export const DEFAULT_GT_ONE_TOKEN_FORMATTING_DECIMALS = 2;
 // Used to enforce the number of decimals in the input fields
 export const DEFAULT_TOKEN_VALIDATION_DECIMALS = DEFAULT_TOKEN_FORMATTING_DECIMALS;
 
+export const ESTIMATE_DEBOUNCE = 700; // ms
+
 export const IMX_TOKEN_SYMBOL = 'IMX';
 export const ETH_TOKEN_SYMBOL = 'ETH';
 
@@ -105,3 +107,5 @@ export const PASSPORT_URL = {
   [Environment.SANDBOX]: 'https://passport.sandbox.immutable.com/',
   [Environment.PRODUCTION]: 'https://passport.immutable.com/',
 };
+
+export const WITHDRAWAL_CLAIM_GAS_LIMIT = 91000;

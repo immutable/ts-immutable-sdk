@@ -1,6 +1,7 @@
 import { BigNumber, providers } from 'ethers';
 import { newAmount } from 'lib';
 import { CoinAmount, Native } from 'types';
+import { AVERAGE_SECONDARY_FEE_EXTRA_GAS } from '../../constants';
 
 type FeeData = {
   maxFeePerGas: BigNumber;
@@ -51,6 +52,13 @@ export const fetchGasPrice = async (provider: Provider, nativeToken: Native): Pr
  * @param {BigNumber} gasEstimate - The total gas units that will be used for the transaction
  * @returns - The cost of the transaction in the gas token's smallest denomination (e.g. WEI)
  */
-export const calculateGasFee = (gasPrice: CoinAmount<Native>, gasEstimate: BigNumber): CoinAmount<Native> =>
+export const calculateGasFee = (
+  hasSecondaryFees: boolean,
+  gasPrice: CoinAmount<Native>,
+  gasEstimate: BigNumber,
+): CoinAmount<Native> => {
+  const baseGasFee = newAmount(gasEstimate.mul(gasPrice.value), gasPrice.token);
+  if (!hasSecondaryFees) return baseGasFee;
+  return newAmount(baseGasFee.value.add(gasPrice.value.mul(AVERAGE_SECONDARY_FEE_EXTRA_GAS)), gasPrice.token);
   // eslint-disable-next-line implicit-arrow-linebreak
-  newAmount(gasEstimate.mul(gasPrice.value), gasPrice.token);
+};
