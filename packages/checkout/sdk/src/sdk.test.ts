@@ -759,6 +759,7 @@ describe('Connect', () => {
         tokenAmount: undefined,
         tokenSymbol: 'IMX',
         email: undefined,
+        allowedTokens: [],
       });
     });
 
@@ -803,6 +804,7 @@ describe('Connect', () => {
         tokenAmount: '10',
         tokenSymbol: 'ETH',
         email: undefined,
+        allowedTokens: ['ETH', 'MATIC'],
       });
     });
 
@@ -846,6 +848,7 @@ describe('Connect', () => {
         tokenAmount: '10',
         tokenSymbol: 'IMX',
         email: undefined,
+        allowedTokens: ['IMX', 'ETH', 'MATIC'],
       });
     });
 
@@ -869,6 +872,7 @@ describe('Connect', () => {
       const mockPassport = {
         getUserInfo: jest.fn().mockResolvedValue(mockUser),
       } as unknown as Passport;
+      (getTokenAllowList as jest.Mock).mockResolvedValue([]);
 
       const params: FiatRampParams = {
         exchangeType: ExchangeType.ONRAMP,
