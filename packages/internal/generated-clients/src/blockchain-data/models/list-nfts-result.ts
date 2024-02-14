@@ -27,7 +27,7 @@ import { Page } from './page';
  */
 export interface ListNFTsResult {
     /**
-     * List of nfts
+     * List of NFTs
      * @type {Array<NFT>}
      * @memberof ListNFTsResult
      */

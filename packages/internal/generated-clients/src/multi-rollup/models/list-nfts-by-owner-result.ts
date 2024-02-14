@@ -27,7 +27,7 @@ import { Page } from './page';
  */
 export interface ListNFTsByOwnerResult {
     /**
-     * List of nfts by owner
+     * List of NFTs by owner
      * @type {Array<NFTWithBalance>}
      * @memberof ListNFTsByOwnerResult
      */
