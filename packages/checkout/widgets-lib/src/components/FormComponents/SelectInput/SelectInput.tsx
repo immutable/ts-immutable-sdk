@@ -5,7 +5,7 @@ import {
   selectStyle,
 } from './SelectInputStyles';
 import { SelectForm } from '../SelectForm/SelectForm';
-import { TextInputForm } from '../TextInputForm/TextInputForm';
+import { TextInputForm, TextInputType } from '../TextInputForm/TextInputForm';
 import { CoinSelectorOptionProps } from '../../CoinSelector/CoinSelectorOption';
 
 interface SelectInputProps {
@@ -17,6 +17,7 @@ interface SelectInputProps {
   textInputPlaceholder?: string;
   textInputSubtext?: string;
   textInputErrorMessage?: string;
+  textInputType?: TextInputType;
   selectSubtext?: string;
   selectErrorMessage?: string;
   coinSelectorHeading: string;
@@ -37,6 +38,7 @@ export function SelectInput({
   textInputValue,
   textInputPlaceholder,
   textInputValidator,
+  textInputType,
   onTextInputChange,
   onTextInputBlur,
   onTextInputFocus,
@@ -70,6 +72,7 @@ export function SelectInput({
       </Box>
       <Box sx={inputStyle}>
         <TextInputForm
+          type={textInputType}
           testId={`${testId}-text-form`}
           value={textInputValue}
           placeholder={textInputPlaceholder}
