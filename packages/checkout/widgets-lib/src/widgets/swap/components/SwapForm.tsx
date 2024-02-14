@@ -726,6 +726,7 @@ export function SwapForm({ data }: SwapFromProps) {
                   : ''
               }
               selectTextAlign="left"
+              textInputType="number"
               textInputValue={fromAmount}
               textInputPlaceholder={t('views.SWAP.swapForm.from.inputPlaceholder')}
               textInputSubtext={`${t('views.SWAP.content.fiatPricePrefix')} 
@@ -771,6 +772,7 @@ export function SwapForm({ data }: SwapFromProps) {
               testId="toTokenInputs"
               options={tokensOptionsTo}
               selectTextAlign="left"
+              textInputType="number"
               textInputValue={toAmount}
               textInputPlaceholder={t('views.SWAP.swapForm.to.inputPlaceholder')}
               textInputTextAlign="right"
