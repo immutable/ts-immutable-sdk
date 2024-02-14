@@ -48,6 +48,7 @@ export class FiatRampService {
     const productsAvailed = 'productsAvailed=buy';
     const exchangeScreenTitle = 'exchangeScreenTitle=Buy';
     const themeColor = 'themeColor=0D0D0D';
+    const defaultFiat = 'defaultFiatAmount=50&defaultFiatCurrency=usd';
 
     widgetUrl += `${transakPublishableKey}&`
       + `${zkevmNetwork}&`
@@ -55,8 +56,8 @@ export class FiatRampService {
       + `${disableBankTransfer}&`
       + `${productsAvailed}&`
       + `${exchangeScreenTitle}&`
-      + `${themeColor}`;
-
+      + `${themeColor}&`
+      + `${defaultFiat}`;
     if (params.isPassport && params.email) {
       const encodedEmail = encodeURIComponent(params.email);
       widgetUrl += `&email=${encodedEmail}&isAutoFillUserData=true&disableWalletAddressForm=true`;
