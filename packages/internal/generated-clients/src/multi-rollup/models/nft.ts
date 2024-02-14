@@ -16,6 +16,9 @@
 // May contain unused imports in some cases
 // @ts-ignore
 import { Chain } from './chain';
+// May contain unused imports in some cases
+// @ts-ignore
+import { NFTMetadataAttribute } from './nftmetadata-attribute';
 
 /**
  * 
@@ -101,5 +104,11 @@ export interface NFT {
      * @memberof NFT
      */
     'youtube_url': string | null;
+    /**
+     * List of NFT Metadata attributes
+     * @type {Array<NFTMetadataAttribute>}
+     * @memberof NFT
+     */
+    'attributes': Array<NFTMetadataAttribute>;
 }
 
