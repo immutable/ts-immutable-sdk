@@ -11,6 +11,8 @@ import { Base } from 'widgets/BaseWidgetRoot';
 import { isValidWalletProvider, isValidAmount, isValidAddress } from 'lib/validations/widgetValidators';
 import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
+import { LoadingView } from 'views/loading/LoadingView';
+import i18n from '../../i18n';
 
 const BridgeWidget = React.lazy(() => import('./BridgeWidget'));
 
@@ -58,11 +60,13 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
 
   protected render() {
     if (!this.reactRoot) return;
+    const { t } = i18n;
+
     this.reactRoot.render(
       <React.StrictMode>
         <CustomAnalyticsProvider checkout={this.checkout}>
           <ThemeProvider id="bridge-container" config={this.strongConfig()}>
-            <Suspense fallback={<div />}>
+            <Suspense fallback={<LoadingView loadingText={t('views.LOADING_VIEW.text')} />}>
               <BridgeWidget
                 checkout={this.checkout}
                 config={this.strongConfig()}

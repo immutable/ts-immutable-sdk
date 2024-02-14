@@ -14,7 +14,9 @@ import { getL1ChainId, getL2ChainId } from 'lib';
 import { isValidAddress, isValidAmount } from 'lib/validations/widgetValidators';
 import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
+import { LoadingView } from 'views/loading/LoadingView';
 import { sendOnRampWidgetCloseEvent } from './OnRampWidgetEvents';
+import i18n from '../../i18n';
 
 const OnRampWidget = React.lazy(() => import('./OnRampWidget'));
 
@@ -58,6 +60,7 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
   protected render() {
     if (!this.reactRoot) return;
 
+    const { t } = i18n;
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER2,
       walletProviderName: this.parameters.walletProviderName,
@@ -75,7 +78,7 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
               params={connectLoaderParams}
               closeEvent={() => sendOnRampWidgetCloseEvent(window)}
             >
-              <Suspense fallback={<div />}>
+              <Suspense fallback={<LoadingView loadingText={t('views.ONRAMP.initialLoadingText')} />}>
                 <OnRampWidget
                   tokenAddress={this.parameters.tokenAddress}
                   amount={this.parameters.amount}

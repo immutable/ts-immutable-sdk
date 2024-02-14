@@ -18,6 +18,7 @@ import { ServiceType } from 'views/error/serviceTypes';
 import { isValidAddress, isValidAmount, isValidWalletProvider } from 'lib/validations/widgetValidators';
 import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
+import { LoadingView } from 'views/loading/LoadingView';
 import { topUpBridgeOption, topUpOnRampOption } from './helpers';
 import { sendSwapWidgetCloseEvent } from './SwapWidgetEvents';
 import i18n from '../../i18n';
@@ -126,7 +127,7 @@ export class Swap extends Base<WidgetType.SWAP> {
                       widgetConfig={this.strongConfig()}
                       closeEvent={() => sendSwapWidgetCloseEvent(window)}
                     >
-                      <Suspense fallback={<div />}>
+                      <Suspense fallback={<LoadingView loadingText={t('views.LOADING_VIEW.text')} />}>
                         <SwapWidget
                           fromTokenAddress={this.parameters.fromTokenAddress}
                           toTokenAddress={this.parameters.toTokenAddress}
