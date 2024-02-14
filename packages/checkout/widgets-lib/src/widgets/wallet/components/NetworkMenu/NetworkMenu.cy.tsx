@@ -7,7 +7,6 @@ import {
 import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
 import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
-import { useTranslation } from 'react-i18next';
 import { WalletContext, WalletState } from '../../context/WalletContext';
 import { cyIntercept, cySmartGet } from '../../../../lib/testUtils';
 import { NetworkMenu } from './NetworkMenu';
@@ -53,11 +52,9 @@ describe('Network Menu', () => {
         </ConnectLoaderTestComponent>
       </ViewContextTestComponent>,
     );
-
-    const { t } = useTranslation();
     cySmartGet('network-heading').should(
       'include.text',
-      t('views.WALLET_BALANCES.networkStatus.heading'),
+      'Network',
     );
   });
   it('should have network buttons', () => {
