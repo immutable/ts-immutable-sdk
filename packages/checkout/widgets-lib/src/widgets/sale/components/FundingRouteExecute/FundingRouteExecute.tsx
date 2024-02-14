@@ -57,7 +57,7 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
   const {
     config, provider, checkout, env, environmentId,
   } = useSaleContext();
-  const { fetchCurrency, currencyResponse } = useCurrency({ env, environmentId });
+  const { fetchCurrency } = useCurrency({ env, environmentId });
 
   const { viewDispatch } = useContext(ViewContext);
 
@@ -116,13 +116,9 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
     }
     if (step.type === FundingStepType.SWAP) {
       let requiredTokenAddress = '';
-      if (currencyResponse && currencyResponse.length > 0) {
-        requiredTokenAddress = currencyResponse[0].erc20_address;
-      } else {
-        const fetchedTokenAddress = await fetchCurrency();
-        if (fetchedTokenAddress && fetchedTokenAddress.length > 0) {
-          requiredTokenAddress = fetchedTokenAddress[0].erc20_address;
-        }
+      const fetchedTokenAddresses = await fetchCurrency();
+      if (fetchedTokenAddresses && fetchedTokenAddresses.length > 0) {
+        requiredTokenAddress = fetchedTokenAddresses[0].erc20_address;
       }
 
       setSwapParams({

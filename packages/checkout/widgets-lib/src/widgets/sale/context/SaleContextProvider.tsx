@@ -252,7 +252,7 @@ export function SaleContextProvider(props: {
     [[paymentMethod, executeResponse]],
   );
 
-  const { fetchCurrency, currencyResponse } = useCurrency({
+  const { fetchCurrency } = useCurrency({
     env,
     environmentId,
   });
@@ -262,21 +262,19 @@ export function SaleContextProvider(props: {
       type: SalePaymentTypes,
       callback?: (r?: SignResponse) => void,
     ): Promise<SignResponse | undefined> => {
-      let fetchedCurrency;
-      if (currencyResponse) {
-        fetchedCurrency = currencyResponse;
-      } else {
-        fetchedCurrency = await fetchCurrency();
-      }
+      const fetchedTokenAddresses = await fetchCurrency();
 
-      if (!fetchedCurrency || fetchedCurrency.length === 0) {
+      if (!fetchedTokenAddresses || fetchedTokenAddresses.length === 0) {
         goToErrorView(SaleErrorTypes.SERVICE_BREAKDOWN, {
           error: new Error('Failed to fetch currency data'),
         });
         return undefined;
       }
 
-      const response = await signOrder(type, fetchedCurrency[0].erc20_address);
+      const response = await signOrder(
+        type,
+        fetchedTokenAddresses[0].erc20_address,
+      );
       if (!response) return undefined;
 
       callback?.(response);
