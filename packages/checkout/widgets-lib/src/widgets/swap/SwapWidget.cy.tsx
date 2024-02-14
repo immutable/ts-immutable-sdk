@@ -9,7 +9,6 @@ import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { Web3Provider } from '@ethersproject/providers';
 import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
-import { useTranslation } from 'react-i18next';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import SwapWidget from './SwapWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
@@ -21,7 +20,6 @@ import {
 import { NATIVE } from '../../lib';
 
 describe('SwapWidget tests', () => {
-  const { t } = useTranslation();
   const mockProvider = {
     getSigner: () => ({
       getAddress: () => Promise.resolve('0xwalletAddress'),
@@ -486,12 +484,10 @@ describe('SwapWidget tests', () => {
           cySmartGet('toTokenInputs-select-form-select__target').click();
           cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
 
-          cySmartGet('fromTokenInputs-text-form-text__input').type('0.1');
-          cySmartGet('fromTokenInputs-text-form-text__input').blur();
-
+          cySmartGet('fromTokenInputs-text-form-text__input').type('0.1').trigger('change');
+          cySmartGet('@fromAmountInStub').should('have.been.called');
           cySmartGet('swap-button').click();
 
-          cySmartGet('@fromAmountInStub').should('have.been.called');
           cySmartGet('@sendTransactionStub').should('have.been.calledOnce');
           cySmartGet('loading-view').should('be.visible');
           cy.wait(1000);
@@ -524,12 +520,10 @@ describe('SwapWidget tests', () => {
           // eslint-disable-next-line max-len
           cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
 
-          cySmartGet('fromTokenInputs-text-form-text__input').type('0.1');
-          cySmartGet('fromTokenInputs-text-form-text__input').blur();
-
+          cySmartGet('fromTokenInputs-text-form-text__input').type('0.1').trigger('change');
+          cySmartGet('@fromAmountInStub').should('have.been.called');
           cySmartGet('swap-button').click();
 
-          cySmartGet('@fromAmountInStub').should('have.been.called');
           cySmartGet('@sendTransactionStub').should('have.been.calledOnce');
           cySmartGet('loading-view').should('be.visible');
           cy.wait(1000);
@@ -573,25 +567,22 @@ describe('SwapWidget tests', () => {
           // eslint-disable-next-line max-len
           cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
 
-          cySmartGet('fromTokenInputs-text-form-text__input').type('0.1');
-          cySmartGet('fromTokenInputs-text-form-text__input').blur();
-
+          cySmartGet('fromTokenInputs-text-form-text__input').type('0.1').trigger('change');
+          cySmartGet('@fromAmountInStub').should('have.been.called');
           cySmartGet('swap-button').click();
 
           cySmartGet('simple-text-body__heading').should(
             'have.text',
-            t('views.APPROVE_ERC20.approveSpending.content.metamask.heading'),
+            'You\'ll be asked to set a spending cap for this transaction',
           );
           cySmartGet('simple-text-body__body').should(
             'include.text',
-            t('views.APPROVE_ERC20.approveSpending.content.metamask.body'),
+            'Input at least 0.1 ETH for this transaction and future transactions, then follow the prompts.',
           );
-          cySmartGet('footer-button').should('have.text', t('views.APPROVE_ERC20.approveSpending.footer.buttonText'));
+          cySmartGet('footer-button').should('have.text', 'Got it');
 
           // click button for Approval transaction
           cySmartGet('footer-button').click();
-
-          cySmartGet('@fromAmountInStub').should('have.been.called');
           cySmartGet('@sendTransactionStub').should('have.been.calledOnce');
           cySmartGet('@sendTransactionStub')
             .should(
@@ -606,13 +597,13 @@ describe('SwapWidget tests', () => {
 
           cySmartGet('simple-text-body__heading').should(
             'have.text',
-            t('views.APPROVE_ERC20.approveSwap.content.heading'),
+            'Now you\'ll just need to confirm the transaction',
           );
           cySmartGet('simple-text-body__body').should(
             'include.text',
-            t('views.APPROVE_ERC20.approveSwap.content.body'),
+            'Follow the prompts in your wallet.',
           );
-          cySmartGet('footer-button').should('have.text', t('views.APPROVE_ERC20.approveSwap.footer.buttonText'));
+          cySmartGet('footer-button').should('have.text', 'Okay');
 
           // click button for Swap transaction
           cySmartGet('footer-button').click();
@@ -663,20 +654,20 @@ describe('SwapWidget tests', () => {
           // eslint-disable-next-line max-len
           cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
 
-          cySmartGet('fromTokenInputs-text-form-text__input').type('0.1');
-          cySmartGet('fromTokenInputs-text-form-text__input').blur();
+          cySmartGet('fromTokenInputs-text-form-text__input').type('0.1').trigger('change');
+          cySmartGet('@fromAmountInStub').should('have.been.called');
 
           cySmartGet('swap-button').click();
 
           cySmartGet('simple-text-body__heading').should(
             'have.text',
-            t('views.APPROVE_ERC20.approveSpending.content.metamask.heading'),
+            'You\'ll be asked to set a spending cap for this transaction',
           );
           cySmartGet('simple-text-body__body').should(
             'include.text',
-            t('views.APPROVE_ERC20.approveSpending.content.metamask.body'),
+            'Input at least 0.1 ETH for this transaction and future transactions, then follow the prompts.',
           );
-          cySmartGet('footer-button').should('have.text', t('views.APPROVE_ERC20.approveSpending.footer.buttonText'));
+          cySmartGet('footer-button').should('have.text', 'Got it');
 
           // click button for Approval transaction
           cySmartGet('footer-button').click();
@@ -696,13 +687,13 @@ describe('SwapWidget tests', () => {
 
           cySmartGet('simple-text-body__heading').should(
             'have.text',
-            t('views.APPROVE_ERC20.approveSwap.content.heading'),
+            'Now you\'ll just need to confirm the transaction',
           );
           cySmartGet('simple-text-body__body').should(
             'include.text',
-            t('views.APPROVE_ERC20.approveSwap.content.body'),
+            'Follow the prompts in your wallet.',
           );
-          cySmartGet('footer-button').should('have.text', t('views.APPROVE_ERC20.approveSwap.footer.buttonText'));
+          cySmartGet('footer-button').should('have.text', 'Okay');
 
           // click button for Swap transaction
           cySmartGet('footer-button').click();

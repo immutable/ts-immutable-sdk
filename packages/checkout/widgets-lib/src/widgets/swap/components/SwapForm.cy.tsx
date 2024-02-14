@@ -9,7 +9,6 @@ import {
 import { Exchange } from '@imtbl/dex-sdk';
 import { Environment } from '@imtbl/config';
 import { SinonStub } from 'cypress/types/sinon';
-import { useTranslation } from 'react-i18next';
 import { cyIntercept, cySmartGet } from '../../../lib/testUtils';
 import { SwapWidgetTestComponent } from '../test-components/SwapWidgetTestComponent';
 import { SwapForm } from './SwapForm';
@@ -23,7 +22,6 @@ import {
 import { NATIVE } from '../../../lib';
 
 describe('SwapForm', () => {
-  const { t } = useTranslation();
   let testSwapState: SwapState;
   let cryptoConversions;
 
@@ -107,14 +105,14 @@ describe('SwapForm', () => {
       cySmartGet('fromTokenInputs-text-form-text')
         .should('be.visible');
       cySmartGet('fromTokenInputs-text-form-text__input')
-        .should('have.attr', 'placeholder', t('views.SWAP.swapForm.from.inputPlaceholder'));
+        .should('have.attr', 'placeholder', '0');
       cySmartGet('toTokenInputs-select-form-select__target').should('be.visible');
       cySmartGet('toTokenInputs-select-form-select__target').should('have.text', 'Select coin');
       cySmartGet('toTokenInputs-text-form-text').should('be.visible');
       cySmartGet('toTokenInputs-text-form-text__input').should(
         'have.attr',
         'placeholder',
-        t('views.SWAP.swapForm.to.inputPlaceholder'),
+        '0',
       );
     });
 
@@ -306,7 +304,7 @@ describe('SwapForm', () => {
   });
 
   describe('swap form behaviour', () => {
-    it('should validate all inputs when Swap Button is clicked', () => {
+    it('should validate from input when direction is from and Swap Button is clicked', () => {
       mount(
         <SwapWidgetTestComponent
           initialStateOverride={testSwapState}
@@ -316,23 +314,52 @@ describe('SwapForm', () => {
         </SwapWidgetTestComponent>,
       );
 
+      cySmartGet('fromTokenInputs-text-form-text__input').focus();
       cySmartGet('swap-button').click();
 
       cySmartGet('fromTokenInputs-select-form-select-control-error')
         .should('exist')
-        .should('have.text', t('views.SWAP.validation.noFromTokenSelected'));
+        .should('have.text', 'Select a coin to swap');
 
       cySmartGet('fromTokenInputs-text-form-text-control-error')
         .should('exist')
-        .should('have.text', t('views.SWAP.validation.noAmountInputted'));
+        .should('have.text', 'Please input amount');
 
       cySmartGet('toTokenInputs-select-form-select-control-error')
         .should('exist')
-        .should('have.text', t('views.SWAP.validation.noToTokenSelected'));
+        .should('have.text', 'Select a coin to receive');
+
+      cySmartGet('toTokenInputs-text-form-text-control-error')
+        .should('not.exist');
+    });
+
+    it('should validate to input when direction is to and Swap Button is clicked', () => {
+      mount(
+        <SwapWidgetTestComponent
+          initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
+        >
+          <SwapCoins theme={WidgetTheme.LIGHT} />
+        </SwapWidgetTestComponent>,
+      );
+
+      cySmartGet('toTokenInputs-text-form-text__input').focus();
+      cySmartGet('swap-button').click();
+
+      cySmartGet('fromTokenInputs-select-form-select-control-error')
+        .should('exist')
+        .should('have.text', 'Select a coin to swap');
 
       cySmartGet('toTokenInputs-text-form-text-control-error')
         .should('exist')
-        .should('have.text', t('views.SWAP.validation.noAmountInputted'));
+        .should('have.text', 'Please input amount');
+
+      cySmartGet('toTokenInputs-select-form-select-control-error')
+        .should('exist')
+        .should('have.text', 'Select a coin to receive');
+
+      cySmartGet('fromTokenInputs-text-form-text-control-error')
+        .should('not.exist');
     });
 
     it('should show insufficient balance error when swap from amount is larger than token balance', () => {
@@ -354,7 +381,7 @@ describe('SwapForm', () => {
 
       cySmartGet('fromTokenInputs-text-form-text-control-error')
         .should('exist')
-        .should('have.text', t('views.SWAP.validation.insufficientBalance'));
+        .should('have.text', 'Insufficient balance');
     });
 
     it('should show no amount error when swap from amount missing', () => {
@@ -375,7 +402,7 @@ describe('SwapForm', () => {
 
       cySmartGet('fromTokenInputs-text-form-text-control-error')
         .should('exist')
-        .should('have.text', t('views.SWAP.validation.noAmountInputted'));
+        .should('have.text', 'Please input amount');
     });
 
     it('should remove validation error when swap from amount is fixed', () => {
@@ -395,7 +422,7 @@ describe('SwapForm', () => {
       cySmartGet('swap-button').click();
       cySmartGet('fromTokenInputs-text-form-text-control-error')
         .should('exist')
-        .should('have.text', t('views.SWAP.validation.noAmountInputted'));
+        .should('have.text', 'Please input amount');
 
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').blur();
 
@@ -419,7 +446,7 @@ describe('SwapForm', () => {
       cySmartGet('swap-button').click();
       cySmartGet('fromTokenInputs-select-form-select-control-error')
         .should('exist')
-        .should('have.text', t('views.SWAP.validation.noFromTokenSelected'));
+        .should('have.text', 'Select a coin to swap');
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
       cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
@@ -497,7 +524,6 @@ describe('SwapForm', () => {
       cySmartGet('toTokenInputs-select-form-select__target').click();
       cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').trigger('change');
-      cySmartGet('fromTokenInputs-text-form-text__input').blur();
 
       const params = [
         // exchange
@@ -544,7 +570,6 @@ describe('SwapForm', () => {
       cySmartGet('toTokenInputs-select-form-select__target').click();
       cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').trigger('change');
-      cySmartGet('fromTokenInputs-text-form-text__input').blur();
       cySmartGet('@fromAmountInStub').should('have.been.called');
 
       const params = [
@@ -570,8 +595,8 @@ describe('SwapForm', () => {
         },
       ];
       cySmartGet('@fromAmountInStub').should('have.been.calledWith', ...params);
-      cySmartGet('fee_description_gas').should('have.text', '≈ IMX 0.112300');
-      cySmartGet('fee_description_gas_fiat').should('have.text', `${t('views.SWAP.content.fiatPricePrefix')} $0.08`);
+      cySmartGet('fees-gas-fee__priceDisplay__price').should('have.text', '~ IMX 0.112300');
+      cySmartGet('fees-gas-fee__priceDisplay__fiatAmount').should('have.text', '~ USD $0.08');
     });
 
     it('should fetch a quote after from amount max button is clicked', () => {
@@ -694,7 +719,6 @@ describe('SwapForm', () => {
       cySmartGet('@fromAmountInStub').should('not.have.been.called');
 
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').trigger('change');
-      cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').blur();
       cySmartGet('@fromAmountInStub').should('have.been.called');
     });
 
@@ -773,7 +797,6 @@ describe('SwapForm', () => {
       cySmartGet('toTokenInputs-select-form-select__target').click();
       cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').trigger('change');
-      cySmartGet('fromTokenInputs-text-form-text__input').blur();
       cySmartGet('@fromAmountInStub').should('have.been.called');
 
       const params = [
@@ -799,8 +822,8 @@ describe('SwapForm', () => {
         },
       ];
       cySmartGet('@fromAmountInStub').should('have.been.calledWith', ...params);
-      cySmartGet('fee_description_gas').should('have.text', '≈ IMX 0.224600');
-      cySmartGet('fee_description_gas_fiat').should('have.text', `${t('views.SWAP.content.fiatPricePrefix')} $0.17`);
+      cySmartGet('fees-gas-fee__priceDisplay__price').should('have.text', '~ IMX 0.224600');
+      cySmartGet('fees-gas-fee__priceDisplay__fiatAmount').should('have.text', '~ USD $0.17');
     });
   });
 
@@ -940,14 +963,13 @@ describe('SwapForm', () => {
         cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
 
         cySmartGet('fromTokenInputs-text-form-text__input').type('0.1').trigger('change');
-        cySmartGet('fromTokenInputs-text-form-text__input').blur();
-
+        cySmartGet('@fromAmountInStub').should('have.been.called');
         cySmartGet('swap-button').click();
 
         cySmartGet('transaction-rejected-heading').should('be.visible');
       });
 
-      it('should show not enough imx drawer if user does not have enough imx', () => {
+      it('should show not enough imx drawer if user has zero imx', () => {
         mount(
 
           <ConnectLoaderTestComponent
@@ -968,8 +990,8 @@ describe('SwapForm', () => {
                     },
                   },
                   {
-                    balance: BigNumber.from('100000'),
-                    formattedBalance: '0.0001',
+                    balance: BigNumber.from('0'),
+                    formattedBalance: '0',
                     token: {
                       name: 'ImmutableX',
                       symbol: 'IMX',
@@ -985,17 +1007,6 @@ describe('SwapForm', () => {
             </SwapWidgetTestComponent>
           </ConnectLoaderTestComponent>,
         );
-
-        cySmartGet('fromTokenInputs-select-form-select__target').click();
-        cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
-          .click();
-        cySmartGet('toTokenInputs-select-form-select__target').click();
-        cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
-
-        cySmartGet('fromTokenInputs-text-form-text__input').type('0.00001').trigger('change');
-        cySmartGet('fromTokenInputs-text-form-text__input').blur();
-
-        cySmartGet('swap-button').click();
 
         cySmartGet('not-enough-gas-bottom-sheet').should('be.visible');
         cySmartGet('not-enough-gas-add-imx-button').should('be.visible');
@@ -1049,8 +1060,7 @@ describe('SwapForm', () => {
         cySmartGet('fromTokenInputs-select-form-coin-selector__option-imx-native').click();
 
         cySmartGet('toTokenInputs-text-form-text__input').type('0.00001').trigger('change');
-        cySmartGet('toTokenInputs-text-form-text__input').blur();
-
+        cySmartGet('@fromAmountInStub').should('have.been.called');
         cySmartGet('swap-button').click();
 
         cySmartGet('not-enough-gas-bottom-sheet').should('be.visible');
@@ -1111,8 +1121,7 @@ describe('SwapForm', () => {
         cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
 
         cySmartGet('fromTokenInputs-text-form-text__input').type('0.1').trigger('change');
-        cySmartGet('fromTokenInputs-text-form-text__input').blur();
-
+        cySmartGet('@fromAmountInStub').should('have.been.called');
         cySmartGet('swap-button').click();
 
         cySmartGet('not-enough-gas-bottom-sheet').should('not.exist');
@@ -1150,8 +1159,7 @@ describe('SwapForm', () => {
         cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
 
         cySmartGet('fromTokenInputs-text-form-text__input').type('0.00001').trigger('change');
-        cySmartGet('fromTokenInputs-text-form-text__input').blur();
-
+        cySmartGet('@fromAmountInStub').should('have.been.called');
         cySmartGet('unable-to-swap-bottom-sheet').should('be.visible');
         cySmartGet('unable-to-swap-cancel-button').should('be.visible');
 
