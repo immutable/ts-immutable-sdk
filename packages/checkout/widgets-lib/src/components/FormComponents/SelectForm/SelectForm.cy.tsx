@@ -28,7 +28,7 @@ describe('SelectForm', () => {
         />
       </ViewContextTestComponent>,
     );
-    cySmartGet('select-form-test-select__target__controlledLabel').should('have.text', 'IMX');
+    cySmartGet('select-form-test-select__target__label').should('have.text', 'IMX');
   });
 
   it('should show options in options list', () => {
@@ -80,7 +80,7 @@ describe('SelectForm', () => {
         />
       </ViewContextTestComponent>,
     );
-    cySmartGet('select-form-test-select__target__defaultLabel').should('have.text', 'Select coin');
+    cySmartGet('select-form-test-select__target__label').should('have.text', 'Select coin');
   });
 
   it('should show select coin when options is empty', () => {
@@ -94,7 +94,7 @@ describe('SelectForm', () => {
         />
       </ViewContextTestComponent>,
     );
-    cySmartGet('select-form-test-select__target__defaultLabel').should('have.text', 'Select coin');
+    cySmartGet('select-form-test-select__target__label').should('have.text', 'Select coin');
   });
 
   it('should show select coin when selected option not in options list', () => {
@@ -109,6 +109,6 @@ describe('SelectForm', () => {
         />
       </ViewContextTestComponent>,
     );
-    cySmartGet('select-form-test-select__target__defaultLabel').should('have.text', 'Select coin');
+    cySmartGet('select-form-test-select__target__label').should('have.text', 'Select coin');
   });
 });
