@@ -196,15 +196,20 @@ export function BridgeForm(props: BridgeFormProps) {
   }, [tokenBalances, formToken, formAmount]);
 
   const handleBridgeAmountChange = (value: string) => {
-    setFormAmount(value);
+    // Ensure that starting with a decimal is formatted correctly
+    let inputValue = value;
+    if (inputValue === '.') {
+      inputValue = '0.';
+    }
+    setFormAmount(inputValue);
     if (amountError) {
-      const validateAmountError = validateAmount(value, formToken?.formattedBalance);
+      const validateAmountError = validateAmount(inputValue, formToken?.formattedBalance);
       setAmountError(validateAmountError);
     }
 
     if (!formToken) return;
     setAmountFiatValue(calculateCryptoToFiat(
-      value,
+      inputValue,
       formToken.token.symbol,
       cryptoFiatState.conversions,
     ));
@@ -343,6 +348,7 @@ export function BridgeForm(props: BridgeFormProps) {
             />
             <TextInputForm
               testId="bridge-amount"
+              type="number"
               value={formAmount}
               placeholder={t('views.BRIDGE_FORM.bridgeForm.from.inputPlaceholder')}
               subtext={`${t('views.BRIDGE_FORM.content.fiatPricePrefix')} $${formatZeroAmount(amountFiatValue, true)}`}
