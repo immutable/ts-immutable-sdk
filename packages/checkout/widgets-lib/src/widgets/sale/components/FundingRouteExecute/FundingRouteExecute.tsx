@@ -21,6 +21,7 @@ import {
 } from 'react';
 import BridgeWidget from 'widgets/bridge/BridgeWidget';
 import { useTranslation } from 'react-i18next';
+import { useCurrency } from 'widgets/sale/hooks/useCurrency';
 import {
   ConnectLoaderActions,
   ConnectLoaderContext,
@@ -54,8 +55,10 @@ enum FundingRouteExecuteViews {
 export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }: FundingRouteExecuteProps) {
   const { t } = useTranslation();
   const {
-    config, provider, checkout, fromTokenAddress: requiredTokenAddress,
+    config, provider, checkout, env, environmentId,
   } = useSaleContext();
+  const { fetchCurrency, currencyResponse } = useCurrency({ env, environmentId });
+
   const { viewDispatch } = useContext(ViewContext);
 
   const { connectLoaderDispatch } = useContext(ConnectLoaderContext);
@@ -112,6 +115,16 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
       setView(FundingRouteExecuteViews.SWITCH_NETWORK_ETH);
     }
     if (step.type === FundingStepType.SWAP) {
+      let requiredTokenAddress = '';
+      if (currencyResponse && currencyResponse.length > 0) {
+        requiredTokenAddress = currencyResponse[0].erc20_address;
+      } else {
+        const fetchedTokenAddress = await fetchCurrency();
+        if (fetchedTokenAddress && fetchedTokenAddress.length > 0) {
+          requiredTokenAddress = fetchedTokenAddress[0].erc20_address;
+        }
+      }
+
       setSwapParams({
         amount: step.fundingItem.fundsRequired.formattedAmount,
         fromTokenAddress: step.fundingItem.token.address,
