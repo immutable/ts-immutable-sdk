@@ -7,6 +7,7 @@ interface TextInputFormProps {
   placeholder?: string;
   subtext?: string;
   textAlign?: 'left' | 'right';
+  type?: TextInputType;
   errorMessage?: string;
   disabled?: boolean;
   validator: (value: string) => boolean;
@@ -16,6 +17,8 @@ interface TextInputFormProps {
   onTextInputEnter?: () => void;
   maxButtonClick?: () => void;
 }
+
+export type TextInputType = 'text' | 'number';
 
 export function TextInputForm({
   testId,
@@ -28,12 +31,16 @@ export function TextInputForm({
   onTextInputFocus,
   onTextInputEnter,
   textAlign,
+  type,
   subtext,
   maxButtonClick,
   disabled,
 }: TextInputFormProps) {
   const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>, previousValue: string) => {
-    const inputValue = event.target.value;
+    let inputValue = event.target.value;
+    if (type === 'number' && inputValue === '.') {
+      inputValue = '0.';
+    }
     if (!validator(inputValue)) {
       // TODO: is there a better solution to this, cypress tests having issues with typing 'abc' and it still being set
       onTextInputChange(previousValue ?? '');
