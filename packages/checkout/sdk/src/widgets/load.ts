@@ -37,7 +37,7 @@ export function loadUnresolvedBundle(
 }
 
 // Gets the CDN url for the split checkout widgets bundle
-export function getCdnUrl(
+export function getWidgetsEsmUrl(
   version?: SemanticVersion,
 ): string {
   const validVersion = validateAndBuildVersion(version);

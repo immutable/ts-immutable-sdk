@@ -65,10 +65,12 @@ import { FiatRampService, FiatRampWidgetParams } from './fiatRamp';
 import { getItemRequirementsFromRequirements } from './smartCheckout/itemRequirements';
 import { CheckoutError, CheckoutErrorType } from './errors';
 import { AvailabilityService, availabilityService } from './availability';
-import { getCdnUrl, loadUnresolvedBundle } from './widgets/load';
+import { getWidgetsEsmUrl, loadUnresolvedBundle } from './widgets/load';
 import { WidgetsInit } from './types/widgets';
 import { HttpClient } from './api/http';
 import { isMatchingAddress } from './utils/utils';
+import { WidgetConfiguration } from './widgets/definitions/configurations';
+import { SemanticVersion } from './widgets/definitions/types';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
@@ -119,32 +121,28 @@ export class Checkout {
     // Preload the configurations
     await checkout.config.remote.getConfig();
 
-    // Resolves the factory for the esm build of the widgets
-    if (init.useEsModules) {
-      const cdnUrl = getCdnUrl(init.version);
-      // WebpackIgnore comment required to prevent webpack modifying the import statement and
-      // breaking the dynamic import in certain applications integrating checkout
-      const checkoutWidgetsModule = await import(/* webpackIgnore: true */ cdnUrl);
-
-      const factory = new Promise<ImmutableCheckoutWidgets.WidgetsFactory>((resolve, reject) => {
-        if (checkoutWidgetsModule && checkoutWidgetsModule.WidgetsFactory) {
-          resolve(new checkoutWidgetsModule.WidgetsFactory(checkout, init.config));
-        } else {
-          reject(new CheckoutError(
-            'Unable to resolve the WidgetsFactory from the checkout widgets module',
-            CheckoutErrorType.WIDGETS_SCRIPT_LOAD_ERROR,
-          ));
-        }
-      });
-
+    try {
+      const factory = await this.loadEsModules(init.config, init.version);
       return factory;
+    } catch (err: any) {
+      throw new CheckoutError(
+        'Failed to load widgets script',
+        CheckoutErrorType.WIDGETS_SCRIPT_LOAD_ERROR,
+        { error: err },
+      );
     }
+  }
 
-    // Resolves the factory for the umd build of the widgets
+  private async loadUmdBundle(
+    config: WidgetConfiguration,
+    version?: SemanticVersion,
+  ) {
+    const checkout = this;
+
     const factory = new Promise<ImmutableCheckoutWidgets.WidgetsFactory>((resolve, reject) => {
       function checkForWidgetsBundleLoaded() {
         if (typeof ImmutableCheckoutWidgets !== 'undefined') {
-          resolve(new ImmutableCheckoutWidgets.WidgetsFactory(checkout, init.config));
+          resolve(new ImmutableCheckoutWidgets.WidgetsFactory(checkout, config));
         } else {
         // If ImmutableCheckoutWidgets is not defined, wait for set amount of time.
         // When time has elapsed, check again if ImmutableCheckoutWidgets is defined.
@@ -154,9 +152,9 @@ export class Checkout {
       }
 
       try {
-        const script = loadUnresolvedBundle(init.version);
+        const script = loadUnresolvedBundle(version);
         if (script.loaded && typeof ImmutableCheckoutWidgets !== 'undefined') {
-          resolve(new ImmutableCheckoutWidgets.WidgetsFactory(checkout, init.config));
+          resolve(new ImmutableCheckoutWidgets.WidgetsFactory(checkout, config));
         } else {
           checkForWidgetsBundleLoaded();
         }
@@ -172,6 +170,30 @@ export class Checkout {
     });
 
     return factory;
+  }
+
+  private async loadEsModules(
+    config: WidgetConfiguration,
+    version?: SemanticVersion,
+  ) {
+    const checkout = this;
+    try {
+      const cdnUrl = getWidgetsEsmUrl(version);
+
+      // WebpackIgnore comment required to prevent webpack modifying the import statement and
+      // breaking the dynamic import in certain applications integrating checkout
+      const checkoutWidgetsModule = await import(/* webpackIgnore: true */ cdnUrl);
+
+      if (checkoutWidgetsModule && checkoutWidgetsModule.WidgetsFactory) {
+        return new checkoutWidgetsModule.WidgetsFactory(checkout, config);
+      }
+    } catch (err: any) {
+      // eslint-disable-next-line no-console
+      console.warn(`Failed to resolve checkout widgets module, falling back to UMD bundle. Error: ${err.message}`);
+    }
+
+    // Fallback to UMD bundle if esm bundle fails to load
+    return await checkout.loadUmdBundle(config, version);
   }
 
   /**
