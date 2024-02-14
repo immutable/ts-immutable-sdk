@@ -12,6 +12,7 @@ export interface FiatRampWidgetParams {
   tokenAmount?: string;
   tokenSymbol?: string;
   email?: string;
+  allowedTokens?: string[];
 }
 
 export class FiatRampService {
@@ -69,6 +70,10 @@ export class FiatRampService {
 
     if (params.walletAddress) {
       widgetUrl += `&walletAddress=${params.walletAddress}`;
+    }
+
+    if (params.allowedTokens) {
+      widgetUrl += `&cryptoCurrencyList=${params.allowedTokens?.join(',').toLowerCase()}`;
     }
 
     return widgetUrl;

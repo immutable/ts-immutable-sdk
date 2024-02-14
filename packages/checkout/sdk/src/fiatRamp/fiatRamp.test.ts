@@ -143,5 +143,16 @@ describe('FiatRampService', () => {
       expect(result).toContain(defaultWidgetUrl);
       expect(result).toContain('&walletAddress=0x1234567890');
     });
+
+    it('should return widget url with allowed crypto tokens in query params when allowed list is present', async () => {
+      const params: FiatRampWidgetParams = {
+        exchangeType: ExchangeType.ONRAMP,
+        isPassport: false,
+        allowedTokens: ['ETH', 'IMX'],
+      };
+      const result = await fiatRampService.createWidgetUrl(params);
+      expect(result).toContain(defaultWidgetUrl);
+      expect(result).toContain('&cryptoCurrencyList=eth,imx');
+    });
   });
 });
