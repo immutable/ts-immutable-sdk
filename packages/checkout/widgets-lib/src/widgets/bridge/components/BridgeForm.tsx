@@ -153,7 +153,6 @@ export function BridgeForm(props: BridgeFormProps) {
     // with values from context when the user
     // has selected the back button from the review screen
     if (!amount || !token) return;
-    console.log('Set Form Amount Again?!', amount);
     setFormAmount(amount);
     for (let i = 0; i < tokenBalances.length; i++) {
       const balance = tokenBalances[i];
