@@ -4,6 +4,6 @@ export {
   setEnvironment,
   setPassportClientId,
   setPublishableApiKey,
+  getDetail,
+  Detail,
 } from './details';
-export { getDetail } from './utils/state';
-export { Detail } from './utils/constants';
