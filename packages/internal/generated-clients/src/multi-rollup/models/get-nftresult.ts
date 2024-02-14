@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { NFTWithMetadataAttributes } from './nftwith-metadata-attributes';
+import { NFT } from './nft';
 
 /**
  * Single NFT
@@ -25,9 +25,9 @@ import { NFTWithMetadataAttributes } from './nftwith-metadata-attributes';
 export interface GetNFTResult {
     /**
      * 
-     * @type {NFTWithMetadataAttributes}
+     * @type {NFT}
      * @memberof GetNFTResult
      */
-    'result': NFTWithMetadataAttributes;
+    'result': NFT;
 }
 

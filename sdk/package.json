@@ -8,8 +8,8 @@
   "dependencies": {
     "@0xsequence/abi": "^1.4.3",
     "@0xsequence/core": "^1.4.3",
-    "@biom3/design-tokens": "^0.2.11",
-    "@biom3/react": "^0.19.42",
+    "@biom3/design-tokens": "^0.3.1",
+    "@biom3/react": "^0.20.2",
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/abstract-signer": "^5.7.0",
     "@ethersproject/providers": "^5.7.2",
@@ -30,6 +30,7 @@
     "crypto-browserify": "^3.12.0",
     "enc-utils": "^3.0.0",
     "ethers": "^5.7.2",
+    "global-const": "^0.1.2",
     "https-browserify": "^1.0.0",
     "i18next": "^23.7.6",
     "i18next-browser-languagedetector": "^7.2.0",
@@ -124,7 +125,7 @@
   },
   "repository": "immutable/ts-immutable-sdk.git",
   "resolutions": {
-    "@biom3/design-tokens": "^0.2.11",
+    "@biom3/design-tokens": "^0.3.1",
     "@openzeppelin/contracts": "3.4.2-solc-0.7"
   },
   "scripts": {

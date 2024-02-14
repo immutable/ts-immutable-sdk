@@ -66,6 +66,18 @@ export interface GetMintRequestResult {
      */
     'transaction_hash': string | null;
     /**
+     * When the mint request was created
+     * @type {string}
+     * @memberof GetMintRequestResult
+     */
+    'created_at': string;
+    /**
+     * When the mint request was last updated
+     * @type {string}
+     * @memberof GetMintRequestResult
+     */
+    'updated_at': string;
+    /**
      * 
      * @type {MintRequestErrorMessage}
      * @memberof GetMintRequestResult

@@ -16,6 +16,9 @@
 // May contain unused imports in some cases
 // @ts-ignore
 import { Chain } from './chain';
+// May contain unused imports in some cases
+// @ts-ignore
+import { NFTMetadataAttribute } from './nftmetadata-attribute';
 
 /**
  * 
@@ -107,6 +110,12 @@ export interface NFTWithBalance {
      * @memberof NFTWithBalance
      */
     'youtube_url': string | null;
+    /**
+     * List of Metadata attributes
+     * @type {Array<NFTMetadataAttribute>}
+     * @memberof NFTWithBalance
+     */
+    'attributes': Array<NFTMetadataAttribute>;
     /**
      * The balance of NFT in the account
      * @type {string}

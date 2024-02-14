@@ -17,5 +17,5 @@ export const gasAmountAccordionStyles = {
 
 export const gasAmountHeadingStyles = {
   marginBottom: 'base.spacing.x4',
-  color: 'base.color.text.secondary',
+  color: 'base.color.text.body.secondary',
 };
