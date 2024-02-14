@@ -46,7 +46,6 @@ type SaleContextProps = {
   items: SaleItem[];
   amount: string;
   collectionName: string;
-  fromTokenAddress: string;
   provider: ConnectLoaderState['provider'];
   checkout: ConnectLoaderState['checkout'];
   passport?: Passport;
@@ -88,7 +87,6 @@ type SaleContextValues = SaleContextProps & {
 const SaleContext = createContext<SaleContextValues>({
   items: [],
   amount: '',
-  fromTokenAddress: '',
   collectionName: '',
   provider: undefined,
   checkout: undefined,
@@ -133,7 +131,6 @@ export function SaleContextProvider(props: {
       environmentId,
       items,
       amount,
-      fromTokenAddress,
       provider,
       checkout,
       passport,
@@ -204,7 +201,6 @@ export function SaleContextProvider(props: {
   } = useSignOrder({
     items,
     provider,
-    fromTokenAddress,
     recipientAddress,
     environmentId,
     env,
@@ -256,7 +252,7 @@ export function SaleContextProvider(props: {
     [[paymentMethod, executeResponse]],
   );
 
-  const { fetchCurrency } = useCurrency({
+  const { fetchCurrency, currencyResponse } = useCurrency({
     env,
     environmentId,
   });
@@ -266,7 +262,12 @@ export function SaleContextProvider(props: {
       type: SalePaymentTypes,
       callback?: (r?: SignResponse) => void,
     ): Promise<SignResponse | undefined> => {
-      const fetchedCurrency = await fetchCurrency();
+      let fetchedCurrency;
+      if (currencyResponse) {
+        fetchedCurrency = currencyResponse;
+      } else {
+        fetchedCurrency = await fetchCurrency();
+      }
 
       if (!fetchedCurrency || fetchedCurrency.length === 0) {
         goToErrorView(SaleErrorTypes.SERVICE_BREAKDOWN, {
@@ -371,14 +372,13 @@ export function SaleContextProvider(props: {
     if (invalidItems || invalidAmount || !collectionName || !environmentId) {
       setInvalidParameters(true);
     }
-  }, [items, amount, fromTokenAddress, collectionName, environmentId]);
+  }, [items, amount, collectionName, environmentId]);
 
   const values = useMemo(
     () => ({
       config,
       items,
       amount,
-      fromTokenAddress,
       sign,
       signResponse,
       signError,
@@ -409,7 +409,6 @@ export function SaleContextProvider(props: {
       environmentId,
       items,
       amount,
-      fromTokenAddress,
       collectionName,
       provider,
       checkout,

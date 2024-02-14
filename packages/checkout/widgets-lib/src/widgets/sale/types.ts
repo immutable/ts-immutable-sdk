@@ -43,7 +43,6 @@ export type SignResponse = {
 export type SignOrderInput = {
   provider: Web3Provider | undefined;
   items: SaleItem[];
-  fromTokenAddress: string;
   recipientAddress: string;
   env: string;
   environmentId: string;

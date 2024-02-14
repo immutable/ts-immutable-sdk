@@ -10,9 +10,15 @@ import {
   WidgetType,
 } from '@imtbl/checkout-sdk';
 import { Base } from 'widgets/BaseWidgetRoot';
-import { ConnectLoader, ConnectLoaderParams } from 'components/ConnectLoader/ConnectLoader';
+import {
+  ConnectLoader,
+  ConnectLoaderParams,
+} from 'components/ConnectLoader/ConnectLoader';
 import { getL2ChainId } from 'lib';
-import { isValidAmount, isValidWalletProvider } from 'lib/validations/widgetValidators';
+import {
+  isValidAmount,
+  isValidWalletProvider,
+} from 'lib/validations/widgetValidators';
 import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
 import { LoadingView } from 'views/loading/LoadingView';
@@ -33,9 +39,9 @@ export class Sale extends Base<WidgetType.SALE> {
     }
   }
 
-  protected getValidatedProperties(
-    { config }: WidgetProperties<WidgetType.SALE>,
-  ): WidgetProperties<WidgetType.SALE> {
+  protected getValidatedProperties({
+    config,
+  }: WidgetProperties<WidgetType.SALE>): WidgetProperties<WidgetType.SALE> {
     let validatedConfig: WidgetConfiguration | undefined;
 
     if (config) {
@@ -76,12 +82,6 @@ export class Sale extends Base<WidgetType.SALE> {
       validatedParams.environmentId = '';
     }
 
-    if (!params.fromTokenAddress) {
-      // eslint-disable-next-line no-console
-      console.warn('[IMTBL]: invalid "fromTokenAddress" widget input');
-      validatedParams.fromTokenAddress = '';
-    }
-
     if (!params.collectionName) {
       // eslint-disable-next-line no-console
       console.warn('[IMTBL]: invalid "collectionName" widget input');
@@ -99,9 +99,7 @@ export class Sale extends Base<WidgetType.SALE> {
       targetLayer: ConnectTargetLayer.LAYER2,
       web3Provider: this.web3Provider,
       checkout: this.checkout,
-      allowedChains: [
-        getL2ChainId(this.checkout!.config),
-      ],
+      allowedChains: [getL2ChainId(this.checkout!.config)],
     };
 
     this.reactRoot.render(
@@ -120,7 +118,6 @@ export class Sale extends Base<WidgetType.SALE> {
                   config={this.strongConfig()}
                   amount={this.parameters.amount!}
                   items={this.parameters.items!}
-                  fromTokenAddress={this.parameters.fromTokenAddress!}
                   environmentId={this.parameters.environmentId!}
                   collectionName={this.parameters.collectionName!}
                   language="en"

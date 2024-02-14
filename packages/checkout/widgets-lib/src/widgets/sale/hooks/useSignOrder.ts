@@ -150,12 +150,7 @@ const toSignResponse = (
 
 export const useSignOrder = (input: SignOrderInput) => {
   const {
-    provider,
-    items,
-    fromTokenAddress,
-    recipientAddress,
-    env,
-    environmentId,
+    provider, items, recipientAddress, env, environmentId,
   } = input;
   const [signError, setSignError] = useState<SignOrderError | undefined>(
     undefined,
@@ -245,6 +240,7 @@ export const useSignOrder = (input: SignOrderInput) => {
   const sign = useCallback(
     async (
       paymentType: SalePaymentTypes,
+      fromTokenAddress: string,
     ): Promise<SignResponse | undefined> => {
       try {
         const data: SignApiRequest = {
@@ -303,7 +299,7 @@ export const useSignOrder = (input: SignOrderInput) => {
       }
       return undefined;
     },
-    [items, fromTokenAddress, recipientAddress, environmentId, env, provider],
+    [items, recipientAddress, environmentId, env, provider],
   );
 
   const execute = async (

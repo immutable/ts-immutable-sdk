@@ -43,7 +43,6 @@ export default function SaleWidget(props: SaleWidgetProps) {
     amount,
     items,
     environmentId,
-    fromTokenAddress,
     collectionName,
   } = props;
   const { connectLoaderState } = useContext(ConnectLoaderContext);
@@ -102,7 +101,6 @@ export default function SaleWidget(props: SaleWidgetProps) {
           config,
           items,
           amount,
-          fromTokenAddress,
           env: checkout!.config.environment ?? Environment.SANDBOX,
           environmentId,
           provider,

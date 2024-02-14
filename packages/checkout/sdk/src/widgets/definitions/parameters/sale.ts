@@ -7,7 +7,6 @@ import { WidgetLanguage } from '../configurations';
  * Sale Widget parameters
  * @property {string} amount
  * @property {string} environmentId
- * @property {string} fromTokenAddress
  * @property {SaleItem[]} items
  * @property {WalletProviderName | undefined} walletProviderName
  */
@@ -16,8 +15,6 @@ export type SaleWidgetParams = {
   amount?: string;
   /** Environment id from Immutable Hub */
   environmentId?: string;
-  /** Contract address of the token accepted for payments */
-  fromTokenAddress?: string;
   /** The list of products to be purchased */
   items?: SaleItem[];
   /** The name of the NFT collection on sale */
