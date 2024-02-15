@@ -630,17 +630,25 @@ export function SwapForm({ data }: SwapFromProps) {
     const validateToTokenError = validateToToken(toToken);
     const validateToAmountError = validateToAmount(toAmount);
 
+    if (direction === SwapDirection.FROM) {
+      setToAmountError('');
+      if (validateFromAmountError) {
+        setFromAmountError(validateFromAmountError);
+      }
+    } else if (direction === SwapDirection.TO) {
+      setFromAmountError('');
+      if (validateToAmountError) {
+        setToAmountError(validateToAmountError);
+      }
+    }
     if (validateFromTokenError) setFromTokenError(validateFromTokenError);
-    if (validateFromAmountError) setFromAmountError(validateFromAmountError);
     if (validateToTokenError) setToTokenError(validateToTokenError);
-    if (validateToAmountError) setToAmountError(validateToAmountError);
-
     let isSwapFormValid = true;
     if (
       validateFromTokenError
-      || validateFromAmountError
       || validateToTokenError
-      || validateToAmountError) isSwapFormValid = false;
+      || (validateFromAmountError && direction === SwapDirection.FROM)
+      || (validateToAmountError && direction === SwapDirection.TO)) isSwapFormValid = false;
 
     track({
       userJourney: UserJourney.SWAP,
@@ -718,6 +726,7 @@ export function SwapForm({ data }: SwapFromProps) {
                   : ''
               }
               selectTextAlign="left"
+              textInputType="number"
               textInputValue={fromAmount}
               textInputPlaceholder={t('views.SWAP.swapForm.from.inputPlaceholder')}
               textInputSubtext={`${t('views.SWAP.content.fiatPricePrefix')} 
@@ -763,6 +772,7 @@ export function SwapForm({ data }: SwapFromProps) {
               testId="toTokenInputs"
               options={tokensOptionsTo}
               selectTextAlign="left"
+              textInputType="number"
               textInputValue={toAmount}
               textInputPlaceholder={t('views.SWAP.swapForm.to.inputPlaceholder')}
               textInputTextAlign="right"
