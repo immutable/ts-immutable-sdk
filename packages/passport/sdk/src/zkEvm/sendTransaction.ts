@@ -7,7 +7,7 @@ import { MetaTransaction, RelayerTransactionStatus } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { retryWithDelay } from '../network/retry';
 import { RelayerClient } from './relayerClient';
-import GuardianClient, { convertBigNumberishToString } from '../guardian/guardian';
+import GuardianClient, { convertBigNumberishToString } from '../guardian';
 
 const MAX_TRANSACTION_HASH_RETRIEVAL_RETRIES = 30;
 const TRANSACTION_HASH_RETRIEVAL_WAIT = 1000;

@@ -6,7 +6,7 @@ import { RelayerClient } from './relayerClient';
 import { retryWithDelay } from '../network/retry';
 import { RelayerTransaction, RelayerTransactionStatus } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
-import GuardianClient from '../guardian/guardian';
+import GuardianClient from '../guardian';
 
 jest.mock('@ethersproject/providers');
 jest.mock('./walletHelpers');

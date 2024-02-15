@@ -17,19 +17,18 @@ import {
 import { Web3Provider } from '@ethersproject/providers';
 import { ImxApiClients } from '@imtbl/generated-clients';
 import registerPassportStarkEx from './workflows/registration';
-import { mockUser, mockUserImx, testConfig } from '../test/mocks';
+import { mockUser, mockUserImx } from '../test/mocks';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import { PassportImxProvider } from './passportImxProvider';
 import {
   batchNftTransfer, cancelOrder, createOrder, createTrade, exchangeTransfer, transfer,
 } from './workflows';
-import { ConfirmationScreen } from '../confirmation';
-import { PassportConfiguration } from '../config';
 import { PassportEventMap, PassportEvents } from '../types';
 import TypedEventEmitter from '../utils/typedEventEmitter';
 import AuthManager from '../authManager';
 import MagicAdapter from '../magicAdapter';
 import { getStarkSigner } from './getStarkSigner';
+import GuardianClient from '../guardian';
 
 jest.mock('@ethersproject/providers');
 jest.mock('./workflows');
@@ -47,8 +46,6 @@ describe('PassportImxProvider', () => {
       environment: Environment.SANDBOX,
     }),
   });
-
-  const confirmationScreen = new ConfirmationScreen({} as PassportConfiguration);
 
   const mockAuthManager = {
     login: jest.fn(),
@@ -69,6 +66,8 @@ describe('PassportImxProvider', () => {
   const magicAdapterMock = {
     login: jest.fn(),
   };
+
+  const mockGuardianClient = {};
 
   const getSignerMock = jest.fn();
 
@@ -91,9 +90,8 @@ describe('PassportImxProvider', () => {
     passportImxProvider = new PassportImxProvider({
       authManager: mockAuthManager as unknown as AuthManager,
       magicAdapter: magicAdapterMock as unknown as MagicAdapter,
-      confirmationScreen,
+      guardianClient: mockGuardianClient as unknown as GuardianClient,
       immutableXClient,
-      config: testConfig,
       passportEventEmitter,
       imxApiClients,
     });
@@ -129,9 +127,8 @@ describe('PassportImxProvider', () => {
       const pp = new PassportImxProvider({
         authManager: mockAuthManager as unknown as AuthManager,
         magicAdapter: magicAdapterMock as unknown as MagicAdapter,
-        confirmationScreen,
+        guardianClient: mockGuardianClient as unknown as GuardianClient,
         immutableXClient,
-        config: testConfig,
         passportEventEmitter: new TypedEventEmitter<PassportEventMap>(),
         imxApiClients: new ImxApiClients({} as any),
       });
@@ -154,8 +151,7 @@ describe('PassportImxProvider', () => {
           user: mockUserImx,
           starkSigner: mockStarkSigner,
           transfersApi: immutableXClient.transfersApi,
-          // @ts-ignore
-          guardianClient: passportImxProvider.guardianClient,
+          guardianClient: mockGuardianClient,
         });
       expect(result)
         .toEqual(returnValue);
@@ -198,8 +194,7 @@ describe('PassportImxProvider', () => {
           user: mockUserImx,
           starkSigner: mockStarkSigner,
           ordersApi: immutableXClient.ordersApi,
-          // @ts-ignore
-          guardianClient: passportImxProvider.guardianClient,
+          guardianClient: mockGuardianClient,
         });
       expect(result)
         .toEqual(returnValue);
@@ -220,8 +215,7 @@ describe('PassportImxProvider', () => {
           user: mockUserImx,
           starkSigner: mockStarkSigner,
           ordersApi: immutableXClient.ordersApi,
-          // @ts-ignore
-          guardianClient: passportImxProvider.guardianClient,
+          guardianClient: mockGuardianClient,
         });
       expect(result)
         .toEqual(returnValue);
@@ -242,8 +236,7 @@ describe('PassportImxProvider', () => {
           user: mockUserImx,
           starkSigner: mockStarkSigner,
           tradesApi: immutableXClient.tradesApi,
-          // @ts-ignore
-          guardianClient: passportImxProvider.guardianClient,
+          guardianClient: mockGuardianClient,
         });
       expect(result)
         .toEqual(returnValue);
@@ -264,8 +257,7 @@ describe('PassportImxProvider', () => {
           user: mockUserImx,
           starkSigner: mockStarkSigner,
           transfersApi: immutableXClient.transfersApi,
-          // @ts-ignore
-          guardianClient: passportImxProvider.guardianClient,
+          guardianClient: mockGuardianClient,
         });
       expect(result)
         .toEqual(returnValue);
