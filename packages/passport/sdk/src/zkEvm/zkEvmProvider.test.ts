@@ -4,12 +4,12 @@ import { ZkEvmProviderInput, ZkEvmProvider } from './zkEvmProvider';
 import { loginZkEvmUser } from './user';
 import { sendTransaction } from './sendTransaction';
 import { JsonRpcError, ProviderErrorCode } from './JsonRpcError';
-import GuardianClient from '../guardian/guardian';
+import GuardianClient from '../guardian';
 import { RelayerClient } from './relayerClient';
 import { Provider } from './types';
 import { PassportEventMap, PassportEvents } from '../types';
 import TypedEventEmitter from '../utils/typedEventEmitter';
-import { mockUserZkEvm } from '../test/mocks';
+import { mockUserZkEvm, testConfig } from '../test/mocks';
 import { signTypedDataV4 } from './signTypedDataV4';
 
 jest.mock('@ethersproject/providers');
@@ -23,16 +23,22 @@ describe('ZkEvmProvider', () => {
 
   beforeEach(() => {
     passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
+    jest.resetAllMocks();
   });
+
+  const config = testConfig;
+  const authManager = {
+    getUser: jest.fn().mockResolvedValue(mockUserZkEvm),
+    removeUser: jest.fn(),
+  } as unknown as AuthManager;
+  const guardianClient = {} as GuardianClient;
 
   const getProvider = () => {
     const constructorParameters = {
-      config: {},
-      authManager: {
-        getUser: jest.fn().mockResolvedValue(mockUserZkEvm),
-        removeUser: jest.fn(),
-      } as unknown as AuthManager,
+      config,
+      authManager,
       passportEventEmitter,
+      guardianClient,
     } as Partial<ZkEvmProviderInput>;
 
     return new ZkEvmProvider(constructorParameters as ZkEvmProviderInput);
@@ -272,8 +278,8 @@ describe('ZkEvmProvider', () => {
       expect(result).toEqual(transactionHash);
       expect(sendTransaction).toHaveBeenCalledWith({
         params: [transaction],
+        guardianClient,
         magicProvider: mockMagicProvider,
-        guardianClient: expect.any(GuardianClient),
         jsonRpcProvider: expect.any(Object),
         relayerClient: expect.any(RelayerClient),
         zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
@@ -315,10 +321,10 @@ describe('ZkEvmProvider', () => {
       expect(signTypedDataV4).toHaveBeenCalledWith({
         method: 'eth_signTypedData_v4',
         params: [address, typedDataPayload],
+        guardianClient,
         magicProvider: mockMagicProvider,
         jsonRpcProvider: expect.any(Object),
         relayerClient: expect.any(RelayerClient),
-        guardianClient: expect.any(GuardianClient),
       });
     });
   });
@@ -344,7 +350,6 @@ describe('ZkEvmProvider', () => {
       const userLoggedInKeys = [
         'magicProvider',
         'relayerClient',
-        'guardianClient',
       ];
 
       userLoggedInKeys.forEach((key) => {

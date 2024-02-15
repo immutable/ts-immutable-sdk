@@ -73,7 +73,7 @@ describe('AuthManager', () => {
   afterEach(jest.resetAllMocks);
 
   let authManager: AuthManager;
-  let mockSignIn: jest.Mock;
+  let mockSigninPopup: jest.Mock;
   let mockSigninPopupCallback: jest.Mock;
   let mockSignoutRedirect: jest.Mock;
   let mockGetUser: jest.Mock;
@@ -82,7 +82,7 @@ describe('AuthManager', () => {
   let mockStoreUser: jest.Mock;
 
   beforeEach(() => {
-    mockSignIn = jest.fn();
+    mockSigninPopup = jest.fn();
     mockSigninPopupCallback = jest.fn();
     mockSignoutRedirect = jest.fn();
     mockGetUser = jest.fn();
@@ -90,7 +90,7 @@ describe('AuthManager', () => {
     mockSignoutSilent = jest.fn();
     mockStoreUser = jest.fn();
     (UserManager as jest.Mock).mockReturnValue({
-      signinPopup: mockSignIn,
+      signinPopup: mockSigninPopup,
       signinPopupCallback: mockSigninPopupCallback,
       signoutRedirect: mockSignoutRedirect,
       signoutSilent: mockSignoutSilent,
@@ -160,7 +160,7 @@ describe('AuthManager', () => {
   describe('login', () => {
     describe('when the user has not registered for any rollup', () => {
       it('should get the login user and return the domain model', async () => {
-        mockSignIn.mockResolvedValue(mockOidcUser);
+        mockSigninPopup.mockResolvedValue(mockOidcUser);
 
         const result = await authManager.login();
 
@@ -170,7 +170,7 @@ describe('AuthManager', () => {
 
     describe('when the user has registered for imx', () => {
       it('should populate the imx object', async () => {
-        mockSignIn.mockResolvedValue({
+        mockSigninPopup.mockResolvedValue({
           ...mockOidcUser,
           profile: {
             ...mockOidcUser.profile,
@@ -188,7 +188,7 @@ describe('AuthManager', () => {
 
     describe('when the user has registered for zkEvm', () => {
       it('should populate the zkEvm object', async () => {
-        mockSignIn.mockResolvedValue({
+        mockSigninPopup.mockResolvedValue({
           ...mockOidcUser,
           profile: {
             ...mockOidcUser.profile,
@@ -206,7 +206,7 @@ describe('AuthManager', () => {
 
     describe('when the user has registered for imx & zkEvm', () => {
       it('should populate the imx & zkEvm objects', async () => {
-        mockSignIn.mockResolvedValue({
+        mockSigninPopup.mockResolvedValue({
           ...mockOidcUser,
           profile: {
             ...mockOidcUser.profile,
@@ -235,7 +235,7 @@ describe('AuthManager', () => {
     });
 
     it('should throw the error if user is failed to login', async () => {
-      mockSignIn.mockRejectedValue(new Error(mockErrorMsg));
+      mockSigninPopup.mockRejectedValue(new Error(mockErrorMsg));
 
       await expect(() => authManager.login()).rejects.toThrow(
         new PassportError(
@@ -243,6 +243,31 @@ describe('AuthManager', () => {
           PassportErrorType.AUTHENTICATION_ERROR,
         ),
       );
+    });
+  });
+
+  describe('getUserOrLogin', () => {
+    describe('when getUser returns a user', () => {
+      it('should return the user', async () => {
+        mockGetUser.mockReturnValue(mockOidcUser);
+        (isTokenExpired as jest.Mock).mockReturnValue(false);
+
+        const result = await authManager.getUserOrLogin();
+
+        expect(result).toEqual(mockUser);
+      });
+    });
+
+    describe('when getUser throws an error', () => {
+      it('calls attempts to sign in the user using signinPopup', async () => {
+        mockGetUser.mockRejectedValue(new Error(mockErrorMsg));
+        mockSigninPopup.mockReturnValue(mockOidcUser);
+        (isTokenExpired as jest.Mock).mockReturnValue(false);
+
+        const result = await authManager.getUserOrLogin();
+
+        expect(result).toEqual(mockUser);
+      });
     });
   });
 

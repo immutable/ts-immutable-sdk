@@ -2,30 +2,24 @@ import { IMXClient } from '@imtbl/x-client';
 import { IMXProvider } from '@imtbl/x-provider';
 import { ImxApiClients } from '@imtbl/generated-clients';
 import { PassportError, PassportErrorType } from '../errors/passportError';
-import { PassportConfiguration } from '../config';
 import AuthManager from '../authManager';
-import { ConfirmationScreen } from '../confirmation';
 import MagicAdapter from '../magicAdapter';
 import { PassportEventMap, User } from '../types';
 import TypedEventEmitter from '../utils/typedEventEmitter';
 import { PassportImxProvider } from './passportImxProvider';
+import GuardianClient from '../guardian';
 
 export type PassportImxProviderFactoryInput = {
   authManager: AuthManager;
-  config: PassportConfiguration;
-  confirmationScreen: ConfirmationScreen;
   immutableXClient: IMXClient;
   magicAdapter: MagicAdapter;
   passportEventEmitter: TypedEventEmitter<PassportEventMap>;
   imxApiClients: ImxApiClients;
+  guardianClient: GuardianClient;
 };
 
 export class PassportImxProviderFactory {
   private readonly authManager: AuthManager;
-
-  private readonly config: PassportConfiguration;
-
-  private readonly confirmationScreen: ConfirmationScreen;
 
   private readonly immutableXClient: IMXClient;
 
@@ -35,35 +29,26 @@ export class PassportImxProviderFactory {
 
   public readonly imxApiClients: ImxApiClients;
 
+  private readonly guardianClient: GuardianClient;
+
   constructor({
     authManager,
-    config,
-    confirmationScreen,
     immutableXClient,
     magicAdapter,
     passportEventEmitter,
     imxApiClients,
+    guardianClient,
   }: PassportImxProviderFactoryInput) {
     this.authManager = authManager;
-    this.config = config;
-    this.confirmationScreen = confirmationScreen;
     this.immutableXClient = immutableXClient;
     this.magicAdapter = magicAdapter;
     this.passportEventEmitter = passportEventEmitter;
     this.imxApiClients = imxApiClients;
+    this.guardianClient = guardianClient;
   }
 
   public async getProvider(): Promise<IMXProvider> {
-    let user = null;
-    try {
-      user = await this.authManager.getUser();
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.warn(e);
-    }
-    if (!user) {
-      user = await this.authManager.login();
-    }
+    const user = await this.authManager.getUserOrLogin();
     return this.createProviderInstance(user);
   }
 
@@ -85,13 +70,12 @@ export class PassportImxProviderFactory {
     }
 
     return new PassportImxProvider({
-      config: this.config,
       authManager: this.authManager,
       immutableXClient: this.immutableXClient,
-      confirmationScreen: this.confirmationScreen,
       passportEventEmitter: this.passportEventEmitter,
       magicAdapter: this.magicAdapter,
       imxApiClients: this.imxApiClients,
+      guardianClient: this.guardianClient,
     });
   }
 }

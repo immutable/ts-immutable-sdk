@@ -3,12 +3,10 @@ import { ExternalProvider, JsonRpcProvider } from '@ethersproject/providers';
 import { registerZkEvmUser } from './registerZkEvmUser';
 import { UserZkEvm } from '../../types';
 import AuthManager from '../../authManager';
-import { PassportConfiguration } from '../../config';
 import MagicAdapter from '../../magicAdapter';
 
 type LoginZkEvmUserInput = {
   authManager: AuthManager;
-  config: PassportConfiguration;
   magicAdapter: MagicAdapter;
   multiRollupApiClients: MultiRollupApiClients;
   jsonRpcProvider: JsonRpcProvider;
@@ -25,17 +23,7 @@ export const loginZkEvmUser = async ({
   multiRollupApiClients,
   jsonRpcProvider,
 }: LoginZkEvmUserInput): Promise<LoginZkEvmUserOutput> => {
-  let user = null;
-  try {
-    user = await authManager.getUser();
-  } catch (err) {
-    // eslint-disable-next-line no-console
-    console.warn('eth_requestAccounts` failed to retrieve a cached user session:', err);
-  }
-
-  if (!user) {
-    user = await authManager.login();
-  }
+  const user = await authManager.getUserOrLogin();
   if (!user.idToken) {
     throw new Error('User is missing idToken');
   }

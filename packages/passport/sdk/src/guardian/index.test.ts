@@ -3,7 +3,7 @@ import * as guardian from '@imtbl/guardian';
 import { TransactionRequest } from '@ethersproject/providers';
 import { ImmutableConfiguration } from '@imtbl/config';
 import AuthManager from 'authManager';
-import GuardianClient from './guardian';
+import GuardianClient from './index';
 import { mockUser, mockUserImx, mockUserZkEvm } from '../test/mocks';
 import { JsonRpcError, RpcErrorCode } from '../zkEvm/JsonRpcError';
 import { PassportConfiguration } from '../config';
