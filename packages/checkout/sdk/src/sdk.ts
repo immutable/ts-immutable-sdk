@@ -507,6 +507,7 @@ export class Checkout {
       tokenAmount = params.tokenAmount;
       tokenSymbol = token.symbol;
     }
+    const allowedTokens = tokenList?.tokens?.filter((t) => t.symbol).map((t) => t.symbol);
 
     return await this.fiatRampService.createWidgetUrl({
       exchangeType: params.exchangeType,
@@ -515,6 +516,7 @@ export class Checkout {
       tokenAmount,
       tokenSymbol,
       email,
+      allowedTokens,
     } as FiatRampWidgetParams);
   }
 
