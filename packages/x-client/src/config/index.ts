@@ -6,14 +6,16 @@ import {
   ModuleConfiguration,
 } from '@imtbl/config';
 
+export { Environment, ImmutableConfiguration } from '@imtbl/config';
+
+const defaultHeaders = { 'x-sdk-version': 'ts-immutable-sdk-__SDK_VERSION__' };
+
 interface ImmutableXConfigurationParams {
   basePath: string,
   chainID: number,
   coreContractAddress: string,
   registrationContractAddress: string,
 }
-
-const defaultHeaders = { 'x-sdk-version': 'ts-immutable-sdk-__SDK_VERSION__' };
 
 export interface EthConfiguration {
   coreContractAddress: string;
@@ -168,3 +170,25 @@ export class ImxConfiguration {
     }
   }
 }
+
+/**
+ * imxClientConfig
+ * @description Helper method to create a standard ImxConfiguration object for
+ * the IMXClient class. If you need to override the default configuration, use
+ * the ImxConfiguration class directly.
+ * @param environment {Environment} The environment to use for the configuration
+ * @returns ImxConfiguration
+ */
+export const imxClientConfig = (environment: Environment): ImxConfiguration => {
+  if (!environment) {
+    throw new Error('Environment is required');
+  }
+  if (Object.values(Environment).indexOf(environment) === -1) {
+    throw new Error(`Invalid environment: ${environment}`);
+  }
+
+  const immutableConfiguration = new ImmutableConfiguration({
+    environment,
+  });
+  return new ImxConfiguration({ baseConfig: immutableConfiguration });
+};

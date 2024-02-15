@@ -1,6 +1,12 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { imx } from '@imtbl/generated-clients';
-import { Config, ImmutableXConfiguration } from './index';
+import {
+  Config,
+  ImmutableXConfiguration,
+  Environment,
+  ImxConfiguration,
+  imxClientConfig,
+} from './index';
 
 const defaultHeaders = { 'x-sdk-version': 'ts-immutable-sdk-__SDK_VERSION__' };
 
@@ -93,5 +99,22 @@ describe('createConfig', () => {
       sdkVersion,
     });
     expect(actual).toEqual(expected);
+  });
+});
+
+describe('imxClientConfig', () => {
+  it('should return an instance of ImxConfiguration', () => {
+    const config = imxClientConfig(Environment.SANDBOX);
+    expect(config).toBeInstanceOf(ImxConfiguration);
+  });
+
+  it('should throw when missing the Enironment parameter', () => {
+    // @ts-expect-error
+    expect(() => imxClientConfig()).toThrowError('Environment is required');
+  });
+
+  it('should throw when the Enironment parameter is not a valid Environment', () => {
+    // @ts-expect-error
+    expect(() => imxClientConfig('invalid')).toThrowError('Invalid environment: invalid');
   });
 });
