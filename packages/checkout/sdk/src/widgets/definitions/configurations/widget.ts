@@ -8,6 +8,11 @@ export type WidgetConfiguration = {
   /** The theme of the Checkout Widget (default: "DARK") */
   theme?: WidgetTheme;
   language?: WidgetLanguage;
+  walletConnect?: {
+    enable: boolean;
+    includeWalletIds: string[];
+    excludeWalletIds: string[];
+  };
 };
 
 /**
