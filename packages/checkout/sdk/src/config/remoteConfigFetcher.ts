@@ -78,7 +78,7 @@ export class RemoteConfigFetcher {
     this.configCache = this.parseResponse<RemoteConfiguration>(response);
 
     // eslint-disable-next-line no-console
-    if (this.configCache.connect.walletConnect) console.warn('WalletConnect is enabled');
+    if (this.configCache && this.configCache.connect.walletConnect) console.warn('WalletConnect is enabled');
 
     return this.configCache;
   }
