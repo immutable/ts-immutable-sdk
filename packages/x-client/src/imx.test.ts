@@ -1,8 +1,12 @@
-import { IMXClient } from 'index';
+import { IMXClient } from 'x-client';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { Config } from '@imtbl/core-sdk';
 import { AxiosRequestConfig } from 'axios';
-import { ImxConfiguration, ImxModuleConfiguration, createImmutableXConfiguration } from './config';
+import {
+  Config,
+  ImxConfiguration,
+  ImxModuleConfiguration,
+  createImmutableXConfiguration,
+} from './config';
 
 describe('IMXClient', () => {
   it('should instantiate a SANDBOX IMXClient', async () => {
