@@ -1,4 +1,4 @@
-import { ExternalProvider, JsonRpcProvider } from '@ethersproject/providers';
+import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { Signer } from '@ethersproject/abstract-signer';
 import {
@@ -15,11 +15,14 @@ import MagicAdapter from '../magicAdapter';
 import TypedEventEmitter from '../utils/typedEventEmitter';
 import { PassportConfiguration } from '../config';
 import {
-  PassportEventMap, PassportEvents, User, UserZkEvm,
+  PassportEventMap,
+  PassportEvents,
+  User,
+  UserZkEvm,
 } from '../types';
 import { RelayerClient } from './relayerClient';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
-import {loginZkEvmUser, registerZkEvmUser} from './user';
+import { registerZkEvmUser } from './user';
 import { sendTransaction } from './sendTransaction';
 import GuardianClient from '../guardian';
 import { signTypedDataV4 } from './signTypedDataV4';
@@ -33,13 +36,7 @@ export type ZkEvmProviderInput = {
   guardianClient: GuardianClient;
 };
 
-type LoggedInZkEvmProvider = {
-  magicProvider: ExternalProvider;
-  relayerClient: RelayerClient;
-  zkevmAddress: string;
-};
-
-const isZkevmUser = (user: User): user is UserZkEvm => 'zkEvm' in user;
+const isZkEvmUser = (user: User): user is UserZkEvm => 'zkEvm' in user;
 
 export class ZkEvmProvider implements Provider {
   readonly #authManager: AuthManager;
@@ -58,7 +55,9 @@ export class ZkEvmProvider implements Provider {
 
   readonly #relayerClient: RelayerClient;
 
-  #ethSigner?: Promise<Signer>;
+  #ethSigner?: Promise<Signer | undefined> | undefined;
+
+  #signerInitialisationError: unknown | undefined;
 
   #zkEvmAddress?: string;
 
@@ -97,10 +96,10 @@ export class ZkEvmProvider implements Provider {
     this.#multiRollupApiClients = multiRollupApiClients;
     this.#eventEmitter = new TypedEventEmitter<ProviderEventMap>();
 
-    passportEventEmitter.on(PassportEvents.LOGGED_OUT, this.handleLogout);
+    passportEventEmitter.on(PassportEvents.LOGGED_OUT, this.#handleLogout);
   }
 
-  private handleLogout = () => {
+  #handleLogout = () => {
     const shouldEmitAccountsChanged = !!this.#zkEvmAddress;
 
     this.#ethSigner = undefined;
@@ -111,7 +110,40 @@ export class ZkEvmProvider implements Provider {
     }
   };
 
-  private async performRequest(request: RequestArguments): Promise<any> {
+  async #initialiseEthSigner(user: User) {
+    const generateSigner = async (): Promise<Signer> => {
+      const magicRpcProvider = await this.#magicAdapter.login(user.idToken!);
+      const web3Provider = new Web3Provider(magicRpcProvider);
+
+      return web3Provider.getSigner();
+    };
+
+    // eslint-disable-next-line no-async-promise-executor
+    this.#ethSigner = new Promise(async (resolve) => {
+      try {
+        resolve(await generateSigner());
+      } catch (err) {
+        // Capture and store the initialization error
+        this.#signerInitialisationError = err;
+        resolve(undefined);
+      }
+    });
+  }
+
+  async #getSigner(): Promise<Signer> {
+    const ethSigner = await this.#ethSigner;
+    // Throw the stored error if the signers failed to initialise
+    if (typeof ethSigner === 'undefined') {
+      if (typeof this.#signerInitialisationError !== 'undefined') {
+        throw this.#signerInitialisationError;
+      }
+      throw new Error('Signer failed to initialise');
+    }
+
+    return ethSigner;
+  }
+
+  async #performRequest(request: RequestArguments): Promise<any> {
     switch (request.method) {
       case 'eth_requestAccounts': {
         if (this.#zkEvmAddress) {
@@ -119,40 +151,38 @@ export class ZkEvmProvider implements Provider {
         }
 
         const user = await this.#authManager.getUserOrLogin();
+        this.#initialiseEthSigner(user);
 
-        this.#initialiseSigners();
+        if (!isZkEvmUser(user)) {
+          const ethSigner = await this.#getSigner();
 
-        if (!isZkevmUser(user)) {
-          const ethSigner = await this.#ethSigner;
           const userZkEvm = await registerZkEvmUser({
+            ethSigner,
             authManager: this.#authManager,
             multiRollupApiClients: this.#multiRollupApiClients,
             accessToken: user.accessToken,
             jsonRpcProvider: this.#jsonRpcProvider,
           });
+
+          this.#zkEvmAddress = userZkEvm.zkEvm.ethAddress;
+        } else {
+          this.#zkEvmAddress = user.zkEvm.ethAddress;
         }
 
-        const { magicProvider, user } = await loginZkEvmUser({
-          authManager: this.#authManager,
-          magicAdapter: this.#magicAdapter,
-          multiRollupApiClients: this.#multiRollupApiClients,
-          jsonRpcProvider: this.#jsonRpcProvider,
-        });
+        this.#eventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [this.#zkEvmAddress]);
 
-        this.#magicProvider = magicProvider;
-        this.#zkEvmAddress = user.zkEvm.ethAddress;
-
-        this.#eventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [user.zkEvm.ethAddress]);
-
-        return [user.zkEvm.ethAddress];
+        return [this.#zkEvmAddress];
       }
       case 'eth_sendTransaction': {
         if (!this.#zkEvmAddress) {
           throw new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
         }
+
+        const ethSigner = await this.#getSigner();
+
         return sendTransaction({
           params: request.params || [],
-          magicProvider: this.#magicProvider,
+          ethSigner,
           guardianClient: this.#guardianClient,
           jsonRpcProvider: this.#jsonRpcProvider,
           relayerClient: this.#relayerClient,
@@ -164,13 +194,16 @@ export class ZkEvmProvider implements Provider {
       }
       case 'eth_signTypedData':
       case 'eth_signTypedData_v4': {
-        if (!this.isLoggedIn()) {
+        if (!this.#zkEvmAddress) {
           throw new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
         }
+
+        const ethSigner = await this.#getSigner();
+
         return signTypedDataV4({
           method: request.method,
           params: request.params || [],
-          magicProvider: this.#magicProvider,
+          ethSigner,
           jsonRpcProvider: this.#jsonRpcProvider,
           relayerClient: this.#relayerClient,
           guardianClient: this.#guardianClient,
@@ -198,10 +231,10 @@ export class ZkEvmProvider implements Provider {
     }
   }
 
-  private async performJsonRpcRequest(request: JsonRpcRequestPayload): Promise<JsonRpcResponsePayload> {
+  async #performJsonRpcRequest(request: JsonRpcRequestPayload): Promise<JsonRpcResponsePayload> {
     const { id, jsonrpc } = request;
     try {
-      const result = await this.performRequest(request);
+      const result = await this.#performRequest(request);
       return {
         id,
         jsonrpc,
@@ -229,7 +262,7 @@ export class ZkEvmProvider implements Provider {
     request: RequestArguments,
   ): Promise<any> {
     try {
-      return this.performRequest(request);
+      return this.#performRequest(request);
     } catch (error: unknown) {
       if (error instanceof JsonRpcError) {
         throw error;
@@ -251,13 +284,13 @@ export class ZkEvmProvider implements Provider {
     }
 
     if (Array.isArray(request)) {
-      Promise.all(request.map(this.performJsonRpcRequest)).then((result) => {
+      Promise.all(request.map(this.#performJsonRpcRequest)).then((result) => {
         callback(null, result);
       }).catch((error: JsonRpcError) => {
         callback(error, []);
       });
     } else {
-      this.performJsonRpcRequest(request).then((result) => {
+      this.#performJsonRpcRequest(request).then((result) => {
         callback(null, result);
       }).catch((error: JsonRpcError) => {
         callback(error, null);
@@ -298,7 +331,7 @@ export class ZkEvmProvider implements Provider {
     }
 
     if (!Array.isArray(request) && typeof request === 'object') {
-      return this.performJsonRpcRequest(request);
+      return this.#performJsonRpcRequest(request);
     }
 
     throw new JsonRpcError(RpcErrorCode.INVALID_REQUEST, 'Invalid request');

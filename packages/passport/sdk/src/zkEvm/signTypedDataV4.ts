@@ -1,8 +1,5 @@
-import {
-  ExternalProvider,
-  JsonRpcProvider,
-  Web3Provider,
-} from '@ethersproject/providers';
+import { JsonRpcProvider } from '@ethersproject/providers';
+import { Signer } from '@ethersproject/abstract-signer';
 import { BigNumber } from 'ethers';
 import GuardianClient from 'guardian';
 import { getSignedTypedData } from './walletHelpers';
@@ -11,7 +8,7 @@ import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { RelayerClient } from './relayerClient';
 
 export type SignTypedDataV4Params = {
-  magicProvider: ExternalProvider;
+  ethSigner: Signer;
   jsonRpcProvider: JsonRpcProvider;
   relayerClient: RelayerClient;
   method: string;
@@ -68,7 +65,7 @@ const transformTypedData = (typedData: string | object, chainId: number): TypedD
 export const signTypedDataV4 = async ({
   params,
   method,
-  magicProvider,
+  ethSigner,
   jsonRpcProvider,
   relayerClient,
   guardianClient,
@@ -86,8 +83,6 @@ export const signTypedDataV4 = async ({
 
     await guardianClient.validateMessage({ chainID: String(chainId), payload: typedData });
     const relayerSignature = await relayerClient.imSignTypedData(fromAddress, typedData);
-    const magicWeb3Provider = new Web3Provider(magicProvider);
-    const signer = magicWeb3Provider.getSigner();
 
-    return getSignedTypedData(typedData, relayerSignature, BigNumber.from(chainId), fromAddress, signer);
+    return getSignedTypedData(typedData, relayerSignature, BigNumber.from(chainId), fromAddress, ethSigner);
   });

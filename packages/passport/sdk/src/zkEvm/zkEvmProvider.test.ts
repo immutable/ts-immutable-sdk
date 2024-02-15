@@ -1,7 +1,6 @@
 import { JsonRpcProvider } from '@ethersproject/providers';
 import AuthManager from 'authManager';
 import { ZkEvmProviderInput, ZkEvmProvider } from './zkEvmProvider';
-import { loginZkEvmUser } from './user';
 import { sendTransaction } from './sendTransaction';
 import { JsonRpcError, ProviderErrorCode } from './JsonRpcError';
 import GuardianClient from '../guardian';
@@ -28,8 +27,7 @@ describe('ZkEvmProvider', () => {
 
   const config = testConfig;
   const authManager = {
-    getUser: jest.fn().mockResolvedValue(mockUserZkEvm),
-    removeUser: jest.fn(),
+    getUserOrLogin: jest.fn().mockResolvedValue(mockUserZkEvm),
   } as unknown as AuthManager;
   const guardianClient = {} as GuardianClient;
 
@@ -348,8 +346,8 @@ describe('ZkEvmProvider', () => {
       await provider.request({ method: 'eth_requestAccounts' });
 
       const userLoggedInKeys = [
-        'magicProvider',
-        'relayerClient',
+        '#ethSigner',
+        '#zkEvmAddress',
       ];
 
       userLoggedInKeys.forEach((key) => {
