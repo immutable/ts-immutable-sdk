@@ -65,6 +65,7 @@
       "packages/config",
       "packages/x-client",
       "packages/x-provider",
+      "packages/x-link",
       "packages/x-provider/src/sample-app",
       "packages/passport/sdk",
       "packages/passport/sdk-sample-app",
