@@ -11,11 +11,9 @@ jest.mock('./registerZkEvmUser');
 describe('loginZkEvmUser', () => {
   afterEach(jest.resetAllMocks);
 
-  const getUserMock = jest.fn();
-  const authLoginMock = jest.fn();
+  const getUserOrLoginMock = jest.fn();
   const authManager = {
-    getUser: getUserMock,
-    login: authLoginMock,
+    getUserOrLogin: getUserOrLoginMock,
   } as unknown as AuthManager;
   const magicProvider = {};
   const magicAdapter = {
@@ -25,7 +23,7 @@ describe('loginZkEvmUser', () => {
   const multiRollupApiClients = { } as unknown as MultiRollupApiClients;
 
   it('should return a user that has registered with zkEvm', async () => {
-    getUserMock.mockResolvedValue(mockUserZkEvm);
+    getUserOrLoginMock.mockResolvedValue(mockUserZkEvm);
     const result = await loginZkEvmUser({
       authManager,
       magicAdapter,
@@ -37,12 +35,11 @@ describe('loginZkEvmUser', () => {
       user: mockUserZkEvm,
       magicProvider,
     });
-    expect(authManager.login).toBeCalledTimes(0);
     expect(registerZkEvmUser).toBeCalledTimes(0);
   });
 
   it('should register and return a user if the user has not registered with zkEvm', async () => {
-    authLoginMock.mockResolvedValue(mockUser);
+    getUserOrLoginMock.mockResolvedValue(mockUser);
     (registerZkEvmUser as unknown as jest.Mock).mockResolvedValue(mockUserZkEvm);
     const result = await loginZkEvmUser({
       authManager,
@@ -55,12 +52,11 @@ describe('loginZkEvmUser', () => {
       user: mockUserZkEvm,
       magicProvider,
     });
-    expect(authManager.login).toBeCalledTimes(1);
     expect(registerZkEvmUser).toBeCalledTimes(1);
   });
 
-  it('should returns a user that has invalid refresh token but login again', async () => {
-    (authManager.login as unknown as jest.Mock).mockResolvedValue(mockUserZkEvm);
+  it('should return a user that has invalid refresh token but login again', async () => {
+    (authManager.getUserOrLogin as unknown as jest.Mock).mockResolvedValue(mockUserZkEvm);
     const result = await loginZkEvmUser({
       authManager,
       magicAdapter,
@@ -72,7 +68,7 @@ describe('loginZkEvmUser', () => {
       user: mockUserZkEvm,
       magicProvider,
     });
-    expect(authManager.login).toBeCalledTimes(1);
+    expect(authManager.getUserOrLogin).toBeCalledTimes(1);
     expect(registerZkEvmUser).toBeCalledTimes(0);
   });
 });

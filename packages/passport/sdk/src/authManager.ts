@@ -174,6 +174,18 @@ export default class AuthManager {
     }, PassportErrorType.AUTHENTICATION_ERROR);
   }
 
+  public async getUserOrLogin(): Promise<User> {
+    let user = null;
+    try {
+      user = await this.getUser();
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.warn('failed to retrieve a cached user session:', err);
+    }
+
+    return user || this.login();
+  }
+
   public async loginCallback(): Promise<void> {
     return withPassportError<void>(
       async () => this.userManager.signinPopupCallback(),
