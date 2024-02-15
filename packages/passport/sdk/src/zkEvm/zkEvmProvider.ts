@@ -1,5 +1,6 @@
 import { ExternalProvider, JsonRpcProvider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
+import { Signer } from '@ethersproject/abstract-signer';
 import {
   JsonRpcRequestCallback,
   JsonRpcRequestPayload,
@@ -13,17 +14,15 @@ import AuthManager from '../authManager';
 import MagicAdapter from '../magicAdapter';
 import TypedEventEmitter from '../utils/typedEventEmitter';
 import { PassportConfiguration } from '../config';
-import { ConfirmationScreen } from '../confirmation';
 import {
-  PassportEventMap, PassportEvents,
+  PassportEventMap, PassportEvents, User, UserZkEvm,
 } from '../types';
 import { RelayerClient } from './relayerClient';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
-import { loginZkEvmUser } from './user';
+import {loginZkEvmUser, registerZkEvmUser} from './user';
 import { sendTransaction } from './sendTransaction';
 import GuardianClient from '../guardian';
 import { signTypedDataV4 } from './signTypedDataV4';
-import {EthSigner} from "@imtbl/core-sdk";
 
 export type ZkEvmProviderInput = {
   authManager: AuthManager;
@@ -40,12 +39,12 @@ type LoggedInZkEvmProvider = {
   zkevmAddress: string;
 };
 
+const isZkevmUser = (user: User): user is UserZkEvm => 'zkEvm' in user;
+
 export class ZkEvmProvider implements Provider {
   readonly #authManager: AuthManager;
 
   readonly #config: PassportConfiguration;
-
-  readonly #confirmationScreen: ConfirmationScreen;
 
   readonly #eventEmitter: TypedEventEmitter<ProviderEventMap>;
 
@@ -55,13 +54,11 @@ export class ZkEvmProvider implements Provider {
 
   readonly #magicAdapter: MagicAdapter;
 
-  readonly #guardianClient: GuardianClient;
-
   readonly #multiRollupApiClients: MultiRollupApiClients;
 
   readonly #relayerClient: RelayerClient;
 
-  #ethSigner?: Promise<EthSigner>;
+  #ethSigner?: Promise<Signer>;
 
   #zkEvmAddress?: string;
 
@@ -119,6 +116,20 @@ export class ZkEvmProvider implements Provider {
       case 'eth_requestAccounts': {
         if (this.#zkEvmAddress) {
           return [this.#zkEvmAddress];
+        }
+
+        const user = await this.#authManager.getUserOrLogin();
+
+        this.#initialiseSigners();
+
+        if (!isZkevmUser(user)) {
+          const ethSigner = await this.#ethSigner;
+          const userZkEvm = await registerZkEvmUser({
+            authManager: this.#authManager,
+            multiRollupApiClients: this.#multiRollupApiClients,
+            accessToken: user.accessToken,
+            jsonRpcProvider: this.#jsonRpcProvider,
+          });
         }
 
         const { magicProvider, user } = await loginZkEvmUser({
