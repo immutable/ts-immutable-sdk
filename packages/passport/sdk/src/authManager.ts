@@ -164,7 +164,7 @@ export default class AuthManager {
       const popupWindowFeatures = { width: 410, height: 450 };
       const oidcUser = await this.userManager.signinPopup({
         extraQueryParams: {
-          ...this.userManager.settings.extraQueryParams,
+          ...(this.userManager.settings.extraQueryParams ?? {}),
           rid: rid || '',
           third_party_a_id: anonymousId || '',
         },
