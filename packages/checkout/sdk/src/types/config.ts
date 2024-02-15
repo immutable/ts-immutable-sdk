@@ -48,6 +48,7 @@ export interface CheckoutModuleConfiguration extends ModuleConfiguration<Checkou
 /**
  * A type representing various remotely defined configurations which are
  * accessible via the Checkout config and configured based on the Environment.
+ * @property {ConnectConfig} connect
  * @property {DexConfig} dex
  * @property {OnRampConfig} onramp
  * @property {BridgeConfig} bridge
@@ -57,6 +58,8 @@ export interface CheckoutModuleConfiguration extends ModuleConfiguration<Checkou
  * @property {TelemetryConfig | undefined} telemetry
  */
 export type RemoteConfiguration = {
+  /** The config used for the Connect. */
+  connect: ConnectConfig;
   /** The config used for the DEX. */
   dex: DexConfig;
   /** The config used for the OnRamp */
@@ -113,6 +116,15 @@ export enum OnRampProvider {
 export type OnRampConfig = {
   /** OnRamp config for Transak provider */
   [key: string]: OnRampProviderConfig;
+};
+
+/**
+ * A type representing the configuration for the Connect.
+ * @property {boolean} walletConnect
+ */
+export type ConnectConfig = {
+  /** A boolean value for enabling/disabling WalletConnect */
+  walletConnect: boolean;
 };
 
 /**
