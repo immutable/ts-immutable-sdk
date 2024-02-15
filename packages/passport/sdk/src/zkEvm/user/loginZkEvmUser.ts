@@ -3,12 +3,10 @@ import { ExternalProvider, JsonRpcProvider } from '@ethersproject/providers';
 import { registerZkEvmUser } from './registerZkEvmUser';
 import { UserZkEvm } from '../../types';
 import AuthManager from '../../authManager';
-import { PassportConfiguration } from '../../config';
 import MagicAdapter from '../../magicAdapter';
 
 type LoginZkEvmUserInput = {
   authManager: AuthManager;
-  config: PassportConfiguration;
   magicAdapter: MagicAdapter;
   multiRollupApiClients: MultiRollupApiClients;
   jsonRpcProvider: JsonRpcProvider;

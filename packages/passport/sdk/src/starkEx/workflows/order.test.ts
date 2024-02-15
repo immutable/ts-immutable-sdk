@@ -1,10 +1,10 @@
 import { ETHAmount, OrdersApi, UnsignedOrderRequest } from '@imtbl/core-sdk';
-import GuardianClient from '../../guardian/guardian';
+import GuardianClient from '../../guardian';
 import { PassportError, PassportErrorType } from '../../errors/passportError';
 import { mockErrorMessage, mockStarkSignature, mockUserImx } from '../../test/mocks';
 import { cancelOrder, createOrder } from './order';
 
-jest.mock('../../guardian/guardian');
+jest.mock('../../guardian');
 
 describe('order', () => {
   const mockGuardianClient = new GuardianClient({} as any);
