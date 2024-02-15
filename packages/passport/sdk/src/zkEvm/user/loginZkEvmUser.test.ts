@@ -55,8 +55,8 @@ describe('loginZkEvmUser', () => {
     expect(registerZkEvmUser).toBeCalledTimes(1);
   });
 
-  it('should returns a user that has invalid refresh token but login again', async () => {
-    (authManager.login as unknown as jest.Mock).mockResolvedValue(mockUserZkEvm);
+  it('should return a user that has invalid refresh token but login again', async () => {
+    (authManager.getUserOrLogin as unknown as jest.Mock).mockResolvedValue(mockUserZkEvm);
     const result = await loginZkEvmUser({
       authManager,
       magicAdapter,
@@ -68,7 +68,7 @@ describe('loginZkEvmUser', () => {
       user: mockUserZkEvm,
       magicProvider,
     });
-    expect(authManager.login).toBeCalledTimes(1);
+    expect(authManager.getUserOrLogin).toBeCalledTimes(1);
     expect(registerZkEvmUser).toBeCalledTimes(0);
   });
 });
