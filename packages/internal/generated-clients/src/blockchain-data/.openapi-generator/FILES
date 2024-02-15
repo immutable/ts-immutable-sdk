@@ -103,6 +103,7 @@ models/nft.ts
 models/nftcontract-type.ts
 models/nftmetadata-attribute-value.ts
 models/nftmetadata-attribute.ts
+models/nftmetadata-request.ts
 models/nftowner.ts
 models/nftsale.ts
 models/nftwith-balance.ts
