@@ -1,6 +1,6 @@
 import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
-import GuardianClient from 'guardian/guardian';
+import GuardianClient from 'guardian';
 import { getEip155ChainId, getSignedTypedData } from './walletHelpers';
 import {
   chainId,

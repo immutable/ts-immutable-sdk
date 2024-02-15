@@ -24,7 +24,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import { ImxApiClients } from '@imtbl/generated-clients';
 import TypedEventEmitter from '../utils/typedEventEmitter';
 import AuthManager from '../authManager';
-import GuardianClient from '../guardian/guardian';
+import GuardianClient from '../guardian';
 import {
   PassportEventMap, PassportEvents, UserImx, User, IMXSigners,
 } from '../types';
@@ -32,8 +32,6 @@ import { PassportError, PassportErrorType } from '../errors/passportError';
 import {
   batchNftTransfer, cancelOrder, createOrder, createTrade, exchangeTransfer, transfer,
 } from './workflows';
-import { ConfirmationScreen } from '../confirmation';
-import { PassportConfiguration } from '../config';
 import registerOffchain from './workflows/registerOffchain';
 import MagicAdapter from '../magicAdapter';
 import { getStarkSigner } from './getStarkSigner';
@@ -41,11 +39,10 @@ import { getStarkSigner } from './getStarkSigner';
 export interface PassportImxProviderOptions {
   authManager: AuthManager;
   immutableXClient: IMXClient;
-  confirmationScreen: ConfirmationScreen;
-  config: PassportConfiguration;
   passportEventEmitter: TypedEventEmitter<PassportEventMap>;
   magicAdapter: MagicAdapter;
   imxApiClients: ImxApiClients;
+  guardianClient: GuardianClient;
 }
 
 type AuthenticatedUserAndSigners = {
@@ -84,21 +81,16 @@ export class PassportImxProvider implements IMXProvider {
   constructor({
     authManager,
     immutableXClient,
-    confirmationScreen,
-    config,
     passportEventEmitter,
     magicAdapter,
     imxApiClients,
+    guardianClient,
   }: PassportImxProviderOptions) {
     this.authManager = authManager;
     this.immutableXClient = immutableXClient;
-    this.guardianClient = new GuardianClient({
-      confirmationScreen,
-      config,
-      authManager,
-    });
     this.magicAdapter = magicAdapter;
     this.imxApiClients = imxApiClients;
+    this.guardianClient = guardianClient;
     this.initialiseSigners();
 
     passportEventEmitter.on(PassportEvents.LOGGED_OUT, this.handleLogout);
