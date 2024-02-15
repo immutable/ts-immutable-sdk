@@ -9,6 +9,7 @@ import axios from 'axios';
 import DeviceCredentialsManager from 'storage/device_credentials_manager';
 import * as crypto from 'crypto';
 import jwt_decode from 'jwt-decode';
+import { getDetail, Detail } from '@imtbl/metrics';
 import { isTokenExpired } from './utils/token';
 import { PassportErrorType, withPassportError } from './errors/passportError';
 import {
@@ -153,10 +154,19 @@ export default class AuthManager {
     });
   };
 
-  public async login(): Promise<User> {
+  /**
+   * login
+   * @param anonymousId Caller can pass an anonymousId if they want to associate their user's identity with immutable's internal instrumentation.
+   */
+  public async login(anonymousId?: string): Promise<User> {
     return withPassportError<User>(async () => {
+      const rid = getDetail(Detail.RUNTIME_ID);
       const popupWindowFeatures = { width: 410, height: 450 };
       const oidcUser = await this.userManager.signinPopup({
+        extraQueryParams: {
+          rid: rid || '',
+          third_party_a_id: anonymousId || '',
+        },
         popupWindowFeatures,
       });
 
@@ -171,7 +181,11 @@ export default class AuthManager {
     );
   }
 
-  public async loginWithDeviceFlow(): Promise<DeviceConnectResponse> {
+  /**
+   * loginWithDeviceFlow
+   * @param anonymousId Caller can pass an anonymousId if they want to associate their user's identity with immutable's internal instrumentation.
+   */
+  public async loginWithDeviceFlow(anonymousId?: string): Promise<DeviceConnectResponse> {
     return withPassportError<DeviceConnectResponse>(async () => {
       const response = await axios.post<DeviceCodeResponse>(
         `${this.config.authenticationDomain}/oauth/device/code`,
@@ -183,10 +197,12 @@ export default class AuthManager {
         formUrlEncodedHeader,
       );
 
+      const rid = getDetail(Detail.RUNTIME_ID);
+
       return {
         code: response.data.user_code,
         deviceCode: response.data.device_code,
-        url: response.data.verification_uri_complete,
+        url: `${response.data.verification_uri_complete}${rid ? `&rid=${rid}` : ''}${anonymousId ? `&third_party_a_id=${anonymousId}` : ''}`,
         interval: response.data.interval,
       };
     }, PassportErrorType.AUTHENTICATION_ERROR);
@@ -338,7 +354,7 @@ export default class AuthManager {
     return this.userManager.signoutSilentCallback(url);
   }
 
-  public async forceUserRefresh() : Promise<User | null> {
+  public async forceUserRefresh(): Promise<User | null> {
     return this.refreshTokenAndUpdatePromise();
   }
 
