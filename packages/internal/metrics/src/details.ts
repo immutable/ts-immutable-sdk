@@ -1,6 +1,6 @@
 import { errorBoundary } from './utils/errorBoundary';
 import { Detail } from './utils/constants';
-import { storeDetail } from './utils/state';
+import { storeDetail, getDetail as getDetailFn } from './utils/state';
 import { getGlobalisedValue } from './utils/globalise';
 
 const setEnvironmentFn = (env: 'sandbox' | 'production') => {
@@ -23,3 +23,9 @@ const setPublishableApiKeyFn = (publishableApiKey: string) => {
 export const setPublishableApiKey = errorBoundary(
   getGlobalisedValue('setPublishableApiKey', setPublishableApiKeyFn),
 );
+
+export const getDetail = errorBoundary(
+  getGlobalisedValue('getDetail', getDetailFn),
+);
+
+export { Detail };

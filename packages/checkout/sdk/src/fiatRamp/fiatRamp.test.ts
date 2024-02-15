@@ -8,7 +8,8 @@ import { HttpClient } from '../api/http';
 const defaultWidgetUrl = 'https://global-stg.transak.com?apiKey=mock-api-key'
 + '&network=immutablezkevm&defaultPaymentMethod=credit_debit_card&disablePaymentMethods=sepa_bank_transfer,'
 + 'gbp_bank_transfer,pm_cash_app,pm_jwire,pm_paymaya,pm_bpi,pm_ubp,pm_grabpay,pm_shopeepay,pm_gcash,pm_pix,'
-+ 'pm_astropay,pm_pse,inr_bank_transfer&productsAvailed=buy&exchangeScreenTitle=Buy&themeColor=0D0D0D';
++ 'pm_astropay,pm_pse,inr_bank_transfer&productsAvailed=buy&exchangeScreenTitle=Buy&themeColor=0D0D0D'
++ '&defaultFiatAmount=50&defaultFiatCurrency=usd';
 
 jest.mock('../config/remoteConfigFetcher');
 
@@ -142,6 +143,17 @@ describe('FiatRampService', () => {
       const result = await fiatRampService.createWidgetUrl(params);
       expect(result).toContain(defaultWidgetUrl);
       expect(result).toContain('&walletAddress=0x1234567890');
+    });
+
+    it('should return widget url with allowed crypto tokens in query params when allowed list is present', async () => {
+      const params: FiatRampWidgetParams = {
+        exchangeType: ExchangeType.ONRAMP,
+        isPassport: false,
+        allowedTokens: ['ETH', 'IMX'],
+      };
+      const result = await fiatRampService.createWidgetUrl(params);
+      expect(result).toContain(defaultWidgetUrl);
+      expect(result).toContain('&cryptoCurrencyList=eth,imx');
     });
   });
 });

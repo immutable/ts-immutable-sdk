@@ -15,10 +15,10 @@ import {
   mswHandlers,
 } from './mocks/zkEvm/msw';
 import { JsonRpcError, RpcErrorCode } from './zkEvm/JsonRpcError';
-import GuardianClient from './guardian/guardian';
+import GuardianClient from './guardian';
 import { chainIdHex } from './test/mocks';
 
-jest.mock('./guardian/guardian');
+jest.mock('./guardian');
 
 jest.mock('magic-sdk');
 jest.mock('oidc-client-ts');

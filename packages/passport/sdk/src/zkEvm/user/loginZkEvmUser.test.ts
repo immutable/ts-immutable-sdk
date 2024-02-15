@@ -1,6 +1,4 @@
 import { mockUser, mockUserZkEvm } from 'test/mocks';
-import { PassportConfiguration } from 'config';
-import { ImmutableConfiguration } from '@imtbl/config';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { loginZkEvmUser } from './loginZkEvmUser';
@@ -24,20 +22,12 @@ describe('loginZkEvmUser', () => {
     login: () => magicProvider,
   } as unknown as MagicAdapter;
 
-  const config = new PassportConfiguration({
-    baseConfig: {} as ImmutableConfiguration,
-    clientId: 'client123',
-    logoutRedirectUri: 'http://localhost:3000/logout',
-    redirectUri: 'http://localhost:3000/redirect',
-  });
-
   const multiRollupApiClients = { } as unknown as MultiRollupApiClients;
 
   it('should return a user that has registered with zkEvm', async () => {
     getUserMock.mockResolvedValue(mockUserZkEvm);
     const result = await loginZkEvmUser({
       authManager,
-      config,
       magicAdapter,
       multiRollupApiClients,
       jsonRpcProvider: {} as JsonRpcProvider,
@@ -56,7 +46,6 @@ describe('loginZkEvmUser', () => {
     (registerZkEvmUser as unknown as jest.Mock).mockResolvedValue(mockUserZkEvm);
     const result = await loginZkEvmUser({
       authManager,
-      config,
       magicAdapter,
       multiRollupApiClients,
       jsonRpcProvider: {} as JsonRpcProvider,
@@ -74,7 +63,6 @@ describe('loginZkEvmUser', () => {
     (authManager.login as unknown as jest.Mock).mockResolvedValue(mockUserZkEvm);
     const result = await loginZkEvmUser({
       authManager,
-      config,
       magicAdapter,
       multiRollupApiClients,
       jsonRpcProvider: {} as JsonRpcProvider,

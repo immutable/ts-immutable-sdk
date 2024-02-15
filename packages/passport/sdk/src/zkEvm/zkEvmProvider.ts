@@ -13,7 +13,6 @@ import AuthManager from '../authManager';
 import MagicAdapter from '../magicAdapter';
 import TypedEventEmitter from '../utils/typedEventEmitter';
 import { PassportConfiguration } from '../config';
-import { ConfirmationScreen } from '../confirmation';
 import {
   PassportEventMap, PassportEvents,
 } from '../types';
@@ -21,22 +20,21 @@ import { RelayerClient } from './relayerClient';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
 import { loginZkEvmUser } from './user';
 import { sendTransaction } from './sendTransaction';
-import GuardianClient from '../guardian/guardian';
+import GuardianClient from '../guardian';
 import { signTypedDataV4 } from './signTypedDataV4';
 
 export type ZkEvmProviderInput = {
   authManager: AuthManager;
   magicAdapter: MagicAdapter,
   config: PassportConfiguration,
-  confirmationScreen: ConfirmationScreen,
   multiRollupApiClients: MultiRollupApiClients,
   passportEventEmitter: TypedEventEmitter<PassportEventMap>;
+  guardianClient: GuardianClient;
 };
 
 type LoggedInZkEvmProvider = {
   magicProvider: ExternalProvider;
   relayerClient: RelayerClient;
-  guardianClient: GuardianClient;
   zkevmAddress: string;
 };
 
@@ -44,8 +42,6 @@ export class ZkEvmProvider implements Provider {
   private readonly authManager: AuthManager;
 
   private readonly config: PassportConfiguration;
-
-  private readonly confirmationScreen: ConfirmationScreen;
 
   private readonly magicAdapter: MagicAdapter;
 
@@ -55,7 +51,7 @@ export class ZkEvmProvider implements Provider {
 
   private readonly eventEmitter: TypedEventEmitter<ProviderEventMap>;
 
-  protected guardianClient?: GuardianClient;
+  private readonly guardianClient: GuardianClient;
 
   protected relayerClient?: RelayerClient;
 
@@ -69,14 +65,14 @@ export class ZkEvmProvider implements Provider {
     authManager,
     magicAdapter,
     config,
-    confirmationScreen,
     multiRollupApiClients,
     passportEventEmitter,
+    guardianClient,
   }: ZkEvmProviderInput) {
     this.authManager = authManager;
     this.magicAdapter = magicAdapter;
     this.config = config;
-    this.confirmationScreen = confirmationScreen;
+    this.guardianClient = guardianClient;
 
     if (config.crossSdkBridgeEnabled) {
       // JsonRpcProvider by default sets the referrer as "client".
@@ -100,7 +96,6 @@ export class ZkEvmProvider implements Provider {
 
     this.magicProvider = undefined;
     this.relayerClient = undefined;
-    this.guardianClient = undefined;
 
     if (shouldEmitAccountsChanged) {
       this.eventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, []);
@@ -110,8 +105,7 @@ export class ZkEvmProvider implements Provider {
   private isLoggedIn(): this is LoggedInZkEvmProvider {
     return this.magicProvider !== undefined
       && this.zkevmAddress !== undefined
-      && this.relayerClient !== undefined
-      && this.guardianClient !== undefined;
+      && this.relayerClient !== undefined;
   }
 
   private async performRequest(request: RequestArguments): Promise<any> {
@@ -120,23 +114,17 @@ export class ZkEvmProvider implements Provider {
         if (this.isLoggedIn()) {
           return [this.zkevmAddress];
         }
+
         const { magicProvider, user } = await loginZkEvmUser({
           authManager: this.authManager,
-          config: this.config,
           magicAdapter: this.magicAdapter,
           multiRollupApiClients: this.multiRollupApiClients,
           jsonRpcProvider: this.jsonRpcProvider,
         });
-
         this.magicProvider = magicProvider;
         this.relayerClient = new RelayerClient({
           config: this.config,
           jsonRpcProvider: this.jsonRpcProvider,
-          authManager: this.authManager,
-        });
-        this.guardianClient = new GuardianClient({
-          confirmationScreen: this.confirmationScreen,
-          config: this.config,
           authManager: this.authManager,
         });
 

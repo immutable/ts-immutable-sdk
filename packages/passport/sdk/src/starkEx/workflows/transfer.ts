@@ -14,7 +14,7 @@ import {
   withPassportError,
 } from '../../errors/passportError';
 import { UserImx } from '../../types';
-import GuardianClient from '../../guardian/guardian';
+import GuardianClient from '../../guardian';
 
 const ERC721 = 'ERC721';
 

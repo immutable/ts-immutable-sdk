@@ -2,9 +2,9 @@ import { TradesApi } from '@imtbl/core-sdk';
 import { createTrade } from './trades';
 import { mockErrorMessage, mockStarkSignature, mockUserImx } from '../../test/mocks';
 import { PassportError, PassportErrorType } from '../../errors/passportError';
-import GuardianClient from '../../guardian/guardian';
+import GuardianClient from '../../guardian';
 
-jest.mock('../../guardian/guardian');
+jest.mock('../../guardian');
 
 const mockPayloadHash = 'test_payload_hash';
 const mockSignableTradeRequest = {

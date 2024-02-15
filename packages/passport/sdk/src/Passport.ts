@@ -26,6 +26,7 @@ import { ConfirmationScreen } from './confirmation';
 import { ZkEvmProvider } from './zkEvm';
 import { Provider } from './zkEvm/types';
 import TypedEventEmitter from './utils/typedEventEmitter';
+import GuardianClient from './guardian';
 
 const buildImxClientConfig = (passportModuleConfiguration: PassportModuleConfiguration) => {
   if (passportModuleConfiguration.overrides) {
@@ -56,16 +57,21 @@ export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConf
     ? passportModuleConfiguration.overrides.immutableXClient
     : new IMXClient({ baseConfig: passportModuleConfiguration.baseConfig });
 
+  const guardianClient = new GuardianClient({
+    confirmationScreen,
+    config,
+    authManager,
+  });
+
   const imxApiClients = buildImxApiClients(passportModuleConfiguration);
 
   const passportImxProviderFactory = new PassportImxProviderFactory({
     authManager,
-    config,
-    confirmationScreen,
     immutableXClient,
     magicAdapter,
     passportEventEmitter,
     imxApiClients,
+    guardianClient,
   });
 
   return {
@@ -77,6 +83,7 @@ export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConf
     multiRollupApiClients,
     passportEventEmitter,
     passportImxProviderFactory,
+    guardianClient,
   };
 };
 
@@ -97,6 +104,8 @@ export class Passport {
 
   private readonly passportEventEmitter: TypedEventEmitter<PassportEventMap>;
 
+  private readonly guardianClient: GuardianClient;
+
   constructor(passportModuleConfiguration: PassportModuleConfiguration) {
     const privateVars = buildPrivateVars(passportModuleConfiguration);
 
@@ -108,6 +117,7 @@ export class Passport {
     this.multiRollupApiClients = privateVars.multiRollupApiClients;
     this.passportEventEmitter = privateVars.passportEventEmitter;
     this.passportImxProviderFactory = privateVars.passportImxProviderFactory;
+    this.guardianClient = privateVars.guardianClient;
 
     setPassportClientId(passportModuleConfiguration.clientId);
     track('passport', 'initialised');
@@ -131,8 +141,8 @@ export class Passport {
       authManager: this.authManager,
       magicAdapter: this.magicAdapter,
       config: this.config,
-      confirmationScreen: this.confirmationScreen,
       multiRollupApiClients: this.multiRollupApiClients,
+      guardianClient: this.guardianClient,
     });
   }
 
