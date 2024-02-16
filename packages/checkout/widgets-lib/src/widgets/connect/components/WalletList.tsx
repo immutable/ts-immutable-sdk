@@ -45,7 +45,7 @@ export function WalletList(props: WalletListProps) {
   const [walletConnectEnabled] = useState(true);
   const [wallets, setWallets] = useState<WalletInfo[]>([]);
   const { track } = useAnalytics();
-  const { ethereumProvider, walletConnectModal, getWalletConnectDisplayUri } = useWalletConnect();
+  const { ethereumProvider, walletConnectModal, openWalletConnectModal } = useWalletConnect();
 
   const excludedWallets = useCallback(() => {
     const passportWalletProvider = { walletProviderName: WalletProviderName.PASSPORT };
@@ -72,10 +72,7 @@ export function WalletList(props: WalletListProps) {
 
   const onWalletConnectClick = useCallback(async () => {
     try {
-      const uri = await getWalletConnectDisplayUri();
-      walletConnectModal?.openModal({
-        uri,
-      });
+      await openWalletConnectModal();
     } catch (error) {
       // TODO: Handle wallet connect cancelled?
     }

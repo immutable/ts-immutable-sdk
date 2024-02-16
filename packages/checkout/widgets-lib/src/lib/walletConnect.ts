@@ -87,16 +87,16 @@ export class WalletConnectManager {
         }).then((wcEthereumProvider: EthereumProvider) => {
           // eslint-disable-next-line no-console
           console.log('wcEthereumProvider', wcEthereumProvider);
-          wcEthereumProvider.on('display_uri', (data) => {
-            // eslint-disable-next-line no-console
-            console.log('wc display_uri', data);
-            // setWcDisplayURI(data);
-            this.displayUri = data;
-            const pairingTopic = data.split('@')[0].replace('wc:', '');
-            // eslint-disable-next-line no-console
-            console.log('pairingTopic', pairingTopic);
-            // setWcPairingTopic(pairingTopic);
-          });
+          // wcEthereumProvider.on('display_uri', (data) => {
+          //   // eslint-disable-next-line no-console
+          //   console.log('wc display_uri', data);
+          //   // setWcDisplayURI(data);
+          //   this.displayUri = data;
+          //   const pairingTopic = data.split('@')[0].replace('wc:', '');
+          //   // eslint-disable-next-line no-console
+          //   console.log('pairingTopic', pairingTopic);
+          //   // setWcPairingTopic(pairingTopic);
+          // });
           wcEthereumProvider.on('connect', (data) => {
             // eslint-disable-next-line no-console
             console.log('wc connect', data);
