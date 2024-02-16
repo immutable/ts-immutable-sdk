@@ -65,3 +65,16 @@ generate-mr-api-client-tmp-minting-api:
     -g typescript-axios \
     -o /app/src/multi-rollup \
     -c /app/config/mr.config.json
+
+.PHONY: generate-blockchain-data-types-tmp-minting-api
+generate-blockchain-data-types-tmp-minting-api:
+	rm -rf src/blockchain-data && \
+    mkdir src/blockchain-data && \
+	docker run --rm -v $(shell pwd):/app openapitools/openapi-generator-cli:v7.0.1 generate \
+    --inline-schema-options REFACTOR_ALLOF_INLINE_SCHEMAS=true \
+    -i ./app/src/tmp-openapi-minting-api.json \
+    -g typescript-axios \
+    -o /app/src/blockchain-data \
+    -c /app/config/blockchain-data.config.json \
+    --additional-properties=stringEnums=true
+
