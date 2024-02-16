@@ -1,7 +1,8 @@
 import {
-  ExternalProvider, JsonRpcProvider, JsonRpcSigner, TransactionRequest, Web3Provider,
+  JsonRpcProvider, TransactionRequest,
 } from '@ethersproject/providers';
 import { BigNumber, BigNumberish } from 'ethers';
+import { Signer } from '@ethersproject/abstract-signer';
 import { getEip155ChainId, getNonce, getSignedMetaTransactions } from './walletHelpers';
 import { MetaTransaction, RelayerTransactionStatus } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
@@ -13,7 +14,7 @@ const MAX_TRANSACTION_HASH_RETRIEVAL_RETRIES = 30;
 const TRANSACTION_HASH_RETRIEVAL_WAIT = 1000;
 
 export type EthSendTransactionParams = {
-  magicProvider: ExternalProvider;
+  ethSigner: Signer;
   jsonRpcProvider: JsonRpcProvider;
   guardianClient: GuardianClient;
   relayerClient: RelayerClient;
@@ -26,7 +27,7 @@ const getMetaTransactions = async (
   nonce: BigNumberish,
   chainId: BigNumber,
   walletAddress: string,
-  signer: JsonRpcSigner,
+  signer: Signer,
   relayerClient: RelayerClient,
 ): Promise<MetaTransaction[]> => {
   // NOTE: We sign the transaction before getting the fee options because
@@ -68,7 +69,7 @@ const getMetaTransactions = async (
 
 export const sendTransaction = ({
   params,
-  magicProvider,
+  ethSigner,
   jsonRpcProvider,
   relayerClient,
   guardianClient,
@@ -82,8 +83,6 @@ export const sendTransaction = ({
 
     const { chainId } = await jsonRpcProvider.ready;
     const chainIdBigNumber = BigNumber.from(chainId);
-    const magicWeb3Provider = new Web3Provider(magicProvider);
-    const signer = magicWeb3Provider.getSigner();
 
     const nonce = await getNonce(jsonRpcProvider, zkevmAddress);
     const metaTransaction: MetaTransaction = {
@@ -99,7 +98,7 @@ export const sendTransaction = ({
       nonce,
       chainIdBigNumber,
       zkevmAddress,
-      signer,
+      ethSigner,
       relayerClient,
     );
 
@@ -116,7 +115,7 @@ export const sendTransaction = ({
       nonce,
       chainIdBigNumber,
       zkevmAddress,
-      signer,
+      ethSigner,
     );
 
     const relayerId = await relayerClient.ethSendTransaction(zkevmAddress, signedTransactions);
