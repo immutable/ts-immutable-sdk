@@ -9,11 +9,7 @@ export type WidgetConfiguration = {
   theme?: WidgetTheme;
   language?: WidgetLanguage;
   /** Enable/disable Wallet Connect */
-  walletConnect?: {
-    enable: boolean;
-    includeWalletIds: string[];
-    excludeWalletIds: string[];
-  };
+  walletConnect?: boolean;
 };
 
 /**
