@@ -56,7 +56,7 @@ export class ZkEvmProvider implements Provider {
   readonly #relayerClient: RelayerClient;
 
   /**
-   * This property is set during initialisation and stores the signer in a promise.
+   * This property is set during `#initialiseEthSigner` and stores the signer in a promise.
    * This property is not meant to be accessed directly, but through the
    * `#getSigner` method.
    * @see getSigner
