@@ -83,6 +83,7 @@ export * from './nft';
 export * from './nftcontract-type';
 export * from './nftmetadata-attribute';
 export * from './nftmetadata-attribute-value';
+export * from './nftmetadata-request';
 export * from './nftowner';
 export * from './nftsale';
 export * from './nftwith-balance';
