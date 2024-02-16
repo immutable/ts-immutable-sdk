@@ -61,11 +61,11 @@ const main = () => {
           jsFiles.forEach((jsFile) => {
             // Check if the file is a .js file
             if (path.extname(jsFile) === '.js') {
-              // Skip copying the original file and only copy .js chunks
+              // Skip copying the original file and copy over all other .js files
               if (jsFile !== path.basename(sourceFile)) {
-                const chunkSrcPath = path.join(srcDirectory, jsFile);
-                const chunkDestPath = path.join(directoryPath, jsFile);
-                fs.copyFileSync(chunkSrcPath, chunkDestPath);
+                const jsSrcPath = path.join(srcDirectory, jsFile);
+                const jsDestPath = path.join(directoryPath, jsFile);
+                fs.copyFileSync(jsSrcPath, jsDestPath);
               }
             }
           });
