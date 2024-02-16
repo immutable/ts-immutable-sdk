@@ -1,14 +1,15 @@
-import { ExternalProvider, JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
+import { JsonRpcProvider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { signRaw } from '@imtbl/toolkit';
 import { getEip155ChainId } from 'zkEvm/walletHelpers';
+import { Signer } from '@ethersproject/abstract-signer';
 import { UserZkEvm } from '../../types';
 import AuthManager from '../../authManager';
 import { JsonRpcError, RpcErrorCode } from '../JsonRpcError';
 
 export type RegisterZkEvmUserInput = {
   authManager: AuthManager;
-  magicProvider: ExternalProvider,
+  ethSigner: Signer,
   multiRollupApiClients: MultiRollupApiClients,
   accessToken: string;
   jsonRpcProvider: JsonRpcProvider;
@@ -18,16 +19,11 @@ const MESSAGE_TO_SIGN = 'Only sign this message from Immutable Passport';
 
 export async function registerZkEvmUser({
   authManager,
-  magicProvider,
+  ethSigner,
   multiRollupApiClients,
   accessToken,
   jsonRpcProvider,
 }: RegisterZkEvmUserInput): Promise<UserZkEvm> {
-  const web3Provider = new Web3Provider(
-    magicProvider,
-  );
-  const ethSigner = web3Provider.getSigner();
-
   const ethereumAddress = await ethSigner.getAddress();
   const ethereumSignature = await signRaw(MESSAGE_TO_SIGN, ethSigner);
 

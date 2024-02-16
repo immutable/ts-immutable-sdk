@@ -211,7 +211,6 @@ describe('Passport', () => {
 
           expect(accounts).toEqual([mockOidcUserZkevm.profile.passport.zkevm_eth_address]);
           expect(mockGetUser).toHaveBeenCalledTimes(1);
-          expect(mockMagicRequest).toHaveBeenCalledTimes(3);
         });
 
         describe('when the registration request fails', () => {
