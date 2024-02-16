@@ -1,16 +1,11 @@
-import { Environment } from '@imtbl/config';
 import { useState, useCallback } from 'react';
+import { PRIMARY_SALES_API_BASE_URL } from '../utils/config';
 
 type CurrencyResponse = {
   decimals: number;
   // eslint-disable-next-line @typescript-eslint/naming-convention
   erc20_address: string;
   name: string;
-};
-
-const PRIMARY_SALES_API_BASE_URL = {
-  [Environment.SANDBOX]: 'https://api.sandbox.immutable.com/v1/primary-sales',
-  [Environment.PRODUCTION]: 'https://api.immutable.com/v1/primary-sales',
 };
 
 export const useCurrency = ({

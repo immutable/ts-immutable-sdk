@@ -2,7 +2,6 @@
 import { useCallback, useState } from 'react';
 import { SaleItem, SalePaymentTypes } from '@imtbl/checkout-sdk';
 
-import { Environment } from '@imtbl/config';
 import {
   SignResponse,
   SignOrderInput,
@@ -12,11 +11,7 @@ import {
   ExecutedTransaction,
   SaleErrorTypes,
 } from '../types';
-
-const PRIMARY_SALES_API_BASE_URL = {
-  [Environment.SANDBOX]: 'https://api.sandbox.immutable.com/v1/primary-sales',
-  [Environment.PRODUCTION]: 'https://api.immutable.com/v1/primary-sales',
-};
+import { PRIMARY_SALES_API_BASE_URL } from '../utils/config';
 
 type SignApiTransaction = {
   contract_address: string;
