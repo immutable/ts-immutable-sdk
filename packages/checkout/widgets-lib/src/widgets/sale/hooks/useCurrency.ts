@@ -20,8 +20,8 @@ export const useCurrency = ({
   currencyName,
 }: UseCurrencyParams) => {
   const [currencyResponse, setCurrencyResponse] = useState<
-  CurrencyResponse | {}
-  >({});
+  CurrencyResponse | undefined
+  >(undefined);
 
   useEffect(() => {
     const fetchCurrency = async () => {
@@ -36,8 +36,7 @@ export const useCurrency = ({
 
         const data = await response.json();
 
-        let selectedCurrency = {};
-
+        let selectedCurrency;
         if (data.currencies && data.currencies.length > 0) {
           if (currencyName) {
             selectedCurrency = data.currencies.find(
@@ -48,7 +47,7 @@ export const useCurrency = ({
           setCurrencyResponse(selectedCurrency);
         }
       } catch (error) {
-        setCurrencyResponse({});
+        setCurrencyResponse(undefined);
       }
     };
 
