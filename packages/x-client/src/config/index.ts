@@ -7,6 +7,8 @@ import {
 } from '@imtbl/config';
 
 export { Environment, ImmutableConfiguration } from '@imtbl/config';
+const ApiConfiguration = imx.Configuration;
+export { ApiConfiguration };
 
 const defaultHeaders = { 'x-sdk-version': 'ts-immutable-sdk-__SDK_VERSION__' };
 
