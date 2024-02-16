@@ -205,7 +205,6 @@ describe('AuthManager', () => {
     describe('when the user has registered for imx & zkEvm', () => {
       it('should populate the imx & zkEvm objects', async () => {
         mockSigninPopup.mockResolvedValue(mockOidcUser);
-        // eslint-disable-next-line global-require
         (jwt_decode as jest.Mock).mockReturnValue({
           passport: {
             zkevm_eth_address: mockUserZkEvm.zkEvm.ethAddress,
