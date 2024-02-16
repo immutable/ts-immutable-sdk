@@ -1,4 +1,4 @@
-import { Box } from '@biom3/react';
+import { Box, MenuItem } from '@biom3/react';
 import {
   WalletFilterTypes,
   WalletFilter,
@@ -11,6 +11,7 @@ import {
   useEffect,
   useCallback,
 } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import {
   ConnectContext,
@@ -26,6 +27,7 @@ import {
   UserJourney,
   useAnalytics,
 } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { useWalletConnect } from '../../../lib/hooks/useWalletConnect';
 
 export interface WalletListProps {
   walletFilterTypes?: WalletFilterTypes;
@@ -33,14 +35,17 @@ export interface WalletListProps {
 }
 
 export function WalletList(props: WalletListProps) {
+  const { t } = useTranslation();
   const { walletFilterTypes, excludeWallets } = props;
   const {
     connectDispatch,
     connectState: { checkout, passport },
   } = useContext(ConnectContext);
   const { viewDispatch } = useContext(ViewContext);
+  const [walletConnectEnabled] = useState(true);
   const [wallets, setWallets] = useState<WalletInfo[]>([]);
   const { track } = useAnalytics();
+  const { ethereumProvider, walletConnectModal, getWalletConnectDisplayUri } = useWalletConnect();
 
   const excludedWallets = useCallback(() => {
     const passportWalletProvider = { walletProviderName: WalletProviderName.PASSPORT };
@@ -64,6 +69,17 @@ export function WalletList(props: WalletListProps) {
     };
     getAllowedWallets();
   }, [checkout, excludedWallets, walletFilterTypes]);
+
+  const onWalletConnectClick = useCallback(async () => {
+    try {
+      const uri = await getWalletConnectDisplayUri();
+      walletConnectModal?.openModal({
+        uri,
+      });
+    } catch (error) {
+      // TODO: Handle wallet connect cancelled?
+    }
+  }, [ethereumProvider, walletConnectModal]);
 
   const onWalletClick = useCallback(async (walletProviderName: WalletProviderName) => {
     track({
@@ -126,6 +142,27 @@ export function WalletList(props: WalletListProps) {
           key={wallet.walletProviderName}
         />
       ))}
+      {walletConnectEnabled && (
+        <MenuItem
+          testId="wallet-list-walletconnect"
+          size="medium"
+          emphasized
+          onClick={() => onWalletConnectClick()}
+          sx={{ marginBottom: 'base.spacing.x1' }}
+        >
+          <MenuItem.FramedLogo
+            logo="WalletConnectSymbol"
+            sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
+          />
+          <MenuItem.Label size="medium">
+            {t('wallets.walletconnect.heading')}
+          </MenuItem.Label>
+          <MenuItem.IntentIcon />
+          <MenuItem.Caption>
+            {t('wallets.walletconnect.description')}
+          </MenuItem.Caption>
+        </MenuItem>
+      )}
     </Box>
   );
 }
