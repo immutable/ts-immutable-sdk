@@ -24,27 +24,32 @@ export async function registerZkEvmUser({
   accessToken,
   jsonRpcProvider,
 }: RegisterZkEvmUserInput): Promise<UserZkEvm> {
-  const ethereumAddress = await ethSigner.getAddress();
-  const ethereumSignature = await signRaw(MESSAGE_TO_SIGN, ethSigner);
+  const [ethereumAddress, ethereumSignature, chainId, chainList] = await Promise.all([
+    ethSigner.getAddress(),
+    signRaw(MESSAGE_TO_SIGN, ethSigner),
+    (await jsonRpcProvider.ready).chainId,
+    (await multiRollupApiClients.chainsApi.listChains()).data.result,
+  ]);
 
-  const headers = { Authorization: `Bearer ${accessToken}` };
-
-  const { chainId } = await jsonRpcProvider.ready;
   const eipChainId = getEip155ChainId(chainId);
+  const chainName = chainList.find((chain) => chain.id === eipChainId)?.name;
+  if (!chainName) {
+    throw new JsonRpcError(
+      RpcErrorCode.INTERNAL_ERROR,
+      `Chain name does not exist on for chain id ${chainId}`,
+    );
+  }
 
   try {
-    const chainList = (await multiRollupApiClients.chainsApi.listChains()).data.result;
-    const chainName = chainList.find((chain) => chain.id === eipChainId)?.name;
-    if (!chainName) {
-      throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, `Chain name does not exist on for chain id ${chainId}`);
-    }
     await multiRollupApiClients.passportApi.createCounterfactualAddressV2({
       chainName,
       createCounterfactualAddressRequest: {
         ethereum_address: ethereumAddress,
         ethereum_signature: ethereumSignature,
       },
-    }, { headers });
+    }, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
   } catch (error) {
     throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, `Failed to create counterfactual address: ${error}`);
   }
