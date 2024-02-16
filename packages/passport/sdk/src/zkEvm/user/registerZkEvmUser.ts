@@ -24,19 +24,19 @@ export async function registerZkEvmUser({
   accessToken,
   jsonRpcProvider,
 }: RegisterZkEvmUserInput): Promise<UserZkEvm> {
-  const [ethereumAddress, ethereumSignature, chainId, chainList] = await Promise.all([
+  const [ethereumAddress, ethereumSignature, network, chainListResponse] = await Promise.all([
     ethSigner.getAddress(),
     signRaw(MESSAGE_TO_SIGN, ethSigner),
-    (await jsonRpcProvider.ready).chainId,
-    (await multiRollupApiClients.chainsApi.listChains()).data.result,
+    jsonRpcProvider.ready,
+    multiRollupApiClients.chainsApi.listChains(),
   ]);
 
-  const eipChainId = getEip155ChainId(chainId);
-  const chainName = chainList.find((chain) => chain.id === eipChainId)?.name;
+  const eipChainId = getEip155ChainId(network.chainId);
+  const chainName = chainListResponse.data?.result?.find((chain) => chain.id === eipChainId)?.name;
   if (!chainName) {
     throw new JsonRpcError(
       RpcErrorCode.INTERNAL_ERROR,
-      `Chain name does not exist on for chain id ${chainId}`,
+      `Chain name does not exist on for chain id ${network.chainId}`,
     );
   }
 
