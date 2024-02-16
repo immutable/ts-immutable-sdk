@@ -207,7 +207,7 @@ export function SaleContextProvider(props: {
       type: SalePaymentTypes,
       callback?: (r?: SignResponse) => void,
     ): Promise<SignResponse | undefined> => {
-      const response = await signOrder(type);
+      const response = await signOrder(type, fromTokenAddress);
       if (!response) return undefined;
 
       callback?.(response);
@@ -345,6 +345,8 @@ export function SaleContextProvider(props: {
 
     if (invalidItems || invalidAmount || invalidFromTokenAddress || !collectionName || !environmentId) {
       setInvalidParameters(true);
+    } else {
+      setInvalidParameters(false);
     }
   }, [items, amount, fromTokenAddress, collectionName, environmentId]);
 

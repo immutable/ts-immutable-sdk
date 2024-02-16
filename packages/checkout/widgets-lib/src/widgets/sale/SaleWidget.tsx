@@ -1,9 +1,18 @@
 import {
-  useCallback, useContext, useEffect, useMemo, useReducer, useRef,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
 } from 'react';
 
 import {
-  BlockExplorerService, ChainId, IMTBLWidgetEvents, SaleWidgetParams,
+  BlockExplorerService,
+  ChainId,
+  IMTBLWidgetEvents,
+  SaleWidgetParams,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { useTranslation } from 'react-i18next';
@@ -31,19 +40,19 @@ import { TopUpView } from '../../views/top-up/TopUpView';
 import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
+import { useCurrency } from './hooks/useCurrency';
 
-export interface SaleWidgetProps extends Required<Omit<SaleWidgetParams, 'walletProviderName'>> {
+const CURRENCY_NAME = 'USDC';
+
+export interface SaleWidgetProps
+  extends Required<Omit<SaleWidgetParams, 'walletProviderName'>> {
   config: StrongCheckoutWidgetsConfig;
 }
 
 export default function SaleWidget(props: SaleWidgetProps) {
   const { t } = useTranslation();
   const {
-    config,
-    amount,
-    items,
-    environmentId,
-    collectionName,
+    config, amount, items, environmentId, collectionName,
   } = props;
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
@@ -53,14 +62,33 @@ export default function SaleWidget(props: SaleWidgetProps) {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
 
+  const env = checkout!.config.environment ?? Environment.SANDBOX;
+
   const { theme } = config;
   const biomeTheme = useMemo(() => widgetTheme(theme), [theme]);
 
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
-  const viewReducerValues = useMemo(() => ({ viewState, viewDispatch }), [viewState, viewDispatch]);
+  const viewReducerValues = useMemo(
+    () => ({ viewState, viewDispatch }),
+    [viewState, viewDispatch],
+  );
+  const { currencyResponse: currency } = useCurrency({
+    env,
+    environmentId,
+    currencyName: CURRENCY_NAME,
+  });
 
-  const loadingText = viewState.view.data?.loadingText
-    || t('views.LOADING_VIEW.text');
+  const [fromTokenAddress, setFromTokenAddress] = useState('');
+
+  const loadingText = viewState.view.data?.loadingText || t('views.LOADING_VIEW.text');
+
+  useEffect(() => {
+    if (currency) {
+      setFromTokenAddress(currency.erc20_address);
+    } else {
+      setFromTokenAddress('');
+    }
+  }, [currency]);
 
   useEffect(() => {
     if (!checkout || !provider) return;
@@ -73,7 +101,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
 
   const mounted = useRef(false);
   const onMount = useCallback(() => {
-    if (!checkout || !provider) return;
+    if (!checkout || !provider || fromTokenAddress === '') return;
 
     if (!mounted.current) {
       mounted.current = true;
@@ -86,13 +114,13 @@ export default function SaleWidget(props: SaleWidgetProps) {
         },
       });
     }
-  }, [checkout, provider]);
+  }, [checkout, provider, fromTokenAddress]);
 
   useEffect(() => {
     if (!checkout || !provider) return;
 
     onMount();
-  }, [checkout, provider]);
+  }, [checkout, provider, currency]);
 
   return (
     <ViewContext.Provider value={viewReducerValues}>
@@ -101,7 +129,8 @@ export default function SaleWidget(props: SaleWidgetProps) {
           config,
           items,
           amount,
-          env: checkout!.config.environment ?? Environment.SANDBOX,
+          fromTokenAddress,
+          env,
           environmentId,
           provider,
           checkout,
