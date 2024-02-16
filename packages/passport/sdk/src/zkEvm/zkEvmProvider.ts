@@ -55,6 +55,12 @@ export class ZkEvmProvider implements Provider {
 
   readonly #relayerClient: RelayerClient;
 
+  /**
+   * This property is set during initialisation and stores the signer in a promise.
+   * This property is not meant to be accessed directly, but through the
+   * `#getSigner` method.
+   * @see getSigner
+   */
   #ethSigner?: Promise<Signer | undefined> | undefined;
 
   #signerInitialisationError: unknown | undefined;
@@ -110,6 +116,18 @@ export class ZkEvmProvider implements Provider {
     }
   };
 
+  /**
+   * This method is called by `eth_requestAccounts` and asynchronously initialises the signer.
+   * The signer is stored in a promise so that it can be retrieved by the provider
+   * when needed.
+   *
+   * If an error is thrown during initialisation, it is stored in the `signerInitialisationError`,
+   * so that it doesn't result in an unhandled promise rejection.
+   *
+   * This error is thrown when the signer is requested through:
+   * @see #getSigner
+   *
+   */
   async #initialiseEthSigner(user: User) {
     const generateSigner = async (): Promise<Signer> => {
       const magicRpcProvider = await this.#magicAdapter.login(user.idToken!);
