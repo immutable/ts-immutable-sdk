@@ -1,5 +1,6 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { User as OidcUser, UserManager, WebStorageStateStore } from 'oidc-client-ts';
+import jwt_decode from 'jwt-decode';
 import AuthManager from './authManager';
 import { PassportError, PassportErrorType } from './errors/passportError';
 import { PassportConfiguration } from './config';
@@ -170,8 +171,7 @@ describe('AuthManager', () => {
     describe('when the user has registered for imx', () => {
       it('should populate the imx object', async () => {
         mockSigninPopup.mockResolvedValue(mockOidcUser);
-        // eslint-disable-next-line global-require
-        (require('jwt-decode') as jest.Mock).mockReturnValue({
+        (jwt_decode as jest.Mock).mockReturnValue({
           passport: {
             imx_eth_address: mockUserImx.imx.ethAddress,
             imx_stark_address: mockUserImx.imx.starkAddress,
@@ -189,8 +189,7 @@ describe('AuthManager', () => {
       it('should populate the zkEvm object', async () => {
         mockSigninPopup.mockResolvedValue(mockOidcUser);
 
-        // eslint-disable-next-line global-require
-        (require('jwt-decode') as jest.Mock).mockReturnValue({
+        (jwt_decode as jest.Mock).mockReturnValue({
           passport: {
             zkevm_eth_address: mockUserZkEvm.zkEvm.ethAddress,
             zkevm_user_admin_address: mockUserZkEvm.zkEvm.userAdminAddress,
@@ -207,7 +206,7 @@ describe('AuthManager', () => {
       it('should populate the imx & zkEvm objects', async () => {
         mockSigninPopup.mockResolvedValue(mockOidcUser);
         // eslint-disable-next-line global-require
-        (require('jwt-decode') as jest.Mock).mockReturnValue({
+        (jwt_decode as jest.Mock).mockReturnValue({
           passport: {
             zkevm_eth_address: mockUserZkEvm.zkEvm.ethAddress,
             zkevm_user_admin_address: mockUserZkEvm.zkEvm.userAdminAddress,
