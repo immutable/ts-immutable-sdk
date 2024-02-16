@@ -4,7 +4,6 @@ import {
   Config,
   ImmutableXConfiguration,
   Environment,
-  ImxConfiguration,
   imxClientConfig,
 } from './index';
 
@@ -105,7 +104,8 @@ describe('createConfig', () => {
 describe('imxClientConfig', () => {
   it('should return an instance of ImxConfiguration', () => {
     const config = imxClientConfig(Environment.SANDBOX);
-    expect(config).toBeInstanceOf(ImxConfiguration);
+    expect(config).toHaveProperty('baseConfig');
+    expect(config.baseConfig).toHaveProperty('environment', 'sandbox');
   });
 
   it('should throw when missing the Enironment parameter', () => {

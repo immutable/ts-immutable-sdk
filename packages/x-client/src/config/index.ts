@@ -4,6 +4,7 @@ import {
   Environment,
   ImmutableConfiguration,
   ModuleConfiguration,
+  addPublishableKeyToAxiosHeader,
 } from '@imtbl/config';
 
 export { Environment, ImmutableConfiguration } from '@imtbl/config';
@@ -174,14 +175,18 @@ export class ImxConfiguration {
 }
 
 /**
- * imxClientConfig
- * @description Helper method to create a standard ImxConfiguration object for
- * the IMXClient class. If you need to override the default configuration, use
- * the ImxConfiguration class directly.
- * @param environment {Environment} The environment to use for the configuration
- * @returns ImxConfiguration
+ * @name imxClientConfig
+ * @description Helper method to create a standard ImxModuleConfiguration
+ * object for the IMXClient class. If you need to override the default
+ * configuration, manually construct the ImxModuleConfiguration object.
+ * @param environment {Environment} The environment to connect to
+ * @param publishableKey {string} The publishable key from Hub
+ * @returns {ImxModuleConfiguration}
  */
-export const imxClientConfig = (environment: Environment): ImxConfiguration => {
+export const imxClientConfig = (
+  environment: Environment,
+  publishableKey?: string,
+): ImxModuleConfiguration => {
   if (!environment) {
     throw new Error('Environment is required');
   }
@@ -189,8 +194,13 @@ export const imxClientConfig = (environment: Environment): ImxConfiguration => {
     throw new Error(`Invalid environment: ${environment}`);
   }
 
-  const immutableConfiguration = new ImmutableConfiguration({
-    environment,
-  });
-  return new ImxConfiguration({ baseConfig: immutableConfiguration });
+  if (publishableKey) {
+    addPublishableKeyToAxiosHeader(publishableKey);
+  }
+
+  return {
+    baseConfig: new ImmutableConfiguration({
+      environment,
+    }),
+  };
 };
