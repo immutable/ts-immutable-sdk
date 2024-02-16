@@ -16,11 +16,23 @@
 // @ts-ignore
 import { APIError400 } from '../models';
 // @ts-ignore
+import { APIError401 } from '../models';
+// @ts-ignore
+import { APIError403 } from '../models';
+// @ts-ignore
 import { APIError404 } from '../models';
+// @ts-ignore
+import { APIError429 } from '../models';
 // @ts-ignore
 import { APIError500 } from '../models';
 // @ts-ignore
+import { CreateMintRequestRequest } from '../models';
+// @ts-ignore
+import { CreateMintRequestResult } from '../models';
+// @ts-ignore
 import { GetNFTResult } from '../models';
+// @ts-ignore
+import { ListMintRequestsResult } from '../models';
 // @ts-ignore
 import { ListNFTsByOwnerResult } from '../models';
 // @ts-ignore
@@ -28,15 +40,83 @@ import { ListNFTsResult } from '../models';
 // @ts-ignore
 export { APIError400 } from '../models';
 // @ts-ignore
+export { APIError401 } from '../models';
+// @ts-ignore
+export { APIError403 } from '../models';
+// @ts-ignore
 export { APIError404 } from '../models';
+// @ts-ignore
+export { APIError429 } from '../models';
 // @ts-ignore
 export { APIError500 } from '../models';
 // @ts-ignore
+export { CreateMintRequestRequest } from '../models';
+// @ts-ignore
+export { CreateMintRequestResult } from '../models';
+// @ts-ignore
 export { GetNFTResult } from '../models';
+// @ts-ignore
+export { ListMintRequestsResult } from '../models';
 // @ts-ignore
 export { ListNFTsByOwnerResult } from '../models';
 // @ts-ignore
 export { ListNFTsResult } from '../models';
+
+/**
+ * Request parameters for createMintRequest operation in NftsApi.
+ * @export
+ * @interface CreateMintRequestRequest
+ */
+export interface CreateMintRequestRequestParams {
+    /**
+     * The address of contract
+     * @type {string}
+     * @memberof CreateMintRequest
+     */
+    readonly contractAddress: string
+
+    /**
+     * The name of chain
+     * @type {string}
+     * @memberof CreateMintRequest
+     */
+    readonly chainName: string
+
+    /**
+     * the request body
+     * @type {CreateMintRequestRequest}
+     * @memberof CreateMintRequest
+     */
+    readonly createMintRequestRequest: CreateMintRequestRequest
+}
+
+/**
+ * Request parameters for getMintRequest operation in NftsApi.
+ * @export
+ * @interface GetMintRequestRequest
+ */
+export interface GetMintRequestRequestParams {
+    /**
+     * The address of contract
+     * @type {string}
+     * @memberof GetMintRequest
+     */
+    readonly contractAddress: string
+
+    /**
+     * The name of chain
+     * @type {string}
+     * @memberof GetMintRequest
+     */
+    readonly chainName: string
+
+    /**
+     * The ID of the mint request
+     * @type {string}
+     * @memberof GetMintRequest
+     */
+    readonly referenceId: string
+}
 
 /**
  * Request parameters for getNFT operation in NftsApi.
