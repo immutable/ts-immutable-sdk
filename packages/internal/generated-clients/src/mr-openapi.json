@@ -4559,6 +4559,22 @@
         ]
       },
       "RefreshableNFTAttributes": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/NFTMetadataRequest"
+          }
+        ],
+        "required": [
+          "name",
+          "description",
+          "image",
+          "external_url",
+          "animation_url",
+          "youtube_url",
+          "attributes"
+        ]
+      },
+      "NFTMetadataRequest": {
         "type": "object",
         "properties": {
           "name": {
@@ -4605,16 +4621,7 @@
               "$ref": "#/components/schemas/NFTMetadataAttribute"
             }
           }
-        },
-        "required": [
-          "name",
-          "description",
-          "image",
-          "external_url",
-          "animation_url",
-          "youtube_url",
-          "attributes"
-        ]
+        }
       },
       "RefreshNFTMetadataByTokenIDRequest": {
         "type": "object",
@@ -4815,7 +4822,7 @@
             "example": "0xc344c05eef8876e517072f879dae8905aa2b956b"
           },
           "metadata": {
-            "$ref": "#/components/schemas/RefreshableNFTAttributes"
+            "$ref": "#/components/schemas/NFTMetadataRequest"
           }
         },
         "required": [
@@ -4847,6 +4854,13 @@
             "example": "1",
             "nullable": true,
             "description": "An `uint256` token id as string. Only available when the mint request succeeds"
+          },
+          "activity_id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "4e28df8d-f65c-4c11-ba04-6a9dd47b179b",
+            "nullable": true,
+            "description": "The id of the mint activity associated with this mint request"
           },
           "transaction_hash": {
             "type": "string",
