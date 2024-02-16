@@ -10,7 +10,7 @@ export type WidgetConfiguration = {
   language?: WidgetLanguage;
   /** Enable/disable Wallet Connect */
   walletConnect?: {
-     enable: boolean
+     enable: boolean;
   },
 };
 
