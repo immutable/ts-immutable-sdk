@@ -71,6 +71,7 @@ import { HttpClient } from './api/http';
 import { isMatchingAddress } from './utils/utils';
 import { WidgetConfiguration } from './widgets/definitions/configurations';
 import { SemanticVersion } from './widgets/definitions/types';
+import { validateAndBuildVersion } from './widgets/version';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
@@ -78,7 +79,6 @@ const SANDBOX_CONFIGURATION = {
   },
   passport: undefined,
 };
-const WIDGETS_SCRIPT_TIMEOUT = 100;
 
 // Checkout SDK
 export class Checkout {
@@ -140,24 +140,52 @@ export class Checkout {
     const checkout = this;
 
     const factory = new Promise<ImmutableCheckoutWidgets.WidgetsFactory>((resolve, reject) => {
-      function checkForWidgetsBundleLoaded() {
-        if (typeof ImmutableCheckoutWidgets !== 'undefined') {
-          resolve(new ImmutableCheckoutWidgets.WidgetsFactory(checkout, config));
-        } else {
-        // If ImmutableCheckoutWidgets is not defined, wait for set amount of time.
-        // When time has elapsed, check again if ImmutableCheckoutWidgets is defined.
-        // Once it's defined, the promise will resolve and setTimeout won't be called again.
-          setTimeout(checkForWidgetsBundleLoaded, WIDGETS_SCRIPT_TIMEOUT);
-        }
-      }
-
       try {
-        const script = loadUnresolvedBundle(version);
-        if (script.loaded && typeof ImmutableCheckoutWidgets !== 'undefined') {
-          resolve(new ImmutableCheckoutWidgets.WidgetsFactory(checkout, config));
-        } else {
-          checkForWidgetsBundleLoaded();
+        const scriptId = 'immutable-checkout-widgets-bundle';
+        const validVersion = validateAndBuildVersion(version);
+
+        // Prevent the script to be loaded more than once
+        // by checking the presence of the script and its version.
+        const initScript = document.getElementById(scriptId) as HTMLScriptElement;
+        if (initScript) {
+          if (typeof ImmutableCheckoutWidgets !== 'undefined') {
+            resolve(new ImmutableCheckoutWidgets.WidgetsFactory(checkout, config));
+          } else {
+            reject(
+              new CheckoutError(
+                'Failed to find ImmutableCheckoutWidgets script',
+                CheckoutErrorType.WIDGETS_SCRIPT_LOAD_ERROR,
+              ),
+            );
+          }
         }
+
+        const tag = document.createElement('script');
+
+        tag.addEventListener('load', () => {
+          if (typeof ImmutableCheckoutWidgets !== 'undefined') {
+            resolve(new ImmutableCheckoutWidgets.WidgetsFactory(checkout, config));
+          } else {
+            reject(
+              new CheckoutError(
+                'Failed to find ImmutableCheckoutWidgets script',
+                CheckoutErrorType.WIDGETS_SCRIPT_LOAD_ERROR,
+              ),
+            );
+          }
+        });
+
+        tag.addEventListener('error', (err) => {
+          reject(
+            new CheckoutError(
+              'Failed to load widgets script',
+              CheckoutErrorType.WIDGETS_SCRIPT_LOAD_ERROR,
+              { error: err },
+            ),
+          );
+        });
+
+        loadUnresolvedBundle(tag, scriptId, validVersion);
       } catch (err: any) {
         reject(
           new CheckoutError(
