@@ -1,59 +1,43 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { Checkout, SaleItem, SmartCheckoutResult } from '@imtbl/checkout-sdk';
+import {
+  Checkout,
+  SaleItem,
+  SmartCheckoutResult,
+} from '@imtbl/checkout-sdk';
 import { useCallback, useState } from 'react';
 import {
-  SaleErrorTypes,
-  SmartCheckoutError,
-  SmartCheckoutErrorTypes,
+  SaleErrorTypes, SmartCheckoutError, SmartCheckoutErrorTypes,
 } from '../types';
 import {
-  filterSmartCheckoutResult,
-  getGasEstimate,
-  getItemRequirements,
-  isUserFractionalBalanceBlocked,
+  filterSmartCheckoutResult, getGasEstimate, getItemRequirements, isUserFractionalBalanceBlocked,
 } from '../functions/smartCheckoutUtils';
-import { useCurrency } from './useCurrency';
 
 type UseSmartCheckoutInput = {
   checkout: Checkout | undefined;
   provider: Web3Provider | undefined;
-  items: SaleItem[];
-  amount: string;
-  env: string;
-  environmentId: string;
+  items: SaleItem[],
+  amount: string,
+  tokenAddress: string,
 };
 
 export const useSmartCheckout = ({
-  checkout,
-  provider,
-  items,
-  amount,
-  env,
-  environmentId,
+  checkout, provider, items, amount, tokenAddress,
 }: UseSmartCheckoutInput) => {
-  const [smartCheckoutResult, setSmartCheckoutResult] = useState<
-  SmartCheckoutResult | undefined
-  >(undefined);
-  const [smartCheckoutError, setSmartCheckoutError] = useState<
-  SmartCheckoutError | undefined
-  >(undefined);
-
-  const { fetchCurrency } = useCurrency({
-    env,
-    environmentId,
-  });
+  const [smartCheckoutResult, setSmartCheckoutResult] = useState<SmartCheckoutResult | undefined>(
+    undefined,
+  );
+  const [smartCheckoutError, setSmartCheckoutError] = useState<SmartCheckoutError | undefined>(
+    undefined,
+  );
 
   const smartCheckout = useCallback(async () => {
     try {
       const signer = provider?.getSigner();
-      const spenderAddress = (await signer?.getAddress()) || '';
-      const fetchedTokenAddress = await fetchCurrency();
-
-      if (!fetchedTokenAddress) return undefined;
+      const spenderAddress = await signer?.getAddress() || '';
 
       const userFractionalBalanceBlocked = await isUserFractionalBalanceBlocked(
         spenderAddress,
-        fetchedTokenAddress[0].erc20_address,
+        tokenAddress,
         amount,
         checkout,
         provider,
@@ -62,17 +46,15 @@ export const useSmartCheckout = ({
         throw new Error(SmartCheckoutErrorTypes.FRACTIONAL_BALANCE_BLOCKED);
       }
 
-      const itemRequirements = getItemRequirements(
-        amount,
-        spenderAddress,
-        fetchedTokenAddress[0].erc20_address,
-      );
+      const itemRequirements = getItemRequirements(amount, spenderAddress, tokenAddress);
       const gasEstimate = getGasEstimate();
-      const res = await checkout?.smartCheckout({
-        provider: provider!,
-        itemRequirements,
-        transactionOrGasAmount: gasEstimate,
-      });
+      const res = await checkout?.smartCheckout(
+        {
+          provider: provider!,
+          itemRequirements,
+          transactionOrGasAmount: gasEstimate,
+        },
+      );
       if (!res) {
         throw new Error();
       }
@@ -87,11 +69,9 @@ export const useSmartCheckout = ({
       });
     }
     return undefined;
-  }, [checkout, provider, items, amount]);
+  }, [checkout, provider, items, amount, tokenAddress]);
 
   return {
-    smartCheckout,
-    smartCheckoutResult,
-    smartCheckoutError,
+    smartCheckout, smartCheckoutResult, smartCheckoutError,
   };
 };
