@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { RefreshableNFTAttributes } from './refreshable-nftattributes';
+import { NFTMetadataRequest } from './nftmetadata-request';
 
 /**
  * 
@@ -37,9 +37,9 @@ export interface MintAsset {
     'owner_address': string;
     /**
      * 
-     * @type {RefreshableNFTAttributes}
+     * @type {NFTMetadataRequest}
      * @memberof MintAsset
      */
-    'metadata'?: RefreshableNFTAttributes;
+    'metadata'?: NFTMetadataRequest;
 }
 
