@@ -8,6 +8,7 @@ import AuthManager from '../../authManager';
 import { mockListChains, mockUser, mockUserZkEvm } from '../../test/mocks';
 
 jest.mock('@ethersproject/providers');
+jest.mock('@ethersproject/abstract-signer');
 jest.mock('@imtbl/toolkit');
 
 describe('registerZkEvmUser', () => {

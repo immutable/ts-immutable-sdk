@@ -9,7 +9,6 @@ import { RelayerTransaction, RelayerTransactionStatus } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import GuardianClient from '../guardian';
 
-jest.mock('@ethersproject/providers');
 jest.mock('./walletHelpers');
 jest.mock('../network/retry');
 const withConfirmationScreenStub = jest.fn();
