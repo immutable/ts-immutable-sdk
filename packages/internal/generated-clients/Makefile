@@ -55,7 +55,7 @@ generate-blockchain-data-types:
     --additional-properties=stringEnums=true
 
 
-.PHONY: generate-mr-api-client
+.PHONY: generate-mr-api-client-tmp-minting-api
 generate-mr-api-client-tmp-minting-api:
 	rm -rf src/multi-rollup && \
     mkdir src/multi-rollup && \
