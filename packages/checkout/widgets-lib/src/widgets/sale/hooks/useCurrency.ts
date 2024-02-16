@@ -1,53 +1,59 @@
-import { useState, useCallback } from 'react';
+/* eslint-disable @typescript-eslint/naming-convention */
+import { useState, useEffect } from 'react';
 import { PRIMARY_SALES_API_BASE_URL } from '../utils/config';
 
 type CurrencyResponse = {
   decimals: number;
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   erc20_address: string;
   name: string;
+};
+
+type UseCurrencyParams = {
+  env: string;
+  environmentId: string;
+  currencyName?: string;
 };
 
 export const useCurrency = ({
   env,
   environmentId,
-}: {
-  env: string;
-  environmentId: string;
-}) => {
-  const [currencyError, setCurrencyError] = useState<Error | undefined>(
-    undefined,
-  );
+  currencyName,
+}: UseCurrencyParams) => {
   const [currencyResponse, setCurrencyResponse] = useState<
-  CurrencyResponse[] | undefined
-  >(undefined);
+  CurrencyResponse | {}
+  >({});
 
-  const fetchCurrency = useCallback(async () => {
-    setCurrencyError(undefined);
+  useEffect(() => {
+    const fetchCurrency = async () => {
+      try {
+        const baseUrl = `${PRIMARY_SALES_API_BASE_URL[env]}/${environmentId}/currency`;
+        const response = await fetch(baseUrl, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
 
-    try {
-      const baseUrl = `${PRIMARY_SALES_API_BASE_URL[env]}/${environmentId}/currency`;
-      const response = await fetch(baseUrl, {
-        method: 'GET',
-        headers: {
-          // eslint-disable-next-line @typescript-eslint/naming-convention
-          'Content-Type': 'application/json',
-        },
-      });
+        const data = await response.json();
 
-      const data = await response.json();
-      if (!data) {
-        throw new Error('Failed to fetch currency');
+        let selectedCurrency = {};
+
+        if (data.currencies && data.currencies.length > 0) {
+          if (currencyName) {
+            selectedCurrency = data.currencies.find(
+              (c: CurrencyResponse) => c.name === currencyName,
+            ) || null;
+          }
+          selectedCurrency = selectedCurrency || data.currencies[0];
+          setCurrencyResponse(selectedCurrency);
+        }
+      } catch (error) {
+        setCurrencyResponse({});
       }
-      setCurrencyResponse(data.currencies);
+    };
 
-      return data.currencies;
-    } catch (error) {
-      setCurrencyError(error as Error);
-    }
+    fetchCurrency();
+  }, [env, environmentId, currencyName]);
 
-    return undefined;
-  }, []);
-
-  return { fetchCurrency, currencyResponse, currencyError };
+  return { currencyResponse };
 };
