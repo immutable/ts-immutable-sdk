@@ -164,6 +164,7 @@ export default class AuthManager {
       const popupWindowFeatures = { width: 410, height: 450 };
       const oidcUser = await this.userManager.signinPopup({
         extraQueryParams: {
+          ...(this.userManager.settings?.extraQueryParams ?? {}),
           rid: rid || '',
           third_party_a_id: anonymousId || '',
         },
@@ -172,6 +173,18 @@ export default class AuthManager {
 
       return AuthManager.mapOidcUserToDomainModel(oidcUser);
     }, PassportErrorType.AUTHENTICATION_ERROR);
+  }
+
+  public async getUserOrLogin(): Promise<User> {
+    let user = null;
+    try {
+      user = await this.getUser();
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.warn('failed to retrieve a cached user session:', err);
+    }
+
+    return user || this.login();
   }
 
   public async loginCallback(): Promise<void> {

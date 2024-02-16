@@ -142,14 +142,18 @@ export const isNativeToken = (
   address: string | undefined,
 ): boolean => !address || address.toLocaleLowerCase() === NATIVE;
 
-export function getEthTokenImage(environment: Environment) {
-  return `${CHECKOUT_CDN_BASE_URL[environment]}/v1/blob/img/tokens/eth.svg`;
+export function getRemoteImage(environment: Environment | undefined, path: string) {
+  return `${CHECKOUT_CDN_BASE_URL[environment ?? Environment.PRODUCTION]}/v1/blob/img${path}`;
 }
 
-export function getImxTokenImage(environment: Environment) {
-  return `${CHECKOUT_CDN_BASE_URL[environment]}/v1/blob/img/tokens/imx.svg`;
+export function getEthTokenImage(environment: Environment | undefined) {
+  return getRemoteImage(environment, '/tokens/eth.svg');
 }
 
-export function getTokenImageByAddress(environment: Environment, address: string) {
-  return `${CHECKOUT_CDN_BASE_URL[environment]}/v1/blob/img/tokens/${address.toLowerCase()}.svg`;
+export function getImxTokenImage(environment: Environment | undefined) {
+  return getRemoteImage(environment, '/tokens/imx.svg');
+}
+
+export function getTokenImageByAddress(environment: Environment | undefined, address: string) {
+  return getRemoteImage(environment, `/tokens/${address.toLowerCase()}.svg`);
 }
