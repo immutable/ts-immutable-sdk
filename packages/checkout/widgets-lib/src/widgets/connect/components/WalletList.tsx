@@ -14,6 +14,7 @@ import {
 } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Web3Provider } from '@ethersproject/providers';
+import { ConnectConfig } from '@imtbl/checkout-sdk/dist/types';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { ConnectActions, ConnectContext } from '../context/ConnectContext';
 import { WalletItem } from './WalletItem';
@@ -39,7 +40,7 @@ export function WalletList(props: WalletListProps) {
     connectState: { checkout, passport },
   } = useContext(ConnectContext);
   const { viewDispatch } = useContext(ViewContext);
-  const [walletConnectEnabled] = useState(true);
+  const [enableWalletConnect, setEnableWalletConnect] = useState(false);
   const [wallets, setWallets] = useState<WalletInfo[]>([]);
   const { track } = useAnalytics();
 
@@ -60,11 +61,9 @@ export function WalletList(props: WalletListProps) {
 
   const { walletConnectBusy, openWalletConnectModal } = useWalletConnect({
     connectCallback: async (ethereumProvider) => {
-      // TODO: Pass the provider back in the connectCallback
       const web3Provider = new Web3Provider(ethereumProvider as any);
       selectWeb3Provider(web3Provider);
 
-      // TODO: should we be validating the chainId here? is this validation different to underlyingChainId
       const chainId = await web3Provider.getSigner().getChainId();
       if (chainId !== targetChainId) {
         viewDispatch({
@@ -107,6 +106,14 @@ export function WalletList(props: WalletListProps) {
     };
     getAllowedWallets();
   }, [checkout, excludedWallets, walletFilterTypes]);
+
+  useEffect(() => {
+    if (!checkout) return;
+    (async () => {
+      const connectConfig: ConnectConfig = await checkout.config.remote.getConfig('connect') as ConnectConfig;
+      setEnableWalletConnect(connectConfig.walletConnect);
+    })();
+  }, [checkout]);
 
   const onWalletClick = useCallback(async (walletProviderName: WalletProviderName) => {
     track({
@@ -161,7 +168,7 @@ export function WalletList(props: WalletListProps) {
           key={wallet.walletProviderName}
         />
       ))}
-      {walletConnectEnabled && (
+      {enableWalletConnect && (
         <MenuItem
           testId="wallet-list-walletconnect"
           size="medium"
