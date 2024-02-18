@@ -4,6 +4,7 @@ import { TransactionRequest } from '@ethersproject/providers';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { OidcConfiguration } from 'types';
 import { IMXClient } from '@imtbl/x-client';
+import encode from 'jwt-encode';
 import { mockValidIdToken } from './utils/token.test';
 import { buildPrivateVars, Passport } from './Passport';
 import { RequestArguments } from './zkEvm/types';
@@ -16,7 +17,7 @@ import {
 } from './mocks/zkEvm/msw';
 import { JsonRpcError, RpcErrorCode } from './zkEvm/JsonRpcError';
 import GuardianClient from './guardian';
-import { chainIdHex } from './test/mocks';
+import { chainIdHex, mockUserZkEvm } from './test/mocks';
 
 jest.mock('./guardian');
 
@@ -38,13 +39,12 @@ const mockOidcUser = {
 
 const mockOidcUserZkevm = {
   ...mockOidcUser,
-  profile: {
-    ...mockOidcUser.profile,
+  id_token: encode({
     passport: {
-      zkevm_eth_address: '0x7EEC32793414aAb720a90073607733d9e7B0ecD0',
-      zkevm_user_admin_address: '0x123',
+      zkevm_eth_address: mockUserZkEvm.zkEvm.ethAddress,
+      zkevm_user_admin_address: mockUserZkEvm.zkEvm.userAdminAddress,
     },
-  },
+  }, 'secret'),
 };
 
 const oidcConfiguration: OidcConfiguration = {
@@ -77,6 +77,7 @@ describe('Passport', () => {
 
   beforeEach(() => {
     jest.resetAllMocks();
+
     (UserManager as jest.Mock).mockImplementation(() => ({
       signinPopup: mockSigninPopup,
       signinSilent: mockSigninSilent,
@@ -87,12 +88,8 @@ describe('Passport', () => {
       withConfirmationScreen: () => (task: () => void) => task(),
     }));
     (Magic as jest.Mock).mockImplementation(() => ({
-      openid: {
-        loginWithOIDC: mockLoginWithOidc,
-      },
-      rpcProvider: {
-        request: mockMagicRequest,
-      },
+      openid: { loginWithOIDC: mockLoginWithOidc },
+      rpcProvider: { request: mockMagicRequest },
       preload: jest.fn(),
     }));
   });
@@ -109,10 +106,12 @@ describe('Passport', () => {
     describe('when the env is prod', () => {
       it('sets the prod x URL as the basePath on imxApiClients', () => {
         const baseConfig = new ImmutableConfiguration({ environment: Environment.PRODUCTION });
+
         const privateVars = buildPrivateVars({
           baseConfig,
           ...oidcConfiguration,
         });
+
         expect(privateVars.passportImxProviderFactory.imxApiClients.config.basePath).toEqual('https://api.x.immutable.com');
       });
     });
@@ -120,10 +119,12 @@ describe('Passport', () => {
     describe('when the env is sandbox', () => {
       it('sets the sandbox x URL as the basePath on imxApiClients', () => {
         const baseConfig = new ImmutableConfiguration({ environment: Environment.SANDBOX });
+
         const privateVars = buildPrivateVars({
           baseConfig,
           ...oidcConfiguration,
         });
+
         expect(privateVars.passportImxProviderFactory.imxApiClients.config.basePath).toEqual('https://api.sandbox.x.immutable.com');
       });
     });
@@ -174,7 +175,7 @@ describe('Passport', () => {
             method: 'eth_requestAccounts',
           });
 
-          expect(accounts).toEqual([mockOidcUserZkevm.profile.passport.zkevm_eth_address]);
+          expect(accounts).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
           expect(mockGetUser).toHaveBeenCalledTimes(1);
         });
       });
@@ -199,6 +200,7 @@ describe('Passport', () => {
           mockSigninPopup.mockResolvedValue(mockOidcUser);
           mockSigninSilent.mockResolvedValueOnce(mockOidcUserZkevm);
           useMswHandlers([
+            mswHandlers.jsonRpcProvider.success,
             mswHandlers.counterfactualAddress.success,
             mswHandlers.api.chains.success,
           ]);
@@ -209,7 +211,7 @@ describe('Passport', () => {
             method: 'eth_requestAccounts',
           });
 
-          expect(accounts).toEqual([mockOidcUserZkevm.profile.passport.zkevm_eth_address]);
+          expect(accounts).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
           expect(mockGetUser).toHaveBeenCalledTimes(1);
         });
 
@@ -218,7 +220,7 @@ describe('Passport', () => {
             mockSigninPopup.mockResolvedValue(mockOidcUser);
             mockGetUser.mockResolvedValueOnce(null);
             mockGetUser.mockResolvedValueOnce(mockOidcUser);
-            mockSigninSilent.mockResolvedValue(mockOidcUserZkevm);
+            mockSigninSilent.mockResolvedValue(mockOidcUser);
             useMswHandlers([
               mswHandlers.counterfactualAddress.internalServerError,
               mswHandlers.api.chains.success,
