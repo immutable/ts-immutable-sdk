@@ -58,8 +58,8 @@ export function WalletList(props: WalletListProps) {
     });
   }, []);
 
-  const { walletConnectBusy, openWalletConnectModal, ethereumProvider } = useWalletConnect({
-    connectCallback: async () => {
+  const { walletConnectBusy, openWalletConnectModal } = useWalletConnect({
+    connectCallback: async (ethereumProvider) => {
       // TODO: Pass the provider back in the connectCallback
       const web3Provider = new Web3Provider(ethereumProvider as any);
       selectWeb3Provider(web3Provider);

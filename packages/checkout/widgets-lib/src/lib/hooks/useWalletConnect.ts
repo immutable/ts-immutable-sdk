@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import EthereumProvider from '@walletconnect/ethereum-provider';
 import { WalletConnectModal } from '@walletconnect/modal';
-import { ProviderInfo } from '@walletconnect/ethereum-provider/dist/types/types';
 import { WalletConnectManager } from '../walletConnect';
 
 export interface UseWalletConnectParams {
-  connectCallback: (data: ProviderInfo) => void,
+  connectCallback: (ethereumProvider: EthereumProvider) => void,
 }
 
 export const useWalletConnect = ({ connectCallback }: UseWalletConnectParams) => {
@@ -19,18 +18,34 @@ export const useWalletConnect = ({ connectCallback }: UseWalletConnectParams) =>
     setWalletConnectModal(WalletConnectManager.getInstance().getModal());
   }, []);
 
-  const openWalletConnectModal = useCallback(async () => (
+  const openWalletConnectModal = useCallback(async (restoreSession: boolean = true) => (
     new Promise((resolve, reject) => {
       if (!ethereumProvider || !walletConnectModal) reject('WalletConnect not initialized');
       setWalletConnectBusy(true);
+
+      if (restoreSession) {
+        // restore session
+        const existingPairings = ethereumProvider?.signer.client.core.pairing.getPairings();
+        console.log('existingPairings', existingPairings);
+        if (existingPairings && existingPairings.length > 0 && existingPairings[0].topic !== '') {
+          ethereumProvider?.signer.client.core.pairing.activate({ topic: existingPairings[0].topic })
+            .then(() => {
+              console.log('restored session');
+              if (connectCallback) {
+                connectCallback(ethereumProvider);
+              }
+            });
+          return;
+        }
+      }
 
       // Hook into next available display_uri
       ethereumProvider?.once('display_uri', (data) => {
         // eslint-disable-next-line no-console
         console.log('** hook wc display_uri', data);
-        const pairingTopic = data.split('@')[0].replace('wc:', '');
-        // eslint-disable-next-line no-console
-        console.log('** hook pairingTopic', pairingTopic);
+        // const pairingTopic = data.split('@')[0].replace('wc:', '');
+        // // eslint-disable-next-line no-console
+        // console.log('** hook pairingTopic', pairingTopic);
 
         // setDisplayUri(data);
         walletConnectModal?.openModal({
@@ -48,10 +63,11 @@ export const useWalletConnect = ({ connectCallback }: UseWalletConnectParams) =>
       });
 
       ethereumProvider?.once('connect', (data) => {
+        console.log(data);
         walletConnectModal?.closeModal();
 
         if (connectCallback) {
-          connectCallback(data);
+          connectCallback(ethereumProvider);
         }
       });
 
@@ -59,10 +75,23 @@ export const useWalletConnect = ({ connectCallback }: UseWalletConnectParams) =>
     })
   ), [ethereumProvider, walletConnectModal]);
 
+  const restoreExistingSession = useCallback(async () => new Promise((resolve) => {
+    const existingPairings = ethereumProvider?.signer.client.core.pairing.getPairings();
+    if (existingPairings && existingPairings.length > 0) {
+      console.log(existingPairings);
+      console.log('activating pairing for', existingPairings[0]);
+      ethereumProvider?.signer.client.core.pairing.activate({ topic: existingPairings[0].topic })
+        .then(() => resolve(true));
+    } else {
+      resolve(false);
+    }
+  }), [ethereumProvider]);
+
   return {
     ethereumProvider,
     walletConnectBusy,
     walletConnectModal,
     openWalletConnectModal,
+    restoreExistingSession,
   };
 };

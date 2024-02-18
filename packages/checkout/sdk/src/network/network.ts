@@ -174,7 +174,9 @@ export async function switchWalletNetwork(
   try {
     await switchNetworkInWallet(networkMap, web3Provider, chainId);
   } catch (err: any) {
-    if (err.code === UNRECOGNISED_CHAIN_ERROR_CODE || err?.includes('Request expired. Please try again.')) {
+    // eslint-disable-next-line no-console
+    console.error(err);
+    if (err.code === UNRECOGNISED_CHAIN_ERROR_CODE) {
       try {
         await addNetworkToWallet(networkMap, web3Provider, chainId);
         // eslint-disable-next-line @typescript-eslint/no-shadow

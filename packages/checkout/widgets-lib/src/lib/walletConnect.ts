@@ -50,7 +50,7 @@ export class WalletConnectManager {
         EthereumProvider.init({
           projectId: '938b553484e344b1e0b4bb80edf8c362',
           chains: [ChainId.IMTBL_ZKEVM_TESTNET],
-          // optionalChains: [ChainId.IMTBL_ZKEVM_TESTNET], // ChainId.SEPOLIA
+          optionalChains: [ChainId.SEPOLIA], // ChainId.SEPOLIA
           // chains: [ChainId.ETHEREUM],
           // optionalChains: [ChainId.IMTBL_ZKEVM_MAINNET],
           showQrModal: false,
