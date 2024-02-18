@@ -1,43 +1,77 @@
-import { WalletProviderName, WalletInfo } from '@imtbl/checkout-sdk';
-import { Box, MenuItem } from '@biom3/react';
+import {
+  Box,
+  MenuItem,
+  useConvertSxToEmotionStyles,
+} from '@biom3/react';
+import { EIP6963ProviderDetail } from 'mipd/src/types';
 import { useTranslation } from 'react-i18next';
 
 export interface WalletProps {
-  onWalletClick: (walletProviderName: WalletProviderName) => void;
-  wallet: WalletInfo;
+  onWalletClick: (providerDetail: EIP6963ProviderDetail) => void;
+  providerDetail: EIP6963ProviderDetail;
 }
 export function WalletItem(props: WalletProps) {
   const { t } = useTranslation();
-  const { wallet, onWalletClick } = props;
-  const logo = {
-    [WalletProviderName.PASSPORT]: 'PassportSymbolOutlined',
-    [WalletProviderName.METAMASK]: 'MetaMaskSymbol',
+  const { providerDetail, onWalletClick } = props;
+
+  const allStyles = {
+    minw: '16px',
+    display: 'flex',
+    bg: 'base.color.translucent.standard.100',
+    overflow: 'hidden',
+    borderRadius: '4px',
+    objectFit: 'cover',
+    objectPosition: 'center',
+    backgroundColor: 'base.color.translucent.standard.200',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexShrink: 0,
+    width: '48px',
+    height: '48px',
+    position: 'absolute',
+  };
+
+  const customStyles = {
+    position: 'absolute',
+    width: '48px',
+    height: '100%',
+    top: '0',
+    left: '0',
+    objectFit: 'cover',
+    objectPosition: '50% 50%',
   };
 
   return (
     <MenuItem
-      testId={`wallet-list-${wallet.walletProviderName}`}
+      testId={`wallet-list-${providerDetail.info.rdns}`}
       size="medium"
       emphasized
-      onClick={() => onWalletClick(wallet.walletProviderName)}
-      sx={{ marginBottom: 'base.spacing.x1' }}
+      onClick={() => onWalletClick(providerDetail)}
+      sx={{ marginBottom: 'base.spacing.x1', position: 'relative' }}
     >
-      <MenuItem.FramedLogo
-        logo={logo[wallet.walletProviderName] as any}
-        sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
-      />
-      <MenuItem.Label size="medium">
-        {t(`wallets.${wallet.walletProviderName}.heading`)}
+      <Box
+        className="FramedImage AspectRatioImage"
+        sx={allStyles}
+        rc={<span />}
+      >
+        <img
+          src={providerDetail.info.icon}
+          alt={providerDetail.info.name}
+          className="CloudImage"
+          style={useConvertSxToEmotionStyles(customStyles)}
+          loading="lazy"
+        />
+      </Box>
+      <MenuItem.Label size="medium" sx={{ marginLeft: '65px' }}>
+        {providerDetail.info.name}
       </MenuItem.Label>
-      <MenuItem.IntentIcon />
-      <MenuItem.Caption>
-        {wallet.walletProviderName === WalletProviderName.PASSPORT ? (
+      <MenuItem.IntentIcon sx={{ marginLeft: '65px' }} />
+      <MenuItem.Caption sx={{ marginLeft: '65px' }}>
+        {providerDetail.info.rdns === 'com.immutable.passport' ? (
           <Box rc={<span />} sx={{ c: 'base.gradient.1' }}>
-            {t(`wallets.${wallet.walletProviderName}.accentText`)}
+            {t('wallets.passport.accentText')}
           </Box>
         ) : null}
-        {' '}
-        {t(`wallets.${wallet.walletProviderName}.description`)}
       </MenuItem.Caption>
     </MenuItem>
   );

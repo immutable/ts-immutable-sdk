@@ -65,7 +65,14 @@ export function ConnectWallet({ targetChainId }: ConnectWalletProps) {
           {t('views.CONNECT_WALLET.body.content')}
         </Body>
       </Box>
-      <Box sx={{ paddingX: 'base.spacing.x2' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          height: '100%',
+          paddingX: 'base.spacing.x2',
+          overflowY: 'auto',
+        }}
+      >
         <WalletList targetChainId={targetChainId} />
       </Box>
     </SimpleLayout>

@@ -22,12 +22,12 @@ import { passport } from './passport';
 import { LanguageSelector } from './LanguageSelector';
 
 // Create one instance of Checkout and inject Passport
+passport.connectEvm();
 const checkout = new Checkout({
   baseConfig: {
     environment: Environment.SANDBOX,
     publishableKey: 'pk_imapik-test-pCHFU0GpQImZx9UzSnU3',
-  },
-  passport,
+  }
 })
 
 export const MainPage = () => {
