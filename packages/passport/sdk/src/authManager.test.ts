@@ -1,5 +1,6 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { User as OidcUser, UserManager, WebStorageStateStore } from 'oidc-client-ts';
+import jwt_decode from 'jwt-decode';
 import AuthManager from './authManager';
 import { PassportError, PassportErrorType } from './errors/passportError';
 import { PassportConfiguration } from './config';
@@ -109,7 +110,6 @@ describe('AuthManager', () => {
       expect(UserManager).toBeCalledWith({
         authority: config.authenticationDomain,
         client_id: config.oidcConfiguration.clientId,
-        loadUserInfo: true,
         mergeClaims: true,
         metadata: {
           authorization_endpoint: `${config.authenticationDomain}/authorize`,
@@ -170,13 +170,12 @@ describe('AuthManager', () => {
 
     describe('when the user has registered for imx', () => {
       it('should populate the imx object', async () => {
-        mockSigninPopup.mockResolvedValue({
-          ...mockOidcUser,
-          profile: {
-            ...mockOidcUser.profile,
-            passport: {
-              ...imxProfileData,
-            },
+        mockSigninPopup.mockResolvedValue(mockOidcUser);
+        (jwt_decode as jest.Mock).mockReturnValue({
+          passport: {
+            imx_eth_address: mockUserImx.imx.ethAddress,
+            imx_stark_address: mockUserImx.imx.starkAddress,
+            imx_user_admin_address: mockUserImx.imx.userAdminAddress,
           },
         });
 
@@ -188,13 +187,12 @@ describe('AuthManager', () => {
 
     describe('when the user has registered for zkEvm', () => {
       it('should populate the zkEvm object', async () => {
-        mockSigninPopup.mockResolvedValue({
-          ...mockOidcUser,
-          profile: {
-            ...mockOidcUser.profile,
-            passport: {
-              ...zkEvmProfileData,
-            },
+        mockSigninPopup.mockResolvedValue(mockOidcUser);
+
+        (jwt_decode as jest.Mock).mockReturnValue({
+          passport: {
+            zkevm_eth_address: mockUserZkEvm.zkEvm.ethAddress,
+            zkevm_user_admin_address: mockUserZkEvm.zkEvm.userAdminAddress,
           },
         });
 
@@ -206,14 +204,14 @@ describe('AuthManager', () => {
 
     describe('when the user has registered for imx & zkEvm', () => {
       it('should populate the imx & zkEvm objects', async () => {
-        mockSigninPopup.mockResolvedValue({
-          ...mockOidcUser,
-          profile: {
-            ...mockOidcUser.profile,
-            passport: {
-              ...zkEvmProfileData,
-              ...imxProfileData,
-            },
+        mockSigninPopup.mockResolvedValue(mockOidcUser);
+        (jwt_decode as jest.Mock).mockReturnValue({
+          passport: {
+            zkevm_eth_address: mockUserZkEvm.zkEvm.ethAddress,
+            zkevm_user_admin_address: mockUserZkEvm.zkEvm.userAdminAddress,
+            imx_eth_address: mockUserImx.imx.ethAddress,
+            imx_stark_address: mockUserImx.imx.starkAddress,
+            imx_user_admin_address: mockUserImx.imx.userAdminAddress,
           },
         });
 
