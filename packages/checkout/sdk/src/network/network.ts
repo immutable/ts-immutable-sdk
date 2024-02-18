@@ -37,7 +37,6 @@ async function switchNetworkInWallet(
   }
 }
 
-// TODO: Should these functions always return something?
 // eslint-disable-next-line consistent-return
 async function addNetworkToWallet(
   networkMap: NetworkMap,
@@ -58,6 +57,8 @@ async function addNetworkToWallet(
       params: [addNetwork],
     });
   }
+
+  return Promise.reject('Provider does not support request method');
 }
 
 export async function getNetworkAllowList(
@@ -173,7 +174,7 @@ export async function switchWalletNetwork(
   try {
     await switchNetworkInWallet(networkMap, web3Provider, chainId);
   } catch (err: any) {
-    if (err.code === UNRECOGNISED_CHAIN_ERROR_CODE) {
+    if (err.code === UNRECOGNISED_CHAIN_ERROR_CODE || err?.includes('Request expired. Please try again.')) {
       try {
         await addNetworkToWallet(networkMap, web3Provider, chainId);
         // eslint-disable-next-line @typescript-eslint/no-shadow

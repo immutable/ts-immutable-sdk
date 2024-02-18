@@ -177,7 +177,7 @@ export class Checkout {
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
-      { allowUnsupportedProvider: true } as ValidateProviderOptions,
+      { allowMistmatchedChainId: true, allowUnsupportedProvider: true } as ValidateProviderOptions,
     );
     return connect.checkIsWalletConnected(web3Provider);
   }
@@ -334,6 +334,10 @@ export class Checkout {
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
+      {
+        allowUnsupportedProvider: true,
+        allowMistmatchedChainId: true,
+      } as ValidateProviderOptions,
     );
     return await transaction.sendTransaction(web3Provider, params.transaction);
   }

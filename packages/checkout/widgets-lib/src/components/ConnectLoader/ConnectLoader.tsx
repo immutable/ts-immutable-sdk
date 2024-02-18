@@ -209,6 +209,9 @@ export function ConnectLoader({
           },
         });
       } catch (err: any) {
+        // eslint-disable-next-line no-console
+        console.error(err);
+
         connectLoaderDispatch({
           payload: {
             type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,

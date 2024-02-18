@@ -110,6 +110,9 @@ export function SwapButton({
         },
       });
     } catch (err: any) {
+      // eslint-disable-next-line no-console
+      console.error(err);
+
       updateLoading(false);
       if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
         setShowTxnRejectedState(true);

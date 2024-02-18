@@ -160,7 +160,7 @@ export function ConnectWidget({
           <LoadingView loadingText="Loading" />
           )}
           {view.type === ConnectWidgetViews.CONNECT_WALLET && (
-            <ConnectWallet />
+            <ConnectWallet targetChainId={targetChainId} />
           )}
           {view.type === ConnectWidgetViews.READY_TO_CONNECT && (
             <ReadyToConnect targetChainId={targetChainId} allowedChains={allowedChains ?? [targetChainId]} />
