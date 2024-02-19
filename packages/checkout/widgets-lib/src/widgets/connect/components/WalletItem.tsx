@@ -68,9 +68,12 @@ export function WalletItem(props: WalletProps) {
       <MenuItem.IntentIcon sx={{ marginLeft: '65px' }} />
       <MenuItem.Caption sx={{ marginLeft: '65px' }}>
         {providerDetail.info.rdns === 'com.immutable.passport' ? (
-          <Box rc={<span />} sx={{ c: 'base.gradient.1' }}>
-            {t('wallets.passport.accentText')}
-          </Box>
+          <>
+            <Box rc={<span />} sx={{ c: 'base.gradient.1' }}>
+              {t('wallets.passport.accentText')}
+            </Box>
+            {` ${t('wallets.passport.description')}`}
+          </>
         ) : null}
       </MenuItem.Caption>
     </MenuItem>
