@@ -22,7 +22,7 @@ import { passport } from './passport';
 import { LanguageSelector } from './LanguageSelector';
 
 // Create one instance of Checkout and inject Passport
-passport.connectEvm();
+// passport.connectEvm();
 const checkout = new Checkout({
   baseConfig: {
     environment: Environment.SANDBOX,

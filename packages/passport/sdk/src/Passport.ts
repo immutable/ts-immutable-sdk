@@ -137,6 +137,8 @@ export class Passport {
   }
 
   public connectEvm(): Provider {
+    (window as any).Unity?.log('PASSPORT***connectEvm');
+    console.log('ConnectEvm!!');
     const provider = new ZkEvmProvider({
       passportEventEmitter: this.passportEventEmitter,
       authManager: this.authManager,

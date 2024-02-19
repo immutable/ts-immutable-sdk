@@ -9,6 +9,7 @@ export const useProviders = () => {
   const [providers, setProviders] = useState<EIP6963ProviderDetail[]>([]);
 
   useEffect(() => {
+    console.log('Requesting all providers now!');
     InjectedProvidersManager.getInstance().reset();
     const cancelSubscription = InjectedProvidersManager
       .getInstance()
@@ -30,6 +31,8 @@ export const useProviders = () => {
             // Sort based on the index
             return indexA - indexB;
           });
+
+        console.log('Found providers!', injectedProviders, filteredProviders);
         setProviders(filteredProviders);
       });
 

@@ -40,6 +40,9 @@ function App() {
         <div>
           <a href={"/marketplace-orchestrator"}>Marketplace Orchestrator</a>
         </div>
+        <div>
+          <a href={"/embed"}>Embedded Widget</a>
+        </div>
         <br />
       </main>
     </div>

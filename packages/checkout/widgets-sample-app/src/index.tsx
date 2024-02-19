@@ -12,6 +12,7 @@ import { PassportLoginCallback } from './components/ui/marketplace-orchestrator/
 import { Marketplace } from './components/ui/marketplace-orchestrator';
 import { SaleUI } from './components/ui/sale/sale';
 import { Embed } from './components/ui/embed';
+import { Host } from './components/ui/host/Host';
 
 const router = createBrowserRouter([
   {
@@ -53,6 +54,10 @@ const router = createBrowserRouter([
   {
     path: '/embed',
     element: <Embed />
+  },
+  {
+    path: '/host',
+    element: <Host />
   },
   {
     path: '/embed/login/callback',

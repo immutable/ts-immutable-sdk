@@ -147,7 +147,7 @@ export function WalletList(props: WalletListProps) {
         width: '100%',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
         alignItems: 'flex-start',
       }}
     >
