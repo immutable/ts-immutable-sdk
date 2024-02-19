@@ -38,6 +38,8 @@ import { ListNFTsByOwnerResult } from '../models';
 // @ts-ignore
 import { ListNFTsResult } from '../models';
 // @ts-ignore
+import { MintRequestStatus } from '../models';
+// @ts-ignore
 export { APIError400 } from '../models';
 // @ts-ignore
 export { APIError401 } from '../models';
@@ -61,6 +63,8 @@ export { ListMintRequestsResult } from '../models';
 export { ListNFTsByOwnerResult } from '../models';
 // @ts-ignore
 export { ListNFTsResult } from '../models';
+// @ts-ignore
+export { MintRequestStatus } from '../models';
 
 /**
  * Request parameters for createMintRequest operation in NftsApi.
@@ -179,6 +183,48 @@ export interface ListAllNFTsRequestParams {
      * @memberof ListAllNFTs
      */
     readonly pageSize?: number
+}
+
+/**
+ * Request parameters for listMintRequests operation in NftsApi.
+ * @export
+ * @interface ListMintRequestsRequest
+ */
+export interface ListMintRequestsRequestParams {
+    /**
+     * The address of contract
+     * @type {string}
+     * @memberof ListMintRequests
+     */
+    readonly contractAddress: string
+
+    /**
+     * The name of chain
+     * @type {string}
+     * @memberof ListMintRequests
+     */
+    readonly chainName: string
+
+    /**
+     * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+     * @type {string}
+     * @memberof ListMintRequests
+     */
+    readonly pageCursor?: string
+
+    /**
+     * Maximum number of items to return
+     * @type {number}
+     * @memberof ListMintRequests
+     */
+    readonly pageSize?: number
+
+    /**
+     * The status of the mint request
+     * @type {MintRequestStatus}
+     * @memberof ListMintRequests
+     */
+    readonly status?: MintRequestStatus
 }
 
 /**
