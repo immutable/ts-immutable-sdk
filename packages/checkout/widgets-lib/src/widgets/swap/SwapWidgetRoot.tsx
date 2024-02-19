@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import {
   ConnectTargetLayer,
   IMTBLWidgetEvents,
@@ -18,10 +18,12 @@ import { ServiceType } from 'views/error/serviceTypes';
 import { isValidAddress, isValidAmount, isValidWalletProvider } from 'lib/validations/widgetValidators';
 import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
+import { LoadingView } from 'views/loading/LoadingView';
 import { topUpBridgeOption, topUpOnRampOption } from './helpers';
 import { sendSwapWidgetCloseEvent } from './SwapWidgetEvents';
-import { SwapWidget } from './SwapWidget';
 import i18n from '../../i18n';
+
+const SwapWidget = React.lazy(() => import('./SwapWidget'));
 
 export class Swap extends Base<WidgetType.SWAP> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT;
@@ -125,12 +127,14 @@ export class Swap extends Base<WidgetType.SWAP> {
                       widgetConfig={this.strongConfig()}
                       closeEvent={() => sendSwapWidgetCloseEvent(window)}
                     >
-                      <SwapWidget
-                        fromTokenAddress={this.parameters.fromTokenAddress}
-                        toTokenAddress={this.parameters.toTokenAddress}
-                        amount={this.parameters.amount}
-                        config={this.strongConfig()}
-                      />
+                      <Suspense fallback={<LoadingView loadingText={t('views.LOADING_VIEW.text')} />}>
+                        <SwapWidget
+                          fromTokenAddress={this.parameters.fromTokenAddress}
+                          toTokenAddress={this.parameters.toTokenAddress}
+                          amount={this.parameters.amount}
+                          config={this.strongConfig()}
+                        />
+                      </Suspense>
                     </ConnectLoader>
                   )
                   : (
