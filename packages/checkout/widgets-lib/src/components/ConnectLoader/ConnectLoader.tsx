@@ -100,6 +100,14 @@ export function ConnectLoader({
             provider: createProviderResult.provider,
           },
         });
+
+        connectLoaderDispatch({
+          payload: {
+            type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
+            connectionStatus: ConnectionStatus.NOT_CONNECTED,
+            deepLink: ConnectWidgetViews.READY_TO_CONNECT,
+          },
+        });
         return true;
       }
     } catch (err: any) {
@@ -209,6 +217,9 @@ export function ConnectLoader({
           },
         });
       } catch (err: any) {
+        // eslint-disable-next-line no-console
+        console.error(err);
+
         connectLoaderDispatch({
           payload: {
             type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
