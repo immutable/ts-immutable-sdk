@@ -161,6 +161,9 @@ export default function WalletWidget(props: WalletWidgetInputs) {
         },
       });
     } catch (error: any) {
+      // eslint-disable-next-line no-console
+      console.error(error);
+
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,

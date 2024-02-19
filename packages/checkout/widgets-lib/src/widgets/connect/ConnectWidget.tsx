@@ -35,7 +35,7 @@ import {
 import { StatusType } from '../../components/Status/StatusType';
 import { StatusView } from '../../components/Status/StatusView';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { getTargetLayerChainId, sendProviderUpdatedEvent } from '../../lib';
+import { addProviderListenersForWidgetRoot, getTargetLayerChainId, sendProviderUpdatedEvent } from '../../lib';
 import { SwitchNetworkEth } from './views/SwitchNetworkEth';
 import { ErrorView } from '../../views/error/ErrorView';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
@@ -147,6 +147,8 @@ export default function ConnectWidget({
       userJourney: UserJourney.CONNECT,
       screen: 'ConnectSuccess',
     });
+    // Set up EIP-1193 provider event listeners for widget root instances
+    addProviderListenersForWidgetRoot(provider);
     await identifyUser(identify, provider);
     sendProviderUpdatedEvent({ provider });
     sendConnectSuccessEvent(eventTarget, provider, walletProviderName ?? undefined);
@@ -157,10 +159,10 @@ export default function ConnectWidget({
       <ConnectContext.Provider value={connectReducerValues}>
         <>
           {view.type === SharedViews.LOADING_VIEW && (
-          <LoadingView loadingText="Loading" />
+            <LoadingView loadingText="Loading" />
           )}
           {view.type === ConnectWidgetViews.CONNECT_WALLET && (
-            <ConnectWallet />
+            <ConnectWallet targetChainId={targetChainId} />
           )}
           {view.type === ConnectWidgetViews.READY_TO_CONNECT && (
             <ReadyToConnect targetChainId={targetChainId} allowedChains={allowedChains ?? [targetChainId]} />
@@ -185,22 +187,22 @@ export default function ConnectWidget({
           )}
           {((view.type === ConnectWidgetViews.SUCCESS && !provider)
             || view.type === SharedViews.ERROR_VIEW)
-              && (
-                <ErrorView
-                  actionText={errorText}
-                  onActionClick={() => {
-                    viewDispatch({
-                      payload: {
-                        type: ViewActions.UPDATE_VIEW,
-                        view: {
-                          type: ConnectWidgetViews.CONNECT_WALLET,
-                        } as ConnectWidgetView,
-                      },
-                    });
-                  }}
-                  onCloseClick={() => sendCloseEvent()}
-                />
-              )}
+            && (
+              <ErrorView
+                actionText={errorText}
+                onActionClick={() => {
+                  viewDispatch({
+                    payload: {
+                      type: ViewActions.UPDATE_VIEW,
+                      view: {
+                        type: ConnectWidgetViews.CONNECT_WALLET,
+                      } as ConnectWidgetView,
+                    },
+                  });
+                }}
+                onCloseClick={() => sendCloseEvent()}
+              />
+            )}
         </>
       </ConnectContext.Provider>
     </ViewContext.Provider>

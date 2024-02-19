@@ -535,6 +535,10 @@
     "metamask": {
       "heading": "MetaMask",
       "description": "Digital wallet for accessing blockchain applications and web3"
+    },
+    "walletconnect": {
+      "heading": "Other wallets",
+      "description": "Allows you to connect with any blockchain wallet including MetaMask"
     }
   },
   "drawers": {
