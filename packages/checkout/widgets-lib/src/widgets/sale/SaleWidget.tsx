@@ -13,7 +13,6 @@ import {
   IMTBLWidgetEvents,
   SaleWidgetParams,
 } from '@imtbl/checkout-sdk';
-import { Environment } from '@imtbl/config';
 import { useTranslation } from 'react-i18next';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import {
@@ -40,8 +39,7 @@ import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsPr
 import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { useCurrency } from './hooks/useCurrency';
-
-const CURRENCY_NAME = 'USDC';
+import { CURRENCY_NAME } from './utils/config';
 
 export interface SaleWidgetProps
   extends Required<Omit<SaleWidgetParams, 'walletProviderName'>> {
@@ -61,8 +59,6 @@ export default function SaleWidget(props: SaleWidgetProps) {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
 
-  const env = checkout!.config.environment ?? Environment.SANDBOX;
-
   const { theme } = config;
   const biomeTheme = useMemo(() => widgetTheme(theme), [theme]);
 
@@ -72,7 +68,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
     [viewState, viewDispatch],
   );
   const { currencyResponse: currency } = useCurrency({
-    env,
+    env: config.environment,
     environmentId,
     currencyName: CURRENCY_NAME,
   });
@@ -121,7 +117,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
           items,
           amount,
           fromTokenAddress,
-          env,
+          env: config.environment,
           environmentId,
           provider,
           checkout,

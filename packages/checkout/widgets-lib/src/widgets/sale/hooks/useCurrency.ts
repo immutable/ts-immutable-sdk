@@ -4,7 +4,7 @@ import { PRIMARY_SALES_API_BASE_URL } from '../utils/config';
 
 type CurrencyResponse = {
   decimals: number;
-  erc20_address: string;
+  erc20Address: string;
   name: string;
 };
 
@@ -19,12 +19,13 @@ export const useCurrency = ({
   environmentId,
   currencyName,
 }: UseCurrencyParams) => {
-  const [currencyResponse, setCurrencyResponse] = useState<
-  CurrencyResponse | undefined
+  const [currencyResponse, setCurrencyResponse] = useState<CurrencyResponse | undefined
   >(undefined);
 
   useEffect(() => {
     const fetchCurrency = async () => {
+      if (!env || !environmentId) return;
+
       try {
         const baseUrl = `${PRIMARY_SALES_API_BASE_URL[env]}/${environmentId}/currency`;
         const response = await fetch(baseUrl, {
@@ -36,16 +37,14 @@ export const useCurrency = ({
 
         const data = await response.json();
 
-        let selectedCurrency;
-        if (data.currencies && data.currencies.length > 0) {
-          if (currencyName) {
-            selectedCurrency = data.currencies.find(
-              (c: CurrencyResponse) => c.name === currencyName,
-            ) || null;
-          }
-          selectedCurrency = selectedCurrency || data.currencies[0];
-          setCurrencyResponse(selectedCurrency);
-        }
+        const selectedCurrency = data.currencies.find((c) => c.name === currencyName) || data.currencies[0];
+
+        const mappedCurrency: CurrencyResponse = {
+          ...selectedCurrency,
+          erc20Address: selectedCurrency.erc20_address,
+        };
+
+        setCurrencyResponse(mappedCurrency);
       } catch (error) {
         setCurrencyResponse(undefined);
       }
