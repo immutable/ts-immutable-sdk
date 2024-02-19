@@ -14,8 +14,10 @@ export const useWalletConnect = ({ connectCallback }: UseWalletConnectParams) =>
   // const [displayUri, setDisplayUri] = useState<string | null>(null);
 
   useEffect(() => {
-    (async () => setEthereumProvider(await WalletConnectManager.getInstance().getProvider()))();
-    setWalletConnectModal(WalletConnectManager.getInstance().getModal());
+    if (WalletConnectManager.getInstance().isInitialised) {
+      (async () => setEthereumProvider(await WalletConnectManager.getInstance().getProvider()))();
+      setWalletConnectModal(WalletConnectManager.getInstance().getModal());
+    }
   }, []);
 
   const openWalletConnectModal = useCallback(async (restoreSession: boolean = true) => (

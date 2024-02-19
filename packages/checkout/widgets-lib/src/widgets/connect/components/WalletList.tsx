@@ -14,6 +14,7 @@ import {
 } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Web3Provider } from '@ethersproject/providers';
+import { WalletConnectManager } from 'lib/walletConnect';
 import { ConnectConfig } from '@imtbl/checkout-sdk/dist/types';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { ConnectActions, ConnectContext } from '../context/ConnectContext';
@@ -168,28 +169,29 @@ export function WalletList(props: WalletListProps) {
           key={wallet.walletProviderName}
         />
       ))}
-      {enableWalletConnect && (
-        <MenuItem
-          testId="wallet-list-walletconnect"
-          size="medium"
-          emphasized
-          disabled={walletConnectBusy}
-          onClick={() => openWalletConnectModal()}
-          sx={{ marginBottom: 'base.spacing.x1' }}
-        >
-          <MenuItem.FramedLogo
-            logo="WalletConnectSymbol"
-            sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
-          />
-          <MenuItem.Label size="medium">
-            {t('wallets.walletconnect.heading')}
-          </MenuItem.Label>
-          <MenuItem.IntentIcon />
-          <MenuItem.Caption>
-            {t('wallets.walletconnect.description')}
-          </MenuItem.Caption>
-        </MenuItem>
-      )}
+      {enableWalletConnect && WalletConnectManager.getInstance().isInitialised
+        && (
+          <MenuItem
+            testId="wallet-list-walletconnect"
+            size="medium"
+            emphasized
+            disabled={walletConnectBusy}
+            onClick={() => openWalletConnectModal()}
+            sx={{ marginBottom: 'base.spacing.x1' }}
+          >
+            <MenuItem.FramedLogo
+              logo="WalletConnectSymbol"
+              sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
+            />
+            <MenuItem.Label size="medium">
+              {t('wallets.walletconnect.heading')}
+            </MenuItem.Label>
+            <MenuItem.IntentIcon />
+            <MenuItem.Caption>
+              {t('wallets.walletconnect.description')}
+            </MenuItem.Caption>
+          </MenuItem>
+        )}
     </Box>
   );
 }

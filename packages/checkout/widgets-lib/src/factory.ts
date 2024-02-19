@@ -13,6 +13,7 @@ import { Wallet } from 'widgets/wallet/WalletWidgetRoot';
 import { Sale } from 'widgets/sale/SaleWidgetRoot';
 import { Web3Provider } from '@ethersproject/providers';
 import { Bridge } from 'widgets/bridge/BridgeWidgetRoot';
+import { WalletConnectManager } from 'lib/walletConnect';
 import {
   sendProviderUpdatedEvent,
   addProviderListenersForWidgetRoot,
@@ -27,6 +28,14 @@ export class WidgetsFactory implements IWidgetsFactory {
   constructor(sdk: Checkout, widgetConfig: WidgetConfiguration) {
     this.sdk = sdk;
     this.widgetConfig = widgetConfig;
+    if (widgetConfig.walletConnect) {
+      try {
+        WalletConnectManager.getInstance().initialise(sdk.config.environment, widgetConfig.walletConnect);
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.warn('WalletConnect has not been set up correctly');
+      }
+    }
   }
 
   updateProvider(provider: Web3Provider) {

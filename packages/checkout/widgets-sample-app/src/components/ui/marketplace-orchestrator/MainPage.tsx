@@ -31,7 +31,20 @@ const checkout = new Checkout({
 })
 
 export const MainPage = () => {
-  const widgetsFactory = useMemo(() => new WidgetsFactory(checkout, { theme: WidgetTheme.DARK }), [checkout]);
+  const widgetsFactory = useMemo(() => new WidgetsFactory(
+    checkout,
+    {
+      theme: WidgetTheme.DARK,
+      walletConnect: {
+        projectId: '938b553484e344b1e0b4bb80edf8c362',
+        metadata: {
+          name: 'Marketplace Orchestrator',
+          description: '',
+          url: 'http://localhost:3000/marketplace-orchestrator',
+          icons: []
+        }
+      }
+    }), [checkout]);
 
   const connectWidget = useMemo(() => widgetsFactory.create(WidgetType.CONNECT), [widgetsFactory]);
   const walletWidget = useMemo(() => widgetsFactory.create(WidgetType.WALLET), [widgetsFactory]);
