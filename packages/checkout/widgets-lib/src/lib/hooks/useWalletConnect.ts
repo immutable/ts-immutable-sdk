@@ -42,12 +42,11 @@ export const useWalletConnect = ({ connectCallback }: UseWalletConnectParams) =>
       // Hook into next available display_uri
       ethereumProvider?.once('display_uri', (data) => {
         // eslint-disable-next-line no-console
-        console.log('** hook wc display_uri', data);
-        // const pairingTopic = data.split('@')[0].replace('wc:', '');
-        // // eslint-disable-next-line no-console
-        // console.log('** hook pairingTopic', pairingTopic);
+        console.log('useWalletConnect::display_uri', data);
+        const pairingTopic = data.split('@')[0].replace('wc:', '');
+        // eslint-disable-next-line no-console
+        console.log('useWalletConnect::pairingTopic', pairingTopic);
 
-        // setDisplayUri(data);
         walletConnectModal?.openModal({
           uri: data,
         })
@@ -63,7 +62,8 @@ export const useWalletConnect = ({ connectCallback }: UseWalletConnectParams) =>
       });
 
       ethereumProvider?.once('connect', (data) => {
-        console.log(data);
+        // eslint-disable-next-line no-console
+        console.log('useWalletConnect::data', data);
         walletConnectModal?.closeModal();
 
         if (connectCallback) {
