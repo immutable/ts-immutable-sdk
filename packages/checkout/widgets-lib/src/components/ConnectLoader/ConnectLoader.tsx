@@ -21,7 +21,7 @@ import {
   initialConnectLoaderState,
 } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { LoadingView } from '../../views/loading/LoadingView';
-import { ConnectWidget } from '../../widgets/connect/ConnectWidget';
+import ConnectWidget from '../../widgets/connect/ConnectWidget';
 import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';

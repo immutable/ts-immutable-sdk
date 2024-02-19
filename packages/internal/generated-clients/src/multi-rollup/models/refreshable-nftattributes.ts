@@ -16,54 +16,14 @@
 // May contain unused imports in some cases
 // @ts-ignore
 import { NFTMetadataAttribute } from './nftmetadata-attribute';
+// May contain unused imports in some cases
+// @ts-ignore
+import { NFTMetadataRequest } from './nftmetadata-request';
 
 /**
- * 
+ * @type RefreshableNFTAttributes
  * @export
- * @interface RefreshableNFTAttributes
  */
-export interface RefreshableNFTAttributes {
-    /**
-     * The name of the NFT
-     * @type {string}
-     * @memberof RefreshableNFTAttributes
-     */
-    'name': string | null;
-    /**
-     * The description of the NFT
-     * @type {string}
-     * @memberof RefreshableNFTAttributes
-     */
-    'description': string | null;
-    /**
-     * The image url of the NFT
-     * @type {string}
-     * @memberof RefreshableNFTAttributes
-     */
-    'image': string | null;
-    /**
-     * The external link of the NFT
-     * @type {string}
-     * @memberof RefreshableNFTAttributes
-     */
-    'external_url': string | null;
-    /**
-     * The animation url of the NFT
-     * @type {string}
-     * @memberof RefreshableNFTAttributes
-     */
-    'animation_url': string | null;
-    /**
-     * The youtube link of the NFT
-     * @type {string}
-     * @memberof RefreshableNFTAttributes
-     */
-    'youtube_url': string | null;
-    /**
-     * List of Metadata attributes
-     * @type {Array<NFTMetadataAttribute>}
-     * @memberof RefreshableNFTAttributes
-     */
-    'attributes': Array<NFTMetadataAttribute> | null;
-}
+export type RefreshableNFTAttributes = NFTMetadataRequest;
+
 

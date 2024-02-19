@@ -4,4 +4,6 @@ export {
   setEnvironment,
   setPassportClientId,
   setPublishableApiKey,
+  getDetail,
+  Detail,
 } from './details';

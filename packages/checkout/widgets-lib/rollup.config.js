@@ -7,12 +7,19 @@ import replace from '@rollup/plugin-replace';
 import nodePolyfills from 'rollup-plugin-polyfill-node';
 
 const defaultPlugin = [
+  resolve({
+    browser: true,
+    dedupe: ['react', 'react-dom'],
+  }),
+  nodePolyfills(),
+  commonjs(),
   json(),
   replace({
     preventAssignment: true,
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
   }),
-  typescript()
+  typescript(),
+  terser()
 ]
 
 export default [
@@ -23,7 +30,9 @@ export default [
       dir: 'dist',
       format: 'es'
     },
-    plugins: [...defaultPlugin ],
+    plugins: [
+      ...defaultPlugin,
+    ]
   },
   {
     watch: false,
@@ -36,14 +45,7 @@ export default [
     },
     context: 'window',
     plugins: [
-      resolve({
-        browser: true,
-        dedupe: ['react', 'react-dom'],
-      }),
-      nodePolyfills(),
-      commonjs(),
-      ...defaultPlugin,
-      terser(),
+      ...defaultPlugin,,
     ]
   }
 ]

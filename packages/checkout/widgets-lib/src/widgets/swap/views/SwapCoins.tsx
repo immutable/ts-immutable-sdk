@@ -83,7 +83,7 @@ export function SwapCoins({
           onCloseButtonClick={() => sendSwapWidgetCloseEvent(eventTarget)}
         />
       )}
-      footer={<QuickswapFooter theme={theme} />}
+      footer={<QuickswapFooter environment={checkout?.config.environment} theme={theme} />}
     >
       <Box
         sx={{

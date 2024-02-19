@@ -52,7 +52,7 @@ export type ConnectWidgetInputs = ConnectWidgetParams & {
   web3Provider?: Web3Provider;
 };
 
-export function ConnectWidget({
+export default function ConnectWidget({
   config,
   sendCloseEventOverride,
   web3Provider,

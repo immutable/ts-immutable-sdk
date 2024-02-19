@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import {
   ConnectTargetLayer,
   IMTBLWidgetEvents,
@@ -15,8 +15,11 @@ import { getL2ChainId } from 'lib';
 import { isValidAmount, isValidWalletProvider } from 'lib/validations/widgetValidators';
 import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
+import { LoadingView } from 'views/loading/LoadingView';
 import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
-import { SaleWidget } from './SaleWidget';
+import i18n from '../../i18n';
+
+const SaleWidget = React.lazy(() => import('./SaleWidget'));
 
 export class Sale extends Base<WidgetType.SALE> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT;
@@ -91,6 +94,7 @@ export class Sale extends Base<WidgetType.SALE> {
   protected render() {
     if (!this.reactRoot) return;
 
+    const { t } = i18n;
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER2,
       web3Provider: this.web3Provider,
@@ -111,15 +115,17 @@ export class Sale extends Base<WidgetType.SALE> {
                 sendSaleWidgetCloseEvent(window);
               }}
             >
-              <SaleWidget
-                config={this.strongConfig()}
-                amount={this.parameters.amount!}
-                items={this.parameters.items!}
-                fromTokenAddress={this.parameters.fromTokenAddress!}
-                environmentId={this.parameters.environmentId!}
-                collectionName={this.parameters.collectionName!}
-                language="en"
-              />
+              <Suspense fallback={<LoadingView loadingText={t('views.LOADING_VIEW.text')} />}>
+                <SaleWidget
+                  config={this.strongConfig()}
+                  amount={this.parameters.amount!}
+                  items={this.parameters.items!}
+                  fromTokenAddress={this.parameters.fromTokenAddress!}
+                  environmentId={this.parameters.environmentId!}
+                  collectionName={this.parameters.collectionName!}
+                  language="en"
+                />
+              </Suspense>
             </ConnectLoader>
           </ThemeProvider>
         </CustomAnalyticsProvider>
