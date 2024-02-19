@@ -238,8 +238,39 @@ export class BlockchainData {
       });
   }
 
-  // TODO list mint requests
-  // TODO get mint request by reference ID
+  /**
+   * List all mint requests for a given contract address
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with a list of mint requests
+   * @throws {@link index.APIError}
+   */
+  public async listMintRequests(
+    request: mr.NftsApiListMintRequestsRequest,
+  ): Promise<mr.ListMintRequestsResult> {
+    return await this.nfts
+      .listMintRequests(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
+
+  /**
+   * Retrieve the status of a single mint request identified by its reference ID
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with a single mint request
+   * @throws {@link index.APIError}
+   */
+  public async getMintRequest(
+    request: mr.NftsApiGetMintRequestRequest,
+  ): Promise<mr.ListMintRequestsResult> {
+    return await this.nfts
+      .getMintRequest(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
 
   /**
    * List NFT owners by token ID
