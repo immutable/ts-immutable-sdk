@@ -73,7 +73,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
     currencyName: CURRENCY_NAME,
   });
 
-  const fromTokenAddress = currency?.erc20_address || '';
+  const fromTokenAddress = currency?.erc20Address || '';
 
   const loadingText = viewState.view.data?.loadingText || t('views.LOADING_VIEW.text');
 
