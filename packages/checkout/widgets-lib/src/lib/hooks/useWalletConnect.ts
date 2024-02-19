@@ -26,11 +26,9 @@ export const useWalletConnect = ({ connectCallback }: UseWalletConnectParams) =>
       if (restoreSession) {
         // restore session
         const existingPairings = ethereumProvider?.signer.client.core.pairing.getPairings();
-        console.log('existingPairings', existingPairings);
         if (existingPairings && existingPairings.length > 0 && existingPairings[0].topic !== '') {
           ethereumProvider?.signer.client.core.pairing.activate({ topic: existingPairings[0].topic })
             .then(() => {
-              console.log('restored session');
               if (connectCallback) {
                 connectCallback(ethereumProvider);
               }
@@ -78,8 +76,6 @@ export const useWalletConnect = ({ connectCallback }: UseWalletConnectParams) =>
   const restoreExistingSession = useCallback(async () => new Promise((resolve) => {
     const existingPairings = ethereumProvider?.signer.client.core.pairing.getPairings();
     if (existingPairings && existingPairings.length > 0) {
-      console.log(existingPairings);
-      console.log('activating pairing for', existingPairings[0]);
       ethereumProvider?.signer.client.core.pairing.activate({ topic: existingPairings[0].topic })
         .then(() => resolve(true));
     } else {
