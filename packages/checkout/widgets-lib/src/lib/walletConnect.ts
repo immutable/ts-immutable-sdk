@@ -91,30 +91,6 @@ export class WalletConnectManager {
         }).then((wcEthereumProvider: EthereumProvider) => {
           // eslint-disable-next-line no-console
           console.log('wcEthereumProvider', wcEthereumProvider);
-          // wcEthereumProvider.on('disconnect', (data) => {
-          //   // eslint-disable-next-line no-console
-          //   console.log('wc disconnect', data);
-          // });
-          // wcEthereumProvider.on('session_update', (data) => {
-          //   // eslint-disable-next-line no-console
-          //   console.log('wc session_update', data);
-          //   // setWcSessionUpdateEvent(data);
-          //   // setWcSessionTopic(data?.topic);
-          // });
-          // wcEthereumProvider.on('session_event', (data) => {
-          //   // eslint-disable-next-line no-console
-          //   console.log('wc session_event', data);
-          //   // setWcSessionEvent(data);
-          //   // setWcSessionTopic(data?.topic);
-          // });
-          // wcEthereumProvider.on('session_delete', (data) => {
-          //   // eslint-disable-next-line no-console
-          //   console.log('wc session_delete', data);
-          // });
-          // wcEthereumProvider.on('message', (data) => {
-          //   // eslint-disable-next-line no-console
-          //   console.log('wc message', data);
-          // });
 
           addProviderListenersForWidgetRoot({ provider: wcEthereumProvider } as unknown as Web3Provider);
           this.ethereumProvider = wcEthereumProvider;
