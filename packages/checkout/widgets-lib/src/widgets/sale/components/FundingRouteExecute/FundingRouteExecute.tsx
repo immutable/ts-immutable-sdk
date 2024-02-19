@@ -19,7 +19,7 @@ import {
   useContext,
   useEffect, useMemo, useReducer, useRef, useState,
 } from 'react';
-import { BridgeWidget } from 'widgets/bridge/BridgeWidget';
+import BridgeWidget from 'widgets/bridge/BridgeWidget';
 import { useTranslation } from 'react-i18next';
 import {
   ConnectLoaderActions,
@@ -33,8 +33,8 @@ import { SaleWidgetViews } from '../../../../context/view-context/SaleViewContex
 import { ViewActions, ViewContext } from '../../../../context/view-context/ViewContext';
 import { getL1ChainId, getL2ChainId } from '../../../../lib/networkUtils';
 import { LoadingView } from '../../../../views/loading/LoadingView';
-import { ConnectWidget } from '../../../connect/ConnectWidget';
-import { SwapWidget } from '../../../swap/SwapWidget';
+import ConnectWidget from '../../../connect/ConnectWidget';
+import SwapWidget from '../../../swap/SwapWidget';
 import { useSaleContext } from '../../context/SaleContextProvider';
 import { SaleErrorTypes } from '../../types';
 
