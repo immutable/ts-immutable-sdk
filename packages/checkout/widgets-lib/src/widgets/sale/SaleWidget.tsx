@@ -5,7 +5,6 @@ import {
   useMemo,
   useReducer,
   useRef,
-  useState,
 } from 'react';
 
 import {
@@ -78,17 +77,9 @@ export default function SaleWidget(props: SaleWidgetProps) {
     currencyName: CURRENCY_NAME,
   });
 
-  const [fromTokenAddress, setFromTokenAddress] = useState('');
+  const fromTokenAddress = currency?.erc20_address || '';
 
   const loadingText = viewState.view.data?.loadingText || t('views.LOADING_VIEW.text');
-
-  useEffect(() => {
-    if (currency) {
-      setFromTokenAddress(currency.erc20_address);
-    } else {
-      setFromTokenAddress('');
-    }
-  }, [currency]);
 
   useEffect(() => {
     if (!checkout || !provider) return;

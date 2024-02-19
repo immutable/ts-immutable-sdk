@@ -213,7 +213,7 @@ export function SaleContextProvider(props: {
       callback?.(response);
       return response;
     },
-    [signOrder],
+    [signOrder, fromTokenAddress],
   );
 
   const goToErrorView = useCallback(
