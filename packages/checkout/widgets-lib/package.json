@@ -76,7 +76,7 @@
   "private": true,
   "scripts": {
     "build": "rollup --config rollup.config.js",
-    "build:local": "yarn build && mkdir -p ../widgets-sample-app/public/lib/js && cp dist/widgets.js ../widgets-sample-app/public/lib/js/widgets.js",
+    "build:local": "yarn build && mkdir -p ../widgets-sample-app/public/lib/js && cp dist/*.js ../widgets-sample-app/public/lib/js/",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix",
     "start": "rollup --config rollup.config.js --watch",
