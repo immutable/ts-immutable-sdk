@@ -29,6 +29,6 @@ export type WalletConnectConfig = {
     name: string;
     description: string;
     url: string;
-    icon: string;
+    icons: [];
   };
 };
