@@ -1,4 +1,5 @@
-import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
+import { JsonRpcProvider } from '@ethersproject/providers';
+import { Signer } from '@ethersproject/abstract-signer';
 import { signRaw } from '@imtbl/toolkit';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { ChainId, ChainName } from 'network/chains';
@@ -7,10 +8,10 @@ import AuthManager from '../../authManager';
 import { mockListChains, mockUser, mockUserZkEvm } from '../../test/mocks';
 
 jest.mock('@ethersproject/providers');
+jest.mock('@ethersproject/abstract-signer');
 jest.mock('@imtbl/toolkit');
 
 describe('registerZkEvmUser', () => {
-  const getSignerMock = jest.fn();
   const ethSignerMock = {
     getAddress: jest.fn(),
   };
@@ -18,7 +19,6 @@ describe('registerZkEvmUser', () => {
     getUser: jest.fn(),
     forceUserRefresh: jest.fn(),
   };
-  const magicProvider = {};
   const multiRollupApiClients = {
     passportApi: {
       createCounterfactualAddressV2: jest.fn(),
@@ -38,10 +38,7 @@ describe('registerZkEvmUser', () => {
 
   beforeEach(() => {
     jest.restoreAllMocks();
-    (Web3Provider as unknown as jest.Mock).mockImplementation(() => ({
-      getSigner: getSignerMock,
-    }));
-    getSignerMock.mockReturnValue(ethSignerMock);
+    (Signer as unknown as jest.Mock).mockImplementation(() => ethSignerMock);
     ethSignerMock.getAddress.mockResolvedValue(ethereumAddress);
     (signRaw as jest.Mock).mockResolvedValue(ethereumSignature);
     multiRollupApiClients.chainsApi.listChains.mockImplementation(() => mockListChains);
@@ -54,7 +51,7 @@ describe('registerZkEvmUser', () => {
       });
       await expect(async () => registerZkEvmUser({
         authManager: authManager as unknown as AuthManager,
-        magicProvider,
+        ethSigner: ethSignerMock as unknown as Signer,
         multiRollupApiClients: multiRollupApiClients as unknown as MultiRollupApiClients,
         accessToken,
         jsonRpcProvider: jsonRPCProvider as unknown as JsonRpcProvider,
@@ -72,7 +69,7 @@ describe('registerZkEvmUser', () => {
 
       await expect(async () => registerZkEvmUser({
         authManager: authManager as unknown as AuthManager,
-        magicProvider,
+        ethSigner: ethSignerMock as unknown as Signer,
         multiRollupApiClients: multiRollupApiClients as unknown as MultiRollupApiClients,
         accessToken,
         jsonRpcProvider: jsonRPCProvider as unknown as JsonRpcProvider,
@@ -90,7 +87,7 @@ describe('registerZkEvmUser', () => {
 
       await expect(async () => registerZkEvmUser({
         authManager: authManager as unknown as AuthManager,
-        magicProvider,
+        ethSigner: ethSignerMock as unknown as Signer,
         multiRollupApiClients: multiRollupApiClients as unknown as MultiRollupApiClients,
         accessToken,
         jsonRpcProvider: jsonRPCProvider as unknown as JsonRpcProvider,
@@ -107,7 +104,7 @@ describe('registerZkEvmUser', () => {
 
     const result = await registerZkEvmUser({
       authManager: authManager as unknown as AuthManager,
-      magicProvider,
+      ethSigner: ethSignerMock as unknown as Signer,
       multiRollupApiClients: multiRollupApiClients as unknown as MultiRollupApiClients,
       accessToken,
       jsonRpcProvider: jsonRPCProvider as unknown as JsonRpcProvider,

@@ -45,8 +45,8 @@ export const mockUserImx: UserImx = {
 export const mockUserZkEvm: UserZkEvm = {
   ...mockUser,
   zkEvm: {
-    ethAddress: 'zkevmEthAddress123',
-    userAdminAddress: 'zkevmUserAdminAddress123',
+    ethAddress: '0x0000000000000000000000000000000000000001',
+    userAdminAddress: '0x0000000000000000000000000000000000000002',
   },
 };
 

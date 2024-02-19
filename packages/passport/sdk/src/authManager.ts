@@ -53,7 +53,6 @@ const getAuthConfiguration = (config: PassportConfiguration): UserManagerSetting
       end_session_endpoint: endSessionEndpoint,
     },
     mergeClaims: true,
-    loadUserInfo: true,
     scope: oidcConfiguration.scope,
     userStore,
   };
@@ -105,7 +104,11 @@ export default class AuthManager {
   }
 
   private static mapOidcUserToDomainModel = (oidcUser: OidcUser): User => {
-    const passport = oidcUser.profile?.passport as PassportMetadata;
+    let passport: PassportMetadata | undefined;
+    if (oidcUser.id_token) {
+      passport = jwt_decode<IdTokenPayload>(oidcUser.id_token)?.passport;
+    }
+
     const user: User = {
       expired: oidcUser.expired,
       idToken: oidcUser.id_token,
