@@ -1,5 +1,8 @@
 import { mr } from '@imtbl/generated-clients';
-import { BlockchainDataConfiguration, BlockchainDataModuleConfiguration, } from './config';
+import {
+  BlockchainDataConfiguration,
+  BlockchainDataModuleConfiguration,
+} from './config';
 import { formatError } from './utils/formatErrors';
 
 export class BlockchainData {
@@ -55,7 +58,7 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async listActivityHistory(
-    request: mr.ActivitiesApiListActivityHistoryRequest
+    request: mr.ActivitiesApiListActivityHistoryRequest,
   ): Promise<mr.ListActivitiesResult> {
     return await this.activities
       .listActivityHistory(request)
@@ -217,6 +220,26 @@ export class BlockchainData {
         throw formatError(err);
       });
   }
+
+  /**
+   * Create a mint request to mint a set of NFTs for a given collection
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with the remaining rate limits
+   * @throws {@link index.APIError}
+   */
+  public async createMintRequest(
+    request: mr.NftsApiCreateMintRequestRequest,
+  ): Promise<mr.CreateMintRequestResult> {
+    return await this.nfts
+      .createMintRequest(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
+
+  // TODO list mint requests
+  // TODO get mint request by reference ID
 
   /**
    * List NFT owners by token ID
