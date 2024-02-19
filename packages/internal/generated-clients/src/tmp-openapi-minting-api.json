@@ -1905,6 +1905,96 @@
             "$ref": "#/components/responses/InternalServerError"
           }
         }
+      },
+      "get": {
+        "description": "Retrieve the status of all mints for a given contract address",
+        "summary": "Mint NFTs",
+        "security": [
+          {
+            "ImmutableApiKey": [
+              "write:mint-request"
+            ]
+          }
+        ],
+        "tags": [
+          "nfts"
+        ],
+        "operationId": "ListMintRequests",
+        "parameters": [
+          {
+            "name": "contract_address",
+            "in": "path",
+            "description": "The address of contract",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          },
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            }
+          },
+          {
+            "name": "page_cursor",
+            "in": "query",
+            "description": "Encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageCursor"
+            }
+          },
+          {
+            "name": "page_size",
+            "description": "Maximum number of items to return",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageSize"
+            }
+          },
+          {
+            "name": "status",
+            "description": "The status of the mint request",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/MintRequestStatus"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListMintRequestsResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorisedRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
       }
     },
     "/v1/chains/{chain_name}/collections/{contract_address}/nfts/mint-requests/{reference_id}": {
@@ -5180,7 +5270,6 @@
           "token_id",
           "transaction_hash",
           "error",
-          "status",
           "created_at",
           "updated_at"
         ]
