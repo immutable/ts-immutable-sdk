@@ -11,6 +11,7 @@ import OnRampUI from "./components/ui/on-ramp/onRamp";
 import { PassportLoginCallback } from './components/ui/marketplace-orchestrator/PassportLoginCallback';
 import { Marketplace } from './components/ui/marketplace-orchestrator';
 import { SaleUI } from './components/ui/sale/sale';
+import { Embed } from './components/ui/embed';
 
 const router = createBrowserRouter([
   {
@@ -47,6 +48,14 @@ const router = createBrowserRouter([
   },
   {
     path: '/marketplace-orchestrator/login/callback',
+    element: <PassportLoginCallback />
+  },
+  {
+    path: '/embed',
+    element: <Embed />
+  },
+  {
+    path: '/embed/login/callback',
     element: <PassportLoginCallback />
   },
 ]);
