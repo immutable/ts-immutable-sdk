@@ -59,6 +59,8 @@ export async function validateProvider(
       }
 
       if (web3ChainId !== underlyingChainId && !options.allowMistmatchedChainId) {
+        // eslint-disable-next-line no-console
+        console.error('web3ChainId', web3ChainId, 'underlyingChainId', underlyingChainId, options);
         throw new CheckoutError(
           'Your wallet has changed network, please switch to a supported network',
           CheckoutErrorType.WEB3_PROVIDER_ERROR,

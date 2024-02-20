@@ -21,7 +21,7 @@ import {
   initialConnectLoaderState,
 } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { LoadingView } from '../../views/loading/LoadingView';
-import { ConnectWidget } from '../../widgets/connect/ConnectWidget';
+import ConnectWidget from '../../widgets/connect/ConnectWidget';
 import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
@@ -98,6 +98,14 @@ export function ConnectLoader({
           payload: {
             type: ConnectLoaderActions.SET_PROVIDER,
             provider: createProviderResult.provider,
+          },
+        });
+
+        connectLoaderDispatch({
+          payload: {
+            type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
+            connectionStatus: ConnectionStatus.NOT_CONNECTED,
+            deepLink: ConnectWidgetViews.READY_TO_CONNECT,
           },
         });
         return true;
@@ -209,6 +217,9 @@ export function ConnectLoader({
           },
         });
       } catch (err: any) {
+        // eslint-disable-next-line no-console
+        console.error(err);
+
         connectLoaderDispatch({
           payload: {
             type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,

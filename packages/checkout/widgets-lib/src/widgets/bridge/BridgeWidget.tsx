@@ -67,7 +67,7 @@ export type BridgeWidgetInputs = BridgeWidgetParams & {
   web3Provider?: Web3Provider;
 };
 
-export function BridgeWidget({
+export default function BridgeWidget({
   checkout,
   web3Provider,
   config,

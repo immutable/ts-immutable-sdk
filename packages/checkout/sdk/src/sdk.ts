@@ -65,10 +65,13 @@ import { FiatRampService, FiatRampWidgetParams } from './fiatRamp';
 import { getItemRequirementsFromRequirements } from './smartCheckout/itemRequirements';
 import { CheckoutError, CheckoutErrorType } from './errors';
 import { AvailabilityService, availabilityService } from './availability';
-import { loadUnresolved } from './widgets/load';
+import { getWidgetsEsmUrl, loadUnresolvedBundle } from './widgets/load';
 import { WidgetsInit } from './types/widgets';
 import { HttpClient } from './api/http';
 import { isMatchingAddress } from './utils/utils';
+import { WidgetConfiguration } from './widgets/definitions/configurations';
+import { SemanticVersion } from './widgets/definitions/types';
+import { validateAndBuildVersion } from './widgets/version';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
@@ -76,7 +79,6 @@ const SANDBOX_CONFIGURATION = {
   },
   passport: undefined,
 };
-const WIDGETS_SCRIPT_TIMEOUT = 100;
 
 // Checkout SDK
 export class Checkout {
@@ -119,25 +121,71 @@ export class Checkout {
     // Preload the configurations
     await checkout.config.remote.getConfig();
 
-    const factory = new Promise<ImmutableCheckoutWidgets.WidgetsFactory>((resolve, reject) => {
-      function checkForWidgetsBundleLoaded() {
-        if (typeof ImmutableCheckoutWidgets !== 'undefined') {
-          resolve(new ImmutableCheckoutWidgets.WidgetsFactory(checkout, init.config));
-        } else {
-          // If ImmutableCheckoutWidgets is not defined, wait for set amount of time.
-          // When time has elapsed, check again if ImmutableCheckoutWidgets is defined.
-          // Once it's defined, the promise will resolve and setTimeout won't be called again.
-          setTimeout(checkForWidgetsBundleLoaded, WIDGETS_SCRIPT_TIMEOUT);
-        }
-      }
+    try {
+      const factory = await this.loadEsModules(init.config, init.version);
+      return factory;
+    } catch (err: any) {
+      throw new CheckoutError(
+        'Failed to load widgets script',
+        CheckoutErrorType.WIDGETS_SCRIPT_LOAD_ERROR,
+        { error: err },
+      );
+    }
+  }
 
+  private async loadUmdBundle(
+    config: WidgetConfiguration,
+    version?: SemanticVersion,
+  ) {
+    const checkout = this;
+
+    const factory = new Promise<ImmutableCheckoutWidgets.WidgetsFactory>((resolve, reject) => {
       try {
-        const script = loadUnresolved(init.version);
-        if (script.loaded && typeof ImmutableCheckoutWidgets !== 'undefined') {
-          resolve(new ImmutableCheckoutWidgets.WidgetsFactory(checkout, init.config));
-        } else {
-          checkForWidgetsBundleLoaded();
+        const scriptId = 'immutable-checkout-widgets-bundle';
+        const validVersion = validateAndBuildVersion(version);
+
+        // Prevent the script to be loaded more than once
+        // by checking the presence of the script and its version.
+        const initScript = document.getElementById(scriptId) as HTMLScriptElement;
+        if (initScript) {
+          if (typeof ImmutableCheckoutWidgets !== 'undefined') {
+            resolve(new ImmutableCheckoutWidgets.WidgetsFactory(checkout, config));
+          } else {
+            reject(
+              new CheckoutError(
+                'Failed to find ImmutableCheckoutWidgets script',
+                CheckoutErrorType.WIDGETS_SCRIPT_LOAD_ERROR,
+              ),
+            );
+          }
         }
+
+        const tag = document.createElement('script');
+
+        tag.addEventListener('load', () => {
+          if (typeof ImmutableCheckoutWidgets !== 'undefined') {
+            resolve(new ImmutableCheckoutWidgets.WidgetsFactory(checkout, config));
+          } else {
+            reject(
+              new CheckoutError(
+                'Failed to find ImmutableCheckoutWidgets script',
+                CheckoutErrorType.WIDGETS_SCRIPT_LOAD_ERROR,
+              ),
+            );
+          }
+        });
+
+        tag.addEventListener('error', (err) => {
+          reject(
+            new CheckoutError(
+              'Failed to load widgets script',
+              CheckoutErrorType.WIDGETS_SCRIPT_LOAD_ERROR,
+              { error: err },
+            ),
+          );
+        });
+
+        loadUnresolvedBundle(tag, scriptId, validVersion);
       } catch (err: any) {
         reject(
           new CheckoutError(
@@ -150,6 +198,30 @@ export class Checkout {
     });
 
     return factory;
+  }
+
+  private async loadEsModules(
+    config: WidgetConfiguration,
+    version?: SemanticVersion,
+  ) {
+    const checkout = this;
+    try {
+      const cdnUrl = getWidgetsEsmUrl(version);
+
+      // WebpackIgnore comment required to prevent webpack modifying the import statement and
+      // breaking the dynamic import in certain applications integrating checkout
+      const checkoutWidgetsModule = await import(/* webpackIgnore: true */ cdnUrl);
+
+      if (checkoutWidgetsModule && checkoutWidgetsModule.WidgetsFactory) {
+        return new checkoutWidgetsModule.WidgetsFactory(checkout, config);
+      }
+    } catch (err: any) {
+      // eslint-disable-next-line no-console
+      console.warn(`Failed to resolve checkout widgets module, falling back to UMD bundle. Error: ${err.message}`);
+    }
+
+    // Fallback to UMD bundle if esm bundle fails to load
+    return await checkout.loadUmdBundle(config, version);
   }
 
   /**
@@ -177,7 +249,7 @@ export class Checkout {
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
-      { allowUnsupportedProvider: true } as ValidateProviderOptions,
+      { allowMistmatchedChainId: true, allowUnsupportedProvider: true } as ValidateProviderOptions,
     );
     return connect.checkIsWalletConnected(web3Provider);
   }
@@ -194,7 +266,10 @@ export class Checkout {
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
-      { allowUnsupportedProvider: true } as ValidateProviderOptions,
+      {
+        allowUnsupportedProvider: true,
+        allowMistmatchedChainId: true,
+      } as ValidateProviderOptions,
     );
 
     if (params.requestWalletPermissions && !(web3Provider.provider as any)?.isPassport) {
@@ -334,6 +409,10 @@ export class Checkout {
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
+      {
+        allowUnsupportedProvider: true,
+        allowMistmatchedChainId: true,
+      } as ValidateProviderOptions,
     );
     return await transaction.sendTransaction(web3Provider, params.transaction);
   }
