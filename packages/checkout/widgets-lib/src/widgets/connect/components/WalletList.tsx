@@ -14,8 +14,6 @@ import {
 } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Web3Provider } from '@ethersproject/providers';
-import { WalletConnectManager } from 'lib/walletConnect';
-import { ConnectConfig } from '@imtbl/checkout-sdk/dist/types';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { ConnectActions, ConnectContext } from '../context/ConnectContext';
 import { WalletItem } from './WalletItem';
@@ -41,7 +39,6 @@ export function WalletList(props: WalletListProps) {
     connectState: { checkout, passport },
   } = useContext(ConnectContext);
   const { viewDispatch } = useContext(ViewContext);
-  const [enableWalletConnect, setEnableWalletConnect] = useState(false);
   const [wallets, setWallets] = useState<WalletInfo[]>([]);
   const { track } = useAnalytics();
 
@@ -60,30 +57,37 @@ export function WalletList(props: WalletListProps) {
     });
   }, []);
 
-  const { walletConnectBusy, openWalletConnectModal } = useWalletConnect({
-    connectCallback: async (ethereumProvider) => {
-      const web3Provider = new Web3Provider(ethereumProvider as any);
-      selectWeb3Provider(web3Provider);
+  const { isWalletConnectEnabled, walletConnectBusy, openWalletConnectModal } = useWalletConnect({ checkout });
 
-      const chainId = await web3Provider.getSigner().getChainId();
-      if (chainId !== targetChainId) {
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: { type: ConnectWidgetViews.SWITCH_NETWORK },
-          },
-        });
-        return;
-      }
+  const connectCallback = async (ethereumProvider) => {
+    const web3Provider = new Web3Provider(ethereumProvider as any);
+    selectWeb3Provider(web3Provider);
 
+    const chainId = await web3Provider.getSigner().getChainId();
+    if (chainId !== targetChainId) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
-          view: { type: ConnectWidgetViews.SUCCESS },
+          view: { type: ConnectWidgetViews.SWITCH_NETWORK },
         },
       });
-    },
-  });
+      return;
+    }
+
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: { type: ConnectWidgetViews.SUCCESS },
+      },
+    });
+  }
+
+  const handleWalletConnectConnection = async () => {
+    await openWalletConnectModal({
+      connectCallback,
+      restoreSession: true
+    })
+  }
 
   const excludedWallets = useCallback(() => {
     const passportWalletProvider = { walletProviderName: WalletProviderName.PASSPORT };
@@ -108,13 +112,6 @@ export function WalletList(props: WalletListProps) {
     getAllowedWallets();
   }, [checkout, excludedWallets, walletFilterTypes]);
 
-  useEffect(() => {
-    if (!checkout) return;
-    (async () => {
-      const connectConfig: ConnectConfig = await checkout.config.remote.getConfig('connect') as ConnectConfig;
-      setEnableWalletConnect(connectConfig.walletConnect);
-    })();
-  }, [checkout]);
 
   const onWalletClick = useCallback(async (walletProviderName: WalletProviderName) => {
     track({
@@ -169,14 +166,14 @@ export function WalletList(props: WalletListProps) {
           key={wallet.walletProviderName}
         />
       ))}
-      {enableWalletConnect && WalletConnectManager.getInstance().isInitialised
+      {isWalletConnectEnabled
         && (
           <MenuItem
             testId="wallet-list-walletconnect"
             size="medium"
             emphasized
             disabled={walletConnectBusy}
-            onClick={() => openWalletConnectModal()}
+            onClick={() => handleWalletConnectConnection()}
             sx={{ marginBottom: 'base.spacing.x1' }}
           >
             <MenuItem.FramedLogo

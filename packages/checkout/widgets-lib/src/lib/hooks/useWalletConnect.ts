@@ -2,16 +2,34 @@ import { useCallback, useEffect, useState } from 'react';
 import EthereumProvider from '@walletconnect/ethereum-provider';
 import { WalletConnectModal } from '@walletconnect/modal';
 import { WalletConnectManager } from '../walletConnect';
+import { Checkout } from '@imtbl/checkout-sdk';
 
 export interface UseWalletConnectParams {
-  connectCallback: (ethereumProvider: EthereumProvider) => void,
+  checkout: Checkout | null;
 }
 
-export const useWalletConnect = ({ connectCallback }: UseWalletConnectParams) => {
+export interface OpenWalletConnectModalParams {
+  connectCallback: (ethereumProvider: EthereumProvider) => void
+  restoreSession?: boolean
+}
+
+export const useWalletConnect = ({ checkout }: UseWalletConnectParams) => {
+  const [isWalletConnectEnabled, setIsWalletConnectEnabled] = useState(false);
   const [walletConnectBusy, setWalletConnectBusy] = useState<boolean>(false);
   const [ethereumProvider, setEthereumProvider] = useState<EthereumProvider | null>(null);
   const [walletConnectModal, setWalletConnectModal] = useState<WalletConnectModal | null>(null);
   // const [displayUri, setDisplayUri] = useState<string | null>(null);
+
+  useEffect(() => {
+    if(!checkout) return;
+    (async () => {
+      const connectConfig = await checkout.config.remote.getConfig('connect');
+      setIsWalletConnectEnabled(
+        /**connectConfig?.walletConnect */ true && 
+        WalletConnectManager.getInstance().isInitialised
+        );
+    })();
+  }, [checkout])
 
   useEffect(() => {
     if (WalletConnectManager.getInstance().isInitialised) {
@@ -20,7 +38,10 @@ export const useWalletConnect = ({ connectCallback }: UseWalletConnectParams) =>
     }
   }, []);
 
-  const openWalletConnectModal = useCallback(async (restoreSession: boolean = true) => (
+  const openWalletConnectModal = useCallback(async ({
+    connectCallback,
+    restoreSession = true
+  }: OpenWalletConnectModalParams) => (
     new Promise((resolve, reject) => {
       if (!ethereumProvider || !walletConnectModal) reject('WalletConnect not initialized');
       setWalletConnectBusy(true);
@@ -28,9 +49,14 @@ export const useWalletConnect = ({ connectCallback }: UseWalletConnectParams) =>
       if (restoreSession) {
         // restore session
         const existingPairings = ethereumProvider?.signer.client.core.pairing.getPairings();
+        // console.log('existingPairings', existingPairings);
         if (existingPairings && existingPairings.length > 0 && existingPairings[0].topic !== '') {
+          // console.log('restoring existing pairing for', existingPairings[0])
           ethereumProvider?.signer.client.core.pairing.activate({ topic: existingPairings[0].topic })
             .then(() => {
+
+              // inspect ethereumProvider to see if it is connected with a network
+              // if not call ethereumProvider.connect({paritingTopic: existingPairings[0].topic})
               if (connectCallback) {
                 connectCallback(ethereumProvider);
               }
@@ -86,6 +112,7 @@ export const useWalletConnect = ({ connectCallback }: UseWalletConnectParams) =>
   }), [ethereumProvider]);
 
   return {
+    isWalletConnectEnabled,
     ethereumProvider,
     walletConnectBusy,
     walletConnectModal,

@@ -14,7 +14,7 @@ import {
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import {
-  createAndConnectToProvider, isMetaMaskProvider, isPassportProvider,
+  createAndConnectToProvider, getWalletProviderNameByProvider, isMetaMaskProvider, isPassportProvider,
 } from 'lib/providerUtils';
 import { getL1ChainId, getL2ChainId } from 'lib';
 import { getChainNameById } from 'lib/chains';
@@ -31,6 +31,7 @@ import { BridgeActions, BridgeContext } from '../context/BridgeContext';
 import { NetworkItem } from './NetworkItem';
 import { WalletNetworkButton } from './WalletNetworkButton';
 import { WalletDrawer } from './WalletDrawer';
+import { useWalletConnect } from 'lib/hooks/useWalletConnect';
 
 const testId = 'wallet-network-selector';
 
@@ -55,6 +56,9 @@ export function WalletAndNetworkSelector() {
 
   const passportCache = useRef<Web3Provider>();
 
+  /** WalletConnect */
+  const { isWalletConnectEnabled, openWalletConnectModal } = useWalletConnect({ checkout });
+
   /** From wallet and from network local state */
   const [fromWalletDrawerOpen, setFromWalletDrawerOpen] = useState(false);
   const [fromNetworkDrawerOpen, setFromNetworkDrawerOpen] = useState(false);
@@ -74,16 +78,12 @@ export function WalletAndNetworkSelector() {
 
   const fromWalletProviderName = useMemo(() => {
     if (!fromWalletWeb3Provider) return null;
-    return isPassportProvider(fromWalletWeb3Provider)
-      ? WalletProviderName.PASSPORT
-      : WalletProviderName.METAMASK;
+    return getWalletProviderNameByProvider(fromWalletWeb3Provider);
   }, [fromWalletWeb3Provider]);
 
   const toWalletProviderName = useMemo(() => {
-    if (!fromWalletWeb3Provider) return null;
-    return isPassportProvider(toWalletWeb3Provider)
-      ? WalletProviderName.PASSPORT
-      : WalletProviderName.METAMASK;
+    if (!toWalletWeb3Provider) return null;
+    return getWalletProviderNameByProvider(toWalletWeb3Provider);
   }, [toWalletWeb3Provider]);
 
   const fromWalletSelectorOptions = useMemo(() => {
@@ -91,8 +91,11 @@ export function WalletAndNetworkSelector() {
     if (checkout.passport) {
       options.push(WalletProviderName.PASSPORT);
     }
+    if (isWalletConnectEnabled) {
+      options.push('walletconnect' as WalletProviderName);
+    }
     return options;
-  }, [checkout]);
+  }, [checkout, isWalletConnectEnabled]);
 
   const toWalletSelectorOptions = useMemo(() => {
     const options = [WalletProviderName.METAMASK];
@@ -102,8 +105,11 @@ export function WalletAndNetworkSelector() {
       && fromWalletProviderName === WalletProviderName.METAMASK) {
       options.push(WalletProviderName.PASSPORT);
     }
+    if (isWalletConnectEnabled) {
+      options.push('walletconnect' as WalletProviderName);
+    }
     return options;
-  }, [checkout, fromNetwork, fromWalletProviderName]);
+  }, [checkout, fromNetwork, fromWalletProviderName, isWalletConnectEnabled]);
 
   useEffect(() => {
     if (!from || !to) return;
@@ -200,20 +206,9 @@ export function WalletAndNetworkSelector() {
   /* --------------------------- */
   /* --- Handling selections --- */
   /* --------------------------- */
-  const handleFromWalletConnection = useCallback(async (walletProviderName: WalletProviderName) => {
-    clearToWalletSelections();
-    let provider;
-    if (walletProviderName === WalletProviderName.PASSPORT && passportCache.current) {
-      provider = passportCache.current;
-    }
-    if (!provider) {
-      try {
-        provider = await createProviderAndConnect(walletProviderName);
-      } catch (error) {
-        return;
-      }
-    }
 
+
+  const handleFromWalletConnectionSuccess = async (provider: Web3Provider) => {
     setFromWalletWeb3Provider(provider);
     const address = await provider!.getSigner().getAddress();
     setFromWalletAddress(address.toLowerCase());
@@ -234,7 +229,33 @@ export function WalletAndNetworkSelector() {
 
     setFromWalletDrawerOpen(false);
     setTimeout(() => setFromNetworkDrawerOpen(true), 500);
-  }, [fromWalletProviderName, passportCache.current]);
+  }
+
+  const handleFromWalletConnection = useCallback(async (walletProviderName: WalletProviderName | string) => {
+    clearToWalletSelections();
+    let provider;
+    if (walletProviderName === WalletProviderName.PASSPORT && passportCache.current) {
+      provider = passportCache.current;
+    }
+    if (!provider) {
+      try {
+        if (walletProviderName === 'walletconnect') {
+          await openWalletConnectModal({
+            connectCallback: (ethereumProvider) => {
+              handleFromWalletConnectionSuccess(new Web3Provider(ethereumProvider));
+            },
+            restoreSession: true
+          });
+          return;
+        } else {
+          provider = await createProviderAndConnect(walletProviderName as WalletProviderName);
+          await handleFromWalletConnectionSuccess(provider)
+        }
+      } catch (error) {
+        return;
+      }
+    }
+  }, [fromWalletProviderName, passportCache.current, openWalletConnectModal]);
 
   const handleFromNetworkSelection = useCallback(
     async (chainId: ChainId) => {
@@ -274,7 +295,7 @@ export function WalletAndNetworkSelector() {
     ],
   );
 
-  const handleToWalletSelection = useCallback(async (selectedToWalletProviderName: WalletProviderName) => {
+  const handleToWalletSelection = useCallback(async (selectedToWalletProviderName: WalletProviderName | string) => {
     if (fromWalletProviderName === selectedToWalletProviderName) {
       // if same from wallet and to wallet, just use the existing fromWalletLocalWeb3Provider
       setToWalletWeb3Provider(fromWalletWeb3Provider);
@@ -287,7 +308,16 @@ export function WalletAndNetworkSelector() {
       }
       if (!toWalletProvider) {
         try {
-          toWalletProvider = await createProviderAndConnect(selectedToWalletProviderName);
+          if (selectedToWalletProviderName === "walletconnect") {
+            await openWalletConnectModal({
+              connectCallback: (ethereumProvider) => {
+                const newProvider = new Web3Provider(ethereumProvider);
+                setToWalletWeb3Provider(newProvider);
+                newProvider!.getSigner().getAddress().then((address) => setToWalletAddress(address.toLowerCase()));
+              }
+            })
+          }
+          toWalletProvider = await createProviderAndConnect(selectedToWalletProviderName as WalletProviderName);
         } catch (error) {
           return;
         }
@@ -300,7 +330,6 @@ export function WalletAndNetworkSelector() {
     // toNetwork is always the opposite of fromNetwork
     const theToNetwork = fromNetwork === l1NetworkChainId ? imtblZkEvmNetworkChainId : l1NetworkChainId;
     setToNetwork(theToNetwork);
-
     setToWalletDrawerOpen(false);
   }, [
     fromWalletProviderName,
@@ -462,16 +491,17 @@ export function WalletAndNetworkSelector() {
             onNetworkClick={handleFromNetworkSelection}
             chainId={imtblZkEvmNetworkChainId}
           />
-          {/** Show L1 option for Metamask only */}
-          {fromWalletProviderName === WalletProviderName.METAMASK && (
-            <NetworkItem
-              key={l1NetworkName}
-              testId={testId}
-              chainName={l1NetworkName}
-              onNetworkClick={handleFromNetworkSelection}
-              chainId={l1NetworkChainId}
-            />
-          )}
+          {/** Show L1 option for Metamask && Wallet Connect only */}
+          {(fromWalletProviderName === WalletProviderName.METAMASK
+            || fromWalletProviderName === 'walletconnect') && (
+              <NetworkItem
+                key={l1NetworkName}
+                testId={testId}
+                chainName={l1NetworkName}
+                onNetworkClick={handleFromNetworkSelection}
+                chainId={l1NetworkChainId}
+              />
+            )}
         </Drawer.Content>
       </Drawer>
 

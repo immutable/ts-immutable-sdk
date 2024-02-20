@@ -14,6 +14,7 @@ import {
   walletCaptionStyles,
   walletLogoStyles,
 } from './WalletNetworkButtonStyles';
+import { getWalletDisplayName, getWalletLogoByName } from 'lib/logoUtils';
 
 const networkIcon = {
   [ChainId.IMTBL_ZKEVM_DEVNET]: 'Immutable',
@@ -30,7 +31,7 @@ const walletLogo = {
 
 interface WalletNetworkButtonProps {
   testId: string;
-  walletName: WalletProviderName;
+  walletName: WalletProviderName | string;
   walletAddress: string;
   chainId: ChainId;
   disableNetworkButton?: boolean;
@@ -47,7 +48,8 @@ export function WalletNetworkButton({
   onNetworkClick,
 }: WalletNetworkButtonProps) {
   const networkName = getChainNameById(chainId);
-  const walletHeading = walletName === WalletProviderName.METAMASK ? 'Metamask' : 'Passport';
+  const walletHeading = getWalletDisplayName(walletName);
+  const walletLogo = getWalletLogoByName(walletName);
 
   return (
     <Box
@@ -56,7 +58,7 @@ export function WalletNetworkButton({
       onClick={onWalletClick}
     >
       <Logo
-        logo={walletLogo[walletName] as any}
+        logo={walletLogo as any}
         sx={walletLogoStyles(walletName)}
       />
       <Box sx={{

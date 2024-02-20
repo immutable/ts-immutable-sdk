@@ -111,7 +111,7 @@ export function Transactions({ onBackButtonClick }: TransactionsProps) {
     }
   }, [checkout, from]);
 
-  const updateAndConnectProvider = useCallback(async (walletProviderName: WalletProviderName) => {
+  const updateAndConnectProvider = useCallback(async (walletProviderName: WalletProviderName | string) => {
     track({
       userJourney: UserJourney.BRIDGE,
       screen: 'EmptyStateNotConnected',
@@ -122,7 +122,7 @@ export function Transactions({ onBackButtonClick }: TransactionsProps) {
       },
     });
     try {
-      const localProvider = await createAndConnectToProvider(checkout, walletProviderName, true);
+      const localProvider = await createAndConnectToProvider(checkout, walletProviderName as WalletProviderName, true);
       const network = await localProvider.getNetwork();
       const address = await localProvider?.getSigner().getAddress() ?? '';
       setTxs([]);
