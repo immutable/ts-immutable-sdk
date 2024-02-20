@@ -1,6 +1,6 @@
-import { IMXClient } from 'x-client';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { AxiosRequestConfig } from 'axios';
+import { IMXClient } from './IMXClient';
 import {
   Config,
   ImxConfiguration,
