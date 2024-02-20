@@ -30,6 +30,7 @@ import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAna
 import { TopUpView } from 'views/top-up/TopUpView';
 import { useTranslation } from 'react-i18next';
 import { ClaimWithdrawalInProgress } from 'components/Transactions/ClaimWithdrawalInProgress';
+import { getDefaultTokenImage } from 'lib/utils';
 import {
   ViewActions,
   ViewContext,
@@ -82,6 +83,7 @@ export default function BridgeWidget({
     isBridgeEnabled,
     theme,
   } = config;
+  const defaultTokenImage = getDefaultTokenImage(checkout.config.environment, theme);
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const { page } = useAnalytics();
@@ -201,7 +203,7 @@ export default function BridgeWidget({
             <WalletNetworkSelectionView />
           )}
           {viewState.view.type === BridgeWidgetViews.BRIDGE_FORM && (
-            <Bridge amount={amount} tokenAddress={tokenAddress} theme={theme} />
+            <Bridge amount={amount} tokenAddress={tokenAddress} defaultTokenImage={defaultTokenImage} />
           )}
           {viewState.view.type === BridgeWidgetViews.BRIDGE_REVIEW && (
             <BridgeReview />
@@ -245,7 +247,7 @@ export default function BridgeWidget({
             />
           )}
           {viewState.view.type === BridgeWidgetViews.TRANSACTIONS && (
-            <Transactions onBackButtonClick={goBackToWalletNetworkSelector} />
+            <Transactions onBackButtonClick={goBackToWalletNetworkSelector} defaultTokenImage={defaultTokenImage} />
           )}
           {viewState.view.type === BridgeWidgetViews.CLAIM_WITHDRAWAL && (
             <ClaimWithdrawal transaction={viewState.view.transaction} />
