@@ -1,5 +1,5 @@
 import {
-  ChainId, CheckoutConfiguration, GetBalanceResult, NetworkInfo,
+  ChainId, CheckoutConfiguration, GetBalanceResult, NetworkInfo, WidgetTheme,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { getL1ChainId, getL2ChainId } from './networkUtils';
@@ -156,4 +156,13 @@ export function getImxTokenImage(environment: Environment | undefined) {
 
 export function getTokenImageByAddress(environment: Environment | undefined, address: string) {
   return getRemoteImage(environment, `/tokens/${address.toLowerCase()}.svg`);
+}
+
+export function getDefaultTokenImage(
+  environment: Environment | undefined,
+  theme: WidgetTheme,
+) {
+  return theme === WidgetTheme.LIGHT
+    ? getRemoteImage(environment, '/tokens/defaultonlight.svg')
+    : getRemoteImage(environment, '/tokens/defaultondark.svg');
 }
