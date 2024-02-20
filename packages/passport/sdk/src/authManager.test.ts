@@ -429,7 +429,7 @@ describe('AuthManager', () => {
     });
 
     describe('when the user does meet the type assertion', () => {
-      it('should the user', async () => {
+      it('should return the user', async () => {
         mockGetUser.mockReturnValue(mockOidcUser);
         (jwt_decode as jest.Mock).mockReturnValue({
           passport: {
@@ -446,7 +446,7 @@ describe('AuthManager', () => {
     });
 
     describe('when the user is refreshing', () => {
-      it('should return the user', async () => {
+      it('should return the refreshed used', async () => {
         mockSigninSilent.mockReturnValue(mockOidcUser);
 
         authManager.forceUserRefreshInBackground();

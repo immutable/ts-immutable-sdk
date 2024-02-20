@@ -22,7 +22,11 @@ import {
   DeviceTokenResponse,
   DeviceErrorResponse,
   IdTokenPayload,
-  OidcConfiguration, UserZkEvm, isUserZkEvm, UserImx, isUserImx,
+  OidcConfiguration,
+  UserZkEvm,
+  isUserZkEvm,
+  UserImx,
+  isUserImx,
 } from './types';
 import { PassportConfiguration } from './config';
 
