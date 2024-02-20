@@ -138,7 +138,7 @@ export class PassportImxProvider implements IMXProvider {
   }
 
   protected async getAuthenticatedUserAndSigners(): Promise<AuthenticatedUserAndSigners> {
-    const user = await this.authManager.getUser(); // CHECKED
+    const user = await this.authManager.getUser();
     if (!user || !this.signers) {
       throw new PassportError(
         'User has been logged out',

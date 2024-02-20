@@ -183,7 +183,7 @@ export default class AuthManager {
   public async getUserOrLogin(): Promise<User> {
     let user = null;
     try {
-      user = await this.getUser(); // CHECKED
+      user = await this.getUser();
     } catch (err) {
       // eslint-disable-next-line no-console
       console.warn('failed to retrieve a cached user session:', err);
