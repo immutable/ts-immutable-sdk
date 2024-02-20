@@ -37,6 +37,7 @@ import { SupportMessage } from './SupportMessage';
 import { KnownNetworkMap } from './transactionsType';
 import { TransactionList } from './TransactionList';
 import { NoTransactions } from './NoTransactions';
+import { useWalletConnect } from 'lib/hooks/useWalletConnect';
 
 type TransactionsProps = {
   onBackButtonClick: () => void;
@@ -57,6 +58,8 @@ export function Transactions({ onBackButtonClick }: TransactionsProps) {
   const [showWalletDrawer, setShowWalletDrawer] = useState(false);
 
   const isPassport = isPassportProvider(from?.web3Provider);
+
+  const { isWalletConnectEnabled } = useWalletConnect({ checkout });
 
   // Fetch the tokens for the root chain using the allowed tokens.
   // In case this list does not have all the tokens, there is logic
@@ -274,9 +277,12 @@ export function Transactions({ onBackButtonClick }: TransactionsProps) {
   }, [from, getTransactionsDetails]);
 
   const walletOptions = useMemo(() => {
-    const options = [WalletProviderName.METAMASK];
+    const options: Array<WalletProviderName | string> = [WalletProviderName.METAMASK];
     if (checkout.passport) {
       options.push(WalletProviderName.PASSPORT);
+    }
+    if (isWalletConnectEnabled) {
+      options.push('walletconnect')
     }
     return options;
   }, [checkout]);

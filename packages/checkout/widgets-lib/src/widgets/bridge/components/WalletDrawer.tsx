@@ -12,7 +12,7 @@ interface WalletDrawerProps {
     defaultText?: string;
   },
   showWalletSelectorTarget: boolean;
-  walletOptions: WalletProviderName[];
+  walletOptions: string[];
   showDrawer: boolean;
   setShowDrawer: (show: boolean) => void;
   onWalletItemClick: (name: WalletProviderName | string) => Promise<void>;

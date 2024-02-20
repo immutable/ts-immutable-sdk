@@ -14,8 +14,8 @@ export function isWalletConnectProvider(provider?: Web3Provider | null) {
 }
 
 export function getWalletProviderNameByProvider(provider?: Web3Provider | null) {
-  if (isMetaMaskProvider(provider)) return WalletProviderName.METAMASK;
-  if (isPassportProvider(provider)) return WalletProviderName.PASSPORT;
+  if (isMetaMaskProvider(provider)) return WalletProviderName.METAMASK.toString();
+  if (isPassportProvider(provider)) return WalletProviderName.PASSPORT.toString();
   if (isWalletConnectProvider(provider)) return 'walletconnect';
 
   return WalletProviderName.METAMASK;

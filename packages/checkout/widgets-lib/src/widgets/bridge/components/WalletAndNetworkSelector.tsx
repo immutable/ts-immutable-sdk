@@ -87,26 +87,26 @@ export function WalletAndNetworkSelector() {
   }, [toWalletWeb3Provider]);
 
   const fromWalletSelectorOptions = useMemo(() => {
-    const options = [WalletProviderName.METAMASK];
+    const options = [WalletProviderName.METAMASK.toString()];
     if (checkout.passport) {
-      options.push(WalletProviderName.PASSPORT);
+      options.push(WalletProviderName.PASSPORT.toString());
     }
     if (isWalletConnectEnabled) {
-      options.push('walletconnect' as WalletProviderName);
+      options.push('walletconnect');
     }
     return options;
   }, [checkout, isWalletConnectEnabled]);
 
   const toWalletSelectorOptions = useMemo(() => {
-    const options = [WalletProviderName.METAMASK];
+    const options = [WalletProviderName.METAMASK.toString()];
 
     if (checkout.passport
       && fromNetwork === l1NetworkChainId
       && fromWalletProviderName === WalletProviderName.METAMASK) {
-      options.push(WalletProviderName.PASSPORT);
+      options.push(WalletProviderName.PASSPORT.toString());
     }
     if (isWalletConnectEnabled) {
-      options.push('walletconnect' as WalletProviderName);
+      options.push('walletconnect');
     }
     return options;
   }, [checkout, fromNetwork, fromWalletProviderName, isWalletConnectEnabled]);
@@ -182,12 +182,12 @@ export function WalletAndNetworkSelector() {
   }, [from, to]);
 
   const createProviderAndConnect = useCallback(async (
-    walletProviderName: WalletProviderName,
+    walletProviderName: string,
   ): Promise<Web3Provider | undefined> => {
     let web3Provider: Web3Provider;
     try {
-      web3Provider = await createAndConnectToProvider(checkout, walletProviderName);
-      if (walletProviderName === WalletProviderName.PASSPORT) {
+      web3Provider = await createAndConnectToProvider(checkout, walletProviderName as WalletProviderName);
+      if (walletProviderName === WalletProviderName.PASSPORT.toString()) {
         passportCache.current = web3Provider;
       }
       return web3Provider;
@@ -231,10 +231,10 @@ export function WalletAndNetworkSelector() {
     setTimeout(() => setFromNetworkDrawerOpen(true), 500);
   }
 
-  const handleFromWalletConnection = useCallback(async (walletProviderName: WalletProviderName | string) => {
+  const handleFromWalletConnection = useCallback(async (walletProviderName: string) => {
     clearToWalletSelections();
     let provider;
-    if (walletProviderName === WalletProviderName.PASSPORT && passportCache.current) {
+    if (walletProviderName === WalletProviderName.PASSPORT.toString() && passportCache.current) {
       provider = passportCache.current;
     }
     if (!provider) {
@@ -303,7 +303,7 @@ export function WalletAndNetworkSelector() {
       setToWalletAddress(address.toLowerCase());
     } else {
       let toWalletProvider;
-      if (selectedToWalletProviderName === WalletProviderName.PASSPORT && passportCache.current) {
+      if (selectedToWalletProviderName === WalletProviderName.PASSPORT.toString() && passportCache.current) {
         toWalletProvider = passportCache.current;
       }
       if (!toWalletProvider) {
@@ -492,7 +492,7 @@ export function WalletAndNetworkSelector() {
             chainId={imtblZkEvmNetworkChainId}
           />
           {/** Show L1 option for Metamask && Wallet Connect only */}
-          {(fromWalletProviderName === WalletProviderName.METAMASK
+          {(fromWalletProviderName === WalletProviderName.METAMASK.toString()
             || fromWalletProviderName === 'walletconnect') && (
               <NetworkItem
                 key={l1NetworkName}

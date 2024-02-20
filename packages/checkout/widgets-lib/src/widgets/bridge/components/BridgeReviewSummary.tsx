@@ -15,7 +15,7 @@ import {
 } from '@imtbl/checkout-sdk';
 import { abbreviateAddress } from 'lib/addressUtils';
 import { CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext';
-import { isMetaMaskProvider, isPassportProvider } from 'lib/providerUtils';
+import { getWalletProviderNameByProvider, isMetaMaskProvider, isPassportProvider } from 'lib/providerUtils';
 import { calculateCryptoToFiat } from 'lib/utils';
 import { Web3Provider } from '@ethersproject/providers';
 import { DEFAULT_QUOTE_REFRESH_INTERVAL, DEFAULT_TOKEN_DECIMALS, NATIVE } from 'lib';
@@ -38,14 +38,8 @@ import { BridgeContext } from '../context/BridgeContext';
 import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { Fees } from '../../../components/Fees/Fees';
 import { formatBridgeFees } from '../functions/BridgeFees';
-
-const networkIcon = {
-  [ChainId.IMTBL_ZKEVM_DEVNET]: 'Immutable',
-  [ChainId.IMTBL_ZKEVM_MAINNET]: 'Immutable',
-  [ChainId.IMTBL_ZKEVM_TESTNET]: 'Immutable',
-  [ChainId.ETHEREUM]: 'EthToken',
-  [ChainId.SEPOLIA]: 'EthToken',
-};
+import { getWalletLogoByName } from 'lib/logoUtils';
+import { networkIcon } from 'lib';
 
 const logo = {
   [WalletProviderName.PASSPORT]: 'PassportSymbolOutlined',
@@ -76,14 +70,8 @@ export function BridgeReviewSummary() {
   const [estimates, setEstimates] = useState<any | undefined>(undefined);
   const [gasFee, setGasFee] = useState<string>('');
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [approveTransaction, setApproveTransaction] = useState<ApproveBridgeResponse | undefined>(undefined);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [transaction, setTransaction] = useState<BridgeTxResponse | undefined>(undefined);
-
-  const walletProviderName = (provider: Web3Provider | undefined) => (isPassportProvider(provider)
-    ? WalletProviderName.PASSPORT
-    : WalletProviderName.METAMASK);
 
   const displayAmount = useMemo(() => (token?.symbol ? `${token?.symbol} ${amount}` : `${amount}`), [token, amount]);
   const fromFiatAmount = useMemo(() => {
@@ -95,15 +83,17 @@ export function BridgeReviewSummary() {
     return from.walletAddress;
   }, [from]);
 
-  const fromWalletProviderName = useMemo(() => walletProviderName(from?.web3Provider), [from]);
+  const fromWalletProviderName = useMemo(() => getWalletProviderNameByProvider(from?.web3Provider), [from]);
   const fromNetwork = useMemo(() => from && from.network, [from]);
+  const fromLogo = getWalletLogoByName(fromWalletProviderName);
 
   const toAddress = useMemo(() => {
     if (!to) return '-';
     return to.walletAddress;
   }, [to]);
-  const toWalletProviderName = useMemo(() => walletProviderName(to?.web3Provider), [to]);
+  const toWalletProviderName = useMemo(() => getWalletProviderNameByProvider(to?.web3Provider), [to]);
   const toNetwork = useMemo(() => to?.network, [to]);
+  const toLogo = getWalletLogoByName(toWalletProviderName);
 
   const fetchGasEstimate = useCallback(async () => {
     if (!tokenBridge || !amount || !from || !to || !token) return;
@@ -253,7 +243,7 @@ export function BridgeReviewSummary() {
       >
         {fromWalletProviderName && (
           <MenuItem.FramedLogo
-            logo={logo[fromWalletProviderName] as any}
+            logo={fromLogo}
             sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
           />
         )}
@@ -290,7 +280,7 @@ export function BridgeReviewSummary() {
       >
         {toWalletProviderName && (
           <MenuItem.FramedLogo
-            logo={logo[toWalletProviderName] as any}
+            logo={toLogo}
             sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
           />
         )}
