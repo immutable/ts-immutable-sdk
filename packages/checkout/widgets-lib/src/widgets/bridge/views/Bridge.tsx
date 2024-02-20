@@ -4,9 +4,10 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { TokenFilterTypes } from '@imtbl/checkout-sdk';
+import { TokenFilterTypes, WidgetTheme } from '@imtbl/checkout-sdk';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { useTranslation } from 'react-i18next';
+import { getDefaultTokenImage } from 'lib/utils';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
@@ -22,15 +23,17 @@ const REFRESH_TOKENS_INTERVAL_MS = 10000;
 export interface BridgeProps {
   amount?: string;
   tokenAddress?: string;
+  theme: WidgetTheme;
 }
 
-export function Bridge({ amount, tokenAddress }: BridgeProps) {
+export function Bridge({ amount, tokenAddress, theme }: BridgeProps) {
   const { t } = useTranslation();
   const { bridgeState, bridgeDispatch } = useContext(BridgeContext);
   const { checkout, from } = bridgeState;
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
   const [isTokenBalancesLoading, setIsTokenBalancesLoading] = useState(false);
   const showBackButton = true;
+  const defaultTokenImage = getDefaultTokenImage(checkout.config.environment, theme);
 
   const { page } = useAnalytics();
 
@@ -112,6 +115,7 @@ export function Bridge({ amount, tokenAddress }: BridgeProps) {
         defaultAmount={amount}
         defaultTokenAddress={tokenAddress}
         isTokenBalancesLoading={isTokenBalancesLoading}
+        defaultTokenImage={defaultTokenImage}
       />
     </SimpleLayout>
   );

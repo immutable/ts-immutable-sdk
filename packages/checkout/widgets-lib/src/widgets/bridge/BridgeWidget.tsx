@@ -80,6 +80,7 @@ export default function BridgeWidget({
     isOnRampEnabled,
     isSwapEnabled,
     isBridgeEnabled,
+    theme,
   } = config;
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
@@ -200,7 +201,7 @@ export default function BridgeWidget({
             <WalletNetworkSelectionView />
           )}
           {viewState.view.type === BridgeWidgetViews.BRIDGE_FORM && (
-            <Bridge amount={amount} tokenAddress={tokenAddress} />
+            <Bridge amount={amount} tokenAddress={tokenAddress} theme={theme} />
           )}
           {viewState.view.type === BridgeWidgetViews.BRIDGE_REVIEW && (
             <BridgeReview />

@@ -17,6 +17,7 @@ interface SelectFormProps {
   disabled?: boolean;
   onSelectChange: (value: string) => void;
   coinSelectorHeading: string;
+  defaultTokenImage: string;
 }
 
 export function SelectForm({
@@ -30,6 +31,7 @@ export function SelectForm({
   disabled,
   selectedOption,
   coinSelectorHeading,
+  defaultTokenImage,
 }: SelectFormProps) {
   const [coinSelectorOpen, setCoinSelectorOpen] = useState<boolean>(false);
 
@@ -97,6 +99,7 @@ export function SelectForm({
                 <Option.FramedImage
                   imageUrl={option.icon}
                   circularFrame
+                  defaultImageUrl={defaultTokenImage}
                 />
               )}
               <Option.Label>{option.symbol}</Option.Label>
