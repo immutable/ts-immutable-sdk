@@ -1,0 +1,16 @@
+{
+  "name": "@examples/x-client",
+  "packageManager": "yarn@3.6.1",
+  "dependencies": {
+    "@imtbl/sdk": "file:../../sdk",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.19",
+    "tsx": "^4.7.1"
+  },
+  "scripts": {
+    "stark:randomKey": "tsx  ./src/starkKey.ts"
+  }
+}
