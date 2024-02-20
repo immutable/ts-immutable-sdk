@@ -160,7 +160,7 @@ export class Passport {
     const { useCachedSession = false } = options || {};
     let user = null;
     try {
-      user = await this.authManager.getUser();
+      user = await this.authManager.getUser(); // CHECKED
     } catch (error) {
       if (useCachedSession) {
         throw error;
@@ -254,22 +254,22 @@ export class Passport {
   }
 
   public async getUserInfo(): Promise<UserProfile | undefined> {
-    const user = await this.authManager.getUser();
+    const user = await this.authManager.getUser(); // CHECKED
     return user?.profile;
   }
 
   public async getIdToken(): Promise<string | undefined> {
-    const user = await this.authManager.getUser();
+    const user = await this.authManager.getUser(); // CHECKED
     return user?.idToken;
   }
 
   public async getAccessToken(): Promise<string | undefined> {
-    const user = await this.authManager.getUser();
+    const user = await this.authManager.getUser(); // CHECKED
     return user?.accessToken;
   }
 
   public async getLinkedAddresses(): Promise<string[]> {
-    const user = await this.authManager.getUser();
+    const user = await this.authManager.getUser(); // CHECKED
     if (!user?.profile.sub) {
       return [];
     }

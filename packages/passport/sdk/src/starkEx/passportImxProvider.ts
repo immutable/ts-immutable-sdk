@@ -26,7 +26,7 @@ import TypedEventEmitter from '../utils/typedEventEmitter';
 import AuthManager from '../authManager';
 import GuardianClient from '../guardian';
 import {
-  PassportEventMap, PassportEvents, UserImx, User, IMXSigners,
+  PassportEventMap, PassportEvents, UserImx, User, IMXSigners, isUserImx,
 } from '../types';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import {
@@ -112,7 +112,7 @@ export class PassportImxProvider implements IMXProvider {
    * @see getAuthenticatedUserAndSigners
    *
    */
-  private async initialiseSigners(): Promise<void> {
+  private initialiseSigners() {
     const generateSigners = async (): Promise<IMXSigners> => {
       const user = await this.authManager.getUser();
       // The user will be present because the factory validates it
@@ -138,7 +138,7 @@ export class PassportImxProvider implements IMXProvider {
   }
 
   protected async getAuthenticatedUserAndSigners(): Promise<AuthenticatedUserAndSigners> {
-    const user = await this.authManager.getUser();
+    const user = await this.authManager.getUser(); // CHECKED
     if (!user || !this.signers) {
       throw new PassportError(
         'User has been logged out',
@@ -160,7 +160,6 @@ export class PassportImxProvider implements IMXProvider {
 
   protected async getRegisteredImxUserAndSigners(): Promise<RegisteredUserAndSigners> {
     const { user, starkSigner, ethSigner } = await this.getAuthenticatedUserAndSigners();
-    const isUserImx = (oidcUser: User | null): oidcUser is UserImx => oidcUser?.imx !== undefined;
 
     if (!isUserImx(user)) {
       throw new PassportError(

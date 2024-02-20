@@ -53,7 +53,7 @@ export class PassportImxProviderFactory {
   }
 
   public async getProviderSilent(): Promise<IMXProvider | null> {
-    const user = await this.authManager.getUser();
+    const user = await this.authManager.getUser(); // CHECKED
     if (!user) {
       return null;
     }
