@@ -30,6 +30,7 @@ interface SelectInputProps {
   textInputMaxButtonClick?: () => void;
   onSelectChange: (value: OptionKey) => void;
   selectedOption?: OptionKey;
+  defaultTokenImage: string;
 }
 
 export function SelectInput({
@@ -54,6 +55,7 @@ export function SelectInput({
   selectInputDisabled,
   selectedOption,
   coinSelectorHeading,
+  defaultTokenImage,
 }: SelectInputProps) {
   return (
     <Box sx={selectInputBoxStyle}>
@@ -68,6 +70,7 @@ export function SelectInput({
           disabled={selectInputDisabled}
           selectedOption={selectedOption}
           coinSelectorHeading={coinSelectorHeading}
+          defaultTokenImage={defaultTokenImage}
         />
       </Box>
       <Box sx={inputStyle}>

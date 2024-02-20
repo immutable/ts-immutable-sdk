@@ -56,6 +56,7 @@ export function SelectForm({
       <CoinSelector
         heading={coinSelectorHeading}
         options={coinSelectorOptions}
+        defaultTokenImage={defaultTokenImage}
         optionsLoading={optionsLoading ?? false}
         visible={coinSelectorOpen}
         onCloseDrawer={() => setCoinSelectorOpen(false)}
