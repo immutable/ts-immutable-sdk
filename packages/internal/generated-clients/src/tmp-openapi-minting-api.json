@@ -1814,7 +1814,7 @@
         }
       }
     },
-    "/v1/chains/{chain_name}/collections/{contract_address}/nfts/mint-requests": {
+    "/experimental/chains/{chain_name}/collections/{contract_address}/nfts/mint-requests": {
       "post": {
         "description": "Create a mint request to mint a set of NFTs for a given collection",
         "security": [
@@ -1908,7 +1908,7 @@
       },
       "get": {
         "description": "Retrieve the status of all mints for a given contract address",
-        "summary": "Mint NFTs",
+        "summary": "List mint requests",
         "security": [
           {
             "ImmutableApiKey": [
@@ -1997,10 +1997,10 @@
         }
       }
     },
-    "/v1/chains/{chain_name}/collections/{contract_address}/nfts/mint-requests/{reference_id}": {
+    "/experimental/chains/{chain_name}/collections/{contract_address}/nfts/mint-requests/{reference_id}": {
       "get": {
         "description": "Retrieve the status of a mint request identified by its reference_id",
-        "summary": "Mint NFTs",
+        "summary": "Get mint request by reference ID",
         "security": [
           {
             "ImmutableApiKey": [
