@@ -60,26 +60,28 @@ export function WalletList(props: WalletListProps) {
   const { isWalletConnectEnabled, walletConnectBusy, openWalletConnectModal } = useWalletConnect({ checkout });
 
   const connectCallback = async (ethereumProvider) => {
-    const web3Provider = new Web3Provider(ethereumProvider as any);
-    selectWeb3Provider(web3Provider);
+    if (ethereumProvider.connected && ethereumProvider.session) {
+      const web3Provider = new Web3Provider(ethereumProvider as any);
+      selectWeb3Provider(web3Provider);
 
-    const chainId = await web3Provider.getSigner().getChainId();
-    if (chainId !== targetChainId) {
+      const chainId = await web3Provider.getSigner().getChainId();
+      if (chainId !== targetChainId) {
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: { type: ConnectWidgetViews.SWITCH_NETWORK },
+          },
+        });
+        return;
+      }
+
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
-          view: { type: ConnectWidgetViews.SWITCH_NETWORK },
+          view: { type: ConnectWidgetViews.SUCCESS },
         },
       });
-      return;
     }
-
-    viewDispatch({
-      payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: { type: ConnectWidgetViews.SUCCESS },
-      },
-    });
   }
 
   const handleWalletConnectConnection = async () => {
