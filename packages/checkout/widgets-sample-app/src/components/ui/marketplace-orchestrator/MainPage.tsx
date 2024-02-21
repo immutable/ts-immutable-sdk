@@ -31,10 +31,16 @@ const checkout = new Checkout({
 })
 
 export const MainPage = () => {
+  // local state for enabling/disabling and changing buttons
+  const [doneSwap, setDoneSwap] = useState<boolean>(false);
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('en');
+  const [selectedTheme, setSelectedTheme] = useState<WidgetTheme>(WidgetTheme.DARK);
+  const [web3Provider, setWeb3Provider] = useState<Web3Provider | undefined>(undefined);
+
   const widgetsFactory = useMemo(() => new WidgetsFactory(
     checkout,
     {
-      theme: WidgetTheme.DARK,
+      theme: selectedTheme,
       walletConnect: {
         projectId: '938b553484e344b1e0b4bb80edf8c362',
         metadata: {
@@ -44,7 +50,7 @@ export const MainPage = () => {
           icons: []
         }
       }
-    }), [checkout]);
+    }), [checkout, selectedTheme]);
 
   const connectWidget = useMemo(() => widgetsFactory.create(WidgetType.CONNECT), [widgetsFactory]);
   const walletWidget = useMemo(() => widgetsFactory.create(WidgetType.WALLET), [widgetsFactory]);
@@ -57,11 +63,6 @@ export const MainPage = () => {
   bridgeWidget.addListener(BridgeEventType.CLOSE_WIDGET, () => { bridgeWidget.unmount() });
   swapWidget.addListener(SwapEventType.CLOSE_WIDGET, () => swapWidget.unmount());
   onRampWidget.addListener(OnRampEventType.CLOSE_WIDGET, () => { onRampWidget.unmount() });
-
-  // local state for enabling/disabling and changing buttons
-  const [doneSwap, setDoneSwap] = useState<boolean>(false);
-  const [selectedLanguage, setSelectedLanguage] = useState<string>('en');
-  const [web3Provider, setWeb3Provider] = useState<Web3Provider | undefined>(undefined);
 
   useEffect(() => {
     connectWidget.addListener(ConnectEventType.CLOSE_WIDGET, () => connectWidget.unmount());
@@ -133,7 +134,24 @@ export const MainPage = () => {
     bridgeWidget.update(languageUpdate);
     swapWidget.update(languageUpdate);
     onRampWidget.update(languageUpdate);
-  }, [onRampWidget, web3Provider])
+  }, [onRampWidget, web3Provider]);
+
+
+  const toggleTheme = useCallback(() => {
+    let theme;
+    if (selectedTheme === WidgetTheme.DARK) {
+      theme = WidgetTheme.LIGHT
+    } else {
+      theme = WidgetTheme.DARK
+    }
+    setSelectedTheme(theme);
+    const themeUpdate: WidgetProperties<any> = { config: { theme } } as WidgetProperties<any>;
+    connectWidget.update(themeUpdate);
+    walletWidget.update(themeUpdate);
+    bridgeWidget.update(themeUpdate);
+    swapWidget.update(themeUpdate);
+    onRampWidget.update(themeUpdate);
+  }, [selectedTheme, connectWidget, walletWidget, bridgeWidget, swapWidget, onRampWidget]);
 
   return (
     <Box sx={{ minWidth: '100vw', minHeight: '100vh', width: '100%', height: '100%', backgroundColor: 'base.color.brand.6' }}>
@@ -145,6 +163,7 @@ export const MainPage = () => {
           <Button onClick={openSwapWidget}>Swap</Button>
           <Button onClick={openBridgeWidget}>Bridge</Button>
           <Button onClick={openOnRampWidget}>On-ramp</Button>
+          <Button onClick={toggleTheme}>Toggle theme</Button>
           <LanguageSelector onLanguageChange={(language: string) => updateLanguage(language)} language={selectedLanguage} />
         </Box>
         {passport && web3Provider && (web3Provider.provider as any)?.isPassport && <Button onClick={logout}>Passport Logout</Button>}

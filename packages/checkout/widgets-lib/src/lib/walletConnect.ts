@@ -1,6 +1,6 @@
 import { WalletConnectModal } from '@walletconnect/modal';
 import EthereumProvider from '@walletconnect/ethereum-provider';
-import { ChainId } from '@imtbl/checkout-sdk';
+import { ChainId, WidgetTheme } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 
 export type WalletConnectConfiguration = {
@@ -22,6 +22,8 @@ export class WalletConnectManager {
   private initialised: boolean = false;
 
   private environment!: Environment;
+
+  private theme!: WidgetTheme;
 
   private walletConnectConfig!: WalletConnectConfiguration;
 
@@ -53,12 +55,13 @@ export class WalletConnectManager {
     return WalletConnectManager.instance;
   }
 
-  public initialise(environment: Environment, config: WalletConnectConfiguration): void {
+  public initialise(environment: Environment, config: WalletConnectConfiguration, theme: WidgetTheme): void {
     if (!this.validateConfig(config)) {
       throw new Error('Incorrect Wallet Connect configuration');
     }
     this.walletConnectConfig = config;
     this.environment = environment;
+    this.theme = theme;
     this.initialised = true;
   }
 
@@ -81,6 +84,7 @@ export class WalletConnectManager {
           // '1ae92b26df02f0abca6304df07debccd18262fdf5fe82daa81593582dac9a369', // Rainbow
         ],
         explorerExcludedWalletIds: 'ALL',
+        themeMode: this.theme,
       });
       this.walletConnectModal = modal;
     }
@@ -128,7 +132,7 @@ export class WalletConnectManager {
             'wallet_scanQRCode',
           ],
           qrModalOptions: {
-            themeMode: 'dark',
+            themeMode: this.theme,
           },
           rpcMap: {
             [ChainId.ETHEREUM]: 'https://checkout-api.immutable.com/v1/rpc/eth-mainnet',
