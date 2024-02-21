@@ -136,7 +136,8 @@ export const MainPage = () => {
     onRampWidget.update(languageUpdate);
   }, [onRampWidget, web3Provider]);
 
-
+  // When widgets are already mounted, the theme only changes once
+  // When the widgets are mounted, the WalletConnect theme is fixed to the theme before widget is mounted
   const toggleTheme = useCallback(() => {
     let theme;
     if (selectedTheme === WidgetTheme.DARK) {
