@@ -365,7 +365,9 @@ export class TokenBridge {
     let contract: ethers.Contract;
     let contractMethods: Record<string, string>;
     let contractAddress: string;
+    let contractAction: BridgeFeeActions;
     if (sourceChainId === this.config.bridgeInstance.rootChainID) {
+      contractAction = BridgeFeeActions.DEPOSIT;
       contractMethods = bridgeMethods.deposit;
       contractAddress = this.config.bridgeContracts.rootERC20BridgeFlowRate;
       contract = await withBridgeError<ethers.Contract>(
@@ -373,13 +375,14 @@ export class TokenBridge {
           const rootContract = new ethers.Contract(
             this.config.bridgeContracts.rootERC20BridgeFlowRate,
             ROOT_ERC20_BRIDGE_FLOW_RATE,
-            // this.config.rootProvider,
+            this.config.rootProvider,
           );
           return rootContract;
         },
         BridgeErrorType.INTERNAL_ERROR,
       );
     } else {
+      contractAction = BridgeFeeActions.WITHDRAW;
       contractMethods = bridgeMethods.withdraw;
       contractAddress = this.config.bridgeContracts.childERC20Bridge;
       contract = await withBridgeError<ethers.Contract>(
@@ -387,7 +390,7 @@ export class TokenBridge {
           const childContract = new ethers.Contract(
             this.config.bridgeContracts.childERC20Bridge,
             CHILD_ERC20_BRIDGE,
-            // this.config.childProvider,
+            this.config.childProvider,
           );
           return childContract;
         },
@@ -396,6 +399,7 @@ export class TokenBridge {
     }
     return {
       contract,
+      contractAction,
       contractMethods,
       contractAddress,
     };
@@ -543,7 +547,6 @@ export class TokenBridge {
       req.token,
       req.sourceChainId,
       req.destinationChainId,
-      BridgeFeeActions.DEPOSIT,
       this.config.rootProvider,
       req.gasMultiplier,
     );
@@ -585,19 +588,9 @@ export class TokenBridge {
     token:string,
     sourceChainId: string,
     destinationChainId: string,
-    action: BridgeFeeActions,
     provider: ethers.providers.Provider,
     gasMultiplier: number = 1.1,
   ): Promise<BridgeTxResponse> {
-    const fees:BridgeFeeResponse = await this.getFeePrivate({
-      action,
-      gasMultiplier,
-      sourceChainId,
-      destinationChainId,
-      token,
-      amount,
-    });
-
     const canReceive:boolean = await this.checkReceiver(provider, recipient);
 
     if (!canReceive) {
@@ -608,6 +601,15 @@ export class TokenBridge {
     }
 
     const getContractRes = await this.getBridgeContract(sourceChainId);
+
+    const fees:BridgeFeeResponse = await this.getFeePrivate({
+      action: getContractRes.contractAction,
+      gasMultiplier,
+      sourceChainId,
+      destinationChainId,
+      token,
+      amount,
+    });
 
     const data = await this.getTxData(
       sender,
