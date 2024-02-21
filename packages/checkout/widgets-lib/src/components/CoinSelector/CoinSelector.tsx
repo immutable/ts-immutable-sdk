@@ -12,13 +12,14 @@ type CoinSelectorProps = {
   onCloseDrawer?: () => void;
   heading: string;
   options: CoinSelectorOptionProps[];
+  defaultTokenImage: string;
   optionsLoading?: boolean;
   children?: any;
   visible?: boolean;
 };
 
 export function CoinSelector({
-  heading, options, optionsLoading, children, onCloseDrawer, visible,
+  heading, options, defaultTokenImage, optionsLoading, children, onCloseDrawer, visible,
 }: CoinSelectorProps) {
   const { t } = useTranslation();
   return (
@@ -52,6 +53,7 @@ export function CoinSelector({
               name={name}
               symbol={symbol}
               balance={balance}
+              defaultTokenImage={defaultTokenImage}
             />
           ))}
         </Box>

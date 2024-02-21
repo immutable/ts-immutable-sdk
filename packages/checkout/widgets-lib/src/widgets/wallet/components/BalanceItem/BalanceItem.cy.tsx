@@ -7,6 +7,7 @@ import {
   WalletProviderName,
   IMTBLWidgetEvents,
   GetBalanceResult,
+  WidgetTheme,
 } from '@imtbl/checkout-sdk';
 import { cy } from 'local-cypress';
 import { Environment } from '@imtbl/config';
@@ -77,6 +78,7 @@ describe('BalanceItem', () => {
           <BalanceItem
             balanceInfo={testBalanceInfo}
             bridgeToL2OnClick={() => {}}
+            theme={WidgetTheme.DARK}
           />
         </WalletWidgetTestComponent>
       </ConnectLoaderTestComponent>,
@@ -120,6 +122,7 @@ describe('BalanceItem', () => {
           <BalanceItem
             balanceInfo={testBalanceInfo}
             bridgeToL2OnClick={() => {}}
+            theme={WidgetTheme.DARK}
           />
         </WalletWidgetTestComponent>
       </ConnectLoaderTestComponent>,
@@ -156,6 +159,7 @@ describe('BalanceItem', () => {
           <BalanceItem
             balanceInfo={testBalanceInfo}
             bridgeToL2OnClick={() => {}}
+            theme={WidgetTheme.DARK}
           />
         </WalletWidgetTestComponent>
         ,
@@ -196,6 +200,7 @@ describe('BalanceItem', () => {
           <BalanceItem
             balanceInfo={testBalanceInfo}
             bridgeToL2OnClick={() => {}}
+            theme={WidgetTheme.DARK}
           />
         </WalletWidgetTestComponent>
         ,
@@ -236,6 +241,7 @@ describe('BalanceItem', () => {
           <BalanceItem
             balanceInfo={testBalanceInfo}
             bridgeToL2OnClick={() => {}}
+            theme={WidgetTheme.DARK}
           />
         </WalletWidgetTestComponent>
       </ConnectLoaderTestComponent>,
@@ -286,6 +292,7 @@ describe('BalanceItem', () => {
           <BalanceItem
             balanceInfo={testBalanceInfo}
             bridgeToL2OnClick={() => {}}
+            theme={WidgetTheme.DARK}
           />
         </WalletWidgetTestComponent>
         ,
@@ -347,6 +354,7 @@ describe('BalanceItem', () => {
           <BalanceItem
             balanceInfo={balanceInfoNotInAllowList}
             bridgeToL2OnClick={() => {}}
+            theme={WidgetTheme.DARK}
           />
         </WalletWidgetTestComponent>
         ,
@@ -388,6 +396,7 @@ describe('BalanceItem', () => {
           <BalanceItem
             balanceInfo={testBalanceInfo}
             bridgeToL2OnClick={() => {}}
+            theme={WidgetTheme.DARK}
           />
         </WalletWidgetTestComponent>
         ,
@@ -428,6 +437,7 @@ describe('BalanceItem', () => {
           <BalanceItem
             balanceInfo={testBalanceInfo}
             bridgeToL2OnClick={() => {}}
+            theme={WidgetTheme.DARK}
           />
         </WalletWidgetTestComponent>
       </ConnectLoaderTestComponent>,
@@ -455,6 +465,7 @@ describe('BalanceItem', () => {
           <BalanceItem
             balanceInfo={testBalanceInfo}
             bridgeToL2OnClick={() => {}}
+            theme={WidgetTheme.DARK}
           />
         </WalletWidgetTestComponent>
       </ConnectLoaderTestComponent>,
@@ -506,6 +517,7 @@ describe('BalanceItem', () => {
             <BalanceItem
               balanceInfo={testBalanceInfo}
               bridgeToL2OnClick={() => {}}
+              theme={WidgetTheme.DARK}
             />
           </WalletWidgetTestComponent>
         </ConnectLoaderTestComponent>,
@@ -534,6 +546,7 @@ describe('BalanceItem', () => {
             <BalanceItem
               balanceInfo={testBalanceInfo}
               bridgeToL2OnClick={() => {}}
+              theme={WidgetTheme.DARK}
             />
           </WalletWidgetTestComponent>
         </ConnectLoaderTestComponent>,
