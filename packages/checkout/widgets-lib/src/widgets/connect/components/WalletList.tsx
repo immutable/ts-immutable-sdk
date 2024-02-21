@@ -7,33 +7,33 @@ import {
   WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import {
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
+  useCallback, useContext, useEffect, useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Web3Provider } from '@ethersproject/providers';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { ConnectActions, ConnectContext } from '../context/ConnectContext';
 import { WalletItem } from './WalletItem';
-import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
-import { useAnalytics, UserJourney } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import {
+  SharedViews,
+  ViewActions,
+  ViewContext,
+} from '../../../context/view-context/ViewContext';
+import {
+  useAnalytics,
+  UserJourney,
+} from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { useWalletConnect } from '../../../lib/hooks/useWalletConnect';
 
 export interface WalletListProps {
-  targetChainId: ChainId,
+  targetChainId: ChainId;
   walletFilterTypes?: WalletFilterTypes;
   excludeWallets?: WalletFilter[];
 }
 
 export function WalletList(props: WalletListProps) {
   const { t } = useTranslation();
-  const {
-    targetChainId,
-    walletFilterTypes,
-    excludeWallets,
-  } = props;
+  const { targetChainId, walletFilterTypes, excludeWallets } = props;
   const {
     connectDispatch,
     connectState: { checkout, passport },
@@ -82,17 +82,19 @@ export function WalletList(props: WalletListProps) {
         },
       });
     }
-  }
+  };
 
   const handleWalletConnectConnection = async () => {
     await openWalletConnectModal({
       connectCallback,
-      restoreSession: true
-    })
-  }
+      restoreSession: true,
+    });
+  };
 
   const excludedWallets = useCallback(() => {
-    const passportWalletProvider = { walletProviderName: WalletProviderName.PASSPORT };
+    const passportWalletProvider = {
+      walletProviderName: WalletProviderName.PASSPORT,
+    };
     if (!excludeWallets && !passport) {
       return [passportWalletProvider];
     }
@@ -114,41 +116,43 @@ export function WalletList(props: WalletListProps) {
     getAllowedWallets();
   }, [checkout, excludedWallets, walletFilterTypes]);
 
+  const onWalletClick = useCallback(
+    async (walletProviderName: WalletProviderName) => {
+      track({
+        userJourney: UserJourney.CONNECT,
+        screen: 'ConnectWallet',
+        control: walletProviderName,
+        controlType: 'MenuItem',
+      });
+      if (checkout) {
+        try {
+          const providerResult = await checkout.createProvider({
+            walletProviderName,
+          });
+          const web3Provider = providerResult.provider;
+          selectWeb3Provider(web3Provider);
 
-  const onWalletClick = useCallback(async (walletProviderName: WalletProviderName) => {
-    track({
-      userJourney: UserJourney.CONNECT,
-      screen: 'ConnectWallet',
-      control: walletProviderName,
-      controlType: 'MenuItem',
-    });
-    if (checkout) {
-      try {
-        const providerResult = await checkout.createProvider({
-          walletProviderName,
-        });
-        const web3Provider = providerResult.provider;
-        selectWeb3Provider(web3Provider);
+          viewDispatch({
+            payload: {
+              type: ViewActions.UPDATE_VIEW,
+              view: { type: ConnectWidgetViews.READY_TO_CONNECT },
+            },
+          });
+        } catch (err: any) {
+          // eslint-disable-next-line no-console
+          console.error(err);
 
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: { type: ConnectWidgetViews.READY_TO_CONNECT },
-          },
-        });
-      } catch (err: any) {
-        // eslint-disable-next-line no-console
-        console.error(err);
-
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: { type: SharedViews.ERROR_VIEW, error: err },
-          },
-        });
+          viewDispatch({
+            payload: {
+              type: ViewActions.UPDATE_VIEW,
+              view: { type: SharedViews.ERROR_VIEW, error: err },
+            },
+          });
+        }
       }
-    }
-  }, [track]);
+    },
+    [track],
+  );
 
   return (
     <Box
@@ -168,29 +172,28 @@ export function WalletList(props: WalletListProps) {
           key={wallet.walletProviderName}
         />
       ))}
-      {isWalletConnectEnabled
-        && (
-          <MenuItem
-            testId="wallet-list-walletconnect"
-            size="medium"
-            emphasized
-            disabled={walletConnectBusy}
-            onClick={() => handleWalletConnectConnection()}
-            sx={{ marginBottom: 'base.spacing.x1' }}
-          >
-            <MenuItem.FramedLogo
-              logo="WalletConnectSymbol"
-              sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
-            />
-            <MenuItem.Label size="medium">
-              {t('wallets.walletconnect.heading')}
-            </MenuItem.Label>
-            <MenuItem.IntentIcon />
-            <MenuItem.Caption>
-              {t('wallets.walletconnect.description')}
-            </MenuItem.Caption>
-          </MenuItem>
-        )}
+      {isWalletConnectEnabled && (
+        <MenuItem
+          testId="wallet-list-walletconnect"
+          size="medium"
+          emphasized
+          disabled={walletConnectBusy}
+          onClick={() => handleWalletConnectConnection()}
+          sx={{ marginBottom: 'base.spacing.x1' }}
+        >
+          <MenuItem.FramedLogo
+            logo="WalletConnectSymbol"
+            sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
+          />
+          <MenuItem.Label size="medium">
+            {t('wallets.walletconnect.heading')}
+          </MenuItem.Label>
+          <MenuItem.IntentIcon />
+          <MenuItem.Caption>
+            {t('wallets.walletconnect.description')}
+          </MenuItem.Caption>
+        </MenuItem>
+      )}
     </Box>
   );
 }

@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  useCallback, useEffect, useRef, useState,
+} from 'react';
 import EthereumProvider from '@walletconnect/ethereum-provider';
 import { WalletConnectModal } from '@walletconnect/modal';
-import { WalletConnectManager } from '../walletConnect';
 import { Checkout } from '@imtbl/checkout-sdk';
+import { WalletConnectManager } from '../walletConnect';
 
 export interface UseWalletConnectParams {
   checkout: Checkout | null;
@@ -21,15 +23,15 @@ export const useWalletConnect = ({ checkout }: UseWalletConnectParams) => {
   const displayUri = useRef<string>('');
 
   useEffect(() => {
-    if(!checkout) return;
+    if (!checkout) return;
     (async () => {
-      const connectConfig = await checkout.config.remote.getConfig('connect');
+      // const connectConfig = await checkout.config.remote.getConfig('connect');
       setIsWalletConnectEnabled(
-        /**connectConfig?.walletConnect */ true && 
-        WalletConnectManager.getInstance().isInitialised
-        );
+        /** connectConfig?.walletConnect */ true
+        && WalletConnectManager.getInstance().isInitialised,
+      );
     })();
-  }, [checkout])
+  }, [checkout]);
 
   useEffect(() => {
     if (WalletConnectManager.getInstance().isInitialised) {
@@ -40,11 +42,10 @@ export const useWalletConnect = ({ checkout }: UseWalletConnectParams) => {
 
   const openWalletConnectModal = useCallback(async ({
     connectCallback,
-    restoreSession = true
+    restoreSession = true,
   }: OpenWalletConnectModalParams) => (
     new Promise((resolve, reject) => {
       if (!ethereumProvider || !walletConnectModal) reject('WalletConnect not initialized');
-      let successfullyRestored = false;
       setWalletConnectBusy(true);
 
       if (restoreSession) {
@@ -54,32 +55,32 @@ export const useWalletConnect = ({ checkout }: UseWalletConnectParams) => {
         // if then the ethereumProvider is connected and has a session
         // call connectCallback and return
         // if not we need to create a new session
-        
+
         try {
           const existingPairings = ethereumProvider?.signer.client.core.pairing.getPairings();
-          console.log('existingPairings', existingPairings);
+          // console.log('existingPairings', existingPairings);
           if (existingPairings && existingPairings.length > 0 && existingPairings[0].topic !== '') {
-            console.log('restoring existing pairing for', existingPairings[0])
+            // console.log('restoring existing pairing for', existingPairings[0]);
             ethereumProvider?.signer.client.core.pairing.activate({ topic: existingPairings[0].topic })
               .then(() => {
                 if (connectCallback && ethereumProvider.connected && ethereumProvider.session) {
-                  successfullyRestored = true;
                   connectCallback(ethereumProvider);
                   displayUri.current = '';
                 } else {
                   // eslint-disable-next-line no-console
-                  console.log('activate succeeded but there is no connected session')
+                  console.log('activate succeeded but there is no connected session');
                 }
+              // eslint-disable-next-line no-console
               }).catch((err) => console.log('activate existing pairing error', err));
           }
-        } catch(err) {
-          console.error(err)
+        } catch (err) {
+          // eslint-disable-next-line no-console
+          console.error(err);
         }
       }
 
       // Hook into next available display_uri
       ethereumProvider?.once('display_uri', (data) => {
-
         // save the displayUri in case the user closes the modal without connecting
         displayUri.current = data;
 
@@ -115,18 +116,9 @@ export const useWalletConnect = ({ checkout }: UseWalletConnectParams) => {
         }
       });
 
-      // ethereumProvider?.once('session_event', (data) => {
-      //   console.log("session_event", data)
-      // })
-
-      // ethereumProvider?.once('session_update', (data) => {
-      //   console.log("session_update", data)
-      // })
-
       // if we have a display uri that hasn't been used and no connected session
       // open the modal
-      if(displayUri.current !== '' && !ethereumProvider?.session) {
-        console.log('displayUri', displayUri.current)
+      if (displayUri.current !== '' && !ethereumProvider?.session) {
         walletConnectModal?.openModal({
           uri: displayUri.current,
         })
@@ -139,7 +131,7 @@ export const useWalletConnect = ({ checkout }: UseWalletConnectParams) => {
             setWalletConnectBusy(true);
             reject(error);
           });
-      } else if(!ethereumProvider?.session) {
+      } else if (!ethereumProvider?.session) {
         // if we don't have a display uri and no connected session
         // call connect to generate display_uri event
         ethereumProvider?.connect();
@@ -147,21 +139,11 @@ export const useWalletConnect = ({ checkout }: UseWalletConnectParams) => {
     })
   ), [ethereumProvider, walletConnectModal]);
 
-  // const restoreExistingSession = useCallback(async () => new Promise((resolve) => {
-  //   const existingPairings = ethereumProvider?.signer.client.core.pairing.getPairings();
-  //   if (existingPairings && existingPairings.length > 0) {
-  //     ethereumProvider?.signer.client.core.pairing.activate({ topic: existingPairings[0].topic })
-  //       .then(() => resolve(true));
-  //   } else {
-  //     resolve(false);
-  //   }
-  // }), [ethereumProvider]);
-
   return {
     isWalletConnectEnabled,
     ethereumProvider,
     walletConnectBusy,
     walletConnectModal,
-    openWalletConnectModal
+    openWalletConnectModal,
   };
 };

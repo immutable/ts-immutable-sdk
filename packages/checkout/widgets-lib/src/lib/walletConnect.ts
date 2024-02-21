@@ -1,9 +1,7 @@
 import { WalletConnectModal } from '@walletconnect/modal';
 import EthereumProvider from '@walletconnect/ethereum-provider';
 import { ChainId } from '@imtbl/checkout-sdk';
-import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
-import { addProviderListenersForWidgetRoot } from './eip1193Events';
 
 export type WalletConnectConfiguration = {
   projectId: string;
@@ -139,10 +137,6 @@ export class WalletConnectManager {
             [ChainId.IMTBL_ZKEVM_TESTNET]: 'https://rpc.testnet.immutable.com',
           },
         }).then((wcEthereumProvider: EthereumProvider) => {
-          // eslint-disable-next-line no-console
-          console.log('wcEthereumProvider', wcEthereumProvider);
-
-          addProviderListenersForWidgetRoot({ provider: wcEthereumProvider } as unknown as Web3Provider);
           this.ethereumProvider = wcEthereumProvider;
           resolve(this.ethereumProvider);
         });

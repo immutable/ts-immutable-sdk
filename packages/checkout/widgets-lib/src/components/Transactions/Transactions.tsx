@@ -25,6 +25,7 @@ import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAna
 import { useTranslation } from 'react-i18next';
 import { BridgeActions, BridgeContext } from 'widgets/bridge/context/BridgeContext';
 import { WalletDrawer } from 'widgets/bridge/components/WalletDrawer';
+import { useWalletConnect } from 'lib/hooks/useWalletConnect';
 import { sendBridgeWidgetCloseEvent } from '../../widgets/bridge/BridgeWidgetEvents';
 import { Shimmer } from './Shimmer';
 import {
@@ -37,7 +38,6 @@ import { SupportMessage } from './SupportMessage';
 import { KnownNetworkMap } from './transactionsType';
 import { TransactionList } from './TransactionList';
 import { NoTransactions } from './NoTransactions';
-import { useWalletConnect } from 'lib/hooks/useWalletConnect';
 
 type TransactionsProps = {
   onBackButtonClick: () => void;
@@ -282,7 +282,7 @@ export function Transactions({ onBackButtonClick }: TransactionsProps) {
       options.push(WalletProviderName.PASSPORT);
     }
     if (isWalletConnectEnabled) {
-      options.push('walletconnect')
+      options.push('walletconnect');
     }
     return options;
   }, [checkout]);
