@@ -223,6 +223,7 @@ export class BlockchainData {
 
   /**
    * Create a mint request to mint a set of NFTs for a given collection
+   * @experimental
    * @param request - the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the remaining rate limits
    * @throws {@link index.APIError}
@@ -240,6 +241,7 @@ export class BlockchainData {
 
   /**
    * List all mint requests for a given contract address
+   * @experimental
    * @param request - the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with a list of mint requests
    * @throws {@link index.APIError}
@@ -257,6 +259,7 @@ export class BlockchainData {
 
   /**
    * Retrieve the status of a single mint request identified by its reference ID
+   * @experimental
    * @param request - the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with a single mint request
    * @throws {@link index.APIError}
