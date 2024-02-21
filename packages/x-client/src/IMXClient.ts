@@ -831,6 +831,21 @@ export class IMXClient {
   //       throw formatError(err);
   //     });
   // }
+
+  // /**
+  //  * Reject a PrimarySale
+  //  * @param ethSigner - eth signer matching the 'studio_ether_key' of the primary sale
+  //  * @param primarySaleId - id of the primary sale to be rejected
+  //  * @returns a promise that resolves with the rejected PrimarySale
+  //  * @throws {@link index.IMXError}
+  //  */
+  // public rejectPrimarySale(ethSigner: EthSigner, primarySaleId: number) {
+  //   return this.workflows
+  //     .rejectPrimarySale(ethSigner, primarySaleId)
+  //     .catch(err => {
+  //       throw formatError(err);
+  //     });
+  // }
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -870,4 +885,5 @@ export const ImmutableX = IMXClient;
  * exchangeTransfer
  * createPrimarySale
  * acceptPrimarySale
+ * rejectPrimarySale
  */
