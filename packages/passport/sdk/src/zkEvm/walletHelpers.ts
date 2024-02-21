@@ -1,9 +1,16 @@
-import { BigNumber, BigNumberish, ethers } from 'ethers';
+import {
+  BigNumber,
+  BigNumberish,
+  Contract,
+  constants,
+  utils,
+} from 'ethers';
 import { walletContracts } from '@0xsequence/abi';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { Signer } from '@ethersproject/abstract-signer';
 import { v1 as sequenceCoreV1 } from '@0xsequence/core';
 import { MetaTransaction, MetaTransactionNormalised, TypedDataPayload } from './types';
+import logger from '../utils/logger';
 
 const SIGNATURE_WEIGHT = 1; // Weight of a single signature in the multi-sig
 const TRANSACTION_SIGNATURE_THRESHOLD = 1; // Total required weight in the multi-sig for a transaction
@@ -24,36 +31,44 @@ export function getNormalisedTransactions(txs: MetaTransaction[]): MetaTransacti
   return txs.map((t) => ({
     delegateCall: t.delegateCall === true,
     revertOnError: t.revertOnError === true,
-    gasLimit: t.gasLimit ?? ethers.constants.Zero,
-    target: t.to ?? ethers.constants.AddressZero,
-    value: t.value ?? ethers.constants.Zero,
+    gasLimit: t.gasLimit ?? constants.Zero,
+    target: t.to ?? constants.AddressZero,
+    value: t.value ?? constants.Zero,
     data: t.data ?? [],
   }));
 }
 
 export function digestOfTransactionsAndNonce(nonce: BigNumberish, normalisedTransactions: MetaTransactionNormalised[]) {
-  const packMetaTransactionsNonceData = ethers.utils.defaultAbiCoder.encode(
+  const packMetaTransactionsNonceData = utils.defaultAbiCoder.encode(
     ['uint256', META_TRANSACTIONS_TYPE],
     [nonce, normalisedTransactions],
   );
-  return ethers.utils.keccak256(packMetaTransactionsNonceData);
+  return utils.keccak256(packMetaTransactionsNonceData);
 }
 
-export const getNonce = async (jsonRpcProvider: JsonRpcProvider, smartContractWalletAddress: string) => {
-  const code = await jsonRpcProvider.send('eth_getCode', [smartContractWalletAddress, 'latest']);
-  if (code && code !== '0x') {
-    const contract = new ethers.Contract(
+export const getNonce = async (
+  jsonRpcProvider: JsonRpcProvider,
+  smartContractWalletAddress: string,
+): Promise<BigNumber> => {
+  try {
+    const contract = new Contract(
       smartContractWalletAddress,
       walletContracts.mainModule.abi,
       jsonRpcProvider,
     );
-    return contract.nonce();
+    const result = await contract.nonce();
+    if (result instanceof BigNumber) {
+      return result;
+    }
+  } catch (error) {
+    logger.warn('Failed to retrieve nonce', error);
   }
-  return 0;
+
+  return BigNumber.from(0);
 };
 
 const encodeMessageSubDigest = (chainId: BigNumber, walletAddress: string, digest: string): string => (
-  ethers.utils.solidityPack(
+  utils.solidityPack(
     ['string', 'uint256', 'address', 'bytes32'],
     [ETH_SIGN_PREFIX, chainId, walletAddress, digest],
   )
@@ -72,10 +87,10 @@ export const getSignedMetaTransactions = async (
   const digest = digestOfTransactionsAndNonce(nonce, normalisedMetaTransactions);
   const completePayload = encodeMessageSubDigest(chainId, walletAddress, digest);
 
-  const hash = ethers.utils.keccak256(completePayload);
+  const hash = utils.keccak256(completePayload);
 
   // Sign the digest
-  const hashArray = ethers.utils.arrayify(hash);
+  const hashArray = utils.arrayify(hash);
   const ethsigNoType = await signer.signMessage(hashArray);
   const signedDigest = `${ethsigNoType}${ETH_SIGN_FLAG}`;
 
@@ -94,7 +109,7 @@ export const getSignedMetaTransactions = async (
   });
 
   // Encode the transaction;
-  const walletInterface = new ethers.utils.Interface(walletContracts.mainModule.abi);
+  const walletInterface = new utils.Interface(walletContracts.mainModule.abi);
   return walletInterface.encodeFunctionData(walletInterface.getFunction('execute'), [
     normalisedMetaTransactions,
     nonce,
@@ -120,14 +135,14 @@ export const getSignedTypedData = async (
   delete types.EIP712Domain;
 
   // Hash the EIP712 payload and generate the complete payload
-  const { _TypedDataEncoder: typedDataEncoder } = ethers.utils;
+  const { _TypedDataEncoder: typedDataEncoder } = utils;
   const typedDataHash = typedDataEncoder.hash(typedData.domain, types, typedData.message);
   const messageSubDigest = encodeMessageSubDigest(chainId, walletAddress, typedDataHash);
-  const hash = ethers.utils.keccak256(messageSubDigest);
+  const hash = utils.keccak256(messageSubDigest);
 
   // Sign the sub digest
   // https://github.com/immutable/wallet-contracts/blob/7824b5f24b2e0eb2dc465ecb5cd71f3984556b73/src/contracts/modules/commons/ModuleAuth.sol#L155
-  const hashArray = ethers.utils.arrayify(hash);
+  const hashArray = utils.arrayify(hash);
   const ethsigNoType = await signer.signMessage(hashArray);
   const signedDigest = `${ethsigNoType}${ETH_SIGN_FLAG}`;
 

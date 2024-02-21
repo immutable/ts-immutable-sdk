@@ -10,6 +10,7 @@ import DeviceCredentialsManager from 'storage/device_credentials_manager';
 import * as crypto from 'crypto';
 import jwt_decode from 'jwt-decode';
 import { getDetail, Detail } from '@imtbl/metrics';
+import logger from './utils/logger';
 import { isTokenExpired } from './utils/token';
 import { PassportErrorType, withPassportError } from './errors/passportError';
 import {
@@ -183,8 +184,7 @@ export default class AuthManager {
     try {
       user = await this.getUser();
     } catch (err) {
-      // eslint-disable-next-line no-console
-      console.warn('failed to retrieve a cached user session:', err);
+      logger.warn('failed to retrieve a cached user session:', err);
     }
 
     return user || this.login();

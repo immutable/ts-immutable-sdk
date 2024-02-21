@@ -1,6 +1,12 @@
-import { BigNumber, Wallet } from 'ethers';
-import { getSignedMetaTransactions, getSignedTypedData } from './walletHelpers';
+import { BigNumber, Wallet, Contract } from 'ethers';
+import { JsonRpcProvider } from '@ethersproject/providers';
+import { getNonce, getSignedMetaTransactions, getSignedTypedData } from './walletHelpers';
 import { TypedDataPayload } from './types';
+
+jest.mock('ethers', () => ({
+  ...jest.requireActual('ethers'),
+  Contract: jest.fn(),
+}));
 
 // SCW addr
 const walletAddress = '0x7EEC32793414aAb720a90073607733d9e7B0ecD0';
@@ -107,6 +113,38 @@ describe('getSignedTypedData', () => {
         eoaSignatureWithoutPrefix,
         ethSignFlag,
       ].join(''));
+    });
+  });
+});
+
+describe('getNonce', () => {
+  const jsonRpcProvider = {} as JsonRpcProvider;
+  const nonceMock = jest.fn();
+
+  beforeEach(() => {
+    jest.resetAllMocks();
+    (Contract as unknown as jest.Mock).mockImplementation(() => ({
+      nonce: nonceMock,
+    }));
+  });
+
+  describe('when an error is thrown', () => {
+    it('should return 0', async () => {
+      nonceMock.mockRejectedValue(new Error('call revert exception'));
+
+      const result = await getNonce(jsonRpcProvider, walletAddress);
+
+      expect(result).toEqual(BigNumber.from(0));
+    });
+  });
+
+  describe('when a BigNumber is returned', () => {
+    it('should return a number', async () => {
+      nonceMock.mockResolvedValue(BigNumber.from(20));
+
+      const result = await getNonce(jsonRpcProvider, walletAddress);
+
+      expect(result).toEqual(BigNumber.from(20));
     });
   });
 });

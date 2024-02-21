@@ -45,12 +45,12 @@ export const mswHandlers = {
     success: rest.post('https://rpc.testnet.immutable.com', async (req, res, ctx) => {
       const body = await req.json<JsonRpcRequestPayload>();
       switch (body.method) {
-        case 'eth_getCode': {
+        case 'eth_call': {
           return res(
             ctx.json({
               id: body.id,
               jsonrpc: '2.0',
-              result: '0x',
+              result: '0x0',
             }),
           );
         }
