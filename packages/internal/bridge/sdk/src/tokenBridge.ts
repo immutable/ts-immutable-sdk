@@ -217,7 +217,7 @@ export class TokenBridge {
       from: dummyAddress,
       to: getContractRes.contractAddress,
       value: txValue,
-      // chainId: parseInt(sourceChainId, 10),
+      chainId: parseInt(sourceChainId, 10),
       gasPrice: gasPriceInWei,
     };
   }
@@ -228,10 +228,8 @@ export class TokenBridge {
     txnGasLimitInWei: number,
   ): Promise<ethers.BigNumber> {
     const feeData: FeeData = await provider.getFeeData();
-
     const gasPriceInWei = getGasPriceInWei(feeData);
     if (!gasPriceInWei) return ethers.BigNumber.from(0);
-
     return gasPriceInWei.mul(txnGasLimitInWei);
   }
 
