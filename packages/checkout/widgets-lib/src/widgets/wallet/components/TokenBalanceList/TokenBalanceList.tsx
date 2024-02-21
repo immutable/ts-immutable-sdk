@@ -1,5 +1,6 @@
 import { Body, Box } from '@biom3/react';
 import { useTranslation } from 'react-i18next';
+import { WidgetTheme } from '@imtbl/checkout-sdk';
 import { BalanceItem } from '../BalanceItem/BalanceItem';
 import { tokenBalanceListStyle, noTokensStyle } from './TokenBalanceListStyles';
 import { BalanceInfo } from '../../functions/tokenBalances';
@@ -12,11 +13,13 @@ const filterZeroBalances = (balanceInfoItems: BalanceInfo[]) => balanceInfoItems
 
 interface TokenBalanceListProps {
   balanceInfoItems: BalanceInfo[];
+  theme: WidgetTheme;
   bridgeToL2OnClick: (address?: string) => void;
 }
 
 export function TokenBalanceList({
   balanceInfoItems,
+  theme,
   bridgeToL2OnClick,
 }: TokenBalanceListProps) {
   const { t } = useTranslation();
@@ -35,6 +38,7 @@ export function TokenBalanceList({
           key={balance.id}
           balanceInfo={balance}
           bridgeToL2OnClick={bridgeToL2OnClick}
+          theme={theme}
         />
       ))}
     </Box>
