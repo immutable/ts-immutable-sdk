@@ -65,6 +65,8 @@ models/create-counterfactual-address-request.ts
 models/create-counterfactual-address-res-deprecated.ts
 models/create-counterfactual-address-res.ts
 models/create-listing-request-body.ts
+models/create-mint-request-request.ts
+models/create-mint-request-result.ts
 models/deposit.ts
 models/erc1155-item.ts
 models/erc20-item.ts
@@ -95,6 +97,7 @@ models/list-collection-owners-result.ts
 models/list-collections-result.ts
 models/list-listings-result.ts
 models/list-metadata-result.ts
+models/list-mint-requests-result.ts
 models/list-nftowners-result.ts
 models/list-nfts-by-owner-result.ts
 models/list-nfts-result.ts
