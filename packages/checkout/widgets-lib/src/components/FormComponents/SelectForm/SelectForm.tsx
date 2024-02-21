@@ -101,6 +101,7 @@ export function SelectForm({
                   imageUrl={option.icon}
                   circularFrame
                   defaultImageUrl={defaultTokenImage}
+                  sx={{ background: 'base.color.translucent.standard.100' }}
                 />
               )}
               <Option.Label>{option.symbol}</Option.Label>
