@@ -168,7 +168,7 @@ export class Passport {
       if (useCachedSession) {
         throw error;
       }
-      logger.warn('login failed to retrieve a cached user session', error);
+      logger.warn('Failed to retrieve a cached user session', error);
     }
     if (!user && !useCachedSession) {
       user = await this.authManager.login(options?.anonymousId);

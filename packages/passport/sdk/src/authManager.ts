@@ -184,7 +184,7 @@ export default class AuthManager {
     try {
       user = await this.getUser();
     } catch (err) {
-      logger.warn('failed to retrieve a cached user session:', err);
+      logger.warn('Failed to retrieve a cached user session', err);
     }
 
     return user || this.login();
