@@ -26,6 +26,8 @@
     "getMapping": "node --loader ts-node/esm ./src/getMapping.ts",
     "lint": "eslint ./src --ext .ts --max-warnings=0",
     "mapToken": "node --loader ts-node/esm ./src/mapToken.ts",
+    "multicall": "node --loader ts-node/esm ./src/multicall.ts",
+    "multicallENS": "node --loader ts-node/esm ./src/multicallENS.ts",
     "pending": "node --loader ts-node/esm ./src/pending.ts",
     "setFlowRate": "node --loader ts-node/esm ./src/setFlowRate.ts",
     "status": "node --loader ts-node/esm ./src/status.ts",
