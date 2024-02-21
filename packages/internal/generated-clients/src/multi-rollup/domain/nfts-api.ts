@@ -54,8 +54,8 @@ import { MintRequestStatus } from '../models';
 export const NftsApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Create a mint request to mint a set of NFTs for a given collection
-         * @summary Mint NFTs
+         * [Experimental] Create a mint request to mint a set of NFTs for a given collection
+         * @summary [Experimental] Mint NFTs
          * @param {string} contractAddress The address of contract
          * @param {string} chainName The name of chain
          * @param {CreateMintRequestRequest} createMintRequestRequest the request body
@@ -69,7 +69,7 @@ export const NftsApiAxiosParamCreator = function (configuration?: Configuration)
             assertParamExists('createMintRequest', 'chainName', chainName)
             // verify required parameter 'createMintRequestRequest' is not null or undefined
             assertParamExists('createMintRequest', 'createMintRequestRequest', createMintRequestRequest)
-            const localVarPath = `/experimental/chains/{chain_name}/collections/{contract_address}/nfts/mint-requests`
+            const localVarPath = `/v1/chains/{chain_name}/collections/{contract_address}/nfts/mint-requests`
                 .replace(`{${"contract_address"}}`, encodeURIComponent(String(contractAddress)))
                 .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -101,8 +101,8 @@ export const NftsApiAxiosParamCreator = function (configuration?: Configuration)
             };
         },
         /**
-         * Retrieve the status of a mint request identified by its reference_id
-         * @summary Get mint request by reference ID
+         * [Experimental] Retrieve the status of a mint request identified by its reference_id
+         * @summary [Experimental] Get mint request by reference ID
          * @param {string} contractAddress The address of contract
          * @param {string} chainName The name of chain
          * @param {string} referenceId The ID of the mint request
@@ -116,7 +116,7 @@ export const NftsApiAxiosParamCreator = function (configuration?: Configuration)
             assertParamExists('getMintRequest', 'chainName', chainName)
             // verify required parameter 'referenceId' is not null or undefined
             assertParamExists('getMintRequest', 'referenceId', referenceId)
-            const localVarPath = `/experimental/chains/{chain_name}/collections/{contract_address}/nfts/mint-requests/{reference_id}`
+            const localVarPath = `/v1/chains/{chain_name}/collections/{contract_address}/nfts/mint-requests/{reference_id}`
                 .replace(`{${"contract_address"}}`, encodeURIComponent(String(contractAddress)))
                 .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)))
                 .replace(`{${"reference_id"}}`, encodeURIComponent(String(referenceId)));
@@ -239,8 +239,8 @@ export const NftsApiAxiosParamCreator = function (configuration?: Configuration)
             };
         },
         /**
-         * Retrieve the status of all mints for a given contract address
-         * @summary List mint requests
+         * [Experimental] Retrieve the status of all mints for a given contract address
+         * @summary [Experimental] List mint requests
          * @param {string} contractAddress The address of contract
          * @param {string} chainName The name of chain
          * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
@@ -254,7 +254,7 @@ export const NftsApiAxiosParamCreator = function (configuration?: Configuration)
             assertParamExists('listMintRequests', 'contractAddress', contractAddress)
             // verify required parameter 'chainName' is not null or undefined
             assertParamExists('listMintRequests', 'chainName', chainName)
-            const localVarPath = `/experimental/chains/{chain_name}/collections/{contract_address}/nfts/mint-requests`
+            const localVarPath = `/v1/chains/{chain_name}/collections/{contract_address}/nfts/mint-requests`
                 .replace(`{${"contract_address"}}`, encodeURIComponent(String(contractAddress)))
                 .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -418,8 +418,8 @@ export const NftsApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = NftsApiAxiosParamCreator(configuration)
     return {
         /**
-         * Create a mint request to mint a set of NFTs for a given collection
-         * @summary Mint NFTs
+         * [Experimental] Create a mint request to mint a set of NFTs for a given collection
+         * @summary [Experimental] Mint NFTs
          * @param {string} contractAddress The address of contract
          * @param {string} chainName The name of chain
          * @param {CreateMintRequestRequest} createMintRequestRequest the request body
@@ -431,8 +431,8 @@ export const NftsApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Retrieve the status of a mint request identified by its reference_id
-         * @summary Get mint request by reference ID
+         * [Experimental] Retrieve the status of a mint request identified by its reference_id
+         * @summary [Experimental] Get mint request by reference ID
          * @param {string} contractAddress The address of contract
          * @param {string} chainName The name of chain
          * @param {string} referenceId The ID of the mint request
@@ -471,8 +471,8 @@ export const NftsApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Retrieve the status of all mints for a given contract address
-         * @summary List mint requests
+         * [Experimental] Retrieve the status of all mints for a given contract address
+         * @summary [Experimental] List mint requests
          * @param {string} contractAddress The address of contract
          * @param {string} chainName The name of chain
          * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
@@ -527,8 +527,8 @@ export const NftsApiFactory = function (configuration?: Configuration, basePath?
     const localVarFp = NftsApiFp(configuration)
     return {
         /**
-         * Create a mint request to mint a set of NFTs for a given collection
-         * @summary Mint NFTs
+         * [Experimental] Create a mint request to mint a set of NFTs for a given collection
+         * @summary [Experimental] Mint NFTs
          * @param {NftsApiCreateMintRequestRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -537,8 +537,8 @@ export const NftsApiFactory = function (configuration?: Configuration, basePath?
             return localVarFp.createMintRequest(requestParameters.contractAddress, requestParameters.chainName, requestParameters.createMintRequestRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * Retrieve the status of a mint request identified by its reference_id
-         * @summary Get mint request by reference ID
+         * [Experimental] Retrieve the status of a mint request identified by its reference_id
+         * @summary [Experimental] Get mint request by reference ID
          * @param {NftsApiGetMintRequestRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -567,8 +567,8 @@ export const NftsApiFactory = function (configuration?: Configuration, basePath?
             return localVarFp.listAllNFTs(requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
         },
         /**
-         * Retrieve the status of all mints for a given contract address
-         * @summary List mint requests
+         * [Experimental] Retrieve the status of all mints for a given contract address
+         * @summary [Experimental] List mint requests
          * @param {NftsApiListMintRequestsRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -859,8 +859,8 @@ export interface NftsApiListNFTsByAccountAddressRequest {
  */
 export class NftsApi extends BaseAPI {
     /**
-     * Create a mint request to mint a set of NFTs for a given collection
-     * @summary Mint NFTs
+     * [Experimental] Create a mint request to mint a set of NFTs for a given collection
+     * @summary [Experimental] Mint NFTs
      * @param {NftsApiCreateMintRequestRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -871,8 +871,8 @@ export class NftsApi extends BaseAPI {
     }
 
     /**
-     * Retrieve the status of a mint request identified by its reference_id
-     * @summary Get mint request by reference ID
+     * [Experimental] Retrieve the status of a mint request identified by its reference_id
+     * @summary [Experimental] Get mint request by reference ID
      * @param {NftsApiGetMintRequestRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -907,8 +907,8 @@ export class NftsApi extends BaseAPI {
     }
 
     /**
-     * Retrieve the status of all mints for a given contract address
-     * @summary List mint requests
+     * [Experimental] Retrieve the status of all mints for a given contract address
+     * @summary [Experimental] List mint requests
      * @param {NftsApiListMintRequestsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
