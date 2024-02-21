@@ -267,12 +267,13 @@
         "crypto": {
           "heading": "Coins",
           "caption": "Using the coins balance in your wallet",
-          "disabledCaption": "We can't see enough coins in your balance"
+          "noFundsCaption": "We can't see enough coins in your balance",
+          "disabledCaption": "Currently not available"
         },
         "fiat": {
           "heading": "Card",
           "caption": "GooglePay also available with Transak",
-          "disabledCaption": "Not currently available"
+          "disabledCaption": "Currently not available"
         }
       },
       "insufficientCoinsBanner": {

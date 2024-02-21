@@ -6,12 +6,13 @@ export interface PaymentOptionProps {
   type: SalePaymentTypes;
   onClick: (type: SalePaymentTypes) => void;
   disabled?: boolean;
+  captionType: 'caption' | 'disabledCaption' | 'noFundsCaption';
 }
 
 export function PaymentOption(props: PaymentOptionProps) {
   const { t } = useTranslation();
-  const { type, onClick, disabled } = props;
-  // const optionText = options[type];
+  const { type, onClick, disabled, captionType } = props;
+  const captionText = t(`views.PAYMENT_METHODS.options.${type}.${captionType}`);
 
   const icon: Record<string, IconProps['icon']> = {
     [SalePaymentTypes.CRYPTO]: 'Coins',
@@ -34,9 +35,7 @@ export function PaymentOption(props: PaymentOptionProps) {
       <MenuItem.FramedIcon icon={icon[type]} />
       <MenuItem.Label size="medium">{t(`views.PAYMENT_METHODS.options.${type}.heading`)}</MenuItem.Label>
       {!disabled && <MenuItem.IntentIcon />}
-      <MenuItem.Caption>
-        {t(`views.PAYMENT_METHODS.options.${type}.${disabled ? 'disabledCaption' : 'caption'}`)}
-      </MenuItem.Caption>
+      <MenuItem.Caption>{captionText}</MenuItem.Caption>
     </MenuItem>
   );
 }

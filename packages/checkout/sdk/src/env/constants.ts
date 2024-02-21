@@ -56,11 +56,6 @@ export const DEFAULT_SWAP_ENABLED = true;
  */
 export const DEFAULT_BRIDGE_ENABLED = true;
 
-/**
- * Smart Checkout sale widget default fiat payments enabled flag
- */
-export const DEFAULT_FIAT_PAYMENT_ENABLED = true;
-
 export const TRANSAK_API_BASE_URL = {
   [Environment.SANDBOX]: 'https://global-stg.transak.com',
   [Environment.PRODUCTION]: 'https://global.transak.com/',

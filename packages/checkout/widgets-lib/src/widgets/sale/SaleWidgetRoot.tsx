@@ -19,8 +19,6 @@ import { SaleWidget } from './SaleWidget';
 export class Sale extends Base<WidgetType.SALE> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT;
 
-  protected widgetConfig: WidgetConfigurations[WidgetType.SALE] = {};
-
   // TODO: add specific validation logic for the sale items
   private isValidProucts(products: SaleItem[]): boolean {
     try {
@@ -40,8 +38,6 @@ export class Sale extends Base<WidgetType.SALE> {
       if (config.theme === WidgetTheme.LIGHT) validatedConfig.theme = WidgetTheme.LIGHT;
       else validatedConfig.theme = WidgetTheme.DARK;
     }
-
-    this.widgetConfig = validatedConfig;
 
     return {
       config: validatedConfig,
@@ -101,6 +97,7 @@ export class Sale extends Base<WidgetType.SALE> {
         getL2ChainId(this.checkout!.config),
       ],
     };
+
     this.reactRoot.render(
       <React.StrictMode>
         <CustomAnalyticsProvider checkout={this.checkout}>
@@ -114,7 +111,7 @@ export class Sale extends Base<WidgetType.SALE> {
             >
               <SaleWidget
                 config={this.strongConfig()}
-                widgetConfig={this.widgetConfig}
+                widgetConfig={this.properties.config || {}}
                 amount={this.parameters.amount!}
                 items={this.parameters.items!}
                 fromTokenAddress={this.parameters.fromTokenAddress!}

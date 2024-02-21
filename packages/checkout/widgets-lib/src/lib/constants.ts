@@ -77,11 +77,6 @@ export const DEFAULT_SWAP_ENABLED = true;
 export const DEFAULT_BRIDGE_ENABLED = true;
 
 /**
- * Checkout Sale Widget default pay with card flow enabled flag
- */
-export const DEFAULT_FIAT_PAYMENT_ENABLED = true;
-
-/**
  * Checkout Widget default refresh quote interval
  */
 export const DEFAULT_QUOTE_REFRESH_INTERVAL = 30000;

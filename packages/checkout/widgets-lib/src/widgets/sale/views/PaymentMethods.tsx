@@ -30,8 +30,9 @@ export function PaymentMethods() {
     setPaymentMethod,
     disabledPaymentTypes,
     invalidParameters,
-    config,
+    smartCheckoutError,
   } = useSaleContext();
+  console.log('🚀 ~ smartCheckoutError:', smartCheckoutError);
   const { sendPageView, sendCloseEvent, sendSelectedPaymentMethod } = useSaleEvent();
 
   const handleOptionClick = (type: SalePaymentTypes) => setPaymentMethod(type);
@@ -94,9 +95,9 @@ export function PaymentMethods() {
         <Banner.Icon icon="InformationCircle" />
         <Banner.Caption>
           {t('views.PAYMENT_METHODS.insufficientCoinsBanner.caption')}
-          {config.isFiatPaymentEnabled
-            ? t('views.PAYMENT_METHODS.insufficientCoinsBanner.captionWithCard')
-            : t('views.PAYMENT_METHODS.insufficientCoinsBanner.captionWithoutCard')}
+          {disabledPaymentTypes?.includes(SalePaymentTypes.FIAT)
+            ? t('views.PAYMENT_METHODS.insufficientCoinsBanner.captionWithoutCard')
+            : t('views.PAYMENT_METHODS.insufficientCoinsBanner.captionWithCard')}
           <Link
             sx={{ mx: 'base.spacing.x1' }}
             onClick={() => onClickInsufficientCoinsBanner()}
@@ -143,7 +144,11 @@ export function PaymentMethods() {
           {t('views.PAYMENT_METHODS.header.heading')}
         </Heading>
         <Box sx={{ paddingX: 'base.spacing.x2' }}>
-          <PaymentOptions disabledOptions={disabledPaymentTypes} onClick={handleOptionClick} />
+          <PaymentOptions
+            onClick={handleOptionClick}
+            withErrors={!!smartCheckoutError}
+            disabledOptions={disabledPaymentTypes}
+          />
         </Box>
         {viewState.view.data?.showInsufficientCoinsBanner ? insufficientCoinsBanner : null}
       </Box>

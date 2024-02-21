@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Environment } from '@imtbl/config';
 import { config, passport } from '@imtbl/sdk';
 import { WidgetsFactory } from '@imtbl/checkout-widgets';
-import { BridgeEventType, OnRampEventType, SaleEventType, SaleItem, SwapEventType, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
+import { BridgeEventType, OnRampEventType, SaleEventType, SaleItem, SalePaymentTypes, SwapEventType, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
 import { Checkout } from '@imtbl/checkout-sdk';
 import { Passport } from '@imtbl/passport';
 
@@ -84,7 +84,10 @@ export function SaleUI() {
   const passportInstance = useMemo(() => usePassportInstance(JSON.parse(passportConfig)), []);
   const checkout = useMemo(() => new Checkout({baseConfig: {environment: Environment.SANDBOX}, passport: passportInstance as unknown as Passport}), [passportInstance])
   const factory = useMemo(() => new WidgetsFactory(checkout, {theme: WidgetTheme.DARK}), [checkout])
-  const saleWidget = useMemo(() => factory.create(WidgetType.SALE, { config: { theme: WidgetTheme.DARK } }),
+  const saleWidget = useMemo(() => factory.create(WidgetType.SALE, { config: { 
+    theme: WidgetTheme.DARK,
+    disabledPaymentTypes: [SalePaymentTypes.FIAT],
+  }}),
   [factory, amount, environmentId, fromTokenAddress, collectionName, defaultItems]
   );
   const bridgeWidget = useMemo(() => factory.create(WidgetType.BRIDGE, { config: { theme: WidgetTheme.DARK } }),

@@ -9,7 +9,6 @@ import {
   DEFAULT_BRIDGE_ENABLED,
   DEFAULT_ON_RAMP_ENABLED,
   DEFAULT_SWAP_ENABLED,
-  DEFAULT_FIAT_PAYMENT_ENABLED,
   DEV_CHAIN_ID_NETWORK_MAP,
   PRODUCTION_CHAIN_ID_NETWORK_MAP,
   SANDBOX_CHAIN_ID_NETWORK_MAP,
@@ -66,8 +65,6 @@ export class CheckoutConfiguration {
 
   readonly isBridgeEnabled: boolean;
 
-  readonly isFiatPaymentEnabled: boolean;
-
   readonly remote: RemoteConfigFetcher;
 
   readonly environment: Environment;
@@ -88,7 +85,6 @@ export class CheckoutConfiguration {
     this.isOnRampEnabled = config.onRamp?.enable ?? DEFAULT_ON_RAMP_ENABLED;
     this.isSwapEnabled = config.swap?.enable ?? DEFAULT_SWAP_ENABLED;
     this.isBridgeEnabled = config.bridge?.enable ?? DEFAULT_BRIDGE_ENABLED;
-    this.isFiatPaymentEnabled = config.sale?.fiatPayment?.enable ?? DEFAULT_FIAT_PAYMENT_ENABLED;
 
     this.networkMap = networkMap(
       this.isProduction,

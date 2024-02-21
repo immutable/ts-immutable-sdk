@@ -155,7 +155,6 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
       isOnRampEnabled: this.checkout.config.isOnRampEnabled,
       isSwapEnabled: this.checkout.config.isSwapEnabled,
       isBridgeEnabled: this.checkout.config.isBridgeEnabled,
-      isFiatPaymentEnabled: this.checkout.config.isFiatPaymentEnabled,
     });
   }
 

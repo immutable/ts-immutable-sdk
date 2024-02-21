@@ -77,6 +77,7 @@ type SaleContextValues = SaleContextProps & {
     callback?: (r?: SmartCheckoutResult) => void
   ) => Promise<SmartCheckoutResult | undefined>;
   smartCheckoutResult: SmartCheckoutResult | undefined;
+  smartCheckoutError: SmartCheckoutErrorTypes | undefined;
   fundingRoutes: FundingRoute[];
   invalidParameters: boolean;
 };
@@ -108,6 +109,7 @@ const SaleContext = createContext<SaleContextValues>({
   config: {} as StrongCheckoutWidgetsConfig,
   querySmartCheckout: () => Promise.resolve(undefined),
   smartCheckoutResult: undefined,
+  smartCheckoutError: undefined,
   fundingRoutes: [],
   disabledPaymentTypes: [],
   invalidParameters: false,
@@ -382,6 +384,7 @@ export function SaleContextProvider(props: {
       isPassportWallet: !!(provider?.provider as any)?.isPassport,
       querySmartCheckout,
       smartCheckoutResult,
+      smartCheckoutError,
       fundingRoutes,
       disabledPaymentTypes,
       invalidParameters,
@@ -408,6 +411,7 @@ export function SaleContextProvider(props: {
       sign,
       querySmartCheckout,
       smartCheckoutResult,
+      smartCheckoutError,
       fundingRoutes,
       disabledPaymentTypes,
       invalidParameters,
