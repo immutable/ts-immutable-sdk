@@ -115,7 +115,10 @@ export class TokenBridge {
     if (req.action !== BridgeFeeActions.FINALISE_WITHDRAWAL) {
       await this.validateChainIds(req.sourceChainId, req.destinationChainId);
     }
+    return await this.getFeePrivate(req);
+  }
 
+  private async getFeePrivate(req: BridgeFeeRequest): Promise<BridgeFeeResponse> {
     if (req.action === BridgeFeeActions.DEPOSIT && req.sourceChainId !== this.config.bridgeInstance.rootChainID) {
       throw new BridgeError(
         `Deposit must be from the root chain (${this.config.bridgeInstance.rootChainID}) to the child chain (${this.config.bridgeInstance.childChainID})`,
@@ -168,21 +171,6 @@ export class TokenBridge {
         req.gasMultiplier,
       );
 
-      const dummyDeposit = await this.getDummyTx(
-        sourceProvider,
-        '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
-        ethers.BigNumber.from(1000000),
-        'NATIVE',
-        req.sourceChainId,
-        feeResult.bridgeFee,
-      );
-
-      console.log('dummyDeposit', dummyDeposit);
-
-      const callRes = await sourceProvider.estimateGas(dummyDeposit);
-
-      console.log('callRes', callRes, ethers.BigNumber.from(callRes).toString());
-
       sourceChainGas = await this.getGasEstimates(
         sourceProvider,
         BridgeMethodsGasLimit[`${req.action}_SOURCE`],
@@ -202,7 +190,7 @@ export class TokenBridge {
     };
   }
 
-  private async getDummyTx(
+  private async getSimulatedTx(
     provider: ethers.providers.Provider,
     dummyAddress: string,
     amount: ethers.BigNumber,
@@ -299,7 +287,12 @@ export class TokenBridge {
     req: ApproveBridgeRequest,
   ): Promise<ApproveBridgeResponse> {
     await this.validateChainConfiguration();
+    return await this.getUnsignedApproveBridgeTxPrivate(req);
+  }
 
+  public async getUnsignedApproveBridgeTxPrivate(
+    req: ApproveBridgeRequest,
+  ): Promise<ApproveBridgeResponse> {
     await this.validateDepositArgs(
       req.token,
       req.senderAddress,
@@ -384,7 +377,7 @@ export class TokenBridge {
           const rootContract = new ethers.Contract(
             this.config.bridgeContracts.rootERC20BridgeFlowRate,
             ROOT_ERC20_BRIDGE_FLOW_RATE,
-            this.config.rootProvider,
+            // this.config.rootProvider,
           );
           return rootContract;
         },
@@ -398,7 +391,7 @@ export class TokenBridge {
           const childContract = new ethers.Contract(
             this.config.bridgeContracts.childERC20Bridge,
             CHILD_ERC20_BRIDGE,
-            this.config.childProvider,
+            // this.config.childProvider,
           );
           return childContract;
         },
@@ -600,7 +593,7 @@ export class TokenBridge {
     provider: ethers.providers.Provider,
     gasMultiplier: number = 1.1,
   ): Promise<BridgeTxResponse> {
-    const fees:BridgeFeeResponse = await this.getFee({
+    const fees:BridgeFeeResponse = await this.getFeePrivate({
       action,
       gasMultiplier,
       sourceChainId,
