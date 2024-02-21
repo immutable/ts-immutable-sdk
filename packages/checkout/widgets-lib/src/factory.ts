@@ -28,9 +28,13 @@ export class WidgetsFactory implements IWidgetsFactory {
   constructor(sdk: Checkout, widgetConfig: WidgetConfiguration) {
     this.sdk = sdk;
     this.widgetConfig = widgetConfig;
-    if (widgetConfig.walletConnect) {
+    if (widgetConfig.walletConnect && widgetConfig.theme) {
       try {
-        WalletConnectManager.getInstance().initialise(sdk.config.environment, widgetConfig.walletConnect);
+        WalletConnectManager.getInstance().initialise(
+          sdk.config.environment,
+          widgetConfig.walletConnect,
+          widgetConfig.theme,
+        );
       } catch (err) {
         // eslint-disable-next-line no-console
         console.warn('WalletConnect has not been set up correctly');

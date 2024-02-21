@@ -1,6 +1,6 @@
 import { WalletConnectModal } from '@walletconnect/modal';
 import EthereumProvider from '@walletconnect/ethereum-provider';
-import { ChainId } from '@imtbl/checkout-sdk';
+import { ChainId, WidgetTheme } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 
 export type WalletConnectConfiguration = {
@@ -16,12 +16,36 @@ export type WalletConnectConfiguration = {
 const testnetModalChains = [`eip155:${ChainId.IMTBL_ZKEVM_TESTNET}`, `eip155:${ChainId.SEPOLIA}`];
 const productionModalChains = [`eip155:${ChainId.IMTBL_ZKEVM_MAINNET}`, `eip155:${ChainId.ETHEREUM}`];
 
+const darkThemeVariables = {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  '--wcm-accent-fill-color': '#F3F3F3',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  '--wcm-background-color': '#131313',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  '--wcm-container-border-radius': '8px',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  '--wcm-wallet-icon-border-radius': '8px',
+};
+
+const lightThemeVariables = {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  '--wcm-accent-fill-color': '#131313',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  '--wcm-background-color': '#F3F3F3',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  '--wcm-container-border-radius': '8px',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  '--wcm-wallet-icon-border-radius': '8px',
+};
+
 export class WalletConnectManager {
   private static instance: WalletConnectManager;
 
   private initialised: boolean = false;
 
   private environment!: Environment;
+
+  private theme!: WidgetTheme;
 
   private walletConnectConfig!: WalletConnectConfiguration;
 
@@ -53,12 +77,13 @@ export class WalletConnectManager {
     return WalletConnectManager.instance;
   }
 
-  public initialise(environment: Environment, config: WalletConnectConfiguration): void {
+  public initialise(environment: Environment, config: WalletConnectConfiguration, theme: WidgetTheme): void {
     if (!this.validateConfig(config)) {
       throw new Error('Incorrect Wallet Connect configuration');
     }
     this.walletConnectConfig = config;
     this.environment = environment;
+    this.theme = theme;
     this.initialised = true;
   }
 
@@ -81,6 +106,8 @@ export class WalletConnectManager {
           // '1ae92b26df02f0abca6304df07debccd18262fdf5fe82daa81593582dac9a369', // Rainbow
         ],
         explorerExcludedWalletIds: 'ALL',
+        themeMode: this.theme,
+        themeVariables: this.theme === WidgetTheme.DARK ? darkThemeVariables : lightThemeVariables,
       });
       this.walletConnectModal = modal;
     }
@@ -128,7 +155,7 @@ export class WalletConnectManager {
             'wallet_scanQRCode',
           ],
           qrModalOptions: {
-            themeMode: 'dark',
+            themeMode: this.theme,
           },
           rpcMap: {
             [ChainId.ETHEREUM]: 'https://checkout-api.immutable.com/v1/rpc/eth-mainnet',
