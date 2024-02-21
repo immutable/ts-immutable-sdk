@@ -30,7 +30,7 @@ function App() {
         <div>
           <a
             href={
-              "/sale?amount=1&fromTokenAddress=0x21B51Ec6fB7654B7e59e832F9e9687f29dF94Fb8&environmentId=249d9b0b-ee16-4dd5-91ee-96bece3b0473&collectionName=Iguanas"
+              "/sale?amount=1&environmentId=249d9b0b-ee16-4dd5-91ee-96bece3b0473&collectionName=Iguanas"
             }
           >
             Sale Widget

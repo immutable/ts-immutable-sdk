@@ -1,4 +1,4 @@
-import { Environment, ImmutableConfiguration } from '@imtbl/config';
+import { Environment, ImmutableConfiguration, KeyHeaders } from '@imtbl/config';
 import { BlockchainData } from '../blockchain-data';
 import { BlockchainDataModuleConfiguration } from './index';
 
@@ -53,6 +53,30 @@ describe('BlockchainData', () => {
 
     const config: BlockchainDataModuleConfiguration = {
       baseConfig: { environment: Environment.PRODUCTION },
+      overrides: {
+        basePath: 'https://api.dev.immutable.com/v1',
+        headers,
+      },
+    };
+    const blockchainData = new BlockchainData(config);
+    expect(blockchainData).toBeInstanceOf(BlockchainData);
+    expect(blockchainData.config.apiConfig.baseOptions?.headers).toMatchObject(
+      headers
+    );
+  });
+
+  it('should instantiate a BlockchainData with rate limit and api key in headers', async () => {
+    const rateLimitKey = 'rateLimit';
+    const apiKey = 'api';
+
+    const headers = {
+      testHeader: 'ts-immutable-sdk-0.0.1',
+      [KeyHeaders.API_KEY]: apiKey,
+      [KeyHeaders.RATE_LIMITING_KEY]: rateLimitKey,
+    };
+
+    const config: BlockchainDataModuleConfiguration = {
+      baseConfig: { environment: Environment.PRODUCTION, rateLimitingKey: rateLimitKey, apiKey },
       overrides: {
         basePath: 'https://api.dev.immutable.com/v1',
         headers,

@@ -44,11 +44,12 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          token: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
 
       - name: Setup Github
         run: |
-          git config user.name "${GITHUB_ACTOR}"
-          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git config user.name "platform-sa"
+          git config user.email "platform-sa@users.noreply.github.com"
 
       - name: Get tags
         run: git fetch --tags
@@ -140,7 +141,7 @@ jobs:
       - name: Create GitHub Release
         id: gh_release
         if: contains(github.event.inputs.release_type, 'release') && github.event.inputs.dry_run == 'false'
-        run: gh release create ${{ steps.version.outputs.NEXT_VERSION }} --title ${{ steps.version.outputs.NEXT_VERSION }} --draft=false --prerelease=false --generate-notes --repo immutable/ts-immutable-sdk
+        run: gh release create ${{ steps.version.outputs.NEXT_VERSION }} --title ${{ steps.version.outputs.NEXT_VERSION }} --draft=false --prerelease=false --generate-notes --repo immutable/ts-immutable-sdk --target main
 
       - name: Get GitHub Release Name and URL
         if: contains(github.event.inputs.release_type, 'release') && github.event.inputs.dry_run == 'false'
