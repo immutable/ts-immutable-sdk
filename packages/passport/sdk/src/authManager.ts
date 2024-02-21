@@ -185,7 +185,7 @@ export default class AuthManager {
   }
 
   public async getUserOrLogin(): Promise<User> {
-    let user = null;
+    let user: User | null = null;
     try {
       user = await this.getUser();
     } catch (err) {
@@ -439,12 +439,12 @@ export default class AuthManager {
    * 4. Return null if no valid User can be obtained.
    */
   public async getUser<T extends User>(
-    typeAssertion: (user: User) => boolean = () => true,
+    typeAssertion: (user: User) => user is T = (user: User): user is T => true,
   ): Promise<T | null> {
     if (this.refreshingPromise) {
       const user = await this.refreshingPromise;
       if (user && typeAssertion(user)) {
-        return user as T;
+        return user;
       }
 
       return null;
@@ -456,14 +456,14 @@ export default class AuthManager {
     if (!isTokenExpired(oidcUser)) {
       const user = AuthManager.mapOidcUserToDomainModel(oidcUser);
       if (user && typeAssertion(user)) {
-        return user as T;
+        return user;
       }
     }
 
     if (oidcUser.refresh_token) {
       const user = await this.refreshTokenAndUpdatePromise();
       if (user && typeAssertion(user)) {
-        return user as T;
+        return user;
       }
     }
 
@@ -471,7 +471,7 @@ export default class AuthManager {
   }
 
   public async getUserZkEvm(): Promise<UserZkEvm> {
-    const user = await this.getUser<UserZkEvm>(isUserZkEvm);
+    const user = await this.getUser(isUserZkEvm);
     if (!user) {
       throw new Error('Failed to obtain a User with the required ZkEvm attributes');
     }
@@ -480,7 +480,7 @@ export default class AuthManager {
   }
 
   public async getUserImx(): Promise<UserImx> {
-    const user = await this.getUser<UserImx>(isUserImx);
+    const user = await this.getUser(isUserImx);
     if (!user) {
       throw new Error('Failed to obtain a User with the required IMX attributes');
     }

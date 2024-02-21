@@ -6,7 +6,7 @@ import { PassportError, PassportErrorType } from './errors/passportError';
 import { PassportConfiguration } from './config';
 import { mockUser, mockUserImx, mockUserZkEvm } from './test/mocks';
 import { isTokenExpired } from './utils/token';
-import { isUserZkEvm, PassportModuleConfiguration, UserZkEvm } from './types';
+import { isUserZkEvm, PassportModuleConfiguration } from './types';
 
 jest.mock('jwt-decode');
 jest.mock('./utils/token');
@@ -422,7 +422,7 @@ describe('AuthManager', () => {
         mockGetUser.mockReturnValue(mockOidcUser);
         (isTokenExpired as jest.Mock).mockReturnValue(false);
 
-        const result = await authManager.getUser<UserZkEvm>(isUserZkEvm);
+        const result = await authManager.getUser(isUserZkEvm);
 
         expect(result).toBeNull();
       });
@@ -439,7 +439,7 @@ describe('AuthManager', () => {
         });
         (isTokenExpired as jest.Mock).mockReturnValue(false);
 
-        const result = await authManager.getUser<UserZkEvm>(isUserZkEvm);
+        const result = await authManager.getUser(isUserZkEvm);
 
         expect(result).toEqual(mockUserZkEvm);
       });
