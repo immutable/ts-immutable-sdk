@@ -7,7 +7,7 @@ import {
 } from '@imtbl/core-sdk';
 import { PassportErrorType, withPassportError } from '../../errors/passportError';
 import { UserImx } from '../../types';
-import GuardianClient from '../../guardian/guardian';
+import GuardianClient from '../../guardian';
 
 type CreateTradeParams = {
   request: GetSignableTradeRequest;
@@ -41,7 +41,6 @@ export async function createTrade({
     }, { headers });
 
     await guardianClient.evaluateImxTransaction({
-      user,
       payloadHash: getSignableTradeResponse.data.payload_hash,
     });
 

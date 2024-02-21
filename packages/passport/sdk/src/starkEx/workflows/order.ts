@@ -11,7 +11,7 @@ import {
 import { convertToSignableToken } from '@imtbl/toolkit';
 import { PassportErrorType, withPassportError } from '../../errors/passportError';
 import { UserImx } from '../../types';
-import GuardianClient from '../../guardian/guardian';
+import GuardianClient from '../../guardian';
 
 type CancelOrderParams = {
   request: GetSignableCancelOrderRequest;
@@ -63,7 +63,6 @@ export async function createOrder({
     );
 
     await guardianClient.evaluateImxTransaction({
-      user,
       payloadHash: getSignableOrderResponse.data.payload_hash,
     });
 
@@ -122,7 +121,6 @@ export async function cancelOrder({
     }, { headers });
 
     await guardianClient.evaluateImxTransaction({
-      user,
       payloadHash: getSignableCancelOrderResponse.data.payload_hash,
     });
 

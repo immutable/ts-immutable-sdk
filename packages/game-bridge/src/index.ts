@@ -3,7 +3,6 @@ import * as passport from '@imtbl/passport';
 import * as config from '@imtbl/config';
 import * as provider from '@imtbl/x-provider';
 import { track, identify } from '@imtbl/metrics';
-import { gameBridgeVersionCheck } from '@imtbl/version-check';
 
 /* eslint-disable no-undef */
 const scope = 'openid offline_access profile email transact';
@@ -14,7 +13,8 @@ const keyFunctionName = 'fxName';
 const keyRequestId = 'requestId';
 const keyData = 'data';
 
-const moduleName = 'game_bridge';
+const trackFunction = 'track';
+const moduleName = 'gameBridge';
 
 // version check placeholders
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -132,7 +132,7 @@ const getZkEvmProvider = (): passport.Provider => {
   return zkEvmProviderInstance;
 };
 
-track(moduleName, 'loadGameBridge', {
+track(moduleName, 'loadedGameBridge', {
   sdkVersionTag,
 });
 
@@ -143,16 +143,16 @@ window.callFunction = async (jsonData: string) => {
   let fxName = null;
   let requestId = null;
 
+  const markStart = Date.now();
   try {
     const json = JSON.parse(jsonData);
     fxName = json[keyFunctionName];
     requestId = json[keyRequestId];
     const data = json[keyData];
 
-    track(moduleName, 'startCallFunction', {
+    track(moduleName, 'startedCallFunction', {
       function: fxName,
     });
-
     switch (fxName) {
       case PASSPORT_FUNCTIONS.init: {
         const request = JSON.parse(data);
@@ -170,7 +170,9 @@ window.callFunction = async (jsonData: string) => {
             crossSdkBridgeEnabled: true,
           };
           passportClient = new passport.Passport(passportConfig);
-          track(moduleName, 'initInititalisePassport');
+          track(moduleName, 'initialisedPassport', {
+            timeMs: Date.now() - markStart,
+          });
         }
         callbackToGame({
           responseFor: fxName,
@@ -187,16 +189,21 @@ window.callFunction = async (jsonData: string) => {
           engineVersion: engineVersion.engineVersion,
           platform: engineVersion.platform,
           platformVersion: engineVersion.platformVersion,
+          deviceModel: engineVersion.deviceModel ?? 'N/A',
         };
         console.log(`Version check: ${JSON.stringify(versionCheckParams)}`);
 
-        track(moduleName, 'completeInitGameBridge', versionCheckParams);
-        gameBridgeVersionCheck(versionCheckParams);
+        track(moduleName, 'completedInitGameBridge', {
+          ...versionCheckParams,
+          timeMs: Date.now() - markStart,
+        });
         break;
       }
       case PASSPORT_FUNCTIONS.initDeviceFlow: {
         const response = await passportClient?.loginWithDeviceFlow();
-        track(moduleName, 'performedInitDeviceFlow');
+        track(moduleName, 'performedInitDeviceFlow', {
+          timeMs: Date.now() - markStart,
+        });
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -218,6 +225,7 @@ window.callFunction = async (jsonData: string) => {
         }
         track(moduleName, 'performedRelogin', {
           succeeded,
+          timeMs: Date.now() - markStart,
         });
         callbackToGame({
           responseFor: fxName,
@@ -239,6 +247,7 @@ window.callFunction = async (jsonData: string) => {
         }
         track(moduleName, 'performedReconnect', {
           succeeded: userInfo !== null,
+          timeMs: Date.now() - markStart,
         });
         callbackToGame({
           responseFor: fxName,
@@ -250,7 +259,9 @@ window.callFunction = async (jsonData: string) => {
       }
       case PASSPORT_FUNCTIONS.getPKCEAuthUrl: {
         const response = passportClient?.loginWithPKCEFlow();
-        track(moduleName, 'performedGetPkceAuthUrl');
+        track(moduleName, 'performedGetPkceAuthUrl', {
+          timeMs: Date.now() - markStart,
+        });
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -266,7 +277,9 @@ window.callFunction = async (jsonData: string) => {
           request.state,
         );
         identify({ passportId: profile.sub });
-        track(moduleName, 'performedLoginPkce');
+        track(moduleName, 'performedLoginPkce', {
+          timeMs: Date.now() - markStart,
+        });
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -287,6 +300,7 @@ window.callFunction = async (jsonData: string) => {
         }
         track(moduleName, 'performedConnectPkce', {
           succeeded: providerSet,
+          timeMs: Date.now() - markStart,
         });
         callbackToGame({
           responseFor: fxName,
@@ -305,7 +319,9 @@ window.callFunction = async (jsonData: string) => {
         );
 
         identify({ passportId: profile.sub });
-        track(moduleName, 'performedLoginConfirmCode');
+        track(moduleName, 'performedLoginConfirmCode', {
+          timeMs: Date.now() - markStart,
+        });
 
         callbackToGame({
           responseFor: fxName,
@@ -330,6 +346,7 @@ window.callFunction = async (jsonData: string) => {
         }
         track(moduleName, 'performedConnectConfirmCode', {
           succeeded: providerSet,
+          timeMs: Date.now() - markStart,
         });
 
         callbackToGame({
@@ -344,7 +361,9 @@ window.callFunction = async (jsonData: string) => {
         const deviceFlowEndSessionEndpoint = await passportClient?.logoutDeviceFlow();
         providerInstance = null;
         zkEvmProviderInstance = null;
-        track(moduleName, 'performedGetLogoutUrl');
+        track(moduleName, 'performedGetLogoutUrl', {
+          timeMs: Date.now() - markStart,
+        });
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -355,7 +374,9 @@ window.callFunction = async (jsonData: string) => {
       }
       case PASSPORT_FUNCTIONS.getAccessToken: {
         const accessToken = await passportClient?.getAccessToken();
-        track(moduleName, 'performedGetAccessToken');
+        track(moduleName, 'performedGetAccessToken', {
+          timeMs: Date.now() - markStart,
+        });
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -366,7 +387,9 @@ window.callFunction = async (jsonData: string) => {
       }
       case PASSPORT_FUNCTIONS.getIdToken: {
         const idToken = await passportClient?.getIdToken();
-        track(moduleName, 'performedGetIdToken');
+        track(moduleName, 'performedGetIdToken', {
+          timeMs: Date.now() - markStart,
+        });
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -377,7 +400,9 @@ window.callFunction = async (jsonData: string) => {
       }
       case PASSPORT_FUNCTIONS.getEmail: {
         const userProfile = await passportClient?.getUserInfo();
-        track(moduleName, 'performedGetEmail');
+        track(moduleName, 'performedGetEmail', {
+          timeMs: Date.now() - markStart,
+        });
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -388,7 +413,9 @@ window.callFunction = async (jsonData: string) => {
       }
       case PASSPORT_FUNCTIONS.imx.getAddress: {
         const address = await getProvider().getAddress();
-        track(moduleName, 'performedImxGetAddress');
+        track(moduleName, 'performedImxGetAddress', {
+          timeMs: Date.now() - markStart,
+        });
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -399,7 +426,9 @@ window.callFunction = async (jsonData: string) => {
       }
       case PASSPORT_FUNCTIONS.imx.isRegisteredOffchain: {
         const registered = await getProvider().isRegisteredOffchain();
-        track(moduleName, 'performedImxIsRegisteredOffchain');
+        track(moduleName, 'performedImxIsRegisteredOffchain', {
+          timeMs: Date.now() - markStart,
+        });
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -410,7 +439,9 @@ window.callFunction = async (jsonData: string) => {
       }
       case PASSPORT_FUNCTIONS.imx.registerOffchain: {
         const response = await getProvider().registerOffchain();
-        track(moduleName, 'performedImxRegisterOffchain');
+        track(moduleName, 'performedImxRegisterOffchain', {
+          timeMs: Date.now() - markStart,
+        });
         callbackToGame({
           ...{
             responseFor: fxName,
@@ -424,7 +455,9 @@ window.callFunction = async (jsonData: string) => {
       case PASSPORT_FUNCTIONS.imx.transfer: {
         const unsignedTransferRequest = JSON.parse(data);
         const response = await getProvider().transfer(unsignedTransferRequest);
-        track(moduleName, 'performedImxTransfer');
+        track(moduleName, 'performedImxTransfer', {
+          timeMs: Date.now() - markStart,
+        });
         callbackToGame({
           ...{
             responseFor: fxName,
@@ -440,7 +473,9 @@ window.callFunction = async (jsonData: string) => {
         const response = await getProvider().batchNftTransfer(
           nftTransferDetails,
         );
-        track(moduleName, 'performedImxBatchNftTransfer');
+        track(moduleName, 'performedImxBatchNftTransfer', {
+          timeMs: Date.now() - markStart,
+        });
         callbackToGame({
           ...{
             responseFor: fxName,
@@ -457,6 +492,7 @@ window.callFunction = async (jsonData: string) => {
         const providerSet = setZkEvmProvider(zkEvmProvider);
         track(moduleName, 'performedZkevmConnectEvm', {
           succeeded: providerSet,
+          timeMs: Date.now() - markStart,
         });
         callbackToGame({
           responseFor: fxName,
@@ -472,7 +508,9 @@ window.callFunction = async (jsonData: string) => {
           method: 'eth_sendTransaction',
           params: [transaction],
         });
-        track(moduleName, 'performedZkevmSendTransaction');
+        track(moduleName, 'performedZkevmSendTransaction', {
+          timeMs: Date.now() - markStart,
+        });
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -485,7 +523,9 @@ window.callFunction = async (jsonData: string) => {
         const result = await getZkEvmProvider().request({
           method: 'eth_requestAccounts',
         });
-        track(moduleName, 'performedZkevmRequestAccounts');
+        track(moduleName, 'performedZkevmRequestAccounts', {
+          timeMs: Date.now() - markStart,
+        });
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -500,12 +540,25 @@ window.callFunction = async (jsonData: string) => {
           method: 'eth_getBalance',
           params: [request.address, request.blockNumberOrTag],
         });
-        track(moduleName, 'performedZkevmGetBalance');
+        track(moduleName, 'performedZkevmGetBalance', {
+          timeMs: Date.now() - markStart,
+        });
         callbackToGame({
           responseFor: fxName,
           requestId,
           success: true,
           result,
+        });
+        break;
+      }
+      case trackFunction: {
+        const request = JSON.parse(data);
+        const properties = JSON.parse(request.properties);
+        track(request.moduleName, request.eventName, properties);
+        callbackToGame({
+          responseFor: fxName,
+          requestId,
+          success: true,
         });
         break;
       }
@@ -516,6 +569,7 @@ window.callFunction = async (jsonData: string) => {
     track(moduleName, 'failedCallFunction', {
       function: fxName,
       error: error.message,
+      timeMs: Date.now() - markStart,
     });
     console.log(error);
     callbackToGame({

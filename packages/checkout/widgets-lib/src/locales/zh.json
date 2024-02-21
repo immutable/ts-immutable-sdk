@@ -535,6 +535,10 @@
     "metamask": {
       "heading": "MetaMask",
       "description": "用于访问区块链应用程序和web3的数字钱包"
+    },
+    "walletconnect": {
+      "heading": "其他钱包",
+      "description": "允许您连接到包括MetaMask在内的任何区块链钱包"
     }
   },
   "drawers": {
@@ -578,6 +582,7 @@
       },
       "buttons": {
         "adjustAmount": "调整金额",
+        "addMoreImx": "添加IMX币",
         "copyAddress": "复制钱包地址",
         "cancel": "关闭"
       }

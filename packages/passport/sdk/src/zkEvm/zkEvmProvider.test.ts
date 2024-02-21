@@ -1,15 +1,16 @@
-import { JsonRpcProvider } from '@ethersproject/providers';
-import { ZkEvmProviderInput, ZkEvmProvider } from './zkEvmProvider';
-import { loginZkEvmUser } from './user';
+import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
+import AuthManager from 'authManager';
+import { ZkEvmProvider, ZkEvmProviderInput } from './zkEvmProvider';
 import { sendTransaction } from './sendTransaction';
-import { JsonRpcError, ProviderErrorCode } from './JsonRpcError';
-import GuardianClient from '../guardian/guardian';
+import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
+import GuardianClient from '../guardian';
 import { RelayerClient } from './relayerClient';
 import { Provider } from './types';
 import { PassportEventMap, PassportEvents } from '../types';
 import TypedEventEmitter from '../utils/typedEventEmitter';
-import { mockUserZkEvm } from '../test/mocks';
+import { mockUserZkEvm, testConfig } from '../test/mocks';
 import { signTypedDataV4 } from './signTypedDataV4';
+import MagicAdapter from '../magicAdapter';
 
 jest.mock('@ethersproject/providers');
 jest.mock('./relayerClient');
@@ -19,19 +20,224 @@ jest.mock('./signTypedDataV4');
 
 describe('ZkEvmProvider', () => {
   let passportEventEmitter: TypedEventEmitter<PassportEventMap>;
+  const config = testConfig;
+  const ethSigner = {};
+  const authManager = {
+    getUserOrLogin: jest.fn().mockResolvedValue(mockUserZkEvm),
+  };
+  const magicAdapter = {
+    login: jest.fn(),
+  } as Partial<MagicAdapter> as MagicAdapter;
+  const guardianClient = {} as GuardianClient;
 
   beforeEach(() => {
     passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
+    jest.resetAllMocks();
+    (Web3Provider as unknown as jest.Mock).mockImplementation(() => ({
+      getSigner: jest.fn().mockImplementation(() => ethSigner),
+    }));
   });
 
   const getProvider = () => {
     const constructorParameters = {
-      config: {},
+      config,
+      authManager: authManager as Partial<AuthManager> as AuthManager,
       passportEventEmitter,
+      guardianClient,
+      magicAdapter,
     } as Partial<ZkEvmProviderInput>;
 
     return new ZkEvmProvider(constructorParameters as ZkEvmProviderInput);
   };
+
+  describe('eth_requestAccounts', () => {
+    it('should return the ethAddress if already logged in', async () => {
+      authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
+      const provider = getProvider();
+
+      const resultOne = await provider.request({ method: 'eth_requestAccounts', params: [] });
+      const resultTwo = await provider.request({ method: 'eth_requestAccounts', params: [] });
+
+      expect(resultOne).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
+      expect(resultTwo).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
+      expect(authManager.getUserOrLogin).toBeCalledTimes(1);
+    });
+
+    it('should emit accountsChanged event when user logs in', async () => {
+      authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
+      const provider = getProvider();
+      const onAccountsChanged = jest.fn();
+
+      provider.on('accountsChanged', onAccountsChanged);
+
+      const result = await provider.request({ method: 'eth_requestAccounts' });
+
+      expect(result).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
+      expect(onAccountsChanged).toHaveBeenCalledWith([mockUserZkEvm.zkEvm.ethAddress]);
+    });
+
+    it('should throw an error if the signer initialisation fails', async () => {
+      authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
+      (Web3Provider as unknown as jest.Mock).mockImplementation(() => ({
+        getSigner: () => {
+          throw new Error('Something went wrong');
+        },
+      }));
+      const provider = getProvider();
+      await provider.request({ method: 'eth_requestAccounts' });
+
+      await expect(async () => (
+        provider.request({ method: 'eth_sendTransaction' })
+      )).rejects.toThrow(
+        new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, 'Something went wrong'),
+      );
+    });
+  });
+
+  describe('eth_sendTransaction', () => {
+    const transaction = {
+      from: '0x123',
+      to: '0x456',
+      value: '1',
+    };
+
+    it('should throw an error if the user is not logged in', async () => {
+      const provider = getProvider();
+
+      await expect(async () => (
+        provider.request({ method: 'eth_sendTransaction', params: [transaction] })
+      )).rejects.toThrow(
+        new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first'),
+      );
+    });
+
+    it('should call sendTransaction with the correct params', async () => {
+      const transactionHash = '0x789';
+      authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
+      (sendTransaction as jest.Mock).mockResolvedValue(transactionHash);
+
+      const provider = getProvider();
+      await provider.request({ method: 'eth_requestAccounts' });
+      const result = await provider.request({
+        method: 'eth_sendTransaction',
+        params: [transaction],
+      });
+
+      expect(result).toEqual(transactionHash);
+      expect(sendTransaction).toHaveBeenCalledWith({
+        params: [transaction],
+        guardianClient,
+        ethSigner,
+        jsonRpcProvider: expect.any(Object),
+        relayerClient: expect.any(RelayerClient),
+        zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
+      });
+    });
+  });
+
+  describe('eth_signTypedData_v4', () => {
+    const address = '0xd64b0d2d72bb1b3f18046b8a7fc6c9ee6bccd287';
+    const typedDataPayload = '{}';
+
+    it('should throw an error if the user is not logged in', async () => {
+      const provider = getProvider();
+
+      await expect(async () => (
+        provider.request({ method: 'eth_signTypedData_v4', params: [address, typedDataPayload] })
+      )).rejects.toThrow(
+        new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first'),
+      );
+    });
+
+    it('should call eth_signTypedData_v4 with the correct params', async () => {
+      const signature = '0x123';
+      authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
+      (signTypedDataV4 as jest.Mock).mockResolvedValue(signature);
+
+      const provider = getProvider();
+      await provider.request({ method: 'eth_requestAccounts' });
+      const result = await provider.request({
+        method: 'eth_signTypedData_v4',
+        params: [address, typedDataPayload],
+      });
+
+      expect(result).toEqual(signature);
+      expect(signTypedDataV4).toHaveBeenCalledWith({
+        method: 'eth_signTypedData_v4',
+        params: [address, typedDataPayload],
+        guardianClient,
+        ethSigner,
+        jsonRpcProvider: expect.any(Object),
+        relayerClient: expect.any(RelayerClient),
+      });
+    });
+  });
+
+  describe('isPassport', () => {
+    it('should be set to true', () => {
+      const provider = getProvider();
+
+      expect(provider.isPassport).toBe(true);
+      expect((provider as Provider).isPassport).toBe(true);
+    });
+  });
+
+  describe('when the user has been logged out', () => {
+    const unauthorisedError = new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
+
+    describe('and eth_sendTransaction is called', () => {
+      it('throws an unauthorized error', async () => {
+        authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
+
+        const provider = getProvider();
+        await provider.request({ method: 'eth_requestAccounts' });
+        passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
+
+        await expect(provider.request({ method: 'eth_sendTransaction' })).rejects.toThrowError(
+          unauthorisedError,
+        );
+      });
+    });
+
+    describe('and eth_signTypedDataV4 is called', () => {
+      it('throws an unauthorized error', async () => {
+        authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
+
+        const provider = getProvider();
+        await provider.request({ method: 'eth_requestAccounts' });
+        passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
+
+        await expect(provider.request({ method: 'eth_signTypedData_v4' })).rejects.toThrowError(
+          unauthorisedError,
+        );
+      });
+    });
+
+    describe('and eth_accounts is called', () => {
+      it('returns an empty array', async () => {
+        authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
+
+        const provider = getProvider();
+        await provider.request({ method: 'eth_requestAccounts' });
+        passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
+        const result = await provider.request({ method: 'eth_accounts' });
+
+        expect(result).toEqual([]);
+      });
+    });
+
+    it('should emit accountsChanged', async () => {
+      authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
+      const provider = getProvider();
+      await provider.request({ method: 'eth_requestAccounts' });
+
+      const onAccountsChanged = jest.fn();
+      provider.on('accountsChanged', onAccountsChanged);
+      passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
+
+      expect(onAccountsChanged).toHaveBeenCalledWith([]);
+    });
+  });
 
   describe('passthrough methods', () => {
     const sendMock = jest.fn();
@@ -193,171 +399,6 @@ describe('ZkEvmProvider', () => {
       expect(sendMock).toBeCalledTimes(1);
       expect(sendMock).toBeCalledWith(providerParams.method, providerParams.params);
       expect(result).toBe(returnValue);
-    });
-  });
-
-  describe('eth_requestAccounts', () => {
-    it('should return the ethAddress if already logged in', async () => {
-      const mockMagicProvider = {};
-      (loginZkEvmUser as jest.Mock).mockResolvedValue({
-        user: mockUserZkEvm,
-        magicProvider: mockMagicProvider,
-      });
-      const provider = getProvider();
-
-      const resultOne = await provider.request({ method: 'eth_requestAccounts', params: [] });
-      const resultTwo = await provider.request({ method: 'eth_requestAccounts', params: [] });
-
-      expect(resultOne).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
-      expect(resultTwo).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
-      expect(loginZkEvmUser).toBeCalledTimes(1);
-    });
-
-    it('should emit accountsChanged event when user logs in', async () => {
-      const mockMagicProvider = {};
-      (loginZkEvmUser as jest.Mock).mockResolvedValue({
-        user: mockUserZkEvm,
-        magicProvider: mockMagicProvider,
-      });
-      const provider = getProvider();
-      const onAccountsChanged = jest.fn();
-
-      provider.on('accountsChanged', onAccountsChanged);
-
-      const result = await provider.request({ method: 'eth_requestAccounts' });
-
-      expect(result).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
-      expect(onAccountsChanged).toHaveBeenCalledWith([mockUserZkEvm.zkEvm.ethAddress]);
-    });
-  });
-
-  describe('eth_sendTransaction', () => {
-    const transaction = {
-      from: '0x123',
-      to: '0x456',
-      value: '1',
-    };
-
-    it('should throw an error if the user is not logged in', async () => {
-      const provider = getProvider();
-
-      await expect(async () => (
-        provider.request({ method: 'eth_sendTransaction', params: [transaction] })
-      )).rejects.toThrow(
-        new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first'),
-      );
-    });
-
-    it('should call sendTransaction with the correct params', async () => {
-      const transactionHash = '0x789';
-      const mockMagicProvider = {};
-      (loginZkEvmUser as jest.Mock).mockResolvedValue({
-        user: mockUserZkEvm,
-        magicProvider: mockMagicProvider,
-      });
-      (sendTransaction as jest.Mock).mockResolvedValue(transactionHash);
-
-      const provider = getProvider();
-      await provider.request({ method: 'eth_requestAccounts' });
-      const result = await provider.request({
-        method: 'eth_sendTransaction',
-        params: [transaction],
-      });
-
-      expect(result).toEqual(transactionHash);
-      expect(sendTransaction).toHaveBeenCalledWith({
-        params: [transaction],
-        magicProvider: mockMagicProvider,
-        guardianClient: expect.any(GuardianClient),
-        jsonRpcProvider: expect.any(Object),
-        relayerClient: expect.any(RelayerClient),
-        user: mockUserZkEvm,
-      });
-    });
-  });
-
-  describe('eth_signTypedData_v4', () => {
-    const address = '0xd64b0d2d72bb1b3f18046b8a7fc6c9ee6bccd287';
-    const typedDataPayload = '{}';
-
-    it('should throw an error if the user is not logged in', async () => {
-      const provider = getProvider();
-
-      await expect(async () => (
-        provider.request({ method: 'eth_signTypedData_v4', params: [address, typedDataPayload] })
-      )).rejects.toThrow(
-        new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first'),
-      );
-    });
-
-    it('should call signTypedDataV4 with the correct params', async () => {
-      const signature = '0x123';
-      const mockMagicProvider = {};
-      (loginZkEvmUser as jest.Mock).mockResolvedValue({
-        user: mockUserZkEvm,
-        magicProvider: mockMagicProvider,
-      });
-      (signTypedDataV4 as jest.Mock).mockResolvedValue(signature);
-
-      const provider = getProvider();
-      await provider.request({ method: 'eth_requestAccounts' });
-      const result = await provider.request({
-        method: 'eth_signTypedData_v4',
-        params: [address, typedDataPayload],
-      });
-
-      expect(result).toEqual(signature);
-      expect(signTypedDataV4).toHaveBeenCalledWith({
-        method: 'eth_signTypedData_v4',
-        params: [address, typedDataPayload],
-        magicProvider: mockMagicProvider,
-        jsonRpcProvider: expect.any(Object),
-        relayerClient: expect.any(RelayerClient),
-        user: mockUserZkEvm,
-        guardianClient: expect.any(GuardianClient),
-      });
-    });
-  });
-
-  describe('isPassport', () => {
-    it('should be set to true', () => {
-      const provider = getProvider();
-
-      expect(provider.isPassport).toBe(true);
-      expect((provider as Provider).isPassport).toBe(true);
-    });
-  });
-
-  describe('when the user has been logged out', () => {
-    it('should clear the user specific properties & emit accountsChanged', async () => {
-      (loginZkEvmUser as jest.Mock).mockResolvedValue({
-        user: mockUserZkEvm,
-        magicProvider: {},
-      });
-      const provider = getProvider();
-      await provider.request({ method: 'eth_requestAccounts' });
-
-      const userLoggedInKeys = [
-        'magicProvider',
-        'user',
-        'relayerClient',
-        'guardianClient',
-      ];
-
-      userLoggedInKeys.forEach((key) => {
-        // @ts-ignore
-        expect(provider[key]).toBeDefined();
-      });
-
-      const onAccountsChanged = jest.fn();
-      provider.on('accountsChanged', onAccountsChanged);
-      passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
-
-      expect(onAccountsChanged).toHaveBeenCalledWith([]);
-      userLoggedInKeys.forEach((key) => {
-        // @ts-ignore
-        expect(provider[key]).toBeUndefined();
-      });
     });
   });
 });

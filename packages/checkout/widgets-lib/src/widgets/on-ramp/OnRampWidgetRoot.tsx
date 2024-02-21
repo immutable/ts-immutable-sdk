@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import {
   ConnectTargetLayer,
   IMTBLWidgetEvents,
@@ -14,8 +14,11 @@ import { getL1ChainId, getL2ChainId } from 'lib';
 import { isValidAddress, isValidAmount } from 'lib/validations/widgetValidators';
 import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
-import { OnRampWidget } from './OnRampWidget';
+import { LoadingView } from 'views/loading/LoadingView';
 import { sendOnRampWidgetCloseEvent } from './OnRampWidgetEvents';
+import i18n from '../../i18n';
+
+const OnRampWidget = React.lazy(() => import('./OnRampWidget'));
 
 export class OnRamp extends Base<WidgetType.ONRAMP> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT;
@@ -57,6 +60,7 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
   protected render() {
     if (!this.reactRoot) return;
 
+    const { t } = i18n;
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER2,
       walletProviderName: this.parameters.walletProviderName,
@@ -74,11 +78,13 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
               params={connectLoaderParams}
               closeEvent={() => sendOnRampWidgetCloseEvent(window)}
             >
-              <OnRampWidget
-                tokenAddress={this.parameters.tokenAddress}
-                amount={this.parameters.amount}
-                config={this.strongConfig()}
-              />
+              <Suspense fallback={<LoadingView loadingText={t('views.ONRAMP.initialLoadingText')} />}>
+                <OnRampWidget
+                  tokenAddress={this.parameters.tokenAddress}
+                  amount={this.parameters.amount}
+                  config={this.strongConfig()}
+                />
+              </Suspense>
             </ConnectLoader>
           </ThemeProvider>
         </CustomAnalyticsProvider>

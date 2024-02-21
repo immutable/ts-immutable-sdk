@@ -34,7 +34,7 @@ export const quickswapFooterLogoStyles = {
   justifyContent: 'center',
   alignItems: 'center',
   marginBottom: 'base.spacing.x2',
-  color: 'base.color.text.primary',
+  color: 'base.color.text.body.primary',
 };
 
 export const quickswapFooterDisclaimerTextStyles = {
@@ -42,5 +42,5 @@ export const quickswapFooterDisclaimerTextStyles = {
   justifyContent: 'center',
   alignItems: 'center',
   textAlign: 'center',
-  color: 'base.color.text.secondary',
+  color: 'base.color.text.body.secondary',
 };

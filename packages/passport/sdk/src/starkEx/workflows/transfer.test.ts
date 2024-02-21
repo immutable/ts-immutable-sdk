@@ -2,9 +2,9 @@ import { TransfersApi, UnsignedTransferRequest } from '@imtbl/core-sdk';
 import { PassportError, PassportErrorType } from '../../errors/passportError';
 import { mockErrorMessage, mockStarkSignature, mockUserImx } from '../../test/mocks';
 import { batchNftTransfer, transfer } from './transfer';
-import GuardianClient from '../../guardian/guardian';
+import GuardianClient from '../../guardian';
 
-jest.mock('../../guardian/guardian');
+jest.mock('../../guardian');
 
 describe('transfer', () => {
   const mockGuardianClient = new GuardianClient({} as any);
@@ -114,7 +114,7 @@ describe('transfer', () => {
       expect(getSignableTransferV1Mock).toBeCalledWith(mockSignableTransferRequest, mockHeader);
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
       expect(mockGuardianClient.evaluateImxTransaction)
-        .toBeCalledWith({ payloadHash: mockPayloadHash, user: mockUserImx });
+        .toBeCalledWith({ payloadHash: mockPayloadHash });
       expect(createTransferV1Mock).toBeCalledWith(mockCreateTransferRequest, mockHeader);
       expect(result).toEqual(mockReturnValue);
     });
@@ -269,7 +269,7 @@ describe('transfer', () => {
       expect(mockStarkSigner.signMessage).toHaveBeenCalled();
       expect(mockGuardianClient.withConfirmationScreenTask).toBeCalledWith(popupOptions);
       expect(mockGuardianClient.evaluateImxTransaction)
-        .toBeCalledWith({ payloadHash: payload_hash, user: mockUserImx });
+        .toBeCalledWith({ payloadHash: payload_hash });
       expect(mockCreateTransfer).toHaveBeenCalledWith(
         {
           createTransferRequestV2: {

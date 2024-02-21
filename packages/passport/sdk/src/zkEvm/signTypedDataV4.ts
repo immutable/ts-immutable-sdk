@@ -1,21 +1,16 @@
-import {
-  ExternalProvider,
-  JsonRpcProvider,
-  Web3Provider,
-} from '@ethersproject/providers';
+import { JsonRpcProvider } from '@ethersproject/providers';
+import { Signer } from '@ethersproject/abstract-signer';
 import { BigNumber } from 'ethers';
-import GuardianClient from 'guardian/guardian';
+import GuardianClient from 'guardian';
 import { getSignedTypedData } from './walletHelpers';
 import { TypedDataPayload } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { RelayerClient } from './relayerClient';
-import { UserZkEvm } from '../types';
 
 export type SignTypedDataV4Params = {
-  magicProvider: ExternalProvider;
+  ethSigner: Signer;
   jsonRpcProvider: JsonRpcProvider;
   relayerClient: RelayerClient;
-  user: UserZkEvm;
   method: string;
   params: Array<any>;
   guardianClient: GuardianClient;
@@ -70,13 +65,12 @@ const transformTypedData = (typedData: string | object, chainId: number): TypedD
 export const signTypedDataV4 = async ({
   params,
   method,
-  magicProvider,
+  ethSigner,
   jsonRpcProvider,
   relayerClient,
   guardianClient,
-  user,
 }: SignTypedDataV4Params): Promise<string> => guardianClient
-  .withConfirmationScreen({ width: 480, height: 730 })(async () => {
+  .withConfirmationScreen({ width: 480, height: 720 })(async () => {
     const fromAddress: string = params[0];
     const typedDataParam: string | object = params[1];
 
@@ -87,10 +81,8 @@ export const signTypedDataV4 = async ({
     const { chainId } = await jsonRpcProvider.ready;
     const typedData = transformTypedData(typedDataParam, chainId);
 
-    await guardianClient.validateMessage({ chainID: String(chainId), payload: typedData, user });
+    await guardianClient.validateMessage({ chainID: String(chainId), payload: typedData });
     const relayerSignature = await relayerClient.imSignTypedData(fromAddress, typedData);
-    const magicWeb3Provider = new Web3Provider(magicProvider);
-    const signer = magicWeb3Provider.getSigner();
 
-    return getSignedTypedData(typedData, relayerSignature, BigNumber.from(chainId), fromAddress, signer);
+    return getSignedTypedData(typedData, relayerSignature, BigNumber.from(chainId), fromAddress, ethSigner);
   });

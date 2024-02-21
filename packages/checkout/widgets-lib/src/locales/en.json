@@ -115,7 +115,7 @@
       },
       "content": {
         "title": "What would you like to swap?",
-        "fiatPricePrefix": "Approx USD",
+        "fiatPricePrefix": "~ USD",
         "availableBalancePrefix": "Available"
       },
       "swapForm": {
@@ -391,7 +391,7 @@
       },
       "content": {
         "title": "How much would you like to move?",
-        "fiatPricePrefix": "Approx USD",
+        "fiatPricePrefix": "~ USD",
         "availableBalancePrefix": "Available"
       },
       "bridgeForm": {
@@ -481,7 +481,7 @@
       "changeWallet": {
         "buttonText": "Change wallet"
       },
-      "fiatPricePrefix": "≈ USD $",
+      "fiatPricePrefix": "~ USD $",
       "support": {
         "body1": "Need help?",
         "body2": " Contact ",
@@ -535,15 +535,29 @@
     "metamask": {
       "heading": "MetaMask",
       "description": "Digital wallet for accessing blockchain applications and web3"
+    },
+    "walletconnect": {
+      "heading": "Other wallets",
+      "description": "Allows you to connect with any blockchain wallet including MetaMask"
     }
   },
   "drawers": {
     "feesBreakdown": {
-      "heading": "Fee breakdown",
-      "total": "Fees total",
+      "heading": "Fees",
+      "total": "Total fees",
       "fees": {
-        "gas": {
-          "label": "Gas fee"
+        "fiatPricePrefix": "USD $",
+        "gasFeeSwap": {
+          "label": "Gas fee swap"
+        },
+        "gasFeeMove": {
+          "label": "Gas fee move"
+        },
+        "gasFeeApproval": {
+          "label": "Gas fee approval"
+        },
+        "serviceFee": {
+          "label": "Service fee"
         }
       }
     },
@@ -561,7 +575,7 @@
     },
     "coinSelector": {
       "option": {
-        "fiatPricePrefix": "Approx USD $"
+        "fiatPricePrefix": "~ USD $"
       },
       "noCoins": "You have no available coins to select in your wallet."
     },
@@ -578,6 +592,7 @@
       },
       "buttons": {
         "adjustAmount": "Adjust amount",
+        "addMoreImx": "Add IMX coins",
         "copyAddress": "Copy wallet address",
         "cancel": "Dismiss"
       }

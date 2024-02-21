@@ -1,19 +1,18 @@
-import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
+import { JsonRpcProvider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
-import GuardianClient from 'guardian/guardian';
+import GuardianClient from 'guardian';
+import { Signer } from '@ethersproject/abstract-signer';
 import { getEip155ChainId, getSignedTypedData } from './walletHelpers';
 import {
   chainId,
   chainIdHex,
   chainIdEip155,
-  mockUserZkEvm,
 } from '../test/mocks';
 import { RelayerClient } from './relayerClient';
 import { signTypedDataV4 } from './signTypedDataV4';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { TypedDataPayload } from './types';
 
-jest.mock('@ethersproject/providers');
 jest.mock('./walletHelpers');
 
 describe('signTypedDataV4', () => {
@@ -26,9 +25,7 @@ describe('signTypedDataV4', () => {
   };
   const relayerSignature = '02011b1d383526a2815d26550eb314b5d7e0551327330043c4d07715346a7d5517ecbc32304fc1ccdcd52fea386c94c3b58b90410f20cd1d5c6db8fa1f03c34e82dce78c3445ce38583e0b0689c69b8fbedbc33d3a2e45431b0103';
   const combinedSignature = '0x000202011b1d383526a2815d26550eb314b5d7e0551327330043c4d07715346a7d5517ecbc32304fc1ccdcd52fea386c94c3b58b90410f20cd1d5c6db8fa1f03c34e82dce78c3445ce38583e0b0689c69b8fbedbc33d3a2e45431b01030001d25acf5eef26fb627f91e02ebd111580030ab8fb0a55567ac8cc66c34de7ae98185125a76adc6ee2fea042c7fce9c85a41e790ce3529f93dfec281bf56620ef21b02';
-
-  const magicProvider = {};
-  const magicSigner = {};
+  const ethSigner = {} as Signer;
   const jsonRpcProvider = {
     ready: Promise.resolve({ chainId }),
   };
@@ -49,9 +46,6 @@ describe('signTypedDataV4', () => {
     (getSignedTypedData as jest.Mock).mockResolvedValueOnce(
       combinedSignature,
     );
-    (Web3Provider as unknown as jest.Mock).mockImplementation(() => ({
-      getSigner: () => magicSigner,
-    }));
     withConfirmationScreenStub.mockImplementation(() => (task: () => void) => task());
     guardianClient.withConfirmationScreen = withConfirmationScreenStub;
   });
@@ -61,10 +55,9 @@ describe('signTypedDataV4', () => {
       const result = await signTypedDataV4({
         method: 'eth_signTypedData_v4',
         params: [address, JSON.stringify(eip712Payload)],
-        magicProvider,
+        ethSigner,
         jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,
-        user: mockUserZkEvm,
         guardianClient: guardianClient as unknown as GuardianClient,
       });
 
@@ -78,7 +71,7 @@ describe('signTypedDataV4', () => {
         relayerSignature,
         BigNumber.from(chainId),
         address,
-        magicSigner,
+        ethSigner,
       );
     });
   });
@@ -88,10 +81,9 @@ describe('signTypedDataV4', () => {
       const result = await signTypedDataV4({
         method: 'eth_signTypedData_v4',
         params: [address, eip712Payload],
-        magicProvider,
+        ethSigner,
         jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,
-        user: mockUserZkEvm,
         guardianClient: guardianClient as any,
       });
 
@@ -105,7 +97,7 @@ describe('signTypedDataV4', () => {
         relayerSignature,
         BigNumber.from(chainId),
         address,
-        magicSigner,
+        ethSigner,
       );
     });
   });
@@ -116,10 +108,9 @@ describe('signTypedDataV4', () => {
         signTypedDataV4({
           method: 'eth_signTypedData_v4',
           params: [address],
-          magicProvider,
+          ethSigner,
           jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
           relayerClient: relayerClient as unknown as RelayerClient,
-          user: mockUserZkEvm,
           guardianClient: guardianClient as any,
         })
       )).rejects.toThrow(
@@ -134,10 +125,9 @@ describe('signTypedDataV4', () => {
         signTypedDataV4({
           method: 'eth_signTypedData_v4',
           params: [address, '*~<|8)-/-<'],
-          magicProvider,
+          ethSigner,
           jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
           relayerClient: relayerClient as unknown as RelayerClient,
-          user: mockUserZkEvm,
           guardianClient: guardianClient as any,
         })
       )).rejects.toMatchObject({
@@ -160,10 +150,9 @@ describe('signTypedDataV4', () => {
         signTypedDataV4({
           method: 'eth_signTypedData_v4',
           params: [address, payload],
-          magicProvider,
+          ethSigner,
           jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
           relayerClient: relayerClient as unknown as RelayerClient,
-          user: mockUserZkEvm,
           guardianClient: guardianClient as any,
         })
       )).rejects.toThrow(
@@ -186,10 +175,9 @@ describe('signTypedDataV4', () => {
               },
             },
           ],
-          magicProvider,
+          ethSigner,
           jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
           relayerClient: relayerClient as unknown as RelayerClient,
-          user: mockUserZkEvm,
           guardianClient: guardianClient as any,
         })
       )).rejects.toThrow(
@@ -211,10 +199,9 @@ describe('signTypedDataV4', () => {
         address,
         payload,
       ],
-      magicProvider,
+      ethSigner,
       jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
-      user: mockUserZkEvm,
       guardianClient: guardianClient as any,
     });
 
@@ -228,7 +215,7 @@ describe('signTypedDataV4', () => {
       relayerSignature,
       BigNumber.from(chainId),
       address,
-      magicSigner,
+      ethSigner,
     );
   });
 });

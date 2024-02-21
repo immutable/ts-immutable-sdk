@@ -538,6 +538,10 @@
     "metamask": {
       "heading": "MetaMask",
       "description": "ブロックチェーンアプリケーションとWeb3へのアクセス用のデジタルウォレット"
+    },
+    "walletconnect": {
+      "heading": "その他のウォレット",
+      "description": "MetaMaskを含む任意のブロックチェーンウォレットに接続できます"
     }
   },
   "drawers": {
@@ -581,6 +585,7 @@
       },
       "buttons": {
         "adjustAmount": "金額を調整",
+        "addMoreImx": "IMXコインを追加",
         "copyAddress": "ウォレットアドレスをコピー",
         "cancel": "閉じる"
       }

@@ -14,7 +14,7 @@ import {
   withPassportError,
 } from '../../errors/passportError';
 import { UserImx } from '../../types';
-import GuardianClient from '../../guardian/guardian';
+import GuardianClient from '../../guardian';
 
 const ERC721 = 'ERC721';
 
@@ -63,7 +63,6 @@ export async function transfer({
       );
 
       await guardianClient.evaluateImxTransaction({
-        user,
         payloadHash: signableResult.data.payload_hash,
       });
 
@@ -142,7 +141,6 @@ export async function batchNftTransfer({
       );
 
       await guardianClient.evaluateImxTransaction({
-        user,
         payloadHash: signableResult.data.signable_responses[0]?.payload_hash,
       });
 

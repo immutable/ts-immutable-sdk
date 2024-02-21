@@ -9,8 +9,7 @@ import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { CryptoFiat } from '@imtbl/cryptofiat';
-import { useTranslation } from 'react-i18next';
-import { WalletWidget } from './WalletWidget';
+import WalletWidget from './WalletWidget';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
@@ -20,7 +19,6 @@ import { ConnectionStatus } from '../../context/connect-loader-context/ConnectLo
 import { NATIVE } from '../../lib';
 
 describe('WalletWidget tests', () => {
-  const { t } = useTranslation();
   beforeEach(() => {
     cy.viewport('ipad-2');
     cyIntercept();
@@ -533,7 +531,14 @@ describe('WalletWidget tests', () => {
         cySmartGet('wallet-address').should('have.text', '0xwalletAddress');
       });
 
-      it('should NOT show a disconnect button for Metamask users', () => {
+      it('should show a disconnect button for Metamask that fires the right event when clicked', () => {
+        cy.window().then((window) => {
+          window.addEventListener(
+            IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
+            cy.stub().as('disconnectEvent'),
+          );
+        });
+
         const widgetConfig = {
           theme: WidgetTheme.DARK,
           environment: Environment.SANDBOX,
@@ -554,8 +559,11 @@ describe('WalletWidget tests', () => {
         );
         cySmartGet('settings-button').click();
         cySmartGet('disconnect-button').should(
-          'not.exist',
+          'have.text',
+          'Disconnect Wallet',
         );
+        cySmartGet('disconnect-button').click();
+        cySmartGet('@disconnectEvent').should('have.been.calledOnce');
       });
 
       it('should show a disconnect button for Passport that fires the right event when clicked', () => {
@@ -626,8 +634,8 @@ describe('WalletWidget tests', () => {
         );
 
         cySmartGet('coin-info-icon').click();
-        cy.get('body').contains(t('views.COIN_INFO.metamask.body'));
-        cy.get('body').contains(t('views.COIN_INFO.metamask.heading'));
+        cy.get('body').contains('You can switch networks to add coins or move them from one network to another');
+        cy.get('body').contains('Coins and collectibles are native to networks');
         cySmartGet('back-button').should('be.visible');
       });
 
@@ -658,10 +666,11 @@ describe('WalletWidget tests', () => {
         );
 
         cySmartGet('coin-info-icon').click();
-        cy.get('body').contains(t('views.COIN_INFO.passport.body1'));
-        cy.get('body').contains(t('views.COIN_INFO.passport.body2'));
-        cy.get('body').contains(t('views.COIN_INFO.passport.linkText'));
-        cy.get('body').contains(t('views.COIN_INFO.passport.heading'));
+        // eslint-disable-next-line max-len
+        cy.get('body').contains('This network is called Immutable zkEVM. If you have other coins in your Passport and can’t see them here, they might be on another network. ');
+        cy.get('body').contains(' for more info.');
+        cy.get('body').contains('Visit our FAQs');
+        cy.get('body').contains('Coins and collectibles are native to networks');
         cySmartGet('back-button').should('be.visible');
       });
     });

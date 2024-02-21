@@ -28,6 +28,9 @@ describe('RemoteConfig', () => {
         const mockResponse = {
           status: 200,
           data: {
+            connect: {
+              walletConnect: false,
+            },
             dex: {
               overrides: {
                 rpcURL: 'https://test.com',
@@ -44,14 +47,9 @@ describe('RemoteConfig', () => {
         });
 
         expect(await fetcher.getConfig()).toEqual({
-          dex: {
-            overrides: {
-              rpcURL: 'https://test.com',
-            },
+          connect: {
+            walletConnect: false,
           },
-          allowedNetworks: [ChainId.SEPOLIA],
-        });
-        expect(await fetcher.getConfig()).toEqual({
           dex: {
             overrides: {
               rpcURL: 'https://test.com',
@@ -71,6 +69,9 @@ describe('RemoteConfig', () => {
         const mockResponse = {
           status: 200,
           data: {
+            connect: {
+              walletConnect: false,
+            },
             dex: {
               overrides: {
                 rpcURL: 'https://test.com',
@@ -126,6 +127,9 @@ describe('RemoteConfig', () => {
         const mockResponse = {
           status: 200,
           data: {
+            connect: {
+              walletConnect: false,
+            },
             [ChainId.IMTBL_ZKEVM_DEVNET]: {
               allowed: [
                 {

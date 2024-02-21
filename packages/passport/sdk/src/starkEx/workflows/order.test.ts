@@ -1,10 +1,10 @@
 import { ETHAmount, OrdersApi, UnsignedOrderRequest } from '@imtbl/core-sdk';
-import GuardianClient from '../../guardian/guardian';
+import GuardianClient from '../../guardian';
 import { PassportError, PassportErrorType } from '../../errors/passportError';
 import { mockErrorMessage, mockStarkSignature, mockUserImx } from '../../test/mocks';
 import { cancelOrder, createOrder } from './order';
 
-jest.mock('../../guardian/guardian');
+jest.mock('../../guardian');
 
 describe('order', () => {
   const mockGuardianClient = new GuardianClient({} as any);
@@ -125,7 +125,7 @@ describe('order', () => {
       expect(mockGetSignableCreateOrder).toBeCalledWith(mockSignableOrderRequest, mockHeader);
       expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
       expect(mockGuardianClient.evaluateImxTransaction)
-        .toBeCalledWith({ payloadHash: mockSignableOrderResponse.data.payload_hash, user: mockUserImx });
+        .toBeCalledWith({ payloadHash: mockSignableOrderResponse.data.payload_hash });
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
       expect(mockCreateOrder).toBeCalledWith(
         mockCreateOrderRequest,
@@ -187,7 +187,7 @@ describe('order', () => {
       ));
       expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
       expect(mockGuardianClient.evaluateImxTransaction)
-        .toBeCalledWith({ payloadHash: mockSignableOrderResponse.data.payload_hash, user: mockUserImx });
+        .toBeCalledWith({ payloadHash: mockSignableOrderResponse.data.payload_hash });
     });
   });
 
@@ -266,7 +266,7 @@ describe('order', () => {
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
       expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
       expect(mockGuardianClient.evaluateImxTransaction)
-        .toBeCalledWith({ payloadHash: mockPayloadHash, user: mockUserImx });
+        .toBeCalledWith({ payloadHash: mockPayloadHash });
       expect(mockCancelOrder).toBeCalledWith(
         mockCancelOrderRequest,
         mockHeader,

@@ -7,14 +7,18 @@ interface TextInputFormProps {
   placeholder?: string;
   subtext?: string;
   textAlign?: 'left' | 'right';
+  type?: TextInputType;
   errorMessage?: string;
   disabled?: boolean;
   validator: (value: string) => boolean;
   onTextInputChange: (value: string) => void;
-  onTextInputBlur: (value: string) => void;
+  onTextInputBlur?: (value: string) => void;
   onTextInputFocus?: (value: string) => void;
+  onTextInputEnter?: () => void;
   maxButtonClick?: () => void;
 }
+
+export type TextInputType = 'text' | 'number';
 
 export function TextInputForm({
   testId,
@@ -25,13 +29,18 @@ export function TextInputForm({
   onTextInputChange,
   onTextInputBlur,
   onTextInputFocus,
+  onTextInputEnter,
   textAlign,
+  type,
   subtext,
   maxButtonClick,
   disabled,
 }: TextInputFormProps) {
   const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>, previousValue: string) => {
-    const inputValue = event.target.value;
+    let inputValue = event.target.value;
+    if (type === 'number' && inputValue === '.') {
+      inputValue = '0.';
+    }
     if (!validator(inputValue)) {
       // TODO: is there a better solution to this, cypress tests having issues with typing 'abc' and it still being set
       onTextInputChange(previousValue ?? '');
@@ -41,6 +50,7 @@ export function TextInputForm({
   };
 
   const handleOnBlur = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!onTextInputBlur) return;
     const inputValue = event.target.value;
     if (!validator(inputValue)) return;
     onTextInputBlur(inputValue);
@@ -51,6 +61,13 @@ export function TextInputForm({
     const inputValue = event.target.value;
     if (!validator(inputValue)) return;
     onTextInputFocus(inputValue);
+  };
+
+  const handleOnKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!onTextInputEnter) return;
+    if (event.key === 'Enter') {
+      onTextInputEnter();
+    }
   };
 
   return (
@@ -71,6 +88,7 @@ export function TextInputForm({
         placeholder={placeholder}
         onBlur={handleOnBlur}
         onFocus={handleOnFocus}
+        onKeyDown={handleOnKeyDown}
         disabled={disabled}
         hideClearValueButton
         sx={{ minWidth: '100%' }}

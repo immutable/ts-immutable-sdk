@@ -1,24 +1,24 @@
 import {
-  ExternalProvider, JsonRpcProvider, JsonRpcSigner, TransactionRequest, Web3Provider,
+  JsonRpcProvider, TransactionRequest,
 } from '@ethersproject/providers';
 import { BigNumber, BigNumberish } from 'ethers';
+import { Signer } from '@ethersproject/abstract-signer';
 import { getEip155ChainId, getNonce, getSignedMetaTransactions } from './walletHelpers';
 import { MetaTransaction, RelayerTransactionStatus } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { retryWithDelay } from '../network/retry';
 import { RelayerClient } from './relayerClient';
-import { UserZkEvm } from '../types';
-import GuardianClient, { convertBigNumberishToString } from '../guardian/guardian';
+import GuardianClient, { convertBigNumberishToString } from '../guardian';
 
 const MAX_TRANSACTION_HASH_RETRIEVAL_RETRIES = 30;
 const TRANSACTION_HASH_RETRIEVAL_WAIT = 1000;
 
 export type EthSendTransactionParams = {
-  magicProvider: ExternalProvider;
+  ethSigner: Signer;
   jsonRpcProvider: JsonRpcProvider;
   guardianClient: GuardianClient;
   relayerClient: RelayerClient;
-  user: UserZkEvm;
+  zkevmAddress: string,
   params: Array<any>;
 };
 
@@ -27,7 +27,7 @@ const getMetaTransactions = async (
   nonce: BigNumberish,
   chainId: BigNumber,
   walletAddress: string,
-  signer: JsonRpcSigner,
+  signer: Signer,
   relayerClient: RelayerClient,
 ): Promise<MetaTransaction[]> => {
   // NOTE: We sign the transaction before getting the fee options because
@@ -69,11 +69,11 @@ const getMetaTransactions = async (
 
 export const sendTransaction = ({
   params,
-  magicProvider,
+  ethSigner,
   jsonRpcProvider,
   relayerClient,
   guardianClient,
-  user,
+  zkevmAddress,
 }: EthSendTransactionParams): Promise<string> => guardianClient
   .withConfirmationScreen({ width: 480, height: 720 })(async () => {
     const transactionRequest: TransactionRequest = params[0];
@@ -83,10 +83,8 @@ export const sendTransaction = ({
 
     const { chainId } = await jsonRpcProvider.ready;
     const chainIdBigNumber = BigNumber.from(chainId);
-    const magicWeb3Provider = new Web3Provider(magicProvider);
-    const signer = magicWeb3Provider.getSigner();
 
-    const nonce = await getNonce(jsonRpcProvider, user.zkEvm.ethAddress);
+    const nonce = await getNonce(jsonRpcProvider, zkevmAddress);
     const metaTransaction: MetaTransaction = {
       to: transactionRequest.to,
       data: transactionRequest.data,
@@ -99,29 +97,30 @@ export const sendTransaction = ({
       metaTransaction,
       nonce,
       chainIdBigNumber,
-      user.zkEvm.ethAddress,
-      signer,
+      zkevmAddress,
+      ethSigner,
       relayerClient,
     );
 
-    await guardianClient.validateEVMTransaction({
-      chainId: getEip155ChainId(chainId),
-      nonce: convertBigNumberishToString(nonce),
-      user,
-      metaTransactions,
-    });
+    // Parallelize the validation and signing of the transaction
+    const [, signedTransactions] = await Promise.all([
+      guardianClient.validateEVMTransaction({
+        chainId: getEip155ChainId(chainId),
+        nonce: convertBigNumberishToString(nonce),
+        metaTransactions,
+      }),
+      // NOTE: We sign again because we now are adding the fee transaction, so the
+      // whole payload is different and needs a new signature.
+      getSignedMetaTransactions(
+        metaTransactions,
+        nonce,
+        chainIdBigNumber,
+        zkevmAddress,
+        ethSigner,
+      ),
+    ]);
 
-    // NOTE: We sign again because we now are adding the fee transaction, so the
-    // whole payload is different and needs a new signature.
-    const signedTransactions = await getSignedMetaTransactions(
-      metaTransactions,
-      nonce,
-      chainIdBigNumber,
-      user.zkEvm.ethAddress,
-      signer,
-    );
-
-    const relayerId = await relayerClient.ethSendTransaction(user.zkEvm.ethAddress, signedTransactions);
+    const relayerId = await relayerClient.ethSendTransaction(zkevmAddress, signedTransactions);
 
     const retrieveRelayerTransaction = async () => {
       const tx = await relayerClient.imGetTransactionByHash(relayerId);

@@ -16,9 +16,15 @@ export const feeItemStyles = { display: 'flex', width: '100%' };
 
 export const feeItemLabelStyles = (boldLabel?: boolean) => ({
   width: '50%',
-  color: boldLabel ? 'base.color.text.primary' : 'base.color.text.secondary',
+  color: boldLabel ? 'base.color.text.body.primary' : 'base.color.text.body.secondary',
 });
 
 export const feeItemPriceDisplayStyles = {
   width: '50%',
+};
+
+export const feeItemLoadingStyles = {
+  display: 'flex',
+  flexDirection: 'column',
+  rowGap: 'base.spacing.x2',
 };

@@ -53,6 +53,23 @@ const main = () => {
         // data = findAndReplace(data, <find>, <replace>);
 
         fs.writeFileSync(destPath, data);
+
+        // Copy over all js files when the copyAllJsFiles flag is set
+        if (item.copyAllJsFiles) {
+          const srcDirectory = path.dirname(sourceFile);
+          const jsFiles = fs.readdirSync(srcDirectory);
+          jsFiles.forEach((jsFile) => {
+            // Check if the file is a .js file
+            if (path.extname(jsFile) === '.js') {
+              // Skip copying the original file and copy over all other .js files
+              if (jsFile !== path.basename(sourceFile)) {
+                const jsSrcPath = path.join(srcDirectory, jsFile);
+                const jsDestPath = path.join(directoryPath, jsFile);
+                fs.copyFileSync(jsSrcPath, jsDestPath);
+              }
+            }
+          });
+        }
       });
     }
   });

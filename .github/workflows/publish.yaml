@@ -99,11 +99,12 @@ jobs:
       - name: Test
         run: yarn test
 
-      - name: Push tags
-        # Boolean inputs are not actually booleans, see https://github.com/actions/runner/issues/1483
-        if: github.event.inputs.dry_run == 'false'
-        run: |
-          echo "$(git push --tags)"
+      # [DX-2633]: Disabled for now, check the JIRA issue for more details
+      # - name: Push tags
+      #   # Boolean inputs are not actually booleans, see https://github.com/actions/runner/issues/1483
+      #   if: github.event.inputs.dry_run == 'false'
+      #   run: |
+      #     echo "$(git push --tags)"
 
       - name: Pre Release Step
         if: contains(github.event.inputs.release_type, 'alpha')
@@ -140,7 +141,7 @@ jobs:
       - name: Create GitHub Release
         id: gh_release
         if: contains(github.event.inputs.release_type, 'release') && github.event.inputs.dry_run == 'false'
-        run: gh release create ${{ steps.version.outputs.NEXT_VERSION }} --title ${{ steps.version.outputs.NEXT_VERSION }} --draft=false --prerelease=false --generate-notes --repo immutable/ts-immutable-sdk
+        run: gh release create ${{ steps.version.outputs.NEXT_VERSION }} --title ${{ steps.version.outputs.NEXT_VERSION }} --draft=false --prerelease=false --generate-notes --repo immutable/ts-immutable-sdk --target main
 
       - name: Get GitHub Release Name and URL
         if: contains(github.event.inputs.release_type, 'release') && github.event.inputs.dry_run == 'false'

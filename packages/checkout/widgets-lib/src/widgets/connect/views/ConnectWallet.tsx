@@ -1,6 +1,7 @@
 import { useContext, useEffect } from 'react';
 import { Body, Box, Heading } from '@biom3/react';
 import { useTranslation } from 'react-i18next';
+import { ChainId } from '@imtbl/checkout-sdk';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -8,7 +9,11 @@ import { WalletList } from '../components/WalletList';
 import { ConnectContext } from '../context/ConnectContext';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
-export function ConnectWallet() {
+export interface ConnectWalletProps {
+  targetChainId: ChainId;
+}
+
+export function ConnectWallet({ targetChainId }: ConnectWalletProps) {
   const { t } = useTranslation();
   const {
     connectState: { sendCloseEvent },
@@ -53,7 +58,7 @@ export function ConnectWallet() {
         <Body
           size="small"
           sx={{
-            color: 'base.color.text.secondary',
+            color: 'base.color.text.body.secondary',
             paddingX: 'base.spacing.x4',
           }}
         >
@@ -61,7 +66,7 @@ export function ConnectWallet() {
         </Body>
       </Box>
       <Box sx={{ paddingX: 'base.spacing.x2' }}>
-        <WalletList />
+        <WalletList targetChainId={targetChainId} />
       </Box>
     </SimpleLayout>
   );

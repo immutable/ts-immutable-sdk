@@ -3,12 +3,13 @@ export const containerStyles = {
   flexDirection: 'column',
   alignItems: 'center',
   paddingTop: 'base.spacing.x6',
-  paddingBottom: 'base.spacing.x1',
+  paddingBottom: 'base.spacing.x4',
+  paddingX: 'base.spacing.x4',
   height: '100%',
 };
 
 export const contentTextStyles = {
-  color: 'base.color.text.secondary',
+  color: 'base.color.text.body.secondary',
   fontFamily: 'base.font.family.heading.secondary',
   textAlign: 'center',
   marginTop: 'base.spacing.x4',
