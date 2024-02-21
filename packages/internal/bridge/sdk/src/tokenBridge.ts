@@ -162,18 +162,16 @@ export class TokenBridge {
       const sourceProvider:ethers.providers.Provider = (req.action === BridgeFeeActions.WITHDRAW)
         ? this.config.childProvider : this.config.rootProvider;
 
-      // const dummyAddress = ethers.Wallet.createRandom().address;
+      sourceChainGas = await this.getGasEstimates(
+        sourceProvider,
+        BridgeMethodsGasLimit[`${req.action}_SOURCE`],
+      );
 
       const feeResult = await this.calculateBridgeFee(
         req.sourceChainId,
         req.destinationChainId,
         BridgeMethodsGasLimit[`${req.action}_DESTINATION`],
         req.gasMultiplier,
-      );
-
-      sourceChainGas = await this.getGasEstimates(
-        sourceProvider,
-        BridgeMethodsGasLimit[`${req.action}_SOURCE`],
       );
 
       bridgeFee = feeResult.bridgeFee;
