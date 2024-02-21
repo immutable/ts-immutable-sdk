@@ -2,7 +2,7 @@ import { Box, ButtCon, MenuItem } from '@biom3/react';
 import {
   useContext, useEffect, useMemo, useState,
 } from 'react';
-import { IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
+import { IMTBLWidgetEvents, WidgetTheme } from '@imtbl/checkout-sdk';
 import { fetchTokenSymbols } from 'lib/fetchTokenSymbols';
 import { CryptoFiatActions, CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext';
 import { ButtonNavigationStyles } from 'components/Header/HeaderStyles';
@@ -37,9 +37,11 @@ import { BalanceInfo, mapTokenBalancesWithConversions } from '../functions/token
 
 type WalletBalancesProps = {
   balancesLoading: boolean;
+  theme: WidgetTheme;
 };
 export function WalletBalances({
   balancesLoading,
+  theme,
 }: WalletBalancesProps) {
   const { t } = useTranslation();
   const { connectLoaderState } = useContext(ConnectLoaderContext);
@@ -188,6 +190,7 @@ export function WalletBalances({
               <TokenBalanceList
                 balanceInfoItems={balanceInfos}
                 bridgeToL2OnClick={handleBridgeToL2OnClick}
+                theme={theme}
               />
             )}
           </Box>

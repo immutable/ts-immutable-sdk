@@ -52,6 +52,7 @@ export default function WalletWidget(props: WalletWidgetInputs) {
       isOnRampEnabled,
       isSwapEnabled,
       isBridgeEnabled,
+      theme,
     },
   } = props;
 
@@ -199,7 +200,7 @@ export default function WalletWidget(props: WalletWidgetInputs) {
             <LoadingView loadingText={loadingText} />
           )}
           {viewState.view.type === WalletWidgetViews.WALLET_BALANCES && (
-            <WalletBalances balancesLoading={balancesLoading} />
+            <WalletBalances balancesLoading={balancesLoading} theme={theme} />
           )}
           {viewState.view.type === WalletWidgetViews.SETTINGS && <Settings />}
           {viewState.view.type === WalletWidgetViews.COIN_INFO && (

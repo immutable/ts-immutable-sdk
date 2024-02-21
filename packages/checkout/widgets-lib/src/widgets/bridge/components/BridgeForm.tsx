@@ -48,6 +48,7 @@ interface BridgeFormProps {
   defaultAmount?: string;
   defaultTokenAddress?: string;
   isTokenBalancesLoading?: boolean;
+  defaultTokenImage: string;
 }
 
 export function BridgeForm(props: BridgeFormProps) {
@@ -72,6 +73,7 @@ export function BridgeForm(props: BridgeFormProps) {
     defaultAmount,
     defaultTokenAddress,
     isTokenBalancesLoading,
+    defaultTokenImage,
   } = props;
 
   const { track } = useAnalytics();
@@ -345,6 +347,7 @@ export function BridgeForm(props: BridgeFormProps) {
               textAlign="left"
               errorMessage={t(tokenError)}
               onSelectChange={(option) => handleSelectTokenChange(option)}
+              defaultTokenImage={defaultTokenImage}
             />
             <TextInputForm
               testId="bridge-amount"
