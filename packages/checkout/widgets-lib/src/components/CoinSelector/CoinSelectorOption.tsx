@@ -6,6 +6,7 @@ export interface CoinSelectorOptionProps {
   id: string;
   name: string;
   icon?: AllIconKeys | string;
+  defaultTokenImage: string;
   symbol: string;
   onClick?: () => void
   balance?: {
@@ -15,7 +16,7 @@ export interface CoinSelectorOptionProps {
 }
 
 export function CoinSelectorOption({
-  onClick, icon, name, symbol, balance, testId, id,
+  onClick, icon, name, symbol, balance, defaultTokenImage, testId, id,
 }: CoinSelectorOptionProps) {
   const { t } = useTranslation();
 
@@ -26,6 +27,7 @@ export function CoinSelectorOption({
         <MenuItem.FramedImage
           imageUrl={icon}
           circularFrame
+          defaultImageUrl={defaultTokenImage}
         />
       )}
 

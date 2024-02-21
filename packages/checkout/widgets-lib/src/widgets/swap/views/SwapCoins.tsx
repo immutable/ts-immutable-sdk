@@ -93,12 +93,14 @@ export function SwapCoins({
           justifyContent: 'space-between',
         }}
       >
-        <SwapForm data={{
-          fromAmount,
-          toAmount,
-          fromTokenAddress,
-          toTokenAddress,
-        }}
+        <SwapForm
+          data={{
+            fromAmount,
+            toAmount,
+            fromTokenAddress,
+            toTokenAddress,
+          }}
+          theme={theme}
         />
         <NotEnoughImx
           environment={checkout?.config.environment ?? Environment.PRODUCTION}

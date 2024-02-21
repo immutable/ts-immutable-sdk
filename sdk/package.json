@@ -23,6 +23,8 @@
     "@uniswap/router-sdk": "^1.4.0",
     "@uniswap/sdk-core": "^3.0.1",
     "@uniswap/v3-sdk": "^3.9.0",
+    "@walletconnect/ethereum-provider": "^2.11.1",
+    "@walletconnect/modal": "^2.6.2",
     "assert": "^2.0.0",
     "axios": "^1.6.5",
     "bn.js": "^5.2.1",

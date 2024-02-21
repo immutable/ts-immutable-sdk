@@ -15,16 +15,19 @@ describe('SelectForm', () => {
               id: 'imx',
               name: 'ImmutableX',
               symbol: 'IMX',
+              defaultTokenImage: 'default-token-image',
             },
             {
               id: 'eth',
               name: 'Ethereum',
               symbol: 'ETH',
+              defaultTokenImage: 'default-token-image',
             },
           ]}
           onSelectChange={() => {}}
           coinSelectorHeading="Select coin"
           selectedOption="imx"
+          defaultTokenImage="default-token-image"
         />
       </ViewContextTestComponent>,
     );
@@ -41,15 +44,18 @@ describe('SelectForm', () => {
               id: 'imx',
               name: 'ImmutableX',
               symbol: 'IMX',
+              defaultTokenImage: 'default-token-image',
             },
             {
               id: 'eth',
               name: 'Ethereum',
               symbol: 'ETH',
+              defaultTokenImage: 'default-token-image',
             },
           ]}
           onSelectChange={() => {}}
           coinSelectorHeading="Select coin"
+          defaultTokenImage="default-token-image"
         />
       </ViewContextTestComponent>,
     );
@@ -68,15 +74,18 @@ describe('SelectForm', () => {
               id: 'imx',
               name: 'ImmutableX',
               symbol: 'IMX',
+              defaultTokenImage: 'default-token-image',
             },
             {
               id: 'eth',
               name: 'Ethereum',
               symbol: 'ETH',
+              defaultTokenImage: 'default-token-image',
             },
           ]}
           onSelectChange={() => {}}
           coinSelectorHeading="Select coin"
+          defaultTokenImage="default-token-image"
         />
       </ViewContextTestComponent>,
     );
@@ -91,6 +100,7 @@ describe('SelectForm', () => {
           options={[]}
           onSelectChange={() => {}}
           coinSelectorHeading="Select coin"
+          defaultTokenImage="default-token-image"
         />
       </ViewContextTestComponent>,
     );
@@ -106,6 +116,7 @@ describe('SelectForm', () => {
           onSelectChange={() => {}}
           coinSelectorHeading="Select coin"
           selectedOption="imx"
+          defaultTokenImage="default-token-image"
         />
       </ViewContextTestComponent>,
     );

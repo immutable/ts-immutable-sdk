@@ -22,6 +22,7 @@ type TransactionItemWithdrawPendingProps = {
   fiatAmount: string,
   amount: string,
   icon: string,
+  defaultTokenImage: string,
 };
 
 export function TransactionItemWithdrawPending({
@@ -30,6 +31,7 @@ export function TransactionItemWithdrawPending({
   fiatAmount,
   amount,
   icon,
+  defaultTokenImage,
 }: TransactionItemWithdrawPendingProps) {
   const { viewDispatch } = useContext(ViewContext);
   const { track } = useAnalytics();
@@ -148,7 +150,7 @@ export function TransactionItemWithdrawPending({
       >
         <Accordion.TargetLeftSlot sx={{ pr: 'base.spacing.x2' }}>
           <MenuItem size="xSmall">
-            <MenuItem.FramedImage imageUrl={icon} circularFrame />
+            <MenuItem.FramedImage imageUrl={icon} circularFrame defaultImageUrl={defaultTokenImage} />
             <MenuItem.Label>
               {label}
             </MenuItem.Label>
