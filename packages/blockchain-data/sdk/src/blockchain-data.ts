@@ -1,5 +1,8 @@
 import { mr } from '@imtbl/generated-clients';
-import { BlockchainDataConfiguration, BlockchainDataModuleConfiguration, } from './config';
+import {
+  BlockchainDataConfiguration,
+  BlockchainDataModuleConfiguration,
+} from './config';
 import { formatError } from './utils/formatErrors';
 
 export class BlockchainData {
@@ -55,7 +58,7 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async listActivityHistory(
-    request: mr.ActivitiesApiListActivityHistoryRequest
+    request: mr.ActivitiesApiListActivityHistoryRequest,
   ): Promise<mr.ListActivitiesResult> {
     return await this.activities
       .listActivityHistory(request)
@@ -212,6 +215,60 @@ export class BlockchainData {
   ): Promise<mr.ListNFTsResult> {
     return await this.nfts
       .listAllNFTs(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
+
+  /**
+   * Create a mint request to mint a set of NFTs for a given collection
+   * @experimental
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with the remaining rate limits
+   * @throws {@link index.APIError}
+   */
+  public async createMintRequest(
+    request: mr.NftsApiCreateMintRequestRequest,
+  ): Promise<mr.CreateMintRequestResult> {
+    return await this.nfts
+      .createMintRequest(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
+
+  /**
+   * List all mint requests for a given contract address
+   * @experimental
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with a list of mint requests
+   * @throws {@link index.APIError}
+   */
+  public async listMintRequests(
+    request: mr.NftsApiListMintRequestsRequest,
+  ): Promise<mr.ListMintRequestsResult> {
+    return await this.nfts
+      .listMintRequests(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
+
+  /**
+   * Retrieve the status of a single mint request identified by its reference ID
+   * @experimental
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with a single mint request
+   * @throws {@link index.APIError}
+   */
+  public async getMintRequest(
+    request: mr.NftsApiGetMintRequestRequest,
+  ): Promise<mr.ListMintRequestsResult> {
+    return await this.nfts
+      .getMintRequest(request)
       .then((res) => res.data)
       .catch((err) => {
         throw formatError(err);
