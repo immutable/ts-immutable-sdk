@@ -97,7 +97,7 @@ describe('SwapForm', () => {
           initialStateOverride={testSwapState}
           cryptoConversionsOverride={cryptoConversions}
         >
-          <SwapForm />
+          <SwapForm theme={WidgetTheme.DARK} />
         </SwapWidgetTestComponent>,
       );
       cySmartGet('fromTokenInputs-select-form-select__target').should('be.visible');
@@ -122,9 +122,11 @@ describe('SwapForm', () => {
           initialStateOverride={testSwapState}
           cryptoConversionsOverride={cryptoConversions}
         >
-          <SwapForm data={{
-            fromTokenAddress: NATIVE,
-          }}
+          <SwapForm
+            theme={WidgetTheme.DARK}
+            data={{
+              fromTokenAddress: NATIVE,
+            }}
           />
         </SwapWidgetTestComponent>,
       );
@@ -139,9 +141,11 @@ describe('SwapForm', () => {
           initialStateOverride={testSwapState}
           cryptoConversionsOverride={cryptoConversions}
         >
-          <SwapForm data={{
-            toTokenAddress: NATIVE,
-          }}
+          <SwapForm
+            theme={WidgetTheme.DARK}
+            data={{
+              toTokenAddress: NATIVE,
+            }}
           />
         </SwapWidgetTestComponent>,
       );
@@ -156,9 +160,11 @@ describe('SwapForm', () => {
           initialStateOverride={testSwapState}
           cryptoConversionsOverride={cryptoConversions}
         >
-          <SwapForm data={{
-            fromTokenAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-          }}
+          <SwapForm
+            theme={WidgetTheme.DARK}
+            data={{
+              fromTokenAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+            }}
           />
         </SwapWidgetTestComponent>,
       );
@@ -173,9 +179,11 @@ describe('SwapForm', () => {
           initialStateOverride={testSwapState}
           cryptoConversionsOverride={cryptoConversions}
         >
-          <SwapForm data={{
-            toTokenAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-          }}
+          <SwapForm
+            theme={WidgetTheme.DARK}
+            data={{
+              toTokenAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+            }}
           />
         </SwapWidgetTestComponent>,
       );
@@ -190,10 +198,12 @@ describe('SwapForm', () => {
           initialStateOverride={testSwapState}
           cryptoConversionsOverride={cryptoConversions}
         >
-          <SwapForm data={{
-            fromTokenAddress: NATIVE,
-            toTokenAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-          }}
+          <SwapForm
+            theme={WidgetTheme.DARK}
+            data={{
+              fromTokenAddress: NATIVE,
+              toTokenAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+            }}
           />
         </SwapWidgetTestComponent>,
       );
@@ -210,10 +220,12 @@ describe('SwapForm', () => {
           initialStateOverride={testSwapState}
           cryptoConversionsOverride={cryptoConversions}
         >
-          <SwapForm data={{
-            fromTokenAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-            toTokenAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-          }}
+          <SwapForm
+            theme={WidgetTheme.DARK}
+            data={{
+              fromTokenAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+              toTokenAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+            }}
           />
         </SwapWidgetTestComponent>,
       );
@@ -292,7 +304,7 @@ describe('SwapForm', () => {
       it(`should only allow numbers with 6 decimal places in the swapFromAmount input - ${testCase.name}`, () => {
         mount(
           <SwapWidgetTestComponent>
-            <SwapForm />
+            <SwapForm theme={WidgetTheme.DARK} />
           </SwapWidgetTestComponent>,
         );
 

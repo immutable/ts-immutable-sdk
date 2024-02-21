@@ -39,10 +39,11 @@ import { TransactionList } from './TransactionList';
 import { NoTransactions } from './NoTransactions';
 
 type TransactionsProps = {
+  defaultTokenImage: string;
   onBackButtonClick: () => void;
 };
 
-export function Transactions({ onBackButtonClick }: TransactionsProps) {
+export function Transactions({ defaultTokenImage, onBackButtonClick }: TransactionsProps) {
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const { cryptoFiatDispatch } = useContext(CryptoFiatContext);
@@ -342,6 +343,7 @@ export function Transactions({ onBackButtonClick }: TransactionsProps) {
               transactions={txs}
               knownTokenMap={knownTokenMap}
               isPassport={isPassport}
+              defaultTokenImage={defaultTokenImage}
               changeWallet={() => setShowWalletDrawer(true)}
             />
           )}

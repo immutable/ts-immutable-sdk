@@ -22,6 +22,7 @@ type TransactionItemProps = {
   fiatAmount: string,
   amount: string,
   icon: string,
+  defaultTokenImage: string,
 };
 
 export function TransactionItem({
@@ -31,6 +32,7 @@ export function TransactionItem({
   fiatAmount,
   amount,
   icon,
+  defaultTokenImage,
 }: TransactionItemProps) {
   const { track } = useAnalytics();
 
@@ -77,7 +79,7 @@ export function TransactionItem({
       >
         <Accordion.TargetLeftSlot sx={{ pr: 'base.spacing.x2' }}>
           <MenuItem size="xSmall">
-            <MenuItem.FramedImage imageUrl={icon} circularFrame />
+            <MenuItem.FramedImage imageUrl={icon} circularFrame defaultImageUrl={defaultTokenImage} />
             <MenuItem.Label>
               {label}
             </MenuItem.Label>

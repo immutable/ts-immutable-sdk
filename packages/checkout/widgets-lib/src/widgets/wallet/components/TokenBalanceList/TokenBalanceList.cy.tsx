@@ -1,6 +1,7 @@
 import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
+import { WidgetTheme } from '@imtbl/checkout-sdk';
 import { TokenBalanceList } from './TokenBalanceList';
 import { cyIntercept, cySmartGet } from '../../../../lib/testUtils';
 import { ZERO_BALANCE_STRING } from '../../../../lib';
@@ -17,6 +18,7 @@ describe('TokenBalanceList', () => {
         <TokenBalanceList
           balanceInfoItems={[]}
           bridgeToL2OnClick={() => {}}
+          theme={WidgetTheme.DARK}
         />
       </ViewContextTestComponent>,
     );
@@ -37,6 +39,7 @@ describe('TokenBalanceList', () => {
             },
           ]}
           bridgeToL2OnClick={() => {}}
+          theme={WidgetTheme.DARK}
         />
       </ViewContextTestComponent>,
     );
@@ -71,6 +74,7 @@ describe('TokenBalanceList', () => {
             },
           ]}
           bridgeToL2OnClick={() => {}}
+          theme={WidgetTheme.DARK}
         />
       </ViewContextTestComponent>,
     );
