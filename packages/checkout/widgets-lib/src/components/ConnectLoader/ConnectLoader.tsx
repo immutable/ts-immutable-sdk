@@ -100,6 +100,14 @@ export function ConnectLoader({
             provider: createProviderResult.provider,
           },
         });
+
+        connectLoaderDispatch({
+          payload: {
+            type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
+            connectionStatus: ConnectionStatus.NOT_CONNECTED,
+            deepLink: ConnectWidgetViews.READY_TO_CONNECT,
+          },
+        });
         return true;
       }
     } catch (err: any) {
