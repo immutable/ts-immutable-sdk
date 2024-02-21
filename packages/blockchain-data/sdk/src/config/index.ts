@@ -3,6 +3,7 @@ import {
   Environment,
   ImmutableConfiguration,
   ModuleConfiguration,
+  addKeysToHeadersOverride
 } from '@imtbl/config';
 import { mr } from '@imtbl/generated-clients';
 
@@ -20,16 +21,23 @@ export interface APIConfigurationParams {
  * createAPIConfiguration to create a custom Configuration
  * other than the production and sandbox defined below.
  */
-export const createAPIConfiguration = ({
-  baseConfig,
-  basePath,
-  headers: baseHeaders,
-}: APIConfigurationParams): mr.Configuration => {
+export const createAPIConfiguration = (overrides: APIConfigurationParams): mr.Configuration => {
+  const {
+    baseConfig,
+    basePath,
+    headers: baseHeaders,
+  } = overrides;
+
   if (!basePath.trim()) {
     throw Error('basePath can not be empty');
   }
 
-  const headers = { ...(baseHeaders || {}), ...defaultHeaders };
+  const headers = {
+    ...(baseHeaders || {}),
+    ...(addKeysToHeadersOverride(baseConfig, overrides) || {}),
+    ...defaultHeaders
+  };
+
   const configParams: mr.ConfigurationParameters = {
     ...baseConfig,
     basePath,
@@ -40,7 +48,7 @@ export const createAPIConfiguration = ({
 };
 
 export interface BlockchainDataModuleConfiguration
-  extends ModuleConfiguration<APIConfigurationParams> {}
+  extends ModuleConfiguration<APIConfigurationParams> { }
 
 export class BlockchainDataConfiguration {
   readonly apiConfig: mr.Configuration;
