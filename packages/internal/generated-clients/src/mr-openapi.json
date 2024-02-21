@@ -1814,6 +1814,264 @@
         }
       }
     },
+    "/v1/chains/{chain_name}/collections/{contract_address}/nfts/mint-requests": {
+      "post": {
+        "description": "[Experimental] Create a mint request to mint a set of NFTs for a given collection",
+        "summary": "[Experimental] Mint NFTs",
+        "security": [
+          {
+            "ImmutableApiKey": [
+              "write:mint-request"
+            ]
+          }
+        ],
+        "tags": [
+          "nfts"
+        ],
+        "operationId": "CreateMintRequest",
+        "parameters": [
+          {
+            "name": "contract_address",
+            "in": "path",
+            "description": "The address of contract",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          },
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "the request body",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMintRequestRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "headers": {
+              "imx-mint-requests-limit": {
+                "$ref": "#/components/headers/MintRequestsLimit"
+              },
+              "imx-mint-requests-limit-reset": {
+                "$ref": "#/components/headers/MintRequestsLimitReset"
+              },
+              "imx-remaining-mint-requests": {
+                "$ref": "#/components/headers/MintRequestsLimitRemaining"
+              },
+              "imx-mint-requests-retry-after": {
+                "$ref": "#/components/headers/MintRequestsRetryAfter"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateMintRequestResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorisedRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyMintRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      },
+      "get": {
+        "description": "[Experimental] Retrieve the status of all mints for a given contract address",
+        "summary": "[Experimental] List mint requests",
+        "security": [
+          {
+            "ImmutableApiKey": [
+              "write:mint-request"
+            ]
+          }
+        ],
+        "tags": [
+          "nfts"
+        ],
+        "operationId": "ListMintRequests",
+        "parameters": [
+          {
+            "name": "contract_address",
+            "in": "path",
+            "description": "The address of contract",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          },
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            }
+          },
+          {
+            "name": "page_cursor",
+            "in": "query",
+            "description": "Encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageCursor"
+            }
+          },
+          {
+            "name": "page_size",
+            "description": "Maximum number of items to return",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageSize"
+            }
+          },
+          {
+            "name": "status",
+            "description": "The status of the mint request",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/MintRequestStatus"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListMintRequestsResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorisedRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/collections/{contract_address}/nfts/mint-requests/{reference_id}": {
+      "get": {
+        "description": "[Experimental] Retrieve the status of a mint request identified by its reference_id",
+        "summary": "[Experimental] Get mint request by reference ID",
+        "security": [
+          {
+            "ImmutableApiKey": [
+              "write:mint-request"
+            ]
+          }
+        ],
+        "tags": [
+          "nfts"
+        ],
+        "operationId": "GetMintRequest",
+        "parameters": [
+          {
+            "name": "contract_address",
+            "in": "path",
+            "description": "The address of contract",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          },
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            }
+          },
+          {
+            "name": "reference_id",
+            "description": "The ID of the mint request",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "67f7d464-b8f0-4f6a-9a3b-8d3cb4a21af0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListMintRequestsResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorisedRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/v1/chains/{chain_name}/orders/cancel": {
       "post": {
         "tags": [
@@ -3151,6 +3409,30 @@
           },
           "retry-after": {
             "$ref": "#/components/headers/MetadataRefreshRetryAfter"
+          }
+        }
+      },
+      "TooManyMintRequests": {
+        "description": "Too Many mint requests (429)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/APIError429"
+            }
+          }
+        },
+        "headers": {
+          "imx-mint-requests-limit": {
+            "$ref": "#/components/headers/MintRequestsLimit"
+          },
+          "imx-mint-requests-limit-reset": {
+            "$ref": "#/components/headers/MintRequestsLimitReset"
+          },
+          "imx-remaining-mint-requests": {
+            "$ref": "#/components/headers/MintRequestsLimitRemaining"
+          },
+          "imx-mint-requests-retry-after": {
+            "$ref": "#/components/headers/MintRequestsRetryAfter"
           }
         }
       },
@@ -4808,6 +5090,23 @@
           "retry_after"
         ]
       },
+      "CreateMintRequestRequest": {
+        "type": "object",
+        "properties": {
+          "assets": {
+            "type": "array",
+            "maxItems": 100,
+            "minItems": 1,
+            "description": "List of nft to be minted",
+            "items": {
+              "$ref": "#/components/schemas/MintAsset"
+            }
+          }
+        },
+        "required": [
+          "assets"
+        ]
+      },
       "MintAsset": {
         "type": "object",
         "properties": {
@@ -4828,6 +5127,49 @@
         "required": [
           "reference_id",
           "owner_address"
+        ]
+      },
+      "CreateMintRequestResult": {
+        "type": "object",
+        "properties": {
+          "imx_mint_requests_limit": {
+            "type": "string"
+          },
+          "imx_mint_requests_limit_reset": {
+            "type": "string"
+          },
+          "imx_remaining_mint_requests": {
+            "type": "string"
+          },
+          "imx_mint_requests_retry_after": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "imx_mint_requests_limit",
+          "imx_mint_requests_limit_reset",
+          "imx_remaining_mint_requests",
+          "imx_mint_requests_retry_after"
+        ]
+      },
+      "ListMintRequestsResult": {
+        "type": "object",
+        "description": "List mint requests",
+        "properties": {
+          "result": {
+            "type": "array",
+            "description": "List of mint requests",
+            "items": {
+              "$ref": "#/components/schemas/GetMintRequestResult"
+            }
+          },
+          "page": {
+            "$ref": "#/components/schemas/Page"
+          }
+        },
+        "required": [
+          "result",
+          "page"
         ]
       },
       "GetMintRequestResult": {
@@ -4896,7 +5238,6 @@
           "token_id",
           "transaction_hash",
           "error",
-          "status",
           "created_at",
           "updated_at"
         ]
