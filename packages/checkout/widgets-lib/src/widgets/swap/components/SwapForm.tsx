@@ -6,7 +6,7 @@ import {
   Body, Box, Heading, OptionKey,
 } from '@biom3/react';
 import { BigNumber, utils } from 'ethers';
-import { TokenInfo } from '@imtbl/checkout-sdk';
+import { TokenInfo, WidgetTheme } from '@imtbl/checkout-sdk';
 import { TransactionResponse } from '@imtbl/dex-sdk';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { useTranslation } from 'react-i18next';
@@ -15,7 +15,7 @@ import { amountInputValidation as textInputValidator } from '../../../lib/valida
 import { SwapContext } from '../context/SwapContext';
 import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import {
-  calculateCryptoToFiat, formatZeroAmount, isNativeToken, tokenValueFormat,
+  calculateCryptoToFiat, formatZeroAmount, getDefaultTokenImage, isNativeToken, tokenValueFormat,
 } from '../../../lib/utils';
 import {
   DEFAULT_TOKEN_DECIMALS,
@@ -96,9 +96,10 @@ let quoteRequest: CancellablePromise<any>;
 
 export interface SwapFromProps {
   data?: SwapFormData;
+  theme: WidgetTheme;
 }
 
-export function SwapForm({ data }: SwapFromProps) {
+export function SwapForm({ data, theme }: SwapFromProps) {
   const { t } = useTranslation();
   const {
     swapState: {
@@ -110,6 +111,7 @@ export function SwapForm({ data }: SwapFromProps) {
   } = useContext(SwapContext);
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
+  const defaultTokenImage = getDefaultTokenImage(checkout?.config.environment, theme);
 
   const formatTokenOptionsId = useCallback((symbol: string, address?: string) => (isNativeToken(address)
     ? `${symbol.toLowerCase()}-${NATIVE}`
@@ -746,6 +748,7 @@ export function SwapForm({ data }: SwapFromProps) {
                 ? formatTokenOptionsId(fromToken.symbol, fromToken.address)
                 : undefined}
               coinSelectorHeading={t('views.SWAP.swapForm.from.selectorTitle')}
+              defaultTokenImage={defaultTokenImage}
             />
           </Box>
 
@@ -786,6 +789,7 @@ export function SwapForm({ data }: SwapFromProps) {
                 ? formatTokenOptionsId(toToken.symbol, toToken.address)
                 : undefined}
               coinSelectorHeading={t('views.SWAP.swapForm.to.selectorTitle')}
+              defaultTokenImage={defaultTokenImage}
             />
           </Box>
         </Box>
