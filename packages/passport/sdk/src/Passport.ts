@@ -20,6 +20,7 @@ import {
   PassportEventMap,
   PassportEvents,
   PassportModuleConfiguration,
+  User,
   UserProfile,
 } from './types';
 import { ConfirmationScreen } from './confirmation';
@@ -160,7 +161,7 @@ export class Passport {
     anonymousId?: string;
   }): Promise<UserProfile | null> {
     const { useCachedSession = false } = options || {};
-    let user = null;
+    let user: User | null = null;
     try {
       user = await this.authManager.getUser();
     } catch (error) {

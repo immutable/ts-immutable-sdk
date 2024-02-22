@@ -4,7 +4,7 @@ import { SetupServer, setupServer } from 'msw/node';
 import { ChainName } from 'network/chains';
 import { RelayerTransactionRequest } from '../../zkEvm/relayerClient';
 import { JsonRpcRequestPayload } from '../../zkEvm/types';
-import { chainId, chainIdHex } from '../../test/mocks';
+import { chainId, chainIdHex, mockUserZkEvm } from '../../test/mocks';
 
 export const relayerId = '0x745';
 export const transactionHash = '0x867';
@@ -34,7 +34,12 @@ export const mswHandlers = {
   counterfactualAddress: {
     success: rest.post(
       `https://api.sandbox.immutable.com/v2/chains/${chainName}/passport/counterfactual-address`,
-      (req, res, ctx) => res(ctx.status(201)),
+      (req, res, ctx) => res(
+        ctx.status(201),
+        ctx.json({
+          counterfactual_address: mockUserZkEvm.zkEvm.ethAddress,
+        }),
+      ),
     ),
     internalServerError: rest.post(
       `https://api.sandbox.immutable.com/v2/chains/${chainName}/passport/counterfactual-address`,
