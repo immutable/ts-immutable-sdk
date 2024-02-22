@@ -20,7 +20,9 @@ describe('relayerClient', () => {
   const relayerClient = new RelayerClient({
     config: config as PassportConfiguration,
     jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
-    authManager: { getUser: jest.fn().mockResolvedValue(user as UserZkEvm) } as unknown as AuthManager,
+    authManager: {
+      getUserZkEvm: jest.fn().mockResolvedValue(user as UserZkEvm),
+    } as unknown as AuthManager,
   });
 
   let originalFetch: any;

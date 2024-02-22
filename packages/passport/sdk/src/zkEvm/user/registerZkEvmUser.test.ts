@@ -5,7 +5,7 @@ import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { ChainId, ChainName } from 'network/chains';
 import { registerZkEvmUser } from './registerZkEvmUser';
 import AuthManager from '../../authManager';
-import { mockListChains, mockUser, mockUserZkEvm } from '../../test/mocks';
+import { mockListChains, mockUserZkEvm } from '../../test/mocks';
 
 jest.mock('@ethersproject/providers');
 jest.mock('@ethersproject/abstract-signer');
@@ -17,7 +17,7 @@ describe('registerZkEvmUser', () => {
   };
   const authManager = {
     getUser: jest.fn(),
-    forceUserRefresh: jest.fn(),
+    forceUserRefreshInBackground: jest.fn(),
   };
   const multiRollupApiClients = {
     passportApi: {
@@ -59,48 +59,13 @@ describe('registerZkEvmUser', () => {
     });
   });
 
-  describe('when getUser fails to return a user', () => {
-    it('should throw an error', async () => {
-      multiRollupApiClients.passportApi.createCounterfactualAddressV2.mockResolvedValue({
-        status: 201,
-      });
-
-      authManager.getUser.mockResolvedValue(null);
-
-      await expect(async () => registerZkEvmUser({
-        authManager: authManager as unknown as AuthManager,
-        ethSigner: ethSignerMock as unknown as Signer,
-        multiRollupApiClients: multiRollupApiClients as unknown as MultiRollupApiClients,
-        accessToken,
-        jsonRpcProvider: jsonRPCProvider as unknown as JsonRpcProvider,
-      })).rejects.toThrow('Failed to refresh user details');
-    });
-  });
-
-  describe('when getUser returns a user that has not registered with zkEvm', () => {
-    it('should throw an error', async () => {
-      multiRollupApiClients.passportApi.createCounterfactualAddressV2.mockResolvedValue({
-        status: 201,
-      });
-
-      authManager.getUser.mockResolvedValue(mockUser);
-
-      await expect(async () => registerZkEvmUser({
-        authManager: authManager as unknown as AuthManager,
-        ethSigner: ethSignerMock as unknown as Signer,
-        multiRollupApiClients: multiRollupApiClients as unknown as MultiRollupApiClients,
-        accessToken,
-        jsonRpcProvider: jsonRPCProvider as unknown as JsonRpcProvider,
-      })).rejects.toThrow('Failed to refresh user details');
-    });
-  });
-
   it('should return a user that has registered with zkEvm', async () => {
     multiRollupApiClients.passportApi.createCounterfactualAddressV2.mockResolvedValue({
       status: 201,
+      data: {
+        counterfactual_address: mockUserZkEvm.zkEvm.ethAddress,
+      },
     });
-
-    authManager.forceUserRefresh.mockResolvedValue(mockUserZkEvm);
 
     const result = await registerZkEvmUser({
       authManager: authManager as unknown as AuthManager,
@@ -110,7 +75,7 @@ describe('registerZkEvmUser', () => {
       jsonRpcProvider: jsonRPCProvider as unknown as JsonRpcProvider,
     });
 
-    expect(result).toEqual(mockUserZkEvm);
+    expect(result).toEqual(mockUserZkEvm.zkEvm.ethAddress);
     expect(multiRollupApiClients.passportApi.createCounterfactualAddressV2).toHaveBeenCalledWith({
       chainName: ChainName.IMTBL_ZKEVM_TESTNET,
       createCounterfactualAddressRequest: {
@@ -122,6 +87,6 @@ describe('registerZkEvmUser', () => {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-    expect(authManager.forceUserRefresh).toHaveBeenCalledTimes(1);
+    expect(authManager.forceUserRefreshInBackground).toHaveBeenCalledTimes(1);
   });
 });
