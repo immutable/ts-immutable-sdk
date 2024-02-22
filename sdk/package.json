@@ -39,6 +39,7 @@
     "jwt-decode": "^3.1.2",
     "lru-memorise": "^0.2.1",
     "magic-sdk": "^21.2.0",
+    "mipd": "^0.0.5",
     "oidc-client-ts": "2.2.1",
     "os-browserify": "^0.3.0",
     "pako": "^2.1.0",
