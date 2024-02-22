@@ -77,3 +77,8 @@ export const addKeysToHeadersOverride = <T extends { headers?: Record<string, st
     headers: newHeaders,
   } as T;
 };
+
+export interface ModuleConfiguration<T> {
+  baseConfig: ImmutableConfiguration;
+  overrides?: T;
+}
