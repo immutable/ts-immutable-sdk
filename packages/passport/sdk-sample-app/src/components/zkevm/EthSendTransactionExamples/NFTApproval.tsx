@@ -1,4 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback, useEffect, useMemo, useState,
+} from 'react';
 import { Accordion, Form } from 'react-bootstrap';
 import { usePassportProvider } from '@/context/PassportProvider';
 import WorkflowButton from '@/components/WorkflowButton';
@@ -45,17 +47,16 @@ function NFTApproval({ disabled, handleExampleSubmitted }: RequestExampleProps) 
 
   const { zkEvmProvider } = usePassportProvider();
 
-
   const handleSetApproveType = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    setChoosedApproveType(e.target.value as ApproveType)
-  }, [])
+    setChoosedApproveType(e.target.value as ApproveType);
+  }, []);
 
   useEffect(() => {
     const nftTokenId = tokenId.trim() === '' ? '1' : tokenId;
     try {
-      const data = choosedApproveType ===ApproveType.NFTApprove
-      ? nftApproveContract.encodeFunctionData('approve', [toAddress, nftTokenId])
-      : nftApproveContract.encodeFunctionData('setApprovalForAll', [toAddress, true]);
+      const data = choosedApproveType === ApproveType.NFTApprove
+        ? nftApproveContract.encodeFunctionData('approve', [toAddress, nftTokenId])
+        : nftApproveContract.encodeFunctionData('setApprovalForAll', [toAddress, true]);
 
       setParams([{
         from: fromAddress,
@@ -134,7 +135,9 @@ function NFTApproval({ disabled, handleExampleSubmitted }: RequestExampleProps) 
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>
-              {choosedApproveType === ApproveType.NFTApprove ? "ERC721" : "ERC721 / ERC1155"} Contract Address
+              {choosedApproveType === ApproveType.NFTApprove
+                ? 'ERC721 Contract Address'
+                : 'ERC721 / ERC1155 Contract Address'}
             </Form.Label>
             <Form.Control
               required
@@ -157,8 +160,8 @@ function NFTApproval({ disabled, handleExampleSubmitted }: RequestExampleProps) 
               value={toAddress}
             />
           </Form.Group>
-          {choosedApproveType === ApproveType.NFTApprove
-            && <Form.Group className="mb-3">
+          {choosedApproveType === ApproveType.NFTApprove && (
+            <Form.Group className="mb-3">
               <Form.Label>
                 Token Id
               </Form.Label>
@@ -170,7 +173,7 @@ function NFTApproval({ disabled, handleExampleSubmitted }: RequestExampleProps) 
                 value={tokenId}
               />
             </Form.Group>
-          }
+          )}
           <WorkflowButton
             disabled={disabled}
             type="submit"
