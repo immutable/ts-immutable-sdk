@@ -378,8 +378,7 @@ export default class AuthManager {
 
   public forceUserRefreshInBackground() {
     this.refreshTokenAndUpdatePromise().catch((error) => {
-      // eslint-disable-next-line no-console
-      console.warn('Failed to refresh user token', error);
+      logger.warn('Failed to refresh user token', error);
     });
   }
 
