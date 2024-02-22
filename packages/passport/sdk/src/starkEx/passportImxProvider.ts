@@ -65,8 +65,8 @@ export class PassportImxProvider implements IMXProvider {
   /**
    * This property is set during initialisation and stores the signers in a promise.
    * This property is not meant to be accessed directly, but through the
-   * `getAuthenticatedUserAndSigners` method.
-   * @see getAuthenticatedUserAndSigners
+   * `#getSigners` method.
+   * @see #getSigners
    */
   private signers: Promise<IMXSigners | undefined> | undefined;
 
@@ -103,7 +103,7 @@ export class PassportImxProvider implements IMXProvider {
    * so that it doesn't result in an unhandled promise rejection.
    *
    * This error is thrown when the signers are requested through:
-   * @see getAuthenticatedUserAndSigners
+   * @see #getSigners
    *
    */
   #initialiseSigners() {
