@@ -1,4 +1,6 @@
-import { BigNumber, Wallet, Contract } from 'ethers';
+import {
+  BigNumber, Wallet, Contract, errors,
+} from 'ethers';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { getNonce, getSignedMetaTransactions, getSignedTypedData } from './walletHelpers';
 import { TypedDataPayload } from './types';
@@ -129,12 +131,27 @@ describe('getNonce', () => {
   });
 
   describe('when an error is thrown', () => {
-    it('should return 0', async () => {
-      nonceMock.mockRejectedValue(new Error('call revert exception'));
+    describe('and the error is a call_exception', () => {
+      it('should return 0', async () => {
+        const error = new Error('call revert exception');
+        Object.defineProperty(error, 'code', { value: errors.CALL_EXCEPTION });
 
-      const result = await getNonce(jsonRpcProvider, walletAddress);
+        nonceMock.mockRejectedValue(error);
 
-      expect(result).toEqual(BigNumber.from(0));
+        const result = await getNonce(jsonRpcProvider, walletAddress);
+
+        expect(result).toEqual(BigNumber.from(0));
+      });
+    });
+
+    describe('and the error is NOT a call_exception', () => {
+      it('should throw the error', async () => {
+        const error = new Error('call revert exception');
+        Object.defineProperty(error, 'code', { value: errors.NETWORK_ERROR });
+        nonceMock.mockRejectedValue(error);
+
+        await expect(() => getNonce(jsonRpcProvider, walletAddress)).rejects.toThrow(error);
+      });
     });
   });
 

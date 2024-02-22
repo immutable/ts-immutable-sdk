@@ -4,13 +4,13 @@ import {
   Contract,
   constants,
   utils,
+  errors,
 } from 'ethers';
 import { walletContracts } from '@0xsequence/abi';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { Signer } from '@ethersproject/abstract-signer';
 import { v1 as sequenceCoreV1 } from '@0xsequence/core';
 import { MetaTransaction, MetaTransactionNormalised, TypedDataPayload } from './types';
-import logger from '../utils/logger';
 
 const SIGNATURE_WEIGHT = 1; // Weight of a single signature in the multi-sig
 const TRANSACTION_SIGNATURE_THRESHOLD = 1; // Total required weight in the multi-sig for a transaction
@@ -61,10 +61,18 @@ export const getNonce = async (
       return result;
     }
   } catch (error) {
-    logger.warn('Failed to retrieve nonce', error);
+    if (error instanceof Error
+      && 'code' in error
+      && error.code === errors.CALL_EXCEPTION) {
+      // The most likely reason for a CALL_EXCEPTION is that the smart contract wallet
+      // has not been deployed yet, so we should default to a nonce of 0.
+      return BigNumber.from(0);
+    }
+
+    throw error;
   }
 
-  return BigNumber.from(0);
+  throw new Error('Unexpected result from contract.nonce() call.');
 };
 
 const encodeMessageSubDigest = (chainId: BigNumber, walletAddress: string, digest: string): string => (

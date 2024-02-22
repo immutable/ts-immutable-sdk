@@ -55,7 +55,7 @@ export const mswHandlers = {
             ctx.json({
               id: body.id,
               jsonrpc: '2.0',
-              result: '0x0',
+              result: '0x',
             }),
           );
         }
