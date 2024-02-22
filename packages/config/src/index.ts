@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { track, setEnvironment, setPublishableApiKey } from '@imtbl/metrics';
 
 export enum Environment {
@@ -55,6 +54,7 @@ export const addKeysToHeadersOverride = <T extends { headers?: Record<string, st
 
   if (baseConfig.publishableKey) {
     newHeaders[KeyHeaders.PUBLISHABLE_KEY] = baseConfig.publishableKey;
+    setPublishableApiKey(baseConfig.publishableKey);
   }
 
   if (baseConfig.rateLimitingKey) {
@@ -77,45 +77,3 @@ export const addKeysToHeadersOverride = <T extends { headers?: Record<string, st
     headers: newHeaders,
   } as T;
 };
-
-const API_KEY_PREFIX = 'sk_imapik-';
-const PUBLISHABLE_KEY_PREFIX = 'pk_imapik-';
-
-export const addApiKeyToAxiosHeader = (apiKey: string) => {
-  if (!apiKey.startsWith(API_KEY_PREFIX)) {
-    throw new Error(
-      'Invalid API key. Create your api key in Immutable developer hub. https://hub.immutable.com',
-    );
-  }
-  axios.defaults.headers.common[KeyHeaders.API_KEY] = apiKey;
-};
-
-export const addPublishableKeyToAxiosHeader = (publishableKey: string) => {
-  if (!publishableKey.startsWith(PUBLISHABLE_KEY_PREFIX)) {
-    throw new Error(
-      'Invalid Publishable key. Create your Publishable key in Immutable developer hub.'
-      + ' https://hub.immutable.com',
-    );
-  }
-  setPublishableApiKey(publishableKey);
-  axios.defaults.headers.common[KeyHeaders.PUBLISHABLE_KEY] = publishableKey;
-};
-
-export const addRateLimitingKeyToAxiosHeader = (rateLimitingKey: string) => {
-  axios.defaults.headers.common[KeyHeaders.RATE_LIMITING_KEY] = rateLimitingKey;
-};
-
-type ImmutableConfigurationWithRequireableFields<T> = ImmutableConfiguration &
-(T extends { apiKey: 'required' } ? Required<{ apiKey: string }> : {}) &
-(T extends { publishableKey: 'required' }
-  ? Required<{ publishableKey: string }>
-  : {});
-
-type ImmutableConfigurationWithOmitableFields<T> = T extends { apiKey: 'omit' }
-  ? Omit<ImmutableConfigurationWithRequireableFields<T>, 'apiKey'>
-  : ImmutableConfigurationWithRequireableFields<T>;
-
-export interface ModuleConfiguration<T> {
-  baseConfig: ImmutableConfigurationWithOmitableFields<T>;
-  overrides?: T;
-}
