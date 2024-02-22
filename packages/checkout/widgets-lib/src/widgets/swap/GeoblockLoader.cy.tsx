@@ -4,7 +4,6 @@ import { mount } from "cypress/react18";
 import { Checkout } from "@imtbl/checkout-sdk";
 
 describe('GeoblockLoader', () => {
-
   beforeEach(() => {
     cy.viewport('ipad-2');
   });
