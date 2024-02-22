@@ -66,6 +66,7 @@ export const useWalletConnect = ({ checkout }: UseWalletConnectParams) => {
                 if (connectCallback && ethereumProvider.connected && ethereumProvider.session) {
                   connectCallback(ethereumProvider);
                   displayUri.current = '';
+                  resolve({}); // required to resolve when restore is successful
                 } else {
                   // eslint-disable-next-line no-console
                   console.log('activate succeeded but there is no connected session');
