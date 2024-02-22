@@ -6,6 +6,11 @@ import { RequestExampleProps, EnvironmentNames } from '@/types';
 import { Interface } from 'ethers/lib/utils';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 
+enum ApproveType {
+  NFTApprove = 'NFT_APPROVE',
+  NFTApprovalForAll = 'NFT_APPROVAL_FOR_ALL',
+}
+
 const getErc721DefaultContractAddress = (environment: EnvironmentNames) => {
   switch (environment) {
     case EnvironmentNames.SANDBOX:
@@ -21,12 +26,15 @@ const getErc721DefaultContractAddress = (environment: EnvironmentNames) => {
 
 function NFTApproval({ disabled, handleExampleSubmitted }: RequestExampleProps) {
   const { environment } = useImmutableProvider();
-  const iface = useMemo(() => {
+  const nftApproveContract = useMemo(() => {
     const abi = [
+      'function setApprovalForAll(address to, bool approved)',
       'function approve(address to, uint256 tokenId)',
     ];
     return new Interface(abi);
   }, []);
+
+  const [choosedApproveType, setChoosedApproveType] = useState<ApproveType>(ApproveType.NFTApprove);
   const [fromAddress, setFromAddress] = useState<string>('');
   const [erc721ContractAddress, setErc721ContractAddress] = useState<string>(
     getErc721DefaultContractAddress(environment),
@@ -36,10 +44,19 @@ function NFTApproval({ disabled, handleExampleSubmitted }: RequestExampleProps) 
   const [params, setParams] = useState<any[]>([]);
 
   const { zkEvmProvider } = usePassportProvider();
+
+
+  const handleSetApproveType = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    setChoosedApproveType(e.target.value as ApproveType)
+  }, [])
+
   useEffect(() => {
     const nftTokenId = tokenId.trim() === '' ? '1' : tokenId;
     try {
-      const data = iface.encodeFunctionData('approve', [toAddress, nftTokenId]);
+      const data = choosedApproveType ===ApproveType.NFTApprove
+      ? nftApproveContract.encodeFunctionData('approve', [toAddress, nftTokenId])
+      : nftApproveContract.encodeFunctionData('setApprovalForAll', [toAddress, true]);
+
       setParams([{
         from: fromAddress,
         to: erc721ContractAddress,
@@ -54,7 +71,7 @@ function NFTApproval({ disabled, handleExampleSubmitted }: RequestExampleProps) 
         data: '0x',
       }]);
     }
-  }, [fromAddress, erc721ContractAddress, toAddress, tokenId, iface]);
+  }, [fromAddress, erc721ContractAddress, toAddress, tokenId, choosedApproveType, nftApproveContract]);
 
   useEffect(() => {
     const getAddress = async () => {
@@ -98,6 +115,11 @@ function NFTApproval({ disabled, handleExampleSubmitted }: RequestExampleProps) 
               }}
             />
           </Form.Group>
+          <Form.Label>Token Type</Form.Label>
+          <Form.Select onChange={handleSetApproveType}>
+            <option value={ApproveType.NFTApprove}>NFT Approve</option>
+            <option value={ApproveType.NFTApprovalForAll}>NFT Batch Approve</option>
+          </Form.Select>
           <Form.Group className="mb-3">
             <Form.Label>
               From
@@ -112,7 +134,7 @@ function NFTApproval({ disabled, handleExampleSubmitted }: RequestExampleProps) 
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>
-              ERC721
+              {choosedApproveType === ApproveType.NFTApprove ? "ERC721" : "ERC721 / ERC1155"} Contract Address
             </Form.Label>
             <Form.Control
               required
@@ -135,18 +157,20 @@ function NFTApproval({ disabled, handleExampleSubmitted }: RequestExampleProps) 
               value={toAddress}
             />
           </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>
-              Token Id
-            </Form.Label>
-            <Form.Control
-              required
-              type="number"
-              disabled={disabled}
-              onChange={(e) => setTokenId(e.target.value)}
-              value={tokenId}
-            />
-          </Form.Group>
+          {choosedApproveType === ApproveType.NFTApprove
+            && <Form.Group className="mb-3">
+              <Form.Label>
+                Token Id
+              </Form.Label>
+              <Form.Control
+                required
+                type="number"
+                disabled={disabled}
+                onChange={(e) => setTokenId(e.target.value)}
+                value={tokenId}
+              />
+            </Form.Group>
+          }
           <WorkflowButton
             disabled={disabled}
             type="submit"
