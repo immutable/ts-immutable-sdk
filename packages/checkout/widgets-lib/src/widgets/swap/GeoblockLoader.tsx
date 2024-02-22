@@ -9,15 +9,14 @@ type GeoblockLoaderParams = {
   serviceUnavailableView: React.ReactNode;
   loadingView: React.ReactNode;
   checkout: Checkout,
-}
+};
 
-export const GeoblockLoader = ({
+export function GeoblockLoader({
   widget,
   serviceUnavailableView,
   loadingView,
   checkout,
-}: GeoblockLoaderParams) => {
-
+}: GeoblockLoaderParams) {
   const [loading, setLoading] = useState(true);
   const [available, setAvailable] = useState(false);
 
@@ -34,9 +33,11 @@ export const GeoblockLoader = ({
   }, [checkout]);
 
   return (
+    // eslint-disable-next-line react/jsx-no-useless-fragment
     <>
       {
-        loading ? loadingView 
+        // eslint-disable-next-line no-nested-ternary
+        loading ? loadingView
           : available
             ? widget
             : serviceUnavailableView

@@ -1,7 +1,7 @@
-import { cy } from "local-cypress";
-import { GeoblockLoader } from "./GeoblockLoader";
-import { mount } from "cypress/react18";
-import { Checkout } from "@imtbl/checkout-sdk";
+import { cy } from 'local-cypress';
+import { mount } from 'cypress/react18';
+import { Checkout } from '@imtbl/checkout-sdk';
+import { GeoblockLoader } from './GeoblockLoader';
 
 describe('GeoblockLoader', () => {
   beforeEach(() => {
@@ -19,7 +19,7 @@ describe('GeoblockLoader', () => {
         serviceUnavailableView={<div id="unavailable-view">Service Unavailable</div>}
         loadingView={<div id="loading-view">Loading</div>}
         checkout={checkout}
-      />
+      />,
     );
 
     cy.get('#loading-view').should('exist');
@@ -38,7 +38,7 @@ describe('GeoblockLoader', () => {
         serviceUnavailableView={<div id="unavailable-view">Service Unavailable</div>}
         loadingView={<div id="loading-view">Loading</div>}
         checkout={checkout}
-      />
+      />,
     );
 
     cy.get('#inner-widget').should('exist');
@@ -57,7 +57,7 @@ describe('GeoblockLoader', () => {
         serviceUnavailableView={<div id="unavailable-view">Service Unavailable</div>}
         loadingView={<div id="loading-view">Loading</div>}
         checkout={checkout}
-      />
+      />,
     );
 
     cy.get('#unavailable-view').should('exist');
@@ -76,7 +76,7 @@ describe('GeoblockLoader', () => {
         serviceUnavailableView={<div id="unavailable-view">Service Unavailable</div>}
         loadingView={<div id="loading-view">Loading</div>}
         checkout={checkout}
-      />
+      />,
     );
 
     cy.get('#unavailable-view').should('exist');
