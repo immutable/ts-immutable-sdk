@@ -128,7 +128,7 @@ export class ZkEvmProvider implements Provider {
    * @see #getSigner
    *
    */
-  async #initialiseEthSigner(user: User) {
+  #initialiseEthSigner(user: User) {
     const generateSigner = async (): Promise<Signer> => {
       const magicRpcProvider = await this.#magicAdapter.login(user.idToken!);
       const web3Provider = new Web3Provider(magicRpcProvider);
@@ -173,16 +173,13 @@ export class ZkEvmProvider implements Provider {
 
         if (!isZkEvmUser(user)) {
           const ethSigner = await this.#getSigner();
-
-          const userZkEvm = await registerZkEvmUser({
+          this.#zkEvmAddress = await registerZkEvmUser({
             ethSigner,
             authManager: this.#authManager,
             multiRollupApiClients: this.#multiRollupApiClients,
             accessToken: user.accessToken,
             jsonRpcProvider: this.#jsonRpcProvider,
           });
-
-          this.#zkEvmAddress = userZkEvm.zkEvm.ethAddress;
         } else {
           this.#zkEvmAddress = user.zkEvm.ethAddress;
         }

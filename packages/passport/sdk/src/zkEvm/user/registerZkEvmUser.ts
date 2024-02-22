@@ -3,7 +3,6 @@ import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { signRaw } from '@imtbl/toolkit';
 import { getEip155ChainId } from 'zkEvm/walletHelpers';
 import { Signer } from '@ethersproject/abstract-signer';
-import { UserZkEvm } from '../../types';
 import AuthManager from '../../authManager';
 import { JsonRpcError, RpcErrorCode } from '../JsonRpcError';
 
@@ -23,7 +22,7 @@ export async function registerZkEvmUser({
   multiRollupApiClients,
   accessToken,
   jsonRpcProvider,
-}: RegisterZkEvmUserInput): Promise<UserZkEvm> {
+}: RegisterZkEvmUserInput): Promise<string> {
   const [ethereumAddress, ethereumSignature, network, chainListResponse] = await Promise.all([
     ethSigner.getAddress(),
     signRaw(MESSAGE_TO_SIGN, ethSigner),
@@ -41,7 +40,7 @@ export async function registerZkEvmUser({
   }
 
   try {
-    await multiRollupApiClients.passportApi.createCounterfactualAddressV2({
+    const registrationResponse = await multiRollupApiClients.passportApi.createCounterfactualAddressV2({
       chainName,
       createCounterfactualAddressRequest: {
         ethereum_address: ethereumAddress,
@@ -50,14 +49,11 @@ export async function registerZkEvmUser({
     }, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
+
+    authManager.forceUserRefreshInBackground();
+
+    return registrationResponse.data.counterfactual_address;
   } catch (error) {
     throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, `Failed to create counterfactual address: ${error}`);
   }
-
-  const user = await authManager.forceUserRefresh();
-  if (!user?.zkEvm) {
-    throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, 'Failed to refresh user details');
-  }
-
-  return user as UserZkEvm;
 }
