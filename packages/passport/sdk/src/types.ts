@@ -73,6 +73,10 @@ export interface PassportModuleConfiguration extends ModuleConfiguration<Passpor
    * and not directly on the web.
    */
   crossSdkBridgeEnabled?: boolean;
+  /**
+   * This flag indicates that the provider should be announced via EIP-6963
+   */
+  announceProvider?: boolean;
 }
 
 type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };

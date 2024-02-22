@@ -49,10 +49,13 @@ export class PassportConfiguration {
 
   readonly crossSdkBridgeEnabled: boolean;
 
+  readonly announceProvider: boolean;
+
   constructor({
     baseConfig,
     overrides,
     crossSdkBridgeEnabled,
+    announceProvider,
     ...oidcConfiguration
   }: PassportModuleConfiguration) {
     validateConfiguration(oidcConfiguration, [
@@ -62,6 +65,7 @@ export class PassportConfiguration {
     this.oidcConfiguration = oidcConfiguration;
     this.baseConfig = baseConfig;
     this.crossSdkBridgeEnabled = crossSdkBridgeEnabled || false;
+    this.announceProvider = announceProvider ?? true;
 
     if (overrides) {
       validateConfiguration(
