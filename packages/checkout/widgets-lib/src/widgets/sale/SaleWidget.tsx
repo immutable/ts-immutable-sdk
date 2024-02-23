@@ -115,12 +115,13 @@ export default function SaleWidget(props: SaleWidgetProps) {
           items,
           amount,
           fromTokenAddress,
-          env: config.environment,
+          environment: config.environment,
           environmentId,
           provider,
           checkout,
           passport: checkout?.passport,
           collectionName,
+          clientConfig,
         }}
       >
         <CryptoFiatProvider environment={config.environment}>

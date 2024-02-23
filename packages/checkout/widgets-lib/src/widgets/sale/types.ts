@@ -45,7 +45,7 @@ export type SignOrderInput = {
   items: SaleItem[];
   fromTokenAddress: string;
   recipientAddress: string;
-  env: string;
+  environment: string;
   environmentId: string;
 };
 
