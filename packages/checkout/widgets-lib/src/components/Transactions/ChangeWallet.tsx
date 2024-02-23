@@ -3,11 +3,7 @@ import {
 } from '@biom3/react';
 import { useContext } from 'react';
 import { BridgeContext } from 'widgets/bridge/context/BridgeContext';
-import {
-  getWalletProviderNameByProvider,
-  isMetaMaskProvider,
-  isPassportProvider,
-} from 'lib/providerUtils';
+import { getWalletProviderNameByProvider } from 'lib/providerUtils';
 import {
   UserJourney,
   useAnalytics,
@@ -28,8 +24,6 @@ export function ChangeWallet({ onChangeWalletClick }: ChangeWalletProps) {
   } = useContext(BridgeContext);
   const { track } = useAnalytics();
   const walletAddress = from?.walletAddress || '';
-  const isMetaMask = isMetaMaskProvider(from?.web3Provider);
-  const isPassport = isPassportProvider(from?.web3Provider);
 
   const walletLogo = getWalletLogoByName(
     getWalletProviderNameByProvider(from?.web3Provider),
