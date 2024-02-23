@@ -38,8 +38,7 @@ import { TopUpView } from '../../views/top-up/TopUpView';
 import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
-import { useCurrency } from './hooks/useCurrency';
-import { CURRENCY_NAME } from './utils/config';
+import { useClientConfig } from './hooks/useClientConfig';
 
 export interface SaleWidgetProps
   extends Required<Omit<SaleWidgetParams, 'walletProviderName'>> {
@@ -67,10 +66,9 @@ export default function SaleWidget(props: SaleWidgetProps) {
     () => ({ viewState, viewDispatch }),
     [viewState, viewDispatch],
   );
-  const { currencyResponse: currency } = useCurrency({
-    env: config.environment,
+  const { currency, clientConfig } = useClientConfig({
     environmentId,
-    currencyName: CURRENCY_NAME,
+    environment: config.environment,
   });
 
   const fromTokenAddress = currency?.erc20Address || '';
@@ -117,12 +115,13 @@ export default function SaleWidget(props: SaleWidgetProps) {
           items,
           amount,
           fromTokenAddress,
-          env: config.environment,
+          environment: config.environment,
           environmentId,
           provider,
           checkout,
           passport: checkout?.passport,
           collectionName,
+          clientConfig,
         }}
       >
         <CryptoFiatProvider environment={config.environment}>
