@@ -81,7 +81,7 @@
     "build:local": "yarn build && mkdir -p ../widgets-sample-app/public/lib/js && cp dist/*.js ../widgets-sample-app/public/lib/js/",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix",
-    "start": "rollup --config rollup.config.js --watch",
+    "start": "NODE_ENV=development rollup --config rollup.config.js --watch",
     "test": "jest test --passWithNoTests",
     "test:cypress": "NODE_ENV=test cypress run --component --headless",
     "test:cypress:open": "NODE_ENV=test cypress open --component --browser electron",
