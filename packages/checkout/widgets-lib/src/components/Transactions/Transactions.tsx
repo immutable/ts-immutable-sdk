@@ -144,20 +144,25 @@ export function Transactions({
     }
   }, [checkout, from]);
 
-  const handleConnectWalletSuccess = async (provider: Web3Provider) => {
-    const network = await provider.getNetwork();
-    const address = (await provider?.getSigner().getAddress()) ?? '';
-    setTxs([]);
-    bridgeDispatch({
-      payload: {
-        type: BridgeActions.SET_WALLETS_AND_NETWORKS,
-        from: {
-          web3Provider: provider,
-          walletAddress: address.toLowerCase(),
-          network: network.chainId,
-        },
-        to: null,
-      },
+  const handleConnectWalletSuccess = (provider: Web3Provider) => {
+    provider.getNetwork().then((network) => {
+      provider
+        ?.getSigner()
+        .getAddress()
+        .then((address) => {
+          setTxs([]);
+          bridgeDispatch({
+            payload: {
+              type: BridgeActions.SET_WALLETS_AND_NETWORKS,
+              from: {
+                web3Provider: provider,
+                walletAddress: address.toLowerCase(),
+                network: network.chainId,
+              },
+              to: null,
+            },
+          });
+        });
     });
   };
 
