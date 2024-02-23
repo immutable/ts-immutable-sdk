@@ -11,7 +11,6 @@ export type TransakNFTCheckoutParams = {
   calldata: string;
   cryptoCurrencyCode: string;
   estimatedGasLimit: number;
-  smartContractAddress: string;
   exchangeScreenTitle: string;
   partnerOrderId?: string;
   walletAddress?: string;
