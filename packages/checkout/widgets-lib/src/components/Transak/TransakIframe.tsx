@@ -15,6 +15,7 @@ export type TransakIframeProps = {
   id: string;
   type: TransakWidgetType;
   email: string;
+  contractId: string;
   environment: Environment;
   walletAddress: string;
   isPassportWallet: boolean;
@@ -46,6 +47,7 @@ export function TransakIframe(props: TransakIframeProps) {
     failedToLoadTimeoutInMs,
     loadingText,
     environment,
+    contractId,
   } = props;
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
@@ -67,6 +69,7 @@ export function TransakIframe(props: TransakIframeProps) {
 
   const { iframeSrc } = useTransakIframe({
     type,
+    contractId,
     environment,
     transakParams: {
       nftData,

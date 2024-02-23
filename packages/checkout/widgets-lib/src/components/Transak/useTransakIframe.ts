@@ -20,8 +20,9 @@ export type TransakNFTCheckoutParams = {
 
 type UseTransakIframeProps = {
   type: TransakWidgetType;
+  contractId: string;
   environment: Environment;
-  transakParams: TransakNFTCheckoutParams
+  transakParams: TransakNFTCheckoutParams;
 };
 
 const MAX_GAS_LIMIT = '30000000';
@@ -38,7 +39,7 @@ export const TRANSAK_ENVIRONMENT = {
 };
 
 export const useTransakIframe = (props: UseTransakIframeProps) => {
-  const { environment, transakParams } = props;
+  const { contractId, environment, transakParams } = props;
   const [iframeSrc, setIframeSrc] = useState<string>('');
 
   // TODO: Get transak config from checkout SDK
@@ -64,6 +65,7 @@ export const useTransakIframe = (props: UseTransakIframeProps) => {
       apiKey,
       isNFT: 'true',
       disableWalletAddressForm: 'true',
+      contractId,
       environment: TRANSAK_ENVIRONMENT[environment],
       calldata: btoa(String.fromCharCode.apply(null, pako.deflate(calldata))),
       nftData: btoa(JSON.stringify(nftData)),
