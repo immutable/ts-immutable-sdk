@@ -28,7 +28,7 @@ const productionPlugins = [
   terser()
 ]
 
-const getDefaultPlugins = () => {
+const getPlugins = () => {
   if (process.env.NODE_ENV === DEVELOPMENT) {
     return defaultPlugin;
   }
@@ -51,7 +51,7 @@ export default [
       inlineDynamicImports: isDevelopment()
     },
     plugins: [
-      ...getDefaultPlugins(),
+      ...getPlugins(),
     ]
   },
   {
