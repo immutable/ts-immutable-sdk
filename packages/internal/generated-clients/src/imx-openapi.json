@@ -13,7 +13,7 @@
     },
     "version": "3.0.0"
   },
-  "host": "api.sandbox.immutable.com",
+  "host": "api.sandbox.x.immutable.com",
   "basePath": "/",
   "paths": {
     "/v1/assets": {
@@ -3751,6 +3751,41 @@
         }
       }
     },
+    "/v2/signable-withdrawal-details": {
+      "post": {
+        "description": "Gets details of a signable withdrawal",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "withdrawals"
+        ],
+        "summary": "Gets details of a signable withdrawal for starkex contracts that are higher than v3",
+        "operationId": "getSignableWithdrawalV2",
+        "parameters": [
+          {
+            "description": "get details of signable withdrawal",
+            "name": "GetSignableWithdrawalRequest",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/GetSignableWithdrawalRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/GetSignableWithdrawalResponseV2"
+            }
+          }
+        }
+      }
+    },
     "/v2/transfers": {
       "post": {
         "description": "Create a new transfer request. Use https://docs.x.immutable.com/reference#/operations/getSignableTransfer to get request body params.",
@@ -3823,6 +3858,55 @@
             "description": "Internal Server Error",
             "schema": {
               "$ref": "#/definitions/APIError"
+            }
+          }
+        }
+      }
+    },
+    "/v2/withdrawals": {
+      "post": {
+        "description": "Creates a withdrawal. Use https://docs.x.immutable.com/reference#/operations/getSignableWithdrawal to get request body params.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "withdrawals"
+        ],
+        "summary": "Creates a withdrawal of a token for starkex contracts that are higher than v3",
+        "operationId": "createWithdrawalV2",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "eth address",
+            "name": "x-imx-eth-address",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "eth signature",
+            "name": "x-imx-eth-signature",
+            "in": "header",
+            "required": true
+          },
+          {
+            "description": "create a withdrawal",
+            "name": "CreateWithdrawalRequestV2",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreateWithdrawalRequestV2"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/CreateWithdrawalResponse"
             }
           }
         }
