@@ -192,7 +192,6 @@ export const useSignOrder = (input: SignOrderInput) => {
         });
 
         setExecuteTransactions({ method, hash: txnResponse?.hash });
-        await txnResponse?.wait(1);
 
         transactionHash = txnResponse?.hash || '';
         return [transactionHash, undefined];
