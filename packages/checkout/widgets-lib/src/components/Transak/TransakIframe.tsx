@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { Environment } from '@imtbl/config';
 import { TransakEventHandlers, useTransakEvents } from './useTransakEvents';
 
 import {
@@ -10,17 +11,19 @@ import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsPr
 import { CenteredBoxContent } from '../CenteredBoxContent/CenteredBoxContent';
 import { LoadingBox } from '../../views/loading/LoadingBox';
 
-export type TransactionIframeProps = {
+export type TransakIframeProps = {
   id: string;
   type: TransakWidgetType;
   email: string;
+  contractId: string;
+  environment: Environment;
   walletAddress: string;
   isPassportWallet: boolean;
   loadingText: string;
 } & TransakEventHandlers &
 TransakNFTCheckoutParams;
 
-export function TransakIframe(props: TransactionIframeProps) {
+export function TransakIframe(props: TransakIframeProps) {
   const {
     id,
     type,
@@ -32,7 +35,6 @@ export function TransakIframe(props: TransactionIframeProps) {
     cryptoCurrencyCode,
     estimatedGasLimit,
     exchangeScreenTitle,
-    smartContractAddress,
     partnerOrderId,
     onOpen,
     onInit,
@@ -43,6 +45,8 @@ export function TransakIframe(props: TransactionIframeProps) {
     onFailedToLoad,
     failedToLoadTimeoutInMs,
     loadingText,
+    environment,
+    contractId,
   } = props;
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
@@ -64,15 +68,18 @@ export function TransakIframe(props: TransactionIframeProps) {
 
   const { iframeSrc } = useTransakIframe({
     type,
-    nftData,
-    calldata,
-    cryptoCurrencyCode,
-    estimatedGasLimit,
-    exchangeScreenTitle,
-    smartContractAddress,
-    email,
-    walletAddress,
-    partnerOrderId,
+    contractId,
+    environment,
+    transakParams: {
+      nftData,
+      calldata,
+      cryptoCurrencyCode,
+      estimatedGasLimit,
+      exchangeScreenTitle,
+      email,
+      walletAddress,
+      partnerOrderId,
+    },
   });
 
   return (
@@ -83,8 +90,8 @@ export function TransakIframe(props: TransactionIframeProps) {
         </CenteredBoxContent>
       )}
       <iframe
-        ref={iframeRef}
         id={id}
+        ref={iframeRef}
         src={iframeSrc}
         title="Transak-Iframe"
         allow="camera;microphone;fullscreen;payment"

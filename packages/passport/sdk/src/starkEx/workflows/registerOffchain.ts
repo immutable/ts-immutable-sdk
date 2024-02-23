@@ -38,7 +38,7 @@ export default async function registerOffchain(
 
       return response;
     } catch (err: any) {
-      if (axios.isAxiosError(err) && err.status === 409) {
+      if (axios.isAxiosError(err) && err.response?.status === 409) {
         // The user already registered, but the user token is not updated yet.
         await forceUserRefresh(authManager);
         return { tx_hash: '' };
