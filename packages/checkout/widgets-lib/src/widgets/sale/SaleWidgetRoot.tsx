@@ -113,7 +113,7 @@ export class Sale extends Base<WidgetType.SALE> {
                 sendSaleWidgetCloseEvent(window);
               }}
             >
-              <Suspense fallback={<LoadingView loadingText={t('views.LOADING_VIEW.text')} />}>
+              <Suspense fallback={<LoadingView loadingText={t('views.LOADING_VIEW.text')} showFooterLogo />}>
                 <SaleWidget
                   config={this.strongConfig()}
                   amount={this.parameters.amount!}
