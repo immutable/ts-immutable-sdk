@@ -87,7 +87,10 @@ describe('registerOffchain', () => {
         const imxApiClients = new ImxApiClients({} as any);
         // create axios error with status 409
         const err = new AxiosError('User already registered');
-        err.status = 409;
+        err.response = {
+          ...err.response,
+          status: 409,
+        } as typeof err.response;
 
         (registerPassportStarkEx as jest.Mock).mockRejectedValue(err);
         mockForceUserRefresh.mockResolvedValue(mockUserImx);
