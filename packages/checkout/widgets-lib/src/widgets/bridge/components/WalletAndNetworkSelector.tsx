@@ -104,11 +104,7 @@ export function WalletAndNetworkSelector() {
   const toWalletSelectorOptions = useMemo(() => {
     const options = [WalletProviderName.METAMASK.toString()];
 
-    if (
-      checkout.passport
-      && fromNetwork === l1NetworkChainId
-      && fromWalletProviderName === WalletProviderName.METAMASK
-    ) {
+    if (checkout.passport && fromNetwork === l1NetworkChainId) {
       options.push(WalletProviderName.PASSPORT.toString());
     }
     if (isWalletConnectEnabled) {
@@ -249,6 +245,8 @@ export function WalletAndNetworkSelector() {
         && passportCache.current
       ) {
         provider = passportCache.current;
+        await handleFromWalletConnectionSuccess(provider);
+        return;
       }
       if (!provider) {
         try {
@@ -312,6 +310,29 @@ export function WalletAndNetworkSelector() {
     [checkout, fromWalletWeb3Provider, fromWalletProviderName, fromNetwork],
   );
 
+  const handleSettingToNetwork = useCallback(() => {
+    // toNetwork is always the opposite of fromNetwork
+    const theToNetwork = fromNetwork === l1NetworkChainId
+      ? imtblZkEvmNetworkChainId
+      : l1NetworkChainId;
+    setToNetwork(theToNetwork);
+    setToWalletDrawerOpen(false);
+  }, [fromNetwork]);
+
+  const handleWalletConnectToWalletConnection = useCallback(
+    (provider: Web3Provider) => {
+      setToWalletWeb3Provider(provider);
+      provider!
+        .getSigner()
+        .getAddress()
+        .then((address) => {
+          setToWalletAddress(address.toLowerCase());
+          handleSettingToNetwork();
+        });
+    },
+    [handleSettingToNetwork],
+  );
+
   const handleToWalletSelection = useCallback(
     async (selectedToWalletProviderName: WalletProviderName | string) => {
       if (fromWalletProviderName === selectedToWalletProviderName) {
@@ -319,53 +340,48 @@ export function WalletAndNetworkSelector() {
         setToWalletWeb3Provider(fromWalletWeb3Provider);
         const address = await fromWalletWeb3Provider!.getSigner().getAddress();
         setToWalletAddress(address.toLowerCase());
-      } else {
-        let toWalletProvider;
-        if (
-          selectedToWalletProviderName
-            === WalletProviderName.PASSPORT.toString()
-          && passportCache.current
-        ) {
-          toWalletProvider = passportCache.current;
-        }
-        if (!toWalletProvider) {
-          try {
-            if (selectedToWalletProviderName === 'walletconnect') {
-              await openWalletConnectModal({
-                connectCallback: (ethereumProvider) => {
-                  const newProvider = new Web3Provider(ethereumProvider);
-                  setToWalletWeb3Provider(newProvider);
-                  newProvider!
-                    .getSigner()
-                    .getAddress()
-                    .then((address) => setToWalletAddress(address.toLowerCase()));
-                },
-              });
-            }
+        handleSettingToNetwork();
+        return;
+      }
+
+      let toWalletProvider;
+      try {
+        if (selectedToWalletProviderName === 'walletconnect') {
+          await openWalletConnectModal({
+            connectCallback: (ethereumProvider) => {
+              const newProvider = new Web3Provider(ethereumProvider);
+              handleWalletConnectToWalletConnection(newProvider);
+              handleSettingToNetwork();
+            },
+          });
+        } else {
+          if (
+            selectedToWalletProviderName
+              === WalletProviderName.PASSPORT.toString()
+            && passportCache.current
+          ) {
+            toWalletProvider = passportCache.current;
+          } else {
             toWalletProvider = await createProviderAndConnect(
               selectedToWalletProviderName as WalletProviderName,
             );
-          } catch (error) {
-            return;
           }
+          setToWalletWeb3Provider(toWalletProvider);
+          const address = await toWalletProvider!.getSigner().getAddress();
+          setToWalletAddress(address.toLowerCase());
+          handleSettingToNetwork();
         }
-        setToWalletWeb3Provider(toWalletProvider);
-        const address = await toWalletProvider!.getSigner().getAddress();
-        setToWalletAddress(address.toLowerCase());
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error(error);
       }
-
-      // toNetwork is always the opposite of fromNetwork
-      const theToNetwork = fromNetwork === l1NetworkChainId
-        ? imtblZkEvmNetworkChainId
-        : l1NetworkChainId;
-      setToNetwork(theToNetwork);
-      setToWalletDrawerOpen(false);
     },
     [
       fromWalletProviderName,
-      fromNetwork,
       fromWalletWeb3Provider,
       passportCache.current,
+      handleSettingToNetwork,
+      handleWalletConnectToWalletConnection,
     ],
   );
 
