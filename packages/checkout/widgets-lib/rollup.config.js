@@ -39,15 +39,16 @@ const getDefaultPlugins = () => {
   ];
 }
 
-const useWatchMode = () => process.env.NODE_ENV === DEVELOPMENT;
+const isDevelopment = () => process.env.NODE_ENV === DEVELOPMENT;
 
 export default [
   {
-    watch:  useWatchMode(),
+    watch:  isDevelopment(),
     input: 'src/index.ts',
     output: {
       dir: 'dist',
-      format: 'es'
+      format: 'es',
+      inlineDynamicImports: isDevelopment()
     },
     plugins: [
       ...getDefaultPlugins(),
