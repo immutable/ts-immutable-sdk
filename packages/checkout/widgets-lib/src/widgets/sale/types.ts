@@ -87,3 +87,14 @@ export enum SaleErrorTypes {
 export enum SmartCheckoutErrorTypes {
   FRACTIONAL_BALANCE_BLOCKED = 'FRACTIONAL_BALANCE_BLOCKED',
 }
+
+export type ClientConfigCurrency = {
+  name: string;
+  decimals: number;
+  erc20Address: string;
+};
+
+export type ClientConfig = {
+  contractId: string;
+  currencies: ClientConfigCurrency[];
+};
