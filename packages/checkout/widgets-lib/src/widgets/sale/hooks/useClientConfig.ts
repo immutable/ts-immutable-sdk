@@ -61,6 +61,7 @@ export const useClientConfig = ({
 
         setClientConfig(toClientConfig(data));
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.warn('Error fetching client config', error);
       }
     })();
