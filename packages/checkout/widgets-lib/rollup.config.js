@@ -43,7 +43,7 @@ const isDevelopment = () => process.env.NODE_ENV === DEVELOPMENT;
 
 export default [
   {
-    watch:  isDevelopment(),
+    watch: isDevelopment(),
     input: 'src/index.ts',
     output: {
       dir: 'dist',
