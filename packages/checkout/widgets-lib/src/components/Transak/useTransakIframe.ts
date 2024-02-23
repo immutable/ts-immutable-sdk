@@ -20,28 +20,31 @@ export type TransakNFTCheckoutParams = {
 
 type UseTransakIframeProps = {
   type: TransakWidgetType;
-} & TransakNFTCheckoutParams;
+  environment: Environment;
+  transakParams: TransakNFTCheckoutParams
+};
 
 const MAX_GAS_LIMIT = '30000000';
 
 // TODO: Move to common config file inside Checkout SDK while refactoring onRamp
-// const { baseUrl, apiKey } = checkout.fiatExchangeConfig('transak')
 export const TRANSAK_API_BASE_URL = {
   [Environment.SANDBOX]: 'https://global-stg.transak.com',
   [Environment.PRODUCTION]: 'https://global.transak.com/',
 };
 
+export const TRANSAK_ENVIRONMENT = {
+  [Environment.SANDBOX]: 'STAGING',
+  [Environment.PRODUCTION]: 'PRODUCTION',
+};
+
 export const useTransakIframe = (props: UseTransakIframeProps) => {
-  const { type, ...transakParams } = props;
+  const { environment, transakParams } = props;
   const [iframeSrc, setIframeSrc] = useState<string>('');
 
   // TODO: Get transak config from checkout SDK
   // const { checkout, provider } = connectLoaderState;
-  // const {  config } = checkout.fiatExchangeConfig('transak');
-  // const { environment, apiKey, network } = config
-  const environment = 'sandbox';
+  // const { baseUrl, apiKey, environment } = checkout.fiatExchangeConfig('transak')
   const apiKey = 'd14b44fb-0f84-4db5-affb-e044040d724b';
-  const network = 'immutablezkevm';
 
   const getNFTCheckoutURL = useCallback(() => {
     const {
@@ -59,10 +62,9 @@ export const useTransakIframe = (props: UseTransakIframeProps) => {
 
     const params = {
       apiKey,
-      network,
       isNFT: 'true',
       disableWalletAddressForm: 'true',
-      environment: 'STAGING',
+      environment: TRANSAK_ENVIRONMENT[environment],
       calldata: btoa(String.fromCharCode.apply(null, pako.deflate(calldata))),
       nftData: btoa(JSON.stringify(nftData)),
       estimatedGasLimit: gasLimit.toString(),

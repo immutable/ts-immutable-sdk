@@ -25,7 +25,7 @@ export function WithCard(props: WithCardProps) {
     onOrderFailed,
   } = props;
   const {
-    recipientEmail, recipientAddress, isPassportWallet, signResponse, goToErrorView,
+    recipientEmail, recipientAddress, isPassportWallet, signResponse, goToErrorView, environment,
   } = useSaleContext();
   const executeTxn = signResponse?.transactions.find((txn) => txn.methodCall.startsWith('execute'));
 
@@ -72,6 +72,7 @@ export function WithCard(props: WithCardProps) {
       onOrderCompleted={onOrderCompleted}
       onOrderFailed={onOrderFailed}
       onFailedToLoad={onFailedToLoad}
+      environment={environment}
     />
   );
 }
