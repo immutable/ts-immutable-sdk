@@ -9,7 +9,7 @@ import nodePolyfills from 'rollup-plugin-polyfill-node';
 const DEVELOPMENT = 'development';
 const PRODUCTION = 'production';
 
-const defaultPlugin = [
+const defaultPlugins = [
   json(),
   replace({
     preventAssignment: true,
@@ -30,11 +30,11 @@ const productionPlugins = [
 
 const getPlugins = () => {
   if (process.env.NODE_ENV === DEVELOPMENT) {
-    return defaultPlugin;
+    return defaultPlugins;
   }
 
   return [
-    ...defaultPlugin,
+    ...defaultPlugins,
     ...productionPlugins
   ];
 }
