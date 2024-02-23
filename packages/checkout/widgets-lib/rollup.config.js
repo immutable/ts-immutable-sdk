@@ -65,7 +65,7 @@ export default [
     },
     context: 'window',
     plugins: [
-      ...defaultPlugins,
+      ...getPlugins(),
     ]
   }
 ]
