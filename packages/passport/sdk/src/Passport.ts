@@ -20,6 +20,7 @@ import {
   PassportEventMap,
   PassportEvents,
   PassportModuleConfiguration,
+  User,
   UserProfile,
 } from './types';
 import { ConfirmationScreen } from './confirmation';
@@ -27,6 +28,7 @@ import { ZkEvmProvider } from './zkEvm';
 import { Provider } from './zkEvm/types';
 import TypedEventEmitter from './utils/typedEventEmitter';
 import GuardianClient from './guardian';
+import logger from './utils/logger';
 
 const buildImxClientConfig = (passportModuleConfiguration: PassportModuleConfiguration) => {
   if (passportModuleConfiguration.overrides) {
@@ -160,15 +162,14 @@ export class Passport {
     anonymousId?: string;
   }): Promise<UserProfile | null> {
     const { useCachedSession = false } = options || {};
-    let user = null;
+    let user: User | null = null;
     try {
       user = await this.authManager.getUser();
     } catch (error) {
       if (useCachedSession) {
         throw error;
       }
-      // eslint-disable-next-line no-console
-      console.warn('login failed to retrieve a cached user session', error);
+      logger.warn('Failed to retrieve a cached user session', error);
     }
     if (!user && !useCachedSession) {
       user = await this.authManager.login(options?.anonymousId);
@@ -225,8 +226,7 @@ export class Passport {
     try {
       await this.confirmationScreen.logout();
     } catch (err) {
-      // eslint-disable-next-line no-console
-      console.warn('Failed to logout from confirmation screen', err);
+      logger.warn('Failed to logout from confirmation screen', err);
     }
     await Promise.allSettled([
       this.authManager.logout(),
