@@ -16,6 +16,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import { Environment } from '@imtbl/config';
 import { ConnectLoaderState } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import {
   FundWithSmartCheckoutSubViews,
@@ -28,6 +29,7 @@ import {
 import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 import { useSignOrder } from '../hooks/useSignOrder';
 import {
+  ClientConfig,
   ExecuteOrderResponse,
   ExecutedTransaction,
   SaleErrorTypes,
@@ -37,10 +39,11 @@ import {
 } from '../types';
 
 import { useSmartCheckout } from '../hooks/useSmartCheckout';
+import { defaultClientConfig } from '../hooks/useClientConfig';
 
 type SaleContextProps = {
   config: StrongCheckoutWidgetsConfig;
-  env: string;
+  environment: Environment;
   environmentId: string;
   items: SaleItem[];
   amount: string;
@@ -49,6 +52,7 @@ type SaleContextProps = {
   provider: ConnectLoaderState['provider'];
   checkout: ConnectLoaderState['checkout'];
   passport?: Passport;
+  clientConfig: ClientConfig;
 };
 
 type SaleContextValues = SaleContextProps & {
@@ -90,7 +94,7 @@ const SaleContext = createContext<SaleContextValues>({
   provider: undefined,
   checkout: undefined,
   environmentId: '',
-  env: '',
+  environment: Environment.SANDBOX,
   recipientAddress: '',
   recipientEmail: '',
   sign: () => Promise.resolve(undefined),
@@ -111,6 +115,7 @@ const SaleContext = createContext<SaleContextValues>({
   fundingRoutes: [],
   disabledPaymentTypes: [],
   invalidParameters: false,
+  clientConfig: defaultClientConfig,
 });
 
 SaleContext.displayName = 'SaleSaleContext';
@@ -126,7 +131,7 @@ export function SaleContextProvider(props: {
     children,
     value: {
       config,
-      env,
+      environment,
       environmentId,
       items,
       amount,
@@ -135,6 +140,7 @@ export function SaleContextProvider(props: {
       checkout,
       passport,
       collectionName,
+      clientConfig,
     },
   } = props;
 
@@ -199,7 +205,7 @@ export function SaleContextProvider(props: {
     fromTokenAddress,
     recipientAddress,
     environmentId,
-    env,
+    environment,
   });
 
   const sign = useCallback(
@@ -363,7 +369,7 @@ export function SaleContextProvider(props: {
       executeResponse,
       environmentId,
       collectionName,
-      env,
+      environment,
       provider,
       checkout,
       recipientAddress,
@@ -379,10 +385,11 @@ export function SaleContextProvider(props: {
       fundingRoutes,
       disabledPaymentTypes,
       invalidParameters,
+      clientConfig,
     }),
     [
       config,
-      env,
+      environment,
       environmentId,
       items,
       amount,
@@ -405,6 +412,7 @@ export function SaleContextProvider(props: {
       fundingRoutes,
       disabledPaymentTypes,
       invalidParameters,
+      clientConfig,
     ],
   );
 

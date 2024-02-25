@@ -80,6 +80,9 @@ type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 export type UserImx = WithRequired<User, 'imx'>;
 export type UserZkEvm = WithRequired<User, 'zkEvm'>;
 
+export const isUserZkEvm = (user: User): user is UserZkEvm => !!user.zkEvm;
+export const isUserImx = (user: User): user is UserImx => !!user.imx;
+
 // Device code auth
 
 export type DeviceConnectResponse = {
