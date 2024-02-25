@@ -1,29 +1,37 @@
 import {
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-  useEffect,
+  useCallback, useContext, useMemo, useState, useEffect,
 } from 'react';
 import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import {
-  Body,
-  Box, Button, Heading, Icon, MenuItem,
+  Body, Box, Button, Heading, Icon, MenuItem,
 } from '@biom3/react';
 import {
-  ChainId, GasEstimateBridgeToL2Result, GasEstimateType, WalletProviderName,
+  GasEstimateBridgeToL2Result,
+  GasEstimateType,
 } from '@imtbl/checkout-sdk';
 import { abbreviateAddress } from 'lib/addressUtils';
 import { CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext';
-import { isMetaMaskProvider, isPassportProvider } from 'lib/providerUtils';
+import {
+  getWalletProviderNameByProvider,
+  isMetaMaskProvider,
+  isPassportProvider,
+} from 'lib/providerUtils';
 import { calculateCryptoToFiat } from 'lib/utils';
-import { Web3Provider } from '@ethersproject/providers';
-import { DEFAULT_QUOTE_REFRESH_INTERVAL, DEFAULT_TOKEN_DECIMALS, NATIVE } from 'lib';
+import {
+  DEFAULT_QUOTE_REFRESH_INTERVAL,
+  DEFAULT_TOKEN_DECIMALS,
+  NATIVE,
+  networkIcon,
+} from 'lib';
 import { useInterval } from 'lib/hooks/useInterval';
 import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
 import { BigNumber, utils } from 'ethers';
-import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
+import {
+  UserJourney,
+  useAnalytics,
+} from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { useTranslation } from 'react-i18next';
+import { getWalletLogoByName } from 'lib/logoUtils';
 import { networkIconStyles } from './WalletNetworkButtonStyles';
 import {
   arrowIconStyles,
@@ -35,22 +43,12 @@ import {
   topMenuItemStyles,
 } from './BridgeReviewSummaryStyles';
 import { BridgeContext } from '../context/BridgeContext';
-import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import {
+  ViewActions,
+  ViewContext,
+} from '../../../context/view-context/ViewContext';
 import { Fees } from '../../../components/Fees/Fees';
 import { formatBridgeFees } from '../functions/BridgeFees';
-
-const networkIcon = {
-  [ChainId.IMTBL_ZKEVM_DEVNET]: 'Immutable',
-  [ChainId.IMTBL_ZKEVM_MAINNET]: 'Immutable',
-  [ChainId.IMTBL_ZKEVM_TESTNET]: 'Immutable',
-  [ChainId.ETHEREUM]: 'EthToken',
-  [ChainId.SEPOLIA]: 'EthToken',
-};
-
-const logo = {
-  [WalletProviderName.PASSPORT]: 'PassportSymbolOutlined',
-  [WalletProviderName.METAMASK]: 'MetaMaskSymbol',
-};
 
 const testId = 'bridge-review-summary';
 
@@ -60,12 +58,7 @@ export function BridgeReviewSummary() {
 
   const {
     bridgeState: {
-      checkout,
-      tokenBridge,
-      from,
-      to,
-      token,
-      amount,
+      checkout, tokenBridge, from, to, token, amount,
     },
   } = useContext(BridgeContext);
 
@@ -76,56 +69,71 @@ export function BridgeReviewSummary() {
   const [estimates, setEstimates] = useState<any | undefined>(undefined);
   const [gasFee, setGasFee] = useState<string>('');
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [approveTransaction, setApproveTransaction] = useState<ApproveBridgeResponse | undefined>(undefined);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [transaction, setTransaction] = useState<BridgeTxResponse | undefined>(undefined);
+  const [approveTransaction, setApproveTransaction] = useState<
+  ApproveBridgeResponse | undefined
+  >(undefined);
+  const [transaction, setTransaction] = useState<BridgeTxResponse | undefined>(
+    undefined,
+  );
 
-  const walletProviderName = (provider: Web3Provider | undefined) => (isPassportProvider(provider)
-    ? WalletProviderName.PASSPORT
-    : WalletProviderName.METAMASK);
-
-  const displayAmount = useMemo(() => (token?.symbol ? `${token?.symbol} ${amount}` : `${amount}`), [token, amount]);
+  const displayAmount = useMemo(
+    () => (token?.symbol ? `${token?.symbol} ${amount}` : `${amount}`),
+    [token, amount],
+  );
   const fromFiatAmount = useMemo(() => {
     if (!amount || !token) return '';
-    return calculateCryptoToFiat(amount, token.symbol, cryptoFiatState.conversions);
+    return calculateCryptoToFiat(
+      amount,
+      token.symbol,
+      cryptoFiatState.conversions,
+    );
   }, [token, amount]);
   const fromAddress = useMemo(() => {
     if (!from) return '-';
     return from.walletAddress;
   }, [from]);
 
-  const fromWalletProviderName = useMemo(() => walletProviderName(from?.web3Provider), [from]);
+  const fromWalletProviderName = useMemo(
+    () => getWalletProviderNameByProvider(from?.web3Provider),
+    [from],
+  );
   const fromNetwork = useMemo(() => from && from.network, [from]);
+  const fromLogo = getWalletLogoByName(fromWalletProviderName);
 
   const toAddress = useMemo(() => {
     if (!to) return '-';
     return to.walletAddress;
   }, [to]);
-  const toWalletProviderName = useMemo(() => walletProviderName(to?.web3Provider), [to]);
+  const toWalletProviderName = useMemo(
+    () => getWalletProviderNameByProvider(to?.web3Provider),
+    [to],
+  );
   const toNetwork = useMemo(() => to?.network, [to]);
+  const toLogo = getWalletLogoByName(toWalletProviderName);
 
   const fetchGasEstimate = useCallback(async () => {
     if (!tokenBridge || !amount || !from || !to || !token) return;
 
-    const [unsignedApproveTransaction, unsignedTransaction] = await Promise.all([
-      tokenBridge!.getUnsignedApproveBridgeTx({
-        senderAddress: fromAddress,
-        token: token.address ?? NATIVE.toUpperCase(),
-        amount: utils.parseUnits(amount, token.decimals),
-        sourceChainId: from?.network.toString(),
-        destinationChainId: to?.network.toString(),
-      }),
-      tokenBridge!.getUnsignedBridgeTx({
-        senderAddress: fromAddress,
-        recipientAddress: toAddress,
-        token: token.address ?? NATIVE.toUpperCase(),
-        amount: utils.parseUnits(amount, token.decimals),
-        sourceChainId: from?.network.toString(),
-        destinationChainId: to?.network.toString(),
-        gasMultiplier: 1.1,
-      }),
-    ]);
+    const [unsignedApproveTransaction, unsignedTransaction] = await Promise.all(
+      [
+        tokenBridge!.getUnsignedApproveBridgeTx({
+          senderAddress: fromAddress,
+          token: token.address ?? NATIVE.toUpperCase(),
+          amount: utils.parseUnits(amount, token.decimals),
+          sourceChainId: from?.network.toString(),
+          destinationChainId: to?.network.toString(),
+        }),
+        tokenBridge!.getUnsignedBridgeTx({
+          senderAddress: fromAddress,
+          recipientAddress: toAddress,
+          token: token.address ?? NATIVE.toUpperCase(),
+          amount: utils.parseUnits(amount, token.decimals),
+          sourceChainId: from?.network.toString(),
+          destinationChainId: to?.network.toString(),
+          gasMultiplier: 1.1,
+        }),
+      ],
+    );
 
     setApproveTransaction(unsignedApproveTransaction);
     setTransaction(unsignedTransaction);
@@ -158,15 +166,20 @@ export function BridgeReviewSummary() {
     );
 
     setGasFee(estimatedAmount);
-    setGasFeeFiatValue(calculateCryptoToFiat(
-      estimatedAmount,
-      gasEstimateResult?.token?.symbol || '',
-      cryptoFiatState.conversions,
-    ));
+    setGasFeeFiatValue(
+      calculateCryptoToFiat(
+        estimatedAmount,
+        gasEstimateResult?.token?.symbol || '',
+        cryptoFiatState.conversions,
+      ),
+    );
   }, [checkout, tokenBridge]);
   useInterval(() => fetchGasEstimate(), DEFAULT_QUOTE_REFRESH_INTERVAL);
 
-  const formatFeeBreakdown = useCallback((): any => formatBridgeFees(estimates, cryptoFiatState, t), [estimates]);
+  const formatFeeBreakdown = useCallback(
+    (): any => formatBridgeFees(estimates, cryptoFiatState, t),
+    [estimates],
+  );
 
   useEffect(() => {
     (async () => {
@@ -235,14 +248,19 @@ export function BridgeReviewSummary() {
         emphasized
         sx={topMenuItemStyles}
       >
-        <MenuItem.Label size="small" sx={{ marginBottom: 'base.spacing.x4', fontWeight: 'bold' }}>
+        <MenuItem.Label
+          size="small"
+          sx={{ marginBottom: 'base.spacing.x4', fontWeight: 'bold' }}
+        >
           {t('views.BRIDGE_REVIEW.fromLabel.amountHeading')}
         </MenuItem.Label>
         <MenuItem.Caption />
         <MenuItem.PriceDisplay
           use={<Heading size="xSmall" weight="light" />}
           price={displayAmount ?? '-'}
-          fiatAmount={`${t('views.BRIDGE_REVIEW.fiatPricePrefix')}${fromFiatAmount}`}
+          fiatAmount={`${t(
+            'views.BRIDGE_REVIEW.fiatPricePrefix',
+          )}${fromFiatAmount}`}
         />
       </MenuItem>
       <MenuItem
@@ -253,7 +271,7 @@ export function BridgeReviewSummary() {
       >
         {fromWalletProviderName && (
           <MenuItem.FramedLogo
-            logo={logo[fromWalletProviderName] as any}
+            logo={fromLogo}
             sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
           />
         )}
@@ -290,7 +308,7 @@ export function BridgeReviewSummary() {
       >
         {toWalletProviderName && (
           <MenuItem.FramedLogo
-            logo={logo[toWalletProviderName] as any}
+            logo={toLogo}
             sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
           />
         )}
@@ -348,7 +366,9 @@ export function BridgeReviewSummary() {
         >
           {loading ? (
             <Button.Icon icon="Loading" sx={bridgeButtonIconLoadingStyle} />
-          ) : t('views.BRIDGE_REVIEW.submitButton.buttonText')}
+          ) : (
+            t('views.BRIDGE_REVIEW.submitButton.buttonText')
+          )}
         </Button>
       </Box>
     </Box>
