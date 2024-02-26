@@ -6,32 +6,52 @@ import terser from '@rollup/plugin-terser';
 import replace from '@rollup/plugin-replace';
 import nodePolyfills from 'rollup-plugin-polyfill-node';
 
-const defaultPlugin = [
+const DEVELOPMENT = 'development';
+const PRODUCTION = 'production';
+
+const defaultPlugins = [
+  json(),
+  replace({
+    preventAssignment: true,
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || PRODUCTION),
+  }),
+  typescript(),
+]
+
+const productionPlugins = [
   resolve({
     browser: true,
     dedupe: ['react', 'react-dom'],
   }),
   nodePolyfills(),
   commonjs(),
-  json(),
-  replace({
-    preventAssignment: true,
-    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
-  }),
-  typescript(),
   terser()
 ]
 
+const getPlugins = () => {
+  if (process.env.NODE_ENV === DEVELOPMENT) {
+    return defaultPlugins;
+  }
+
+  return [
+    ...defaultPlugins,
+    ...productionPlugins
+  ];
+}
+
+const isDevelopment = () => process.env.NODE_ENV === DEVELOPMENT;
+
 export default [
   {
-    watch: true,
+    watch: isDevelopment(),
     input: 'src/index.ts',
     output: {
       dir: 'dist',
-      format: 'es'
+      format: 'es',
+      inlineDynamicImports: isDevelopment()
     },
     plugins: [
-      ...defaultPlugin,
+      ...getPlugins(),
     ]
   },
   {
@@ -45,7 +65,7 @@ export default [
     },
     context: 'window',
     plugins: [
-      ...defaultPlugin,,
+      ...getPlugins(),
     ]
   }
 ]
