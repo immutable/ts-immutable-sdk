@@ -73,7 +73,7 @@ function NFTApproval({ disabled, handleExampleSubmitted }: RequestExampleProps) 
         data: '0x',
       }]);
     }
-  }, [fromAddress, erc721ContractAddress, toAddress, tokenId, choosedApproveType, nftApproveContract]);
+  }, [fromAddress, erc721ContractAddress, toAddress, tokenId, choosedApproveType, nftApproveContract, isUnSafe]);
 
   useEffect(() => {
     const getAddress = async () => {
@@ -175,10 +175,11 @@ function NFTApproval({ disabled, handleExampleSubmitted }: RequestExampleProps) 
               />
             </Form.Group>
           )}
-          <Form.Check onClick={() => {setIsUnSafe(!isUnSafe);}}
-            type={"checkbox"}
-            id={"check-is-unsafe"}
-            label={"is Unsafe?"}
+          <Form.Check
+            onClick={() => { setIsUnSafe(!isUnSafe); }}
+            type="checkbox"
+            id="check-is-unsafe"
+            label="is Unsafe?"
           />
           <WorkflowButton
             disabled={disabled}
