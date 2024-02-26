@@ -32,8 +32,7 @@ export const NetworkSwitchDrawer = ({
       chainId: targetChainId
     })
     onNetworkSwitch(switchNetworkResult.provider)
-
-  }, [checkout, provider, onNetworkSwitch])
+  }, [checkout, provider, onNetworkSwitch, targetChainId])
 
   const walletLogo = getWalletLogoByName(getWalletProviderNameByProvider(provider));
 
@@ -41,7 +40,7 @@ export const NetworkSwitchDrawer = ({
 
   const walletConnectPeer = useMemo(() => {
     if(!isWalletConnect) return '';
-    return (provider.prvoider as any)?.session?.peer?.metadata?.name as string;
+    return (provider.provider as any)?.session?.peer?.metadata?.name as string;
   }, [provider, isWalletConnect])
 
   return(

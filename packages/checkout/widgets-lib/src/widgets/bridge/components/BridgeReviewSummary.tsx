@@ -21,7 +21,9 @@ import {
   DEFAULT_QUOTE_REFRESH_INTERVAL,
   DEFAULT_TOKEN_DECIMALS,
   NATIVE,
+  addChainChangedListener,
   networkIcon,
+  removeChainChangedListener,
 } from 'lib';
 import { useInterval } from 'lib/hooks/useInterval';
 import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
@@ -210,6 +212,21 @@ export function BridgeReviewSummary() {
       }
     })
   }, [from?.web3Provider, from?.network, to?.web3Provider, to?.network])
+
+  useEffect(() => {
+    if(!from?.web3Provider) return;
+
+    const handleChainChanged = () => {
+      const newProvider = new Web3Provider(from?.web3Provider.provider);
+      handleNetworkSwitch(newProvider);
+      setShowSwitchNetworkDrawer(false);
+    }
+    addChainChangedListener(from?.web3Provider, handleChainChanged)
+
+    return () => {
+      removeChainChangedListener(from?.web3Provider, handleChainChanged)
+    }
+  }, [from?.web3Provider])
 
   const submitBridge = useCallback(async () => {
     if (!approveTransaction || !transaction) return;
