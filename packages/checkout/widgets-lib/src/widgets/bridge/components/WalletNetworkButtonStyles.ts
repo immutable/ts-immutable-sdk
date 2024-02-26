@@ -25,7 +25,7 @@ export const walletButtonOuterStyles = {
   },
 };
 
-export const walletLogoStyles = (walletName: WalletProviderName) => ({
+export const walletLogoStyles = (walletName: WalletProviderName | string) => ({
   width: 'base.icon.size.500',
   padding: walletName === WalletProviderName.PASSPORT ? 'base.spacing.x1' : '',
   backgroundColor: 'base.color.translucent.standard.200',
