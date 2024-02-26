@@ -1,35 +1,35 @@
 name: Functional Tests (zkEVM)
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
-      with:
-        node-version: 18
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
 
-    - name: Install root dependencies
-      run: npm install -g yarn && yarn install --immutable
+      - name: Install root dependencies
+        run: npm install -g yarn && yarn install --immutable
 
-    - name: Build SDK
-      run: yarn build
+      - name: Build SDK
+        run: yarn build
 
-    - name: Install functional tests dependencies
-      run: cd tests/func-tests/zkevm && yarn install --no-immutable
+      - name: Install functional tests dependencies
+        run: cd tests/func-tests/zkevm && yarn install --no-immutable
 
-    - name: Run tests
-      env:
-        ZKEVM_ORDERBOOK_BANKER: ${{ secrets.ZKEVM_ORDERBOOK_BANKER }}
-        ZKEVM_ORDERBOOK_ERC721: '0xBE8B131f39825282Ace9eFf99C0Bb14972417b49'
-        SEAPORT_CONTRACT_ADDRESS: '0x7d117aA8BD6D31c4fa91722f246388f38ab1942c'
-        ZONE_CONTRACT_ADDRESS: '0x8831867E347AB87FA30199C5B695F0A31604Bb52'
-        ZKEVM_RPC_ENDPOINT: 'https://rpc.testnet.immutable.com'
-        ORDERBOOK_MR_API_URL: 'https://api.sandbox.immutable.com'
-        ZKEVM_CHAIN_NAME: 'imtbl-zkevm-testnet'
-      run: cd tests/func-tests/zkevm && yarn test:ci
+      - name: Run tests
+        env:
+          ZKEVM_ORDERBOOK_BANKER: ${{ secrets.ZKEVM_ORDERBOOK_BANKER }}
+          ZKEVM_ORDERBOOK_ERC721: '0xBE8B131f39825282Ace9eFf99C0Bb14972417b49'
+          SEAPORT_CONTRACT_ADDRESS: '0x7d117aA8BD6D31c4fa91722f246388f38ab1942c'
+          ZONE_CONTRACT_ADDRESS: '0x8831867E347AB87FA30199C5B695F0A31604Bb52'
+          ZKEVM_RPC_ENDPOINT: 'https://rpc.testnet.immutable.com'
+          ORDERBOOK_MR_API_URL: 'https://api.sandbox.immutable.com'
+          ZKEVM_CHAIN_NAME: 'imtbl-zkevm-testnet'
+        run: cd tests/func-tests/zkevm && yarn test:ci
