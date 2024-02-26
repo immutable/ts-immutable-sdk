@@ -2,65 +2,126 @@ import { ImxApiClients } from '@imtbl/generated-clients';
 import { ImxConfiguration, ImxModuleConfiguration } from './config';
 import { formatError } from './utils/formatError';
 import {
-  // ImmutableX,
+  // // ImmutableX,
   // EthSigner,
-  // generateLegacyStarkPrivateKey,
-  // createStarkSigner,
+  // // generateLegacyStarkPrivateKey,
+  // // createStarkSigner,
   // UnsignedExchangeTransferRequest,
   // UnsignedMintRequest,
   // WalletConnection,
-  DepositsApi,
-  MintsApi,
-  OrdersApi,
-  TokensApi,
-  TradesApi,
-  TransfersApi,
-  UsersApi,
-  WithdrawalsApi,
-  BalancesApi,
+  // AssetsApi,
+  // BalancesApi,
+  // CollectionsApi,
+  // DepositsApi,
+  // EncodingApi,
+  // MintsApi,
+  // MetadataApi,
+  // OrdersApi,
+  // PrimarySalesApi,
+  // ProjectsApi,
+  // TokensApi,
+  // TradesApi,
+  // TransfersApi,
+  // UsersApi,
+  // WithdrawalsApi,
+  // DepositsApiGetDepositRequest,
+  // DepositsApiListDepositsRequest,
+  // AssetsApiGetAssetRequest,
+  // AssetsApiListAssetsRequest,
+  // CreateCollectionRequest,
+  // CollectionsApiGetCollectionRequest,
+  // CollectionsApiListCollectionFiltersRequest,
+  // CollectionsApiListCollectionsRequest,
+  // UpdateCollectionRequest,
+  // AddMetadataSchemaToCollectionRequest,
+  // MetadataApiGetMetadataSchemaRequest,
+  // MetadataSchemaRequest,
+  // BalancesApiGetBalanceRequest,
+  // BalancesApiListBalancesRequest,
+  // MintsApiGetMintRequest,
+  // MintsApiListMintsRequest,
+  // WithdrawalsApiListWithdrawalsRequest,
+  // WithdrawalsApiGetWithdrawalRequest,
+  // OrdersApiGetOrderV3Request,
+  // OrdersApiListOrdersV3Request,
+  // TradesApiGetTradeV3Request,
+  // TradesApiListTradesV3Request,
+  // TokensApiGetTokenRequest,
+  // TokensApiListTokensRequest,
+  // TransfersApiGetTransferRequest,
+  // TransfersApiListTransfersRequest,
+  // MetadataRefreshesApi,
+  // CreateMetadataRefreshRequest,
+  // ExchangesApi,
+  // ExchangesApiCreateExchangeRequest,
+  // ExchangesApiGetExchangeRequest,
+  // ExchangesApiGetExchangesRequest,
+  // NftCheckoutPrimaryApi,
+  // NftCheckoutPrimaryApiCreateNftPrimaryRequest,
+  // NftCheckoutPrimaryApiGetCurrenciesNFTCheckoutPrimaryRequest,
+  // NftCheckoutPrimaryApiGetNftPrimaryTransactionRequest,
+  // NftCheckoutPrimaryApiGetNftPrimaryTransactionsRequest,
+  // PrimarySalesApiSignableCreatePrimarySaleRequest,
+
+  AddMetadataSchemaToCollectionRequest,
   AssetsApi,
-  CollectionsApi,
-  MetadataApi,
-  ProjectsApi,
-  EncodingApi,
-  DepositsApiGetDepositRequest,
-  DepositsApiListDepositsRequest,
   AssetsApiGetAssetRequest,
   AssetsApiListAssetsRequest,
-  // CreateCollectionRequest,
+  BalancesApi,
+  BalancesApiGetBalanceRequest,
+  BalancesApiListBalancesRequest,
+  CollectionsApi,
   CollectionsApiGetCollectionRequest,
   CollectionsApiListCollectionFiltersRequest,
   CollectionsApiListCollectionsRequest,
-  // UpdateCollectionRequest,
-  // AddMetadataSchemaToCollectionRequest,
-  MetadataApiGetMetadataSchemaRequest,
-  // MetadataSchemaRequest,
-  BalancesApiGetBalanceRequest,
-  BalancesApiListBalancesRequest,
-  MintsApiGetMintRequest,
-  MintsApiListMintsRequest,
-  WithdrawalsApiListWithdrawalsRequest,
-  WithdrawalsApiGetWithdrawalRequest,
-  OrdersApiGetOrderV3Request,
-  OrdersApiListOrdersV3Request,
-  TradesApiGetTradeV3Request,
-  TradesApiListTradesV3Request,
-  TokensApiGetTokenRequest,
-  TokensApiListTokensRequest,
-  TransfersApiGetTransferRequest,
-  TransfersApiListTransfersRequest,
-  MetadataRefreshesApi,
-  // CreateMetadataRefreshRequest,
+  CreateCollectionRequest,
+  CreateMetadataRefreshRequest,
+  DepositsApi,
+  DepositsApiGetDepositRequest,
+  DepositsApiListDepositsRequest,
+  EncodingApi,
+  EthSigner,
   ExchangesApi,
   ExchangesApiCreateExchangeRequest,
   ExchangesApiGetExchangeRequest,
   ExchangesApiGetExchangesRequest,
+  MintsApi,
+  MintsApiGetMintRequest,
+  MintsApiListMintsRequest,
+  MetadataApi,
+  MetadataApiGetMetadataSchemaRequest,
+  MetadataRefreshesApi,
+  MetadataSchemaRequest,
   NftCheckoutPrimaryApi,
   NftCheckoutPrimaryApiCreateNftPrimaryRequest,
   NftCheckoutPrimaryApiGetCurrenciesNFTCheckoutPrimaryRequest,
   NftCheckoutPrimaryApiGetNftPrimaryTransactionRequest,
   NftCheckoutPrimaryApiGetNftPrimaryTransactionsRequest,
+  OrdersApi,
+  OrdersApiGetOrderV3Request,
+  OrdersApiListOrdersV3Request,
+  PrimarySalesApi,
+  PrimarySalesApiSignableCreatePrimarySaleRequest,
+  ProjectsApi,
+  TokensApi,
+  TokensApiGetTokenRequest,
+  TokensApiListTokensRequest,
+  TradesApi,
+  TradesApiGetTradeV3Request,
+  TradesApiListTradesV3Request,
+  TransfersApi,
+  TransfersApiGetTransferRequest,
+  TransfersApiListTransfersRequest,
+  UpdateCollectionRequest,
+  UnsignedMintRequest,
+  WalletConnection,
+  UnsignedExchangeTransferRequest,
+  UsersApi,
+  WithdrawalsApi,
+  WithdrawalsApiGetWithdrawalRequest,
+  WithdrawalsApiListWithdrawalsRequest,
 } from './types';
+import { Workflows } from './workflows';
 
 export class IMXClient {
   private immutableX: ImxApiClients;
@@ -87,6 +148,8 @@ export class IMXClient {
 
   public ordersApi: OrdersApi;
 
+  public primarySalesApi: PrimarySalesApi;
+
   public projectsApi: ProjectsApi;
 
   public tokensApi: TokensApi;
@@ -98,6 +161,8 @@ export class IMXClient {
   public usersApi: UsersApi;
 
   public withdrawalsApi: WithdrawalsApi;
+
+  public workflows: Workflows;
 
   constructor(config: ImxModuleConfiguration) {
     const imxConfig = new ImxConfiguration(config);
@@ -113,12 +178,23 @@ export class IMXClient {
     this.mintsApi = this.immutableX.mintsApi;
     this.nftCheckoutPrimaryApi = this.immutableX.nftCheckoutPrimaryApi;
     this.ordersApi = this.immutableX.ordersApi;
+    this.primarySalesApi = this.immutableX.primarySalesApi;
     this.projectsApi = this.immutableX.projectsApi;
     this.tokensApi = this.immutableX.tokensApi;
     this.tradesApi = this.immutableX.tradesApi;
     this.transfersApi = this.immutableX.transfersApi;
     this.usersApi = this.immutableX.usersApi;
     this.withdrawalsApi = this.immutableX.withdrawalsApi;
+    this.workflows = new Workflows(
+      imxConfig.immutableXConfig,
+      this.immutableX.collectionApi,
+      this.immutableX.exchangeApi,
+      this.immutableX.metadataApi,
+      this.immutableX.metadataRefreshesApi,
+      this.immutableX.mintsApi,
+      this.immutableX.primarySalesApi,
+      this.immutableX.projectsApi,
+    );
   }
 
   /**
@@ -196,20 +272,24 @@ export class IMXClient {
       });
   }
 
-  // /**
-  //  * Create a Collection
-  //  * @param ethSigner - the L1 signer
-  //  * @param request - the request object to be provided in the API request
-  //  * @returns a promise that resolves with the created Collection
-  //  * @throws {@link index.IMXError}
-  //  */
-  // public createCollection(
-  //   ethSigner: EthSigner,
-  //   request: CreateCollectionRequest,
-  // ) {
-  //   // TODO - workflow
-  //   return this.collectionApi.createCollection(ethSigner, request);
-  // }
+  /**
+   * Create a Collection
+   * @param ethSigner - the L1 signer
+   * @param request - the request object to be provided in the API request
+   * @returns a promise that resolves with the created Collection
+   * @throws {@link index.IMXError}
+   */
+  public createCollection(
+    ethSigner: EthSigner,
+    request: CreateCollectionRequest,
+  ) {
+    return this.workflows
+      .createCollection(ethSigner, request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
 
   /**
    * Get details of a Collection at the given address
@@ -258,47 +338,47 @@ export class IMXClient {
       });
   }
 
-  // /**
-  //  * Update a Collection
-  //  * @param ethSigner - the L1 signer
-  //  * @param collectionAddress - the Collection contract address
-  //  * @param request - the request object containing the parameters to be provided in the API request
-  //  * @returns a promise that resolves with the updated Collection
-  //  * @throws {@link index.IMXError}
-  //  */
-  // public updateCollection(
-  //   ethSigner: EthSigner,
-  //   collectionAddress: string,
-  //   request: UpdateCollectionRequest,
-  // ) {
-  //   // TODO - workflow
-  //   return this.collectionApi.updateCollection(
-  //     ethSigner,
-  //     collectionAddress,
-  //     request,
-  //   );
-  // }
+  /**
+   * Update a Collection
+   * @param ethSigner - the L1 signer
+   * @param collectionAddress - the Collection contract address
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with the updated Collection
+   * @throws {@link index.IMXError}
+   */
+  public updateCollection(
+    ethSigner: EthSigner,
+    collectionAddress: string,
+    request: UpdateCollectionRequest,
+  ) {
+    return this.workflows
+      .updateCollection(ethSigner, collectionAddress, request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
 
-  // /**
-  //  * Add metadata schema to Collection
-  //  * @param ethSigner - the L1 signer
-  //  * @param collectionAddress - the Collection contract address
-  //  * @param request - the request object containing the parameters to be provided in the API request
-  //  * @returns a promise that resolves with the SuccessResponse if successful
-  //  * @throws {@link index.IMXError}
-  //  */
-  // public addMetadataSchemaToCollection(
-  //   ethSigner: EthSigner,
-  //   collectionAddress: string,
-  //   request: AddMetadataSchemaToCollectionRequest,
-  // ) {
-  //   // TODO - workflow
-  //   return this.metadataApi.addMetadataSchemaToCollection(
-  //     ethSigner,
-  //     collectionAddress,
-  //     request,
-  //   );
-  // }
+  /**
+   * Add metadata schema to Collection
+   * @param ethSigner - the L1 signer
+   * @param collectionAddress - the Collection contract address
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with the SuccessResponse if successful
+   * @throws {@link index.IMXError}
+   */
+  public addMetadataSchemaToCollection(
+    ethSigner: EthSigner,
+    collectionAddress: string,
+    request: AddMetadataSchemaToCollectionRequest,
+  ) {
+    return this.workflows
+      .addMetadataSchemaToCollection(ethSigner, collectionAddress, request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
 
   /**
    * Get Metadata schema
@@ -315,143 +395,125 @@ export class IMXClient {
       });
   }
 
-  // /**
-  //  * Update metadata schema by name
-  //  * @param ethSigner - the L1 signer
-  //  * @param collectionAddress - the Collection contract address
-  //  * @param name - the Metadata schema name
-  //  * @param request - the request object containing the parameters to be provided in the API request
-  //  * @returns a promise that resolves with the SuccessResponse if successful
-  //  * @throws {@link index.IMXError}
-  //  */
-  // public updateMetadataSchemaByName(
-  //   ethSigner: EthSigner,
-  //   collectionAddress: string,
-  //   name: string,
-  //   request: MetadataSchemaRequest,
-  // ) {
-  //   // TODO - workflow
-  //   return this.immutableX.updateMetadataSchemaByName(
-  //     ethSigner,
-  //     collectionAddress,
-  //     name,
-  //     request,
-  //   );
-  // }
+  /**
+   * Update metadata schema by name
+   * @param ethSigner - the L1 signer
+   * @param collectionAddress - the Collection contract address
+   * @param name - the Metadata schema name
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with the SuccessResponse if successful
+   * @throws {@link index.IMXError}
+   */
+  public updateMetadataSchemaByName(
+    ethSigner: EthSigner,
+    collectionAddress: string,
+    name: string,
+    request: MetadataSchemaRequest,
+  ) {
+    return this.workflows
+      .updateMetadataSchemaByName(ethSigner, collectionAddress, name, request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
 
-  // /**
-  //  * Get a list of metadata refreshes
-  //  * @param ethSigner - the L1 signer
-  //  * @param collectionAddress - the Collection contract address
-  //  * @param pageSize - the page size of the result
-  //  * @param cursor - the cursor
-  //  * @returns a promise that resolves with the requested metadata refreshes
-  //  * @throws {@link index.IMXError}
-  //  */
-  // public listMetadataRefreshes(
-  //   ethSigner: EthSigner,
-  //   collectionAddress?: string,
-  //   pageSize?: number,
-  //   cursor?: string,
-  // ) {
-  //   // TODO - workflow
-  //   return this.immutableX.listMetadataRefreshes(
-  //     ethSigner,
-  //     collectionAddress,
-  //     pageSize,
-  //     cursor,
-  //   );
-  // }
+  /**
+   * Get a list of metadata refreshes
+   * @param ethSigner - the L1 signer
+   * @param collectionAddress - the Collection contract address
+   * @param pageSize - the page size of the result
+   * @param cursor - the cursor
+   * @returns a promise that resolves with the requested metadata refreshes
+   * @throws {@link index.IMXError}
+   */
+  public listMetadataRefreshes(
+    ethSigner: EthSigner,
+    collectionAddress?: string,
+    pageSize?: number,
+    cursor?: string,
+  ) {
+    return this.workflows
+      .listMetadataRefreshes(ethSigner, collectionAddress, pageSize, cursor)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
 
-  // /**
-  //  * Get a list of metadata refresh errors
-  //  * @param ethSigner - the L1 signer
-  //  * @param refreshId - the metadata refresh ID
-  //  * @param pageSize - the page size of the result
-  //  * @param cursor - the cursor
-  //  * @returns a promise that resolves with the requested metadata refresh errors
-  //  * @throws {@link index.IMXError}
-  //  */
-  // public getMetadataRefreshErrors(
-  //   ethSigner: EthSigner,
-  //   refreshId: string,
-  //   pageSize?: number,
-  //   cursor?: string,
-  // ) {
-  //   // TODO - workflow
-  //   return this.immutableX.getMetadataRefreshErrors(
-  //     ethSigner,
-  //     refreshId,
-  //     pageSize,
-  //     cursor,
-  //   );
-  // }
+  /**
+   * Get a list of metadata refresh errors
+   * @param ethSigner - the L1 signer
+   * @param refreshId - the metadata refresh ID
+   * @param pageSize - the page size of the result
+   * @param cursor - the cursor
+   * @returns a promise that resolves with the requested metadata refresh errors
+   * @throws {@link index.IMXError}
+   */
+  public getMetadataRefreshErrors(
+    ethSigner: EthSigner,
+    refreshId: string,
+    pageSize?: number,
+    cursor?: string,
+  ) {
+    return this.workflows
+      .getMetadataRefreshErrors(ethSigner, refreshId, pageSize, cursor)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
 
-  // /**
-  //  * Get a list of metadata refresh results
-  //  * @param ethSigner - the L1 signer
-  //  * @param refreshId - the metadata refresh ID
-  //  * @returns a promise that resolves with the requested metadata refresh results
-  //  * @throws {@link index.IMXError}
-  //  */
-  // public getMetadataRefreshResults(ethSigner: EthSigner, refreshId: string) {
-  //   // TODO - workflow
-  //   return this.immutableX.getMetadataRefreshResults(ethSigner, refreshId);
-  // }
+  /**
+   * Get a list of metadata refresh results
+   * @param ethSigner - the L1 signer
+   * @param refreshId - the metadata refresh ID
+   * @returns a promise that resolves with the requested metadata refresh results
+   * @throws {@link index.IMXError}
+   */
+  public getMetadataRefreshResults(ethSigner: EthSigner, refreshId: string) {
+    return this.workflows
+      .getMetadataRefreshResults(ethSigner, refreshId)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
 
-  // /**
-  //  * Request a metadata refresh
-  //  * @param ethSigner - the L1 signer
-  //  * @param request the request object containing the parameters to be provided in the API request
-  //  * @returns a promise that resolves with the requested metadata refresh
-  //  * @throws {@link index.IMXError}
-  //  */
-  // public createMetadataRefresh(
-  //   ethSigner: EthSigner,
-  //   request: CreateMetadataRefreshRequest,
-  // ) {
-  //   // TODO - workflow
-  //   return this.immutableX.createMetadataRefresh(ethSigner, request);
-  // }
+  /**
+   * Request a metadata refresh
+   * @param ethSigner - the L1 signer
+   * @param request the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with the requested metadata refresh
+   * @throws {@link index.IMXError}
+   */
+  public createMetadataRefresh(
+    ethSigner: EthSigner,
+    request: CreateMetadataRefreshRequest,
+  ) {
+    return this.workflows
+      .createMetadataRefresh(ethSigner, request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
 
-  // /**
-  //  * Get a Project
-  //  * @param ethSigner - the L1 signer
-  //  * @param id - the Project ID
-  //  * @returns a promise that resolves with the requested Project
-  //  * @throws {@link index.IMXError}
-  //  */
-  // public async getProject(ethSigner: EthSigner, id: string) {
-  //   // TODO - workflow
-  //   return this.immutableX.getProject(ethSigner, id);
-  // }
-
-  // /**
-  //  * Get Projects owned by the given User
-  //  * @param ethSigner - the L1 signer
-  //  * @param pageSize - the page size of the result
-  //  * @param cursor - the cursor
-  //  * @param orderBy - the property to sort by
-  //  * @param direction - direction to sort (asc/desc)
-  //  * @returns a promise that resolves with the requested Projects
-  //  * @throws {@link index.IMXError}
-  //  */
-  // public async getProjects(
-  //   ethSigner: EthSigner,
-  //   pageSize?: number,
-  //   cursor?: string,
-  //   orderBy?: string,
-  //   direction?: string,
-  // ) {
-  //   // TODO - workflow
-  //   return this.immutableX.getProjects(
-  //     ethSigner,
-  //     pageSize,
-  //     cursor,
-  //     orderBy,
-  //     direction,
-  //   );
-  // }
+  /**
+   * Get a Project
+   * @param ethSigner - the L1 signer
+   * @param id - the Project ID
+   * @returns a promise that resolves with the requested Project
+   * @throws {@link index.IMXError}
+   */
+  public async getProject(ethSigner: EthSigner, id: string) {
+    return this.workflows
+      .getProject(ethSigner, id)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
 
   /**
    * Get the token Balances of the User
@@ -513,17 +575,16 @@ export class IMXClient {
       });
   }
 
-  // /**
-  //  * Mint tokens in a batch with fees
-  //  * @param ethSigner - the L1 signer
-  //  * @param request - the request object to be provided in the API request
-  //  * @returns a promise that resolves with the minted tokens
-  //  * @throws {@link index.IMXError}
-  //  */
-  // public mint(ethSigner: EthSigner, request: UnsignedMintRequest) {
-  //   // TODO - workflow
-  //   return this.immutableX.mint(ethSigner, request);
-  // }
+  /**
+   * Mint tokens in a batch with fees
+   * @param ethSigner - the L1 signer
+   * @param request - the request object to be provided in the API request
+   * @returns a promise that resolves with the minted tokens
+   * @throws {@link index.IMXError}
+   */
+  public mint(ethSigner: EthSigner, request: UnsignedMintRequest) {
+    return this.workflows.mint(ethSigner, request);
+  }
 
   /**
    * Get a list of Withdrawals
@@ -717,20 +778,19 @@ export class IMXClient {
       });
   }
 
-  // /**
-  //  * Create a new Transfer request
-  //  * @param walletConnection - the pair of Eth/Stark signers
-  //  * @param request - the request object to be provided in the API request
-  //  * @returns a promise that resolves with the created Exchange Transfer
-  //  * @throws {@link index.IMXError}
-  //  */
-  // public exchangeTransfer(
-  //   walletConnection: WalletConnection,
-  //   request: UnsignedExchangeTransferRequest,
-  // ) {
-  //   // TODO - workflow
-  //   return this.immutableX.exchangeTransfer(walletConnection, request);
-  // }
+  /**
+   * Create a new Transfer request
+   * @param walletConnection - the pair of Eth/Stark signers
+   * @param request - the request object to be provided in the API request
+   * @returns a promise that resolves with the created Exchange Transfer
+   * @throws {@link index.IMXError}
+   */
+  public exchangeTransfer(
+    walletConnection: WalletConnection,
+    request: UnsignedExchangeTransferRequest,
+  ) {
+    return this.workflows.exchangeTransfer(walletConnection, request);
+  }
 
   /**
    * Create a new nft primary transaction
@@ -799,53 +859,53 @@ export class IMXClient {
       });
   }
 
-  // /**
-  //  * Create a PrimarySale
-  //  * @param walletConnection - the pair of L1/L2 signers
-  //  * @param request - the request object to be provided in the API request
-  //  * @returns a promise that resolves with the created Trade
-  //  * @throws {@link index.IMXError}
-  //  */
-  // public createPrimarySale(
-  //   walletConnection: WalletConnection,
-  //   request: PrimarySalesApiSignableCreatePrimarySaleRequest,
-  // ) {
-  //   return this.workflows
-  //     .createPrimarySale(walletConnection, request)
-  //     .catch(err => {
-  //       throw formatError(err);
-  //     });
-  // }
+  /**
+   * Create a PrimarySale
+   * @param walletConnection - the pair of L1/L2 signers
+   * @param request - the request object to be provided in the API request
+   * @returns a promise that resolves with the created Trade
+   * @throws {@link index.IMXError}
+   */
+  public createPrimarySale(
+    walletConnection: WalletConnection,
+    request: PrimarySalesApiSignableCreatePrimarySaleRequest,
+  ) {
+    return this.workflows
+      .createPrimarySale(walletConnection, request)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
 
-  // /**
-  //  * Accept a PrimarySale
-  //  * @param ethSigner - eth signer matching the 'studio_ether_key' of the primary sale
-  //  * @param primarySaleId - id of the primary sale accepting
-  //  * @returns a promise that resolves with the created Trade
-  //  * @throws {@link index.IMXError}
-  //  */
-  // public acceptPrimarySale(ethSigner: EthSigner, primarySaleId: number) {
-  //   return this.workflows
-  //     .acceptPrimarySale(ethSigner, primarySaleId)
-  //     .catch(err => {
-  //       throw formatError(err);
-  //     });
-  // }
+  /**
+   * Accept a PrimarySale
+   * @param ethSigner - eth signer matching the 'studio_ether_key' of the primary sale
+   * @param primarySaleId - id of the primary sale accepting
+   * @returns a promise that resolves with the created Trade
+   * @throws {@link index.IMXError}
+   */
+  public acceptPrimarySale(ethSigner: EthSigner, primarySaleId: number) {
+    return this.workflows
+      .acceptPrimarySale(ethSigner, primarySaleId)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
 
-  // /**
-  //  * Reject a PrimarySale
-  //  * @param ethSigner - eth signer matching the 'studio_ether_key' of the primary sale
-  //  * @param primarySaleId - id of the primary sale to be rejected
-  //  * @returns a promise that resolves with the rejected PrimarySale
-  //  * @throws {@link index.IMXError}
-  //  */
-  // public rejectPrimarySale(ethSigner: EthSigner, primarySaleId: number) {
-  //   return this.workflows
-  //     .rejectPrimarySale(ethSigner, primarySaleId)
-  //     .catch(err => {
-  //       throw formatError(err);
-  //     });
-  // }
+  /**
+   * Reject a PrimarySale
+   * @param ethSigner - eth signer matching the 'studio_ether_key' of the primary sale
+   * @param primarySaleId - id of the primary sale to be rejected
+   * @returns a promise that resolves with the rejected PrimarySale
+   * @throws {@link index.IMXError}
+   */
+  public rejectPrimarySale(ethSigner: EthSigner, primarySaleId: number) {
+    return this.workflows
+      .rejectPrimarySale(ethSigner, primarySaleId)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -871,19 +931,19 @@ export const ImmutableX = IMXClient;
 // methods moved from Core SDK that aren't in x-provider
 // workflows
 /**
- * createCollection
- * updateCollection
- * addMetadataSchemaToCollection
- * updateMetadataSchemaByName
- * listMetadataRefreshes
- * getMetadataRefreshErrors
- * getMetadataRefreshResults
- * createMetadataRefresh
- * getProject
- * getProjects
- * mint
- * exchangeTransfer
- * createPrimarySale
- * acceptPrimarySale
- * rejectPrimarySale
+ * createCollection ✅
+ * updateCollection ✅
+ * addMetadataSchemaToCollection ✅
+ * updateMetadataSchemaByName ✅
+ * listMetadataRefreshes ✅
+ * getMetadataRefreshErrors ✅
+ * getMetadataRefreshResults ✅
+ * createMetadataRefresh ✅
+ * getProject ✅
+ * getProjects (removed)
+ * mint ✅
+ * exchangeTransfer ✅
+ * createPrimarySale ✅
+ * acceptPrimarySale ✅
+ * rejectPrimarySale ✅
  */

@@ -105,25 +105,33 @@ export class Workflows {
     return chainID === this.config.ethConfiguration.chainID;
   }
 
-  constructor(protected config: ImmutableXConfiguration) {
-    const { apiConfiguration } = config;
-
+  constructor(
+    protected config: ImmutableXConfiguration,
+    collectionsApi: CollectionsApi,
+    exchangesApi: ExchangesApi,
+    metadataApi: MetadataApi,
+    metadataRefreshesApi: MetadataRefreshesApi,
+    mintsApi: MintsApi,
+    primarySalesApi: PrimarySalesApi,
+    projectsApi: ProjectsApi,
+  ) {
     this.config = config;
-    // this.depositsApi = new DepositsApi(apiConfiguration);
-    // this.encodingApi = new EncodingApi(apiConfiguration);
-    this.mintsApi = new MintsApi(apiConfiguration);
-    // this.ordersApi = new OrdersApi(apiConfiguration);
-    // this.tokensApi = new TokensApi(apiConfiguration);
-    // this.tradesApi = new TradesApi(apiConfiguration);
-    // this.transfersApi = new TransfersApi(apiConfiguration);
-    // this.usersApi = new UsersApi(apiConfiguration);
-    // this.withdrawalsApi = new WithdrawalsApi(apiConfiguration);
-    this.projectsApi = new ProjectsApi(apiConfiguration);
-    this.collectionsApi = new CollectionsApi(apiConfiguration);
-    this.metadataApi = new MetadataApi(apiConfiguration);
-    this.metadataRefreshesApi = new MetadataRefreshesApi(apiConfiguration);
-    this.exchangesApi = new ExchangesApi(apiConfiguration);
-    this.primarySalesApi = new PrimarySalesApi(apiConfiguration);
+    this.collectionsApi = collectionsApi;
+    this.exchangesApi = exchangesApi;
+    this.metadataApi = metadataApi;
+    this.metadataRefreshesApi = metadataRefreshesApi;
+    this.mintsApi = mintsApi;
+    this.primarySalesApi = primarySalesApi;
+    this.projectsApi = projectsApi;
+
+    // const { apiConfiguration } = config;
+    // this.collectionsApi = new CollectionsApi(apiConfiguration);
+    // this.exchangesApi = new ExchangesApi(apiConfiguration);
+    // this.metadataApi = new MetadataApi(apiConfiguration);
+    // this.metadataRefreshesApi = new MetadataRefreshesApi(apiConfiguration);
+    // this.mintsApi = new MintsApi(apiConfiguration);
+    // this.primarySalesApi = new PrimarySalesApi(apiConfiguration);
+    // this.projectsApi = new ProjectsApi(apiConfiguration);
   }
 
   private async validateChain(signer: Signer) {
