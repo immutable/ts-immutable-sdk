@@ -3,7 +3,7 @@ name: Passport SDK Sample App Deployment
 on:
   push:
     paths:
-      - 'packages/passport/**'
+      - "packages/passport/**"
     branches:
       - main
   workflow_dispatch:

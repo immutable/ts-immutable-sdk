@@ -23,7 +23,7 @@ on:
         default: none
       dry_run:
         type: boolean
-        description: '(Optional) Dry run'
+        description: "(Optional) Dry run"
         required: false
         default: true
 
@@ -86,7 +86,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version-file: .nvmrc
-          cache: 'yarn'
+          cache: "yarn"
 
       - name: Workout next version string
         run: |
@@ -162,7 +162,7 @@ jobs:
       # Wait for 30 seconds to make sure the tag is available on GitHub
       - uses: GuillaumeFalourd/wait-sleep-action@v1
         with:
-          time: '30'
+          time: "30"
 
       - name: Create GitHub Release
         id: gh_release
@@ -186,4 +186,4 @@ jobs:
         if: ${{ failure() && (steps.npm_release.conclusion == 'failure' || steps.pre_release.conclusion == 'failure' || steps.gh_release.conclusion == 'failure') && github.event.inputs.dry_run == 'false' }}
         uses: ./.github/actions/notify-slack-publish-status
         with:
-          message: '❌ Failed to publish SDK version ${{steps.version.outputs.NEXT_VERSION}} to NPM. ${{ github.triggering_actor }} please check the logs for more details.'
+          message: "❌ Failed to publish SDK version ${{steps.version.outputs.NEXT_VERSION}} to NPM. ${{ github.triggering_actor }} please check the logs for more details."

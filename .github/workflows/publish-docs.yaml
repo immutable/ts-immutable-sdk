@@ -2,7 +2,7 @@ name: Publish SDK Reference Docs
 
 on:
   workflow_run:
-    workflows: ['Publish to NPM', 'Publish Major Version to NPM']
+    workflows: ["Publish to NPM", "Publish Major Version to NPM"]
     types:
       - completed
 
@@ -47,7 +47,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version-file: .nvmrc
-          cache: 'yarn'
+          cache: "yarn"
 
       - name: Update SDK package.json version
         run: |
@@ -95,4 +95,4 @@ jobs:
         if: ${{ failure() && steps.docs_version_check.conclusion == 'success' }}
         uses: ./.github/actions/notify-slack-publish-status
         with:
-          message: '❌ Failed to publish SDK reference documents. Please check the logs for more details.'
+          message: "❌ Failed to publish SDK reference documents. Please check the logs for more details."
