@@ -20,6 +20,7 @@
     "@magic-ext/oidc": "4.2.0",
     "@metamask/detect-provider": "^2.0.0",
     "@opensea/seaport-js": "2.0.7",
+    "@rive-app/react-canvas": "^4.8.3",
     "@uniswap/router-sdk": "^1.4.0",
     "@uniswap/sdk-core": "^3.0.1",
     "@uniswap/v3-sdk": "^3.9.0",
