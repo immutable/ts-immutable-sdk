@@ -59,7 +59,7 @@ jobs:
         id: allowed_actors_check
         # only allow certain SDK team members to run this workflow
         if: ${{ contains(fromJson(env.SDK_PUBLISH_MAJOR_VERSION_ACTORS), github.triggering_actor) }}
-        run: echo "ALLOWED_ACTOR=true" >> $GITHUB_OUTPUT 
+        run: echo "ALLOWED_ACTOR=true" >> $GITHUB_OUTPUT
 
       - name: Allowed Actors Filter
         if: ${{ steps.allowed_actors_check.outputs.ALLOWED_ACTOR != 'true' }}
@@ -85,8 +85,8 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: lts/*
-          cache: 'yarn'
+          node-version-file: .nvmrc
+          cache: "yarn"
 
       - name: Workout next version string
         run: |
@@ -162,7 +162,7 @@ jobs:
       # Wait for 30 seconds to make sure the tag is available on GitHub
       - uses: GuillaumeFalourd/wait-sleep-action@v1
         with:
-          time: '30'
+          time: "30"
 
       - name: Create GitHub Release
         id: gh_release

@@ -1,9 +1,9 @@
 name: Playwright Tests
 on:
   push:
-    branches: [ main, master ]
+    branches: [main, master]
   pull_request:
-    branches: [ main, master ]
+    branches: [main, master]
 jobs:
   test:
     timeout-minutes: 60
@@ -11,33 +11,33 @@ jobs:
     container:
       image: mcr.microsoft.com/playwright:v1.40.0-jammy
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
-      with:
-        node-version: 18
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: samples/apps/ts-immutable-sample/.nvmrc
 
-    - name: Install root dependencies
-      run: npm install -g yarn && yarn install --immutable
+      - name: Install root dependencies
+        run: npm install -g yarn && yarn install --immutable
 
-    - name: Build SDK
-      run: yarn build
+      - name: Build SDK
+        run: yarn build
 
-    - name: Install sample apps dependencies
-      run: cd samples/apps/ts-immutable-sample && yarn install --no-immutable
+      - name: Install sample apps dependencies
+        run: cd samples/apps/ts-immutable-sample && yarn install --no-immutable
 
-    - name: Run Unit tests
-      run: cd samples/apps/ts-immutable-sample && yarn test
-      
-    - name: Run Playwright tests
-      env:
-        # Required for Firefox to run
-        # https://github.com/microsoft/playwright/issues/6500#issuecomment-838515115
-        HOME: /root
-      working-directory: samples/apps/ts-immutable-sample
-      run: yarn playwright test
-    - uses: actions/upload-artifact@v3
-      if: always()
-      with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 30
+      - name: Run Unit tests
+        run: cd samples/apps/ts-immutable-sample && yarn test
+
+      - name: Run Playwright tests
+        env:
+          # Required for Firefox to run
+          # https://github.com/microsoft/playwright/issues/6500#issuecomment-838515115
+          HOME: /root
+        working-directory: samples/apps/ts-immutable-sample
+        run: yarn playwright test
+      - uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
