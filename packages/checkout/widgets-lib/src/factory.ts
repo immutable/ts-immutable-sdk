@@ -5,6 +5,7 @@ import {
   IWidgetsFactory,
   WidgetConfiguration,
   WidgetProperties,
+  WidgetTheme,
 } from '@imtbl/checkout-sdk';
 import { Connect } from 'widgets/connect/ConnectWidgetRoot';
 import { Swap } from 'widgets/swap/SwapWidgetRoot';
@@ -28,12 +29,13 @@ export class WidgetsFactory implements IWidgetsFactory {
   constructor(sdk: Checkout, widgetConfig: WidgetConfiguration) {
     this.sdk = sdk;
     this.widgetConfig = widgetConfig;
-    if (widgetConfig.walletConnect && widgetConfig.theme) {
+    if (!this.widgetConfig.theme) this.widgetConfig.theme = WidgetTheme.DARK;
+    if (widgetConfig.walletConnect) {
       try {
         WalletConnectManager.getInstance().initialise(
           sdk.config.environment,
           widgetConfig.walletConnect,
-          widgetConfig.theme,
+          this.widgetConfig.theme,
         );
       } catch (err) {
         // eslint-disable-next-line no-console

@@ -42,13 +42,15 @@ import {
   bridgeReviewWrapperStyles,
   topMenuItemStyles,
 } from './BridgeReviewSummaryStyles';
-import { BridgeContext } from '../context/BridgeContext';
+import { BridgeActions, BridgeContext } from '../context/BridgeContext';
 import {
   ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
 import { Fees } from '../../../components/Fees/Fees';
 import { formatBridgeFees } from '../functions/BridgeFees';
+import { NetworkSwitchDrawer } from 'components/NetworkSwitchDrawer/NetworkSwitchDrawer';
+import { Web3Provider } from '@ethersproject/providers';
 
 const testId = 'bridge-review-summary';
 
@@ -60,6 +62,7 @@ export function BridgeReviewSummary() {
     bridgeState: {
       checkout, tokenBridge, from, to, token, amount,
     },
+    bridgeDispatch
   } = useContext(BridgeContext);
 
   const { track } = useAnalytics();
@@ -75,6 +78,7 @@ export function BridgeReviewSummary() {
   const [transaction, setTransaction] = useState<BridgeTxResponse | undefined>(
     undefined,
   );
+  const [showSwitchNetworkDrawer, setShowSwitchNetworkDrawer] = useState(false);
 
   const displayAmount = useMemo(
     () => (token?.symbol ? `${token?.symbol} ${amount}` : `${amount}`),
@@ -189,8 +193,36 @@ export function BridgeReviewSummary() {
     })();
   }, []);
 
+  const handleNetworkSwitch = useCallback((provider: Web3Provider) => {
+    bridgeDispatch({
+      payload: {
+        type: BridgeActions.SET_WALLETS_AND_NETWORKS,
+        from: {
+          web3Provider: provider,
+          walletAddress: from?.walletAddress!,
+          network: from?.network!
+        },
+        to: {
+          web3Provider: to?.web3Provider!,
+          walletAddress: to?.walletAddress!,
+          network: to?.network!
+        }
+      }
+    })
+  }, [from?.web3Provider, from?.network, to?.web3Provider, to?.network])
+
   const submitBridge = useCallback(async () => {
     if (!approveTransaction || !transaction) return;
+
+    const currentChainId = await (from?.web3Provider.provider as any).request({method: 'eth_chainId', params: []});
+    console.log("currentChainId", currentChainId);
+    console.log("from network", from?.network);
+    const parsedChainId = parseInt(currentChainId.toString());
+    console.log("parsedChainId", parsedChainId)
+    if(parsedChainId !== from?.network){
+      setShowSwitchNetworkDrawer(true);
+      return;
+    }
 
     track({
       userJourney: UserJourney.BRIDGE,
@@ -228,7 +260,7 @@ export function BridgeReviewSummary() {
         },
       },
     });
-  }, [viewDispatch, approveTransaction, transaction]);
+  }, [viewDispatch, approveTransaction, transaction, from?.web3Provider, from?.network]);
 
   return (
     <Box testId={testId} sx={bridgeReviewWrapperStyles}>
@@ -371,6 +403,14 @@ export function BridgeReviewSummary() {
           )}
         </Button>
       </Box>
+      <NetworkSwitchDrawer 
+        visible={showSwitchNetworkDrawer} 
+        targetChainId={from?.network} 
+        provider={from?.web3Provider} 
+        checkout={checkout} 
+        onCloseDrawer={() => setShowSwitchNetworkDrawer(false)} 
+        onNetworkSwitch={handleNetworkSwitch} 
+        />
     </Box>
   );
 }
