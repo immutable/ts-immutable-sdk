@@ -2160,7 +2160,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/design-tokens@npm:^0.3.1, @biom3/design-tokens@npm:~0.3.1":
+"@biom3/design-tokens@npm:^0.3.1":
   version: 0.3.1
   resolution: "@biom3/design-tokens@npm:0.3.1"
   dependencies:
@@ -2169,28 +2169,38 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.20.2":
-  version: 0.20.2
-  resolution: "@biom3/react@npm:0.20.2"
+"@biom3/design-tokens@npm:~0.3.3":
+  version: 0.3.3
+  resolution: "@biom3/design-tokens@npm:0.3.3"
   dependencies:
-    "@biom3/design-tokens": ~0.3.1
+    lodash.get: ^4.4.2
+  checksum: afaeedee606a9bd54eced4d7f5e38bd657ef74e4f8efa27be32d0eb70d532338ddbaa603a61ce603d52d08d198fb2a0dabc5a8ce6b3c72f6e876ea4ba303d1ae
+  languageName: node
+  linkType: hard
+
+"@biom3/react@npm:^0.20.11":
+  version: 0.20.11
+  resolution: "@biom3/react@npm:0.20.11"
+  dependencies:
+    "@biom3/design-tokens": ~0.3.3
     "@emotion/css": ^11.11.2
-    "@emotion/react": 11.11.1
-    "@rive-app/react-canvas": ^4.5.0
     buffer: ^6.0.3
     csstype: ^3.1.2
-    framer-motion: ^10.12.12
     localforage: ^1.10.0
     lodash.debounce: ^4.0.8
     lodash.get: ^4.4.2
     lodash.isequal: ^4.5.0
     lodash.throttle: ^4.1.1
-    react: ^18.2.0
-    react-dom: ^18.2.0
     react-is: ^18.2.0
     react-keyed-flatten-children: ^3.0.0
     ts-deepmerge: ^6.2.0
-  checksum: d360544193f127e2372fad5fcdd62a43966b592794998c19503961554805ce2621f0ef2e59a25f5a47db331a367d5c2385d91b4e2cc5b18174c18a1e873fbe72
+  peerDependencies:
+    "@emotion/react": 11.11.1
+    "@rive-app/react-canvas": ^4.5.0
+    framer-motion: ^10.12.12
+    react: ^18.2.0
+    react-dom: ^18.2.0
+  checksum: 8c5d4fe413fc167cb5cd587fb947f95dec21de042caf619584e9bb43b5f64234c82b6825277e3da5ef6b2dc413969884112eef1a4007e61122c0615b88c4415c
   languageName: node
   linkType: hard
 
@@ -2485,47 +2495,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@emotion/is-prop-valid@npm:^0.8.2":
-  version: 0.8.8
-  resolution: "@emotion/is-prop-valid@npm:0.8.8"
-  dependencies:
-    "@emotion/memoize": 0.7.4
-  checksum: bb7ec6d48c572c540e24e47cc94fc2f8dec2d6a342ae97bc9c8b6388d9b8d283862672172a1bb62d335c02662afe6291e10c71e9b8642664a8b43416cdceffac
-  languageName: node
-  linkType: hard
-
-"@emotion/memoize@npm:0.7.4":
-  version: 0.7.4
-  resolution: "@emotion/memoize@npm:0.7.4"
-  checksum: 4e3920d4ec95995657a37beb43d3f4b7d89fed6caa2b173a4c04d10482d089d5c3ea50bbc96618d918b020f26ed6e9c4026bbd45433566576c1f7b056c3271dc
-  languageName: node
-  linkType: hard
-
 "@emotion/memoize@npm:^0.8.1":
   version: 0.8.1
   resolution: "@emotion/memoize@npm:0.8.1"
   checksum: a19cc01a29fcc97514948eaab4dc34d8272e934466ed87c07f157887406bc318000c69ae6f813a9001c6a225364df04249842a50e692ef7a9873335fbcc141b0
-  languageName: node
-  linkType: hard
-
-"@emotion/react@npm:11.11.1":
-  version: 11.11.1
-  resolution: "@emotion/react@npm:11.11.1"
-  dependencies:
-    "@babel/runtime": ^7.18.3
-    "@emotion/babel-plugin": ^11.11.0
-    "@emotion/cache": ^11.11.0
-    "@emotion/serialize": ^1.1.2
-    "@emotion/use-insertion-effect-with-fallbacks": ^1.0.1
-    "@emotion/utils": ^1.2.1
-    "@emotion/weak-memoize": ^0.3.1
-    hoist-non-react-statics: ^3.3.1
-  peerDependencies:
-    react: ">=16.8.0"
-  peerDependenciesMeta:
-    "@types/react":
-      optional: true
-  checksum: aec3c36650f5f0d3d4445ff44d73dd88712b1609645b6af3e6d08049cfbc51f1785fe13dea1a1d4ab1b0800d68f2339ab11e459687180362b1ef98863155aae5
   languageName: node
   linkType: hard
 
@@ -2553,15 +2526,6 @@ __metadata:
   version: 0.8.1
   resolution: "@emotion/unitless@npm:0.8.1"
   checksum: 385e21d184d27853bb350999471f00e1429fa4e83182f46cd2c164985999d9b46d558dc8b9cc89975cb337831ce50c31ac2f33b15502e85c299892e67e7b4a88
-  languageName: node
-  linkType: hard
-
-"@emotion/use-insertion-effect-with-fallbacks@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "@emotion/use-insertion-effect-with-fallbacks@npm:1.0.1"
-  peerDependencies:
-    react: ">=16.8.0"
-  checksum: 700b6e5bbb37a9231f203bb3af11295eed01d73b2293abece0bc2a2237015e944d7b5114d4887ad9a79776504aa51ed2a8b0ddbc117c54495dd01a6b22f93786
   languageName: node
   linkType: hard
 
@@ -3297,7 +3261,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-sdk-sample-app@workspace:packages/checkout/sdk-sample-app"
   dependencies:
-    "@biom3/react": ^0.20.2
+    "@biom3/react": ^0.20.11
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
@@ -3371,7 +3335,7 @@ __metadata:
   resolution: "@imtbl/checkout-widgets-sample-app@workspace:packages/checkout/widgets-sample-app"
   dependencies:
     "@biom3/design-tokens": ^0.3.1
-    "@biom3/react": ^0.20.2
+    "@biom3/react": ^0.20.11
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
@@ -3400,7 +3364,7 @@ __metadata:
   resolution: "@imtbl/checkout-widgets@workspace:packages/checkout/widgets-lib"
   dependencies:
     "@biom3/design-tokens": ^0.3.1
-    "@biom3/react": ^0.20.2
+    "@biom3/react": ^0.20.11
     "@ethersproject/providers": ^5.7.2
     "@imtbl/bridge-sdk": 0.0.0
     "@imtbl/checkout-sdk": 0.0.0
@@ -3670,7 +3634,7 @@ __metadata:
   resolution: "@imtbl/passport-sdk-sample-app@workspace:packages/passport/sdk-sample-app"
   dependencies:
     "@biom3/design-tokens": ^0.3.1
-    "@biom3/react": ^0.20.2
+    "@biom3/react": ^0.20.11
     "@imtbl/config": 0.0.0
     "@imtbl/core-sdk": ^2.4.0
     "@imtbl/passport": 0.0.0
@@ -3759,7 +3723,7 @@ __metadata:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
     "@biom3/design-tokens": ^0.3.1
-    "@biom3/react": ^0.20.2
+    "@biom3/react": ^0.20.11
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
     "@ethersproject/providers": ^5.7.2
@@ -6350,24 +6314,6 @@ __metadata:
     react: ">=16.14.0"
     react-dom: ">=16.14.0"
   checksum: c2d1b56a0a6c3afadd98f1adf3cf16897b86752464d1f17f81f3611c99b2aada0c6701944807bcc997f1095dd2c3f4dac8b83ef515bac560b40a8060663871cf
-  languageName: node
-  linkType: hard
-
-"@rive-app/canvas@npm:2.7.4":
-  version: 2.7.4
-  resolution: "@rive-app/canvas@npm:2.7.4"
-  checksum: 4a7ebfd94890611986d30a1cfb2777b8c82f0e1e533e1a49ab50f5b4d86974c19015510e1185eb39f287aea8efb4bb38d880dbe51c04e32ce7a0143e606ee4f0
-  languageName: node
-  linkType: hard
-
-"@rive-app/react-canvas@npm:^4.5.0":
-  version: 4.5.4
-  resolution: "@rive-app/react-canvas@npm:4.5.4"
-  dependencies:
-    "@rive-app/canvas": 2.7.4
-  peerDependencies:
-    react: ^16.8.0 || ^17.0.0 || ^18.0.0
-  checksum: 2513dfd1c3a7fe044680876db5ad163dd3daee722c6dbae7e6c83e391f9de37f13c48e93de0bab5aa3cfb35fd4620f39708303f754e71da104c6bd917b240d65
   languageName: node
   linkType: hard
 
@@ -16549,27 +16495,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"framer-motion@npm:^10.12.12":
-  version: 10.13.0
-  resolution: "framer-motion@npm:10.13.0"
-  dependencies:
-    "@emotion/is-prop-valid": ^0.8.2
-    tslib: ^2.4.0
-  peerDependencies:
-    react: ^18.0.0
-    react-dom: ^18.0.0
-  dependenciesMeta:
-    "@emotion/is-prop-valid":
-      optional: true
-  peerDependenciesMeta:
-    react:
-      optional: true
-    react-dom:
-      optional: true
-  checksum: b84b78b6994bd77814a3fa0dfb4f266b74221369d9e82e350f8c8b2ec952d683597a373fe49609645631af020de42a6ec041bac60a022e396ff0be70c4233d87
-  languageName: node
-  linkType: hard
-
 "fresh@npm:0.5.2":
   version: 0.5.2
   resolution: "fresh@npm:0.5.2"
@@ -17437,15 +17362,6 @@ __metadata:
     minimalistic-assert: ^1.0.0
     minimalistic-crypto-utils: ^1.0.1
   checksum: bd30b6a68d7f22d63f10e1888aee497d7c2c5c0bb469e66bbdac99f143904d1dfe95f8131f95b3e86c86dd239963c9d972fcbe147e7cffa00e55d18585c43fe0
-  languageName: node
-  linkType: hard
-
-"hoist-non-react-statics@npm:^3.3.1":
-  version: 3.3.2
-  resolution: "hoist-non-react-statics@npm:3.3.2"
-  dependencies:
-    react-is: ^16.7.0
-  checksum: b1538270429b13901ee586aa44f4cc3ecd8831c061d06cb8322e50ea17b3f5ce4d0e2e66394761e6c8e152cd8c34fb3b4b690116c6ce2bd45b18c746516cb9e8
   languageName: node
   linkType: hard
 
@@ -24546,7 +24462,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-is@npm:^16.13.1, react-is@npm:^16.3.2, react-is@npm:^16.7.0":
+"react-is@npm:^16.13.1, react-is@npm:^16.3.2":
   version: 16.13.1
   resolution: "react-is@npm:16.13.1"
   checksum: f7a19ac3496de32ca9ae12aa030f00f14a3d45374f1ceca0af707c831b2a6098ef0d6bdae51bd437b0a306d7f01d4677fcc8de7c0d331eb47ad0f46130e53c5f
@@ -29566,7 +29482,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "x-provider-sample-app@workspace:packages/x-provider/src/sample-app"
   dependencies:
-    "@biom3/react": ^0.20.2
+    "@biom3/react": ^0.20.11
     "@imtbl/core-sdk": ^2.4.0
     "@imtbl/sdk": 0.0.0
     "@svgr/webpack": ^8.0.1
