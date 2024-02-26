@@ -1,12 +1,10 @@
 import {
-  Body,
-  Box,
-  Button,
-  Heading,
-  Logo,
+  Body, Box, Button, Heading, Logo,
 } from '@biom3/react';
 import { ChainId, WalletProviderName } from '@imtbl/checkout-sdk';
 import { getChainNameById } from 'lib/chains';
+import { getWalletDisplayName, getWalletLogoByName } from 'lib/logoUtils';
+import { networkIcon } from 'lib';
 import {
   networkButtonStyles,
   networkIconStyles,
@@ -15,22 +13,9 @@ import {
   walletLogoStyles,
 } from './WalletNetworkButtonStyles';
 
-const networkIcon = {
-  [ChainId.IMTBL_ZKEVM_DEVNET]: 'Immutable',
-  [ChainId.IMTBL_ZKEVM_MAINNET]: 'Immutable',
-  [ChainId.IMTBL_ZKEVM_TESTNET]: 'Immutable',
-  [ChainId.ETHEREUM]: 'EthToken',
-  [ChainId.SEPOLIA]: 'EthToken',
-};
-
-const walletLogo = {
-  [WalletProviderName.PASSPORT]: 'PassportSymbolOutlined',
-  [WalletProviderName.METAMASK]: 'MetaMaskSymbol',
-};
-
 interface WalletNetworkButtonProps {
   testId: string;
-  walletName: WalletProviderName;
+  walletName: WalletProviderName | string;
   walletAddress: string;
   chainId: ChainId;
   disableNetworkButton?: boolean;
@@ -47,7 +32,8 @@ export function WalletNetworkButton({
   onNetworkClick,
 }: WalletNetworkButtonProps) {
   const networkName = getChainNameById(chainId);
-  const walletHeading = walletName === WalletProviderName.METAMASK ? 'Metamask' : 'Passport';
+  const walletHeading = getWalletDisplayName(walletName);
+  const walletLogo = getWalletLogoByName(walletName);
 
   return (
     <Box
@@ -55,15 +41,13 @@ export function WalletNetworkButton({
       sx={walletButtonOuterStyles}
       onClick={onWalletClick}
     >
-      <Logo
-        logo={walletLogo[walletName] as any}
-        sx={walletLogoStyles(walletName)}
-      />
-      <Box sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        flex: 1,
-      }}
+      <Logo logo={walletLogo as any} sx={walletLogoStyles(walletName)} />
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          flex: 1,
+        }}
       >
         <Heading size="xSmall">{walletHeading}</Heading>
         <Body size="xSmall" sx={walletCaptionStyles}>

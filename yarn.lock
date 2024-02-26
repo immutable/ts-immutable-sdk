@@ -3635,7 +3635,7 @@ __metadata:
     global-const: ^0.1.2
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
-    lru-memorise: ^0.2.1
+    lru-memorise: 0.3.0
     rollup: ^3.17.2
     ts-jest: ^29.1.0
     typescript: ^4.9.5
@@ -3809,7 +3809,7 @@ __metadata:
     i18next: ^23.7.6
     i18next-browser-languagedetector: ^7.2.0
     jwt-decode: ^3.1.2
-    lru-memorise: ^0.2.1
+    lru-memorise: 0.3.0
     magic-sdk: ^21.2.0
     oidc-client-ts: 2.2.1
     os-browserify: ^0.3.0
@@ -20934,12 +20934,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lru-memorise@npm:^0.2.1":
-  version: 0.2.1
-  resolution: "lru-memorise@npm:0.2.1"
+"lru-memorise@npm:0.3.0":
+  version: 0.3.0
+  resolution: "lru-memorise@npm:0.3.0"
   dependencies:
     tiny-lru: ^11.2.5
-  checksum: 57b65f96644dd7e80c93cba8e7f21b23b813b27e04f47db2777320f61367646d88b77a5459ab6abc63755a881a0baeba1bc11dc90ca7ab885affcb382b6a9317
+  checksum: 2b9de2fb4f8612732d97118c2f077614f0bb7d33ba3ab714fd7f43273f83451dc800dfc2ff3291e8d049503854d0242731bdd63be732774cb9e0919aa418f1e8
   languageName: node
   linkType: hard
 
