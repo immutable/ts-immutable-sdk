@@ -3,6 +3,7 @@ import { useContext, useState } from 'react';
 import { TransactionResponse } from '@imtbl/dex-sdk';
 import { CheckoutErrorType } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
+import { getL2ChainId } from 'lib';
 import { PrefilledSwapForm, SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import {
   ViewContext,
@@ -26,10 +27,11 @@ export interface SwapButtonProps {
   data?: SwapFormData;
   insufficientFundsForGas: boolean;
   openNotEnoughImxDrawer: () => void;
+  openNetworkSwitchDrawer: () => void;
 }
 
 export function SwapButton({
-  loading, updateLoading, validator, transaction, data, insufficientFundsForGas, openNotEnoughImxDrawer,
+  loading, updateLoading, validator, transaction, data, insufficientFundsForGas, openNotEnoughImxDrawer, openNetworkSwitchDrawer,
 }: SwapButtonProps) {
   const { t } = useTranslation();
   const [showTxnRejectedState, setShowTxnRejectedState] = useState(false);
@@ -60,6 +62,17 @@ export function SwapButton({
     if (!checkout || !provider || !transaction) return;
     if (insufficientFundsForGas) {
       openNotEnoughImxDrawer();
+      return;
+    }
+
+    const currentChainId = await (provider.provider as any).request({ method: 'eth_chainId', params: [] });
+
+    console.log('currentChainId', currentChainId);
+    // eslint-disable-next-line radix
+    const parsedChainId = parseInt(currentChainId.toString());
+    console.log('parsedChainId', parsedChainId);
+    if (parsedChainId !== getL2ChainId(checkout.config)) {
+      openNetworkSwitchDrawer();
       return;
     }
 
