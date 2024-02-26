@@ -545,6 +545,7 @@ describe('Token Bridge', () => {
     const bridgeFee:ethers.BigNumber = destinationChainGas.add(validatorFee);
     const imtblFee:ethers.BigNumber = ethers.BigNumber.from(0);
     const totalFees:ethers.BigNumber = sourceChainGas.add(bridgeFee).add(imtblFee);
+    const sender = '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772';
 
     beforeEach(() => {
       const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
@@ -576,25 +577,34 @@ describe('Token Bridge', () => {
       TokenBridge.prototype['calculateBridgeFee'] = originalCalculateBridgeFee;
     });
     it('returns the deposit fees for native tokens', async () => {
-      expect.assertions(5);
+      expect.assertions(6);
+      const amount = ethers.BigNumber.from(1000);
       const result = await tokenBridge.getFee(
         {
           action: BridgeFeeActions.DEPOSIT,
           gasMultiplier: 1.1,
           sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
           destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
+          amount,
+          senderAddress: sender,
         },
       );
 
       expect(result).not.toBeNull();
       expect(result.sourceChainGas).toStrictEqual(sourceChainGas);
+      expect(result.approvalFee).toStrictEqual(ethers.BigNumber.from(0));
       expect(result.bridgeFee).toStrictEqual(bridgeFee);
       expect(result.imtblFee).toStrictEqual(imtblFee);
       expect(result.totalFees).toStrictEqual(totalFees);
     });
 
-    it('returns the deposit fees for ERC20 tokens', async () => {
+    it('returns the deposit fees for ERC20 tokens with no allowance required', async () => {
       expect.assertions(6);
+      const amount = ethers.BigNumber.from(1000);
+      const allowance = ethers.BigNumber.from(1000);
+
+      mockERC20Contract.allowance.mockResolvedValue(allowance);
+
       const result = await tokenBridge.getFee(
         {
           action: BridgeFeeActions.DEPOSIT,
@@ -602,7 +612,111 @@ describe('Token Bridge', () => {
           sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
           destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
           token: '0x40b87d235A5B010a20A241F15797C9debf1ecd01',
-          amount: ethers.BigNumber.from(1000),
+          amount,
+          senderAddress: sender,
+        },
+      );
+
+      expect(result).not.toBeNull();
+      expect(result.sourceChainGas).toStrictEqual(sourceChainGas);
+      expect(result.approvalFee).toStrictEqual(ethers.BigNumber.from(0));
+      expect(result.bridgeFee).toStrictEqual(bridgeFee);
+      expect(result.imtblFee).toStrictEqual(imtblFee);
+      expect(result.totalFees).toStrictEqual(totalFees);
+    });
+
+    it('returns the deposit fees for ERC20 tokens with allowance requiring increase', async () => {
+      expect.assertions(6);
+      const amount = ethers.BigNumber.from(1000);
+      const allowance = ethers.BigNumber.from(500);
+
+      mockERC20Contract.allowance.mockResolvedValue(allowance);
+
+      const result = await tokenBridge.getFee(
+        {
+          action: BridgeFeeActions.DEPOSIT,
+          gasMultiplier: 1.1,
+          sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
+          token: '0x40b87d235A5B010a20A241F15797C9debf1ecd01',
+          amount,
+          senderAddress: sender,
+        },
+      );
+
+      expect(result).not.toBeNull();
+      expect(result.sourceChainGas).toStrictEqual(sourceChainGas);
+      expect(result.approvalFee).toStrictEqual(approavalGas);
+      expect(result.bridgeFee).toStrictEqual(bridgeFee);
+      expect(result.imtblFee).toStrictEqual(imtblFee);
+      expect(result.totalFees).toStrictEqual(totalFees.add(approavalGas));
+    });
+
+    it('returns the withdrawal fees for native tokens', async () => {
+      expect.assertions(6);
+      const amount = ethers.BigNumber.from(1000);
+      const result = await tokenBridge.getFee(
+        {
+          action: BridgeFeeActions.WITHDRAW,
+          gasMultiplier: 1.1,
+          sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
+          destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          amount,
+          senderAddress: sender,
+        },
+      );
+
+      expect(result).not.toBeNull();
+      expect(result.sourceChainGas).toStrictEqual(sourceChainGas);
+      expect(result.approvalFee).toStrictEqual(ethers.BigNumber.from(0));
+      expect(result.bridgeFee).toStrictEqual(bridgeFee);
+      expect(result.imtblFee).toStrictEqual(imtblFee);
+      expect(result.totalFees).toStrictEqual(totalFees);
+    });
+
+    it('returns the withdrawal fees for ERC20 tokens with no allowance required', async () => {
+      expect.assertions(6);
+      const amount = ethers.BigNumber.from(1000);
+      const allowance = ethers.BigNumber.from(1000);
+
+      mockERC20Contract.allowance.mockResolvedValue(allowance);
+
+      const result = await tokenBridge.getFee(
+        {
+          action: BridgeFeeActions.WITHDRAW,
+          gasMultiplier: 1.1,
+          sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
+          destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          token: '0x40b87d235A5B010a20A241F15797C9debf1ecd01',
+          amount,
+          senderAddress: sender,
+        },
+      );
+
+      expect(result).not.toBeNull();
+      expect(result.sourceChainGas).toStrictEqual(sourceChainGas);
+      expect(result.approvalFee).toStrictEqual(ethers.BigNumber.from(0));
+      expect(result.bridgeFee).toStrictEqual(bridgeFee);
+      expect(result.imtblFee).toStrictEqual(imtblFee);
+      expect(result.totalFees).toStrictEqual(totalFees);
+    });
+
+    it('returns the withdrawal fees for ERC20 tokens with allowance requiring increase', async () => {
+      expect.assertions(6);
+      const amount = ethers.BigNumber.from(1000);
+      const allowance = ethers.BigNumber.from(500);
+
+      mockERC20Contract.allowance.mockResolvedValue(allowance);
+
+      const result = await tokenBridge.getFee(
+        {
+          action: BridgeFeeActions.WITHDRAW,
+          gasMultiplier: 1.1,
+          sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
+          destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          token: '0x40b87d235A5B010a20A241F15797C9debf1ecd01',
+          amount,
+          senderAddress: sender,
         },
       );
 

@@ -27,6 +27,7 @@ async function getBridgeFees() {
     childProvider: params.childProvider,
   });
 
+
   const tokenBridge = new TokenBridge(bridgeConfig);
 
   const depositReq: BridgeFeeRequest = {
@@ -34,6 +35,8 @@ async function getBridgeFees() {
     gasMultiplier: 1.1,
     sourceChainId: bridgeConfig.bridgeInstance.rootChainID,
     destinationChainId: bridgeConfig.bridgeInstance.childChainID,
+    amount: params.amount,
+    senderAddress: params.sender,
   }
 
   console.log('depositReq', depositReq);
@@ -47,6 +50,8 @@ async function getBridgeFees() {
     gasMultiplier: 1.1,
     sourceChainId: bridgeConfig.bridgeInstance.childChainID,
     destinationChainId: bridgeConfig.bridgeInstance.rootChainID,
+    amount: params.amount,
+    senderAddress: params.sender,
   }
 
   console.log('withdrawReq', withdrawReq)

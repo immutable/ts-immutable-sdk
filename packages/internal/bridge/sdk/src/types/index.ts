@@ -142,6 +142,8 @@ export interface DepositNativeFeeRequest {
   gasMultiplier: number;
   sourceChainId: string;
   destinationChainId: string;
+  amount: ethers.BigNumber;
+  senderAddress: Address;
 }
 
 /**
@@ -160,6 +162,7 @@ export interface DepositERC20FeeRequest {
   destinationChainId: string;
   token: FungibleToken;
   amount: ethers.BigNumber;
+  senderAddress: Address;
 }
 
 /**
@@ -174,6 +177,8 @@ export interface WithdrawNativeFeeRequest {
   gasMultiplier: number;
   sourceChainId: string;
   destinationChainId: string;
+  amount: ethers.BigNumber;
+  senderAddress: Address;
 }
 
 /**
@@ -192,6 +197,7 @@ export interface WithdrawERC20FeeRequest {
   destinationChainId: string;
   token: FungibleToken;
   amount: ethers.BigNumber;
+  senderAddress: Address;
 }
 
 /**

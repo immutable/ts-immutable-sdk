@@ -147,10 +147,21 @@ export class TokenBridge {
     const imtblFee: ethers.BigNumber = ethers.BigNumber.from(0);
 
     if ('token' in req && req.token !== 'NATIVE') {
-      approvalFee = await this.getGasEstimates(
-        this.config.rootProvider,
-        BridgeMethodsGasLimit.APPROVE_TOKEN,
+      const resGetAllowance = await this.getAllowance(
+        req.sourceChainId,
+        req.token,
+        req.senderAddress,
+        req.amount,
       );
+
+      console.log('resGetAllowance', resGetAllowance);
+
+      if (resGetAllowance.amountToApprove.gt(0)) {
+        approvalFee = await this.getGasEstimates(
+          this.config.rootProvider,
+          BridgeMethodsGasLimit.APPROVE_TOKEN,
+        );
+      }
     }
 
     if (req.action === BridgeFeeActions.FINALISE_WITHDRAWAL) {
@@ -305,45 +316,25 @@ export class TokenBridge {
       };
     }
 
-    let sourceProvider:ethers.providers.Provider;
-    let sourceBridgeAddress: string;
-    if (req.sourceChainId === this.config.bridgeInstance.rootChainID) {
-      sourceProvider = this.config.rootProvider;
-      sourceBridgeAddress = this.config.bridgeContracts.rootERC20BridgeFlowRate;
-    } else {
-      sourceProvider = this.config.childProvider;
-      sourceBridgeAddress = this.config.bridgeContracts.childERC20Bridge;
-    }
-
-    const erc20Contract: ethers.Contract = await withBridgeError<ethers.Contract>(
-      async () => new ethers.Contract(req.token, ERC20, sourceProvider),
-      BridgeErrorType.PROVIDER_ERROR,
+    const resGetAllowance = await this.getAllowance(
+      req.sourceChainId,
+      req.token,
+      req.senderAddress,
+      req.amount,
     );
 
-    // Get the current approved allowance of the RootERC20Predicate
-    const allowance: ethers.BigNumber = await withBridgeError<ethers.BigNumber>(() => erc20Contract
-      .allowance(
-        req.senderAddress,
-        sourceBridgeAddress,
-      ), BridgeErrorType.PROVIDER_ERROR);
-
-    // If the allowance is greater than or equal to the deposit amount, no approval is required
-    if (allowance.gte(req.amount)) {
+    if (resGetAllowance.amountToApprove.eq(0)) {
       return {
         contractToApprove: null,
         unsignedTx: null,
       };
     }
-    // Calculate the amount of tokens that need to be approved for deposit
-    const approvalAmountRequired = req.amount.sub(
-      allowance,
-    );
 
     // Encode the approve function call data for the ERC20 contract
-    const data: string = await withBridgeError<string>(async () => erc20Contract.interface
+    const data: string = await withBridgeError<string>(async () => resGetAllowance.erc20Contract.interface
       .encodeFunctionData('approve', [
-        sourceBridgeAddress,
-        approvalAmountRequired,
+        resGetAllowance.contractToApprove,
+        resGetAllowance.amountToApprove,
       ]), BridgeErrorType.INTERNAL_ERROR);
 
     // Create the unsigned transaction for the approval
@@ -356,8 +347,55 @@ export class TokenBridge {
     };
 
     return {
-      contractToApprove: sourceBridgeAddress,
+      contractToApprove: resGetAllowance.contractToApprove,
       unsignedTx,
+    };
+  }
+
+  private async getAllowance(sourceChainId:string, token: string, senderAddress: string, amount: ethers.BigNumber) {
+    let sourceProvider:ethers.providers.Provider;
+    let sourceBridgeAddress: string;
+    if (sourceChainId === this.config.bridgeInstance.rootChainID) {
+      sourceProvider = this.config.rootProvider;
+      sourceBridgeAddress = this.config.bridgeContracts.rootERC20BridgeFlowRate;
+    } else {
+      sourceProvider = this.config.childProvider;
+      sourceBridgeAddress = this.config.bridgeContracts.childERC20Bridge;
+    }
+
+    const erc20Contract: ethers.Contract = await withBridgeError<ethers.Contract>(
+      async () => new ethers.Contract(token, ERC20, sourceProvider),
+      BridgeErrorType.PROVIDER_ERROR,
+    );
+
+    // Get the current approved allowance of the RootERC20Predicate
+    const allowance: ethers.BigNumber = await withBridgeError<ethers.BigNumber>(() => erc20Contract
+      .allowance(
+        senderAddress,
+        sourceBridgeAddress,
+      ), BridgeErrorType.PROVIDER_ERROR);
+
+    // If the allowance is greater than or equal to the deposit amount, no approval is required
+    if (allowance.gte(amount)) {
+      return {
+        erc20Contract,
+        allowance,
+        amount,
+        amountToApprove: ethers.BigNumber.from(0),
+        contractToApprove: sourceBridgeAddress,
+      };
+    }
+    // Calculate the amount of tokens that need to be approved for deposit
+    const approvalAmountRequired = amount.sub(
+      allowance,
+    );
+
+    return {
+      erc20Contract,
+      allowance,
+      amount,
+      amountToApprove: approvalAmountRequired,
+      contractToApprove: sourceBridgeAddress,
     };
   }
 
@@ -609,6 +647,7 @@ export class TokenBridge {
       destinationChainId,
       token,
       amount,
+      senderAddress: sender,
     });
 
     const data = await this.getTxData(
