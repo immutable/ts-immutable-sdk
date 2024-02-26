@@ -128,7 +128,7 @@ async function deposit() {
   const depositNonce = await params.rootWallet.getTransactionCount();
   const depositGasPrice = await params.rootProvider.getGasPrice();
 
-  depositRes!.unsignedTx.gasLimit = BridgeMethodsGasLimit.DEPOSIT_SOURCE;
+  depositRes!.unsignedTx.gasLimit = BridgeMethodsGasLimit.DEPOSIT_SOURCE*2;
   depositRes!.unsignedTx.nonce = depositNonce;
   depositRes!.unsignedTx.gasPrice = depositGasPrice.mul(2);
 
