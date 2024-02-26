@@ -3374,6 +3374,7 @@ __metadata:
     "@imtbl/passport": 0.0.0
     "@imtbl/react-analytics": 0.2.1-alpha
     "@imtbl/version-check": 0.0.0
+    "@rive-app/react-canvas": ^4.8.3
     "@rollup/plugin-commonjs": ^24.0.1
     "@rollup/plugin-json": ^6.0.0
     "@rollup/plugin-node-resolve": ^15.0.2
@@ -6314,6 +6315,24 @@ __metadata:
     react: ">=16.14.0"
     react-dom: ">=16.14.0"
   checksum: c2d1b56a0a6c3afadd98f1adf3cf16897b86752464d1f17f81f3611c99b2aada0c6701944807bcc997f1095dd2c3f4dac8b83ef515bac560b40a8060663871cf
+  languageName: node
+  linkType: hard
+
+"@rive-app/canvas@npm:2.10.3":
+  version: 2.10.3
+  resolution: "@rive-app/canvas@npm:2.10.3"
+  checksum: 3fef1b3326240ff9910f49d0bc088ebfab2ec69142a4aa2f83c7af218c3106c66d2c5a264799f88a8838147a6c68c09d462b4d0db5b0c071dff1115b18d820bf
+  languageName: node
+  linkType: hard
+
+"@rive-app/react-canvas@npm:^4.8.3":
+  version: 4.8.3
+  resolution: "@rive-app/react-canvas@npm:4.8.3"
+  dependencies:
+    "@rive-app/canvas": 2.10.3
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0
+  checksum: bf6ee76df56ff78879a1ed75d3bbb8e1256dce9850345f7a29b28cc90277d35fbc936f62509ca48a098425676d51fbc36d9dc90757a64184c5948f9726921a68
   languageName: node
   linkType: hard
 
