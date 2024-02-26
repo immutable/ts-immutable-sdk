@@ -1,0 +1,8 @@
+root = true
+
+# https://github.com/editorconfig/editorconfig/wiki/EditorConfig-Properties
+
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
+quote_type = double
