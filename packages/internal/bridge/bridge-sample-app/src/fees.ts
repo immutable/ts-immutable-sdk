@@ -36,14 +36,11 @@ async function getBridgeFees() {
     destinationChainId: bridgeConfig.bridgeInstance.childChainID,
   }
 
-  console.log('depositReq', depositReq)
+  console.log('depositReq', depositReq);
 
-  try {
-    const depositRes: BridgeFeeResponse = await tokenBridge.getFee(depositReq);
-    console.log('depositRes', depositRes);
-  } catch(err) {
-    console.error('depositErr', err);
-  }
+  const depositRes: BridgeFeeResponse = await tokenBridge.getFee(depositReq);
+  console.log('depositRes', depositRes);
+
 
   const withdrawReq: BridgeFeeRequest = {
     action: BridgeFeeActions.WITHDRAW,
