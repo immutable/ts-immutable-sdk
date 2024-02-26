@@ -2,11 +2,12 @@ import { WalletProviderName } from '@imtbl/checkout-sdk';
 import { MenuItem } from '@biom3/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { getWalletLogoByName } from 'lib/logoUtils';
 
 export interface WalletItemProps {
   testId: string;
-  walletProviderName: WalletProviderName
-  onWalletClick: (walletProviderName: WalletProviderName) => Promise<void>;
+  walletProviderName: WalletProviderName | string
+  onWalletClick: (walletProviderName: WalletProviderName | string) => Promise<void>;
   loading: boolean;
 }
 export function WalletItem({
@@ -17,11 +18,6 @@ export function WalletItem({
 }: WalletItemProps) {
   const { t } = useTranslation();
   const [showLoadingIcon, setShowLoadingIcon] = useState(false);
-
-  const logo = {
-    [WalletProviderName.PASSPORT]: 'PassportSymbolOutlined',
-    [WalletProviderName.METAMASK]: 'MetaMaskSymbol',
-  };
 
   return (
     <MenuItem
@@ -40,7 +36,7 @@ export function WalletItem({
       }}
     >
       <MenuItem.FramedLogo
-        logo={logo[walletProviderName] as any}
+        logo={getWalletLogoByName(walletProviderName) as any}
         sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
       />
       <MenuItem.Label size="medium">

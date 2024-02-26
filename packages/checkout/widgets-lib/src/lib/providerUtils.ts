@@ -9,6 +9,18 @@ export function isMetaMaskProvider(provider?: Web3Provider | null) {
   return provider?.provider?.isMetaMask === true;
 }
 
+export function isWalletConnectProvider(provider?: Web3Provider | null) {
+  return (provider?.provider as any)?.isWalletConnect === true;
+}
+
+export function getWalletProviderNameByProvider(provider?: Web3Provider | null) {
+  if (isMetaMaskProvider(provider)) return WalletProviderName.METAMASK.toString();
+  if (isPassportProvider(provider)) return WalletProviderName.PASSPORT.toString();
+  if (isWalletConnectProvider(provider)) return 'walletconnect';
+
+  return WalletProviderName.METAMASK;
+}
+
 export async function createAndConnectToProvider(
   checkout: Checkout,
   walletProviderName: WalletProviderName,
