@@ -4,7 +4,6 @@ import {
   Environment,
   ImmutableConfiguration,
   ModuleConfiguration,
-  addPublishableKeyToAxiosHeader,
 } from '@imtbl/config';
 
 export { Environment, ImmutableConfiguration } from '@imtbl/config';
@@ -194,13 +193,20 @@ export const imxClientConfig = (
     throw new Error(`Invalid environment: ${environment}`);
   }
 
+  type ConfigOptions = {
+    environment: Environment;
+    publishableKey?: string;
+  };
+
+  const configOptions: ConfigOptions = {
+    environment,
+  };
+
   if (publishableKey) {
-    addPublishableKeyToAxiosHeader(publishableKey);
+    configOptions.publishableKey = publishableKey;
   }
 
   return {
-    baseConfig: new ImmutableConfiguration({
-      environment,
-    }),
+    baseConfig: new ImmutableConfiguration(configOptions),
   };
 };
