@@ -58,11 +58,11 @@ function NFTApproval({ disabled, handleExampleSubmitted }: RequestExampleProps) 
       const data = choosedApproveType === ApproveType.NFTApprove
         ? nftApproveContract.encodeFunctionData('approve', [toAddress, nftTokenId])
         : nftApproveContract.encodeFunctionData('setApprovalForAll', [toAddress, true]);
-      const value = isUnSafe ? '16000000000000000000' : '0';
+      const transferAmount = isUnSafe ? '16000000000000000000' : '0';
       setParams([{
         from: fromAddress,
         to: erc721ContractAddress,
-        value,
+        value: transferAmount,
         data,
       }]);
     } catch (err) {
