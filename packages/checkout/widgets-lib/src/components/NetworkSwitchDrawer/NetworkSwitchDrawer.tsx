@@ -1,10 +1,9 @@
-import { Body, Button, Drawer, Heading, Logo } from "@biom3/react"
+import { Body, Box, Button, Drawer, Heading, Logo } from "@biom3/react"
 import { Web3Provider } from "@ethersproject/providers";
 import { ChainId, Checkout } from "@imtbl/checkout-sdk";
-import { providers } from "ethers";
 import { getChainNameById } from "lib/chains";
 import { getWalletLogoByName } from "lib/logoUtils";
-import { getWalletProviderNameByProvider, isMetaMaskProvider, isWalletConnectProvider } from "lib/providerUtils";
+import { getWalletProviderNameByProvider, isWalletConnectProvider } from "lib/providerUtils";
 import { useCallback, useMemo } from "react";
 
 export interface NetworkSwitchDrawerProps {
@@ -38,10 +37,14 @@ export const NetworkSwitchDrawer = ({
 
   const isWalletConnect = isWalletConnectProvider(provider);
 
-  const walletConnectPeer = useMemo(() => {
+  const walletConnectPeerName = useMemo(() => {
     if(!isWalletConnect) return '';
     return (provider.provider as any)?.session?.peer?.metadata?.name as string;
-  }, [provider, isWalletConnect])
+  }, [provider, isWalletConnect]);
+
+  const isMetaMaskMobileWalletPeer = useMemo(() => {
+    return walletConnectPeerName?.toLowerCase().includes('metamask');
+  }, [walletConnectPeerName])
 
   return(
     <Drawer 
@@ -49,22 +52,32 @@ export const NetworkSwitchDrawer = ({
     visible={visible}
      onCloseDrawer={onCloseDrawer}
      showHeaderBar
-     headerBarTitle="Switch Network">
+     headerBarTitle="Switch Network"
+     >
       <Drawer.Content sx={{
         padding: 'base.spacing.x4',
         display: 'flex',
         flexDirection: 'column',
-        gap: 'base.spacing.x2'
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap: 'base.spacing.x4',
+        flex: 1
       }}>
-        <Logo logo={walletLogo} sx={{ width: 'base.icon.size.600' }} />
-        {isWalletConnect && <Body>{walletConnectPeer}</Body>}
-        <Heading size="large">Switch to {targetChainName} to proceed</Heading>
-        {isWalletConnect && <Body>Go to your mobile wallet and ensure you are connected to {targetChainName}</Body>}
-        {!walletConnectPeer?.toLowerCase().includes('metamask') && (
-          <Button onClick={handleSwitchNetwork}>Switch to {targetChainName}</Button>
-        )}
-        {isMetaMaskProvider(provider) && (
-          <Button onClick={handleSwitchNetwork}>Switch to {targetChainName}</Button>
+        <Box sx={{display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 'base.spacing.x4'
+        }}>
+          <Logo logo={walletLogo} sx={{ width: 'base.icon.size.600' }} />
+          {isWalletConnect && <Body>{walletConnectPeerName}</Body>}
+          <Heading>Switch to {targetChainName} to proceed</Heading>
+          {isWalletConnect && isMetaMaskMobileWalletPeer && <Body sx={{marginTop: 'base.spacing.x6'}}>Go to your mobile wallet and ensure you are connected to {targetChainName}</Body>}
+        </Box>
+        
+        {!isWalletConnect || (isWalletConnect && !isMetaMaskMobileWalletPeer) && (
+          <Box sx={{display: 'flex', flexDirection: 'column',paddingY: 'base.spacing.x6', paddingX: 'base.spacing.x4'}}>
+            <Button onClick={handleSwitchNetwork}>Switch to {targetChainName}</Button>
+          </Box>
         )}
       </Drawer.Content>
     </Drawer>
