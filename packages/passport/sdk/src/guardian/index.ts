@@ -7,7 +7,6 @@ import { ConfirmationScreen } from '../confirmation';
 import { retryWithDelay } from '../network/retry';
 import { JsonRpcError, RpcErrorCode } from '../zkEvm/JsonRpcError';
 import { MetaTransaction, TypedDataPayload } from '../zkEvm/types';
-import { UserImx, UserZkEvm } from '../types';
 import { PassportConfiguration } from '../config';
 
 export type GuardianClientParams = {
@@ -114,7 +113,7 @@ export default class GuardianClient {
     const finallyFn = () => {
       this.confirmationScreen.closeWindow();
     };
-    const user = await this.authManager.getUser() as UserImx;
+    const user = await this.authManager.getUserImx();
 
     const headers = { Authorization: `Bearer ${user.accessToken}` };
     const transactionRes = await retryWithDelay(
@@ -161,7 +160,7 @@ export default class GuardianClient {
     nonce,
     metaTransactions,
   }: GuardianEVMValidationParams): Promise<TransactionEvaluationResponse> {
-    const user = await this.authManager.getUser() as UserZkEvm;
+    const user = await this.authManager.getUserZkEvm();
     const headers = { Authorization: `Bearer ${user.accessToken}` };
     const guardianTransactions = transformGuardianTransactions(metaTransactions);
     try {
@@ -210,7 +209,7 @@ export default class GuardianClient {
     }
 
     if (confirmationRequired && !!transactionId) {
-      const user = await this.authManager.getUser() as UserZkEvm;
+      const user = await this.authManager.getUserZkEvm();
       const confirmationResult = await this.confirmationScreen.requestConfirmation(
         transactionId,
         user.zkEvm.ethAddress,
@@ -233,7 +232,7 @@ export default class GuardianClient {
     { chainID, payload }:GuardianMessageValidationParams,
   ): Promise<guardian.MessageEvaluationResponse> {
     try {
-      const user = await this.authManager.getUser() as UserZkEvm;
+      const user = await this.authManager.getUserZkEvm();
       if (user === null) {
         throw new PassportError('evaluateMessage requires a valid ID token or refresh token. Please log in first', PassportErrorType.NOT_LOGGED_IN_ERROR);
       }
@@ -254,7 +253,7 @@ export default class GuardianClient {
       throw new JsonRpcError(RpcErrorCode.TRANSACTION_REJECTED, transactionRejectedCrossSdkBridgeError);
     }
     if (confirmationRequired && !!messageId) {
-      const user = await this.authManager.getUser() as UserZkEvm;
+      const user = await this.authManager.getUserZkEvm();
       const confirmationResult = await this.confirmationScreen.requestMessageConfirmation(
         messageId,
         user.zkEvm.ethAddress,

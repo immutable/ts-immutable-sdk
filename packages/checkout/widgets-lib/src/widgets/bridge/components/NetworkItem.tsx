@@ -1,18 +1,12 @@
 import { ChainId, ChainName } from '@imtbl/checkout-sdk';
 import { MenuItem } from '@biom3/react';
+import { networkIcon } from 'lib';
 import { networkItemStyles } from './NetworkItemStyles';
 
-const networkIcon = {
-  [ChainId.IMTBL_ZKEVM_DEVNET]: 'Immutable',
-  [ChainId.IMTBL_ZKEVM_MAINNET]: 'Immutable',
-  [ChainId.IMTBL_ZKEVM_TESTNET]: 'Immutable',
-  [ChainId.ETHEREUM]: 'EthToken',
-  [ChainId.SEPOLIA]: 'EthToken',
-};
 export interface BridgeNetworkProps {
   testId: string;
   chainId: ChainId;
-  chainName: ChainName
+  chainName: ChainName;
   onNetworkClick: (chainId: ChainId) => Promise<void>;
 }
 export function NetworkItem({
@@ -36,9 +30,7 @@ export function NetworkItem({
         circularFrame
         sx={networkItemStyles(chainId)}
       />
-      <MenuItem.Label size="medium">
-        {chainName}
-      </MenuItem.Label>
+      <MenuItem.Label size="medium">{chainName}</MenuItem.Label>
     </MenuItem>
   );
 }
