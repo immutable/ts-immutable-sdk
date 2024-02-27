@@ -42,6 +42,9 @@ export interface ImmutableXConfiguration {
   ethConfiguration: EthConfiguration;
 }
 
+/**
+ * @dev Copied from Core SDK as a convenience for migrating away from Core SDK
+ */
 const createConfig = ({
   coreContractAddress,
   registrationContractAddress,
@@ -66,7 +69,7 @@ const createConfig = ({
   };
 
   return {
-    apiConfiguration: new imx.Configuration(apiConfigOptions),
+    apiConfiguration: new ApiConfiguration(apiConfigOptions),
     ethConfiguration: {
       coreContractAddress,
       registrationContractAddress,

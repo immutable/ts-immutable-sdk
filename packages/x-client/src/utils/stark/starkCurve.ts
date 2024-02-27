@@ -278,21 +278,15 @@ export function generateStarkPrivateKey(): string {
 export async function generateLegacyStarkPrivateKey(
   signer: Signer,
 ): Promise<string> {
-  // console.log('generateLegacyStarkPrivateKey');
   const address = (await signer.getAddress()).toLowerCase();
-  // console.log('address', address);
   const signature = await signer.signMessage(legacy.DEFAULT_SIGNATURE_MESSAGE);
-  // console.log('signature', signature);
   const seed = splitSignature(signature).s;
-  // console.log('seed', seed);
   const path = legacy.getAccountPath(
     legacy.DEFAULT_ACCOUNT_LAYER,
     legacy.DEFAULT_ACCOUNT_APPLICATION,
     address,
     legacy.DEFAULT_ACCOUNT_INDEX,
   );
-  // console.log('path', path);
   const key = await getKeyFromPath(seed, path, address);
-  // console.log('key', key);
   return key.padStart(64, '0');
 }

@@ -1,71 +1,10 @@
 import { ImxApiClients } from '@imtbl/generated-clients';
 import {
   ImxConfiguration,
-  ImxModuleConfiguration as ImxClientModuleConfiguration,
+  ImxModuleConfiguration as ImxClientModuleConfiguration, // preserve old name for backwards compatibility
 } from './config';
 import { formatError } from './utils/formatError';
 import {
-  // // ImmutableX,
-  // EthSigner,
-  // // generateLegacyStarkPrivateKey,
-  // // createStarkSigner,
-  // UnsignedExchangeTransferRequest,
-  // UnsignedMintRequest,
-  // WalletConnection,
-  // AssetsApi,
-  // BalancesApi,
-  // CollectionsApi,
-  // DepositsApi,
-  // EncodingApi,
-  // MintsApi,
-  // MetadataApi,
-  // OrdersApi,
-  // PrimarySalesApi,
-  // ProjectsApi,
-  // TokensApi,
-  // TradesApi,
-  // TransfersApi,
-  // UsersApi,
-  // WithdrawalsApi,
-  // DepositsApiGetDepositRequest,
-  // DepositsApiListDepositsRequest,
-  // AssetsApiGetAssetRequest,
-  // AssetsApiListAssetsRequest,
-  // CreateCollectionRequest,
-  // CollectionsApiGetCollectionRequest,
-  // CollectionsApiListCollectionFiltersRequest,
-  // CollectionsApiListCollectionsRequest,
-  // UpdateCollectionRequest,
-  // AddMetadataSchemaToCollectionRequest,
-  // MetadataApiGetMetadataSchemaRequest,
-  // MetadataSchemaRequest,
-  // BalancesApiGetBalanceRequest,
-  // BalancesApiListBalancesRequest,
-  // MintsApiGetMintRequest,
-  // MintsApiListMintsRequest,
-  // WithdrawalsApiListWithdrawalsRequest,
-  // WithdrawalsApiGetWithdrawalRequest,
-  // OrdersApiGetOrderV3Request,
-  // OrdersApiListOrdersV3Request,
-  // TradesApiGetTradeV3Request,
-  // TradesApiListTradesV3Request,
-  // TokensApiGetTokenRequest,
-  // TokensApiListTokensRequest,
-  // TransfersApiGetTransferRequest,
-  // TransfersApiListTransfersRequest,
-  // MetadataRefreshesApi,
-  // CreateMetadataRefreshRequest,
-  // ExchangesApi,
-  // ExchangesApiCreateExchangeRequest,
-  // ExchangesApiGetExchangeRequest,
-  // ExchangesApiGetExchangesRequest,
-  // NftCheckoutPrimaryApi,
-  // NftCheckoutPrimaryApiCreateNftPrimaryRequest,
-  // NftCheckoutPrimaryApiGetCurrenciesNFTCheckoutPrimaryRequest,
-  // NftCheckoutPrimaryApiGetNftPrimaryTransactionRequest,
-  // NftCheckoutPrimaryApiGetNftPrimaryTransactionsRequest,
-  // PrimarySalesApiSignableCreatePrimarySaleRequest,
-
   AddMetadataSchemaToCollectionRequest,
   AssetsApi,
   AssetsApiGetAssetRequest,
@@ -913,40 +852,3 @@ export class IMXClient {
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const ImmutableX = IMXClient;
-
-// methods moved to x-provider
-/**
- * getAddress
- * registerOffchain
- * isRegisteredOffchain
- * isRegisteredOnchain
- * createOrder
- * cancelOrder
- * createTrade
- * transfer
- * batchNftTransfer
- * exchangeTransfer
- * deposit
- * prepareWithdrawal
- * completeWithdrawal
- */
-
-// methods moved from Core SDK that aren't in x-provider
-// workflows
-/**
- * createCollection ✅
- * updateCollection ✅
- * addMetadataSchemaToCollection ✅
- * updateMetadataSchemaByName ✅
- * listMetadataRefreshes ✅
- * getMetadataRefreshErrors ✅
- * getMetadataRefreshResults ✅
- * createMetadataRefresh ✅
- * getProject ✅
- * getProjects (removed)
- * mint ✅
- * exchangeTransfer ✅
- * createPrimarySale ✅
- * acceptPrimarySale ✅
- * rejectPrimarySale ✅
- */
