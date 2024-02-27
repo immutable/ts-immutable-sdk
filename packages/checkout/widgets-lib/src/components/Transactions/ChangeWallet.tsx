@@ -3,7 +3,7 @@ import {
 } from '@biom3/react';
 import { useContext, useEffect, useState } from 'react';
 import { BridgeContext } from 'widgets/bridge/context/BridgeContext';
-import { getWalletProviderNameByProvider } from 'lib/providerUtils';
+import { getWalletProviderNameByProvider, isWalletConnectProvider } from 'lib/providerUtils';
 import {
   UserJourney,
   useAnalytics,
@@ -51,7 +51,7 @@ export function ChangeWallet({ onChangeWalletClick }: ChangeWalletProps) {
 
   useEffect(() => {
     if (isWalletConnectEnabled) {
-      setIsWalletConnect((from?.web3Provider.provider as any)?.isWalletConnect);
+      setIsWalletConnect(isWalletConnectProvider(from?.web3Provider));
       (async () => {
         setWalletLogoUrl(await getWalletLogoUrl());
       })();
@@ -67,7 +67,7 @@ export function ChangeWallet({ onChangeWalletClick }: ChangeWalletProps) {
           <Box sx={wcWalletLogoWrapperStyles}>
             <FramedImage
               imageUrl={walletLogoUrl}
-              alt="wallet connect"
+              alt="walletconnect"
               sx={wcWalletLogoStyles}
             />
             <Logo logo="WalletConnectSymbol" sx={wcStickerLogoStyles} />

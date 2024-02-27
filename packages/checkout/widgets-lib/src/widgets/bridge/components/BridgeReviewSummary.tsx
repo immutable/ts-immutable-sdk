@@ -15,6 +15,7 @@ import {
   getWalletProviderNameByProvider,
   isMetaMaskProvider,
   isPassportProvider,
+  isWalletConnectProvider,
 } from 'lib/providerUtils';
 import { calculateCryptoToFiat } from 'lib/utils';
 import {
@@ -205,8 +206,8 @@ export function BridgeReviewSummary() {
 
   useEffect(() => {
     if (isWalletConnectEnabled) {
-      setFromWalletIsWalletConnect((from?.web3Provider.provider as any)?.isWalletConnect);
-      setToWalletIsWalletConnect((to?.web3Provider.provider as any)?.isWalletConnect);
+      setFromWalletIsWalletConnect(isWalletConnectProvider(from?.web3Provider));
+      setToWalletIsWalletConnect(isWalletConnectProvider(to?.web3Provider));
       (async () => {
         setFromWalletLogoUrl(await getWalletLogoUrl());
         setToWalletLogoUrl(await getWalletLogoUrl());
@@ -294,11 +295,11 @@ export function BridgeReviewSummary() {
         emphasized
         sx={bottomMenuItemStyles}
       >
-        {fromWalletProviderName && fromWalletIsWalletConnect && fromWalletLogoUrl && (
+        {fromWalletIsWalletConnect && fromWalletLogoUrl && (
           <>
             <MenuItem.FramedImage
               imageUrl={fromWalletLogoUrl}
-              alt="wallet connect"
+              alt="walletconnect"
               sx={wcWalletLogoStyles}
             />
             <Logo logo="WalletConnectSymbol" sx={wcStickerLogoStyles} />
@@ -345,7 +346,7 @@ export function BridgeReviewSummary() {
           <>
             <MenuItem.FramedImage
               imageUrl={toWalletLogoUrl}
-              alt="wallet connect"
+              alt="walletconnect"
               sx={wcWalletLogoStyles}
             />
             <Logo logo="WalletConnectSymbol" sx={wcStickerLogoStyles} />

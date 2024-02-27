@@ -8,6 +8,7 @@ import { networkIcon } from 'lib';
 import { Web3Provider } from '@ethersproject/providers';
 import { useContext, useEffect, useState } from 'react';
 import { useWalletConnect } from 'lib/hooks/useWalletConnect';
+import { isWalletConnectProvider } from 'lib/providerUtils';
 import {
   networkButtonStyles,
   networkIconStyles,
@@ -55,7 +56,7 @@ export function WalletNetworkButton({
 
   useEffect(() => {
     if (isWalletConnectEnabled) {
-      setIsWalletConnect((walletProvider.provider as any)?.isWalletConnect);
+      setIsWalletConnect(isWalletConnectProvider(walletProvider));
       (async () => {
         setWalletLogoUrl(await getWalletLogoUrl());
       })();
@@ -72,7 +73,7 @@ export function WalletNetworkButton({
         <>
           <FramedImage
             imageUrl={walletLogoUrl}
-            alt="wallet connect"
+            alt="walletconnect"
             sx={wcWalletLogoStyles}
           />
           <Logo logo="WalletConnectSymbol" sx={wcStickerLogoStyles} />

@@ -64,6 +64,8 @@ export class WalletConnectManager {
 
   private ethereumProvider!: EthereumProvider;
 
+  private walletListings!: any;
+
   private validateConfig(config: WalletConnectConfiguration): boolean {
     if (!config.projectId || config.projectId === '') {
       // eslint-disable-next-line no-console
@@ -175,13 +177,16 @@ export class WalletConnectManager {
   }
 
   public async getWalletLogoUrl(): Promise<string | undefined> {
-    const walletListings = await this.loadWalletListings() as any;
+    if (!this.walletListings) {
+      this.walletListings = await this.loadWalletListings();
+    }
     const walletName = this.ethereumProvider?.session?.peer.metadata.name;
-    if (!walletListings || !walletName) {
+
+    if (!this.walletListings || !walletName) {
       return undefined;
     }
 
-    const matchedWallet = Object.values(walletListings.listings)
+    const matchedWallet = Object.values(this.walletListings.listings)
       .find((wallet: any) => walletName.toLowerCase().includes(wallet.slug)) as any;
 
     return matchedWallet.image_url.md;
