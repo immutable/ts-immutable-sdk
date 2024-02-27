@@ -3,7 +3,7 @@
     "baseUrl": "./src",
     "outDir": "./dist",
     "rootDirs": ["src"],
-    "target": "es2022",
+    "target": "es2015",
     "module": "esnext",
     "moduleResolution": "node",
     "noEmit": true,
