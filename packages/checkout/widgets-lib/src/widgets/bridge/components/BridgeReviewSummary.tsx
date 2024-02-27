@@ -84,8 +84,8 @@ export function BridgeReviewSummary() {
   const [toWalletLogoUrl, setToWalletLogoUrl] = useState<string | undefined>(
     undefined,
   );
-  const [isFromWalletConnect, setFromIsWalletConnect] = useState<boolean>(false);
-  const [isToWalletConnect, setToIsWalletConnect] = useState<boolean>(false);
+  const [fromWalletIsWalletConnect, setFromWalletIsWalletConnect] = useState<boolean>(false);
+  const [toWalletIsWalletConnect, setToWalletIsWalletConnect] = useState<boolean>(false);
   const { isWalletConnectEnabled, getWalletLogoUrl } = useWalletConnect({
     checkout,
   });
@@ -205,8 +205,8 @@ export function BridgeReviewSummary() {
 
   useEffect(() => {
     if (isWalletConnectEnabled) {
-      setFromIsWalletConnect((from?.web3Provider.provider as any)?.isWalletConnect);
-      setToIsWalletConnect((to?.web3Provider.provider as any)?.isWalletConnect);
+      setFromWalletIsWalletConnect((from?.web3Provider.provider as any)?.isWalletConnect);
+      setToWalletIsWalletConnect((to?.web3Provider.provider as any)?.isWalletConnect);
       (async () => {
         setFromWalletLogoUrl(await getWalletLogoUrl());
         setToWalletLogoUrl(await getWalletLogoUrl());
@@ -294,7 +294,7 @@ export function BridgeReviewSummary() {
         emphasized
         sx={bottomMenuItemStyles}
       >
-        {fromWalletProviderName && isFromWalletConnect && fromWalletLogoUrl && (
+        {fromWalletProviderName && fromWalletIsWalletConnect && fromWalletLogoUrl && (
           <>
             <MenuItem.FramedImage
               imageUrl={fromWalletLogoUrl}
@@ -304,7 +304,7 @@ export function BridgeReviewSummary() {
             <Logo logo="WalletConnectSymbol" sx={wcStickerLogoStyles} />
           </>
         )}
-        {fromWalletProviderName && !isFromWalletConnect && (
+        {fromWalletProviderName && !fromWalletIsWalletConnect && (
           <MenuItem.FramedLogo
             logo={fromLogo}
             sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
@@ -341,7 +341,7 @@ export function BridgeReviewSummary() {
         emphasized
         sx={topMenuItemStyles}
       >
-        {toWalletProviderName && isToWalletConnect && toWalletLogoUrl && (
+        {toWalletProviderName && toWalletIsWalletConnect && toWalletLogoUrl && (
           <>
             <MenuItem.FramedImage
               imageUrl={toWalletLogoUrl}
@@ -351,7 +351,7 @@ export function BridgeReviewSummary() {
             <Logo logo="WalletConnectSymbol" sx={wcStickerLogoStyles} />
           </>
         )}
-        {toWalletProviderName && !isToWalletConnect && (
+        {toWalletProviderName && !toWalletIsWalletConnect && (
           <MenuItem.FramedLogo
             logo={toLogo}
             sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
