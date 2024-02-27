@@ -1,7 +1,12 @@
 export {
   EthConfiguration,
+  ApiConfiguration,
   ImxModuleConfiguration,
   ImxModuleConfiguration as ImxClientModuleConfiguration, // preserve old name for backwards compatibility
+  ImmutableXConfiguration,
+  createImmutableXConfiguration,
+  Config,
+  imxClientConfig,
 } from './config';
 export { IMXClient, ImmutableX } from './IMXClient';
 export * from './exportUtils';
