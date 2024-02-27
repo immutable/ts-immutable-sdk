@@ -91,14 +91,14 @@ describe('Key generation', () => {
           '0x057a8278637277ebaaa63b000185507eb847eec8f69c7758fc10a490d0226e7d', // Compatible with core-sdk GrindKey, with Expected Index of 0,0,1,... // Hash Iterated 2 times
       },
       {
-        name: 'case 10 - Eth Private Key hashed with index once, should generate correct stark key',
+        name: 'case 10 - Eth Private Key hashed with index once, should generate correct stark key, account not found on IMX',
         privateKey:
           '0xe7ecb8f91175446248a6cfa45a9526c85bc4cd7cbd9427e3e65a82d3f5fb8cdc',
         wantPublicKey:
           '0x05f8f00b03e896cb8c02a936bab73623fc3651fddabfe0d28fbc309c63642c10', // Hash Iterated 1 time
       },
       {
-        name: 'case 11 - Eth Private Key hashed with index more than once, should generate correct stark key',
+        name: 'case 11 - Eth Private Key hashed with index more than once, should generate correct stark key, account not found on IMX',
         privateKey:
           '0x82930dfa052b198828f70529148b02178b03515e910217dab32bf9fc046bc9d9',
         wantPublicKey:
