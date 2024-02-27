@@ -132,7 +132,8 @@ export default [
         __SDK_VERSION__: pkg.version,
         
         // This breaks in a dex dependency, so manually replacing it.
-        'process.env.NODE_ENV': '"production"'
+        'process.env.NODE_ENV': '"production"',
+        'process': 'undefined'
       }),
       terser(),
     ],
