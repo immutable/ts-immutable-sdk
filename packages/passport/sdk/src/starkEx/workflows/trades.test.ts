@@ -1,4 +1,4 @@
-import { TradesApi } from '@imtbl/core-sdk';
+import { imx } from '@imtbl/generated-clients';
 import { createTrade } from './trades';
 import { mockErrorMessage, mockStarkSignature, mockUserImx } from '../../test/mocks';
 import { PassportError, PassportErrorType } from '../../errors/passportError';
@@ -73,10 +73,10 @@ describe('Trades', () => {
     const mockGetSignableTrade = jest.fn();
     const mockCreateTrade = jest.fn();
 
-    const mockTradesApi: TradesApi = {
+    const mockTradesApi: imx.TradesApi = {
       getSignableTrade: mockGetSignableTrade,
       createTradeV3: mockCreateTrade,
-    } as unknown as TradesApi;
+    } as unknown as imx.TradesApi;
 
     it('should successfully create a trade ', async () => {
       mockGetSignableTrade.mockResolvedValue(mockSignableTradeResponse);

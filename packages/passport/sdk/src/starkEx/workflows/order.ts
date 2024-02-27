@@ -1,21 +1,16 @@
+import { imx } from '@imtbl/generated-clients';
 import {
-  CancelOrderResponse,
-  CreateOrderResponse,
-  GetSignableCancelOrderRequest,
-  GetSignableOrderRequest,
-  OrdersApi,
-  OrdersApiCreateOrderV3Request,
   StarkSigner,
   UnsignedOrderRequest,
-} from '@imtbl/core-sdk';
+} from '@imtbl/x-client';
 import { convertToSignableToken } from '@imtbl/toolkit';
 import { PassportErrorType, withPassportError } from '../../errors/passportError';
 import { UserImx } from '../../types';
 import GuardianClient from '../../guardian';
 
 type CancelOrderParams = {
-  request: GetSignableCancelOrderRequest;
-  ordersApi: OrdersApi;
+  request: imx.GetSignableCancelOrderRequest;
+  ordersApi: imx.OrdersApi;
   user: UserImx;
   starkSigner: StarkSigner;
   guardianClient: GuardianClient;
@@ -23,7 +18,7 @@ type CancelOrderParams = {
 
 type CreateOrderParams = {
   request: UnsignedOrderRequest;
-  ordersApi: OrdersApi;
+  ordersApi: imx.OrdersApi;
   user: UserImx;
   starkSigner: StarkSigner;
   guardianClient: GuardianClient;
@@ -37,14 +32,14 @@ export async function createOrder({
   request,
   ordersApi,
   guardianClient,
-}: CreateOrderParams): Promise<CreateOrderResponse> {
-  return withPassportError<CreateOrderResponse>(guardianClient.withDefaultConfirmationScreenTask(async () => {
+}: CreateOrderParams): Promise<imx.CreateOrderResponse> {
+  return withPassportError<imx.CreateOrderResponse>(guardianClient.withDefaultConfirmationScreenTask(async () => {
     const { ethAddress } = user.imx;
     const amountSell = request.sell.type === ERC721 ? '1' : request.sell.amount;
     const amountBuy = request.buy.type === ERC721 ? '1' : request.buy.amount;
     const headers = { Authorization: `Bearer ${user.accessToken}` };
 
-    const getSignableOrderRequestV3: GetSignableOrderRequest = {
+    const getSignableOrderRequestV3: imx.GetSignableOrderRequest = {
       user: ethAddress,
       amount_buy: amountBuy,
       token_buy: convertToSignableToken(request.buy),
@@ -72,7 +67,7 @@ export async function createOrder({
 
     const signableResultData = getSignableOrderResponse.data;
 
-    const orderParams: OrdersApiCreateOrderV3Request = {
+    const orderParams: imx.OrdersApiCreateOrderV3Request = {
       createOrderRequest: {
         include_fees: true,
         fees: request.fees,
@@ -106,9 +101,9 @@ export async function cancelOrder({
   request,
   ordersApi,
   guardianClient,
-}: CancelOrderParams): Promise<CancelOrderResponse> {
-  return withPassportError<CancelOrderResponse>(guardianClient.withDefaultConfirmationScreenTask(async () => {
-    const getSignableCancelOrderRequest: GetSignableCancelOrderRequest = {
+}: CancelOrderParams): Promise<imx.CancelOrderResponse> {
+  return withPassportError<imx.CancelOrderResponse>(guardianClient.withDefaultConfirmationScreenTask(async () => {
+    const getSignableCancelOrderRequest: imx.GetSignableCancelOrderRequest = {
       order_id: request.order_id,
     };
 
