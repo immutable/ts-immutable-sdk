@@ -57,8 +57,8 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: lts/*
-          cache: 'yarn'
+          node-version-file: .nvmrc
+          cache: "yarn"
 
       - name: Workout next version string
         run: |
@@ -136,7 +136,7 @@ jobs:
       # Wait for 30 seconds to make sure the tag is available on GitHub
       - uses: GuillaumeFalourd/wait-sleep-action@v1
         with:
-          time: '30'
+          time: "30"
 
       - name: Create GitHub Release
         id: gh_release
