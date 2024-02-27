@@ -1,6 +1,6 @@
 {
   "name": "ts-immutable-sdk",
-  "description": "Immutable Unified TypeScript SDK",
+  "description": "Immutable Unified TypeScript SDK.",
   "version": "0.0.0",
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
