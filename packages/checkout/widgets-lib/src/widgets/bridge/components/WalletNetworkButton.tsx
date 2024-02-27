@@ -6,15 +6,18 @@ import { getChainNameById } from 'lib/chains';
 import { getWalletDisplayName, getWalletLogoByName } from 'lib/logoUtils';
 import { networkIcon } from 'lib';
 import { Web3Provider } from '@ethersproject/providers';
-import { WalletConnectManager } from 'lib/walletConnect';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { useWalletConnect } from 'lib/hooks/useWalletConnect';
 import {
   networkButtonStyles,
   networkIconStyles,
   walletButtonOuterStyles,
   walletCaptionStyles,
   walletLogoStyles,
+  wcStickerLogoStyles,
+  wcWalletLogoStyles,
 } from './WalletNetworkButtonStyles';
+import { BridgeContext } from '../context/BridgeContext';
 
 interface WalletNetworkButtonProps {
   testId: string;
@@ -42,17 +45,22 @@ export function WalletNetworkButton({
   const [walletLogoUrl, setWalletLogoUrl] = useState<string | undefined>(
     undefined,
   );
-  const [walletIsWalletConnect, setWalletIsWalletConnect] = useState<boolean>(false);
+  const [isWalletConnect, setIsWalletConnect] = useState<boolean>(false);
+  const {
+    bridgeState: { checkout },
+  } = useContext(BridgeContext);
+  const { isWalletConnectEnabled, getWalletLogoUrl } = useWalletConnect({
+    checkout,
+  });
 
   useEffect(() => {
-    if (WalletConnectManager.getInstance().isInitialised) {
-      setWalletIsWalletConnect((walletProvider.provider as any)?.isWalletConnect);
+    if (isWalletConnectEnabled) {
+      setIsWalletConnect((walletProvider.provider as any)?.isWalletConnect);
       (async () => {
-        const url = await WalletConnectManager.getInstance().getWalletLogoUrl();
-        setWalletLogoUrl(url);
+        setWalletLogoUrl(await getWalletLogoUrl());
       })();
     }
-  }, []);
+  }, [isWalletConnectEnabled, walletProvider]);
 
   return (
     <Box
@@ -60,8 +68,15 @@ export function WalletNetworkButton({
       sx={walletButtonOuterStyles}
       onClick={onWalletClick}
     >
-      {(walletIsWalletConnect && walletLogoUrl) ? (
-        <FramedImage imageUrl={walletLogoUrl} alt="wallet connect" sx={{}} />
+      {isWalletConnect && walletLogoUrl ? (
+        <>
+          <FramedImage
+            imageUrl={walletLogoUrl}
+            alt="wallet connect"
+            sx={wcWalletLogoStyles}
+          />
+          <Logo logo="WalletConnectSymbol" sx={wcStickerLogoStyles} />
+        </>
       ) : (
         <Logo logo={walletLogo as any} sx={walletLogoStyles(walletName)} />
       )}
