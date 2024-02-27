@@ -1,12 +1,23 @@
+export {
+  ImxModuleConfiguration,
+  ImxModuleConfiguration as ImxClientModuleConfiguration, // preserve old name for backwards compatibility
+} from './config';
 export { IMXClient, ImmutableX } from './IMXClient';
 export {
   createStarkSigner,
+  createStarkSigner as imxClientCreateStarkSigner, // preserve old name for backwards compatibility
   generateLegacyStarkPrivateKey,
+  generateLegacyStarkPrivateKey as imxClientGenerateLegacyStarkPrivateKey, // TODO - remove console.log in utils file -- // preserve old name for backwards compatibility
   generateStarkPrivateKey,
 } from './utils';
 export { IMXError } from './types/errors';
 export * from './types/requests';
-export * from './types/signers';
+export {
+  EthSigner,
+  StarkSigner,
+  WalletConnection,
+  WalletConnection as ImxClientWalletConnection, // preserve old name for backwards compatibility
+} from './types/signers';
 export * from './types/tokens';
 export * from './types/transfers';
 // export types for IMXClient

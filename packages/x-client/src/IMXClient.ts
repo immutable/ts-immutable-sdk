@@ -1,5 +1,8 @@
 import { ImxApiClients } from '@imtbl/generated-clients';
-import { ImxConfiguration, ImxModuleConfiguration } from './config';
+import {
+  ImxConfiguration,
+  ImxModuleConfiguration as ImxClientModuleConfiguration,
+} from './config';
 import { formatError } from './utils/formatError';
 import {
   // // ImmutableX,
@@ -164,7 +167,7 @@ export class IMXClient {
 
   public workflows: Workflows;
 
-  constructor(config: ImxModuleConfiguration) {
+  constructor(config: ImxClientModuleConfiguration) {
     const imxConfig = new ImxConfiguration(config);
     this.immutableX = new ImxApiClients(imxConfig.immutableXConfig.apiConfiguration);
     this.assetApi = this.immutableX.assetApi;
