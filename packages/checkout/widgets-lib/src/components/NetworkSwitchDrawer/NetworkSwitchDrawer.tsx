@@ -1,12 +1,19 @@
 import {
-  Body, Box, Button, Drawer, Logo,
+  Body, Box, Button, CloudImage, Drawer, Heading, Logo,
 } from '@biom3/react';
 import { Web3Provider } from '@ethersproject/providers';
 import { ChainId, Checkout } from '@imtbl/checkout-sdk';
+import { Environment } from '@imtbl/config';
+import { FooterLogo } from 'components/Footer/FooterLogo';
+import { getL1ChainId } from 'lib';
 import { getChainNameById } from 'lib/chains';
-import { getWalletLogoByName } from 'lib/logoUtils';
-import { getWalletProviderNameByProvider, isWalletConnectProvider } from 'lib/providerUtils';
+import {
+  isMetaMaskProvider,
+  isWalletConnectProvider,
+} from 'lib/providerUtils';
+import { getRemoteImage } from 'lib/utils';
 import { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export interface NetworkSwitchDrawerProps {
   visible: boolean;
@@ -24,7 +31,16 @@ export function NetworkSwitchDrawer({
   onCloseDrawer,
   onNetworkSwitch,
 }: NetworkSwitchDrawerProps) {
+  const { t } = useTranslation();
+
   const targetChainName = getChainNameById(targetChainId);
+  const networkSwitchImage = useMemo(() => {
+    if (targetChainId === getL1ChainId(checkout.config)) {
+      const ethNetworkImageUrl = getRemoteImage(Environment.SANDBOX, '/switchnetworkethereum.svg');
+      return <CloudImage imageUrl={ethNetworkImageUrl} sx={{ width: '161px', height: '98px' }} />;
+    }
+    return <Logo logo="ImmutableSymbol" sx={{ fill: 'base.color.accent.1', width: 'base.spacing.x20' }} />;
+  }, [targetChainId]);
 
   const handleSwitchNetwork = useCallback(async () => {
     if (!checkout) return;
@@ -34,8 +50,6 @@ export function NetworkSwitchDrawer({
     });
     onNetworkSwitch(switchNetworkResult.provider);
   }, [checkout, provider, onNetworkSwitch, targetChainId]);
-
-  const walletLogo = getWalletLogoByName(getWalletProviderNameByProvider(provider));
 
   const isWalletConnect = isWalletConnectProvider(provider);
 
@@ -49,28 +63,32 @@ export function NetworkSwitchDrawer({
     [walletConnectPeerName],
   );
 
-  const openWalletUrl = useCallback(() => {
-    if (!isWalletConnect) return;
-    const redirectUrl = (provider.provider as any)?.session?.peer?.metadata?.redirect?.native;
-    window.open(redirectUrl, '_self');
-  }, [provider, isWalletConnect]);
+  const walletDisplayName = useMemo(() => {
+    if (isMetaMaskProvider(provider)) return 'MetaMask wallet';
+    if (isWalletConnect && walletConnectPeerName) return walletConnectPeerName;
+    return 'wallet';
+  }, [provider, isWalletConnect, walletConnectPeerName]);
+
+  // const openWalletUrl = useCallback(() => {
+  //   if (!isWalletConnect) return;
+  //   const redirectUrl = (provider.provider as any)?.session?.peer?.metadata?.redirect?.native;
+  //   window.open(redirectUrl, '_self');
+  // }, [provider, isWalletConnect]);
 
   return (
     <Drawer
-      size="full"
+      size="threeQuarter"
       visible={visible}
       onCloseDrawer={onCloseDrawer}
       showHeaderBar
-      headerBarTitle="Switch Network"
+      headerBarTitle=""
     >
       <Drawer.Content sx={{
-        padding: 'base.spacing.x4',
+        paddingX: 'base.spacing.x4',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
         alignItems: 'center',
-        gap: 'base.spacing.x4',
-        flex: 1,
       }}
       >
         <Box sx={{
@@ -78,46 +96,37 @@ export function NetworkSwitchDrawer({
           flexDirection: 'column',
           alignItems: 'center',
           gap: 'base.spacing.x4',
+          paddingX: 'base.spacing.x2',
         }}
         >
-          <Logo logo={walletLogo} sx={{ width: 'base.icon.size.600' }} />
-          {isWalletConnect && <Body>{walletConnectPeerName}</Body>}
-          <Body sx={{ paddingX: 'base.spacing.x6' }}>
-            You will need to switch to
-            {targetChainName}
-            {' '}
-            to proceed.
+          {networkSwitchImage}
+          <Heading size="small" weight="bold" sx={{ textAlign: 'center', paddingX: 'base.spacing.x6' }}>
+            {`${t('drawers.networkSwitch.heading')} ${walletDisplayName}`}
+          </Heading>
+          <Body size="large" weight="regular" sx={{ textAlign: 'center' }}>
+            {`${t('drawers.networkSwitch.body1')}${targetChainName}${t('drawers.networkSwitch.body2')}`}
           </Body>
-          {isWalletConnect && isMetaMaskMobileWalletPeer && (
-            <>
-              <Body sx={{ marginTop: 'base.spacing.x6' }}>
-                You need to go to your mobile wallet (
-                {walletConnectPeerName}
-                ) and switch the network to
-                {targetChainName}
-                {' '}
-                in order to proceed.
-              </Body>
-              <Button onClick={openWalletUrl}>Open MetaMask</Button>
-            </>
-          )}
         </Box>
 
-        {(!isWalletConnect || (isWalletConnect && !isMetaMaskMobileWalletPeer)) && (
-          <Box sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            paddingY: 'base.spacing.x6',
-            paddingX: 'base.spacing.x4',
-            width: '100%',
-          }}
-          >
-            <Button size="large" variant="tertiary" sx={{ width: '100%' }} onClick={handleSwitchNetwork}>
-              Switch to
-              {targetChainName}
+        <Box sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          paddingX: 'base.spacing.x4',
+          width: '100%',
+        }}
+        >
+          {(!isWalletConnect || (isWalletConnect && !isMetaMaskMobileWalletPeer)) && (
+            <Button
+              size="large"
+              variant="primary"
+              sx={{ width: '100%', marginBottom: 'base.spacing.x2' }}
+              onClick={handleSwitchNetwork}
+            >
+              {`${t('drawers.networkSwitch.switchButton')}${targetChainName}`}
             </Button>
-          </Box>
-        )}
+          )}
+          <FooterLogo />
+        </Box>
       </Drawer.Content>
     </Drawer>
   );

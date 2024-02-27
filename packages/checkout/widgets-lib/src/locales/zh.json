@@ -622,6 +622,12 @@
       "buttons": {
         "cancel": "关闭"
       }
+    },
+    "networkSwitch": {
+      "heading": "在您的网络中切换 ",
+      "body1": "您需要打开您的钱包并切换到 ",
+      "body2": " 网络才能继续进行",
+      "switchButton": "切换到 "
     }
   }
 }

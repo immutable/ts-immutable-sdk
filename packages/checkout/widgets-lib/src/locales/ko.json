@@ -622,6 +622,12 @@
       "buttons": {
         "cancel": "취소"
       }
+    },
+    "networkSwitch": {
+      "heading": "귀하의 네트워크를 전환하세요 ",
+      "body1": "계속하려면 지갑을 열고 ",
+      "body2": " 네트워크로 전환해야 합니다",
+      "switchButton": "전환하기 "
     }
   }
 }
