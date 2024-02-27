@@ -34,6 +34,8 @@ import {
 } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { useTranslation } from 'react-i18next';
 import { getWalletLogoByName } from 'lib/logoUtils';
+import { NetworkSwitchDrawer } from 'components/NetworkSwitchDrawer/NetworkSwitchDrawer';
+import { Web3Provider } from '@ethersproject/providers';
 import { networkIconStyles } from './WalletNetworkButtonStyles';
 import {
   arrowIconStyles,
@@ -51,8 +53,6 @@ import {
 } from '../../../context/view-context/ViewContext';
 import { Fees } from '../../../components/Fees/Fees';
 import { formatBridgeFees } from '../functions/BridgeFees';
-import { NetworkSwitchDrawer } from 'components/NetworkSwitchDrawer/NetworkSwitchDrawer';
-import { Web3Provider } from '@ethersproject/providers';
 
 const testId = 'bridge-review-summary';
 
@@ -64,7 +64,7 @@ export function BridgeReviewSummary() {
     bridgeState: {
       checkout, tokenBridge, from, to, token, amount,
     },
-    bridgeDispatch
+    bridgeDispatch,
   } = useContext(BridgeContext);
 
   const { track } = useAnalytics();
@@ -202,41 +202,39 @@ export function BridgeReviewSummary() {
         from: {
           web3Provider: provider,
           walletAddress: from?.walletAddress!,
-          network: from?.network!
+          network: from?.network!,
         },
         to: {
           web3Provider: to?.web3Provider!,
           walletAddress: to?.walletAddress!,
-          network: to?.network!
-        }
-      }
-    })
-  }, [from?.web3Provider, from?.network, to?.web3Provider, to?.network])
+          network: to?.network!,
+        },
+      },
+    });
+  }, [from?.web3Provider, from?.network, to?.web3Provider, to?.network]);
 
   useEffect(() => {
-    if(!from?.web3Provider) return;
+    if (!from?.web3Provider) return () => {};
 
     const handleChainChanged = () => {
       const newProvider = new Web3Provider(from?.web3Provider.provider);
       handleNetworkSwitch(newProvider);
       setShowSwitchNetworkDrawer(false);
-    }
-    addChainChangedListener(from?.web3Provider, handleChainChanged)
+    };
+    addChainChangedListener(from?.web3Provider, handleChainChanged);
 
     return () => {
-      removeChainChangedListener(from?.web3Provider, handleChainChanged)
-    }
-  }, [from?.web3Provider])
+      removeChainChangedListener(from?.web3Provider, handleChainChanged);
+    };
+  }, [from?.web3Provider]);
 
   const submitBridge = useCallback(async () => {
     if (!approveTransaction || !transaction) return;
 
-    const currentChainId = await (from?.web3Provider.provider as any).request({method: 'eth_chainId', params: []});
-    console.log("currentChainId", currentChainId);
-    console.log("from network", from?.network);
+    const currentChainId = await (from?.web3Provider.provider as any).request({ method: 'eth_chainId', params: [] });
+    // eslint-disable-next-line radix
     const parsedChainId = parseInt(currentChainId.toString());
-    console.log("parsedChainId", parsedChainId)
-    if(parsedChainId !== from?.network){
+    if (parsedChainId !== from?.network) {
       setShowSwitchNetworkDrawer(true);
       return;
     }
@@ -420,14 +418,14 @@ export function BridgeReviewSummary() {
           )}
         </Button>
       </Box>
-      <NetworkSwitchDrawer 
-        visible={showSwitchNetworkDrawer} 
-        targetChainId={from?.network} 
-        provider={from?.web3Provider} 
-        checkout={checkout} 
-        onCloseDrawer={() => setShowSwitchNetworkDrawer(false)} 
-        onNetworkSwitch={handleNetworkSwitch} 
-        />
+      <NetworkSwitchDrawer
+        visible={showSwitchNetworkDrawer}
+        targetChainId={from?.network!}
+        provider={from?.web3Provider!}
+        checkout={checkout}
+        onCloseDrawer={() => setShowSwitchNetworkDrawer(false)}
+        onNetworkSwitch={handleNetworkSwitch}
+      />
     </Box>
   );
 }
