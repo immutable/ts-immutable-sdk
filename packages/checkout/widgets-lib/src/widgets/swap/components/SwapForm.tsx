@@ -876,10 +876,9 @@ export function SwapForm({ data, theme }: SwapFromProps) {
       <NetworkSwitchDrawer
         visible={showNetworkSwitchDrawer}
         targetChainId={getL2ChainId(checkout?.config!)}
-        provider={provider}
-        checkout={checkout}
+        provider={provider!}
+        checkout={checkout!}
         onCloseDrawer={() => setShowNetworkSwitchDrawer(false)}
-        onNetworkSwitch={(newProvider) => console.log(newProvider)}
       />
     </>
   );

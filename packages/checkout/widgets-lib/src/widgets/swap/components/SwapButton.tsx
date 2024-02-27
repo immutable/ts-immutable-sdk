@@ -31,7 +31,14 @@ export interface SwapButtonProps {
 }
 
 export function SwapButton({
-  loading, updateLoading, validator, transaction, data, insufficientFundsForGas, openNotEnoughImxDrawer, openNetworkSwitchDrawer,
+  loading,
+  updateLoading,
+  validator,
+  transaction,
+  data,
+  insufficientFundsForGas,
+  openNotEnoughImxDrawer,
+  openNetworkSwitchDrawer,
 }: SwapButtonProps) {
   const { t } = useTranslation();
   const [showTxnRejectedState, setShowTxnRejectedState] = useState(false);
@@ -65,12 +72,10 @@ export function SwapButton({
       return;
     }
 
+    // check for switch network here
     const currentChainId = await (provider.provider as any).request({ method: 'eth_chainId', params: [] });
-
-    console.log('currentChainId', currentChainId);
     // eslint-disable-next-line radix
     const parsedChainId = parseInt(currentChainId.toString());
-    console.log('parsedChainId', parsedChainId);
     if (parsedChainId !== getL2ChainId(checkout.config)) {
       openNetworkSwitchDrawer();
       return;

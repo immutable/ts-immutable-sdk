@@ -21,7 +21,7 @@ export interface NetworkSwitchDrawerProps {
   provider: Web3Provider;
   checkout: Checkout;
   onCloseDrawer: () => void;
-  onNetworkSwitch: (provider: Web3Provider) => void;
+  onNetworkSwitch?: (provider: Web3Provider) => void;
 }
 export function NetworkSwitchDrawer({
   visible,
@@ -48,7 +48,9 @@ export function NetworkSwitchDrawer({
       provider,
       chainId: targetChainId,
     });
-    onNetworkSwitch(switchNetworkResult.provider);
+    if (onNetworkSwitch) {
+      onNetworkSwitch(switchNetworkResult.provider);
+    }
   }, [checkout, provider, onNetworkSwitch, targetChainId]);
 
   const isWalletConnect = isWalletConnectProvider(provider);
