@@ -1,10 +1,13 @@
 import {
-  Body, Box, Button, Heading, Logo,
+  Body, Box, Button, FramedImage, Heading, Logo,
 } from '@biom3/react';
 import { ChainId, WalletProviderName } from '@imtbl/checkout-sdk';
 import { getChainNameById } from 'lib/chains';
 import { getWalletDisplayName, getWalletLogoByName } from 'lib/logoUtils';
 import { networkIcon } from 'lib';
+import { Web3Provider } from '@ethersproject/providers';
+import { WalletConnectManager } from 'lib/walletConnect';
+import { useEffect, useState } from 'react';
 import {
   networkButtonStyles,
   networkIconStyles,
@@ -15,6 +18,7 @@ import {
 
 interface WalletNetworkButtonProps {
   testId: string;
+  walletProvider: Web3Provider;
   walletName: WalletProviderName | string;
   walletAddress: string;
   chainId: ChainId;
@@ -24,6 +28,7 @@ interface WalletNetworkButtonProps {
 }
 export function WalletNetworkButton({
   testId,
+  walletProvider,
   walletName,
   walletAddress,
   chainId,
@@ -34,6 +39,20 @@ export function WalletNetworkButton({
   const networkName = getChainNameById(chainId);
   const walletHeading = getWalletDisplayName(walletName);
   const walletLogo = getWalletLogoByName(walletName);
+  const [walletLogoUrl, setWalletLogoUrl] = useState<string | undefined>(
+    undefined,
+  );
+  const [walletIsWalletConnect, setWalletIsWalletConnect] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (WalletConnectManager.getInstance().isInitialised) {
+      setWalletIsWalletConnect((walletProvider.provider as any)?.isWalletConnect);
+      (async () => {
+        const url = await WalletConnectManager.getInstance().getWalletLogoUrl();
+        setWalletLogoUrl(url);
+      })();
+    }
+  }, []);
 
   return (
     <Box
@@ -41,7 +60,11 @@ export function WalletNetworkButton({
       sx={walletButtonOuterStyles}
       onClick={onWalletClick}
     >
-      <Logo logo={walletLogo as any} sx={walletLogoStyles(walletName)} />
+      {(walletIsWalletConnect && walletLogoUrl) ? (
+        <FramedImage imageUrl={walletLogoUrl} alt="wallet connect" sx={{}} />
+      ) : (
+        <Logo logo={walletLogo as any} sx={walletLogoStyles(walletName)} />
+      )}
       <Box
         sx={{
           display: 'flex',

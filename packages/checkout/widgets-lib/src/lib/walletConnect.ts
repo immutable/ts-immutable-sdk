@@ -38,6 +38,13 @@ const lightThemeVariables = {
   '--wcm-wallet-icon-border-radius': '8px',
 };
 
+// Whitelisted wallet ids on WalletConnect explorer API
+const metamaskId = 'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96';
+const frontierId = '85db431492aa2e8672e93f4ea7acf10c88b97b867b0d373107af63dc4880f041';
+const coinbaseId = 'fd20dc426fb37566d803205b19bbc1d4096b248ac04548e3cfb6b3a38bd033aa';
+// const phantomId = 'a797aa35c0fadbfc1a53e7f675162ed5226968b44a19ee3d24385c64d1d3c393';
+// const rainbowId = '1ae92b26df02f0abca6304df07debccd18262fdf5fe82daa81593582dac9a369';
+
 export class WalletConnectManager {
   private static instance: WalletConnectManager;
 
@@ -100,10 +107,9 @@ export class WalletConnectManager {
         projectId: this.walletConnectConfig.projectId,
         chains: this.environment === Environment.PRODUCTION ? productionModalChains : testnetModalChains,
         explorerRecommendedWalletIds: [
-          'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96', // MetaMask
-          '85db431492aa2e8672e93f4ea7acf10c88b97b867b0d373107af63dc4880f041', // Frontier
-          // 'a797aa35c0fadbfc1a53e7f675162ed5226968b44a19ee3d24385c64d1d3c393', // Phantom
-          // '1ae92b26df02f0abca6304df07debccd18262fdf5fe82daa81593582dac9a369', // Rainbow
+          metamaskId,
+          frontierId,
+          coinbaseId,
         ],
         explorerExcludedWalletIds: 'ALL',
         themeMode: this.theme,
@@ -148,5 +154,31 @@ export class WalletConnectManager {
         resolve(this.ethereumProvider);
       }
     });
+  }
+
+  private async loadWalletListings(): Promise<Response | undefined> {
+    // eslint-disable-next-line max-len
+    const walletListingsApi = `https://explorer-api.walletconnect.com/v3/wallets?projectId=${this.walletConnectConfig.projectId}&ids=${metamaskId},${frontierId},${coinbaseId}`;
+    try {
+      const response = await fetch(walletListingsApi);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching wallet listings', error);
+    }
+    return undefined;
+  }
+
+  public async getWalletLogoUrl(): Promise<string | undefined> {
+    const walletListings = await this.loadWalletListings() as any;
+    const walletName = this.ethereumProvider?.session?.peer.metadata.name;
+    if (!walletListings || !walletName) {
+      return undefined;
+    }
+
+    const matchedWallet = Object.values(walletListings.listings)
+      .find((wallet: any) => walletName.toLowerCase().includes(wallet.slug)) as any;
+
+    return matchedWallet.image_url.md;
   }
 }
