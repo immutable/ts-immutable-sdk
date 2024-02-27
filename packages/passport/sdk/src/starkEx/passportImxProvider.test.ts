@@ -133,7 +133,7 @@ describe('PassportImxProvider', () => {
         imxApiClients: new ImxApiClients({} as any),
       });
 
-      await expect(pp.getAddress()).rejects.toThrow(new Error('error'));
+      await expect(pp.registerOffchain()).rejects.toThrow(new Error('error'));
     });
   });
 
@@ -354,6 +354,7 @@ describe('PassportImxProvider', () => {
     ['batchNftTransfer' as const, [] as NftTransferDetails[]],
     ['exchangeTransfer' as const, {} as UnsignedExchangeTransferRequest],
     ['getAddress' as const, {} as any],
+    ['isRegisteredOffchain' as const, {} as any],
   ])('when the user has been logged out - %s', (methodName, args) => {
     beforeEach(() => {
       passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
@@ -379,6 +380,7 @@ describe('PassportImxProvider', () => {
     ['batchNftTransfer' as const, [] as NftTransferDetails[]],
     ['exchangeTransfer' as const, {} as UnsignedExchangeTransferRequest],
     ['getAddress' as const, {} as any],
+    ['isRegisteredOffchain' as const, {} as any],
   ])('when the user\'s access token is expired and cannot be retrieved', (methodName, args) => {
     beforeEach(() => {
       mockAuthManager.getUser.mockResolvedValue(null);

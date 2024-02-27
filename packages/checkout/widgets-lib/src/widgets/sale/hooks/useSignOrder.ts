@@ -145,7 +145,7 @@ const toSignResponse = (
 
 export const useSignOrder = (input: SignOrderInput) => {
   const {
-    provider, items, recipientAddress, env, environmentId,
+    provider, items, recipientAddress, environment, environmentId,
   } = input;
   const [signError, setSignError] = useState<SignOrderError | undefined>(
     undefined,
@@ -192,7 +192,7 @@ export const useSignOrder = (input: SignOrderInput) => {
         });
 
         setExecuteTransactions({ method, hash: txnResponse?.hash });
-        await txnResponse?.wait(1);
+        await txnResponse?.wait();
 
         transactionHash = txnResponse?.hash || '';
         return [transactionHash, undefined];
@@ -249,7 +249,7 @@ export const useSignOrder = (input: SignOrderInput) => {
           })),
         };
 
-        const baseUrl = `${PRIMARY_SALES_API_BASE_URL[env]}/${environmentId}/order/sign`;
+        const baseUrl = `${PRIMARY_SALES_API_BASE_URL[environment]}/${environmentId}/order/sign`;
         const response = await fetch(baseUrl, {
           method: 'POST',
           headers: {
@@ -294,7 +294,7 @@ export const useSignOrder = (input: SignOrderInput) => {
       }
       return undefined;
     },
-    [items, recipientAddress, environmentId, env, provider],
+    [items, recipientAddress, environmentId, environment, provider],
   );
 
   const execute = async (
