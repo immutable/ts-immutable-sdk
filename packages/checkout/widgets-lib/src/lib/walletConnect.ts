@@ -25,6 +25,8 @@ const darkThemeVariables = {
   '--wcm-container-border-radius': '8px',
   // eslint-disable-next-line @typescript-eslint/naming-convention
   '--wcm-wallet-icon-border-radius': '8px',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  '--wcm-overlay-background-color': 'rgba(255, 255, 255, 0.1)',
 };
 
 const lightThemeVariables = {
@@ -36,6 +38,8 @@ const lightThemeVariables = {
   '--wcm-container-border-radius': '8px',
   // eslint-disable-next-line @typescript-eslint/naming-convention
   '--wcm-wallet-icon-border-radius': '8px',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  '--wcm-overlay-background-color': 'rgba(255, 255, 255, 0.1)',
 };
 
 // Whitelisted wallet ids on WalletConnect explorer API
@@ -164,6 +168,7 @@ export class WalletConnectManager {
       const data = await response.json();
       return data;
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error fetching wallet listings', error);
     }
     return undefined;
