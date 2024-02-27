@@ -42,7 +42,7 @@ export function WalletList(props: WalletListProps) {
   const [wallets, setWallets] = useState<WalletInfo[]>([]);
   const { track } = useAnalytics();
 
-  const selectWeb3Provider = useCallback((web3Provider: any) => {
+  const selectWeb3Provider = useCallback((web3Provider: any, providerName: string) => {
     connectDispatch({
       payload: {
         type: ConnectActions.SET_PROVIDER,
@@ -52,7 +52,7 @@ export function WalletList(props: WalletListProps) {
     connectDispatch({
       payload: {
         type: ConnectActions.SET_WALLET_PROVIDER_NAME,
-        walletProviderName: WalletProviderName.METAMASK,
+        walletProviderName: providerName as WalletProviderName,
       },
     });
   }, []);
@@ -62,7 +62,7 @@ export function WalletList(props: WalletListProps) {
   const connectCallback = async (ethereumProvider) => {
     if (ethereumProvider.connected && ethereumProvider.session) {
       const web3Provider = new Web3Provider(ethereumProvider as any);
-      selectWeb3Provider(web3Provider);
+      selectWeb3Provider(web3Provider, 'walletconnect');
 
       const chainId = await web3Provider.getSigner().getChainId();
       if (chainId !== targetChainId) {
@@ -130,7 +130,7 @@ export function WalletList(props: WalletListProps) {
             walletProviderName,
           });
           const web3Provider = providerResult.provider;
-          selectWeb3Provider(web3Provider);
+          selectWeb3Provider(web3Provider, walletProviderName);
 
           viewDispatch({
             payload: {
