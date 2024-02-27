@@ -71,11 +71,7 @@ export function NetworkSwitchDrawer({
     return 'wallet';
   }, [provider, isWalletConnect, walletConnectPeerName]);
 
-  // const openWalletUrl = useCallback(() => {
-  //   if (!isWalletConnect) return;
-  //   const redirectUrl = (provider.provider as any)?.session?.peer?.metadata?.redirect?.native;
-  //   window.open(redirectUrl, '_self');
-  // }, [provider, isWalletConnect]);
+  const requireManualSwitch = isWalletConnect && isMetaMaskMobileWalletPeer;
 
   return (
     <Drawer
@@ -105,9 +101,24 @@ export function NetworkSwitchDrawer({
           <Heading size="small" weight="bold" sx={{ textAlign: 'center', paddingX: 'base.spacing.x6' }}>
             {`${t('drawers.networkSwitch.heading')} ${walletDisplayName}`}
           </Heading>
-          <Body size="large" weight="regular" sx={{ textAlign: 'center' }}>
-            {`${t('drawers.networkSwitch.body1')}${targetChainName}${t('drawers.networkSwitch.body2')}`}
-          </Body>
+          {/** MetaMask mobile requires manual switch */}
+          {requireManualSwitch && (
+            <Body size="large" weight="regular" sx={{ textAlign: 'center' }}>
+              {
+              // eslint-disable-next-line max-len
+              `${t('drawers.networkSwitch.manualSwitch.body1')}${targetChainName}${t('drawers.networkSwitch.manualSwitch.body2')}`
+              }
+            </Body>
+          )}
+          {!requireManualSwitch && (
+            <Body size="large" weight="regular" sx={{ textAlign: 'center' }}>
+              {
+              // eslint-disable-next-line max-len
+              `${t('drawers.networkSwitch.controlledSwitch.body1')}${targetChainName}${t('drawers.networkSwitch.controlledSwitch.body2')}`
+              }
+            </Body>
+          )}
+
         </Box>
 
         <Box sx={{
@@ -117,7 +128,7 @@ export function NetworkSwitchDrawer({
           width: '100%',
         }}
         >
-          {(!isWalletConnect || (isWalletConnect && !isMetaMaskMobileWalletPeer)) && (
+          {!requireManualSwitch && (
             <Button
               size="large"
               variant="primary"

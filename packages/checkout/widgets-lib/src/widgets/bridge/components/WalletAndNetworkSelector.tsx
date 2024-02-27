@@ -281,27 +281,6 @@ export function WalletAndNetworkSelector() {
       clearToWalletSelections();
       setFromNetworkDrawerOpen(false);
       setFromNetwork(chainId);
-
-      // const currentNetwork = await fromWalletWeb3Provider?.getNetwork();
-      // if (currentNetwork?.chainId === chainId) {
-      //   setFromNetworkDrawerOpen(false);
-      //   setFromNetwork(chainId);
-      //   return;
-      // }
-
-      // let switchNetwork;
-      // try {
-      //   switchNetwork = await checkout.switchNetwork({
-      //     provider: fromWalletWeb3Provider,
-      //     chainId,
-      //   });
-      //   setFromWalletWeb3Provider(switchNetwork.provider);
-      //   setFromNetworkDrawerOpen(false);
-      //   setFromNetwork(switchNetwork.network.chainId);
-      // } catch (err) {
-      //   // eslint-disable-next-line no-console
-      //   console.error(err);
-      // }
     },
     [checkout, fromWalletWeb3Provider],
   );
