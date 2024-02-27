@@ -24,6 +24,7 @@
     "fees": "node --loader ts-node/esm ./src/fees.ts",
     "flowRateInfo": "node --loader ts-node/esm ./src/flowRateInfo.ts",
     "getMapping": "node --loader ts-node/esm ./src/getMapping.ts",
+    "issueUSDC": "node --loader ts-node/esm ./src/issueUSDC.ts",
     "lint": "eslint ./src --ext .ts --max-warnings=0",
     "mapToken": "node --loader ts-node/esm ./src/mapToken.ts",
     "pending": "node --loader ts-node/esm ./src/pending.ts",
