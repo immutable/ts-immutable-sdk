@@ -1,6 +1,5 @@
 {
   "name": "@examples/x-client",
-  "packageManager": "yarn@3.6.1",
   "dependencies": {
     "@imtbl/sdk": "file:../../sdk",
     "ts-node": "^10.9.2",
@@ -11,6 +10,8 @@
     "tsx": "^4.7.1"
   },
   "scripts": {
-    "stark:randomKey": "tsx  ./src/starkKey.ts"
-  }
+    "starkKey": "tsx ./src/scripts/starkKey.ts",
+    "list-collections": "tsx -r dotenv/config ./src/listCollections.ts"
+  },
+  "type": "module"
 }
