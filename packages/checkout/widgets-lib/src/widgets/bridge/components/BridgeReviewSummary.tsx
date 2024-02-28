@@ -85,6 +85,7 @@ export function BridgeReviewSummary() {
     undefined,
   );
   const [showSwitchNetworkDrawer, setShowSwitchNetworkDrawer] = useState(false);
+
   const [fromWalletLogoUrl, setFromWalletLogoUrl] = useState<string | undefined>(
     undefined,
   );
@@ -243,6 +244,7 @@ export function BridgeReviewSummary() {
       removeChainChangedListener(from?.web3Provider, handleChainChanged);
     };
   }, [from?.web3Provider]);
+
   useEffect(() => {
     if (isWalletConnectEnabled) {
       setFromWalletIsWalletConnect(isWalletConnectProvider(from?.web3Provider));
