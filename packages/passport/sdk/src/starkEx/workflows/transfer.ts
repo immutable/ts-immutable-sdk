@@ -141,7 +141,6 @@ export async function batchNftTransfer({
       });
 
       const requests = await Promise.all(
-        // @ts-ignore - TS is not able to infer the type of the response
         signableResult.data.signable_responses.map(async (resp) => {
           const starkSignature = await starkSigner.signMessage(resp.payload_hash);
           return {
