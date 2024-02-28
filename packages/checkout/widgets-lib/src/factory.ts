@@ -5,7 +5,6 @@ import {
   IWidgetsFactory,
   WidgetConfiguration,
   WidgetProperties,
-  WidgetTheme,
 } from '@imtbl/checkout-sdk';
 import { Connect } from 'widgets/connect/ConnectWidgetRoot';
 import { Swap } from 'widgets/swap/SwapWidgetRoot';
@@ -18,6 +17,7 @@ import { WalletConnectManager } from 'lib/walletConnect';
 import {
   sendProviderUpdatedEvent,
   addProviderListenersForWidgetRoot,
+  DEFAULT_THEME,
 } from './lib';
 import './i18n';
 
@@ -29,7 +29,7 @@ export class WidgetsFactory implements IWidgetsFactory {
   constructor(sdk: Checkout, widgetConfig: WidgetConfiguration) {
     this.sdk = sdk;
     this.widgetConfig = widgetConfig;
-    if (!this.widgetConfig.theme) this.widgetConfig.theme = WidgetTheme.DARK;
+    if (!this.widgetConfig.theme) this.widgetConfig.theme = DEFAULT_THEME;
     if (widgetConfig.walletConnect) {
       try {
         WalletConnectManager.getInstance().initialise(
