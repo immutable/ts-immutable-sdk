@@ -214,7 +214,7 @@ export function BridgeReviewSummary() {
   }, [from?.web3Provider, from?.network, to?.web3Provider, to?.network]);
 
   useEffect(() => {
-    if (!from?.web3Provider) return () => {};
+    if (!from?.web3Provider) return;
 
     const handleChainChanged = () => {
       const newProvider = new Web3Provider(from?.web3Provider.provider);
@@ -223,6 +223,7 @@ export function BridgeReviewSummary() {
     };
     addChainChangedListener(from?.web3Provider, handleChainChanged);
 
+    // eslint-disable-next-line consistent-return
     return () => {
       removeChainChangedListener(from?.web3Provider, handleChainChanged);
     };
@@ -231,12 +232,17 @@ export function BridgeReviewSummary() {
   const submitBridge = useCallback(async () => {
     if (!approveTransaction || !transaction) return;
 
-    const currentChainId = await (from?.web3Provider.provider as any).request({ method: 'eth_chainId', params: [] });
-    // eslint-disable-next-line radix
-    const parsedChainId = parseInt(currentChainId.toString());
-    if (parsedChainId !== from?.network) {
-      setShowSwitchNetworkDrawer(true);
-      return;
+    try {
+      const currentChainId = await (from?.web3Provider.provider as any).request({ method: 'eth_chainId', params: [] });
+      // eslint-disable-next-line radix
+      const parsedChainId = parseInt(currentChainId.toString());
+      if (parsedChainId !== from?.network) {
+        setShowSwitchNetworkDrawer(true);
+        return;
+      }
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Current network check failed', err);
     }
 
     track({

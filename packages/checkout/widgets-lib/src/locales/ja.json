@@ -627,16 +627,14 @@
       }
     },
     "networkSwitch": {
-      "heading": "あなたのネットワークを切り替える ",
+      "heading": "あなたの{{wallet}}でネットワークを切り替える",
       "manualSwitch": {
-        "body1": "続行するにはモバイルウォレットを開き、",
-        "body2": " ネットワークに切り替える必要があります"
+        "body": "続行するにはモバイルウォレットを開き、{{chain}}ネットワークに切り替える必要があります"
       },
       "controlledSwitch": {
-        "body1": "続行するには ",
-        "body2": " ネットワークに切り替える必要があります"
+        "body": "{{chain}}ネットワークに切り替える必要があります"
       },
-      "switchButton": "切り替える "
+      "switchButton": "{{chain}}に切り替える"
     }
   }
 }

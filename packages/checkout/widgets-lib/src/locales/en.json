@@ -634,16 +634,14 @@
       }
     },
     "networkSwitch": {
-      "heading": "Switch network in your ",
+      "heading": "Switch network in your {{wallet}}",
       "manualSwitch": {
-        "body1": "You'll need to open your mobile wallet and switch to the ",
-        "body2": " network to proceed"
+        "body": "You'll need to open your mobile wallet and switch to the {{chain}} network to proceed"
       },
       "controlledSwitch": {
-        "body1": "You'll need to switch to the ",
-        "body2": " network to proceed"
+        "body": "You'll need to switch to the {{chain}} network to proceed"
       },
-      "switchButton": "Switch to "
+      "switchButton": "Switch to {{chain}}"
     }
   }
 }

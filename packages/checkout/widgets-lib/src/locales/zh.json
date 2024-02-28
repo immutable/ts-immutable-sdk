@@ -624,16 +624,14 @@
       }
     },
     "networkSwitch": {
-      "heading": "在您的网络中切换 ",
+      "heading": "在您的{{wallet}}中切换网络",
       "manualSwitch": {
-        "body1": "您需要打开您的移动钱包并切换到 ",
-        "body2": " 网络才能继续进行"
+        "body": "您需要打开您的移动钱包并切换到{{chain}}网络才能继续进行"
       },
       "controlledSwitch": {
-        "body1": "您需要切换到 ",
-        "body2": " 网络才能继续进行"
+        "body": "您需要切换到{{chain}}网络才能继续进行"
       },
-      "switchButton": "切换到 "
+      "switchButton": "切换到{{chain}}"
     }
   }
 }

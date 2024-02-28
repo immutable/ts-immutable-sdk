@@ -99,23 +99,23 @@ export function NetworkSwitchDrawer({
         >
           {networkSwitchImage}
           <Heading size="small" weight="bold" sx={{ textAlign: 'center', paddingX: 'base.spacing.x6' }}>
-            {`${t('drawers.networkSwitch.heading')} ${walletDisplayName}`}
+            {t('drawers.networkSwitch.heading', {
+              wallet: walletDisplayName,
+            })}
           </Heading>
           {/** MetaMask mobile requires manual switch */}
           {requireManualSwitch && (
             <Body size="large" weight="regular" sx={{ textAlign: 'center' }}>
-              {
-              // eslint-disable-next-line max-len
-              `${t('drawers.networkSwitch.manualSwitch.body1')}${targetChainName}${t('drawers.networkSwitch.manualSwitch.body2')}`
-              }
+              {t('drawers.networkSwitch.manualSwitch.body', {
+                chain: targetChainName,
+              })}
             </Body>
           )}
           {!requireManualSwitch && (
             <Body size="large" weight="regular" sx={{ textAlign: 'center' }}>
-              {
-              // eslint-disable-next-line max-len
-              `${t('drawers.networkSwitch.controlledSwitch.body1')}${targetChainName}${t('drawers.networkSwitch.controlledSwitch.body2')}`
-              }
+              {t('drawers.networkSwitch.controlledSwitch.body', {
+                chain: targetChainName,
+              })}
             </Body>
           )}
 
@@ -135,7 +135,9 @@ export function NetworkSwitchDrawer({
               sx={{ width: '100%', marginBottom: 'base.spacing.x2' }}
               onClick={handleSwitchNetwork}
             >
-              {`${t('drawers.networkSwitch.switchButton')}${targetChainName}`}
+              {t('drawers.networkSwitch.switchButton', {
+                chain: targetChainName,
+              })}
             </Button>
           )}
           <FooterLogo />

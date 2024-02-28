@@ -72,13 +72,18 @@ export function SwapButton({
       return;
     }
 
+    try {
     // check for switch network here
-    const currentChainId = await (provider.provider as any).request({ method: 'eth_chainId', params: [] });
-    // eslint-disable-next-line radix
-    const parsedChainId = parseInt(currentChainId.toString());
-    if (parsedChainId !== getL2ChainId(checkout.config)) {
-      openNetworkSwitchDrawer();
-      return;
+      const currentChainId = await (provider.provider as any).request({ method: 'eth_chainId', params: [] });
+      // eslint-disable-next-line radix
+      const parsedChainId = parseInt(currentChainId.toString());
+      if (parsedChainId !== getL2ChainId(checkout.config)) {
+        openNetworkSwitchDrawer();
+        return;
+      }
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Current network check failed', err);
     }
 
     if (!transaction) return;
