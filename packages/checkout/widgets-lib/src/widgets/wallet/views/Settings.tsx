@@ -13,7 +13,13 @@ import { ConnectLoaderContext } from '../../../context/connect-loader-context/Co
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
-export function Settings() {
+export interface SettingsProps {
+  showDisconnectButton: boolean;
+}
+
+export function Settings({
+  showDisconnectButton,
+}: SettingsProps) {
   const { t } = useTranslation();
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
@@ -78,6 +84,7 @@ export function Settings() {
         sx={settingsBoxStyle}
       >
         <WalletAddress provider={provider} />
+        {showDisconnectButton && (
         <Button
           testId="disconnect-button"
           variant="secondary"
@@ -89,6 +96,7 @@ export function Settings() {
         >
           {t('views.SETTINGS.disconnectButton.label')}
         </Button>
+        )}
       </Box>
     </SimpleLayout>
   );
