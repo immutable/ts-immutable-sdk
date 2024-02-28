@@ -1,9 +1,11 @@
-import { Box, MenuItem, useConvertSxToEmotionStyles } from '@biom3/react';
+import { Box, MenuItem } from '@biom3/react';
 import { useTranslation } from 'react-i18next';
 import { EIP6963ProviderDetail } from 'mipd/src/types';
 import { EIP1193Provider } from 'mipd';
 import { ReactElement } from 'react';
+import { WalletProviderName } from '@imtbl/checkout-sdk';
 import { getProviderSlugFromRdns } from '../../../lib/eip6963';
+import { RawImage } from '../../../components/RawImage/RawImage';
 
 export interface WalletProps<RC extends ReactElement | undefined = undefined> {
   onWalletClick: (providerDetail: EIP6963ProviderDetail<EIP1193Provider>) => void;
@@ -20,37 +22,8 @@ export function WalletItem<
   const { t } = useTranslation();
   const { providerDetail, onWalletClick } = props;
   const providerSlug = getProviderSlugFromRdns(providerDetail.info.rdns);
-  const isPassportOrMetamask = providerSlug === 'passport' || providerSlug === 'metamask';
-
-  // const logo = {
-  //   [WalletProviderName.PASSPORT]: 'PassportSymbolOutlined',
-  //   [WalletProviderName.METAMASK]: 'MetaMaskSymbol',
-  // };
-
-  const allStyles = {
-    minw: '16px',
-    padding: '8px',
-    display: 'flex',
-    bg: 'base.color.translucent.standard.100',
-    overflow: 'hidden',
-    borderRadius: '4px',
-    objectFit: 'cover',
-    objectPosition: 'center',
-    backgroundColor: 'base.color.translucent.standard.200',
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexShrink: 0,
-    width: '48px',
-    height: '48px',
-    position: 'absolute',
-  };
-
-  const customStyles = {
-    width: '32px',
-    height: '100%',
-    objectFit: 'contain',
-    objectPosition: '50% 50%',
-  };
+  const isPassportOrMetamask = providerSlug === WalletProviderName.PASSPORT
+    || providerSlug === WalletProviderName.METAMASK;
 
   return (
     <MenuItem
@@ -61,19 +34,7 @@ export function WalletItem<
       onClick={() => onWalletClick(providerDetail)}
       sx={{ marginBottom: 'base.spacing.x1' }}
     >
-      <Box
-        className="FramedImage AspectRatioImage"
-        sx={allStyles}
-        rc={<span />}
-      >
-        <img
-          src={providerDetail.info.icon}
-          alt={providerDetail.info.name}
-          className="CloudImage"
-          style={useConvertSxToEmotionStyles(customStyles)}
-          loading="lazy"
-        />
-      </Box>
+      <RawImage src={providerDetail.info.icon} alt={providerDetail.info.name} sx={{ position: 'absolute' }} />
       <MenuItem.Label size="medium" sx={{ marginLeft: '65px' }}>
         {providerDetail.info.name}
       </MenuItem.Label>

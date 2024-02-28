@@ -28,6 +28,7 @@ import { useWalletConnect } from '../../../lib/hooks/useWalletConnect';
 import { useProviders } from '../../../lib/hooks/useProviders';
 import { getProviderSlugFromRdns } from '../../../lib/eip6963';
 import { useAnimation } from '../../../lib/hooks/useAnimation';
+import { walletListStyle } from './WalletListStyles';
 
 export interface WalletListProps {
   targetChainId: ChainId;
@@ -143,47 +144,48 @@ export function WalletList(props: WalletListProps) {
           animate="show"
         />
       )}
-      sx={{
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'flex-start',
-        position: 'relative',
-      }}
+      sx={walletListStyle}
     >
       {providers.map((providerDetail, index) => (
-        <WalletItem
-          rc={(
-            <motion.div variants={listItemVariants} custom={index} />
-          )}
-          onWalletClick={onWalletClick}
-          providerDetail={providerDetail}
-          key={providerDetail.info.rdns}
-        />
-      ))}
-      {isWalletConnectEnabled && (
-        <MenuItem
-          testId="wallet-list-walletconnect"
-          size="medium"
-          emphasized
-          disabled={walletConnectBusy}
-          onClick={() => handleWalletConnectConnection()}
-          sx={{ marginBottom: 'base.spacing.x1' }}
-        >
-          <MenuItem.FramedLogo
-            logo="WalletConnectSymbol"
-            sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
+        <>
+          <WalletItem
+            onWalletClick={onWalletClick}
+            providerDetail={providerDetail}
+            key={providerDetail.info.rdns}
+            rc={(
+              <motion.div variants={listItemVariants} custom={index} />
+            )}
           />
-          <MenuItem.Label size="medium">
-            {t('wallets.walletconnect.heading')}
-          </MenuItem.Label>
-          <MenuItem.IntentIcon />
-          <MenuItem.Caption>
-            {t('wallets.walletconnect.description')}
-          </MenuItem.Caption>
-        </MenuItem>
-      )}
+          {isWalletConnectEnabled && (index === providers.length - 1) && (
+            <motion.div
+              variants={listItemVariants}
+              custom={providers.length}
+              key="walletconnect"
+            >
+              <MenuItem
+                testId="wallet-list-walletconnect"
+                size="medium"
+                emphasized
+                disabled={walletConnectBusy}
+                onClick={() => handleWalletConnectConnection()}
+                sx={{ marginBottom: 'base.spacing.x1' }}
+              >
+                <MenuItem.FramedLogo
+                  logo="WalletConnectSymbol"
+                  sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
+                />
+                <MenuItem.Label size="medium">
+                  {t('wallets.walletconnect.heading')}
+                </MenuItem.Label>
+                <MenuItem.IntentIcon />
+                <MenuItem.Caption>
+                  {t('wallets.walletconnect.description')}
+                </MenuItem.Caption>
+              </MenuItem>
+            </motion.div>
+          )}
+        </>
+      ))}
     </Box>
   );
 }
