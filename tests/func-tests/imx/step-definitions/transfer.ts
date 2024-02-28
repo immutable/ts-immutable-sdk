@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { parseEther } from '@ethersproject/units';
 import {
-  ImxClientModuleConfiguration,
+  ImxModuleConfiguration,
   GenericIMXProvider,
   ProviderConfiguration,
 } from '@imtbl/sdk/x';
@@ -11,7 +11,7 @@ import { configuration, StepSharedState } from './stepSharedState';
 export class Transfer {
   constructor(protected stepSharedState: StepSharedState) {}
 
-  config: ImxClientModuleConfiguration = {
+  config: ImxModuleConfiguration = {
     baseConfig: { environment: configuration.environment },
   };
 
