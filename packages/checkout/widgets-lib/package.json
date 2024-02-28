@@ -64,6 +64,7 @@
     "react-scripts": "5.0.1",
     "rollup": "^3.17.2",
     "rollup-plugin-svg": "^2.0.0",
+    "rollup-plugin-visualizer": "^5.9.3",
     "ts-jest": "^29.1.0",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
