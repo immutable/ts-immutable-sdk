@@ -632,6 +632,16 @@
       "buttons": {
         "cancel": "Dismiss"
       }
+    },
+    "networkSwitch": {
+      "heading": "Switch network in your {{wallet}}",
+      "manualSwitch": {
+        "body": "You'll need to open your mobile wallet and switch to the {{chain}} network to proceed"
+      },
+      "controlledSwitch": {
+        "body": "You'll need to switch to the {{chain}} network to proceed"
+      },
+      "switchButton": "Switch to {{chain}}"
     }
   }
 }

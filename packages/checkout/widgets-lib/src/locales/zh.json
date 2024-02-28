@@ -622,6 +622,16 @@
       "buttons": {
         "cancel": "关闭"
       }
+    },
+    "networkSwitch": {
+      "heading": "在您的{{wallet}}中切换网络",
+      "manualSwitch": {
+        "body": "您需要打开您的移动钱包并切换到{{chain}}网络才能继续进行"
+      },
+      "controlledSwitch": {
+        "body": "您需要切换到{{chain}}网络才能继续进行"
+      },
+      "switchButton": "切换到{{chain}}"
     }
   }
 }
