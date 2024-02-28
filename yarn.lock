@@ -3899,7 +3899,7 @@ __metadata:
     "@imtbl/generated-clients": 0.0.0
     "@rollup/plugin-typescript": ^11.0.0
     "@swc/jest": ^0.2.24
-    "@types/elliptic": ^6.4.14
+    "@types/elliptic": ^6.4.18
     "@types/jest": ^29.4.3
     axios: ^1.6.5
     bn.js: ^5.2.1
@@ -8967,7 +8967,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/elliptic@npm:^6.4.14":
+"@types/elliptic@npm:^6.4.18":
   version: 6.4.18
   resolution: "@types/elliptic@npm:6.4.18"
   dependencies:
