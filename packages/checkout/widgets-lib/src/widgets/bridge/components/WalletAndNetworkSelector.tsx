@@ -279,35 +279,10 @@ export function WalletAndNetworkSelector() {
       if (!fromWalletWeb3Provider) return;
 
       clearToWalletSelections();
-
-      if (isPassportProvider(fromWalletWeb3Provider)) {
-        setFromNetworkDrawerOpen(false);
-        setFromNetwork(chainId);
-        return;
-      }
-
-      const currentNetwork = await fromWalletWeb3Provider?.getNetwork();
-      if (currentNetwork?.chainId === chainId) {
-        setFromNetworkDrawerOpen(false);
-        setFromNetwork(chainId);
-        return;
-      }
-
-      let switchNetwork;
-      try {
-        switchNetwork = await checkout.switchNetwork({
-          provider: fromWalletWeb3Provider,
-          chainId,
-        });
-        setFromWalletWeb3Provider(switchNetwork.provider);
-        setFromNetworkDrawerOpen(false);
-        setFromNetwork(switchNetwork.network.chainId);
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error(err);
-      }
+      setFromNetworkDrawerOpen(false);
+      setFromNetwork(chainId);
     },
-    [checkout, fromWalletWeb3Provider, fromWalletProviderName, fromNetwork],
+    [checkout, fromWalletWeb3Provider],
   );
 
   const handleSettingToNetwork = useCallback(() => {
@@ -504,6 +479,7 @@ export function WalletAndNetworkSelector() {
         >
           <WalletNetworkButton
             testId={testId}
+            walletProvider={fromWalletWeb3Provider}
             walletName={fromWalletProviderName}
             walletAddress={abbreviateAddress(fromWalletAddress)}
             chainId={fromNetwork}
@@ -582,6 +558,7 @@ export function WalletAndNetworkSelector() {
         >
           <WalletNetworkButton
             testId={testId}
+            walletProvider={toWalletWeb3Provider}
             walletName={toWalletProviderName}
             walletAddress={abbreviateAddress(toWalletAddress)}
             chainId={toNetwork!}

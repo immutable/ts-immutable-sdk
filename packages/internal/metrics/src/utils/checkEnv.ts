@@ -1,4 +1,11 @@
-export function isTestEnvironment() {
+import { isBrowser } from './browser';
+import { errorBoundary } from './errorBoundary';
+
+function isTestEnvironmentFn() {
+  if (isBrowser()) {
+    return false;
+  }
+
   if (typeof process === 'undefined') {
     return false;
   }
@@ -7,3 +14,5 @@ export function isTestEnvironment() {
   // Just use process.env.CI for now.
   return process.env.JEST_WORKER_ID !== undefined;
 }
+
+export const isTestEnvironment = errorBoundary(isTestEnvironmentFn, false);

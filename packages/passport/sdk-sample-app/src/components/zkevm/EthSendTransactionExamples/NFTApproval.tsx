@@ -45,11 +45,13 @@ function NFTApproval({ disabled, handleExampleSubmitted }: RequestExampleProps) 
   const [tokenId, setTokenId] = useState<string>('1');
   const [params, setParams] = useState<any[]>([]);
 
+  const [isUnSafe, setIsUnSafe] = useState<boolean>(false);
   const { zkEvmProvider } = usePassportProvider();
 
   const handleSetApproveType = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
     setChoosedApproveType(e.target.value as ApproveType);
   }, []);
+  const sixteenNativeToken = '16000000000000000000';
 
   useEffect(() => {
     const nftTokenId = tokenId.trim() === '' ? '1' : tokenId;
@@ -57,11 +59,11 @@ function NFTApproval({ disabled, handleExampleSubmitted }: RequestExampleProps) 
       const data = choosedApproveType === ApproveType.NFTApprove
         ? nftApproveContract.encodeFunctionData('approve', [toAddress, nftTokenId])
         : nftApproveContract.encodeFunctionData('setApprovalForAll', [toAddress, true]);
-
+      const transferAmount = isUnSafe ? sixteenNativeToken : '0';
       setParams([{
         from: fromAddress,
         to: erc721ContractAddress,
-        value: '0',
+        value: transferAmount,
         data,
       }]);
     } catch (err) {
@@ -72,7 +74,7 @@ function NFTApproval({ disabled, handleExampleSubmitted }: RequestExampleProps) 
         data: '0x',
       }]);
     }
-  }, [fromAddress, erc721ContractAddress, toAddress, tokenId, choosedApproveType, nftApproveContract]);
+  }, [fromAddress, erc721ContractAddress, toAddress, tokenId, choosedApproveType, nftApproveContract, isUnSafe]);
 
   useEffect(() => {
     const getAddress = async () => {
@@ -174,6 +176,12 @@ function NFTApproval({ disabled, handleExampleSubmitted }: RequestExampleProps) 
               />
             </Form.Group>
           )}
+          <Form.Check
+            onClick={() => { setIsUnSafe(!isUnSafe); }}
+            type="checkbox"
+            id="check-is-unsafe"
+            label="is Unsafe?"
+          />
           <WorkflowButton
             disabled={disabled}
             type="submit"
