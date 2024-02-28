@@ -140,11 +140,14 @@ export const useWalletConnect = ({ checkout }: UseWalletConnectParams) => {
     })
   ), [ethereumProvider, walletConnectModal]);
 
+  const getWalletLogoUrl = useCallback(async () => await WalletConnectManager.getInstance().getWalletLogoUrl(), []);
+
   return {
     isWalletConnectEnabled,
     ethereumProvider,
     walletConnectBusy,
     walletConnectModal,
     openWalletConnectModal,
+    getWalletLogoUrl,
   };
 };

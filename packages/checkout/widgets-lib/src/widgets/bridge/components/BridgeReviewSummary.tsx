@@ -3,7 +3,7 @@ import {
 } from 'react';
 import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import {
-  Body, Box, Button, Heading, Icon, MenuItem,
+  Body, Box, Button, Heading, Icon, Logo, MenuItem,
 } from '@biom3/react';
 import {
   GasEstimateBridgeToL2Result,
@@ -15,6 +15,7 @@ import {
   getWalletProviderNameByProvider,
   isMetaMaskProvider,
   isPassportProvider,
+  isWalletConnectProvider,
 } from 'lib/providerUtils';
 import { calculateCryptoToFiat } from 'lib/utils';
 import {
@@ -32,6 +33,7 @@ import {
 } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { useTranslation } from 'react-i18next';
 import { getWalletLogoByName } from 'lib/logoUtils';
+import { useWalletConnect } from 'lib/hooks/useWalletConnect';
 import { networkIconStyles } from './WalletNetworkButtonStyles';
 import {
   arrowIconStyles,
@@ -41,6 +43,8 @@ import {
   bridgeReviewHeadingStyles,
   bridgeReviewWrapperStyles,
   topMenuItemStyles,
+  wcStickerLogoStyles,
+  wcWalletLogoStyles,
 } from './BridgeReviewSummaryStyles';
 import { BridgeContext } from '../context/BridgeContext';
 import {
@@ -75,6 +79,17 @@ export function BridgeReviewSummary() {
   const [transaction, setTransaction] = useState<BridgeTxResponse | undefined>(
     undefined,
   );
+  const [fromWalletLogoUrl, setFromWalletLogoUrl] = useState<string | undefined>(
+    undefined,
+  );
+  const [toWalletLogoUrl, setToWalletLogoUrl] = useState<string | undefined>(
+    undefined,
+  );
+  const [fromWalletIsWalletConnect, setFromWalletIsWalletConnect] = useState<boolean>(false);
+  const [toWalletIsWalletConnect, setToWalletIsWalletConnect] = useState<boolean>(false);
+  const { isWalletConnectEnabled, getWalletLogoUrl } = useWalletConnect({
+    checkout,
+  });
 
   const displayAmount = useMemo(
     () => (token?.symbol ? `${token?.symbol} ${amount}` : `${amount}`),
@@ -189,6 +204,17 @@ export function BridgeReviewSummary() {
     })();
   }, []);
 
+  useEffect(() => {
+    if (isWalletConnectEnabled) {
+      setFromWalletIsWalletConnect(isWalletConnectProvider(from?.web3Provider));
+      setToWalletIsWalletConnect(isWalletConnectProvider(to?.web3Provider));
+      (async () => {
+        setFromWalletLogoUrl(await getWalletLogoUrl());
+        setToWalletLogoUrl(await getWalletLogoUrl());
+      })();
+    }
+  }, [isWalletConnectEnabled, from, to]);
+
   const submitBridge = useCallback(async () => {
     if (!approveTransaction || !transaction) return;
 
@@ -269,7 +295,17 @@ export function BridgeReviewSummary() {
         emphasized
         sx={bottomMenuItemStyles}
       >
-        {fromWalletProviderName && (
+        {fromWalletIsWalletConnect && fromWalletLogoUrl && (
+          <>
+            <MenuItem.FramedImage
+              imageUrl={fromWalletLogoUrl}
+              alt="walletconnect"
+              sx={wcWalletLogoStyles}
+            />
+            <Logo logo="WalletConnectSymbol" sx={wcStickerLogoStyles} />
+          </>
+        )}
+        {fromWalletProviderName && !fromWalletIsWalletConnect && (
           <MenuItem.FramedLogo
             logo={fromLogo}
             sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
@@ -306,7 +342,17 @@ export function BridgeReviewSummary() {
         emphasized
         sx={topMenuItemStyles}
       >
-        {toWalletProviderName && (
+        {toWalletProviderName && toWalletIsWalletConnect && toWalletLogoUrl && (
+          <>
+            <MenuItem.FramedImage
+              imageUrl={toWalletLogoUrl}
+              alt="walletconnect"
+              sx={wcWalletLogoStyles}
+            />
+            <Logo logo="WalletConnectSymbol" sx={wcStickerLogoStyles} />
+          </>
+        )}
+        {toWalletProviderName && !toWalletIsWalletConnect && (
           <MenuItem.FramedLogo
             logo={toLogo}
             sx={{ backgroundColor: 'base.color.translucent.standard.200' }}

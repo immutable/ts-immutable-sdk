@@ -1,20 +1,28 @@
 import {
-  Body, Box, Button, Heading, Logo,
+  Body, Box, Button, FramedImage, Heading, Logo,
 } from '@biom3/react';
 import { ChainId, WalletProviderName } from '@imtbl/checkout-sdk';
 import { getChainNameById } from 'lib/chains';
 import { getWalletDisplayName, getWalletLogoByName } from 'lib/logoUtils';
 import { networkIcon } from 'lib';
+import { Web3Provider } from '@ethersproject/providers';
+import { useContext, useEffect, useState } from 'react';
+import { useWalletConnect } from 'lib/hooks/useWalletConnect';
+import { isWalletConnectProvider } from 'lib/providerUtils';
 import {
   networkButtonStyles,
   networkIconStyles,
   walletButtonOuterStyles,
   walletCaptionStyles,
   walletLogoStyles,
+  wcStickerLogoStyles,
+  wcWalletLogoStyles,
 } from './WalletNetworkButtonStyles';
+import { BridgeContext } from '../context/BridgeContext';
 
 interface WalletNetworkButtonProps {
   testId: string;
+  walletProvider: Web3Provider;
   walletName: WalletProviderName | string;
   walletAddress: string;
   chainId: ChainId;
@@ -24,6 +32,7 @@ interface WalletNetworkButtonProps {
 }
 export function WalletNetworkButton({
   testId,
+  walletProvider,
   walletName,
   walletAddress,
   chainId,
@@ -34,6 +43,25 @@ export function WalletNetworkButton({
   const networkName = getChainNameById(chainId);
   const walletHeading = getWalletDisplayName(walletName);
   const walletLogo = getWalletLogoByName(walletName);
+  const [walletLogoUrl, setWalletLogoUrl] = useState<string | undefined>(
+    undefined,
+  );
+  const [isWalletConnect, setIsWalletConnect] = useState<boolean>(false);
+  const {
+    bridgeState: { checkout },
+  } = useContext(BridgeContext);
+  const { isWalletConnectEnabled, getWalletLogoUrl } = useWalletConnect({
+    checkout,
+  });
+
+  useEffect(() => {
+    if (isWalletConnectEnabled) {
+      setIsWalletConnect(isWalletConnectProvider(walletProvider));
+      (async () => {
+        setWalletLogoUrl(await getWalletLogoUrl());
+      })();
+    }
+  }, [isWalletConnectEnabled, walletProvider]);
 
   return (
     <Box
@@ -41,7 +69,18 @@ export function WalletNetworkButton({
       sx={walletButtonOuterStyles}
       onClick={onWalletClick}
     >
-      <Logo logo={walletLogo as any} sx={walletLogoStyles(walletName)} />
+      {isWalletConnect && walletLogoUrl ? (
+        <>
+          <FramedImage
+            imageUrl={walletLogoUrl}
+            alt="walletconnect"
+            sx={wcWalletLogoStyles}
+          />
+          <Logo logo="WalletConnectSymbol" sx={wcStickerLogoStyles} />
+        </>
+      ) : (
+        <Logo logo={walletLogo as any} sx={walletLogoStyles(walletName)} />
+      )}
       <Box
         sx={{
           display: 'flex',
