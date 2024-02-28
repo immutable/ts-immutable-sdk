@@ -2,7 +2,7 @@ import { Box, Button } from '@biom3/react';
 import { useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useWalletConnect } from 'lib/hooks/useWalletConnect';
-import { isMetaMaskProvider, isPassportProvider, isWalletConnectProvider } from 'lib/providerUtils';
+import { isWalletConnectProvider } from 'lib/providerUtils';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -30,32 +30,34 @@ export function Settings() {
     });
   }, []);
 
+  // disconnect all Wallet Connect pairings and disconnect the provider
+  // so that restoreSession doesn't pick up the previous sessions
   const handleWCDisconnect = async () => {
-    if (isPassportProvider(provider)) {
-      console.log('disconnecting passport provider by calling logout on Passport');
-      await checkout?.passport?.logout();
-      console.log('disconnected');
-      return;
-    }
-
-    if (isMetaMaskProvider(provider)) {
-      console.log('disconnecting MetaMask provider by revoking permissions');
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      await (provider?.provider as any).request({ method: 'wallet_revokePermissions', params: [{ eth_accounts: {} }] });
-      console.log('disconnected');
-      return;
-    }
-
     if (isWalletConnectProvider(provider)) {
-      console.log('disconnecting WalletConnect by disconnecting all pairings and then provider disconnect');
-      if (ethereumProvider?.session) {
-        const pairings = ethereumProvider?.signer.client.core.pairing.getPairings();
-        console.log('pairings', pairings);
-        // eslint-disable-next-line max-len
-        const pairingsToDisconnect = pairings.map((pairing) => ethereumProvider?.signer.client.core.pairing.disconnect({ topic: pairing.topic }));
-        await Promise.allSettled(pairingsToDisconnect);
-        await ethereumProvider.disconnect();
-        console.log('disconnected');
+      try {
+        if ((provider!.provider as any)?.session) {
+          const pairings = (provider!.provider as any)?.signer.client.core.pairing.getPairings();
+          if (pairings && pairings.length > 0) {
+            // eslint-disable-next-line max-len
+            const pairingsToDisconnect = pairings.map((pairing) => ethereumProvider?.signer.client.core.pairing.disconnect({ topic: pairing.topic }));
+            await Promise.allSettled(pairingsToDisconnect);
+          }
+          await (provider!.provider as any).disconnect();
+          return;
+        }
+
+        if (ethereumProvider) {
+          const pairings = ethereumProvider?.signer.client.core.pairing.getPairings();
+          if (pairings && pairings.length > 0) {
+            // eslint-disable-next-line max-len
+            const pairingsToDisconnect = pairings.map((pairing) => ethereumProvider?.signer.client.core.pairing.disconnect({ topic: pairing.topic }));
+            await Promise.allSettled(pairingsToDisconnect);
+          }
+          await ethereumProvider.disconnect();
+        }
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error(err);
       }
     }
   };
