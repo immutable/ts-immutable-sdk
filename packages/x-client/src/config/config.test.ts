@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { imx } from '@imtbl/generated-clients';
 import {
-  Config,
+  createConfig,
   ImmutableXConfiguration,
   Environment,
   imxClientConfig,
@@ -11,7 +11,7 @@ const defaultHeaders = { 'x-sdk-version': 'ts-immutable-sdk-__SDK_VERSION__' };
 
 describe('createConfig', () => {
   it('should throw if basePath is whitespace', () => {
-    expect(() => Config.createConfig({
+    expect(() => createConfig({
       coreContractAddress: '0x1',
       registrationContractAddress: '0x2',
       chainID: 3,
@@ -20,7 +20,7 @@ describe('createConfig', () => {
   });
 
   it('should throw if basePath is empty', () => {
-    expect(() => Config.createConfig({
+    expect(() => createConfig({
       coreContractAddress: '0x1',
       registrationContractAddress: '0x2',
       chainID: 3,
@@ -51,7 +51,7 @@ describe('createConfig', () => {
       },
     };
 
-    const actual = Config.createConfig({
+    const actual = createConfig({
       coreContractAddress,
       registrationContractAddress,
       chainID,
@@ -89,7 +89,7 @@ describe('createConfig', () => {
       },
     };
 
-    const actual = Config.createConfig({
+    const actual = createConfig({
       coreContractAddress,
       registrationContractAddress,
       chainID,

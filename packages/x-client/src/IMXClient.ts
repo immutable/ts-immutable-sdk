@@ -1,7 +1,7 @@
 import { ImxApiClients } from '@imtbl/generated-clients';
 import {
   ImxConfiguration,
-  ImxModuleConfiguration as ImxClientModuleConfiguration, // preserve old name for backwards compatibility
+  ImxModuleConfiguration,
 } from './config';
 import { formatError } from './utils/formatError';
 import {
@@ -106,7 +106,7 @@ export class IMXClient {
 
   public workflows: Workflows;
 
-  constructor(config: ImxClientModuleConfiguration) {
+  constructor(config: ImxModuleConfiguration) {
     const imxConfig = new ImxConfiguration(config);
     this.immutableX = new ImxApiClients(imxConfig.immutableXConfig.apiConfiguration);
     this.assetApi = this.immutableX.assetApi;
@@ -850,5 +850,4 @@ export class IMXClient {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export const ImmutableX = IMXClient;
+export class ImmutableX extends IMXClient {}

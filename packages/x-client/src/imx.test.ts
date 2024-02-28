@@ -2,7 +2,7 @@ import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { AxiosRequestConfig } from 'axios';
 import { IMXClient } from './IMXClient';
 import {
-  Config,
+  createConfig,
   ImxConfiguration,
   ImxModuleConfiguration,
   createImmutableXConfiguration,
@@ -80,7 +80,7 @@ describe('IMXClient', () => {
   it('should instantiate a IMXClient with override and custom SDK version', async () => {
     const sdkVersion = 'ts-immutable-sdk-0.0.1';
 
-    const immutableXConfig = Config.createConfig({
+    const immutableXConfig = createConfig({
       basePath: 'https://api.sandbox.x.immutable.com',
       chainID: 1,
       coreContractAddress: '0x5FDCCA53617f4d2b9134B29090C87D01058e27e9',

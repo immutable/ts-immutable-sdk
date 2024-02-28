@@ -7,8 +7,7 @@ import {
 } from '@imtbl/config';
 
 export { Environment, ImmutableConfiguration } from '@imtbl/config';
-const ApiConfiguration = imx.Configuration;
-export { ApiConfiguration };
+export class ApiConfiguration extends imx.Configuration {}
 
 const defaultHeaders = { 'x-sdk-version': 'ts-immutable-sdk-__SDK_VERSION__' };
 
@@ -35,7 +34,7 @@ export interface ImmutableXConfiguration {
   /**
    * The configuration for the API client
    */
-  apiConfiguration: imx.Configuration;
+  apiConfiguration: ApiConfiguration;
   /**
    * The configuration for the Ethereum network
    */
@@ -43,9 +42,9 @@ export interface ImmutableXConfiguration {
 }
 
 /**
- * @dev Copied from Core SDK as a convenience for migrating away from Core SDK
+ * @dev use createImmutableXConfiguration instead
  */
-const createConfig = ({
+export const createConfig = ({
   coreContractAddress,
   registrationContractAddress,
   chainID,
@@ -76,33 +75,6 @@ const createConfig = ({
       chainID,
     },
   };
-};
-
-/**
- * Creates a Configuration for the specified environment
- * @dev Copied from Core SDK as a convenience for migrating away from Core SDK
- * @returns an ImmutableXConfiguration
- */
-export const Config = {
-  get PRODUCTION() {
-    return createConfig({
-      basePath: 'https://api.x.immutable.com',
-      chainID: 1,
-      coreContractAddress: '0x5FDCCA53617f4d2b9134B29090C87D01058e27e9',
-      registrationContractAddress: '0x72a06bf2a1CE5e39cBA06c0CAb824960B587d64c',
-    });
-  },
-
-  get SANDBOX() {
-    return createConfig({
-      basePath: 'https://api.sandbox.x.immutable.com',
-      chainID: 11155111,
-      coreContractAddress: '0x2d5C349fD8464DA06a3f90b4B0E9195F3d1b7F98',
-      registrationContractAddress: '0xDbA6129C02E69405622fAdc3d5A7f8d23eac3b97',
-    });
-  },
-
-  createConfig,
 };
 
 /**
