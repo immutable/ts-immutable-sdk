@@ -68,6 +68,7 @@
       "packages/x-provider/src/sample-app",
       "packages/passport/sdk",
       "packages/passport/sdk-sample-app",
+      "packages/passport/wagmi-connector",
       "packages/orderbook",
       "packages/internal/version-check",
       "packages/internal/metrics",
