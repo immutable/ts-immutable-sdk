@@ -25,9 +25,10 @@ export const useWalletConnect = ({ checkout }: UseWalletConnectParams) => {
   useEffect(() => {
     if (!checkout) return;
     (async () => {
-      const connectConfig = await checkout.config.remote.getConfig('connect') as any;
+      // const connectConfig = await checkout.config.remote.getConfig('connect') as any;
       setIsWalletConnectEnabled(
-        connectConfig?.walletConnect
+        // connectConfig?.walletConnect
+        true
         && WalletConnectManager.getInstance().isInitialised,
       );
     })();
