@@ -479,6 +479,7 @@ export function WalletAndNetworkSelector() {
         >
           <WalletNetworkButton
             testId={testId}
+            walletProvider={fromWalletWeb3Provider}
             walletName={fromWalletProviderName}
             walletAddress={abbreviateAddress(fromWalletAddress)}
             chainId={fromNetwork}
@@ -557,6 +558,7 @@ export function WalletAndNetworkSelector() {
         >
           <WalletNetworkButton
             testId={testId}
+            walletProvider={toWalletWeb3Provider}
             walletName={toWalletProviderName}
             walletAddress={abbreviateAddress(toWalletAddress)}
             chainId={toNetwork!}
