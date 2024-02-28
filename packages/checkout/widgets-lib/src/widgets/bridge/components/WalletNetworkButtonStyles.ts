@@ -9,6 +9,7 @@ export const logoColour = {
 };
 
 export const walletButtonOuterStyles = {
+  position: 'relative',
   width: '100%',
   backgroundColor: 'base.color.translucent.emphasis.100',
   borderRadius: 'base.borderRadius.x4',
@@ -25,9 +26,29 @@ export const walletButtonOuterStyles = {
   },
 };
 
+export const wcWalletLogoStyles = {
+  width: 'base.icon.size.500',
+  backgroundColor: 'base.color.translucent.standard.200',
+  borderRadius: 'base.borderRadius.x2',
+};
+
+export const wcStickerLogoStyles = {
+  position: 'absolute',
+  top: '14px',
+  left: '38px',
+  width: '28px',
+  padding: 'base.spacing.x1',
+  backgroundColor: 'base.color.translucent.inverse.900',
+  borderRadius: 'base.borderRadius.x2',
+};
+
 export const walletLogoStyles = (walletName: WalletProviderName | string) => ({
   width: 'base.icon.size.500',
-  padding: walletName === WalletProviderName.PASSPORT ? 'base.spacing.x1' : '',
+  padding:
+    // eslint-disable-next-line no-constant-condition
+    walletName === WalletProviderName.PASSPORT || 'walletconnect'
+      ? 'base.spacing.x1'
+      : '',
   backgroundColor: 'base.color.translucent.standard.200',
   borderRadius: 'base.borderRadius.x2',
 });
@@ -39,11 +60,10 @@ export const networkButtonStyles = {
   borderRadius: 'base.borderRadius.x18',
 };
 
-export const networkIconStyles = (chainId:ChainId) => ({
+export const networkIconStyles = (chainId: ChainId) => ({
   fill: 'base.color.brand.2',
   width: 'base.icon.size.300',
   backgroundColor: logoColour[chainId],
   borderRadius: '100%',
   padding: 'base.spacing.x1',
-}
-);
+});

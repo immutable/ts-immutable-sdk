@@ -2,12 +2,28 @@ export const topMenuItemStyles = {
   borderBottomLeftRadius: '0px',
   borderBottomRightRadius: '0px',
   marginBottom: '2px',
+  position: 'relative',
 };
 
 export const bottomMenuItemStyles = {
   borderTopLeftRadius: '0px',
   borderTopRightRadius: '0px',
   backgroundColor: 'base.color.translucent.emphasis.100',
+  position: 'relative',
+};
+
+export const wcWalletLogoStyles = {
+  width: 'base.icon.size.400',
+};
+
+export const wcStickerLogoStyles = {
+  position: 'absolute',
+  top: '2px',
+  left: '26px',
+  width: '20px',
+  padding: '2px',
+  backgroundColor: 'base.color.translucent.inverse.900',
+  borderRadius: 'base.borderRadius.x2',
 };
 
 export const bridgeReviewWrapperStyles = {
