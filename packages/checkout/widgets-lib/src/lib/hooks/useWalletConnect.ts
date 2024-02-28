@@ -71,7 +71,7 @@ export const useWalletConnect = ({ checkout }: UseWalletConnectParams) => {
                   // eslint-disable-next-line no-console
                   console.log('activate succeeded but there is no connected session');
                 }
-              // eslint-disable-next-line no-console
+                // eslint-disable-next-line no-console
               }).catch((err) => console.log('activate existing pairing error', err));
           }
         } catch (err) {

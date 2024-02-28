@@ -22,7 +22,9 @@ import {
   DEFAULT_QUOTE_REFRESH_INTERVAL,
   DEFAULT_TOKEN_DECIMALS,
   NATIVE,
+  addChainChangedListener,
   networkIcon,
+  removeChainChangedListener,
 } from 'lib';
 import { useInterval } from 'lib/hooks/useInterval';
 import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
@@ -33,6 +35,8 @@ import {
 } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { useTranslation } from 'react-i18next';
 import { getWalletLogoByName } from 'lib/logoUtils';
+import { NetworkSwitchDrawer } from 'components/NetworkSwitchDrawer/NetworkSwitchDrawer';
+import { Web3Provider } from '@ethersproject/providers';
 import { useWalletConnect } from 'lib/hooks/useWalletConnect';
 import { networkIconStyles } from './WalletNetworkButtonStyles';
 import {
@@ -46,7 +50,7 @@ import {
   wcStickerLogoStyles,
   wcWalletLogoStyles,
 } from './BridgeReviewSummaryStyles';
-import { BridgeContext } from '../context/BridgeContext';
+import { BridgeActions, BridgeContext } from '../context/BridgeContext';
 import {
   ViewActions,
   ViewContext,
@@ -64,6 +68,7 @@ export function BridgeReviewSummary() {
     bridgeState: {
       checkout, tokenBridge, from, to, token, amount,
     },
+    bridgeDispatch,
   } = useContext(BridgeContext);
 
   const { track } = useAnalytics();
@@ -79,6 +84,8 @@ export function BridgeReviewSummary() {
   const [transaction, setTransaction] = useState<BridgeTxResponse | undefined>(
     undefined,
   );
+  const [showSwitchNetworkDrawer, setShowSwitchNetworkDrawer] = useState(false);
+
   const [fromWalletLogoUrl, setFromWalletLogoUrl] = useState<string | undefined>(
     undefined,
   );
@@ -204,6 +211,40 @@ export function BridgeReviewSummary() {
     })();
   }, []);
 
+  const handleNetworkSwitch = useCallback((provider: Web3Provider) => {
+    bridgeDispatch({
+      payload: {
+        type: BridgeActions.SET_WALLETS_AND_NETWORKS,
+        from: {
+          web3Provider: provider,
+          walletAddress: from?.walletAddress!,
+          network: from?.network!,
+        },
+        to: {
+          web3Provider: to?.web3Provider!,
+          walletAddress: to?.walletAddress!,
+          network: to?.network!,
+        },
+      },
+    });
+  }, [from?.web3Provider, from?.network, to?.web3Provider, to?.network]);
+
+  useEffect(() => {
+    if (!from?.web3Provider) return;
+
+    const handleChainChanged = () => {
+      const newProvider = new Web3Provider(from?.web3Provider.provider);
+      handleNetworkSwitch(newProvider);
+      setShowSwitchNetworkDrawer(false);
+    };
+    addChainChangedListener(from?.web3Provider, handleChainChanged);
+
+    // eslint-disable-next-line consistent-return
+    return () => {
+      removeChainChangedListener(from?.web3Provider, handleChainChanged);
+    };
+  }, [from?.web3Provider]);
+
   useEffect(() => {
     if (isWalletConnectEnabled) {
       setFromWalletIsWalletConnect(isWalletConnectProvider(from?.web3Provider));
@@ -217,6 +258,19 @@ export function BridgeReviewSummary() {
 
   const submitBridge = useCallback(async () => {
     if (!approveTransaction || !transaction) return;
+
+    try {
+      const currentChainId = await (from?.web3Provider.provider as any).request({ method: 'eth_chainId', params: [] });
+      // eslint-disable-next-line radix
+      const parsedChainId = parseInt(currentChainId.toString());
+      if (parsedChainId !== from?.network) {
+        setShowSwitchNetworkDrawer(true);
+        return;
+      }
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Current network check failed', err);
+    }
 
     track({
       userJourney: UserJourney.BRIDGE,
@@ -254,7 +308,7 @@ export function BridgeReviewSummary() {
         },
       },
     });
-  }, [viewDispatch, approveTransaction, transaction]);
+  }, [viewDispatch, approveTransaction, transaction, from?.web3Provider, from?.network]);
 
   return (
     <Box testId={testId} sx={bridgeReviewWrapperStyles}>
@@ -417,6 +471,14 @@ export function BridgeReviewSummary() {
           )}
         </Button>
       </Box>
+      <NetworkSwitchDrawer
+        visible={showSwitchNetworkDrawer}
+        targetChainId={from?.network!}
+        provider={from?.web3Provider!}
+        checkout={checkout}
+        onCloseDrawer={() => setShowSwitchNetworkDrawer(false)}
+        onNetworkSwitch={handleNetworkSwitch}
+      />
     </Box>
   );
 }

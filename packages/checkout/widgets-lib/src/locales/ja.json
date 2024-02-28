@@ -625,6 +625,16 @@
       "buttons": {
         "cancel": "閉じる"
       }
+    },
+    "networkSwitch": {
+      "heading": "あなたの{{wallet}}でネットワークを切り替える",
+      "manualSwitch": {
+        "body": "続行するにはモバイルウォレットを開き、{{chain}}ネットワークに切り替える必要があります"
+      },
+      "controlledSwitch": {
+        "body": "{{chain}}ネットワークに切り替える必要があります"
+      },
+      "switchButton": "{{chain}}に切り替える"
     }
   }
 }
