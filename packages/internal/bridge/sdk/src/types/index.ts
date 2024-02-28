@@ -103,13 +103,13 @@ export enum BridgeFeeActions {
  */
 export enum BridgeMethodsGasLimit { // @TODO test methods on chain and put correct values here
   DEPOSIT_SOURCE = 150000,
-  DEPOSIT_DESTINATION = 200000,
+  DEPOSIT_DESTINATION = 160000,
   WITHDRAW_SOURCE = 150000,
-  WITHDRAW_DESTINATION = 250000,
+  WITHDRAW_DESTINATION = 160000,
   MAP_TOKEN_SOURCE = 200000,
   MAP_TOKEN_DESTINATION = 200000,
   FINALISE_WITHDRAWAL = 200000,
-  APPROVE_TOKEN = 55000,
+  APPROVE_TOKEN = 50000,
 }
 
 export interface FeeData {
@@ -142,8 +142,10 @@ export interface DepositNativeFeeRequest {
   gasMultiplier: number;
   sourceChainId: string;
   destinationChainId: string;
+  token: 'NATIVE',
   amount: ethers.BigNumber;
   senderAddress: Address;
+  recipientAddress: Address;
 }
 
 /**
@@ -163,6 +165,7 @@ export interface DepositERC20FeeRequest {
   token: FungibleToken;
   amount: ethers.BigNumber;
   senderAddress: Address;
+  recipientAddress: Address;
 }
 
 /**
@@ -177,8 +180,10 @@ export interface WithdrawNativeFeeRequest {
   gasMultiplier: number;
   sourceChainId: string;
   destinationChainId: string;
+  token: 'NATIVE',
   amount: ethers.BigNumber;
   senderAddress: Address;
+  recipientAddress: Address;
 }
 
 /**
@@ -198,6 +203,7 @@ export interface WithdrawERC20FeeRequest {
   token: FungibleToken;
   amount: ethers.BigNumber;
   senderAddress: Address;
+  recipientAddress: Address;
 }
 
 /**
@@ -208,6 +214,14 @@ export interface WithdrawERC20FeeRequest {
 export interface FinaliseFeeRequest {
   action: BridgeFeeActions.FINALISE_WITHDRAWAL,
   sourceChainId: string;
+}
+
+export interface GetAllowanceResponse {
+  erc20Contract: ethers.Contract,
+  allowance: ethers.BigNumber,
+  amount: ethers.BigNumber,
+  amountToApprove: ethers.BigNumber,
+  contractToApprove: string,
 }
 
 /**
@@ -231,6 +245,11 @@ export interface BridgeFeeResponse {
   bridgeFee: ethers.BigNumber,
   imtblFee: ethers.BigNumber,
   totalFees: ethers.BigNumber,
+}
+
+export interface TenderlyGasEstimatesResponse {
+  approvalFee: ethers.BigNumber,
+  sourceChainGas: ethers.BigNumber,
 }
 
 /**

@@ -31,9 +31,6 @@ export const SUPPORTED_BRIDGES_FOR_ENVIRONMENT: {
   [Environment.PRODUCTION]: SUPPORTED_PRODUCTION_BRIDGES,
 };
 
-// @TODO update the childChainERC20Bridge and rootChainERC20BridgeFlowRate when available
-//  and remove any unused addresses
-
 /**
  * @constant {Map<BridgeInstance, BridgeContracts>} CONTRACTS_FOR_BRIDGE - A map of bridge instances to their associated contract addresses.
  */

@@ -36,7 +36,9 @@ async function getBridgeFees() {
     sourceChainId: bridgeConfig.bridgeInstance.rootChainID,
     destinationChainId: bridgeConfig.bridgeInstance.childChainID,
     amount: params.amount,
+    token: params.rootToken,
     senderAddress: params.sender,
+    recipientAddress: params.recipient,
   }
 
   console.log('depositReq', depositReq);
@@ -51,7 +53,9 @@ async function getBridgeFees() {
     sourceChainId: bridgeConfig.bridgeInstance.childChainID,
     destinationChainId: bridgeConfig.bridgeInstance.rootChainID,
     amount: params.amount,
+    token: params.childToken,
     senderAddress: params.sender,
+    recipientAddress: params.recipient,
   }
 
   console.log('withdrawReq', withdrawReq)

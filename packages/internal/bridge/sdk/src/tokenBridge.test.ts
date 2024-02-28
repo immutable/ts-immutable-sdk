@@ -546,6 +546,8 @@ describe('Token Bridge', () => {
     const imtblFee:ethers.BigNumber = ethers.BigNumber.from(0);
     const totalFees:ethers.BigNumber = sourceChainGas.add(bridgeFee).add(imtblFee);
     const sender = '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772';
+    const receipient = '0xA383968dC8711FFE8A7353AdE9feF7Ddcb1473a0';
+    const token = '0x40b87d235A5B010a20A241F15797C9debf1ecd01';
 
     beforeEach(() => {
       const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
@@ -586,7 +588,9 @@ describe('Token Bridge', () => {
           sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
           destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
           amount,
+          token: 'NATIVE',
           senderAddress: sender,
+          recipientAddress: receipient,
         },
       );
 
@@ -611,9 +615,10 @@ describe('Token Bridge', () => {
           gasMultiplier: 1.1,
           sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
           destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
-          token: '0x40b87d235A5B010a20A241F15797C9debf1ecd01',
           amount,
+          token,
           senderAddress: sender,
+          recipientAddress: receipient,
         },
       );
 
@@ -638,9 +643,10 @@ describe('Token Bridge', () => {
           gasMultiplier: 1.1,
           sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
           destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
-          token: '0x40b87d235A5B010a20A241F15797C9debf1ecd01',
           amount,
+          token,
           senderAddress: sender,
+          recipientAddress: receipient,
         },
       );
 
@@ -662,7 +668,9 @@ describe('Token Bridge', () => {
           sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
           destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
           amount,
+          token: 'NATIVE',
           senderAddress: sender,
+          recipientAddress: receipient,
         },
       );
 
@@ -687,9 +695,10 @@ describe('Token Bridge', () => {
           gasMultiplier: 1.1,
           sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
           destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
-          token: '0x40b87d235A5B010a20A241F15797C9debf1ecd01',
           amount,
+          token,
           senderAddress: sender,
+          recipientAddress: receipient,
         },
       );
 
@@ -714,9 +723,10 @@ describe('Token Bridge', () => {
           gasMultiplier: 1.1,
           sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
           destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
-          token: '0x40b87d235A5B010a20A241F15797C9debf1ecd01',
           amount,
+          token,
           senderAddress: sender,
+          recipientAddress: receipient,
         },
       );
 
