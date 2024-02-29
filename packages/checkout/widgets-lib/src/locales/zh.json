@@ -47,6 +47,7 @@
       "zkEVM": {
         "heading": "将要求您切换到Immutable zkEVM网络",
         "body": "检查MetaMask的弹窗并选择'批准'以切换。如果这是第一次，MetaMask还会要求您添加网络。",
+        "bodyWalletConnect": "请检查您的钱包弹出窗口以进行切换。如果这是第一次，您的钱包还会要求您添加网络。",
         "button": {
           "text": "准备切换",
           "retryText": "再试一次"
