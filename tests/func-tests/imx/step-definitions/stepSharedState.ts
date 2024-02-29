@@ -2,8 +2,8 @@ import { Wallet } from '@ethersproject/wallet';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { ethers } from 'ethers';
 import {
-  imxClientCreateStarkSigner,
-  ImxClientWalletConnection,
+  createStarkSigner,
+  WalletConnection,
   UnsignedOrderRequest,
 } from '@imtbl/sdk/x';
 import { Environment, ImmutableConfiguration } from '@imtbl/sdk/config';
@@ -26,7 +26,7 @@ const generateWalletConnection = async (
   privateKey: string,
   starkPrivateKey: string,
   rpcProvider: JsonRpcProvider,
-): Promise<ImxClientWalletConnection> => {
+): Promise<WalletConnection> => {
   if (!privateKey) {
     throw new Error('PrivateKey required!');
   }
@@ -35,7 +35,7 @@ const generateWalletConnection = async (
   const ethSigner = new Wallet(privateKey).connect(rpcProvider);
 
   // L2 credentials
-  const starkSigner = imxClientCreateStarkSigner(starkPrivateKey);
+  const starkSigner = createStarkSigner(starkPrivateKey);
 
   return {
     ethSigner,
@@ -44,12 +44,12 @@ const generateWalletConnection = async (
 };
 
 export class StepSharedState {
-  private minter?: ImxClientWalletConnection;
+  private minter?: WalletConnection;
 
-  private banker?: ImxClientWalletConnection;
+  private banker?: WalletConnection;
 
   users: {
-    [key: string]: ImxClientWalletConnection;
+    [key: string]: WalletConnection;
   } = {};
 
   nfts: {
@@ -107,7 +107,7 @@ export class StepSharedState {
   //   [key: string]: NftsecondarytransactionCreateResponse
   // } = {};
 
-  public async getMinter(): Promise<ImxClientWalletConnection> {
+  public async getMinter(): Promise<WalletConnection> {
     if (this.minter !== undefined) {
       return this.minter;
     }
@@ -122,7 +122,7 @@ export class StepSharedState {
     return this.minter;
   }
 
-  public async getBanker(): Promise<ImxClientWalletConnection> {
+  public async getBanker(): Promise<WalletConnection> {
     if (this.banker !== undefined) {
       return this.banker;
     }

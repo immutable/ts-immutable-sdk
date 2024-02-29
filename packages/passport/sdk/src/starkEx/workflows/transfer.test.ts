@@ -1,4 +1,5 @@
-import { TransfersApi, UnsignedTransferRequest } from '@imtbl/core-sdk';
+import { imx } from '@imtbl/generated-clients';
+import { UnsignedTransferRequest } from '@imtbl/x-client';
 import { PassportError, PassportErrorType } from '../../errors/passportError';
 import { mockErrorMessage, mockStarkSignature, mockUserImx } from '../../test/mocks';
 import { batchNftTransfer, transfer } from './transfer';
@@ -24,7 +25,7 @@ describe('transfer', () => {
   describe('single transfer', () => {
     let getSignableTransferV1Mock: jest.Mock;
     let createTransferV1Mock: jest.Mock;
-    let transferApiMock: TransfersApi;
+    let transferApiMock: imx.TransfersApi;
 
     const mockReceiver = 'AAA';
     const type = 'ERC721';
@@ -43,7 +44,7 @@ describe('transfer', () => {
       transferApiMock = {
         getSignableTransferV1: getSignableTransferV1Mock,
         createTransferV1: createTransferV1Mock,
-      } as unknown as TransfersApi;
+      } as unknown as imx.TransfersApi;
     });
 
     it('should return success transfer result', async () => {
@@ -173,7 +174,7 @@ describe('transfer', () => {
   describe('batchNftTransfer', () => {
     let mockGetSignableTransfer: jest.Mock;
     let mockCreateTransfer: jest.Mock;
-    let mockTransferApi: TransfersApi;
+    let mockTransferApi: imx.TransfersApi;
 
     const transferRequest = [
       {
@@ -191,7 +192,7 @@ describe('transfer', () => {
       mockTransferApi = {
         getSignableTransfer: mockGetSignableTransfer,
         createTransfer: mockCreateTransfer,
-      } as unknown as TransfersApi;
+      } as unknown as imx.TransfersApi;
     });
 
     it('should make a successful batch transfer request', async () => {
