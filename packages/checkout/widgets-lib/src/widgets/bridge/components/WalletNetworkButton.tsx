@@ -1,30 +1,32 @@
 import {
   Body, Box, Button, FramedImage, Heading, Logo,
 } from '@biom3/react';
-import { ChainId, WalletProviderName } from '@imtbl/checkout-sdk';
+import { ChainId, WalletProviderRdns } from '@imtbl/checkout-sdk';
 import { getChainNameById } from 'lib/chains';
-import { getWalletDisplayName, getWalletLogoByName } from 'lib/logoUtils';
 import { networkIcon } from 'lib';
 import { Web3Provider } from '@ethersproject/providers';
 import { useContext, useEffect, useState } from 'react';
 import { useWalletConnect } from 'lib/hooks/useWalletConnect';
 import { isWalletConnectProvider } from 'lib/providerUtils';
+import { EIP1193Provider } from 'mipd';
+import { EIP6963ProviderDetail } from 'mipd/src/types';
 import {
   networkButtonStyles,
   networkIconStyles,
   walletButtonOuterStyles,
   walletCaptionStyles,
-  walletLogoStyles,
   wcStickerLogoStyles,
   wcWalletLogoStyles,
 } from './WalletNetworkButtonStyles';
 import { BridgeContext } from '../context/BridgeContext';
+import { RawImage } from '../../../components/RawImage/RawImage';
 
 interface WalletNetworkButtonProps {
   testId: string;
   walletProvider: Web3Provider;
-  walletName: WalletProviderName | string;
+  walletProviderDetail: EIP6963ProviderDetail<EIP1193Provider> | undefined;
   walletAddress: string;
+  walletName: string,
   chainId: ChainId;
   disableNetworkButton?: boolean;
   onWalletClick: (e) => void;
@@ -33,16 +35,15 @@ interface WalletNetworkButtonProps {
 export function WalletNetworkButton({
   testId,
   walletProvider,
-  walletName,
+  walletProviderDetail,
   walletAddress,
+  walletName,
   chainId,
   disableNetworkButton = false,
   onWalletClick,
   onNetworkClick,
 }: WalletNetworkButtonProps) {
   const networkName = getChainNameById(chainId);
-  const walletHeading = getWalletDisplayName(walletName);
-  const walletLogo = getWalletLogoByName(walletName);
   const [walletLogoUrl, setWalletLogoUrl] = useState<string | undefined>(
     undefined,
   );
@@ -65,7 +66,7 @@ export function WalletNetworkButton({
 
   return (
     <Box
-      testId={`${testId}-${walletName}-${chainId}-button-wrapper`}
+      testId={`${testId}-${walletProviderDetail?.info.rdns}-${chainId}-button-wrapper`}
       sx={walletButtonOuterStyles}
       onClick={onWalletClick}
     >
@@ -78,9 +79,12 @@ export function WalletNetworkButton({
           />
           <Logo logo="WalletConnectSymbol" sx={wcStickerLogoStyles} />
         </>
-      ) : (
-        <Logo logo={walletLogo as any} sx={walletLogoStyles(walletName)} />
-      )}
+      ) : (walletProviderDetail && (
+        <RawImage
+          src={walletProviderDetail.info.icon}
+          alt={walletProviderDetail.info.name}
+        />
+      ))}
       <Box
         sx={{
           display: 'flex',
@@ -88,7 +92,10 @@ export function WalletNetworkButton({
           flex: 1,
         }}
       >
-        <Heading size="xSmall">{walletHeading}</Heading>
+        <Heading size="xSmall" sx={{ textTransform: 'capitalize' }}>
+          {walletProviderDetail?.info.rdns === WalletProviderRdns.PASSPORT
+            ? walletName : walletProviderDetail?.info.name}
+        </Heading>
         <Body size="xSmall" sx={walletCaptionStyles}>
           {walletAddress}
         </Body>

@@ -19,8 +19,7 @@ export const useProviders = ({ checkout }: UseProvidersParams) => {
   ), [providers]);
 
   useEffect(() => {
-    // eslint-disable-next-line no-console
-    console.log('Requesting all providers now!');
+    // Initial request for all injected providers
     InjectedProvidersManager.getInstance().reset();
     const cancelSubscription = InjectedProvidersManager
       .getInstance()
@@ -31,10 +30,8 @@ export const useProviders = ({ checkout }: UseProvidersParams) => {
           'io.metamask', // MetaMask
           // 'xyz.frontier.wallet', // Frontier
           // 'me.rainbow', // Rainbow
-          'com.coinbase.wallet', // Coinbase Wallet
+          // 'com.coinbase.wallet', // Coinbase Wallet
         ];
-        // console.log('**** Providers changed!');
-        // console.log('**** Found', injectedProviders);
         const uniqueRdnsSet = new Set();
         const filteredProviders = injectedProviders
           .filter((provider) => {
@@ -56,7 +53,7 @@ export const useProviders = ({ checkout }: UseProvidersParams) => {
             return indexA - indexB;
           });
 
-        // Add passport if its not in the list of injected providers
+        // Add passport from checkout config if not from injected providers
         if (checkout?.passport
           && !filteredProviders.some((provider) => provider.info.rdns === 'com.immutable.passport')) {
           const providerResult = await checkout.createProvider({
@@ -66,8 +63,6 @@ export const useProviders = ({ checkout }: UseProvidersParams) => {
           filteredProviders.unshift(getPassportProviderDetail(providerResult.provider.provider as EIP1193Provider));
         }
 
-        // eslint-disable-next-line no-console
-        console.log('Found providers!', injectedProviders, filteredProviders);
         setProviders(filteredProviders);
       });
 

@@ -149,9 +149,9 @@ export function WalletList(props: WalletListProps) {
       {providers.map((providerDetail, index) => (
         <>
           <WalletItem
+            key={providerDetail.info.rdns}
             onWalletClick={onWalletClick}
             providerDetail={providerDetail}
-            key={providerDetail.info.rdns}
             rc={(
               <motion.div variants={listItemVariants} custom={index} />
             )}
