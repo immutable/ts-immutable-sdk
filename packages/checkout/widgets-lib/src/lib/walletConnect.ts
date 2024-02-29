@@ -2,6 +2,7 @@ import { WalletConnectModal } from '@walletconnect/modal';
 import EthereumProvider from '@walletconnect/ethereum-provider';
 import { ChainId, WidgetTheme } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
+import { ConnectConfig } from '@imtbl/checkout-sdk/dist/types';
 
 export type WalletConnectConfiguration = {
   projectId: string;
@@ -58,6 +59,8 @@ export class WalletConnectManager {
 
   private initialised: boolean = false;
 
+  private enabled: boolean = false;
+
   private environment!: Environment;
 
   private theme!: WidgetTheme;
@@ -94,7 +97,12 @@ export class WalletConnectManager {
     return WalletConnectManager.instance;
   }
 
-  public initialise(environment: Environment, config: WalletConnectConfiguration, theme: WidgetTheme): void {
+  public initialise(
+    environment: Environment,
+    config: WalletConnectConfiguration,
+    theme: WidgetTheme,
+    remoteConfig: Promise<ConnectConfig>,
+  ): void {
     if (!this.validateConfig(config)) {
       throw new Error('Incorrect Wallet Connect configuration');
     }
@@ -102,10 +110,21 @@ export class WalletConnectManager {
     this.environment = environment;
     this.theme = theme;
     this.initialised = true;
+
+    // Determine if WalletConnect feature flag is enabled
+    remoteConfig?.then((loadedConfig) => {
+      this.enabled = loadedConfig.walletConnect;
+      this.enabled = true;
+      console.log('WalletConnect Remote Config enabled:', this.enabled);
+    });
   }
 
   public get isInitialised() {
     return this.initialised;
+  }
+
+  public get isEnabled() {
+    return this.enabled;
   }
 
   public getModal(): WalletConnectModal {

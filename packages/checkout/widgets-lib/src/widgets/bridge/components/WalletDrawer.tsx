@@ -1,6 +1,6 @@
 import { Drawer, Select } from '@biom3/react';
 import { FormControlWrapper } from 'components/FormComponents/FormControlWrapper/FormControlWrapper';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import { EIP1193Provider } from 'mipd';
 import { EIP6963ProviderDetail } from 'mipd/src/types';
 import { motion } from 'framer-motion';
@@ -9,7 +9,6 @@ import { walletItemListStyles } from './WalletDrawerStyles';
 import { WalletConnectItem } from './WalletConnectItem';
 import { useAnimation } from '../../../lib/hooks/useAnimation';
 import { useWalletConnect } from '../../../lib/hooks/useWalletConnect';
-import { BridgeContext } from '../context/BridgeContext';
 import { WalletChangeEvent } from './WalletDrawerEvents';
 
 interface WalletDrawerProps {
@@ -33,12 +32,7 @@ export function WalletDrawer({
   setShowDrawer,
   onWalletChange,
 }: WalletDrawerProps) {
-  const {
-    bridgeState: { checkout },
-  } = useContext(BridgeContext);
-  const { isWalletConnectEnabled, openWalletConnectModal, walletConnectProviderInfo } = useWalletConnect({
-    checkout,
-  });
+  const { isWalletConnectEnabled, openWalletConnectModal, walletConnectProviderInfo } = useWalletConnect();
   const [walletItemLoading, setWalletItemLoading] = useState(false);
   const { listVariants, listItemVariants } = useAnimation();
   const { heading, defaultText } = drawerText;

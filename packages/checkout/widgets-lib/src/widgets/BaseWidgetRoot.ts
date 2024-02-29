@@ -16,6 +16,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import i18next from 'i18next';
 import { StrongCheckoutWidgetsConfig, withDefaultWidgetConfigs } from '../lib/withDefaultWidgetConfig';
 import { addProviderListenersForWidgetRoot, baseWidgetProviderEvent } from '../lib';
+import { InjectedProvidersManager } from '../lib/eip6963';
 
 export abstract class Base<T extends WidgetType> implements Widget<T> {
   protected checkout: Checkout;
@@ -50,6 +51,7 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
     }
     this.setupProviderUpdatedListener();
     this.setupDisconnectProviderListener();
+    InjectedProvidersManager.getInstance().initialise();
   }
 
   unmount() {

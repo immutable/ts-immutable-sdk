@@ -8,6 +8,8 @@ export class InjectedProvidersManager {
 
   private resetTimeout: any;
 
+  private isInit: boolean = false;
+
   private constructor() {
     this.store = createStore();
     this.store.reset();
@@ -16,6 +18,9 @@ export class InjectedProvidersManager {
   public static getInstance(): InjectedProvidersManager {
     if (!InjectedProvidersManager.instance) {
       InjectedProvidersManager.instance = new InjectedProvidersManager();
+      InjectedProvidersManager.instance.subscribe((providers) => {
+        console.log('*** Providers changed:', providers);
+      });
     }
 
     return InjectedProvidersManager.instance;
@@ -34,10 +39,24 @@ export class InjectedProvidersManager {
   }
 
   public reset() {
+    console.log('Reset Providers ******');
     clearTimeout(this.resetTimeout);
     this.resetTimeout = setTimeout(() => {
       this.store.reset();
     }, 200);
+  }
+
+  public initialise() {
+    if (!this.isInit) {
+      console.log('Injected Providers init');
+      this.isInit = true;
+      this.reset();
+    }
+  }
+
+  public requestProviders() {
+    console.log('request providers!');
+    window.dispatchEvent(new CustomEvent('eip6963:requestProvider'));
   }
 
   public destroy() {

@@ -35,7 +35,7 @@ import { BridgeActions, BridgeContext } from '../context/BridgeContext';
 import { NetworkItem } from './NetworkItem';
 import { WalletNetworkButton } from './WalletNetworkButton';
 import { WalletDrawer } from './WalletDrawer';
-import { useProviders } from '../../../lib/hooks/useProviders';
+import { useInjectedProviders } from '../../../lib/hooks/useInjectedProviders';
 import { WalletChangeEvent } from './WalletDrawerEvents';
 
 const testId = 'wallet-network-selector';
@@ -47,7 +47,7 @@ export function WalletAndNetworkSelector() {
     bridgeDispatch,
   } = useContext(BridgeContext);
   const { viewDispatch } = useContext(ViewContext);
-  const { providers } = useProviders({ checkout });
+  const { providers } = useInjectedProviders({ checkout });
 
   const { track } = useAnalytics();
 
