@@ -5,11 +5,17 @@ import {
 } from '@imtbl/checkout-sdk';
 import { createContext } from 'react';
 
+export type WalletConfiguration = {
+  showDisconnectButton: boolean;
+  showNetworkMenu: boolean;
+};
+
 export interface WalletState {
   walletProviderName: WalletProviderName | null;
   network: NetworkInfo | null;
   tokenBalances: GetBalanceResult[];
   supportedTopUps: TopUpFeature | null;
+  walletConfig: WalletConfiguration;
 }
 
 export interface TopUpFeature {
@@ -24,6 +30,11 @@ export const initialWalletState: WalletState = {
   network: null,
   tokenBalances: [],
   supportedTopUps: null,
+  /** initial state gets overriden when reducer set up in WalletWidget.tsx */
+  walletConfig: {
+    showDisconnectButton: true,
+    showNetworkMenu: true,
+  },
 };
 
 export interface WalletContextState {
@@ -71,7 +82,7 @@ export interface SetSupportedTopUpPayload {
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const WalletContext = createContext<WalletContextState>({
   walletState: initialWalletState,
-  walletDispatch: () => {},
+  walletDispatch: () => { },
 });
 
 WalletContext.displayName = 'WalletContext'; // help with debugging Context in browser
