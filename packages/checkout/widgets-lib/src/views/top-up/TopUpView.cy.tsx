@@ -308,6 +308,10 @@ describe('Top Up View', () => {
           isBridgeEnabled: true,
           isSwapAvailable: true,
         },
+        walletConfig: {
+          showNetworkMenu: true,
+          showDisconnectButton: true,
+        },
       };
       cy.stub(Checkout.prototype, 'getExchangeFeeEstimate')
         .as('getExchangeFeeEstimateStub')
@@ -366,6 +370,10 @@ describe('Top Up View', () => {
           isSwapEnabled: true,
           isBridgeEnabled: true,
           isSwapAvailable: true,
+        },
+        walletConfig: {
+          showNetworkMenu: true,
+          showDisconnectButton: true,
         },
       };
 
