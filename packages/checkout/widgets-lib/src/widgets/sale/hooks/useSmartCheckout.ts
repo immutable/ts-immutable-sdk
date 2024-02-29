@@ -34,6 +34,7 @@ export const useSmartCheckout = ({
     try {
       const signer = provider?.getSigner();
       const spenderAddress = await signer?.getAddress() || '';
+      console.log('🚀 ~ spenderAddress:', spenderAddress); // eslint-disable-line
 
       const userFractionalBalanceBlocked = await isUserFractionalBalanceBlocked(
         spenderAddress,
@@ -61,11 +62,11 @@ export const useSmartCheckout = ({
         throw new Error();
       }
       const result = { ...res };
-      // const filteredSmartCheckoutResult = filterSmartCheckoutResult(result, provider);
-      const filteredSmartCheckoutResult = filterSmartCheckoutResult(result);
+      const filteredSmartCheckoutResult = filterSmartCheckoutResult(result, provider);
       setSmartCheckoutResult(filteredSmartCheckoutResult);
       return result;
     } catch (err: any) {
+      console.log('🚀 ~ setSmartCheckoutError:', err); // eslint-disable-line
       setSmartCheckoutError({
         type: SaleErrorTypes.SMART_CHECKOUT_ERROR,
         data: { error: err },

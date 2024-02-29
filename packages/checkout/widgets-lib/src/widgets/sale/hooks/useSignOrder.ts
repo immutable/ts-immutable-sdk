@@ -238,9 +238,21 @@ export const useSignOrder = (input: SignOrderInput) => {
       paymentType: SalePaymentTypes,
       fromTokenAddress: string,
     ): Promise<SignResponse | undefined> => {
+      const signer = provider?.getSigner();
+      const spenderAddress = await signer?.getAddress() || '';
+      console.log('🚀 ~ SignApiRequest.spenderAddress:', spenderAddress); // eslint-disable-line
+      console.log('🚀 ~ SignApiRequest.recipientAddress:', recipientAddress); // eslint-disable-line
+
+      if (!recipientAddress) {
+        setSignError({
+          type: SaleErrorTypes.SERVICE_BREAKDOWN, data: { reason: 'No recipient address' },
+        });
+        return undefined;
+      }
+
       try {
         const data: SignApiRequest = {
-          recipient_address: '',
+          recipient_address: recipientAddress,
           payment_type: paymentType,
           currency_filter: SignCurrencyFilter.CONTRACT_ADDRESS,
           currency_value: fromTokenAddress,
@@ -249,6 +261,7 @@ export const useSignOrder = (input: SignOrderInput) => {
             quantity: item.qty,
           })),
         };
+
         console.log('🚀 ~ sign/request:', data); // eslint-disable-line
 
         const baseUrl = `${PRIMARY_SALES_API_BASE_URL[environment]}/${environmentId}/order/sign`;
