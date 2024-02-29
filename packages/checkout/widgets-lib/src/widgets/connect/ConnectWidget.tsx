@@ -46,7 +46,6 @@ export type ConnectWidgetInputs = ConnectWidgetParams & {
   config: StrongCheckoutWidgetsConfig
   deepLink?: ConnectWidgetViews;
   sendCloseEventOverride?: () => void;
-  targetLayer?: ConnectTargetLayer;
   allowedChains?: ChainId[];
   checkout: Checkout;
   web3Provider?: Web3Provider;
@@ -89,6 +88,9 @@ export default function ConnectWidget({
   const networkToSwitchTo = targetLayer ?? ConnectTargetLayer.LAYER2;
 
   const targetChainId = getTargetLayerChainId(checkout.config, targetLayer ?? ConnectTargetLayer.LAYER2);
+
+  console.log(checkout.config.environment);
+  console.log('targetChainId', targetChainId);
 
   const { identify, page } = useAnalytics();
 

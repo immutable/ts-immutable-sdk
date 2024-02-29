@@ -22,6 +22,7 @@ export class Connect extends Base<WidgetType.CONNECT> {
   }
 
   protected getValidatedParameters(params: ConnectWidgetParams): ConnectWidgetParams {
+    console.log(params);
     return params;
   }
 
@@ -37,6 +38,7 @@ export class Connect extends Base<WidgetType.CONNECT> {
               <ConnectWidget
                 config={this.strongConfig()}
                 checkout={this.checkout}
+                targetLayer={this.parameters.targetLayer}
               />
             </Suspense>
           </ThemeProvider>
