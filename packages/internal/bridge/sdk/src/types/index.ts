@@ -38,7 +38,9 @@ export interface AxelarChainDetails {
  */
 export type BridgeContracts = {
   rootERC20BridgeFlowRate: Address;
+  rootAxelarAdapter: Address;
   childERC20Bridge: Address;
+  childAxelarAdapter: Address;
   rootChainIMX: Address;
   rootChainWrappedETH: Address;
   childChainWrappedETH: Address;
@@ -105,7 +107,7 @@ export enum BridgeMethodsGasLimit { // @TODO test methods on chain and put corre
   DEPOSIT_SOURCE = 150000,
   DEPOSIT_DESTINATION = 160000,
   WITHDRAW_SOURCE = 150000,
-  WITHDRAW_DESTINATION = 160000,
+  WITHDRAW_DESTINATION = 155000,
   MAP_TOKEN_SOURCE = 200000,
   MAP_TOKEN_DESTINATION = 200000,
   FINALISE_WITHDRAWAL = 200000,
