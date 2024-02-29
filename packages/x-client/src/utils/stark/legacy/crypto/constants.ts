@@ -47,7 +47,6 @@ const constantPoints = constantPointsHex.map((coords: string[]) =>
 const shiftPoint = constantPoints[0];
 
 // Instruction type mapping encoded in BigNumber
-// see https://docs.starkware.co/starkex-v3/starkex-deep-dive/message-encodings/signatures
 const instructionEncodingMap: {
   [instruction in Instruction | InstructionWithFee]: BN;
 } = {
