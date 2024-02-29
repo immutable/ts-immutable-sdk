@@ -3,3 +3,4 @@ coverage
 .parcel-cache
 .DS_Store
 imx-checkout-sdk-*.*.*.tgz
+stats.html

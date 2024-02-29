@@ -5,7 +5,6 @@ import json from '@rollup/plugin-json';
 import terser from '@rollup/plugin-terser';
 import replace from '@rollup/plugin-replace';
 import nodePolyfills from 'rollup-plugin-polyfill-node';
-import { visualizer } from "rollup-plugin-visualizer";
 
 const DEVELOPMENT = 'development';
 const PRODUCTION = 'production';
@@ -27,9 +26,6 @@ const productionPlugins = [
   nodePolyfills(),
   commonjs(),
   terser(),
-  visualizer({
-    filename: './visualizer/bundle-stats.html',
-  })
 ]
 
 const getPlugins = () => {
