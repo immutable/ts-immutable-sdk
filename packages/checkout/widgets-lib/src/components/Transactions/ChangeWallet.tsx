@@ -23,15 +23,13 @@ export interface ChangeWalletProps {
 export function ChangeWallet({ onChangeWalletClick }: ChangeWalletProps) {
   const { t } = useTranslation();
   const {
-    bridgeState: { checkout, from },
+    bridgeState: { from },
   } = useContext(BridgeContext);
   const [walletLogoUrl, setWalletLogoUrl] = useState<string | undefined>(
     undefined,
   );
   const [isWalletConnect, setIsWalletConnect] = useState<boolean>(false);
-  const { isWalletConnectEnabled, getWalletLogoUrl } = useWalletConnect({
-    checkout,
-  });
+  const { isWalletConnectEnabled, getWalletLogoUrl } = useWalletConnect();
   const { track } = useAnalytics();
   const walletAddress = from?.walletAddress || '';
 

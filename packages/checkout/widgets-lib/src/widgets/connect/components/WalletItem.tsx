@@ -22,8 +22,9 @@ export function WalletItem<
   const { t } = useTranslation();
   const { providerDetail, onWalletClick } = props;
   const providerSlug = getProviderSlugFromRdns(providerDetail.info.rdns);
-  const isPassportOrMetamask = providerSlug === WalletProviderName.PASSPORT
-    || providerSlug === WalletProviderName.METAMASK;
+  const isPassport = providerSlug === WalletProviderName.PASSPORT;
+  const isPassportOrMetamask = isPassport || providerSlug === WalletProviderName.METAMASK;
+  const offsetStyles = { marginLeft: '65px' };
 
   return (
     <MenuItem
@@ -35,12 +36,12 @@ export function WalletItem<
       sx={{ marginBottom: 'base.spacing.x1' }}
     >
       <RawImage src={providerDetail.info.icon} alt={providerDetail.info.name} sx={{ position: 'absolute' }} />
-      <MenuItem.Label size="medium" sx={{ marginLeft: '65px' }}>
+      <MenuItem.Label size="medium" sx={offsetStyles}>
         {providerDetail.info.name}
       </MenuItem.Label>
-      <MenuItem.IntentIcon sx={{ marginLeft: '65px' }} />
-      <MenuItem.Caption sx={{ marginLeft: '65px' }}>
-        {providerDetail.info.rdns === 'com.immutable.passport' ? (
+      <MenuItem.IntentIcon sx={offsetStyles} />
+      <MenuItem.Caption sx={offsetStyles}>
+        {isPassport ? (
           <Box rc={<span />} sx={{ c: 'base.gradient.1' }}>
             {isPassportOrMetamask ? t(`wallets.${providerSlug}.accentText`) : providerDetail.info.name}
           </Box>

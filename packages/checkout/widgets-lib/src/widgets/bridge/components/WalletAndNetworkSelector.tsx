@@ -31,7 +31,7 @@ import {
   brigdeWalletWrapperStyles,
   submitButtonWrapperStyles,
 } from './WalletAndNetworkSelectorStyles';
-import { BridgeActions, BridgeContext } from '../context/BridgeContext';
+import { BridgeActions, BridgeContext, WalletProviderInfo } from '../context/BridgeContext';
 import { NetworkItem } from './NetworkItem';
 import { WalletNetworkButton } from './WalletNetworkButton';
 import { WalletDrawer } from './WalletDrawer';
@@ -311,11 +311,13 @@ export function WalletAndNetworkSelector() {
         from: {
           web3Provider: fromWalletWeb3Provider,
           walletAddress: fromWalletAddress.toLowerCase(),
+          walletProviderInfo: fromWallet?.providerDetail.info as WalletProviderInfo,
           network: fromNetwork,
         },
         to: {
           web3Provider: toWalletWeb3Provider,
           walletAddress: toWalletAddress.toLowerCase(),
+          walletProviderInfo: toWallet?.providerDetail.info as WalletProviderInfo,
           network: toNetwork,
         },
       },
@@ -332,6 +334,7 @@ export function WalletAndNetworkSelector() {
         fromWallet: {
           address: fromWalletAddress,
           rdns: fromWallet?.providerDetail.info.rdns,
+          uuid: fromWallet?.providerDetail.info.uuid,
           isPassportWallet: isPassportProvider(fromWalletWeb3Provider),
           isMetaMask: isMetaMaskProvider(fromWalletWeb3Provider),
         },
@@ -340,6 +343,7 @@ export function WalletAndNetworkSelector() {
         toWallet: {
           address: toWalletAddress,
           rdns: toWallet?.providerDetail.info.rdns,
+          uuid: toWallet?.providerDetail.info.uuid,
           isPassportWallet: isPassportProvider(toWalletWeb3Provider),
           isMetaMask: isMetaMaskProvider(toWalletWeb3Provider),
         },

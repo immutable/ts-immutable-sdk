@@ -17,7 +17,7 @@ const processProviders = (checkout: Checkout | null, injectedProviders: EIP6963P
     'io.metamask', // MetaMask
     // 'xyz.frontier.wallet', // Frontier
     // 'me.rainbow', // Rainbow
-    'com.coinbase.wallet', // Coinbase Wallet
+    // 'com.coinbase.wallet', // Coinbase Wallet
   ];
   const uniqueRdnsSet = new Set();
   const filteredProviders = injectedProviders

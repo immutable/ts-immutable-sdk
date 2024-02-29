@@ -114,8 +114,6 @@ export class WalletConnectManager {
     // Determine if WalletConnect feature flag is enabled
     remoteConfig?.then((loadedConfig) => {
       this.enabled = loadedConfig.walletConnect;
-      this.enabled = true;
-      console.log('WalletConnect Remote Config enabled:', this.enabled);
     });
   }
 

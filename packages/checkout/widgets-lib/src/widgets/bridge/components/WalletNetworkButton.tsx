@@ -5,7 +5,7 @@ import { ChainId, WalletProviderRdns } from '@imtbl/checkout-sdk';
 import { getChainNameById } from 'lib/chains';
 import { networkIcon } from 'lib';
 import { Web3Provider } from '@ethersproject/providers';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useWalletConnect } from 'lib/hooks/useWalletConnect';
 import { isWalletConnectProvider } from 'lib/providerUtils';
 import { EIP1193Provider } from 'mipd';
@@ -18,7 +18,6 @@ import {
   wcStickerLogoStyles,
   wcWalletLogoStyles,
 } from './WalletNetworkButtonStyles';
-import { BridgeContext } from '../context/BridgeContext';
 import { RawImage } from '../../../components/RawImage/RawImage';
 
 interface WalletNetworkButtonProps {
@@ -48,12 +47,7 @@ export function WalletNetworkButton({
     undefined,
   );
   const [isWalletConnect, setIsWalletConnect] = useState<boolean>(false);
-  const {
-    bridgeState: { checkout },
-  } = useContext(BridgeContext);
-  const { isWalletConnectEnabled, getWalletLogoUrl } = useWalletConnect({
-    checkout,
-  });
+  const { isWalletConnectEnabled, getWalletLogoUrl } = useWalletConnect();
 
   useEffect(() => {
     if (isWalletConnectEnabled) {

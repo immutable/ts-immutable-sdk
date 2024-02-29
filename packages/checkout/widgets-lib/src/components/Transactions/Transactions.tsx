@@ -84,9 +84,7 @@ export function Transactions({
 
   const isPassport = isPassportProvider(from?.web3Provider);
 
-  const { isWalletConnectEnabled, openWalletConnectModal } = useWalletConnect({
-    checkout,
-  });
+  const { isWalletConnectEnabled, openWalletConnectModal } = useWalletConnect();
 
   // Fetch the tokens for the root chain using the allowed tokens.
   // In case this list does not have all the tokens, there is logic
@@ -309,6 +307,7 @@ export function Transactions({
           from: {
             web3Provider: from?.web3Provider,
             walletAddress: from?.walletAddress,
+            walletProviderInfo: from?.walletProviderInfo,
             network: from?.network,
           },
           to: null,

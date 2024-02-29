@@ -22,10 +22,10 @@ export function Settings({
 }: SettingsProps) {
   const { t } = useTranslation();
   const { connectLoaderState } = useContext(ConnectLoaderContext);
-  const { checkout, provider } = connectLoaderState;
+  const { provider } = connectLoaderState;
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
-  const { ethereumProvider } = useWalletConnect({ checkout: checkout! });
+  const { ethereumProvider } = useWalletConnect();
 
   const { page } = useAnalytics();
 

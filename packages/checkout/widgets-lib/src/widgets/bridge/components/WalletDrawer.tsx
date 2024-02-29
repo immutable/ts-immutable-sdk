@@ -114,33 +114,30 @@ export function WalletDrawer({
         )}
       >
         {walletOptions.map((providerDetail, index) => (
-          <>
-            <WalletItem
-              key={providerDetail.info.rdns}
-              testId={testId}
-              loading={walletItemLoading}
-              providerDetail={providerDetail}
-              onWalletItemClick={handleWalletItemClick}
-              rc={(
-                <motion.div variants={listItemVariants} custom={index} />
-              )}
-            />
-            {isWalletConnectEnabled && (index === walletOptions.length - 1) && (
-              <motion.div
-                variants={listItemVariants}
-                custom={walletOptions.length}
-                key="walletconnect"
-              >
-                <WalletConnectItem
-                  key="walletconnect"
-                  testId={`${testId}-wallet-list-walletconnect`}
-                  loading={walletItemLoading}
-                  onWalletItemClick={handleWalletConnectClick}
-                />
-              </motion.div>
+          <WalletItem
+            key={providerDetail.info.rdns}
+            testId={testId}
+            loading={walletItemLoading}
+            providerDetail={providerDetail}
+            onWalletItemClick={handleWalletItemClick}
+            rc={(
+              <motion.div variants={listItemVariants} custom={index} />
             )}
-          </>
+          />
         ))}
+        {isWalletConnectEnabled && (
+          <motion.div
+            variants={listItemVariants}
+            custom={walletOptions.length}
+            key="walletconnect"
+          >
+            <WalletConnectItem
+              testId={`${testId}-wallet-list-walletconnect`}
+              loading={walletItemLoading}
+              onWalletItemClick={handleWalletConnectClick}
+            />
+          </motion.div>
+        )}
       </Drawer.Content>
     </Drawer>
   );

@@ -14,12 +14,15 @@ export function isWalletConnectProvider(provider?: Web3Provider | null) {
   return (provider?.provider as any)?.isWalletConnect === true;
 }
 
-export function getWalletProviderNameByProvider(web3Provider: Web3Provider, providers?: EIP6963ProviderDetail[]) {
+export function getWalletProviderNameByProvider(
+  web3Provider: Web3Provider | undefined,
+  providers?: EIP6963ProviderDetail[],
+) {
   if (isMetaMaskProvider(web3Provider)) return WalletProviderName.METAMASK.toString();
   if (isPassportProvider(web3Provider)) return WalletProviderName.PASSPORT.toString();
   if (isWalletConnectProvider(web3Provider)) return 'walletconnect';
 
-  if (providers) {
+  if (providers && web3Provider) {
     // Find the matching provider in the providerDetail
     const matchedProviderDetail = providers.find((providerDetail) => providerDetail.provider === web3Provider.provider);
     if (matchedProviderDetail) {
