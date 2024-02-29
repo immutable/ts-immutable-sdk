@@ -147,6 +147,7 @@ export const useSignOrder = (input: SignOrderInput) => {
   const {
     provider, items, recipientAddress, environment, environmentId,
   } = input;
+    console.log('🚀 ~ sign/recipientAddress:', recipientAddress); // eslint-disable-line
   const [signError, setSignError] = useState<SignOrderError | undefined>(
     undefined,
   );
@@ -239,7 +240,7 @@ export const useSignOrder = (input: SignOrderInput) => {
     ): Promise<SignResponse | undefined> => {
       try {
         const data: SignApiRequest = {
-          recipient_address: recipientAddress,
+          recipient_address: '',
           payment_type: paymentType,
           currency_filter: SignCurrencyFilter.CONTRACT_ADDRESS,
           currency_value: fromTokenAddress,
@@ -248,6 +249,7 @@ export const useSignOrder = (input: SignOrderInput) => {
             quantity: item.qty,
           })),
         };
+        console.log('🚀 ~ sign/request:', data); // eslint-disable-line
 
         const baseUrl = `${PRIMARY_SALES_API_BASE_URL[environment]}/${environmentId}/order/sign`;
         const response = await fetch(baseUrl, {

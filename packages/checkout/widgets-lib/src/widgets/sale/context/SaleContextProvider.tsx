@@ -153,6 +153,8 @@ export function SaleContextProvider(props: {
     recipientEmail: '',
     recipientAddress: '',
   });
+  console.log('🚀 ~ recipientEmail:', recipientEmail); // eslint-disable-line
+  console.log('🚀 ~ recipientAddress:', recipientAddress); // eslint-disable-line
 
   const [paymentMethod, setPaymentMethod] = useState<SalePaymentTypes | undefined>(
     undefined,
