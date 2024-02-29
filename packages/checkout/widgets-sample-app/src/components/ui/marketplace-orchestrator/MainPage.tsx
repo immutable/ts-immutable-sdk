@@ -24,7 +24,7 @@ import { LanguageSelector } from './LanguageSelector';
 // Create one instance of Checkout and inject Passport
 const checkout = new Checkout({
   baseConfig: {
-    environment: Environment.SANDBOX,
+    environment: Environment.PRODUCTION,
     publishableKey: 'pk_imapik-test-pCHFU0GpQImZx9UzSnU3',
   },
   passport,
@@ -44,8 +44,8 @@ export const MainPage = () => {
       walletConnect: {
         projectId: '938b553484e344b1e0b4bb80edf8c362',
         metadata: {
-          name: 'Marketplace Orchestrator',
-          description: '',
+          name: 'Checkout Marketplace',
+          description: 'Checkout Marketplace',
           url: 'http://localhost:3000/marketplace-orchestrator',
           icons: []
         }
@@ -156,9 +156,9 @@ export const MainPage = () => {
 
   return (
     <Box sx={{ minWidth: '100vw', minHeight: '100vh', width: '100%', height: '100%', backgroundColor: 'base.color.brand.6' }}>
-      <Box sx={{ width: '100%', padding: 'base.spacing.x4', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Box sx={{ width: '100%', padding: 'base.spacing.x4', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
         <Heading>Immutable Checkout Marketplace</Heading>
-        <Box sx={{ padding: 'base.spacing.x4', display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', gap: 'base.spacing.x6', alignItems: 'center' }}>
+        <Box sx={{ padding: 'base.spacing.x4', display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', gap: 'base.spacing.x6', alignItems: 'center', flexWrap: 'wrap' }}>
           <Button onClick={openConnectWidget}>Connect</Button>
           <Button onClick={openWalletWidget}>Wallet</Button>
           <Button onClick={openSwapWidget}>Swap</Button>

@@ -1,9 +1,9 @@
 import {
-  Box, Button, EllipsizedText, Logo,
+  Box, Button, EllipsizedText, FramedImage, Logo,
 } from '@biom3/react';
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { BridgeContext } from 'widgets/bridge/context/BridgeContext';
-import { getWalletProviderNameByProvider } from 'lib/providerUtils';
+import { getWalletProviderNameByProvider, isWalletConnectProvider } from 'lib/providerUtils';
 import {
   UserJourney,
   useAnalytics,
@@ -11,7 +11,10 @@ import {
 import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { useTranslation } from 'react-i18next';
 import { getWalletLogoByName } from 'lib/logoUtils';
-import { headingStyles } from './ChangeWalletStyles';
+import { useWalletConnect } from 'lib/hooks/useWalletConnect';
+import {
+  headingStyles, wcStickerLogoStyles, wcWalletLogoStyles, wcWalletLogoWrapperStyles,
+} from './ChangeWalletStyles';
 
 export interface ChangeWalletProps {
   onChangeWalletClick: () => void;
@@ -20,8 +23,15 @@ export interface ChangeWalletProps {
 export function ChangeWallet({ onChangeWalletClick }: ChangeWalletProps) {
   const { t } = useTranslation();
   const {
-    bridgeState: { from },
+    bridgeState: { checkout, from },
   } = useContext(BridgeContext);
+  const [walletLogoUrl, setWalletLogoUrl] = useState<string | undefined>(
+    undefined,
+  );
+  const [isWalletConnect, setIsWalletConnect] = useState<boolean>(false);
+  const { isWalletConnectEnabled, getWalletLogoUrl } = useWalletConnect({
+    checkout,
+  });
   const { track } = useAnalytics();
   const walletAddress = from?.walletAddress || '';
 
@@ -39,18 +49,38 @@ export function ChangeWallet({ onChangeWalletClick }: ChangeWalletProps) {
     onChangeWalletClick();
   };
 
+  useEffect(() => {
+    if (isWalletConnectEnabled) {
+      setIsWalletConnect(isWalletConnectProvider(from?.web3Provider));
+      (async () => {
+        setWalletLogoUrl(await getWalletLogoUrl());
+      })();
+    }
+  }, [isWalletConnectEnabled, from]);
+
   return (
     <Box sx={headingStyles}>
       <Box
         sx={{ display: 'flex', alignItems: 'center', gap: 'base.spacing.x1' }}
       >
-        <Logo
-          logo={walletLogo}
-          sx={{
-            width: 'base.icon.size.400',
-            pr: 'base.spacing.x1',
-          }}
-        />
+        {isWalletConnect && walletLogoUrl ? (
+          <Box sx={wcWalletLogoWrapperStyles}>
+            <FramedImage
+              imageUrl={walletLogoUrl}
+              alt="walletconnect"
+              sx={wcWalletLogoStyles}
+            />
+            <Logo logo="WalletConnectSymbol" sx={wcStickerLogoStyles} />
+          </Box>
+        ) : (
+          <Logo
+            logo={walletLogo}
+            sx={{
+              width: 'base.icon.size.400',
+              pr: 'base.spacing.x1',
+            }}
+          />
+        )}
         <EllipsizedText
           leftSideLength={6}
           rightSideLength={4}

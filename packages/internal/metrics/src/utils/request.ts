@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const IMTBL_API = 'https://api.x.immutable.com';
+const IMTBL_API = 'https://api.immutable.com';
 
 export async function post<T = any>(path: string, data: any) {
   const client = axios.create({

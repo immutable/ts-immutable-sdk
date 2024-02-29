@@ -622,6 +622,16 @@
       "buttons": {
         "cancel": "취소"
       }
+    },
+    "networkSwitch": {
+      "heading": "귀하의 {{wallet}}에서 네트워크를 전환하세요",
+      "manualSwitch": {
+        "body": "계속하려면 모바일 지갑을 열고 {{chain}} 네트워크로 전환해야 합니다"
+      },
+      "controlledSwitch": {
+        "body": "{{chain}} 네트워크로 전환해야 합니다"
+      },
+      "switchButton": "{{chain}}로 전환하기"
     }
   }
 }

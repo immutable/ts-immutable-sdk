@@ -202,7 +202,9 @@ export default function SwapWidget({
 
       if (!(await loadBalances())) return;
 
-      showSwapView();
+      if (viewState.view.type === SharedViews.LOADING_VIEW) {
+        showSwapView();
+      }
     })();
   }, [checkout, provider]);
 

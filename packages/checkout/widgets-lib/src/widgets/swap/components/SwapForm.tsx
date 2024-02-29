@@ -11,6 +11,7 @@ import { TransactionResponse } from '@imtbl/dex-sdk';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { useTranslation } from 'react-i18next';
 import { Environment } from '@imtbl/config';
+import { NetworkSwitchDrawer } from 'components/NetworkSwitchDrawer/NetworkSwitchDrawer';
 import { amountInputValidation as textInputValidator } from '../../../lib/validations/amountInputValidations';
 import { SwapContext } from '../context/SwapContext';
 import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
@@ -23,6 +24,7 @@ import {
   NATIVE,
   DEFAULT_TOKEN_VALIDATION_DECIMALS,
   ESTIMATE_DEBOUNCE,
+  getL2ChainId,
 } from '../../../lib';
 import { quotesProcessor } from '../functions/FetchQuote';
 import { SelectInput } from '../../../components/FormComponents/SelectInput/SelectInput';
@@ -152,6 +154,7 @@ export function SwapForm({ data, theme }: SwapFromProps) {
   // Drawers
   const [showNotEnoughImxDrawer, setShowNotEnoughImxDrawer] = useState(false);
   const [showUnableToSwapDrawer, setShowUnableToSwapDrawer] = useState(false);
+  const [showNetworkSwitchDrawer, setShowNetworkSwitchDrawer] = useState(false);
 
   useEffect(() => {
     if (tokenBalances.length === 0) return;
@@ -836,6 +839,7 @@ export function SwapForm({ data, theme }: SwapFromProps) {
         }}
         insufficientFundsForGas={insufficientFundsForGas}
         openNotEnoughImxDrawer={openNotEnoughImxDrawer}
+        openNetworkSwitchDrawer={() => setShowNetworkSwitchDrawer(true)}
       />
       <NotEnoughImx
         environment={checkout?.config.environment ?? Environment.PRODUCTION}
@@ -868,6 +872,13 @@ export function SwapForm({ data, theme }: SwapFromProps) {
           setToToken(undefined);
           setToAmount('');
         }}
+      />
+      <NetworkSwitchDrawer
+        visible={showNetworkSwitchDrawer}
+        targetChainId={getL2ChainId(checkout?.config!)}
+        provider={provider!}
+        checkout={checkout!}
+        onCloseDrawer={() => setShowNetworkSwitchDrawer(false)}
       />
     </>
   );

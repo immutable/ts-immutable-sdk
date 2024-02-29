@@ -26,4 +26,16 @@ describe('errorBoundary', () => {
     };
     expect(errorBoundary(testFn)).not.toThrowError();
   });
+  it('should return the fallback result for a function that throws', () => {
+    const testFn = (): number => {
+      throw new Error('test');
+    };
+    expect(errorBoundary(testFn, 3)()).toEqual(3);
+  });
+  it('should return the fallback result for an async function that throws', () => {
+    const testFn = async (): Promise<number> => {
+      throw new Error('test');
+    };
+    expect(errorBoundary(testFn, Promise.resolve(3))()).resolves.toEqual(3);
+  });
 });
