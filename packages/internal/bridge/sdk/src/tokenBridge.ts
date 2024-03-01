@@ -205,7 +205,6 @@ export class TokenBridge {
 
       destinationChainGas = BridgeMethodsGasLimit[`${req.action}_DESTINATION`];
 
-      console.log('tenderlyRes', tenderlyRes);
       if (tenderlyRes.approvalFee > 0) {
         approvalFee = await this.getGasEstimates(
           sourceProvider,
@@ -240,8 +239,6 @@ export class TokenBridge {
       //   req.amount,
       //   req.token,
       // );
-
-      // console.log('destinationChainGas', destinationChainGas);
     }
 
     const feeResult = await this.calculateBridgeFee(
@@ -446,8 +443,6 @@ export class TokenBridge {
 
     const tenderlyGasEstimatesRes = {} as TenderlyGasEstimatesResponse;
     const simResults = axiosResponse.data.simulation_results;
-
-    // console.log('simResults[0].simulation', simResults[0].simulation);
 
     if (simResults.length === 1) {
       if (simResults[0].simulation.error_message) {
@@ -1144,7 +1139,6 @@ export class TokenBridge {
     try {
       pendingWithdrawalResponses = await Promise.all(pendingWithdrawalPromises);
     } catch (err) {
-      console.log('err', err);
       throw new BridgeError(
         `Failed to fetch the pending withdrawals with: ${err}`,
         BridgeErrorType.FLOW_RATE_ERROR,
