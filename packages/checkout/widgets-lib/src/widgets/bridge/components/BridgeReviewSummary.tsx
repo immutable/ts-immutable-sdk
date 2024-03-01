@@ -236,6 +236,7 @@ export function BridgeReviewSummary() {
   }, [from?.web3Provider]);
 
   useEffect(() => {
+    console.log('Hola wallet connect', isWalletConnectEnabled);
     if (isWalletConnectEnabled) {
       const isFromProviderWalletConnect = isWalletConnectProvider(from?.web3Provider);
       const isToProviderWalletConnect = isWalletConnectProvider(to?.web3Provider);
@@ -248,9 +249,10 @@ export function BridgeReviewSummary() {
         if (isToProviderWalletConnect) {
           setToWalletLogoUrl(await getWalletLogoUrl());
         }
+        console.log('To Wallet connect', from, to, isToProviderWalletConnect);
       })();
     }
-  }, [isWalletConnectEnabled, from, to]);
+  }, [isWalletConnectEnabled, from?.web3Provider, to?.web3Provider]);
 
   const submitBridge = useCallback(async () => {
     if (!approveTransaction || !transaction) return;
@@ -359,7 +361,7 @@ export function BridgeReviewSummary() {
         emphasized
         sx={bottomMenuItemStyles}
       >
-        {fromWalletIsWalletConnect && fromWalletLogoUrl && (
+        {(fromWalletIsWalletConnect && fromWalletLogoUrl) ? (
           <>
             <MenuItem.FramedImage
               imageUrl={fromWalletLogoUrl}
@@ -368,15 +370,14 @@ export function BridgeReviewSummary() {
             />
             <Logo logo="WalletConnectSymbol" sx={wcStickerLogoStyles} />
           </>
-        )}
-        {!fromWalletIsWalletConnect && from?.walletProviderInfo && (
+        ) : (from?.walletProviderInfo && (
           <RawImage
             src={from?.walletProviderInfo.icon}
             alt={from?.walletProviderInfo.name}
             sx={rawImageStyle}
           />
-        )}
-        <MenuItem.Label sx={{ marginLeft: fromWalletIsWalletConnect ? '0px' : '45px' }}>
+        ))}
+        <MenuItem.Label sx={{ marginLeft: (fromWalletIsWalletConnect && fromWalletLogoUrl) ? '0px' : '45px' }}>
           <strong>{t('views.BRIDGE_REVIEW.fromLabel.heading')}</strong>
           {' '}
           <Body
@@ -407,7 +408,7 @@ export function BridgeReviewSummary() {
         emphasized
         sx={topMenuItemStyles}
       >
-        {toWalletIsWalletConnect && toWalletLogoUrl && (
+        {(toWalletIsWalletConnect && toWalletLogoUrl) ? (
           <>
             <MenuItem.FramedImage
               imageUrl={toWalletLogoUrl}
@@ -416,15 +417,14 @@ export function BridgeReviewSummary() {
             />
             <Logo logo="WalletConnectSymbol" sx={wcStickerLogoStyles} />
           </>
-        )}
-        {!toWalletIsWalletConnect && to?.walletProviderInfo && (
+        ) : (to?.walletProviderInfo && (
           <RawImage
             src={to?.walletProviderInfo.icon}
             alt={to?.walletProviderInfo.name}
             sx={rawImageStyle}
           />
-        )}
-        <MenuItem.Label sx={{ marginLeft: toWalletIsWalletConnect ? '0px' : '45px' }}>
+        ))}
+        <MenuItem.Label sx={{ marginLeft: (toWalletIsWalletConnect && toWalletLogoUrl) ? '0px' : '45px' }}>
           <strong>{t('views.BRIDGE_REVIEW.toLabel.heading')}</strong>
           {' '}
           <Body
