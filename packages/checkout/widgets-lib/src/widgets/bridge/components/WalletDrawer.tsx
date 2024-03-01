@@ -17,7 +17,6 @@ interface WalletDrawerProps {
     heading: string;
     defaultText?: string;
   },
-  changeAccount: boolean;
   showWalletSelectorTarget: boolean;
   walletOptions: EIP6963ProviderDetail<EIP1193Provider>[];
   showDrawer: boolean;
@@ -27,7 +26,6 @@ interface WalletDrawerProps {
 export function WalletDrawer({
   testId,
   drawerText,
-  changeAccount,
   walletOptions,
   showWalletSelectorTarget,
   showDrawer,
@@ -71,7 +69,7 @@ export function WalletDrawer({
           };
           onWalletChange(walletChangeEvent);
         },
-        restoreSession: !changeAccount,
+        restoreSession: true,
       });
     } catch (error) {
       // eslint-disable-next-line no-console

@@ -414,7 +414,6 @@ export function Transactions({
           drawerText={{
             heading: t('views.TRANSACTIONS.walletSelection.heading'),
           }}
-          changeAccount
           showWalletSelectorTarget={false}
           walletOptions={walletOptions}
           showDrawer={showWalletDrawer}
