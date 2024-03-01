@@ -59,13 +59,16 @@ export interface ExchangesApiGetExchangesRequest extends imx.ExchangesApiGetExch
 export interface GetSignableCancelOrderRequest extends imx.GetSignableCancelOrderRequest {}
 export interface GetSignableOrderRequest extends imx.GetSignableOrderRequest {}
 export interface GetSignableTradeRequest extends imx.GetSignableTradeRequest {}
+export interface MetadataApiGetMetadataSchemaRequest extends imx.MetadataApiGetMetadataSchemaRequest {}
+export interface MetadataSchemaRequest extends imx.MetadataSchemaRequest {}
+export interface MintFee extends imx.MintFee {}
+export interface MintRequest extends imx.MintRequest {}
+export interface MintTokenDataV2 extends imx.MintTokenDataV2 {}
+export interface MintTokensResponse extends imx.MintTokensResponse {}
+export interface MintUser extends imx.MintUser {}
 export interface MintsApiGetMintRequest extends imx.MintsApiGetMintRequest {}
 export interface MintsApiListMintsRequest extends imx.MintsApiListMintsRequest {}
 export interface MintsApiMintTokensRequest extends imx.MintsApiMintTokensRequest {}
-export interface MintRequest extends imx.MintRequest {}
-export interface MintTokensResponse extends imx.MintTokensResponse {}
-export interface MetadataApiGetMetadataSchemaRequest extends imx.MetadataApiGetMetadataSchemaRequest {}
-export interface MetadataSchemaRequest extends imx.MetadataSchemaRequest {}
 export interface NftCheckoutPrimaryApiCreateNftPrimaryRequest extends imx.NftCheckoutPrimaryApiCreateNftPrimaryRequest {}
 export interface NftCheckoutPrimaryApiGetCurrenciesNFTCheckoutPrimaryRequest extends imx.NftCheckoutPrimaryApiGetCurrenciesNFTCheckoutPrimaryRequest {}
 export interface NftCheckoutPrimaryApiGetNftPrimaryTransactionRequest extends imx.NftCheckoutPrimaryApiGetNftPrimaryTransactionRequest {}
@@ -90,3 +93,5 @@ export interface TransfersApiListTransfersRequest extends imx.TransfersApiListTr
 export interface UpdateCollectionRequest extends imx.UpdateCollectionRequest {}
 export interface WithdrawalsApiGetWithdrawalRequest extends imx.WithdrawalsApiGetWithdrawalRequest {}
 export interface WithdrawalsApiListWithdrawalsRequest extends imx.WithdrawalsApiListWithdrawalsRequest {}
+
+export const { MetadataSchemaRequestTypeEnum } = imx;

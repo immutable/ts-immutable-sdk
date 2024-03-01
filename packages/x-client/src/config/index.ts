@@ -148,40 +148,35 @@ export class ImxConfiguration {
   }
 }
 
+export interface ConfigOptions {
+  environment: Environment;
+  apiKey?: string;
+  publishableKey?: string;
+  rateLimitingKey?: string;
+}
+
 /**
  * @name imxClientConfig
  * @description Helper method to create a standard ImxModuleConfiguration
  * object for the IMXClient class. If you need to override the default
  * configuration, manually construct the ImxModuleConfiguration object.
- * @param environment {Environment} The environment to connect to
- * @param publishableKey {string} The publishable key from Hub
+ * @param configOptions {ConfigOptions} The configuration options
+ * @param configOptions.environment {Environment} The environment to connect to
+ * @param configOptions.apkKey {string} The API key from Immutable Hub
+ * @param configOptions.publishableKey {string} The publishable key from Immutable Hub
  * @returns {ImxModuleConfiguration}
  */
-export const imxClientConfig = (
-  environment: Environment,
-  publishableKey?: string,
-): ImxModuleConfiguration => {
-  if (!environment) {
-    throw new Error('Environment is required');
+export const imxClientConfig = (configOptions: ConfigOptions): ImxModuleConfiguration => {
+  if (!configOptions) {
+    throw new Error('configOptions is required');
   }
-  if (Object.values(Environment).indexOf(environment) === -1) {
-    throw new Error(`Invalid environment: ${environment}`);
+  if (Object.values(Environment).indexOf(configOptions.environment) === -1) {
+    throw new Error(`Invalid environment: ${configOptions.environment}`);
   }
 
-  type ConfigOptions = {
-    environment: Environment;
-    publishableKey?: string;
-  };
-
-  const configOptions: ConfigOptions = {
-    environment,
-  };
-
-  if (publishableKey) {
-    configOptions.publishableKey = publishableKey;
-  }
-
-  return {
+  const clientConfig = new ImxConfiguration({
     baseConfig: new ImmutableConfiguration(configOptions),
-  };
+  });
+
+  return clientConfig;
 };
