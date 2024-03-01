@@ -237,11 +237,17 @@ export function BridgeReviewSummary() {
 
   useEffect(() => {
     if (isWalletConnectEnabled) {
-      setFromWalletIsWalletConnect(isWalletConnectProvider(from?.web3Provider));
-      setToWalletIsWalletConnect(isWalletConnectProvider(to?.web3Provider));
+      const isFromProviderWalletConnect = isWalletConnectProvider(from?.web3Provider);
+      const isToProviderWalletConnect = isWalletConnectProvider(to?.web3Provider);
+      setFromWalletIsWalletConnect(isFromProviderWalletConnect);
+      setToWalletIsWalletConnect(isToProviderWalletConnect);
       (async () => {
-        setFromWalletLogoUrl(await getWalletLogoUrl());
-        setToWalletLogoUrl(await getWalletLogoUrl());
+        if (isFromProviderWalletConnect) {
+          setFromWalletLogoUrl(await getWalletLogoUrl());
+        }
+        if (isToProviderWalletConnect) {
+          setToWalletLogoUrl(await getWalletLogoUrl());
+        }
       })();
     }
   }, [isWalletConnectEnabled, from, to]);

@@ -51,10 +51,13 @@ export function WalletNetworkButton({
 
   useEffect(() => {
     if (isWalletConnectEnabled) {
-      setIsWalletConnect(isWalletConnectProvider(walletProvider));
-      (async () => {
-        setWalletLogoUrl(await getWalletLogoUrl());
-      })();
+      const isProviderWalletConnect = isWalletConnectProvider(walletProvider);
+      setIsWalletConnect(isProviderWalletConnect);
+      if (isProviderWalletConnect) {
+        (async () => {
+          setWalletLogoUrl(await getWalletLogoUrl());
+        })();
+      }
     }
   }, [isWalletConnectEnabled, walletProvider]);
 

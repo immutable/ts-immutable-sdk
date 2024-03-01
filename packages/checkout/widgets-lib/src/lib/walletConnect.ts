@@ -114,6 +114,7 @@ export class WalletConnectManager {
     // Determine if WalletConnect feature flag is enabled
     remoteConfig?.then((loadedConfig) => {
       this.enabled = loadedConfig.walletConnect;
+      this.enabled = true;
     });
   }
 
@@ -211,7 +212,6 @@ export class WalletConnectManager {
 
     const matchedWallet = Object.values(this.walletListings.listings)
       .find((wallet: any) => walletName.toLowerCase().includes(wallet.slug)) as any;
-
-    return matchedWallet.image_url.md;
+    return matchedWallet?.image_url.md;
   }
 }
