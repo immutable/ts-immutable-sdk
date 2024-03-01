@@ -3904,7 +3904,7 @@ __metadata:
     "@types/jest": ^29.4.3
     axios: ^1.6.5
     bn.js: ^5.2.1
-    elliptic: ^6.5.4
+    elliptic: "https://github.com/dreamoftrees/elliptic#master"
     enc-utils: ^3.0.0
     eslint: ^8.40.0
     ethers: ^5.7.2
@@ -14759,6 +14759,21 @@ __metadata:
   version: 1.4.466
   resolution: "electron-to-chromium@npm:1.4.466"
   checksum: 695af573f8642ed86db6e291b1c102083b1306fff7566b9d8e90bab04f7f330a9073a0487013fa21772625d60d9e2eb193a0518a6e80ef20ece20be8f3cd6e50
+  languageName: node
+  linkType: hard
+
+"elliptic@https://github.com/dreamoftrees/elliptic#master":
+  version: 6.5.4
+  resolution: "elliptic@https://github.com/dreamoftrees/elliptic.git#commit=34f3c2ee58dd5e8621781b5537b8e1b6f2bcbc0c"
+  dependencies:
+    bn.js: ^4.11.9
+    brorand: ^1.1.0
+    hash.js: ^1.0.0
+    hmac-drbg: ^1.0.1
+    inherits: ^2.0.4
+    minimalistic-assert: ^1.0.1
+    minimalistic-crypto-utils: ^1.0.1
+  checksum: d08e1b5c685fe1224ff4683758843d21b77806eee423c2d73a84f69bcaedbf70d9c2c221b26c88380b01c1467ba623083833d9cb5b4d81da71e3208e854697ec
   languageName: node
   linkType: hard
 
