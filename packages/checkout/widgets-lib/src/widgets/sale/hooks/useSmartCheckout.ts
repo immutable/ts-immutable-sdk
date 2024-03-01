@@ -34,7 +34,7 @@ export const useSmartCheckout = ({
     try {
       const signer = provider?.getSigner();
       const spenderAddress = await signer?.getAddress() || '';
-      console.log('🚀 ~ spenderAddress:', spenderAddress); // eslint-disable-line
+      console.log('🚀 ~ fractional check: spenderAddress:', spenderAddress); // eslint-disable-line
 
       const userFractionalBalanceBlocked = await isUserFractionalBalanceBlocked(
         spenderAddress,
@@ -50,6 +50,7 @@ export const useSmartCheckout = ({
 
       const itemRequirements = getItemRequirements(amount, spenderAddress, tokenAddress);
       const gasEstimate = getGasEstimate();
+      console.log('🚀 ~ smartCheckout/itemRequirements:', itemRequirements, gasEstimate, !!provider); // eslint-disable-line
       const res = await checkout?.smartCheckout(
         {
           provider: provider!,
