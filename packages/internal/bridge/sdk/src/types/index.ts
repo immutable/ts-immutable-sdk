@@ -250,8 +250,8 @@ export interface BridgeFeeResponse {
 }
 
 export interface TenderlyGasEstimatesResponse {
-  approvalFee: ethers.BigNumber,
-  sourceChainGas: ethers.BigNumber,
+  approvalFee: number,
+  sourceChainGas: number,
 }
 
 /**

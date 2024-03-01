@@ -537,6 +537,7 @@ describe('Token Bridge', () => {
     const originalValidateDepositArgs = TokenBridge.prototype['validateDepositArgs'];
     const originalGetGasEstimates = TokenBridge.prototype['getGasEstimates'];
     const originalCalculateBridgeFee = TokenBridge.prototype['calculateBridgeFee'];
+    const originalGetTenderlyBridgeGasEstimates = TokenBridge.prototype['getTenderlyBridgeGasEstimates'];
 
     const sourceChainGas:ethers.BigNumber = ethers.utils.parseUnits('0.000001', 18);
     const approavalGas:ethers.BigNumber = ethers.utils.parseUnits('0.000001', 18);
@@ -577,9 +578,17 @@ describe('Token Bridge', () => {
       TokenBridge.prototype['validateDepositArgs'] = originalValidateDepositArgs;
       TokenBridge.prototype['getGasEstimates'] = originalGetGasEstimates;
       TokenBridge.prototype['calculateBridgeFee'] = originalCalculateBridgeFee;
+      TokenBridge.prototype['getTenderlyBridgeGasEstimates'] = originalGetTenderlyBridgeGasEstimates;
     });
     it('returns the deposit fees for native tokens', async () => {
       expect.assertions(6);
+
+      jest.spyOn(TokenBridge.prototype as any, 'getTenderlyBridgeGasEstimates')
+        .mockImplementation(async () => ({
+          approvalFee: 0,
+          sourceChainGas: 1000,
+        }));
+
       const amount = ethers.BigNumber.from(1000);
       const result = await tokenBridge.getFee(
         {
@@ -609,6 +618,12 @@ describe('Token Bridge', () => {
 
       mockERC20Contract.allowance.mockResolvedValue(allowance);
 
+      jest.spyOn(TokenBridge.prototype as any, 'getTenderlyBridgeGasEstimates')
+        .mockImplementation(async () => ({
+          approvalFee: 0,
+          sourceChainGas: 1000,
+        }));
+
       const result = await tokenBridge.getFee(
         {
           action: BridgeFeeActions.DEPOSIT,
@@ -636,6 +651,12 @@ describe('Token Bridge', () => {
       const allowance = ethers.BigNumber.from(500);
 
       mockERC20Contract.allowance.mockResolvedValue(allowance);
+
+      jest.spyOn(TokenBridge.prototype as any, 'getTenderlyBridgeGasEstimates')
+        .mockImplementation(async () => ({
+          approvalFee: 1000,
+          sourceChainGas: 1000,
+        }));
 
       const result = await tokenBridge.getFee(
         {
@@ -716,6 +737,12 @@ describe('Token Bridge', () => {
       const allowance = ethers.BigNumber.from(500);
 
       mockERC20Contract.allowance.mockResolvedValue(allowance);
+
+      jest.spyOn(TokenBridge.prototype as any, 'getTenderlyBridgeGasEstimates')
+        .mockImplementation(async () => ({
+          approvalFee: 1000,
+          sourceChainGas: 1000,
+        }));
 
       const result = await tokenBridge.getFee(
         {

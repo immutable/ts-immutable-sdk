@@ -203,12 +203,20 @@ export class TokenBridge {
         req.token,
       );
 
-      console.log('tenderlyRes', tenderlyRes);
-
       destinationChainGas = BridgeMethodsGasLimit[`${req.action}_DESTINATION`];
 
-      approvalFee = tenderlyRes.approvalFee as ethers.BigNumber;
-      sourceChainGas = tenderlyRes.sourceChainGas;
+      console.log('tenderlyRes', tenderlyRes);
+      if (tenderlyRes.approvalFee > 0) {
+        approvalFee = await this.getGasEstimates(
+          sourceProvider,
+          tenderlyRes.approvalFee,
+        );
+      }
+
+      sourceChainGas = await this.getGasEstimates(
+        sourceProvider,
+        tenderlyRes.sourceChainGas,
+      );
     } else {
       // withdrawal
       sourceChainGas = await this.getGasEstimates(
@@ -216,15 +224,24 @@ export class TokenBridge {
         BridgeMethodsGasLimit[`${req.action}_SOURCE`],
       );
 
-      destinationChainGas = await this.getTenderlyAdapterGasEstimates(
-        req.destinationChainId,
-        req.senderAddress,
-        req.recipientAddress,
-        req.amount,
-        req.token,
-      );
+      if (amountToApprove.gt(0)) {
+        approvalFee = await this.getGasEstimates(
+          sourceProvider,
+          BridgeMethodsGasLimit.APPROVE_TOKEN,
+        );
+      }
 
-      console.log('destinationChainGas', destinationChainGas);
+      destinationChainGas = BridgeMethodsGasLimit[`${req.action}_DESTINATION`];
+
+      // destinationChainGas = await this.getTenderlyAdapterGasEstimates(
+      //   req.destinationChainId,
+      //   req.senderAddress,
+      //   req.recipientAddress,
+      //   req.amount,
+      //   req.token,
+      // );
+
+      // console.log('destinationChainGas', destinationChainGas);
     }
 
     const feeResult = await this.calculateBridgeFee(
@@ -247,6 +264,7 @@ export class TokenBridge {
     };
   }
 
+  // @DEV this function is not used until issue SMR-2559
   private async getTenderlyAdapterGasEstimates(
     destinationChainId:string,
     sender: string,
@@ -271,30 +289,29 @@ export class TokenBridge {
       BridgeErrorType.PROVIDER_ERROR,
     );
 
+    // @TODO this is just a static test, real payload needs to be constructed using the params parsed in
     const executeData = await withBridgeError<string>(async () => axelarAdapterContract.interface
       .encodeFunctionData('execute', [
         '0xb5d4436a9cb2a42a521b47c97c8d50c5d63fe5f7c3e9cd91611b922febffd11f',
         'immutable',
         '0x6328Ac88ba8D466a0F551FC7C42C61d1aC7f92ab',
         // eslint-disable-next-line max-len
-        '0x7a8dc26796a1e50e6e190b70259f58f6a4edd5b22280ceecc82b687b8e982869000000000000000000000000e2629e08f4125d14e446660028bd98ee60ee69f2000000000000000000000000b3d11a26df3e35ac6b9775aa3ed2cac2704d1eef000000000000000000000000b3d11a26df3e35ac6b9775aa3ed2cac2704d1eef0000000000000000000000000000000000000000000000000de0b6b3a7640000',
+        '0x7a8dc26796a1e50e6e190b70259f58f6a4edd5b22280ceecc82b687b8e982869000000000000000000000000e2629e08f4125d14e446660028bd98ee60ee69f200000000000000000000000024e190929c646bffb3f3bfd81ae3b8ea24194c80000000000000000000000000c4c3d44eb95c24babc172ff4a7006ed1565e9d9e0000000000000000000000000000000000000000000000000de0b6b3a7640000',
       ]), BridgeErrorType.INTERNAL_ERROR);
-
-    console.log('executeData', executeData);
 
     const tenderlyAPI = this.getTenderlyEndpoint(destinationChainId);
     let axiosResponse:AxiosResponse;
 
+    // @TODO this needs to use state overrides so the transaction doesnt revert because the commandId is invalid.
     const simulations = [{
       network_id: destinationChainId,
       estimate_gas: true,
       simulation_type: 'quick',
+      block_number: 5370742,
       from: sender,
       to: sourceAdapterAddress,
       input: executeData,
     }];
-
-    console.log('simulations', simulations);
 
     try {
       axiosResponse = await axios.post(
@@ -313,18 +330,22 @@ export class TokenBridge {
     }
 
     if (axiosResponse.data.error) {
-      console.log('axiosResponse.data.error', axiosResponse.data.error);
       throw new BridgeError(
-        `Estimating Gas failed with the reason: ${axiosResponse.data.message}`,
+        `Estimating gas failed with the reason: ${axiosResponse.data.error.message}`,
         BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
       );
     }
 
     const simResults = axiosResponse.data.simulation_results;
 
-    console.log('simResults', simResults);
+    if (simResults.length !== 1 || simResults[0].simulation.gas_used === undefined) {
+      throw new BridgeError(
+        'Estimating gas did not return simulation results',
+        BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
+      );
+    }
 
-    return BridgeMethodsGasLimit.WITHDRAW_DESTINATION;
+    return simResults[0].simulation.gas_used;
   }
 
   private async getTenderlyBridgeGasEstimates(
@@ -411,14 +432,14 @@ export class TokenBridge {
 
     if (axiosResponse.data.error) {
       throw new BridgeError(
-        `Estimating Gas failed with the reason: ${axiosResponse.data.message}`,
+        `Estimating gas failed with the reason: ${axiosResponse.data.error.message}`,
         BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
       );
     }
 
     if (axiosResponse.data.simulation_results.length !== simulations.length) {
       throw new BridgeError(
-        'Estimating Gas failed with mismatched responses',
+        'Estimating gas failed with mismatched responses',
         BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
       );
     }
@@ -429,14 +450,33 @@ export class TokenBridge {
     // console.log('simResults[0].simulation', simResults[0].simulation);
 
     if (simResults.length === 1) {
-      tenderlyGasEstimatesRes.approvalFee = ethers.BigNumber.from(0);
-      tenderlyGasEstimatesRes.sourceChainGas = ethers.BigNumber.from(simResults[0].simulation.gas_used);
+      if (simResults[0].simulation.error_message) {
+        throw new BridgeError(
+          `Estimating deposit gas failed with the reason: ${simResults[0].simulation.error_message}`,
+          BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
+        );
+      } else {
+        tenderlyGasEstimatesRes.sourceChainGas = simResults[0].simulation.gas_used;
+        tenderlyGasEstimatesRes.approvalFee = 0;
+      }
     } else if (axiosResponse.data.simulation_results.length === 2) {
-      tenderlyGasEstimatesRes.approvalFee = ethers.BigNumber.from(simResults[0].simulation.gas_used);
-      tenderlyGasEstimatesRes.sourceChainGas = ethers.BigNumber.from(simResults[1].simulation.gas_used);
+      if (simResults[0].simulation.error_message) {
+        throw new BridgeError(
+          `Estimating approval gas failed with the reason: ${simResults[0].simulation.error_message}`,
+          BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
+        );
+      } else if (simResults[1].simulation.error_message) {
+        throw new BridgeError(
+          `Estimating deposit gas failed with the reason: ${simResults[1].simulation.error_message}`,
+          BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
+        );
+      } else {
+        tenderlyGasEstimatesRes.approvalFee = simResults[0].simulation.gas_used;
+        tenderlyGasEstimatesRes.sourceChainGas = simResults[1].simulation.gas_used;
+      }
     } else {
       throw new BridgeError(
-        `Estimating Gas failed with unexpected number responses ${axiosResponse.data.simulation_results.length}`,
+        `Estimating gas failed with unexpected number responses ${axiosResponse.data.simulation_results.length}`,
         BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
       );
     }
@@ -1060,7 +1100,7 @@ export class TokenBridge {
 
     if (axiosResponse.data.error) {
       throw new BridgeError(
-        `Estimating Axelar Gas failed with the reason: ${axiosResponse.data.message}`,
+        `Estimating Axelar Gas failed with the reason: ${axiosResponse.data.error.message}`,
         BridgeErrorType.AXELAR_GAS_ESTIMATE_FAILED,
       );
     }
