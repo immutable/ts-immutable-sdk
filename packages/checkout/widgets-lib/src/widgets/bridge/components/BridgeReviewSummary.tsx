@@ -308,7 +308,17 @@ export function BridgeReviewSummary() {
         },
       },
     });
-  }, [viewDispatch, approveTransaction, transaction, from?.web3Provider, from?.network]);
+  }, [
+    viewDispatch,
+    approveTransaction,
+    transaction,
+    from?.web3Provider,
+    from?.network,
+    from?.walletProviderInfo,
+    to?.web3Provider,
+    to?.network,
+    to?.walletProviderInfo,
+  ]);
 
   return (
     <Box testId={testId} sx={bridgeReviewWrapperStyles}>

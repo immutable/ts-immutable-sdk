@@ -51,6 +51,34 @@ export function WalletAndNetworkSelector() {
 
   const { track } = useAnalytics();
 
+  // add default state from context values
+  // if user has clicked back button
+  const defaultFromWeb3Provider = from?.web3Provider ?? null;
+  const defaultFromNetwork = from?.network ?? null;
+  const defaultFromWalletAddress = from?.walletAddress?.toLowerCase() ?? '';
+  const defaultFromWallet = from ? {
+    provider: defaultFromWeb3Provider,
+    providerDetail: {
+      provider: defaultFromWeb3Provider,
+      info: {
+        ...from.walletProviderInfo,
+      },
+    },
+  } as unknown as WalletChangeEvent : null;
+
+  const defaultToWeb3Provider = to?.web3Provider ?? null;
+  const defaultToNetwork = to?.network ?? null;
+  const defaultToWalletAddress = to?.walletAddress?.toLowerCase() ?? '';
+  const defaultToWallet = to ? {
+    provider: defaultToWeb3Provider,
+    providerDetail: {
+      provider: defaultToWeb3Provider,
+      info: {
+        ...to.walletProviderInfo,
+      },
+    },
+  } as unknown as WalletChangeEvent : null;
+
   // calculating l1/l2 chains to work with based on Checkout environment
   const l1NetworkChainId = getL1ChainId(checkout.config);
   const l1NetworkName = getChainNameById(l1NetworkChainId);
@@ -60,17 +88,17 @@ export function WalletAndNetworkSelector() {
   /** From wallet and from network local state */
   const [fromWalletDrawerOpen, setFromWalletDrawerOpen] = useState(false);
   const [fromNetworkDrawerOpen, setFromNetworkDrawerOpen] = useState(false);
-  const [fromWalletWeb3Provider, setFromWalletWeb3Provider] = useState<Web3Provider | null>();
-  const [fromNetwork, setFromNetwork] = useState<ChainId | null>();
-  const [fromWalletAddress, setFromWalletAddress] = useState<string>('');
-  const [fromWallet, setFromWallet] = useState<WalletChangeEvent | null>();
+  const [fromWalletWeb3Provider, setFromWalletWeb3Provider] = useState<Web3Provider | null>(defaultFromWeb3Provider);
+  const [fromNetwork, setFromNetwork] = useState<ChainId | null>(defaultFromNetwork);
+  const [fromWalletAddress, setFromWalletAddress] = useState<string>(defaultFromWalletAddress);
+  const [fromWallet, setFromWallet] = useState<WalletChangeEvent | null>(defaultFromWallet);
 
   /** To wallet local state */
   const [toWalletDrawerOpen, setToWalletDrawerOpen] = useState(false);
-  const [toWalletWeb3Provider, setToWalletWeb3Provider] = useState<Web3Provider | null>();
-  const [toNetwork, setToNetwork] = useState<ChainId | null>();
-  const [toWalletAddress, setToWalletAddress] = useState<string>('');
-  const [toWallet, setToWallet] = useState<WalletChangeEvent | null>();
+  const [toWalletWeb3Provider, setToWalletWeb3Provider] = useState<Web3Provider | null>(defaultToWeb3Provider);
+  const [toNetwork, setToNetwork] = useState<ChainId | null>(defaultToNetwork);
+  const [toWalletAddress, setToWalletAddress] = useState<string>(defaultToWalletAddress);
+  const [toWallet, setToWallet] = useState<WalletChangeEvent | null>(defaultToWallet);
 
   /* Derived state */
   const isFromWalletAndNetworkSelected = fromWalletWeb3Provider && fromNetwork;
@@ -146,16 +174,6 @@ export function WalletAndNetworkSelector() {
         },
       });
     }
-
-    // add local state from context values
-    // if user has clicked back button
-    setFromWalletWeb3Provider(from.web3Provider);
-    setFromWalletAddress(from.walletAddress.toLowerCase());
-    setFromNetwork(from.network);
-
-    setToWalletWeb3Provider(to.web3Provider);
-    setToWalletAddress(to.walletAddress.toLowerCase());
-    setToNetwork(to.network);
 
     bridgeDispatch({
       payload: {
@@ -357,9 +375,11 @@ export function WalletAndNetworkSelector() {
       },
     });
   }, [
+    fromWallet,
     fromWalletWeb3Provider,
     fromNetwork,
     fromWalletAddress,
+    toWallet,
     toWalletWeb3Provider,
     toNetwork,
     toWalletAddress,
