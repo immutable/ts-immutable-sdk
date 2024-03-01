@@ -47,6 +47,7 @@
       "zkEVM": {
         "heading": "Immutable zkEVM 네트워크로 전환하라는 요청을 받게 됩니다",
         "body": "MetaMask 팝업에서 '승인'을 선택하고 전환하세요. 처음이라면 MetaMask에서 네트워크 추가를 요구할 수도 있습니다.",
+        "bodyWalletConnect": "지갑에서 팝업을 확인하여 전환하십시오. 처음이라면 지갑에서 네트워크 추가를 요청합니다.",
         "button": {
           "text": "전환 준비됨",
           "retryText": "다시 시도"
