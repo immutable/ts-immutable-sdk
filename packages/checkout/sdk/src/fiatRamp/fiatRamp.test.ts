@@ -103,7 +103,7 @@ describe('FiatRampService', () => {
       expect(result).not.toContain('&email=');
       expect(result).not.toContain('&isAutoFillUserData=true&disableWalletAddressForm=true');
       expect(result).not.toContain('&defaultCryptoAmount=');
-      expect(result).not.toContain('&cryptoCurrencyCode=');
+      expect(result).not.toContain('&defaultCryptoCurrency=');
       expect(result).not.toContain('&walletAddress=');
     });
 
@@ -131,7 +131,7 @@ describe('FiatRampService', () => {
       const result = await fiatRampService.createWidgetUrl(params);
       expect(result).toContain(defaultWidgetUrl);
       expect(result).toContain('&defaultCryptoAmount=100');
-      expect(result).toContain('&cryptoCurrencyCode=ETH');
+      expect(result).toContain('&defaultCryptoCurrency=ETH');
     });
 
     it('should return widget url with walletAddress query params when walletAddress is present', async () => {
