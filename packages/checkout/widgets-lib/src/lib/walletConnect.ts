@@ -2,7 +2,6 @@ import { WalletConnectModal } from '@walletconnect/modal';
 import EthereumProvider from '@walletconnect/ethereum-provider';
 import { ChainId, WidgetTheme } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
-import { ConnectConfig } from '@imtbl/checkout-sdk/dist/types';
 
 export type WalletConnectConfiguration = {
   projectId: string;
@@ -12,6 +11,10 @@ export type WalletConnectConfiguration = {
     url: string;
     icons: string[];
   }
+};
+
+type ConnectConfig = {
+  walletConnect: boolean;
 };
 
 const testnetModalChains = [`eip155:${ChainId.IMTBL_ZKEVM_TESTNET}`, `eip155:${ChainId.SEPOLIA}`];
