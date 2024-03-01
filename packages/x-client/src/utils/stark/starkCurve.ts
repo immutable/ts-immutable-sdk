@@ -2,7 +2,7 @@
 import { Signer } from '@ethersproject/abstract-signer';
 import { splitSignature } from '@ethersproject/bytes';
 import hash from 'hash.js';
-import { curves, ec } from 'elliptic';
+import pkg from 'elliptic';
 import * as encUtils from 'enc-utils';
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import BN from 'bn.js';
@@ -10,6 +10,8 @@ import { hdkey } from 'ethereumjs-wallet';
 import { createStarkSigner } from './starkSigner';
 import * as legacy from './legacy/crypto';
 import { getStarkPublicKeyFromImx } from './getStarkPublicKeyFromImx';
+
+const { ec, curves } = pkg;
 
 /*
 Stark-friendly elliptic curve
