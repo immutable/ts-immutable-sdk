@@ -65,10 +65,12 @@ export function SwitchNetworkZkEVM() {
       return;
     }
 
-    const walletName = (provider.provider as any)?.session?.peer?.metadata?.name.toLowerCase();
-
     try {
-      if (isWalletConnectProvider(provider) && walletName === 'metamask') {
+      let walletName = '';
+      if (isWalletConnectProvider(provider)) {
+        walletName = (provider.provider as any)?.session?.peer?.metadata?.name.toLowerCase();
+      }
+      if (walletName === 'metamask') {
         try {
           await checkout.addNetwork({
             provider,

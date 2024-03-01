@@ -6,7 +6,7 @@ import { TokenInfo } from './tokenInfo';
 /**
  * Interface representing the parameters for {@link Checkout.addNetwork}.
  * @property {Web3Provider} provider - The provider to connect to the network.
- * @property {ChainId} chainId - The ID of the network to add.
+ * @property {ChainId} chainId - The ID of the network to add. We only support adding Immutable zkEVM and Immutable zkEVM Testnet.
  */
 export interface AddNetworkParams {
   provider: Web3Provider;
