@@ -93,17 +93,18 @@ describe('FiatRampService', () => {
       }, mockedHttpClient);
       fiatRampService = new FiatRampService(config);
     });
-    it('should return widget url with non-configurable query params when onRampProvider is Transak', async () => {
+    it(`should return widget url with non-configurable query params when onRampProvider is Transak' +
+      'and default to IMX`, async () => {
       const params: FiatRampWidgetParams = {
         exchangeType: ExchangeType.ONRAMP,
         isPassport: false,
       };
       const result = await fiatRampService.createWidgetUrl(params);
       expect(result).toContain(defaultWidgetUrl);
+      expect(result).toContain('&defaultCryptoCurrency=IMX');
       expect(result).not.toContain('&email=');
       expect(result).not.toContain('&isAutoFillUserData=true&disableWalletAddressForm=true');
       expect(result).not.toContain('&defaultCryptoAmount=');
-      expect(result).not.toContain('&defaultCryptoCurrency=');
       expect(result).not.toContain('&walletAddress=');
     });
 
