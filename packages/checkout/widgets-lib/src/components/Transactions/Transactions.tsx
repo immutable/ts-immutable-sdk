@@ -251,7 +251,7 @@ export function Transactions({
 
       try {
         const web3Provider = new Web3Provider(event.provider as any);
-        const connectedProvider = await connectToProvider(checkout, web3Provider, false);
+        const connectedProvider = await connectToProvider(checkout, web3Provider, true);
         const network = await connectedProvider.getNetwork();
         const address = await connectedProvider.getSigner().getAddress();
 
@@ -414,6 +414,7 @@ export function Transactions({
           drawerText={{
             heading: t('views.TRANSACTIONS.walletSelection.heading'),
           }}
+          changeAccount
           showWalletSelectorTarget={false}
           walletOptions={walletOptions}
           showDrawer={showWalletDrawer}
