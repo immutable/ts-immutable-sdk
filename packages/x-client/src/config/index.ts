@@ -1,9 +1,15 @@
-import { ImmutableXConfiguration, Config } from '@imtbl/core-sdk';
+/* eslint-disable @typescript-eslint/naming-convention */
+import { imx } from '@imtbl/generated-clients';
 import {
   Environment,
   ImmutableConfiguration,
   ModuleConfiguration,
 } from '@imtbl/config';
+
+export { Environment, ImmutableConfiguration } from '@imtbl/config';
+export class ApiConfiguration extends imx.Configuration {}
+
+const defaultHeaders = { 'x-sdk-version': 'ts-immutable-sdk-__SDK_VERSION__' };
 
 interface ImmutableXConfigurationParams {
   basePath: string,
@@ -11,6 +17,65 @@ interface ImmutableXConfigurationParams {
   coreContractAddress: string,
   registrationContractAddress: string,
 }
+
+export interface EthConfiguration {
+  coreContractAddress: string;
+  registrationContractAddress: string;
+  chainID: number;
+}
+
+interface ImxEnvironment extends EthConfiguration {
+  basePath: string;
+  headers?: Record<string, string>;
+  sdkVersion?: string;
+}
+
+export interface ImmutableXConfiguration {
+  /**
+   * The configuration for the API client
+   */
+  apiConfiguration: ApiConfiguration;
+  /**
+   * The configuration for the Ethereum network
+   */
+  ethConfiguration: EthConfiguration;
+}
+
+/**
+ * @dev use createImmutableXConfiguration instead
+ */
+export const createConfig = ({
+  coreContractAddress,
+  registrationContractAddress,
+  chainID,
+  basePath,
+  headers,
+  sdkVersion,
+}: ImxEnvironment): ImmutableXConfiguration => {
+  if (!basePath.trim()) {
+    throw Error('basePath can not be empty');
+  }
+
+  if (sdkVersion) {
+    defaultHeaders['x-sdk-version'] = sdkVersion;
+  }
+
+  // eslint-disable-next-line no-param-reassign
+  headers = { ...(headers || {}), ...defaultHeaders };
+  const apiConfigOptions: imx.ConfigurationParameters = {
+    basePath,
+    baseOptions: { headers },
+  };
+
+  return {
+    apiConfiguration: new ApiConfiguration(apiConfigOptions),
+    ethConfiguration: {
+      coreContractAddress,
+      registrationContractAddress,
+      chainID,
+    },
+  };
+};
 
 /**
  * createImmutableXConfiguration to create a custom ImmutableXConfiguration
@@ -21,7 +86,7 @@ export const createImmutableXConfiguration = ({
   chainID,
   coreContractAddress,
   registrationContractAddress,
-}: ImmutableXConfigurationParams): ImmutableXConfiguration => Config.createConfig({
+}: ImmutableXConfigurationParams): ImmutableXConfiguration => createConfig({
   basePath,
   chainID,
   coreContractAddress,
@@ -82,3 +147,41 @@ export class ImxConfiguration {
     }
   }
 }
+
+/**
+ * @name imxClientConfig
+ * @description Helper method to create a standard ImxModuleConfiguration
+ * object for the IMXClient class. If you need to override the default
+ * configuration, manually construct the ImxModuleConfiguration object.
+ * @param environment {Environment} The environment to connect to
+ * @param publishableKey {string} The publishable key from Hub
+ * @returns {ImxModuleConfiguration}
+ */
+export const imxClientConfig = (
+  environment: Environment,
+  publishableKey?: string,
+): ImxModuleConfiguration => {
+  if (!environment) {
+    throw new Error('Environment is required');
+  }
+  if (Object.values(Environment).indexOf(environment) === -1) {
+    throw new Error(`Invalid environment: ${environment}`);
+  }
+
+  type ConfigOptions = {
+    environment: Environment;
+    publishableKey?: string;
+  };
+
+  const configOptions: ConfigOptions = {
+    environment,
+  };
+
+  if (publishableKey) {
+    configOptions.publishableKey = publishableKey;
+  }
+
+  return {
+    baseConfig: new ImmutableConfiguration(configOptions),
+  };
+};

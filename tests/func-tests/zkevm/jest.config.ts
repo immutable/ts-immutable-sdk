@@ -14,6 +14,7 @@ const config: Config = {
     "@imtbl/sdk/provider": "<rootDir>/../../../node_modules/@imtbl/sdk/dist/provider",
     "@imtbl/sdk/config": "<rootDir>/../../../node_modules/@imtbl/sdk/dist/config",
     "@imtbl/sdk/x_client": "<rootDir>/../../../node_modules/@imtbl/sdk/dist/x_client",
+    "@imtbl/generated-clients": "<rootDir>/../../../node_modules/@imtbl/generated-clients/dist"
   },
   transform: {
     "^.+\\.(t|j)sx?$": "@swc/jest"
