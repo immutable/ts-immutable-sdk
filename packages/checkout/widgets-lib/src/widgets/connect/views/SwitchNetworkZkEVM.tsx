@@ -2,6 +2,7 @@ import {
   useCallback, useContext, useEffect, useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
+import { isWalletConnectProvider } from 'lib/providerUtils';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../../components/Footer/FooterButton';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
@@ -38,7 +39,65 @@ export function SwitchNetworkZkEVM() {
       controlType: 'Button',
     });
 
+    if (!provider.provider.request) return;
+
+    const currentChainId = provider.provider.request({ method: 'eth_chainId', params: [] });
+    // eslint-disable-next-line radix
+    const parsedChainId = parseInt(currentChainId.toString());
+
+    if (parsedChainId === getL2ChainId(checkout.config)) {
+      connectDispatch({
+        payload: {
+          type: ConnectActions.SET_PROVIDER,
+          provider,
+        },
+      });
+
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: ConnectWidgetViews.SUCCESS,
+          },
+        },
+      });
+
+      return;
+    }
+
     try {
+      let walletName = '';
+      if (isWalletConnectProvider(provider)) {
+        walletName = (provider.provider as any)?.session?.peer?.metadata?.name.toLowerCase();
+      }
+      if (walletName === 'metamask') {
+        try {
+          await checkout.addNetwork({
+            provider,
+            chainId: getL2ChainId(checkout.config),
+          });
+          connectDispatch({
+            payload: {
+              type: ConnectActions.SET_PROVIDER,
+              provider,
+            },
+          });
+
+          viewDispatch({
+            payload: {
+              type: ViewActions.UPDATE_VIEW,
+              view: {
+                type: ConnectWidgetViews.SUCCESS,
+              },
+            },
+          });
+          return;
+        } catch {
+          // eslint-disable-next-line no-console
+          console.warn('Failed to add network to wallet, skipping add network');
+        }
+      }
+
       const switchRes = await checkout.switchNetwork({
         provider,
         chainId: getL2ChainId(checkout.config),
@@ -84,7 +143,9 @@ export function SwitchNetworkZkEVM() {
       <SimpleTextBody
         heading={t('views.SWITCH_NETWORK.zkEVM.heading')}
       >
-        {t('views.SWITCH_NETWORK.zkEVM.body')}
+        {isWalletConnectProvider(provider) ? (
+          t('views.SWITCH_NETWORK.zkEVM.bodyWalletConnect')) : (
+          t('views.SWITCH_NETWORK.zkEVM.body'))}
       </SimpleTextBody>
     </SimpleLayout>
   );
