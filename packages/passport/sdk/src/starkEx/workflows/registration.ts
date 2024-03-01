@@ -1,6 +1,6 @@
 import { signRaw } from '@imtbl/toolkit';
-import { RegisterUserResponse, WalletConnection } from '@imtbl/core-sdk';
-import { ImxApiClients } from '@imtbl/generated-clients';
+import { WalletConnection } from '@imtbl/x-client';
+import { ImxApiClients, imx } from '@imtbl/generated-clients';
 
 export type RegisterPassportParams = WalletConnection & {
   imxApiClients: ImxApiClients;
@@ -9,7 +9,7 @@ export type RegisterPassportParams = WalletConnection & {
 export default async function registerPassport(
   { ethSigner, starkSigner, imxApiClients }: RegisterPassportParams,
   authorization: string,
-): Promise<RegisterUserResponse> {
+): Promise<imx.RegisterUserResponse> {
   const [userAddress, starkPublicKey] = await Promise.all([
     ethSigner.getAddress(),
     starkSigner.getAddress(),
@@ -37,5 +37,5 @@ export default async function registerPassport(
       stark_key: starkPublicKey,
     },
   });
-  return response.data as RegisterUserResponse;
+  return response.data as imx.RegisterUserResponse;
 }

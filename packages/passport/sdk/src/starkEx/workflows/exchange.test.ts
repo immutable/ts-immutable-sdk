@@ -1,4 +1,5 @@
-import { CreateTransferResponseV1, ETHAmount, ExchangesApi } from '@imtbl/core-sdk';
+import { imx } from '@imtbl/generated-clients';
+import { ETHAmount } from '@imtbl/x-client';
 import { exchangeTransfer } from './exchange';
 import { mockErrorMessage, mockStarkSignature, mockUserImx } from '../../test/mocks';
 import { PassportError, PassportErrorType } from '../../errors/passportError';
@@ -9,7 +10,7 @@ describe('exchangeTransfer', () => {
   const getExchangeSignableTransferMock = jest.fn();
   const createExchangeTransferMock = jest.fn();
   const mockStarkAddress = '0x1111...';
-  let exchangesApiMock: ExchangesApi;
+  let exchangesApiMock: imx.ExchangesApi;
 
   const mockStarkSigner = {
     getAddress: jest.fn(),
@@ -31,7 +32,7 @@ describe('exchangeTransfer', () => {
     exchangesApiMock = {
       getExchangeSignableTransfer: getExchangeSignableTransferMock,
       createExchangeTransfer: createExchangeTransferMock,
-    } as unknown as ExchangesApi;
+    } as unknown as imx.ExchangesApi;
   });
 
   it('should returns success exchange transfer result', async () => {
@@ -74,7 +75,7 @@ describe('exchangeTransfer', () => {
       },
     };
 
-    const response: CreateTransferResponseV1 = await exchangeTransfer({
+    const response: imx.CreateTransferResponseV1 = await exchangeTransfer({
       user: mockUserImx,
       starkSigner: mockStarkSigner,
       request: exchangeTransferRequest,

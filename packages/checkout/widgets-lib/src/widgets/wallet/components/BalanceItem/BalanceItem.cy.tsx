@@ -50,6 +50,10 @@ describe('BalanceItem', () => {
     walletProviderName: WalletProviderName.METAMASK,
     tokenBalances: testTokenBalances,
     supportedTopUps: null,
+    walletConfig: {
+      showNetworkMenu: true,
+      showDisconnectButton: true,
+    },
   };
 
   const testBalanceInfo: BalanceInfo = {

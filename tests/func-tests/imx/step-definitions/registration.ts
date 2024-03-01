@@ -1,12 +1,10 @@
 import { strict as assert } from 'assert';
 import { Wallet } from '@ethersproject/wallet';
 import {
-  generateStarkPrivateKey,
-} from '@imtbl/core-sdk';
-import {
   ProviderConfiguration,
   GenericIMXProvider,
-  imxClientCreateStarkSigner,
+  createStarkSigner,
+  generateStarkPrivateKey,
 } from '@imtbl/sdk/x';
 import { configuration, StepSharedState } from './stepSharedState';
 import { getProvider, env } from '../common';
@@ -52,7 +50,7 @@ export class Registration {
 
     // L2 credentials
     const starkPrivateKey = generateStarkPrivateKey();
-    const starkSigner = imxClientCreateStarkSigner(starkPrivateKey);
+    const starkSigner = createStarkSigner(starkPrivateKey);
 
     this.stepSharedState.users[addressVar] = {
       ethSigner,
