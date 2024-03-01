@@ -3802,7 +3802,7 @@ __metadata:
     bn.js: ^5.2.1
     buffer: ^6.0.3
     crypto-browserify: ^3.12.0
-    elliptic: ^6.5.4
+    elliptic: "https://github.com/dreamoftrees/elliptic#master"
     enc-utils: ^3.0.0
     eslint: ^8.40.0
     ethers: ^5.7.2
