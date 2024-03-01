@@ -15,7 +15,7 @@ import {
   SwapEventType,
   WalletEventType,
   WalletNetworkSwitch,
-  WidgetTheme, WidgetType, ProviderEventType, ProviderUpdated, WidgetConfiguration, WidgetProperties
+  WidgetTheme, WidgetType, ProviderEventType, ProviderUpdated, WidgetProperties
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { passport } from './passport';

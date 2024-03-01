@@ -56,6 +56,7 @@ import {
   SellResult,
   TokenInfo,
   GetTokenInfoParams,
+  AddNetworkParams,
 } from './types';
 import { CheckoutConfiguration } from './config';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
@@ -279,6 +280,23 @@ export class Checkout {
     }
 
     return { provider: web3Provider };
+  }
+
+  /**
+   * Adds the network for the current wallet provider.
+   * @param {AddNetworkParams} params - The parameters for adding the network.
+   * @returns {Promise<any>} - A promise that resolves to the result of adding the network.
+   */
+  public async addNetwork(
+    params: AddNetworkParams,
+  ): Promise<any> {
+    const addNetworkRes = await network.addNetworkToWallet(
+      this.config.networkMap,
+      params.provider,
+      params.chainId,
+    );
+
+    return addNetworkRes;
   }
 
   /**
