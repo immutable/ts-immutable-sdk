@@ -103,18 +103,21 @@ describe('createConfig', () => {
 
 describe('imxClientConfig', () => {
   it('should return an instance of ImxConfiguration', () => {
-    const config = imxClientConfig(Environment.SANDBOX);
+    const config = imxClientConfig({
+      environment: Environment.SANDBOX,
+    });
     expect(config).toHaveProperty('baseConfig');
     expect(config.baseConfig).toHaveProperty('environment', 'sandbox');
   });
 
-  it('should throw when missing the Enironment parameter', () => {
+  it('should throw when missing the config options', () => {
     // @ts-expect-error
-    expect(() => imxClientConfig()).toThrowError('Environment is required');
+    expect(() => imxClientConfig()).toThrowError('configOptions is required');
   });
 
   it('should throw when the Enironment parameter is not a valid Environment', () => {
     // @ts-expect-error
-    expect(() => imxClientConfig('invalid')).toThrowError('Invalid environment: invalid');
+    expect(() => imxClientConfig({ environment: 'invalid' }))
+      .toThrowError('Invalid environment: invalid');
   });
 });
