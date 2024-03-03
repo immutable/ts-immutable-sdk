@@ -47,7 +47,9 @@ describe('config', () => {
       overrides: {
         bridgeContracts: {
           rootERC20BridgeFlowRate: '0x',
+          rootAxelarAdapter: '0x',
           childERC20Bridge: '0x',
+          childAxelarAdapter: '0x',
           rootChainIMX: '0x',
           rootChainWrappedETH: '0x',
           childChainWrappedETH: '0x',
