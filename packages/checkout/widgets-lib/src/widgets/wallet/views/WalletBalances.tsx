@@ -38,10 +38,12 @@ import { BalanceInfo, mapTokenBalancesWithConversions } from '../functions/token
 type WalletBalancesProps = {
   balancesLoading: boolean;
   theme: WidgetTheme;
+  showNetworkMenu: boolean;
 };
 export function WalletBalances({
   balancesLoading,
   theme,
+  showNetworkMenu,
 }: WalletBalancesProps) {
   const { t } = useTranslation();
   const { connectLoaderState } = useContext(ConnectLoaderContext);
@@ -59,7 +61,7 @@ export function WalletBalances({
   } = walletState;
   const { conversions } = cryptoFiatState;
   const isPassport = isPassportProvider(provider);
-  const showNetworkMenu = !isPassport;
+  const enableNetworkMenu = !isPassport && showNetworkMenu;
 
   const { track, page } = useAnalytics();
 
@@ -174,10 +176,10 @@ export function WalletBalances({
         sx={walletBalanceOuterContainerStyles}
       >
         <Box sx={walletBalanceContainerStyles}>
-          {showNetworkMenu && <NetworkMenu />}
+          {enableNetworkMenu && <NetworkMenu />}
           <TotalTokenBalance totalBalance={totalFiatAmount} loading={balancesLoading} />
           <Box
-            sx={walletBalanceListContainerStyles(showNetworkMenu, showAddCoins)}
+            sx={walletBalanceListContainerStyles(enableNetworkMenu, showAddCoins)}
           >
             {balancesLoading && (
               <Box sx={walletBalanceLoadingIconStyles}>

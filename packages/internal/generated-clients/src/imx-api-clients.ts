@@ -16,6 +16,7 @@ import {
   ExchangesApi,
   NftCheckoutPrimaryApi,
   EncodingApi,
+  PrimarySalesApi,
 } from './imx';
 import { ImmutableAPIConfiguration } from './config';
 
@@ -44,6 +45,8 @@ export class ImxApiClients {
 
   public ordersApi: OrdersApi;
 
+  public primarySalesApi: PrimarySalesApi;
+
   public projectsApi: ProjectsApi;
 
   public tokensApi: TokensApi;
@@ -69,6 +72,7 @@ export class ImxApiClients {
     this.mintsApi = new MintsApi(config);
     this.nftCheckoutPrimaryApi = new NftCheckoutPrimaryApi(config);
     this.ordersApi = new OrdersApi(config);
+    this.primarySalesApi = new PrimarySalesApi(config);
     this.projectsApi = new ProjectsApi(config);
     this.tokensApi = new TokensApi(config);
     this.tradesApi = new TradesApi(config);

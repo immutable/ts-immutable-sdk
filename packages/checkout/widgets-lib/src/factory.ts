@@ -5,6 +5,7 @@ import {
   IWidgetsFactory,
   WidgetConfiguration,
   WidgetProperties,
+  WidgetConfigurations,
 } from '@imtbl/checkout-sdk';
 import { Connect } from 'widgets/connect/ConnectWidgetRoot';
 import { Swap } from 'widgets/swap/SwapWidgetRoot';
@@ -50,7 +51,8 @@ export class WidgetsFactory implements IWidgetsFactory {
   }
 
   create<T extends WidgetType>(type: T, props?: WidgetProperties<T>): Widget<T> {
-    const { config = {}, provider } = props ?? {};
+    const { provider } = props ?? {};
+    const config = props?.config as WidgetConfigurations[T] || {};
 
     switch (type) {
       case WidgetType.CONNECT: {

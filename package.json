@@ -92,7 +92,8 @@
       "packages/game-bridge"
     ],
     "nohoist": [
-      "samples/**"
+      "samples/**",
+      "examples/**"
     ]
   }
 }

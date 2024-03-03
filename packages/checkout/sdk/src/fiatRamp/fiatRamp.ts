@@ -64,7 +64,7 @@ export class FiatRampService {
     }
 
     if (params.tokenAmount && params.tokenSymbol) {
-      widgetUrl += `&defaultCryptoAmount=${params.tokenAmount}&cryptoCurrencyCode=${params.tokenSymbol}`;
+      widgetUrl += `&defaultCryptoAmount=${params.tokenAmount}&defaultCryptoCurrency=${params.tokenSymbol}`;
     } else {
       widgetUrl += '&defaultCryptoCurrency=IMX';
     }
