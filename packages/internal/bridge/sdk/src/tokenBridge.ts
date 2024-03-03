@@ -232,13 +232,15 @@ export class TokenBridge {
 
       destinationChainGas = BridgeMethodsGasLimit[`${req.action}_DESTINATION`];
 
-      // destinationChainGas = await this.getTenderlyAdapterGasEstimates(
-      //   req.destinationChainId,
-      //   req.senderAddress,
-      //   req.recipientAddress,
-      //   req.amount,
-      //   req.token,
-      // );
+      const tenderlyAdapterRes = await this.getTenderlyAdapterGasEstimates(
+        req.destinationChainId,
+        req.senderAddress,
+        req.recipientAddress,
+        req.amount,
+        req.token,
+      );
+
+      console.log('tenderlyAdapterRes', tenderlyAdapterRes);
     }
 
     const feeResult = await this.calculateBridgeFee(
@@ -296,6 +298,8 @@ export class TokenBridge {
         '0x7a8dc26796a1e50e6e190b70259f58f6a4edd5b22280ceecc82b687b8e982869000000000000000000000000e2629e08f4125d14e446660028bd98ee60ee69f200000000000000000000000024e190929c646bffb3f3bfd81ae3b8ea24194c80000000000000000000000000c4c3d44eb95c24babc172ff4a7006ed1565e9d9e0000000000000000000000000000000000000000000000000de0b6b3a7640000',
       ]), BridgeErrorType.INTERNAL_ERROR);
 
+    console.log('executeData', executeData);
+
     const tenderlyAPI = this.getTenderlyEndpoint(destinationChainId);
     let axiosResponse:AxiosResponse;
 
@@ -309,6 +313,8 @@ export class TokenBridge {
       to: sourceAdapterAddress,
       input: executeData,
     }];
+
+    console.log('simulations', simulations);
 
     try {
       axiosResponse = await axios.post(
@@ -334,6 +340,8 @@ export class TokenBridge {
     }
 
     const simResults = axiosResponse.data.simulation_results;
+
+    console.log('simResults', simResults);
 
     if (simResults.length !== 1 || simResults[0].simulation.gas_used === undefined) {
       throw new BridgeError(
