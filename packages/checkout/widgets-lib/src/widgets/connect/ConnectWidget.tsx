@@ -9,6 +9,7 @@ import {
 import { Web3Provider } from '@ethersproject/providers';
 import { useTranslation } from 'react-i18next';
 import { isL1EthChainId, isZkEvmChainId } from 'lib/utils';
+import { Environment } from '@imtbl/config';
 import {
   sendCloseWidgetEvent,
   sendConnectFailedEvent,
@@ -88,6 +89,13 @@ export default function ConnectWidget({
 
   const { identify, page } = useAnalytics();
 
+  let targetChain = targetChainId;
+  if (!targetChain) {
+    targetChain = checkout.config.environment === Environment.PRODUCTION
+      ? ChainId.IMTBL_ZKEVM_MAINNET
+      : ChainId.IMTBL_ZKEVM_TESTNET;
+  }
+
   useEffect(() => {
     if (!web3Provider) return;
     connectDispatch({
@@ -158,15 +166,15 @@ export default function ConnectWidget({
             <LoadingView loadingText="Loading" />
           )}
           {view.type === ConnectWidgetViews.CONNECT_WALLET && (
-            <ConnectWallet targetChainId={targetChainId!} />
+            <ConnectWallet targetChainId={targetChain} />
           )}
           {view.type === ConnectWidgetViews.READY_TO_CONNECT && (
-            <ReadyToConnect targetChainId={targetChainId!} allowedChains={allowedChains ?? [targetChainId!]} />
+            <ReadyToConnect targetChainId={targetChain} allowedChains={allowedChains ?? [targetChain]} />
           )}
-          {view.type === ConnectWidgetViews.SWITCH_NETWORK && isZkEvmChainId(targetChainId!) && (
+          {view.type === ConnectWidgetViews.SWITCH_NETWORK && isZkEvmChainId(targetChain) && (
             <SwitchNetworkZkEVM />
           )}
-          {view.type === ConnectWidgetViews.SWITCH_NETWORK && !isL1EthChainId(targetChainId!) && (
+          {view.type === ConnectWidgetViews.SWITCH_NETWORK && isL1EthChainId(targetChain) && (
             <SwitchNetworkEth />
           )}
           {view.type === ConnectWidgetViews.SUCCESS && provider && (
