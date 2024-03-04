@@ -15,7 +15,7 @@ import {
   SwapEventType,
   WalletEventType,
   WalletNetworkSwitch,
-  WidgetTheme, WidgetType, ProviderEventType, ProviderUpdated, WidgetProperties, ConnectTargetLayer
+  WidgetTheme, WidgetType, ProviderEventType, ProviderUpdated, WidgetProperties, ChainId
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { passport } from './passport';
@@ -102,8 +102,8 @@ export const MainPage = () => {
   }, [walletWidget, bridgeWidget, onRampWidget, swapWidget]);
 
   // button click functions to open/close widgets
-  const openConnectWidget = useCallback((targetLayer?: ConnectTargetLayer) => {
-    connectWidget.mount('connect-target', {targetLayer: targetLayer});
+  const openConnectWidget = useCallback((targetChainId?: ChainId) => {
+    connectWidget.mount('connect-target', {targetChainId: targetChainId});
   }, [connectWidget])
 
   const openWalletWidget = useCallback(() => {
@@ -160,7 +160,7 @@ export const MainPage = () => {
         <Heading>Immutable Checkout Marketplace</Heading>
         <Box sx={{ padding: 'base.spacing.x4', display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', gap: 'base.spacing.x6', alignItems: 'center', flexWrap: 'wrap' }}>
           <Button onClick={() => openConnectWidget()}>Connect</Button>
-          <Button onClick={() => openConnectWidget(ConnectTargetLayer.LAYER1)}>Connect (Layer 1)</Button>
+          <Button onClick={() => openConnectWidget(checkout.config.environment === Environment.PRODUCTION ? ChainId.ETHEREUM : ChainId.SEPOLIA)}>Connect (Layer 1)</Button>
           <Button onClick={openWalletWidget}>Wallet</Button>
           <Button onClick={openSwapWidget}>Swap</Button>
           <Button onClick={openBridgeWidget}>Bridge</Button>

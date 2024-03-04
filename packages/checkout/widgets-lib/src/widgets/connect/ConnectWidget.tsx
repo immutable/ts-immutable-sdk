@@ -4,10 +4,11 @@ import React, {
 } from 'react';
 import {
   ChainId,
-  Checkout, ConnectTargetLayer, ConnectWidgetParams,
+  Checkout, ConnectWidgetParams,
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { useTranslation } from 'react-i18next';
+import { isL1EthChainId, isZkEvmChainId } from 'lib/utils';
 import {
   sendCloseWidgetEvent,
   sendConnectFailedEvent,
@@ -35,7 +36,7 @@ import {
 import { StatusType } from '../../components/Status/StatusType';
 import { StatusView } from '../../components/Status/StatusView';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { addProviderListenersForWidgetRoot, getTargetLayerChainId, sendProviderUpdatedEvent } from '../../lib';
+import { addProviderListenersForWidgetRoot, sendProviderUpdatedEvent } from '../../lib';
 import { SwitchNetworkEth } from './views/SwitchNetworkEth';
 import { ErrorView } from '../../views/error/ErrorView';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
@@ -56,7 +57,7 @@ export default function ConnectWidget({
   sendCloseEventOverride,
   web3Provider,
   checkout,
-  targetLayer,
+  targetChainId,
   allowedChains,
   deepLink = ConnectWidgetViews.CONNECT_WALLET,
 }: ConnectWidgetInputs) {
@@ -84,13 +85,6 @@ export default function ConnectWidget({
     () => ({ viewState, viewDispatch }),
     [viewState, viewDispatch],
   );
-
-  const networkToSwitchTo = targetLayer ?? ConnectTargetLayer.LAYER2;
-
-  const targetChainId = getTargetLayerChainId(checkout.config, targetLayer ?? ConnectTargetLayer.LAYER2);
-
-  console.log(checkout.config.environment);
-  console.log('targetChainId', targetChainId);
 
   const { identify, page } = useAnalytics();
 
@@ -164,15 +158,15 @@ export default function ConnectWidget({
             <LoadingView loadingText="Loading" />
           )}
           {view.type === ConnectWidgetViews.CONNECT_WALLET && (
-            <ConnectWallet targetChainId={targetChainId} />
+            <ConnectWallet targetChainId={targetChainId!} />
           )}
           {view.type === ConnectWidgetViews.READY_TO_CONNECT && (
-            <ReadyToConnect targetChainId={targetChainId} allowedChains={allowedChains ?? [targetChainId]} />
+            <ReadyToConnect targetChainId={targetChainId!} allowedChains={allowedChains ?? [targetChainId!]} />
           )}
-          {view.type === ConnectWidgetViews.SWITCH_NETWORK && networkToSwitchTo === ConnectTargetLayer.LAYER2 && (
+          {view.type === ConnectWidgetViews.SWITCH_NETWORK && isZkEvmChainId(targetChainId!) && (
             <SwitchNetworkZkEVM />
           )}
-          {view.type === ConnectWidgetViews.SWITCH_NETWORK && networkToSwitchTo === ConnectTargetLayer.LAYER1 && (
+          {view.type === ConnectWidgetViews.SWITCH_NETWORK && !isL1EthChainId(targetChainId!) && (
             <SwitchNetworkEth />
           )}
           {view.type === ConnectWidgetViews.SUCCESS && provider && (

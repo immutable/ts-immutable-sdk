@@ -3,7 +3,6 @@ import {
   ChainName,
   Checkout,
   WidgetTheme,
-  ConnectTargetLayer,
   ConnectWidgetParams,
 } from '@imtbl/checkout-sdk';
 import { describe, it, cy } from 'local-cypress';
@@ -326,7 +325,7 @@ describe('ConnectWidget tests', () => {
               config={config}
               checkout={checkout}
               {...props}
-              targetLayer={ConnectTargetLayer.LAYER2}
+              targetChainId={ChainId.IMTBL_ZKEVM_TESTNET}
               allowedChains={[ChainId.IMTBL_ZKEVM_TESTNET, ChainId.SEPOLIA]}
             />
           </ViewContextTestComponent>,

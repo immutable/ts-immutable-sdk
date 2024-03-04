@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react';
 import {
-  ConnectTargetLayer,
+  ChainId,
   IMTBLWidgetEvents,
   WalletWidgetConfiguration,
   WalletWidgetParams,
@@ -15,6 +15,7 @@ import { isValidWalletProvider } from 'lib/validations/widgetValidators';
 import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
 import { LoadingView } from 'views/loading/LoadingView';
+import { Environment } from '@imtbl/config';
 import { sendWalletWidgetCloseEvent } from './WalletWidgetEvents';
 import i18n from '../../i18n';
 
@@ -67,7 +68,9 @@ export class Wallet extends Base<WidgetType.WALLET> {
 
     const { t } = i18n;
     const connectLoaderParams: ConnectLoaderParams = {
-      targetLayer: ConnectTargetLayer.LAYER2,
+      targetChainId: this.checkout.config.environment === Environment.PRODUCTION
+        ? ChainId.IMTBL_ZKEVM_MAINNET
+        : ChainId.IMTBL_ZKEVM_TESTNET,
       walletProviderName: this.parameters?.walletProviderName,
       web3Provider: this.web3Provider,
       checkout: this.checkout,
