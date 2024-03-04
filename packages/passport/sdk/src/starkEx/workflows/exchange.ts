@@ -1,9 +1,8 @@
+import { imx } from '@imtbl/generated-clients';
 import {
-  CreateTransferResponseV1,
-  ExchangesApi,
   StarkSigner,
   UnsignedExchangeTransferRequest,
-} from '@imtbl/core-sdk';
+} from '@imtbl/x-client';
 import { convertToSignableToken } from '@imtbl/toolkit';
 import { PassportErrorType, withPassportError } from '../../errors/passportError';
 import { UserImx } from '../../types';
@@ -12,7 +11,7 @@ type TransfersParams = {
   user: UserImx;
   starkSigner: StarkSigner;
   request: UnsignedExchangeTransferRequest;
-  exchangesApi: ExchangesApi;
+  exchangesApi: imx.ExchangesApi;
 };
 
 export async function exchangeTransfer({
@@ -20,8 +19,8 @@ export async function exchangeTransfer({
   starkSigner,
   request,
   exchangesApi,
-}: TransfersParams): Promise<CreateTransferResponseV1> {
-  return withPassportError<CreateTransferResponseV1>(async () => {
+}: TransfersParams): Promise<imx.CreateTransferResponseV1> {
+  return withPassportError<imx.CreateTransferResponseV1>(async () => {
     const { ethAddress } = user.imx;
     const transferAmount = request.amount;
     const signableResult = await exchangesApi.getExchangeSignableTransfer({

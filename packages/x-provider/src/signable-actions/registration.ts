@@ -6,7 +6,7 @@ import {
   UsersApi,
 } from '@imtbl/core-sdk';
 import { signRaw } from '@imtbl/toolkit';
-import { AxiosError } from 'axios';
+import { isAxiosError } from 'axios';
 import { Signers } from './types';
 import { validateChain } from './helpers';
 import { ProviderConfiguration } from '../config';
@@ -56,7 +56,7 @@ export async function isRegisteredOffchain(ethAddress: string, config: ProviderC
 
     return accounts?.length > 0;
   } catch (ex) {
-    if (ex instanceof AxiosError && ex.response?.status === 404) {
+    if (isAxiosError(ex) && ex.response?.status === 404) {
       return false;
     }
     throw ex;

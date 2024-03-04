@@ -38,7 +38,7 @@ async function switchNetworkInWallet(
 }
 
 // eslint-disable-next-line consistent-return
-async function addNetworkToWallet(
+export async function addNetworkToWallet(
   networkMap: NetworkMap,
   web3Provider: Web3Provider,
   chainId: ChainId,

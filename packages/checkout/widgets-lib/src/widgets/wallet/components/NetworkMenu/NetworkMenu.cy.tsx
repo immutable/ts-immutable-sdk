@@ -63,6 +63,10 @@ describe('Network Menu', () => {
       walletProviderName: WalletProviderName.METAMASK,
       tokenBalances: [],
       supportedTopUps: null,
+      walletConfig: {
+        showNetworkMenu: true,
+        showDisconnectButton: true,
+      },
     };
     mount(
       <ViewContextTestComponent>
@@ -107,6 +111,10 @@ describe('Network Menu', () => {
       walletProviderName: WalletProviderName.METAMASK,
       tokenBalances: [],
       supportedTopUps: null,
+      walletConfig: {
+        showNetworkMenu: true,
+        showDisconnectButton: true,
+      },
     };
     mount(
       <ViewContextTestComponent>

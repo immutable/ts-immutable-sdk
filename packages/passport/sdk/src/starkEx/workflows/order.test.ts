@@ -1,4 +1,5 @@
-import { ETHAmount, OrdersApi, UnsignedOrderRequest } from '@imtbl/core-sdk';
+import { imx } from '@imtbl/generated-clients';
+import { ETHAmount, UnsignedOrderRequest } from '@imtbl/x-client';
 import GuardianClient from '../../guardian';
 import { PassportError, PassportErrorType } from '../../errors/passportError';
 import { mockErrorMessage, mockStarkSignature, mockUserImx } from '../../test/mocks';
@@ -23,7 +24,7 @@ describe('order', () => {
   describe('createOrder', () => {
     let mockGetSignableCreateOrder: jest.Mock;
     let mockCreateOrder: jest.Mock;
-    let mockOrdersApi: OrdersApi;
+    let mockOrdersApi: imx.OrdersApi;
 
     const buy = { type: 'ETH', amount: '2' } as ETHAmount;
     const sell = { type: 'ERC721', tokenId: '123', tokenAddress: '0x9999' };
@@ -40,7 +41,7 @@ describe('order', () => {
       mockOrdersApi = {
         getSignableOrder: mockGetSignableCreateOrder,
         createOrderV3: mockCreateOrder,
-      } as unknown as OrdersApi;
+      } as unknown as imx.OrdersApi;
     });
 
     it('should returns success createOrder result', async () => {
@@ -194,7 +195,7 @@ describe('order', () => {
   describe('cancelOrder', () => {
     let mockGetSignableCancelOrder: jest.Mock;
     let mockCancelOrder: jest.Mock;
-    let mockOrdersApi: OrdersApi;
+    let mockOrdersApi: imx.OrdersApi;
     const orderId = 54321;
     const cancelOrderRequest = {
       order_id: orderId,
@@ -206,7 +207,7 @@ describe('order', () => {
       mockOrdersApi = {
         getSignableCancelOrderV3: mockGetSignableCancelOrder,
         cancelOrderV3: mockCancelOrder,
-      } as unknown as OrdersApi;
+      } as unknown as imx.OrdersApi;
     });
 
     it('should returns success cancelOrder result', async () => {
