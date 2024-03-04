@@ -68,6 +68,8 @@ import { Workflows } from './workflows';
 export class IMXClient {
   private immutableX: ImxApiClients;
 
+  public imxConfig: ImxConfiguration;
+
   public assetApi: AssetsApi;
 
   public balanceApi: BalancesApi;
@@ -107,8 +109,8 @@ export class IMXClient {
   public workflows: Workflows;
 
   constructor(config: ImxModuleConfiguration) {
-    const imxConfig = new ImxConfiguration(config);
-    this.immutableX = new ImxApiClients(imxConfig.immutableXConfig.apiConfiguration);
+    this.imxConfig = new ImxConfiguration(config);
+    this.immutableX = new ImxApiClients(this.imxConfig.immutableXConfig.apiConfiguration);
     this.assetApi = this.immutableX.assetApi;
     this.balanceApi = this.immutableX.balanceApi;
     this.collectionApi = this.immutableX.collectionApi;
@@ -128,7 +130,7 @@ export class IMXClient {
     this.usersApi = this.immutableX.usersApi;
     this.withdrawalsApi = this.immutableX.withdrawalsApi;
     this.workflows = new Workflows(
-      imxConfig.immutableXConfig,
+      this.imxConfig.immutableXConfig,
       this.immutableX.collectionApi,
       this.immutableX.exchangeApi,
       this.immutableX.metadataApi,
