@@ -146,10 +146,11 @@ export class TokenBridge {
       );
     }
 
-    let sourceChainGas: ethers.BigNumber = ethers.BigNumber.from(0);
-    let approvalFee: ethers.BigNumber = ethers.BigNumber.from(0);
-    let bridgeFee: ethers.BigNumber = ethers.BigNumber.from(0);
     const imtblFee: ethers.BigNumber = ethers.BigNumber.from(0);
+    let bridgeFee: ethers.BigNumber = ethers.BigNumber.from(0);
+    let sourceChainGas = ethers.BigNumber.from(0);
+    let approvalFee = ethers.BigNumber.from(0);
+    let destinationChainGas = 0;
 
     if (req.action === BridgeFeeActions.FINALISE_WITHDRAWAL) {
       sourceChainGas = await this.getGasEstimates(
@@ -168,78 +169,36 @@ export class TokenBridge {
       };
     }
 
-    let amountToApprove = ethers.BigNumber.from(0);
-    let contractToApprove;
-    let erc20Contract;
-
-    if ('token' in req && req.token !== 'NATIVE') {
-      const resGetAllowance = await this.getAllowance(
-        req.sourceChainId,
-        req.token,
-        req.senderAddress,
-        req.amount,
-      );
-
-      amountToApprove = resGetAllowance.amountToApprove;
-      contractToApprove = resGetAllowance.contractToApprove;
-      erc20Contract = resGetAllowance.erc20Contract;
-    }
-
     const sourceProvider:ethers.providers.Provider = (req.action === BridgeFeeActions.WITHDRAW)
       ? this.config.childProvider : this.config.rootProvider;
 
-    let destinationChainGas: number;
+    let fees;
 
-    if (req.action === BridgeFeeActions.DEPOSIT) {
-      // deposit
-      const tenderlyRes = await this.getTenderlyBridgeGasEstimates(
+    // use static fees as a fallback where no sender & recipient is parsed
+    // @TODO deprecate this and always use dynamic fees
+    if (req.senderAddress === '0x0' || req.recipientAddress === '0x0') {
+      fees = await this.getFeesStatic(
+        sourceProvider,
+        req.action,
+        req.token,
+      );
+    } else {
+      fees = await this.getFeesDynamic(
+        sourceProvider,
+        req.action,
         req.sourceChainId,
+        req.token,
         req.senderAddress,
         req.recipientAddress,
         req.amount,
-        amountToApprove,
-        contractToApprove,
-        erc20Contract,
-        req.token,
       );
-
-      destinationChainGas = BridgeMethodsGasLimit[`${req.action}_DESTINATION`];
-
-      if (tenderlyRes.approvalFee > 0) {
-        approvalFee = await this.getGasEstimates(
-          sourceProvider,
-          tenderlyRes.approvalFee,
-        );
-      }
-
-      sourceChainGas = await this.getGasEstimates(
-        sourceProvider,
-        tenderlyRes.sourceChainGas,
-      );
-    } else {
-      // withdrawal
-      sourceChainGas = await this.getGasEstimates(
-        sourceProvider,
-        BridgeMethodsGasLimit[`${req.action}_SOURCE`],
-      );
-
-      if (amountToApprove.gt(0)) {
-        approvalFee = await this.getGasEstimates(
-          sourceProvider,
-          BridgeMethodsGasLimit.APPROVE_TOKEN,
-        );
-      }
-
-      destinationChainGas = BridgeMethodsGasLimit[`${req.action}_DESTINATION`];
-
-      // destinationChainGas = await this.getTenderlyAdapterGasEstimates(
-      //   req.destinationChainId,
-      //   req.senderAddress,
-      //   req.recipientAddress,
-      //   req.amount,
-      //   req.token,
-      // );
     }
+
+    console.log('fees', fees);
+
+    destinationChainGas = fees.destinationChainGas;
+    sourceChainGas = fees.sourceChainGas;
+    approvalFee = fees.approvalFee;
 
     const feeResult = await this.calculateBridgeFee(
       req.sourceChainId,
@@ -258,6 +217,131 @@ export class TokenBridge {
       bridgeFee,
       imtblFee, // no network fee charged currently
       totalFees,
+    };
+  }
+
+  private async getFeesStatic(
+    sourceProvider: ethers.providers.Provider,
+    action: BridgeFeeActions.DEPOSIT | BridgeFeeActions.WITHDRAW,
+    token:string,
+  ) {
+    console.log('getFeesStatic', sourceProvider, action, token);
+
+    let sourceChainGas: ethers.BigNumber = ethers.BigNumber.from(0);
+    let approvalFee: ethers.BigNumber = ethers.BigNumber.from(0);
+
+    if (token !== 'NATIVE') {
+      approvalFee = await this.getGasEstimates(
+        sourceProvider,
+        BridgeMethodsGasLimit.APPROVE_TOKEN,
+      );
+    }
+
+    sourceChainGas = await this.getGasEstimates(
+      sourceProvider,
+      BridgeMethodsGasLimit[`${action}_SOURCE`],
+    );
+
+    const destinationChainGas: number = BridgeMethodsGasLimit[`${action}_DESTINATION`];
+
+    return {
+      sourceChainGas,
+      approvalFee,
+      destinationChainGas,
+    };
+  }
+
+  private async getFeesDynamic(
+    sourceProvider: ethers.providers.Provider,
+    action: BridgeFeeActions.DEPOSIT | BridgeFeeActions.WITHDRAW,
+    sourceChainId: string,
+    token:string,
+    senderAddress: string,
+    recipientAddress: string,
+    amount: ethers.BigNumber,
+  ) {
+    console.log(
+      'getFeesDynamic',
+      sourceProvider,
+      action,
+      sourceChainId,
+      token,
+      senderAddress,
+      recipientAddress,
+      amount,
+    );
+
+    let sourceChainGas: ethers.BigNumber = ethers.BigNumber.from(0);
+    let approvalFee: ethers.BigNumber = ethers.BigNumber.from(0);
+    let amountToApprove = ethers.BigNumber.from(0);
+    let contractToApprove;
+    let erc20Contract;
+
+    if (token !== 'NATIVE') {
+      const resGetAllowance = await this.getAllowance(
+        sourceChainId,
+        token,
+        senderAddress,
+        amount,
+      );
+
+      amountToApprove = resGetAllowance.amountToApprove;
+      contractToApprove = resGetAllowance.contractToApprove;
+      erc20Contract = resGetAllowance.erc20Contract;
+    }
+
+    const destinationChainGas: number = BridgeMethodsGasLimit[`${action}_DESTINATION`];
+
+    if (action === BridgeFeeActions.DEPOSIT) {
+      // deposit
+      const tenderlyRes = await this.getTenderlyBridgeGasEstimates(
+        sourceChainId,
+        senderAddress,
+        recipientAddress,
+        amount,
+        amountToApprove,
+        contractToApprove,
+        erc20Contract,
+        token,
+      );
+
+      if (tenderlyRes.approvalFee > 0) {
+        approvalFee = await this.getGasEstimates(
+          sourceProvider,
+          tenderlyRes.approvalFee,
+        );
+      }
+
+      sourceChainGas = await this.getGasEstimates(
+        sourceProvider,
+        tenderlyRes.sourceChainGas,
+      );
+    } else {
+      // withdrawal
+      sourceChainGas = await this.getGasEstimates(
+        sourceProvider,
+        BridgeMethodsGasLimit[`${action}_SOURCE`],
+      );
+
+      if (amountToApprove.gt(0)) {
+        approvalFee = await this.getGasEstimates(
+          sourceProvider,
+          BridgeMethodsGasLimit.APPROVE_TOKEN,
+        );
+      }
+
+      // destinationChainGas = await this.getTenderlyAdapterGasEstimates(
+      //   req.destinationChainId,
+      //   req.senderAddress,
+      //   req.recipientAddress,
+      //   req.amount,
+      //   req.token,
+      // );
+    }
+    return {
+      sourceChainGas,
+      approvalFee,
+      destinationChainGas,
     };
   }
 

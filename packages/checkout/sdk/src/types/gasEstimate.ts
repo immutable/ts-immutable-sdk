@@ -23,9 +23,20 @@ export type GasEstimateParams = GasEstimateBridgeToL2Params | GasEstimateSwapPar
 /**
  * An interface representing the parameters for estimating gas for a bridge to L2 transaction {@link Checkout.gasEstimate}.
  * @param {GasEstimateType.BRIDGE_TO_L2} gasEstimateType - The type of gas estimate.
- */
+ * @param {string|undefined} amount - The type of gas estimate.
+ * @param {string|undefined} tokenAddress - The address of the token being bridged.
+ * @param {string|undefined} senderAddress - The sender address for the bridge.
+ * @param {string|undefined} recipientAddress - The receiver address for the bridge.
+ * @dev having the amount, tokenAddress, senderAddress and recipientAddress able to be undefined prevents
+ * causing a breaking change in the Checkout SDK. This functionality should be deprecated over time and
+ * the Checkout SDK's 'estimateGas' method should force these currently optional params to be required.
+*/
 export interface GasEstimateBridgeToL2Params {
   gasEstimateType: GasEstimateType.BRIDGE_TO_L2;
+  amount?: string,
+  tokenAddress?: string,
+  senderAddress?: string,
+  recipientAddress?: string,
 }
 
 /**
