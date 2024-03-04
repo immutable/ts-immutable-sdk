@@ -127,54 +127,6 @@ export function WalletAndNetworkSelector() {
   useEffect(() => {
     if (!from || !to) return;
 
-    if (fromWalletAddress !== from?.walletAddress) {
-      track({
-        userJourney: UserJourney.BRIDGE,
-        screen: 'WalletAndNetwork',
-        control: 'FromWallet',
-        controlType: 'Select',
-        extras: {
-          walletAddress: from?.walletAddress,
-        },
-      });
-    }
-
-    if (fromNetwork !== from?.network) {
-      track({
-        userJourney: UserJourney.BRIDGE,
-        screen: 'WalletAndNetwork',
-        control: 'FromNetwork',
-        controlType: 'Select',
-        extras: {
-          chainId: from?.network,
-        },
-      });
-    }
-
-    if (toWalletAddress !== to?.walletAddress) {
-      track({
-        userJourney: UserJourney.BRIDGE,
-        screen: 'WalletAndNetwork',
-        control: 'ToWallet',
-        controlType: 'Select',
-        extras: {
-          walletAddress: to?.walletAddress,
-        },
-      });
-    }
-
-    if (toNetwork !== to?.network) {
-      track({
-        userJourney: UserJourney.BRIDGE,
-        screen: 'WalletAndNetwork',
-        control: 'ToNetwork',
-        controlType: 'Select',
-        extras: {
-          chainId: to?.network,
-        },
-      });
-    }
-
     bridgeDispatch({
       payload: {
         type: BridgeActions.SET_WALLETS_AND_NETWORKS,
@@ -198,10 +150,30 @@ export function WalletAndNetworkSelector() {
     const address = await provider!.getSigner().getAddress();
     setFromWalletAddress(address.toLowerCase());
 
+    track({
+      userJourney: UserJourney.BRIDGE,
+      screen: 'WalletAndNetwork',
+      control: 'FromWallet',
+      controlType: 'Select',
+      extras: {
+        walletAddress: address.toLowerCase(),
+      },
+    });
+
     /** if Passport skip from network selector and default to zkEVM */
     if (isPassportProvider(provider)) {
       setFromNetwork(imtblZkEvmNetworkChainId);
       setFromWalletDrawerOpen(false);
+
+      track({
+        userJourney: UserJourney.BRIDGE,
+        screen: 'WalletAndNetwork',
+        control: 'FromNetwork',
+        controlType: 'Select',
+        extras: {
+          chainId: imtblZkEvmNetworkChainId,
+        },
+      });
       return;
     }
 
@@ -235,6 +207,16 @@ export function WalletAndNetworkSelector() {
       clearToWalletSelections();
       setFromNetworkDrawerOpen(false);
       setFromNetwork(chainId);
+
+      track({
+        userJourney: UserJourney.BRIDGE,
+        screen: 'WalletAndNetwork',
+        control: 'FromNetwork',
+        controlType: 'Select',
+        extras: {
+          chainId,
+        },
+      });
     },
     [checkout, fromWalletWeb3Provider],
   );
@@ -246,6 +228,16 @@ export function WalletAndNetworkSelector() {
       : l1NetworkChainId;
     setToNetwork(theToNetwork);
     setToWalletDrawerOpen(false);
+
+    track({
+      userJourney: UserJourney.BRIDGE,
+      screen: 'WalletAndNetwork',
+      control: 'ToNetwork',
+      controlType: 'Select',
+      extras: {
+        chainId: theToNetwork,
+      },
+    });
   }, [fromNetwork]);
 
   const handleWalletConnectToWalletConnection = useCallback(
@@ -257,6 +249,16 @@ export function WalletAndNetworkSelector() {
         .then((address) => {
           setToWalletAddress(address.toLowerCase());
           handleSettingToNetwork();
+
+          track({
+            userJourney: UserJourney.BRIDGE,
+            screen: 'WalletAndNetwork',
+            control: 'ToWallet',
+            controlType: 'Select',
+            extras: {
+              walletAddress: address.toLowerCase(),
+            },
+          });
         });
     },
     [handleSettingToNetwork],
@@ -271,6 +273,16 @@ export function WalletAndNetworkSelector() {
         const address = await fromWalletWeb3Provider!.getSigner().getAddress();
         setToWalletAddress(address.toLowerCase());
         handleSettingToNetwork();
+
+        track({
+          userJourney: UserJourney.BRIDGE,
+          screen: 'WalletAndNetwork',
+          control: 'ToWallet',
+          controlType: 'Select',
+          extras: {
+            walletAddress: address.toLowerCase(),
+          },
+        });
         return;
       }
 
@@ -287,6 +299,16 @@ export function WalletAndNetworkSelector() {
           const address = await connectedProvider!.getSigner().getAddress();
           setToWalletAddress(address.toLowerCase());
           handleSettingToNetwork();
+
+          track({
+            userJourney: UserJourney.BRIDGE,
+            screen: 'WalletAndNetwork',
+            control: 'ToWallet',
+            controlType: 'Select',
+            extras: {
+              walletAddress: address.toLowerCase(),
+            },
+          });
         }
       } catch (error) {
         // eslint-disable-next-line no-console
