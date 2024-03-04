@@ -9,7 +9,6 @@ import {
 import { Web3Provider } from '@ethersproject/providers';
 import { useTranslation } from 'react-i18next';
 import { isL1EthChainId, isZkEvmChainId } from 'lib/utils';
-import { Environment } from '@imtbl/config';
 import {
   sendCloseWidgetEvent,
   sendConnectFailedEvent,
@@ -91,7 +90,7 @@ export default function ConnectWidget({
 
   let targetChain = targetChainId;
   if (!targetChain) {
-    targetChain = checkout.config.environment === Environment.PRODUCTION
+    targetChain = checkout.config.isProduction
       ? ChainId.IMTBL_ZKEVM_MAINNET
       : ChainId.IMTBL_ZKEVM_TESTNET;
   }

@@ -19,7 +19,6 @@ import { isValidAddress, isValidAmount, isValidWalletProvider } from 'lib/valida
 import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
 import { LoadingView } from 'views/loading/LoadingView';
-import { Environment } from '@imtbl/config';
 import { topUpBridgeOption, topUpOnRampOption } from './helpers';
 import { sendSwapWidgetCloseEvent } from './SwapWidgetEvents';
 import i18n from '../../i18n';
@@ -100,7 +99,7 @@ export class Swap extends Base<WidgetType.SWAP> {
 
     const { t } = i18n;
     const connectLoaderParams: ConnectLoaderParams = {
-      targetChainId: this.checkout.config.environment === Environment.PRODUCTION
+      targetChainId: this.checkout.config.isProduction
         ? ChainId.IMTBL_ZKEVM_MAINNET
         : ChainId.IMTBL_ZKEVM_TESTNET,
       walletProviderName: this.parameters.walletProviderName,

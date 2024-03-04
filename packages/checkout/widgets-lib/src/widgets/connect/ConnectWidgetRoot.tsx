@@ -29,10 +29,10 @@ export class Connect extends Base<WidgetType.CONNECT> {
 
     // validating targetChainId per environment
     if (!params.targetChainId
-      && this.checkout.config.environment === Environment.PRODUCTION) {
+      && this.checkout.config.isProduction) {
       validatedParams.targetChainId = ChainId.IMTBL_ZKEVM_MAINNET;
     } else if (params.targetChainId
-      && this.checkout.config.environment === Environment.PRODUCTION
+      && this.checkout.config.isProduction
       && (params.targetChainId !== ChainId.ETHEREUM && params.targetChainId !== ChainId.IMTBL_ZKEVM_MAINNET)
     ) {
       // eslint-disable-next-line max-len, no-console
