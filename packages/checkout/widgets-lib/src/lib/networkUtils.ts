@@ -1,4 +1,4 @@
-import { ChainId, CheckoutConfiguration, ConnectTargetLayer } from '@imtbl/checkout-sdk';
+import { ChainId, CheckoutConfiguration } from '@imtbl/checkout-sdk';
 
 // **************************************************** //
 // **************************************************** //
@@ -20,8 +20,3 @@ export const getL2ChainId = (config: CheckoutConfiguration): ChainId => {
 };
 // **************************************************** //
 // **************************************************** //
-
-export function getTargetLayerChainId(config: CheckoutConfiguration, targetLayer: ConnectTargetLayer) {
-  if (targetLayer === ConnectTargetLayer.LAYER2) return getL2ChainId(config);
-  return getL1ChainId(config);
-}
