@@ -13,7 +13,7 @@ import {
 import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import {
   TokenFilterTypes,
-  TokenInfo,
+  TokenInfo, WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
 import {
   DEFAULT_TRANSACTIONS_RETRY_POLICY,
@@ -250,8 +250,12 @@ export function Transactions({
       });
 
       try {
+        let changeAccount = false;
+        if (event.providerDetail.info.rdns === WalletProviderRdns.METAMASK) {
+          changeAccount = true;
+        }
         const web3Provider = new Web3Provider(event.provider as any);
-        const connectedProvider = await connectToProvider(checkout, web3Provider, true);
+        const connectedProvider = await connectToProvider(checkout, web3Provider, changeAccount);
         const network = await connectedProvider.getNetwork();
         const address = await connectedProvider.getSigner().getAddress();
 
