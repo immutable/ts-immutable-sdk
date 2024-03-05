@@ -1,10 +1,10 @@
 import { Box, MenuItem } from '@biom3/react';
 import {
   ChainId,
-  WalletProviderName,
+  WalletProviderName, WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
 import {
-  useCallback, useContext,
+  useCallback, useContext, useMemo,
 } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
@@ -31,6 +31,7 @@ import {
   EIP6963ProviderDetail,
   getProviderSlugFromRdns,
 } from '../../../lib/provider';
+import { getL1ChainId } from '../../../lib';
 
 export interface WalletListProps {
   targetChainId: ChainId;
@@ -47,6 +48,10 @@ export function WalletList(props: WalletListProps) {
   const { track } = useAnalytics();
   const { listVariants, listItemVariants } = useAnimation();
   const { providers } = useInjectedProviders({ checkout });
+  const filteredProviders = useMemo(() => (
+    providers.filter((provider) => (
+      !(provider.info.rdns === WalletProviderRdns.PASSPORT && targetChainId === getL1ChainId(checkout!.config))))
+  ), [providers]);
 
   const selectWeb3Provider = useCallback((web3Provider: any, providerName: string) => {
     connectDispatch({
@@ -149,7 +154,7 @@ export function WalletList(props: WalletListProps) {
       )}
       sx={walletListStyle}
     >
-      {providers.map((providerDetail, index) => (
+      {filteredProviders.map((providerDetail, index) => (
         <WalletItem
           key={providerDetail.info.rdns}
           onWalletClick={onWalletClick}
@@ -162,7 +167,7 @@ export function WalletList(props: WalletListProps) {
       {isWalletConnectEnabled && (
         <motion.div
           variants={listItemVariants}
-          custom={providers.length}
+          custom={filteredProviders.length}
           key="walletconnect"
         >
           <MenuItem
