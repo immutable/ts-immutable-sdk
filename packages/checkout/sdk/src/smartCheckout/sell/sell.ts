@@ -147,7 +147,7 @@ export const sell = async (
   ];
 
   let smartCheckoutResult;
-  const { isPassport } = (provider.provider as any);
+  const isPassport = (provider.provider as any)?.isPassport;
   if (!isPassport) {
     smartCheckoutResult = await measureAsyncExecution<SmartCheckoutResult>(
       config,
