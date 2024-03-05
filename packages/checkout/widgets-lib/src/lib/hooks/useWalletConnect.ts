@@ -42,9 +42,7 @@ export const useWalletConnect = () => {
 
         try {
           const existingPairings = ethereumProvider?.signer.client.core.pairing.getPairings();
-          // console.log('existingPairings', existingPairings);
           if (existingPairings && existingPairings.length > 0 && existingPairings[0].topic !== '') {
-            // console.log('restoring existing pairing for', existingPairings[0]);
             ethereumProvider?.signer.client.core.pairing.activate({ topic: existingPairings[0].topic })
               .then(() => {
                 if (connectCallback && ethereumProvider.connected && ethereumProvider.session) {
@@ -68,12 +66,6 @@ export const useWalletConnect = () => {
       ethereumProvider?.once('display_uri', (data) => {
         // save the displayUri in case the user closes the modal without connecting
         displayUri.current = data;
-
-        // eslint-disable-next-line no-console
-        console.log('useWalletConnect::display_uri', data);
-        // const pairingTopicFromUrl = data.split('@')[0].replace('wc:', '');
-        // eslint-disable-next-line no-console
-        // console.log('useWalletConnect::pairingTopic', pairingTopicFromUrl);
         walletConnectModal?.openModal({
           uri: data,
         })
@@ -88,9 +80,7 @@ export const useWalletConnect = () => {
           });
       });
 
-      ethereumProvider?.once('connect', (data) => {
-        // eslint-disable-next-line no-console
-        console.log('useWalletConnect::connect event', data);
+      ethereumProvider?.once('connect', () => {
         walletConnectModal?.closeModal();
         // reset the display uri once it has been successfully used for connection
         displayUri.current = '';
