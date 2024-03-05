@@ -1,27 +1,31 @@
-import { WalletProviderName } from '@imtbl/checkout-sdk';
 import { MenuItem } from '@biom3/react';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { getWalletLogoByName } from 'lib/logoUtils';
+import { ReactElement, useState } from 'react';
+import { RawImage } from '../../../components/RawImage/RawImage';
+import { EIP1193Provider, EIP6963ProviderDetail } from '../../../lib/provider';
 
-export interface WalletItemProps {
+export interface WalletItemProps<RC extends ReactElement | undefined = undefined> {
   testId: string;
-  walletProviderName: WalletProviderName | string
-  onWalletClick: (walletProviderName: WalletProviderName | string) => Promise<void>;
+  providerDetail: EIP6963ProviderDetail<EIP1193Provider>;
+  onWalletItemClick: (providerDetail: EIP6963ProviderDetail<EIP1193Provider>) => Promise<void>;
   loading: boolean;
+  rc?: RC;
 }
-export function WalletItem({
+
+export function WalletItem<
+  RC extends ReactElement | undefined = undefined,
+>({
+  rc = <span />,
   testId,
-  walletProviderName,
-  onWalletClick,
+  providerDetail,
+  onWalletItemClick,
   loading,
-}: WalletItemProps) {
-  const { t } = useTranslation();
+}: WalletItemProps<RC>) {
   const [showLoadingIcon, setShowLoadingIcon] = useState(false);
 
   return (
     <MenuItem
-      testId={`${testId}-wallet-list-${walletProviderName}`}
+      rc={rc}
+      testId={`${testId}-wallet-list-${providerDetail.info.rdns}`}
       size="medium"
       emphasized
       onClick={async () => {
@@ -29,18 +33,15 @@ export function WalletItem({
         setShowLoadingIcon(true);
         // let the parent handle errors
         try {
-          await onWalletClick(walletProviderName);
+          await onWalletItemClick(providerDetail);
         } finally {
           setShowLoadingIcon(false);
         }
       }}
     >
-      <MenuItem.FramedLogo
-        logo={getWalletLogoByName(walletProviderName) as any}
-        sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
-      />
-      <MenuItem.Label size="medium">
-        {t(`wallets.${walletProviderName}.heading`)}
+      <RawImage src={providerDetail.info.icon} alt={providerDetail.info.name} sx={{ position: 'absolute' }} />
+      <MenuItem.Label size="medium" sx={{ marginLeft: '65px' }}>
+        {providerDetail.info.name}
       </MenuItem.Label>
       {showLoadingIcon && (<MenuItem.StatefulButtCon state="loading" icon="Loading" />)}
     </MenuItem>

@@ -58,3 +58,11 @@ export const gasAmountHeadingStyles = {
 export const bridgeButtonIconLoadingStyle = {
   width: 'base.icon.size.400',
 };
+
+export const rawImageStyle = {
+  backgroundColor: 'base.color.translucent.standard.200',
+  position: 'absolute',
+  width: '32px',
+  height: '32px',
+  padding: '6px',
+};

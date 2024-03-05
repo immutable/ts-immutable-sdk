@@ -12,7 +12,7 @@ import { orchestrationEvents } from '../../../../lib/orchestrationEvents';
 import { getL1ChainId, getL2ChainId } from '../../../../lib/networkUtils';
 import { formatZeroAmount, getDefaultTokenImage, tokenValueFormat } from '../../../../lib/utils';
 import { ConnectLoaderContext } from '../../../../context/connect-loader-context/ConnectLoaderContext';
-import { isPassportProvider } from '../../../../lib/providerUtils';
+import { isPassportProvider } from '../../../../lib/provider';
 import { EventTargetContext } from '../../../../context/event-target-context/EventTargetContext';
 import { UserJourney, useAnalytics } from '../../../../context/analytics-provider/SegmentAnalyticsProvider';
 
