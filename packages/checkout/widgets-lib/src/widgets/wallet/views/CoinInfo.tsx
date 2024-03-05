@@ -7,7 +7,7 @@ import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { IMXCoinsHero } from '../../../components/Hero/IMXCoinsHero';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
-import { isPassportProvider } from '../../../lib/providerUtils';
+import { isPassportProvider } from '../../../lib/provider';
 import { FAQS_LINK } from '../../../lib';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 

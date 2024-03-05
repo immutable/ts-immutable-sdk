@@ -1,30 +1,29 @@
 import {
   Body, Box, Button, FramedImage, Heading, Logo,
 } from '@biom3/react';
-import { ChainId, WalletProviderName } from '@imtbl/checkout-sdk';
+import { ChainId, WalletProviderRdns } from '@imtbl/checkout-sdk';
 import { getChainNameById } from 'lib/chains';
-import { getWalletDisplayName, getWalletLogoByName } from 'lib/logoUtils';
 import { networkIcon } from 'lib';
 import { Web3Provider } from '@ethersproject/providers';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useWalletConnect } from 'lib/hooks/useWalletConnect';
-import { isWalletConnectProvider } from 'lib/providerUtils';
 import {
   networkButtonStyles,
   networkIconStyles,
   walletButtonOuterStyles,
   walletCaptionStyles,
-  walletLogoStyles,
   wcStickerLogoStyles,
   wcWalletLogoStyles,
 } from './WalletNetworkButtonStyles';
-import { BridgeContext } from '../context/BridgeContext';
+import { RawImage } from '../../../components/RawImage/RawImage';
+import { EIP1193Provider, EIP6963ProviderDetail, isWalletConnectProvider } from '../../../lib/provider';
 
 interface WalletNetworkButtonProps {
   testId: string;
   walletProvider: Web3Provider;
-  walletName: WalletProviderName | string;
+  walletProviderDetail: EIP6963ProviderDetail<EIP1193Provider> | undefined;
   walletAddress: string;
+  walletName: string,
   chainId: ChainId;
   disableNetworkButton?: boolean;
   onWalletClick: (e) => void;
@@ -33,39 +32,36 @@ interface WalletNetworkButtonProps {
 export function WalletNetworkButton({
   testId,
   walletProvider,
-  walletName,
+  walletProviderDetail,
   walletAddress,
+  walletName,
   chainId,
   disableNetworkButton = false,
   onWalletClick,
   onNetworkClick,
 }: WalletNetworkButtonProps) {
   const networkName = getChainNameById(chainId);
-  const walletHeading = getWalletDisplayName(walletName);
-  const walletLogo = getWalletLogoByName(walletName);
   const [walletLogoUrl, setWalletLogoUrl] = useState<string | undefined>(
     undefined,
   );
   const [isWalletConnect, setIsWalletConnect] = useState<boolean>(false);
-  const {
-    bridgeState: { checkout },
-  } = useContext(BridgeContext);
-  const { isWalletConnectEnabled, getWalletLogoUrl } = useWalletConnect({
-    checkout,
-  });
+  const { isWalletConnectEnabled, getWalletLogoUrl } = useWalletConnect();
 
   useEffect(() => {
     if (isWalletConnectEnabled) {
-      setIsWalletConnect(isWalletConnectProvider(walletProvider));
-      (async () => {
-        setWalletLogoUrl(await getWalletLogoUrl());
-      })();
+      const isProviderWalletConnect = isWalletConnectProvider(walletProvider);
+      setIsWalletConnect(isProviderWalletConnect);
+      if (isProviderWalletConnect) {
+        (async () => {
+          setWalletLogoUrl(await getWalletLogoUrl());
+        })();
+      }
     }
   }, [isWalletConnectEnabled, walletProvider]);
 
   return (
     <Box
-      testId={`${testId}-${walletName}-${chainId}-button-wrapper`}
+      testId={`${testId}-${walletProviderDetail?.info.rdns}-${chainId}-button-wrapper`}
       sx={walletButtonOuterStyles}
       onClick={onWalletClick}
     >
@@ -78,9 +74,12 @@ export function WalletNetworkButton({
           />
           <Logo logo="WalletConnectSymbol" sx={wcStickerLogoStyles} />
         </>
-      ) : (
-        <Logo logo={walletLogo as any} sx={walletLogoStyles(walletName)} />
-      )}
+      ) : (walletProviderDetail && (
+        <RawImage
+          src={walletProviderDetail.info.icon}
+          alt={walletProviderDetail.info.name}
+        />
+      ))}
       <Box
         sx={{
           display: 'flex',
@@ -88,7 +87,10 @@ export function WalletNetworkButton({
           flex: 1,
         }}
       >
-        <Heading size="xSmall">{walletHeading}</Heading>
+        <Heading size="xSmall" sx={{ textTransform: 'capitalize' }}>
+          {walletProviderDetail?.info.rdns === WalletProviderRdns.PASSPORT
+            ? walletName : walletProviderDetail?.info.name}
+        </Heading>
         <Body size="xSmall" sx={walletCaptionStyles}>
           {walletAddress}
         </Body>
