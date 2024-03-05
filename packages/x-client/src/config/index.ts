@@ -4,6 +4,7 @@ import {
   Environment,
   ImmutableConfiguration,
   ModuleConfiguration,
+  addKeysToHeadersOverride,
 } from '@imtbl/config';
 
 export { Environment, ImmutableConfiguration } from '@imtbl/config';
@@ -16,6 +17,7 @@ interface ImmutableXConfigurationParams {
   chainID: number,
   coreContractAddress: string,
   registrationContractAddress: string,
+  baseConfig?: ImmutableConfiguration,
 }
 
 export interface EthConfiguration {
@@ -28,6 +30,7 @@ interface ImxEnvironment extends EthConfiguration {
   basePath: string;
   headers?: Record<string, string>;
   sdkVersion?: string;
+  baseConfig?: ImmutableConfiguration;
 }
 
 export interface ImmutableXConfiguration {
@@ -51,6 +54,7 @@ export const createConfig = ({
   basePath,
   headers,
   sdkVersion,
+  baseConfig,
 }: ImxEnvironment): ImmutableXConfiguration => {
   if (!basePath.trim()) {
     throw Error('basePath can not be empty');
@@ -61,7 +65,12 @@ export const createConfig = ({
   }
 
   // eslint-disable-next-line no-param-reassign
-  headers = { ...(headers || {}), ...defaultHeaders };
+  headers = {
+    ...(headers || {}),
+    ...(addKeysToHeadersOverride(baseConfig, { headers })?.headers || {}),
+    ...defaultHeaders,
+  };
+
   const apiConfigOptions: imx.ConfigurationParameters = {
     basePath,
     baseOptions: { headers },
@@ -86,32 +95,34 @@ export const createImmutableXConfiguration = ({
   chainID,
   coreContractAddress,
   registrationContractAddress,
+  baseConfig,
 }: ImmutableXConfigurationParams): ImmutableXConfiguration => createConfig({
   basePath,
   chainID,
   coreContractAddress,
   registrationContractAddress,
   sdkVersion: 'ts-immutable-sdk-__SDK_VERSION__',
+  baseConfig,
 });
 
-/**
- * Sets `sdkVersion` at the time of build
- */
-const production = () => createImmutableXConfiguration({
+interface environmentConfig {
+  baseConfig?: ImmutableConfiguration;
+}
+
+const production = ({ baseConfig }: environmentConfig) => createImmutableXConfiguration({
   basePath: 'https://api.x.immutable.com',
   chainID: 1,
   coreContractAddress: '0x5FDCCA53617f4d2b9134B29090C87D01058e27e9',
   registrationContractAddress: '0x72a06bf2a1CE5e39cBA06c0CAb824960B587d64c',
+  baseConfig,
 });
 
-/**
- * Sets `sdkVersion` at the time of build
- */
-const sandbox = () => createImmutableXConfiguration({
+const sandbox = ({ baseConfig }: environmentConfig) => createImmutableXConfiguration({
   basePath: 'https://api.sandbox.x.immutable.com',
   chainID: 11155111,
   coreContractAddress: '0x2d5C349fD8464DA06a3f90b4B0E9195F3d1b7F98',
   registrationContractAddress: '0xDbA6129C02E69405622fAdc3d5A7f8d23eac3b97',
+  baseConfig,
 });
 
 export interface ImxOverrides {
@@ -133,15 +144,15 @@ export class ImxConfiguration {
     } else {
       switch (baseConfig.environment) {
         case Environment.SANDBOX: {
-          this.immutableXConfig = sandbox();
+          this.immutableXConfig = sandbox({ baseConfig });
           break;
         }
         case Environment.PRODUCTION: {
-          this.immutableXConfig = production();
+          this.immutableXConfig = production({ baseConfig });
           break;
         }
         default: {
-          this.immutableXConfig = sandbox();
+          this.immutableXConfig = sandbox({ baseConfig });
         }
       }
     }
@@ -174,9 +185,9 @@ export const imxClientConfig = (configOptions: ConfigOptions): ImxModuleConfigur
     throw new Error(`Invalid environment: ${configOptions.environment}`);
   }
 
-  const clientConfig = new ImxConfiguration({
+  const clientConfig = {
     baseConfig: new ImmutableConfiguration(configOptions),
-  });
+  } as ImxModuleConfiguration;
 
   return clientConfig;
 };

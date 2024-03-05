@@ -3,6 +3,7 @@ import { imx } from '@imtbl/generated-clients';
 import {
   createConfig,
   ImmutableXConfiguration,
+  ImxConfiguration,
   Environment,
   imxClientConfig,
 } from './index';
@@ -119,5 +120,51 @@ describe('imxClientConfig', () => {
     // @ts-expect-error
     expect(() => imxClientConfig({ environment: 'invalid' }))
       .toThrowError('Invalid environment: invalid');
+  });
+
+  it('should set the APIs keys in the ImmutableConfiguration base config', () => {
+    const apiKey = 'api-key';
+    const publishableKey = 'publishable-key';
+    const rateLimitingKey = 'rate-limit-key';
+
+    const config = imxClientConfig({
+      environment: Environment.SANDBOX,
+      apiKey,
+      publishableKey,
+      rateLimitingKey,
+    });
+
+    expect(config.baseConfig.apiKey).toBe(apiKey);
+    expect(config.baseConfig.publishableKey).toBe(publishableKey);
+    expect(config.baseConfig.rateLimitingKey).toBe(rateLimitingKey);
+  });
+});
+
+describe('ImxConfiguration', () => {
+  it('should set apiConfiguration basePath, baseOptions, and headers when used with imxClientConfig', () => {
+    const apiKey = 'api-key';
+    const publishableKey = 'publishable-key';
+    const rateLimitingKey = 'rate-limit-key';
+
+    const config = imxClientConfig({
+      environment: Environment.SANDBOX,
+      apiKey,
+      publishableKey,
+      rateLimitingKey,
+    });
+
+    const imxConfig = new ImxConfiguration(config);
+
+    expect(imxConfig.immutableXConfig.apiConfiguration).toMatchObject({
+      basePath: 'https://api.sandbox.x.immutable.com',
+      baseOptions: {
+        headers: {
+          'x-sdk-version': 'ts-immutable-sdk-__SDK_VERSION__',
+          'x-immutable-api-key': apiKey,
+          'x-immutable-publishable-key': publishableKey,
+          'x-api-key': rateLimitingKey,
+        },
+      },
+    });
   });
 });

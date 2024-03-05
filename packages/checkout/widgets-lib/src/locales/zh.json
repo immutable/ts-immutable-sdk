@@ -37,7 +37,7 @@
     },
     "SWITCH_NETWORK": {
       "eth": {
-        "heading": "要转移您的硬币，您需要切换到Sepolia网络",
+        "heading": "您需要切换到{{networkName}}网络",
         "body": "MetaMask将提示您切换网络。需要时可以切回。",
         "button": {
           "text": "准备切换",

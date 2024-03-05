@@ -1,13 +1,23 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { Web3Provider } from '@ethersproject/providers';
 import {
-  Checkout, FundingRoute, FundingStepType, RoutingOutcomeType, SmartCheckoutResult,
+  Checkout,
+  FundingRoute,
+  FundingStepType,
+  ItemType,
+  RoutingOutcomeType,
+  SmartCheckoutInsufficient,
+  SmartCheckoutResult,
+  SmartCheckoutSufficient,
 } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { NATIVE } from '../../../lib';
 import {
-  MAX_GAS_LIMIT, filterSmartCheckoutResult, fundingRouteFees,
-  isUserFractionalBalanceBlocked, smartCheckoutTokensList,
+  MAX_GAS_LIMIT,
+  filterSmartCheckoutResult,
+  fundingRouteFees,
+  isUserFractionalBalanceBlocked,
+  smartCheckoutTokensList,
 } from './smartCheckoutUtils';
 
 const PURCHASE_CURRENCY_ADDRESS = '0x000000000000000000000000000000000000USDC';
@@ -27,7 +37,6 @@ describe('isUserFractionalBalanceBlocked', () => {
               type: 'ERC-20',
             },
           },
-
         ],
       })),
       config: {},
@@ -134,7 +143,6 @@ describe('isUserFractionalBalanceBlocked', () => {
               type: 'ERC-20',
             },
           },
-
         ],
       })),
       config: {},
@@ -169,7 +177,10 @@ describe('fundingRouteFees', () => {
     },
   };
 
-  const conversions = new Map<string, number>([['eth', 100], ['imx', 10]]);
+  const conversions = new Map<string, number>([
+    ['eth', 100],
+    ['imx', 10],
+  ]);
 
   it('should aggregate fees for Bridge', () => {
     const fundingRoute: FundingRoute = {
@@ -180,7 +191,6 @@ describe('fundingRouteFees', () => {
             approvalGasFee: ethFee,
             bridgeFees: [ethFee, ethFee],
             bridgeGasFee: ethFee,
-
           },
         },
       ],
@@ -200,7 +210,6 @@ describe('fundingRouteFees', () => {
             approvalGasFee: imxFee,
             swapFees: [imxFee, imxFee],
             swapGasFee: imxFee,
-
           },
         },
       ],
@@ -220,7 +229,6 @@ describe('fundingRouteFees', () => {
             approvalGasFee: ethFee,
             bridgeFees: [ethFee, ethFee],
             bridgeGasFee: ethFee,
-
           },
         },
         {
@@ -229,7 +237,6 @@ describe('fundingRouteFees', () => {
             approvalGasFee: imxFee,
             swapFees: [imxFee, imxFee],
             swapGasFee: imxFee,
-
           },
         },
       ],
@@ -321,132 +328,65 @@ describe('smartCheckoutTokensList', () => {
   });
 
   describe('filterSmartCheckoutResult', () => {
-    it('should not filter routes if only swap is returned', () => {
-      const smartCheckoutResult: SmartCheckoutResult = {
+    it('should not filter sufficient results', () => {
+      const sufficentSmartCheckoutResult = {
+        sufficient: true,
         transactionRequirements: [],
         router: {
           routingOutcome: {
-            type: RoutingOutcomeType.ROUTES_FOUND,
-            fundingRoutes: [
-              {
-                steps: [
-                  {
-                    type: 'SWAP',
-                  },
-                ],
-              },
-            ],
+            type: RoutingOutcomeType.NO_ROUTES_FOUND,
+            fundingRoutes: [],
           },
         },
-      } as unknown as SmartCheckoutResult;
+      } as unknown as SmartCheckoutSufficient;
 
-      const filteredSmartCheckoutResult = filterSmartCheckoutResult(smartCheckoutResult);
+      const filteredSmartCheckoutResult = filterSmartCheckoutResult(sufficentSmartCheckoutResult);
 
-      expect(filteredSmartCheckoutResult).toEqual(
-        smartCheckoutResult,
-      );
-    });
-    it('should filter any non SWAP funding routes', () => {
-      const smartCheckoutResult: SmartCheckoutResult = {
-        transactionRequirements: [],
-        router: {
-          routingOutcome: {
-            type: RoutingOutcomeType.ROUTES_FOUND,
-            fundingRoutes: [
-              {
-                steps: [
-                  {
-                    type: 'SWAP',
-                  },
-                ],
-              },
-              {
-                steps: [
-                  {
-                    type: 'SWAP',
-                  },
-                ],
-              },
-              {
-                steps: [
-                  {
-                    type: 'BRIDGE',
-                  },
-                ],
-              },
-              {
-                steps: [
-                  {
-                    type: 'ONRAMP',
-                  },
-                ],
-              },
-              {
-                steps: [
-                  {
-                    type: 'BRIDGE',
-                  },
-                  {
-                    type: 'SWAP',
-                  },
-                ],
-              },
-            ],
-          },
-        },
-      } as unknown as SmartCheckoutResult;
-
-      const filteredSmartCheckoutResult = filterSmartCheckoutResult(smartCheckoutResult);
-
-      expect(filteredSmartCheckoutResult).toEqual(
-        {
-          transactionRequirements: [],
-          router: {
-            routingOutcome: {
-              type: RoutingOutcomeType.ROUTES_FOUND,
-              fundingRoutes: [
-                {
-                  steps: [
-                    {
-                      type: 'SWAP',
-                    },
-                  ],
-                },
-                {
-                  steps: [
-                    {
-                      type: 'SWAP',
-                    },
-                  ],
-                },
-              ],
-            },
-          },
-        },
-      );
+      expect(filteredSmartCheckoutResult).toEqual(sufficentSmartCheckoutResult);
     });
 
-    it('should set routingOutcome to NO_ROUTES_FOUND if no routes remain after filtering', () => {
-      const smartCheckoutResult: SmartCheckoutResult = {
+    it('should not filter insufficient results if no funding routes were found', () => {
+      const insufficientSmartCheckoutResult = {
+        sufficient: false,
         transactionRequirements: [],
+        router: {
+          routingOutcome: {
+            type: RoutingOutcomeType.NO_ROUTES_FOUND,
+            fundingRoutes: [],
+          },
+        },
+      } as unknown as SmartCheckoutInsufficient;
+
+      const filteredSmartCheckoutResult = filterSmartCheckoutResult(insufficientSmartCheckoutResult);
+
+      expect(filteredSmartCheckoutResult).toEqual(insufficientSmartCheckoutResult);
+    });
+
+    it('should be sufficent if wallet is passport, has enough balance and only native balance is insufficient', () => {
+      const insufficientSmartCheckoutResult = {
+        sufficient: false,
+        transactionRequirements: [
+          {
+            sufficient: false,
+            type: ItemType.NATIVE,
+          },
+          {
+            sufficient: true,
+            type: ItemType.ERC20,
+          },
+        ],
         router: {
           routingOutcome: {
             type: RoutingOutcomeType.ROUTES_FOUND,
             fundingRoutes: [
               {
+                priority: 1,
                 steps: [
                   {
-                    type: 'BRIDGE',
-                  },
-                ],
-              },
-              {
-                steps: [
-                  {
-                    type: 'BRIDGE',
-                  },
-                  {
-                    type: 'SWAP',
+                    type: FundingStepType.ONRAMP,
+                    fundingItem: {
+                      type: ItemType.NATIVE,
+                    },
                   },
                 ],
               },
@@ -454,20 +394,18 @@ describe('smartCheckoutTokensList', () => {
           },
         },
       } as unknown as SmartCheckoutResult;
+      const sufficentSmartCheckoutResult: SmartCheckoutSufficient = {
+        sufficient: true,
+        transactionRequirements:
+          insufficientSmartCheckoutResult.transactionRequirements,
+      };
+      const provider: Web3Provider = {
+        provider: { isPassport: true },
+      } as unknown as Web3Provider;
 
-      const filteredSmartCheckoutResult = filterSmartCheckoutResult(smartCheckoutResult);
+      const filteredSmartCheckoutResult = filterSmartCheckoutResult(insufficientSmartCheckoutResult, provider);
 
-      expect(filteredSmartCheckoutResult).toEqual(
-        {
-          transactionRequirements: [],
-          router: {
-            routingOutcome: {
-              type: RoutingOutcomeType.NO_ROUTES_FOUND,
-              message: expect.anything(),
-            },
-          },
-        },
-      );
+      expect(filteredSmartCheckoutResult).toEqual(sufficentSmartCheckoutResult);
     });
   });
 });
