@@ -3,7 +3,6 @@ import {
   ChainId,
   Checkout,
   WalletProviderName,
-  ConnectTargetLayer,
   CheckoutErrorType,
 
 } from '@imtbl/checkout-sdk';
@@ -35,7 +34,7 @@ export interface ConnectLoaderProps {
 }
 
 export interface ConnectLoaderParams {
-  targetLayer?: ConnectTargetLayer;
+  targetChainId: ChainId;
   walletProviderName?: WalletProviderName;
   web3Provider?: Web3Provider;
   checkout: Checkout;
@@ -50,7 +49,7 @@ export function ConnectLoader({
 }: ConnectLoaderProps) {
   const {
     checkout,
-    targetLayer,
+    targetChainId,
     walletProviderName,
     allowedChains,
     web3Provider,
@@ -67,8 +66,6 @@ export function ConnectLoader({
   const {
     connectionStatus, deepLink, provider,
   } = connectLoaderState;
-
-  const networkToSwitchTo = targetLayer ?? ConnectTargetLayer.LAYER2;
 
   const { identify } = useAnalytics();
 
@@ -241,7 +238,7 @@ export function ConnectLoader({
         || connectionStatus === ConnectionStatus.CONNECTED_WRONG_NETWORK) && (
           <ConnectWidget
             config={widgetConfig}
-            targetLayer={networkToSwitchTo}
+            targetChainId={targetChainId}
             web3Provider={provider}
             checkout={checkout}
             deepLink={deepLink}

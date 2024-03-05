@@ -18,16 +18,16 @@ export const sortTokensByAmount = (
   // make sure IMX is at the top of the list
   if (
     chainId === getL2ChainId(config)
-      && a.token.symbol.toLowerCase() === 'imx'
-      && b.token.symbol.toLowerCase() !== 'imx'
+    && a.token.symbol.toLowerCase() === 'imx'
+    && b.token.symbol.toLowerCase() !== 'imx'
   ) {
     return -1;
   }
 
   if (
     chainId === getL2ChainId(config)
-      && b.token.symbol.toLowerCase() === 'imx'
-      && a.token.symbol.toLowerCase() !== 'imx'
+    && b.token.symbol.toLowerCase() === 'imx'
+    && a.token.symbol.toLowerCase() !== 'imx'
   ) {
     return 1;
   }
@@ -137,6 +137,9 @@ export const tokenValueFormat = (
 export const isZkEvmChainId = (chainId: ChainId) => chainId === ChainId.IMTBL_ZKEVM_DEVNET
   || chainId === ChainId.IMTBL_ZKEVM_TESTNET
   || chainId === ChainId.IMTBL_ZKEVM_MAINNET;
+
+export const isL1EthChainId = (chainId: ChainId) => chainId === ChainId.SEPOLIA
+  || chainId === ChainId.ETHEREUM;
 
 export const isNativeToken = (
   address: string | undefined,

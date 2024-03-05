@@ -11,6 +11,7 @@ import {
 } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Web3Provider } from '@ethersproject/providers';
+import { getL1ChainId } from 'lib';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { ConnectActions, ConnectContext } from '../context/ConnectContext';
 import { WalletItem } from './WalletItem';
@@ -95,15 +96,17 @@ export function WalletList(props: WalletListProps) {
     const passportWalletProvider = {
       walletProviderName: WalletProviderName.PASSPORT,
     };
-    if (!excludeWallets && !passport) {
+    if (!excludeWallets && (!passport || (checkout && targetChainId === getL1ChainId(checkout.config)))) {
       return [passportWalletProvider];
     }
-    if (excludeWallets && !passport) {
+    if (excludeWallets
+      && (!passport || (checkout && targetChainId === getL1ChainId(checkout.config)))) {
       excludeWallets.push(passportWalletProvider);
       return excludeWallets;
     }
+
     return excludeWallets;
-  }, [excludeWallets, passport]);
+  }, [excludeWallets, passport, checkout, targetChainId]);
 
   useEffect(() => {
     const getAllowedWallets = async () => {

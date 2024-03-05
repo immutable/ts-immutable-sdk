@@ -1,10 +1,13 @@
 import React, { Suspense } from 'react';
 import {
+  ChainId,
   ConnectWidgetParams, IMTBLWidgetEvents, WidgetProperties, WidgetType,
 } from '@imtbl/checkout-sdk';
 import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
 import { LoadingView } from 'views/loading/LoadingView';
+import { Environment } from '@imtbl/config';
+import { getChainNameById } from 'lib/chains';
 import i18n from '../../i18n';
 import { Base } from '../BaseWidgetRoot';
 
@@ -22,6 +25,33 @@ export class Connect extends Base<WidgetType.CONNECT> {
   }
 
   protected getValidatedParameters(params: ConnectWidgetParams): ConnectWidgetParams {
+    const validatedParams = params;
+
+    // validating targetChainId per environment
+    if (!params.targetChainId
+      && this.checkout.config.isProduction) {
+      validatedParams.targetChainId = ChainId.IMTBL_ZKEVM_MAINNET;
+    } else if (params.targetChainId
+      && this.checkout.config.isProduction
+      && (params.targetChainId !== ChainId.ETHEREUM && params.targetChainId !== ChainId.IMTBL_ZKEVM_MAINNET)
+    ) {
+      // eslint-disable-next-line max-len, no-console
+      console.warn(`Cannot set targetChainId to ${params.targetChainId} in ${Environment.PRODUCTION} environment, defaulting to ${getChainNameById(ChainId.IMTBL_ZKEVM_MAINNET)}, chainId ${ChainId.IMTBL_ZKEVM_MAINNET}`);
+      validatedParams.targetChainId = ChainId.IMTBL_ZKEVM_MAINNET;
+    }
+
+    if (!params.targetChainId
+      && this.checkout.config.environment === Environment.SANDBOX) {
+      validatedParams.targetChainId = ChainId.IMTBL_ZKEVM_TESTNET;
+    } else if (params.targetChainId
+      && this.checkout.config.environment === Environment.SANDBOX
+      && (params.targetChainId !== ChainId.SEPOLIA && params.targetChainId !== ChainId.IMTBL_ZKEVM_TESTNET)
+    ) {
+      // eslint-disable-next-line max-len, no-console
+      console.warn(`Cannot set targetChainId to ${params.targetChainId} in ${Environment.SANDBOX} environment, defaulting to ${getChainNameById(ChainId.IMTBL_ZKEVM_TESTNET)}, chainId ${ChainId.IMTBL_ZKEVM_TESTNET}`);
+      validatedParams.targetChainId = ChainId.IMTBL_ZKEVM_TESTNET;
+    }
+
     return params;
   }
 
@@ -37,6 +67,7 @@ export class Connect extends Base<WidgetType.CONNECT> {
               <ConnectWidget
                 config={this.strongConfig()}
                 checkout={this.checkout}
+                targetChainId={this.parameters.targetChainId}
               />
             </Suspense>
           </ThemeProvider>
