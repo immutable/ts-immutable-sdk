@@ -26,6 +26,7 @@ export const sendSaleSuccessEvent = (
   eventTarget: Window | EventTarget,
   paymentMethod: SalePaymentTypes | undefined,
   transactions: ExecutedTransaction[] = [],
+  tokenIds: string[] = [],
 ) => {
   const event = new CustomEvent<
   WidgetEvent<WidgetType.SALE, SaleEventType.SUCCESS>
@@ -35,6 +36,7 @@ export const sendSaleSuccessEvent = (
       data: {
         paymentMethod,
         transactions,
+        tokenIds,
       },
     },
   });

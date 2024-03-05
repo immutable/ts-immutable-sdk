@@ -66,6 +66,7 @@ export const useSaleEvent = () => {
   const sendSuccessEvent = (
     screen: string = defaultView,
     transactions: ExecutedTransaction[] = [],
+    tokenIds: string[] = [],
     details?: Record<string, unknown>,
   ) => {
     track({
@@ -80,9 +81,10 @@ export const useSaleEvent = () => {
         transactions: toStringifyTransactions(transactions),
         ...orderProps,
         paymentMethod,
+        tokenIds,
       },
     });
-    sendSaleSuccessEvent(eventTarget, paymentMethod, transactions);
+    sendSaleSuccessEvent(eventTarget, paymentMethod, transactions, tokenIds);
   };
 
   const sendFailedEvent = (
