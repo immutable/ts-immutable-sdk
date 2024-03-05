@@ -117,13 +117,21 @@ export function WalletList(props: WalletListProps) {
       });
       if (checkout) {
         try {
-          const web3Provider = await connectToProvider(checkout, new Web3Provider(providerDetail.provider as any));
+          let changeAccount = false;
+          if (providerDetail.info.rdns === WalletProviderRdns.METAMASK) {
+            changeAccount = true;
+          }
+          const web3Provider = await connectToProvider(
+            checkout,
+            new Web3Provider(providerDetail.provider as any),
+            changeAccount,
+          );
           selectWeb3Provider(web3Provider, getProviderSlugFromRdns(providerDetail.info.rdns));
 
           viewDispatch({
             payload: {
               type: ViewActions.UPDATE_VIEW,
-              view: { type: ConnectWidgetViews.SUCCESS },
+              view: { type: ConnectWidgetViews.READY_TO_CONNECT },
             },
           });
         } catch (err: any) {

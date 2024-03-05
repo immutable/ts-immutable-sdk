@@ -194,8 +194,12 @@ export function WalletAndNetworkSelector() {
       clearToWalletSelections();
       setFromWallet(event);
 
+      let changeAccount = false;
+      if (event.providerDetail.info.rdns === WalletProviderRdns.METAMASK) {
+        changeAccount = true;
+      }
       const web3Provider = new Web3Provider(event.provider as any);
-      const connectedProvider = await connectToProvider(checkout, web3Provider, false);
+      const connectedProvider = await connectToProvider(checkout, web3Provider, changeAccount);
       await handleFromWalletConnectionSuccess(connectedProvider);
     },
     [checkout],
