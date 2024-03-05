@@ -3,7 +3,7 @@ import {
 } from '@biom3/react';
 import { useContext, useEffect, useState } from 'react';
 import { BridgeContext } from 'widgets/bridge/context/BridgeContext';
-import { isWalletConnectProvider } from 'lib/providerUtils';
+import { isWalletConnectProvider } from 'lib/provider';
 import {
   UserJourney,
   useAnalytics,

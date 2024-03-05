@@ -9,7 +9,7 @@ import { Box } from '@biom3/react';
 import {
   connectToProvider,
   isPassportProvider,
-} from 'lib/providerUtils';
+} from 'lib/provider';
 import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import {
   TokenFilterTypes,

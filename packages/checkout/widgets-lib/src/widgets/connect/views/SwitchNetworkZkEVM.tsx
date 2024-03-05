@@ -2,7 +2,7 @@ import {
   useCallback, useContext, useEffect, useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { isWalletConnectProvider } from 'lib/providerUtils';
+import { isWalletConnectProvider } from 'lib/provider';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../../components/Footer/FooterButton';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';

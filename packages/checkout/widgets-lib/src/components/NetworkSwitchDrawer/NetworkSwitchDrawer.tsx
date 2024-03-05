@@ -10,7 +10,7 @@ import { getChainNameById } from 'lib/chains';
 import {
   isMetaMaskProvider,
   isWalletConnectProvider,
-} from 'lib/providerUtils';
+} from 'lib/provider';
 import { getRemoteImage } from 'lib/utils';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';

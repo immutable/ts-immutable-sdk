@@ -12,7 +12,7 @@ import {
 import { Base } from 'widgets/BaseWidgetRoot';
 import { ConnectLoader, ConnectLoaderParams } from 'components/ConnectLoader/ConnectLoader';
 import { getL2ChainId } from 'lib';
-import { isPassportProvider } from 'lib/providerUtils';
+import { isPassportProvider } from 'lib/provider';
 import { ServiceUnavailableErrorView } from 'views/error/ServiceUnavailableErrorView';
 import { ServiceType } from 'views/error/serviceTypes';
 import { isValidAddress, isValidAmount, isValidWalletProvider } from 'lib/validations/widgetValidators';

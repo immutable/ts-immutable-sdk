@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { Transaction } from 'lib/clients';
 import { getChainNameById } from 'lib/chains';
 import { WITHDRAWAL_CLAIM_GAS_LIMIT, getL1ChainId } from 'lib';
-import { isPassportProvider } from 'lib/providerUtils';
+import { isPassportProvider } from 'lib/provider';
 import { WalletProviderName } from '@imtbl/checkout-sdk';
 import { isNativeToken } from 'lib/utils';
 import { BigNumber } from 'ethers';

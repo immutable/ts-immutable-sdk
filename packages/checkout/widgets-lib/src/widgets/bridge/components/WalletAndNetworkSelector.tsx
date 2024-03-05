@@ -15,8 +15,9 @@ import {
   connectToProvider,
   getWalletProviderNameByProvider,
   isMetaMaskProvider,
-  isPassportProvider, isWalletConnectProvider,
-} from 'lib/providerUtils';
+  isPassportProvider,
+  isWalletConnectProvider,
+} from 'lib/provider';
 import { getL1ChainId, getL2ChainId } from 'lib';
 import { getChainNameById } from 'lib/chains';
 import { ViewActions, ViewContext } from 'context/view-context/ViewContext';

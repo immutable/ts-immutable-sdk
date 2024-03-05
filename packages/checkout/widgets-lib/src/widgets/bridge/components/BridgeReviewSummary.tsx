@@ -15,7 +15,7 @@ import {
   isMetaMaskProvider,
   isPassportProvider,
   isWalletConnectProvider,
-} from 'lib/providerUtils';
+} from 'lib/provider';
 import { calculateCryptoToFiat } from 'lib/utils';
 import {
   DEFAULT_QUOTE_REFRESH_INTERVAL,

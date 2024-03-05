@@ -17,7 +17,7 @@ import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { ConnectContext, ConnectActions } from '../context/ConnectContext';
 import { ViewContext, ViewActions } from '../../../context/view-context/ViewContext';
-import { isMetaMaskProvider, isPassportProvider } from '../../../lib/providerUtils';
+import { isMetaMaskProvider, isPassportProvider } from '../../../lib/provider';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { identifyUser } from '../../../lib/analytics/identifyUser';
 
