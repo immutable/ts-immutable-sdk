@@ -69,6 +69,11 @@ export type ExecuteOrderResponse = {
   transactions: ExecutedTransaction[];
 };
 
+export type ClientConfigError = {
+  type: SaleErrorTypes;
+  data?: Record<string, unknown>;
+};
+
 export enum SaleErrorTypes {
   DEFAULT = 'DEFAULT_ERROR',
   INVALID_PARAMETERS = 'INVALID_PARAMETERS',
@@ -82,6 +87,7 @@ export enum SaleErrorTypes {
   WALLET_REJECTED_NO_FUNDS = 'WALLET_REJECTED_NO_FUNDS',
   SMART_CHECKOUT_ERROR = 'SMART_CHECKOUT_ERROR',
   SMART_CHECKOUT_EXECUTE_ERROR = 'SMART_CHECKOUT_EXECUTE_ERROR',
+  CLIENT_CONFIG_ERROR = 'CLIENT_CONFIG_ERROR',
 }
 
 export enum SmartCheckoutErrorTypes {

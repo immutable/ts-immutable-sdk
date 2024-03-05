@@ -66,7 +66,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
     () => ({ viewState, viewDispatch }),
     [viewState, viewDispatch],
   );
-  const { currency, clientConfig } = useClientConfig({
+  const { currency, clientConfig, clientConfigError } = useClientConfig({
     environmentId,
     environment: config.environment,
   });
@@ -122,6 +122,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
           passport: checkout?.passport,
           collectionName,
           clientConfig,
+          clientConfigError,
         }}
       >
         <CryptoFiatProvider environment={config.environment}>

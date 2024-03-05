@@ -109,6 +109,11 @@ export function SaleErrorView({
         transform: 'none',
       },
     },
+    [SaleErrorTypes.CLIENT_CONFIG_ERROR]: {
+      onActionClick: goBackToPaymentMethods,
+      onSecondaryActionClick: closeWidget,
+      statusType: StatusType.INFORMATION,
+    },
     [SaleErrorTypes.DEFAULT]: {
       onActionClick: goBackToPaymentMethods,
       onSecondaryActionClick: closeWidget,

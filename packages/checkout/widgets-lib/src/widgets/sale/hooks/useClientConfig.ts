@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { useState, useEffect } from 'react';
 import { PRIMARY_SALES_API_BASE_URL } from '../utils/config';
-import { ClientConfig, ClientConfigCurrency } from '../types';
+import {
+  ClientConfig, ClientConfigCurrency, ClientConfigError, SaleErrorTypes,
+} from '../types';
 
 type ClientConfigResponse = {
   contract_id: string;
@@ -38,6 +40,9 @@ export const useClientConfig = ({
 }: UseClientConfigParams) => {
   const [currency, setCurrency] = useState<ClientConfigCurrency | undefined>();
   const [clientConfig, setClientConfig] = useState<ClientConfig>(defaultClientConfig);
+  const [clientConfigError, setClientConfigError] = useState<ClientConfigError | undefined>(
+    undefined,
+  );
 
   useEffect(() => {
     if (!environment || !environmentId) return;
@@ -61,8 +66,10 @@ export const useClientConfig = ({
 
         setClientConfig(toClientConfig(data));
       } catch (error) {
-        // eslint-disable-next-line no-console
-        console.warn('Error fetching client config', error);
+        setClientConfigError({
+          type: SaleErrorTypes.SMART_CHECKOUT_ERROR,
+          data: { error },
+        });
       }
     })();
   }, [environment, environmentId]);
@@ -78,5 +85,6 @@ export const useClientConfig = ({
   return {
     clientConfig,
     currency,
+    clientConfigError,
   };
 };

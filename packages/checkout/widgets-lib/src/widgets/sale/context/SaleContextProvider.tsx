@@ -30,6 +30,7 @@ import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfi
 import { useSignOrder } from '../hooks/useSignOrder';
 import {
   ClientConfig,
+  ClientConfigError,
   ExecuteOrderResponse,
   ExecutedTransaction,
   SaleErrorTypes,
@@ -53,6 +54,7 @@ type SaleContextProps = {
   checkout: ConnectLoaderState['checkout'];
   passport?: Passport;
   clientConfig: ClientConfig;
+  clientConfigError?: ClientConfigError | undefined;
 };
 
 type SaleContextValues = SaleContextProps & {
@@ -116,6 +118,7 @@ const SaleContext = createContext<SaleContextValues>({
   disabledPaymentTypes: [],
   invalidParameters: false,
   clientConfig: defaultClientConfig,
+  clientConfigError: undefined,
 });
 
 SaleContext.displayName = 'SaleSaleContext';
@@ -141,6 +144,7 @@ export function SaleContextProvider(props: {
       passport,
       collectionName,
       clientConfig,
+      clientConfigError,
     },
   } = props;
 
@@ -345,6 +349,11 @@ export function SaleContextProvider(props: {
   }, [smartCheckoutResult]);
 
   useEffect(() => {
+    if (!clientConfigError) return;
+    goToErrorView(clientConfigError.type, clientConfigError.data);
+  }, [clientConfigError]);
+
+  useEffect(() => {
     const invalidItems = !items || items.length === 0;
     const invalidAmount = !amount || amount === '0';
     const invalidFromTokenAddress = !fromTokenAddress || !fromTokenAddress.startsWith('0x');
@@ -386,6 +395,7 @@ export function SaleContextProvider(props: {
       disabledPaymentTypes,
       invalidParameters,
       clientConfig,
+      clientConfigError,
     }),
     [
       config,
@@ -413,6 +423,7 @@ export function SaleContextProvider(props: {
       disabledPaymentTypes,
       invalidParameters,
       clientConfig,
+      clientConfigError,
     ],
   );
 
