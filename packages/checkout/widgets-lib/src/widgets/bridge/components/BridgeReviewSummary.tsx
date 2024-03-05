@@ -236,7 +236,6 @@ export function BridgeReviewSummary() {
   }, [from?.web3Provider]);
 
   useEffect(() => {
-    console.log('Hola wallet connect', isWalletConnectEnabled);
     if (isWalletConnectEnabled) {
       const isFromProviderWalletConnect = isWalletConnectProvider(from?.web3Provider);
       const isToProviderWalletConnect = isWalletConnectProvider(to?.web3Provider);
@@ -249,7 +248,6 @@ export function BridgeReviewSummary() {
         if (isToProviderWalletConnect) {
           setToWalletLogoUrl(await getWalletLogoUrl());
         }
-        console.log('To Wallet connect', from, to, isToProviderWalletConnect);
       })();
     }
   }, [isWalletConnectEnabled, from?.web3Provider, to?.web3Provider]);
