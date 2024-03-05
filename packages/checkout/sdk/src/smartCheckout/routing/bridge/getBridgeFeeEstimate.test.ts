@@ -34,6 +34,9 @@ describe('getBridgeFeeEstimate', () => {
       readOnlyProviders,
       ChainId.SEPOLIA,
       ChainId.IMTBL_ZKEVM_TESTNET,
+      '0xSENDER_ADDRESS',
+      BigNumber.from(1000),
+      '0xTOKEN_ADDRESS',
     );
 
     expect(bridgeFee).toEqual(
@@ -61,6 +64,9 @@ describe('getBridgeFeeEstimate', () => {
         readOnlyProviders,
         ChainId.SEPOLIA,
         ChainId.IMTBL_ZKEVM_TESTNET,
+        '0xSENDER_ADDRESS',
+        BigNumber.from(1000),
+        '0xTOKEN_ADDRESS',
       );
     } catch (err: any) {
       type = err.type;

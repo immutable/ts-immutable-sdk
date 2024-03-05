@@ -194,8 +194,6 @@ export class TokenBridge {
       );
     }
 
-    console.log('fees', fees);
-
     destinationChainGas = fees.destinationChainGas;
     sourceChainGas = fees.sourceChainGas;
     approvalFee = fees.approvalFee;
@@ -225,12 +223,10 @@ export class TokenBridge {
     action: BridgeFeeActions.DEPOSIT | BridgeFeeActions.WITHDRAW,
     token:string,
   ) {
-    console.log('getFeesStatic', sourceProvider, action, token);
-
     let sourceChainGas: ethers.BigNumber = ethers.BigNumber.from(0);
     let approvalFee: ethers.BigNumber = ethers.BigNumber.from(0);
 
-    if (token !== 'NATIVE') {
+    if (token.toUpperCase() !== 'NATIVE') {
       approvalFee = await this.getGasEstimates(
         sourceProvider,
         BridgeMethodsGasLimit.APPROVE_TOKEN,
@@ -260,33 +256,20 @@ export class TokenBridge {
     recipientAddress: string,
     amount: ethers.BigNumber,
   ) {
-    console.log(
-      'getFeesDynamic',
-      sourceProvider,
-      action,
-      sourceChainId,
-      token,
-      senderAddress,
-      recipientAddress,
-      amount,
-    );
-
     let sourceChainGas: ethers.BigNumber = ethers.BigNumber.from(0);
     let approvalFee: ethers.BigNumber = ethers.BigNumber.from(0);
     let amountToApprove = ethers.BigNumber.from(0);
-    let contractToApprove;
+    let sourceBridgeAddress;
     let erc20Contract;
 
-    if (token !== 'NATIVE') {
+    if (token.toUpperCase() !== 'NATIVE') {
       const resGetAllowance = await this.getAllowance(
         sourceChainId,
         token,
         senderAddress,
         amount,
       );
-
       amountToApprove = resGetAllowance.amountToApprove;
-      contractToApprove = resGetAllowance.contractToApprove;
       erc20Contract = resGetAllowance.erc20Contract;
     }
 
@@ -294,13 +277,14 @@ export class TokenBridge {
 
     if (action === BridgeFeeActions.DEPOSIT) {
       // deposit
+      sourceBridgeAddress = this.config.bridgeContracts.rootERC20BridgeFlowRate;
       const tenderlyRes = await this.getTenderlyBridgeGasEstimates(
         sourceChainId,
         senderAddress,
         recipientAddress,
         amount,
         amountToApprove,
-        contractToApprove,
+        sourceBridgeAddress,
         erc20Contract,
         token,
       );
@@ -329,7 +313,6 @@ export class TokenBridge {
           BridgeMethodsGasLimit.APPROVE_TOKEN,
         );
       }
-
       // destinationChainGas = await this.getTenderlyAdapterGasEstimates(
       //   req.destinationChainId,
       //   req.senderAddress,
@@ -458,7 +441,7 @@ export class TokenBridge {
         simulations.push({
           network_id: sourceChainId,
           estimate_gas: true,
-          simulation_type: 'quick',
+          simulation_type: 'full',
           from: sender,
           to: token,
           input: approvalData,
@@ -481,14 +464,17 @@ export class TokenBridge {
       token,
     );
 
+    // tx value for simulation mocked as amount + 1 wei for a native bridge and 1 wei for token bridges
+    const txValue = (token.toUpperCase() !== 'NATIVE') ? '1' : amount.add('1').toString();
+
     simulations.push({
       network_id: sourceChainId,
       estimate_gas: true,
-      simulation_type: 'quick',
+      simulation_type: 'full',
       from: sender,
       to: contractToApprove,
       input: txData,
-      value: '1',
+      value: txValue,
     });
 
     let axiosResponse:AxiosResponse;
@@ -716,16 +702,12 @@ export class TokenBridge {
         contractToApprove: sourceBridgeAddress,
       };
     }
-    // Calculate the amount of tokens that need to be approved for deposit
-    const approvalAmountRequired = amount.sub(
-      allowance,
-    );
 
     return {
       erc20Contract,
       allowance,
       amount,
-      amountToApprove: approvalAmountRequired,
+      amountToApprove: amount,
       contractToApprove: sourceBridgeAddress,
     };
   }

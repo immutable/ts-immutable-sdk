@@ -20,13 +20,12 @@ async function getBridgeFees() {
 
   const bridgeConfig = new BridgeConfiguration({
     baseConfig: new ImmutableConfiguration({
-      environment: Environment.SANDBOX,
+      environment: params.environment,
     }),
     bridgeInstance: params.bridgeInstance,
     rootProvider: params.rootProvider,
     childProvider: params.childProvider,
   });
-
 
   const tokenBridge = new TokenBridge(bridgeConfig);
 
@@ -44,8 +43,8 @@ async function getBridgeFees() {
   console.log('depositReq', depositReq);
 
   const depositRes: BridgeFeeResponse = await tokenBridge.getFee(depositReq);
-  console.log('depositRes', depositRes);
 
+  console.log('depositRes', depositRes);
 
   const withdrawReq: BridgeFeeRequest = {
     action: BridgeFeeActions.WITHDRAW,

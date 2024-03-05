@@ -3,6 +3,7 @@ import {
   ETH_SEPOLIA_TO_ZKEVM_DEVNET, 
   ETH_SEPOLIA_TO_ZKEVM_TESTNET 
 } from '@imtbl/bridge-sdk';
+import { Environment } from '@imtbl/config';
 import { ethers } from 'ethers';
 
 export async function setupForBridge() {
@@ -71,15 +72,18 @@ export async function setupForBridge() {
     childProvider,
   );
 
-  let bridgeInstance;
+  let bridgeInstance, environment;
   switch (process.env.ENVIRONMENT) {
     case 'MAINNET':
+      environment = Environment.PRODUCTION;
       bridgeInstance = ETH_MAINNET_TO_ZKEVM_MAINNET;
       break;
     case 'TESTNET':
+      environment = Environment.SANDBOX;
       bridgeInstance = ETH_SEPOLIA_TO_ZKEVM_TESTNET;
       break;
     case 'DEVNET':
+      environment = Environment.SANDBOX;
       bridgeInstance = ETH_SEPOLIA_TO_ZKEVM_DEVNET;
       break;
     default:
@@ -88,6 +92,7 @@ export async function setupForBridge() {
 
   return {
     bridgeInstance,
+    environment,
     rootProvider,
     childProvider,
     sender: process.env.SENDER_ADDRESS,
