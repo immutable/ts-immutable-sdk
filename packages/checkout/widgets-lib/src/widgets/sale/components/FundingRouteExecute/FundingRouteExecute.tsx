@@ -266,7 +266,7 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
       {view === FundingRouteExecuteViews.EXECUTE_ON_RAMP && (
         <OnRampWidget
           config={config}
-          {...onRamParams}
+          {...onRampParams}
         />
       )}
       {view === FundingRouteExecuteViews.SWITCH_NETWORK_ETH && (
