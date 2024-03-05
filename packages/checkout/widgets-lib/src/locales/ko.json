@@ -37,7 +37,7 @@
     },
     "SWITCH_NETWORK": {
       "eth": {
-        "heading": "코인을 옮기려면 Sepolia 네트워크로 전환해야 합니다",
+        "heading": "{{networkName}} 네트워크로 전환해야 합니다",
         "body": "MetaMask에서 네트워크 전환을 요청받게 됩니다. 필요할 때 다시 전환할 수 있습니다.",
         "button": {
           "text": "전환 준비됨",

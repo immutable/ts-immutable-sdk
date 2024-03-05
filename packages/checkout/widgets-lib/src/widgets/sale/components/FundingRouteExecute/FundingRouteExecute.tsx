@@ -7,12 +7,12 @@ import {
   BridgeWidgetParams,
   ConnectEventType,
   ConnectionSuccess,
-  ConnectTargetLayer,
   IMTBLWidgetEvents,
   SwapEventType,
   SwapFailed,
   SwapSuccess,
   SwapWidgetParams,
+  ChainId,
 } from '@imtbl/checkout-sdk';
 import {
   useCallback,
@@ -247,7 +247,7 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
       {view === FundingRouteExecuteViews.SWITCH_NETWORK_ETH && (
         <ConnectWidget
           config={config}
-          targetLayer={ConnectTargetLayer.LAYER1}
+          targetChainId={checkout!.config.isProduction ? ChainId.ETHEREUM : ChainId.SEPOLIA}
           web3Provider={provider}
           checkout={checkout!}
           deepLink={ConnectWidgetViews.SWITCH_NETWORK}
@@ -256,7 +256,7 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
       {view === FundingRouteExecuteViews.SWITCH_NETWORK_ZKEVM && (
         <ConnectWidget
           config={config}
-          targetLayer={ConnectTargetLayer.LAYER2}
+          targetChainId={checkout!.config.isProduction ? ChainId.IMTBL_ZKEVM_MAINNET : ChainId.IMTBL_ZKEVM_TESTNET}
           web3Provider={provider}
           checkout={checkout!}
           deepLink={ConnectWidgetViews.SWITCH_NETWORK}
