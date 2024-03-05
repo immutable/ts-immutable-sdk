@@ -131,8 +131,15 @@ export function ReadyToConnect({ targetChainId, allowedChains }: ReadyToConnectP
         control: 'Connect',
         controlType: 'Button',
       });
+
+      let changeAccount = false;
+      if (isMetaMaskProvider(provider)) {
+        changeAccount = true;
+      }
+
       const connectResult = await checkout.connect({
         provider,
+        requestWalletPermissions: changeAccount,
       });
 
       // Set up EIP-1193 provider event listeners for widget root instances

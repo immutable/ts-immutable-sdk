@@ -26,7 +26,6 @@ import { useInjectedProviders } from '../../../lib/hooks/useInjectedProviders';
 import { useAnimation } from '../../../lib/hooks/useAnimation';
 import { walletListStyle } from './WalletListStyles';
 import {
-  connectToProvider,
   EIP1193Provider,
   EIP6963ProviderDetail,
   getProviderSlugFromRdns,
@@ -117,16 +116,10 @@ export function WalletList(props: WalletListProps) {
       });
       if (checkout) {
         try {
-          let changeAccount = false;
-          if (providerDetail.info.rdns === WalletProviderRdns.METAMASK) {
-            changeAccount = true;
-          }
-          const web3Provider = await connectToProvider(
-            checkout,
+          selectWeb3Provider(
             new Web3Provider(providerDetail.provider as any),
-            changeAccount,
+            getProviderSlugFromRdns(providerDetail.info.rdns),
           );
-          selectWeb3Provider(web3Provider, getProviderSlugFromRdns(providerDetail.info.rdns));
 
           viewDispatch({
             payload: {
