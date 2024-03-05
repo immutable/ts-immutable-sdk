@@ -157,6 +157,7 @@ export const useSignOrder = (input: SignOrderInput) => {
     done: false,
     transactions: [],
   });
+  const [tokenIds, setTokenIds] = useState<string[]>([]);
 
   const setExecuteTransactions = (transaction: ExecutedTransaction) => {
     setExecuteResponse((prev) => ({
@@ -192,7 +193,6 @@ export const useSignOrder = (input: SignOrderInput) => {
         });
 
         setExecuteTransactions({ method, hash: txnResponse?.hash });
-        await txnResponse?.wait();
 
         transactionHash = txnResponse?.hash || '';
         return [transactionHash, undefined];
@@ -285,7 +285,14 @@ export const useSignOrder = (input: SignOrderInput) => {
           return undefined;
         }
 
-        const responseData = toSignResponse(await response.json(), items);
+        const apiResponse: SignApiResponse = await response.json();
+        const apiTokenIds = apiResponse.order.products
+          .map((product) => product.detail.map(({ token_id }) => token_id))
+          .flat();
+
+        const responseData = toSignResponse(apiResponse, items);
+
+        setTokenIds(apiTokenIds);
         setSignResponse(responseData);
 
         return responseData;
@@ -349,5 +356,6 @@ export const useSignOrder = (input: SignOrderInput) => {
     signError,
     execute,
     executeResponse,
+    tokenIds,
   };
 };
