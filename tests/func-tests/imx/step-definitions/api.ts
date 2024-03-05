@@ -2,7 +2,7 @@ import { strict as assert } from 'assert';
 import { parseEther } from '@ethersproject/units';
 import {
   IMXClient,
-  ImxClientModuleConfiguration,
+  ImxModuleConfiguration,
   ProviderConfiguration,
 } from '@imtbl/sdk/x';
 import { configuration, StepSharedState } from './stepSharedState';
@@ -12,7 +12,7 @@ import { env, getProvider, repeatCheck20 } from '../common';
 export class Trading {
   constructor(protected stepSharedState: StepSharedState) {}
 
-  config: ImxClientModuleConfiguration = {
+  config: ImxModuleConfiguration = {
     baseConfig: { environment: configuration.environment },
   };
 

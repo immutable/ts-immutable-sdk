@@ -2,7 +2,7 @@ import { strict as assert } from 'assert';
 import { formatEther, parseEther } from '@ethersproject/units';
 import {
   IMXClient,
-  ImxClientModuleConfiguration,
+  ImxModuleConfiguration,
   GenericIMXProvider,
   ProviderConfiguration,
 } from '@imtbl/sdk/x';
@@ -15,7 +15,7 @@ import {
 export class DepositEth {
   constructor(protected stepSharedState: StepSharedState) {}
 
-  config: ImxClientModuleConfiguration = {
+  config: ImxModuleConfiguration = {
     baseConfig: { environment: configuration.environment },
   };
 

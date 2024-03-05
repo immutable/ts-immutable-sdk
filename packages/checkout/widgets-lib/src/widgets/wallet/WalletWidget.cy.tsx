@@ -17,6 +17,7 @@ import {
 } from '../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
 import { ConnectionStatus } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { NATIVE } from '../../lib';
+import { WalletConfiguration } from './context/WalletContext';
 
 describe('WalletWidget tests', () => {
   beforeEach(() => {
@@ -44,6 +45,11 @@ describe('WalletWidget tests', () => {
     provider: mockProvider,
     connectionStatus: ConnectionStatus.CONNECTED_WITH_NETWORK,
   };
+
+  const walletConfig = {
+    showDisconnectButton: true,
+    showNetworkMenu: true,
+  } as WalletConfiguration;
 
   describe('WalletWidget initialisation', () => {
     beforeEach(() => {
@@ -85,6 +91,7 @@ describe('WalletWidget tests', () => {
         >
           <WalletWidget
             config={widgetConfig}
+            walletConfig={walletConfig}
           />
         </ConnectLoaderTestComponent>,
       );
@@ -138,6 +145,7 @@ describe('WalletWidget tests', () => {
         >
           <WalletWidget
             config={widgetConfig}
+            walletConfig={walletConfig}
           />
         </ConnectLoaderTestComponent>,
       );
@@ -316,6 +324,7 @@ describe('WalletWidget tests', () => {
           >
             <WalletWidget
               config={widgetConfig}
+              walletConfig={walletConfig}
             />
             ,
           </ConnectLoaderTestComponent>,
@@ -356,6 +365,7 @@ describe('WalletWidget tests', () => {
           >
             <WalletWidget
               config={widgetConfig}
+              walletConfig={walletConfig}
             />
             ,
           </ConnectLoaderTestComponent>,
@@ -417,6 +427,7 @@ describe('WalletWidget tests', () => {
           >
             <WalletWidget
               config={widgetConfig}
+              walletConfig={walletConfig}
             />
           </ConnectLoaderTestComponent>,
         );
@@ -471,6 +482,7 @@ describe('WalletWidget tests', () => {
           >
             <WalletWidget
               config={widgetConfig}
+              walletConfig={walletConfig}
             />
             ,
           </ConnectLoaderTestComponent>,
@@ -497,6 +509,7 @@ describe('WalletWidget tests', () => {
           >
             <WalletWidget
               config={widgetConfig}
+              walletConfig={walletConfig}
             />
             ,
           </ConnectLoaderTestComponent>,
@@ -523,6 +536,7 @@ describe('WalletWidget tests', () => {
           >
             <WalletWidget
               config={widgetConfig}
+              walletConfig={walletConfig}
             />
             ,
           </ConnectLoaderTestComponent>,
@@ -553,6 +567,7 @@ describe('WalletWidget tests', () => {
           >
             <WalletWidget
               config={widgetConfig}
+              walletConfig={walletConfig}
             />
             ,x
           </ConnectLoaderTestComponent>,
@@ -593,6 +608,7 @@ describe('WalletWidget tests', () => {
           >
             <WalletWidget
               config={widgetConfig}
+              walletConfig={walletConfig}
             />
           </ConnectLoaderTestComponent>,
         );
@@ -603,6 +619,38 @@ describe('WalletWidget tests', () => {
         );
         cySmartGet('disconnect-button').click();
         cySmartGet('@disconnectEvent').should('have.been.calledOnce');
+      });
+
+      it('should NOT show a disconnect button when wallet config showDisconnectButton is false', () => {
+        cy.window().then((window) => {
+          window.addEventListener(
+            IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
+            cy.stub().as('disconnectEvent'),
+          );
+        });
+
+        const widgetConfig = {
+          theme: WidgetTheme.DARK,
+          environment: Environment.SANDBOX,
+          isBridgeEnabled: false,
+          isSwapEnabled: false,
+          isOnRampEnabled: false,
+        } as StrongCheckoutWidgetsConfig;
+
+        mount(
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <WalletWidget
+              config={widgetConfig}
+              walletConfig={{ ...walletConfig, showDisconnectButton: false }}
+            />
+            ,x
+          </ConnectLoaderTestComponent>,
+        );
+        cySmartGet('settings-button').click();
+        cySmartGet('disconnect-button').should('not.exist');
+        cySmartGet('@disconnectEvent').should('not.have.been.called');
       });
     });
 
@@ -628,6 +676,7 @@ describe('WalletWidget tests', () => {
           >
             <WalletWidget
               config={widgetConfig}
+              walletConfig={walletConfig}
             />
             ,
           </ConnectLoaderTestComponent>,
@@ -660,6 +709,7 @@ describe('WalletWidget tests', () => {
           >
             <WalletWidget
               config={widgetConfig}
+              walletConfig={walletConfig}
             />
             ,
           </ConnectLoaderTestComponent>,
@@ -672,6 +722,32 @@ describe('WalletWidget tests', () => {
         cy.get('body').contains('Visit our FAQs');
         cy.get('body').contains('Coins and collectibles are native to networks');
         cySmartGet('back-button').should('be.visible');
+      });
+    });
+
+    describe('Network menu', () => {
+      it('should not show the Network Menu when wallet config showNetworkMenu is false', () => {
+        const widgetConfig = {
+          theme: WidgetTheme.DARK,
+          environment: Environment.SANDBOX,
+          isBridgeEnabled: false,
+          isSwapEnabled: false,
+          isOnRampEnabled: false,
+        } as StrongCheckoutWidgetsConfig;
+
+        mount(
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <WalletWidget
+              config={widgetConfig}
+              walletConfig={{ ...walletConfig, showNetworkMenu: false }}
+            />
+          </ConnectLoaderTestComponent>,
+        );
+
+        cySmartGet('wallet-balances').should('exist');
+        cySmartGet('network-menu').should('not.exist');
       });
     });
 
@@ -699,6 +775,7 @@ describe('WalletWidget tests', () => {
           >
             <WalletWidget
               config={widgetConfig}
+              walletConfig={walletConfig}
             />
           </ConnectLoaderTestComponent>,
         );

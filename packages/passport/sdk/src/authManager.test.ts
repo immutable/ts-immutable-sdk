@@ -111,6 +111,7 @@ describe('AuthManager', () => {
         authority: config.authenticationDomain,
         client_id: config.oidcConfiguration.clientId,
         mergeClaims: true,
+        automaticSilentRenew: false,
         metadata: {
           authorization_endpoint: `${config.authenticationDomain}/authorize`,
           token_endpoint: `${config.authenticationDomain}/oauth/token`,

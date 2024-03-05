@@ -42,6 +42,7 @@ export const useSmartCheckout = ({
         checkout,
         provider,
       );
+
       if (userFractionalBalanceBlocked) {
         throw new Error(SmartCheckoutErrorTypes.FRACTIONAL_BALANCE_BLOCKED);
       }
@@ -55,11 +56,12 @@ export const useSmartCheckout = ({
           transactionOrGasAmount: gasEstimate,
         },
       );
+
       if (!res) {
         throw new Error();
       }
       const result = { ...res };
-      const filteredSmartCheckoutResult = filterSmartCheckoutResult(result);
+      const filteredSmartCheckoutResult = filterSmartCheckoutResult(result, provider);
       setSmartCheckoutResult(filteredSmartCheckoutResult);
       return result;
     } catch (err: any) {

@@ -24,3 +24,5 @@ yarn-error.log*
 
 cypress/videos/*
 
+# visualizer
+stats.html

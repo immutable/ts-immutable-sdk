@@ -10,6 +10,7 @@ import {
   ProviderEventType,
   ProviderUpdated,
   WidgetParameters,
+  WalletEventType,
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import i18next from 'i18next';
@@ -48,6 +49,7 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
       addProviderListenersForWidgetRoot(this.web3Provider);
     }
     this.setupProviderUpdatedListener();
+    this.setupDisconnectProviderListener();
   }
 
   unmount() {
@@ -177,6 +179,13 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
     window.addEventListener(baseWidgetProviderEvent, () => widgetRoot.handleEIP1193ProviderEvents(widgetRoot));
   }
 
+  private setupDisconnectProviderListener() {
+    window.addEventListener(
+      IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
+      this.handleDisconnectEvent,
+    );
+  }
+
   private handleEIP1193ProviderEvents(widgetRoot: Base<T>) {
     if (widgetRoot.web3Provider) {
       // eslint-disable-next-line no-param-reassign
@@ -197,6 +206,22 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
       case ProviderEventType.PROVIDER_UPDATED: {
         const eventData = event.detail.data as ProviderUpdated;
         widgetRoot.web3Provider = eventData.provider;
+        this.render();
+        break;
+      }
+      default:
+    }
+  }) as EventListener;
+
+  /**
+   * Handles disconnect event from the wallet widget
+   */
+  private handleDisconnectEvent = ((event: CustomEvent) => {
+    const widgetRoot = this;
+
+    switch (event.detail.type) {
+      case WalletEventType.DISCONNECT_WALLET: {
+        widgetRoot.web3Provider = undefined;
         this.render();
         break;
       }

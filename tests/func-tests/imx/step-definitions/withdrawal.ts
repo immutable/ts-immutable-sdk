@@ -1,6 +1,6 @@
 import {
   IMXClient,
-  ImxClientModuleConfiguration,
+  ImxModuleConfiguration,
   GenericIMXProvider,
   ProviderConfiguration,
 } from '@imtbl/sdk/x';
@@ -75,7 +75,7 @@ export class Withdrawal {
   ) {
     const id = this.stepSharedState.withdrawals[withdrawalName].withdrawal_id!;
     const repeatCheckFunction = status === 'withdrawable' ? repeatCheck300 : repeatCheck30;
-    const config: ImxClientModuleConfiguration = {
+    const config: ImxModuleConfiguration = {
       baseConfig: { environment: configuration.environment },
     };
     const client = new IMXClient(config);

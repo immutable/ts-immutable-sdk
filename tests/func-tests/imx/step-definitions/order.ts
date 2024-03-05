@@ -2,7 +2,7 @@ import { UnsignedOrderRequest } from '@imtbl/core-sdk';
 import { parseEther } from '@ethersproject/units';
 import {
   IMXClient,
-  ImxClientModuleConfiguration,
+  ImxModuleConfiguration,
   GenericIMXProvider,
   ProviderConfiguration,
 } from '@imtbl/sdk/x';
@@ -12,7 +12,7 @@ import { configuration, StepSharedState } from './stepSharedState';
 export class Order {
   constructor(protected stepSharedState: StepSharedState) {}
 
-  config: ImxClientModuleConfiguration = {
+  config: ImxModuleConfiguration = {
     baseConfig: { environment: configuration.environment },
   };
 
