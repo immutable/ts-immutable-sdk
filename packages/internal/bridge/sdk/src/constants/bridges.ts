@@ -66,7 +66,7 @@ export const ETH_MAINNET_TO_ZKEVM_MAINNET: BridgeInstance = {
 export const axelarAPIEndpoints:Record<string, string> = {
   mainnet: 'https://api.gmp.axelarscan.io',
   testnet: 'https://testnet.api.gmp.axelarscan.io',
-  devnet: 'https://testnet.api.gmp.axelarscan.io',
+  devnet: 'https://stagenet.api.gmp.axelarscan.io',
 };
 
 /**
