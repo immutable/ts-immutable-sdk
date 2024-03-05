@@ -7,9 +7,6 @@ import { networkIcon } from 'lib';
 import { Web3Provider } from '@ethersproject/providers';
 import { useEffect, useState } from 'react';
 import { useWalletConnect } from 'lib/hooks/useWalletConnect';
-import { isWalletConnectProvider } from 'lib/providerUtils';
-import { EIP1193Provider } from 'mipd';
-import { EIP6963ProviderDetail } from 'mipd/src/types';
 import {
   networkButtonStyles,
   networkIconStyles,
@@ -19,6 +16,7 @@ import {
   wcWalletLogoStyles,
 } from './WalletNetworkButtonStyles';
 import { RawImage } from '../../../components/RawImage/RawImage';
+import { EIP1193Provider, EIP6963ProviderDetail, isWalletConnectProvider } from '../../../lib/provider';
 
 interface WalletNetworkButtonProps {
   testId: string;

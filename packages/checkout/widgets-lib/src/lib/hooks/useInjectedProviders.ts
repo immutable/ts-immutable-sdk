@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
-import { EIP6963ProviderDetail } from 'mipd/src/types';
 import { Checkout, WalletProviderRdns } from '@imtbl/checkout-sdk';
-import { EIP1193Provider } from 'mipd';
 import { Web3Provider } from '@ethersproject/providers';
-import { getPassportProviderDetail, InjectedProvidersManager } from '../eip6963';
+import {
+  EIP1193Provider,
+  EIP6963ProviderDetail,
+  getPassportProviderDetail,
+  InjectedProvidersManager,
+} from '../provider';
 
 export interface UseInjectedProvidersParams {
   checkout: Checkout | null;

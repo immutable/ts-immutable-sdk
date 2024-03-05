@@ -3,21 +3,12 @@ import {
 } from 'react';
 import EthereumProvider from '@walletconnect/ethereum-provider';
 import { WalletConnectModal } from '@walletconnect/modal';
-import { EIP6963ProviderInfo } from 'mipd';
 import { WalletConnectManager } from '../walletConnect';
 
 export interface OpenWalletConnectModalParams {
   connectCallback: (ethereumProvider: EthereumProvider) => void
   restoreSession?: boolean
 }
-
-export const walletConnectProviderInfo = {
-  name: 'Other',
-  rdns: 'walletconnect',
-  // eslint-disable-next-line max-len
-  icon: 'data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNDggNDgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGc+PHBhdGggZD0iTTEwLjQyMzYgMTQuODY4NkMxNy45NTA3IDcuNTIzNzcgMzAuMTY5NCA3LjUyMzc3IDM3LjY5NjQgMTQuODY4NkwzOC42MDI2IDE1Ljc1OTNDMzguOTgyNiAxNi4xMjQ0IDM4Ljk4MjYgMTYuNzIzMSAzOC42MDI2IDE3LjA4ODFMMzUuNTA0MSAyMC4xMTA4QzM1LjMxNDEgMjAuMzAwNiAzNS4wMDcxIDIwLjMwMDYgMzQuODE3MSAyMC4xMTA4TDMzLjU3NDggMTguODk4OEMyOC4zMTMyIDEzLjc3MzUgMTkuODA2OSAxMy43NzM1IDE0LjU0NTIgMTguODk4OEwxMy4yMTUyIDIwLjE5ODRDMTMuMDI1MiAyMC4zODgyIDEyLjcxODMgMjAuMzg4MiAxMi41MjgzIDIwLjE5ODRMOS40Mjk3OCAxNy4xNzU3QzkuMDQ5NzcgMTYuODEwNyA5LjA0OTc3IDE2LjIxMiA5LjQyOTc4IDE1Ljg0N0wxMC40MjM2IDE0Ljg2ODZaTTQ0LjExMjcgMjEuMTE4M0w0Ni44NzUgMjMuODA1MUM0Ny4yNTUgMjQuMTcwMSA0Ny4yNTUgMjQuNzY4OCA0Ni44NzUgMjUuMTMzOUwzNC40MzcxIDM3LjI2ODJDMzQuMDU3MSAzNy42MzMyIDMzLjQ0MzMgMzcuNjMzMiAzMy4wNzc5IDM3LjI2ODJMMjQuMjUgMjguNjUzQzI0LjE2MjMgMjguNTY1NCAyNC4wMDE2IDI4LjU2NTQgMjMuOTEzOSAyOC42NTNMMTUuMDg2IDM3LjI2ODJDMTQuNzA2IDM3LjYzMzIgMTQuMDkyMiAzNy42MzMyIDEzLjcyNjggMzcuMjY4MkwxLjI0NTAzIDI1LjEzMzlDMC44NjUwMiAyNC43Njg4IDAuODY1MDIgMjQuMTcwMSAxLjI0NTAzIDIzLjgwNTFMNC4wMDczOCAyMS4xMTgzQzQuMzg3MzkgMjAuNzUzMyA1LjAwMTI1IDIwLjc1MzMgNS4zNjY2NCAyMS4xMTgzTDE0LjE5NDUgMjkuNzMzNUMxNC4yODIyIDI5LjgyMTEgMTQuNDQyOSAyOS44MjExIDE0LjUzMDYgMjkuNzMzNUwyMy4zNTg1IDIxLjExODNDMjMuNzM4NSAyMC43NTMzIDI0LjM1MjMgMjAuNzUzMyAyNC43MTc3IDIxLjExODNMMzMuNTQ1NiAyOS43MzM1QzMzLjYzMzMgMjkuODIxMSAzMy43OTQgMjkuODIxMSAzMy44ODE3IDI5LjczMzVMNDIuNzA5NiAyMS4xMTgzQzQzLjExODggMjAuNzUzMyA0My43MzI3IDIwLjc1MzMgNDQuMTEyNyAyMS4xMTgzWiIgZmlsbD0iIzM2OEFGQSI+PC9wYXRoPjwvZz48L3N2Zz4=',
-  uuid: 'wallet-connect',
-} as EIP6963ProviderInfo;
 
 export const useWalletConnect = () => {
   const [walletConnectBusy, setWalletConnectBusy] = useState<boolean>(false);
@@ -80,10 +71,9 @@ export const useWalletConnect = () => {
 
         // eslint-disable-next-line no-console
         console.log('useWalletConnect::display_uri', data);
-        const pairingTopicFromUrl = data.split('@')[0].replace('wc:', '');
+        // const pairingTopicFromUrl = data.split('@')[0].replace('wc:', '');
         // eslint-disable-next-line no-console
-        console.log('useWalletConnect::pairingTopic', pairingTopicFromUrl);
-        console.log('walletConnectModal', walletConnectModal, data);
+        // console.log('useWalletConnect::pairingTopic', pairingTopicFromUrl);
         walletConnectModal?.openModal({
           uri: data,
         })
@@ -142,6 +132,5 @@ export const useWalletConnect = () => {
     walletConnectModal,
     openWalletConnectModal,
     getWalletLogoUrl,
-    walletConnectProviderInfo,
   };
 };

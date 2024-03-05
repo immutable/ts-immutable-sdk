@@ -1,5 +1,4 @@
-import { EIP1193Provider } from 'mipd';
-import { EIP6963ProviderDetail } from 'mipd/src/types';
+import { EIP1193Provider, EIP6963ProviderDetail } from '../../../lib/provider';
 
 export type WalletChangeEvent = {
   walletType: 'injected' | 'walletconnect';

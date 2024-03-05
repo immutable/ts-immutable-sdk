@@ -1,8 +1,7 @@
 import { MenuItem } from '@biom3/react';
 import { ReactElement, useState } from 'react';
-import { EIP6963ProviderDetail } from 'mipd/src/types';
-import { EIP1193Provider } from 'mipd';
 import { RawImage } from '../../../components/RawImage/RawImage';
+import { EIP1193Provider, EIP6963ProviderDetail } from '../../../lib/provider';
 
 export interface WalletItemProps<RC extends ReactElement | undefined = undefined> {
   testId: string;

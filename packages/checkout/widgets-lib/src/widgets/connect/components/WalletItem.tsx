@@ -1,11 +1,9 @@
 import { Box, MenuItem } from '@biom3/react';
 import { useTranslation } from 'react-i18next';
-import { EIP6963ProviderDetail } from 'mipd/src/types';
-import { EIP1193Provider } from 'mipd';
 import { ReactElement } from 'react';
 import { WalletProviderName } from '@imtbl/checkout-sdk';
-import { getProviderSlugFromRdns } from '../../../lib/eip6963';
 import { RawImage } from '../../../components/RawImage/RawImage';
+import { EIP1193Provider, EIP6963ProviderDetail, getProviderSlugFromRdns } from '../../../lib/provider';
 
 export interface WalletProps<RC extends ReactElement | undefined = undefined> {
   onWalletClick: (providerDetail: EIP6963ProviderDetail<EIP1193Provider>) => void;

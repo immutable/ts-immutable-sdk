@@ -9,9 +9,6 @@ import {
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Web3Provider } from '@ethersproject/providers';
-import { EIP1193Provider } from 'mipd';
-import { EIP6963ProviderDetail } from 'mipd/src/types';
-import { getL1ChainId } from 'lib';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { ConnectActions, ConnectContext } from '../context/ConnectContext';
 import { WalletItem } from './WalletItem';
@@ -26,10 +23,14 @@ import {
 } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { useWalletConnect } from '../../../lib/hooks/useWalletConnect';
 import { useInjectedProviders } from '../../../lib/hooks/useInjectedProviders';
-import { getProviderSlugFromRdns } from '../../../lib/eip6963';
 import { useAnimation } from '../../../lib/hooks/useAnimation';
 import { walletListStyle } from './WalletListStyles';
-import { connectToProvider } from '../../../lib/providerUtils';
+import {
+  connectToProvider,
+  EIP1193Provider,
+  EIP6963ProviderDetail,
+  getProviderSlugFromRdns,
+} from '../../../lib/provider';
 
 export interface WalletListProps {
   targetChainId: ChainId;
