@@ -202,7 +202,7 @@ export function SaleUI() {
       <br />
       <br />
       <br />
-      <h3>Passport Config</h3>
+      <h3>Passport Config <button onClick={() => { passportInstance?.logout(); }}>Passport logout</button></h3>
       <textarea
         rows={12}
         cols={80}
@@ -210,6 +210,7 @@ export function SaleUI() {
         onChange={handlePassportConfigChange}
         onBlur={handlePassportConfigFormat}
       />
+      
       <br />
       <br />
       <h3>Items</h3>
