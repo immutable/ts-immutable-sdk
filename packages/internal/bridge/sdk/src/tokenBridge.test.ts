@@ -4,7 +4,7 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { TokenBridge } from 'tokenBridge';
 import { BridgeConfiguration } from 'config';
-import { ETH_SEPOLIA_TO_ZKEVM_DEVNET, ETH_SEPOLIA_TO_ZKEVM_TESTNET } from 'constants/bridges';
+import { ETH_SEPOLIA_TO_ZKEVM_TESTNET } from 'constants/bridges';
 import {
   BridgeFeeActions, BridgeTxRequest, BridgeTxResponse, StatusResponse,
 } from 'types';
@@ -30,7 +30,7 @@ describe('Token Bridge', () => {
       baseConfig: new ImmutableConfiguration({
         environment: Environment.SANDBOX,
       }),
-      bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+      bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
       rootProvider: voidRootProvider,
       childProvider: voidChildProvider,
     });
@@ -59,7 +59,7 @@ describe('Token Bridge', () => {
         baseConfig: new ImmutableConfiguration({
           environment: Environment.SANDBOX,
         }),
-        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
         rootProvider: voidRootProvider,
         childProvider: voidChildProvider,
       });
@@ -88,8 +88,8 @@ describe('Token Bridge', () => {
         senderAddress: '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816',
         token: '0x2f14582947E292a2eCd20C430B46f2d27CFE213c',
         amount,
-        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
-        destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+        destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
       };
 
       const result = await tokenBridge.getUnsignedApproveBridgeTx(req);
@@ -113,8 +113,8 @@ describe('Token Bridge', () => {
         senderAddress: '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816',
         token: '0x2f14582947E292a2eCd20C430B46f2d27CFE213c',
         amount,
-        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
-        destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+        destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
       };
 
       const result = await tokenBridge.getUnsignedApproveBridgeTx(req);
@@ -128,8 +128,8 @@ describe('Token Bridge', () => {
           token: 'NATIVE',
           senderAddress: '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816',
           amount: ethers.utils.parseUnits('0.01', 18),
-          sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
-          destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+          sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
         },
       );
       expect(result.unsignedTx).toBeNull();
@@ -139,7 +139,7 @@ describe('Token Bridge', () => {
   describe('getUnsignedBridgeTx', () => {
     const originalValidateDepositArgs = TokenBridge.prototype['validateDepositArgs'];
     const originalValidateChainConfiguration = TokenBridge.prototype['validateChainConfiguration'];
-    const originalGetFee = TokenBridge.prototype['getFee'];
+    const originalGetFeePrivate = TokenBridge.prototype['getFeePrivate'];
 
     const sourceChainGas:ethers.BigNumber = ethers.utils.parseUnits('0.000001', 18);
     const destinationChainGas:ethers.BigNumber = ethers.utils.parseUnits('0.000001', 18);
@@ -151,18 +151,18 @@ describe('Token Bridge', () => {
     let bridgeConfig: BridgeConfiguration;
     beforeEach(() => {
       const mockRootProvider = {
-        getNetwork: jest.fn().mockReturnValue({ chainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID }),
+        getNetwork: jest.fn().mockReturnValue({ chainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID }),
         getCode: jest.fn().mockReturnValue('0x'),
       } as unknown as ethers.providers.Web3Provider;
       const mockChildProvider = {
-        getNetwork: jest.fn().mockReturnValue({ chainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID }),
+        getNetwork: jest.fn().mockReturnValue({ chainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID }),
         getCode: jest.fn().mockReturnValue('0x'),
       } as unknown as ethers.providers.Web3Provider;
       bridgeConfig = new BridgeConfiguration({
         baseConfig: new ImmutableConfiguration({
           environment: Environment.SANDBOX,
         }),
-        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
         rootProvider: mockRootProvider,
         childProvider: mockChildProvider,
       });
@@ -171,7 +171,7 @@ describe('Token Bridge', () => {
         .mockImplementation(async () => 'Valid');
       jest.spyOn(TokenBridge.prototype as any, 'validateChainConfiguration')
         .mockImplementation(async () => 'Valid');
-      jest.spyOn(TokenBridge.prototype as any, 'getFee')
+      jest.spyOn(TokenBridge.prototype as any, 'getFeePrivate')
         .mockImplementation(async () => ({
           sourceChainGas,
           destinationChainGas,
@@ -184,7 +184,7 @@ describe('Token Bridge', () => {
       jest.clearAllMocks();
       TokenBridge.prototype['validateDepositArgs'] = originalValidateDepositArgs;
       TokenBridge.prototype['validateChainConfiguration'] = originalValidateChainConfiguration;
-      TokenBridge.prototype['getFee'] = originalGetFee;
+      TokenBridge.prototype['getFeePrivate'] = originalGetFeePrivate;
     });
 
     it('ERC20 token with valid arguments is successful', async () => {
@@ -197,8 +197,8 @@ describe('Token Bridge', () => {
         recipientAddress,
         amount,
         token,
-        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
-        destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+        destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
         gasMultiplier: 1.1,
       };
       const response: BridgeTxResponse = await tokenBridge.getUnsignedBridgeTx(request);
@@ -220,8 +220,8 @@ describe('Token Bridge', () => {
         recipientAddress,
         amount,
         token,
-        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
-        destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+        destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
         gasMultiplier: 1.1,
       };
 
@@ -241,8 +241,8 @@ describe('Token Bridge', () => {
         recipientAddress,
         amount,
         token,
-        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
-        destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+        destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
         gasMultiplier: 1.1,
       };
       const response: BridgeTxResponse = await tokenBridge.getUnsignedBridgeTx(request);
@@ -266,7 +266,7 @@ describe('Token Bridge', () => {
         baseConfig: new ImmutableConfiguration({
           environment: Environment.SANDBOX,
         }),
-        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
         rootProvider: voidRootProvider,
         childProvider: voidChildProvider,
       });
@@ -286,8 +286,8 @@ describe('Token Bridge', () => {
           '0x1234567890123456789012345678901234567890',
           '0x1234567890123456789012345678901234567890',
           ethers.utils.parseUnits('0.01', 18),
-          ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
-          ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
         );
       } catch (error: any) {
         expect(error).toBeInstanceOf(BridgeError);
@@ -301,8 +301,8 @@ describe('Token Bridge', () => {
           '0x1234567890123456789012345678901234567890',
           'invalidAddress',
           ethers.utils.parseUnits('0.01', 18),
-          ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
-          ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
         );
       } catch (error: any) {
         expect(error).toBeInstanceOf(BridgeError);
@@ -316,8 +316,8 @@ describe('Token Bridge', () => {
           'NATIVE',
           'invalidAddress',
           ethers.utils.parseUnits('0.01', 18),
-          ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
-          ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
         );
       } catch (error: any) {
         expect(error).toBeInstanceOf(BridgeError);
@@ -331,8 +331,8 @@ describe('Token Bridge', () => {
           'invalidToken',
           '0x1234567890123456789012345678901234567890',
           ethers.utils.parseUnits('0.01', 18),
-          ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
-          ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
         );
       } catch (error: any) {
         expect(error).toBeInstanceOf(BridgeError);
@@ -346,8 +346,8 @@ describe('Token Bridge', () => {
           '0x1234567890123456789012345678901234567890',
           '0x1234567890123456789012345678901234567890',
           ethers.BigNumber.from(0),
-          ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
-          ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
         );
       } catch (error: any) {
         expect(error).toBeInstanceOf(BridgeError);
@@ -361,8 +361,8 @@ describe('Token Bridge', () => {
           'NATIVE',
           '0x1234567890123456789012345678901234567890',
           ethers.BigNumber.from(0),
-          ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
-          ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
         );
       } catch (error: any) {
         expect(error).toBeInstanceOf(BridgeError);
@@ -380,7 +380,7 @@ describe('Token Bridge', () => {
         baseConfig: new ImmutableConfiguration({
           environment: Environment.SANDBOX,
         }),
-        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
         rootProvider: voidRootProvider,
         childProvider: voidChildProvider,
       });
@@ -394,8 +394,8 @@ describe('Token Bridge', () => {
       expect.assertions(0);
       try {
         await tokenBridge['validateChainIds'](
-          ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
-          ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
         );
       } catch (error: any) {
         expect(error).toBeInstanceOf(BridgeError);
@@ -407,7 +407,7 @@ describe('Token Bridge', () => {
       try {
         await tokenBridge['validateChainIds'](
           '100',
-          ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
         );
       } catch (error: any) {
         expect(error).toBeInstanceOf(BridgeError);
@@ -418,7 +418,7 @@ describe('Token Bridge', () => {
       expect.assertions(2);
       try {
         await tokenBridge['validateChainIds'](
-          ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
           '100',
         );
       } catch (error: any) {
@@ -430,8 +430,8 @@ describe('Token Bridge', () => {
       expect.assertions(2);
       try {
         await tokenBridge['validateChainIds'](
-          ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
-          ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
         );
       } catch (error: any) {
         expect(error).toBeInstanceOf(BridgeError);
@@ -446,17 +446,17 @@ describe('Token Bridge', () => {
     });
     it('does not throw an error when everything setup correctly', async () => {
       const mockRootProvider = {
-        getNetwork: jest.fn().mockReturnValue({ chainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID }),
+        getNetwork: jest.fn().mockReturnValue({ chainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID }),
       } as unknown as ethers.providers.Web3Provider;
       const mockChildProvider = {
-        getNetwork: jest.fn().mockReturnValue({ chainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID }),
+        getNetwork: jest.fn().mockReturnValue({ chainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID }),
       } as unknown as ethers.providers.Web3Provider;
 
       const bridgeConfig = new BridgeConfiguration({
         baseConfig: new ImmutableConfiguration({
           environment: Environment.SANDBOX,
         }),
-        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
         rootProvider: mockRootProvider,
         childProvider: mockChildProvider,
       });
@@ -475,14 +475,14 @@ describe('Token Bridge', () => {
         getNetwork: jest.fn().mockReturnValue({ chainId: 100 }),
       } as unknown as ethers.providers.Web3Provider;
       const mockChildProvider = {
-        getNetwork: jest.fn().mockReturnValue({ chainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID }),
+        getNetwork: jest.fn().mockReturnValue({ chainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID }),
       } as unknown as ethers.providers.Web3Provider;
 
       const bridgeConfig = new BridgeConfiguration({
         baseConfig: new ImmutableConfiguration({
           environment: Environment.SANDBOX,
         }),
-        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
         rootProvider: mockRootProvider,
         childProvider: mockChildProvider,
       });
@@ -499,7 +499,7 @@ describe('Token Bridge', () => {
 
     it('throws an error when the childProvider chainId is not the one set in the config', async () => {
       const mockRootProvider = {
-        getNetwork: jest.fn().mockReturnValue({ chainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID }),
+        getNetwork: jest.fn().mockReturnValue({ chainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID }),
       } as unknown as ethers.providers.Web3Provider;
       const mockChildProvider = {
         getNetwork: jest.fn().mockReturnValue({ chainId: '100' }),
@@ -509,7 +509,7 @@ describe('Token Bridge', () => {
         baseConfig: new ImmutableConfiguration({
           environment: Environment.SANDBOX,
         }),
-        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
         rootProvider: mockRootProvider,
         childProvider: mockChildProvider,
       });
@@ -553,7 +553,7 @@ describe('Token Bridge', () => {
         baseConfig: new ImmutableConfiguration({
           environment: Environment.SANDBOX,
         }),
-        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
         rootProvider: voidRootProvider,
         childProvider: voidChildProvider,
       });
@@ -581,8 +581,8 @@ describe('Token Bridge', () => {
         {
           action: BridgeFeeActions.DEPOSIT,
           gasMultiplier: 1.1,
-          sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
-          destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+          sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
         },
       );
 
@@ -599,8 +599,8 @@ describe('Token Bridge', () => {
         {
           action: BridgeFeeActions.DEPOSIT,
           gasMultiplier: 1.1,
-          sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
-          destinationChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+          sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
           token: '0x40b87d235A5B010a20A241F15797C9debf1ecd01',
           amount: ethers.BigNumber.from(1000),
         },
@@ -704,7 +704,7 @@ describe('Token Bridge', () => {
         baseConfig: new ImmutableConfiguration({
           environment: Environment.SANDBOX,
         }),
-        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
         rootProvider: voidRootProvider,
         childProvider: voidChildProvider,
       });
@@ -736,7 +736,7 @@ describe('Token Bridge', () => {
         transactions: [{
           txHash,
         }],
-        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
       });
 
       expect(result).not.toBeNull();
@@ -768,7 +768,7 @@ describe('Token Bridge', () => {
         transactions: [{
           txHash,
         }],
-        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
       });
 
       expect(result).not.toBeNull();
@@ -800,7 +800,7 @@ describe('Token Bridge', () => {
         transactions: [{
           txHash,
         }],
-        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
       });
 
       expect(result).not.toBeNull();
@@ -832,7 +832,7 @@ describe('Token Bridge', () => {
         transactions: [{
           txHash,
         }],
-        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
       });
 
       expect(result).not.toBeNull();
@@ -864,7 +864,7 @@ describe('Token Bridge', () => {
         transactions: [{
           txHash,
         }],
-        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
       });
 
       expect(result).not.toBeNull();
@@ -896,7 +896,7 @@ describe('Token Bridge', () => {
         transactions: [{
           txHash,
         }],
-        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
       });
 
       expect(result).not.toBeNull();
@@ -928,7 +928,7 @@ describe('Token Bridge', () => {
         transactions: [{
           txHash,
         }],
-        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
       });
 
       expect(result).not.toBeNull();
@@ -960,7 +960,7 @@ describe('Token Bridge', () => {
         transactions: [{
           txHash,
         }],
-        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
       });
 
       expect(result).not.toBeNull();
@@ -994,7 +994,7 @@ describe('Token Bridge', () => {
         transactions: [{
           txHash,
         }],
-        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
       });
 
       expect(result).not.toBeNull();
@@ -1033,7 +1033,7 @@ describe('Token Bridge', () => {
         }, {
           txHash: txHash2,
         }],
-        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
       });
 
       expect(result).not.toBeNull();
@@ -1071,7 +1071,7 @@ describe('Token Bridge', () => {
         transactions: [{
           txHash,
         }],
-        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
       });
 
       expect(result).not.toBeNull();
@@ -1103,7 +1103,7 @@ describe('Token Bridge', () => {
         transactions: [{
           txHash,
         }],
-        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
       });
 
       expect(result).not.toBeNull();
@@ -1150,7 +1150,7 @@ describe('Token Bridge', () => {
       baseConfig: new ImmutableConfiguration({
         environment: Environment.SANDBOX,
       }),
-      bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+      bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
       rootProvider: voidRootProvider,
       childProvider: voidChildProvider,
     });
@@ -1298,7 +1298,7 @@ describe('Token Bridge', () => {
       baseConfig: new ImmutableConfiguration({
         environment: Environment.SANDBOX,
       }),
-      bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+      bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
       rootProvider: voidRootProvider,
       childProvider: voidChildProvider,
     });
@@ -1458,7 +1458,7 @@ describe('Token Bridge', () => {
       baseConfig: new ImmutableConfiguration({
         environment: Environment.SANDBOX,
       }),
-      bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+      bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
       rootProvider: voidRootProvider,
       childProvider: voidChildProvider,
     });
@@ -1589,7 +1589,7 @@ describe('Token Bridge', () => {
         baseConfig: new ImmutableConfiguration({
           environment: Environment.SANDBOX,
         }),
-        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
         rootProvider: voidRootProvider,
         childProvider: voidChildProvider,
       });
@@ -1602,8 +1602,8 @@ describe('Token Bridge', () => {
     it('returns the bridge fee when no errors', async () => {
       expect.assertions(1);
       const feeResult = await tokenBridge['calculateBridgeFee'](
-        ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
-        ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+        ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+        ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
         500,
         1.1,
       );
@@ -1614,7 +1614,7 @@ describe('Token Bridge', () => {
       try {
         await tokenBridge['calculateBridgeFee'](
           '100',
-          ETH_SEPOLIA_TO_ZKEVM_DEVNET.childChainID,
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
           500,
           1.1,
         );
@@ -1627,7 +1627,7 @@ describe('Token Bridge', () => {
       expect.assertions(2);
       try {
         await tokenBridge['calculateBridgeFee'](
-          ETH_SEPOLIA_TO_ZKEVM_DEVNET.rootChainID,
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
           '100',
           500,
           1.1,

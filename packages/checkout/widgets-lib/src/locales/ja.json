@@ -37,7 +37,7 @@
     },
     "SWITCH_NETWORK": {
       "eth": {
-        "heading": "コインを移動するには、セポリアネットワークに切り替える必要があります",
+        "heading": "{{networkName}}ネットワークに切り替える必要があります",
         "body": "MetaMaskでネットワークを切り替えるように求められます。必要に応じて後で切り替えることができます。",
         "button": {
           "text": "切り替えの準備ができました",
@@ -47,6 +47,7 @@
       "zkEVM": {
         "heading": "Immutable zkEVMネットワークに切り替えるように求められます",
         "body": "MetaMaskからのポップアップを確認し、「承認」して切り替えてください。これが初めての場合、MetaMaskはネットワークを追加するように求めることもあります。",
+        "bodyWalletConnect": "ウォレットからのポップアップを確認して切り替えます。これが初めての場合、ウォレットはネットワークの追加を求めます。",
         "button": {
           "text": "切り替えの準備ができました",
           "retryText": "再試行する"
@@ -538,6 +539,10 @@
     "metamask": {
       "heading": "MetaMask",
       "description": "ブロックチェーンアプリケーションとWeb3へのアクセス用のデジタルウォレット"
+    },
+    "walletconnect": {
+      "heading": "その他のウォレット",
+      "description": "MetaMaskを含む任意のブロックチェーンウォレットに接続できます"
     }
   },
   "drawers": {
@@ -621,6 +626,16 @@
       "buttons": {
         "cancel": "閉じる"
       }
+    },
+    "networkSwitch": {
+      "heading": "あなたの{{wallet}}でネットワークを切り替える",
+      "manualSwitch": {
+        "body": "続行するにはモバイルウォレットを開き、{{chain}}ネットワークに切り替える必要があります"
+      },
+      "controlledSwitch": {
+        "body": "{{chain}}ネットワークに切り替える必要があります"
+      },
+      "switchButton": "{{chain}}に切り替える"
     }
   }
 }

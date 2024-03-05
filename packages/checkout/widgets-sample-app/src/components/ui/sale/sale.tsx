@@ -31,14 +31,12 @@ const useParams = () => {
   const login = urlParams.get('login') as string;
   const amount = urlParams.get('amount') as string;
   const environmentId = urlParams.get('environmentId') as string;
-  const fromTokenAddress = urlParams.get('fromTokenAddress') as string;
   const collectionName = urlParams.get('collectionName') as string;
 
   return {
     login,
     amount,
     environmentId,
-    fromTokenAddress,
     collectionName,
   };
 };
@@ -74,7 +72,7 @@ const usePassportInstance = (passportConfig: any) => {
 export function SaleUI() {
   const params = useParams();
   const { 
-    login, amount, environmentId, fromTokenAddress, collectionName
+    login, amount, environmentId, collectionName
   } = params;
   const [passportConfig, setPassportConfig] = useState(
     JSON.stringify(defaultPassportConfig, null, 2),
@@ -85,16 +83,16 @@ export function SaleUI() {
   const checkout = useMemo(() => new Checkout({baseConfig: {environment: Environment.SANDBOX}, passport: passportInstance as unknown as Passport}), [passportInstance])
   const factory = useMemo(() => new WidgetsFactory(checkout, {theme: WidgetTheme.DARK}), [checkout])
   const saleWidget = useMemo(() => factory.create(WidgetType.SALE, { config: { theme: WidgetTheme.DARK } }),
-  [factory, amount, environmentId, fromTokenAddress, collectionName, defaultItems]
+  [factory, amount, environmentId, collectionName, defaultItems]
   );
   const bridgeWidget = useMemo(() => factory.create(WidgetType.BRIDGE, { config: { theme: WidgetTheme.DARK } }),
-  [factory, amount, environmentId, fromTokenAddress, collectionName, defaultItems]
+  [factory, amount, environmentId, collectionName, defaultItems]
   );
   const swapWidget = useMemo(() => factory.create(WidgetType.SWAP, { config: { theme: WidgetTheme.DARK } }),
-  [factory, amount, environmentId, fromTokenAddress, collectionName, defaultItems]
+  [factory, amount, environmentId, collectionName, defaultItems]
   );
   const onrampWidget = useMemo(() => factory.create(WidgetType.ONRAMP, { config: { theme: WidgetTheme.DARK } }),
-  [factory, amount, environmentId, fromTokenAddress, collectionName, defaultItems]
+  [factory, amount, environmentId, collectionName, defaultItems]
   );
 
   // mount sale widget and subscribe to close event
@@ -102,7 +100,6 @@ export function SaleUI() {
     saleWidget.mount("sale", {
       amount,
       environmentId,
-      fromTokenAddress,
       collectionName,
       items: defaultItems
     });
@@ -194,7 +191,6 @@ export function SaleUI() {
     <button onClick={() => saleWidget.mount('sale', {
       amount,
       environmentId,
-      fromTokenAddress,
       collectionName,
       items: defaultItems
     })}>Mount</button>

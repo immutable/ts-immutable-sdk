@@ -95,12 +95,12 @@ export class RelayerClient {
       ...request,
     };
 
-    const user = await this.authManager.getUser();
+    const user = await this.authManager.getUserZkEvm();
 
     const response = await fetch(`${this.config.relayerUrl}/v1/transactions`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${user?.accessToken}`,
+        Authorization: `Bearer ${user.accessToken}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),

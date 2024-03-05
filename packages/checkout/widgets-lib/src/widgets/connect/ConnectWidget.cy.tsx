@@ -3,7 +3,6 @@ import {
   ChainName,
   Checkout,
   WidgetTheme,
-  ConnectTargetLayer,
   ConnectWidgetParams,
 } from '@imtbl/checkout-sdk';
 import { describe, it, cy } from 'local-cypress';
@@ -37,8 +36,8 @@ describe('ConnectWidget tests', () => {
 
   const mockWeb3Provider = {
     provider: {
-      on: providerOnStub,
-      removeListener: providerRemoveListenerStub,
+      on: () => providerOnStub,
+      removeListener: () => providerRemoveListenerStub,
     },
     getSigner: () => ({
       getAddress: () => Promise.resolve(''),
@@ -277,10 +276,12 @@ describe('ConnectWidget tests', () => {
             provider: {
               on: providerOnStub,
               removeListener: providerRemoveListenerStub,
+              request: async () => Promise.resolve(ChainId.IMTBL_ZKEVM_TESTNET), // used for checking chainId
             },
             getSigner: () => ({
               getAddress: () => Promise.resolve(''),
               getChainId: async () => Promise.resolve(ChainId.IMTBL_ZKEVM_TESTNET),
+
             }),
           } as unknown as Web3Provider,
         });
@@ -291,6 +292,7 @@ describe('ConnectWidget tests', () => {
               provider: {
                 on: providerOnStub,
                 removeListener: providerRemoveListenerStub,
+                request: async () => Promise.resolve(ChainId.IMTBL_ZKEVM_TESTNET),
               },
               getSigner: () => ({
                 getAddress: () => Promise.resolve(''),
@@ -326,7 +328,7 @@ describe('ConnectWidget tests', () => {
               config={config}
               checkout={checkout}
               {...props}
-              targetLayer={ConnectTargetLayer.LAYER2}
+              targetChainId={ChainId.IMTBL_ZKEVM_TESTNET}
               allowedChains={[ChainId.IMTBL_ZKEVM_TESTNET, ChainId.SEPOLIA]}
             />
           </ViewContextTestComponent>,
@@ -347,10 +349,10 @@ describe('ConnectWidget tests', () => {
             provider: {
               on: providerOnStub,
               removeListener: providerRemoveListenerStub,
+              request: async () => Promise.resolve(ChainId.SEPOLIA),
             },
             getSigner: () => ({
               getAddress: () => Promise.resolve(''),
-              getChainId: async () => Promise.resolve(ChainId.SEPOLIA),
             }),
           } as unknown as Web3Provider,
         });
@@ -361,10 +363,10 @@ describe('ConnectWidget tests', () => {
               provider: {
                 on: providerOnStub,
                 removeListener: providerRemoveListenerStub,
+                request: async () => Promise.resolve(ChainId.SEPOLIA),
               },
               getSigner: () => ({
                 getAddress: () => Promise.resolve(''),
-                getChainId: async () => Promise.resolve(ChainId.SEPOLIA),
               }),
             } as unknown as Web3Provider,
           });
@@ -405,6 +407,7 @@ describe('ConnectWidget tests', () => {
         cySmartGet('footer-button').should('have.text', 'Ready to connect');
         cySmartGet('footer-button').click();
         cySmartGet('switch-network-view').should('be.visible');
+
         cySmartGet('footer-button').click();
         cySmartGet('success-view').should('be.visible');
       });

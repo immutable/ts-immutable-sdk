@@ -45,7 +45,7 @@ export type SignOrderInput = {
   items: SaleItem[];
   fromTokenAddress: string;
   recipientAddress: string;
-  env: string;
+  environment: string;
   environmentId: string;
 };
 
@@ -73,7 +73,7 @@ export enum SaleErrorTypes {
   DEFAULT = 'DEFAULT_ERROR',
   INVALID_PARAMETERS = 'INVALID_PARAMETERS',
   TRANSACTION_FAILED = 'TRANSACTION_FAILED',
-  SERVICE_BREAKDOWN = 'SERVICE_BREAK_DOWN',
+  SERVICE_BREAKDOWN = 'SERVICE_BREAKDOWN',
   PRODUCT_NOT_FOUND = 'PRODUCT_NOT_FOUND',
   INSUFFICIENT_STOCK = 'INSUFFICIENT_STOCK',
   TRANSAK_FAILED = 'TRANSAK_FAILED',
@@ -87,3 +87,14 @@ export enum SaleErrorTypes {
 export enum SmartCheckoutErrorTypes {
   FRACTIONAL_BALANCE_BLOCKED = 'FRACTIONAL_BALANCE_BLOCKED',
 }
+
+export type ClientConfigCurrency = {
+  name: string;
+  decimals: number;
+  erc20Address: string;
+};
+
+export type ClientConfig = {
+  contractId: string;
+  currencies: ClientConfigCurrency[];
+};

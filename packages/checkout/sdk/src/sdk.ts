@@ -56,6 +56,7 @@ import {
   SellResult,
   TokenInfo,
   GetTokenInfoParams,
+  AddNetworkParams,
 } from './types';
 import { CheckoutConfiguration } from './config';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
@@ -249,7 +250,7 @@ export class Checkout {
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
-      { allowUnsupportedProvider: true } as ValidateProviderOptions,
+      { allowMistmatchedChainId: true, allowUnsupportedProvider: true } as ValidateProviderOptions,
     );
     return connect.checkIsWalletConnected(web3Provider);
   }
@@ -266,7 +267,10 @@ export class Checkout {
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
-      { allowUnsupportedProvider: true } as ValidateProviderOptions,
+      {
+        allowUnsupportedProvider: true,
+        allowMistmatchedChainId: true,
+      } as ValidateProviderOptions,
     );
 
     if (params.requestWalletPermissions && !(web3Provider.provider as any)?.isPassport) {
@@ -276,6 +280,23 @@ export class Checkout {
     }
 
     return { provider: web3Provider };
+  }
+
+  /**
+   * Adds the network for the current wallet provider.
+   * @param {AddNetworkParams} params - The parameters for adding the network.
+   * @returns {Promise<any>} - A promise that resolves to the result of adding the network.
+   */
+  public async addNetwork(
+    params: AddNetworkParams,
+  ): Promise<any> {
+    const addNetworkRes = await network.addNetworkToWallet(
+      this.config.networkMap,
+      params.provider,
+      params.chainId,
+    );
+
+    return addNetworkRes;
   }
 
   /**
@@ -406,6 +427,10 @@ export class Checkout {
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
+      {
+        allowUnsupportedProvider: true,
+        allowMistmatchedChainId: true,
+      } as ValidateProviderOptions,
     );
     return await transaction.sendTransaction(web3Provider, params.transaction);
   }

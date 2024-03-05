@@ -89,6 +89,10 @@ describe('WalletBalances', () => {
       walletProviderName: WalletProviderName.METAMASK,
       tokenBalances: balancesMock,
       supportedTopUps: null,
+      walletConfig: {
+        showNetworkMenu: true,
+        showDisconnectButton: true,
+      },
     };
 
     it('should show balances', () => {
@@ -101,7 +105,7 @@ describe('WalletBalances', () => {
               initialStateOverride={baseWalletState}
               cryptoConversionsOverride={cryptoConversions}
             >
-              <WalletBalances balancesLoading={false} />
+              <WalletBalances balancesLoading={false} theme={WidgetTheme.DARK} showNetworkMenu />
             </WalletWidgetTestComponent>
           </ConnectLoaderTestComponent>
         </ViewContextTestComponent>,
@@ -121,7 +125,7 @@ describe('WalletBalances', () => {
               initialStateOverride={baseWalletState}
               cryptoConversionsOverride={cryptoConversions}
             >
-              <WalletBalances balancesLoading />
+              <WalletBalances balancesLoading theme={WidgetTheme.DARK} showNetworkMenu />
             </WalletWidgetTestComponent>
           </ConnectLoaderTestComponent>
         </ViewContextTestComponent>,
@@ -143,7 +147,7 @@ describe('WalletBalances', () => {
               initialStateOverride={baseWalletState}
               cryptoConversionsOverride={cryptoConversions}
             >
-              <WalletBalances balancesLoading={false} />
+              <WalletBalances balancesLoading={false} theme={WidgetTheme.DARK} showNetworkMenu />
             </WalletWidgetTestComponent>
           </ConnectLoaderTestComponent>
         </ViewContextTestComponent>,
@@ -165,7 +169,7 @@ describe('WalletBalances', () => {
               initialStateOverride={{ ...baseWalletState, tokenBalances: [] }}
               cryptoConversionsOverride={cryptoConversions}
             >
-              <WalletBalances balancesLoading={false} />
+              <WalletBalances balancesLoading={false} theme={WidgetTheme.DARK} showNetworkMenu />
             </WalletWidgetTestComponent>
           </ConnectLoaderTestComponent>
         </ViewContextTestComponent>,
@@ -186,6 +190,10 @@ describe('WalletBalances', () => {
       walletProviderName: WalletProviderName.METAMASK,
       tokenBalances: [],
       supportedTopUps: null,
+      walletConfig: {
+        showNetworkMenu: true,
+        showDisconnectButton: true,
+      },
     };
 
     it('should show add coins button on zkEVM when topUps are supported', () => {
@@ -222,7 +230,7 @@ describe('WalletBalances', () => {
                 <WalletContext.Provider
                   value={{ walletState: testWalletState, walletDispatch: () => {} }}
                 >
-                  <WalletBalances balancesLoading={false} />
+                  <WalletBalances balancesLoading={false} theme={WidgetTheme.DARK} showNetworkMenu />
                 </WalletContext.Provider>
               </ConnectLoaderTestComponent>
             </ViewContextTestComponent>
@@ -250,7 +258,7 @@ describe('WalletBalances', () => {
               <WalletContext.Provider
                 value={{ walletState: testWalletState, walletDispatch: () => {} }}
               >
-                <WalletBalances balancesLoading={false} />
+                <WalletBalances balancesLoading={false} theme={WidgetTheme.DARK} showNetworkMenu />
               </WalletContext.Provider>
             </ConnectLoaderTestComponent>
           </ViewContextTestComponent>
@@ -274,6 +282,10 @@ describe('WalletBalances', () => {
           isSwapEnabled: true,
           isBridgeEnabled: true,
         },
+        walletConfig: {
+          showNetworkMenu: true,
+          showDisconnectButton: true,
+        },
       };
       mount(
         <ViewContextTestComponent>
@@ -284,7 +296,7 @@ describe('WalletBalances', () => {
               <WalletContext.Provider
                 value={{ walletState, walletDispatch: () => {} }}
               >
-                <WalletBalances balancesLoading={false} />
+                <WalletBalances balancesLoading={false} theme={WidgetTheme.DARK} showNetworkMenu />
               </WalletContext.Provider>
             </ConnectLoaderTestComponent>
           </ViewContextTestComponent>

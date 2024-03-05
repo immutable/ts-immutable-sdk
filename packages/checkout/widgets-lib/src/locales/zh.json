@@ -37,7 +37,7 @@
     },
     "SWITCH_NETWORK": {
       "eth": {
-        "heading": "要转移您的硬币，您需要切换到Sepolia网络",
+        "heading": "您需要切换到{{networkName}}网络",
         "body": "MetaMask将提示您切换网络。需要时可以切回。",
         "button": {
           "text": "准备切换",
@@ -47,6 +47,7 @@
       "zkEVM": {
         "heading": "将要求您切换到Immutable zkEVM网络",
         "body": "检查MetaMask的弹窗并选择'批准'以切换。如果这是第一次，MetaMask还会要求您添加网络。",
+        "bodyWalletConnect": "请检查您的钱包弹出窗口以进行切换。如果这是第一次，您的钱包还会要求您添加网络。",
         "button": {
           "text": "准备切换",
           "retryText": "再试一次"
@@ -535,6 +536,10 @@
     "metamask": {
       "heading": "MetaMask",
       "description": "用于访问区块链应用程序和web3的数字钱包"
+    },
+    "walletconnect": {
+      "heading": "其他钱包",
+      "description": "允许您连接到包括MetaMask在内的任何区块链钱包"
     }
   },
   "drawers": {
@@ -618,6 +623,16 @@
       "buttons": {
         "cancel": "关闭"
       }
+    },
+    "networkSwitch": {
+      "heading": "在您的{{wallet}}中切换网络",
+      "manualSwitch": {
+        "body": "您需要打开您的移动钱包并切换到{{chain}}网络才能继续进行"
+      },
+      "controlledSwitch": {
+        "body": "您需要切换到{{chain}}网络才能继续进行"
+      },
+      "switchButton": "切换到{{chain}}"
     }
   }
 }

@@ -22,9 +22,10 @@ const REFRESH_TOKENS_INTERVAL_MS = 10000;
 export interface BridgeProps {
   amount?: string;
   tokenAddress?: string;
+  defaultTokenImage: string;
 }
 
-export function Bridge({ amount, tokenAddress }: BridgeProps) {
+export function Bridge({ amount, tokenAddress, defaultTokenImage }: BridgeProps) {
   const { t } = useTranslation();
   const { bridgeState, bridgeDispatch } = useContext(BridgeContext);
   const { checkout, from } = bridgeState;
@@ -56,6 +57,7 @@ export function Bridge({ amount, tokenAddress }: BridgeProps) {
       const tokensAndBalances = await getAllowedBalances({
         checkout,
         provider: from.web3Provider,
+        chainId: from?.network,
         allowTokenListType: TokenFilterTypes.BRIDGE,
         // Skip retry given that in this case it is not needed;
         // refreshBalances will be, automatically, called again
@@ -86,7 +88,7 @@ export function Bridge({ amount, tokenAddress }: BridgeProps) {
       // eslint-disable-next-line no-console
       console.debug(e);
     }
-  }, [checkout, from?.web3Provider]);
+  }, [checkout, from?.web3Provider, from?.network]);
   useInterval(refreshBalances, REFRESH_TOKENS_INTERVAL_MS);
 
   useEffect(() => {
@@ -112,6 +114,7 @@ export function Bridge({ amount, tokenAddress }: BridgeProps) {
         defaultAmount={amount}
         defaultTokenAddress={tokenAddress}
         isTokenBalancesLoading={isTokenBalancesLoading}
+        defaultTokenImage={defaultTokenImage}
       />
     </SimpleLayout>
   );

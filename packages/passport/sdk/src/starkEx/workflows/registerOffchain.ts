@@ -1,10 +1,10 @@
-import { EthSigner, RegisterUserResponse, StarkSigner } from '@imtbl/core-sdk';
+import { EthSigner, StarkSigner } from '@imtbl/x-client';
 import AuthManager from 'authManager';
 import { PassportErrorType, withPassportError } from 'errors/passportError';
 import { retryWithDelay } from 'network/retry';
 import { User } from 'types';
 import axios from 'axios';
-import { ImxApiClients } from '@imtbl/generated-clients';
+import { ImxApiClients, imx } from '@imtbl/generated-clients';
 import registerPassportStarkEx from './registration';
 
 async function forceUserRefresh(authManager: AuthManager) {
@@ -24,7 +24,7 @@ export default async function registerOffchain(
   authManager: AuthManager,
   imxApiClients: ImxApiClients,
 ) {
-  return withPassportError<RegisterUserResponse>(async () => {
+  return withPassportError<imx.RegisterUserResponse>(async () => {
     try {
       const response = await registerPassportStarkEx(
         {
@@ -38,7 +38,7 @@ export default async function registerOffchain(
 
       return response;
     } catch (err: any) {
-      if (axios.isAxiosError(err) && err.status === 409) {
+      if (axios.isAxiosError(err) && err.response?.status === 409) {
         // The user already registered, but the user token is not updated yet.
         await forceUserRefresh(authManager);
         return { tx_hash: '' };

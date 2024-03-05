@@ -1,5 +1,5 @@
 import {
-  ChainId, CheckoutConfiguration, GetBalanceResult, NetworkInfo,
+  ChainId, CheckoutConfiguration, GetBalanceResult, NetworkInfo, WidgetTheme,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { getL1ChainId, getL2ChainId } from './networkUtils';
@@ -18,16 +18,16 @@ export const sortTokensByAmount = (
   // make sure IMX is at the top of the list
   if (
     chainId === getL2ChainId(config)
-      && a.token.symbol.toLowerCase() === 'imx'
-      && b.token.symbol.toLowerCase() !== 'imx'
+    && a.token.symbol.toLowerCase() === 'imx'
+    && b.token.symbol.toLowerCase() !== 'imx'
   ) {
     return -1;
   }
 
   if (
     chainId === getL2ChainId(config)
-      && b.token.symbol.toLowerCase() === 'imx'
-      && a.token.symbol.toLowerCase() !== 'imx'
+    && b.token.symbol.toLowerCase() === 'imx'
+    && a.token.symbol.toLowerCase() !== 'imx'
   ) {
     return 1;
   }
@@ -138,6 +138,9 @@ export const isZkEvmChainId = (chainId: ChainId) => chainId === ChainId.IMTBL_ZK
   || chainId === ChainId.IMTBL_ZKEVM_TESTNET
   || chainId === ChainId.IMTBL_ZKEVM_MAINNET;
 
+export const isL1EthChainId = (chainId: ChainId) => chainId === ChainId.SEPOLIA
+  || chainId === ChainId.ETHEREUM;
+
 export const isNativeToken = (
   address: string | undefined,
 ): boolean => !address || address.toLocaleLowerCase() === NATIVE;
@@ -156,4 +159,13 @@ export function getImxTokenImage(environment: Environment | undefined) {
 
 export function getTokenImageByAddress(environment: Environment | undefined, address: string) {
   return getRemoteImage(environment, `/tokens/${address.toLowerCase()}.svg`);
+}
+
+export function getDefaultTokenImage(
+  environment: Environment | undefined,
+  theme: WidgetTheme,
+) {
+  return theme === WidgetTheme.LIGHT
+    ? getRemoteImage(environment, '/tokens/defaultonlight.svg')
+    : getRemoteImage(environment, '/tokens/defaultondark.svg');
 }

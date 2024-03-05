@@ -6,16 +6,17 @@ import {
   Body, Box, Heading, OptionKey,
 } from '@biom3/react';
 import { BigNumber, utils } from 'ethers';
-import { TokenInfo } from '@imtbl/checkout-sdk';
+import { TokenInfo, WidgetTheme } from '@imtbl/checkout-sdk';
 import { TransactionResponse } from '@imtbl/dex-sdk';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { useTranslation } from 'react-i18next';
 import { Environment } from '@imtbl/config';
+import { NetworkSwitchDrawer } from 'components/NetworkSwitchDrawer/NetworkSwitchDrawer';
 import { amountInputValidation as textInputValidator } from '../../../lib/validations/amountInputValidations';
 import { SwapContext } from '../context/SwapContext';
 import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import {
-  calculateCryptoToFiat, formatZeroAmount, isNativeToken, tokenValueFormat,
+  calculateCryptoToFiat, formatZeroAmount, getDefaultTokenImage, isNativeToken, tokenValueFormat,
 } from '../../../lib/utils';
 import {
   DEFAULT_TOKEN_DECIMALS,
@@ -23,6 +24,7 @@ import {
   NATIVE,
   DEFAULT_TOKEN_VALIDATION_DECIMALS,
   ESTIMATE_DEBOUNCE,
+  getL2ChainId,
 } from '../../../lib';
 import { quotesProcessor } from '../functions/FetchQuote';
 import { SelectInput } from '../../../components/FormComponents/SelectInput/SelectInput';
@@ -96,9 +98,10 @@ let quoteRequest: CancellablePromise<any>;
 
 export interface SwapFromProps {
   data?: SwapFormData;
+  theme: WidgetTheme;
 }
 
-export function SwapForm({ data }: SwapFromProps) {
+export function SwapForm({ data, theme }: SwapFromProps) {
   const { t } = useTranslation();
   const {
     swapState: {
@@ -110,6 +113,7 @@ export function SwapForm({ data }: SwapFromProps) {
   } = useContext(SwapContext);
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
+  const defaultTokenImage = getDefaultTokenImage(checkout?.config.environment, theme);
 
   const formatTokenOptionsId = useCallback((symbol: string, address?: string) => (isNativeToken(address)
     ? `${symbol.toLowerCase()}-${NATIVE}`
@@ -150,6 +154,7 @@ export function SwapForm({ data }: SwapFromProps) {
   // Drawers
   const [showNotEnoughImxDrawer, setShowNotEnoughImxDrawer] = useState(false);
   const [showUnableToSwapDrawer, setShowUnableToSwapDrawer] = useState(false);
+  const [showNetworkSwitchDrawer, setShowNetworkSwitchDrawer] = useState(false);
 
   useEffect(() => {
     if (tokenBalances.length === 0) return;
@@ -746,6 +751,7 @@ export function SwapForm({ data }: SwapFromProps) {
                 ? formatTokenOptionsId(fromToken.symbol, fromToken.address)
                 : undefined}
               coinSelectorHeading={t('views.SWAP.swapForm.from.selectorTitle')}
+              defaultTokenImage={defaultTokenImage}
             />
           </Box>
 
@@ -786,6 +792,7 @@ export function SwapForm({ data }: SwapFromProps) {
                 ? formatTokenOptionsId(toToken.symbol, toToken.address)
                 : undefined}
               coinSelectorHeading={t('views.SWAP.swapForm.to.selectorTitle')}
+              defaultTokenImage={defaultTokenImage}
             />
           </Box>
         </Box>
@@ -832,6 +839,7 @@ export function SwapForm({ data }: SwapFromProps) {
         }}
         insufficientFundsForGas={insufficientFundsForGas}
         openNotEnoughImxDrawer={openNotEnoughImxDrawer}
+        openNetworkSwitchDrawer={() => setShowNetworkSwitchDrawer(true)}
       />
       <NotEnoughImx
         environment={checkout?.config.environment ?? Environment.PRODUCTION}
@@ -864,6 +872,13 @@ export function SwapForm({ data }: SwapFromProps) {
           setToToken(undefined);
           setToAmount('');
         }}
+      />
+      <NetworkSwitchDrawer
+        visible={showNetworkSwitchDrawer}
+        targetChainId={getL2ChainId(checkout?.config!)}
+        provider={provider!}
+        checkout={checkout!}
+        onCloseDrawer={() => setShowNetworkSwitchDrawer(false)}
       />
     </>
   );

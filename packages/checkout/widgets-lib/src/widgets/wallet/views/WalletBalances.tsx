@@ -2,7 +2,7 @@ import { Box, ButtCon, MenuItem } from '@biom3/react';
 import {
   useContext, useEffect, useMemo, useState,
 } from 'react';
-import { IMTBLWidgetEvents } from '@imtbl/checkout-sdk';
+import { IMTBLWidgetEvents, WidgetTheme } from '@imtbl/checkout-sdk';
 import { fetchTokenSymbols } from 'lib/fetchTokenSymbols';
 import { CryptoFiatActions, CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext';
 import { ButtonNavigationStyles } from 'components/Header/HeaderStyles';
@@ -37,9 +37,13 @@ import { BalanceInfo, mapTokenBalancesWithConversions } from '../functions/token
 
 type WalletBalancesProps = {
   balancesLoading: boolean;
+  theme: WidgetTheme;
+  showNetworkMenu: boolean;
 };
 export function WalletBalances({
   balancesLoading,
+  theme,
+  showNetworkMenu,
 }: WalletBalancesProps) {
   const { t } = useTranslation();
   const { connectLoaderState } = useContext(ConnectLoaderContext);
@@ -57,7 +61,7 @@ export function WalletBalances({
   } = walletState;
   const { conversions } = cryptoFiatState;
   const isPassport = isPassportProvider(provider);
-  const showNetworkMenu = !isPassport;
+  const enableNetworkMenu = !isPassport && showNetworkMenu;
 
   const { track, page } = useAnalytics();
 
@@ -172,10 +176,10 @@ export function WalletBalances({
         sx={walletBalanceOuterContainerStyles}
       >
         <Box sx={walletBalanceContainerStyles}>
-          {showNetworkMenu && <NetworkMenu />}
+          {enableNetworkMenu && <NetworkMenu />}
           <TotalTokenBalance totalBalance={totalFiatAmount} loading={balancesLoading} />
           <Box
-            sx={walletBalanceListContainerStyles(showNetworkMenu, showAddCoins)}
+            sx={walletBalanceListContainerStyles(enableNetworkMenu, showAddCoins)}
           >
             {balancesLoading && (
               <Box sx={walletBalanceLoadingIconStyles}>
@@ -188,6 +192,7 @@ export function WalletBalances({
               <TokenBalanceList
                 balanceInfoItems={balanceInfos}
                 bridgeToL2OnClick={handleBridgeToL2OnClick}
+                theme={theme}
               />
             )}
           </Box>

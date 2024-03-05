@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { MintFee, MintTokenDataV2 } from '@imtbl/core-sdk';
 import * as assert from 'assert';
-import { IMXClient, ImxClientModuleConfiguration } from '@imtbl/sdk/x';
+import { IMXClient, ImxModuleConfiguration } from '@imtbl/sdk/x';
 import { env, repeatCheck300 } from '../common';
 import { configuration, StepSharedState } from './stepSharedState';
 
@@ -9,7 +9,7 @@ import { configuration, StepSharedState } from './stepSharedState';
 export class Minting {
   constructor(protected stepSharedState: StepSharedState) {}
 
-  config: ImxClientModuleConfiguration = {
+  config: ImxModuleConfiguration = {
     baseConfig: { environment: configuration.environment },
   };
 

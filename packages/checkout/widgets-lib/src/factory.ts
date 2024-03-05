@@ -5,6 +5,7 @@ import {
   IWidgetsFactory,
   WidgetConfiguration,
   WidgetProperties,
+  WidgetConfigurations,
 } from '@imtbl/checkout-sdk';
 import { Connect } from 'widgets/connect/ConnectWidgetRoot';
 import { Swap } from 'widgets/swap/SwapWidgetRoot';
@@ -13,9 +14,11 @@ import { Wallet } from 'widgets/wallet/WalletWidgetRoot';
 import { Sale } from 'widgets/sale/SaleWidgetRoot';
 import { Web3Provider } from '@ethersproject/providers';
 import { Bridge } from 'widgets/bridge/BridgeWidgetRoot';
+import { WalletConnectManager } from 'lib/walletConnect';
 import {
   sendProviderUpdatedEvent,
   addProviderListenersForWidgetRoot,
+  DEFAULT_THEME,
 } from './lib';
 import './i18n';
 
@@ -27,6 +30,19 @@ export class WidgetsFactory implements IWidgetsFactory {
   constructor(sdk: Checkout, widgetConfig: WidgetConfiguration) {
     this.sdk = sdk;
     this.widgetConfig = widgetConfig;
+    if (!this.widgetConfig.theme) this.widgetConfig.theme = DEFAULT_THEME;
+    if (widgetConfig.walletConnect) {
+      try {
+        WalletConnectManager.getInstance().initialise(
+          sdk.config.environment,
+          widgetConfig.walletConnect,
+          this.widgetConfig.theme,
+        );
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.warn('WalletConnect has not been set up correctly');
+      }
+    }
   }
 
   updateProvider(provider: Web3Provider) {
@@ -35,7 +51,8 @@ export class WidgetsFactory implements IWidgetsFactory {
   }
 
   create<T extends WidgetType>(type: T, props?: WidgetProperties<T>): Widget<T> {
-    const { config = {}, provider } = props ?? {};
+    const { provider } = props ?? {};
+    const config = props?.config as WidgetConfigurations[T] || {};
 
     switch (type) {
       case WidgetType.CONNECT: {

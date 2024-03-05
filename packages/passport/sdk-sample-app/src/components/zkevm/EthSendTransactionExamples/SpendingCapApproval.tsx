@@ -11,7 +11,7 @@ import { useImmutableProvider } from '@/context/ImmutableProvider';
 const getErc20DefaultContractAddress = (environment: EnvironmentNames) => {
   switch (environment) {
     case EnvironmentNames.SANDBOX:
-      return '0xe9E96d1aad82562b7588F03f49aD34186f996478';
+      return '0x7bbe61ba86dc1b128b7c6228a4834bf2c1394240';
     case EnvironmentNames.PRODUCTION:
       return '0x52a6c53869ce09a731cd772f245b97a4401d3348';
     case EnvironmentNames.DEV:

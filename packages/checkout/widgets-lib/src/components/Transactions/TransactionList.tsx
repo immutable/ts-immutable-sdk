@@ -26,6 +26,7 @@ type TransactionListProps = {
   transactions: Transaction[],
   knownTokenMap: KnownNetworkMap,
   isPassport: boolean;
+  defaultTokenImage: string;
   changeWallet: () => void,
 };
 
@@ -34,6 +35,7 @@ export function TransactionList({
   transactions,
   knownTokenMap,
   isPassport,
+  defaultTokenImage,
   changeWallet,
 }: TransactionListProps) {
   const { cryptoFiatState } = useContext(CryptoFiatContext);
@@ -90,6 +92,7 @@ export function TransactionList({
                   fiatAmount={`${t('views.TRANSACTIONS.fiatPricePrefix')}${fiat}`}
                   amount={amount}
                   icon={getTransactionItemIcon(transaction)}
+                  defaultTokenImage={defaultTokenImage}
                 />
               );
             }
@@ -103,6 +106,7 @@ export function TransactionList({
                 fiatAmount={`${t('views.TRANSACTIONS.fiatPricePrefix')}${fiat}`}
                 amount={amount}
                 icon={getTransactionItemIcon(transaction)}
+                defaultTokenImage={defaultTokenImage}
               />
             );
           })}

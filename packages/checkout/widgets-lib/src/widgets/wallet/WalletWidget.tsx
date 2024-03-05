@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import {
   initialWalletState,
   WalletActions,
+  WalletConfiguration,
   WalletContext,
   walletReducer,
 } from './context/WalletContext';
@@ -35,7 +36,8 @@ import { EventTargetContext } from '../../context/event-target-context/EventTarg
 import { useBalance } from '../../lib/hooks/useBalance';
 
 export type WalletWidgetInputs = WalletWidgetParams & {
-  config: StrongCheckoutWidgetsConfig
+  config: StrongCheckoutWidgetsConfig,
+  walletConfig: WalletConfiguration
 };
 
 export default function WalletWidget(props: WalletWidgetInputs) {
@@ -52,6 +54,11 @@ export default function WalletWidget(props: WalletWidgetInputs) {
       isOnRampEnabled,
       isSwapEnabled,
       isBridgeEnabled,
+      theme,
+    },
+    walletConfig: {
+      showDisconnectButton,
+      showNetworkMenu,
     },
   } = props;
 
@@ -65,7 +72,7 @@ export default function WalletWidget(props: WalletWidgetInputs) {
 
   const [walletState, walletDispatch] = useReducer(
     walletReducer,
-    initialWalletState,
+    { ...initialWalletState, walletConfig: { showDisconnectButton, showNetworkMenu } },
   );
 
   const walletReducerValues = useMemo(
@@ -161,6 +168,9 @@ export default function WalletWidget(props: WalletWidgetInputs) {
         },
       });
     } catch (error: any) {
+      // eslint-disable-next-line no-console
+      console.error(error);
+
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -196,9 +206,12 @@ export default function WalletWidget(props: WalletWidgetInputs) {
             <LoadingView loadingText={loadingText} />
           )}
           {viewState.view.type === WalletWidgetViews.WALLET_BALANCES && (
-            <WalletBalances balancesLoading={balancesLoading} />
+            <WalletBalances balancesLoading={balancesLoading} theme={theme} showNetworkMenu={showNetworkMenu} />
           )}
-          {viewState.view.type === WalletWidgetViews.SETTINGS && <Settings />}
+          {viewState.view.type === WalletWidgetViews.SETTINGS
+          && (
+          <Settings showDisconnectButton={showDisconnectButton} />
+          )}
           {viewState.view.type === WalletWidgetViews.COIN_INFO && (
             <CoinInfo />
           )}

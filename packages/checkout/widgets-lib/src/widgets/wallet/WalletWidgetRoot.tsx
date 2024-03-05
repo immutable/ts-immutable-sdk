@@ -1,9 +1,9 @@
 import React, { Suspense } from 'react';
 import {
-  ConnectTargetLayer,
+  ChainId,
   IMTBLWidgetEvents,
+  WalletWidgetConfiguration,
   WalletWidgetParams,
-  WidgetConfiguration,
   WidgetProperties,
   WidgetTheme,
   WidgetType,
@@ -26,12 +26,24 @@ export class Wallet extends Base<WidgetType.WALLET> {
   protected getValidatedProperties(
     { config }: WidgetProperties<WidgetType.WALLET>,
   ): WidgetProperties<WidgetType.WALLET> {
-    let validatedConfig: WidgetConfiguration | undefined;
+    let validatedConfig: WalletWidgetConfiguration | undefined;
 
     if (config) {
       validatedConfig = config;
       if (config.theme === WidgetTheme.LIGHT) validatedConfig.theme = WidgetTheme.LIGHT;
       else validatedConfig.theme = WidgetTheme.DARK;
+
+      if (config?.showDisconnectButton === undefined) {
+        validatedConfig.showDisconnectButton = true;
+      } else {
+        validatedConfig.showDisconnectButton = config.showDisconnectButton;
+      }
+
+      if (config?.showNetworkMenu === undefined) {
+        validatedConfig.showNetworkMenu = true;
+      } else {
+        validatedConfig.showNetworkMenu = config.showNetworkMenu;
+      }
     }
 
     return {
@@ -55,7 +67,9 @@ export class Wallet extends Base<WidgetType.WALLET> {
 
     const { t } = i18n;
     const connectLoaderParams: ConnectLoaderParams = {
-      targetLayer: ConnectTargetLayer.LAYER2,
+      targetChainId: this.checkout.config.isProduction
+        ? ChainId.IMTBL_ZKEVM_MAINNET
+        : ChainId.IMTBL_ZKEVM_TESTNET,
       walletProviderName: this.parameters?.walletProviderName,
       web3Provider: this.web3Provider,
       checkout: this.checkout,
@@ -74,6 +88,10 @@ export class Wallet extends Base<WidgetType.WALLET> {
               <Suspense fallback={<LoadingView loadingText={t('views.LOADING_VIEW.text')} />}>
                 <WalletWidget
                   config={this.strongConfig()}
+                  walletConfig={{
+                    showDisconnectButton: this.properties.config?.showDisconnectButton!,
+                    showNetworkMenu: this.properties.config?.showNetworkMenu!,
+                  }}
                 />
               </Suspense>
             </ConnectLoader>

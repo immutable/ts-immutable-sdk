@@ -1,29 +1,43 @@
 import {
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-  useEffect,
+  useCallback, useContext, useMemo, useState, useEffect,
 } from 'react';
 import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import {
-  Body,
-  Box, Button, Heading, Icon, MenuItem,
+  Body, Box, Button, Heading, Icon, Logo, MenuItem,
 } from '@biom3/react';
 import {
-  ChainId, GasEstimateBridgeToL2Result, GasEstimateType, WalletProviderName,
+  GasEstimateBridgeToL2Result,
+  GasEstimateType,
 } from '@imtbl/checkout-sdk';
 import { abbreviateAddress } from 'lib/addressUtils';
 import { CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext';
-import { isMetaMaskProvider, isPassportProvider } from 'lib/providerUtils';
+import {
+  getWalletProviderNameByProvider,
+  isMetaMaskProvider,
+  isPassportProvider,
+  isWalletConnectProvider,
+} from 'lib/providerUtils';
 import { calculateCryptoToFiat } from 'lib/utils';
-import { Web3Provider } from '@ethersproject/providers';
-import { DEFAULT_QUOTE_REFRESH_INTERVAL, DEFAULT_TOKEN_DECIMALS, NATIVE } from 'lib';
+import {
+  DEFAULT_QUOTE_REFRESH_INTERVAL,
+  DEFAULT_TOKEN_DECIMALS,
+  NATIVE,
+  addChainChangedListener,
+  networkIcon,
+  removeChainChangedListener,
+} from 'lib';
 import { useInterval } from 'lib/hooks/useInterval';
 import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
 import { BigNumber, utils } from 'ethers';
-import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
+import {
+  UserJourney,
+  useAnalytics,
+} from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { useTranslation } from 'react-i18next';
+import { getWalletLogoByName } from 'lib/logoUtils';
+import { NetworkSwitchDrawer } from 'components/NetworkSwitchDrawer/NetworkSwitchDrawer';
+import { Web3Provider } from '@ethersproject/providers';
+import { useWalletConnect } from 'lib/hooks/useWalletConnect';
 import { networkIconStyles } from './WalletNetworkButtonStyles';
 import {
   arrowIconStyles,
@@ -33,24 +47,16 @@ import {
   bridgeReviewHeadingStyles,
   bridgeReviewWrapperStyles,
   topMenuItemStyles,
+  wcStickerLogoStyles,
+  wcWalletLogoStyles,
 } from './BridgeReviewSummaryStyles';
-import { BridgeContext } from '../context/BridgeContext';
-import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import { BridgeActions, BridgeContext } from '../context/BridgeContext';
+import {
+  ViewActions,
+  ViewContext,
+} from '../../../context/view-context/ViewContext';
 import { Fees } from '../../../components/Fees/Fees';
 import { formatBridgeFees } from '../functions/BridgeFees';
-
-const networkIcon = {
-  [ChainId.IMTBL_ZKEVM_DEVNET]: 'Immutable',
-  [ChainId.IMTBL_ZKEVM_MAINNET]: 'Immutable',
-  [ChainId.IMTBL_ZKEVM_TESTNET]: 'Immutable',
-  [ChainId.ETHEREUM]: 'EthToken',
-  [ChainId.SEPOLIA]: 'EthToken',
-};
-
-const logo = {
-  [WalletProviderName.PASSPORT]: 'PassportSymbolOutlined',
-  [WalletProviderName.METAMASK]: 'MetaMaskSymbol',
-};
 
 const testId = 'bridge-review-summary';
 
@@ -60,13 +66,9 @@ export function BridgeReviewSummary() {
 
   const {
     bridgeState: {
-      checkout,
-      tokenBridge,
-      from,
-      to,
-      token,
-      amount,
+      checkout, tokenBridge, from, to, token, amount,
     },
+    bridgeDispatch,
   } = useContext(BridgeContext);
 
   const { track } = useAnalytics();
@@ -76,56 +78,84 @@ export function BridgeReviewSummary() {
   const [estimates, setEstimates] = useState<any | undefined>(undefined);
   const [gasFee, setGasFee] = useState<string>('');
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [approveTransaction, setApproveTransaction] = useState<ApproveBridgeResponse | undefined>(undefined);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [transaction, setTransaction] = useState<BridgeTxResponse | undefined>(undefined);
+  const [approveTransaction, setApproveTransaction] = useState<
+  ApproveBridgeResponse | undefined
+  >(undefined);
+  const [transaction, setTransaction] = useState<BridgeTxResponse | undefined>(
+    undefined,
+  );
+  const [showSwitchNetworkDrawer, setShowSwitchNetworkDrawer] = useState(false);
 
-  const walletProviderName = (provider: Web3Provider | undefined) => (isPassportProvider(provider)
-    ? WalletProviderName.PASSPORT
-    : WalletProviderName.METAMASK);
+  const [fromWalletLogoUrl, setFromWalletLogoUrl] = useState<string | undefined>(
+    undefined,
+  );
+  const [toWalletLogoUrl, setToWalletLogoUrl] = useState<string | undefined>(
+    undefined,
+  );
+  const [fromWalletIsWalletConnect, setFromWalletIsWalletConnect] = useState<boolean>(false);
+  const [toWalletIsWalletConnect, setToWalletIsWalletConnect] = useState<boolean>(false);
+  const { isWalletConnectEnabled, getWalletLogoUrl } = useWalletConnect({
+    checkout,
+  });
 
-  const displayAmount = useMemo(() => (token?.symbol ? `${token?.symbol} ${amount}` : `${amount}`), [token, amount]);
+  const displayAmount = useMemo(
+    () => (token?.symbol ? `${token?.symbol} ${amount}` : `${amount}`),
+    [token, amount],
+  );
   const fromFiatAmount = useMemo(() => {
     if (!amount || !token) return '';
-    return calculateCryptoToFiat(amount, token.symbol, cryptoFiatState.conversions);
+    return calculateCryptoToFiat(
+      amount,
+      token.symbol,
+      cryptoFiatState.conversions,
+    );
   }, [token, amount]);
   const fromAddress = useMemo(() => {
     if (!from) return '-';
     return from.walletAddress;
   }, [from]);
 
-  const fromWalletProviderName = useMemo(() => walletProviderName(from?.web3Provider), [from]);
+  const fromWalletProviderName = useMemo(
+    () => getWalletProviderNameByProvider(from?.web3Provider),
+    [from],
+  );
   const fromNetwork = useMemo(() => from && from.network, [from]);
+  const fromLogo = getWalletLogoByName(fromWalletProviderName);
 
   const toAddress = useMemo(() => {
     if (!to) return '-';
     return to.walletAddress;
   }, [to]);
-  const toWalletProviderName = useMemo(() => walletProviderName(to?.web3Provider), [to]);
+  const toWalletProviderName = useMemo(
+    () => getWalletProviderNameByProvider(to?.web3Provider),
+    [to],
+  );
   const toNetwork = useMemo(() => to?.network, [to]);
+  const toLogo = getWalletLogoByName(toWalletProviderName);
 
   const fetchGasEstimate = useCallback(async () => {
     if (!tokenBridge || !amount || !from || !to || !token) return;
 
-    const [unsignedApproveTransaction, unsignedTransaction] = await Promise.all([
-      tokenBridge!.getUnsignedApproveBridgeTx({
-        senderAddress: fromAddress,
-        token: token.address ?? NATIVE.toUpperCase(),
-        amount: utils.parseUnits(amount, token.decimals),
-        sourceChainId: from?.network.toString(),
-        destinationChainId: to?.network.toString(),
-      }),
-      tokenBridge!.getUnsignedBridgeTx({
-        senderAddress: fromAddress,
-        recipientAddress: toAddress,
-        token: token.address ?? NATIVE.toUpperCase(),
-        amount: utils.parseUnits(amount, token.decimals),
-        sourceChainId: from?.network.toString(),
-        destinationChainId: to?.network.toString(),
-        gasMultiplier: 1.1,
-      }),
-    ]);
+    const [unsignedApproveTransaction, unsignedTransaction] = await Promise.all(
+      [
+        tokenBridge!.getUnsignedApproveBridgeTx({
+          senderAddress: fromAddress,
+          token: token.address ?? NATIVE.toUpperCase(),
+          amount: utils.parseUnits(amount, token.decimals),
+          sourceChainId: from?.network.toString(),
+          destinationChainId: to?.network.toString(),
+        }),
+        tokenBridge!.getUnsignedBridgeTx({
+          senderAddress: fromAddress,
+          recipientAddress: toAddress,
+          token: token.address ?? NATIVE.toUpperCase(),
+          amount: utils.parseUnits(amount, token.decimals),
+          sourceChainId: from?.network.toString(),
+          destinationChainId: to?.network.toString(),
+          gasMultiplier: 1.1,
+        }),
+      ],
+    );
 
     setApproveTransaction(unsignedApproveTransaction);
     setTransaction(unsignedTransaction);
@@ -158,15 +188,20 @@ export function BridgeReviewSummary() {
     );
 
     setGasFee(estimatedAmount);
-    setGasFeeFiatValue(calculateCryptoToFiat(
-      estimatedAmount,
-      gasEstimateResult?.token?.symbol || '',
-      cryptoFiatState.conversions,
-    ));
+    setGasFeeFiatValue(
+      calculateCryptoToFiat(
+        estimatedAmount,
+        gasEstimateResult?.token?.symbol || '',
+        cryptoFiatState.conversions,
+      ),
+    );
   }, [checkout, tokenBridge]);
   useInterval(() => fetchGasEstimate(), DEFAULT_QUOTE_REFRESH_INTERVAL);
 
-  const formatFeeBreakdown = useCallback((): any => formatBridgeFees(estimates, cryptoFiatState, t), [estimates]);
+  const formatFeeBreakdown = useCallback(
+    (): any => formatBridgeFees(estimates, cryptoFiatState, t),
+    [estimates],
+  );
 
   useEffect(() => {
     (async () => {
@@ -176,8 +211,66 @@ export function BridgeReviewSummary() {
     })();
   }, []);
 
+  const handleNetworkSwitch = useCallback((provider: Web3Provider) => {
+    bridgeDispatch({
+      payload: {
+        type: BridgeActions.SET_WALLETS_AND_NETWORKS,
+        from: {
+          web3Provider: provider,
+          walletAddress: from?.walletAddress!,
+          network: from?.network!,
+        },
+        to: {
+          web3Provider: to?.web3Provider!,
+          walletAddress: to?.walletAddress!,
+          network: to?.network!,
+        },
+      },
+    });
+  }, [from?.web3Provider, from?.network, to?.web3Provider, to?.network]);
+
+  useEffect(() => {
+    if (!from?.web3Provider) return;
+
+    const handleChainChanged = () => {
+      const newProvider = new Web3Provider(from?.web3Provider.provider);
+      handleNetworkSwitch(newProvider);
+      setShowSwitchNetworkDrawer(false);
+    };
+    addChainChangedListener(from?.web3Provider, handleChainChanged);
+
+    // eslint-disable-next-line consistent-return
+    return () => {
+      removeChainChangedListener(from?.web3Provider, handleChainChanged);
+    };
+  }, [from?.web3Provider]);
+
+  useEffect(() => {
+    if (isWalletConnectEnabled) {
+      setFromWalletIsWalletConnect(isWalletConnectProvider(from?.web3Provider));
+      setToWalletIsWalletConnect(isWalletConnectProvider(to?.web3Provider));
+      (async () => {
+        setFromWalletLogoUrl(await getWalletLogoUrl());
+        setToWalletLogoUrl(await getWalletLogoUrl());
+      })();
+    }
+  }, [isWalletConnectEnabled, from, to]);
+
   const submitBridge = useCallback(async () => {
     if (!approveTransaction || !transaction) return;
+
+    try {
+      const currentChainId = await (from?.web3Provider.provider as any).request({ method: 'eth_chainId', params: [] });
+      // eslint-disable-next-line radix
+      const parsedChainId = parseInt(currentChainId.toString());
+      if (parsedChainId !== from?.network) {
+        setShowSwitchNetworkDrawer(true);
+        return;
+      }
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Current network check failed', err);
+    }
 
     track({
       userJourney: UserJourney.BRIDGE,
@@ -215,7 +308,7 @@ export function BridgeReviewSummary() {
         },
       },
     });
-  }, [viewDispatch, approveTransaction, transaction]);
+  }, [viewDispatch, approveTransaction, transaction, from?.web3Provider, from?.network]);
 
   return (
     <Box testId={testId} sx={bridgeReviewWrapperStyles}>
@@ -235,14 +328,19 @@ export function BridgeReviewSummary() {
         emphasized
         sx={topMenuItemStyles}
       >
-        <MenuItem.Label size="small" sx={{ marginBottom: 'base.spacing.x4', fontWeight: 'bold' }}>
+        <MenuItem.Label
+          size="small"
+          sx={{ marginBottom: 'base.spacing.x4', fontWeight: 'bold' }}
+        >
           {t('views.BRIDGE_REVIEW.fromLabel.amountHeading')}
         </MenuItem.Label>
         <MenuItem.Caption />
         <MenuItem.PriceDisplay
           use={<Heading size="xSmall" weight="light" />}
           price={displayAmount ?? '-'}
-          fiatAmount={`${t('views.BRIDGE_REVIEW.fiatPricePrefix')}${fromFiatAmount}`}
+          fiatAmount={`${t(
+            'views.BRIDGE_REVIEW.fiatPricePrefix',
+          )}${fromFiatAmount}`}
         />
       </MenuItem>
       <MenuItem
@@ -251,9 +349,19 @@ export function BridgeReviewSummary() {
         emphasized
         sx={bottomMenuItemStyles}
       >
-        {fromWalletProviderName && (
+        {fromWalletIsWalletConnect && fromWalletLogoUrl && (
+          <>
+            <MenuItem.FramedImage
+              imageUrl={fromWalletLogoUrl}
+              alt="walletconnect"
+              sx={wcWalletLogoStyles}
+            />
+            <Logo logo="WalletConnectSymbol" sx={wcStickerLogoStyles} />
+          </>
+        )}
+        {fromWalletProviderName && !fromWalletIsWalletConnect && (
           <MenuItem.FramedLogo
-            logo={logo[fromWalletProviderName] as any}
+            logo={fromLogo}
             sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
           />
         )}
@@ -288,9 +396,19 @@ export function BridgeReviewSummary() {
         emphasized
         sx={topMenuItemStyles}
       >
-        {toWalletProviderName && (
+        {toWalletProviderName && toWalletIsWalletConnect && toWalletLogoUrl && (
+          <>
+            <MenuItem.FramedImage
+              imageUrl={toWalletLogoUrl}
+              alt="walletconnect"
+              sx={wcWalletLogoStyles}
+            />
+            <Logo logo="WalletConnectSymbol" sx={wcStickerLogoStyles} />
+          </>
+        )}
+        {toWalletProviderName && !toWalletIsWalletConnect && (
           <MenuItem.FramedLogo
-            logo={logo[toWalletProviderName] as any}
+            logo={toLogo}
             sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
           />
         )}
@@ -348,9 +466,19 @@ export function BridgeReviewSummary() {
         >
           {loading ? (
             <Button.Icon icon="Loading" sx={bridgeButtonIconLoadingStyle} />
-          ) : t('views.BRIDGE_REVIEW.submitButton.buttonText')}
+          ) : (
+            t('views.BRIDGE_REVIEW.submitButton.buttonText')
+          )}
         </Button>
       </Box>
+      <NetworkSwitchDrawer
+        visible={showSwitchNetworkDrawer}
+        targetChainId={from?.network!}
+        provider={from?.web3Provider!}
+        checkout={checkout}
+        onCloseDrawer={() => setShowSwitchNetworkDrawer(false)}
+        onNetworkSwitch={handleNetworkSwitch}
+      />
     </Box>
   );
 }

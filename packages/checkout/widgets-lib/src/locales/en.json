@@ -37,8 +37,8 @@
     },
     "SWITCH_NETWORK": {
       "eth": {
-        "heading": "To move your coins, you'll need to switch to the Sepolia network",
-        "body": "You'll be prompted to switch networks in MetaMask. You'll be able to switch back when needed.",
+        "heading": "You'll need to switch to the {{networkName}} network",
+        "body": "You'll be prompted to switch networks in your wallet.",
         "button": {
           "text": "Ready to Switch",
           "retryText": "Try Again"
@@ -47,6 +47,7 @@
       "zkEVM": {
         "heading": "You’ll be asked to switch to the Immutable zkEVM network",
         "body": "Check for the pop-up from MetaMask and 'Approve' to switch. If this is the first time, MetaMask will also ask you to add the network.",
+        "bodyWalletConnect": "Check for the pop-up from your wallet to switch. If this is the first time, your wallet will also ask you to add the network.",
         "button": {
           "text": "Ready to Switch",
           "retryText": "Try Again"
@@ -535,6 +536,10 @@
     "metamask": {
       "heading": "MetaMask",
       "description": "Digital wallet for accessing blockchain applications and web3"
+    },
+    "walletconnect": {
+      "heading": "Other wallets",
+      "description": "Allows you to connect with any blockchain wallet including MetaMask"
     }
   },
   "drawers": {
@@ -628,6 +633,16 @@
       "buttons": {
         "cancel": "Dismiss"
       }
+    },
+    "networkSwitch": {
+      "heading": "Switch network in your {{wallet}}",
+      "manualSwitch": {
+        "body": "You'll need to open your mobile wallet and switch to the {{chain}} network to proceed"
+      },
+      "controlledSwitch": {
+        "body": "You'll need to switch to the {{chain}} network to proceed"
+      },
+      "switchButton": "Switch to {{chain}}"
     }
   }
 }

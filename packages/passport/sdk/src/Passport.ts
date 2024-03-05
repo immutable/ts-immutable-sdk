@@ -20,6 +20,7 @@ import {
   PassportEventMap,
   PassportEvents,
   PassportModuleConfiguration,
+  User,
   UserProfile,
 } from './types';
 import { ConfirmationScreen } from './confirmation';
@@ -27,6 +28,7 @@ import { ZkEvmProvider } from './zkEvm';
 import { Provider } from './zkEvm/types';
 import TypedEventEmitter from './utils/typedEventEmitter';
 import GuardianClient from './guardian';
+import logger from './utils/logger';
 
 const buildImxClientConfig = (passportModuleConfiguration: PassportModuleConfiguration) => {
   if (passportModuleConfiguration.overrides) {
@@ -152,24 +154,25 @@ export class Passport {
    *
    * @param options.useCachedSession = false - If true, and no active session exists, then the user will not be
    * prompted to log in and the Promise will resolve with a null value.
+   * @param options.anonymousId - If provided, Passport internal metrics will be enriched with this value.
    * @returns {Promise<UserProfile | null>} the user profile if the user is logged in, otherwise null
    */
   public async login(options?: {
     useCachedSession: boolean;
+    anonymousId?: string;
   }): Promise<UserProfile | null> {
     const { useCachedSession = false } = options || {};
-    let user = null;
+    let user: User | null = null;
     try {
       user = await this.authManager.getUser();
     } catch (error) {
       if (useCachedSession) {
         throw error;
       }
-      // eslint-disable-next-line no-console
-      console.warn('login failed to retrieve a cached user session', error);
+      logger.warn('Failed to retrieve a cached user session', error);
     }
     if (!user && !useCachedSession) {
-      user = await this.authManager.login();
+      user = await this.authManager.login(options?.anonymousId);
     }
 
     if (user) {
@@ -185,8 +188,10 @@ export class Passport {
     return this.authManager.loginCallback();
   }
 
-  public async loginWithDeviceFlow(): Promise<DeviceConnectResponse> {
-    return this.authManager.loginWithDeviceFlow();
+  public async loginWithDeviceFlow(options?: {
+    anonymousId?: string;
+  }): Promise<DeviceConnectResponse> {
+    return this.authManager.loginWithDeviceFlow(options?.anonymousId);
   }
 
   public async loginWithDeviceFlowCallback(
@@ -221,8 +226,7 @@ export class Passport {
     try {
       await this.confirmationScreen.logout();
     } catch (err) {
-      // eslint-disable-next-line no-console
-      console.warn('Failed to logout from confirmation screen', err);
+      logger.warn('Failed to logout from confirmation screen', err);
     }
     await Promise.allSettled([
       this.authManager.logout(),

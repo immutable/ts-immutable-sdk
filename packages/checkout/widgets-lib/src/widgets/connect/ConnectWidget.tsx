@@ -4,10 +4,11 @@ import React, {
 } from 'react';
 import {
   ChainId,
-  Checkout, ConnectTargetLayer, ConnectWidgetParams,
+  Checkout, ConnectWidgetParams,
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { useTranslation } from 'react-i18next';
+import { isL1EthChainId, isZkEvmChainId } from 'lib/utils';
 import {
   sendCloseWidgetEvent,
   sendConnectFailedEvent,
@@ -35,7 +36,7 @@ import {
 import { StatusType } from '../../components/Status/StatusType';
 import { StatusView } from '../../components/Status/StatusView';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { getTargetLayerChainId, sendProviderUpdatedEvent } from '../../lib';
+import { addProviderListenersForWidgetRoot, sendProviderUpdatedEvent } from '../../lib';
 import { SwitchNetworkEth } from './views/SwitchNetworkEth';
 import { ErrorView } from '../../views/error/ErrorView';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
@@ -46,7 +47,6 @@ export type ConnectWidgetInputs = ConnectWidgetParams & {
   config: StrongCheckoutWidgetsConfig
   deepLink?: ConnectWidgetViews;
   sendCloseEventOverride?: () => void;
-  targetLayer?: ConnectTargetLayer;
   allowedChains?: ChainId[];
   checkout: Checkout;
   web3Provider?: Web3Provider;
@@ -57,7 +57,7 @@ export default function ConnectWidget({
   sendCloseEventOverride,
   web3Provider,
   checkout,
-  targetLayer,
+  targetChainId,
   allowedChains,
   deepLink = ConnectWidgetViews.CONNECT_WALLET,
 }: ConnectWidgetInputs) {
@@ -86,11 +86,14 @@ export default function ConnectWidget({
     [viewState, viewDispatch],
   );
 
-  const networkToSwitchTo = targetLayer ?? ConnectTargetLayer.LAYER2;
-
-  const targetChainId = getTargetLayerChainId(checkout.config, targetLayer ?? ConnectTargetLayer.LAYER2);
-
   const { identify, page } = useAnalytics();
+
+  let targetChain = targetChainId;
+  if (!targetChain) {
+    targetChain = checkout.config.isProduction
+      ? ChainId.IMTBL_ZKEVM_MAINNET
+      : ChainId.IMTBL_ZKEVM_TESTNET;
+  }
 
   useEffect(() => {
     if (!web3Provider) return;
@@ -147,6 +150,8 @@ export default function ConnectWidget({
       userJourney: UserJourney.CONNECT,
       screen: 'ConnectSuccess',
     });
+    // Set up EIP-1193 provider event listeners for widget root instances
+    addProviderListenersForWidgetRoot(provider);
     await identifyUser(identify, provider);
     sendProviderUpdatedEvent({ provider });
     sendConnectSuccessEvent(eventTarget, provider, walletProviderName ?? undefined);
@@ -157,18 +162,18 @@ export default function ConnectWidget({
       <ConnectContext.Provider value={connectReducerValues}>
         <>
           {view.type === SharedViews.LOADING_VIEW && (
-          <LoadingView loadingText="Loading" />
+            <LoadingView loadingText="Loading" />
           )}
           {view.type === ConnectWidgetViews.CONNECT_WALLET && (
-            <ConnectWallet />
+            <ConnectWallet targetChainId={targetChain} />
           )}
           {view.type === ConnectWidgetViews.READY_TO_CONNECT && (
-            <ReadyToConnect targetChainId={targetChainId} allowedChains={allowedChains ?? [targetChainId]} />
+            <ReadyToConnect targetChainId={targetChain} allowedChains={allowedChains ?? [targetChain]} />
           )}
-          {view.type === ConnectWidgetViews.SWITCH_NETWORK && networkToSwitchTo === ConnectTargetLayer.LAYER2 && (
+          {view.type === ConnectWidgetViews.SWITCH_NETWORK && isZkEvmChainId(targetChain) && (
             <SwitchNetworkZkEVM />
           )}
-          {view.type === ConnectWidgetViews.SWITCH_NETWORK && networkToSwitchTo === ConnectTargetLayer.LAYER1 && (
+          {view.type === ConnectWidgetViews.SWITCH_NETWORK && isL1EthChainId(targetChain) && (
             <SwitchNetworkEth />
           )}
           {view.type === ConnectWidgetViews.SUCCESS && provider && (
@@ -185,22 +190,22 @@ export default function ConnectWidget({
           )}
           {((view.type === ConnectWidgetViews.SUCCESS && !provider)
             || view.type === SharedViews.ERROR_VIEW)
-              && (
-                <ErrorView
-                  actionText={errorText}
-                  onActionClick={() => {
-                    viewDispatch({
-                      payload: {
-                        type: ViewActions.UPDATE_VIEW,
-                        view: {
-                          type: ConnectWidgetViews.CONNECT_WALLET,
-                        } as ConnectWidgetView,
-                      },
-                    });
-                  }}
-                  onCloseClick={() => sendCloseEvent()}
-                />
-              )}
+            && (
+              <ErrorView
+                actionText={errorText}
+                onActionClick={() => {
+                  viewDispatch({
+                    payload: {
+                      type: ViewActions.UPDATE_VIEW,
+                      view: {
+                        type: ConnectWidgetViews.CONNECT_WALLET,
+                      } as ConnectWidgetView,
+                    },
+                  });
+                }}
+                onCloseClick={() => sendCloseEvent()}
+              />
+            )}
         </>
       </ConnectContext.Provider>
     </ViewContext.Provider>
