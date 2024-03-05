@@ -68,7 +68,7 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
 
   const [swapParams, setSwapParams] = useState<SwapWidgetParams | undefined>(undefined);
   const [bridgeParams, setBridgeParams] = useState<BridgeWidgetParams | undefined>(undefined);
-  const [onRamParams, setOnRampParams] = useState<OnRampWidgetParams | undefined>(undefined);
+  const [onRampParams, setOnRampParams] = useState<OnRampWidgetParams | undefined>(undefined);
 
   const [view, setView] = useState<FundingRouteExecuteViews>(FundingRouteExecuteViews.LOADING);
   const nextView = useRef<FundingRouteExecuteViews | false>(false);
