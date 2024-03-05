@@ -199,6 +199,7 @@ export function SaleContextProvider(props: {
     signResponse,
     signError,
     executeResponse,
+    tokenIds,
   } = useSignOrder({
     items,
     provider,
@@ -259,13 +260,14 @@ export function SaleContextProvider(props: {
             data: {
               paymentMethod,
               transactions: executeResponse.transactions,
+              tokenIds,
               ...data,
             },
           },
         },
       });
     },
-    [[paymentMethod, executeResponse]],
+    [[paymentMethod, executeResponse, tokenIds]],
   );
 
   useEffect(() => {
