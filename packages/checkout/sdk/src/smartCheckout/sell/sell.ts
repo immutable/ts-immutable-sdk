@@ -18,6 +18,7 @@ import {
   SellResult,
   CheckoutStatus,
   SmartCheckoutResult,
+  SmartCheckoutSufficient,
 } from '../../types';
 import * as instance from '../../instance';
 import { CheckoutConfiguration } from '../../config';
@@ -38,7 +39,7 @@ export const getERC721Requirement = (
   id: string,
   contractAddress: string,
   spenderAddress: string,
-):ERC721Item => ({
+): ERC721Item => ({
   type: ItemType.ERC721,
   id,
   contractAddress,
@@ -145,22 +146,28 @@ export const sell = async (
     getERC721Requirement(sellToken.id, sellToken.collectionAddress, spenderAddress),
   ];
 
-  const smartCheckoutResult = await measureAsyncExecution<SmartCheckoutResult>(
-    config,
-    'Total time running smart checkout',
-    smartCheckout(
+  let smartCheckoutResult;
+  const { isPassport } = (provider.provider as any);
+  if (!isPassport) {
+    smartCheckoutResult = await measureAsyncExecution<SmartCheckoutResult>(
       config,
-      provider,
-      itemRequirements,
-      {
-        type: TransactionOrGasType.GAS,
-        gasToken: {
-          type: GasTokenType.NATIVE,
-          limit: BigNumber.from(constants.estimatedFulfillmentGasGwei),
+      'Total time running smart checkout',
+      smartCheckout(
+        config,
+        provider,
+        itemRequirements,
+        {
+          type: TransactionOrGasType.GAS,
+          gasToken: {
+            type: GasTokenType.NATIVE,
+            limit: BigNumber.from(constants.estimatedFulfillmentGasGwei),
+          },
         },
-      },
-    ),
-  );
+      ),
+    );
+  } else {
+    smartCheckoutResult = { sufficient: true, transactionRequirements: [] } as SmartCheckoutSufficient;
+  }
 
   if (smartCheckoutResult.sufficient) {
     const unsignedTransactions = await getUnsignedERC721Transactions(listing.actions);
@@ -198,7 +205,7 @@ export const sell = async (
 
     let orderId = '';
 
-    const createListingParams:CreateListingParams = {
+    const createListingParams: CreateListingParams = {
       orderComponents: signedMessage.orderComponents,
       orderHash: signedMessage.orderHash,
       orderSignature: signedMessage.signedMessage,
