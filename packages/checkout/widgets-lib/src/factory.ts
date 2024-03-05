@@ -15,7 +15,6 @@ import { Sale } from 'widgets/sale/SaleWidgetRoot';
 import { Web3Provider } from '@ethersproject/providers';
 import { Bridge } from 'widgets/bridge/BridgeWidgetRoot';
 import { WalletConnectManager } from 'lib/walletConnect';
-import { ConnectConfig } from '@imtbl/checkout-sdk/dist/types';
 import {
   sendProviderUpdatedEvent,
   addProviderListenersForWidgetRoot,
@@ -38,7 +37,7 @@ export class WidgetsFactory implements IWidgetsFactory {
           sdk.config.environment,
           widgetConfig.walletConnect,
           this.widgetConfig.theme,
-          sdk.config.remote.getConfig('connect') as Promise<ConnectConfig>,
+          sdk.config.remote.getConfig('connect') as Promise<any>,
         );
       } catch (err) {
         // eslint-disable-next-line no-console
