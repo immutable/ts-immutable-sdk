@@ -267,12 +267,17 @@
       "options": {
         "crypto": {
           "heading": "Coins",
-          "caption": "Using the coins balance in your wallet",
+          "caption": "The fastest way to pay, if you have coins in your balance.",
           "disabledCaption": "We can't see enough coins in your balance"
         },
-        "fiat": {
-          "heading": "Card",
-          "caption": "GooglePay also available with Transak",
+        "debit" : {
+          "heading": "Debit Card",
+          "caption": "The recommended way to pay with card.",
+          "disabledCaption": null
+        },
+        "credit" : {
+          "heading": "Credit Card",
+          "caption": "Not recommended since transactions may be blocked by your bank.",
           "disabledCaption": null
         }
       },

@@ -98,3 +98,8 @@ export type ClientConfig = {
   contractId: string;
   currencies: ClientConfigCurrency[];
 };
+
+export enum SignPaymentTypes {
+  CRYPTO = 'crypto',
+  FIAT = 'fiat',
+}

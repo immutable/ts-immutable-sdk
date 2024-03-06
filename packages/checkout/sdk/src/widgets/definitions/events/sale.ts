@@ -78,5 +78,6 @@ export type SalePaymentMethod = {
  */
 export enum SalePaymentTypes {
   CRYPTO = 'crypto',
-  FIAT = 'fiat',
+  DEBIT = 'debit',
+  CREDIT = 'credit',
 }

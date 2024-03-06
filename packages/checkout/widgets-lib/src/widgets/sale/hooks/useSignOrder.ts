@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { useCallback, useState } from 'react';
-import { SaleItem, SalePaymentTypes } from '@imtbl/checkout-sdk';
+import { SaleItem } from '@imtbl/checkout-sdk';
 
 import {
   SignResponse,
@@ -10,6 +10,7 @@ import {
   ExecuteOrderResponse,
   ExecutedTransaction,
   SaleErrorTypes,
+  SignPaymentTypes,
 } from '../types';
 import { PRIMARY_SALES_API_BASE_URL } from '../utils/config';
 
@@ -234,7 +235,7 @@ export const useSignOrder = (input: SignOrderInput) => {
 
   const sign = useCallback(
     async (
-      paymentType: SalePaymentTypes,
+      paymentType: SignPaymentTypes,
       fromTokenAddress: string,
     ): Promise<SignResponse | undefined> => {
       try {
