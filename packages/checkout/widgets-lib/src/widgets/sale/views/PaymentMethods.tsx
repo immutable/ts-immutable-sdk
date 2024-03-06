@@ -8,7 +8,10 @@ import { useTranslation } from 'react-i18next';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import { FundWithSmartCheckoutSubViews, SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
+import {
+  FundWithSmartCheckoutSubViews,
+  SaleWidgetViews,
+} from '../../../context/view-context/SaleViewContextTypes';
 import {
   SharedViews,
   ViewActions,
@@ -40,7 +43,10 @@ export function PaymentMethods() {
       sendSelectedPaymentMethod(paymentMethod, SaleWidgetViews.PAYMENT_METHODS);
     }
 
-    if (paymentMethod === SalePaymentTypes.DEBIT || paymentMethod === SalePaymentTypes.CREDIT) {
+    if (
+      paymentMethod
+      && [SalePaymentTypes.DEBIT, SalePaymentTypes.CREDIT].includes(paymentMethod)
+    ) {
       sign(SignPaymentTypes.FIAT, () => {
         viewDispatch({
           payload: {
@@ -63,7 +69,7 @@ export function PaymentMethods() {
       });
     }
 
-    if (paymentMethod === SalePaymentTypes.CRYPTO) {
+    if (paymentMethod && paymentMethod === SalePaymentTypes.CRYPTO) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -95,9 +101,7 @@ export function PaymentMethods() {
           {t('views.PAYMENT_METHODS.insufficientCoinsBanner.caption')}
           <Link
             sx={{ mx: 'base.spacing.x1' }}
-            onClick={
-              () => onClickInsufficientCoinsBanner()
-            }
+            onClick={() => onClickInsufficientCoinsBanner()}
           >
             {t('views.PAYMENT_METHODS.insufficientCoinsBanner.captionCTA')}
           </Link>
@@ -141,9 +145,14 @@ export function PaymentMethods() {
           {t('views.PAYMENT_METHODS.header.heading')}
         </Heading>
         <Box sx={{ paddingX: 'base.spacing.x2' }}>
-          <PaymentOptions disabledOptions={disabledPaymentTypes} onClick={handleOptionClick} />
+          <PaymentOptions
+            disabledOptions={disabledPaymentTypes}
+            onClick={handleOptionClick}
+          />
         </Box>
-        {viewState.view.data?.showInsufficientCoinsBanner ? insufficientCoinsBanner : null}
+        {viewState.view.data?.showInsufficientCoinsBanner
+          ? insufficientCoinsBanner
+          : null}
       </Box>
     </SimpleLayout>
   );
