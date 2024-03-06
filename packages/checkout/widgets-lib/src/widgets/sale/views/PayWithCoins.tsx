@@ -8,23 +8,19 @@ import { useSaleEvent } from '../hooks/useSaleEvents';
 export function PayWithCoins() {
   const { t } = useTranslation();
   const processing = useRef(false);
-  const { sendPageView, sendTransactionSuccessEvent, sendFailedEvent } = useSaleEvent();
   const {
-    execute, signResponse, executeResponse, goToSuccessView,
-  } = useSaleContext();
-  const expectedTxns = signResponse?.transactions.length || 0;
+    sendPageView,
+    sendTransactionSuccessEvent,
+    sendFailedEvent,
+    sendCloseEvent,
+  } = useSaleEvent();
+  const { execute, signResponse, executeResponse } = useSaleContext();
   const executedTxns = executeResponse?.transactions.length || 0;
 
   let loadingText = t('views.PAYMENT_METHODS.loading.ready');
 
-  if (signResponse !== undefined) {
-    loadingText = t('views.PAYMENT_METHODS.loading.confirm');
-  } else if (executedTxns > 0 && executedTxns === expectedTxns) {
+  if (executedTxns >= 1) {
     loadingText = t('views.PAYMENT_METHODS.loading.processing');
-  }
-
-  if (signResponse !== undefined) {
-    loadingText = `${loadingText} ${executedTxns}/${expectedTxns}`;
   }
 
   const sendTransaction = async () => {
@@ -48,7 +44,7 @@ export function PayWithCoins() {
 
   useEffect(() => {
     if (executeResponse?.done === true) {
-      goToSuccessView();
+      sendCloseEvent(SaleWidgetViews.SALE_SUCCESS);
     }
   }, [executeResponse]);
 

@@ -56,11 +56,7 @@
     },
     "ERROR_VIEW": {
       "heading": "문제가 발생했습니다",
-      "body": [
-        "다시 시도하거나",
-        "지원팀에",
-        "도움을 요청하세요."
-      ],
+      "body": ["다시 시도하거나", "지원팀에", "도움을 요청하세요."],
       "actionText": "다시 시도"
     },
     "SERVICE_UNAVAILABLE_ERROR_VIEW": {
@@ -287,9 +283,8 @@
         "captionCTA": "코인 추가"
       },
       "loading": {
-        "ready": "구매 준비 완료",
-        "confirm": "지갑에서 확인하세요",
-        "processing": "구매 처리 중"
+        "ready": ["주문 수집 중", "지갑과 대화 중", "자산 준비 중"],
+        "processing": ["결제 초기화 중", "자산 보호 중", "결제 완료 중"]
       }
     },
     "PAY_WITH_COINS": {
