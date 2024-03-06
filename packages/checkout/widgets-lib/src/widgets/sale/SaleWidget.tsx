@@ -126,7 +126,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
       >
         <CryptoFiatProvider environment={config.environment}>
           {viewState.view.type === SharedViews.LOADING_VIEW && (
-            <LoadingView loadingText={loadingText} showFooterLogo />
+            <LoadingView loadingText={loadingText} />
           )}
           {viewState.view.type === SaleWidgetViews.PAYMENT_METHODS && (
             <PaymentMethods />

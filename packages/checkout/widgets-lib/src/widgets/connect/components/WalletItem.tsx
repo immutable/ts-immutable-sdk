@@ -31,9 +31,19 @@ export function WalletItem<
       size="medium"
       emphasized
       onClick={() => onWalletClick(providerDetail)}
-      sx={{ marginBottom: 'base.spacing.x1' }}
+      sx={{
+        marginBottom: 'base.spacing.x1',
+        position: 'relative',
+      }}
     >
-      <RawImage src={providerDetail.info.icon} alt={providerDetail.info.name} sx={{ position: 'absolute' }} />
+      <RawImage
+        src={providerDetail.info.icon}
+        alt={providerDetail.info.name}
+        sx={{
+          position: 'absolute',
+          left: 'base.spacing.x3',
+        }}
+      />
       <MenuItem.Label size="medium" sx={offsetStyles}>
         {providerDetail.info.name}
       </MenuItem.Label>

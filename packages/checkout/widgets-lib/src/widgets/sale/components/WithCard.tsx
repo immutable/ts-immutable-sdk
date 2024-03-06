@@ -64,7 +64,6 @@ export function WithCard(props: WithCardProps) {
       walletAddress={recipientAddress}
       isPassportWallet={isPassportWallet}
       exchangeScreenTitle={t('views.PAY_WITH_CARD.screenTitle')}
-      loadingText={t('views.PAY_WITH_CARD.loading')}
       nftData={nftData}
       calldata={executeTxn.rawData}
       cryptoCurrencyCode={signResponse.order.currency.name}
