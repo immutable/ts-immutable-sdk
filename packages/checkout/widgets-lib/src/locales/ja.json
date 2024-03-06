@@ -273,18 +273,26 @@
           "caption": "残高にコインがある場合、最も速い支払い方法です。",
           "disabledCaption": "残高に十分なコインが見つかりません"
         },
-        "fiat": {
-          "debit" : {
-            "heading": "デビットカード",
-            "caption": "カードでの支払いに推奨される方法。",
-            "disabledCaption": null
-          },
-          "credit" : {
-            "heading": "クレジットカード",
-            "caption": "銀行によって取引がブロックされる可能性があるため、推奨されません。",
-            "disabledCaption": null
-          }
+        "debit": {
+          "heading": "デビットカード",
+          "caption": "カードでの支払いに推奨される方法です。",
+          "disabledCaption": null
+        },
+        "credit": {
+          "heading": "クレジットカード",
+          "caption": "銀行によって取引がブロックされる可能性があるため、推奨されません。",
+          "disabledCaption": null
         }
+      },
+      "insufficientCoinsBanner": {
+        "caption": "コインの残高が不足しています。カードで支払うか、",
+        "captionEnd": "して再試行してください。",
+        "captionCTA": "コインを追加"
+      },
+      "loading": {
+        "ready": "購入準備完了",
+        "confirm": "ウォレットで確認してください",
+        "processing": "購入処理中"
       }
     },
     "SALE_FAIL": {
