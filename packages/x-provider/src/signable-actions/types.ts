@@ -1,4 +1,5 @@
-import { EthSigner, StarkSigner } from '@imtbl/core-sdk';
+import { EthSigner } from '@imtbl/core-sdk';
+import { StarkSigner } from '@imtbl/x-client';
 
 export type Signers = {
   ethSigner: EthSigner;
