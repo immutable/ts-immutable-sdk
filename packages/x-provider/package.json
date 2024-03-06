@@ -8,6 +8,7 @@
     "@imtbl/config": "0.0.0",
     "@imtbl/core-sdk": "^2.4.0",
     "@imtbl/toolkit": "0.0.0",
+    "@imtbl/x-client": "0.0.0",
     "@magic-ext/oidc": "4.2.0",
     "@metamask/detect-provider": "^2.0.0",
     "axios": "^1.6.5",
