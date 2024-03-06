@@ -3483,7 +3483,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/config@workspace:packages/config"
   dependencies:
-    "@imtbl/core-sdk": ^2.4.0
     "@imtbl/metrics": 0.0.0
     "@magic-ext/oidc": 4.2.0
     "@metamask/detect-provider": ^2.0.0
