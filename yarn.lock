@@ -3922,7 +3922,6 @@ __metadata:
     "@ethersproject/strings": ^5.7.0
     "@ethersproject/wallet": ^5.7.0
     "@imtbl/config": 0.0.0
-    "@imtbl/core-sdk": ^2.4.0
     "@imtbl/generated-clients": 0.0.0
     "@rollup/plugin-typescript": ^11.0.0
     "@swc/jest": ^0.2.24
