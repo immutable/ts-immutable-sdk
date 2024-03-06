@@ -65,4 +65,5 @@ export const rawImageStyle = {
   width: '32px',
   height: '32px',
   padding: '6px',
+  left: 'base.spacing.x3',
 };
