@@ -1,6 +1,11 @@
 import {
   AspectRatioImage,
-  Body, Box, ButtCon, Button, Drawer, Heading,
+  Body,
+  Box,
+  ButtCon,
+  Button,
+  Drawer,
+  Heading,
 } from '@biom3/react';
 import { Web3Provider } from '@ethersproject/providers';
 import { ChainId, Checkout } from '@imtbl/checkout-sdk';
@@ -124,7 +129,7 @@ export function NetworkSwitchDrawer({
           flexDirection: 'column',
           alignItems: 'center',
           gap: 'base.spacing.x4',
-          paddingX: 'base.spacing.x2',
+          paddingX: 'base.spacing.x6',
         }}
         >
           <Heading size="small" weight="bold" sx={{ textAlign: 'center', paddingX: 'base.spacing.x6' }}>
@@ -134,20 +139,35 @@ export function NetworkSwitchDrawer({
           </Heading>
           {/** MetaMask mobile requires manual switch */}
           {requireManualSwitch && (
-          <Body size="large" weight="regular" sx={{ textAlign: 'center' }}>
+          <Body
+            size="medium"
+            weight="regular"
+            sx={{
+              color: 'base.color.text.body.secondary',
+              textAlign: 'center',
+              paddingX: 'base.spacing.x6',
+            }}
+          >
             {t('drawers.networkSwitch.manualSwitch.body', {
               chain: targetChainName,
             })}
           </Body>
           )}
           {!requireManualSwitch && (
-          <Body size="large" weight="regular" sx={{ textAlign: 'center' }}>
+          <Body
+            size="medium"
+            weight="regular"
+            sx={{
+              color: 'base.color.text.body.secondary',
+              textAlign: 'center',
+              paddingX: 'base.spacing.x6',
+            }}
+          >
             {t('drawers.networkSwitch.controlledSwitch.body', {
               chain: targetChainName,
             })}
           </Body>
           )}
-
         </Box>
 
         <Box sx={{
