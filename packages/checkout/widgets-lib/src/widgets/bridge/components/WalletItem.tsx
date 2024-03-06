@@ -38,8 +38,16 @@ export function WalletItem<
           setShowLoadingIcon(false);
         }
       }}
+      sx={{ position: 'relative' }}
     >
-      <RawImage src={providerDetail.info.icon} alt={providerDetail.info.name} sx={{ position: 'absolute' }} />
+      <RawImage
+        src={providerDetail.info.icon}
+        alt={providerDetail.info.name}
+        sx={{
+          position: 'absolute',
+          left: 'base.spacing.x3',
+        }}
+      />
       <MenuItem.Label size="medium" sx={{ marginLeft: '65px' }}>
         {providerDetail.info.name}
       </MenuItem.Label>
