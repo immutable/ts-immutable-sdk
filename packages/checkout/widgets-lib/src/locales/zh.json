@@ -263,18 +263,23 @@
       "options": {
         "crypto": {
           "heading": "硬币",
-          "caption": "使用您钱包中的硬币余额",
-          "disabledCaption": "我们看不到您余额中有足够多的硬币"
+          "caption": "如果您的余额中有硬币，这是最快的支付方式。",
+          "disabledCaption": "我们看不到您的余额中有足够的硬币"
         },
-        "fiat": {
-          "heading": "卡",
-          "caption": "Transak也支持使用GooglePay",
+        "debit": {
+          "heading": "借记卡",
+          "caption": "使用卡支付的推荐方式。",
+          "disabledCaption": null
+        },
+        "credit": {
+          "heading": "信用卡",
+          "caption": "不推荐使用，因为您的银行可能会阻止交易。",
           "disabledCaption": null
         }
       },
       "insufficientCoinsBanner": {
-        "caption": "硬币余额不足。请用卡支付以继续，或者",
-        "captionEnd": "再次尝试。",
+        "caption": "硬币余额不足。请使用卡支付，或",
+        "captionEnd": "再试一次。",
         "captionCTA": "添加硬币"
       },
       "loading": {

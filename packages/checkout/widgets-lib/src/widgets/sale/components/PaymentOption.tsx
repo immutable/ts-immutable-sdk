@@ -13,9 +13,10 @@ export function PaymentOption(props: PaymentOptionProps) {
   const { type, onClick, disabled } = props;
   // const optionText = options[type];
 
-  const icon: Record<string, IconProps['icon']> = {
+  const icon: Record<SalePaymentTypes, IconProps['icon']> = {
     [SalePaymentTypes.CRYPTO]: 'Coins',
-    [SalePaymentTypes.FIAT]: 'BankCard',
+    [SalePaymentTypes.DEBIT]: 'BankCard',
+    [SalePaymentTypes.CREDIT]: 'BankCard',
   };
 
   const handleClick = () => onClick(type);
