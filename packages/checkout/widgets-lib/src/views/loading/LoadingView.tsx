@@ -1,22 +1,17 @@
+import { LoadingOverlay } from '@biom3/react';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
-import { LoadingBox } from './LoadingBox';
-import { CenteredBoxContent } from '../../components/CenteredBoxContent/CenteredBoxContent';
-import { FooterLogo } from '../../components/Footer/FooterLogo';
 
 export interface LoadingViewProps {
   loadingText: string;
-  showFooterLogo?: boolean;
 }
-export function LoadingView({ loadingText, showFooterLogo }: LoadingViewProps) {
+export function LoadingView({ loadingText }: LoadingViewProps) {
   return (
-    <SimpleLayout
-      footer={(
-        <FooterLogo hideLogo={!showFooterLogo} />
-      )}
-    >
-      <CenteredBoxContent testId="loading-view">
-        <LoadingBox loadingText={loadingText} />
-      </CenteredBoxContent>
+    <SimpleLayout>
+      <LoadingOverlay visible>
+        <LoadingOverlay.Content>
+          <LoadingOverlay.Content.LoopingText text={[loadingText]} />
+        </LoadingOverlay.Content>
+      </LoadingOverlay>
     </SimpleLayout>
   );
 }

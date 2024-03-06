@@ -318,7 +318,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
   return (
     <>
       {approvalTxnLoading && (
-        <LoadingView loadingText={t('views.APPROVE_ERC20.approveSpending.loading.text')} showFooterLogo />
+        <LoadingView loadingText={t('views.APPROVE_ERC20.approveSpending.loading.text')} />
       )}
       {!approvalTxnLoading && (
         <SimpleLayout
