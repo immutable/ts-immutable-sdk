@@ -1,4 +1,5 @@
 import { ModuleConfiguration } from '@imtbl/config';
+import { providers } from 'ethers';
 import { ImmutableApiClient, ImmutableApiClientFactory } from './api-client';
 import {
   getOrderbookConfig,
@@ -54,6 +55,12 @@ export class Orderbook {
       ...obConfig,
       ...config.overrides,
     } as OrderbookModuleConfiguration;
+
+    if (config.overrides?.jsonRpcProviderUrl) {
+      finalConfig.provider = new providers.JsonRpcProvider(
+        config.overrides.jsonRpcProviderUrl,
+      );
+    }
 
     if (!finalConfig) {
       throw new Error(
