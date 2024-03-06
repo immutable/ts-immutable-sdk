@@ -4,8 +4,9 @@ import { SalePaymentTypes } from '@imtbl/checkout-sdk';
 import { PaymentOption } from './PaymentOption';
 
 const defaultPaymentOptions: SalePaymentTypes[] = [
-  SalePaymentTypes.FIAT,
   SalePaymentTypes.CRYPTO,
+  SalePaymentTypes.DEBIT,
+  SalePaymentTypes.CREDIT,
 ];
 
 export interface PaymentOptionsProps {

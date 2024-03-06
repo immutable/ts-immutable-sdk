@@ -34,6 +34,7 @@ import {
   ExecutedTransaction,
   SaleErrorTypes,
   SignOrderError,
+  SignPaymentTypes,
   SignResponse,
   SmartCheckoutErrorTypes,
 } from '../types';
@@ -57,13 +58,13 @@ type SaleContextProps = {
 
 type SaleContextValues = SaleContextProps & {
   sign: (
-    paymentType: SalePaymentTypes,
+    paymentType: SignPaymentTypes,
     callback?: (response: SignResponse | undefined) => void
   ) => Promise<SignResponse | undefined>;
   execute: (
     signResponse: SignResponse | undefined,
     onTxnSuccess: (txn: ExecutedTransaction) => void,
-    onTxnError: (error: any, txns: ExecutedTransaction[]) => void,
+    onTxnError: (error: any, txns: ExecutedTransaction[]) => void
   ) => Promise<ExecutedTransaction[]>;
   recipientAddress: string;
   recipientEmail: string;
@@ -73,7 +74,9 @@ type SaleContextValues = SaleContextProps & {
   isPassportWallet: boolean;
   paymentMethod: SalePaymentTypes | undefined;
   setPaymentMethod: (paymentMethod: SalePaymentTypes | undefined) => void;
-  goBackToPaymentMethods: (paymentMethod?: SalePaymentTypes | undefined) => void;
+  goBackToPaymentMethods: (
+    paymentMethod?: SalePaymentTypes | undefined
+  ) => void;
   goToErrorView: (type: SaleErrorTypes, data?: Record<string, unknown>) => void;
   goToSuccessView: (data?: Record<string, unknown>) => void;
   querySmartCheckout: (
@@ -81,7 +84,7 @@ type SaleContextValues = SaleContextProps & {
   ) => Promise<SmartCheckoutResult | undefined>;
   smartCheckoutResult: SmartCheckoutResult | undefined;
   fundingRoutes: FundingRoute[];
-  disabledPaymentTypes: SalePaymentTypes[]
+  disabledPaymentTypes: SalePaymentTypes[];
   invalidParameters: boolean;
 };
 
@@ -154,17 +157,22 @@ export function SaleContextProvider(props: {
     recipientAddress: '',
   });
 
-  const [paymentMethod, setPaymentMethod] = useState<SalePaymentTypes | undefined>(
-    undefined,
-  );
+  const [paymentMethod, setPaymentMethod] = useState<
+  SalePaymentTypes | undefined
+  >(undefined);
 
   const [fundingRoutes, setFundingRoutes] = useState<FundingRoute[]>([]);
-  const [disabledPaymentTypes, setDisabledPaymentTypes] = useState<SalePaymentTypes[]>([]);
+  const [disabledPaymentTypes, setDisabledPaymentTypes] = useState<
+  SalePaymentTypes[]
+  >([]);
 
   const [invalidParameters, setInvalidParameters] = useState<boolean>(false);
 
   const goBackToPaymentMethods = useCallback(
-    (type?: SalePaymentTypes | undefined, showInsufficientCoinsBanner?: boolean) => {
+    (
+      type?: SalePaymentTypes | undefined,
+      showInsufficientCoinsBanner?: boolean,
+    ) => {
       setPaymentMethod(type);
       viewDispatch({
         payload: {
@@ -211,7 +219,7 @@ export function SaleContextProvider(props: {
 
   const sign = useCallback(
     async (
-      type: SalePaymentTypes,
+      type: SignPaymentTypes,
       callback?: (r?: SignResponse) => void,
     ): Promise<SignResponse | undefined> => {
       const response = await signOrder(type, fromTokenAddress);
@@ -285,7 +293,10 @@ export function SaleContextProvider(props: {
 
   useEffect(() => {
     if (!smartCheckoutError) return;
-    if ((smartCheckoutError.data?.error as Error)?.message === SmartCheckoutErrorTypes.FRACTIONAL_BALANCE_BLOCKED) {
+    if (
+      (smartCheckoutError.data?.error as Error)?.message
+      === SmartCheckoutErrorTypes.FRACTIONAL_BALANCE_BLOCKED
+    ) {
       setDisabledPaymentTypes([SalePaymentTypes.CRYPTO]);
       goBackToPaymentMethods(undefined, true);
       return;
@@ -307,7 +318,7 @@ export function SaleContextProvider(props: {
       return;
     }
     if (smartCheckoutResult.sufficient) {
-      sign(SalePaymentTypes.CRYPTO);
+      sign(SignPaymentTypes.CRYPTO);
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -351,7 +362,13 @@ export function SaleContextProvider(props: {
     const invalidAmount = !amount || amount === '0';
     const invalidFromTokenAddress = !fromTokenAddress || !fromTokenAddress.startsWith('0x');
 
-    if (invalidItems || invalidAmount || invalidFromTokenAddress || !collectionName || !environmentId) {
+    if (
+      invalidItems
+      || invalidAmount
+      || invalidFromTokenAddress
+      || !collectionName
+      || !environmentId
+    ) {
       setInvalidParameters(true);
     } else {
       setInvalidParameters(false);
