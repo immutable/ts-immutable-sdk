@@ -56,11 +56,7 @@
     },
     "ERROR_VIEW": {
       "heading": "出了些问题",
-      "body": [
-        "您可以再试一次或联系",
-        "支持",
-        "寻求帮助。"
-      ],
+      "body": ["您可以再试一次或联系", "支持", "寻求帮助。"],
       "actionText": "再试一次"
     },
     "SERVICE_UNAVAILABLE_ERROR_VIEW": {
@@ -282,9 +278,8 @@
         "captionCTA": "添加硬币"
       },
       "loading": {
-        "ready": "准备购买",
-        "confirm": "在您的钱包中确认",
-        "processing": "正在处理购买"
+        "ready": ["正在收集您的订单", "正在与钱包交流", "正在准备资产"],
+        "processing": ["正在初始化支付", "正在保护您的资产", "正在完成支付"]
       }
     },
     "PAY_WITH_COINS": {

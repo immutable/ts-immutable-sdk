@@ -103,13 +103,14 @@ export class Sale extends Base<WidgetType.SALE> {
       checkout: this.checkout,
       allowedChains: [getL2ChainId(this.checkout!.config)],
     };
+    const config = this.strongConfig();
 
     this.reactRoot.render(
       <React.StrictMode>
         <CustomAnalyticsProvider checkout={this.checkout}>
-          <ThemeProvider id="sale-container" config={this.strongConfig()}>
+          <ThemeProvider id="sale-container" config={config}>
             <ConnectLoader
-              widgetConfig={this.strongConfig()}
+              widgetConfig={config}
               params={connectLoaderParams}
               closeEvent={() => {
                 sendSaleWidgetCloseEvent(window);
@@ -117,7 +118,7 @@ export class Sale extends Base<WidgetType.SALE> {
             >
               <Suspense fallback={<LoadingView loadingText={t('views.LOADING_VIEW.text')} />}>
                 <SaleWidget
-                  config={this.strongConfig()}
+                  config={config}
                   amount={this.parameters.amount!}
                   items={this.parameters.items!}
                   environmentId={this.parameters.environmentId!}
