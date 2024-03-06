@@ -18,7 +18,7 @@ import {
 import { PaymentOptions } from '../components/PaymentOptions';
 import { useSaleContext } from '../context/SaleContextProvider';
 import { useSaleEvent } from '../hooks/useSaleEvents';
-import { SaleErrorTypes } from '../types';
+import { SaleErrorTypes, SignPaymentTypes } from '../types';
 
 export function PaymentMethods() {
   const { t } = useTranslation();
@@ -40,8 +40,8 @@ export function PaymentMethods() {
       sendSelectedPaymentMethod(paymentMethod, SaleWidgetViews.PAYMENT_METHODS);
     }
 
-    if (paymentMethod === SalePaymentTypes.FIAT) {
-      sign(paymentMethod, () => {
+    if (paymentMethod === SalePaymentTypes.DEBIT || paymentMethod === SalePaymentTypes.CREDIT) {
+      sign(SignPaymentTypes.FIAT, () => {
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,
