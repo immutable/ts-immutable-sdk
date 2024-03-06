@@ -1,4 +1,5 @@
-import { ImmutableXConfiguration, EthSigner } from '@imtbl/core-sdk';
+import { ImmutableXConfiguration } from '@imtbl/core-sdk';
+import { EthSigner } from '@imtbl/x-client';
 
 function isChainValid(chainID: number, config: ImmutableXConfiguration) {
   return chainID === config.ethConfiguration.chainID;
