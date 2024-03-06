@@ -33,7 +33,7 @@ export function PaymentOptions(props: PaymentOptionsProps) {
           disabled={disabledOptions.includes(type)}
           onClick={onClick}
           type={type}
-          key={type}
+          key={`${Math.random()}-${type}`}
         />
       ))}
     </Box>
