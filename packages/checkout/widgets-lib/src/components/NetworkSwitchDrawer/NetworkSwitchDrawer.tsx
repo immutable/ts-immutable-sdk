@@ -1,5 +1,6 @@
 import {
-  Body, Box, Button, CloudImage, Drawer, Heading, Logo,
+  AspectRatioImage,
+  Body, Box, ButtCon, Button, Drawer, Heading,
 } from '@biom3/react';
 import { Web3Provider } from '@ethersproject/providers';
 import { ChainId, Checkout } from '@imtbl/checkout-sdk';
@@ -12,7 +13,9 @@ import {
   isWalletConnectProvider,
 } from 'lib/provider';
 import { getRemoteImage } from 'lib/utils';
-import { useCallback, useMemo } from 'react';
+import {
+  useCallback, useMemo, useEffect,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 
 export interface NetworkSwitchDrawerProps {
@@ -33,14 +36,18 @@ export function NetworkSwitchDrawer({
 }: NetworkSwitchDrawerProps) {
   const { t } = useTranslation();
 
+  const ethImageUrl = getRemoteImage(
+    checkout.config.environment ?? Environment.PRODUCTION,
+    '/switchnetworkethereum.png',
+  );
+
+  const zkevmImageUrl = getRemoteImage(
+    checkout.config.environment ?? Environment.PRODUCTION,
+    '/switchnetworkzkevm.png',
+  );
+
   const targetChainName = getChainNameById(targetChainId);
-  const networkSwitchImage = useMemo(() => {
-    if (targetChainId === getL1ChainId(checkout.config)) {
-      const ethNetworkImageUrl = getRemoteImage(Environment.SANDBOX, '/switchnetworkethereum.svg');
-      return <CloudImage imageUrl={ethNetworkImageUrl} sx={{ width: '161px', height: '98px' }} />;
-    }
-    return <Logo logo="ImmutableSymbol" sx={{ fill: 'base.color.accent.1', width: 'base.spacing.x20' }} />;
-  }, [targetChainId]);
+  const showEthImage = targetChainId === getL1ChainId(checkout.config);
 
   const handleSwitchNetwork = useCallback(async () => {
     if (!checkout) return;
@@ -73,22 +80,45 @@ export function NetworkSwitchDrawer({
 
   const requireManualSwitch = isWalletConnect && isMetaMaskMobileWalletPeer;
 
+  // Image preloading - load images into browser when component mounts
+  // show cached images when drawer is made visible
+  useEffect(() => {
+    const switchNetworkEthImage = new Image();
+    switchNetworkEthImage.src = ethImageUrl;
+    const switchNetworkzkEVMImage = new Image();
+    switchNetworkzkEVMImage.src = zkevmImageUrl;
+  }, []);
+
   return (
     <Drawer
       size="threeQuarter"
       visible={visible}
       onCloseDrawer={onCloseDrawer}
-      showHeaderBar
-      headerBarTitle=""
+      showHeaderBar={false}
     >
       <Drawer.Content sx={{
-        paddingX: 'base.spacing.x4',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
         alignItems: 'center',
       }}
       >
+        <AspectRatioImage
+          aspectRatio="21:9"
+          responsiveSizes={[450, 512, 640, 720, 860, 1024, 1280, 1440]}
+          imageUrl={showEthImage ? ethImageUrl : zkevmImageUrl}
+        />
+        <ButtCon
+          icon="Close"
+          variant="tertiary"
+          sx={{
+            pos: 'absolute',
+            top: 'base.spacing.x5',
+            left: 'base.spacing.x5',
+            backdropFilter: 'blur(30px)',
+          }}
+          onClick={onCloseDrawer}
+        />
         <Box sx={{
           display: 'flex',
           flexDirection: 'column',
@@ -97,7 +127,6 @@ export function NetworkSwitchDrawer({
           paddingX: 'base.spacing.x2',
         }}
         >
-          {networkSwitchImage}
           <Heading size="small" weight="bold" sx={{ textAlign: 'center', paddingX: 'base.spacing.x6' }}>
             {t('drawers.networkSwitch.heading', {
               wallet: walletDisplayName,
@@ -105,18 +134,18 @@ export function NetworkSwitchDrawer({
           </Heading>
           {/** MetaMask mobile requires manual switch */}
           {requireManualSwitch && (
-            <Body size="large" weight="regular" sx={{ textAlign: 'center' }}>
-              {t('drawers.networkSwitch.manualSwitch.body', {
-                chain: targetChainName,
-              })}
-            </Body>
+          <Body size="large" weight="regular" sx={{ textAlign: 'center' }}>
+            {t('drawers.networkSwitch.manualSwitch.body', {
+              chain: targetChainName,
+            })}
+          </Body>
           )}
           {!requireManualSwitch && (
-            <Body size="large" weight="regular" sx={{ textAlign: 'center' }}>
-              {t('drawers.networkSwitch.controlledSwitch.body', {
-                chain: targetChainName,
-              })}
-            </Body>
+          <Body size="large" weight="regular" sx={{ textAlign: 'center' }}>
+            {t('drawers.networkSwitch.controlledSwitch.body', {
+              chain: targetChainName,
+            })}
+          </Body>
           )}
 
         </Box>
@@ -129,16 +158,16 @@ export function NetworkSwitchDrawer({
         }}
         >
           {!requireManualSwitch && (
-            <Button
-              size="large"
-              variant="primary"
-              sx={{ width: '100%', marginBottom: 'base.spacing.x2' }}
-              onClick={handleSwitchNetwork}
-            >
-              {t('drawers.networkSwitch.switchButton', {
-                chain: targetChainName,
-              })}
-            </Button>
+          <Button
+            size="large"
+            variant="primary"
+            sx={{ width: '100%', marginBottom: 'base.spacing.x2' }}
+            onClick={handleSwitchNetwork}
+          >
+            {t('drawers.networkSwitch.switchButton', {
+              chain: targetChainName,
+            })}
+          </Button>
           )}
           <FooterLogo />
         </Box>
