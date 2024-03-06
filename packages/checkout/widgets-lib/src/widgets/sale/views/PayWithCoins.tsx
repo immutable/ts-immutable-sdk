@@ -54,5 +54,5 @@ export function PayWithCoins() {
 
   useEffect(() => sendPageView(SaleWidgetViews.PAY_WITH_COINS), []);
 
-  return <LoadingView loadingText={loadingText} showFooterLogo />;
+  return <LoadingView loadingText={loadingText} />;
 }
