@@ -52,6 +52,25 @@ export const useWalletConnect = () => {
                 } else {
                   // eslint-disable-next-line no-console
                   console.log('activate succeeded but there is no connected session');
+
+                  if (displayUri.current !== '') {
+                    walletConnectModal?.openModal({
+                      uri: displayUri.current,
+                    })
+                      .then((result) => {
+                        setWalletConnectBusy(false);
+                        resolve(result);
+                      })
+                      .catch((error) => {
+                        // Error opening WalletConnect Modal
+                        setWalletConnectBusy(true);
+                        reject(error);
+                      });
+                  } else {
+                    // if we don't have a display uri and no connected session
+                    // call connect to generate display_uri event
+                    ethereumProvider?.connect();
+                  }
                 }
                 // eslint-disable-next-line no-console
               }).catch((err) => console.log('activate existing pairing error', err));
