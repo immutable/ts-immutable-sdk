@@ -266,12 +266,12 @@
           "caption": "The fastest way to pay, if you have coins in your balance.",
           "disabledCaption": "We can't see enough coins in your balance"
         },
-        "debit" : {
+        "debit": {
           "heading": "Debit Card",
           "caption": "The recommended way to pay with card.",
           "disabledCaption": null
         },
-        "credit" : {
+        "credit": {
           "heading": "Credit Card",
           "caption": "Not recommended since transactions may be blocked by your bank.",
           "disabledCaption": null
@@ -283,16 +283,12 @@
         "captionCTA": "add coins"
       },
       "loading": {
-        "ready": [
-          "Collecting your order",
-          "Talking to wallet",
-          "Readying assets"
-        ],
-        "processing": [
-          "Initialising payment",
-          "Securing your assets",
-          "Finalising payment"
-        ]
+        "ready1": "Collecting your order",
+        "ready2": "Talking to wallet",
+        "ready3": "Readying assets",
+        "processing1": "Initialising payment",
+        "processing2": "Securing your assets",
+        "processing3": "Finalising payment"
       }
     },
     "PAY_WITH_COINS": {

@@ -283,8 +283,12 @@
         "captionCTA": "코인 추가"
       },
       "loading": {
-        "ready": ["주문 수집 중", "지갑과 대화 중", "자산 준비 중"],
-        "processing": ["결제 초기화 중", "자산 보호 중", "결제 완료 중"]
+        "ready1": "주문 수집 중",
+        "ready2": "지갑과 대화 중",
+        "ready3": "자산 준비 중",
+        "processing1": "결제 초기화 중",
+        "processing2": "자산 보호 중",
+        "processing3": "결제 완료 중"
       }
     },
     "PAY_WITH_COINS": {
