@@ -20,25 +20,26 @@ const processProviders = (checkout: Checkout | null, injectedProviders: EIP6963P
     'io.metamask', // MetaMask
     // 'xyz.frontier.wallet', // Frontier
     // 'me.rainbow', // Rainbow
-    // 'com.coinbase.wallet', // Coinbase Wallet
+    'com.coinbase.wallet', // Coinbase Wallet
   ];
-  const uniqueRdnsSet = new Set();
+  // const uniqueRdnsSet = new Set();
   const filteredProviders = injectedProviders
-    .filter((provider) => {
-      if (allowedWalletRdns.includes(provider.info.rdns)) {
-        if (!uniqueRdnsSet.has(provider.info.rdns)) {
-          uniqueRdnsSet.add(provider.info.rdns);
-          return true;
-        }
-      }
-
-      return false;
-    })
+    // .filter((provider) => {
+    //   if (allowedWalletRdns.includes(provider.info.rdns)) {
+    //     if (!uniqueRdnsSet.has(provider.info.rdns)) {
+    //       uniqueRdnsSet.add(provider.info.rdns);
+    //       return true;
+    //     }
+    //   }
+    //
+    //   return false;
+    // })
     .sort((a, b) => {
       // Get the index of the rdns for each provider
-      const indexA = allowedWalletRdns.indexOf(a.info.rdns);
-      const indexB = allowedWalletRdns.indexOf(b.info.rdns);
-
+      let indexA = allowedWalletRdns.indexOf(a.info.rdns);
+      if (indexA < 0) indexA = 999;
+      let indexB = allowedWalletRdns.indexOf(b.info.rdns);
+      if (indexB < 0) indexB = 999;
       // Sort based on the index
       return indexA - indexB;
     });
