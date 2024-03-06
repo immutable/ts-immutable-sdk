@@ -292,6 +292,19 @@
         "processing": "구매 처리 중"
       }
     },
+    "PAY_WITH_COINS": {
+      "header": {
+        "heading": "코인으로 결제",
+        "caption": "지갑에 있는 코인 잔액을 이용하여"
+      },
+      "button": {
+        "buyNow": "지금 구매"
+      }
+    },
+    "PAY_WITH_CARD": {
+      "screenTitle": "카드로 결제",
+      "loading": "Transak으로 이동하는 중"
+    },
     "SALE_FAIL": {
       "errors": {
         "TRANSACTION_FAILED": {

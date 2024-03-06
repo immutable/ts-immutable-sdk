@@ -288,6 +288,19 @@
         "processing": "正在处理购买"
       }
     },
+    "PAY_WITH_COINS": {
+      "header": {
+        "heading": "用您的硬币支付",
+        "caption": "使用您钱包中的硬币余额"
+      },
+      "button": {
+        "buyNow": "立即购买"
+      }
+    },
+    "PAY_WITH_CARD": {
+      "screenTitle": "用卡支付",
+      "loading": "带您前往Transak"
+    },
     "SALE_FAIL": {
       "errors": {
         "TRANSACTION_FAILED": {

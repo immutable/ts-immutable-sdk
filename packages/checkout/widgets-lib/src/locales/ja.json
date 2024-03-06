@@ -295,6 +295,19 @@
         "processing": "購入処理中"
       }
     },
+    "PAY_WITH_COINS": {
+      "header": {
+        "heading": "あなたので支払う",
+        "caption": "ウォレットのコイン残高を使用して"
+      },
+      "button": {
+        "buyNow": "今すぐ購入"
+      }
+    },
+    "PAY_WITH_CARD": {
+      "screenTitle": "カードで支払う",
+      "loading": "Transakに移動しています"
+    },
     "SALE_FAIL": {
       "errors": {
         "TRANSACTION_FAILED": {
