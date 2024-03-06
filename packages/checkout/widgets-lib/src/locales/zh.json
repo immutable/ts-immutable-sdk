@@ -267,38 +267,22 @@
       "options": {
         "crypto": {
           "heading": "硬币",
-          "caption": "使用您钱包中的硬币余额",
-          "disabledCaption": "我们看不到您余额中有足够多的硬币"
+          "caption": "如果您的余额中有硬币，这是最快的支付方式。",
+          "disabledCaption": "我们看不到您的余额中有足够的硬币"
         },
         "fiat": {
-          "heading": "卡",
-          "caption": "Transak也支持使用GooglePay",
-          "disabledCaption": null
+          "debit" : {
+            "heading": "借记卡",
+            "caption": "推荐使用卡支付的方式。",
+            "disabledCaption": null
+          },
+          "credit" : {
+            "heading": "信用卡",
+            "caption": "不推荐使用，因为您的银行可能会阻止交易。",
+            "disabledCaption": null
+          }
         }
-      },
-      "insufficientCoinsBanner": {
-        "caption": "硬币余额不足。请用卡支付以继续，或者",
-        "captionEnd": "再次尝试。",
-        "captionCTA": "添加硬币"
-      },
-      "loading": {
-        "ready": "准备购买",
-        "confirm": "在您的钱包中确认",
-        "processing": "正在处理购买"
       }
-    },
-    "PAY_WITH_COINS": {
-      "header": {
-        "heading": "用您的硬币支付",
-        "caption": "使用您钱包中的硬币余额"
-      },
-      "button": {
-        "buyNow": "立即购买"
-      }
-    },
-    "PAY_WITH_CARD": {
-      "screenTitle": "用卡支付",
-      "loading": "带您前往Transak"
     },
     "SALE_FAIL": {
       "errors": {

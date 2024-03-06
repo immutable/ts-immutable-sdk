@@ -267,13 +267,20 @@
       "options": {
         "crypto": {
           "heading": "Coins",
-          "caption": "Using the coins balance in your wallet",
+          "caption": "The fastest way to pay, if you have coins in your balance.",
           "disabledCaption": "We can't see enough coins in your balance"
         },
         "fiat": {
-          "heading": "Card",
-          "caption": "GooglePay also available with Transak",
-          "disabledCaption": null
+          "debit" : {
+            "heading": "Debit Card",
+            "caption": "The recommended way to pay with card.",
+            "disabledCaption": null
+          },
+          "credit" : {
+            "heading": "Credit Card",
+            "caption": "Not recommended since transactions may be blocked by your bank.",
+            "disabledCaption": null
+          }
         }
       },
       "insufficientCoinsBanner": {
@@ -286,19 +293,6 @@
         "confirm": "Confirm in your wallet",
         "processing": "Processing purchase"
       }
-    },
-    "PAY_WITH_COINS": {
-      "header": {
-        "heading": "Pay with your",
-        "caption": "Using the coins balance in your wallet"
-      },
-      "button": {
-        "buyNow": "Buy now"
-      }
-    },
-    "PAY_WITH_CARD": {
-      "screenTitle": "Pay with card",
-      "loading": "Taking you to Transak"
     },
     "SALE_FAIL": {
       "errors": {
