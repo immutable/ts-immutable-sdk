@@ -63,7 +63,7 @@ export function PaymentMethods() {
           type: ViewActions.UPDATE_VIEW,
           view: {
             type: SharedViews.LOADING_VIEW,
-            data: { loadingText: t('views.PAYMENT_METHODS.loading.ready') },
+            data: { loadingText: t('views.PAYMENT_METHODS.loading.ready1') },
           },
         },
       });
