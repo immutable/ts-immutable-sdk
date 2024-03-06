@@ -13,14 +13,25 @@ export function PayWithCoins() {
     sendTransactionSuccessEvent,
     sendFailedEvent,
     sendCloseEvent,
+    sendSuccessEvent,
   } = useSaleEvent();
-  const { execute, signResponse, executeResponse } = useSaleContext();
+  const {
+    execute, signResponse, executeResponse, signTokenIds,
+  } = useSaleContext();
   const executedTxns = executeResponse?.transactions.length || 0;
 
-  let loadingText = t('views.PAYMENT_METHODS.loading.ready');
+  let loadingText = [
+    t('views.PAYMENT_METHODS.loading.ready1'),
+    t('views.PAYMENT_METHODS.loading.ready2'),
+    t('views.PAYMENT_METHODS.loading.ready3'),
+  ];
 
   if (executedTxns >= 1) {
-    loadingText = t('views.PAYMENT_METHODS.loading.processing');
+    loadingText = [
+      t('views.PAYMENT_METHODS.loading.processing1'),
+      t('views.PAYMENT_METHODS.loading.processing2'),
+      t('views.PAYMENT_METHODS.loading.processing3'),
+    ];
   }
 
   const sendTransaction = async () => {
@@ -44,6 +55,7 @@ export function PayWithCoins() {
 
   useEffect(() => {
     if (executeResponse?.done === true) {
+      sendSuccessEvent(SaleWidgetViews.SALE_SUCCESS, executeResponse?.transactions, signTokenIds);
       sendCloseEvent(SaleWidgetViews.SALE_SUCCESS);
     }
   }, [executeResponse]);
