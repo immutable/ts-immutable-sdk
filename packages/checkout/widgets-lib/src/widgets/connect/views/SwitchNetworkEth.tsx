@@ -2,6 +2,7 @@ import {
   useCallback, useContext, useEffect, useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
+import { getChainNameById } from 'lib/chains';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../../components/Footer/FooterButton';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
@@ -86,7 +87,9 @@ export function SwitchNetworkEth() {
       floatHeader
     >
       <SimpleTextBody
-        heading={t('views.SWITCH_NETWORK.eth.heading')}
+        heading={t('views.SWITCH_NETWORK.eth.heading', {
+          networkName: getChainNameById(getL1ChainId(checkout!.config)),
+        })}
       >
         {t('views.SWITCH_NETWORK.eth.body')}
       </SimpleTextBody>

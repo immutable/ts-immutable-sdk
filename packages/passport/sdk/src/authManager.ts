@@ -60,6 +60,7 @@ const getAuthConfiguration = (config: PassportConfiguration): UserManagerSetting
       end_session_endpoint: endSessionEndpoint,
     },
     mergeClaims: true,
+    automaticSilentRenew: false, // Disabled until https://github.com/authts/oidc-client-ts/issues/430 has been resolved
     scope: oidcConfiguration.scope,
     userStore,
   };

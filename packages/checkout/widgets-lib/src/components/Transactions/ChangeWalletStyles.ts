@@ -25,3 +25,11 @@ export const wcStickerLogoStyles = {
   backgroundColor: 'base.color.translucent.inverse.900',
   borderRadius: 'base.borderRadius.x2',
 };
+
+export const rawImageStyle = {
+  backgroundColor: 'transparent',
+  width: 'base.icon.size.400',
+  height: 'base.icon.size.400',
+  marginRight: 'base.spacing.x1',
+  padding: 'base.spacing.x1',
+};

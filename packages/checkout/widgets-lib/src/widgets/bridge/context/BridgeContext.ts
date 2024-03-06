@@ -9,11 +9,20 @@ import {
 } from '@imtbl/checkout-sdk';
 import { createContext } from 'react';
 
+export type WalletProviderInfo = {
+  name: string;
+  icon: string;
+  rdns: string;
+  uuid: string;
+};
+
 export type WalletAndNetworkDetails = {
   web3Provider: Web3Provider;
+  walletProviderInfo: WalletProviderInfo;
   walletAddress: string;
   network: ChainId;
 };
+
 export interface BridgeState {
   checkout: Checkout;
   web3Provider: Web3Provider | null;

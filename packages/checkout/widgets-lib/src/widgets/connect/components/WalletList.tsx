@@ -1,14 +1,12 @@
 import { Box, MenuItem } from '@biom3/react';
 import {
   ChainId,
-  WalletFilter,
-  WalletFilterTypes,
-  WalletInfo,
-  WalletProviderName,
+  WalletProviderName, WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
 import {
-  useCallback, useContext, useEffect, useState,
+  useCallback, useContext, useMemo,
 } from 'react';
+import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Web3Provider } from '@ethersproject/providers';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
@@ -24,23 +22,35 @@ import {
   UserJourney,
 } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { useWalletConnect } from '../../../lib/hooks/useWalletConnect';
+import { useInjectedProviders } from '../../../lib/hooks/useInjectedProviders';
+import { useAnimation } from '../../../lib/hooks/useAnimation';
+import { walletListStyle } from './WalletListStyles';
+import {
+  EIP1193Provider,
+  EIP6963ProviderDetail,
+  getProviderSlugFromRdns,
+} from '../../../lib/provider';
+import { getL1ChainId } from '../../../lib';
 
 export interface WalletListProps {
   targetChainId: ChainId;
-  walletFilterTypes?: WalletFilterTypes;
-  excludeWallets?: WalletFilter[];
 }
 
 export function WalletList(props: WalletListProps) {
   const { t } = useTranslation();
-  const { targetChainId, walletFilterTypes, excludeWallets } = props;
+  const { targetChainId } = props;
   const {
     connectDispatch,
-    connectState: { checkout, passport },
+    connectState: { checkout },
   } = useContext(ConnectContext);
   const { viewDispatch } = useContext(ViewContext);
-  const [wallets, setWallets] = useState<WalletInfo[]>([]);
   const { track } = useAnalytics();
+  const { listVariants, listItemVariants } = useAnimation();
+  const { providers } = useInjectedProviders({ checkout });
+  const filteredProviders = useMemo(() => (
+    providers.filter((provider) => (
+      !(provider.info.rdns === WalletProviderRdns.PASSPORT && targetChainId === getL1ChainId(checkout!.config))))
+  ), [providers]);
 
   const selectWeb3Provider = useCallback((web3Provider: any, providerName: string) => {
     connectDispatch({
@@ -57,7 +67,7 @@ export function WalletList(props: WalletListProps) {
     });
   }, []);
 
-  const { isWalletConnectEnabled, walletConnectBusy, openWalletConnectModal } = useWalletConnect({ checkout });
+  const { isWalletConnectEnabled, walletConnectBusy, openWalletConnectModal } = useWalletConnect();
 
   const connectCallback = async (ethereumProvider) => {
     if (ethereumProvider.connected && ethereumProvider.session) {
@@ -91,46 +101,25 @@ export function WalletList(props: WalletListProps) {
     });
   };
 
-  const excludedWallets = useCallback(() => {
-    const passportWalletProvider = {
-      walletProviderName: WalletProviderName.PASSPORT,
-    };
-    if (!excludeWallets && !passport) {
-      return [passportWalletProvider];
-    }
-    if (excludeWallets && !passport) {
-      excludeWallets.push(passportWalletProvider);
-      return excludeWallets;
-    }
-    return excludeWallets;
-  }, [excludeWallets, passport]);
-
-  useEffect(() => {
-    const getAllowedWallets = async () => {
-      const allowedWallets = await checkout?.getWalletAllowList({
-        type: walletFilterTypes ?? WalletFilterTypes.ALL,
-        exclude: excludedWallets(),
-      });
-      setWallets(allowedWallets?.wallets || []);
-    };
-    getAllowedWallets();
-  }, [checkout, excludedWallets, walletFilterTypes]);
-
   const onWalletClick = useCallback(
-    async (walletProviderName: WalletProviderName) => {
+    async (providerDetail: EIP6963ProviderDetail<EIP1193Provider>) => {
       track({
         userJourney: UserJourney.CONNECT,
         screen: 'ConnectWallet',
-        control: walletProviderName,
+        control: providerDetail.info.name,
         controlType: 'MenuItem',
+        extras: {
+          wallet: getProviderSlugFromRdns(providerDetail.info.rdns),
+          walletRdns: providerDetail.info.rdns,
+          walletUuid: providerDetail.info.uuid,
+        },
       });
       if (checkout) {
         try {
-          const providerResult = await checkout.createProvider({
-            walletProviderName,
-          });
-          const web3Provider = providerResult.provider;
-          selectWeb3Provider(web3Provider, walletProviderName);
+          selectWeb3Provider(
+            new Web3Provider(providerDetail.provider as any),
+            getProviderSlugFromRdns(providerDetail.info.rdns),
+          );
 
           viewDispatch({
             payload: {
@@ -157,42 +146,52 @@ export function WalletList(props: WalletListProps) {
   return (
     <Box
       testId="wallet-list"
-      sx={{
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'flex-start',
-      }}
+      rc={(
+        <motion.div
+          variants={listVariants}
+          initial="hidden"
+          animate="show"
+        />
+      )}
+      sx={walletListStyle}
     >
-      {wallets.map((wallet) => (
+      {filteredProviders.map((providerDetail, index) => (
         <WalletItem
+          key={providerDetail.info.rdns}
           onWalletClick={onWalletClick}
-          wallet={wallet}
-          key={wallet.walletProviderName}
+          providerDetail={providerDetail}
+          rc={(
+            <motion.div variants={listItemVariants} custom={index} />
+          )}
         />
       ))}
       {isWalletConnectEnabled && (
-        <MenuItem
-          testId="wallet-list-walletconnect"
-          size="medium"
-          emphasized
-          disabled={walletConnectBusy}
-          onClick={() => handleWalletConnectConnection()}
-          sx={{ marginBottom: 'base.spacing.x1' }}
+        <motion.div
+          variants={listItemVariants}
+          custom={filteredProviders.length}
+          key="walletconnect"
         >
-          <MenuItem.FramedLogo
-            logo="WalletConnectSymbol"
-            sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
-          />
-          <MenuItem.Label size="medium">
-            {t('wallets.walletconnect.heading')}
-          </MenuItem.Label>
-          <MenuItem.IntentIcon />
-          <MenuItem.Caption>
-            {t('wallets.walletconnect.description')}
-          </MenuItem.Caption>
-        </MenuItem>
+          <MenuItem
+            testId="wallet-list-walletconnect"
+            size="medium"
+            emphasized
+            disabled={walletConnectBusy}
+            onClick={() => handleWalletConnectConnection()}
+            sx={{ marginBottom: 'base.spacing.x1' }}
+          >
+            <MenuItem.FramedLogo
+              logo="WalletConnectSymbol"
+              sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
+            />
+            <MenuItem.Label size="medium">
+              {t('wallets.walletconnect.heading')}
+            </MenuItem.Label>
+            <MenuItem.IntentIcon />
+            <MenuItem.Caption>
+              {t('wallets.walletconnect.description')}
+            </MenuItem.Caption>
+          </MenuItem>
+        </motion.div>
       )}
     </Box>
   );
