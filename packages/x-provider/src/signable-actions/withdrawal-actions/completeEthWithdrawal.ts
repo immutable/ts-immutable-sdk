@@ -1,6 +1,7 @@
 import { Signer } from '@ethersproject/abstract-signer';
 import { TransactionResponse } from '@ethersproject/providers';
-import { Contracts, ImmutableXConfiguration, UsersApi } from '@imtbl/core-sdk';
+import { Contracts, UsersApi } from '@imtbl/core-sdk';
+import { ImmutableXConfiguration } from '@imtbl/x-client';
 import { ProviderConfiguration } from '../../config';
 import {
   getSignableRegistrationOnchain,
