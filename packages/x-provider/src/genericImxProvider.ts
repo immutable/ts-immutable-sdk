@@ -1,5 +1,4 @@
 import {
-  StarkSigner,
   TokenAmount,
   UnsignedTransferRequest,
   EthSigner,
@@ -13,6 +12,7 @@ import {
   GetSignableTradeRequest,
   CreateTradeResponse,
   NftTransferDetails,
+  StarkSigner,
 } from '@imtbl/x-client';
 import { TransactionResponse } from '@ethersproject/providers';
 import { ProviderConfiguration } from './config';
