@@ -4,6 +4,9 @@
       "body": {
         "heading": "지갑 연결",
         "content": "구매, 판매, 거래 및 코인과 수집품을 저장하려면 디지털 지갑을 연결하거나 만들어야 합니다."
+      },
+      "walletSelection": {
+        "heading": "지갑 선택"
       }
     },
     "CONNECT_SUCCESS": {
@@ -544,6 +547,10 @@
     "walletconnect": {
       "heading": "기타 지갑",
       "description": "MetaMask를 포함한 모든 블록체인 지갑에 연결할 수 있습니다"
+    },
+    "browserwallet": {
+      "heading": "브라우저 지갑",
+      "description": "블록체인 애플리케이션 및 web3에 접근하기 위한 디지털 지갑"
     }
   },
   "drawers": {

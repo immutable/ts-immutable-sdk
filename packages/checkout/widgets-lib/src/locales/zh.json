@@ -4,6 +4,9 @@
       "body": {
         "heading": "连接钱包",
         "content": "您需要连接或创建数字钱包以购买、出售、交易和存储您的硬币和收藏品。"
+      },
+      "walletSelection": {
+        "heading": "选择一个钱包"
       }
     },
     "CONNECT_SUCCESS": {
@@ -544,6 +547,10 @@
     "walletconnect": {
       "heading": "其他钱包",
       "description": "允许您连接到包括MetaMask在内的任何区块链钱包"
+    },
+    "browserwallet": {
+      "heading": "浏览器钱包",
+      "description": "用于访问区块链应用和web3的数字钱包"
     }
   },
   "drawers": {
