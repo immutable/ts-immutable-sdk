@@ -1,4 +1,4 @@
-import { EIP1193Provider, EIP6963ProviderDetail } from '../../../lib/provider';
+import { EIP1193Provider, EIP6963ProviderDetail } from '../../lib/provider';
 
 export type WalletChangeEvent = {
   walletType: 'injected' | 'walletconnect';

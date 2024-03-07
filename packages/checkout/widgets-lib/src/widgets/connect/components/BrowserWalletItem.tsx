@@ -91,7 +91,7 @@ export function BrowserWalletItem({
         {t('wallets.browserwallet.heading')}
       </MenuItem.Label>
       <MenuItem.IntentIcon />
-      <MenuItem.Caption sx={{ marginLeft: '65px' }}>
+      <MenuItem.Caption sx={{ marginLeft: '65px', width: '230px' }}>
         {t('wallets.browserwallet.description')}
       </MenuItem.Caption>
     </MenuItem>
