@@ -1,5 +1,4 @@
 import {
-  EncodingApi,
   TokensApi,
   ERC20Amount,
   Contracts,
@@ -58,7 +57,7 @@ describe('Deposit ERC20', () => {
       encodeAssetMock = jest.fn().mockResolvedValue({
         data: encodeAssetResponse,
       });
-      (EncodingApi as jest.Mock).mockReturnValue({
+      (imx.EncodingApi as jest.Mock).mockReturnValue({
         encodeAsset: encodeAssetMock,
       });
 

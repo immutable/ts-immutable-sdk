@@ -1,12 +1,13 @@
 import {
   EncodeAssetResponse,
-  EncodingApi,
   EncodingApiEncodeAssetRequest,
 } from '@imtbl/core-sdk';
+import { imx } from '@imtbl/generated-clients';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 import { testConfig } from '../../test/helpers';
 
 jest.mock('@imtbl/core-sdk');
+jest.mock('@imtbl/generated-clients');
 
 describe('getEncodeAssetInfo', () => {
   let encodeAssetMock: jest.Mock;
@@ -24,7 +25,7 @@ describe('getEncodeAssetInfo', () => {
       data: encodeAssetResponse,
     });
 
-    (EncodingApi as jest.Mock).mockReturnValue({
+    (imx.EncodingApi as jest.Mock).mockReturnValue({
       encodeAsset: encodeAssetMock,
     });
   });

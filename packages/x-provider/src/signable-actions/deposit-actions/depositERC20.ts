@@ -1,6 +1,5 @@
 import {
   Contracts,
-  EncodingApi,
   ERC20Amount,
   TokensApi,
   EthConfiguration,
@@ -96,7 +95,7 @@ export async function depositERC20({
   const user = await ethSigner.getAddress();
   const tokensApi = new TokensApi(apiConfiguration);
   const depositsApi = new imx.DepositsApi(apiConfiguration);
-  const encodingApi = new EncodingApi(apiConfiguration);
+  const encodingApi = new imx.EncodingApi(apiConfiguration);
   const usersApi = new imx.UsersApi(apiConfiguration);
 
   // Get decimals for this specific ERC20

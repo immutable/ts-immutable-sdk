@@ -1,5 +1,4 @@
 import {
-  EncodingApi,
   ERC721Token,
   Contracts,
 } from '@imtbl/core-sdk';
@@ -56,7 +55,7 @@ describe('Deposit ERC721', () => {
       encodeAssetMock = jest.fn().mockResolvedValue({
         data: encodeAssetResponse,
       });
-      (EncodingApi as jest.Mock).mockReturnValue({
+      (imx.EncodingApi as jest.Mock).mockReturnValue({
         encodeAsset: encodeAssetMock,
       });
 

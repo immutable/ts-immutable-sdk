@@ -1,6 +1,5 @@
 import {
   Contracts,
-  EncodingApi,
   ERC721Token,
 } from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
@@ -62,7 +61,7 @@ export async function depositERC721({
   const user = await ethSigner.getAddress();
   const { immutableXConfig } = config;
   const depositsApi = new imx.DepositsApi(immutableXConfig.apiConfiguration);
-  const encodingApi = new EncodingApi(immutableXConfig.apiConfiguration);
+  const encodingApi = new imx.EncodingApi(immutableXConfig.apiConfiguration);
   const usersApi = new imx.UsersApi(immutableXConfig.apiConfiguration);
 
   const data: ERC721TokenData = {
