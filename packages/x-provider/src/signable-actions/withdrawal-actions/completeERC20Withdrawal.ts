@@ -1,11 +1,11 @@
 import { Signer } from '@ethersproject/abstract-signer';
 import { TransactionResponse } from '@ethersproject/providers';
-import {
-  Contracts,
-  ERC20Token,
-} from '@imtbl/core-sdk';
+import { Contracts } from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
-import { ImmutableXConfiguration } from '@imtbl/x-client';
+import {
+  ERC20Token,
+  ImmutableXConfiguration,
+} from '@imtbl/x-client';
 import {
   getSignableRegistrationOnchain,
   isRegisteredOnChain,
