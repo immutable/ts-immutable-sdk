@@ -1,10 +1,10 @@
 import {
   Contracts,
-  EthConfiguration,
 } from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
 import {
   ERC20Amount,
+  EthConfiguration,
   EthSigner,
 } from '@imtbl/x-client';
 import { TransactionResponse } from '@ethersproject/providers';
