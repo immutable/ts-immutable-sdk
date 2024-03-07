@@ -4,6 +4,9 @@
       "body": {
         "heading": "Connect a wallet",
         "content": "You'll need to connect or create a digital wallet to buy, sell, trade and store your coins and collectibles."
+      },
+      "walletSelection": {
+        "heading": "Choose a wallet"
       }
     },
     "CONNECT_SUCCESS": {
@@ -547,7 +550,11 @@
     },
     "walletconnect": {
       "heading": "Other wallets",
-      "description": "Allows you to connect with any blockchain wallet including MetaMask"
+      "description": "Allows you to connect with any blockchain mobile wallet including MetaMask"
+    },
+    "browserwallet": {
+      "heading": "Browser wallets",
+      "description": "Digital wallet for accessing blockchain applications and web3"
     }
   },
   "drawers": {

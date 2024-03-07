@@ -1,11 +1,10 @@
-import { Box, useConvertSxToEmotionStyles } from '@biom3/react';
+import { Box, BoxProps, useConvertSxToEmotionStyles } from '@biom3/react';
 import { imageStyles, rawImageStyles } from './RawImageStyles';
 
-export interface RawImageProps {
+export type RawImageProps = {
   src: string;
   alt: string;
-  sx?: any;
-}
+} & BoxProps;
 
 export function RawImage({
   src,
