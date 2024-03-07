@@ -7,14 +7,18 @@ import {
   CreateTransferResponse,
   CreateTransferResponseV1,
   CreateWithdrawalResponse,
-  GetSignableTradeRequest,
   NftTransferDetails,
   StarkSigner,
   TokenAmount,
   UnsignedTransferRequest,
   EthSigner,
 } from '@imtbl/core-sdk';
-import { UnsignedOrderRequest, UnsignedExchangeTransferRequest, GetSignableCancelOrderRequest } from '@imtbl/x-client';
+import {
+  UnsignedOrderRequest,
+  UnsignedExchangeTransferRequest,
+  GetSignableCancelOrderRequest,
+  GetSignableTradeRequest,
+} from '@imtbl/x-client';
 import { TransactionResponse } from '@ethersproject/providers';
 import { ProviderConfiguration } from './config';
 import { IMXProvider } from './imxProvider';

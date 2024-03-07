@@ -1,4 +1,4 @@
-import { GetSignableTradeRequest } from '@imtbl/core-sdk';
+import { GetSignableTradeRequest } from '@imtbl/x-client';
 import { imx } from '@imtbl/generated-clients';
 import { signRaw } from '@imtbl/toolkit';
 import { generateSigners, privateKey1, testConfig } from '../test/helpers';
@@ -7,6 +7,7 @@ import { createTrade } from './trades';
 jest.mock('@imtbl/core-sdk');
 jest.mock('@imtbl/generated-clients');
 jest.mock('@imtbl/toolkit');
+jest.mock('@imtbl/x-client');
 
 describe('Trades', () => {
   describe('createTrade()', () => {

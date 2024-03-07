@@ -7,7 +7,6 @@ import {
   CreateTransferResponse,
   CreateTransferResponseV1,
   CreateWithdrawalResponse,
-  GetSignableTradeRequest,
   NftTransferDetails,
   TokenAmount,
   UnsignedTransferRequest,
@@ -16,6 +15,7 @@ import {
   UnsignedOrderRequest,
   UnsignedExchangeTransferRequest,
   GetSignableCancelOrderRequest,
+  GetSignableTradeRequest,
 } from '@imtbl/x-client';
 import { TransactionResponse } from '@ethersproject/providers';
 
