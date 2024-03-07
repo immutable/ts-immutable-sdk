@@ -1,8 +1,6 @@
-import {
-  ETHAmount,
-  Contracts,
-} from '@imtbl/core-sdk';
+import { Contracts } from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
+import { ETHAmount } from '@imtbl/x-client';
 import {
   generateSigners,
   privateKey1,

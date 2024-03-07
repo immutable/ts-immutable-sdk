@@ -1,9 +1,7 @@
-import {
-  Contracts,
-  ETHAmount,
-} from '@imtbl/core-sdk';
+import { Contracts } from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
 import {
+  ETHAmount,
   EthSigner,
   ImmutableXConfiguration,
 } from '@imtbl/x-client';
