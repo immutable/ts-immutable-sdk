@@ -4,9 +4,10 @@ import {
   EncodingApi,
   ERC20Amount,
   TokensApi,
-  EthSigner, EthConfiguration,
+  EthConfiguration,
 } from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
+import { EthSigner } from '@imtbl/x-client';
 import { TransactionResponse } from '@ethersproject/providers';
 import { parseUnits } from '@ethersproject/units';
 import { BigNumber } from '@ethersproject/bignumber';

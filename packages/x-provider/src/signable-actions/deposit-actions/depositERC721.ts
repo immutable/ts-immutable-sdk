@@ -3,10 +3,10 @@ import {
   DepositsApi,
   EncodingApi,
   ERC721Token,
-  EthSigner,
   ImmutableXConfiguration,
 } from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
+import { EthSigner } from '@imtbl/x-client';
 import { TransactionResponse } from '@ethersproject/providers';
 import {
   getSignableRegistrationOnchain,

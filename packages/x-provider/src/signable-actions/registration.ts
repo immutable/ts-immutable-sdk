@@ -1,9 +1,9 @@
 import {
   Contracts,
   GetSignableRegistrationResponse,
-  EthSigner,
 } from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
+import { EthSigner } from '@imtbl/x-client';
 import { signRaw } from '@imtbl/toolkit';
 import { isAxiosError } from 'axios';
 import { Signers } from './types';

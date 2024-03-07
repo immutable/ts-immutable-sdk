@@ -1,9 +1,7 @@
-import {
-  EthSigner,
-} from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
 import {
   AnyToken,
+  EthSigner,
   UnsignedOrderRequest,
   UnsignedExchangeTransferRequest,
   GetSignableCancelOrderRequest,
