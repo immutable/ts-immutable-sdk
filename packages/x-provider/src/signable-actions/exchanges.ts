@@ -1,7 +1,7 @@
 import {
   CreateTransferResponseV1,
-  UnsignedExchangeTransferRequest,
 } from '@imtbl/core-sdk';
+import { UnsignedExchangeTransferRequest } from '@imtbl/x-client';
 import { imx } from '@imtbl/generated-clients';
 import { signRaw, convertToSignableToken } from '@imtbl/toolkit';
 import { Signers } from './types';
