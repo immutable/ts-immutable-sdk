@@ -1,9 +1,9 @@
 import {
-  NftTransferDetails,
   TransfersApi,
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
+import { NftTransferDetails } from '@imtbl/x-client';
 import { signRaw, convertToSignableToken } from '@imtbl/toolkit';
 import { Signers } from './types';
 import { validateChain } from './helpers';

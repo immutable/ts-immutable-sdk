@@ -1,14 +1,15 @@
 import {
   UnsignedTransferRequest,
   TransfersApi,
-  NftTransferDetails,
 } from '@imtbl/core-sdk';
+import { NftTransferDetails } from '@imtbl/x-client';
 import { signRaw, convertToSignableToken } from '@imtbl/toolkit';
 import { generateSigners, privateKey1, testConfig } from '../test/helpers';
 import { transfer, batchTransfer } from './transfer';
 
 jest.mock('@imtbl/core-sdk');
 jest.mock('@imtbl/toolkit');
+jest.mock('@imtbl/x-client');
 
 describe('Transfer', () => {
   describe('transfer()', () => {
