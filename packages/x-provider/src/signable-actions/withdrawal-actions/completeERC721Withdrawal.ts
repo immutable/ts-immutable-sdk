@@ -3,9 +3,9 @@ import {
   MintsApi,
   Contracts,
   ImmutableXConfiguration,
-  UsersApi,
   ERC721Token,
 } from '@imtbl/core-sdk';
+import { imx } from '@imtbl/generated-clients';
 import * as encUtils from 'enc-utils';
 import { TransactionResponse } from '@ethersproject/providers';
 import { ProviderConfiguration } from '../../config';
@@ -60,7 +60,7 @@ async function executeRegisterAndWithdrawMintableERC721(
   config: ImmutableXConfiguration,
 ): Promise<TransactionResponse> {
   const etherKey = await ethSigner.getAddress();
-  const usersApi = new UsersApi(config.apiConfiguration);
+  const usersApi = new imx.UsersApi(config.apiConfiguration);
   const signableResult = await getSignableRegistrationOnchain(
     etherKey,
     starkPublicKey,
@@ -141,7 +141,7 @@ async function executeRegisterAndWithdrawERC721(
   config: ImmutableXConfiguration,
 ): Promise<TransactionResponse> {
   const etherKey = await ethSigner.getAddress();
-  const usersApi = new UsersApi(config.apiConfiguration);
+  const usersApi = new imx.UsersApi(config.apiConfiguration);
   const signableResult = await getSignableRegistrationOnchain(
     etherKey,
     starkPublicKey,

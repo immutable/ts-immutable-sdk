@@ -3,8 +3,8 @@ import {
   RegisterUserResponse,
   GetSignableRegistrationResponse,
   EthSigner,
-  UsersApi,
 } from '@imtbl/core-sdk';
+import { imx } from '@imtbl/generated-clients';
 import { signRaw } from '@imtbl/toolkit';
 import { isAxiosError } from 'axios';
 import { Signers } from './types';
@@ -16,7 +16,7 @@ export async function registerOffchain(
   config: ProviderConfiguration,
 ): Promise<RegisterUserResponse> {
   await validateChain(signers.ethSigner, config.immutableXConfig);
-  const usersApi = new UsersApi(config.immutableXConfig.apiConfiguration);
+  const usersApi = new imx.UsersApi(config.immutableXConfig.apiConfiguration);
 
   const userAddress = await signers.ethSigner.getAddress();
   const starkPublicKey = await signers.starkSigner.getAddress();
@@ -48,7 +48,7 @@ export async function registerOffchain(
 
 export async function isRegisteredOffchain(ethAddress: string, config: ProviderConfiguration): Promise<boolean> {
   try {
-    const usersApi = new UsersApi(config.immutableXConfig.apiConfiguration);
+    const usersApi = new imx.UsersApi(config.immutableXConfig.apiConfiguration);
     const getUsersResult = await usersApi.getUsers({
       user: ethAddress,
     });
@@ -92,7 +92,7 @@ export async function isRegisteredOnChain(
 export async function getSignableRegistrationOnchain(
   etherKey: string,
   starkPublicKey: string,
-  usersApi: UsersApi,
+  usersApi: imx.UsersApi,
 ): Promise<GetSignableRegistrationResponse> {
   const response = await usersApi.getSignableRegistration({
     getSignableRegistrationRequest: {

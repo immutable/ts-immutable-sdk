@@ -4,8 +4,8 @@ import {
   Contracts,
   ERC20Token,
   ImmutableXConfiguration,
-  UsersApi,
 } from '@imtbl/core-sdk';
+import { imx } from '@imtbl/generated-clients';
 import {
   getSignableRegistrationOnchain,
   isRegisteredOnChain,
@@ -36,7 +36,7 @@ async function executeRegisterAndWithdrawERC20({
 }: ExecuteRegisterAndWithdrawERC20Params): Promise<TransactionResponse> {
   const etherKey = await ethSigner.getAddress();
   const imxConfig = config.immutableXConfig;
-  const usersApi = new UsersApi(imxConfig.apiConfiguration);
+  const usersApi = new imx.UsersApi(imxConfig.apiConfiguration);
   const signableResult = await getSignableRegistrationOnchain(
     etherKey,
     starkPublicKey,

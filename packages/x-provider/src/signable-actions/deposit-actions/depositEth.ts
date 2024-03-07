@@ -5,8 +5,8 @@ import {
   ETHAmount,
   EthSigner,
   ImmutableXConfiguration,
-  UsersApi,
 } from '@imtbl/core-sdk';
+import { imx } from '@imtbl/generated-clients';
 import { parseUnits } from '@ethersproject/units';
 import { BigNumber } from '@ethersproject/bignumber';
 import { TransactionResponse } from '@ethersproject/providers';
@@ -35,7 +35,7 @@ async function executeRegisterAndDepositEth(
   starkPublicKey: string,
   vaultId: number,
   config: ImmutableXConfiguration,
-  usersApi: UsersApi,
+  usersApi: imx.UsersApi,
 ): Promise<TransactionResponse> {
   const etherKey = await ethSigner.getAddress();
   const coreContract = Contracts.Core.connect(
@@ -95,7 +95,7 @@ export async function depositEth({
   const imxConfig = config.immutableXConfig;
   const depositsApi = new DepositsApi(imxConfig.apiConfiguration);
   const encodingApi = new EncodingApi(imxConfig.apiConfiguration);
-  const usersApi = new UsersApi(imxConfig.apiConfiguration);
+  const usersApi = new imx.UsersApi(imxConfig.apiConfiguration);
 
   const getSignableDepositRequest = {
     user,

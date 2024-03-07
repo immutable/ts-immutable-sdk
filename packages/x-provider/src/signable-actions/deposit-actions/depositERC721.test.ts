@@ -1,10 +1,10 @@
 import {
   DepositsApi,
   EncodingApi,
-  UsersApi,
   ERC721Token,
   Contracts,
 } from '@imtbl/core-sdk';
+import { imx } from '@imtbl/generated-clients';
 import {
   generateSigners,
   privateKey1,
@@ -14,6 +14,7 @@ import {
 import { depositERC721 } from '.';
 
 jest.mock('@imtbl/core-sdk');
+jest.mock('@imtbl/generated-clients');
 
 describe('Deposit ERC721', () => {
   describe('depositERC721()', () => {
@@ -63,7 +64,7 @@ describe('Deposit ERC721', () => {
       getSignableRegistrationMock = jest.fn().mockResolvedValue({
         data: getSignableRegistrationResponse,
       });
-      (UsersApi as jest.Mock).mockReturnValue({
+      (imx.UsersApi as jest.Mock).mockReturnValue({
         getSignableRegistration: getSignableRegistrationMock,
       });
 

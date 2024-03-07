@@ -1,11 +1,11 @@
 import {
   DepositsApi,
   EncodingApi,
-  UsersApi,
   TokensApi,
   ERC20Amount,
   Contracts,
 } from '@imtbl/core-sdk';
+import { imx } from '@imtbl/generated-clients';
 import {
   generateSigners,
   privateKey1,
@@ -15,6 +15,7 @@ import {
 import { depositERC20 } from '.';
 
 jest.mock('@imtbl/core-sdk');
+jest.mock('@imtbl/generated-clients');
 
 describe('Deposit ERC20', () => {
   describe('depositERC20()', () => {
@@ -72,7 +73,7 @@ describe('Deposit ERC20', () => {
       getSignableRegistrationMock = jest.fn().mockResolvedValue({
         data: getSignableRegistrationResponse,
       });
-      (UsersApi as jest.Mock).mockReturnValue({
+      (imx.UsersApi as jest.Mock).mockReturnValue({
         getSignableRegistration: getSignableRegistrationMock,
       });
 
@@ -93,8 +94,7 @@ describe('Deposit ERC20', () => {
     const testCases = [{ isRegistered: true }, { isRegistered: false }];
 
     testCases.forEach((testCase) => {
-      test(`should make the correct api requests when user is ${
-        testCase.isRegistered ? '' : 'not'
+      test(`should make the correct api requests when user is ${testCase.isRegistered ? '' : 'not'
       } registered on-chain`, async () => {
         (Contracts.Registration.connect as jest.Mock).mockReturnValue({
           isRegistered: async () => testCase.isRegistered,
