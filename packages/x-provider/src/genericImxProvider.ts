@@ -3,7 +3,6 @@ import {
   RegisterUserResponse,
   CancelOrderResponse,
   CreateOrderResponse,
-  CreateTradeResponse,
   CreateTransferResponse,
   CreateTransferResponseV1,
   CreateWithdrawalResponse,
@@ -18,6 +17,7 @@ import {
   UnsignedExchangeTransferRequest,
   GetSignableCancelOrderRequest,
   GetSignableTradeRequest,
+  CreateTradeResponse,
 } from '@imtbl/x-client';
 import { TransactionResponse } from '@ethersproject/providers';
 import { ProviderConfiguration } from './config';

@@ -1,5 +1,4 @@
-import { CreateTradeResponse } from '@imtbl/core-sdk';
-import { GetSignableTradeRequest } from '@imtbl/x-client';
+import { GetSignableTradeRequest, CreateTradeResponse } from '@imtbl/x-client';
 import { imx } from '@imtbl/generated-clients';
 import { signRaw } from '@imtbl/toolkit';
 import { Signers } from './types';
