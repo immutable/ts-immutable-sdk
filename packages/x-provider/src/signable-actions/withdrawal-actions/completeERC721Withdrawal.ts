@@ -1,6 +1,5 @@
 import { Signer } from '@ethersproject/abstract-signer';
 import {
-  MintsApi,
   Contracts,
   ImmutableXConfiguration,
   ERC721Token,
@@ -231,7 +230,7 @@ export async function completeERC721WithdrawalAction({
   const { tokenAddress } = token;
   const { tokenId } = token;
   const imxConfig = config.immutableXConfig;
-  const mintsApi = new MintsApi(imxConfig.apiConfiguration);
+  const mintsApi = new imx.MintsApi(imxConfig.apiConfiguration);
 
   return await mintsApi
     .getMintableTokenDetailsByClientTokenId({

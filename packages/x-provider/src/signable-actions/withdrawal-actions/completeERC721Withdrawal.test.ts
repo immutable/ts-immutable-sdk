@@ -1,4 +1,5 @@
-import { Contracts, MintableTokenDetails, MintsApi } from '@imtbl/core-sdk';
+import { Contracts, MintableTokenDetails } from '@imtbl/core-sdk';
+import { imx } from '@imtbl/generated-clients';
 import * as encUtils from 'enc-utils';
 import { TransactionResponse } from '@ethersproject/providers';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
@@ -19,6 +20,7 @@ jest.mock('@imtbl/toolkit');
 jest.mock('enc-utils');
 jest.mock('../registration');
 jest.mock('./getEncodeAssetInfo');
+jest.mock('@imtbl/generated-clients');
 
 async function act(): Promise<TransactionResponse> {
   const signers = await generateSigners(privateKey1);
@@ -51,7 +53,7 @@ describe('completeERC721Withdrawal action', () => {
       jest.restoreAllMocks();
       (getEncodeAssetInfo as jest.Mock).mockResolvedValue(encodeAssetResponse);
       (encUtils.sanitizeHex as jest.Mock).mockResolvedValue(mintingBlob);
-      (MintsApi as jest.Mock).mockReturnValue({
+      (imx.MintsApi as jest.Mock).mockReturnValue({
         getMintableTokenDetailsByClientTokenId: jest.fn().mockResolvedValue({
           data: mintableErc721Token,
         }),
@@ -100,7 +102,7 @@ describe('completeERC721Withdrawal action', () => {
           status: 404,
         },
       };
-      (MintsApi as jest.Mock).mockReturnValue({
+      (imx.MintsApi as jest.Mock).mockReturnValue({
         getMintableTokenDetailsByClientTokenId: jest
           .fn()
           .mockRejectedValue(error),
@@ -139,7 +141,7 @@ describe('completeERC721Withdrawal action', () => {
           status: 500,
         },
       };
-      (MintsApi as jest.Mock).mockReturnValue({
+      (imx.MintsApi as jest.Mock).mockReturnValue({
         getMintableTokenDetailsByClientTokenId: jest
           .fn()
           .mockRejectedValue(() => {
