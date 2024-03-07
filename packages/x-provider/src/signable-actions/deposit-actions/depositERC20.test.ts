@@ -1,8 +1,6 @@
-import {
-  ERC20Amount,
-  Contracts,
-} from '@imtbl/core-sdk';
+import { Contracts } from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
+import { ERC20Amount } from '@imtbl/x-client';
 import {
   generateSigners,
   privateKey1,
