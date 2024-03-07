@@ -1,5 +1,4 @@
 import {
-  TokenAmount,
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
@@ -11,6 +10,7 @@ import {
   GetSignableTradeRequest,
   CreateTradeResponse,
   NftTransferDetails,
+  TokenAmount,
 } from '@imtbl/x-client';
 import { TransactionResponse } from '@ethersproject/providers';
 
