@@ -644,6 +644,18 @@
         "body": "您需要切换到{{chain}}网络才能继续进行"
       },
       "switchButton": "切换到{{chain}}"
+    },
+    "walletConnectionError": {
+      "unableToConnect": {
+          "heading": "无法连接",
+          "body": "请检查您的钱包并重试，或关闭并尝试其他选项。",
+          "actionButtonText": "重试"
+      },
+      "changedYourMind": {
+          "heading": "改变主意了吗？",
+          "body": "确保弹出窗口已启用，并按照钱包中的提示进行连接。",
+          "actionButtonText": "重试"
+      }
     }
   }
 }
