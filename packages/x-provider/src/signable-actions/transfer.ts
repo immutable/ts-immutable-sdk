@@ -1,5 +1,4 @@
 import {
-  CreateTransferResponseV1,
   NftTransferDetails,
   TransfersApi,
   UnsignedTransferRequest,
@@ -26,7 +25,7 @@ export async function transfer({
   signers: { ethSigner, starkSigner },
   request,
   config,
-}: TransfersWorkflowParams): Promise<CreateTransferResponseV1> {
+}: TransfersWorkflowParams): Promise<imx.CreateTransferResponseV1> {
   await validateChain(ethSigner, config.immutableXConfig);
 
   const ethAddress = await ethSigner.getAddress();

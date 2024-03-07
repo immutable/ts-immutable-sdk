@@ -1,5 +1,4 @@
 import {
-  CreateTransferResponseV1,
   CreateWithdrawalResponse,
   NftTransferDetails,
   StarkSigner,
@@ -123,7 +122,7 @@ export class GenericIMXProvider implements IMXProvider {
 
   exchangeTransfer(
     request: UnsignedExchangeTransferRequest,
-  ): Promise<CreateTransferResponseV1> {
+  ): Promise<imx.CreateTransferResponseV1> {
     return exchangeTransfer({
       signers: this.signers,
       request,
@@ -150,7 +149,7 @@ export class GenericIMXProvider implements IMXProvider {
 
   transfer(
     request: UnsignedTransferRequest,
-  ): Promise<CreateTransferResponseV1> {
+  ): Promise<imx.CreateTransferResponseV1> {
     return transfer({
       signers: this.signers,
       request,

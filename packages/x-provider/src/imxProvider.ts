@@ -1,5 +1,4 @@
 import {
-  CreateTransferResponseV1,
   CreateWithdrawalResponse,
   NftTransferDetails,
   TokenAmount,
@@ -68,9 +67,9 @@ export interface IMXProvider {
    * Create a new Transfer request
    *
    * @param {UnsignedTransferRequest} request The unsigned transfer request
-   * @return {Promise<CreateTransferResponseV1>} Returns a promise that resolves with the created Transfer
+   * @return {Promise<imx.CreateTransferResponseV1>} Returns a promise that resolves with the created Transfer
    */
-  transfer(request: UnsignedTransferRequest): Promise<CreateTransferResponseV1>;
+  transfer(request: UnsignedTransferRequest): Promise<imx.CreateTransferResponseV1>;
   /**
    * Create a batch of NFT transfer requests
    *
@@ -84,11 +83,11 @@ export interface IMXProvider {
    * Create a new Exchange transaction
    *
    * @param {UnsignedExchangeTransferRequest} request The unsigned exchange transfer request
-   * @return {Promise<CreateTransferResponseV1>} Returns a promise that resolves with the created Exchange Transaction
+   * @return {Promise<imx.CreateTransferResponseV1>} Returns a promise that resolves with the created Exchange Transaction
    */
   exchangeTransfer(
     request: UnsignedExchangeTransferRequest
-  ): Promise<CreateTransferResponseV1>;
+  ): Promise<imx.CreateTransferResponseV1>;
   /**
    * Deposit either ETH, ERC20 or ERC721 tokens
    *
