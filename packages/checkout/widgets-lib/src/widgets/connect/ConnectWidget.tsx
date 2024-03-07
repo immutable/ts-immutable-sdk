@@ -22,7 +22,6 @@ import {
 } from './context/ConnectContext';
 import { ConnectWidgetView, ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import { ConnectWallet } from './views/ConnectWallet';
-import { ReadyToConnect } from './views/ReadyToConnect';
 import { SwitchNetworkZkEVM } from './views/SwitchNetworkZkEVM';
 import { LoadingView } from '../../views/loading/LoadingView';
 import { ConnectLoaderSuccess } from '../../components/ConnectLoader/ConnectLoaderSuccess';
@@ -165,10 +164,7 @@ export default function ConnectWidget({
             <LoadingView loadingText="Loading" />
           )}
           {view.type === ConnectWidgetViews.CONNECT_WALLET && (
-            <ConnectWallet targetChainId={targetChain} />
-          )}
-          {view.type === ConnectWidgetViews.READY_TO_CONNECT && (
-            <ReadyToConnect targetChainId={targetChain} allowedChains={allowedChains ?? [targetChain]} />
+            <ConnectWallet targetChainId={targetChain} allowedChains={allowedChains ?? [targetChain]} />
           )}
           {view.type === ConnectWidgetViews.SWITCH_NETWORK && isZkEvmChainId(targetChain) && (
             <SwitchNetworkZkEVM />

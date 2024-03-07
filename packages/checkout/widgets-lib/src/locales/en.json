@@ -541,21 +541,21 @@
   "wallets": {
     "passport": {
       "heading": "Immutable Passport",
-      "accentText": "Recommended",
-      "description": "digital wallet and identity"
+      "description": "Your gaming wallet to pay with card, manage items & more."
     },
     "metamask": {
       "heading": "MetaMask",
-      "description": "Digital wallet for accessing blockchain applications and web3"
+      "description": "Digital wallet for accessing blockchain applications and web3."
     },
     "walletconnect": {
       "heading": "Other wallets",
-      "description": "Allows you to connect with any blockchain mobile wallet including MetaMask"
+      "description": "Allows you to connect with any blockchain mobile wallet including MetaMask."
     },
     "browserwallet": {
       "heading": "Browser wallets",
-      "description": "Digital wallet for accessing blockchain applications and web3"
-    }
+      "description": "Digital wallet for accessing blockchain applications and web3."
+    },
+    "recommended": "Recommended"
   },
   "drawers": {
     "feesBreakdown": {

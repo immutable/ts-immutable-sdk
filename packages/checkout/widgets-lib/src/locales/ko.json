@@ -541,21 +541,21 @@
   "wallets": {
     "passport": {
       "heading": "Immutable Passport",
-      "accentText": "추천",
-      "description": "디지털 지갑 및 신원"
+      "description": "카드로 결제하고, 아이템을 관리하는 게임용 지갑입니다."
     },
     "metamask": {
       "heading": "MetaMask",
-      "description": "블록체인 애플리케이션 및 웹3에 액세스하기 위한 디지털 지갑"
+      "description": "블록체인 애플리케이션 및 web3에 접근하는 디지털 지갑입니다."
     },
     "walletconnect": {
       "heading": "기타 지갑",
-      "description": "MetaMask를 포함한 모든 블록체인 지갑에 연결할 수 있습니다"
+      "description": "MetaMask를 포함한 모든 블록체인 모바일 지갑에 연결할 수 있습니다."
     },
     "browserwallet": {
       "heading": "브라우저 지갑",
-      "description": "블록체인 애플리케이션 및 web3에 접근하기 위한 디지털 지갑"
-    }
+      "description": "블록체인 애플리케이션 및 web3에 접근하는 디지털 지갑입니다."
+    },
+    "recommended": "추천"
   },
   "drawers": {
     "feesBreakdown": {

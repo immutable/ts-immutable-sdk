@@ -37,7 +37,7 @@ import {
   BridgeActions,
   BridgeContext,
 } from 'widgets/bridge/context/BridgeContext';
-import { WalletDrawer } from 'widgets/bridge/components/WalletDrawer';
+import { WalletDrawer } from 'components/WalletDrawer/WalletDrawer';
 import { sendBridgeWidgetCloseEvent } from '../../widgets/bridge/BridgeWidgetEvents';
 import { Shimmer } from './Shimmer';
 import {
@@ -51,7 +51,7 @@ import { KnownNetworkMap } from './transactionsType';
 import { TransactionList } from './TransactionList';
 import { NoTransactions } from './NoTransactions';
 import { useInjectedProviders } from '../../lib/hooks/useInjectedProviders';
-import { WalletChangeEvent } from '../../widgets/bridge/components/WalletDrawerEvents';
+import { WalletChangeEvent } from '../WalletDrawer/WalletDrawerEvents';
 
 type TransactionsProps = {
   defaultTokenImage: string;
