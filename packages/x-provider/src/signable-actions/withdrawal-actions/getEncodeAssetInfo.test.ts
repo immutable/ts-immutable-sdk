@@ -1,4 +1,3 @@
-import { EncodingApiEncodeAssetRequest } from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 import { testConfig } from '../../test/helpers';
@@ -46,6 +45,6 @@ describe('getEncodeAssetInfo', () => {
           data: tokenData,
         },
       },
-    } as EncodingApiEncodeAssetRequest);
+    } as imx.EncodingApiEncodeAssetRequest);
   });
 });
