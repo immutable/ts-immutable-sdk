@@ -3,9 +3,9 @@ import { TransactionResponse } from '@ethersproject/providers';
 import {
   Contracts,
   ERC20Token,
-  ImmutableXConfiguration,
 } from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
+import { ImmutableXConfiguration } from '@imtbl/x-client';
 import {
   getSignableRegistrationOnchain,
   isRegisteredOnChain,

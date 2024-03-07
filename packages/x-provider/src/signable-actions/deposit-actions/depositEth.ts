@@ -3,10 +3,12 @@ import {
   DepositsApi,
   EncodingApi,
   ETHAmount,
-  ImmutableXConfiguration,
 } from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
-import { EthSigner } from '@imtbl/x-client';
+import {
+  EthSigner,
+  ImmutableXConfiguration,
+} from '@imtbl/x-client';
 import { parseUnits } from '@ethersproject/units';
 import { BigNumber } from '@ethersproject/bignumber';
 import { TransactionResponse } from '@ethersproject/providers';

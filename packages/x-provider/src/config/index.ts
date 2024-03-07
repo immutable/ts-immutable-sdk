@@ -1,7 +1,7 @@
 import {
   Config as CoreSDKConfigOptions,
-  ImmutableXConfiguration,
 } from '@imtbl/core-sdk';
+import { ImmutableXConfiguration } from '@imtbl/x-client';
 import {
   Environment,
   ImmutableConfiguration,
@@ -13,7 +13,7 @@ interface ProviderOverrides {
 }
 
 interface ProviderModuleConfiguration
-  extends ModuleConfiguration<ProviderOverrides> {}
+  extends ModuleConfiguration<ProviderOverrides> { }
 
 export class ProviderConfiguration {
   readonly immutableXConfig: ImmutableXConfiguration;

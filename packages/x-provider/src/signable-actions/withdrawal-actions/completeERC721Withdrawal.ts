@@ -1,10 +1,10 @@
 import { Signer } from '@ethersproject/abstract-signer';
 import {
   Contracts,
-  ImmutableXConfiguration,
   ERC721Token,
 } from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
+import { ImmutableXConfiguration } from '@imtbl/x-client';
 import * as encUtils from 'enc-utils';
 import { TransactionResponse } from '@ethersproject/providers';
 import { ProviderConfiguration } from '../../config';

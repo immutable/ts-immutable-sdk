@@ -1,9 +1,11 @@
 import {
   WithdrawalsApi,
-  ImmutableXConfiguration,
 } from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
-import { TokenAmount } from '@imtbl/x-client';
+import {
+  TokenAmount,
+  ImmutableXConfiguration,
+} from '@imtbl/x-client';
 import { signMessage, convertToSignableToken } from '@imtbl/toolkit';
 import { Signers } from '../types';
 import { validateChain } from '../helpers';

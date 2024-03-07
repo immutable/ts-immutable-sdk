@@ -2,9 +2,9 @@ import {
   EncodeAssetRequestTokenTypeEnum,
   EncodeAssetResponse,
   EncodeAssetTokenData,
-  ImmutableXConfiguration,
   EncodingApi,
 } from '@imtbl/core-sdk';
+import { ImmutableXConfiguration } from '@imtbl/x-client';
 
 export async function getEncodeAssetInfo(
   assetType: string,
