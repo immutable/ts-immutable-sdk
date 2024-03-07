@@ -1,6 +1,3 @@
-import {
-  WithdrawalsApi,
-} from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
 import {
   TokenAmount,
@@ -29,7 +26,7 @@ export async function prepareWithdrawalAction(
     config,
   } = params;
   await validateChain(ethSigner, params.config);
-  const withdrawalsApi = new WithdrawalsApi(config.apiConfiguration);
+  const withdrawalsApi = new imx.WithdrawalsApi(config.apiConfiguration);
   const withdrawalAmount = type === 'ERC721' ? '1' : params.amount;
   const signableWithdrawalResult = await withdrawalsApi.getSignableWithdrawal({
     getSignableWithdrawalRequest: {

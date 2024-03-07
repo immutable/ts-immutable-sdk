@@ -1,6 +1,5 @@
 import {
   GetSignableWithdrawalResponse,
-  WithdrawalsApi,
 } from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
 import { convertToSignableToken, signMessage } from '@imtbl/toolkit';
@@ -12,6 +11,7 @@ import {
 
 jest.mock('@imtbl/core-sdk');
 jest.mock('@imtbl/toolkit');
+jest.mock('@imtbl/generated-clients');
 
 describe('prepareWithdrawal', () => {
   describe('prepareWithdrawal action', () => {
@@ -44,7 +44,7 @@ describe('prepareWithdrawal', () => {
         data: createWithdrawalResponse,
       });
 
-      (WithdrawalsApi as jest.Mock).mockReturnValue({
+      (imx.WithdrawalsApi as jest.Mock).mockReturnValue({
         getSignableWithdrawal: getSignableWithdrawalMock,
         createWithdrawal: createWithdrawalMock,
       });
