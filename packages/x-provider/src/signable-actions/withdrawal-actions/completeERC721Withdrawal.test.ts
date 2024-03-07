@@ -1,4 +1,4 @@
-import { Contracts, MintableTokenDetails } from '@imtbl/core-sdk';
+import { Contracts } from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
 import * as encUtils from 'enc-utils';
 import { TransactionResponse } from '@ethersproject/providers';
@@ -38,7 +38,7 @@ async function act(): Promise<TransactionResponse> {
 
 describe('completeERC721Withdrawal action', () => {
   describe('when ERC721 is mintable', () => {
-    const mintableErc721Token: MintableTokenDetails = {
+    const mintableErc721Token: imx.MintableTokenDetails = {
       token_id: '23',
       client_token_id: '12',
       blueprint: 'blueprint',
