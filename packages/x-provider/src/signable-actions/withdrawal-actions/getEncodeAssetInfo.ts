@@ -1,6 +1,5 @@
 import {
   EncodeAssetRequestTokenTypeEnum,
-  EncodeAssetResponse,
   EncodeAssetTokenData,
 } from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
@@ -11,7 +10,7 @@ export async function getEncodeAssetInfo(
   tokenType: EncodeAssetRequestTokenTypeEnum,
   config: ImmutableXConfiguration,
   tokenData?: EncodeAssetTokenData,
-): Promise<EncodeAssetResponse> {
+): Promise<imx.EncodeAssetResponse> {
   const encodingApi = new imx.EncodingApi(config.apiConfiguration);
   const result = await encodingApi.encodeAsset({
     assetType,

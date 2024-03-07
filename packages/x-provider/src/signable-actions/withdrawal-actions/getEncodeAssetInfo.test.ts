@@ -1,7 +1,4 @@
-import {
-  EncodeAssetResponse,
-  EncodingApiEncodeAssetRequest,
-} from '@imtbl/core-sdk';
+import { EncodingApiEncodeAssetRequest } from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 import { testConfig } from '../../test/helpers';
@@ -11,7 +8,7 @@ jest.mock('@imtbl/generated-clients');
 
 describe('getEncodeAssetInfo', () => {
   let encodeAssetMock: jest.Mock;
-  let encodeAssetResponse: EncodeAssetResponse;
+  let encodeAssetResponse: imx.EncodeAssetResponse;
   const assetType = 'asset-type';
 
   beforeEach(() => {
