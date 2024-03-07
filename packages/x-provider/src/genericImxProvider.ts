@@ -1,5 +1,4 @@
 import {
-  CreateWithdrawalResponse,
   NftTransferDetails,
   StarkSigner,
   TokenAmount,
@@ -139,7 +138,7 @@ export class GenericIMXProvider implements IMXProvider {
     );
   }
 
-  prepareWithdrawal(request: TokenAmount): Promise<CreateWithdrawalResponse> {
+  prepareWithdrawal(request: TokenAmount): Promise<imx.CreateWithdrawalResponse> {
     return prepareWithdrawal({
       signers: this.signers,
       withdrawal: request,

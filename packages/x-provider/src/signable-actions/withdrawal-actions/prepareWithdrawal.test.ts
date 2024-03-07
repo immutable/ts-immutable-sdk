@@ -1,8 +1,8 @@
 import {
-  CreateWithdrawalResponse,
   GetSignableWithdrawalResponse,
   WithdrawalsApi,
 } from '@imtbl/core-sdk';
+import { imx } from '@imtbl/generated-clients';
 import { convertToSignableToken, signMessage } from '@imtbl/toolkit';
 import { generateSigners, privateKey1, testConfig } from '../../test/helpers';
 import {
@@ -28,7 +28,7 @@ describe('prepareWithdrawal', () => {
       readable_transaction: '',
       verification_signature: '',
     };
-    const createWithdrawalResponse: CreateWithdrawalResponse = {
+    const createWithdrawalResponse: imx.CreateWithdrawalResponse = {
       time: 0,
       status: 'status',
       withdrawal_id: 12,

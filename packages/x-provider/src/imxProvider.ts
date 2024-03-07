@@ -1,5 +1,4 @@
 import {
-  CreateWithdrawalResponse,
   NftTransferDetails,
   TokenAmount,
   UnsignedTransferRequest,
@@ -101,7 +100,7 @@ export interface IMXProvider {
    * @param {TokenAmount} request The token type amount in its corresponding unit
    * @return {Promise<CreateWithdrawalResponse>} Returns a promise that resolves with the created Withdrawal
    */
-  prepareWithdrawal(request: TokenAmount): Promise<CreateWithdrawalResponse>;
+  prepareWithdrawal(request: TokenAmount): Promise<imx.CreateWithdrawalResponse>;
   /**
    * Completes a Withdrawal
    *

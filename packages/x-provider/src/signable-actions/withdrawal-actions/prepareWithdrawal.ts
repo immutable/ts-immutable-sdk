@@ -1,9 +1,9 @@
 import {
   WithdrawalsApi,
-  CreateWithdrawalResponse,
   ImmutableXConfiguration,
   TokenAmount,
 } from '@imtbl/core-sdk';
+import { imx } from '@imtbl/generated-clients';
 import { signMessage, convertToSignableToken } from '@imtbl/toolkit';
 import { Signers } from '../types';
 import { validateChain } from '../helpers';
@@ -20,7 +20,7 @@ export type PrepareWithdrawalWorkflowParams = TokenAmount & {
 
 export async function prepareWithdrawalAction(
   params: PrepareWithdrawalWorkflowParams,
-): Promise<CreateWithdrawalResponse> {
+): Promise<imx.CreateWithdrawalResponse> {
   const {
     signers: { ethSigner, starkSigner },
     type,
