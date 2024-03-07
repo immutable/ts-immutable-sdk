@@ -1,5 +1,4 @@
 import {
-  GetSignableOrderRequestV3,
   OrdersApiCreateOrderV3Request,
 } from '@imtbl/core-sdk';
 import { UnsignedOrderRequest, GetSignableCancelOrderRequest } from '@imtbl/x-client';
@@ -33,7 +32,7 @@ export async function createOrder({
 
   const amountSell = request.sell.type === 'ERC721' ? '1' : request.sell.amount;
   const amountBuy = request.buy.type === 'ERC721' ? '1' : request.buy.amount;
-  const getSignableOrderRequest: GetSignableOrderRequestV3 = {
+  const getSignableOrderRequest: imx.GetSignableOrderRequestV3 = {
     user: ethAddress,
     amount_buy: amountBuy,
     token_buy: convertToSignableToken(request.buy),
