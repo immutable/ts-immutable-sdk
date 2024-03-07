@@ -652,6 +652,18 @@
         "body": "You'll need to switch to the {{chain}} network to proceed"
       },
       "switchButton": "Switch to {{chain}}"
+    },
+    "walletConnectionError": {
+      "unableToConnect": {
+        "heading": "Unable to connect",
+        "body": "Check your wallet and try again, or close and try a different option",
+        "actionButtonText": "Try again"
+      },
+      "changedYourMind": {
+        "heading": "Changed your mind?",
+        "body": "Make sure pop ups are enabled and follow the prompts in your wallet to connect",
+        "actionButtonText": "Try again"
+      }
     }
   }
 }

@@ -645,6 +645,18 @@
         "body": "{{chain}}ネットワークに切り替える必要があります"
       },
       "switchButton": "{{chain}}に切り替える"
+    },
+    "walletConnectionError": {
+      "unableToConnect": {
+          "heading": "接続できません",
+          "body": "ウォレットを確認してもう一度お試しください。または、閉じて別のオプションを試してください。",
+          "actionButtonText": "もう一度試す"
+      },
+      "changedYourMind": {
+          "heading": "考えを変えましたか？",
+          "body": "ポップアップが有効になっていることを確認し、ウォレットのプロンプトに従って接続してください。",
+          "actionButtonText": "もう一度試す"
+      }
     }
   }
 }
