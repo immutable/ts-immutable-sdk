@@ -532,7 +532,6 @@ export function BridgeReviewSummary() {
         visible={showNotEnoughGasDrawer}
         onCloseDrawer={() => setShowNotEnoughGasDrawer(false)}
         walletAddress={from?.walletAddress || ''}
-        showAdjustAmount={isNativeToken(token?.address)}
         tokenSymbol={
             from?.network === getL1ChainId(checkout?.config)
               ? ETH_TOKEN_SYMBOL

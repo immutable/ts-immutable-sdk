@@ -8,11 +8,16 @@ export const containerStyles = {
   paddingX: 'base.spacing.x6',
 };
 
-export const contentTextStyles = {
+export const headingTextStyles = {
   fontFamily: 'base.font.family.heading.secondary',
   textAlign: 'center',
   marginTop: '15px',
   paddingX: 'base.spacing.x6',
+};
+
+export const bodyTextStyles = {
+  ...headingTextStyles,
+  color: 'base.color.text.body.secondary',
 };
 
 export const actionButtonContainerStyles = {

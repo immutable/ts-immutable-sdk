@@ -56,7 +56,11 @@
     },
     "ERROR_VIEW": {
       "heading": "出了些问题",
-      "body": ["您可以再试一次或联系", "支持", "寻求帮助。"],
+      "body": [
+        "您可以再试一次或联系",
+        "支持",
+        "寻求帮助。"
+      ],
       "actionText": "再试一次"
     },
     "SERVICE_UNAVAILABLE_ERROR_VIEW": {
@@ -576,14 +580,8 @@
     },
     "notEnoughGas": {
       "content": {
-        "eth": {
-          "heading": "余额过低",
-          "body": "您的ETH余额不足以支付此操作的燃气费。您可以直接使用MetaMask向您的钱包转入更多ETH。"
-        },
-        "imx": {
-          "heading": "您需要更多IMX币",
-          "body": "为了支付指定金额的费用，您需要添加更多IMX币。"
-        }
+        "heading": "您需要更多{{token}}来支付燃气费",
+        "body": "您的{{token}}余额不足以支付此操作的燃气费，因此在继续之前，您需要添加更多{{token}}。"
       },
       "buttons": {
         "adjustAmount": "调整金额",
