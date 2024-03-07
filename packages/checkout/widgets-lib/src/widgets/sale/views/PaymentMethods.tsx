@@ -8,7 +8,10 @@ import { useTranslation } from 'react-i18next';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import { FundWithSmartCheckoutSubViews, SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
+import {
+  FundWithSmartCheckoutSubViews,
+  SaleWidgetViews,
+} from '../../../context/view-context/SaleViewContextTypes';
 import {
   SharedViews,
   ViewActions,
@@ -18,7 +21,7 @@ import {
 import { PaymentOptions } from '../components/PaymentOptions';
 import { useSaleContext } from '../context/SaleContextProvider';
 import { useSaleEvent } from '../hooks/useSaleEvents';
-import { SaleErrorTypes } from '../types';
+import { SaleErrorTypes, SignPaymentTypes } from '../types';
 
 export function PaymentMethods() {
   const { t } = useTranslation();
@@ -40,8 +43,11 @@ export function PaymentMethods() {
       sendSelectedPaymentMethod(paymentMethod, SaleWidgetViews.PAYMENT_METHODS);
     }
 
-    if (paymentMethod === SalePaymentTypes.FIAT) {
-      sign(paymentMethod, () => {
+    if (
+      paymentMethod
+      && [SalePaymentTypes.DEBIT, SalePaymentTypes.CREDIT].includes(paymentMethod)
+    ) {
+      sign(SignPaymentTypes.FIAT, () => {
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,
@@ -57,13 +63,13 @@ export function PaymentMethods() {
           type: ViewActions.UPDATE_VIEW,
           view: {
             type: SharedViews.LOADING_VIEW,
-            data: { loadingText: t('views.PAYMENT_METHODS.loading.ready') },
+            data: { loadingText: t('views.PAYMENT_METHODS.loading.ready1') },
           },
         },
       });
     }
 
-    if (paymentMethod === SalePaymentTypes.CRYPTO) {
+    if (paymentMethod && paymentMethod === SalePaymentTypes.CRYPTO) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -95,9 +101,7 @@ export function PaymentMethods() {
           {t('views.PAYMENT_METHODS.insufficientCoinsBanner.caption')}
           <Link
             sx={{ mx: 'base.spacing.x1' }}
-            onClick={
-              () => onClickInsufficientCoinsBanner()
-            }
+            onClick={() => onClickInsufficientCoinsBanner()}
           >
             {t('views.PAYMENT_METHODS.insufficientCoinsBanner.captionCTA')}
           </Link>
@@ -141,9 +145,14 @@ export function PaymentMethods() {
           {t('views.PAYMENT_METHODS.header.heading')}
         </Heading>
         <Box sx={{ paddingX: 'base.spacing.x2' }}>
-          <PaymentOptions disabledOptions={disabledPaymentTypes} onClick={handleOptionClick} />
+          <PaymentOptions
+            disabledOptions={disabledPaymentTypes}
+            onClick={handleOptionClick}
+          />
         </Box>
-        {viewState.view.data?.showInsufficientCoinsBanner ? insufficientCoinsBanner : null}
+        {viewState.view.data?.showInsufficientCoinsBanner
+          ? insufficientCoinsBanner
+          : null}
       </Box>
     </SimpleLayout>
   );

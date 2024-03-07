@@ -1,5 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { isMetaMaskProvider, isPassportProvider } from '../providerUtils';
+import { isMetaMaskProvider, isPassportProvider } from '../provider';
 
 /**
  * identifyUser - function to identify a user by their wallet address and call the function to raise analytics

@@ -1,22 +1,24 @@
+import { LoadingOverlay } from '@biom3/react';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
-import { LoadingBox } from './LoadingBox';
-import { CenteredBoxContent } from '../../components/CenteredBoxContent/CenteredBoxContent';
-import { FooterLogo } from '../../components/Footer/FooterLogo';
 
 export interface LoadingViewProps {
-  loadingText: string;
-  showFooterLogo?: boolean;
+  loadingText: string | string[];
+  textDuration?: number;
 }
-export function LoadingView({ loadingText, showFooterLogo }: LoadingViewProps) {
+export function LoadingView({ loadingText, textDuration }: LoadingViewProps) {
+  const text = Array.isArray(loadingText) ? loadingText : [loadingText];
+  const duration = textDuration || 2500;
+
   return (
-    <SimpleLayout
-      footer={(
-        <FooterLogo hideLogo={!showFooterLogo} />
-      )}
-    >
-      <CenteredBoxContent testId="loading-view">
-        <LoadingBox loadingText={loadingText} />
-      </CenteredBoxContent>
+    <SimpleLayout>
+      <LoadingOverlay visible>
+        <LoadingOverlay.Content>
+          <LoadingOverlay.Content.LoopingText
+            text={[...text]}
+            textDuration={duration}
+          />
+        </LoadingOverlay.Content>
+      </LoadingOverlay>
     </SimpleLayout>
   );
 }

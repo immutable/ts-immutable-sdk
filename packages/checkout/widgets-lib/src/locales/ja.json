@@ -265,29 +265,37 @@
     },
     "PAYMENT_METHODS": {
       "header": {
-        "heading": "どのようにして支払いますか？"
+        "heading": "どの支払い方法をご希望ですか？"
       },
       "options": {
         "crypto": {
           "heading": "コイン",
-          "caption": "ウォレットのコイン残高を使用して",
-          "disabledCaption": "残高に十分なコインが見当たりません"
+          "caption": "残高にコインがある場合、最も速い支払い方法です。",
+          "disabledCaption": "残高に十分なコインが見つかりません"
         },
-        "fiat": {
-          "heading": "カード",
-          "caption": "GooglePayもTransakで利用可能",
-          "disabledCaption": ""
+        "debit": {
+          "heading": "デビットカード",
+          "caption": "カードでの支払いに推奨される方法です。",
+          "disabledCaption": null
+        },
+        "credit": {
+          "heading": "クレジットカード",
+          "caption": "銀行によって取引がブロックされる可能性があるため、推奨されません。",
+          "disabledCaption": null
         }
       },
       "insufficientCoinsBanner": {
-        "caption": "コイン残高が不足しています。続行するにはカードで支払うか、",
-        "captionEnd": "、再試行してください。",
+        "caption": "コインの残高が不足しています。カードで支払うか、",
+        "captionEnd": "して再試行してください。",
         "captionCTA": "コインを追加"
       },
       "loading": {
-        "ready": "購入の準備ができました",
-        "confirm": "ウォレットで確認してください",
-        "processing": "購入処理中"
+        "ready1": "注文を受け取り中",
+        "ready2": "ウォレットと通信中",
+        "ready3": "資産を準備中",
+        "processing1": "支払いを初期化中",
+        "processing2": "資産を確保中",
+        "processing3": "支払いを完了中"
       }
     },
     "PAY_WITH_COINS": {

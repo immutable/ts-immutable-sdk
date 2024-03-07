@@ -9,6 +9,14 @@ export enum WalletProviderName {
 }
 
 /**
+ * Enum representing the rdns of injected wallet providers.
+ */
+export enum WalletProviderRdns {
+  PASSPORT = 'com.immutable.passport',
+  METAMASK = 'io.metamask',
+}
+
+/**
  * Interface for the parameters required to create a wallet provider {@link Checkout.createProvider}.
  * @interface CreateProviderParams
  * @property {WalletProviderName} walletProviderName - The wallet provider name to create a provider for.
