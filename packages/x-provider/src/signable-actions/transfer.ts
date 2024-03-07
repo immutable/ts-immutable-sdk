@@ -1,6 +1,3 @@
-import {
-  TransfersApi,
-} from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
 import {
   NftTransferDetails,
@@ -31,7 +28,7 @@ export async function transfer({
   await validateChain(ethSigner, config.immutableXConfig);
 
   const ethAddress = await ethSigner.getAddress();
-  const transfersApi = new TransfersApi(
+  const transfersApi = new imx.TransfersApi(
     config.immutableXConfig.apiConfiguration,
   );
 
@@ -86,7 +83,7 @@ export async function batchTransfer({
   await validateChain(ethSigner, config.immutableXConfig);
 
   const ethAddress = await ethSigner.getAddress();
-  const transfersApi = new TransfersApi(
+  const transfersApi = new imx.TransfersApi(
     config.immutableXConfig.apiConfiguration,
   );
 

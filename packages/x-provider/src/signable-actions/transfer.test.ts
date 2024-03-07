@@ -1,6 +1,4 @@
-import {
-  TransfersApi,
-} from '@imtbl/core-sdk';
+import { imx } from '@imtbl/generated-clients';
 import {
   NftTransferDetails,
   UnsignedTransferRequest,
@@ -9,7 +7,7 @@ import { signRaw, convertToSignableToken } from '@imtbl/toolkit';
 import { generateSigners, privateKey1, testConfig } from '../test/helpers';
 import { transfer, batchTransfer } from './transfer';
 
-jest.mock('@imtbl/core-sdk');
+jest.mock('@imtbl/generated-clients');
 jest.mock('@imtbl/toolkit');
 jest.mock('@imtbl/x-client');
 
@@ -50,7 +48,7 @@ describe('Transfer', () => {
       createTransferMock = jest.fn().mockResolvedValue({
         data: createTransferResponse,
       });
-      (TransfersApi as jest.Mock).mockReturnValue({
+      (imx.TransfersApi as jest.Mock).mockReturnValue({
         getSignableTransferV1: getSignableTransferMock,
         createTransferV1: createTransferMock,
       });
@@ -149,7 +147,7 @@ describe('Transfer', () => {
       createTransferMock = jest.fn().mockResolvedValue({
         data: createTransferResponse,
       });
-      (TransfersApi as jest.Mock).mockReturnValue({
+      (imx.TransfersApi as jest.Mock).mockReturnValue({
         getSignableTransfer: getSignableTransferMock,
         createTransfer: createTransferMock,
       });
