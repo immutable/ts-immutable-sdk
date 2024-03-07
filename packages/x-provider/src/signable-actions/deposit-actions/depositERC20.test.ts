@@ -1,5 +1,4 @@
 import {
-  TokensApi,
   ERC20Amount,
   Contracts,
 } from '@imtbl/core-sdk';
@@ -64,7 +63,7 @@ describe('Deposit ERC20', () => {
       getTokenMock = jest.fn().mockResolvedValue({
         data: getTokenResponse,
       });
-      (TokensApi as jest.Mock).mockReturnValue({
+      (imx.TokensApi as jest.Mock).mockReturnValue({
         getToken: getTokenMock,
       });
 

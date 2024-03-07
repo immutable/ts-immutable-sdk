@@ -1,7 +1,6 @@
 import {
   Contracts,
   ERC20Amount,
-  TokensApi,
   EthConfiguration,
 } from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
@@ -93,7 +92,7 @@ export async function depositERC20({
 
   const { apiConfiguration, ethConfiguration } = config.immutableXConfig;
   const user = await ethSigner.getAddress();
-  const tokensApi = new TokensApi(apiConfiguration);
+  const tokensApi = new imx.TokensApi(apiConfiguration);
   const depositsApi = new imx.DepositsApi(apiConfiguration);
   const encodingApi = new imx.EncodingApi(apiConfiguration);
   const usersApi = new imx.UsersApi(apiConfiguration);
