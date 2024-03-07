@@ -3945,7 +3945,6 @@ __metadata:
   resolution: "@imtbl/x-provider@workspace:packages/x-provider"
   dependencies:
     "@imtbl/config": 0.0.0
-    "@imtbl/core-sdk": ^2.4.0
     "@imtbl/generated-clients": 0.0.0
     "@imtbl/toolkit": 0.0.0
     "@imtbl/x-client": 0.0.0
