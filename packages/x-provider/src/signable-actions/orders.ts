@@ -1,5 +1,4 @@
 import {
-  CreateOrderResponse,
   GetSignableOrderRequestV3,
   OrdersApiCreateOrderV3Request,
 } from '@imtbl/core-sdk';
@@ -26,7 +25,7 @@ export async function createOrder({
   signers,
   request,
   config,
-}: CreateOrderWorkflowParams): Promise<CreateOrderResponse> {
+}: CreateOrderWorkflowParams): Promise<imx.CreateOrderResponse> {
   await validateChain(signers.ethSigner, config.immutableXConfig);
 
   const ethAddress = await signers.ethSigner.getAddress();

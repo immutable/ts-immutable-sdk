@@ -1,5 +1,4 @@
 import {
-  CreateOrderResponse,
   CreateTransferResponse,
   CreateTransferResponseV1,
   CreateWithdrawalResponse,
@@ -99,7 +98,7 @@ export class GenericIMXProvider implements IMXProvider {
     });
   }
 
-  createOrder(request: UnsignedOrderRequest): Promise<CreateOrderResponse> {
+  createOrder(request: UnsignedOrderRequest): Promise<imx.CreateOrderResponse> {
     return createOrder({
       signers: this.signers,
       request,

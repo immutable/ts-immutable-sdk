@@ -1,5 +1,4 @@
 import {
-  CreateOrderResponse,
   CreateTransferResponse,
   CreateTransferResponseV1,
   CreateWithdrawalResponse,
@@ -49,7 +48,7 @@ export interface IMXProvider {
    * @param {UnsignedOrderRequest} request The unsigned order request to create an order
    * @return {Promise<CreateOrderResponse>} Returns a promise that resolves with the created Order
    */
-  createOrder(request: UnsignedOrderRequest): Promise<CreateOrderResponse>;
+  createOrder(request: UnsignedOrderRequest): Promise<imx.CreateOrderResponse>;
   /**
    * Cancel an Order
    *
