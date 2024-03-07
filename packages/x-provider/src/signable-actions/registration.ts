@@ -1,7 +1,4 @@
-import {
-  Contracts,
-  GetSignableRegistrationResponse,
-} from '@imtbl/core-sdk';
+import { Contracts } from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
 import { EthSigner } from '@imtbl/x-client';
 import { signRaw } from '@imtbl/toolkit';
@@ -92,7 +89,7 @@ export async function getSignableRegistrationOnchain(
   etherKey: string,
   starkPublicKey: string,
   usersApi: imx.UsersApi,
-): Promise<GetSignableRegistrationResponse> {
+): Promise<imx.GetSignableRegistrationResponse> {
   const response = await usersApi.getSignableRegistration({
     getSignableRegistrationRequest: {
       ether_key: etherKey,
