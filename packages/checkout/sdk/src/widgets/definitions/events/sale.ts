@@ -21,6 +21,8 @@ export enum SaleEventType {
 export type SaleSuccess = {
   /** Chosen payment method */
   paymentMethod: SalePaymentTypes | undefined;
+  /** The minted items token ids  */
+  tokenIds: string[];
   /** The executed transactions */
   transactions: {
     method: string;
