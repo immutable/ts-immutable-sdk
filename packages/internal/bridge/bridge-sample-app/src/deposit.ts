@@ -13,7 +13,8 @@ import {
     TxStatusResponse,
     TxStatusRequest,
     StatusResponse,
-    BridgeMethodsGasLimit,
+    bridgeGasPerAction,
+    bridgeMethodsGasPerToken,
 } from '@imtbl/bridge-sdk';
 
 // @ts-ignore
@@ -26,7 +27,7 @@ async function deposit() {
 
   const bridgeConfig = new BridgeConfiguration({
     baseConfig: new ImmutableConfiguration({
-      environment: Environment.SANDBOX,
+      environment: params.environment,
     }),
     bridgeInstance: params.bridgeInstance,
     rootProvider: params.rootProvider,
@@ -81,9 +82,9 @@ async function deposit() {
     console.log('approvalNonce', approvalNonce);
     console.log('approvalGasPrice', approvalGasPrice);
 
-    approvalRes!.unsignedTx.gasLimit = BridgeMethodsGasLimit.DEPOSIT_SOURCE;
+    approvalRes!.unsignedTx.gasLimit = bridgeGasPerAction.approveToken*3;
     approvalRes!.unsignedTx.nonce = approvalNonce;
-    approvalRes!.unsignedTx.gasPrice = approvalGasPrice.mul(2);
+    approvalRes!.unsignedTx.gasPrice = approvalGasPrice.mul(3);
 
     console.log('approvalRes.unsignedTx');
     console.log(approvalRes!.unsignedTx);
@@ -128,7 +129,9 @@ async function deposit() {
   const depositNonce = await params.rootWallet.getTransactionCount();
   const depositGasPrice = await params.rootProvider.getGasPrice();
 
-  depositRes!.unsignedTx.gasLimit = BridgeMethodsGasLimit.DEPOSIT_SOURCE*2;
+  console.log('bridgeMethodsGasPerToken.DEFAULT.deposit.sourceGas', bridgeMethodsGasPerToken.DEFAULT.deposit.sourceGas);
+
+  depositRes!.unsignedTx.gasLimit = bridgeMethodsGasPerToken.DEFAULT.deposit.sourceGas*3;
   depositRes!.unsignedTx.nonce = depositNonce;
   depositRes!.unsignedTx.gasPrice = depositGasPrice.mul(2);
 

@@ -820,6 +820,276 @@ describe('Token Bridge', () => {
     });
   });
 
+  describe('getStaticGasLimit', () => {
+    let tokenBridge: TokenBridge;
+    let bridgeConfig: BridgeConfiguration;
+    beforeEach(() => {
+      const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
+      const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
+      bridgeConfig = new BridgeConfiguration({
+        baseConfig: new ImmutableConfiguration({
+          environment: Environment.SANDBOX,
+        }),
+        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
+        rootProvider: voidRootProvider,
+        childProvider: voidChildProvider,
+      });
+      tokenBridge = new TokenBridge(bridgeConfig);
+    });
+
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+    describe('IMX', () => {
+      it('returns value for IMX deposit', async () => {
+        expect.assertions(4);
+        const response = await tokenBridge['getStaticGasLimit'](
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          bridgeConfig.bridgeContracts.rootChainIMX,
+          '0x01',
+          '0x01',
+        );
+        expect(response.sourceGas).toBeDefined();
+        expect(response.destinationGas).toBeDefined();
+        expect(response.symbol).toBe('IMX');
+        expect(response.action).toBe('deposit');
+      });
+      it('returns value for IMX depositTo', async () => {
+        expect.assertions(4);
+        const response = await tokenBridge['getStaticGasLimit'](
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          bridgeConfig.bridgeContracts.rootChainIMX,
+          '0x01',
+          '0x02',
+        );
+        expect(response.sourceGas).toBeDefined();
+        expect(response.destinationGas).toBeDefined();
+        expect(response.symbol).toBe('IMX');
+        expect(response.action).toBe('depositTo');
+      });
+      it('returns value for native withdraw', async () => {
+        expect.assertions(4);
+        const response = await tokenBridge['getStaticGasLimit'](
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
+          'NATIVE',
+          '0x01',
+          '0x01',
+        );
+        expect(response.sourceGas).toBeDefined();
+        expect(response.destinationGas).toBeDefined();
+        expect(response.symbol).toBe('IMX');
+        expect(response.action).toBe('withdraw');
+      });
+      it('returns value for native withdrawTo', async () => {
+        expect.assertions(4);
+        const response = await tokenBridge['getStaticGasLimit'](
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
+          'NATIVE',
+          '0x01',
+          '0x02',
+        );
+        expect(response.sourceGas).toBeDefined();
+        expect(response.destinationGas).toBeDefined();
+        expect(response.symbol).toBe('IMX');
+        expect(response.action).toBe('withdrawTo');
+      });
+    });
+
+    describe('ETH', () => {
+      it('returns value for ETH deposit', async () => {
+        expect.assertions(4);
+        const response = await tokenBridge['getStaticGasLimit'](
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          'NATIVE',
+          '0x01',
+          '0x01',
+        );
+        expect(response.sourceGas).toBeDefined();
+        expect(response.destinationGas).toBeDefined();
+        expect(response.symbol).toBe('ETH');
+        expect(response.action).toBe('deposit');
+      });
+      it('returns value for ETH depositTo', async () => {
+        expect.assertions(4);
+        const response = await tokenBridge['getStaticGasLimit'](
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          'NATIVE',
+          '0x01',
+          '0x02',
+        );
+        expect(response.sourceGas).toBeDefined();
+        expect(response.destinationGas).toBeDefined();
+        expect(response.symbol).toBe('ETH');
+        expect(response.action).toBe('depositTo');
+      });
+      it('returns value for ETH withdraw', async () => {
+        expect.assertions(4);
+        const response = await tokenBridge['getStaticGasLimit'](
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
+          bridgeConfig.bridgeContracts.childChainWrappedETH,
+          '0x01',
+          '0x01',
+        );
+        expect(response.sourceGas).toBeDefined();
+        expect(response.destinationGas).toBeDefined();
+        expect(response.symbol).toBe('ETH');
+        expect(response.action).toBe('withdraw');
+      });
+      it('returns value for ETH withdrawTo', async () => {
+        expect.assertions(4);
+        const response = await tokenBridge['getStaticGasLimit'](
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
+          bridgeConfig.bridgeContracts.childChainWrappedETH,
+          '0x01',
+          '0x02',
+        );
+        expect(response.sourceGas).toBeDefined();
+        expect(response.destinationGas).toBeDefined();
+        expect(response.symbol).toBe('ETH');
+        expect(response.action).toBe('withdrawTo');
+      });
+    });
+
+    describe('WETH', () => {
+      it('returns value for WETH deposit', async () => {
+        expect.assertions(4);
+        const response = await tokenBridge['getStaticGasLimit'](
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          bridgeConfig.bridgeContracts.rootChainWrappedETH,
+          '0x01',
+          '0x01',
+        );
+        expect(response.sourceGas).toBeDefined();
+        expect(response.destinationGas).toBeDefined();
+        expect(response.symbol).toBe('WETH');
+        expect(response.action).toBe('deposit');
+      });
+      it('returns value for WETH depositTo', async () => {
+        expect.assertions(4);
+        const response = await tokenBridge['getStaticGasLimit'](
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          bridgeConfig.bridgeContracts.rootChainWrappedETH,
+          '0x01',
+          '0x02',
+        );
+        expect(response.sourceGas).toBeDefined();
+        expect(response.destinationGas).toBeDefined();
+        expect(response.symbol).toBe('WETH');
+        expect(response.action).toBe('depositTo');
+      });
+    });
+
+    describe('USDC', () => {
+      it('returns value for USDC deposit', async () => {
+        expect.assertions(4);
+        const response = await tokenBridge['getStaticGasLimit'](
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          bridgeConfig.bridgeContracts.rootChainUSDC,
+          '0x01',
+          '0x01',
+        );
+        expect(response.sourceGas).toBeDefined();
+        expect(response.destinationGas).toBeDefined();
+        expect(response.symbol).toBe('USDC');
+        expect(response.action).toBe('deposit');
+      });
+      it('returns value for USDC depositTo', async () => {
+        expect.assertions(4);
+        const response = await tokenBridge['getStaticGasLimit'](
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          bridgeConfig.bridgeContracts.rootChainUSDC,
+          '0x01',
+          '0x02',
+        );
+        expect(response.sourceGas).toBeDefined();
+        expect(response.destinationGas).toBeDefined();
+        expect(response.symbol).toBe('USDC');
+        expect(response.action).toBe('depositTo');
+      });
+      it('returns value for USDC withdraw', async () => {
+        expect.assertions(4);
+        const response = await tokenBridge['getStaticGasLimit'](
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
+          bridgeConfig.bridgeContracts.childChainWrappedUSDC,
+          '0x01',
+          '0x01',
+        );
+        expect(response.sourceGas).toBeDefined();
+        expect(response.destinationGas).toBeDefined();
+        expect(response.symbol).toBe('USDC');
+        expect(response.action).toBe('withdraw');
+      });
+      it('returns value for USDC withdrawTo', async () => {
+        expect.assertions(4);
+        const response = await tokenBridge['getStaticGasLimit'](
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
+          bridgeConfig.bridgeContracts.childChainWrappedUSDC,
+          '0x01',
+          '0x02',
+        );
+        expect(response.sourceGas).toBeDefined();
+        expect(response.destinationGas).toBeDefined();
+        expect(response.symbol).toBe('USDC');
+        expect(response.action).toBe('withdrawTo');
+      });
+    });
+
+    describe('DEFAULT', () => {
+      it('returns value for DEFAULT deposit', async () => {
+        expect.assertions(4);
+        const response = await tokenBridge['getStaticGasLimit'](
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          '0xDEFAULT',
+          '0x01',
+          '0x01',
+        );
+        expect(response.sourceGas).toBeDefined();
+        expect(response.destinationGas).toBeDefined();
+        expect(response.symbol).toBe('DEFAULT');
+        expect(response.action).toBe('deposit');
+      });
+      it('returns value for DEFAULT depositTo', async () => {
+        expect.assertions(4);
+        const response = await tokenBridge['getStaticGasLimit'](
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          '0xDEFAULT',
+          '0x01',
+          '0x02',
+        );
+        expect(response.sourceGas).toBeDefined();
+        expect(response.destinationGas).toBeDefined();
+        expect(response.symbol).toBe('DEFAULT');
+        expect(response.action).toBe('depositTo');
+      });
+      it('returns value for DEFAULT withdraw', async () => {
+        expect.assertions(4);
+        const response = await tokenBridge['getStaticGasLimit'](
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
+          '0xDEFAULT',
+          '0x01',
+          '0x01',
+        );
+        expect(response.sourceGas).toBeDefined();
+        expect(response.destinationGas).toBeDefined();
+        expect(response.symbol).toBe('DEFAULT');
+        expect(response.action).toBe('withdraw');
+      });
+      it('returns value for DEFAULT withdrawTo', async () => {
+        expect.assertions(4);
+        const response = await tokenBridge['getStaticGasLimit'](
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
+          '0xDEFAULT',
+          '0x01',
+          '0x02',
+        );
+        expect(response.sourceGas).toBeDefined();
+        expect(response.destinationGas).toBeDefined();
+        expect(response.symbol).toBe('DEFAULT');
+        expect(response.action).toBe('withdrawTo');
+      });
+    });
+  });
+
   describe('getTransactionStatus', () => {
     let tokenBridge: TokenBridge;
 

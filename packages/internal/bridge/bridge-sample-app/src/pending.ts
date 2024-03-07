@@ -38,7 +38,7 @@ async function pending() {
 
   const bridgeConfig = new BridgeConfiguration({
     baseConfig: new ImmutableConfiguration({
-      environment: Environment.SANDBOX,
+      environment: params.environment,
     }),
     bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
     rootProvider: params.rootProvider,
