@@ -1,8 +1,10 @@
 import {
-  UnsignedTransferRequest,
   TransfersApi,
 } from '@imtbl/core-sdk';
-import { NftTransferDetails } from '@imtbl/x-client';
+import {
+  NftTransferDetails,
+  UnsignedTransferRequest,
+} from '@imtbl/x-client';
 import { signRaw, convertToSignableToken } from '@imtbl/toolkit';
 import { generateSigners, privateKey1, testConfig } from '../test/helpers';
 import { transfer, batchTransfer } from './transfer';
