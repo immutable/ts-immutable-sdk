@@ -1,5 +1,4 @@
 import {
-  CancelOrderResponse,
   CreateOrderResponse,
   CreateTransferResponse,
   CreateTransferResponseV1,
@@ -80,7 +79,7 @@ export class GenericIMXProvider implements IMXProvider {
 
   cancelOrder(
     request: GetSignableCancelOrderRequest,
-  ): Promise<CancelOrderResponse> {
+  ): Promise<imx.CancelOrderResponse> {
     return cancelOrder({
       signers: this.signers,
       request,

@@ -1,5 +1,4 @@
 import {
-  CancelOrderResponse,
   CreateOrderResponse,
   CreateTransferResponse,
   CreateTransferResponseV1,
@@ -59,7 +58,7 @@ export interface IMXProvider {
    */
   cancelOrder(
     request: GetSignableCancelOrderRequest
-  ): Promise<CancelOrderResponse>;
+  ): Promise<imx.CancelOrderResponse>;
   /**
    * Create a Trade
    *

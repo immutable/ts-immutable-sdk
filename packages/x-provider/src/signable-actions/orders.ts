@@ -1,5 +1,4 @@
 import {
-  CancelOrderResponse,
   CreateOrderResponse,
   GetSignableOrderRequestV3,
   OrdersApiCreateOrderV3Request,
@@ -86,7 +85,7 @@ export async function cancelOrder({
   signers,
   request,
   config,
-}: CancelOrderWorkflowParams): Promise<CancelOrderResponse> {
+}: CancelOrderWorkflowParams): Promise<imx.CancelOrderResponse> {
   const ordersApi = new imx.OrdersApi(config.immutableXConfig.apiConfiguration);
 
   const getSignableCancelOrderResponse = await ordersApi.getSignableCancelOrderV3(
