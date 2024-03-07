@@ -28,27 +28,30 @@ import {
   EIP1193Provider,
   EIP6963ProviderDetail,
   getProviderSlugFromRdns,
+  isPassportProvider,
 } from '../../../lib/provider';
-import { getL1ChainId } from '../../../lib';
+import { addProviderListenersForWidgetRoot, getL1ChainId } from '../../../lib';
 import { listItemVariants, listVariants } from '../../../lib/animation/listAnimation';
 import { WalletDrawer } from '../../bridge/components/WalletDrawer';
 import { WalletChangeEvent } from '../../bridge/components/WalletDrawerEvents';
 import { WalletConnectItem } from './WalletConnectItem';
 import { BrowserWalletItem } from './BrowserWalletItem';
+import { identifyUser } from '../../../lib/analytics/identifyUser';
 
 export interface WalletListProps {
   targetChainId: ChainId;
+  allowedChains: ChainId[];
 }
 
 export function WalletList(props: WalletListProps) {
   const { t } = useTranslation();
-  const { targetChainId } = props;
+  const { targetChainId, allowedChains } = props;
   const {
     connectDispatch,
     connectState: { checkout },
   } = useContext(ConnectContext);
   const { viewDispatch } = useContext(ViewContext);
-  const { track } = useAnalytics();
+  const { track, identify } = useAnalytics();
   const { providers } = useInjectedProviders({ checkout });
   const [showWalletDrawer, setShowWalletDrawer] = useState(false);
   const { isWalletConnectEnabled, openWalletConnectModal } = useWalletConnect();
@@ -63,7 +66,7 @@ export function WalletList(props: WalletListProps) {
     && providers.find((provider) => provider.info.rdns === WalletProviderRdns.PASSPORT)
   ), [providers, checkout]);
 
-  const selectWeb3Provider = useCallback((web3Provider: any, providerName: string) => {
+  const selectWeb3Provider = useCallback((web3Provider: Web3Provider, providerName: string) => {
     connectDispatch({
       payload: {
         type: ConnectActions.SET_PROVIDER,
@@ -78,22 +81,84 @@ export function WalletList(props: WalletListProps) {
     });
   }, []);
 
-  const selectProviderDetail = (providerDetail: EIP6963ProviderDetail) => {
-    try {
-      selectWeb3Provider(
-        new Web3Provider(providerDetail.provider as any),
-        getProviderSlugFromRdns(providerDetail.info.rdns),
-      );
-
+  const handleConnectViewUpdate = async (provider: Web3Provider) => {
+    const isPassport = isPassportProvider(provider);
+    const chainId = await provider.provider.request!({ method: 'eth_chainId', params: [] });
+    // eslint-disable-next-line radix
+    const parsedChainId = parseInt(chainId.toString());
+    if (parsedChainId !== targetChainId && !allowedChains?.includes(parsedChainId)) {
+      // TODO: What do we do with Passport here as it can't connect to L1
+      if (isPassport) {
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: { type: ConnectWidgetViews.SUCCESS },
+          },
+        });
+        return;
+      }
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
-          view: { type: ConnectWidgetViews.READY_TO_CONNECT },
+          view: { type: ConnectWidgetViews.SWITCH_NETWORK },
         },
       });
+      return;
+    }
+
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: { type: ConnectWidgetViews.SUCCESS },
+      },
+    });
+  };
+
+  const selectProviderDetail = useCallback(async (providerDetail: EIP6963ProviderDetail) => {
+    if (!checkout) return;
+
+    try {
+      const isMetaMask = providerDetail.info.rdns === WalletProviderRdns.METAMASK;
+      const web3Provider = new Web3Provider(providerDetail.provider as any);
+
+      track({
+        userJourney: UserJourney.CONNECT,
+        screen: 'ConnectWallet',
+        control: 'Wallet',
+        controlType: 'MenuItem',
+        extras: {
+          wallet: getProviderSlugFromRdns(providerDetail.info.rdns),
+          walletRdns: providerDetail.info.rdns,
+          walletUuid: providerDetail.info.uuid,
+        },
+      });
+
+      try {
+        // TODO: Find a nice way to detect if the wallet supports switching accounts via requestPermissions
+        const changeAccount = isMetaMask;
+        const connectResult = await checkout.connect({
+          provider: web3Provider,
+          requestWalletPermissions: changeAccount,
+        });
+
+        // Set up EIP-1193 provider event listeners for widget root instances
+        addProviderListenersForWidgetRoot(connectResult.provider);
+        await identifyUser(identify, connectResult.provider);
+
+        selectWeb3Provider(
+          web3Provider,
+          getProviderSlugFromRdns(providerDetail.info.rdns),
+        );
+        await handleConnectViewUpdate(web3Provider);
+      } catch (err: any) {
+        // eslint-disable-next-line no-console
+        console.error('Connect rejected', err);
+
+        // TODO: Wire up error state drawers or throw them
+      }
     } catch (err: any) {
       // eslint-disable-next-line no-console
-      console.error(err);
+      console.error('Connect unknown error', err);
 
       viewDispatch({
         payload: {
@@ -102,7 +167,7 @@ export function WalletList(props: WalletListProps) {
         },
       });
     }
-  };
+  }, [checkout]);
 
   const connectCallback = async (ethereumProvider) => {
     if (ethereumProvider.connected && ethereumProvider.session) {
