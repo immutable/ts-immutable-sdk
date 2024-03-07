@@ -1,5 +1,4 @@
 import {
-  AnyToken,
   RegisterUserResponse,
   CancelOrderResponse,
   CreateOrderResponse,
@@ -11,6 +10,7 @@ import {
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
 import {
+  AnyToken,
   UnsignedOrderRequest,
   UnsignedExchangeTransferRequest,
   GetSignableCancelOrderRequest,

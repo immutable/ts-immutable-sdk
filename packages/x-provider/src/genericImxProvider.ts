@@ -1,5 +1,4 @@
 import {
-  AnyToken,
   RegisterUserResponse,
   CancelOrderResponse,
   CreateOrderResponse,
@@ -13,6 +12,7 @@ import {
   EthSigner,
 } from '@imtbl/core-sdk';
 import {
+  AnyToken,
   UnsignedOrderRequest,
   UnsignedExchangeTransferRequest,
   GetSignableCancelOrderRequest,
