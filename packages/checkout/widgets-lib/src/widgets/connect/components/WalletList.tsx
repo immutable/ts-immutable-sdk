@@ -259,7 +259,11 @@ export function WalletList(props: WalletListProps) {
           onWalletItemClick={handleWalletItemClick}
           providerDetail={passportProviderDetail}
           rc={(
-            <motion.div variants={listItemVariants} custom={0} />
+            <motion.div
+              variants={listItemVariants}
+              custom={0}
+              style={{ width: '100%' }}
+            />
           )}
         />
       )}
@@ -269,7 +273,11 @@ export function WalletList(props: WalletListProps) {
           onWalletItemClick={handleWalletItemClick}
           providerDetail={filteredProviders[0]}
           rc={(
-            <motion.div variants={listItemVariants} custom={0 + (passportProviderDetail ? 1 : 0)} />
+            <motion.div
+              variants={listItemVariants}
+              custom={0 + (passportProviderDetail ? 1 : 0)}
+              style={{ width: '100%' }}
+            />
           )}
         />
       )}
