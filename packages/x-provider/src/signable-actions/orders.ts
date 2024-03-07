@@ -1,6 +1,3 @@
-import {
-  OrdersApiCreateOrderV3Request,
-} from '@imtbl/core-sdk';
 import { UnsignedOrderRequest, GetSignableCancelOrderRequest } from '@imtbl/x-client';
 import { imx } from '@imtbl/generated-clients';
 import { convertToSignableToken, signRaw } from '@imtbl/toolkit';
@@ -54,7 +51,7 @@ export async function createOrder({
 
   const resp = getSignableOrderResponse.data;
 
-  const orderParams: OrdersApiCreateOrderV3Request = {
+  const orderParams: imx.OrdersApiCreateOrderV3Request = {
     createOrderRequest: {
       amount_buy: resp.amount_buy,
       amount_sell: resp.amount_sell,
