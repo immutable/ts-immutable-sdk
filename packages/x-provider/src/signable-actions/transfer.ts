@@ -1,10 +1,10 @@
 import {
-  CreateTransferResponse,
   CreateTransferResponseV1,
   NftTransferDetails,
   TransfersApi,
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
+import { imx } from '@imtbl/generated-clients';
 import { signRaw, convertToSignableToken } from '@imtbl/toolkit';
 import { Signers } from './types';
 import { validateChain } from './helpers';
@@ -81,7 +81,7 @@ export async function batchTransfer({
   signers: { ethSigner, starkSigner },
   request,
   config,
-}: BatchTransfersWorkflowParams): Promise<CreateTransferResponse> {
+}: BatchTransfersWorkflowParams): Promise<imx.CreateTransferResponse> {
   await validateChain(ethSigner, config.immutableXConfig);
 
   const ethAddress = await ethSigner.getAddress();

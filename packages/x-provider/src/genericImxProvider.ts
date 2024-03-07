@@ -1,5 +1,4 @@
 import {
-  CreateTransferResponse,
   CreateTransferResponseV1,
   CreateWithdrawalResponse,
   NftTransferDetails,
@@ -68,7 +67,7 @@ export class GenericIMXProvider implements IMXProvider {
 
   batchNftTransfer(
     request: Array<NftTransferDetails>,
-  ): Promise<CreateTransferResponse> {
+  ): Promise<imx.CreateTransferResponse> {
     return batchTransfer({
       signers: this.signers,
       request,

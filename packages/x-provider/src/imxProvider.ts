@@ -1,5 +1,4 @@
 import {
-  CreateTransferResponse,
   CreateTransferResponseV1,
   CreateWithdrawalResponse,
   NftTransferDetails,
@@ -80,7 +79,7 @@ export interface IMXProvider {
    */
   batchNftTransfer(
     request: Array<NftTransferDetails>
-  ): Promise<CreateTransferResponse>;
+  ): Promise<imx.CreateTransferResponse>;
   /**
    * Create a new Exchange transaction
    *
