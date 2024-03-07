@@ -32,8 +32,8 @@ import {
 } from '../../../lib/provider';
 import { addProviderListenersForWidgetRoot, getL1ChainId } from '../../../lib';
 import { listItemVariants, listVariants } from '../../../lib/animation/listAnimation';
-import { WalletDrawer } from '../../bridge/components/WalletDrawer';
-import { WalletChangeEvent } from '../../bridge/components/WalletDrawerEvents';
+import { WalletDrawer } from '../../../components/WalletDrawer/WalletDrawer';
+import { WalletChangeEvent } from '../../../components/WalletDrawer/WalletDrawerEvents';
 import { WalletConnectItem } from './WalletConnectItem';
 import { BrowserWalletItem } from './BrowserWalletItem';
 import { identifyUser } from '../../../lib/analytics/identifyUser';
@@ -202,8 +202,6 @@ export function WalletList(props: WalletListProps) {
   };
 
   const handleWalletChange = async (event: WalletChangeEvent) => {
-    setShowWalletDrawer(false);
-
     const { providerDetail } = event;
     track({
       userJourney: UserJourney.CONNECT,
@@ -216,10 +214,11 @@ export function WalletList(props: WalletListProps) {
         walletUuid: providerDetail.info.uuid,
       },
     });
-    selectProviderDetail(providerDetail);
+    await selectProviderDetail(providerDetail);
+    setShowWalletDrawer(false);
   };
 
-  const onWalletClick = useCallback(
+  const handleWalletItemClick = useCallback(
     async (providerDetail: EIP6963ProviderDetail<EIP1193Provider>) => {
       track({
         userJourney: UserJourney.CONNECT,
@@ -232,7 +231,7 @@ export function WalletList(props: WalletListProps) {
           walletUuid: providerDetail.info.uuid,
         },
       });
-      selectProviderDetail(providerDetail);
+      await selectProviderDetail(providerDetail);
     },
     [track, checkout],
   );
@@ -255,8 +254,9 @@ export function WalletList(props: WalletListProps) {
     >
       {passportProviderDetail && (
         <WalletItem
+          recommended
           key={passportProviderDetail.info.rdns}
-          onWalletClick={onWalletClick}
+          onWalletItemClick={handleWalletItemClick}
           providerDetail={passportProviderDetail}
           rc={(
             <motion.div variants={listItemVariants} custom={0} />
@@ -266,7 +266,7 @@ export function WalletList(props: WalletListProps) {
       {filteredProviders.length === 1 && (
         <WalletItem
           key={filteredProviders[0].info.rdns}
-          onWalletClick={onWalletClick}
+          onWalletItemClick={handleWalletItemClick}
           providerDetail={filteredProviders[0]}
           rc={(
             <motion.div variants={listItemVariants} custom={0 + (passportProviderDetail ? 1 : 0)} />
@@ -278,6 +278,7 @@ export function WalletList(props: WalletListProps) {
           variants={listItemVariants}
           custom={0 + (passportProviderDetail ? 1 : 0)}
           key="browserwallet"
+          style={{ width: '100%' }}
         >
           <BrowserWalletItem onClick={onBrowserWalletsClick} providers={filteredProviders} />
         </motion.div>
@@ -287,6 +288,7 @@ export function WalletList(props: WalletListProps) {
           variants={listItemVariants}
           custom={0 + (passportProviderDetail ? 1 : 0) + (filteredProviders.length > 0 ? 1 : 0)}
           key="walletconnect"
+          style={{ width: '100%' }}
         >
           <WalletConnectItem onConnect={handleWalletConnectConnection} />
         </motion.div>

@@ -102,7 +102,7 @@ export function ConnectLoader({
           payload: {
             type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
             connectionStatus: ConnectionStatus.NOT_CONNECTED,
-            deepLink: ConnectWidgetViews.READY_TO_CONNECT,
+            deepLink: ConnectWidgetViews.CONNECT_WALLET,
           },
         });
         return true;
@@ -141,7 +141,7 @@ export function ConnectLoader({
         payload: {
           type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
           connectionStatus: ConnectionStatus.NOT_CONNECTED,
-          deepLink: ConnectWidgetViews.READY_TO_CONNECT,
+          deepLink: ConnectWidgetViews.CONNECT_WALLET,
         },
       });
       return false;

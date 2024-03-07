@@ -544,21 +544,21 @@
   "wallets": {
     "passport": {
       "heading": "Immutable Passport",
-      "accentText": "おすすめ",
-      "description": "デジタルウォレットおよびアイデンティティ"
+      "description": "カードで支払い、アイテムを管理するなど、ゲーム用ウォレットです。"
     },
     "metamask": {
       "heading": "MetaMask",
-      "description": "ブロックチェーンアプリケーションとWeb3へのアクセス用のデジタルウォレット"
+      "description": "ブロックチェーンアプリケーションおよびweb3にアクセスするためのデジタルウォレット。"
     },
     "walletconnect": {
       "heading": "その他のウォレット",
-      "description": "MetaMaskを含む任意のブロックチェーンウォレットに接続できます"
+      "description": "MetaMaskを含む任意のブロックチェーンモバイルウォレットに接続できます。"
     },
     "browserwallet": {
       "heading": "ブラウザウォレット",
-      "description": "ブロックチェーンアプリケーションおよびweb3にアクセスするためのデジタルウォレット"
-    }
+      "description": "ブロックチェーンアプリケーションおよびweb3にアクセスするためのデジタルウォレット。"
+    },
+    "recommended": "推奨"
   },
   "drawers": {
     "feesBreakdown": {
