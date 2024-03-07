@@ -4,6 +4,9 @@
       "body": {
         "heading": "ウォレットを接続する",
         "content": "購入、販売、取引、およびコインとコレクティブルを保存するには、デジタルウォレットを接続または作成する必要があります。"
+      },
+      "walletSelection": {
+        "heading": "ウォレットを選択"
       }
     },
     "CONNECT_SUCCESS": {
@@ -551,6 +554,10 @@
     "walletconnect": {
       "heading": "その他のウォレット",
       "description": "MetaMaskを含む任意のブロックチェーンウォレットに接続できます"
+    },
+    "browserwallet": {
+      "heading": "ブラウザウォレット",
+      "description": "ブロックチェーンアプリケーションおよびweb3にアクセスするためのデジタルウォレット"
     }
   },
   "drawers": {

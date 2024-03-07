@@ -138,7 +138,7 @@ export class WalletConnectManager {
         chains: this.environment === Environment.PRODUCTION ? productionModalChains : testnetModalChains,
         explorerRecommendedWalletIds: this.environment === Environment.PRODUCTION
           ? productionWalletWhitelist : sandboxWalletWhitelist,
-        explorerExcludedWalletIds: 'ALL',
+        explorerExcludedWalletIds: undefined, // 'ALL',
         themeMode: this.theme,
         themeVariables: this.theme === WidgetTheme.DARK ? darkThemeVariables : lightThemeVariables,
       });
