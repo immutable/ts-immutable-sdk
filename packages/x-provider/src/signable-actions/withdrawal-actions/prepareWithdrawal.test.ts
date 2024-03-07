@@ -1,6 +1,3 @@
-import {
-  GetSignableWithdrawalResponse,
-} from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
 import { convertToSignableToken, signMessage } from '@imtbl/toolkit';
 import { generateSigners, privateKey1, testConfig } from '../../test/helpers';
@@ -17,7 +14,7 @@ describe('prepareWithdrawal', () => {
   describe('prepareWithdrawal action', () => {
     let getSignableWithdrawalMock: jest.Mock;
     let createWithdrawalMock: jest.Mock;
-    const getSignableWithdrawalResponse: GetSignableWithdrawalResponse = {
+    const getSignableWithdrawalResponse: imx.GetSignableWithdrawalResponse = {
       signable_message: 'hello',
       payload_hash: 'hash',
       nonce: 0,
