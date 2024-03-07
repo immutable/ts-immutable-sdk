@@ -1,7 +1,7 @@
 import { Signer } from '@ethersproject/abstract-signer';
-import { Contracts } from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
 import {
+  Contracts,
   ERC721Token,
   ImmutableXConfiguration,
 } from '@imtbl/x-client';

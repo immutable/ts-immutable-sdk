@@ -1,8 +1,6 @@
-import {
-  Contracts,
-} from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
 import {
+  Contracts,
   ERC20Amount,
   EthConfiguration,
   EthSigner,

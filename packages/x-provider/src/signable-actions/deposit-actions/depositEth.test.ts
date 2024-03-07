@@ -1,6 +1,8 @@
-import { Contracts } from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
-import { ETHAmount } from '@imtbl/x-client';
+import {
+  Contracts,
+  ETHAmount,
+} from '@imtbl/x-client';
 import {
   generateSigners,
   privateKey1,
@@ -10,6 +12,7 @@ import {
 import { depositEth } from '.';
 
 jest.mock('@imtbl/generated-clients');
+jest.mock('@imtbl/x-client');
 jest.mock('@imtbl/core-sdk');
 
 describe('Deposit ETH', () => {

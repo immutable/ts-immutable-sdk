@@ -1,8 +1,8 @@
 import { Signer } from '@ethersproject/abstract-signer';
 import { TransactionResponse } from '@ethersproject/providers';
-import { Contracts } from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
 import {
+  Contracts,
   ERC20Token,
   ImmutableXConfiguration,
 } from '@imtbl/x-client';

@@ -1,4 +1,4 @@
-import { Contracts } from '@imtbl/core-sdk';
+import { Contracts } from '@imtbl/x-client';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 import {
   getSignableRegistrationOnchain,
@@ -12,7 +12,7 @@ import {
   transactionResponse,
 } from '../../test/helpers';
 
-jest.mock('@imtbl/core-sdk');
+jest.mock('@imtbl/x-client');
 jest.mock('@imtbl/toolkit');
 jest.mock('../registration');
 jest.mock('./getEncodeAssetInfo');

@@ -1,12 +1,12 @@
-import { Contracts } from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
+import { Contracts } from '@imtbl/x-client';
 import { signRaw } from '@imtbl/toolkit';
 import { AxiosError } from 'axios';
 import { generateSigners, privateKey1, testConfig } from '../test/helpers';
 import { isRegisteredOffchain, isRegisteredOnChain, registerOffchain } from './registration';
 
 jest.mock('@imtbl/generated-clients');
-jest.mock('@imtbl/core-sdk');
+jest.mock('@imtbl/x-client');
 jest.mock('@imtbl/toolkit');
 
 describe('Registration', () => {

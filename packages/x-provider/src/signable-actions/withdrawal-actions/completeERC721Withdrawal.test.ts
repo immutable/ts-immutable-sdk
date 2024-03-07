@@ -1,4 +1,4 @@
-import { Contracts } from '@imtbl/core-sdk';
+import { Contracts } from '@imtbl/x-client';
 import { imx } from '@imtbl/generated-clients';
 import * as encUtils from 'enc-utils';
 import { TransactionResponse } from '@ethersproject/providers';
@@ -15,7 +15,7 @@ import {
 } from '../../test/helpers';
 import { completeERC721WithdrawalAction } from './completeERC721Withdrawal';
 
-jest.mock('@imtbl/core-sdk');
+jest.mock('@imtbl/x-client');
 jest.mock('@imtbl/toolkit');
 jest.mock('enc-utils');
 jest.mock('../registration');

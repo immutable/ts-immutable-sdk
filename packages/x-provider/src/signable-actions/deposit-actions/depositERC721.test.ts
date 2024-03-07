@@ -1,8 +1,8 @@
+import { imx } from '@imtbl/generated-clients';
 import {
   Contracts,
-} from '@imtbl/core-sdk';
-import { imx } from '@imtbl/generated-clients';
-import { ERC721Token } from '@imtbl/x-client';
+  ERC721Token,
+} from '@imtbl/x-client';
 import {
   generateSigners,
   privateKey1,

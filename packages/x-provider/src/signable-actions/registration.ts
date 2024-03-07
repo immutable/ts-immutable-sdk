@@ -1,6 +1,8 @@
-import { Contracts } from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
-import { EthSigner } from '@imtbl/x-client';
+import {
+  Contracts,
+  EthSigner,
+} from '@imtbl/x-client';
 import { signRaw } from '@imtbl/toolkit';
 import { isAxiosError } from 'axios';
 import { Signers } from './types';

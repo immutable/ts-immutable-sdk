@@ -1,6 +1,8 @@
-import { Contracts } from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
-import { ERC20Amount } from '@imtbl/x-client';
+import {
+  Contracts,
+  ERC20Amount,
+} from '@imtbl/x-client';
 import {
   generateSigners,
   privateKey1,
@@ -9,7 +11,7 @@ import {
 } from '../../test/helpers';
 import { depositERC20 } from '.';
 
-jest.mock('@imtbl/core-sdk');
+jest.mock('@imtbl/x-client');
 jest.mock('@imtbl/generated-clients');
 
 describe('Deposit ERC20', () => {
