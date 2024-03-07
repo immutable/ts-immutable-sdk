@@ -29,6 +29,7 @@ export {
   TransactionOrGasType,
   WalletFilterTypes,
   WalletProviderName,
+  WalletProviderRdns,
 } from './types';
 
 export type {

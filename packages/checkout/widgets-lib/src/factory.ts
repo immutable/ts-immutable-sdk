@@ -37,6 +37,7 @@ export class WidgetsFactory implements IWidgetsFactory {
           sdk.config.environment,
           widgetConfig.walletConnect,
           this.widgetConfig.theme,
+          sdk.config.remote.getConfig('connect') as Promise<any>,
         );
       } catch (err) {
         // eslint-disable-next-line no-console

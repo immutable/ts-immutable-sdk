@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@biom3/design-tokens": "^0.3.1",
-    "@biom3/react": "^0.20.2",
+    "@biom3/react": "^0.20.11",
     "@ethersproject/providers": "^5.7.2",
     "@imtbl/bridge-sdk": "0.0.0",
     "@imtbl/checkout-sdk": "0.0.0",
@@ -25,6 +25,7 @@
     "@imtbl/passport": "0.0.0",
     "@imtbl/react-analytics": "0.2.1-alpha",
     "@imtbl/version-check": "0.0.0",
+    "@rive-app/react-canvas": "^4.8.3",
     "@walletconnect/ethereum-provider": "^2.11.1",
     "@walletconnect/modal": "^2.6.2",
     "assert": "^2.0.0",

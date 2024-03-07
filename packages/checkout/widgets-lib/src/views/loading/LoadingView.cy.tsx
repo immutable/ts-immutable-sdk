@@ -12,21 +12,6 @@ describe('LoadingView', () => {
       </ViewContextTestComponent>,
     );
 
-    cySmartGet('loading-box').should('exist');
-    cySmartGet('loading-icon').should('be.visible');
-    cySmartGet('loading-text').should('have.text', testLoadingText);
-  });
-  it('should show the loading spinner with text and footer logo', () => {
-    const testLoadingText = 'Loading the view';
-    mount(
-      <ViewContextTestComponent>
-        <LoadingView loadingText={testLoadingText} showFooterLogo />
-      </ViewContextTestComponent>,
-    );
-
-    cySmartGet('loading-box').should('exist');
-    cySmartGet('loading-icon').should('be.visible');
-    cySmartGet('loading-text').should('have.text', testLoadingText);
-    cySmartGet('footer-logo-container').should('exist');
+    cySmartGet('LoopingText').should('have.text', testLoadingText);
   });
 });

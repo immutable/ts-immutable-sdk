@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "dependencies": {
     "@biom3/design-tokens": "^0.3.1",
-    "@biom3/react": "^0.20.2",
+    "@biom3/react": "^0.20.11",
     "@imtbl/config": "0.0.0",
     "@imtbl/core-sdk": "^2.4.0",
     "@imtbl/passport": "0.0.0",
@@ -13,6 +13,7 @@
     "bootstrap": "^5.2.3",
     "bootstrap-icons": "^1.10.3",
     "ethers": "^5.7.2",
+    "framer-motion": "^11.0.6",
     "next": "13.3.1",
     "react": "^18.2.0",
     "react-bootstrap": "^2.7.2",

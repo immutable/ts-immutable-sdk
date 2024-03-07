@@ -18,11 +18,11 @@ import { SwapContext } from '../context/SwapContext';
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { LoadingView } from '../../../views/loading/LoadingView';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
-import { isPassportProvider } from '../../../lib/providerUtils';
 import { SpendingCapHero } from '../../../components/Hero/SpendingCapHero';
 import { WalletApproveHero } from '../../../components/Hero/WalletApproveHero';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { isPassportProvider } from '../../../lib/provider';
 
 export interface ApproveERC20Props {
   data: ApproveERC20SwapData;
@@ -318,7 +318,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
   return (
     <>
       {approvalTxnLoading && (
-        <LoadingView loadingText={t('views.APPROVE_ERC20.approveSpending.loading.text')} showFooterLogo />
+        <LoadingView loadingText={t('views.APPROVE_ERC20.approveSpending.loading.text')} />
       )}
       {!approvalTxnLoading && (
         <SimpleLayout

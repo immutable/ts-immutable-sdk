@@ -2,7 +2,7 @@ import { Box, Button } from '@biom3/react';
 import { useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useWalletConnect } from 'lib/hooks/useWalletConnect';
-import { isWalletConnectProvider } from 'lib/providerUtils';
+import { isWalletConnectProvider } from 'lib/provider';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -22,10 +22,10 @@ export function Settings({
 }: SettingsProps) {
   const { t } = useTranslation();
   const { connectLoaderState } = useContext(ConnectLoaderContext);
-  const { checkout, provider } = connectLoaderState;
+  const { provider } = connectLoaderState;
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
-  const { ethereumProvider } = useWalletConnect({ checkout: checkout! });
+  const { ethereumProvider } = useWalletConnect();
 
   const { page } = useAnalytics();
 

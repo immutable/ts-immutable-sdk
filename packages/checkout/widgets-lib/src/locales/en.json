@@ -56,11 +56,7 @@
     },
     "ERROR_VIEW": {
       "heading": "Something's gone wrong",
-      "body": [
-        "You can try again or contact",
-        "support",
-        "for help."
-      ],
+      "body": ["You can try again or contact", "support", "for help."],
       "actionText": "Try again"
     },
     "SERVICE_UNAVAILABLE_ERROR_VIEW": {
@@ -267,12 +263,17 @@
       "options": {
         "crypto": {
           "heading": "Coins",
-          "caption": "Using the coins balance in your wallet",
+          "caption": "The fastest way to pay, if you have coins in your balance.",
           "disabledCaption": "We can't see enough coins in your balance"
         },
-        "fiat": {
-          "heading": "Card",
-          "caption": "GooglePay also available with Transak",
+        "debit": {
+          "heading": "Debit Card",
+          "caption": "The recommended way to pay with card.",
+          "disabledCaption": null
+        },
+        "credit": {
+          "heading": "Credit Card",
+          "caption": "Not recommended since transactions may be blocked by your bank.",
           "disabledCaption": null
         }
       },
@@ -282,9 +283,12 @@
         "captionCTA": "add coins"
       },
       "loading": {
-        "ready": "Ready to purchase",
-        "confirm": "Confirm in your wallet",
-        "processing": "Processing purchase"
+        "ready1": "Collecting your order",
+        "ready2": "Talking to wallet",
+        "ready3": "Readying assets",
+        "processing1": "Initialising payment",
+        "processing2": "Securing your assets",
+        "processing3": "Finalising payment"
       }
     },
     "PAY_WITH_COINS": {
