@@ -5,19 +5,20 @@ export const containerStyles = {
   paddingTop: 'base.spacing.x6',
   paddingBottom: 'base.spacing.x1',
   height: '100%',
+  paddingX: 'base.spacing.x6',
 };
 
 export const contentTextStyles = {
-  color: 'base.color.text.body.secondary',
   fontFamily: 'base.font.family.heading.secondary',
   textAlign: 'center',
   marginTop: '15px',
+  paddingX: 'base.spacing.x6',
 };
 
 export const actionButtonContainerStyles = {
   display: 'flex',
   flexDirection: 'column',
-  justifyContent: 'center',
+  justifyContent: 'flex-end',
   gap: 'base.spacing.x2',
   height: '100%',
   width: '100%',

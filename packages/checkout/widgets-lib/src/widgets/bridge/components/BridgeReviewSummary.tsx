@@ -16,12 +16,15 @@ import {
   isPassportProvider,
   isWalletConnectProvider,
 } from 'lib/provider';
-import { calculateCryptoToFiat } from 'lib/utils';
+import { calculateCryptoToFiat, isNativeToken } from 'lib/utils';
 import {
   DEFAULT_QUOTE_REFRESH_INTERVAL,
   DEFAULT_TOKEN_DECIMALS,
+  ETH_TOKEN_SYMBOL,
+  IMX_TOKEN_SYMBOL,
   NATIVE,
   addChainChangedListener,
+  getL1ChainId,
   networkIcon,
   removeChainChangedListener,
 } from 'lib';
@@ -36,6 +39,7 @@ import { useTranslation } from 'react-i18next';
 import { NetworkSwitchDrawer } from 'components/NetworkSwitchDrawer/NetworkSwitchDrawer';
 import { Web3Provider } from '@ethersproject/providers';
 import { useWalletConnect } from 'lib/hooks/useWalletConnect';
+import { NotEnoughGas } from 'components/NotEnoughGas/NotEnoughGas';
 import { networkIconStyles } from './WalletNetworkButtonStyles';
 import {
   arrowIconStyles,
@@ -50,6 +54,7 @@ import {
 } from './BridgeReviewSummaryStyles';
 import { BridgeActions, BridgeContext } from '../context/BridgeContext';
 import {
+  SharedViews,
   ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
@@ -65,7 +70,7 @@ export function BridgeReviewSummary() {
 
   const {
     bridgeState: {
-      checkout, tokenBridge, from, to, token, amount,
+      checkout, tokenBridge, from, to, token, amount, tokenBalances,
     },
     bridgeDispatch,
   } = useContext(BridgeContext);
@@ -94,6 +99,26 @@ export function BridgeReviewSummary() {
   const [fromWalletIsWalletConnect, setFromWalletIsWalletConnect] = useState<boolean>(false);
   const [toWalletIsWalletConnect, setToWalletIsWalletConnect] = useState<boolean>(false);
   const { isWalletConnectEnabled, getWalletLogoUrl } = useWalletConnect();
+
+  // Not enough ETH to cover gas
+  const [showNotEnoughGasDrawer, setShowNotEnoughGasDrawer] = useState(false);
+
+  const insufficientFundsForGas = useMemo(() => {
+    if (!estimates) return false;
+    if (!token) return true;
+
+    const nativeTokenBalance = tokenBalances
+      .find((balance) => isNativeToken(balance.token.address));
+
+    let requiredAmount = BigNumber.from(estimates.fees.totalFees);
+    if (isNativeToken(token.address)) {
+      // add native move amount to required amount as they need to cover
+      // the gas + move amount
+      requiredAmount = requiredAmount.add(utils.parseUnits(amount, token.decimals));
+    }
+
+    return !nativeTokenBalance || nativeTokenBalance.balance.lt(requiredAmount);
+  }, [tokenBalances, estimates, token, amount]);
 
   const displayAmount = useMemo(
     () => (token?.symbol ? `${token?.symbol} ${amount}` : `${amount}`),
@@ -252,8 +277,19 @@ export function BridgeReviewSummary() {
     }
   }, [isWalletConnectEnabled, from?.web3Provider, to?.web3Provider]);
 
+  useEffect(() => {
+    if (insufficientFundsForGas) {
+      setShowNotEnoughGasDrawer(true);
+    }
+  }, [insufficientFundsForGas]);
+
   const submitBridge = useCallback(async () => {
     if (!approveTransaction || !transaction) return;
+
+    if (insufficientFundsForGas) {
+      setShowNotEnoughGasDrawer(true);
+      return;
+    }
 
     try {
       const currentChainId = await (from?.web3Provider.provider as any).request({ method: 'eth_chainId', params: [] });
@@ -467,6 +503,7 @@ export function BridgeReviewSummary() {
           width: '100%',
         }}
       >
+        {(estimates && !loading) && (
         <Button
           size="large"
           sx={{ width: '100%' }}
@@ -480,6 +517,7 @@ export function BridgeReviewSummary() {
             t('views.BRIDGE_REVIEW.submitButton.buttonText')
           )}
         </Button>
+        )}
       </Box>
       <NetworkSwitchDrawer
         visible={showSwitchNetworkDrawer}
@@ -488,6 +526,28 @@ export function BridgeReviewSummary() {
         checkout={checkout}
         onCloseDrawer={() => setShowSwitchNetworkDrawer(false)}
         onNetworkSwitch={handleNetworkSwitch}
+      />
+      <NotEnoughGas
+        environment={checkout.config.environment}
+        visible={showNotEnoughGasDrawer}
+        onCloseDrawer={() => setShowNotEnoughGasDrawer(false)}
+        walletAddress={from?.walletAddress || ''}
+        showAdjustAmount={isNativeToken(token?.address)}
+        tokenSymbol={
+            from?.network === getL1ChainId(checkout?.config)
+              ? ETH_TOKEN_SYMBOL
+              : IMX_TOKEN_SYMBOL
+          }
+        onAddCoinsClick={() => {
+          viewDispatch({
+            payload: {
+              type: ViewActions.UPDATE_VIEW,
+              view: {
+                type: SharedViews.TOP_UP_VIEW,
+              },
+            },
+          });
+        }}
       />
     </Box>
   );
