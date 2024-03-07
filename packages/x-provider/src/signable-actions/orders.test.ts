@@ -1,4 +1,5 @@
-import { UnsignedOrderRequest, OrdersApi, GetSignableCancelOrderRequest } from '@imtbl/core-sdk';
+import { UnsignedOrderRequest, GetSignableCancelOrderRequest } from '@imtbl/core-sdk';
+import { imx } from '@imtbl/generated-clients';
 import { parseEther } from '@ethersproject/units';
 import { signRaw, convertToSignableToken } from '@imtbl/toolkit';
 import { cancelOrder, createOrder } from './orders';
@@ -6,6 +7,7 @@ import { generateSigners, privateKey1, testConfig } from '../test/helpers';
 
 jest.mock('@imtbl/core-sdk');
 jest.mock('@imtbl/toolkit');
+jest.mock('@imtbl/generated-clients');
 
 describe('Orders', () => {
   describe('createOrder()', () => {
@@ -53,7 +55,7 @@ describe('Orders', () => {
       createOrderMock = jest.fn().mockResolvedValue({
         data: createOrderResponse,
       });
-      (OrdersApi as jest.Mock).mockReturnValue({
+      (imx.OrdersApi as jest.Mock).mockReturnValue({
         getSignableOrder: getSignableOrderMock,
         createOrderV3: createOrderMock,
       });
@@ -126,7 +128,7 @@ describe('Orders', () => {
       cancelOrderMock = jest.fn().mockResolvedValue({
         data: createCancelResponse,
       });
-      (OrdersApi as jest.Mock).mockReturnValue({
+      (imx.OrdersApi as jest.Mock).mockReturnValue({
         getSignableCancelOrderV3: getSignableCancelOrderMock,
         cancelOrderV3: cancelOrderMock,
       });

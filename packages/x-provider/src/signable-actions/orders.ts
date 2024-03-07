@@ -3,10 +3,10 @@ import {
   CreateOrderResponse,
   GetSignableCancelOrderRequest,
   GetSignableOrderRequestV3,
-  OrdersApi,
   OrdersApiCreateOrderV3Request,
   UnsignedOrderRequest,
 } from '@imtbl/core-sdk';
+import { imx } from '@imtbl/generated-clients';
 import { convertToSignableToken, signRaw } from '@imtbl/toolkit';
 import { Signers } from './types';
 import { validateChain } from './helpers';
@@ -32,7 +32,7 @@ export async function createOrder({
   await validateChain(signers.ethSigner, config.immutableXConfig);
 
   const ethAddress = await signers.ethSigner.getAddress();
-  const ordersApi = new OrdersApi(config.immutableXConfig.apiConfiguration);
+  const ordersApi = new imx.OrdersApi(config.immutableXConfig.apiConfiguration);
 
   const amountSell = request.sell.type === 'ERC721' ? '1' : request.sell.amount;
   const amountBuy = request.buy.type === 'ERC721' ? '1' : request.buy.amount;
@@ -88,7 +88,7 @@ export async function cancelOrder({
   request,
   config,
 }: CancelOrderWorkflowParams): Promise<CancelOrderResponse> {
-  const ordersApi = new OrdersApi(config.immutableXConfig.apiConfiguration);
+  const ordersApi = new imx.OrdersApi(config.immutableXConfig.apiConfiguration);
 
   const getSignableCancelOrderResponse = await ordersApi.getSignableCancelOrderV3(
     {
