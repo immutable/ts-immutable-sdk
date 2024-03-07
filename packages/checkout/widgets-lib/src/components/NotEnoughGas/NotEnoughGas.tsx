@@ -1,13 +1,12 @@
 import {
   Body,
-  Drawer, Box, ButtCon, Button, Heading, CloudImage,
+  Drawer, Box, Button, Heading, CloudImage,
 } from '@biom3/react';
 import { useCallback, useState } from 'react';
 import { ETH_TOKEN_SYMBOL } from 'lib';
 import { Environment } from '@imtbl/config';
 import { getRemoteImage } from 'lib/utils';
 import { useTranslation } from 'react-i18next';
-import { FooterLogo } from 'components/Footer/FooterLogo';
 import {
   containerStyles,
   headingTextStyles,
@@ -58,7 +57,13 @@ NotEnoughGasProps) {
   }, [walletAddress]);
 
   return (
-    <Drawer size="threeQuarter" visible={visible} showHeaderBar={false}>
+    <Drawer
+      size="threeQuarter"
+      visible={visible}
+      showHeaderBar
+      headerBarTitle={undefined}
+      onCloseDrawer={onCloseDrawer}
+    >
       <Drawer.Content testId="not-enough-gas-bottom-sheet" sx={containerStyles}>
         <CloudImage
           imageUrl={
@@ -67,17 +72,6 @@ NotEnoughGasProps) {
                 : notEnoughImx
             }
           sx={{ w: '90px', h: tokenSymbol === ETH_TOKEN_SYMBOL ? '110px' : '90px' }}
-        />
-        <ButtCon
-          icon="Close"
-          variant="tertiary"
-          sx={{
-            pos: 'absolute',
-            top: 'base.spacing.x5',
-            left: 'base.spacing.x5',
-            backdropFilter: 'blur(30px)',
-          }}
-          onClick={onCloseDrawer}
         />
         <Heading
           size="small"
@@ -114,7 +108,6 @@ NotEnoughGasProps) {
               </Button>
             )}
         </Box>
-        <FooterLogo />
       </Drawer.Content>
     </Drawer>
   );

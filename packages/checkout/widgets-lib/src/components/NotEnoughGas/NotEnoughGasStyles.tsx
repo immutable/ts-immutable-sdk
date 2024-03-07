@@ -2,8 +2,7 @@ export const containerStyles = {
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  paddingTop: 'base.spacing.x6',
-  paddingBottom: 'base.spacing.x1',
+  paddingBottom: 'base.spacing.x6',
   height: '100%',
   paddingX: 'base.spacing.x6',
 };
