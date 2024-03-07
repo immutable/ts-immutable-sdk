@@ -1,5 +1,4 @@
 import {
-  EncodeAssetRequestTokenTypeEnum,
   EncodeAssetTokenData,
 } from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
@@ -7,7 +6,7 @@ import { ImmutableXConfiguration } from '@imtbl/x-client';
 
 export async function getEncodeAssetInfo(
   assetType: string,
-  tokenType: EncodeAssetRequestTokenTypeEnum,
+  tokenType: imx.EncodeAssetRequestTokenTypeEnum,
   config: ImmutableXConfiguration,
   tokenData?: EncodeAssetTokenData,
 ): Promise<imx.EncodeAssetResponse> {
