@@ -1,6 +1,5 @@
 import {
   Contracts,
-  DepositsApi,
   EncodingApi,
   ERC20Amount,
   TokensApi,
@@ -96,7 +95,7 @@ export async function depositERC20({
   const { apiConfiguration, ethConfiguration } = config.immutableXConfig;
   const user = await ethSigner.getAddress();
   const tokensApi = new TokensApi(apiConfiguration);
-  const depositsApi = new DepositsApi(apiConfiguration);
+  const depositsApi = new imx.DepositsApi(apiConfiguration);
   const encodingApi = new EncodingApi(apiConfiguration);
   const usersApi = new imx.UsersApi(apiConfiguration);
 

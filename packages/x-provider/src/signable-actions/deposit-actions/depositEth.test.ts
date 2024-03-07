@@ -1,5 +1,6 @@
 import {
-  DepositsApi, EncodingApi, ETHAmount,
+  EncodingApi,
+  ETHAmount,
   Contracts,
 } from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
@@ -47,7 +48,7 @@ describe('Deposit ETH', () => {
       getSignableDepositMock = jest.fn().mockResolvedValue({
         data: getSignableDepositResponse,
       });
-      (DepositsApi as jest.Mock).mockReturnValue({
+      (imx.DepositsApi as jest.Mock).mockReturnValue({
         getSignableDeposit: getSignableDepositMock,
       });
 

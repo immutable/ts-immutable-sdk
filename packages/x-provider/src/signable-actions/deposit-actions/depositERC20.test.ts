@@ -1,5 +1,4 @@
 import {
-  DepositsApi,
   EncodingApi,
   TokensApi,
   ERC20Amount,
@@ -52,7 +51,7 @@ describe('Deposit ERC20', () => {
       getSignableDepositMock = jest.fn().mockResolvedValue({
         data: getSignableDepositResponse,
       });
-      (DepositsApi as jest.Mock).mockReturnValue({
+      (imx.DepositsApi as jest.Mock).mockReturnValue({
         getSignableDeposit: getSignableDepositMock,
       });
 

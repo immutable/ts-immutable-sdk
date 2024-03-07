@@ -1,6 +1,5 @@
 import {
   Contracts,
-  DepositsApi,
   EncodingApi,
   ETHAmount,
 } from '@imtbl/core-sdk';
@@ -95,7 +94,7 @@ export async function depositEth({
   };
   const amount = parseUnits(deposit.amount, 'wei');
   const imxConfig = config.immutableXConfig;
-  const depositsApi = new DepositsApi(imxConfig.apiConfiguration);
+  const depositsApi = new imx.DepositsApi(imxConfig.apiConfiguration);
   const encodingApi = new EncodingApi(imxConfig.apiConfiguration);
   const usersApi = new imx.UsersApi(imxConfig.apiConfiguration);
 
