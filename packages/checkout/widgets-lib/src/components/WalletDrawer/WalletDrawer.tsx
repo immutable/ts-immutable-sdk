@@ -7,8 +7,9 @@ import { walletItemListStyles } from './WalletDrawerStyles';
 import { WalletConnectItem } from './WalletConnectItem';
 import { useWalletConnect } from '../../lib/hooks/useWalletConnect';
 import { WalletChangeEvent } from './WalletDrawerEvents';
-import { EIP1193Provider, EIP6963ProviderDetail, walletConnectProviderInfo } from '../../lib/provider';
+import { EIP1193Provider, EIP6963ProviderDetail } from '../../lib/provider';
 import { listItemVariants, listVariants } from '../../lib/animation/listAnimation';
+import { walletConnectProviderInfo } from '../../lib/provider/providerDetail';
 
 interface WalletDrawerProps {
   testId: string;
