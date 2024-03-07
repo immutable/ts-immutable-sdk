@@ -4,6 +4,7 @@ import { ReactElement, useState } from 'react';
 import { WalletProviderName } from '@imtbl/checkout-sdk';
 import { RawImage } from '../../../components/RawImage/RawImage';
 import { EIP1193Provider, EIP6963ProviderDetail, getProviderSlugFromRdns } from '../../../lib/provider';
+import useIsSmallScreen from '../../../lib/hooks/useIsSmallScreen';
 
 export interface WalletProps<RC extends ReactElement | undefined = undefined> {
   loading?: boolean;
@@ -23,6 +24,7 @@ export function WalletItem<
   onWalletItemClick,
 }: WalletProps<RC>) {
   const { t } = useTranslation();
+  const { isSmallScreenMode } = useIsSmallScreen();
   const [busy, setBusy] = useState(false);
   const providerSlug = getProviderSlugFromRdns(providerDetail.info.rdns);
   const isPassport = providerSlug === WalletProviderName.PASSPORT;
@@ -69,7 +71,7 @@ export function WalletItem<
         <MenuItem.Badge
           variant="guidance"
           isAnimated={busy}
-          badgeContent={busy ? '' : t('wallets.recommended')}
+          badgeContent={busy || isSmallScreenMode ? '' : t('wallets.recommended')}
         />
       ))}
     </MenuItem>
