@@ -644,6 +644,18 @@
         "body": "{{chain}} 네트워크로 전환해야 합니다"
       },
       "switchButton": "{{chain}}로 전환하기"
+    },
+    "walletConnectionError": {
+      "unableToConnect": {
+          "heading": "연결할 수 없음",
+          "body": "지갑을 확인한 후 다시 시도하거나 닫고 다른 옵션을 시도하세요.",
+          "actionButtonText": "다시 시도"
+      },
+      "changedYourMind": {
+          "heading": "생각을 바꾸셨나요?",
+          "body": "팝업이 활성화되어 있는지 확인하고 지갑의 프롬프트를 따라 연결하세요.",
+          "actionButtonText": "다시 시도"
+      }
     }
   }
 }
