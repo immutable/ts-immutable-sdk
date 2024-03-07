@@ -1,6 +1,5 @@
 import {
   Contracts,
-  RegisterUserResponse,
   GetSignableRegistrationResponse,
   EthSigner,
 } from '@imtbl/core-sdk';
@@ -14,7 +13,7 @@ import { ProviderConfiguration } from '../config';
 export async function registerOffchain(
   signers: Signers,
   config: ProviderConfiguration,
-): Promise<RegisterUserResponse> {
+): Promise<imx.RegisterUserResponse> {
   await validateChain(signers.ethSigner, config.immutableXConfig);
   const usersApi = new imx.UsersApi(config.immutableXConfig.apiConfiguration);
 

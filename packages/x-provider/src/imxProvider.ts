@@ -1,5 +1,4 @@
 import {
-  RegisterUserResponse,
   CancelOrderResponse,
   CreateOrderResponse,
   CreateTransferResponse,
@@ -9,6 +8,7 @@ import {
   TokenAmount,
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
+import { imx } from '@imtbl/generated-clients';
 import {
   AnyToken,
   UnsignedOrderRequest,
@@ -29,9 +29,9 @@ export interface IMXProvider {
   /**
    * Register a User to Immutable X if they are not already registered
    *
-   * @return {Promise<RegisterUserResponse>} Returns a promise that resolves with the user registration response
+   * @return {Promise<imx.RegisterUserResponse>} Returns a promise that resolves with the user registration response
    */
-  registerOffchain(): Promise<RegisterUserResponse>;
+  registerOffchain(): Promise<imx.RegisterUserResponse>;
   /**
    *  Checks if a User is registered off-chain
    *

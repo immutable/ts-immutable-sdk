@@ -1,5 +1,4 @@
 import {
-  RegisterUserResponse,
   CancelOrderResponse,
   CreateOrderResponse,
   CreateTransferResponse,
@@ -11,6 +10,7 @@ import {
   UnsignedTransferRequest,
   EthSigner,
 } from '@imtbl/core-sdk';
+import { imx } from '@imtbl/generated-clients';
 import {
   AnyToken,
   UnsignedOrderRequest,
@@ -64,7 +64,7 @@ export class GenericIMXProvider implements IMXProvider {
     );
   }
 
-  registerOffchain(): Promise<RegisterUserResponse> {
+  registerOffchain(): Promise<imx.RegisterUserResponse> {
     return registerOffchain(this.signers, this.config);
   }
 
