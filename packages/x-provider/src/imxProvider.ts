@@ -11,10 +11,12 @@ import {
   GetSignableTradeRequest,
   NftTransferDetails,
   TokenAmount,
-  UnsignedOrderRequest,
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
-import { UnsignedExchangeTransferRequest } from '@imtbl/x-client';
+import {
+  UnsignedOrderRequest,
+  UnsignedExchangeTransferRequest,
+} from '@imtbl/x-client';
 import { TransactionResponse } from '@ethersproject/providers';
 
 export interface IMXProvider {

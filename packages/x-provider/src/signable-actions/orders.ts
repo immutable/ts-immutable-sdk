@@ -4,8 +4,8 @@ import {
   GetSignableCancelOrderRequest,
   GetSignableOrderRequestV3,
   OrdersApiCreateOrderV3Request,
-  UnsignedOrderRequest,
 } from '@imtbl/core-sdk';
+import { UnsignedOrderRequest } from '@imtbl/x-client';
 import { imx } from '@imtbl/generated-clients';
 import { convertToSignableToken, signRaw } from '@imtbl/toolkit';
 import { Signers } from './types';
