@@ -38,8 +38,6 @@ const processProviders = (
       return indexA - indexB;
     });
 
-  console.log('Providers filtered', filteredProviders, injectedProviders);
-
   // Add passport from checkout config if not from injected providers
   if (checkout?.passport
     // && priorityWalletRdns.includes(WalletProviderRdns.PASSPORT) TODO: // Uncomment this when config JSON is updated
@@ -49,8 +47,6 @@ const processProviders = (
     }
     filteredProviders.unshift(getPassportProviderDetail(passportWeb3Provider.provider as EIP1193Provider));
   }
-
-  console.log('Adding passport provider', filteredProviders[0]);
 
   return filteredProviders;
 };
@@ -66,7 +62,6 @@ export const useInjectedProviders = ({ checkout }: UseInjectedProvidersParams) =
     defaultPriorityWalletRdns = connectConfig.injected?.priorityWalletRdns ?? [];
     defaultBlacklistWalletRdns = connectConfig.injected?.blacklistWalletRdns ?? [];
   })();
-  console.log('Preparing default providers', defaultBlacklistWalletRdns, defaultPriorityWalletRdns);
   const defaultProviders = processProviders(
     checkout,
     InjectedProvidersManager.getInstance().getProviders(),
