@@ -1,9 +1,9 @@
 import {
   Contracts,
-  ERC721Token,
 } from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
 import {
+  ERC721Token,
   EthSigner,
   ImmutableXConfiguration,
 } from '@imtbl/x-client';

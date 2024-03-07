@@ -1,8 +1,8 @@
 import {
-  ERC721Token,
   Contracts,
 } from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
+import { ERC721Token } from '@imtbl/x-client';
 import {
   generateSigners,
   privateKey1,
@@ -13,6 +13,7 @@ import { depositERC721 } from '.';
 
 jest.mock('@imtbl/core-sdk');
 jest.mock('@imtbl/generated-clients');
+jest.mock('@imtbl/x-client');
 
 describe('Deposit ERC721', () => {
   describe('depositERC721()', () => {
