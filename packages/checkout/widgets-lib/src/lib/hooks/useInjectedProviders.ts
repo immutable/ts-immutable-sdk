@@ -12,41 +12,37 @@ export interface UseInjectedProvidersParams {
   checkout: Checkout | null;
 }
 
+type ConnectConfig = {
+  injected: {
+    priorityWalletRdns: WalletProviderRdns | string[];
+    blacklistWalletRdns: WalletProviderRdns | string[];
+  };
+};
+
 let passportWeb3Provider: Web3Provider;
-const processProviders = (checkout: Checkout | null, injectedProviders: EIP6963ProviderDetail<EIP1193Provider>[]) => {
-  // Apply wallet providers allowlist
-  const allowedWalletRdns = [
-    'com.immutable.passport', // Immutable Passport
-    'io.metamask', // MetaMask
-    // 'xyz.frontier.wallet', // Frontier
-    // 'me.rainbow', // Rainbow
-    'com.coinbase.wallet', // Coinbase Wallet
-  ];
-  // const uniqueRdnsSet = new Set();
+const processProviders = (
+  checkout: Checkout | null,
+  injectedProviders: EIP6963ProviderDetail<EIP1193Provider>[],
+  priorityWalletRdns: WalletProviderRdns | string[] = [],
+  blacklistWalletRdns: WalletProviderRdns | string[] = [],
+) => {
+  // Filter providers
   const filteredProviders = injectedProviders
-    // .filter((provider) => {
-    //   if (allowedWalletRdns.includes(provider.info.rdns)) {
-    //     if (!uniqueRdnsSet.has(provider.info.rdns)) {
-    //       uniqueRdnsSet.add(provider.info.rdns);
-    //       return true;
-    //     }
-    //   }
-    //
-    //   return false;
-    // })
+    .filter((provider) => !blacklistWalletRdns.includes(provider.info.rdns))
     .sort((a, b) => {
-      // Get the index of the rdns for each provider
-      let indexA = allowedWalletRdns.indexOf(a.info.rdns);
+      let indexA = priorityWalletRdns.indexOf(a.info.rdns);
       if (indexA < 0) indexA = 999;
-      let indexB = allowedWalletRdns.indexOf(b.info.rdns);
+      let indexB = priorityWalletRdns.indexOf(b.info.rdns);
       if (indexB < 0) indexB = 999;
-      // Sort based on the index
+
       return indexA - indexB;
     });
 
+  console.log('Providers filtered', filteredProviders, injectedProviders);
+
   // Add passport from checkout config if not from injected providers
   if (checkout?.passport
-    && allowedWalletRdns.includes(WalletProviderRdns.PASSPORT)
+    // && priorityWalletRdns.includes(WalletProviderRdns.PASSPORT) TODO: // Uncomment this when config JSON is updated
     && !filteredProviders.some((provider) => provider.info.rdns === WalletProviderRdns.PASSPORT)) {
     if (!passportWeb3Provider) {
       passportWeb3Provider = new Web3Provider(checkout.passport.connectEvm());
@@ -54,16 +50,28 @@ const processProviders = (checkout: Checkout | null, injectedProviders: EIP6963P
     filteredProviders.unshift(getPassportProviderDetail(passportWeb3Provider.provider as EIP1193Provider));
   }
 
+  console.log('Adding passport provider', filteredProviders[0]);
+
   return filteredProviders;
 };
 
 /**
- * Hook that supplies a filters and sorted list of EIP-6963 injected providers.
+ * Hook that supplies a sorted list of EIP-6963 injected providers.
  */
 export const useInjectedProviders = ({ checkout }: UseInjectedProvidersParams) => {
+  let defaultPriorityWalletRdns: WalletProviderRdns | string[] = [];
+  let defaultBlacklistWalletRdns: WalletProviderRdns | string[] = [];
+  (async () => {
+    const connectConfig = await checkout?.config.remote.getConfig('connect') as ConnectConfig;
+    defaultPriorityWalletRdns = connectConfig.injected?.priorityWalletRdns ?? [];
+    defaultBlacklistWalletRdns = connectConfig.injected?.blacklistWalletRdns ?? [];
+  })();
+  console.log('Preparing default providers', defaultBlacklistWalletRdns, defaultPriorityWalletRdns);
   const defaultProviders = processProviders(
     checkout,
     InjectedProvidersManager.getInstance().getProviders(),
+    defaultPriorityWalletRdns,
+    defaultBlacklistWalletRdns,
   );
   const [providers, setProviders] = useState<EIP6963ProviderDetail[]>(
     defaultProviders,
@@ -77,7 +85,15 @@ export const useInjectedProviders = ({ checkout }: UseInjectedProvidersParams) =
     const cancelSubscription = InjectedProvidersManager
       .getInstance()
       .subscribe(async (injectedProviders: EIP6963ProviderDetail[]) => {
-        const filteredProviders = processProviders(checkout, injectedProviders);
+        const connectConfig = await checkout?.config.remote.getConfig('connect') as ConnectConfig;
+        const priorityWalletRdns = connectConfig.injected?.priorityWalletRdns ?? [];
+        const blacklistWalletRdns = connectConfig.injected?.blacklistWalletRdns ?? [];
+        const filteredProviders = processProviders(
+          checkout,
+          injectedProviders,
+          priorityWalletRdns,
+          blacklistWalletRdns,
+        );
         setProviders(filteredProviders);
       });
 
