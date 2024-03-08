@@ -13,7 +13,8 @@ import {
     TxStatusResponse,
     TxStatusRequest,
     StatusResponse,
-    BridgeMethodsGasLimit,
+    bridgeGasPerAction,
+    bridgeMethodsGasPerToken,
 } from '@imtbl/bridge-sdk';
 
 // @ts-ignore
@@ -26,7 +27,7 @@ export async function withdraw() {
 
   const bridgeConfig = new BridgeConfiguration({
     baseConfig: new ImmutableConfiguration({
-      environment: Environment.SANDBOX,
+      environment: params.environment,
     }),
     bridgeInstance: params.bridgeInstance,
     rootProvider: params.rootProvider,
@@ -81,9 +82,9 @@ export async function withdraw() {
     console.log('approvalNonce', approvalNonce);
     console.log('approvalGasPrice', approvalGasPrice);
 
-    approvalRes!.unsignedTx.gasLimit = BridgeMethodsGasLimit.WITHDRAW_SOURCE;
+    approvalRes!.unsignedTx.gasLimit = bridgeGasPerAction.approveToken*3;
     approvalRes!.unsignedTx.nonce = approvalNonce;
-    approvalRes!.unsignedTx.gasPrice = approvalGasPrice.mul(2);
+    approvalRes!.unsignedTx.gasPrice = approvalGasPrice.mul(3);
 
     console.log('approvalRes.unsignedTx');
     console.log(approvalRes!.unsignedTx);
@@ -128,7 +129,7 @@ export async function withdraw() {
   const withdrawNonce = await params.childWallet.getTransactionCount();
   const withdrawGasPrice = await params.childProvider.getGasPrice();
 
-  withdrawRes!.unsignedTx.gasLimit = BridgeMethodsGasLimit.WITHDRAW_SOURCE;
+  withdrawRes!.unsignedTx.gasLimit = bridgeMethodsGasPerToken.DEFAULT.withdraw.sourceGas*2;
   withdrawRes!.unsignedTx.nonce = withdrawNonce;
   withdrawRes!.unsignedTx.gasPrice = withdrawGasPrice.mul(2);
 

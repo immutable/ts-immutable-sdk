@@ -38,32 +38,38 @@ const CONTRACTS_FOR_BRIDGE = new Map<BridgeInstance, BridgeContracts>()
   .set(ETH_SEPOLIA_TO_ZKEVM_DEVNET, {
     rootERC20BridgeFlowRate: '0x0',
     rootAxelarAdapter: '0x0',
-    childERC20Bridge: '0x0',
-    childAxelarAdapter: '0x0',
     rootChainIMX: '0x0',
     rootChainWrappedETH: '0x0',
+    rootChainUSDC: '0x0',
+    childERC20Bridge: '0x0',
+    childAxelarAdapter: '0x0',
     childChainWrappedETH: '0x0',
     childChainWrappedIMX: '0x0',
+    childChainWrappedUSDC: '0x0',
   })
   .set(ETH_SEPOLIA_TO_ZKEVM_TESTNET, {
     rootERC20BridgeFlowRate: '0x0D3C59c779Fd552C27b23F723E80246c840100F5',
     rootAxelarAdapter: '0x6328Ac88ba8D466a0F551FC7C42C61d1aC7f92ab',
-    childERC20Bridge: '0x0D3C59c779Fd552C27b23F723E80246c840100F5',
-    childAxelarAdapter: '0x6328Ac88ba8D466a0F551FC7C42C61d1aC7f92ab',
     rootChainIMX: '0xe2629e08f4125d14e446660028bD98ee60EE69F2',
     rootChainWrappedETH: '0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9',
+    rootChainUSDC: '0x40b87d235A5B010a20A241F15797C9debf1ecd01',
+    childERC20Bridge: '0x0D3C59c779Fd552C27b23F723E80246c840100F5',
+    childAxelarAdapter: '0x6328Ac88ba8D466a0F551FC7C42C61d1aC7f92ab',
     childChainWrappedETH: '0xe9E96d1aad82562b7588F03f49aD34186f996478',
     childChainWrappedIMX: '0x1CcCa691501174B4A623CeDA58cC8f1a76dc3439',
+    childChainWrappedUSDC: '',
   })
   .set(ETH_MAINNET_TO_ZKEVM_MAINNET, {
     rootERC20BridgeFlowRate: '0xBa5E35E26Ae59c7aea6F029B68c6460De2d13eB6',
     rootAxelarAdapter: '0x4f49B53928A71E553bB1B0F66a5BcB54Fd4E8932',
-    childERC20Bridge: '0xBa5E35E26Ae59c7aea6F029B68c6460De2d13eB6',
-    childAxelarAdapter: '0x4f49B53928A71E553bB1B0F66a5BcB54Fd4E8932',
     rootChainIMX: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
     rootChainWrappedETH: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+    rootChainUSDC: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+    childERC20Bridge: '0xBa5E35E26Ae59c7aea6F029B68c6460De2d13eB6',
+    childAxelarAdapter: '0x4f49B53928A71E553bB1B0F66a5BcB54Fd4E8932',
     childChainWrappedETH: '0x52a6c53869ce09a731cd772f245b97a4401d3348',
     childChainWrappedIMX: '0x3a0c2ba54d6cbd3121f01b96dfd20e99d1696c9d',
+    childChainWrappedUSDC: '',
   });
 
 /**

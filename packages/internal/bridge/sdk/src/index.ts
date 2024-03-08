@@ -6,7 +6,6 @@ export * from './types/axelar';
 export {
   CompletionStatus,
   BridgeFeeActions,
-  BridgeMethodsGasLimit,
   StatusResponse,
 } from './types/index';
 export type {

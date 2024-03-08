@@ -39,12 +39,14 @@ export interface AxelarChainDetails {
 export type BridgeContracts = {
   rootERC20BridgeFlowRate: Address;
   rootAxelarAdapter: Address;
-  childERC20Bridge: Address;
-  childAxelarAdapter: Address;
   rootChainIMX: Address;
   rootChainWrappedETH: Address;
+  rootChainUSDC: Address;
+  childERC20Bridge: Address;
+  childAxelarAdapter: Address;
   childChainWrappedETH: Address;
   childChainWrappedIMX: Address;
+  childChainWrappedUSDC: Address;
 };
 
 /**
@@ -95,23 +97,14 @@ export enum BridgeFeeActions {
   FINALISE_WITHDRAWAL = 'FINALISE_WITHDRAWAL',
 }
 
-/**
- * @typedef {Object} BridgeMethodGas
- * @property {string} DEPOSIT_SOURCE - The gas required to deposit to the bridge.
- * @property {string} DEPOSIT_DESTINATION - The gas required to process the deposit on the destination chain.
- * @property {string} WITHDRAW_SOURCE - The gas required to withdraw from the bridge.
- * @property {string} WITHDRAW_DESTINATION - The gas required to process the withdrawal on the destination chain.
- * @property {string} FINALISE_WITHDRAWAL - The gas required to finalise a withdrawal from the flow rate queue.
- */
-export enum BridgeMethodsGasLimit { // @TODO test methods on chain and put correct values here
-  DEPOSIT_SOURCE = 150000,
-  DEPOSIT_DESTINATION = 160000,
-  WITHDRAW_SOURCE = 150000,
-  WITHDRAW_DESTINATION = 155000,
-  MAP_TOKEN_SOURCE = 200000,
-  MAP_TOKEN_DESTINATION = 200000,
-  FINALISE_WITHDRAWAL = 200000,
-  APPROVE_TOKEN = 50000,
+export interface BridgeMethodsGas {
+  sourceGas: number,
+  destinationGas: number,
+}
+
+export interface BridgeMethodsGasResponse extends BridgeMethodsGas {
+  symbol: string,
+  action: string,
 }
 
 export interface FeeData {

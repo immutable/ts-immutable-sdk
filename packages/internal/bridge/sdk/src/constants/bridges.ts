@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import { AxelarChainDetails, BridgeInstance } from '../types';
+import {
+  AxelarChainDetails, BridgeInstance, BridgeMethodsGas,
+} from '../types';
 
 /**
  * @constant {string} ETH_SEPOLIA_CHAIN_ID - The chain ID for the Ethereum Sepolia testnet (EIP-155 compatible format).
@@ -122,5 +124,95 @@ export const bridgeMethods = {
     tokenTo: 'withdrawTo',
     native: 'withdrawIMX',
     nativeTo: 'withdrawIMXTo',
+  },
+};
+
+export const bridgeGasPerAction: Record<string, number> = {
+  finalizeWithdrawal: 200000,
+  approveToken: 50000,
+};
+
+export const bridgeMethodsGasPerToken:Record<string, Record<string, BridgeMethodsGas>> = {
+  IMX: {
+    deposit: {
+      sourceGas: 150000,
+      destinationGas: 160000,
+    },
+    depositTo: {
+      sourceGas: 150000,
+      destinationGas: 160000,
+    },
+    withdraw: {
+      sourceGas: 150000,
+      destinationGas: 160000,
+    },
+    withdrawTo: {
+      sourceGas: 150000,
+      destinationGas: 160000,
+    },
+  },
+  ETH: {
+    deposit: {
+      sourceGas: 150000,
+      destinationGas: 160000,
+    },
+    depositTo: {
+      sourceGas: 150000,
+      destinationGas: 160000,
+    },
+    withdraw: {
+      sourceGas: 150000,
+      destinationGas: 160000,
+    },
+    withdrawTo: {
+      sourceGas: 150000,
+      destinationGas: 160000,
+    },
+  },
+  WETH: {
+    deposit: {
+      sourceGas: 150000,
+      destinationGas: 160000,
+    },
+    depositTo: {
+      sourceGas: 150000,
+      destinationGas: 160000,
+    },
+  },
+  USDC: {
+    deposit: {
+      sourceGas: 150000,
+      destinationGas: 160000,
+    },
+    depositTo: {
+      sourceGas: 150000,
+      destinationGas: 160000,
+    },
+    withdraw: {
+      sourceGas: 150000,
+      destinationGas: 160000,
+    },
+    withdrawTo: {
+      sourceGas: 150000,
+      destinationGas: 160000,
+    },
+  },
+  DEFAULT: {
+    deposit: {
+      sourceGas: 150000,
+      destinationGas: 160000,
+    },
+    depositTo: {
+      sourceGas: 150000,
+      destinationGas: 160000,
+    },
+    withdraw: {
+      sourceGas: 150000,
+      destinationGas: 160000,
+    },
+    withdrawTo: {
+      sourceGas: 150000,
+      destinationGas: 160000,
+    },
   },
 };

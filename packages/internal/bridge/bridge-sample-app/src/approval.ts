@@ -19,7 +19,7 @@ async function getApprovalTxs() {
 
   const bridgeConfig = new BridgeConfiguration({
       baseConfig: new ImmutableConfiguration({
-        environment: Environment.SANDBOX,
+        environment: params.environment,
       }),
       bridgeInstance: params.bridgeInstance,
       rootProvider: params.rootProvider,
