@@ -1,6 +1,5 @@
 import { TransactionResponse } from '@ethersproject/abstract-provider';
 import {
-  CreateWithdrawalResponse,
   NftTransferDetails,
   RegisterUserResponse,
   TokenAmount,
@@ -290,7 +289,7 @@ export class PassportImxProvider implements IMXProvider {
   }
 
   // eslint-disable-next-line class-methods-use-this, @typescript-eslint/no-unused-vars
-  prepareWithdrawal(request: TokenAmount): Promise<CreateWithdrawalResponse> {
+  prepareWithdrawal(request: TokenAmount): Promise<imx.CreateWithdrawalResponse> {
     throw new PassportError(
       'Operation not supported',
       PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR,
