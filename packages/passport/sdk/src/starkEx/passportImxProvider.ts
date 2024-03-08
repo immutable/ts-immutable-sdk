@@ -1,6 +1,5 @@
 import { TransactionResponse } from '@ethersproject/abstract-provider';
 import {
-  AnyToken,
   CancelOrderResponse,
   CreateOrderResponse,
   CreateTradeResponse,
@@ -17,6 +16,7 @@ import {
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
 import {
+  AnyToken,
   EthSigner,
   IMXClient,
   StarkSigner,
