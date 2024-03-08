@@ -1,11 +1,9 @@
 import { TransactionResponse } from '@ethersproject/abstract-provider';
 import {
-  NftTransferDetails,
-} from '@imtbl/core-sdk';
-import {
   AnyToken,
   EthSigner,
   IMXClient,
+  NftTransferDetails,
   StarkSigner,
   TokenAmount,
   UnsignedExchangeTransferRequest,

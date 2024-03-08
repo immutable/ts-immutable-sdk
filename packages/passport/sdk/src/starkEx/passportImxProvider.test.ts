@@ -1,7 +1,4 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import {
-  NftTransferDetails,
-} from '@imtbl/core-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import {
   imx,
@@ -9,6 +6,7 @@ import {
 } from '@imtbl/generated-clients';
 import {
   IMXClient,
+  NftTransferDetails,
   StarkSigner,
   UnsignedExchangeTransferRequest,
   UnsignedOrderRequest,
