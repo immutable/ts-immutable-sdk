@@ -22,7 +22,7 @@ export const useWalletConnect = () => {
       (async () => setEthereumProvider(await WalletConnectManager.getInstance().getProvider()))();
       setWalletConnectModal(WalletConnectManager.getInstance().getModal());
     }
-  }, []);
+  }, [isWalletConnectEnabled]);
 
   const openWalletConnectModal = useCallback(async ({
     connectCallback,
