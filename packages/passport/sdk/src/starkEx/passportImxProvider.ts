@@ -1,7 +1,6 @@
 import { TransactionResponse } from '@ethersproject/abstract-provider';
 import {
   NftTransferDetails,
-  RegisterUserResponse,
   TokenAmount,
 } from '@imtbl/core-sdk';
 import {
@@ -186,7 +185,7 @@ export class PassportImxProvider implements IMXProvider {
     });
   }
 
-  async registerOffchain(): Promise<RegisterUserResponse> {
+  async registerOffchain(): Promise<imx.RegisterUserResponse> {
     const [user, signers] = await Promise.all([
       this.#getAuthenticatedUser(),
       this.#getSigners(),
