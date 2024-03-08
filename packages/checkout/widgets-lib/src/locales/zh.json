@@ -4,6 +4,9 @@
       "body": {
         "heading": "连接钱包",
         "content": "您需要连接或创建数字钱包以购买、出售、交易和存储您的硬币和收藏品。"
+      },
+      "walletSelection": {
+        "heading": "选择一个钱包"
       }
     },
     "CONNECT_SUCCESS": {
@@ -56,7 +59,11 @@
     },
     "ERROR_VIEW": {
       "heading": "出了些问题",
-      "body": ["您可以再试一次或联系", "支持", "寻求帮助。"],
+      "body": [
+        "您可以再试一次或联系",
+        "支持",
+        "寻求帮助。"
+      ],
       "actionText": "再试一次"
     },
     "SERVICE_UNAVAILABLE_ERROR_VIEW": {
@@ -534,17 +541,21 @@
   "wallets": {
     "passport": {
       "heading": "Immutable Passport",
-      "accentText": "推荐",
-      "description": "数字钱包和身份"
+      "description": "您的游戏钱包，可以用卡支付、管理物品等。"
     },
     "metamask": {
       "heading": "MetaMask",
-      "description": "用于访问区块链应用程序和web3的数字钱包"
+      "description": "用于访问区块链应用和web3的数字钱包。"
     },
     "walletconnect": {
       "heading": "其他钱包",
-      "description": "允许您连接到包括MetaMask在内的任何区块链钱包"
-    }
+      "description": "允许您连接任何区块链移动钱包，包括MetaMask。"
+    },
+    "browserwallet": {
+      "heading": "浏览器钱包",
+      "description": "用于访问区块链应用和web3的数字钱包。"
+    },
+    "recommended": "推荐"
   },
   "drawers": {
     "feesBreakdown": {
@@ -576,14 +587,8 @@
     },
     "notEnoughGas": {
       "content": {
-        "eth": {
-          "heading": "余额过低",
-          "body": "您的ETH余额不足以支付此操作的燃气费。您可以直接使用MetaMask向您的钱包转入更多ETH。"
-        },
-        "imx": {
-          "heading": "您需要更多IMX币",
-          "body": "为了支付指定金额的费用，您需要添加更多IMX币。"
-        }
+        "heading": "您需要更多{{token}}来支付燃气费",
+        "body": "您的{{token}}余额不足以支付此操作的燃气费，因此在继续之前，您需要添加更多{{token}}。"
       },
       "buttons": {
         "adjustAmount": "调整金额",
@@ -637,6 +642,18 @@
         "body": "您需要切换到{{chain}}网络才能继续进行"
       },
       "switchButton": "切换到{{chain}}"
+    },
+    "walletConnectionError": {
+      "unableToConnect": {
+          "heading": "无法连接",
+          "body": "请检查您的钱包并重试，或关闭并尝试其他选项。",
+          "actionButtonText": "重试"
+      },
+      "changedYourMind": {
+          "heading": "改变主意了吗？",
+          "body": "确保弹出窗口已启用，并按照钱包中的提示进行连接。",
+          "actionButtonText": "重试"
+      }
     }
   }
 }

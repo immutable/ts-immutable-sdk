@@ -90,8 +90,9 @@ export function Settings({
           variant="secondary"
           sx={settingsDisconnectButtonStyle}
           onClick={() => {
-            handleWCDisconnect();
-            sendDisconnectWalletEvent(eventTarget);
+            handleWCDisconnect().then(() => {
+              sendDisconnectWalletEvent(eventTarget);
+            });
           }}
         >
           {t('views.SETTINGS.disconnectButton.label')}

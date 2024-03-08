@@ -17,7 +17,7 @@ export function WalletConnectItem<
   loading,
 }: WalletConnectItemProps<RC>) {
   const { t } = useTranslation();
-  const [showLoadingIcon, setShowLoadingIcon] = useState(false);
+  const [busy, setBusy] = useState(false);
 
   return (
     <MenuItem
@@ -27,12 +27,12 @@ export function WalletConnectItem<
       emphasized
       onClick={async () => {
         if (loading) return;
-        setShowLoadingIcon(true);
+        setBusy(true);
         // let the parent handle errors
         try {
           await onWalletItemClick();
         } finally {
-          setShowLoadingIcon(false);
+          setBusy(false);
         }
       }}
     >
@@ -43,7 +43,12 @@ export function WalletConnectItem<
       <MenuItem.Label size="medium">
         {t('wallets.walletconnect.heading')}
       </MenuItem.Label>
-      {showLoadingIcon && (<MenuItem.StatefulButtCon state="loading" icon="Loading" />)}
+      {(busy && (
+        <MenuItem.Badge
+          variant="guidance"
+          isAnimated={busy}
+        />
+      ))}
     </MenuItem>
   );
 }
