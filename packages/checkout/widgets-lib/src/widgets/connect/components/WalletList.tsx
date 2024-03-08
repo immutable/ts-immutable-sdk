@@ -1,6 +1,7 @@
 import { Box } from '@biom3/react';
 import {
   ChainId,
+  CheckoutErrorType,
   WalletProviderName, WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
 import {
@@ -9,11 +10,12 @@ import {
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Web3Provider } from '@ethersproject/providers';
+import { UnableToConnectDrawer } from 'components/UnableToConnectDrawer/UnableToConnectDrawer';
+import { ChangedYourMindDrawer } from 'components/ChangedYourMindDrawer/ChangedYourMindDrawer';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { ConnectActions, ConnectContext } from '../context/ConnectContext';
 import { WalletItem } from './WalletItem';
 import {
-  SharedViews,
   ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
@@ -55,6 +57,10 @@ export function WalletList(props: WalletListProps) {
   const { providers } = useInjectedProviders({ checkout });
   const [showWalletDrawer, setShowWalletDrawer] = useState(false);
   const { isWalletConnectEnabled, openWalletConnectModal } = useWalletConnect();
+
+  const [showChangedYourMindDrawer, setShowChangedYourMindDrawer] = useState(false);
+  const [showUnableToConnectDrawer, setShowUnableToConnectDrawer] = useState(false);
+  const [chosenProviderDetail, setChosenProviderDetail] = useState<EIP6963ProviderDetail>();
 
   const filteredProviders = useMemo(() => (
     providers.filter((provider) => (!(provider.info.rdns === WalletProviderRdns.PASSPORT)))
@@ -150,22 +156,24 @@ export function WalletList(props: WalletListProps) {
           getProviderSlugFromRdns(providerDetail.info.rdns),
         );
         await handleConnectViewUpdate(web3Provider);
-      } catch (err: any) {
+      } catch (err: CheckoutErrorType | any) {
+        if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
         // eslint-disable-next-line no-console
-        console.error('Connect rejected', err);
+          console.error('Connect rejected', err);
 
-        // TODO: Wire up error state drawers or throw them
+          setShowChangedYourMindDrawer(true);
+        } else {
+          // eslint-disable-next-line no-console
+          console.error('Connect error', err);
+
+          setShowUnableToConnectDrawer(true);
+        }
       }
     } catch (err: any) {
       // eslint-disable-next-line no-console
       console.error('Connect unknown error', err);
 
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: { type: SharedViews.ERROR_VIEW, error: err },
-        },
-      });
+      setShowUnableToConnectDrawer(true);
     }
   }, [checkout]);
 
@@ -203,6 +211,7 @@ export function WalletList(props: WalletListProps) {
 
   const handleWalletChange = async (event: WalletChangeEvent) => {
     const { providerDetail } = event;
+    setChosenProviderDetail(providerDetail);
     track({
       userJourney: UserJourney.CONNECT,
       screen: 'ConnectWallet',
@@ -220,6 +229,9 @@ export function WalletList(props: WalletListProps) {
 
   const handleWalletItemClick = useCallback(
     async (providerDetail: EIP6963ProviderDetail<EIP1193Provider>) => {
+      setShowChangedYourMindDrawer(false);
+      setShowUnableToConnectDrawer(false);
+      setChosenProviderDetail(providerDetail);
       track({
         userJourney: UserJourney.CONNECT,
         screen: 'ConnectWallet',
@@ -235,6 +247,11 @@ export function WalletList(props: WalletListProps) {
     },
     [track, checkout],
   );
+
+  const onChosenProviderDetailChange = useCallback(() => {
+    if (!chosenProviderDetail) return;
+    handleWalletItemClick(chosenProviderDetail!);
+  }, [chosenProviderDetail]);
 
   const onBrowserWalletsClick = useCallback(() => {
     setShowWalletDrawer(true);
@@ -315,6 +332,20 @@ export function WalletList(props: WalletListProps) {
           setShowWalletDrawer(show);
         }}
         onWalletChange={handleWalletChange}
+      />
+
+      <ChangedYourMindDrawer
+        visible={showChangedYourMindDrawer}
+        checkout={checkout!}
+        onCloseDrawer={() => setShowChangedYourMindDrawer(false)}
+        onTryAgain={onChosenProviderDetailChange}
+      />
+
+      <UnableToConnectDrawer
+        visible={showUnableToConnectDrawer}
+        checkout={checkout!}
+        onCloseDrawer={() => setShowUnableToConnectDrawer(false)}
+        onTryAgain={() => setShowUnableToConnectDrawer(false)}
       />
     </Box>
   );
