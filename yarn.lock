@@ -29638,7 +29638,6 @@ __metadata:
   resolution: "x-provider-sample-app@workspace:packages/x-provider/src/sample-app"
   dependencies:
     "@biom3/react": ^0.20.11
-    "@imtbl/core-sdk": ^2.4.0
     "@imtbl/sdk": 0.0.0
     "@svgr/webpack": ^8.0.1
     "@testing-library/jest-dom": ^5.16.5
