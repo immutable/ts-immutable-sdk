@@ -424,7 +424,7 @@ export class TokenBridge {
   ): Promise<TenderlyGasEstimatesResponse> {
     const simulations: Array<any> = [];
 
-    if (amountToApprove.gt(0)) {
+    if (amountToApprove.gt(0) && token.toUpperCase() !== 'NATIVE') {
       if (!erc20Contract || !contractToApprove) {
         throw new BridgeError(
           `erc20Contract not found. The address (${contractToApprove}) is not a valid.`,
