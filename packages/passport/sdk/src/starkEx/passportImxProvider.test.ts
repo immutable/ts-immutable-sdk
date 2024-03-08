@@ -1,6 +1,5 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import {
-  CancelOrderResponse,
   CreateOrderResponse,
   CreateTradeResponse,
   CreateTransferResponse,
@@ -13,7 +12,10 @@ import {
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
 import { Web3Provider } from '@ethersproject/providers';
-import { ImxApiClients } from '@imtbl/generated-clients';
+import {
+  imx,
+  ImxApiClients,
+} from '@imtbl/generated-clients';
 import {
   IMXClient,
   StarkSigner,
@@ -206,7 +208,7 @@ describe('PassportImxProvider', () => {
 
   describe('cancelOrder', () => {
     it('calls cancelOrder workflow', async () => {
-      const returnValue = {} as CancelOrderResponse;
+      const returnValue = {} as imx.CancelOrderResponse;
       const request = {} as GetSignableCancelOrderRequest;
 
       (cancelOrder as jest.Mock).mockResolvedValue(returnValue);

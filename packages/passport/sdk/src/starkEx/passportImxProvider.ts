@@ -1,6 +1,5 @@
 import { TransactionResponse } from '@ethersproject/abstract-provider';
 import {
-  CancelOrderResponse,
   CreateOrderResponse,
   CreateTradeResponse,
   CreateTransferResponse,
@@ -23,7 +22,10 @@ import {
 } from '@imtbl/x-client';
 import { IMXProvider } from '@imtbl/x-provider';
 import { Web3Provider } from '@ethersproject/providers';
-import { ImxApiClients } from '@imtbl/generated-clients';
+import {
+  imx,
+  ImxApiClients,
+} from '@imtbl/generated-clients';
 import TypedEventEmitter from '../utils/typedEventEmitter';
 import AuthManager from '../authManager';
 import GuardianClient from '../guardian';
@@ -234,7 +236,7 @@ export class PassportImxProvider implements IMXProvider {
 
   async cancelOrder(
     request: GetSignableCancelOrderRequest,
-  ): Promise<CancelOrderResponse> {
+  ): Promise<imx.CancelOrderResponse> {
     const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
 
     return cancelOrder({
