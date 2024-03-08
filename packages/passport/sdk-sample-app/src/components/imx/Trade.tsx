@@ -4,7 +4,8 @@ import {
   Alert, Button, Form, Image, Offcanvas, Spinner, Stack, Table,
 } from 'react-bootstrap';
 import { Heading, TextInput } from '@biom3/react';
-import { GetSignableTradeRequest, Order } from '@imtbl/core-sdk';
+import { Order } from '@imtbl/core-sdk';
+import { imx } from '@imtbl/generated-clients';
 import { ModalProps } from '@/types';
 import { usePassportProvider } from '@/context/PassportProvider';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
@@ -61,7 +62,7 @@ function Trade({ showModal: showTradeModal, setShowModal: setShowTradeModal }: M
     setTradeIndex(index);
     try {
       const user = await imxProvider?.getAddress() || '';
-      const request: GetSignableTradeRequest = {
+      const request: imx.GetSignableTradeRequest = {
         order_id: id,
         user,
         fees: [{
