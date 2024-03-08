@@ -59,7 +59,11 @@
     },
     "ERROR_VIEW": {
       "heading": "Something's gone wrong",
-      "body": ["You can try again or contact", "support", "for help."],
+      "body": [
+        "You can try again or contact",
+        "support",
+        "for help."
+      ],
       "actionText": "Try again"
     },
     "SERVICE_UNAVAILABLE_ERROR_VIEW": {
@@ -537,21 +541,21 @@
   "wallets": {
     "passport": {
       "heading": "Immutable Passport",
-      "accentText": "Recommended",
-      "description": "digital wallet and identity"
+      "description": "Your gaming wallet to pay with card, manage items & more."
     },
     "metamask": {
       "heading": "MetaMask",
-      "description": "Digital wallet for accessing blockchain applications and web3"
+      "description": "Digital wallet for accessing blockchain applications and web3."
     },
     "walletconnect": {
       "heading": "Other wallets",
-      "description": "Allows you to connect with any blockchain mobile wallet including MetaMask"
+      "description": "Allows you to connect with any blockchain mobile wallet including MetaMask."
     },
     "browserwallet": {
       "heading": "Browser wallets",
-      "description": "Digital wallet for accessing blockchain applications and web3"
-    }
+      "description": "Digital wallet for accessing blockchain applications and web3."
+    },
+    "recommended": "Recommended"
   },
   "drawers": {
     "feesBreakdown": {
@@ -593,14 +597,8 @@
     },
     "notEnoughGas": {
       "content": {
-        "eth": {
-          "heading": "Balance too low",
-          "body": "You're ETH balance is too low to cover the gas fee on this move. You could transfer more ETH into your wallet using MetaMask directly."
-        },
-        "imx": {
-          "heading": "You'll need more IMX coins",
-          "body": "In order to cover the fees for the amount specified, you'll need to add more IMX coins."
-        }
+        "heading": "You'll need more {{token}} for gas",
+        "body": "Your {{token}} balance is too low to cover the gas fee on this move, so you'll need to add more before proceeding."
       },
       "buttons": {
         "adjustAmount": "Adjust amount",
@@ -654,6 +652,18 @@
         "body": "You'll need to switch to the {{chain}} network to proceed"
       },
       "switchButton": "Switch to {{chain}}"
+    },
+    "walletConnectionError": {
+      "unableToConnect": {
+        "heading": "Unable to connect",
+        "body": "Check your wallet and try again, or close and try a different option",
+        "actionButtonText": "Try again"
+      },
+      "changedYourMind": {
+        "heading": "Changed your mind?",
+        "body": "Make sure pop ups are enabled and follow the prompts in your wallet to connect",
+        "actionButtonText": "Try again"
+      }
     }
   }
 }

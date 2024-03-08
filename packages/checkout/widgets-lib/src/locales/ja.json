@@ -544,21 +544,21 @@
   "wallets": {
     "passport": {
       "heading": "Immutable Passport",
-      "accentText": "おすすめ",
-      "description": "デジタルウォレットおよびアイデンティティ"
+      "description": "カードで支払い、アイテムを管理するなど、ゲーム用ウォレットです。"
     },
     "metamask": {
       "heading": "MetaMask",
-      "description": "ブロックチェーンアプリケーションとWeb3へのアクセス用のデジタルウォレット"
+      "description": "ブロックチェーンアプリケーションおよびweb3にアクセスするためのデジタルウォレット。"
     },
     "walletconnect": {
       "heading": "その他のウォレット",
-      "description": "MetaMaskを含む任意のブロックチェーンウォレットに接続できます"
+      "description": "MetaMaskを含む任意のブロックチェーンモバイルウォレットに接続できます。"
     },
     "browserwallet": {
       "heading": "ブラウザウォレット",
-      "description": "ブロックチェーンアプリケーションおよびweb3にアクセスするためのデジタルウォレット"
-    }
+      "description": "ブロックチェーンアプリケーションおよびweb3にアクセスするためのデジタルウォレット。"
+    },
+    "recommended": "推奨"
   },
   "drawers": {
     "feesBreakdown": {
@@ -590,14 +590,8 @@
     },
     "notEnoughGas": {
       "content": {
-        "eth": {
-          "heading": "残高が低すぎます",
-          "body": "この移動のガス手数料をカバーするには、ETH残高が不足しています。MetaMaskを使用して直接ウォレットにETHを送金することができます。"
-        },
-        "imx": {
-          "heading": "もっとIMXコインが必要になるでしょう",
-          "body": "指定された金額の手数料をカバーするために、もっとIMXコインを追加する必要があります"
-        }
+        "heading": "{{token}}が不足しています",
+        "body": "この操作のガス手数料をカバーするには{{token}}残高が十分にありません。続行する前に、もっと{{token}}を追加する必要があります。"
       },
       "buttons": {
         "adjustAmount": "金額を調整",
@@ -651,6 +645,18 @@
         "body": "{{chain}}ネットワークに切り替える必要があります"
       },
       "switchButton": "{{chain}}に切り替える"
+    },
+    "walletConnectionError": {
+      "unableToConnect": {
+          "heading": "接続できません",
+          "body": "ウォレットを確認してもう一度お試しください。または、閉じて別のオプションを試してください。",
+          "actionButtonText": "もう一度試す"
+      },
+      "changedYourMind": {
+          "heading": "考えを変えましたか？",
+          "body": "ポップアップが有効になっていることを確認し、ウォレットのプロンプトに従って接続してください。",
+          "actionButtonText": "もう一度試す"
+      }
     }
   }
 }
