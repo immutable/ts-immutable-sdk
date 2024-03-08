@@ -15,7 +15,7 @@ import {
   SwapEventType,
   WalletEventType,
   WalletNetworkSwitch,
-  WidgetTheme, WidgetType, ProviderEventType, ProviderUpdated, WidgetProperties
+  WidgetTheme, WidgetType, ProviderEventType, ProviderUpdated, WidgetProperties, ChainId
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { passport } from './passport';
@@ -24,7 +24,7 @@ import { LanguageSelector } from './LanguageSelector';
 // Create one instance of Checkout and inject Passport
 const checkout = new Checkout({
   baseConfig: {
-    environment: Environment.PRODUCTION,
+    environment: Environment.SANDBOX,
     publishableKey: 'pk_imapik-test-pCHFU0GpQImZx9UzSnU3',
   },
   passport,
@@ -102,8 +102,8 @@ export const MainPage = () => {
   }, [walletWidget, bridgeWidget, onRampWidget, swapWidget]);
 
   // button click functions to open/close widgets
-  const openConnectWidget = useCallback(() => {
-    connectWidget.mount('connect-target');
+  const openConnectWidget = useCallback((targetChainId?: ChainId) => {
+    connectWidget.mount('connect-target', {targetChainId: targetChainId});
   }, [connectWidget])
 
   const openWalletWidget = useCallback(() => {
@@ -159,7 +159,8 @@ export const MainPage = () => {
       <Box sx={{ width: '100%', padding: 'base.spacing.x4', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
         <Heading>Immutable Checkout Marketplace</Heading>
         <Box sx={{ padding: 'base.spacing.x4', display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', gap: 'base.spacing.x6', alignItems: 'center', flexWrap: 'wrap' }}>
-          <Button onClick={openConnectWidget}>Connect</Button>
+          <Button onClick={() => openConnectWidget()}>Connect</Button>
+          <Button onClick={() => openConnectWidget(checkout.config.isProduction ? ChainId.ETHEREUM : ChainId.SEPOLIA)}>Connect (Layer 1)</Button>
           <Button onClick={openWalletWidget}>Wallet</Button>
           <Button onClick={openSwapWidget}>Swap</Button>
           <Button onClick={openBridgeWidget}>Bridge</Button>

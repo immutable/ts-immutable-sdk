@@ -19,6 +19,7 @@
     "declaration": true,
     "jsx": "react-jsx",
     "noImplicitAny": false,
+    "jsxImportSource": "@emotion/react",
     "experimentalDecorators": true
   },
   "include": ["src", "babel.config.js"],

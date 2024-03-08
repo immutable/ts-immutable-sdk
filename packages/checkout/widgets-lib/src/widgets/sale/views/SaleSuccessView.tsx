@@ -20,8 +20,8 @@ export function SaleSuccessView({ data }: SaleSuccessViewProps) {
       statusText={t('views.SALE_SUCCESS.text')}
       actionText={t('views.SALE_SUCCESS.actionText')}
       onRenderEvent={() => {
-        const { transactions, ...rest } = data;
-        sendSuccessEvent(SaleWidgetViews.SALE_SUCCESS, transactions, rest);
+        const { transactions, tokenIds, ...details } = data;
+        sendSuccessEvent(SaleWidgetViews.SALE_SUCCESS, transactions, tokenIds, details);
       }}
       onActionClick={() => closeWidget()}
       statusType={StatusType.SUCCESS}

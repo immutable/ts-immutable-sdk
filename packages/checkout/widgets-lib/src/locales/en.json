@@ -4,6 +4,9 @@
       "body": {
         "heading": "Connect a wallet",
         "content": "You'll need to connect or create a digital wallet to buy, sell, trade and store your coins and collectibles."
+      },
+      "walletSelection": {
+        "heading": "Choose a wallet"
       }
     },
     "CONNECT_SUCCESS": {
@@ -37,8 +40,8 @@
     },
     "SWITCH_NETWORK": {
       "eth": {
-        "heading": "To move your coins, you'll need to switch to the Sepolia network",
-        "body": "You'll be prompted to switch networks in MetaMask. You'll be able to switch back when needed.",
+        "heading": "You'll need to switch to the {{networkName}} network",
+        "body": "You'll be prompted to switch networks in your wallet.",
         "button": {
           "text": "Ready to Switch",
           "retryText": "Try Again"
@@ -56,11 +59,7 @@
     },
     "ERROR_VIEW": {
       "heading": "Something's gone wrong",
-      "body": [
-        "You can try again or contact",
-        "support",
-        "for help."
-      ],
+      "body": ["You can try again or contact", "support", "for help."],
       "actionText": "Try again"
     },
     "SERVICE_UNAVAILABLE_ERROR_VIEW": {
@@ -267,12 +266,17 @@
       "options": {
         "crypto": {
           "heading": "Coins",
-          "caption": "Using the coins balance in your wallet",
+          "caption": "The fastest way to pay, if you have coins in your balance.",
           "disabledCaption": "We can't see enough coins in your balance"
         },
-        "fiat": {
-          "heading": "Card",
-          "caption": "GooglePay also available with Transak",
+        "debit": {
+          "heading": "Debit Card",
+          "caption": "The recommended way to pay with card.",
+          "disabledCaption": null
+        },
+        "credit": {
+          "heading": "Credit Card",
+          "caption": "Not recommended since transactions may be blocked by your bank.",
           "disabledCaption": null
         }
       },
@@ -282,9 +286,12 @@
         "captionCTA": "add coins"
       },
       "loading": {
-        "ready": "Ready to purchase",
-        "confirm": "Confirm in your wallet",
-        "processing": "Processing purchase"
+        "ready1": "Collecting your order",
+        "ready2": "Talking to wallet",
+        "ready3": "Readying assets",
+        "processing1": "Initialising payment",
+        "processing2": "Securing your assets",
+        "processing3": "Finalising payment"
       }
     },
     "PAY_WITH_COINS": {
@@ -539,7 +546,11 @@
     },
     "walletconnect": {
       "heading": "Other wallets",
-      "description": "Allows you to connect with any blockchain wallet including MetaMask"
+      "description": "Allows you to connect with any blockchain mobile wallet including MetaMask"
+    },
+    "browserwallet": {
+      "heading": "Browser wallets",
+      "description": "Digital wallet for accessing blockchain applications and web3"
     }
   },
   "drawers": {

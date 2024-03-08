@@ -119,6 +119,7 @@ export const bridgeRoute = async (
   availableRoutingOptions: AvailableRoutingOptions,
   bridgeRequirement: BridgeRequirement,
   tokenBalanceResults: Map<ChainId, TokenBalanceResult>,
+  ownerAddress: string,
 ): Promise<BridgeFundingStep | undefined> => {
   if (!availableRoutingOptions.bridge) return undefined;
   const l1ChainId = getL1ChainId(config);
@@ -157,6 +158,9 @@ export const bridgeRoute = async (
     readOnlyProviders,
     l1ChainId,
     l2ChainId,
+    ownerAddress,
+    bridgeRequirement.amount,
+    l1address,
   );
 
   const {

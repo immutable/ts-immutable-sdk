@@ -27,3 +27,4 @@ yalc.lock
 package-lock.json
 
 docs/
+packages/internal/bridge/bridge-sample-app/mainnet.env

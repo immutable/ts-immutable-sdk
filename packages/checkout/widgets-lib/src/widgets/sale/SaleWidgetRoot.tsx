@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react';
 import {
-  ConnectTargetLayer,
+  ChainId,
   IMTBLWidgetEvents,
   SaleItem,
   SaleWidgetParams,
@@ -96,26 +96,29 @@ export class Sale extends Base<WidgetType.SALE> {
 
     const { t } = i18n;
     const connectLoaderParams: ConnectLoaderParams = {
-      targetLayer: ConnectTargetLayer.LAYER2,
+      targetChainId: this.checkout.config.isProduction
+        ? ChainId.IMTBL_ZKEVM_MAINNET
+        : ChainId.IMTBL_ZKEVM_TESTNET,
       web3Provider: this.web3Provider,
       checkout: this.checkout,
       allowedChains: [getL2ChainId(this.checkout!.config)],
     };
+    const config = this.strongConfig();
 
     this.reactRoot.render(
       <React.StrictMode>
         <CustomAnalyticsProvider checkout={this.checkout}>
-          <ThemeProvider id="sale-container" config={this.strongConfig()}>
+          <ThemeProvider id="sale-container" config={config}>
             <ConnectLoader
-              widgetConfig={this.strongConfig()}
+              widgetConfig={config}
               params={connectLoaderParams}
               closeEvent={() => {
                 sendSaleWidgetCloseEvent(window);
               }}
             >
-              <Suspense fallback={<LoadingView loadingText={t('views.LOADING_VIEW.text')} showFooterLogo />}>
+              <Suspense fallback={<LoadingView loadingText={t('views.LOADING_VIEW.text')} />}>
                 <SaleWidget
-                  config={this.strongConfig()}
+                  config={config}
                   amount={this.parameters.amount!}
                   items={this.parameters.items!}
                   environmentId={this.parameters.environmentId!}

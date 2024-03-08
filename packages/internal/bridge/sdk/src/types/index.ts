@@ -126,83 +126,31 @@ export interface FeeData {
  * @dev Union type of DepositFeeRequest|WithdrawFeeRequest|FinaliseFeeRequest|MapTokenFeeRequest
  * ensures the correct params are supplied when trying to calculate the fees
  */
-export type BridgeFeeRequest = DepositNativeFeeRequest
-| DepositERC20FeeRequest
-| WithdrawNativeFeeRequest
-| WithdrawERC20FeeRequest
-| FinaliseFeeRequest;
+export type BridgeFeeRequest = DepositOrWithdrawFeeRequest | FinaliseFeeRequest;
 
 /**
- * @typedef {Object} DepositNativeFeeRequest
+ * @typedef {Object} DepositOrWithdrawFeeRequest
  * @property {BridgeFeeActions} method - The method for which the bridge fee is being requested.
  * @property {number} gasMultiplier - How much buffer to add to the gas fee.
  * @property {string} sourceChainId - The chain ID of the source chain.
  * @property {string} destinationChainId - The chain ID of the destination chain.
+ * @property {FungibleToken} token - The token to be bridged.
+ * @property {ethers.BigNumber} amount - The amount to be bridged.
+ * @property {Address} senderAddress - The sender address or '0x0' if unknown.
+ * @property {Address} recipientAddress - The recipient address or '0x0' if unknown.
+ * @dev Parsing 0x0 for either the senderAddress or recipient address will cause the fee estimator
+ * to revert back to using static values and will always return the approval transction fee since
+ * we are unable to check the allowance amount since no address was parsed.
+ * @dev having the senderAddress and recipientAddress able to be set to 0x0 prevents causing a breaking
+ * change in the Checkout SDK. This functionality should be deprecated over time and the Checkout SDK's
+ * 'estimateGas' method should require the currently optional params to be required.
  */
-export interface DepositNativeFeeRequest {
-  action: BridgeFeeActions.DEPOSIT,
+export interface DepositOrWithdrawFeeRequest {
+  action: BridgeFeeActions,
   gasMultiplier: number;
   sourceChainId: string;
   destinationChainId: string;
-  token: 'NATIVE',
-  amount: ethers.BigNumber;
-  senderAddress: Address;
-  recipientAddress: Address;
-}
-
-/**
- * @typedef {Object} DepositERC20FeeRequest
- * @property {BridgeFeeActions} method - The method for which the bridge fee is being requested.
- * @property {number} gasMultiplier - How much buffer to add to the gas fee.
- * @property {string} sourceChainId - The chain ID of the source chain.
- * @property {string} destinationChainId - The chain ID of the destination chain.
- * @property {FungibleToken} token - The token to be deposited.
- * @property {ethers.BigNumber} amount - The amount to be deposited.
- */
-export interface DepositERC20FeeRequest {
-  action: BridgeFeeActions.DEPOSIT,
-  gasMultiplier: number;
-  sourceChainId: string;
-  destinationChainId: string;
-  token: FungibleToken;
-  amount: ethers.BigNumber;
-  senderAddress: Address;
-  recipientAddress: Address;
-}
-
-/**
- * @typedef {Object} WithdrawNativeFeeRequest
- * @property {BridgeFeeActions} method - The method for which the bridge fee is being requested.
- * @property {number} gasMultiplier - How much buffer to add to the gas fee.
- * @property {string} sourceChainId - The chain ID of the source chain.
- * @property {string} destinationChainId - The chain ID of the destination chain.
- */
-export interface WithdrawNativeFeeRequest {
-  action: BridgeFeeActions.WITHDRAW,
-  gasMultiplier: number;
-  sourceChainId: string;
-  destinationChainId: string;
-  token: 'NATIVE',
-  amount: ethers.BigNumber;
-  senderAddress: Address;
-  recipientAddress: Address;
-}
-
-/**
- * @typedef {Object} WithdrawERC20FeeRequest
- * @property {BridgeFeeActions} method - The method for which the bridge fee is being requested.
- * @property {number} gasMultiplier - How much buffer to add to the gas fee.
- * @property {string} sourceChainId - The chain ID of the source chain.
- * @property {string} destinationChainId - The chain ID of the destination chain.
- * @property {FungibleToken} token - The token to be withdrawn.
- * @property {ethers.BigNumber} amount - The amount to be withdrawn.
- */
-export interface WithdrawERC20FeeRequest {
-  action: BridgeFeeActions.WITHDRAW,
-  gasMultiplier: number;
-  sourceChainId: string;
-  destinationChainId: string;
-  token: FungibleToken;
+  token: FungibleToken,
   amount: ethers.BigNumber;
   senderAddress: Address;
   recipientAddress: Address;

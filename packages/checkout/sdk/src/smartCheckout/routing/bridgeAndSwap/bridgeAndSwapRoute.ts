@@ -276,6 +276,7 @@ export const bridgeAndSwapRoute = async (
         availableRoutingOptions,
         bridgeRequirement,
         tokenBalances,
+        ownerAddress,
       ),
     );
     bridgeableRequirementsMap.set(bridgeRequirement.l2address, {

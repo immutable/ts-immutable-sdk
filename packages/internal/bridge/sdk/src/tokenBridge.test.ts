@@ -540,7 +540,7 @@ describe('Token Bridge', () => {
     const originalGetTenderlyBridgeGasEstimates = TokenBridge.prototype['getTenderlyBridgeGasEstimates'];
 
     const sourceChainGas:ethers.BigNumber = ethers.utils.parseUnits('0.000001', 18);
-    const approavalGas:ethers.BigNumber = ethers.utils.parseUnits('0.000001', 18);
+    const approvalGas:ethers.BigNumber = ethers.utils.parseUnits('0.000001', 18);
     const destinationChainGas:ethers.BigNumber = ethers.utils.parseUnits('0.000001', 18);
     const validatorFee:ethers.BigNumber = ethers.utils.parseUnits('0.0001', 18);
     const bridgeFee:ethers.BigNumber = destinationChainGas.add(validatorFee);
@@ -580,7 +580,61 @@ describe('Token Bridge', () => {
       TokenBridge.prototype['calculateBridgeFee'] = originalCalculateBridgeFee;
       TokenBridge.prototype['getTenderlyBridgeGasEstimates'] = originalGetTenderlyBridgeGasEstimates;
     });
-    it('returns the deposit fees for native tokens', async () => {
+
+    it('returns the static deposit fees for native tokens', async () => {
+      expect.assertions(6);
+
+      const amount = ethers.BigNumber.from(1000);
+      const result = await tokenBridge.getFee(
+        {
+          action: BridgeFeeActions.DEPOSIT,
+          gasMultiplier: 1.1,
+          sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
+          amount,
+          token: 'NATIVE',
+          senderAddress: '0x0',
+          recipientAddress: '0x0',
+        },
+      );
+
+      expect(result).not.toBeNull();
+      expect(result.sourceChainGas).toStrictEqual(sourceChainGas);
+      expect(result.approvalFee).toStrictEqual(ethers.BigNumber.from(0));
+      expect(result.bridgeFee).toStrictEqual(bridgeFee);
+      expect(result.imtblFee).toStrictEqual(imtblFee);
+      expect(result.totalFees).toStrictEqual(totalFees);
+    });
+
+    it('returns the static deposit fees for ERC20 tokens', async () => {
+      expect.assertions(6);
+      const amount = ethers.BigNumber.from(1000);
+      const allowance = ethers.BigNumber.from(1000);
+
+      mockERC20Contract.allowance.mockResolvedValue(allowance);
+
+      const result = await tokenBridge.getFee(
+        {
+          action: BridgeFeeActions.DEPOSIT,
+          gasMultiplier: 1.1,
+          sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
+          amount,
+          token,
+          senderAddress: '0x0',
+          recipientAddress: '0x0',
+        },
+      );
+
+      expect(result).not.toBeNull();
+      expect(result.sourceChainGas).toStrictEqual(sourceChainGas);
+      expect(result.approvalFee).toStrictEqual(approvalGas);
+      expect(result.bridgeFee).toStrictEqual(bridgeFee);
+      expect(result.imtblFee).toStrictEqual(imtblFee);
+      expect(result.totalFees).toStrictEqual(totalFees.add(approvalGas));
+    });
+
+    it('returns the dynamic deposit fees for native tokens', async () => {
       expect.assertions(6);
 
       jest.spyOn(TokenBridge.prototype as any, 'getTenderlyBridgeGasEstimates')
@@ -611,7 +665,7 @@ describe('Token Bridge', () => {
       expect(result.totalFees).toStrictEqual(totalFees);
     });
 
-    it('returns the deposit fees for ERC20 tokens with no allowance required', async () => {
+    it('returns the dynamic deposit fees for ERC20 tokens with no allowance required', async () => {
       expect.assertions(6);
       const amount = ethers.BigNumber.from(1000);
       const allowance = ethers.BigNumber.from(1000);
@@ -645,7 +699,7 @@ describe('Token Bridge', () => {
       expect(result.totalFees).toStrictEqual(totalFees);
     });
 
-    it('returns the deposit fees for ERC20 tokens with allowance requiring increase', async () => {
+    it('returns the dynamic deposit fees for ERC20 tokens with allowance requiring increase', async () => {
       expect.assertions(6);
       const amount = ethers.BigNumber.from(1000);
       const allowance = ethers.BigNumber.from(500);
@@ -673,13 +727,13 @@ describe('Token Bridge', () => {
 
       expect(result).not.toBeNull();
       expect(result.sourceChainGas).toStrictEqual(sourceChainGas);
-      expect(result.approvalFee).toStrictEqual(approavalGas);
+      expect(result.approvalFee).toStrictEqual(approvalGas);
       expect(result.bridgeFee).toStrictEqual(bridgeFee);
       expect(result.imtblFee).toStrictEqual(imtblFee);
-      expect(result.totalFees).toStrictEqual(totalFees.add(approavalGas));
+      expect(result.totalFees).toStrictEqual(totalFees.add(approvalGas));
     });
 
-    it('returns the withdrawal fees for native tokens', async () => {
+    it('returns the dynamic withdrawal fees for native tokens', async () => {
       expect.assertions(6);
       const amount = ethers.BigNumber.from(1000);
       const result = await tokenBridge.getFee(
@@ -703,7 +757,7 @@ describe('Token Bridge', () => {
       expect(result.totalFees).toStrictEqual(totalFees);
     });
 
-    it('returns the withdrawal fees for ERC20 tokens with no allowance required', async () => {
+    it('returns the dynamic withdrawal fees for ERC20 tokens with no allowance required', async () => {
       expect.assertions(6);
       const amount = ethers.BigNumber.from(1000);
       const allowance = ethers.BigNumber.from(1000);
@@ -731,7 +785,7 @@ describe('Token Bridge', () => {
       expect(result.totalFees).toStrictEqual(totalFees);
     });
 
-    it('returns the withdrawal fees for ERC20 tokens with allowance requiring increase', async () => {
+    it('returns the dynamicwithdrawal fees for ERC20 tokens with allowance requiring increase', async () => {
       expect.assertions(6);
       const amount = ethers.BigNumber.from(1000);
       const allowance = ethers.BigNumber.from(500);
@@ -759,10 +813,10 @@ describe('Token Bridge', () => {
 
       expect(result).not.toBeNull();
       expect(result.sourceChainGas).toStrictEqual(sourceChainGas);
-      expect(result.approvalFee).toStrictEqual(approavalGas);
+      expect(result.approvalFee).toStrictEqual(approvalGas);
       expect(result.bridgeFee).toStrictEqual(bridgeFee);
       expect(result.imtblFee).toStrictEqual(imtblFee);
-      expect(result.totalFees).toStrictEqual(totalFees.add(approavalGas));
+      expect(result.totalFees).toStrictEqual(totalFees.add(approvalGas));
     });
   });
 

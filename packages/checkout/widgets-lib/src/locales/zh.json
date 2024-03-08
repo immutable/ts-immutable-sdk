@@ -4,6 +4,9 @@
       "body": {
         "heading": "连接钱包",
         "content": "您需要连接或创建数字钱包以购买、出售、交易和存储您的硬币和收藏品。"
+      },
+      "walletSelection": {
+        "heading": "选择一个钱包"
       }
     },
     "CONNECT_SUCCESS": {
@@ -37,7 +40,7 @@
     },
     "SWITCH_NETWORK": {
       "eth": {
-        "heading": "要转移您的硬币，您需要切换到Sepolia网络",
+        "heading": "您需要切换到{{networkName}}网络",
         "body": "MetaMask将提示您切换网络。需要时可以切回。",
         "button": {
           "text": "准备切换",
@@ -56,11 +59,7 @@
     },
     "ERROR_VIEW": {
       "heading": "出了些问题",
-      "body": [
-        "您可以再试一次或联系",
-        "支持",
-        "寻求帮助。"
-      ],
+      "body": ["您可以再试一次或联系", "支持", "寻求帮助。"],
       "actionText": "再试一次"
     },
     "SERVICE_UNAVAILABLE_ERROR_VIEW": {
@@ -267,24 +266,32 @@
       "options": {
         "crypto": {
           "heading": "硬币",
-          "caption": "使用您钱包中的硬币余额",
-          "disabledCaption": "我们看不到您余额中有足够多的硬币"
+          "caption": "如果您的余额中有硬币，这是最快的支付方式。",
+          "disabledCaption": "我们看不到您的余额中有足够的硬币"
         },
-        "fiat": {
-          "heading": "卡",
-          "caption": "Transak也支持使用GooglePay",
+        "debit": {
+          "heading": "借记卡",
+          "caption": "使用卡支付的推荐方式。",
+          "disabledCaption": null
+        },
+        "credit": {
+          "heading": "信用卡",
+          "caption": "不推荐使用，因为您的银行可能会阻止交易。",
           "disabledCaption": null
         }
       },
       "insufficientCoinsBanner": {
-        "caption": "硬币余额不足。请用卡支付以继续，或者",
-        "captionEnd": "再次尝试。",
+        "caption": "硬币余额不足。请使用卡支付，或",
+        "captionEnd": "再试一次。",
         "captionCTA": "添加硬币"
       },
       "loading": {
-        "ready": "准备购买",
-        "confirm": "在您的钱包中确认",
-        "processing": "正在处理购买"
+        "ready1": "正在收集您的订单",
+        "ready2": "正在与钱包交流",
+        "ready3": "正在准备资产",
+        "processing1": "正在初始化支付",
+        "processing2": "正在保护您的资产",
+        "processing3": "正在完成支付"
       }
     },
     "PAY_WITH_COINS": {
@@ -540,6 +547,10 @@
     "walletconnect": {
       "heading": "其他钱包",
       "description": "允许您连接到包括MetaMask在内的任何区块链钱包"
+    },
+    "browserwallet": {
+      "heading": "浏览器钱包",
+      "description": "用于访问区块链应用和web3的数字钱包"
     }
   },
   "drawers": {

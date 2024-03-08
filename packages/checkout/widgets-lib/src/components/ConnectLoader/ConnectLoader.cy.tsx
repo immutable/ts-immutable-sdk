@@ -95,6 +95,7 @@ describe('ConnectLoader', () => {
       request: () => {},
     };
     const params = {
+      targetChainId: ChainId.IMTBL_ZKEVM_TESTNET,
       web3Provider: { provider } as any as Web3Provider,
       allowedChains: [ChainId.IMTBL_ZKEVM_TESTNET],
       checkout,
@@ -151,14 +152,14 @@ describe('ConnectLoader', () => {
     const provider = {
       on: providerOnStub,
       removeListener: providerRemoveListenerStub,
-      request: () => {},
+      request: async () => Promise.resolve(ChainId.IMTBL_ZKEVM_TESTNET),
     };
     const params = {
+      targetChainId: ChainId.IMTBL_ZKEVM_TESTNET,
       web3Provider: {
         provider,
         getSigner: () => ({
           getAddress: async () => Promise.resolve(''),
-          getChainId: async () => Promise.resolve(ChainId.IMTBL_ZKEVM_TESTNET),
         }),
         isMetaMask: true,
       } as any as Web3Provider,
@@ -238,6 +239,7 @@ describe('ConnectLoader', () => {
       request: () => {},
     };
     const params = {
+      targetChainId: ChainId.IMTBL_ZKEVM_TESTNET,
       web3Provider: {
         provider,
         getSigner: () => ({

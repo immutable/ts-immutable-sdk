@@ -3,18 +3,18 @@ import {
 } from '@biom3/react';
 import { useContext, useEffect, useState } from 'react';
 import { BridgeContext } from 'widgets/bridge/context/BridgeContext';
-import { getWalletProviderNameByProvider, isWalletConnectProvider } from 'lib/providerUtils';
+import { isWalletConnectProvider } from 'lib/provider';
 import {
   UserJourney,
   useAnalytics,
 } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { useTranslation } from 'react-i18next';
-import { getWalletLogoByName } from 'lib/logoUtils';
 import { useWalletConnect } from 'lib/hooks/useWalletConnect';
 import {
-  headingStyles, wcStickerLogoStyles, wcWalletLogoStyles, wcWalletLogoWrapperStyles,
+  headingStyles, rawImageStyle, wcStickerLogoStyles, wcWalletLogoStyles, wcWalletLogoWrapperStyles,
 } from './ChangeWalletStyles';
+import { RawImage } from '../RawImage/RawImage';
 
 export interface ChangeWalletProps {
   onChangeWalletClick: () => void;
@@ -23,21 +23,16 @@ export interface ChangeWalletProps {
 export function ChangeWallet({ onChangeWalletClick }: ChangeWalletProps) {
   const { t } = useTranslation();
   const {
-    bridgeState: { checkout, from },
+    bridgeState: { from },
   } = useContext(BridgeContext);
   const [walletLogoUrl, setWalletLogoUrl] = useState<string | undefined>(
     undefined,
   );
   const [isWalletConnect, setIsWalletConnect] = useState<boolean>(false);
-  const { isWalletConnectEnabled, getWalletLogoUrl } = useWalletConnect({
-    checkout,
-  });
+  const { isWalletConnectEnabled, getWalletLogoUrl } = useWalletConnect();
   const { track } = useAnalytics();
   const walletAddress = from?.walletAddress || '';
-
-  const walletLogo = getWalletLogoByName(
-    getWalletProviderNameByProvider(from?.web3Provider),
-  );
+  const walletProviderInfo = from?.walletProviderInfo;
 
   const handleChangeWalletClick = () => {
     track({
@@ -51,10 +46,13 @@ export function ChangeWallet({ onChangeWalletClick }: ChangeWalletProps) {
 
   useEffect(() => {
     if (isWalletConnectEnabled) {
-      setIsWalletConnect(isWalletConnectProvider(from?.web3Provider));
-      (async () => {
-        setWalletLogoUrl(await getWalletLogoUrl());
-      })();
+      const isProviderWalletConnect = isWalletConnectProvider(from?.web3Provider);
+      setIsWalletConnect(isProviderWalletConnect);
+      if (isProviderWalletConnect) {
+        (async () => {
+          setWalletLogoUrl(await getWalletLogoUrl());
+        })();
+      }
     }
   }, [isWalletConnectEnabled, from]);
 
@@ -63,7 +61,7 @@ export function ChangeWallet({ onChangeWalletClick }: ChangeWalletProps) {
       <Box
         sx={{ display: 'flex', alignItems: 'center', gap: 'base.spacing.x1' }}
       >
-        {isWalletConnect && walletLogoUrl ? (
+        {(isWalletConnect && walletLogoUrl) ? (
           <Box sx={wcWalletLogoWrapperStyles}>
             <FramedImage
               imageUrl={walletLogoUrl}
@@ -72,15 +70,13 @@ export function ChangeWallet({ onChangeWalletClick }: ChangeWalletProps) {
             />
             <Logo logo="WalletConnectSymbol" sx={wcStickerLogoStyles} />
           </Box>
-        ) : (
-          <Logo
-            logo={walletLogo}
-            sx={{
-              width: 'base.icon.size.400',
-              pr: 'base.spacing.x1',
-            }}
+        ) : (walletProviderInfo && (
+          <RawImage
+            src={walletProviderInfo.icon}
+            alt={walletProviderInfo.name}
+            sx={rawImageStyle}
           />
-        )}
+        ))}
         <EllipsizedText
           leftSideLength={6}
           rightSideLength={4}

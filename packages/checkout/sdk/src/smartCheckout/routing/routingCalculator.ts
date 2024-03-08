@@ -61,6 +61,7 @@ export const getBridgeFundingStep = async (
   availableRoutingOptions: AvailableRoutingOptions,
   insufficientRequirement: BalanceRequirement | undefined,
   tokenBalances: Map<ChainId, TokenBalanceResult>,
+  ownerAddress: string,
 ): Promise<BridgeFundingStep | undefined> => {
   let bridgeFundingStep;
   if (insufficientRequirement === undefined) return undefined;
@@ -81,6 +82,7 @@ export const getBridgeFundingStep = async (
       availableRoutingOptions,
       bridgeRequirement,
       tokenBalances,
+      ownerAddress,
     );
   }
 
@@ -244,6 +246,7 @@ export const routingCalculator = async (
     availableRoutingOptions,
     insufficientRequirement,
     tokenBalances,
+    ownerAddress,
   ));
 
   routePromises.push(getSwapFundingSteps(

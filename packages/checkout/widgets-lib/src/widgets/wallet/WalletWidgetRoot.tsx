@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react';
 import {
-  ConnectTargetLayer,
+  ChainId,
   IMTBLWidgetEvents,
   WalletWidgetConfiguration,
   WalletWidgetParams,
@@ -67,7 +67,9 @@ export class Wallet extends Base<WidgetType.WALLET> {
 
     const { t } = i18n;
     const connectLoaderParams: ConnectLoaderParams = {
-      targetLayer: ConnectTargetLayer.LAYER2,
+      targetChainId: this.checkout.config.isProduction
+        ? ChainId.IMTBL_ZKEVM_MAINNET
+        : ChainId.IMTBL_ZKEVM_TESTNET,
       walletProviderName: this.parameters?.walletProviderName,
       web3Provider: this.web3Provider,
       checkout: this.checkout,

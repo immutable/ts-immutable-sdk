@@ -1,8 +1,9 @@
 import {
   useCallback, useContext, useEffect, useState,
 } from 'react';
+import { Web3Provider } from '@ethersproject/providers';
 import { useTranslation } from 'react-i18next';
-import { isWalletConnectProvider } from 'lib/providerUtils';
+import { isWalletConnectProvider } from 'lib/provider';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../../components/Footer/FooterButton';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
@@ -10,7 +11,7 @@ import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { ConnectActions, ConnectContext } from '../context/ConnectContext';
 import { ViewContext, ViewActions } from '../../../context/view-context/ViewContext';
-import { getL2ChainId } from '../../../lib';
+import { addChainChangedListener, getL2ChainId, removeChainChangedListener } from '../../../lib';
 import { ImmutablePlanetHero } from '../../../components/Hero/ImmutablePlanetHero';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
@@ -28,6 +29,40 @@ export function SwitchNetworkZkEVM() {
       screen: 'SwitchNetworkZkEVM',
     });
   }, []);
+
+  useEffect(() => {
+    if (!provider || !checkout) return;
+
+    const checkCorrectNetwork = async () => {
+      const currentChainId = await provider.provider.request!({ method: 'eth_chainId', params: [] });
+      // eslint-disable-next-line radix
+      const parsedChainId = parseInt(currentChainId.toString());
+      if (parsedChainId === getL2ChainId(checkout.config)) {
+        connectDispatch({
+          payload: {
+            type: ConnectActions.SET_PROVIDER,
+            provider: new Web3Provider(provider.provider as any),
+          },
+        });
+
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: {
+              type: ConnectWidgetViews.SUCCESS,
+            },
+          },
+        });
+      }
+    };
+
+    addChainChangedListener(provider, checkCorrectNetwork);
+
+    // eslint-disable-next-line consistent-return
+    return () => {
+      removeChainChangedListener(provider, checkCorrectNetwork);
+    };
+  }, [checkout, provider]);
 
   const switchNetwork = useCallback(async () => {
     if (!provider || !checkout) return;
@@ -70,7 +105,7 @@ export function SwitchNetworkZkEVM() {
       if (isWalletConnectProvider(provider)) {
         walletName = (provider.provider as any)?.session?.peer?.metadata?.name.toLowerCase();
       }
-      if (walletName === 'metamask') {
+      if (walletName.includes('metamask')) {
         try {
           await checkout.addNetwork({
             provider,

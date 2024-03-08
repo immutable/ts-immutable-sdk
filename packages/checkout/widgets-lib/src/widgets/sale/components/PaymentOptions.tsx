@@ -4,8 +4,9 @@ import { SalePaymentTypes } from '@imtbl/checkout-sdk';
 import { PaymentOption } from './PaymentOption';
 
 const defaultPaymentOptions: SalePaymentTypes[] = [
-  SalePaymentTypes.FIAT,
   SalePaymentTypes.CRYPTO,
+  SalePaymentTypes.DEBIT,
+  SalePaymentTypes.CREDIT,
 ];
 
 export interface PaymentOptionsProps {
@@ -32,7 +33,7 @@ export function PaymentOptions(props: PaymentOptionsProps) {
           disabled={disabledOptions.includes(type)}
           onClick={onClick}
           type={type}
-          key={type}
+          key={`${Math.random()}-${type}`}
         />
       ))}
     </Box>

@@ -7,12 +7,16 @@ import {
   BridgeWidgetParams,
   ConnectEventType,
   ConnectionSuccess,
-  ConnectTargetLayer,
   IMTBLWidgetEvents,
   SwapEventType,
   SwapFailed,
   SwapSuccess,
   SwapWidgetParams,
+  OnRampWidgetParams,
+  OnRampEventType,
+  OnRampSuccess,
+  OnRampFailed,
+  ChainId,
 } from '@imtbl/checkout-sdk';
 import {
   useCallback,
@@ -21,6 +25,7 @@ import {
 } from 'react';
 import BridgeWidget from 'widgets/bridge/BridgeWidget';
 import { useTranslation } from 'react-i18next';
+import OnRampWidget from 'widgets/on-ramp/OnRampWidget';
 import {
   ConnectLoaderActions,
   ConnectLoaderContext,
@@ -45,8 +50,9 @@ type FundingRouteExecuteProps = {
 
 enum FundingRouteExecuteViews {
   LOADING = 'LOADING',
-  EXECUTE_BRIDGE = 'EXECUTE_BRIDGE',
   EXECUTE_SWAP = 'EXECUTE_SWAP',
+  EXECUTE_BRIDGE = 'EXECUTE_BRIDGE',
+  EXECUTE_ON_RAMP = 'EXECUTE_ON_RAMP',
   SWITCH_NETWORK_ETH = 'SWITCH_NETWORK_ETH',
   SWITCH_NETWORK_ZKEVM = 'SWITCH_NETWORK_ZKEVM',
 }
@@ -62,6 +68,7 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
 
   const [swapParams, setSwapParams] = useState<SwapWidgetParams | undefined>(undefined);
   const [bridgeParams, setBridgeParams] = useState<BridgeWidgetParams | undefined>(undefined);
+  const [onRampParams, setOnRampParams] = useState<OnRampWidgetParams | undefined>(undefined);
 
   const [view, setView] = useState<FundingRouteExecuteViews>(FundingRouteExecuteViews.LOADING);
   const nextView = useRef<FundingRouteExecuteViews | false>(false);
@@ -111,6 +118,7 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
 
       setView(FundingRouteExecuteViews.SWITCH_NETWORK_ETH);
     }
+
     if (step.type === FundingStepType.SWAP) {
       setSwapParams({
         amount: step.fundingItem.fundsRequired.formattedAmount,
@@ -124,6 +132,14 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
       nextView.current = FundingRouteExecuteViews.EXECUTE_SWAP;
 
       setView(FundingRouteExecuteViews.SWITCH_NETWORK_ZKEVM);
+    }
+
+    if (step.type === FundingStepType.ONRAMP) {
+      setOnRampParams({
+        amount: step.fundingItem.fundsRequired.formattedAmount,
+        tokenAddress: step.fundingItem.token.address,
+      });
+      setView(FundingRouteExecuteViews.EXECUTE_ON_RAMP);
     }
   }, [provider, checkout]);
 
@@ -152,21 +168,24 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
   const handleCustomEvent = (event) => {
     switch (event.detail.type) {
       case BridgeEventType.TRANSACTION_SENT:
-      case SwapEventType.SUCCESS: {
-        const successEvent = event.detail.data as (SwapSuccess | BridgeTransactionSent);
+      case SwapEventType.SUCCESS:
+      case OnRampEventType.SUCCESS: {
+        const successEvent = event.detail.data as (SwapSuccess | BridgeTransactionSent | OnRampSuccess);
         stepSuccess.current = successEvent;
         break;
       }
       case BridgeEventType.FAILURE:
-      case SwapEventType.FAILURE: {
+      case SwapEventType.FAILURE:
+      case OnRampEventType.FAILURE: {
         // On FAILURE, widget will prompt user to try again.
         // We need to know if it failed though when they close the widget
-        const failureEvent = event.detail.data as (SwapFailed | BridgeFailed);
+        const failureEvent = event.detail.data as (SwapFailed | BridgeFailed | OnRampFailed);
         stepFailed.current = failureEvent;
         break;
       }
       case BridgeEventType.CLOSE_WIDGET:
-      case SwapEventType.CLOSE_WIDGET: {
+      case SwapEventType.CLOSE_WIDGET:
+      case OnRampEventType.CLOSE_WIDGET: {
         onCloseWidget();
         break;
       }
@@ -229,7 +248,7 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
   return (
     <EventTargetContext.Provider value={eventTargetReducerValues}>
       {view === FundingRouteExecuteViews.LOADING && (
-        <LoadingView loadingText={t('views.FUND_WITH_SMART_CHECKOUT.loading.checkingBalances')} showFooterLogo />
+        <LoadingView loadingText={t('views.FUND_WITH_SMART_CHECKOUT.loading.checkingBalances')} />
       )}
       {view === FundingRouteExecuteViews.EXECUTE_BRIDGE && (
         <BridgeWidget
@@ -244,10 +263,16 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
           config={config}
         />
       )}
+      {view === FundingRouteExecuteViews.EXECUTE_ON_RAMP && (
+        <OnRampWidget
+          config={config}
+          {...onRampParams}
+        />
+      )}
       {view === FundingRouteExecuteViews.SWITCH_NETWORK_ETH && (
         <ConnectWidget
           config={config}
-          targetLayer={ConnectTargetLayer.LAYER1}
+          targetChainId={checkout!.config.isProduction ? ChainId.ETHEREUM : ChainId.SEPOLIA}
           web3Provider={provider}
           checkout={checkout!}
           deepLink={ConnectWidgetViews.SWITCH_NETWORK}
@@ -256,7 +281,7 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
       {view === FundingRouteExecuteViews.SWITCH_NETWORK_ZKEVM && (
         <ConnectWidget
           config={config}
-          targetLayer={ConnectTargetLayer.LAYER2}
+          targetChainId={checkout!.config.isProduction ? ChainId.IMTBL_ZKEVM_MAINNET : ChainId.IMTBL_ZKEVM_TESTNET}
           web3Provider={provider}
           checkout={checkout!}
           deepLink={ConnectWidgetViews.SWITCH_NETWORK}

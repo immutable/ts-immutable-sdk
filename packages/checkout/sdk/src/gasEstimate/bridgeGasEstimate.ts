@@ -13,6 +13,10 @@ export async function getBridgeFeeEstimate(
   fromChainId: ChainId,
   toChainId: ChainId,
   config: CheckoutConfiguration,
+  amount?: string,
+  tokenAddress?: string,
+  senderAddress?: string,
+  recipientAddress?: string,
 ): Promise<BridgeFeeResponse> {
   const bridgeFeeAction = fromChainId === getL1ChainId(config)
     ? BridgeFeeActions.DEPOSIT
@@ -23,7 +27,9 @@ export async function getBridgeFeeEstimate(
     gasMultiplier: 1.1,
     sourceChainId: fromChainId.toString(),
     destinationChainId: toChainId.toString(),
-    token: NATIVE.toUpperCase(),
-    amount: BigNumber.from(0),
+    token: tokenAddress ?? NATIVE.toUpperCase(),
+    amount: (amount) ? BigNumber.from(amount) : BigNumber.from(0),
+    senderAddress: senderAddress ?? '0x0',
+    recipientAddress: recipientAddress ?? '0x0',
   });
 }

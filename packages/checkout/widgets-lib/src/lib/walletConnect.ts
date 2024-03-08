@@ -13,6 +13,10 @@ export type WalletConnectConfiguration = {
   }
 };
 
+type ConnectConfig = {
+  walletConnect: boolean;
+};
+
 const testnetModalChains = [`eip155:${ChainId.IMTBL_ZKEVM_TESTNET}`, `eip155:${ChainId.SEPOLIA}`];
 const productionModalChains = [`eip155:${ChainId.IMTBL_ZKEVM_MAINNET}`, `eip155:${ChainId.ETHEREUM}`];
 
@@ -58,6 +62,8 @@ export class WalletConnectManager {
 
   private initialised: boolean = false;
 
+  private enabled: boolean = false;
+
   private environment!: Environment;
 
   private theme!: WidgetTheme;
@@ -94,7 +100,12 @@ export class WalletConnectManager {
     return WalletConnectManager.instance;
   }
 
-  public initialise(environment: Environment, config: WalletConnectConfiguration, theme: WidgetTheme): void {
+  public initialise(
+    environment: Environment,
+    config: WalletConnectConfiguration,
+    theme: WidgetTheme,
+    remoteConfig: Promise<ConnectConfig>,
+  ): void {
     if (!this.validateConfig(config)) {
       throw new Error('Incorrect Wallet Connect configuration');
     }
@@ -102,10 +113,19 @@ export class WalletConnectManager {
     this.environment = environment;
     this.theme = theme;
     this.initialised = true;
+
+    // Determine if WalletConnect feature flag is enabled
+    remoteConfig?.then((loadedConfig) => {
+      this.enabled = loadedConfig.walletConnect;
+    });
   }
 
   public get isInitialised() {
     return this.initialised;
+  }
+
+  public get isEnabled() {
+    return this.enabled;
   }
 
   public getModal(): WalletConnectModal {
@@ -118,7 +138,7 @@ export class WalletConnectManager {
         chains: this.environment === Environment.PRODUCTION ? productionModalChains : testnetModalChains,
         explorerRecommendedWalletIds: this.environment === Environment.PRODUCTION
           ? productionWalletWhitelist : sandboxWalletWhitelist,
-        explorerExcludedWalletIds: 'ALL',
+        explorerExcludedWalletIds: undefined, // 'ALL',
         themeMode: this.theme,
         themeVariables: this.theme === WidgetTheme.DARK ? darkThemeVariables : lightThemeVariables,
       });
@@ -194,7 +214,6 @@ export class WalletConnectManager {
 
     const matchedWallet = Object.values(this.walletListings.listings)
       .find((wallet: any) => walletName.toLowerCase().includes(wallet.slug)) as any;
-
-    return matchedWallet.image_url.md;
+    return matchedWallet?.image_url.md;
   }
 }

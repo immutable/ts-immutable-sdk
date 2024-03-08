@@ -12,11 +12,10 @@ import {
 import { abbreviateAddress } from 'lib/addressUtils';
 import { CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext';
 import {
-  getWalletProviderNameByProvider,
   isMetaMaskProvider,
   isPassportProvider,
   isWalletConnectProvider,
-} from 'lib/providerUtils';
+} from 'lib/provider';
 import { calculateCryptoToFiat } from 'lib/utils';
 import {
   DEFAULT_QUOTE_REFRESH_INTERVAL,
@@ -34,7 +33,6 @@ import {
   useAnalytics,
 } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { useTranslation } from 'react-i18next';
-import { getWalletLogoByName } from 'lib/logoUtils';
 import { NetworkSwitchDrawer } from 'components/NetworkSwitchDrawer/NetworkSwitchDrawer';
 import { Web3Provider } from '@ethersproject/providers';
 import { useWalletConnect } from 'lib/hooks/useWalletConnect';
@@ -45,7 +43,7 @@ import {
   bottomMenuItemStyles,
   bridgeButtonIconLoadingStyle,
   bridgeReviewHeadingStyles,
-  bridgeReviewWrapperStyles,
+  bridgeReviewWrapperStyles, rawImageStyle,
   topMenuItemStyles,
   wcStickerLogoStyles,
   wcWalletLogoStyles,
@@ -57,6 +55,7 @@ import {
 } from '../../../context/view-context/ViewContext';
 import { Fees } from '../../../components/Fees/Fees';
 import { formatBridgeFees } from '../functions/BridgeFees';
+import { RawImage } from '../../../components/RawImage/RawImage';
 
 const testId = 'bridge-review-summary';
 
@@ -94,9 +93,7 @@ export function BridgeReviewSummary() {
   );
   const [fromWalletIsWalletConnect, setFromWalletIsWalletConnect] = useState<boolean>(false);
   const [toWalletIsWalletConnect, setToWalletIsWalletConnect] = useState<boolean>(false);
-  const { isWalletConnectEnabled, getWalletLogoUrl } = useWalletConnect({
-    checkout,
-  });
+  const { isWalletConnectEnabled, getWalletLogoUrl } = useWalletConnect();
 
   const displayAmount = useMemo(
     () => (token?.symbol ? `${token?.symbol} ${amount}` : `${amount}`),
@@ -115,23 +112,14 @@ export function BridgeReviewSummary() {
     return from.walletAddress;
   }, [from]);
 
-  const fromWalletProviderName = useMemo(
-    () => getWalletProviderNameByProvider(from?.web3Provider),
-    [from],
-  );
   const fromNetwork = useMemo(() => from && from.network, [from]);
-  const fromLogo = getWalletLogoByName(fromWalletProviderName);
 
   const toAddress = useMemo(() => {
     if (!to) return '-';
     return to.walletAddress;
   }, [to]);
-  const toWalletProviderName = useMemo(
-    () => getWalletProviderNameByProvider(to?.web3Provider),
-    [to],
-  );
+
   const toNetwork = useMemo(() => to?.network, [to]);
-  const toLogo = getWalletLogoByName(toWalletProviderName);
 
   const fetchGasEstimate = useCallback(async () => {
     if (!tokenBridge || !amount || !from || !to || !token) return;
@@ -218,11 +206,13 @@ export function BridgeReviewSummary() {
         from: {
           web3Provider: provider,
           walletAddress: from?.walletAddress!,
+          walletProviderInfo: from?.walletProviderInfo!,
           network: from?.network!,
         },
         to: {
           web3Provider: to?.web3Provider!,
           walletAddress: to?.walletAddress!,
+          walletProviderInfo: to?.walletProviderInfo!,
           network: to?.network!,
         },
       },
@@ -247,14 +237,20 @@ export function BridgeReviewSummary() {
 
   useEffect(() => {
     if (isWalletConnectEnabled) {
-      setFromWalletIsWalletConnect(isWalletConnectProvider(from?.web3Provider));
-      setToWalletIsWalletConnect(isWalletConnectProvider(to?.web3Provider));
+      const isFromProviderWalletConnect = isWalletConnectProvider(from?.web3Provider);
+      const isToProviderWalletConnect = isWalletConnectProvider(to?.web3Provider);
+      setFromWalletIsWalletConnect(isFromProviderWalletConnect);
+      setToWalletIsWalletConnect(isToProviderWalletConnect);
       (async () => {
-        setFromWalletLogoUrl(await getWalletLogoUrl());
-        setToWalletLogoUrl(await getWalletLogoUrl());
+        if (isFromProviderWalletConnect) {
+          setFromWalletLogoUrl(await getWalletLogoUrl());
+        }
+        if (isToProviderWalletConnect) {
+          setToWalletLogoUrl(await getWalletLogoUrl());
+        }
       })();
     }
-  }, [isWalletConnectEnabled, from, to]);
+  }, [isWalletConnectEnabled, from?.web3Provider, to?.web3Provider]);
 
   const submitBridge = useCallback(async () => {
     if (!approveTransaction || !transaction) return;
@@ -282,6 +278,8 @@ export function BridgeReviewSummary() {
         fromNetwork,
         fromWallet: {
           address: fromAddress,
+          rdns: from?.walletProviderInfo.rdns,
+          uuid: from?.walletProviderInfo.uuid,
           isPassportWallet: isPassportProvider(from?.web3Provider),
           isMetaMask: isMetaMaskProvider(from?.web3Provider),
         },
@@ -289,6 +287,8 @@ export function BridgeReviewSummary() {
         toNetwork,
         toWallet: {
           address: toAddress,
+          rdns: to?.walletProviderInfo.rdns,
+          uuid: to?.walletProviderInfo.uuid,
           isPassportWallet: isPassportProvider(to?.web3Provider),
           isMetaMask: isMetaMaskProvider(to?.web3Provider),
         },
@@ -308,7 +308,17 @@ export function BridgeReviewSummary() {
         },
       },
     });
-  }, [viewDispatch, approveTransaction, transaction, from?.web3Provider, from?.network]);
+  }, [
+    viewDispatch,
+    approveTransaction,
+    transaction,
+    from?.web3Provider,
+    from?.network,
+    from?.walletProviderInfo,
+    to?.web3Provider,
+    to?.network,
+    to?.walletProviderInfo,
+  ]);
 
   return (
     <Box testId={testId} sx={bridgeReviewWrapperStyles}>
@@ -349,7 +359,7 @@ export function BridgeReviewSummary() {
         emphasized
         sx={bottomMenuItemStyles}
       >
-        {fromWalletIsWalletConnect && fromWalletLogoUrl && (
+        {(fromWalletIsWalletConnect && fromWalletLogoUrl) ? (
           <>
             <MenuItem.FramedImage
               imageUrl={fromWalletLogoUrl}
@@ -358,14 +368,14 @@ export function BridgeReviewSummary() {
             />
             <Logo logo="WalletConnectSymbol" sx={wcStickerLogoStyles} />
           </>
-        )}
-        {fromWalletProviderName && !fromWalletIsWalletConnect && (
-          <MenuItem.FramedLogo
-            logo={fromLogo}
-            sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
+        ) : (from?.walletProviderInfo && (
+          <RawImage
+            src={from?.walletProviderInfo.icon}
+            alt={from?.walletProviderInfo.name}
+            sx={rawImageStyle}
           />
-        )}
-        <MenuItem.Label>
+        ))}
+        <MenuItem.Label sx={{ marginLeft: (fromWalletIsWalletConnect && fromWalletLogoUrl) ? '0px' : '45px' }}>
           <strong>{t('views.BRIDGE_REVIEW.fromLabel.heading')}</strong>
           {' '}
           <Body
@@ -396,7 +406,7 @@ export function BridgeReviewSummary() {
         emphasized
         sx={topMenuItemStyles}
       >
-        {toWalletProviderName && toWalletIsWalletConnect && toWalletLogoUrl && (
+        {(toWalletIsWalletConnect && toWalletLogoUrl) ? (
           <>
             <MenuItem.FramedImage
               imageUrl={toWalletLogoUrl}
@@ -405,14 +415,14 @@ export function BridgeReviewSummary() {
             />
             <Logo logo="WalletConnectSymbol" sx={wcStickerLogoStyles} />
           </>
-        )}
-        {toWalletProviderName && !toWalletIsWalletConnect && (
-          <MenuItem.FramedLogo
-            logo={toLogo}
-            sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
+        ) : (to?.walletProviderInfo && (
+          <RawImage
+            src={to?.walletProviderInfo.icon}
+            alt={to?.walletProviderInfo.name}
+            sx={rawImageStyle}
           />
-        )}
-        <MenuItem.Label>
+        ))}
+        <MenuItem.Label sx={{ marginLeft: (toWalletIsWalletConnect && toWalletLogoUrl) ? '0px' : '45px' }}>
           <strong>{t('views.BRIDGE_REVIEW.toLabel.heading')}</strong>
           {' '}
           <Body
