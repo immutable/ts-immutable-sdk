@@ -1,5 +1,5 @@
 import { BigNumber, utils } from 'ethers';
-import { JsonRpcProvider } from '@ethersproject/providers';
+import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import { CheckoutConfiguration, getL2ChainId } from '../../../config';
 import {
   AvailableRoutingOptions,
@@ -208,7 +208,7 @@ export type BridgeAndSwapRoute = {
 };
 export const bridgeAndSwapRoute = async (
   config: CheckoutConfiguration,
-  readOnlyProviders: Map<ChainId, JsonRpcProvider>,
+  readOnlyProviders: Map<ChainId, StaticJsonRpcProvider>,
   availableRoutingOptions: AvailableRoutingOptions,
   insufficientRequirement: BalanceNativeRequirement | BalanceERC20Requirement,
   ownerAddress: string,

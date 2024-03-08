@@ -23,14 +23,14 @@ const DUMMY_WALLET_ADDRESS = '0x0000000000000000000000000000000000000001';
 const DEFAULT_TOKEN_DECIMALS = 18;
 
 async function bridgeToL2GasEstimator(
-  readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
+  readOnlyProviders: Map<ChainId, ethers.providers.StaticJsonRpcProvider>,
   config: CheckoutConfiguration,
 ): Promise<GasEstimateBridgeToL2Result> {
   const fromChainId = getL1ChainId(config);
   const toChainId = getL2ChainId(config);
 
   const provider = readOnlyProviders.get(fromChainId);
-  if (!provider) throw new Error(`Missing JsonRpcProvider for chain id: ${fromChainId}`);
+  if (!provider) throw new Error(`Missing StaticJsonRpcProvider for chain id: ${fromChainId}`);
 
   try {
     const tokenBridge = instance.createBridgeInstance(
@@ -123,7 +123,7 @@ async function swapGasEstimator(
 
 export async function gasEstimator(
   params: GasEstimateParams,
-  readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
+  readOnlyProviders: Map<ChainId, ethers.providers.StaticJsonRpcProvider>,
   config: CheckoutConfiguration,
 ): Promise<GasEstimateSwapResult | GasEstimateBridgeToL2Result> {
   switch (params.gasEstimateType) {

@@ -272,7 +272,7 @@ describe('Connect', () => {
 
   it('should call gasEstimate function', async () => {
     (createReadOnlyProviders as jest.Mock).mockResolvedValue(
-      {} as Map<ChainId, ethers.providers.JsonRpcProvider>,
+      {} as Map<ChainId, ethers.providers.StaticJsonRpcProvider>,
     );
     (gasEstimator as jest.Mock).mockResolvedValue({} as GasEstimateSwapResult);
 

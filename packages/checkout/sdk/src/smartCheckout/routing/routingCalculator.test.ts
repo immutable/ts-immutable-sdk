@@ -1,6 +1,6 @@
 import { BigNumber, utils } from 'ethers';
 import { Environment } from '@imtbl/config';
-import { JsonRpcProvider } from '@ethersproject/providers';
+import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import {
   getBridgeAndSwapFundingSteps,
   getSwapFundingSteps,
@@ -47,9 +47,9 @@ jest.mock('./bridgeAndSwap/bridgeAndSwapRoute');
 describe('routingCalculator', () => {
   let config: CheckoutConfiguration;
 
-  const readonlyProviders = new Map<ChainId, JsonRpcProvider>([
-    [ChainId.SEPOLIA, {} as JsonRpcProvider],
-    [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+  const readonlyProviders = new Map<ChainId, StaticJsonRpcProvider>([
+    [ChainId.SEPOLIA, {} as StaticJsonRpcProvider],
+    [ChainId.IMTBL_ZKEVM_TESTNET, {} as StaticJsonRpcProvider],
   ]);
 
   beforeEach(() => {
@@ -69,8 +69,8 @@ describe('routingCalculator', () => {
 
     const balanceRequirements = {} as BalanceCheckResult;
     (createReadOnlyProviders as jest.Mock).mockResolvedValue(new Map([
-      [ChainId.SEPOLIA, {} as JsonRpcProvider],
-      [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+      [ChainId.SEPOLIA, {} as StaticJsonRpcProvider],
+      [ChainId.IMTBL_ZKEVM_TESTNET, {} as StaticJsonRpcProvider],
     ]));
 
     const routingOptions = await routingCalculator(
@@ -90,8 +90,8 @@ describe('routingCalculator', () => {
     const availableRoutingOptions = {};
     const balanceRequirements = {} as BalanceCheckResult;
     (createReadOnlyProviders as jest.Mock).mockResolvedValue(new Map([
-      [ChainId.SEPOLIA, {} as JsonRpcProvider],
-      [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+      [ChainId.SEPOLIA, {} as StaticJsonRpcProvider],
+      [ChainId.IMTBL_ZKEVM_TESTNET, {} as StaticJsonRpcProvider],
     ]));
 
     const routingOptions = await routingCalculator(
@@ -205,8 +205,8 @@ describe('routingCalculator', () => {
     (bridgeRoute as jest.Mock).mockResolvedValue(bridgeFundingStep);
 
     (createReadOnlyProviders as jest.Mock).mockResolvedValue(new Map([
-      [ChainId.SEPOLIA, {} as JsonRpcProvider],
-      [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+      [ChainId.SEPOLIA, {} as StaticJsonRpcProvider],
+      [ChainId.IMTBL_ZKEVM_TESTNET, {} as StaticJsonRpcProvider],
     ]));
 
     const routingOptions = await routingCalculator(
@@ -342,8 +342,8 @@ describe('routingCalculator', () => {
     (swapRoute as jest.Mock).mockResolvedValue([swapFundingStep]);
 
     (createReadOnlyProviders as jest.Mock).mockResolvedValue(new Map([
-      [ChainId.SEPOLIA, {} as JsonRpcProvider],
-      [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+      [ChainId.SEPOLIA, {} as StaticJsonRpcProvider],
+      [ChainId.IMTBL_ZKEVM_TESTNET, {} as StaticJsonRpcProvider],
     ]));
 
     const routingOptions = await routingCalculator(
@@ -518,8 +518,8 @@ describe('routingCalculator', () => {
     (swapRoute as jest.Mock).mockResolvedValue([swapFundingStep1, swapFundingStep2]);
 
     (createReadOnlyProviders as jest.Mock).mockResolvedValue(new Map([
-      [ChainId.SEPOLIA, {} as JsonRpcProvider],
-      [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+      [ChainId.SEPOLIA, {} as StaticJsonRpcProvider],
+      [ChainId.IMTBL_ZKEVM_TESTNET, {} as StaticJsonRpcProvider],
     ]));
 
     const routingOptions = await routingCalculator(
@@ -655,8 +655,8 @@ describe('routingCalculator', () => {
     (swapRoute as jest.Mock).mockResolvedValue(undefined);
 
     (createReadOnlyProviders as jest.Mock).mockResolvedValue(new Map([
-      [ChainId.SEPOLIA, {} as JsonRpcProvider],
-      [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+      [ChainId.SEPOLIA, {} as StaticJsonRpcProvider],
+      [ChainId.IMTBL_ZKEVM_TESTNET, {} as StaticJsonRpcProvider],
     ]));
 
     const routingOptions = await routingCalculator(
@@ -901,8 +901,8 @@ describe('routingCalculator', () => {
     ]);
 
     (createReadOnlyProviders as jest.Mock).mockResolvedValue(new Map([
-      [ChainId.SEPOLIA, {} as JsonRpcProvider],
-      [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+      [ChainId.SEPOLIA, {} as StaticJsonRpcProvider],
+      [ChainId.IMTBL_ZKEVM_TESTNET, {} as StaticJsonRpcProvider],
     ]));
 
     const routingOptions = await routingCalculator(
@@ -984,8 +984,8 @@ describe('routingCalculator', () => {
     ]));
 
     (createReadOnlyProviders as jest.Mock).mockResolvedValue(new Map([
-      [ChainId.SEPOLIA, {} as JsonRpcProvider],
-      [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+      [ChainId.SEPOLIA, {} as StaticJsonRpcProvider],
+      [ChainId.IMTBL_ZKEVM_TESTNET, {} as StaticJsonRpcProvider],
     ]));
 
     (bridgeRoute as jest.Mock).mockResolvedValue({
@@ -1034,8 +1034,8 @@ describe('routingCalculator', () => {
     ]));
 
     (createReadOnlyProviders as jest.Mock).mockResolvedValue(new Map([
-      [ChainId.SEPOLIA, {} as JsonRpcProvider],
-      [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+      [ChainId.SEPOLIA, {} as StaticJsonRpcProvider],
+      [ChainId.IMTBL_ZKEVM_TESTNET, {} as StaticJsonRpcProvider],
     ]));
 
     (bridgeRoute as jest.Mock).mockResolvedValue(undefined);

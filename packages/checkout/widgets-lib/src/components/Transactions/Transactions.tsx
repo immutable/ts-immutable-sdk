@@ -10,7 +10,7 @@ import {
   connectToProvider,
   isPassportProvider,
 } from 'lib/provider';
-import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
+import { StaticJsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import {
   TokenFilterTypes,
   TokenInfo, WalletProviderRdns,
@@ -160,12 +160,12 @@ export function Transactions({
       ) missingTokens[key] = value;
     });
     // Root provider is always L1
-    const rootProvider = new JsonRpcProvider(
+    const rootProvider = new StaticJsonRpcProvider(
       checkout.config.networkMap.get(getL1ChainId(checkout.config))?.rpcUrls[0],
     );
 
     // Child provider is always L2
-    const childProvider = new JsonRpcProvider(
+    const childProvider = new StaticJsonRpcProvider(
       checkout.config.networkMap.get(getL2ChainId(checkout.config))?.rpcUrls[0],
     );
 

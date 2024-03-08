@@ -1,4 +1,4 @@
-import { JsonRpcProvider } from '@ethersproject/providers';
+import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import { Signer } from '@ethersproject/abstract-signer';
 import { BigNumber } from 'ethers';
 import GuardianClient from 'guardian';
@@ -9,7 +9,7 @@ import { RelayerClient } from './relayerClient';
 
 export type SignTypedDataV4Params = {
   ethSigner: Signer;
-  jsonRpcProvider: JsonRpcProvider;
+  staticJsonRpcProvider: StaticJsonRpcProvider;
   relayerClient: RelayerClient;
   method: string;
   params: Array<any>;
@@ -66,7 +66,7 @@ export const signTypedDataV4 = async ({
   params,
   method,
   ethSigner,
-  jsonRpcProvider,
+  staticJsonRpcProvider,
   relayerClient,
   guardianClient,
 }: SignTypedDataV4Params): Promise<string> => guardianClient
@@ -78,7 +78,7 @@ export const signTypedDataV4 = async ({
       throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `${method} requires an address and a typed data JSON`);
     }
 
-    const { chainId } = await jsonRpcProvider.ready;
+    const { chainId } = await staticJsonRpcProvider.ready;
     const typedData = transformTypedData(typedDataParam, chainId);
 
     await guardianClient.validateMessage({ chainID: String(chainId), payload: typedData });

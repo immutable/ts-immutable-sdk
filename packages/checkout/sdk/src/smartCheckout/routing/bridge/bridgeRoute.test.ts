@@ -1,5 +1,5 @@
 import { Environment } from '@imtbl/config';
-import { JsonRpcProvider } from '@ethersproject/providers';
+import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import { BigNumber, utils } from 'ethers';
 import {
   BridgeRequirement,
@@ -33,9 +33,9 @@ describe('bridgeRoute', () => {
     baseConfig: { environment: Environment.SANDBOX },
   }, mockedHttpClient);
 
-  const readonlyProviders = new Map<ChainId, JsonRpcProvider>([
-    [ChainId.SEPOLIA, {} as JsonRpcProvider],
-    [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+  const readonlyProviders = new Map<ChainId, StaticJsonRpcProvider>([
+    [ChainId.SEPOLIA, {} as StaticJsonRpcProvider],
+    [ChainId.IMTBL_ZKEVM_TESTNET, {} as StaticJsonRpcProvider],
   ]);
 
   describe('bridgeRoute', () => {
@@ -829,8 +829,8 @@ describe('bridgeRoute', () => {
       try {
         await bridgeRoute(
           config,
-          new Map<ChainId, JsonRpcProvider>([
-            [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+          new Map<ChainId, StaticJsonRpcProvider>([
+            [ChainId.IMTBL_ZKEVM_TESTNET, {} as StaticJsonRpcProvider],
           ]),
           {
             bridge: true,

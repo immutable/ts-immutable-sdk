@@ -1,4 +1,4 @@
-import { JsonRpcProvider } from '@ethersproject/providers';
+import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import {
   BalanceCheckResult,
   BalanceRequirement,
@@ -57,7 +57,7 @@ export const getInsufficientRequirement = (
 
 export const getBridgeFundingStep = async (
   config: CheckoutConfiguration,
-  readOnlyProviders: Map<ChainId, JsonRpcProvider>,
+  readOnlyProviders: Map<ChainId, StaticJsonRpcProvider>,
   availableRoutingOptions: AvailableRoutingOptions,
   insufficientRequirement: BalanceRequirement | undefined,
   tokenBalances: Map<ChainId, TokenBalanceResult>,
@@ -124,7 +124,7 @@ export const getSwapFundingSteps = async (
 
 export const getBridgeAndSwapFundingSteps = async (
   config: CheckoutConfiguration,
-  readOnlyProviders: Map<ChainId, JsonRpcProvider>,
+  readOnlyProviders: Map<ChainId, StaticJsonRpcProvider>,
   availableRoutingOptions: AvailableRoutingOptions,
   insufficientRequirement: BalanceRequirement | undefined,
   ownerAddress: string,

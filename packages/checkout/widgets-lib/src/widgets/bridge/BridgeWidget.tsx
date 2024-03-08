@@ -12,7 +12,7 @@ import {
 } from 'react';
 import { StrongCheckoutWidgetsConfig } from 'lib/withDefaultWidgetConfig';
 import { CryptoFiatProvider } from 'context/crypto-fiat-context/CryptoFiatProvider';
-import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
+import { StaticJsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { BridgeClaimWithdrawalFailure, BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { StatusView } from 'components/Status/StatusView';
 import { StatusType } from 'components/Status/StatusType';
@@ -109,12 +109,12 @@ export default function BridgeWidget({
         if (checkout.config.isProduction) bridgeInstance = ETH_MAINNET_TO_ZKEVM_MAINNET;
 
         // Root provider is always L1
-        const rootProvider = new JsonRpcProvider(
+        const rootProvider = new StaticJsonRpcProvider(
           checkout.config.networkMap.get(getL1ChainId(checkout.config))?.rpcUrls[0],
         );
 
         // Child provider is always L2
-        const childProvider = new JsonRpcProvider(
+        const childProvider = new StaticJsonRpcProvider(
           checkout.config.networkMap.get(getL2ChainId(checkout.config))?.rpcUrls[0],
         );
         const bridgeConfiguration = new BridgeConfiguration({

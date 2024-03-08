@@ -11,7 +11,7 @@ jest.mock('../../../gasEstimate');
 jest.mock('../../../instance');
 
 describe('getBridgeFeeEstimate', () => {
-  const readOnlyProviders = new Map<ChainId, ethers.providers.JsonRpcProvider>([]);
+  const readOnlyProviders = new Map<ChainId, ethers.providers.StaticJsonRpcProvider>([]);
   const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
   const config = new CheckoutConfiguration({
     baseConfig: { environment: Environment.SANDBOX },

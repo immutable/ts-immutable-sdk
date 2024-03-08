@@ -115,7 +115,7 @@ export type BridgeRequirement = {
 };
 export const bridgeRoute = async (
   config: CheckoutConfiguration,
-  readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
+  readOnlyProviders: Map<ChainId, ethers.providers.StaticJsonRpcProvider>,
   availableRoutingOptions: AvailableRoutingOptions,
   bridgeRequirement: BridgeRequirement,
   tokenBalanceResults: Map<ChainId, TokenBalanceResult>,

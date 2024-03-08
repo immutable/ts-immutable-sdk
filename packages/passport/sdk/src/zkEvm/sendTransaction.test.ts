@@ -1,4 +1,4 @@
-import { JsonRpcProvider, TransactionRequest } from '@ethersproject/providers';
+import { StaticJsonRpcProvider, TransactionRequest } from '@ethersproject/providers';
 import { Signer } from '@ethersproject/abstract-signer';
 import { getEip155ChainId, getNonce, getSignedMetaTransactions } from './walletHelpers';
 import { sendTransaction } from './sendTransaction';
@@ -26,7 +26,7 @@ describe('sendTransaction', () => {
     data: '0x456',
     value: '0x00',
   };
-  const jsonRpcProvider = {
+  const staticJsonRpcProvider = {
     ready: Promise.resolve({ chainId }),
   };
   const relayerClient = {
@@ -76,7 +76,7 @@ describe('sendTransaction', () => {
     const result = await sendTransaction({
       params: [transactionRequest],
       ethSigner,
-      jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
+      staticJsonRpcProvider: staticJsonRpcProvider as StaticJsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
       zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
       guardianClient: guardianClient as unknown as GuardianClient,
@@ -108,7 +108,7 @@ describe('sendTransaction', () => {
     const result = await sendTransaction({
       params: [transactionRequest],
       ethSigner,
-      jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
+      staticJsonRpcProvider: staticJsonRpcProvider as StaticJsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
       zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
       guardianClient: guardianClient as unknown as GuardianClient,
@@ -147,7 +147,7 @@ describe('sendTransaction', () => {
     const result = await sendTransaction({
       params: [transactionRequest],
       ethSigner,
-      jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
+      staticJsonRpcProvider: staticJsonRpcProvider as StaticJsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
       zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
       guardianClient: guardianClient as unknown as GuardianClient,
@@ -192,7 +192,7 @@ describe('sendTransaction', () => {
       sendTransaction({
         params: [transactionRequest],
         ethSigner,
-        jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
+        staticJsonRpcProvider: staticJsonRpcProvider as StaticJsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,
         zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
         guardianClient: guardianClient as unknown as GuardianClient,

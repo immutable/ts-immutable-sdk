@@ -83,7 +83,7 @@ const SANDBOX_CONFIGURATION = {
 
 // Checkout SDK
 export class Checkout {
-  private readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>;
+  private readOnlyProviders: Map<ChainId, ethers.providers.StaticJsonRpcProvider>;
 
   private httpClient: HttpClient;
 
@@ -105,7 +105,7 @@ export class Checkout {
     this.httpClient = new HttpClient(config);
     this.config = new CheckoutConfiguration(config, this.httpClient);
     this.fiatRampService = new FiatRampService(this.config);
-    this.readOnlyProviders = new Map<ChainId, ethers.providers.JsonRpcProvider>();
+    this.readOnlyProviders = new Map<ChainId, ethers.providers.StaticJsonRpcProvider>();
     this.availability = availabilityService(this.config.isDevelopment, this.config.isProduction);
     this.passport = config.passport;
 

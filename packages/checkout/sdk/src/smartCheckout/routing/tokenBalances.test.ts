@@ -1,5 +1,5 @@
 import { Environment } from '@imtbl/config';
-import { JsonRpcProvider } from '@ethersproject/providers';
+import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import { getAllTokenBalances } from './tokenBalances';
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../config';
@@ -34,9 +34,9 @@ describe('tokenBalances', () => {
       bridge: true,
     };
 
-    const readonlyProviders = new Map<ChainId, JsonRpcProvider>([
-      [ChainId.SEPOLIA, {} as JsonRpcProvider],
-      [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+    const readonlyProviders = new Map<ChainId, StaticJsonRpcProvider>([
+      [ChainId.SEPOLIA, {} as StaticJsonRpcProvider],
+      [ChainId.IMTBL_ZKEVM_TESTNET, {} as StaticJsonRpcProvider],
     ]);
 
     const getBalancesResult = {
@@ -76,9 +76,9 @@ describe('tokenBalances', () => {
       bridge: false,
     };
 
-    const readonlyProviders = new Map<ChainId, JsonRpcProvider>([
-      [ChainId.SEPOLIA, {} as JsonRpcProvider],
-      [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+    const readonlyProviders = new Map<ChainId, StaticJsonRpcProvider>([
+      [ChainId.SEPOLIA, {} as StaticJsonRpcProvider],
+      [ChainId.IMTBL_ZKEVM_TESTNET, {} as StaticJsonRpcProvider],
     ]);
 
     const getBalancesResult = {
@@ -118,7 +118,7 @@ describe('tokenBalances', () => {
       bridge: true,
     };
 
-    const readonlyProviders = new Map<ChainId, JsonRpcProvider>([]);
+    const readonlyProviders = new Map<ChainId, StaticJsonRpcProvider>([]);
 
     const tokenBalances = await getAllTokenBalances(
       mockConfig,
@@ -146,8 +146,8 @@ describe('tokenBalances', () => {
       bridge: true,
     };
 
-    const readonlyProviders = new Map<ChainId, JsonRpcProvider>([
-      [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+    const readonlyProviders = new Map<ChainId, StaticJsonRpcProvider>([
+      [ChainId.IMTBL_ZKEVM_TESTNET, {} as StaticJsonRpcProvider],
     ]);
 
     const getBalancesResult = {
@@ -191,8 +191,8 @@ describe('tokenBalances', () => {
       bridge: true,
     };
 
-    const readonlyProviders = new Map<ChainId, JsonRpcProvider>([
-      [ChainId.SEPOLIA, {} as JsonRpcProvider],
+    const readonlyProviders = new Map<ChainId, StaticJsonRpcProvider>([
+      [ChainId.SEPOLIA, {} as StaticJsonRpcProvider],
     ]);
 
     const getBalancesResult = {

@@ -27,7 +27,7 @@ jest.mock('ethers', () => ({
 }));
 
 describe('gasServiceEstimator', () => {
-  let readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>;
+  let readOnlyProviders: Map<ChainId, ethers.providers.StaticJsonRpcProvider>;
   let config: CheckoutConfiguration;
   let decimalsMock: jest.Mock;
   let nameMock: jest.Mock;
@@ -43,7 +43,7 @@ describe('gasServiceEstimator', () => {
       symbol: symbolMock,
     });
 
-    readOnlyProviders = new Map<ChainId, ethers.providers.JsonRpcProvider>([
+    readOnlyProviders = new Map<ChainId, ethers.providers.StaticJsonRpcProvider>([
       [
         ChainId.SEPOLIA,
         {
@@ -52,7 +52,7 @@ describe('gasServiceEstimator', () => {
             maxPriorityFeePerGas: '0x1',
             gasPrice: null,
           }),
-        } as unknown as ethers.providers.JsonRpcProvider,
+        } as unknown as ethers.providers.StaticJsonRpcProvider,
       ],
     ]);
 
@@ -257,7 +257,7 @@ describe('gasServiceEstimator', () => {
 
       const readOnlyProvidersUndefinedFees = new Map<
       ChainId,
-      ethers.providers.JsonRpcProvider
+      ethers.providers.StaticJsonRpcProvider
       >([
         [
           ChainId.SEPOLIA,
@@ -268,7 +268,7 @@ describe('gasServiceEstimator', () => {
               maxPriorityFeePerGas: null,
               gasPrice: '0x1',
             }),
-          } as unknown as ethers.providers.JsonRpcProvider,
+          } as unknown as ethers.providers.StaticJsonRpcProvider,
         ],
       ]);
       const result = (await gasEstimator(

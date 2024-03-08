@@ -1,4 +1,4 @@
-import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
+import { StaticJsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 
 /**
  * Represents information about a token.
@@ -19,10 +19,10 @@ export interface TokenInfo {
 
 /**
  * Interface representing the parameters for {@link Checkout.getTokenInfo}.
- * @property {Web3Provider | JsonRpcProvider} provider - The provider used to get the balance.
+ * @property {Web3Provider | StaticJsonRpcProvider} provider - The provider used to get the balance.
  * @property {string} tokenAddress - The contract address of the token.
  */
 export interface GetTokenInfoParams {
-  provider: Web3Provider | JsonRpcProvider;
+  provider: Web3Provider | StaticJsonRpcProvider;
   tokenAddress: string;
 }

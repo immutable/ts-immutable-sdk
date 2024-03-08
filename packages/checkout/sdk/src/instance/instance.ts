@@ -17,7 +17,7 @@ import { CheckoutConfiguration } from '../config';
 export function createBridgeInstance(
   fromChainId: ChainId,
   toChainId: ChainId,
-  readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
+  readOnlyProviders: Map<ChainId, ethers.providers.StaticJsonRpcProvider>,
   config: CheckoutConfiguration,
 ): TokenBridge {
   const rootChainProvider = readOnlyProviders.get(fromChainId);

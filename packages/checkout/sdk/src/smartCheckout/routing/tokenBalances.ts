@@ -8,7 +8,7 @@ import { TokenBalanceResult } from './types';
 
 export const getAllTokenBalances = async (
   config: CheckoutConfiguration,
-  readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
+  readOnlyProviders: Map<ChainId, ethers.providers.StaticJsonRpcProvider>,
   ownerAddress: string,
   availableRoutingOptions: AvailableRoutingOptions,
 ): Promise<Map<ChainId, TokenBalanceResult>> => {

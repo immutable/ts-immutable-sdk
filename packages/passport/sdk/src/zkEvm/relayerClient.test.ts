@@ -1,4 +1,4 @@
-import { JsonRpcProvider } from '@ethersproject/providers';
+import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import AuthManager from 'authManager';
 import { RelayerClient } from './relayerClient';
 import { PassportConfiguration } from '../config';
@@ -14,12 +14,12 @@ describe('relayerClient', () => {
   const user = {
     accessToken: 'accessToken123',
   };
-  const jsonRpcProvider: Partial<JsonRpcProvider> = {
+  const staticJsonRpcProvider: Partial<StaticJsonRpcProvider> = {
     ready: Promise.resolve({ chainId, name: '' }),
   };
   const relayerClient = new RelayerClient({
     config: config as PassportConfiguration,
-    jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
+    staticJsonRpcProvider: staticJsonRpcProvider as StaticJsonRpcProvider,
     authManager: {
       getUserZkEvm: jest.fn().mockResolvedValue(user as UserZkEvm),
     } as unknown as AuthManager,

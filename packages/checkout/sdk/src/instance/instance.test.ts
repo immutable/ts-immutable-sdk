@@ -47,12 +47,12 @@ describe('instance', () => {
   describe('createBridgeInstance', () => {
     const readOnlyProviders = new Map<
     ChainId,
-    ethers.providers.JsonRpcProvider
+    ethers.providers.StaticJsonRpcProvider
     >([
-      [ChainId.SEPOLIA, new ethers.providers.JsonRpcProvider('sepolia')],
+      [ChainId.SEPOLIA, new ethers.providers.StaticJsonRpcProvider('sepolia')],
       [
         ChainId.IMTBL_ZKEVM_TESTNET,
-        new ethers.providers.JsonRpcProvider('devnet'),
+        new ethers.providers.StaticJsonRpcProvider('devnet'),
       ],
     ]);
 

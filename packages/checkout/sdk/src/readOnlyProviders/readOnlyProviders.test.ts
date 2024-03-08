@@ -1,5 +1,5 @@
 import { Environment } from '@imtbl/config';
-import { JsonRpcProvider } from '@ethersproject/providers';
+import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import { ChainId, ChainName, GetNetworkAllowListResult } from '../types';
 import { createReadOnlyProviders } from './readOnlyProvider';
 import { CheckoutConfiguration } from '../config';
@@ -9,7 +9,7 @@ import { HttpClient } from '../api/http';
 jest.mock('../network');
 jest.mock('@ethersproject/providers', () => ({
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  JsonRpcProvider: jest.fn(),
+  StaticJsonRpcProvider: jest.fn(),
 }));
 
 const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
@@ -51,10 +51,10 @@ describe('read only providers', () => {
   });
 
   it('should return new map of read only providers', async () => {
-    const existingReadOnlyProviders = new Map<ChainId, JsonRpcProvider>();
+    const existingReadOnlyProviders = new Map<ChainId, StaticJsonRpcProvider>();
     existingReadOnlyProviders.set(
       ChainId.ETHEREUM,
-      new JsonRpcProvider('mainnet-url'),
+      new StaticJsonRpcProvider('mainnet-url'),
     );
 
     const result = await createReadOnlyProviders(
@@ -69,10 +69,10 @@ describe('read only providers', () => {
   });
 
   it('should return existing map of read only providers', async () => {
-    const existingReadOnlyProviders = new Map<ChainId, JsonRpcProvider>();
+    const existingReadOnlyProviders = new Map<ChainId, StaticJsonRpcProvider>();
     existingReadOnlyProviders.set(
       ChainId.SEPOLIA,
-      new JsonRpcProvider('sepolia-url'),
+      new StaticJsonRpcProvider('sepolia-url'),
     );
 
     const result = await createReadOnlyProviders(

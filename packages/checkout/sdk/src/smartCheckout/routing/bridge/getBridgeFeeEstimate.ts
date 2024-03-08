@@ -9,7 +9,7 @@ import * as instance from '../../../instance';
 
 export const getBridgeFeeEstimate = async (
   config: CheckoutConfiguration,
-  readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
+  readOnlyProviders: Map<ChainId, ethers.providers.StaticJsonRpcProvider>,
   fromChainId: ChainId,
   toChainId: ChainId,
 ): Promise<BridgeFeeResponse & { approvalGas: BigNumber; }> => {
