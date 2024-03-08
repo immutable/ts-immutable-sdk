@@ -4,7 +4,6 @@ import {
   Alert, Button, Form, Image, InputGroup, Offcanvas, Spinner, Stack, Table,
 } from 'react-bootstrap';
 import { Heading } from '@biom3/react';
-import { Asset } from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
 import { UnsignedOrderRequest } from '@imtbl/x-client';
 import { ModalProps } from '@/types';
@@ -15,7 +14,7 @@ import ViewOffersModal from '@/components/imx/ViewOffersModal';
 import { MARKETPLACE_FEE_PERCENTAGE, MARKETPLACE_FEE_RECIPIENT } from '@/config';
 
 type OrderType = imx.Order; 
-type AssetWithSellOrder = { asset: Asset; sellOrder?: OrderType; };
+type AssetWithSellOrder = { asset: imx.Asset; sellOrder?: OrderType; };
 type AssetWithOffer = { asset: imx.TokenData; offerOrder?: OrderType; };
 
 type AssetsWithOrders = {
@@ -93,7 +92,7 @@ function Order({ showModal, setShowModal }: ModalProps) {
     }
   }, [imxProvider, handleClose, addMessage]);
 
-  const createOrder = useCallback(async (asset: Asset) => {
+  const createOrder = useCallback(async (asset: imx.Asset) => {
     setLoading(true);
     const request: UnsignedOrderRequest = {
       buy: {
