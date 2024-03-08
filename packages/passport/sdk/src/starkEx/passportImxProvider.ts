@@ -4,7 +4,6 @@ import {
   NftTransferDetails,
   RegisterUserResponse,
   TokenAmount,
-  UnsignedExchangeTransferRequest,
   UnsignedOrderRequest,
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
@@ -13,6 +12,7 @@ import {
   EthSigner,
   IMXClient,
   StarkSigner,
+  UnsignedExchangeTransferRequest,
 } from '@imtbl/x-client';
 import { IMXProvider } from '@imtbl/x-provider';
 import { Web3Provider } from '@ethersproject/providers';

@@ -1,7 +1,6 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import {
   NftTransferDetails,
-  UnsignedExchangeTransferRequest,
   UnsignedOrderRequest,
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
@@ -13,6 +12,7 @@ import {
 import {
   IMXClient,
   StarkSigner,
+  UnsignedExchangeTransferRequest,
 } from '@imtbl/x-client';
 import registerPassportStarkEx from './workflows/registration';
 import { mockUser, mockUserImx } from '../test/mocks';
