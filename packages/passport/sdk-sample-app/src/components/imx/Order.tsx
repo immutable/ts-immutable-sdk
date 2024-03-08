@@ -5,8 +5,10 @@ import {
 } from 'react-bootstrap';
 import { Heading } from '@biom3/react';
 import {
-  Asset, Order as OrderType, TokenData,
+  Asset, 
+  TokenData,
 } from '@imtbl/core-sdk';
+import { imx } from '@imtbl/generated-clients';
 import { UnsignedOrderRequest } from '@imtbl/x-client';
 import { ModalProps } from '@/types';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
@@ -15,6 +17,7 @@ import { usePassportProvider } from '@/context/PassportProvider';
 import ViewOffersModal from '@/components/imx/ViewOffersModal';
 import { MARKETPLACE_FEE_PERCENTAGE, MARKETPLACE_FEE_RECIPIENT } from '@/config';
 
+type OrderType = imx.Order; 
 type AssetWithSellOrder = { asset: Asset; sellOrder?: OrderType; };
 type AssetWithOffer = { asset: TokenData; offerOrder?: OrderType; };
 
