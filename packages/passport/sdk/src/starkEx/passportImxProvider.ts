@@ -1,7 +1,6 @@
 import { TransactionResponse } from '@ethersproject/abstract-provider';
 import {
   CreateWithdrawalResponse,
-  GetSignableTradeRequest,
   NftTransferDetails,
   RegisterUserResponse,
   TokenAmount,
@@ -243,7 +242,7 @@ export class PassportImxProvider implements IMXProvider {
     });
   }
 
-  async createTrade(request: GetSignableTradeRequest): Promise<imx.CreateTradeResponse> {
+  async createTrade(request: imx.GetSignableTradeRequest): Promise<imx.CreateTradeResponse> {
     const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
 
     return createTrade({
