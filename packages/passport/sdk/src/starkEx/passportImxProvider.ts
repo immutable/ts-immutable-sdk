@@ -1,6 +1,5 @@
 import { TransactionResponse } from '@ethersproject/abstract-provider';
 import {
-  CreateTransferResponse,
   CreateTransferResponseV1,
   CreateWithdrawalResponse,
   GetSignableCancelOrderRequest,
@@ -260,7 +259,7 @@ export class PassportImxProvider implements IMXProvider {
 
   async batchNftTransfer(
     request: NftTransferDetails[],
-  ): Promise<CreateTransferResponse> {
+  ): Promise<imx.CreateTransferResponse> {
     const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
 
     return batchNftTransfer({

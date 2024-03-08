@@ -1,6 +1,5 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import {
-  CreateTransferResponse,
   CreateTransferResponseV1,
   GetSignableCancelOrderRequest,
   GetSignableTradeRequest,
@@ -248,7 +247,7 @@ describe('PassportImxProvider', () => {
 
   describe('batchNftTransfer', () => {
     it('calls batchNftTransfer workflow', async () => {
-      const returnValue = {} as CreateTransferResponse;
+      const returnValue = {} as imx.CreateTransferResponse;
       const request = [] as NftTransferDetails[];
 
       (batchNftTransfer as jest.Mock).mockResolvedValue(returnValue);
