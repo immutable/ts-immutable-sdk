@@ -5,8 +5,9 @@ import {
 } from 'react-bootstrap';
 import { Heading } from '@biom3/react';
 import {
-  Asset, Order as OrderType, TokenData, UnsignedOrderRequest,
+  Asset, Order as OrderType, TokenData,
 } from '@imtbl/core-sdk';
+import { UnsignedOrderRequest } from '@imtbl/x-client';
 import { ModalProps } from '@/types';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { useStatusProvider } from '@/context/StatusProvider';
