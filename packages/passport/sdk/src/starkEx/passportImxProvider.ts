@@ -4,7 +4,6 @@ import {
   NftTransferDetails,
   RegisterUserResponse,
   TokenAmount,
-  UnsignedOrderRequest,
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
 import {
@@ -13,6 +12,7 @@ import {
   IMXClient,
   StarkSigner,
   UnsignedExchangeTransferRequest,
+  UnsignedOrderRequest,
 } from '@imtbl/x-client';
 import { IMXProvider } from '@imtbl/x-provider';
 import { Web3Provider } from '@ethersproject/providers';

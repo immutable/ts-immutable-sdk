@@ -1,7 +1,6 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import {
   NftTransferDetails,
-  UnsignedOrderRequest,
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
 import { Web3Provider } from '@ethersproject/providers';
@@ -13,6 +12,7 @@ import {
   IMXClient,
   StarkSigner,
   UnsignedExchangeTransferRequest,
+  UnsignedOrderRequest,
 } from '@imtbl/x-client';
 import registerPassportStarkEx from './workflows/registration';
 import { mockUser, mockUserImx } from '../test/mocks';
