@@ -4,10 +4,7 @@ import {
   Alert, Button, Form, Image, InputGroup, Offcanvas, Spinner, Stack, Table,
 } from 'react-bootstrap';
 import { Heading } from '@biom3/react';
-import {
-  Asset, 
-  TokenData,
-} from '@imtbl/core-sdk';
+import { Asset } from '@imtbl/core-sdk';
 import { imx } from '@imtbl/generated-clients';
 import { UnsignedOrderRequest } from '@imtbl/x-client';
 import { ModalProps } from '@/types';
@@ -19,7 +16,7 @@ import { MARKETPLACE_FEE_PERCENTAGE, MARKETPLACE_FEE_RECIPIENT } from '@/config'
 
 type OrderType = imx.Order; 
 type AssetWithSellOrder = { asset: Asset; sellOrder?: OrderType; };
-type AssetWithOffer = { asset: TokenData; offerOrder?: OrderType; };
+type AssetWithOffer = { asset: imx.TokenData; offerOrder?: OrderType; };
 
 type AssetsWithOrders = {
   sellAssets: AssetWithSellOrder[];
