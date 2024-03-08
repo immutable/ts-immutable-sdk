@@ -1,7 +1,6 @@
 import { TransactionResponse } from '@ethersproject/abstract-provider';
 import {
   CreateWithdrawalResponse,
-  GetSignableCancelOrderRequest,
   GetSignableTradeRequest,
   NftTransferDetails,
   RegisterUserResponse,
@@ -231,7 +230,7 @@ export class PassportImxProvider implements IMXProvider {
   }
 
   async cancelOrder(
-    request: GetSignableCancelOrderRequest,
+    request: imx.GetSignableCancelOrderRequest,
   ): Promise<imx.CancelOrderResponse> {
     const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
 

@@ -1,6 +1,5 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import {
-  GetSignableCancelOrderRequest,
   GetSignableTradeRequest,
   NftTransferDetails,
   UnsignedExchangeTransferRequest,
@@ -205,7 +204,7 @@ describe('PassportImxProvider', () => {
   describe('cancelOrder', () => {
     it('calls cancelOrder workflow', async () => {
       const returnValue = {} as imx.CancelOrderResponse;
-      const request = {} as GetSignableCancelOrderRequest;
+      const request = {} as imx.GetSignableCancelOrderRequest;
 
       (cancelOrder as jest.Mock).mockResolvedValue(returnValue);
       const result = await passportImxProvider.cancelOrder(request);
@@ -350,7 +349,7 @@ describe('PassportImxProvider', () => {
   describe.each([
     ['transfer' as const, {} as UnsignedTransferRequest],
     ['createOrder' as const, {} as UnsignedOrderRequest],
-    ['cancelOrder' as const, {} as GetSignableCancelOrderRequest],
+    ['cancelOrder' as const, {} as imx.GetSignableCancelOrderRequest],
     ['createTrade' as const, {} as GetSignableTradeRequest],
     ['batchNftTransfer' as const, [] as NftTransferDetails[]],
     ['exchangeTransfer' as const, {} as UnsignedExchangeTransferRequest],
@@ -376,7 +375,7 @@ describe('PassportImxProvider', () => {
   describe.each([
     ['transfer' as const, {} as UnsignedTransferRequest],
     ['createOrder' as const, {} as UnsignedOrderRequest],
-    ['cancelOrder' as const, {} as GetSignableCancelOrderRequest],
+    ['cancelOrder' as const, {} as imx.GetSignableCancelOrderRequest],
     ['createTrade' as const, {} as GetSignableTradeRequest],
     ['batchNftTransfer' as const, [] as NftTransferDetails[]],
     ['exchangeTransfer' as const, {} as UnsignedExchangeTransferRequest],
