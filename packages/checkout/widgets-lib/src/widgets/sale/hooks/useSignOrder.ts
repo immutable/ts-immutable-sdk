@@ -209,6 +209,11 @@ export const useSignOrder = (input: SignOrderInput) => {
         transactionHash = (err as any)?.transactionHash;
 
         let errorType = SaleErrorTypes.WALLET_FAILED;
+
+        if (reason.includes('failed') && reason.includes('open confirmation')) {
+          errorType = SaleErrorTypes.WALLET_POPUP_BLOCKED;
+        }
+
         if (reason.includes('rejected') && reason.includes('user')) {
           errorType = SaleErrorTypes.WALLET_REJECTED;
         }

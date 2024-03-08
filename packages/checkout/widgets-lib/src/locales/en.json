@@ -350,6 +350,11 @@
           "primaryAction": "Try again",
           "secondaryAction": "Cancel"
         },
+        "WALLET_POPUP_BLOCKED": {
+          "description": "You'll need to allow pop-ups in your browser to proceed.",
+          "primaryAction": "I've fixed this, Try again",
+          "secondaryAction": "Cancel"
+        },
         "SMART_CHECKOUT_ERROR": {
           "description": "Unable to check your wallets balance. Please try again.",
           "primaryAction": "Try again",
