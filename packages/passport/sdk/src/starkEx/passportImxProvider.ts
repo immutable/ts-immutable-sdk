@@ -1,6 +1,5 @@
 import { TransactionResponse } from '@ethersproject/abstract-provider';
 import {
-  CreateTradeResponse,
   CreateTransferResponse,
   CreateTransferResponseV1,
   CreateWithdrawalResponse,
@@ -247,7 +246,7 @@ export class PassportImxProvider implements IMXProvider {
     });
   }
 
-  async createTrade(request: GetSignableTradeRequest): Promise<CreateTradeResponse> {
+  async createTrade(request: GetSignableTradeRequest): Promise<imx.CreateTradeResponse> {
     const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
 
     return createTrade({
