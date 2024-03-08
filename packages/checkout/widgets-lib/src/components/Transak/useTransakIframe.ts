@@ -2,6 +2,7 @@ import pako from 'pako';
 import { useCallback, useEffect, useState } from 'react';
 import { Environment } from '@imtbl/config';
 
+import { sanitizeToLatin1 } from 'widgets/sale/functions/utils';
 import { TransakNFTData } from './TransakTypes';
 
 export type TransakWidgetType = 'on-ramp' | 'nft-checkout';
@@ -61,7 +62,8 @@ export const useTransakIframe = (props: UseTransakIframeProps) => {
     // as transak currently only supports on nft at a time
     const nftData = nfts?.slice(0, 1).map((item) => ({
       ...item,
-      // TODO: sanitise each value to ensure it can be btoa
+      imageURL: sanitizeToLatin1(item.imageURL),
+      nftName: sanitizeToLatin1(item.nftName),
     }));
 
     const gasLimit = estimatedGasLimit > 0 ? estimatedGasLimit : MAX_GAS_LIMIT;
