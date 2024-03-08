@@ -235,7 +235,10 @@ export class TokenBridge {
     let sourceChainGas: ethers.BigNumber = ethers.BigNumber.from(0);
     let approvalFee: ethers.BigNumber = ethers.BigNumber.from(0);
 
-    if (token.toUpperCase() !== 'NATIVE') {
+    // only get approvals for L1 tokens and wIMX on L2
+    if ((token.toUpperCase() !== 'NATIVE' && sourceChainId === this.config.bridgeInstance.rootChainID)
+    || (token === this.config.bridgeContracts.childChainWrappedIMX
+    && sourceChainId === this.config.bridgeInstance.childChainID)) {
       approvalFee = await this.getGasEstimates(
         sourceProvider,
         bridgeGasPerAction.approveToken,
@@ -276,7 +279,10 @@ export class TokenBridge {
     let sourceBridgeAddress;
     let erc20Contract;
 
-    if (token.toUpperCase() !== 'NATIVE') {
+    // only get approvals for L1 tokens and wIMX on L2
+    if ((token.toUpperCase() !== 'NATIVE' && sourceChainId === this.config.bridgeInstance.rootChainID)
+    || (token === this.config.bridgeContracts.childChainWrappedIMX
+    && sourceChainId === this.config.bridgeInstance.childChainID)) {
       const resGetAllowance = await this.getAllowance(
         sourceChainId,
         token,
@@ -694,8 +700,10 @@ export class TokenBridge {
       req.destinationChainId,
     );
 
-    // If the token is NATIVE, no approval is required
-    if (req.token.toUpperCase() === 'NATIVE') {
+    // only get approvals for L1 tokens and wIMX on L2
+    if ((req.token.toUpperCase() === 'NATIVE' && req.sourceChainId === this.config.bridgeInstance.rootChainID)
+    || (req.token !== this.config.bridgeContracts.childChainWrappedIMX
+    && req.sourceChainId === this.config.bridgeInstance.childChainID)) {
       return {
         contractToApprove: null,
         unsignedTx: null,

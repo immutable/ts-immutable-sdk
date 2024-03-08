@@ -51,11 +51,11 @@ describe('Token Bridge', () => {
 
     const originalValidateDepositArgs = TokenBridge.prototype['validateDepositArgs'];
     const originalValidateChainConfiguration = TokenBridge.prototype['validateChainConfiguration'];
-
+    let bridgeConfig: BridgeConfiguration;
     beforeEach(() => {
       const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
       const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
-      const bridgeConfig = new BridgeConfiguration({
+      bridgeConfig = new BridgeConfiguration({
         baseConfig: new ImmutableConfiguration({
           environment: Environment.SANDBOX,
         }),
@@ -133,6 +133,45 @@ describe('Token Bridge', () => {
         },
       );
       expect(result.unsignedTx).toBeNull();
+    });
+
+    it('return null tx when the token is not wIMX on L2', async () => {
+      expect.assertions(1);
+      const result = await tokenBridge.getUnsignedApproveBridgeTx(
+        {
+          token: '0x2f14582947E292a2eCd20C430B46f2d27CFE213c',
+          senderAddress: '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816',
+          amount: ethers.utils.parseUnits('0.01', 18),
+          sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
+          destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+        },
+      );
+      expect(result.unsignedTx).toBeNull();
+    });
+
+    it('returns the unsigned approval transaction the token is wIMX on L2', async () => {
+      expect.assertions(5);
+      const allowance = ethers.utils.parseUnits('50', 18);
+      const amount = ethers.utils.parseUnits('100', 18);
+
+      mockERC20Contract.allowance.mockResolvedValue(allowance);
+      mockERC20Contract.interface.encodeFunctionData.mockResolvedValue('0xdata');
+
+      const req = {
+        senderAddress: '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816',
+        token: bridgeConfig.bridgeContracts.childChainWrappedIMX,
+        amount,
+        sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
+        destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+      };
+
+      const result = await tokenBridge.getUnsignedApproveBridgeTx(req);
+
+      expect(result.unsignedTx).toBeDefined();
+      expect(result.unsignedTx?.data).toBe('0xdata');
+      expect(result.unsignedTx?.to).toBe(req.token);
+      expect(result.unsignedTx?.from).toBe(req.senderAddress);
+      expect(result.unsignedTx?.value).toBe(0);
     });
   });
 
@@ -549,11 +588,11 @@ describe('Token Bridge', () => {
     const sender = '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772';
     const receipient = '0xA383968dC8711FFE8A7353AdE9feF7Ddcb1473a0';
     const token = '0x40b87d235A5B010a20A241F15797C9debf1ecd01';
-
+    let bridgeConfig: BridgeConfiguration;
     beforeEach(() => {
       const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
       const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
-      const bridgeConfig = new BridgeConfiguration({
+      bridgeConfig = new BridgeConfiguration({
         baseConfig: new ImmutableConfiguration({
           environment: Environment.SANDBOX,
         }),
@@ -785,7 +824,41 @@ describe('Token Bridge', () => {
       expect(result.totalFees).toStrictEqual(totalFees);
     });
 
-    it('returns the dynamicwithdrawal fees for ERC20 tokens with allowance requiring increase', async () => {
+    it('returns the dynamicwithdrawal fees for wIMX with allowance requiring increase', async () => {
+      expect.assertions(6);
+      const amount = ethers.BigNumber.from(1000);
+      const allowance = ethers.BigNumber.from(500);
+
+      mockERC20Contract.allowance.mockResolvedValue(allowance);
+
+      jest.spyOn(TokenBridge.prototype as any, 'getTenderlyBridgeGasEstimates')
+        .mockImplementation(async () => ({
+          approvalFee: 1000,
+          sourceChainGas: 1000,
+        }));
+
+      const result = await tokenBridge.getFee(
+        {
+          action: BridgeFeeActions.WITHDRAW,
+          gasMultiplier: 1.1,
+          sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
+          destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          amount,
+          token: bridgeConfig.bridgeContracts.childChainWrappedIMX,
+          senderAddress: sender,
+          recipientAddress: receipient,
+        },
+      );
+
+      expect(result).not.toBeNull();
+      expect(result.sourceChainGas).toStrictEqual(sourceChainGas);
+      expect(result.approvalFee).toStrictEqual(approvalGas);
+      expect(result.bridgeFee).toStrictEqual(bridgeFee);
+      expect(result.imtblFee).toStrictEqual(imtblFee);
+      expect(result.totalFees).toStrictEqual(totalFees.add(approvalGas));
+    });
+
+    it('returns the dynamicwithdrawal fees for token that doesnt require allowance approval on L2', async () => {
       expect.assertions(6);
       const amount = ethers.BigNumber.from(1000);
       const allowance = ethers.BigNumber.from(500);
@@ -813,10 +886,10 @@ describe('Token Bridge', () => {
 
       expect(result).not.toBeNull();
       expect(result.sourceChainGas).toStrictEqual(sourceChainGas);
-      expect(result.approvalFee).toStrictEqual(approvalGas);
+      expect(result.approvalFee).toStrictEqual(ethers.BigNumber.from(0));
       expect(result.bridgeFee).toStrictEqual(bridgeFee);
       expect(result.imtblFee).toStrictEqual(imtblFee);
-      expect(result.totalFees).toStrictEqual(totalFees.add(approvalGas));
+      expect(result.totalFees).toStrictEqual(totalFees);
     });
   });
 
