@@ -4,7 +4,8 @@ import {
   Alert, Button, Form, Image, Offcanvas, Spinner, Stack, Table,
 } from 'react-bootstrap';
 import { Heading } from '@biom3/react';
-import { Asset, UnsignedTransferRequest } from '@imtbl/core-sdk';
+import { Asset } from '@imtbl/core-sdk';
+import { UnsignedTransferRequest } from '@imtbl/x-client';
 import { ModalProps } from '@/types';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { useStatusProvider } from '@/context/StatusProvider';
