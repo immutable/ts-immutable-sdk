@@ -1,11 +1,8 @@
+import { imx } from '@imtbl/generated-clients';
 import {
-  DepositsApi,
-  EncodingApi,
-  UsersApi,
-  TokensApi,
-  ERC20Amount,
   Contracts,
-} from '@imtbl/core-sdk';
+  ERC20Amount,
+} from '@imtbl/x-client';
 import {
   generateSigners,
   privateKey1,
@@ -14,7 +11,8 @@ import {
 } from '../../test/helpers';
 import { depositERC20 } from '.';
 
-jest.mock('@imtbl/core-sdk');
+jest.mock('@imtbl/x-client');
+jest.mock('@imtbl/generated-clients');
 
 describe('Deposit ERC20', () => {
   describe('depositERC20()', () => {
@@ -51,28 +49,28 @@ describe('Deposit ERC20', () => {
       getSignableDepositMock = jest.fn().mockResolvedValue({
         data: getSignableDepositResponse,
       });
-      (DepositsApi as jest.Mock).mockReturnValue({
+      (imx.DepositsApi as jest.Mock).mockReturnValue({
         getSignableDeposit: getSignableDepositMock,
       });
 
       encodeAssetMock = jest.fn().mockResolvedValue({
         data: encodeAssetResponse,
       });
-      (EncodingApi as jest.Mock).mockReturnValue({
+      (imx.EncodingApi as jest.Mock).mockReturnValue({
         encodeAsset: encodeAssetMock,
       });
 
       getTokenMock = jest.fn().mockResolvedValue({
         data: getTokenResponse,
       });
-      (TokensApi as jest.Mock).mockReturnValue({
+      (imx.TokensApi as jest.Mock).mockReturnValue({
         getToken: getTokenMock,
       });
 
       getSignableRegistrationMock = jest.fn().mockResolvedValue({
         data: getSignableRegistrationResponse,
       });
-      (UsersApi as jest.Mock).mockReturnValue({
+      (imx.UsersApi as jest.Mock).mockReturnValue({
         getSignableRegistration: getSignableRegistrationMock,
       });
 
@@ -93,8 +91,7 @@ describe('Deposit ERC20', () => {
     const testCases = [{ isRegistered: true }, { isRegistered: false }];
 
     testCases.forEach((testCase) => {
-      test(`should make the correct api requests when user is ${
-        testCase.isRegistered ? '' : 'not'
+      test(`should make the correct api requests when user is ${testCase.isRegistered ? '' : 'not'
       } registered on-chain`, async () => {
         (Contracts.Registration.connect as jest.Mock).mockReturnValue({
           isRegistered: async () => testCase.isRegistered,

@@ -1,10 +1,12 @@
-import { Contracts, UsersApi } from '@imtbl/core-sdk';
+import { imx } from '@imtbl/generated-clients';
+import { Contracts } from '@imtbl/x-client';
 import { signRaw } from '@imtbl/toolkit';
 import { AxiosError } from 'axios';
 import { generateSigners, privateKey1, testConfig } from '../test/helpers';
 import { isRegisteredOffchain, isRegisteredOnChain, registerOffchain } from './registration';
 
-jest.mock('@imtbl/core-sdk');
+jest.mock('@imtbl/generated-clients');
+jest.mock('@imtbl/x-client');
 jest.mock('@imtbl/toolkit');
 
 describe('Registration', () => {
@@ -47,7 +49,7 @@ describe('Registration', () => {
     beforeEach(() => {
       jest.restoreAllMocks();
 
-      (UsersApi as jest.Mock).mockReturnValue({
+      (imx.UsersApi as jest.Mock).mockReturnValue({
         getUsers: getUsersMock,
       });
     });
@@ -122,7 +124,7 @@ describe('Registration', () => {
       registerUserMock = jest
         .fn()
         .mockResolvedValue({ data: registerUserResponse });
-      (UsersApi as jest.Mock).mockReturnValue({
+      (imx.UsersApi as jest.Mock).mockReturnValue({
         getSignableRegistrationOffchain: getSignableRegistrationOffchainMock,
         registerUser: registerUserMock,
       });

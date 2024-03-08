@@ -1,11 +1,10 @@
 import { Signer } from '@ethersproject/abstract-signer';
+import { imx } from '@imtbl/generated-clients';
 import {
-  MintsApi,
   Contracts,
-  ImmutableXConfiguration,
-  UsersApi,
   ERC721Token,
-} from '@imtbl/core-sdk';
+  ImmutableXConfiguration,
+} from '@imtbl/x-client';
 import * as encUtils from 'enc-utils';
 import { TransactionResponse } from '@ethersproject/providers';
 import { ProviderConfiguration } from '../../config';
@@ -60,7 +59,7 @@ async function executeRegisterAndWithdrawMintableERC721(
   config: ImmutableXConfiguration,
 ): Promise<TransactionResponse> {
   const etherKey = await ethSigner.getAddress();
-  const usersApi = new UsersApi(config.apiConfiguration);
+  const usersApi = new imx.UsersApi(config.apiConfiguration);
   const signableResult = await getSignableRegistrationOnchain(
     etherKey,
     starkPublicKey,
@@ -141,7 +140,7 @@ async function executeRegisterAndWithdrawERC721(
   config: ImmutableXConfiguration,
 ): Promise<TransactionResponse> {
   const etherKey = await ethSigner.getAddress();
-  const usersApi = new UsersApi(config.apiConfiguration);
+  const usersApi = new imx.UsersApi(config.apiConfiguration);
   const signableResult = await getSignableRegistrationOnchain(
     etherKey,
     starkPublicKey,
@@ -231,7 +230,7 @@ export async function completeERC721WithdrawalAction({
   const { tokenAddress } = token;
   const { tokenId } = token;
   const imxConfig = config.immutableXConfig;
-  const mintsApi = new MintsApi(imxConfig.apiConfiguration);
+  const mintsApi = new imx.MintsApi(imxConfig.apiConfiguration);
 
   return await mintsApi
     .getMintableTokenDetailsByClientTokenId({
