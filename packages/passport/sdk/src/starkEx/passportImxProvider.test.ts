@@ -1,6 +1,5 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import {
-  CreateOrderResponse,
   CreateTradeResponse,
   CreateTransferResponse,
   CreateTransferResponseV1,
@@ -187,7 +186,7 @@ describe('PassportImxProvider', () => {
 
   describe('createOrder', () => {
     it('calls createOrder workflow', async () => {
-      const returnValue = {} as CreateOrderResponse;
+      const returnValue = {} as imx.CreateOrderResponse;
       const request = {} as UnsignedOrderRequest;
 
       (createOrder as jest.Mock).mockResolvedValue(returnValue);
