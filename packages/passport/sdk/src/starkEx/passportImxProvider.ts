@@ -11,7 +11,6 @@ import {
   GetSignableTradeRequest,
   NftTransferDetails,
   RegisterUserResponse,
-  StarkSigner,
   TokenAmount,
   UnsignedExchangeTransferRequest,
   UnsignedOrderRequest,
@@ -20,6 +19,7 @@ import {
 import {
   EthSigner,
   IMXClient,
+  StarkSigner,
 } from '@imtbl/x-client';
 import { IMXProvider } from '@imtbl/x-provider';
 import { Web3Provider } from '@ethersproject/providers';

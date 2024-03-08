@@ -1,5 +1,4 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { IMXClient } from '@imtbl/x-client';
 import {
   CancelOrderResponse,
   CreateOrderResponse,
@@ -9,13 +8,16 @@ import {
   GetSignableCancelOrderRequest,
   GetSignableTradeRequest,
   NftTransferDetails,
-  StarkSigner,
   UnsignedExchangeTransferRequest,
   UnsignedOrderRequest,
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { ImxApiClients } from '@imtbl/generated-clients';
+import {
+  IMXClient,
+  StarkSigner,
+} from '@imtbl/x-client';
 import registerPassportStarkEx from './workflows/registration';
 import { mockUser, mockUserImx } from '../test/mocks';
 import { PassportError, PassportErrorType } from '../errors/passportError';
@@ -35,6 +37,7 @@ jest.mock('./workflows');
 jest.mock('./workflows/registration');
 jest.mock('./getStarkSigner');
 jest.mock('@imtbl/generated-clients');
+jest.mock('@imtbl/x-client');
 
 describe('PassportImxProvider', () => {
   afterEach(jest.resetAllMocks);

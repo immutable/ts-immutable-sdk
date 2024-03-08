@@ -1,8 +1,8 @@
 import { ModuleConfiguration } from '@imtbl/config';
-import { StarkSigner } from '@imtbl/core-sdk';
 import {
   EthSigner,
   IMXClient,
+  StarkSigner,
 } from '@imtbl/x-client';
 import { ImxApiClients } from '@imtbl/generated-clients';
 
