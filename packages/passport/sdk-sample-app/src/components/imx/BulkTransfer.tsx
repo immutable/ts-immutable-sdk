@@ -8,7 +8,8 @@ import {
   Alert, Button, Card, Form, Image, Offcanvas, Spinner, Stack, Table,
 } from 'react-bootstrap';
 import { Heading } from '@biom3/react';
-import { Asset, NftTransferDetails } from '@imtbl/core-sdk';
+import { Asset } from '@imtbl/core-sdk';
+import { NftTransferDetails } from '@imtbl/x-client';
 import { ModalProps } from '@/types';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { usePassportProvider } from '@/context/PassportProvider';
