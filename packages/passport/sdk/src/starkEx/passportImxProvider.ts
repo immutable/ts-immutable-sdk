@@ -1,6 +1,5 @@
 import { TransactionResponse } from '@ethersproject/abstract-provider';
 import {
-  CreateTransferResponseV1,
   CreateWithdrawalResponse,
   GetSignableCancelOrderRequest,
   GetSignableTradeRequest,
@@ -178,7 +177,7 @@ export class PassportImxProvider implements IMXProvider {
     };
   }
 
-  async transfer(request: UnsignedTransferRequest): Promise<CreateTransferResponseV1> {
+  async transfer(request: UnsignedTransferRequest): Promise<imx.CreateTransferResponseV1> {
     const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
 
     return transfer({
@@ -273,7 +272,7 @@ export class PassportImxProvider implements IMXProvider {
 
   async exchangeTransfer(
     request: UnsignedExchangeTransferRequest,
-  ): Promise<CreateTransferResponseV1> {
+  ): Promise<imx.CreateTransferResponseV1> {
     const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
 
     return exchangeTransfer({

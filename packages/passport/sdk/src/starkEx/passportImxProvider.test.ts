@@ -1,6 +1,5 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import {
-  CreateTransferResponseV1,
   GetSignableCancelOrderRequest,
   GetSignableTradeRequest,
   NftTransferDetails,
@@ -141,7 +140,7 @@ describe('PassportImxProvider', () => {
 
   describe('transfer', () => {
     it('calls transfer workflow', async () => {
-      const returnValue = {} as CreateTransferResponseV1;
+      const returnValue = {} as imx.CreateTransferResponseV1;
       const request = {} as UnsignedTransferRequest;
 
       (transfer as jest.Mock).mockResolvedValue(returnValue);
@@ -268,7 +267,7 @@ describe('PassportImxProvider', () => {
 
   describe('exchangeTransfer', () => {
     it('calls the exchangeTransfer workflow', async () => {
-      const returnValue = {} as CreateTransferResponseV1;
+      const returnValue = {} as imx.CreateTransferResponseV1;
       const request = {} as UnsignedExchangeTransferRequest;
 
       (exchangeTransfer as jest.Mock).mockResolvedValue(returnValue);
