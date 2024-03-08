@@ -16,7 +16,11 @@ export function PayWithCoins() {
     sendSuccessEvent,
   } = useSaleEvent();
   const {
-    execute, signResponse, executeResponse, signTokenIds,
+    execute,
+    signResponse,
+    executeResponse,
+    signTokenIds,
+    provider,
   } = useSaleContext();
   const executedTxns = executeResponse?.transactions.length || 0;
 
@@ -37,10 +41,11 @@ export function PayWithCoins() {
   const sendTransaction = async () => {
     execute(
       signResponse,
+      !!(provider?.provider as any)?.isMetaMask,
       (txn) => {
         sendTransactionSuccessEvent(txn);
       },
-      (error, txns) => {
+      (error: any, txns) => {
         sendFailedEvent(error.toString(), error, txns);
       },
     );
