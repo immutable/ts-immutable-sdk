@@ -1,6 +1,9 @@
 import { ModuleConfiguration } from '@imtbl/config';
-import { IMXClient } from '@imtbl/x-client';
-import { EthSigner, StarkSigner } from '@imtbl/core-sdk';
+import { StarkSigner } from '@imtbl/core-sdk';
+import {
+  EthSigner,
+  IMXClient,
+} from '@imtbl/x-client';
 import { ImxApiClients } from '@imtbl/generated-clients';
 
 export enum PassportEvents {

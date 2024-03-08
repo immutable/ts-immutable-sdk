@@ -12,13 +12,15 @@ import {
   NftTransferDetails,
   RegisterUserResponse,
   StarkSigner,
-  EthSigner,
   TokenAmount,
   UnsignedExchangeTransferRequest,
   UnsignedOrderRequest,
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
-import { IMXClient } from '@imtbl/x-client';
+import {
+  EthSigner,
+  IMXClient,
+} from '@imtbl/x-client';
 import { IMXProvider } from '@imtbl/x-provider';
 import { Web3Provider } from '@ethersproject/providers';
 import { ImxApiClients } from '@imtbl/generated-clients';
