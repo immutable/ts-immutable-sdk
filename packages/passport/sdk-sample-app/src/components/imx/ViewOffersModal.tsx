@@ -4,7 +4,7 @@ import {
   Button, Modal, Spinner, Table,
 } from 'react-bootstrap';
 import React, { useCallback, useEffect, useState } from 'react';
-import { OrderV3 } from '@imtbl/core-sdk';
+import { imx } from '@imtbl/generated-clients';
 import WorkflowButton from '@/components/WorkflowButton';
 import { usePassportProvider } from '@/context/PassportProvider';
 import { useStatusProvider } from '@/context/StatusProvider';
@@ -16,7 +16,7 @@ function ViewOffersModal({
   showModal, setShowModal, buyTokenAddress, buyTokenId, onClose,
 }: ViewOffersModalProps) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [offers, setOffers] = useState<Array<OrderV3>>([]);
+  const [offers, setOffers] = useState<Array<imx.OrderV3>>([]);
 
   const { coreSdkClient } = useImmutableProvider();
   const { imxProvider } = usePassportProvider();
