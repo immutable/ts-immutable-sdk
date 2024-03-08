@@ -1,6 +1,6 @@
 import { Signer } from 'ethers';
-import { createStarkSigner } from '@imtbl/core-sdk';
 import {
+  createStarkSigner,
   generateLegacyStarkPrivateKey,
   StarkSigner,
 } from '@imtbl/x-client';

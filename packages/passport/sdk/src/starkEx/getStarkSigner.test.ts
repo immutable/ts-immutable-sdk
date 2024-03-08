@@ -1,7 +1,7 @@
 import {
   createStarkSigner,
-} from '@imtbl/core-sdk';
-import { generateLegacyStarkPrivateKey } from '@imtbl/x-client';
+  generateLegacyStarkPrivateKey,
+} from '@imtbl/x-client';
 import { ethers } from 'ethers';
 import { getStarkSigner } from './getStarkSigner';
 import { PassportError, PassportErrorType } from '../errors/passportError';
