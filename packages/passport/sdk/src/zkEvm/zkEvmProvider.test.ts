@@ -1,4 +1,4 @@
-import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
+import { StaticJsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import AuthManager from 'authManager';
 import { ZkEvmProvider, ZkEvmProviderInput } from './zkEvmProvider';
 import { sendTransaction } from './sendTransaction';
@@ -128,7 +128,7 @@ describe('ZkEvmProvider', () => {
         params: [transaction],
         guardianClient,
         ethSigner,
-        jsonRpcProvider: expect.any(Object),
+        staticJsonRpcProvider: expect.any(Object),
         relayerClient: expect.any(RelayerClient),
         zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
       });
@@ -167,7 +167,7 @@ describe('ZkEvmProvider', () => {
         params: [address, typedDataPayload],
         guardianClient,
         ethSigner,
-        jsonRpcProvider: expect.any(Object),
+        staticJsonRpcProvider: expect.any(Object),
         relayerClient: expect.any(RelayerClient),
       });
     });
@@ -377,7 +377,7 @@ describe('ZkEvmProvider', () => {
     beforeEach(() => {
       jest.resetAllMocks();
 
-      (JsonRpcProvider as unknown as jest.Mock).mockImplementation(() => ({
+      (StaticJsonRpcProvider as unknown as jest.Mock).mockImplementation(() => ({
         send: sendMock,
         network: Promise.resolve({
           chainId: 13371,
@@ -385,7 +385,7 @@ describe('ZkEvmProvider', () => {
       }));
     });
 
-    it.each(passthroughMethods)('should passthrough %s to the jsonRpcProvider', async (method, returnValue) => {
+    it.each(passthroughMethods)('should passthrough %s to the staticJsonRpcProvider', async (method, returnValue) => {
       sendMock.mockResolvedValueOnce(returnValue);
 
       const provider = getProvider();

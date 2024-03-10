@@ -46,7 +46,7 @@ export const mswHandlers = {
       (req, res, ctx) => res(ctx.status(500)),
     ),
   },
-  jsonRpcProvider: {
+  staticJsonRpcProvider: {
     success: rest.post('https://rpc.testnet.immutable.com', async (req, res, ctx) => {
       const body = await req.json<JsonRpcRequestPayload>();
       switch (body.method) {

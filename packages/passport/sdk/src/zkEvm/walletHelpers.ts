@@ -7,7 +7,7 @@ import {
   errors,
 } from 'ethers';
 import { walletContracts } from '@0xsequence/abi';
-import { JsonRpcProvider } from '@ethersproject/providers';
+import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import { Signer } from '@ethersproject/abstract-signer';
 import { v1 as sequenceCoreV1 } from '@0xsequence/core';
 import { MetaTransaction, MetaTransactionNormalised, TypedDataPayload } from './types';
@@ -47,14 +47,14 @@ export function digestOfTransactionsAndNonce(nonce: BigNumberish, normalisedTran
 }
 
 export const getNonce = async (
-  jsonRpcProvider: JsonRpcProvider,
+  staticJsonRpcProvider: StaticJsonRpcProvider,
   smartContractWalletAddress: string,
 ): Promise<BigNumber> => {
   try {
     const contract = new Contract(
       smartContractWalletAddress,
       walletContracts.mainModule.abi,
-      jsonRpcProvider,
+      staticJsonRpcProvider,
     );
     const result = await contract.nonce();
     if (result instanceof BigNumber) {

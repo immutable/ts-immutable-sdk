@@ -1,4 +1,4 @@
-import { JsonRpcProvider } from '@ethersproject/providers';
+import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import { Signer } from '@ethersproject/abstract-signer';
 import { signRaw } from '@imtbl/toolkit';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
@@ -54,7 +54,7 @@ describe('registerZkEvmUser', () => {
         ethSigner: ethSignerMock as unknown as Signer,
         multiRollupApiClients: multiRollupApiClients as unknown as MultiRollupApiClients,
         accessToken,
-        jsonRpcProvider: jsonRPCProvider as unknown as JsonRpcProvider,
+        staticJsonRpcProvider: jsonRPCProvider as unknown as StaticJsonRpcProvider,
       })).rejects.toThrow('Failed to create counterfactual address: Error: Internal server error');
     });
   });
@@ -72,7 +72,7 @@ describe('registerZkEvmUser', () => {
       ethSigner: ethSignerMock as unknown as Signer,
       multiRollupApiClients: multiRollupApiClients as unknown as MultiRollupApiClients,
       accessToken,
-      jsonRpcProvider: jsonRPCProvider as unknown as JsonRpcProvider,
+      staticJsonRpcProvider: jsonRPCProvider as unknown as StaticJsonRpcProvider,
     });
 
     expect(result).toEqual(mockUserZkEvm.zkEvm.ethAddress);
