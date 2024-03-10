@@ -1,4 +1,4 @@
-import { TokenAmount } from '@imtbl/core-sdk';
+import { TokenAmount } from '@imtbl/x-client';
 import { ProviderConfiguration } from 'config';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { deposit } from './deposit';

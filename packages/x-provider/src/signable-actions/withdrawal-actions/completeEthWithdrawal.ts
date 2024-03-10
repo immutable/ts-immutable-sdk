@@ -1,6 +1,10 @@
 import { Signer } from '@ethersproject/abstract-signer';
 import { TransactionResponse } from '@ethersproject/providers';
-import { Contracts, ImmutableXConfiguration, UsersApi } from '@imtbl/core-sdk';
+import { imx } from '@imtbl/generated-clients';
+import {
+  Contracts,
+  ImmutableXConfiguration,
+} from '@imtbl/x-client';
 import { ProviderConfiguration } from '../../config';
 import {
   getSignableRegistrationOnchain,
@@ -22,7 +26,7 @@ async function executeRegisterAndWithdrawEth(
   config: ImmutableXConfiguration,
 ): Promise<TransactionResponse> {
   const etherKey = await ethSigner.getAddress();
-  const usersApi = new UsersApi(config.apiConfiguration);
+  const usersApi = new imx.UsersApi(config.apiConfiguration);
   const signableResult = await getSignableRegistrationOnchain(
     etherKey,
     starkPublicKey,
