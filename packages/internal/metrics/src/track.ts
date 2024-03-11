@@ -16,7 +16,6 @@ import {
 
 export const POLLING_FREQUENCY = 5000;
 
-// Store the event in the event store
 const trackFn = (
   moduleName: string,
   eventName: string,
@@ -29,9 +28,46 @@ const trackFn = (
   };
   addEvent(event);
 };
+
+/**
+ * Track an event completion.
+ * @param moduleName Name of the module being tracked (for namespacing purposes), e.g. `passport`
+ * @param eventName Name of the event, use camelCase e.g. `clickItem`
+ * @param properties Other properties to be sent with the event
+ *
+ * e.g.
+ *
+ * ```ts
+ * track("passport", "performTransaction");
+ * track("passport", "performTransaction", { transationType: "transfer" });
+ * ```
+ */
 export const track = errorBoundary(
   getGlobalisedCachedFunction('track', trackFn),
 );
+
+/**
+ * Track an event and it's performance. Works similarly to `track`, but also includes a duration.
+ * @param moduleName Name of the module being tracked (for namespacing purposes), e.g. `passport`
+ * @param eventName Name of the event, e.g. `clickItem`
+ * @param duration Duration of the event in milliseconds, e.g. `1000`
+ * @param properties Other properties to be sent with the event, other than duration
+ *
+ * e.g.
+ * ```ts
+ * trackDuration("passport", "performTransaction", 1000);
+ * trackDuration("passport", "performTransaction", 1000, { transationType: "transfer" });
+ * ```
+ */
+export const trackDuration = (
+  moduleName: string,
+  eventName: string,
+  duration: number,
+  properties?: Record<string, string | number | boolean> & { duration: never },
+) => track(moduleName, eventName, {
+  ...(properties || {}),
+  duration,
+});
 
 // Sending events to the server
 const flushFn = async () => {
