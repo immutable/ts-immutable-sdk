@@ -37,7 +37,7 @@ export function InsufficientCoinsBanner() {
 
   let label = t('views.PAYMENT_METHODS.insufficientCoinsBanner.caption');
 
-  if (!hasEnough[ItemType.NATIVE] && hasEnough[ItemType.NATIVE]) {
+  if (!hasEnough[ItemType.NATIVE] && hasEnough[ItemType.ERC20]) {
     label = t('views.PAYMENT_METHODS.insufficientCoinsBanner.gasCaption');
   }
 
