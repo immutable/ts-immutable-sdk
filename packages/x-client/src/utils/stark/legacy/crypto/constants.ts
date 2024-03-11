@@ -26,9 +26,12 @@ const order = new BN(
   16,
 );
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
+const { PresetCurve }: typeof elliptic.curves = elliptic.curves;
+
 // eslint-disable-next-line new-cap
 const starkEc = new elliptic.ec(
-  new elliptic.curves.PresetCurve({
+  new PresetCurve({
     type: 'short',
     prime: null,
     p: prime as any,
