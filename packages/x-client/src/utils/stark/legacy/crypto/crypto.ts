@@ -4,7 +4,7 @@
 import assert from 'assert';
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import BN from 'bn.js';
-import elliptic from 'elliptic';
+import * as elliptic from 'elliptic';
 // import { ec } from 'elliptic';
 import * as encUtils from 'enc-utils';
 import { hdkey } from 'ethereumjs-wallet';

@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import BN from 'bn.js';
-import elliptic from 'elliptic';
+import * as elliptic from 'elliptic';
 // import { curves, ec as Ec } from 'elliptic';
 import hashJS from 'hash.js';
 

@@ -2,7 +2,7 @@
 import { Signer } from '@ethersproject/abstract-signer';
 import { splitSignature } from '@ethersproject/bytes';
 import hash from 'hash.js';
-import elliptic from 'elliptic';
+import * as elliptic from 'elliptic';
 // import { curves, ec } from 'elliptic';
 import * as encUtils from 'enc-utils';
 // eslint-disable-next-line @typescript-eslint/naming-convention
