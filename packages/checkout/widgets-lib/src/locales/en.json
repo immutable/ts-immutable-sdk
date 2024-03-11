@@ -286,6 +286,7 @@
       },
       "insufficientCoinsBanner": {
         "caption": "Insufficient coin balance. Pay with card to proceed, or",
+        "gasCaption": "Insufficient IMX for gas fees. Pay with card to proceed, or",
         "captionEnd": "and try again.",
         "captionCTA": "add coins"
       },

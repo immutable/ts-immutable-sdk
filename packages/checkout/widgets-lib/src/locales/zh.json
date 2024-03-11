@@ -286,6 +286,7 @@
       },
       "insufficientCoinsBanner": {
         "caption": "硬币余额不足。请使用卡支付，或",
+        "gasCaption": "IMX 币不足以支付汽油费。请使用卡支付，或",
         "captionEnd": "再试一次。",
         "captionCTA": "添加硬币"
       },
