@@ -13,8 +13,10 @@ import { SaleErrorTypes } from '../types';
 export function PayWithCard() {
   const { sendPageView } = useSaleEvent();
   const [initialised, setInitialised] = useState(false);
-  const { goBackToPaymentMethods, goToErrorView, goToSuccessView } = useSaleContext();
-  const { sendOrderCreated } = useSaleEvent();
+  const {
+    goBackToPaymentMethods, goToErrorView, signResponse: signData, signTokenIds,
+  } = useSaleContext();
+  const { sendOrderCreated, sendCloseEvent, sendSuccessEvent } = useSaleEvent();
   const { t } = useTranslation();
 
   const onInit = () => setInitialised(true);
@@ -40,7 +42,7 @@ export function PayWithCard() {
       nftAssetInfo,
     } = data;
     const { nftDataBase64, quantity } = nftAssetInfo || ({} as any);
-    goToSuccessView({
+    const details = {
       orderId,
       orderStatus,
       cryptoAmount,
@@ -55,7 +57,11 @@ export function PayWithCard() {
       walletAddress,
       nftDataBase64,
       quantity,
-    });
+      signData,
+    };
+
+    sendSuccessEvent(SaleWidgetViews.SALE_SUCCESS, [], signTokenIds, details);
+    sendCloseEvent(SaleWidgetViews.SALE_SUCCESS);
   };
 
   const onOrderCreated = (data: Record<string, unknown> = {}) => {
@@ -90,6 +96,7 @@ export function PayWithCard() {
       walletAddress,
       nftDataBase64,
       quantity,
+      signData,
     });
   };
 
@@ -108,7 +115,9 @@ export function PayWithCard() {
       <>
         <LoadingOverlay visible={!initialised}>
           <LoadingOverlay.Content>
-            <LoadingOverlay.Content.LoopingText text={[t('views.PAY_WITH_CARD.loading')]} />
+            <LoadingOverlay.Content.LoopingText
+              text={[t('views.PAY_WITH_CARD.loading')]}
+            />
           </LoadingOverlay.Content>
         </LoadingOverlay>
         <Box

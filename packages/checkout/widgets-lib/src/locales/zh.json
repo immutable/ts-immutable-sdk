@@ -350,6 +350,11 @@
           "primaryAction": "再试一次",
           "secondaryAction": "取消"
         },
+        "WALLET_POPUP_BLOCKED": {
+          "description": "您需要允许浏览器中的弹出窗口才能继续。", 
+          "primaryAction": "我已经解决了这个问题，再试一次",
+          "secondaryAction": "取消"
+        },
         "SMART_CHECKOUT_ERROR": {
           "description": "无法检查您的钱包余额。请再试一次。",
           "primaryAction": "再试一次",

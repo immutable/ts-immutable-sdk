@@ -353,6 +353,11 @@
           "primaryAction": "もう一度試す",
           "secondaryAction": "キャンセル"
         },
+        "WALLET_POPUP_BLOCKED": {
+          "description": "続行するには、ブラウザでポップアップを許可する必要があります。",
+          "primaryAction": "もう一度試す",
+          "secondaryAction": "キャンセル"
+        },
         "SMART_CHECKOUT_ERROR": {
           "description": "ウォレットの残高を確認できません。もう一度お試しください。",
           "primaryAction": "もう一度試す",

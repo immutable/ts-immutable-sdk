@@ -61,6 +61,7 @@ type SaleContextValues = SaleContextProps & {
   ) => Promise<SignResponse | undefined>;
   execute: (
     signResponse: SignResponse | undefined,
+    waitForTrnsactionSettlement: boolean,
     onTxnSuccess: (txn: ExecutedTransaction) => void,
     onTxnError: (error: any, txns: ExecutedTransaction[]) => void
   ) => Promise<ExecutedTransaction[]>;
