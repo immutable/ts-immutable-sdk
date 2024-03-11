@@ -5,7 +5,7 @@ import {
   ViewContext,
 } from 'context/view-context/ViewContext';
 import { useContext } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { ItemType } from '@imtbl/checkout-sdk';
 import { useSaleContext } from '../context/SaleContextProvider';
 import { SmartCheckoutErrorTypes } from '../types';
@@ -13,7 +13,11 @@ import { SmartCheckoutErrorTypes } from '../types';
 export function InsufficientCoinsBanner() {
   const { t } = useTranslation();
   const { viewDispatch } = useContext(ViewContext);
-  const { smartCheckoutError, fromTokenAddress: tokenAddress, amount } = useSaleContext();
+  const {
+    smartCheckoutError,
+    fromTokenAddress: tokenAddress,
+    amount,
+  } = useSaleContext();
 
   if (
     smartCheckoutError?.data?.error?.message
@@ -36,10 +40,10 @@ export function InsufficientCoinsBanner() {
 
   const hasEnough = smartCheckoutError?.data?.fractionalBalance || {};
 
-  let label = t('views.PAYMENT_METHODS.insufficientCoinsBanner.caption');
+  let labelKey = t('views.PAYMENT_METHODS.insufficientCoinsBanner.caption');
 
   if (!hasEnough[ItemType.NATIVE] && hasEnough[ItemType.ERC20]) {
-    label = t('views.PAYMENT_METHODS.insufficientCoinsBanner.gasCaption');
+    labelKey = t('views.PAYMENT_METHODS.insufficientCoinsBanner.gasCaption');
   }
 
   return (
@@ -47,11 +51,12 @@ export function InsufficientCoinsBanner() {
       <Banner>
         <Banner.Icon icon="InformationCircle" />
         <Banner.Caption>
-          {label}
-          <Link sx={{ mx: 'base.spacing.x1' }} onClick={() => onClick()}>
-            {t('views.PAYMENT_METHODS.insufficientCoinsBanner.captionCTA')}
-          </Link>
-          {t('views.PAYMENT_METHODS.insufficientCoinsBanner.captionEnd')}
+          <Trans
+            i18nKey={labelKey}
+            components={{
+              link: (<Link sx={{ mx: 'base.spacing.x1' }} onClick={() => onClick()} />),
+            }}
+          />
         </Banner.Caption>
       </Banner>
     </Box>
