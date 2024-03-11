@@ -285,8 +285,8 @@
         }
       },
       "insufficientCoinsBanner": {
-        "caption": "코인 잔액이 부족합니다. 카드로 결제하거나 <link>코인 추가</link>하고 다시 시도해 보세요.",
-        "gasCaption": "가스를 위한 IMX가 부족합니다. 카드로 결제하거나 <link>코인 추가</link>하고 다시 시도해 보세요."
+        "caption": "코인 잔액이 부족합니다. 카드로 결제하거나 <cta>코인 추가</cta>하고 다시 시도해 보세요.",
+        "gasCaption": "가스를 위한 IMX가 부족합니다. 카드로 결제하거나 <cta>코인 추가</cta>하고 다시 시도해 보세요."
       },
       "loading": {
         "ready1": "주문 수집 중",

@@ -285,8 +285,8 @@
         }
       },
       "insufficientCoinsBanner": {
-        "caption": "硬币余额不足。请使用卡支付，或 <link>添加硬币</link> 再试一次。",
-        "gasCaption": "IMX 币不足以支付汽油费。请使用卡支付，或 <link>添加硬币</link> 再试一次。"
+        "caption": "硬币余额不足。请使用卡支付，或 <cta>添加硬币</cta> 再试一次。",
+        "gasCaption": "IMX 币不足以支付汽油费。请使用卡支付，或 <cta>添加硬币</cta> 再试一次。"
       },
       "loading": {
         "ready1": "正在收集您的订单",

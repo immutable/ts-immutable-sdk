@@ -54,7 +54,7 @@ export function InsufficientCoinsBanner() {
           <Trans
             i18nKey={labelKey}
             components={{
-              link: (<Link sx={{ mx: 'base.spacing.x1' }} onClick={() => onClick()} />),
+              cta: <Link sx={{ mx: 'base.spacing.x1' }} onClick={() => onClick()} />,
             }}
           />
         </Banner.Caption>
