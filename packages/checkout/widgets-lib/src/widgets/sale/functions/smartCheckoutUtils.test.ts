@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { Web3Provider } from '@ethersproject/providers';
 import {
-  Checkout,
   FundingRoute,
   FundingStepType,
   ItemType,
@@ -10,155 +9,35 @@ import {
   SmartCheckoutResult,
   SmartCheckoutSufficient,
 } from '@imtbl/checkout-sdk';
-import { BigNumber } from 'ethers';
-import { NATIVE } from '../../../lib';
 import {
-  MAX_GAS_LIMIT,
   filterSmartCheckoutResult,
   fundingRouteFees,
-  isUserFractionalBalanceBlocked,
+  getFractionalBalance,
   smartCheckoutTokensList,
 } from './smartCheckoutUtils';
 
-const PURCHASE_CURRENCY_ADDRESS = '0x000000000000000000000000000000000000USDC';
-const USER_ADDRESS = '0x000000000000000000000000000000000000USER';
+describe('getFractionalBalance', () => {
+  it('should return map insufficient balances', async () => {
+    const insufficientSmartCheckoutResult = {
+      sufficient: false,
+      transactionRequirements: [
+        {
+          sufficient: false,
+          type: ItemType.NATIVE,
+        },
+        {
+          sufficient: true,
+          type: ItemType.ERC20,
+        },
+      ],
+      router: {},
+    } as unknown as SmartCheckoutResult;
 
-describe('isUserFractionalBalanceBlocked', () => {
-  it('should return true if purchase balance 0', async () => {
-    const checkout: Checkout = {
-      getAllBalances: jest.fn(() => Promise.resolve({
-        balances: [
-          {
-            balance: BigNumber.from('0'),
-            token: {
-              address: PURCHASE_CURRENCY_ADDRESS,
-              decimals: 6,
-              symbol: 'USDC',
-              type: 'ERC-20',
-            },
-          },
-        ],
-      })),
-      config: {},
-    } as unknown as Checkout;
-    const provider: Web3Provider = {} as unknown as Web3Provider;
-    const amount = '0.5';
-
-    const userFractionalBalanceBlocked = await isUserFractionalBalanceBlocked(
-      USER_ADDRESS,
-      PURCHASE_CURRENCY_ADDRESS,
-      amount,
-      checkout,
-      provider,
-    );
-
-    expect(userFractionalBalanceBlocked).toBe(true);
-  });
-
-  it('should return false if purchase balance >= purchase amount and enough gas', async () => {
-    const checkout: Checkout = {
-      getAllBalances: jest.fn(() => Promise.resolve({
-        balances: [
-          {
-            balance: BigNumber.from('500000'),
-            token: {
-              address: PURCHASE_CURRENCY_ADDRESS,
-              decimals: 6,
-              symbol: 'USDC',
-              type: 'ERC-20',
-            },
-          },
-          {
-            balance: BigNumber.from(MAX_GAS_LIMIT),
-            token: {
-              address: NATIVE,
-              decimals: 18,
-              name: 'IMX',
-              symbol: 'IMX',
-            },
-          },
-        ],
-      })),
-      config: {},
-    } as unknown as Checkout;
-    const provider: Web3Provider = {} as unknown as Web3Provider;
-    const amount = '0.5';
-
-    const userFractionalBalanceBlocked = await isUserFractionalBalanceBlocked(
-      USER_ADDRESS,
-      PURCHASE_CURRENCY_ADDRESS,
-      amount,
-      checkout,
-      provider,
-    );
-
-    expect(userFractionalBalanceBlocked).toBe(false);
-  });
-
-  it('should return false if purchase balance >= purchase amount and zero gas on passport', async () => {
-    const checkout: Checkout = {
-      getAllBalances: jest.fn(() => Promise.resolve({
-        balances: [
-          {
-            balance: BigNumber.from('500000'),
-            token: {
-              address: PURCHASE_CURRENCY_ADDRESS,
-              decimals: 6,
-              symbol: 'USDC',
-              type: 'ERC-20',
-            },
-          },
-        ],
-      })),
-      config: {},
-    } as unknown as Checkout;
-    const provider: Web3Provider = {
-      provider: {
-        isPassport: true,
-      },
-    } as unknown as Web3Provider;
-    const amount = '0.5';
-
-    const userFractionalBalanceBlocked = await isUserFractionalBalanceBlocked(
-      USER_ADDRESS,
-      PURCHASE_CURRENCY_ADDRESS,
-      amount,
-      checkout,
-      provider,
-    );
-
-    expect(userFractionalBalanceBlocked).toBe(false);
-  });
-
-  it('should return true if purchase balance >= purchase amount and not enough gas', async () => {
-    const checkout: Checkout = {
-      getAllBalances: jest.fn(() => Promise.resolve({
-        balances: [
-          {
-            balance: BigNumber.from('500000'),
-            token: {
-              address: PURCHASE_CURRENCY_ADDRESS,
-              decimals: 6,
-              symbol: 'USDC',
-              type: 'ERC-20',
-            },
-          },
-        ],
-      })),
-      config: {},
-    } as unknown as Checkout;
-    const provider: Web3Provider = {} as unknown as Web3Provider;
-    const amount = '0.5';
-
-    const userFractionalBalanceBlocked = await isUserFractionalBalanceBlocked(
-      USER_ADDRESS,
-      PURCHASE_CURRENCY_ADDRESS,
-      amount,
-      checkout,
-      provider,
-    );
-
-    expect(userFractionalBalanceBlocked).toBe(true);
+    const fractionalBalance = getFractionalBalance(insufficientSmartCheckoutResult);
+    expect(fractionalBalance).toEqual({
+      [ItemType.NATIVE]: false,
+      [ItemType.ERC20]: true,
+    });
   });
 });
 
@@ -340,7 +219,9 @@ describe('smartCheckoutTokensList', () => {
         },
       } as unknown as SmartCheckoutSufficient;
 
-      const filteredSmartCheckoutResult = filterSmartCheckoutResult(sufficentSmartCheckoutResult);
+      const filteredSmartCheckoutResult = filterSmartCheckoutResult(
+        sufficentSmartCheckoutResult,
+      );
 
       expect(filteredSmartCheckoutResult).toEqual(sufficentSmartCheckoutResult);
     });
@@ -357,12 +238,16 @@ describe('smartCheckoutTokensList', () => {
         },
       } as unknown as SmartCheckoutInsufficient;
 
-      const filteredSmartCheckoutResult = filterSmartCheckoutResult(insufficientSmartCheckoutResult);
+      const filteredSmartCheckoutResult = filterSmartCheckoutResult(
+        insufficientSmartCheckoutResult,
+      );
 
-      expect(filteredSmartCheckoutResult).toEqual(insufficientSmartCheckoutResult);
+      expect(filteredSmartCheckoutResult).toEqual(
+        insufficientSmartCheckoutResult,
+      );
     });
 
-    it('should be sufficent if wallet is passport, has enough balance and only native balance is insufficient', () => {
+    it('should have sufficent NATIVE token requirement if wallet is passport', () => {
       const insufficientSmartCheckoutResult = {
         sufficient: false,
         transactionRequirements: [
@@ -395,15 +280,27 @@ describe('smartCheckoutTokensList', () => {
         },
       } as unknown as SmartCheckoutResult;
       const sufficentSmartCheckoutResult: SmartCheckoutSufficient = {
-        sufficient: true,
-        transactionRequirements:
-          insufficientSmartCheckoutResult.transactionRequirements,
-      };
+        ...insufficientSmartCheckoutResult,
+        transactionRequirements: [
+          {
+            sufficient: true,
+            type: ItemType.NATIVE,
+          },
+          {
+            sufficient: true,
+            type: ItemType.ERC20,
+          },
+        ],
+      } as unknown as SmartCheckoutSufficient;
+
       const provider: Web3Provider = {
         provider: { isPassport: true },
       } as unknown as Web3Provider;
 
-      const filteredSmartCheckoutResult = filterSmartCheckoutResult(insufficientSmartCheckoutResult, provider);
+      const filteredSmartCheckoutResult = filterSmartCheckoutResult(
+        insufficientSmartCheckoutResult,
+        provider,
+      );
 
       expect(filteredSmartCheckoutResult).toEqual(sufficentSmartCheckoutResult);
     });
