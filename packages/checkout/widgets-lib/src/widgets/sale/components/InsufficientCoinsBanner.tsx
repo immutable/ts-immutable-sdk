@@ -13,7 +13,7 @@ import { SmartCheckoutErrorTypes } from '../types';
 export function InsufficientCoinsBanner() {
   const { t } = useTranslation();
   const { viewDispatch } = useContext(ViewContext);
-  const { smartCheckoutError } = useSaleContext();
+  const { smartCheckoutError, fromTokenAddress: tokenAddress, amount } = useSaleContext();
 
   if (
     smartCheckoutError?.data?.error?.message
@@ -28,6 +28,7 @@ export function InsufficientCoinsBanner() {
         type: ViewActions.UPDATE_VIEW,
         view: {
           type: SharedViews.TOP_UP_VIEW,
+          data: { tokenAddress, amount },
         },
       },
     });
