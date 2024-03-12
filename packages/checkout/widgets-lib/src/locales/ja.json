@@ -288,9 +288,8 @@
         }
       },
       "insufficientCoinsBanner": {
-        "caption": "コインの残高が不足しています。カードで支払うか、",
-        "captionEnd": "して再試行してください。",
-        "captionCTA": "コインを追加"
+        "caption": "コインの残高が不足しています。カードで支払うか、<cta>コインを追加</cta>して再試行してください。",
+        "gasCaption": "ガス料金に足りない IMX コイン。カードで支払うか、<cta>コインを追加</cta>して再試行してください。"
       },
       "loading": {
         "ready1": "注文を受け取り中",

@@ -9,7 +9,7 @@ import {
   SaleErrorTypes, SmartCheckoutError, SmartCheckoutErrorTypes,
 } from '../types';
 import {
-  filterSmartCheckoutResult, getGasEstimate, getItemRequirements, isUserFractionalBalanceBlocked,
+  filterSmartCheckoutResult, getFractionalBalance, getGasEstimate, getItemRequirements,
 } from '../functions/smartCheckoutUtils';
 
 type UseSmartCheckoutInput = {
@@ -31,25 +31,13 @@ export const useSmartCheckout = ({
   );
 
   const smartCheckout = useCallback(async () => {
+    let finalSmartCheckoutResult: SmartCheckoutResult | undefined;
     try {
       const signer = provider?.getSigner();
       const spenderAddress = await signer?.getAddress() || '';
-
-      const userFractionalBalanceBlocked = await isUserFractionalBalanceBlocked(
-        spenderAddress,
-        tokenAddress,
-        amount,
-        checkout,
-        provider,
-      );
-
-      if (userFractionalBalanceBlocked) {
-        throw new Error(SmartCheckoutErrorTypes.FRACTIONAL_BALANCE_BLOCKED);
-      }
-
       const itemRequirements = getItemRequirements(amount, spenderAddress, tokenAddress);
       const gasEstimate = getGasEstimate();
-      const res = await checkout?.smartCheckout(
+      const result = await checkout?.smartCheckout(
         {
           provider: provider!,
           itemRequirements,
@@ -57,19 +45,30 @@ export const useSmartCheckout = ({
         },
       );
 
-      if (!res) {
+      if (!result) {
         throw new Error();
       }
-      const result = { ...res };
-      const filteredSmartCheckoutResult = filterSmartCheckoutResult(result, provider);
-      setSmartCheckoutResult(filteredSmartCheckoutResult);
+
+      // TODO: Smart funding UI will be added later, meanwhile all insufficient
+      // balances will be blocked and routed tru the add coins flow
+      // FIXME: filtering smart checkout result won't be necessary
+      // once smart checkout allows to skip gas checks and passing disabled funding routes
+      finalSmartCheckoutResult = filterSmartCheckoutResult({ ...result }, provider);
+      if (!finalSmartCheckoutResult.sufficient) {
+        throw new Error(SmartCheckoutErrorTypes.FRACTIONAL_BALANCE_BLOCKED);
+      }
+
+      setSmartCheckoutResult(finalSmartCheckoutResult);
+
       return result;
-    } catch (err: any) {
+    } catch (error: any) {
+      const fractionalBalance = getFractionalBalance(finalSmartCheckoutResult);
       setSmartCheckoutError({
         type: SaleErrorTypes.SMART_CHECKOUT_ERROR,
-        data: { error: err },
+        data: { error, fractionalBalance },
       });
     }
+
     return undefined;
   }, [checkout, provider, items, amount, tokenAddress]);
 

@@ -60,7 +60,7 @@
     "ERROR_VIEW": {
       "heading": "Something's gone wrong",
       "body": [
-        "You can try again or contact",
+        "You can try again or contagact",
         "support",
         "for help."
       ],
@@ -285,9 +285,8 @@
         }
       },
       "insufficientCoinsBanner": {
-        "caption": "Insufficient coin balance. Pay with card to proceed, or",
-        "captionEnd": "and try again.",
-        "captionCTA": "add coins"
+        "caption": "Insufficient coin balance. Pay with card to proceed, or <cta>add coins</cta> and try again.",
+        "gasCaption": "Insufficient IMX for gas fees. Pay with card to proceed, or <cta>add coins</cta> and try again."
       },
       "loading": {
         "ready1": "Collecting your order",
