@@ -197,8 +197,14 @@ export function SaleUI() {
     <button onClick={() => saleWidget.unmount()}>Unmount</button>
     <button onClick={() => saleWidget.update({config: {theme: WidgetTheme.LIGHT}})}>Update Config Light</button>
     <button onClick={() => saleWidget.update({config: {theme: WidgetTheme.DARK}})}>Update Config Dark</button>
-    <button onClick={() => saleWidget?.update({ config: { language: 'en'}})}>EN</button>
-    <button onClick={() => saleWidget?.update({ config: { language: 'ja'}})}>JA</button>
+    <select
+      onChange={(e) => saleWidget.update({ config: { language: e.target.value}})}
+    >
+      <option value="en">EN</option>
+      <option value="ja">JA</option>
+      <option value="ko">KO</option>
+      <option value="zh">ZH</option>
+    </select>
       <br />
       <br />
       <br />
