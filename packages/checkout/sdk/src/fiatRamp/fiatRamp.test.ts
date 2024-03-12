@@ -5,11 +5,19 @@ import { FiatRampService, FiatRampWidgetParams } from './fiatRamp';
 import { ExchangeType, OnRampProvider } from '../types';
 import { HttpClient } from '../api/http';
 
-const defaultWidgetUrl = 'https://global-stg.transak.com?apiKey=mock-api-key'
-+ '&network=immutablezkevm&defaultPaymentMethod=credit_debit_card&disablePaymentMethods=sepa_bank_transfer,'
-+ 'gbp_bank_transfer,pm_cash_app,pm_jwire,pm_paymaya,pm_bpi,pm_ubp,pm_grabpay,pm_shopeepay,pm_gcash,pm_pix,'
-+ 'pm_astropay,pm_pse,inr_bank_transfer&productsAvailed=buy&exchangeScreenTitle=Buy&themeColor=0D0D0D'
-+ '&defaultFiatAmount=50&defaultFiatCurrency=usd';
+const defaultURL = 'https://global-stg.transak.com';
+const defaultParams = {
+  apiKey: 'mock-api-key',
+  network: 'immutablezkevm',
+  defaultPaymentMethod: 'credit_debit_card',
+  disablePaymentMethods: 'sepa_bank_transfer,gbp_bank_transfer,pm_cash_app,pm_jwire,pm_paymaya,pm_bpi,pm_ubp,pm_grabpay,pm_shopeepay,pm_gcash,pm_pix,pm_astropay,pm_pse,inr_bank_transfer', // eslint-disable-line max-len
+  productsAvailed: 'buy',
+  exchangeScreenTitle: 'Buy',
+  themeColor: '0D0D0D',
+  defaultFiatCurrency: 'usd',
+};
+
+const defaultWidgetUrl = `${defaultURL}?${new URLSearchParams(defaultParams).toString()}`;
 
 jest.mock('../config/remoteConfigFetcher');
 
@@ -117,8 +125,23 @@ describe('FiatRampService', () => {
       };
       const result = await fiatRampService.createWidgetUrl(params);
       expect(result).toContain(defaultWidgetUrl);
-      expect(result).toContain('&email=passport.user%40immutable.com');
-      expect(result).toContain('&isAutoFillUserData=true&disableWalletAddressForm=true');
+      expect(result).toContain('&email=passport.user%2540immutable.com');
+      expect(result).toContain('&isAutoFillUserData=true');
+      expect(result).toContain('&disableWalletAddressForm=true');
+    });
+
+    it(`should return widget url with defaultFiatAmount and defaultCryptoCurrency query params when tokenAmount and
+    tokenSymbol are no present`, async () => {
+      const params: FiatRampWidgetParams = {
+        exchangeType: ExchangeType.ONRAMP,
+        isPassport: false,
+      };
+      const result = await fiatRampService.createWidgetUrl(params);
+      expect(result).toContain(defaultWidgetUrl);
+      expect(result).toContain('&defaultFiatAmount=50');
+      expect(result).toContain('&defaultCryptoCurrency=IMX');
+      expect(result).not.toContain('&defaultCryptoAmount=100');
+      expect(result).not.toContain('&cryptoCurrencyCode=ETH');
     });
 
     it(`should return widget url with defaultCryptoAmount and cryptoCurrencyCode query params when tokenAmount and
@@ -132,7 +155,9 @@ describe('FiatRampService', () => {
       const result = await fiatRampService.createWidgetUrl(params);
       expect(result).toContain(defaultWidgetUrl);
       expect(result).toContain('&defaultCryptoAmount=100');
-      expect(result).toContain('&defaultCryptoCurrency=ETH');
+      expect(result).toContain('&cryptoCurrencyCode=ETH');
+      expect(result).not.toContain('&defaultFiatAmount=');
+      expect(result).not.toContain('&defaultCryptoCurrency=IMX');
     });
 
     it('should return widget url with walletAddress query params when walletAddress is present', async () => {
@@ -154,7 +179,7 @@ describe('FiatRampService', () => {
       };
       const result = await fiatRampService.createWidgetUrl(params);
       expect(result).toContain(defaultWidgetUrl);
-      expect(result).toContain('&cryptoCurrencyList=eth,imx');
+      expect(result).toContain('&cryptoCurrencyList=eth%2Cimx');
     });
   });
 });
