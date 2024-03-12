@@ -225,7 +225,6 @@ export class ZkEvmProvider implements Provider {
           guardianClient: this.#guardianClient,
         });
       }
-      // Pass through methods
       case 'eth_chainId': {
         // Call detect network to fetch the chainId so to take advantage of
         // the caching layer provided by StaticJsonRpcProvider.
@@ -244,6 +243,7 @@ export class ZkEvmProvider implements Provider {
           })();
         });
       }
+      // Pass through methods
       case 'eth_gasPrice':
       case 'eth_getBalance':
       case 'eth_getCode':
