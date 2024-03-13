@@ -1,4 +1,4 @@
-import { BaseProvider, StaticJsonRpcProvider, Web3Provider } from '@ethersproject/providers';
+import { StaticJsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { Signer } from '@ethersproject/abstract-signer';
 import { utils } from 'ethers';
@@ -48,7 +48,7 @@ export class ZkEvmProvider implements Provider {
 
   readonly #guardianClient: GuardianClient;
 
-  readonly rpcProvider: BaseProvider; // Used for read
+  readonly rpcProvider: StaticJsonRpcProvider; // Used for read
 
   readonly #magicAdapter: MagicAdapter;
 
