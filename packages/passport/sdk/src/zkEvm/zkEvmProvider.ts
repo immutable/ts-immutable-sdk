@@ -48,7 +48,7 @@ export class ZkEvmProvider implements Provider {
 
   readonly #guardianClient: GuardianClient;
 
-  readonly rpcProvider: StaticJsonRpcProvider; // Used for read
+  readonly #rpcProvider: StaticJsonRpcProvider; // Used for read
 
   readonly #magicAdapter: MagicAdapter;
 
@@ -86,17 +86,17 @@ export class ZkEvmProvider implements Provider {
     if (config.crossSdkBridgeEnabled) {
       // StaticJsonRpcProvider by default sets the referrer as "client".
       // On Unreal 4 this errors as the browser used is expecting a valid URL.
-      this.rpcProvider = new StaticJsonRpcProvider({
+      this.#rpcProvider = new StaticJsonRpcProvider({
         url: this.#config.zkEvmRpcUrl,
         fetchOptions: { referrer: 'http://imtblgamesdk.local' },
       });
     } else {
-      this.rpcProvider = new StaticJsonRpcProvider(this.#config.zkEvmRpcUrl);
+      this.#rpcProvider = new StaticJsonRpcProvider(this.#config.zkEvmRpcUrl);
     }
 
     this.#relayerClient = new RelayerClient({
       config: this.#config,
-      rpcProvider: this.rpcProvider,
+      rpcProvider: this.#rpcProvider,
       authManager: this.#authManager,
     });
 
@@ -179,7 +179,7 @@ export class ZkEvmProvider implements Provider {
             authManager: this.#authManager,
             multiRollupApiClients: this.#multiRollupApiClients,
             accessToken: user.accessToken,
-            rpcProvider: this.rpcProvider,
+            rpcProvider: this.#rpcProvider,
           });
         } else {
           this.#zkEvmAddress = user.zkEvm.ethAddress;
@@ -200,7 +200,7 @@ export class ZkEvmProvider implements Provider {
           params: request.params || [],
           ethSigner,
           guardianClient: this.#guardianClient,
-          rpcProvider: this.rpcProvider,
+          rpcProvider: this.#rpcProvider,
           relayerClient: this.#relayerClient,
           zkevmAddress: this.#zkEvmAddress,
         });
@@ -220,7 +220,7 @@ export class ZkEvmProvider implements Provider {
           method: request.method,
           params: request.params || [],
           ethSigner,
-          rpcProvider: this.rpcProvider,
+          rpcProvider: this.#rpcProvider,
           relayerClient: this.#relayerClient,
           guardianClient: this.#guardianClient,
         });
@@ -235,7 +235,7 @@ export class ZkEvmProvider implements Provider {
         return new Promise<string>((resolve, reject) => {
           (async () => {
             try {
-              const { chainId } = await this.rpcProvider.detectNetwork();
+              const { chainId } = await this.#rpcProvider.detectNetwork();
               resolve(utils.hexlify(chainId));
             } catch (err) {
               reject(err);
@@ -256,7 +256,7 @@ export class ZkEvmProvider implements Provider {
       case 'eth_getTransactionByHash':
       case 'eth_getTransactionReceipt':
       case 'eth_getTransactionCount': {
-        return this.rpcProvider.send(request.method, request.params || []);
+        return this.#rpcProvider.send(request.method, request.params || []);
       }
       default: {
         throw new JsonRpcError(ProviderErrorCode.UNSUPPORTED_METHOD, 'Method not supported');
