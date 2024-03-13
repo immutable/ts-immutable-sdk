@@ -129,7 +129,7 @@ describe('ZkEvmProvider', () => {
         params: [transaction],
         guardianClient,
         ethSigner,
-        staticJsonRpcProvider: expect.any(Object),
+        rpcProvider: expect.any(Object),
         relayerClient: expect.any(RelayerClient),
         zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
       });
@@ -168,7 +168,7 @@ describe('ZkEvmProvider', () => {
         params: [address, typedDataPayload],
         guardianClient,
         ethSigner,
-        staticJsonRpcProvider: expect.any(Object),
+        rpcProvider: expect.any(Object),
         relayerClient: expect.any(RelayerClient),
       });
     });
@@ -410,7 +410,7 @@ describe('ZkEvmProvider', () => {
       }));
     });
 
-    it.each(passthroughMethods)('should passthrough %s to the staticJsonRpcProvider', async (method, returnValue) => {
+    it.each(passthroughMethods)('should passthrough %s to the rpcProvider', async (method, returnValue) => {
       sendMock.mockResolvedValueOnce(returnValue);
 
       const provider = getProvider();

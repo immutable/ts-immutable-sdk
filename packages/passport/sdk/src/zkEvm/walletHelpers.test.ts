@@ -1,7 +1,7 @@
 import {
   BigNumber, Wallet, Contract, errors,
 } from 'ethers';
-import { StaticJsonRpcProvider } from '@ethersproject/providers';
+import { BaseProvider } from '@ethersproject/providers';
 import { getNonce, getSignedMetaTransactions, getSignedTypedData } from './walletHelpers';
 import { TypedDataPayload } from './types';
 
@@ -120,7 +120,7 @@ describe('getSignedTypedData', () => {
 });
 
 describe('getNonce', () => {
-  const staticJsonRpcProvider = {} as StaticJsonRpcProvider;
+  const rpcProvider = {} as BaseProvider;
   const nonceMock = jest.fn();
 
   beforeEach(() => {
@@ -138,7 +138,7 @@ describe('getNonce', () => {
 
         nonceMock.mockRejectedValue(error);
 
-        const result = await getNonce(staticJsonRpcProvider, walletAddress);
+        const result = await getNonce(rpcProvider, walletAddress);
 
         expect(result).toEqual(BigNumber.from(0));
       });
@@ -150,7 +150,7 @@ describe('getNonce', () => {
         Object.defineProperty(error, 'code', { value: errors.NETWORK_ERROR });
         nonceMock.mockRejectedValue(error);
 
-        await expect(() => getNonce(staticJsonRpcProvider, walletAddress)).rejects.toThrow(error);
+        await expect(() => getNonce(rpcProvider, walletAddress)).rejects.toThrow(error);
       });
     });
   });
@@ -159,7 +159,7 @@ describe('getNonce', () => {
     it('should return a number', async () => {
       nonceMock.mockResolvedValue(BigNumber.from(20));
 
-      const result = await getNonce(staticJsonRpcProvider, walletAddress);
+      const result = await getNonce(rpcProvider, walletAddress);
 
       expect(result).toEqual(BigNumber.from(20));
     });

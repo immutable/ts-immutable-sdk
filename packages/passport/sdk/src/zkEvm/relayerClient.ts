@@ -1,5 +1,5 @@
 import { BytesLike } from 'ethers';
-import { StaticJsonRpcProvider } from '@ethersproject/providers';
+import { BaseProvider } from '@ethersproject/providers';
 import AuthManager from 'authManager';
 import { PassportConfiguration } from '../config';
 import { FeeOption, RelayerTransaction, TypedDataPayload } from './types';
@@ -7,7 +7,7 @@ import { getEip155ChainId } from './walletHelpers';
 
 export type RelayerClientInput = {
   config: PassportConfiguration,
-  staticJsonRpcProvider: StaticJsonRpcProvider,
+  rpcProvider: BaseProvider,
   authManager: AuthManager
 };
 
@@ -78,13 +78,13 @@ export type RelayerTransactionRequest =
 export class RelayerClient {
   private readonly config: PassportConfiguration;
 
-  private readonly staticJsonRpcProvider: StaticJsonRpcProvider;
+  private readonly rpcProvider: BaseProvider;
 
   private readonly authManager: AuthManager;
 
-  constructor({ config, staticJsonRpcProvider, authManager }: RelayerClientInput) {
+  constructor({ config, rpcProvider, authManager }: RelayerClientInput) {
     this.config = config;
-    this.staticJsonRpcProvider = staticJsonRpcProvider;
+    this.rpcProvider = rpcProvider;
     this.authManager = authManager;
   }
 
@@ -115,7 +115,7 @@ export class RelayerClient {
   }
 
   public async ethSendTransaction(to: string, data: BytesLike): Promise<string> {
-    const { chainId } = await this.staticJsonRpcProvider.ready;
+    const { chainId } = await this.rpcProvider.ready;
     const payload: EthSendTransactionRequest = {
       method: 'eth_sendTransaction',
       params: [{
@@ -138,7 +138,7 @@ export class RelayerClient {
   }
 
   public async imGetFeeOptions(userAddress: string, data: BytesLike): Promise<FeeOption[]> {
-    const { chainId } = await this.staticJsonRpcProvider.ready;
+    const { chainId } = await this.rpcProvider.ready;
     const payload: ImGetFeeOptionsRequest = {
       method: 'im_getFeeOptions',
       params: [{
@@ -152,7 +152,7 @@ export class RelayerClient {
   }
 
   public async imSignTypedData(address: string, eip712Payload: TypedDataPayload): Promise<string> {
-    const { chainId } = await this.staticJsonRpcProvider.ready;
+    const { chainId } = await this.rpcProvider.ready;
     const payload: ImSignTypedDataRequest = {
       method: 'im_signTypedData',
       params: [{

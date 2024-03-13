@@ -1,4 +1,4 @@
-import { StaticJsonRpcProvider } from '@ethersproject/providers';
+import { BaseProvider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { signRaw } from '@imtbl/toolkit';
 import { getEip155ChainId } from 'zkEvm/walletHelpers';
@@ -11,7 +11,7 @@ export type RegisterZkEvmUserInput = {
   ethSigner: Signer,
   multiRollupApiClients: MultiRollupApiClients,
   accessToken: string;
-  staticJsonRpcProvider: StaticJsonRpcProvider;
+  rpcProvider: BaseProvider;
 };
 
 const MESSAGE_TO_SIGN = 'Only sign this message from Immutable Passport';
@@ -21,12 +21,12 @@ export async function registerZkEvmUser({
   ethSigner,
   multiRollupApiClients,
   accessToken,
-  staticJsonRpcProvider,
+  rpcProvider,
 }: RegisterZkEvmUserInput): Promise<string> {
   const [ethereumAddress, ethereumSignature, network, chainListResponse] = await Promise.all([
     ethSigner.getAddress(),
     signRaw(MESSAGE_TO_SIGN, ethSigner),
-    staticJsonRpcProvider.ready,
+    rpcProvider.ready,
     multiRollupApiClients.chainsApi.listChains(),
   ]);
 
