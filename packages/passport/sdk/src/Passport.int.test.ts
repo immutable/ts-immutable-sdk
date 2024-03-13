@@ -166,7 +166,7 @@ describe('Passport', () => {
         it('returns the users ether key', async () => {
           mockGetUser.mockResolvedValue(mockOidcUserZkevm);
           useMswHandlers([
-            mswHandlers.staticJsonRpcProvider.success,
+            mswHandlers.rpcProvider.success,
           ]);
 
           const zkEvmProvider = getZkEvmProvider();
@@ -200,7 +200,7 @@ describe('Passport', () => {
           mockSigninPopup.mockResolvedValue(mockOidcUser);
           mockSigninSilent.mockResolvedValueOnce(mockOidcUserZkevm);
           useMswHandlers([
-            mswHandlers.staticJsonRpcProvider.success,
+            mswHandlers.rpcProvider.success,
             mswHandlers.counterfactualAddress.success,
             mswHandlers.api.chains.success,
           ]);
@@ -242,7 +242,7 @@ describe('Passport', () => {
 
         useMswHandlers([
           mswHandlers.counterfactualAddress.success,
-          mswHandlers.staticJsonRpcProvider.success,
+          mswHandlers.rpcProvider.success,
           mswHandlers.relayer.success,
           mswHandlers.guardian.evaluateTransaction.success,
         ]);
@@ -296,7 +296,7 @@ describe('Passport', () => {
       it('returns the user\'s ether key if the user is logged in', async () => {
         mockGetUser.mockResolvedValue(mockOidcUserZkevm);
         useMswHandlers([
-          mswHandlers.staticJsonRpcProvider.success,
+          mswHandlers.rpcProvider.success,
         ]);
 
         const zkEvmProvider = getZkEvmProvider();
