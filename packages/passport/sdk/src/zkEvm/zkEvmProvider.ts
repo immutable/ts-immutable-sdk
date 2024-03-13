@@ -232,16 +232,8 @@ export class ZkEvmProvider implements Provider {
         // JsonRpcProvider, this function will still work as expected given
         // that detectNetwork call _uncachedDetectNetwork which will force
         // the provider to re-fetch the chainId from remote.
-        return new Promise<string>((resolve, reject) => {
-          (async () => {
-            try {
-              const { chainId } = await this.#rpcProvider.detectNetwork();
-              resolve(utils.hexlify(chainId));
-            } catch (err) {
-              reject(err);
-            }
-          })();
-        });
+        const { chainId } = await this.#rpcProvider.detectNetwork();
+        return utils.hexlify(chainId);
       }
       // Pass through methods
       case 'eth_gasPrice':
