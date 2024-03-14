@@ -1,5 +1,5 @@
 import {
-  BaseProvider,
+  StaticJsonRpcProvider,
   TransactionRequest,
 } from '@ethersproject/providers';
 import { BigNumber, BigNumberish } from 'ethers';
@@ -16,7 +16,7 @@ const TRANSACTION_HASH_RETRIEVAL_WAIT = 1000;
 
 export type EthSendTransactionParams = {
   ethSigner: Signer;
-  rpcProvider: BaseProvider;
+  rpcProvider: StaticJsonRpcProvider;
   guardianClient: GuardianClient;
   relayerClient: RelayerClient;
   zkevmAddress: string,

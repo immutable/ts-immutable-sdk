@@ -1,5 +1,5 @@
 import { BytesLike } from 'ethers';
-import { BaseProvider } from '@ethersproject/providers';
+import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import AuthManager from 'authManager';
 import { PassportConfiguration } from '../config';
 import { FeeOption, RelayerTransaction, TypedDataPayload } from './types';
@@ -7,7 +7,7 @@ import { getEip155ChainId } from './walletHelpers';
 
 export type RelayerClientInput = {
   config: PassportConfiguration,
-  rpcProvider: BaseProvider,
+  rpcProvider: StaticJsonRpcProvider,
   authManager: AuthManager
 };
 
@@ -78,7 +78,7 @@ export type RelayerTransactionRequest =
 export class RelayerClient {
   private readonly config: PassportConfiguration;
 
-  private readonly rpcProvider: BaseProvider;
+  private readonly rpcProvider: StaticJsonRpcProvider;
 
   private readonly authManager: AuthManager;
 

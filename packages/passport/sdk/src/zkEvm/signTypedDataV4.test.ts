@@ -1,4 +1,4 @@
-import { BaseProvider } from '@ethersproject/providers';
+import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import GuardianClient from 'guardian';
 import { Signer } from '@ethersproject/abstract-signer';
@@ -56,7 +56,7 @@ describe('signTypedDataV4', () => {
         method: 'eth_signTypedData_v4',
         params: [address, JSON.stringify(eip712Payload)],
         ethSigner,
-        rpcProvider: rpcProvider as BaseProvider,
+        rpcProvider: rpcProvider as StaticJsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,
         guardianClient: guardianClient as unknown as GuardianClient,
       });
@@ -82,7 +82,7 @@ describe('signTypedDataV4', () => {
         method: 'eth_signTypedData_v4',
         params: [address, eip712Payload],
         ethSigner,
-        rpcProvider: rpcProvider as BaseProvider,
+        rpcProvider: rpcProvider as StaticJsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,
         guardianClient: guardianClient as any,
       });
@@ -109,7 +109,7 @@ describe('signTypedDataV4', () => {
           method: 'eth_signTypedData_v4',
           params: [address],
           ethSigner,
-          rpcProvider: rpcProvider as BaseProvider,
+          rpcProvider: rpcProvider as StaticJsonRpcProvider,
           relayerClient: relayerClient as unknown as RelayerClient,
           guardianClient: guardianClient as any,
         })
@@ -126,7 +126,7 @@ describe('signTypedDataV4', () => {
           method: 'eth_signTypedData_v4',
           params: [address, '*~<|8)-/-<'],
           ethSigner,
-          rpcProvider: rpcProvider as BaseProvider,
+          rpcProvider: rpcProvider as StaticJsonRpcProvider,
           relayerClient: relayerClient as unknown as RelayerClient,
           guardianClient: guardianClient as any,
         })
@@ -151,7 +151,7 @@ describe('signTypedDataV4', () => {
           method: 'eth_signTypedData_v4',
           params: [address, payload],
           ethSigner,
-          rpcProvider: rpcProvider as BaseProvider,
+          rpcProvider: rpcProvider as StaticJsonRpcProvider,
           relayerClient: relayerClient as unknown as RelayerClient,
           guardianClient: guardianClient as any,
         })
@@ -176,7 +176,7 @@ describe('signTypedDataV4', () => {
             },
           ],
           ethSigner,
-          rpcProvider: rpcProvider as BaseProvider,
+          rpcProvider: rpcProvider as StaticJsonRpcProvider,
           relayerClient: relayerClient as unknown as RelayerClient,
           guardianClient: guardianClient as any,
         })
@@ -200,7 +200,7 @@ describe('signTypedDataV4', () => {
         payload,
       ],
       ethSigner,
-      rpcProvider: rpcProvider as BaseProvider,
+      rpcProvider: rpcProvider as StaticJsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
       guardianClient: guardianClient as any,
     });

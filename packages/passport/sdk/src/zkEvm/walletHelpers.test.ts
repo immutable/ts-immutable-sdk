@@ -1,7 +1,7 @@
 import {
   BigNumber, Wallet, Contract, errors,
 } from 'ethers';
-import { BaseProvider } from '@ethersproject/providers';
+import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import { getNonce, getSignedMetaTransactions, getSignedTypedData } from './walletHelpers';
 import { TypedDataPayload } from './types';
 
@@ -120,7 +120,7 @@ describe('getSignedTypedData', () => {
 });
 
 describe('getNonce', () => {
-  const rpcProvider = {} as BaseProvider;
+  const rpcProvider = {} as StaticJsonRpcProvider;
   const nonceMock = jest.fn();
 
   beforeEach(() => {

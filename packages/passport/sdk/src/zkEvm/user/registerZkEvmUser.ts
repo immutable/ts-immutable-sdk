@@ -1,4 +1,4 @@
-import { BaseProvider } from '@ethersproject/providers';
+import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { signRaw } from '@imtbl/toolkit';
 import { getEip155ChainId } from 'zkEvm/walletHelpers';
@@ -11,7 +11,7 @@ export type RegisterZkEvmUserInput = {
   ethSigner: Signer,
   multiRollupApiClients: MultiRollupApiClients,
   accessToken: string;
-  rpcProvider: BaseProvider;
+  rpcProvider: StaticJsonRpcProvider;
 };
 
 const MESSAGE_TO_SIGN = 'Only sign this message from Immutable Passport';

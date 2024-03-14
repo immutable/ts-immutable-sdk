@@ -1,4 +1,4 @@
-import { BaseProvider } from '@ethersproject/providers';
+import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import { Signer } from '@ethersproject/abstract-signer';
 import { BigNumber } from 'ethers';
 import GuardianClient from 'guardian';
@@ -9,7 +9,7 @@ import { RelayerClient } from './relayerClient';
 
 export type SignTypedDataV4Params = {
   ethSigner: Signer;
-  rpcProvider: BaseProvider;
+  rpcProvider: StaticJsonRpcProvider;
   relayerClient: RelayerClient;
   method: string;
   params: Array<any>;
