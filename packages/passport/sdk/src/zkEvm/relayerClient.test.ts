@@ -15,7 +15,7 @@ describe('relayerClient', () => {
     accessToken: 'accessToken123',
   };
   const rpcProvider: Partial<StaticJsonRpcProvider> = {
-    ready: Promise.resolve({ chainId, name: '' }),
+    detectNetwork: jest.fn().mockResolvedValue({ chainId, name: '' }),
   };
   const relayerClient = new RelayerClient({
     config: config as PassportConfiguration,

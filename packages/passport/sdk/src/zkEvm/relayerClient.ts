@@ -115,7 +115,7 @@ export class RelayerClient {
   }
 
   public async ethSendTransaction(to: string, data: BytesLike): Promise<string> {
-    const { chainId } = await this.rpcProvider.ready;
+    const { chainId } = await this.rpcProvider.detectNetwork();
     const payload: EthSendTransactionRequest = {
       method: 'eth_sendTransaction',
       params: [{
@@ -138,7 +138,7 @@ export class RelayerClient {
   }
 
   public async imGetFeeOptions(userAddress: string, data: BytesLike): Promise<FeeOption[]> {
-    const { chainId } = await this.rpcProvider.ready;
+    const { chainId } = await this.rpcProvider.detectNetwork();
     const payload: ImGetFeeOptionsRequest = {
       method: 'im_getFeeOptions',
       params: [{
@@ -152,7 +152,7 @@ export class RelayerClient {
   }
 
   public async imSignTypedData(address: string, eip712Payload: TypedDataPayload): Promise<string> {
-    const { chainId } = await this.rpcProvider.ready;
+    const { chainId } = await this.rpcProvider.detectNetwork();
     const payload: ImSignTypedDataRequest = {
       method: 'im_signTypedData',
       params: [{

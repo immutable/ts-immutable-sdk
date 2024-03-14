@@ -26,7 +26,7 @@ export async function registerZkEvmUser({
   const [ethereumAddress, ethereumSignature, network, chainListResponse] = await Promise.all([
     ethSigner.getAddress(),
     signRaw(MESSAGE_TO_SIGN, ethSigner),
-    rpcProvider.ready,
+    rpcProvider.detectNetwork(),
     multiRollupApiClients.chainsApi.listChains(),
   ]);
 

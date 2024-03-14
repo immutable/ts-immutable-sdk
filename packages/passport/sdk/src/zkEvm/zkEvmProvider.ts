@@ -232,7 +232,7 @@ export class ZkEvmProvider implements Provider {
         // JsonRpcProvider, this function will still work as expected given
         // that detectNetwork call _uncachedDetectNetwork which will force
         // the provider to re-fetch the chainId from remote.
-        const { chainId } = await this.#rpcProvider.ready;
+        const { chainId } = await this.#rpcProvider.detectNetwork();
         return utils.hexlify(chainId);
       }
       // Pass through methods

@@ -78,7 +78,7 @@ export const signTypedDataV4 = async ({
       throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `${method} requires an address and a typed data JSON`);
     }
 
-    const { chainId } = await rpcProvider.ready;
+    const { chainId } = await rpcProvider.detectNetwork();
     const typedData = transformTypedData(typedDataParam, chainId);
 
     await guardianClient.validateMessage({ chainID: String(chainId), payload: typedData });

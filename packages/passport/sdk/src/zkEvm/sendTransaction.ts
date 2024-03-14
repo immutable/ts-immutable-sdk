@@ -82,7 +82,7 @@ export const sendTransaction = ({
       throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'eth_sendTransaction requires a "to" field');
     }
 
-    const { chainId } = await rpcProvider.ready;
+    const { chainId } = await rpcProvider.detectNetwork();
     const chainIdBigNumber = BigNumber.from(chainId);
 
     const nonce = await getNonce(rpcProvider, zkevmAddress);
