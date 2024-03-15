@@ -57,7 +57,8 @@ export function PayWithCoins() {
 
   useEffect(() => {
     if (executeResponse?.done === true) {
-      sendSuccessEvent(SaleWidgetViews.SALE_SUCCESS, executeResponse?.transactions, signTokenIds);
+      const details = { transactionId: signResponse?.transactionId };
+      sendSuccessEvent(SaleWidgetViews.SALE_SUCCESS, executeResponse?.transactions, signTokenIds, details);
       sendCloseEvent(SaleWidgetViews.SALE_SUCCESS);
     }
   }, [executeResponse]);
