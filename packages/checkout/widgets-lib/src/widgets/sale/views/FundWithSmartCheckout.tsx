@@ -32,7 +32,7 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
   >(undefined);
   const [fundingRouteStepIndex, setFundingRouteStepIndex] = useState<number>(0);
   const {
-    querySmartCheckout, fundingRoutes, smartCheckoutResult, collectionName,
+    querySmartCheckout, fundingRoutes, smartCheckoutResult, collectionName, fromTokenAddress,
   } = useSaleContext();
   const { cryptoFiatDispatch } = useContext(CryptoFiatContext);
 
@@ -41,9 +41,9 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
   };
 
   useEffect(() => {
-    if (subView !== FundWithSmartCheckoutSubViews.INIT) return;
+    if (subView !== FundWithSmartCheckoutSubViews.INIT || !fromTokenAddress) return;
     querySmartCheckout();
-  }, [subView]);
+  }, [subView, fromTokenAddress]);
 
   useEffect(() => {
     if (!cryptoFiatDispatch || !smartCheckoutResult) return;
