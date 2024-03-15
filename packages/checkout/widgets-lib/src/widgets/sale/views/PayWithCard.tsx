@@ -14,7 +14,10 @@ export function PayWithCard() {
   const { sendPageView } = useSaleEvent();
   const [initialised, setInitialised] = useState(false);
   const {
-    goBackToPaymentMethods, goToErrorView, signResponse: signData, signTokenIds,
+    goBackToPaymentMethods,
+    goToErrorView,
+    signResponse: signData,
+    signTokenIds,
   } = useSaleContext();
   const { sendOrderCreated, sendCloseEvent, sendSuccessEvent } = useSaleEvent();
   const { t } = useTranslation();
@@ -58,6 +61,7 @@ export function PayWithCard() {
       nftDataBase64,
       quantity,
       signData,
+      transactionId: signData?.transactionId,
     };
 
     sendSuccessEvent(SaleWidgetViews.SALE_SUCCESS, [], signTokenIds, details);
@@ -97,6 +101,7 @@ export function PayWithCard() {
       nftDataBase64,
       quantity,
       signData,
+      transactionId: signData?.transactionId,
     });
   };
 
