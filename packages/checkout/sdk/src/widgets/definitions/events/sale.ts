@@ -28,6 +28,8 @@ export type SaleSuccess = {
     method: string;
     hash: string | undefined;
   }[];
+  /** THe order reference id, use it to trace order throughout flow */
+  transactionId: string;
   [key: string]: unknown;
 };
 
@@ -51,6 +53,8 @@ export type SaleFailed = {
     method: string;
     hash: string | undefined;
   }[];
+  /** THe order reference id, use it to trace order throughout flow */
+  transactionId: string;
 };
 
 /**

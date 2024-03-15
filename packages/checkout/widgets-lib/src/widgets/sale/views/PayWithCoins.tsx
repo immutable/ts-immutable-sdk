@@ -43,7 +43,8 @@ export function PayWithCoins() {
         sendTransactionSuccessEvent(txn);
       },
       (error, txns) => {
-        sendFailedEvent(error.toString(), error, txns);
+        const details = { transactionId: signResponse?.transactionId };
+        sendFailedEvent(error.toString(), error, txns, undefined, details);
       },
     );
   };
