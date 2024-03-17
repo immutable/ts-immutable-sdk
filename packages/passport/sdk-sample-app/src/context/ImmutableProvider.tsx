@@ -1,10 +1,15 @@
 import React, {
   createContext, useContext, useEffect, useMemo, useState,
 } from 'react';
-import { Config, ImmutableX } from '@imtbl/core-sdk';
+import { ImmutableX } from '@imtbl/core-sdk';
+import { 
+  createImmutableXConfiguration, 
+  IMXClient, 
+  production, 
+  sandbox,
+} from '@imtbl/x-client';
 import { Passport, PassportModuleConfiguration } from '@imtbl/passport';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { IMXClient } from '@imtbl/x-client';
 import {
   AUDIENCE,
   LOGOUT_REDIRECT_URI,
@@ -20,13 +25,13 @@ import { ImxApiClients, createConfig } from '@imtbl/generated-clients';
 const getCoreSdkConfig = (environment: EnvironmentNames) => {
   switch (environment) {
     case EnvironmentNames.PRODUCTION: {
-      return Config.PRODUCTION;
+      return production({});
     }
     case EnvironmentNames.SANDBOX: {
-      return Config.SANDBOX;
+      return sandbox({});
     }
     case EnvironmentNames.DEV: {
-      return Config.createConfig({
+      return createImmutableXConfiguration({
         basePath: 'https://api.dev.x.immutable.com',
         chainID: 5,
         coreContractAddress: '0xd05323731807A35599BF9798a1DE15e89d6D6eF1',
