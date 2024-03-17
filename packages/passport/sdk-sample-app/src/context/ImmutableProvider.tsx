@@ -1,10 +1,10 @@
 import React, {
   createContext, useContext, useEffect, useMemo, useState,
 } from 'react';
-import { ImmutableX } from '@imtbl/core-sdk';
 import { 
   createImmutableXConfiguration, 
-  IMXClient, 
+  IMXClient,
+  ImmutableX,
   production, 
   sandbox,
 } from '@imtbl/x-client';
