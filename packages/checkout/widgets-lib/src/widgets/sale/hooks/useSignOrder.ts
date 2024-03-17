@@ -141,6 +141,7 @@ const toSignResponse = (
       },
       rawData: transaction.raw_data,
     })),
+    transactionId: transactions.find((txn) => txn.method_call.startsWith('execute'))?.params.reference || '',
   };
 };
 
