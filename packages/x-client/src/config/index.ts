@@ -109,7 +109,7 @@ interface environmentConfig {
   baseConfig?: ImmutableConfiguration;
 }
 
-const production = ({ baseConfig }: environmentConfig) => createImmutableXConfiguration({
+export const production = ({ baseConfig }: environmentConfig) => createImmutableXConfiguration({
   basePath: 'https://api.x.immutable.com',
   chainID: 1,
   coreContractAddress: '0x5FDCCA53617f4d2b9134B29090C87D01058e27e9',
@@ -117,7 +117,7 @@ const production = ({ baseConfig }: environmentConfig) => createImmutableXConfig
   baseConfig,
 });
 
-const sandbox = ({ baseConfig }: environmentConfig) => createImmutableXConfiguration({
+export const sandbox = ({ baseConfig }: environmentConfig) => createImmutableXConfiguration({
   basePath: 'https://api.sandbox.x.immutable.com',
   chainID: 11155111,
   coreContractAddress: '0x2d5C349fD8464DA06a3f90b4B0E9195F3d1b7F98',
