@@ -285,9 +285,8 @@
         }
       },
       "insufficientCoinsBanner": {
-        "caption": "코인 잔액이 부족합니다. 카드로 결제하거나",
-        "captionEnd": "하고 다시 시도해 보세요.",
-        "captionCTA": "코인 추가"
+        "caption": "코인 잔액이 부족합니다. 카드로 결제하거나 <cta>코인 추가</cta>하고 다시 시도해 보세요.",
+        "gasCaption": "가스를 위한 IMX가 부족합니다. 카드로 결제하거나 <cta>코인 추가</cta>하고 다시 시도해 보세요."
       },
       "loading": {
         "ready1": "주문 수집 중",
@@ -348,6 +347,11 @@
         "WALLET_REJECTED": {
           "description": "거래를 진행하려면 지갑에서 거래 승인이 필요합니다.",
           "primaryAction": "다시 시도",
+          "secondaryAction": "취소"
+        },
+        "WALLET_POPUP_BLOCKED": {
+          "description": "계속 진행하려면 브라우저에서 팝업을 허용해야 합니다.",
+          "primaryAction": "이 문제를 해결했습니다. 다시 시도하세요.",
           "secondaryAction": "취소"
         },
         "SMART_CHECKOUT_ERROR": {
