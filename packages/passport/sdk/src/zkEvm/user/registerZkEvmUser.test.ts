@@ -1,4 +1,4 @@
-import { JsonRpcProvider } from '@ethersproject/providers';
+import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import { Signer } from '@ethersproject/abstract-signer';
 import { signRaw } from '@imtbl/toolkit';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
@@ -28,9 +28,7 @@ describe('registerZkEvmUser', () => {
     },
   };
   const jsonRPCProvider = {
-    ready: {
-      chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-    },
+    detectNetwork: jest.fn(),
   };
   const ethereumAddress = '0x3082e7c88f1c8b4e24be4a75dee018ad362d84d4';
   const ethereumSignature = '0xcc63b10814e3ab4b2dff6762a6712e40c23db00c11f2c54bcc699babdbf1d2bc3096fec623da4784fafb7f6da65338d91e3c846ef52e856c2f5f86c4cf10790900';
@@ -42,6 +40,7 @@ describe('registerZkEvmUser', () => {
     ethSignerMock.getAddress.mockResolvedValue(ethereumAddress);
     (signRaw as jest.Mock).mockResolvedValue(ethereumSignature);
     multiRollupApiClients.chainsApi.listChains.mockImplementation(() => mockListChains);
+    jsonRPCProvider.detectNetwork.mockResolvedValue({ chainId: ChainId.IMTBL_ZKEVM_TESTNET });
   });
 
   describe('when createCounterfactualAddressV2 doesn\'t return a 201', () => {
@@ -54,7 +53,7 @@ describe('registerZkEvmUser', () => {
         ethSigner: ethSignerMock as unknown as Signer,
         multiRollupApiClients: multiRollupApiClients as unknown as MultiRollupApiClients,
         accessToken,
-        jsonRpcProvider: jsonRPCProvider as unknown as JsonRpcProvider,
+        rpcProvider: jsonRPCProvider as unknown as StaticJsonRpcProvider,
       })).rejects.toThrow('Failed to create counterfactual address: Error: Internal server error');
     });
   });
@@ -72,7 +71,7 @@ describe('registerZkEvmUser', () => {
       ethSigner: ethSignerMock as unknown as Signer,
       multiRollupApiClients: multiRollupApiClients as unknown as MultiRollupApiClients,
       accessToken,
-      jsonRpcProvider: jsonRPCProvider as unknown as JsonRpcProvider,
+      rpcProvider: jsonRPCProvider as unknown as StaticJsonRpcProvider,
     });
 
     expect(result).toEqual(mockUserZkEvm.zkEvm.ethAddress);
