@@ -1,5 +1,6 @@
 import {
-  JsonRpcProvider, TransactionRequest,
+  StaticJsonRpcProvider,
+  TransactionRequest,
 } from '@ethersproject/providers';
 import { BigNumber, BigNumberish } from 'ethers';
 import { Signer } from '@ethersproject/abstract-signer';
@@ -15,7 +16,7 @@ const TRANSACTION_HASH_RETRIEVAL_WAIT = 1000;
 
 export type EthSendTransactionParams = {
   ethSigner: Signer;
-  jsonRpcProvider: JsonRpcProvider;
+  rpcProvider: StaticJsonRpcProvider;
   guardianClient: GuardianClient;
   relayerClient: RelayerClient;
   zkevmAddress: string,
@@ -70,7 +71,7 @@ const getMetaTransactions = async (
 export const sendTransaction = ({
   params,
   ethSigner,
-  jsonRpcProvider,
+  rpcProvider,
   relayerClient,
   guardianClient,
   zkevmAddress,
@@ -81,10 +82,10 @@ export const sendTransaction = ({
       throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'eth_sendTransaction requires a "to" field');
     }
 
-    const { chainId } = await jsonRpcProvider.ready;
+    const { chainId } = await rpcProvider.detectNetwork();
     const chainIdBigNumber = BigNumber.from(chainId);
 
-    const nonce = await getNonce(jsonRpcProvider, zkevmAddress);
+    const nonce = await getNonce(rpcProvider, zkevmAddress);
     const metaTransaction: MetaTransaction = {
       to: transactionRequest.to,
       data: transactionRequest.data,
