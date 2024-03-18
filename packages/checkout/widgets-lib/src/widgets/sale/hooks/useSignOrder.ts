@@ -13,6 +13,7 @@ import {
   SignPaymentTypes,
 } from '../types';
 import { PRIMARY_SALES_API_BASE_URL } from '../utils/config';
+import { hexToText } from '../functions/utils';
 
 type SignApiTransaction = {
   contract_address: string;
@@ -141,7 +142,11 @@ const toSignResponse = (
       },
       rawData: transaction.raw_data,
     })),
-    transactionId: transactions.find((txn) => txn.method_call.startsWith('execute'))?.params.reference || '',
+    transactionId: hexToText(
+      transactions
+        .find((txn) => txn.method_call.startsWith('execute'))
+        ?.params.reference || '',
+    ),
   };
 };
 
