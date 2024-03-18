@@ -1,8 +1,4 @@
-import {
-  CreateWithdrawalResponse,
-  GetSignableWithdrawalResponse,
-  WithdrawalsApi,
-} from '@imtbl/core-sdk';
+import { imx } from '@imtbl/generated-clients';
 import { convertToSignableToken, signMessage } from '@imtbl/toolkit';
 import { generateSigners, privateKey1, testConfig } from '../../test/helpers';
 import {
@@ -12,12 +8,13 @@ import {
 
 jest.mock('@imtbl/core-sdk');
 jest.mock('@imtbl/toolkit');
+jest.mock('@imtbl/generated-clients');
 
 describe('prepareWithdrawal', () => {
   describe('prepareWithdrawal action', () => {
     let getSignableWithdrawalMock: jest.Mock;
     let createWithdrawalMock: jest.Mock;
-    const getSignableWithdrawalResponse: GetSignableWithdrawalResponse = {
+    const getSignableWithdrawalResponse: imx.GetSignableWithdrawalResponse = {
       signable_message: 'hello',
       payload_hash: 'hash',
       nonce: 0,
@@ -28,7 +25,7 @@ describe('prepareWithdrawal', () => {
       readable_transaction: '',
       verification_signature: '',
     };
-    const createWithdrawalResponse: CreateWithdrawalResponse = {
+    const createWithdrawalResponse: imx.CreateWithdrawalResponse = {
       time: 0,
       status: 'status',
       withdrawal_id: 12,
@@ -44,7 +41,7 @@ describe('prepareWithdrawal', () => {
         data: createWithdrawalResponse,
       });
 
-      (WithdrawalsApi as jest.Mock).mockReturnValue({
+      (imx.WithdrawalsApi as jest.Mock).mockReturnValue({
         getSignableWithdrawal: getSignableWithdrawalMock,
         createWithdrawal: createWithdrawalMock,
       });

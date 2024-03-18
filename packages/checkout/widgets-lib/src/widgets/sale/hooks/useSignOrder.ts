@@ -141,6 +141,7 @@ const toSignResponse = (
       },
       rawData: transaction.raw_data,
     })),
+    transactionId: transactions.find((txn) => txn.method_call.startsWith('execute'))?.params.reference || '',
   };
 };
 
@@ -180,6 +181,7 @@ export const useSignOrder = (input: SignOrderInput) => {
       data: string,
       gasLimit: number,
       method: string,
+      waitForTrnsactionSettlement: boolean,
     ): Promise<[hash: string | undefined, error: any]> => {
       let transactionHash: string | undefined;
 
@@ -195,6 +197,10 @@ export const useSignOrder = (input: SignOrderInput) => {
 
         setExecuteTransactions({ method, hash: txnResponse?.hash });
 
+        if (waitForTrnsactionSettlement) {
+          await txnResponse?.wait();
+        }
+
         transactionHash = txnResponse?.hash || '';
         return [transactionHash, undefined];
       } catch (err) {
@@ -204,6 +210,11 @@ export const useSignOrder = (input: SignOrderInput) => {
         transactionHash = (err as any)?.transactionHash;
 
         let errorType = SaleErrorTypes.WALLET_FAILED;
+
+        if (reason.includes('failed') && reason.includes('open confirmation')) {
+          errorType = SaleErrorTypes.WALLET_POPUP_BLOCKED;
+        }
+
         if (reason.includes('rejected') && reason.includes('user')) {
           errorType = SaleErrorTypes.WALLET_REJECTED;
         }
@@ -307,6 +318,7 @@ export const useSignOrder = (input: SignOrderInput) => {
 
   const execute = async (
     signData: SignResponse | undefined,
+    waitForTrnsactionSettlement: boolean,
     onTxnSuccess: (txn: ExecutedTransaction) => void,
     onTxnError: (error: any, txns: ExecutedTransaction[]) => void,
   ): Promise<ExecutedTransaction[]> => {
@@ -334,6 +346,7 @@ export const useSignOrder = (input: SignOrderInput) => {
         data,
         gasEstimate,
         method,
+        waitForTrnsactionSettlement,
       );
 
       if (txnError || !hash) {

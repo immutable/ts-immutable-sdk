@@ -1,7 +1,8 @@
+import { imx } from '@imtbl/generated-clients';
 import {
-  DepositsApi, EncodingApi, UsersApi, ETHAmount,
   Contracts,
-} from '@imtbl/core-sdk';
+  ETHAmount,
+} from '@imtbl/x-client';
 import {
   generateSigners,
   privateKey1,
@@ -10,6 +11,8 @@ import {
 } from '../../test/helpers';
 import { depositEth } from '.';
 
+jest.mock('@imtbl/generated-clients');
+jest.mock('@imtbl/x-client');
 jest.mock('@imtbl/core-sdk');
 
 describe('Deposit ETH', () => {
@@ -45,21 +48,21 @@ describe('Deposit ETH', () => {
       getSignableDepositMock = jest.fn().mockResolvedValue({
         data: getSignableDepositResponse,
       });
-      (DepositsApi as jest.Mock).mockReturnValue({
+      (imx.DepositsApi as jest.Mock).mockReturnValue({
         getSignableDeposit: getSignableDepositMock,
       });
 
       encodeAssetMock = jest.fn().mockResolvedValue({
         data: encodeAssetResponse,
       });
-      (EncodingApi as jest.Mock).mockReturnValue({
+      (imx.EncodingApi as jest.Mock).mockReturnValue({
         encodeAsset: encodeAssetMock,
       });
 
       getSignableRegistrationMock = jest.fn().mockResolvedValue({
         data: getSignableRegistrationResponse,
       });
-      (UsersApi as jest.Mock).mockReturnValue({
+      (imx.UsersApi as jest.Mock).mockReturnValue({
         getSignableRegistration: getSignableRegistrationMock,
       });
 

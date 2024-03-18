@@ -1,4 +1,5 @@
-import { CreateTradeResponse, GetSignableTradeRequest, TradesApi } from '@imtbl/core-sdk';
+import { GetSignableTradeRequest, CreateTradeResponse } from '@imtbl/x-client';
+import { imx } from '@imtbl/generated-clients';
 import { signRaw } from '@imtbl/toolkit';
 import { Signers } from './types';
 import { validateChain } from './helpers';
@@ -17,7 +18,7 @@ export async function createTrade({
 }: CreateTradeWorkflowParams): Promise<CreateTradeResponse> {
   await validateChain(ethSigner, config.immutableXConfig);
   const ethAddress = await ethSigner.getAddress();
-  const tradesApi = new TradesApi(config.immutableXConfig.apiConfiguration);
+  const tradesApi = new imx.TradesApi(config.immutableXConfig.apiConfiguration);
 
   const signableResult = await tradesApi.getSignableTrade({
     getSignableTradeRequest: {

@@ -1,10 +1,13 @@
-import { UnsignedExchangeTransferRequest, ExchangesApi } from '@imtbl/core-sdk';
+import { UnsignedExchangeTransferRequest } from '@imtbl/x-client';
+import { imx } from '@imtbl/generated-clients';
 import { signRaw, convertToSignableToken } from '@imtbl/toolkit';
 import { generateSigners, privateKey1, testConfig } from '../test/helpers';
 import { exchangeTransfer } from './exchanges';
 
 jest.mock('@imtbl/core-sdk');
 jest.mock('@imtbl/toolkit');
+jest.mock('@imtbl/generated-clients');
+jest.mock('@imtbl/x-client');
 
 describe('ExchangeTransfer', () => {
   describe('exchangeTransfer()', () => {
@@ -43,7 +46,7 @@ describe('ExchangeTransfer', () => {
       createExchangeTransferMock = jest.fn().mockResolvedValue({
         data: createExchangeTransferResponse,
       });
-      (ExchangesApi as jest.Mock).mockReturnValue({
+      (imx.ExchangesApi as jest.Mock).mockReturnValue({
         getExchangeSignableTransfer: getSignableExchangeTransferMock,
         createExchangeTransfer: createExchangeTransferMock,
       });

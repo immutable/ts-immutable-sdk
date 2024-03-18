@@ -1,13 +1,18 @@
 import { Web3Provider } from '@ethersproject/providers';
 import {
-  Checkout, ERC20ItemRequirement, Fee, FundingRoute,
-  FundingStepType, GasAmount, GasTokenType, ItemType, RoutingOutcome, RoutingOutcomeType,
-  SmartCheckoutResult, SmartCheckoutSufficient, TokenBalance,
+  ERC20ItemRequirement,
+  Fee,
+  FundingRoute,
+  FundingStepType,
+  GasAmount,
+  GasTokenType,
+  ItemType,
+  RoutingOutcome,
+  RoutingOutcomeType,
+  SmartCheckoutResult, TokenBalance,
   TransactionOrGasType,
 } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
-import { parseUnits } from 'ethers/lib/utils';
-import { getL2ChainId, NATIVE } from '../../../lib';
 import { calculateCryptoToFiat, formatFiatString } from '../../../lib/utils';
 
 export const MAX_GAS_LIMIT = '30000000';
@@ -29,54 +34,6 @@ export const getGasEstimate = (): GasAmount => ({
     limit: BigNumber.from(MAX_GAS_LIMIT),
   },
 });
-
-export const isUserFractionalBalanceBlocked = async (
-  walletAddress: string,
-  tokenAddress: string,
-  amount: string,
-  checkout?: Checkout,
-  provider?: Web3Provider,
-): Promise<boolean> => {
-  const chainId = getL2ChainId(checkout!.config);
-  const balanceResponse = await checkout!.getAllBalances({ provider: provider!, walletAddress, chainId });
-  const zero = BigNumber.from('0');
-
-  // check if the user has any funds
-  if (balanceResponse.balances.length === 0) {
-    return true;
-  }
-
-  // check if the user has the token used for the purchase
-  const purchaseBalance = balanceResponse.balances.find(
-    (balance) => balance.token.address?.toLowerCase() === tokenAddress.toLocaleLowerCase(),
-  );
-
-  if (!purchaseBalance) {
-    return false;
-  }
-
-  // check if the user has enough funds of the token used for the purchase
-  const formattedAmount = parseUnits(amount, purchaseBalance.token.decimals);
-  if (purchaseBalance.balance.gt(zero) && purchaseBalance.balance.lt(formattedAmount)) {
-    return true;
-  }
-
-  // if passport, don't check for imx balance as gas is sponsored
-  const isPassport = !!(provider?.provider as any)?.isPassport;
-  if (isPassport) {
-    return false;
-  }
-
-  // check if the user has enough IMX to pay for gas
-  const imxBalance = balanceResponse.balances.find((balance) => balance.token.address === NATIVE);
-  const imxBalanceAmount = imxBalance ? imxBalance.balance : BigNumber.from('0');
-  if (imxBalanceAmount.gte(zero) && imxBalanceAmount.lt(BigNumber.from(MAX_GAS_LIMIT))) {
-    return true;
-  }
-
-  // otherwise, the user doesn't have enough funds
-  return false;
-};
 
 export const fundingRouteFees = (
   fundingRoute: FundingRoute,
@@ -139,40 +96,45 @@ export const filterSmartCheckoutResult = (
   smartCheckoutResult: SmartCheckoutResult,
   provider?: Web3Provider,
 ): SmartCheckoutResult => {
-  // if the transaction is sufficient or there are no routes found stays as is
-  if (smartCheckoutResult.sufficient
-    || smartCheckoutResult.router.routingOutcome.type !== RoutingOutcomeType.ROUTES_FOUND) {
-    return smartCheckoutResult;
-  }
-
-  // if passport wallet and only native balance is insufficient,
-  // return sufficient as passport transactions are gas sponsored
+  // if passport wallet gas requirements are always sufficient
   const isPassport = !!(provider?.provider as any)?.isPassport;
-  const onlyNativeBalanceIsInsufficient = smartCheckoutResult.transactionRequirements.every(
-    (req) => (req.type === ItemType.NATIVE ? !req.sufficient : req.sufficient),
-  );
+  const transactionRequirements = isPassport
+    ? smartCheckoutResult.transactionRequirements.map((req) => {
+      if (req.type === ItemType.NATIVE) {
+        return { ...req, sufficient: true };
+      }
+      return req;
+    })
+    : smartCheckoutResult.transactionRequirements;
 
-  if (isPassport && !smartCheckoutResult.sufficient && onlyNativeBalanceIsInsufficient) {
+  // if the transaction is sufficient, no need to filter
+  if (
+    smartCheckoutResult.sufficient
+    || smartCheckoutResult.router.routingOutcome.type
+      !== RoutingOutcomeType.ROUTES_FOUND
+  ) {
     return {
-      sufficient: true,
-      transactionRequirements: smartCheckoutResult.transactionRequirements,
-    } as SmartCheckoutSufficient;
+      ...smartCheckoutResult,
+      transactionRequirements,
+    };
   }
 
-  // otherwise, filter out disabled steps if required
+  // otherwise, filter disabled steps
   const stepTypesToFiler = [
     // FundingStepType.SWAP,
     // FundingStepType.ONRAMP,
     // FundingStepType.BRIDGE,
   ] as FundingStepType[];
-  const filteredFundingRoutes = smartCheckoutResult.router.routingOutcome.fundingRoutes
-    .filter((route) => !route.steps.some((step) => stepTypesToFiler.includes(step.type)));
+  const filteredFundingRoutes = smartCheckoutResult.router.routingOutcome.fundingRoutes.filter(
+    (route) => !route.steps.some((step) => stepTypesToFiler.includes(step.type)),
+  );
 
   let routingOutcome: RoutingOutcome;
   if (filteredFundingRoutes.length === 0) {
     routingOutcome = {
       type: RoutingOutcomeType.NO_ROUTES_FOUND,
-      message: 'Smart Checkout did not find any routes to fulfill the transaction',
+      message:
+        'Smart Checkout did not find any routes to fulfill the transaction',
     };
   } else {
     routingOutcome = {
@@ -183,12 +145,26 @@ export const filterSmartCheckoutResult = (
 
   const filteredResult = {
     ...smartCheckoutResult,
+    transactionRequirements,
     router: {
       ...smartCheckoutResult.router,
       routingOutcome,
     },
-
   };
 
   return filteredResult;
+};
+
+export const getFractionalBalance = (
+  smartCheckoutResult?: SmartCheckoutResult,
+): Record<ItemType, boolean> | undefined => {
+  if (!smartCheckoutResult) return undefined;
+
+  return smartCheckoutResult.transactionRequirements.reduce(
+    (acc, req) => ({
+      ...acc,
+      [req.type]: req.sufficient,
+    }),
+    {} as Record<ItemType, boolean>,
+  );
 };

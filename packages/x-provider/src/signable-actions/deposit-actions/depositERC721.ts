@@ -1,12 +1,10 @@
+import { imx } from '@imtbl/generated-clients';
 import {
   Contracts,
-  DepositsApi,
-  EncodingApi,
   ERC721Token,
   EthSigner,
   ImmutableXConfiguration,
-  UsersApi,
-} from '@imtbl/core-sdk';
+} from '@imtbl/x-client';
 import { TransactionResponse } from '@ethersproject/providers';
 import {
   getSignableRegistrationOnchain,
@@ -60,9 +58,9 @@ export async function depositERC721({
 
   const user = await ethSigner.getAddress();
   const { immutableXConfig } = config;
-  const depositsApi = new DepositsApi(immutableXConfig.apiConfiguration);
-  const encodingApi = new EncodingApi(immutableXConfig.apiConfiguration);
-  const usersApi = new UsersApi(immutableXConfig.apiConfiguration);
+  const depositsApi = new imx.DepositsApi(immutableXConfig.apiConfiguration);
+  const encodingApi = new imx.EncodingApi(immutableXConfig.apiConfiguration);
+  const usersApi = new imx.UsersApi(immutableXConfig.apiConfiguration);
 
   const data: ERC721TokenData = {
     token_address: deposit.tokenAddress,
