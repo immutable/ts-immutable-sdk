@@ -34,6 +34,7 @@
     "crypto-browserify": "^3.12.0",
     "elliptic": "^6.5.4",
     "enc-utils": "^3.0.0",
+    "ethereumjs-wallet": "^1.0.2",
     "ethers": "^5.7.2",
     "global-const": "^0.1.2",
     "https-browserify": "^1.0.0",
