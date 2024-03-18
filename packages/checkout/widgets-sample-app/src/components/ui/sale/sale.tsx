@@ -17,11 +17,11 @@ const defaultPassportConfig = {
 
 const defaultItems: SaleItem[] = [
   {
-    productId: 'lab',
-    qty: 2,
-    name: 'Lab Iguana',
+    productId: 'prayer-slips',
+    qty: 5,
+    name: 'Prayer',
     image: 'https://pokemon-nfts.mystagingwebsite.com/wp-content/uploads/2023/11/645-300x300.png',
-    description: 'Lab Iguana',
+    description: 'Prayer',
   },
 ];
 

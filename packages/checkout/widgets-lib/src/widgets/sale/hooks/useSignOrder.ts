@@ -308,12 +308,14 @@ export const useSignOrder = (input: SignOrderInput) => {
           .flat();
 
         const responseData = toSignResponse(apiResponse, items);
+        console.log('@@ ~ responseData:', responseData); // eslint-disable-line no-console
 
         setTokenIds(apiTokenIds);
         setSignResponse(responseData);
 
         return responseData;
       } catch (e: any) {
+        console.log('@@ Error', e); // eslint-disable-line no-console
         setSignError({ type: SaleErrorTypes.DEFAULT, data: { error: e } });
       }
       return undefined;
