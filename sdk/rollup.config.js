@@ -4,6 +4,7 @@ import { readFileSync } from 'fs';
 import commonJs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import dts from 'rollup-plugin-dts';
+import babel from '@rollup/plugin-babel';
 import replace from '@rollup/plugin-replace';
 import pkg from './package.json' assert { type: 'json' };
 import moduleReleases from './module-release.json' assert { type: 'json' };
@@ -47,12 +48,18 @@ const getFileBuild = (inputFilename) => [
       nodeResolve({
         resolveOnly: getPackages(),
       }),
-      commonJs(),
-      json(),
       typescript({
         declaration: true,
         declarationDir: './dist/types',
       }),
+      babel({
+        babelHelpers: 'bundled',
+        plugins: ['@babel/plugin-transform-class-properties', '@babel/plugin-transform-private-methods'],
+      }),
+      commonJs({
+        transformMixedEsModules: true
+      }),
+      json(),
       replace({
         exclude: 'node_modules/**',
         preventAssignment: true,
@@ -122,7 +129,16 @@ export default [
         preferBuiltins: false,
       }),
       nodePolyfills(),
-      commonJs(),
+      babel({
+        babelHelpers: 'bundled',
+        plugins: [
+          '@babel/plugin-transform-class-properties',
+          '@babel/plugin-transform-private-methods'
+        ],
+      }),
+      commonJs({
+        transformMixedEsModules: true
+      }),
       typescript(),
       json(),
       replace({
