@@ -5,7 +5,6 @@ import { Signers } from './types';
 import * as WithdrawalActions from './withdrawal-actions';
 import { ProviderConfiguration } from '../config';
 
-jest.mock('@imtbl/core-sdk');
 jest.mock('./withdrawal-actions');
 
 describe('withdrawal', () => {
