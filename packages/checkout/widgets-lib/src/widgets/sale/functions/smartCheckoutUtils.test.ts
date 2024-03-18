@@ -281,6 +281,7 @@ describe('smartCheckoutTokensList', () => {
       } as unknown as SmartCheckoutResult;
       const sufficentSmartCheckoutResult: SmartCheckoutSufficient = {
         ...insufficientSmartCheckoutResult,
+        sufficient: true,
         transactionRequirements: [
           {
             sufficient: true,
