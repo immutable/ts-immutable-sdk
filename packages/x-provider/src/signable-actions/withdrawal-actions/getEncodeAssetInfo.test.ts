@@ -2,7 +2,6 @@ import { imx } from '@imtbl/generated-clients';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 import { testConfig } from '../../test/helpers';
 
-jest.mock('@imtbl/core-sdk');
 jest.mock('@imtbl/generated-clients');
 
 describe('getEncodeAssetInfo', () => {

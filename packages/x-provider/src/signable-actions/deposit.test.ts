@@ -5,7 +5,6 @@ import { deposit } from './deposit';
 import * as depositActions from './deposit-actions';
 import { Signers } from './types';
 
-jest.mock('@imtbl/core-sdk');
 jest.mock('./deposit-actions');
 
 describe('deposit', () => {
