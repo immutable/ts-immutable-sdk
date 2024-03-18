@@ -6,7 +6,6 @@ import {
   PrepareWithdrawalWorkflowParams,
 } from './prepareWithdrawal';
 
-jest.mock('@imtbl/core-sdk');
 jest.mock('@imtbl/toolkit');
 jest.mock('@imtbl/generated-clients');
 

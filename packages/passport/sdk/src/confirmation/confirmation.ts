@@ -3,6 +3,7 @@ import {
   ConfirmationResult,
   PASSPORT_EVENT_TYPE,
   ReceiveMessage,
+  SendMessage,
 } from './types';
 import { openPopupCenter } from './popup';
 import { PassportConfiguration } from '../config';
@@ -58,6 +59,10 @@ export default class ConfirmationScreen {
         }
         switch (data.messageType as ReceiveMessage) {
           case ReceiveMessage.CONFIRMATION_WINDOW_READY: {
+            this.confirmationWindow?.postMessage({
+              eventType: PASSPORT_EVENT_TYPE,
+              messageType: SendMessage.CONFIRMATION_START,
+            }, this.config.passportDomain);
             break;
           }
           case ReceiveMessage.TRANSACTION_CONFIRMED: {
@@ -101,6 +106,10 @@ export default class ConfirmationScreen {
         }
         switch (data.messageType as ReceiveMessage) {
           case ReceiveMessage.CONFIRMATION_WINDOW_READY: {
+            this.confirmationWindow?.postMessage({
+              eventType: PASSPORT_EVENT_TYPE,
+              messageType: SendMessage.CONFIRMATION_START,
+            }, this.config.passportDomain);
             break;
           }
           case ReceiveMessage.MESSAGE_CONFIRMED: {

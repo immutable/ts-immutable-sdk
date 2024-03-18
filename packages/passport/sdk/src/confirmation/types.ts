@@ -1,3 +1,7 @@
+export enum SendMessage {
+  CONFIRMATION_START = 'confirmation_start',
+}
+
 export enum ReceiveMessage {
   CONFIRMATION_WINDOW_READY = 'confirmation_window_ready',
   TRANSACTION_CONFIRMED = 'transaction_confirmed',
