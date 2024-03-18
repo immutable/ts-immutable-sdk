@@ -23,7 +23,6 @@
     "@ethersproject/providers": "^5.7.2",
     "@ethersproject/units": "^5.7.0",
     "@ethersproject/wallet": "^5.7.0",
-    "@imtbl/core-sdk": "^2.4.1",
     "@imtbl/sdk": "file:../../../sdk",
     "dotenv": "^16.3.1"
   },
