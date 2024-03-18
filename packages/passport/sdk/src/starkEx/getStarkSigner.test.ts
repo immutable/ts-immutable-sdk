@@ -6,7 +6,6 @@ import { ethers } from 'ethers';
 import { getStarkSigner } from './getStarkSigner';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 
-jest.mock('@imtbl/core-sdk');
 jest.mock('@imtbl/x-client');
 
 describe('getStarkSigner', () => {
