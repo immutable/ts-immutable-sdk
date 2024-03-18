@@ -1,6 +1,7 @@
-import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
+import { StaticJsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { Signer } from '@ethersproject/abstract-signer';
+import { utils } from 'ethers';
 import {
   JsonRpcRequestCallback,
   JsonRpcRequestPayload,
@@ -47,7 +48,7 @@ export class ZkEvmProvider implements Provider {
 
   readonly #guardianClient: GuardianClient;
 
-  readonly #jsonRpcProvider: JsonRpcProvider; // Used for read
+  readonly #rpcProvider: StaticJsonRpcProvider; // Used for read
 
   readonly #magicAdapter: MagicAdapter;
 
@@ -83,19 +84,19 @@ export class ZkEvmProvider implements Provider {
     this.#guardianClient = guardianClient;
 
     if (config.crossSdkBridgeEnabled) {
-      // JsonRpcProvider by default sets the referrer as "client".
+      // StaticJsonRpcProvider by default sets the referrer as "client".
       // On Unreal 4 this errors as the browser used is expecting a valid URL.
-      this.#jsonRpcProvider = new JsonRpcProvider({
+      this.#rpcProvider = new StaticJsonRpcProvider({
         url: this.#config.zkEvmRpcUrl,
         fetchOptions: { referrer: 'http://imtblgamesdk.local' },
       });
     } else {
-      this.#jsonRpcProvider = new JsonRpcProvider(this.#config.zkEvmRpcUrl);
+      this.#rpcProvider = new StaticJsonRpcProvider(this.#config.zkEvmRpcUrl);
     }
 
     this.#relayerClient = new RelayerClient({
       config: this.#config,
-      jsonRpcProvider: this.#jsonRpcProvider,
+      rpcProvider: this.#rpcProvider,
       authManager: this.#authManager,
     });
 
@@ -178,7 +179,7 @@ export class ZkEvmProvider implements Provider {
             authManager: this.#authManager,
             multiRollupApiClients: this.#multiRollupApiClients,
             accessToken: user.accessToken,
-            jsonRpcProvider: this.#jsonRpcProvider,
+            rpcProvider: this.#rpcProvider,
           });
         } else {
           this.#zkEvmAddress = user.zkEvm.ethAddress;
@@ -199,7 +200,7 @@ export class ZkEvmProvider implements Provider {
           params: request.params || [],
           ethSigner,
           guardianClient: this.#guardianClient,
-          jsonRpcProvider: this.#jsonRpcProvider,
+          rpcProvider: this.#rpcProvider,
           relayerClient: this.#relayerClient,
           zkevmAddress: this.#zkEvmAddress,
         });
@@ -219,10 +220,20 @@ export class ZkEvmProvider implements Provider {
           method: request.method,
           params: request.params || [],
           ethSigner,
-          jsonRpcProvider: this.#jsonRpcProvider,
+          rpcProvider: this.#rpcProvider,
           relayerClient: this.#relayerClient,
           guardianClient: this.#guardianClient,
         });
+      }
+      case 'eth_chainId': {
+        // Call detect network to fetch the chainId so to take advantage of
+        // the caching layer provided by StaticJsonRpcProvider.
+        // In case Passport is changed from StaticJsonRpcProvider to a
+        // JsonRpcProvider, this function will still work as expected given
+        // that detectNetwork call _uncachedDetectNetwork which will force
+        // the provider to re-fetch the chainId from remote.
+        const { chainId } = await this.#rpcProvider.detectNetwork();
+        return utils.hexlify(chainId);
       }
       // Pass through methods
       case 'eth_gasPrice':
@@ -232,13 +243,12 @@ export class ZkEvmProvider implements Provider {
       case 'eth_estimateGas':
       case 'eth_call':
       case 'eth_blockNumber':
-      case 'eth_chainId':
       case 'eth_getBlockByHash':
       case 'eth_getBlockByNumber':
       case 'eth_getTransactionByHash':
       case 'eth_getTransactionReceipt':
       case 'eth_getTransactionCount': {
-        return this.#jsonRpcProvider.send(request.method, request.params || []);
+        return this.#rpcProvider.send(request.method, request.params || []);
       }
       default: {
         throw new JsonRpcError(ProviderErrorCode.UNSUPPORTED_METHOD, 'Method not supported');

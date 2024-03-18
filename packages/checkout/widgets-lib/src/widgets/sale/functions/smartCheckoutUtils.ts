@@ -96,36 +96,40 @@ export const filterSmartCheckoutResult = (
   smartCheckoutResult: SmartCheckoutResult,
   provider?: Web3Provider,
 ): SmartCheckoutResult => {
+  const filteredSmartCheckoutResult = { ...smartCheckoutResult };
+
   // if passport wallet gas requirements are always sufficient
   const isPassport = !!(provider?.provider as any)?.isPassport;
-  const transactionRequirements = isPassport
-    ? smartCheckoutResult.transactionRequirements.map((req) => {
+  if (isPassport) {
+    // mark native token as sufficient
+    filteredSmartCheckoutResult.transactionRequirements = smartCheckoutResult.transactionRequirements.map((req) => {
       if (req.type === ItemType.NATIVE) {
         return { ...req, sufficient: true };
       }
       return req;
-    })
-    : smartCheckoutResult.transactionRequirements;
-
-  // if the transaction is sufficient, no need to filter
-  if (
-    smartCheckoutResult.sufficient
-    || smartCheckoutResult.router.routingOutcome.type
-      !== RoutingOutcomeType.ROUTES_FOUND
-  ) {
-    return {
-      ...smartCheckoutResult,
-      transactionRequirements,
-    };
+    });
+    // mark sufficient if all requirements are sufficient
+    filteredSmartCheckoutResult.sufficient = filteredSmartCheckoutResult.transactionRequirements.every(
+      (req) => req.sufficient,
+    );
   }
 
-  // otherwise, filter disabled steps
+  // if the transaction has been made sufficient, no need to filter
+  if (
+    filteredSmartCheckoutResult.sufficient
+    || filteredSmartCheckoutResult.router.routingOutcome.type
+      !== RoutingOutcomeType.ROUTES_FOUND
+  ) {
+    return filteredSmartCheckoutResult;
+  }
+
+  // otherwise, filter disabled routing outcomes
   const stepTypesToFiler = [
     // FundingStepType.SWAP,
     // FundingStepType.ONRAMP,
     // FundingStepType.BRIDGE,
   ] as FundingStepType[];
-  const filteredFundingRoutes = smartCheckoutResult.router.routingOutcome.fundingRoutes.filter(
+  const filteredFundingRoutes = filteredSmartCheckoutResult.router.routingOutcome.fundingRoutes.filter(
     (route) => !route.steps.some((step) => stepTypesToFiler.includes(step.type)),
   );
 
@@ -143,18 +147,14 @@ export const filterSmartCheckoutResult = (
     };
   }
 
-  const filteredResult = {
-    ...smartCheckoutResult,
-    transactionRequirements,
+  return {
+    ...filteredSmartCheckoutResult,
     router: {
-      ...smartCheckoutResult.router,
+      ...filteredSmartCheckoutResult.router,
       routingOutcome,
     },
   };
-
-  return filteredResult;
 };
-
 export const getFractionalBalance = (
   smartCheckoutResult?: SmartCheckoutResult,
 ): Record<ItemType, boolean> | undefined => {
