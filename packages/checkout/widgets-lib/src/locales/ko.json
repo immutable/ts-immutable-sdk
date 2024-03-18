@@ -59,11 +59,7 @@
     },
     "ERROR_VIEW": {
       "heading": "문제가 발생했습니다",
-      "body": [
-        "다시 시도하거나",
-        "지원팀에",
-        "도움을 요청하세요."
-      ],
+      "body": ["다시 시도하거나", "지원팀에", "도움을 요청하세요."],
       "actionText": "다시 시도"
     },
     "SERVICE_UNAVAILABLE_ERROR_VIEW": {
@@ -284,9 +280,13 @@
           "disabledCaption": null
         }
       },
-      "insufficientCoinsBanner": {
-        "caption": "코인 잔액이 부족합니다. 카드로 결제하거나 <cta>코인 추가</cta>하고 다시 시도해 보세요.",
-        "gasCaption": "가스를 위한 IMX가 부족합니다. 카드로 결제하거나 <cta>코인 추가</cta>하고 다시 시도해 보세요."
+      "topUp": {
+        "heading": "일부 코인을 추가해야합니다",
+        "subheading": {
+          "both": "이 구매 및 가스를 포함하여 이를 커버하기 위해 {{erc20.value}} {{erc20.symbol}} 및 {{native.value}} {{native.symbol}}를 추가하십시오.",
+          "erc20": "다음 옵션 중 하나를 통해 균형에 {{erc20.value}} {{erc20.symbol}}를 추가하십시오.",
+          "native": "다음 옵션 중 하나를 통해 가스에 {{native.value}} {{native.symbol}}를 추가하십시오."
+        }
       },
       "loading": {
         "ready1": "주문 수집 중",
@@ -649,14 +649,14 @@
     },
     "walletConnectionError": {
       "unableToConnect": {
-          "heading": "연결할 수 없음",
-          "body": "지갑을 확인한 후 다시 시도하거나 닫고 다른 옵션을 시도하세요.",
-          "actionButtonText": "다시 시도"
+        "heading": "연결할 수 없음",
+        "body": "지갑을 확인한 후 다시 시도하거나 닫고 다른 옵션을 시도하세요.",
+        "actionButtonText": "다시 시도"
       },
       "changedYourMind": {
-          "heading": "생각을 바꾸셨나요?",
-          "body": "팝업이 활성화되어 있는지 확인하고 지갑의 프롬프트를 따라 연결하세요.",
-          "actionButtonText": "다시 시도"
+        "heading": "생각을 바꾸셨나요?",
+        "body": "팝업이 활성화되어 있는지 확인하고 지갑의 프롬프트를 따라 연결하세요.",
+        "actionButtonText": "다시 시도"
       }
     }
   }
