@@ -38,6 +38,7 @@ export type SignedTransaction = {
 export type SignResponse = {
   order: SignedOrder;
   transactions: SignedTransaction[];
+  transactionId: string;
 };
 
 export type SignOrderInput = {

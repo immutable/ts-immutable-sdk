@@ -27,6 +27,7 @@ export const sendSaleSuccessEvent = (
   paymentMethod: SalePaymentTypes | undefined,
   transactions: ExecutedTransaction[] = [],
   tokenIds: string[] = [],
+  transactionId: string = '',
 ) => {
   const event = new CustomEvent<
   WidgetEvent<WidgetType.SALE, SaleEventType.SUCCESS>
@@ -37,6 +38,7 @@ export const sendSaleSuccessEvent = (
         paymentMethod,
         transactions,
         tokenIds,
+        transactionId,
       },
     },
   });
@@ -51,6 +53,7 @@ export const sendSaleFailedEvent = (
   error: Record<string, unknown>,
   paymentMethod: SalePaymentTypes | undefined,
   transactions: ExecutedTransaction[] = [],
+  transactionId: string = '',
 ) => {
   const event = new CustomEvent<
   WidgetEvent<WidgetType.SALE, SaleEventType.FAILURE>
@@ -62,6 +65,7 @@ export const sendSaleFailedEvent = (
         error,
         paymentMethod,
         transactions,
+        transactionId,
         timestamp: new Date().getTime(),
       },
     },
