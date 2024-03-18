@@ -59,7 +59,7 @@
     },
     "ERROR_VIEW": {
       "heading": "Something's gone wrong",
-      "body": ["You can try again or contagact", "support", "for help."],
+      "body": ["You can try again or contact", "support", "for help."],
       "actionText": "Try again"
     },
     "SERVICE_UNAVAILABLE_ERROR_VIEW": {
