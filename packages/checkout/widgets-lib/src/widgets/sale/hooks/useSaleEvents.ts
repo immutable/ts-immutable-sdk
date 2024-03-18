@@ -67,7 +67,7 @@ export const useSaleEvent = () => {
     screen: string = defaultView,
     transactions: ExecutedTransaction[] = [],
     tokenIds: string[] = [],
-    details?: Record<string, unknown>,
+    details: Record<string, any> = {},
   ) => {
     track({
       ...commonProps,
@@ -84,7 +84,7 @@ export const useSaleEvent = () => {
         tokenIds,
       },
     });
-    sendSaleSuccessEvent(eventTarget, paymentMethod, transactions, tokenIds);
+    sendSaleSuccessEvent(eventTarget, paymentMethod, transactions, tokenIds, details.transactionId);
   };
 
   const sendFailedEvent = (
@@ -92,14 +92,16 @@ export const useSaleEvent = () => {
     error: Record<string, unknown>,
     transactions: ExecutedTransaction[] = [],
     screen: string = defaultView,
+    details: Record<string, any> = {},
   ) => {
     track({
       ...commonProps,
-      screen: toPascalCase(screen),
+      screen: toPascalCase(screen || defaultView),
       control: 'Fail',
       controlType: 'Event',
       action: 'Failed',
       extras: {
+        ...details,
         transactions: toStringifyTransactions(transactions),
         ...error,
         ...orderProps,
@@ -108,7 +110,7 @@ export const useSaleEvent = () => {
         reason,
       },
     });
-    sendSaleFailedEvent(eventTarget, reason, error, paymentMethod, transactions);
+    sendSaleFailedEvent(eventTarget, reason, error, paymentMethod, transactions, details.transactionId);
   };
 
   const sendTransactionSuccessEvent = (transaction: ExecutedTransaction) => {
