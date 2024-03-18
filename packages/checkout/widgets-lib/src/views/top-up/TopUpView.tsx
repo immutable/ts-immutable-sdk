@@ -303,7 +303,6 @@ export function TopUpView({
     <SimpleLayout
       header={(
         <HeaderNavigation
-          title="Top Up"
           onBackButtonClick={onBackButtonClick}
           onCloseButtonClick={onCloseButtonClick}
           showBack
