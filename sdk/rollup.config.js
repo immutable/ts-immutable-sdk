@@ -48,6 +48,7 @@ const getFileBuild = (inputFilename) => [
       nodeResolve({
         resolveOnly: getPackages(),
       }),
+      commonJs(),
       typescript({
         declaration: true,
         declarationDir: './dist/types',
@@ -55,9 +56,6 @@ const getFileBuild = (inputFilename) => [
       babel({
         babelHelpers: 'bundled',
         plugins: ['@babel/plugin-transform-class-properties', '@babel/plugin-transform-private-methods'],
-      }),
-      commonJs({
-        transformMixedEsModules: true
       }),
       json(),
       replace({
@@ -129,6 +127,8 @@ export default [
         preferBuiltins: false,
       }),
       nodePolyfills(),
+      commonJs(),
+      typescript(),
       babel({
         babelHelpers: 'bundled',
         plugins: [
@@ -136,10 +136,6 @@ export default [
           '@babel/plugin-transform-private-methods'
         ],
       }),
-      commonJs({
-        transformMixedEsModules: true
-      }),
-      typescript(),
       json(),
       replace({
         // Can't exclude node_modules here because some dependencies use process.env.NODE_ENV
