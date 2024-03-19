@@ -1,12 +1,10 @@
+import { imx } from '@imtbl/generated-clients';
 import {
   Contracts,
-  DepositsApi,
-  EncodingApi,
   ERC20Amount,
-  TokensApi,
-  UsersApi,
-  EthSigner, EthConfiguration,
-} from '@imtbl/core-sdk';
+  EthConfiguration,
+  EthSigner,
+} from '@imtbl/x-client';
 import { TransactionResponse } from '@ethersproject/providers';
 import { parseUnits } from '@ethersproject/units';
 import { BigNumber } from '@ethersproject/bignumber';
@@ -37,7 +35,7 @@ async function executeRegisterAndDepositERC20(
   starkPublicKey: string,
   vaultId: number,
   config: EthConfiguration,
-  usersApi: UsersApi,
+  usersApi: imx.UsersApi,
 ): Promise<TransactionResponse> {
   const etherKey = await ethSigner.getAddress();
   const coreContract = Contracts.Core.connect(
@@ -94,10 +92,10 @@ export async function depositERC20({
 
   const { apiConfiguration, ethConfiguration } = config.immutableXConfig;
   const user = await ethSigner.getAddress();
-  const tokensApi = new TokensApi(apiConfiguration);
-  const depositsApi = new DepositsApi(apiConfiguration);
-  const encodingApi = new EncodingApi(apiConfiguration);
-  const usersApi = new UsersApi(apiConfiguration);
+  const tokensApi = new imx.TokensApi(apiConfiguration);
+  const depositsApi = new imx.DepositsApi(apiConfiguration);
+  const encodingApi = new imx.EncodingApi(apiConfiguration);
+  const usersApi = new imx.UsersApi(apiConfiguration);
 
   // Get decimals for this specific ERC20
   const token = await tokensApi.getToken({ address: deposit.tokenAddress });

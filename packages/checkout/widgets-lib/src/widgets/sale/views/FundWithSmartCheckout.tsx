@@ -3,7 +3,7 @@ import { FundingRoute } from '@imtbl/checkout-sdk';
 import {
   useContext,
   useEffect,
-  useMemo, useRef, useState,
+  useMemo, useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -32,26 +32,18 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
   >(undefined);
   const [fundingRouteStepIndex, setFundingRouteStepIndex] = useState<number>(0);
   const {
-    querySmartCheckout, fundingRoutes, smartCheckoutResult, collectionName,
+    querySmartCheckout, fundingRoutes, smartCheckoutResult, collectionName, fromTokenAddress,
   } = useSaleContext();
   const { cryptoFiatDispatch } = useContext(CryptoFiatContext);
-
-  const smartCheckoutLoading = useRef(false);
 
   const onFundingRouteSelected = (fundingRoute: FundingRoute) => {
     setSelectedFundingRoute(fundingRoute);
   };
 
   useEffect(() => {
-    if (subView === FundWithSmartCheckoutSubViews.INIT && !smartCheckoutLoading.current) {
-      smartCheckoutLoading.current = true;
-      try {
-        querySmartCheckout();
-      } finally {
-        smartCheckoutLoading.current = false;
-      }
-    }
-  }, [subView]);
+    if (subView !== FundWithSmartCheckoutSubViews.INIT || !fromTokenAddress) return;
+    querySmartCheckout();
+  }, [subView, fromTokenAddress]);
 
   useEffect(() => {
     if (!cryptoFiatDispatch || !smartCheckoutResult) return;

@@ -2,6 +2,7 @@ import pako from 'pako';
 import { useCallback, useEffect, useState } from 'react';
 import { Environment } from '@imtbl/config';
 
+import { sanitizeToLatin1 } from 'widgets/sale/functions/utils';
 import { TransakNFTData } from './TransakTypes';
 
 export type TransakWidgetType = 'on-ramp' | 'nft-checkout';
@@ -27,6 +28,9 @@ type UseTransakIframeProps = {
 const MAX_GAS_LIMIT = '30000000';
 
 // TODO: Move to common config file inside Checkout SDK while refactoring onRamp
+// TODO: Get transak config from checkout SDK
+// const { checkout, provider } = connectLoaderState;
+// const { baseUrl, apiKey, environment } = checkout.fiatExchangeConfig('transak')
 export const TRANSAK_API_BASE_URL = {
   [Environment.SANDBOX]: 'https://global-stg.transak.com',
   [Environment.PRODUCTION]: 'https://global.transak.com/',
@@ -37,14 +41,14 @@ export const TRANSAK_ENVIRONMENT = {
   [Environment.PRODUCTION]: 'PRODUCTION',
 };
 
+export const TRANSAK_API_KEY = {
+  [Environment.SANDBOX]: 'd14b44fb-0f84-4db5-affb-e044040d724b',
+  [Environment.PRODUCTION]: 'ad1bca70-d917-4628-bb0f-5609537498bc',
+};
+
 export const useTransakIframe = (props: UseTransakIframeProps) => {
   const { contractId, environment, transakParams } = props;
   const [iframeSrc, setIframeSrc] = useState<string>('');
-
-  // TODO: Get transak config from checkout SDK
-  // const { checkout, provider } = connectLoaderState;
-  // const { baseUrl, apiKey, environment } = checkout.fiatExchangeConfig('transak')
-  const apiKey = 'd14b44fb-0f84-4db5-affb-e044040d724b';
 
   const getNFTCheckoutURL = useCallback(() => {
     const {
@@ -56,12 +60,16 @@ export const useTransakIframe = (props: UseTransakIframeProps) => {
 
     // FIXME: defaulting to first nft in the list
     // as transak currently only supports on nft at a time
-    const nftData = nfts?.slice(0, 1);
+    const nftData = nfts?.slice(0, 1).map((item) => ({
+      ...item,
+      imageURL: sanitizeToLatin1(item.imageURL),
+      nftName: sanitizeToLatin1(item.nftName),
+    }));
 
     const gasLimit = estimatedGasLimit > 0 ? estimatedGasLimit : MAX_GAS_LIMIT;
 
     const params = {
-      apiKey,
+      apiKey: TRANSAK_API_KEY[environment],
       isNFT: 'true',
       disableWalletAddressForm: 'true',
       contractId,

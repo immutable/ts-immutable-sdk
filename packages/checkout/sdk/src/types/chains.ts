@@ -27,7 +27,7 @@ export enum ChainId {
 export enum ChainName {
   ETHEREUM = 'Ethereum',
   SEPOLIA = 'Sepolia',
-  IMTBL_ZKEVM_TESTNET = 'Immutable zkEVM Test',
+  IMTBL_ZKEVM_TESTNET = 'Immutable zkEVM Testnet',
   IMTBL_ZKEVM_DEVNET = 'Immutable zkEVM Dev',
   IMTBL_ZKEVM_MAINNET = 'Immutable zkEVM',
 }

@@ -155,6 +155,10 @@ export default function SaleWidget(props: SaleWidgetProps) {
               showSwapOption={config.isSwapEnabled}
               showBridgeOption={config.isBridgeEnabled}
               onCloseButtonClick={() => sendSaleWidgetCloseEvent(eventTarget)}
+              amount={viewState.view.data?.amount}
+              tokenAddress={viewState.view.data?.tokenAddress}
+              heading={viewState.view.data?.heading}
+              subheading={viewState.view.data?.subheading}
             />
           )}
         </CryptoFiatProvider>

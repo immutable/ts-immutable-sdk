@@ -16,7 +16,7 @@ export function PayWithCoins() {
     sendSuccessEvent,
   } = useSaleEvent();
   const {
-    execute, signResponse, executeResponse, signTokenIds,
+    execute, signResponse, executeResponse, signTokenIds, provider,
   } = useSaleContext();
   const executedTxns = executeResponse?.transactions.length || 0;
 
@@ -35,13 +35,16 @@ export function PayWithCoins() {
   }
 
   const sendTransaction = async () => {
+    const waitForTrnsactionSettlement = !('isMetaMask' in (provider?.provider as any) && provider?.provider.isMetaMask);
     execute(
       signResponse,
+      waitForTrnsactionSettlement,
       (txn) => {
         sendTransactionSuccessEvent(txn);
       },
       (error, txns) => {
-        sendFailedEvent(error.toString(), error, txns);
+        const details = { transactionId: signResponse?.transactionId };
+        sendFailedEvent(error.toString(), error, txns, undefined, details);
       },
     );
   };
@@ -55,7 +58,8 @@ export function PayWithCoins() {
 
   useEffect(() => {
     if (executeResponse?.done === true) {
-      sendSuccessEvent(SaleWidgetViews.SALE_SUCCESS, executeResponse?.transactions, signTokenIds);
+      const details = { transactionId: signResponse?.transactionId };
+      sendSuccessEvent(SaleWidgetViews.SALE_SUCCESS, executeResponse?.transactions, signTokenIds, details);
       sendCloseEvent(SaleWidgetViews.SALE_SUCCESS);
     }
   }, [executeResponse]);

@@ -4,7 +4,8 @@ import {
   Alert, Button, Form, Image, Offcanvas, Spinner, Stack, Table,
 } from 'react-bootstrap';
 import { Heading } from '@biom3/react';
-import { Asset, UnsignedTransferRequest } from '@imtbl/core-sdk';
+import { imx } from '@imtbl/generated-clients';
+import { UnsignedTransferRequest } from '@imtbl/x-client';
 import { ModalProps } from '@/types';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { useStatusProvider } from '@/context/StatusProvider';
@@ -26,7 +27,7 @@ function Transfer({ showModal, setShowModal }: ModalProps) {
   const [isInvalid, setInvalid] = useState<boolean | undefined>(undefined);
   const [loadingTransfer, setLoadingTransfer] = useState<boolean>(false);
   const [loadingAssets, setLoadingAssets] = useState<boolean>(false);
-  const [assets, setAssets] = useState<Asset[]>([]);
+  const [assets, setAssets] = useState<imx.Asset[]>([]);
 
   const { addMessage } = useStatusProvider();
   const { imxProvider } = usePassportProvider();

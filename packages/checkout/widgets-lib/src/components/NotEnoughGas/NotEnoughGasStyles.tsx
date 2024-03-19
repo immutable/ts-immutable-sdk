@@ -2,22 +2,27 @@ export const containerStyles = {
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  paddingTop: 'base.spacing.x6',
-  paddingBottom: 'base.spacing.x1',
+  paddingBottom: 'base.spacing.x6',
   height: '100%',
+  paddingX: 'base.spacing.x6',
 };
 
-export const contentTextStyles = {
-  color: 'base.color.text.body.secondary',
+export const headingTextStyles = {
   fontFamily: 'base.font.family.heading.secondary',
   textAlign: 'center',
   marginTop: '15px',
+  paddingX: 'base.spacing.x6',
+};
+
+export const bodyTextStyles = {
+  ...headingTextStyles,
+  color: 'base.color.text.body.secondary',
 };
 
 export const actionButtonContainerStyles = {
   display: 'flex',
   flexDirection: 'column',
-  justifyContent: 'center',
+  justifyContent: 'flex-end',
   gap: 'base.spacing.x2',
   height: '100%',
   width: '100%',

@@ -1,6 +1,7 @@
 import { Box } from '@biom3/react';
 import {
   ChainId,
+  CheckoutErrorType,
   WalletProviderName, WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
 import {
@@ -9,11 +10,12 @@ import {
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Web3Provider } from '@ethersproject/providers';
+import { UnableToConnectDrawer } from 'components/UnableToConnectDrawer/UnableToConnectDrawer';
+import { ChangedYourMindDrawer } from 'components/ChangedYourMindDrawer/ChangedYourMindDrawer';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { ConnectActions, ConnectContext } from '../context/ConnectContext';
 import { WalletItem } from './WalletItem';
 import {
-  SharedViews,
   ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
@@ -28,30 +30,37 @@ import {
   EIP1193Provider,
   EIP6963ProviderDetail,
   getProviderSlugFromRdns,
+  isPassportProvider,
 } from '../../../lib/provider';
-import { getL1ChainId } from '../../../lib';
+import { addProviderListenersForWidgetRoot, getL1ChainId } from '../../../lib';
 import { listItemVariants, listVariants } from '../../../lib/animation/listAnimation';
-import { WalletDrawer } from '../../bridge/components/WalletDrawer';
-import { WalletChangeEvent } from '../../bridge/components/WalletDrawerEvents';
+import { WalletDrawer } from '../../../components/WalletDrawer/WalletDrawer';
+import { WalletChangeEvent } from '../../../components/WalletDrawer/WalletDrawerEvents';
 import { WalletConnectItem } from './WalletConnectItem';
 import { BrowserWalletItem } from './BrowserWalletItem';
+import { identifyUser } from '../../../lib/analytics/identifyUser';
 
 export interface WalletListProps {
   targetChainId: ChainId;
+  allowedChains: ChainId[];
 }
 
 export function WalletList(props: WalletListProps) {
   const { t } = useTranslation();
-  const { targetChainId } = props;
+  const { targetChainId, allowedChains } = props;
   const {
     connectDispatch,
     connectState: { checkout },
   } = useContext(ConnectContext);
   const { viewDispatch } = useContext(ViewContext);
-  const { track } = useAnalytics();
+  const { track, identify } = useAnalytics();
   const { providers } = useInjectedProviders({ checkout });
   const [showWalletDrawer, setShowWalletDrawer] = useState(false);
   const { isWalletConnectEnabled, openWalletConnectModal } = useWalletConnect();
+
+  const [showChangedYourMindDrawer, setShowChangedYourMindDrawer] = useState(false);
+  const [showUnableToConnectDrawer, setShowUnableToConnectDrawer] = useState(false);
+  const [chosenProviderDetail, setChosenProviderDetail] = useState<EIP6963ProviderDetail>();
 
   const filteredProviders = useMemo(() => (
     providers.filter((provider) => (!(provider.info.rdns === WalletProviderRdns.PASSPORT)))
@@ -63,7 +72,7 @@ export function WalletList(props: WalletListProps) {
     && providers.find((provider) => provider.info.rdns === WalletProviderRdns.PASSPORT)
   ), [providers, checkout]);
 
-  const selectWeb3Provider = useCallback((web3Provider: any, providerName: string) => {
+  const selectWeb3Provider = useCallback((web3Provider: Web3Provider, providerName: string) => {
     connectDispatch({
       payload: {
         type: ConnectActions.SET_PROVIDER,
@@ -78,31 +87,95 @@ export function WalletList(props: WalletListProps) {
     });
   }, []);
 
-  const selectProviderDetail = (providerDetail: EIP6963ProviderDetail) => {
-    try {
-      selectWeb3Provider(
-        new Web3Provider(providerDetail.provider as any),
-        getProviderSlugFromRdns(providerDetail.info.rdns),
-      );
-
+  const handleConnectViewUpdate = async (provider: Web3Provider) => {
+    const isPassport = isPassportProvider(provider);
+    const chainId = await provider.provider.request!({ method: 'eth_chainId', params: [] });
+    // eslint-disable-next-line radix
+    const parsedChainId = parseInt(chainId.toString());
+    if (parsedChainId !== targetChainId && !allowedChains?.includes(parsedChainId)) {
+      // TODO: What do we do with Passport here as it can't connect to L1
+      if (isPassport) {
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: { type: ConnectWidgetViews.SUCCESS },
+          },
+        });
+        return;
+      }
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
-          view: { type: ConnectWidgetViews.READY_TO_CONNECT },
+          view: { type: ConnectWidgetViews.SWITCH_NETWORK },
         },
       });
+      return;
+    }
+
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: { type: ConnectWidgetViews.SUCCESS },
+      },
+    });
+  };
+
+  const selectProviderDetail = useCallback(async (providerDetail: EIP6963ProviderDetail) => {
+    if (!checkout) return;
+
+    try {
+      const isMetaMask = providerDetail.info.rdns === WalletProviderRdns.METAMASK;
+      const web3Provider = new Web3Provider(providerDetail.provider as any);
+
+      track({
+        userJourney: UserJourney.CONNECT,
+        screen: 'ConnectWallet',
+        control: 'Wallet',
+        controlType: 'MenuItem',
+        extras: {
+          wallet: getProviderSlugFromRdns(providerDetail.info.rdns),
+          walletRdns: providerDetail.info.rdns,
+          walletUuid: providerDetail.info.uuid,
+        },
+      });
+
+      try {
+        // TODO: Find a nice way to detect if the wallet supports switching accounts via requestPermissions
+        const changeAccount = isMetaMask;
+        const connectResult = await checkout.connect({
+          provider: web3Provider,
+          requestWalletPermissions: changeAccount,
+        });
+
+        // Set up EIP-1193 provider event listeners for widget root instances
+        addProviderListenersForWidgetRoot(connectResult.provider);
+        await identifyUser(identify, connectResult.provider);
+
+        selectWeb3Provider(
+          web3Provider,
+          getProviderSlugFromRdns(providerDetail.info.rdns),
+        );
+        await handleConnectViewUpdate(web3Provider);
+      } catch (err: CheckoutErrorType | any) {
+        if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
+        // eslint-disable-next-line no-console
+          console.error('Connect rejected', err);
+
+          setShowChangedYourMindDrawer(true);
+        } else {
+          // eslint-disable-next-line no-console
+          console.error('Connect error', err);
+
+          setShowUnableToConnectDrawer(true);
+        }
+      }
     } catch (err: any) {
       // eslint-disable-next-line no-console
-      console.error(err);
+      console.error('Connect unknown error', err);
 
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: { type: SharedViews.ERROR_VIEW, error: err },
-        },
-      });
+      setShowUnableToConnectDrawer(true);
     }
-  };
+  }, [checkout]);
 
   const connectCallback = async (ethereumProvider) => {
     if (ethereumProvider.connected && ethereumProvider.session) {
@@ -137,9 +210,8 @@ export function WalletList(props: WalletListProps) {
   };
 
   const handleWalletChange = async (event: WalletChangeEvent) => {
-    setShowWalletDrawer(false);
-
     const { providerDetail } = event;
+    setChosenProviderDetail(providerDetail);
     track({
       userJourney: UserJourney.CONNECT,
       screen: 'ConnectWallet',
@@ -151,11 +223,15 @@ export function WalletList(props: WalletListProps) {
         walletUuid: providerDetail.info.uuid,
       },
     });
-    selectProviderDetail(providerDetail);
+    await selectProviderDetail(providerDetail);
+    setShowWalletDrawer(false);
   };
 
-  const onWalletClick = useCallback(
+  const handleWalletItemClick = useCallback(
     async (providerDetail: EIP6963ProviderDetail<EIP1193Provider>) => {
+      setShowChangedYourMindDrawer(false);
+      setShowUnableToConnectDrawer(false);
+      setChosenProviderDetail(providerDetail);
       track({
         userJourney: UserJourney.CONNECT,
         screen: 'ConnectWallet',
@@ -167,10 +243,15 @@ export function WalletList(props: WalletListProps) {
           walletUuid: providerDetail.info.uuid,
         },
       });
-      selectProviderDetail(providerDetail);
+      await selectProviderDetail(providerDetail);
     },
     [track, checkout],
   );
+
+  const onChosenProviderDetailChange = useCallback(() => {
+    if (!chosenProviderDetail) return;
+    handleWalletItemClick(chosenProviderDetail!);
+  }, [chosenProviderDetail]);
 
   const onBrowserWalletsClick = useCallback(() => {
     setShowWalletDrawer(true);
@@ -190,21 +271,30 @@ export function WalletList(props: WalletListProps) {
     >
       {passportProviderDetail && (
         <WalletItem
+          recommended
           key={passportProviderDetail.info.rdns}
-          onWalletClick={onWalletClick}
+          onWalletItemClick={handleWalletItemClick}
           providerDetail={passportProviderDetail}
           rc={(
-            <motion.div variants={listItemVariants} custom={0} />
+            <motion.div
+              variants={listItemVariants}
+              custom={0}
+              style={{ width: '100%' }}
+            />
           )}
         />
       )}
       {filteredProviders.length === 1 && (
         <WalletItem
           key={filteredProviders[0].info.rdns}
-          onWalletClick={onWalletClick}
+          onWalletItemClick={handleWalletItemClick}
           providerDetail={filteredProviders[0]}
           rc={(
-            <motion.div variants={listItemVariants} custom={0 + (passportProviderDetail ? 1 : 0)} />
+            <motion.div
+              variants={listItemVariants}
+              custom={0 + (passportProviderDetail ? 1 : 0)}
+              style={{ width: '100%' }}
+            />
           )}
         />
       )}
@@ -213,6 +303,7 @@ export function WalletList(props: WalletListProps) {
           variants={listItemVariants}
           custom={0 + (passportProviderDetail ? 1 : 0)}
           key="browserwallet"
+          style={{ width: '100%' }}
         >
           <BrowserWalletItem onClick={onBrowserWalletsClick} providers={filteredProviders} />
         </motion.div>
@@ -222,6 +313,7 @@ export function WalletList(props: WalletListProps) {
           variants={listItemVariants}
           custom={0 + (passportProviderDetail ? 1 : 0) + (filteredProviders.length > 0 ? 1 : 0)}
           key="walletconnect"
+          style={{ width: '100%' }}
         >
           <WalletConnectItem onConnect={handleWalletConnectConnection} />
         </motion.div>
@@ -240,6 +332,20 @@ export function WalletList(props: WalletListProps) {
           setShowWalletDrawer(show);
         }}
         onWalletChange={handleWalletChange}
+      />
+
+      <ChangedYourMindDrawer
+        visible={showChangedYourMindDrawer}
+        checkout={checkout!}
+        onCloseDrawer={() => setShowChangedYourMindDrawer(false)}
+        onTryAgain={onChosenProviderDetailChange}
+      />
+
+      <UnableToConnectDrawer
+        visible={showUnableToConnectDrawer}
+        checkout={checkout!}
+        onCloseDrawer={() => setShowUnableToConnectDrawer(false)}
+        onTryAgain={() => setShowUnableToConnectDrawer(false)}
       />
     </Box>
   );

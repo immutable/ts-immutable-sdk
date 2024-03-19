@@ -3688,7 +3688,6 @@ __metadata:
     "@biom3/design-tokens": ^0.3.1
     "@biom3/react": ^0.20.11
     "@imtbl/config": 0.0.0
-    "@imtbl/core-sdk": ^2.4.0
     "@imtbl/passport": 0.0.0
     "@imtbl/x-client": 0.0.0
     "@imtbl/x-provider": 0.0.0
@@ -3721,7 +3720,6 @@ __metadata:
     "@0xsequence/core": ^1.4.3
     "@ethersproject/providers": ^5.7.2
     "@imtbl/config": 0.0.0
-    "@imtbl/core-sdk": ^2.4.0
     "@imtbl/generated-clients": 0.0.0
     "@imtbl/guardian": 0.0.0
     "@imtbl/metrics": 0.0.0
@@ -3856,7 +3854,7 @@ __metadata:
     "@ethersproject/abstract-signer": ^5.7.0
     "@ethersproject/providers": ^5.7.2
     "@ethersproject/wallet": ^5.7.0
-    "@imtbl/core-sdk": ^2.4.0
+    "@imtbl/x-client": 0.0.0
     "@magic-ext/oidc": 4.2.0
     "@metamask/detect-provider": ^2.0.0
     "@rollup/plugin-typescript": ^11.0.0
@@ -3936,8 +3934,9 @@ __metadata:
   resolution: "@imtbl/x-provider@workspace:packages/x-provider"
   dependencies:
     "@imtbl/config": 0.0.0
-    "@imtbl/core-sdk": ^2.4.0
+    "@imtbl/generated-clients": 0.0.0
     "@imtbl/toolkit": 0.0.0
+    "@imtbl/x-client": 0.0.0
     "@magic-ext/oidc": 4.2.0
     "@metamask/detect-provider": ^2.0.0
     "@rollup/plugin-typescript": ^11.0.0
@@ -29637,7 +29636,6 @@ __metadata:
   resolution: "x-provider-sample-app@workspace:packages/x-provider/src/sample-app"
   dependencies:
     "@biom3/react": ^0.20.11
-    "@imtbl/core-sdk": ^2.4.0
     "@imtbl/sdk": 0.0.0
     "@svgr/webpack": ^8.0.1
     "@testing-library/jest-dom": ^5.16.5

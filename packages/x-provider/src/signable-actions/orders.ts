@@ -1,12 +1,5 @@
-import {
-  CancelOrderResponse,
-  CreateOrderResponse,
-  GetSignableCancelOrderRequest,
-  GetSignableOrderRequestV3,
-  OrdersApi,
-  OrdersApiCreateOrderV3Request,
-  UnsignedOrderRequest,
-} from '@imtbl/core-sdk';
+import { UnsignedOrderRequest, GetSignableCancelOrderRequest } from '@imtbl/x-client';
+import { imx } from '@imtbl/generated-clients';
 import { convertToSignableToken, signRaw } from '@imtbl/toolkit';
 import { Signers } from './types';
 import { validateChain } from './helpers';
@@ -28,15 +21,15 @@ export async function createOrder({
   signers,
   request,
   config,
-}: CreateOrderWorkflowParams): Promise<CreateOrderResponse> {
+}: CreateOrderWorkflowParams): Promise<imx.CreateOrderResponse> {
   await validateChain(signers.ethSigner, config.immutableXConfig);
 
   const ethAddress = await signers.ethSigner.getAddress();
-  const ordersApi = new OrdersApi(config.immutableXConfig.apiConfiguration);
+  const ordersApi = new imx.OrdersApi(config.immutableXConfig.apiConfiguration);
 
   const amountSell = request.sell.type === 'ERC721' ? '1' : request.sell.amount;
   const amountBuy = request.buy.type === 'ERC721' ? '1' : request.buy.amount;
-  const getSignableOrderRequest: GetSignableOrderRequestV3 = {
+  const getSignableOrderRequest: imx.GetSignableOrderRequestV3 = {
     user: ethAddress,
     amount_buy: amountBuy,
     token_buy: convertToSignableToken(request.buy),
@@ -58,7 +51,7 @@ export async function createOrder({
 
   const resp = getSignableOrderResponse.data;
 
-  const orderParams: OrdersApiCreateOrderV3Request = {
+  const orderParams: imx.OrdersApiCreateOrderV3Request = {
     createOrderRequest: {
       amount_buy: resp.amount_buy,
       amount_sell: resp.amount_sell,
@@ -87,8 +80,8 @@ export async function cancelOrder({
   signers,
   request,
   config,
-}: CancelOrderWorkflowParams): Promise<CancelOrderResponse> {
-  const ordersApi = new OrdersApi(config.immutableXConfig.apiConfiguration);
+}: CancelOrderWorkflowParams): Promise<imx.CancelOrderResponse> {
+  const ordersApi = new imx.OrdersApi(config.immutableXConfig.apiConfiguration);
 
   const getSignableCancelOrderResponse = await ordersApi.getSignableCancelOrderV3(
     {

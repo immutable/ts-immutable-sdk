@@ -280,10 +280,13 @@
           "disabledCaption": null
         }
       },
-      "insufficientCoinsBanner": {
-        "caption": "코인 잔액이 부족합니다. 카드로 결제하거나",
-        "captionEnd": "하고 다시 시도해 보세요.",
-        "captionCTA": "코인 추가"
+      "topUp": {
+        "heading": "일부 코인을 추가해야합니다",
+        "subheading": {
+          "both": "이 구매 및 가스를 포함하여 이를 커버하기 위해 {{erc20.value}} {{erc20.symbol}} 및 {{native.value}} {{native.symbol}}를 추가하십시오.",
+          "erc20": "다음 옵션 중 하나를 통해 균형에 {{erc20.value}} {{erc20.symbol}}를 추가하십시오.",
+          "native": "다음 옵션 중 하나를 통해 가스에 {{native.value}} {{native.symbol}}를 추가하십시오."
+        }
       },
       "loading": {
         "ready1": "주문 수집 중",
@@ -344,6 +347,11 @@
         "WALLET_REJECTED": {
           "description": "거래를 진행하려면 지갑에서 거래 승인이 필요합니다.",
           "primaryAction": "다시 시도",
+          "secondaryAction": "취소"
+        },
+        "WALLET_POPUP_BLOCKED": {
+          "description": "계속 진행하려면 브라우저에서 팝업을 허용해야 합니다.",
+          "primaryAction": "이 문제를 해결했습니다. 다시 시도하세요.",
           "secondaryAction": "취소"
         },
         "SMART_CHECKOUT_ERROR": {
@@ -537,21 +545,21 @@
   "wallets": {
     "passport": {
       "heading": "Immutable Passport",
-      "accentText": "추천",
-      "description": "디지털 지갑 및 신원"
+      "description": "카드로 결제하고, 아이템을 관리하는 게임용 지갑입니다."
     },
     "metamask": {
       "heading": "MetaMask",
-      "description": "블록체인 애플리케이션 및 웹3에 액세스하기 위한 디지털 지갑"
+      "description": "블록체인 애플리케이션 및 web3에 접근하는 디지털 지갑입니다."
     },
     "walletconnect": {
       "heading": "기타 지갑",
-      "description": "MetaMask를 포함한 모든 블록체인 지갑에 연결할 수 있습니다"
+      "description": "MetaMask를 포함한 모든 블록체인 모바일 지갑에 연결할 수 있습니다."
     },
     "browserwallet": {
       "heading": "브라우저 지갑",
-      "description": "블록체인 애플리케이션 및 web3에 접근하기 위한 디지털 지갑"
-    }
+      "description": "블록체인 애플리케이션 및 web3에 접근하는 디지털 지갑입니다."
+    },
+    "recommended": "추천"
   },
   "drawers": {
     "feesBreakdown": {
@@ -583,14 +591,8 @@
     },
     "notEnoughGas": {
       "content": {
-        "eth": {
-          "heading": "잔액이 너무 낮습니다",
-          "body": "이 이동에 필요한 가스 수수료를 충당하기에 ETH 잔액이 너무 낮습니다. MetaMask를 직접 사용하여 지갑에 ETH를 더 이전할 수 있습니다."
-        },
-        "imx": {
-          "heading": "더 많은 IMX 코인이 필요할 것입니다",
-          "body": "지정된 금액의 수수료를 커버하기 위해 더 많은 IMX 코인을 추가해야 합니다"
-        }
+        "heading": "가스를 위해 {{token}}이 더 필요합니다",
+        "body": "이 작업에 필요한 가스 수수료를 지불하기 위해 {{token}} 잔액이 너무 낮습니다. 계속하기 전에 더 추가해야 합니다."
       },
       "buttons": {
         "adjustAmount": "금액 조정",
@@ -644,6 +646,18 @@
         "body": "{{chain}} 네트워크로 전환해야 합니다"
       },
       "switchButton": "{{chain}}로 전환하기"
+    },
+    "walletConnectionError": {
+      "unableToConnect": {
+        "heading": "연결할 수 없음",
+        "body": "지갑을 확인한 후 다시 시도하거나 닫고 다른 옵션을 시도하세요.",
+        "actionButtonText": "다시 시도"
+      },
+      "changedYourMind": {
+        "heading": "생각을 바꾸셨나요?",
+        "body": "팝업이 활성화되어 있는지 확인하고 지갑의 프롬프트를 따라 연결하세요.",
+        "actionButtonText": "다시 시도"
+      }
     }
   }
 }
