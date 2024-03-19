@@ -3,7 +3,7 @@
 set -e
 set -x
 
-if [ -z "VERSION" ]
+if [ -z "$VERSION" ]
 then
   echo "VERSION is not set"
   exit 1
