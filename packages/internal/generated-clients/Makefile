@@ -42,6 +42,7 @@ generate-mr-api-client:
     -o /app/src/multi-rollup \
     -c /app/config/mr.config.json
 
+# When running this command, ensure files not relevant to blockchain data are manually removed
 .PHONY: generate-blockchain-data-types
 generate-blockchain-data-types:
 	rm -rf src/blockchain-data && \
