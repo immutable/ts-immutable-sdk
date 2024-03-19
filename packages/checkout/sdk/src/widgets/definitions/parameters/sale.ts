@@ -25,7 +25,7 @@ export type SaleWidgetParams = {
   /** The language to use for the sales widget */
   language?: WidgetLanguage;
   /** The disabled payment types */
-  disabledPaymentTypes: SalePaymentTypes[];
+  disabledPaymentTypes?: SalePaymentTypes[];
 };
 
 /**
