@@ -267,17 +267,17 @@
         "crypto": {
           "heading": "Coins",
           "caption": "The fastest way to pay, if you have coins in your balance.",
-          "disabledCaption": "We can't see enough coins in your balance"
+          "disabledCaption": "Currently not available for this purchase"
         },
         "debit": {
           "heading": "Debit Card",
           "caption": "The recommended way to pay with card.",
-          "disabledCaption": null
+          "disabledCaption": "Currently working on improving this payment method for larger purchases"
         },
         "credit": {
           "heading": "Credit Card",
           "caption": "Not recommended since transactions may be blocked by your bank.",
-          "disabledCaption": null
+          "disabledCaption": "Currently working on improving this payment method for larger purchases"
         }
       },
       "topUp": {

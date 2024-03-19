@@ -53,6 +53,7 @@ type SaleContextProps = {
   provider: ConnectLoaderState['provider'];
   checkout: ConnectLoaderState['checkout'];
   passport?: Passport;
+  excludePaymentTypes: SalePaymentTypes[];
 };
 
 type SaleContextValues = SaleContextProps & {
@@ -126,6 +127,7 @@ const SaleContext = createContext<SaleContextValues>({
   fromTokenAddress: '',
   clientConfig: defaultClientConfig,
   signTokenIds: [],
+  excludePaymentTypes: [],
 });
 
 SaleContext.displayName = 'SaleSaleContext';
@@ -149,6 +151,7 @@ export function SaleContextProvider(props: {
       checkout,
       passport,
       collectionName,
+      excludePaymentTypes,
     },
   } = props;
 
@@ -169,7 +172,11 @@ export function SaleContextProvider(props: {
   const [fundingRoutes, setFundingRoutes] = useState<FundingRoute[]>([]);
   const [disabledPaymentTypes, setDisabledPaymentTypes] = useState<
   SalePaymentTypes[]
-  >([]);
+  >(excludePaymentTypes || []);
+
+  const disablePaymentTypes = (types: SalePaymentTypes[]) => {
+    setDisabledPaymentTypes((prev) => [...prev, ...types]);
+  };
 
   const [invalidParameters, setInvalidParameters] = useState<boolean>(false);
 
@@ -313,7 +320,7 @@ export function SaleContextProvider(props: {
       (smartCheckoutError.data?.error as Error)?.message
       === SmartCheckoutErrorTypes.FRACTIONAL_BALANCE_BLOCKED
     ) {
-      setDisabledPaymentTypes([SalePaymentTypes.CRYPTO]);
+      disablePaymentTypes([SalePaymentTypes.CRYPTO]);
       goBackToPaymentMethods(undefined);
       return;
     }
@@ -367,7 +374,7 @@ export function SaleContextProvider(props: {
         default:
           setFundingRoutes([]);
           setPaymentMethod(undefined);
-          setDisabledPaymentTypes([SalePaymentTypes.CRYPTO]);
+          disablePaymentTypes([SalePaymentTypes.CRYPTO]);
           goBackToPaymentMethods(undefined);
           break;
       }
@@ -382,6 +389,11 @@ export function SaleContextProvider(props: {
       setInvalidParameters(true);
     }
   }, [items, amount, collectionName, environmentId]);
+
+  useEffect(() => {
+    if (excludePaymentTypes?.length <= 0) return;
+    setDisabledPaymentTypes(excludePaymentTypes);
+  }, [excludePaymentTypes]);
 
   const values = useMemo(
     () => ({
@@ -415,6 +427,7 @@ export function SaleContextProvider(props: {
       invalidParameters,
       clientConfig,
       signTokenIds: tokenIds,
+      excludePaymentTypes,
     }),
     [
       config,
@@ -444,6 +457,7 @@ export function SaleContextProvider(props: {
       invalidParameters,
       clientConfig,
       tokenIds,
+      excludePaymentTypes,
     ],
   );
 

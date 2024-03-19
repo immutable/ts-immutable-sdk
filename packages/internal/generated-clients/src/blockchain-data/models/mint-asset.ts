@@ -24,7 +24,7 @@ import { NFTMetadataRequest } from './nftmetadata-request';
  */
 export interface MintAsset {
     /**
-     * The ID of this asset in the system that originates the mint request
+     * The id of this asset in the system that originates the mint request
      * @type {string}
      * @memberof MintAsset
      */
@@ -35,6 +35,12 @@ export interface MintAsset {
      * @memberof MintAsset
      */
     'owner_address': string;
+    /**
+     * An `uint256` token id as string. Including token_id is currently only possible on Testnet
+     * @type {string}
+     * @memberof MintAsset
+     */
+    'token_id'?: string | null;
     /**
      * 
      * @type {NFTMetadataRequest}
