@@ -9,18 +9,18 @@ function EthBalance() {
   const [loadingBalance, setLoadingBalance] = useState<boolean>(true);
 
   const { imxProvider } = usePassportProvider();
-  const { coreSdkClient } = useImmutableProvider();
+  const { sdkClient } = useImmutableProvider();
 
   useEffect(() => {
     const getEthBalance = async () => {
       const owner = await imxProvider?.getAddress() || '';
-      const balances = await coreSdkClient.getBalance({ owner, address: 'ETH' });
+      const balances = await sdkClient.getBalance({ owner, address: 'ETH' });
       setEthBalance(utils.formatEther(balances.balance));
       setLoadingBalance(false);
     };
 
     getEthBalance().catch(console.error);
-  }, [coreSdkClient, imxProvider]);
+  }, [sdkClient, imxProvider]);
 
   return (
     <Alert variant="info">
