@@ -155,16 +155,3 @@ export const filterSmartCheckoutResult = (
     },
   };
 };
-export const getFractionalBalance = (
-  smartCheckoutResult?: SmartCheckoutResult,
-): Record<ItemType, boolean> | undefined => {
-  if (!smartCheckoutResult) return undefined;
-
-  return smartCheckoutResult.transactionRequirements.reduce(
-    (acc, req) => ({
-      ...acc,
-      [req.type]: req.sufficient,
-    }),
-    {} as Record<ItemType, boolean>,
-  );
-};

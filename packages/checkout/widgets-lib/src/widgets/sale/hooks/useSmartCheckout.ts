@@ -1,49 +1,54 @@
 import { Web3Provider } from '@ethersproject/providers';
-import {
-  Checkout,
-  SaleItem,
-  SmartCheckoutResult,
-} from '@imtbl/checkout-sdk';
+import { Checkout, SaleItem, SmartCheckoutResult } from '@imtbl/checkout-sdk';
 import { useCallback, useState } from 'react';
 import {
-  SaleErrorTypes, SmartCheckoutError, SmartCheckoutErrorTypes,
+  SaleErrorTypes,
+  SmartCheckoutError,
+  SmartCheckoutErrorTypes,
 } from '../types';
 import {
-  filterSmartCheckoutResult, getFractionalBalance, getGasEstimate, getItemRequirements,
+  filterSmartCheckoutResult, getGasEstimate,
+  getItemRequirements,
 } from '../functions/smartCheckoutUtils';
 
 type UseSmartCheckoutInput = {
   checkout: Checkout | undefined;
   provider: Web3Provider | undefined;
-  items: SaleItem[],
-  amount: string,
-  tokenAddress: string,
+  items: SaleItem[];
+  amount: string;
+  tokenAddress: string;
 };
 
 export const useSmartCheckout = ({
-  checkout, provider, items, amount, tokenAddress,
+  checkout,
+  provider,
+  items,
+  amount,
+  tokenAddress,
 }: UseSmartCheckoutInput) => {
-  const [smartCheckoutResult, setSmartCheckoutResult] = useState<SmartCheckoutResult | undefined>(
-    undefined,
-  );
-  const [smartCheckoutError, setSmartCheckoutError] = useState<SmartCheckoutError | undefined>(
-    undefined,
-  );
+  const [smartCheckoutResult, setSmartCheckoutResult] = useState<
+  SmartCheckoutResult | undefined
+  >(undefined);
+  const [smartCheckoutError, setSmartCheckoutError] = useState<
+  SmartCheckoutError | undefined
+  >(undefined);
 
   const smartCheckout = useCallback(async () => {
     let finalSmartCheckoutResult: SmartCheckoutResult | undefined;
     try {
       const signer = provider?.getSigner();
-      const spenderAddress = await signer?.getAddress() || '';
-      const itemRequirements = getItemRequirements(amount, spenderAddress, tokenAddress);
-      const gasEstimate = getGasEstimate();
-      const result = await checkout?.smartCheckout(
-        {
-          provider: provider!,
-          itemRequirements,
-          transactionOrGasAmount: gasEstimate,
-        },
+      const spenderAddress = (await signer?.getAddress()) || '';
+      const itemRequirements = getItemRequirements(
+        amount,
+        spenderAddress,
+        tokenAddress,
       );
+      const gasEstimate = getGasEstimate();
+      const result = await checkout?.smartCheckout({
+        provider: provider!,
+        itemRequirements,
+        transactionOrGasAmount: gasEstimate,
+      });
 
       if (!result) {
         throw new Error();
@@ -53,7 +58,10 @@ export const useSmartCheckout = ({
       // balances will be blocked and routed tru the add coins flow
       // FIXME: filtering smart checkout result won't be necessary
       // once smart checkout allows to skip gas checks and passing disabled funding routes
-      finalSmartCheckoutResult = filterSmartCheckoutResult({ ...result }, provider);
+      finalSmartCheckoutResult = filterSmartCheckoutResult(
+        { ...result },
+        provider,
+      );
       if (!finalSmartCheckoutResult.sufficient) {
         throw new Error(SmartCheckoutErrorTypes.FRACTIONAL_BALANCE_BLOCKED);
       }
@@ -62,10 +70,13 @@ export const useSmartCheckout = ({
 
       return result;
     } catch (error: any) {
-      const fractionalBalance = getFractionalBalance(finalSmartCheckoutResult);
       setSmartCheckoutError({
         type: SaleErrorTypes.SMART_CHECKOUT_ERROR,
-        data: { error, fractionalBalance },
+        data: {
+          error,
+          transactionRequirements:
+            finalSmartCheckoutResult?.transactionRequirements,
+        },
       });
     }
 
@@ -73,6 +84,8 @@ export const useSmartCheckout = ({
   }, [checkout, provider, items, amount, tokenAddress]);
 
   return {
-    smartCheckout, smartCheckoutResult, smartCheckoutError,
+    smartCheckout,
+    smartCheckoutResult,
+    smartCheckoutError,
   };
 };

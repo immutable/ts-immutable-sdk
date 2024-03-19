@@ -20,9 +20,10 @@ import { PaymentOptions } from '../components/PaymentOptions';
 import { useSaleContext } from '../context/SaleContextProvider';
 import { useSaleEvent } from '../hooks/useSaleEvents';
 import { SaleErrorTypes, SignPaymentTypes } from '../types';
-import { InsufficientCoinsBanner } from '../components/InsufficientCoinsBanner';
+import { useInsufficientBalance } from '../hooks/useInsufficientBalance';
 
 export function PaymentMethods() {
+  useInsufficientBalance();
   const { t } = useTranslation();
   const { viewDispatch } = useContext(ViewContext);
   const {
@@ -120,7 +121,6 @@ export function PaymentMethods() {
             onClick={handleOptionClick}
           />
         </Box>
-        <InsufficientCoinsBanner />
       </Box>
     </SimpleLayout>
   );
