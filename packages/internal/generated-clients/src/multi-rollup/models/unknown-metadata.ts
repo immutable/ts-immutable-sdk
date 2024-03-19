@@ -17,14 +17,21 @@
 /**
  * 
  * @export
- * @interface RefreshMetadataByIDAllOf
+ * @interface UnknownMetadata
  */
-export interface RefreshMetadataByIDAllOf {
+export interface UnknownMetadata {
     /**
-     * Metadata id in UUIDv4 format
+     * Transaction type
      * @type {string}
-     * @memberof RefreshMetadataByIDAllOf
+     * @memberof UnknownMetadata
      */
-    'metadata_id': string;
+    'transaction_type': UnknownMetadataTransactionTypeEnum;
 }
+
+export const UnknownMetadataTransactionTypeEnum = {
+    Unknown: 'UNKNOWN'
+} as const;
+
+export type UnknownMetadataTransactionTypeEnum = typeof UnknownMetadataTransactionTypeEnum[keyof typeof UnknownMetadataTransactionTypeEnum];
+
 
