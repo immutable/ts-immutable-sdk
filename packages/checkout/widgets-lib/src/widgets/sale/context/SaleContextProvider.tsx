@@ -53,7 +53,6 @@ type SaleContextProps = {
   provider: ConnectLoaderState['provider'];
   checkout: ConnectLoaderState['checkout'];
   passport?: Passport;
-  disabledPaymentTypes: SalePaymentTypes[];
   excludePaymentTypes: SalePaymentTypes[];
 };
 
@@ -88,6 +87,7 @@ type SaleContextValues = SaleContextProps & {
   smartCheckoutResult: SmartCheckoutResult | undefined;
   smartCheckoutError: SmartCheckoutError | undefined;
   fundingRoutes: FundingRoute[];
+  disabledPaymentTypes: SalePaymentTypes[];
   invalidParameters: boolean;
   fromTokenAddress: string;
   clientConfig: ClientConfig;
