@@ -35,6 +35,9 @@ jobs:
       - name: Typecheck
         run: yarn typecheck
 
+      - name: Build passport sample app
+        run: yarn workspace @imtbl/passport-sdk-sample-app build
+
   test:
     name: Test
     runs-on: ubuntu-latest-4-cores

@@ -13,7 +13,7 @@ import { usePassportProvider } from '@/context/PassportProvider';
 import ViewOffersModal from '@/components/imx/ViewOffersModal';
 import { MARKETPLACE_FEE_PERCENTAGE, MARKETPLACE_FEE_RECIPIENT } from '@/config';
 
-type OrderType = imx.Order; 
+type OrderType = imx.Order;
 type AssetWithSellOrder = { asset: imx.Asset; sellOrder?: OrderType; };
 type AssetWithOffer = { asset: imx.TokenData; offerOrder?: OrderType; };
 
@@ -32,12 +32,12 @@ function Order({ showModal, setShowModal }: ModalProps) {
 
   const { addMessage } = useStatusProvider();
   const { imxProvider } = usePassportProvider();
-  const { coreSdkClient } = useImmutableProvider();
+  const { sdkClient } = useImmutableProvider();
 
   const getUserAssetsWithOrder = useCallback(async () => {
     const imxWalletAddress = await imxProvider?.getAddress();
-    const assets = await coreSdkClient.listAssets({ user: imxWalletAddress });
-    const orders = await coreSdkClient.listOrders({
+    const assets = await sdkClient.listAssets({ user: imxWalletAddress });
+    const orders = await sdkClient.listOrders({
       user: imxWalletAddress,
       status: 'active',
       auxiliaryFeePercentages: MARKETPLACE_FEE_PERCENTAGE.toString(),
@@ -59,7 +59,7 @@ function Order({ showModal, setShowModal }: ModalProps) {
       sellAssets: sellOrders,
       offerAssets: assetsWithOffers,
     };
-  }, [coreSdkClient, imxProvider]);
+  }, [sdkClient, imxProvider]);
 
   useEffect(() => {
     if (showModal) {

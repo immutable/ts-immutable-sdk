@@ -22,18 +22,18 @@ function Trade({ showModal: showTradeModal, setShowModal: setShowTradeModal }: M
   const [showMakeOffer, setShowMakeOffer] = useState<boolean>(false);
 
   const { addMessage } = useStatusProvider();
-  const { coreSdkClient } = useImmutableProvider();
+  const { sdkClient } = useImmutableProvider();
   const { imxProvider } = usePassportProvider();
 
   const getOrders = async (e?: React.FormEvent<HTMLFormElement>) => {
     e?.preventDefault();
     e?.stopPropagation();
 
-    if (coreSdkClient && showTradeModal) {
+    if (sdkClient && showTradeModal) {
       setLoadingOrders(true);
       setOrders([]);
 
-      const result = await coreSdkClient.listOrders({
+      const result = await sdkClient.listOrders({
         status: 'active',
         orderBy: 'updated_at',
         direction: 'desc',
@@ -49,7 +49,7 @@ function Trade({ showModal: showTradeModal, setShowModal: setShowTradeModal }: M
 
   useEffect(() => {
     getOrders().catch(console.error);
-  }, [showTradeModal, coreSdkClient]);
+  }, [showTradeModal, sdkClient]);
 
   const handleCloseTrade = () => {
     setLoadingTrade(false);

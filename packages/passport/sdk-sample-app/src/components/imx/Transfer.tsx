@@ -31,18 +31,18 @@ function Transfer({ showModal, setShowModal }: ModalProps) {
 
   const { addMessage } = useStatusProvider();
   const { imxProvider } = usePassportProvider();
-  const { coreSdkClient } = useImmutableProvider();
+  const { sdkClient } = useImmutableProvider();
 
   useEffect(() => {
     setLoadingAssets(true);
     const getAssets = async () => {
       const imxWalletAddress = await imxProvider?.getAddress();
-      const result = await coreSdkClient.listAssets({ user: imxWalletAddress });
+      const result = await sdkClient.listAssets({ user: imxWalletAddress });
       setAssets(result.result);
       setLoadingAssets(false);
     };
     getAssets().catch(console.log);
-  }, [coreSdkClient, imxProvider]);
+  }, [sdkClient, imxProvider]);
 
   useEffect(() => {
     (async () => {
@@ -51,12 +51,12 @@ function Transfer({ showModal, setShowModal }: ModalProps) {
         setAssets([]);
 
         const imxWalletAddress = await imxProvider?.getAddress();
-        const result = await coreSdkClient.listAssets({ user: imxWalletAddress });
+        const result = await sdkClient.listAssets({ user: imxWalletAddress });
         setAssets(result.result);
         setLoadingAssets(false);
       }
     })();
-  }, [showModal, coreSdkClient, imxProvider]);
+  }, [showModal, sdkClient, imxProvider]);
 
   const resetForm = () => {
     setToken(TokenType.ERC721Token);
