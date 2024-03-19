@@ -34,11 +34,11 @@ export const useInsufficientBalance = () => {
     // FIXME: Get token symbols from requirements (ie. erc20.symbol)
     const balances = {
       erc20: {
-        value: erc20?.required.formattedBalance,
+        value: erc20?.delta.formattedBalance,
         symbol: 'USDC',
       },
       native: {
-        value: native?.required.formattedBalance,
+        value: native?.delta.formattedBalance,
         symbol: 'IMX',
       },
     };
