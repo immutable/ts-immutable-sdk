@@ -54,6 +54,7 @@ type SaleContextProps = {
   checkout: ConnectLoaderState['checkout'];
   passport?: Passport;
   disabledPaymentTypes: SalePaymentTypes[];
+  excludePaymentTypes: SalePaymentTypes[];
 };
 
 type SaleContextValues = SaleContextProps & {
@@ -126,6 +127,7 @@ const SaleContext = createContext<SaleContextValues>({
   fromTokenAddress: '',
   clientConfig: defaultClientConfig,
   signTokenIds: [],
+  excludePaymentTypes: [],
 });
 
 SaleContext.displayName = 'SaleSaleContext';
@@ -149,7 +151,7 @@ export function SaleContextProvider(props: {
       checkout,
       passport,
       collectionName,
-      disabledPaymentTypes: initialDisabledPaymentTypes,
+      excludePaymentTypes,
     },
   } = props;
 
@@ -170,7 +172,7 @@ export function SaleContextProvider(props: {
   const [fundingRoutes, setFundingRoutes] = useState<FundingRoute[]>([]);
   const [disabledPaymentTypes, setDisabledPaymentTypes] = useState<
   SalePaymentTypes[]
-  >(initialDisabledPaymentTypes || []);
+  >(excludePaymentTypes || []);
 
   const disablePaymentTypes = (types: SalePaymentTypes[]) => {
     setDisabledPaymentTypes((prev) => [...prev, ...types]);
@@ -389,9 +391,9 @@ export function SaleContextProvider(props: {
   }, [items, amount, collectionName, environmentId]);
 
   useEffect(() => {
-    if (initialDisabledPaymentTypes?.length <= 0) return;
-    setDisabledPaymentTypes(initialDisabledPaymentTypes);
-  }, [initialDisabledPaymentTypes]);
+    if (excludePaymentTypes?.length <= 0) return;
+    setDisabledPaymentTypes(excludePaymentTypes);
+  }, [excludePaymentTypes]);
 
   const values = useMemo(
     () => ({
@@ -425,6 +427,7 @@ export function SaleContextProvider(props: {
       invalidParameters,
       clientConfig,
       signTokenIds: tokenIds,
+      excludePaymentTypes,
     }),
     [
       config,
@@ -454,6 +457,7 @@ export function SaleContextProvider(props: {
       invalidParameters,
       clientConfig,
       tokenIds,
+      excludePaymentTypes,
     ],
   );
 

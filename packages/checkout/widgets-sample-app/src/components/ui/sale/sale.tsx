@@ -32,14 +32,14 @@ const useParams = () => {
   const amount = urlParams.get('amount') as string;
   const environmentId = urlParams.get('environmentId') as string;
   const collectionName = urlParams.get('collectionName') as string;
-  const disabledPaymentTypes = urlParams.get('disabledPaymentTypes')?.split(',') as SalePaymentTypes[];
+  const excludePaymentTypes = urlParams.get('excludePaymentTypes')?.split(',') as SalePaymentTypes[];
 
   return {
     login,
     amount,
     environmentId,
     collectionName,
-    disabledPaymentTypes,
+    excludePaymentTypes,
   };
 };
 
@@ -74,7 +74,7 @@ const usePassportInstance = (passportConfig: any) => {
 export function SaleUI() {
   const params = useParams();
   const { 
-    login, amount, environmentId, collectionName, disabledPaymentTypes
+    login, amount, environmentId, collectionName, excludePaymentTypes
   } = params;
   const [passportConfig, setPassportConfig] = useState(
     JSON.stringify(defaultPassportConfig, null, 2),
@@ -104,7 +104,7 @@ export function SaleUI() {
       environmentId,
       collectionName,
       items: defaultItems,
-      disabledPaymentTypes,
+      excludePaymentTypes,
     });
     saleWidget.addListener(SaleEventType.CLOSE_WIDGET, () => { saleWidget.unmount()})
 
@@ -196,7 +196,7 @@ export function SaleUI() {
       environmentId,
       collectionName,
       items: defaultItems,
-      disabledPaymentTypes
+      excludePaymentTypes
     })}>Mount</button>
     <button onClick={() => saleWidget.unmount()}>Unmount</button>
     <button onClick={() => saleWidget.update({config: {theme: WidgetTheme.LIGHT}})}>Update Config Light</button>

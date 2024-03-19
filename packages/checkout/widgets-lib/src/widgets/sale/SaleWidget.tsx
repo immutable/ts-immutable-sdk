@@ -39,7 +39,7 @@ import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsPr
 import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 
-type OptionalWidgetParams = Pick<SaleWidgetParams, 'disabledPaymentTypes'>;
+type OptionalWidgetParams = Pick<SaleWidgetParams, 'excludePaymentTypes'>;
 type RequiredWidgetParams = Required<Omit<SaleWidgetParams, 'walletProviderName'>>;
 
 type WidgetParams = RequiredWidgetParams & OptionalWidgetParams;
@@ -55,7 +55,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
     items,
     environmentId,
     collectionName,
-    disabledPaymentTypes,
+    excludePaymentTypes,
   } = props;
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
@@ -121,7 +121,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
           checkout,
           passport: checkout?.passport,
           collectionName,
-          disabledPaymentTypes,
+          excludePaymentTypes,
         }}
       >
         <CryptoFiatProvider environment={config.environment}>
