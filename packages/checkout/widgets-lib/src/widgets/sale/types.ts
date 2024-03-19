@@ -1,5 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { SaleItem, ItemType } from '@imtbl/checkout-sdk';
+import { SaleItem, TransactionRequirement } from '@imtbl/checkout-sdk';
 
 export type SignedOrderProduct = {
   productId: string;
@@ -59,7 +59,7 @@ export type SmartCheckoutError = {
   type: SaleErrorTypes;
   data?: {
     error: Error;
-    fractionalBalance?: Record<ItemType, boolean>
+    transactionRequirements?: TransactionRequirement[];
   }
 };
 

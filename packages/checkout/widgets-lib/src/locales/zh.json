@@ -284,9 +284,13 @@
           "disabledCaption": null
         }
       },
-      "insufficientCoinsBanner": {
-        "caption": "硬币余额不足。请使用卡支付，或 <cta>添加硬币</cta> 再试一次。",
-        "gasCaption": "IMX 币不足以支付汽油费。请使用卡支付，或 <cta>添加硬币</cta> 再试一次。"
+      "topUp": {
+        "heading": "您需要添加一些硬币",
+        "subheading": {
+          "both": "添加{{erc20.value}} {{erc20.symbol}}和{{native.value}} {{native.symbol}}以支付本次购买及燃气费。",
+          "erc20": "通过以下选项之一将{{erc20.value}} {{erc20.symbol}}添加到您的余额。",
+          "native": "通过以下选项之一，为燃气添加{{native.value}} {{native.symbol}}。"
+        }
       },
       "loading": {
         "ready1": "正在收集您的订单",
@@ -350,7 +354,7 @@
           "secondaryAction": "取消"
         },
         "WALLET_POPUP_BLOCKED": {
-          "description": "您需要允许浏览器中的弹出窗口才能继续。", 
+          "description": "您需要允许浏览器中的弹出窗口才能继续。",
           "primaryAction": "我已经解决了这个问题，再试一次",
           "secondaryAction": "取消"
         },
@@ -649,14 +653,14 @@
     },
     "walletConnectionError": {
       "unableToConnect": {
-          "heading": "无法连接",
-          "body": "请检查您的钱包并重试，或关闭并尝试其他选项。",
-          "actionButtonText": "重试"
+        "heading": "无法连接",
+        "body": "请检查您的钱包并重试，或关闭并尝试其他选项。",
+        "actionButtonText": "重试"
       },
       "changedYourMind": {
-          "heading": "改变主意了吗？",
-          "body": "确保弹出窗口已启用，并按照钱包中的提示进行连接。",
-          "actionButtonText": "重试"
+        "heading": "改变主意了吗？",
+        "body": "确保弹出窗口已启用，并按照钱包中的提示进行连接。",
+        "actionButtonText": "重试"
       }
     }
   }

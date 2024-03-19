@@ -11,35 +11,8 @@ import {
 } from '@imtbl/checkout-sdk';
 import {
   filterSmartCheckoutResult,
-  fundingRouteFees,
-  getFractionalBalance,
-  smartCheckoutTokensList,
+  fundingRouteFees, smartCheckoutTokensList,
 } from './smartCheckoutUtils';
-
-describe('getFractionalBalance', () => {
-  it('should return map insufficient balances', async () => {
-    const insufficientSmartCheckoutResult = {
-      sufficient: false,
-      transactionRequirements: [
-        {
-          sufficient: false,
-          type: ItemType.NATIVE,
-        },
-        {
-          sufficient: true,
-          type: ItemType.ERC20,
-        },
-      ],
-      router: {},
-    } as unknown as SmartCheckoutResult;
-
-    const fractionalBalance = getFractionalBalance(insufficientSmartCheckoutResult);
-    expect(fractionalBalance).toEqual({
-      [ItemType.NATIVE]: false,
-      [ItemType.ERC20]: true,
-    });
-  });
-});
 
 describe('fundingRouteFees', () => {
   const ethFee = {
