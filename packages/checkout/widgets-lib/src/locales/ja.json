@@ -274,17 +274,17 @@
         "crypto": {
           "heading": "コイン",
           "caption": "残高にコインがある場合、最も速い支払い方法です。",
-          "disabledCaption": "残高に十分なコインが見つかりません"
+          "disabledCaption": "現在、この支払い方法は利用できません。"
         },
         "debit": {
           "heading": "デビットカード",
           "caption": "カードでの支払いに推奨される方法です。",
-          "disabledCaption": null
+          "disabledCaption": "現在、高額購入向けにこの支払い方法の改善に取り組んでいます。"
         },
         "credit": {
           "heading": "クレジットカード",
           "caption": "銀行によって取引がブロックされる可能性があるため、推奨されません。",
-          "disabledCaption": null
+          "disabledCaption": "現在、高額購入向けにこの支払い方法の改善に取り組んでいます。"
         }
       },
       "topUp": {
