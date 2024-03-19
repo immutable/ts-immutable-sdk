@@ -51,6 +51,8 @@ export class FiatRampService {
       exchangeScreenTitle: 'Buy',
       themeColor: '0D0D0D',
       defaultFiatCurrency: 'usd',
+      defaultFiatAmount: '50',
+      defaultCryptoCurrency: params.tokenSymbol || 'IMX',
     };
 
     if (params.isPassport && params.email) {
@@ -67,18 +69,6 @@ export class FiatRampService {
         ...widgetParams,
         defaultCryptoAmount: params.tokenAmount,
         cryptoCurrencyCode: params.tokenSymbol,
-      };
-    } else if (params.tokenSymbol) {
-      widgetParams = {
-        ...widgetParams,
-        defaultFiatAmount: '50',
-        defaultCryptoCurrency: params.tokenSymbol,
-      };
-    } else {
-      widgetParams = {
-        ...widgetParams,
-        defaultFiatAmount: '50',
-        defaultCryptoCurrency: 'IMX',
       };
     }
 
