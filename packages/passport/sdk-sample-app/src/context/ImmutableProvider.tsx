@@ -1,15 +1,10 @@
 import React, {
   createContext, useContext, useEffect, useMemo, useState,
 } from 'react';
-import { 
-  createImmutableXConfiguration, 
-  IMXClient,
-  ImmutableX,
-  production, 
-  sandbox,
-} from '@imtbl/x-client';
+import { Config, ImmutableX } from '@imtbl/core-sdk';
 import { Passport, PassportModuleConfiguration } from '@imtbl/passport';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
+import { IMXClient } from '@imtbl/x-client';
 import {
   AUDIENCE,
   LOGOUT_REDIRECT_URI,
@@ -22,16 +17,16 @@ import { EnvironmentNames } from '@/types';
 import useLocalStorage from '@/hooks/useLocalStorage';
 import { ImxApiClients, createConfig } from '@imtbl/generated-clients';
 
-const getSdkConfig = (environment: EnvironmentNames) => {
+const getCoreSdkConfig = (environment: EnvironmentNames) => {
   switch (environment) {
     case EnvironmentNames.PRODUCTION: {
-      return production({});
+      return Config.PRODUCTION;
     }
     case EnvironmentNames.SANDBOX: {
-      return sandbox({});
+      return Config.SANDBOX;
     }
     case EnvironmentNames.DEV: {
-      return createImmutableXConfiguration({
+      return Config.createConfig({
         basePath: 'https://api.dev.x.immutable.com',
         chainID: 5,
         coreContractAddress: '0xd05323731807A35599BF9798a1DE15e89d6D6eF1',
@@ -93,7 +88,7 @@ const getPassportConfig = (environment: EnvironmentNames): PassportModuleConfigu
           immutableXClient: new IMXClient({
             baseConfig,
             overrides: {
-              immutableXConfig: getSdkConfig(EnvironmentNames.DEV),
+              immutableXConfig: getCoreSdkConfig(EnvironmentNames.DEV),
             },
           }),
           zkEvmRpcUrl: 'https://rpc.dev.immutable.com',
@@ -113,11 +108,11 @@ const getPassportConfig = (environment: EnvironmentNames): PassportModuleConfigu
 
 const ImmutableContext = createContext<{
   passportClient: Passport,
-  sdkClient: ImmutableX,
+  coreSdkClient: ImmutableX,
   environment: EnvironmentNames,
   setEnvironment?:(environment: EnvironmentNames) => void;
 }>({
-      sdkClient: new ImmutableX(getSdkConfig(EnvironmentNames.DEV)),
+      coreSdkClient: new ImmutableX(getCoreSdkConfig(EnvironmentNames.DEV)),
       passportClient: new Passport(getPassportConfig(EnvironmentNames.DEV)),
       environment: EnvironmentNames.DEV,
     });
@@ -129,24 +124,24 @@ export function ImmutableProvider({
     'IMX_PASSPORT_SAMPLE_ENVIRONMENT',
     useContext(ImmutableContext).environment,
   );
-  const [sdkClient, setSdkClient] = useState<ImmutableX>(
-    useContext(ImmutableContext).sdkClient,
+  const [coreSdkClient, setCoreSdkClient] = useState<ImmutableX>(
+    useContext(ImmutableContext).coreSdkClient,
   );
   const [passportClient, setPassportClient] = useState<Passport>(
     useContext(ImmutableContext).passportClient,
   );
 
   useEffect(() => {
-    setSdkClient(new ImmutableX(getSdkConfig(environment)));
+    setCoreSdkClient(new ImmutableX(getCoreSdkConfig(environment)));
     setPassportClient(new Passport(getPassportConfig(environment)));
   }, [environment]);
 
   const providerValues = useMemo(() => ({
-    sdkClient,
+    coreSdkClient,
     passportClient,
     environment,
     setEnvironment,
-  }), [sdkClient, passportClient, environment, setEnvironment]);
+  }), [coreSdkClient, passportClient, environment, setEnvironment]);
 
   return (
     <ImmutableContext.Provider value={providerValues}>
@@ -157,9 +152,9 @@ export function ImmutableProvider({
 
 export function useImmutableProvider() {
   const {
-    sdkClient: sdkClient, passportClient, environment, setEnvironment,
+    coreSdkClient, passportClient, environment, setEnvironment,
   } = useContext(ImmutableContext);
   return {
-    sdkClient, passportClient, environment, setEnvironment,
+    coreSdkClient, passportClient, environment, setEnvironment,
   };
 }

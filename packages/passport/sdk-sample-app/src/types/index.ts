@@ -5,7 +5,7 @@ import {
   ComponentType,
 } from 'react';
 import { RequestArguments } from '@imtbl/passport';
-import { imx } from '@imtbl/generated-clients';
+import { Order } from '@imtbl/core-sdk';
 
 export enum EnvironmentNames {
   DEV = 'dev',
@@ -27,7 +27,7 @@ export interface ModalProps {
 }
 
 export interface MakeOfferModalProps extends ModalProps {
-  order?: imx.Order;
+  order?: Order;
   onClose?: () => void;
 }
 
