@@ -18,7 +18,7 @@ function ViewOffersModal({
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [offers, setOffers] = useState<Array<imx.OrderV3>>([]);
 
-  const { coreSdkClient } = useImmutableProvider();
+  const { sdkClient } = useImmutableProvider();
   const { imxProvider } = usePassportProvider();
   const { addMessage } = useStatusProvider();
 
@@ -37,7 +37,7 @@ function ViewOffersModal({
     const onMount = async () => {
       try {
         setIsLoading(true);
-        const result = await coreSdkClient.listOrders({
+        const result = await sdkClient.listOrders({
           buyTokenAddress,
           buyTokenId,
           orderBy: 'sell_quantity',
@@ -58,7 +58,7 @@ function ViewOffersModal({
     onMount()
       .catch(console.error)
       .finally(() => setIsLoading(false));
-  }, [addMessage, buyTokenAddress, buyTokenId, coreSdkClient, handleClose]);
+  }, [addMessage, buyTokenAddress, buyTokenId, sdkClient, handleClose]);
 
   const acceptOffer = async (orderId: number) => {
     setIsLoading(true);
