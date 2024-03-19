@@ -271,17 +271,17 @@
         "crypto": {
           "heading": "硬币",
           "caption": "如果您的余额中有硬币，这是最快的支付方式。",
-          "disabledCaption": "我们看不到您的余额中有足够的硬币"
+          "disabledCaption": "目前无法进行此购买。" 
         },
         "debit": {
           "heading": "借记卡",
           "caption": "使用卡支付的推荐方式。",
-          "disabledCaption": null
+          "disabledCaption": "目前正在努力改进这种大额采购的支付方式。" 
         },
         "credit": {
           "heading": "信用卡",
           "caption": "不推荐使用，因为您的银行可能会阻止交易。",
-          "disabledCaption": null
+          "disabledCaption": "目前正在努力改进这种大额采购的支付方式。"
         }
       },
       "topUp": {

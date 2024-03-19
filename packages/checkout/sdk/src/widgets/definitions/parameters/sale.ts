@@ -1,5 +1,6 @@
 import { WalletProviderName } from '../../../types';
 import { WidgetLanguage } from '../configurations';
+import { SalePaymentTypes } from '../events/sale';
 
 // Fixme: In SaleWidgetParams pass environmentId through from sdk when it is sorted with hub
 
@@ -23,6 +24,8 @@ export type SaleWidgetParams = {
   walletProviderName?: WalletProviderName;
   /** The language to use for the sales widget */
   language?: WidgetLanguage;
+  /** The disabled payment types */
+  disabledPaymentTypes: SalePaymentTypes[];
 };
 
 /**

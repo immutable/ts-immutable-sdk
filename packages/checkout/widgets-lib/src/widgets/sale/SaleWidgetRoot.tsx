@@ -88,6 +88,12 @@ export class Sale extends Base<WidgetType.SALE> {
       validatedParams.collectionName = '';
     }
 
+    if (params.disabledPaymentTypes !== undefined && !Array.isArray(params.disabledPaymentTypes)) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "disabledPaymentTypes" widget input');
+      validatedParams.disabledPaymentTypes = [];
+    }
+
     return validatedParams;
   }
 
@@ -123,6 +129,7 @@ export class Sale extends Base<WidgetType.SALE> {
                   items={this.parameters.items!}
                   environmentId={this.parameters.environmentId!}
                   collectionName={this.parameters.collectionName!}
+                  disabledPaymentTypes={this.parameters.disabledPaymentTypes}
                   language="en"
                 />
               </Suspense>
