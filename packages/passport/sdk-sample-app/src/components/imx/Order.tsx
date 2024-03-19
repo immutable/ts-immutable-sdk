@@ -4,8 +4,9 @@ import {
   Alert, Button, Form, Image, InputGroup, Offcanvas, Spinner, Stack, Table,
 } from 'react-bootstrap';
 import { Heading } from '@biom3/react';
-import { imx } from '@imtbl/generated-clients';
-import { UnsignedOrderRequest } from '@imtbl/x-client';
+import {
+  Asset, Order as OrderType, TokenData, UnsignedOrderRequest,
+} from '@imtbl/core-sdk';
 import { ModalProps } from '@/types';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { useStatusProvider } from '@/context/StatusProvider';
@@ -13,9 +14,8 @@ import { usePassportProvider } from '@/context/PassportProvider';
 import ViewOffersModal from '@/components/imx/ViewOffersModal';
 import { MARKETPLACE_FEE_PERCENTAGE, MARKETPLACE_FEE_RECIPIENT } from '@/config';
 
-type OrderType = imx.Order; 
-type AssetWithSellOrder = { asset: imx.Asset; sellOrder?: OrderType; };
-type AssetWithOffer = { asset: imx.TokenData; offerOrder?: OrderType; };
+type AssetWithSellOrder = { asset: Asset; sellOrder?: OrderType; };
+type AssetWithOffer = { asset: TokenData; offerOrder?: OrderType; };
 
 type AssetsWithOrders = {
   sellAssets: AssetWithSellOrder[];
@@ -92,7 +92,7 @@ function Order({ showModal, setShowModal }: ModalProps) {
     }
   }, [imxProvider, handleClose, addMessage]);
 
-  const createOrder = useCallback(async (asset: imx.Asset) => {
+  const createOrder = useCallback(async (asset: Asset) => {
     setLoading(true);
     const request: UnsignedOrderRequest = {
       buy: {

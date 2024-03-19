@@ -1,5 +1,5 @@
 import { isAxiosError } from 'axios';
-import { imx } from '@imtbl/generated-clients';
+import { APIError } from '@imtbl/core-sdk';
 
 export enum PassportErrorType {
   AUTHENTICATION_ERROR = 'AUTHENTICATION_ERROR',
@@ -19,7 +19,7 @@ export enum PassportErrorType {
   OPERATION_NOT_SUPPORTED_ERROR = 'OPERATION_NOT_SUPPORTED_ERROR',
 }
 
-function isAPIError(error: any): error is imx.APIError {
+function isAPIError(error: any): error is APIError {
   return 'code' in error && 'message' in error;
 }
 

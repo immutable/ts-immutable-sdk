@@ -1,12 +1,12 @@
 import {
-  createStarkSigner,
   generateLegacyStarkPrivateKey,
-} from '@imtbl/x-client';
+  createStarkSigner,
+} from '@imtbl/core-sdk';
 import { ethers } from 'ethers';
 import { getStarkSigner } from './getStarkSigner';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 
-jest.mock('@imtbl/x-client');
+jest.mock('@imtbl/core-sdk');
 
 describe('getStarkSigner', () => {
   const privateKey = '0x610855bbd7dad4efa59587e97041baa5ec96d483cac2ae78f2c2fb124fc391c1';

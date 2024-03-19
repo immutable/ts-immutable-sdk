@@ -8,8 +8,7 @@ import {
   Alert, Button, Card, Form, Image, Offcanvas, Spinner, Stack, Table,
 } from 'react-bootstrap';
 import { Heading } from '@biom3/react';
-import { imx } from '@imtbl/generated-clients';
-import { NftTransferDetails } from '@imtbl/x-client';
+import { Asset, NftTransferDetails } from '@imtbl/core-sdk';
 import { ModalProps } from '@/types';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { usePassportProvider } from '@/context/PassportProvider';
@@ -26,7 +25,7 @@ function BulkTransfer({ showModal, setShowModal }: ModalProps) {
   const [isInvalid, setInvalid] = useState<boolean | undefined>(undefined);
   const [loadingTransfer, setLoadingTransfer] = useState<boolean>(false);
   const [loadingAssets, setLoadingAssets] = useState<boolean>(false);
-  const [assets, setAssets] = useState<imx.Asset[]>([]);
+  const [assets, setAssets] = useState<Asset[]>([]);
   const [transfers, setTransfers] = useState<Partial<Transfer>[]>([{}]);
 
   const { addMessage } = useStatusProvider();

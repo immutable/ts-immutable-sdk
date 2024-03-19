@@ -7,7 +7,7 @@ import React, { useState } from 'react';
 import { utils } from 'ethers';
 import WorkflowButton from '@/components/WorkflowButton';
 import { usePassportProvider } from '@/context/PassportProvider';
-import { UnsignedOrderRequest } from '@imtbl/x-client';
+import { UnsignedOrderRequest } from '@imtbl/core-sdk';
 import { useStatusProvider } from '@/context/StatusProvider';
 import { MARKETPLACE_FEE_PERCENTAGE, MARKETPLACE_FEE_RECIPIENT } from '@/config';
 
