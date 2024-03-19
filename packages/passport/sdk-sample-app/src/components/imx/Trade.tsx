@@ -4,7 +4,7 @@ import {
   Alert, Button, Form, Image, Offcanvas, Spinner, Stack, Table,
 } from 'react-bootstrap';
 import { Heading, TextInput } from '@biom3/react';
-import { imx } from '@imtbl/generated-clients';
+import { GetSignableTradeRequest, Order } from '@imtbl/core-sdk';
 import { ModalProps } from '@/types';
 import { usePassportProvider } from '@/context/PassportProvider';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
@@ -16,7 +16,7 @@ import { MARKETPLACE_FEE_PERCENTAGE, MARKETPLACE_FEE_RECIPIENT } from '@/config'
 function Trade({ showModal: showTradeModal, setShowModal: setShowTradeModal }: ModalProps) {
   const [sellTokenName, setSellTokenName] = useState<string>('');
   const [tradeIndex, setTradeIndex] = useState<number | null>(null);
-  const [orders, setOrders] = useState<imx.Order[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loadingOrders, setLoadingOrders] = useState<boolean>(false);
   const [loadingTrade, setLoadingTrade] = useState<boolean>(false);
   const [showMakeOffer, setShowMakeOffer] = useState<boolean>(false);
@@ -61,7 +61,7 @@ function Trade({ showModal: showTradeModal, setShowModal: setShowTradeModal }: M
     setTradeIndex(index);
     try {
       const user = await imxProvider?.getAddress() || '';
-      const request: imx.GetSignableTradeRequest = {
+      const request: GetSignableTradeRequest = {
         order_id: id,
         user,
         fees: [{
