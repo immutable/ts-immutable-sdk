@@ -1,27 +1,21 @@
 import { TransactionResponse } from '@ethersproject/abstract-provider';
 import {
   AnyToken,
-  CancelOrderResponse,
-  CreateOrderResponse,
-  CreateTradeResponse,
-  CreateTransferResponse,
-  CreateTransferResponseV1,
-  CreateWithdrawalResponse,
-  GetSignableCancelOrderRequest,
-  GetSignableTradeRequest,
-  NftTransferDetails,
-  RegisterUserResponse,
-  StarkSigner,
   EthSigner,
+  IMXClient,
+  NftTransferDetails,
+  StarkSigner,
   TokenAmount,
   UnsignedExchangeTransferRequest,
   UnsignedOrderRequest,
   UnsignedTransferRequest,
-} from '@imtbl/core-sdk';
-import { IMXClient } from '@imtbl/x-client';
+} from '@imtbl/x-client';
 import { IMXProvider } from '@imtbl/x-provider';
 import { Web3Provider } from '@ethersproject/providers';
-import { ImxApiClients } from '@imtbl/generated-clients';
+import {
+  imx,
+  ImxApiClients,
+} from '@imtbl/generated-clients';
 import TypedEventEmitter from '../utils/typedEventEmitter';
 import AuthManager from '../authManager';
 import GuardianClient from '../guardian';
@@ -177,7 +171,7 @@ export class PassportImxProvider implements IMXProvider {
     };
   }
 
-  async transfer(request: UnsignedTransferRequest): Promise<CreateTransferResponseV1> {
+  async transfer(request: UnsignedTransferRequest): Promise<imx.CreateTransferResponseV1> {
     const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
 
     return transfer({
@@ -189,7 +183,7 @@ export class PassportImxProvider implements IMXProvider {
     });
   }
 
-  async registerOffchain(): Promise<RegisterUserResponse> {
+  async registerOffchain(): Promise<imx.RegisterUserResponse> {
     const [user, signers] = await Promise.all([
       this.#getAuthenticatedUser(),
       this.#getSigners(),
@@ -218,7 +212,7 @@ export class PassportImxProvider implements IMXProvider {
     );
   }
 
-  async createOrder(request: UnsignedOrderRequest): Promise<CreateOrderResponse> {
+  async createOrder(request: UnsignedOrderRequest): Promise<imx.CreateOrderResponse> {
     const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
 
     return createOrder({
@@ -231,8 +225,8 @@ export class PassportImxProvider implements IMXProvider {
   }
 
   async cancelOrder(
-    request: GetSignableCancelOrderRequest,
-  ): Promise<CancelOrderResponse> {
+    request: imx.GetSignableCancelOrderRequest,
+  ): Promise<imx.CancelOrderResponse> {
     const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
 
     return cancelOrder({
@@ -244,7 +238,7 @@ export class PassportImxProvider implements IMXProvider {
     });
   }
 
-  async createTrade(request: GetSignableTradeRequest): Promise<CreateTradeResponse> {
+  async createTrade(request: imx.GetSignableTradeRequest): Promise<imx.CreateTradeResponse> {
     const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
 
     return createTrade({
@@ -258,7 +252,7 @@ export class PassportImxProvider implements IMXProvider {
 
   async batchNftTransfer(
     request: NftTransferDetails[],
-  ): Promise<CreateTransferResponse> {
+  ): Promise<imx.CreateTransferResponse> {
     const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
 
     return batchNftTransfer({
@@ -272,7 +266,7 @@ export class PassportImxProvider implements IMXProvider {
 
   async exchangeTransfer(
     request: UnsignedExchangeTransferRequest,
-  ): Promise<CreateTransferResponseV1> {
+  ): Promise<imx.CreateTransferResponseV1> {
     const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
 
     return exchangeTransfer({
@@ -292,7 +286,7 @@ export class PassportImxProvider implements IMXProvider {
   }
 
   // eslint-disable-next-line class-methods-use-this, @typescript-eslint/no-unused-vars
-  prepareWithdrawal(request: TokenAmount): Promise<CreateWithdrawalResponse> {
+  prepareWithdrawal(request: TokenAmount): Promise<imx.CreateWithdrawalResponse> {
     throw new PassportError(
       'Operation not supported',
       PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR,
