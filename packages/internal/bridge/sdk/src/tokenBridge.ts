@@ -3,7 +3,6 @@
 /* eslint-disable class-methods-use-this */
 import axios, { AxiosResponse } from 'axios';
 import { ethers } from 'ethers';
-import { ROOT_AXELAR_ADAPTER } from 'contracts/ABIs/RootAxelarBridgeAdapter';
 import {
   ETHEREUM_NATIVE_TOKEN_ADDRESS,
   ETH_MAINNET_TO_ZKEVM_MAINNET,
@@ -313,103 +312,12 @@ export class TokenBridge {
           BridgeMethodsGasLimit.APPROVE_TOKEN,
         );
       }
-      // destinationChainGas = await this.getTenderlyAdapterGasEstimates(
-      //   req.destinationChainId,
-      //   req.senderAddress,
-      //   req.recipientAddress,
-      //   req.amount,
-      //   req.token,
-      // );
     }
     return {
       sourceChainGas,
       approvalFee,
       destinationChainGas,
     };
-  }
-
-  // @DEV this function is not used until issue SMR-2559
-  private async getTenderlyAdapterGasEstimates(
-    destinationChainId:string,
-    sender: string,
-    recipient: string,
-    amount: ethers.BigNumber,
-    token: FungibleToken,
-  ): Promise<number> {
-    console.log('getTenderlyAdapterGasEstimates', destinationChainId, sender, recipient, amount, token);
-
-    let sourceProvider:ethers.providers.Provider;
-    let sourceAdapterAddress: string;
-    if (destinationChainId === this.config.bridgeInstance.rootChainID) {
-      sourceProvider = this.config.rootProvider;
-      sourceAdapterAddress = this.config.bridgeContracts.rootAxelarAdapter;
-    } else {
-      sourceProvider = this.config.childProvider;
-      sourceAdapterAddress = this.config.bridgeContracts.childAxelarAdapter;
-    }
-
-    const axelarAdapterContract: ethers.Contract = await withBridgeError<ethers.Contract>(
-      async () => new ethers.Contract(sourceAdapterAddress, ROOT_AXELAR_ADAPTER, sourceProvider),
-      BridgeErrorType.PROVIDER_ERROR,
-    );
-
-    // @TODO this is just a static test, real payload needs to be constructed using the params parsed in
-    const executeData = await withBridgeError<string>(async () => axelarAdapterContract.interface
-      .encodeFunctionData('execute', [
-        '0xb5d4436a9cb2a42a521b47c97c8d50c5d63fe5f7c3e9cd91611b922febffd11f',
-        'immutable',
-        '0x6328Ac88ba8D466a0F551FC7C42C61d1aC7f92ab',
-        // eslint-disable-next-line max-len
-        '0x7a8dc26796a1e50e6e190b70259f58f6a4edd5b22280ceecc82b687b8e982869000000000000000000000000e2629e08f4125d14e446660028bd98ee60ee69f200000000000000000000000024e190929c646bffb3f3bfd81ae3b8ea24194c80000000000000000000000000c4c3d44eb95c24babc172ff4a7006ed1565e9d9e0000000000000000000000000000000000000000000000000de0b6b3a7640000',
-      ]), BridgeErrorType.INTERNAL_ERROR);
-
-    const tenderlyAPI = this.getTenderlyEndpoint(destinationChainId);
-    let axiosResponse:AxiosResponse;
-
-    // @TODO this needs to use state overrides so the transaction doesnt revert because the commandId is invalid.
-    const simulations = [{
-      network_id: destinationChainId,
-      estimate_gas: true,
-      simulation_type: 'quick',
-      block_number: 5370742,
-      from: sender,
-      to: sourceAdapterAddress,
-      input: executeData,
-    }];
-
-    try {
-      axiosResponse = await axios.post(
-        tenderlyAPI,
-        {
-          simulations,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      );
-    } catch (error: any) {
-      axiosResponse = error.response;
-    }
-
-    if (axiosResponse.data.error) {
-      throw new BridgeError(
-        `Estimating gas failed with the reason: ${axiosResponse.data.error.message}`,
-        BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
-      );
-    }
-
-    const simResults = axiosResponse.data.simulation_results;
-
-    if (simResults.length !== 1 || simResults[0].simulation.gas_used === undefined) {
-      throw new BridgeError(
-        'Estimating gas did not return simulation results',
-        BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
-      );
-    }
-
-    return simResults[0].simulation.gas_used;
   }
 
   private async getTenderlyBridgeGasEstimates(
