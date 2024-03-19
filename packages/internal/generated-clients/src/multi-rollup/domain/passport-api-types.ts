@@ -36,11 +36,13 @@ import { CreateCounterfactualAddressRes } from '../models';
 // @ts-ignore
 import { CreateCounterfactualAddressResDeprecated } from '../models';
 // @ts-ignore
-import { GetContractAbiRes } from '../models';
-// @ts-ignore
 import { GetLinkedAddressesRes } from '../models';
 // @ts-ignore
 import { GetLinkedAddressesResDeprecated } from '../models';
+// @ts-ignore
+import { GetTransactionMetadataRequest } from '../models';
+// @ts-ignore
+import { GetTransactionMetadataRes } from '../models';
 // @ts-ignore
 export { APIError400 } from '../models';
 // @ts-ignore
@@ -64,11 +66,13 @@ export { CreateCounterfactualAddressRes } from '../models';
 // @ts-ignore
 export { CreateCounterfactualAddressResDeprecated } from '../models';
 // @ts-ignore
-export { GetContractAbiRes } from '../models';
-// @ts-ignore
 export { GetLinkedAddressesRes } from '../models';
 // @ts-ignore
 export { GetLinkedAddressesResDeprecated } from '../models';
+// @ts-ignore
+export { GetTransactionMetadataRequest } from '../models';
+// @ts-ignore
+export { GetTransactionMetadataRes } from '../models';
 
 /**
  * Request parameters for createCounterfactualAddress operation in PassportApi.
@@ -127,34 +131,6 @@ export interface CreateCounterfactualAddressV2RequestParams {
 }
 
 /**
- * Request parameters for getContractAbi operation in PassportApi.
- * @export
- * @interface GetContractAbiRequest
- */
-export interface GetContractAbiRequestParams {
-    /**
-     * 
-     * @type {string}
-     * @memberof GetContractAbi
-     */
-    readonly chainName: string
-
-    /**
-     * contract address
-     * @type {string}
-     * @memberof GetContractAbi
-     */
-    readonly contractAddress: string
-
-    /**
-     * method id
-     * @type {string}
-     * @memberof GetContractAbi
-     */
-    readonly methodId: string
-}
-
-/**
  * Request parameters for getLinkedAddresses operation in PassportApi.
  * @export
  * @interface GetLinkedAddressesRequest
@@ -187,6 +163,69 @@ export interface GetLinkedAddressesDeprecatedRequestParams {
      * @memberof GetLinkedAddressesDeprecated
      */
     readonly userId: string
+}
+
+/**
+ * Request parameters for getTransactionMetadata operation in PassportApi.
+ * @export
+ * @interface GetTransactionMetadataRequest
+ */
+export interface GetTransactionMetadataRequestParams {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetTransactionMetadata
+     */
+    readonly chainName: string
+
+    /**
+     * 
+     * @type {GetTransactionMetadataRequest}
+     * @memberof GetTransactionMetadata
+     */
+    readonly getTransactionMetadataRequest: GetTransactionMetadataRequest
+}
+
+/**
+ * Request parameters for getTransactionMetadataDeprecated operation in PassportApi.
+ * @export
+ * @interface GetTransactionMetadataDeprecatedRequest
+ */
+export interface GetTransactionMetadataDeprecatedRequestParams {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetTransactionMetadataDeprecated
+     */
+    readonly chainName: string
+
+    /**
+     * The address of the contract intended for interaction with this transaction
+     * @type {string}
+     * @memberof GetTransactionMetadataDeprecated
+     */
+    readonly contractAddress: string
+
+    /**
+     * The method ID of the contract intended for interaction with this transaction
+     * @type {string}
+     * @memberof GetTransactionMetadataDeprecated
+     */
+    readonly methodId: string
+
+    /**
+     * ID of the given transaction to be decoded
+     * @type {string}
+     * @memberof GetTransactionMetadataDeprecated
+     */
+    readonly transactionId: string
+
+    /**
+     * Encoded transaction data
+     * @type {string}
+     * @memberof GetTransactionMetadataDeprecated
+     */
+    readonly transactionData: string
 }
 
 

@@ -61,6 +61,20 @@ Run the following command to regenerate the Immutable multi-rollup clients:
 make generate-mr-openapi
 ```
 
+## Regenerate Blockchain Data Types
+
+The following commands should be run from the root of the `packages/internal/generated-clients` directory.
+
+Run the following command to pull in the latest OpenApi spec:
+
+```bash
+make get-mr-openapi
+make generate-blockchain-data-types
+```
+
+Note - You will need to manually remove the models and domain files not relevant to the Blockchain Data package from the `blockchain-data` folder, in order
+for other teams types not to bleed into our Blockchain Data Types namespace.
+
 ## View generators
 
 To inspect underlying generator files, run:
