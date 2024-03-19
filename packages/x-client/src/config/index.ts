@@ -8,7 +8,7 @@ import {
 } from '@imtbl/config';
 
 export { Environment, ImmutableConfiguration } from '@imtbl/config';
-export class ApiConfiguration extends imx.Configuration {}
+export class ApiConfiguration extends imx.Configuration { }
 
 const defaultHeaders = { 'x-sdk-version': 'ts-immutable-sdk-__SDK_VERSION__' };
 
@@ -130,7 +130,7 @@ export interface ImxOverrides {
 }
 
 export interface ImxModuleConfiguration
-  extends ModuleConfiguration<ImxOverrides> {}
+  extends ModuleConfiguration<ImxOverrides> { }
 
 export class ImxConfiguration {
   readonly immutableXConfig: ImmutableXConfiguration;

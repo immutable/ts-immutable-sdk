@@ -1,11 +1,11 @@
 import React, {
   createContext, useContext, useEffect, useMemo, useState,
 } from 'react';
-import { 
-  createImmutableXConfiguration, 
+import {
+  createImmutableXConfiguration,
   IMXClient,
   ImmutableX,
-  production, 
+  production,
   sandbox,
 } from '@imtbl/x-client';
 import { Passport, PassportModuleConfiguration } from '@imtbl/passport';
@@ -25,18 +25,30 @@ import { ImxApiClients, createConfig } from '@imtbl/generated-clients';
 const getSdkConfig = (environment: EnvironmentNames) => {
   switch (environment) {
     case EnvironmentNames.PRODUCTION: {
-      return production({});
+      const baseConfig = new ImmutableConfiguration({ environment: Environment.PRODUCTION });
+      return {
+        baseConfig,
+        override: production({}),
+      };
     }
     case EnvironmentNames.SANDBOX: {
-      return sandbox({});
+      const baseConfig = new ImmutableConfiguration({ environment: Environment.SANDBOX });
+      return {
+        baseConfig,
+        override: sandbox({}),
+      };
     }
     case EnvironmentNames.DEV: {
-      return createImmutableXConfiguration({
-        basePath: 'https://api.dev.x.immutable.com',
-        chainID: 5,
-        coreContractAddress: '0xd05323731807A35599BF9798a1DE15e89d6D6eF1',
-        registrationContractAddress: '0x7EB840223a3b1E0e8D54bF8A6cd83df5AFfC88B2',
-      });
+      const baseConfig = new ImmutableConfiguration({ environment: Environment.SANDBOX });
+      return {
+        baseConfig,
+        override: createImmutableXConfiguration({
+          basePath: 'https://api.dev.x.immutable.com',
+          chainID: 5,
+          coreContractAddress: '0xd05323731807A35599BF9798a1DE15e89d6D6eF1',
+          registrationContractAddress: '0x7EB840223a3b1E0e8D54bF8A6cd83df5AFfC88B2',
+        }),
+      };
     }
     default: {
       throw new Error('Invalid environment');
@@ -90,12 +102,7 @@ const getPassportConfig = (environment: EnvironmentNames): PassportModuleConfigu
           imxApiClients: new ImxApiClients(createConfig({
             basePath: 'https://api.dev.immutable.com',
           })),
-          immutableXClient: new IMXClient({
-            baseConfig,
-            overrides: {
-              immutableXConfig: getSdkConfig(EnvironmentNames.DEV),
-            },
-          }),
+          immutableXClient: new IMXClient(getSdkConfig(EnvironmentNames.DEV)),
           zkEvmRpcUrl: 'https://rpc.dev.immutable.com',
           relayerUrl: 'https://api.dev.immutable.com/relayer-mr',
           indexerMrBasePath: 'https://api.dev.immutable.com',
@@ -157,7 +164,7 @@ export function ImmutableProvider({
 
 export function useImmutableProvider() {
   const {
-    sdkClient: sdkClient, passportClient, environment, setEnvironment,
+    sdkClient, passportClient, environment, setEnvironment,
   } = useContext(ImmutableContext);
   return {
     sdkClient, passportClient, environment, setEnvironment,
