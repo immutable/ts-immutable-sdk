@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - DX-2714/fix-broken-ci-on-main
   pull_request:
 
 jobs:
@@ -34,6 +35,9 @@ jobs:
 
       - name: Typecheck
         run: yarn typecheck
+
+      - name: Build passport sample app
+        run: yarn workspace @imtbl/passport-sdk-sample-app build
 
   test:
     name: Test
