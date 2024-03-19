@@ -87,7 +87,7 @@ export interface CreateMintRequestRequestParams {
     readonly chainName: string
 
     /**
-     * the request body
+     * Create Mint Request Body
      * @type {CreateMintRequestRequest}
      * @memberof CreateMintRequest
      */
@@ -115,7 +115,7 @@ export interface GetMintRequestRequestParams {
     readonly chainName: string
 
     /**
-     * The ID of the mint request
+     * The id of the mint request
      * @type {string}
      * @memberof GetMintRequest
      */

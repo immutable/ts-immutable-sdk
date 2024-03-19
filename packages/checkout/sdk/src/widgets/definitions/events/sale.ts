@@ -21,11 +21,15 @@ export enum SaleEventType {
 export type SaleSuccess = {
   /** Chosen payment method */
   paymentMethod: SalePaymentTypes | undefined;
+  /** The minted items token ids  */
+  tokenIds: string[];
   /** The executed transactions */
   transactions: {
     method: string;
     hash: string | undefined;
   }[];
+  /** The order reference id, use it to trace order throughout flow */
+  transactionId: string;
   [key: string]: unknown;
 };
 
@@ -49,6 +53,8 @@ export type SaleFailed = {
     method: string;
     hash: string | undefined;
   }[];
+  /** The order reference id, use it to trace order throughout flow */
+  transactionId: string;
 };
 
 /**
@@ -78,5 +84,6 @@ export type SalePaymentMethod = {
  */
 export enum SalePaymentTypes {
   CRYPTO = 'crypto',
-  FIAT = 'fiat',
+  DEBIT = 'debit',
+  CREDIT = 'credit',
 }

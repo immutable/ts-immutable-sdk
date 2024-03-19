@@ -38,17 +38,24 @@ import { TopUpView } from '../../views/top-up/TopUpView';
 import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
-import { useClientConfig } from './hooks/useClientConfig';
 
-export interface SaleWidgetProps
-  extends Required<Omit<SaleWidgetParams, 'walletProviderName'>> {
+type OptionalWidgetParams = Pick<SaleWidgetParams, 'excludePaymentTypes'>;
+type RequiredWidgetParams = Required<Omit<SaleWidgetParams, 'walletProviderName'>>;
+
+type WidgetParams = RequiredWidgetParams & OptionalWidgetParams;
+export interface SaleWidgetProps extends WidgetParams {
   config: StrongCheckoutWidgetsConfig;
 }
 
 export default function SaleWidget(props: SaleWidgetProps) {
   const { t } = useTranslation();
   const {
-    config, amount, items, environmentId, collectionName,
+    config,
+    amount,
+    items,
+    environmentId,
+    collectionName,
+    excludePaymentTypes,
   } = props;
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
@@ -66,12 +73,6 @@ export default function SaleWidget(props: SaleWidgetProps) {
     () => ({ viewState, viewDispatch }),
     [viewState, viewDispatch],
   );
-  const { currency, clientConfig } = useClientConfig({
-    environmentId,
-    environment: config.environment,
-  });
-
-  const fromTokenAddress = currency?.erc20Address || '';
 
   const loadingText = viewState.view.data?.loadingText || t('views.LOADING_VIEW.text');
 
@@ -86,7 +87,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
 
   const mounted = useRef(false);
   const onMount = useCallback(() => {
-    if (!checkout || !provider || fromTokenAddress === '') return;
+    if (!checkout || !provider) return;
 
     if (!mounted.current) {
       mounted.current = true;
@@ -99,13 +100,13 @@ export default function SaleWidget(props: SaleWidgetProps) {
         },
       });
     }
-  }, [checkout, provider, fromTokenAddress]);
+  }, [checkout, provider]);
 
   useEffect(() => {
     if (!checkout || !provider) return;
 
     onMount();
-  }, [checkout, provider, currency]);
+  }, [checkout, provider]);
 
   return (
     <ViewContext.Provider value={viewReducerValues}>
@@ -114,19 +115,18 @@ export default function SaleWidget(props: SaleWidgetProps) {
           config,
           items,
           amount,
-          fromTokenAddress,
           environment: config.environment,
           environmentId,
           provider,
           checkout,
           passport: checkout?.passport,
           collectionName,
-          clientConfig,
+          excludePaymentTypes,
         }}
       >
         <CryptoFiatProvider environment={config.environment}>
           {viewState.view.type === SharedViews.LOADING_VIEW && (
-            <LoadingView loadingText={loadingText} showFooterLogo />
+            <LoadingView loadingText={loadingText} />
           )}
           {viewState.view.type === SaleWidgetViews.PAYMENT_METHODS && (
             <PaymentMethods />
@@ -164,6 +164,10 @@ export default function SaleWidget(props: SaleWidgetProps) {
               showSwapOption={config.isSwapEnabled}
               showBridgeOption={config.isBridgeEnabled}
               onCloseButtonClick={() => sendSaleWidgetCloseEvent(eventTarget)}
+              amount={viewState.view.data?.amount}
+              tokenAddress={viewState.view.data?.tokenAddress}
+              heading={viewState.view.data?.heading}
+              subheading={viewState.view.data?.subheading}
             />
           )}
         </CryptoFiatProvider>

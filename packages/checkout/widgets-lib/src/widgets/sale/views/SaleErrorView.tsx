@@ -91,6 +91,13 @@ export function SaleErrorView({
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
     },
+    [SaleErrorTypes.WALLET_POPUP_BLOCKED]: {
+      onActionClick: () => {
+        goBackToPaymentMethods(SalePaymentTypes.CRYPTO);
+      },
+      onSecondaryActionClick: closeWidget,
+      statusType: StatusType.INFORMATION,
+    },
     [SaleErrorTypes.SMART_CHECKOUT_ERROR]: {
       onActionClick: goBackToPaymentMethods,
       onSecondaryActionClick: closeWidget,

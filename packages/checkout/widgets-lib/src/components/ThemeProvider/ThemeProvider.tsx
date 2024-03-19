@@ -26,6 +26,7 @@ export function ThemeProvider({
       globalSx={globalSx}
       theme={{ base: themeBase }}
       drawerContainerId={`${id}${portalId}`}
+      modalContainerId={`${id}${portalId}`}
     >
       <Box sx={containerStyles} id={`${id}${portalId}`}>
         {children}

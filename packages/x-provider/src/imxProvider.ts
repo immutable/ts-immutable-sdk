@@ -1,20 +1,15 @@
+import { imx } from '@imtbl/generated-clients';
 import {
   AnyToken,
-  RegisterUserResponse,
-  CancelOrderResponse,
-  CreateOrderResponse,
-  CreateTradeResponse,
-  CreateTransferResponse,
-  CreateTransferResponseV1,
-  CreateWithdrawalResponse,
+  UnsignedOrderRequest,
+  UnsignedExchangeTransferRequest,
   GetSignableCancelOrderRequest,
   GetSignableTradeRequest,
+  CreateTradeResponse,
   NftTransferDetails,
   TokenAmount,
-  UnsignedExchangeTransferRequest,
-  UnsignedOrderRequest,
   UnsignedTransferRequest,
-} from '@imtbl/core-sdk';
+} from '@imtbl/x-client';
 import { TransactionResponse } from '@ethersproject/providers';
 
 export interface IMXProvider {
@@ -27,9 +22,9 @@ export interface IMXProvider {
   /**
    * Register a User to Immutable X if they are not already registered
    *
-   * @return {Promise<RegisterUserResponse>} Returns a promise that resolves with the user registration response
+   * @return {Promise<imx.RegisterUserResponse>} Returns a promise that resolves with the user registration response
    */
-  registerOffchain(): Promise<RegisterUserResponse>;
+  registerOffchain(): Promise<imx.RegisterUserResponse>;
   /**
    *  Checks if a User is registered off-chain
    *
@@ -48,7 +43,7 @@ export interface IMXProvider {
    * @param {UnsignedOrderRequest} request The unsigned order request to create an order
    * @return {Promise<CreateOrderResponse>} Returns a promise that resolves with the created Order
    */
-  createOrder(request: UnsignedOrderRequest): Promise<CreateOrderResponse>;
+  createOrder(request: UnsignedOrderRequest): Promise<imx.CreateOrderResponse>;
   /**
    * Cancel an Order
    *
@@ -57,7 +52,7 @@ export interface IMXProvider {
    */
   cancelOrder(
     request: GetSignableCancelOrderRequest
-  ): Promise<CancelOrderResponse>;
+  ): Promise<imx.CancelOrderResponse>;
   /**
    * Create a Trade
    *
@@ -69,9 +64,9 @@ export interface IMXProvider {
    * Create a new Transfer request
    *
    * @param {UnsignedTransferRequest} request The unsigned transfer request
-   * @return {Promise<CreateTransferResponseV1>} Returns a promise that resolves with the created Transfer
+   * @return {Promise<imx.CreateTransferResponseV1>} Returns a promise that resolves with the created Transfer
    */
-  transfer(request: UnsignedTransferRequest): Promise<CreateTransferResponseV1>;
+  transfer(request: UnsignedTransferRequest): Promise<imx.CreateTransferResponseV1>;
   /**
    * Create a batch of NFT transfer requests
    *
@@ -80,16 +75,16 @@ export interface IMXProvider {
    */
   batchNftTransfer(
     request: Array<NftTransferDetails>
-  ): Promise<CreateTransferResponse>;
+  ): Promise<imx.CreateTransferResponse>;
   /**
    * Create a new Exchange transaction
    *
    * @param {UnsignedExchangeTransferRequest} request The unsigned exchange transfer request
-   * @return {Promise<CreateTransferResponseV1>} Returns a promise that resolves with the created Exchange Transaction
+   * @return {Promise<imx.CreateTransferResponseV1>} Returns a promise that resolves with the created Exchange Transaction
    */
   exchangeTransfer(
     request: UnsignedExchangeTransferRequest
-  ): Promise<CreateTransferResponseV1>;
+  ): Promise<imx.CreateTransferResponseV1>;
   /**
    * Deposit either ETH, ERC20 or ERC721 tokens
    *
@@ -103,7 +98,7 @@ export interface IMXProvider {
    * @param {TokenAmount} request The token type amount in its corresponding unit
    * @return {Promise<CreateWithdrawalResponse>} Returns a promise that resolves with the created Withdrawal
    */
-  prepareWithdrawal(request: TokenAmount): Promise<CreateWithdrawalResponse>;
+  prepareWithdrawal(request: TokenAmount): Promise<imx.CreateWithdrawalResponse>;
   /**
    * Completes a Withdrawal
    *

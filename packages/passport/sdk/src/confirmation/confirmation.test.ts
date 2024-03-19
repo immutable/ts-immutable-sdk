@@ -11,8 +11,9 @@ import { PASSPORT_EVENT_TYPE, ReceiveMessage } from './types';
 
 let windowSpy: SpyInstance;
 const closeMock = jest.fn();
+const postMessageMock = jest.fn();
 const mockNewWindow = {
-  closed: true, focus: jest.fn(), close: closeMock, location: { href: 'http' },
+  closed: true, focus: jest.fn(), close: closeMock, location: { href: 'http' }, postMessage: postMessageMock,
 };
 const mockedOpen = jest.fn().mockReturnValue(mockNewWindow);
 const addEventListenerMock = jest.fn();
@@ -91,18 +92,50 @@ describe('confirmation', () => {
       expect(result.logout).toEqual(true);
     });
   });
+
   describe('requestConfirmation', () => {
     it('should handle popup window opened', async () => {
       const transactionId = 'transactionId123';
+      confirmationScreen.loading();
       const res = await confirmationScreen.requestConfirmation(
         transactionId,
         mockEtherAddress,
         TransactionApprovalRequestChainTypeEnum.Starkex,
       );
-      confirmationScreen.loading();
 
       expect(res.confirmed).toEqual(false);
       expect(mockNewWindow.location.href).toEqual('https://passport.sandbox.immutable.com/transaction-confirmation/transaction?transactionId=transactionId123&etherAddress=0x1234&chainType=starkex');
+    });
+
+    it('should send `confirmation_start` postMessage', async () => {
+      const transactionId = 'transactionId123';
+      const mockedWindowReadyValue = {
+        origin: testConfig.passportDomain,
+        data: {
+          eventType: PASSPORT_EVENT_TYPE,
+          messageType: ReceiveMessage.CONFIRMATION_WINDOW_READY,
+        },
+      };
+      addEventListenerMock
+        .mockImplementationOnce((event, callback) => {
+          callback(mockedWindowReadyValue);
+        });
+      confirmationScreen.loading();
+
+      await confirmationScreen.requestConfirmation(
+        transactionId,
+        mockEtherAddress,
+        TransactionApprovalRequestChainTypeEnum.Starkex,
+      );
+
+      expect(postMessageMock).toHaveBeenCalledTimes(1);
+      expect(postMessageMock).toHaveBeenCalledWith(
+        {
+          eventType: 'imx_passport_confirmation',
+          messageType: 'confirmation_start',
+        },
+        'https://passport.sandbox.immutable.com',
+      );
     });
   });
 
@@ -110,12 +143,40 @@ describe('confirmation', () => {
     it('should open a window when confirmation is required', async () => {
       const messageId = 'transactionId123';
       const etherAddress = 'etherAddress123';
-      const res = await confirmationScreen.requestMessageConfirmation(messageId, etherAddress);
       confirmationScreen.loading();
+      const res = await confirmationScreen.requestMessageConfirmation(messageId, etherAddress);
       expect(res.confirmed).toEqual(false);
       expect(mockNewWindow.location.href).toEqual(
         'https://passport.sandbox.immutable.com/'
         + `transaction-confirmation/zkevm/message?messageID=${messageId}&etherAddress=${etherAddress}`,
+      );
+    });
+
+    it('should send `confirmation_start` postMessage', async () => {
+      const messageId = 'transactionId123';
+      const etherAddress = 'etherAddress123';
+      const mockedWindowReadyValue = {
+        origin: testConfig.passportDomain,
+        data: {
+          eventType: PASSPORT_EVENT_TYPE,
+          messageType: ReceiveMessage.CONFIRMATION_WINDOW_READY,
+        },
+      };
+      addEventListenerMock
+        .mockImplementationOnce((event, callback) => {
+          callback(mockedWindowReadyValue);
+        });
+      confirmationScreen.loading();
+
+      await confirmationScreen.requestMessageConfirmation(messageId, etherAddress);
+
+      expect(postMessageMock).toHaveBeenCalledTimes(1);
+      expect(postMessageMock).toHaveBeenCalledWith(
+        {
+          eventType: 'imx_passport_confirmation',
+          messageType: 'confirmation_start',
+        },
+        'https://passport.sandbox.immutable.com',
       );
     });
   });

@@ -1,9 +1,9 @@
 import { Signer } from 'ethers';
 import {
-  generateLegacyStarkPrivateKey,
   createStarkSigner,
+  generateLegacyStarkPrivateKey,
   StarkSigner,
-} from '@imtbl/core-sdk';
+} from '@imtbl/x-client';
 import { withPassportError, PassportErrorType } from '../errors/passportError';
 
 export const getStarkSigner = async (signer: Signer) => withPassportError<StarkSigner>(async () => {

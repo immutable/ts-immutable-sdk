@@ -35,9 +35,9 @@ import {
 import { BridgeActions, BridgeContext, WalletProviderInfo } from '../context/BridgeContext';
 import { NetworkItem } from './NetworkItem';
 import { WalletNetworkButton } from './WalletNetworkButton';
-import { WalletDrawer } from './WalletDrawer';
+import { WalletDrawer } from '../../../components/WalletDrawer/WalletDrawer';
 import { useInjectedProviders } from '../../../lib/hooks/useInjectedProviders';
-import { WalletChangeEvent } from './WalletDrawerEvents';
+import { WalletChangeEvent } from '../../../components/WalletDrawer/WalletDrawerEvents';
 
 const testId = 'wallet-network-selector';
 

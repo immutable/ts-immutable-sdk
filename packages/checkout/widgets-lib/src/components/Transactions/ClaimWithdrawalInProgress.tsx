@@ -70,5 +70,5 @@ export function ClaimWithdrawalInProgress({ transactionResponse }: ClaimWithdraw
     })();
   }, [transactionResponse]);
 
-  return <LoadingView loadingText={t('views.CLAIM_WITHDRAWAL.IN_PROGRESS.loading.text')} showFooterLogo />;
+  return <LoadingView loadingText={t('views.CLAIM_WITHDRAWAL.IN_PROGRESS.loading.text')} />;
 }

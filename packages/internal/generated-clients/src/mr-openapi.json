@@ -129,6 +129,16 @@
             "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
           },
           {
+            "name": "activity_type",
+            "in": "query",
+            "description": "The activity type",
+            "required": false,
+            "example": "burn",
+            "schema": {
+              "$ref": "#/components/schemas/ActivityType"
+            }
+          },
+          {
             "name": "page_cursor",
             "in": "query",
             "description": "Encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
@@ -1816,8 +1826,8 @@
     },
     "/v1/chains/{chain_name}/collections/{contract_address}/nfts/mint-requests": {
       "post": {
-        "description": "[Experimental] Create a mint request to mint a set of NFTs for a given collection",
-        "summary": "[Experimental] Mint NFTs",
+        "description": "Create a mint request to mint a set of NFTs for a given collection",
+        "summary": "Mint NFTs",
         "security": [
           {
             "ImmutableApiKey": [
@@ -1851,7 +1861,7 @@
           }
         ],
         "requestBody": {
-          "description": "the request body",
+          "description": "Create Mint Request Body",
           "required": true,
           "content": {
             "application/json": {
@@ -1907,8 +1917,8 @@
         }
       },
       "get": {
-        "description": "[Experimental] Retrieve the status of all mints for a given contract address",
-        "summary": "[Experimental] List mint requests",
+        "description": "Retrieve the status of all mints for a given contract address",
+        "summary": "List mint requests",
         "security": [
           {
             "ImmutableApiKey": [
@@ -1999,8 +2009,8 @@
     },
     "/v1/chains/{chain_name}/collections/{contract_address}/nfts/mint-requests/{reference_id}": {
       "get": {
-        "description": "[Experimental] Retrieve the status of a mint request identified by its reference_id",
-        "summary": "[Experimental] Get mint request by reference ID",
+        "description": "Retrieve the status of a mint request identified by its reference_id",
+        "summary": "Get mint request by reference ID",
         "security": [
           {
             "ImmutableApiKey": [
@@ -2034,7 +2044,7 @@
           },
           {
             "name": "reference_id",
-            "description": "The ID of the mint request",
+            "description": "The id of the mint request",
             "in": "path",
             "required": true,
             "schema": {
@@ -2167,6 +2177,20 @@
               "type": "string",
               "example": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
               "pattern": "^0x[a-fA-F0-9]{40}$"
+            }
+          },
+          {
+            "name": "buy_item_type",
+            "in": "query",
+            "description": "Buy item type to filter by",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "NATIVE",
+                "ERC20"
+              ],
+              "example": "NATIVE"
             }
           },
           {
@@ -2503,7 +2527,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "description": "Account address to filter trades by (includes buy and sell trades)",
+              "description": "Account address to filter trades by (includes buy and sell wallet address)",
               "example": "0x784578949A4A50DeA641Fb15dd2B11C72E76919a",
               "pattern": "^0x[a-fA-F0-9]{40}$"
             }
@@ -2646,6 +2670,7 @@
     },
     "/passport-mr/v1/counterfactual-address": {
       "post": {
+        "deprecated": true,
         "summary": "Deprecated Create a counterfactual address",
         "description": "Create a counterfactual address for a user based on their Ethereum address",
         "tags": [
@@ -2745,6 +2770,7 @@
     },
     "/passport-mr/v1/users/{userId}/linked-addresses": {
       "get": {
+        "deprecated": true,
         "summary": "Deprecated Get Ethereum linked addresses for a user",
         "description": "Get all the Ethereum linked addresses for a user based on its userId",
         "tags": [
@@ -2845,6 +2871,7 @@
     },
     "/v1/chains/{chain_name}/passport/counterfactual-address": {
       "post": {
+        "deprecated": true,
         "summary": "Create a counterfactual address",
         "description": "Create a counterfactual address for a user based on their Ethereum address",
         "tags": [
@@ -3171,12 +3198,13 @@
     },
     "/v1/chains/{chain_name}/passport/transaction-metadata": {
       "get": {
-        "summary": "Get a contract abi",
-        "description": "Get a contract abi by contract address and method id",
+        "deprecated": true,
+        "summary": "Get transaction metadata",
+        "description": "Get transaction metadata for a given encoded transaction",
         "tags": [
           "passport"
         ],
-        "operationId": "getContractAbi",
+        "operationId": "getTransactionMetadataDeprecated",
         "security": [
           {
             "BearerAuth": [
@@ -3200,7 +3228,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "contract address"
+            "description": "The address of the contract intended for interaction with this transaction"
           },
           {
             "in": "query",
@@ -3209,16 +3237,151 @@
             "schema": {
               "type": "string"
             },
-            "description": "method id"
+            "description": "The method ID of the contract intended for interaction with this transaction"
+          },
+          {
+            "in": "query",
+            "name": "transaction_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the given transaction to be decoded"
+          },
+          {
+            "in": "query",
+            "name": "transaction_data",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Encoded transaction data"
           }
         ],
         "responses": {
           "200": {
-            "description": "Counterfactual address created response",
+            "description": "Get transaction metadata response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetContractAbiRes"
+                  "$ref": "#/components/schemas/GetTransactionMetadataRes"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NotFoundError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError404"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "TooManyRequestsError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError429"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicAPIError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Get transaction metadata",
+        "description": "Get transaction metadata for a given encoded transaction",
+        "tags": [
+          "passport"
+        ],
+        "operationId": "getTransactionMetadata",
+        "security": [
+          {
+            "BearerAuth": [
+              "transact"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "chain_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetTransactionMetadataRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Get transaction metadata response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetTransactionMetadataRes"
                 }
               }
             }
@@ -4270,6 +4433,9 @@
             "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e",
             "description": "The contract address of the NFT"
           },
+          "contract_type": {
+            "$ref": "#/components/schemas/NFTContractType"
+          },
           "indexed_at": {
             "type": "string",
             "format": "date-time",
@@ -4338,6 +4504,12 @@
             "items": {
               "$ref": "#/components/schemas/NFTMetadataAttribute"
             }
+          },
+          "total_supply": {
+            "type": "string",
+            "nullable": true,
+            "description": "The total supply of NFT",
+            "example": "100"
           }
         },
         "required": [
@@ -4353,7 +4525,8 @@
           "external_link",
           "animation_url",
           "youtube_url",
-          "attributes"
+          "attributes",
+          "contract_type"
         ]
       },
       "NFTWithBalance": {
@@ -4373,10 +4546,7 @@
             "description": "The contract address of the NFT"
           },
           "contract_type": {
-            "type": "string",
-            "example": "erc721",
-            "nullable": false,
-            "description": "The contract type of the NFT"
+            "$ref": "#/components/schemas/NFTContractType"
           },
           "indexed_at": {
             "type": "string",
@@ -4508,13 +4678,13 @@
         "example": "imtbl-zkevm-testnet"
       },
       "ActivityID": {
-        "description": "Activity ID in UUIDv4 format",
+        "description": "Activity id in UUIDv4 format",
         "type": "string",
         "format": "uuid",
         "example": "4e28df8d-f65c-4c11-ba04-6a9dd47b179b"
       },
       "MetadataID": {
-        "description": "Metadata ID in UUIDv4 format",
+        "description": "Metadata id in UUIDv4 format",
         "type": "string",
         "format": "uuid",
         "example": "4e28df8d-f65c-4c11-ba04-6a9dd47b179b"
@@ -4531,7 +4701,8 @@
         "description": "The contract type for an NFT",
         "type": "string",
         "enum": [
-          "ERC721"
+          "ERC721",
+          "ERC1155"
         ]
       },
       "TokenContractType": {
@@ -4858,6 +5029,7 @@
       },
       "NFTMetadataRequest": {
         "type": "object",
+        "description": "The NFT metadata",
         "properties": {
           "name": {
             "type": "string",
@@ -4911,7 +5083,7 @@
           "nft_metadata": {
             "type": "array",
             "description": "List of nft metadata to be refreshed",
-            "maxItems": 10,
+            "maxItems": 250,
             "minItems": 1,
             "items": {
               "$ref": "#/components/schemas/RefreshMetadataByTokenID"
@@ -5112,13 +5284,19 @@
         "properties": {
           "reference_id": {
             "type": "string",
-            "description": "The ID of this asset in the system that originates the mint request",
+            "description": "The id of this asset in the system that originates the mint request",
             "example": "67f7d464-b8f0-4f6a-9a3b-8d3cb4a21af0"
           },
           "owner_address": {
             "type": "string",
             "description": "The address of the receiver",
             "example": "0xc344c05eef8876e517072f879dae8905aa2b956b"
+          },
+          "token_id": {
+            "type": "string",
+            "description": "An `uint256` token id as string. Including token_id is currently only possible on Testnet",
+            "example": "1",
+            "nullable": true
           },
           "metadata": {
             "$ref": "#/components/schemas/NFTMetadataRequest"
@@ -5185,7 +5363,7 @@
           },
           "reference_id": {
             "type": "string",
-            "description": "The reference ID of this mint request"
+            "description": "The reference id of this mint request"
           },
           "owner_address": {
             "type": "string",
@@ -5244,6 +5422,7 @@
       },
       "MintRequestErrorMessage": {
         "type": "object",
+        "description": "The error details in case the mint request fails",
         "nullable": true,
         "properties": {
           "message": {
@@ -6877,6 +7056,38 @@
         },
         "additionalProperties": false
       },
+      "GetTransactionMetadataRequest": {
+        "type": "object",
+        "required": [
+          "contract_address",
+          "method_id",
+          "transaction_id",
+          "transaction_data"
+        ],
+        "properties": {
+          "contract_address": {
+            "description": "The address of the contract intended for interaction with this transaction",
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]*$",
+            "maxLength": 42
+          },
+          "method_id": {
+            "description": "The method ID of the contract intended for interaction with this transaction",
+            "type": "string",
+            "maxLength": 132
+          },
+          "transaction_id": {
+            "description": "ID of the given transaction to be decoded",
+            "type": "string"
+          },
+          "transaction_data": {
+            "description": "Encoded transaction data",
+            "pattern": "^0x[0-9a-fA-F]*$",
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "CreateCounterfactualAddressResDeprecated": {
         "type": "object",
         "required": [
@@ -6941,31 +7152,128 @@
           }
         }
       },
-      "GetContractAbiRes": {
+      "ERC721ApproveMetadata": {
         "type": "object",
         "required": [
-          "abi",
-          "transaction_type"
+          "transaction_type",
+          "collection_name",
+          "collection_image",
+          "asset_image",
+          "asset_name"
         ],
         "properties": {
-          "abi": {
-            "description": "contract's abi component",
-            "type": "array",
-            "minItems": 0,
-            "items": {
-              "description": "abi",
-              "type": "object",
-              "additionalProperties": true
-            }
-          },
           "transaction_type": {
-            "description": "name of ui component",
             "type": "string",
+            "description": "Transaction type",
+            "enum": [
+              "ERC721_APPROVE"
+            ]
+          },
+          "collection_name": {
+            "type": "string",
+            "description": "NFT Collection name"
+          },
+          "collection_image": {
+            "type": "string",
+            "description": "NFT Collection image"
+          },
+          "asset_image": {
+            "type": "string",
+            "description": "NFT Asset name"
+          },
+          "asset_name": {
+            "type": "string",
+            "description": "NFT Asset image"
+          }
+        }
+      },
+      "ERC20ApproveMetadata": {
+        "type": "object",
+        "required": [
+          "transaction_type",
+          "amount",
+          "token_symbol",
+          "spender"
+        ],
+        "properties": {
+          "transaction_type": {
+            "type": "string",
+            "description": "Transaction type",
             "enum": [
               "ERC20_APPROVE"
             ]
+          },
+          "amount": {
+            "type": "string",
+            "description": "Requested approval amount"
+          },
+          "token_symbol": {
+            "type": "string",
+            "description": "Requested token symbol"
+          },
+          "spender": {
+            "type": "string",
+            "description": "Spender address"
           }
         }
+      },
+      "NFTSetApprovalForAllMetadata": {
+        "type": "object",
+        "required": [
+          "transaction_type",
+          "collection_name",
+          "collection_image"
+        ],
+        "properties": {
+          "transaction_type": {
+            "type": "string",
+            "description": "Transaction type",
+            "enum": [
+              "ERC721_SET_APPROVAL_FOR_ALL",
+              "ERC1155_SET_APPROVAL_FOR_ALL"
+            ]
+          },
+          "collection_name": {
+            "type": "string",
+            "description": "NFT Collection name"
+          },
+          "collection_image": {
+            "type": "string",
+            "description": "NFT Collection image"
+          }
+        }
+      },
+      "UnknownMetadata": {
+        "type": "object",
+        "required": [
+          "transaction_type"
+        ],
+        "properties": {
+          "transaction_type": {
+            "type": "string",
+            "description": "Transaction type",
+            "enum": [
+              "UNKNOWN"
+            ]
+          }
+        }
+      },
+      "GetTransactionMetadataRes": {
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/ERC20ApproveMetadata"
+          },
+          {
+            "$ref": "#/components/schemas/ERC721ApproveMetadata"
+          },
+          {
+            "$ref": "#/components/schemas/NFTSetApprovalForAllMetadata"
+          },
+          {
+            "$ref": "#/components/schemas/UnknownMetadata"
+          }
+        ]
       }
     }
   },

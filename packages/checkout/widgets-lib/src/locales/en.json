@@ -4,6 +4,9 @@
       "body": {
         "heading": "Connect a wallet",
         "content": "You'll need to connect or create a digital wallet to buy, sell, trade and store your coins and collectibles."
+      },
+      "walletSelection": {
+        "heading": "Choose a wallet"
       }
     },
     "CONNECT_SUCCESS": {
@@ -56,11 +59,7 @@
     },
     "ERROR_VIEW": {
       "heading": "Something's gone wrong",
-      "body": [
-        "You can try again or contact",
-        "support",
-        "for help."
-      ],
+      "body": ["You can try again or contact", "support", "for help."],
       "actionText": "Try again"
     },
     "SERVICE_UNAVAILABLE_ERROR_VIEW": {
@@ -267,24 +266,35 @@
       "options": {
         "crypto": {
           "heading": "Coins",
-          "caption": "Using the coins balance in your wallet",
-          "disabledCaption": "We can't see enough coins in your balance"
+          "caption": "The fastest way to pay, if you have coins in your balance.",
+          "disabledCaption": "Currently not available for this purchase"
         },
-        "fiat": {
-          "heading": "Card",
-          "caption": "GooglePay also available with Transak",
-          "disabledCaption": null
+        "debit": {
+          "heading": "Debit Card",
+          "caption": "The recommended way to pay with card.",
+          "disabledCaption": "Currently working on improving this payment method for larger purchases"
+        },
+        "credit": {
+          "heading": "Credit Card",
+          "caption": "Not recommended since transactions may be blocked by your bank.",
+          "disabledCaption": "Currently working on improving this payment method for larger purchases"
         }
       },
-      "insufficientCoinsBanner": {
-        "caption": "Insufficient coin balance. Pay with card to proceed, or",
-        "captionEnd": "and try again.",
-        "captionCTA": "add coins"
+      "topUp": {
+        "heading": "You’ll need to add some coins",
+        "subheading": {
+          "both": "Add {{erc20.value}} {{erc20.symbol}} and {{native.value}} {{native.symbol}} to cover this purchase plus gas.",
+          "erc20": "Add {{erc20.value}} {{erc20.symbol}} to your balance through one of the following options.",
+          "native": "Add {{native.value}} {{native.symbol}} for gas, through one of the following options."
+        }
       },
       "loading": {
-        "ready": "Ready to purchase",
-        "confirm": "Confirm in your wallet",
-        "processing": "Processing purchase"
+        "ready1": "Collecting your order",
+        "ready2": "Talking to wallet",
+        "ready3": "Readying assets",
+        "processing1": "Initialising payment",
+        "processing2": "Securing your assets",
+        "processing3": "Finalising payment"
       }
     },
     "PAY_WITH_COINS": {
@@ -337,6 +347,11 @@
         "WALLET_REJECTED": {
           "description": "You'll need to approve the transaction in your wallet to proceed.",
           "primaryAction": "Try again",
+          "secondaryAction": "Cancel"
+        },
+        "WALLET_POPUP_BLOCKED": {
+          "description": "You'll need to allow pop-ups in your browser to proceed.",
+          "primaryAction": "I've fixed this, Try again",
           "secondaryAction": "Cancel"
         },
         "SMART_CHECKOUT_ERROR": {
@@ -530,17 +545,21 @@
   "wallets": {
     "passport": {
       "heading": "Immutable Passport",
-      "accentText": "Recommended",
-      "description": "digital wallet and identity"
+      "description": "Your gaming wallet to pay with card, manage items & more."
     },
     "metamask": {
       "heading": "MetaMask",
-      "description": "Digital wallet for accessing blockchain applications and web3"
+      "description": "Digital wallet for accessing blockchain applications and web3."
     },
     "walletconnect": {
       "heading": "Other wallets",
-      "description": "Allows you to connect with any blockchain wallet including MetaMask"
-    }
+      "description": "Allows you to connect with any blockchain mobile wallet including MetaMask."
+    },
+    "browserwallet": {
+      "heading": "Browser wallets",
+      "description": "Digital wallet for accessing blockchain applications and web3."
+    },
+    "recommended": "Recommended"
   },
   "drawers": {
     "feesBreakdown": {
@@ -582,14 +601,8 @@
     },
     "notEnoughGas": {
       "content": {
-        "eth": {
-          "heading": "Balance too low",
-          "body": "You're ETH balance is too low to cover the gas fee on this move. You could transfer more ETH into your wallet using MetaMask directly."
-        },
-        "imx": {
-          "heading": "You'll need more IMX coins",
-          "body": "In order to cover the fees for the amount specified, you'll need to add more IMX coins."
-        }
+        "heading": "You'll need more {{token}} for gas",
+        "body": "Your {{token}} balance is too low to cover the gas fee on this move, so you'll need to add more before proceeding."
       },
       "buttons": {
         "adjustAmount": "Adjust amount",
@@ -643,6 +656,18 @@
         "body": "You'll need to switch to the {{chain}} network to proceed"
       },
       "switchButton": "Switch to {{chain}}"
+    },
+    "walletConnectionError": {
+      "unableToConnect": {
+        "heading": "Unable to connect",
+        "body": "Check your wallet and try again, or close and try a different option",
+        "actionButtonText": "Try again"
+      },
+      "changedYourMind": {
+        "heading": "Changed your mind?",
+        "body": "Make sure pop ups are enabled and follow the prompts in your wallet to connect",
+        "actionButtonText": "Try again"
+      }
     }
   }
 }

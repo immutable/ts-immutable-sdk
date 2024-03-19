@@ -5,10 +5,11 @@ import { motion } from 'framer-motion';
 import { WalletItem } from './WalletItem';
 import { walletItemListStyles } from './WalletDrawerStyles';
 import { WalletConnectItem } from './WalletConnectItem';
-import { useAnimation } from '../../../lib/hooks/useAnimation';
-import { useWalletConnect } from '../../../lib/hooks/useWalletConnect';
+import { useWalletConnect } from '../../lib/hooks/useWalletConnect';
 import { WalletChangeEvent } from './WalletDrawerEvents';
-import { EIP1193Provider, EIP6963ProviderDetail, walletConnectProviderInfo } from '../../../lib/provider';
+import { EIP1193Provider, EIP6963ProviderDetail } from '../../lib/provider';
+import { listItemVariants, listVariants } from '../../lib/animation/listAnimation';
+import { walletConnectProviderInfo } from '../../lib/provider/providerDetail';
 
 interface WalletDrawerProps {
   testId: string;
@@ -16,6 +17,7 @@ interface WalletDrawerProps {
     heading: string;
     defaultText?: string;
   },
+  showWalletConnect?: boolean;
   showWalletSelectorTarget: boolean;
   walletOptions: EIP6963ProviderDetail<EIP1193Provider>[];
   showDrawer: boolean;
@@ -26,6 +28,7 @@ export function WalletDrawer({
   testId,
   drawerText,
   walletOptions,
+  showWalletConnect = true,
   showWalletSelectorTarget,
   showDrawer,
   setShowDrawer,
@@ -33,7 +36,6 @@ export function WalletDrawer({
 }: WalletDrawerProps) {
   const { isWalletConnectEnabled, openWalletConnectModal } = useWalletConnect();
   const [walletItemLoading, setWalletItemLoading] = useState(false);
-  const { listVariants, listItemVariants } = useAnimation();
   const { heading, defaultText } = drawerText;
 
   const handleWalletItemClick = async (providerDetail: EIP6963ProviderDetail<EIP1193Provider>) => {
@@ -124,7 +126,7 @@ export function WalletDrawer({
             )}
           />
         ))}
-        {isWalletConnectEnabled && (
+        {isWalletConnectEnabled && showWalletConnect && (
           <motion.div
             variants={listItemVariants}
             custom={walletOptions.length}

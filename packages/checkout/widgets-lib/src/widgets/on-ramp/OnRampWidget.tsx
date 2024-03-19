@@ -76,10 +76,10 @@ export default function OnRampWidget({
   return (
     <ViewContext.Provider value={viewReducerValues}>
       {viewState.view.type === SharedViews.LOADING_VIEW && (
-      <LoadingView loadingText={t('views.ONRAMP.initialLoadingText')} showFooterLogo />
+      <LoadingView loadingText={t('views.ONRAMP.initialLoadingText')} />
       )}
       {viewState.view.type === OnRampWidgetViews.IN_PROGRESS_LOADING && (
-      <LoadingView loadingText={t('views.ONRAMP.IN_PROGRESS_LOADING.loading.text')} showFooterLogo />
+      <LoadingView loadingText={t('views.ONRAMP.IN_PROGRESS_LOADING.loading.text')} />
       )}
       {viewState.view.type === OnRampWidgetViews.IN_PROGRESS && (
       <OrderInProgress />

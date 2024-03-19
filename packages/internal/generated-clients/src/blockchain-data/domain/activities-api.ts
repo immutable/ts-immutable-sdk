@@ -157,6 +157,13 @@ export interface ListActivityHistoryRequestParams {
     readonly contractAddress?: string
 
     /**
+     * The activity type
+     * @type {ActivityType}
+     * @memberof ListActivityHistory
+     */
+    readonly activityType?: ActivityType
+
+    /**
      * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
      * @type {string}
      * @memberof ListActivityHistory

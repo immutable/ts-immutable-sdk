@@ -86,6 +86,6 @@ export function SwapInProgress({
   }, [transactionResponse]);
 
   return (
-    <LoadingView loadingText={t('views.SWAP.IN_PROGRESS.loading.text')} showFooterLogo />
+    <LoadingView loadingText={t('views.SWAP.IN_PROGRESS.loading.text')} />
   );
 }

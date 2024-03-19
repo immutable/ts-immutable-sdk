@@ -248,7 +248,7 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
   return (
     <EventTargetContext.Provider value={eventTargetReducerValues}>
       {view === FundingRouteExecuteViews.LOADING && (
-        <LoadingView loadingText={t('views.FUND_WITH_SMART_CHECKOUT.loading.checkingBalances')} showFooterLogo />
+        <LoadingView loadingText={t('views.FUND_WITH_SMART_CHECKOUT.loading.checkingBalances')} />
       )}
       {view === FundingRouteExecuteViews.EXECUTE_BRIDGE && (
         <BridgeWidget

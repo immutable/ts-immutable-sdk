@@ -1,5 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { SaleItem } from '@imtbl/checkout-sdk';
+import { SaleItem, TransactionRequirement } from '@imtbl/checkout-sdk';
 
 export type SignedOrderProduct = {
   productId: string;
@@ -38,6 +38,7 @@ export type SignedTransaction = {
 export type SignResponse = {
   order: SignedOrder;
   transactions: SignedTransaction[];
+  transactionId: string;
 };
 
 export type SignOrderInput = {
@@ -56,7 +57,10 @@ export type SignOrderError = {
 
 export type SmartCheckoutError = {
   type: SaleErrorTypes;
-  data?: Record<string, unknown>;
+  data?: {
+    error: Error;
+    transactionRequirements?: TransactionRequirement[];
+  }
 };
 
 export type ExecutedTransaction = {
@@ -80,6 +84,7 @@ export enum SaleErrorTypes {
   WALLET_FAILED = 'WALLET_FAILED',
   WALLET_REJECTED = 'WALLET_REJECTED',
   WALLET_REJECTED_NO_FUNDS = 'WALLET_REJECTED_NO_FUNDS',
+  WALLET_POPUP_BLOCKED = 'WALLET_POPUP_BLOCKED',
   SMART_CHECKOUT_ERROR = 'SMART_CHECKOUT_ERROR',
   SMART_CHECKOUT_EXECUTE_ERROR = 'SMART_CHECKOUT_EXECUTE_ERROR',
 }
@@ -98,3 +103,8 @@ export type ClientConfig = {
   contractId: string;
   currencies: ClientConfigCurrency[];
 };
+
+export enum SignPaymentTypes {
+  CRYPTO = 'crypto',
+  FIAT = 'fiat',
+}

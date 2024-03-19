@@ -1,4 +1,4 @@
-import { TokenAmount, AnyToken } from '@imtbl/core-sdk';
+import { AnyToken, TokenAmount } from '@imtbl/x-client';
 import { ProviderConfiguration } from '../config';
 import { Signers } from './types';
 import {

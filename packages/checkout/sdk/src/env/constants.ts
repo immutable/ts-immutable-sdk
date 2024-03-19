@@ -17,6 +17,13 @@ export const ZKEVM_NATIVE_TOKEN = {
   address: NATIVE,
 };
 
+export const ZKEVM_NATIVE_SANDBOX_TOKEN = {
+  name: 'tIMX',
+  symbol: 'tIMX',
+  decimals: DEFAULT_TOKEN_DECIMALS,
+  address: NATIVE,
+};
+
 /**
  * Base URL for the Immutable API based on the environment.
  * @property {string} DEVELOPMENT - The base URL for the development environment.
@@ -116,7 +123,7 @@ NetworkDetails
       chainIdHex: `0x${ChainId.IMTBL_ZKEVM_TESTNET.toString(16)}`,
       chainName: ChainName.IMTBL_ZKEVM_TESTNET,
       rpcUrls: ['https://rpc.testnet.immutable.com'],
-      nativeCurrency: ZKEVM_NATIVE_TOKEN,
+      nativeCurrency: ZKEVM_NATIVE_SANDBOX_TOKEN,
     },
   ],
 ]);

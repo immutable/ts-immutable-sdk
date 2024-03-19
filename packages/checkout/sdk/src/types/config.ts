@@ -125,6 +125,13 @@ export type OnRampConfig = {
 export type ConnectConfig = {
   /** A boolean value for enabling/disabling WalletConnect */
   walletConnect: boolean;
+  /** A configuration for injected wallets */
+  injected: {
+    /** List for sorting injected wallets via wallet rdns */
+    priorityWalletRdns: string[];
+    /** List for blocking injected wallets via wallet rdns */
+    blacklistWalletRdns: string[];
+  }
 };
 
 /**
@@ -236,7 +243,7 @@ export type ChainsTokensConfig = {
  * @property {boolean | undefined} blockscout -
  */
 export type ChainTokensConfig = {
-/** List of allowed tokens for a given chain. */
+  /** List of allowed tokens for a given chain. */
   allowed?: TokenInfo[];
   /** Feature flag to enable/disable blockscout integration. */
   blockscout?: boolean;

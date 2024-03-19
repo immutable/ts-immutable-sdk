@@ -1,9 +1,8 @@
+import { imx } from '@imtbl/generated-clients';
 import {
-  WithdrawalsApi,
-  CreateWithdrawalResponse,
-  ImmutableXConfiguration,
   TokenAmount,
-} from '@imtbl/core-sdk';
+  ImmutableXConfiguration,
+} from '@imtbl/x-client';
 import { signMessage, convertToSignableToken } from '@imtbl/toolkit';
 import { Signers } from '../types';
 import { validateChain } from '../helpers';
@@ -20,14 +19,14 @@ export type PrepareWithdrawalWorkflowParams = TokenAmount & {
 
 export async function prepareWithdrawalAction(
   params: PrepareWithdrawalWorkflowParams,
-): Promise<CreateWithdrawalResponse> {
+): Promise<imx.CreateWithdrawalResponse> {
   const {
     signers: { ethSigner, starkSigner },
     type,
     config,
   } = params;
   await validateChain(ethSigner, params.config);
-  const withdrawalsApi = new WithdrawalsApi(config.apiConfiguration);
+  const withdrawalsApi = new imx.WithdrawalsApi(config.apiConfiguration);
   const withdrawalAmount = type === 'ERC721' ? '1' : params.amount;
   const signableWithdrawalResult = await withdrawalsApi.getSignableWithdrawal({
     getSignableWithdrawalRequest: {

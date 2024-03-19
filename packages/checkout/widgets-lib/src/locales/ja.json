@@ -4,6 +4,9 @@
       "body": {
         "heading": "ウォレットを接続する",
         "content": "購入、販売、取引、およびコインとコレクティブルを保存するには、デジタルウォレットを接続または作成する必要があります。"
+      },
+      "walletSelection": {
+        "heading": "ウォレットを選択"
       }
     },
     "CONNECT_SUCCESS": {
@@ -265,29 +268,40 @@
     },
     "PAYMENT_METHODS": {
       "header": {
-        "heading": "どのようにして支払いますか？"
+        "heading": "どの支払い方法をご希望ですか？"
       },
       "options": {
         "crypto": {
           "heading": "コイン",
-          "caption": "ウォレットのコイン残高を使用して",
-          "disabledCaption": "残高に十分なコインが見当たりません"
+          "caption": "残高にコインがある場合、最も速い支払い方法です。",
+          "disabledCaption": "現在、この支払い方法は利用できません。"
         },
-        "fiat": {
-          "heading": "カード",
-          "caption": "GooglePayもTransakで利用可能",
-          "disabledCaption": ""
+        "debit": {
+          "heading": "デビットカード",
+          "caption": "カードでの支払いに推奨される方法です。",
+          "disabledCaption": "現在、高額購入向けにこの支払い方法の改善に取り組んでいます。"
+        },
+        "credit": {
+          "heading": "クレジットカード",
+          "caption": "銀行によって取引がブロックされる可能性があるため、推奨されません。",
+          "disabledCaption": "現在、高額購入向けにこの支払い方法の改善に取り組んでいます。"
         }
       },
-      "insufficientCoinsBanner": {
-        "caption": "コイン残高が不足しています。続行するにはカードで支払うか、",
-        "captionEnd": "、再試行してください。",
-        "captionCTA": "コインを追加"
+      "topUp": {
+        "heading": "残高が不足しています",
+        "subheading": {
+          "both": "この購入とガスをカバーするために{{erc20.value}} {{erc20.symbol}}と{{native.value}} {{native.symbol}}を追加する必要があります。",
+          "erc20": "残高が不足しているため、{{erc20.value}} {{erc20.symbol}}を追加する必要があります。",
+          "native": "残高が不足しているため、{{native.value}} {{native.symbol}}を追加する必要があります。"
+        }
       },
       "loading": {
-        "ready": "購入の準備ができました",
-        "confirm": "ウォレットで確認してください",
-        "processing": "購入処理中"
+        "ready1": "注文を受け取り中",
+        "ready2": "ウォレットと通信中",
+        "ready3": "資産を準備中",
+        "processing1": "支払いを初期化中",
+        "processing2": "資産を確保中",
+        "processing3": "支払いを完了中"
       }
     },
     "PAY_WITH_COINS": {
@@ -339,6 +353,11 @@
         },
         "WALLET_REJECTED": {
           "description": "取引を承認するには、ウォレットで承認する必要があります。",
+          "primaryAction": "もう一度試す",
+          "secondaryAction": "キャンセル"
+        },
+        "WALLET_POPUP_BLOCKED": {
+          "description": "続行するには、ブラウザでポップアップを許可する必要があります。",
           "primaryAction": "もう一度試す",
           "secondaryAction": "キャンセル"
         },
@@ -533,17 +552,21 @@
   "wallets": {
     "passport": {
       "heading": "Immutable Passport",
-      "accentText": "おすすめ",
-      "description": "デジタルウォレットおよびアイデンティティ"
+      "description": "カードで支払い、アイテムを管理するなど、ゲーム用ウォレットです。"
     },
     "metamask": {
       "heading": "MetaMask",
-      "description": "ブロックチェーンアプリケーションとWeb3へのアクセス用のデジタルウォレット"
+      "description": "ブロックチェーンアプリケーションおよびweb3にアクセスするためのデジタルウォレット。"
     },
     "walletconnect": {
       "heading": "その他のウォレット",
-      "description": "MetaMaskを含む任意のブロックチェーンウォレットに接続できます"
-    }
+      "description": "MetaMaskを含む任意のブロックチェーンモバイルウォレットに接続できます。"
+    },
+    "browserwallet": {
+      "heading": "ブラウザウォレット",
+      "description": "ブロックチェーンアプリケーションおよびweb3にアクセスするためのデジタルウォレット。"
+    },
+    "recommended": "推奨"
   },
   "drawers": {
     "feesBreakdown": {
@@ -575,14 +598,8 @@
     },
     "notEnoughGas": {
       "content": {
-        "eth": {
-          "heading": "残高が低すぎます",
-          "body": "この移動のガス手数料をカバーするには、ETH残高が不足しています。MetaMaskを使用して直接ウォレットにETHを送金することができます。"
-        },
-        "imx": {
-          "heading": "もっとIMXコインが必要になるでしょう",
-          "body": "指定された金額の手数料をカバーするために、もっとIMXコインを追加する必要があります"
-        }
+        "heading": "{{token}}が不足しています",
+        "body": "この操作のガス手数料をカバーするには{{token}}残高が十分にありません。続行する前に、もっと{{token}}を追加する必要があります。"
       },
       "buttons": {
         "adjustAmount": "金額を調整",
@@ -636,6 +653,18 @@
         "body": "{{chain}}ネットワークに切り替える必要があります"
       },
       "switchButton": "{{chain}}に切り替える"
+    },
+    "walletConnectionError": {
+      "unableToConnect": {
+          "heading": "接続できません",
+          "body": "ウォレットを確認してもう一度お試しください。または、閉じて別のオプションを試してください。",
+          "actionButtonText": "もう一度試す"
+      },
+      "changedYourMind": {
+          "heading": "考えを変えましたか？",
+          "body": "ポップアップが有効になっていることを確認し、ウォレットのプロンプトに従って接続してください。",
+          "actionButtonText": "もう一度試す"
+      }
     }
   }
 }
