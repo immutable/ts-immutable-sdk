@@ -60,7 +60,9 @@ models/create-mint-request-request.ts
 models/create-mint-request-result.ts
 models/deposit.ts
 models/erc1155-item.ts
+models/erc20-approve-metadata.ts
 models/erc20-item.ts
+models/erc721-approve-metadata.ts
 models/erc721-item.ts
 models/expired-order-status.ts
 models/failed-order-cancellation.ts
@@ -72,13 +74,14 @@ models/fulfillment-data200-response-result.ts
 models/fulfillment-data200-response.ts
 models/get-activity-result.ts
 models/get-collection-result.ts
-models/get-contract-abi-res.ts
 models/get-linked-addresses-res-deprecated.ts
 models/get-linked-addresses-res.ts
 models/get-metadata-result.ts
 models/get-mint-request-result.ts
 models/get-nftresult.ts
 models/get-token-result.ts
+models/get-transaction-metadata-request.ts
+models/get-transaction-metadata-res.ts
 models/inactive-order-status.ts
 models/index.ts
 models/item.ts
@@ -109,6 +112,7 @@ models/nftmetadata-attribute.ts
 models/nftmetadata-request.ts
 models/nftowner.ts
 models/nftsale.ts
+models/nftset-approval-for-all-metadata.ts
 models/nftwith-balance.ts
 models/nftwith-owner.ts
 models/order-status-name.ts
@@ -136,4 +140,5 @@ models/trade-result.ts
 models/trade.ts
 models/transfer.ts
 models/unfulfillable-order.ts
+models/unknown-metadata.ts
 models/withdrawal.ts

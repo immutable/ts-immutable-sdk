@@ -15,7 +15,7 @@
 
 
 /**
- * 
+ * The error details in case the mint request fails
  * @export
  * @interface MintRequestErrorMessage
  */

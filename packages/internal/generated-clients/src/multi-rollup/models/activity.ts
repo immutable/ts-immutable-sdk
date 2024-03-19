@@ -33,7 +33,7 @@ import { Chain } from './chain';
  */
 export interface Activity {
     /**
-     * Activity ID in UUIDv4 format
+     * Activity id in UUIDv4 format
      * @type {string}
      * @memberof Activity
      */

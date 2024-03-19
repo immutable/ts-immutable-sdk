@@ -21,7 +21,7 @@
  */
 export interface RefreshMetadataByIDAllOf {
     /**
-     * Metadata ID in UUIDv4 format
+     * Metadata id in UUIDv4 format
      * @type {string}
      * @memberof RefreshMetadataByIDAllOf
      */
