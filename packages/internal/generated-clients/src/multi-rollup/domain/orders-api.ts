@@ -261,6 +261,7 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
          * @param {string} chainName 
          * @param {OrderStatusName} [status] Order status to filter by
          * @param {string} [sellItemContractAddress] Sell item contract address to filter by
+         * @param {ListListingsBuyItemTypeEnum} [buyItemType] Buy item type to filter by
          * @param {string} [buyItemContractAddress] Buy item contract address to filter by
          * @param {string} [accountAddress] The account address of the user who created the listing
          * @param {string} [sellItemMetadataId] The metadata_id of the sell item
@@ -273,7 +274,7 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listListings: async (chainName: string, status?: OrderStatusName, sellItemContractAddress?: string, buyItemContractAddress?: string, accountAddress?: string, sellItemMetadataId?: string, sellItemTokenId?: string, fromUpdatedAt?: string, pageSize?: number, sortBy?: ListListingsSortByEnum, sortDirection?: ListListingsSortDirectionEnum, pageCursor?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listListings: async (chainName: string, status?: OrderStatusName, sellItemContractAddress?: string, buyItemType?: ListListingsBuyItemTypeEnum, buyItemContractAddress?: string, accountAddress?: string, sellItemMetadataId?: string, sellItemTokenId?: string, fromUpdatedAt?: string, pageSize?: number, sortBy?: ListListingsSortByEnum, sortDirection?: ListListingsSortDirectionEnum, pageCursor?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'chainName' is not null or undefined
             assertParamExists('listListings', 'chainName', chainName)
             const localVarPath = `/v1/chains/{chain_name}/orders/listings`
@@ -295,6 +296,10 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
 
             if (sellItemContractAddress !== undefined) {
                 localVarQueryParameter['sell_item_contract_address'] = sellItemContractAddress;
+            }
+
+            if (buyItemType !== undefined) {
+                localVarQueryParameter['buy_item_type'] = buyItemType;
             }
 
             if (buyItemContractAddress !== undefined) {
@@ -488,6 +493,7 @@ export const OrdersApiFp = function(configuration?: Configuration) {
          * @param {string} chainName 
          * @param {OrderStatusName} [status] Order status to filter by
          * @param {string} [sellItemContractAddress] Sell item contract address to filter by
+         * @param {ListListingsBuyItemTypeEnum} [buyItemType] Buy item type to filter by
          * @param {string} [buyItemContractAddress] Buy item contract address to filter by
          * @param {string} [accountAddress] The account address of the user who created the listing
          * @param {string} [sellItemMetadataId] The metadata_id of the sell item
@@ -500,8 +506,8 @@ export const OrdersApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listListings(chainName: string, status?: OrderStatusName, sellItemContractAddress?: string, buyItemContractAddress?: string, accountAddress?: string, sellItemMetadataId?: string, sellItemTokenId?: string, fromUpdatedAt?: string, pageSize?: number, sortBy?: ListListingsSortByEnum, sortDirection?: ListListingsSortDirectionEnum, pageCursor?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListListingsResult>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listListings(chainName, status, sellItemContractAddress, buyItemContractAddress, accountAddress, sellItemMetadataId, sellItemTokenId, fromUpdatedAt, pageSize, sortBy, sortDirection, pageCursor, options);
+        async listListings(chainName: string, status?: OrderStatusName, sellItemContractAddress?: string, buyItemType?: ListListingsBuyItemTypeEnum, buyItemContractAddress?: string, accountAddress?: string, sellItemMetadataId?: string, sellItemTokenId?: string, fromUpdatedAt?: string, pageSize?: number, sortBy?: ListListingsSortByEnum, sortDirection?: ListListingsSortDirectionEnum, pageCursor?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListListingsResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listListings(chainName, status, sellItemContractAddress, buyItemType, buyItemContractAddress, accountAddress, sellItemMetadataId, sellItemTokenId, fromUpdatedAt, pageSize, sortBy, sortDirection, pageCursor, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -589,7 +595,7 @@ export const OrdersApiFactory = function (configuration?: Configuration, basePat
          * @throws {RequiredError}
          */
         listListings(requestParameters: OrdersApiListListingsRequest, options?: AxiosRequestConfig): AxiosPromise<ListListingsResult> {
-            return localVarFp.listListings(requestParameters.chainName, requestParameters.status, requestParameters.sellItemContractAddress, requestParameters.buyItemContractAddress, requestParameters.accountAddress, requestParameters.sellItemMetadataId, requestParameters.sellItemTokenId, requestParameters.fromUpdatedAt, requestParameters.pageSize, requestParameters.sortBy, requestParameters.sortDirection, requestParameters.pageCursor, options).then((request) => request(axios, basePath));
+            return localVarFp.listListings(requestParameters.chainName, requestParameters.status, requestParameters.sellItemContractAddress, requestParameters.buyItemType, requestParameters.buyItemContractAddress, requestParameters.accountAddress, requestParameters.sellItemMetadataId, requestParameters.sellItemTokenId, requestParameters.fromUpdatedAt, requestParameters.pageSize, requestParameters.sortBy, requestParameters.sortDirection, requestParameters.pageCursor, options).then((request) => request(axios, basePath));
         },
         /**
          * List all trades
@@ -735,6 +741,13 @@ export interface OrdersApiListListingsRequest {
      * @memberof OrdersApiListListings
      */
     readonly sellItemContractAddress?: string
+
+    /**
+     * Buy item type to filter by
+     * @type {'NATIVE' | 'ERC20'}
+     * @memberof OrdersApiListListings
+     */
+    readonly buyItemType?: ListListingsBuyItemTypeEnum
 
     /**
      * Buy item contract address to filter by
@@ -932,7 +945,7 @@ export class OrdersApi extends BaseAPI {
      * @memberof OrdersApi
      */
     public listListings(requestParameters: OrdersApiListListingsRequest, options?: AxiosRequestConfig) {
-        return OrdersApiFp(this.configuration).listListings(requestParameters.chainName, requestParameters.status, requestParameters.sellItemContractAddress, requestParameters.buyItemContractAddress, requestParameters.accountAddress, requestParameters.sellItemMetadataId, requestParameters.sellItemTokenId, requestParameters.fromUpdatedAt, requestParameters.pageSize, requestParameters.sortBy, requestParameters.sortDirection, requestParameters.pageCursor, options).then((request) => request(this.axios, this.basePath));
+        return OrdersApiFp(this.configuration).listListings(requestParameters.chainName, requestParameters.status, requestParameters.sellItemContractAddress, requestParameters.buyItemType, requestParameters.buyItemContractAddress, requestParameters.accountAddress, requestParameters.sellItemMetadataId, requestParameters.sellItemTokenId, requestParameters.fromUpdatedAt, requestParameters.pageSize, requestParameters.sortBy, requestParameters.sortDirection, requestParameters.pageCursor, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -948,6 +961,14 @@ export class OrdersApi extends BaseAPI {
     }
 }
 
+/**
+ * @export
+ */
+export const ListListingsBuyItemTypeEnum = {
+    Native: 'NATIVE',
+    Erc20: 'ERC20'
+} as const;
+export type ListListingsBuyItemTypeEnum = typeof ListListingsBuyItemTypeEnum[keyof typeof ListListingsBuyItemTypeEnum];
 /**
  * @export
  */

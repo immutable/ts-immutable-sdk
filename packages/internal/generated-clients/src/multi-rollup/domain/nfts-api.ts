@@ -58,7 +58,7 @@ export const NftsApiAxiosParamCreator = function (configuration?: Configuration)
          * @summary Mint NFTs
          * @param {string} contractAddress The address of contract
          * @param {string} chainName The name of chain
-         * @param {CreateMintRequestRequest} createMintRequestRequest the request body
+         * @param {CreateMintRequestRequest} createMintRequestRequest Create Mint Request Body
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -105,7 +105,7 @@ export const NftsApiAxiosParamCreator = function (configuration?: Configuration)
          * @summary Get mint request by reference ID
          * @param {string} contractAddress The address of contract
          * @param {string} chainName The name of chain
-         * @param {string} referenceId The ID of the mint request
+         * @param {string} referenceId The id of the mint request
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -422,7 +422,7 @@ export const NftsApiFp = function(configuration?: Configuration) {
          * @summary Mint NFTs
          * @param {string} contractAddress The address of contract
          * @param {string} chainName The name of chain
-         * @param {CreateMintRequestRequest} createMintRequestRequest the request body
+         * @param {CreateMintRequestRequest} createMintRequestRequest Create Mint Request Body
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -435,7 +435,7 @@ export const NftsApiFp = function(configuration?: Configuration) {
          * @summary Get mint request by reference ID
          * @param {string} contractAddress The address of contract
          * @param {string} chainName The name of chain
-         * @param {string} referenceId The ID of the mint request
+         * @param {string} referenceId The id of the mint request
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -620,7 +620,7 @@ export interface NftsApiCreateMintRequestRequest {
     readonly chainName: string
 
     /**
-     * the request body
+     * Create Mint Request Body
      * @type {CreateMintRequestRequest}
      * @memberof NftsApiCreateMintRequest
      */
@@ -648,7 +648,7 @@ export interface NftsApiGetMintRequestRequest {
     readonly chainName: string
 
     /**
-     * The ID of the mint request
+     * The id of the mint request
      * @type {string}
      * @memberof NftsApiGetMintRequest
      */

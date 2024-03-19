@@ -18,7 +18,7 @@
 import { NFTMetadataAttribute } from './nftmetadata-attribute';
 
 /**
- * 
+ * The NFT metadata
  * @export
  * @interface NFTMetadataRequest
  */

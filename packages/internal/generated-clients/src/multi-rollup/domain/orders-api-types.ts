@@ -211,6 +211,13 @@ export interface ListListingsRequestParams {
     readonly sellItemContractAddress?: string
 
     /**
+     * Buy item type to filter by
+     * @type {'NATIVE' | 'ERC20'}
+     * @memberof ListListings
+     */
+    readonly buyItemType?: ListListingsBuyItemTypeEnum
+
+    /**
      * Buy item contract address to filter by
      * @type {string}
      * @memberof ListListings
@@ -331,6 +338,14 @@ export interface ListTradesRequestParams {
 }
 
 
+/**
+ * @export
+ */
+export const ListListingsBuyItemTypeEnum = {
+    Native: 'NATIVE',
+    Erc20: 'ERC20'
+} as const;
+export type ListListingsBuyItemTypeEnum = typeof ListListingsBuyItemTypeEnum[keyof typeof ListListingsBuyItemTypeEnum];
 /**
  * @export
  */

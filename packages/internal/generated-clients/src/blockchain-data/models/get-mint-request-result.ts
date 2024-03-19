@@ -42,7 +42,7 @@ export interface GetMintRequestResult {
      */
     'collection_address': string;
     /**
-     * The reference ID of this mint request
+     * The reference id of this mint request
      * @type {string}
      * @memberof GetMintRequestResult
      */
