@@ -156,7 +156,7 @@ describe('FiatRampService', () => {
       expect(result).toContain(defaultWidgetUrl);
       expect(result).toContain('&defaultCryptoAmount=100');
       expect(result).toContain('&cryptoCurrencyCode=ETH');
-      expect(result).not.toContain('&defaultFiatAmount=');
+      expect(result).toContain('&defaultFiatAmount=');
       expect(result).not.toContain('&defaultCryptoCurrency=IMX');
     });
 
