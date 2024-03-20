@@ -122,7 +122,7 @@ export class Passport {
     this.guardianClient = privateVars.guardianClient;
 
     setPassportClientId(passportModuleConfiguration.clientId);
-    track('passport', 'initialised');
+    track('passport', 'initialise');
   }
 
   /**
