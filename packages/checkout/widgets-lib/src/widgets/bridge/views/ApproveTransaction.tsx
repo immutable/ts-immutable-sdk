@@ -214,7 +214,7 @@ export function ApproveTransaction({ approveTransaction, transaction }: ApproveT
 
   return (
     <>
-      {loading && (<LoadingView loadingText={t('views.APPROVE_TRANSACTION.loadingView.text')} showFooterLogo />)}
+      {loading && (<LoadingView loadingText={t('views.APPROVE_TRANSACTION.loadingView.text')} />)}
       {!loading && (
         <SimpleLayout
           header={(

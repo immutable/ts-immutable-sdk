@@ -22,7 +22,7 @@ export const useWalletConnect = () => {
       (async () => setEthereumProvider(await WalletConnectManager.getInstance().getProvider()))();
       setWalletConnectModal(WalletConnectManager.getInstance().getModal());
     }
-  }, []);
+  }, [isWalletConnectEnabled]);
 
   const openWalletConnectModal = useCallback(async ({
     connectCallback,
@@ -52,6 +52,25 @@ export const useWalletConnect = () => {
                 } else {
                   // eslint-disable-next-line no-console
                   console.log('activate succeeded but there is no connected session');
+
+                  if (displayUri.current !== '') {
+                    walletConnectModal?.openModal({
+                      uri: displayUri.current,
+                    })
+                      .then((result) => {
+                        setWalletConnectBusy(false);
+                        resolve(result);
+                      })
+                      .catch((error) => {
+                        // Error opening WalletConnect Modal
+                        setWalletConnectBusy(true);
+                        reject(error);
+                      });
+                  } else {
+                    // if we don't have a display uri and no connected session
+                    // call connect to generate display_uri event
+                    ethereumProvider?.connect();
+                  }
                 }
                 // eslint-disable-next-line no-console
               }).catch((err) => console.log('activate existing pairing error', err));
@@ -114,6 +133,14 @@ export const useWalletConnect = () => {
   ), [ethereumProvider, walletConnectModal]);
 
   const getWalletLogoUrl = useCallback(async () => await WalletConnectManager.getInstance().getWalletLogoUrl(), []);
+  const getWalletName = useCallback(() => {
+    if (!ethereumProvider || !ethereumProvider.session) return 'Other';
+    let peerName = ethereumProvider.session.peer.metadata.name;
+    peerName = peerName.replace('Wallet', '');
+    peerName = peerName.replace('wallet', '');
+    peerName = peerName.trim();
+    return peerName;
+  }, [ethereumProvider]);
 
   return {
     isWalletConnectEnabled,
@@ -122,5 +149,6 @@ export const useWalletConnect = () => {
     walletConnectModal,
     openWalletConnectModal,
     getWalletLogoUrl,
+    getWalletName,
   };
 };

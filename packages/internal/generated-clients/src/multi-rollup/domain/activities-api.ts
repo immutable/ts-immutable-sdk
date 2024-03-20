@@ -153,12 +153,13 @@ export const ActivitiesApiAxiosParamCreator = function (configuration?: Configur
          * @param {string} fromUpdatedAt From indexed at including given date
          * @param {string} [toUpdatedAt] To indexed at including given date
          * @param {string} [contractAddress] The contract address of the collection
+         * @param {ActivityType} [activityType] The activity type
          * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {number} [pageSize] Maximum number of items to return
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listActivityHistory: async (chainName: string, fromUpdatedAt: string, toUpdatedAt?: string, contractAddress?: string, pageCursor?: string, pageSize?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listActivityHistory: async (chainName: string, fromUpdatedAt: string, toUpdatedAt?: string, contractAddress?: string, activityType?: ActivityType, pageCursor?: string, pageSize?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'chainName' is not null or undefined
             assertParamExists('listActivityHistory', 'chainName', chainName)
             // verify required parameter 'fromUpdatedAt' is not null or undefined
@@ -190,6 +191,10 @@ export const ActivitiesApiAxiosParamCreator = function (configuration?: Configur
 
             if (contractAddress !== undefined) {
                 localVarQueryParameter['contract_address'] = contractAddress;
+            }
+
+            if (activityType !== undefined) {
+                localVarQueryParameter['activity_type'] = activityType;
             }
 
             if (pageCursor !== undefined) {
@@ -258,13 +263,14 @@ export const ActivitiesApiFp = function(configuration?: Configuration) {
          * @param {string} fromUpdatedAt From indexed at including given date
          * @param {string} [toUpdatedAt] To indexed at including given date
          * @param {string} [contractAddress] The contract address of the collection
+         * @param {ActivityType} [activityType] The activity type
          * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {number} [pageSize] Maximum number of items to return
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listActivityHistory(chainName: string, fromUpdatedAt: string, toUpdatedAt?: string, contractAddress?: string, pageCursor?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListActivitiesResult>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listActivityHistory(chainName, fromUpdatedAt, toUpdatedAt, contractAddress, pageCursor, pageSize, options);
+        async listActivityHistory(chainName: string, fromUpdatedAt: string, toUpdatedAt?: string, contractAddress?: string, activityType?: ActivityType, pageCursor?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListActivitiesResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listActivityHistory(chainName, fromUpdatedAt, toUpdatedAt, contractAddress, activityType, pageCursor, pageSize, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -305,7 +311,7 @@ export const ActivitiesApiFactory = function (configuration?: Configuration, bas
          * @throws {RequiredError}
          */
         listActivityHistory(requestParameters: ActivitiesApiListActivityHistoryRequest, options?: AxiosRequestConfig): AxiosPromise<ListActivitiesResult> {
-            return localVarFp.listActivityHistory(requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.toUpdatedAt, requestParameters.contractAddress, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
+            return localVarFp.listActivityHistory(requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.toUpdatedAt, requestParameters.contractAddress, requestParameters.activityType, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -429,6 +435,13 @@ export interface ActivitiesApiListActivityHistoryRequest {
     readonly contractAddress?: string
 
     /**
+     * The activity type
+     * @type {ActivityType}
+     * @memberof ActivitiesApiListActivityHistory
+     */
+    readonly activityType?: ActivityType
+
+    /**
      * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
      * @type {string}
      * @memberof ActivitiesApiListActivityHistory
@@ -483,7 +496,7 @@ export class ActivitiesApi extends BaseAPI {
      * @memberof ActivitiesApi
      */
     public listActivityHistory(requestParameters: ActivitiesApiListActivityHistoryRequest, options?: AxiosRequestConfig) {
-        return ActivitiesApiFp(this.configuration).listActivityHistory(requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.toUpdatedAt, requestParameters.contractAddress, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
+        return ActivitiesApiFp(this.configuration).listActivityHistory(requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.toUpdatedAt, requestParameters.contractAddress, requestParameters.activityType, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

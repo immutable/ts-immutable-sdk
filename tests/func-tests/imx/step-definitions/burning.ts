@@ -1,14 +1,14 @@
-import { UnsignedTransferRequest } from '@imtbl/core-sdk';
 import {
   IMXClient,
   ImxModuleConfiguration,
   GenericIMXProvider,
   ProviderConfiguration,
+  UnsignedTransferRequest,
 } from '@imtbl/sdk/x';
 import { configuration, StepSharedState } from './stepSharedState';
 
 export class Burning {
-  constructor(protected stepSharedState: StepSharedState) {}
+  constructor(protected stepSharedState: StepSharedState) { }
 
   config: ImxModuleConfiguration = {
     baseConfig: { environment: configuration.environment },

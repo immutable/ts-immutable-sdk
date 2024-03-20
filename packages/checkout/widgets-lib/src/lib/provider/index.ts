@@ -11,6 +11,5 @@ export type {
 
 export * from './utils';
 export * from './providers';
-export * from './passport';
 export * from './injectedProvidersManager';
-export * from './walletconnect';
+export * from './providerDetail';

@@ -1,6 +1,7 @@
 import {
   useCallback, useContext, useEffect, useState,
 } from 'react';
+import { Web3Provider } from '@ethersproject/providers';
 import { useTranslation } from 'react-i18next';
 import { isWalletConnectProvider } from 'lib/provider';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
@@ -40,7 +41,7 @@ export function SwitchNetworkZkEVM() {
         connectDispatch({
           payload: {
             type: ConnectActions.SET_PROVIDER,
-            provider,
+            provider: new Web3Provider(provider.provider as any),
           },
         });
 

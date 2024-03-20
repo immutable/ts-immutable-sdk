@@ -1,6 +1,4 @@
-import {
-  Banner, Box, Heading, Link,
-} from '@biom3/react';
+import { Box, Heading } from '@biom3/react';
 import { useContext, useEffect } from 'react';
 
 import { SalePaymentTypes } from '@imtbl/checkout-sdk';
@@ -8,7 +6,10 @@ import { useTranslation } from 'react-i18next';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import { FundWithSmartCheckoutSubViews, SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
+import {
+  FundWithSmartCheckoutSubViews,
+  SaleWidgetViews,
+} from '../../../context/view-context/SaleViewContextTypes';
 import {
   SharedViews,
   ViewActions,
@@ -18,11 +19,13 @@ import {
 import { PaymentOptions } from '../components/PaymentOptions';
 import { useSaleContext } from '../context/SaleContextProvider';
 import { useSaleEvent } from '../hooks/useSaleEvents';
-import { SaleErrorTypes } from '../types';
+import { SaleErrorTypes, SignPaymentTypes } from '../types';
+import { useInsufficientBalance } from '../hooks/useInsufficientBalance';
 
 export function PaymentMethods() {
+  useInsufficientBalance();
   const { t } = useTranslation();
-  const { viewState, viewDispatch } = useContext(ViewContext);
+  const { viewDispatch } = useContext(ViewContext);
   const {
     sign,
     goToErrorView,
@@ -40,8 +43,11 @@ export function PaymentMethods() {
       sendSelectedPaymentMethod(paymentMethod, SaleWidgetViews.PAYMENT_METHODS);
     }
 
-    if (paymentMethod === SalePaymentTypes.FIAT) {
-      sign(paymentMethod, () => {
+    if (
+      paymentMethod
+      && [SalePaymentTypes.DEBIT, SalePaymentTypes.CREDIT].includes(paymentMethod)
+    ) {
+      sign(SignPaymentTypes.FIAT, () => {
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,
@@ -57,13 +63,13 @@ export function PaymentMethods() {
           type: ViewActions.UPDATE_VIEW,
           view: {
             type: SharedViews.LOADING_VIEW,
-            data: { loadingText: t('views.PAYMENT_METHODS.loading.ready') },
+            data: { loadingText: t('views.PAYMENT_METHODS.loading.ready1') },
           },
         },
       });
     }
 
-    if (paymentMethod === SalePaymentTypes.CRYPTO) {
+    if (paymentMethod && paymentMethod === SalePaymentTypes.CRYPTO) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -75,37 +81,6 @@ export function PaymentMethods() {
       });
     }
   }, [paymentMethod]);
-
-  const onClickInsufficientCoinsBanner = () => {
-    viewDispatch({
-      payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: {
-          type: SharedViews.TOP_UP_VIEW,
-        },
-      },
-    });
-  };
-
-  const insufficientCoinsBanner = (
-    <Box sx={{ paddingX: 'base.spacing.x2' }}>
-      <Banner>
-        <Banner.Icon icon="InformationCircle" />
-        <Banner.Caption>
-          {t('views.PAYMENT_METHODS.insufficientCoinsBanner.caption')}
-          <Link
-            sx={{ mx: 'base.spacing.x1' }}
-            onClick={
-              () => onClickInsufficientCoinsBanner()
-            }
-          >
-            {t('views.PAYMENT_METHODS.insufficientCoinsBanner.captionCTA')}
-          </Link>
-          {t('views.PAYMENT_METHODS.insufficientCoinsBanner.captionEnd')}
-        </Banner.Caption>
-      </Banner>
-    </Box>
-  );
 
   useEffect(() => sendPageView(SaleWidgetViews.PAYMENT_METHODS), []);
   useEffect(() => {
@@ -141,9 +116,11 @@ export function PaymentMethods() {
           {t('views.PAYMENT_METHODS.header.heading')}
         </Heading>
         <Box sx={{ paddingX: 'base.spacing.x2' }}>
-          <PaymentOptions disabledOptions={disabledPaymentTypes} onClick={handleOptionClick} />
+          <PaymentOptions
+            disabledOptions={disabledPaymentTypes}
+            onClick={handleOptionClick}
+          />
         </Box>
-        {viewState.view.data?.showInsufficientCoinsBanner ? insufficientCoinsBanner : null}
       </Box>
     </SimpleLayout>
   );

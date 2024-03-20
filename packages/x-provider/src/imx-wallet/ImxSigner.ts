@@ -1,4 +1,4 @@
-import { StarkSigner } from '@imtbl/core-sdk';
+import { StarkSigner } from '@imtbl/x-client';
 import {
   COMMUNICATION_TYPE,
   ResponseEventType,

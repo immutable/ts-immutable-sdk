@@ -5,7 +5,7 @@ import { ChainId, WalletProviderRdns } from '@imtbl/checkout-sdk';
 import { getChainNameById } from 'lib/chains';
 import { networkIcon } from 'lib';
 import { Web3Provider } from '@ethersproject/providers';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useWalletConnect } from 'lib/hooks/useWalletConnect';
 import {
   networkButtonStyles,
@@ -44,8 +44,21 @@ export function WalletNetworkButton({
   const [walletLogoUrl, setWalletLogoUrl] = useState<string | undefined>(
     undefined,
   );
+  const [walletConnectPeerName, setWalletConnectPeerName] = useState('Other');
   const [isWalletConnect, setIsWalletConnect] = useState<boolean>(false);
-  const { isWalletConnectEnabled, getWalletLogoUrl } = useWalletConnect();
+  const { isWalletConnectEnabled, getWalletLogoUrl, getWalletName } = useWalletConnect();
+
+  const walletDisplayName = useMemo(() => {
+    if (walletProviderDetail?.info.rdns === WalletProviderRdns.PASSPORT) {
+      return walletName;
+    }
+
+    if (isWalletConnectProvider(walletProvider)) {
+      return walletConnectPeerName;
+    }
+
+    return walletProviderDetail?.info.name;
+  }, [walletProviderDetail, walletConnectPeerName, walletProvider]);
 
   useEffect(() => {
     if (isWalletConnectEnabled) {
@@ -55,9 +68,10 @@ export function WalletNetworkButton({
         (async () => {
           setWalletLogoUrl(await getWalletLogoUrl());
         })();
+        setWalletConnectPeerName(getWalletName());
       }
     }
-  }, [isWalletConnectEnabled, walletProvider]);
+  }, [isWalletConnectEnabled, walletProvider, getWalletLogoUrl, getWalletName]);
 
   return (
     <Box
@@ -87,10 +101,7 @@ export function WalletNetworkButton({
           flex: 1,
         }}
       >
-        <Heading size="xSmall" sx={{ textTransform: 'capitalize' }}>
-          {walletProviderDetail?.info.rdns === WalletProviderRdns.PASSPORT
-            ? walletName : walletProviderDetail?.info.name}
-        </Heading>
+        <Heading size="xSmall" sx={{ textTransform: 'capitalize' }}>{walletDisplayName}</Heading>
         <Body size="xSmall" sx={walletCaptionStyles}>
           {walletAddress}
         </Body>

@@ -27,7 +27,7 @@ import { NFTMetadataAttribute } from './nftmetadata-attribute';
  */
 export interface Metadata {
     /**
-     * Metadata ID in UUIDv4 format
+     * Metadata id in UUIDv4 format
      * @type {string}
      * @memberof Metadata
      */

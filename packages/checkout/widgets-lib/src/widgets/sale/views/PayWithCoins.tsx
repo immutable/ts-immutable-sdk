@@ -8,33 +8,43 @@ import { useSaleEvent } from '../hooks/useSaleEvents';
 export function PayWithCoins() {
   const { t } = useTranslation();
   const processing = useRef(false);
-  const { sendPageView, sendTransactionSuccessEvent, sendFailedEvent } = useSaleEvent();
   const {
-    execute, signResponse, executeResponse, goToSuccessView,
+    sendPageView,
+    sendTransactionSuccessEvent,
+    sendFailedEvent,
+    sendCloseEvent,
+    sendSuccessEvent,
+  } = useSaleEvent();
+  const {
+    execute, signResponse, executeResponse, signTokenIds, provider,
   } = useSaleContext();
-  const expectedTxns = signResponse?.transactions.length || 0;
   const executedTxns = executeResponse?.transactions.length || 0;
 
-  let loadingText = t('views.PAYMENT_METHODS.loading.ready');
+  let loadingText = [
+    t('views.PAYMENT_METHODS.loading.ready1'),
+    t('views.PAYMENT_METHODS.loading.ready2'),
+    t('views.PAYMENT_METHODS.loading.ready3'),
+  ];
 
-  if (signResponse !== undefined) {
-    loadingText = t('views.PAYMENT_METHODS.loading.confirm');
-  } else if (executedTxns > 0 && executedTxns === expectedTxns) {
-    loadingText = t('views.PAYMENT_METHODS.loading.processing');
-  }
-
-  if (signResponse !== undefined) {
-    loadingText = `${loadingText} ${executedTxns}/${expectedTxns}`;
+  if (executedTxns >= 1) {
+    loadingText = [
+      t('views.PAYMENT_METHODS.loading.processing1'),
+      t('views.PAYMENT_METHODS.loading.processing2'),
+      t('views.PAYMENT_METHODS.loading.processing3'),
+    ];
   }
 
   const sendTransaction = async () => {
+    const waitForTrnsactionSettlement = !('isMetaMask' in (provider?.provider as any) && provider?.provider.isMetaMask);
     execute(
       signResponse,
+      waitForTrnsactionSettlement,
       (txn) => {
         sendTransactionSuccessEvent(txn);
       },
       (error, txns) => {
-        sendFailedEvent(error.toString(), error, txns);
+        const details = { transactionId: signResponse?.transactionId };
+        sendFailedEvent(error.toString(), error, txns, undefined, details);
       },
     );
   };
@@ -48,11 +58,13 @@ export function PayWithCoins() {
 
   useEffect(() => {
     if (executeResponse?.done === true) {
-      goToSuccessView();
+      const details = { transactionId: signResponse?.transactionId };
+      sendSuccessEvent(SaleWidgetViews.SALE_SUCCESS, executeResponse?.transactions, signTokenIds, details);
+      sendCloseEvent(SaleWidgetViews.SALE_SUCCESS);
     }
   }, [executeResponse]);
 
   useEffect(() => sendPageView(SaleWidgetViews.PAY_WITH_COINS), []);
 
-  return <LoadingView loadingText={loadingText} showFooterLogo />;
+  return <LoadingView loadingText={loadingText} />;
 }

@@ -1,4 +1,4 @@
-import { TokenAmount } from '@imtbl/core-sdk';
+import { TokenAmount } from '@imtbl/x-client';
 import { Signers } from './types';
 import { depositEth, depositERC20, depositERC721 } from './deposit-actions';
 import { ProviderConfiguration } from '../config';

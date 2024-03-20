@@ -1,8 +1,5 @@
-import {
-  CreateTransferResponseV1,
-  UnsignedExchangeTransferRequest,
-  ExchangesApi,
-} from '@imtbl/core-sdk';
+import { UnsignedExchangeTransferRequest } from '@imtbl/x-client';
+import { imx } from '@imtbl/generated-clients';
 import { signRaw, convertToSignableToken } from '@imtbl/toolkit';
 import { Signers } from './types';
 import { validateChain } from './helpers';
@@ -18,10 +15,10 @@ export async function exchangeTransfer({
   signers,
   request,
   config,
-}: TransfersWorkflowParams): Promise<CreateTransferResponseV1> {
+}: TransfersWorkflowParams): Promise<imx.CreateTransferResponseV1> {
   await validateChain(signers.ethSigner, config.immutableXConfig);
 
-  const exchangeApi = new ExchangesApi(
+  const exchangeApi = new imx.ExchangesApi(
     config.immutableXConfig.apiConfiguration,
   );
   const ethAddress = await signers.ethSigner.getAddress();
