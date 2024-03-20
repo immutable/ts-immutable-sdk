@@ -16,10 +16,12 @@ import {
 
 export const POLLING_FREQUENCY = 5000;
 
+export type TrackProperties = Record<string, string | number | boolean>;
+
 const trackFn = (
   moduleName: string,
   eventName: string,
-  properties?: Record<string, string | number | boolean>,
+  properties?: TrackProperties,
 ) => {
   const event = {
     event: `${moduleName}.${eventName}`,
