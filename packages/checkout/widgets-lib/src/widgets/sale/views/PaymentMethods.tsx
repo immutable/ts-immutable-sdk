@@ -1,6 +1,4 @@
-import {
-  Banner, Box, Heading, Link,
-} from '@biom3/react';
+import { Box, Heading } from '@biom3/react';
 import { useContext, useEffect } from 'react';
 
 import { SalePaymentTypes } from '@imtbl/checkout-sdk';
@@ -22,10 +20,12 @@ import { PaymentOptions } from '../components/PaymentOptions';
 import { useSaleContext } from '../context/SaleContextProvider';
 import { useSaleEvent } from '../hooks/useSaleEvents';
 import { SaleErrorTypes, SignPaymentTypes } from '../types';
+import { useInsufficientBalance } from '../hooks/useInsufficientBalance';
 
 export function PaymentMethods() {
+  useInsufficientBalance();
   const { t } = useTranslation();
-  const { viewState, viewDispatch } = useContext(ViewContext);
+  const { viewDispatch } = useContext(ViewContext);
   const {
     sign,
     goToErrorView,
@@ -82,35 +82,6 @@ export function PaymentMethods() {
     }
   }, [paymentMethod]);
 
-  const onClickInsufficientCoinsBanner = () => {
-    viewDispatch({
-      payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: {
-          type: SharedViews.TOP_UP_VIEW,
-        },
-      },
-    });
-  };
-
-  const insufficientCoinsBanner = (
-    <Box sx={{ paddingX: 'base.spacing.x2' }}>
-      <Banner>
-        <Banner.Icon icon="InformationCircle" />
-        <Banner.Caption>
-          {t('views.PAYMENT_METHODS.insufficientCoinsBanner.caption')}
-          <Link
-            sx={{ mx: 'base.spacing.x1' }}
-            onClick={() => onClickInsufficientCoinsBanner()}
-          >
-            {t('views.PAYMENT_METHODS.insufficientCoinsBanner.captionCTA')}
-          </Link>
-          {t('views.PAYMENT_METHODS.insufficientCoinsBanner.captionEnd')}
-        </Banner.Caption>
-      </Banner>
-    </Box>
-  );
-
   useEffect(() => sendPageView(SaleWidgetViews.PAYMENT_METHODS), []);
   useEffect(() => {
     if (!invalidParameters) return;
@@ -150,9 +121,6 @@ export function PaymentMethods() {
             onClick={handleOptionClick}
           />
         </Box>
-        {viewState.view.data?.showInsufficientCoinsBanner
-          ? insufficientCoinsBanner
-          : null}
       </Box>
     </SimpleLayout>
   );

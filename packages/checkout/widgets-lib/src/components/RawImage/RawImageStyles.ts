@@ -16,7 +16,7 @@ export const rawImageStyles = {
 };
 
 export const imageStyles = {
-  width: '32px',
+  width: 'auto',
   height: '100%',
   objectFit: 'contain',
   objectPosition: '50% 50%',

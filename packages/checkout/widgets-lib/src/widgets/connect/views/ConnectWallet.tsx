@@ -11,9 +11,10 @@ import { UserJourney, useAnalytics } from '../../../context/analytics-provider/S
 
 export interface ConnectWalletProps {
   targetChainId: ChainId;
+  allowedChains: ChainId[];
 }
 
-export function ConnectWallet({ targetChainId }: ConnectWalletProps) {
+export function ConnectWallet({ targetChainId, allowedChains }: ConnectWalletProps) {
   const { t } = useTranslation();
   const {
     connectState: { sendCloseEvent },
@@ -66,7 +67,7 @@ export function ConnectWallet({ targetChainId }: ConnectWalletProps) {
         </Body>
       </Box>
       <Box sx={{ paddingX: 'base.spacing.x2' }}>
-        <WalletList targetChainId={targetChainId} />
+        <WalletList targetChainId={targetChainId} allowedChains={allowedChains} />
       </Box>
     </SimpleLayout>
   );

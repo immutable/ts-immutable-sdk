@@ -15,7 +15,7 @@ describe('view-context', () => {
       const updateViewPayload: UpdateViewPayload = {
         type: ViewActions.UPDATE_VIEW,
         view: {
-          type: ConnectWidgetViews.READY_TO_CONNECT,
+          type: ConnectWidgetViews.CONNECT_WALLET,
         },
       };
 
@@ -29,9 +29,9 @@ describe('view-context', () => {
       const state = viewReducer(initialViewState, { payload: updateViewPayload });
       expect(state).toEqual({
         view: {
-          type: ConnectWidgetViews.READY_TO_CONNECT,
+          type: ConnectWidgetViews.CONNECT_WALLET,
         },
-        history: [{ type: ConnectWidgetViews.READY_TO_CONNECT }],
+        history: [{ type: ConnectWidgetViews.CONNECT_WALLET }],
       });
     });
 
@@ -77,7 +77,7 @@ describe('view-context', () => {
           payload: {
             type: ViewActions.UPDATE_VIEW,
             view: {
-              type: ConnectWidgetViews.READY_TO_CONNECT,
+              type: ConnectWidgetViews.SUCCESS,
             },
           },
         },
@@ -85,11 +85,11 @@ describe('view-context', () => {
 
       expect(state).toEqual({
         view: {
-          type: ConnectWidgetViews.READY_TO_CONNECT,
+          type: ConnectWidgetViews.SUCCESS,
         },
         history: [
           { type: ConnectWidgetViews.CONNECT_WALLET },
-          { type: ConnectWidgetViews.READY_TO_CONNECT },
+          { type: ConnectWidgetViews.SUCCESS },
         ],
       });
     });
@@ -105,7 +105,7 @@ describe('view-context', () => {
           payload: {
             type: ViewActions.UPDATE_VIEW,
             view: {
-              type: ConnectWidgetViews.READY_TO_CONNECT,
+              type: ConnectWidgetViews.SUCCESS,
             },
             currentViewData: {
               tokenAddress: '0xsomeTestAddress',
@@ -116,11 +116,11 @@ describe('view-context', () => {
 
       expect(state).toEqual({
         view: {
-          type: ConnectWidgetViews.READY_TO_CONNECT,
+          type: ConnectWidgetViews.SUCCESS,
         },
         history: [
           { type: ConnectWidgetViews.CONNECT_WALLET, data: { tokenAddress: '0xsomeTestAddress' } },
-          { type: ConnectWidgetViews.READY_TO_CONNECT },
+          { type: ConnectWidgetViews.SUCCESS },
         ],
       });
     });
@@ -131,10 +131,10 @@ describe('view-context', () => {
       const state = viewReducer(
         {
           view: {
-            type: ConnectWidgetViews.READY_TO_CONNECT,
+            type: ConnectWidgetViews.SWITCH_NETWORK,
           },
           history: [
-            { type: ConnectWidgetViews.READY_TO_CONNECT },
+            { type: ConnectWidgetViews.SWITCH_NETWORK },
             { type: ConnectWidgetViews.CONNECT_WALLET },
             { type: ConnectWidgetViews.SUCCESS },
           ],
@@ -151,7 +151,7 @@ describe('view-context', () => {
           type: ConnectWidgetViews.CONNECT_WALLET,
         },
         history: [
-          { type: ConnectWidgetViews.READY_TO_CONNECT },
+          { type: ConnectWidgetViews.SWITCH_NETWORK },
           { type: ConnectWidgetViews.CONNECT_WALLET },
         ],
       });
@@ -161,20 +161,20 @@ describe('view-context', () => {
       const state = viewReducer(
         {
           view: {
-            type: ConnectWidgetViews.READY_TO_CONNECT,
+            type: ConnectWidgetViews.CONNECT_WALLET,
           },
-          history: [{ type: ConnectWidgetViews.READY_TO_CONNECT }],
+          history: [{ type: ConnectWidgetViews.CONNECT_WALLET }],
         },
         { payload: { type: ViewActions.GO_BACK } },
       );
 
       expect(state).toEqual({
         view: {
-          type: ConnectWidgetViews.READY_TO_CONNECT,
+          type: ConnectWidgetViews.CONNECT_WALLET,
         },
         history: [
           {
-            type: ConnectWidgetViews.READY_TO_CONNECT,
+            type: ConnectWidgetViews.CONNECT_WALLET,
           },
         ],
       });

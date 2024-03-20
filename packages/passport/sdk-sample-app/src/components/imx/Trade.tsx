@@ -4,7 +4,7 @@ import {
   Alert, Button, Form, Image, Offcanvas, Spinner, Stack, Table,
 } from 'react-bootstrap';
 import { Heading, TextInput } from '@biom3/react';
-import { GetSignableTradeRequest, Order } from '@imtbl/core-sdk';
+import { imx } from '@imtbl/generated-clients';
 import { ModalProps } from '@/types';
 import { usePassportProvider } from '@/context/PassportProvider';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
@@ -16,24 +16,24 @@ import { MARKETPLACE_FEE_PERCENTAGE, MARKETPLACE_FEE_RECIPIENT } from '@/config'
 function Trade({ showModal: showTradeModal, setShowModal: setShowTradeModal }: ModalProps) {
   const [sellTokenName, setSellTokenName] = useState<string>('');
   const [tradeIndex, setTradeIndex] = useState<number | null>(null);
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<imx.Order[]>([]);
   const [loadingOrders, setLoadingOrders] = useState<boolean>(false);
   const [loadingTrade, setLoadingTrade] = useState<boolean>(false);
   const [showMakeOffer, setShowMakeOffer] = useState<boolean>(false);
 
   const { addMessage } = useStatusProvider();
-  const { coreSdkClient } = useImmutableProvider();
+  const { sdkClient } = useImmutableProvider();
   const { imxProvider } = usePassportProvider();
 
   const getOrders = async (e?: React.FormEvent<HTMLFormElement>) => {
     e?.preventDefault();
     e?.stopPropagation();
 
-    if (coreSdkClient && showTradeModal) {
+    if (sdkClient && showTradeModal) {
       setLoadingOrders(true);
       setOrders([]);
 
-      const result = await coreSdkClient.listOrders({
+      const result = await sdkClient.listOrders({
         status: 'active',
         orderBy: 'updated_at',
         direction: 'desc',
@@ -49,7 +49,7 @@ function Trade({ showModal: showTradeModal, setShowModal: setShowTradeModal }: M
 
   useEffect(() => {
     getOrders().catch(console.error);
-  }, [showTradeModal, coreSdkClient]);
+  }, [showTradeModal, sdkClient]);
 
   const handleCloseTrade = () => {
     setLoadingTrade(false);
@@ -61,7 +61,7 @@ function Trade({ showModal: showTradeModal, setShowModal: setShowTradeModal }: M
     setTradeIndex(index);
     try {
       const user = await imxProvider?.getAddress() || '';
-      const request: GetSignableTradeRequest = {
+      const request: imx.GetSignableTradeRequest = {
         order_id: id,
         user,
         fees: [{

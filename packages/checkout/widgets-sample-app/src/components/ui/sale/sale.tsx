@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Environment } from '@imtbl/config';
 import { config, passport } from '@imtbl/sdk';
 import { WidgetsFactory } from '@imtbl/checkout-widgets';
-import { BridgeEventType, OnRampEventType, SaleEventType, SaleItem, SwapEventType, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
+import { BridgeEventType, OnRampEventType, SaleEventType, SaleItem, SalePaymentTypes, SwapEventType, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
 import { Checkout } from '@imtbl/checkout-sdk';
 import { Passport } from '@imtbl/passport';
 
@@ -32,12 +32,14 @@ const useParams = () => {
   const amount = urlParams.get('amount') as string;
   const environmentId = urlParams.get('environmentId') as string;
   const collectionName = urlParams.get('collectionName') as string;
+  const excludePaymentTypes = urlParams.get('excludePaymentTypes')?.split(',') as SalePaymentTypes[];
 
   return {
     login,
     amount,
     environmentId,
     collectionName,
+    excludePaymentTypes,
   };
 };
 
@@ -72,7 +74,7 @@ const usePassportInstance = (passportConfig: any) => {
 export function SaleUI() {
   const params = useParams();
   const { 
-    login, amount, environmentId, collectionName
+    login, amount, environmentId, collectionName, excludePaymentTypes
   } = params;
   const [passportConfig, setPassportConfig] = useState(
     JSON.stringify(defaultPassportConfig, null, 2),
@@ -101,7 +103,8 @@ export function SaleUI() {
       amount,
       environmentId,
       collectionName,
-      items: defaultItems
+      items: defaultItems,
+      excludePaymentTypes,
     });
     saleWidget.addListener(SaleEventType.CLOSE_WIDGET, () => { saleWidget.unmount()})
 
@@ -192,13 +195,20 @@ export function SaleUI() {
       amount,
       environmentId,
       collectionName,
-      items: defaultItems
+      items: defaultItems,
+      excludePaymentTypes
     })}>Mount</button>
     <button onClick={() => saleWidget.unmount()}>Unmount</button>
     <button onClick={() => saleWidget.update({config: {theme: WidgetTheme.LIGHT}})}>Update Config Light</button>
     <button onClick={() => saleWidget.update({config: {theme: WidgetTheme.DARK}})}>Update Config Dark</button>
-    <button onClick={() => saleWidget?.update({ config: { language: 'en'}})}>EN</button>
-    <button onClick={() => saleWidget?.update({ config: { language: 'ja'}})}>JA</button>
+    <select
+      onChange={(e) => saleWidget.update({ config: { language: e.target.value}})}
+    >
+      <option value="en">EN</option>
+      <option value="ja">JA</option>
+      <option value="ko">KO</option>
+      <option value="zh">ZH</option>
+    </select>
       <br />
       <br />
       <br />

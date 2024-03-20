@@ -36,6 +36,7 @@ import {
   SignOrderError,
   SignPaymentTypes,
   SignResponse,
+  SmartCheckoutError,
   SmartCheckoutErrorTypes,
 } from '../types';
 
@@ -52,6 +53,7 @@ type SaleContextProps = {
   provider: ConnectLoaderState['provider'];
   checkout: ConnectLoaderState['checkout'];
   passport?: Passport;
+  excludePaymentTypes: SalePaymentTypes[];
 };
 
 type SaleContextValues = SaleContextProps & {
@@ -61,6 +63,7 @@ type SaleContextValues = SaleContextProps & {
   ) => Promise<SignResponse | undefined>;
   execute: (
     signResponse: SignResponse | undefined,
+    waitForTrnsactionSettlement: boolean,
     onTxnSuccess: (txn: ExecutedTransaction) => void,
     onTxnError: (error: any, txns: ExecutedTransaction[]) => void
   ) => Promise<ExecutedTransaction[]>;
@@ -73,7 +76,8 @@ type SaleContextValues = SaleContextProps & {
   paymentMethod: SalePaymentTypes | undefined;
   setPaymentMethod: (paymentMethod: SalePaymentTypes | undefined) => void;
   goBackToPaymentMethods: (
-    paymentMethod?: SalePaymentTypes | undefined
+    paymentMethod?: SalePaymentTypes | undefined,
+    data?: Record<string, unknown>
   ) => void;
   goToErrorView: (type: SaleErrorTypes, data?: Record<string, unknown>) => void;
   goToSuccessView: (data?: Record<string, unknown>) => void;
@@ -81,6 +85,7 @@ type SaleContextValues = SaleContextProps & {
     callback?: (r?: SmartCheckoutResult) => void
   ) => Promise<SmartCheckoutResult | undefined>;
   smartCheckoutResult: SmartCheckoutResult | undefined;
+  smartCheckoutError: SmartCheckoutError | undefined;
   fundingRoutes: FundingRoute[];
   disabledPaymentTypes: SalePaymentTypes[];
   invalidParameters: boolean;
@@ -115,12 +120,14 @@ const SaleContext = createContext<SaleContextValues>({
   config: {} as StrongCheckoutWidgetsConfig,
   querySmartCheckout: () => Promise.resolve(undefined),
   smartCheckoutResult: undefined,
+  smartCheckoutError: undefined,
   fundingRoutes: [],
   disabledPaymentTypes: [],
   invalidParameters: false,
   fromTokenAddress: '',
   clientConfig: defaultClientConfig,
   signTokenIds: [],
+  excludePaymentTypes: [],
 });
 
 SaleContext.displayName = 'SaleSaleContext';
@@ -144,6 +151,7 @@ export function SaleContextProvider(props: {
       checkout,
       passport,
       collectionName,
+      excludePaymentTypes,
     },
   } = props;
 
@@ -164,7 +172,11 @@ export function SaleContextProvider(props: {
   const [fundingRoutes, setFundingRoutes] = useState<FundingRoute[]>([]);
   const [disabledPaymentTypes, setDisabledPaymentTypes] = useState<
   SalePaymentTypes[]
-  >([]);
+  >(excludePaymentTypes || []);
+
+  const disablePaymentTypes = (types: SalePaymentTypes[]) => {
+    setDisabledPaymentTypes((prev) => [...prev, ...types]);
+  };
 
   const [invalidParameters, setInvalidParameters] = useState<boolean>(false);
 
@@ -178,7 +190,7 @@ export function SaleContextProvider(props: {
   const goBackToPaymentMethods = useCallback(
     (
       type?: SalePaymentTypes | undefined,
-      showInsufficientCoinsBanner?: boolean,
+      data?: Record<string, unknown>,
     ) => {
       setPaymentMethod(type);
       viewDispatch({
@@ -186,9 +198,7 @@ export function SaleContextProvider(props: {
           type: ViewActions.UPDATE_VIEW,
           view: {
             type: SaleWidgetViews.PAYMENT_METHODS,
-            data: {
-              showInsufficientCoinsBanner,
-            },
+            data,
           },
         },
       });
@@ -310,8 +320,8 @@ export function SaleContextProvider(props: {
       (smartCheckoutError.data?.error as Error)?.message
       === SmartCheckoutErrorTypes.FRACTIONAL_BALANCE_BLOCKED
     ) {
-      setDisabledPaymentTypes([SalePaymentTypes.CRYPTO]);
-      goBackToPaymentMethods(undefined, true);
+      disablePaymentTypes([SalePaymentTypes.CRYPTO]);
+      goBackToPaymentMethods(undefined);
       return;
     }
     goToErrorView(smartCheckoutError.type, smartCheckoutError.data);
@@ -330,6 +340,7 @@ export function SaleContextProvider(props: {
     if (!smartCheckoutResult) {
       return;
     }
+
     if (smartCheckoutResult.sufficient) {
       sign(SignPaymentTypes.CRYPTO);
       viewDispatch({
@@ -363,8 +374,8 @@ export function SaleContextProvider(props: {
         default:
           setFundingRoutes([]);
           setPaymentMethod(undefined);
-          setDisabledPaymentTypes([SalePaymentTypes.CRYPTO]);
-          goBackToPaymentMethods(undefined, true);
+          disablePaymentTypes([SalePaymentTypes.CRYPTO]);
+          goBackToPaymentMethods(undefined);
           break;
       }
     }
@@ -378,6 +389,11 @@ export function SaleContextProvider(props: {
       setInvalidParameters(true);
     }
   }, [items, amount, collectionName, environmentId]);
+
+  useEffect(() => {
+    if (excludePaymentTypes?.length <= 0) return;
+    setDisabledPaymentTypes(excludePaymentTypes);
+  }, [excludePaymentTypes]);
 
   const values = useMemo(
     () => ({
@@ -405,11 +421,13 @@ export function SaleContextProvider(props: {
       isPassportWallet: !!(provider?.provider as any)?.isPassport,
       querySmartCheckout,
       smartCheckoutResult,
+      smartCheckoutError,
       fundingRoutes,
       disabledPaymentTypes,
       invalidParameters,
       clientConfig,
       signTokenIds: tokenIds,
+      excludePaymentTypes,
     }),
     [
       config,
@@ -433,11 +451,13 @@ export function SaleContextProvider(props: {
       sign,
       querySmartCheckout,
       smartCheckoutResult,
+      smartCheckoutError,
       fundingRoutes,
       disabledPaymentTypes,
       invalidParameters,
       clientConfig,
       tokenIds,
+      excludePaymentTypes,
     ],
   );
 
