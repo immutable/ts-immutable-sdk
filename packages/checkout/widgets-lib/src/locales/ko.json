@@ -267,17 +267,17 @@
         "crypto": {
           "heading": "코인",
           "caption": "잔액에 코인이 있으면 가장 빠른 결제 방법입니다.",
-          "disabledCaption": "잔액에서 충분한 코인을 찾을 수 없습니다"
+          "disabledCaption": "현재 이 구매에는 사용할 수 없습니다."
         },
         "debit": {
           "heading": "직불카드",
           "caption": "카드로 결제하는 권장 방법입니다.",
-          "disabledCaption": null
+          "disabledCaption": "현재 대규모 구매를 위해 이 결제 방법을 개선하는 중입니다."
         },
         "credit": {
           "heading": "신용카드",
           "caption": "은행에서 거래를 차단할 수 있으므로 권장하지 않습니다.",
-          "disabledCaption": null
+          "disabledCaption": "현재 대규모 구매를 위해 이 결제 방법을 개선하는 중입니다."
         }
       },
       "topUp": {
