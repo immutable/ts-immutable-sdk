@@ -2828,7 +2828,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ethersproject/abi@npm:5.7.0, @ethersproject/abi@npm:^5.0.0, @ethersproject/abi@npm:^5.0.12, @ethersproject/abi@npm:^5.5.0, @ethersproject/abi@npm:^5.7.0":
+"@ethersproject/abi@npm:5.7.0, @ethersproject/abi@npm:^5.0.12, @ethersproject/abi@npm:^5.5.0, @ethersproject/abi@npm:^5.7.0":
   version: 5.7.0
   resolution: "@ethersproject/abi@npm:5.7.0"
   dependencies:
@@ -2916,7 +2916,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ethersproject/bytes@npm:5.7.0, @ethersproject/bytes@npm:^5.0.0, @ethersproject/bytes@npm:^5.7.0":
+"@ethersproject/bytes@npm:5.7.0, @ethersproject/bytes@npm:^5.7.0":
   version: 5.7.0
   resolution: "@ethersproject/bytes@npm:5.7.0"
   dependencies:
@@ -3055,7 +3055,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ethersproject/providers@npm:5.7.2, @ethersproject/providers@npm:^5.0.0, @ethersproject/providers@npm:^5.7.2":
+"@ethersproject/providers@npm:5.7.2, @ethersproject/providers@npm:^5.7.2":
   version: 5.7.2
   resolution: "@ethersproject/providers@npm:5.7.2"
   dependencies:
@@ -3501,24 +3501,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/core-sdk@npm:^2.4.0":
-  version: 2.4.0
-  resolution: "@imtbl/core-sdk@npm:2.4.0"
-  dependencies:
-    "@ethersproject/abi": ^5.0.0
-    "@ethersproject/bytes": ^5.0.0
-    "@ethersproject/providers": ^5.0.0
-    axios: ^0.26.1
-    bn.js: ^5.2.0
-    elliptic: ^6.5.4
-    enc-utils: ^3.0.0
-    ethereumjs-wallet: ^1.0.2
-    ethers: ^5.7.1
-    hash.js: ^1.1.7
-  checksum: 348939509b461551c4664f32f6194a2bd659c0b7cf8c3c3689e3fa183ee6db810f3dc82a16979d01e4c0e6231f98a10ea67aeb1cb7bdc5501bb0c5aa6ade1fe6
-  languageName: node
-  linkType: hard
-
 "@imtbl/cryptofiat@0.0.0, @imtbl/cryptofiat@workspace:packages/internal/cryptofiat":
   version: 0.0.0-use.local
   resolution: "@imtbl/cryptofiat@workspace:packages/internal/cryptofiat"
@@ -3784,7 +3766,6 @@ __metadata:
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
-    "@imtbl/core-sdk": ^2.4.0
     "@imtbl/cryptofiat": 0.0.0
     "@imtbl/generated-clients": 0.0.0
     "@imtbl/guardian": 0.0.0
@@ -3820,6 +3801,7 @@ __metadata:
     elliptic: ^6.5.4
     enc-utils: ^3.0.0
     eslint: ^8.40.0
+    ethereumjs-wallet: ^1.0.2
     ethers: ^5.7.2
     glob: ^10.2.3
     global-const: ^0.1.2
@@ -3921,6 +3903,7 @@ __metadata:
     elliptic: ^6.5.4
     enc-utils: ^3.0.0
     eslint: ^8.40.0
+    ethereumjs-wallet: ^1.0.2
     ethers: ^5.7.2
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
@@ -11615,15 +11598,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^0.26.1":
-  version: 0.26.1
-  resolution: "axios@npm:0.26.1"
-  dependencies:
-    follow-redirects: ^1.14.8
-  checksum: d9eb58ff4bc0b36a04783fc9ff760e9245c829a5a1052ee7ca6013410d427036b1d10d04e7380c02f3508c5eaf3485b1ae67bd2adbfec3683704745c8d7a6e1a
-  languageName: node
-  linkType: hard
-
 "axios@npm:^1.6.5":
   version: 1.6.5
   resolution: "axios@npm:1.6.5"
@@ -15848,7 +15822,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ethers@npm:^5.7.1, ethers@npm:^5.7.2":
+"ethers@npm:^5.7.2":
   version: 5.7.2
   resolution: "ethers@npm:5.7.2"
   dependencies:
@@ -16458,7 +16432,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.0.0, follow-redirects@npm:^1.14.8, follow-redirects@npm:^1.15.0":
+"follow-redirects@npm:^1.0.0, follow-redirects@npm:^1.15.0":
   version: 1.15.2
   resolution: "follow-redirects@npm:1.15.2"
   peerDependenciesMeta:
