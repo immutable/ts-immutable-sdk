@@ -53,12 +53,16 @@ export const fetchGasPrice = async (provider: Provider, nativeToken: Native): Pr
  * @returns - The cost of the transaction in the gas token's smallest denomination (e.g. WEI)
  */
 export const calculateGasFee = (
-  hasSecondaryFees: boolean,
+  gasPrice: CoinAmount<Native>,
+  gasEstimate: BigNumber,
+): CoinAmount<Native> =>
+  newAmount(gasEstimate.mul(gasPrice.value), gasPrice.token);
+  // eslint-disable-next-line implicit-arrow-linebreak
+
+export const calculateGasFeeViaSwapProxy = (
   gasPrice: CoinAmount<Native>,
   gasEstimate: BigNumber,
 ): CoinAmount<Native> => {
   const baseGasFee = newAmount(gasEstimate.mul(gasPrice.value), gasPrice.token);
-  if (!hasSecondaryFees) return baseGasFee;
   return newAmount(baseGasFee.value.add(gasPrice.value.mul(AVERAGE_SECONDARY_FEE_EXTRA_GAS)), gasPrice.token);
-  // eslint-disable-next-line implicit-arrow-linebreak
 };
