@@ -3767,7 +3767,7 @@ __metadata:
     "@metamask/detect-provider": ^2.0.0
     "@opensea/seaport-js": 3.0.2
     "@rive-app/react-canvas": ^4.8.3
-    "@rollup/plugin-commonjs": ^25.0.7
+    "@rollup/plugin-commonjs": ^24.0.1
     "@rollup/plugin-json": ^6.0.0
     "@rollup/plugin-node-resolve": ^15.0.2
     "@rollup/plugin-replace": ^5.0.2
@@ -6449,25 +6449,6 @@ __metadata:
     rollup:
       optional: true
   checksum: 42faafc9bc8e04d75c86bb50d693ebb9c5eee19bf9ab3c09780b872547d12ff5ea85cfec7da75f5176d0aa4b5233101f667f44b85b331450a7bb14c95180852e
-  languageName: node
-  linkType: hard
-
-"@rollup/plugin-commonjs@npm:^25.0.7":
-  version: 25.0.7
-  resolution: "@rollup/plugin-commonjs@npm:25.0.7"
-  dependencies:
-    "@rollup/pluginutils": ^5.0.1
-    commondir: ^1.0.1
-    estree-walker: ^2.0.2
-    glob: ^8.0.3
-    is-reference: 1.2.1
-    magic-string: ^0.30.3
-  peerDependencies:
-    rollup: ^2.68.0||^3.0.0||^4.0.0
-  peerDependenciesMeta:
-    rollup:
-      optional: true
-  checksum: 052e11839a9edc556eda5dcc759ab816dcc57e9f0f905a1e6e14fff954eaa6b1e2d0d544f5bd18d863993c5eba43d8ac9c19d9bb53b1c3b1213f32cfc9d50b2e
   languageName: node
   linkType: hard
 
