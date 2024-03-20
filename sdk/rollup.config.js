@@ -48,11 +48,11 @@ const getFileBuild = (inputFilename) => [
         resolveOnly: getPackages(),
       }),
       commonJs(),
+      json(),
       typescript({
         declaration: true,
         declarationDir: './dist/types',
       }),
-      json(),
       replace({
         exclude: 'node_modules/**',
         preventAssignment: true,
