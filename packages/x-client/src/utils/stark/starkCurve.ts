@@ -2,7 +2,8 @@
 import { Signer } from '@ethersproject/abstract-signer';
 import { splitSignature } from '@ethersproject/bytes';
 import hash from 'hash.js';
-import { curves, ec } from 'elliptic';
+import * as elliptic from 'elliptic';
+// import { curves, ec } from 'elliptic';
 import * as encUtils from 'enc-utils';
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import BN from 'bn.js';
@@ -40,9 +41,12 @@ export const starkEcOrder = new BN(
   16,
 );
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
+const { PresetCurve }: typeof elliptic.curves = elliptic.curves;
+
 // eslint-disable-next-line new-cap
-export const starkEc = new ec(
-  new curves.PresetCurve({
+export const starkEc = new elliptic.ec(
+  new PresetCurve({
     type: 'short',
     prime: null,
     p: '08000000 00000011 00000000 00000000 00000000 00000000 00000000 00000001',
