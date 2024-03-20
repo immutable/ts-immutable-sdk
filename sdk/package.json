@@ -16,7 +16,6 @@
     "@ethersproject/providers": "^5.7.2",
     "@ethersproject/strings": "^5.7.0",
     "@ethersproject/wallet": "^5.7.0",
-    "@imtbl/core-sdk": "^2.4.0",
     "@imtbl/react-analytics": "0.2.1-alpha",
     "@jest/globals": "^29.5.0",
     "@magic-ext/oidc": "4.2.0",
@@ -53,9 +52,6 @@
     "url": "^0.11.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.24.0",
-    "@babel/plugin-transform-class-properties": "^7.23.3",
-    "@babel/plugin-transform-private-methods": "^7.23.3",
     "@imtbl/blockchain-data": "0.0.0",
     "@imtbl/checkout-sdk": "0.0.0",
     "@imtbl/checkout-widgets": "0.0.0",
@@ -68,8 +64,7 @@
     "@imtbl/version-check": "0.0.0",
     "@imtbl/x-client": "0.0.0",
     "@imtbl/x-provider": "0.0.0",
-    "@rollup/plugin-babel": "^6.0.4",
-    "@rollup/plugin-commonjs": "^24.0.1",
+    "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-node-resolve": "^15.0.2",
     "@rollup/plugin-replace": "^5.0.2",
@@ -140,8 +135,8 @@
     "@openzeppelin/contracts": "3.4.2-solc-0.7"
   },
   "scripts": {
-    "build": "yarn packageList && yarn updateDependencies && yarn regenModules && rm -rf dist && NODE_ENV=production node --max-old-space-size=8192 ../node_modules/rollup/dist/bin/rollup --config rollup.config.js && rm -rf dist/types",
-    "build:only": "rm -rf dist && NODE_ENV=production node --max-old-space-size=8192 ../node_modules/rollup/dist/bin/rollup --config rollup.config.js && rm -rf dist/types",
+    "build": "yarn packageList && yarn updateDependencies && yarn regenModules && rm -rf dist && NODE_ENV=production rollup --config rollup.config.js && rm -rf dist/types",
+    "build:only": "rm -rf dist && NODE_ENV=production rollup --config rollup.config.js && rm -rf dist/types",
     "copyBrowserBundles": "node scripts/copyBrowserBundles.js",
     "generateIndex": "node scripts/generateIndex.js",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
