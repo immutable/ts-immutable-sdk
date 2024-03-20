@@ -1196,7 +1196,7 @@ __metadata:
 
 "@imtbl/sdk@file:../../../sdk::locator=ts-immutable-sample%40workspace%3A.":
   version: 0.0.0
-  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=d58b95&locator=ts-immutable-sample%40workspace%3A."
+  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=502a0e&locator=ts-immutable-sample%40workspace%3A."
   dependencies:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
@@ -1245,7 +1245,7 @@ __metadata:
   peerDependencies:
     react: ^18.2.0
     react-dom: ^18.2.0
-  checksum: 1e06b047e5d89c569f91e6bc51cff823653de502bfe05f2376becb3cfe8c6a7af219895ce5d6157b188e5b22e41b0c0e191c775094adae1b8506acc031b92ab7
+  checksum: 1bae1fe584e0cf7a92a3b4be98a13b73b6fc4bd81d8c098c829b7620af6036d94e989d689a266e3525babb31ecfa343f62e4f1aee91d57391f40dc2419662074
   languageName: node
   linkType: hard
 
@@ -8740,9 +8740,9 @@ __metadata:
   linkType: hard
 
 "ip@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "ip@npm:2.0.0"
-  checksum: cfcfac6b873b701996d71ec82a7dd27ba92450afdb421e356f44044ed688df04567344c36cbacea7d01b1c39a4c732dc012570ebe9bebfb06f27314bca625349
+  version: 2.0.1
+  resolution: "ip@npm:2.0.1"
+  checksum: d765c9fd212b8a99023a4cde6a558a054c298d640fec1020567494d257afd78ca77e37126b1a3ef0e053646ced79a816bf50621d38d5e768cdde0431fa3b0d35
   languageName: node
   linkType: hard
 
