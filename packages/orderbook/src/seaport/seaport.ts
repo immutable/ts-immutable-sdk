@@ -106,10 +106,14 @@ export class Seaport {
     const { orderComponents, tips } = this.mapImmutableOrderToSeaportOrderComponents(order);
     const seaportLib = this.getSeaportLib(order);
 
-    const signer = await this.provider.getSigner(account);
-    const address = await signer.getAddress();
-    // eslint-disable-next-line no-console
-    console.log(`Fulfiller address: ${address}`);
+    try {
+      const signer = await this.provider.getSigner(account);
+      const address = await signer.getAddress();
+      // eslint-disable-next-line no-console
+      console.log(`Fulfiller address: ${address}`);
+    } catch {
+      // no-op - this is for temporary debugging
+    }
 
     const { actions: seaportActions } = await seaportLib.fulfillOrders({
       accountAddress: account,

@@ -460,7 +460,6 @@ describe('Seaport', () => {
           mockedSeaportJs.fulfillOrders(
             deepEqual({
               accountAddress: fulfiller,
-              recipientAddress: fulfiller,
               fulfillOrderDetails: [
                 {
                   order: {
