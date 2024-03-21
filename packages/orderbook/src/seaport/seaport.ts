@@ -108,6 +108,8 @@ export class Seaport {
 
     const { actions: seaportActions } = await seaportLib.fulfillOrders({
       accountAddress: account,
+      // TODO: Verify if this prevent zero address recipient from browsers
+      recipientAddress: account,
       fulfillOrderDetails: [
         {
           order: {

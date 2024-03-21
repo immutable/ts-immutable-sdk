@@ -35,7 +35,9 @@ function convertToV6Provider(
     // Account address
     // This is where the override comes in to effect. We explicitly do not confirm if the
     // provider has access to the address as a signer.
-    return new JsonRpcSigner(this, address);
+    const signer = new JsonRpcSigner(this, address);
+    signer.getAddress = async () => address as string;
+    return signer;
   };
 
   return overwrittenProvider;
