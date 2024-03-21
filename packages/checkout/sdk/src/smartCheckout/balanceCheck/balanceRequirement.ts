@@ -134,6 +134,7 @@ export const getTokenBalanceRequirement = async (
       name = contractName;
       symbol = contractSymbol;
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Failed to query contract information', itemRequirement.tokenAddress);
     }
   }
