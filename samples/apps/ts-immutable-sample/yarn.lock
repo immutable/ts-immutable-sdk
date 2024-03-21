@@ -1196,7 +1196,7 @@ __metadata:
 
 "@imtbl/sdk@file:../../../sdk::locator=ts-immutable-sample%40workspace%3A.":
   version: 0.0.0
-  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=d58b95&locator=ts-immutable-sample%40workspace%3A."
+  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=502a0e&locator=ts-immutable-sample%40workspace%3A."
   dependencies:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
@@ -1245,7 +1245,7 @@ __metadata:
   peerDependencies:
     react: ^18.2.0
     react-dom: ^18.2.0
-  checksum: 1e06b047e5d89c569f91e6bc51cff823653de502bfe05f2376becb3cfe8c6a7af219895ce5d6157b188e5b22e41b0c0e191c775094adae1b8506acc031b92ab7
+  checksum: 1bae1fe584e0cf7a92a3b4be98a13b73b6fc4bd81d8c098c829b7620af6036d94e989d689a266e3525babb31ecfa343f62e4f1aee91d57391f40dc2419662074
   languageName: node
   linkType: hard
 
@@ -10674,14 +10674,14 @@ __metadata:
   linkType: hard
 
 "msgpackr@npm:^1.9.5, msgpackr@npm:^1.9.9":
-  version: 1.9.9
-  resolution: "msgpackr@npm:1.9.9"
+  version: 1.10.1
+  resolution: "msgpackr@npm:1.10.1"
   dependencies:
     msgpackr-extract: ^3.0.2
   dependenciesMeta:
     msgpackr-extract:
       optional: true
-  checksum: b63182d99f479d79f0d082fd2688ce7cf699b1aee71e20f28591c30b48743bb57868fdd72656759a892891072d186d864702c756434520709e8fe7e0d350a119
+  checksum: e422d18b01051598b23701eebeb4b9e2c686b9c7826b20f564724837ba2b5cd4af74c91a549eaeaf8186645cc95e8196274a4a19442aa3286ac611b98069c194
   languageName: node
   linkType: hard
 
