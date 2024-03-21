@@ -27,18 +27,18 @@ fi
 
   # Update versions in the browserBundle docs (https://docs.immutable.com/docs/x/sdks/typescript/#browser-bundle)
   FILE=docs/main/sdks/_typescript.mdx
-  major=$(awk '{ 
+  major=$(echo $VERSION | awk '{ 
     split($0, a, ".");
     print a[1];
-  }' <<< $VERSION)
-  minor=$(awk '{ 
+  }')
+  minor=$(echo $VERSION | awk '{ 
     split($0, a, ".");
     print a[2];
-  }' <<< $VERSION)
-  patch=$(awk '{ 
+  }')
+  patch=$(echo $VERSION | awk '{ 
     split($0, a, ".");
     print a[3];
-  }' <<< $VERSION)
+  }')
   echo "major: $major minor: $minor patch: $patch"
 
   # On Mac OS, sed requires an empty string as an argument to -i to avoid creating a backup file
