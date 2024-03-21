@@ -1269,7 +1269,7 @@ __metadata:
 
 "@imtbl/sdk@file:../../../sdk::locator=func-tests-imx%40workspace%3A.":
   version: 0.0.0
-  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=d58b95&locator=func-tests-imx%40workspace%3A."
+  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=502a0e&locator=func-tests-imx%40workspace%3A."
   dependencies:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
@@ -1318,7 +1318,7 @@ __metadata:
   peerDependencies:
     react: ^18.2.0
     react-dom: ^18.2.0
-  checksum: 1e06b047e5d89c569f91e6bc51cff823653de502bfe05f2376becb3cfe8c6a7af219895ce5d6157b188e5b22e41b0c0e191c775094adae1b8506acc031b92ab7
+  checksum: 1bae1fe584e0cf7a92a3b4be98a13b73b6fc4bd81d8c098c829b7620af6036d94e989d689a266e3525babb31ecfa343f62e4f1aee91d57391f40dc2419662074
   languageName: node
   linkType: hard
 
@@ -2544,6 +2544,13 @@ __metadata:
   version: 4.9.5
   resolution: "@openzeppelin/contracts@npm:4.9.5"
   checksum: 2cddeb08c006a8f99c5cc40cc80aecb449fd941cd1a92ebda315d77f48c4b4d487798a1254bffbc3ec811b390365d14665e92dbb2dd8f45aacef479d69d94574
+  languageName: node
+  linkType: hard
+
+"@openzeppelin/contracts@npm:^4.9.6":
+  version: 4.9.6
+  resolution: "@openzeppelin/contracts@npm:4.9.6"
+  checksum: 274b6e968268294f12d5ca4f0278f6e6357792c8bb4d76664f83dbdc325f780541538a127e6a6e97e4f018088b42f65952014dec9c745c0fa25081f43ef9c4bf
   languageName: node
   linkType: hard
 
@@ -9377,7 +9384,7 @@ __metadata:
     "@nomicfoundation/hardhat-verify": ^2.0.0
     "@nomiclabs/hardhat-ethers": ^2.0.0
     "@nomiclabs/hardhat-etherscan": ^3.0.0
-    "@openzeppelin/contracts": ^4.9.3
+    "@openzeppelin/contracts": ^4.9.6
     "@swc/jest": ^0.2.29
     "@typechain/ethers-v6": ^0.5.0
     "@typechain/hardhat": ^9.0.0
