@@ -108,6 +108,7 @@ export class Seaport {
 
     const signer = await this.provider.getSigner(account);
     const address = await signer.getAddress();
+    // eslint-disable-next-line no-console
     console.log(`Fulfiller address: ${address}`);
 
     const { actions: seaportActions } = await seaportLib.fulfillOrders({
