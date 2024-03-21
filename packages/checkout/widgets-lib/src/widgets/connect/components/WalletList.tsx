@@ -127,18 +127,6 @@ export function WalletList(props: WalletListProps) {
       const isMetaMask = providerDetail.info.rdns === WalletProviderRdns.METAMASK;
       const web3Provider = new Web3Provider(providerDetail.provider as any);
 
-      track({
-        userJourney: UserJourney.CONNECT,
-        screen: 'ConnectWallet',
-        control: 'Wallet',
-        controlType: 'MenuItem',
-        extras: {
-          wallet: getProviderSlugFromRdns(providerDetail.info.rdns),
-          walletRdns: providerDetail.info.rdns,
-          walletUuid: providerDetail.info.uuid,
-        },
-      });
-
       try {
         // TODO: Find a nice way to detect if the wallet supports switching accounts via requestPermissions
         const changeAccount = isMetaMask;
@@ -203,6 +191,12 @@ export function WalletList(props: WalletListProps) {
   };
 
   const handleWalletConnectConnection = async () => {
+    track({
+      userJourney: UserJourney.CONNECT,
+      screen: 'ConnectWallet',
+      control: 'WalletConnect',
+      controlType: 'MenuItem',
+    });
     await openWalletConnectModal({
       connectCallback,
       restoreSession: true,
@@ -254,6 +248,12 @@ export function WalletList(props: WalletListProps) {
   }, [chosenProviderDetail]);
 
   const onBrowserWalletsClick = useCallback(() => {
+    track({
+      userJourney: UserJourney.CONNECT,
+      screen: 'ConnectWallet',
+      control: 'BrowserWallets',
+      controlType: 'MenuItem',
+    });
     setShowWalletDrawer(true);
   }, [track]);
 
