@@ -1,6 +1,13 @@
 import { BigNumber } from 'ethers';
+import { Web3Provider } from '@ethersproject/providers';
 import {
-  ERC20Item, ERC721Item, ItemBalance, ItemRequirement, ItemType, NativeItem,
+  ChainId,
+  ERC20Item,
+  ERC721Item,
+  ItemBalance,
+  ItemRequirement,
+  ItemType,
+  NativeItem,
 } from '../../types';
 import {
   getERC721BalanceRequirement,
@@ -63,30 +70,28 @@ describe('balanceRequirement', () => {
         },
       ];
       const result = getERC721BalanceRequirement(itemRequirement, balances);
-      expect(result).toEqual(
-        {
-          sufficient: true,
-          type: ItemType.ERC721,
-          delta: {
-            balance: BigNumber.from(0),
-            formattedBalance: '0',
-          },
-          required: {
-            type: ItemType.ERC721,
-            balance: BigNumber.from(1),
-            formattedBalance: '1',
-            contractAddress: '0xERC721',
-            id: '0',
-          },
-          current: {
-            type: ItemType.ERC721,
-            balance: BigNumber.from(1),
-            formattedBalance: '1',
-            contractAddress: '0xERC721',
-            id: '0',
-          },
+      expect(result).toEqual({
+        sufficient: true,
+        type: ItemType.ERC721,
+        delta: {
+          balance: BigNumber.from(0),
+          formattedBalance: '0',
         },
-      );
+        required: {
+          type: ItemType.ERC721,
+          balance: BigNumber.from(1),
+          formattedBalance: '1',
+          contractAddress: '0xERC721',
+          id: '0',
+        },
+        current: {
+          type: ItemType.ERC721,
+          balance: BigNumber.from(1),
+          formattedBalance: '1',
+          contractAddress: '0xERC721',
+          id: '0',
+        },
+      });
     });
 
     it('should return sufficient false if does not meet requirement for ERC721', () => {
@@ -110,34 +115,45 @@ describe('balanceRequirement', () => {
         },
       ];
       const result = getERC721BalanceRequirement(itemRequirement, balances);
-      expect(result).toEqual(
-        {
-          sufficient: false,
-          type: ItemType.ERC721,
-          delta: {
-            balance: BigNumber.from(1),
-            formattedBalance: '1',
-          },
-          required: {
-            type: ItemType.ERC721,
-            balance: BigNumber.from(1),
-            formattedBalance: '1',
-            contractAddress: '0xERC721',
-            id: '0',
-          },
-          current: {
-            type: ItemType.ERC721,
-            balance: BigNumber.from(0),
-            formattedBalance: '0',
-            contractAddress: '0xERC721',
-            id: '0',
-          },
+      expect(result).toEqual({
+        sufficient: false,
+        type: ItemType.ERC721,
+        delta: {
+          balance: BigNumber.from(1),
+          formattedBalance: '1',
         },
-      );
+        required: {
+          type: ItemType.ERC721,
+          balance: BigNumber.from(1),
+          formattedBalance: '1',
+          contractAddress: '0xERC721',
+          id: '0',
+        },
+        current: {
+          type: ItemType.ERC721,
+          balance: BigNumber.from(0),
+          formattedBalance: '0',
+          contractAddress: '0xERC721',
+          id: '0',
+        },
+      });
     });
   });
 
   describe('getTokenBalanceRequirement', () => {
+    let mockProvider: Web3Provider;
+
+    beforeEach(() => {
+      mockProvider = {
+        getSigner: jest.fn().mockReturnValue({
+          getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
+        }),
+        network: {
+          chainId: ChainId.ETHEREUM,
+        },
+      } as unknown as Web3Provider;
+    });
+
     it('should return sufficient true if meets requirements for NATIVE', async () => {
       const itemRequirement: NativeItem = {
         type: ItemType.NATIVE,
@@ -156,7 +172,11 @@ describe('balanceRequirement', () => {
         },
       ];
 
-      const result = await getTokenBalanceRequirement(itemRequirement, balances);
+      const result = await getTokenBalanceRequirement(
+        itemRequirement,
+        balances,
+        mockProvider,
+      );
       expect(result).toEqual({
         sufficient: true,
         type: ItemType.NATIVE,
@@ -187,7 +207,7 @@ describe('balanceRequirement', () => {
       });
     });
 
-    it('should return sufficient true if meets requirements for ERC20', () => {
+    it('should return sufficient true if meets requirements for ERC20', async () => {
       const itemRequirement: ERC20Item = {
         type: ItemType.ERC20,
         tokenAddress: '0xERC20',
@@ -208,7 +228,11 @@ describe('balanceRequirement', () => {
         },
       ];
 
-      const result = getTokenBalanceRequirement(itemRequirement, balances);
+      const result = await getTokenBalanceRequirement(
+        itemRequirement,
+        balances,
+        mockProvider,
+      );
       expect(result).toEqual({
         sufficient: true,
         type: ItemType.ERC20,
@@ -241,7 +265,7 @@ describe('balanceRequirement', () => {
       });
     });
 
-    it('should return sufficient false if requirements not met for NATIVE', () => {
+    it('should return sufficient false if requirements not met for NATIVE', async () => {
       const itemRequirement: NativeItem = {
         type: ItemType.NATIVE,
         amount: BigNumber.from('1000000000000000000'),
@@ -270,7 +294,11 @@ describe('balanceRequirement', () => {
         },
       ];
 
-      const result = getTokenBalanceRequirement(itemRequirement, balances);
+      const result = await getTokenBalanceRequirement(
+        itemRequirement,
+        balances,
+        mockProvider,
+      );
       expect(result).toEqual({
         sufficient: false,
         type: ItemType.NATIVE,
@@ -301,7 +329,7 @@ describe('balanceRequirement', () => {
       });
     });
 
-    it('should return sufficient false if requirements not met for ERC20', () => {
+    it('should return sufficient false if requirements not met for ERC20', async () => {
       const itemRequirement: ERC20Item = {
         type: ItemType.ERC20,
         tokenAddress: '0xERC20',
@@ -332,7 +360,11 @@ describe('balanceRequirement', () => {
         },
       ];
 
-      const result = getTokenBalanceRequirement(itemRequirement, balances);
+      const result = await getTokenBalanceRequirement(
+        itemRequirement,
+        balances,
+        mockProvider,
+      );
       expect(result).toEqual({
         sufficient: false,
         type: ItemType.ERC20,
