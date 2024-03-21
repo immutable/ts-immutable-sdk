@@ -158,14 +158,17 @@ export const balanceCheck = async (
 
   // Wait for all balances and calculate the requirements
   const promisesResponses = await Promise.all(balancePromises);
-  const balanceRequirements: BalanceRequirement[] = [];
+  const erc721BalanceRequirements: BalanceRequirement[] = [];
+  const tokenBalanceRequirementPromises: Promise<BalanceRequirement>[] = [];
 
   // Get all ERC20 and NATIVE balances
   if (requiredToken.length > 0 && promisesResponses.length > 0) {
     const result = promisesResponses.shift();
     if (result) {
       requiredToken.forEach((item) => {
-        balanceRequirements.push(getTokenBalanceRequirement(item as (NativeItem | ERC20Item), result));
+        tokenBalanceRequirementPromises.push(
+          getTokenBalanceRequirement(item as (NativeItem | ERC20Item), result, provider),
+        );
       });
     }
   }
@@ -175,10 +178,14 @@ export const balanceCheck = async (
     const result = promisesResponses.shift();
     if (result) {
       requiredERC721.forEach((item) => {
-        balanceRequirements.push(getERC721BalanceRequirement(item as (ERC721Item), result));
+        erc721BalanceRequirements.push(getERC721BalanceRequirement(item as (ERC721Item), result));
       });
     }
   }
+  const balanceRequirements = [
+    ...erc721BalanceRequirements,
+    ...(await Promise.all(tokenBalanceRequirementPromises)),
+  ];
 
   // Find if there are any requirements that aren't sufficient.
   // If there is not item with sufficient === false then the requirements
