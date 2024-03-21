@@ -138,7 +138,7 @@ describe('balanceRequirement', () => {
   });
 
   describe('getTokenBalanceRequirement', () => {
-    it('should return sufficient true if meets requirements for NATIVE', () => {
+    it('should return sufficient true if meets requirements for NATIVE', async () => {
       const itemRequirement: NativeItem = {
         type: ItemType.NATIVE,
         amount: BigNumber.from('1000000000000000000'),
@@ -156,7 +156,7 @@ describe('balanceRequirement', () => {
         },
       ];
 
-      const result = getTokenBalanceRequirement(itemRequirement, balances);
+      const result = await getTokenBalanceRequirement(itemRequirement, balances);
       expect(result).toEqual({
         sufficient: true,
         type: ItemType.NATIVE,

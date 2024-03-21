@@ -1,5 +1,6 @@
 /* eslint-disable arrow-body-style */
-import { BigNumber, utils } from 'ethers';
+import { BigNumber, Contract, utils } from 'ethers';
+import { Web3Provider } from '@ethersproject/providers';
 import {
   ERC20Item,
   ERC721Balance,
@@ -11,12 +12,13 @@ import {
   TokenBalance,
   TokenInfo,
 } from '../../types';
+import { BalanceERC20Requirement, BalanceERC721Requirement, BalanceNativeRequirement } from './types';
 import {
-  BalanceERC20Requirement,
-  BalanceERC721Requirement,
-  BalanceNativeRequirement,
-} from './types';
-import { DEFAULT_TOKEN_DECIMALS, NATIVE, ZKEVM_NATIVE_TOKEN } from '../../env';
+  DEFAULT_TOKEN_DECIMALS,
+  ERC20ABI,
+  NATIVE,
+  ZKEVM_NATIVE_TOKEN,
+} from '../../env';
 import { isNativeToken } from '../../tokens';
 import { isMatchingAddress } from '../../utils/utils';
 
@@ -88,10 +90,11 @@ export const getERC721BalanceRequirement = (
 /**
  * Gets the balance requirement for a NATIVE or ERC20 requirement.
  */
-export const getTokenBalanceRequirement = (
+export const getTokenBalanceRequirement = async (
   itemRequirement: ERC20Item | NativeItem,
   balances: ItemBalance[],
-) : BalanceNativeRequirement | BalanceERC20Requirement => {
+  provider: Web3Provider,
+) : Promise<BalanceNativeRequirement | BalanceERC20Requirement> => {
   let itemBalanceResult: ItemBalance | undefined;
 
   // Get the requirements related balance
@@ -118,6 +121,21 @@ export const getTokenBalanceRequirement = (
     decimals = (itemBalanceResult as TokenBalance).token?.decimals ?? DEFAULT_TOKEN_DECIMALS;
     name = (itemBalanceResult as TokenBalance).token.name;
     symbol = (itemBalanceResult as TokenBalance).token.symbol;
+  } else if (itemRequirement.type === ItemType.ERC20) {
+    // Missing item balance so we need to query contract
+    try {
+      const contract = new Contract(itemRequirement.tokenAddress, JSON.stringify(ERC20ABI), provider);
+      const [contractName, contractSymbol, contractDecimals] = await Promise.all([
+        contract.name(),
+        contract.symbol(),
+        contract.decimals(),
+      ]);
+      decimals = contractDecimals;
+      name = contractName;
+      symbol = contractSymbol;
+    } catch (error) {
+      console.error('Failed to query contract information', itemRequirement.tokenAddress);
+    }
   }
 
   let tokenBalanceResult = itemBalanceResult as TokenBalance;
@@ -141,10 +159,22 @@ export const getTokenBalanceRequirement = (
       },
       current: {
         ...tokenBalanceResult,
+        token: {
+          address: tokenBalanceResult.token.address,
+          symbol,
+          name,
+          decimals,
+        },
         type: ItemType.NATIVE,
       },
       required: {
         ...tokenBalanceResult,
+        token: {
+          address: tokenBalanceResult.token.address,
+          symbol,
+          name,
+          decimals,
+        },
         type: ItemType.NATIVE,
         balance: BigNumber.from(itemRequirement.amount),
         formattedBalance: utils.formatUnits(itemRequirement.amount, decimals),
@@ -174,9 +204,23 @@ export const getTokenBalanceRequirement = (
       balance: delta,
       formattedBalance: utils.formatUnits(delta, decimals),
     },
-    current: tokenBalanceResult,
+    current: {
+      ...tokenBalanceResult,
+      token: {
+        address: itemRequirement.tokenAddress,
+        name,
+        symbol,
+        decimals,
+      },
+    },
     required: {
       ...tokenBalanceResult,
+      token: {
+        address: itemRequirement.tokenAddress,
+        name,
+        symbol,
+        decimals,
+      },
       balance: BigNumber.from(itemRequirement.amount),
       formattedBalance: utils.formatUnits(itemRequirement.amount, decimals),
     },
