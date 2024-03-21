@@ -1196,7 +1196,7 @@ __metadata:
 
 "@imtbl/sdk@file:../../../sdk::locator=ts-immutable-sample%40workspace%3A.":
   version: 0.0.0
-  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=d58b95&locator=ts-immutable-sample%40workspace%3A."
+  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=502a0e&locator=ts-immutable-sample%40workspace%3A."
   dependencies:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
@@ -1245,7 +1245,7 @@ __metadata:
   peerDependencies:
     react: ^18.2.0
     react-dom: ^18.2.0
-  checksum: 1e06b047e5d89c569f91e6bc51cff823653de502bfe05f2376becb3cfe8c6a7af219895ce5d6157b188e5b22e41b0c0e191c775094adae1b8506acc031b92ab7
+  checksum: 1bae1fe584e0cf7a92a3b4be98a13b73b6fc4bd81d8c098c829b7620af6036d94e989d689a266e3525babb31ecfa343f62e4f1aee91d57391f40dc2419662074
   languageName: node
   linkType: hard
 
@@ -7991,12 +7991,12 @@ __metadata:
   linkType: hard
 
 "follow-redirects@npm:^1.15.4":
-  version: 1.15.5
-  resolution: "follow-redirects@npm:1.15.5"
+  version: 1.15.6
+  resolution: "follow-redirects@npm:1.15.6"
   peerDependenciesMeta:
     debug:
       optional: true
-  checksum: 5ca49b5ce6f44338cbfc3546823357e7a70813cecc9b7b768158a1d32c1e62e7407c944402a918ea8c38ae2e78266312d617dc68783fac502cbb55e1047b34ec
+  checksum: a62c378dfc8c00f60b9c80cab158ba54e99ba0239a5dd7c81245e5a5b39d10f0c35e249c3379eae719ff0285fff88c365dd446fab19dee771f1d76252df1bbf5
   languageName: node
   linkType: hard
 
