@@ -106,10 +106,12 @@ export class Seaport {
     const { orderComponents, tips } = this.mapImmutableOrderToSeaportOrderComponents(order);
     const seaportLib = this.getSeaportLib(order);
 
+    const signer = await this.provider.getSigner(account);
+    const address = await signer.getAddress();
+    console.log(`Fulfiller address: ${address}`);
+
     const { actions: seaportActions } = await seaportLib.fulfillOrders({
       accountAddress: account,
-      // TODO: Verify if this prevent zero address recipient from browsers
-      recipientAddress: account,
       fulfillOrderDetails: [
         {
           order: {

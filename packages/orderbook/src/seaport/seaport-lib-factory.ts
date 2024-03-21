@@ -14,6 +14,12 @@ function convertToV6Provider(
 ): JsonRpcProvider {
   const overwrittenProvider = new JsonRpcProvider(provider.connection.url);
 
+  console.log('Overwritten provider getSigner method');
+  console.log(overwrittenProvider.getSigner);
+
+  console.log('Overwriter provider methods');
+  console.log(JSON.stringify(Object.keys(overwrittenProvider), null, 2));
+
   // Need to override the getSigner method to mimic V5 behaviour
   overwrittenProvider.getSigner = async function getSigner(
     address?: number | string,
@@ -35,9 +41,7 @@ function convertToV6Provider(
     // Account address
     // This is where the override comes in to effect. We explicitly do not confirm if the
     // provider has access to the address as a signer.
-    const signer = new JsonRpcSigner(this, address);
-    signer.getAddress = async () => address as string;
-    return signer;
+    return new JsonRpcSigner(this, address);
   };
 
   return overwrittenProvider;
