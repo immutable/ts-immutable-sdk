@@ -36,6 +36,7 @@ const PASSPORT_FUNCTIONS = {
   getIdToken: 'getIdToken',
   logout: 'logout',
   getEmail: 'getEmail',
+  getPassportId: 'getPassportId',
   imx: {
     getAddress: 'getAddress',
     isRegisteredOffchain: 'isRegisteredOffchain',
@@ -408,6 +409,19 @@ window.callFunction = async (jsonData: string) => {
           requestId,
           success: true,
           result: userProfile?.email,
+        });
+        break;
+      }
+      case PASSPORT_FUNCTIONS.getPassportId: {
+        const userProfile = await passportClient?.getUserInfo();
+        track(moduleName, 'performedGetPassportId', {
+          timeMs: Date.now() - markStart,
+        });
+        callbackToGame({
+          responseFor: fxName,
+          requestId,
+          success: true,
+          result: userProfile?.sub,
         });
         break;
       }
