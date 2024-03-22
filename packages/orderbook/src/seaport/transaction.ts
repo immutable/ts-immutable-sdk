@@ -22,8 +22,6 @@ export function prepareTransaction(
       maxPriorityFeePerGas: v6ContractTransaction.maxPriorityFeePerGas
         ? BigNumber.from(v6ContractTransaction.maxPriorityFeePerGas)
         : undefined,
-      accessList: v6ContractTransaction.accessList,
-      customData: v6ContractTransaction.customData,
       value: v6ContractTransaction.value ? BigNumber.from(v6ContractTransaction.value) : undefined,
       data: v6ContractTransaction.data,
       nonce: v6ContractTransaction.nonce,
