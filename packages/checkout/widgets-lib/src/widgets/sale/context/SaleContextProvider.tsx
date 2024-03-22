@@ -23,6 +23,7 @@ import {
   SaleWidgetViews,
 } from '../../../context/view-context/SaleViewContextTypes';
 import {
+  SharedViews,
   ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
@@ -39,6 +40,7 @@ import {
   SmartCheckoutError,
   SmartCheckoutErrorTypes,
 } from '../types';
+import { getTopUpViewData } from '../functions/smartCheckoutUtils';
 
 import { useSmartCheckout } from '../hooks/useSmartCheckout';
 import { useClientConfig, defaultClientConfig } from '../hooks/useClientConfig';
@@ -188,10 +190,7 @@ export function SaleContextProvider(props: {
   const fromTokenAddress = currency?.erc20Address || '';
 
   const goBackToPaymentMethods = useCallback(
-    (
-      type?: SalePaymentTypes | undefined,
-      data?: Record<string, unknown>,
-    ) => {
+    (type?: SalePaymentTypes | undefined, data?: Record<string, unknown>) => {
       setPaymentMethod(type);
       viewDispatch({
         payload: {
@@ -321,7 +320,21 @@ export function SaleContextProvider(props: {
       === SmartCheckoutErrorTypes.FRACTIONAL_BALANCE_BLOCKED
     ) {
       disablePaymentTypes([SalePaymentTypes.CRYPTO]);
-      goBackToPaymentMethods(undefined);
+      setPaymentMethod(undefined);
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SharedViews.TOP_UP_VIEW,
+            data: getTopUpViewData(
+              smartCheckoutError,
+              fromTokenAddress,
+              amount,
+            ),
+          },
+        },
+      });
+
       return;
     }
     goToErrorView(smartCheckoutError.type, smartCheckoutError.data);
@@ -379,7 +392,7 @@ export function SaleContextProvider(props: {
           break;
       }
     }
-  }, [smartCheckoutResult]);
+  }, [smartCheckoutResult, smartCheckoutError, sign, amount, fromTokenAddress]);
 
   useEffect(() => {
     const invalidItems = !items || items.length === 0;

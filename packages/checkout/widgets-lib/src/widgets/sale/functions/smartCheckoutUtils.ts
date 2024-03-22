@@ -155,3 +155,43 @@ export const filterSmartCheckoutResult = (
     },
   };
 };
+
+export const getTopUpViewData = (smartCheckoutError: any, tokenAddress: string, amount: string) => {
+  const transactionRequirements = smartCheckoutError?.data?.transactionRequirements || [];
+
+  const native = transactionRequirements.find(
+    ({ type }) => type === ItemType.NATIVE,
+  );
+  const erc20 = transactionRequirements.find(
+    ({ type }) => type === ItemType.ERC20,
+  );
+
+  // FIXME: Get token symbols from requirements (ie. erc20.symbol)
+  const balances = {
+    erc20: {
+      value: erc20?.delta.formattedBalance,
+      symbol: 'USDC',
+    },
+    native: {
+      value: native?.delta.formattedBalance,
+      symbol: 'IMX',
+    },
+  };
+
+  const heading = ['views.PAYMENT_METHODS.topUp.heading'];
+  let subheading = ['views.PAYMENT_METHODS.topUp.subheading.both', balances];
+
+  if (native?.sufficient && !erc20?.sufficient) {
+    subheading = ['views.PAYMENT_METHODS.topUp.subheading.erc20', balances];
+  }
+  if (!native?.sufficient && erc20?.sufficient) {
+    subheading = ['views.PAYMENT_METHODS.topUp.subheading.native', balances];
+  }
+
+  return {
+    tokenAddress,
+    amount,
+    heading,
+    subheading,
+  };
+};
