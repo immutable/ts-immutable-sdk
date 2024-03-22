@@ -265,7 +265,6 @@ const getTokenBalances = async (
   // This fallback to use ERC20s calls which is a best effort solution
   // Fails in fetching data from the RCP calls might result in some
   // missing data.
-  console.log(`Fetching ${filterTokens.map((token) => token.symbol).join(',')} on ${chainId}`);
   let address = walletAddress;
   if (!address) address = await web3Provider?.getSigner().getAddress();
   return await measureAsyncExecution<GetBalancesResult>(
