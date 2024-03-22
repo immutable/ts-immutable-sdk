@@ -14,15 +14,6 @@ function convertToV6Provider(
 ): JsonRpcProvider {
   const overwrittenProvider = new JsonRpcProvider(provider.connection.url);
 
-  // eslint-disable-next-line no-console
-  console.log('Overwritten provider getSigner method');
-  // eslint-disable-next-line no-console
-  console.log(overwrittenProvider.getSigner);
-  // eslint-disable-next-line no-console
-  console.log('Overwriter provider methods');
-  // eslint-disable-next-line no-console
-  console.log(JSON.stringify(Object.keys(overwrittenProvider), null, 2));
-
   // Need to override the getSigner method to mimic V5 behaviour
   overwrittenProvider.getSigner = async function getSigner(
     address?: number | string,
