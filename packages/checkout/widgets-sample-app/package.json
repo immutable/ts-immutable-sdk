@@ -20,13 +20,11 @@
     "@imtbl/checkout-widgets": "0.0.0",
     "@imtbl/config": "0.0.0",
     "@imtbl/passport": "0.0.0",
-    "browserify-sign": "^4.2.3",
     "framer-motion": "^11.0.6",
     "jsbi": "^3.2.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.11.0",
-    "resolve": "^1.22.8"
+    "react-router-dom": "^6.11.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16.5",
@@ -38,7 +36,7 @@
     "@types/react-dom": "^18.0.11",
     "@vitejs/plugin-react": "^4.2.0",
     "typescript": "^4.9.5",
-    "vite": "^5.0.2",
+    "vite": "^5.0.12",
     "vite-plugin-node-polyfills": "^0.16.0",
     "web-vitals": "^2.1.4"
   },
