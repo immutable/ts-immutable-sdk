@@ -502,7 +502,7 @@ describe('Seaport', () => {
         );
         expect(approvalAction).toBeTruthy();
         const unsignedApprovalTransaction = await approvalAction!.buildTransaction();
-        expect(unsignedApprovalTransaction!.from).toEqual(approvalTransaction.from);
+        expect(unsignedApprovalTransaction!.from).toEqual(fulfiller);
         expect(unsignedApprovalTransaction!.to).toEqual(approvalTransaction.to);
 
         const approvalGasAsBigNumber = BigNumber.from(approvalGas);
@@ -517,7 +517,7 @@ describe('Seaport', () => {
         );
         const unsignedFulfillmentTransaction = await fulfillmentAction!.buildTransaction();
         expect(unsignedFulfillmentTransaction).toBeTruthy();
-        expect(unsignedFulfillmentTransaction!.from).toEqual(approvalTransaction.from);
+        expect(unsignedFulfillmentTransaction!.from).toEqual(fulfiller);
         expect(unsignedFulfillmentTransaction!.to).toEqual(approvalTransaction.to);
 
         const fulfilGasAsBigNumber = BigNumber.from(fulfilGas);

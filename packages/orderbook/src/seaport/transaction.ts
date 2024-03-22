@@ -8,13 +8,14 @@ export function prepareTransaction(
   transactionMethods: TransactionMethods,
   // chainId is required for EIP155
   chainId: number,
+  callerAddress: string,
 ): TransactionBuilder {
   return async () => {
     const v6ContractTransaction = await transactionMethods.buildTransaction();
 
     const v5PopulatedTransaction: PopulatedTransaction = {
       to: v6ContractTransaction.to,
-      from: v6ContractTransaction.from,
+      from: callerAddress,
       type: v6ContractTransaction.type,
       maxFeePerGas: v6ContractTransaction.maxFeePerGas
         ? BigNumber.from(v6ContractTransaction.maxFeePerGas)
