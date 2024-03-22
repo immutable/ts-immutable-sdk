@@ -81,7 +81,7 @@ function SeaportFulfillAvailableAdvancedOrders({ disabled, handleExampleSubmitte
       if (verifyAction) {
         const approvalTransaction = await verifyAction.buildTransaction();
         await zkEvmProvider?.request({
-          method: 'eth_requestAccounts',
+          method: 'eth_sendTransaction',
           params: [approvalTransaction],
         });
       }
