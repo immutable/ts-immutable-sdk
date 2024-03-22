@@ -5,6 +5,7 @@
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
+    "browserify-sign": "^4.2.3",
     "tslib": "^2.6.2"
   },
   "devDependencies": {
