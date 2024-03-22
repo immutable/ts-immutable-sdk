@@ -8,8 +8,9 @@ import {
   production,
   sandbox,
 } from '@imtbl/x-client';
+import { Orderbook, OrderbookOverrides } from '@imtbl/orderbook';
 import { Passport, PassportModuleConfiguration } from '@imtbl/passport';
-import { Environment, ImmutableConfiguration } from '@imtbl/config';
+import { Environment, ImmutableConfiguration, ModuleConfiguration } from '@imtbl/config';
 import {
   AUDIENCE,
   LOGOUT_REDIRECT_URI,
@@ -118,13 +119,44 @@ const getPassportConfig = (environment: EnvironmentNames): PassportModuleConfigu
   }
 };
 
+const getOrderbookConfig = (environment: EnvironmentNames): ModuleConfiguration<OrderbookOverrides> => {
+  switch (environment) {
+    case EnvironmentNames.PRODUCTION: {
+      const baseConfig = new ImmutableConfiguration({ environment: Environment.PRODUCTION });
+      return {
+        baseConfig,
+      };
+    }
+    case EnvironmentNames.SANDBOX: {
+      const baseConfig = new ImmutableConfiguration({ environment: Environment.SANDBOX });
+      return {
+        baseConfig,
+      };
+    }
+    case EnvironmentNames.DEV: {
+      const baseConfig = new ImmutableConfiguration({ environment: Environment.SANDBOX });
+      return {
+        baseConfig,
+        overrides: {
+          seaportContractAddress: '0xbA22c310787e9a3D74343B17AB0Ab946c28DFB52',
+        },
+      };
+    }
+    default: {
+      throw new Error('Invalid environment');
+    }
+  }
+};
+
 const ImmutableContext = createContext<{
   passportClient: Passport,
   sdkClient: ImmutableX,
+  orderbookClient: Orderbook,
   environment: EnvironmentNames,
   setEnvironment?:(environment: EnvironmentNames) => void;
 }>({
       sdkClient: new ImmutableX(getSdkConfig(EnvironmentNames.DEV)),
+      orderbookClient: new Orderbook(getOrderbookConfig(EnvironmentNames.DEV)),
       passportClient: new Passport(getPassportConfig(EnvironmentNames.DEV)),
       environment: EnvironmentNames.DEV,
     });
@@ -139,21 +171,26 @@ export function ImmutableProvider({
   const [sdkClient, setSdkClient] = useState<ImmutableX>(
     useContext(ImmutableContext).sdkClient,
   );
+  const [orderbookClient, setOrderbookClient] = useState<Orderbook>(
+    useContext(ImmutableContext).orderbookClient,
+  );
   const [passportClient, setPassportClient] = useState<Passport>(
     useContext(ImmutableContext).passportClient,
   );
 
   useEffect(() => {
     setSdkClient(new ImmutableX(getSdkConfig(environment)));
+    setOrderbookClient(new Orderbook(getOrderbookConfig(environment)));
     setPassportClient(new Passport(getPassportConfig(environment)));
   }, [environment]);
 
   const providerValues = useMemo(() => ({
     sdkClient,
+    orderbookClient,
     passportClient,
     environment,
     setEnvironment,
-  }), [sdkClient, passportClient, environment, setEnvironment]);
+  }), [sdkClient, orderbookClient, passportClient, environment, setEnvironment]);
 
   return (
     <ImmutableContext.Provider value={providerValues}>
@@ -164,9 +201,17 @@ export function ImmutableProvider({
 
 export function useImmutableProvider() {
   const {
-    sdkClient, passportClient, environment, setEnvironment,
+    sdkClient,
+    orderbookClient,
+    passportClient,
+    environment,
+    setEnvironment,
   } = useContext(ImmutableContext);
   return {
-    sdkClient, passportClient, environment, setEnvironment,
+    sdkClient,
+    orderbookClient,
+    passportClient,
+    environment,
+    setEnvironment,
   };
 }
