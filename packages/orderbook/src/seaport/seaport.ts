@@ -111,15 +111,12 @@ export class Seaport {
       const address = await signer.getAddress();
       // eslint-disable-next-line no-console
       console.log(`Fulfiller address: ${address}`);
-      // eslint-disable-next-line no-console
-      console.log(`Provided address: ${account}`);
     } catch {
       // no-op - this is for temporary debugging
     }
 
     const { actions: seaportActions } = await seaportLib.fulfillOrders({
       accountAddress: account,
-      recipientAddress: account,
       fulfillOrderDetails: [
         {
           order: {
