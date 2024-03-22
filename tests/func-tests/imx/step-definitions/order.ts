@@ -1,16 +1,16 @@
-import { UnsignedOrderRequest } from '@imtbl/core-sdk';
 import { parseEther } from '@ethersproject/units';
 import {
   IMXClient,
   ImxModuleConfiguration,
   GenericIMXProvider,
   ProviderConfiguration,
+  UnsignedOrderRequest,
 } from '@imtbl/sdk/x';
 import { configuration, StepSharedState } from './stepSharedState';
 
 // @binding([StepSharedState])
 export class Order {
-  constructor(protected stepSharedState: StepSharedState) {}
+  constructor(protected stepSharedState: StepSharedState) { }
 
   config: ImxModuleConfiguration = {
     baseConfig: { environment: configuration.environment },

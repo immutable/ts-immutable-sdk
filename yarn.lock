@@ -2828,7 +2828,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ethersproject/abi@npm:5.7.0, @ethersproject/abi@npm:^5.0.0, @ethersproject/abi@npm:^5.0.12, @ethersproject/abi@npm:^5.5.0, @ethersproject/abi@npm:^5.7.0":
+"@ethersproject/abi@npm:5.7.0, @ethersproject/abi@npm:^5.0.12, @ethersproject/abi@npm:^5.5.0, @ethersproject/abi@npm:^5.7.0":
   version: 5.7.0
   resolution: "@ethersproject/abi@npm:5.7.0"
   dependencies:
@@ -2916,7 +2916,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ethersproject/bytes@npm:5.7.0, @ethersproject/bytes@npm:^5.0.0, @ethersproject/bytes@npm:^5.7.0":
+"@ethersproject/bytes@npm:5.7.0, @ethersproject/bytes@npm:^5.7.0":
   version: 5.7.0
   resolution: "@ethersproject/bytes@npm:5.7.0"
   dependencies:
@@ -3055,7 +3055,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ethersproject/providers@npm:5.7.2, @ethersproject/providers@npm:^5.0.0, @ethersproject/providers@npm:^5.7.2":
+"@ethersproject/providers@npm:5.7.2, @ethersproject/providers@npm:^5.7.2":
   version: 5.7.2
   resolution: "@ethersproject/providers@npm:5.7.2"
   dependencies:
@@ -3501,24 +3501,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/core-sdk@npm:^2.4.0":
-  version: 2.4.0
-  resolution: "@imtbl/core-sdk@npm:2.4.0"
-  dependencies:
-    "@ethersproject/abi": ^5.0.0
-    "@ethersproject/bytes": ^5.0.0
-    "@ethersproject/providers": ^5.0.0
-    axios: ^0.26.1
-    bn.js: ^5.2.0
-    elliptic: ^6.5.4
-    enc-utils: ^3.0.0
-    ethereumjs-wallet: ^1.0.2
-    ethers: ^5.7.1
-    hash.js: ^1.1.7
-  checksum: 348939509b461551c4664f32f6194a2bd659c0b7cf8c3c3689e3fa183ee6db810f3dc82a16979d01e4c0e6231f98a10ea67aeb1cb7bdc5501bb0c5aa6ade1fe6
-  languageName: node
-  linkType: hard
-
 "@imtbl/cryptofiat@0.0.0, @imtbl/cryptofiat@workspace:packages/internal/cryptofiat":
   version: 0.0.0-use.local
   resolution: "@imtbl/cryptofiat@workspace:packages/internal/cryptofiat"
@@ -3784,7 +3766,6 @@ __metadata:
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
-    "@imtbl/core-sdk": ^2.4.0
     "@imtbl/cryptofiat": 0.0.0
     "@imtbl/generated-clients": 0.0.0
     "@imtbl/guardian": 0.0.0
@@ -3820,6 +3801,7 @@ __metadata:
     elliptic: ^6.5.4
     enc-utils: ^3.0.0
     eslint: ^8.40.0
+    ethereumjs-wallet: ^1.0.2
     ethers: ^5.7.2
     glob: ^10.2.3
     global-const: ^0.1.2
@@ -3921,6 +3903,7 @@ __metadata:
     elliptic: ^6.5.4
     enc-utils: ^3.0.0
     eslint: ^8.40.0
+    ethereumjs-wallet: ^1.0.2
     ethers: ^5.7.2
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
@@ -11437,6 +11420,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"asn1.js@npm:^4.10.1":
+  version: 4.10.1
+  resolution: "asn1.js@npm:4.10.1"
+  dependencies:
+    bn.js: ^4.0.0
+    inherits: ^2.0.1
+    minimalistic-assert: ^1.0.0
+  checksum: 9289a1a55401238755e3142511d7b8f6fc32f08c86ff68bd7100da8b6c186179dd6b14234fba2f7f6099afcd6758a816708485efe44bc5b2a6ec87d9ceeddbb5
+  languageName: node
+  linkType: hard
+
 "asn1.js@npm:^5.2.0":
   version: 5.4.1
   resolution: "asn1.js@npm:5.4.1"
@@ -11612,15 +11606,6 @@ __metadata:
     form-data: ^4.0.0
     proxy-from-env: ^1.1.0
   checksum: 7fb6a4313bae7f45e89d62c70a800913c303df653f19eafec88e56cea2e3821066b8409bc68be1930ecca80e861c52aa787659df0ffec6ad4d451c7816b9386b
-  languageName: node
-  linkType: hard
-
-"axios@npm:^0.26.1":
-  version: 0.26.1
-  resolution: "axios@npm:0.26.1"
-  dependencies:
-    follow-redirects: ^1.14.8
-  checksum: d9eb58ff4bc0b36a04783fc9ff760e9245c829a5a1052ee7ca6013410d427036b1d10d04e7380c02f3508c5eaf3485b1ae67bd2adbfec3683704745c8d7a6e1a
   languageName: node
   linkType: hard
 
@@ -12067,7 +12052,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bn.js@npm:^5.0.0, bn.js@npm:^5.1.1, bn.js@npm:^5.1.2, bn.js@npm:^5.2.0, bn.js@npm:^5.2.1":
+"bn.js@npm:^5.0.0, bn.js@npm:^5.1.2, bn.js@npm:^5.2.0, bn.js@npm:^5.2.1":
   version: 5.2.1
   resolution: "bn.js@npm:5.2.1"
   checksum: 3dd8c8d38055fedfa95c1d5fc3c99f8dd547b36287b37768db0abab3c239711f88ff58d18d155dd8ad902b0b0cee973747b7ae20ea12a09473272b0201c9edd3
@@ -12259,7 +12244,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"browserify-rsa@npm:^4.0.0, browserify-rsa@npm:^4.0.1":
+"browserify-rsa@npm:^4.0.0, browserify-rsa@npm:^4.1.0":
   version: 4.1.0
   resolution: "browserify-rsa@npm:4.1.0"
   dependencies:
@@ -12270,19 +12255,20 @@ __metadata:
   linkType: hard
 
 "browserify-sign@npm:^4.0.0":
-  version: 4.2.1
-  resolution: "browserify-sign@npm:4.2.1"
+  version: 4.2.3
+  resolution: "browserify-sign@npm:4.2.3"
   dependencies:
-    bn.js: ^5.1.1
-    browserify-rsa: ^4.0.1
+    bn.js: ^5.2.1
+    browserify-rsa: ^4.1.0
     create-hash: ^1.2.0
     create-hmac: ^1.1.7
-    elliptic: ^6.5.3
+    elliptic: ^6.5.5
+    hash-base: ~3.0
     inherits: ^2.0.4
-    parse-asn1: ^5.1.5
-    readable-stream: ^3.6.0
-    safe-buffer: ^5.2.0
-  checksum: 0221f190e3f5b2d40183fa51621be7e838d9caa329fe1ba773406b7637855f37b30f5d83e52ff8f244ed12ffe6278dd9983638609ed88c841ce547e603855707
+    parse-asn1: ^5.1.7
+    readable-stream: ^2.3.8
+    safe-buffer: ^5.2.1
+  checksum: 403a8061d229ae31266670345b4a7c00051266761d2c9bbeb68b1a9bcb05f68143b16110cf23a171a5d6716396a1f41296282b3e73eeec0a1871c77f0ff4ee6b
   languageName: node
   linkType: hard
 
@@ -14792,6 +14778,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"elliptic@npm:^6.5.5":
+  version: 6.5.5
+  resolution: "elliptic@npm:6.5.5"
+  dependencies:
+    bn.js: ^4.11.9
+    brorand: ^1.1.0
+    hash.js: ^1.0.0
+    hmac-drbg: ^1.0.1
+    inherits: ^2.0.4
+    minimalistic-assert: ^1.0.1
+    minimalistic-crypto-utils: ^1.0.1
+  checksum: ec9105e4469eb3b32b0ee2579756c888ddf3f99d259aa0d65fccb906ee877768aaf8880caae73e3e669c9a4adeb3eb1945703aa974ec5000d2d33a239f4567eb
+  languageName: node
+  linkType: hard
+
 "emittery@npm:^0.10.2":
   version: 0.10.2
   resolution: "emittery@npm:0.10.2"
@@ -15848,7 +15849,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ethers@npm:^5.7.1, ethers@npm:^5.7.2":
+"ethers@npm:^5.7.2":
   version: 5.7.2
   resolution: "ethers@npm:5.7.2"
   dependencies:
@@ -16458,7 +16459,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.0.0, follow-redirects@npm:^1.14.8, follow-redirects@npm:^1.15.0":
+"follow-redirects@npm:^1.0.0, follow-redirects@npm:^1.15.0":
   version: 1.15.2
   resolution: "follow-redirects@npm:1.15.2"
   peerDependenciesMeta:
@@ -17433,6 +17434,16 @@ __metadata:
     readable-stream: ^3.6.0
     safe-buffer: ^5.2.0
   checksum: 26b7e97ac3de13cb23fc3145e7e3450b0530274a9562144fc2bf5c1e2983afd0e09ed7cc3b20974ba66039fad316db463da80eb452e7373e780cbee9a0d2f2dc
+  languageName: node
+  linkType: hard
+
+"hash-base@npm:~3.0":
+  version: 3.0.4
+  resolution: "hash-base@npm:3.0.4"
+  dependencies:
+    inherits: ^2.0.1
+    safe-buffer: ^5.0.1
+  checksum: 878465a0dfcc33cce195c2804135352c590d6d10980adc91a9005fd377e77f2011256c2b7cfce472e3f2e92d561d1bf3228d2da06348a9017ce9a258b3b49764
   languageName: node
   linkType: hard
 
@@ -22715,7 +22726,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"parse-asn1@npm:^5.0.0, parse-asn1@npm:^5.1.5":
+"parse-asn1@npm:^5.0.0":
   version: 5.1.6
   resolution: "parse-asn1@npm:5.1.6"
   dependencies:
@@ -22725,6 +22736,20 @@ __metadata:
     pbkdf2: ^3.0.3
     safe-buffer: ^5.1.1
   checksum: 9243311d1f88089bc9f2158972aa38d1abd5452f7b7cabf84954ed766048fe574d434d82c6f5a39b988683e96fb84cd933071dda38927e03469dc8c8d14463c7
+  languageName: node
+  linkType: hard
+
+"parse-asn1@npm:^5.1.7":
+  version: 5.1.7
+  resolution: "parse-asn1@npm:5.1.7"
+  dependencies:
+    asn1.js: ^4.10.1
+    browserify-aes: ^1.2.0
+    evp_bytestokey: ^1.0.3
+    hash-base: ~3.0
+    pbkdf2: ^3.1.2
+    safe-buffer: ^5.2.1
+  checksum: 93c7194c1ed63a13e0b212d854b5213ad1aca0ace41c66b311e97cca0519cf9240f79435a0306a3b412c257f0ea3f1953fd0d9549419a0952c9e995ab361fd6c
   languageName: node
   linkType: hard
 
@@ -22908,7 +22933,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pbkdf2@npm:^3.0.17, pbkdf2@npm:^3.0.3":
+"pbkdf2@npm:^3.0.17, pbkdf2@npm:^3.0.3, pbkdf2@npm:^3.1.2":
   version: 3.1.2
   resolution: "pbkdf2@npm:3.1.2"
   dependencies:
@@ -24789,7 +24814,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"readable-stream@npm:^2.0.1":
+"readable-stream@npm:^2.0.1, readable-stream@npm:^2.3.8":
   version: 2.3.8
   resolution: "readable-stream@npm:2.3.8"
   dependencies:
@@ -25546,7 +25571,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"safe-buffer@npm:5.2.1, safe-buffer@npm:>=5.1.0, safe-buffer@npm:^5.0.1, safe-buffer@npm:^5.1.0, safe-buffer@npm:^5.1.1, safe-buffer@npm:^5.1.2, safe-buffer@npm:^5.2.0, safe-buffer@npm:~5.2.0":
+"safe-buffer@npm:5.2.1, safe-buffer@npm:>=5.1.0, safe-buffer@npm:^5.0.1, safe-buffer@npm:^5.1.0, safe-buffer@npm:^5.1.1, safe-buffer@npm:^5.1.2, safe-buffer@npm:^5.2.0, safe-buffer@npm:^5.2.1, safe-buffer@npm:~5.2.0":
   version: 5.2.1
   resolution: "safe-buffer@npm:5.2.1"
   checksum: b99c4b41fdd67a6aaf280fcd05e9ffb0813654894223afb78a31f14a19ad220bba8aba1cb14eddce1fcfb037155fe6de4e861784eb434f7d11ed58d1e70dd491
