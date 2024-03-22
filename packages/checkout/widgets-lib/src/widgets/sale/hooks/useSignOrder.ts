@@ -143,9 +143,8 @@ const toSignResponse = (
       rawData: transaction.raw_data,
     })),
     transactionId: hexToText(
-      transactions
-        .find((txn) => txn.method_call.startsWith('execute'))
-        ?.params.reference || '',
+      transactions.find((txn) => txn.method_call.startsWith('execute'))?.params
+        .reference || '',
     ),
   };
 };
@@ -186,9 +185,9 @@ export const useSignOrder = (input: SignOrderInput) => {
       data: string,
       gasLimit: number,
       method: string,
-      waitForTrnsactionSettlement: boolean,
     ): Promise<[hash: string | undefined, error: any]> => {
       let transactionHash: string | undefined;
+      let errorType = SaleErrorTypes.TRANSACTION_FAILED;
 
       try {
         const signer = provider?.getSigner();
@@ -202,8 +201,10 @@ export const useSignOrder = (input: SignOrderInput) => {
 
         setExecuteTransactions({ method, hash: txnResponse?.hash });
 
-        if (waitForTrnsactionSettlement) {
-          await txnResponse?.wait();
+        // wait for the transaction to be mined
+        const receipt = await txnResponse?.wait();
+        if (receipt && receipt.status === 0) {
+          throw new Error('Transaction failed after being mined');
         }
 
         transactionHash = txnResponse?.hash || '';
@@ -214,28 +215,15 @@ export const useSignOrder = (input: SignOrderInput) => {
         }`.toLowerCase();
         transactionHash = (err as any)?.transactionHash;
 
-        let errorType = SaleErrorTypes.WALLET_FAILED;
-
         if (reason.includes('failed') && reason.includes('open confirmation')) {
           errorType = SaleErrorTypes.WALLET_POPUP_BLOCKED;
-        }
-
-        if (reason.includes('rejected') && reason.includes('user')) {
+        } else if (reason.includes('rejected') && reason.includes('user')) {
           errorType = SaleErrorTypes.WALLET_REJECTED;
-        }
-
-        if (
+        } else if (
           reason.includes('failed to submit')
           && reason.includes('highest gas limit')
         ) {
           errorType = SaleErrorTypes.WALLET_REJECTED_NO_FUNDS;
-        }
-
-        if (
-          reason.includes('status failed')
-          || reason.includes('transaction failed')
-        ) {
-          errorType = SaleErrorTypes.TRANSACTION_FAILED;
         }
 
         setSignError({
@@ -323,7 +311,6 @@ export const useSignOrder = (input: SignOrderInput) => {
 
   const execute = async (
     signData: SignResponse | undefined,
-    waitForTrnsactionSettlement: boolean,
     onTxnSuccess: (txn: ExecutedTransaction) => void,
     onTxnError: (error: any, txns: ExecutedTransaction[]) => void,
   ): Promise<ExecutedTransaction[]> => {
@@ -338,6 +325,7 @@ export const useSignOrder = (input: SignOrderInput) => {
 
     let successful = true;
     const execTransactions: ExecutedTransaction[] = [];
+
     for (const transaction of signData.transactions) {
       const {
         tokenAddress: to,
@@ -351,9 +339,7 @@ export const useSignOrder = (input: SignOrderInput) => {
         data,
         gasEstimate,
         method,
-        waitForTrnsactionSettlement,
       );
-
       if (txnError || !hash) {
         successful = false;
         onTxnError(txnError, execTransactions);

@@ -63,7 +63,6 @@ type SaleContextValues = SaleContextProps & {
   ) => Promise<SignResponse | undefined>;
   execute: (
     signResponse: SignResponse | undefined,
-    waitForTrnsactionSettlement: boolean,
     onTxnSuccess: (txn: ExecutedTransaction) => void,
     onTxnError: (error: any, txns: ExecutedTransaction[]) => void
   ) => Promise<ExecutedTransaction[]>;
@@ -188,10 +187,7 @@ export function SaleContextProvider(props: {
   const fromTokenAddress = currency?.erc20Address || '';
 
   const goBackToPaymentMethods = useCallback(
-    (
-      type?: SalePaymentTypes | undefined,
-      data?: Record<string, unknown>,
-    ) => {
+    (type?: SalePaymentTypes | undefined, data?: Record<string, unknown>) => {
       setPaymentMethod(type);
       viewDispatch({
         payload: {
