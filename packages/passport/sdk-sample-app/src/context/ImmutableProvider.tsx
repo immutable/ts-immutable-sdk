@@ -190,7 +190,7 @@ export function ImmutableProvider({
     passportClient,
     environment,
     setEnvironment,
-  }), [sdkClient, passportClient, environment, setEnvironment]);
+  }), [sdkClient, orderbookClient, passportClient, environment, setEnvironment]);
 
   return (
     <ImmutableContext.Provider value={providerValues}>
