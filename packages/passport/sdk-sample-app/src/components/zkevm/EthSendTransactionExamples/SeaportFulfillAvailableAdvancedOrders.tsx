@@ -65,39 +65,37 @@ function SeaportFulfillAvailableAdvancedOrders({ disabled, handleExampleSubmitte
         return;
       }
 
-      if (fulfillResponse.sufficientBalance) {
-        const {
-          actions, unfulfillableOrders,
-        } = fulfillResponse;
+      const {
+        actions, unfulfillableOrders,
+      } = fulfillResponse;
 
-        if (unfulfillableOrders.length > 0) {
-          setTransactionError('Not all orders are fulfillable');
-          return;
-        }
-
-        const verifyAction = actions.find((action) => (
-          action.type === ActionType.TRANSACTION && action.purpose === TransactionPurpose.APPROVAL
-        )) as TransactionAction | undefined;
-
-        if (verifyAction) {
-          const approvalTransaction = await verifyAction.buildTransaction();
-          await zkEvmProvider?.request({
-            method: 'eth_requestAccounts',
-            params: [approvalTransaction],
-          });
-        }
-
-        const transactionAction = actions.find((action) => (
-          action.type === ActionType.TRANSACTION && action.purpose === TransactionPurpose.FULFILL_ORDER
-        )) as TransactionAction | undefined;
-
-        if (!transactionAction) {
-          setTransactionError('Failed to find transaction to process');
-          return;
-        }
-
-        setTransaction(await transactionAction.buildTransaction());
+      if (unfulfillableOrders.length > 0) {
+        setTransactionError('Not all orders are fulfillable');
+        return;
       }
+
+      const verifyAction = actions.find((action) => (
+        action.type === ActionType.TRANSACTION && action.purpose === TransactionPurpose.APPROVAL
+      )) as TransactionAction | undefined;
+
+      if (verifyAction) {
+        const approvalTransaction = await verifyAction.buildTransaction();
+        await zkEvmProvider?.request({
+          method: 'eth_requestAccounts',
+          params: [approvalTransaction],
+        });
+      }
+
+      const transactionAction = actions.find((action) => (
+        action.type === ActionType.TRANSACTION && action.purpose === TransactionPurpose.FULFILL_ORDER
+      )) as TransactionAction | undefined;
+
+      if (!transactionAction) {
+        setTransactionError('Failed to find transaction to process');
+        return;
+      }
+
+      setTransaction(await transactionAction.buildTransaction());
     } catch (err) {
       setTransactionError(`Failed to retrieve Seaport orders: ${err}`);
     } finally {
