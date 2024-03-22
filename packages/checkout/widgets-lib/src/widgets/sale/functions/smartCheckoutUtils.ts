@@ -14,6 +14,7 @@ import {
 } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { calculateCryptoToFiat, formatFiatString } from '../../../lib/utils';
+import { SmartCheckoutError } from '../types';
 
 export const MAX_GAS_LIMIT = '30000000';
 
@@ -156,7 +157,7 @@ export const filterSmartCheckoutResult = (
   };
 };
 
-export const getTopUpViewData = (smartCheckoutError: any, tokenAddress: string, amount: string) => {
+export const getTopUpViewData = (smartCheckoutError: SmartCheckoutError, tokenAddress: string) => {
   const transactionRequirements = smartCheckoutError?.data?.transactionRequirements || [];
 
   const native = transactionRequirements.find(
@@ -188,10 +189,12 @@ export const getTopUpViewData = (smartCheckoutError: any, tokenAddress: string, 
     subheading = ['views.PAYMENT_METHODS.topUp.subheading.native', balances];
   }
 
+  const amount = erc20?.delta.balance.toNumber() || 0;
+
   return {
-    tokenAddress,
     amount,
     heading,
     subheading,
+    tokenAddress,
   };
 };

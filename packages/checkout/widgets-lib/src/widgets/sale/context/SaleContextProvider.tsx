@@ -329,7 +329,6 @@ export function SaleContextProvider(props: {
             data: getTopUpViewData(
               smartCheckoutError,
               fromTokenAddress,
-              amount,
             ),
           },
         },
