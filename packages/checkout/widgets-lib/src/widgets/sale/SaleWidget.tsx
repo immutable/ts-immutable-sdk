@@ -40,7 +40,9 @@ import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 
 type OptionalWidgetParams = Pick<SaleWidgetParams, 'excludePaymentTypes'>;
-type RequiredWidgetParams = Required<Omit<SaleWidgetParams, 'walletProviderName'>>;
+type RequiredWidgetParams = Required<
+Omit<SaleWidgetParams, 'walletProviderName'>
+>;
 
 type WidgetParams = RequiredWidgetParams & OptionalWidgetParams;
 export interface SaleWidgetProps extends WidgetParams {
@@ -94,9 +96,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: SaleWidgetViews.PAYMENT_METHODS,
-          },
+          view: { type: SaleWidgetViews.PAYMENT_METHODS },
         },
       });
     }
@@ -164,6 +164,14 @@ export default function SaleWidget(props: SaleWidgetProps) {
               showSwapOption={config.isSwapEnabled}
               showBridgeOption={config.isBridgeEnabled}
               onCloseButtonClick={() => sendSaleWidgetCloseEvent(eventTarget)}
+              onBackButtonClick={() => {
+                viewDispatch({
+                  payload: {
+                    type: ViewActions.UPDATE_VIEW,
+                    view: { type: SaleWidgetViews.PAYMENT_METHODS },
+                  },
+                });
+              }}
               amount={viewState.view.data?.amount}
               tokenAddress={viewState.view.data?.tokenAddress}
               heading={viewState.view.data?.heading}
