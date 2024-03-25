@@ -152,8 +152,9 @@ export class TokenBridge {
     let destinationChainGas = 0;
 
     if (req.action === BridgeFeeActions.FINALISE_WITHDRAWAL) {
+      const feeData: FeeData = await this.config.rootProvider.getFeeData();
       sourceChainGas = await this.getGasEstimates(
-        this.config.rootProvider,
+        feeData,
         BridgeMethodsGasLimit.FINALISE_WITHDRAWAL,
       );
 
@@ -225,15 +226,16 @@ export class TokenBridge {
     let sourceChainGas: ethers.BigNumber = ethers.BigNumber.from(0);
     let approvalFee: ethers.BigNumber = ethers.BigNumber.from(0);
 
+    const feeData: FeeData = await sourceProvider.getFeeData();
     if (token.toUpperCase() !== 'NATIVE') {
       approvalFee = await this.getGasEstimates(
-        sourceProvider,
+        feeData,
         BridgeMethodsGasLimit.APPROVE_TOKEN,
       );
     }
 
     sourceChainGas = await this.getGasEstimates(
-      sourceProvider,
+      feeData,
       BridgeMethodsGasLimit[`${action}_SOURCE`],
     );
 
@@ -274,6 +276,7 @@ export class TokenBridge {
 
     const destinationChainGas: number = BridgeMethodsGasLimit[`${action}_DESTINATION`];
 
+    const feeData: FeeData = await sourceProvider.getFeeData();
     if (action === BridgeFeeActions.DEPOSIT) {
       // deposit
       sourceBridgeAddress = this.config.bridgeContracts.rootERC20BridgeFlowRate;
@@ -290,25 +293,25 @@ export class TokenBridge {
 
       if (tenderlyRes.approvalFee > 0) {
         approvalFee = await this.getGasEstimates(
-          sourceProvider,
+          feeData,
           tenderlyRes.approvalFee,
         );
       }
 
       sourceChainGas = await this.getGasEstimates(
-        sourceProvider,
+        feeData,
         tenderlyRes.sourceChainGas,
       );
     } else {
       // withdrawal
       sourceChainGas = await this.getGasEstimates(
-        sourceProvider,
+        feeData,
         BridgeMethodsGasLimit[`${action}_SOURCE`],
       );
 
       if (amountToApprove.gt(0)) {
         approvalFee = await this.getGasEstimates(
-          sourceProvider,
+          feeData,
           BridgeMethodsGasLimit.APPROVE_TOKEN,
         );
       }
@@ -459,10 +462,9 @@ export class TokenBridge {
 
   // eslint-disable-next-line class-methods-use-this
   private async getGasEstimates(
-    provider: ethers.providers.Provider,
+    feeData: FeeData,
     txnGasLimitInWei: number,
   ): Promise<ethers.BigNumber> {
-    const feeData: FeeData = await provider.getFeeData();
     const gasPriceInWei = getGasPriceInWei(feeData);
     if (!gasPriceInWei) return ethers.BigNumber.from(0);
     return gasPriceInWei.mul(txnGasLimitInWei);
