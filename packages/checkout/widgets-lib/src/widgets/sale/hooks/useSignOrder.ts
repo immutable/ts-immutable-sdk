@@ -14,6 +14,7 @@ import {
 } from '../types';
 import { PRIMARY_SALES_API_BASE_URL } from '../utils/config';
 import { hexToText } from '../functions/utils';
+import { filterAllowedTransactions } from '../functions/signUtils';
 
 type SignApiTransaction = {
   contract_address: string;
@@ -143,9 +144,8 @@ const toSignResponse = (
       rawData: transaction.raw_data,
     })),
     transactionId: hexToText(
-      transactions
-        .find((txn) => txn.method_call.startsWith('execute'))
-        ?.params.reference || '',
+      transactions.find((txn) => txn.method_call.startsWith('execute'))?.params
+        .reference || '',
     ),
   };
 };
@@ -200,11 +200,13 @@ export const useSignOrder = (input: SignOrderInput) => {
           gasLimit,
         });
 
+        console.log(
+          '🚀 ~ waitForTrnsactionSettlement:',
+          waitForTrnsactionSettlement,
+        ); // eslint-disable-line
         setExecuteTransactions({ method, hash: txnResponse?.hash });
 
-        if (waitForTrnsactionSettlement) {
-          await txnResponse?.wait();
-        }
+        await txnResponse?.wait();
 
         transactionHash = txnResponse?.hash || '';
         return [transactionHash, undefined];
@@ -327,7 +329,7 @@ export const useSignOrder = (input: SignOrderInput) => {
     onTxnSuccess: (txn: ExecutedTransaction) => void,
     onTxnError: (error: any, txns: ExecutedTransaction[]) => void,
   ): Promise<ExecutedTransaction[]> => {
-    if (!signData) {
+    if (!signData || !provider) {
       setSignError({
         type: SaleErrorTypes.DEFAULT,
         data: { reason: 'No sign data' },
@@ -338,7 +340,13 @@ export const useSignOrder = (input: SignOrderInput) => {
 
     let successful = true;
     const execTransactions: ExecutedTransaction[] = [];
-    for (const transaction of signData.transactions) {
+
+    const transactions = await filterAllowedTransactions(
+      signData.transactions,
+      provider,
+    );
+
+    for (const transaction of transactions) {
       const {
         tokenAddress: to,
         rawData: data,
