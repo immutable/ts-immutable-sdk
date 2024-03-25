@@ -270,7 +270,7 @@
       "options": {
         "crypto": {
           "heading": "硬币",
-          "caption": "请使用钱包中的硬币或用卡购买。",
+          "caption": "请用钱包里的硬币付款，或用卡购买硬币。",
           "disabledCaption": "目前无法进行此购买。" 
         },
         "debit": {

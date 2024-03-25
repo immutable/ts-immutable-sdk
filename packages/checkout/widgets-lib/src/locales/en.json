@@ -266,7 +266,7 @@
       "options": {
         "crypto": {
           "heading": "Coins",
-          "caption": "Use coins in your wallet or buy them with card",
+          "caption": "Pay with the coins in your wallet, or buy coins with card",
           "disabledCaption": "Currently not available for this purchase"
         },
         "debit": {

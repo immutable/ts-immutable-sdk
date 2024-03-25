@@ -266,7 +266,7 @@
       "options": {
         "crypto": {
           "heading": "코인",
-          "caption": "지갑에 있는 동전을 사용하거나 카드로 구매하세요.",
+          "caption": "지갑 안의 동전으로 지불하거나 카드로 동전을 구입하세요.",
           "disabledCaption": "현재 이 구매에는 사용할 수 없습니다."
         },
         "debit": {
