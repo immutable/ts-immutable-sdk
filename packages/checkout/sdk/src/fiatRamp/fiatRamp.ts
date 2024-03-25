@@ -25,12 +25,14 @@ export class FiatRampService {
   }
 
   public async feeEstimate(): Promise<OnRampProviderFees> {
-    const config = (await this.config.remote.getConfig('onramp')) as OnRampConfig;
+    const config = (await this.config.remote.getConfig(
+      'onramp',
+    )) as OnRampConfig;
     return config[OnRampProvider.TRANSAK]?.fees;
   }
 
   public async createWidgetUrl(params: FiatRampWidgetParams): Promise<string> {
-    return (await this.getTransakWidgetUrl(params));
+    return await this.getTransakWidgetUrl(params);
   }
 
   private async getTransakWidgetUrl(
@@ -45,7 +47,8 @@ export class FiatRampService {
       apiKey: onRampConfig[OnRampProvider.TRANSAK].publishableApiKey,
       network: 'immutablezkevm',
       defaultPaymentMethod: 'credit_debit_card',
-      disablePaymentMethods: 'sepa_bank_transfer,gbp_bank_transfer,pm_cash_app,pm_jwire,pm_paymaya,'
+      disablePaymentMethods:
+        'sepa_bank_transfer,gbp_bank_transfer,pm_cash_app,pm_jwire,pm_paymaya,'
         + 'pm_bpi,pm_ubp,pm_grabpay,pm_shopeepay,pm_gcash,pm_pix,pm_astropay,pm_pse,inr_bank_transfer',
       productsAvailed: 'buy',
       exchangeScreenTitle: 'Buy',
@@ -68,7 +71,7 @@ export class FiatRampService {
       widgetParams = {
         ...widgetParams,
         defaultCryptoAmount: params.tokenAmount,
-        cryptoCurrencyCode: params.tokenSymbol,
+        defaultCryptoCurrency: params.tokenSymbol,
       };
     }
 
