@@ -270,7 +270,7 @@
       "options": {
         "crypto": {
           "heading": "硬币",
-          "caption": "如果您的余额中有硬币，这是最快的支付方式。",
+          "caption": "请使用钱包中的硬币或用卡购买。",
           "disabledCaption": "目前无法进行此购买。" 
         },
         "debit": {

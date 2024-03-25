@@ -266,7 +266,7 @@
       "options": {
         "crypto": {
           "heading": "Coins",
-          "caption": "The fastest way to pay, if you have coins in your balance.",
+          "caption": "Use coins in your wallet or buy them with card",
           "disabledCaption": "Currently not available for this purchase"
         },
         "debit": {
