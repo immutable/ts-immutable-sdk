@@ -5,8 +5,7 @@ import {
   createImmutableXConfiguration,
   IMXClient,
   ImmutableX,
-  production,
-  sandbox,
+  ImxModuleConfiguration,
 } from '@imtbl/x-client';
 import { Orderbook, OrderbookOverrides } from '@imtbl/orderbook';
 import { Passport, PassportModuleConfiguration } from '@imtbl/passport';
@@ -23,32 +22,33 @@ import { EnvironmentNames } from '@/types';
 import useLocalStorage from '@/hooks/useLocalStorage';
 import { ImxApiClients, createConfig } from '@imtbl/generated-clients';
 
-const getSdkConfig = (environment: EnvironmentNames) => {
+const getSdkConfig = (environment: EnvironmentNames): ImxModuleConfiguration => {
   switch (environment) {
     case EnvironmentNames.PRODUCTION: {
       const baseConfig = new ImmutableConfiguration({ environment: Environment.PRODUCTION });
       return {
         baseConfig,
-        override: production({}),
       };
     }
     case EnvironmentNames.SANDBOX: {
       const baseConfig = new ImmutableConfiguration({ environment: Environment.SANDBOX });
       return {
         baseConfig,
-        override: sandbox({}),
       };
     }
     case EnvironmentNames.DEV: {
       const baseConfig = new ImmutableConfiguration({ environment: Environment.SANDBOX });
       return {
         baseConfig,
-        override: createImmutableXConfiguration({
-          basePath: 'https://api.dev.x.immutable.com',
-          chainID: 5,
-          coreContractAddress: '0xd05323731807A35599BF9798a1DE15e89d6D6eF1',
-          registrationContractAddress: '0x7EB840223a3b1E0e8D54bF8A6cd83df5AFfC88B2',
-        }),
+        overrides: {
+          immutableXConfig: createImmutableXConfiguration({
+            baseConfig,
+            basePath: 'https://api.dev.x.immutable.com',
+            chainID: 5,
+            coreContractAddress: '0xd05323731807A35599BF9798a1DE15e89d6D6eF1',
+            registrationContractAddress: '0x7EB840223a3b1E0e8D54bF8A6cd83df5AFfC88B2',
+          }),
+        },
       };
     }
     default: {
