@@ -6,6 +6,7 @@ import {
 import { CheckoutConfiguration } from '../../../config';
 import { CheckoutError, CheckoutErrorType } from '../../../errors';
 import * as instance from '../../../instance';
+import { measureAsyncExecution } from '../../../logger/debugLogger';
 
 export const getBridgeFeeEstimate = async (
   config: CheckoutConfiguration,
@@ -24,18 +25,37 @@ export const getBridgeFeeEstimate = async (
   );
 
   try {
-    const bridgeFeeResponse = await bridge.getFee(
-      {
-        action: BridgeFeeActions.DEPOSIT,
-        gasMultiplier: 1.1,
-        sourceChainId: fromChainId.toString(),
-        destinationChainId: toChainId.toString(),
-        token: tokenAddress,
-        amount,
-        senderAddress,
-        recipientAddress: senderAddress,
-      },
+    // const bridgeFeeResponse = await bridge.getFee(
+    //   {
+    //     action: BridgeFeeActions.DEPOSIT,
+    //     gasMultiplier: 1.1,
+    //     sourceChainId: fromChainId.toString(),
+    //     destinationChainId: toChainId.toString(),
+    //     token: tokenAddress,
+    //     amount,
+    //     senderAddress,
+    //     recipientAddress: senderAddress,
+    //   },
+    // );
+
+    const bridgeFeeResponse = await measureAsyncExecution<any>(
+      config,
+      'Time to call bridge.getFee',
+      bridge.getFee(
+        {
+          action: BridgeFeeActions.DEPOSIT,
+          gasMultiplier: 1.1,
+          sourceChainId: fromChainId.toString(),
+          destinationChainId: toChainId.toString(),
+          token: tokenAddress,
+          amount,
+          senderAddress,
+          recipientAddress: senderAddress,
+        },
+      ),
     );
+
+    console.log('bridge fee response', bridgeFeeResponse, tokenAddress, amount, senderAddress);
 
     return {
       ...bridgeFeeResponse,

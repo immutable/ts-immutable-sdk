@@ -114,12 +114,27 @@ export class TokenBridge {
    *   });
    */
   public async getFee(req: BridgeFeeRequest): Promise<BridgeFeeResponse> {
+    console.time('validateChainConfiguration');
+
     await this.validateChainConfiguration();
+
+    console.timeEnd('validateChainConfiguration');
+
+    console.time('validateChainIds');
 
     if (req.action !== BridgeFeeActions.FINALISE_WITHDRAWAL) {
       await this.validateChainIds(req.sourceChainId, req.destinationChainId);
     }
-    return await this.getFeePrivate(req);
+
+    console.timeEnd('validateChainIds');
+
+    console.time('getFeePrivate');
+
+    const getFeeRes = await this.getFeePrivate(req);
+
+    console.timeEnd('getFeePrivate');
+
+    return getFeeRes;
   }
 
   private async getFeePrivate(req: BridgeFeeRequest): Promise<BridgeFeeResponse> {
