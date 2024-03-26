@@ -1,5 +1,9 @@
 import { JsonRpcProvider, TransactionRequest } from '@ethersproject/providers';
-import { getEip155ChainId, getNonce, getSignedMetaTransactions } from './walletHelpers';
+import {
+  getEip155ChainId,
+  getNonce,
+  getSignedMetaTransactions,
+} from './walletHelpers';
 import { sendTransaction } from './sendTransaction';
 import { chainId, chainIdEip155, mockUserZkEvm } from '../test/mocks';
 import { RelayerClient } from './relayerClient';
@@ -61,7 +65,9 @@ describe('sendTransaction', () => {
       signedTransactions,
     );
     relayerClient.ethSendTransaction.mockResolvedValue(relayerTransactionId);
-    withConfirmationScreenStub.mockImplementation(() => (task: () => void) => task());
+    withConfirmationScreenStub.mockImplementation(
+      () => (task: () => void) => task(),
+    );
     guardianClient.withConfirmationScreen = withConfirmationScreenStub;
   });
 
@@ -113,22 +119,20 @@ describe('sendTransaction', () => {
     });
 
     expect(result).toEqual(transactionHash);
-    expect(guardianClient.validateEVMTransaction).toHaveBeenCalledWith(
-      {
-        chainId: chainIdEip155,
-        nonce,
-        user: mockUserZkEvm,
-        metaTransactions: [
-          {
-            data: transactionRequest.data,
-            revertOnError: true,
-            to: mockUserZkEvm.zkEvm.ethAddress,
-            value: '0x00',
-            nonce,
-          },
-        ],
-      },
-    );
+    expect(guardianClient.validateEVMTransaction).toHaveBeenCalledWith({
+      chainId: chainIdEip155,
+      nonce,
+      user: mockUserZkEvm,
+      metaTransactions: [
+        {
+          data: transactionRequest.data,
+          revertOnError: true,
+          to: mockUserZkEvm.zkEvm.ethAddress,
+          value: '0x00',
+          nonce,
+        },
+      ],
+    });
 
     expect(relayerClient.ethSendTransaction).toHaveBeenCalledWith(
       mockUserZkEvm.zkEvm.ethAddress,
@@ -154,28 +158,26 @@ describe('sendTransaction', () => {
 
     expect(result).toEqual(transactionHash);
     expect(getEip155ChainId).toHaveBeenCalledWith(chainId);
-    expect(guardianClient.validateEVMTransaction).toHaveBeenCalledWith(
-      {
-        chainId: chainIdEip155,
-        nonce,
-        user: mockUserZkEvm,
-        metaTransactions: [
-          {
-            data: transactionRequest.data,
-            revertOnError: true,
-            to: mockUserZkEvm.zkEvm.ethAddress,
-            value: '0x00',
-            nonce,
-          },
-          {
-            revertOnError: true,
-            to: imxFeeOption.recipientAddress,
-            value: imxFeeOption.tokenPrice,
-            nonce,
-          },
-        ],
-      },
-    );
+    expect(guardianClient.validateEVMTransaction).toHaveBeenCalledWith({
+      chainId: chainIdEip155,
+      nonce,
+      user: mockUserZkEvm,
+      metaTransactions: [
+        {
+          data: transactionRequest.data,
+          revertOnError: true,
+          to: mockUserZkEvm.zkEvm.ethAddress,
+          value: '0x00',
+          nonce,
+        },
+        {
+          revertOnError: true,
+          to: imxFeeOption.recipientAddress,
+          value: imxFeeOption.tokenPrice,
+          nonce,
+        },
+      ],
+    });
     expect(relayerClient.ethSendTransaction).toHaveBeenCalledWith(
       mockUserZkEvm.zkEvm.ethAddress,
       signedTransactions,
@@ -201,6 +203,29 @@ describe('sendTransaction', () => {
       new JsonRpcError(
         RpcErrorCode.INTERNAL_ERROR,
         'Transaction failed to submit with status FAILED. Error message: Unable to complete transaction',
+      ),
+    );
+  });
+
+  it('returns and surfaces an error if the relayer cancels a transaction', async () => {
+    (retryWithDelay as jest.Mock).mockResolvedValue({
+      status: RelayerTransactionStatus.CANCELLED,
+      statusMessage: 'Transaction cancelled',
+    } as RelayerTransaction);
+
+    await expect(
+      sendTransaction({
+        params: [transactionRequest],
+        magicProvider,
+        jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
+        relayerClient: relayerClient as unknown as RelayerClient,
+        user: mockUserZkEvm,
+        guardianClient: guardianClient as unknown as GuardianClient,
+      }),
+    ).rejects.toThrow(
+      new JsonRpcError(
+        RpcErrorCode.INTERNAL_ERROR,
+        'Transaction failed to submit with status CANCELLED. Error message: Transaction cancelled',
       ),
     );
   });
