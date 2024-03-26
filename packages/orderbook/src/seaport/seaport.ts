@@ -70,6 +70,7 @@ export class Seaport {
         buildTransaction: prepareTransaction(
           approvalAction.transactionMethods,
           (await this.provider.getNetwork()).chainId,
+          offerer,
         ),
       });
     }
@@ -132,6 +133,7 @@ export class Seaport {
         buildTransaction: prepareTransaction(
           approvalAction.transactionMethods,
           (await this.provider.getNetwork()).chainId,
+          account,
         ),
         purpose: TransactionPurpose.APPROVAL,
       });
@@ -150,6 +152,7 @@ export class Seaport {
       buildTransaction: prepareTransaction(
         fulfilOrderAction.transactionMethods,
         (await this.provider.getNetwork()).chainId,
+        account,
       ),
       purpose: TransactionPurpose.FULFILL_ORDER,
     });
@@ -198,6 +201,7 @@ export class Seaport {
         buildTransaction: prepareTransaction(
           approvalAction.transactionMethods,
           (await this.provider.getNetwork()).chainId,
+          account,
         ),
         purpose: TransactionPurpose.APPROVAL,
       });
@@ -216,6 +220,7 @@ export class Seaport {
       buildTransaction: prepareTransaction(
         fulfilOrderAction.transactionMethods,
         (await this.provider.getNetwork()).chainId,
+        account,
       ),
       purpose: TransactionPurpose.FULFILL_ORDER,
     });
@@ -242,6 +247,7 @@ export class Seaport {
       buildTransaction: prepareTransaction(
         cancellationTransaction,
         (await this.provider.getNetwork()).chainId,
+        account,
       ),
       purpose: TransactionPurpose.CANCEL,
     };

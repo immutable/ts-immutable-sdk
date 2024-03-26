@@ -1,13 +1,14 @@
 import {
   anything, deepEqual, instance, mock, when,
 } from 'ts-mockito';
+import { TransactionMethods } from '@opensea/seaport-js/lib/utils/usecase';
+import { ContractTransaction } from 'ethers-v6';
 import { Seaport as SeaportLib } from '@opensea/seaport-js';
 import {
   ApprovalAction,
   CreateOrderAction,
   ExchangeAction,
   OrderComponents,
-  TransactionMethods,
 } from '@opensea/seaport-js/lib/types';
 import {
   ActionType,
@@ -18,7 +19,7 @@ import {
   SignableAction,
   TransactionPurpose,
 } from 'types';
-import { BigNumber, PopulatedTransaction, providers } from 'ethers';
+import { BigNumber, providers } from 'ethers';
 import { ProtocolData, Order, OrderStatusName } from 'openapi/sdk';
 import {
   EIP_712_ORDER_TYPE,
@@ -219,10 +220,11 @@ describe('Seaport', () => {
       const orderStart = new Date();
       const orderExpiry = new Date();
       const orderHash = randomAddress();
-      const approvalGas = BigNumber.from(1000000);
-      const approvalTransaction: PopulatedTransaction = {
+      const approvalGas = BigInt(1000000);
+      const approvalTransaction: ContractTransaction = {
         from: offerer,
         to: seaportContractAddress,
+        data: '',
       };
 
       beforeEach(() => {
@@ -237,7 +239,7 @@ describe('Seaport', () => {
           Promise.resolve(JSON.stringify({ message: orderComponents })),
         );
 
-        const transactionMethods = mock<TransactionMethods<boolean>>();
+        const transactionMethods = mock<TransactionMethods<any>>();
         const approvalAction = mock<ApprovalAction>();
         const approvalActionInstance = instance(approvalAction);
         approvalActionInstance.type = 'approval';
@@ -312,7 +314,8 @@ describe('Seaport', () => {
         expect(unsignedApprovalTransaction!.from).toEqual(approvalTransaction.from);
         expect(unsignedApprovalTransaction!.to).toEqual(approvalTransaction.to);
 
-        const expectedGasLimit = approvalGas.add(approvalGas.div(5));
+        const approvalGasAsBigNumber = BigNumber.from(approvalGas);
+        const expectedGasLimit = approvalGasAsBigNumber.add(approvalGasAsBigNumber.div(5));
         expect(unsignedApprovalTransaction!.gasLimit).toEqual(expectedGasLimit);
       });
 
@@ -375,16 +378,18 @@ describe('Seaport', () => {
       const offerer = randomAddress();
       const fulfiller = randomAddress();
 
-      const approvalGas = BigNumber.from(1000000);
-      const approvalTransaction: PopulatedTransaction = {
+      const approvalGas = BigInt(1000000);
+      const approvalTransaction: ContractTransaction = {
         from: offerer,
         to: seaportContractAddress,
+        data: '',
       };
 
-      const fulfilGas = BigNumber.from(2000000);
-      const fulfilTransaction: PopulatedTransaction = {
+      const fulfilGas = BigInt(2000000);
+      const fulfilTransaction: ContractTransaction = {
         from: offerer,
         to: seaportContractAddress,
+        data: '',
       };
 
       const immutableOrder: Order = {
@@ -428,7 +433,7 @@ describe('Seaport', () => {
           } as any),
         );
 
-        const exchangeTransactionMethods = mock<TransactionMethods<boolean>>();
+        const exchangeTransactionMethods = mock<TransactionMethods<any>>();
         const exchangeAction = mock<ExchangeAction<any>>();
         const exchangeActionInstance = instance(exchangeAction);
         exchangeActionInstance.type = 'exchange';
@@ -438,7 +443,7 @@ describe('Seaport', () => {
         );
         when(exchangeTransactionMethods.estimateGas()).thenReturn(Promise.resolve(fulfilGas));
 
-        const approvalTransactionMethods = mock<TransactionMethods<boolean>>();
+        const approvalTransactionMethods = mock<TransactionMethods<any>>();
         const approvalAction = mock<ApprovalAction>();
         const approvalActionInstance = instance(approvalAction);
         approvalActionInstance.type = 'approval';
@@ -470,11 +475,11 @@ describe('Seaport', () => {
         ).thenReturn(
           Promise.resolve({
             actions: [approvalActionInstance, exchangeActionInstance],
-            executeAllActions: () => undefined as any,
-          }),
+            executeAllActions: () => undefined as never,
+          } as any),
         );
 
-        when(mockedSeaportJs.getCounter(offerer)).thenReturn(Promise.resolve(BigNumber.from(1)));
+        when(mockedSeaportJs.getCounter(offerer)).thenReturn(Promise.resolve(BigInt(1)));
 
         sut = new Seaport(
           instance(mockedSeaportLibFactory),
@@ -497,10 +502,11 @@ describe('Seaport', () => {
         );
         expect(approvalAction).toBeTruthy();
         const unsignedApprovalTransaction = await approvalAction!.buildTransaction();
-        expect(unsignedApprovalTransaction!.from).toEqual(approvalTransaction.from);
+        expect(unsignedApprovalTransaction!.from).toEqual(fulfiller);
         expect(unsignedApprovalTransaction!.to).toEqual(approvalTransaction.to);
 
-        const expectedGasLimit = approvalGas.add(approvalGas.div(5));
+        const approvalGasAsBigNumber = BigNumber.from(approvalGas);
+        const expectedGasLimit = approvalGasAsBigNumber.add(approvalGasAsBigNumber.div(5));
         expect(unsignedApprovalTransaction!.gasLimit).toEqual(expectedGasLimit);
       });
 
@@ -511,10 +517,11 @@ describe('Seaport', () => {
         );
         const unsignedFulfillmentTransaction = await fulfillmentAction!.buildTransaction();
         expect(unsignedFulfillmentTransaction).toBeTruthy();
-        expect(unsignedFulfillmentTransaction!.from).toEqual(approvalTransaction.from);
+        expect(unsignedFulfillmentTransaction!.from).toEqual(fulfiller);
         expect(unsignedFulfillmentTransaction!.to).toEqual(approvalTransaction.to);
 
-        const expectedGasLimit = fulfilGas.add(fulfilGas.div(5));
+        const fulfilGasAsBigNumber = BigNumber.from(fulfilGas);
+        const expectedGasLimit = fulfilGasAsBigNumber.add(fulfilGasAsBigNumber.div(5));
         expect(unsignedFulfillmentTransaction!.gasLimit).toEqual(expectedGasLimit);
       });
     });
