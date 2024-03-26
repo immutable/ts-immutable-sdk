@@ -1,57 +1,96 @@
 import {
-  BottomSheet, Box, Divider,
+  Drawer, Box, Divider, MenuItem,
 } from '@biom3/react';
-import { feeItemContainerStyles, feesBreakdownContentStyles } from './FeesBreakdownStyles';
+import { formatZeroAmount, tokenValueFormat } from 'lib/utils';
+import { useTranslation } from 'react-i18next';
+import { feeItemContainerStyles, feeItemLoadingStyles, feesBreakdownContentStyles } from './FeesBreakdownStyles';
 import { FeeItem } from './FeeItem';
-import { text } from '../../resources/text/textConfig';
 import { FooterLogo } from '../Footer/FooterLogo';
 
 type Fee = {
   label: string;
   amount: string;
   fiatAmount: string;
+  prefix?: string;
 };
 
 type FeesBreakdownProps = {
-  onCloseBottomSheet?: () => void;
+  onCloseDrawer?: () => void;
   fees: Fee[];
   children?: any;
   visible?: boolean;
-  totalFiatAmount: string;
-  totalAmount: string;
+  totalFiatAmount?: string;
+  totalAmount?: string;
+  tokenSymbol: string;
+  loading?: boolean;
 };
 
 export function FeesBreakdown({
-  fees, children, onCloseBottomSheet, visible, totalFiatAmount, totalAmount,
+  fees,
+  children,
+  visible,
+  onCloseDrawer,
+  totalFiatAmount,
+  totalAmount,
+  tokenSymbol,
+  loading = false,
 }: FeesBreakdownProps) {
+  const { t } = useTranslation();
   return (
-    <BottomSheet
-      headerBarTitle={text.drawers.feesBreakdown.heading}
+    <Drawer
+      headerBarTitle={t('drawers.feesBreakdown.heading')}
       size="threeQuarter"
-      onCloseBottomSheet={onCloseBottomSheet}
+      onCloseDrawer={onCloseDrawer}
       visible={visible}
     >
-      <BottomSheet.Target>
+      <Drawer.Target>
         {children}
-      </BottomSheet.Target>
-      <BottomSheet.Content testId="fees-breakdown-content" sx={feesBreakdownContentStyles}>
+      </Drawer.Target>
+      <Drawer.Content testId="fees-breakdown-content" sx={feesBreakdownContentStyles}>
         <Box sx={feeItemContainerStyles}>
-          <FeeItem
-            key={text.drawers.feesBreakdown.total}
-            label={text.drawers.feesBreakdown.total}
-            amount={totalAmount}
-            fiatAmount={totalFiatAmount}
-            boldLabel
-          />
-          <Divider size="xSmall" />
           {
-              fees.map(({ label, amount, fiatAmount }) => (
-                <FeeItem key={label} label={label} amount={amount} fiatAmount={fiatAmount} />
-              ))
-            }
+            loading && (
+              <Box sx={feeItemLoadingStyles}>
+                <MenuItem shimmer emphasized testId="balance-item-shimmer--1" />
+                <MenuItem shimmer emphasized testId="balance-item-shimmer--2" />
+              </Box>
+            )
+          }
+          {
+            !loading && fees.map(({
+              label,
+              amount,
+              fiatAmount,
+              prefix,
+            }) => (
+              <FeeItem
+                key={label}
+                label={label}
+                amount={amount}
+                fiatAmount={fiatAmount}
+                tokenSymbol={tokenSymbol}
+                prefix={prefix}
+              />
+            ))
+          }
+          {totalAmount && (
+            <>
+              <Divider size="xSmall" />
+              <FeeItem
+                key={t('drawers.feesBreakdown.total')}
+                label={t('drawers.feesBreakdown.total')}
+                amount={tokenValueFormat(totalAmount)}
+                fiatAmount={totalFiatAmount
+                  ? `~ ${t('drawers.feesBreakdown.fees.fiatPricePrefix')}${totalFiatAmount}`
+                  : formatZeroAmount('0')}
+                tokenSymbol={tokenSymbol}
+                boldLabel
+              />
+            </>
+          )}
         </Box>
         <FooterLogo />
-      </BottomSheet.Content>
-    </BottomSheet>
+      </Drawer.Content>
+    </Drawer>
   );
 }

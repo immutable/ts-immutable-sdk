@@ -1,6 +1,7 @@
 import {
-  Body, BottomSheet, Box, Button, Heading, Icon, Logo,
+  Body, Drawer, Box, Button, Heading, Icon, Logo,
 } from '@biom3/react';
+import { useTranslation } from 'react-i18next';
 import {
   containerStyles,
   contentTextStyles,
@@ -9,24 +10,23 @@ import {
   logoContainerStyles,
   statusStyles,
 } from './UnableToSwapStyles';
-import { text } from '../../../resources/text/textConfig';
 
 type UnableToSwapProps = {
   visible: boolean;
-  onCloseBottomSheet: () => void;
+  onCloseDrawer: () => void;
 };
 
-export function UnableToSwap({ visible, onCloseBottomSheet }: UnableToSwapProps) {
-  const { heading, body, buttons } = text.drawers.unableToSwap;
+export function UnableToSwap({ visible, onCloseDrawer }: UnableToSwapProps) {
+  const { t } = useTranslation();
 
   return (
-    <BottomSheet
+    <Drawer
       size="full"
-      onCloseBottomSheet={onCloseBottomSheet}
+      onCloseDrawer={onCloseDrawer}
       visible={visible}
       showHeaderBar={false}
     >
-      <BottomSheet.Content>
+      <Drawer.Content>
         <Box testId="unable-to-swap-bottom-sheet" sx={containerStyles}>
           <Icon
             icon="Alert"
@@ -39,19 +39,19 @@ export function UnableToSwap({ visible, onCloseBottomSheet }: UnableToSwapProps)
             sx={contentTextStyles}
             testId="unable-to-swap-heading"
           >
-            {heading}
+            {t('drawers.unableToSwap.heading')}
           </Heading>
           <Body sx={contentTextStyles}>
-            {body}
+            {t('drawers.unableToSwap.body')}
           </Body>
           <Box sx={actionButtonContainerStyles}>
             <Button
               sx={actionButtonStyles}
               variant="tertiary"
-              onClick={onCloseBottomSheet}
+              onClick={onCloseDrawer}
               testId="unable-to-swap-cancel-button"
             >
-              {buttons.cancel}
+              {t('drawers.unableToSwap.buttons.cancel')}
             </Button>
           </Box>
           <Box sx={logoContainerStyles}>
@@ -62,7 +62,7 @@ export function UnableToSwap({ visible, onCloseBottomSheet }: UnableToSwapProps)
             />
           </Box>
         </Box>
-      </BottomSheet.Content>
-    </BottomSheet>
+      </Drawer.Content>
+    </Drawer>
   );
 }

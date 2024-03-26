@@ -2,7 +2,8 @@ import { Box, Button } from '@biom3/react';
 import { useContext, useState } from 'react';
 import { TransactionResponse } from '@imtbl/dex-sdk';
 import { CheckoutErrorType } from '@imtbl/checkout-sdk';
-import { text } from '../../../resources/text/textConfig';
+import { useTranslation } from 'react-i18next';
+import { getL2ChainId } from 'lib';
 import { PrefilledSwapForm, SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import {
   ViewContext,
@@ -26,16 +27,24 @@ export interface SwapButtonProps {
   data?: SwapFormData;
   insufficientFundsForGas: boolean;
   openNotEnoughImxDrawer: () => void;
+  openNetworkSwitchDrawer: () => void;
 }
 
 export function SwapButton({
-  loading, updateLoading, validator, transaction, data, insufficientFundsForGas, openNotEnoughImxDrawer,
+  loading,
+  updateLoading,
+  validator,
+  transaction,
+  data,
+  insufficientFundsForGas,
+  openNotEnoughImxDrawer,
+  openNetworkSwitchDrawer,
 }: SwapButtonProps) {
+  const { t } = useTranslation();
   const [showTxnRejectedState, setShowTxnRejectedState] = useState(false);
   const { viewDispatch } = useContext(ViewContext);
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
-  const { buttonText } = text.views[SwapWidgetViews.SWAP].swapForm;
   const { track } = useAnalytics();
   const sendTransaction = async () => {
     const isValid = validator();
@@ -46,10 +55,10 @@ export function SwapButton({
       control: 'Swap',
       controlType: 'Button',
       extras: {
-        swapFromAddress: data?.fromContractAddress,
+        swapFromAddress: data?.fromTokenAddress,
         swapFromAmount: data?.fromAmount,
         swapFromTokenSymbol: data?.fromTokenSymbol,
-        swapToAddress: data?.toContractAddress,
+        swapToAddress: data?.toTokenAddress,
         swapToAmount: data?.toAmount,
         swapToTokenSymbol: data?.toTokenSymbol,
         isSwapFormValid: isValid,
@@ -63,13 +72,28 @@ export function SwapButton({
       return;
     }
 
+    try {
+    // check for switch network here
+      const currentChainId = await (provider.provider as any).request({ method: 'eth_chainId', params: [] });
+      // eslint-disable-next-line radix
+      const parsedChainId = parseInt(currentChainId.toString());
+      if (parsedChainId !== getL2ChainId(checkout.config)) {
+        openNetworkSwitchDrawer();
+        return;
+      }
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Current network check failed', err);
+    }
+
     if (!transaction) return;
     try {
       updateLoading(true);
       const prefilledSwapData:PrefilledSwapForm = {
         fromAmount: data?.fromAmount || '',
-        fromContractAddress: data?.fromContractAddress || '',
-        toContractAddress: data?.toContractAddress || '',
+        fromTokenAddress: data?.fromTokenAddress || '',
+        toTokenAddress: data?.toTokenAddress || '',
+        toAmount: data?.toAmount || '',
       };
 
       if (transaction.approval) {
@@ -109,6 +133,9 @@ export function SwapButton({
         },
       });
     } catch (err: any) {
+      // eslint-disable-next-line no-console
+      console.error(err);
+
       updateLoading(false);
       if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
         setShowTxnRejectedState(true);
@@ -165,12 +192,12 @@ export function SwapButton({
       >
         {loading ? (
           <Button.Icon icon="Loading" sx={swapButtonIconLoadingStyle} />
-        ) : buttonText}
+        ) : t('views.SWAP.swapForm.buttonText')}
       </Button>
       <TransactionRejected
         visible={showTxnRejectedState}
         showHeaderBar={false}
-        onCloseBottomSheet={() => setShowTxnRejectedState(false)}
+        onCloseDrawer={() => setShowTxnRejectedState(false)}
         onRetry={() => {
           sendTransaction();
           setShowTxnRejectedState(false);

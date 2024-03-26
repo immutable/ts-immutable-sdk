@@ -1,13 +1,13 @@
 import { mount } from 'cypress/react18';
 import { describe } from 'local-cypress';
-import { BiomeCombinedProviders } from '@biom3/react';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { SelectForm } from './SelectForm';
 import { cySmartGet } from '../../../lib/testUtils';
 
 describe('SelectForm', () => {
   it('should show selected option when selected option in option list', () => {
     mount(
-      <BiomeCombinedProviders>
+      <ViewContextTestComponent>
         <SelectForm
           testId="select-form-test"
           options={[
@@ -15,25 +15,28 @@ describe('SelectForm', () => {
               id: 'imx',
               name: 'ImmutableX',
               symbol: 'IMX',
+              defaultTokenImage: 'default-token-image',
             },
             {
               id: 'eth',
               name: 'Ethereum',
               symbol: 'ETH',
+              defaultTokenImage: 'default-token-image',
             },
           ]}
           onSelectChange={() => {}}
           coinSelectorHeading="Select coin"
           selectedOption="imx"
+          defaultTokenImage="default-token-image"
         />
-      </BiomeCombinedProviders>,
+      </ViewContextTestComponent>,
     );
-    cySmartGet('select-form-test-select__target__controlledLabel').should('have.text', 'IMX');
+    cySmartGet('select-form-test-select__target__label').should('have.text', 'IMX');
   });
 
   it('should show options in options list', () => {
     mount(
-      <BiomeCombinedProviders>
+      <ViewContextTestComponent>
         <SelectForm
           testId="select-form-test"
           options={[
@@ -41,17 +44,20 @@ describe('SelectForm', () => {
               id: 'imx',
               name: 'ImmutableX',
               symbol: 'IMX',
+              defaultTokenImage: 'default-token-image',
             },
             {
               id: 'eth',
               name: 'Ethereum',
               symbol: 'ETH',
+              defaultTokenImage: 'default-token-image',
             },
           ]}
           onSelectChange={() => {}}
           coinSelectorHeading="Select coin"
+          defaultTokenImage="default-token-image"
         />
-      </BiomeCombinedProviders>,
+      </ViewContextTestComponent>,
     );
     cySmartGet('select-form-test-select__target').click();
     cySmartGet('select-form-test-coin-selector__option-imx').should('exist');
@@ -60,7 +66,7 @@ describe('SelectForm', () => {
 
   it('should show select coin when no selected option', () => {
     mount(
-      <BiomeCombinedProviders>
+      <ViewContextTestComponent>
         <SelectForm
           testId="select-form-test"
           options={[
@@ -68,47 +74,52 @@ describe('SelectForm', () => {
               id: 'imx',
               name: 'ImmutableX',
               symbol: 'IMX',
+              defaultTokenImage: 'default-token-image',
             },
             {
               id: 'eth',
               name: 'Ethereum',
               symbol: 'ETH',
+              defaultTokenImage: 'default-token-image',
             },
           ]}
           onSelectChange={() => {}}
           coinSelectorHeading="Select coin"
+          defaultTokenImage="default-token-image"
         />
-      </BiomeCombinedProviders>,
+      </ViewContextTestComponent>,
     );
-    cySmartGet('select-form-test-select__target__defaultLabel').should('have.text', 'Select coin');
+    cySmartGet('select-form-test-select__target__label').should('have.text', 'Select coin');
   });
 
   it('should show select coin when options is empty', () => {
     mount(
-      <BiomeCombinedProviders>
+      <ViewContextTestComponent>
         <SelectForm
           testId="select-form-test"
           options={[]}
           onSelectChange={() => {}}
           coinSelectorHeading="Select coin"
+          defaultTokenImage="default-token-image"
         />
-      </BiomeCombinedProviders>,
+      </ViewContextTestComponent>,
     );
-    cySmartGet('select-form-test-select__target__defaultLabel').should('have.text', 'Select coin');
+    cySmartGet('select-form-test-select__target__label').should('have.text', 'Select coin');
   });
 
   it('should show select coin when selected option not in options list', () => {
     mount(
-      <BiomeCombinedProviders>
+      <ViewContextTestComponent>
         <SelectForm
           testId="select-form-test"
           options={[]}
           onSelectChange={() => {}}
           coinSelectorHeading="Select coin"
           selectedOption="imx"
+          defaultTokenImage="default-token-image"
         />
-      </BiomeCombinedProviders>,
+      </ViewContextTestComponent>,
     );
-    cySmartGet('select-form-test-select__target__defaultLabel').should('have.text', 'Select coin');
+    cySmartGet('select-form-test-select__target__label').should('have.text', 'Select coin');
   });
 });

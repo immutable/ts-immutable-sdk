@@ -1,5 +1,6 @@
 import { useContext } from 'react';
 import { StandardAnalyticsActions } from '@imtbl/react-analytics';
+import { SalePaymentTypes } from '@imtbl/checkout-sdk';
 import {
   UserJourney,
   useAnalytics,
@@ -11,6 +12,7 @@ import {
   sendSaleSuccessEvent,
   sendSaleWidgetCloseEvent,
   sendSaleTransactionSuccessEvent,
+  sendSalePaymentMethodEvent,
 } from '../SaleWidgetEvents';
 import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 import { ExecutedTransaction } from '../types';
@@ -64,7 +66,8 @@ export const useSaleEvent = () => {
   const sendSuccessEvent = (
     screen: string = defaultView,
     transactions: ExecutedTransaction[] = [],
-    details?: Record<string, unknown>,
+    tokenIds: string[] = [],
+    details: Record<string, any> = {},
   ) => {
     track({
       ...commonProps,
@@ -77,39 +80,44 @@ export const useSaleEvent = () => {
         ...userProps,
         transactions: toStringifyTransactions(transactions),
         ...orderProps,
+        paymentMethod,
+        tokenIds,
       },
     });
-    sendSaleSuccessEvent(eventTarget, transactions);
+    sendSaleSuccessEvent(eventTarget, paymentMethod, transactions, tokenIds, details.transactionId);
   };
 
   const sendFailedEvent = (
     reason: string,
+    error: Record<string, unknown>,
     transactions: ExecutedTransaction[] = [],
     screen: string = defaultView,
-    details?: Record<string, unknown>,
+    details: Record<string, any> = {},
   ) => {
     track({
       ...commonProps,
-      screen: toPascalCase(screen),
+      screen: toPascalCase(screen || defaultView),
       control: 'Fail',
       controlType: 'Event',
       action: 'Failed',
       extras: {
-        transactions: toStringifyTransactions(transactions),
         ...details,
+        transactions: toStringifyTransactions(transactions),
+        ...error,
         ...orderProps,
         ...userProps,
+        paymentMethod,
         reason,
       },
     });
-    sendSaleFailedEvent(eventTarget, reason, transactions);
+    sendSaleFailedEvent(eventTarget, reason, error, paymentMethod, transactions, details.transactionId);
   };
 
-  const sendTransactionSuccessEvent = (transactions: ExecutedTransaction[]) => {
-    sendSaleTransactionSuccessEvent(eventTarget, transactions);
+  const sendTransactionSuccessEvent = (transaction: ExecutedTransaction) => {
+    sendSaleTransactionSuccessEvent(eventTarget, paymentMethod, [transaction]);
   };
 
-  const sendSelectedPaymentMethod = (type: string, screen: string) => {
+  const sendSelectedPaymentMethod = (type: SalePaymentTypes, screen: string) => {
     track({
       ...commonProps,
       screen: toPascalCase(screen),
@@ -119,6 +127,7 @@ export const useSaleEvent = () => {
         paymentMethod: type,
       },
     });
+    sendSalePaymentMethodEvent(eventTarget, type);
   };
 
   const sendPageView = (screen: string, data?: Record<string, unknown>) => {

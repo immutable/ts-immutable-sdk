@@ -1,78 +1,73 @@
 import { BigNumber, ethers } from 'ethers';
 import { Environment } from '@imtbl/config';
-import { gasEstimator } from '../../../gasEstimate';
-import {
-  ChainId, FundingStepType, GasEstimateBridgeToL2Result, TokenInfo,
-} from '../../../types';
+import { ChainId } from '../../../types';
 import { getBridgeFeeEstimate } from './getBridgeFeeEstimate';
 import { CheckoutConfiguration } from '../../../config';
 import { CheckoutErrorType } from '../../../errors';
+import { createBridgeInstance } from '../../../instance';
+import { HttpClient } from '../../../api/http';
 
 jest.mock('../../../gasEstimate');
+jest.mock('../../../instance');
 
 describe('getBridgeFeeEstimate', () => {
   const readOnlyProviders = new Map<ChainId, ethers.providers.JsonRpcProvider>([]);
+  const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
   const config = new CheckoutConfiguration({
     baseConfig: { environment: Environment.SANDBOX },
-  });
+  }, mockedHttpClient);
 
   it('should return the total fees for the bridge', async () => {
-    (gasEstimator as jest.Mock).mockResolvedValue({
-      gasFee: {
-        estimatedAmount: BigNumber.from(1),
-        token: {
-          name: 'ETH',
-          symbol: 'ETH',
-          decimals: 18,
-        } as TokenInfo,
-      },
-      bridgeFee: {
-        estimatedAmount: BigNumber.from(2),
-        token: {
-          name: 'ETH',
-          symbol: 'ETH',
-          decimals: 18,
-        } as TokenInfo,
-      },
-    } as GasEstimateBridgeToL2Result);
-
-    const bridgeFee = await getBridgeFeeEstimate(config, readOnlyProviders);
-    expect(bridgeFee).toEqual({
-      type: FundingStepType.BRIDGE,
-      gasFee: {
-        estimatedAmount: BigNumber.from(1),
-        token: {
-          name: 'ETH',
-          symbol: 'ETH',
-          decimals: 18,
+    (createBridgeInstance as jest.Mock).mockReturnValue({
+      getFee: jest.fn().mockResolvedValue(
+        {
+          sourceChainGas: BigNumber.from(1),
+          bridgeFee: BigNumber.from(2),
+          imtblFee: BigNumber.from(3),
+          totalFees: BigNumber.from(4),
         },
-      },
-      bridgeFee: {
-        estimatedAmount: BigNumber.from(2),
-        token: {
-          name: 'ETH',
-          symbol: 'ETH',
-          decimals: 18,
-        },
-      },
-      totalFees: BigNumber.from(3),
+      ),
     });
+
+    const bridgeFee = await getBridgeFeeEstimate(
+      config,
+      readOnlyProviders,
+      ChainId.SEPOLIA,
+      ChainId.IMTBL_ZKEVM_TESTNET,
+    );
+
+    expect(bridgeFee).toEqual(
+      {
+        sourceChainGas: BigNumber.from(1),
+        approvalGas: BigNumber.from(0),
+        bridgeFee: BigNumber.from(2),
+        imtblFee: BigNumber.from(3),
+        totalFees: BigNumber.from(4),
+      },
+    );
   });
 
   it('should throw checkout error if gas estimator errors', async () => {
-    (gasEstimator as jest.Mock).mockRejectedValue(new Error('error from gas estimator'));
+    (createBridgeInstance as jest.Mock).mockReturnValue({
+      getFee: jest.fn().mockRejectedValue(new Error('error from gas estimator')),
+    });
 
     let type;
     let data;
 
     try {
-      await getBridgeFeeEstimate(config, readOnlyProviders);
+      await getBridgeFeeEstimate(
+        config,
+        readOnlyProviders,
+        ChainId.SEPOLIA,
+        ChainId.IMTBL_ZKEVM_TESTNET,
+      );
     } catch (err: any) {
       type = err.type;
       data = err.data;
     }
 
     expect(type).toEqual(CheckoutErrorType.BRIDGE_GAS_ESTIMATE_ERROR);
-    expect(data).toEqual({ message: 'error from gas estimator' });
+    expect(data.error).toBeDefined();
   });
 });

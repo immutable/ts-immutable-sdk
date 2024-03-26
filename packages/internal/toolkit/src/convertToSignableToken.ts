@@ -1,4 +1,4 @@
-import { TokenAmount, SignableToken } from '@imtbl/core-sdk';
+import { TokenAmount, SignableToken } from '@imtbl/x-client';
 
 /**
  * Helper method to convert token type to a SignableToken type

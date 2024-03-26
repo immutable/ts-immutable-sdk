@@ -1,5 +1,7 @@
-import { ExternalProvider, JsonRpcProvider } from '@ethersproject/providers';
+import { StaticJsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
+import { Signer } from '@ethersproject/abstract-signer';
+import { utils } from 'ethers';
 import {
   JsonRpcRequestCallback,
   JsonRpcRequestPayload,
@@ -13,53 +15,58 @@ import AuthManager from '../authManager';
 import MagicAdapter from '../magicAdapter';
 import TypedEventEmitter from '../utils/typedEventEmitter';
 import { PassportConfiguration } from '../config';
-import { ConfirmationScreen } from '../confirmation';
-import { PassportEventMap, PassportEvents, UserZkEvm } from '../types';
+import {
+  PassportEventMap,
+  PassportEvents,
+  User,
+  UserZkEvm,
+} from '../types';
 import { RelayerClient } from './relayerClient';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
-import { loginZkEvmUser } from './user';
+import { registerZkEvmUser } from './user';
 import { sendTransaction } from './sendTransaction';
-import GuardianClient from '../guardian/guardian';
+import GuardianClient from '../guardian';
 import { signTypedDataV4 } from './signTypedDataV4';
 
 export type ZkEvmProviderInput = {
   authManager: AuthManager;
   magicAdapter: MagicAdapter,
   config: PassportConfiguration,
-  confirmationScreen: ConfirmationScreen,
   multiRollupApiClients: MultiRollupApiClients,
   passportEventEmitter: TypedEventEmitter<PassportEventMap>;
-};
-
-type LoggedInZkEvmProvider = {
-  magicProvider: ExternalProvider;
-  user: UserZkEvm;
-  relayerClient: RelayerClient;
   guardianClient: GuardianClient;
 };
 
+const isZkEvmUser = (user: User): user is UserZkEvm => 'zkEvm' in user;
+
 export class ZkEvmProvider implements Provider {
-  private readonly authManager: AuthManager;
+  readonly #authManager: AuthManager;
 
-  private readonly config: PassportConfiguration;
+  readonly #config: PassportConfiguration;
 
-  private readonly confirmationScreen: ConfirmationScreen;
+  readonly #eventEmitter: TypedEventEmitter<ProviderEventMap>;
 
-  private readonly magicAdapter: MagicAdapter;
+  readonly #guardianClient: GuardianClient;
 
-  private readonly multiRollupApiClients: MultiRollupApiClients;
+  readonly #rpcProvider: StaticJsonRpcProvider; // Used for read
 
-  private readonly jsonRpcProvider: JsonRpcProvider; // Used for read
+  readonly #magicAdapter: MagicAdapter;
 
-  private readonly eventEmitter: TypedEventEmitter<ProviderEventMap>;
+  readonly #multiRollupApiClients: MultiRollupApiClients;
 
-  protected guardianClient?: GuardianClient;
+  readonly #relayerClient: RelayerClient;
 
-  protected relayerClient?: RelayerClient;
+  /**
+   * This property is set during `#initialiseEthSigner` and stores the signer in a promise.
+   * This property is not meant to be accessed directly, but through the
+   * `#getSigner` method.
+   * @see getSigner
+   */
+  #ethSigner?: Promise<Signer | undefined> | undefined;
 
-  protected magicProvider?: ExternalProvider; // Used for signing
+  #signerInitialisationError: unknown | undefined;
 
-  protected user?: UserZkEvm;
+  #zkEvmAddress?: string;
 
   public readonly isPassport: boolean = true;
 
@@ -67,114 +74,166 @@ export class ZkEvmProvider implements Provider {
     authManager,
     magicAdapter,
     config,
-    confirmationScreen,
     multiRollupApiClients,
     passportEventEmitter,
+    guardianClient,
   }: ZkEvmProviderInput) {
-    this.authManager = authManager;
-    this.magicAdapter = magicAdapter;
-    this.config = config;
-    this.confirmationScreen = confirmationScreen;
+    this.#authManager = authManager;
+    this.#magicAdapter = magicAdapter;
+    this.#config = config;
+    this.#guardianClient = guardianClient;
 
     if (config.crossSdkBridgeEnabled) {
-      // JsonRpcProvider by default sets the referrer as "client".
+      // StaticJsonRpcProvider by default sets the referrer as "client".
       // On Unreal 4 this errors as the browser used is expecting a valid URL.
-      this.jsonRpcProvider = new JsonRpcProvider({
-        url: this.config.zkEvmRpcUrl,
+      this.#rpcProvider = new StaticJsonRpcProvider({
+        url: this.#config.zkEvmRpcUrl,
         fetchOptions: { referrer: 'http://imtblgamesdk.local' },
       });
     } else {
-      this.jsonRpcProvider = new JsonRpcProvider(this.config.zkEvmRpcUrl);
+      this.#rpcProvider = new StaticJsonRpcProvider(this.#config.zkEvmRpcUrl);
     }
 
-    this.multiRollupApiClients = multiRollupApiClients;
-    this.eventEmitter = new TypedEventEmitter<ProviderEventMap>();
+    this.#relayerClient = new RelayerClient({
+      config: this.#config,
+      rpcProvider: this.#rpcProvider,
+      authManager: this.#authManager,
+    });
 
-    passportEventEmitter.on(PassportEvents.LOGGED_OUT, this.handleLogout);
+    this.#multiRollupApiClients = multiRollupApiClients;
+    this.#eventEmitter = new TypedEventEmitter<ProviderEventMap>();
+
+    passportEventEmitter.on(PassportEvents.LOGGED_OUT, this.#handleLogout);
   }
 
-  private handleLogout = () => {
-    const shouldEmitAccountsChanged = this.isLoggedIn();
+  #handleLogout = () => {
+    const shouldEmitAccountsChanged = !!this.#zkEvmAddress;
 
-    this.magicProvider = undefined;
-    this.user = undefined;
-    this.relayerClient = undefined;
-    this.guardianClient = undefined;
+    this.#ethSigner = undefined;
+    this.#zkEvmAddress = undefined;
 
     if (shouldEmitAccountsChanged) {
-      this.eventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, []);
+      this.#eventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, []);
     }
   };
 
-  private isLoggedIn(): this is LoggedInZkEvmProvider {
-    return this.magicProvider !== undefined
-      && this.user !== undefined
-      && this.relayerClient !== undefined
-      && this.guardianClient !== undefined;
+  /**
+   * This method is called by `eth_requestAccounts` and asynchronously initialises the signer.
+   * The signer is stored in a promise so that it can be retrieved by the provider
+   * when needed.
+   *
+   * If an error is thrown during initialisation, it is stored in the `signerInitialisationError`,
+   * so that it doesn't result in an unhandled promise rejection.
+   *
+   * This error is thrown when the signer is requested through:
+   * @see #getSigner
+   *
+   */
+  #initialiseEthSigner(user: User) {
+    const generateSigner = async (): Promise<Signer> => {
+      const magicRpcProvider = await this.#magicAdapter.login(user.idToken!);
+      const web3Provider = new Web3Provider(magicRpcProvider);
+
+      return web3Provider.getSigner();
+    };
+
+    // eslint-disable-next-line no-async-promise-executor
+    this.#ethSigner = new Promise(async (resolve) => {
+      try {
+        resolve(await generateSigner());
+      } catch (err) {
+        // Capture and store the initialization error
+        this.#signerInitialisationError = err;
+        resolve(undefined);
+      }
+    });
   }
 
-  private async performRequest(request: RequestArguments): Promise<any> {
+  async #getSigner(): Promise<Signer> {
+    const ethSigner = await this.#ethSigner;
+    // Throw the stored error if the signers failed to initialise
+    if (typeof ethSigner === 'undefined') {
+      if (typeof this.#signerInitialisationError !== 'undefined') {
+        throw this.#signerInitialisationError;
+      }
+      throw new Error('Signer failed to initialise');
+    }
+
+    return ethSigner;
+  }
+
+  async #performRequest(request: RequestArguments): Promise<any> {
     switch (request.method) {
       case 'eth_requestAccounts': {
-        if (this.isLoggedIn()) {
-          return [this.user.zkEvm.ethAddress];
+        if (this.#zkEvmAddress) {
+          return [this.#zkEvmAddress];
         }
-        const { magicProvider, user } = await loginZkEvmUser({
-          authManager: this.authManager,
-          config: this.config,
-          magicAdapter: this.magicAdapter,
-          multiRollupApiClients: this.multiRollupApiClients,
-          jsonRpcProvider: this.jsonRpcProvider,
-        });
 
-        this.user = user;
-        this.magicProvider = magicProvider;
-        this.relayerClient = new RelayerClient({
-          config: this.config,
-          jsonRpcProvider: this.jsonRpcProvider,
-          user: this.user,
-        });
-        this.guardianClient = new GuardianClient({
-          confirmationScreen: this.confirmationScreen,
-          config: this.config,
-        });
+        const user = await this.#authManager.getUserOrLogin();
+        this.#initialiseEthSigner(user);
 
-        this.eventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [this.user.zkEvm.ethAddress]);
+        if (!isZkEvmUser(user)) {
+          const ethSigner = await this.#getSigner();
+          this.#zkEvmAddress = await registerZkEvmUser({
+            ethSigner,
+            authManager: this.#authManager,
+            multiRollupApiClients: this.#multiRollupApiClients,
+            accessToken: user.accessToken,
+            rpcProvider: this.#rpcProvider,
+          });
+        } else {
+          this.#zkEvmAddress = user.zkEvm.ethAddress;
+        }
 
-        return [this.user.zkEvm.ethAddress];
+        this.#eventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [this.#zkEvmAddress]);
+
+        return [this.#zkEvmAddress];
       }
       case 'eth_sendTransaction': {
-        if (!this.isLoggedIn()) {
+        if (!this.#zkEvmAddress) {
           throw new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
         }
+
+        const ethSigner = await this.#getSigner();
 
         return sendTransaction({
           params: request.params || [],
-          magicProvider: this.magicProvider,
-          guardianClient: this.guardianClient,
-          jsonRpcProvider: this.jsonRpcProvider,
-          relayerClient: this.relayerClient,
-          user: this.user,
+          ethSigner,
+          guardianClient: this.#guardianClient,
+          rpcProvider: this.#rpcProvider,
+          relayerClient: this.#relayerClient,
+          zkevmAddress: this.#zkEvmAddress,
         });
       }
       case 'eth_accounts': {
-        return this.isLoggedIn() ? [this.user.zkEvm.ethAddress] : [];
+        return this.#zkEvmAddress ? [this.#zkEvmAddress] : [];
       }
       case 'eth_signTypedData':
       case 'eth_signTypedData_v4': {
-        if (!this.isLoggedIn()) {
+        if (!this.#zkEvmAddress) {
           throw new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
         }
+
+        const ethSigner = await this.#getSigner();
 
         return signTypedDataV4({
           method: request.method,
           params: request.params || [],
-          magicProvider: this.magicProvider,
-          jsonRpcProvider: this.jsonRpcProvider,
-          relayerClient: this.relayerClient,
-          user: this.user,
-          guardianClient: this.guardianClient,
+          ethSigner,
+          rpcProvider: this.#rpcProvider,
+          relayerClient: this.#relayerClient,
+          guardianClient: this.#guardianClient,
         });
+      }
+      case 'eth_chainId': {
+        // Call detect network to fetch the chainId so to take advantage of
+        // the caching layer provided by StaticJsonRpcProvider.
+        // In case Passport is changed from StaticJsonRpcProvider to a
+        // JsonRpcProvider, this function will still work as expected given
+        // that detectNetwork call _uncachedDetectNetwork which will force
+        // the provider to re-fetch the chainId from remote.
+        const { chainId } = await this.#rpcProvider.detectNetwork();
+        return utils.hexlify(chainId);
       }
       // Pass through methods
       case 'eth_gasPrice':
@@ -184,13 +243,12 @@ export class ZkEvmProvider implements Provider {
       case 'eth_estimateGas':
       case 'eth_call':
       case 'eth_blockNumber':
-      case 'eth_chainId':
       case 'eth_getBlockByHash':
       case 'eth_getBlockByNumber':
       case 'eth_getTransactionByHash':
       case 'eth_getTransactionReceipt':
       case 'eth_getTransactionCount': {
-        return this.jsonRpcProvider.send(request.method, request.params || []);
+        return this.#rpcProvider.send(request.method, request.params || []);
       }
       default: {
         throw new JsonRpcError(ProviderErrorCode.UNSUPPORTED_METHOD, 'Method not supported');
@@ -198,10 +256,10 @@ export class ZkEvmProvider implements Provider {
     }
   }
 
-  private async performJsonRpcRequest(request: JsonRpcRequestPayload): Promise<JsonRpcResponsePayload> {
+  async #performJsonRpcRequest(request: JsonRpcRequestPayload): Promise<JsonRpcResponsePayload> {
     const { id, jsonrpc } = request;
     try {
-      const result = await this.performRequest(request);
+      const result = await this.#performRequest(request);
       return {
         id,
         jsonrpc,
@@ -229,7 +287,7 @@ export class ZkEvmProvider implements Provider {
     request: RequestArguments,
   ): Promise<any> {
     try {
-      return this.performRequest(request);
+      return this.#performRequest(request);
     } catch (error: unknown) {
       if (error instanceof JsonRpcError) {
         throw error;
@@ -251,13 +309,13 @@ export class ZkEvmProvider implements Provider {
     }
 
     if (Array.isArray(request)) {
-      Promise.all(request.map(this.performJsonRpcRequest)).then((result) => {
+      Promise.all(request.map(this.#performJsonRpcRequest)).then((result) => {
         callback(null, result);
       }).catch((error: JsonRpcError) => {
         callback(error, []);
       });
     } else {
-      this.performJsonRpcRequest(request).then((result) => {
+      this.#performJsonRpcRequest(request).then((result) => {
         callback(null, result);
       }).catch((error: JsonRpcError) => {
         callback(error, null);
@@ -298,17 +356,17 @@ export class ZkEvmProvider implements Provider {
     }
 
     if (!Array.isArray(request) && typeof request === 'object') {
-      return this.performJsonRpcRequest(request);
+      return this.#performJsonRpcRequest(request);
     }
 
     throw new JsonRpcError(RpcErrorCode.INVALID_REQUEST, 'Invalid request');
   }
 
   public on(event: string, listener: (...args: any[]) => void): void {
-    this.eventEmitter.on(event, listener);
+    this.#eventEmitter.on(event, listener);
   }
 
   public removeListener(event: string, listener: (...args: any[]) => void): void {
-    this.eventEmitter.removeListener(event, listener);
+    this.#eventEmitter.removeListener(event, listener);
   }
 }

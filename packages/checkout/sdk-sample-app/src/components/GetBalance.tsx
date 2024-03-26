@@ -11,7 +11,7 @@ interface BalanceProps {
 }
 
 export default function GetBalance(props: BalanceProps) {
-  const contractAddress = '0x741185AEFC3E539c1F42c1d6eeE8bFf1c89D70FE';
+  const tokenAddress = '0x741185AEFC3E539c1F42c1d6eeE8bFf1c89D70FE';
 
   const { provider, checkout } = props;
 
@@ -72,7 +72,7 @@ export default function GetBalance(props: BalanceProps) {
       const resp = await checkout.getBalance({
         provider,
         walletAddress,
-        contractAddress,
+        tokenAddress,
       });
       setResultBalance(resp);
       setLoadingBalance(false);
@@ -141,7 +141,7 @@ export default function GetBalance(props: BalanceProps) {
                 marginBottom: 'base.spacing.x2',
               }}
             >
-              Target token: {contractAddress}
+              Target token: {tokenAddress}
             </Box>
             <Box>Balance: {resultBalance.balance.toString()}</Box>
             <Box>Fromatted Balance: {resultBalance.formattedBalance}</Box>

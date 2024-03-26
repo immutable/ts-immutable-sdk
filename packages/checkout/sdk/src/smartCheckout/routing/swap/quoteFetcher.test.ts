@@ -11,6 +11,7 @@ import { ChainId } from '../../../types';
 import { quoteFetcher } from './quoteFetcher';
 import { createExchangeInstance } from '../../../instance';
 import { DexQuote, DexQuotes } from '../types';
+import { HttpClient } from '../../../api/http';
 
 jest.mock('../../../instance');
 
@@ -118,9 +119,10 @@ describe('quoteFetcher', () => {
     return dexQuote;
   };
 
+  const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
   const config = new CheckoutConfiguration({
     baseConfig: { environment: Environment.SANDBOX },
-  });
+  }, mockedHttpClient);
 
   beforeEach(() => {
     jest.spyOn(console, 'info').mockImplementation(() => {});

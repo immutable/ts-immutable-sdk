@@ -4,14 +4,11 @@ import { BigNumber } from 'ethers';
 import { ExternalProvider, TransactionRequest, Web3Provider } from '@ethersproject/providers';
 import { Checkout, CheckoutErrorType } from '@imtbl/checkout-sdk';
 import { Quote } from '@imtbl/dex-sdk';
-import { Environment } from '@imtbl/config';
 import { ApproveERC20Onboarding } from './ApproveERC20Onboarding';
 import { cyIntercept, cySmartGet } from '../../../lib/testUtils';
-import { text } from '../../../resources/text/textConfig';
 import {
   ApproveERC20SwapData,
   PrefilledSwapForm,
-  SwapWidgetViews,
 } from '../../../context/view-context/SwapViewContextTypes';
 import { SwapState } from '../context/SwapContext';
 import { SwapWidgetTestComponent } from '../test-components/SwapWidgetTestComponent';
@@ -19,7 +16,6 @@ import { ConnectLoaderState, ConnectionStatus } from '../../../context/connect-l
 import {
   ConnectLoaderTestComponent,
 } from '../../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
-import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 import { CustomAnalyticsProvider } from '../../../context/analytics-provider/CustomAnalyticsProvider';
 
 describe('Approve ERC20 Onboarding', () => {
@@ -92,7 +88,7 @@ describe('Approve ERC20 Onboarding', () => {
       info: {} as Quote,
       swapFormInfo: {
         fromAmount: '0.5',
-        fromContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+        fromTokenAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
       } as PrefilledSwapForm,
     };
   });
@@ -100,7 +96,7 @@ describe('Approve ERC20 Onboarding', () => {
   describe('Approve Spending Step', () => {
     it('should request user to approve spending transaction on button click', () => {
       mount(
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <CustomAnalyticsProvider checkout={{} as Checkout}>
           <ConnectLoaderTestComponent
             initialStateOverride={connectLoaderState}
           >
@@ -126,9 +122,8 @@ describe('Approve ERC20 Onboarding', () => {
       sendTransactionStub.resolves({
         transactionResponse: { wait: () => Promise.resolve({ status: 1 }) },
       });
-      const { approveSwap, approveSpending } = text.views[SwapWidgetViews.APPROVE_ERC20];
       mount(
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <CustomAnalyticsProvider checkout={{} as Checkout}>
           <ConnectLoaderTestComponent
             initialStateOverride={connectLoaderState}
           >
@@ -140,27 +135,31 @@ describe('Approve ERC20 Onboarding', () => {
       );
 
       // assert approve spending copy
-      cySmartGet('simple-text-body__heading').should('have.text', approveSpending.content.metamask.heading);
-      cySmartGet('simple-text-body__body').should('include.text', approveSpending.content.metamask.body[0]);
-      cySmartGet('simple-text-body__body').should('include.text', approveSpending.content.metamask.body[1]);
-      cySmartGet('footer-button').should('have.text', approveSpending.footer.buttonText);
+      cySmartGet('simple-text-body__heading').should(
+        'have.text',
+        'You\'ll be asked to set a spending cap for this transaction',
+      );
+      cySmartGet('simple-text-body__body').should(
+        'include.text',
+        'Input at least 0.5 IMX for this transaction and future transactions, then follow the prompts.',
+      );
+      cySmartGet('footer-button').should('have.text', 'Got it');
 
       // make transaction
       cySmartGet('footer-button').click();
 
       // assert approve swap copy
-      cySmartGet('simple-text-body__heading').should('have.text', approveSwap.content.heading);
-      cySmartGet('simple-text-body__body').should('include.text', approveSwap.content.body[0]);
-      cySmartGet('footer-button').should('have.text', approveSwap.footer.buttonText);
+      cySmartGet('simple-text-body__heading').should('have.text', 'Now you\'ll just need to confirm the transaction');
+      cySmartGet('simple-text-body__body').should('include.text', 'Follow the prompts in your wallet.');
+      cySmartGet('footer-button').should('have.text', 'Okay');
     });
 
     it('should move to the approve swap content with Passport', () => {
       sendTransactionStub.resolves({
         transactionResponse: { wait: () => Promise.resolve({ status: 1 }) },
       });
-      const { approveSwap, approveSpending } = text.views[SwapWidgetViews.APPROVE_ERC20];
       mount(
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <CustomAnalyticsProvider checkout={{} as Checkout}>
           <ConnectLoaderTestComponent
             initialStateOverride={
             {
@@ -177,22 +176,28 @@ describe('Approve ERC20 Onboarding', () => {
       );
 
       // assert approve spending copy
-      cySmartGet('simple-text-body__heading').should('have.text', approveSpending.content.passport.heading);
-      cySmartGet('simple-text-body__body').should('include.text', approveSpending.content.passport.body);
-      cySmartGet('footer-button').should('have.text', approveSpending.footer.buttonText);
+      cySmartGet('simple-text-body__heading').should(
+        'have.text',
+        'You\'ll be asked to approve a spending cap for this transaction',
+      );
+      cySmartGet('simple-text-body__body').should(
+        'include.text',
+        'Follow the prompts in your wallet to approve the spending cap.',
+      );
+      cySmartGet('footer-button').should('have.text', 'Got it');
 
       // make transaction
       cySmartGet('footer-button').click();
 
       // assert approve swap copy
-      cySmartGet('simple-text-body__heading').should('have.text', approveSwap.content.heading);
-      cySmartGet('simple-text-body__body').should('include.text', approveSwap.content.body[0]);
-      cySmartGet('footer-button').should('have.text', approveSwap.footer.buttonText);
+      cySmartGet('simple-text-body__heading').should('have.text', 'Now you\'ll just need to confirm the transaction');
+      cySmartGet('simple-text-body__body').should('include.text', 'Follow the prompts in your wallet.');
+      cySmartGet('footer-button').should('have.text', 'Okay');
     });
 
     it('should show correct approval spending hint (amount and symbol) in body', () => {
       mount(
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <CustomAnalyticsProvider checkout={{} as Checkout}>
           <ConnectLoaderTestComponent
             initialStateOverride={connectLoaderState}
           >
@@ -208,9 +213,8 @@ describe('Approve ERC20 Onboarding', () => {
 
     it('should reset the button text when user rejects request', () => {
       sendTransactionStub.rejects({ type: CheckoutErrorType.USER_REJECTED_REQUEST_ERROR });
-      const { footer } = text.views[SwapWidgetViews.APPROVE_ERC20].approveSpending;
       mount(
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <CustomAnalyticsProvider checkout={{} as Checkout}>
           <ConnectLoaderTestComponent
             initialStateOverride={connectLoaderState}
           >
@@ -220,11 +224,11 @@ describe('Approve ERC20 Onboarding', () => {
           </ConnectLoaderTestComponent>
         </CustomAnalyticsProvider>,
       );
-      cySmartGet('footer-button').should('have.text', footer.buttonText);
+      cySmartGet('footer-button').should('have.text', 'Got it');
 
       cySmartGet('footer-button').click();
 
-      cySmartGet('footer-button').should('have.text', footer.retryText);
+      cySmartGet('footer-button').should('have.text', 'Try again');
     });
   });
 
@@ -234,7 +238,7 @@ describe('Approve ERC20 Onboarding', () => {
         transactionResponse: { wait: () => Promise.resolve({ status: 1 }) },
       });
       mount(
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <CustomAnalyticsProvider checkout={{} as Checkout}>
           <ConnectLoaderTestComponent
             initialStateOverride={connectLoaderState}
           >

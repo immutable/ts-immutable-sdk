@@ -21,7 +21,7 @@ jobs:
         with:
           node-version: lts/*
           registry-url: https://registry.npmjs.org/
-          cache: 'yarn'
+          cache: "yarn"
 
       - name: Install dependencies
         run: yarn install --immutable
@@ -35,6 +35,8 @@ jobs:
       - name: Typecheck
         run: yarn typecheck
 
+      - name: Build passport sample app
+        run: yarn workspace @imtbl/passport-sdk-sample-app build
 
   test:
     name: Test
@@ -48,9 +50,9 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: lts/*
+          node-version-file: .nvmrc
           registry-url: https://registry.npmjs.org/
-          cache: 'yarn'
+          cache: "yarn"
 
       - name: Install dependencies
         run: yarn install --immutable
@@ -90,7 +92,7 @@ jobs:
         with:
           node-version: lts/*
           registry-url: https://registry.npmjs.org/
-          cache: 'yarn'
+          cache: "yarn"
 
       - name: Install dependencies
         run: yarn install --immutable
@@ -105,6 +107,7 @@ jobs:
 
       - name: Checkout-widgets cypress tests
         if: ${{ contains(steps.reviewer-teams.outputs.teams, 'Wallets') && !contains(github.event.pull_request.title, 'SKIP-CY') }}
+        working-directory: ./packages/checkout/widgets-lib
         run: yarn test:checkout:cypress
 
       - name: Upload cypress videos artifacts
@@ -120,7 +123,7 @@ jobs:
         with:
           name: checkout-widgets-cypress-screenshots
           path: ./packages/checkout/widgets-lib/cypress/screenshots
-  
+
   lint:
     name: Lint
     runs-on: ubuntu-latest-4-cores
@@ -133,7 +136,7 @@ jobs:
         with:
           node-version: lts/*
           registry-url: https://registry.npmjs.org/
-          cache: 'yarn'
+          cache: "yarn"
 
       - name: Install dependencies
         run: yarn install --immutable

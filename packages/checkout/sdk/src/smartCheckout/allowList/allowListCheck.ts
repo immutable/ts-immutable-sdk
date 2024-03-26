@@ -1,18 +1,22 @@
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../config';
+import { getTokenAllowList } from '../../tokens';
 import {
-  BridgeConfig,
-  DexConfig, OnRampConfig,
   AvailableRoutingOptions,
   TokenInfo,
+  TokenFilterTypes,
 } from '../../types';
 import { TokenBalanceResult, TokenBalances } from '../routing/types';
-import { OnRampTokensAllowList, RoutingTokensAllowList } from './types';
+import { isMatchingAddress } from '../../utils/utils';
+import { RoutingTokensAllowList } from './types';
 
 const filterTokens = (allowedTokens: TokenInfo[], balances: TokenBalanceResult | undefined) => {
   if (balances && balances.success) {
     return allowedTokens.filter((token) => {
       if ('address' in token) {
-        return balances.balances.find((balance) => balance.token.address === token.address && balance.balance.gt(0));
+        return balances.balances.find(
+          (balance) => isMatchingAddress(balance.token.address, token.address)
+          && balance.balance.gt(0),
+        );
       }
       return balances.balances.find((balance) => !('address' in balance.token) && balance.balance.gt(0));
     });
@@ -24,19 +28,13 @@ const filterTokens = (allowedTokens: TokenInfo[], balances: TokenBalanceResult |
 export const allowListCheckForOnRamp = async (
   config: CheckoutConfiguration,
   availableRoutingOptions: AvailableRoutingOptions,
-) : Promise<OnRampTokensAllowList> => {
+) : Promise<TokenInfo[]> => {
   if (availableRoutingOptions.onRamp) {
-    const onRampOptions = await config.remote.getConfig('onramp') as OnRampConfig;
-    const onRampAllowList: OnRampTokensAllowList = {};
-    Object.entries(onRampOptions)
-      .forEach(([onRampProvider, onRampProviderConfig]) => {
-        // Allowed list per onRamp provider
-        onRampAllowList[onRampProvider] = onRampProviderConfig.tokens ?? [];
-      });
-    return onRampAllowList;
+    const onRampOptions = (await getTokenAllowList(config, { type: TokenFilterTypes.ONRAMP }));
+    return onRampOptions.tokens;
   }
 
-  return {};
+  return [];
 };
 
 export const allowListCheckForBridge = async (
@@ -45,8 +43,9 @@ export const allowListCheckForBridge = async (
   availableRoutingOptions: AvailableRoutingOptions,
 ) : Promise<TokenInfo[]> => {
   if (availableRoutingOptions.bridge) {
-    const allowedTokens = ((await config.remote.getConfig('bridge')) as BridgeConfig)?.tokens ?? [];
-    const balances = tokenBalances.get(getL1ChainId(config));
+    const chainId = getL1ChainId(config);
+    const allowedTokens = (await getTokenAllowList(config, { type: TokenFilterTypes.BRIDGE, chainId })).tokens;
+    const balances = tokenBalances.get(chainId);
     return filterTokens(allowedTokens, balances);
   }
 
@@ -59,7 +58,7 @@ export const allowListCheckForSwap = async (
   availableRoutingOptions: AvailableRoutingOptions,
 ) : Promise<TokenInfo[]> => {
   if (availableRoutingOptions.swap) {
-    const allowedTokens = ((await config.remote.getConfig('dex')) as DexConfig)?.tokens ?? [];
+    const allowedTokens = (await getTokenAllowList(config, { type: TokenFilterTypes.SWAP })).tokens;
     const balances = tokenBalances.get(getL2ChainId(config));
     return filterTokens(allowedTokens, balances);
   }

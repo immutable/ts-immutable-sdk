@@ -1,92 +1,100 @@
 import {
-  Box, Button, Heading, OptionKey,
+  Box,
+  Button,
+  Heading,
+  OptionKey,
 } from '@biom3/react';
 import {
-  CheckoutErrorType, GasEstimateBridgeToL2Result, GasEstimateType, GetBalanceResult,
+  GetBalanceResult,
 } from '@imtbl/checkout-sdk';
 import {
   useCallback, useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
-import { ApproveDepositBridgeResponse, BridgeDepositResponse } from '@imtbl/bridge-sdk';
-import { BigNumber, utils } from 'ethers';
+import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
+import { useTranslation } from 'react-i18next';
 import { amountInputValidation } from '../../../lib/validations/amountInputValidations';
-import { BridgeContext } from '../context/BridgeContext';
-import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
-import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
+import { BridgeActions, BridgeContext } from '../context/BridgeContext';
+import {
+  ViewActions,
+  ViewContext,
+} from '../../../context/view-context/ViewContext';
 import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
-import { text } from '../../../resources/text/textConfig';
 import { TextInputForm } from '../../../components/FormComponents/TextInputForm/TextInputForm';
 import {
   calculateCryptoToFiat, formatZeroAmount, isNativeToken, tokenValueFormat,
 } from '../../../lib/utils';
 import { SelectForm } from '../../../components/FormComponents/SelectForm/SelectForm';
 import { validateAmount, validateToken } from '../functions/BridgeFormValidator';
-import { Fees } from '../../../components/Fees/Fees';
 import {
   bridgeFormButtonContainerStyles,
   bridgeFormWrapperStyles,
   formInputsContainerStyles,
 } from './BridgeFormStyles';
 import { CoinSelectorOptionProps } from '../../../components/CoinSelector/CoinSelectorOption';
-import { useInterval } from '../../../lib/hooks/useInterval';
-import { DEFAULT_TOKEN_DECIMALS, DEFAULT_QUOTE_REFRESH_INTERVAL, NATIVE } from '../../../lib';
-import { swapButtonIconLoadingStyle } from '../../swap/components/SwapButtonStyles';
+import {
+  NATIVE,
+} from '../../../lib';
 import { TransactionRejected } from '../../../components/TransactionRejected/TransactionRejected';
-import { NotEnoughGas } from '../../../components/NotEnoughGas/NotEnoughGas';
-import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
+import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
+import { TokenSelectShimmer } from './TokenSelectShimmer';
 
 interface BridgeFormProps {
   testId?: string;
   defaultAmount?: string;
-  defaultFromContractAddress?: string;
+  defaultTokenAddress?: string;
+  isTokenBalancesLoading?: boolean;
+  defaultTokenImage: string;
 }
 
 export function BridgeForm(props: BridgeFormProps) {
+  const { t } = useTranslation();
   const {
+    bridgeDispatch,
     bridgeState: {
-      tokenBridge,
       tokenBalances,
       allowedTokens,
+      checkout,
+      from,
+      to,
+      amount,
+      token,
     },
   } = useContext(BridgeContext);
-  const { connectLoaderState } = useContext(ConnectLoaderContext);
-  const { checkout, provider } = connectLoaderState;
 
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { viewDispatch } = useContext(ViewContext);
-  const { testId, defaultAmount, defaultFromContractAddress } = props;
-  const { content, bridgeForm, fees } = text.views[BridgeWidgetViews.BRIDGE];
+  const {
+    testId,
+    defaultAmount,
+    defaultTokenAddress,
+    isTokenBalancesLoading,
+    defaultTokenImage,
+  } = props;
+
+  const { track } = useAnalytics();
 
   // Form state
-  const [amount, setAmount] = useState<string>(defaultAmount || '');
+  const [formAmount, setFormAmount] = useState<string>(defaultAmount || '');
   const [amountError, setAmountError] = useState<string>('');
-  const [token, setToken] = useState<GetBalanceResult | undefined>();
+  const [formToken, setFormToken] = useState<GetBalanceResult | undefined>();
   const [tokenError, setTokenError] = useState<string>('');
   const [amountFiatValue, setAmountFiatValue] = useState<string>('');
-  const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const hasSetDefaultState = useRef(false);
+  const tokenBalanceSubtext = formToken
+    ? `${t('views.BRIDGE_FORM.content.availableBalancePrefix')} ${tokenValueFormat(formToken?.formattedBalance)}`
+    : '';
 
   // Fee estimates & transactions
-  const [isFetching, setIsFetching] = useState(false);
-  const [estimates, setEstimates] = useState<GasEstimateBridgeToL2Result | undefined>(undefined);
-  const [gasFee, setGasFee] = useState<string>('');
-  const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
-  const [approvalTransaction, setApprovalTransaction] = useState<ApproveDepositBridgeResponse | undefined>(undefined);
-  const [unsignedBridgeTransaction,
-    setUnsignedBridgeTransaction] = useState<BridgeDepositResponse | undefined>(undefined);
   const [tokensOptions, setTokensOptions] = useState<CoinSelectorOptionProps[]>([]);
-
-  // Not enough ETH to cover gas
-  const [showNotEnoughGasDrawer, setShowNotEnoughGasDrawer] = useState(false);
-  const [walletAddress, setWalletAddress] = useState('');
 
   // user rejects transaction
   const [showTxnRejectedState, setShowTxnRejectedState] = useState(false);
 
-  const formatTokenOptionsId = useCallback((symbol: string, address?: string) => (isNativeToken(address)
-    ? `${symbol.toLowerCase()}-${NATIVE}`
-    : `${symbol.toLowerCase()}-${address!.toLowerCase()}`), []);
+  const formatTokenOptionsId = useCallback((symbol: string, address?: string) => {
+    if (!address) return symbol.toLowerCase();
+    return `${symbol.toLowerCase()}-${address.toLowerCase()}`;
+  }, []);
 
   useEffect(() => {
     if (tokenBalances.length === 0) return;
@@ -95,19 +103,19 @@ export function BridgeForm(props: BridgeFormProps) {
     const options = tokenBalances
       .filter((tokenBalance) => tokenBalance.balance.gt(0))
       .map(
-        (t) => ({
-          id: formatTokenOptionsId(t.token.symbol, t.token.address),
-          name: t.token.name,
-          symbol: t.token.symbol,
-          icon: t.token.icon,
+        (tokenBalance) => ({
+          id: formatTokenOptionsId(tokenBalance.token.symbol, tokenBalance.token.address),
+          name: tokenBalance.token.name,
+          symbol: tokenBalance.token.symbol,
+          icon: tokenBalance.token.icon,
           balance: {
             formattedFiatAmount: cryptoFiatState.conversions.size === 0 ? formatZeroAmount('')
               : calculateCryptoToFiat(
-                t.formattedBalance,
-                t.token.symbol,
+                tokenBalance.formattedBalance,
+                tokenBalance.token.symbol,
                 cryptoFiatState.conversions,
               ),
-            formattedAmount: tokenValueFormat(t.formattedBalance),
+            formattedAmount: tokenValueFormat(tokenBalance.formattedBalance),
           },
         } as CoinSelectorOptionProps),
       );
@@ -115,11 +123,11 @@ export function BridgeForm(props: BridgeFormProps) {
 
     if (!hasSetDefaultState.current) {
       hasSetDefaultState.current = true;
-      if (defaultFromContractAddress) {
-        setToken(
+      if (defaultTokenAddress) {
+        setFormToken(
           tokenBalances.find(
-            (b) => (isNativeToken(b.token.address) && defaultFromContractAddress?.toLowerCase() === NATIVE)
-            || (b.token.address?.toLowerCase() === defaultFromContractAddress?.toLowerCase()),
+            (b) => (isNativeToken(b.token.address) && defaultTokenAddress?.toLocaleUpperCase() === NATIVE)
+              || (b.token.address?.toLowerCase() === defaultTokenAddress?.toLowerCase()),
           ),
         );
       }
@@ -127,162 +135,83 @@ export function BridgeForm(props: BridgeFormProps) {
   }, [
     tokenBalances,
     cryptoFiatState.conversions,
-    defaultFromContractAddress,
+    defaultTokenAddress,
     hasSetDefaultState.current,
-    setToken,
-    setTokensOptions,
     formatTokenOptionsId,
     formatZeroAmount,
   ]);
 
+  useEffect(() => {
+    // This useEffect is for populating the form
+    // with values from context when the user
+    // has selected the back button from the review screen
+    if (!amount || !token) return;
+    setFormAmount(amount);
+    for (let i = 0; i < tokenBalances.length; i++) {
+      const balance = tokenBalances[i];
+      if (balance.token.address === token.address) {
+        setFormToken(balance);
+        break;
+      }
+    }
+
+    bridgeDispatch({
+      payload: {
+        type: BridgeActions.SET_TOKEN_AND_AMOUNT,
+        token: null,
+        amount: '',
+      },
+    });
+  }, [amount, token, tokenBalances]);
+
   const selectedOption = useMemo(
-    () => (token && token.token
-      ? formatTokenOptionsId(token.token.symbol, token.token.address)
+    () => (formToken && formToken.token
+      ? formatTokenOptionsId(formToken.token.symbol, formToken.token.address)
       : undefined),
-    [token, tokenBalances, cryptoFiatState.conversions, formatTokenOptionsId],
+    [formToken, tokenBalances, cryptoFiatState.conversions, formatTokenOptionsId],
   );
 
-  const canFetchEstimates = (): boolean => {
-    if (Number.isNaN(parseFloat(amount))) return false;
-    if (parseFloat(amount) <= 0) return false;
-    if (!token) return false;
-    if (isFetching) return false;
+  const canFetchEstimates = (silently: boolean): boolean => {
+    if (Number.isNaN(parseFloat(formAmount))) return false;
+    if (parseFloat(formAmount) <= 0) return false;
+    if (!formToken) return false;
+    if (!from || !from.walletAddress) return false;
+    if (!to || !to.walletAddress) return false;
+    if (silently && loading) return false;
+    if (!checkout) return false;
     return true;
   };
 
-  const getUnsignedTransactions = async ()
-  : Promise<{ approveRes: ApproveDepositBridgeResponse, bridgeTxn:BridgeDepositResponse } | undefined> => {
-    if (!checkout || !provider || !tokenBridge || !token || !token.token) return;
-
-    const depositorAddress = await provider.getSigner().getAddress();
-    const depositAmount = utils.parseUnits(amount, token.token.decimals);
-
-    const approveRes: ApproveDepositBridgeResponse = await tokenBridge.getUnsignedApproveDepositBridgeTx({
-      depositorAddress,
-      token: isNativeToken(token.token.address) ? NATIVE.toUpperCase() : token.token.address,
-      depositAmount,
-    });
-
-    const bridgeTxn: BridgeDepositResponse = await tokenBridge.getUnsignedDepositTx({
-      depositorAddress,
-      recipientAddress: depositorAddress,
-      token: isNativeToken(token.token.address) ? NATIVE.toUpperCase() : token.token.address,
-      depositAmount,
-    });
-
-    // eslint-disable-next-line consistent-return
-    return { approveRes, bridgeTxn };
-  };
-
-  const fetchEstimates = async (silently: boolean = false) => {
-    if (!canFetchEstimates()) return;
-
-    // setIsFetching within this if statement
-    // to allow the user to edit the form
-    // even if a new quote is fetching silently
-    if (!silently) {
-      setLoading(true);
-      setIsFetching(true);
-    }
-
-    // get approval txn and bridge txn
-    const transactions = await getUnsignedTransactions();
-    setApprovalTransaction(transactions?.approveRes);
-    setUnsignedBridgeTransaction(transactions?.bridgeTxn);
-
-    // Prevent silently fetching and set a new fee estimate
-    // if the user has updated and the widget is already
-    // fetching or the user is updating the inputs.
-    if ((silently && (loading || editing)) || !transactions?.bridgeTxn || !checkout) return;
-
-    const gasEstimateResult = await checkout.gasEstimate({
-      gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-      isSpendingCapApprovalRequired: !!transactions?.approveRes?.unsignedTx,
-    }) as GasEstimateBridgeToL2Result;
-
-    setEstimates(gasEstimateResult);
-    const estimatedAmount = utils.formatUnits(
-      gasEstimateResult?.gasFee?.estimatedAmount || 0,
-      DEFAULT_TOKEN_DECIMALS,
-    );
-
-    setGasFee(estimatedAmount);
-    setGasFeeFiatValue(calculateCryptoToFiat(
-      estimatedAmount,
-      gasEstimateResult.gasFee?.token?.symbol || '',
-      cryptoFiatState.conversions,
-    ));
-
-    if (!silently) {
-      setLoading(false);
-      setIsFetching(false);
-    }
-  };
-
-  const insufficientFundsForGas = useMemo(() => {
-    const ethBalance = tokenBalances
-      .find((balance) => isNativeToken(balance.token.address));
-    if (!ethBalance) {
-      return true;
-    }
-
-    const tokenIsEth = isNativeToken(token?.token.address);
-    const gasAmount = utils.parseEther(gasFee.length !== 0 ? gasFee : '0');
-    const additionalAmount = tokenIsEth && !Number.isNaN(parseFloat(amount))
-      ? utils.parseEther(amount)
-      : BigNumber.from('0');
-
-    return gasAmount.add(additionalAmount).gt(ethBalance.balance);
-  }, [gasFee, tokenBalances, token, amount]);
-
-  // Silently refresh the quote
-  useInterval(() => fetchEstimates(true), DEFAULT_QUOTE_REFRESH_INTERVAL);
-
-  useEffect(() => {
-    if (editing) return;
-    (async () => await fetchEstimates())();
-  }, [amount, token, editing]);
-
-  const onTextInputFocus = () => {
-    setEditing(true);
-  };
-
   const handleBridgeAmountChange = (value: string) => {
-    setAmount(value);
+    // Ensure that starting with a decimal is formatted correctly
+    let inputValue = value;
+    if (inputValue === '.') {
+      inputValue = '0.';
+    }
+    setFormAmount(inputValue);
     if (amountError) {
-      const validateAmountError = validateAmount(value, token?.formattedBalance);
+      const validateAmountError = validateAmount(inputValue, formToken?.formattedBalance);
       setAmountError(validateAmountError);
     }
 
-    if (!token) return;
+    if (!formToken) return;
     setAmountFiatValue(calculateCryptoToFiat(
-      value,
-      token.token.symbol,
+      inputValue,
+      formToken.token.symbol,
       cryptoFiatState.conversions,
     ));
-  };
-
-  const handleAmountInputBlur = (value: string) => {
-    setEditing(false);
-    setAmount(value);
-    if (amountError) {
-      const validateAmountError = validateAmount(value, token?.formattedBalance);
-      setAmountError(validateAmountError);
+    if (canFetchEstimates(true)) {
+      setLoading(true);
     }
-
-    if (!token) return;
-    setAmountFiatValue(calculateCryptoToFiat(
-      value,
-      token.token.symbol,
-      cryptoFiatState.conversions,
-    ));
   };
 
   const handleSelectTokenChange = (value: OptionKey) => {
-    const selected = tokenBalances.find((t) => value === formatTokenOptionsId(t.token.symbol, t.token.address));
+    const selected = tokenBalances.find((tokenBalance) => (
+      value === formatTokenOptionsId(tokenBalance.token.symbol, tokenBalance.token.address)
+    ));
     if (!selected) return;
 
-    setToken(selected);
+    setFormToken(selected);
     setTokenError('');
   };
 
@@ -296,141 +225,66 @@ export function BridgeForm(props: BridgeFormProps) {
   }, [cryptoFiatDispatch, allowedTokens]);
 
   useEffect(() => {
-    if (!amount) return;
-    if (!token) return;
+    if (!formAmount) return;
+    if (!formToken) return;
 
     setAmountFiatValue(calculateCryptoToFiat(
-      amount,
-      token.token.symbol,
+      formAmount,
+      formToken.token.symbol,
       cryptoFiatState.conversions,
     ));
-  }, [amount, token]);
-
-  useEffect(() => {
-    (async () => {
-      if (!provider) return;
-      const address = await provider.getSigner().getAddress();
-      setWalletAddress((previous) => {
-        if (previous !== '' && previous !== address) {
-          setToken(undefined);
-        }
-        return address;
-      });
-    })();
-  }, [provider, tokenBalances]);
+  }, [formAmount, formToken]);
 
   const bridgeFormValidator = useCallback((): boolean => {
-    const validateTokenError = validateToken(token);
-    const validateAmountError = validateAmount(amount, token?.formattedBalance);
+    const validateTokenError = validateToken(formToken);
+    const validateAmountError = validateAmount(formAmount, formToken?.formattedBalance);
     if (validateTokenError) setTokenError(validateTokenError);
     if (validateAmountError) setAmountError(validateAmountError);
     if (validateTokenError || validateAmountError) return false;
     return true;
-  }, [token, amount, setTokenError, setAmountError]);
+  }, [formToken, formAmount, setTokenError, setAmountError]);
 
-  const submitBridge = useCallback(async () => {
+  const submitBridgeValues = useCallback(async () => {
     if (!bridgeFormValidator()) return;
-    if (!checkout || !provider || !token || !unsignedBridgeTransaction) return;
+    if (!checkout || !from?.web3Provider || !formToken) return;
 
-    if (insufficientFundsForGas) {
-      setShowNotEnoughGasDrawer(true);
-      return;
-    }
+    track({
+      userJourney: UserJourney.BRIDGE,
+      screen: 'TokenAmount',
+      control: 'Review',
+      controlType: 'Button',
+      extras: {
+        tokenAddress: formToken.token.address,
+        amount: formAmount,
+      },
+    });
 
-    try {
-      setLoading(true);
-      if (approvalTransaction && approvalTransaction.unsignedTx) {
-        // move to new Approve ERC20 view
-        // pass in approvalTransaction and unsignedBridgeTransaction
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: {
-              type: BridgeWidgetViews.APPROVE_ERC20,
-              data: {
-                approveTransaction: approvalTransaction,
-                transaction: unsignedBridgeTransaction,
-                bridgeFormInfo: {
-                  fromContractAddress: isNativeToken(token?.token.address) ? NATIVE : token?.token.address ?? '',
-                  fromAmount: amount,
-                },
-              },
-            },
-            currentViewData: {
-              tokenAddress: token.token?.address ?? '',
-              amount,
-            },
-          },
-        });
-        return;
-      }
+    bridgeDispatch({
+      payload: {
+        type: BridgeActions.SET_TOKEN_AND_AMOUNT,
+        token: formToken.token,
+        amount: formAmount,
+      },
+    });
 
-      const { transactionResponse } = await checkout.sendTransaction({
-        provider,
-        transaction: unsignedBridgeTransaction.unsignedTx,
-      });
-
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: BridgeWidgetViews.IN_PROGRESS,
-            data: {
-              token: token?.token!,
-              transactionResponse,
-              bridgeForm: {
-                fromContractAddress: isNativeToken(token?.token.address) ? NATIVE : token?.token.address ?? '',
-                fromAmount: amount,
-              },
-            },
-          },
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: BridgeWidgetViews.BRIDGE_REVIEW,
         },
-      });
-    } catch (err: any) {
-      setLoading(false);
-
-      if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
-        setShowTxnRejectedState(true);
-        return;
-      }
-      if (err.type === CheckoutErrorType.UNPREDICTABLE_GAS_LIMIT
-        || err.type === CheckoutErrorType.TRANSACTION_FAILED
-        || err.type === CheckoutErrorType.INSUFFICIENT_FUNDS
-        || (err.receipt && err.receipt.status === 0)) {
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: {
-              type: BridgeWidgetViews.FAIL,
-              reason: 'Transaction failed',
-              data: {
-                fromContractAddress: isNativeToken(token?.token.address) ? NATIVE : token?.token.address ?? '',
-                fromAmount: amount,
-              },
-            },
-          },
-        });
-        return;
-      }
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: { type: SharedViews.ERROR_VIEW, error: err },
-        },
-      });
-    }
+      },
+    });
   }, [
     checkout,
-    provider,
+    from?.web3Provider,
     bridgeFormValidator,
-    approvalTransaction,
-    unsignedBridgeTransaction,
-    insufficientFundsForGas,
-    token]);
+    formToken,
+  ]);
 
-  const retrySubmitBridge = async () => {
+  const retrySubmitBridgeValues = async () => {
     setShowTxnRejectedState(false);
-    await submitBridge();
+    await submitBridgeValues();
   };
 
   return (
@@ -445,69 +299,54 @@ export function BridgeForm(props: BridgeFormProps) {
           weight="regular"
           sx={{ paddingBottom: 'base.spacing.x4' }}
         >
-          {content.title}
+          {t('views.BRIDGE_FORM.content.title')}
         </Heading>
-        <Box sx={formInputsContainerStyles}>
-          <SelectForm
-            testId="bridge-token"
-            options={tokensOptions}
-            coinSelectorHeading={bridgeForm.from.selectorTitle}
-            selectedOption={selectedOption}
-            subtext={token
-              ? `${content.availableBalancePrefix} ${tokenValueFormat(token?.formattedBalance)}`
-              : ''}
-            textAlign="left"
-            errorMessage={tokenError}
-            onSelectChange={(option) => handleSelectTokenChange(option)}
-            disabled={isFetching}
-          />
-          <TextInputForm
-            testId="bridge-amount"
-            value={amount}
-            placeholder={bridgeForm.from.inputPlaceholder}
-            subtext={`${content.fiatPricePrefix} $${formatZeroAmount(amountFiatValue, true)}`}
-            validator={amountInputValidation}
-            onTextInputFocus={onTextInputFocus}
-            onTextInputChange={(value) => handleBridgeAmountChange(value)}
-            onTextInputBlur={(value) => handleAmountInputBlur(value)}
-            textAlign="right"
-            errorMessage={amountError}
-            disabled={isFetching}
-          />
-        </Box>
-        {/** TODO: update here when we have the correct gas values from the estimator */}
-        <Fees
-          title={fees.title}
-          fiatPricePrefix={content.fiatPricePrefix}
-          gasFeeValue={gasFee}
-          gasFeeToken={estimates?.gasFee?.token}
-          gasFeeFiatValue={gasFeeFiatValue}
-        />
+        {(!defaultTokenAddress || !isTokenBalancesLoading) && (
+          <Box sx={formInputsContainerStyles}>
+            <SelectForm
+              testId="bridge-token"
+              options={tokensOptions}
+              optionsLoading={isTokenBalancesLoading}
+              coinSelectorHeading={t('views.BRIDGE_FORM.bridgeForm.from.selectorTitle')}
+              selectedOption={selectedOption}
+              subtext={tokenBalanceSubtext}
+              textAlign="left"
+              errorMessage={t(tokenError)}
+              onSelectChange={(option) => handleSelectTokenChange(option)}
+              defaultTokenImage={defaultTokenImage}
+            />
+            <TextInputForm
+              testId="bridge-amount"
+              type="number"
+              value={formAmount}
+              placeholder={t('views.BRIDGE_FORM.bridgeForm.from.inputPlaceholder')}
+              subtext={`${t('views.BRIDGE_FORM.content.fiatPricePrefix')} $${formatZeroAmount(amountFiatValue, true)}`}
+              validator={amountInputValidation}
+              onTextInputChange={(value) => handleBridgeAmountChange(value)}
+              onTextInputEnter={submitBridgeValues}
+              textAlign="right"
+              errorMessage={t(amountError)}
+            />
+          </Box>
+        )}
+        {defaultTokenAddress && isTokenBalancesLoading && (
+          <TokenSelectShimmer sx={formInputsContainerStyles} />
+        )}
       </Box>
       <Box sx={bridgeFormButtonContainerStyles}>
         <Button
           testId={`${testId}-button`}
           variant="primary"
-          onClick={submitBridge}
-          disabled={loading}
+          onClick={submitBridgeValues}
           size="large"
         >
-          {loading ? (
-            <Button.Icon icon="Loading" sx={swapButtonIconLoadingStyle} />
-          ) : bridgeForm.buttonText}
+          {t('views.BRIDGE_FORM.bridgeForm.buttonText')}
         </Button>
         <TransactionRejected
           visible={showTxnRejectedState}
           showHeaderBar={false}
-          onCloseBottomSheet={() => setShowTxnRejectedState(false)}
-          onRetry={retrySubmitBridge}
-        />
-        <NotEnoughGas
-          visible={showNotEnoughGasDrawer}
-          showHeaderBar={false}
-          onCloseBottomSheet={() => setShowNotEnoughGasDrawer(false)}
-          walletAddress={walletAddress}
-          showAdjustAmount={isNativeToken(token?.token.address)}
+          onCloseDrawer={() => setShowTxnRejectedState(false)}
+          onRetry={retrySubmitBridgeValues}
         />
       </Box>
     </Box>

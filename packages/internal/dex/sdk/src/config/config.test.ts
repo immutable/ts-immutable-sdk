@@ -4,7 +4,7 @@ import * as test from 'test/utils';
 import { ERC20 } from 'types';
 import { ExchangeContracts, ExchangeModuleConfiguration, ExchangeOverrides } from '../types';
 import { ExchangeConfiguration } from './index';
-import { IMMUTABLE_TESTNET_CHAIN_ID } from '../constants/chains';
+import { IMMUTABLE_MAINNET_CHAIN_ID, IMMUTABLE_TESTNET_CHAIN_ID } from '../constants/chains';
 
 describe('ExchangeConfiguration', () => {
   const chainId = 999999999;
@@ -24,9 +24,9 @@ describe('ExchangeConfiguration', () => {
   const contractOverrides: ExchangeContracts = {
     multicall: test.TEST_MULTICALL_ADDRESS,
     coreFactory: test.TEST_V3_CORE_FACTORY_ADDRESS,
-    quoterV2: test.TEST_QUOTER_ADDRESS,
-    peripheryRouter: test.TEST_ROUTER_ADDRESS,
-    secondaryFee: test.TEST_SECONDARY_FEE_ADDRESS,
+    quoter: test.TEST_QUOTER_ADDRESS,
+    swapRouter: test.TEST_ROUTER_ADDRESS,
+    immutableSwapProxy: test.TEST_SWAP_PROXY_ADDRESS,
   };
 
   describe('when given sandbox environment with supported chain id', () => {
@@ -60,6 +60,40 @@ describe('ExchangeConfiguration', () => {
       expect(() => new ExchangeConfiguration(exchangeConfiguration)).toThrow(
         new ChainNotSupportedError(1, Environment.SANDBOX),
       );
+    });
+
+    describe('when given production environment with supported chain id', () => {
+      it('should create successfully', () => {
+        const baseConfig = new ImmutableConfiguration({
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          environment: Environment.PRODUCTION,
+        });
+        const exchangeConfiguration: ExchangeModuleConfiguration = {
+          baseConfig,
+          chainId: IMMUTABLE_MAINNET_CHAIN_ID,
+        };
+
+        const config = new ExchangeConfiguration(exchangeConfiguration);
+        expect(config.chain.chainId).toBe(IMMUTABLE_MAINNET_CHAIN_ID);
+        expect(config.baseConfig.environment).toBe(Environment.PRODUCTION);
+      });
+    });
+
+    describe('when given production environment with unsupported chain id', () => {
+      it('should throw ChainNotSupportedError', () => {
+        const baseConfig = new ImmutableConfiguration({
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          environment: Environment.PRODUCTION,
+        });
+        const exchangeConfiguration: ExchangeModuleConfiguration = {
+          baseConfig,
+          chainId: 1,
+        };
+
+        expect(() => new ExchangeConfiguration(exchangeConfiguration)).toThrow(
+          new ChainNotSupportedError(1, Environment.PRODUCTION),
+        );
+      });
     });
   });
 
@@ -129,8 +163,8 @@ describe('ExchangeConfiguration', () => {
       // contracts
       expect(config.chain.contracts.coreFactory).toBe(contractOverrides.coreFactory);
       expect(config.chain.contracts.multicall).toBe(contractOverrides.multicall);
-      expect(config.chain.contracts.peripheryRouter).toBe(contractOverrides.peripheryRouter);
-      expect(config.chain.contracts.quoterV2).toBe(contractOverrides.quoterV2);
+      expect(config.chain.contracts.swapRouter).toBe(contractOverrides.swapRouter);
+      expect(config.chain.contracts.quoter).toBe(contractOverrides.quoter);
       // tokens
       expect(config.chain.commonRoutingTokens[0].address.toLocaleLowerCase()).toEqual(
         commonRoutingTokens[0].address.toLocaleLowerCase(),
@@ -161,9 +195,9 @@ describe('ExchangeConfiguration', () => {
       const invalidContractOverrides: ExchangeContracts = {
         multicall: '',
         coreFactory: test.TEST_V3_CORE_FACTORY_ADDRESS,
-        quoterV2: test.TEST_QUOTER_ADDRESS,
-        peripheryRouter: test.TEST_ROUTER_ADDRESS,
-        secondaryFee: test.TEST_SECONDARY_FEE_ADDRESS,
+        quoter: test.TEST_QUOTER_ADDRESS,
+        swapRouter: test.TEST_ROUTER_ADDRESS,
+        immutableSwapProxy: test.TEST_SWAP_PROXY_ADDRESS,
       };
 
       const rpcURL = 'https://anrpcurl.net';

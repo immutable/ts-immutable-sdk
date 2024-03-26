@@ -1,5 +1,5 @@
 import { AppHeaderBar, ButtCon } from '@biom3/react';
-import { useContext } from 'react';
+import { ReactNode, useContext } from 'react';
 import { HeaderNavigationStyles, ButtonNavigationStyles } from './HeaderStyles';
 import {
   ViewActions,
@@ -9,21 +9,19 @@ import {
 export interface HeaderNavigationProps {
   title?: string;
   showBack?: boolean;
-  showSettings?: boolean;
   transparent?: boolean;
-  onSettingsClick?: () => void;
   onBackButtonClick?: () => void;
   onCloseButtonClick?: () => void;
+  rightActions?: ReactNode;
 }
 
 export function HeaderNavigation({
   title,
   showBack = false,
-  showSettings = false,
   transparent = false,
-  onSettingsClick,
   onBackButtonClick,
   onCloseButtonClick,
+  rightActions,
 }: HeaderNavigationProps) {
   const { viewDispatch } = useContext(ViewContext);
 
@@ -62,16 +60,8 @@ export function HeaderNavigation({
       <AppHeaderBar.Title testId="header-title" size="small">
         {title}
       </AppHeaderBar.Title>
-      <AppHeaderBar.RightHandButtons>
-        {showSettings && onSettingsClick && (
-          <ButtCon
-            icon="SettingsCog"
-            sx={ButtonNavigationStyles(transparent)}
-            iconVariant="bold"
-            onClick={onSettingsClick}
-            testId="settings-button"
-          />
-        )}
+      <AppHeaderBar.RightSlot>
+        {rightActions}
         {onCloseButtonClick && (
           <ButtCon
             iconVariant="bold"
@@ -81,7 +71,7 @@ export function HeaderNavigation({
             testId="close-button"
           />
         )}
-      </AppHeaderBar.RightHandButtons>
+      </AppHeaderBar.RightSlot>
     </AppHeaderBar>
   );
 }

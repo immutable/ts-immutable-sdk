@@ -7,7 +7,7 @@ import {
   newAmountFromString,
   TEST_FROM_ADDRESS,
   TEST_ROUTER_ADDRESS,
-  TEST_SECONDARY_FEE_ADDRESS,
+  TEST_SWAP_PROXY_ADDRESS,
   WETH_TEST_TOKEN,
 } from 'test/utils';
 import { Contract } from '@ethersproject/contracts';
@@ -213,7 +213,7 @@ describe('prepareApproval', () => {
         amountWithSlippage,
         {
           routerAddress: TEST_ROUTER_ADDRESS,
-          secondaryFeeAddress: TEST_SECONDARY_FEE_ADDRESS,
+          secondaryFeeAddress: TEST_SWAP_PROXY_ADDRESS,
         },
         secondaryFees,
       );
@@ -233,7 +233,7 @@ describe('prepareApproval', () => {
         amountWithSlippage, // token in
         {
           routerAddress: TEST_ROUTER_ADDRESS,
-          secondaryFeeAddress: TEST_SECONDARY_FEE_ADDRESS,
+          secondaryFeeAddress: TEST_SWAP_PROXY_ADDRESS,
         },
         secondaryFees,
       );
@@ -253,7 +253,7 @@ describe('prepareApproval', () => {
         amountWithSlippage,
         {
           routerAddress: TEST_ROUTER_ADDRESS,
-          secondaryFeeAddress: TEST_SECONDARY_FEE_ADDRESS,
+          secondaryFeeAddress: TEST_SWAP_PROXY_ADDRESS,
         },
         secondaryFees,
       );
@@ -273,7 +273,7 @@ describe('prepareApproval', () => {
         amountWithSlippage,
         {
           routerAddress: TEST_ROUTER_ADDRESS,
-          secondaryFeeAddress: TEST_SECONDARY_FEE_ADDRESS,
+          secondaryFeeAddress: TEST_SWAP_PROXY_ADDRESS,
         },
         secondaryFees,
       );
@@ -293,12 +293,12 @@ describe('prepareApproval', () => {
         amountWithSlippage,
         {
           routerAddress: TEST_ROUTER_ADDRESS,
-          secondaryFeeAddress: TEST_SECONDARY_FEE_ADDRESS,
+          secondaryFeeAddress: TEST_SWAP_PROXY_ADDRESS,
         },
         secondaryFees,
       );
       expect(approval).not.toBeNull();
-      expect(approval?.spender).toEqual(TEST_SECONDARY_FEE_ADDRESS);
+      expect(approval?.spender).toEqual(TEST_SWAP_PROXY_ADDRESS);
     });
   });
 
@@ -313,7 +313,7 @@ describe('prepareApproval', () => {
         amountWithSlippage,
         {
           routerAddress: TEST_ROUTER_ADDRESS,
-          secondaryFeeAddress: TEST_SECONDARY_FEE_ADDRESS,
+          secondaryFeeAddress: TEST_SWAP_PROXY_ADDRESS,
         },
         secondaryFees,
       );

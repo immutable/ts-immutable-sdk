@@ -7,19 +7,16 @@ import {
 } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
-import { BiomeCombinedProviders } from '@biom3/react';
 import { Web3Provider } from '@ethersproject/providers';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
-import { SwapWidget } from './SwapWidget';
+import SwapWidget from './SwapWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { quotesProcessor } from './functions/FetchQuote';
-import { text } from '../../resources/text/textConfig';
-import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
 import { ConnectionStatus } from '../../context/connect-loader-context/ConnectLoaderContext';
 import {
   ConnectLoaderTestComponent,
 } from '../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
-import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 import { NATIVE } from '../../lib';
 
 describe('SwapWidget tests', () => {
@@ -122,17 +119,14 @@ describe('SwapWidget tests', () => {
         });
 
       mount(
-        <CustomAnalyticsProvider widgetConfig={config}>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <SwapWidget
-              {...params}
-              config={config}
-            />
-          </ConnectLoaderTestComponent>
-          ,
-        </CustomAnalyticsProvider>,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <SwapWidget
+            {...params}
+            config={config}
+          />
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('not-enough-gas-bottom-sheet').should('be.visible');
@@ -162,17 +156,14 @@ describe('SwapWidget tests', () => {
         });
 
       mount(
-        <CustomAnalyticsProvider widgetConfig={config}>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <SwapWidget
-              {...params}
-              config={config}
-            />
-          </ConnectLoaderTestComponent>
-          ,
-        </CustomAnalyticsProvider>,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <SwapWidget
+            {...params}
+            config={config}
+          />
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('not-enough-gas-bottom-sheet').should('be.visible');
@@ -202,17 +193,14 @@ describe('SwapWidget tests', () => {
         });
 
       mount(
-        <CustomAnalyticsProvider widgetConfig={config}>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <SwapWidget
-              {...params}
-              config={config}
-            />
-          </ConnectLoaderTestComponent>
-          ,
-        </CustomAnalyticsProvider>,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <SwapWidget
+            {...params}
+            config={config}
+          />
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('not-enough-gas-bottom-sheet').should('not.exist');
@@ -237,17 +225,14 @@ describe('SwapWidget tests', () => {
         });
 
       mount(
-        <CustomAnalyticsProvider widgetConfig={config}>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <SwapWidget
-              {...params}
-              config={config}
-            />
-          </ConnectLoaderTestComponent>
-          ,
-        </CustomAnalyticsProvider>,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <SwapWidget
+            {...params}
+            config={config}
+          />
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('not-enough-gas-add-imx-button').click();
@@ -299,17 +284,14 @@ describe('SwapWidget tests', () => {
 
     it('should show swap widget on mount', () => {
       mount(
-        <CustomAnalyticsProvider widgetConfig={config}>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <SwapWidget
-              {...params}
-              config={config}
-            />
-          </ConnectLoaderTestComponent>
-          ,
-        </CustomAnalyticsProvider>,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <SwapWidget
+            {...params}
+            config={config}
+          />
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').should('be.visible');
@@ -335,17 +317,14 @@ describe('SwapWidget tests', () => {
         });
 
       mount(
-        <CustomAnalyticsProvider widgetConfig={config}>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <SwapWidget
-              config={config}
-              {...params}
-            />
-          </ConnectLoaderTestComponent>
-          ,
-        </CustomAnalyticsProvider>,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <SwapWidget
+            config={config}
+            {...params}
+          />
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
@@ -373,17 +352,12 @@ describe('SwapWidget tests', () => {
         });
 
       mount(
-        <CustomAnalyticsProvider widgetConfig={config}>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <SwapWidget
-              config={config}
-              {...params}
-            />
-          </ConnectLoaderTestComponent>
-          ,
-        </CustomAnalyticsProvider>,
+        <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
+          <SwapWidget
+            config={config}
+            {...params}
+          />
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('error-view').should('be.visible');
@@ -396,16 +370,14 @@ describe('SwapWidget tests', () => {
 
     it('should set fromTokens to user balances filtered by the token allow list', () => {
       mount(
-        <CustomAnalyticsProvider widgetConfig={config}>
-          <ConnectLoaderTestComponent
-            initialStateOverride={connectLoaderState}
-          >
-            <SwapWidget
-              config={config}
-              {...params}
-            />
-          </ConnectLoaderTestComponent>
-        </CustomAnalyticsProvider>,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <SwapWidget
+            config={config}
+            {...params}
+          />
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
@@ -477,15 +449,13 @@ describe('SwapWidget tests', () => {
           .resolves(mockQuoteFromAmountIn);
 
         mount(
-          <BiomeCombinedProviders>
-            <CustomAnalyticsProvider widgetConfig={config}>
-              <ConnectLoaderTestComponent
-                initialStateOverride={connectLoaderState}
-              >
-                <SwapWidget {...params} config={config} />
-              </ConnectLoaderTestComponent>
-            </CustomAnalyticsProvider>
-          </BiomeCombinedProviders>,
+          <ViewContextTestComponent>
+            <ConnectLoaderTestComponent
+              initialStateOverride={connectLoaderState}
+            >
+              <SwapWidget {...params} config={config} />
+            </ConnectLoaderTestComponent>
+          </ViewContextTestComponent>,
         );
       });
 
@@ -514,12 +484,10 @@ describe('SwapWidget tests', () => {
           cySmartGet('toTokenInputs-select-form-select__target').click();
           cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
 
-          cySmartGet('fromTokenInputs-text-form-text__input').type('0.1');
-          cySmartGet('fromTokenInputs-text-form-text__input').blur();
-
+          cySmartGet('fromTokenInputs-text-form-text__input').type('0.1').trigger('change');
+          cySmartGet('@fromAmountInStub').should('have.been.called');
           cySmartGet('swap-button').click();
 
-          cySmartGet('@fromAmountInStub').should('have.been.called');
           cySmartGet('@sendTransactionStub').should('have.been.calledOnce');
           cySmartGet('loading-view').should('be.visible');
           cy.wait(1000);
@@ -552,12 +520,10 @@ describe('SwapWidget tests', () => {
           // eslint-disable-next-line max-len
           cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
 
-          cySmartGet('fromTokenInputs-text-form-text__input').type('0.1');
-          cySmartGet('fromTokenInputs-text-form-text__input').blur();
-
+          cySmartGet('fromTokenInputs-text-form-text__input').type('0.1').trigger('change');
+          cySmartGet('@fromAmountInStub').should('have.been.called');
           cySmartGet('swap-button').click();
 
-          cySmartGet('@fromAmountInStub').should('have.been.called');
           cySmartGet('@sendTransactionStub').should('have.been.calledOnce');
           cySmartGet('loading-view').should('be.visible');
           cy.wait(1000);
@@ -593,8 +559,6 @@ describe('SwapWidget tests', () => {
               },
             });
 
-          const { approveSwap, approveSpending } = text.views[SwapWidgetViews.APPROVE_ERC20];
-
           cySmartGet('fromTokenInputs-select-form-select__target').click();
           cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
             .click();
@@ -603,20 +567,22 @@ describe('SwapWidget tests', () => {
           // eslint-disable-next-line max-len
           cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
 
-          cySmartGet('fromTokenInputs-text-form-text__input').type('0.1');
-          cySmartGet('fromTokenInputs-text-form-text__input').blur();
-
+          cySmartGet('fromTokenInputs-text-form-text__input').type('0.1').trigger('change');
+          cySmartGet('@fromAmountInStub').should('have.been.called');
           cySmartGet('swap-button').click();
 
-          cySmartGet('simple-text-body__heading').should('have.text', approveSpending.content.metamask.heading);
-          cySmartGet('simple-text-body__body').should('include.text', approveSpending.content.metamask.body[0]);
-          cySmartGet('simple-text-body__body').should('include.text', approveSpending.content.metamask.body[1]);
-          cySmartGet('footer-button').should('have.text', approveSpending.footer.buttonText);
+          cySmartGet('simple-text-body__heading').should(
+            'have.text',
+            'You\'ll be asked to set a spending cap for this transaction',
+          );
+          cySmartGet('simple-text-body__body').should(
+            'include.text',
+            'Input at least 0.1 ETH for this transaction and future transactions, then follow the prompts.',
+          );
+          cySmartGet('footer-button').should('have.text', 'Got it');
 
           // click button for Approval transaction
           cySmartGet('footer-button').click();
-
-          cySmartGet('@fromAmountInStub').should('have.been.called');
           cySmartGet('@sendTransactionStub').should('have.been.calledOnce');
           cySmartGet('@sendTransactionStub')
             .should(
@@ -629,9 +595,15 @@ describe('SwapWidget tests', () => {
           cySmartGet('loading-view').should('be.visible');
           cy.wait(1000);
 
-          cySmartGet('simple-text-body__heading').should('have.text', approveSwap.content.heading);
-          cySmartGet('simple-text-body__body').should('include.text', approveSwap.content.body[0]);
-          cySmartGet('footer-button').should('have.text', approveSwap.footer.buttonText);
+          cySmartGet('simple-text-body__heading').should(
+            'have.text',
+            'Now you\'ll just need to confirm the transaction',
+          );
+          cySmartGet('simple-text-body__body').should(
+            'include.text',
+            'Follow the prompts in your wallet.',
+          );
+          cySmartGet('footer-button').should('have.text', 'Okay');
 
           // click button for Swap transaction
           cySmartGet('footer-button').click();
@@ -674,8 +646,6 @@ describe('SwapWidget tests', () => {
               },
             });
 
-          const { approveSwap, approveSpending } = text.views[SwapWidgetViews.APPROVE_ERC20];
-
           cySmartGet('fromTokenInputs-select-form-select__target').click();
           cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
             .click();
@@ -684,15 +654,20 @@ describe('SwapWidget tests', () => {
           // eslint-disable-next-line max-len
           cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
 
-          cySmartGet('fromTokenInputs-text-form-text__input').type('0.1');
-          cySmartGet('fromTokenInputs-text-form-text__input').blur();
+          cySmartGet('fromTokenInputs-text-form-text__input').type('0.1').trigger('change');
+          cySmartGet('@fromAmountInStub').should('have.been.called');
 
           cySmartGet('swap-button').click();
 
-          cySmartGet('simple-text-body__heading').should('have.text', approveSpending.content.metamask.heading);
-          cySmartGet('simple-text-body__body').should('include.text', approveSpending.content.metamask.body[0]);
-          cySmartGet('simple-text-body__body').should('include.text', approveSpending.content.metamask.body[1]);
-          cySmartGet('footer-button').should('have.text', approveSpending.footer.buttonText);
+          cySmartGet('simple-text-body__heading').should(
+            'have.text',
+            'You\'ll be asked to set a spending cap for this transaction',
+          );
+          cySmartGet('simple-text-body__body').should(
+            'include.text',
+            'Input at least 0.1 ETH for this transaction and future transactions, then follow the prompts.',
+          );
+          cySmartGet('footer-button').should('have.text', 'Got it');
 
           // click button for Approval transaction
           cySmartGet('footer-button').click();
@@ -710,9 +685,15 @@ describe('SwapWidget tests', () => {
           cySmartGet('loading-view').should('be.visible');
           cy.wait(1000);
 
-          cySmartGet('simple-text-body__heading').should('have.text', approveSwap.content.heading);
-          cySmartGet('simple-text-body__body').should('include.text', approveSwap.content.body[0]);
-          cySmartGet('footer-button').should('have.text', approveSwap.footer.buttonText);
+          cySmartGet('simple-text-body__heading').should(
+            'have.text',
+            'Now you\'ll just need to confirm the transaction',
+          );
+          cySmartGet('simple-text-body__body').should(
+            'include.text',
+            'Follow the prompts in your wallet.',
+          );
+          cySmartGet('footer-button').should('have.text', 'Okay');
 
           // click button for Swap transaction
           cySmartGet('footer-button').click();

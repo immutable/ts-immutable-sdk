@@ -24,7 +24,7 @@ export const headerStyle = (floatHeader: boolean) => ({
   alignItems: 'center',
   width: '100%',
   position: floatHeader ? 'absolute' : 'relative',
-  zIndex: 8,
+  zIndex: 1,
 });
 
 export const footerStyle = (footerBackgroundColor?: string) => ({

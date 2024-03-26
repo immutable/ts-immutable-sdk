@@ -10,10 +10,13 @@ import {
   ProviderEventType,
   ProviderUpdated,
   WidgetParameters,
+  WalletEventType,
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
+import i18next from 'i18next';
 import { StrongCheckoutWidgetsConfig, withDefaultWidgetConfigs } from '../lib/withDefaultWidgetConfig';
 import { addProviderListenersForWidgetRoot, baseWidgetProviderEvent } from '../lib';
+import { InjectedProvidersManager } from '../lib/provider';
 
 export abstract class Base<T extends WidgetType> implements Widget<T> {
   protected checkout: Checkout;
@@ -47,6 +50,8 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
       addProviderListenersForWidgetRoot(this.web3Provider);
     }
     this.setupProviderUpdatedListener();
+    this.setupDisconnectProviderListener();
+    InjectedProvidersManager.getInstance().initialise();
   }
 
   unmount() {
@@ -98,6 +103,13 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
     if (props.provider) {
       // eslint-disable-next-line no-console
       console.warn('Updating a widget provider through the update() method is not supported yet');
+    }
+
+    if (props.config?.language) {
+      i18next.changeLanguage(props.config.language).then(() => {
+        // eslint-disable-next-line no-console
+        console.log('Language changed:', props.config?.language);
+      });
     }
 
     this.render();
@@ -169,6 +181,13 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
     window.addEventListener(baseWidgetProviderEvent, () => widgetRoot.handleEIP1193ProviderEvents(widgetRoot));
   }
 
+  private setupDisconnectProviderListener() {
+    window.addEventListener(
+      IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
+      this.handleDisconnectEvent,
+    );
+  }
+
   private handleEIP1193ProviderEvents(widgetRoot: Base<T>) {
     if (widgetRoot.web3Provider) {
       // eslint-disable-next-line no-param-reassign
@@ -189,6 +208,22 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
       case ProviderEventType.PROVIDER_UPDATED: {
         const eventData = event.detail.data as ProviderUpdated;
         widgetRoot.web3Provider = eventData.provider;
+        this.render();
+        break;
+      }
+      default:
+    }
+  }) as EventListener;
+
+  /**
+   * Handles disconnect event from the wallet widget
+   */
+  private handleDisconnectEvent = ((event: CustomEvent) => {
+    const widgetRoot = this;
+
+    switch (event.detail.type) {
+      case WalletEventType.DISCONNECT_WALLET: {
+        widgetRoot.web3Provider = undefined;
         this.render();
         break;
       }

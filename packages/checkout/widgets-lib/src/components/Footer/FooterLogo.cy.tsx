@@ -1,6 +1,5 @@
-import { onDarkBase } from '@biom3/design-tokens';
-import { BiomeCombinedProviders } from '@biom3/react';
 import { mount } from 'cypress/react18';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
 import { cySmartGet } from '../../lib/testUtils';
 import { FooterLogo } from './FooterLogo';
@@ -8,9 +7,9 @@ import { FooterLogo } from './FooterLogo';
 describe('Footer Logo', () => {
   it('should show the immutable logo', () => {
     mount(
-      <BiomeCombinedProviders theme={{ base: onDarkBase }}>
+      <ViewContextTestComponent>
         <SimpleLayout footer={<FooterLogo />} />
-      </BiomeCombinedProviders>,
+      </ViewContextTestComponent>,
     );
 
     cySmartGet('footer-logo-image').should('exist');
@@ -18,9 +17,9 @@ describe('Footer Logo', () => {
 
   it('should hide the logo when configured', () => {
     mount(
-      <BiomeCombinedProviders theme={{ base: onDarkBase }}>
+      <ViewContextTestComponent>
         <SimpleLayout footer={<FooterLogo hideLogo />} />
-      </BiomeCombinedProviders>,
+      </ViewContextTestComponent>,
     );
 
     cySmartGet('footer-logo-container').should('exist');

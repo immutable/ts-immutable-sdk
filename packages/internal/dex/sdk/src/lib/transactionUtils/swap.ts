@@ -1,14 +1,14 @@
 import { Trade, toHex, encodeRouteToPath, Route } from '@uniswap/v3-sdk';
 import { PaymentsExtended, SwapRouter } from '@uniswap/router-sdk';
 import * as Uniswap from '@uniswap/sdk-core';
-import { SecondaryFee__factory } from 'contracts/types';
-import { ISecondaryFee, SecondaryFeeInterface } from 'contracts/types/SecondaryFee';
 import { Fees } from 'lib/fees';
 import { isNative, toCurrencyAmount, toPublicAmount } from 'lib/utils';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
 import { NativeTokenService, canUnwrapToken } from 'lib/nativeTokenService';
 import { Coin, CoinAmount, Native } from 'types';
 import { Interface } from 'ethers/lib/utils';
+import { IImmutableSwapProxy, ImmutableSwapProxyInterface } from 'contracts/types/ImmutableSwapProxy';
+import { ImmutableSwapProxy__factory } from 'contracts/types';
 import { SecondaryFee, TransactionDetails } from '../../types';
 import { calculateGasFee } from './gas';
 import { slippageToFraction } from './slippage';
@@ -67,9 +67,12 @@ function buildSinglePoolSwap(
     );
   }
 
-  const shouldRefundNativeTokens = trade.tradeType === Uniswap.TradeType.EXACT_OUTPUT && isNative(tokenIn);
+  const shouldRefundNativeTokens = isNative(tokenIn);
   if (shouldRefundNativeTokens) {
-    // Refund ETH if the input token is native and the swap is exact output
+    // Refund ETH if the input token is native.
+    // In some cases, the user may have specified an input amount that is greater than what
+    // the liqudiity of the pool can provide.
+    // To account for this case, always call `refundETH` to refund any excess native tokens.
     calldatas.push(paymentsContract.encodeFunctionData('refundETH'));
   }
 
@@ -89,10 +92,10 @@ function buildSinglePoolSwapWithFees(
   amountIn: string,
   amountOut: string,
   secondaryFees: SecondaryFee[],
-  secondaryFeeContract: SecondaryFeeInterface,
+  swapProxyContract: ImmutableSwapProxyInterface,
   tokenOut: Coin,
 ) {
-  const secondaryFeeValues: ISecondaryFee.SecondaryFeeParamsStruct[] = secondaryFees.map((fee) => ({
+  const secondaryFeeValues: IImmutableSwapProxy.SecondaryFeeParamsStruct[] = secondaryFees.map((fee) => ({
     feeBasisPoints: fee.basisPoints,
     recipient: fee.recipient,
   }));
@@ -101,7 +104,7 @@ function buildSinglePoolSwapWithFees(
 
   if (trade.tradeType === Uniswap.TradeType.EXACT_INPUT) {
     calldatas.push(
-      secondaryFeeContract.encodeFunctionData('exactInputSingleWithSecondaryFee', [
+      swapProxyContract.encodeFunctionData('exactInputSingleWithSecondaryFee', [
         secondaryFeeValues,
         {
           tokenIn: route.tokenPath[0].address,
@@ -118,7 +121,7 @@ function buildSinglePoolSwapWithFees(
 
   if (trade.tradeType === Uniswap.TradeType.EXACT_OUTPUT) {
     calldatas.push(
-      secondaryFeeContract.encodeFunctionData('exactOutputSingleWithSecondaryFee', [
+      swapProxyContract.encodeFunctionData('exactOutputSingleWithSecondaryFee', [
         secondaryFeeValues,
         {
           tokenIn: route.tokenPath[0].address,
@@ -136,7 +139,7 @@ function buildSinglePoolSwapWithFees(
   const shouldUnwrapTokens = isNative(tokenOut);
   if (shouldUnwrapTokens) {
     // Unwrap the output token if the user specified a native token as the output
-    calldatas.push(secondaryFeeContract.encodeFunctionData('unwrapNativeToken', [amountOut]));
+    calldatas.push(swapProxyContract.encodeFunctionData('unwrapNativeToken', [amountOut]));
   }
 
   return calldatas;
@@ -182,9 +185,12 @@ function buildMultiPoolSwap(
     );
   }
 
-  const shouldRefundNativeTokens = trade.tradeType === Uniswap.TradeType.EXACT_OUTPUT && isNative(tokenIn);
+  const shouldRefundNativeTokens = isNative(tokenIn);
   if (shouldRefundNativeTokens) {
-    // Refund ETH if the input token is native and the swap is exact output
+    // Refund ETH if the input token is native.
+    // In some cases, the user may have specified an input amount that is greater than what
+    // the liqudiity of the pool can provide.
+    // To account for this case, always call `refundETH` to refund any excess native tokens.
     calldatas.push(paymentsContract.encodeFunctionData('refundETH'));
   }
 
@@ -204,12 +210,12 @@ function buildMultiPoolSwapWithFees(
   amountIn: string,
   amountOut: string,
   secondaryFees: SecondaryFee[],
-  secondaryFeeContract: SecondaryFeeInterface,
+  swapProxyContract: ImmutableSwapProxyInterface,
   tokenOut: Coin,
 ) {
   const path: string = encodeRouteToPath(route, trade.tradeType === Uniswap.TradeType.EXACT_OUTPUT);
 
-  const secondaryFeeValues: ISecondaryFee.SecondaryFeeParamsStruct[] = secondaryFees.map((fee) => ({
+  const secondaryFeeValues: IImmutableSwapProxy.SecondaryFeeParamsStruct[] = secondaryFees.map((fee) => ({
     feeBasisPoints: fee.basisPoints,
     recipient: fee.recipient,
   }));
@@ -218,7 +224,7 @@ function buildMultiPoolSwapWithFees(
 
   if (trade.tradeType === Uniswap.TradeType.EXACT_INPUT) {
     calldatas.push(
-      secondaryFeeContract.encodeFunctionData('exactInputWithSecondaryFee', [
+      swapProxyContract.encodeFunctionData('exactInputWithSecondaryFee', [
         secondaryFeeValues,
         {
           path,
@@ -232,7 +238,7 @@ function buildMultiPoolSwapWithFees(
 
   if (trade.tradeType === Uniswap.TradeType.EXACT_OUTPUT) {
     calldatas.push(
-      secondaryFeeContract.encodeFunctionData('exactOutputWithSecondaryFee', [
+      swapProxyContract.encodeFunctionData('exactOutputWithSecondaryFee', [
         secondaryFeeValues,
         {
           path,
@@ -247,7 +253,7 @@ function buildMultiPoolSwapWithFees(
   const shouldUnwrapTokens = isNative(tokenOut);
   if (shouldUnwrapTokens) {
     // Unwrap the output token if the user specified a native token as the output
-    calldatas.push(secondaryFeeContract.encodeFunctionData('unwrapNativeToken', [amountOut]));
+    calldatas.push(swapProxyContract.encodeFunctionData('unwrapNativeToken', [amountOut]));
   }
 
   return calldatas;
@@ -260,7 +266,7 @@ function buildMultiPoolSwapWithFees(
  * @param fromAddress The address of the user
  * @param trade The trade to be executed
  * @param secondaryFees Secondary fees to be applied to the swap
- * @param secondaryFeeContract The SecondaryFee contract interface
+ * @param swapProxyContract The SecondaryFee contract interface
  * @param routerContract The SwapRouter02 contract interface
  * @param paymentsContract The PaymentsExtended contract interface
  * @param maximumAmountIn The maximum amount of tokenIn to be swapped
@@ -273,7 +279,7 @@ function buildSwapParameters(
   recipient: string,
   trade: Trade<Uniswap.Token, Uniswap.Token, Uniswap.TradeType>,
   secondaryFees: SecondaryFee[],
-  secondaryFeeContract: SecondaryFeeInterface,
+  swapProxyContract: ImmutableSwapProxyInterface,
   routerContract: Interface,
   paymentsContract: Interface,
   maximumAmountIn: string,
@@ -295,7 +301,7 @@ function buildSwapParameters(
         maximumAmountIn,
         minimumAmountOut,
         secondaryFees,
-        secondaryFeeContract,
+        swapProxyContract,
         tokenOut,
       );
     }
@@ -321,7 +327,7 @@ function buildSwapParameters(
       maximumAmountIn,
       minimumAmountOut,
       secondaryFees,
-      secondaryFeeContract,
+      swapProxyContract,
       tokenOut,
     );
   }
@@ -349,7 +355,7 @@ function createSwapCallParameters(
   maximumAmountIn: string,
   minimumAmountOut: string,
 ): string {
-  const secondaryFeeContract = SecondaryFee__factory.createInterface();
+  const swapProxyContract = ImmutableSwapProxy__factory.createInterface();
   const routerContract = SwapRouter.INTERFACE;
   const paymentsContract = PaymentsExtended.INTERFACE;
 
@@ -359,7 +365,7 @@ function createSwapCallParameters(
     recipient,
     trade,
     secondaryFees,
-    secondaryFeeContract,
+    swapProxyContract,
     routerContract,
     paymentsContract,
     maximumAmountIn,
@@ -367,7 +373,7 @@ function createSwapCallParameters(
   );
 
   // Create the multicall transaction using the calldatas generated above
-  return secondaryFeeContract.encodeFunctionData(multicallWithDeadlineFunctionSignature, [
+  return swapProxyContract.encodeFunctionData(multicallWithDeadlineFunctionSignature, [
     swapOptions.deadlineOrPreviousBlockhash,
     calldatas,
   ]);
@@ -467,8 +473,9 @@ export function getSwap(
     secondaryFees,
   );
 
-  // TODO: Add additional gas fee estimates for secondary fees
-  const gasFeeEstimate = gasPrice ? calculateGasFee(gasPrice, adjustedQuote.gasEstimate) : null;
+  const hasSecondaryFees = secondaryFees.length > 0;
+
+  const gasFeeEstimate = gasPrice ? calculateGasFee(hasSecondaryFees, gasPrice, adjustedQuote.gasEstimate) : null;
 
   const transactionValue = getTransactionValue(tokenIn, maximumAmountIn);
 

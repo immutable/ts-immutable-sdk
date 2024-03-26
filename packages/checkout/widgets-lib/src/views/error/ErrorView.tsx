@@ -1,11 +1,10 @@
 import { Link } from '@biom3/react';
+import { useTranslation } from 'react-i18next';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
 import { FooterButton } from '../../components/Footer/FooterButton';
 import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
 import { SatelliteHero } from '../../components/Hero/SatelliteHero';
 import { SimpleTextBody } from '../../components/Body/SimpleTextBody';
-import { text } from '../../resources/text/textConfig';
-import { SharedViews } from '../../context/view-context/ViewContext';
 
 export interface ErrorViewProps {
   actionText: string;
@@ -22,7 +21,7 @@ export function ErrorView({
   errorEventActionLoading = false,
   onCloseClick,
 }: ErrorViewProps) {
-  const errorText = text.views[SharedViews.ERROR_VIEW];
+  const { t } = useTranslation();
 
   if (typeof errorEventAction === 'function') errorEventAction();
 
@@ -47,8 +46,8 @@ export function ErrorView({
       floatHeader
       testId="error-view"
     >
-      <SimpleTextBody heading={errorText.heading}>
-        {errorText.body[0]}
+      <SimpleTextBody heading={t('views.ERROR_VIEW.heading')}>
+        {t('views.ERROR_VIEW.body', { returnObjects: true })[0]}
         {' '}
         <Link
           size="small"
@@ -56,10 +55,10 @@ export function ErrorView({
             <a href="https://support.immutable.com/en/" />
           }
         >
-          {errorText.body[1]}
+          {t('views.ERROR_VIEW.body', { returnObjects: true })[1]}
         </Link>
         {' '}
-        {errorText.body[2]}
+        {t('views.ERROR_VIEW.body', { returnObjects: true })[2]}
       </SimpleTextBody>
     </SimpleLayout>
   );

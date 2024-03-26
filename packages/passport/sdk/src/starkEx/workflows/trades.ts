@@ -1,17 +1,12 @@
-import {
-  CreateTradeResponse,
-  GetSignableTradeRequest,
-  StarkSigner,
-  TradesApi,
-  TradesApiCreateTradeV3Request,
-} from '@imtbl/core-sdk';
+import { imx } from '@imtbl/generated-clients';
+import { StarkSigner } from '@imtbl/x-client';
 import { PassportErrorType, withPassportError } from '../../errors/passportError';
 import { UserImx } from '../../types';
-import GuardianClient from '../../guardian/guardian';
+import GuardianClient from '../../guardian';
 
 type CreateTradeParams = {
-  request: GetSignableTradeRequest;
-  tradesApi: TradesApi;
+  request: imx.GetSignableTradeRequest;
+  tradesApi: imx.TradesApi;
   user: UserImx;
   starkSigner: StarkSigner;
   guardianClient: GuardianClient,
@@ -23,10 +18,10 @@ export async function createTrade({
   user,
   starkSigner,
   guardianClient,
-}: CreateTradeParams): Promise<CreateTradeResponse> {
-  return withPassportError<CreateTradeResponse>(guardianClient.withDefaultConfirmationScreenTask(async () => {
+}: CreateTradeParams): Promise<imx.CreateTradeResponse> {
+  return withPassportError<imx.CreateTradeResponse>(guardianClient.withDefaultConfirmationScreenTask(async () => {
     const { ethAddress } = user.imx;
-    const getSignableTradeRequest: GetSignableTradeRequest = {
+    const getSignableTradeRequest: imx.GetSignableTradeRequest = {
       expiration_timestamp: request.expiration_timestamp,
       fees: request.fees,
       order_id: request.order_id,
@@ -41,7 +36,6 @@ export async function createTrade({
     }, { headers });
 
     await guardianClient.evaluateImxTransaction({
-      user,
       payloadHash: getSignableTradeResponse.data.payload_hash,
     });
 
@@ -49,7 +43,7 @@ export async function createTrade({
     const starkSignature = await starkSigner.signMessage(payloadHash);
     const { data: signableResultData } = getSignableTradeResponse;
 
-    const tradeParams: TradesApiCreateTradeV3Request = {
+    const tradeParams: imx.TradesApiCreateTradeV3Request = {
       createTradeRequest: {
         include_fees: true,
         fees: request?.fees,

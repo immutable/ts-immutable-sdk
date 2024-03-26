@@ -3,6 +3,7 @@ import {
 } from 'react';
 import { StandardAnalyticsActions } from '@imtbl/react-analytics';
 
+import * as url from 'url';
 import { TransakEvent, TransakEvents, TransakStatuses } from './TransakEvents';
 import {
   AnalyticsControlTypes,
@@ -10,8 +11,8 @@ import {
   useAnalytics,
 } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 
-const TRANSAK_ORIGIN = 'transak.com';
-const FAILED_TO_LOAD_TIMEOUT_IN_MS = 5000;
+export const TRANSAK_ORIGIN = ['global.transak.com', 'global-stg.transak.com'];
+const FAILED_TO_LOAD_TIMEOUT_IN_MS = 10000;
 
 export type TransakEventHandlers = {
   onInit?: (data: Record<string, unknown>) => void;
@@ -78,18 +79,19 @@ export const useTransakEvents = (props: UseTransakEventsProps) => {
   const [initialised, setInitialsed] = useState<boolean>(false);
   const failedToLoadTimeout = failedToLoadTimeoutInMs || FAILED_TO_LOAD_TIMEOUT_IN_MS;
 
-  const timeout = useRef<NodeJS.Timeout | number>(0);
+  const timeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const onInit = (data: Record<string, unknown>) => {
     setInitialsed(true);
     clearTimeout(timeout.current);
+    timeout.current = undefined;
     props.onInit?.(data);
   };
 
   const onLoad = () => {
     if (onFailedToLoad === undefined) return;
 
-    if (!initialised) {
+    if (timeout.current === undefined && !initialised) {
       timeout.current = setTimeout(() => {
         if (!initialised) onFailedToLoad();
       }, failedToLoadTimeout);
@@ -146,8 +148,9 @@ export const useTransakEvents = (props: UseTransakEventsProps) => {
 
   const handleMessageEvent = useCallback(
     (event: MessageEvent) => {
+      const host = url.parse(event.origin)?.host?.toLowerCase();
       const isTransakEvent = event.source === ref?.current?.contentWindow
-        && event.origin.toLowerCase().includes(TRANSAK_ORIGIN);
+        && host && TRANSAK_ORIGIN.includes(host);
 
       if (!isTransakEvent) return;
 

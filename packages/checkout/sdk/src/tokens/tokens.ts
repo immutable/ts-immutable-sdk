@@ -1,4 +1,7 @@
+import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
+import { Contract } from 'ethers';
 import {
+  BridgeConfig,
   ChainId,
   DexConfig,
   GetTokenAllowListResult,
@@ -8,7 +11,9 @@ import {
   TokenInfo,
 } from '../types';
 import { CheckoutConfiguration, getL1ChainId } from '../config';
-import { NATIVE } from '../env';
+import { ERC20ABI, NATIVE } from '../env';
+import { CheckoutErrorType, withCheckoutError } from '../errors';
+import { isMatchingAddress } from '../utils/utils';
 
 type TokenAllowListParams = {
   type: TokenFilterTypes;
@@ -19,11 +24,16 @@ type TokenAllowListParams = {
 export const getTokenAllowList = async (
   config: CheckoutConfiguration,
   {
-    type = TokenFilterTypes.ALL, chainId, exclude,
+    type = TokenFilterTypes.ALL,
+    chainId,
+    exclude,
   }: TokenAllowListParams,
 ): Promise<GetTokenAllowListResult> => {
   let tokens: TokenInfo[] = [];
   let onRampConfig: OnRampConfig;
+  let onBridgeConfig: BridgeConfig;
+
+  const targetChainId = chainId ?? getL1ChainId(config);
 
   switch (type) {
     case TokenFilterTypes.SWAP:
@@ -35,16 +45,19 @@ export const getTokenAllowList = async (
       break;
     case TokenFilterTypes.ONRAMP:
       onRampConfig = (await config.remote.getConfig('onramp')) as OnRampConfig;
-      // Only using Transak as it's the only on-ramp provider at the moment
-      if (!onRampConfig) {
-        tokens = [];
-      }
+      if (!onRampConfig) tokens = [];
+
       tokens = onRampConfig[OnRampProvider.TRANSAK]?.tokens || [];
       break;
     case TokenFilterTypes.BRIDGE:
+      onBridgeConfig = ((await config.remote.getConfig('bridge')) as BridgeConfig);
+      if (!onBridgeConfig) tokens = [];
+
+      tokens = onBridgeConfig[targetChainId]?.tokens || [];
+      break;
     case TokenFilterTypes.ALL:
     default:
-      tokens = (await config.remote.getTokensConfig(chainId || getL1ChainId(config))).allowed as TokenInfo[];
+      tokens = (await config.remote.getTokensConfig(targetChainId)).allowed as TokenInfo[];
   }
 
   if (!exclude || exclude?.length === 0) return { tokens };
@@ -56,4 +69,29 @@ export const getTokenAllowList = async (
 
 export const isNativeToken = (
   address: string | undefined,
-): boolean => !address || address.toLocaleLowerCase() === NATIVE;
+): boolean => !address || isMatchingAddress(address, NATIVE);
+
+export async function getERC20TokenInfo(
+  web3Provider: Web3Provider | JsonRpcProvider,
+  tokenAddress: string,
+) {
+  return await withCheckoutError<TokenInfo>(
+    async () => {
+      const contract = new Contract(tokenAddress, JSON.stringify(ERC20ABI), web3Provider);
+
+      const [name, symbol, decimals] = await Promise.all([
+        contract.name(),
+        contract.symbol(),
+        contract.decimals(),
+      ]);
+
+      return {
+        name,
+        symbol,
+        decimals,
+        address: tokenAddress,
+      };
+    },
+    { type: CheckoutErrorType.GET_ERC20_INFO_ERROR },
+  );
+}

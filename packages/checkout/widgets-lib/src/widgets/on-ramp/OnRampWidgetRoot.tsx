@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import {
-  ConnectTargetLayer,
+  ChainId,
   IMTBLWidgetEvents,
   OnRampWidgetParams,
   WidgetConfiguration,
@@ -11,11 +11,14 @@ import {
 import { Base } from 'widgets/BaseWidgetRoot';
 import { ConnectLoader, ConnectLoaderParams } from 'components/ConnectLoader/ConnectLoader';
 import { getL1ChainId, getL2ChainId } from 'lib';
-import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
 import { isValidAddress, isValidAmount } from 'lib/validations/widgetValidators';
-import { BiomePortalIdProvider } from '@biom3/react';
-import { OnRampWidget } from './OnRampWidget';
+import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
+import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
+import { LoadingView } from 'views/loading/LoadingView';
 import { sendOnRampWidgetCloseEvent } from './OnRampWidgetEvents';
+import i18n from '../../i18n';
+
+const OnRampWidget = React.lazy(() => import('./OnRampWidget'));
 
 export class OnRamp extends Base<WidgetType.ONRAMP> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT;
@@ -45,43 +48,48 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
       validatedParams.amount = '';
     }
 
-    if (!isValidAddress(params.contractAddress)) {
+    if (!isValidAddress(params.tokenAddress)) {
       // eslint-disable-next-line no-console
-      console.warn('[IMTBL]: invalid "contractAddress" widget input');
-      validatedParams.contractAddress = '';
+      console.warn('[IMTBL]: invalid "tokenAddress" widget input');
+      validatedParams.tokenAddress = '';
     }
 
     return validatedParams;
   }
 
   protected render() {
+    if (!this.reactRoot) return;
+
+    const { t } = i18n;
     const connectLoaderParams: ConnectLoaderParams = {
-      targetLayer: ConnectTargetLayer.LAYER2,
+      targetChainId: this.checkout.config.isProduction
+        ? ChainId.IMTBL_ZKEVM_MAINNET
+        : ChainId.IMTBL_ZKEVM_TESTNET,
       walletProviderName: this.parameters.walletProviderName,
       web3Provider: this.web3Provider,
       checkout: this.checkout,
       allowedChains: [getL1ChainId(this.checkout.config), getL2ChainId(this.checkout.config)],
     };
 
-    if (!this.reactRoot) return;
-
     this.reactRoot.render(
       <React.StrictMode>
-        <BiomePortalIdProvider>
-          <CustomAnalyticsProvider widgetConfig={this.strongConfig()}>
+        <CustomAnalyticsProvider checkout={this.checkout}>
+          <ThemeProvider id="onramp-container" config={this.strongConfig()}>
             <ConnectLoader
               widgetConfig={this.strongConfig()}
               params={connectLoaderParams}
               closeEvent={() => sendOnRampWidgetCloseEvent(window)}
             >
-              <OnRampWidget
-                contractAddress={this.parameters.contractAddress}
-                amount={this.parameters.amount}
-                config={this.strongConfig()}
-              />
+              <Suspense fallback={<LoadingView loadingText={t('views.ONRAMP.initialLoadingText')} />}>
+                <OnRampWidget
+                  tokenAddress={this.parameters.tokenAddress}
+                  amount={this.parameters.amount}
+                  config={this.strongConfig()}
+                />
+              </Suspense>
             </ConnectLoader>
-          </CustomAnalyticsProvider>
-        </BiomePortalIdProvider>
+          </ThemeProvider>
+        </CustomAnalyticsProvider>
       </React.StrictMode>,
     );
   }

@@ -4,6 +4,7 @@ import { ChainId, ChainName, GetNetworkAllowListResult } from '../types';
 import { createReadOnlyProviders } from './readOnlyProvider';
 import { CheckoutConfiguration } from '../config';
 import * as network from '../network';
+import { HttpClient } from '../api/http';
 
 jest.mock('../network');
 jest.mock('@ethersproject/providers', () => ({
@@ -11,9 +12,10 @@ jest.mock('@ethersproject/providers', () => ({
   JsonRpcProvider: jest.fn(),
 }));
 
+const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
 const baseConfig = new CheckoutConfiguration({
   baseConfig: { environment: Environment.SANDBOX },
-});
+}, mockedHttpClient);
 
 describe('read only providers', () => {
   beforeEach(() => {

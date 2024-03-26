@@ -22,6 +22,10 @@ export type SwapWidgetView =
 export interface SwapSuccessView extends ViewType {
   type: SwapWidgetViews.SUCCESS;
   data: {
+    fromTokenAddress: string;
+    fromAmount: string;
+    toTokenAddress: string;
+    toAmount: string;
     transactionHash: string;
   }
 }
@@ -61,6 +65,7 @@ export interface ApproveERC20SwapData {
 }
 export interface PrefilledSwapForm {
   fromAmount: string;
-  fromContractAddress: string;
-  toContractAddress: string;
+  fromTokenAddress: string;
+  toTokenAddress: string;
+  toAmount?: string;
 }

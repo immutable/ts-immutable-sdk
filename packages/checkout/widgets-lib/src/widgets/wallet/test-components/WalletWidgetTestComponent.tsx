@@ -1,5 +1,5 @@
-import { BiomeCombinedProviders } from '@biom3/react';
 import React, { useCallback, useMemo, useReducer } from 'react';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import {
   initialWalletState,
   WalletContext,
@@ -44,12 +44,12 @@ export function WalletWidgetTestComponent({
   ), [cryptoFiatState, cryptoFiatDispatch]);
 
   return (
-    <BiomeCombinedProviders>
+    <ViewContextTestComponent>
       <WalletContext.Provider value={reducerValues}>
         <CryptoFiatContext.Provider value={cryptoFiatReducerValues as CryptoFiatContextState}>
           {children}
         </CryptoFiatContext.Provider>
       </WalletContext.Provider>
-    </BiomeCombinedProviders>
+    </ViewContextTestComponent>
   );
 }

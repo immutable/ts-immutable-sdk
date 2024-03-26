@@ -1,12 +1,15 @@
-import { Banner, Box, Heading } from '@biom3/react';
+import { Box, Heading } from '@biom3/react';
 import { useContext, useEffect } from 'react';
 
+import { SalePaymentTypes } from '@imtbl/checkout-sdk';
+import { useTranslation } from 'react-i18next';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import { FundWithSmartCheckoutSubViews, SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
-import { text as textConfig } from '../../../resources/text/textConfig';
-
+import {
+  FundWithSmartCheckoutSubViews,
+  SaleWidgetViews,
+} from '../../../context/view-context/SaleViewContextTypes';
 import {
   SharedViews,
   ViewActions,
@@ -14,28 +17,35 @@ import {
 } from '../../../context/view-context/ViewContext';
 
 import { PaymentOptions } from '../components/PaymentOptions';
-
 import { useSaleContext } from '../context/SaleContextProvider';
 import { useSaleEvent } from '../hooks/useSaleEvents';
-import { PaymentTypes } from '../types';
+import { SaleErrorTypes, SignPaymentTypes } from '../types';
 
 export function PaymentMethods() {
-  const text = { methods: textConfig.views[SaleWidgetViews.PAYMENT_METHODS] };
-  const { viewState, viewDispatch } = useContext(ViewContext);
+  const { t } = useTranslation();
+  const { viewDispatch } = useContext(ViewContext);
   const {
-    paymentMethod, setPaymentMethod, sign, disabledPaymentTypes,
+    sign,
+    goToErrorView,
+    paymentMethod,
+    setPaymentMethod,
+    disabledPaymentTypes,
+    invalidParameters,
   } = useSaleContext();
   const { sendPageView, sendCloseEvent, sendSelectedPaymentMethod } = useSaleEvent();
 
-  const handleOptionClick = (type: PaymentTypes) => setPaymentMethod(type);
+  const handleOptionClick = (type: SalePaymentTypes) => setPaymentMethod(type);
 
   useEffect(() => {
     if (paymentMethod) {
       sendSelectedPaymentMethod(paymentMethod, SaleWidgetViews.PAYMENT_METHODS);
     }
 
-    if (paymentMethod === PaymentTypes.FIAT) {
-      sign(paymentMethod, () => {
+    if (
+      paymentMethod
+      && [SalePaymentTypes.DEBIT, SalePaymentTypes.CREDIT].includes(paymentMethod)
+    ) {
+      sign(SignPaymentTypes.FIAT, () => {
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,
@@ -51,13 +61,13 @@ export function PaymentMethods() {
           type: ViewActions.UPDATE_VIEW,
           view: {
             type: SharedViews.LOADING_VIEW,
-            data: { loadingText: text.methods.loading.ready },
+            data: { loadingText: t('views.PAYMENT_METHODS.loading.ready1') },
           },
         },
       });
     }
 
-    if (paymentMethod === PaymentTypes.CRYPTO) {
+    if (paymentMethod && paymentMethod === SalePaymentTypes.CRYPTO) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -70,18 +80,11 @@ export function PaymentMethods() {
     }
   }, [paymentMethod]);
 
-  const insufficientCoinsBanner = (
-    <Box sx={{ paddingX: 'base.spacing.x2' }}>
-      <Banner>
-        <Banner.Icon icon="InformationCircle" />
-        <Banner.Caption>
-          {text.methods.insufficientCoinsBanner.caption}
-        </Banner.Caption>
-      </Banner>
-    </Box>
-  );
-
   useEffect(() => sendPageView(SaleWidgetViews.PAYMENT_METHODS), []);
+  useEffect(() => {
+    if (!invalidParameters) return;
+    goToErrorView(SaleErrorTypes.INVALID_PARAMETERS);
+  }, [invalidParameters]);
 
   return (
     <SimpleLayout
@@ -108,12 +111,14 @@ export function PaymentMethods() {
             paddingX: 'base.spacing.x4',
           }}
         >
-          {text.methods.header.heading}
+          {t('views.PAYMENT_METHODS.header.heading')}
         </Heading>
         <Box sx={{ paddingX: 'base.spacing.x2' }}>
-          <PaymentOptions disabledOptions={disabledPaymentTypes} onClick={handleOptionClick} />
+          <PaymentOptions
+            disabledOptions={disabledPaymentTypes}
+            onClick={handleOptionClick}
+          />
         </Box>
-        {viewState.view.data?.showInsufficientCoinsBanner ? insufficientCoinsBanner : null}
       </Box>
     </SimpleLayout>
   );

@@ -4,36 +4,34 @@ import { BigNumber, utils } from 'ethers';
 import {
   BridgeRequirement,
   bridgeRoute,
-  getBridgeGasEstimate,
   hasSufficientL1Eth,
 } from './bridgeRoute';
 import { CheckoutConfiguration } from '../../../config';
 import {
-  BridgeRouteFeeEstimate,
   ChainId,
-  FundingRouteFeeEstimate,
+  FeeType,
   FundingStepType,
   ItemType,
 } from '../../../types';
 import { TokenBalanceResult } from '../types';
 import { createBlockchainDataInstance } from '../../../instance';
-import { estimateGasForBridgeApproval } from './estimateApprovalGas';
 import { getBridgeFeeEstimate } from './getBridgeFeeEstimate';
 import { CheckoutErrorType } from '../../../errors';
 import { allowListCheckForBridge } from '../../allowList/allowListCheck';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from '../indexer/fetchL1Representation';
 import { DEFAULT_TOKEN_DECIMALS } from '../../../env';
+import { HttpClient } from '../../../api/http';
 
 jest.mock('../../../gasEstimate');
 jest.mock('../../../instance');
-jest.mock('./estimateApprovalGas');
 jest.mock('./getBridgeFeeEstimate');
 jest.mock('../../allowList/allowListCheck');
 
 describe('bridgeRoute', () => {
+  const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
   const config = new CheckoutConfiguration({
     baseConfig: { environment: Environment.SANDBOX },
-  });
+  }, mockedHttpClient);
 
   const readonlyProviders = new Map<ChainId, JsonRpcProvider>([
     [ChainId.SEPOLIA, {} as JsonRpcProvider],
@@ -41,33 +39,7 @@ describe('bridgeRoute', () => {
   ]);
 
   describe('bridgeRoute', () => {
-    const feeEstimates = new Map<FundingStepType, FundingRouteFeeEstimate>([
-      [
-        FundingStepType.BRIDGE,
-        {
-          type: FundingStepType.BRIDGE,
-          gasFee: {
-            estimatedAmount: BigNumber.from(2),
-            token: {
-              name: 'Ethereum',
-              symbol: 'ETH',
-              decimals: 18,
-            },
-          },
-          bridgeFee: {
-            estimatedAmount: BigNumber.from(3),
-            token: {
-              name: 'Ethereum',
-              symbol: 'ETH',
-              decimals: 18,
-            },
-          },
-          totalFees: BigNumber.from(5),
-        },
-      ],
-    ]);
-
-    describe('Bridge ETH ERC20', () => {
+    describe('Bridge ETH', () => {
       const bridgeRequirement: BridgeRequirement = {
         amount: BigNumber.from(10),
         formattedAmount: '10',
@@ -84,10 +56,17 @@ describe('bridgeRoute', () => {
           }),
         });
 
-        (estimateGasForBridgeApproval as jest.Mock).mockResolvedValue(BigNumber.from(0));
+        (getBridgeFeeEstimate as jest.Mock).mockResolvedValue({
+          approvalGas: BigNumber.from(0),
+          sourceChainGas: BigNumber.from(2),
+          bridgeFee: BigNumber.from(3),
+          imtblFee: BigNumber.from(4),
+          totalFees: BigNumber.from(9),
+        });
+
         (allowListCheckForBridge as jest.Mock).mockResolvedValue([
           {
-            name: 'Ethereum',
+            name: 'Sep Eth',
             symbol: 'ETH',
             decimals: 18,
           },
@@ -110,10 +89,10 @@ describe('bridgeRoute', () => {
                 },
               },
               {
-                balance: BigNumber.from(16),
-                formattedBalance: '16',
+                balance: BigNumber.from(20),
+                formattedBalance: '20',
                 token: {
-                  name: 'Ethereum',
+                  name: 'Sep Eth',
                   symbol: 'ETH',
                   decimals: 18,
                   address: 'native',
@@ -126,13 +105,11 @@ describe('bridgeRoute', () => {
         const route = await bridgeRoute(
           config,
           readonlyProviders,
-          '0xADDRESS',
           {
             bridge: true,
           },
           bridgeRequirement,
           balances,
-          feeEstimates,
         );
 
         expect(route).toEqual({
@@ -145,44 +122,59 @@ describe('bridgeRoute', () => {
               formattedAmount: '10',
             },
             userBalance: {
-              balance: BigNumber.from(16),
-              formattedBalance: '16',
+              balance: BigNumber.from(20),
+              formattedBalance: '20',
             },
             token: {
-              name: 'Ethereum',
+              name: 'Sep Eth',
               symbol: 'ETH',
               decimals: 18,
               address: 'native',
             },
           },
           fees: {
-            approvalGasFees: {
+            approvalGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(0),
               formattedAmount: utils.formatUnits(BigNumber.from(0), DEFAULT_TOKEN_DECIMALS),
               token: {
-                name: 'Ethereum',
+                name: 'Sep Eth',
                 symbol: 'ETH',
                 decimals: 18,
               },
             },
-            bridgeGasFees: {
+            bridgeGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(2),
               formattedAmount: utils.formatUnits(BigNumber.from(2), DEFAULT_TOKEN_DECIMALS),
               token: {
-                name: 'Ethereum',
+                name: 'Sep Eth',
                 symbol: 'ETH',
                 decimals: 18,
               },
             },
-            bridgeFees: [{
-              amount: BigNumber.from(3),
-              formattedAmount: utils.formatUnits(BigNumber.from(3), DEFAULT_TOKEN_DECIMALS),
-              token: {
-                name: 'Ethereum',
-                symbol: 'ETH',
-                decimals: 18,
+            bridgeFees: [
+              {
+                type: FeeType.BRIDGE_FEE,
+                amount: BigNumber.from(3),
+                formattedAmount: utils.formatUnits(BigNumber.from(3), DEFAULT_TOKEN_DECIMALS),
+                token: {
+                  name: 'Sep Eth',
+                  symbol: 'ETH',
+                  decimals: 18,
+                },
               },
-            }],
+              {
+                type: FeeType.IMMUTABLE_FEE,
+                amount: BigNumber.from(4),
+                formattedAmount: utils.formatUnits(BigNumber.from(4), DEFAULT_TOKEN_DECIMALS),
+                token: {
+                  name: 'Sep Eth',
+                  symbol: 'ETH',
+                  decimals: 18,
+                },
+              },
+            ],
           },
         });
       });
@@ -193,10 +185,10 @@ describe('bridgeRoute', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(15),
-                formattedBalance: '15',
+                balance: BigNumber.from(19),
+                formattedBalance: '19',
                 token: {
-                  name: 'Ethereum',
+                  name: 'Sep Eth',
                   symbol: 'ETH',
                   decimals: 18,
                 },
@@ -208,13 +200,11 @@ describe('bridgeRoute', () => {
         const route = await bridgeRoute(
           config,
           readonlyProviders,
-          '0xADDRESS',
           {
             bridge: true,
           },
           bridgeRequirement,
           balances,
-          feeEstimates,
         );
 
         expect(route).toEqual({
@@ -227,58 +217,73 @@ describe('bridgeRoute', () => {
               formattedAmount: '10',
             },
             userBalance: {
-              balance: BigNumber.from(15),
-              formattedBalance: '15',
+              balance: BigNumber.from(19),
+              formattedBalance: '19',
             },
             token: {
-              name: 'Ethereum',
+              name: 'Sep Eth',
               symbol: 'ETH',
               decimals: 18,
               address: undefined,
             },
           },
           fees: {
-            approvalGasFees: {
+            approvalGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(0),
               formattedAmount: utils.formatUnits(BigNumber.from(0), DEFAULT_TOKEN_DECIMALS),
               token: {
-                name: 'Ethereum',
+                name: 'Sep Eth',
                 symbol: 'ETH',
                 decimals: 18,
               },
             },
-            bridgeGasFees: {
+            bridgeGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(2),
               formattedAmount: utils.formatUnits(BigNumber.from(2), DEFAULT_TOKEN_DECIMALS),
               token: {
-                name: 'Ethereum',
+                name: 'Sep Eth',
                 symbol: 'ETH',
                 decimals: 18,
               },
             },
-            bridgeFees: [{
-              amount: BigNumber.from(3),
-              formattedAmount: utils.formatUnits(BigNumber.from(3), DEFAULT_TOKEN_DECIMALS),
-              token: {
-                name: 'Ethereum',
-                symbol: 'ETH',
-                decimals: 18,
+            bridgeFees: [
+              {
+                type: FeeType.BRIDGE_FEE,
+                amount: BigNumber.from(3),
+                formattedAmount: utils.formatUnits(BigNumber.from(3), DEFAULT_TOKEN_DECIMALS),
+                token: {
+                  name: 'Sep Eth',
+                  symbol: 'ETH',
+                  decimals: 18,
+                },
               },
-            }],
+              {
+                type: FeeType.IMMUTABLE_FEE,
+                amount: BigNumber.from(4),
+                formattedAmount: utils.formatUnits(BigNumber.from(4), DEFAULT_TOKEN_DECIMALS),
+                token: {
+                  name: 'Sep Eth',
+                  symbol: 'ETH',
+                  decimals: 18,
+                },
+              },
+            ],
           },
         });
       });
 
-      it('should not return bridge route if enough eth balance on L1 but not enough for gas', async () => {
+      it('should not return bridge route if enough eth balance on L1 but not enough for fees', async () => {
         const balances = new Map<ChainId, TokenBalanceResult>([
           [ChainId.SEPOLIA, {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(14),
-                formattedBalance: '14',
+                balance: BigNumber.from(18),
+                formattedBalance: '18',
                 token: {
-                  name: 'Ethereum',
+                  name: 'Sep Eth',
                   symbol: 'ETH',
                   decimals: 18,
                 },
@@ -290,13 +295,11 @@ describe('bridgeRoute', () => {
         const route = await bridgeRoute(
           config,
           readonlyProviders,
-          '0xADDRESS',
           {
             bridge: true,
           },
           bridgeRequirement,
           balances,
-          feeEstimates,
         );
 
         expect(route).toBeUndefined();
@@ -321,7 +324,7 @@ describe('bridgeRoute', () => {
                 balance: BigNumber.from(20),
                 formattedBalance: '20',
                 token: {
-                  name: 'Ethereum',
+                  name: 'Sep Eth',
                   symbol: 'ETH',
                   decimals: 18,
                 },
@@ -334,13 +337,11 @@ describe('bridgeRoute', () => {
         const route = await bridgeRoute(
           config,
           readonlyProviders,
-          '0xADDRESS',
           {
             bridge: true,
           },
           bridgeRequirement,
           balances,
-          feeEstimates,
         );
 
         expect(allowListCheckForBridge).toHaveBeenCalledTimes(1);
@@ -348,7 +349,7 @@ describe('bridgeRoute', () => {
       });
     });
 
-    describe('Bridge non-ETH ERC20', () => {
+    describe('Bridge ERC20', () => {
       const bridgeRequirement = {
         amount: BigNumber.from(10),
         formattedAmount: '10',
@@ -365,7 +366,14 @@ describe('bridgeRoute', () => {
           }),
         });
 
-        (estimateGasForBridgeApproval as jest.Mock).mockResolvedValue(BigNumber.from(1));
+        (getBridgeFeeEstimate as jest.Mock).mockResolvedValue({
+          approvalGas: BigNumber.from(1),
+          sourceChainGas: BigNumber.from(2),
+          bridgeFee: BigNumber.from(3),
+          imtblFee: BigNumber.from(4),
+          totalFees: BigNumber.from(9),
+        });
+
         (allowListCheckForBridge as jest.Mock).mockResolvedValue([
           {
             address: '0xROOT_ADDRESS',
@@ -382,10 +390,10 @@ describe('bridgeRoute', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(7),
-                formattedBalance: '7',
+                balance: BigNumber.from(10),
+                formattedBalance: '10',
                 token: {
-                  name: 'Ethereum',
+                  name: 'Sep Eth',
                   symbol: 'ETH',
                   decimals: 18,
                 },
@@ -407,13 +415,11 @@ describe('bridgeRoute', () => {
         const route = await bridgeRoute(
           config,
           readonlyProviders,
-          '0xADDRESS',
           {
             bridge: true,
           },
           bridgeRequirement,
           balances,
-          feeEstimates,
         );
 
         expect(route).toEqual({
@@ -437,33 +443,48 @@ describe('bridgeRoute', () => {
             },
           },
           fees: {
-            approvalGasFees: {
+            approvalGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(1),
               formattedAmount: utils.formatUnits(BigNumber.from(1), DEFAULT_TOKEN_DECIMALS),
               token: {
-                name: 'Ethereum',
+                name: 'Sep Eth',
                 symbol: 'ETH',
                 decimals: 18,
               },
             },
-            bridgeGasFees: {
+            bridgeGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(2),
               formattedAmount: utils.formatUnits(BigNumber.from(2), DEFAULT_TOKEN_DECIMALS),
               token: {
-                name: 'Ethereum',
+                name: 'Sep Eth',
                 symbol: 'ETH',
                 decimals: 18,
               },
             },
-            bridgeFees: [{
-              amount: BigNumber.from(3),
-              formattedAmount: utils.formatUnits(BigNumber.from(3), DEFAULT_TOKEN_DECIMALS),
-              token: {
-                name: 'Ethereum',
-                symbol: 'ETH',
-                decimals: 18,
+            bridgeFees: [
+              {
+                type: FeeType.BRIDGE_FEE,
+                amount: BigNumber.from(3),
+                formattedAmount: utils.formatUnits(BigNumber.from(3), DEFAULT_TOKEN_DECIMALS),
+                token: {
+                  name: 'Sep Eth',
+                  symbol: 'ETH',
+                  decimals: 18,
+                },
               },
-            }],
+              {
+                type: FeeType.IMMUTABLE_FEE,
+                amount: BigNumber.from(4),
+                formattedAmount: utils.formatUnits(BigNumber.from(4), DEFAULT_TOKEN_DECIMALS),
+                token: {
+                  name: 'Sep Eth',
+                  symbol: 'ETH',
+                  decimals: 18,
+                },
+              },
+            ],
           },
         });
       });
@@ -474,10 +495,10 @@ describe('bridgeRoute', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(6),
-                formattedBalance: '6',
+                balance: BigNumber.from(9),
+                formattedBalance: '9',
                 token: {
-                  name: 'Ethereum',
+                  name: 'Sep Eth',
                   symbol: 'ETH',
                   decimals: 18,
                 },
@@ -499,13 +520,11 @@ describe('bridgeRoute', () => {
         const route = await bridgeRoute(
           config,
           readonlyProviders,
-          '0xADDRESS',
           {
             bridge: true,
           },
           bridgeRequirement,
           balances,
-          feeEstimates,
         );
 
         expect(route).toEqual({
@@ -529,33 +548,48 @@ describe('bridgeRoute', () => {
             },
           },
           fees: {
-            approvalGasFees: {
+            approvalGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(1),
               formattedAmount: utils.formatUnits(BigNumber.from(1), DEFAULT_TOKEN_DECIMALS),
               token: {
-                name: 'Ethereum',
+                name: 'Sep Eth',
                 symbol: 'ETH',
                 decimals: 18,
               },
             },
-            bridgeGasFees: {
+            bridgeGasFee: {
+              type: FeeType.GAS,
               amount: BigNumber.from(2),
               formattedAmount: utils.formatUnits(BigNumber.from(2), DEFAULT_TOKEN_DECIMALS),
               token: {
-                name: 'Ethereum',
+                name: 'Sep Eth',
                 symbol: 'ETH',
                 decimals: 18,
               },
             },
-            bridgeFees: [{
-              amount: BigNumber.from(3),
-              formattedAmount: utils.formatUnits(BigNumber.from(3), DEFAULT_TOKEN_DECIMALS),
-              token: {
-                name: 'Ethereum',
-                symbol: 'ETH',
-                decimals: 18,
+            bridgeFees: [
+              {
+                type: FeeType.BRIDGE_FEE,
+                amount: BigNumber.from(3),
+                formattedAmount: utils.formatUnits(BigNumber.from(3), DEFAULT_TOKEN_DECIMALS),
+                token: {
+                  name: 'Sep Eth',
+                  symbol: 'ETH',
+                  decimals: 18,
+                },
               },
-            }],
+              {
+                type: FeeType.IMMUTABLE_FEE,
+                amount: BigNumber.from(4),
+                formattedAmount: utils.formatUnits(BigNumber.from(4), DEFAULT_TOKEN_DECIMALS),
+                token: {
+                  name: 'Sep Eth',
+                  symbol: 'ETH',
+                  decimals: 18,
+                },
+              },
+            ],
           },
         });
       });
@@ -569,7 +603,7 @@ describe('bridgeRoute', () => {
                 balance: BigNumber.from(10),
                 formattedBalance: '10',
                 token: {
-                  name: 'Ethereum',
+                  name: 'Sep Eth',
                   symbol: 'ETH',
                   decimals: 18,
                 },
@@ -591,13 +625,11 @@ describe('bridgeRoute', () => {
         const route = await bridgeRoute(
           config,
           readonlyProviders,
-          '0xADDRESS',
           {
             bridge: true,
           },
           bridgeRequirement,
           balances,
-          feeEstimates,
         );
 
         expect(route).toBeUndefined();
@@ -609,10 +641,10 @@ describe('bridgeRoute', () => {
             success: true,
             balances: [
               {
-                balance: BigNumber.from(4),
-                formattedBalance: '4',
+                balance: BigNumber.from(8),
+                formattedBalance: '8',
                 token: {
-                  name: 'Ethereum',
+                  name: 'Sep Eth',
                   symbol: 'ETH',
                   decimals: 18,
                 },
@@ -634,13 +666,11 @@ describe('bridgeRoute', () => {
         const route = await bridgeRoute(
           config,
           readonlyProviders,
-          '0xADDRESS',
           {
             bridge: true,
           },
           bridgeRequirement,
           balances,
-          feeEstimates,
         );
 
         expect(route).toBeUndefined();
@@ -655,7 +685,7 @@ describe('bridgeRoute', () => {
                 balance: BigNumber.from(10),
                 formattedBalance: '10',
                 token: {
-                  name: 'Ethereum',
+                  name: 'Sep Eth',
                   symbol: 'ETH',
                   decimals: 18,
                 },
@@ -678,13 +708,11 @@ describe('bridgeRoute', () => {
         const route = await bridgeRoute(
           config,
           readonlyProviders,
-          '0xADDRESS',
           {
             bridge: true,
           },
           bridgeRequirement,
           balances,
-          feeEstimates,
         );
 
         expect(allowListCheckForBridge).toHaveBeenCalledTimes(1);
@@ -701,7 +729,7 @@ describe('bridgeRoute', () => {
 
       (allowListCheckForBridge as jest.Mock).mockResolvedValue([
         {
-          name: 'Ethereum',
+          name: 'Sep Eth',
           symbol: 'ETH',
           decimals: 18,
         },
@@ -717,13 +745,11 @@ describe('bridgeRoute', () => {
       const route = await bridgeRoute(
         config,
         readonlyProviders,
-        '0xADDRESS',
         {
           bridge: true,
         },
         bridgeRequirement,
         balances,
-        feeEstimates,
       );
 
       expect(route).toBeUndefined();
@@ -746,13 +772,11 @@ describe('bridgeRoute', () => {
       const route = await bridgeRoute(
         config,
         readonlyProviders,
-        '0xADDRESS',
         {
           bridge: true,
         },
         bridgeRequirement,
         balances,
-        feeEstimates,
       );
 
       expect(route).toEqual(undefined);
@@ -775,13 +799,11 @@ describe('bridgeRoute', () => {
       const route = await bridgeRoute(
         config,
         readonlyProviders,
-        '0xADDRESS',
         {
           bridge: true,
         },
         bridgeRequirement,
         balances,
-        feeEstimates,
       );
 
       expect(route).toEqual(undefined);
@@ -810,13 +832,11 @@ describe('bridgeRoute', () => {
           new Map<ChainId, JsonRpcProvider>([
             [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
           ]),
-          '0xADDRESS',
           {
             bridge: true,
           },
           bridgeRequirement,
           balances,
-          feeEstimates,
         );
       } catch (err: any) {
         type = err.type;
@@ -838,7 +858,7 @@ describe('bridgeRoute', () => {
               balance: BigNumber.from(2),
               formattedBalance: '2',
               token: {
-                name: 'Ethereum',
+                name: 'Sep Eth',
                 symbol: 'ETH',
                 decimals: 18,
               },
@@ -860,7 +880,7 @@ describe('bridgeRoute', () => {
               balance: BigNumber.from(1),
               formattedBalance: '1',
               token: {
-                name: 'Ethereum',
+                name: 'Sep Eth',
                 symbol: 'ETH',
                 decimals: 18,
               },
@@ -882,7 +902,7 @@ describe('bridgeRoute', () => {
               balance: BigNumber.from(0),
               formattedBalance: '0',
               token: {
-                name: 'Ethereum',
+                name: 'Sep Eth',
                 symbol: 'ETH',
                 decimals: 18,
               },
@@ -893,103 +913,6 @@ describe('bridgeRoute', () => {
       );
 
       expect(hasSufficientEth).toBeFalsy();
-    });
-  });
-
-  describe('getBridgeGasEstimate', () => {
-    it('should get from cache if already fetched', async () => {
-      const bridgeRouteFeeEstimate: BridgeRouteFeeEstimate = {
-        type: FundingStepType.BRIDGE,
-        gasFee: {
-          estimatedAmount: BigNumber.from(1),
-          token: {
-            name: 'Ethereum',
-            symbol: 'ETH',
-            decimals: 18,
-          },
-        },
-        bridgeFee: {
-          estimatedAmount: BigNumber.from(1),
-          token: {
-            name: 'Ethereum',
-            symbol: 'ETH',
-            decimals: 18,
-          },
-        },
-        totalFees: BigNumber.from(2),
-      };
-      (getBridgeFeeEstimate as jest.Mock).mockResolvedValue(bridgeRouteFeeEstimate);
-
-      const feeEstimates = new Map<FundingStepType, FundingRouteFeeEstimate>([
-        [
-          FundingStepType.BRIDGE,
-          {
-            type: FundingStepType.BRIDGE,
-            gasFee: {
-              estimatedAmount: BigNumber.from(1),
-              token: {
-                name: 'Ethereum',
-                symbol: 'ETH',
-                decimals: 18,
-              },
-            },
-            bridgeFee: {
-              estimatedAmount: BigNumber.from(1),
-              token: {
-                name: 'Ethereum',
-                symbol: 'ETH',
-                decimals: 18,
-              },
-            },
-            totalFees: BigNumber.from(2),
-          },
-        ],
-      ]);
-
-      const bridgeFeeEstimate = await getBridgeGasEstimate(
-        config,
-        readonlyProviders,
-        feeEstimates,
-      );
-
-      expect(bridgeFeeEstimate).toEqual(bridgeRouteFeeEstimate);
-      expect(getBridgeFeeEstimate).not.toHaveBeenCalled();
-    });
-
-    it('should fetch from cache if not already cached and set in cache', async () => {
-      const bridgeRouteFeeEstimate: BridgeRouteFeeEstimate = {
-        type: FundingStepType.BRIDGE,
-        gasFee: {
-          estimatedAmount: BigNumber.from(1),
-          token: {
-            name: 'Ethereum',
-            symbol: 'ETH',
-            decimals: 18,
-          },
-        },
-        bridgeFee: {
-          estimatedAmount: BigNumber.from(1),
-          token: {
-            name: 'Ethereum',
-            symbol: 'ETH',
-            decimals: 18,
-          },
-        },
-        totalFees: BigNumber.from(2),
-      };
-      (getBridgeFeeEstimate as jest.Mock).mockResolvedValue(bridgeRouteFeeEstimate);
-
-      const feeEstimates = new Map<FundingStepType, FundingRouteFeeEstimate>([]);
-
-      const bridgeFeeEstimate = await getBridgeGasEstimate(
-        config,
-        readonlyProviders,
-        feeEstimates,
-      );
-
-      expect(bridgeFeeEstimate).toEqual(bridgeRouteFeeEstimate);
-      expect(getBridgeFeeEstimate).toHaveBeenCalledTimes(1);
-      expect(feeEstimates).toEqual(new Map<FundingStepType, FundingRouteFeeEstimate>(feeEstimates));
     });
   });
 });

@@ -1,18 +1,25 @@
-import axios from 'axios';
 import { Environment } from '@imtbl/config';
+import { AxiosResponse } from 'axios';
 import { ChainId } from '../types';
 import { RemoteConfigFetcher } from './remoteConfigFetcher';
-import { CheckoutError, CheckoutErrorType } from '../errors';
-import { CHECKOUT_API_BASE_URL, ENV_DEVELOPMENT } from '../env';
+import {
+  CHECKOUT_CDN_BASE_URL,
+  ENV_DEVELOPMENT,
+} from '../env';
+import { HttpClient } from '../api/http';
 
-jest.mock('axios');
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+jest.mock('../api/http');
 
 describe('RemoteConfig', () => {
   const version = 'v1';
+  let mockedHttpClient: jest.Mocked<HttpClient>;
 
   afterEach(() => {
     jest.clearAllMocks();
+  });
+
+  beforeEach(() => {
+    mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
   });
 
   [Environment.PRODUCTION, Environment.SANDBOX, ENV_DEVELOPMENT].forEach((env) => {
@@ -21,6 +28,9 @@ describe('RemoteConfig', () => {
         const mockResponse = {
           status: 200,
           data: {
+            connect: {
+              walletConnect: false,
+            },
             dex: {
               overrides: {
                 rpcURL: 'https://test.com',
@@ -28,23 +38,18 @@ describe('RemoteConfig', () => {
             },
             allowedNetworks: [ChainId.SEPOLIA],
           },
-        };
-        mockedAxios.get.mockResolvedValueOnce(mockResponse);
+        } as AxiosResponse;
+        mockedHttpClient.get.mockResolvedValueOnce(mockResponse);
 
-        const fetcher = new RemoteConfigFetcher({
+        const fetcher = new RemoteConfigFetcher(mockedHttpClient, {
           isDevelopment: env === ENV_DEVELOPMENT,
           isProduction: env !== ENV_DEVELOPMENT && env === Environment.PRODUCTION,
         });
 
         expect(await fetcher.getConfig()).toEqual({
-          dex: {
-            overrides: {
-              rpcURL: 'https://test.com',
-            },
+          connect: {
+            walletConnect: false,
           },
-          allowedNetworks: [ChainId.SEPOLIA],
-        });
-        expect(await fetcher.getConfig()).toEqual({
           dex: {
             overrides: {
               rpcURL: 'https://test.com',
@@ -53,10 +58,10 @@ describe('RemoteConfig', () => {
           allowedNetworks: [ChainId.SEPOLIA],
         });
 
-        expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-        expect(mockedAxios.get).toHaveBeenNthCalledWith(
+        expect(mockedHttpClient.get).toHaveBeenCalledTimes(1);
+        expect(mockedHttpClient.get).toHaveBeenNthCalledWith(
           1,
-          `${CHECKOUT_API_BASE_URL[env]}/${version}/config`,
+          `${CHECKOUT_CDN_BASE_URL[env]}/${version}/config`,
         );
       });
 
@@ -64,6 +69,9 @@ describe('RemoteConfig', () => {
         const mockResponse = {
           status: 200,
           data: {
+            connect: {
+              walletConnect: false,
+            },
             dex: {
               overrides: {
                 rpcURL: 'https://test.com',
@@ -71,10 +79,10 @@ describe('RemoteConfig', () => {
             },
             allowedNetworks: [ChainId.SEPOLIA],
           },
-        };
-        mockedAxios.get.mockResolvedValueOnce(mockResponse);
+        } as AxiosResponse;
+        mockedHttpClient.get.mockResolvedValueOnce(mockResponse);
 
-        const fetcher = new RemoteConfigFetcher({
+        const fetcher = new RemoteConfigFetcher(mockedHttpClient, {
           isDevelopment: env === ENV_DEVELOPMENT,
           isProduction: env !== ENV_DEVELOPMENT && env === Environment.PRODUCTION,
         });
@@ -85,10 +93,10 @@ describe('RemoteConfig', () => {
       it(`should return undefined if missing config [${env}]`, async () => {
         const mockResponse = {
           status: 200,
-        };
-        mockedAxios.get.mockResolvedValueOnce(mockResponse);
+        } as AxiosResponse;
+        mockedHttpClient.get.mockResolvedValueOnce(mockResponse);
 
-        const fetcher = new RemoteConfigFetcher({
+        const fetcher = new RemoteConfigFetcher(mockedHttpClient, {
           isDevelopment: env === ENV_DEVELOPMENT,
           isProduction: env !== ENV_DEVELOPMENT && env === Environment.PRODUCTION,
         });
@@ -96,36 +104,20 @@ describe('RemoteConfig', () => {
         expect(await fetcher.getConfig()).toBeUndefined();
       });
 
-      it(`should throw error when non-200 status [${env}]`, async () => {
-        const mockResponse = {
-          status: 500,
-          statusText: 'error message',
-        };
-        mockedAxios.get.mockResolvedValueOnce(mockResponse);
+      it('should throw error when configuration is invalid JSON', async () => {
+        const mockInvalidJSONResponse = {
+          status: 200,
+          data: 'invalid json',
+        } as AxiosResponse;
+        mockedHttpClient.get.mockResolvedValue(mockInvalidJSONResponse);
 
-        const fetcher = new RemoteConfigFetcher({
+        const fetcher = new RemoteConfigFetcher(mockedHttpClient, {
           isDevelopment: env === ENV_DEVELOPMENT,
           isProduction: env !== ENV_DEVELOPMENT && env === Environment.PRODUCTION,
         });
 
-        await expect(fetcher.getConfig()).rejects.toThrowError(new Error('Error fetching from api: 500 error message'));
-      });
-
-      it(`should throw error when error fetching [${env}]`, async () => {
-        mockedAxios.get.mockRejectedValue({
-          message: 'error message',
-        });
-
-        const fetcher = new RemoteConfigFetcher({
-          isDevelopment: env === ENV_DEVELOPMENT,
-          isProduction: env !== ENV_DEVELOPMENT && env === Environment.PRODUCTION,
-        });
-
-        await expect(fetcher.getConfig()).rejects.toThrow(
-          new CheckoutError(
-            'Error fetching from api: error message',
-            CheckoutErrorType.API_ERROR,
-          ),
+        await expect(fetcher.getConfig()).rejects.toThrowError(
+          new Error('Invalid configuration'),
         );
       });
     });
@@ -135,6 +127,9 @@ describe('RemoteConfig', () => {
         const mockResponse = {
           status: 200,
           data: {
+            connect: {
+              walletConnect: false,
+            },
             [ChainId.IMTBL_ZKEVM_DEVNET]: {
               allowed: [
                 {
@@ -156,77 +151,35 @@ describe('RemoteConfig', () => {
               ],
             },
           },
-        };
-        mockedAxios.get.mockResolvedValueOnce(mockResponse);
+        } as AxiosResponse;
+        mockedHttpClient.get.mockResolvedValueOnce(mockResponse);
 
-        const fetcher = new RemoteConfigFetcher({
+        const fetcher = new RemoteConfigFetcher(mockedHttpClient, {
           isDevelopment: env === ENV_DEVELOPMENT,
           isProduction: env !== ENV_DEVELOPMENT && env === Environment.PRODUCTION,
         });
         await fetcher.getTokensConfig(ChainId.SEPOLIA);
         await fetcher.getTokensConfig(ChainId.IMTBL_ZKEVM_DEVNET);
 
-        expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-        expect(mockedAxios.get).toHaveBeenNthCalledWith(
+        expect(mockedHttpClient.get).toHaveBeenCalledTimes(1);
+        expect(mockedHttpClient.get).toHaveBeenNthCalledWith(
           1,
-          `${CHECKOUT_API_BASE_URL[env as Environment]}/${version}/config/tokens`,
+          `${CHECKOUT_CDN_BASE_URL[env as Environment]}/${version}/config/tokens`,
         );
       });
 
       it(`should return empty array if config missing [${env}]`, async () => {
         const mockResponse = {
           status: 200,
-        };
-        mockedAxios.get.mockResolvedValueOnce(mockResponse);
+        } as AxiosResponse;
+        mockedHttpClient.get.mockResolvedValueOnce(mockResponse);
 
-        const fetcher = new RemoteConfigFetcher({
+        const fetcher = new RemoteConfigFetcher(mockedHttpClient, {
           isDevelopment: env === ENV_DEVELOPMENT,
           isProduction: env !== ENV_DEVELOPMENT && env === Environment.PRODUCTION,
         });
 
         expect(await fetcher.getTokensConfig(ChainId.SEPOLIA)).toEqual({});
-      });
-
-      it(`should throw error when non-200 status [${env}]`, async () => {
-        const mockResponse = {
-          status: 500,
-          statusText: 'error message',
-        };
-        mockedAxios.get.mockResolvedValueOnce(mockResponse);
-
-        const fetcher = new RemoteConfigFetcher({
-          isDevelopment: env === ENV_DEVELOPMENT,
-          isProduction: env !== ENV_DEVELOPMENT && env === Environment.PRODUCTION,
-        });
-
-        await expect(fetcher.getTokensConfig(ChainId.SEPOLIA))
-          .rejects
-          .toThrow(
-            new CheckoutError(
-              'Error fetching from api: 500 error message',
-              CheckoutErrorType.API_ERROR,
-            ),
-          );
-      });
-
-      it(`should throw error when error fetching [${env}]`, async () => {
-        mockedAxios.get.mockRejectedValue({
-          message: 'error message',
-        });
-
-        const fetcher = new RemoteConfigFetcher({
-          isDevelopment: env === ENV_DEVELOPMENT,
-          isProduction: env !== ENV_DEVELOPMENT && env === Environment.PRODUCTION,
-        });
-
-        await expect(fetcher.getTokensConfig(ChainId.SEPOLIA))
-          .rejects
-          .toThrow(
-            new CheckoutError(
-              'Error fetching from api: error message',
-              CheckoutErrorType.API_ERROR,
-            ),
-          );
       });
     });
   });

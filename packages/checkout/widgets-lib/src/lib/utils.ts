@@ -1,8 +1,10 @@
 import {
-  ChainId, CheckoutConfiguration, GetBalanceResult, NetworkInfo,
+  ChainId, CheckoutConfiguration, GetBalanceResult, NetworkInfo, WidgetTheme,
 } from '@imtbl/checkout-sdk';
+import { Environment } from '@imtbl/config';
 import { getL1ChainId, getL2ChainId } from './networkUtils';
 import {
+  CHECKOUT_CDN_BASE_URL,
   DEFAULT_GT_ONE_TOKEN_FORMATTING_DECIMALS,
   DEFAULT_TOKEN_FORMATTING_DECIMALS,
   NATIVE,
@@ -16,16 +18,16 @@ export const sortTokensByAmount = (
   // make sure IMX is at the top of the list
   if (
     chainId === getL2ChainId(config)
-      && a.token.symbol.toLowerCase() === 'imx'
-      && b.token.symbol.toLowerCase() !== 'imx'
+    && a.token.symbol.toLowerCase() === 'imx'
+    && b.token.symbol.toLowerCase() !== 'imx'
   ) {
     return -1;
   }
 
   if (
     chainId === getL2ChainId(config)
-      && b.token.symbol.toLowerCase() === 'imx'
-      && a.token.symbol.toLowerCase() !== 'imx'
+    && b.token.symbol.toLowerCase() === 'imx'
+    && a.token.symbol.toLowerCase() !== 'imx'
   ) {
     return 1;
   }
@@ -93,7 +95,10 @@ const tokenValueFormatDecimals = (s: string, numDecimals: number): string => {
   return parseFloat(s.substring(0, pointIndex + numDecimals + 1)).toFixed(numDecimals);
 };
 
-export const tokenValueFormat = (s: Number | string): string => {
+export const tokenValueFormat = (
+  s: Number | string,
+  maxDecimals: number = DEFAULT_TOKEN_FORMATTING_DECIMALS,
+): string => {
   const asString = s.toString();
 
   // Only float numbers will be handled by this function
@@ -104,7 +109,19 @@ export const tokenValueFormat = (s: Number | string): string => {
   // 1. The number provided starts with "." (e.g. ".012")
   // 2. The number starts with 0 (e.g. "0.234")
   if (asString[0] === '.' || parseInt(asString[0], 10) === 0) {
-    return tokenValueFormatDecimals(asString, DEFAULT_TOKEN_FORMATTING_DECIMALS);
+    let formattedDecimals = Math.min(maxDecimals, DEFAULT_TOKEN_FORMATTING_DECIMALS);
+    let formattedValue = tokenValueFormatDecimals(asString, formattedDecimals);
+    if (parseFloat(formattedValue) === 0) {
+      // Ensure we return a value greater than 0
+      while ((formattedValue[formattedValue.length - 1] || '') === '0' && formattedDecimals < maxDecimals) {
+        formattedDecimals += 1;
+        formattedValue = tokenValueFormatDecimals(asString, formattedDecimals);
+        if ((formattedValue[formattedValue.length - 1] || '') !== '0') {
+          break;
+        }
+      }
+    }
+    return formattedValue;
   }
 
   // In case the number is greater than 1 then the formatting will look slightly different.
@@ -121,6 +138,34 @@ export const isZkEvmChainId = (chainId: ChainId) => chainId === ChainId.IMTBL_ZK
   || chainId === ChainId.IMTBL_ZKEVM_TESTNET
   || chainId === ChainId.IMTBL_ZKEVM_MAINNET;
 
+export const isL1EthChainId = (chainId: ChainId) => chainId === ChainId.SEPOLIA
+  || chainId === ChainId.ETHEREUM;
+
 export const isNativeToken = (
   address: string | undefined,
 ): boolean => !address || address.toLocaleLowerCase() === NATIVE;
+
+export function getRemoteImage(environment: Environment | undefined, path: string) {
+  return `${CHECKOUT_CDN_BASE_URL[environment ?? Environment.PRODUCTION]}/v1/blob/img${path}`;
+}
+
+export function getEthTokenImage(environment: Environment | undefined) {
+  return getRemoteImage(environment, '/tokens/eth.svg');
+}
+
+export function getImxTokenImage(environment: Environment | undefined) {
+  return getRemoteImage(environment, '/tokens/imx.svg');
+}
+
+export function getTokenImageByAddress(environment: Environment | undefined, address: string) {
+  return getRemoteImage(environment, `/tokens/${address.toLowerCase()}.svg`);
+}
+
+export function getDefaultTokenImage(
+  environment: Environment | undefined,
+  theme: WidgetTheme,
+) {
+  return theme === WidgetTheme.LIGHT
+    ? getRemoteImage(environment, '/tokens/defaultonlight.svg')
+    : getRemoteImage(environment, '/tokens/defaultondark.svg');
+}

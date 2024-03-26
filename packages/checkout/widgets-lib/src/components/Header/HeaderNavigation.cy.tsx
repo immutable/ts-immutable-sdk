@@ -1,19 +1,21 @@
 /* eslint-disable no-console */
 import { describe, it } from 'local-cypress';
 import { mount } from 'cypress/react18';
-import { BiomeCombinedProviders } from '@biom3/react';
-import { onDarkBase, onLightBase } from '@biom3/design-tokens';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
+import { WidgetTheme } from '@imtbl/checkout-sdk';
+import { ButtCon } from '@biom3/react';
 import { cySmartGet } from '../../lib/testUtils';
 import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from './HeaderNavigation';
+import { ButtonNavigationStyles } from './HeaderStyles';
 
 describe('HeaderNavigation', () => {
   describe('configurable buttons and title', () => {
     it('should show back button when configured', () => {
       mount(
-        <BiomeCombinedProviders theme={{ base: onDarkBase }}>
+        <ViewContextTestComponent>
           <SimpleLayout header={<HeaderNavigation showBack />} />
-        </BiomeCombinedProviders>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('back-button').should('exist');
@@ -24,7 +26,7 @@ describe('HeaderNavigation', () => {
 
     it('should show close button when configured', () => {
       mount(
-        <BiomeCombinedProviders theme={{ base: onDarkBase }}>
+        <ViewContextTestComponent>
           <SimpleLayout
             header={(
               <HeaderNavigation
@@ -32,7 +34,7 @@ describe('HeaderNavigation', () => {
               />
             )}
           />
-        </BiomeCombinedProviders>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('back-button').should('not.exist');
@@ -43,16 +45,23 @@ describe('HeaderNavigation', () => {
 
     it('should show settings button when configured with on click', () => {
       mount(
-        <BiomeCombinedProviders theme={{ base: onDarkBase }}>
+        <ViewContextTestComponent>
           <SimpleLayout
             header={(
               <HeaderNavigation
-                showSettings
-                onSettingsClick={() => console.log('test settings')}
+                rightActions={(
+                  <ButtCon
+                    icon="SettingsCog"
+                    sx={ButtonNavigationStyles()}
+                    iconVariant="bold"
+                    onClick={() => console.log('test settings')}
+                    testId="settings-button"
+                  />
+                )}
               />
             )}
           />
-        </BiomeCombinedProviders>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('back-button').should('not.exist');
@@ -63,7 +72,7 @@ describe('HeaderNavigation', () => {
 
     it('should show title and close when configured', () => {
       mount(
-        <BiomeCombinedProviders theme={{ base: onDarkBase }}>
+        <ViewContextTestComponent>
           <SimpleLayout
             header={(
               <HeaderNavigation
@@ -72,7 +81,7 @@ describe('HeaderNavigation', () => {
               />
             )}
           />
-        </BiomeCombinedProviders>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('back-button').should('not.exist');
@@ -83,7 +92,7 @@ describe('HeaderNavigation', () => {
 
     it('should show back and close when configured', () => {
       mount(
-        <BiomeCombinedProviders theme={{ base: onDarkBase }}>
+        <ViewContextTestComponent>
           <SimpleLayout
             header={(
               <HeaderNavigation
@@ -92,7 +101,7 @@ describe('HeaderNavigation', () => {
               />
             )}
           />
-        </BiomeCombinedProviders>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('back-button').should('exist');
@@ -105,7 +114,7 @@ describe('HeaderNavigation', () => {
   describe('HeaderNavigation styling', () => {
     it('should set solid background when configured', () => {
       mount(
-        <BiomeCombinedProviders theme={{ base: onLightBase }}>
+        <ViewContextTestComponent theme={WidgetTheme.LIGHT}>
           <SimpleLayout
             header={(
               <HeaderNavigation
@@ -114,20 +123,20 @@ describe('HeaderNavigation', () => {
               />
             )}
           />
-        </BiomeCombinedProviders>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('header-navigation-container').should('exist');
       cySmartGet('header-navigation-container').should(
         'have.css',
         'background-color',
-        'rgb(236, 236, 236)',
+        'rgb(231, 231, 231)',
       );
     });
 
     it('should set transparent background when configured', () => {
       mount(
-        <BiomeCombinedProviders theme={{ base: onLightBase }}>
+        <ViewContextTestComponent theme={WidgetTheme.LIGHT}>
           <SimpleLayout
             header={(
               <HeaderNavigation
@@ -137,7 +146,7 @@ describe('HeaderNavigation', () => {
               />
             )}
           />
-        </BiomeCombinedProviders>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('header-navigation-container').should('exist');

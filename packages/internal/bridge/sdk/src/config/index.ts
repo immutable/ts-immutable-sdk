@@ -19,7 +19,7 @@ const SUPPORTED_SANDBOX_BRIDGES: BridgeInstance[] = [ETH_SEPOLIA_TO_ZKEVM_DEVNET
 /**
  * @constant {BridgeInstance[]} SUPPORTED_PRODUCTION_BRIDGES - An array of supported bridge instances for the production environment.
  */
-const SUPPORTED_PRODUCTION_BRIDGES: BridgeInstance[] = [];
+const SUPPORTED_PRODUCTION_BRIDGES: BridgeInstance[] = [ETH_MAINNET_TO_ZKEVM_MAINNET];
 
 /**
  * @constant {Object} SUPPORTED_BRIDGES_FOR_ENVIRONMENT - An object mapping environment types to their supported bridge instances.
@@ -31,33 +31,36 @@ export const SUPPORTED_BRIDGES_FOR_ENVIRONMENT: {
   [Environment.PRODUCTION]: SUPPORTED_PRODUCTION_BRIDGES,
 };
 
+// @TODO update the childChainERC20Bridge and rootChainERC20BridgeFlowRate when available
+//  and remove any unused addresses
+
 /**
  * @constant {Map<BridgeInstance, BridgeContracts>} CONTRACTS_FOR_BRIDGE - A map of bridge instances to their associated contract addresses.
  */
 const CONTRACTS_FOR_BRIDGE = new Map<BridgeInstance, BridgeContracts>()
   .set(ETH_SEPOLIA_TO_ZKEVM_DEVNET, {
-    rootChainERC20Predicate: '0x75E468cF088F947B96422996132FbE71160F21F1',
-    rootChainStateSender: '0xbdC11416f01b122b7621855e61c99C7ED986F894',
-    rootChainCheckpointManager: '0x0721b564a96466b864A998D31846Ba409d21092B',
-    rootChainExitHelper: '0x0a2cb3f90aE65429E5c516af500F59d8fed51844',
-    childChainERC20Predicate: '0x0000000000000000000000000000000000001004',
-    childChainStateReceiver: '0x0000000000000000000000000000000000001001',
+    rootERC20BridgeFlowRate: '0x0',
+    childERC20Bridge: '0x0',
+    rootChainIMX: '0x0',
+    rootChainWrappedETH: '0x0',
+    childChainWrappedETH: '0x0',
+    childChainWrappedIMX: '0x0',
   })
   .set(ETH_SEPOLIA_TO_ZKEVM_TESTNET, {
-    rootChainERC20Predicate: '0x1118Cc83780d07ef99F84fD1C0E10CEd49AF3613',
-    rootChainStateSender: '0x41716a0DD85ae257DD011A97cE1470F609871270',
-    rootChainCheckpointManager: '0xfD69e3FCd72C6374623eeb156dd2C4159eBa7327',
-    rootChainExitHelper: '0x270D2B290c8183De23eCD17C7DaAE59fd084fE70',
-    childChainERC20Predicate: '0x0000000000000000000000000000000000001004',
-    childChainStateReceiver: '0x0000000000000000000000000000000000001001',
+    rootERC20BridgeFlowRate: '0x0D3C59c779Fd552C27b23F723E80246c840100F5',
+    childERC20Bridge: '0x0D3C59c779Fd552C27b23F723E80246c840100F5',
+    rootChainIMX: '0xe2629e08f4125d14e446660028bD98ee60EE69F2',
+    rootChainWrappedETH: '0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9',
+    childChainWrappedETH: '0xe9E96d1aad82562b7588F03f49aD34186f996478',
+    childChainWrappedIMX: '0x1CcCa691501174B4A623CeDA58cC8f1a76dc3439',
   })
   .set(ETH_MAINNET_TO_ZKEVM_MAINNET, {
-    rootChainERC20Predicate: '0x',
-    rootChainStateSender: '0x',
-    rootChainCheckpointManager: '0x',
-    rootChainExitHelper: '0x',
-    childChainERC20Predicate: '0x',
-    childChainStateReceiver: '0x',
+    rootERC20BridgeFlowRate: '0xBa5E35E26Ae59c7aea6F029B68c6460De2d13eB6',
+    childERC20Bridge: '0xBa5E35E26Ae59c7aea6F029B68c6460De2d13eB6',
+    rootChainIMX: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+    rootChainWrappedETH: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+    childChainWrappedETH: '0x52a6c53869ce09a731cd772f245b97a4401d3348',
+    childChainWrappedIMX: '0x3a0c2ba54d6cbd3121f01b96dfd20e99d1696c9d',
   });
 
 /**
@@ -70,11 +73,6 @@ export class BridgeConfiguration {
    * @property {BridgeContracts} bridgeContracts - The configuration of the contracts associated with the bridge.
    * @property {ethers.providers.Provider} rootProvider - The Ethereum provider for the root chain.
    * @property {ethers.providers.Provider} childProvider - The Ethereum provider for the child chain.
-   * @property {number} blockTime - The approximate block time
-   * @property {number} pollInterval - The time to wait between polls to the blockchain
-   * @property {number} maxDepositBlockDelay - The maximum number of blocks it should take on child chain for deposit to be observed
-   * @property {number} clockInaccuracy - The maximum number of seconds of inaccuracy of blockchain timestamps
-   * @property {number} rootChainFinalityBlocks - The number of blocks to wait for on the rootchain before accepting finality
   */
   public baseConfig: ImmutableConfiguration;
 
@@ -85,16 +83,6 @@ export class BridgeConfiguration {
   public rootProvider: ethers.providers.Provider;
 
   public childProvider: ethers.providers.Provider;
-
-  public blockTime: number;
-
-  public pollInterval: number;
-
-  public maxDepositBlockDelay: number;
-
-  public clockInaccuracy: number;
-
-  public rootChainFinalityBlocks: number;
 
   /**
    * Constructs a BridgeConfiguration instance.
@@ -112,18 +100,6 @@ export class BridgeConfiguration {
     this.bridgeInstance = bridgeInstance;
     this.rootProvider = rootProvider;
     this.childProvider = childProvider;
-
-    // Does not need to be exact, just approximate
-    this.blockTime = 12;
-    // How frequently we poll the childchain for StateSync events
-    this.pollInterval = 5 * 1000; // 5 seconds
-    // The upper bound of the block range we poll for StateSync events
-    this.maxDepositBlockDelay = 250;
-    // Assume that the clock timestamp is at most 900 seconds inaccurate, see for more ->
-    // https://github.com/ethereum/wiki/blob/c02254611f218f43cbb07517ca8e5d00fd6d6d75/Block-Protocol-2.0.md
-    this.clockInaccuracy = 900;
-    // How many blocks to wait for on the root chain before accepting rootchain finality
-    this.rootChainFinalityBlocks = 3;
 
     if (overrides) {
       this.bridgeContracts = overrides.bridgeContracts;

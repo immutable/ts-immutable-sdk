@@ -1,25 +1,20 @@
 import { useContext, useEffect } from 'react';
 import { Link } from '@biom3/react';
+import { useTranslation } from 'react-i18next';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import { text } from '../../../resources/text/textConfig';
-import { WalletWidgetViews } from '../../../context/view-context/WalletViewContextTypes';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { IMXCoinsHero } from '../../../components/Hero/IMXCoinsHero';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
-import { isPassportProvider } from '../../../lib/providerUtils';
+import { isPassportProvider } from '../../../lib/provider';
 import { FAQS_LINK } from '../../../lib';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 export function CoinInfo() {
+  const { t } = useTranslation();
   const { connectLoaderState: { provider } } = useContext(ConnectLoaderContext);
-  const coinInfoText = text.views[WalletWidgetViews.COIN_INFO];
   const isPassport = isPassportProvider(provider);
-  const { heading, body } = coinInfoText.metamask;
-  const {
-    heading: passportHeading, body1, body2, linkText,
-  } = coinInfoText.passport;
 
   const { page } = useAnalytics();
 
@@ -38,12 +33,16 @@ export function CoinInfo() {
       heroContent={<IMXCoinsHero />}
       floatHeader
     >
-      {!isPassport && <SimpleTextBody heading={heading}>{body}</SimpleTextBody>}
+      {!isPassport && (
+        <SimpleTextBody heading={t('views.COIN_INFO.metamask.heading')}>
+          {t('views.COIN_INFO.metamask.body')}
+        </SimpleTextBody>
+      )}
       {isPassport && (
-      <SimpleTextBody heading={passportHeading}>
-        {body1}
-        <Link onClick={() => window.open(FAQS_LINK)}>{linkText}</Link>
-        {body2}
+      <SimpleTextBody heading={t('views.COIN_INFO.passport.heading')}>
+        {t('views.COIN_INFO.passport.body1')}
+        <Link onClick={() => window.open(FAQS_LINK)}>{t('views.COIN_INFO.passport.linkText')}</Link>
+        {t('views.COIN_INFO.passport.body2')}
       </SimpleTextBody>
       )}
     </SimpleLayout>

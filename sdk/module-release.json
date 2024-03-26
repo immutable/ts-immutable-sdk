@@ -9,17 +9,17 @@
   "modules": {
     "config": "prod",
     "blockchain_data": "prod",
-    "immutablex_client": "prod",
     "passport": "prod",
     "orderbook": "prod",
-    "provider": "prod",
-    "checkout": "prod"
+    "checkout": "prod",
+    "x": "prod"
   },
   "fileCopy": [
     {
-      "src": "../packages/checkout/widgets-lib/dist/widgets.js",
-      "dest": "./dist/browser/checkout/widgets.js",
-      "stage": "prod"
+      "src": "../packages/checkout/widgets-lib/dist/index.js",
+      "dest": "./dist/browser/checkout/widgets-esm.js",
+      "stage": "prod",
+      "copyAllJsFiles": true
     },
     {
       "src": "../packages/checkout/sdk/dist/browser.js",

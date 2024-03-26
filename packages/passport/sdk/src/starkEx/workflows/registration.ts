@@ -1,20 +1,21 @@
 import { signRaw } from '@imtbl/toolkit';
-import { RegisterUserResponse, UsersApi, WalletConnection } from '@imtbl/core-sdk';
+import { WalletConnection } from '@imtbl/x-client';
+import { ImxApiClients, imx } from '@imtbl/generated-clients';
 
 export type RegisterPassportParams = WalletConnection & {
-  usersApi: UsersApi;
+  imxApiClients: ImxApiClients;
 };
 
 export default async function registerPassport(
-  { ethSigner, starkSigner, usersApi }: RegisterPassportParams,
+  { ethSigner, starkSigner, imxApiClients }: RegisterPassportParams,
   authorization: string,
-): Promise<RegisterUserResponse> {
+): Promise<imx.RegisterUserResponse> {
   const [userAddress, starkPublicKey] = await Promise.all([
     ethSigner.getAddress(),
     starkSigner.getAddress(),
   ]);
 
-  const signableResult = await usersApi.getSignableRegistrationOffchain({
+  const signableResult = await imxApiClients.usersApi.getSignableRegistrationOffchain({
     getSignableRegistrationRequest: {
       ether_key: userAddress,
       stark_key: starkPublicKey,
@@ -27,7 +28,7 @@ export default async function registerPassport(
     starkSigner.signMessage(payloadHash),
   ]);
 
-  const response = await usersApi.registerPassportUser({
+  const response = await imxApiClients.usersApi.registerPassportUserV2({
     authorization: `Bearer ${authorization}`,
     registerPassportUserRequest: {
       eth_signature: ethSignature,
@@ -36,5 +37,5 @@ export default async function registerPassport(
       stark_key: starkPublicKey,
     },
   });
-  return response.data as RegisterUserResponse;
+  return response.data as imx.RegisterUserResponse;
 }

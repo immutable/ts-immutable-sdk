@@ -1,16 +1,19 @@
+/.husky @immutable/sdk
 /sdk @immutable/sdk
-/packages/immutablex_client @immutable/sdk
+/packages/x-client @immutable/sdk
 /packages/config @immutable/sdk
 /packages/internal/version-check @immutable/sdk
+/packages/internal/metrics @immutable/sdk
 /packages/internal/generated-clients @immutable/sdk
+/packages/internal/generated-clients/src/blockchain-data @immutable/assets
 /packages/internal/toolkit @immutable/wallets
 /packages/internal/cryptofiat @immutable/wallets
 /packages/internal/dex @immutable/tokens
 /packages/internal/bridge @immutable/rollups
 /packages/passport @immutable/passport
-/packages/provider @immutable/wallets
+/packages/x-provider @immutable/wallets
 /packages/checkout @immutable/wallets
 /packages/checkout/widgets-lib @immutable/wallets @immutable/primary-revenue
-/packages/economy @immutable/igs-frontend
 /packages/blockchain-data @immutable/assets
+/packages/game-bridge @immutable/sdk
 /samples @immutable/sdk

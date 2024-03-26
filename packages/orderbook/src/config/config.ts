@@ -5,7 +5,7 @@ export const TESTNET_CHAIN_NAME = 'imtbl-zkevm-testnet';
 export const MAINNET_CHAIN_NAME = 'imtbl-zkevm-mainnet';
 
 export interface OrderbookOverrides {
-  provider?: providers.JsonRpcProvider | providers.Web3Provider;
+  jsonRpcProviderUrl?: string;
   seaportContractAddress?: string;
   zoneContractAddress?: string;
   chainName?: string;
@@ -17,7 +17,7 @@ export interface OrderbookModuleConfiguration {
   zoneContractAddress: string;
   apiEndpoint: string;
   chainName: string;
-  provider: providers.JsonRpcProvider | providers.Web3Provider;
+  provider: providers.JsonRpcProvider;
 }
 
 export function getOrderbookConfig(
@@ -26,8 +26,8 @@ export function getOrderbookConfig(
   switch (environment) {
     case Environment.SANDBOX:
       return {
-        seaportContractAddress: '0x3A0C2Ba54D6CBd3121F01b96dFd20e99D1696C9D',
-        zoneContractAddress: '0x2EA937879beeF3393853A74Ad62F9ad7DA0B9E81',
+        seaportContractAddress: '0x7d117aA8BD6D31c4fa91722f246388f38ab1942c',
+        zoneContractAddress: '0x8831867E347AB87FA30199C5B695F0A31604Bb52',
         apiEndpoint: 'https://api.sandbox.immutable.com',
         chainName: TESTNET_CHAIN_NAME,
         provider: new providers.JsonRpcProvider(
@@ -37,8 +37,8 @@ export function getOrderbookConfig(
     // not yet deployed
     case Environment.PRODUCTION:
       return {
-        seaportContractAddress: '',
-        zoneContractAddress: '',
+        seaportContractAddress: '0x6c12aD6F0bD274191075Eb2E78D7dA5ba6453424',
+        zoneContractAddress: '0x00338b92Bec262078B3e49BF12bbEA058916BF91',
         apiEndpoint: 'https://api.immutable.com',
         chainName: MAINNET_CHAIN_NAME,
         provider: new providers.JsonRpcProvider(

@@ -1,36 +1,36 @@
 import {
   Body,
-  BottomSheet, Box, Button, DuoCon, Heading,
+  Drawer, Box, Button, DuoCon, Heading,
 } from '@biom3/react';
+import { useTranslation } from 'react-i18next';
 import {
   transactionRejectedContainerStyles,
   contentTextStyles,
   actionButtonStyles,
   actionButtonContainerStyles,
 } from './TransactionRejectedStyles';
-import { text } from '../../resources/text/textConfig';
 
 type TransactionRejectedProps = {
-  onCloseBottomSheet?: () => void;
+  onCloseDrawer?: () => void;
   visible?: boolean;
   showHeaderBar?: boolean;
   onRetry: () => void
 };
 
 export function TransactionRejected({
-  onCloseBottomSheet, visible, showHeaderBar, onRetry,
+  onCloseDrawer, visible, showHeaderBar, onRetry,
 }: TransactionRejectedProps) {
-  const { content, buttons } = text.drawers.transactionFailed;
+  const { t } = useTranslation();
 
   return (
-    <BottomSheet
+    <Drawer
       headerBarTitle={undefined}
       size="full"
-      onCloseBottomSheet={onCloseBottomSheet}
+      onCloseDrawer={onCloseDrawer}
       visible={visible}
       showHeaderBar={showHeaderBar}
     >
-      <BottomSheet.Content>
+      <Drawer.Content>
         <Box sx={transactionRejectedContainerStyles}>
           <DuoCon
             icon="Information"
@@ -42,30 +42,30 @@ export function TransactionRejected({
             sx={contentTextStyles}
             testId="transaction-rejected-heading"
           >
-            {content.heading1}
+            {t('drawers.transactionFailed.content.heading1')}
             <br />
-            {content.heading2}
+            {t('drawers.transactionFailed.content.heading2')}
           </Heading>
           <Body sx={contentTextStyles}>
-            {content.body1}
+            {t('drawers.transactionFailed.content.body1')}
             <br />
-            {content.body2}
+            {t('drawers.transactionFailed.content.body2')}
           </Body>
           <Box sx={actionButtonContainerStyles}>
             <Button sx={actionButtonStyles} variant="tertiary" onClick={onRetry}>
-              {buttons.retry}
+              {t('drawers.transactionFailed.buttons.retry')}
             </Button>
             <Button
               sx={actionButtonStyles}
               variant="tertiary"
-              onClick={onCloseBottomSheet}
+              onClick={onCloseDrawer}
               testId="transaction-rejected-cancel-button"
             >
-              {buttons.cancel}
+              {t('drawers.transactionFailed.buttons.cancel')}
             </Button>
           </Box>
         </Box>
-      </BottomSheet.Content>
-    </BottomSheet>
+      </Drawer.Content>
+    </Drawer>
   );
 }

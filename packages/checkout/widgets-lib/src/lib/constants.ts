@@ -2,6 +2,8 @@ import { Environment } from '@imtbl/config';
 import { CheckoutErrorType, WalletProviderName, WidgetTheme } from '@imtbl/checkout-sdk';
 import { RetryType } from './retry';
 
+export const ENV_DEVELOPMENT = 'development' as Environment;
+
 export const NATIVE = 'native';
 
 export const DEFAULT_TOKEN_DECIMALS = 18;
@@ -10,6 +12,8 @@ export const DEFAULT_TOKEN_FORMATTING_DECIMALS = 6;
 export const DEFAULT_GT_ONE_TOKEN_FORMATTING_DECIMALS = 2;
 // Used to enforce the number of decimals in the input fields
 export const DEFAULT_TOKEN_VALIDATION_DECIMALS = DEFAULT_TOKEN_FORMATTING_DECIMALS;
+
+export const ESTIMATE_DEBOUNCE = 700; // ms
 
 export const IMX_TOKEN_SYMBOL = 'IMX';
 export const ETH_TOKEN_SYMBOL = 'ETH';
@@ -31,6 +35,15 @@ export const DEFAULT_BALANCE_RETRY_POLICY: RetryType = {
   retries: 60, // retry up to DEFAULT_RETRY_DELAY / 1000 minutes
   nonRetryable: (err: any) => err?.data?.code >= 500 || err.type === CheckoutErrorType.GET_ERC20_BALANCE_ERROR,
   nonRetryableSilently: (err: any) => err.type === CheckoutErrorType.WEB3_PROVIDER_ERROR,
+};
+
+/**
+ * Default retry policy for fetching transactions from remote.
+ */
+export const DEFAULT_TRANSACTIONS_RETRY_POLICY: RetryType = {
+  retryIntervalMs: DEFAULT_RETRY_DELAY,
+  retries: 60,
+  nonRetryableSilently: (err: any) => !!err,
 };
 
 /**
@@ -67,3 +80,32 @@ export const DEFAULT_BRIDGE_ENABLED = true;
  * Checkout Widget default refresh quote interval
  */
 export const DEFAULT_QUOTE_REFRESH_INTERVAL = 30000;
+
+/**
+ * Base URL for the checkout CDN based on the environment.
+ */
+export const CHECKOUT_CDN_BASE_URL = {
+  [ENV_DEVELOPMENT]: 'https://checkout-cdn.dev.immutable.com',
+  [Environment.SANDBOX]: 'https://checkout-cdn.sandbox.immutable.com',
+  [Environment.PRODUCTION]: 'https://checkout-cdn.immutable.com',
+};
+
+/**
+ * URL for axelar scan based on the environment
+ */
+export const AXELAR_SCAN_URL = {
+  [ENV_DEVELOPMENT]: 'https://testnet.axelarscan.io/gmp/',
+  [Environment.SANDBOX]: 'https://testnet.axelarscan.io/gmp/',
+  [Environment.PRODUCTION]: 'https://axelarscan.io/gmp/',
+};
+
+/**
+ * URL for passport based on environment
+ */
+export const PASSPORT_URL = {
+  [ENV_DEVELOPMENT]: 'https://passport.sandbox.immutable.com/',
+  [Environment.SANDBOX]: 'https://passport.sandbox.immutable.com/',
+  [Environment.PRODUCTION]: 'https://passport.immutable.com/',
+};
+
+export const WITHDRAWAL_CLAIM_GAS_LIMIT = 91000;

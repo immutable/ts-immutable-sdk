@@ -25,19 +25,22 @@ export interface NativeItem {
      * @type {string}
      * @memberof NativeItem
      */
-    'item_type': NativeItemItemTypeEnum;
+    'type': NativeItemTypeEnum;
     /**
-     * A string representing the starting price at which the user is willing to sell the token. This value is provided in the smallest unit of the token (e.g., wei for Ethereum).
+     * A string representing the price at which the user is willing to sell the token. This value is provided in the smallest unit of the token (e.g., wei for Ethereum).
      * @type {string}
      * @memberof NativeItem
      */
-    'start_amount': string;
+    'amount': string;
 }
 
-export const NativeItemItemTypeEnum = {
-    Native: 'NATIVE'
+export const NativeItemTypeEnum = {
+    Native: 'NATIVE',
+    Erc20: 'ERC20',
+    Erc721: 'ERC721',
+    Erc1155: 'ERC1155'
 } as const;
 
-export type NativeItemItemTypeEnum = typeof NativeItemItemTypeEnum[keyof typeof NativeItemItemTypeEnum];
+export type NativeItemTypeEnum = typeof NativeItemTypeEnum[keyof typeof NativeItemTypeEnum];
 
 

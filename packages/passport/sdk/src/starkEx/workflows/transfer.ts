@@ -1,20 +1,16 @@
+import { imx } from '@imtbl/generated-clients';
 import {
-  CreateTransferResponse,
-  CreateTransferResponseV1,
-  GetSignableTransferRequestV1,
-  NftTransferDetails,
-  SignableTransferDetails,
   StarkSigner,
-  TransfersApi,
+  NftTransferDetails,
   UnsignedTransferRequest,
-} from '@imtbl/core-sdk';
+} from '@imtbl/x-client';
 import { convertToSignableToken } from '@imtbl/toolkit';
 import {
   PassportErrorType,
   withPassportError,
 } from '../../errors/passportError';
 import { UserImx } from '../../types';
-import GuardianClient from '../../guardian/guardian';
+import GuardianClient from '../../guardian';
 
 const ERC721 = 'ERC721';
 
@@ -22,7 +18,7 @@ type TransferRequest = {
   request: UnsignedTransferRequest;
   user: UserImx;
   starkSigner: StarkSigner;
-  transfersApi: TransfersApi;
+  transfersApi: imx.TransfersApi;
   guardianClient: GuardianClient;
 };
 
@@ -30,7 +26,7 @@ type BatchTransfersParams = {
   request: Array<NftTransferDetails>;
   user: UserImx;
   starkSigner: StarkSigner;
-  transfersApi: TransfersApi;
+  transfersApi: imx.TransfersApi;
   guardianClient: GuardianClient;
 };
 
@@ -40,11 +36,11 @@ export async function transfer({
   starkSigner,
   user,
   guardianClient,
-}: TransferRequest): Promise<CreateTransferResponseV1> {
-  return withPassportError<CreateTransferResponseV1>(
+}: TransferRequest): Promise<imx.CreateTransferResponseV1> {
+  return withPassportError<imx.CreateTransferResponseV1>(
     guardianClient.withDefaultConfirmationScreenTask(async () => {
       const transferAmount = request.type === ERC721 ? '1' : request.amount;
-      const getSignableTransferRequest: GetSignableTransferRequestV1 = {
+      const getSignableTransferRequest: imx.GetSignableTransferRequestV1 = {
         sender: user.imx.ethAddress,
         token: convertToSignableToken(request),
         amount: transferAmount,
@@ -63,7 +59,6 @@ export async function transfer({
       );
 
       await guardianClient.evaluateImxTransaction({
-        user,
         payloadHash: signableResult.data.payload_hash,
       });
 
@@ -110,16 +105,16 @@ export async function batchNftTransfer({
   request,
   transfersApi,
   guardianClient,
-}: BatchTransfersParams): Promise<CreateTransferResponse> {
+}: BatchTransfersParams): Promise<imx.CreateTransferResponse> {
   // eslint-disable-next-line function-paren-newline
-  return withPassportError<CreateTransferResponse>(
+  return withPassportError<imx.CreateTransferResponse>(
     guardianClient.withConfirmationScreenTask(
       { width: 480, height: 784 },
     )(async () => {
       const { ethAddress } = user.imx;
 
       const signableRequests = request.map(
-        (nftTransfer): SignableTransferDetails => ({
+        (nftTransfer): imx.SignableTransferDetails => ({
           amount: '1',
           token: convertToSignableToken({
             type: ERC721,
@@ -142,7 +137,6 @@ export async function batchNftTransfer({
       );
 
       await guardianClient.evaluateImxTransaction({
-        user,
         payloadHash: signableResult.data.signable_responses[0]?.payload_hash,
       });
 

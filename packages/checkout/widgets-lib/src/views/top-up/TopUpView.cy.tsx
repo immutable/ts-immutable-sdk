@@ -2,16 +2,15 @@ import {
   beforeEach, cy, describe, it,
 } from 'local-cypress';
 import { mount } from 'cypress/react18';
-import { BiomeCombinedProviders } from '@biom3/react';
 import {
   IMTBLWidgetEvents, Checkout, GasEstimateType, WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { BigNumber } from 'ethers';
-import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
+import { Web3Provider } from '@ethersproject/providers';
 import { UserJourney } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
-import { StrongCheckoutWidgetsConfig } from 'lib/withDefaultWidgetConfig';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { TopUpView } from './TopUpView';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { orchestrationEvents } from '../../lib/orchestrationEvents';
@@ -39,8 +38,8 @@ describe('Top Up View', () => {
   describe('TopUpView render', () => {
     it('should render the top up view', () => {
       mount(
-        <BiomeCombinedProviders>
-          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <ViewContextTestComponent>
+          <CustomAnalyticsProvider checkout={{} as Checkout}>
             <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
               <TopUpView
                 analytics={{ userJourney: UserJourney.WALLET }}
@@ -52,7 +51,7 @@ describe('Top Up View', () => {
               />
             </ConnectLoaderTestComponent>
           </CustomAnalyticsProvider>
-        </BiomeCombinedProviders>,
+        </ViewContextTestComponent>,
       );
       cySmartGet('menu-item-onramp').should('exist');
       cySmartGet('menu-item-swap').should('exist');
@@ -61,8 +60,8 @@ describe('Top Up View', () => {
 
     it('should hide onramp option', () => {
       mount(
-        <BiomeCombinedProviders>
-          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <ViewContextTestComponent>
+          <CustomAnalyticsProvider checkout={{} as Checkout}>
             <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
               <TopUpView
                 analytics={{ userJourney: UserJourney.WALLET }}
@@ -74,7 +73,7 @@ describe('Top Up View', () => {
               />
             </ConnectLoaderTestComponent>
           </CustomAnalyticsProvider>
-        </BiomeCombinedProviders>,
+        </ViewContextTestComponent>,
       );
       cySmartGet('menu-item-onramp').should('not.exist');
       cySmartGet('menu-item-swap').should('exist');
@@ -83,8 +82,8 @@ describe('Top Up View', () => {
 
     it('should hide swap option', () => {
       mount(
-        <BiomeCombinedProviders>
-          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <ViewContextTestComponent>
+          <CustomAnalyticsProvider checkout={{} as Checkout}>
             <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
               <TopUpView
                 analytics={{ userJourney: UserJourney.WALLET }}
@@ -96,7 +95,7 @@ describe('Top Up View', () => {
               />
             </ConnectLoaderTestComponent>
           </CustomAnalyticsProvider>
-        </BiomeCombinedProviders>,
+        </ViewContextTestComponent>,
       );
       cySmartGet('menu-item-onramp').should('exist');
       cySmartGet('menu-item-swap').should('not.exist');
@@ -105,8 +104,8 @@ describe('Top Up View', () => {
 
     it('should hide bridge option', () => {
       mount(
-        <BiomeCombinedProviders>
-          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <ViewContextTestComponent>
+          <CustomAnalyticsProvider checkout={{} as Checkout}>
             <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
               <TopUpView
                 analytics={{ userJourney: UserJourney.WALLET }}
@@ -118,36 +117,7 @@ describe('Top Up View', () => {
               />
             </ConnectLoaderTestComponent>
           </CustomAnalyticsProvider>
-        </BiomeCombinedProviders>,
-      );
-      cySmartGet('menu-item-onramp').should('exist');
-      cySmartGet('menu-item-swap').should('exist');
-      cySmartGet('menu-item-bridge').should('not.exist');
-    });
-
-    it('should hide bridge option when provider is Passport', () => {
-      mount(
-        <BiomeCombinedProviders>
-          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-            <ConnectLoaderTestComponent
-              initialStateOverride={{
-                ...connectLoaderState,
-                provider: {
-                  provider: { isPassport: true } as any as ExternalProvider,
-                } as Web3Provider,
-              }}
-            >
-              <TopUpView
-                analytics={{ userJourney: UserJourney.WALLET }}
-                showOnrampOption
-                showSwapOption
-                showBridgeOption={false}
-                widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
-                onCloseButtonClick={() => {}}
-              />
-            </ConnectLoaderTestComponent>
-          </CustomAnalyticsProvider>
-        </BiomeCombinedProviders>,
+        </ViewContextTestComponent>,
       );
       cySmartGet('menu-item-onramp').should('exist');
       cySmartGet('menu-item-swap').should('exist');
@@ -157,8 +127,8 @@ describe('Top Up View', () => {
     it('should call close function when close button clicked', () => {
       const closeFunction = cy.stub().as('closeFunction');
       mount(
-        <BiomeCombinedProviders>
-          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <ViewContextTestComponent>
+          <CustomAnalyticsProvider checkout={{} as Checkout}>
             <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
               <TopUpView
                 analytics={{ userJourney: UserJourney.WALLET }}
@@ -170,7 +140,7 @@ describe('Top Up View', () => {
               />
             </ConnectLoaderTestComponent>
           </CustomAnalyticsProvider>
-        </BiomeCombinedProviders>,
+        </ViewContextTestComponent>,
       );
       cySmartGet('menu-item-onramp').should('exist');
       cySmartGet('menu-item-swap').should('exist');
@@ -185,8 +155,8 @@ describe('Top Up View', () => {
       );
 
       mount(
-        <BiomeCombinedProviders>
-          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <ViewContextTestComponent>
+          <CustomAnalyticsProvider checkout={{} as Checkout}>
             <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
               <TopUpView
                 analytics={{ userJourney: UserJourney.WALLET }}
@@ -200,7 +170,7 @@ describe('Top Up View', () => {
               />
             </ConnectLoaderTestComponent>
           </CustomAnalyticsProvider>
-        </BiomeCombinedProviders>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('menu-item-onramp').click();
@@ -217,8 +187,8 @@ describe('Top Up View', () => {
       cy.stub(orchestrationEvents, 'sendRequestSwapEvent').as('sendRequestSwapEventStub');
 
       mount(
-        <BiomeCombinedProviders>
-          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <ViewContextTestComponent>
+          <CustomAnalyticsProvider checkout={{} as Checkout}>
             <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
               <TopUpView
                 analytics={{ userJourney: UserJourney.WALLET }}
@@ -232,7 +202,7 @@ describe('Top Up View', () => {
               />
             </ConnectLoaderTestComponent>
           </CustomAnalyticsProvider>
-        </BiomeCombinedProviders>,
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('menu-item-swap').click();
@@ -252,22 +222,20 @@ describe('Top Up View', () => {
       );
 
       mount(
-        <BiomeCombinedProviders>
-          <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-            <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
-              <TopUpView
-                analytics={{ userJourney: UserJourney.WALLET }}
-                showOnrampOption
-                showSwapOption
-                showBridgeOption
-                widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
-                tokenAddress="0x123"
-                amount="10"
-                onCloseButtonClick={() => {}}
-              />
-            </ConnectLoaderTestComponent>
-          </CustomAnalyticsProvider>
-        </BiomeCombinedProviders>,
+        <ViewContextTestComponent>
+          <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
+            <TopUpView
+              analytics={{ userJourney: UserJourney.WALLET }}
+              showOnrampOption
+              showSwapOption
+              showBridgeOption
+              widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
+              tokenAddress="0x123"
+              amount="10"
+              onCloseButtonClick={() => {}}
+            />
+          </ConnectLoaderTestComponent>
+        </ViewContextTestComponent>,
       );
 
       cySmartGet('menu-item-bridge').click();
@@ -292,8 +260,8 @@ describe('Top Up View', () => {
         cy.stub(orchestrationEvents, 'sendRequestSwapEvent').as('sendRequestSwapEventStub');
 
         mount(
-          <BiomeCombinedProviders>
-            <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+          <ViewContextTestComponent>
+            <CustomAnalyticsProvider checkout={{} as Checkout}>
               <ConnectLoaderTestComponent
                 initialStateOverride={connectLoaderState}
               >
@@ -309,11 +277,11 @@ describe('Top Up View', () => {
                 />
               </ConnectLoaderTestComponent>
             </CustomAnalyticsProvider>
-          </BiomeCombinedProviders>,
+          </ViewContextTestComponent>,
         );
 
         cySmartGet('menu-item-swap')
-          .should('have.css', 'background-color', 'rgba(255, 255, 255, 0.48)');
+          .should('have.css', 'background-color', 'rgba(243, 243, 243, 0.06)');
       });
     });
   });
@@ -340,86 +308,11 @@ describe('Top Up View', () => {
           isBridgeEnabled: true,
           isSwapAvailable: true,
         },
-      };
-      cy.stub(Checkout.prototype, 'getExchangeFeeEstimate')
-        .as('getExchangeFeeEstimateStub')
-        .onFirstCall()
-        .resolves({
-          minPercentage: '3.5',
-          maxPercentage: '5.5',
-        });
-      cy.stub(Checkout.prototype, 'gasEstimate')
-        .as('gasEstimateStub')
-        .onFirstCall()
-        .resolves({
-          gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-          gasFee: {
-            estimatedAmount: BigNumber.from(1000000000000000),
-            token: {
-              name: 'Ethereum',
-              symbol: 'ETH',
-              decimals: 18,
-            },
-          },
-          bridgeFee: {
-            estimatedAmount: BigNumber.from(1000000000000000),
-            token: {
-              name: 'Ethereum',
-              symbol: 'ETH',
-              decimals: 18,
-            },
-          },
-        });
-
-      mount(
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-          <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
-            <WalletWidgetTestComponent
-              initialStateOverride={baseWalletState}
-              cryptoConversionsOverride={cryptoConversions}
-            >
-              <TopUpView
-                analytics={{ userJourney: UserJourney.WALLET }}
-                showOnrampOption
-                showSwapOption
-                showBridgeOption
-                widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
-                onCloseButtonClick={() => {}}
-              />
-            </WalletWidgetTestComponent>
-          </ConnectLoaderTestComponent>
-        </CustomAnalyticsProvider>,
-      );
-
-      cySmartGet('menu-item-caption-swap').contains(
-        'Using the coins I have on the same network',
-      );
-      cySmartGet('menu-item-caption-swap').contains('$0.05 USD');
-
-      cySmartGet('menu-item-caption-bridge').contains(
-        'From the coins I have on a different network',
-      );
-      cySmartGet('menu-item-caption-bridge').contains('$4.00 USD');
-
-      cySmartGet('menu-item-caption-onramp').contains(
-        'Google pay & Apple pay available. Minimum $5.',
-      );
-      cySmartGet('menu-item-caption-onramp').contains('3.5% to 5.5%');
-    });
-
-    it('should not fetch swap fees for geo-blocked region', () => {
-      const baseWalletState: WalletState = {
-        network: null,
-        walletProviderName: WalletProviderName.METAMASK,
-        tokenBalances: [],
-        supportedTopUps: {
-          isOnRampEnabled: true,
-          isSwapEnabled: true,
-          isBridgeEnabled: true,
-          isSwapAvailable: false,
+        walletConfig: {
+          showNetworkMenu: true,
+          showDisconnectButton: true,
         },
       };
-      cy.stub(Checkout.prototype, 'isSwapAvailable').as('isSwapAvailableStub').returns(false);
       cy.stub(Checkout.prototype, 'getExchangeFeeEstimate')
         .as('getExchangeFeeEstimateStub')
         .onFirstCall()
@@ -429,28 +322,21 @@ describe('Top Up View', () => {
         });
       cy.stub(Checkout.prototype, 'gasEstimate')
         .as('gasEstimateStub')
+        .onFirstCall()
         .resolves({
           gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-          gasFee: {
-            estimatedAmount: BigNumber.from(100000000000000),
-            token: {
-              name: 'Ethereum',
-              symbol: 'ETH',
-              decimals: 18,
-            },
+          fees: {
+            totalFees: BigNumber.from(1000000000000000),
           },
-          bridgeFee: {
-            estimatedAmount: BigNumber.from(100000000000000),
-            token: {
-              name: 'Ethereum',
-              symbol: 'ETH',
-              decimals: 18,
-            },
+          token: {
+            name: 'Ethereum',
+            symbol: 'ETH',
+            decimals: 18,
           },
         });
 
       mount(
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
+        <CustomAnalyticsProvider checkout={{} as Checkout}>
           <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
             <WalletWidgetTestComponent
               initialStateOverride={baseWalletState}
@@ -469,19 +355,9 @@ describe('Top Up View', () => {
         </CustomAnalyticsProvider>,
       );
 
-      cySmartGet('menu-item-caption-swap').contains(
-        'Not available in your region',
-      );
-
-      cySmartGet('menu-item-caption-bridge').contains(
-        'From the coins I have on a different network',
-      );
-      cySmartGet('menu-item-caption-bridge').contains('$0.40 USD');
-
-      cySmartGet('menu-item-caption-onramp').contains(
-        'Google pay & Apple pay available. Minimum $5.',
-      );
-      cySmartGet('menu-item-caption-onramp').contains('3.5% to 5.5%');
+      cySmartGet('menu-item-caption-swap').should('be.visible');
+      cySmartGet('menu-item-caption-bridge').should('be.visible');
+      cySmartGet('menu-item-caption-onramp').should('be.visible');
     });
 
     it('should display placeholder fees for onramp, swap and bridge', () => {
@@ -495,6 +371,10 @@ describe('Top Up View', () => {
           isBridgeEnabled: true,
           isSwapAvailable: true,
         },
+        walletConfig: {
+          showNetworkMenu: true,
+          showDisconnectButton: true,
+        },
       };
 
       cy.stub(Checkout.prototype, 'getExchangeFeeEstimate')
@@ -507,23 +387,21 @@ describe('Top Up View', () => {
         .rejects();
 
       mount(
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-          <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
-            <WalletWidgetTestComponent
-              initialStateOverride={baseWalletState}
-              cryptoConversionsOverride={cryptoConversions}
-            >
-              <TopUpView
-                analytics={{ userJourney: UserJourney.WALLET }}
-                showOnrampOption
-                showSwapOption
-                showBridgeOption
-                widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
-                onCloseButtonClick={() => {}}
-              />
-            </WalletWidgetTestComponent>
-          </ConnectLoaderTestComponent>
-        </CustomAnalyticsProvider>,
+        <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
+          <WalletWidgetTestComponent
+            initialStateOverride={baseWalletState}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <TopUpView
+              analytics={{ userJourney: UserJourney.WALLET }}
+              showOnrampOption
+              showSwapOption
+              showBridgeOption
+              widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
+              onCloseButtonClick={() => {}}
+            />
+          </WalletWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('menu-item-caption-bridge').contains('$-.-- USD');

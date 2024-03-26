@@ -19,25 +19,25 @@ describe('itemAggregator', () => {
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(1),
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(1),
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
         },
         {
           type: ItemType.ERC721,
           id: '1',
-          contractAddress: '0xERC20',
+          contractAddress: '0xERC721',
           spenderAddress: '0xSEAPORT',
         },
         {
           type: ItemType.ERC721,
           id: '1',
-          contractAddress: '0xERC20',
+          contractAddress: '0xERC721',
           spenderAddress: '0xSEAPORT',
         },
       ];
@@ -51,13 +51,13 @@ describe('itemAggregator', () => {
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(2),
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
         },
         {
           type: ItemType.ERC721,
           id: '1',
-          contractAddress: '0xERC20',
+          contractAddress: '0xERC721',
           spenderAddress: '0xSEAPORT',
         },
       ]);
@@ -78,13 +78,13 @@ describe('itemAggregator', () => {
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(1),
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(1),
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
         },
       ];
@@ -102,7 +102,7 @@ describe('itemAggregator', () => {
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(2),
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
         },
       ]);
@@ -113,13 +113,13 @@ describe('itemAggregator', () => {
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(1),
-          contractAddress: '0xERC20_1',
+          tokenAddress: '0xERC20_1',
           spenderAddress: '0xSEAPORT',
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(1),
-          contractAddress: '0xERC20_2',
+          tokenAddress: '0xERC20_2',
           spenderAddress: '0xSEAPORT',
         },
       ];
@@ -129,13 +129,13 @@ describe('itemAggregator', () => {
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(1),
-          contractAddress: '0xERC20_1',
+          tokenAddress: '0xERC20_1',
           spenderAddress: '0xSEAPORT',
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(1),
-          contractAddress: '0xERC20_2',
+          tokenAddress: '0xERC20_2',
           spenderAddress: '0xSEAPORT',
         },
       ]);
@@ -157,7 +157,7 @@ describe('itemAggregator', () => {
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(1),
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
         },
         {
@@ -167,7 +167,7 @@ describe('itemAggregator', () => {
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(1),
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
         },
       ];
@@ -186,7 +186,7 @@ describe('itemAggregator', () => {
           {
             type: ItemType.ERC20,
             amount: BigNumber.from(2),
-            contractAddress: '0xERC20',
+            tokenAddress: '0xERC20',
             spenderAddress: '0xSEAPORT',
           },
         ]),
@@ -206,13 +206,13 @@ describe('itemAggregator', () => {
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(1),
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(1),
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
         },
         {
@@ -241,7 +241,7 @@ describe('itemAggregator', () => {
           {
             type: ItemType.ERC20,
             amount: BigNumber.from(2),
-            contractAddress: '0xERC20',
+            tokenAddress: '0xERC20',
             spenderAddress: '0xSEAPORT',
           },
           {
@@ -476,13 +476,13 @@ describe('itemAggregator', () => {
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(1),
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(1),
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
         },
       ];
@@ -492,13 +492,13 @@ describe('itemAggregator', () => {
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(1),
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(1),
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
         },
         {

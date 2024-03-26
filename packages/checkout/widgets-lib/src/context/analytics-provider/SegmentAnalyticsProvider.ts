@@ -3,7 +3,6 @@ import {
   StandardAnalyticsActions,
   StandardAnalyticsControlTypes,
 } from '@imtbl/react-analytics';
-import { Environment } from '@imtbl/config';
 
 export enum UserJourney {
   CONNECT = 'Connect',
@@ -18,13 +17,6 @@ export type AnalyticsControlTypes =
   | StandardAnalyticsControlTypes
   | 'IframeEvent'
   | 'Event';
-
-const SEGMENT_ANALYTICS_WRITE_KEY = {
-  [Environment.SANDBOX]: 'b69BcXnFXdaiFC6MqRQiHvjcPrTxftZl',
-  [Environment.PRODUCTION]: 'hecEjBUtJP8IvC9rBx9IkBFR0UuDiIos',
-};
-
-export const getSegmentWriteKey = (env: Environment) => SEGMENT_ANALYTICS_WRITE_KEY[env];
 
 const productName = 'checkout';
 

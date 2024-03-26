@@ -6,22 +6,28 @@ import {
   Body, Box, Heading, OptionKey,
 } from '@biom3/react';
 import { BigNumber, utils } from 'ethers';
-import { TokenInfo } from '@imtbl/checkout-sdk';
+import { TokenInfo, WidgetTheme } from '@imtbl/checkout-sdk';
 import { TransactionResponse } from '@imtbl/dex-sdk';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
-import { text } from '../../../resources/text/textConfig';
+import { useTranslation } from 'react-i18next';
+import { Environment } from '@imtbl/config';
+import { NetworkSwitchDrawer } from 'components/NetworkSwitchDrawer/NetworkSwitchDrawer';
 import { amountInputValidation as textInputValidator } from '../../../lib/validations/amountInputValidations';
 import { SwapContext } from '../context/SwapContext';
 import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import {
-  calculateCryptoToFiat, formatZeroAmount, isNativeToken, tokenValueFormat,
+  calculateCryptoToFiat, formatZeroAmount, getDefaultTokenImage, isNativeToken, tokenValueFormat,
 } from '../../../lib/utils';
 import {
-  DEFAULT_TOKEN_DECIMALS, DEFAULT_QUOTE_REFRESH_INTERVAL, NATIVE, DEFAULT_TOKEN_VALIDATION_DECIMALS,
+  DEFAULT_TOKEN_DECIMALS,
+  DEFAULT_QUOTE_REFRESH_INTERVAL,
+  NATIVE,
+  DEFAULT_TOKEN_VALIDATION_DECIMALS,
+  ESTIMATE_DEBOUNCE,
+  getL2ChainId,
 } from '../../../lib';
 import { quotesProcessor } from '../functions/FetchQuote';
 import { SelectInput } from '../../../components/FormComponents/SelectInput/SelectInput';
-import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import {
   validateFromAmount,
   validateFromToken,
@@ -37,6 +43,8 @@ import { NotEnoughImx } from '../../../components/NotEnoughImx/NotEnoughImx';
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { UnableToSwap } from './UnableToSwap';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
+import useDebounce from '../../../lib/hooks/useDebounce';
+import { CancellablePromise } from '../../../lib/async/cancellablePromise';
 
 enum SwapDirection {
   FROM = 'FROM',
@@ -48,11 +56,13 @@ const swapValuesToText = ({
   swapToToken,
   swapFromAmount,
   swapToAmount,
+  conversion,
 }: {
   swapFromToken?: TokenInfo;
   swapFromAmount: string;
   swapToToken?: TokenInfo;
   swapToAmount: string;
+  conversion: BigNumber;
 }): {
   fromToConversion: string,
   swapToAmount: string,
@@ -66,10 +76,11 @@ const swapValuesToText = ({
   resp.swapToAmount = tokenValueFormat(swapToAmount);
 
   if (swapFromAmount && swapFromToken && swapToToken) {
-    const conversionRatio = tokenValueFormat(Number(swapToAmount) / Number(swapFromAmount));
-    resp.fromToConversion = `1 ${swapFromToken.symbol} ≈ ${
-      formatZeroAmount(conversionRatio, true)
-    } ${swapToToken.symbol}`;
+    const formattedConversion = formatZeroAmount(tokenValueFormat(
+      utils.formatUnits(conversion, swapToToken.decimals),
+    ), true);
+
+    resp.fromToConversion = `1 ${swapFromToken.symbol} ≈ ${formattedConversion} ${swapToToken.symbol}`;
   }
 
   return resp;
@@ -83,11 +94,15 @@ const shouldSetToAddress = (toAddress: string | undefined, fromAddress: string |
   return true;
 };
 
+let quoteRequest: CancellablePromise<any>;
+
 export interface SwapFromProps {
   data?: SwapFormData;
+  theme: WidgetTheme;
 }
 
-export function SwapForm({ data }: SwapFromProps) {
+export function SwapForm({ data, theme }: SwapFromProps) {
+  const { t } = useTranslation();
   const {
     swapState: {
       allowedTokens,
@@ -97,7 +112,8 @@ export function SwapForm({ data }: SwapFromProps) {
     },
   } = useContext(SwapContext);
   const { connectLoaderState } = useContext(ConnectLoaderContext);
-  const { provider } = connectLoaderState;
+  const { checkout, provider } = connectLoaderState;
+  const defaultTokenImage = getDefaultTokenImage(checkout?.config.environment, theme);
 
   const formatTokenOptionsId = useCallback((symbol: string, address?: string) => (isNativeToken(address)
     ? `${symbol.toLowerCase()}-${NATIVE}`
@@ -106,10 +122,9 @@ export function SwapForm({ data }: SwapFromProps) {
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { viewDispatch } = useContext(ViewContext);
 
-  const [editing, setEditing] = useState(false);
-  const [isFetching, setIsFetching] = useState(false);
   const [direction, setDirection] = useState<SwapDirection>(SwapDirection.FROM);
   const [loading, setLoading] = useState(false);
+  const [conversion, setConversion] = useState(BigNumber.from(0));
   const [swapFromToConversionText, setSwapFromToConversionText] = useState('');
   const hasSetDefaultState = useRef(false);
 
@@ -118,11 +133,13 @@ export function SwapForm({ data }: SwapFromProps) {
   // Form State
   const [fromAmount, setFromAmount] = useState<string>(data?.fromAmount || '');
   const [fromAmountError, setFromAmountError] = useState<string>('');
+  const debouncedFromAmount = useDebounce(fromAmount, ESTIMATE_DEBOUNCE);
   const [fromToken, setFromToken] = useState<TokenInfo | undefined>();
   const [fromBalance, setFromBalance] = useState<string>('');
   const [fromTokenError, setFromTokenError] = useState<string>('');
   const [toAmount, setToAmount] = useState<string>(data?.toAmount || '');
   const [toAmountError, setToAmountError] = useState<string>('');
+  const debouncedToAmount = useDebounce(toAmount, ESTIMATE_DEBOUNCE);
   const [toToken, setToToken] = useState<TokenInfo | undefined>();
   const [toTokenError, setToTokenError] = useState<string>('');
   const [fromFiatValue, setFromFiatValue] = useState('');
@@ -130,13 +147,14 @@ export function SwapForm({ data }: SwapFromProps) {
   // Quote
   const [quote, setQuote] = useState<TransactionResponse | null>(null);
   const [gasFeeValue, setGasFeeValue] = useState<string>('');
-  const [gasFeeToken, setGasFeeToken] = useState< TokenInfo | undefined>(undefined);
+  const [gasFeeToken, setGasFeeToken] = useState<TokenInfo | undefined>(undefined);
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
   const [tokensOptionsFrom, setTokensOptionsForm] = useState<CoinSelectorOptionProps[]>([]);
 
   // Drawers
   const [showNotEnoughImxDrawer, setShowNotEnoughImxDrawer] = useState(false);
   const [showUnableToSwapDrawer, setShowUnableToSwapDrawer] = useState(false);
+  const [showNetworkSwitchDrawer, setShowNetworkSwitchDrawer] = useState(false);
 
   useEffect(() => {
     if (tokenBalances.length === 0) return;
@@ -144,16 +162,16 @@ export function SwapForm({ data }: SwapFromProps) {
     const fromOptions = tokenBalances
       .filter((b) => b.balance.gt(0))
       .map(
-        (t) => ({
-          id: formatTokenOptionsId(t.token.symbol, t.token.address),
-          name: t.token.name,
-          symbol: t.token.symbol,
-          icon: t.token.icon,
+        (tokenBalance) => ({
+          id: formatTokenOptionsId(tokenBalance.token.symbol, tokenBalance.token.address),
+          name: tokenBalance.token.name,
+          symbol: tokenBalance.token.symbol,
+          icon: tokenBalance.token.icon,
           balance: {
-            formattedAmount: tokenValueFormat(t.formattedBalance),
+            formattedAmount: tokenValueFormat(tokenBalance.formattedBalance),
             formattedFiatAmount: cryptoFiatState.conversions.size === 0 ? formatZeroAmount('') : calculateCryptoToFiat(
-              t.formattedBalance,
-              t.token.symbol || '',
+              tokenBalance.formattedBalance,
+              tokenBalance.token.symbol || '',
               cryptoFiatState.conversions,
             ),
           },
@@ -166,35 +184,35 @@ export function SwapForm({ data }: SwapFromProps) {
     if (!hasSetDefaultState.current) {
       hasSetDefaultState.current = true;
 
-      if (data?.fromContractAddress) {
+      if (data?.fromTokenAddress) {
         setFromToken(
-          allowedTokens.find((t) => (isNativeToken(t.address)
-              && data?.fromContractAddress?.toLowerCase() === NATIVE)
-              || t.address?.toLowerCase()
-                === data?.fromContractAddress?.toLowerCase()),
+          allowedTokens.find((token) => (isNativeToken(token.address)
+            && data?.fromTokenAddress?.toLowerCase() === NATIVE)
+            || token.address?.toLowerCase()
+            === data?.fromTokenAddress?.toLowerCase()),
         );
         setFromBalance(
           tokenBalances.find(
-            (t) => (
-              isNativeToken(t.token.address)
-                && data?.fromContractAddress?.toLowerCase() === NATIVE)
-              || (t.token.address?.toLowerCase() === data?.fromContractAddress?.toLowerCase()),
+            (tokenBalance) => (
+              isNativeToken(tokenBalance.token.address)
+              && data?.fromTokenAddress?.toLowerCase() === NATIVE)
+              || (tokenBalance.token.address?.toLowerCase() === data?.fromTokenAddress?.toLowerCase()),
           )?.formattedBalance ?? '',
         );
       }
 
-      if (shouldSetToAddress(data?.toContractAddress, data?.fromContractAddress)) {
-        setToToken(allowedTokens.find((t) => (
-          isNativeToken(t.address) && data?.toContractAddress?.toLowerCase() === NATIVE
-        ) || (t.address?.toLowerCase() === data?.toContractAddress?.toLowerCase())));
+      if (shouldSetToAddress(data?.toTokenAddress, data?.fromTokenAddress)) {
+        setToToken(allowedTokens.find((token) => (
+          isNativeToken(token.address) && data?.toTokenAddress?.toLowerCase() === NATIVE
+        ) || (token.address?.toLowerCase() === data?.toTokenAddress?.toLowerCase())));
       }
     }
   }, [
     tokenBalances,
     allowedTokens,
     cryptoFiatState.conversions,
-    data?.fromContractAddress,
-    data?.toContractAddress,
+    data?.fromTokenAddress,
+    data?.toTokenAddress,
     hasSetDefaultState.current,
     setFromToken,
     setFromBalance,
@@ -207,11 +225,11 @@ export function SwapForm({ data }: SwapFromProps) {
 
   const tokensOptionsTo = useMemo(() => allowedTokens
     .map(
-      (t) => ({
-        id: formatTokenOptionsId(t.symbol, t.address),
-        name: t.name,
-        symbol: t.symbol,
-        icon: undefined, // todo: add correct image once available on token info
+      (token) => ({
+        id: formatTokenOptionsId(token.symbol, token.address),
+        name: token.name,
+        symbol: token.symbol,
+        icon: token.icon,
       } as CoinSelectorOptionProps),
     ), [allowedTokens, fromToken]);
 
@@ -227,6 +245,22 @@ export function SwapForm({ data }: SwapFromProps) {
   // ------------------//
   //    FETCH QUOTES   //
   // ------------------//
+  const resetFormErrors = () => {
+    setFromAmountError('');
+    setFromTokenError('');
+    setToAmountError('');
+    setToTokenError('');
+  };
+
+  const resetQuote = () => {
+    if (quoteRequest) {
+      quoteRequest.cancel();
+    }
+    setSwapFromToConversionText('');
+    setGasFeeFiatValue('');
+    setQuote(null);
+  };
+
   const processFetchQuoteFrom = async (silently: boolean = false) => {
     if (!provider) return;
     if (!exchange) return;
@@ -234,28 +268,50 @@ export function SwapForm({ data }: SwapFromProps) {
     if (!toToken) return;
 
     try {
-      const result = await quotesProcessor.fromAmountIn(
+      if (!silently) setSwapFromToConversionText('');
+
+      const quoteResultPromise = quotesProcessor.fromAmountIn(
         exchange,
         provider,
         fromToken,
         fromAmount,
         toToken,
       );
+      const conversionResultPromise = quotesProcessor.fromAmountIn(
+        exchange,
+        provider,
+        fromToken,
+        '1',
+        toToken,
+      );
 
-      // Prevent to silently fetch and set a new quote
-      // if the user has updated and the widget is already
-      // fetching or the user is updating the inputs.
-      if (silently && (loading || editing)) return;
+      const currentQuoteRequest = CancellablePromise.all<TransactionResponse>([
+        quoteResultPromise,
+        conversionResultPromise,
+      ]);
+      quoteRequest = currentQuoteRequest;
 
-      const estimate = result.swap.gasFeeEstimate;
+      const resolved = await currentQuoteRequest;
+      const quoteResult = resolved[0];
+      const conversionResult = resolved[1];
+      setConversion(conversionResult.quote.amount.value);
+
+      const estimate = quoteResult.swap.gasFeeEstimate;
+      let gasFeeTotal = BigNumber.from(estimate?.value || 0);
+      if (quoteResult.approval?.gasFeeEstimate) {
+        gasFeeTotal = gasFeeTotal.add(quoteResult.approval.gasFeeEstimate.value);
+      }
       const gasFee = utils.formatUnits(
-        estimate?.value || 0,
+        gasFeeTotal,
         DEFAULT_TOKEN_DECIMALS,
       );
       const estimateToken = estimate?.token;
 
-      const gasToken = allowedTokens.find((token) => token.symbol === estimateToken?.symbol);
-      setQuote(result);
+      const gasToken = allowedTokens.find(
+        (token) => token.address?.toLocaleLowerCase() === estimateToken?.address?.toLocaleLowerCase(),
+      );
+
+      setQuote(quoteResult);
       setGasFeeValue(gasFee);
       setGasFeeToken({
         name: gasToken?.name || '',
@@ -272,23 +328,28 @@ export function SwapForm({ data }: SwapFromProps) {
 
       setToAmount(
         formatZeroAmount(
-          tokenValueFormat(utils.formatUnits(
-            result.quote.amount.value,
-            result.quote.amount.token.decimals,
-          )),
+          tokenValueFormat(
+            utils.formatUnits(
+              quoteResult.quote.amount.value,
+              quoteResult.quote.amount.token.decimals,
+            ),
+            quoteResult.quote.amount.token.decimals,
+          ),
         ),
       );
 
-      setFromAmountError('');
-      setFromTokenError('');
-      setToAmountError('');
-      setToTokenError('');
+      resetFormErrors();
     } catch (error: any) {
-      setQuote(null);
-      setShowNotEnoughImxDrawer(false);
-      setShowUnableToSwapDrawer(true);
+      if (!error.cancelled) {
+        resetQuote();
+        setShowNotEnoughImxDrawer(false);
+        setShowUnableToSwapDrawer(true);
+      }
     }
-    setIsFetching(false);
+
+    if (!silently) {
+      setLoading(false);
+    }
   };
 
   const processFetchQuoteTo = async (silently: boolean = false) => {
@@ -298,28 +359,47 @@ export function SwapForm({ data }: SwapFromProps) {
     if (!toToken) return;
 
     try {
-      const result = await quotesProcessor.fromAmountOut(
+      if (!silently) setSwapFromToConversionText('');
+
+      const quoteResultPromise = quotesProcessor.fromAmountOut(
         exchange,
         provider,
         toToken,
         toAmount,
         fromToken,
       );
+      const conversionResultPromise = quotesProcessor.fromAmountIn(
+        exchange,
+        provider,
+        fromToken,
+        '1',
+        toToken,
+      );
 
-      // Prevent to silently fetch and set a new quote
-      // if the user has updated and the widget is already
-      // fetching or the user is updating the inputs.
-      if (silently && (loading || editing)) return;
+      const currentQuoteRequest = CancellablePromise.all<TransactionResponse>([
+        quoteResultPromise,
+        conversionResultPromise,
+      ]);
+      quoteRequest = currentQuoteRequest;
+      const resolved = await currentQuoteRequest;
 
-      const estimate = result.swap.gasFeeEstimate;
+      const quoteResult = resolved[0];
+      const conversionResult = resolved[1];
+      setConversion(conversionResult.quote.amount.value);
+
+      const estimate = quoteResult.swap.gasFeeEstimate;
+      let gasFeeTotal = BigNumber.from(estimate?.value || 0);
+      if (quoteResult.approval?.gasFeeEstimate) {
+        gasFeeTotal = gasFeeTotal.add(quoteResult.approval.gasFeeEstimate.value);
+      }
       const gasFee = utils.formatUnits(
-        estimate?.value || 0,
+        gasFeeTotal,
         DEFAULT_TOKEN_DECIMALS,
       );
       const estimateToken = estimate?.token;
 
       const gasToken = allowedTokens.find((token) => token.symbol === estimateToken?.symbol);
-      setQuote(result);
+      setQuote(quoteResult);
       setGasFeeValue(gasFee);
       setGasFeeToken({
         name: gasToken?.name || '',
@@ -338,79 +418,72 @@ export function SwapForm({ data }: SwapFromProps) {
       setFromAmount(
         formatZeroAmount(
           tokenValueFormat(utils.formatUnits(
-            result.quote.amount.value,
-            result.quote.amount.token.decimals,
+            quoteResult.quote.amount.value,
+            quoteResult.quote.amount.token.decimals,
           )),
         ),
       );
 
-      setFromAmountError('');
-      setFromTokenError('');
-      setToAmountError('');
-      setToTokenError('');
+      resetFormErrors();
     } catch (error: any) {
-      setQuote(null);
-      setShowNotEnoughImxDrawer(false);
-      setShowUnableToSwapDrawer(true);
+      if (!error.cancelled) {
+        resetQuote();
+        setShowNotEnoughImxDrawer(false);
+        setShowUnableToSwapDrawer(true);
+      }
     }
 
-    setIsFetching(false);
+    if (!silently) {
+      setLoading(false);
+    }
   };
 
-  const canRunFromQuote = (): boolean => {
+  const canRunFromQuote = (silently: boolean): boolean => {
     if (Number.isNaN(parseFloat(fromAmount))) return false;
     if (parseFloat(fromAmount) <= 0) return false;
     if (!fromToken) return false;
     if (!toToken) return false;
-    if (isFetching) return false;
+    if (silently && loading) return false;
     return true;
   };
 
   const fetchQuoteFrom = async (silently: boolean = false) => {
-    if (!canRunFromQuote()) return;
+    if (!canRunFromQuote(silently)) return;
 
-    // setIsFetching within this if statement
-    // to allow the user to edit the form
-    // even if a new quote is fetch silently
+    // Cancel any existing quote
+    if (quoteRequest) {
+      quoteRequest.cancel();
+    }
+
     if (!silently) {
       setLoading(true);
-      setIsFetching(true);
     }
 
     await processFetchQuoteFrom(silently);
-
-    if (!silently) {
-      setLoading(false);
-      setIsFetching(false);
-    }
   };
 
-  const canRunToQuote = (): boolean => {
+  const canRunToQuote = (silently): boolean => {
     if (Number.isNaN(parseFloat(toAmount))) return false;
     if (parseFloat(toAmount) <= 0) return false;
     if (!fromToken) return false;
     if (!toToken) return false;
-    if (isFetching) return false;
+    if (silently && loading) return false;
     return true;
   };
 
   const fetchQuoteTo = async (silently: boolean = false) => {
-    if (!canRunToQuote()) return;
+    if (!canRunToQuote(silently)) return;
 
-    // setIsFetching within this if statement
-    // to allow the user to edit the form
-    // even if a new quote is fetch silently
+    // Cancel any existing quote
+    if (quoteRequest) {
+      quoteRequest.cancel();
+    }
+
     if (!silently) {
       setLoading(true);
-      setIsFetching(true);
     }
 
     await processFetchQuoteTo(silently);
-
-    if (!silently) {
-      setLoading(false);
-      setIsFetching(false);
-    }
   };
 
   const fetchQuote = async (silently: boolean = false) => {
@@ -423,17 +496,25 @@ export function SwapForm({ data }: SwapFromProps) {
 
   useEffect(() => {
     if (direction === SwapDirection.FROM) {
-      if (editing) return;
+      if (debouncedFromAmount <= 0) {
+        setLoading(false);
+        resetQuote();
+        return;
+      }
       (async () => await fetchQuote())();
     }
-  }, [fromAmount, fromToken, toToken, editing]);
+  }, [debouncedFromAmount, fromToken, toToken]);
 
   useEffect(() => {
     if (direction === SwapDirection.TO) {
-      if (editing) return;
+      if (debouncedToAmount <= 0) {
+        setLoading(false);
+        resetQuote();
+        return;
+      }
       (async () => await fetchQuote())();
     }
-  }, [toAmount, toToken, fromToken, editing]);
+  }, [debouncedToAmount, toToken, fromToken]);
 
   // during swaps, having enough IMX to cover the gas fee means
   // 1. swapping from any token to any token costs IMX - so do a check
@@ -468,38 +549,39 @@ export function SwapForm({ data }: SwapFromProps) {
 
   const onFromSelectChange = useCallback((value: OptionKey) => {
     const selected = tokenBalances
-      .find((t) => value === formatTokenOptionsId(t.token.symbol, t.token.address));
+      .find((tokenBalance) => value === formatTokenOptionsId(tokenBalance.token.symbol, tokenBalance.token.address));
     if (!selected) return;
 
     if (toToken && value === formatTokenOptionsId(toToken.symbol, toToken?.address)) {
       setToToken(undefined);
     }
-
     setFromToken(selected.token);
     setFromBalance(selected.formattedBalance);
     setFromTokenError('');
   }, [toToken]);
 
   const onFromTextInputFocus = () => {
-    setEditing(true);
     setDirection(SwapDirection.FROM);
   };
 
   const onFromTextInputChange = (value) => {
-    setFromAmount(value);
-    setFromAmountError('');
-  };
-
-  const onFromTextInputBlur = (value) => {
-    setEditing(false);
+    resetFormErrors();
+    resetQuote();
+    setToAmount('');
+    if (canRunFromQuote(false)) {
+      setLoading(true);
+    }
     setFromAmount(value);
   };
 
   const textInputMaxButtonClick = () => {
     if (!fromBalance) return;
     const fromBalanceTruncated = fromBalance.slice(0, fromBalance.indexOf('.') + DEFAULT_TOKEN_VALIDATION_DECIMALS + 1);
-    setFromAmount(fromBalanceTruncated);
+    resetFormErrors();
+    resetQuote();
+    setToAmount('');
     setDirection(SwapDirection.FROM);
+    setFromAmount(fromBalanceTruncated);
     track({
       userJourney: UserJourney.SWAP,
       screen: 'SwapCoins',
@@ -516,7 +598,7 @@ export function SwapForm({ data }: SwapFromProps) {
   //      TO     //
   // ------------//
   const onToSelectChange = useCallback((value: OptionKey) => {
-    const selected = allowedTokens.find((t) => value === formatTokenOptionsId(t.symbol, t.address));
+    const selected = allowedTokens.find((token) => value === formatTokenOptionsId(token.symbol, token.address));
     if (!selected) return;
 
     if (fromToken && value === formatTokenOptionsId(fromToken.symbol, fromToken?.address)) {
@@ -528,17 +610,17 @@ export function SwapForm({ data }: SwapFromProps) {
   }, [fromToken]);
 
   const onToTextInputFocus = () => {
-    setEditing(true);
     setDirection(SwapDirection.TO);
   };
 
   const onToTextInputChange = (value) => {
-    setToAmount(value);
-    setToAmountError('');
-  };
-
-  const onToTextInputBlur = (value) => {
-    setEditing(false);
+    resetFormErrors();
+    resetQuote();
+    setFromFiatValue('');
+    setFromAmount('');
+    if (canRunToQuote(false)) {
+      setLoading(true);
+    }
     setToAmount(value);
   };
 
@@ -547,24 +629,31 @@ export function SwapForm({ data }: SwapFromProps) {
     setShowNotEnoughImxDrawer(true);
   };
 
-  const { content, swapForm, fees } = text.views[SwapWidgetViews.SWAP];
   const SwapFormValidator = (): boolean => {
     const validateFromTokenError = validateFromToken(fromToken);
     const validateFromAmountError = validateFromAmount(fromAmount, fromBalance);
     const validateToTokenError = validateToToken(toToken);
     const validateToAmountError = validateToAmount(toAmount);
 
+    if (direction === SwapDirection.FROM) {
+      setToAmountError('');
+      if (validateFromAmountError) {
+        setFromAmountError(validateFromAmountError);
+      }
+    } else if (direction === SwapDirection.TO) {
+      setFromAmountError('');
+      if (validateToAmountError) {
+        setToAmountError(validateToAmountError);
+      }
+    }
     if (validateFromTokenError) setFromTokenError(validateFromTokenError);
-    if (validateFromAmountError) setFromAmountError(validateFromAmountError);
     if (validateToTokenError) setToTokenError(validateToTokenError);
-    if (validateToAmountError) setToAmountError(validateToAmountError);
-
     let isSwapFormValid = true;
     if (
       validateFromTokenError
-      || validateFromAmountError
       || validateToTokenError
-      || validateToAmountError) isSwapFormValid = false;
+      || (validateFromAmountError && direction === SwapDirection.FROM)
+      || (validateToAmountError && direction === SwapDirection.TO)) isSwapFormValid = false;
 
     track({
       userJourney: UserJourney.SWAP,
@@ -586,29 +675,36 @@ export function SwapForm({ data }: SwapFromProps) {
   };
 
   useEffect(() => {
+    if (!quote || !conversion) return;
     setSwapFromToConversionText(swapValuesToText({
       swapFromToken: fromToken,
       swapFromAmount: fromAmount,
       swapToToken: toToken,
       swapToAmount: toAmount,
+      conversion,
     }).fromToConversion);
-  }, [quote]);
+  }, [quote, conversion]);
 
   return (
     <>
-      <Box sx={{ paddingX: 'base.spacing.x4' }}>
+      <Box sx={{
+        paddingX: 'base.spacing.x4',
+        marginBottom: 'base.spacing.x2',
+      }}
+      >
         <Heading
           size="small"
           weight="regular"
           sx={{ paddingBottom: 'base.spacing.x4' }}
         >
-          {content.title}
+          {t('views.SWAP.content.title')}
         </Heading>
         <Box
           sx={{
             display: 'flex',
             flexDirection: 'column',
             rowGap: 'base.spacing.x6',
+            paddingBottom: 'base.spacing.x2',
           }}
         >
 
@@ -622,22 +718,23 @@ export function SwapForm({ data }: SwapFromProps) {
                 paddingBottom: 'base.spacing.x1',
               }}
             >
-              {swapForm.from.label}
+              {t('views.SWAP.swapForm.from.label')}
             </Heading>
             <SelectInput
               testId="fromTokenInputs"
               options={tokensOptionsFrom}
               selectSubtext={
                 fromToken
-                  ? `${content.availableBalancePrefix} ${tokenValueFormat(
+                  ? `${t('views.SWAP.content.availableBalancePrefix')} ${tokenValueFormat(
                     fromBalance,
                   )}`
                   : ''
               }
               selectTextAlign="left"
+              textInputType="number"
               textInputValue={fromAmount}
-              textInputPlaceholder={swapForm.from.inputPlaceholder}
-              textInputSubtext={`${content.fiatPricePrefix} 
+              textInputPlaceholder={t('views.SWAP.swapForm.from.inputPlaceholder')}
+              textInputSubtext={`${t('views.SWAP.content.fiatPricePrefix')} 
               $${formatZeroAmount(
                 fromFiatValue,
                 true,
@@ -645,18 +742,16 @@ export function SwapForm({ data }: SwapFromProps) {
               textInputTextAlign="right"
               textInputValidator={textInputValidator}
               onTextInputChange={(v) => onFromTextInputChange(v)}
-              onTextInputBlur={(v) => onFromTextInputBlur(v)}
               onTextInputFocus={onFromTextInputFocus}
               textInputMaxButtonClick={textInputMaxButtonClick}
               onSelectChange={onFromSelectChange}
-              textInputErrorMessage={fromAmountError}
-              selectErrorMessage={fromTokenError}
-              selectInputDisabled={isFetching}
-              textInputDisabled={isFetching}
+              textInputErrorMessage={t(fromAmountError)}
+              selectErrorMessage={t(fromTokenError)}
               selectedOption={fromToken
                 ? formatTokenOptionsId(fromToken.symbol, fromToken.address)
                 : undefined}
-              coinSelectorHeading={swapForm.from.selectorTitle}
+              coinSelectorHeading={t('views.SWAP.swapForm.from.selectorTitle')}
+              defaultTokenImage={defaultTokenImage}
             />
           </Box>
 
@@ -669,7 +764,7 @@ export function SwapForm({ data }: SwapFromProps) {
                 paddingBottom: 'base.spacing.x1',
               }}
             >
-              <Heading size="xSmall">{swapForm.to.label}</Heading>
+              <Heading size="xSmall">{t('views.SWAP.swapForm.to.label')}</Heading>
               <Body
                 sx={{
                   color: 'base.color.brand.4',
@@ -683,31 +778,48 @@ export function SwapForm({ data }: SwapFromProps) {
               testId="toTokenInputs"
               options={tokensOptionsTo}
               selectTextAlign="left"
+              textInputType="number"
               textInputValue={toAmount}
-              textInputPlaceholder={swapForm.to.inputPlaceholder}
+              textInputPlaceholder={t('views.SWAP.swapForm.to.inputPlaceholder')}
               textInputTextAlign="right"
               textInputValidator={textInputValidator}
               onTextInputChange={(v) => onToTextInputChange(v)}
-              onTextInputBlur={(v) => onToTextInputBlur(v)}
               onTextInputFocus={onToTextInputFocus}
               onSelectChange={onToSelectChange}
-              textInputErrorMessage={toAmountError}
-              selectErrorMessage={toTokenError}
-              selectInputDisabled={isFetching}
-              textInputDisabled={isFetching}
+              textInputErrorMessage={t(toAmountError)}
+              selectErrorMessage={t(toTokenError)}
               selectedOption={toToken
                 ? formatTokenOptionsId(toToken.symbol, toToken.address)
                 : undefined}
-              coinSelectorHeading={swapForm.to.selectorTitle}
+              coinSelectorHeading={t('views.SWAP.swapForm.to.selectorTitle')}
+              defaultTokenImage={defaultTokenImage}
             />
           </Box>
         </Box>
         <Fees
-          title={fees.title}
-          fiatPricePrefix={content.fiatPricePrefix}
           gasFeeFiatValue={gasFeeFiatValue}
           gasFeeToken={gasFeeToken}
           gasFeeValue={gasFeeValue}
+          fees={[
+            {
+              label: t('drawers.feesBreakdown.fees.gasFeeSwap.label'),
+              fiatAmount: `~ ${t('drawers.feesBreakdown.fees.fiatPricePrefix')}${gasFeeFiatValue}`,
+              amount: tokenValueFormat(gasFeeValue),
+              prefix: '~',
+            },
+          ]}
+          onFeesClick={() => {
+            track({
+              userJourney: UserJourney.SWAP,
+              screen: 'SwapCoins',
+              control: 'ViewFees',
+              controlType: 'Button',
+            });
+          }}
+          sx={{
+            paddingBottom: '0',
+          }}
+          loading={loading}
         />
       </Box>
       <SwapButton
@@ -721,14 +833,16 @@ export function SwapForm({ data }: SwapFromProps) {
           fromAmount,
           toAmount,
           fromTokenSymbol: fromToken?.symbol,
-          fromContractAddress: fromToken?.address,
+          fromTokenAddress: fromToken?.address,
           toTokenSymbol: toToken?.symbol,
-          toContractAddress: toToken?.address,
+          toTokenAddress: toToken?.address,
         }}
         insufficientFundsForGas={insufficientFundsForGas}
         openNotEnoughImxDrawer={openNotEnoughImxDrawer}
+        openNetworkSwitchDrawer={() => setShowNetworkSwitchDrawer(true)}
       />
       <NotEnoughImx
+        environment={checkout?.config.environment ?? Environment.PRODUCTION}
         visible={showNotEnoughImxDrawer}
         showAdjustAmount={fromToken?.address === NATIVE}
         hasZeroImx={false}
@@ -740,24 +854,31 @@ export function SwapForm({ data }: SwapFromProps) {
                 type: SharedViews.TOP_UP_VIEW,
               },
               currentViewData: {
-                fromContractAddress: fromToken?.address ?? '',
+                fromTokenAddress: fromToken?.address ?? '',
                 fromAmount,
-                toContractAddress: toToken?.address ?? '',
+                toTokenAddress: toToken?.address ?? '',
               },
             },
           });
         }}
-        onCloseBottomSheet={() => setShowNotEnoughImxDrawer(false)}
+        onCloseDrawer={() => setShowNotEnoughImxDrawer(false)}
       />
       <UnableToSwap
         visible={showUnableToSwapDrawer}
-        onCloseBottomSheet={() => {
+        onCloseDrawer={() => {
           setShowUnableToSwapDrawer(false);
           setFromToken(undefined);
           setFromAmount('');
           setToToken(undefined);
           setToAmount('');
         }}
+      />
+      <NetworkSwitchDrawer
+        visible={showNetworkSwitchDrawer}
+        targetChainId={getL2ChainId(checkout?.config!)}
+        provider={provider!}
+        checkout={checkout!}
+        onCloseDrawer={() => setShowNetworkSwitchDrawer(false)}
       />
     </>
   );

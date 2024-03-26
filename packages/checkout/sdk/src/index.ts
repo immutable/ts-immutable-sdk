@@ -9,11 +9,16 @@ export * from './widgets/definitions/configurations';
 // SDKs
 
 export { Checkout } from './sdk';
+
+export { IMMUTABLE_API_BASE_URL } from './env';
+
 export {
   ChainId,
   ChainName,
+  ChainSlug,
   CheckoutStatus,
   ExchangeType,
+  FeeType,
   FundingStepType,
   GasEstimateType,
   GasTokenType,
@@ -24,7 +29,9 @@ export {
   TransactionOrGasType,
   WalletFilterTypes,
   WalletProviderName,
+  WalletProviderRdns,
 } from './types';
+
 export type {
   AllowedNetworkConfig,
   AvailableRoutingOptions,
@@ -32,15 +39,20 @@ export type {
   BridgeFundingStep,
   BuyOrder,
   BuyParams,
+  BuyOverrides,
   BuyResult,
   BuyResultFailed,
   BuyResultInsufficientFunds,
   BuyResultSuccess,
+  BuyResultFulfillmentsUnsettled,
   BuyToken,
   CancelParams,
+  CancelOverrides,
   CancelResult,
   CancelResultFailed,
+  CancelResultGasless,
   CancelResultSuccess,
+  CancelResultFulfillmentsUnsettled,
   CheckConnectionParams,
   CheckConnectionResult,
   CheckoutModuleConfiguration,
@@ -55,6 +67,7 @@ export type {
   ERC20ItemRequirement,
   ERC721Balance,
   ERC721ItemRequirement,
+  FailedGaslessCancellation,
   Fee,
   FeePercentage,
   FeeToken,
@@ -76,6 +89,7 @@ export type {
   GetNetworkAllowListParams,
   GetNetworkAllowListResult,
   GetNetworkParams,
+  GetTokenInfoParams,
   GetTokenAllowListParams,
   GetTokenAllowListResult,
   GetWalletAllowListParams,
@@ -89,6 +103,7 @@ export type {
   OnRampFundingStep,
   OrderFee,
   OnRampProviderFees,
+  PendingGaslessCancellation,
   RemoteConfiguration,
   RoutesFound,
   RoutingOutcome,
@@ -106,6 +121,7 @@ export type {
   SmartCheckoutResult,
   SmartCheckoutRouter,
   SmartCheckoutSufficient,
+  SuccessfulGaslessCancellation,
   SwapFundingStep,
   SwitchNetworkParams,
   SwitchNetworkResult,
@@ -117,7 +133,9 @@ export type {
   WalletFilter,
   WalletInfo,
 } from './types';
+
 export type { ErrorType } from './errors';
+
 export { CheckoutErrorType } from './errors';
 export { CheckoutConfiguration } from './config';
-export { CHECKOUT_API_BASE_URL } from './env';
+export { BlockExplorerService } from './blockExplorer';

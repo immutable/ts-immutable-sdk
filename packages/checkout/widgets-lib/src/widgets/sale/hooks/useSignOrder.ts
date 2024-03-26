@@ -2,25 +2,19 @@
 import { useCallback, useState } from 'react';
 import { SaleItem } from '@imtbl/checkout-sdk';
 
-import { Environment } from '@imtbl/config';
 import {
   SignResponse,
   SignOrderInput,
-  PaymentTypes,
-
   SignedOrderProduct,
   SignOrderError,
   ExecuteOrderResponse,
   ExecutedTransaction,
   SaleErrorTypes,
+  SignPaymentTypes,
 } from '../types';
-
-const PRIMARY_SALES_API_BASE_URL = {
-  [Environment.SANDBOX]:
-    'https://api.sandbox.immutable.com/v1/primary-sales',
-  [Environment.PRODUCTION]:
-    'https://api.immutable.com/v1/primary-sales',
-};
+import { PRIMARY_SALES_API_BASE_URL } from '../utils/config';
+import { hexToText } from '../functions/utils';
+import { filterAllowedTransactions } from '../functions/signUtils';
 
 type SignApiTransaction = {
   contract_address: string;
@@ -40,12 +34,13 @@ type SignApiTransaction = {
 };
 
 type SignApiProduct = {
+  product_id: string;
+  collection_address: string;
+  contract_type: string;
   detail: {
     amount: number;
-    collection_address: string;
     token_id: string;
   }[];
-  product_id: string;
 };
 
 type SignApiResponse = {
@@ -97,9 +92,10 @@ const toSignedProduct = (
   name: item?.name || '',
   description: item?.description || '',
   currency,
-  collectionAddress: product.detail[0]?.collection_address,
+  contractType: product.contract_type,
+  collectionAddress: product.collection_address,
   amount: product.detail.map(({ amount }) => amount),
-  tokenId: product.detail.map(({ token_id: tokenId }) => Number(tokenId)),
+  tokenId: product.detail.map(({ token_id: tokenId }) => tokenId),
 });
 
 const toSignResponse = (
@@ -137,7 +133,7 @@ const toSignResponse = (
       totalAmount: Number(order.total_amount),
     },
     transactions: transactions.map((transaction) => ({
-      contractAddress: transaction.contract_address,
+      tokenAddress: transaction.contract_address,
       gasEstimate: transaction.gas_estimate,
       methodCall: transaction.method_call,
       params: {
@@ -147,17 +143,16 @@ const toSignResponse = (
       },
       rawData: transaction.raw_data,
     })),
+    transactionId: hexToText(
+      transactions.find((txn) => txn.method_call.startsWith('execute'))?.params
+        .reference || '',
+    ),
   };
 };
 
 export const useSignOrder = (input: SignOrderInput) => {
   const {
-    provider,
-    items,
-    fromContractAddress,
-    recipientAddress,
-    env,
-    environmentId,
+    provider, items, recipientAddress, environment, environmentId,
   } = input;
   const [signError, setSignError] = useState<SignOrderError | undefined>(
     undefined,
@@ -169,12 +164,21 @@ export const useSignOrder = (input: SignOrderInput) => {
     done: false,
     transactions: [],
   });
+  const [tokenIds, setTokenIds] = useState<string[]>([]);
 
   const setExecuteTransactions = (transaction: ExecutedTransaction) => {
-    setExecuteResponse((prev) => ({ ...prev, transactions: [...prev.transactions, transaction] }));
+    setExecuteResponse((prev) => ({
+      ...prev,
+      transactions: [...prev.transactions, transaction],
+    }));
   };
 
   const setExecuteDone = () => setExecuteResponse((prev) => ({ ...prev, done: true }));
+
+  const setExecuteFailed = () => setExecuteResponse({
+    done: false,
+    transactions: [],
+  });
 
   const sendTransaction = useCallback(
     async (
@@ -182,7 +186,8 @@ export const useSignOrder = (input: SignOrderInput) => {
       data: string,
       gasLimit: number,
       method: string,
-    ): Promise<string | undefined> => {
+      waitForTrnsactionSettlement: boolean,
+    ): Promise<[hash: string | undefined, error: any]> => {
       let transactionHash: string | undefined;
 
       try {
@@ -196,16 +201,24 @@ export const useSignOrder = (input: SignOrderInput) => {
         });
 
         setExecuteTransactions({ method, hash: txnResponse?.hash });
-        await txnResponse?.wait(1);
 
-        transactionHash = txnResponse?.hash;
-        return transactionHash;
-      } catch (e) {
-        // TODO: check error type to send
-        // SaleErrorTypes.WALLET_REJECTED or SaleErrorTypes.WALLET_REJECTED_NO_FUNDS
+        if (waitForTrnsactionSettlement) {
+          await txnResponse?.wait();
+        }
 
-        const reason = typeof e === 'string' ? e : (e as any).reason || '';
-        let errorType = SaleErrorTypes.TRANSACTION_FAILED;
+        transactionHash = txnResponse?.hash || '';
+        return [transactionHash, undefined];
+      } catch (err) {
+        const reason = `${
+          (err as any)?.reason || (err as any)?.message || ''
+        }`.toLowerCase();
+        transactionHash = (err as any)?.transactionHash;
+
+        let errorType = SaleErrorTypes.WALLET_FAILED;
+
+        if (reason.includes('failed') && reason.includes('open confirmation')) {
+          errorType = SaleErrorTypes.WALLET_POPUP_BLOCKED;
+        }
 
         if (reason.includes('rejected') && reason.includes('user')) {
           errorType = SaleErrorTypes.WALLET_REJECTED;
@@ -218,57 +231,42 @@ export const useSignOrder = (input: SignOrderInput) => {
           errorType = SaleErrorTypes.WALLET_REJECTED_NO_FUNDS;
         }
 
+        if (
+          reason.includes('status failed')
+          || reason.includes('transaction failed')
+        ) {
+          errorType = SaleErrorTypes.TRANSACTION_FAILED;
+        }
+
         setSignError({
           type: errorType,
-          data: { error: e },
+          data: { error: err },
         });
-        return undefined;
+
+        return [undefined, err];
       }
     },
     [provider],
   );
 
-  const expirePrevSignedOrder = useCallback(async () => {
-    const reference = signResponse?.transactions
-      .find((txn) => txn.methodCall.startsWith('execute'))?.params.reference;
-
-    if (!reference) return;
-
-    try {
-      const baseUrl = `${PRIMARY_SALES_API_BASE_URL[env]}/${environmentId}/order/expire`;
-      const response = await fetch(baseUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reference }),
-      });
-
-      if (!response.ok) {
-        const { code, message } = (await response.json()) as SignApiError;
-        throw new Error(code, { cause: message });
-      }
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.warn(`Failed to expire transaction with ref: '${reference}'`, e);
-    }
-  }, [signResponse, env, environmentId]);
-
   const sign = useCallback(
-    async (paymentType: PaymentTypes): Promise<SignResponse | undefined> => {
+    async (
+      paymentType: SignPaymentTypes,
+      fromTokenAddress: string,
+    ): Promise<SignResponse | undefined> => {
       try {
-        await expirePrevSignedOrder();
-
         const data: SignApiRequest = {
           recipient_address: recipientAddress,
           payment_type: paymentType,
           currency_filter: SignCurrencyFilter.CONTRACT_ADDRESS,
-          currency_value: fromContractAddress,
+          currency_value: fromTokenAddress,
           products: items.map((item) => ({
             product_id: item.productId,
             quantity: item.qty,
           })),
         };
 
-        const baseUrl = `${PRIMARY_SALES_API_BASE_URL[env]}/${environmentId}/order/sign`;
+        const baseUrl = `${PRIMARY_SALES_API_BASE_URL[environment]}/${environmentId}/order/sign`;
         const response = await fetch(baseUrl, {
           method: 'POST',
           headers: {
@@ -277,56 +275,103 @@ export const useSignOrder = (input: SignOrderInput) => {
           body: JSON.stringify(data),
         });
 
-        if (!response.ok) {
-          const { code, message } = (await response.json()) as SignApiError;
-          throw new Error(code, { cause: message });
+        const { ok, status } = response;
+        if (!ok) {
+          const { code } = (await response.json()) as SignApiError;
+          let errorType: SaleErrorTypes;
+          switch (status) {
+            case 400:
+              errorType = SaleErrorTypes.SERVICE_BREAKDOWN;
+              break;
+            case 404:
+              if (code === 'insufficient_stock') {
+                errorType = SaleErrorTypes.INSUFFICIENT_STOCK;
+              } else {
+                errorType = SaleErrorTypes.PRODUCT_NOT_FOUND;
+              }
+              break;
+            case 429:
+            case 500:
+              errorType = SaleErrorTypes.DEFAULT;
+              break;
+            default:
+              throw new Error('Unknown error');
+          }
+
+          setSignError({ type: errorType });
+          return undefined;
         }
 
-        const responseData = toSignResponse(await response.json(), items);
+        const apiResponse: SignApiResponse = await response.json();
+        const apiTokenIds = apiResponse.order.products
+          .map((product) => product.detail.map(({ token_id }) => token_id))
+          .flat();
+
+        const responseData = toSignResponse(apiResponse, items);
+
+        setTokenIds(apiTokenIds);
         setSignResponse(responseData);
 
         return responseData;
-      } catch (e) {
+      } catch (e: any) {
         setSignError({ type: SaleErrorTypes.DEFAULT, data: { error: e } });
       }
       return undefined;
     },
-    [items, fromContractAddress, recipientAddress, environmentId, env, provider, expirePrevSignedOrder],
+    [items, recipientAddress, environmentId, environment, provider],
   );
 
   const execute = async (
     signData: SignResponse | undefined,
+    waitForTrnsactionSettlement: boolean,
+    onTxnSuccess: (txn: ExecutedTransaction) => void,
+    onTxnError: (error: any, txns: ExecutedTransaction[]) => void,
   ): Promise<ExecutedTransaction[]> => {
-    if (!signData) {
+    if (!signData || !provider) {
       setSignError({
         type: SaleErrorTypes.DEFAULT,
         data: { reason: 'No sign data' },
       });
+
       return [];
     }
+
     let successful = true;
     const execTransactions: ExecutedTransaction[] = [];
-    for (const transaction of signData.transactions) {
+
+    const transactions = await filterAllowedTransactions(
+      signData.transactions,
+      provider,
+    );
+
+    for (const transaction of transactions) {
       const {
-        contractAddress: to,
+        tokenAddress: to,
         rawData: data,
         methodCall: method,
         gasEstimate,
       } = transaction;
       // eslint-disable-next-line no-await-in-loop
-      const hash = await sendTransaction(to, data, gasEstimate, method);
+      const [hash, txnError] = await sendTransaction(
+        to,
+        data,
+        gasEstimate,
+        method,
+        waitForTrnsactionSettlement,
+      );
 
-      if (!hash) {
+      if (txnError || !hash) {
         successful = false;
+        onTxnError(txnError, execTransactions);
         break;
       }
 
       execTransactions.push({ method, hash });
+      onTxnSuccess({ method, hash });
     }
 
-    if (successful) {
-      setExecuteDone();
-    }
+    (successful ? setExecuteDone : setExecuteFailed)();
+
     return execTransactions;
   };
 
@@ -336,5 +381,6 @@ export const useSignOrder = (input: SignOrderInput) => {
     signError,
     execute,
     executeResponse,
+    tokenIds,
   };
 };

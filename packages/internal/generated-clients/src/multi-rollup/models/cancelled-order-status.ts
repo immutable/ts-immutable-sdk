@@ -21,7 +21,7 @@
  */
 export interface CancelledOrderStatus {
     /**
-     * The order status
+     * The order status indicating a order is has been cancelled or about to be cancelled.
      * @type {string}
      * @memberof CancelledOrderStatus
      */
@@ -31,7 +31,7 @@ export interface CancelledOrderStatus {
      * @type {boolean}
      * @memberof CancelledOrderStatus
      */
-    'is_pending': boolean;
+    'pending': boolean;
     /**
      * Whether the cancellation was done on-chain or off-chain
      * @type {string}

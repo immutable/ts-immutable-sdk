@@ -1,6 +1,5 @@
-import { onDarkBase } from '@biom3/design-tokens';
-import { BiomeCombinedProviders } from '@biom3/react';
 import { mount } from 'cypress/react18';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
 import { FooterButton } from './FooterButton';
 import { cySmartGet } from '../../lib/testUtils';
@@ -8,7 +7,7 @@ import { cySmartGet } from '../../lib/testUtils';
 describe('Footer Button', () => {
   it('should have right aligned large button', () => {
     mount(
-      <BiomeCombinedProviders theme={{ base: onDarkBase }}>
+      <ViewContextTestComponent>
         <SimpleLayout
           footer={(
             <FooterButton
@@ -18,7 +17,7 @@ describe('Footer Button', () => {
             />
           )}
         />
-      </BiomeCombinedProviders>,
+      </ViewContextTestComponent>,
     );
 
     cySmartGet('footer-button-container').should('exist');
@@ -38,7 +37,7 @@ describe('Footer Button', () => {
 
   it('should hide button when configured', () => {
     mount(
-      <BiomeCombinedProviders theme={{ base: onDarkBase }}>
+      <ViewContextTestComponent>
         <SimpleLayout
           footer={(
             <FooterButton
@@ -49,7 +48,7 @@ describe('Footer Button', () => {
             />
           )}
         />
-      </BiomeCombinedProviders>,
+      </ViewContextTestComponent>,
     );
 
     cySmartGet('footer-button-container').should('exist');
@@ -58,7 +57,7 @@ describe('Footer Button', () => {
 
   it('should show loading icon when configured', () => {
     mount(
-      <BiomeCombinedProviders theme={{ base: onDarkBase }}>
+      <ViewContextTestComponent>
         <SimpleLayout
           footer={(
             <FooterButton
@@ -69,7 +68,7 @@ describe('Footer Button', () => {
             />
           )}
         />
-      </BiomeCombinedProviders>,
+      </ViewContextTestComponent>,
     );
 
     cySmartGet('footer-button-container').should('exist');

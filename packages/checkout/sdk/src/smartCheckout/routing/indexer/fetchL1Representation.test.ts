@@ -4,13 +4,15 @@ import { createBlockchainDataInstance } from '../../../instance';
 import { ChainId } from '../../../types';
 import { fetchL1Representation } from './fetchL1Representation';
 import { NATIVE } from '../../../env';
+import { HttpClient } from '../../../api/http';
 
 jest.mock('../../../instance');
 
 describe('fetchL1Representation', () => {
+  const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
   const config = new CheckoutConfiguration({
     baseConfig: { environment: Environment.SANDBOX },
-  });
+  }, mockedHttpClient);
 
   it('should fetch L1 representation of ERC20', async () => {
     const requiredL2Address = '0x123';

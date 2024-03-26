@@ -32,7 +32,7 @@ jobs:
     name: Publish Workflow
     runs-on: ubuntu-latest-4-cores
     env:
-      GH_TOKEN: ${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}
+      GH_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
       NODE_OPTIONS: --max-old-space-size=14366
       SDK_PUBLISH_SLACK_WEBHOOK: ${{ secrets.SDK_PUBLISH_SLACK_WEBHOOK }}
     steps:
@@ -44,11 +44,12 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          token: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
 
       - name: Setup Github
         run: |
-          git config user.name "${GITHUB_ACTOR}"
-          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git config user.name "platform-sa"
+          git config user.email "platform-sa@users.noreply.github.com"
 
       - name: Get tags
         run: git fetch --tags
@@ -56,8 +57,8 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: lts/*
-          cache: 'yarn'
+          node-version-file: .nvmrc
+          cache: "yarn"
 
       - name: Workout next version string
         run: |
@@ -110,7 +111,7 @@ jobs:
         id: pre_release
         uses: JS-DevTools/npm-publish@v3
         with:
-          token: ${{ secrets.PLATFORM_SA_NPM_TOKEN }}
+          token: ${{ secrets.TS_IMMUTABLE_SDK_NPM_TOKEN }}
           access: public
           package: ./sdk/package.json
           tag: ${{ contains(github.event.inputs.release_type, 'alpha') && 'alpha' }}
@@ -118,22 +119,29 @@ jobs:
 
       - name: Authenticate NPM
         if: contains(github.event.inputs.release_type, 'release')
-        run: npm config set //registry.npmjs.org/:_authToken ${{ secrets.PLATFORM_SA_NPM_TOKEN }}
+        run: npm config set //registry.npmjs.org/:_authToken ${{ secrets.TS_IMMUTABLE_SDK_NPM_TOKEN }}
 
       - name: Release
         id: npm_release
         if: contains(github.event.inputs.release_type, 'release')
-        run: yarn release --ci --no-increment -c .release-it.json $( ${{ github.event.inputs.dry_run }} && echo "--dry-run" || echo "") --github.tokenRef=${{ secrets.RELEASE_TOKEN }}
+        run: yarn release --ci --no-increment -c .release-it.json $( ${{ github.event.inputs.dry_run }} && echo "--dry-run" || echo "") --github.tokenRef=${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
 
-      # Wait for 60 seconds to make sure the tag is available on GitHub
+      - name: Warm up CDN
+        id: warm_up_cdn
+        if: contains(github.event.inputs.release_type, 'release')
+        run: |
+          wget https://cdn.jsdelivr.net/npm/@imtbl/sdk/dist/browser/checkout/widgets.js
+          wget https://cdn.jsdelivr.net/npm/@imtbl/sdk/dist/browser/checkout/sdk.js
+
+      # Wait for 30 seconds to make sure the tag is available on GitHub
       - uses: GuillaumeFalourd/wait-sleep-action@v1
         with:
-          time: '60'
+          time: "30"
 
       - name: Create GitHub Release
         id: gh_release
         if: contains(github.event.inputs.release_type, 'release') && github.event.inputs.dry_run == 'false'
-        run: gh release create ${{ steps.version.outputs.NEXT_VERSION }} --title ${{ steps.version.outputs.NEXT_VERSION }} --draft=false --prerelease=false --generate-notes --repo immutable/ts-immutable-sdk
+        run: gh release create ${{ steps.version.outputs.NEXT_VERSION }} --title ${{ steps.version.outputs.NEXT_VERSION }} --draft=false --prerelease=false --generate-notes --repo immutable/ts-immutable-sdk --target main
 
       - name: Get GitHub Release Name and URL
         if: contains(github.event.inputs.release_type, 'release') && github.event.inputs.dry_run == 'false'
@@ -146,10 +154,10 @@ jobs:
         if: ${{ success() && (steps.npm_release.conclusion == 'success' || steps.pre_release.conclusion == 'success') && github.event.inputs.dry_run == 'false' }}
         uses: ./.github/actions/notify-slack-publish-status
         with:
-          message: "✅ Successfully published SDK version ${{steps.version.outputs.NEXT_VERSION}} to NPM.\n\nhttps://www.npmjs.com/package/@imtbl/sdk/v/${{steps.version.outputs.NEXT_VERSION}}"
+          message: "✅ ${{ github.triggering_actor }} successfully published SDK version ${{steps.version.outputs.NEXT_VERSION}} to NPM.\n\nhttps://www.npmjs.com/package/@imtbl/sdk/v/${{steps.version.outputs.NEXT_VERSION}}"
 
       - name: Notify SDK Slack Publish Failure
         if: ${{ failure() && (steps.npm_release.conclusion == 'failure' || steps.pre_release.conclusion == 'failure' || steps.gh_release.conclusion == 'failure') && github.event.inputs.dry_run == 'false' }}
         uses: ./.github/actions/notify-slack-publish-status
         with:
-          message: "❌ Failed to publish SDK version ${{steps.version.outputs.NEXT_VERSION}} to NPM. Please check the logs for more details."
+          message: "❌ Failed to publish SDK version ${{steps.version.outputs.NEXT_VERSION}} to NPM. ${{ github.triggering_actor }} please check the logs for more details."

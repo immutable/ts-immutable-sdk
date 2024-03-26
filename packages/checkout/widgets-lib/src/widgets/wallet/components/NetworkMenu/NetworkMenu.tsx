@@ -11,8 +11,9 @@ import {
   NetworkInfo,
   SwitchNetworkParams,
 } from '@imtbl/checkout-sdk';
+import { logoColour, networkIcon } from 'lib';
+import { useTranslation } from 'react-i18next';
 import { WalletContext } from '../../context/WalletContext';
-import { text } from '../../../../resources/text/textConfig';
 import { sendNetworkSwitchEvent } from '../../WalletWidgetEvents';
 import {
   activeNetworkButtonStyle,
@@ -27,41 +28,19 @@ import {
   ViewActions,
   SharedViews,
 } from '../../../../context/view-context/ViewContext';
-import { WalletWidgetViews } from '../../../../context/view-context/WalletViewContextTypes';
 import {
   ConnectLoaderContext,
 } from '../../../../context/connect-loader-context/ConnectLoaderContext';
 import { EventTargetContext } from '../../../../context/event-target-context/EventTargetContext';
 import { UserJourney, useAnalytics } from '../../../../context/analytics-provider/SegmentAnalyticsProvider';
 
-const logoColour = {
-  [ChainId.IMTBL_ZKEVM_DEVNET]: 'base.color.text.link.primary',
-  [ChainId.IMTBL_ZKEVM_TESTNET]: 'base.color.text.link.primary',
-  [ChainId.IMTBL_ZKEVM_MAINNET]: 'base.color.text.link.primary',
-  [ChainId.ETHEREUM]: 'base.color.accent.5',
-  [ChainId.SEPOLIA]: 'base.color.accent.5',
-};
-
-// todo: add corresponding network symbols
-const networkIcon = {
-  [ChainId.IMTBL_ZKEVM_DEVNET]: 'Immutable',
-  [ChainId.IMTBL_ZKEVM_MAINNET]: 'Immutable',
-  [ChainId.IMTBL_ZKEVM_TESTNET]: 'Immutable',
-  [ChainId.ETHEREUM]: 'EthToken',
-  [ChainId.SEPOLIA]: 'EthToken',
-};
-
-export interface NetworkMenuProps {
-  setBalancesLoading: (loading: boolean) => void;
-}
-
-export function NetworkMenu({ setBalancesLoading }: NetworkMenuProps) {
+export function NetworkMenu() {
+  const { t } = useTranslation();
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
   const { checkout, provider } = connectLoaderState;
   const { viewDispatch } = useContext(ViewContext);
   const { walletState, walletDispatch } = useContext(WalletContext);
-  const { networkStatus } = text.views[WalletWidgetViews.WALLET_BALANCES];
   const { network } = walletState;
   const [allowedNetworks, setNetworks] = useState<NetworkInfo[] | undefined>(
     [],
@@ -82,8 +61,6 @@ export function NetworkMenu({ setBalancesLoading }: NetworkMenuProps) {
       });
 
       try {
-        setBalancesLoading(true);
-
         const switchNetworkResult = await checkout.switchNetwork({
           provider,
           chainId,
@@ -91,7 +68,6 @@ export function NetworkMenu({ setBalancesLoading }: NetworkMenuProps) {
 
         sendNetworkSwitchEvent(eventTarget, switchNetworkResult.provider, switchNetworkResult.network);
       } catch (err: any) {
-        setBalancesLoading(false);
         if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
           // ignore error
         } else {
@@ -123,7 +99,7 @@ export function NetworkMenu({ setBalancesLoading }: NetworkMenuProps) {
   return (
     <Box testId="network-menu" sx={networkMenuStyles}>
       <Body testId="network-heading" size="medium" sx={networkHeadingStyle}>
-        {networkStatus.heading}
+        {t('views.WALLET_BALANCES.networkStatus.heading')}
       </Body>
       <HorizontalMenu>
         {checkout

@@ -1,0 +1,673 @@
+{
+  "views": {
+    "CONNECT_WALLET": {
+      "body": {
+        "heading": "Connect a wallet",
+        "content": "You'll need to connect or create a digital wallet to buy, sell, trade and store your coins and collectibles."
+      },
+      "walletSelection": {
+        "heading": "Choose a wallet"
+      }
+    },
+    "CONNECT_SUCCESS": {
+      "status": "Connection secure",
+      "action": "Continue"
+    },
+    "READY_TO_CONNECT": {
+      "header": {
+        "title": "Connect"
+      },
+      "metamask": {
+        "body": {
+          "heading": "Check for the pop-up from MetaMask",
+          "content": "Follow the prompts in the MetaMask popup to connect"
+        },
+        "footer": {
+          "buttonText1": "Ready to connect",
+          "buttonText2": "Try again"
+        }
+      },
+      "passport": {
+        "body": {
+          "heading": "Connect with Immutable Passport",
+          "content": "Follow the prompts to connect with Immutable Passport"
+        },
+        "footer": {
+          "buttonText1": "Continue",
+          "buttonText2": "Try again"
+        }
+      }
+    },
+    "SWITCH_NETWORK": {
+      "eth": {
+        "heading": "You'll need to switch to the {{networkName}} network",
+        "body": "You'll be prompted to switch networks in your wallet.",
+        "button": {
+          "text": "Ready to Switch",
+          "retryText": "Try Again"
+        }
+      },
+      "zkEVM": {
+        "heading": "You’ll be asked to switch to the Immutable zkEVM network",
+        "body": "Check for the pop-up from MetaMask and 'Approve' to switch. If this is the first time, MetaMask will also ask you to add the network.",
+        "bodyWalletConnect": "Check for the pop-up from your wallet to switch. If this is the first time, your wallet will also ask you to add the network.",
+        "button": {
+          "text": "Ready to Switch",
+          "retryText": "Try Again"
+        }
+      }
+    },
+    "ERROR_VIEW": {
+      "heading": "Something's gone wrong",
+      "body": ["You can try again or contact", "support", "for help."],
+      "actionText": "Try again"
+    },
+    "SERVICE_UNAVAILABLE_ERROR_VIEW": {
+      "heading": {
+        "swap": "Swapping is not available in your region"
+      },
+      "body": {
+        "swap": "Please refer to <quickswapLink>Quickswap’s</quickswapLink> website for further information."
+      }
+    },
+    "LOADING_VIEW": {
+      "text": "Loading"
+    },
+    "WALLET_BALANCES": {
+      "header": {
+        "title": "Wallet"
+      },
+      "networkStatus": {
+        "heading": "Network"
+      },
+      "totalTokenBalance": {
+        "heading": "Coins",
+        "totalHeading": "Value"
+      },
+      "tokenBalancesList": {
+        "noTokensFound": "No tokens found"
+      },
+      "addCoins": "Add coins"
+    },
+    "SETTINGS": {
+      "header": {
+        "title": "Settings"
+      },
+      "disconnectButton": {
+        "label": "Disconnect Wallet"
+      }
+    },
+    "COIN_INFO": {
+      "metamask": {
+        "heading": "Coins and collectibles are native to networks",
+        "body": "You can switch networks to add coins or move them from one network to another"
+      },
+      "passport": {
+        "heading": "Coins and collectibles are native to networks",
+        "body1": "This network is called Immutable zkEVM. If you have other coins in your Passport and can’t see them here, they might be on another network. ",
+        "body2": " for more info.",
+        "linkText": "Visit our FAQs"
+      }
+    },
+    "SWAP": {
+      "header": {
+        "title": "Swap coins"
+      },
+      "content": {
+        "title": "What would you like to swap?",
+        "fiatPricePrefix": "~ USD",
+        "availableBalancePrefix": "Available"
+      },
+      "swapForm": {
+        "from": {
+          "label": "From",
+          "inputPlaceholder": "0",
+          "selectorTitle": "What would you like to swap from?"
+        },
+        "to": {
+          "label": "To",
+          "inputPlaceholder": "0",
+          "selectorTitle": "What would you like to swap to?"
+        },
+        "buttonText": "Swap"
+      },
+      "fees": {
+        "title": "Fees total"
+      },
+      "validation": {
+        "noAmountInputted": "Please input amount",
+        "insufficientBalance": "Insufficient balance",
+        "noFromTokenSelected": "Select a coin to swap",
+        "noToTokenSelected": "Select a coin to receive"
+      },
+      "success": {
+        "text": "Success",
+        "actionText": "Continue"
+      },
+      "failed": {
+        "text": "Transaction rejected",
+        "actionText": "Try again"
+      },
+      "rejected": {
+        "text": "Price surge",
+        "actionText": "Review & try again"
+      },
+      "IN_PROGRESS": {
+        "loading": {
+          "text": "Swap in progress"
+        }
+      }
+    },
+    "APPROVE_ERC20": {
+      "approveSwap": {
+        "content": {
+          "heading": "Now you'll just need to confirm the transaction",
+          "body": "Follow the prompts in your wallet."
+        },
+        "footer": {
+          "buttonText": "Okay",
+          "retryText": "Try again"
+        }
+      },
+      "approveSpending": {
+        "content": {
+          "metamask": {
+            "heading": "You'll be asked to set a spending cap for this transaction",
+            "body": "Input at least {{amount}} for this transaction and future transactions, then follow the prompts."
+          },
+          "passport": {
+            "heading": "You'll be asked to approve a spending cap for this transaction",
+            "body": "Follow the prompts in your wallet to approve the spending cap."
+          }
+        },
+        "footer": {
+          "buttonText": "Got it",
+          "retryText": "Try again"
+        },
+        "loading": {
+          "text": "Approving spending cap"
+        }
+      }
+    },
+    "ONRAMP": {
+      "header": {
+        "title": "Add coins"
+      },
+      "initialLoadingText": "Taking you to Transak",
+      "IN_PROGRESS_LOADING": {
+        "loading": {
+          "text": "Transak is processing your order"
+        }
+      },
+      "IN_PROGRESS": {
+        "content": {
+          "heading": "Order in progress",
+          "body1": "You’ll receive an email from Transak when complete. This can take up to 3 mins.",
+          "body2": "You can close this window, the transaction will be reflected in your wallet once complete."
+        }
+      },
+      "SUCCESS": {
+        "text": "Coins are on the way",
+        "actionText": "Done"
+      },
+      "FAIL": {
+        "text": "Transaction failed",
+        "actionText": "Try again"
+      }
+    },
+    "TOP_UP_VIEW": {
+      "header": {
+        "title": "How would you like to add coins?"
+      },
+      "topUpOptions": {
+        "onramp": {
+          "heading": "Buy",
+          "caption": "With card, Google pay or Apple pay available.",
+          "subcaption": "Fees ",
+          "disabledCaption": ""
+        },
+        "swap": {
+          "heading": "Swap",
+          "caption": "With the coins I have in my balance.",
+          "subcaption": "Fees",
+          "disabledCaption": "Not available in your region"
+        },
+        "bridge": {
+          "heading": "Move",
+          "caption": "The coins I have in another wallet or network.",
+          "subcaption": "Fees ",
+          "disabledCaption": ""
+        }
+      }
+    },
+    "FUND_WITH_SMART_CHECKOUT": {
+      "loading": {
+        "checkingBalances": "Crunching numbers"
+      },
+      "currency": {
+        "usdEstimate": "≈ USD $",
+        "fees": "Fees"
+      },
+      "fundingRouteDrawer": {
+        "header": "Available balance"
+      },
+      "fundingRouteSelect": {
+        "heading": "Pay with your",
+        "noRoutesAvailable": "Insufficient coin balance. Please proceed with card instead.",
+        "continue": "Continue",
+        "payWithCardInstead": "No thanks, I'll pay with card",
+        "payWithCard": "Pay with card"
+      }
+    },
+    "PAYMENT_METHODS": {
+      "header": {
+        "heading": "How would you like to pay?"
+      },
+      "options": {
+        "crypto": {
+          "heading": "Coins",
+          "caption": "Pay with the coins in your wallet, or buy coins with card",
+          "disabledCaption": "Currently not available for this purchase"
+        },
+        "debit": {
+          "heading": "Debit Card",
+          "caption": "The recommended way to pay with card.",
+          "disabledCaption": "Currently working on this. Proceed with Coins & you’ll be guided on how to add them if needed."
+        },
+        "credit": {
+          "heading": "Credit Card",
+          "caption": "Not recommended since transactions may be blocked by your bank.",
+          "disabledCaption": "Currently working on this. Proceed with Coins & you’ll be guided on how to add them if needed."
+        }
+      },
+      "topUp": {
+        "heading": "You’ll need to add some coins",
+        "subheading": {
+          "both": "Add {{erc20.value}} {{erc20.symbol}} and {{native.value}} {{native.symbol}} to cover this purchase plus gas.",
+          "erc20": "Add {{erc20.value}} {{erc20.symbol}} to your balance through one of the following options.",
+          "native": "Add {{native.value}} {{native.symbol}} for gas, through one of the following options."
+        }
+      },
+      "loading": {
+        "ready1": "Collecting your order",
+        "ready2": "Talking to wallet",
+        "ready3": "Readying assets",
+        "processing1": "Initialising payment",
+        "processing2": "Securing your assets",
+        "processing3": "Finalising payment"
+      }
+    },
+    "PAY_WITH_COINS": {
+      "header": {
+        "heading": "Pay with your",
+        "caption": "Using the coins balance in your wallet"
+      },
+      "button": {
+        "buyNow": "Buy now"
+      }
+    },
+    "PAY_WITH_CARD": {
+      "screenTitle": "Pay with card",
+      "loading": "Taking you to Transak"
+    },
+    "SALE_FAIL": {
+      "errors": {
+        "TRANSACTION_FAILED": {
+          "description": "Transaction failed",
+          "primaryAction": "Try again",
+          "secondaryAction": "View details"
+        },
+        "SERVICE_BREAKDOWN": {
+          "description": "Sorry, we're unable to process your payment right now. Please try again in a few minutes.",
+          "secondaryAction": "Dismiss"
+        },
+        "PRODUCT_NOT_FOUND": {
+          "description": "Sorry, this item is no longer available",
+          "secondaryAction": "Dismiss"
+        },
+        "INSUFFICIENT_STOCK": {
+          "description": "Sorry, the requested quantity is not in stock. Consider buying a smaller quantity.",
+          "secondaryAction": "Dismiss"
+        },
+        "TRANSAK_FAILED": {
+          "description": "Sorry, something went wrong. Please try again.",
+          "primaryAction": "Try again",
+          "secondaryAction": "Dismiss"
+        },
+        "WALLET_FAILED": {
+          "description": "Sorry, we're unable to process this right now.",
+          "primaryAction": "Go back",
+          "secondaryAction": "Dismiss"
+        },
+        "WALLET_REJECTED_NO_FUNDS": {
+          "description": "Sorry, something went wrong. Please try again.",
+          "primaryAction": "Go back",
+          "secondaryAction": "Dismiss"
+        },
+        "WALLET_REJECTED": {
+          "description": "You'll need to approve the transaction in your wallet to proceed.",
+          "primaryAction": "Try again",
+          "secondaryAction": "Cancel"
+        },
+        "WALLET_POPUP_BLOCKED": {
+          "description": "You'll need to allow pop-ups in your browser to proceed.",
+          "primaryAction": "I've fixed this, Try again",
+          "secondaryAction": "Cancel"
+        },
+        "SMART_CHECKOUT_ERROR": {
+          "description": "Unable to check your wallets balance. Please try again.",
+          "primaryAction": "Try again",
+          "secondaryAction": "Cancel"
+        },
+        "SMART_CHECKOUT_EXECUTE_ERROR": {
+          "description": "Sorry, something went wrong while moving funds. Please try again.",
+          "primaryAction": "Try again",
+          "secondaryAction": "Cancel"
+        },
+        "DEFAULT_ERROR": {
+          "description": "Sorry, something went wrong. Please try again.",
+          "primaryAction": "Try again",
+          "secondaryAction": "Dismiss"
+        },
+        "INVALID_PARAMETERS": {
+          "description": "Sorry, we're unable to process your order. Missing information from client",
+          "secondaryAction": "Dismiss"
+        }
+      }
+    },
+    "SALE_SUCCESS": {
+      "text": "Order completed",
+      "actionText": "Continue"
+    },
+    "WALLET_NETWORK_SELECTION": {
+      "layoutHeading": "Move",
+      "heading": "Where would you like to move funds between?",
+      "fromFormInput": {
+        "heading": "From",
+        "selectDefaultText": "Select wallet and network",
+        "walletSelectorHeading": "From wallet",
+        "networkSelectorHeading": "From network"
+      },
+      "toFormInput": {
+        "heading": "To",
+        "selectDefaultText": "Select wallet and network",
+        "walletSelectorHeading": "To wallet"
+      },
+      "submitButton": {
+        "text": "Next"
+      }
+    },
+    "BRIDGE_FORM": {
+      "header": {
+        "title": "Move coins"
+      },
+      "fees": {
+        "title": "Gas Fee",
+        "fiatPricePrefix": "~ USD $"
+      },
+      "content": {
+        "title": "How much would you like to move?",
+        "fiatPricePrefix": "~ USD",
+        "availableBalancePrefix": "Available"
+      },
+      "bridgeForm": {
+        "from": {
+          "inputPlaceholder": "0",
+          "selectorTitle": "What would you like to move?"
+        },
+        "buttonText": "Review"
+      },
+      "validation": {
+        "noAmountInputted": "Please input amount",
+        "insufficientBalance": "Insufficient balance",
+        "noTokenSelected": "Select a coin to move"
+      }
+    },
+    "BRIDGE_REVIEW": {
+      "layoutHeading": "Move",
+      "heading": "Ok, how does this look?",
+      "fromLabel": {
+        "amountHeading": "Moving",
+        "heading": "From"
+      },
+      "toLabel": {
+        "heading": "To"
+      },
+      "fees": {
+        "heading": "Gas fee"
+      },
+      "submitButton": {
+        "buttonText": "Confirm move"
+      },
+      "fiatPricePrefix": "~ USD $"
+    },
+    "BRIDGE_FAILURE": {
+      "bridgeFailureText": {
+        "statusText": "Transaction failed",
+        "actionText": "Review & Try again"
+      }
+    },
+    "APPROVE_TRANSACTION": {
+      "content": {
+        "heading": "Approve the transaction in your wallet",
+        "body": "Follow the prompts in your wallet popup to confirm."
+      },
+      "footer": {
+        "buttonText": "Okay",
+        "retryText": "Try again"
+      },
+      "loadingView": {
+        "text": "Initiating move"
+      }
+    },
+    "IN_PROGRESS": {
+      "heading": "Move in progress",
+      "body1": "Your funds have been sent, with less than 20 mins remaining until they're received. You can return and view progress by clicking on the rocket icon.",
+      "body2": "You can close this window."
+    },
+    "TRANSACTIONS": {
+      "layoutHeading": "In progress",
+      "passportDashboard": "View the full transaction history in your",
+      "status": {
+        "withdrawalPending": {
+          "actionButtonText": "Proceed",
+          "withdrawalDelayText": "This move has been paused, please return ",
+          "withdrawalReadyText": "Action required to receive your coins",
+          "caption": "Paused"
+        },
+        "inProgress": {
+          "heading": "In Progress",
+          "txnEstimate": "Usually takes 20 mins",
+          "stepInfo": "View Details"
+        },
+        "emptyState": {
+          "notConnected": {
+            "body": "Connect your wallet to view the transactions",
+            "buttonText": "Connect"
+          }
+        },
+        "noTransactions": {
+          "body": "You're all done here.",
+          "passport": {
+            "body": "View your completed transactions in ",
+            "link": "Passport"
+          }
+        }
+      },
+      "changeWallet": {
+        "buttonText": "Change wallet"
+      },
+      "fiatPricePrefix": "~ USD $",
+      "support": {
+        "body1": "Need help?",
+        "body2": " Contact ",
+        "body3": "support",
+        "supportLink": "https://support.immutable.com/en/",
+        "passport": {
+          "body1": "Or view completed transactions in your ",
+          "body2": "Passport"
+        }
+      },
+      "walletSelection": {
+        "heading": "Choose a wallet to view"
+      }
+    },
+    "CLAIM_WITHDRAWAL": {
+      "content": {
+        "heading": "Follow the prompts to receive your coins on ",
+        "body": "You’ll be asked to pay a small gas fee to claim your withdrawal.",
+        "body2": "Destination wallet address: "
+      },
+      "footer": {
+        "buttonText": "Continue",
+        "retryText": "Try again"
+      },
+      "IN_PROGRESS": {
+        "loading": {
+          "text": "Processing"
+        },
+        "success": {
+          "text": "Success",
+          "actionText": "Done"
+        },
+        "failure": {
+          "text": "Transaction failed",
+          "actionText": "Try again"
+        }
+      }
+    }
+  },
+  "footers": {
+    "quickswapFooter": {
+      "disclaimerText": "Quickswap is a third party app. Immutable neither builds, owns, operates or deploys Quickswap. For further info, refer to Quickswap’s website."
+    }
+  },
+  "wallets": {
+    "passport": {
+      "heading": "Immutable Passport",
+      "description": "Your gaming wallet to pay with card, manage items & more."
+    },
+    "metamask": {
+      "heading": "MetaMask",
+      "description": "Digital wallet for accessing blockchain applications and web3."
+    },
+    "walletconnect": {
+      "heading": "Other wallets",
+      "description": "Allows you to connect with any blockchain mobile wallet including MetaMask."
+    },
+    "browserwallet": {
+      "heading": "Browser wallets",
+      "description": "Digital wallet for accessing blockchain applications and web3."
+    },
+    "recommended": "Recommended"
+  },
+  "drawers": {
+    "feesBreakdown": {
+      "heading": "Fees",
+      "total": "Total fees",
+      "fees": {
+        "fiatPricePrefix": "USD $",
+        "gasFeeSwap": {
+          "label": "Gas fee swap"
+        },
+        "gasFeeMove": {
+          "label": "Gas fee move"
+        },
+        "gasFeeApproval": {
+          "label": "Gas fee approval"
+        },
+        "serviceFee": {
+          "label": "Service fee"
+        }
+      }
+    },
+    "transactionFailed": {
+      "content": {
+        "heading1": "We’ll need you to confirm in your",
+        "heading2": "wallet before proceeding",
+        "body1": "When the MetaMask pop up appears, be sure to",
+        "body2": "sign the transaction"
+      },
+      "buttons": {
+        "retry": "Got it",
+        "cancel": "Dismiss"
+      }
+    },
+    "coinSelector": {
+      "option": {
+        "fiatPricePrefix": "~ USD $"
+      },
+      "noCoins": "You have no available coins to select in your wallet."
+    },
+    "notEnoughGas": {
+      "content": {
+        "heading": "You'll need more {{token}} for gas",
+        "body": "Your {{token}} balance is too low to cover the gas fee on this move, so you'll need to add more before proceeding."
+      },
+      "buttons": {
+        "adjustAmount": "Adjust amount",
+        "addMoreImx": "Add IMX coins",
+        "copyAddress": "Copy wallet address",
+        "cancel": "Dismiss"
+      }
+    },
+    "notEnoughImx": {
+      "content": {
+        "noImx": {
+          "heading": "You'll need IMX coins to swap",
+          "body": "Swap fees are paid in IMX coins, so you'll need to add this before you can swap"
+        },
+        "insufficientImx": {
+          "heading": "You'll need more IMX coins",
+          "body": "In order to cover the fees for the amount specified, you'll need to add more IMX coins"
+        }
+      },
+      "buttons": {
+        "adjustAmount": "Adjust amount",
+        "addMoreImx": "Add IMX coins",
+        "cancel": "Dismiss"
+      }
+    },
+    "notEnoughEthWithdrawal": {
+      "content": {
+        "heading1": "Insufficient",
+        "heading2": "for gas",
+        "body1": "Add",
+        "body2": "to your destination account, or select another account to pay the gas. Your destination account will remain the same."
+      },
+      "buttons": {
+        "retry": "Pay gas with another account",
+        "dismiss": "Dismiss"
+      }
+    },
+    "unableToSwap": {
+      "heading": "Unable to swap this coin",
+      "body": "This coin pairing isn't available to swap right now. Try another selection.",
+      "buttons": {
+        "cancel": "Dismiss"
+      }
+    },
+    "networkSwitch": {
+      "heading": "Switch network in your {{wallet}}",
+      "manualSwitch": {
+        "body": "You'll need to open your mobile wallet and switch to the {{chain}} network to proceed"
+      },
+      "controlledSwitch": {
+        "body": "You'll need to switch to the {{chain}} network to proceed"
+      },
+      "switchButton": "Switch to {{chain}}"
+    },
+    "walletConnectionError": {
+      "unableToConnect": {
+        "heading": "Unable to connect",
+        "body": "Check your wallet and try again, or close and try a different option",
+        "actionButtonText": "Try again"
+      },
+      "changedYourMind": {
+        "heading": "Changed your mind?",
+        "body": "Make sure pop ups are enabled and follow the prompts in your wallet to connect",
+        "actionButtonText": "Try again"
+      }
+    }
+  }
+}

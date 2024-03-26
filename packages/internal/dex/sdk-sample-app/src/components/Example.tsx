@@ -18,7 +18,13 @@ type mapping = {
   [address: string]: string;
 };
 
-const allTokens: Token[] = [
+const mainnetTokens: Token[] = [
+  { symbol: 'IMX', address: 'native' },
+  { symbol: 'ETH', address: '0x52a6c53869ce09a731cd772f245b97a4401d3348' },
+  { symbol: 'USDC', address: '0x6de8aCC0D406837030CE4dd28e7c08C5a96a30d2' },
+];
+
+const testnetTokens: Token[] = [
   { symbol: 'IMX', address: 'native' },
   { symbol: 'WIMX', address: '0x1CcCa691501174B4A623CeDA58cC8f1a76dc3439' },
   { symbol: 'zkTDR', address: '0x6531F7B9158d78Ca78b46799c4Fd65C2Af8Ae506' },
@@ -27,7 +33,12 @@ const allTokens: Token[] = [
   { symbol: 'zkSRE', address: '0x43566cAB87CC147C95e2895E7b972E19993520e4' },
   { symbol: 'zkCORE', address: '0x4B96E7b7eA673A996F140d5De411a97b7eab934E' },
   { symbol: 'zkWAT', address: '0xaC953a0d7B67Fae17c87abf79f09D0f818AC66A2' },
+  { symbol: 'zkCATS', address: '0xb95B75B4E4c09F04d5DA6349861BF1b6F163D78c' },
+  { symbol: 'zkYEET', address: '0x8AC26EfCbf5D700b37A27aA00E6934e6904e7B8e' },
 ];
+
+/// @dev Update this to change tokens used in the app
+const allTokens = testnetTokens;
 
 const buildExchange = (secondaryFeeRecipient: string, secondaryFeePercentage: number) => {
   if (secondaryFeeRecipient && secondaryFeePercentage) {
@@ -73,6 +84,7 @@ export function Example() {
   const getQuote = async (tokenInAddress: string, tokenOutAddress: string) => {
     setIsFetching(true);
     setError(null);
+    setApproved(false);
 
     try {
       const exchange = buildExchange(secondaryFeeRecipient, secondaryFeePercentage);
@@ -109,7 +121,7 @@ export function Example() {
   const performSwap = async (result: TransactionResponse) => {
     setSwapTransaction(null);
     setIsFetching(true);
-    const provider = new ethers.providers.Web3Provider((window as any).ethereum)
+    const provider = new ethers.providers.Web3Provider((window as any).ethereum);
     const signer = provider.getSigner();
 
     // Approve the ERC20 spend
@@ -157,13 +169,13 @@ export function Example() {
         </div>
         <div>
           <select
+            className='dark:bg-slate-800'
             value={tradeType}
             onChange={(e) => {
               setTradeType(e.target.value as TradeType);
               setResult(null);
-              setSwapTransaction(null)
-            }}
-          >
+              setSwapTransaction(null);
+            }}>
             <option>exactInput</option>
             <option>exactOutput</option>
           </select>
@@ -176,6 +188,7 @@ export function Example() {
         </div>
         <div>
           <select
+            className='dark:bg-slate-800'
             value={inputToken.address}
             onChange={(e) => {
               setInputToken({
@@ -183,9 +196,8 @@ export function Example() {
                 symbol: addressToSymbolMapping[e.target.value],
               });
               setResult(null);
-              setSwapTransaction(null)
-            }}
-          >
+              setSwapTransaction(null);
+            }}>
             {allTokens.map((token) => (
               <option key={token.address} value={token.address}>
                 {token.symbol}
@@ -201,6 +213,7 @@ export function Example() {
         </div>
         <div>
           <select
+            className='dark:bg-slate-800'
             value={outputToken.address}
             onChange={(e) => {
               setOutputToken({
@@ -208,9 +221,8 @@ export function Example() {
                 symbol: addressToSymbolMapping[e.target.value],
               });
               setResult(null);
-              setSwapTransaction(null)
-            }}
-          >
+              setSwapTransaction(null);
+            }}>
             {allTokens.map((token) => (
               <option key={token.address} value={token.address}>
                 {token.symbol}
@@ -220,7 +232,7 @@ export function Example() {
         </div>
       </div>
 
-      <hr className="my-4" />
+      <hr className='my-4' />
 
       <SecondaryFeeInput setSecondaryFeeRecipient={setSecondaryFeeRecipient} setFeePercentage={setFeePercentage} />
       {tradeType === 'exactInput' && inputToken && (
@@ -232,15 +244,14 @@ export function Example() {
 
       {inputToken && outputToken && (
         <button
-          className="disabled:opacity-50 mt-2 py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
+          className='disabled:opacity-50 mt-2 py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75'
           onClick={() => getQuote(inputToken.address, outputToken.address)}
-          disabled={isFetching}
-        >
+          disabled={isFetching}>
           Get Quote
         </button>
       )}
 
-      <hr className="my-4" />
+      <hr className='my-4' />
       {error && <ErrorMessage message={error} />}
       {result && (
         <>
@@ -262,10 +273,9 @@ export function Example() {
 
           <>
             <button
-              className="disabled:opacity-50 mt-2 py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
+              className='disabled:opacity-50 mt-2 py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75'
               onClick={() => performSwap(result)}
-              disabled={isFetching}
-            >
+              disabled={isFetching}>
               {approved ? 'Swap' : 'Approve'}
             </button>
             {isFetching && <h3>loading...</h3>}
@@ -275,10 +285,9 @@ export function Example() {
                   Swap successful! Check your metamask to see updated token balances
                 </h3>
                 <a
-                  className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+                  className='underline text-blue-600 hover:text-blue-800 visited:text-purple-600'
                   href={`https://explorer.testnet.immutable.com/tx/${swapTransaction.transactionHash}`}
-                  target="_blank"
-                >
+                  target='_blank'>
                   Transaction
                 </a>
               </>

@@ -32,10 +32,10 @@ import { getAllBalances, getBalance, getERC20Balance } from './balances';
 import { sendTransaction } from './transaction';
 import { gasEstimator } from './gasEstimate';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
-import { checkIsWalletConnected, connectSite } from './connect';
+import { checkIsWalletConnected, connectSite, requestPermissions } from './connect';
 import * as network from './network';
 import { createProvider, isWeb3Provider, validateProvider } from './provider';
-import { getTokenAllowList } from './tokens';
+import { getERC20TokenInfo, getTokenAllowList } from './tokens';
 import { getWalletAllowList } from './wallet';
 import { buy } from './smartCheckout/buy';
 import { sell } from './smartCheckout/sell';
@@ -93,7 +93,7 @@ describe('Connect', () => {
     );
   });
 
-  it('should call the connectWalletProvider function', async () => {
+  it('should call the connectSite function', async () => {
     const checkout = new Checkout({
       baseConfig: { environment: Environment.PRODUCTION },
     });
@@ -103,6 +103,49 @@ describe('Connect', () => {
     });
 
     expect(connectSite).toBeCalledTimes(1);
+  });
+
+  it(`should call the requestPermissions function if requestWalletPermissions is
+  true and provider is not Passport`, async () => {
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.PRODUCTION },
+    });
+
+    const provider = new Web3Provider(providerMock, ChainId.ETHEREUM);
+    (validateProvider as jest.Mock).mockResolvedValue(provider);
+
+    await checkout.connect({
+      provider,
+      requestWalletPermissions: true,
+    });
+
+    expect(connectSite).not.toHaveBeenCalled();
+    expect(requestPermissions).toBeCalledWith(provider);
+  });
+
+  it(`should call the connectSite function if requestWalletPermissions is
+  true and provider is Passport`, async () => {
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.PRODUCTION },
+    });
+
+    const requestMock = jest.fn();
+    providerMock = {
+      isPassport: true,
+      request: requestMock,
+    } as unknown as ExternalProvider;
+    requestMock.mockResolvedValue('0x1');
+
+    const provider = new Web3Provider(providerMock, ChainId.ETHEREUM);
+    (validateProvider as jest.Mock).mockResolvedValue(provider);
+
+    await checkout.connect({
+      provider,
+      requestWalletPermissions: true,
+    });
+
+    expect(connectSite).toBeCalledTimes(1);
+    expect(requestPermissions).not.toBeCalled();
   });
 
   it('should call getBalance when no contract address provided', async () => {
@@ -137,12 +180,29 @@ describe('Connect', () => {
     await checkout.getBalance({
       provider,
       walletAddress: '0x123',
-      contractAddress: '0x456',
+      tokenAddress: '0x456',
     } as GetBalanceParams);
 
     expect(getBalance).toBeCalledTimes(0);
     expect(getERC20Balance).toBeCalledTimes(1);
     expect(getERC20Balance).toBeCalledWith(provider, '0x123', '0x456');
+  });
+
+  it('should call getTokenInfo', async () => {
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.PRODUCTION },
+    });
+
+    const provider = new Web3Provider(providerMock, ChainId.ETHEREUM);
+    (getERC20TokenInfo as jest.Mock).mockResolvedValue({});
+
+    await checkout.getTokenInfo({
+      provider,
+      tokenAddress: '0x456',
+    });
+
+    expect(getERC20TokenInfo).toBeCalledTimes(1);
+    expect(getERC20TokenInfo).toBeCalledWith(provider, '0x456');
   });
 
   it('should call the switchWalletNetwork function', async () => {
@@ -482,7 +542,7 @@ describe('Connect', () => {
     });
 
     expect(buy).toBeCalledTimes(1);
-    expect(buy).toBeCalledWith(checkout.config, provider, [{ id: '1', takerFees: [] }]);
+    expect(buy).toBeCalledWith(checkout.config, provider, [{ id: '1', takerFees: [] }], undefined);
   });
 
   it('should call sell function', async () => {
@@ -546,6 +606,7 @@ describe('Connect', () => {
       checkout.config,
       provider,
       ['1234'],
+      undefined,
     );
   });
 
@@ -599,7 +660,7 @@ describe('Connect', () => {
       provider,
       itemRequirements: [{
         type: ItemType.ERC20,
-        contractAddress: '0xNOADDRESS',
+        tokenAddress: '0xNOADDRESS',
         spenderAddress: '0xSPENDER',
         amount: '1.5',
       }],
@@ -698,6 +759,7 @@ describe('Connect', () => {
         tokenAmount: undefined,
         tokenSymbol: 'IMX',
         email: undefined,
+        allowedTokens: [],
       });
     });
 
@@ -742,6 +804,7 @@ describe('Connect', () => {
         tokenAmount: '10',
         tokenSymbol: 'ETH',
         email: undefined,
+        allowedTokens: ['ETH', 'MATIC'],
       });
     });
 
@@ -785,6 +848,7 @@ describe('Connect', () => {
         tokenAmount: '10',
         tokenSymbol: 'IMX',
         email: undefined,
+        allowedTokens: ['IMX', 'ETH', 'MATIC'],
       });
     });
 
@@ -808,6 +872,7 @@ describe('Connect', () => {
       const mockPassport = {
         getUserInfo: jest.fn().mockResolvedValue(mockUser),
       } as unknown as Passport;
+      (getTokenAllowList as jest.Mock).mockResolvedValue([]);
 
       const params: FiatRampParams = {
         exchangeType: ExchangeType.ONRAMP,

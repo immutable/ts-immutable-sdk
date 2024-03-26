@@ -1,17 +1,17 @@
 import { Box } from '@biom3/react';
 
+import { SalePaymentTypes } from '@imtbl/checkout-sdk';
 import { PaymentOption } from './PaymentOption';
 
-import { PaymentTypes } from '../types';
-
-const defaultPaymentOptions: PaymentTypes[] = [
-  PaymentTypes.FIAT,
-  PaymentTypes.CRYPTO,
+const defaultPaymentOptions: SalePaymentTypes[] = [
+  SalePaymentTypes.CRYPTO,
+  SalePaymentTypes.DEBIT,
+  SalePaymentTypes.CREDIT,
 ];
 
 export interface PaymentOptionsProps {
-  onClick: (type: PaymentTypes) => void;
-  disabledOptions?: PaymentTypes[];
+  onClick: (type: SalePaymentTypes) => void;
+  disabledOptions?: SalePaymentTypes[];
 }
 
 export function PaymentOptions(props: PaymentOptionsProps) {
@@ -33,7 +33,7 @@ export function PaymentOptions(props: PaymentOptionsProps) {
           disabled={disabledOptions.includes(type)}
           onClick={onClick}
           type={type}
-          key={type}
+          key={`${Math.random()}-${type}`}
         />
       ))}
     </Box>

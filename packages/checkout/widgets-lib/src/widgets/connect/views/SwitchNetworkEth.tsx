@@ -1,13 +1,14 @@
 import {
   useCallback, useContext, useEffect, useState,
 } from 'react';
+import { useTranslation } from 'react-i18next';
+import { getChainNameById } from 'lib/chains';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../../components/Footer/FooterButton';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { EthereumPlanetHero } from '../../../components/Hero/EthereumPlanetHero';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
-import { text } from '../../../resources/text/textConfig';
 import { ConnectActions, ConnectContext } from '../context/ConnectContext';
 import { getL1ChainId } from '../../../lib/networkUtils';
 import {
@@ -17,12 +18,11 @@ import {
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 export function SwitchNetworkEth() {
+  const { t } = useTranslation();
   const { viewDispatch } = useContext(ViewContext);
   const { connectDispatch, connectState } = useContext(ConnectContext);
   const { checkout, provider, sendCloseEvent } = connectState;
-  const { heading, body, button } = text.views[ConnectWidgetViews.SWITCH_NETWORK].eth;
-
-  const [buttonText, setButtonText] = useState(button.text);
+  const [buttonTextKey, setButtonTextKey] = useState(t('views.SWITCH_NETWORK.eth.button.text'));
 
   const { page, track } = useAnalytics();
 
@@ -64,7 +64,7 @@ export function SwitchNetworkEth() {
         },
       });
     } catch (err: any) {
-      setButtonText(button.retryText);
+      setButtonTextKey(t('views.SWITCH_NETWORK.eth.button.retryText'));
     }
   }, [provider, checkout, track]);
 
@@ -79,14 +79,20 @@ export function SwitchNetworkEth() {
       )}
       footer={(
         <FooterButton
-          actionText={buttonText}
+          actionText={t(buttonTextKey)}
           onActionClick={switchNetwork}
         />
       )}
       heroContent={<EthereumPlanetHero />}
       floatHeader
     >
-      <SimpleTextBody heading={heading}>{body}</SimpleTextBody>
+      <SimpleTextBody
+        heading={t('views.SWITCH_NETWORK.eth.heading', {
+          networkName: getChainNameById(getL1ChainId(checkout!.config)),
+        })}
+      >
+        {t('views.SWITCH_NETWORK.eth.body')}
+      </SimpleTextBody>
     </SimpleLayout>
   );
 }

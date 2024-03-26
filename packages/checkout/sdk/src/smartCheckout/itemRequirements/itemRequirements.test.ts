@@ -21,13 +21,13 @@ describe('itemRequirements', () => {
           type: ItemType.ERC20,
           spenderAddress: '0xSPENDER',
           amount: '1.5',
-          contractAddress: '0xCONTRACTADDRESS1',
+          tokenAddress: '0xCONTRACTADDRESS1',
         },
         {
           type: ItemType.ERC20,
           spenderAddress: '0xSPENDER',
           amount: '0.5',
-          contractAddress: '0xCONTRACTADDRESS2',
+          tokenAddress: '0xCONTRACTADDRESS2',
         },
         {
           type: ItemType.ERC721,
@@ -48,13 +48,13 @@ describe('itemRequirements', () => {
           type: ItemType.ERC20,
           spenderAddress: '0xSPENDER',
           amount: utils.parseUnits('1.5', 18),
-          contractAddress: '0xCONTRACTADDRESS1',
+          tokenAddress: '0xCONTRACTADDRESS1',
         },
         {
           type: ItemType.ERC20,
           spenderAddress: '0xSPENDER',
           amount: utils.parseUnits('0.5', 18),
-          contractAddress: '0xCONTRACTADDRESS2',
+          tokenAddress: '0xCONTRACTADDRESS2',
         },
         {
           type: ItemType.ERC721,

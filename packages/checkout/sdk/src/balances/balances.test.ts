@@ -16,17 +16,22 @@ import {
   NetworkInfo,
   TokenInfo,
 } from '../types';
-import { CheckoutError, CheckoutErrorType } from '../errors';
+import { CheckoutErrorType } from '../errors';
 import * as tokens from '../tokens';
 import { CheckoutConfiguration } from '../config';
 import {
   Blockscout,
-  BlockscoutNativeTokenData, BlockscoutToken, BlockscoutTokens, BlockscoutTokenType,
-} from '../client';
-import { BLOCKSCOUT_CHAIN_URL_MAP, ERC20ABI, NATIVE } from '../env';
+  BlockscoutNativeTokenData,
+  BlockscoutToken,
+  BlockscoutTokens,
+  BlockscoutTokenType,
+} from '../api/blockscout';
+import { ERC20ABI, NATIVE } from '../env';
+import { HttpClient } from '../api/http';
 
+jest.mock('../api/http');
+jest.mock('../api/blockscout');
 jest.mock('../tokens');
-jest.mock('../client');
 jest.mock('ethers', () => ({
   ...jest.requireActual('ethers'),
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -34,7 +39,13 @@ jest.mock('ethers', () => ({
 }));
 
 describe('balances', () => {
-  const testCheckoutConfig = new CheckoutConfiguration({ baseConfig: { environment: Environment.PRODUCTION } });
+  const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
+  const testCheckoutConfig = new CheckoutConfiguration(
+    {
+      baseConfig: { environment: Environment.PRODUCTION },
+    },
+    mockedHttpClient,
+  );
   const currentBalance = BigNumber.from('1000000000000000000');
   const formattedBalance = '1.0';
   const mockGetBalance = jest.fn().mockResolvedValue(currentBalance);
@@ -85,12 +96,17 @@ describe('balances', () => {
         getNetwork: mockGetNetwork,
       }));
 
-      await expect(getBalance(testCheckoutConfig, mockProvider(), '0xAddress')).rejects.toThrow(
-        new CheckoutError(
-          '[GET_BALANCE_ERROR] Cause:Error getting balance',
-          CheckoutErrorType.GET_BALANCE_ERROR,
-        ),
-      );
+      let message;
+      let type;
+      try {
+        await getBalance(testCheckoutConfig, mockProvider(), '0xAddress');
+      } catch (err: any) {
+        message = err.message;
+        type = err.type;
+      }
+
+      expect(message).toContain('Error getting balance');
+      expect(type).toEqual(CheckoutErrorType.GET_BALANCE_ERROR);
     });
 
     it(
@@ -108,39 +124,46 @@ describe('balances', () => {
           }),
         }));
 
-        await expect(getBalance(testCheckoutConfig, mockProvider(), '0xAddress')).rejects.toThrow(
-          new CheckoutError(
-            '[GET_BALANCE_ERROR] Cause:Chain:0 is not a supported chain',
-            CheckoutErrorType.GET_BALANCE_ERROR,
-          ),
-        );
+        let message;
+        let type;
+        try {
+          await getBalance(testCheckoutConfig, mockProvider(), '0xAddress');
+        } catch (err: any) {
+          message = err.message;
+          type = err.type;
+        }
+
+        expect(message).toContain('Chain:0 is not a supported chain');
+        expect(type).toEqual(CheckoutErrorType.GET_BALANCE_ERROR);
       },
     );
   });
 
   describe('getERC20Balance()', () => {
+    const testContractAddress = '0x10c';
+
     let balanceOfMock: jest.Mock;
-    let decimalsMock: jest.Mock;
-    let nameMock: jest.Mock;
-    let symbolMock: jest.Mock;
+    let getERC20TokenInfoMock: jest.Mock;
 
     beforeEach(() => {
       jest.restoreAllMocks();
 
       balanceOfMock = jest.fn().mockResolvedValue(currentBalance);
-      decimalsMock = jest.fn().mockResolvedValue(18);
-      nameMock = jest.fn().mockResolvedValue(ChainName.ETHEREUM);
-      symbolMock = jest.fn().mockResolvedValue('ETH');
+      getERC20TokenInfoMock = jest.fn().mockResolvedValue({
+        name: ChainName.ETHEREUM,
+        symbol: 'ETH',
+        decimals: 18,
+        address: testContractAddress,
+      });
+      (tokens.getERC20TokenInfo as jest.Mock).mockImplementation(
+        getERC20TokenInfoMock,
+      );
       (Contract as unknown as jest.Mock).mockReturnValue({
         balanceOf: balanceOfMock,
-        decimals: decimalsMock,
-        name: nameMock,
-        symbol: symbolMock,
       });
     });
 
     it('should call balanceOf on the appropriate contract and return the balance', async () => {
-      const testContractAddress = '0x10c';
       const balanceResult = await getERC20Balance(
         mockProvider(),
         'abc123',
@@ -148,9 +171,7 @@ describe('balances', () => {
       );
 
       expect(balanceOfMock).toBeCalledTimes(1);
-      expect(decimalsMock).toBeCalledTimes(1);
-      expect(nameMock).toBeCalledTimes(1);
-      expect(symbolMock).toBeCalledTimes(1);
+      expect(getERC20TokenInfoMock).toBeCalledTimes(1);
       expect(balanceResult).toEqual({
         balance: currentBalance,
         formattedBalance,
@@ -165,22 +186,22 @@ describe('balances', () => {
 
     it('should throw error if call to the contract fails', async () => {
       (Contract as unknown as jest.Mock).mockReturnValue({
-        balanceOf: balanceOfMock,
-        decimals: decimalsMock,
-        name: jest
+        balanceOf: jest
           .fn()
-          .mockRejectedValue(new Error('Error getting name from contract')),
-        symbol: symbolMock,
+          .mockRejectedValue(new Error('Error getting balance from contract')),
       });
 
-      await expect(
-        getERC20Balance(mockProvider(), 'abc123', '0x10c'),
-      ).rejects.toThrow(
-        new CheckoutError(
-          '[GET_ERC20_BALANCE_ERROR] Cause:Error getting name from contract',
-          CheckoutErrorType.GET_ERC20_BALANCE_ERROR,
-        ),
-      );
+      let message;
+      let type;
+      try {
+        await getERC20Balance(mockProvider(), 'abc123', '0x10c');
+      } catch (err: any) {
+        message = err.message;
+        type = err.type;
+      }
+
+      expect(message).toContain('Error getting balance from contract');
+      expect(type).toEqual(CheckoutErrorType.GET_ERC20_BALANCE_ERROR);
     });
 
     it('should throw an error if the contract address is invalid', async () => {
@@ -191,24 +212,21 @@ describe('balances', () => {
         return new contract(mockProvider(), JSON.stringify(ERC20ABI), null);
       });
 
-      await expect(
-        getERC20Balance(mockProvider(), 'abc123', '0x10c'),
-      ).rejects.toThrow(
-        new CheckoutError(
-          // eslint-disable-next-line max-len
-          '[GET_ERC20_BALANCE_ERROR] Cause:invalid contract address or ENS name (argument="addressOrName", value=undefined, code=INVALID_ARGUMENT, version=contracts/5.7.0)',
-          CheckoutErrorType.GET_ERC20_BALANCE_ERROR,
-        ),
-      );
+      let type;
+      try {
+        await getERC20Balance(mockProvider(), 'abc123', '0x10c');
+      } catch (err: any) {
+        type = err.type;
+      }
+
+      expect(type).toEqual(CheckoutErrorType.GET_ERC20_BALANCE_ERROR);
     });
   });
 
   describe('getAllBalances()', () => {
     let mockProviderForAllBalances: jest.Mock;
     let balanceOfMock: jest.Mock;
-    let decimalsMock: jest.Mock;
-    let nameMock: jest.Mock;
-    let symbolMock: jest.Mock;
+    let getERC20TokenInfoMock: jest.Mock;
 
     // TODO fix variable shadowing
     // eslint-disable-next-line @typescript-eslint/no-shadow
@@ -239,8 +257,8 @@ describe('balances', () => {
             decimals: '18',
           },
           {
-            name: 'Ethereum',
-            address: 'native',
+            name: ChainName.ETHEREUM,
+            address: NATIVE,
             symbol: 'ETH',
             decimals: 18,
           } as TokenInfo,
@@ -267,23 +285,77 @@ describe('balances', () => {
       } as unknown as Web3Provider));
 
       balanceOfMock = jest.fn().mockResolvedValue(currentBalance);
-      decimalsMock = jest.fn().mockResolvedValue(18);
-      nameMock = jest
-        .fn()
-        .mockResolvedValueOnce('Immutable X')
-        .mockResolvedValueOnce('Matic')
-        .mockResolvedValueOnce('Cats');
-      symbolMock = jest
-        .fn()
-        .mockResolvedValueOnce('IMX')
-        .mockResolvedValueOnce('MATIC')
-        .mockResolvedValueOnce('zkCATS');
+
+      getERC20TokenInfoMock = jest.fn()
+        .mockResolvedValueOnce({
+          name: 'Immutable X',
+          symbol: 'IMX',
+          decimals: 18,
+          address: '0xL1Address',
+        })
+        .mockResolvedValueOnce({
+          name: 'Matic',
+          symbol: 'MATIC',
+          decimals: 18,
+          address: '0xmaticAddress',
+        })
+        .mockResolvedValueOnce({
+          name: ChainName.ETHEREUM,
+          symbol: 'ETH',
+          decimals: 18,
+          address: NATIVE,
+        });
+      (tokens.getERC20TokenInfo as jest.Mock).mockImplementation(
+        getERC20TokenInfoMock,
+      );
+
       (Contract as unknown as jest.Mock).mockReturnValue({
         balanceOf: balanceOfMock,
-        decimals: decimalsMock,
-        name: nameMock,
-        symbol: symbolMock,
       });
+    });
+
+    it('should fail if no wallet address or provider are given', async () => {
+      let message;
+      try {
+        await getAllBalances(
+          {
+            remote: {
+              getTokensConfig: () => ({
+                blockscout: false,
+              }),
+            },
+            networkMap: testCheckoutConfig.networkMap,
+          } as unknown as CheckoutConfiguration,
+          undefined,
+          undefined,
+          ChainId.ETHEREUM,
+        );
+      } catch (err: any) {
+        message = err.message;
+      }
+      expect(message).toContain('both walletAddress and provider are missing');
+    });
+
+    it('should fail if no provider is given and indexer is disabled', async () => {
+      let message;
+      try {
+        await getAllBalances(
+          {
+            remote: {
+              getTokensConfig: () => ({
+                blockscout: false,
+              }),
+            },
+            networkMap: testCheckoutConfig.networkMap,
+          } as unknown as CheckoutConfiguration,
+          undefined,
+          'wallet-address',
+          ChainId.ETHEREUM,
+        );
+      } catch (e: any) {
+        message = e.message;
+      }
+      expect(message).toContain('indexer is disabled for this chain, you must provide a provider');
     });
 
     it('should call getBalance and getERC20Balance functions with native and ERC20 tokens', async () => {
@@ -293,6 +365,7 @@ describe('balances', () => {
             getTokensConfig: () => ({
               blockscout: false,
             }),
+            getHttpClient: () => mockedHttpClient,
           },
           networkMap: testCheckoutConfig.networkMap,
         } as unknown as CheckoutConfiguration,
@@ -303,9 +376,6 @@ describe('balances', () => {
 
       expect(mockGetBalance).toBeCalledTimes(1);
       expect(balanceOfMock).toBeCalledTimes(2);
-      expect(decimalsMock).toBeCalledTimes(2);
-      expect(nameMock).toBeCalledTimes(2);
-      expect(symbolMock).toBeCalledTimes(2);
 
       expect(getAllBalancesResult.balances).toEqual(
         expect.arrayContaining(
@@ -337,6 +407,7 @@ describe('balances', () => {
                 name: ChainName.ETHEREUM,
                 symbol: 'ETH',
                 decimals: 18,
+                address: NATIVE,
               },
             },
           ],
@@ -377,20 +448,19 @@ describe('balances', () => {
         getNativeTokenByWalletAddress: getNativeTokenByWalletAddressMock,
       });
 
-      const chainId = Object.keys(BLOCKSCOUT_CHAIN_URL_MAP)[0] as unknown as ChainId;
-
       const getAllBalancesResult = await getAllBalances(
         {
           remote: {
             getTokensConfig: () => ({
               blockscout: true,
             }),
+            getHttpClient: () => mockedHttpClient,
           },
           networkMap: testCheckoutConfig.networkMap,
         } as unknown as CheckoutConfiguration,
         jest.fn() as unknown as Web3Provider,
         'abc123',
-        chainId,
+        ChainId.ETHEREUM,
       );
 
       expect(getNativeTokenByWalletAddressMock).toHaveBeenCalledTimes(1);
@@ -467,8 +537,14 @@ describe('balances', () => {
             getTokensConfig: () => ({
               blockscout: true,
             }),
+            getHttpClient: () => mockedHttpClient,
           },
-          networkMap: testCheckoutConfig.networkMap,
+          networkMap: new CheckoutConfiguration(
+            {
+              baseConfig: { environment: Environment.SANDBOX },
+            },
+            mockedHttpClient,
+          ).networkMap,
         } as unknown as CheckoutConfiguration,
         jest.fn() as unknown as Web3Provider,
         'abc123',
@@ -501,20 +577,19 @@ describe('balances', () => {
         getNativeTokenByWalletAddress: getNativeTokenByWalletAddressMock,
       });
 
-      const chainId = Object.keys(BLOCKSCOUT_CHAIN_URL_MAP)[0] as unknown as ChainId;
-
       const getAllBalancesResult = await getAllBalances(
         {
           remote: {
             getTokensConfig: () => ({
               blockscout: true,
             }),
+            getHttpClient: () => mockedHttpClient,
           },
           networkMap: testCheckoutConfig.networkMap,
         } as unknown as CheckoutConfiguration,
         jest.fn() as unknown as Web3Provider,
         'abc123',
-        chainId,
+        ChainId.ETHEREUM,
       );
 
       expect(getNativeTokenByWalletAddressMock).toHaveBeenCalledTimes(1);
@@ -561,20 +636,19 @@ describe('balances', () => {
         getNativeTokenByWalletAddress: getNativeTokenByWalletAddressMock,
       });
 
-      const chainId = Object.keys(BLOCKSCOUT_CHAIN_URL_MAP)[0] as unknown as ChainId;
-
       const getAllBalancesResult = await getAllBalances(
         {
           remote: {
             getTokensConfig: () => ({
               blockscout: true,
             }),
+            getHttpClient: () => mockedHttpClient,
           },
           networkMap: testCheckoutConfig.networkMap,
         } as unknown as CheckoutConfiguration,
         jest.fn() as unknown as Web3Provider,
         'abc123',
-        chainId,
+        ChainId.ETHEREUM,
       );
 
       expect(getNativeTokenByWalletAddressMock).toHaveBeenCalledTimes(1);
@@ -609,20 +683,19 @@ describe('balances', () => {
         getNativeTokenByWalletAddress: getNativeTokenByWalletAddressMock,
       });
 
-      const chainId = Object.keys(BLOCKSCOUT_CHAIN_URL_MAP)[0] as unknown as ChainId;
-
       const getAllBalancesResult = await getAllBalances(
         {
           remote: {
             getTokensConfig: () => ({
               blockscout: true,
             }),
+            getHttpClient: () => mockedHttpClient,
           },
           networkMap: testCheckoutConfig.networkMap,
         } as unknown as CheckoutConfiguration,
         jest.fn() as unknown as Web3Provider,
         'abc123',
-        chainId,
+        ChainId.ETHEREUM,
       );
 
       expect(getNativeTokenByWalletAddressMock).toHaveBeenCalledTimes(1);
@@ -655,7 +728,6 @@ describe('balances', () => {
           getNativeTokenByWalletAddress: getNativeTokenByWalletAddressMock,
         });
 
-        const chainId = Object.keys(BLOCKSCOUT_CHAIN_URL_MAP)[0] as unknown as ChainId;
         let message;
         let type;
         let data;
@@ -666,12 +738,13 @@ describe('balances', () => {
                 getTokensConfig: () => ({
                   blockscout: true,
                 }),
+                getHttpClient: () => mockedHttpClient,
               },
               networkMap: testCheckoutConfig.networkMap,
             } as unknown as CheckoutConfiguration,
             jest.fn() as unknown as Web3Provider,
             '0xabc123', // use unique wallet address to prevent cached data
-            chainId,
+            ChainId.ETHEREUM,
           );
         } catch (err: any) {
           message = err.message;
@@ -683,16 +756,43 @@ describe('balances', () => {
 
         expect(message).toEqual(testCase.expectedErrorMessage);
         expect(type).toEqual(CheckoutErrorType.GET_INDEXER_BALANCE_ERROR);
-        expect(data).toEqual({
+        expect(data.error).toEqual({
           code: HttpStatusCode.Forbidden,
           message: testCase.errorMessage,
         });
       });
     });
+
+    it('should fail if unsupported chain is provided', async () => {
+      let message;
+      let type;
+      try {
+        await getAllBalances(
+          {
+            remote: {
+              getTokensConfig: () => ({
+                blockscout: true,
+              }),
+            },
+            networkMap: testCheckoutConfig.networkMap,
+          } as unknown as CheckoutConfiguration,
+          jest.fn() as unknown as Web3Provider,
+          '0xabc123', // use unique wallet address to prevent cached data
+          ChainId.SEPOLIA,
+        );
+      } catch (err: any) {
+        message = err.message;
+        type = err.type;
+      }
+
+      expect(message).toEqual(`chain ID ${ChainId.SEPOLIA} not supported by the environment`);
+      expect(type).toEqual(CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR);
+    });
   });
 
   describe('getBalances()', () => {
     let mockProviderForAllBalances: jest.Mock;
+    let getERC20TokenInfoMock: jest.Mock;
 
     beforeEach(() => {
       jest.restoreAllMocks();
@@ -703,15 +803,21 @@ describe('balances', () => {
           request: jest.fn(),
         },
       } as unknown as Web3Provider));
+      getERC20TokenInfoMock = jest.fn()
+        .mockResolvedValueOnce({
+          name: 'zkCATS',
+          symbol: 'zkCATS',
+          decimals: 18,
+          address: '0xaddr',
+        });
+      (tokens.getERC20TokenInfo as jest.Mock).mockImplementation(
+        getERC20TokenInfoMock,
+      );
     });
 
     it('should call getERC20Balance functions', async () => {
       (Contract as unknown as jest.Mock).mockReturnValue({
         balanceOf: jest.fn().mockResolvedValue(currentBalance),
-        decimals: jest.fn().mockResolvedValue(18),
-        name: jest.fn().mockResolvedValue('zkCATS'),
-        symbol: jest.fn().mockResolvedValue('zkCATS'),
-        address: jest.fn().mockResolvedValue('0xaddr'),
       });
 
       const getBalancesResult = await getBalances(

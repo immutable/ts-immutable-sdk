@@ -1,13 +1,14 @@
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
 import assert from 'assert';
 import { DuplicateAddressesError, InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError } from 'errors';
-import { fetchGasPrice } from 'lib/transactionUtils/gas';
+import { calculateGasFee, fetchGasPrice } from 'lib/transactionUtils/gas';
 import { getApproval, prepareApproval } from 'lib/transactionUtils/approval';
 import { getOurQuoteReqAmount, prepareUserQuote } from 'lib/transactionUtils/getQuote';
 import { Fees } from 'lib/fees';
-import { Multicall__factory, SecondaryFee__factory } from 'contracts/types';
+import { Multicall__factory, ImmutableSwapProxy__factory, WIMX__factory } from 'contracts/types';
 import { NativeTokenService } from 'lib/nativeTokenService';
+import { IMX_UNWRAP_GAS_COST, IMX_WRAP_GAS_COST } from 'constants/wrapping';
 import { DEFAULT_MAX_HOPS, DEFAULT_SLIPPAGE, MAX_MAX_HOPS, MIN_MAX_HOPS } from './constants';
 import { Router } from './lib/router';
 import {
@@ -26,6 +27,7 @@ import {
   Native,
   Quote,
   SecondaryFee,
+  TransactionDetails,
   TransactionResponse,
 } from './types';
 import { getSwap, adjustQuoteWithFees } from './lib/transactionUtils/swap';
@@ -46,6 +48,16 @@ const toPublicQuote = (
   })),
 });
 
+/**
+ * Type representing the details of a wrap or unwrap transaction
+ * @property {@link TransactionDetails} transaction - The wrap or unwrap transaction
+ * @property {@link TransactionDetails | null} approval - The approval transaction or null if it is not required
+ */
+type WrapUnwrapTransactionDetails = {
+  transaction: TransactionDetails,
+  approval: TransactionDetails | null,
+};
+
 export class Exchange {
   private provider: ethers.providers.StaticJsonRpcProvider;
 
@@ -63,7 +75,7 @@ export class Exchange {
 
   private nativeTokenService: NativeTokenService;
 
-  private secondaryFeeContractAddress: string;
+  private swapProxyContractAddress: string;
 
   private routerContractAddress: string;
 
@@ -75,8 +87,8 @@ export class Exchange {
     this.wrappedNativeToken = config.chain.wrappedNativeToken;
     this.nativeTokenService = new NativeTokenService(this.nativeToken, this.wrappedNativeToken);
     this.secondaryFees = config.secondaryFees;
-    this.routerContractAddress = config.chain.contracts.peripheryRouter;
-    this.secondaryFeeContractAddress = config.chain.contracts.secondaryFee;
+    this.routerContractAddress = config.chain.contracts.swapRouter;
+    this.swapProxyContractAddress = config.chain.contracts.immutableSwapProxy;
 
     this.provider = new ethers.providers.StaticJsonRpcProvider({
       url: config.chain.rpcUrl,
@@ -120,9 +132,9 @@ export class Exchange {
       return [];
     }
 
-    const secondaryFeeContract = SecondaryFee__factory.connect(this.secondaryFeeContractAddress, provider);
+    const swapProxyContract = ImmutableSwapProxy__factory.connect(this.swapProxyContractAddress, provider);
 
-    if (await secondaryFeeContract.paused()) {
+    if (await swapProxyContract.paused()) {
       // Do not use secondary fees if the contract is paused
       return [];
     }
@@ -141,6 +153,102 @@ export class Exchange {
       chainId: this.chainId,
       decimals,
     };
+  }
+
+  private async getUnwrapTransaction(
+    fromAddress: string,
+    tokenAmount: BigNumber,
+    wimxInterface: ethers.utils.Interface,
+    gasPrice: CoinAmount<Native> | null,
+  ) : Promise<WrapUnwrapTransactionDetails> {
+    const calldata = wimxInterface.encodeFunctionData('withdraw', [tokenAmount]);
+    const gasEstimate = ethers.BigNumber.from(IMX_UNWRAP_GAS_COST);
+
+    const gasFeeEstimate = gasPrice ? toPublicAmount(calculateGasFee(false, gasPrice, gasEstimate)) : null;
+    // This transaction is for calling calling `withdraw` on the WETH/WIMX contract.
+    const transactionDetails: TransactionDetails = {
+      transaction: {
+        data: calldata,
+        to: this.wrappedNativeToken.address, // wrapping and unwrapping is done on the WETH/WIMX contract itself
+        from: fromAddress,
+      },
+      gasFeeEstimate,
+    };
+
+    return {
+      transaction: transactionDetails,
+      approval: null,
+    };
+  }
+
+  private getWrapTransaction(
+    fromAddress: string,
+    tokenAmount: BigNumber,
+    wimxInterface: ethers.utils.Interface,
+    gasPrice: CoinAmount<Native> | null,
+  ) : WrapUnwrapTransactionDetails {
+    const calldata = wimxInterface.encodeFunctionData('deposit');
+    const gasEstimate = ethers.BigNumber.from(IMX_WRAP_GAS_COST);
+
+    const gasFeeEstimate = gasPrice ? toPublicAmount(calculateGasFee(false, gasPrice, gasEstimate)) : null;
+    // This transaction is for calling calling `deposit` on the WETH/WIMX contract.
+    const transactionDetails: TransactionDetails = {
+      transaction: {
+        data: calldata,
+        to: this.wrappedNativeToken.address, // wrapping and unwrapping is done on the WETH/WIMX contract itself
+        value: tokenAmount, // Wrapping involves sending the native asset as TX.value
+        from: fromAddress,
+      },
+      gasFeeEstimate,
+    };
+
+    return {
+      transaction: transactionDetails,
+      approval: null,
+    };
+  }
+
+  private async getUnsignedWrapUnwrapTx(
+    tokenSpecified: Coin,
+    amountIn: CoinAmount<Coin>,
+    fromAddress: string,
+    gasPrice: CoinAmount<Native> | null,
+  ): Promise<TransactionResponse> {
+    const isWrap = amountIn.token.type === 'native';
+    const quoteToken = tokenSpecified.type === 'native' ? this.wrappedNativeToken : this.nativeToken;
+    const otherTokenCoinAmount = {
+      token: quoteToken,
+      value: amountIn.value,
+    };
+
+    // The quote is always 1:1 (0 {price impact, slippage}) when wrapping/unwrapping.
+    const quote: Quote = {
+      amount: toPublicAmount(otherTokenCoinAmount),
+      amountWithMaxSlippage: toPublicAmount(otherTokenCoinAmount),
+      slippage: 0,
+      fees: [],
+    };
+
+    const wimxInterface = WIMX__factory.createInterface();
+    let transactionDetails;
+
+    if (isWrap) {
+      transactionDetails = this.getWrapTransaction(
+        fromAddress,
+        otherTokenCoinAmount.value,
+        wimxInterface,
+        gasPrice,
+      );
+    } else {
+      transactionDetails = await this.getUnwrapTransaction(
+        fromAddress,
+        otherTokenCoinAmount.value,
+        wimxInterface,
+        gasPrice,
+      );
+    }
+
+    return { quote, approval: transactionDetails.approval, swap: transactionDetails.transaction };
   }
 
   private async getUnsignedSwapTx(
@@ -174,6 +282,17 @@ export class Exchange {
 
     const amountSpecified = newAmount(amount, tokenSpecified);
 
+    if (this.nativeTokenService.isWrapOrUnwrap(tokenIn, tokenOut)) {
+      // If the user is swapping between the native token and the wrapped native token,
+      // we want to just wrap/unwrap the native token instead of swapping
+      return this.getUnsignedWrapUnwrapTx(
+        tokenSpecified,
+        newAmount(amount, tokenIn),
+        fromAddress,
+        gasPrice,
+      );
+    }
+
     const fees = new Fees(secondaryFees, tokenIn);
 
     const ourQuoteReqAmount = getOurQuoteReqAmount(amountSpecified, fees, tradeType, this.nativeTokenService);
@@ -196,7 +315,7 @@ export class Exchange {
       slippagePercent,
       deadline,
       this.routerContractAddress,
-      this.secondaryFeeContractAddress,
+      this.swapProxyContractAddress,
       gasPrice,
       secondaryFees,
     );
@@ -214,7 +333,7 @@ export class Exchange {
       quotedAmountWithMaxSlippage,
       {
         routerAddress: this.routerContractAddress,
-        secondaryFeeAddress: this.secondaryFeeContractAddress,
+        secondaryFeeAddress: this.swapProxyContractAddress,
       },
       secondaryFees,
     );

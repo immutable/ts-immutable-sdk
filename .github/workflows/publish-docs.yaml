@@ -2,7 +2,7 @@ name: Publish SDK Reference Docs
 
 on:
   workflow_run:
-    workflows: ["Publish to NPM"]
+    workflows: ["Publish to NPM", "Publish Major Version to NPM"]
     types:
       - completed
 
@@ -11,7 +11,6 @@ jobs:
     name: Publish SDK Reference Docs
     runs-on: ubuntu-latest
     env:
-      GH_TOKEN: ${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}
       SDK_PUBLISH_SLACK_WEBHOOK: ${{ secrets.SDK_PUBLISH_SLACK_WEBHOOK }}
       NETLIFY_BUILD_HOOK: ${{ secrets.NETLIFY_BUILD_HOOK }}
       GITHUB_USER: ${{ github.actor }}
@@ -24,8 +23,8 @@ jobs:
       - name: Checkout Docs Repo
         uses: actions/checkout@v3
         with:
-          repository: immutable/imx-docs
-          token: ${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}
+          repository: immutable/docs
+          token: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
           path: imx-docs
           ref: main
 
@@ -47,8 +46,8 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: lts/*
-          cache: 'yarn'
+          node-version-file: .nvmrc
+          cache: "yarn"
 
       - name: Update SDK package.json version
         run: |
@@ -68,8 +67,8 @@ jobs:
       - name: Update version link
         run: ./.github/scripts/update-docs-link.sh
 
-      - name: Push SDK Docs to imx-docs
-        id: docs_push 
+      - name: Push SDK Docs to docs
+        id: docs_push
         run: ./.github/scripts/push-docs.sh
         shell: bash
 

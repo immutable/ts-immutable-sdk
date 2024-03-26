@@ -1,20 +1,20 @@
+import { Checkout } from '@imtbl/checkout-sdk';
 import {
   AnalyticsProvider,
 } from './SegmentAnalyticsProvider';
-import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { SetupAnalytics } from './SetupAnalytics';
 
 type CustomAnalyticsProps = {
-  widgetConfig: StrongCheckoutWidgetsConfig
   children: React.ReactNode;
+  checkout: Checkout;
 };
 
 export function CustomAnalyticsProvider(
-  { widgetConfig, children }: CustomAnalyticsProps,
+  { children, checkout }: CustomAnalyticsProps,
 ) {
   return (
     <AnalyticsProvider>
-      <SetupAnalytics widgetConfig={widgetConfig}>
+      <SetupAnalytics checkout={checkout}>
         {children}
       </SetupAnalytics>
     </AnalyticsProvider>

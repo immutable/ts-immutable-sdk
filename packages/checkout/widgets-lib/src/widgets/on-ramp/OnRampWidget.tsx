@@ -1,10 +1,9 @@
-import { BiomeCombinedProviders } from '@biom3/react';
-import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
   useContext, useEffect, useMemo, useReducer, useState,
 } from 'react';
-import { IMTBLWidgetEvents, OnRampWidgetParams, WidgetTheme } from '@imtbl/checkout-sdk';
+import { IMTBLWidgetEvents, OnRampWidgetParams } from '@imtbl/checkout-sdk';
 import { UserJourney } from 'context/analytics-provider/SegmentAnalyticsProvider';
+import { useTranslation } from 'react-i18next';
 import { NATIVE } from '../../lib';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
@@ -17,7 +16,6 @@ import {
   OnRampWidgetViews,
 } from '../../context/view-context/OnRampViewContextTypes';
 import { LoadingView } from '../../views/loading/LoadingView';
-import { text } from '../../resources/text/textConfig';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { TopUpView } from '../../views/top-up/TopUpView';
 import { sendOnRampFailedEvent, sendOnRampSuccessEvent, sendOnRampWidgetCloseEvent } from './OnRampWidgetEvents';
@@ -31,28 +29,25 @@ export type OnRampWidgetInputs = OnRampWidgetParams & {
   config: StrongCheckoutWidgetsConfig
 };
 
-export function OnRampWidget({
-  amount, contractAddress, config,
+export default function OnRampWidget({
+  amount, tokenAddress, config,
 }: OnRampWidgetInputs) {
   const {
-    theme, isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
+    isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
   } = config;
-  const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
+  const [viewState, viewDispatch] = useReducer(viewReducer, {
+    ...initialViewState,
+    history: [],
+  });
   const viewReducerValues = useMemo(() => ({ viewState, viewDispatch }), [viewState, viewReducer]);
 
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
-  const [tokenAddress, setTokenAddress] = useState(contractAddress);
+  const [tknAddr, setTknAddr] = useState(tokenAddress);
 
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
-  const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
-    ? onLightBase
-    : onDarkBase;
-
-  const {
-    initialLoadingText, IN_PROGRESS_LOADING, SUCCESS, FAIL,
-  } = text.views[OnRampWidgetViews.ONRAMP];
+  const { t } = useTranslation();
 
   const showIframe = useMemo(
     () => viewState.view.type === OnRampWidgetViews.ONRAMP,
@@ -70,93 +65,93 @@ export function OnRampWidget({
       if (!network.isSupported) {
         return;
       }
-      const tknAddr = contractAddress?.toLocaleLowerCase() === NATIVE
+      const address = tknAddr?.toLocaleLowerCase() === NATIVE
         ? NATIVE
-        : contractAddress;
+        : tokenAddress;
 
-      setTokenAddress(tknAddr);
+      setTknAddr(address);
     })();
   }, [checkout, provider, viewDispatch]);
 
   return (
-    <BiomeCombinedProviders theme={{ base: biomeTheme }}>
-      <ViewContext.Provider value={viewReducerValues}>
-        {viewState.view.type === SharedViews.LOADING_VIEW && (
-          <LoadingView loadingText={initialLoadingText} showFooterLogo />
-        )}
-        {viewState.view.type === OnRampWidgetViews.IN_PROGRESS_LOADING && (
-          <LoadingView loadingText={IN_PROGRESS_LOADING.loading.text} showFooterLogo />
-        )}
-        {viewState.view.type === OnRampWidgetViews.IN_PROGRESS && (
-          <OrderInProgress />
-        )}
+    <ViewContext.Provider value={viewReducerValues}>
+      {viewState.view.type === SharedViews.LOADING_VIEW && (
+      <LoadingView loadingText={t('views.ONRAMP.initialLoadingText')} />
+      )}
+      {viewState.view.type === OnRampWidgetViews.IN_PROGRESS_LOADING && (
+      <LoadingView loadingText={t('views.ONRAMP.IN_PROGRESS_LOADING.loading.text')} />
+      )}
+      {viewState.view.type === OnRampWidgetViews.IN_PROGRESS && (
+      <OrderInProgress />
+      )}
 
-        {viewState.view.type === OnRampWidgetViews.SUCCESS && (
-          <StatusView
-            statusText={SUCCESS.text}
-            actionText={SUCCESS.actionText}
-            onRenderEvent={() => sendOnRampSuccessEvent(
-              eventTarget,
-              (viewState.view as OnRampSuccessView).data.transactionHash,
-            )}
-            onActionClick={() => sendOnRampWidgetCloseEvent(eventTarget)}
-            statusType={StatusType.SUCCESS}
-            testId="success-view"
-          />
+      {viewState.view.type === OnRampWidgetViews.SUCCESS && (
+      <StatusView
+        statusText={t('views.ONRAMP.SUCCESS.text')}
+        actionText={t('views.ONRAMP.SUCCESS.actionText')}
+        onRenderEvent={() => sendOnRampSuccessEvent(
+          eventTarget,
+          (viewState.view as OnRampSuccessView).data.transactionHash,
         )}
+        onActionClick={() => sendOnRampWidgetCloseEvent(eventTarget)}
+        statusType={StatusType.SUCCESS}
+        testId="success-view"
+      />
+      )}
 
-        {viewState.view.type === OnRampWidgetViews.FAIL && (
-          <StatusView
-            statusText={FAIL.text}
-            actionText={FAIL.actionText}
-            onRenderEvent={() => sendOnRampFailedEvent(
-              eventTarget,
-              (viewState.view as OnRampFailView).reason
+      {viewState.view.type === OnRampWidgetViews.FAIL && (
+      <StatusView
+        statusText={t('views.ONRAMP.FAIL.text')}
+        actionText={t('views.ONRAMP.FAIL.actionText')}
+        onRenderEvent={() => sendOnRampFailedEvent(
+          eventTarget,
+          (viewState.view as OnRampFailView).reason
                   ?? 'Transaction failed',
-            )}
-            onActionClick={() => {
-              viewDispatch({
-                payload: {
-                  type: ViewActions.UPDATE_VIEW,
-                  view: {
-                    type: OnRampWidgetViews.ONRAMP,
-                    data: viewState.view.data,
-                  },
-                },
-              });
-            }}
-            statusType={StatusType.FAILURE}
-            onCloseClick={() => sendOnRampWidgetCloseEvent(eventTarget)}
-            testId="fail-view"
-          />
         )}
+        onActionClick={() => {
+          viewDispatch({
+            payload: {
+              type: ViewActions.UPDATE_VIEW,
+              view: {
+                type: OnRampWidgetViews.ONRAMP,
+                data: viewState.view.data,
+              },
+            },
+          });
+        }}
+        statusType={StatusType.FAILURE}
+        onCloseClick={() => sendOnRampWidgetCloseEvent(eventTarget)}
+        testId="fail-view"
+      />
+      )}
 
-        {/* This keeps Transak's iframe instance in dom to listen to transak's events. */}
-        {/* We will remove the iframe instance once the processing has been finalised, either as a success or a failure */}
-        {(viewState.view.type !== OnRampWidgetViews.SUCCESS
+      {/* This keeps Transak's iframe instance in dom to listen to transak's events. */}
+      {/* We will remove the iframe instance once the processing has been finalised, either as a success or a failure */}
+      {(viewState.view.type !== OnRampWidgetViews.SUCCESS
         && viewState.view.type !== OnRampWidgetViews.FAIL
-        ) && (
+      ) && (
         <OnRampMain
           passport={checkout?.passport}
           showIframe={showIframe}
           tokenAmount={viewState.view.data?.amount ?? amount}
           tokenAddress={
-            viewState.view.data?.contractAddress ?? tokenAddress
+            viewState.view.data?.tokenAddress ?? tknAddr
           }
         />
-        )}
+      )}
 
-        {viewState.view.type === SharedViews.TOP_UP_VIEW && (
-          <TopUpView
-            analytics={{ userJourney: UserJourney.ON_RAMP }}
-            widgetEvent={IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT}
-            showOnrampOption={isOnRampEnabled}
-            showSwapOption={isSwapEnabled}
-            showBridgeOption={isBridgeEnabled}
-            onCloseButtonClick={() => sendOnRampWidgetCloseEvent(eventTarget)}
-          />
-        )}
-      </ViewContext.Provider>
-    </BiomeCombinedProviders>
+      {viewState.view.type === SharedViews.TOP_UP_VIEW && (
+        <TopUpView
+          analytics={{ userJourney: UserJourney.ON_RAMP }}
+          widgetEvent={IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT}
+          checkout={checkout}
+          provider={provider}
+          showOnrampOption={isOnRampEnabled}
+          showSwapOption={isSwapEnabled}
+          showBridgeOption={isBridgeEnabled}
+          onCloseButtonClick={() => sendOnRampWidgetCloseEvent(eventTarget)}
+        />
+      )}
+    </ViewContext.Provider>
   );
 }

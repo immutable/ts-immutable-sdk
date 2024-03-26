@@ -1,0 +1,670 @@
+{
+  "views": {
+    "CONNECT_WALLET": {
+      "body": {
+        "heading": "ウォレットを接続する",
+        "content": "購入、販売、取引、およびコインとコレクティブルを保存するには、デジタルウォレットを接続または作成する必要があります。"
+      },
+      "walletSelection": {
+        "heading": "ウォレットを選択"
+      }
+    },
+    "CONNECT_SUCCESS": {
+      "status": "接続が安全です",
+      "action": "続ける"
+    },
+    "READY_TO_CONNECT": {
+      "header": {
+        "title": "接続する"
+      },
+      "metamask": {
+        "body": {
+          "heading": "MetaMaskからのポップアップを確認する",
+          "content": "MetaMaskのポップアップに従って接続してください"
+        },
+        "footer": {
+          "buttonText1": "接続する準備ができました",
+          "buttonText2": "再試行する"
+        }
+      },
+      "passport": {
+        "body": {
+          "heading": "Immutable Passportで接続する",
+          "content": "Immutable Passportに接続するためのプロンプトに従ってください"
+        },
+        "footer": {
+          "buttonText1": "続ける",
+          "buttonText2": "再試行する"
+        }
+      }
+    },
+    "SWITCH_NETWORK": {
+      "eth": {
+        "heading": "{{networkName}}ネットワークに切り替える必要があります",
+        "body": "MetaMaskでネットワークを切り替えるように求められます。必要に応じて後で切り替えることができます。",
+        "button": {
+          "text": "切り替えの準備ができました",
+          "retryText": "再試行する"
+        }
+      },
+      "zkEVM": {
+        "heading": "Immutable zkEVMネットワークに切り替えるように求められます",
+        "body": "MetaMaskからのポップアップを確認し、「承認」して切り替えてください。これが初めての場合、MetaMaskはネットワークを追加するように求めることもあります。",
+        "bodyWalletConnect": "ウォレットからのポップアップを確認して切り替えます。これが初めての場合、ウォレットはネットワークの追加を求めます。",
+        "button": {
+          "text": "切り替えの準備ができました",
+          "retryText": "再試行する"
+        }
+      }
+    },
+    "ERROR_VIEW": {
+      "heading": "何かがうまくいかない",
+      "body": [
+        "もう一度やってみるか、",
+        "サポート",
+        "に連絡して助けを求めることができます。"
+      ],
+      "actionText": "もう一度試す"
+    },
+    "SERVICE_UNAVAILABLE_ERROR_VIEW": {
+      "heading": {
+        "swap": "お住まいの地域では交換が利用できません"
+      },
+      "body": {
+        "swap": "<quickswapLink>Quickswap</quickswapLink>のウェブサイトで詳細情報をご覧ください。"
+      }
+    },
+    "LOADING_VIEW": {
+      "text": "読み込み中"
+    },
+    "WALLET_BALANCES": {
+      "header": {
+        "title": "ウォレット"
+      },
+      "networkStatus": {
+        "heading": "ネットワーク"
+      },
+      "totalTokenBalance": {
+        "heading": "コイン",
+        "totalHeading": "価値"
+      },
+      "tokenBalancesList": {
+        "noTokensFound": "トークンが見つかりません"
+      },
+      "addCoins": "コインを追加"
+    },
+    "SETTINGS": {
+      "header": {
+        "title": "設定"
+      },
+      "disconnectButton": {
+        "label": "ウォレットを切断"
+      }
+    },
+    "COIN_INFO": {
+      "metamask": {
+        "heading": "コインとコレクティブルはネットワーク固有です",
+        "body": "コインを追加したり、ネットワーク間でコインを移動したりするには、ネットワークを切り替えることができます"
+      },
+      "passport": {
+        "heading": "コインとコレクティブルはネットワーク固有です",
+        "body1": "このネットワークはImmutable zkEVMと呼ばれます。Passportに他のコインがあり、ここに表示されない場合、それらは別のネットワークにあるかもしれません。",
+        "body2": "詳細については、",
+        "linkText": "FAQをご覧ください"
+      }
+    },
+    "SWAP": {
+      "header": {
+        "title": "コインをスワップ"
+      },
+      "content": {
+        "title": "何をスワップしたいですか？",
+        "fiatPricePrefix": "約USD",
+        "availableBalancePrefix": "利用可能"
+      },
+      "swapForm": {
+        "from": {
+          "label": "出金元",
+          "inputPlaceholder": "0",
+          "selectorTitle": "何からスワップしたいですか？"
+        },
+        "to": {
+          "label": "宛先",
+          "inputPlaceholder": "0",
+          "selectorTitle": "何にスワップしたいですか？"
+        },
+        "buttonText": "スワップ"
+      },
+      "fees": {
+        "title": "手数料合計"
+      },
+      "validation": {
+        "noAmountInputted": "金額を入力してください",
+        "insufficientBalance": "残高不足",
+        "noFromTokenSelected": "スワップするコインを選択してください",
+        "noToTokenSelected": "受け取るコインを選択してください"
+      },
+      "success": {
+        "text": "成功",
+        "actionText": "続行"
+      },
+      "failed": {
+        "text": "トランザクションが拒否されました",
+        "actionText": "もう一度試す"
+      },
+      "rejected": {
+        "text": "価格が急騰しています",
+        "actionText": "レビューしてもう一度試す"
+      },
+      "IN_PROGRESS": {
+        "loading": {
+          "text": "スワップ進行中"
+        }
+      }
+    },
+    "APPROVE_ERC20": {
+      "approveSwap": {
+        "content": {
+          "heading": "これでトランザクションを承認する必要があります",
+          "body": "ウォレットのプロンプトに従ってください。"
+        },
+        "footer": {
+          "buttonText": "はい",
+          "retryText": "もう一度試す"
+        }
+      },
+      "approveSpending": {
+        "content": {
+          "metamask": {
+            "heading": "このトランザクションのために支出上限を設定するように求められます",
+            "body": [
+              "少なくとも入力してください",
+              "このトランザクションおよび将来のトランザクションのために、その後、プロンプトに従ってください。"
+            ]
+          },
+          "passport": {
+            "heading": "このトランザクションのために支出上限を承認するように求められます",
+            "body": "ウォレットのプロンプトに従って支出上限を承認してください。"
+          }
+        },
+        "footer": {
+          "buttonText": "了解",
+          "retryText": "もう一度試す"
+        },
+        "loading": {
+          "text": "支出上限を承認しています"
+        }
+      }
+    },
+    "ONRAMP": {
+      "header": {
+        "title": "コインを追加"
+      },
+      "initialLoadingText": "Transakに移動しています",
+      "IN_PROGRESS_LOADING": {
+        "loading": {
+          "text": "Transakが注文を処理しています"
+        }
+      },
+      "IN_PROGRESS": {
+        "content": {
+          "heading": "注文進行中",
+          "body1": "完了するとTransakからメールが届きます。これには最大3分かかる場合があります。",
+          "body2": "このウィンドウを閉じても、トランザクションは完了次第ウォレットに反映されます。"
+        }
+      },
+      "SUCCESS": {
+        "text": "コインが途中にあります",
+        "actionText": "完了"
+      },
+      "FAIL": {
+        "text": "トランザクションが失敗しました",
+        "actionText": "もう一度試す"
+      }
+    },
+    "TOP_UP_VIEW": {
+      "header": {
+        "title": "コインを追加する方法は？"
+      },
+      "topUpOptions": {
+        "onramp": {
+          "heading": "購入",
+          "caption": "カード、Googleペイ、またはAppleペイが利用可能。",
+          "subcaption": "手数料",
+          "disabledCaption": ""
+        },
+        "swap": {
+          "heading": "交換",
+          "caption": "私の残高にあるコインで。",
+          "subcaption": "手数料",
+          "disabledCaption": "お住まいの地域では利用できません"
+        },
+        "bridge": {
+          "heading": "移動",
+          "caption": "別のウォレットやネットワークにある私のコイン。",
+          "subcaption": "手数料",
+          "disabledCaption": ""
+        }
+      }
+    },
+    "FUND_WITH_SMART_CHECKOUT": {
+      "loading": {
+        "checkingBalances": "数値を計算しています"
+      },
+      "currency": {
+        "usdEstimate": "≈ USD $",
+        "fees": "手数料"
+      },
+      "fundingRouteDrawer": {
+        "header": "利用可能な残高"
+      },
+      "fundingRouteSelect": {
+        "heading": "で支払う",
+        "noRoutesAvailable": "コインの残高が不足しています。代わりにカードで続行してください。",
+        "continue": "続行",
+        "payWithCardInstead": "いいえ、カードで支払います",
+        "payWithCard": "カードで支払う"
+      }
+    },
+    "PAYMENT_METHODS": {
+      "header": {
+        "heading": "どの支払い方法をご希望ですか？"
+      },
+      "options": {
+        "crypto": {
+          "heading": "コイン",
+          "caption": "財布の中のコインで支払うか、カードでコインを購入してください。",
+          "disabledCaption": "現在、この支払い方法は利用できません。"
+        },
+        "debit": {
+          "heading": "デビットカード",
+          "caption": "カードでの支払いに推奨される方法です。",
+          "disabledCaption": "現在作業中です。コインを使って進んでください。必要に応じて、追加する方法が案内されます。"
+        },
+        "credit": {
+          "heading": "クレジットカード",
+          "caption": "銀行によって取引がブロックされる可能性があるため、推奨されません。",
+          "disabledCaption": "現在作業中です。コインを使って進んでください。必要に応じて、追加する方法が案内されます。"
+        }
+      },
+      "topUp": {
+        "heading": "残高が不足しています",
+        "subheading": {
+          "both": "この購入とガスをカバーするために{{erc20.value}} {{erc20.symbol}}と{{native.value}} {{native.symbol}}を追加する必要があります。",
+          "erc20": "残高が不足しているため、{{erc20.value}} {{erc20.symbol}}を追加する必要があります。",
+          "native": "残高が不足しているため、{{native.value}} {{native.symbol}}を追加する必要があります。"
+        }
+      },
+      "loading": {
+        "ready1": "注文を受け取り中",
+        "ready2": "ウォレットと通信中",
+        "ready3": "資産を準備中",
+        "processing1": "支払いを初期化中",
+        "processing2": "資産を確保中",
+        "processing3": "支払いを完了中"
+      }
+    },
+    "PAY_WITH_COINS": {
+      "header": {
+        "heading": "あなたので支払う",
+        "caption": "ウォレットのコイン残高を使用して"
+      },
+      "button": {
+        "buyNow": "今すぐ購入"
+      }
+    },
+    "PAY_WITH_CARD": {
+      "screenTitle": "カードで支払う",
+      "loading": "Transakに移動しています"
+    },
+    "SALE_FAIL": {
+      "errors": {
+        "TRANSACTION_FAILED": {
+          "description": "トランザクションが失敗しました",
+          "primaryAction": "もう一度試す",
+          "secondaryAction": "詳細を表示"
+        },
+        "SERVICE_BREAKDOWN": {
+          "description": "申し訳ありませんが、現在お支払いを処理できません。数分後にもう一度お試しください。",
+          "secondaryAction": "閉じる"
+        },
+        "PRODUCT_NOT_FOUND": {
+          "description": "申し訳ありませんが、このアイテムはもう利用できません。",
+          "secondaryAction": "閉じる"
+        },
+        "INSUFFICIENT_STOCK": {
+          "description": "申し訳ありませんが、ご希望の数量は在庫がありません。少ない数量の購入をご検討ください。",
+          "secondaryAction": "閉じる"
+        },
+        "TRANSAK_FAILED": {
+          "description": "申し訳ありませんが、何かがうまくいかなかったようです。もう一度お試しください。",
+          "primaryAction": "もう一度試す",
+          "secondaryAction": "閉じる"
+        },
+        "WALLET_FAILED": {
+          "description": "申し訳ありませんが、現在これを処理できません。",
+          "primaryAction": "戻る",
+          "secondaryAction": "閉じる"
+        },
+        "WALLET_REJECTED_NO_FUNDS": {
+          "description": "申し訳ありませんが、何かがうまくいかなかったようです。もう一度お試しください。",
+          "primaryAction": "戻る",
+          "secondaryAction": "閉じる"
+        },
+        "WALLET_REJECTED": {
+          "description": "取引を承認するには、ウォレットで承認する必要があります。",
+          "primaryAction": "もう一度試す",
+          "secondaryAction": "キャンセル"
+        },
+        "WALLET_POPUP_BLOCKED": {
+          "description": "続行するには、ブラウザでポップアップを許可する必要があります。",
+          "primaryAction": "もう一度試す",
+          "secondaryAction": "キャンセル"
+        },
+        "SMART_CHECKOUT_ERROR": {
+          "description": "ウォレットの残高を確認できません。もう一度お試しください。",
+          "primaryAction": "もう一度試す",
+          "secondaryAction": "キャンセル"
+        },
+        "SMART_CHECKOUT_EXECUTE_ERROR": {
+          "description": "資金を移動する際に何かがうまくいかなかったようです。もう一度お試しください。",
+          "primaryAction": "もう一度試す",
+          "secondaryAction": "キャンセル"
+        },
+        "DEFAULT_ERROR": {
+          "description": "申し訳ありませんが、何かがうまくいかなかったようです。もう一度お試しください。",
+          "primaryAction": "もう一度試す",
+          "secondaryAction": "閉じる"
+        },
+        "INVALID_PARAMETERS": {
+          "description": "申し訳ありませんが、ご注文を処理できません。クライアントからの情報が不足しています。",
+          "secondaryAction": "閉じる"
+        }
+      }
+    },
+    "SALE_SUCCESS": {
+      "text": "注文が完了しました",
+      "actionText": "続行"
+    },
+    "WALLET_NETWORK_SELECTION": {
+      "layoutHeading": "移動",
+      "heading": "どこに資金を移動させたいですか？",
+      "fromFormInput": {
+        "heading": "From",
+        "selectDefaultText": "ウォレットとネットワークを選択",
+        "walletSelectorHeading": "From wallet",
+        "networkSelectorHeading": "From network"
+      },
+      "toFormInput": {
+        "heading": "To",
+        "selectDefaultText": "ウォレットとネットワークを選択",
+        "walletSelectorHeading": "To wallet"
+      },
+      "submitButton": {
+        "text": "次へ"
+      }
+    },
+    "BRIDGE_FORM": {
+      "header": {
+        "title": "コインを移動"
+      },
+      "fees": {
+        "title": "ガス手数料",
+        "fiatPricePrefix": "~ USD $"
+      },
+      "content": {
+        "title": "いくら移動しますか？",
+        "fiatPricePrefix": "約USD",
+        "availableBalancePrefix": "利用可能"
+      },
+      "bridgeForm": {
+        "from": {
+          "inputPlaceholder": "0",
+          "selectorTitle": "移動するコインを選択"
+        },
+        "buttonText": "確認"
+      },
+      "validation": {
+        "noAmountInputted": "金額を入力してください",
+        "insufficientBalance": "残高が不足しています",
+        "noTokenSelected": "移動するコインを選択してください"
+      }
+    },
+    "BRIDGE_REVIEW": {
+      "layoutHeading": "移動",
+      "heading": "これはどう見えますか？",
+      "fromLabel": {
+        "amountHeading": "移動中",
+        "heading": "From"
+      },
+      "toLabel": {
+        "heading": "To"
+      },
+      "fees": {
+        "heading": "ガス手数料"
+      },
+      "submitButton": {
+        "buttonText": "移動を確認"
+      },
+      "fiatPricePrefix": "~ USD $"
+    },
+    "BRIDGE_FAILURE": {
+      "bridgeFailureText": {
+        "statusText": "トランザクションが失敗しました",
+        "actionText": "再確認してもう一度試す"
+      }
+    },
+    "APPROVE_TRANSACTION": {
+      "content": {
+        "heading": "ウォレットでトランザクションを承認してください",
+        "body": "ウォレットのポップアップで表示されるプロンプトに従って承認してください。"
+      },
+      "footer": {
+        "buttonText": "OK",
+        "retryText": "もう一度試す"
+      },
+      "loadingView": {
+        "text": "移動を開始しています"
+      }
+    },
+    "IN_PROGRESS": {
+      "heading": "移動進行中",
+      "body1": "資金は送信されました。受信まで残り20分未満です。進捗状況は、ロケットアイコンをクリックして戻って確認できます。",
+      "body2": "このウィンドウを閉じてもよろしいです。"
+    },
+    "TRANSACTIONS": {
+      "layoutHeading": "進行中",
+      "passportDashboard": "完全な取引履歴を表示する",
+      "status": {
+        "withdrawalPending": {
+          "actionButtonText": "続行",
+          "withdrawalDelayText": "この移動は一時停止されました。戻ってください",
+          "withdrawalReadyText": "コインを受け取るためには行動が必要です",
+          "caption": "一時停止中"
+        },
+        "inProgress": {
+          "heading": "進行中",
+          "txnEstimate": "通常、20分かかります",
+          "stepInfo": "詳細を表示"
+        },
+        "emptyState": {
+          "notConnected": {
+            "body": "トランザクションを表示するにはウォレットを接続してください",
+            "buttonText": "接続する"
+          }
+        },
+        "noTransactions": {
+          "body": "ここで完了しました。",
+          "passport": {
+            "body": "完了した取引は",
+            "link": "パスポート"
+          }
+        }
+      },
+      "changeWallet": {
+        "buttonText": "ウォレットを変更する"
+      },
+      "fiatPricePrefix": "≈ USD $",
+      "support": {
+        "body1": "サポートが必要ですか？",
+        "body2": " お問い合わせは ",
+        "body3": "サポートへ",
+        "supportLink": "https://support.immutable.com/ja/",
+        "passport": {
+          "body1": "または、完了した取引をご覧になるには ",
+          "body2": "パスポート"
+        }
+      },
+      "walletSelection": {
+        "heading": "表示するウォレットを選択"
+      }
+    },
+    "CLAIM_WITHDRAWAL": {
+      "content": {
+        "heading": "コインを受け取るためのプロンプトに従ってください",
+        "body": "引き出しを請求するには小額のガス手数料が必要です。",
+        "body2": "目的地ウォレットアドレス："
+      },
+      "footer": {
+        "buttonText": "続行",
+        "retryText": "もう一度試す"
+      },
+      "IN_PROGRESS": {
+        "loading": {
+          "text": "処理中"
+        },
+        "success": {
+          "text": "成功",
+          "actionText": "完了"
+        },
+        "failure": {
+          "text": "取引失敗",
+          "actionText": "再試行"
+        }
+      }
+    }
+  },
+  "footers": {
+    "quickswapFooter": {
+      "disclaimerText": "Quickswapはサードパーティアプリケーションです。ImmutableはQuickswapをビルド、所有、運営、デプロイしていません。詳細については、Quickswapのウェブサイトを参照してください。"
+    }
+  },
+  "wallets": {
+    "passport": {
+      "heading": "Immutable Passport",
+      "description": "カードで支払い、アイテムを管理するなど、ゲーム用ウォレットです。"
+    },
+    "metamask": {
+      "heading": "MetaMask",
+      "description": "ブロックチェーンアプリケーションおよびweb3にアクセスするためのデジタルウォレット。"
+    },
+    "walletconnect": {
+      "heading": "その他のウォレット",
+      "description": "MetaMaskを含む任意のブロックチェーンモバイルウォレットに接続できます。"
+    },
+    "browserwallet": {
+      "heading": "ブラウザウォレット",
+      "description": "ブロックチェーンアプリケーションおよびweb3にアクセスするためのデジタルウォレット。"
+    },
+    "recommended": "推奨"
+  },
+  "drawers": {
+    "feesBreakdown": {
+      "heading": "手数料の内訳",
+      "total": "総手数料",
+      "fees": {
+        "gas": {
+          "label": "ガス手数料"
+        }
+      }
+    },
+    "transactionFailed": {
+      "content": {
+        "heading1": "続行する前に、",
+        "heading2": "ウォレットで確認が必要です",
+        "body1": "MetaMaskのポップアップが表示されたら、",
+        "body2": "トランザクションに署名してください"
+      },
+      "buttons": {
+        "retry": "了解",
+        "cancel": "閉じる"
+      }
+    },
+    "coinSelector": {
+      "option": {
+        "fiatPricePrefix": "約USD $"
+      },
+      "noCoins": "ウォレットで選択できるコインがありません。"
+    },
+    "notEnoughGas": {
+      "content": {
+        "heading": "{{token}}が不足しています",
+        "body": "この操作のガス手数料をカバーするには{{token}}残高が十分にありません。続行する前に、もっと{{token}}を追加する必要があります。"
+      },
+      "buttons": {
+        "adjustAmount": "金額を調整",
+        "addMoreImx": "IMXコインを追加",
+        "copyAddress": "ウォレットアドレスをコピー",
+        "cancel": "閉じる"
+      }
+    },
+    "notEnoughImx": {
+      "content": {
+        "noImx": {
+          "heading": "IMXコインが必要です",
+          "body": "スワップ手数料はIMXコインで支払われるため、スワップする前にこれを追加する必要があります。"
+        },
+        "insufficientImx": {
+          "heading": "IMXコインが不足しています",
+          "body": "指定された金額の手数料をカバーするためには、IMXコインを追加する必要があります。"
+        }
+      },
+      "buttons": {
+        "adjustAmount": "金額を調整",
+        "addMoreImx": "IMXコインを追加",
+        "cancel": "閉じる"
+      }
+    },
+    "notEnoughEthWithdrawal": {
+      "content": {
+        "heading1": "不足",
+        "heading2": "ガス用",
+        "body1": "追加",
+        "body2": "あなたの宛先アカウントに追加するか、別のアカウントを選択してガスを支払います。宛先アカウントは変更されません。"
+      },
+      "buttons": {
+        "retry": "別のアカウントでガスを支払う",
+        "dismiss": "閉じる"
+      }
+    },
+    "unableToSwap": {
+      "heading": "このコインはスワップできません",
+      "body": "このコインのペアは現在スワップできません。別の選択肢を試してください。",
+      "buttons": {
+        "cancel": "閉じる"
+      }
+    },
+    "networkSwitch": {
+      "heading": "あなたの{{wallet}}でネットワークを切り替える",
+      "manualSwitch": {
+        "body": "続行するにはモバイルウォレットを開き、{{chain}}ネットワークに切り替える必要があります"
+      },
+      "controlledSwitch": {
+        "body": "{{chain}}ネットワークに切り替える必要があります"
+      },
+      "switchButton": "{{chain}}に切り替える"
+    },
+    "walletConnectionError": {
+      "unableToConnect": {
+          "heading": "接続できません",
+          "body": "ウォレットを確認してもう一度お試しください。または、閉じて別のオプションを試してください。",
+          "actionButtonText": "もう一度試す"
+      },
+      "changedYourMind": {
+          "heading": "考えを変えましたか？",
+          "body": "ポップアップが有効になっていることを確認し、ウォレットのプロンプトに従って接続してください。",
+          "actionButtonText": "もう一度試す"
+      }
+    }
+  }
+}

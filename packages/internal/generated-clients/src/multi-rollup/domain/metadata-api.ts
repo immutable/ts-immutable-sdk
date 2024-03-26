@@ -81,7 +81,7 @@ export const MetadataApiAxiosParamCreator = function (configuration?: Configurat
             const localVarQueryParameter = {} as any;
 
 
-
+    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -92,8 +92,8 @@ export const MetadataApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * Get a list of metadata by from the a given contract
-         * @summary Get a list of metadata by from the a given contract
+         * Get a list of metadata from the given contract
+         * @summary Get a list of metadata from the given contract
          * @param {string} chainName The name of chain
          * @param {string} contractAddress The address of metadata contract
          * @param {string} [fromUpdatedAt] Datetime to use as the oldest updated timestamp
@@ -136,7 +136,58 @@ export const MetadataApiAxiosParamCreator = function (configuration?: Configurat
             }
 
 
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Get a list of metadata from the given chain
+         * @summary Get a list of metadata from the given chain
+         * @param {string} chainName The name of chain
+         * @param {string} [fromUpdatedAt] Datetime to use as the oldest updated timestamp
+         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+         * @param {number} [pageSize] Maximum number of items to return
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listMetadataForChain: async (chainName: string, fromUpdatedAt?: string, pageCursor?: string, pageSize?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'chainName' is not null or undefined
+            assertParamExists('listMetadataForChain', 'chainName', chainName)
+            const localVarPath = `/v1/chains/{chain_name}/metadata`
+                .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (fromUpdatedAt !== undefined) {
+                localVarQueryParameter['from_updated_at'] = (fromUpdatedAt as any instanceof Date) ?
+                    (fromUpdatedAt as any).toISOString() :
+                    fromUpdatedAt;
+            }
+
+            if (pageCursor !== undefined) {
+                localVarQueryParameter['page_cursor'] = pageCursor;
+            }
+
+            if (pageSize !== undefined) {
+                localVarQueryParameter['page_size'] = pageSize;
+            }
+
+
+    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -180,7 +231,7 @@ export const MetadataApiAxiosParamCreator = function (configuration?: Configurat
             await setApiKeyToObject(localVarHeaderParameter, "x-immutable-api-key", configuration)
 
 
-
+    
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -227,7 +278,7 @@ export const MetadataApiAxiosParamCreator = function (configuration?: Configurat
             await setApiKeyToObject(localVarHeaderParameter, "x-immutable-api-key", configuration)
 
 
-
+    
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -264,8 +315,8 @@ export const MetadataApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Get a list of metadata by from the a given contract
-         * @summary Get a list of metadata by from the a given contract
+         * Get a list of metadata from the given contract
+         * @summary Get a list of metadata from the given contract
          * @param {string} chainName The name of chain
          * @param {string} contractAddress The address of metadata contract
          * @param {string} [fromUpdatedAt] Datetime to use as the oldest updated timestamp
@@ -276,6 +327,20 @@ export const MetadataApiFp = function(configuration?: Configuration) {
          */
         async listMetadata(chainName: string, contractAddress: string, fromUpdatedAt?: string, pageCursor?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListMetadataResult>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listMetadata(chainName, contractAddress, fromUpdatedAt, pageCursor, pageSize, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Get a list of metadata from the given chain
+         * @summary Get a list of metadata from the given chain
+         * @param {string} chainName The name of chain
+         * @param {string} [fromUpdatedAt] Datetime to use as the oldest updated timestamp
+         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+         * @param {number} [pageSize] Maximum number of items to return
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listMetadataForChain(chainName: string, fromUpdatedAt?: string, pageCursor?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListMetadataResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listMetadataForChain(chainName, fromUpdatedAt, pageCursor, pageSize, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -325,14 +390,24 @@ export const MetadataApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.getMetadata(requestParameters.chainName, requestParameters.contractAddress, requestParameters.metadataId, options).then((request) => request(axios, basePath));
         },
         /**
-         * Get a list of metadata by from the a given contract
-         * @summary Get a list of metadata by from the a given contract
+         * Get a list of metadata from the given contract
+         * @summary Get a list of metadata from the given contract
          * @param {MetadataApiListMetadataRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         listMetadata(requestParameters: MetadataApiListMetadataRequest, options?: AxiosRequestConfig): AxiosPromise<ListMetadataResult> {
             return localVarFp.listMetadata(requestParameters.chainName, requestParameters.contractAddress, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get a list of metadata from the given chain
+         * @summary Get a list of metadata from the given chain
+         * @param {MetadataApiListMetadataForChainRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listMetadataForChain(requestParameters: MetadataApiListMetadataForChainRequest, options?: AxiosRequestConfig): AxiosPromise<ListMetadataResult> {
+            return localVarFp.listMetadataForChain(requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
         },
         /**
          * Refresh stacked metadata
@@ -428,6 +503,41 @@ export interface MetadataApiListMetadataRequest {
 }
 
 /**
+ * Request parameters for listMetadataForChain operation in MetadataApi.
+ * @export
+ * @interface MetadataApiListMetadataForChainRequest
+ */
+export interface MetadataApiListMetadataForChainRequest {
+    /**
+     * The name of chain
+     * @type {string}
+     * @memberof MetadataApiListMetadataForChain
+     */
+    readonly chainName: string
+
+    /**
+     * Datetime to use as the oldest updated timestamp
+     * @type {string}
+     * @memberof MetadataApiListMetadataForChain
+     */
+    readonly fromUpdatedAt?: string
+
+    /**
+     * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+     * @type {string}
+     * @memberof MetadataApiListMetadataForChain
+     */
+    readonly pageCursor?: string
+
+    /**
+     * Maximum number of items to return
+     * @type {number}
+     * @memberof MetadataApiListMetadataForChain
+     */
+    readonly pageSize?: number
+}
+
+/**
  * Request parameters for refreshMetadataByID operation in MetadataApi.
  * @export
  * @interface MetadataApiRefreshMetadataByIDRequest
@@ -503,8 +613,8 @@ export class MetadataApi extends BaseAPI {
     }
 
     /**
-     * Get a list of metadata by from the a given contract
-     * @summary Get a list of metadata by from the a given contract
+     * Get a list of metadata from the given contract
+     * @summary Get a list of metadata from the given contract
      * @param {MetadataApiListMetadataRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -512,6 +622,18 @@ export class MetadataApi extends BaseAPI {
      */
     public listMetadata(requestParameters: MetadataApiListMetadataRequest, options?: AxiosRequestConfig) {
         return MetadataApiFp(this.configuration).listMetadata(requestParameters.chainName, requestParameters.contractAddress, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get a list of metadata from the given chain
+     * @summary Get a list of metadata from the given chain
+     * @param {MetadataApiListMetadataForChainRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MetadataApi
+     */
+    public listMetadataForChain(requestParameters: MetadataApiListMetadataForChainRequest, options?: AxiosRequestConfig) {
+        return MetadataApiFp(this.configuration).listMetadataForChain(requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -1,11 +1,12 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { User as OidcUser, UserManager, WebStorageStateStore } from 'oidc-client-ts';
+import jwt_decode from 'jwt-decode';
 import AuthManager from './authManager';
 import { PassportError, PassportErrorType } from './errors/passportError';
 import { PassportConfiguration } from './config';
 import { mockUser, mockUserImx, mockUserZkEvm } from './test/mocks';
 import { isTokenExpired } from './utils/token';
-import { PassportModuleConfiguration } from './types';
+import { isUserZkEvm, PassportModuleConfiguration } from './types';
 
 jest.mock('jwt-decode');
 jest.mock('./utils/token');
@@ -73,7 +74,7 @@ describe('AuthManager', () => {
   afterEach(jest.resetAllMocks);
 
   let authManager: AuthManager;
-  let mockSignIn: jest.Mock;
+  let mockSigninPopup: jest.Mock;
   let mockSigninPopupCallback: jest.Mock;
   let mockSignoutRedirect: jest.Mock;
   let mockGetUser: jest.Mock;
@@ -82,7 +83,7 @@ describe('AuthManager', () => {
   let mockStoreUser: jest.Mock;
 
   beforeEach(() => {
-    mockSignIn = jest.fn();
+    mockSigninPopup = jest.fn();
     mockSigninPopupCallback = jest.fn();
     mockSignoutRedirect = jest.fn();
     mockGetUser = jest.fn();
@@ -90,7 +91,7 @@ describe('AuthManager', () => {
     mockSignoutSilent = jest.fn();
     mockStoreUser = jest.fn();
     (UserManager as jest.Mock).mockReturnValue({
-      signinPopup: mockSignIn,
+      signinPopup: mockSigninPopup,
       signinPopupCallback: mockSigninPopupCallback,
       signoutRedirect: mockSignoutRedirect,
       signoutSilent: mockSignoutSilent,
@@ -109,8 +110,8 @@ describe('AuthManager', () => {
       expect(UserManager).toBeCalledWith({
         authority: config.authenticationDomain,
         client_id: config.oidcConfiguration.clientId,
-        loadUserInfo: true,
         mergeClaims: true,
+        automaticSilentRenew: false,
         metadata: {
           authorization_endpoint: `${config.authenticationDomain}/authorize`,
           token_endpoint: `${config.authenticationDomain}/oauth/token`,
@@ -160,7 +161,7 @@ describe('AuthManager', () => {
   describe('login', () => {
     describe('when the user has not registered for any rollup', () => {
       it('should get the login user and return the domain model', async () => {
-        mockSignIn.mockResolvedValue(mockOidcUser);
+        mockSigninPopup.mockResolvedValue(mockOidcUser);
 
         const result = await authManager.login();
 
@@ -170,13 +171,12 @@ describe('AuthManager', () => {
 
     describe('when the user has registered for imx', () => {
       it('should populate the imx object', async () => {
-        mockSignIn.mockResolvedValue({
-          ...mockOidcUser,
-          profile: {
-            ...mockOidcUser.profile,
-            passport: {
-              ...imxProfileData,
-            },
+        mockSigninPopup.mockResolvedValue(mockOidcUser);
+        (jwt_decode as jest.Mock).mockReturnValue({
+          passport: {
+            imx_eth_address: mockUserImx.imx.ethAddress,
+            imx_stark_address: mockUserImx.imx.starkAddress,
+            imx_user_admin_address: mockUserImx.imx.userAdminAddress,
           },
         });
 
@@ -188,13 +188,12 @@ describe('AuthManager', () => {
 
     describe('when the user has registered for zkEvm', () => {
       it('should populate the zkEvm object', async () => {
-        mockSignIn.mockResolvedValue({
-          ...mockOidcUser,
-          profile: {
-            ...mockOidcUser.profile,
-            passport: {
-              ...zkEvmProfileData,
-            },
+        mockSigninPopup.mockResolvedValue(mockOidcUser);
+
+        (jwt_decode as jest.Mock).mockReturnValue({
+          passport: {
+            zkevm_eth_address: mockUserZkEvm.zkEvm.ethAddress,
+            zkevm_user_admin_address: mockUserZkEvm.zkEvm.userAdminAddress,
           },
         });
 
@@ -206,14 +205,14 @@ describe('AuthManager', () => {
 
     describe('when the user has registered for imx & zkEvm', () => {
       it('should populate the imx & zkEvm objects', async () => {
-        mockSignIn.mockResolvedValue({
-          ...mockOidcUser,
-          profile: {
-            ...mockOidcUser.profile,
-            passport: {
-              ...zkEvmProfileData,
-              ...imxProfileData,
-            },
+        mockSigninPopup.mockResolvedValue(mockOidcUser);
+        (jwt_decode as jest.Mock).mockReturnValue({
+          passport: {
+            zkevm_eth_address: mockUserZkEvm.zkEvm.ethAddress,
+            zkevm_user_admin_address: mockUserZkEvm.zkEvm.userAdminAddress,
+            imx_eth_address: mockUserImx.imx.ethAddress,
+            imx_stark_address: mockUserImx.imx.starkAddress,
+            imx_user_admin_address: mockUserImx.imx.userAdminAddress,
           },
         });
 
@@ -235,7 +234,7 @@ describe('AuthManager', () => {
     });
 
     it('should throw the error if user is failed to login', async () => {
-      mockSignIn.mockRejectedValue(new Error(mockErrorMsg));
+      mockSigninPopup.mockRejectedValue(new Error(mockErrorMsg));
 
       await expect(() => authManager.login()).rejects.toThrow(
         new PassportError(
@@ -243,6 +242,31 @@ describe('AuthManager', () => {
           PassportErrorType.AUTHENTICATION_ERROR,
         ),
       );
+    });
+  });
+
+  describe('getUserOrLogin', () => {
+    describe('when getUser returns a user', () => {
+      it('should return the user', async () => {
+        mockGetUser.mockReturnValue(mockOidcUser);
+        (isTokenExpired as jest.Mock).mockReturnValue(false);
+
+        const result = await authManager.getUserOrLogin();
+
+        expect(result).toEqual(mockUser);
+      });
+    });
+
+    describe('when getUser throws an error', () => {
+      it('calls attempts to sign in the user using signinPopup', async () => {
+        mockGetUser.mockRejectedValue(new Error(mockErrorMsg));
+        mockSigninPopup.mockReturnValue(mockOidcUser);
+        (isTokenExpired as jest.Mock).mockReturnValue(false);
+
+        const result = await authManager.getUserOrLogin();
+
+        expect(result).toEqual(mockUser);
+      });
     });
   });
 
@@ -392,6 +416,68 @@ describe('AuthManager', () => {
           expect(mockSigninSilent).toBeCalledTimes(1);
         });
       });
+    });
+
+    describe('when the user does not meet the type assertion', () => {
+      it('should return null', async () => {
+        mockGetUser.mockReturnValue(mockOidcUser);
+        (isTokenExpired as jest.Mock).mockReturnValue(false);
+
+        const result = await authManager.getUser(isUserZkEvm);
+
+        expect(result).toBeNull();
+      });
+    });
+
+    describe('when the user does meet the type assertion', () => {
+      it('should return the user', async () => {
+        mockGetUser.mockReturnValue(mockOidcUser);
+        (jwt_decode as jest.Mock).mockReturnValue({
+          passport: {
+            zkevm_eth_address: mockUserZkEvm.zkEvm.ethAddress,
+            zkevm_user_admin_address: mockUserZkEvm.zkEvm.userAdminAddress,
+          },
+        });
+        (isTokenExpired as jest.Mock).mockReturnValue(false);
+
+        const result = await authManager.getUser(isUserZkEvm);
+
+        expect(result).toEqual(mockUserZkEvm);
+      });
+    });
+
+    describe('when the user is refreshing', () => {
+      it('should return the refreshed used', async () => {
+        mockSigninSilent.mockReturnValue(mockOidcUser);
+
+        authManager.forceUserRefreshInBackground();
+
+        const result = await authManager.getUser();
+        expect(result).toEqual(mockUser);
+
+        expect(mockSigninSilent).toBeCalledTimes(1);
+        expect(mockGetUser).toBeCalledTimes(0);
+      });
+    });
+  });
+
+  describe('getUserZkEvm', () => {
+    it('should throw an error if no user is returned', async () => {
+      mockGetUser.mockReturnValue(null);
+
+      await expect(() => authManager.getUserZkEvm()).rejects.toThrow(
+        new Error('Failed to obtain a User with the required ZkEvm attributes'),
+      );
+    });
+  });
+
+  describe('getUserImx', () => {
+    it('should throw an error if no user is returned', async () => {
+      mockGetUser.mockReturnValue(null);
+
+      await expect(() => authManager.getUserImx()).rejects.toThrow(
+        new Error('Failed to obtain a User with the required IMX attributes'),
+      );
     });
   });
 

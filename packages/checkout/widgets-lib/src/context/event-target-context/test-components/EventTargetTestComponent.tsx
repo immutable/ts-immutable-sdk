@@ -1,5 +1,5 @@
-import { BiomeCombinedProviders } from '@biom3/react';
 import React, { useMemo, useReducer } from 'react';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import {
   EventTargetState,
   initialEventTargetState,
@@ -24,10 +24,10 @@ export function EventTargetTestComponent({ children, initialStateOverride }: Tes
   );
 
   return (
-    <BiomeCombinedProviders>
+    <ViewContextTestComponent>
       <EventTargetContext.Provider value={reducerValues}>
         {children}
       </EventTargetContext.Provider>
-    </BiomeCombinedProviders>
+    </ViewContextTestComponent>
   );
 }

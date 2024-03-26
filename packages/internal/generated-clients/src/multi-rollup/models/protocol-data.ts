@@ -21,23 +21,23 @@
  */
 export interface ProtocolData {
     /**
-     * The Order type
+     * Seaport order type
      * @type {string}
      * @memberof ProtocolData
      */
     'order_type': ProtocolDataOrderTypeEnum;
-    /**
-     * Immutable zone address
-     * @type {string}
-     * @memberof ProtocolData
-     */
-    'zone_address': string;
     /**
      * big.Int or uint256 string for order counter
      * @type {string}
      * @memberof ProtocolData
      */
     'counter': string;
+    /**
+     * Immutable zone address
+     * @type {string}
+     * @memberof ProtocolData
+     */
+    'zone_address': string;
     /**
      * Immutable Seaport contract address
      * @type {string}

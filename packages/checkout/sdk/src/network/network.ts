@@ -37,9 +37,8 @@ async function switchNetworkInWallet(
   }
 }
 
-// TODO: Should these functions always return something?
 // eslint-disable-next-line consistent-return
-async function addNetworkToWallet(
+export async function addNetworkToWallet(
   networkMap: NetworkMap,
   web3Provider: Web3Provider,
   chainId: ChainId,
@@ -58,6 +57,8 @@ async function addNetworkToWallet(
       params: [addNetwork],
     });
   }
+
+  return Promise.reject('Provider does not support request method');
 }
 
 export async function getNetworkAllowList(
@@ -69,8 +70,12 @@ export async function getNetworkAllowList(
   const allowedNetworkConfig = (await config.remote.getConfig(
     'allowedNetworks',
   )) as AllowedNetworkConfig[];
+  if (!allowedNetworkConfig) {
+    // eslint-disable-next-line no-console
+    console.warn('No allowed networks configured');
+  }
 
-  const list = allowedNetworkConfig.filter((network) => {
+  const list = (allowedNetworkConfig || []).filter((network) => {
     const allowAllTokens = type === NetworkFilterTypes.ALL;
     const networkNotExcluded = !(exclude || [])
       .map((exc) => exc.chainId)
@@ -169,6 +174,8 @@ export async function switchWalletNetwork(
   try {
     await switchNetworkInWallet(networkMap, web3Provider, chainId);
   } catch (err: any) {
+    // eslint-disable-next-line no-console
+    console.error(err);
     if (err.code === UNRECOGNISED_CHAIN_ERROR_CODE) {
       try {
         await addNetworkToWallet(networkMap, web3Provider, chainId);
@@ -177,6 +184,7 @@ export async function switchWalletNetwork(
         throw new CheckoutError(
           'User cancelled add network request',
           CheckoutErrorType.USER_REJECTED_REQUEST_ERROR,
+          { error: err },
         );
       }
     } else {

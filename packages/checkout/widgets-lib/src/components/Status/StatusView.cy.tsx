@@ -1,7 +1,6 @@
 import { describe, it } from 'local-cypress';
 import { mount } from 'cypress/react18';
-import { onDarkBase } from '@biom3/design-tokens';
-import { BiomeCombinedProviders } from '@biom3/react';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { cySmartGet } from '../../lib/testUtils';
 import { StatusView } from './StatusView';
 import { StatusType } from './StatusType';
@@ -9,7 +8,7 @@ import { StatusType } from './StatusType';
 describe('status view', () => {
   it('shows success text and button', () => {
     mount(
-      <BiomeCombinedProviders theme={{ base: onDarkBase }}>
+      <ViewContextTestComponent>
         <StatusView
           actionText="Close"
           testId="status-view"
@@ -20,7 +19,7 @@ describe('status view', () => {
           statusType={StatusType.SUCCESS}
           statusText="Test success"
         />
-      </BiomeCombinedProviders>,
+      </ViewContextTestComponent>,
     );
 
     cySmartGet('status-view-container').should('be.visible');
@@ -36,7 +35,7 @@ describe('status view', () => {
 
   it('shows failure text and button', () => {
     mount(
-      <BiomeCombinedProviders theme={{ base: onDarkBase }}>
+      <ViewContextTestComponent>
         <StatusView
           actionText="Close"
           testId="status-view"
@@ -47,7 +46,7 @@ describe('status view', () => {
           statusType={StatusType.FAILURE}
           statusText="Test failure"
         />
-      </BiomeCombinedProviders>,
+      </ViewContextTestComponent>,
     );
 
     cySmartGet('status-view-container').should('be.visible');
@@ -63,7 +62,7 @@ describe('status view', () => {
 
   it('shows rejected text and button', () => {
     mount(
-      <BiomeCombinedProviders theme={{ base: onDarkBase }}>
+      <ViewContextTestComponent>
         <StatusView
           actionText="Close"
           testId="status-view"
@@ -74,7 +73,7 @@ describe('status view', () => {
           statusType={StatusType.WARNING}
           statusText="Test rejected"
         />
-      </BiomeCombinedProviders>,
+      </ViewContextTestComponent>,
     );
 
     cySmartGet('status-view-container').should('be.visible');

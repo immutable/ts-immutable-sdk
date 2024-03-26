@@ -3,22 +3,29 @@ import {
   FundingStepType,
   BridgeEventType,
   BridgeFailed,
-  BridgeSuccess,
+  BridgeTransactionSent,
   BridgeWidgetParams,
   ConnectEventType,
   ConnectionSuccess,
-  ConnectTargetLayer,
   IMTBLWidgetEvents,
   SwapEventType,
   SwapFailed,
   SwapSuccess,
   SwapWidgetParams,
+  OnRampWidgetParams,
+  OnRampEventType,
+  OnRampSuccess,
+  OnRampFailed,
+  ChainId,
 } from '@imtbl/checkout-sdk';
 import {
   useCallback,
   useContext,
   useEffect, useMemo, useReducer, useRef, useState,
 } from 'react';
+import BridgeWidget from 'widgets/bridge/BridgeWidget';
+import { useTranslation } from 'react-i18next';
+import OnRampWidget from 'widgets/on-ramp/OnRampWidget';
 import {
   ConnectLoaderActions,
   ConnectLoaderContext,
@@ -30,11 +37,9 @@ import { ConnectWidgetViews } from '../../../../context/view-context/ConnectView
 import { SaleWidgetViews } from '../../../../context/view-context/SaleViewContextTypes';
 import { ViewActions, ViewContext } from '../../../../context/view-context/ViewContext';
 import { getL1ChainId, getL2ChainId } from '../../../../lib/networkUtils';
-import { text as textConfig } from '../../../../resources/text/textConfig';
 import { LoadingView } from '../../../../views/loading/LoadingView';
-import { BridgeWidget } from '../../../bridge/BridgeWidget';
-import { ConnectWidget } from '../../../connect/ConnectWidget';
-import { SwapWidget } from '../../../swap/SwapWidget';
+import ConnectWidget from '../../../connect/ConnectWidget';
+import SwapWidget from '../../../swap/SwapWidget';
 import { useSaleContext } from '../../context/SaleContextProvider';
 import { SaleErrorTypes } from '../../types';
 
@@ -45,28 +50,30 @@ type FundingRouteExecuteProps = {
 
 enum FundingRouteExecuteViews {
   LOADING = 'LOADING',
-  EXECUTE_BRIDGE = 'EXECUTE_BRIDGE',
   EXECUTE_SWAP = 'EXECUTE_SWAP',
+  EXECUTE_BRIDGE = 'EXECUTE_BRIDGE',
+  EXECUTE_ON_RAMP = 'EXECUTE_ON_RAMP',
   SWITCH_NETWORK_ETH = 'SWITCH_NETWORK_ETH',
   SWITCH_NETWORK_ZKEVM = 'SWITCH_NETWORK_ZKEVM',
 }
 
 export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }: FundingRouteExecuteProps) {
+  const { t } = useTranslation();
   const {
-    config, provider, checkout, fromContractAddress: requiredTokenAddress,
+    config, provider, checkout, fromTokenAddress: requiredTokenAddress,
   } = useSaleContext();
   const { viewDispatch } = useContext(ViewContext);
 
   const { connectLoaderDispatch } = useContext(ConnectLoaderContext);
-  const text = textConfig.views[SaleWidgetViews.FUND_WITH_SMART_CHECKOUT];
 
   const [swapParams, setSwapParams] = useState<SwapWidgetParams | undefined>(undefined);
   const [bridgeParams, setBridgeParams] = useState<BridgeWidgetParams | undefined>(undefined);
+  const [onRampParams, setOnRampParams] = useState<OnRampWidgetParams | undefined>(undefined);
 
   const [view, setView] = useState<FundingRouteExecuteViews>(FundingRouteExecuteViews.LOADING);
   const nextView = useRef<FundingRouteExecuteViews | false>(false);
 
-  const stepSuccess = useRef<BridgeSuccess | SwapSuccess | undefined>(undefined);
+  const stepSuccess = useRef<BridgeTransactionSent | SwapSuccess | undefined>(undefined);
   const stepFailed = useRef<BridgeFailed | SwapFailed | undefined>(undefined);
 
   const [eventTargetState, eventTargetDispatch] = useReducer(eventTargetReducer, initialEventTargetState);
@@ -100,7 +107,7 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
 
     if (step.type === FundingStepType.BRIDGE) {
       setBridgeParams({
-        fromContractAddress: step.fundingItem.token.address,
+        tokenAddress: step.fundingItem.token.address,
         amount: step.fundingItem.fundsRequired.formattedAmount,
       });
       if (network.chainId === getL1ChainId(checkout!.config)) {
@@ -111,11 +118,12 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
 
       setView(FundingRouteExecuteViews.SWITCH_NETWORK_ETH);
     }
+
     if (step.type === FundingStepType.SWAP) {
       setSwapParams({
         amount: step.fundingItem.fundsRequired.formattedAmount,
-        fromContractAddress: step.fundingItem.token.address,
-        toContractAddress: requiredTokenAddress,
+        fromTokenAddress: step.fundingItem.token.address,
+        toTokenAddress: requiredTokenAddress,
       });
       if (network.chainId === getL2ChainId(checkout!.config)) {
         setView(FundingRouteExecuteViews.EXECUTE_SWAP);
@@ -124,6 +132,14 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
       nextView.current = FundingRouteExecuteViews.EXECUTE_SWAP;
 
       setView(FundingRouteExecuteViews.SWITCH_NETWORK_ZKEVM);
+    }
+
+    if (step.type === FundingStepType.ONRAMP) {
+      setOnRampParams({
+        amount: step.fundingItem.fundsRequired.formattedAmount,
+        tokenAddress: step.fundingItem.token.address,
+      });
+      setView(FundingRouteExecuteViews.EXECUTE_ON_RAMP);
     }
   }, [provider, checkout]);
 
@@ -151,22 +167,25 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
 
   const handleCustomEvent = (event) => {
     switch (event.detail.type) {
-      case BridgeEventType.SUCCESS:
-      case SwapEventType.SUCCESS: {
-        const successEvent = event.detail.data as (SwapSuccess | BridgeSuccess);
+      case BridgeEventType.TRANSACTION_SENT:
+      case SwapEventType.SUCCESS:
+      case OnRampEventType.SUCCESS: {
+        const successEvent = event.detail.data as (SwapSuccess | BridgeTransactionSent | OnRampSuccess);
         stepSuccess.current = successEvent;
         break;
       }
       case BridgeEventType.FAILURE:
-      case SwapEventType.FAILURE: {
+      case SwapEventType.FAILURE:
+      case OnRampEventType.FAILURE: {
         // On FAILURE, widget will prompt user to try again.
         // We need to know if it failed though when they close the widget
-        const failureEvent = event.detail.data as (SwapFailed | BridgeFailed);
+        const failureEvent = event.detail.data as (SwapFailed | BridgeFailed | OnRampFailed);
         stepFailed.current = failureEvent;
         break;
       }
       case BridgeEventType.CLOSE_WIDGET:
-      case SwapEventType.CLOSE_WIDGET: {
+      case SwapEventType.CLOSE_WIDGET:
+      case OnRampEventType.CLOSE_WIDGET: {
         onCloseWidget();
         break;
       }
@@ -229,12 +248,13 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
   return (
     <EventTargetContext.Provider value={eventTargetReducerValues}>
       {view === FundingRouteExecuteViews.LOADING && (
-        <LoadingView loadingText={text.loading.checkingBalances} />
+        <LoadingView loadingText={t('views.FUND_WITH_SMART_CHECKOUT.loading.checkingBalances')} />
       )}
       {view === FundingRouteExecuteViews.EXECUTE_BRIDGE && (
         <BridgeWidget
           {...bridgeParams!}
           config={config}
+          checkout={checkout!}
         />
       )}
       {view === FundingRouteExecuteViews.EXECUTE_SWAP && (
@@ -243,10 +263,16 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
           config={config}
         />
       )}
+      {view === FundingRouteExecuteViews.EXECUTE_ON_RAMP && (
+        <OnRampWidget
+          config={config}
+          {...onRampParams}
+        />
+      )}
       {view === FundingRouteExecuteViews.SWITCH_NETWORK_ETH && (
         <ConnectWidget
           config={config}
-          targetLayer={ConnectTargetLayer.LAYER1}
+          targetChainId={checkout!.config.isProduction ? ChainId.ETHEREUM : ChainId.SEPOLIA}
           web3Provider={provider}
           checkout={checkout!}
           deepLink={ConnectWidgetViews.SWITCH_NETWORK}
@@ -255,7 +281,7 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
       {view === FundingRouteExecuteViews.SWITCH_NETWORK_ZKEVM && (
         <ConnectWidget
           config={config}
-          targetLayer={ConnectTargetLayer.LAYER2}
+          targetChainId={checkout!.config.isProduction ? ChainId.IMTBL_ZKEVM_MAINNET : ChainId.IMTBL_ZKEVM_TESTNET}
           web3Provider={provider}
           checkout={checkout!}
           deepLink={ConnectWidgetViews.SWITCH_NETWORK}

@@ -1,44 +1,41 @@
+/** @jest-environment jsdom */
 import { SDK_VERSION_MARKER } from '../env';
-import { loadUnresolved } from './load';
+import { getWidgetsEsmUrl, loadUnresolvedBundle } from './load';
 
 describe('load', () => {
   const SDK_VERSION = SDK_VERSION_MARKER;
+  const scriptId = 'immutable-checkout-widgets-bundle';
 
   beforeEach(() => {
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
 
-  describe('Config', () => {
+  describe('load unresolved bundle', () => {
     it('should validate the versioning', () => {
-      loadUnresolved();
+      const tag = document.createElement('script');
+      loadUnresolvedBundle(tag, scriptId, SDK_VERSION);
       expect(document.head.innerHTML).toBe(
         '<script id="immutable-checkout-widgets-bundle" '
         + 'data-version="__SDK_VERSION__" '
         + `src="https://cdn.jsdelivr.net/npm/@imtbl/sdk@${SDK_VERSION}/dist/browser/checkout/widgets.js"></script>`,
       );
     });
+  });
 
-    it('should not re-add script', () => {
-      loadUnresolved();
-      loadUnresolved();
-      loadUnresolved();
-      expect(document.head.innerHTML).toBe(
-        '<script id="immutable-checkout-widgets-bundle" '
-        + 'data-version="__SDK_VERSION__" '
-        + `src="https://cdn.jsdelivr.net/npm/@imtbl/sdk@${SDK_VERSION}/dist/browser/checkout/widgets.js"></script>`,
+  describe('get widgets esm url', () => {
+    it('should validate the versioning', () => {
+      expect(getWidgetsEsmUrl()).toEqual(
+        `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${SDK_VERSION}/dist/browser/checkout/widgets-esm.js`,
       );
     });
 
     it('should change version', () => {
-      loadUnresolved();
-      loadUnresolved({
+      expect(getWidgetsEsmUrl({
         major: 1,
         minor: 2,
-      });
-      expect(document.head.innerHTML).toBe(
-        '<script id="immutable-checkout-widgets-bundle" '
-        + 'data-version="__SDK_VERSION__" '
-        + `src="https://cdn.jsdelivr.net/npm/@imtbl/sdk@${SDK_VERSION}/dist/browser/checkout/widgets.js"></script>`,
+        patch: 3,
+      })).toEqual(
+        'https://cdn.jsdelivr.net/npm/@imtbl/sdk@1.2.3/dist/browser/checkout/widgets-esm.js',
       );
     });
   });

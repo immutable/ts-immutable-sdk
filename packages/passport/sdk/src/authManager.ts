@@ -1,4 +1,6 @@
 import {
+  ErrorResponse,
+  ErrorTimeout,
   InMemoryWebStorage,
   User as OidcUser,
   UserManager,
@@ -9,8 +11,10 @@ import axios from 'axios';
 import DeviceCredentialsManager from 'storage/device_credentials_manager';
 import * as crypto from 'crypto';
 import jwt_decode from 'jwt-decode';
+import { getDetail, Detail } from '@imtbl/metrics';
+import logger from './utils/logger';
 import { isTokenExpired } from './utils/token';
-import { PassportErrorType, withPassportError } from './errors/passportError';
+import { PassportError, PassportErrorType, withPassportError } from './errors/passportError';
 import {
   PassportMetadata,
   User,
@@ -20,6 +24,10 @@ import {
   DeviceErrorResponse,
   IdTokenPayload,
   OidcConfiguration,
+  UserZkEvm,
+  isUserZkEvm,
+  UserImx,
+  isUserImx,
 } from './types';
 import { PassportConfiguration } from './config';
 
@@ -52,7 +60,7 @@ const getAuthConfiguration = (config: PassportConfiguration): UserManagerSetting
       end_session_endpoint: endSessionEndpoint,
     },
     mergeClaims: true,
-    loadUserInfo: true,
+    automaticSilentRenew: false, // Disabled until https://github.com/authts/oidc-client-ts/issues/430 has been resolved
     scope: oidcConfiguration.scope,
     userStore,
   };
@@ -85,9 +93,9 @@ function sha256(buffer: string) {
 export default class AuthManager {
   private userManager;
 
-  private config: PassportConfiguration;
-
   private deviceCredentialsManager: DeviceCredentialsManager;
+
+  private readonly config: PassportConfiguration;
 
   private readonly logoutMode: Exclude<OidcConfiguration['logoutMode'], undefined>;
 
@@ -104,7 +112,11 @@ export default class AuthManager {
   }
 
   private static mapOidcUserToDomainModel = (oidcUser: OidcUser): User => {
-    const passport = oidcUser.profile?.passport as PassportMetadata;
+    let passport: PassportMetadata | undefined;
+    if (oidcUser.id_token) {
+      passport = jwt_decode<IdTokenPayload>(oidcUser.id_token)?.passport;
+    }
+
     const user: User = {
       expired: oidcUser.expired,
       idToken: oidcUser.id_token,
@@ -153,15 +165,36 @@ export default class AuthManager {
     });
   };
 
-  public async login(): Promise<User> {
+  /**
+   * login
+   * @param anonymousId Caller can pass an anonymousId if they want to associate their user's identity with immutable's internal instrumentation.
+   */
+  public async login(anonymousId?: string): Promise<User> {
     return withPassportError<User>(async () => {
+      const rid = getDetail(Detail.RUNTIME_ID);
       const popupWindowFeatures = { width: 410, height: 450 };
       const oidcUser = await this.userManager.signinPopup({
+        extraQueryParams: {
+          ...(this.userManager.settings?.extraQueryParams ?? {}),
+          rid: rid || '',
+          third_party_a_id: anonymousId || '',
+        },
         popupWindowFeatures,
       });
 
       return AuthManager.mapOidcUserToDomainModel(oidcUser);
     }, PassportErrorType.AUTHENTICATION_ERROR);
+  }
+
+  public async getUserOrLogin(): Promise<User> {
+    let user: User | null = null;
+    try {
+      user = await this.getUser();
+    } catch (err) {
+      logger.warn('Failed to retrieve a cached user session', err);
+    }
+
+    return user || this.login();
   }
 
   public async loginCallback(): Promise<void> {
@@ -171,7 +204,11 @@ export default class AuthManager {
     );
   }
 
-  public async loginWithDeviceFlow(): Promise<DeviceConnectResponse> {
+  /**
+   * loginWithDeviceFlow
+   * @param anonymousId Caller can pass an anonymousId if they want to associate their user's identity with immutable's internal instrumentation.
+   */
+  public async loginWithDeviceFlow(anonymousId?: string): Promise<DeviceConnectResponse> {
     return withPassportError<DeviceConnectResponse>(async () => {
       const response = await axios.post<DeviceCodeResponse>(
         `${this.config.authenticationDomain}/oauth/device/code`,
@@ -183,10 +220,12 @@ export default class AuthManager {
         formUrlEncodedHeader,
       );
 
+      const rid = getDetail(Detail.RUNTIME_ID);
+
       return {
         code: response.data.user_code,
         deviceCode: response.data.device_code,
-        url: response.data.verification_uri_complete,
+        url: `${response.data.verification_uri_complete}${rid ? `&rid=${rid}` : ''}${anonymousId ? `&third_party_a_id=${anonymousId}` : ''}`,
         interval: response.data.interval,
       };
     }, PassportErrorType.AUTHENTICATION_ERROR);
@@ -270,7 +309,7 @@ export default class AuthManager {
       + `&audience=${this.config.oidcConfiguration.audience}`;
   }
 
-  public async connectImxPKCEFlow(authorizationCode: string, state: string): Promise<User> {
+  public async loginWithPKCEFlowCallback(authorizationCode: string, state: string): Promise<User> {
     return withPassportError<User>(async () => {
       const pkceData = this.deviceCredentialsManager.getPKCEData();
       if (!pkceData) {
@@ -338,7 +377,13 @@ export default class AuthManager {
     return this.userManager.signoutSilentCallback(url);
   }
 
-  public async forceUserRefresh() : Promise<User | null> {
+  public forceUserRefreshInBackground() {
+    this.refreshTokenAndUpdatePromise().catch((error) => {
+      logger.warn('Failed to refresh user token', error);
+    });
+  }
+
+  public async forceUserRefresh(): Promise<User | null> {
     return this.refreshTokenAndUpdatePromise();
   }
 
@@ -359,7 +404,19 @@ export default class AuthManager {
         }
         resolve(null);
       } catch (err) {
-        reject(err);
+        let passportErrorType = PassportErrorType.AUTHENTICATION_ERROR;
+        let errorMessage = 'Failed to refresh token';
+
+        if (err instanceof ErrorTimeout) {
+          passportErrorType = PassportErrorType.SILENT_LOGIN_ERROR;
+        } else if (err instanceof ErrorResponse) {
+          passportErrorType = PassportErrorType.NOT_LOGGED_IN_ERROR;
+          errorMessage = `${err.message}: ${err.error_description}`;
+        } else if (err instanceof Error) {
+          errorMessage = err.message;
+        }
+
+        reject(new PassportError(errorMessage, passportErrorType));
       } finally {
         this.refreshingPromise = null; // Reset the promise after completion
       }
@@ -369,23 +426,65 @@ export default class AuthManager {
   }
 
   /**
-   * Get the user from the cache or refresh the token if it's expired.
-   * return null if there's no refresh token.
+   *
+   * @param typeAssertion {(user: User) => boolean} - Optional. If provided, then the User will be checked against
+   * the typeAssertion. If the user meets the requirements, then it will be typed as T and returned. If the User
+   * does NOT meet the type assertion, then execution will continue, and we will attempt to obtain a User that does
+   * meet the type assertion.
+   *
+   * This function will attempt to obtain a User in the following order:
+   * 1. If the User is currently refreshing, wait for the refresh to complete.
+   * 2. Attempt to obtain a User from storage that has not expired.
+   * 3. Attempt to refresh the User if a refresh token is present.
+   * 4. Return null if no valid User can be obtained.
    */
-  public async getUser(): Promise<User | null> {
-    return withPassportError<User | null>(async () => {
-      const oidcUser = await this.userManager.getUser();
-      if (!oidcUser) return null;
-
-      if (!isTokenExpired(oidcUser)) {
-        return AuthManager.mapOidcUserToDomainModel(oidcUser);
-      }
-
-      if (oidcUser.refresh_token) {
-        return this.refreshTokenAndUpdatePromise();
+  public async getUser<T extends User>(
+    typeAssertion: (user: User) => user is T = (user: User): user is T => true,
+  ): Promise<T | null> {
+    if (this.refreshingPromise) {
+      const user = await this.refreshingPromise;
+      if (user && typeAssertion(user)) {
+        return user;
       }
 
       return null;
-    }, PassportErrorType.NOT_LOGGED_IN_ERROR);
+    }
+
+    const oidcUser = await this.userManager.getUser();
+    if (!oidcUser) return null;
+
+    if (!isTokenExpired(oidcUser)) {
+      const user = AuthManager.mapOidcUserToDomainModel(oidcUser);
+      if (user && typeAssertion(user)) {
+        return user;
+      }
+    }
+
+    if (oidcUser.refresh_token) {
+      const user = await this.refreshTokenAndUpdatePromise();
+      if (user && typeAssertion(user)) {
+        return user;
+      }
+    }
+
+    return null;
+  }
+
+  public async getUserZkEvm(): Promise<UserZkEvm> {
+    const user = await this.getUser(isUserZkEvm);
+    if (!user) {
+      throw new Error('Failed to obtain a User with the required ZkEvm attributes');
+    }
+
+    return user;
+  }
+
+  public async getUserImx(): Promise<UserImx> {
+    const user = await this.getUser(isUserImx);
+    if (!user) {
+      throw new Error('Failed to obtain a User with the required IMX attributes');
+    }
+
+    return user;
   }
 }

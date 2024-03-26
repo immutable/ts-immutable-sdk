@@ -14,7 +14,7 @@ describe('allowanceAggregator', () => {
           delta: BigNumber.from(1),
           itemRequirement: {
             type: ItemType.ERC20,
-            contractAddress: '0xERC20_1',
+            tokenAddress: '0xERC20_1',
             amount: BigNumber.from(1),
             spenderAddress: '0xSEAPORT',
           },
@@ -24,7 +24,7 @@ describe('allowanceAggregator', () => {
           sufficient: true,
           itemRequirement: {
             type: ItemType.ERC20,
-            contractAddress: '0xERC20_2',
+            tokenAddress: '0xERC20_2',
             amount: BigNumber.from(1),
             spenderAddress: '0xSEAPORT',
           },
@@ -50,7 +50,7 @@ describe('allowanceAggregator', () => {
       delta: BigNumber.from(1),
       itemRequirement: {
         type: ItemType.ERC20,
-        contractAddress: '0xERC20_1',
+        tokenAddress: '0xERC20_1',
         amount: BigNumber.from(1),
         spenderAddress: '0xSEAPORT',
       },
@@ -65,7 +65,7 @@ describe('allowanceAggregator', () => {
         sufficient: true,
         itemRequirement: {
           type: ItemType.ERC20,
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           amount: BigNumber.from(1),
           spenderAddress: '0xSEAPORT',
         },
@@ -119,7 +119,7 @@ describe('allowanceAggregator', () => {
         delta: BigNumber.from(1),
         itemRequirement: {
           type: ItemType.ERC20,
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           amount: BigNumber.from(1),
           spenderAddress: '0xSEAPORT',
         },
@@ -148,7 +148,7 @@ describe('allowanceAggregator', () => {
         delta: BigNumber.from(1),
         itemRequirement: {
           type: ItemType.ERC20,
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           amount: BigNumber.from(1),
           spenderAddress: '0xSEAPORT',
         },
@@ -176,7 +176,7 @@ describe('allowanceAggregator', () => {
           sufficient: true,
           itemRequirement: {
             type: ItemType.ERC20,
-            contractAddress: '0xERC20',
+            tokenAddress: '0xERC20',
             amount: BigNumber.from(1),
             spenderAddress: '0xSEAPORT',
           },

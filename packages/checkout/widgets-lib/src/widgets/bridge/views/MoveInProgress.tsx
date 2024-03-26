@@ -1,87 +1,61 @@
-import { TokenInfo } from '@imtbl/checkout-sdk';
-import { TransactionResponse } from '@ethersproject/providers';
 import { useContext, useEffect } from 'react';
-import { CompletionStatus, WaitForDepositResponse } from '@imtbl/bridge-sdk';
+import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
+import { useTranslation } from 'react-i18next';
+import { ButtonNavigationStyles } from 'components/Header/HeaderStyles';
+import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
+import { ViewActions, ViewContext } from 'context/view-context/ViewContext';
+import { Badge, ButtCon } from '@biom3/react';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
-import { BridgeHero } from '../../../components/Hero/BridgeHero';
+import { RocketHero } from '../../../components/Hero/RocketHero';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import { text } from '../../../resources/text/textConfig';
-import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
+import { sendBridgeTransactionSentEvent, sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
-import { BridgeWidgetViews, PrefilledBridgeForm } from '../../../context/view-context/BridgeViewContextTypes';
-import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
-import { BridgeContext } from '../context/BridgeContext';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
+import { BridgeContext } from '../context/BridgeContext';
+import { calculateCryptoToFiat } from '../../../lib/utils';
+import { CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 
-interface MoveInProgressProps {
-  token: TokenInfo,
-  transactionResponse: TransactionResponse,
-  bridgeForm: PrefilledBridgeForm,
+export interface MoveInProgressProps {
+  transactionHash: string;
 }
 
-export function MoveInProgress({ token, transactionResponse, bridgeForm }: MoveInProgressProps) {
-  const { viewDispatch } = useContext(ViewContext);
+export function MoveInProgress({ transactionHash }: MoveInProgressProps) {
+  const { t } = useTranslation();
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+  const { page } = useAnalytics();
 
-  const { heading, body1, body2 } = text.views[BridgeWidgetViews.IN_PROGRESS];
+  const { cryptoFiatState } = useContext(CryptoFiatContext);
+  const { viewDispatch } = useContext(ViewContext);
   const {
     bridgeState: {
-      tokenBridge,
+      checkout,
+      from,
+      to,
+      token,
+      amount,
     },
   } = useContext(BridgeContext);
 
   useEffect(() => {
-    if (!tokenBridge) return;
+    sendBridgeTransactionSentEvent(
+      eventTarget,
+      transactionHash,
+    );
 
-    (async () => {
-      try {
-        const receipt = await transactionResponse.wait();
-
-        if (receipt.status === 1) {
-          const bridgeResult: WaitForDepositResponse = await tokenBridge.waitForDeposit({
-            transactionHash: receipt.transactionHash,
-          });
-
-          if (bridgeResult.status === CompletionStatus.SUCCESS) {
-            viewDispatch({
-              payload: {
-                type: ViewActions.UPDATE_VIEW,
-                view: {
-                  type: BridgeWidgetViews.SUCCESS,
-                  data: {
-                    transactionHash: receipt.transactionHash,
-                  },
-                },
-              },
-            });
-            return;
-          }
-        }
-
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: {
-              type: BridgeWidgetViews.FAIL,
-              data: bridgeForm,
-            },
-          },
-        });
-      } catch (err) {
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: {
-              type: BridgeWidgetViews.FAIL,
-              data: bridgeForm,
-              reason: 'Transaction failed',
-            },
-          },
-        });
-      }
-    })();
-  }, [transactionResponse, tokenBridge]);
+    const fiatAmount = calculateCryptoToFiat(amount, token?.symbol ?? '', cryptoFiatState.conversions);
+    page({
+      userJourney: UserJourney.BRIDGE,
+      screen: 'InProgress',
+      extras: {
+        fromWalletAddress: from?.walletAddress,
+        toWalletAddress: to?.walletAddress,
+        amount,
+        fiatAmount,
+        tokenAddress: token?.address,
+      },
+    });
+  }, []);
 
   return (
     <SimpleLayout
@@ -90,19 +64,45 @@ export function MoveInProgress({ token, transactionResponse, bridgeForm }: MoveI
         <HeaderNavigation
           transparent
           onCloseButtonClick={() => sendBridgeWidgetCloseEvent(eventTarget)}
+          rightActions={(
+            <>
+              <ButtCon
+                icon="Minting"
+                sx={ButtonNavigationStyles()}
+                onClick={() => {
+                  viewDispatch({
+                    payload: {
+                      type: ViewActions.UPDATE_VIEW,
+                      view: { type: BridgeWidgetViews.TRANSACTIONS },
+                    },
+                  });
+                }}
+                testId="settings-button"
+              />
+              <Badge
+                isAnimated
+                variant="guidance"
+                sx={{
+                  position: 'absolute',
+                  right: 'base.spacing.x14',
+                  top: 'base.spacing.x1',
+                }}
+              />
+            </>
+          )}
         />
       )}
       footer={(
         <FooterLogo />
       )}
-      heroContent={<BridgeHero />}
+      heroContent={<RocketHero environment={checkout.config.environment} />}
       floatHeader
     >
-      <SimpleTextBody heading={heading}>
-        {body1(token?.symbol)}
+      <SimpleTextBody heading={t('views.IN_PROGRESS.heading')}>
+        {t('views.IN_PROGRESS.body1')}
         <br />
         <br />
-        {body2}
+        {t('views.IN_PROGRESS.body2')}
       </SimpleTextBody>
     </SimpleLayout>
   );

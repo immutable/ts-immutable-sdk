@@ -1,9 +1,9 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { ImmutableXClient } from '@imtbl/immutablex-client';
+import { IMXClient } from '@imtbl/x-client';
+import { ImxApiClients } from '@imtbl/generated-clients';
 import { PassportConfiguration } from './config';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import {
-  Networks,
   PassportOverrides,
   PassportModuleConfiguration,
 } from '../types';
@@ -22,15 +22,17 @@ describe('Config', () => {
     imxPublicApiDomain: 'guardianDomain123',
     magicProviderId: 'providerId123',
     magicPublishableApiKey: 'publishableKey123',
-    network: Networks.SANDBOX,
     passportDomain: 'customDomain123',
     zkEvmRpcUrl: 'rpcUrl123',
     relayerUrl: 'relayerUrl123',
-    immutableXClient: {} as ImmutableXClient,
+    immutableXClient: {} as IMXClient,
+    imxApiClients: {} as ImxApiClients,
     indexerMrBasePath: 'indexerMrBasePath123',
     orderBookMrBasePath: 'orderBookMrBasePath123',
     passportMrBasePath: 'passportMrBasePath123',
   };
+
+  const defaultHeaders = { 'x-sdk-version': 'ts-immutable-sdk-__SDK_VERSION__' };
 
   describe('when the baseConfig environment is SANDBOX', () => {
     it('returns a Config', () => {
@@ -43,7 +45,6 @@ describe('Config', () => {
       });
       expect(config).toEqual(
         expect.objectContaining({
-          network: Networks.SANDBOX,
           authenticationDomain: 'https://auth.immutable.com',
           magicPublishableApiKey: 'pk_live_10F423798A540ED7',
           magicProviderId: 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=',
@@ -51,6 +52,7 @@ describe('Config', () => {
           oidcConfiguration,
         }),
       );
+      expect(config.multiRollupConfig.passport.baseOptions?.headers).toEqual(defaultHeaders);
     });
   });
 
@@ -65,7 +67,6 @@ describe('Config', () => {
       });
       expect(config).toEqual(
         expect.objectContaining({
-          network: Networks.PRODUCTION,
           authenticationDomain: 'https://auth.immutable.com',
           magicPublishableApiKey: 'pk_live_10F423798A540ED7',
           magicProviderId: 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=',
@@ -73,6 +74,7 @@ describe('Config', () => {
           oidcConfiguration,
         }),
       );
+      expect(config.multiRollupConfig.passport.baseOptions?.headers).toEqual(defaultHeaders);
     });
   });
 
@@ -93,11 +95,11 @@ describe('Config', () => {
             authenticationDomain: overrides.authenticationDomain,
             magicProviderId: overrides.magicProviderId,
             magicPublishableApiKey: overrides.magicPublishableApiKey,
-            network: overrides.network,
             passportDomain: overrides.passportDomain,
             oidcConfiguration,
           }),
         );
+        expect(config.multiRollupConfig.passport.baseOptions?.headers).toEqual(defaultHeaders);
       });
     });
 

@@ -1,12 +1,12 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { ImmutableXClient } from '@imtbl/immutablex-client';
-import { MultiRollupApiClients } from '@imtbl/generated-clients';
+import { IMXClient } from '@imtbl/x-client';
+import { ImxApiClients, MultiRollupApiClients, imxApiConfig } from '@imtbl/generated-clients';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
 import { ConfirmationScreen } from './confirmation';
 import { Passport } from './Passport';
 import { PassportImxProvider, PassportImxProviderFactory } from './starkEx';
-import { Networks, OidcConfiguration } from './types';
+import { OidcConfiguration } from './types';
 import { mockUser, mockLinkedAddresses, mockUserImx } from './test/mocks';
 
 jest.mock('./authManager');
@@ -92,9 +92,10 @@ describe('Passport', () => {
         const baseConfig = new ImmutableConfiguration({
           environment: Environment.SANDBOX,
         });
-        const immutableXClient = new ImmutableXClient({
+        const immutableXClient = new IMXClient({
           baseConfig,
         });
+        const imxApiClients = new ImxApiClients(imxApiConfig.getSandbox());
         const passportInstance = new Passport({
           baseConfig,
           overrides: {
@@ -102,10 +103,10 @@ describe('Passport', () => {
             imxPublicApiDomain: 'guardianDomain123',
             magicProviderId: 'providerId123',
             magicPublishableApiKey: 'publishableKey123',
-            network: Networks.SANDBOX,
             passportDomain: 'customDomain123',
             relayerUrl: 'relayerUrl123',
             zkEvmRpcUrl: 'zkEvmRpcUrl123',
+            imxApiClients,
             indexerMrBasePath: 'indexerMrBasePath123',
             orderBookMrBasePath: 'orderBookMrBasePath123',
             passportMrBasePath: 'passportMrBasePath123',

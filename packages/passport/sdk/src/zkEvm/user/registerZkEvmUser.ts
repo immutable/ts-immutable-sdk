@@ -1,60 +1,59 @@
-import { ExternalProvider, JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
+import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { signRaw } from '@imtbl/toolkit';
-import { CHAIN_NAME_MAP } from 'network/constants';
-import { UserZkEvm } from '../../types';
+import { getEip155ChainId } from 'zkEvm/walletHelpers';
+import { Signer } from '@ethersproject/abstract-signer';
 import AuthManager from '../../authManager';
 import { JsonRpcError, RpcErrorCode } from '../JsonRpcError';
 
 export type RegisterZkEvmUserInput = {
   authManager: AuthManager;
-  magicProvider: ExternalProvider,
+  ethSigner: Signer,
   multiRollupApiClients: MultiRollupApiClients,
   accessToken: string;
-  jsonRpcProvider: JsonRpcProvider;
+  rpcProvider: StaticJsonRpcProvider;
 };
 
 const MESSAGE_TO_SIGN = 'Only sign this message from Immutable Passport';
 
 export async function registerZkEvmUser({
   authManager,
-  magicProvider,
+  ethSigner,
   multiRollupApiClients,
   accessToken,
-  jsonRpcProvider,
-}: RegisterZkEvmUserInput): Promise<UserZkEvm> {
-  const web3Provider = new Web3Provider(
-    magicProvider,
-  );
-  const ethSigner = web3Provider.getSigner();
+  rpcProvider,
+}: RegisterZkEvmUserInput): Promise<string> {
+  const [ethereumAddress, ethereumSignature, network, chainListResponse] = await Promise.all([
+    ethSigner.getAddress(),
+    signRaw(MESSAGE_TO_SIGN, ethSigner),
+    rpcProvider.detectNetwork(),
+    multiRollupApiClients.chainsApi.listChains(),
+  ]);
 
-  const ethereumAddress = await ethSigner.getAddress();
-  const ethereumSignature = await signRaw(MESSAGE_TO_SIGN, ethSigner);
-
-  const headers = { Authorization: `Bearer ${accessToken}` };
-
-  const { chainId } = await jsonRpcProvider.ready;
+  const eipChainId = getEip155ChainId(network.chainId);
+  const chainName = chainListResponse.data?.result?.find((chain) => chain.id === eipChainId)?.name;
+  if (!chainName) {
+    throw new JsonRpcError(
+      RpcErrorCode.INTERNAL_ERROR,
+      `Chain name does not exist on for chain id ${network.chainId}`,
+    );
+  }
 
   try {
-    const chainName = CHAIN_NAME_MAP.get(chainId);
-    if (!chainName) {
-      throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, `Chain name does not exist on for chain id ${chainId}`);
-    }
-    await multiRollupApiClients.passportApi.createCounterfactualAddress({
+    const registrationResponse = await multiRollupApiClients.passportApi.createCounterfactualAddressV2({
       chainName,
       createCounterfactualAddressRequest: {
         ethereum_address: ethereumAddress,
         ethereum_signature: ethereumSignature,
       },
-    }, { headers });
+    }, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+
+    authManager.forceUserRefreshInBackground();
+
+    return registrationResponse.data.counterfactual_address;
   } catch (error) {
     throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, `Failed to create counterfactual address: ${error}`);
   }
-
-  const user = await authManager.forceUserRefresh();
-  if (!user?.zkEvm) {
-    throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, 'Failed to refresh user details');
-  }
-
-  return user as UserZkEvm;
 }

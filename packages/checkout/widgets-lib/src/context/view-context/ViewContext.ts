@@ -2,11 +2,10 @@ import { createContext } from 'react';
 import { ConnectWidgetView } from './ConnectViewContextTypes';
 import { WalletWidgetView } from './WalletViewContextTypes';
 import { PrefilledSwapForm, SwapWidgetView } from './SwapViewContextTypes';
-import { BridgeWidgetView, PrefilledBridgeForm } from './BridgeViewContextTypes';
+import { BridgeWidgetView } from './BridgeViewContextTypes';
 import { SaleWidgetView } from './SaleViewContextTypes';
 import { ViewType } from './ViewType';
 import { OnRampWidgetView } from './OnRampViewContextTypes';
-import { XBridgeWidgetView } from './XBridgeViewContextTypes';
 
 export enum SharedViews {
   LOADING_VIEW = 'LOADING_VIEW',
@@ -39,7 +38,6 @@ export interface ServiceUnavailableErrorView extends ViewType {
 interface TopUpView extends ViewType {
   type: SharedViews.TOP_UP_VIEW,
   swapData?: PrefilledSwapForm,
-  bridgeData?: PrefilledBridgeForm,
 }
 
 export type View =
@@ -47,10 +45,9 @@ export type View =
   | ConnectWidgetView
   | WalletWidgetView
   | SwapWidgetView
-  | BridgeWidgetView
   | OnRampWidgetView
   | SaleWidgetView
-  | XBridgeWidgetView;
+  | BridgeWidgetView;
 
 export interface ViewState {
   view: View;

@@ -52,8 +52,8 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
   const [amountError, setAmountError] = useState<string>('');
   const [id, setId] = useState<string>('');
   const [idError, setIdError] = useState<string>('');
-  const [contractAddress, setContractAddress] = useState<string>('');
-  const [contractAddressError, setContractAddressError] = useState<string>('');
+  const [tokenAddress, setTokenAddress] = useState<string>('');
+  const [tokenAddressError, setTokenAddressError] = useState<string>('');
   const [spenderAddress, setSpenderAddress] = useState<string>('');
   const [spenderAddressError, setSpenderAddressError] = useState<string>('');
 
@@ -121,7 +121,7 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
         gasToken: {
           type: GasTokenType.ERC20,
           limit: BigNumber.from(gasLimit),
-          contractAddress: gasContractAddress,
+          tokenAddress: gasContractAddress,
         }
       });
     }
@@ -174,20 +174,20 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
     if (!amount) {
       setAmountError('Amount is required for ERC20 token');
     }
-    if (!contractAddress) {
-      setContractAddressError('Contract address is required for ERC20 token');
+    if (!tokenAddress) {
+      setTokenAddressError('Contract address is required for ERC20 token');
     }
     if (!spenderAddress) {
       setSpenderAddressError('Spender address is required for ERC20 token');
     }
-    if (!amount || !contractAddress || !spenderAddress) {
+    if (!amount || !tokenAddress || !spenderAddress) {
       return;
     }
 
     updateItemRequirements({
       type: ItemType.ERC20,
       amount,
-      contractAddress,
+      tokenAddress,
       spenderAddress,
     });
   }
@@ -196,19 +196,19 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
     if (!id) {
       setIdError('ID is required for ERC721 token');
     }
-    if (!contractAddress) {
-      setContractAddressError('Contract address is required for ERC721 token');
+    if (!tokenAddress) {
+      setTokenAddressError('Contract address is required for ERC721 token');
     }
     if (!spenderAddress) {
       setSpenderAddressError('Spender address is required for ERC721 token');
     }
-    if (!id || !contractAddress || !spenderAddress) {
+    if (!id || !tokenAddress || !spenderAddress) {
       return;
     }
     updateItemRequirements({
       type: ItemType.ERC721,
       id,
-      contractAddress,
+      contractAddress: tokenAddress,
       spenderAddress,
     });
   }
@@ -248,7 +248,7 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
             <td>{item.type}</td>
             <td>{item.amount}</td>
             <td></td>
-            <td>{item.contractAddress}</td>
+            <td>{item.tokenAddress}</td>
             <td>{item.spenderAddress}</td>
           </tr>
         );
@@ -268,7 +268,7 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
   const selectItemType = (value: OptionKey) => {
     setAmountError('');
     setIdError('');
-    setContractAddressError('');
+    setTokenAddressError('');
     setSpenderAddressError('');
 
     switch (value) {
@@ -279,7 +279,7 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
         setDisabledContractAddress(true);
         setDisabledSpenderAddress(true);
         setId('');
-        setContractAddress('');
+        setTokenAddress('');
         setSpenderAddress('');
         break;
       case 'erc20':
@@ -373,17 +373,17 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
               </FormControl>
             </td>
             <td>
-              <FormControl validationStatus={contractAddressError ? 'error' : 'success'}>
+              <FormControl validationStatus={tokenAddressError ? 'error' : 'success'}>
                 <TextInput
-                  value={contractAddress}
+                  value={tokenAddress}
                   disabled={disableContractAddress}
                   onChange={(event: any) => {
-                    setContractAddress(event.target.value);
-                    setContractAddressError('');
+                    setTokenAddress(event.target.value);
+                    setTokenAddressError('');
                   }}
                 />
-              {contractAddressError && (
-                  <FormControl.Validation>{contractAddressError}</FormControl.Validation>
+              {tokenAddressError && (
+                  <FormControl.Validation>{tokenAddressError}</FormControl.Validation>
                 )}
               </FormControl>
             </td>

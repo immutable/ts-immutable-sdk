@@ -1,18 +1,17 @@
-import { onDarkBase, onLightBase } from '@biom3/design-tokens';
-import { BiomeCombinedProviders } from '@biom3/react';
 import { mount } from 'cypress/react18';
 import { WidgetTheme } from '@imtbl/checkout-sdk';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
+import { Environment } from '@imtbl/config';
 import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
 import { cySmartGet } from '../../lib/testUtils';
 import { QuickswapFooter } from './QuickswapFooter';
-import { text } from '../../resources/text/textConfig';
 
 describe('Quickswap Footer', () => {
   it('should show the Quickswap logo', () => {
     mount(
-      <BiomeCombinedProviders theme={{ base: onLightBase }}>
-        <SimpleLayout footer={<QuickswapFooter theme={WidgetTheme.LIGHT} />} />
-      </BiomeCombinedProviders>,
+      <ViewContextTestComponent theme={WidgetTheme.LIGHT}>
+        <SimpleLayout footer={<QuickswapFooter environment={Environment.SANDBOX} theme={WidgetTheme.LIGHT} />} />
+      </ViewContextTestComponent>,
     );
 
     cySmartGet('quickswap-logo').should('be.visible');
@@ -20,16 +19,17 @@ describe('Quickswap Footer', () => {
 
   it('should show the disclaimer text', () => {
     mount(
-      <BiomeCombinedProviders theme={{ base: onDarkBase }}>
-        <SimpleLayout footer={<QuickswapFooter theme={WidgetTheme.DARK} />} />
-      </BiomeCombinedProviders>,
+      <ViewContextTestComponent theme={WidgetTheme.DARK}>
+        <SimpleLayout footer={<QuickswapFooter environment={Environment.SANDBOX} theme={WidgetTheme.DARK} />} />
+      </ViewContextTestComponent>,
     );
 
     cySmartGet(
       'quickswap-footer-disclaimer-text',
     ).should(
       'have.text',
-      text.footers.quickswapFooter.disclaimerText,
+      // eslint-disable-next-line max-len
+      'Quickswap is a third party app. Immutable neither builds, owns, operates or deploys Quickswap. For further info, refer to Quickswap’s website.',
     );
   });
 });

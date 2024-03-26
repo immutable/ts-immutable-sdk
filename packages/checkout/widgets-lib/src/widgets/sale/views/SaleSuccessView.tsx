@@ -1,4 +1,4 @@
-import { text } from '../../../resources/text/textConfig';
+import { useTranslation } from 'react-i18next';
 import { StatusView } from '../../../components/Status/StatusView';
 import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 import { useSaleEvent } from '../hooks/useSaleEvents';
@@ -8,6 +8,7 @@ export type SaleSuccessViewProps = {
   data: Record<string, any>;
 };
 export function SaleSuccessView({ data }: SaleSuccessViewProps) {
+  const { t } = useTranslation();
   const { sendCloseEvent, sendSuccessEvent } = useSaleEvent();
 
   const closeWidget = () => {
@@ -16,11 +17,11 @@ export function SaleSuccessView({ data }: SaleSuccessViewProps) {
 
   return (
     <StatusView
-      statusText={text.views[SaleWidgetViews.SALE_SUCCESS].text}
-      actionText={text.views[SaleWidgetViews.SALE_SUCCESS].actionText}
+      statusText={t('views.SALE_SUCCESS.text')}
+      actionText={t('views.SALE_SUCCESS.actionText')}
       onRenderEvent={() => {
-        const { transactions, ...rest } = data;
-        sendSuccessEvent(SaleWidgetViews.SALE_SUCCESS, transactions, rest);
+        const { transactions, tokenIds, ...details } = data;
+        sendSuccessEvent(SaleWidgetViews.SALE_SUCCESS, transactions, tokenIds, details);
       }}
       onActionClick={() => closeWidget()}
       statusType={StatusType.SUCCESS}

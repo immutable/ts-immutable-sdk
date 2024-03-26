@@ -1,14 +1,17 @@
 import { Box } from '@biom3/react';
 import {
-  useContext, useEffect, useMemo, useState,
+  useContext,
+  useEffect,
+  useState,
 } from 'react';
 import { WidgetTheme } from '@imtbl/checkout-sdk';
+import { useTranslation } from 'react-i18next';
+import { ConnectLoaderContext } from 'context/connect-loader-context/ConnectLoaderContext';
+import { Environment } from '@imtbl/config';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { QuickswapFooter } from '../../../components/Footer/QuickswapFooter';
 import { sendSwapWidgetCloseEvent } from '../SwapWidgetEvents';
-import { text } from '../../../resources/text/textConfig';
-import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import { SwapForm } from '../components/SwapForm';
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { hasZeroBalance } from '../../../lib/gasBalanceCheck';
@@ -22,29 +25,32 @@ export interface SwapCoinsProps {
   theme: WidgetTheme;
   fromAmount?: string;
   toAmount?: string;
-  fromContractAddress?: string;
-  toContractAddress?: string;
+  fromTokenAddress?: string;
+  toTokenAddress?: string;
 }
 
 export function SwapCoins({
   theme,
   fromAmount,
   toAmount,
-  fromContractAddress,
-  toContractAddress,
+  fromTokenAddress,
+  toTokenAddress,
 }: SwapCoinsProps) {
-  const { header } = text.views[SwapWidgetViews.SWAP];
-  const { viewState, viewDispatch } = useContext(ViewContext);
+  const { t } = useTranslation();
+  const { viewDispatch } = useContext(ViewContext);
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
-
-  const showBackButton = useMemo(() => viewState.history.length > 2
-  && viewState.history[viewState.history.length - 2].type === SharedViews.TOP_UP_VIEW, [viewState.history]);
 
   const {
     swapState: {
       tokenBalances,
     },
   } = useContext(SwapContext);
+
+  const {
+    connectLoaderState: {
+      checkout,
+    },
+  } = useContext(ConnectLoaderContext);
 
   const [showNotEnoughImxDrawer, setShowNotEnoughImxDrawer] = useState(false);
 
@@ -57,8 +63,8 @@ export function SwapCoins({
       extras: {
         fromAmount,
         toAmount,
-        fromContractAddress,
-        toContractAddress,
+        fromTokenAddress,
+        toTokenAddress,
       },
     });
   }, []);
@@ -73,13 +79,11 @@ export function SwapCoins({
     <SimpleLayout
       header={(
         <HeaderNavigation
-          showBack={showBackButton}
-          title={header.title}
+          title={t('views.SWAP.header.title')}
           onCloseButtonClick={() => sendSwapWidgetCloseEvent(eventTarget)}
         />
       )}
-      footer={<QuickswapFooter theme={theme} />}
-      footerBackgroundColor="base.color.translucent.emphasis.200"
+      footer={<QuickswapFooter environment={checkout?.config.environment} theme={theme} />}
     >
       <Box
         sx={{
@@ -89,14 +93,17 @@ export function SwapCoins({
           justifyContent: 'space-between',
         }}
       >
-        <SwapForm data={{
-          fromAmount,
-          toAmount,
-          fromContractAddress,
-          toContractAddress,
-        }}
+        <SwapForm
+          data={{
+            fromAmount,
+            toAmount,
+            fromTokenAddress,
+            toTokenAddress,
+          }}
+          theme={theme}
         />
         <NotEnoughImx
+          environment={checkout?.config.environment ?? Environment.PRODUCTION}
           visible={showNotEnoughImxDrawer}
           showAdjustAmount={false}
           hasZeroImx
@@ -110,7 +117,7 @@ export function SwapCoins({
               },
             });
           }}
-          onCloseBottomSheet={() => {
+          onCloseDrawer={() => {
             setShowNotEnoughImxDrawer(false);
           }}
         />

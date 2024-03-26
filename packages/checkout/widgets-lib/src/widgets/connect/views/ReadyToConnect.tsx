@@ -7,6 +7,7 @@ import {
   useContext, useState, useCallback, useMemo, useEffect,
 } from 'react';
 import { addProviderListenersForWidgetRoot } from 'lib';
+import { useTranslation } from 'react-i18next';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../../components/Footer/FooterButton';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
@@ -14,10 +15,9 @@ import { MetamaskConnectHero } from '../../../components/Hero/MetamaskConnectHer
 import { PassportConnectHero } from '../../../components/Hero/PassportConnectHero';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
-import { text } from '../../../resources/text/textConfig';
 import { ConnectContext, ConnectActions } from '../context/ConnectContext';
 import { ViewContext, ViewActions } from '../../../context/view-context/ViewContext';
-import { isMetaMaskProvider, isPassportProvider } from '../../../lib/providerUtils';
+import { isMetaMaskProvider, isPassportProvider } from '../../../lib/provider';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { identifyUser } from '../../../lib/analytics/identifyUser';
 
@@ -26,6 +26,7 @@ export interface ReadyToConnectProps {
   allowedChains: ChainId[];
 }
 export function ReadyToConnect({ targetChainId, allowedChains }: ReadyToConnectProps) {
+  const { t } = useTranslation();
   const {
     connectState: { checkout, provider, sendCloseEvent },
     connectDispatch,
@@ -65,15 +66,8 @@ export function ReadyToConnect({ targetChainId, allowedChains }: ReadyToConnectP
     }
   }, [isPassport, isMetaMask]);
 
-  const textView = () => {
-    if (isPassport) {
-      return text.views[ConnectWidgetViews.READY_TO_CONNECT].passport;
-    }
-    return text.views[ConnectWidgetViews.READY_TO_CONNECT].metamask;
-  };
-  const { header } = text.views[ConnectWidgetViews.READY_TO_CONNECT];
-  const { body, footer } = textView();
-  const [footerButtonText, setFooterButtonText] = useState(footer.buttonText1);
+  const textView = () => `views.READY_TO_CONNECT.${isPassport ? 'passport' : 'metamask'}`;
+  const [footerButtonTextKey, setFooterButtonTextKey] = useState(`${textView()}.footer.buttonText1`);
   const [loading, setLoading] = useState(false);
   const heroContent = () => {
     if (isPassport) {
@@ -92,21 +86,27 @@ export function ReadyToConnect({ targetChainId, allowedChains }: ReadyToConnectP
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
   const handleConnectViewUpdate = async (provider: Web3Provider) => {
-    // Skip checks for Passport. Passport will be shipped with the
-    // zkEVM network pre-configured and changes of networks are handled
-    // by the ConnectLoader.
-    // TODO: Remove this check when Passport has support for L1.
-    if (!isPassport) {
-      const chainId = await provider.getSigner().getChainId();
-      if (chainId !== targetChainId && !allowedChains?.includes(chainId)) {
+    const chainId = await provider.provider.request!({ method: 'eth_chainId', params: [] });
+    // eslint-disable-next-line radix
+    const parsedChainId = parseInt(chainId.toString());
+    if (parsedChainId !== targetChainId && !allowedChains?.includes(parsedChainId)) {
+      // TODO: What do we do with Passport here as it can't connect to L1
+      if (isPassport) {
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,
-            view: { type: ConnectWidgetViews.SWITCH_NETWORK },
+            view: { type: ConnectWidgetViews.SUCCESS },
           },
         });
         return;
       }
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: { type: ConnectWidgetViews.SWITCH_NETWORK },
+        },
+      });
+      return;
     }
 
     viewDispatch({
@@ -131,8 +131,15 @@ export function ReadyToConnect({ targetChainId, allowedChains }: ReadyToConnectP
         control: 'Connect',
         controlType: 'Button',
       });
+
+      let changeAccount = false;
+      if (isMetaMaskProvider(provider)) {
+        changeAccount = true;
+      }
+
       const connectResult = await checkout.connect({
         provider,
+        requestWalletPermissions: changeAccount,
       });
 
       // Set up EIP-1193 provider event listeners for widget root instances
@@ -148,10 +155,12 @@ export function ReadyToConnect({ targetChainId, allowedChains }: ReadyToConnectP
       });
       handleConnectViewUpdate(provider);
     } catch (err: any) {
+      // eslint-disable-next-line no-console
+      console.error(err);
       setLoading(false);
-      setFooterButtonText(footer.buttonText2);
+      setFooterButtonTextKey(`${textView()}.footer.buttonText2`);
     }
-  }, [checkout, provider, connectDispatch, viewDispatch, footer.buttonText2, identify]);
+  }, [checkout, provider, connectDispatch, viewDispatch, identify]);
 
   return (
     <SimpleLayout
@@ -159,7 +168,7 @@ export function ReadyToConnect({ targetChainId, allowedChains }: ReadyToConnectP
       header={(
         <HeaderNavigation
           showBack={showBackButton}
-          title={header.title}
+          title={t('views.READY_TO_CONNECT.header.title')}
           transparent
           onCloseButtonClick={sendCloseEvent}
         />
@@ -169,12 +178,12 @@ export function ReadyToConnect({ targetChainId, allowedChains }: ReadyToConnectP
       footer={(
         <FooterButton
           loading={loading}
-          actionText={footerButtonText}
+          actionText={t(footerButtonTextKey)}
           onActionClick={onConnectClick}
         />
       )}
     >
-      <SimpleTextBody heading={body.heading}>{body.content}</SimpleTextBody>
+      <SimpleTextBody heading={t(`${textView()}.body.heading`)}>{t(`${textView()}.body.content`)}</SimpleTextBody>
     </SimpleLayout>
   );
 }

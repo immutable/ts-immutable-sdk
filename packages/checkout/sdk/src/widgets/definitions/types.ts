@@ -1,9 +1,11 @@
 import { Environment } from '@imtbl/config';
 import { Web3Provider } from '@ethersproject/providers';
 import {
+  BridgeClaimWithdrawalFailed,
+  BridgeClaimWithdrawalSuccess,
   BridgeEventType,
   BridgeFailed,
-  BridgeSuccess,
+  BridgeTransactionSent,
   ConnectEventType,
   ConnectionFailed,
   ConnectionSuccess,
@@ -20,6 +22,7 @@ import {
   RequestWalletEvent,
   SaleEventType,
   SaleFailed,
+  SalePaymentMethod,
   SaleSuccess,
   SaleTransactionSuccess,
   SwapEventType,
@@ -138,9 +141,11 @@ export type WidgetEventData = {
   } & OrchestrationMapping & ProviderEventMapping
 
   [WidgetType.BRIDGE]: {
-    [BridgeEventType.SUCCESS]: BridgeSuccess,
+    [BridgeEventType.TRANSACTION_SENT]: BridgeTransactionSent,
     [BridgeEventType.FAILURE]: BridgeFailed,
     [BridgeEventType.CLOSE_WIDGET]: {}
+    [BridgeEventType.CLAIM_WITHDRAWAL_SUCCESS]: BridgeClaimWithdrawalSuccess
+    [BridgeEventType.CLAIM_WITHDRAWAL_FAILURE]: BridgeClaimWithdrawalFailed
   } & OrchestrationMapping & ProviderEventMapping,
 
   [WidgetType.ONRAMP]: {
@@ -154,7 +159,11 @@ export type WidgetEventData = {
     [SaleEventType.FAILURE]: SaleFailed,
     [SaleEventType.REJECTED]: any,
     [SaleEventType.CLOSE_WIDGET]: {},
-    [SaleEventType.TRANSACTION_SUCCESS]: SaleTransactionSuccess
+    [SaleEventType.TRANSACTION_SUCCESS]: SaleTransactionSuccess,
+    [SaleEventType.PAYMENT_METHOD]: SalePaymentMethod,
+    [SaleEventType.REQUEST_BRIDGE]: {},
+    [SaleEventType.REQUEST_SWAP]: {},
+    [SaleEventType.REQUEST_ONRAMP]: {},
   } & OrchestrationMapping & ProviderEventMapping
 };
 

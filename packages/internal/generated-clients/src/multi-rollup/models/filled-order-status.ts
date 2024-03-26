@@ -21,7 +21,7 @@
  */
 export interface FilledOrderStatus {
     /**
-     * The order status
+     * A terminal order status indicating that an order has been fulfilled.
      * @type {string}
      * @memberof FilledOrderStatus
      */

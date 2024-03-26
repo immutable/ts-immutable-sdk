@@ -2,25 +2,29 @@ import { Heading, MenuItem } from '@biom3/react';
 import {
   useContext, useEffect, useMemo, useState,
 } from 'react';
-import { IMTBLWidgetEvents, TokenFilterTypes, TokenInfo } from '@imtbl/checkout-sdk';
+import {
+  IMTBLWidgetEvents, TokenFilterTypes, TokenInfo, WidgetTheme,
+} from '@imtbl/checkout-sdk';
 import { ShowMenuItem } from './BalanceItemStyles';
 import { BalanceInfo } from '../../functions/tokenBalances';
 import { WalletContext } from '../../context/WalletContext';
 import { orchestrationEvents } from '../../../../lib/orchestrationEvents';
 import { getL1ChainId, getL2ChainId } from '../../../../lib/networkUtils';
-import { formatZeroAmount, tokenValueFormat } from '../../../../lib/utils';
+import { formatZeroAmount, getDefaultTokenImage, tokenValueFormat } from '../../../../lib/utils';
 import { ConnectLoaderContext } from '../../../../context/connect-loader-context/ConnectLoaderContext';
-import { isPassportProvider } from '../../../../lib/providerUtils';
+import { isPassportProvider } from '../../../../lib/provider';
 import { EventTargetContext } from '../../../../context/event-target-context/EventTargetContext';
 import { UserJourney, useAnalytics } from '../../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 export interface BalanceItemProps {
   balanceInfo: BalanceInfo;
+  theme: WidgetTheme;
   bridgeToL2OnClick: (address?: string) => void;
 }
 
 export function BalanceItem({
   balanceInfo,
+  theme,
   bridgeToL2OnClick,
 }: BalanceItemProps) {
   const { connectLoaderState } = useContext(ConnectLoaderContext);
@@ -60,9 +64,9 @@ export function BalanceItem({
       && (supportedTopUps?.isOnRampEnabled ?? true);
     setIsOnRampEnabled(enableAddCoin);
 
-    const enableMoveCoin = network.chainId === getL1ChainId(checkout.config)
-      && (supportedTopUps?.isBridgeEnabled ?? true)
-      && !isPassport;
+    const enableMoveCoin = (network.chainId === getL1ChainId(checkout.config)
+    || network.chainId === getL2ChainId(checkout.config))
+      && (supportedTopUps?.isBridgeEnabled ?? true);
     setIsBridgeEnabled(enableMoveCoin);
 
     const enableSwapCoin = network.chainId === getL2ChainId(checkout.config)
@@ -84,7 +88,11 @@ export function BalanceItem({
 
   return (
     <MenuItem testId={`balance-item-${balanceInfo.symbol}`} emphasized>
-      <MenuItem.FramedIcon icon="Coins" circularFrame />
+      <MenuItem.FramedImage
+        imageUrl={balanceInfo.icon}
+        defaultImageUrl={getDefaultTokenImage(checkout?.config.environment, theme)}
+        circularFrame
+      />
       <MenuItem.Label>{balanceInfo.symbol}</MenuItem.Label>
       <MenuItem.Caption>{balanceInfo.description}</MenuItem.Caption>
       <MenuItem.PriceDisplay

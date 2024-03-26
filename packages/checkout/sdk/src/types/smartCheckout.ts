@@ -1,4 +1,4 @@
-import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
+import { TransactionRequest, TransactionResponse, Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import { TokenInfo } from './tokenInfo';
 import { OrderFee } from './fees';
@@ -6,7 +6,11 @@ import { OrderFee } from './fees';
 /*
 * Type representing the result of the buy
 */
-export type BuyResult = BuyResultSuccess | BuyResultFailed | BuyResultInsufficientFunds;
+export type BuyResult =
+  BuyResultSuccess |
+  BuyResultFailed |
+  BuyResultFulfillmentsUnsettled |
+  BuyResultInsufficientFunds;
 
 /**
  * Represents the result of {@link Checkout.buy}
@@ -40,6 +44,21 @@ export type BuyResultFailed = {
 
 /**
  * Represents the result of {@link Checkout.buy}
+ * @property {CheckoutStatus.FULFILLMENTS_UNSETTLED} status
+ * @property {SmartCheckoutSufficient} smartCheckoutResult
+ * @property {SendTransactionResult[]} transactions
+ */
+export type BuyResultFulfillmentsUnsettled = {
+  /** The status to indicate success */
+  status: CheckoutStatus.FULFILLMENTS_UNSETTLED,
+  /** The sufficient result of smart checkout */
+  smartCheckoutResult: SmartCheckoutSufficient,
+  /** Array of transaction results */
+  transactions: TransactionResponse[],
+};
+
+/**
+ * Represents the result of {@link Checkout.buy}
  * @property {CheckoutStatus.INSUFFICIENT_FUNDS} status
  * @property {SmartCheckoutInsufficient} smartCheckoutResult
  */
@@ -48,6 +67,15 @@ export type BuyResultInsufficientFunds = {
   status: CheckoutStatus.INSUFFICIENT_FUNDS,
   /** The insufficient result of smart checkout */
   smartCheckoutResult: SmartCheckoutInsufficient
+};
+
+/**
+ * Represents the overrides available for {@link Checkout.buy}
+ * @property {boolean} waitFulfillmentSettlements
+ */
+export type BuyOverrides = {
+  /** If the buy should wait for the fulfillment transactions to settle */
+  waitFulfillmentSettlements?: boolean;
 };
 
 /*
@@ -103,7 +131,10 @@ export type SellResultInsufficientFunds = {
 /*
 * Type representing the result of the cancel
 */
-export type CancelResult = CancelResultSuccess | CancelResultFailed;
+export type CancelResult = CancelResultSuccess |
+CancelResultFailed |
+CancelResultFulfillmentsUnsettled |
+CancelResultGasless;
 
 /**
  * Represents the result of {@link Checkout.cancel}
@@ -130,22 +161,89 @@ export type CancelResultFailed = {
 };
 
 /**
+ * Represents the result of {@link Checkout.cancel}
+ * @property {CheckoutStatus.FULFILLMENTS_UNSETTLED} status
+ * @property {SendTransactionResult[]} transactions
+ */
+export type CancelResultFulfillmentsUnsettled = {
+  /** The status to indicate the fulfillments have not yet settled on chain. */
+  status: CheckoutStatus.FULFILLMENTS_UNSETTLED,
+  /** Array of transaction results */
+  transactions: TransactionResponse[],
+};
+
+/**
+ * Represents the result of {@link Checkout.cancel} when using gasless cancel
+ * @property {SuccessfulGaslessCancellation[]} successfulCancellations
+ * @property {FailedGaslessCancellation[]} failedCancellations
+ * @property {PendingGaslessCancellation[]} pendingCancellations
+ */
+export type CancelResultGasless = {
+  successfulCancellations: SuccessfulGaslessCancellation[],
+  failedCancellations: FailedGaslessCancellation[],
+  pendingCancellations: PendingGaslessCancellation[],
+};
+
+/**
+ * Represents a successful gasless cancellation
+ * @property {string} orderId
+ */
+export type SuccessfulGaslessCancellation = {
+  /** The order id of the successful cancellation */
+  orderId: string;
+};
+
+/**
+ * Represents a failed gasless cancellation
+ * @property {string} orderId
+ * @property {string} reason
+ */
+export type FailedGaslessCancellation = {
+  /** The order id of the failed cancellation */
+  orderId: string;
+  /** The reason for failure */
+  reason: string;
+};
+
+/**
+ * Represents a pending gasless cancellation
+ * @property {string} orderId
+ */
+export type PendingGaslessCancellation = {
+  /** The order id of the pending cancellation */
+  orderId: string;
+};
+
+/**
+ * Represents the overrides available for {@link Checkout.cancel}
+ * @property {boolean} waitFulfillmentSettlements
+ */
+export type CancelOverrides = {
+  /** If the cancel should wait for the fulfillment transactions to settle */
+  waitFulfillmentSettlements?: boolean;
+  /** If the cancel should use the gasless option */
+  useGaslessCancel?: boolean;
+};
+
+/**
  * An enum representing the checkout status types
  * @enum {string}
  * @property {string} SUCCESS - If checkout succeeded as the transactions were able to be processed
  * @property {string} FAILED - If checkout failed due to transactions not settling on chain
  * @property {string} INSUFFICIENT_FUNDS - If checkout failed due to insufficient funds
+ * @property {string} FULFILLMENTS_UNSETTLED - If checkout succeeded but the fulfillment transactions are not yet settled
  */
 export enum CheckoutStatus {
   SUCCESS = 'SUCCESS',
   FAILED = 'FAILED',
   INSUFFICIENT_FUNDS = 'INSUFFICIENT_FUNDS',
+  FULFILLMENTS_UNSETTLED = 'FULFILLMENTS_UNSETTLED',
 }
 
 /**
  * The type representing the order to buy
  * @property {string} orderId
- * @property {Array<OrderFee>} takerFees
+ * @property {OrderFee[]} takerFees
  */
 export type BuyOrder = {
   /** the id of the order to buy */
@@ -165,8 +263,10 @@ export type SellOrder = {
   sellToken: SellToken,
   /** the token info of the price of the item */
   buyToken: BuyToken,
-  /** option array of makerFees to be applied to the listing */
+  /** optional array of makerFees to be applied to the listing */
   makerFees?: OrderFee[],
+  /** optional order expiry date. Default order expiry to 2 years from now */
+  orderExpiry?: Date;
 };
 
 /**
@@ -191,15 +291,15 @@ export type NativeBuyToken = {
  * Represents a ERC20 buy token
  * @property {ItemType} type
  * @property {string} amount
- * @property {string} contractAddress
+ * @property {string} tokenAddress
  */
 export type ERC20BuyToken = {
   /** The type indicate this is a ERC20 token. */
   type: ItemType.ERC20;
   /** The amount of native token. */
   amount: string;
-  /** The contract address of the ERC20. */
-  contractAddress: string;
+  /** The token address of the ERC20. */
+  tokenAddress: string;
 };
 
 /**
@@ -244,16 +344,16 @@ export type NativeItemRequirement = {
 /**
  * Represents an ERC20 item requirement for a transaction.
  * @property {ItemType.ERC20} type
+ * @property {string} tokenAddress
  * @property {string} amount
- * @property {string} contractAddress
  * @property {string} spenderAddress
  */
 export type ERC20ItemRequirement = {
   /** The type to indicate this is a ERC20 item requirement. */
   type: ItemType.ERC20;
+  /** The token address of the ERC20. */
+  tokenAddress: string;
   /** The amount of the item. */
-  contractAddress: string;
-  /** The contract address of the ERC20. */
   amount: string;
   /** The contract address of the approver. */
   spenderAddress: string,
@@ -311,15 +411,15 @@ export type NativeItem = {
 /**
  * Represents an ERC20 item.
  * @property {ItemType} type
- * @property {string} contractAddress
+ * @property {string} tokenAddress
  * @property {BigNumber} amount
  * @property {string} spenderAddress
  */
 export type ERC20Item = {
   /**  The type to indicate this is an ERC20 item. */
   type: ItemType.ERC20;
-  /** The contract address of the ERC20. */
-  contractAddress: string;
+  /** The token address of the ERC20. */
+  tokenAddress: string;
   /** The amount of the item. */
   amount: BigNumber;
   /** The contract address of the approver. */
@@ -410,14 +510,14 @@ export type NativeGas = {
 /**
  * Represents an ERC20 gas token.
  * @property {GasTokenType} type
- * @property {string} contractAddress
+ * @property {string} tokenAddress
  * @property {BigNumber} limit
  */
 export type ERC20Gas = {
   /** The type to indicate this is an ERC20 gas token. */
   type: GasTokenType.ERC20,
-  /** The contract address of the ERC20. */
-  contractAddress: string;
+  /** The token address of the ERC20. */
+  tokenAddress: string;
   /** The gas limit. */
   limit: BigNumber;
 };
@@ -539,6 +639,8 @@ export type FundingRoute = {
  * @property {TokenInfo | undefined} token
  */
 export type Fee = {
+  /** The type of fee */
+  type: FeeType;
   /** The amount of the fee */
   amount: BigNumber;
   /** The formatted amount of the fee */
@@ -546,6 +648,21 @@ export type Fee = {
   /** The token info for the fee */
   token?: TokenInfo;
 };
+
+/**
+ * An enum representing the funding step types
+ * @enum {string}
+ * @property {string} GAS - If the fee is a gas fee.
+ * @property {string} BRIDGE_FEE - If the fee is a bridge fee.
+ * @property {string} SWAP_FEE - If the fee is a swap fee.
+ * @property {string} IMMUTABLE_FEE - If the fee is an immutable fee.
+ */
+export enum FeeType {
+  GAS = 'GAS',
+  BRIDGE_FEE = 'BRIDGE_FEE',
+  SWAP_FEE = 'SWAP_FEE',
+  IMMUTABLE_FEE = 'IMMUTABLE_FEE',
+}
 
 /*
 * Type representing the various funding steps
@@ -572,15 +689,15 @@ export type BridgeFundingStep = {
 
 /**
  * Represents the fees for a bridge funding step
- * @property {Fee} approvalGasFees
- * @property {Fee} bridgeGasFees
+ * @property {Fee} approvalGasFee
+ * @property {Fee} bridgeGasFee
  * @property {Fee[]} bridgeFees
  */
 export type BridgeFees = {
-  /** The approval gas fees for the bridge */
-  approvalGasFees: Fee,
-  /** The bridge gas fees for the bridge */
-  bridgeGasFees: Fee,
+  /** The approval gas fee for the bridge */
+  approvalGasFee: Fee,
+  /** The bridge gas fee for the bridge */
+  bridgeGasFee: Fee,
   /** Additional bridge fees for the bridge */
   bridgeFees: Fee[],
 };
@@ -605,15 +722,15 @@ export type SwapFundingStep = {
 
 /**
  * Represents the fees for a swap funding step
- * @property {Fee} approvalGasFees
- * @property {Fee} swapGasFees
+ * @property {Fee} approvalGasFee
+ * @property {Fee} swapGasFee
  * @property {Fee[]} swapFees
  */
 export type SwapFees = {
-  /** The approval gas fees for the swap */
-  approvalGasFees: Fee,
-  /** The swap gas fees for the swap */
-  swapGasFees: Fee,
+  /** The approval gas fee for the swap */
+  approvalGasFee: Fee,
+  /** The swap gas fee for the swap */
+  swapGasFee: Fee,
   /** Additional swap fees for the swap */
   swapFees: Fee[],
 };

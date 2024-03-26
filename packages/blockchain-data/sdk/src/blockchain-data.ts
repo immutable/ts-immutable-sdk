@@ -52,6 +52,23 @@ export class BlockchainData {
   }
 
   /**
+   * List activities sorted by updated_at timestamp ascending, useful for time based data replication
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with a list of activities
+   * @throws {@link index.APIError}
+   */
+  public async listActivityHistory(
+    request: mr.ActivitiesApiListActivityHistoryRequest,
+  ): Promise<mr.ListActivitiesResult> {
+    return await this.activities
+      .listActivityHistory(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
+
+  /**
    * Get a single activity by ID
    * @param request - the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with a single activity
@@ -120,7 +137,7 @@ export class BlockchainData {
   }
 
   /**
-   * Get collection by contract address
+   * Get a collection by contract address
    * @param request - the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with a single collection
    * @throws {@link index.APIError}
@@ -205,6 +222,57 @@ export class BlockchainData {
   }
 
   /**
+   * Create a mint request to mint a set of NFTs for a given collection
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with the remaining rate limits
+   * @throws {@link index.APIError}
+   */
+  public async createMintRequest(
+    request: mr.NftsApiCreateMintRequestRequest,
+  ): Promise<mr.CreateMintRequestResult> {
+    return await this.nfts
+      .createMintRequest(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
+
+  /**
+   * List all mint requests for a given contract address
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with a list of mint requests
+   * @throws {@link index.APIError}
+   */
+  public async listMintRequests(
+    request: mr.NftsApiListMintRequestsRequest,
+  ): Promise<mr.ListMintRequestsResult> {
+    return await this.nfts
+      .listMintRequests(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
+
+  /**
+   * Retrieve the status of a single mint request identified by its reference ID
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with a single mint request
+   * @throws {@link index.APIError}
+   */
+  public async getMintRequest(
+    request: mr.NftsApiGetMintRequestRequest,
+  ): Promise<mr.ListMintRequestsResult> {
+    return await this.nfts
+      .getMintRequest(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
+
+  /**
    * List NFT owners by token ID
    * @param request - the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with a list of NFT owners
@@ -245,9 +313,9 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async listAllNFTOwners(
-    request: mr.NftsApiListAllNFTOwnersRequest,
+    request: mr.NftOwnersApiListNFTOwnersRequest,
   ): Promise<mr.ListNFTOwnersResult> {
-    return await this.nfts
+    return await this.nftOwners
       .listAllNFTOwners(request)
       .then((res) => res.data)
       .catch((err) => {
@@ -317,6 +385,23 @@ export class BlockchainData {
   ): Promise<mr.ListMetadataResult> {
     return await this.metadata
       .listMetadata(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
+
+  /**
+   * List NFT Metadata by chain
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with a list of Metadata
+   * @throws {@link index.APIError}
+   */
+  public async listNFTMetadataByChain(
+    request: mr.MetadataApiListMetadataForChainRequest,
+  ): Promise<mr.ListMetadataResult> {
+    return await this.metadata
+      .listMetadataForChain(request)
       .then((res) => res.data)
       .catch((err) => {
         throw formatError(err);

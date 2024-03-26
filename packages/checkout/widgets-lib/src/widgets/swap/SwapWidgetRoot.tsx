@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import {
-  ConnectTargetLayer,
+  ChainId,
   IMTBLWidgetEvents,
   SwapWidgetParams,
   WalletProviderName,
@@ -12,16 +12,19 @@ import {
 import { Base } from 'widgets/BaseWidgetRoot';
 import { ConnectLoader, ConnectLoaderParams } from 'components/ConnectLoader/ConnectLoader';
 import { getL2ChainId } from 'lib';
-import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
-import { BiomeCombinedProviders, BiomePortalIdProvider } from '@biom3/react';
-import { isPassportProvider } from 'lib/providerUtils';
+import { isPassportProvider } from 'lib/provider';
 import { ServiceUnavailableErrorView } from 'views/error/ServiceUnavailableErrorView';
 import { ServiceType } from 'views/error/serviceTypes';
 import { isValidAddress, isValidAmount, isValidWalletProvider } from 'lib/validations/widgetValidators';
-import { widgetTheme } from 'lib/theme';
+import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
+import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
+import { LoadingView } from 'views/loading/LoadingView';
 import { topUpBridgeOption, topUpOnRampOption } from './helpers';
 import { sendSwapWidgetCloseEvent } from './SwapWidgetEvents';
-import { SwapWidget } from './SwapWidget';
+import i18n from '../../i18n';
+import { GeoblockLoader } from './GeoblockLoader';
+
+const SwapWidget = React.lazy(() => import('./SwapWidget'));
 
 export class Swap extends Base<WidgetType.SWAP> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT;
@@ -55,16 +58,16 @@ export class Swap extends Base<WidgetType.SWAP> {
       validatedParams.amount = '';
     }
 
-    if (!isValidAddress(params.fromContractAddress)) {
+    if (!isValidAddress(params.fromTokenAddress)) {
       // eslint-disable-next-line no-console
-      console.warn('[IMTBL]: invalid "fromContractAddress" widget input');
-      validatedParams.fromContractAddress = '';
+      console.warn('[IMTBL]: invalid "fromTokenAddress" widget input');
+      validatedParams.fromTokenAddress = '';
     }
 
-    if (!isValidAddress(params.toContractAddress)) {
+    if (!isValidAddress(params.toTokenAddress)) {
       // eslint-disable-next-line no-console
-      console.warn('[IMTBL]: invalid "toContractAddress" widget input');
-      validatedParams.toContractAddress = '';
+      console.warn('[IMTBL]: invalid "toTokenAddress" widget input');
+      validatedParams.toTokenAddress = '';
     }
 
     return validatedParams;
@@ -73,97 +76,97 @@ export class Swap extends Base<WidgetType.SWAP> {
   private isNotPassport = !isPassportProvider(this.web3Provider)
     || this.parameters?.walletProviderName !== WalletProviderName.PASSPORT;
 
-  private topUpOptions(): { text: string; action: () => void }[] | undefined {
-    const optionsArray: { text: string; action: () => void }[] = [];
+  private topUpOptions(): { textKey: string; action: () => void }[] | undefined {
+    const optionsArray: { textKey: string; action: () => void }[] = [];
 
     const isOnramp = topUpOnRampOption(this.strongConfig().isOnRampEnabled);
     if (isOnramp) {
-      optionsArray.push({ text: isOnramp.text, action: isOnramp.action });
+      optionsArray.push({ ...isOnramp });
     }
     const isBridge = topUpBridgeOption(
       this.strongConfig().isBridgeEnabled,
       this.isNotPassport,
     );
     if (isBridge) {
-      optionsArray.push({ text: isBridge.text, action: isBridge.action });
+      optionsArray.push({ ...isBridge });
     }
 
     return optionsArray;
   }
 
   protected render() {
+    if (!this.reactRoot) return;
+
+    const { t } = i18n;
     const connectLoaderParams: ConnectLoaderParams = {
-      targetLayer: ConnectTargetLayer.LAYER2,
+      targetChainId: this.checkout.config.isProduction
+        ? ChainId.IMTBL_ZKEVM_MAINNET
+        : ChainId.IMTBL_ZKEVM_TESTNET,
       walletProviderName: this.parameters.walletProviderName,
       web3Provider: this.web3Provider,
       checkout: this.checkout,
       allowedChains: [getL2ChainId(this.checkout!.config)],
     };
 
-    let isSwapAvailable = false;
-
     const topUpOptions = this.topUpOptions();
 
-    const themeBase = widgetTheme(this.strongConfig().theme);
-
-    if (!this.reactRoot) return;
-
-    this.checkout
-      ?.isSwapAvailable()
-      .then((available) => {
-        isSwapAvailable = available;
-      })
-      .finally(() => {
-        this.reactRoot!.render(
-          <React.StrictMode>
-            <BiomePortalIdProvider>
-              <CustomAnalyticsProvider widgetConfig={this.strongConfig()}>
-                {!isSwapAvailable && (
-                  <BiomeCombinedProviders theme={{ base: themeBase }}>
-                    <ServiceUnavailableErrorView
-                      service={ServiceType.SWAP}
-                      onCloseClick={() => sendSwapWidgetCloseEvent(window)}
-                      primaryActionText={
-                        topUpOptions && topUpOptions?.length > 0
-                          ? topUpOptions[0].text
-                          : undefined
-                      }
-                      onPrimaryButtonClick={
-                        topUpOptions && topUpOptions?.length > 0
-                          ? topUpOptions[0].action
-                          : undefined
-                      }
-                      secondaryActionText={
-                        topUpOptions?.length === 2
-                          ? topUpOptions[1].text
-                          : undefined
-                      }
-                      onSecondaryButtonClick={
-                        topUpOptions?.length === 2
-                          ? topUpOptions[1].action
-                          : undefined
-                      }
-                    />
-                  </BiomeCombinedProviders>
-                )}
-                {isSwapAvailable && (
+    this.reactRoot!.render(
+      <React.StrictMode>
+        <CustomAnalyticsProvider checkout={this.checkout}>
+          <ThemeProvider id="swap-container" config={this.strongConfig()}>
+            <GeoblockLoader
+              checkout={this.checkout}
+              loadingView={<LoadingView loadingText={t('views.LOADING_VIEW.text')} />}
+              widget={
+                (
                   <ConnectLoader
                     params={connectLoaderParams}
                     widgetConfig={this.strongConfig()}
                     closeEvent={() => sendSwapWidgetCloseEvent(window)}
                   >
-                    <SwapWidget
-                      fromContractAddress={this.parameters.fromContractAddress}
-                      toContractAddress={this.parameters.toContractAddress}
-                      amount={this.parameters.amount}
-                      config={this.strongConfig()}
-                    />
+                    <Suspense fallback={<LoadingView loadingText={t('views.LOADING_VIEW.text')} />}>
+                      <SwapWidget
+                        fromTokenAddress={this.parameters.fromTokenAddress}
+                        toTokenAddress={this.parameters.toTokenAddress}
+                        amount={this.parameters.amount}
+                        config={this.strongConfig()}
+                      />
+                    </Suspense>
                   </ConnectLoader>
-                )}
-              </CustomAnalyticsProvider>
-            </BiomePortalIdProvider>
-          </React.StrictMode>,
-        );
-      });
+                )
+              }
+              serviceUnavailableView={
+                (
+                  <ServiceUnavailableErrorView
+                    service={ServiceType.SWAP}
+                    onCloseClick={() => sendSwapWidgetCloseEvent(window)}
+                    primaryActionText={
+                      topUpOptions && topUpOptions?.length > 0
+                        ? t(topUpOptions[0].textKey)
+                        : undefined
+                    }
+                    onPrimaryButtonClick={
+                      topUpOptions && topUpOptions?.length > 0
+                        ? topUpOptions[0].action
+                        : undefined
+                    }
+                    secondaryActionText={
+                      topUpOptions?.length === 2
+                        ? t(topUpOptions[1].textKey)
+                        : undefined
+                    }
+                    onSecondaryButtonClick={
+                      topUpOptions?.length === 2
+                        ? topUpOptions[1].action
+                        : undefined
+                    }
+                  />
+                )
+              }
+            />
+          </ThemeProvider>
+        </CustomAnalyticsProvider>
+      </React.StrictMode>,
+    );
   }
 }

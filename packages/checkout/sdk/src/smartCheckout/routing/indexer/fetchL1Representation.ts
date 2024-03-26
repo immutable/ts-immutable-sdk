@@ -1,16 +1,17 @@
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../../config';
 import { createBlockchainDataInstance } from '../../../instance';
 import { NATIVE } from '../../../env';
-import { ChainId, ImxAddressConfig } from '../../../types';
+import { ChainId, ChainSlug, ImxAddressConfig } from '../../../types';
 import { isNativeToken } from '../../../tokens';
+import { isMatchingAddress } from '../../../utils/utils';
 
 // If the root address evaluates to this then its ETH
-export const INDEXER_ETH_ROOT_CONTRACT_ADDRESS = '0x0000000000000000000000000000000000000001';
+export const INDEXER_ETH_ROOT_CONTRACT_ADDRESS = '0x0000000000000000000000000000000000000eee';
 
 const getIndexerChainName = (chainId: ChainId): string => {
-  if (chainId === ChainId.IMTBL_ZKEVM_MAINNET) return 'imtbl-zkevm-mainnet';
-  if (chainId === ChainId.IMTBL_ZKEVM_TESTNET) return 'imtbl-zkevm-testnet';
-  if (chainId === ChainId.IMTBL_ZKEVM_DEVNET) return 'imtbl-zkevm-devent';
+  if (chainId === ChainId.IMTBL_ZKEVM_MAINNET) return ChainSlug.IMTBL_ZKEVM_MAINNET;
+  if (chainId === ChainId.IMTBL_ZKEVM_TESTNET) return ChainSlug.IMTBL_ZKEVM_TESTNET;
+  if (chainId === ChainId.IMTBL_ZKEVM_DEVNET) return ChainSlug.IMTBL_ZKEVM_DEVNET;
   return '';
 };
 
@@ -46,9 +47,8 @@ export const fetchL1Representation = async (
     contractAddress: l2address,
   });
 
-  // TODO: When bridge is ready we need to understand how L2 ETH will be mapped back to L1 ETH
   const l1address = tokenData.result.root_contract_address;
-  if (l1address === INDEXER_ETH_ROOT_CONTRACT_ADDRESS) {
+  if (isMatchingAddress(l1address ?? '', INDEXER_ETH_ROOT_CONTRACT_ADDRESS)) {
     return {
       l1address: 'native',
       l2address,

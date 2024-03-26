@@ -9,7 +9,8 @@ import { balanceCheck } from './balanceCheck';
 import { CheckoutConfiguration } from '../../config';
 import { getAllBalances } from '../../balances';
 import { BalanceCheckResult } from './types';
-import { DEFAULT_TOKEN_DECIMALS } from '../../env';
+import { DEFAULT_TOKEN_DECIMALS, ZKEVM_NATIVE_TOKEN } from '../../env';
+import { HttpClient } from '../../api/http';
 
 jest.mock('../../balances');
 jest.mock('ethers', () => ({
@@ -33,9 +34,10 @@ describe('balanceCheck', () => {
       },
     } as unknown as Web3Provider;
 
+    const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
     config = new CheckoutConfiguration({
       baseConfig: { environment: Environment.SANDBOX },
-    });
+    }, mockedHttpClient);
   });
 
   describe('when NATIVE tokens are required', () => {
@@ -127,7 +129,7 @@ describe('balanceCheck', () => {
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(10),
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
         },
       ];
@@ -157,7 +159,7 @@ describe('balanceCheck', () => {
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(10),
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
         },
       ];
@@ -241,13 +243,13 @@ describe('balanceCheck', () => {
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(10),
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from(10),
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
         },
       ];
@@ -271,11 +273,7 @@ describe('balanceCheck', () => {
               type: ItemType.NATIVE,
               balance: BigNumber.from(0),
               formattedBalance: '0',
-              token: {
-                decimals: DEFAULT_TOKEN_DECIMALS,
-                name: '',
-                symbol: '',
-              },
+              token: ZKEVM_NATIVE_TOKEN,
             },
             delta: {
               balance: BigNumber.from(2),
@@ -285,11 +283,7 @@ describe('balanceCheck', () => {
               type: ItemType.NATIVE,
               balance: BigNumber.from(2),
               formattedBalance: '0.000000000000000002',
-              token: {
-                decimals: DEFAULT_TOKEN_DECIMALS,
-                name: '',
-                symbol: '',
-              },
+              token: ZKEVM_NATIVE_TOKEN,
             },
             sufficient: false,
             type: ItemType.NATIVE,
@@ -338,7 +332,7 @@ describe('balanceCheck', () => {
         {
           type: ItemType.ERC20,
           amount: BigNumber.from('10'),
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
         },
         {
@@ -394,13 +388,13 @@ describe('balanceCheck', () => {
         {
           type: ItemType.ERC20,
           amount: BigNumber.from('10'),
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
         },
         {
           type: ItemType.ERC20,
           amount: BigNumber.from('10'),
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           spenderAddress: '0xSEAPORT',
         },
         {
@@ -610,6 +604,47 @@ describe('balanceCheck', () => {
             type: ItemType.ERC721,
           },
         ]));
+    });
+  });
+
+  describe('when requesting a cache reset', () => {
+    const itemRequirements: ItemRequirement[] = [
+      {
+        type: ItemType.NATIVE,
+        amount: BigNumber.from(1),
+      },
+    ];
+    const getBalancesResult = {
+      balances:
+        [
+          {
+            balance: BigNumber.from(1),
+            formattedBalance: '1',
+            token: {
+              name: '',
+              symbol: '',
+              decimals: 18,
+            },
+          },
+        ],
+    };
+    it('should call getAllBalances with forceFetch = false when flag false or not provided', async () => {
+      (getAllBalances as jest.Mock).mockResolvedValue(getBalancesResult);
+
+      await balanceCheck(config, mockProvider, '0xADDRESS', itemRequirements);
+      expect((getAllBalances as jest.Mock))
+        .toHaveBeenCalledWith(config, mockProvider, '0xADDRESS', expect.anything(), false);
+
+      await balanceCheck(config, mockProvider, '0xADDRESS', itemRequirements, false);
+      expect((getAllBalances as jest.Mock))
+        .toHaveBeenLastCalledWith(config, mockProvider, '0xADDRESS', expect.anything(), false);
+    });
+    it('should call getAllBalances with forceFetch = true when flag true', async () => {
+      (getAllBalances as jest.Mock).mockResolvedValue(getBalancesResult);
+
+      await balanceCheck(config, mockProvider, '0xADDRESS', itemRequirements, true);
+      expect((getAllBalances as jest.Mock))
+        .toHaveBeenCalledWith(config, mockProvider, '0xADDRESS', expect.anything(), true);
     });
   });
 });

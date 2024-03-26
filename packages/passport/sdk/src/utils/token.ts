@@ -8,6 +8,7 @@ export function isIdTokenExpired(idToken: string | undefined): boolean {
   if (!idToken) {
     return false;
   }
+
   const decodedToken = jwt_decode<IdTokenPayload>(idToken);
   const now = Math.floor(Date.now() / 1000);
   return decodedToken.exp < now;

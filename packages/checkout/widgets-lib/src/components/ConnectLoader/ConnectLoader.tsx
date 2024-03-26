@@ -1,20 +1,16 @@
-import { BiomeCombinedProviders } from '@biom3/react';
 import { Web3Provider } from '@ethersproject/providers';
 import {
   ChainId,
   Checkout,
   WalletProviderName,
-  ConnectTargetLayer,
   CheckoutErrorType,
 
 } from '@imtbl/checkout-sdk';
-import { BaseTokens } from '@biom3/design-tokens';
 import React, {
   useEffect,
   useMemo,
   useReducer,
 } from 'react';
-import { widgetTheme } from 'lib/theme';
 import { ErrorView } from 'views/error/ErrorView';
 import {
   ConnectLoaderActions,
@@ -24,7 +20,7 @@ import {
   initialConnectLoaderState,
 } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { LoadingView } from '../../views/loading/LoadingView';
-import { ConnectWidget } from '../../widgets/connect/ConnectWidget';
+import ConnectWidget from '../../widgets/connect/ConnectWidget';
 import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
@@ -38,7 +34,7 @@ export interface ConnectLoaderProps {
 }
 
 export interface ConnectLoaderParams {
-  targetLayer?: ConnectTargetLayer;
+  targetChainId: ChainId;
   walletProviderName?: WalletProviderName;
   web3Provider?: Web3Provider;
   checkout: Checkout;
@@ -53,7 +49,7 @@ export function ConnectLoader({
 }: ConnectLoaderProps) {
   const {
     checkout,
-    targetLayer,
+    targetChainId,
     walletProviderName,
     allowedChains,
     web3Provider,
@@ -70,10 +66,6 @@ export function ConnectLoader({
   const {
     connectionStatus, deepLink, provider,
   } = connectLoaderState;
-
-  const networkToSwitchTo = targetLayer ?? ConnectTargetLayer.LAYER2;
-
-  const biomeTheme: BaseTokens = widgetTheme(widgetConfig.theme);
 
   const { identify } = useAnalytics();
 
@@ -103,6 +95,14 @@ export function ConnectLoader({
           payload: {
             type: ConnectLoaderActions.SET_PROVIDER,
             provider: createProviderResult.provider,
+          },
+        });
+
+        connectLoaderDispatch({
+          payload: {
+            type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
+            connectionStatus: ConnectionStatus.NOT_CONNECTED,
+            deepLink: ConnectWidgetViews.CONNECT_WALLET,
           },
         });
         return true;
@@ -141,7 +141,7 @@ export function ConnectLoader({
         payload: {
           type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
           connectionStatus: ConnectionStatus.NOT_CONNECTED,
-          deepLink: ConnectWidgetViews.READY_TO_CONNECT,
+          deepLink: ConnectWidgetViews.CONNECT_WALLET,
         },
       });
       return false;
@@ -214,6 +214,9 @@ export function ConnectLoader({
           },
         });
       } catch (err: any) {
+        // eslint-disable-next-line no-console
+        console.error(err);
+
         connectLoaderDispatch({
           payload: {
             type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
@@ -227,9 +230,7 @@ export function ConnectLoader({
   return (
     <>
       {(connectionStatus === ConnectionStatus.LOADING) && (
-        <BiomeCombinedProviders theme={{ base: biomeTheme }}>
-          <LoadingView loadingText="Loading" />
-        </BiomeCombinedProviders>
+      <LoadingView loadingText="Loading" />
       )}
       <ConnectLoaderContext.Provider value={connectLoaderReducerValues}>
         {(connectionStatus === ConnectionStatus.NOT_CONNECTED_NO_PROVIDER
@@ -237,7 +238,7 @@ export function ConnectLoader({
         || connectionStatus === ConnectionStatus.CONNECTED_WRONG_NETWORK) && (
           <ConnectWidget
             config={widgetConfig}
-            targetLayer={networkToSwitchTo}
+            targetChainId={targetChainId}
             web3Provider={provider}
             checkout={checkout}
             deepLink={deepLink}
@@ -249,20 +250,18 @@ export function ConnectLoader({
         {connectionStatus === ConnectionStatus.CONNECTED_WITH_NETWORK && (children)}
       </ConnectLoaderContext.Provider>
       {connectionStatus === ConnectionStatus.ERROR && (
-        <BiomeCombinedProviders theme={{ base: biomeTheme }}>
-          <ErrorView
-            onCloseClick={closeEvent}
-            onActionClick={() => {
-              connectLoaderDispatch({
-                payload: {
-                  type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
-                  connectionStatus: ConnectionStatus.NOT_CONNECTED,
-                },
-              });
-            }}
-            actionText="Try Again"
-          />
-        </BiomeCombinedProviders>
+      <ErrorView
+        onCloseClick={closeEvent}
+        onActionClick={() => {
+          connectLoaderDispatch({
+            payload: {
+              type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
+              connectionStatus: ConnectionStatus.NOT_CONNECTED,
+            },
+          });
+        }}
+        actionText="Try Again"
+      />
       )}
     </>
   );

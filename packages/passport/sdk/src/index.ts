@@ -17,7 +17,6 @@ export {
 } from './zkEvm/JsonRpcError';
 export {
   UserProfile,
-  Networks,
   PassportOverrides,
   PassportModuleConfiguration,
   DeviceConnectResponse,

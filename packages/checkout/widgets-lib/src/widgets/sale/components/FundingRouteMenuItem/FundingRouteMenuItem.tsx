@@ -3,11 +3,10 @@ import {
 } from '@biom3/react';
 import { ChainId, FundingRoute } from '@imtbl/checkout-sdk';
 import { useContext, useEffect, useState } from 'react';
+import { getChainNameById } from 'lib/chains';
+import { useTranslation } from 'react-i18next';
 import { CryptoFiatContext } from '../../../../context/crypto-fiat-context/CryptoFiatContext';
-import { SaleWidgetViews } from '../../../../context/view-context/SaleViewContextTypes';
-import { getChainNameById } from '../../../../lib/chainName';
 import { calculateCryptoToFiat, tokenValueFormat } from '../../../../lib/utils';
-import { text } from '../../../../resources/text/textConfig';
 import { useSaleContext } from '../../context/SaleContextProvider';
 import { fundingRouteFees } from '../../functions/smartCheckoutUtils';
 
@@ -38,7 +37,7 @@ export interface FundingRouteMenuItemProps {
 export function FundingRouteMenuItem({
   onClick, fundingRoute, toggleVisible, selected, size = 'small',
 }: FundingRouteMenuItemProps) {
-  const textConfig = text.views[SaleWidgetViews.FUND_WITH_SMART_CHECKOUT];
+  const { t } = useTranslation();
   const firstFundingStep = fundingRoute.steps[0];
 
   const { cryptoFiatState } = useContext(CryptoFiatContext);
@@ -106,7 +105,7 @@ export function FundingRouteMenuItem({
       <MenuItem.FramedIcon icon="Coins" circularFrame />
       <MenuItem.PriceDisplay
         use={<Heading size="xSmall" />}
-        fiatAmount={`${textConfig.currency.usdEstimate}${usdBalance}`}
+        fiatAmount={`${t('views.FUND_WITH_SMART_CHECKOUT.currency.usdEstimate')}${usdBalance}`}
         price={tokenValueFormat(firstFundingStep.fundingItem.userBalance.formattedBalance)}
       />
       <MenuItem.Label sx={{ display: 'flex', wordBreak: 'default' }}>

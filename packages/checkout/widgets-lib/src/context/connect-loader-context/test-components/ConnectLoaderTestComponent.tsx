@@ -1,5 +1,5 @@
-import { BiomeCombinedProviders } from '@biom3/react';
 import React, { useMemo, useReducer } from 'react';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import {
   ConnectLoaderState,
   initialConnectLoaderState,
@@ -24,10 +24,10 @@ export function ConnectLoaderTestComponent({ children, initialStateOverride }: T
   );
 
   return (
-    <BiomeCombinedProviders>
+    <ViewContextTestComponent>
       <ConnectLoaderContext.Provider value={reducerValues}>
         {children}
       </ConnectLoaderContext.Provider>
-    </BiomeCombinedProviders>
+    </ViewContextTestComponent>
   );
 }

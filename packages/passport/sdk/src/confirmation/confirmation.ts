@@ -3,12 +3,13 @@ import {
   ConfirmationResult,
   PASSPORT_EVENT_TYPE,
   ReceiveMessage,
+  SendMessage,
 } from './types';
 import { openPopupCenter } from './popup';
 import { PassportConfiguration } from '../config';
 
 const CONFIRMATION_WINDOW_TITLE = 'Confirm this transaction';
-const CONFIRMATION_WINDOW_HEIGHT = 380;
+const CONFIRMATION_WINDOW_HEIGHT = 720;
 const CONFIRMATION_WINDOW_WIDTH = 480;
 const CONFIRMATION_WINDOW_CLOSED_POLLING_DURATION = 1000;
 
@@ -58,6 +59,10 @@ export default class ConfirmationScreen {
         }
         switch (data.messageType as ReceiveMessage) {
           case ReceiveMessage.CONFIRMATION_WINDOW_READY: {
+            this.confirmationWindow?.postMessage({
+              eventType: PASSPORT_EVENT_TYPE,
+              messageType: SendMessage.CONFIRMATION_START,
+            }, this.config.passportDomain);
             break;
           }
           case ReceiveMessage.TRANSACTION_CONFIRMED: {
@@ -82,8 +87,8 @@ export default class ConfirmationScreen {
       if (chainType === TransactionApprovalRequestChainTypeEnum.Starkex) {
         href = this.getHref('transaction', { transactionId, etherAddress, chainType });
       } else {
-        href = this.getHref('zkevm', {
-          transactionId, etherAddress, chainType, chainId,
+        href = this.getHref('zkevm/transaction', {
+          transactionID: transactionId, etherAddress, chainType, chainID: chainId,
         });
       }
       this.showConfirmationScreen(href, messageHandler, resolve);
@@ -101,6 +106,10 @@ export default class ConfirmationScreen {
         }
         switch (data.messageType as ReceiveMessage) {
           case ReceiveMessage.CONFIRMATION_WINDOW_READY: {
+            this.confirmationWindow?.postMessage({
+              eventType: PASSPORT_EVENT_TYPE,
+              messageType: SendMessage.CONFIRMATION_START,
+            }, this.config.passportDomain);
             break;
           }
           case ReceiveMessage.MESSAGE_CONFIRMED: {

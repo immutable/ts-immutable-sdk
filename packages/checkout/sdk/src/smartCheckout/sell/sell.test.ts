@@ -22,6 +22,7 @@ import {
   signMessage,
 } from '../actions';
 import { SignTransactionStatusType } from '../actions/types';
+import { HttpClient } from '../../api/http';
 
 jest.mock('../../instance');
 jest.mock('../smartCheckout');
@@ -29,19 +30,21 @@ jest.mock('../actions');
 
 describe('sell', () => {
   const seaportContractAddress = '0xSEAPORT';
+  const walletAddress = '0xADDRESS';
   let config: CheckoutConfiguration;
   let mockProvider: Web3Provider;
 
   beforeEach(() => {
     mockProvider = {
       getSigner: jest.fn().mockReturnValue({
-        getAddress: jest.fn().mockResolvedValue('0xADDRESS'),
+        getAddress: jest.fn().mockResolvedValue(walletAddress),
       }),
     } as unknown as Web3Provider;
 
+    const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
     config = new CheckoutConfiguration({
       baseConfig: { environment: Environment.SANDBOX },
-    });
+    }, mockedHttpClient);
 
     jest.spyOn(console, 'info').mockImplementation(() => {});
   });
@@ -87,30 +90,35 @@ describe('sell', () => {
           erc721TransactionRequirement,
         ],
       });
+
       const mockCreateListing = jest.fn().mockResolvedValue({
         result: {
           id: '1234',
         },
       });
+
+      const prepareListing = jest.fn().mockResolvedValue({
+        actions: [
+          {
+            type: ActionType.SIGNABLE,
+            purpose: SignablePurpose.CREATE_LISTING,
+            message: {
+              domain: '',
+              types: '',
+              value: '',
+            },
+          },
+        ],
+      });
+
       (createOrderbookInstance as jest.Mock).mockReturnValue({
         config: jest.fn().mockReturnValue({
           seaportContractAddress,
         }),
-        prepareListing: jest.fn().mockResolvedValue({
-          actions: [
-            {
-              type: ActionType.SIGNABLE,
-              purpose: SignablePurpose.CREATE_LISTING,
-              message: {
-                domain: '',
-                types: '',
-                value: '',
-              },
-            },
-          ],
-        }),
+        prepareListing,
         createListing: mockCreateListing,
       });
+
       (getUnsignedMessage as jest.Mock).mockReturnValue(
         {
           orderHash: 'hash',
@@ -134,7 +142,8 @@ describe('sell', () => {
         type: SignTransactionStatusType.SUCCESS,
       });
 
-      const orders:Array<SellOrder> = [{
+      const orderExpiry = new Date('2022-03-25');
+      const order: SellOrder = {
         sellToken: {
           id,
           collectionAddress: contractAddress,
@@ -147,12 +156,13 @@ describe('sell', () => {
           amount: { percentageDecimal: 0.025 },
           recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
         }],
-      }];
+        orderExpiry,
+      };
 
       const result = await sell(
         config,
         mockProvider,
-        orders,
+        [order],
       );
 
       expect(result).toEqual({
@@ -176,6 +186,19 @@ describe('sell', () => {
           },
         },
       );
+      expect(prepareListing).toBeCalledWith({
+        makerAddress: walletAddress,
+        buy: {
+          type: ItemType.NATIVE,
+          amount: '1000000000000000000',
+        },
+        sell: {
+          type: ItemType.ERC721,
+          contractAddress: order.sellToken.collectionAddress,
+          tokenId: order.sellToken.id,
+        },
+        orderExpiry: order.orderExpiry,
+      });
       expect(signMessage).toBeCalledWith(
         mockProvider,
         {
@@ -507,11 +530,9 @@ describe('sell', () => {
 
       expect(message).toEqual('An error occurred while preparing the listing');
       expect(type).toEqual(CheckoutErrorType.PREPARE_ORDER_LISTING_ERROR);
-      expect(data).toEqual({
-        message: 'error from orderbook',
-        id,
-        collectionAddress: contractAddress,
-      });
+      expect(data.error).toBeDefined();
+      expect(data.id).toEqual(id);
+      expect(data.collectionAddress).toEqual(contractAddress);
 
       expect(smartCheckout).toBeCalledTimes(0);
     });
@@ -578,11 +599,9 @@ describe('sell', () => {
 
       expect(message).toEqual('An error occurred while preparing the listing');
       expect(type).toEqual(CheckoutErrorType.PREPARE_ORDER_LISTING_ERROR);
-      expect(data).toEqual({
-        message: 'error from provider',
-        id,
-        collectionAddress: contractAddress,
-      });
+      expect(data.error).toBeDefined();
+      expect(data.id).toEqual(id);
+      expect(data.collectionAddress).toEqual(contractAddress);
 
       expect(smartCheckout).toBeCalledTimes(0);
     });
@@ -1071,11 +1090,9 @@ describe('sell', () => {
 
       expect(message).toEqual('An error occurred while creating the listing');
       expect(type).toEqual(CheckoutErrorType.CREATE_ORDER_LISTING_ERROR);
-      expect(data).toEqual({
-        message: 'error from create listing',
-        collectionId,
-        collectionAddress: contractAddress,
-      });
+      expect(data.error).toBeDefined();
+      expect(data.collectionId).toEqual(collectionId);
+      expect(data.collectionAddress).toEqual(contractAddress);
 
       expect(smartCheckout).toBeCalledTimes(1);
       expect(signMessage).toBeCalledTimes(1);
@@ -1103,7 +1120,7 @@ describe('sell', () => {
       const buyToken: BuyToken = {
         type: ItemType.ERC20,
         amount: '1',
-        contractAddress: '0xERC20',
+        tokenAddress: '0xERC20',
       };
 
       const result = getBuyToken(buyToken);
@@ -1119,7 +1136,7 @@ describe('sell', () => {
       const buyToken: BuyToken = {
         type: ItemType.ERC20,
         amount: '1',
-        contractAddress: '0xERC20',
+        tokenAddress: '0xERC20',
       };
 
       const result = getBuyToken(buyToken, 6);

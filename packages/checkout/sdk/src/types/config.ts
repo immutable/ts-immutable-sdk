@@ -1,10 +1,11 @@
 import { ModuleConfiguration } from '@imtbl/config';
-import { ExchangeOverrides } from '@imtbl/dex-sdk';
+import { ExchangeOverrides, SecondaryFee } from '@imtbl/dex-sdk';
 import { Passport } from '@imtbl/passport';
 import { TokenInfo } from './tokenInfo';
 import { ChainId } from './chains';
 
-export interface CheckoutOverrides {}
+export interface CheckoutOverrides {
+}
 
 interface CheckoutFeatureConfiguration {
   enable: boolean;
@@ -34,25 +35,31 @@ export interface CheckoutBridgeConfiguration extends CheckoutFeatureConfiguratio
  * @property {CheckoutSwapConfiguration} swap - To configure the swap feature.
  * @property {CheckoutBridgeConfiguration} bridge - To configure the bridge feature.
  * @property {Passport} passport - To enable passport wallet integration.
+ * @property {string} publishableKey - To identify your integration for tracking and analytics purposes.
 */
 export interface CheckoutModuleConfiguration extends ModuleConfiguration<CheckoutOverrides> {
   onRamp?: CheckoutOnRampConfiguration;
   swap?: CheckoutSwapConfiguration;
   bridge?: CheckoutBridgeConfiguration;
   passport?: Passport;
+  publishableKey?: string;
 }
 
 /**
  * A type representing various remotely defined configurations which are
  * accessible via the Checkout config and configured based on the Environment.
+ * @property {ConnectConfig} connect
  * @property {DexConfig} dex
  * @property {OnRampConfig} onramp
  * @property {BridgeConfig} bridge
  * @property {AllowedNetworkConfig[]} allowedNetworks
  * @property {GasEstimateTokenConfig | undefined} gasEstimateTokens
  * @property {ImxAddressConfig | undefined} imxAddressMapping
+ * @property {TelemetryConfig | undefined} telemetry
  */
 export type RemoteConfiguration = {
+  /** The config used for the Connect. */
+  connect: ConnectConfig;
   /** The config used for the DEX. */
   dex: DexConfig;
   /** The config used for the OnRamp */
@@ -65,6 +72,8 @@ export type RemoteConfiguration = {
   gasEstimateTokens?: GasEstimateTokenConfig;
   /** The IMX address mappings across available networks. */
   imxAddressMapping?: ImxAddressConfig;
+  /** Telemetry config. */
+  telemetry?: TelemetryConfig;
 };
 
 /**
@@ -110,6 +119,22 @@ export type OnRampConfig = {
 };
 
 /**
+ * A type representing the configuration for the Connect.
+ * @property {boolean} walletConnect
+ */
+export type ConnectConfig = {
+  /** A boolean value for enabling/disabling WalletConnect */
+  walletConnect: boolean;
+  /** A configuration for injected wallets */
+  injected: {
+    /** List for sorting injected wallets via wallet rdns */
+    priorityWalletRdns: string[];
+    /** List for blocking injected wallets via wallet rdns */
+    blacklistWalletRdns: string[];
+  }
+};
+
+/**
  * A type representing the configuration for the DEX.
  * @property {ExchangeOverrides | undefined} overrides
  * @property {TokenInfo[] | undefined} tokens
@@ -119,13 +144,23 @@ export type DexConfig = {
   overrides?: ExchangeOverrides;
   /** An array of tokens compatible with the DEX. */
   tokens?: TokenInfo[];
+  /** An array of secondary fees to be applied to swaps */
+  secondaryFees?: SecondaryFee[];
+};
+
+/**
+ * A type representing the configuration for the Bridge for all the supported chains.
+ */
+export type BridgeConfig = {
+  /** An object containing the bridge configuration per chain */
+  [chainId: string]: BridgeChainConfig;
 };
 
 /**
  * A type representing the configuration for the Bridge.
  * @property {TokenInfo[] | undefined} tokens
  */
-export type BridgeConfig = {
+export type BridgeChainConfig = {
   /** An array of tokens compatible with the Bridge. */
   tokens?: TokenInfo[];
 };
@@ -145,6 +180,14 @@ export type AllowedNetworkConfig = {
  */
 export type ImxAddressConfig = {
   [chainId: string]: string;
+};
+
+/**
+ * A type representing the telemetry configurations.
+ * @property {string} segmentPublishableKey
+ */
+export type TelemetryConfig = {
+  segmentPublishableKey: string
 };
 
 /**
@@ -200,7 +243,7 @@ export type ChainsTokensConfig = {
  * @property {boolean | undefined} blockscout -
  */
 export type ChainTokensConfig = {
-/** List of allowed tokens for a given chain. */
+  /** List of allowed tokens for a given chain. */
   allowed?: TokenInfo[];
   /** Feature flag to enable/disable blockscout integration. */
   blockscout?: boolean;

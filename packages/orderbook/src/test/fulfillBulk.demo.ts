@@ -14,6 +14,7 @@ import {
   getConfigFromEnv,
 } from './helpers';
 import { actionAll } from './helpers/actions';
+import { GAS_OVERRIDES } from './helpers/gas';
 
 async function deployAndMintNftContract(wallet: Wallet, count?: number): Promise<TestToken> {
   const { contract } = await deployTestToken(wallet);
@@ -21,7 +22,7 @@ async function deployAndMintNftContract(wallet: Wallet, count?: number): Promise
   if (count) {
     for (let i = 0; i < count; i += 1) {
       // eslint-disable-next-line no-await-in-loop
-      const receipt = await contract.safeMint(wallet.address);
+      const receipt = await contract.safeMint(wallet.address, GAS_OVERRIDES);
       // eslint-disable-next-line no-await-in-loop
       await receipt.wait();
       log('token minted');

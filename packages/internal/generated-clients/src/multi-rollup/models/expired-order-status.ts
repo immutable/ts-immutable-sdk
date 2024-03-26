@@ -21,7 +21,7 @@
  */
 export interface ExpiredOrderStatus {
     /**
-     * The order status
+     * A terminal order status indicating that an order cannot be fulfilled due to expiry.
      * @type {string}
      * @memberof ExpiredOrderStatus
      */

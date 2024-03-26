@@ -4,8 +4,12 @@
   "version": "0.0.0",
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
+  "dependencies": {
+    "tslib": "^2.6.2"
+  },
   "devDependencies": {
     "@actions/core": "^1.10.1",
+    "@emotion/react": "^11.11.3",
     "@release-it-plugins/workspaces": "^4.0.0",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
@@ -30,15 +34,11 @@
     "*": "yarn scan:secrets",
     "*.{js,jsx,ts,tsx}": "eslint"
   },
-  "overrides": {
-    "@openzeppelin/contracts": "3.4.2-solc-0.7"
-  },
   "packageManager": "yarn@3.6.1",
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "resolutions": {
-    "@biom3/design-tokens": "0.2.4-beta",
-    "@openzeppelin/contracts": "3.4.2-solc-0.7"
+    "responselike": "^2.0.0"
   },
   "scripts": {
     "build": "NODE_OPTIONS=--max-old-space-size=14366 wsrun -y 4 -p @imtbl/sdk -p @imtbl/checkout-widgets-lib -e -r --serial build && yarn syncpack:format && yarn wsrun -p @imtbl/sdk -a -m copyBrowserBundles",
@@ -64,13 +64,14 @@
     "packages": [
       "sdk",
       "packages/config",
-      "packages/immutablex_client",
+      "packages/x-client",
+      "packages/x-provider",
+      "packages/x-provider/src/sample-app",
       "packages/passport/sdk",
       "packages/passport/sdk-sample-app",
-      "packages/provider",
-      "packages/provider/src/sample-app",
       "packages/orderbook",
       "packages/internal/version-check",
+      "packages/internal/metrics",
       "packages/internal/contracts",
       "packages/internal/toolkit",
       "packages/internal/cryptofiat",
@@ -86,16 +87,13 @@
       "packages/checkout/sdk-sample-app",
       "packages/checkout/widgets-sample-app",
       "packages/checkout/widgets-lib",
-      "packages/economy/sdk",
-      "packages/economy/playground",
-      "packages/economy/services",
       "packages/blockchain-data/sdk",
       "packages/blockchain-data/sample-app",
-      "packages/game-bridge",
-      "packages/internal/economy-building-blocks/playground"
+      "packages/game-bridge"
     ],
     "nohoist": [
-      "samples/**"
+      "samples/**",
+      "examples/**"
     ]
   }
 }

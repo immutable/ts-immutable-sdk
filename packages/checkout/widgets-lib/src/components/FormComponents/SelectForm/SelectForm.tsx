@@ -9,6 +9,7 @@ import { CoinSelectorOptionProps } from '../../CoinSelector/CoinSelectorOption';
 interface SelectFormProps {
   testId: string;
   options: CoinSelectorOptionProps[];
+  optionsLoading?: boolean;
   textAlign?: 'left' | 'right';
   subtext?: string;
   errorMessage?: string;
@@ -16,11 +17,13 @@ interface SelectFormProps {
   disabled?: boolean;
   onSelectChange: (value: string) => void;
   coinSelectorHeading: string;
+  defaultTokenImage: string;
 }
 
 export function SelectForm({
   testId,
   options,
+  optionsLoading,
   subtext,
   onSelectChange,
   textAlign,
@@ -28,6 +31,7 @@ export function SelectForm({
   disabled,
   selectedOption,
   coinSelectorHeading,
+  defaultTokenImage,
 }: SelectFormProps) {
   const [coinSelectorOpen, setCoinSelectorOpen] = useState<boolean>(false);
 
@@ -52,8 +56,10 @@ export function SelectForm({
       <CoinSelector
         heading={coinSelectorHeading}
         options={coinSelectorOptions}
+        defaultTokenImage={defaultTokenImage}
+        optionsLoading={optionsLoading ?? false}
         visible={coinSelectorOpen}
-        onCloseBottomSheet={() => setCoinSelectorOpen(false)}
+        onCloseDrawer={() => setCoinSelectorOpen(false)}
       />
       <FormControlWrapper
         testId={`${testId}-select-control`}
@@ -94,6 +100,8 @@ export function SelectForm({
                 <Option.FramedImage
                   imageUrl={option.icon}
                   circularFrame
+                  defaultImageUrl={defaultTokenImage}
+                  sx={{ background: 'base.color.translucent.standard.100' }}
                 />
               )}
               <Option.Label>{option.symbol}</Option.Label>

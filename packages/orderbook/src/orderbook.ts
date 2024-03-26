@@ -1,4 +1,5 @@
 import { ModuleConfiguration } from '@imtbl/config';
+import { providers } from 'ethers';
 import { ImmutableApiClient, ImmutableApiClientFactory } from './api-client';
 import {
   getOrderbookConfig,
@@ -54,6 +55,12 @@ export class Orderbook {
       ...obConfig,
       ...config.overrides,
     } as OrderbookModuleConfiguration;
+
+    if (config.overrides?.jsonRpcProviderUrl) {
+      finalConfig.provider = new providers.JsonRpcProvider(
+        config.overrides.jsonRpcProviderUrl,
+      );
+    }
 
     if (!finalConfig) {
       throw new Error(
@@ -197,7 +204,8 @@ export class Orderbook {
    * transaction exists it must be signed and submitted to the chain before the fulfilment
    * transaction can be submitted or it will be reverted.
    * @param {string} listingId - The listingId to fulfil.
-   * @param {string} fulfillerAddress - The address of the account fulfilling the order.
+   * @param {string} takerAddress - The address of the account fulfilling the order.
+   * @param {FeeValue[]} takerFees - Taker ecosystem fees to be paid.
    * @return {FulfillOrderResponse} Approval and fulfilment transactions.
    */
   async fulfillOrder(
@@ -208,6 +216,7 @@ export class Orderbook {
     const fulfillmentDataRes = await this.apiClient.fulfillmentData([
       {
         order_id: listingId,
+        taker_address: takerAddress,
         fees: takerFees.map((fee) => ({
           amount: fee.amount,
           type:
@@ -244,6 +253,7 @@ export class Orderbook {
     const fulfillmentDataRes = await this.apiClient.fulfillmentData(
       listings.map((listingRequest) => ({
         order_id: listingRequest.listingId,
+        taker_address: takerAddress,
         fees: listingRequest.takerFees.map((fee) => ({
           amount: fee.amount,
           type:

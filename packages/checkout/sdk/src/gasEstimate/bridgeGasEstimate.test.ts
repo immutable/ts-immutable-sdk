@@ -1,46 +1,32 @@
-import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
-import { getBridgeEstimatedGas } from './bridgeGasEstimate';
+import { TokenBridge } from '@imtbl/bridge-sdk';
+import { getBridgeFeeEstimate } from './bridgeGasEstimate';
+import { CheckoutConfiguration } from '../config';
+import { ChainId } from '../types';
 
 describe('getBridgeGasEstimate', () => {
-  let provider: Web3Provider;
+  let tokenBridge: TokenBridge;
+  let fromChainId: ChainId;
+  let toChainId: ChainId;
+  let config: CheckoutConfiguration;
 
   beforeEach(() => {
-    provider = {
-      getFeeData: jest.fn().mockResolvedValue({
-        maxFeePerGas: '0x1',
-        maxPriorityFeePerGas: '0x1',
-        gasPrice: null,
+    tokenBridge = {
+      getFee: jest.fn().mockResolvedValue({
+        totalFees: BigNumber.from(280000),
       }),
-    } as unknown as Web3Provider;
+    } as unknown as TokenBridge;
+    fromChainId = ChainId.ETHEREUM;
+    toChainId = ChainId.IMTBL_ZKEVM_TESTNET;
+    config = {
+      l1ChainId: ChainId.ETHEREUM,
+      l2ChainId: ChainId.IMTBL_ZKEVM_TESTNET,
+    } as unknown as CheckoutConfiguration;
   });
 
-  it('should return gasEstimate for supported eip1159 txn', async () => {
-    const result = await getBridgeEstimatedGas(
-      provider,
-      false,
-    );
+  it('should return gas estimate for supported eip1159 txn', async () => {
+    const result = await getBridgeFeeEstimate(tokenBridge, fromChainId, toChainId, config);
 
-    expect(result.estimatedAmount).toEqual(BigNumber.from(280000));
-  });
-
-  it('should return gas estimate for txn and approve txn', async () => {
-    const result = await getBridgeEstimatedGas(
-      provider,
-      true,
-    );
-    expect(result.estimatedAmount).toEqual(BigNumber.from(560000));
-  });
-
-  it('should return gasEstimate for non-eip1159 txn', async () => {
-    provider = {
-      getFeeData: jest.fn().mockResolvedValue({
-        gasPrice: '0x1',
-      }),
-    } as unknown as Web3Provider;
-
-    const result = await getBridgeEstimatedGas(provider, false);
-
-    expect(result.estimatedAmount).toEqual(BigNumber.from(140000));
+    expect(result.totalFees).toEqual(BigNumber.from(280000));
   });
 });

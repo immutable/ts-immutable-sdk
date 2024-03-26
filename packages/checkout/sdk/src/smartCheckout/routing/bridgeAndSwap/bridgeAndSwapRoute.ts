@@ -5,8 +5,6 @@ import {
   AvailableRoutingOptions,
   BridgeFundingStep,
   ChainId,
-  FundingRouteFeeEstimate,
-  FundingStepType,
   GetBalanceResult,
   SwapFundingStep,
   TokenInfo,
@@ -26,6 +24,7 @@ import { constructBridgeRequirements } from './constructBridgeRequirements';
 import { fetchL1ToL2Mappings } from './fetchL1ToL2Mappings';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS, L1ToL2TokenAddressMapping } from '../indexer/fetchL1Representation';
 import { getDexQuotes } from './getDexQuotes';
+import { isMatchingAddress } from '../../../utils/utils';
 
 export const abortBridgeAndSwap = (
   bridgeableTokens: string[],
@@ -58,9 +57,11 @@ export const filterSwappableTokensByBridgeableAddresses = (
     // TODO: Check for ETH (native) L1 in bridgeableTokens first
     if (!bridgeableTokens.includes(addresses.l1address)) continue;
     // Filter out the token that is required from the swappable tokens list
-    if (addresses.l2address === requiredTokenAddress) continue;
+    if (isMatchingAddress(addresses.l2address, requiredTokenAddress)) continue;
 
-    const tokenInfo = swappableTokens.find((token) => token.address === addresses.l2address);
+    const tokenInfo = swappableTokens.find(
+      (token) => isMatchingAddress(token.address, addresses.l2address),
+    );
     if (!tokenInfo) continue;
     filteredSwappableTokens.push(tokenInfo);
   }
@@ -106,7 +107,7 @@ const modifyTokenBalancesWithBridgedAmount = (
 
     const newBalance = l2balance.add(amount);
 
-    const tokenInfo = swappableTokens.find((token) => token.address === l2address) as TokenInfo;
+    const tokenInfo = swappableTokens.find((token) => isMatchingAddress(token.address, l2address)) as TokenInfo;
 
     balanceMap.set(l2address, {
       balance: newBalance,
@@ -145,7 +146,9 @@ export const reapplyOriginalSwapBalances = (
 
     let originalBalance = BigNumber.from(0);
     let originalFormattedBalance = '0';
-    const l2balance = tokenBalance.balances.find((balance) => balance.token.address === fundingItem.token.address);
+    const l2balance = tokenBalance.balances.find(
+      (balance) => isMatchingAddress(balance.token.address, fundingItem.token.address),
+    );
     if (l2balance) {
       originalBalance = l2balance.balance;
       originalFormattedBalance = l2balance.formattedBalance;
@@ -172,15 +175,21 @@ export const constructBridgeAndSwapRoutes = (
     const mapping = l1tol2Addresses.find(
       (addresses) => {
         if (bridgeFundingStep.fundingItem.token.address === undefined) {
-          return addresses.l1address === INDEXER_ETH_ROOT_CONTRACT_ADDRESS && addresses.l2address;
+          return isMatchingAddress(addresses.l1address, INDEXER_ETH_ROOT_CONTRACT_ADDRESS) && addresses.l2address;
         }
-        return addresses.l1address === bridgeFundingStep.fundingItem.token.address && addresses.l2address;
+        return (
+          isMatchingAddress(
+            addresses.l1address,
+            bridgeFundingStep.fundingItem.token.address,
+          )
+          && addresses.l2address
+        );
       },
     );
     if (!mapping) continue;
 
     const swapFundingStep = swapFundingSteps.find(
-      (step) => step.fundingItem.token.address === mapping.l2address,
+      (step) => isMatchingAddress(step.fundingItem.token.address, mapping.l2address),
     );
     if (!swapFundingStep) continue;
 
@@ -203,7 +212,6 @@ export const bridgeAndSwapRoute = async (
   availableRoutingOptions: AvailableRoutingOptions,
   insufficientRequirement: BalanceNativeRequirement | BalanceERC20Requirement,
   ownerAddress: string,
-  feeEstimates: Map<FundingStepType, FundingRouteFeeEstimate>,
   tokenBalances: Map<ChainId, TokenBalanceResult>,
   bridgeableTokens: string[],
   swappableTokens: TokenInfo[],
@@ -265,11 +273,9 @@ export const bridgeAndSwapRoute = async (
       bridgeRoute(
         config,
         readOnlyProviders,
-        ownerAddress,
         availableRoutingOptions,
         bridgeRequirement,
         tokenBalances,
-        feeEstimates,
       ),
     );
     bridgeableRequirementsMap.set(bridgeRequirement.l2address, {

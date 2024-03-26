@@ -1,10 +1,11 @@
-import { TransfersApi, UnsignedTransferRequest } from '@imtbl/core-sdk';
+import { imx } from '@imtbl/generated-clients';
+import { UnsignedTransferRequest } from '@imtbl/x-client';
 import { PassportError, PassportErrorType } from '../../errors/passportError';
 import { mockErrorMessage, mockStarkSignature, mockUserImx } from '../../test/mocks';
 import { batchNftTransfer, transfer } from './transfer';
-import GuardianClient from '../../guardian/guardian';
+import GuardianClient from '../../guardian';
 
-jest.mock('../../guardian/guardian');
+jest.mock('../../guardian');
 
 describe('transfer', () => {
   const mockGuardianClient = new GuardianClient({} as any);
@@ -24,7 +25,7 @@ describe('transfer', () => {
   describe('single transfer', () => {
     let getSignableTransferV1Mock: jest.Mock;
     let createTransferV1Mock: jest.Mock;
-    let transferApiMock: TransfersApi;
+    let transferApiMock: imx.TransfersApi;
 
     const mockReceiver = 'AAA';
     const type = 'ERC721';
@@ -43,7 +44,7 @@ describe('transfer', () => {
       transferApiMock = {
         getSignableTransferV1: getSignableTransferV1Mock,
         createTransferV1: createTransferV1Mock,
-      } as unknown as TransfersApi;
+      } as unknown as imx.TransfersApi;
     });
 
     it('should return success transfer result', async () => {
@@ -114,7 +115,7 @@ describe('transfer', () => {
       expect(getSignableTransferV1Mock).toBeCalledWith(mockSignableTransferRequest, mockHeader);
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
       expect(mockGuardianClient.evaluateImxTransaction)
-        .toBeCalledWith({ payloadHash: mockPayloadHash, user: mockUserImx });
+        .toBeCalledWith({ payloadHash: mockPayloadHash });
       expect(createTransferV1Mock).toBeCalledWith(mockCreateTransferRequest, mockHeader);
       expect(result).toEqual(mockReturnValue);
     });
@@ -173,7 +174,7 @@ describe('transfer', () => {
   describe('batchNftTransfer', () => {
     let mockGetSignableTransfer: jest.Mock;
     let mockCreateTransfer: jest.Mock;
-    let mockTransferApi: TransfersApi;
+    let mockTransferApi: imx.TransfersApi;
 
     const transferRequest = [
       {
@@ -191,7 +192,7 @@ describe('transfer', () => {
       mockTransferApi = {
         getSignableTransfer: mockGetSignableTransfer,
         createTransfer: mockCreateTransfer,
-      } as unknown as TransfersApi;
+      } as unknown as imx.TransfersApi;
     });
 
     it('should make a successful batch transfer request', async () => {
@@ -269,7 +270,7 @@ describe('transfer', () => {
       expect(mockStarkSigner.signMessage).toHaveBeenCalled();
       expect(mockGuardianClient.withConfirmationScreenTask).toBeCalledWith(popupOptions);
       expect(mockGuardianClient.evaluateImxTransaction)
-        .toBeCalledWith({ payloadHash: payload_hash, user: mockUserImx });
+        .toBeCalledWith({ payloadHash: payload_hash });
       expect(mockCreateTransfer).toHaveBeenCalledWith(
         {
           createTransferRequestV2: {

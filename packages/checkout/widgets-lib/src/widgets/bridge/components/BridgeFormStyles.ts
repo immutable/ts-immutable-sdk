@@ -3,6 +3,7 @@ export const bridgeFormWrapperStyles = {
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-between',
+  paddingTop: 'base.spacing.x10',
 };
 
 export const formInputsContainerStyles = {
@@ -16,5 +17,4 @@ export const bridgeFormButtonContainerStyles = {
   flexDirection: 'column',
   paddingY: 'base.spacing.x6',
   paddingX: 'base.spacing.x4',
-  backgroundColor: 'base.color.translucent.emphasis.200',
 };

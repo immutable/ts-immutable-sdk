@@ -4,6 +4,7 @@
   "dependencies": {
     "@imtbl/bridge-sdk": "0.0.0",
     "@imtbl/config": "0.0.0",
+    "dotenv": "^16.0.3",
     "ethers": "^5.7.2"
   },
   "devDependencies": {
@@ -16,9 +17,21 @@
   },
   "private": true,
   "scripts": {
+    "approval": "node --loader ts-node/esm ./src/approval.ts",
+    "bridge": "node --loader ts-node/esm ./src/bridge.ts",
     "build": "",
-    "deposit": "ts-node --esm ./src/index.ts",
-    "lint": "eslint ./src --ext .ts --max-warnings=0"
+    "deposit": "node --loader ts-node/esm ./src/deposit.ts",
+    "fees": "node --loader ts-node/esm ./src/fees.ts",
+    "flowRateInfo": "node --loader ts-node/esm ./src/flowRateInfo.ts",
+    "getMapping": "node --loader ts-node/esm ./src/getMapping.ts",
+    "issueUSDC": "node --loader ts-node/esm ./src/issueUSDC.ts",
+    "lint": "eslint ./src --ext .ts --max-warnings=0",
+    "mapToken": "node --loader ts-node/esm ./src/mapToken.ts",
+    "pending": "node --loader ts-node/esm ./src/pending.ts",
+    "setFlowRate": "node --loader ts-node/esm ./src/setFlowRate.ts",
+    "status": "node --loader ts-node/esm ./src/status.ts",
+    "withdraw": "node --loader ts-node/esm ./src/withdraw.ts",
+    "withdrawTx": "node --loader ts-node/esm ./src/withdrawTx.ts"
   },
   "type": "module"
 }

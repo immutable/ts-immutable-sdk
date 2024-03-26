@@ -1,7 +1,10 @@
 import {
   Body,
-  BottomSheet, Box, Button, FramedImage, Heading, Logo,
+  Drawer, Box, Button, Heading, Logo, CloudImage,
 } from '@biom3/react';
+import { useTranslation } from 'react-i18next';
+import { Environment } from '@imtbl/config';
+import { getImxTokenImage } from 'lib/utils';
 import {
   containerStyles,
   contentTextStyles,
@@ -9,50 +12,50 @@ import {
   actionButtonContainerStyles,
   logoContainerStyles,
 } from './NotEnoughImxStyles';
-import { text } from '../../resources/text/textConfig';
 
 type NotEnoughImxProps = {
+  environment: Environment;
   visible: boolean;
   showAdjustAmount: boolean;
   hasZeroImx: boolean;
-  onCloseBottomSheet?: () => void;
+  onCloseDrawer?: () => void;
   onAddCoinsClick: () => void;
 };
 
 export function NotEnoughImx({
-  visible, showAdjustAmount, hasZeroImx, onCloseBottomSheet, onAddCoinsClick,
+  environment,
+  visible,
+  showAdjustAmount,
+  hasZeroImx,
+  onCloseDrawer,
+  onAddCoinsClick,
 }: NotEnoughImxProps) {
-  const { content, buttons } = text.drawers.notEnoughImx;
-  const { noImx, insufficientImx } = content;
+  const { t } = useTranslation();
 
-  const imxLogo = 'https://design-system.immutable.com/hosted-for-ds/currency-icons/currency--imx.svg';
+  const imxLogo = getImxTokenImage(environment);
 
   return (
-    <BottomSheet
+    <Drawer
       size="full"
-      onCloseBottomSheet={onCloseBottomSheet}
+      onCloseDrawer={onCloseDrawer}
       visible={visible}
       showHeaderBar={false}
     >
-      <BottomSheet.Content>
+      <Drawer.Content>
         <Box testId="not-enough-gas-bottom-sheet" sx={containerStyles}>
-          <FramedImage
+          <CloudImage
             imageUrl={imxLogo}
-            circularFrame
-            sx={{
-              height: '110px',
-              width: '64px',
-            }}
+            sx={{ w: 'base.icon.size.600', h: 'base.icon.size.600' }}
           />
           <Heading
             size="small"
             sx={contentTextStyles}
             testId="not-enough-gas-heading"
           >
-            {hasZeroImx ? noImx.heading : insufficientImx.heading}
+            {t(`drawers.notEnoughImx.content.${hasZeroImx ? 'noImx' : 'insufficientImx'}.heading`)}
           </Heading>
           <Body sx={contentTextStyles}>
-            {hasZeroImx ? noImx.body : insufficientImx.body}
+            {t(`drawers.notEnoughImx.content.${hasZeroImx ? 'noImx' : 'insufficientImx'}.body`)}
           </Body>
           <Box sx={actionButtonContainerStyles}>
             {showAdjustAmount && (
@@ -60,9 +63,9 @@ export function NotEnoughImx({
                 testId="not-enough-gas-adjust-amount-button"
                 sx={actionButtonStyles}
                 variant="tertiary"
-                onClick={onCloseBottomSheet}
+                onClick={onCloseDrawer}
               >
-                {buttons.adjustAmount}
+                {t('drawers.notEnoughImx.buttons.adjustAmount')}
               </Button>
             )}
             <Button
@@ -71,15 +74,15 @@ export function NotEnoughImx({
               variant="tertiary"
               onClick={onAddCoinsClick}
             >
-              {buttons.addMoreImx}
+              {t('drawers.notEnoughImx.buttons.addMoreImx')}
             </Button>
             <Button
               sx={actionButtonStyles}
               variant="tertiary"
-              onClick={onCloseBottomSheet}
+              onClick={onCloseDrawer}
               testId="not-enough-gas-cancel-button"
             >
-              {buttons.cancel}
+              {t('drawers.notEnoughImx.buttons.cancel')}
             </Button>
           </Box>
           <Box sx={logoContainerStyles}>
@@ -90,7 +93,7 @@ export function NotEnoughImx({
             />
           </Box>
         </Box>
-      </BottomSheet.Content>
-    </BottomSheet>
+      </Drawer.Content>
+    </Drawer>
   );
 }

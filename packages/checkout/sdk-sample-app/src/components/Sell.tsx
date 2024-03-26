@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
 import { Box, FormControl, Select, TextInput, Option, OptionKey, Body } from '@biom3/react';
 import { utils } from 'ethers';
+import { ERC20BuyToken } from '@imtbl/checkout-sdk/dist/types';
 
 interface SellProps {
   checkout: Checkout;
@@ -21,11 +22,18 @@ export default function Sell({ checkout, provider }: SellProps) {
   const [listingTypeError, setListingTypeError] = useState<string>('');
   const [amount, setAmount] = useState<string>('');
   const [amountError, setAmountError] = useState<string>('');
-  const [contractAddress, setContractAddress] = useState<string>('');
+  const [expiry, setExpiry] = useState<string | undefined>(undefined);
+  const [expiryError, setExpiryError] = useState<string>('');
+  const [tokenAddress, setTokenAddress] = useState<string>('');
   const [contractAddressError, setContractAddressError] = useState<string>('');
   const [error, setError] = useState<any>(null);
   const [success, setSuccess] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+
+  const isDateValid = (dateStr: string) => {
+    var dateRegex = /^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}):(\d{2})Z)?$/;
+    return dateRegex.test(dateStr);
+  }
 
   const getBuyToken = (): BuyToken => {
     if (listingType === ItemType.NATIVE) {
@@ -37,34 +45,44 @@ export default function Sell({ checkout, provider }: SellProps) {
     return {
       type: ItemType.ERC20,
       amount,
-      contractAddress,
+      tokenAddress,
     };
   }
 
   async function sellClick() {
     if (!id) {
       setIdError('Please enter the ID of the ERC721');
+      return
     }
     if (!collectionAddress) {
       setCollectionAddressError('Please enter the collection address for the ERC721');
+      return
     }
     if (!listingType) {
       setListingTypeError('Please select the listing type');
+      return
     }
     if (listingType === ItemType.NATIVE && !amount) {
       setAmountError('Please enter the amount of NATIVE tokens to sell the ERC721 for');
+      return
     }
     if (listingType === ItemType.ERC20 && !amount) {
       setAmountError('Please enter the amount of ERC20 tokens to sell the ERC721 for');
+      return
     }
-    if (listingType === ItemType.ERC20 && !contractAddress) {
+    if (listingType === ItemType.ERC20 && !tokenAddress) {
       setContractAddressError('Please enter the contract address for the ERC20');
+      return
+    }
+    if (expiry && !isDateValid(expiry)) {
+      setExpiryError('Invalid date - format YYYY-MM-DD or YYYY-MM-DDTHH:MM:SSZ');
+      return
     }
     if (!id ||
       !collectionAddress ||
       !amount ||
       !listingType ||
-      (listingType === ItemType.ERC20 && !contractAddress)) {
+      (listingType === ItemType.ERC20 && !tokenAddress)) {
       return;
     }
     if (!checkout) {
@@ -88,7 +106,8 @@ export default function Sell({ checkout, provider }: SellProps) {
         makerFees: [{
           amount: { percentageDecimal: 0.025 },
           recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772'
-        }]
+        }],
+        orderExpiry: expiry ? new Date(expiry) : undefined
       }]
 
       const result = await checkout.sell({
@@ -117,6 +136,11 @@ export default function Sell({ checkout, provider }: SellProps) {
     setCollectionAddressError('');
   }
 
+  const updateExpiry = (event: any) => {
+    setExpiry(event.target.value);
+    setError('');
+  }
+
   const updateAmount = (event: any) => {
     const value = event.target.value;
     setAmount(value);
@@ -134,7 +158,7 @@ export default function Sell({ checkout, provider }: SellProps) {
         setListingType(ItemType.NATIVE);
         setDisabledContractAddress(true);
         setListingTypeError('');
-        setContractAddress('');
+        setTokenAddress('');
         setContractAddressError('');
         break;
       case 'erc20':
@@ -170,7 +194,7 @@ export default function Sell({ checkout, provider }: SellProps) {
                   <Option optionKey="erc20">
                     <Option.Label>ERC20</Option.Label>
                   </Option>
-                </Select> 
+                </Select>
                 {listingTypeError && (
                   <FormControl.Validation>{listingTypeError}</FormControl.Validation>
                 )}
@@ -191,10 +215,10 @@ export default function Sell({ checkout, provider }: SellProps) {
             {listingType === ItemType.ERC20 && <td>
               <FormControl validationStatus={contractAddressError ? 'error' : 'success'}>
                 <TextInput
-                  value={contractAddress}
+                  value={tokenAddress}
                   disabled={disableContractAddress}
                   onChange={(event: any) => {
-                    setContractAddress(event.target.value);
+                    setTokenAddress(event.target.value);
                     setContractAddressError('');
                   }}
                 />
@@ -223,6 +247,13 @@ export default function Sell({ checkout, provider }: SellProps) {
         <TextInput onChange={updateCollectionAddress} />
         {collectionAddressError && (
           <FormControl.Validation>{collectionAddressError}</FormControl.Validation>
+        )}
+      </FormControl>
+      <FormControl validationStatus={expiryError ? 'error' : 'success'} >
+        <FormControl.Label>Expiry</FormControl.Label>
+        <TextInput onChange={updateExpiry} />
+        {expiryError && (
+          <FormControl.Validation>{expiryError}</FormControl.Validation>
         )}
       </FormControl>
       {tokenForm()}

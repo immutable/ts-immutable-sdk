@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import {
-  ConnectTargetLayer,
+  ChainId,
   IMTBLWidgetEvents,
+  WalletWidgetConfiguration,
   WalletWidgetParams,
-  WidgetConfiguration,
   WidgetProperties,
   WidgetTheme,
   WidgetType,
@@ -11,11 +11,14 @@ import {
 import { Base } from 'widgets/BaseWidgetRoot';
 import { ConnectLoader, ConnectLoaderParams } from 'components/ConnectLoader/ConnectLoader';
 import { getL1ChainId, getL2ChainId } from 'lib';
-import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
 import { isValidWalletProvider } from 'lib/validations/widgetValidators';
-import { BiomePortalIdProvider } from '@biom3/react';
-import { WalletWidget } from './WalletWidget';
+import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
+import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
+import { LoadingView } from 'views/loading/LoadingView';
 import { sendWalletWidgetCloseEvent } from './WalletWidgetEvents';
+import i18n from '../../i18n';
+
+const WalletWidget = React.lazy(() => import('./WalletWidget'));
 
 export class Wallet extends Base<WidgetType.WALLET> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT;
@@ -23,12 +26,24 @@ export class Wallet extends Base<WidgetType.WALLET> {
   protected getValidatedProperties(
     { config }: WidgetProperties<WidgetType.WALLET>,
   ): WidgetProperties<WidgetType.WALLET> {
-    let validatedConfig: WidgetConfiguration | undefined;
+    let validatedConfig: WalletWidgetConfiguration | undefined;
 
     if (config) {
       validatedConfig = config;
       if (config.theme === WidgetTheme.LIGHT) validatedConfig.theme = WidgetTheme.LIGHT;
       else validatedConfig.theme = WidgetTheme.DARK;
+
+      if (config?.showDisconnectButton === undefined) {
+        validatedConfig.showDisconnectButton = true;
+      } else {
+        validatedConfig.showDisconnectButton = config.showDisconnectButton;
+      }
+
+      if (config?.showNetworkMenu === undefined) {
+        validatedConfig.showNetworkMenu = true;
+      } else {
+        validatedConfig.showNetworkMenu = config.showNetworkMenu;
+      }
     }
 
     return {
@@ -48,31 +63,40 @@ export class Wallet extends Base<WidgetType.WALLET> {
   }
 
   protected render() {
+    if (!this.reactRoot) return;
+
+    const { t } = i18n;
     const connectLoaderParams: ConnectLoaderParams = {
-      targetLayer: ConnectTargetLayer.LAYER2,
+      targetChainId: this.checkout.config.isProduction
+        ? ChainId.IMTBL_ZKEVM_MAINNET
+        : ChainId.IMTBL_ZKEVM_TESTNET,
       walletProviderName: this.parameters?.walletProviderName,
       web3Provider: this.web3Provider,
       checkout: this.checkout,
       allowedChains: [getL1ChainId(this.checkout.config), getL2ChainId(this.checkout.config)],
     };
 
-    if (!this.reactRoot) return;
-
     this.reactRoot.render(
       <React.StrictMode>
-        <BiomePortalIdProvider>
-          <CustomAnalyticsProvider widgetConfig={this.strongConfig()}>
+        <CustomAnalyticsProvider checkout={this.checkout}>
+          <ThemeProvider id="wallet-container" config={this.strongConfig()}>
             <ConnectLoader
               widgetConfig={this.strongConfig()}
               params={connectLoaderParams}
               closeEvent={() => sendWalletWidgetCloseEvent(window)}
             >
-              <WalletWidget
-                config={this.strongConfig()}
-              />
+              <Suspense fallback={<LoadingView loadingText={t('views.LOADING_VIEW.text')} />}>
+                <WalletWidget
+                  config={this.strongConfig()}
+                  walletConfig={{
+                    showDisconnectButton: this.properties.config?.showDisconnectButton!,
+                    showNetworkMenu: this.properties.config?.showNetworkMenu!,
+                  }}
+                />
+              </Suspense>
             </ConnectLoader>
-          </CustomAnalyticsProvider>
-        </BiomePortalIdProvider>
+          </ThemeProvider>
+        </CustomAnalyticsProvider>
       </React.StrictMode>,
     );
   }

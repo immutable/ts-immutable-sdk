@@ -68,14 +68,14 @@ export const getSwapFeeEstimation = (
   swapFees: GasEstimateSwapResult,
   conversions: Map<string, number>,
 ): string => {
-  const { gasFee } = swapFees;
+  const { fees } = swapFees;
 
-  const gasFeeAmount = gasFee.estimatedAmount;
-  if (gasFeeAmount === undefined) return '-.--';
-  const gasFeeToken = gasFee.token;
-  if (gasFeeToken === undefined) return '-.--';
+  const feeAmount = fees.totalFees;
+  if (feeAmount === undefined) return '-.--';
+  const feeToken = fees.token;
+  if (feeToken === undefined) return '-.--';
 
-  const gasFeeInFiat = convertFeeToFiat(gasFeeAmount, gasFeeToken, conversions);
+  const gasFeeInFiat = convertFeeToFiat(feeAmount, feeToken, conversions);
   if (gasFeeInFiat < 0) return '-.--';
 
   return formatFiatDecimals(gasFeeInFiat);
@@ -85,20 +85,14 @@ export const getBridgeFeeEstimation = (
   bridgeFees: GasEstimateBridgeToL2Result,
   conversions: Map<string, number>,
 ): string => {
-  const { gasFee, bridgeFee } = bridgeFees;
+  const { fees, token } = bridgeFees;
 
-  const gasFeeAmount = gasFee.estimatedAmount;
-  if (gasFeeAmount === undefined) return '-.--';
-  const gasFeeToken = gasFee.token;
-  if (typeof gasFeeAmount === 'undefined') return '-.--';
+  const feeAmount = fees.totalFees;
+  if (feeAmount === undefined) return '-.--';
+  if (token === undefined) return '-.--';
 
-  const gasFeeInFiat = convertFeeToFiat(gasFeeAmount, gasFeeToken, conversions);
-  if (gasFeeInFiat < 0) return '-.--';
+  const feesInFiat = convertFeeToFiat(fees.totalFees, token, conversions);
+  if (feesInFiat < 0) return '-.--';
 
-  const bridgeFeeInFiat = convertFeeToFiat(bridgeFee.estimatedAmount, bridgeFee.token, conversions);
-  if (bridgeFeeInFiat < 0) {
-    return formatFiatDecimals(gasFeeInFiat);
-  }
-
-  return formatFiatDecimals(gasFeeInFiat + bridgeFeeInFiat);
+  return formatFiatDecimals(feesInFiat);
 };

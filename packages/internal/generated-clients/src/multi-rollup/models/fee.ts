@@ -31,22 +31,22 @@ export interface Fee {
      * @type {string}
      * @memberof Fee
      */
-    'fee_type': FeeFeeTypeEnum;
+    'type': FeeTypeEnum;
     /**
      * Wallet address of fee recipient
      * @type {string}
      * @memberof Fee
      */
-    'recipient': string;
+    'recipient_address': string;
 }
 
-export const FeeFeeTypeEnum = {
+export const FeeTypeEnum = {
     Royalty: 'ROYALTY',
     MakerEcosystem: 'MAKER_ECOSYSTEM',
     TakerEcosystem: 'TAKER_ECOSYSTEM',
     Protocol: 'PROTOCOL'
 } as const;
 
-export type FeeFeeTypeEnum = typeof FeeFeeTypeEnum[keyof typeof FeeFeeTypeEnum];
+export type FeeTypeEnum = typeof FeeTypeEnum[keyof typeof FeeTypeEnum];
 
 

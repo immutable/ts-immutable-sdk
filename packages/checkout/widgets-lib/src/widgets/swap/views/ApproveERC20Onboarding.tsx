@@ -3,11 +3,11 @@ import {
   useCallback, useContext, useEffect, useMemo, useState,
 } from 'react';
 import { CheckoutErrorType, TokenInfo } from '@imtbl/checkout-sdk';
+import { useTranslation } from 'react-i18next';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { sendSwapWidgetCloseEvent } from '../SwapWidgetEvents';
 import { FooterButton } from '../../../components/Footer/FooterButton';
-import { text } from '../../../resources/text/textConfig';
 import {
   ApproveERC20SwapData,
   PrefilledSwapForm,
@@ -18,21 +18,21 @@ import { SwapContext } from '../context/SwapContext';
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { LoadingView } from '../../../views/loading/LoadingView';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
-import { isPassportProvider } from '../../../lib/providerUtils';
 import { SpendingCapHero } from '../../../components/Hero/SpendingCapHero';
 import { WalletApproveHero } from '../../../components/Hero/WalletApproveHero';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { isPassportProvider } from '../../../lib/provider';
 
 export interface ApproveERC20Props {
   data: ApproveERC20SwapData;
 }
 export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
+  const { t } = useTranslation();
   const { swapState: { allowedTokens } } = useContext(SwapContext);
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
   const { viewDispatch } = useContext(ViewContext);
-  const { approveSpending, approveSwap } = text.views[SwapWidgetViews.APPROVE_ERC20];
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
   const isPassport = isPassportProvider(provider);
@@ -61,9 +61,9 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
   // Get symbol from swap info for approve amount text
   const fromToken = useMemo(
     () => allowedTokens.find(
-      (token: TokenInfo) => token.address === data.swapFormInfo.fromContractAddress,
+      (token: TokenInfo) => token.address === data.swapFormInfo.fromTokenAddress,
     ),
-    [allowedTokens, data.swapFormInfo.fromContractAddress],
+    [allowedTokens, data.swapFormInfo.fromTokenAddress],
   );
 
   // Common error view function
@@ -201,24 +201,33 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
     setApprovalTxnLoading,
   ]);
 
-  const approveSpendingContent = useMemo(() => {
-    const { metamask, passport } = approveSpending.content;
-    return (
-      <SimpleTextBody heading={isPassport ? passport.heading : metamask.heading}>
-        {isPassport && (<Box>{passport.body}</Box>)}
+  const approveSpendingContent = useMemo(
+    () => (
+      <SimpleTextBody
+        heading={t(`views.APPROVE_ERC20.approveSpending.content.${isPassport ? 'passport' : 'metamask'}.heading`)}
+      >
+        {isPassport && (<Box>{t('views.APPROVE_ERC20.approveSpending.content.passport.body')}</Box>)}
         {!isPassport
-        // eslint-disable-next-line max-len
-        && (<Box>{`${metamask.body[0]} ${data.swapFormInfo.fromAmount} ${fromToken?.symbol || ''} ${metamask.body[1]}`}</Box>)}
+      // eslint-disable-next-line max-len
+      && (
+        <Box>
+          {t(
+            'views.APPROVE_ERC20.approveSpending.content.metamask.body',
+            { amount: `${data.swapFormInfo.fromAmount} ${fromToken?.symbol || ''}` },
+          )}
+        </Box>
+      )}
       </SimpleTextBody>
-    );
-  }, [data.swapFormInfo, fromToken, isPassport]);
+    ),
+    [data.swapFormInfo, fromToken, isPassport],
+  );
 
   const approveSpendingFooter = useMemo(() => (
     <FooterButton
       loading={loading}
-      actionText={rejectedSpending
-        ? approveSpending.footer.retryText
-        : approveSpending.footer.buttonText}
+      actionText={t(rejectedSpending
+        ? 'views.APPROVE_ERC20.approveSpending.footer.retryText'
+        : 'views.APPROVE_ERC20.approveSpending.footer.buttonText')}
       onActionClick={handleApproveSpendingClick}
     />
   ), [rejectedSpending, handleApproveSpendingClick, loading]);
@@ -291,24 +300,26 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
   ]);
 
   const approveSwapContent = (
-    <SimpleTextBody heading={approveSwap.content.heading}>
-      <Box>{approveSwap.content.body}</Box>
+    <SimpleTextBody heading={t('views.APPROVE_ERC20.approveSwap.content.heading')}>
+      <Box>{t('views.APPROVE_ERC20.approveSwap.content.body')}</Box>
     </SimpleTextBody>
   );
 
   const approveSwapFooter = useMemo(() => (
     <FooterButton
       loading={loading}
-      actionText={rejectedSwap
-        ? approveSwap.footer.retryText
-        : approveSwap.footer.buttonText}
+      actionText={t(rejectedSwap
+        ? 'views.APPROVE_ERC20.approveSwap.footer.retryText'
+        : 'views.APPROVE_ERC20.approveSwap.footer.buttonText')}
       onActionClick={handleApproveSwapClick}
     />
   ), [rejectedSwap, handleApproveSwapClick, loading]);
 
   return (
     <>
-      {approvalTxnLoading && (<LoadingView loadingText={approveSpending.loading.text} showFooterLogo />)}
+      {approvalTxnLoading && (
+        <LoadingView loadingText={t('views.APPROVE_ERC20.approveSpending.loading.text')} />
+      )}
       {!approvalTxnLoading && (
         <SimpleLayout
           header={(

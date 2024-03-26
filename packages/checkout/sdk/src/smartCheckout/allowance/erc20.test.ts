@@ -36,9 +36,9 @@ describe('allowance', () => {
         allowance: allowanceMock,
       });
 
-      let message = '';
-      let type = '';
-      let data = {};
+      let message;
+      let type;
+      let data;
 
       try {
         await getERC20Allowance(
@@ -55,9 +55,7 @@ describe('allowance', () => {
 
       expect(message).toEqual('Failed to get the allowance for ERC20');
       expect(type).toEqual(CheckoutErrorType.GET_ERC20_ALLOWANCE_ERROR);
-      expect(data).toEqual({
-        contractAddress: 'OxERC20',
-      });
+      expect(data.error).toBeDefined();
       expect(allowanceMock).toBeCalledWith('0xADDRESS', '0xSEAPORT');
     });
   });
@@ -90,9 +88,9 @@ describe('allowance', () => {
         },
       });
 
-      let message = '';
-      let type = '';
-      let data = {};
+      let message;
+      let type;
+      let data;
 
       try {
         await getERC20ApprovalTransaction(
@@ -110,9 +108,8 @@ describe('allowance', () => {
 
       expect(message).toEqual('Failed to get the approval transaction for ERC20');
       expect(type).toEqual(CheckoutErrorType.GET_ERC20_ALLOWANCE_ERROR);
-      expect(data).toEqual({
-        contractAddress: 'OxERC20',
-      });
+      expect(data.error).toBeDefined();
+      expect(data.contractAddress).toEqual('OxERC20');
       expect(approveMock).toBeCalledWith('0xSEAPORT', BigNumber.from(1));
     });
   });
@@ -135,7 +132,7 @@ describe('allowance', () => {
         },
         {
           type: ItemType.ERC20,
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           amount: BigNumber.from(2),
           spenderAddress: '0xSEAPORT',
         },
@@ -171,7 +168,7 @@ describe('allowance', () => {
         },
         {
           type: ItemType.ERC20,
-          contractAddress: '0xERC20',
+          tokenAddress: '0xERC20',
           amount: BigNumber.from(1),
           spenderAddress: '0xSEAPORT',
         },
@@ -204,19 +201,19 @@ describe('allowance', () => {
         },
         {
           type: ItemType.ERC20,
-          contractAddress: '0xERC20a',
+          tokenAddress: '0xERC20a',
           amount: BigNumber.from(2),
           spenderAddress: '0xSEAPORT',
         },
         {
           type: ItemType.ERC20,
-          contractAddress: '0xERC20b',
+          tokenAddress: '0xERC20b',
           amount: BigNumber.from(1),
           spenderAddress: '0xSEAPORT',
         },
         {
           type: ItemType.ERC20,
-          contractAddress: '0xERC20c',
+          tokenAddress: '0xERC20c',
           amount: BigNumber.from(2),
           spenderAddress: '0xSEAPORT',
         },

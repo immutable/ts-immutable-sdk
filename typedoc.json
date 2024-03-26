@@ -4,11 +4,10 @@
     "packages/blockchain-data/sdk/",
     "packages/checkout/sdk/",
     "packages/config/",
-    "packages/economy/sdk/",
-    "packages/immutablex_client/",
+    "packages/x-client/",
     "packages/orderbook/",
     "packages/passport/sdk/",
-    "packages/provider/"
+    "packages/x-provider/"
   ],
   "name": "ts-immutable-sdk",
   "entryPointStrategy": "packages",

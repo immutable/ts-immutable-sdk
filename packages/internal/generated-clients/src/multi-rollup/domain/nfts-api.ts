@@ -24,21 +24,127 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 // @ts-ignore
 import { APIError400 } from '../models';
 // @ts-ignore
+import { APIError401 } from '../models';
+// @ts-ignore
+import { APIError403 } from '../models';
+// @ts-ignore
 import { APIError404 } from '../models';
+// @ts-ignore
+import { APIError429 } from '../models';
 // @ts-ignore
 import { APIError500 } from '../models';
 // @ts-ignore
+import { CreateMintRequestRequest } from '../models';
+// @ts-ignore
+import { CreateMintRequestResult } from '../models';
+// @ts-ignore
 import { GetNFTResult } from '../models';
 // @ts-ignore
-import { ListNFTOwnersResult } from '../models';
+import { ListMintRequestsResult } from '../models';
+// @ts-ignore
+import { ListNFTsByOwnerResult } from '../models';
 // @ts-ignore
 import { ListNFTsResult } from '../models';
+// @ts-ignore
+import { MintRequestStatus } from '../models';
 /**
  * NftsApi - axios parameter creator
  * @export
  */
 export const NftsApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
+        /**
+         * Create a mint request to mint a set of NFTs for a given collection
+         * @summary Mint NFTs
+         * @param {string} contractAddress The address of contract
+         * @param {string} chainName The name of chain
+         * @param {CreateMintRequestRequest} createMintRequestRequest Create Mint Request Body
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createMintRequest: async (contractAddress: string, chainName: string, createMintRequestRequest: CreateMintRequestRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'contractAddress' is not null or undefined
+            assertParamExists('createMintRequest', 'contractAddress', contractAddress)
+            // verify required parameter 'chainName' is not null or undefined
+            assertParamExists('createMintRequest', 'chainName', chainName)
+            // verify required parameter 'createMintRequestRequest' is not null or undefined
+            assertParamExists('createMintRequest', 'createMintRequestRequest', createMintRequestRequest)
+            const localVarPath = `/v1/chains/{chain_name}/collections/{contract_address}/nfts/mint-requests`
+                .replace(`{${"contract_address"}}`, encodeURIComponent(String(contractAddress)))
+                .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication ImmutableApiKey required
+            await setApiKeyToObject(localVarHeaderParameter, "x-immutable-api-key", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createMintRequestRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Retrieve the status of a mint request identified by its reference_id
+         * @summary Get mint request by reference ID
+         * @param {string} contractAddress The address of contract
+         * @param {string} chainName The name of chain
+         * @param {string} referenceId The id of the mint request
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getMintRequest: async (contractAddress: string, chainName: string, referenceId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'contractAddress' is not null or undefined
+            assertParamExists('getMintRequest', 'contractAddress', contractAddress)
+            // verify required parameter 'chainName' is not null or undefined
+            assertParamExists('getMintRequest', 'chainName', chainName)
+            // verify required parameter 'referenceId' is not null or undefined
+            assertParamExists('getMintRequest', 'referenceId', referenceId)
+            const localVarPath = `/v1/chains/{chain_name}/collections/{contract_address}/nfts/mint-requests/{reference_id}`
+                .replace(`{${"contract_address"}}`, encodeURIComponent(String(contractAddress)))
+                .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)))
+                .replace(`{${"reference_id"}}`, encodeURIComponent(String(referenceId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication ImmutableApiKey required
+            await setApiKeyToObject(localVarHeaderParameter, "x-immutable-api-key", configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
         /**
          * Get NFT by token ID
          * @summary Get NFT by token ID
@@ -69,59 +175,6 @@ export const NftsApiAxiosParamCreator = function (configuration?: Configuration)
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * List all NFT owners on a chain
-         * @summary List all NFT owners
-         * @param {string} chainName The name of chain
-         * @param {string} fromUpdatedAt Datetime to use as the oldest updated timestamp
-         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
-         * @param {number} [pageSize] Maximum number of items to return
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        listAllNFTOwners: async (chainName: string, fromUpdatedAt: string, pageCursor?: string, pageSize?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'chainName' is not null or undefined
-            assertParamExists('listAllNFTOwners', 'chainName', chainName)
-            // verify required parameter 'fromUpdatedAt' is not null or undefined
-            assertParamExists('listAllNFTOwners', 'fromUpdatedAt', fromUpdatedAt)
-            const localVarPath = `/v1/chains/{chain_name}/nft-owners`
-                .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            if (fromUpdatedAt !== undefined) {
-                localVarQueryParameter['from_updated_at'] = (fromUpdatedAt as any instanceof Date) ?
-                    (fromUpdatedAt as any).toISOString() :
-                    fromUpdatedAt;
-            }
-
-            if (pageCursor !== undefined) {
-                localVarQueryParameter['page_cursor'] = pageCursor;
-            }
-
-            if (pageSize !== undefined) {
-                localVarQueryParameter['page_size'] = pageSize;
-            }
 
 
     
@@ -186,17 +239,74 @@ export const NftsApiAxiosParamCreator = function (configuration?: Configuration)
             };
         },
         /**
+         * Retrieve the status of all mints for a given contract address
+         * @summary List mint requests
+         * @param {string} contractAddress The address of contract
+         * @param {string} chainName The name of chain
+         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+         * @param {number} [pageSize] Maximum number of items to return
+         * @param {MintRequestStatus} [status] The status of the mint request
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listMintRequests: async (contractAddress: string, chainName: string, pageCursor?: string, pageSize?: number, status?: MintRequestStatus, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'contractAddress' is not null or undefined
+            assertParamExists('listMintRequests', 'contractAddress', contractAddress)
+            // verify required parameter 'chainName' is not null or undefined
+            assertParamExists('listMintRequests', 'chainName', chainName)
+            const localVarPath = `/v1/chains/{chain_name}/collections/{contract_address}/nfts/mint-requests`
+                .replace(`{${"contract_address"}}`, encodeURIComponent(String(contractAddress)))
+                .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication ImmutableApiKey required
+            await setApiKeyToObject(localVarHeaderParameter, "x-immutable-api-key", configuration)
+
+            if (pageCursor !== undefined) {
+                localVarQueryParameter['page_cursor'] = pageCursor;
+            }
+
+            if (pageSize !== undefined) {
+                localVarQueryParameter['page_size'] = pageSize;
+            }
+
+            if (status !== undefined) {
+                localVarQueryParameter['status'] = status;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * List NFTs by contract address
          * @summary List NFTs by contract address
          * @param {string} contractAddress Contract address
          * @param {string} chainName The name of chain
+         * @param {Array<string>} [tokenId] List of token IDs to filter by
          * @param {string} [fromUpdatedAt] Datetime to use as the oldest updated timestamp
          * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {number} [pageSize] Maximum number of items to return
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listNFTs: async (contractAddress: string, chainName: string, fromUpdatedAt?: string, pageCursor?: string, pageSize?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listNFTs: async (contractAddress: string, chainName: string, tokenId?: Array<string>, fromUpdatedAt?: string, pageCursor?: string, pageSize?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'contractAddress' is not null or undefined
             assertParamExists('listNFTs', 'contractAddress', contractAddress)
             // verify required parameter 'chainName' is not null or undefined
@@ -214,6 +324,10 @@ export const NftsApiAxiosParamCreator = function (configuration?: Configuration)
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            if (tokenId) {
+                localVarQueryParameter['token_id'] = tokenId;
+            }
 
             if (fromUpdatedAt !== undefined) {
                 localVarQueryParameter['from_updated_at'] = (fromUpdatedAt as any instanceof Date) ?
@@ -304,6 +418,32 @@ export const NftsApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = NftsApiAxiosParamCreator(configuration)
     return {
         /**
+         * Create a mint request to mint a set of NFTs for a given collection
+         * @summary Mint NFTs
+         * @param {string} contractAddress The address of contract
+         * @param {string} chainName The name of chain
+         * @param {CreateMintRequestRequest} createMintRequestRequest Create Mint Request Body
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createMintRequest(contractAddress: string, chainName: string, createMintRequestRequest: CreateMintRequestRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateMintRequestResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createMintRequest(contractAddress, chainName, createMintRequestRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Retrieve the status of a mint request identified by its reference_id
+         * @summary Get mint request by reference ID
+         * @param {string} contractAddress The address of contract
+         * @param {string} chainName The name of chain
+         * @param {string} referenceId The id of the mint request
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getMintRequest(contractAddress: string, chainName: string, referenceId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListMintRequestsResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getMintRequest(contractAddress, chainName, referenceId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Get NFT by token ID
          * @summary Get NFT by token ID
          * @param {string} contractAddress The address of NFT contract
@@ -314,20 +454,6 @@ export const NftsApiFp = function(configuration?: Configuration) {
          */
         async getNFT(contractAddress: string, tokenId: string, chainName: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetNFTResult>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getNFT(contractAddress, tokenId, chainName, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * List all NFT owners on a chain
-         * @summary List all NFT owners
-         * @param {string} chainName The name of chain
-         * @param {string} fromUpdatedAt Datetime to use as the oldest updated timestamp
-         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
-         * @param {number} [pageSize] Maximum number of items to return
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async listAllNFTOwners(chainName: string, fromUpdatedAt: string, pageCursor?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListNFTOwnersResult>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listAllNFTOwners(chainName, fromUpdatedAt, pageCursor, pageSize, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -345,18 +471,34 @@ export const NftsApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Retrieve the status of all mints for a given contract address
+         * @summary List mint requests
+         * @param {string} contractAddress The address of contract
+         * @param {string} chainName The name of chain
+         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+         * @param {number} [pageSize] Maximum number of items to return
+         * @param {MintRequestStatus} [status] The status of the mint request
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listMintRequests(contractAddress: string, chainName: string, pageCursor?: string, pageSize?: number, status?: MintRequestStatus, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListMintRequestsResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listMintRequests(contractAddress, chainName, pageCursor, pageSize, status, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * List NFTs by contract address
          * @summary List NFTs by contract address
          * @param {string} contractAddress Contract address
          * @param {string} chainName The name of chain
+         * @param {Array<string>} [tokenId] List of token IDs to filter by
          * @param {string} [fromUpdatedAt] Datetime to use as the oldest updated timestamp
          * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {number} [pageSize] Maximum number of items to return
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listNFTs(contractAddress: string, chainName: string, fromUpdatedAt?: string, pageCursor?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListNFTsResult>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listNFTs(contractAddress, chainName, fromUpdatedAt, pageCursor, pageSize, options);
+        async listNFTs(contractAddress: string, chainName: string, tokenId?: Array<string>, fromUpdatedAt?: string, pageCursor?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListNFTsResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listNFTs(contractAddress, chainName, tokenId, fromUpdatedAt, pageCursor, pageSize, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -370,7 +512,7 @@ export const NftsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listNFTsByAccountAddress(accountAddress: string, chainName: string, contractAddress?: string, pageCursor?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListNFTsResult>> {
+        async listNFTsByAccountAddress(accountAddress: string, chainName: string, contractAddress?: string, pageCursor?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListNFTsByOwnerResult>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listNFTsByAccountAddress(accountAddress, chainName, contractAddress, pageCursor, pageSize, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -385,6 +527,26 @@ export const NftsApiFactory = function (configuration?: Configuration, basePath?
     const localVarFp = NftsApiFp(configuration)
     return {
         /**
+         * Create a mint request to mint a set of NFTs for a given collection
+         * @summary Mint NFTs
+         * @param {NftsApiCreateMintRequestRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createMintRequest(requestParameters: NftsApiCreateMintRequestRequest, options?: AxiosRequestConfig): AxiosPromise<CreateMintRequestResult> {
+            return localVarFp.createMintRequest(requestParameters.contractAddress, requestParameters.chainName, requestParameters.createMintRequestRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Retrieve the status of a mint request identified by its reference_id
+         * @summary Get mint request by reference ID
+         * @param {NftsApiGetMintRequestRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getMintRequest(requestParameters: NftsApiGetMintRequestRequest, options?: AxiosRequestConfig): AxiosPromise<ListMintRequestsResult> {
+            return localVarFp.getMintRequest(requestParameters.contractAddress, requestParameters.chainName, requestParameters.referenceId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Get NFT by token ID
          * @summary Get NFT by token ID
          * @param {NftsApiGetNFTRequest} requestParameters Request parameters.
@@ -393,16 +555,6 @@ export const NftsApiFactory = function (configuration?: Configuration, basePath?
          */
         getNFT(requestParameters: NftsApiGetNFTRequest, options?: AxiosRequestConfig): AxiosPromise<GetNFTResult> {
             return localVarFp.getNFT(requestParameters.contractAddress, requestParameters.tokenId, requestParameters.chainName, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * List all NFT owners on a chain
-         * @summary List all NFT owners
-         * @param {NftsApiListAllNFTOwnersRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        listAllNFTOwners(requestParameters: NftsApiListAllNFTOwnersRequest, options?: AxiosRequestConfig): AxiosPromise<ListNFTOwnersResult> {
-            return localVarFp.listAllNFTOwners(requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
         },
         /**
          * List all NFTs on a chain
@@ -415,6 +567,16 @@ export const NftsApiFactory = function (configuration?: Configuration, basePath?
             return localVarFp.listAllNFTs(requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
         },
         /**
+         * Retrieve the status of all mints for a given contract address
+         * @summary List mint requests
+         * @param {NftsApiListMintRequestsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listMintRequests(requestParameters: NftsApiListMintRequestsRequest, options?: AxiosRequestConfig): AxiosPromise<ListMintRequestsResult> {
+            return localVarFp.listMintRequests(requestParameters.contractAddress, requestParameters.chainName, requestParameters.pageCursor, requestParameters.pageSize, requestParameters.status, options).then((request) => request(axios, basePath));
+        },
+        /**
          * List NFTs by contract address
          * @summary List NFTs by contract address
          * @param {NftsApiListNFTsRequest} requestParameters Request parameters.
@@ -422,7 +584,7 @@ export const NftsApiFactory = function (configuration?: Configuration, basePath?
          * @throws {RequiredError}
          */
         listNFTs(requestParameters: NftsApiListNFTsRequest, options?: AxiosRequestConfig): AxiosPromise<ListNFTsResult> {
-            return localVarFp.listNFTs(requestParameters.contractAddress, requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
+            return localVarFp.listNFTs(requestParameters.contractAddress, requestParameters.chainName, requestParameters.tokenId, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
         },
         /**
          * List NFTs by account address
@@ -431,11 +593,67 @@ export const NftsApiFactory = function (configuration?: Configuration, basePath?
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listNFTsByAccountAddress(requestParameters: NftsApiListNFTsByAccountAddressRequest, options?: AxiosRequestConfig): AxiosPromise<ListNFTsResult> {
+        listNFTsByAccountAddress(requestParameters: NftsApiListNFTsByAccountAddressRequest, options?: AxiosRequestConfig): AxiosPromise<ListNFTsByOwnerResult> {
             return localVarFp.listNFTsByAccountAddress(requestParameters.accountAddress, requestParameters.chainName, requestParameters.contractAddress, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
         },
     };
 };
+
+/**
+ * Request parameters for createMintRequest operation in NftsApi.
+ * @export
+ * @interface NftsApiCreateMintRequestRequest
+ */
+export interface NftsApiCreateMintRequestRequest {
+    /**
+     * The address of contract
+     * @type {string}
+     * @memberof NftsApiCreateMintRequest
+     */
+    readonly contractAddress: string
+
+    /**
+     * The name of chain
+     * @type {string}
+     * @memberof NftsApiCreateMintRequest
+     */
+    readonly chainName: string
+
+    /**
+     * Create Mint Request Body
+     * @type {CreateMintRequestRequest}
+     * @memberof NftsApiCreateMintRequest
+     */
+    readonly createMintRequestRequest: CreateMintRequestRequest
+}
+
+/**
+ * Request parameters for getMintRequest operation in NftsApi.
+ * @export
+ * @interface NftsApiGetMintRequestRequest
+ */
+export interface NftsApiGetMintRequestRequest {
+    /**
+     * The address of contract
+     * @type {string}
+     * @memberof NftsApiGetMintRequest
+     */
+    readonly contractAddress: string
+
+    /**
+     * The name of chain
+     * @type {string}
+     * @memberof NftsApiGetMintRequest
+     */
+    readonly chainName: string
+
+    /**
+     * The id of the mint request
+     * @type {string}
+     * @memberof NftsApiGetMintRequest
+     */
+    readonly referenceId: string
+}
 
 /**
  * Request parameters for getNFT operation in NftsApi.
@@ -463,41 +681,6 @@ export interface NftsApiGetNFTRequest {
      * @memberof NftsApiGetNFT
      */
     readonly chainName: string
-}
-
-/**
- * Request parameters for listAllNFTOwners operation in NftsApi.
- * @export
- * @interface NftsApiListAllNFTOwnersRequest
- */
-export interface NftsApiListAllNFTOwnersRequest {
-    /**
-     * The name of chain
-     * @type {string}
-     * @memberof NftsApiListAllNFTOwners
-     */
-    readonly chainName: string
-
-    /**
-     * Datetime to use as the oldest updated timestamp
-     * @type {string}
-     * @memberof NftsApiListAllNFTOwners
-     */
-    readonly fromUpdatedAt: string
-
-    /**
-     * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
-     * @type {string}
-     * @memberof NftsApiListAllNFTOwners
-     */
-    readonly pageCursor?: string
-
-    /**
-     * Maximum number of items to return
-     * @type {number}
-     * @memberof NftsApiListAllNFTOwners
-     */
-    readonly pageSize?: number
 }
 
 /**
@@ -536,6 +719,48 @@ export interface NftsApiListAllNFTsRequest {
 }
 
 /**
+ * Request parameters for listMintRequests operation in NftsApi.
+ * @export
+ * @interface NftsApiListMintRequestsRequest
+ */
+export interface NftsApiListMintRequestsRequest {
+    /**
+     * The address of contract
+     * @type {string}
+     * @memberof NftsApiListMintRequests
+     */
+    readonly contractAddress: string
+
+    /**
+     * The name of chain
+     * @type {string}
+     * @memberof NftsApiListMintRequests
+     */
+    readonly chainName: string
+
+    /**
+     * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+     * @type {string}
+     * @memberof NftsApiListMintRequests
+     */
+    readonly pageCursor?: string
+
+    /**
+     * Maximum number of items to return
+     * @type {number}
+     * @memberof NftsApiListMintRequests
+     */
+    readonly pageSize?: number
+
+    /**
+     * The status of the mint request
+     * @type {MintRequestStatus}
+     * @memberof NftsApiListMintRequests
+     */
+    readonly status?: MintRequestStatus
+}
+
+/**
  * Request parameters for listNFTs operation in NftsApi.
  * @export
  * @interface NftsApiListNFTsRequest
@@ -554,6 +779,13 @@ export interface NftsApiListNFTsRequest {
      * @memberof NftsApiListNFTs
      */
     readonly chainName: string
+
+    /**
+     * List of token IDs to filter by
+     * @type {Array<string>}
+     * @memberof NftsApiListNFTs
+     */
+    readonly tokenId?: Array<string>
 
     /**
      * Datetime to use as the oldest updated timestamp
@@ -627,6 +859,30 @@ export interface NftsApiListNFTsByAccountAddressRequest {
  */
 export class NftsApi extends BaseAPI {
     /**
+     * Create a mint request to mint a set of NFTs for a given collection
+     * @summary Mint NFTs
+     * @param {NftsApiCreateMintRequestRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof NftsApi
+     */
+    public createMintRequest(requestParameters: NftsApiCreateMintRequestRequest, options?: AxiosRequestConfig) {
+        return NftsApiFp(this.configuration).createMintRequest(requestParameters.contractAddress, requestParameters.chainName, requestParameters.createMintRequestRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Retrieve the status of a mint request identified by its reference_id
+     * @summary Get mint request by reference ID
+     * @param {NftsApiGetMintRequestRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof NftsApi
+     */
+    public getMintRequest(requestParameters: NftsApiGetMintRequestRequest, options?: AxiosRequestConfig) {
+        return NftsApiFp(this.configuration).getMintRequest(requestParameters.contractAddress, requestParameters.chainName, requestParameters.referenceId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Get NFT by token ID
      * @summary Get NFT by token ID
      * @param {NftsApiGetNFTRequest} requestParameters Request parameters.
@@ -636,18 +892,6 @@ export class NftsApi extends BaseAPI {
      */
     public getNFT(requestParameters: NftsApiGetNFTRequest, options?: AxiosRequestConfig) {
         return NftsApiFp(this.configuration).getNFT(requestParameters.contractAddress, requestParameters.tokenId, requestParameters.chainName, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * List all NFT owners on a chain
-     * @summary List all NFT owners
-     * @param {NftsApiListAllNFTOwnersRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof NftsApi
-     */
-    public listAllNFTOwners(requestParameters: NftsApiListAllNFTOwnersRequest, options?: AxiosRequestConfig) {
-        return NftsApiFp(this.configuration).listAllNFTOwners(requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -663,6 +907,18 @@ export class NftsApi extends BaseAPI {
     }
 
     /**
+     * Retrieve the status of all mints for a given contract address
+     * @summary List mint requests
+     * @param {NftsApiListMintRequestsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof NftsApi
+     */
+    public listMintRequests(requestParameters: NftsApiListMintRequestsRequest, options?: AxiosRequestConfig) {
+        return NftsApiFp(this.configuration).listMintRequests(requestParameters.contractAddress, requestParameters.chainName, requestParameters.pageCursor, requestParameters.pageSize, requestParameters.status, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * List NFTs by contract address
      * @summary List NFTs by contract address
      * @param {NftsApiListNFTsRequest} requestParameters Request parameters.
@@ -671,7 +927,7 @@ export class NftsApi extends BaseAPI {
      * @memberof NftsApi
      */
     public listNFTs(requestParameters: NftsApiListNFTsRequest, options?: AxiosRequestConfig) {
-        return NftsApiFp(this.configuration).listNFTs(requestParameters.contractAddress, requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
+        return NftsApiFp(this.configuration).listNFTs(requestParameters.contractAddress, requestParameters.chainName, requestParameters.tokenId, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

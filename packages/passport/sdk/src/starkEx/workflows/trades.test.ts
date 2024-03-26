@@ -1,10 +1,10 @@
-import { TradesApi } from '@imtbl/core-sdk';
+import { imx } from '@imtbl/generated-clients';
 import { createTrade } from './trades';
 import { mockErrorMessage, mockStarkSignature, mockUserImx } from '../../test/mocks';
 import { PassportError, PassportErrorType } from '../../errors/passportError';
-import GuardianClient from '../../guardian/guardian';
+import GuardianClient from '../../guardian';
 
-jest.mock('../../guardian/guardian');
+jest.mock('../../guardian');
 
 const mockPayloadHash = 'test_payload_hash';
 const mockSignableTradeRequest = {
@@ -73,10 +73,10 @@ describe('Trades', () => {
     const mockGetSignableTrade = jest.fn();
     const mockCreateTrade = jest.fn();
 
-    const mockTradesApi: TradesApi = {
+    const mockTradesApi: imx.TradesApi = {
       getSignableTrade: mockGetSignableTrade,
       createTradeV3: mockCreateTrade,
-    } as unknown as TradesApi;
+    } as unknown as imx.TradesApi;
 
     it('should successfully create a trade ', async () => {
       mockGetSignableTrade.mockResolvedValue(mockSignableTradeResponse);
@@ -97,7 +97,7 @@ describe('Trades', () => {
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
       expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
       expect(mockGuardianClient.evaluateImxTransaction)
-        .toBeCalledWith({ payloadHash: mockPayloadHash, user: mockUserImx });
+        .toBeCalledWith({ payloadHash: mockPayloadHash });
       expect(mockCreateTrade).toBeCalledWith(
         mockCreateTradeRequest,
         mockHeader,
@@ -119,7 +119,7 @@ describe('Trades', () => {
 
       expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
       expect(mockGuardianClient.evaluateImxTransaction)
-        .toBeCalledWith({ payloadHash: mockPayloadHash, user: mockUserImx });
+        .toBeCalledWith({ payloadHash: mockPayloadHash });
     });
 
     it('should return error if failed to call public api', async () => {

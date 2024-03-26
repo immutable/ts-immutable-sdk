@@ -30,6 +30,12 @@ export interface FulfillmentDataRequest {
      */
     'order_id': string;
     /**
+     * Address of the intended account fulfilling the order
+     * @type {string}
+     * @memberof FulfillmentDataRequest
+     */
+    'taker_address': string;
+    /**
      * 
      * @type {Array<Fee>}
      * @memberof FulfillmentDataRequest

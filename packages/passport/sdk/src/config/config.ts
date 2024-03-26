@@ -1,7 +1,6 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { createConfig, MultiRollupAPIConfiguration, multiRollupConfig } from '@imtbl/generated-clients';
 import {
-  Networks,
   OidcConfiguration,
   PassportModuleConfiguration,
 } from '../types';
@@ -28,8 +27,6 @@ const validateConfiguration = <T>(
 };
 
 export class PassportConfiguration {
-  readonly network: Networks;
-
   readonly authenticationDomain: string;
 
   readonly passportDomain: string;
@@ -70,7 +67,6 @@ export class PassportConfiguration {
       validateConfiguration(
         overrides,
         [
-          'network',
           'authenticationDomain',
           'passportDomain',
           'magicPublishableApiKey',
@@ -84,7 +80,6 @@ export class PassportConfiguration {
         ],
         'overrides',
       );
-      this.network = overrides.network;
       this.authenticationDomain = overrides.authenticationDomain;
       this.passportDomain = overrides.passportDomain;
       this.imxPublicApiDomain = overrides.imxPublicApiDomain;
@@ -106,20 +101,18 @@ export class PassportConfiguration {
     } else {
       switch (baseConfig.environment) {
         case Environment.PRODUCTION: {
-          this.network = Networks.PRODUCTION;
           this.authenticationDomain = 'https://auth.immutable.com';
           this.magicPublishableApiKey = 'pk_live_10F423798A540ED7';
           this.magicProviderId = 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=';
           this.passportDomain = 'https://passport.immutable.com';
           this.imxPublicApiDomain = 'https://api.immutable.com';
-          this.zkEvmRpcUrl = ''; // TODO: ID-785 Update once mainnet has been deployed
+          this.zkEvmRpcUrl = 'https://rpc.immutable.com';
           this.relayerUrl = 'https://api.immutable.com/relayer-mr';
           this.multiRollupConfig = multiRollupConfig.getProduction();
           break;
         }
         case Environment.SANDBOX:
         default: {
-          this.network = Networks.SANDBOX;
           this.authenticationDomain = 'https://auth.immutable.com';
           this.magicPublishableApiKey = 'pk_live_10F423798A540ED7';
           this.magicProviderId = 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=';

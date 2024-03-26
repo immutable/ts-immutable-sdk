@@ -4,12 +4,14 @@ import { getAvailableRoutingOptions } from './routingOptions';
 import { CheckoutConfiguration } from '../../config';
 import * as geoBlocking from './geoBlocking';
 import { DEFAULT_BRIDGE_ENABLED, DEFAULT_ON_RAMP_ENABLED, DEFAULT_SWAP_ENABLED } from '../../env';
+import { HttpClient } from '../../api/http';
 
 jest.mock('./geoBlocking');
 
 describe('getAvailableRoutingOptions', () => {
   let mockProvider: Web3Provider;
   let config: CheckoutConfiguration;
+  let mockedHttpClient: jest.Mocked<HttpClient>;
 
   beforeEach(() => {
     mockProvider = {
@@ -18,9 +20,10 @@ describe('getAvailableRoutingOptions', () => {
       }),
     } as unknown as Web3Provider;
 
+    mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
     config = new CheckoutConfiguration({
       baseConfig: { environment: Environment.SANDBOX },
-    });
+    }, mockedHttpClient);
 
     // Default to no geo-blocking
     (geoBlocking.isOnRampAvailable as jest.Mock).mockResolvedValue(false);
@@ -45,7 +48,7 @@ describe('getAvailableRoutingOptions', () => {
       bridge: { enable: false },
       onRamp: { enable: false },
       swap: { enable: false },
-    });
+    }, mockedHttpClient);
 
     const routingOptions = await getAvailableRoutingOptions(configWithOptions, mockProvider);
     expect(routingOptions).toEqual({

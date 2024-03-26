@@ -14,6 +14,14 @@ export const ZKEVM_NATIVE_TOKEN = {
   name: 'IMX',
   symbol: 'IMX',
   decimals: DEFAULT_TOKEN_DECIMALS,
+  address: NATIVE,
+};
+
+export const ZKEVM_NATIVE_SANDBOX_TOKEN = {
+  name: 'tIMX',
+  symbol: 'tIMX',
+  decimals: DEFAULT_TOKEN_DECIMALS,
+  address: NATIVE,
 };
 
 /**
@@ -29,12 +37,12 @@ export const IMMUTABLE_API_BASE_URL = {
 };
 
 /**
- * Base URL for the checkout API based on the environment.
+ * Base URL for the checkout CDN based on the environment.
  * @property {string} DEVELOPMENT - The base URL for the development environment.
  * @property {string} SANDBOX - The base URL for the sandbox environment.
  * @property {string} PRODUCTION - The base URL for the production environment.
  */
-export const CHECKOUT_API_BASE_URL = {
+export const CHECKOUT_CDN_BASE_URL = {
   [ENV_DEVELOPMENT]: 'https://checkout-api.dev.immutable.com',
   [Environment.SANDBOX]: 'https://checkout-api.sandbox.immutable.com',
   [Environment.PRODUCTION]: 'https://checkout-api.immutable.com',
@@ -115,7 +123,7 @@ NetworkDetails
       chainIdHex: `0x${ChainId.IMTBL_ZKEVM_TESTNET.toString(16)}`,
       chainName: ChainName.IMTBL_ZKEVM_TESTNET,
       rpcUrls: ['https://rpc.testnet.immutable.com'],
-      nativeCurrency: ZKEVM_NATIVE_TOKEN,
+      nativeCurrency: ZKEVM_NATIVE_SANDBOX_TOKEN,
     },
   ],
 ]);
@@ -163,7 +171,7 @@ export const BLOCKSCOUT_CHAIN_URL_MAP: {
     nativeToken: SANDBOX_CHAIN_ID_NETWORK_MAP.get(ChainId.IMTBL_ZKEVM_TESTNET)!.nativeCurrency,
   },
   [ChainId.IMTBL_ZKEVM_MAINNET]: {
-    url: 'https://explorer.mainnet.immutable.com',
+    url: 'https://explorer.immutable.com',
     nativeToken: PRODUCTION_CHAIN_ID_NETWORK_MAP.get(ChainId.IMTBL_ZKEVM_MAINNET)!.nativeCurrency,
   },
   [ChainId.SEPOLIA]: {
@@ -374,8 +382,8 @@ export const ERC721ABI = [
 ];
 
 // Gas overrides -- Anti-spam mechanism for when the baseFee drops low
-// https://github.com/immutable/imx-docs/blob/main/docs/main/zkEVM/overview/gas-configuration.md
-export const GAS_OVERRIDES = {
-  maxFeePerGas: BigNumber.from(102e9),
-  maxPriorityFeePerGas: BigNumber.from(101e9),
+// https://docs.immutable.com/docs/zkEVM/architecture/gas-config
+export const IMMUTABLE_ZKVEM_GAS_OVERRIDES = {
+  maxFeePerGas: BigNumber.from(15e9),
+  maxPriorityFeePerGas: BigNumber.from(10e9),
 };

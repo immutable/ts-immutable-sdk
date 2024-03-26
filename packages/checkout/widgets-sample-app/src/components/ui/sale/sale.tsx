@@ -2,13 +2,13 @@ import { useEffect, useMemo, useState } from 'react';
 import { Environment } from '@imtbl/config';
 import { config, passport } from '@imtbl/sdk';
 import { WidgetsFactory } from '@imtbl/checkout-widgets';
-import { SaleEventType, SaleItem, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
+import { BridgeEventType, OnRampEventType, SaleEventType, SaleItem, SalePaymentTypes, SwapEventType, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
 import { Checkout } from '@imtbl/checkout-sdk';
 import { Passport } from '@imtbl/passport';
 
 const defaultPassportConfig = {
   environment: 'sandbox',
-  clientId: 'XuGsHvMqMJrb73diq1fCswWwn4AYhcM6',
+  clientId: 'q4gEET7vAKD5jsBWV6j8eoYNKEYpOOw1',
   redirectUri: 'http://localhost:3000/sale?login=true',
   logoutRedirectUri: 'http://localhost:3000/sale?logout=true',
   audience: 'platform_api',
@@ -17,25 +17,11 @@ const defaultPassportConfig = {
 
 const defaultItems: SaleItem[] = [
   {
-    productId: 'P0001',
-    qty: 3,
-    name: 'Bulbasaur',
-    image: 'https://pokemon-nfts.s3.ap-southeast-2.amazonaws.com/images/1.png',
-    description: 'Bulbasaur',
-  },
-  {
-    productId: 'P0002',
+    productId: 'lab',
     qty: 2,
-    name: 'Ivyasaur',
-    image: 'https://pokemon-nfts.s3.ap-southeast-2.amazonaws.com/images/2.png',
-    description: 'Ivyasaur',
-  },
-  {
-    productId: 'P0003',
-    qty: 1,
-    name: 'Venusaur',
-    image: 'https://pokemon-nfts.s3.ap-southeast-2.amazonaws.com/images/3.png',
-    description: 'Venusaur',
+    name: 'Lab Iguana',
+    image: 'https://pokemon-nfts.mystagingwebsite.com/wp-content/uploads/2023/11/645-300x300.png',
+    description: 'Lab Iguana',
   },
 ];
 
@@ -45,13 +31,15 @@ const useParams = () => {
   const login = urlParams.get('login') as string;
   const amount = urlParams.get('amount') as string;
   const environmentId = urlParams.get('environmentId') as string;
-  const fromContractAddress = urlParams.get('fromContractAddress') as string;
+  const collectionName = urlParams.get('collectionName') as string;
+  const excludePaymentTypes = urlParams.get('excludePaymentTypes')?.split(',') as SalePaymentTypes[];
 
   return {
     login,
     amount,
     environmentId,
-    fromContractAddress,
+    collectionName,
+    excludePaymentTypes,
   };
 };
 
@@ -85,8 +73,8 @@ const usePassportInstance = (passportConfig: any) => {
 
 export function SaleUI() {
   const params = useParams();
-  const {
-    login, amount, environmentId, fromContractAddress,
+  const { 
+    login, amount, environmentId, collectionName, excludePaymentTypes
   } = params;
   const [passportConfig, setPassportConfig] = useState(
     JSON.stringify(defaultPassportConfig, null, 2),
@@ -96,20 +84,52 @@ export function SaleUI() {
   const passportInstance = useMemo(() => usePassportInstance(JSON.parse(passportConfig)), []);
   const checkout = useMemo(() => new Checkout({baseConfig: {environment: Environment.SANDBOX}, passport: passportInstance as unknown as Passport}), [passportInstance])
   const factory = useMemo(() => new WidgetsFactory(checkout, {theme: WidgetTheme.DARK}), [checkout])
-  const saleWidget = useMemo(() => factory.create(WidgetType.SALE, { config: { theme: WidgetTheme.DARK } }), 
-  [factory, amount, environmentId, fromContractAddress, defaultItems]
-  )
+  const saleWidget = useMemo(() => factory.create(WidgetType.SALE, { config: { theme: WidgetTheme.DARK } }),
+  [factory, amount, environmentId, collectionName, defaultItems]
+  );
+  const bridgeWidget = useMemo(() => factory.create(WidgetType.BRIDGE, { config: { theme: WidgetTheme.DARK } }),
+  [factory, amount, environmentId, collectionName, defaultItems]
+  );
+  const swapWidget = useMemo(() => factory.create(WidgetType.SWAP, { config: { theme: WidgetTheme.DARK } }),
+  [factory, amount, environmentId, collectionName, defaultItems]
+  );
+  const onrampWidget = useMemo(() => factory.create(WidgetType.ONRAMP, { config: { theme: WidgetTheme.DARK } }),
+  [factory, amount, environmentId, collectionName, defaultItems]
+  );
 
   // mount sale widget and subscribe to close event
   useEffect(() => {
     saleWidget.mount("sale", {
-      amount, 
-      environmentId, 
-      fromContractAddress, 
-      items: defaultItems
+      amount,
+      environmentId,
+      collectionName,
+      items: defaultItems,
+      excludePaymentTypes,
     });
     saleWidget.addListener(SaleEventType.CLOSE_WIDGET, () => { saleWidget.unmount()})
-  }, [saleWidget])
+
+    saleWidget.addListener(SaleEventType.REQUEST_BRIDGE, (event) => {
+      saleWidget.unmount();
+
+      bridgeWidget.mount('bridge');
+      bridgeWidget.addListener(BridgeEventType.CLOSE_WIDGET, () => { bridgeWidget.unmount()})
+      return;
+    });
+    saleWidget.addListener(SaleEventType.REQUEST_SWAP, (event) => {
+      saleWidget.unmount();
+
+      swapWidget.mount('swap');
+      swapWidget.addListener(SwapEventType.CLOSE_WIDGET, () => { swapWidget.unmount()})
+      return;
+    });
+    saleWidget.addListener(SaleEventType.REQUEST_ONRAMP, (event) => {
+      saleWidget.unmount();
+
+      onrampWidget.mount('onramp');
+      onrampWidget.addListener(OnRampEventType.CLOSE_WIDGET, () => { onrampWidget.unmount()})
+      return;
+    });
+  }, [saleWidget, swapWidget, bridgeWidget, onrampWidget])
 
   const handlePassportConfigChange = (e: any) => {
     setPassportConfig(e.target.value);
@@ -168,19 +188,31 @@ export function SaleUI() {
   return (
     <>
     <div id="sale"></div>
+    <div id="bridge"></div>
+    <div id="swap"></div>
+    <div id="onramp"></div>
     <button onClick={() => saleWidget.mount('sale', {
-      amount, 
-      environmentId, 
-      fromContractAddress, 
-      items: defaultItems
+      amount,
+      environmentId,
+      collectionName,
+      items: defaultItems,
+      excludePaymentTypes
     })}>Mount</button>
     <button onClick={() => saleWidget.unmount()}>Unmount</button>
     <button onClick={() => saleWidget.update({config: {theme: WidgetTheme.LIGHT}})}>Update Config Light</button>
     <button onClick={() => saleWidget.update({config: {theme: WidgetTheme.DARK}})}>Update Config Dark</button>
+    <select
+      onChange={(e) => saleWidget.update({ config: { language: e.target.value}})}
+    >
+      <option value="en">EN</option>
+      <option value="ja">JA</option>
+      <option value="ko">KO</option>
+      <option value="zh">ZH</option>
+    </select>
       <br />
       <br />
       <br />
-      <h3>Passport Config</h3>
+      <h3>Passport Config <button onClick={() => { passportInstance?.logout(); }}>Passport logout</button></h3>
       <textarea
         rows={12}
         cols={80}
@@ -188,6 +220,7 @@ export function SaleUI() {
         onChange={handlePassportConfigChange}
         onBlur={handlePassportConfigFormat}
       />
+      
       <br />
       <br />
       <h3>Items</h3>

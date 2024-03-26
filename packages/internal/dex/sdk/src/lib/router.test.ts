@@ -28,7 +28,7 @@ const fees = [100, 500, 10000];
 const config = SUPPORTED_SANDBOX_CHAINS[IMMUTABLE_TESTNET_CHAIN_ID];
 const provider = new providers.JsonRpcBatchProvider(config.rpcUrl, config.chainId);
 
-const q = QuoterV2__factory.connect(config.contracts.quoterV2, provider);
+const q = QuoterV2__factory.connect(config.contracts.quoter, provider);
 const m = Multicall__factory.connect(config.contracts.multicall, provider);
 
 const callDatas = () => fees.map((fee) => {
@@ -57,7 +57,7 @@ describe('router', () => {
     it.each(Array(10).fill(null))('parallel', async () => {
       const promises = callDatas().map(async (data) => {
         const res = await provider.call({
-          to: config.contracts.quoterV2,
+          to: config.contracts.quoter,
           data,
         });
         const { amountOut } = q.interface.decodeFunctionResult(
@@ -74,7 +74,7 @@ describe('router', () => {
     it.each(Array(10).fill(null))('multicall', async () => {
       const calls = callDatas().map((callData) => {
         return {
-          target: config.contracts.quoterV2,
+          target: config.contracts.quoter,
           callData,
           gasLimit: 24_000_000,
         };
@@ -94,7 +94,7 @@ describe('router', () => {
     it.each(Array(1).fill(null))('batch', async () => {
       const promises = callDatas().map((callData) => {
         return provider.send('eth_call', [{
-          to: config.contracts.quoterV2,
+          to: config.contracts.quoter,
           data: callData,
         }, 'latest']);
       });

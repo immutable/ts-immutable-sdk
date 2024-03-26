@@ -23,7 +23,7 @@ export const getERC20Allowance = async (
     throw new CheckoutError(
       'Failed to get the allowance for ERC20',
       CheckoutErrorType.GET_ERC20_ALLOWANCE_ERROR,
-      { contractAddress },
+      { contractAddress, error: err },
     );
   }
 };
@@ -46,11 +46,11 @@ export const getERC20ApprovalTransaction = async (
     const approveTransaction = await contract.populateTransaction.approve(spenderAddress, amount);
     if (approveTransaction) approveTransaction.from = ownerAddress;
     return approveTransaction;
-  } catch {
+  } catch (err: any) {
     throw new CheckoutError(
       'Failed to get the approval transaction for ERC20',
       CheckoutErrorType.GET_ERC20_ALLOWANCE_ERROR,
-      { contractAddress },
+      { contractAddress, error: err },
     );
   }
 };
@@ -74,12 +74,12 @@ export const hasERC20Allowances = async (
   // so the promise and data can be linked together when the promise resolves
   for (const itemRequirement of itemRequirements) {
     if (itemRequirement.type !== ItemType.ERC20) continue;
-    const { contractAddress, spenderAddress } = itemRequirement;
-    const key = `${contractAddress}${spenderAddress}`;
+    const { tokenAddress, spenderAddress } = itemRequirement;
+    const key = `${tokenAddress}${spenderAddress}`;
     erc20s.set(key, itemRequirement);
     allowancePromises.set(
       key,
-      getERC20Allowance(provider, ownerAddress, contractAddress, spenderAddress),
+      getERC20Allowance(provider, ownerAddress, tokenAddress, spenderAddress),
     );
   }
 
@@ -102,8 +102,8 @@ export const hasERC20Allowances = async (
     }
 
     sufficient = false; // Set sufficient false on the root of the return object when an ERC20 is insufficient
-    const { contractAddress, spenderAddress } = itemRequirement;
-    const key = `${contractAddress}${spenderAddress}`;
+    const { tokenAddress, spenderAddress } = itemRequirement;
+    const key = `${tokenAddress}${spenderAddress}`;
     const delta = itemRequirement.amount.sub(allowances[index]);
     // Create maps for both the insufficient ERC20 data and the transaction promises using the same key so the results can be merged
     insufficientERC20s.set(
@@ -121,7 +121,7 @@ export const hasERC20Allowances = async (
       getERC20ApprovalTransaction(
         provider,
         ownerAddress,
-        contractAddress,
+        tokenAddress,
         spenderAddress,
         delta,
       ),

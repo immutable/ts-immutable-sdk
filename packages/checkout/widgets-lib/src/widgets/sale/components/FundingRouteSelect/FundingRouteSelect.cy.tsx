@@ -1,15 +1,19 @@
-import { BiomeCombinedProviders } from '@biom3/react';
 import {
   BridgeFundingStep,
-  ChainId, FundingRoute, FundingStepType, ItemType, SwapFundingStep, WidgetTheme,
+  ChainId,
+  Checkout,
+  FeeType,
+  FundingRoute,
+  FundingStepType,
+  ItemType,
+  SwapFundingStep,
 } from '@imtbl/checkout-sdk';
-import { Environment } from '@imtbl/config';
 import { mount } from 'cypress/react18';
 import { BigNumber, utils } from 'ethers';
 import { cy, describe } from 'local-cypress';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { CustomAnalyticsProvider } from '../../../../context/analytics-provider/CustomAnalyticsProvider';
 import { cyIntercept, cySmartGet } from '../../../../lib/testUtils';
-import { StrongCheckoutWidgetsConfig } from '../../../../lib/withDefaultWidgetConfig';
 import { FundingRouteSelect } from './FundingRouteSelect';
 
 describe('FundingRouteSelect View', () => {
@@ -17,14 +21,6 @@ describe('FundingRouteSelect View', () => {
     cyIntercept();
     cy.viewport('ipad-2');
   });
-
-  const config: StrongCheckoutWidgetsConfig = {
-    environment: Environment.SANDBOX,
-    theme: WidgetTheme.DARK,
-    isBridgeEnabled: true,
-    isSwapEnabled: true,
-    isOnRampEnabled: true,
-  };
 
   const bridgeFundingStep: BridgeFundingStep = {
     type: FundingStepType.BRIDGE,
@@ -46,18 +42,23 @@ describe('FundingRouteSelect View', () => {
       },
     },
     fees: {
-      approvalGasFees: {
+      approvalGasFee: {
+        type: FeeType.GAS,
         amount: BigNumber.from(0),
         formattedAmount: '0',
       },
-      bridgeGasFees: {
+      bridgeGasFee: {
+        type: FeeType.GAS,
         amount: BigNumber.from(0),
         formattedAmount: '0',
       },
-      bridgeFees: [{
-        amount: BigNumber.from(0),
-        formattedAmount: '0',
-      }],
+      bridgeFees: [
+        {
+          type: FeeType.BRIDGE_FEE,
+          amount: BigNumber.from(0),
+          formattedAmount: '0',
+        },
+      ],
     },
   };
 
@@ -82,18 +83,23 @@ describe('FundingRouteSelect View', () => {
       },
     },
     fees: {
-      approvalGasFees: {
+      approvalGasFee: {
+        type: FeeType.GAS,
         amount: BigNumber.from(0),
         formattedAmount: '0',
       },
-      swapGasFees: {
+      swapGasFee: {
+        type: FeeType.GAS,
         amount: BigNumber.from(0),
         formattedAmount: '0',
       },
-      swapFees: [{
-        amount: BigNumber.from(0),
-        formattedAmount: '0',
-      }],
+      swapFees: [
+        {
+          type: FeeType.SWAP_FEE,
+          amount: BigNumber.from(0),
+          formattedAmount: '0',
+        },
+      ],
     },
   };
 
@@ -106,12 +112,15 @@ describe('FundingRouteSelect View', () => {
     ];
     beforeEach(() => {
       mount(
-        <CustomAnalyticsProvider widgetConfig={config}>
-          <BiomeCombinedProviders>
-            <FundingRouteSelect fundingRoutes={fundingRoutes} onFundingRouteSelected={() => {}} />
-          </BiomeCombinedProviders>
+        <CustomAnalyticsProvider checkout={{} as Checkout}>
+          <ViewContextTestComponent>
+            <FundingRouteSelect
+              fundingRoutes={fundingRoutes}
+              collectionName=""
+              onFundingRouteSelected={() => {}}
+            />
+          </ViewContextTestComponent>
         </CustomAnalyticsProvider>,
-
       );
     });
     it('should display first option, without chevron', () => {
@@ -124,7 +133,7 @@ describe('FundingRouteSelect View', () => {
     it('clicking should not open bottom sheet', () => {
       cySmartGet('funding-route-menu-item').click();
 
-      cySmartGet('bottomSheet').should('not.exist');
+      cySmartGet('Drawer__container').should('not.exist');
     });
   });
 
@@ -141,12 +150,15 @@ describe('FundingRouteSelect View', () => {
     ];
     beforeEach(() => {
       mount(
-        <CustomAnalyticsProvider widgetConfig={config}>
-          <BiomeCombinedProviders>
-            <FundingRouteSelect fundingRoutes={fundingRoutes} onFundingRouteSelected={() => {}} />
-          </BiomeCombinedProviders>
+        <CustomAnalyticsProvider checkout={{} as Checkout}>
+          <ViewContextTestComponent>
+            <FundingRouteSelect
+              fundingRoutes={fundingRoutes}
+              onFundingRouteSelected={() => {}}
+              collectionName=""
+            />
+          </ViewContextTestComponent>
         </CustomAnalyticsProvider>,
-
       );
     });
     it('should display first option, with chevron', () => {
@@ -159,31 +171,43 @@ describe('FundingRouteSelect View', () => {
     it('clicking should open bottom sheet', () => {
       cySmartGet('funding-route-menu-item').click();
 
-      cySmartGet('bottomSheet').should('exist');
+      cySmartGet('Drawer__container').should('exist');
     });
 
     it('selecting an item inside the bottom sheet should change selected option', () => {
       cySmartGet('funding-route-menu-item').should('contain.text', 'ETH');
       cySmartGet('funding-route-menu-item').click();
 
-      cySmartGet('bottomSheet').should('exist');
-      cySmartGet('bottomSheet').find('[data-testId="funding-route-menu-item"]').should('have.length', 2);
-      cySmartGet('bottomSheet').find('[data-testId="funding-route-menu-item"]')
-        .eq(0).should('have.class', 'selected');
-      cySmartGet('bottomSheet').find('[data-testId="funding-route-menu-item"]')
-        .eq(1).should('not.have.class', 'selected');
-      cySmartGet('bottomSheet').find('[data-testId="funding-route-menu-item"]')
-        .eq(1).click();
+      cySmartGet('Drawer__container').should('exist');
+      cySmartGet('Drawer__container')
+        .find('[data-testId="funding-route-menu-item"]')
+        .should('have.length', 2);
+      cySmartGet('Drawer__container')
+        .find('[data-testId="funding-route-menu-item"]')
+        .eq(0)
+        .should('have.class', 'selected');
+      cySmartGet('Drawer__container')
+        .find('[data-testId="funding-route-menu-item"]')
+        .eq(1)
+        .should('not.have.class', 'selected');
+      cySmartGet('Drawer__container')
+        .find('[data-testId="funding-route-menu-item"]')
+        .eq(1)
+        .click();
 
-      cySmartGet('bottomSheet').should('not.exist');
+      cySmartGet('Drawer__container').should('not.exist');
 
       cySmartGet('funding-route-menu-item').should('contain.text', 'USDC');
 
       cySmartGet('funding-route-menu-item').click();
-      cySmartGet('bottomSheet').find('[data-testId="funding-route-menu-item"]')
-        .eq(0).should('not.have.class', 'selected');
-      cySmartGet('bottomSheet').find('[data-testId="funding-route-menu-item"]')
-        .eq(1).should('have.class', 'selected');
+      cySmartGet('Drawer__container')
+        .find('[data-testId="funding-route-menu-item"]')
+        .eq(0)
+        .should('not.have.class', 'selected');
+      cySmartGet('Drawer__container')
+        .find('[data-testId="funding-route-menu-item"]')
+        .eq(1)
+        .should('have.class', 'selected');
     });
   });
 });

@@ -1,59 +1,79 @@
-import { WalletProviderName, WalletInfo } from '@imtbl/checkout-sdk';
-import { Box, MenuItem } from '@biom3/react';
-import { text } from '../../../resources/text/textConfig';
+import { MenuItem } from '@biom3/react';
+import { useTranslation } from 'react-i18next';
+import { ReactElement, useState } from 'react';
+import { WalletProviderName } from '@imtbl/checkout-sdk';
+import { RawImage } from '../../../components/RawImage/RawImage';
+import { EIP1193Provider, EIP6963ProviderDetail, getProviderSlugFromRdns } from '../../../lib/provider';
+import useIsSmallScreen from '../../../lib/hooks/useIsSmallScreen';
 
-export interface WalletProps {
-  onWalletClick: (walletProviderName: WalletProviderName) => void;
-  wallet: WalletInfo;
+export interface WalletProps<RC extends ReactElement | undefined = undefined> {
+  loading?: boolean;
+  recommended?: boolean;
+  onWalletItemClick: (providerDetail: EIP6963ProviderDetail<EIP1193Provider>) => void;
+  providerDetail: EIP6963ProviderDetail<EIP1193Provider>;
+  rc?: RC;
 }
-export function WalletItem(props: WalletProps) {
-  const { wallet, onWalletClick } = props;
-  const { wallets } = text;
 
-  const walletText = wallets[wallet.walletProviderName];
-  const logo = {
-    [WalletProviderName.PASSPORT]: 'PassportSymbolOutlined',
-    [WalletProviderName.METAMASK]: 'MetaMaskSymbol',
-  };
+export function WalletItem<
+  RC extends ReactElement | undefined = undefined,
+>({
+  rc = <span />,
+  loading = false,
+  recommended = false,
+  providerDetail,
+  onWalletItemClick,
+}: WalletProps<RC>) {
+  const { t } = useTranslation();
+  const { isSmallScreenMode } = useIsSmallScreen();
+  const [busy, setBusy] = useState(false);
+  const providerSlug = getProviderSlugFromRdns(providerDetail.info.rdns);
+  const isPassport = providerSlug === WalletProviderName.PASSPORT;
+  const isPassportOrMetamask = isPassport || providerSlug === WalletProviderName.METAMASK;
+  const offsetStyles = { marginLeft: '65px' };
 
   return (
-    // TODO: Fragments should contain more than one child - otherwise, there’s no need for a Fragment at all.
-    // Consider checking !walletText and rendering a callback component instead, then it would make sense
-    // to use a Fragment.
-    // eslint-disable-next-line react/jsx-no-useless-fragment
-    <>
-      {walletText && (
-        <MenuItem
-          testId={`wallet-list-${wallet.walletProviderName}`}
-          size="medium"
-          emphasized
-          onClick={() => onWalletClick(wallet.walletProviderName)}
-          sx={{ marginBottom: 'base.spacing.x1' }}
-        >
-          <MenuItem.FramedLogo
-            logo={logo[wallet.walletProviderName] as any}
-            sx={{
-              minWidth: 'base.icon.size.500',
-              padding: 'base.spacing.x1',
-              backgroundColor: 'base.color.translucent.standard.100',
-              borderRadius: 'base.borderRadius.x2',
-            }}
-          />
-          <MenuItem.Label size="medium">
-            {wallets[wallet.walletProviderName].heading}
-          </MenuItem.Label>
-          <MenuItem.IntentIcon />
-          <MenuItem.Caption>
-            {wallet.walletProviderName === WalletProviderName.PASSPORT ? (
-              <Box rc={<span />} sx={{ c: 'base.gradient.1' }}>
-                {wallets[wallet.walletProviderName].accentText}
-              </Box>
-            ) : null}
-            {' '}
-            {wallets[wallet.walletProviderName].description}
-          </MenuItem.Caption>
-        </MenuItem>
-      )}
-    </>
+    <MenuItem
+      rc={rc}
+      testId={`wallet-list-${providerDetail.info.rdns}`}
+      size="medium"
+      emphasized
+      onClick={async () => {
+        if (loading) return;
+        setBusy(true);
+        // let the parent handle errors
+        try {
+          await onWalletItemClick(providerDetail);
+        } finally {
+          setBusy(false);
+        }
+      }}
+      sx={{
+        marginBottom: 'base.spacing.x1',
+        position: 'relative',
+      }}
+    >
+      <RawImage
+        src={providerDetail.info.icon}
+        alt={providerDetail.info.name}
+        sx={{
+          position: 'absolute',
+          left: 'base.spacing.x3',
+        }}
+      />
+      <MenuItem.Label size="medium" sx={offsetStyles}>
+        {providerDetail.info.name}
+      </MenuItem.Label>
+      {(!busy && <MenuItem.IntentIcon />)}
+      <MenuItem.Caption sx={{ ...offsetStyles, width: '200px' }}>
+        {(isPassportOrMetamask) && t(`wallets.${providerSlug}.description`)}
+      </MenuItem.Caption>
+      {((recommended || busy) && (
+        <MenuItem.Badge
+          variant="guidance"
+          isAnimated={busy}
+          badgeContent={busy || isSmallScreenMode ? '' : t('wallets.recommended')}
+        />
+      ))}
+    </MenuItem>
   );
 }

@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import {
-  ConnectTargetLayer,
+  ChainId,
   IMTBLWidgetEvents,
   SaleItem,
   SaleWidgetParams,
@@ -10,12 +10,22 @@ import {
   WidgetType,
 } from '@imtbl/checkout-sdk';
 import { Base } from 'widgets/BaseWidgetRoot';
-import { ConnectLoader, ConnectLoaderParams } from 'components/ConnectLoader/ConnectLoader';
+import {
+  ConnectLoader,
+  ConnectLoaderParams,
+} from 'components/ConnectLoader/ConnectLoader';
 import { getL2ChainId } from 'lib';
-import { isValidAmount, isValidWalletProvider } from 'lib/validations/widgetValidators';
+import {
+  isValidAmount,
+  isValidWalletProvider,
+} from 'lib/validations/widgetValidators';
+import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
+import { LoadingView } from 'views/loading/LoadingView';
 import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
-import { SaleWidget } from './SaleWidget';
+import i18n from '../../i18n';
+
+const SaleWidget = React.lazy(() => import('./SaleWidget'));
 
 export class Sale extends Base<WidgetType.SALE> {
   protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT;
@@ -29,9 +39,9 @@ export class Sale extends Base<WidgetType.SALE> {
     }
   }
 
-  protected getValidatedProperties(
-    { config }: WidgetProperties<WidgetType.SALE>,
-  ): WidgetProperties<WidgetType.SALE> {
+  protected getValidatedProperties({
+    config,
+  }: WidgetProperties<WidgetType.SALE>): WidgetProperties<WidgetType.SALE> {
     let validatedConfig: WidgetConfiguration | undefined;
 
     if (config) {
@@ -52,6 +62,7 @@ export class Sale extends Base<WidgetType.SALE> {
       console.warn('[IMTBL]: invalid "walletProviderName" widget input');
       validatedParams.walletProviderName = undefined;
     }
+
     if (!isValidAmount(params.amount)) {
       // eslint-disable-next-line no-console
       console.warn('[IMTBL]: invalid "amount" widget input');
@@ -71,45 +82,59 @@ export class Sale extends Base<WidgetType.SALE> {
       validatedParams.environmentId = '';
     }
 
-    if (!params.fromContractAddress) {
+    if (!params.collectionName) {
       // eslint-disable-next-line no-console
-      console.warn('[IMTBL]: invalid "fromContractAddress" widget input');
-      validatedParams.fromContractAddress = '';
+      console.warn('[IMTBL]: invalid "collectionName" widget input');
+      validatedParams.collectionName = '';
+    }
+
+    if (params.excludePaymentTypes !== undefined && !Array.isArray(params.excludePaymentTypes)) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "excludePaymentTypes" widget input');
+      validatedParams.excludePaymentTypes = [];
     }
 
     return validatedParams;
   }
 
   protected render() {
+    if (!this.reactRoot) return;
+
+    const { t } = i18n;
     const connectLoaderParams: ConnectLoaderParams = {
-      targetLayer: ConnectTargetLayer.LAYER2,
+      targetChainId: this.checkout.config.isProduction
+        ? ChainId.IMTBL_ZKEVM_MAINNET
+        : ChainId.IMTBL_ZKEVM_TESTNET,
       web3Provider: this.web3Provider,
       checkout: this.checkout,
-      allowedChains: [
-        getL2ChainId(this.checkout!.config),
-      ],
+      allowedChains: [getL2ChainId(this.checkout!.config)],
     };
-
-    if (!this.reactRoot) return;
+    const config = this.strongConfig();
 
     this.reactRoot.render(
       <React.StrictMode>
-        <CustomAnalyticsProvider widgetConfig={this.strongConfig()}>
-          <ConnectLoader
-            widgetConfig={this.strongConfig()}
-            params={connectLoaderParams}
-            closeEvent={() => {
-              sendSaleWidgetCloseEvent(window);
-            }}
-          >
-            <SaleWidget
-              config={this.strongConfig()}
-              amount={this.parameters.amount!}
-              items={this.parameters.items!}
-              fromContractAddress={this.parameters.fromContractAddress!}
-              environmentId={this.parameters.environmentId!}
-            />
-          </ConnectLoader>
+        <CustomAnalyticsProvider checkout={this.checkout}>
+          <ThemeProvider id="sale-container" config={config}>
+            <ConnectLoader
+              widgetConfig={config}
+              params={connectLoaderParams}
+              closeEvent={() => {
+                sendSaleWidgetCloseEvent(window);
+              }}
+            >
+              <Suspense fallback={<LoadingView loadingText={t('views.LOADING_VIEW.text')} />}>
+                <SaleWidget
+                  config={config}
+                  amount={this.parameters.amount!}
+                  items={this.parameters.items!}
+                  environmentId={this.parameters.environmentId!}
+                  collectionName={this.parameters.collectionName!}
+                  excludePaymentTypes={this.parameters.excludePaymentTypes!}
+                  language="en"
+                />
+              </Suspense>
+            </ConnectLoader>
+          </ThemeProvider>
         </CustomAnalyticsProvider>
       </React.StrictMode>,
     );

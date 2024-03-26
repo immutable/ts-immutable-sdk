@@ -1,25 +1,31 @@
 import { Box, Button } from '@biom3/react';
 import { useContext, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useWalletConnect } from 'lib/hooks/useWalletConnect';
+import { isWalletConnectProvider } from 'lib/provider';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import { text } from '../../../resources/text/textConfig';
 import { sendDisconnectWalletEvent, sendWalletWidgetCloseEvent } from '../WalletWidgetEvents';
-import { WalletWidgetViews } from '../../../context/view-context/WalletViewContextTypes';
 import { WalletAddress } from '../components/WalletAddress/WalletAddress';
 import { settingsBoxStyle, settingsDisconnectButtonStyle } from './SettingsStyles';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
-import { isPassportProvider } from '../../../lib/providerUtils';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
-export function Settings() {
+export interface SettingsProps {
+  showDisconnectButton: boolean;
+}
+
+export function Settings({
+  showDisconnectButton,
+}: SettingsProps) {
+  const { t } = useTranslation();
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { provider } = connectLoaderState;
-  const { header, disconnectButton } = text.views[WalletWidgetViews.SETTINGS];
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
 
-  const isPassport = isPassportProvider(provider);
+  const { ethereumProvider } = useWalletConnect();
 
   const { page } = useAnalytics();
 
@@ -30,13 +36,45 @@ export function Settings() {
     });
   }, []);
 
+  // disconnect all Wallet Connect pairings and disconnect the provider
+  // so that restoreSession doesn't pick up the previous sessions
+  const handleWCDisconnect = async () => {
+    if (isWalletConnectProvider(provider)) {
+      try {
+        if ((provider!.provider as any)?.session) {
+          const pairings = (provider!.provider as any)?.signer.client.core.pairing.getPairings();
+          if (pairings && pairings.length > 0) {
+            // eslint-disable-next-line max-len
+            const pairingsToDisconnect = pairings.map((pairing) => ethereumProvider?.signer.client.core.pairing.disconnect({ topic: pairing.topic }));
+            await Promise.allSettled(pairingsToDisconnect);
+          }
+          await (provider!.provider as any).disconnect();
+          return;
+        }
+
+        if (ethereumProvider) {
+          const pairings = ethereumProvider?.signer.client.core.pairing.getPairings();
+          if (pairings && pairings.length > 0) {
+            // eslint-disable-next-line max-len
+            const pairingsToDisconnect = pairings.map((pairing) => ethereumProvider?.signer.client.core.pairing.disconnect({ topic: pairing.topic }));
+            await Promise.allSettled(pairingsToDisconnect);
+          }
+          await ethereumProvider.disconnect();
+        }
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error(err);
+      }
+    }
+  };
+
   return (
     <SimpleLayout
       testId="wallet-balances"
       header={(
         <HeaderNavigation
           showBack
-          title={header.title}
+          title={t('views.SETTINGS.header.title')}
           onCloseButtonClick={() => sendWalletWidgetCloseEvent(eventTarget)}
         />
       )}
@@ -46,14 +84,18 @@ export function Settings() {
         sx={settingsBoxStyle}
       >
         <WalletAddress provider={provider} />
-        {isPassport && (
+        {showDisconnectButton && (
         <Button
           testId="disconnect-button"
           variant="secondary"
           sx={settingsDisconnectButtonStyle}
-          onClick={() => sendDisconnectWalletEvent(eventTarget)}
+          onClick={() => {
+            handleWCDisconnect().then(() => {
+              sendDisconnectWalletEvent(eventTarget);
+            });
+          }}
         >
-          {disconnectButton.label}
+          {t('views.SETTINGS.disconnectButton.label')}
         </Button>
         )}
       </Box>

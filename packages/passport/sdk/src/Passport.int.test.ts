@@ -2,8 +2,11 @@ import { Magic } from 'magic-sdk';
 import { UserManager } from 'oidc-client-ts';
 import { TransactionRequest } from '@ethersproject/providers';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
+import { OidcConfiguration } from 'types';
+import { IMXClient } from '@imtbl/x-client';
+import encode from 'jwt-encode';
 import { mockValidIdToken } from './utils/token.test';
-import { Passport } from './Passport';
+import { buildPrivateVars, Passport } from './Passport';
 import { RequestArguments } from './zkEvm/types';
 import {
   closeMswWorker,
@@ -13,13 +16,14 @@ import {
   mswHandlers,
 } from './mocks/zkEvm/msw';
 import { JsonRpcError, RpcErrorCode } from './zkEvm/JsonRpcError';
-import GuardianClient from './guardian/guardian';
-import { chainIdHex } from './test/mocks';
+import GuardianClient from './guardian';
+import { chainIdHex, mockUserZkEvm } from './test/mocks';
 
-jest.mock('./guardian/guardian');
+jest.mock('./guardian');
 
 jest.mock('magic-sdk');
 jest.mock('oidc-client-ts');
+jest.mock('@imtbl/x-client');
 
 const mockOidcUser = {
   profile: {
@@ -32,15 +36,21 @@ const mockOidcUser = {
   access_token: 'accessToken123',
   refresh_token: 'refreshToken123',
 };
+
 const mockOidcUserZkevm = {
   ...mockOidcUser,
-  profile: {
-    ...mockOidcUser.profile,
+  id_token: encode({
     passport: {
-      zkevm_eth_address: '0x7EEC32793414aAb720a90073607733d9e7B0ecD0',
-      zkevm_user_admin_address: '0x123',
+      zkevm_eth_address: mockUserZkEvm.zkEvm.ethAddress,
+      zkevm_user_admin_address: mockUserZkEvm.zkEvm.userAdminAddress,
     },
-  },
+  }, 'secret'),
+};
+
+const oidcConfiguration: OidcConfiguration = {
+  clientId: '11111',
+  redirectUri: 'https://test.com',
+  logoutRedirectUri: 'https://test.com',
 };
 
 const getZkEvmProvider = () => {
@@ -67,6 +77,7 @@ describe('Passport', () => {
 
   beforeEach(() => {
     jest.resetAllMocks();
+
     (UserManager as jest.Mock).mockImplementation(() => ({
       signinPopup: mockSigninPopup,
       signinSilent: mockSigninSilent,
@@ -77,12 +88,8 @@ describe('Passport', () => {
       withConfirmationScreen: () => (task: () => void) => task(),
     }));
     (Magic as jest.Mock).mockImplementation(() => ({
-      openid: {
-        loginWithOIDC: mockLoginWithOidc,
-      },
-      rpcProvider: {
-        request: mockMagicRequest,
-      },
+      openid: { loginWithOIDC: mockLoginWithOidc },
+      rpcProvider: { request: mockMagicRequest },
       preload: jest.fn(),
     }));
   });
@@ -95,6 +102,62 @@ describe('Passport', () => {
     closeMswWorker();
   });
 
+  describe('buildPrivateVars', () => {
+    describe('when the env is prod', () => {
+      it('sets the prod x URL as the basePath on imxApiClients', () => {
+        const baseConfig = new ImmutableConfiguration({ environment: Environment.PRODUCTION });
+
+        const privateVars = buildPrivateVars({
+          baseConfig,
+          ...oidcConfiguration,
+        });
+
+        expect(privateVars.passportImxProviderFactory.imxApiClients.config.basePath).toEqual('https://api.x.immutable.com');
+      });
+    });
+
+    describe('when the env is sandbox', () => {
+      it('sets the sandbox x URL as the basePath on imxApiClients', () => {
+        const baseConfig = new ImmutableConfiguration({ environment: Environment.SANDBOX });
+
+        const privateVars = buildPrivateVars({
+          baseConfig,
+          ...oidcConfiguration,
+        });
+
+        expect(privateVars.passportImxProviderFactory.imxApiClients.config.basePath).toEqual('https://api.sandbox.x.immutable.com');
+      });
+    });
+
+    describe('when overrides are provided', () => {
+      it('sets imxPublicApiDomain as the basePath on imxApiClients', async () => {
+        const baseConfig = new ImmutableConfiguration({ environment: Environment.SANDBOX });
+        const immutableXClient = new IMXClient({ baseConfig });
+        const overrides = {
+          authenticationDomain: 'authenticationDomain123',
+          imxPublicApiDomain: 'guardianDomain123',
+          magicProviderId: 'providerId123',
+          magicPublishableApiKey: 'publishableKey123',
+          passportDomain: 'customDomain123',
+          relayerUrl: 'relayerUrl123',
+          zkEvmRpcUrl: 'zkEvmRpcUrl123',
+          indexerMrBasePath: 'indexerMrBasePath123',
+          orderBookMrBasePath: 'orderBookMrBasePath123',
+          passportMrBasePath: 'passportMrBasePath123',
+          immutableXClient,
+        };
+
+        const { passportImxProviderFactory } = buildPrivateVars({
+          baseConfig,
+          overrides,
+          ...oidcConfiguration,
+        });
+
+        expect(passportImxProviderFactory.imxApiClients.config.basePath).toEqual(overrides.imxPublicApiDomain);
+      });
+    });
+  });
+
   describe('zkEvm', () => {
     const magicWalletAddress = '0x3082e7c88f1c8b4e24be4a75dee018ad362d84d4';
 
@@ -103,7 +166,7 @@ describe('Passport', () => {
         it('returns the users ether key', async () => {
           mockGetUser.mockResolvedValue(mockOidcUserZkevm);
           useMswHandlers([
-            mswHandlers.jsonRpcProvider.success,
+            mswHandlers.rpcProvider.success,
           ]);
 
           const zkEvmProvider = getZkEvmProvider();
@@ -112,7 +175,7 @@ describe('Passport', () => {
             method: 'eth_requestAccounts',
           });
 
-          expect(accounts).toEqual([mockOidcUserZkevm.profile.passport.zkevm_eth_address]);
+          expect(accounts).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
           expect(mockGetUser).toHaveBeenCalledTimes(1);
         });
       });
@@ -137,7 +200,9 @@ describe('Passport', () => {
           mockSigninPopup.mockResolvedValue(mockOidcUser);
           mockSigninSilent.mockResolvedValueOnce(mockOidcUserZkevm);
           useMswHandlers([
+            mswHandlers.rpcProvider.success,
             mswHandlers.counterfactualAddress.success,
+            mswHandlers.api.chains.success,
           ]);
 
           const zkEvmProvider = getZkEvmProvider();
@@ -146,9 +211,8 @@ describe('Passport', () => {
             method: 'eth_requestAccounts',
           });
 
-          expect(accounts).toEqual([mockOidcUserZkevm.profile.passport.zkevm_eth_address]);
+          expect(accounts).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
           expect(mockGetUser).toHaveBeenCalledTimes(1);
-          expect(mockMagicRequest).toHaveBeenCalledTimes(3);
         });
 
         describe('when the registration request fails', () => {
@@ -156,9 +220,10 @@ describe('Passport', () => {
             mockSigninPopup.mockResolvedValue(mockOidcUser);
             mockGetUser.mockResolvedValueOnce(null);
             mockGetUser.mockResolvedValueOnce(mockOidcUser);
-            mockSigninSilent.mockResolvedValue(mockOidcUserZkevm);
+            mockSigninSilent.mockResolvedValue(mockOidcUser);
             useMswHandlers([
               mswHandlers.counterfactualAddress.internalServerError,
+              mswHandlers.api.chains.success,
             ]);
 
             const zkEvmProvider = getZkEvmProvider();
@@ -177,7 +242,7 @@ describe('Passport', () => {
 
         useMswHandlers([
           mswHandlers.counterfactualAddress.success,
-          mswHandlers.jsonRpcProvider.success,
+          mswHandlers.rpcProvider.success,
           mswHandlers.relayer.success,
           mswHandlers.guardian.evaluateTransaction.success,
         ]);
@@ -215,7 +280,7 @@ describe('Passport', () => {
         });
 
         expect(result).toEqual(transactionHash);
-        expect(mockGetUser).toHaveBeenCalledTimes(1);
+        expect(mockGetUser).toHaveBeenCalledTimes(4);
       });
     });
 
@@ -231,7 +296,7 @@ describe('Passport', () => {
       it('returns the user\'s ether key if the user is logged in', async () => {
         mockGetUser.mockResolvedValue(mockOidcUserZkevm);
         useMswHandlers([
-          mswHandlers.jsonRpcProvider.success,
+          mswHandlers.rpcProvider.success,
         ]);
 
         const zkEvmProvider = getZkEvmProvider();

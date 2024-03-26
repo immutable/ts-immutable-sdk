@@ -7,6 +7,7 @@ import { ChainId } from '../../types';
 import { getAllBalances } from '../../balances';
 import { CheckoutErrorType } from '../../errors';
 import { TokenBalanceResult } from './types';
+import { HttpClient } from '../../api/http';
 
 jest.mock('../../balances');
 jest.mock('../../config');
@@ -20,9 +21,10 @@ describe('tokenBalances', () => {
 
     (getL1ChainId as jest.Mock).mockReturnValue(ChainId.SEPOLIA);
     (getL2ChainId as jest.Mock).mockReturnValue(ChainId.IMTBL_ZKEVM_TESTNET);
+    const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
     mockConfig = new CheckoutConfiguration({
       baseConfig: { environment: Environment.SANDBOX },
-    });
+    }, mockedHttpClient);
   });
 
   it('should return multiple chain balances', async () => {

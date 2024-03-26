@@ -2,15 +2,15 @@
 /* tslint:disable */
 /* eslint-disable */
 export type { ERC20 } from "./ERC20";
+export type { ImmutableSwapProxy } from "./ImmutableSwapProxy";
 export type { Multicall } from "./Multicall";
 export type { QuoterV2 } from "./QuoterV2";
-export type { SecondaryFee } from "./SecondaryFee";
 export type { UniswapV3Pool } from "./UniswapV3Pool";
-export type { WETH } from "./WETH";
+export type { WIMX } from "./WIMX";
 export * as factories from "./factories";
 export { ERC20__factory } from "./factories/ERC20__factory";
+export { ImmutableSwapProxy__factory } from "./factories/ImmutableSwapProxy__factory";
 export { Multicall__factory } from "./factories/Multicall__factory";
 export { QuoterV2__factory } from "./factories/QuoterV2__factory";
-export { SecondaryFee__factory } from "./factories/SecondaryFee__factory";
 export { UniswapV3Pool__factory } from "./factories/UniswapV3Pool__factory";
-export { WETH__factory } from "./factories/WETH__factory";
+export { WIMX__factory } from "./factories/WIMX__factory";

@@ -5,7 +5,7 @@ import {
   selectStyle,
 } from './SelectInputStyles';
 import { SelectForm } from '../SelectForm/SelectForm';
-import { TextInputForm } from '../TextInputForm/TextInputForm';
+import { TextInputForm, TextInputType } from '../TextInputForm/TextInputForm';
 import { CoinSelectorOptionProps } from '../../CoinSelector/CoinSelectorOption';
 
 interface SelectInputProps {
@@ -17,6 +17,7 @@ interface SelectInputProps {
   textInputPlaceholder?: string;
   textInputSubtext?: string;
   textInputErrorMessage?: string;
+  textInputType?: TextInputType;
   selectSubtext?: string;
   selectErrorMessage?: string;
   coinSelectorHeading: string;
@@ -24,11 +25,12 @@ interface SelectInputProps {
   selectInputDisabled?: boolean;
   textInputValidator: (value: string) => boolean;
   onTextInputChange: (value: string) => void;
-  onTextInputBlur: (value: string) => void;
+  onTextInputBlur?: (value: string) => void;
   onTextInputFocus?: (value: string) => void;
   textInputMaxButtonClick?: () => void;
   onSelectChange: (value: OptionKey) => void;
   selectedOption?: OptionKey;
+  defaultTokenImage: string;
 }
 
 export function SelectInput({
@@ -37,6 +39,7 @@ export function SelectInput({
   textInputValue,
   textInputPlaceholder,
   textInputValidator,
+  textInputType,
   onTextInputChange,
   onTextInputBlur,
   onTextInputFocus,
@@ -52,6 +55,7 @@ export function SelectInput({
   selectInputDisabled,
   selectedOption,
   coinSelectorHeading,
+  defaultTokenImage,
 }: SelectInputProps) {
   return (
     <Box sx={selectInputBoxStyle}>
@@ -66,10 +70,12 @@ export function SelectInput({
           disabled={selectInputDisabled}
           selectedOption={selectedOption}
           coinSelectorHeading={coinSelectorHeading}
+          defaultTokenImage={defaultTokenImage}
         />
       </Box>
       <Box sx={inputStyle}>
         <TextInputForm
+          type={textInputType}
           testId={`${testId}-text-form`}
           value={textInputValue}
           placeholder={textInputPlaceholder}

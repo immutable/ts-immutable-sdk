@@ -22,6 +22,7 @@ import {
   getTokensFromRequirements,
 } from './balanceRequirement';
 import { ERC721ABI, NATIVE } from '../../env';
+import { isMatchingAddress } from '../../utils/utils';
 
 /**
  * Gets the balances for all NATIVE and ERC20 balance requirements.
@@ -31,6 +32,7 @@ const getTokenBalances = async (
   provider: Web3Provider,
   ownerAddress: string,
   itemRequirements: ItemRequirement[],
+  forceFetch: boolean = false,
 ) : Promise<ItemBalance[]> => {
   try {
     const tokenMap = new Map<string, TokenInfo>();
@@ -40,14 +42,15 @@ const getTokenBalances = async (
         tokenMap.set(item.address.toLocaleLowerCase(), item);
       },
     );
-    const { balances } = await getAllBalances(config, provider, ownerAddress, getL2ChainId(config));
+    const { balances } = await getAllBalances(config, provider, ownerAddress, getL2ChainId(config), forceFetch);
     return balances.filter(
       (balance) => tokenMap.get((balance.token.address || NATIVE).toLocaleLowerCase()),
     ) as TokenBalance[];
-  } catch (error: any) {
+  } catch (err: any) {
     throw new CheckoutError(
       'Failed to get balances',
       CheckoutErrorType.GET_BALANCE_ERROR,
+      { error: err },
     );
   }
 };
@@ -85,7 +88,7 @@ const getERC721Balances = async (
     erc721Owners.forEach((erc721OwnerAddress, index) => {
       const itemRequirement = erc721s.get(erc721OwnersPromiseIds[index]);
       let itemCount = 0;
-      if (itemRequirement && ownerAddress === erc721OwnerAddress) {
+      if (itemRequirement && isMatchingAddress(ownerAddress, erc721OwnerAddress)) {
         itemCount = 1;
       }
       erc721Balances.push({
@@ -96,10 +99,11 @@ const getERC721Balances = async (
         id: (itemRequirement as ERC721Item).id,
       });
     });
-  } catch (error: any) {
+  } catch (err: any) {
     throw new CheckoutError(
       'Failed to get ERC721 balances',
       CheckoutErrorType.GET_ERC721_BALANCE_ERROR,
+      { error: err },
     );
   }
 
@@ -114,6 +118,7 @@ export const balanceCheck = async (
   provider: Web3Provider,
   ownerAddress: string,
   itemRequirements: ItemRequirement[],
+  forceFetch: boolean = false,
 ) : Promise<BalanceCheckResult> => {
   const aggregatedItems = balanceAggregator(itemRequirements);
 
@@ -143,7 +148,7 @@ export const balanceCheck = async (
   // Get all ERC20 and NATIVE balances
   const balancePromises: Promise<ItemBalance[]>[] = [];
   if (requiredToken.length > 0) {
-    balancePromises.push(getTokenBalances(config, provider, ownerAddress, aggregatedItems));
+    balancePromises.push(getTokenBalances(config, provider, ownerAddress, aggregatedItems, forceFetch));
   }
 
   // Get all ERC721 balances
@@ -153,14 +158,17 @@ export const balanceCheck = async (
 
   // Wait for all balances and calculate the requirements
   const promisesResponses = await Promise.all(balancePromises);
-  const balanceRequirements: BalanceRequirement[] = [];
+  const erc721BalanceRequirements: BalanceRequirement[] = [];
+  const tokenBalanceRequirementPromises: Promise<BalanceRequirement>[] = [];
 
   // Get all ERC20 and NATIVE balances
   if (requiredToken.length > 0 && promisesResponses.length > 0) {
     const result = promisesResponses.shift();
     if (result) {
       requiredToken.forEach((item) => {
-        balanceRequirements.push(getTokenBalanceRequirement(item as (NativeItem | ERC20Item), result));
+        tokenBalanceRequirementPromises.push(
+          getTokenBalanceRequirement(item as (NativeItem | ERC20Item), result, provider),
+        );
       });
     }
   }
@@ -170,10 +178,14 @@ export const balanceCheck = async (
     const result = promisesResponses.shift();
     if (result) {
       requiredERC721.forEach((item) => {
-        balanceRequirements.push(getERC721BalanceRequirement(item as (ERC721Item), result));
+        erc721BalanceRequirements.push(getERC721BalanceRequirement(item as (ERC721Item), result));
       });
     }
   }
+  const balanceRequirements = [
+    ...erc721BalanceRequirements,
+    ...(await Promise.all(tokenBalanceRequirementPromises)),
+  ];
 
   // Find if there are any requirements that aren't sufficient.
   // If there is not item with sufficient === false then the requirements

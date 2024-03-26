@@ -21,11 +21,23 @@
  */
 export interface InactiveOrderStatus {
     /**
-     * The order status
+     * The order status that indicates an order cannot be fulfilled.
      * @type {string}
      * @memberof InactiveOrderStatus
      */
     'name': InactiveOrderStatusNameEnum;
+    /**
+     * Whether the order offerer has sufficient approvals
+     * @type {boolean}
+     * @memberof InactiveOrderStatus
+     */
+    'sufficient_approvals': boolean;
+    /**
+     * Whether the order offerer still has sufficient balance to complete the order
+     * @type {boolean}
+     * @memberof InactiveOrderStatus
+     */
+    'sufficient_balances': boolean;
 }
 
 export const InactiveOrderStatusNameEnum = {

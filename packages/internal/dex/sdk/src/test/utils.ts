@@ -1,17 +1,19 @@
 import { TradeType } from '@uniswap/sdk-core';
-import { BigNumber, BigNumberish, utils } from 'ethers';
+import { BigNumber, BigNumberish, utils, providers } from 'ethers';
 import { Pool, Route, TickMath } from '@uniswap/v3-sdk';
 import { SwapRouter } from '@uniswap/router-sdk';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { SecondaryFee__factory } from 'contracts/types';
-import { IV3SwapRouter } from 'contracts/types/SecondaryFee';
 import { PromiseOrValue } from 'contracts/types/common';
 import { QuoteResult } from 'lib/getQuotesForRoutes';
 import { NativeTokenService } from 'lib/nativeTokenService';
 import { ExchangeModuleConfiguration, SecondaryFee, CoinAmount, Coin, ERC20, Native, Amount } from 'types';
+import { ImmutableSwapProxy__factory } from 'contracts/types';
+import { IV3SwapRouter } from 'contracts/types/ImmutableSwapProxy';
 import { erc20ToUniswapToken, newAmount, Router, RoutingContracts } from '../lib';
 
-export const TEST_GAS_PRICE = BigNumber.from('1500000000'); // 1.5 gwei or 1500000000 wei
+export const TEST_BASE_FEE = BigNumber.from('49'); // 49 wei
+export const TEST_MAX_PRIORITY_FEE_PER_GAS = BigNumber.from('10000000000'); // 10 gwei
+export const TEST_GAS_PRICE = BigNumber.from('10000000098'); // TEST_MAX_PRIORITY_FEE_PER_GAS + 2 * TEST_BASE_FEE
 export const TEST_TRANSACTION_GAS_USAGE = BigNumber.from('200000'); // 200,000 gas units
 
 export const TEST_CHAIN_ID = 999;
@@ -30,11 +32,11 @@ export const TEST_ROUTER_ADDRESS = '0x615FFbea2af24C55d737dD4264895A56624Da072';
 export const TEST_V3_MIGRATOR_ADDRESSES = '0x0Df0d2d5Cf4739C0b579C33Fdb3d8B04Bee85729';
 export const TEST_NONFUNGIBLE_POSITION_MANAGER_ADDRESSES = '0x446c78D97b1E78bC35864FC49AcE1f7404F163F6';
 export const TEST_TICK_LENS_ADDRESSES = '0x3aC4F8094b21A6c5945453007d9c52B7e15340c0';
-export const TEST_SECONDARY_FEE_ADDRESS = '0x8dBE1f0900C5e92ad87A54521902a33ba1598C51';
+export const TEST_SWAP_PROXY_ADDRESS = '0x8dBE1f0900C5e92ad87A54521902a33ba1598C51';
 
 export const TEST_ROUTING_CONTRACTS: RoutingContracts = {
   coreFactory: TEST_V3_CORE_FACTORY_ADDRESS,
-  quoterV2: TEST_QUOTER_ADDRESS,
+  quoter: TEST_QUOTER_ADDRESS,
   multicall: TEST_MULTICALL_ADDRESS,
 };
 
@@ -105,9 +107,9 @@ export const TEST_DEX_CONFIGURATION: ExchangeModuleConfiguration = {
     exchangeContracts: {
       multicall: TEST_MULTICALL_ADDRESS,
       coreFactory: TEST_V3_CORE_FACTORY_ADDRESS,
-      quoterV2: TEST_QUOTER_ADDRESS,
-      peripheryRouter: TEST_ROUTER_ADDRESS,
-      secondaryFee: TEST_SECONDARY_FEE_ADDRESS,
+      quoter: TEST_QUOTER_ADDRESS,
+      swapRouter: TEST_ROUTER_ADDRESS,
+      immutableSwapProxy: TEST_SWAP_PROXY_ADDRESS,
     },
     commonRoutingTokens: [],
     nativeToken: NATIVE_TEST_TOKEN,
@@ -171,7 +173,7 @@ function decodeSecondaryFeeCall(
   calldata: utils.BytesLike,
   ...functionNames: SecondaryFeeFunctionName[]
 ): { deadline: BigNumber; functionData: Record<string, utils.Result> } {
-  const iface = SecondaryFee__factory.createInterface();
+  const iface = ImmutableSwapProxy__factory.createInterface();
   const topLevelParams = iface.decodeFunctionData('multicall(uint256,bytes[])', calldata);
 
   const functionData: Record<string, utils.Result> = {};
@@ -519,3 +521,20 @@ export function newAmountFromString<T extends Coin>(amount: string, token: T): C
   const bn = utils.parseUnits(amount, token.decimals);
   return newAmount(bn, token);
 }
+
+export const buildBlock = ({ baseFeePerGas }: { baseFeePerGas: BigNumber | null }): providers.Block => ({
+  baseFeePerGas,
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  _difficulty: BigNumber.from('0'),
+  difficulty: 0,
+  extraData: '',
+  gasLimit: BigNumber.from('0'),
+  gasUsed: BigNumber.from('0'),
+  hash: '',
+  miner: '',
+  nonce: '',
+  number: 0,
+  parentHash: '',
+  timestamp: 0,
+  transactions: [],
+});

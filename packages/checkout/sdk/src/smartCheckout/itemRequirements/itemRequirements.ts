@@ -21,8 +21,8 @@ export async function getItemRequirementsFromRequirements(
   const decimalPromises:any = [];
   requirements.forEach((itemRequirementParam) => {
     if (itemRequirementParam.type === ItemType.ERC20) {
-      const { contractAddress } = (itemRequirementParam as ERC20ItemRequirement);
-      decimalPromises.push(getTokenContract(contractAddress, ERC20ABI, provider).decimals());
+      const { tokenAddress } = (itemRequirementParam as ERC20ItemRequirement);
+      decimalPromises.push(getTokenContract(tokenAddress, ERC20ABI, provider).decimals());
     }
   });
 

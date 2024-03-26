@@ -4,7 +4,7 @@ import { SetupServer, setupServer } from 'msw/node';
 import { ChainName } from 'network/chains';
 import { RelayerTransactionRequest } from '../../zkEvm/relayerClient';
 import { JsonRpcRequestPayload } from '../../zkEvm/types';
-import { chainId, chainIdHex } from '../../test/mocks';
+import { chainId, chainIdHex, mockUserZkEvm } from '../../test/mocks';
 
 export const relayerId = '0x745';
 export const transactionHash = '0x867';
@@ -33,19 +33,24 @@ const chainName = `${encodeURIComponent(ChainName.IMTBL_ZKEVM_TESTNET)}`;
 export const mswHandlers = {
   counterfactualAddress: {
     success: rest.post(
-      `https://api.sandbox.immutable.com/v1/chains/${chainName}/passport/counterfactual-address`,
-      (req, res, ctx) => res(ctx.status(201)),
+      `https://api.sandbox.immutable.com/v2/chains/${chainName}/passport/counterfactual-address`,
+      (req, res, ctx) => res(
+        ctx.status(201),
+        ctx.json({
+          counterfactual_address: mockUserZkEvm.zkEvm.ethAddress,
+        }),
+      ),
     ),
     internalServerError: rest.post(
-      `https://api.sandbox.immutable.com/v1/chains/${chainName}/passport/counterfactual-address`,
+      `https://api.sandbox.immutable.com/v2/chains/${chainName}/passport/counterfactual-address`,
       (req, res, ctx) => res(ctx.status(500)),
     ),
   },
-  jsonRpcProvider: {
+  rpcProvider: {
     success: rest.post('https://rpc.testnet.immutable.com', async (req, res, ctx) => {
       const body = await req.json<JsonRpcRequestPayload>();
       switch (body.method) {
-        case 'eth_getCode': {
+        case 'eth_call': {
           return res(
             ctx.json({
               id: body.id,
@@ -113,6 +118,19 @@ export const mswHandlers = {
   guardian: {
     evaluateTransaction: {
       success: rest.post('https://api.sandbox.immutable.com/guardian/v1/transactions/evm/evaluate', (req, res, ctx) => res(ctx.status(200))),
+    },
+  },
+  api: {
+    chains: {
+      success: rest.get('https://api.sandbox.immutable.com/v1/chains', async (req, res, ctx) => res(ctx.json({
+        result: [
+          {
+            id: 'eip155:13473',
+            name: 'Immutable zkEVM Test',
+            rpc_url: 'https://rpc.testnet.immutable.com',
+          },
+        ],
+      }))),
     },
   },
 };

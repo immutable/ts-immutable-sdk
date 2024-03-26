@@ -3,14 +3,14 @@ import { FundingRoute } from '@imtbl/checkout-sdk';
 import {
   useContext,
   useEffect,
-  useMemo, useRef, useState,
+  useMemo, useState,
 } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   FundWithSmartCheckoutSubViews,
   SaleWidgetViews,
 } from '../../../context/view-context/SaleViewContextTypes';
 import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
-import { text } from '../../../resources/text/textConfig';
 import { LoadingView } from '../../../views/loading/LoadingView';
 import { FundingRouteExecute } from '../components/FundingRouteExecute/FundingRouteExecute';
 import { FundingRouteSelect } from '../components/FundingRouteSelect/FundingRouteSelect';
@@ -24,33 +24,26 @@ type FundWithSmartCheckoutProps = {
 };
 
 export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
+  const { t } = useTranslation();
   const { sendPageView } = useSaleEvent();
   const { viewDispatch } = useContext(ViewContext);
   const [selectedFundingRoute, setSelectedFundingRoute] = useState<
   FundingRoute | undefined
   >(undefined);
   const [fundingRouteStepIndex, setFundingRouteStepIndex] = useState<number>(0);
-  const textConfig = text.views[SaleWidgetViews.FUND_WITH_SMART_CHECKOUT];
-
-  const { querySmartCheckout, fundingRoutes, smartCheckoutResult } = useSaleContext();
+  const {
+    querySmartCheckout, fundingRoutes, smartCheckoutResult, collectionName, fromTokenAddress,
+  } = useSaleContext();
   const { cryptoFiatDispatch } = useContext(CryptoFiatContext);
-
-  const smartCheckoutLoading = useRef(false);
 
   const onFundingRouteSelected = (fundingRoute: FundingRoute) => {
     setSelectedFundingRoute(fundingRoute);
   };
 
   useEffect(() => {
-    if (subView === FundWithSmartCheckoutSubViews.INIT && !smartCheckoutLoading.current) {
-      smartCheckoutLoading.current = true;
-      try {
-        querySmartCheckout();
-      } finally {
-        smartCheckoutLoading.current = false;
-      }
-    }
-  }, [subView]);
+    if (subView !== FundWithSmartCheckoutSubViews.INIT || !fromTokenAddress) return;
+    querySmartCheckout();
+  }, [subView, fromTokenAddress]);
 
   useEffect(() => {
     if (!cryptoFiatDispatch || !smartCheckoutResult) return;
@@ -105,12 +98,13 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
   return (
     <Box>
       {subView === FundWithSmartCheckoutSubViews.INIT && (
-        <LoadingView loadingText={textConfig.loading.checkingBalances} />
+        <LoadingView loadingText={t('views.FUND_WITH_SMART_CHECKOUT.loading.checkingBalances')} />
       )}
       {subView === FundWithSmartCheckoutSubViews.FUNDING_ROUTE_SELECT && (
         <FundingRouteSelect
-          onFundingRouteSelected={onFundingRouteSelected}
           fundingRoutes={fundingRoutes}
+          collectionName={collectionName}
+          onFundingRouteSelected={onFundingRouteSelected}
         />
       )}
       {subView === FundWithSmartCheckoutSubViews.FUNDING_ROUTE_EXECUTE && (

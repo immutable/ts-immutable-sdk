@@ -1,10 +1,8 @@
 import { useMemo } from 'react';
-
+import { useTranslation } from 'react-i18next';
 import { useSaleContext } from '../context/SaleContextProvider';
 import { TransakIframe } from '../../../components/Transak/TransakIframe';
 import { TransakNFTData } from '../../../components/Transak/TransakTypes';
-import { text as textConfig } from '../../../resources/text/textConfig';
-import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 import { SaleErrorTypes } from '../types';
 
 export interface WithCardProps {
@@ -17,6 +15,7 @@ export interface WithCardProps {
 }
 
 export function WithCard(props: WithCardProps) {
+  const { t } = useTranslation();
   const {
     onInit,
     onOpen,
@@ -25,9 +24,14 @@ export function WithCard(props: WithCardProps) {
     onOrderCompleted,
     onOrderFailed,
   } = props;
-  const { screenTitle, loading } = textConfig.views[SaleWidgetViews.PAY_WITH_CARD];
   const {
-    recipientEmail, recipientAddress, isPassportWallet, signResponse, goToErrorView,
+    recipientEmail,
+    recipientAddress,
+    isPassportWallet,
+    signResponse,
+    goToErrorView,
+    environment,
+    clientConfig,
   } = useSaleContext();
   const executeTxn = signResponse?.transactions.find((txn) => txn.methodCall.startsWith('execute'));
 
@@ -43,7 +47,7 @@ export function WithCard(props: WithCardProps) {
       price: product.amount,
       quantity: product.qty,
       tokenID: product.tokenId,
-      nftType: 'ERC721',
+      nftType: product.contractType || 'ERC721',
     })),
     [signResponse],
   );
@@ -59,13 +63,11 @@ export function WithCard(props: WithCardProps) {
       email={recipientEmail}
       walletAddress={recipientAddress}
       isPassportWallet={isPassportWallet}
-      exchangeScreenTitle={screenTitle}
-      loadingText={loading}
+      exchangeScreenTitle={t('views.PAY_WITH_CARD.screenTitle')}
       nftData={nftData}
       calldata={executeTxn.rawData}
       cryptoCurrencyCode={signResponse.order.currency.name}
       estimatedGasLimit={executeTxn.gasEstimate}
-      smartContractAddress={executeTxn.contractAddress}
       partnerOrderId={executeTxn.params.reference}
       onInit={onInit}
       onOpen={onOpen}
@@ -74,6 +76,8 @@ export function WithCard(props: WithCardProps) {
       onOrderCompleted={onOrderCompleted}
       onOrderFailed={onOrderFailed}
       onFailedToLoad={onFailedToLoad}
+      environment={environment}
+      contractId={clientConfig.contractId}
     />
   );
 }

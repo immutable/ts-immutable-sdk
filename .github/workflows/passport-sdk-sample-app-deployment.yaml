@@ -3,7 +3,7 @@ name: Passport SDK Sample App Deployment
 on:
   push:
     paths:
-      - 'packages/passport/**'
+      - "packages/passport/**"
     branches:
       - main
   workflow_dispatch:
@@ -46,6 +46,9 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
+      - name: Update SDK version
+        run: yarn workspace @imtbl/passport-sdk-sample-app update-sdk-version
+
       - name: Build
         run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build
 
@@ -61,4 +64,4 @@ jobs:
 
       - name: Clear the cloudfront cache
         run: |
-          aws cloudfront create-invalidation --distribution-id ${{ secrets.CF_PASSPORT_PROD_DISTRIBUTION_ID }} --paths "/*" 
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.CF_PASSPORT_PROD_DISTRIBUTION_ID }} --paths "/*"

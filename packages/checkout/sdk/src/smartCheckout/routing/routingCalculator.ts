@@ -7,8 +7,6 @@ import {
   AvailableRoutingOptions,
   BridgeFundingStep,
   ChainId,
-  FundingRouteFeeEstimate,
-  FundingStepType,
   ItemType,
   OnRampFundingStep,
   RoutesFound,
@@ -62,12 +60,9 @@ export const getBridgeFundingStep = async (
   readOnlyProviders: Map<ChainId, JsonRpcProvider>,
   availableRoutingOptions: AvailableRoutingOptions,
   insufficientRequirement: BalanceRequirement | undefined,
-  ownerAddress: string,
   tokenBalances: Map<ChainId, TokenBalanceResult>,
-  feeEstimates: Map<FundingStepType, FundingRouteFeeEstimate>,
 ): Promise<BridgeFundingStep | undefined> => {
   let bridgeFundingStep;
-
   if (insufficientRequirement === undefined) return undefined;
   if (insufficientRequirement.type !== ItemType.NATIVE && insufficientRequirement.type !== ItemType.ERC20) {
     return undefined;
@@ -83,11 +78,9 @@ export const getBridgeFundingStep = async (
     bridgeFundingStep = await bridgeRoute(
       config,
       readOnlyProviders,
-      ownerAddress,
       availableRoutingOptions,
       bridgeRequirement,
       tokenBalances,
-      feeEstimates,
     );
   }
 
@@ -137,7 +130,6 @@ export const getBridgeAndSwapFundingSteps = async (
   ownerAddress: string,
   tokenBalances: Map<ChainId, TokenBalanceResult>,
   tokenAllowList: RoutingTokensAllowList | undefined,
-  feeEstimates: Map<FundingStepType, FundingRouteFeeEstimate>,
   balanceRequirements: BalanceCheckResult,
 ): Promise<BridgeAndSwapRoute[]> => {
   if (!insufficientRequirement) return [];
@@ -170,7 +162,6 @@ export const getBridgeAndSwapFundingSteps = async (
     availableRoutingOptions,
     insufficientRequirement,
     ownerAddress,
-    feeEstimates,
     tokenBalances,
     bridgeableL1Addresses,
     swapTokenAllowList,
@@ -217,7 +208,7 @@ export const routingCalculator = async (
     throw new CheckoutError(
       'Error occurred while creating read only providers',
       CheckoutErrorType.PROVIDER_ERROR,
-      { message: err.message },
+      { error: err },
     );
   }
 
@@ -242,9 +233,6 @@ export const routingCalculator = async (
     ),
   );
 
-  // Fee estimate cache
-  const feeEstimates = new Map<FundingStepType, FundingRouteFeeEstimate>();
-
   // Ensures only 1 balance requirement is insufficient
   const insufficientRequirement = getInsufficientRequirement(balanceRequirements);
 
@@ -255,9 +243,7 @@ export const routingCalculator = async (
     readOnlyProviders,
     availableRoutingOptions,
     insufficientRequirement,
-    ownerAddress,
     tokenBalances,
-    feeEstimates,
   ));
 
   routePromises.push(getSwapFundingSteps(
@@ -284,7 +270,6 @@ export const routingCalculator = async (
     ownerAddress,
     tokenBalances,
     allowList,
-    feeEstimates,
     balanceRequirements,
   ));
 

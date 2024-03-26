@@ -1,6 +1,10 @@
 import { ModuleConfiguration } from '@imtbl/config';
-import { ImmutableXClient } from '@imtbl/immutablex-client';
-import { EthSigner, StarkSigner } from '@imtbl/core-sdk';
+import {
+  EthSigner,
+  IMXClient,
+  StarkSigner,
+} from '@imtbl/x-client';
+import { ImxApiClients } from '@imtbl/generated-clients';
 
 export enum PassportEvents {
   LOGGED_OUT = 'loggedOut',
@@ -41,11 +45,6 @@ export type PassportMetadata = {
   zkevm_user_admin_address: string;
 };
 
-export enum Networks {
-  PRODUCTION = 'mainnet',
-  SANDBOX = 'sepolia',
-}
-
 export interface OidcConfiguration {
   clientId: string;
   logoutRedirectUri?: string;
@@ -56,18 +55,18 @@ export interface OidcConfiguration {
 }
 
 export interface PassportOverrides {
-  network: Networks;
   authenticationDomain: string;
   magicPublishableApiKey: string;
   magicProviderId: string;
   passportDomain: string;
   imxPublicApiDomain: string;
-  immutableXClient: ImmutableXClient;
+  immutableXClient: IMXClient;
   zkEvmRpcUrl: string;
   relayerUrl: string;
   indexerMrBasePath: string;
   orderBookMrBasePath: string;
   passportMrBasePath: string;
+  imxApiClients?: ImxApiClients; // needs to be optional because ImxApiClients is not exposed publicly
 }
 
 export interface PassportModuleConfiguration extends ModuleConfiguration<PassportOverrides>,
@@ -83,6 +82,9 @@ type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 
 export type UserImx = WithRequired<User, 'imx'>;
 export type UserZkEvm = WithRequired<User, 'zkEvm'>;
+
+export const isUserZkEvm = (user: User): user is UserZkEvm => !!user.zkEvm;
+export const isUserImx = (user: User): user is UserImx => !!user.imx;
 
 // Device code auth
 

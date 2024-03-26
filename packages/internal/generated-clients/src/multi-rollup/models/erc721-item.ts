@@ -25,7 +25,7 @@ export interface ERC721Item {
      * @type {string}
      * @memberof ERC721Item
      */
-    'item_type': ERC721ItemItemTypeEnum;
+    'type': ERC721ItemTypeEnum;
     /**
      * Address of ERC721 token
      * @type {string}
@@ -40,10 +40,10 @@ export interface ERC721Item {
     'token_id': string;
 }
 
-export const ERC721ItemItemTypeEnum = {
+export const ERC721ItemTypeEnum = {
     Erc721: 'ERC721'
 } as const;
 
-export type ERC721ItemItemTypeEnum = typeof ERC721ItemItemTypeEnum[keyof typeof ERC721ItemItemTypeEnum];
+export type ERC721ItemTypeEnum = typeof ERC721ItemTypeEnum[keyof typeof ERC721ItemTypeEnum];
 
 

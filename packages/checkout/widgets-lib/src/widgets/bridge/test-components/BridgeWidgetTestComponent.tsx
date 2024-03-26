@@ -1,8 +1,11 @@
-import { BiomeCombinedProviders } from '@biom3/react';
 import React, { useCallback, useMemo, useReducer } from 'react';
-import { onLightBase } from '@biom3/design-tokens';
+import { Checkout } from '@imtbl/checkout-sdk';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import {
-  initialBridgeState, BridgeContext, bridgeReducer, BridgeState,
+  initialBridgeState,
+  BridgeContext,
+  BridgeState,
+  bridgeReducer,
 } from '../context/BridgeContext';
 import {
   CryptoFiatContext, CryptoFiatContextState, CryptoFiatState, FiatSymbols,
@@ -15,7 +18,12 @@ export interface TestProps {
 }
 
 export function BridgeWidgetTestComponent({ children, initialStateOverride, cryptoConversionsOverride }: TestProps) {
-  const [bridgeState, bridgeDispatch] = useReducer(bridgeReducer, initialStateOverride ?? initialBridgeState);
+  const [bridgeState, bridgeDispatch] = useReducer(
+    bridgeReducer,
+    initialStateOverride
+      ? { ...initialStateOverride, checkout: {} as Checkout }
+      : { ...initialBridgeState, checkout: {} as Checkout },
+  );
 
   const bridgeReducerValues = useMemo(
     () => ({ bridgeState, bridgeDispatch }),
@@ -36,12 +44,12 @@ export function BridgeWidgetTestComponent({ children, initialStateOverride, cryp
   ), [cryptoFiatState, cryptoFiatDispatch]);
 
   return (
-    <BiomeCombinedProviders theme={{ base: onLightBase }}>
+    <ViewContextTestComponent>
       <BridgeContext.Provider value={bridgeReducerValues}>
         <CryptoFiatContext.Provider value={cryptoFiatReducerValues as CryptoFiatContextState}>
           {children}
         </CryptoFiatContext.Provider>
       </BridgeContext.Provider>
-    </BiomeCombinedProviders>
+    </ViewContextTestComponent>
   );
 }

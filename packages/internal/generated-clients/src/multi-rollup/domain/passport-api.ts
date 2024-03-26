@@ -28,6 +28,8 @@ import { APIError401 } from '../models';
 // @ts-ignore
 import { APIError403 } from '../models';
 // @ts-ignore
+import { APIError404 } from '../models';
+// @ts-ignore
 import { APIError429 } from '../models';
 // @ts-ignore
 import { APIError500 } from '../models';
@@ -45,6 +47,10 @@ import { CreateCounterfactualAddressResDeprecated } from '../models';
 import { GetLinkedAddressesRes } from '../models';
 // @ts-ignore
 import { GetLinkedAddressesResDeprecated } from '../models';
+// @ts-ignore
+import { GetTransactionMetadataRequest } from '../models';
+// @ts-ignore
+import { GetTransactionMetadataRes } from '../models';
 /**
  * PassportApi - axios parameter creator
  * @export
@@ -57,6 +63,7 @@ export const PassportApiAxiosParamCreator = function (configuration?: Configurat
          * @param {string} chainName 
          * @param {CreateCounterfactualAddressRequest} createCounterfactualAddressRequest 
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         createCounterfactualAddress: async (chainName: string, createCounterfactualAddressRequest: CreateCounterfactualAddressRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
@@ -97,9 +104,10 @@ export const PassportApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * Create a counterfactual address for a user based on their Ethereum address
-         * @summary Create a counterfactual address
+         * @summary Deprecated Create a counterfactual address
          * @param {CreateCounterfactualAddressRequestDeprecated} createCounterfactualAddressRequestDeprecated 
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         createCounterfactualAddressDeprecated: async (createCounterfactualAddressRequestDeprecated: CreateCounterfactualAddressRequestDeprecated, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
@@ -129,6 +137,50 @@ export const PassportApiAxiosParamCreator = function (configuration?: Configurat
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(createCounterfactualAddressRequestDeprecated, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Create a counterfactual address for a user based on their Ethereum address
+         * @summary Create a counterfactual address v2
+         * @param {string} chainName 
+         * @param {CreateCounterfactualAddressRequest} createCounterfactualAddressRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createCounterfactualAddressV2: async (chainName: string, createCounterfactualAddressRequest: CreateCounterfactualAddressRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'chainName' is not null or undefined
+            assertParamExists('createCounterfactualAddressV2', 'chainName', chainName)
+            // verify required parameter 'createCounterfactualAddressRequest' is not null or undefined
+            assertParamExists('createCounterfactualAddressV2', 'createCounterfactualAddressRequest', createCounterfactualAddressRequest)
+            const localVarPath = `/v2/chains/{chain_name}/passport/counterfactual-address`
+                .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createCounterfactualAddressRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -179,9 +231,10 @@ export const PassportApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * Get all the Ethereum linked addresses for a user based on its userId
-         * @summary Get Ethereum linked addresses for a user
+         * @summary Deprecated Get Ethereum linked addresses for a user
          * @param {string} userId The user\&#39;s userId
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         getLinkedAddressesDeprecated: async (userId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
@@ -215,6 +268,117 @@ export const PassportApiAxiosParamCreator = function (configuration?: Configurat
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Get transaction metadata for a given encoded transaction
+         * @summary Get transaction metadata
+         * @param {string} chainName 
+         * @param {GetTransactionMetadataRequest} getTransactionMetadataRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getTransactionMetadata: async (chainName: string, getTransactionMetadataRequest: GetTransactionMetadataRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'chainName' is not null or undefined
+            assertParamExists('getTransactionMetadata', 'chainName', chainName)
+            // verify required parameter 'getTransactionMetadataRequest' is not null or undefined
+            assertParamExists('getTransactionMetadata', 'getTransactionMetadataRequest', getTransactionMetadataRequest)
+            const localVarPath = `/v1/chains/{chain_name}/passport/transaction-metadata`
+                .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(getTransactionMetadataRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Get transaction metadata for a given encoded transaction
+         * @summary Get transaction metadata
+         * @param {string} chainName 
+         * @param {string} contractAddress The address of the contract intended for interaction with this transaction
+         * @param {string} methodId The method ID of the contract intended for interaction with this transaction
+         * @param {string} transactionId ID of the given transaction to be decoded
+         * @param {string} transactionData Encoded transaction data
+         * @param {*} [options] Override http request option.
+         * @deprecated
+         * @throws {RequiredError}
+         */
+        getTransactionMetadataDeprecated: async (chainName: string, contractAddress: string, methodId: string, transactionId: string, transactionData: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'chainName' is not null or undefined
+            assertParamExists('getTransactionMetadataDeprecated', 'chainName', chainName)
+            // verify required parameter 'contractAddress' is not null or undefined
+            assertParamExists('getTransactionMetadataDeprecated', 'contractAddress', contractAddress)
+            // verify required parameter 'methodId' is not null or undefined
+            assertParamExists('getTransactionMetadataDeprecated', 'methodId', methodId)
+            // verify required parameter 'transactionId' is not null or undefined
+            assertParamExists('getTransactionMetadataDeprecated', 'transactionId', transactionId)
+            // verify required parameter 'transactionData' is not null or undefined
+            assertParamExists('getTransactionMetadataDeprecated', 'transactionData', transactionData)
+            const localVarPath = `/v1/chains/{chain_name}/passport/transaction-metadata`
+                .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (contractAddress !== undefined) {
+                localVarQueryParameter['contract_address'] = contractAddress;
+            }
+
+            if (methodId !== undefined) {
+                localVarQueryParameter['method_id'] = methodId;
+            }
+
+            if (transactionId !== undefined) {
+                localVarQueryParameter['transaction_id'] = transactionId;
+            }
+
+            if (transactionData !== undefined) {
+                localVarQueryParameter['transaction_data'] = transactionData;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -231,6 +395,7 @@ export const PassportApiFp = function(configuration?: Configuration) {
          * @param {string} chainName 
          * @param {CreateCounterfactualAddressRequest} createCounterfactualAddressRequest 
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         async createCounterfactualAddress(chainName: string, createCounterfactualAddressRequest: CreateCounterfactualAddressRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateCounterfactualAddressRes>> {
@@ -239,13 +404,26 @@ export const PassportApiFp = function(configuration?: Configuration) {
         },
         /**
          * Create a counterfactual address for a user based on their Ethereum address
-         * @summary Create a counterfactual address
+         * @summary Deprecated Create a counterfactual address
          * @param {CreateCounterfactualAddressRequestDeprecated} createCounterfactualAddressRequestDeprecated 
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         async createCounterfactualAddressDeprecated(createCounterfactualAddressRequestDeprecated: CreateCounterfactualAddressRequestDeprecated, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateCounterfactualAddressResDeprecated>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createCounterfactualAddressDeprecated(createCounterfactualAddressRequestDeprecated, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Create a counterfactual address for a user based on their Ethereum address
+         * @summary Create a counterfactual address v2
+         * @param {string} chainName 
+         * @param {CreateCounterfactualAddressRequest} createCounterfactualAddressRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createCounterfactualAddressV2(chainName: string, createCounterfactualAddressRequest: CreateCounterfactualAddressRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateCounterfactualAddressRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createCounterfactualAddressV2(chainName, createCounterfactualAddressRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -262,13 +440,42 @@ export const PassportApiFp = function(configuration?: Configuration) {
         },
         /**
          * Get all the Ethereum linked addresses for a user based on its userId
-         * @summary Get Ethereum linked addresses for a user
+         * @summary Deprecated Get Ethereum linked addresses for a user
          * @param {string} userId The user\&#39;s userId
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         async getLinkedAddressesDeprecated(userId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetLinkedAddressesResDeprecated>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getLinkedAddressesDeprecated(userId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Get transaction metadata for a given encoded transaction
+         * @summary Get transaction metadata
+         * @param {string} chainName 
+         * @param {GetTransactionMetadataRequest} getTransactionMetadataRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getTransactionMetadata(chainName: string, getTransactionMetadataRequest: GetTransactionMetadataRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetTransactionMetadataRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getTransactionMetadata(chainName, getTransactionMetadataRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Get transaction metadata for a given encoded transaction
+         * @summary Get transaction metadata
+         * @param {string} chainName 
+         * @param {string} contractAddress The address of the contract intended for interaction with this transaction
+         * @param {string} methodId The method ID of the contract intended for interaction with this transaction
+         * @param {string} transactionId ID of the given transaction to be decoded
+         * @param {string} transactionData Encoded transaction data
+         * @param {*} [options] Override http request option.
+         * @deprecated
+         * @throws {RequiredError}
+         */
+        async getTransactionMetadataDeprecated(chainName: string, contractAddress: string, methodId: string, transactionId: string, transactionData: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetTransactionMetadataRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getTransactionMetadataDeprecated(chainName, contractAddress, methodId, transactionId, transactionData, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -286,6 +493,7 @@ export const PassportApiFactory = function (configuration?: Configuration, baseP
          * @summary Create a counterfactual address
          * @param {PassportApiCreateCounterfactualAddressRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         createCounterfactualAddress(requestParameters: PassportApiCreateCounterfactualAddressRequest, options?: AxiosRequestConfig): AxiosPromise<CreateCounterfactualAddressRes> {
@@ -293,13 +501,24 @@ export const PassportApiFactory = function (configuration?: Configuration, baseP
         },
         /**
          * Create a counterfactual address for a user based on their Ethereum address
-         * @summary Create a counterfactual address
+         * @summary Deprecated Create a counterfactual address
          * @param {PassportApiCreateCounterfactualAddressDeprecatedRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         createCounterfactualAddressDeprecated(requestParameters: PassportApiCreateCounterfactualAddressDeprecatedRequest, options?: AxiosRequestConfig): AxiosPromise<CreateCounterfactualAddressResDeprecated> {
             return localVarFp.createCounterfactualAddressDeprecated(requestParameters.createCounterfactualAddressRequestDeprecated, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Create a counterfactual address for a user based on their Ethereum address
+         * @summary Create a counterfactual address v2
+         * @param {PassportApiCreateCounterfactualAddressV2Request} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createCounterfactualAddressV2(requestParameters: PassportApiCreateCounterfactualAddressV2Request, options?: AxiosRequestConfig): AxiosPromise<CreateCounterfactualAddressRes> {
+            return localVarFp.createCounterfactualAddressV2(requestParameters.chainName, requestParameters.createCounterfactualAddressRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * Get all the Ethereum linked addresses for a user based on its userId
@@ -313,13 +532,35 @@ export const PassportApiFactory = function (configuration?: Configuration, baseP
         },
         /**
          * Get all the Ethereum linked addresses for a user based on its userId
-         * @summary Get Ethereum linked addresses for a user
+         * @summary Deprecated Get Ethereum linked addresses for a user
          * @param {PassportApiGetLinkedAddressesDeprecatedRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         getLinkedAddressesDeprecated(requestParameters: PassportApiGetLinkedAddressesDeprecatedRequest, options?: AxiosRequestConfig): AxiosPromise<GetLinkedAddressesResDeprecated> {
             return localVarFp.getLinkedAddressesDeprecated(requestParameters.userId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get transaction metadata for a given encoded transaction
+         * @summary Get transaction metadata
+         * @param {PassportApiGetTransactionMetadataRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getTransactionMetadata(requestParameters: PassportApiGetTransactionMetadataRequest, options?: AxiosRequestConfig): AxiosPromise<GetTransactionMetadataRes> {
+            return localVarFp.getTransactionMetadata(requestParameters.chainName, requestParameters.getTransactionMetadataRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get transaction metadata for a given encoded transaction
+         * @summary Get transaction metadata
+         * @param {PassportApiGetTransactionMetadataDeprecatedRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @deprecated
+         * @throws {RequiredError}
+         */
+        getTransactionMetadataDeprecated(requestParameters: PassportApiGetTransactionMetadataDeprecatedRequest, options?: AxiosRequestConfig): AxiosPromise<GetTransactionMetadataRes> {
+            return localVarFp.getTransactionMetadataDeprecated(requestParameters.chainName, requestParameters.contractAddress, requestParameters.methodId, requestParameters.transactionId, requestParameters.transactionData, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -360,6 +601,27 @@ export interface PassportApiCreateCounterfactualAddressDeprecatedRequest {
 }
 
 /**
+ * Request parameters for createCounterfactualAddressV2 operation in PassportApi.
+ * @export
+ * @interface PassportApiCreateCounterfactualAddressV2Request
+ */
+export interface PassportApiCreateCounterfactualAddressV2Request {
+    /**
+     * 
+     * @type {string}
+     * @memberof PassportApiCreateCounterfactualAddressV2
+     */
+    readonly chainName: string
+
+    /**
+     * 
+     * @type {CreateCounterfactualAddressRequest}
+     * @memberof PassportApiCreateCounterfactualAddressV2
+     */
+    readonly createCounterfactualAddressRequest: CreateCounterfactualAddressRequest
+}
+
+/**
  * Request parameters for getLinkedAddresses operation in PassportApi.
  * @export
  * @interface PassportApiGetLinkedAddressesRequest
@@ -395,6 +657,69 @@ export interface PassportApiGetLinkedAddressesDeprecatedRequest {
 }
 
 /**
+ * Request parameters for getTransactionMetadata operation in PassportApi.
+ * @export
+ * @interface PassportApiGetTransactionMetadataRequest
+ */
+export interface PassportApiGetTransactionMetadataRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof PassportApiGetTransactionMetadata
+     */
+    readonly chainName: string
+
+    /**
+     * 
+     * @type {GetTransactionMetadataRequest}
+     * @memberof PassportApiGetTransactionMetadata
+     */
+    readonly getTransactionMetadataRequest: GetTransactionMetadataRequest
+}
+
+/**
+ * Request parameters for getTransactionMetadataDeprecated operation in PassportApi.
+ * @export
+ * @interface PassportApiGetTransactionMetadataDeprecatedRequest
+ */
+export interface PassportApiGetTransactionMetadataDeprecatedRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof PassportApiGetTransactionMetadataDeprecated
+     */
+    readonly chainName: string
+
+    /**
+     * The address of the contract intended for interaction with this transaction
+     * @type {string}
+     * @memberof PassportApiGetTransactionMetadataDeprecated
+     */
+    readonly contractAddress: string
+
+    /**
+     * The method ID of the contract intended for interaction with this transaction
+     * @type {string}
+     * @memberof PassportApiGetTransactionMetadataDeprecated
+     */
+    readonly methodId: string
+
+    /**
+     * ID of the given transaction to be decoded
+     * @type {string}
+     * @memberof PassportApiGetTransactionMetadataDeprecated
+     */
+    readonly transactionId: string
+
+    /**
+     * Encoded transaction data
+     * @type {string}
+     * @memberof PassportApiGetTransactionMetadataDeprecated
+     */
+    readonly transactionData: string
+}
+
+/**
  * PassportApi - object-oriented interface
  * @export
  * @class PassportApi
@@ -406,6 +731,7 @@ export class PassportApi extends BaseAPI {
      * @summary Create a counterfactual address
      * @param {PassportApiCreateCounterfactualAddressRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
+     * @deprecated
      * @throws {RequiredError}
      * @memberof PassportApi
      */
@@ -415,14 +741,27 @@ export class PassportApi extends BaseAPI {
 
     /**
      * Create a counterfactual address for a user based on their Ethereum address
-     * @summary Create a counterfactual address
+     * @summary Deprecated Create a counterfactual address
      * @param {PassportApiCreateCounterfactualAddressDeprecatedRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
+     * @deprecated
      * @throws {RequiredError}
      * @memberof PassportApi
      */
     public createCounterfactualAddressDeprecated(requestParameters: PassportApiCreateCounterfactualAddressDeprecatedRequest, options?: AxiosRequestConfig) {
         return PassportApiFp(this.configuration).createCounterfactualAddressDeprecated(requestParameters.createCounterfactualAddressRequestDeprecated, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Create a counterfactual address for a user based on their Ethereum address
+     * @summary Create a counterfactual address v2
+     * @param {PassportApiCreateCounterfactualAddressV2Request} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PassportApi
+     */
+    public createCounterfactualAddressV2(requestParameters: PassportApiCreateCounterfactualAddressV2Request, options?: AxiosRequestConfig) {
+        return PassportApiFp(this.configuration).createCounterfactualAddressV2(requestParameters.chainName, requestParameters.createCounterfactualAddressRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -439,14 +778,40 @@ export class PassportApi extends BaseAPI {
 
     /**
      * Get all the Ethereum linked addresses for a user based on its userId
-     * @summary Get Ethereum linked addresses for a user
+     * @summary Deprecated Get Ethereum linked addresses for a user
      * @param {PassportApiGetLinkedAddressesDeprecatedRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
+     * @deprecated
      * @throws {RequiredError}
      * @memberof PassportApi
      */
     public getLinkedAddressesDeprecated(requestParameters: PassportApiGetLinkedAddressesDeprecatedRequest, options?: AxiosRequestConfig) {
         return PassportApiFp(this.configuration).getLinkedAddressesDeprecated(requestParameters.userId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get transaction metadata for a given encoded transaction
+     * @summary Get transaction metadata
+     * @param {PassportApiGetTransactionMetadataRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PassportApi
+     */
+    public getTransactionMetadata(requestParameters: PassportApiGetTransactionMetadataRequest, options?: AxiosRequestConfig) {
+        return PassportApiFp(this.configuration).getTransactionMetadata(requestParameters.chainName, requestParameters.getTransactionMetadataRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get transaction metadata for a given encoded transaction
+     * @summary Get transaction metadata
+     * @param {PassportApiGetTransactionMetadataDeprecatedRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @deprecated
+     * @throws {RequiredError}
+     * @memberof PassportApi
+     */
+    public getTransactionMetadataDeprecated(requestParameters: PassportApiGetTransactionMetadataDeprecatedRequest, options?: AxiosRequestConfig) {
+        return PassportApiFp(this.configuration).getTransactionMetadataDeprecated(requestParameters.chainName, requestParameters.contractAddress, requestParameters.methodId, requestParameters.transactionId, requestParameters.transactionData, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

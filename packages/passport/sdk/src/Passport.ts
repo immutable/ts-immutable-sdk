@@ -1,23 +1,93 @@
-import { IMXProvider } from '@imtbl/provider';
-import { MultiRollupApiClients } from '@imtbl/generated-clients';
-import { ImmutableXClient } from '@imtbl/immutablex-client';
+import { IMXProvider } from '@imtbl/x-provider';
+import {
+  createConfig,
+  ImxApiClients,
+  imxApiConfig,
+  MultiRollupApiClients,
+} from '@imtbl/generated-clients';
+import { IMXClient } from '@imtbl/x-client';
 import { ChainName } from 'network/chains';
+import { Environment } from '@imtbl/config';
+
+import { setPassportClientId, identify, track } from '@imtbl/metrics';
+
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
 import { PassportImxProviderFactory } from './starkEx';
 import { PassportConfiguration } from './config';
 import {
   DeviceConnectResponse,
-  Networks,
   PassportEventMap,
   PassportEvents,
   PassportModuleConfiguration,
+  User,
   UserProfile,
 } from './types';
 import { ConfirmationScreen } from './confirmation';
 import { ZkEvmProvider } from './zkEvm';
 import { Provider } from './zkEvm/types';
 import TypedEventEmitter from './utils/typedEventEmitter';
+import GuardianClient from './guardian';
+import logger from './utils/logger';
+
+const buildImxClientConfig = (passportModuleConfiguration: PassportModuleConfiguration) => {
+  if (passportModuleConfiguration.overrides) {
+    return createConfig({ basePath: passportModuleConfiguration.overrides.imxPublicApiDomain });
+  }
+  if (passportModuleConfiguration.baseConfig.environment === Environment.SANDBOX) {
+    return imxApiConfig.getSandbox();
+  }
+  return imxApiConfig.getProduction();
+};
+
+const buildImxApiClients = (passportModuleConfiguration: PassportModuleConfiguration) => {
+  if (passportModuleConfiguration.overrides?.imxApiClients) return passportModuleConfiguration.overrides.imxApiClients;
+
+  const config = buildImxClientConfig(passportModuleConfiguration);
+  return new ImxApiClients(config);
+};
+
+export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConfiguration) => {
+  const config = new PassportConfiguration(passportModuleConfiguration);
+  const authManager = new AuthManager(config);
+  const magicAdapter = new MagicAdapter(config);
+  const confirmationScreen = new ConfirmationScreen(config);
+  const multiRollupApiClients = new MultiRollupApiClients(config.multiRollupConfig);
+  const passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
+
+  const immutableXClient = passportModuleConfiguration.overrides
+    ? passportModuleConfiguration.overrides.immutableXClient
+    : new IMXClient({ baseConfig: passportModuleConfiguration.baseConfig });
+
+  const guardianClient = new GuardianClient({
+    confirmationScreen,
+    config,
+    authManager,
+  });
+
+  const imxApiClients = buildImxApiClients(passportModuleConfiguration);
+
+  const passportImxProviderFactory = new PassportImxProviderFactory({
+    authManager,
+    immutableXClient,
+    magicAdapter,
+    passportEventEmitter,
+    imxApiClients,
+    guardianClient,
+  });
+
+  return {
+    config,
+    authManager,
+    magicAdapter,
+    confirmationScreen,
+    immutableXClient,
+    multiRollupApiClients,
+    passportEventEmitter,
+    passportImxProviderFactory,
+    guardianClient,
+  };
+};
 
 export class Passport {
   private readonly authManager: AuthManager;
@@ -26,7 +96,7 @@ export class Passport {
 
   private readonly confirmationScreen: ConfirmationScreen;
 
-  private readonly immutableXClient: ImmutableXClient;
+  private readonly immutableXClient: IMXClient;
 
   private readonly magicAdapter: MagicAdapter;
 
@@ -36,25 +106,23 @@ export class Passport {
 
   private readonly passportEventEmitter: TypedEventEmitter<PassportEventMap>;
 
+  private readonly guardianClient: GuardianClient;
+
   constructor(passportModuleConfiguration: PassportModuleConfiguration) {
-    this.config = new PassportConfiguration(passportModuleConfiguration);
-    this.authManager = new AuthManager(this.config);
-    this.magicAdapter = new MagicAdapter(this.config);
-    this.confirmationScreen = new ConfirmationScreen(this.config);
-    this.immutableXClient = passportModuleConfiguration.overrides?.immutableXClient
-      || new ImmutableXClient({
-        baseConfig: passportModuleConfiguration.baseConfig,
-      });
-    this.multiRollupApiClients = new MultiRollupApiClients(this.config.multiRollupConfig);
-    this.passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
-    this.passportImxProviderFactory = new PassportImxProviderFactory({
-      authManager: this.authManager,
-      config: this.config,
-      confirmationScreen: this.confirmationScreen,
-      immutableXClient: this.immutableXClient,
-      magicAdapter: this.magicAdapter,
-      passportEventEmitter: this.passportEventEmitter,
-    });
+    const privateVars = buildPrivateVars(passportModuleConfiguration);
+
+    this.config = privateVars.config;
+    this.authManager = privateVars.authManager;
+    this.magicAdapter = privateVars.magicAdapter;
+    this.confirmationScreen = privateVars.confirmationScreen;
+    this.immutableXClient = privateVars.immutableXClient;
+    this.multiRollupApiClients = privateVars.multiRollupApiClients;
+    this.passportEventEmitter = privateVars.passportEventEmitter;
+    this.passportImxProviderFactory = privateVars.passportImxProviderFactory;
+    this.guardianClient = privateVars.guardianClient;
+
+    setPassportClientId(passportModuleConfiguration.clientId);
+    track('passport', 'initialised');
   }
 
   /**
@@ -69,26 +137,14 @@ export class Passport {
     return this.passportImxProviderFactory.getProvider();
   }
 
-  public getPKCEAuthorizationUrl(): string {
-    return this.authManager.getPKCEAuthorizationUrl();
-  }
-
-  public async connectImxPKCEFlow(authorizationCode: string, state: string): Promise<IMXProvider | null> {
-    return this.passportImxProviderFactory.getProviderWithPKCEFlow(authorizationCode, state);
-  }
-
   public connectEvm(): Provider {
-    if (this.config.network === Networks.PRODUCTION) {
-      throw new Error('EVM is not supported on production network');
-    }
-
     return new ZkEvmProvider({
       passportEventEmitter: this.passportEventEmitter,
       authManager: this.authManager,
       magicAdapter: this.magicAdapter,
       config: this.config,
-      confirmationScreen: this.confirmationScreen,
       multiRollupApiClients: this.multiRollupApiClients,
+      guardianClient: this.guardianClient,
     });
   }
 
@@ -98,24 +154,31 @@ export class Passport {
    *
    * @param options.useCachedSession = false - If true, and no active session exists, then the user will not be
    * prompted to log in and the Promise will resolve with a null value.
+   * @param options.anonymousId - If provided, Passport internal metrics will be enriched with this value.
    * @returns {Promise<UserProfile | null>} the user profile if the user is logged in, otherwise null
    */
   public async login(options?: {
-    useCachedSession: boolean
+    useCachedSession: boolean;
+    anonymousId?: string;
   }): Promise<UserProfile | null> {
     const { useCachedSession = false } = options || {};
-    let user = null;
+    let user: User | null = null;
     try {
       user = await this.authManager.getUser();
     } catch (error) {
       if (useCachedSession) {
         throw error;
       }
-      // eslint-disable-next-line no-console
-      console.warn('login failed to retrieve a cached user session', error);
+      logger.warn('Failed to retrieve a cached user session', error);
     }
     if (!user && !useCachedSession) {
-      user = await this.authManager.login();
+      user = await this.authManager.login(options?.anonymousId);
+    }
+
+    if (user) {
+      identify({
+        passportId: user.profile.sub,
+      });
     }
 
     return user ? user.profile : null;
@@ -125,8 +188,10 @@ export class Passport {
     return this.authManager.loginCallback();
   }
 
-  public async loginWithDeviceFlow(): Promise<DeviceConnectResponse> {
-    return this.authManager.loginWithDeviceFlow();
+  public async loginWithDeviceFlow(options?: {
+    anonymousId?: string;
+  }): Promise<DeviceConnectResponse> {
+    return this.authManager.loginWithDeviceFlow(options?.anonymousId);
   }
 
   public async loginWithDeviceFlowCallback(
@@ -134,15 +199,39 @@ export class Passport {
     interval: number,
     timeoutMs?: number,
   ): Promise<UserProfile> {
-    const user = await this.authManager.loginWithDeviceFlowCallback(deviceCode, interval, timeoutMs);
+    const user = await this.authManager.loginWithDeviceFlowCallback(
+      deviceCode,
+      interval,
+      timeoutMs,
+    );
+    return user.profile;
+  }
+
+  public loginWithPKCEFlow(): string {
+    return this.authManager.getPKCEAuthorizationUrl();
+  }
+
+  public async loginWithPKCEFlowCallback(
+    authorizationCode: string,
+    state: string,
+  ): Promise<UserProfile> {
+    const user = await this.authManager.loginWithPKCEFlowCallback(
+      authorizationCode,
+      state,
+    );
     return user.profile;
   }
 
   public async logout(): Promise<void> {
-    await this.confirmationScreen.logout();
-    await this.authManager.logout();
-    // Code after this point is only executed if the logout mode is silent
-    await this.magicAdapter.logout();
+    try {
+      await this.confirmationScreen.logout();
+    } catch (err) {
+      logger.warn('Failed to logout from confirmation screen', err);
+    }
+    await Promise.allSettled([
+      this.authManager.logout(),
+      this.magicAdapter.logout(),
+    ]);
     this.passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
   }
 
@@ -189,10 +278,13 @@ export class Passport {
       return [];
     }
     const headers = { Authorization: `Bearer ${user.accessToken}` };
-    const linkedAddressesResult = await this.multiRollupApiClients.passportApi.getLinkedAddresses({
-      chainName: ChainName.ETHEREUM,
-      userId: user?.profile.sub,
-    }, { headers });
+    const linkedAddressesResult = await this.multiRollupApiClients.passportApi.getLinkedAddresses(
+      {
+        chainName: ChainName.ETHEREUM,
+        userId: user?.profile.sub,
+      },
+      { headers },
+    );
     return linkedAddressesResult.data.linked_addresses;
   }
 }

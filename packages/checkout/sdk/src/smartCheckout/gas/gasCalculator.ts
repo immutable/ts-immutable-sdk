@@ -17,6 +17,7 @@ export const estimateGas = async (
     throw new CheckoutError(
       'Failed to estimate gas for transaction',
       CheckoutErrorType.UNPREDICTABLE_GAS_LIMIT,
+      { error: err },
     );
   }
 };
@@ -36,7 +37,7 @@ export const getGasItemRequirement = (
   return {
     type: ItemType.ERC20,
     amount: gas,
-    contractAddress: transactionOrGas.gasToken.contractAddress,
+    tokenAddress: transactionOrGas.gasToken.tokenAddress,
     spenderAddress: '',
   };
 };

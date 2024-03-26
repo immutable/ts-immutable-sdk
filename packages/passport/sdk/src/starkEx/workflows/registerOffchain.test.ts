@@ -1,15 +1,16 @@
-import { ImmutableXClient } from '@imtbl/immutablex-client';
 import { Web3Provider } from '@ethersproject/providers';
 import { Signer } from 'ethers';
 import AuthManager from 'authManager';
 import { mockUserImx } from 'test/mocks';
 import { AxiosError } from 'axios';
+import { ImxApiClients } from '@imtbl/generated-clients';
 import registerPassportStarkEx from './registration';
 import { PassportError, PassportErrorType } from '../../errors/passportError';
 import registerOffchain from './registerOffchain';
 
 jest.mock('@ethersproject/providers');
 jest.mock('./registration');
+jest.mock('@imtbl/generated-clients');
 
 const mockGetSigner = jest.fn();
 
@@ -20,10 +21,6 @@ const mockAuthManager = {
   login: mockLogin,
   forceUserRefresh: mockForceUserRefresh,
 } as unknown as AuthManager;
-
-const mockImmutableXClient = {
-  usersApi: {},
-} as ImmutableXClient;
 
 const mockEthSigner = { getAddress: jest.fn() } as unknown as Signer;
 
@@ -41,19 +38,21 @@ mockGetSigner.mockReturnValue(mockEthSigner);
 describe('registerOffchain', () => {
   describe('when we exceed the number of attempts to obtain a user with the correct metadata', () => {
     it('should throw an error', async () => {
+      const imxApiClients = new ImxApiClients({} as any);
+
       await (expect(() => registerOffchain(
         mockEthSigner,
         mockStarkSigner,
         mockUserImx,
         mockAuthManager,
-        mockImmutableXClient.usersApi,
+        imxApiClients,
       )).rejects.toThrow(new PassportError(
         'Retry failed',
         PassportErrorType.REFRESH_TOKEN_ERROR,
       )));
 
       expect(registerPassportStarkEx).toHaveBeenCalledWith(
-        { ethSigner: mockEthSigner, starkSigner: mockStarkSigner, usersApi: mockImmutableXClient.usersApi },
+        { ethSigner: mockEthSigner, starkSigner: mockStarkSigner, imxApiClients },
         mockUserImx.accessToken,
       );
 
@@ -63,6 +62,7 @@ describe('registerOffchain', () => {
 
   describe('when registration is successful', () => {
     it('should register the user and return the transaction hash as a string', async () => {
+      const imxApiClients = new ImxApiClients({} as any);
       mockForceUserRefresh.mockResolvedValue(mockUserImx);
 
       const txHash = await registerOffchain(
@@ -70,23 +70,27 @@ describe('registerOffchain', () => {
         mockStarkSigner,
         mockUserImx,
         mockAuthManager,
-        mockImmutableXClient.usersApi,
+        imxApiClients,
       );
 
       expect(txHash).toEqual(mockReturnHash);
       expect(registerPassportStarkEx).toHaveBeenCalledWith({
         ethSigner: mockEthSigner,
         starkSigner: mockStarkSigner,
-        usersApi: mockImmutableXClient.usersApi,
+        imxApiClients,
       }, mockUserImx.accessToken);
       expect(mockAuthManager.forceUserRefresh).toHaveBeenCalledTimes(1);
     });
 
     describe('when registration fails due to a 409 conflict', () => {
       it('should refresh the user to get the updated token', async () => {
+        const imxApiClients = new ImxApiClients({} as any);
         // create axios error with status 409
         const err = new AxiosError('User already registered');
-        err.status = 409;
+        err.response = {
+          ...err.response,
+          status: 409,
+        } as typeof err.response;
 
         (registerPassportStarkEx as jest.Mock).mockRejectedValue(err);
         mockForceUserRefresh.mockResolvedValue(mockUserImx);
@@ -96,7 +100,7 @@ describe('registerOffchain', () => {
           mockStarkSigner,
           mockUserImx,
           mockAuthManager,
-          mockImmutableXClient.usersApi,
+          imxApiClients,
         );
 
         expect(mockAuthManager.forceUserRefresh).toHaveBeenCalledTimes(1);

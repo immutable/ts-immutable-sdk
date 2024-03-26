@@ -3,15 +3,18 @@
  */
 export enum BridgeEventType {
   CLOSE_WIDGET = 'close-widget',
-  SUCCESS = 'success',
   FAILURE = 'failure',
+  TRANSACTION_SENT = 'transaction-sent',
+  LANGUAGE_CHANGED = 'language-changed',
+  CLAIM_WITHDRAWAL_SUCCESS = 'claim-withdrawal-success',
+  CLAIM_WITHDRAWAL_FAILURE = 'claim-withdrawal-failure',
 }
 
 /**
  * Represents a successful bridge transaction.
  * @property {string} transactionHash
  */
-export type BridgeSuccess = {
+export type BridgeTransactionSent = {
   /** The hash of the successful transaction. */
   transactionHash: string;
 };
@@ -22,6 +25,30 @@ export type BridgeSuccess = {
  * @property {number} timestamp
  */
 export type BridgeFailed = {
+  /** The reason for the failed transaction. */
+  reason: string;
+  /** The timestamp of the failed transaction. */
+  timestamp: number;
+};
+
+/**
+ * Represents a successful bridge claim withdrawal.
+ * @property {string} transactionHash
+ */
+export type BridgeClaimWithdrawalSuccess = {
+  /** The hash of the successful transaction. */
+  transactionHash: string;
+};
+
+/**
+ * Represents a failed bridge claim withdrawal.
+ * @property {string} transactionHash
+ * @property {string} reason
+ * @property {number} timestamp
+ */
+export type BridgeClaimWithdrawalFailed = {
+  /** The hash of the failed transaction. */
+  transactionHash: string;
   /** The reason for the failed transaction. */
   reason: string;
   /** The timestamp of the failed transaction. */

@@ -5,7 +5,8 @@ import { TypedDataDomain } from 'ethers';
 import { signApprovalTransactions, signFulfillmentTransactions, signMessage } from './signActions';
 import { CheckoutErrorType } from '../../errors';
 import { SignTransactionStatusType, UnsignedMessage } from './types';
-import { GAS_OVERRIDES } from '../../env';
+import { IMMUTABLE_ZKVEM_GAS_OVERRIDES } from '../../env';
+import { ChainId, NetworkInfo } from '../../types';
 
 describe('signActions', () => {
   let mockProvider: Web3Provider;
@@ -13,6 +14,9 @@ describe('signActions', () => {
   describe('signApprovalTransactions', () => {
     it('should sign approval transactions', async () => {
       mockProvider = {
+        getNetwork: jest.fn().mockReturnValue({
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        } as NetworkInfo),
         getSigner: jest.fn().mockReturnValue({
           sendTransaction: jest.fn().mockResolvedValue({
             wait: jest.fn().mockResolvedValue({
@@ -41,19 +45,22 @@ describe('signActions', () => {
       expect(mockProvider.getSigner().sendTransaction).toHaveBeenCalledWith({
         data: '0xAPPROVAL1',
         to: '0x123',
-        maxFeePerGas: GAS_OVERRIDES.maxFeePerGas,
-        maxPriorityFeePerGas: GAS_OVERRIDES.maxPriorityFeePerGas,
+        maxFeePerGas: IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxFeePerGas,
+        maxPriorityFeePerGas: IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxPriorityFeePerGas,
       });
       expect(mockProvider.getSigner().sendTransaction).toHaveBeenCalledWith({
         data: '0xAPPROVAL2',
         to: '0x123',
-        maxFeePerGas: GAS_OVERRIDES.maxFeePerGas,
-        maxPriorityFeePerGas: GAS_OVERRIDES.maxPriorityFeePerGas,
+        maxFeePerGas: IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxFeePerGas,
+        maxPriorityFeePerGas: IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxPriorityFeePerGas,
       });
     });
 
     it('should return failed when approval transaction reverted', async () => {
       mockProvider = {
+        getNetwork: jest.fn().mockReturnValue({
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        } as NetworkInfo),
         getSigner: jest.fn().mockReturnValue({
           sendTransaction: jest.fn().mockResolvedValue({
             wait: jest.fn().mockResolvedValue({
@@ -107,15 +114,16 @@ describe('signActions', () => {
 
       expect(message).toEqual('An error occurred while executing the approval transaction');
       expect(type).toEqual(CheckoutErrorType.EXECUTE_APPROVAL_TRANSACTION_ERROR);
-      expect(data).toEqual({
-        message: 'approval error',
-      });
+      expect(data.error).toBeDefined();
     });
   });
 
   describe('signFulfillmentTransactions', () => {
     it('should sign fulfillment transactions', async () => {
       mockProvider = {
+        getNetwork: jest.fn().mockReturnValue({
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        } as NetworkInfo),
         getSigner: jest.fn().mockReturnValue({
           sendTransaction: jest.fn().mockResolvedValue({
             wait: jest.fn().mockResolvedValue({
@@ -141,19 +149,22 @@ describe('signActions', () => {
       expect(mockProvider.getSigner().sendTransaction).toHaveBeenCalledWith({
         data: '0xFULFILLMENT1',
         to: '0x123',
-        maxFeePerGas: GAS_OVERRIDES.maxFeePerGas,
-        maxPriorityFeePerGas: GAS_OVERRIDES.maxPriorityFeePerGas,
+        maxFeePerGas: IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxFeePerGas,
+        maxPriorityFeePerGas: IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxPriorityFeePerGas,
       });
       expect(mockProvider.getSigner().sendTransaction).toHaveBeenCalledWith({
         data: '0xFULFILLMENT2',
         to: '0x123',
-        maxFeePerGas: GAS_OVERRIDES.maxFeePerGas,
-        maxPriorityFeePerGas: GAS_OVERRIDES.maxPriorityFeePerGas,
+        maxFeePerGas: IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxFeePerGas,
+        maxPriorityFeePerGas: IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxPriorityFeePerGas,
       });
     });
 
     it('should return failed when approval transaction reverted', async () => {
       mockProvider = {
+        getNetwork: jest.fn().mockReturnValue({
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        } as NetworkInfo),
         getSigner: jest.fn().mockReturnValue({
           sendTransaction: jest.fn().mockResolvedValue({
             wait: jest.fn().mockResolvedValue({
@@ -207,9 +218,7 @@ describe('signActions', () => {
 
       expect(message).toEqual('An error occurred while executing the fulfillment transaction');
       expect(type).toEqual(CheckoutErrorType.EXECUTE_FULFILLMENT_TRANSACTION_ERROR);
-      expect(data).toEqual({
-        message: 'fulfillment error',
-      });
+      expect(data.error).toBeDefined();
     });
   });
 
@@ -281,9 +290,7 @@ describe('signActions', () => {
 
       expect(message).toEqual('An error occurred while signing the message');
       expect(type).toEqual(CheckoutErrorType.SIGN_MESSAGE_ERROR);
-      expect(data).toEqual({
-        message: 'sign message error',
-      });
+      expect(data.error).toBeDefined();
     });
   });
 });

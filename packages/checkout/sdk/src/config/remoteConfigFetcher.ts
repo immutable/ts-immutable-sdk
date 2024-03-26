@@ -1,13 +1,14 @@
-import axios, { AxiosResponse } from 'axios';
 import { Environment } from '@imtbl/config';
+import { AxiosResponse } from 'axios';
 import {
   ChainId,
   ChainsTokensConfig,
   RemoteConfiguration,
   ChainTokensConfig,
 } from '../types';
+import { CHECKOUT_CDN_BASE_URL, ENV_DEVELOPMENT } from '../env';
+import { HttpClient } from '../api/http';
 import { CheckoutError, CheckoutErrorType } from '../errors';
-import { CHECKOUT_API_BASE_URL, ENV_DEVELOPMENT } from '../env';
 
 export type RemoteConfigParams = {
   isDevelopment: boolean;
@@ -15,6 +16,8 @@ export type RemoteConfigParams = {
 };
 
 export class RemoteConfigFetcher {
+  private httpClient: HttpClient;
+
   private isDevelopment: boolean;
 
   private isProduction: boolean;
@@ -25,43 +28,54 @@ export class RemoteConfigFetcher {
 
   private version: string = 'v1';
 
-  constructor(params: RemoteConfigParams) {
+  constructor(httpClient: HttpClient, params: RemoteConfigParams) {
     this.isDevelopment = params.isDevelopment;
     this.isProduction = params.isProduction;
-  }
-
-  private static async makeHttpRequest(url: string): Promise<AxiosResponse> {
-    let response;
-
-    try {
-      response = await axios.get(url);
-    } catch (error: any) {
-      throw new CheckoutError(`Error fetching from api: ${error.message}`, CheckoutErrorType.API_ERROR);
-    }
-
-    if (response.status !== 200) {
-      throw new CheckoutError(
-        `Error fetching from api: ${response.status} ${response.statusText}`,
-        CheckoutErrorType.API_ERROR,
-      );
-    }
-
-    return response;
+    this.httpClient = httpClient;
   }
 
   private getEndpoint = () => {
-    if (this.isDevelopment) return CHECKOUT_API_BASE_URL[ENV_DEVELOPMENT];
-    if (this.isProduction) return CHECKOUT_API_BASE_URL[Environment.PRODUCTION];
-    return CHECKOUT_API_BASE_URL[Environment.SANDBOX];
+    if (this.isDevelopment) return CHECKOUT_CDN_BASE_URL[ENV_DEVELOPMENT];
+    if (this.isProduction) return CHECKOUT_CDN_BASE_URL[Environment.PRODUCTION];
+    return CHECKOUT_CDN_BASE_URL[Environment.SANDBOX];
   };
+
+  // eslint-disable-next-line class-methods-use-this
+  private parseResponse<T>(response: AxiosResponse<any, any>): T {
+    let responseData: T = response.data;
+    if (response.data && typeof response.data !== 'object') {
+      try {
+        responseData = JSON.parse(response.data);
+      } catch (err: any) {
+        throw new CheckoutError(
+          'Invalid configuration',
+          CheckoutErrorType.API_ERROR,
+          { error: err },
+        );
+      }
+    }
+
+    return responseData!;
+  }
 
   private async loadConfig(): Promise<RemoteConfiguration | undefined> {
     if (this.configCache) return this.configCache;
 
-    const response = await RemoteConfigFetcher.makeHttpRequest(
-      `${this.getEndpoint()}/${this.version}/config`,
-    );
-    this.configCache = response.data;
+    let response: AxiosResponse;
+    try {
+      response = await this.httpClient.get(
+        `${this.getEndpoint()}/${this.version}/config`,
+      );
+    } catch (err: any) {
+      throw new CheckoutError(
+        `Error: ${err.message}`,
+        CheckoutErrorType.API_ERROR,
+        { error: err },
+      );
+    }
+
+    // Ensure that the configuration is valid
+    this.configCache = this.parseResponse<RemoteConfiguration>(response);
 
     return this.configCache;
   }
@@ -69,10 +83,21 @@ export class RemoteConfigFetcher {
   private async loadConfigTokens(): Promise<ChainsTokensConfig | undefined> {
     if (this.tokensCache) return this.tokensCache;
 
-    const response = await RemoteConfigFetcher.makeHttpRequest(
-      `${this.getEndpoint()}/${this.version}/config/tokens`,
-    );
-    this.tokensCache = response.data;
+    let response: AxiosResponse;
+    try {
+      response = await this.httpClient.get(
+        `${this.getEndpoint()}/${this.version}/config/tokens`,
+      );
+    } catch (err: any) {
+      throw new CheckoutError(
+        `Error: ${err.message}`,
+        CheckoutErrorType.API_ERROR,
+        { error: err },
+      );
+    }
+
+    // Ensure that the configuration is valid
+    this.tokensCache = this.parseResponse<ChainsTokensConfig>(response);
 
     return this.tokensCache;
   }
@@ -95,4 +120,6 @@ export class RemoteConfigFetcher {
     if (!config || !config[chainId]) return {};
     return config[chainId] ?? [];
   }
+
+  public getHttpClient = () => this.httpClient;
 }

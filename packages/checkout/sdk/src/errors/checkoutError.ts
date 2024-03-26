@@ -2,12 +2,14 @@
  * Enum representing different types of errors that can occur during the checkout process.
  */
 export enum CheckoutErrorType {
+  MISSING_PARAMS = 'MISSING_PARAMS',
   WEB3_PROVIDER_ERROR = 'WEB3_PROVIDER_ERROR',
   PROVIDER_ERROR = 'PROVIDER_ERROR',
   DEFAULT_PROVIDER_ERROR = 'DEFAULT_PROVIDER_ERROR',
   CONNECT_PROVIDER_ERROR = 'CONNECT_PROVIDER_ERROR',
   GET_BALANCE_ERROR = 'GET_BALANCE_ERROR',
   GET_INDEXER_BALANCE_ERROR = 'GET_INDEXER_BALANCE_ERROR',
+  GET_ERC20_INFO_ERROR = 'GET_ERC20_INFO_ERROR',
   GET_ERC20_BALANCE_ERROR = 'GET_ERC20_BALANCE_ERROR',
   GET_ERC721_BALANCE_ERROR = 'GET_ERC721_BALANCE_ERROR',
   GET_NETWORK_INFO_ERROR = 'GET_NETWORK_INFO_ERROR',
@@ -63,12 +65,14 @@ export class CheckoutError extends Error {
 
   public type: CheckoutErrorType;
 
-  public data?: { [key: string]: string };
+  public data?: { [key: string]: any };
 
   constructor(
     message: string,
     type: CheckoutErrorType,
-    data?: { [key: string]: string },
+    data?: {
+      [key: string]: any
+    },
   ) {
     super(message);
     this.message = message;

@@ -5,10 +5,10 @@ import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { Environment } from '@imtbl/config';
 import { Web3Provider } from '@ethersproject/providers';
+import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { ConnectLoader, ConnectLoaderParams } from './ConnectLoader';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
 
 describe('ConnectLoader', () => {
   const config: StrongCheckoutWidgetsConfig = {
@@ -36,7 +36,7 @@ describe('ConnectLoader', () => {
       checkout,
     } as ConnectLoaderParams;
     mount(
-      <CustomAnalyticsProvider widgetConfig={config}>
+      <ViewContextTestComponent theme={config.theme}>
         <ConnectLoader
           widgetConfig={config}
           params={params}
@@ -45,7 +45,7 @@ describe('ConnectLoader', () => {
           <div id="inner-widget">Inner Widget</div>
         </ConnectLoader>
         ,
-      </CustomAnalyticsProvider>,
+      </ViewContextTestComponent>,
     );
     cySmartGet('wallet-list-metamask').should('be.visible');
     cy.get('#inner-widget').should('not.exist');
@@ -73,7 +73,7 @@ describe('ConnectLoader', () => {
       });
 
     mount(
-      <CustomAnalyticsProvider widgetConfig={config}>
+      <ViewContextTestComponent theme={config.theme}>
         <ConnectLoader
           widgetConfig={config}
           params={params}
@@ -81,7 +81,7 @@ describe('ConnectLoader', () => {
         >
           <div id="inner-widget">Inner Widget</div>
         </ConnectLoader>
-      </CustomAnalyticsProvider>,
+      </ViewContextTestComponent>,
     );
 
     cySmartGet('footer-button').should('have.text', 'Ready to connect');
@@ -95,6 +95,7 @@ describe('ConnectLoader', () => {
       request: () => {},
     };
     const params = {
+      targetChainId: ChainId.IMTBL_ZKEVM_TESTNET,
       web3Provider: { provider } as any as Web3Provider,
       allowedChains: [ChainId.IMTBL_ZKEVM_TESTNET],
       checkout,
@@ -132,7 +133,7 @@ describe('ConnectLoader', () => {
       });
 
     mount(
-      <CustomAnalyticsProvider widgetConfig={config}>
+      <ViewContextTestComponent theme={config.theme}>
         <ConnectLoader
           widgetConfig={config}
           params={params}
@@ -140,7 +141,7 @@ describe('ConnectLoader', () => {
         >
           <div id="inner-widget">Inner Widget</div>
         </ConnectLoader>
-      </CustomAnalyticsProvider>,
+      </ViewContextTestComponent>,
     );
 
     cySmartGet('switch-network-view').should('be.visible');
@@ -151,14 +152,14 @@ describe('ConnectLoader', () => {
     const provider = {
       on: providerOnStub,
       removeListener: providerRemoveListenerStub,
-      request: () => {},
+      request: async () => Promise.resolve(ChainId.IMTBL_ZKEVM_TESTNET),
     };
     const params = {
+      targetChainId: ChainId.IMTBL_ZKEVM_TESTNET,
       web3Provider: {
         provider,
         getSigner: () => ({
           getAddress: async () => Promise.resolve(''),
-          getChainId: async () => Promise.resolve(ChainId.IMTBL_ZKEVM_TESTNET),
         }),
         isMetaMask: true,
       } as any as Web3Provider,
@@ -216,7 +217,7 @@ describe('ConnectLoader', () => {
       });
 
     mount(
-      <CustomAnalyticsProvider widgetConfig={config}>
+      <ViewContextTestComponent theme={config.theme}>
         <ConnectLoader
           widgetConfig={config}
           params={params}
@@ -224,8 +225,7 @@ describe('ConnectLoader', () => {
         >
           <div id="inner-widget">Inner Widget</div>
         </ConnectLoader>
-        ,
-      </CustomAnalyticsProvider>,
+      </ViewContextTestComponent>,
     );
 
     cySmartGet('footer-button').click();
@@ -239,6 +239,7 @@ describe('ConnectLoader', () => {
       request: () => {},
     };
     const params = {
+      targetChainId: ChainId.IMTBL_ZKEVM_TESTNET,
       web3Provider: {
         provider,
         getSigner: () => ({
@@ -289,7 +290,7 @@ describe('ConnectLoader', () => {
       });
 
     mount(
-      <CustomAnalyticsProvider widgetConfig={config}>
+      <ViewContextTestComponent theme={config.theme}>
         <ConnectLoader
           widgetConfig={config}
           params={params}
@@ -297,7 +298,7 @@ describe('ConnectLoader', () => {
         >
           <div id="inner-widget">Inner Widget</div>
         </ConnectLoader>
-      </CustomAnalyticsProvider>,
+      </ViewContextTestComponent>,
     );
 
     cy.get('#inner-widget').should('be.visible');
@@ -359,7 +360,7 @@ describe('ConnectLoader', () => {
   //       });
 
   //     mount(
-  //       <CustomAnalyticsProvider widgetConfig={config}>
+  //       <ViewContextTestComponent theme={config.theme}>
   //         <ConnectLoader
   //           widgetConfig={config}
   //           params={params}
@@ -367,7 +368,7 @@ describe('ConnectLoader', () => {
   //         >
   //           <div id="inner-widget">Inner Widget</div>
   //         </ConnectLoader>
-  //       </CustomAnalyticsProvider>,
+  //       </ViewContextTestComponent>,
   //     );
 
   //     cy.get('#inner-widget').should('be.visible');

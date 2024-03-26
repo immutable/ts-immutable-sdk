@@ -1,21 +1,35 @@
-import { useEffect } from 'react';
-import { useAnalytics, getSegmentWriteKey } from './SegmentAnalyticsProvider';
-import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { useCallback, useEffect } from 'react';
+import { Checkout } from '@imtbl/checkout-sdk';
+import { TelemetryConfig } from '@imtbl/checkout-sdk/dist/types';
+import { useAnalytics } from './SegmentAnalyticsProvider';
 
 type SetupAnalyticsProps = {
-  widgetConfig: StrongCheckoutWidgetsConfig
   children: React.ReactNode;
+  checkout: Checkout
 };
 
 export function SetupAnalytics(
-  { widgetConfig, children }: SetupAnalyticsProps,
+  { children, checkout }: SetupAnalyticsProps,
 ) {
   const { updateWriteKey } = useAnalytics();
 
+  const telemetry = useCallback(async () => {
+    try {
+      return await checkout?.config?.remote.getConfig('telemetry');
+    } catch (err: any) {
+      // eslint-disable-next-line no-console
+      console.error('unable to fetch telemetry config: ', err);
+    }
+    return undefined;
+  }, [checkout]);
+
   useEffect(() => {
-    const writeKey = getSegmentWriteKey(widgetConfig.environment);
-    updateWriteKey(writeKey);
-  }, [widgetConfig]);
+    (async () => {
+      const config = await telemetry() as TelemetryConfig;
+      if (!config) return;
+      updateWriteKey(config.segmentPublishableKey);
+    })();
+  }, [telemetry]);
 
   // eslint-disable-next-line react/jsx-no-useless-fragment
   return (<>{children}</>);

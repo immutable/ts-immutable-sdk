@@ -18,6 +18,7 @@ import {
   SellResult,
   CheckoutStatus,
   SmartCheckoutResult,
+  SmartCheckoutSufficient,
 } from '../../types';
 import * as instance from '../../instance';
 import { CheckoutConfiguration } from '../../config';
@@ -38,7 +39,7 @@ export const getERC721Requirement = (
   id: string,
   contractAddress: string,
   spenderAddress: string,
-):ERC721Item => ({
+): ERC721Item => ({
   type: ItemType.ERC721,
   id,
   contractAddress,
@@ -61,7 +62,7 @@ export const getBuyToken = (
   return {
     type: ItemType.ERC20,
     amount: bnAmount.toString(),
-    contractAddress: buyToken.contractAddress,
+    contractAddress: buyToken.tokenAddress,
   };
 };
 
@@ -81,13 +82,18 @@ export const sell = async (
     );
   }
 
-  const { buyToken, sellToken, makerFees } = orders[0];
+  const {
+    buyToken,
+    sellToken,
+    makerFees,
+    orderExpiry,
+  } = orders[0];
 
   let decimals = 18;
   if (buyToken.type === ItemType.ERC20) {
     // get this from the allowed list
     const buyTokenContract = new Contract(
-      buyToken.contractAddress,
+      buyToken.tokenAddress,
       JSON.stringify(ERC20ABI),
       provider,
     );
@@ -121,6 +127,7 @@ export const sell = async (
           contractAddress: sellToken.collectionAddress,
           tokenId: sellToken.id,
         },
+        orderExpiry,
       }),
     );
   } catch (err: any) {
@@ -128,7 +135,7 @@ export const sell = async (
       'An error occurred while preparing the listing',
       CheckoutErrorType.PREPARE_ORDER_LISTING_ERROR,
       {
-        message: err.message,
+        error: err,
         id: sellToken.id,
         collectionAddress: sellToken.collectionAddress,
       },
@@ -139,22 +146,28 @@ export const sell = async (
     getERC721Requirement(sellToken.id, sellToken.collectionAddress, spenderAddress),
   ];
 
-  const smartCheckoutResult = await measureAsyncExecution<SmartCheckoutResult>(
-    config,
-    'Total time running smart checkout',
-    smartCheckout(
+  let smartCheckoutResult;
+  const isPassport = (provider.provider as any)?.isPassport;
+  if (!isPassport) {
+    smartCheckoutResult = await measureAsyncExecution<SmartCheckoutResult>(
       config,
-      provider,
-      itemRequirements,
-      {
-        type: TransactionOrGasType.GAS,
-        gasToken: {
-          type: GasTokenType.NATIVE,
-          limit: BigNumber.from(constants.estimatedFulfillmentGasGwei),
+      'Total time running smart checkout',
+      smartCheckout(
+        config,
+        provider,
+        itemRequirements,
+        {
+          type: TransactionOrGasType.GAS,
+          gasToken: {
+            type: GasTokenType.NATIVE,
+            limit: BigNumber.from(constants.estimatedFulfillmentGasGwei),
+          },
         },
-      },
-    ),
-  );
+      ),
+    );
+  } else {
+    smartCheckoutResult = { sufficient: true, transactionRequirements: [] } as SmartCheckoutSufficient;
+  }
 
   if (smartCheckoutResult.sufficient) {
     const unsignedTransactions = await getUnsignedERC721Transactions(listing.actions);
@@ -192,7 +205,7 @@ export const sell = async (
 
     let orderId = '';
 
-    const createListingParams:CreateListingParams = {
+    const createListingParams: CreateListingParams = {
       orderComponents: signedMessage.orderComponents,
       orderHash: signedMessage.orderHash,
       orderSignature: signedMessage.signedMessage,
@@ -218,7 +231,7 @@ export const sell = async (
         'An error occurred while creating the listing',
         CheckoutErrorType.CREATE_ORDER_LISTING_ERROR,
         {
-          message: err.message,
+          error: err,
           collectionId: sellToken.id,
           collectionAddress: sellToken.collectionAddress,
         },

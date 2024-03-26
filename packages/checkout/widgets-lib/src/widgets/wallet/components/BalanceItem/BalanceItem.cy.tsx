@@ -7,10 +7,11 @@ import {
   WalletProviderName,
   IMTBLWidgetEvents,
   GetBalanceResult,
+  WidgetTheme,
 } from '@imtbl/checkout-sdk';
 import { cy } from 'local-cypress';
 import { Environment } from '@imtbl/config';
-import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
+import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import { BalanceInfo } from 'widgets/wallet/functions/tokenBalances';
 import { WalletState } from '../../context/WalletContext';
@@ -22,8 +23,6 @@ import { ConnectionStatus } from '../../../../context/connect-loader-context/Con
 import {
   ConnectLoaderTestComponent,
 } from '../../../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
-import { CustomAnalyticsProvider } from '../../../../context/analytics-provider/CustomAnalyticsProvider';
-import { StrongCheckoutWidgetsConfig } from '../../../../lib/withDefaultWidgetConfig';
 import { NATIVE } from '../../../../lib';
 
 describe('BalanceItem', () => {
@@ -51,6 +50,10 @@ describe('BalanceItem', () => {
     walletProviderName: WalletProviderName.METAMASK,
     tokenBalances: testTokenBalances,
     supportedTopUps: null,
+    walletConfig: {
+      showNetworkMenu: true,
+      showDisconnectButton: true,
+    },
   };
 
   const testBalanceInfo: BalanceInfo = {
@@ -74,16 +77,15 @@ describe('BalanceItem', () => {
 
   it('should show balance details', () => {
     mount(
-      <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-        <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
-          <WalletWidgetTestComponent initialStateOverride={baseWalletState}>
-            <BalanceItem
-              balanceInfo={testBalanceInfo}
-              bridgeToL2OnClick={() => {}}
-            />
-          </WalletWidgetTestComponent>
-        </ConnectLoaderTestComponent>
-      </CustomAnalyticsProvider>,
+      <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
+        <WalletWidgetTestComponent initialStateOverride={baseWalletState}>
+          <BalanceItem
+            balanceInfo={testBalanceInfo}
+            bridgeToL2OnClick={() => {}}
+            theme={WidgetTheme.DARK}
+          />
+        </WalletWidgetTestComponent>
+      </ConnectLoaderTestComponent>,
     );
 
     cySmartGet('balance-item-IMX').should('include.text', 'IMX');
@@ -119,19 +121,59 @@ describe('BalanceItem', () => {
     };
 
     mount(
-      <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-        <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
-          <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-            <BalanceItem
-              balanceInfo={testBalanceInfo}
-              bridgeToL2OnClick={() => {}}
-            />
-          </WalletWidgetTestComponent>
-        </ConnectLoaderTestComponent>
-      </CustomAnalyticsProvider>,
+      <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
+        <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+          <BalanceItem
+            balanceInfo={testBalanceInfo}
+            bridgeToL2OnClick={() => {}}
+            theme={WidgetTheme.DARK}
+          />
+        </WalletWidgetTestComponent>
+      </ConnectLoaderTestComponent>,
     );
 
     cySmartGet('token-menu').should('exist');
+  });
+
+  it('should show the move option on zkEVM when all topUps are enabled', () => {
+    const testWalletState = {
+      ...baseWalletState,
+      network: {
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        name: ChainName.IMTBL_ZKEVM_TESTNET,
+        nativeCurrency: {
+          name: 'IMX',
+          symbol: 'IMX',
+          decimals: 18,
+        },
+        isSupported: true,
+      },
+      tokenBalances: testTokenBalances,
+      supportedTopUps: {
+        isOnRampEnabled: true,
+        isSwapEnabled: true,
+        isBridgeEnabled: true,
+        isSwapAvailable: true,
+      },
+    };
+
+    mount(
+      <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
+        <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+          <BalanceItem
+            balanceInfo={testBalanceInfo}
+            bridgeToL2OnClick={() => {}}
+            theme={WidgetTheme.DARK}
+          />
+        </WalletWidgetTestComponent>
+        ,
+      </ConnectLoaderTestComponent>,
+    );
+
+    cySmartGet('token-menu').should('exist');
+    cySmartGet('token-menu').click();
+    cySmartGet('balance-item-move-option').should('be.visible');
+    cySmartGet('balance-item-move-option').should('have.text', 'Move IMX');
   });
 
   it('should show the swap option on zkEVM when all topUps are enabled', () => {
@@ -157,24 +199,22 @@ describe('BalanceItem', () => {
     };
 
     mount(
-      <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-        <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
-          <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-            <BalanceItem
-              balanceInfo={testBalanceInfo}
-              bridgeToL2OnClick={() => {}}
-            />
-          </WalletWidgetTestComponent>
-          ,
-        </ConnectLoaderTestComponent>
-      </CustomAnalyticsProvider>,
+      <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
+        <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+          <BalanceItem
+            balanceInfo={testBalanceInfo}
+            bridgeToL2OnClick={() => {}}
+            theme={WidgetTheme.DARK}
+          />
+        </WalletWidgetTestComponent>
+        ,
+      </ConnectLoaderTestComponent>,
     );
 
     cySmartGet('token-menu').should('exist');
     cySmartGet('token-menu').click();
     cySmartGet('balance-item-swap-option').should('be.visible');
     cySmartGet('balance-item-swap-option').should('have.text', 'Swap IMX');
-    cySmartGet('balance-item-move-option').should('not.be.visible');
   });
 
   it('should hide the swap option on zkEVM when swap is unavailable', () => {
@@ -200,23 +240,21 @@ describe('BalanceItem', () => {
     };
 
     mount(
-      <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-        <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
-          <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-            <BalanceItem
-              balanceInfo={testBalanceInfo}
-              bridgeToL2OnClick={() => {}}
-            />
-          </WalletWidgetTestComponent>
-        </ConnectLoaderTestComponent>
-      </CustomAnalyticsProvider>,
+      <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
+        <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+          <BalanceItem
+            balanceInfo={testBalanceInfo}
+            bridgeToL2OnClick={() => {}}
+            theme={WidgetTheme.DARK}
+          />
+        </WalletWidgetTestComponent>
+      </ConnectLoaderTestComponent>,
     );
 
     cySmartGet('token-menu').should('exist');
     cySmartGet('token-menu').click();
     cySmartGet('balance-item-swap-option').should('not.be.visible');
     cySmartGet('balance-item-swap-option').should('have.text', 'Swap IMX');
-    cySmartGet('balance-item-move-option').should('not.be.visible');
   });
 
   it('should show the add option on zkEVM when token is in onramp allowlist', () => {
@@ -253,17 +291,16 @@ describe('BalanceItem', () => {
     };
 
     mount(
-      <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-        <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
-          <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-            <BalanceItem
-              balanceInfo={testBalanceInfo}
-              bridgeToL2OnClick={() => {}}
-            />
-          </WalletWidgetTestComponent>
-          ,
-        </ConnectLoaderTestComponent>
-      </CustomAnalyticsProvider>,
+      <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
+        <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+          <BalanceItem
+            balanceInfo={testBalanceInfo}
+            bridgeToL2OnClick={() => {}}
+            theme={WidgetTheme.DARK}
+          />
+        </WalletWidgetTestComponent>
+        ,
+      </ConnectLoaderTestComponent>,
     );
 
     cySmartGet('token-menu').should('exist');
@@ -272,7 +309,6 @@ describe('BalanceItem', () => {
     cySmartGet('balance-item-add-option').should('have.text', 'Add IMX');
     cySmartGet('balance-item-swap-option').should('be.visible');
     cySmartGet('balance-item-swap-option').should('have.text', 'Swap IMX');
-    cySmartGet('balance-item-move-option').should('not.be.visible');
   });
 
   it('should NOT show the add option on zkEVM if token is not in allowlist', () => {
@@ -317,17 +353,16 @@ describe('BalanceItem', () => {
     };
 
     mount(
-      <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-        <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
-          <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-            <BalanceItem
-              balanceInfo={balanceInfoNotInAllowList}
-              bridgeToL2OnClick={() => {}}
-            />
-          </WalletWidgetTestComponent>
-          ,
-        </ConnectLoaderTestComponent>
-      </CustomAnalyticsProvider>,
+      <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
+        <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+          <BalanceItem
+            balanceInfo={balanceInfoNotInAllowList}
+            bridgeToL2OnClick={() => {}}
+            theme={WidgetTheme.DARK}
+          />
+        </WalletWidgetTestComponent>
+        ,
+      </ConnectLoaderTestComponent>,
     );
 
     cySmartGet('token-menu').should('exist');
@@ -335,7 +370,6 @@ describe('BalanceItem', () => {
     cySmartGet('balance-item-add-option').should('not.be.visible');
     cySmartGet('balance-item-swap-option').should('be.visible');
     cySmartGet('balance-item-swap-option').should('have.text', 'Swap zkTEST');
-    cySmartGet('balance-item-move-option').should('not.be.visible');
   });
 
   it('should ONLY show swap option on zkEVM if onramp is disabled', () => {
@@ -361,17 +395,16 @@ describe('BalanceItem', () => {
     };
 
     mount(
-      <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-        <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
-          <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-            <BalanceItem
-              balanceInfo={testBalanceInfo}
-              bridgeToL2OnClick={() => {}}
-            />
-          </WalletWidgetTestComponent>
-          ,
-        </ConnectLoaderTestComponent>
-      </CustomAnalyticsProvider>,
+      <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
+        <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+          <BalanceItem
+            balanceInfo={testBalanceInfo}
+            bridgeToL2OnClick={() => {}}
+            theme={WidgetTheme.DARK}
+          />
+        </WalletWidgetTestComponent>
+        ,
+      </ConnectLoaderTestComponent>,
     );
 
     cySmartGet('token-menu').should('exist');
@@ -379,7 +412,6 @@ describe('BalanceItem', () => {
     cySmartGet('balance-item-add-option').should('not.be.visible');
     cySmartGet('balance-item-swap-option').should('be.visible');
     cySmartGet('balance-item-swap-option').should('have.text', 'Swap IMX');
-    cySmartGet('balance-item-move-option').should('not.be.visible');
   });
 
   it('should show ONLY the move option on Ethereum when all topUps are enabled', () => {
@@ -404,16 +436,15 @@ describe('BalanceItem', () => {
     };
 
     mount(
-      <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-        <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
-          <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-            <BalanceItem
-              balanceInfo={testBalanceInfo}
-              bridgeToL2OnClick={() => {}}
-            />
-          </WalletWidgetTestComponent>
-        </ConnectLoaderTestComponent>
-      </CustomAnalyticsProvider>,
+      <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
+        <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+          <BalanceItem
+            balanceInfo={testBalanceInfo}
+            bridgeToL2OnClick={() => {}}
+            theme={WidgetTheme.DARK}
+          />
+        </WalletWidgetTestComponent>
+      </ConnectLoaderTestComponent>,
     );
     cySmartGet('token-menu').should('exist');
     cySmartGet('token-menu').click();
@@ -421,65 +452,6 @@ describe('BalanceItem', () => {
     cySmartGet('balance-item-swap-option').should('not.be.visible');
     cySmartGet('balance-item-move-option').should('be.visible');
     cySmartGet('balance-item-move-option').should('have.text', 'Move IMX');
-  });
-
-  it('should NOT show the move option when provider is Passport', () => {
-    cy.stub(Checkout.prototype, 'getTokenAllowList')
-      .as('tokenAllowListStub')
-      .resolves({
-        tokens: [
-          {
-            name: 'tIMX',
-            symbol: 'tIMX',
-            decimals: 18,
-            address: NATIVE,
-          },
-        ],
-      });
-    const testWalletState = {
-      ...baseWalletState,
-      network: {
-        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-        name: ChainName.IMTBL_ZKEVM_TESTNET,
-        nativeCurrency: {
-          name: 'IMX',
-          symbol: 'IMX',
-          decimals: 18,
-        },
-        isSupported: true,
-      },
-      tokenBalances: testTokenBalances,
-      supportedTopUps: {
-        isOnRampEnabled: true,
-        isSwapEnabled: true,
-        isBridgeEnabled: true,
-      },
-    };
-
-    mount(
-      <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-        <ConnectLoaderTestComponent
-          initialStateOverride={{
-            ...connectLoaderState,
-            provider: {
-              provider: { isPassport: true } as any as ExternalProvider,
-            } as Web3Provider,
-          }}
-        >
-          <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-            <BalanceItem
-              balanceInfo={testBalanceInfo}
-              bridgeToL2OnClick={() => {}}
-            />
-          </WalletWidgetTestComponent>
-        </ConnectLoaderTestComponent>
-      </CustomAnalyticsProvider>,
-    );
-    cySmartGet('token-menu').should('exist');
-    cySmartGet('token-menu').click();
-    cySmartGet('balance-item-add-option').should('be.visible');
-    cySmartGet('balance-item-swap-option').should('be.visible');
-    cySmartGet('balance-item-move-option').should('not.be.visible');
   });
 
   it('should NOT show menu options for the token when all top ups are disabled', () => {
@@ -492,16 +464,15 @@ describe('BalanceItem', () => {
       },
     };
     mount(
-      <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-        <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
-          <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-            <BalanceItem
-              balanceInfo={testBalanceInfo}
-              bridgeToL2OnClick={() => {}}
-            />
-          </WalletWidgetTestComponent>
-        </ConnectLoaderTestComponent>
-      </CustomAnalyticsProvider>,
+      <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
+        <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+          <BalanceItem
+            balanceInfo={testBalanceInfo}
+            bridgeToL2OnClick={() => {}}
+            theme={WidgetTheme.DARK}
+          />
+        </WalletWidgetTestComponent>
+      </ConnectLoaderTestComponent>,
     );
 
     cySmartGet('token-menu').should('not.exist');
@@ -545,16 +516,15 @@ describe('BalanceItem', () => {
 
     it('should emit sendRequestSwapEvent when swap menu button is clicked', () => {
       mount(
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-          <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
-            <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-              <BalanceItem
-                balanceInfo={testBalanceInfo}
-                bridgeToL2OnClick={() => {}}
-              />
-            </WalletWidgetTestComponent>
-          </ConnectLoaderTestComponent>
-        </CustomAnalyticsProvider>,
+        <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
+          <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+            <BalanceItem
+              balanceInfo={testBalanceInfo}
+              bridgeToL2OnClick={() => {}}
+              theme={WidgetTheme.DARK}
+            />
+          </WalletWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('token-menu').should('exist');
@@ -575,16 +545,15 @@ describe('BalanceItem', () => {
 
     it('should emit sendRequestOnrampEvent when add menu button is clicked', () => {
       mount(
-        <CustomAnalyticsProvider widgetConfig={{ environment: Environment.SANDBOX } as StrongCheckoutWidgetsConfig}>
-          <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
-            <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-              <BalanceItem
-                balanceInfo={testBalanceInfo}
-                bridgeToL2OnClick={() => {}}
-              />
-            </WalletWidgetTestComponent>
-          </ConnectLoaderTestComponent>
-        </CustomAnalyticsProvider>,
+        <ConnectLoaderTestComponent initialStateOverride={connectLoaderState}>
+          <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+            <BalanceItem
+              balanceInfo={testBalanceInfo}
+              bridgeToL2OnClick={() => {}}
+              theme={WidgetTheme.DARK}
+            />
+          </WalletWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('token-menu').should('exist');

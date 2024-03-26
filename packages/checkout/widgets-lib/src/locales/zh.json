@@ -1,0 +1,667 @@
+{
+  "views": {
+    "CONNECT_WALLET": {
+      "body": {
+        "heading": "连接钱包",
+        "content": "您需要连接或创建数字钱包以购买、出售、交易和存储您的硬币和收藏品。"
+      },
+      "walletSelection": {
+        "heading": "选择一个钱包"
+      }
+    },
+    "CONNECT_SUCCESS": {
+      "status": "连接安全",
+      "action": "继续"
+    },
+    "READY_TO_CONNECT": {
+      "header": {
+        "title": "连接"
+      },
+      "metamask": {
+        "body": {
+          "heading": "检查MetaMask的弹窗",
+          "content": "按照MetaMask弹窗中的提示进行连接"
+        },
+        "footer": {
+          "buttonText1": "准备好连接",
+          "buttonText2": "再试一次"
+        }
+      },
+      "passport": {
+        "body": {
+          "heading": "使用Immutable Passport连接",
+          "content": "按照提示使用Immutable Passport进行连接"
+        },
+        "footer": {
+          "buttonText1": "继续",
+          "buttonText2": "再试一次"
+        }
+      }
+    },
+    "SWITCH_NETWORK": {
+      "eth": {
+        "heading": "您需要切换到{{networkName}}网络",
+        "body": "MetaMask将提示您切换网络。需要时可以切回。",
+        "button": {
+          "text": "准备切换",
+          "retryText": "再试一次"
+        }
+      },
+      "zkEVM": {
+        "heading": "将要求您切换到Immutable zkEVM网络",
+        "body": "检查MetaMask的弹窗并选择'批准'以切换。如果这是第一次，MetaMask还会要求您添加网络。",
+        "bodyWalletConnect": "请检查您的钱包弹出窗口以进行切换。如果这是第一次，您的钱包还会要求您添加网络。",
+        "button": {
+          "text": "准备切换",
+          "retryText": "再试一次"
+        }
+      }
+    },
+    "ERROR_VIEW": {
+      "heading": "出了些问题",
+      "body": [
+        "您可以再试一次或联系",
+        "支持",
+        "寻求帮助。"
+      ],
+      "actionText": "再试一次"
+    },
+    "SERVICE_UNAVAILABLE_ERROR_VIEW": {
+      "heading": {
+        "swap": "您所在的地区不支持兑换"
+      },
+      "body": {
+        "swap": "请参考<quickswapLink>Quickswap</quickswapLink>的网站了解更多信息。"
+      }
+    },
+    "LOADING_VIEW": {
+      "text": "加载中"
+    },
+    "WALLET_BALANCES": {
+      "header": {
+        "title": "钱包"
+      },
+      "networkStatus": {
+        "heading": "网络"
+      },
+      "totalTokenBalance": {
+        "heading": "硬币",
+        "totalHeading": "价值"
+      },
+      "tokenBalancesList": {
+        "noTokensFound": "未发现代币"
+      },
+      "addCoins": "添加硬币"
+    },
+    "SETTINGS": {
+      "header": {
+        "title": "设置"
+      },
+      "disconnectButton": {
+        "label": "断开钱包连接"
+      }
+    },
+    "COIN_INFO": {
+      "metamask": {
+        "heading": "硬币和收藏品是网络原生的",
+        "body": "您可以切换网络来添加硬币或将它们从一个网络移动到另一个网络"
+      },
+      "passport": {
+        "heading": "硬币和收藏品是网络原生的",
+        "body1": "这个网络称为Immutable zkEVM。如果您在Passport中有其他硬币在这里看不到，它们可能在另一个网络上。",
+        "body2": "欲了解更多信息，请",
+        "linkText": "访问我们的常见问题"
+      }
+    },
+    "SWAP": {
+      "header": {
+        "title": "兑换硬币"
+      },
+      "content": {
+        "title": "您想要兑换什么？",
+        "fiatPricePrefix": "约合美元",
+        "availableBalancePrefix": "可用余额"
+      },
+      "swapForm": {
+        "from": {
+          "label": "从",
+          "inputPlaceholder": "0",
+          "selectorTitle": "您想从哪里兑换？"
+        },
+        "to": {
+          "label": "至",
+          "inputPlaceholder": "0",
+          "selectorTitle": "您想兑换到哪里？"
+        },
+        "buttonText": "兑换"
+      },
+      "fees": {
+        "title": "总费用"
+      },
+      "validation": {
+        "noAmountInputted": "请输入金额",
+        "insufficientBalance": "余额不足",
+        "noFromTokenSelected": "选择一个要兑换的硬币",
+        "noToTokenSelected": "选择一个要接收的硬币"
+      },
+      "success": {
+        "text": "成功",
+        "actionText": "继续"
+      },
+      "failed": {
+        "text": "交易被拒绝",
+        "actionText": "再试一次"
+      },
+      "rejected": {
+        "text": "价格飙升",
+        "actionText": "审查并重试"
+      },
+      "IN_PROGRESS": {
+        "loading": {
+          "text": "交换进行中"
+        }
+      }
+    },
+    "APPROVE_ERC20": {
+      "approveSwap": {
+        "content": {
+          "heading": "现在您只需要确认交易",
+          "body": "按照钱包中的提示操作。"
+        },
+        "footer": {
+          "buttonText": "好的",
+          "retryText": "再试一次"
+        }
+      },
+      "approveSpending": {
+        "content": {
+          "metamask": {
+            "heading": "您将被要求为这笔交易设置支出上限",
+            "body": "至少输入{{amount}}用于本次及未来交易，然后按照提示操作。"
+          },
+          "passport": {
+            "heading": "您将被要求批准这笔交易的支出上限",
+            "body": "按照钱包中的提示批准支出上限。"
+          }
+        },
+        "footer": {
+          "buttonText": "明白",
+          "retryText": "再试一次"
+        },
+        "loading": {
+          "text": "批准支出上限"
+        }
+      }
+    },
+    "ONRAMP": {
+      "header": {
+        "title": "添加硬币"
+      },
+      "initialLoadingText": "带您前往Transak",
+      "IN_PROGRESS_LOADING": {
+        "loading": {
+          "text": "Transak正在处理您的订单"
+        }
+      },
+      "IN_PROGRESS": {
+        "content": {
+          "heading": "订单进行中",
+          "body1": "当完成时，您将从Transak收到一封电子邮件。这可能需要长达3分钟的时间。",
+          "body2": "您可以关闭这个窗口，一旦交易完成，将会反映在您的钱包中。"
+        }
+      },
+      "SUCCESS": {
+        "text": "硬币正在途中",
+        "actionText": "完成"
+      },
+      "FAIL": {
+        "text": "交易失败",
+        "actionText": "再试一次"
+      }
+    },
+    "TOP_UP_VIEW": {
+      "header": {
+        "title": "您想如何添加代币？"
+      },
+      "topUpOptions": {
+        "onramp": {
+          "heading": "购买",
+          "caption": "可通过卡、谷歌支付或苹果支付。",
+          "subcaption": "费用",
+          "disabledCaption": ""
+        },
+        "swap": {
+          "heading": "兑换",
+          "caption": "使用我在余额中的代币。",
+          "subcaption": "费用",
+          "disabledCaption": "您所在的地区不可用"
+        },
+        "bridge": {
+          "heading": "转移",
+          "caption": "我在其他钱包或网络中的代币。",
+          "subcaption": "费用",
+          "disabledCaption": ""
+        }
+      }
+    },
+    "FUND_WITH_SMART_CHECKOUT": {
+      "loading": {
+        "checkingBalances": "正在计算数字"
+      },
+      "currency": {
+        "usdEstimate": "≈ 美元 $",
+        "fees": "费用"
+      },
+      "fundingRouteDrawer": {
+        "header": "可用余额"
+      },
+      "fundingRouteSelect": {
+        "heading": "用您的支付",
+        "noRoutesAvailable": "硬币余额不足。请改用卡继续操作。",
+        "continue": "继续",
+        "payWithCardInstead": "不用了，我要用卡支付",
+        "payWithCard": "用卡支付"
+      }
+    },
+    "PAYMENT_METHODS": {
+      "header": {
+        "heading": "您希望如何支付？"
+      },
+      "options": {
+        "crypto": {
+          "heading": "硬币",
+          "caption": "请用钱包里的硬币付款，或用卡购买硬币。",
+          "disabledCaption": "目前无法进行此购买。" 
+        },
+        "debit": {
+          "heading": "借记卡",
+          "caption": "使用卡支付的推荐方式。",
+          "disabledCaption": "我们正在处理此事。请使用硬币继续，如果需要，我们将指导您如何添加它们。" 
+        },
+        "credit": {
+          "heading": "信用卡",
+          "caption": "不推荐使用，因为您的银行可能会阻止交易。",
+          "disabledCaption": "我们正在处理此事。请使用硬币继续，如果需要，我们将指导您如何添加它们。"
+        }
+      },
+      "topUp": {
+        "heading": "您需要添加一些硬币",
+        "subheading": {
+          "both": "添加{{erc20.value}} {{erc20.symbol}}和{{native.value}} {{native.symbol}}以支付本次购买及燃气费。",
+          "erc20": "通过以下选项之一将{{erc20.value}} {{erc20.symbol}}添加到您的余额。",
+          "native": "通过以下选项之一，为燃气添加{{native.value}} {{native.symbol}}。"
+        }
+      },
+      "loading": {
+        "ready1": "正在收集您的订单",
+        "ready2": "正在与钱包交流",
+        "ready3": "正在准备资产",
+        "processing1": "正在初始化支付",
+        "processing2": "正在保护您的资产",
+        "processing3": "正在完成支付"
+      }
+    },
+    "PAY_WITH_COINS": {
+      "header": {
+        "heading": "用您的硬币支付",
+        "caption": "使用您钱包中的硬币余额"
+      },
+      "button": {
+        "buyNow": "立即购买"
+      }
+    },
+    "PAY_WITH_CARD": {
+      "screenTitle": "用卡支付",
+      "loading": "带您前往Transak"
+    },
+    "SALE_FAIL": {
+      "errors": {
+        "TRANSACTION_FAILED": {
+          "description": "交易失败",
+          "primaryAction": "再试一次",
+          "secondaryAction": "查看详情"
+        },
+        "SERVICE_BREAKDOWN": {
+          "description": "抱歉，我们现在无法处理您的付款。请几分钟后再试。",
+          "secondaryAction": "关闭"
+        },
+        "PRODUCT_NOT_FOUND": {
+          "description": "抱歉，所请求的数量缺货。请考虑购买较少数量。",
+          "secondaryAction": "关闭"
+        },
+        "INSUFFICIENT_STOCK": {
+          "description": "抱歉，库存不足。请考虑购买较少数量。",
+          "secondaryAction": "关闭"
+        },
+        "TRANSAK_FAILED": {
+          "description": "抱歉，出了点问题。请再试一次。",
+          "primaryAction": "再试一次",
+          "secondaryAction": "关闭"
+        },
+        "WALLET_FAILED": {
+          "description": "抱歉，我们现在无法处理。请返回。",
+          "primaryAction": "返回",
+          "secondaryAction": "关闭"
+        },
+        "WALLET_REJECTED_NO_FUNDS": {
+          "description": "抱歉，出了点问题。请再试一次。",
+          "primaryAction": "返回",
+          "secondaryAction": "关闭"
+        },
+        "WALLET_REJECTED": {
+          "description": "您需要在钱包中批准交易才能继续。",
+          "primaryAction": "再试一次",
+          "secondaryAction": "取消"
+        },
+        "WALLET_POPUP_BLOCKED": {
+          "description": "您需要允许浏览器中的弹出窗口才能继续。",
+          "primaryAction": "我已经解决了这个问题，再试一次",
+          "secondaryAction": "取消"
+        },
+        "SMART_CHECKOUT_ERROR": {
+          "description": "无法检查您的钱包余额。请再试一次。",
+          "primaryAction": "再试一次",
+          "secondaryAction": "取消"
+        },
+        "SMART_CHECKOUT_EXECUTE_ERROR": {
+          "description": "抱歉，转移资金时出错。请再试一次。",
+          "primaryAction": "再试一次",
+          "secondaryAction": "取消"
+        },
+        "DEFAULT_ERROR": {
+          "description": "抱歉，出了点问题。请再试一次。",
+          "primaryAction": "再试一次",
+          "secondaryAction": "关闭"
+        },
+        "INVALID_PARAMETERS": {
+          "description": "抱歉，我们无法处理您的订单。客户提供的信息不完整。",
+          "secondaryAction": "关闭"
+        }
+      }
+    },
+    "SALE_SUCCESS": {
+      "text": "订单已完成",
+      "actionText": "继续"
+    },
+    "WALLET_NETWORK_SELECTION": {
+      "layoutHeading": "转移资金",
+      "heading": "您想在哪两个地方之间转移资金？",
+      "fromFormInput": {
+        "heading": "从",
+        "selectDefaultText": "选择钱包和网络",
+        "walletSelectorHeading": "来自钱包",
+        "networkSelectorHeading": "来自网络"
+      },
+      "toFormInput": {
+        "heading": "至",
+        "selectDefaultText": "选择钱包和网络",
+        "walletSelectorHeading": "至钱包"
+      },
+      "submitButton": {
+        "text": "下一步"
+      }
+    },
+    "BRIDGE_FORM": {
+      "header": {
+        "title": "转移硬币"
+      },
+      "fees": {
+        "title": "燃气费",
+        "fiatPricePrefix": "~ 美元 $"
+      },
+      "content": {
+        "title": "您想要转移多少金额？",
+        "fiatPricePrefix": "约美元",
+        "availableBalancePrefix": "可用余额"
+      },
+      "bridgeForm": {
+        "from": {
+          "inputPlaceholder": "0",
+          "selectorTitle": "您想要转移什么？"
+        },
+        "buttonText": "审阅"
+      },
+      "validation": {
+        "noAmountInputted": "请输入金额",
+        "insufficientBalance": "余额不足",
+        "noTokenSelected": "选择一个要转移的硬币"
+      }
+    },
+    "BRIDGE_REVIEW": {
+      "layoutHeading": "转移资金",
+      "heading": "这样看起来怎么样？",
+      "fromLabel": {
+        "amountHeading": "正在转移",
+        "heading": "从"
+      },
+      "toLabel": {
+        "heading": "至"
+      },
+      "fees": {
+        "heading": "燃气费"
+      },
+      "submitButton": {
+        "buttonText": "确认转移"
+      },
+      "fiatPricePrefix": "~ 美元 $"
+    },
+    "BRIDGE_FAILURE": {
+      "bridgeFailureText": {
+        "statusText": "交易失败",
+        "actionText": "审查并重试"
+      }
+    },
+    "APPROVE_TRANSACTION": {
+      "content": {
+        "heading": "在您的钱包中批准交易",
+        "body": "按照钱包弹出窗口中的提示进行确认。"
+      },
+      "footer": {
+        "buttonText": "好的",
+        "retryText": "再试一次"
+      },
+      "loadingView": {
+        "text": "开始转移"
+      }
+    },
+    "IN_PROGRESS": {
+      "heading": "转移进行中",
+      "body1": "您的资金已经发送，距离收到不到20分钟。您可以点击火箭图标返回并查看进展。",
+      "body2": "您可以关闭这个窗口。"
+    },
+    "TRANSACTIONS": {
+      "layoutHeading": "进行中",
+      "passportDashboard": "在您的完整交易历史中查看",
+      "status": {
+        "withdrawalPending": {
+          "actionButtonText": "继续",
+          "withdrawalDelayText": "此操作已暂停，请返回",
+          "withdrawalReadyText": "需要采取行动以收取您的硬币",
+          "caption": "已暂停"
+        },
+        "inProgress": {
+          "heading": "进行中",
+          "txnEstimate": "通常需要20分钟",
+          "stepInfo": "查看详情"
+        },
+        "emptyState": {
+          "notConnected": {
+            "body": "连接您的钱包以查看交易",
+            "buttonText": "连接"
+          }
+        },
+        "noTransactions": {
+          "body": "您已完成所有操作。",
+          "passport": {
+            "body": "在",
+            "link": "护照"
+          }
+        }
+      },
+      "changeWallet": {
+        "buttonText": "更换钱包"
+      },
+      "fiatPricePrefix": "≈ 美元 $",
+      "support": {
+        "body1": "需要帮助吗？",
+        "body2": " 联系 ",
+        "body3": "支持",
+        "supportLink": "https://support.immutable.com/en/",
+        "passport": {
+          "body1": "或在您的 ",
+          "body2": "护照"
+        }
+      },
+      "walletSelection": {
+        "heading": "选择要查看的钱包"
+      }
+    },
+    "CLAIM_WITHDRAWAL": {
+      "content": {
+        "heading": "按照提示在此处收取您的硬币",
+        "body": "您将被要求支付一笔小额燃气费以领取您的提款。",
+        "body2": "目标钱包地址："
+      },
+      "footer": {
+        "buttonText": "继续",
+        "retryText": "重试"
+      },
+      "IN_PROGRESS": {
+        "loading": {
+          "text": "处理中"
+        },
+        "success": {
+          "text": "成功",
+          "actionText": "完成"
+        },
+        "failure": {
+          "text": "交易失败",
+          "actionText": "请重试"
+        }
+      }
+    }
+  },
+  "footers": {
+    "quickswapFooter": {
+      "disclaimerText": "Quickswap是第三方应用。Immutable不构建、拥有、操作或部署Quickswap。更多信息请参阅Quickswap的网站。"
+    }
+  },
+  "wallets": {
+    "passport": {
+      "heading": "Immutable Passport",
+      "description": "您的游戏钱包，可以用卡支付、管理物品等。"
+    },
+    "metamask": {
+      "heading": "MetaMask",
+      "description": "用于访问区块链应用和web3的数字钱包。"
+    },
+    "walletconnect": {
+      "heading": "其他钱包",
+      "description": "允许您连接任何区块链移动钱包，包括MetaMask。"
+    },
+    "browserwallet": {
+      "heading": "浏览器钱包",
+      "description": "用于访问区块链应用和web3的数字钱包。"
+    },
+    "recommended": "推荐"
+  },
+  "drawers": {
+    "feesBreakdown": {
+      "heading": "费用分解",
+      "total": "费用总计",
+      "fees": {
+        "gas": {
+          "label": "燃气费"
+        }
+      }
+    },
+    "transactionFailed": {
+      "content": {
+        "heading1": "在继续前我们需要您在钱包中确认",
+        "heading2": "钱包确认",
+        "body1": "当MetaMask弹出时，请确保",
+        "body2": "签署交易"
+      },
+      "buttons": {
+        "retry": "明白了",
+        "cancel": "关闭"
+      }
+    },
+    "coinSelector": {
+      "option": {
+        "fiatPricePrefix": "约美元 $"
+      },
+      "noCoins": "您的钱包中没有可用的硬币。"
+    },
+    "notEnoughGas": {
+      "content": {
+        "heading": "您需要更多{{token}}来支付燃气费",
+        "body": "您的{{token}}余额不足以支付此操作的燃气费，因此在继续之前，您需要添加更多{{token}}。"
+      },
+      "buttons": {
+        "adjustAmount": "调整金额",
+        "addMoreImx": "添加IMX币",
+        "copyAddress": "复制钱包地址",
+        "cancel": "关闭"
+      }
+    },
+    "notEnoughImx": {
+      "content": {
+        "noImx": {
+          "heading": "您需要IMX币来兑换",
+          "body": "兑换费用需要用IMX币支付，因此在您可以进行兑换之前需要添加此币"
+        },
+        "insufficientImx": {
+          "heading": "您需要更多IMX币",
+          "body": "为了支付指定金额的费用，您需要添加更多IMX币"
+        }
+      },
+      "buttons": {
+        "adjustAmount": "调整金额",
+        "addMoreImx": "添加IMX币",
+        "cancel": "关闭"
+      }
+    },
+    "notEnoughEthWithdrawal": {
+      "content": {
+        "heading1": "不足",
+        "heading2": "用于燃气",
+        "body1": "添加",
+        "body2": "到您的目标账户，或选择另一个账户支付燃气费。您的目标账户将保持不变。"
+      },
+      "buttons": {
+        "retry": "使用另一个账户支付燃气费",
+        "dismiss": "取消"
+      }
+    },
+    "unableToSwap": {
+      "heading": "无法兑换此币种",
+      "body": "现在无法兑换这种币对。请尝试选择其他币种。",
+      "buttons": {
+        "cancel": "关闭"
+      }
+    },
+    "networkSwitch": {
+      "heading": "在您的{{wallet}}中切换网络",
+      "manualSwitch": {
+        "body": "您需要打开您的移动钱包并切换到{{chain}}网络才能继续进行"
+      },
+      "controlledSwitch": {
+        "body": "您需要切换到{{chain}}网络才能继续进行"
+      },
+      "switchButton": "切换到{{chain}}"
+    },
+    "walletConnectionError": {
+      "unableToConnect": {
+        "heading": "无法连接",
+        "body": "请检查您的钱包并重试，或关闭并尝试其他选项。",
+        "actionButtonText": "重试"
+      },
+      "changedYourMind": {
+        "heading": "改变主意了吗？",
+        "body": "确保弹出窗口已启用，并按照钱包中的提示进行连接。",
+        "actionButtonText": "重试"
+      }
+    }
+  }
+}

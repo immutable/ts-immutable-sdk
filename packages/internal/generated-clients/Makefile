@@ -29,14 +29,28 @@ generate-imx-api-client:
     -i ./app/src/imx-openapi.json \
     -g typescript-axios \
     -o /app/src/imx \
-    -c /app/imx.config.json
+    -c /app/config/imx.config.json
 
 .PHONY: generate-mr-api-client
 generate-mr-api-client:
 	rm -rf src/multi-rollup && \
     mkdir src/multi-rollup && \
 	docker run --rm -v $(shell pwd):/app openapitools/openapi-generator-cli:v7.0.1 generate \
+    --inline-schema-options REFACTOR_ALLOF_INLINE_SCHEMAS=true \
     -i ./app/src/mr-openapi.json \
     -g typescript-axios \
     -o /app/src/multi-rollup \
-    -c /app/mr.config.json
+    -c /app/config/mr.config.json
+
+# When running this command, ensure files not relevant to blockchain data are manually removed
+.PHONY: generate-blockchain-data-types
+generate-blockchain-data-types:
+	rm -rf src/blockchain-data && \
+    mkdir src/blockchain-data && \
+	docker run --rm -v $(shell pwd):/app openapitools/openapi-generator-cli:v7.0.1 generate \
+    --inline-schema-options REFACTOR_ALLOF_INLINE_SCHEMAS=true \
+    -i ./app/src/mr-openapi.json \
+    -g typescript-axios \
+    -o /app/src/blockchain-data \
+    -c /app/config/blockchain-data.config.json \
+    --additional-properties=stringEnums=true

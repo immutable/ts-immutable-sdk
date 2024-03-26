@@ -14,7 +14,7 @@ import {
 import { bridgeRoute } from './bridge/bridgeRoute';
 import {
   ChainId,
-  FundingRouteFeeEstimate,
+  FeeType,
   FundingStepType,
   ItemType,
   RoutingOutcomeType,
@@ -33,6 +33,7 @@ import { onRampRoute } from './onRamp';
 import { bridgeAndSwapRoute } from './bridgeAndSwap/bridgeAndSwapRoute';
 import { RoutingTokensAllowList } from '../allowList/types';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from './indexer/fetchL1Representation';
+import { HttpClient } from '../../api/http';
 
 jest.mock('./tokenBalances');
 jest.mock('./bridge/bridgeRoute');
@@ -52,9 +53,10 @@ describe('routingCalculator', () => {
   ]);
 
   beforeEach(() => {
+    const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
     config = new CheckoutConfiguration({
       baseConfig: { environment: Environment.SANDBOX },
-    });
+    }, mockedHttpClient);
     jest.spyOn(console, 'info').mockImplementation(() => {});
   });
 
@@ -183,15 +185,18 @@ describe('routingCalculator', () => {
         },
       },
       fees: {
-        approvalGasFees: {
+        approvalGasFee: {
+          type: FeeType.GAS,
           amount: BigNumber.from(0),
           formattedAmount: '0',
         },
-        bridgeGasFees: {
+        bridgeGasFee: {
+          type: FeeType.GAS,
           amount: BigNumber.from(0),
           formattedAmount: '0',
         },
         bridgeFees: [{
+          type: FeeType.BRIDGE_FEE,
           amount: BigNumber.from(0),
           formattedAmount: '0',
         }],
@@ -804,15 +809,18 @@ describe('routingCalculator', () => {
         },
       },
       fees: {
-        approvalGasFees: {
+        approvalGasFee: {
+          type: FeeType.GAS,
           amount: BigNumber.from(0),
           formattedAmount: '0',
         },
-        bridgeGasFees: {
+        bridgeGasFee: {
+          type: FeeType.GAS,
           amount: BigNumber.from(0),
           formattedAmount: '0',
         },
         bridgeFees: [{
+          type: FeeType.BRIDGE_FEE,
           amount: BigNumber.from(0),
           formattedAmount: '0',
         }],
@@ -1114,7 +1122,6 @@ describe('routingCalculator', () => {
     try {
       await routingCalculator(
         config,
-
         '0x123',
         balanceRequirements,
         availableRoutingOptions,
@@ -1125,7 +1132,7 @@ describe('routingCalculator', () => {
     }
 
     expect(type).toEqual(CheckoutErrorType.PROVIDER_ERROR);
-    expect(data).toEqual({ message: 'Error from create readonly providers' });
+    expect(data.error).toBeDefined();
   });
 
   describe('getSwapFundingStep', () => {
@@ -1754,7 +1761,7 @@ describe('routingCalculator', () => {
         address: '0xERC20_2',
       }],
     };
-    const feeEstimates = new Map<FundingStepType, FundingRouteFeeEstimate>();
+
     const balanceRequirements: BalanceCheckResult = {
       sufficient: false,
       balanceRequirements: [insufficientRequirement],
@@ -1769,7 +1776,6 @@ describe('routingCalculator', () => {
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
-        feeEstimates,
         balanceRequirements,
       );
       expect(result).toEqual([]);
@@ -1784,7 +1790,6 @@ describe('routingCalculator', () => {
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
-        feeEstimates,
         balanceRequirements,
       );
       expect(result).toEqual([]);
@@ -1807,7 +1812,6 @@ describe('routingCalculator', () => {
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
-        feeEstimates,
         balanceRequirements,
       );
       expect(result).toEqual([]);
@@ -1829,7 +1833,6 @@ describe('routingCalculator', () => {
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
-        feeEstimates,
         balanceRequirements,
       );
       expect(result).toEqual([]);
@@ -1845,7 +1848,6 @@ describe('routingCalculator', () => {
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
-        feeEstimates,
         balanceRequirements,
       );
       expect(result).toEqual([]);
@@ -1869,7 +1871,6 @@ describe('routingCalculator', () => {
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
-        feeEstimates,
         balanceRequirements,
       );
       expect(result).toEqual([]);
@@ -1892,7 +1893,6 @@ describe('routingCalculator', () => {
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
-        feeEstimates,
         balanceRequirements,
       );
       expect(result).toEqual([]);
@@ -1911,7 +1911,6 @@ describe('routingCalculator', () => {
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
-        feeEstimates,
         balanceRequirements,
       );
       expect(result).toEqual([]);
@@ -1977,7 +1976,6 @@ describe('routingCalculator', () => {
         '0xADDRESS',
         tokenBalances,
         tokenAllowList,
-        feeEstimates,
         balanceRequirements,
       );
       expect(result)
@@ -1993,7 +1991,6 @@ describe('routingCalculator', () => {
         { bridge: true, swap: true },
         insufficientRequirement,
         '0xADDRESS',
-        feeEstimates,
         tokenBalances,
         ['0xERC20_1', INDEXER_ETH_ROOT_CONTRACT_ADDRESS],
         [

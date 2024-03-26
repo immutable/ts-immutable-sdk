@@ -25,12 +25,12 @@ function ValidateEtherMail({ disabled }: RequestExampleProps) {
       if (zkEvmProvider) {
         const chainIdHex = await zkEvmProvider.request({ method: 'eth_chainId' });
         const chainId = parseInt(chainIdHex, 16);
-        setEtherMailTypedPayload(getEtherMailTypedPayload(chainId));
+        setEtherMailTypedPayload(getEtherMailTypedPayload(chainId, address));
       }
     };
 
     populateParams().catch(console.log);
-  }, [zkEvmProvider]);
+  }, [zkEvmProvider, address]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

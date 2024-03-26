@@ -45,8 +45,8 @@ export const mockUserImx: UserImx = {
 export const mockUserZkEvm: UserZkEvm = {
   ...mockUser,
   zkEvm: {
-    ethAddress: 'zkevmEthAddress123',
-    userAdminAddress: 'zkevmUserAdminAddress123',
+    ethAddress: '0x0000000000000000000000000000000000000001',
+    userAdminAddress: '0x0000000000000000000000000000000000000002',
   },
 };
 
@@ -55,6 +55,18 @@ export const mockLinkedAddresses = {
     linked_addresses: [
       '0x123',
       '0x456',
+    ],
+  },
+};
+
+export const mockListChains = {
+  data: {
+    result: [
+      {
+        id: 'eip155:13473',
+        name: 'Immutable zkEVM Test',
+        rpc_url: 'https://rpc.testnet.immutable.com',
+      },
     ],
   },
 };
