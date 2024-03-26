@@ -3856,7 +3856,7 @@ __metadata:
     "@jest/globals": ^29.5.0
     "@magic-ext/oidc": 4.2.0
     "@metamask/detect-provider": ^2.0.0
-    "@opensea/seaport-js": 3.0.2
+    "@opensea/seaport-js": 4.0.0
     "@rive-app/react-canvas": ^4.8.3
     "@rollup/plugin-babel": ^6.0.4
     "@rollup/plugin-commonjs": ^24.0.1
@@ -5315,16 +5315,6 @@ __metadata:
   version: 1.0.3
   resolution: "@open-draft/until@npm:1.0.3"
   checksum: 323e92ebef0150ed0f8caedc7d219b68cdc50784fa4eba0377eef93533d3f46514eb2400ced83dda8c51bddc3d2c7b8e9cf95e5ec85ab7f62dfc015d174f62f2
-  languageName: node
-  linkType: hard
-
-"@opensea/seaport-js@npm:3.0.2":
-  version: 3.0.2
-  resolution: "@opensea/seaport-js@npm:3.0.2"
-  dependencies:
-    ethers: ^6.9.0
-    merkletreejs: ^0.3.11
-  checksum: a1bb99e86ce26e01c554133c91e521d0ac63422d3ae77a32ab903f7e218fe32fc2f9b7884c0b96d2c88ea4396e3a891d02e978e222743648051c1ca970df97f7
   languageName: node
   linkType: hard
 
