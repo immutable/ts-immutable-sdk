@@ -34,7 +34,6 @@ export const filterAllowedTransactions = async (
     const desiredAmount = approveTxn.params.amount ? BigNumber.from(approveTxn.params.amount) : BigNumber.from(0);
 
     const isAllowed = currentAmount.gte(BigNumber.from('0')) && currentAmount.gte(desiredAmount);
-    console.log('🚀 ~ isAllowed:', isAllowed, currentAmount.toString(), desiredAmount.toString()); // eslint-disable-line
 
     if (isAllowed) {
       return transactions.filter((txn) => txn.methodCall !== approveTxn.methodCall);
