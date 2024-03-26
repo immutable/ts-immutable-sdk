@@ -157,7 +157,11 @@ export const filterSmartCheckoutResult = (
   };
 };
 
-export const getTopUpViewData = (smartCheckoutError: SmartCheckoutError, tokenAddress: string) => {
+export const getTopUpViewData = (
+  smartCheckoutError: SmartCheckoutError,
+  tokenAddress: string,
+  currencyName: string,
+) => {
   const transactionRequirements = smartCheckoutError?.data?.transactionRequirements || [];
 
   const native = transactionRequirements.find(
@@ -171,7 +175,7 @@ export const getTopUpViewData = (smartCheckoutError: SmartCheckoutError, tokenAd
   const balances = {
     erc20: {
       value: erc20?.delta.formattedBalance,
-      symbol: 'USDC',
+      symbol: currencyName,
     },
     native: {
       value: native?.delta.formattedBalance,
@@ -189,7 +193,7 @@ export const getTopUpViewData = (smartCheckoutError: SmartCheckoutError, tokenAd
     subheading = ['views.PAYMENT_METHODS.topUp.subheading.native', balances];
   }
 
-  const amount = erc20?.delta.balance.toNumber() || 0;
+  const amount = erc20?.delta.balance.toString() || '0';
 
   return {
     amount,
