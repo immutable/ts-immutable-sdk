@@ -74,6 +74,12 @@ export class FiatRampService {
         defaultCryptoAmount: params.tokenAmount,
         cryptoCurrencyCode: params.tokenSymbol,
       };
+    } else {
+      widgetParams = {
+        ...widgetParams,
+        defaultFiatAmount: 50,
+        defaultFiatCurrency: 'USD',
+      };
     }
 
     if (params.walletAddress) {
