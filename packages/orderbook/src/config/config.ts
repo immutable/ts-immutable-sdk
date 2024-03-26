@@ -5,7 +5,7 @@ export const TESTNET_CHAIN_NAME = 'imtbl-zkevm-testnet';
 export const MAINNET_CHAIN_NAME = 'imtbl-zkevm-mainnet';
 
 export interface OrderbookOverrides {
-  provider?: providers.JsonRpcProvider | providers.Web3Provider;
+  jsonRpcProviderUrl?: string;
   seaportContractAddress?: string;
   zoneContractAddress?: string;
   chainName?: string;
@@ -17,7 +17,7 @@ export interface OrderbookModuleConfiguration {
   zoneContractAddress: string;
   apiEndpoint: string;
   chainName: string;
-  provider: providers.JsonRpcProvider | providers.Web3Provider;
+  provider: providers.JsonRpcProvider;
 }
 
 export function getOrderbookConfig(
