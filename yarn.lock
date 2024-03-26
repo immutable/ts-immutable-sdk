@@ -3719,7 +3719,7 @@ __metadata:
   resolution: "@imtbl/orderbook@workspace:packages/orderbook"
   dependencies:
     "@imtbl/config": 0.0.0
-    "@opensea/seaport-js": 3.0.2
+    "@opensea/seaport-js": 4.0.0
     "@rollup/plugin-typescript": ^11.0.0
     "@swc/jest": ^0.2.24
     "@typechain/ethers-v5": ^10.2.0
@@ -5325,6 +5325,16 @@ __metadata:
     ethers: ^6.9.0
     merkletreejs: ^0.3.11
   checksum: a1bb99e86ce26e01c554133c91e521d0ac63422d3ae77a32ab903f7e218fe32fc2f9b7884c0b96d2c88ea4396e3a891d02e978e222743648051c1ca970df97f7
+  languageName: node
+  linkType: hard
+
+"@opensea/seaport-js@npm:4.0.0":
+  version: 4.0.0
+  resolution: "@opensea/seaport-js@npm:4.0.0"
+  dependencies:
+    ethers: ^6.9.0
+    merkletreejs: ^0.3.11
+  checksum: dcc921db35818da0111c7884e7aeb26a3b2e1909ad9395fd467ae429dbdca319e4673115d91c378fc7b6bf422c80fb0f56477813c7c45c3f0d66e7dfbc0ad02b
   languageName: node
   linkType: hard
 
