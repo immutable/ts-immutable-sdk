@@ -200,13 +200,11 @@ export const useSignOrder = (input: SignOrderInput) => {
           gasLimit,
         });
 
-        console.log(
-          '🚀 ~ waitForTrnsactionSettlement:',
-          waitForTrnsactionSettlement,
-        ); // eslint-disable-line
         setExecuteTransactions({ method, hash: txnResponse?.hash });
 
-        await txnResponse?.wait();
+        if (waitForTrnsactionSettlement) {
+          await txnResponse?.wait();
+        }
 
         transactionHash = txnResponse?.hash || '';
         return [transactionHash, undefined];
