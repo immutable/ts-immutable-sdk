@@ -78,7 +78,7 @@ export class FiatRampService {
       widgetParams = {
         ...widgetParams,
         defaultFiatAmount: 50,
-        defaultFiatCurrency: 'USD',
+        defaultFiatCurrency: 'usd',
       };
     }
 
