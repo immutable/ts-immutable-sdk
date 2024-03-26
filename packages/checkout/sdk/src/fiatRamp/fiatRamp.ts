@@ -66,13 +66,13 @@ export class FiatRampService {
     }
 
     // NOTE: only set tokenAmount and tokenSymbol if you want a fixed pre-selected token with no currency selector
-    // setting cryptoCurrency code will force the user to buy that token, defaultCryptoAmount will not work without cryptoCurrency
-    // setting defaultFiatAmount/fiatAmount + defaultFiatCurrency will take a higher priority over defaultCryptoAmount + cryptoCurrency
+    // setting cryptoCurrencyCode code will force the user to buy that token, defaultCryptoAmount will not work without cryptoCurrencyCode
+    // setting defaultFiatAmount/fiatAmount + defaultFiatCurrency will take a higher priority over defaultCryptoAmount + cryptoCurrencyCode
     if (params.tokenAmount && params.tokenSymbol) {
       widgetParams = {
         ...widgetParams,
         defaultCryptoAmount: params.tokenAmount,
-        cryptoCurrency: params.tokenSymbol,
+        cryptoCurrencyCode: params.tokenSymbol,
       };
     }
 
