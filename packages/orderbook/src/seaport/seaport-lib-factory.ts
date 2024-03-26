@@ -48,11 +48,9 @@ export class SeaportLibFactory {
   ) { }
 
   create(orderSeaportVersion?: SeaportVersion, orderSeaportAddress?: string): SeaportLib {
-    const seaportVersion = orderSeaportVersion ?? SEAPORT_CONTRACT_VERSION_V1_5;
     const seaportContractAddress = orderSeaportAddress ?? this.defaultSeaportContractAddress;
 
     return new SeaportLib(convertToV6Provider(this.provider), {
-      seaportVersion,
       balanceAndApprovalChecksOnOrderCreation: true,
       overrides: {
         contractAddress: seaportContractAddress,
