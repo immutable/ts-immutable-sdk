@@ -3810,6 +3810,7 @@ __metadata:
     rollup: ^3.17.2
     ts-node: ^10.9.1
     typescript: ^4.9.5
+    uuid: ^8.3.2
   languageName: unknown
   linkType: soft
 

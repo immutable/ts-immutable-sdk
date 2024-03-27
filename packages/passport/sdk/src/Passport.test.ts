@@ -8,11 +8,15 @@ import { Passport } from './Passport';
 import { PassportImxProvider, PassportImxProviderFactory } from './starkEx';
 import { OidcConfiguration } from './types';
 import { mockUser, mockLinkedAddresses, mockUserImx } from './test/mocks';
+import { announceProvider, passportProviderInfo } from './provider/eip6963';
+import { ZkEvmProvider } from './zkEvm';
 
 jest.mock('./authManager');
 jest.mock('./magicAdapter');
 jest.mock('./starkEx');
 jest.mock('./confirmation');
+jest.mock('./zkEvm');
+jest.mock('./provider/eip6963');
 jest.mock('@imtbl/generated-clients');
 
 const oidcConfiguration: OidcConfiguration = {
@@ -153,6 +157,38 @@ describe('Passport', () => {
         expect(result).toBe(passportImxProvider);
         expect(getProviderSilentMock).toHaveBeenCalled();
       });
+    });
+  });
+
+  describe('connectEvm', () => {
+    it('should execute connectEvm without error and return the provider', async () => {
+      const provider = await passport.connectEvm();
+
+      expect(provider).toBeInstanceOf(ZkEvmProvider);
+      expect(ZkEvmProvider).toHaveBeenCalled();
+    });
+
+    it('should announce the provider by default', async () => {
+      passportProviderInfo.uuid = 'mock123';
+      const provider = await passport.connectEvm();
+
+      expect(announceProvider).toHaveBeenCalledWith({
+        info: passportProviderInfo,
+        provider,
+      });
+    });
+
+    it('should not announce the provider if called with options announceProvider false', async () => {
+      const passportInstance = new Passport({
+        baseConfig: new ImmutableConfiguration({
+          environment: Environment.SANDBOX,
+        }),
+        ...oidcConfiguration,
+      });
+
+      await passportInstance.connectEvm({ announceProvider: false });
+
+      expect(announceProvider).not.toHaveBeenCalled();
     });
   });
 

@@ -29,6 +29,7 @@ import { Provider } from './zkEvm/types';
 import TypedEventEmitter from './utils/typedEventEmitter';
 import GuardianClient from './guardian';
 import logger from './utils/logger';
+import { announceProvider, passportProviderInfo } from './provider/eip6963';
 
 const buildImxClientConfig = (passportModuleConfiguration: PassportModuleConfiguration) => {
   if (passportModuleConfiguration.overrides) {
@@ -137,8 +138,12 @@ export class Passport {
     return this.passportImxProviderFactory.getProvider();
   }
 
-  public connectEvm(): Provider {
-    return new ZkEvmProvider({
+  public connectEvm(options: {
+    announceProvider: boolean
+  } = {
+    announceProvider: true,
+  }): Provider {
+    const provider = new ZkEvmProvider({
       passportEventEmitter: this.passportEventEmitter,
       authManager: this.authManager,
       magicAdapter: this.magicAdapter,
@@ -146,6 +151,15 @@ export class Passport {
       multiRollupApiClients: this.multiRollupApiClients,
       guardianClient: this.guardianClient,
     });
+
+    if (options?.announceProvider) {
+      announceProvider({
+        info: passportProviderInfo,
+        provider,
+      });
+    }
+
+    return provider;
   }
 
   /**
