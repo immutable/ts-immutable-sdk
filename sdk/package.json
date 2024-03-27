@@ -20,7 +20,7 @@
     "@jest/globals": "^29.5.0",
     "@magic-ext/oidc": "4.2.0",
     "@metamask/detect-provider": "^2.0.0",
-    "@opensea/seaport-js": "2.0.7",
+    "@opensea/seaport-js": "4.0.0",
     "@rive-app/react-canvas": "^4.8.3",
     "@uniswap/router-sdk": "^1.4.0",
     "@uniswap/sdk-core": "^3.0.1",
@@ -36,6 +36,7 @@
     "enc-utils": "^3.0.0",
     "ethereumjs-wallet": "^1.0.2",
     "ethers": "^5.7.2",
+    "ethers-v6": "npm:ethers@6.11.1",
     "global-const": "^0.1.2",
     "https-browserify": "^1.0.0",
     "i18next": "^23.7.6",
@@ -52,6 +53,9 @@
     "url": "^0.11.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.21.0",
+    "@babel/plugin-transform-class-properties": "^7.24.1",
+    "@babel/plugin-transform-private-methods": "^7.24.1",
     "@imtbl/blockchain-data": "0.0.0",
     "@imtbl/checkout-sdk": "0.0.0",
     "@imtbl/checkout-widgets": "0.0.0",
@@ -64,6 +68,7 @@
     "@imtbl/version-check": "0.0.0",
     "@imtbl/x-client": "0.0.0",
     "@imtbl/x-provider": "0.0.0",
+    "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-commonjs": "^24.0.1",
     "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-node-resolve": "^15.0.2",
@@ -135,8 +140,8 @@
     "@openzeppelin/contracts": "3.4.2-solc-0.7"
   },
   "scripts": {
-    "build": "yarn packageList && yarn updateDependencies && yarn regenModules && rm -rf dist && NODE_ENV=production rollup --config rollup.config.js && rm -rf dist/types",
-    "build:only": "rm -rf dist && NODE_ENV=production rollup --config rollup.config.js && rm -rf dist/types",
+    "build": "yarn packageList && yarn updateDependencies && yarn regenModules && rm -rf dist && NODE_ENV=production node --max-old-space-size=8192 ../node_modules/rollup/dist/bin/rollup --config rollup.config.js && rm -rf dist/types",
+    "build:only": "rm -rf dist && NODE_ENV=production node --max-old-space-size=8192 ../node_modules/rollup/dist/bin/rollup --config rollup.config.js && rm -rf dist/types",
     "copyBrowserBundles": "node scripts/copyBrowserBundles.js",
     "generateIndex": "node scripts/generateIndex.js",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
