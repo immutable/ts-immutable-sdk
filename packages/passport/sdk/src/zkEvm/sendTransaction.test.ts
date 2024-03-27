@@ -63,7 +63,9 @@ describe('sendTransaction', () => {
       signedTransactions,
     );
     relayerClient.ethSendTransaction.mockResolvedValue(relayerTransactionId);
-    withConfirmationScreenStub.mockImplementation(() => (task: () => void) => task());
+    withConfirmationScreenStub.mockImplementation(
+      () => (task: () => void) => task(),
+    );
     guardianClient.withConfirmationScreen = withConfirmationScreenStub;
     rpcProvider.detectNetwork.mockResolvedValue({ chainId });
   });
@@ -202,6 +204,29 @@ describe('sendTransaction', () => {
       new JsonRpcError(
         RpcErrorCode.INTERNAL_ERROR,
         'Transaction failed to submit with status FAILED. Error message: Unable to complete transaction',
+      ),
+    );
+  });
+
+  it('returns and surfaces an error if the relayer cancels a transaction', async () => {
+    (retryWithDelay as jest.Mock).mockResolvedValue({
+      status: RelayerTransactionStatus.CANCELLED,
+      statusMessage: 'Transaction cancelled',
+    } as RelayerTransaction);
+
+    await expect(
+      sendTransaction({
+        params: [transactionRequest],
+        ethSigner,
+        rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
+        relayerClient: relayerClient as unknown as RelayerClient,
+        zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
+        guardianClient: guardianClient as unknown as GuardianClient,
+      }),
+    ).rejects.toThrow(
+      new JsonRpcError(
+        RpcErrorCode.INTERNAL_ERROR,
+        'Transaction failed to submit with status CANCELLED. Error message: Transaction cancelled',
       ),
     );
   });
