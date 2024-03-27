@@ -217,10 +217,10 @@ describe('sendTransaction', () => {
     await expect(
       sendTransaction({
         params: [transactionRequest],
-        magicProvider,
-        jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
+        ethSigner,
+        rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,
-        user: mockUserZkEvm,
+        zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
         guardianClient: guardianClient as unknown as GuardianClient,
       }),
     ).rejects.toThrow(
