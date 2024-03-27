@@ -29,7 +29,7 @@ import { Provider } from './zkEvm/types';
 import TypedEventEmitter from './utils/typedEventEmitter';
 import GuardianClient from './guardian';
 import logger from './utils/logger';
-import { announceProvider, passportProviderInfo } from './provider/eip6963';
+import { announceProvider, passportProviderInfo } from './zkEvm/provider/eip6963';
 
 const buildImxClientConfig = (passportModuleConfiguration: PassportModuleConfiguration) => {
   if (passportModuleConfiguration.overrides) {

@@ -8,7 +8,7 @@ import { Passport } from './Passport';
 import { PassportImxProvider, PassportImxProviderFactory } from './starkEx';
 import { OidcConfiguration } from './types';
 import { mockUser, mockLinkedAddresses, mockUserImx } from './test/mocks';
-import { announceProvider, passportProviderInfo } from './provider/eip6963';
+import { announceProvider, passportProviderInfo } from './zkEvm/provider/eip6963';
 import { ZkEvmProvider } from './zkEvm';
 
 jest.mock('./authManager');
@@ -16,7 +16,7 @@ jest.mock('./magicAdapter');
 jest.mock('./starkEx');
 jest.mock('./confirmation');
 jest.mock('./zkEvm');
-jest.mock('./provider/eip6963');
+jest.mock('./zkEvm/provider/eip6963');
 jest.mock('@imtbl/generated-clients');
 
 const oidcConfiguration: OidcConfiguration = {

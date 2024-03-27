@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { EIP6963AnnounceProviderEvent, EIP6963ProviderDetail, EIP6963ProviderInfo } from './types';
+import { EIP6963AnnounceProviderEvent, EIP6963ProviderDetail, EIP6963ProviderInfo } from '../types';
 
 export const passportProviderInfo = {
   // eslint-disable-next-line max-len
