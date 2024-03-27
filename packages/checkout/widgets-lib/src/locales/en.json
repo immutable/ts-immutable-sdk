@@ -598,7 +598,7 @@
       "fees": {
         "fiatPricePrefix": "USD $",
         "gasFeeSwap": {
-          "label": "Gas fee swap"
+          "label": "Gas fee"
         },
         "gasFeeMove": {
           "label": "Gas fee move"
@@ -608,6 +608,9 @@
         },
         "serviceFee": {
           "label": "Service fee"
+        },
+        "secondarySwapFee": {
+          "label": "Swap service fee"
         }
       }
     },

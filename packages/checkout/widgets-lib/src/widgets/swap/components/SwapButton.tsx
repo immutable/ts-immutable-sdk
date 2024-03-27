@@ -23,7 +23,7 @@ export interface SwapButtonProps {
   loading: boolean
   updateLoading: (value: boolean) => void
   validator: () => boolean
-  transaction: TransactionResponse | null;
+  transaction: TransactionResponse | undefined;
   data?: SwapFormData;
   insufficientFundsForGas: boolean;
   openNotEnoughImxDrawer: () => void;
