@@ -704,6 +704,68 @@ describe('balances', () => {
       expect(getAllBalancesResult.balances).toEqual([]);
     });
 
+    it('should fallback to balances via RPC if Blockscout rate limits with 429 error', async () => {
+      getTokensByWalletAddressMock = jest.fn().mockRejectedValue(
+        { code: HttpStatusCode.TooManyRequests, message: 'Too many requests' },
+      );
+
+      (Blockscout as unknown as jest.Mock).mockReturnValue({
+        getTokensByWalletAddress: getTokensByWalletAddressMock,
+        getNativeTokenByWalletAddress: getNativeTokenByWalletAddressMock,
+      });
+
+      let type;
+      let getAllBalancesResult;
+      try {
+        getAllBalancesResult = await getAllBalances(
+          {
+            remote: {
+              getTokensConfig: () => ({
+                blockscout: true,
+              }),
+              getHttpClient: () => mockedHttpClient,
+            },
+            networkMap: testCheckoutConfig.networkMap,
+          } as unknown as CheckoutConfiguration,
+          jest.fn() as unknown as Web3Provider,
+          '0xabc123', // use unique wallet address to prevent cached data
+          ChainId.ETHEREUM,
+        );
+      } catch (err: any) {
+        type = err.type;
+      }
+
+      expect(getTokensByWalletAddressMock).toHaveBeenCalledTimes(1);
+
+      expect(type).toEqual(undefined);
+      expect(getAllBalancesResult?.balances).toEqual(
+        expect.arrayContaining(
+          [
+            {
+              balance: currentBalance,
+              formattedBalance,
+              token: {
+                name: 'Immutable X',
+                symbol: 'IMX',
+                decimals: 18,
+                address: '0xL1Address',
+              },
+            },
+            {
+              balance: currentBalance,
+              formattedBalance,
+              token: {
+                name: 'Matic',
+                symbol: 'MATIC',
+                decimals: 18,
+                address: '0xmaticAddress',
+              },
+            },
+          ],
+        ),
+      );
+    });
+
     const testCases = [{
       errorMessage: 'test',
       expectedErrorMessage: 'test',
