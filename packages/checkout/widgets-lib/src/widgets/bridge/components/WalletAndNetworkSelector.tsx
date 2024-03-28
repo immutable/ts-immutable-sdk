@@ -9,7 +9,7 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { ChainId, WalletProviderRdns } from '@imtbl/checkout-sdk';
+import { ChainId, CheckoutErrorType, WalletProviderRdns } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import {
   connectToProvider,
@@ -27,9 +27,11 @@ import {
   useAnalytics,
 } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { useTranslation } from 'react-i18next';
+import { ChangedYourMindDrawer } from 'components/ChangedYourMindDrawer/ChangedYourMindDrawer';
+import { UnableToConnectDrawer } from 'components/UnableToConnectDrawer/UnableToConnectDrawer';
 import {
   bridgeHeadingStyles,
-  brigdeWalletWrapperStyles,
+  bridgeWalletWrapperStyles,
   submitButtonWrapperStyles,
 } from './WalletAndNetworkSelectorStyles';
 import { BridgeActions, BridgeContext, WalletProviderInfo } from '../context/BridgeContext';
@@ -104,6 +106,9 @@ export function WalletAndNetworkSelector() {
   /* Derived state */
   const isFromWalletAndNetworkSelected = fromWalletWeb3Provider && fromNetwork;
   const isToWalletAndNetworkSelected = toWalletWeb3Provider && toNetwork;
+
+  const [showChangedYourMindDrawer, setShowChangedYourMindDrawer] = useState(false);
+  const [showUnableToConnectDrawer, setShowUnableToConnectDrawer] = useState(false);
 
   const fromWalletProviderName = useMemo(() => {
     if (!fromWalletWeb3Provider) return null;
@@ -192,18 +197,42 @@ export function WalletAndNetworkSelector() {
   const handleFromWalletConnection = useCallback(
     async (event: WalletChangeEvent) => {
       clearToWalletSelections();
-      setFromWallet(event);
 
-      let changeAccount = false;
-      if (event.providerDetail.info.rdns === WalletProviderRdns.METAMASK) {
-        changeAccount = true;
+      try {
+        setFromWallet(event);
+        setShowChangedYourMindDrawer(false);
+        setShowUnableToConnectDrawer(false);
+
+        let changeAccount = false;
+        if (event.providerDetail.info.rdns === WalletProviderRdns.METAMASK) {
+          changeAccount = true;
+        }
+        const web3Provider = new Web3Provider(event.provider as any);
+        const connectedProvider = await connectToProvider(checkout, web3Provider, changeAccount);
+        await handleFromWalletConnectionSuccess(connectedProvider);
+      } catch (err: CheckoutErrorType | any) {
+        if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
+        // eslint-disable-next-line no-console
+          console.error('Connect rejected', err);
+
+          setFromWalletDrawerOpen(false);
+          setShowChangedYourMindDrawer(true);
+        } else {
+          // eslint-disable-next-line no-console
+          console.error('Connect error', err);
+
+          setShowUnableToConnectDrawer(true);
+        }
       }
-      const web3Provider = new Web3Provider(event.provider as any);
-      const connectedProvider = await connectToProvider(checkout, web3Provider, changeAccount);
-      await handleFromWalletConnectionSuccess(connectedProvider);
     },
     [checkout],
   );
+
+  const onFromWalletChangeEventChange = useCallback(() => {
+    if (!fromWallet) return;
+    setFromWalletDrawerOpen(true);
+    handleFromWalletConnection(fromWallet!);
+  }, [fromWallet]);
 
   const handleFromNetworkSelection = useCallback(
     async (chainId: ChainId) => {
@@ -293,6 +322,9 @@ export function WalletAndNetworkSelector() {
 
       try {
         setToWallet(event);
+        setShowChangedYourMindDrawer(false);
+        setShowUnableToConnectDrawer(false);
+
         const web3Provider = new Web3Provider(event.provider as any);
         const connectedProvider = await connectToProvider(checkout, web3Provider, false);
 
@@ -315,9 +347,19 @@ export function WalletAndNetworkSelector() {
             },
           });
         }
-      } catch (error) {
+      } catch (err: CheckoutErrorType | any) {
+        if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
         // eslint-disable-next-line no-console
-        console.error(error);
+          console.error('Connect rejected', err);
+
+          setToWalletDrawerOpen(false);
+          setShowChangedYourMindDrawer(true);
+        } else {
+          // eslint-disable-next-line no-console
+          console.error('Connect error', err);
+
+          setShowUnableToConnectDrawer(true);
+        }
       }
     },
     [
@@ -327,6 +369,12 @@ export function WalletAndNetworkSelector() {
       handleWalletConnectToWalletConnection,
     ],
   );
+
+  const onToWalletChangeEventChange = useCallback(() => {
+    if (!toWallet) return;
+    setToWalletDrawerOpen(true);
+    handleToWalletSelection(toWallet!);
+  }, [toWallet]);
 
   const handleSubmitDetails = useCallback(() => {
     if (
@@ -413,7 +461,7 @@ export function WalletAndNetworkSelector() {
   ]);
 
   return (
-    <Box testId={testId} sx={brigdeWalletWrapperStyles}>
+    <Box testId={testId} sx={bridgeWalletWrapperStyles}>
       <Heading
         testId={`${testId}-heading`}
         size="small"
@@ -558,6 +606,28 @@ export function WalletAndNetworkSelector() {
           </Box>
         </Box>
       )}
+
+      <ChangedYourMindDrawer
+        visible={showChangedYourMindDrawer}
+        checkout={checkout!}
+        onCloseDrawer={() => setShowChangedYourMindDrawer(false)}
+        onTryAgain={onFromWalletChangeEventChange}
+      />
+
+      <ChangedYourMindDrawer
+        visible={showChangedYourMindDrawer}
+        checkout={checkout!}
+        onCloseDrawer={() => setShowChangedYourMindDrawer(false)}
+        onTryAgain={onToWalletChangeEventChange}
+      />
+
+      <UnableToConnectDrawer
+        visible={showUnableToConnectDrawer}
+        checkout={checkout!}
+        onCloseDrawer={() => setShowUnableToConnectDrawer(false)}
+        onTryAgain={() => setShowUnableToConnectDrawer(false)}
+      />
+
     </Box>
   );
 }

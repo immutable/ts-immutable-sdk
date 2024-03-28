@@ -1,4 +1,4 @@
-export const brigdeWalletWrapperStyles = {
+export const bridgeWalletWrapperStyles = {
   height: '100%',
   display: 'flex',
   flexDirection: 'column',
