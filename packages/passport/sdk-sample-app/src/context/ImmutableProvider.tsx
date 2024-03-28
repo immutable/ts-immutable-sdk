@@ -143,9 +143,7 @@ const getOrderbookConfig = (environment: EnvironmentNames): ModuleConfiguration<
           zoneContractAddress: '0x030a84161998972648e639bd0e2123b019e7DfE5',
           apiEndpoint: 'https://api.dev.immutable.com',
           chainName: 'imtbl-zkevm-devnet',
-          provider: new providers.JsonRpcProvider(
-            'https://rpc.dev.immutable.com',
-          ),
+          jsonRpcProviderUrl: 'https://rpc.dev.immutable.com',
         },
       };
     }
