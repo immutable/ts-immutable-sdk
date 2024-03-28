@@ -12,6 +12,9 @@ export const getBridgeFeeEstimate = async (
   readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
   fromChainId: ChainId,
   toChainId: ChainId,
+  senderAddress: string,
+  amount: BigNumber,
+  tokenAddress: string,
 ): Promise<BridgeFeeResponse & { approvalGas: BigNumber; }> => {
   const bridge = instance.createBridgeInstance(
     fromChainId,
@@ -27,6 +30,10 @@ export const getBridgeFeeEstimate = async (
         gasMultiplier: 1.1,
         sourceChainId: fromChainId.toString(),
         destinationChainId: toChainId.toString(),
+        token: tokenAddress,
+        amount,
+        senderAddress,
+        recipientAddress: senderAddress,
       },
     );
 

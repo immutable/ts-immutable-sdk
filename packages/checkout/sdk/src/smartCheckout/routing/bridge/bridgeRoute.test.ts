@@ -110,6 +110,7 @@ describe('bridgeRoute', () => {
           },
           bridgeRequirement,
           balances,
+          '0x0',
         );
 
         expect(route).toEqual({
@@ -205,6 +206,7 @@ describe('bridgeRoute', () => {
           },
           bridgeRequirement,
           balances,
+          '0x0',
         );
 
         expect(route).toEqual({
@@ -300,6 +302,7 @@ describe('bridgeRoute', () => {
           },
           bridgeRequirement,
           balances,
+          '0x0',
         );
 
         expect(route).toBeUndefined();
@@ -342,6 +345,7 @@ describe('bridgeRoute', () => {
           },
           bridgeRequirement,
           balances,
+          '0x0',
         );
 
         expect(allowListCheckForBridge).toHaveBeenCalledTimes(1);
@@ -420,6 +424,7 @@ describe('bridgeRoute', () => {
           },
           bridgeRequirement,
           balances,
+          '0xOWNER_ADDRESS',
         );
 
         expect(route).toEqual({
@@ -525,6 +530,7 @@ describe('bridgeRoute', () => {
           },
           bridgeRequirement,
           balances,
+          '0xOWNER_ADDRESS',
         );
 
         expect(route).toEqual({
@@ -630,6 +636,7 @@ describe('bridgeRoute', () => {
           },
           bridgeRequirement,
           balances,
+          '0xOWNER_ADDRESS',
         );
 
         expect(route).toBeUndefined();
@@ -671,6 +678,7 @@ describe('bridgeRoute', () => {
           },
           bridgeRequirement,
           balances,
+          '0x0',
         );
 
         expect(route).toBeUndefined();
@@ -713,6 +721,7 @@ describe('bridgeRoute', () => {
           },
           bridgeRequirement,
           balances,
+          '0xOWNER_ADDRESS',
         );
 
         expect(allowListCheckForBridge).toHaveBeenCalledTimes(1);
@@ -750,6 +759,7 @@ describe('bridgeRoute', () => {
         },
         bridgeRequirement,
         balances,
+        '0xOWNER_ADDRESS',
       );
 
       expect(route).toBeUndefined();
@@ -777,6 +787,7 @@ describe('bridgeRoute', () => {
         },
         bridgeRequirement,
         balances,
+        '0xOWNER_ADDRESS',
       );
 
       expect(route).toEqual(undefined);
@@ -804,6 +815,7 @@ describe('bridgeRoute', () => {
         },
         bridgeRequirement,
         balances,
+        '0xOWNER_ADDRESS',
       );
 
       expect(route).toEqual(undefined);
@@ -837,6 +849,7 @@ describe('bridgeRoute', () => {
           },
           bridgeRequirement,
           balances,
+          '0xOWNER_ADDRESS',
         );
       } catch (err: any) {
         type = err.type;

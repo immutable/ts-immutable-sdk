@@ -20,7 +20,7 @@ async function getBridgeFees() {
 
   const bridgeConfig = new BridgeConfiguration({
     baseConfig: new ImmutableConfiguration({
-      environment: Environment.SANDBOX,
+      environment: params.environment,
     }),
     bridgeInstance: params.bridgeInstance,
     rootProvider: params.rootProvider,
@@ -34,19 +34,27 @@ async function getBridgeFees() {
     gasMultiplier: 1.1,
     sourceChainId: bridgeConfig.bridgeInstance.rootChainID,
     destinationChainId: bridgeConfig.bridgeInstance.childChainID,
+    amount: params.amount,
+    token: params.rootToken,
+    senderAddress: params.sender,
+    recipientAddress: params.recipient,
   }
 
   console.log('depositReq', depositReq);
 
   const depositRes: BridgeFeeResponse = await tokenBridge.getFee(depositReq);
-  console.log('depositRes', depositRes);
 
+  console.log('depositRes', depositRes);
 
   const withdrawReq: BridgeFeeRequest = {
     action: BridgeFeeActions.WITHDRAW,
     gasMultiplier: 1.1,
     sourceChainId: bridgeConfig.bridgeInstance.childChainID,
     destinationChainId: bridgeConfig.bridgeInstance.rootChainID,
+    amount: params.amount,
+    token: params.childToken,
+    senderAddress: params.sender,
+    recipientAddress: params.recipient,
   }
 
   console.log('withdrawReq', withdrawReq)

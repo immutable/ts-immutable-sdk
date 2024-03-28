@@ -537,14 +537,18 @@ describe('Token Bridge', () => {
     const originalValidateDepositArgs = TokenBridge.prototype['validateDepositArgs'];
     const originalGetGasEstimates = TokenBridge.prototype['getGasEstimates'];
     const originalCalculateBridgeFee = TokenBridge.prototype['calculateBridgeFee'];
+    const originalGetTenderlyBridgeGasEstimates = TokenBridge.prototype['getTenderlyBridgeGasEstimates'];
 
     const sourceChainGas:ethers.BigNumber = ethers.utils.parseUnits('0.000001', 18);
-    const approavalGas:ethers.BigNumber = ethers.utils.parseUnits('0.000001', 18);
+    const approvalGas:ethers.BigNumber = ethers.utils.parseUnits('0.000001', 18);
     const destinationChainGas:ethers.BigNumber = ethers.utils.parseUnits('0.000001', 18);
     const validatorFee:ethers.BigNumber = ethers.utils.parseUnits('0.0001', 18);
     const bridgeFee:ethers.BigNumber = destinationChainGas.add(validatorFee);
     const imtblFee:ethers.BigNumber = ethers.BigNumber.from(0);
     const totalFees:ethers.BigNumber = sourceChainGas.add(bridgeFee).add(imtblFee);
+    const sender = '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772';
+    const receipient = '0xA383968dC8711FFE8A7353AdE9feF7Ddcb1473a0';
+    const token = '0x40b87d235A5B010a20A241F15797C9debf1ecd01';
 
     beforeEach(() => {
       const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
@@ -574,44 +578,245 @@ describe('Token Bridge', () => {
       TokenBridge.prototype['validateDepositArgs'] = originalValidateDepositArgs;
       TokenBridge.prototype['getGasEstimates'] = originalGetGasEstimates;
       TokenBridge.prototype['calculateBridgeFee'] = originalCalculateBridgeFee;
+      TokenBridge.prototype['getTenderlyBridgeGasEstimates'] = originalGetTenderlyBridgeGasEstimates;
     });
-    it('returns the deposit fees for native tokens', async () => {
-      expect.assertions(5);
+
+    it('returns the static deposit fees for native tokens', async () => {
+      expect.assertions(6);
+
+      const amount = ethers.BigNumber.from(1000);
       const result = await tokenBridge.getFee(
         {
           action: BridgeFeeActions.DEPOSIT,
           gasMultiplier: 1.1,
           sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
           destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
+          amount,
+          token: 'NATIVE',
+          senderAddress: '0x0',
+          recipientAddress: '0x0',
         },
       );
 
       expect(result).not.toBeNull();
       expect(result.sourceChainGas).toStrictEqual(sourceChainGas);
+      expect(result.approvalFee).toStrictEqual(ethers.BigNumber.from(0));
       expect(result.bridgeFee).toStrictEqual(bridgeFee);
       expect(result.imtblFee).toStrictEqual(imtblFee);
       expect(result.totalFees).toStrictEqual(totalFees);
     });
 
-    it('returns the deposit fees for ERC20 tokens', async () => {
+    it('returns the static deposit fees for ERC20 tokens', async () => {
       expect.assertions(6);
+      const amount = ethers.BigNumber.from(1000);
+      const allowance = ethers.BigNumber.from(1000);
+
+      mockERC20Contract.allowance.mockResolvedValue(allowance);
+
       const result = await tokenBridge.getFee(
         {
           action: BridgeFeeActions.DEPOSIT,
           gasMultiplier: 1.1,
           sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
           destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
-          token: '0x40b87d235A5B010a20A241F15797C9debf1ecd01',
-          amount: ethers.BigNumber.from(1000),
+          amount,
+          token,
+          senderAddress: '0x0',
+          recipientAddress: '0x0',
         },
       );
 
       expect(result).not.toBeNull();
       expect(result.sourceChainGas).toStrictEqual(sourceChainGas);
-      expect(result.approvalFee).toStrictEqual(approavalGas);
+      expect(result.approvalFee).toStrictEqual(approvalGas);
       expect(result.bridgeFee).toStrictEqual(bridgeFee);
       expect(result.imtblFee).toStrictEqual(imtblFee);
-      expect(result.totalFees).toStrictEqual(totalFees.add(approavalGas));
+      expect(result.totalFees).toStrictEqual(totalFees.add(approvalGas));
+    });
+
+    it('returns the dynamic deposit fees for native tokens', async () => {
+      expect.assertions(6);
+
+      jest.spyOn(TokenBridge.prototype as any, 'getTenderlyBridgeGasEstimates')
+        .mockImplementation(async () => ({
+          approvalFee: 0,
+          sourceChainGas: 1000,
+        }));
+
+      const amount = ethers.BigNumber.from(1000);
+      const result = await tokenBridge.getFee(
+        {
+          action: BridgeFeeActions.DEPOSIT,
+          gasMultiplier: 1.1,
+          sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
+          amount,
+          token: 'NATIVE',
+          senderAddress: sender,
+          recipientAddress: receipient,
+        },
+      );
+
+      expect(result).not.toBeNull();
+      expect(result.sourceChainGas).toStrictEqual(sourceChainGas);
+      expect(result.approvalFee).toStrictEqual(ethers.BigNumber.from(0));
+      expect(result.bridgeFee).toStrictEqual(bridgeFee);
+      expect(result.imtblFee).toStrictEqual(imtblFee);
+      expect(result.totalFees).toStrictEqual(totalFees);
+    });
+
+    it('returns the dynamic deposit fees for ERC20 tokens with no allowance required', async () => {
+      expect.assertions(6);
+      const amount = ethers.BigNumber.from(1000);
+      const allowance = ethers.BigNumber.from(1000);
+
+      mockERC20Contract.allowance.mockResolvedValue(allowance);
+
+      jest.spyOn(TokenBridge.prototype as any, 'getTenderlyBridgeGasEstimates')
+        .mockImplementation(async () => ({
+          approvalFee: 0,
+          sourceChainGas: 1000,
+        }));
+
+      const result = await tokenBridge.getFee(
+        {
+          action: BridgeFeeActions.DEPOSIT,
+          gasMultiplier: 1.1,
+          sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
+          amount,
+          token,
+          senderAddress: sender,
+          recipientAddress: receipient,
+        },
+      );
+
+      expect(result).not.toBeNull();
+      expect(result.sourceChainGas).toStrictEqual(sourceChainGas);
+      expect(result.approvalFee).toStrictEqual(ethers.BigNumber.from(0));
+      expect(result.bridgeFee).toStrictEqual(bridgeFee);
+      expect(result.imtblFee).toStrictEqual(imtblFee);
+      expect(result.totalFees).toStrictEqual(totalFees);
+    });
+
+    it('returns the dynamic deposit fees for ERC20 tokens with allowance requiring increase', async () => {
+      expect.assertions(6);
+      const amount = ethers.BigNumber.from(1000);
+      const allowance = ethers.BigNumber.from(500);
+
+      mockERC20Contract.allowance.mockResolvedValue(allowance);
+
+      jest.spyOn(TokenBridge.prototype as any, 'getTenderlyBridgeGasEstimates')
+        .mockImplementation(async () => ({
+          approvalFee: 1000,
+          sourceChainGas: 1000,
+        }));
+
+      const result = await tokenBridge.getFee(
+        {
+          action: BridgeFeeActions.DEPOSIT,
+          gasMultiplier: 1.1,
+          sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
+          amount,
+          token,
+          senderAddress: sender,
+          recipientAddress: receipient,
+        },
+      );
+
+      expect(result).not.toBeNull();
+      expect(result.sourceChainGas).toStrictEqual(sourceChainGas);
+      expect(result.approvalFee).toStrictEqual(approvalGas);
+      expect(result.bridgeFee).toStrictEqual(bridgeFee);
+      expect(result.imtblFee).toStrictEqual(imtblFee);
+      expect(result.totalFees).toStrictEqual(totalFees.add(approvalGas));
+    });
+
+    it('returns the dynamic withdrawal fees for native tokens', async () => {
+      expect.assertions(6);
+      const amount = ethers.BigNumber.from(1000);
+      const result = await tokenBridge.getFee(
+        {
+          action: BridgeFeeActions.WITHDRAW,
+          gasMultiplier: 1.1,
+          sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
+          destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          amount,
+          token: 'NATIVE',
+          senderAddress: sender,
+          recipientAddress: receipient,
+        },
+      );
+
+      expect(result).not.toBeNull();
+      expect(result.sourceChainGas).toStrictEqual(sourceChainGas);
+      expect(result.approvalFee).toStrictEqual(ethers.BigNumber.from(0));
+      expect(result.bridgeFee).toStrictEqual(bridgeFee);
+      expect(result.imtblFee).toStrictEqual(imtblFee);
+      expect(result.totalFees).toStrictEqual(totalFees);
+    });
+
+    it('returns the dynamic withdrawal fees for ERC20 tokens with no allowance required', async () => {
+      expect.assertions(6);
+      const amount = ethers.BigNumber.from(1000);
+      const allowance = ethers.BigNumber.from(1000);
+
+      mockERC20Contract.allowance.mockResolvedValue(allowance);
+
+      const result = await tokenBridge.getFee(
+        {
+          action: BridgeFeeActions.WITHDRAW,
+          gasMultiplier: 1.1,
+          sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
+          destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          amount,
+          token,
+          senderAddress: sender,
+          recipientAddress: receipient,
+        },
+      );
+
+      expect(result).not.toBeNull();
+      expect(result.sourceChainGas).toStrictEqual(sourceChainGas);
+      expect(result.approvalFee).toStrictEqual(ethers.BigNumber.from(0));
+      expect(result.bridgeFee).toStrictEqual(bridgeFee);
+      expect(result.imtblFee).toStrictEqual(imtblFee);
+      expect(result.totalFees).toStrictEqual(totalFees);
+    });
+
+    it('returns the dynamicwithdrawal fees for ERC20 tokens with allowance requiring increase', async () => {
+      expect.assertions(6);
+      const amount = ethers.BigNumber.from(1000);
+      const allowance = ethers.BigNumber.from(500);
+
+      mockERC20Contract.allowance.mockResolvedValue(allowance);
+
+      jest.spyOn(TokenBridge.prototype as any, 'getTenderlyBridgeGasEstimates')
+        .mockImplementation(async () => ({
+          approvalFee: 1000,
+          sourceChainGas: 1000,
+        }));
+
+      const result = await tokenBridge.getFee(
+        {
+          action: BridgeFeeActions.WITHDRAW,
+          gasMultiplier: 1.1,
+          sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
+          destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          amount,
+          token,
+          senderAddress: sender,
+          recipientAddress: receipient,
+        },
+      );
+
+      expect(result).not.toBeNull();
+      expect(result.sourceChainGas).toStrictEqual(sourceChainGas);
+      expect(result.approvalFee).toStrictEqual(approvalGas);
+      expect(result.bridgeFee).toStrictEqual(bridgeFee);
+      expect(result.imtblFee).toStrictEqual(imtblFee);
+      expect(result.totalFees).toStrictEqual(totalFees.add(approvalGas));
     });
   });
 

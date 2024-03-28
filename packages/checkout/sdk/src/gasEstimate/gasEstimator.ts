@@ -25,6 +25,10 @@ const DEFAULT_TOKEN_DECIMALS = 18;
 async function bridgeToL2GasEstimator(
   readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
   config: CheckoutConfiguration,
+  amount?: string,
+  tokenAddress?: string,
+  senderAddress?: string,
+  recipientAddress?: string,
 ): Promise<GasEstimateBridgeToL2Result> {
   const fromChainId = getL1ChainId(config);
   const toChainId = getL2ChainId(config);
@@ -46,6 +50,10 @@ async function bridgeToL2GasEstimator(
       fromChainId,
       toChainId,
       config,
+      amount,
+      tokenAddress,
+      senderAddress,
+      recipientAddress,
     );
 
     return {
@@ -131,6 +139,10 @@ export async function gasEstimator(
       return await bridgeToL2GasEstimator(
         readOnlyProviders,
         config,
+        params.amount,
+        params.tokenAddress,
+        params.senderAddress,
+        params.recipientAddress,
       );
     case GasEstimateType.SWAP:
       return await swapGasEstimator(config);

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-console */
 /* eslint-disable class-methods-use-this */
 import axios, { AxiosResponse } from 'axios';
@@ -12,6 +13,7 @@ import {
   axelarAPIEndpoints,
   axelarChains,
   bridgeMethods,
+  tenderlyAPIEndpoints,
 } from './constants/bridges';
 import { ROOT_ERC20_BRIDGE_FLOW_RATE } from './contracts/ABIs/RootERC20BridgeFlowRate';
 import { ERC20 } from './contracts/ABIs/ERC20';
@@ -48,6 +50,8 @@ import {
   FungibleToken,
   FlowRateInfoItem,
   TxStatusRequestItem,
+  GetAllowanceResponse,
+  TenderlyGasEstimatesResponse,
 } from './types';
 import { GMPStatus, GMPStatusResponse, GasPaidStatus } from './types/axelar';
 import { queryTransactionStatus } from './lib/gmpRecovery';
@@ -141,41 +145,67 @@ export class TokenBridge {
       );
     }
 
-    let sourceChainGas: ethers.BigNumber = ethers.BigNumber.from(0);
-    let approvalFee: ethers.BigNumber = ethers.BigNumber.from(0);
-    let bridgeFee: ethers.BigNumber = ethers.BigNumber.from(0);
     const imtblFee: ethers.BigNumber = ethers.BigNumber.from(0);
-
-    if ('token' in req && req.token !== 'NATIVE') {
-      approvalFee = await this.getGasEstimates(
-        this.config.rootProvider,
-        BridgeMethodsGasLimit.APPROVE_TOKEN,
-      );
-    }
+    let bridgeFee: ethers.BigNumber = ethers.BigNumber.from(0);
+    let sourceChainGas = ethers.BigNumber.from(0);
+    let approvalFee = ethers.BigNumber.from(0);
+    let destinationChainGas = 0;
 
     if (req.action === BridgeFeeActions.FINALISE_WITHDRAWAL) {
+      const feeData: FeeData = await this.config.rootProvider.getFeeData();
       sourceChainGas = await this.getGasEstimates(
-        this.config.rootProvider,
+        feeData,
         BridgeMethodsGasLimit.FINALISE_WITHDRAWAL,
       );
-    } else {
-      const sourceProvider:ethers.providers.Provider = (req.action === BridgeFeeActions.WITHDRAW)
-        ? this.config.childProvider : this.config.rootProvider;
 
-      sourceChainGas = await this.getGasEstimates(
-        sourceProvider,
-        BridgeMethodsGasLimit[`${req.action}_SOURCE`],
-      );
+      const totalFees: ethers.BigNumber = sourceChainGas.add(approvalFee).add(bridgeFee).add(imtblFee);
 
-      const feeResult = await this.calculateBridgeFee(
-        req.sourceChainId,
-        req.destinationChainId,
-        BridgeMethodsGasLimit[`${req.action}_DESTINATION`],
-        req.gasMultiplier,
-      );
-
-      bridgeFee = feeResult.bridgeFee;
+      return {
+        sourceChainGas,
+        approvalFee,
+        bridgeFee,
+        imtblFee, // no network fee charged currently
+        totalFees,
+      };
     }
+
+    const sourceProvider:ethers.providers.Provider = (req.action === BridgeFeeActions.WITHDRAW)
+      ? this.config.childProvider : this.config.rootProvider;
+
+    let fees;
+
+    // use static fees as a fallback where no sender & recipient is parsed
+    // @TODO deprecate this and always use dynamic fees
+    if (req.senderAddress === '0x0' || req.recipientAddress === '0x0') {
+      fees = await this.getFeesStatic(
+        sourceProvider,
+        req.action,
+        req.token,
+      );
+    } else {
+      fees = await this.getFeesDynamic(
+        sourceProvider,
+        req.action,
+        req.sourceChainId,
+        req.token,
+        req.senderAddress,
+        req.recipientAddress,
+        req.amount,
+      );
+    }
+
+    destinationChainGas = fees.destinationChainGas;
+    sourceChainGas = fees.sourceChainGas;
+    approvalFee = fees.approvalFee;
+
+    const feeResult = await this.calculateBridgeFee(
+      req.sourceChainId,
+      req.destinationChainId,
+      destinationChainGas,
+      req.gasMultiplier,
+    );
+
+    bridgeFee = feeResult.bridgeFee;
 
     const totalFees: ethers.BigNumber = sourceChainGas.add(approvalFee).add(bridgeFee).add(imtblFee);
 
@@ -188,46 +218,253 @@ export class TokenBridge {
     };
   }
 
-  private async getSimulatedTx(
-    provider: ethers.providers.Provider,
-    dummyAddress: string,
-    amount: ethers.BigNumber,
-    token: string,
-    sourceChainId: string,
-    bridgeFee: ethers.BigNumber,
+  private async getFeesStatic(
+    sourceProvider: ethers.providers.Provider,
+    action: BridgeFeeActions.DEPOSIT | BridgeFeeActions.WITHDRAW,
+    token:string,
   ) {
-    const getContractRes = await this.getBridgeContract(sourceChainId);
+    let sourceChainGas: ethers.BigNumber = ethers.BigNumber.from(0);
+    let approvalFee: ethers.BigNumber = ethers.BigNumber.from(0);
 
-    const data = await this.getTxData(
-      dummyAddress,
-      dummyAddress,
-      amount,
-      token,
-      sourceChainId,
+    const feeData: FeeData = await sourceProvider.getFeeData();
+    if (token.toUpperCase() !== 'NATIVE') {
+      approvalFee = await this.getGasEstimates(
+        feeData,
+        BridgeMethodsGasLimit.APPROVE_TOKEN,
+      );
+    }
+
+    sourceChainGas = await this.getGasEstimates(
+      feeData,
+      BridgeMethodsGasLimit[`${action}_SOURCE`],
     );
 
-    const feeData: FeeData = await provider.getFeeData();
-
-    const gasPriceInWei = getGasPriceInWei(feeData) ?? ethers.BigNumber.from(0);
-
-    const txValue = (token.toUpperCase() !== 'NATIVE') ? bridgeFee.toString() : amount.add(bridgeFee).toString();
+    const destinationChainGas: number = BridgeMethodsGasLimit[`${action}_DESTINATION`];
 
     return {
-      data,
-      from: dummyAddress,
-      to: getContractRes.contractAddress,
-      value: txValue,
-      chainId: parseInt(sourceChainId, 10),
-      gasPrice: gasPriceInWei,
+      sourceChainGas,
+      approvalFee,
+      destinationChainGas,
     };
+  }
+
+  private async getFeesDynamic(
+    sourceProvider: ethers.providers.Provider,
+    action: BridgeFeeActions.DEPOSIT | BridgeFeeActions.WITHDRAW,
+    sourceChainId: string,
+    token:string,
+    senderAddress: string,
+    recipientAddress: string,
+    amount: ethers.BigNumber,
+  ) {
+    let sourceChainGas: ethers.BigNumber = ethers.BigNumber.from(0);
+    let approvalFee: ethers.BigNumber = ethers.BigNumber.from(0);
+    let amountToApprove = ethers.BigNumber.from(0);
+    let sourceBridgeAddress;
+    let erc20Contract;
+
+    if (token.toUpperCase() !== 'NATIVE') {
+      const resGetAllowance = await this.getAllowance(
+        sourceChainId,
+        token,
+        senderAddress,
+        amount,
+      );
+      amountToApprove = resGetAllowance.amountToApprove;
+      erc20Contract = resGetAllowance.erc20Contract;
+    }
+
+    const destinationChainGas: number = BridgeMethodsGasLimit[`${action}_DESTINATION`];
+
+    const feeData: FeeData = await sourceProvider.getFeeData();
+    if (action === BridgeFeeActions.DEPOSIT) {
+      // deposit
+      sourceBridgeAddress = this.config.bridgeContracts.rootERC20BridgeFlowRate;
+      const tenderlyRes = await this.getTenderlyBridgeGasEstimates(
+        sourceChainId,
+        senderAddress,
+        recipientAddress,
+        amount,
+        amountToApprove,
+        sourceBridgeAddress,
+        erc20Contract,
+        token,
+      );
+
+      if (tenderlyRes.approvalFee > 0) {
+        approvalFee = await this.getGasEstimates(
+          feeData,
+          tenderlyRes.approvalFee,
+        );
+      }
+
+      sourceChainGas = await this.getGasEstimates(
+        feeData,
+        tenderlyRes.sourceChainGas,
+      );
+    } else {
+      // withdrawal
+      sourceChainGas = await this.getGasEstimates(
+        feeData,
+        BridgeMethodsGasLimit[`${action}_SOURCE`],
+      );
+
+      if (amountToApprove.gt(0)) {
+        approvalFee = await this.getGasEstimates(
+          feeData,
+          BridgeMethodsGasLimit.APPROVE_TOKEN,
+        );
+      }
+    }
+    return {
+      sourceChainGas,
+      approvalFee,
+      destinationChainGas,
+    };
+  }
+
+  private async getTenderlyBridgeGasEstimates(
+    sourceChainId:string,
+    sender: string,
+    recipient: string,
+    amount: ethers.BigNumber,
+    amountToApprove: ethers.BigNumber,
+    contractToApprove: string | undefined,
+    erc20Contract: ethers.Contract | undefined,
+    token: FungibleToken,
+  ): Promise<TenderlyGasEstimatesResponse> {
+    const simulations: Array<any> = [];
+
+    if (amountToApprove.gt(0) && token.toUpperCase() !== 'NATIVE') {
+      if (!erc20Contract || !contractToApprove) {
+        throw new BridgeError(
+          `erc20Contract not found. The address (${contractToApprove}) is not a valid.`,
+          BridgeErrorType.INVALID_ERC20_CONTRACT,
+        );
+      } else {
+        // Encode the approve function call data for the ERC20 contract
+        const approvalData = await withBridgeError<string>(async () => erc20Contract.interface
+          .encodeFunctionData('approve', [
+            contractToApprove,
+            amountToApprove,
+          ]), BridgeErrorType.INTERNAL_ERROR);
+
+        simulations.push({
+          network_id: sourceChainId,
+          estimate_gas: true,
+          simulation_type: 'full',
+          from: sender,
+          to: token,
+          input: approvalData,
+        });
+      }
+    }
+
+    if (!token) {
+      throw new BridgeError(
+        `token not found. The address (${token}) is not a valid.`,
+        BridgeErrorType.INVALID_TOKEN,
+      );
+    }
+
+    const txData = await this.getTxData(
+      sourceChainId,
+      sender,
+      recipient,
+      amount,
+      token,
+    );
+
+    // tx value for simulation mocked as amount + 1 wei for a native bridge and 1 wei for token bridges
+    const txValue = (token.toUpperCase() !== 'NATIVE') ? '1' : amount.add('1').toString();
+
+    simulations.push({
+      network_id: sourceChainId,
+      estimate_gas: true,
+      simulation_type: 'full',
+      from: sender,
+      to: contractToApprove,
+      input: txData,
+      value: txValue,
+    });
+
+    let axiosResponse:AxiosResponse;
+
+    const tenderlyAPI = this.getTenderlyEndpoint(sourceChainId);
+
+    try {
+      axiosResponse = await axios.post(
+        tenderlyAPI,
+        {
+          simulations,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+    } catch (error: any) {
+      axiosResponse = error.response;
+    }
+
+    if (axiosResponse.data.error) {
+      throw new BridgeError(
+        `Estimating gas failed with the reason: ${axiosResponse.data.error.message}`,
+        BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
+      );
+    }
+
+    if (axiosResponse.data.simulation_results.length !== simulations.length) {
+      throw new BridgeError(
+        'Estimating gas failed with mismatched responses',
+        BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
+      );
+    }
+
+    const tenderlyGasEstimatesRes = {} as TenderlyGasEstimatesResponse;
+    const simResults = axiosResponse.data.simulation_results;
+
+    if (simResults.length === 1) {
+      if (simResults[0].simulation.error_message) {
+        throw new BridgeError(
+          `Estimating deposit gas failed with the reason: ${simResults[0].simulation.error_message}`,
+          BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
+        );
+      } else {
+        tenderlyGasEstimatesRes.sourceChainGas = simResults[0].simulation.gas_used;
+        tenderlyGasEstimatesRes.approvalFee = 0;
+      }
+    } else if (axiosResponse.data.simulation_results.length === 2) {
+      if (simResults[0].simulation.error_message) {
+        throw new BridgeError(
+          `Estimating approval gas failed with the reason: ${simResults[0].simulation.error_message}`,
+          BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
+        );
+      } else if (simResults[1].simulation.error_message) {
+        throw new BridgeError(
+          `Estimating deposit gas failed with the reason: ${simResults[1].simulation.error_message}`,
+          BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
+        );
+      } else {
+        tenderlyGasEstimatesRes.approvalFee = simResults[0].simulation.gas_used;
+        tenderlyGasEstimatesRes.sourceChainGas = simResults[1].simulation.gas_used;
+      }
+    } else {
+      throw new BridgeError(
+        `Estimating gas failed with unexpected number responses ${axiosResponse.data.simulation_results.length}`,
+        BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
+      );
+    }
+
+    return tenderlyGasEstimatesRes;
   }
 
   // eslint-disable-next-line class-methods-use-this
   private async getGasEstimates(
-    provider: ethers.providers.Provider,
+    feeData: FeeData,
     txnGasLimitInWei: number,
   ): Promise<ethers.BigNumber> {
-    const feeData: FeeData = await provider.getFeeData();
     const gasPriceInWei = getGasPriceInWei(feeData);
     if (!gasPriceInWei) return ethers.BigNumber.from(0);
     return gasPriceInWei.mul(txnGasLimitInWei);
@@ -305,45 +542,25 @@ export class TokenBridge {
       };
     }
 
-    let sourceProvider:ethers.providers.Provider;
-    let sourceBridgeAddress: string;
-    if (req.sourceChainId === this.config.bridgeInstance.rootChainID) {
-      sourceProvider = this.config.rootProvider;
-      sourceBridgeAddress = this.config.bridgeContracts.rootERC20BridgeFlowRate;
-    } else {
-      sourceProvider = this.config.childProvider;
-      sourceBridgeAddress = this.config.bridgeContracts.childERC20Bridge;
-    }
-
-    const erc20Contract: ethers.Contract = await withBridgeError<ethers.Contract>(
-      async () => new ethers.Contract(req.token, ERC20, sourceProvider),
-      BridgeErrorType.PROVIDER_ERROR,
+    const resGetAllowance = await this.getAllowance(
+      req.sourceChainId,
+      req.token,
+      req.senderAddress,
+      req.amount,
     );
 
-    // Get the current approved allowance of the RootERC20Predicate
-    const allowance: ethers.BigNumber = await withBridgeError<ethers.BigNumber>(() => erc20Contract
-      .allowance(
-        req.senderAddress,
-        sourceBridgeAddress,
-      ), BridgeErrorType.PROVIDER_ERROR);
-
-    // If the allowance is greater than or equal to the deposit amount, no approval is required
-    if (allowance.gte(req.amount)) {
+    if (resGetAllowance.amountToApprove.eq(0)) {
       return {
         contractToApprove: null,
         unsignedTx: null,
       };
     }
-    // Calculate the amount of tokens that need to be approved for deposit
-    const approvalAmountRequired = req.amount.sub(
-      allowance,
-    );
 
     // Encode the approve function call data for the ERC20 contract
-    const data: string = await withBridgeError<string>(async () => erc20Contract.interface
+    const data: string = await withBridgeError<string>(async () => resGetAllowance.erc20Contract.interface
       .encodeFunctionData('approve', [
-        sourceBridgeAddress,
-        approvalAmountRequired,
+        resGetAllowance.contractToApprove,
+        resGetAllowance.amountToApprove,
       ]), BridgeErrorType.INTERNAL_ERROR);
 
     // Create the unsigned transaction for the approval
@@ -356,8 +573,52 @@ export class TokenBridge {
     };
 
     return {
-      contractToApprove: sourceBridgeAddress,
+      contractToApprove: resGetAllowance.contractToApprove,
       unsignedTx,
+    };
+  }
+
+  private async getAllowance(sourceChainId:string, token: string, senderAddress: string, amount: ethers.BigNumber):
+  Promise<GetAllowanceResponse> {
+    let sourceProvider:ethers.providers.Provider;
+    let sourceBridgeAddress: string;
+    if (sourceChainId === this.config.bridgeInstance.rootChainID) {
+      sourceProvider = this.config.rootProvider;
+      sourceBridgeAddress = this.config.bridgeContracts.rootERC20BridgeFlowRate;
+    } else {
+      sourceProvider = this.config.childProvider;
+      sourceBridgeAddress = this.config.bridgeContracts.childERC20Bridge;
+    }
+
+    const erc20Contract: ethers.Contract = await withBridgeError<ethers.Contract>(
+      async () => new ethers.Contract(token, ERC20, sourceProvider),
+      BridgeErrorType.PROVIDER_ERROR,
+    );
+
+    // Get the current approved allowance of the RootERC20Predicate
+    const allowance: ethers.BigNumber = await withBridgeError<ethers.BigNumber>(() => erc20Contract
+      .allowance(
+        senderAddress,
+        sourceBridgeAddress,
+      ), BridgeErrorType.PROVIDER_ERROR);
+
+    // If the allowance is greater than or equal to the deposit amount, no approval is required
+    if (allowance.gte(amount)) {
+      return {
+        erc20Contract,
+        allowance,
+        amount,
+        amountToApprove: ethers.BigNumber.from(0),
+        contractToApprove: sourceBridgeAddress,
+      };
+    }
+
+    return {
+      erc20Contract,
+      allowance,
+      amount,
+      amountToApprove: amount,
+      contractToApprove: sourceBridgeAddress,
     };
   }
 
@@ -406,11 +667,11 @@ export class TokenBridge {
   }
 
   private async getTxData(
+    sourceChainId: string,
     sender: string,
     recipient: string,
     amount: ethers.BigNumber,
     token: string,
-    sourceChainId: string,
   ) {
     const getContractRes = await this.getBridgeContract(sourceChainId);
     // Handle return if it is a native token
@@ -418,13 +679,11 @@ export class TokenBridge {
       // Encode the function data into a payload
       let data: string;
       if (sender === recipient) {
-        console.log('native deposit');
         data = await withBridgeError<string>(async () => getContractRes.contract.interface.encodeFunctionData(
           getContractRes.contractMethods.native,
           [amount],
         ), BridgeErrorType.INTERNAL_ERROR);
       } else {
-        console.log('native depositTo');
         data = await withBridgeError<string>(async () => getContractRes.contract.interface.encodeFunctionData(
           getContractRes.contractMethods.nativeTo,
           [recipient, amount],
@@ -440,13 +699,11 @@ export class TokenBridge {
     // Encode the function data into a payload
     let data: string;
     if (sender === recipient) {
-      console.log('token deposit');
       data = await withBridgeError<string>(async () => getContractRes.contract.interface.encodeFunctionData(
         getContractRes.contractMethods.token,
         [erc20Token, amount],
       ), BridgeErrorType.INTERNAL_ERROR);
     } else {
-      console.log('token depositTo');
       data = await withBridgeError<string>(async () => getContractRes.contract.interface.encodeFunctionData(
         getContractRes.contractMethods.tokenTo,
         [erc20Token, recipient, amount],
@@ -609,14 +866,16 @@ export class TokenBridge {
       destinationChainId,
       token,
       amount,
+      senderAddress: sender,
+      recipientAddress: recipient,
     });
 
     const data = await this.getTxData(
+      sourceChainId,
       sender,
       recipient,
       amount,
       token,
-      sourceChainId,
     );
 
     const txValue = (token.toUpperCase() !== 'NATIVE')
@@ -745,6 +1004,20 @@ export class TokenBridge {
     return axelarAPIEndpoint;
   }
 
+  private getTenderlyEndpoint(source:string) {
+    let tenderlyAPIEndpoint:string;
+    if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
+      || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
+      tenderlyAPIEndpoint = tenderlyAPIEndpoints.mainnet;
+    } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
+      || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
+      tenderlyAPIEndpoint = tenderlyAPIEndpoints.testnet;
+    } else {
+      tenderlyAPIEndpoint = tenderlyAPIEndpoints.devnet;
+    }
+    return tenderlyAPIEndpoint;
+  }
+
   /**
  * Calculate the gas amount for a transaction using axelarjs-sdk.
  * @param {*} source - The source chainId.
@@ -798,7 +1071,7 @@ export class TokenBridge {
 
     if (axiosResponse.data.error) {
       throw new BridgeError(
-        `Estimating Axelar Gas failed with the reason: ${axiosResponse.data.message}`,
+        `Estimating Axelar Gas failed with the reason: ${axiosResponse.data.error.message}`,
         BridgeErrorType.AXELAR_GAS_ESTIMATE_FAILED,
       );
     }
@@ -842,7 +1115,6 @@ export class TokenBridge {
     try {
       pendingWithdrawalResponses = await Promise.all(pendingWithdrawalPromises);
     } catch (err) {
-      console.log('err', err);
       throw new BridgeError(
         `Failed to fetch the pending withdrawals with: ${err}`,
         BridgeErrorType.FLOW_RATE_ERROR,
