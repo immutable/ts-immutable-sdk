@@ -573,8 +573,21 @@
       "heading": "手数料の内訳",
       "total": "総手数料",
       "fees": {
-        "gas": {
-          "label": "ガス手数料"
+        "fiatPricePrefix": "USD $",
+        "gasFeeSwap": {
+          "label": "ガス料金"
+        },
+        "gasFeeMove": {
+          "label": "ガス料金移動"
+        },
+        "gasFeeApproval": {
+          "label": "ガス料金承認"
+        },
+        "serviceFee": {
+          "label": "手数料"
+        },
+        "secondarySwapFee": {
+          "label": "スワップ手数料"
         }
       }
     },

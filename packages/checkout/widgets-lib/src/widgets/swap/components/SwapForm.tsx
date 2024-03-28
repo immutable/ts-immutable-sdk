@@ -45,6 +45,7 @@ import { UnableToSwap } from './UnableToSwap';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import useDebounce from '../../../lib/hooks/useDebounce';
 import { CancellablePromise } from '../../../lib/async/cancellablePromise';
+import { formatSwapFees } from '../functions/SwapFees';
 
 enum SwapDirection {
   FROM = 'FROM',
@@ -145,7 +146,7 @@ export function SwapForm({ data, theme }: SwapFromProps) {
   const [fromFiatValue, setFromFiatValue] = useState('');
 
   // Quote
-  const [quote, setQuote] = useState<TransactionResponse | null>(null);
+  const [quote, setQuote] = useState<TransactionResponse | undefined>(undefined);
   const [gasFeeValue, setGasFeeValue] = useState<string>('');
   const [gasFeeToken, setGasFeeToken] = useState<TokenInfo | undefined>(undefined);
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
@@ -258,7 +259,7 @@ export function SwapForm({ data, theme }: SwapFromProps) {
     }
     setSwapFromToConversionText('');
     setGasFeeFiatValue('');
-    setQuote(null);
+    setQuote(undefined);
   };
 
   const processFetchQuoteFrom = async (silently: boolean = false) => {
@@ -301,12 +302,17 @@ export function SwapForm({ data, theme }: SwapFromProps) {
       if (quoteResult.approval?.gasFeeEstimate) {
         gasFeeTotal = gasFeeTotal.add(quoteResult.approval.gasFeeEstimate.value);
       }
+      gasFeeTotal = quoteResult.quote?.fees?.reduce((previous, currentFee) => {
+        const previousFeeAmount = BigNumber.from(previous);
+        const currentFeeAmount = BigNumber.from(currentFee.amount.value);
+        return previousFeeAmount.add(currentFeeAmount);
+      }, gasFeeTotal) ?? gasFeeTotal;
+
       const gasFee = utils.formatUnits(
         gasFeeTotal,
-        DEFAULT_TOKEN_DECIMALS,
+        estimate?.token?.decimals ?? DEFAULT_TOKEN_DECIMALS,
       );
       const estimateToken = estimate?.token;
-
       const gasToken = allowedTokens.find(
         (token) => token.address?.toLocaleLowerCase() === estimateToken?.address?.toLocaleLowerCase(),
       );
@@ -392,9 +398,15 @@ export function SwapForm({ data, theme }: SwapFromProps) {
       if (quoteResult.approval?.gasFeeEstimate) {
         gasFeeTotal = gasFeeTotal.add(quoteResult.approval.gasFeeEstimate.value);
       }
+      gasFeeTotal = quoteResult.quote?.fees?.reduce((previous, currentFee) => {
+        const previousFeeAmount = BigNumber.from(previous);
+        const currentFeeAmount = BigNumber.from(currentFee.amount.value);
+        return previousFeeAmount.add(currentFeeAmount);
+      }, gasFeeTotal) ?? gasFeeTotal;
+
       const gasFee = utils.formatUnits(
         gasFeeTotal,
-        DEFAULT_TOKEN_DECIMALS,
+        estimate?.token?.decimals ?? DEFAULT_TOKEN_DECIMALS,
       );
       const estimateToken = estimate?.token;
 
@@ -629,6 +641,11 @@ export function SwapForm({ data, theme }: SwapFromProps) {
     setShowNotEnoughImxDrawer(true);
   };
 
+  const formatFeeBreakdown = useCallback(
+    (): any => formatSwapFees(quote, cryptoFiatState, t),
+    [quote, cryptoFiatState, t],
+  );
+
   const SwapFormValidator = (): boolean => {
     const validateFromTokenError = validateFromToken(fromToken);
     const validateFromAmountError = validateFromAmount(fromAmount, fromBalance);
@@ -797,17 +814,10 @@ export function SwapForm({ data, theme }: SwapFromProps) {
           </Box>
         </Box>
         <Fees
+          gasFeeValue={gasFeeValue}
           gasFeeFiatValue={gasFeeFiatValue}
           gasFeeToken={gasFeeToken}
-          gasFeeValue={gasFeeValue}
-          fees={[
-            {
-              label: t('drawers.feesBreakdown.fees.gasFeeSwap.label'),
-              fiatAmount: `~ ${t('drawers.feesBreakdown.fees.fiatPricePrefix')}${gasFeeFiatValue}`,
-              amount: tokenValueFormat(gasFeeValue),
-              prefix: '~',
-            },
-          ]}
+          fees={formatFeeBreakdown()}
           onFeesClick={() => {
             track({
               userJourney: UserJourney.SWAP,

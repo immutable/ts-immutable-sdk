@@ -566,8 +566,21 @@
       "heading": "수수료 내역",
       "total": "수수료 총액",
       "fees": {
-        "gas": {
+        "fiatPricePrefix": "USD $",
+        "gasFeeSwap": {
           "label": "가스 수수료"
+        },
+        "gasFeeMove": {
+          "label": "가스 수수료 이동"
+        },
+        "gasFeeApproval": {
+          "label": "가스 수수료 승인"
+        },
+        "serviceFee": {
+          "label": "서비스 수수료"
+        },
+        "secondarySwapFee": {
+          "label": "스왑 수수료"
         }
       }
     },

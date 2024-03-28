@@ -173,8 +173,6 @@ export function BridgeReviewSummary() {
     setApproveTransaction(unsignedApproveTransaction);
     setTransaction(unsignedTransaction);
 
-    // todo: add approval gas fees
-
     const transactionFeeData = unsignedTransaction.feeData;
 
     const { totalFees, approvalFee } = transactionFeeData;

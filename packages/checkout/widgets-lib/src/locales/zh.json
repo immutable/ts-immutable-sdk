@@ -570,8 +570,21 @@
       "heading": "费用分解",
       "total": "费用总计",
       "fees": {
-        "gas": {
+        "fiatPricePrefix": "USD $",
+        "gasFeeSwap": {
           "label": "燃气费"
+        },
+        "gasFeeMove": {
+          "label": "燃气费转移"
+        },
+        "gasFeeApproval": {
+          "label": "燃气费批准"
+        },
+        "serviceFee": {
+          "label": "服务费"
+        },
+        "secondarySwapFee": {
+          "label": "交换服务费"
         }
       }
     },
