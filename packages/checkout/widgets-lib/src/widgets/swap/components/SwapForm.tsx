@@ -143,6 +143,7 @@ export function SwapForm({ data, theme }: SwapFromProps) {
   const [toToken, setToToken] = useState<TokenInfo | undefined>();
   const [toTokenError, setToTokenError] = useState<string>('');
   const [fromFiatValue, setFromFiatValue] = useState('');
+  const [maxButtonTriggerCount, setMaxButtonTriggerCount] = useState<number>(0);
 
   // Quote
   const [quote, setQuote] = useState<TransactionResponse | null>(null);
@@ -503,7 +504,7 @@ export function SwapForm({ data, theme }: SwapFromProps) {
       }
       (async () => await fetchQuote())();
     }
-  }, [debouncedFromAmount, fromToken, toToken]);
+  }, [debouncedFromAmount, fromToken, toToken, maxButtonTriggerCount]);
 
   useEffect(() => {
     if (direction === SwapDirection.TO) {
@@ -514,7 +515,7 @@ export function SwapForm({ data, theme }: SwapFromProps) {
       }
       (async () => await fetchQuote())();
     }
-  }, [debouncedToAmount, toToken, fromToken]);
+  }, [debouncedToAmount, toToken, fromToken, maxButtonTriggerCount]);
 
   // during swaps, having enough IMX to cover the gas fee means
   // 1. swapping from any token to any token costs IMX - so do a check
@@ -577,21 +578,21 @@ export function SwapForm({ data, theme }: SwapFromProps) {
   const textInputMaxButtonClick = () => {
     if (!fromBalance) return;
     const fromBalanceTruncated = fromBalance.slice(0, fromBalance.indexOf('.') + DEFAULT_TOKEN_VALIDATION_DECIMALS + 1);
-    resetFormErrors();
-    resetQuote();
-    setToAmount('');
+    setMaxButtonTriggerCount(maxButtonTriggerCount + 1);
     setDirection(SwapDirection.FROM);
-    setFromAmount(fromBalanceTruncated);
-    track({
-      userJourney: UserJourney.SWAP,
-      screen: 'SwapCoins',
-      control: 'MaxFrom',
-      controlType: 'Button',
-      extras: {
-        fromBalance,
-        fromBalanceTruncated,
-      },
-    });
+    setTimeout(() => {
+      onFromTextInputChange(fromBalanceTruncated);
+      track({
+        userJourney: UserJourney.SWAP,
+        screen: 'SwapCoins',
+        control: 'MaxFrom',
+        controlType: 'Button',
+        extras: {
+          fromBalance,
+          fromBalanceTruncated,
+        },
+      });
+    }, 300);
   };
 
   // ------------//
