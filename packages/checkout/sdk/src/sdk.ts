@@ -524,10 +524,18 @@ export class Checkout {
    */
   public async smartCheckout(
     params: SmartCheckoutParams,
+    config?: {
+      validateProviderOptions?: ValidateProviderOptions,
+    },
   ): Promise<SmartCheckoutResult> {
+    const validateProviderOptions = config?.validateProviderOptions || {
+      allowUnsupportedProvider: true,
+      allowMistmatchedChainId: true,
+    };
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
+      validateProviderOptions,
     );
 
     let itemRequirements = [];
