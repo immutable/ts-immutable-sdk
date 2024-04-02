@@ -352,7 +352,7 @@ export class TokenBridge {
         simulations.push({
           network_id: sourceChainId,
           estimate_gas: true,
-          simulation_type: 'full',
+          simulation_type: 'quick',
           from: sender,
           to: token,
           input: approvalData,
@@ -381,7 +381,7 @@ export class TokenBridge {
     simulations.push({
       network_id: sourceChainId,
       estimate_gas: true,
-      simulation_type: 'full',
+      simulation_type: 'quick',
       from: sender,
       to: contractToApprove,
       input: txData,
