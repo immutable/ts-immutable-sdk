@@ -67,7 +67,7 @@ jobs:
           then
             upgrade_type=""
             revision_upgrade=$( ${{ contains(github.event.inputs.release_type, 'alpha') }} && echo '--revision' || echo '')
-            echo $revision
+            echo $revision_upgrade
           fi
           ./.github/scripts/version-up.sh --${{ github.event.inputs.release_type }} --$upgrade_type --apply $revision_upgrade
         shell: bash
