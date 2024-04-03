@@ -13,9 +13,8 @@
  */
 
 
-import type { Configuration } from '../configuration';
-import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
-import globalAxios from 'axios';
+import globalAxios, { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import { Configuration } from '../configuration';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
@@ -246,32 +245,39 @@ export const MetadataApiFactory = function (configuration?: Configuration, baseP
         /**
          * Add metadata schema to collection
          * @summary Add metadata schema to collection
-         * @param {MetadataApiAddMetadataSchemaToCollectionRequest} requestParameters Request parameters.
+         * @param {string} address Collection contract address
+         * @param {string} iMXSignature String created by signing wallet address and timestamp
+         * @param {string} iMXTimestamp Unix Epoc timestamp
+         * @param {AddMetadataSchemaToCollectionRequest} addMetadataSchemaToCollectionRequest add metadata schema to a collection
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        addMetadataSchemaToCollection(requestParameters: MetadataApiAddMetadataSchemaToCollectionRequest, options?: AxiosRequestConfig): AxiosPromise<SuccessResponse> {
-            return localVarFp.addMetadataSchemaToCollection(requestParameters.address, requestParameters.iMXSignature, requestParameters.iMXTimestamp, requestParameters.addMetadataSchemaToCollectionRequest, options).then((request) => request(axios, basePath));
+        addMetadataSchemaToCollection(address: string, iMXSignature: string, iMXTimestamp: string, addMetadataSchemaToCollectionRequest: AddMetadataSchemaToCollectionRequest, options?: any): AxiosPromise<SuccessResponse> {
+            return localVarFp.addMetadataSchemaToCollection(address, iMXSignature, iMXTimestamp, addMetadataSchemaToCollectionRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * Get collection metadata schema
          * @summary Get collection metadata schema
-         * @param {MetadataApiGetMetadataSchemaRequest} requestParameters Request parameters.
+         * @param {string} address Collection contract address
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getMetadataSchema(requestParameters: MetadataApiGetMetadataSchemaRequest, options?: AxiosRequestConfig): AxiosPromise<Array<MetadataSchemaProperty>> {
-            return localVarFp.getMetadataSchema(requestParameters.address, options).then((request) => request(axios, basePath));
+        getMetadataSchema(address: string, options?: any): AxiosPromise<Array<MetadataSchemaProperty>> {
+            return localVarFp.getMetadataSchema(address, options).then((request) => request(axios, basePath));
         },
         /**
          * Update metadata schema by name
          * @summary Update metadata schema by name
-         * @param {MetadataApiUpdateMetadataSchemaByNameRequest} requestParameters Request parameters.
+         * @param {string} address Collection contract address
+         * @param {string} name Metadata schema name
+         * @param {string} iMXSignature String created by signing wallet address and timestamp
+         * @param {string} iMXTimestamp Unix Epoc timestamp
+         * @param {MetadataSchemaRequest} metadataSchemaRequest update metadata schema
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateMetadataSchemaByName(requestParameters: MetadataApiUpdateMetadataSchemaByNameRequest, options?: AxiosRequestConfig): AxiosPromise<SuccessResponse> {
-            return localVarFp.updateMetadataSchemaByName(requestParameters.address, requestParameters.name, requestParameters.iMXSignature, requestParameters.iMXTimestamp, requestParameters.metadataSchemaRequest, options).then((request) => request(axios, basePath));
+        updateMetadataSchemaByName(address: string, name: string, iMXSignature: string, iMXTimestamp: string, metadataSchemaRequest: MetadataSchemaRequest, options?: any): AxiosPromise<SuccessResponse> {
+            return localVarFp.updateMetadataSchemaByName(address, name, iMXSignature, iMXTimestamp, metadataSchemaRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -410,4 +416,3 @@ export class MetadataApi extends BaseAPI {
         return MetadataApiFp(this.configuration).updateMetadataSchemaByName(requestParameters.address, requestParameters.name, requestParameters.iMXSignature, requestParameters.iMXTimestamp, requestParameters.metadataSchemaRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
-

@@ -13,9 +13,8 @@
  */
 
 
-import type { Configuration } from '../configuration';
-import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
-import globalAxios from 'axios';
+import globalAxios, { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import { Configuration } from '../configuration';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
@@ -144,11 +143,11 @@ export const PrimarySalesApiAxiosParamCreator = function (configuration?: Config
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
-            // authentication ImxEthSignature required
-            await setApiKeyToObject(localVarHeaderParameter, "x-imx-eth-signature", configuration)
-
             // authentication ImxEthAddress required
             await setApiKeyToObject(localVarHeaderParameter, "x-imx-eth-address", configuration)
+
+            // authentication ImxEthSignature required
+            await setApiKeyToObject(localVarHeaderParameter, "x-imx-eth-signature", configuration)
 
 
     
@@ -181,11 +180,11 @@ export const PrimarySalesApiAxiosParamCreator = function (configuration?: Config
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
-            // authentication ImxEthSignature required
-            await setApiKeyToObject(localVarHeaderParameter, "x-imx-eth-signature", configuration)
-
             // authentication ImxEthAddress required
             await setApiKeyToObject(localVarHeaderParameter, "x-imx-eth-address", configuration)
+
+            // authentication ImxEthSignature required
+            await setApiKeyToObject(localVarHeaderParameter, "x-imx-eth-signature", configuration)
 
 
     
@@ -258,11 +257,11 @@ export const PrimarySalesApiAxiosParamCreator = function (configuration?: Config
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
-            // authentication ImxEthSignature required
-            await setApiKeyToObject(localVarHeaderParameter, "x-imx-eth-signature", configuration)
-
             // authentication ImxEthAddress required
             await setApiKeyToObject(localVarHeaderParameter, "x-imx-eth-address", configuration)
+
+            // authentication ImxEthSignature required
+            await setApiKeyToObject(localVarHeaderParameter, "x-imx-eth-signature", configuration)
 
 
     
@@ -477,72 +476,72 @@ export const PrimarySalesApiFactory = function (configuration?: Configuration, b
         /**
          * Accept Primary Sale.  This endpoint is experimental and may change in the future.
          * @summary Accept Primary Sale
-         * @param {PrimarySalesApiAcceptPrimarySaleRequest} requestParameters Request parameters.
+         * @param {number} id Global Primary Sale identifier
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        acceptPrimarySale(requestParameters: PrimarySalesApiAcceptPrimarySaleRequest, options?: AxiosRequestConfig): AxiosPromise<AcceptPrimarySaleOKBody> {
-            return localVarFp.acceptPrimarySale(requestParameters.id, options).then((request) => request(axios, basePath));
+        acceptPrimarySale(id: number, options?: any): AxiosPromise<AcceptPrimarySaleOKBody> {
+            return localVarFp.acceptPrimarySale(id, options).then((request) => request(axios, basePath));
         },
         /**
          * Create Primary Sale. This endpoint is experimental and may change in the future.
          * @summary Create Primary Sale
-         * @param {PrimarySalesApiCreatePrimarySaleRequest} requestParameters Request parameters.
+         * @param {CreatePrimarySaleParamsBody} [body] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createPrimarySale(requestParameters: PrimarySalesApiCreatePrimarySaleRequest = {}, options?: AxiosRequestConfig): AxiosPromise<CreatePrimarySaleCreatedBody> {
-            return localVarFp.createPrimarySale(requestParameters.body, options).then((request) => request(axios, basePath));
+        createPrimarySale(body?: CreatePrimarySaleParamsBody, options?: any): AxiosPromise<CreatePrimarySaleCreatedBody> {
+            return localVarFp.createPrimarySale(body, options).then((request) => request(axios, basePath));
         },
         /**
          * Get a single primary sale by ID. This endpoint is experimental and may change in the future.
          * @summary Get a single primary sale by ID
-         * @param {PrimarySalesApiGetPrimarySaleRequest} requestParameters Request parameters.
+         * @param {number} id Global Primary Sale identifier
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getPrimarySale(requestParameters: PrimarySalesApiGetPrimarySaleRequest, options?: AxiosRequestConfig): AxiosPromise<GetPrimarySaleOKBody> {
-            return localVarFp.getPrimarySale(requestParameters.id, options).then((request) => request(axios, basePath));
+        getPrimarySale(id: number, options?: any): AxiosPromise<GetPrimarySaleOKBody> {
+            return localVarFp.getPrimarySale(id, options).then((request) => request(axios, basePath));
         },
         /**
          * Reject Primary Sale.  This endpoint is experimental and may change in the future.
          * @summary Reject Primary Sale
-         * @param {PrimarySalesApiRejectPrimarySaleRequest} requestParameters Request parameters.
+         * @param {number} id Global Primary Sale identifier
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        rejectPrimarySale(requestParameters: PrimarySalesApiRejectPrimarySaleRequest, options?: AxiosRequestConfig): AxiosPromise<RejectPrimarySaleOKBody> {
-            return localVarFp.rejectPrimarySale(requestParameters.id, options).then((request) => request(axios, basePath));
+        rejectPrimarySale(id: number, options?: any): AxiosPromise<RejectPrimarySaleOKBody> {
+            return localVarFp.rejectPrimarySale(id, options).then((request) => request(axios, basePath));
         },
         /**
          * Signable Accept Primary Sale.  This endpoint is experimental and may change in the future.
          * @summary Signable Accept Primary Sale
-         * @param {PrimarySalesApiSignableAcceptPrimarySaleRequest} requestParameters Request parameters.
+         * @param {number} id Global Primary Sale identifier
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        signableAcceptPrimarySale(requestParameters: PrimarySalesApiSignableAcceptPrimarySaleRequest, options?: AxiosRequestConfig): AxiosPromise<SignableAcceptPrimarySaleOKBody> {
-            return localVarFp.signableAcceptPrimarySale(requestParameters.id, options).then((request) => request(axios, basePath));
+        signableAcceptPrimarySale(id: number, options?: any): AxiosPromise<SignableAcceptPrimarySaleOKBody> {
+            return localVarFp.signableAcceptPrimarySale(id, options).then((request) => request(axios, basePath));
         },
         /**
          * Signable Create Primary Sale.  This endpoint is experimental and may change in the future.
          * @summary Signable Create Primary Sale
-         * @param {PrimarySalesApiSignableCreatePrimarySaleRequest} requestParameters Request parameters.
+         * @param {SignableCreatePrimarySaleParamsBody} [body] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        signableCreatePrimarySale(requestParameters: PrimarySalesApiSignableCreatePrimarySaleRequest = {}, options?: AxiosRequestConfig): AxiosPromise<SignableCreatePrimarySaleOKBody> {
-            return localVarFp.signableCreatePrimarySale(requestParameters.body, options).then((request) => request(axios, basePath));
+        signableCreatePrimarySale(body?: SignableCreatePrimarySaleParamsBody, options?: any): AxiosPromise<SignableCreatePrimarySaleOKBody> {
+            return localVarFp.signableCreatePrimarySale(body, options).then((request) => request(axios, basePath));
         },
         /**
          * Signable Reject Primary Sale.  This endpoint is experimental and may change in the future.
          * @summary Signable Reject Primary Sale
-         * @param {PrimarySalesApiSignableRejectPrimarySaleRequest} requestParameters Request parameters.
+         * @param {number} id Global Primary Sale identifier
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        signableRejectPrimarySale(requestParameters: PrimarySalesApiSignableRejectPrimarySaleRequest, options?: AxiosRequestConfig): AxiosPromise<SignableRejectPrimarySaleOKBody> {
-            return localVarFp.signableRejectPrimarySale(requestParameters.id, options).then((request) => request(axios, basePath));
+        signableRejectPrimarySale(id: number, options?: any): AxiosPromise<SignableRejectPrimarySaleOKBody> {
+            return localVarFp.signableRejectPrimarySale(id, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -736,4 +735,3 @@ export class PrimarySalesApi extends BaseAPI {
         return PrimarySalesApiFp(this.configuration).signableRejectPrimarySale(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
     }
 }
-

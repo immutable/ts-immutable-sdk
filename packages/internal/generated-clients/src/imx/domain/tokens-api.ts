@@ -13,9 +13,8 @@
  */
 
 
-import type { Configuration } from '../configuration';
-import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
-import globalAxios from 'axios';
+import globalAxios, { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import { Configuration } from '../configuration';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
@@ -70,14 +69,14 @@ export const TokensApiAxiosParamCreator = function (configuration?: Configuratio
          * @summary Get a list of tokens
          * @param {number} [pageSize] Page size of the result
          * @param {string} [cursor] Cursor
-         * @param {ListTokensOrderByEnum} [orderBy] Property to sort by
+         * @param {'contract_address' | 'name' | 'symbol'} [orderBy] Property to sort by
          * @param {string} [direction] Direction to sort (asc/desc)
          * @param {string} [address] Contract address of the token
          * @param {string} [symbols] Token symbols for the token, e.g. ?symbols&#x3D;IMX,ETH
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listTokens: async (pageSize?: number, cursor?: string, orderBy?: ListTokensOrderByEnum, direction?: string, address?: string, symbols?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listTokens: async (pageSize?: number, cursor?: string, orderBy?: 'contract_address' | 'name' | 'symbol', direction?: string, address?: string, symbols?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/v1/tokens`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -151,14 +150,14 @@ export const TokensApiFp = function(configuration?: Configuration) {
          * @summary Get a list of tokens
          * @param {number} [pageSize] Page size of the result
          * @param {string} [cursor] Cursor
-         * @param {ListTokensOrderByEnum} [orderBy] Property to sort by
+         * @param {'contract_address' | 'name' | 'symbol'} [orderBy] Property to sort by
          * @param {string} [direction] Direction to sort (asc/desc)
          * @param {string} [address] Contract address of the token
          * @param {string} [symbols] Token symbols for the token, e.g. ?symbols&#x3D;IMX,ETH
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listTokens(pageSize?: number, cursor?: string, orderBy?: ListTokensOrderByEnum, direction?: string, address?: string, symbols?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListTokensResponse>> {
+        async listTokens(pageSize?: number, cursor?: string, orderBy?: 'contract_address' | 'name' | 'symbol', direction?: string, address?: string, symbols?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListTokensResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listTokens(pageSize, cursor, orderBy, direction, address, symbols, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -175,22 +174,27 @@ export const TokensApiFactory = function (configuration?: Configuration, basePat
         /**
          * Get details of a token
          * @summary Get details of a token
-         * @param {TokensApiGetTokenRequest} requestParameters Request parameters.
+         * @param {string} address Token Contract Address
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getToken(requestParameters: TokensApiGetTokenRequest, options?: AxiosRequestConfig): AxiosPromise<TokenDetails> {
-            return localVarFp.getToken(requestParameters.address, options).then((request) => request(axios, basePath));
+        getToken(address: string, options?: any): AxiosPromise<TokenDetails> {
+            return localVarFp.getToken(address, options).then((request) => request(axios, basePath));
         },
         /**
          * Get a list of tokens
          * @summary Get a list of tokens
-         * @param {TokensApiListTokensRequest} requestParameters Request parameters.
+         * @param {number} [pageSize] Page size of the result
+         * @param {string} [cursor] Cursor
+         * @param {'contract_address' | 'name' | 'symbol'} [orderBy] Property to sort by
+         * @param {string} [direction] Direction to sort (asc/desc)
+         * @param {string} [address] Contract address of the token
+         * @param {string} [symbols] Token symbols for the token, e.g. ?symbols&#x3D;IMX,ETH
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listTokens(requestParameters: TokensApiListTokensRequest = {}, options?: AxiosRequestConfig): AxiosPromise<ListTokensResponse> {
-            return localVarFp.listTokens(requestParameters.pageSize, requestParameters.cursor, requestParameters.orderBy, requestParameters.direction, requestParameters.address, requestParameters.symbols, options).then((request) => request(axios, basePath));
+        listTokens(pageSize?: number, cursor?: string, orderBy?: 'contract_address' | 'name' | 'symbol', direction?: string, address?: string, symbols?: string, options?: any): AxiosPromise<ListTokensResponse> {
+            return localVarFp.listTokens(pageSize, cursor, orderBy, direction, address, symbols, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -234,7 +238,7 @@ export interface TokensApiListTokensRequest {
      * @type {'contract_address' | 'name' | 'symbol'}
      * @memberof TokensApiListTokens
      */
-    readonly orderBy?: ListTokensOrderByEnum
+    readonly orderBy?: 'contract_address' | 'name' | 'symbol'
 
     /**
      * Direction to sort (asc/desc)
@@ -289,13 +293,3 @@ export class TokensApi extends BaseAPI {
         return TokensApiFp(this.configuration).listTokens(requestParameters.pageSize, requestParameters.cursor, requestParameters.orderBy, requestParameters.direction, requestParameters.address, requestParameters.symbols, options).then((request) => request(this.axios, this.basePath));
     }
 }
-
-/**
- * @export
- */
-export const ListTokensOrderByEnum = {
-    ContractAddress: 'contract_address',
-    Name: 'name',
-    Symbol: 'symbol'
-} as const;
-export type ListTokensOrderByEnum = typeof ListTokensOrderByEnum[keyof typeof ListTokensOrderByEnum];

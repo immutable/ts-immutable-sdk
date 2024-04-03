@@ -13,9 +13,8 @@
  */
 
 
-import type { Configuration } from '../configuration';
-import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
-import globalAxios from 'axios';
+import globalAxios, { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import { Configuration } from '../configuration';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
@@ -82,12 +81,12 @@ export const NftCheckoutPrimaryApiAxiosParamCreator = function (configuration?: 
         /**
          * Returns a list of supported currencies and their limits
          * @summary Get currencies with limits
-         * @param {GetCurrenciesNFTCheckoutPrimaryProviderEnum} [provider] Provider name
+         * @param {'moonpay'} [provider] Provider name
          * @param {boolean} [includeLimits] Flag if limits should be included in the response or not
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getCurrenciesNFTCheckoutPrimary: async (provider?: GetCurrenciesNFTCheckoutPrimaryProviderEnum, includeLimits?: boolean, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getCurrenciesNFTCheckoutPrimary: async (provider?: 'moonpay', includeLimits?: boolean, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/v2/nft/primary/currencies`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -158,19 +157,19 @@ export const NftCheckoutPrimaryApiAxiosParamCreator = function (configuration?: 
          * @summary Get a list of NFT primary sales transactions
          * @param {number} [pageSize] Page size of the result
          * @param {string} [cursor] Cursor
-         * @param {GetNftPrimaryTransactionsOrderByEnum} [orderBy] Property to sort by
+         * @param {'transaction_id' | 'status' | 'amount' | 'mint_id'} [orderBy] Property to sort by
          * @param {string} [direction] Direction to sort (asc/desc)
          * @param {string} [transactionId] Transaction id
          * @param {string} [contractAddress] Contract address of the asset
          * @param {string} [sellerWalletAddress] Ethereum address of the seller
          * @param {string} [userWalletAddress] Ethereum address of the user who wants to create transaction
-         * @param {GetNftPrimaryTransactionsStatusEnum} [status] Transaction status
-         * @param {GetNftPrimaryTransactionsProviderEnum} [provider] Checkout provider name
+         * @param {'created' | 'waitingPayment' | 'pending' | 'completed' | 'failed'} [status] Transaction status
+         * @param {'moonpay'} [provider] Checkout provider name
          * @param {string} [mintId] Minting transaction ID - see mintTokens response
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getNftPrimaryTransactions: async (pageSize?: number, cursor?: string, orderBy?: GetNftPrimaryTransactionsOrderByEnum, direction?: string, transactionId?: string, contractAddress?: string, sellerWalletAddress?: string, userWalletAddress?: string, status?: GetNftPrimaryTransactionsStatusEnum, provider?: GetNftPrimaryTransactionsProviderEnum, mintId?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getNftPrimaryTransactions: async (pageSize?: number, cursor?: string, orderBy?: 'transaction_id' | 'status' | 'amount' | 'mint_id', direction?: string, transactionId?: string, contractAddress?: string, sellerWalletAddress?: string, userWalletAddress?: string, status?: 'created' | 'waitingPayment' | 'pending' | 'completed' | 'failed', provider?: 'moonpay', mintId?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/v2/nft/primary`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -298,12 +297,12 @@ export const NftCheckoutPrimaryApiFp = function(configuration?: Configuration) {
         /**
          * Returns a list of supported currencies and their limits
          * @summary Get currencies with limits
-         * @param {GetCurrenciesNFTCheckoutPrimaryProviderEnum} [provider] Provider name
+         * @param {'moonpay'} [provider] Provider name
          * @param {boolean} [includeLimits] Flag if limits should be included in the response or not
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getCurrenciesNFTCheckoutPrimary(provider?: GetCurrenciesNFTCheckoutPrimaryProviderEnum, includeLimits?: boolean, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CurrencyWithLimits>> {
+        async getCurrenciesNFTCheckoutPrimary(provider?: 'moonpay', includeLimits?: boolean, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CurrencyWithLimits>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getCurrenciesNFTCheckoutPrimary(provider, includeLimits, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -323,19 +322,19 @@ export const NftCheckoutPrimaryApiFp = function(configuration?: Configuration) {
          * @summary Get a list of NFT primary sales transactions
          * @param {number} [pageSize] Page size of the result
          * @param {string} [cursor] Cursor
-         * @param {GetNftPrimaryTransactionsOrderByEnum} [orderBy] Property to sort by
+         * @param {'transaction_id' | 'status' | 'amount' | 'mint_id'} [orderBy] Property to sort by
          * @param {string} [direction] Direction to sort (asc/desc)
          * @param {string} [transactionId] Transaction id
          * @param {string} [contractAddress] Contract address of the asset
          * @param {string} [sellerWalletAddress] Ethereum address of the seller
          * @param {string} [userWalletAddress] Ethereum address of the user who wants to create transaction
-         * @param {GetNftPrimaryTransactionsStatusEnum} [status] Transaction status
-         * @param {GetNftPrimaryTransactionsProviderEnum} [provider] Checkout provider name
+         * @param {'created' | 'waitingPayment' | 'pending' | 'completed' | 'failed'} [status] Transaction status
+         * @param {'moonpay'} [provider] Checkout provider name
          * @param {string} [mintId] Minting transaction ID - see mintTokens response
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getNftPrimaryTransactions(pageSize?: number, cursor?: string, orderBy?: GetNftPrimaryTransactionsOrderByEnum, direction?: string, transactionId?: string, contractAddress?: string, sellerWalletAddress?: string, userWalletAddress?: string, status?: GetNftPrimaryTransactionsStatusEnum, provider?: GetNftPrimaryTransactionsProviderEnum, mintId?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<NftprimarytransactionListTransactionsResponse>> {
+        async getNftPrimaryTransactions(pageSize?: number, cursor?: string, orderBy?: 'transaction_id' | 'status' | 'amount' | 'mint_id', direction?: string, transactionId?: string, contractAddress?: string, sellerWalletAddress?: string, userWalletAddress?: string, status?: 'created' | 'waitingPayment' | 'pending' | 'completed' | 'failed', provider?: 'moonpay', mintId?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<NftprimarytransactionListTransactionsResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getNftPrimaryTransactions(pageSize, cursor, orderBy, direction, transactionId, contractAddress, sellerWalletAddress, userWalletAddress, status, provider, mintId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -363,52 +362,63 @@ export const NftCheckoutPrimaryApiFactory = function (configuration?: Configurat
         /**
          * Creates a transaction representing minting an NFT with a card payment.
          * @summary Create NFT primary sale transaction
-         * @param {NftCheckoutPrimaryApiCreateNftPrimaryRequest} requestParameters Request parameters.
+         * @param {NftprimarytransactionCreateAPIRequest} createAPIRequest req
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createNftPrimary(requestParameters: NftCheckoutPrimaryApiCreateNftPrimaryRequest, options?: AxiosRequestConfig): AxiosPromise<NftprimarytransactionCreateResponse> {
-            return localVarFp.createNftPrimary(requestParameters.createAPIRequest, options).then((request) => request(axios, basePath));
+        createNftPrimary(createAPIRequest: NftprimarytransactionCreateAPIRequest, options?: any): AxiosPromise<NftprimarytransactionCreateResponse> {
+            return localVarFp.createNftPrimary(createAPIRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * Returns a list of supported currencies and their limits
          * @summary Get currencies with limits
-         * @param {NftCheckoutPrimaryApiGetCurrenciesNFTCheckoutPrimaryRequest} requestParameters Request parameters.
+         * @param {'moonpay'} [provider] Provider name
+         * @param {boolean} [includeLimits] Flag if limits should be included in the response or not
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getCurrenciesNFTCheckoutPrimary(requestParameters: NftCheckoutPrimaryApiGetCurrenciesNFTCheckoutPrimaryRequest = {}, options?: AxiosRequestConfig): AxiosPromise<CurrencyWithLimits> {
-            return localVarFp.getCurrenciesNFTCheckoutPrimary(requestParameters.provider, requestParameters.includeLimits, options).then((request) => request(axios, basePath));
+        getCurrenciesNFTCheckoutPrimary(provider?: 'moonpay', includeLimits?: boolean, options?: any): AxiosPromise<CurrencyWithLimits> {
+            return localVarFp.getCurrenciesNFTCheckoutPrimary(provider, includeLimits, options).then((request) => request(axios, basePath));
         },
         /**
          * given a transaction id, returns the corresponding transaction representing a mint executed from a card payment
          * @summary Get NFT primary sale transaction by id
-         * @param {NftCheckoutPrimaryApiGetNftPrimaryTransactionRequest} requestParameters Request parameters.
+         * @param {string} transactionId Transaction id
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getNftPrimaryTransaction(requestParameters: NftCheckoutPrimaryApiGetNftPrimaryTransactionRequest, options?: AxiosRequestConfig): AxiosPromise<NftprimarytransactionGetResponse> {
-            return localVarFp.getNftPrimaryTransaction(requestParameters.transactionId, options).then((request) => request(axios, basePath));
+        getNftPrimaryTransaction(transactionId: string, options?: any): AxiosPromise<NftprimarytransactionGetResponse> {
+            return localVarFp.getNftPrimaryTransaction(transactionId, options).then((request) => request(axios, basePath));
         },
         /**
          * Returns a list of NFT primary sales transactions
          * @summary Get a list of NFT primary sales transactions
-         * @param {NftCheckoutPrimaryApiGetNftPrimaryTransactionsRequest} requestParameters Request parameters.
+         * @param {number} [pageSize] Page size of the result
+         * @param {string} [cursor] Cursor
+         * @param {'transaction_id' | 'status' | 'amount' | 'mint_id'} [orderBy] Property to sort by
+         * @param {string} [direction] Direction to sort (asc/desc)
+         * @param {string} [transactionId] Transaction id
+         * @param {string} [contractAddress] Contract address of the asset
+         * @param {string} [sellerWalletAddress] Ethereum address of the seller
+         * @param {string} [userWalletAddress] Ethereum address of the user who wants to create transaction
+         * @param {'created' | 'waitingPayment' | 'pending' | 'completed' | 'failed'} [status] Transaction status
+         * @param {'moonpay'} [provider] Checkout provider name
+         * @param {string} [mintId] Minting transaction ID - see mintTokens response
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getNftPrimaryTransactions(requestParameters: NftCheckoutPrimaryApiGetNftPrimaryTransactionsRequest = {}, options?: AxiosRequestConfig): AxiosPromise<NftprimarytransactionListTransactionsResponse> {
-            return localVarFp.getNftPrimaryTransactions(requestParameters.pageSize, requestParameters.cursor, requestParameters.orderBy, requestParameters.direction, requestParameters.transactionId, requestParameters.contractAddress, requestParameters.sellerWalletAddress, requestParameters.userWalletAddress, requestParameters.status, requestParameters.provider, requestParameters.mintId, options).then((request) => request(axios, basePath));
+        getNftPrimaryTransactions(pageSize?: number, cursor?: string, orderBy?: 'transaction_id' | 'status' | 'amount' | 'mint_id', direction?: string, transactionId?: string, contractAddress?: string, sellerWalletAddress?: string, userWalletAddress?: string, status?: 'created' | 'waitingPayment' | 'pending' | 'completed' | 'failed', provider?: 'moonpay', mintId?: string, options?: any): AxiosPromise<NftprimarytransactionListTransactionsResponse> {
+            return localVarFp.getNftPrimaryTransactions(pageSize, cursor, orderBy, direction, transactionId, contractAddress, sellerWalletAddress, userWalletAddress, status, provider, mintId, options).then((request) => request(axios, basePath));
         },
         /**
          * Registers a new contract for use in the minting with fiat card flow
          * @summary Executes NFT primary sales contract registration
-         * @param {NftCheckoutPrimaryApiRegisterNftPrimarySalesContractRequest} requestParameters Request parameters.
+         * @param {ContractCreateAPIRequest} createAPIRequest req
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        registerNftPrimarySalesContract(requestParameters: NftCheckoutPrimaryApiRegisterNftPrimarySalesContractRequest, options?: AxiosRequestConfig): AxiosPromise<ContractCreateResponse> {
-            return localVarFp.registerNftPrimarySalesContract(requestParameters.createAPIRequest, options).then((request) => request(axios, basePath));
+        registerNftPrimarySalesContract(createAPIRequest: ContractCreateAPIRequest, options?: any): AxiosPromise<ContractCreateResponse> {
+            return localVarFp.registerNftPrimarySalesContract(createAPIRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -438,7 +448,7 @@ export interface NftCheckoutPrimaryApiGetCurrenciesNFTCheckoutPrimaryRequest {
      * @type {'moonpay'}
      * @memberof NftCheckoutPrimaryApiGetCurrenciesNFTCheckoutPrimary
      */
-    readonly provider?: GetCurrenciesNFTCheckoutPrimaryProviderEnum
+    readonly provider?: 'moonpay'
 
     /**
      * Flag if limits should be included in the response or not
@@ -487,7 +497,7 @@ export interface NftCheckoutPrimaryApiGetNftPrimaryTransactionsRequest {
      * @type {'transaction_id' | 'status' | 'amount' | 'mint_id'}
      * @memberof NftCheckoutPrimaryApiGetNftPrimaryTransactions
      */
-    readonly orderBy?: GetNftPrimaryTransactionsOrderByEnum
+    readonly orderBy?: 'transaction_id' | 'status' | 'amount' | 'mint_id'
 
     /**
      * Direction to sort (asc/desc)
@@ -529,14 +539,14 @@ export interface NftCheckoutPrimaryApiGetNftPrimaryTransactionsRequest {
      * @type {'created' | 'waitingPayment' | 'pending' | 'completed' | 'failed'}
      * @memberof NftCheckoutPrimaryApiGetNftPrimaryTransactions
      */
-    readonly status?: GetNftPrimaryTransactionsStatusEnum
+    readonly status?: 'created' | 'waitingPayment' | 'pending' | 'completed' | 'failed'
 
     /**
      * Checkout provider name
      * @type {'moonpay'}
      * @memberof NftCheckoutPrimaryApiGetNftPrimaryTransactions
      */
-    readonly provider?: GetNftPrimaryTransactionsProviderEnum
+    readonly provider?: 'moonpay'
 
     /**
      * Minting transaction ID - see mintTokens response
@@ -627,39 +637,3 @@ export class NftCheckoutPrimaryApi extends BaseAPI {
         return NftCheckoutPrimaryApiFp(this.configuration).registerNftPrimarySalesContract(requestParameters.createAPIRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
-
-/**
- * @export
- */
-export const GetCurrenciesNFTCheckoutPrimaryProviderEnum = {
-    Moonpay: 'moonpay'
-} as const;
-export type GetCurrenciesNFTCheckoutPrimaryProviderEnum = typeof GetCurrenciesNFTCheckoutPrimaryProviderEnum[keyof typeof GetCurrenciesNFTCheckoutPrimaryProviderEnum];
-/**
- * @export
- */
-export const GetNftPrimaryTransactionsOrderByEnum = {
-    TransactionId: 'transaction_id',
-    Status: 'status',
-    Amount: 'amount',
-    MintId: 'mint_id'
-} as const;
-export type GetNftPrimaryTransactionsOrderByEnum = typeof GetNftPrimaryTransactionsOrderByEnum[keyof typeof GetNftPrimaryTransactionsOrderByEnum];
-/**
- * @export
- */
-export const GetNftPrimaryTransactionsStatusEnum = {
-    Created: 'created',
-    WaitingPayment: 'waitingPayment',
-    Pending: 'pending',
-    Completed: 'completed',
-    Failed: 'failed'
-} as const;
-export type GetNftPrimaryTransactionsStatusEnum = typeof GetNftPrimaryTransactionsStatusEnum[keyof typeof GetNftPrimaryTransactionsStatusEnum];
-/**
- * @export
- */
-export const GetNftPrimaryTransactionsProviderEnum = {
-    Moonpay: 'moonpay'
-} as const;
-export type GetNftPrimaryTransactionsProviderEnum = typeof GetNftPrimaryTransactionsProviderEnum[keyof typeof GetNftPrimaryTransactionsProviderEnum];

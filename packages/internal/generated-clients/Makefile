@@ -25,7 +25,7 @@ get-mr-openapi:
 generate-imx-api-client:
 	rm -rf src/imx && \
     mkdir src/imx && \
-	docker run --rm -v $(shell pwd):/app openapitools/openapi-generator-cli:v7.0.1 generate \
+	docker run --rm -v $(shell pwd):/app openapitools/openapi-generator-cli:v6.2.1 generate \
     -i ./app/src/imx-openapi.json \
     -g typescript-axios \
     -o /app/src/imx \

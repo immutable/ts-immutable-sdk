@@ -16,9 +16,6 @@
 // May contain unused imports in some cases
 // @ts-ignore
 import { TokenData } from './token-data';
-// May contain unused imports in some cases
-// @ts-ignore
-import { TokenDataProperties } from './token-data-properties';
 
 /**
  * @type TokenDataOAIGen
