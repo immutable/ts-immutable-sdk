@@ -3453,6 +3453,7 @@ __metadata:
     ethers: ^5.7.2
     jest: ^29.4.3
     parcel: ^2.8.3
+    regenerator-runtime: ^0.14.1
     rollup: ^3.17.2
     rollup-plugin-dts: ^5.3.0
     rollup-plugin-polyfill-node: ^0.12.0
@@ -3618,6 +3619,7 @@ __metadata:
     ethers: ^5.7.2
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
+    regenerator-runtime: 0.14.1
     rollup: ^3.17.2
     ts-node: ^10.9.1
     typechain: ^8.1.1
@@ -3895,6 +3897,7 @@ __metadata:
     os-browserify: ^0.3.0
     pako: ^2.1.0
     react-i18next: ^13.5.0
+    regenerator-runtime: 0.14.1
     rollup: ^3.17.2
     rollup-plugin-dts: ^5.3.0
     rollup-plugin-polyfill-node: ^0.12.0
@@ -25101,17 +25104,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"regenerator-runtime@npm:0.14.1, regenerator-runtime@npm:^0.14.0, regenerator-runtime@npm:^0.14.1":
+  version: 0.14.1
+  resolution: "regenerator-runtime@npm:0.14.1"
+  checksum: 9f57c93277b5585d3c83b0cf76be47b473ae8c6d9142a46ce8b0291a04bb2cf902059f0f8445dcabb3fb7378e5fe4bb4ea1e008876343d42e46d3b484534ce38
+  languageName: node
+  linkType: hard
+
 "regenerator-runtime@npm:^0.13.11, regenerator-runtime@npm:^0.13.7, regenerator-runtime@npm:^0.13.9":
   version: 0.13.11
   resolution: "regenerator-runtime@npm:0.13.11"
   checksum: 27481628d22a1c4e3ff551096a683b424242a216fee44685467307f14d58020af1e19660bf2e26064de946bad7eff28950eae9f8209d55723e2d9351e632bbb4
-  languageName: node
-  linkType: hard
-
-"regenerator-runtime@npm:^0.14.0":
-  version: 0.14.1
-  resolution: "regenerator-runtime@npm:0.14.1"
-  checksum: 9f57c93277b5585d3c83b0cf76be47b473ae8c6d9142a46ce8b0291a04bb2cf902059f0f8445dcabb3fb7378e5fe4bb4ea1e008876343d42e46d3b484534ce38
   languageName: node
   linkType: hard
 
