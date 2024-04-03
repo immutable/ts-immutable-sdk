@@ -7,6 +7,7 @@ export enum RelayerTransactionStatus {
   SUCCESSFUL = 'SUCCESSFUL',
   REVERTED = 'REVERTED',
   FAILED = 'FAILED',
+  CANCELLED = 'CANCELLED',
 }
 
 export interface RelayerTransaction {
@@ -26,22 +27,22 @@ export interface FeeOption {
 }
 
 export interface MetaTransaction {
-  to: string
-  value?: BigNumberish
-  data?: BytesLike
-  nonce?: BigNumberish
-  gasLimit?: BigNumberish
-  delegateCall?: boolean
-  revertOnError?: boolean
+  to: string;
+  value?: BigNumberish;
+  data?: BytesLike;
+  nonce?: BigNumberish;
+  gasLimit?: BigNumberish;
+  delegateCall?: boolean;
+  revertOnError?: boolean;
 }
 
 export interface MetaTransactionNormalised {
-  delegateCall: boolean
-  revertOnError: boolean
-  gasLimit: BigNumberish
-  target: string
-  value: BigNumberish
-  data: BytesLike
+  delegateCall: boolean;
+  revertOnError: boolean;
+  gasLimit: BigNumberish;
+  target: string;
+  value: BigNumberish;
+  data: BytesLike;
 }
 
 // https://eips.ethereum.org/EIPS/eip-712
@@ -52,7 +53,7 @@ export interface TypedDataPayload {
   };
   domain: {
     name?: string;
-    version? :string;
+    version?: string;
     chainId?: number;
     verifyingContract?: string;
     salt?: string;
@@ -72,7 +73,10 @@ export type JsonRpcRequestPayload = RequestArguments & {
 };
 
 export interface JsonRpcRequestCallback {
-  (err: JsonRpcError | null, result?: JsonRpcResponsePayload | (JsonRpcResponsePayload | null)[] | null): void;
+  (
+    err: JsonRpcError | null,
+    result?: JsonRpcResponsePayload | (JsonRpcResponsePayload | null)[] | null
+  ): void;
 }
 
 export interface JsonRpcResponsePayload {
@@ -86,12 +90,12 @@ export type Provider = {
   request: (request: RequestArguments) => Promise<any>;
   sendAsync: (
     request: JsonRpcRequestPayload | JsonRpcRequestPayload[],
-    callback: JsonRpcRequestCallback,
+    callback: JsonRpcRequestCallback
   ) => void;
   send: (
     request: string | JsonRpcRequestPayload | JsonRpcRequestPayload[],
     callbackOrParams?: JsonRpcRequestCallback | Array<any>,
-    callback?: JsonRpcRequestCallback,
+    callback?: JsonRpcRequestCallback
   ) => void;
   on: (event: string, listener: (...args: any[]) => void) => void;
   removeListener: (event: string, listener: (...args: any[]) => void) => void;
@@ -105,5 +109,5 @@ export enum ProviderEvent {
 export type AccountsChangedEvent = Array<string>;
 
 export interface ProviderEventMap extends Record<string, any> {
-  [ProviderEvent.ACCOUNTS_CHANGED]: [AccountsChangedEvent],
+  [ProviderEvent.ACCOUNTS_CHANGED]: [AccountsChangedEvent];
 }

@@ -193,7 +193,7 @@ export const getTopUpViewData = (
     subheading = ['views.PAYMENT_METHODS.topUp.subheading.native', balances];
   }
 
-  const amount = erc20?.delta.balance.toString() || '0';
+  const amount = erc20?.delta.formattedBalance || '0';
 
   return {
     amount,

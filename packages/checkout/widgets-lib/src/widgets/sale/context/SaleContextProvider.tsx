@@ -172,12 +172,10 @@ export function SaleContextProvider(props: {
   >(undefined);
 
   const [fundingRoutes, setFundingRoutes] = useState<FundingRoute[]>([]);
-  const [disabledPaymentTypes, setDisabledPaymentTypes] = useState<
-  SalePaymentTypes[]
-  >(excludePaymentTypes || []);
+  const [disabledPaymentTypes, setDisabledPaymentTypes] = useState<SalePaymentTypes[]>([]);
 
   const disablePaymentTypes = (types: SalePaymentTypes[]) => {
-    setDisabledPaymentTypes((prev) => [...prev, ...types]);
+    setDisabledPaymentTypes((prev) => Array.from(new Set([...(prev || []), ...types])));
   };
 
   const [invalidParameters, setInvalidParameters] = useState<boolean>(false);

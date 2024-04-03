@@ -139,6 +139,10 @@ const getOrderbookConfig = (environment: EnvironmentNames): ModuleConfiguration<
         baseConfig,
         overrides: {
           seaportContractAddress: '0xbA22c310787e9a3D74343B17AB0Ab946c28DFB52',
+          zoneContractAddress: '0x030a84161998972648e639bd0e2123b019e7DfE5',
+          apiEndpoint: 'https://api.dev.immutable.com',
+          chainName: 'imtbl-zkevm-devnet',
+          jsonRpcProviderUrl: 'https://rpc.dev.immutable.com',
         },
       };
     }
