@@ -1,5 +1,4 @@
 import React, {
-  FormEvent,
   useCallback, useEffect, useState,
 } from 'react';
 import { Accordion, Form } from 'react-bootstrap';
@@ -7,9 +6,9 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import { usePassportProvider } from '@/context/PassportProvider';
 import WorkflowButton from '@/components/WorkflowButton';
 import { RequestExampleProps } from '@/types';
-import { formatBytes32String } from 'ethers/lib/utils';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { ethers } from 'ethers';
+import * as encUtils from 'enc-utils';
 
 function CallSmartContract({ disabled, handleExampleSubmitted }: RequestExampleProps) {
   const { orderbookClient } = useImmutableProvider();
@@ -25,6 +24,8 @@ function CallSmartContract({ disabled, handleExampleSubmitted }: RequestExampleP
   const invalidToAddressError = 'To address is not valid';
   const [toAddressTouched, setToAddressTouched] = useState(false);
 
+  encUtils.isHexString
+
   useEffect(() => {
     try {
       if (!data) {
@@ -35,14 +36,14 @@ function CallSmartContract({ disabled, handleExampleSubmitted }: RequestExampleP
       setParams([{
         from: fromAddress,
         to: toAddress,
-        data: formatBytes32String(data),
+        data: encUtils.utf8ToHex(data, true),
       }]);
     } catch (err) {
       setDataError(emptyDataError);
       setParams([{
         from: fromAddress,
         to: toAddress,
-        data: formatBytes32String(data),
+        data: encUtils.utf8ToHex(data, true),
       }]);
     }
   }, [fromAddress, toAddress, data]);
