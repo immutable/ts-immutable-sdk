@@ -15,7 +15,7 @@ function CallSmartContract({ disabled, handleExampleSubmitted }: RequestExampleP
   const defaultAddress = orderbookClient.config().seaportContractAddress;
   const [fromAddress, setFromAddress] = useState<string>('');
   const [toAddress, setToAddress] = useState<string>(defaultAddress);
-  const [toAddressError, setToAddressError] = useState<string>("");
+  const [toAddressError, setToAddressError] = useState<string>('');
   const [data, setData] = useState<string>('123');
   const { zkEvmProvider } = usePassportProvider();
   const [params, setParams] = useState<any[]>([]);
@@ -24,14 +24,12 @@ function CallSmartContract({ disabled, handleExampleSubmitted }: RequestExampleP
   const invalidToAddressError = 'To address is not valid';
   const [toAddressTouched, setToAddressTouched] = useState(false);
 
-  encUtils.isHexString
-
   useEffect(() => {
     try {
       if (!data) {
         setDataError(emptyDataError);
       } else {
-      setDataError('');
+        setDataError('');
       }
       setParams([{
         from: fromAddress,
@@ -49,14 +47,14 @@ function CallSmartContract({ disabled, handleExampleSubmitted }: RequestExampleP
   }, [fromAddress, toAddress, data]);
 
   const handleToAddressChanged = ((newAddress: string) => {
-    setToAddressTouched(true)
+    setToAddressTouched(true);
     if (ethers.utils.isAddress(newAddress)) {
-      setToAddressError("")
-      setToAddress(newAddress)
+      setToAddressError('');
+      setToAddress(newAddress);
     } else {
-      setToAddressError(invalidToAddressError)
+      setToAddressError(invalidToAddressError);
     }
-  })
+  });
 
   useEffect(() => {
     const getAddress = async () => {
@@ -120,9 +118,9 @@ function CallSmartContract({ disabled, handleExampleSubmitted }: RequestExampleP
               <Form.Control
                 required
                 disabled={disabled}
-                placeholder={toAddressTouched ? "" : defaultAddress}
-                isValid={toAddressError === ""}
-                isInvalid={toAddressError !== ""}
+                placeholder={toAddressTouched ? '' : defaultAddress}
+                isValid={toAddressError === ''}
+                isInvalid={toAddressError !== ''}
                 onChange={(e) => handleToAddressChanged(e.target.value)}
               />
               <Form.Control.Feedback type="invalid" tooltip>
