@@ -13,8 +13,9 @@
  */
 
 
-import globalAxios, { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
-import { Configuration } from '../configuration';
+import type { Configuration } from '../configuration';
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
@@ -285,47 +286,32 @@ export const DepositsApiFactory = function (configuration?: Configuration, baseP
         /**
          * Get details of a deposit with the given ID
          * @summary Get details of a deposit with the given ID
-         * @param {string} id Deposit ID
+         * @param {DepositsApiGetDepositRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getDeposit(id: string, options?: any): AxiosPromise<Deposit> {
-            return localVarFp.getDeposit(id, options).then((request) => request(axios, basePath));
+        getDeposit(requestParameters: DepositsApiGetDepositRequest, options?: AxiosRequestConfig): AxiosPromise<Deposit> {
+            return localVarFp.getDeposit(requestParameters.id, options).then((request) => request(axios, basePath));
         },
         /**
          * Gets details of a signable deposit
          * @summary Gets details of a signable deposit
-         * @param {GetSignableDepositRequest} getSignableDepositRequest Get details of signable deposit
+         * @param {DepositsApiGetSignableDepositRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getSignableDeposit(getSignableDepositRequest: GetSignableDepositRequest, options?: any): AxiosPromise<GetSignableDepositResponse> {
-            return localVarFp.getSignableDeposit(getSignableDepositRequest, options).then((request) => request(axios, basePath));
+        getSignableDeposit(requestParameters: DepositsApiGetSignableDepositRequest, options?: AxiosRequestConfig): AxiosPromise<GetSignableDepositResponse> {
+            return localVarFp.getSignableDeposit(requestParameters.getSignableDepositRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * Get a list of deposits
          * @summary Get a list of deposits
-         * @param {number} [pageSize] Page size of the result
-         * @param {string} [cursor] Cursor
-         * @param {string} [orderBy] Property to sort by
-         * @param {string} [direction] Direction to sort (asc/desc)
-         * @param {string} [user] Ethereum address of the user who submitted this deposit
-         * @param {string} [status] Status of this deposit
-         * @param {string} [minTimestamp] Minimum timestamp for this deposit, in ISO 8601 UTC format. Example: \&#39;2022-05-27T00:10:22Z\&#39;
-         * @param {string} [maxTimestamp] Maximum timestamp for this deposit, in ISO 8601 UTC format. Example: \&#39;2022-05-27T00:10:22Z\&#39;
-         * @param {string} [tokenType] Token type of the deposited asset
-         * @param {string} [tokenId] ERC721 Token ID of the minted asset
-         * @param {string} [assetId] Internal IMX ID of the minted asset
-         * @param {string} [tokenAddress] Token address of the deposited asset
-         * @param {string} [tokenName] Token name of the deposited asset
-         * @param {string} [minQuantity] Min quantity for the deposited asset
-         * @param {string} [maxQuantity] Max quantity for the deposited asset
-         * @param {string} [metadata] JSON-encoded metadata filters for the deposited asset
+         * @param {DepositsApiListDepositsRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listDeposits(pageSize?: number, cursor?: string, orderBy?: string, direction?: string, user?: string, status?: string, minTimestamp?: string, maxTimestamp?: string, tokenType?: string, tokenId?: string, assetId?: string, tokenAddress?: string, tokenName?: string, minQuantity?: string, maxQuantity?: string, metadata?: string, options?: any): AxiosPromise<ListDepositsResponse> {
-            return localVarFp.listDeposits(pageSize, cursor, orderBy, direction, user, status, minTimestamp, maxTimestamp, tokenType, tokenId, assetId, tokenAddress, tokenName, minQuantity, maxQuantity, metadata, options).then((request) => request(axios, basePath));
+        listDeposits(requestParameters: DepositsApiListDepositsRequest = {}, options?: AxiosRequestConfig): AxiosPromise<ListDepositsResponse> {
+            return localVarFp.listDeposits(requestParameters.pageSize, requestParameters.cursor, requestParameters.orderBy, requestParameters.direction, requestParameters.user, requestParameters.status, requestParameters.minTimestamp, requestParameters.maxTimestamp, requestParameters.tokenType, requestParameters.tokenId, requestParameters.assetId, requestParameters.tokenAddress, requestParameters.tokenName, requestParameters.minQuantity, requestParameters.maxQuantity, requestParameters.metadata, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -520,3 +506,4 @@ export class DepositsApi extends BaseAPI {
         return DepositsApiFp(this.configuration).listDeposits(requestParameters.pageSize, requestParameters.cursor, requestParameters.orderBy, requestParameters.direction, requestParameters.user, requestParameters.status, requestParameters.minTimestamp, requestParameters.maxTimestamp, requestParameters.tokenType, requestParameters.tokenId, requestParameters.assetId, requestParameters.tokenAddress, requestParameters.tokenName, requestParameters.minQuantity, requestParameters.maxQuantity, requestParameters.metadata, options).then((request) => request(this.axios, this.basePath));
     }
 }
+

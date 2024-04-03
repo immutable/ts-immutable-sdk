@@ -13,6 +13,9 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import { TokenDataProperties } from './token-data-properties';
 
 /**
  * 
@@ -33,13 +36,19 @@ export interface TokenData {
      */
     'id'?: string;
     /**
+     * 
+     * @type {TokenDataProperties}
+     * @memberof TokenData
+     */
+    'properties'?: TokenDataProperties;
+    /**
      * Quantity of this asset - inclusive of fees for buy order in v1 API and exclusive of fees in v3 API
      * @type {string}
      * @memberof TokenData
      */
     'quantity': string;
     /**
-     * Quantity of this asset with the sum of all fees applied to the asset
+     * [DEPRECATED for v3 endpoints] Quantity of this asset with the sum of all fees applied to the asset. Replaced by quantity_with_fees in maker_fees / taker_fees depending on the type of order. Refer https://docs.x.immutable.com/docs/maker-taker-fees/#new-maker-taker-fields-and-the-deprecation-of-quantity_with_fees-in-buy-and-sell.
      * @type {string}
      * @memberof TokenData
      */

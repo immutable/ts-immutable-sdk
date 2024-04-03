@@ -13,8 +13,9 @@
  */
 
 
-import globalAxios, { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
-import { Configuration } from '../configuration';
+import type { Configuration } from '../configuration';
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
@@ -115,7 +116,7 @@ export const MintsApiAxiosParamCreator = function (configuration?: Configuration
          * @summary Get a list of mints
          * @param {number} [pageSize] Page size of the result
          * @param {string} [cursor] Cursor
-         * @param {'transaction_id' | 'token_id' | 'created_at' | 'updated_at'} [orderBy] Property to sort by
+         * @param {ListMintsOrderByEnum} [orderBy] Property to sort by
          * @param {string} [direction] Direction to sort (asc/desc)
          * @param {string} [user] Ethereum address of the user who submitted this mint
          * @param {string} [status] Status of this mint
@@ -131,7 +132,7 @@ export const MintsApiAxiosParamCreator = function (configuration?: Configuration
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listMints: async (pageSize?: number, cursor?: string, orderBy?: 'transaction_id' | 'token_id' | 'created_at' | 'updated_at', direction?: string, user?: string, status?: string, minTimestamp?: string, maxTimestamp?: string, tokenType?: string, tokenId?: string, tokenName?: string, tokenAddress?: string, minQuantity?: string, maxQuantity?: string, metadata?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listMints: async (pageSize?: number, cursor?: string, orderBy?: ListMintsOrderByEnum, direction?: string, user?: string, status?: string, minTimestamp?: string, maxTimestamp?: string, tokenType?: string, tokenId?: string, tokenName?: string, tokenAddress?: string, minQuantity?: string, maxQuantity?: string, metadata?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/v1/mints`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -289,7 +290,7 @@ export const MintsApiFp = function(configuration?: Configuration) {
          * @summary Get a list of mints
          * @param {number} [pageSize] Page size of the result
          * @param {string} [cursor] Cursor
-         * @param {'transaction_id' | 'token_id' | 'created_at' | 'updated_at'} [orderBy] Property to sort by
+         * @param {ListMintsOrderByEnum} [orderBy] Property to sort by
          * @param {string} [direction] Direction to sort (asc/desc)
          * @param {string} [user] Ethereum address of the user who submitted this mint
          * @param {string} [status] Status of this mint
@@ -305,7 +306,7 @@ export const MintsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listMints(pageSize?: number, cursor?: string, orderBy?: 'transaction_id' | 'token_id' | 'created_at' | 'updated_at', direction?: string, user?: string, status?: string, minTimestamp?: string, maxTimestamp?: string, tokenType?: string, tokenId?: string, tokenName?: string, tokenAddress?: string, minQuantity?: string, maxQuantity?: string, metadata?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListMintsResponse>> {
+        async listMints(pageSize?: number, cursor?: string, orderBy?: ListMintsOrderByEnum, direction?: string, user?: string, status?: string, minTimestamp?: string, maxTimestamp?: string, tokenType?: string, tokenId?: string, tokenName?: string, tokenAddress?: string, minQuantity?: string, maxQuantity?: string, metadata?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListMintsResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listMints(pageSize, cursor, orderBy, direction, user, status, minTimestamp, maxTimestamp, tokenType, tokenId, tokenName, tokenAddress, minQuantity, maxQuantity, metadata, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -333,57 +334,42 @@ export const MintsApiFactory = function (configuration?: Configuration, basePath
         /**
          * Get details of a mint with the given ID
          * @summary Get details of a mint with the given ID
-         * @param {string} id Mint ID. This is the transaction_id returned from listMints
+         * @param {MintsApiGetMintRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getMint(id: string, options?: any): AxiosPromise<Array<Mint>> {
-            return localVarFp.getMint(id, options).then((request) => request(axios, basePath));
+        getMint(requestParameters: MintsApiGetMintRequest, options?: AxiosRequestConfig): AxiosPromise<Array<Mint>> {
+            return localVarFp.getMint(requestParameters.id, options).then((request) => request(axios, basePath));
         },
         /**
          * Get details of a mintable token with the given token address and token ID
          * @summary Get details of a mintable token with the given token address and token ID
-         * @param {string} tokenAddress Address of the ERC721 contract
-         * @param {string} tokenId ERC721 token ID
+         * @param {MintsApiGetMintableTokenDetailsByClientTokenIdRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getMintableTokenDetailsByClientTokenId(tokenAddress: string, tokenId: string, options?: any): AxiosPromise<MintableTokenDetails> {
-            return localVarFp.getMintableTokenDetailsByClientTokenId(tokenAddress, tokenId, options).then((request) => request(axios, basePath));
+        getMintableTokenDetailsByClientTokenId(requestParameters: MintsApiGetMintableTokenDetailsByClientTokenIdRequest, options?: AxiosRequestConfig): AxiosPromise<MintableTokenDetails> {
+            return localVarFp.getMintableTokenDetailsByClientTokenId(requestParameters.tokenAddress, requestParameters.tokenId, options).then((request) => request(axios, basePath));
         },
         /**
          * Get information about token mints. If you want to get information about tokens that have already been minted, use the listAssets endpoint.
          * @summary Get a list of mints
-         * @param {number} [pageSize] Page size of the result
-         * @param {string} [cursor] Cursor
-         * @param {'transaction_id' | 'token_id' | 'created_at' | 'updated_at'} [orderBy] Property to sort by
-         * @param {string} [direction] Direction to sort (asc/desc)
-         * @param {string} [user] Ethereum address of the user who submitted this mint
-         * @param {string} [status] Status of this mint
-         * @param {string} [minTimestamp] Minimum timestamp for this mint, in ISO 8601 UTC format. Example: \&#39;2022-05-27T00:10:22Z\&#39;
-         * @param {string} [maxTimestamp] Maximum timestamp for this mint, in ISO 8601 UTC format. Example: \&#39;2022-05-27T00:10:22Z\&#39;
-         * @param {string} [tokenType] Token type of the minted asset
-         * @param {string} [tokenId] ERC721 Token ID of the minted asset
-         * @param {string} [tokenName] Token Name of the minted asset
-         * @param {string} [tokenAddress] Token address of the minted asset
-         * @param {string} [minQuantity] Min quantity for the minted asset
-         * @param {string} [maxQuantity] Max quantity for the minted asset
-         * @param {string} [metadata] JSON-encoded metadata filters for the minted asset
+         * @param {MintsApiListMintsRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listMints(pageSize?: number, cursor?: string, orderBy?: 'transaction_id' | 'token_id' | 'created_at' | 'updated_at', direction?: string, user?: string, status?: string, minTimestamp?: string, maxTimestamp?: string, tokenType?: string, tokenId?: string, tokenName?: string, tokenAddress?: string, minQuantity?: string, maxQuantity?: string, metadata?: string, options?: any): AxiosPromise<ListMintsResponse> {
-            return localVarFp.listMints(pageSize, cursor, orderBy, direction, user, status, minTimestamp, maxTimestamp, tokenType, tokenId, tokenName, tokenAddress, minQuantity, maxQuantity, metadata, options).then((request) => request(axios, basePath));
+        listMints(requestParameters: MintsApiListMintsRequest = {}, options?: AxiosRequestConfig): AxiosPromise<ListMintsResponse> {
+            return localVarFp.listMints(requestParameters.pageSize, requestParameters.cursor, requestParameters.orderBy, requestParameters.direction, requestParameters.user, requestParameters.status, requestParameters.minTimestamp, requestParameters.maxTimestamp, requestParameters.tokenType, requestParameters.tokenId, requestParameters.tokenName, requestParameters.tokenAddress, requestParameters.minQuantity, requestParameters.maxQuantity, requestParameters.metadata, options).then((request) => request(axios, basePath));
         },
         /**
          * Mint tokens in a batch with fees
          * @summary Mint Tokens V2
-         * @param {Array<MintRequest>} mintTokensRequestV2 details of tokens to mint
+         * @param {MintsApiMintTokensRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        mintTokens(mintTokensRequestV2: Array<MintRequest>, options?: any): AxiosPromise<MintTokensResponse> {
-            return localVarFp.mintTokens(mintTokensRequestV2, options).then((request) => request(axios, basePath));
+        mintTokens(requestParameters: MintsApiMintTokensRequest, options?: AxiosRequestConfig): AxiosPromise<MintTokensResponse> {
+            return localVarFp.mintTokens(requestParameters.mintTokensRequestV2, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -448,7 +434,7 @@ export interface MintsApiListMintsRequest {
      * @type {'transaction_id' | 'token_id' | 'created_at' | 'updated_at'}
      * @memberof MintsApiListMints
      */
-    readonly orderBy?: 'transaction_id' | 'token_id' | 'created_at' | 'updated_at'
+    readonly orderBy?: ListMintsOrderByEnum
 
     /**
      * Direction to sort (asc/desc)
@@ -604,3 +590,14 @@ export class MintsApi extends BaseAPI {
         return MintsApiFp(this.configuration).mintTokens(requestParameters.mintTokensRequestV2, options).then((request) => request(this.axios, this.basePath));
     }
 }
+
+/**
+ * @export
+ */
+export const ListMintsOrderByEnum = {
+    TransactionId: 'transaction_id',
+    TokenId: 'token_id',
+    CreatedAt: 'created_at',
+    UpdatedAt: 'updated_at'
+} as const;
+export type ListMintsOrderByEnum = typeof ListMintsOrderByEnum[keyof typeof ListMintsOrderByEnum];

@@ -13,8 +13,9 @@
  */
 
 
-import globalAxios, { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
-import { Configuration } from '../configuration';
+import type { Configuration } from '../configuration';
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
@@ -478,83 +479,62 @@ export const WithdrawalsApiFactory = function (configuration?: Configuration, ba
         /**
          * Creates a withdrawal. Use https://docs.x.immutable.com/reference/#/operations/getSignableWithdrawal to get request body params. This endpoint will be deprecated once StarkEx contract gets upgraded to v4, check https://docs.immutable.com/x/reference/#/operations/createWithdrawalV2.
          * @summary Creates a withdrawal
-         * @param {string} xImxEthAddress eth address
-         * @param {string} xImxEthSignature eth signature
-         * @param {CreateWithdrawalRequest} createWithdrawalRequest create a withdrawal
+         * @param {WithdrawalsApiCreateWithdrawalRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createWithdrawal(xImxEthAddress: string, xImxEthSignature: string, createWithdrawalRequest: CreateWithdrawalRequest, options?: any): AxiosPromise<CreateWithdrawalResponse> {
-            return localVarFp.createWithdrawal(xImxEthAddress, xImxEthSignature, createWithdrawalRequest, options).then((request) => request(axios, basePath));
+        createWithdrawal(requestParameters: WithdrawalsApiCreateWithdrawalRequest, options?: AxiosRequestConfig): AxiosPromise<CreateWithdrawalResponse> {
+            return localVarFp.createWithdrawal(requestParameters.xImxEthAddress, requestParameters.xImxEthSignature, requestParameters.createWithdrawalRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * Creates a withdrawal. Use https://docs.immutable.com/x/reference/#/operations/getSignableWithdrawalV2 to get request body params.
          * @summary Creates a withdrawal of a token for when StarkEx contract that is higher than v3
-         * @param {string} xImxEthAddress eth address
-         * @param {string} xImxEthSignature eth signature
-         * @param {CreateWithdrawalRequestV2} createWithdrawalRequestV2 create a withdrawal
+         * @param {WithdrawalsApiCreateWithdrawalV2Request} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createWithdrawalV2(xImxEthAddress: string, xImxEthSignature: string, createWithdrawalRequestV2: CreateWithdrawalRequestV2, options?: any): AxiosPromise<CreateWithdrawalResponse> {
-            return localVarFp.createWithdrawalV2(xImxEthAddress, xImxEthSignature, createWithdrawalRequestV2, options).then((request) => request(axios, basePath));
+        createWithdrawalV2(requestParameters: WithdrawalsApiCreateWithdrawalV2Request, options?: AxiosRequestConfig): AxiosPromise<CreateWithdrawalResponse> {
+            return localVarFp.createWithdrawalV2(requestParameters.xImxEthAddress, requestParameters.xImxEthSignature, requestParameters.createWithdrawalRequestV2, options).then((request) => request(axios, basePath));
         },
         /**
          * Gets details of a signable withdrawal. This endpoint will be deprecated once StarkEx contract gets upgraded to v4, check https://docs.immutable.com/x/reference/#/operations/getSignableWithdrawalV2.
          * @summary Gets details of a signable withdrawal
-         * @param {GetSignableWithdrawalRequest} getSignableWithdrawalRequest get details of signable withdrawal
+         * @param {WithdrawalsApiGetSignableWithdrawalRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getSignableWithdrawal(getSignableWithdrawalRequest: GetSignableWithdrawalRequest, options?: any): AxiosPromise<GetSignableWithdrawalResponse> {
-            return localVarFp.getSignableWithdrawal(getSignableWithdrawalRequest, options).then((request) => request(axios, basePath));
+        getSignableWithdrawal(requestParameters: WithdrawalsApiGetSignableWithdrawalRequest, options?: AxiosRequestConfig): AxiosPromise<GetSignableWithdrawalResponse> {
+            return localVarFp.getSignableWithdrawal(requestParameters.getSignableWithdrawalRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * Gets details of a signable withdrawal
          * @summary Gets details of a signable withdrawal for starkex contracts that are higher than v3
-         * @param {GetSignableWithdrawalRequest} getSignableWithdrawalRequest get details of signable withdrawal
+         * @param {WithdrawalsApiGetSignableWithdrawalV2Request} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getSignableWithdrawalV2(getSignableWithdrawalRequest: GetSignableWithdrawalRequest, options?: any): AxiosPromise<GetSignableWithdrawalResponseV2> {
-            return localVarFp.getSignableWithdrawalV2(getSignableWithdrawalRequest, options).then((request) => request(axios, basePath));
+        getSignableWithdrawalV2(requestParameters: WithdrawalsApiGetSignableWithdrawalV2Request, options?: AxiosRequestConfig): AxiosPromise<GetSignableWithdrawalResponseV2> {
+            return localVarFp.getSignableWithdrawalV2(requestParameters.getSignableWithdrawalRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * Gets details of withdrawal with the given ID
          * @summary Gets details of withdrawal with the given ID
-         * @param {string} id Withdrawal ID
+         * @param {WithdrawalsApiGetWithdrawalRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getWithdrawal(id: string, options?: any): AxiosPromise<Withdrawal> {
-            return localVarFp.getWithdrawal(id, options).then((request) => request(axios, basePath));
+        getWithdrawal(requestParameters: WithdrawalsApiGetWithdrawalRequest, options?: AxiosRequestConfig): AxiosPromise<Withdrawal> {
+            return localVarFp.getWithdrawal(requestParameters.id, options).then((request) => request(axios, basePath));
         },
         /**
          * Get a list of withdrawals
          * @summary Get a list of withdrawals
-         * @param {boolean} [withdrawnToWallet] Withdrawal has been transferred to user\&#39;s Layer 1 wallet
-         * @param {string} [rollupStatus] Status of the on-chain batch confirmation for this withdrawal
-         * @param {number} [pageSize] Page size of the result
-         * @param {string} [cursor] Cursor
-         * @param {string} [orderBy] Property to sort by
-         * @param {string} [direction] Direction to sort (asc/desc)
-         * @param {string} [user] Ethereum address of the user who submitted this withdrawal
-         * @param {string} [status] Status of this withdrawal
-         * @param {string} [minTimestamp] Minimum timestamp for this deposit, in ISO 8601 UTC format. Example: \&#39;2022-05-27T00:10:22Z\&#39;
-         * @param {string} [maxTimestamp] Maximum timestamp for this deposit, in ISO 8601 UTC format. Example: \&#39;2022-05-27T00:10:22Z\&#39;
-         * @param {string} [tokenType] Token type of the withdrawn asset
-         * @param {string} [tokenId] ERC721 Token ID of the minted asset
-         * @param {string} [assetId] Internal IMX ID of the minted asset
-         * @param {string} [tokenAddress] Token address of the withdrawn asset
-         * @param {string} [tokenName] Token name of the withdrawn asset
-         * @param {string} [minQuantity] Min quantity for the withdrawn asset
-         * @param {string} [maxQuantity] Max quantity for the withdrawn asset
-         * @param {string} [metadata] JSON-encoded metadata filters for the withdrawn asset
+         * @param {WithdrawalsApiListWithdrawalsRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listWithdrawals(withdrawnToWallet?: boolean, rollupStatus?: string, pageSize?: number, cursor?: string, orderBy?: string, direction?: string, user?: string, status?: string, minTimestamp?: string, maxTimestamp?: string, tokenType?: string, tokenId?: string, assetId?: string, tokenAddress?: string, tokenName?: string, minQuantity?: string, maxQuantity?: string, metadata?: string, options?: any): AxiosPromise<ListWithdrawalsResponse> {
-            return localVarFp.listWithdrawals(withdrawnToWallet, rollupStatus, pageSize, cursor, orderBy, direction, user, status, minTimestamp, maxTimestamp, tokenType, tokenId, assetId, tokenAddress, tokenName, minQuantity, maxQuantity, metadata, options).then((request) => request(axios, basePath));
+        listWithdrawals(requestParameters: WithdrawalsApiListWithdrawalsRequest = {}, options?: AxiosRequestConfig): AxiosPromise<ListWithdrawalsResponse> {
+            return localVarFp.listWithdrawals(requestParameters.withdrawnToWallet, requestParameters.rollupStatus, requestParameters.pageSize, requestParameters.cursor, requestParameters.orderBy, requestParameters.direction, requestParameters.user, requestParameters.status, requestParameters.minTimestamp, requestParameters.maxTimestamp, requestParameters.tokenType, requestParameters.tokenId, requestParameters.assetId, requestParameters.tokenAddress, requestParameters.tokenName, requestParameters.minQuantity, requestParameters.maxQuantity, requestParameters.metadata, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -869,3 +849,4 @@ export class WithdrawalsApi extends BaseAPI {
         return WithdrawalsApiFp(this.configuration).listWithdrawals(requestParameters.withdrawnToWallet, requestParameters.rollupStatus, requestParameters.pageSize, requestParameters.cursor, requestParameters.orderBy, requestParameters.direction, requestParameters.user, requestParameters.status, requestParameters.minTimestamp, requestParameters.maxTimestamp, requestParameters.tokenType, requestParameters.tokenId, requestParameters.assetId, requestParameters.tokenAddress, requestParameters.tokenName, requestParameters.minQuantity, requestParameters.maxQuantity, requestParameters.metadata, options).then((request) => request(this.axios, this.basePath));
     }
 }
+

@@ -13,8 +13,9 @@
  */
 
 
-import globalAxios, { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
-import { Configuration } from '../configuration';
+import type { Configuration } from '../configuration';
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
@@ -114,14 +115,12 @@ export const ProjectsApiFactory = function (configuration?: Configuration, baseP
         /**
          * Get a project
          * @summary Get a project
-         * @param {string} id Project ID
-         * @param {string} iMXSignature String created by signing wallet address and timestamp
-         * @param {string} iMXTimestamp Unix Epoc timestamp
+         * @param {ProjectsApiGetProjectRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getProject(id: string, iMXSignature: string, iMXTimestamp: string, options?: any): AxiosPromise<Project> {
-            return localVarFp.getProject(id, iMXSignature, iMXTimestamp, options).then((request) => request(axios, basePath));
+        getProject(requestParameters: ProjectsApiGetProjectRequest, options?: AxiosRequestConfig): AxiosPromise<Project> {
+            return localVarFp.getProject(requestParameters.id, requestParameters.iMXSignature, requestParameters.iMXTimestamp, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -173,3 +172,4 @@ export class ProjectsApi extends BaseAPI {
         return ProjectsApiFp(this.configuration).getProject(requestParameters.id, requestParameters.iMXSignature, requestParameters.iMXTimestamp, options).then((request) => request(this.axios, this.basePath));
     }
 }
+

@@ -13,8 +13,9 @@
  */
 
 
-import globalAxios, { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
-import { Configuration } from '../configuration';
+import type { Configuration } from '../configuration';
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
@@ -178,7 +179,7 @@ export const CollectionsApiAxiosParamCreator = function (configuration?: Configu
          * @summary Get a list of collections
          * @param {number} [pageSize] Page size of the result
          * @param {string} [cursor] Cursor
-         * @param {'name' | 'address' | 'project_id' | 'created_at' | 'updated_at'} [orderBy] Property to sort by
+         * @param {ListCollectionsOrderByEnum} [orderBy] Property to sort by
          * @param {string} [direction] Direction to sort (asc/desc)
          * @param {string} [blacklist] List of collections not to be included, separated by commas
          * @param {string} [whitelist] List of collections to be included, separated by commas
@@ -186,7 +187,7 @@ export const CollectionsApiAxiosParamCreator = function (configuration?: Configu
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listCollections: async (pageSize?: number, cursor?: string, orderBy?: 'name' | 'address' | 'project_id' | 'created_at' | 'updated_at', direction?: string, blacklist?: string, whitelist?: string, keyword?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listCollections: async (pageSize?: number, cursor?: string, orderBy?: ListCollectionsOrderByEnum, direction?: string, blacklist?: string, whitelist?: string, keyword?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/v1/collections`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -382,7 +383,7 @@ export const CollectionsApiFp = function(configuration?: Configuration) {
          * @summary Get a list of collections
          * @param {number} [pageSize] Page size of the result
          * @param {string} [cursor] Cursor
-         * @param {'name' | 'address' | 'project_id' | 'created_at' | 'updated_at'} [orderBy] Property to sort by
+         * @param {ListCollectionsOrderByEnum} [orderBy] Property to sort by
          * @param {string} [direction] Direction to sort (asc/desc)
          * @param {string} [blacklist] List of collections not to be included, separated by commas
          * @param {string} [whitelist] List of collections to be included, separated by commas
@@ -390,7 +391,7 @@ export const CollectionsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listCollections(pageSize?: number, cursor?: string, orderBy?: 'name' | 'address' | 'project_id' | 'created_at' | 'updated_at', direction?: string, blacklist?: string, whitelist?: string, keyword?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListCollectionsResponse>> {
+        async listCollections(pageSize?: number, cursor?: string, orderBy?: ListCollectionsOrderByEnum, direction?: string, blacklist?: string, whitelist?: string, keyword?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListCollectionsResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listCollections(pageSize, cursor, orderBy, direction, blacklist, whitelist, keyword, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -432,76 +433,62 @@ export const CollectionsApiFactory = function (configuration?: Configuration, ba
         /**
          * Create collection
          * @summary Create collection
-         * @param {string} iMXSignature String created by signing wallet address and timestamp. See https://docs.x.immutable.com/docs/generate-imx-signature
-         * @param {string} iMXTimestamp Unix Epoc timestamp
-         * @param {CreateCollectionRequest} createCollectionRequest create a collection
-         * @param {string} [xImmutableApiKey] Immutable secret API key generated in the Immutable Hub https://hub.immutable.com. This key is required for all projects that are created inside the Immutable Hub.
+         * @param {CollectionsApiCreateCollectionRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createCollection(iMXSignature: string, iMXTimestamp: string, createCollectionRequest: CreateCollectionRequest, xImmutableApiKey?: string, options?: any): AxiosPromise<Collection> {
-            return localVarFp.createCollection(iMXSignature, iMXTimestamp, createCollectionRequest, xImmutableApiKey, options).then((request) => request(axios, basePath));
+        createCollection(requestParameters: CollectionsApiCreateCollectionRequest, options?: AxiosRequestConfig): AxiosPromise<Collection> {
+            return localVarFp.createCollection(requestParameters.iMXSignature, requestParameters.iMXTimestamp, requestParameters.createCollectionRequest, requestParameters.xImmutableApiKey, options).then((request) => request(axios, basePath));
         },
         /**
          * Get details of a collection at the given address
          * @summary Get details of a collection at the given address
-         * @param {string} address Collection contract address
+         * @param {CollectionsApiGetCollectionRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getCollection(address: string, options?: any): AxiosPromise<Collection> {
-            return localVarFp.getCollection(address, options).then((request) => request(axios, basePath));
+        getCollection(requestParameters: CollectionsApiGetCollectionRequest, options?: AxiosRequestConfig): AxiosPromise<Collection> {
+            return localVarFp.getCollection(requestParameters.address, options).then((request) => request(axios, basePath));
         },
         /**
          * Get a list of collection filters
          * @summary Get a list of collection filters
-         * @param {string} address Collection contract address
-         * @param {number} [pageSize] Page size of the result
-         * @param {string} [nextPageToken] Next page token
+         * @param {CollectionsApiListCollectionFiltersRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listCollectionFilters(address: string, pageSize?: number, nextPageToken?: string, options?: any): AxiosPromise<Array<CollectionFilter>> {
-            return localVarFp.listCollectionFilters(address, pageSize, nextPageToken, options).then((request) => request(axios, basePath));
+        listCollectionFilters(requestParameters: CollectionsApiListCollectionFiltersRequest, options?: AxiosRequestConfig): AxiosPromise<Array<CollectionFilter>> {
+            return localVarFp.listCollectionFilters(requestParameters.address, requestParameters.pageSize, requestParameters.nextPageToken, options).then((request) => request(axios, basePath));
         },
         /**
          * Get a list of collections
          * @summary Get a list of collections
-         * @param {number} [pageSize] Page size of the result
-         * @param {string} [cursor] Cursor
-         * @param {'name' | 'address' | 'project_id' | 'created_at' | 'updated_at'} [orderBy] Property to sort by
-         * @param {string} [direction] Direction to sort (asc/desc)
-         * @param {string} [blacklist] List of collections not to be included, separated by commas
-         * @param {string} [whitelist] List of collections to be included, separated by commas
-         * @param {string} [keyword] Keyword to search in collection name and description
+         * @param {CollectionsApiListCollectionsRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listCollections(pageSize?: number, cursor?: string, orderBy?: 'name' | 'address' | 'project_id' | 'created_at' | 'updated_at', direction?: string, blacklist?: string, whitelist?: string, keyword?: string, options?: any): AxiosPromise<ListCollectionsResponse> {
-            return localVarFp.listCollections(pageSize, cursor, orderBy, direction, blacklist, whitelist, keyword, options).then((request) => request(axios, basePath));
+        listCollections(requestParameters: CollectionsApiListCollectionsRequest = {}, options?: AxiosRequestConfig): AxiosPromise<ListCollectionsResponse> {
+            return localVarFp.listCollections(requestParameters.pageSize, requestParameters.cursor, requestParameters.orderBy, requestParameters.direction, requestParameters.blacklist, requestParameters.whitelist, requestParameters.keyword, options).then((request) => request(axios, basePath));
         },
         /**
          * Get details of the collections from which a set of wallets hold tokens, along with the number of tokens held in each collection.
          * @summary Get metadata about the collections held by a set of wallets
-         * @param {string} user Comma separated list of wallet addresses
+         * @param {CollectionsApiSummarizeCollectionsRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        summarizeCollections(user: string, options?: any): AxiosPromise<ApiSummarizeCollectionsResponse> {
-            return localVarFp.summarizeCollections(user, options).then((request) => request(axios, basePath));
+        summarizeCollections(requestParameters: CollectionsApiSummarizeCollectionsRequest, options?: AxiosRequestConfig): AxiosPromise<ApiSummarizeCollectionsResponse> {
+            return localVarFp.summarizeCollections(requestParameters.user, options).then((request) => request(axios, basePath));
         },
         /**
          * Update collection
          * @summary Update collection
-         * @param {string} address Collection contract address
-         * @param {string} iMXSignature String created by signing wallet address and timestamp
-         * @param {string} iMXTimestamp Unix Epoc timestamp
-         * @param {UpdateCollectionRequest} updateCollectionRequest update a collection
+         * @param {CollectionsApiUpdateCollectionRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateCollection(address: string, iMXSignature: string, iMXTimestamp: string, updateCollectionRequest: UpdateCollectionRequest, options?: any): AxiosPromise<Collection> {
-            return localVarFp.updateCollection(address, iMXSignature, iMXTimestamp, updateCollectionRequest, options).then((request) => request(axios, basePath));
+        updateCollection(requestParameters: CollectionsApiUpdateCollectionRequest, options?: AxiosRequestConfig): AxiosPromise<Collection> {
+            return localVarFp.updateCollection(requestParameters.address, requestParameters.iMXSignature, requestParameters.iMXTimestamp, requestParameters.updateCollectionRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -608,7 +595,7 @@ export interface CollectionsApiListCollectionsRequest {
      * @type {'name' | 'address' | 'project_id' | 'created_at' | 'updated_at'}
      * @memberof CollectionsApiListCollections
      */
-    readonly orderBy?: 'name' | 'address' | 'project_id' | 'created_at' | 'updated_at'
+    readonly orderBy?: ListCollectionsOrderByEnum
 
     /**
      * Direction to sort (asc/desc)
@@ -767,3 +754,15 @@ export class CollectionsApi extends BaseAPI {
         return CollectionsApiFp(this.configuration).updateCollection(requestParameters.address, requestParameters.iMXSignature, requestParameters.iMXTimestamp, requestParameters.updateCollectionRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
+
+/**
+ * @export
+ */
+export const ListCollectionsOrderByEnum = {
+    Name: 'name',
+    Address: 'address',
+    ProjectId: 'project_id',
+    CreatedAt: 'created_at',
+    UpdatedAt: 'updated_at'
+} as const;
+export type ListCollectionsOrderByEnum = typeof ListCollectionsOrderByEnum[keyof typeof ListCollectionsOrderByEnum];
