@@ -11,7 +11,7 @@
       "url": "https://support.immutable.com",
       "email": "support@immutable.com"
     },
-    "version": "3.0.0"
+    "version": "3.0"
   },
   "host": "api.sandbox.x.immutable.com",
   "basePath": "/",
@@ -2362,7 +2362,7 @@
     },
     "/v1/signable-withdrawal-details": {
       "post": {
-        "description": "Gets details of a signable withdrawal",
+        "description": "Gets details of a signable withdrawal. This endpoint will be deprecated once StarkEx contract gets upgraded to v4, check https://docs.immutable.com/x/reference/#/operations/getSignableWithdrawalV2.",
         "consumes": [
           "application/json"
         ],
@@ -2985,7 +2985,7 @@
         }
       },
       "post": {
-        "description": "Creates a withdrawal. Use https://docs.x.immutable.com/reference#/operations/getSignableWithdrawal to get request body params.",
+        "description": "Creates a withdrawal. Use https://docs.x.immutable.com/reference/#/operations/getSignableWithdrawal to get request body params. This endpoint will be deprecated once StarkEx contract gets upgraded to v4, check https://docs.immutable.com/x/reference/#/operations/createWithdrawalV2.",
         "consumes": [
           "application/json"
         ],
@@ -2995,7 +2995,7 @@
         "tags": [
           "withdrawals"
         ],
-        "summary": "Creates a withdrawal of a token",
+        "summary": "Creates a withdrawal",
         "operationId": "createWithdrawal",
         "parameters": [
           {
@@ -3865,7 +3865,7 @@
     },
     "/v2/withdrawals": {
       "post": {
-        "description": "Creates a withdrawal. Use https://docs.x.immutable.com/reference#/operations/getSignableWithdrawal to get request body params.",
+        "description": "Creates a withdrawal. Use https://docs.immutable.com/x/reference/#/operations/getSignableWithdrawalV2 to get request body params.",
         "consumes": [
           "application/json"
         ],
@@ -3875,7 +3875,7 @@
         "tags": [
           "withdrawals"
         ],
-        "summary": "Creates a withdrawal of a token for starkex contracts that are higher than v3",
+        "summary": "Creates a withdrawal of a token for when StarkEx contract that is higher than v3",
         "operationId": "createWithdrawalV2",
         "parameters": [
           {
@@ -6889,12 +6889,10 @@
         "expiration_timestamp",
         "nonce",
         "payload_hash",
-        "readable_transaction",
         "receiver_stark_key",
         "receiver_vault_id",
         "sender_vault_id",
-        "signable_message",
-        "verification_signature"
+        "signable_message"
       ],
       "properties": {
         "amount": {
@@ -6917,10 +6915,6 @@
           "description": "Hash of the payload",
           "type": "string"
         },
-        "readable_transaction": {
-          "description": "EIP-712 encoding of the StarkEx transfer transaction to be displayed to the user",
-          "type": "string"
-        },
         "receiver_stark_key": {
           "description": "Receiver of the transfer",
           "type": "string"
@@ -6939,10 +6933,6 @@
         },
         "signable_message": {
           "description": "Message to sign with L1 wallet to confirm transfer request",
-          "type": "string"
-        },
-        "verification_signature": {
-          "description": "IMX signed readable_transaction and payload_hash",
           "type": "string"
         }
       }
@@ -7072,7 +7062,7 @@
           "type": "string"
         },
         "expiration_timestamp": {
-          "description": "Token in request to match in SDK implementation",
+          "description": "Expiration timestamp for this withdrawal",
           "type": "integer"
         },
         "nonce": {
@@ -8343,15 +8333,12 @@
           "description": "[DEPRECATED] Internal Immutable X Token ID",
           "type": "string"
         },
-        "properties": {
-          "$ref": "#/definitions/tokenDataProperties"
-        },
         "quantity": {
           "description": "Quantity of this asset - inclusive of fees for buy order in v1 API and exclusive of fees in v3 API",
           "type": "string"
         },
         "quantity_with_fees": {
-          "description": "[DEPRECATED for v3 endpoints] Quantity of this asset with the sum of all fees applied to the asset.\nReplaced by quantity_with_fees in maker_fees / taker_fees depending on the type of order.\nRefer https://docs.x.immutable.com/docs/maker-taker-fees/#new-maker-taker-fields-and-the-deprecation-of-quantity_with_fees-in-buy-and-sell.",
+          "description": "Quantity of this asset with the sum of all fees applied to the asset",
           "type": "string"
         },
         "symbol": {
@@ -14003,7 +13990,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/definitions/APIError"
+              "$ref": "../../../../common/openapi/errors/api_errors_v2.yaml#/definitions/APIError400"
             }
           }
         },
@@ -14013,7 +14000,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/definitions/APIError"
+              "$ref": "../../../../common/openapi/errors/api_errors_v2.yaml#/definitions/APIError403"
             }
           }
         },
@@ -14023,7 +14010,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/definitions/APIError"
+              "$ref": "../../../../common/openapi/errors/api_errors_v2.yaml#/definitions/APIError500"
             }
           }
         },
@@ -14033,7 +14020,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/definitions/APIError"
+              "$ref": "../../../../common/openapi/errors/api_errors_v2.yaml#/definitions/APIError404"
             }
           }
         },
@@ -14043,7 +14030,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/definitions/APIError"
+              "$ref": "../../../../common/openapi/errors/api_errors_v2.yaml#/definitions/APIError501"
             }
           }
         },
@@ -14053,7 +14040,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/definitions/APIError"
+              "$ref": "../../../../common/openapi/errors/api_errors_v2.yaml#/definitions/APIError429"
             }
           }
         },
@@ -14063,7 +14050,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/definitions/APIError"
+              "$ref": "../../../../common/openapi/errors/api_errors_v2.yaml#/definitions/APIError401"
             }
           }
         },
@@ -14073,7 +14060,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/definitions/APIError"
+              "$ref": "../../../../common/openapi/errors/api_errors_v2.yaml#/definitions/APIError422"
             }
           }
         },

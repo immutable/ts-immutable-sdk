@@ -1,5 +1,5 @@
 {
-  "openapi": "3.0.2",
+  "openapi": "3.0.3",
   "info": {
     "title": "Immutable zkEVM API",
     "version": "1.0.0",
@@ -387,6 +387,18 @@
               "items": {
                 "type": "string",
                 "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
+              }
+            }
+          },
+          {
+            "name": "verification_status",
+            "in": "query",
+            "required": false,
+            "description": "List of verification status to filter by",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/AssetVerificationStatus"
               }
             }
           },
@@ -1587,6 +1599,18 @@
             }
           },
           {
+            "name": "verification_status",
+            "in": "query",
+            "required": false,
+            "description": "List of verification status to filter by",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/AssetVerificationStatus"
+              }
+            }
+          },
+          {
             "name": "page_cursor",
             "in": "query",
             "description": "Encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
@@ -1907,6 +1931,9 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
           },
           "429": {
             "$ref": "#/components/responses/TooManyMintRequests"
@@ -3541,6 +3568,16 @@
           }
         }
       },
+      "Conflict": {
+        "description": "Conflict (409)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/APIError409"
+            }
+          }
+        }
+      },
       "TooManyRequests": {
         "description": "Too Many Requests (429)",
         "content": {
@@ -4218,6 +4255,9 @@
             "description": "The metadata uri for nft",
             "example": "https://some-url"
           },
+          "verification_status": {
+            "$ref": "#/components/schemas/AssetVerificationStatus"
+          },
           "indexed_at": {
             "type": "string",
             "format": "date-time",
@@ -4251,7 +4291,8 @@
           "metadata_uri",
           "indexed_at",
           "updated_at",
-          "metadata_synced_at"
+          "metadata_synced_at",
+          "verification_status"
         ]
       },
       "ListCollectionsResult": {
@@ -4712,6 +4753,17 @@
           "ERC20"
         ]
       },
+      "AssetVerificationStatus": {
+        "description": "The verification status for a given contract",
+        "type": "string",
+        "enum": [
+          "pending",
+          "verified",
+          "unverified",
+          "spam",
+          "inactive"
+        ]
+      },
       "GetNFTResult": {
         "type": "object",
         "description": "Single NFT",
@@ -5135,6 +5187,9 @@
             "example": "Token A",
             "nullable": true
           },
+          "verification_status": {
+            "$ref": "#/components/schemas/AssetVerificationStatus"
+          },
           "updated_at": {
             "type": "string",
             "format": "date-time",
@@ -5150,7 +5205,8 @@
           "decimals",
           "image_url",
           "name",
-          "updated_at"
+          "updated_at",
+          "verification_status"
         ]
       },
       "CollectionMetadata": {
@@ -5294,7 +5350,7 @@
           },
           "token_id": {
             "type": "string",
-            "description": "An `uint256` token id as string. Including token_id is currently only possible on Testnet",
+            "description": "An optional `uint256` token id as string. It is recommended to omit token_id for more efficient minting",
             "example": "1",
             "nullable": true
           },
@@ -5631,6 +5687,36 @@
                 "type": "object",
                 "nullable": true,
                 "description": "Additional details to help resolve the error"
+              }
+            },
+            "required": [
+              "code",
+              "details"
+            ]
+          }
+        ]
+      },
+      "APIError409": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasicAPIError"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Error Code",
+                "enum": [
+                  "CONFLICT_ERROR"
+                ],
+                "example": "CONFLICT_ERROR"
+              },
+              "details": {
+                "type": "object",
+                "nullable": true,
+                "description": "Additional details to help resolve the error",
+                "additionalProperties": true
               }
             },
             "required": [
@@ -7246,7 +7332,10 @@
       "UnknownMetadata": {
         "type": "object",
         "required": [
-          "transaction_type"
+          "transaction_type",
+          "is_smart_contract",
+          "is_contract_verified",
+          "contract_name"
         ],
         "properties": {
           "transaction_type": {
@@ -7255,8 +7344,266 @@
             "enum": [
               "UNKNOWN"
             ]
+          },
+          "is_smart_contract": {
+            "type": "boolean",
+            "description": "Is Smart Contract"
+          },
+          "is_contract_verified": {
+            "type": "boolean",
+            "description": "Is Contract Verified"
+          },
+          "contract_name": {
+            "type": "string",
+            "description": "Smart Contract Name"
           }
         }
+      },
+      "SeaportFulfillAvailableAdvancedOrdersMetadata": {
+        "type": "object",
+        "required": [
+          "transaction_type",
+          "buy",
+          "sell",
+          "fees"
+        ],
+        "properties": {
+          "transaction_type": {
+            "type": "string",
+            "description": "Transaction type",
+            "enum": [
+              "SEAPORT_FULFILL_AVAILABLE_ADVANCED_ORDERS"
+            ]
+          },
+          "orders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeaportAdvancedOrder"
+            }
+          }
+        }
+      },
+      "SeaportAdvancedOrder": {
+        "type": "object",
+        "properties": {
+          "buy": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SeaportNativeItem"
+              },
+              {
+                "$ref": "#/components/schemas/SeaportERC20Item"
+              }
+            ],
+            "example": [
+              {
+                "type": "NATIVE",
+                "amount": "10000000000000000",
+                "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+              }
+            ]
+          },
+          "sell": {
+            "$ref": "#/components/schemas/SeaportERC721Item"
+          },
+          "fees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeaportFee"
+            },
+            "example": [],
+            "minItems": 0
+          }
+        },
+        "required": [
+          "buy",
+          "sell",
+          "fees"
+        ]
+      },
+      "SeaportNativeItem": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Token type user is offering, which in this case is the native IMX token",
+            "example": "NATIVE",
+            "enum": [
+              "NATIVE"
+            ]
+          },
+          "amount": {
+            "type": "string",
+            "description": "A string representing the price at which the user is willing to sell the token",
+            "example": "10000000000000000"
+          },
+          "decimals": {
+            "type": "integer",
+            "description": "The decimal of this item",
+            "example": 18
+          }
+        },
+        "required": [
+          "type",
+          "amount",
+          "decimals"
+        ]
+      },
+      "SeaportERC20Item": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Token type user is offering, which in this case is ERC20",
+            "example": "ERC20",
+            "enum": [
+              "ERC20"
+            ]
+          },
+          "contract_address": {
+            "type": "string",
+            "description": "Address of ERC20 token",
+            "example": "0x0165878A594ca255338adfa4d48449f69242Eb8F",
+            "pattern": "^0x[a-fA-F0-9]{40}$"
+          },
+          "symbol": {
+            "type": "string",
+            "description": "The symbol of token",
+            "example": "AAA",
+            "nullable": true
+          },
+          "image_url": {
+            "type": "string",
+            "description": "The image url of token",
+            "example": "https://some-url",
+            "nullable": true
+          },
+          "amount": {
+            "type": "string",
+            "description": "A string representing the price at which the user is willing to sell the token",
+            "example": "10000000000000000"
+          },
+          "decimals": {
+            "type": "integer",
+            "description": "The decimal of this erc20 item",
+            "example": 18
+          }
+        },
+        "required": [
+          "type",
+          "contract_address",
+          "amount",
+          "decimals"
+        ]
+      },
+      "SeaportERC721Item": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Token type user is offering, which in this case is ERC721",
+            "example": "ERC721",
+            "enum": [
+              "ERC721"
+            ]
+          },
+          "contract_address": {
+            "type": "string",
+            "description": "Address of ERC721 token",
+            "example": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+            "pattern": "^0x[a-fA-F0-9]{40}$"
+          },
+          "contract_name": {
+            "type": "string",
+            "nullable": true,
+            "description": "The name of the collection",
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          },
+          "image_url": {
+            "type": "string",
+            "description": "The URL of the NFT",
+            "example": "https://example.com/nft.jpeg"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "example": "Sword",
+            "description": "The name of the NFT"
+          },
+          "token_id": {
+            "type": "string",
+            "description": "ID of ERC721 token",
+            "example": "1",
+            "pattern": "\\d+"
+          }
+        },
+        "example": [
+          {
+            "type": "ERC721",
+            "contract_address": "0x87c07c927eba711cbc55ec628a670acd48d0b525",
+            "contract_name": "Guild of Guardians Heroes",
+            "name": "Bestowing Saint",
+            "token_id": "1"
+          }
+        ],
+        "required": [
+          "type",
+          "contract_address",
+          "token_id"
+        ]
+      },
+      "SeaportFee": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Token type of the Fee",
+            "example": "ERC20",
+            "enum": [
+              "ERC20",
+              "NATIVE"
+            ]
+          },
+          "amount": {
+            "type": "string",
+            "description": "Fee payable to recipient upon settlement",
+            "example": "10000000000000000"
+          },
+          "recipient_address": {
+            "type": "string",
+            "description": "Wallet address of fee recipient",
+            "example": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92233",
+            "pattern": "^0x[a-fA-F0-9]{40}$"
+          },
+          "contract_address": {
+            "type": "string",
+            "description": "Address of the ERC20 token for the fee",
+            "example": "0x0165878A594ca255338adfa4d48449f69242Eb8F",
+            "pattern": "^0x[a-fA-F0-9]{40}$"
+          },
+          "symbol": {
+            "type": "string",
+            "description": "The symbol of token for the fee",
+            "example": "AAA",
+            "nullable": true
+          },
+          "decimals": {
+            "type": "integer",
+            "description": "The decimal of this item",
+            "example": 18
+          }
+        },
+        "example": {
+          "amount": "10000000000000000",
+          "recipient_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92233",
+          "type": "NATIVE"
+        },
+        "required": [
+          "amount",
+          "type",
+          "recipient_address",
+          "decimals"
+        ]
       },
       "GetTransactionMetadataRes": {
         "type": "object",
@@ -7269,6 +7616,9 @@
           },
           {
             "$ref": "#/components/schemas/NFTSetApprovalForAllMetadata"
+          },
+          {
+            "$ref": "#/components/schemas/SeaportFulfillAvailableAdvancedOrdersMetadata"
           },
           {
             "$ref": "#/components/schemas/UnknownMetadata"

@@ -20,6 +20,8 @@ import { APIError404 } from '../models';
 // @ts-ignore
 import { APIError500 } from '../models';
 // @ts-ignore
+import { AssetVerificationStatus } from '../models';
+// @ts-ignore
 import { GetTokenResult } from '../models';
 // @ts-ignore
 import { ListTokensResult } from '../models';
@@ -29,6 +31,8 @@ export { APIError400 } from '../models';
 export { APIError404 } from '../models';
 // @ts-ignore
 export { APIError500 } from '../models';
+// @ts-ignore
+export { AssetVerificationStatus } from '../models';
 // @ts-ignore
 export { GetTokenResult } from '../models';
 // @ts-ignore
@@ -74,6 +78,13 @@ export interface ListERC20TokensRequestParams {
      * @memberof ListERC20Tokens
      */
     readonly fromUpdatedAt?: string
+
+    /**
+     * List of verification status to filter by
+     * @type {Array<AssetVerificationStatus>}
+     * @memberof ListERC20Tokens
+     */
+    readonly verificationStatus?: Array<AssetVerificationStatus>
 
     /**
      * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.

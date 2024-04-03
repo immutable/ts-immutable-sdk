@@ -26,6 +26,24 @@ export interface UnknownMetadata {
      * @memberof UnknownMetadata
      */
     'transaction_type': UnknownMetadataTransactionTypeEnum;
+    /**
+     * Is Smart Contract
+     * @type {boolean}
+     * @memberof UnknownMetadata
+     */
+    'is_smart_contract': boolean;
+    /**
+     * Is Contract Verified
+     * @type {boolean}
+     * @memberof UnknownMetadata
+     */
+    'is_contract_verified': boolean;
+    /**
+     * Smart Contract Name
+     * @type {string}
+     * @memberof UnknownMetadata
+     */
+    'contract_name': string;
 }
 
 export const UnknownMetadataTransactionTypeEnum = {
