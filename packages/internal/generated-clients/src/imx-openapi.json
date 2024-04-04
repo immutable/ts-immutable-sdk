@@ -11,9 +11,9 @@
       "url": "https://support.immutable.com",
       "email": "support@immutable.com"
     },
-    "version": "3.0"
+    "version": "3.0.0"
   },
-  "host": "api.sandbox.x.immutable.com",
+  "host": "api.immutable.com",
   "basePath": "/",
   "paths": {
     "/v1/assets": {
@@ -14005,7 +14005,6 @@
     }
   ],
   "x-components": {
-    "responses": {
-    }
+    "responses": {}
   }
 }
