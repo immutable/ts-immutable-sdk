@@ -2,11 +2,11 @@ import TransferImx from './TransferImx';
 import SpendingCapApproval from './SpendingCapApproval';
 import NFTApproval from './NFTApproval';
 import SeaportFulfillAvailableAdvancedOrders from './SeaportFulfillAvailableAdvancedOrders';
-import CallSmartContract from './CallSmartContract';
+import ShowGenericConfirmationScreen from './ShowGenericConfirmationScreen';
 
 const EthSendTransactionExamples = [
   TransferImx,
-  CallSmartContract,
+  ShowGenericConfirmationScreen,
   SpendingCapApproval,
   NFTApproval,
   SeaportFulfillAvailableAdvancedOrders,

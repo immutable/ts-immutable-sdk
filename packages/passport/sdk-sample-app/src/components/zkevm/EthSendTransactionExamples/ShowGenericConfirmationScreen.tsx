@@ -10,23 +10,23 @@ import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { ethers } from 'ethers';
 import * as encUtils from 'enc-utils';
 
-function CallSmartContract({ disabled, handleExampleSubmitted }: RequestExampleProps) {
+function ShowGenericConfirmationScreen({ disabled, handleExampleSubmitted }: RequestExampleProps) {
   const { orderbookClient } = useImmutableProvider();
   const defaultAddress = orderbookClient.config().seaportContractAddress;
   const [fromAddress, setFromAddress] = useState<string>('');
   const [toAddress, setToAddress] = useState<string>(defaultAddress);
   const [toAddressError, setToAddressError] = useState<string>('');
-  const [data, setData] = useState<string>('123');
+  const [data, setData] = useState<string>('1234567890');
   const { zkEvmProvider } = usePassportProvider();
   const [params, setParams] = useState<any[]>([]);
   const [dataError, setDataError] = useState<string>('');
-  const emptyDataError = 'Data should not be empty';
+  const emptyDataError = 'Data should not be empty and should be at least 10 characters';
   const invalidToAddressError = 'To address is not valid';
   const [toAddressTouched, setToAddressTouched] = useState(false);
 
   useEffect(() => {
     try {
-      if (!data) {
+      if (!data || data.length < 10) {
         setDataError(emptyDataError);
       } else {
         setDataError('');
@@ -81,7 +81,7 @@ function CallSmartContract({ disabled, handleExampleSubmitted }: RequestExampleP
 
   return (
     <Accordion.Item eventKey="5">
-      <Accordion.Header>Call Smart Contract</Accordion.Header>
+      <Accordion.Header>Show Generic Confirmation Screen</Accordion.Header>
       <Accordion.Body>
         <Form noValidate onSubmit={handleSubmit} className="mb-4">
           <Form.Group className="mb-3">
@@ -158,4 +158,4 @@ function CallSmartContract({ disabled, handleExampleSubmitted }: RequestExampleP
   );
 }
 
-export default CallSmartContract;
+export default ShowGenericConfirmationScreen;
