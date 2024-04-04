@@ -6889,10 +6889,12 @@
         "expiration_timestamp",
         "nonce",
         "payload_hash",
+        "readable_transaction",
         "receiver_stark_key",
         "receiver_vault_id",
         "sender_vault_id",
-        "signable_message"
+        "signable_message",
+        "verification_signature"
       ],
       "properties": {
         "amount": {
@@ -6915,6 +6917,10 @@
           "description": "Hash of the payload",
           "type": "string"
         },
+        "readable_transaction": {
+          "description": "EIP-712 encoding of the StarkEx transfer transaction to be displayed to the user",
+          "type": "string"
+        },
         "receiver_stark_key": {
           "description": "Receiver of the transfer",
           "type": "string"
@@ -6933,6 +6939,10 @@
         },
         "signable_message": {
           "description": "Message to sign with L1 wallet to confirm transfer request",
+          "type": "string"
+        },
+        "verification_signature": {
+          "description": "IMX signed readable_transaction and payload_hash",
           "type": "string"
         }
       }
@@ -7583,7 +7593,7 @@
           "type": "string"
         },
         "token": {
-          "$ref": "#/definitions/mintToken"
+          "$ref": "#/definitions/mintTokenOAIGen"
         },
         "transaction_id": {
           "description": "Sequential ID of transaction in Immutable X",
@@ -7665,6 +7675,59 @@
         "tx_id": {
           "description": "Mint Transaction ID",
           "type": "integer"
+        }
+      }
+    },
+    "MintToken": {
+      "type": "object",
+      "required": [
+        "data",
+        "type"
+      ],
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/mintTokenDataOAIGen"
+        },
+        "type": {
+          "description": "Type of this asset (ETH/ERC20/ERC721)",
+          "type": "string"
+        }
+      }
+    },
+    "MintTokenData": {
+      "type": "object",
+      "required": [
+        "quantity",
+        "quantity_with_fees"
+      ],
+      "properties": {
+        "decimals": {
+          "description": "Number of decimals supported by this asset",
+          "type": "integer"
+        },
+        "id": {
+          "description": "[DEPRECATED] Internal Immutable X Token ID",
+          "type": "string"
+        },
+        "quantity": {
+          "description": "Quantity of this asset - inclusive of fees for buy order in v1 API and exclusive of fees in v3 API",
+          "type": "string"
+        },
+        "quantity_with_fees": {
+          "description": "Quantity of this asset with the sum of all fees applied to the asset",
+          "type": "string"
+        },
+        "symbol": {
+          "description": "Symbol of a token",
+          "type": "string"
+        },
+        "token_address": {
+          "description": "Address of ERC721/ERC20 contract",
+          "type": "string"
+        },
+        "token_id": {
+          "description": "ERC721 Token ID",
+          "type": "string"
         }
       }
     },
@@ -7960,88 +8023,24 @@
     "Project": {
       "type": "object",
       "required": [
-        "collection_limit_expires_at",
-        "collection_monthly_limit",
-        "collection_remaining",
-        "company_name",
-        "contact_email",
         "id",
-        "mint_limit_expires_at",
-        "mint_monthly_limit",
-        "mint_remaining",
         "name"
       ],
       "properties": {
-        "api_key": {
-          "description": "API key for the project. This is only for zkevm project. This API is not for increasing rate limit yet.",
-          "type": "string"
-        },
         "chain_type": {
           "description": "The project ChainType",
           "type": "string"
         },
-        "collection_limit_expires_at": {
-          "description": "The current period expiry date for collection limit",
-          "type": "string"
-        },
-        "collection_monthly_limit": {
-          "description": "The total monthly collection limit",
-          "type": "integer"
-        },
-        "collection_remaining": {
-          "description": "The number of collection remaining in the current period",
-          "type": "integer"
-        },
-        "company_name": {
-          "description": "The company name",
-          "type": "string"
-        },
-        "contact_email": {
-          "description": "The project contact email (must be registered as a developer account with Immutable at https://hub.immutable.com)",
-          "type": "string"
-        },
-        "environment_id": {
-          "description": "The environment ID",
-          "type": "string"
-        },
-        "environment_name": {
-          "description": "The user environment name correlating to this project",
-          "type": "string"
-        },
         "id": {
-          "description": "The project ID",
-          "type": "integer"
-        },
-        "mint_limit_expires_at": {
-          "description": "The current period expiry date for mint operation limit",
+          "description": "The project group ID",
           "type": "string"
-        },
-        "mint_monthly_limit": {
-          "description": "The total monthly mint operation limit",
-          "type": "integer"
-        },
-        "mint_remaining": {
-          "description": "The number of mint operation remaining in the current period",
-          "type": "integer"
         },
         "name": {
-          "description": "The project name",
+          "description": "The project group name",
           "type": "string"
         },
         "org_id": {
           "description": "The organisation ID that the project belongs to",
-          "type": "string"
-        },
-        "project_group_id": {
-          "description": "Project group id",
-          "type": "string"
-        },
-        "publishable_key": {
-          "description": "The public publishable_key for the project",
-          "type": "string"
-        },
-        "publishable_key_created_at": {
-          "description": "The public publishable_key created time",
           "type": "string"
         }
       }
@@ -8333,12 +8332,15 @@
           "description": "[DEPRECATED] Internal Immutable X Token ID",
           "type": "string"
         },
+        "properties": {
+          "$ref": "#/definitions/tokenDataProperties"
+        },
         "quantity": {
           "description": "Quantity of this asset - inclusive of fees for buy order in v1 API and exclusive of fees in v3 API",
           "type": "string"
         },
         "quantity_with_fees": {
-          "description": "Quantity of this asset with the sum of all fees applied to the asset",
+          "description": "[DEPRECATED for v3 endpoints] Quantity of this asset with the sum of all fees applied to the asset.\nReplaced by quantity_with_fees in maker_fees / taker_fees depending on the type of order.\nRefer https://docs.x.immutable.com/docs/maker-taker-fees/#new-maker-taker-fields-and-the-deprecation-of-quantity_with_fees-in-buy-and-sell.",
           "type": "string"
         },
         "symbol": {
@@ -11777,6 +11779,24 @@
       "allOf": [
         {
           "$ref": "#/definitions/Token"
+        }
+      ],
+      "x-go-gen-location": "models"
+    },
+    "mintTokenDataOAIGen": {
+      "description": "Token details of this asset",
+      "allOf": [
+        {
+          "$ref": "#/definitions/MintTokenData"
+        }
+      ],
+      "x-go-gen-location": "models"
+    },
+    "mintTokenOAIGen": {
+      "description": "Details of the asset which has been minted",
+      "allOf": [
+        {
+          "$ref": "#/definitions/MintToken"
         }
       ],
       "x-go-gen-location": "models"

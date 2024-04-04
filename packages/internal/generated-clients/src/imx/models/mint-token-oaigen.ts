@@ -15,16 +15,16 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { TokenData } from './token-data';
+import { MintToken } from './mint-token';
 // May contain unused imports in some cases
 // @ts-ignore
-import { TokenDataProperties } from './token-data-properties';
+import { MintTokenDataOAIGen } from './mint-token-data-oaigen';
 
 /**
- * @type TokenDataOAIGen
- * Token details of this asset
+ * @type MintTokenOAIGen
+ * Details of the asset which has been minted
  * @export
  */
-export type TokenDataOAIGen = TokenData;
+export type MintTokenOAIGen = MintToken;
 
 
