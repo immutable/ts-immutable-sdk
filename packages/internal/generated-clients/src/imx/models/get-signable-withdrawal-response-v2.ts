@@ -33,7 +33,7 @@ export interface GetSignableWithdrawalResponseV2 {
      */
     'asset_id': string;
     /**
-     * Token in request to match in SDK implementation
+     * Expiration timestamp for this withdrawal
      * @type {number}
      * @memberof GetSignableWithdrawalResponseV2
      */

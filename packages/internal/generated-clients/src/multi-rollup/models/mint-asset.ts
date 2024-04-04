@@ -36,7 +36,7 @@ export interface MintAsset {
      */
     'owner_address': string;
     /**
-     * An `uint256` token id as string. Including token_id is currently only possible on Testnet
+     * An optional `uint256` token id as string. It is recommended to omit token_id for more efficient minting
      * @type {string}
      * @memberof MintAsset
      */
