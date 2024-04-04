@@ -186,46 +186,4 @@ export interface GetTransactionMetadataRequestParams {
     readonly getTransactionMetadataRequest: GetTransactionMetadataRequest
 }
 
-/**
- * Request parameters for getTransactionMetadataDeprecated operation in PassportApi.
- * @export
- * @interface GetTransactionMetadataDeprecatedRequest
- */
-export interface GetTransactionMetadataDeprecatedRequestParams {
-    /**
-     * 
-     * @type {string}
-     * @memberof GetTransactionMetadataDeprecated
-     */
-    readonly chainName: string
-
-    /**
-     * The address of the contract intended for interaction with this transaction
-     * @type {string}
-     * @memberof GetTransactionMetadataDeprecated
-     */
-    readonly contractAddress: string
-
-    /**
-     * The method ID of the contract intended for interaction with this transaction
-     * @type {string}
-     * @memberof GetTransactionMetadataDeprecated
-     */
-    readonly methodId: string
-
-    /**
-     * ID of the given transaction to be decoded
-     * @type {string}
-     * @memberof GetTransactionMetadataDeprecated
-     */
-    readonly transactionId: string
-
-    /**
-     * Encoded transaction data
-     * @type {string}
-     * @memberof GetTransactionMetadataDeprecated
-     */
-    readonly transactionData: string
-}
-
 

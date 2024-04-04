@@ -3224,150 +3224,6 @@
       }
     },
     "/v1/chains/{chain_name}/passport/transaction-metadata": {
-      "get": {
-        "deprecated": true,
-        "summary": "Get transaction metadata",
-        "description": "Get transaction metadata for a given encoded transaction",
-        "tags": [
-          "passport"
-        ],
-        "operationId": "getTransactionMetadataDeprecated",
-        "security": [
-          {
-            "BearerAuth": [
-              "transact"
-            ]
-          }
-        ],
-        "parameters": [
-          {
-            "name": "chain_name",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/ChainName"
-            }
-          },
-          {
-            "in": "query",
-            "name": "contract_address",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "The address of the contract intended for interaction with this transaction"
-          },
-          {
-            "in": "query",
-            "name": "method_id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "The method ID of the contract intended for interaction with this transaction"
-          },
-          {
-            "in": "query",
-            "name": "transaction_id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "ID of the given transaction to be decoded"
-          },
-          {
-            "in": "query",
-            "name": "transaction_data",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Encoded transaction data"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Get transaction metadata response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetTransactionMetadataRes"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "BadRequestError",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIError400"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "UnauthorizedError",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIError401"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "ForbiddenError",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIError403"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "NotFoundError",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIError404"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "TooManyRequestsError",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIError429"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "InternalServerError",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIError500"
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BasicAPIError"
-                }
-              }
-            }
-          }
-        }
-      },
       "post": {
         "summary": "Get transaction metadata",
         "description": "Get transaction metadata for a given encoded transaction",
@@ -4662,7 +4518,7 @@
           "balance": {
             "type": "string",
             "nullable": false,
-            "description": "The balance of NFT in the account",
+            "description": "The amount of this NFT this account owns",
             "example": "11"
           }
         },
@@ -4837,7 +4693,13 @@
           },
           "quantity": {
             "type": "string",
-            "description": "The quantity of owned tokens (uint256 as string)",
+            "description": "(deprecated - use balance instead) The quantity of owned tokens (uint256 as string)",
+            "example": "1",
+            "deprecated": true
+          },
+          "balance": {
+            "type": "string",
+            "description": "The amount of owned tokens (uint256 as string)",
             "example": "1"
           },
           "updated_at": {
@@ -4852,7 +4714,8 @@
           "contract_address",
           "token_id",
           "account_address",
-          "quantity"
+          "quantity",
+          "balance"
         ]
       },
       "NFTWithOwner": {
@@ -4878,7 +4741,13 @@
           },
           "quantity": {
             "type": "string",
-            "description": "The quantity of owned tokens (uint256 as string)",
+            "description": "(deprecated - use balance instead) The quantity of owned tokens (uint256 as string)",
+            "example": "1",
+            "deprecated": true
+          },
+          "balance": {
+            "type": "string",
+            "description": "The amount of owned tokens (uint256 as string)",
             "example": "1"
           },
           "updated_at": {
@@ -4894,6 +4763,7 @@
           "token_id",
           "account_address",
           "quantity",
+          "balance",
           "updated_at"
         ]
       },
