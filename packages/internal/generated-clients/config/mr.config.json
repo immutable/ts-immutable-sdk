@@ -5,12 +5,5 @@
   "withSeparateModelsAndApi": true,
   "modelPackage": "models",
   "apiPackage": "domain",
-  "useSingleRequestParameter": true,
-  "templateDir": "app/templates/mr",
-  "files": {
-    "api-types.mustache": {
-      "templateType": "API",
-      "destinationFilename": "-types.ts"
-    }
-  }
+  "useSingleRequestParameter": true
 }
