@@ -24,12 +24,18 @@ import { ERC721ApproveMetadata } from './erc721-approve-metadata';
 import { NFTSetApprovalForAllMetadata } from './nftset-approval-for-all-metadata';
 // May contain unused imports in some cases
 // @ts-ignore
+import { SeaportAdvancedOrder } from './seaport-advanced-order';
+// May contain unused imports in some cases
+// @ts-ignore
+import { SeaportFulfillAvailableAdvancedOrdersMetadata } from './seaport-fulfill-available-advanced-orders-metadata';
+// May contain unused imports in some cases
+// @ts-ignore
 import { UnknownMetadata } from './unknown-metadata';
 
 /**
  * @type GetTransactionMetadataRes
  * @export
  */
-export type GetTransactionMetadataRes = ERC20ApproveMetadata | ERC721ApproveMetadata | NFTSetApprovalForAllMetadata | UnknownMetadata;
+export type GetTransactionMetadataRes = ERC20ApproveMetadata | ERC721ApproveMetadata | NFTSetApprovalForAllMetadata | SeaportFulfillAvailableAdvancedOrdersMetadata | UnknownMetadata;
 
 

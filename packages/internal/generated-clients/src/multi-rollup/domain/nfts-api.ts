@@ -30,6 +30,8 @@ import { APIError403 } from '../models';
 // @ts-ignore
 import { APIError404 } from '../models';
 // @ts-ignore
+import { APIError409 } from '../models';
+// @ts-ignore
 import { APIError429 } from '../models';
 // @ts-ignore
 import { APIError500 } from '../models';
