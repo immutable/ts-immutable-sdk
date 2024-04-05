@@ -228,10 +228,18 @@ export class Passport {
     } catch (err) {
       logger.warn('Failed to logout from confirmation screen', err);
     }
-    await Promise.allSettled([
-      this.authManager.logout(),
-      this.magicAdapter.logout(),
-    ]);
+
+    if (this.config.oidcConfiguration.logoutMode === 'silent') {
+      await Promise.allSettled([
+        this.authManager.logout(),
+        this.magicAdapter.logout(),
+      ]);
+    } else {
+      // We need to ensure that the Magic wallet is logged out BEFORE redirecting
+      await this.magicAdapter.logout();
+      await this.authManager.logout();
+    }
+
     this.passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
   }
 
