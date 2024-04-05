@@ -32,12 +32,15 @@ models/apierror403-all-of.ts
 models/apierror403.ts
 models/apierror404-all-of.ts
 models/apierror404.ts
+models/apierror409-all-of.ts
+models/apierror409.ts
 models/apierror429-all-of.ts
 models/apierror429.ts
 models/apierror500-all-of.ts
 models/apierror500.ts
 models/apierror501-all-of.ts
 models/apierror501.ts
+models/asset-verification-status.ts
 models/basic-apierror.ts
 models/blockchain-metadata.ts
 models/burn.ts
