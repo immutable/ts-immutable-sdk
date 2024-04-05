@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import BN from 'bn.js';
-import { curves, ec } from 'elliptic';
+import { curves, ec as Ec } from 'elliptic';
 import hashJS from 'hash.js';
 
 import { constantPointsHex } from './points';
@@ -25,12 +25,9 @@ const order = new BN(
   16,
 );
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
-const { PresetCurve }: typeof curves = curves;
-
 // eslint-disable-next-line new-cap
-const starkEc = new ec(
-  new PresetCurve({
+const starkEc = new Ec(
+  new curves.PresetCurve({
     type: 'short',
     prime: null,
     p: prime as any,

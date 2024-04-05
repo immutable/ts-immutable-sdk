@@ -40,12 +40,9 @@ export const starkEcOrder = new BN(
   16,
 );
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
-const { PresetCurve }: typeof curves = curves;
-
 // eslint-disable-next-line new-cap
 export const starkEc = new ec(
-  new PresetCurve({
+  new curves.PresetCurve({
     type: 'short',
     prime: null,
     p: '08000000 00000011 00000000 00000000 00000000 00000000 00000000 00000001',
