@@ -165,12 +165,28 @@ describe('Passport', () => {
   });
 
   describe('logout', () => {
-    it('should execute logout without error', async () => {
-      await passport.logout();
+    describe('when the logout mode is silent', () => {
+      it('should execute logout without error', async () => {
+        await passport.logout();
 
-      expect(logoutMock).toBeCalledTimes(1);
-      expect(magicLogoutMock).toBeCalledTimes(1);
-      expect(confirmationLogoutMock).toBeCalledTimes(1);
+        expect(logoutMock).toBeCalledTimes(1);
+        expect(magicLogoutMock).toBeCalledTimes(1);
+        expect(confirmationLogoutMock).toBeCalledTimes(1);
+      });
+    });
+
+    describe('when the logout mode is redirect', () => {
+      it('should execute logout without error in the correct order', async () => {
+        await passport.logout();
+
+        const logoutMockOrder = logoutMock.mock.invocationCallOrder[0];
+        const magicLogoutMockOrder = magicLogoutMock.mock.invocationCallOrder[0];
+
+        expect(confirmationLogoutMock).toBeCalledTimes(1);
+        expect(logoutMock).toBeCalledTimes(1);
+        expect(magicLogoutMock).toBeCalledTimes(1);
+        expect(magicLogoutMockOrder).toBeLessThan(logoutMockOrder);
+      });
     });
   });
 
