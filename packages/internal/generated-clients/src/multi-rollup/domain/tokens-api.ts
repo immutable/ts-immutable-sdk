@@ -28,6 +28,8 @@ import { APIError404 } from '../models';
 // @ts-ignore
 import { APIError500 } from '../models';
 // @ts-ignore
+import { AssetVerificationStatus } from '../models';
+// @ts-ignore
 import { GetTokenResult } from '../models';
 // @ts-ignore
 import { ListTokensResult } from '../models';
@@ -80,12 +82,13 @@ export const TokensApiAxiosParamCreator = function (configuration?: Configuratio
          * @summary List ERC20 tokens
          * @param {string} chainName The name of chain
          * @param {string} [fromUpdatedAt] Datetime to use as the oldest updated timestamp
+         * @param {Array<AssetVerificationStatus>} [verificationStatus] List of verification status to filter by
          * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {number} [pageSize] Maximum number of items to return
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listERC20Tokens: async (chainName: string, fromUpdatedAt?: string, pageCursor?: string, pageSize?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listERC20Tokens: async (chainName: string, fromUpdatedAt?: string, verificationStatus?: Array<AssetVerificationStatus>, pageCursor?: string, pageSize?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'chainName' is not null or undefined
             assertParamExists('listERC20Tokens', 'chainName', chainName)
             const localVarPath = `/v1/chains/{chain_name}/tokens`
@@ -105,6 +108,10 @@ export const TokensApiAxiosParamCreator = function (configuration?: Configuratio
                 localVarQueryParameter['from_updated_at'] = (fromUpdatedAt as any instanceof Date) ?
                     (fromUpdatedAt as any).toISOString() :
                     fromUpdatedAt;
+            }
+
+            if (verificationStatus) {
+                localVarQueryParameter['verification_status'] = verificationStatus;
             }
 
             if (pageCursor !== undefined) {
@@ -153,13 +160,14 @@ export const TokensApiFp = function(configuration?: Configuration) {
          * @summary List ERC20 tokens
          * @param {string} chainName The name of chain
          * @param {string} [fromUpdatedAt] Datetime to use as the oldest updated timestamp
+         * @param {Array<AssetVerificationStatus>} [verificationStatus] List of verification status to filter by
          * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {number} [pageSize] Maximum number of items to return
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listERC20Tokens(chainName: string, fromUpdatedAt?: string, pageCursor?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListTokensResult>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listERC20Tokens(chainName, fromUpdatedAt, pageCursor, pageSize, options);
+        async listERC20Tokens(chainName: string, fromUpdatedAt?: string, verificationStatus?: Array<AssetVerificationStatus>, pageCursor?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListTokensResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listERC20Tokens(chainName, fromUpdatedAt, verificationStatus, pageCursor, pageSize, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -190,7 +198,7 @@ export const TokensApiFactory = function (configuration?: Configuration, basePat
          * @throws {RequiredError}
          */
         listERC20Tokens(requestParameters: TokensApiListERC20TokensRequest, options?: AxiosRequestConfig): AxiosPromise<ListTokensResult> {
-            return localVarFp.listERC20Tokens(requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
+            return localVarFp.listERC20Tokens(requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.verificationStatus, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -237,6 +245,13 @@ export interface TokensApiListERC20TokensRequest {
     readonly fromUpdatedAt?: string
 
     /**
+     * List of verification status to filter by
+     * @type {Array<AssetVerificationStatus>}
+     * @memberof TokensApiListERC20Tokens
+     */
+    readonly verificationStatus?: Array<AssetVerificationStatus>
+
+    /**
      * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
      * @type {string}
      * @memberof TokensApiListERC20Tokens
@@ -279,7 +294,7 @@ export class TokensApi extends BaseAPI {
      * @memberof TokensApi
      */
     public listERC20Tokens(requestParameters: TokensApiListERC20TokensRequest, options?: AxiosRequestConfig) {
-        return TokensApiFp(this.configuration).listERC20Tokens(requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
+        return TokensApiFp(this.configuration).listERC20Tokens(requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.verificationStatus, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
