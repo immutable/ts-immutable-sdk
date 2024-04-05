@@ -9,6 +9,7 @@
     "@0xsequence/core": "^1.4.3",
     "@ethersproject/providers": "^5.7.2",
     "@imtbl/config": "0.0.0",
+    "@imtbl/core-sdk": "^2.7.0",
     "@imtbl/generated-clients": "0.0.0",
     "@imtbl/guardian": "0.0.0",
     "@imtbl/metrics": "0.0.0",
