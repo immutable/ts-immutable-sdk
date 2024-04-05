@@ -3,7 +3,10 @@ import { useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SalePaymentTypes } from '@imtbl/checkout-sdk';
 import { StatusType } from '../../../components/Status/StatusType';
-import { StatusView, StatusViewProps } from '../../../components/Status/StatusView';
+import {
+  StatusView,
+  StatusViewProps,
+} from '../../../components/Status/StatusView';
 import { SaleErrorTypes } from '../types';
 import { useSaleContext } from '../context/SaleContextProvider';
 import { sendSaleWidgetCloseEvent } from '../SaleWidgetEvents';
@@ -17,18 +20,23 @@ interface ErrorHandlerConfig {
 }
 
 type SaleErrorViewProps = {
-  biomeTheme: BaseTokens
-  errorType: SaleErrorTypes | undefined,
-  transactionHash?: string,
-  blockExplorerLink?: string,
+  biomeTheme: BaseTokens;
+  errorType: SaleErrorTypes | undefined;
+  transactionHash?: string;
+  blockExplorerLink?: string;
 };
 
 export function SaleErrorView({
-  errorType = SaleErrorTypes.DEFAULT, transactionHash, blockExplorerLink, biomeTheme,
+  biomeTheme,
+  transactionHash,
+  blockExplorerLink,
+  errorType = SaleErrorTypes.DEFAULT,
 }: SaleErrorViewProps) {
   const { t } = useTranslation();
   const { goBackToPaymentMethods } = useSaleContext();
-  const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
+  const {
+    eventTargetState: { eventTarget },
+  } = useContext(EventTargetContext);
 
   const closeWidget = () => {
     sendSaleWidgetCloseEvent(eventTarget);
@@ -37,9 +45,11 @@ export function SaleErrorView({
   const errorHandlersConfig: Record<SaleErrorTypes, ErrorHandlerConfig> = {
     [SaleErrorTypes.TRANSACTION_FAILED]: {
       onActionClick: goBackToPaymentMethods,
-      onSecondaryActionClick: transactionHash ? () => {
-        window.open(blockExplorerLink);
-      } : closeWidget,
+      onSecondaryActionClick: transactionHash
+        ? () => {
+          window.open(blockExplorerLink);
+        }
+        : closeWidget,
       statusType: StatusType.FAILURE,
       statusIconStyles: {
         fill: biomeTheme.color.status.destructive.dim,
@@ -126,8 +136,8 @@ export function SaleErrorView({
   const getErrorViewProps = (): StatusViewProps => {
     const handlers = errorHandlersConfig[errorType] || {};
     const secondaryActionText = errorType === SaleErrorTypes.TRANSACTION_FAILED && transactionHash
-      ? t(`views.SALE_FAIL.errors.${SaleErrorTypes.DEFAULT}.secondaryAction`)
-      : t(`views.SALE_FAIL.errors.${errorType}.secondaryAction`);
+      ? t(`views.SALE_FAIL.errors.${errorType}.secondaryAction`)
+      : t(`views.SALE_FAIL.errors.${SaleErrorTypes.DEFAULT}.secondaryAction`);
 
     return {
       testId: 'fail-view',
@@ -145,7 +155,5 @@ export function SaleErrorView({
       },
     };
   };
-  return (
-    <StatusView {...getErrorViewProps()} />
-  );
+  return <StatusView {...getErrorViewProps()} />;
 }

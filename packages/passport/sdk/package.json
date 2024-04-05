@@ -9,7 +9,6 @@
     "@0xsequence/core": "^1.4.3",
     "@ethersproject/providers": "^5.7.2",
     "@imtbl/config": "0.0.0",
-    "@imtbl/core-sdk": "^2.4.0",
     "@imtbl/generated-clients": "0.0.0",
     "@imtbl/guardian": "0.0.0",
     "@imtbl/metrics": "0.0.0",
@@ -47,7 +46,7 @@
     "typescript": "^4.9.5"
   },
   "engines": {
-    "node": ">=16.11.0"
+    "node": ">=20.11.0"
   },
   "files": [
     "dist"

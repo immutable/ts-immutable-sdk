@@ -18,6 +18,9 @@
 import { Chain } from './chain';
 // May contain unused imports in some cases
 // @ts-ignore
+import { NFTContractType } from './nftcontract-type';
+// May contain unused imports in some cases
+// @ts-ignore
 import { NFTMetadataAttribute } from './nftmetadata-attribute';
 
 /**
@@ -45,11 +48,11 @@ export interface NFTWithBalance {
      */
     'contract_address': string;
     /**
-     * The contract type of the NFT
-     * @type {string}
+     * 
+     * @type {NFTContractType}
      * @memberof NFTWithBalance
      */
-    'contract_type': string;
+    'contract_type': NFTContractType;
     /**
      * When the NFT was first indexed
      * @type {string}
@@ -117,10 +120,12 @@ export interface NFTWithBalance {
      */
     'attributes': Array<NFTMetadataAttribute>;
     /**
-     * The balance of NFT in the account
+     * The amount of this NFT this account owns
      * @type {string}
      * @memberof NFTWithBalance
      */
     'balance': string;
 }
+
+
 

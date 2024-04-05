@@ -11,7 +11,6 @@ import {
 } from '../../test/helpers';
 import { depositERC721 } from '.';
 
-jest.mock('@imtbl/core-sdk');
 jest.mock('@imtbl/generated-clients');
 jest.mock('@imtbl/x-client');
 

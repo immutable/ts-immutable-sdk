@@ -39,15 +39,25 @@ import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsPr
 import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 
-export interface SaleWidgetProps
-  extends Required<Omit<SaleWidgetParams, 'walletProviderName'>> {
+type OptionalWidgetParams = Pick<SaleWidgetParams, 'excludePaymentTypes'>;
+type RequiredWidgetParams = Required<
+Omit<SaleWidgetParams, 'walletProviderName'>
+>;
+
+type WidgetParams = RequiredWidgetParams & OptionalWidgetParams;
+export interface SaleWidgetProps extends WidgetParams {
   config: StrongCheckoutWidgetsConfig;
 }
 
 export default function SaleWidget(props: SaleWidgetProps) {
   const { t } = useTranslation();
   const {
-    config, amount, items, environmentId, collectionName,
+    config,
+    amount,
+    items,
+    environmentId,
+    collectionName,
+    excludePaymentTypes,
   } = props;
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
@@ -86,9 +96,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: SaleWidgetViews.PAYMENT_METHODS,
-          },
+          view: { type: SaleWidgetViews.PAYMENT_METHODS },
         },
       });
     }
@@ -113,6 +121,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
           checkout,
           passport: checkout?.passport,
           collectionName,
+          excludePaymentTypes,
         }}
       >
         <CryptoFiatProvider environment={config.environment}>
@@ -155,6 +164,18 @@ export default function SaleWidget(props: SaleWidgetProps) {
               showSwapOption={config.isSwapEnabled}
               showBridgeOption={config.isBridgeEnabled}
               onCloseButtonClick={() => sendSaleWidgetCloseEvent(eventTarget)}
+              onBackButtonClick={() => {
+                viewDispatch({
+                  payload: {
+                    type: ViewActions.UPDATE_VIEW,
+                    view: { type: SaleWidgetViews.PAYMENT_METHODS },
+                  },
+                });
+              }}
+              amount={viewState.view.data?.amount}
+              tokenAddress={viewState.view.data?.tokenAddress}
+              heading={viewState.view.data?.heading}
+              subheading={viewState.view.data?.subheading}
             />
           )}
         </CryptoFiatProvider>

@@ -13,7 +13,6 @@ import { depositEth } from '.';
 
 jest.mock('@imtbl/generated-clients');
 jest.mock('@imtbl/x-client');
-jest.mock('@imtbl/core-sdk');
 
 describe('Deposit ETH', () => {
   describe('depositETH()', () => {

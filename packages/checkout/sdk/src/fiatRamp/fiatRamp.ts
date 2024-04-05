@@ -1,7 +1,5 @@
 import { ExchangeType } from '../types/fiatRamp';
-import {
-  OnRampConfig, OnRampProvider, OnRampProviderFees,
-} from '../types';
+import { OnRampConfig, OnRampProvider, OnRampProviderFees } from '../types';
 import { CheckoutConfiguration } from '../config';
 import { TRANSAK_API_BASE_URL } from '../env';
 
@@ -27,56 +25,77 @@ export class FiatRampService {
   }
 
   public async feeEstimate(): Promise<OnRampProviderFees> {
-    const config = (await this.config.remote.getConfig('onramp')) as OnRampConfig;
+    const config = (await this.config.remote.getConfig(
+      'onramp',
+    )) as OnRampConfig;
     return config[OnRampProvider.TRANSAK]?.fees;
   }
 
   public async createWidgetUrl(params: FiatRampWidgetParams): Promise<string> {
-    return (await this.getTransakWidgetUrl(params));
+    return await this.getTransakWidgetUrl(params);
   }
 
-  private async getTransakWidgetUrl(params: FiatRampWidgetParams): Promise<string> {
-    let widgetUrl = `${TRANSAK_API_BASE_URL[this.config.environment]}?`;
-    const onRampConfig = (await this.config.remote.getConfig('onramp')) as OnRampConfig;
-    const apiKey = onRampConfig[OnRampProvider.TRANSAK].publishableApiKey;
-    const transakPublishableKey = `apiKey=${apiKey}`;
-    const zkevmNetwork = 'network=immutablezkevm';
-    const defaultPaymentMethod = 'defaultPaymentMethod=credit_debit_card';
-    const disableBankTransfer = 'disablePaymentMethods=sepa_bank_transfer,gbp_bank_transfer,'
-      + 'pm_cash_app,pm_jwire,pm_paymaya,pm_bpi,pm_ubp,pm_grabpay,pm_shopeepay,pm_gcash,pm_pix,'
-      + 'pm_astropay,pm_pse,inr_bank_transfer';
-    const productsAvailed = 'productsAvailed=buy';
-    const exchangeScreenTitle = 'exchangeScreenTitle=Buy';
-    const themeColor = 'themeColor=0D0D0D';
-    const defaultFiat = 'defaultFiatAmount=50&defaultFiatCurrency=usd';
+  private async getTransakWidgetUrl(
+    params: FiatRampWidgetParams,
+  ): Promise<string> {
+    const onRampConfig = (await this.config.remote.getConfig(
+      'onramp',
+    )) as OnRampConfig;
 
-    widgetUrl += `${transakPublishableKey}&`
-      + `${zkevmNetwork}&`
-      + `${defaultPaymentMethod}&`
-      + `${disableBankTransfer}&`
-      + `${productsAvailed}&`
-      + `${exchangeScreenTitle}&`
-      + `${themeColor}&`
-      + `${defaultFiat}`;
+    const widgetUrl = TRANSAK_API_BASE_URL[this.config.environment];
+    let widgetParams: Record<string, any> = {
+      apiKey: onRampConfig[OnRampProvider.TRANSAK].publishableApiKey,
+      network: 'immutablezkevm',
+      defaultPaymentMethod: 'credit_debit_card',
+      disablePaymentMethods:
+        'sepa_bank_transfer,gbp_bank_transfer,pm_cash_app,pm_jwire,pm_paymaya,'
+        + 'pm_bpi,pm_ubp,pm_grabpay,pm_shopeepay,pm_gcash,pm_pix,pm_astropay,pm_pse,inr_bank_transfer',
+      productsAvailed: 'buy',
+      exchangeScreenTitle: 'Buy',
+      themeColor: '0D0D0D',
+      defaultCryptoCurrency: params.tokenSymbol || 'IMX',
+    };
+
     if (params.isPassport && params.email) {
-      const encodedEmail = encodeURIComponent(params.email);
-      widgetUrl += `&email=${encodedEmail}&isAutoFillUserData=true&disableWalletAddressForm=true`;
+      widgetParams = {
+        ...widgetParams,
+        email: encodeURIComponent(params.email),
+        isAutoFillUserData: true,
+        disableWalletAddressForm: true,
+      };
     }
 
+    // NOTE: only set tokenAmount and tokenSymbol if you want a fixed pre-selected token with no currency selector
+    // setting cryptoCurrencyCode code will force the user to buy that token, defaultCryptoAmount will not work without cryptoCurrencyCode
+    // setting defaultFiatAmount/fiatAmount + defaultFiatCurrency will take a higher priority over defaultCryptoAmount + cryptoCurrencyCode
     if (params.tokenAmount && params.tokenSymbol) {
-      widgetUrl += `&defaultCryptoAmount=${params.tokenAmount}&defaultCryptoCurrency=${params.tokenSymbol}`;
+      widgetParams = {
+        ...widgetParams,
+        defaultCryptoAmount: params.tokenAmount,
+        cryptoCurrencyCode: params.tokenSymbol,
+      };
     } else {
-      widgetUrl += '&defaultCryptoCurrency=IMX';
+      widgetParams = {
+        ...widgetParams,
+        defaultFiatAmount: 50,
+        defaultFiatCurrency: 'usd',
+      };
     }
 
     if (params.walletAddress) {
-      widgetUrl += `&walletAddress=${params.walletAddress}`;
+      widgetParams = {
+        ...widgetParams,
+        walletAddress: params.walletAddress,
+      };
     }
 
     if (params.allowedTokens) {
-      widgetUrl += `&cryptoCurrencyList=${params.allowedTokens?.join(',').toLowerCase()}`;
+      widgetParams = {
+        ...widgetParams,
+        cryptoCurrencyList: params.allowedTokens?.join(',').toLowerCase(),
+      };
     }
 
-    return widgetUrl;
+    return `${widgetUrl}?${new URLSearchParams(widgetParams).toString()}`;
   }
 }

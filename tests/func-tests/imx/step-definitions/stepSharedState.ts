@@ -5,11 +5,12 @@ import {
   createStarkSigner,
   WalletConnection,
   UnsignedOrderRequest,
+  Balance,
+  CreateTransferResponseV1,
+  CreateWithdrawalResponse,
+  MintResultDetails,
 } from '@imtbl/sdk/x';
 import { Environment, ImmutableConfiguration } from '@imtbl/sdk/config';
-import {
-  Balance, CreateTransferResponseV1, CreateWithdrawalResponse, MintResultDetails,
-} from '@imtbl/core-sdk';
 import { env, getProvider } from '../common';
 import genericErc20Abi from '../abi/ERC20.json';
 

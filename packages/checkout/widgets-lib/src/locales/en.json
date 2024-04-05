@@ -59,11 +59,7 @@
     },
     "ERROR_VIEW": {
       "heading": "Something's gone wrong",
-      "body": [
-        "You can try again or contact",
-        "support",
-        "for help."
-      ],
+      "body": ["You can try again or contact", "support", "for help."],
       "actionText": "Try again"
     },
     "SERVICE_UNAVAILABLE_ERROR_VIEW": {
@@ -270,24 +266,27 @@
       "options": {
         "crypto": {
           "heading": "Coins",
-          "caption": "The fastest way to pay, if you have coins in your balance.",
-          "disabledCaption": "We can't see enough coins in your balance"
+          "caption": "Pay with the coins in your wallet, or buy coins with card",
+          "disabledCaption": "Currently not available for this purchase"
         },
         "debit": {
           "heading": "Debit Card",
           "caption": "The recommended way to pay with card.",
-          "disabledCaption": null
+          "disabledCaption": "Currently working on this. Proceed with Coins & you’ll be guided on how to add them if needed."
         },
         "credit": {
           "heading": "Credit Card",
           "caption": "Not recommended since transactions may be blocked by your bank.",
-          "disabledCaption": null
+          "disabledCaption": "Currently working on this. Proceed with Coins & you’ll be guided on how to add them if needed."
         }
       },
-      "insufficientCoinsBanner": {
-        "caption": "Insufficient coin balance. Pay with card to proceed, or",
-        "captionEnd": "and try again.",
-        "captionCTA": "add coins"
+      "topUp": {
+        "heading": "You’ll need to add some coins",
+        "subheading": {
+          "both": "Add {{erc20.value}} {{erc20.symbol}} and {{native.value}} {{native.symbol}} to cover this purchase plus gas.",
+          "erc20": "Add {{erc20.value}} {{erc20.symbol}} to your balance through one of the following options.",
+          "native": "Add {{native.value}} {{native.symbol}} for gas, through one of the following options."
+        }
       },
       "loading": {
         "ready1": "Collecting your order",

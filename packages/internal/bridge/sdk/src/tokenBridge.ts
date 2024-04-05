@@ -147,9 +147,17 @@ export class TokenBridge {
     const imtblFee: ethers.BigNumber = ethers.BigNumber.from(0);
 
     if ('token' in req && req.token !== 'NATIVE') {
+      let approvalLimit = BridgeMethodsGasLimit.APPROVE_TOKEN;
+      if (req.token === 'USDC') {
+        approvalLimit = BridgeMethodsGasLimit.APPROVE_TOKEN_USDC;
+      } else if (req.token === 'GOG') {
+        approvalLimit = BridgeMethodsGasLimit.APPROVE_TOKEN_GOG;
+      } else if (req.token === 'IMX') {
+        approvalLimit = BridgeMethodsGasLimit.APPROVE_TOKEN_IMX;
+      }
       approvalFee = await this.getGasEstimates(
         this.config.rootProvider,
-        BridgeMethodsGasLimit.APPROVE_TOKEN,
+        approvalLimit,
       );
     }
 
@@ -162,9 +170,21 @@ export class TokenBridge {
       const sourceProvider:ethers.providers.Provider = (req.action === BridgeFeeActions.WITHDRAW)
         ? this.config.childProvider : this.config.rootProvider;
 
+      let sourceLimit = BridgeMethodsGasLimit[`${req.action}_SOURCE`];
+      if ('token' in req && req.action === 'DEPOSIT') {
+        if (req.token === 'NATIVE') {
+          sourceLimit = BridgeMethodsGasLimit.DEPOSIT_SOURCE_ETH;
+        } else if (req.token === 'USDC') {
+          sourceLimit = BridgeMethodsGasLimit.DEPOSIT_SOURCE_USDC;
+        } else if (req.token === 'GOG') {
+          sourceLimit = BridgeMethodsGasLimit.DEPOSIT_SOURCE_GOG;
+        } else if (req.token === 'IMX') {
+          sourceLimit = BridgeMethodsGasLimit.DEPOSIT_SOURCE_IMX;
+        }
+      }
       sourceChainGas = await this.getGasEstimates(
         sourceProvider,
-        BridgeMethodsGasLimit[`${req.action}_SOURCE`],
+        sourceLimit,
       );
 
       const feeResult = await this.calculateBridgeFee(

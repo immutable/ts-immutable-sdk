@@ -18,6 +18,9 @@
 import { Chain } from './chain';
 // May contain unused imports in some cases
 // @ts-ignore
+import { NFTContractType } from './nftcontract-type';
+// May contain unused imports in some cases
+// @ts-ignore
 import { NFTMetadataAttribute } from './nftmetadata-attribute';
 
 /**
@@ -44,6 +47,12 @@ export interface NFT {
      * @memberof NFT
      */
     'contract_address': string;
+    /**
+     * 
+     * @type {NFTContractType}
+     * @memberof NFT
+     */
+    'contract_type': NFTContractType;
     /**
      * When the NFT was first indexed
      * @type {string}
@@ -110,5 +119,13 @@ export interface NFT {
      * @memberof NFT
      */
     'attributes': Array<NFTMetadataAttribute>;
+    /**
+     * The total supply of NFT
+     * @type {string}
+     * @memberof NFT
+     */
+    'total_supply'?: string | null;
 }
+
+
 

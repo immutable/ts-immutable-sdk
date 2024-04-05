@@ -9,6 +9,7 @@ import pkg from './package.json' assert { type: 'json' };
 import moduleReleases from './module-release.json' assert { type: 'json' };
 import terser from '@rollup/plugin-terser';
 import nodePolyfills from 'rollup-plugin-polyfill-node';
+import babel from '@rollup/plugin-babel';
 
 
 // RELEASE_TYPE environment variable is set by the CI/CD pipeline
@@ -122,9 +123,14 @@ export default [
         preferBuiltins: false,
       }),
       nodePolyfills(),
-      commonJs(),
-      typescript(),
       json(),
+      commonJs(),
+      babel({
+        babelHelpers: 'bundled',
+        include: ['../node_modules/ethers-v6/**', '../node_modules/@opensea/seaport-js/**'],
+        plugins: ['@babel/plugin-transform-class-properties', '@babel/plugin-transform-private-methods'],
+      }),
+      typescript(),
       replace({
         // Can't exclude node_modules here because some dependencies use process.env.NODE_ENV
         // this breaks in browsers

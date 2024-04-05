@@ -273,24 +273,27 @@
       "options": {
         "crypto": {
           "heading": "コイン",
-          "caption": "残高にコインがある場合、最も速い支払い方法です。",
-          "disabledCaption": "残高に十分なコインが見つかりません"
+          "caption": "財布の中のコインで支払うか、カードでコインを購入してください。",
+          "disabledCaption": "現在、この支払い方法は利用できません。"
         },
         "debit": {
           "heading": "デビットカード",
           "caption": "カードでの支払いに推奨される方法です。",
-          "disabledCaption": null
+          "disabledCaption": "現在作業中です。コインを使って進んでください。必要に応じて、追加する方法が案内されます。"
         },
         "credit": {
           "heading": "クレジットカード",
           "caption": "銀行によって取引がブロックされる可能性があるため、推奨されません。",
-          "disabledCaption": null
+          "disabledCaption": "現在作業中です。コインを使って進んでください。必要に応じて、追加する方法が案内されます。"
         }
       },
-      "insufficientCoinsBanner": {
-        "caption": "コインの残高が不足しています。カードで支払うか、",
-        "captionEnd": "して再試行してください。",
-        "captionCTA": "コインを追加"
+      "topUp": {
+        "heading": "残高が不足しています",
+        "subheading": {
+          "both": "この購入とガスをカバーするために{{erc20.value}} {{erc20.symbol}}と{{native.value}} {{native.symbol}}を追加する必要があります。",
+          "erc20": "残高が不足しているため、{{erc20.value}} {{erc20.symbol}}を追加する必要があります。",
+          "native": "残高が不足しているため、{{native.value}} {{native.symbol}}を追加する必要があります。"
+        }
       },
       "loading": {
         "ready1": "注文を受け取り中",
