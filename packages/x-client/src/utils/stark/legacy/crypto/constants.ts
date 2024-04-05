@@ -25,7 +25,6 @@ const order = new BN(
   16,
 );
 
-// eslint-disable-next-line new-cap
 const starkEc = new Ec(
   new curves.PresetCurve({
     type: 'short',
