@@ -24,6 +24,8 @@ import { APIError404 } from '../models';
 // @ts-ignore
 import { APIError500 } from '../models';
 // @ts-ignore
+import { AssetVerificationStatus } from '../models';
+// @ts-ignore
 import { GetCollectionResult } from '../models';
 // @ts-ignore
 import { ListCollectionsResult } from '../models';
@@ -41,6 +43,8 @@ export { APIError403 } from '../models';
 export { APIError404 } from '../models';
 // @ts-ignore
 export { APIError500 } from '../models';
+// @ts-ignore
+export { AssetVerificationStatus } from '../models';
 // @ts-ignore
 export { GetCollectionResult } from '../models';
 // @ts-ignore
@@ -90,6 +94,13 @@ export interface ListCollectionsRequestParams {
      * @memberof ListCollections
      */
     readonly contractAddress?: Array<string>
+
+    /**
+     * List of verification status to filter by
+     * @type {Array<AssetVerificationStatus>}
+     * @memberof ListCollections
+     */
+    readonly verificationStatus?: Array<AssetVerificationStatus>
 
     /**
      * Datetime to use as the oldest updated timestamp

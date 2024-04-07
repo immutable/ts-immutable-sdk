@@ -22,6 +22,8 @@ import { APIError403 } from '../models';
 // @ts-ignore
 import { APIError404 } from '../models';
 // @ts-ignore
+import { APIError409 } from '../models';
+// @ts-ignore
 import { APIError429 } from '../models';
 // @ts-ignore
 import { APIError500 } from '../models';
@@ -47,6 +49,8 @@ export { APIError401 } from '../models';
 export { APIError403 } from '../models';
 // @ts-ignore
 export { APIError404 } from '../models';
+// @ts-ignore
+export { APIError409 } from '../models';
 // @ts-ignore
 export { APIError429 } from '../models';
 // @ts-ignore
