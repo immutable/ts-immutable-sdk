@@ -11,7 +11,7 @@
       "url": "https://support.immutable.com",
       "email": "support@immutable.com"
     },
-    "version": "3.0"
+    "version": "3.0.0"
   },
   "host": "api.sandbox.x.immutable.com",
   "basePath": "/",
@@ -8023,24 +8023,88 @@
     "Project": {
       "type": "object",
       "required": [
+        "collection_limit_expires_at",
+        "collection_monthly_limit",
+        "collection_remaining",
+        "company_name",
+        "contact_email",
         "id",
+        "mint_limit_expires_at",
+        "mint_monthly_limit",
+        "mint_remaining",
         "name"
       ],
       "properties": {
+        "api_key": {
+          "description": "API key for the project. This is only for zkevm project. This API is not for increasing rate limit yet.",
+          "type": "string"
+        },
         "chain_type": {
           "description": "The project ChainType",
           "type": "string"
         },
-        "id": {
-          "description": "The project group ID",
+        "collection_limit_expires_at": {
+          "description": "The current period expiry date for collection limit",
           "type": "string"
         },
+        "collection_monthly_limit": {
+          "description": "The total monthly collection limit",
+          "type": "integer"
+        },
+        "collection_remaining": {
+          "description": "The number of collection remaining in the current period",
+          "type": "integer"
+        },
+        "company_name": {
+          "description": "The company name",
+          "type": "string"
+        },
+        "contact_email": {
+          "description": "The project contact email (must be registered as a developer account with Immutable at https://hub.immutable.com)",
+          "type": "string"
+        },
+        "environment_id": {
+          "description": "The environment ID",
+          "type": "string"
+        },
+        "environment_name": {
+          "description": "The user environment name correlating to this project",
+          "type": "string"
+        },
+        "id": {
+          "description": "The project ID",
+          "type": "integer"
+        },
+        "mint_limit_expires_at": {
+          "description": "The current period expiry date for mint operation limit",
+          "type": "string"
+        },
+        "mint_monthly_limit": {
+          "description": "The total monthly mint operation limit",
+          "type": "integer"
+        },
+        "mint_remaining": {
+          "description": "The number of mint operation remaining in the current period",
+          "type": "integer"
+        },
         "name": {
-          "description": "The project group name",
+          "description": "The project name",
           "type": "string"
         },
         "org_id": {
           "description": "The organisation ID that the project belongs to",
+          "type": "string"
+        },
+        "project_group_id": {
+          "description": "Project group id",
+          "type": "string"
+        },
+        "publishable_key": {
+          "description": "The public publishable_key for the project",
+          "type": "string"
+        },
+        "publishable_key_created_at": {
+          "description": "The public publishable_key created time",
           "type": "string"
         }
       }
