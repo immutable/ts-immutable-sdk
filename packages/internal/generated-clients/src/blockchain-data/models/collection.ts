@@ -15,6 +15,9 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import { AssetVerificationStatus } from './asset-verification-status';
+// May contain unused imports in some cases
+// @ts-ignore
 import { Chain } from './chain';
 // May contain unused imports in some cases
 // @ts-ignore
@@ -86,6 +89,12 @@ export interface Collection {
      * @memberof Collection
      */
     'base_uri': string | null;
+    /**
+     * 
+     * @type {AssetVerificationStatus}
+     * @memberof Collection
+     */
+    'verification_status': AssetVerificationStatus;
     /**
      * When the collection was first indexed
      * @type {string}

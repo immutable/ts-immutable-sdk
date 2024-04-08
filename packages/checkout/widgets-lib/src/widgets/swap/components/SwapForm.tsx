@@ -137,6 +137,7 @@ export function SwapForm({ data, theme }: SwapFromProps) {
   const [fromToken, setFromToken] = useState<TokenInfo | undefined>();
   const [fromBalance, setFromBalance] = useState<string>('');
   const [fromTokenError, setFromTokenError] = useState<string>('');
+  const [fromMaxTrigger, setFromMaxTrigger] = useState<number>(0);
   const [toAmount, setToAmount] = useState<string>(data?.toAmount || '');
   const [toAmountError, setToAmountError] = useState<string>('');
   const debouncedToAmount = useDebounce(toAmount, ESTIMATE_DEBOUNCE);
@@ -438,9 +439,9 @@ export function SwapForm({ data, theme }: SwapFromProps) {
     }
   };
 
-  const canRunFromQuote = (silently: boolean): boolean => {
-    if (Number.isNaN(parseFloat(fromAmount))) return false;
-    if (parseFloat(fromAmount) <= 0) return false;
+  const canRunFromQuote = (amount: string, silently: boolean): boolean => {
+    if (Number.isNaN(parseFloat(amount))) return false;
+    if (parseFloat(amount) <= 0) return false;
     if (!fromToken) return false;
     if (!toToken) return false;
     if (silently && loading) return false;
@@ -448,7 +449,7 @@ export function SwapForm({ data, theme }: SwapFromProps) {
   };
 
   const fetchQuoteFrom = async (silently: boolean = false) => {
-    if (!canRunFromQuote(silently)) return;
+    if (!canRunFromQuote(fromAmount, silently)) return;
 
     // Cancel any existing quote
     if (quoteRequest) {
@@ -462,9 +463,9 @@ export function SwapForm({ data, theme }: SwapFromProps) {
     await processFetchQuoteFrom(silently);
   };
 
-  const canRunToQuote = (silently): boolean => {
-    if (Number.isNaN(parseFloat(toAmount))) return false;
-    if (parseFloat(toAmount) <= 0) return false;
+  const canRunToQuote = (amount:string, silently): boolean => {
+    if (Number.isNaN(parseFloat(amount))) return false;
+    if (parseFloat(amount) <= 0) return false;
     if (!fromToken) return false;
     if (!toToken) return false;
     if (silently && loading) return false;
@@ -472,7 +473,7 @@ export function SwapForm({ data, theme }: SwapFromProps) {
   };
 
   const fetchQuoteTo = async (silently: boolean = false) => {
-    if (!canRunToQuote(silently)) return;
+    if (!canRunToQuote(toAmount, silently)) return;
 
     // Cancel any existing quote
     if (quoteRequest) {
@@ -494,6 +495,7 @@ export function SwapForm({ data, theme }: SwapFromProps) {
   // Silently refresh the quote
   useInterval(() => fetchQuote(true), DEFAULT_QUOTE_REFRESH_INTERVAL);
 
+  // Fetch quote triggers
   useEffect(() => {
     if (direction === SwapDirection.FROM) {
       if (debouncedFromAmount <= 0) {
@@ -503,7 +505,7 @@ export function SwapForm({ data, theme }: SwapFromProps) {
       }
       (async () => await fetchQuote())();
     }
-  }, [debouncedFromAmount, fromToken, toToken]);
+  }, [debouncedFromAmount, fromToken, toToken, fromMaxTrigger]);
 
   useEffect(() => {
     if (direction === SwapDirection.TO) {
@@ -568,7 +570,7 @@ export function SwapForm({ data, theme }: SwapFromProps) {
     resetFormErrors();
     resetQuote();
     setToAmount('');
-    if (canRunFromQuote(false)) {
+    if (canRunFromQuote(value, false)) {
       setLoading(true);
     }
     setFromAmount(value);
@@ -579,9 +581,17 @@ export function SwapForm({ data, theme }: SwapFromProps) {
     const fromBalanceTruncated = fromBalance.slice(0, fromBalance.indexOf('.') + DEFAULT_TOKEN_VALIDATION_DECIMALS + 1);
     resetFormErrors();
     resetQuote();
-    setToAmount('');
     setDirection(SwapDirection.FROM);
-    setFromAmount(fromBalanceTruncated);
+    setToAmount('');
+    if (canRunFromQuote(fromBalanceTruncated, false)) {
+      setLoading(true);
+    }
+
+    if (fromAmount === fromBalanceTruncated) {
+      setFromMaxTrigger(fromMaxTrigger + 1);
+    } else {
+      setFromAmount(fromBalanceTruncated);
+    }
     track({
       userJourney: UserJourney.SWAP,
       screen: 'SwapCoins',
@@ -618,7 +628,7 @@ export function SwapForm({ data, theme }: SwapFromProps) {
     resetQuote();
     setFromFiatValue('');
     setFromAmount('');
-    if (canRunToQuote(false)) {
+    if (canRunToQuote(value, false)) {
       setLoading(true);
     }
     setToAmount(value);

@@ -120,7 +120,7 @@ export interface NFTWithBalance {
      */
     'attributes': Array<NFTMetadataAttribute>;
     /**
-     * The balance of NFT in the account
+     * The amount of this NFT this account owns
      * @type {string}
      * @memberof NFTWithBalance
      */
