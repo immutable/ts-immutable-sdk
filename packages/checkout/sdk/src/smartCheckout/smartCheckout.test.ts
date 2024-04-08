@@ -2,7 +2,12 @@ import { BigNumber } from 'ethers';
 import { Web3Provider } from '@ethersproject/providers';
 import { smartCheckout } from './smartCheckout';
 import {
-  GasAmount, GasTokenType, ItemRequirement, ItemType, RoutingOutcomeType, TransactionOrGasType,
+  GasAmount,
+  GasTokenType,
+  ItemRequirement,
+  ItemType,
+  RoutingOutcomeType,
+  TransactionOrGasType,
 } from '../types';
 import { hasERC20Allowances, hasERC721Allowances } from './allowance';
 import { gasCalculator } from './gas';
@@ -665,6 +670,116 @@ describe('smartCheckout', () => {
           },
         },
       });
+    });
+
+    it('should not call gasCalculator if transactionOrGasAmount is not provided', async () => {
+      (hasERC20Allowances as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        allowances: [],
+      });
+
+      (hasERC721Allowances as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        allowances: [],
+      });
+
+      (balanceCheck as jest.Mock).mockResolvedValue({
+        sufficient: false,
+        balanceRequirements: [
+          {
+            type: ItemType.NATIVE,
+            sufficient: false,
+            required: {
+              balance: BigNumber.from(2),
+              formattedBalance: '2.0',
+              token: {
+                name: 'IMX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: '0x1010',
+              },
+            },
+            current: {
+              balance: BigNumber.from(1),
+              formattedBalance: '1.0',
+              token: {
+                name: 'IMX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: '0x1010',
+              },
+            },
+            delta: {
+              balance: BigNumber.from(1),
+              formattedBalance: '1.0',
+            },
+          },
+          {
+            type: ItemType.ERC20,
+            sufficient: false,
+            required: {
+              balance: BigNumber.from(1),
+              formattedBalance: '1.0',
+              token: {
+                name: 'zkTKN',
+                symbol: 'zkTKN',
+                decimals: 18,
+                address: '0xERC20',
+              },
+            },
+            current: {
+              balance: BigNumber.from(1),
+              formattedBalance: '1.0',
+              token: {
+                name: 'zkTKN',
+                symbol: 'zkTKN',
+                decimals: 18,
+                address: '0xERC20',
+              },
+            },
+            delta: {
+              balance: BigNumber.from(1),
+              formattedBalance: '1.0',
+            },
+          },
+          {
+            type: ItemType.ERC721,
+            sufficient: false,
+            required: {
+              balance: BigNumber.from(1),
+              formattedBalance: '1.0',
+              id: '0',
+              contractAddress: '0xCollection',
+            },
+            current: {
+              balance: BigNumber.from(0),
+              formattedBalance: '0.0',
+              id: '0',
+              contractAddress: '0xCollection',
+            },
+            delta: {
+              balance: BigNumber.from(1),
+              formattedBalance: '1.0',
+            },
+          },
+        ],
+      });
+
+      const itemRequirements: ItemRequirement[] = [
+        {
+          type: ItemType.NATIVE,
+          amount: BigNumber.from(1),
+        },
+      ];
+
+      await smartCheckout(
+        {} as CheckoutConfiguration,
+        mockProvider,
+        itemRequirements,
+        undefined,
+      );
+
+      expect(gasCalculator).toHaveBeenCalledTimes(0);
     });
   });
 });
