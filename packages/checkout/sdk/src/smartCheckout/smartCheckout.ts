@@ -26,7 +26,7 @@ export const smartCheckout = async (
   config: CheckoutConfiguration,
   provider: Web3Provider,
   itemRequirements: ItemRequirement[],
-  transactionOrGasAmount: FulfillmentTransaction | GasAmount,
+  transactionOrGasAmount?: FulfillmentTransaction | GasAmount,
 ): Promise<SmartCheckoutResult> => {
   const ownerAddress = await provider.getSigner().getAddress();
 
@@ -43,14 +43,18 @@ export const smartCheckout = async (
 
   const aggregatedAllowances = allowanceAggregator(resolvedAllowances[0], resolvedAllowances[1]);
 
-  const gasItem = await measureAsyncExecution<ItemRequirement | null>(
-    config,
-    'Time to run gas calculator',
-    gasCalculator(provider, aggregatedAllowances, transactionOrGasAmount),
-  );
-  if (gasItem !== null) {
-    aggregatedItems.push(gasItem);
-    aggregatedItems = itemAggregator(aggregatedItems);
+  // Skip gas calculation if transactionOrGasAmount is not provided
+  let gasItem = null;
+  if (transactionOrGasAmount) {
+    gasItem = await measureAsyncExecution<ItemRequirement | null>(
+      config,
+      'Time to run gas calculator',
+      gasCalculator(provider, aggregatedAllowances, transactionOrGasAmount),
+    );
+    if (gasItem !== null) {
+      aggregatedItems.push(gasItem);
+      aggregatedItems = itemAggregator(aggregatedItems);
+    }
   }
 
   const balanceCheckResult = await measureAsyncExecution<BalanceCheckResult>(
