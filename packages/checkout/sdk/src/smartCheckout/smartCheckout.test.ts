@@ -687,26 +687,26 @@ describe('smartCheckout', () => {
         sufficient: false,
         balanceRequirements: [
           {
-            type: ItemType.NATIVE,
+            type: ItemType.ERC20,
             sufficient: false,
             required: {
-              balance: BigNumber.from(2),
-              formattedBalance: '2.0',
+              balance: BigNumber.from(1),
+              formattedBalance: '1.0',
               token: {
-                name: 'IMX',
-                symbol: 'IMX',
+                name: 'zkTKN',
+                symbol: 'zkTKN',
                 decimals: 18,
-                address: '0x1010',
+                address: '0xERC20',
               },
             },
             current: {
               balance: BigNumber.from(1),
               formattedBalance: '1.0',
               token: {
-                name: 'IMX',
-                symbol: 'IMX',
+                name: 'zkTKN',
+                symbol: 'zkTKN',
                 decimals: 18,
-                address: '0x1010',
+                address: '0xERC20',
               },
             },
             delta: {
@@ -714,6 +714,30 @@ describe('smartCheckout', () => {
               formattedBalance: '1.0',
             },
           },
+        ],
+      });
+
+      const itemRequirements: ItemRequirement[] = [
+        {
+          type: ItemType.ERC20,
+          tokenAddress: '0xERC20',
+          amount: BigNumber.from(1),
+          spenderAddress: '0x1',
+        },
+      ];
+
+      const result = await smartCheckout(
+        {} as CheckoutConfiguration,
+        mockProvider,
+        itemRequirements,
+        undefined,
+      );
+
+      expect(gasCalculator).toHaveBeenCalledTimes(0);
+
+      expect(result).toEqual({
+        sufficient: false,
+        transactionRequirements: [
           {
             type: ItemType.ERC20,
             sufficient: false,
@@ -742,44 +766,19 @@ describe('smartCheckout', () => {
               formattedBalance: '1.0',
             },
           },
-          {
-            type: ItemType.ERC721,
-            sufficient: false,
-            required: {
-              balance: BigNumber.from(1),
-              formattedBalance: '1.0',
-              id: '0',
-              contractAddress: '0xCollection',
-            },
-            current: {
-              balance: BigNumber.from(0),
-              formattedBalance: '0.0',
-              id: '0',
-              contractAddress: '0xCollection',
-            },
-            delta: {
-              balance: BigNumber.from(1),
-              formattedBalance: '1.0',
-            },
-          },
         ],
-      });
-
-      const itemRequirements: ItemRequirement[] = [
-        {
-          type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
+        router: {
+          availableRoutingOptions: {
+            onRamp: undefined,
+            swap: undefined,
+            bridge: undefined,
+          },
+          routingOutcome: {
+            type: RoutingOutcomeType.NO_ROUTES_FOUND,
+            message: 'No routes found',
+          },
         },
-      ];
-
-      await smartCheckout(
-        {} as CheckoutConfiguration,
-        mockProvider,
-        itemRequirements,
-        undefined,
-      );
-
-      expect(gasCalculator).toHaveBeenCalledTimes(0);
+      });
     });
   });
 });
