@@ -17,6 +17,7 @@
 export * from './domain/activities-api';
 export * from './domain/chains-api';
 export * from './domain/collections-api';
+export * from './domain/demopage-api';
 export * from './domain/metadata-api';
 export * from './domain/nft-owners-api';
 export * from './domain/nfts-api';
