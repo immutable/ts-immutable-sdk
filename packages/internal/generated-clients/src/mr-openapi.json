@@ -72,6 +72,28 @@
     }
   ],
   "paths": {
+    "/demopage": {
+      "get": {
+        "description": "Demopage",
+        "x-internal": true,
+        "tags": [
+          "demopage"
+        ],
+        "operationId": "DemoPage",
+        "responses": {
+          "200": {
+            "description": "success and returns some html text",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemoPage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/chains/{chain_name}/activity-history": {
       "get": {
         "tags": [
@@ -455,6 +477,195 @@
         }
       }
     },
+    "/v1/chains/{chain_name}/environments/{environment_id}/collections": {
+      "get": {
+        "description": "List all collections linked to a specific environment ID",
+        "security": [
+          {
+            "BearerAuth": [
+              "read:collections"
+            ]
+          }
+        ],
+        "tags": [
+          "collections"
+        ],
+        "operationId": "ListEnvironmentCollections",
+        "summary": "List all collections linked to a specific environment ID",
+        "x-internal": true,
+        "parameters": [
+          {
+            "name": "chain_name",
+            "in": "path",
+            "description": "The name of chain",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "examples": {
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              }
+            }
+          },
+          {
+            "name": "environment_id",
+            "in": "path",
+            "description": "The id of the Environment",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page_cursor",
+            "in": "query",
+            "description": "Encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageCursor"
+            }
+          },
+          {
+            "name": "page_size",
+            "description": "Maximum number of items to return",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageSize"
+            }
+          },
+          {
+            "name": "contract_type",
+            "description": "Filter which contract type to return",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/CollectionContractType"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListCollectionsResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorisedRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/environments/{environment_id}/tokens": {
+      "get": {
+        "description": "List all tokens linked to a specific environment ID",
+        "security": [
+          {
+            "BearerAuth": [
+              "read:tokens"
+            ]
+          }
+        ],
+        "tags": [
+          "tokens"
+        ],
+        "operationId": "ListEnvironmentTokens",
+        "summary": "List all tokens linked to a specific environment ID",
+        "x-internal": true,
+        "parameters": [
+          {
+            "name": "chain_name",
+            "in": "path",
+            "description": "The name of chain",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "examples": {
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              }
+            }
+          },
+          {
+            "name": "environment_id",
+            "in": "path",
+            "description": "The id of the Environment",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page_cursor",
+            "in": "query",
+            "description": "Encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageCursor"
+            }
+          },
+          {
+            "name": "page_size",
+            "description": "Maximum number of items to return",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageSize"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListTokensResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorisedRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/v1/chains/{chain_name}/collections/{contract_address}": {
       "get": {
         "description": "Get collection by contract address",
@@ -666,6 +877,89 @@
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/environments/{environment_id}/collections/link": {
+      "post": {
+        "description": "Link a collection with an environment",
+        "security": [
+          {
+            "BearerAuth": [
+              "update:collections"
+            ]
+          }
+        ],
+        "tags": [
+          "collections"
+        ],
+        "operationId": "LinkCollection",
+        "summary": "Link a collection with an environment",
+        "x-internal": true,
+        "parameters": [
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "examples": {
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              }
+            }
+          },
+          {
+            "name": "environment_id",
+            "description": "The environment ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The request body",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LinkCollectionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetCollectionResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorisedRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenRequest"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
@@ -1704,6 +1998,89 @@
         }
       }
     },
+    "/v1/chains/{chain_name}/environments/{environment_id}/tokens/link": {
+      "post": {
+        "description": "Link a ERC20 token with an environment",
+        "security": [
+          {
+            "BearerAuth": [
+              "update:tokens"
+            ]
+          }
+        ],
+        "tags": [
+          "tokens"
+        ],
+        "operationId": "LinkToken",
+        "summary": "Link a ERC20 token with an environment",
+        "x-internal": true,
+        "parameters": [
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "examples": {
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              }
+            }
+          },
+          {
+            "name": "environment_id",
+            "description": "The environment ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The request body",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LinkTokenRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetTokenResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorisedRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/v1/chains": {
       "get": {
         "description": "List supported chains",
@@ -2087,6 +2464,182 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ListMintRequestsResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorisedRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/v1/internal/chains/{chain_name}/collections/{contract_address}": {
+      "patch": {
+        "x-internal": true,
+        "description": "Updates a collection by contract address",
+        "tags": [
+          "collections"
+        ],
+        "operationId": "UpdateCollection",
+        "security": [
+          {
+            "ImmutableApiKey": [
+              "update:collections"
+            ]
+          },
+          {
+            "BearerAuth": [
+              "update:collections"
+            ]
+          }
+        ],
+        "summary": "Updates a collection by contract address",
+        "parameters": [
+          {
+            "name": "contract_address",
+            "in": "path",
+            "description": "The address contract",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          },
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "examples": {
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              }
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The request body",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCollectionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetCollectionResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorisedRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/v1/internal/chains/{chain_name}/tokens/{contract_address}": {
+      "patch": {
+        "x-internal": true,
+        "description": "Updates a token by contract address",
+        "tags": [
+          "tokens"
+        ],
+        "operationId": "UpdateToken",
+        "security": [
+          {
+            "ImmutableApiKey": [
+              "update:tokens"
+            ]
+          },
+          {
+            "BearerAuth": [
+              "update:tokens"
+            ]
+          }
+        ],
+        "summary": "Updates a token by contract address",
+        "parameters": [
+          {
+            "name": "contract_address",
+            "in": "path",
+            "description": "The address contract",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          },
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "examples": {
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              }
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The request body",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTokenRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetTokenResult"
                 }
               }
             }
@@ -2695,108 +3248,9 @@
         }
       }
     },
-    "/passport-mr/v1/counterfactual-address": {
-      "post": {
-        "deprecated": true,
-        "summary": "Deprecated Create a counterfactual address",
-        "description": "Create a counterfactual address for a user based on their Ethereum address",
-        "tags": [
-          "passport"
-        ],
-        "operationId": "createCounterfactualAddressDeprecated",
-        "security": [
-          {
-            "BearerAuth": [
-              "transact"
-            ]
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateCounterfactualAddressRequestDeprecated"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Counterfactual address created response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CreateCounterfactualAddressResDeprecated"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "BadRequestError",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIError400"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "UnauthorizedError",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIError401"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "ForbiddenError",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIError403"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "TooManyRequestsError",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIError429"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "InternalServerError",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIError500"
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BasicAPIError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/passport-mr/v1/users/{userId}/linked-addresses": {
       "get": {
+        "x-internal": true,
         "deprecated": true,
         "summary": "Deprecated Get Ethereum linked addresses for a user",
         "description": "Get all the Ethereum linked addresses for a user based on its userId",
@@ -2898,6 +3352,7 @@
     },
     "/v1/chains/{chain_name}/passport/counterfactual-address": {
       "post": {
+        "x-internal": true,
         "deprecated": true,
         "summary": "Create a counterfactual address",
         "description": "Create a counterfactual address for a user based on their Ethereum address",
@@ -3008,6 +3463,7 @@
     },
     "/v2/chains/{chain_name}/passport/counterfactual-address": {
       "post": {
+        "x-internal": true,
         "summary": "Create a counterfactual address v2",
         "description": "Create a counterfactual address for a user based on their Ethereum address",
         "tags": [
@@ -3225,6 +3681,7 @@
     },
     "/v1/chains/{chain_name}/passport/transaction-metadata": {
       "post": {
+        "x-internal": true,
         "summary": "Get transaction metadata",
         "description": "Get transaction metadata for a given encoded transaction",
         "tags": [
@@ -3863,6 +4320,54 @@
           "price_excluding_fees",
           "price_including_fees",
           "fees"
+        ]
+      },
+      "LinkCollectionRequest": {
+        "type": "object",
+        "properties": {
+          "signature": {
+            "description": "String created by signing wallet address and timestamp",
+            "type": "string"
+          },
+          "contract_address": {
+            "type": "string",
+            "description": "The address of the contract",
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          },
+          "environment_name": {
+            "type": "string",
+            "description": "The name of environment",
+            "example": "Staging Environment"
+          }
+        },
+        "required": [
+          "signature",
+          "contract_address",
+          "environment_name"
+        ]
+      },
+      "LinkTokenRequest": {
+        "type": "object",
+        "properties": {
+          "signature": {
+            "description": "String created by signing wallet address and timestamp",
+            "type": "string"
+          },
+          "contract_address": {
+            "type": "string",
+            "description": "The address of the contract",
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          },
+          "environment_name": {
+            "type": "string",
+            "description": "The name of environment",
+            "example": "Staging Environment"
+          }
+        },
+        "required": [
+          "signature",
+          "contract_address",
+          "environment_name"
         ]
       },
       "SaleFee": {
@@ -5367,6 +5872,40 @@
           "failed"
         ]
       },
+      "UpdateCollectionRequest": {
+        "type": "object",
+        "properties": {
+          "verification_status": {
+            "$ref": "#/components/schemas/AssetVerificationStatus"
+          },
+          "modified_by": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "verification_status",
+          "modified_by"
+        ]
+      },
+      "UpdateTokenRequest": {
+        "type": "object",
+        "properties": {
+          "verification_status": {
+            "$ref": "#/components/schemas/AssetVerificationStatus"
+          },
+          "modified_by": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "verification_status",
+          "modified_by"
+        ]
+      },
+      "DemoPage": {
+        "type": "string",
+        "example": "<html>HTML text</html>"
+      },
       "BasicAPIError": {
         "type": "object",
         "properties": {
@@ -5978,6 +6517,29 @@
           "protocol_data",
           "salt",
           "signature"
+        ]
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Error trace id",
+            "example": "1234567890"
+          },
+          "message": {
+            "type": "string",
+            "description": "Error message",
+            "example": "Order creation failed"
+          }
+        },
+        "description": "Resource not found",
+        "example": {
+          "id": "1234567890",
+          "message": "Order creation failed"
+        },
+        "required": [
+          "message"
         ]
       },
       "Fee": {
