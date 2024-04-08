@@ -1,15 +1,26 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { useState, useEffect } from 'react';
 import { PRIMARY_SALES_API_BASE_URL } from '../utils/config';
-import { ClientConfig, ClientConfigCurrency } from '../types';
+import {
+  ClientConfig, ClientConfigCurrency, ClientConfigCurrencyConversion, SignPaymentTypes,
+} from '../types';
 
 type ClientConfigResponse = {
   contract_id: string;
   currencies: {
-    name: string;
+    base: boolean;
     decimals: number;
     erc20_address: string;
+    exchange_id: string;
+    name: string;
   }[];
+  currency_conversion: {
+    [key: string]: {
+      amount: number;
+      name: string;
+      type: string;
+    };
+  };
 };
 
 const toClientConfig = (response: ClientConfigResponse): ClientConfig => ({
@@ -17,7 +28,16 @@ const toClientConfig = (response: ClientConfigResponse): ClientConfig => ({
   currencies: response.currencies.map((c) => ({
     ...c,
     erc20Address: c.erc20_address,
+    exchangeId: c.exchange_id,
   })),
+  currencyConversion: Object.entries(response.currency_conversion).reduce((acc, [key, value]) => {
+    acc[key] = {
+      amount: value.amount,
+      name: value.name,
+      type: value.type as SignPaymentTypes,
+    };
+    return acc;
+  }, {} as ClientConfigCurrencyConversion),
 });
 
 type UseClientConfigParams = {
@@ -29,6 +49,7 @@ type UseClientConfigParams = {
 export const defaultClientConfig: ClientConfig = {
   contractId: '',
   currencies: [],
+  currencyConversion: {},
 };
 
 export const useClientConfig = ({
@@ -71,7 +92,7 @@ export const useClientConfig = ({
     if (clientConfig.currencies.length === 0) return;
 
     const selectedCurrency = clientConfig.currencies.find((c) => c.name === defaultCurrency)
-      || clientConfig.currencies[0];
+      || clientConfig.currencies.find((c) => c.base === true);
     setCurrency(selectedCurrency);
   }, [defaultCurrency, clientConfig]);
 
