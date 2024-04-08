@@ -330,7 +330,7 @@
           "secondaryAction": "Dismiss"
         },
         "TRANSAK_FAILED": {
-          "description": "Sorry, something went wrong. Please try again.",
+          "description": "TRANSAK_FAILED Sorry, something went wrong. Please try again.",
           "primaryAction": "Try again",
           "secondaryAction": "Dismiss"
         },
@@ -340,7 +340,7 @@
           "secondaryAction": "Dismiss"
         },
         "WALLET_REJECTED_NO_FUNDS": {
-          "description": "Sorry, something went wrong. Please try again.",
+          "description": "WALLET_REJECTED_NO_FUNDS Sorry, something went wrong. Please try again.",
           "primaryAction": "Go back",
           "secondaryAction": "Dismiss"
         },
@@ -360,12 +360,12 @@
           "secondaryAction": "Cancel"
         },
         "SMART_CHECKOUT_EXECUTE_ERROR": {
-          "description": "Sorry, something went wrong while moving funds. Please try again.",
+          "description": "SMART_CHECKOUT_EXECUTE_ERROR Sorry, something went wrong while moving funds. Please try again.",
           "primaryAction": "Try again",
           "secondaryAction": "Cancel"
         },
         "DEFAULT_ERROR": {
-          "description": "Sorry, something went wrong. Please try again.",
+          "description": "DEFAULT_ERROR Sorry, something went wrong. Please try again.",
           "primaryAction": "Try again",
           "secondaryAction": "Dismiss"
         },

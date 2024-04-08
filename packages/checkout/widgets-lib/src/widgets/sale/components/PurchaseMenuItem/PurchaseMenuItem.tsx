@@ -32,6 +32,7 @@ export function PurchaseMenuItem({ fundingRoute, collectionName }: PurchaseMenuI
         ),
       );
     } catch {
+      console.log('🚀 ~ setUsdPurchaseAmount:'); // eslint-disable-line
       setUsdPurchaseAmount(undefined);
     }
   }, [cryptoFiatState, fundingRoute]);

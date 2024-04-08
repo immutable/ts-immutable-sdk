@@ -1,13 +1,15 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { Checkout, SaleItem, SmartCheckoutResult } from '@imtbl/checkout-sdk';
 import { useCallback, useState } from 'react';
+import { useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import {
   SaleErrorTypes,
   SmartCheckoutError,
   SmartCheckoutErrorTypes,
 } from '../types';
 import {
-  filterSmartCheckoutResult, getGasEstimate,
+  filterSmartCheckoutResult,
+  getGasEstimate,
   getItemRequirements,
 } from '../functions/smartCheckoutUtils';
 
@@ -29,9 +31,22 @@ export const useSmartCheckout = ({
   const [smartCheckoutResult, setSmartCheckoutResult] = useState<
   SmartCheckoutResult | undefined
   >(undefined);
-  const [smartCheckoutError, setSmartCheckoutError] = useState<
+  const [smartCheckoutError, setError] = useState<
   SmartCheckoutError | undefined
   >(undefined);
+
+  const { track } = useAnalytics();
+  const setSmartCheckoutError = (error: SmartCheckoutError) => {
+    track({
+      screen: 'Error',
+      action: 'Impression',
+      userJourney: 'PrimarySale' as any,
+      extras: {
+        smartCheckoutError: error,
+      },
+    });
+    setError(error);
+  };
 
   const smartCheckout = useCallback(async () => {
     let finalSmartCheckoutResult: SmartCheckoutResult | undefined;
@@ -51,6 +66,7 @@ export const useSmartCheckout = ({
       });
 
       if (!result) {
+        console.log("🚀 ~ smartCheckout result:", result); // eslint-disable-line
         throw new Error();
       }
 
@@ -70,6 +86,7 @@ export const useSmartCheckout = ({
 
       return result;
     } catch (error: any) {
+      console.log("🚀 ~ setSmartCheckoutError:", error); // eslint-disable-line
       setSmartCheckoutError({
         type: SaleErrorTypes.SMART_CHECKOUT_ERROR,
         data: {

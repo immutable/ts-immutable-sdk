@@ -61,6 +61,7 @@ export function FundingRouteMenuItem({
         ),
       );
     } catch {
+      console.log('🚀 ~ cryptoFiatState:'); // eslint-disable-line
       setFeesUsd(undefined);
       setUsdBalance(undefined);
     }

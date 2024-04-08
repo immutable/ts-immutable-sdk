@@ -2,6 +2,7 @@
 import { useCallback, useState } from 'react';
 import { SaleItem } from '@imtbl/checkout-sdk';
 
+import { useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import {
   SignResponse,
   SignOrderInput,
@@ -151,10 +152,11 @@ const toSignResponse = (
 };
 
 export const useSignOrder = (input: SignOrderInput) => {
+  const { track } = useAnalytics();
   const {
     provider, items, recipientAddress, environment, environmentId,
   } = input;
-  const [signError, setSignError] = useState<SignOrderError | undefined>(
+  const [signError, setError] = useState<SignOrderError | undefined>(
     undefined,
   );
   const [signResponse, setSignResponse] = useState<SignResponse | undefined>(
@@ -165,6 +167,16 @@ export const useSignOrder = (input: SignOrderInput) => {
     transactions: [],
   });
   const [tokenIds, setTokenIds] = useState<string[]>([]);
+
+  const setSignError = (error: SignOrderError) => {
+    track({
+      screen: 'Error',
+      action: 'Impression',
+      userJourney: 'PrimarySale' as any,
+      extras: { error },
+    });
+    setError(error);
+  };
 
   const setExecuteTransactions = (transaction: ExecutedTransaction) => {
     setExecuteResponse((prev) => ({
@@ -209,6 +221,7 @@ export const useSignOrder = (input: SignOrderInput) => {
         transactionHash = txnResponse?.hash || '';
         return [transactionHash, undefined];
       } catch (err) {
+        console.log('🚀 ~ sendTransaction:', err); // eslint-disable-line
         const reason = `${
           (err as any)?.reason || (err as any)?.message || ''
         }`.toLowerCase();
@@ -278,6 +291,7 @@ export const useSignOrder = (input: SignOrderInput) => {
         const { ok, status } = response;
         if (!ok) {
           const { code } = (await response.json()) as SignApiError;
+          console.log('🚀 ~ sign OK:', code, status); // eslint-disable-line
           let errorType: SaleErrorTypes;
           switch (status) {
             case 400:
@@ -298,6 +312,7 @@ export const useSignOrder = (input: SignOrderInput) => {
               throw new Error('Unknown error');
           }
 
+          console.log('🚀 ~ setSignError:', errorType); // eslint-disable-line
           setSignError({ type: errorType });
           return undefined;
         }
@@ -314,6 +329,7 @@ export const useSignOrder = (input: SignOrderInput) => {
 
         return responseData;
       } catch (e: any) {
+        console.log('🚀 ~ sign:', e); // eslint-disable-line
         setSignError({ type: SaleErrorTypes.DEFAULT, data: { error: e } });
       }
       return undefined;
@@ -328,6 +344,8 @@ export const useSignOrder = (input: SignOrderInput) => {
     onTxnError: (error: any, txns: ExecutedTransaction[]) => void,
   ): Promise<ExecutedTransaction[]> => {
     if (!signData || !provider) {
+      console.log('🚀 ~ !signData || !provider:', !signData || !provider); // eslint-disable-line
+
       setSignError({
         type: SaleErrorTypes.DEFAULT,
         data: { reason: 'No sign data' },

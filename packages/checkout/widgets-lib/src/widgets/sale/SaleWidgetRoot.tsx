@@ -35,6 +35,7 @@ export class Sale extends Base<WidgetType.SALE> {
     try {
       return Array.isArray(products);
     } catch {
+      console.log('🚀 ~ isValidProucts:', false); // eslint-disable-line
       return false;
     }
   }
@@ -93,6 +94,7 @@ export class Sale extends Base<WidgetType.SALE> {
       console.warn('[IMTBL]: invalid "excludePaymentTypes" widget input');
       validatedParams.excludePaymentTypes = [];
     }
+    console.log('🚀 ~ validatedParams:', validatedParams); // eslint-disable-line
 
     return validatedParams;
   }

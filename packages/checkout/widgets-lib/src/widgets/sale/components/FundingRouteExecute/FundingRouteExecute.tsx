@@ -150,6 +150,7 @@ export function FundingRouteExecute({ fundingRouteStep, onFundingRouteExecuted }
     try {
       handleStep(fundingRouteStep);
     } catch (err) {
+      console.log('🚀 ~ fundingRouteStep:', err); // eslint-disable-line
       sendFailEvent(err);
     }
   }, [fundingRouteStep]);
