@@ -60,7 +60,7 @@ export type SmartCheckoutError = {
   data?: {
     error: Error;
     transactionRequirements?: TransactionRequirement[];
-  }
+  };
 };
 
 export type ExecutedTransaction = {
@@ -116,6 +116,23 @@ export type ClientConfig = {
   currencies: ClientConfigCurrency[];
   currencyConversion: ClientConfigCurrencyConversion;
 };
+
+export type SaleWidgetCurrency = {
+  name: string;
+  symbol?: string;
+  decimals: number;
+  address?: string;
+  icon?: string;
+  base?: boolean;
+  erc20Address?: string;
+  exchangeId?: string;
+  currencyType: SaleWidgetCurrencyType;
+};
+
+export enum SaleWidgetCurrencyType {
+  SWAPPABLE = 'swappable',
+  SETTLEMENT = 'settlement',
+}
 
 export enum SignPaymentTypes {
   CRYPTO = 'crypto',
