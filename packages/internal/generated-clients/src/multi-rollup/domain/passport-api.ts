@@ -38,11 +38,7 @@ import { BasicAPIError } from '../models';
 // @ts-ignore
 import { CreateCounterfactualAddressRequest } from '../models';
 // @ts-ignore
-import { CreateCounterfactualAddressRequestDeprecated } from '../models';
-// @ts-ignore
 import { CreateCounterfactualAddressRes } from '../models';
-// @ts-ignore
-import { CreateCounterfactualAddressResDeprecated } from '../models';
 // @ts-ignore
 import { GetLinkedAddressesRes } from '../models';
 // @ts-ignore
@@ -96,47 +92,6 @@ export const PassportApiAxiosParamCreator = function (configuration?: Configurat
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(createCounterfactualAddressRequest, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * Create a counterfactual address for a user based on their Ethereum address
-         * @summary Deprecated Create a counterfactual address
-         * @param {CreateCounterfactualAddressRequestDeprecated} createCounterfactualAddressRequestDeprecated 
-         * @param {*} [options] Override http request option.
-         * @deprecated
-         * @throws {RequiredError}
-         */
-        createCounterfactualAddressDeprecated: async (createCounterfactualAddressRequestDeprecated: CreateCounterfactualAddressRequestDeprecated, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'createCounterfactualAddressRequestDeprecated' is not null or undefined
-            assertParamExists('createCounterfactualAddressDeprecated', 'createCounterfactualAddressRequestDeprecated', createCounterfactualAddressRequestDeprecated)
-            const localVarPath = `/passport-mr/v1/counterfactual-address`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication BearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(createCounterfactualAddressRequestDeprecated, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -337,18 +292,6 @@ export const PassportApiFp = function(configuration?: Configuration) {
         },
         /**
          * Create a counterfactual address for a user based on their Ethereum address
-         * @summary Deprecated Create a counterfactual address
-         * @param {CreateCounterfactualAddressRequestDeprecated} createCounterfactualAddressRequestDeprecated 
-         * @param {*} [options] Override http request option.
-         * @deprecated
-         * @throws {RequiredError}
-         */
-        async createCounterfactualAddressDeprecated(createCounterfactualAddressRequestDeprecated: CreateCounterfactualAddressRequestDeprecated, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateCounterfactualAddressResDeprecated>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createCounterfactualAddressDeprecated(createCounterfactualAddressRequestDeprecated, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * Create a counterfactual address for a user based on their Ethereum address
          * @summary Create a counterfactual address v2
          * @param {string} chainName 
          * @param {CreateCounterfactualAddressRequest} createCounterfactualAddressRequest 
@@ -418,17 +361,6 @@ export const PassportApiFactory = function (configuration?: Configuration, baseP
         },
         /**
          * Create a counterfactual address for a user based on their Ethereum address
-         * @summary Deprecated Create a counterfactual address
-         * @param {PassportApiCreateCounterfactualAddressDeprecatedRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @deprecated
-         * @throws {RequiredError}
-         */
-        createCounterfactualAddressDeprecated(requestParameters: PassportApiCreateCounterfactualAddressDeprecatedRequest, options?: AxiosRequestConfig): AxiosPromise<CreateCounterfactualAddressResDeprecated> {
-            return localVarFp.createCounterfactualAddressDeprecated(requestParameters.createCounterfactualAddressRequestDeprecated, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * Create a counterfactual address for a user based on their Ethereum address
          * @summary Create a counterfactual address v2
          * @param {PassportApiCreateCounterfactualAddressV2Request} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -490,20 +422,6 @@ export interface PassportApiCreateCounterfactualAddressRequest {
      * @memberof PassportApiCreateCounterfactualAddress
      */
     readonly createCounterfactualAddressRequest: CreateCounterfactualAddressRequest
-}
-
-/**
- * Request parameters for createCounterfactualAddressDeprecated operation in PassportApi.
- * @export
- * @interface PassportApiCreateCounterfactualAddressDeprecatedRequest
- */
-export interface PassportApiCreateCounterfactualAddressDeprecatedRequest {
-    /**
-     * 
-     * @type {CreateCounterfactualAddressRequestDeprecated}
-     * @memberof PassportApiCreateCounterfactualAddressDeprecated
-     */
-    readonly createCounterfactualAddressRequestDeprecated: CreateCounterfactualAddressRequestDeprecated
 }
 
 /**
@@ -601,19 +519,6 @@ export class PassportApi extends BaseAPI {
      */
     public createCounterfactualAddress(requestParameters: PassportApiCreateCounterfactualAddressRequest, options?: AxiosRequestConfig) {
         return PassportApiFp(this.configuration).createCounterfactualAddress(requestParameters.chainName, requestParameters.createCounterfactualAddressRequest, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * Create a counterfactual address for a user based on their Ethereum address
-     * @summary Deprecated Create a counterfactual address
-     * @param {PassportApiCreateCounterfactualAddressDeprecatedRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @deprecated
-     * @throws {RequiredError}
-     * @memberof PassportApi
-     */
-    public createCounterfactualAddressDeprecated(requestParameters: PassportApiCreateCounterfactualAddressDeprecatedRequest, options?: AxiosRequestConfig) {
-        return PassportApiFp(this.configuration).createCounterfactualAddressDeprecated(requestParameters.createCounterfactualAddressRequestDeprecated, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
