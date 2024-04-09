@@ -86,7 +86,6 @@ export const useCurrency = ({
   useEffect(() => {
     if (!environment || !environmentId) return;
 
-    // Fetching swappable currencies from Checkout config
     const fetchSwappableCurrencies = async () => {
       if (!checkoutClient || !passport) {
         return [];
@@ -102,13 +101,12 @@ export const useCurrency = ({
           chainId: checkoutNetworkInfo.chainId,
         });
 
-        console.log('fetchSwappableCurrencies:', swapAllowList.tokens);
-
         return swapAllowList.tokens.map((token) => ({
           ...token,
           currencyType: SaleWidgetCurrencyType.SWAPPABLE,
         }));
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Error fetching swappable currencies:', error);
         return [];
       }
@@ -123,17 +121,17 @@ export const useCurrency = ({
         });
 
         if (!response.ok) throw new Error(`${response.status} - ${response.statusText}`);
+
         const data: ClientConfigResponse = await response.json();
         const config = toClientConfig(data);
         setClientConfig(config);
-
-        console.log('fetchSettlementCurrencies:', config.currencies);
 
         return config.currencies.map((currency) => ({
           ...currency,
           currencyType: SaleWidgetCurrencyType.SETTLEMENT,
         }));
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Error fetching settlement currencies:', error);
         return [];
       }
@@ -151,7 +149,6 @@ export const useCurrency = ({
       ];
 
       const sortedCurrencies = sortCurrencies(combinedCurrencies);
-      console.log('sortedCurrencies:', sortedCurrencies);
       setAllCurrencies(sortedCurrencies);
     })();
   }, [environment, environmentId, checkoutClient, passport]);
