@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-console */
 /* eslint-disable class-methods-use-this */
 import axios, { AxiosResponse } from 'axios';
 import { ethers } from 'ethers';
 import {
+  NATIVE,
   ETHEREUM_NATIVE_TOKEN_ADDRESS,
   ETH_MAINNET_TO_ZKEVM_MAINNET,
   ETH_SEPOLIA_TO_ZKEVM_TESTNET,
@@ -10,6 +12,7 @@ import {
   ZKEVM_MAINNET_CHAIN_ID,
   ZKEVM_TESTNET_CHAIN_ID,
   axelarAPIEndpoints,
+  tenderlyAPIEndpoints,
   axelarChains,
   bridgeMethods,
 } from './constants/bridges';
@@ -48,6 +51,9 @@ import {
   FungibleToken,
   FlowRateInfoItem,
   TxStatusRequestItem,
+  BridgeBundledTxRequest,
+  BridgeBundledTxResponse,
+  DynamicGasEstimatesResponse,
 } from './types';
 import { GMPStatus, GMPStatusResponse, GasPaidStatus } from './types/axelar';
 import { queryTransactionStatus } from './lib/gmpRecovery';
@@ -62,12 +68,29 @@ export class TokenBridge {
   private config: BridgeConfiguration;
 
   /**
+   * @property {boolean} initialised - Flag to indicate whether this token bridge has been initialised.
+   */
+  private initialised: boolean;
+
+  /**
    * Constructs a TokenBridge instance.
    *
    * @param {BridgeConfiguration} config - The bridge configuration object.
    */
   constructor(config: BridgeConfiguration) {
     this.config = config;
+    this.initialised = false;
+  }
+
+  /**
+   * Initialise the TokenBridge instance.
+   *
+   */
+  public async initialise(): Promise<void> {
+    if (!this.initialised) {
+      await this.validateChainConfiguration();
+      this.initialised = true;
+    }
   }
 
   /**
@@ -251,6 +274,15 @@ export class TokenBridge {
     const gasPriceInWei = getGasPriceInWei(feeData);
     if (!gasPriceInWei) return ethers.BigNumber.from(0);
     return gasPriceInWei.mul(txnGasLimitInWei);
+  }
+
+  private calculateGasFee(
+    feeData: FeeData,
+    gasLimit: number,
+  ): ethers.BigNumber {
+    const gasPriceInWei = getGasPriceInWei(feeData);
+    if (!gasPriceInWei) return ethers.BigNumber.from(0);
+    return gasPriceInWei.mul(gasLimit);
   }
 
   /**
@@ -572,31 +604,166 @@ export class TokenBridge {
     );
   }
 
+  /**
+   * TODO
+   */
+  public async getUnsignedBridgeBundledTx(req: BridgeBundledTxRequest): Promise<BridgeBundledTxResponse> {
+    const [, , , res] = await Promise.all([
+      this.initialise(), // Initialisation will only be exeucted once
+      this.validateBridgeReqArgs(req),
+      this.checkReceiver(req.destinationChainId, req.recipientAddress),
+      this.getUnsignedBridgeBundledTxPrivate(req),
+    ]);
+    return res;
+  }
+
+  private async getUnsignedBridgeBundledTxPrivate(req: BridgeBundledTxRequest): Promise<BridgeBundledTxResponse> {
+    if (req.sourceChainId === this.config.bridgeInstance.rootChainID) {
+      // Deposit request
+      return this.getUnsignedBridgeDepositBundledTxPrivate(
+        req.senderAddress,
+        req.recipientAddress,
+        req.token,
+        req.amount,
+        req.gasMultiplier,
+      );
+    }
+    // Withdraw request
+    return this.getUnsignedBridgeWithdrawBundledTxPrivate();
+  }
+
+  private async getUnsignedBridgeDepositBundledTxPrivate(
+    sender: string,
+    recipient: string,
+    token: FungibleToken,
+    amount: ethers.BigNumber,
+    gasMultiplier: number,
+  ): Promise<BridgeBundledTxResponse> {
+    const [allowance, feeData, rootGas, axelarFee] = await Promise.all([
+      this.getAllowance(this.config.bridgeInstance.rootChainID, token, sender),
+      this.config.rootProvider.getFeeData(),
+      this.getDynamicDepositGas(this.config.bridgeInstance.rootChainID, sender, recipient, token, amount),
+      this.getAxelarFee(
+        this.config.bridgeInstance.rootChainID,
+        this.config.bridgeInstance.childChainID,
+        BridgeMethodsGasLimit.DEPOSIT_DESTINATION,
+        gasMultiplier,
+      ),
+    ]);
+
+    let contractToApprove: string | null;
+    let unsignedApprovalTx: ethers.providers.TransactionRequest | null;
+    let sourceChainFee: ethers.BigNumber = ethers.BigNumber.from(0);
+    let approvalFee: ethers.BigNumber = ethers.BigNumber.from(0);
+    const bridgeFee: ethers.BigNumber = axelarFee;
+    const imtblFee: ethers.BigNumber = ethers.BigNumber.from(0);
+
+    // Approval required for non-native tokens with insufficient allowance.
+    if (token.toUpperCase() !== NATIVE && allowance.lt(amount)) {
+      contractToApprove = token;
+      const erc20Contract: ethers.Contract = await withBridgeError<ethers.Contract>(
+        async () => new ethers.Contract(token, ERC20, this.config.rootProvider),
+        BridgeErrorType.PROVIDER_ERROR,
+      );
+      const data: string = await withBridgeError<string>(async () => erc20Contract.interface
+        .encodeFunctionData('approve', [
+          this.config.bridgeContracts.rootERC20BridgeFlowRate,
+          amount.sub(allowance),
+        ]), BridgeErrorType.INTERNAL_ERROR);
+      unsignedApprovalTx = {
+        data,
+        to: token,
+        value: 0,
+        from: sender,
+        chainId: parseInt(this.config.bridgeInstance.rootChainID, 10),
+      };
+      approvalFee = this.calculateGasFee(feeData, rootGas.approvalGas);
+    } else {
+      contractToApprove = null;
+      unsignedApprovalTx = null;
+    }
+
+    // Deposit transaction & fees.
+    const txData = await this.getTxData(
+      sender,
+      recipient,
+      amount,
+      token,
+      this.config.bridgeInstance.rootChainID,
+    );
+    const txValue = (token.toUpperCase() === NATIVE)
+      ? amount.add(bridgeFee).toString() : bridgeFee.toString();
+    const unsignedBridgeTx : ethers.providers.TransactionRequest = {
+      data: txData,
+      to: this.config.bridgeContracts.rootERC20BridgeFlowRate,
+      value: txValue,
+      from: sender,
+      chainId: parseInt(this.config.bridgeInstance.rootChainID, 10),
+    };
+    sourceChainFee = this.calculateGasFee(feeData, rootGas.sourceChainGas);
+
+    const totalFees: ethers.BigNumber = sourceChainFee.add(approvalFee).add(bridgeFee).add(imtblFee);
+
+    return {
+      feeData: {
+        sourceChainGas: sourceChainFee,
+        approvalFee,
+        bridgeFee,
+        imtblFee,
+        totalFees,
+      },
+      contractToApprove,
+      unsignedApprovalTx,
+      unsignedBridgeTx,
+    };
+  }
+
+  private async getUnsignedBridgeWithdrawBundledTxPrivate(): Promise<BridgeBundledTxResponse> {
+    // TODO
+    return {
+      feeData: {
+        sourceChainGas: ethers.BigNumber.from(0),
+        approvalFee: ethers.BigNumber.from(0),
+        bridgeFee: ethers.BigNumber.from(0),
+        imtblFee: ethers.BigNumber.from(0),
+        totalFees: ethers.BigNumber.from(0),
+      },
+      contractToApprove: null,
+      unsignedApprovalTx: null,
+      unsignedBridgeTx: {},
+    };
+  }
+
   private async checkReceiver(
-    provider: ethers.providers.Provider,
+    destinationChainId: string,
     address: string,
-  ): Promise<boolean> {
-    const ABI = ['function receive()'];
-
+  ): Promise<void> {
+    let provider;
+    if (destinationChainId === this.config.bridgeInstance.rootChainID) {
+      provider = this.config.rootProvider;
+    } else {
+      provider = this.config.childProvider;
+    }
     const bytecode = await provider.getCode(address);
-
     // No code : "0x" then the address is not a contract so it is a valid receiver.
-    if (bytecode.length <= 2) return true;
+    if (bytecode.length <= 2) return;
 
+    const ABI = ['function receive()'];
     const contract = new ethers.Contract(address, ABI, provider);
 
     try {
       // try to estimate gas for the receive function, if it works it exists
       await contract.estimateGas.receive();
-      return true;
     } catch {
       try {
         // if receive fails, try to estimate this way which will work if a fallback function is present
         await provider.estimateGas({ to: address });
-        return true;
       } catch {
         // no receive or fallback
-        return false;
+        throw new BridgeError(
+          `address ${address} is not a valid receipient`,
+          BridgeErrorType.INVALID_RECIPIENT,
+        );
       }
     }
   }
@@ -611,14 +778,7 @@ export class TokenBridge {
     provider: ethers.providers.Provider,
     gasMultiplier: number = 1.1,
   ): Promise<BridgeTxResponse> {
-    const canReceive:boolean = await this.checkReceiver(provider, recipient);
-
-    if (!canReceive) {
-      throw new BridgeError(
-        `address ${recipient} is not a valid receipient`,
-        BridgeErrorType.INVALID_RECIPIENT,
-      );
-    }
+    await this.checkReceiver(destinationChainId, recipient);
 
     const getContractRes = await this.getBridgeContract(sourceChainId);
 
@@ -651,6 +811,191 @@ export class TokenBridge {
         chainId: parseInt(sourceChainId, 10),
       },
     };
+  }
+
+  private async validateBridgeReqArgs(
+    req: BridgeBundledTxRequest,
+  ) {
+    // Validate chain ID.
+    await this.validateChainIds(req.sourceChainId, req.destinationChainId);
+
+    // Validate address
+    if (!ethers.utils.isAddress(req.senderAddress) || !ethers.utils.isAddress(req.recipientAddress)) {
+      throw new BridgeError(
+        `address ${req.senderAddress} or ${req.recipientAddress} is not a valid address`,
+        BridgeErrorType.INVALID_ADDRESS,
+      );
+    }
+
+    // Validate amount
+    if (req.amount.isNegative() || req.amount.isZero()) {
+      throw new BridgeError(
+        `deposit amount ${req.amount.toString()} is invalid`,
+        BridgeErrorType.INVALID_AMOUNT,
+      );
+    }
+
+    // If the token is not native, it must be a valid address
+    if (req.token.toUpperCase() !== NATIVE && !ethers.utils.isAddress(req.token)) {
+      throw new BridgeError(
+        `token address ${req.token} is not a valid address`,
+        BridgeErrorType.INVALID_ADDRESS,
+      );
+    }
+  }
+
+  private async getDynamicDepositGas(
+    sourceChainId: string,
+    sender: string,
+    recipient: string,
+    token: FungibleToken,
+    amount: ethers.BigNumber,
+  ): Promise<DynamicGasEstimatesResponse> {
+    const simulations: Array<any> = [];
+
+    // Encode approval function for non-native tokens.
+    if (token.toUpperCase() !== NATIVE) {
+      // Get erc20 contract
+      const erc20Contract: ethers.Contract = await withBridgeError<ethers.Contract>(
+        async () => new ethers.Contract(token, ERC20, this.config.rootProvider),
+        BridgeErrorType.PROVIDER_ERROR,
+      );
+
+      // Encode function data
+      const txData = await withBridgeError<string>(async () => erc20Contract.interface
+        .encodeFunctionData('approve', [
+          token,
+          amount,
+        ]), BridgeErrorType.INTERNAL_ERROR);
+
+      simulations.push({
+        network_id: sourceChainId,
+        estimate_gas: true,
+        simulation_type: 'quick',
+        from: sender,
+        to: token,
+        input: txData,
+      });
+    }
+
+    // Get tx data
+    const txData = await this.getTxData(
+      sender,
+      recipient,
+      amount,
+      token,
+      sourceChainId,
+    );
+
+    // tx value for simulation mocked as amount + 1 wei for a native bridge and 1 wei for token bridges
+    const txValue = (token.toUpperCase() !== 'NATIVE') ? '1' : amount.add('1').toString();
+
+    simulations.push({
+      network_id: sourceChainId,
+      estimate_gas: true,
+      simulation_type: 'quick',
+      from: sender,
+      to: this.config.bridgeContracts.rootERC20BridgeFlowRate,
+      input: txData,
+      value: txValue,
+    });
+
+    let axiosResponse:AxiosResponse;
+
+    const tenderlyAPI = this.getTenderlyEndpoint(sourceChainId);
+
+    try {
+      axiosResponse = await axios.post(
+        tenderlyAPI,
+        {
+          simulations,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+    } catch (error: any) {
+      axiosResponse = error.response;
+    }
+
+    if (axiosResponse.data.error) {
+      throw new BridgeError(
+        `Estimating gas failed with the reason: ${axiosResponse.data.error.message}`,
+        BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
+      );
+    }
+
+    if (axiosResponse.data.simulation_results.length !== simulations.length) {
+      throw new BridgeError(
+        'Estimating gas failed with mismatched responses',
+        BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
+      );
+    }
+
+    const tenderlyGasEstimatesRes = {} as DynamicGasEstimatesResponse;
+    const simResults = axiosResponse.data.simulation_results;
+
+    if (simResults.length === 1) {
+      if (simResults[0].simulation.error_message) {
+        throw new BridgeError(
+          `Estimating deposit gas failed with the reason: ${simResults[0].simulation.error_message}`,
+          BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
+        );
+      } else {
+        tenderlyGasEstimatesRes.sourceChainGas = simResults[0].simulation.gas_used;
+        tenderlyGasEstimatesRes.approvalGas = 0;
+      }
+    } else if (axiosResponse.data.simulation_results.length === 2) {
+      if (simResults[0].simulation.error_message) {
+        throw new BridgeError(
+          `Estimating approval gas failed with the reason: ${simResults[0].simulation.error_message}`,
+          BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
+        );
+      } else if (simResults[1].simulation.error_message) {
+        throw new BridgeError(
+          `Estimating deposit gas failed with the reason: ${simResults[1].simulation.error_message}`,
+          BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
+        );
+      } else {
+        tenderlyGasEstimatesRes.approvalGas = simResults[0].simulation.gas_used;
+        tenderlyGasEstimatesRes.sourceChainGas = simResults[1].simulation.gas_used;
+      }
+    } else {
+      throw new BridgeError(
+        `Estimating gas failed with unexpected number responses ${axiosResponse.data.simulation_results.length}`,
+        BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
+      );
+    }
+    return tenderlyGasEstimatesRes;
+  }
+
+  private async getAllowance(sourceChainId:string, token: string, sender: string): Promise<ethers.BigNumber> {
+    if (token.toUpperCase() === NATIVE) {
+      // Return immediately for native token.
+      return ethers.BigNumber.from(0);
+    }
+    let provider: ethers.providers.Provider;
+    let bridgeContract;
+    if (sourceChainId === this.config.bridgeInstance.rootChainID) {
+      provider = this.config.rootProvider;
+      bridgeContract = this.config.bridgeContracts.rootERC20BridgeFlowRate;
+    } else {
+      provider = this.config.childProvider;
+      bridgeContract = this.config.bridgeContracts.childERC20Bridge;
+    }
+
+    const erc20Contract: ethers.Contract = await withBridgeError<ethers.Contract>(
+      async () => new ethers.Contract(token, ERC20, provider),
+      BridgeErrorType.PROVIDER_ERROR,
+    );
+
+    return await withBridgeError<ethers.BigNumber>(() => erc20Contract
+      .allowance(
+        sender,
+        bridgeContract,
+      ), BridgeErrorType.PROVIDER_ERROR);
   }
 
   private async validateDepositArgs(
@@ -765,6 +1110,20 @@ export class TokenBridge {
     return axelarAPIEndpoint;
   }
 
+  private getTenderlyEndpoint(source:string) {
+    let tenderlyAPIEndpoint:string;
+    if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
+      || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
+      tenderlyAPIEndpoint = tenderlyAPIEndpoints.mainnet;
+    } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
+      || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
+      tenderlyAPIEndpoint = tenderlyAPIEndpoints.testnet;
+    } else {
+      tenderlyAPIEndpoint = tenderlyAPIEndpoints.devnet;
+    }
+    return tenderlyAPIEndpoint;
+  }
+
   /**
  * Calculate the gas amount for a transaction using axelarjs-sdk.
  * @param {*} source - The source chainId.
@@ -827,6 +1186,65 @@ export class TokenBridge {
       return {
         bridgeFee: ethers.BigNumber.from(`${axiosResponse.data}`),
       };
+    } catch (err) {
+      throw new BridgeError(
+        `Estimating Axelar Gas failed with the reason: ${err}`,
+        BridgeErrorType.AXELAR_GAS_ESTIMATE_FAILED,
+      );
+    }
+  }
+
+  private async getAxelarFee(
+    sourceChainId: string,
+    destinationChainId: string,
+    destinationChainGaslimit: number,
+    gasMultiplier: number = 1.1,
+  ): Promise<ethers.BigNumber> {
+    const sourceAxelar:AxelarChainDetails = axelarChains[sourceChainId];
+    const destinationAxelar:AxelarChainDetails = axelarChains[destinationChainId];
+
+    if (!sourceAxelar) {
+      throw new BridgeError(
+        `Source chainID ${sourceChainId} can not be matched to an Axelar chain.`,
+        BridgeErrorType.AXELAR_CHAIN_NOT_FOUND,
+      );
+    }
+
+    if (!destinationAxelar) {
+      throw new BridgeError(
+        `Destination chainID ${destinationChainId} can not be matched to an Axelar chain.`,
+        BridgeErrorType.AXELAR_CHAIN_NOT_FOUND,
+      );
+    }
+
+    const axelarAPIEndpoint:string = this.getAxelarEndpoint(sourceChainId);
+
+    const estimateGasReq = {
+      method: 'estimateGasFee',
+      sourceChain: sourceAxelar.id,
+      destinationChain: destinationAxelar.id,
+      symbol: sourceAxelar.symbol,
+      destinationChainGaslimit,
+      gasMultiplier,
+    };
+
+    let axiosResponse:AxiosResponse;
+
+    try {
+      axiosResponse = await axios.post(axelarAPIEndpoint, estimateGasReq);
+    } catch (error: any) {
+      axiosResponse = error.response;
+    }
+
+    if (axiosResponse.data.error) {
+      throw new BridgeError(
+        `Estimating Axelar Gas failed with the reason: ${axiosResponse.data.message}`,
+        BridgeErrorType.AXELAR_GAS_ESTIMATE_FAILED,
+      );
+    }
+
+    try {
+      return ethers.BigNumber.from(`${axiosResponse.data}`);
     } catch (err) {
       throw new BridgeError(
         `Estimating Axelar Gas failed with the reason: ${err}`,

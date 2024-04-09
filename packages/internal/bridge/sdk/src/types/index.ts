@@ -103,8 +103,8 @@ export enum BridgeFeeActions {
  */
 export enum BridgeMethodsGasLimit { // @TODO test methods on chain and put correct values here
   DEPOSIT_SOURCE = 150000,
-  DEPOSIT_DESTINATION = 200000,
-  WITHDRAW_SOURCE = 150000,
+  DEPOSIT_DESTINATION = 250000,
+  WITHDRAW_SOURCE = 250000,
   WITHDRAW_DESTINATION = 250000,
   MAP_TOKEN_SOURCE = 200000,
   MAP_TOKEN_DESTINATION = 200000,
@@ -300,6 +300,40 @@ export interface BridgeTxResponse {
 }
 
 /**
+ * @typedef {Object} BridgeBundledTxRequest
+ * @property {Address} senderAddress - The address of the depositor.
+ * @property {Address} recipientAddress - The address of the recipient.
+ * @property {FungibleToken} token - The token to be deposited.
+ * @property {ethers.BigNumber} amount - The amount to be deposited.
+ * @property {string} sourceChainId - The chain ID of the source chain.
+ * @property {string} destinationChainId - The chain ID of the destination chain.
+*/
+export interface BridgeBundledTxRequest {
+  senderAddress: Address;
+  recipientAddress: Address;
+  token: FungibleToken;
+  amount: ethers.BigNumber;
+  sourceChainId: string;
+  destinationChainId: string;
+  gasMultiplier: number;
+}
+
+/**
+ * @typedef {Object} BridgeBundledTxResponse
+ * @property {BridgeFeeResponse} fees - The fees associated with the Bridge transaction.
+ * @property {string | null} contractToApprove - The contract to approve for the approval transaction, or null if no approval is required.
+ * @property {ethers.providers.TransactionRequest | null} unsignedApprovalTx - The unsigned transaction for the token approval, or null
+ * if no approval is required.
+ * @property {ethers.providers.TransactionRequest} unsignedBridgeTx - The unsigned transaction for the deposit / withdrawal.
+ */
+export interface BridgeBundledTxResponse {
+  feeData: BridgeFeeResponse,
+  contractToApprove: string | null,
+  unsignedApprovalTx: ethers.providers.TransactionRequest | null;
+  unsignedBridgeTx: ethers.providers.TransactionRequest;
+}
+
+/**
  * @typedef {Object} TxStatusRequest
  * @property {string} sourceChainId - The chain ID of the source chain.
  * @property {Array<TxStatusRequestItem>} transactions - The transaction items to query the status for.
@@ -471,4 +505,9 @@ export interface TokenMappingRequest {
 export interface TokenMappingResponse {
   rootToken: FungibleToken;
   childToken: FungibleToken | null;
+}
+
+export interface DynamicGasEstimatesResponse {
+  approvalGas: number,
+  sourceChainGas: number,
 }

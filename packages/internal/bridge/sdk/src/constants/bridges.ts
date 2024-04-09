@@ -3,6 +3,11 @@
 import { AxelarChainDetails, BridgeInstance } from '../types';
 
 /**
+ * @constant {string} NATIVE - The native token representation.
+ */
+export const NATIVE = 'NATIVE';
+
+/**
  * @constant {string} ETH_SEPOLIA_CHAIN_ID - The chain ID for the Ethereum Sepolia testnet (EIP-155 compatible format).
  */
 export const ETH_SEPOLIA_CHAIN_ID = '11155111';
@@ -64,9 +69,18 @@ export const ETH_MAINNET_TO_ZKEVM_MAINNET: BridgeInstance = {
  * @typedef {Object} axelarAPIEndpoints - API endpoints for the testnet & mainnet Axelar environment configurations
  */
 export const axelarAPIEndpoints:Record<string, string> = {
-  testnet: 'https://testnet.api.gmp.axelarscan.io',
   mainnet: 'https://api.gmp.axelarscan.io',
-  devnet: '',
+  testnet: 'https://testnet.api.gmp.axelarscan.io',
+  devnet: 'https://stagenet.api.gmp.axelarscan.io',
+};
+
+/**
+ * @typedef {Object} tenderlyAPIEndpoints - API endpoints for the testnet & mainnet Axelar environment configurations
+ */
+export const tenderlyAPIEndpoints:Record<string, string> = {
+  mainnet: 'https://bridge-api.immutable.com/v1/tenderly/simulate',
+  testnet: 'https://bridge-api.sandbox.immutable.com/v1/tenderly/simulate',
+  devnet: 'https://bridge-api.dev.immutable.com/v1/tenderly/simulate',
 };
 
 /**
