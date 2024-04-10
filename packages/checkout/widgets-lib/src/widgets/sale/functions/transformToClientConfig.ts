@@ -30,7 +30,7 @@ export const transformToClientConfig = (
   currencies: response.currencies.map(
     ({ erc20_address, exchange_id, ...rest }) => ({
       ...rest,
-      erc20Address: erc20_address,
+      address: erc20_address,
       exchangeId: exchange_id,
     }),
   ),

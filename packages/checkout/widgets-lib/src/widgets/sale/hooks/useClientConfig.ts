@@ -11,7 +11,7 @@ import {
   SaleWidgetCurrency,
   SaleWidgetCurrencyType,
 } from '../types';
-import { sortAndRemoveDeduplicateCurrencies } from '../functions/sortAndDeduplicateCurrencies';
+import { sortAndDeduplicateCurrencies } from '../functions/sortAndDeduplicateCurrencies';
 import {
   ClientConfigResponse,
   transformToClientConfig,
@@ -108,8 +108,8 @@ export const useClientConfig = ({
         ...swappableCurrencies,
       ];
 
-      const sortedCurrencies = sortAndRemoveDeduplicateCurrencies(combinedCurrencies);
-      setAllCurrencies(sortedCurrencies);
+      const transformedCurrencies = sortAndDeduplicateCurrencies(combinedCurrencies);
+      setAllCurrencies(transformedCurrencies);
     })();
   }, [environment, environmentId, checkout, provider]);
 

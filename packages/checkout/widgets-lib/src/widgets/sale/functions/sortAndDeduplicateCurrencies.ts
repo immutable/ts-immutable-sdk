@@ -1,6 +1,6 @@
 import { SaleWidgetCurrency } from '../types';
 
-export const sortAndRemoveDeduplicateCurrencies = (
+export const sortAndDeduplicateCurrencies = (
   currencies: SaleWidgetCurrency[],
 ): SaleWidgetCurrency[] => {
   const currenciesMap = new Map<string, SaleWidgetCurrency>();

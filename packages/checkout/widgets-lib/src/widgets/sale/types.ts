@@ -96,7 +96,7 @@ export enum SmartCheckoutErrorTypes {
 export type ClientConfigCurrency = {
   base: boolean;
   decimals: number;
-  erc20Address: string;
+  address: string;
   exchangeId: string;
   name: string;
 };
