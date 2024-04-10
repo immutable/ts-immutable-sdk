@@ -2,11 +2,13 @@
 import { Signer } from '@ethersproject/abstract-signer';
 import { splitSignature } from '@ethersproject/bytes';
 import hash from 'hash.js';
-import { curves, ec } from 'elliptic';
+// import { curves, ec } from 'elliptic';
+import * as elliptic from 'elliptic';
 import * as encUtils from 'enc-utils';
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import BN from 'bn.js';
-import { hdkey } from 'ethereumjs-wallet';
+// import { hdkey } from 'ethereumjs-wallet';
+import * as ethereumJsWallet from 'ethereumjs-wallet';
 import { createStarkSigner } from './starkSigner';
 import * as legacy from './legacy/crypto';
 import { getStarkPublicKeyFromImx } from './getStarkPublicKeyFromImx';
@@ -41,8 +43,8 @@ export const starkEcOrder = new BN(
 );
 
 // eslint-disable-next-line new-cap
-export const starkEc = new ec(
-  new curves.PresetCurve({
+export const starkEc = new elliptic.ec(
+  new elliptic.curves.PresetCurve({
     type: 'short',
     prime: null,
     p: '08000000 00000011 00000000 00000000 00000000 00000000 00000000 00000001',
@@ -154,7 +156,7 @@ export function checkIfHashedKeyIsAboveLimit(keySeed: BN) {
 }
 
 export function getPrivateKeyFromPath(seed: string, path: string): BN {
-  const privateKey = hdkey
+  const privateKey = ethereumJsWallet.hdkey
     .fromMasterSeed(Buffer.from(seed.slice(2), 'hex')) // assuming seed is '0x...'
     .derivePath(path)
     .getWallet()

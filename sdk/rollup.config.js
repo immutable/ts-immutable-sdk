@@ -22,11 +22,6 @@ const packages = JSON.parse(
 );
 
 const getPackages = () => packages.map((pkg) => pkg.name);
-// { 
-//   if (!pkg.name.includes('sample-app')) {
-//     return pkg.name
-//   }
-// });
 
 // Get relevant files to bundle
 const getFilesToBuild = () => {
