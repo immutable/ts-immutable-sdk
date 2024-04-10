@@ -14,7 +14,7 @@ import {
   SaleWidgetCurrencyType,
   SignPaymentTypes,
 } from '../types';
-import { sortCurrencies } from '../utils/sortCurrencies';
+import { sortAndRemoveDeduplicateCurrencies } from '../functions/sortAndDeduplicateCurrencies';
 
 type ClientConfigResponse = {
   contract_id: string;
@@ -81,8 +81,6 @@ export const useClientConfig = ({
   const [clientConfig, setClientConfig] = useState<ClientConfig>(defaultClientConfig);
   const [allCurrencies, setAllCurrencies] = useState<SaleWidgetCurrency[]>([]);
 
-  // const checkoutClient = useCheckoutClient({ passport, environment });
-
   useEffect(() => {
     if (!environment || !environmentId) return;
 
@@ -146,7 +144,7 @@ export const useClientConfig = ({
         ...swappableCurrencies,
       ];
 
-      const sortedCurrencies = sortCurrencies(combinedCurrencies);
+      const sortedCurrencies = sortAndRemoveDeduplicateCurrencies(combinedCurrencies);
       setAllCurrencies(sortedCurrencies);
     })();
   }, [environment, environmentId, checkout, provider]);
