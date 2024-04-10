@@ -1,4 +1,4 @@
-import { SaleWidgetCurrency } from '../types';
+import { SaleWidgetCurrency, SaleWidgetCurrencyType } from '../types';
 
 export const sortAndDeduplicateCurrencies = (
   currencies: SaleWidgetCurrency[],
@@ -9,14 +9,17 @@ export const sortAndDeduplicateCurrencies = (
 
   for (const currency of currencies) {
     const currencyNameKey = currency.name.toLowerCase();
-    if (currency.base && currency.currencyType === 'settlement') {
+    if (
+      currency.base
+      && currency.currencyType === SaleWidgetCurrencyType.SETTLEMENT
+    ) {
       baseCurrency = currency;
     } else {
       const existingCurrency = currenciesMap.get(currencyNameKey);
       if (
         !existingCurrency
-        || (existingCurrency.currencyType === 'swappable'
-          && currency.currencyType === 'settlement')
+        || (existingCurrency.currencyType === SaleWidgetCurrencyType.SWAPPABLE
+          && currency.currencyType === SaleWidgetCurrencyType.SETTLEMENT)
       ) {
         currenciesMap.set(currencyNameKey, currency);
       }
