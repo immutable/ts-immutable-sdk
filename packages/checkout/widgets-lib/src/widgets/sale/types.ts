@@ -124,7 +124,6 @@ export type SaleWidgetCurrency = {
   address?: string;
   icon?: string;
   base?: boolean;
-  erc20Address?: string;
   exchangeId?: string;
   currencyType: SaleWidgetCurrencyType;
 };
