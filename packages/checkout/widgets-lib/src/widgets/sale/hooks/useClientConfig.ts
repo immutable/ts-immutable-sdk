@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { useState, useEffect } from 'react';
 
 import { Environment } from '@imtbl/config';
@@ -9,50 +8,14 @@ import { PRIMARY_SALES_API_BASE_URL } from '../utils/config';
 import {
   ClientConfig,
   ClientConfigCurrency,
-  ClientConfigCurrencyConversion,
   SaleWidgetCurrency,
   SaleWidgetCurrencyType,
-  SignPaymentTypes,
 } from '../types';
 import { sortAndRemoveDeduplicateCurrencies } from '../functions/sortAndDeduplicateCurrencies';
-
-type ClientConfigResponse = {
-  contract_id: string;
-  currencies: {
-    base: boolean;
-    decimals: number;
-    erc20_address: string;
-    exchange_id: string;
-    name: string;
-  }[];
-  currency_conversion: {
-    [key: string]: {
-      amount: number;
-      name: string;
-      type: string;
-    };
-  };
-};
-
-const toClientConfig = (response: ClientConfigResponse): ClientConfig => ({
-  contractId: response.contract_id,
-  currencies: response.currencies.map((c) => ({
-    ...c,
-    erc20Address: c.erc20_address,
-    exchangeId: c.exchange_id,
-  })),
-  currencyConversion: Object.entries(response.currency_conversion).reduce(
-    (acc, [key, value]) => {
-      acc[key] = {
-        amount: value.amount,
-        name: value.name,
-        type: value.type as SignPaymentTypes,
-      };
-      return acc;
-    },
-    {} as ClientConfigCurrencyConversion,
-  ),
-});
+import {
+  ClientConfigResponse,
+  transformToClientConfig,
+} from '../functions/transformToClientConfig';
 
 type UseClientConfigParams = {
   environment: Environment;
@@ -113,13 +76,14 @@ export const useClientConfig = ({
         const baseUrl = `${PRIMARY_SALES_API_BASE_URL[environment]}/${environmentId}/client-config`;
         const response = await fetch(baseUrl, {
           method: 'GET',
+          // eslint-disable-next-line @typescript-eslint/naming-convention
           headers: { 'Content-Type': 'application/json' },
         });
 
         if (!response.ok) throw new Error(`${response.status} - ${response.statusText}`);
 
         const data: ClientConfigResponse = await response.json();
-        const config = toClientConfig(data);
+        const config = transformToClientConfig(data);
         setClientConfig(config);
 
         return config.currencies.map((currency) => ({
