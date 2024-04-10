@@ -27,17 +27,19 @@ export const transformToClientConfig = (
   response: ClientConfigResponse,
 ): ClientConfig => ({
   contractId: response.contract_id,
-  currencies: response.currencies.map((c) => ({
-    ...c,
-    erc20Address: c.erc20_address,
-    exchangeId: c.exchange_id,
-  })),
+  currencies: response.currencies.map(
+    ({ erc20_address, exchange_id, ...rest }) => ({
+      ...rest,
+      erc20Address: erc20_address,
+      exchangeId: exchange_id,
+    }),
+  ),
   currencyConversion: Object.entries(response.currency_conversion).reduce(
-    (acc, [key, value]) => {
+    (acc, [key, { amount, name, type }]) => {
       acc[key] = {
-        amount: value.amount,
-        name: value.name,
-        type: value.type as SignPaymentTypes,
+        amount,
+        name,
+        type: type as SignPaymentTypes,
       };
       return acc;
     },
