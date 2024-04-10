@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { useState, useEffect } from 'react';
-import { Passport } from '@imtbl/passport';
 
 import { Environment } from '@imtbl/config';
-import { TokenFilterTypes } from '@imtbl/checkout-sdk';
-import { providers } from 'ethers';
+import { Checkout, TokenFilterTypes } from '@imtbl/checkout-sdk';
+import { Web3Provider } from '@ethersproject/providers';
 import { PRIMARY_SALES_API_BASE_URL } from '../utils/config';
 
 import {
@@ -15,7 +14,6 @@ import {
   SaleWidgetCurrencyType,
   SignPaymentTypes,
 } from '../types';
-import { useCheckoutClient } from './useCheckoutClient';
 import { sortCurrencies } from '../utils/sortCurrencies';
 
 type ClientConfigResponse = {
@@ -59,7 +57,8 @@ const toClientConfig = (response: ClientConfigResponse): ClientConfig => ({
 type UseClientConfigParams = {
   environment: Environment;
   environmentId: string;
-  passport: Passport | undefined;
+  checkout: Checkout | undefined;
+  provider: Web3Provider | undefined;
   defaultCurrency?: string;
 };
 
@@ -72,7 +71,8 @@ export const defaultClientConfig: ClientConfig = {
 export const useClientConfig = ({
   environment,
   environmentId,
-  passport,
+  checkout,
+  provider,
   defaultCurrency,
 }: UseClientConfigParams) => {
   const [selectedCurrency, setSelectedCurrency] = useState<
@@ -81,22 +81,20 @@ export const useClientConfig = ({
   const [clientConfig, setClientConfig] = useState<ClientConfig>(defaultClientConfig);
   const [allCurrencies, setAllCurrencies] = useState<SaleWidgetCurrency[]>([]);
 
-  const checkoutClient = useCheckoutClient({ passport, environment });
+  // const checkoutClient = useCheckoutClient({ passport, environment });
 
   useEffect(() => {
     if (!environment || !environmentId) return;
 
     const fetchSwappableCurrencies = async () => {
-      if (!checkoutClient || !passport) {
+      if (!checkout || !provider) {
         return [];
       }
       try {
-        const passportProvider = passport.connectEvm();
-        const zkEvmProvider = new providers.Web3Provider(passportProvider);
-        const checkoutNetworkInfo = await checkoutClient.getNetworkInfo({
-          provider: zkEvmProvider,
+        const checkoutNetworkInfo = await checkout.getNetworkInfo({
+          provider,
         });
-        const swapAllowList = await checkoutClient.getTokenAllowList({
+        const swapAllowList = await checkout.getTokenAllowList({
           type: TokenFilterTypes.SWAP,
           chainId: checkoutNetworkInfo.chainId,
         });
@@ -151,7 +149,7 @@ export const useClientConfig = ({
       const sortedCurrencies = sortCurrencies(combinedCurrencies);
       setAllCurrencies(sortedCurrencies);
     })();
-  }, [environment, environmentId, checkoutClient, passport]);
+  }, [environment, environmentId, checkout, provider]);
 
   useEffect(() => {
     if (clientConfig.currencies.length === 0) return;

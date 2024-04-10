@@ -185,7 +185,8 @@ export function SaleContextProvider(props: {
   const { selectedCurrency, clientConfig } = useClientConfig({
     environmentId,
     environment: config.environment,
-    passport,
+    checkout,
+    provider,
   });
 
   const fromTokenAddress = selectedCurrency?.erc20Address || '';
