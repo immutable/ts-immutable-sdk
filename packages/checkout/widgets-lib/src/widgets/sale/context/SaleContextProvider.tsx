@@ -182,14 +182,16 @@ export function SaleContextProvider(props: {
 
   const [invalidParameters, setInvalidParameters] = useState<boolean>(false);
 
-  const { selectedCurrency, clientConfig } = useClientConfig({
+  const {
+    selectedCurrency, clientConfig, checkoutError, clientConfigError,
+  } = useClientConfig({
     environmentId,
     environment: config.environment,
     checkout,
     provider,
   });
 
-  const fromTokenAddress = selectedCurrency?.erc20Address || '';
+  const fromTokenAddress = selectedCurrency?.address || '';
 
   const goBackToPaymentMethods = useCallback(
     (type?: SalePaymentTypes | undefined, data?: Record<string, unknown>) => {
@@ -306,6 +308,16 @@ export function SaleContextProvider(props: {
     if (!signError) return;
     goToErrorView(signError.type, signError.data);
   }, [signError]);
+
+  useEffect(() => {
+    if (!checkoutError) return;
+    goToErrorView(checkoutError.type, checkoutError.data);
+  }, [checkoutError]);
+
+  useEffect(() => {
+    if (!clientConfigError) return;
+    goToErrorView(clientConfigError.type, clientConfigError.data);
+  }, [clientConfigError]);
 
   const { smartCheckout, smartCheckoutResult, smartCheckoutError } = useSmartCheckout({
     provider,

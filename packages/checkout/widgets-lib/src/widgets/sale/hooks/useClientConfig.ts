@@ -8,6 +8,7 @@ import { PRIMARY_SALES_API_BASE_URL } from '../utils/config';
 import {
   ClientConfig,
   ClientConfigCurrency,
+  SaleErrorTypes,
   SaleWidgetCurrency,
   SaleWidgetCurrencyType,
 } from '../types';
@@ -31,6 +32,11 @@ export const defaultClientConfig: ClientConfig = {
   currencyConversion: {},
 };
 
+export type ClientConfigError = {
+  type: SaleErrorTypes;
+  data?: Record<string, unknown>;
+};
+
 export const useClientConfig = ({
   environment,
   environmentId,
@@ -42,6 +48,12 @@ export const useClientConfig = ({
   ClientConfigCurrency | undefined
   >();
   const [clientConfig, setClientConfig] = useState<ClientConfig>(defaultClientConfig);
+  const [clientConfigError, setClientConfigError] = useState<
+  ClientConfigError | undefined
+  >(undefined);
+  const [checkoutError, setCheckoutError] = useState<
+  ClientConfigError | undefined
+  >(undefined);
   const [allCurrencies, setAllCurrencies] = useState<SaleWidgetCurrency[]>([]);
 
   useEffect(() => {
@@ -66,7 +78,10 @@ export const useClientConfig = ({
         }));
       } catch (error) {
         // eslint-disable-next-line no-console
-        console.error('Error fetching swappable currencies:', error);
+        setCheckoutError({
+          type: SaleErrorTypes.DEFAULT,
+          data: { reason: 'Error fetching swappable currencies' },
+        });
         return [];
       }
     };
@@ -92,7 +107,10 @@ export const useClientConfig = ({
         }));
       } catch (error) {
         // eslint-disable-next-line no-console
-        console.error('Error fetching settlement currencies:', error);
+        setClientConfigError({
+          type: SaleErrorTypes.DEFAULT,
+          data: { reason: 'Error fetching settlement currencies' },
+        });
         return [];
       }
     };
@@ -126,5 +144,7 @@ export const useClientConfig = ({
     selectedCurrency,
     setSelectedCurrency,
     allCurrencies,
+    clientConfigError,
+    checkoutError,
   };
 };
