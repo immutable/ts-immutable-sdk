@@ -61,6 +61,7 @@ describe('erc721', () => {
       expect(type).toEqual(CheckoutErrorType.GET_ERC721_ALLOWANCE_ERROR);
       expect(data).toEqual({
         id: '0',
+        error: {},
         contractAddress: '0xERC721',
       });
       expect(getApprovedMock).toBeCalledWith(BigNumber.from(0));
@@ -117,6 +118,9 @@ describe('erc721', () => {
       expect(type).toEqual(CheckoutErrorType.GET_ERC721_ALLOWANCE_ERROR);
       expect(data).toEqual({
         id: '0',
+        error: {
+          from: '0xADDRESS',
+        },
         contractAddress: '0xERC721',
         spenderAddress: '0xSEAPORT',
         ownerAddress: '0xADDRESS',
