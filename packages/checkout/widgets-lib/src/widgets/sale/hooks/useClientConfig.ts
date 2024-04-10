@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-
 import { Environment } from '@imtbl/config';
 import { Checkout, TokenFilterTypes } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
@@ -77,7 +76,6 @@ export const useClientConfig = ({
           currencyType: SaleWidgetCurrencyType.SWAPPABLE,
         }));
       } catch (error) {
-        // eslint-disable-next-line no-console
         setCheckoutError({
           type: SaleErrorTypes.DEFAULT,
           data: { reason: 'Error fetching swappable currencies' },
@@ -106,7 +104,6 @@ export const useClientConfig = ({
           currencyType: SaleWidgetCurrencyType.SETTLEMENT,
         }));
       } catch (error) {
-        // eslint-disable-next-line no-console
         setClientConfigError({
           type: SaleErrorTypes.DEFAULT,
           data: { reason: 'Error fetching settlement currencies' },
