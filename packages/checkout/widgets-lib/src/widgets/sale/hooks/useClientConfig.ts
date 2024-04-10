@@ -69,7 +69,7 @@ export const defaultClientConfig: ClientConfig = {
   currencyConversion: {},
 };
 
-export const useCurrency = ({
+export const useClientConfig = ({
   environment,
   environmentId,
   passport,

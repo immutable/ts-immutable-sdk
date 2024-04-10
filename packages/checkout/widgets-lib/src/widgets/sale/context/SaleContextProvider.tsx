@@ -43,7 +43,7 @@ import {
 import { getTopUpViewData } from '../functions/smartCheckoutUtils';
 
 import { useSmartCheckout } from '../hooks/useSmartCheckout';
-import { useCurrency, defaultClientConfig } from '../hooks/useCurrency';
+import { useClientConfig, defaultClientConfig } from '../hooks/useClientConfig';
 
 type SaleContextProps = {
   config: StrongCheckoutWidgetsConfig;
@@ -182,7 +182,7 @@ export function SaleContextProvider(props: {
 
   const [invalidParameters, setInvalidParameters] = useState<boolean>(false);
 
-  const { selectedCurrency, clientConfig } = useCurrency({
+  const { selectedCurrency, clientConfig } = useClientConfig({
     environmentId,
     environment: config.environment,
     passport,
