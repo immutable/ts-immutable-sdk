@@ -2,7 +2,7 @@ import { SaleWidgetCurrency, SaleWidgetCurrencyType } from '../types';
 import { sortAndDeduplicateCurrencies } from './sortAndDeduplicateCurrencies';
 
 describe('sortAndDeduplicateCurrencies', () => {
-  it('sortAndDeduplicateCurrencies', () => {
+  it('should remove duplicates and sort currencies by: base -> settlement -> swappable', () => {
     const allCurrencies: SaleWidgetCurrency[] = [
       {
         base: true,

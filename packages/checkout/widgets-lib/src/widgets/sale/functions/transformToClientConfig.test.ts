@@ -6,7 +6,7 @@ import {
 } from './transformToClientConfig';
 
 describe('transformToClientConfig', () => {
-  it('transformToClientConfig', () => {
+  it('should return input object with camel case keys', () => {
     const fromClientConfig: ClientConfigResponse = {
       contract_id: '65696ef06c55501aab4da5e7',
       currencies: [

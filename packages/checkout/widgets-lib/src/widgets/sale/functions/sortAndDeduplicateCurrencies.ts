@@ -10,15 +10,15 @@ export const sortAndDeduplicateCurrencies = (
   for (const currency of currencies) {
     const currencyNameKey = currency.name.toLowerCase();
     if (
-      currency.base
-      && currency.currencyType === SaleWidgetCurrencyType.SETTLEMENT
+      currency.base && currency.currencyType === SaleWidgetCurrencyType.SETTLEMENT
     ) {
-      baseCurrency = currency;
+      if (!baseCurrency) {
+        baseCurrency = currency;
+      }
     } else {
       const existingCurrency = currenciesMap.get(currencyNameKey);
       if (
-        !existingCurrency
-        || (existingCurrency.currencyType === SaleWidgetCurrencyType.SWAPPABLE
+        !existingCurrency || (existingCurrency.currencyType === SaleWidgetCurrencyType.SWAPPABLE
           && currency.currencyType === SaleWidgetCurrencyType.SETTLEMENT)
       ) {
         currenciesMap.set(currencyNameKey, currency);
