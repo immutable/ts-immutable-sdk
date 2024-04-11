@@ -2,4 +2,4 @@ export {
   generateLegacyStarkPrivateKey,
   generateStarkPrivateKey,
   createStarkSigner,
-} from './utils';
+} from '@imtbl/core-sdk';
