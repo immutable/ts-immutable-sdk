@@ -10,9 +10,6 @@ import moduleReleases from './module-release.json' assert { type: 'json' };
 import terser from '@rollup/plugin-terser';
 import nodePolyfills from 'rollup-plugin-polyfill-node';
 import babel from '@rollup/plugin-babel';
-import internal from 'rollup-plugin-internal';
-import alias from '@rollup/plugin-alias';
-// import { nodeExternals } from 'rollup-plugin-node-externals';
 
 // RELEASE_TYPE environment variable is set by the CI/CD pipeline
 const releaseType = process.env.RELEASE_TYPE || 'alpha';
@@ -47,17 +44,15 @@ const getFileBuild = (inputFilename) => [
       format: 'es',
     },
     plugins: [
-      // nodeExternals(),
-      // nodeResolve(),
       nodeResolve({
         resolveOnly: getPackages(),
       }),
       json(),
+      commonJs(),
       typescript({
         declaration: true,
         declarationDir: './dist/types',
       }),
-      commonJs(),
       replace({
         exclude: 'node_modules/**',
         preventAssignment: true,
