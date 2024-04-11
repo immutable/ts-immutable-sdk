@@ -183,7 +183,7 @@ export function SaleContextProvider(props: {
   const [invalidParameters, setInvalidParameters] = useState<boolean>(false);
 
   const {
-    selectedCurrency, clientConfig, checkoutError, clientConfigError,
+    selectedCurrency, clientConfig, clientConfigError,
   } = useClientConfig({
     environmentId,
     environment: config.environment,
@@ -308,11 +308,6 @@ export function SaleContextProvider(props: {
     if (!signError) return;
     goToErrorView(signError.type, signError.data);
   }, [signError]);
-
-  useEffect(() => {
-    if (!checkoutError) return;
-    goToErrorView(checkoutError.type, checkoutError.data);
-  }, [checkoutError]);
 
   useEffect(() => {
     if (!clientConfigError) return;

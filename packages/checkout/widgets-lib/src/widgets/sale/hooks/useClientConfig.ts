@@ -50,9 +50,6 @@ export const useClientConfig = ({
   const [clientConfigError, setClientConfigError] = useState<
   ConfigError | undefined
   >(undefined);
-  const [checkoutError, setCheckoutError] = useState<
-  ConfigError | undefined
-  >(undefined);
   const [allCurrencies, setAllCurrencies] = useState<SaleWidgetCurrency[]>([]);
 
   useEffect(() => {
@@ -76,10 +73,7 @@ export const useClientConfig = ({
           currencyType: SaleWidgetCurrencyType.SWAPPABLE,
         }));
       } catch (error) {
-        setCheckoutError({
-          type: SaleErrorTypes.DEFAULT,
-          data: { reason: 'Error fetching swappable currencies' },
-        });
+        console.warn("Error fetching swappable currencies", error); // eslint-disable-line
         return [];
       }
     };
@@ -142,6 +136,5 @@ export const useClientConfig = ({
     setSelectedCurrency,
     allCurrencies,
     clientConfigError,
-    checkoutError,
   };
 };
