@@ -13,10 +13,18 @@ export { Checkout } from './sdk';
 export { IMMUTABLE_API_BASE_URL } from './env';
 
 export {
+  getPassportProviderDetail,
+  getMetaMaskProviderDetail,
+} from './provider';
+
+export {
   ChainId,
   ChainName,
   ChainSlug,
   CheckoutStatus,
+  EIP1193Provider,
+  EIP6963ProviderInfo,
+  EIP6963ProviderDetail,
   ExchangeType,
   FeeType,
   FundingStepType,

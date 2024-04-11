@@ -57,6 +57,7 @@ import {
   TokenInfo,
   GetTokenInfoParams,
   AddNetworkParams,
+  EIP6963ProviderDetail,
 } from './types';
 import { CheckoutConfiguration } from './config';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
@@ -73,6 +74,7 @@ import { isMatchingAddress } from './utils/utils';
 import { WidgetConfiguration } from './widgets/definitions/configurations';
 import { SemanticVersion } from './widgets/definitions/types';
 import { validateAndBuildVersion } from './widgets/version';
+import { InjectedProvidersManager } from './provider/injectedProvidersManager';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
@@ -237,6 +239,22 @@ export class Checkout {
       params.walletProviderName,
       this.passport,
     );
+  }
+
+  /**
+   * Returns a list of EIP-6963 injected providers and their metadata.
+   */
+  public getInjectedProviders(): readonly EIP6963ProviderDetail[] {
+    return InjectedProvidersManager.getInstance().getProviders();
+  }
+
+  /**
+   * Finds an injected provider by its RDNS.
+   * @param {rdns: string} args - The parameters for finding the injected provider.
+   * @returns {EIP6963ProviderDetail | undefined} - The found provider and metadata or undefined.
+   */
+  public findInjectedProvider(args: { rdns: string }): EIP6963ProviderDetail | undefined {
+    return InjectedProvidersManager.getInstance().findProvider(args);
   }
 
   /**

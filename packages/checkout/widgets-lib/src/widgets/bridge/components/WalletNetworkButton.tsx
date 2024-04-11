@@ -1,7 +1,7 @@
 import {
   Body, Box, Button, FramedImage, Heading, Logo,
 } from '@biom3/react';
-import { ChainId, WalletProviderRdns } from '@imtbl/checkout-sdk';
+import { ChainId, EIP6963ProviderDetail, WalletProviderRdns } from '@imtbl/checkout-sdk';
 import { getChainNameById } from 'lib/chains';
 import { networkIcon } from 'lib';
 import { Web3Provider } from '@ethersproject/providers';
@@ -16,12 +16,12 @@ import {
   wcWalletLogoStyles,
 } from './WalletNetworkButtonStyles';
 import { RawImage } from '../../../components/RawImage/RawImage';
-import { EIP1193Provider, EIP6963ProviderDetail, isWalletConnectProvider } from '../../../lib/provider';
+import { isWalletConnectProvider } from '../../../lib/provider';
 
 interface WalletNetworkButtonProps {
   testId: string;
   walletProvider: Web3Provider;
-  walletProviderDetail: EIP6963ProviderDetail<EIP1193Provider> | undefined;
+  walletProviderDetail: EIP6963ProviderDetail | undefined;
   walletAddress: string;
   walletName: string,
   chainId: ChainId;

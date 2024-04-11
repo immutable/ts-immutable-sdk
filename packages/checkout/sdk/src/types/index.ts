@@ -4,6 +4,8 @@ export * from './cancel';
 export * from './chains';
 export * from './config';
 export * from './connect';
+export * from './eip1193';
+export * from './eip6963';
 export * from './fees';
 export * from './gasEstimate';
 export * from './network';

@@ -1,7 +1,6 @@
-import { EIP1193Provider } from '../types/eip1193';
-import { EIP6963AnnounceProviderEvent, EIP6963ProviderDetail } from '../types/eip6963';
+import { EIP6963AnnounceProviderEvent, EIP6963ProviderDetail } from '../../types/eip6963';
 
-export type AnnounceProviderParameters = EIP6963ProviderDetail<EIP1193Provider, string>;
+export type AnnounceProviderParameters = EIP6963ProviderDetail;
 export type AnnounceProviderReturnType = () => void;
 
 /**

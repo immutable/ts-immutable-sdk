@@ -1,6 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { createContext } from 'react';
-import { Checkout, WalletProviderName } from '@imtbl/checkout-sdk';
+import { Checkout, EIP6963ProviderInfo, WalletProviderName } from '@imtbl/checkout-sdk';
 import { Passport } from '@imtbl/passport';
 
 export interface ConnectState {
@@ -8,6 +8,7 @@ export interface ConnectState {
   provider: Web3Provider | null;
   passport: Passport | undefined;
   walletProviderName: WalletProviderName | null;
+  walletProviderInfo: EIP6963ProviderInfo | null;
   sendCloseEvent: () => void;
 }
 
@@ -15,6 +16,7 @@ export const initialConnectState: ConnectState = {
   checkout: null,
   provider: null,
   passport: undefined,
+  walletProviderInfo: null,
   walletProviderName: null,
   sendCloseEvent: () => {},
 };
