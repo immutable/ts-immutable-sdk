@@ -31,7 +31,7 @@ export const defaultClientConfig: ClientConfig = {
   currencyConversion: {},
 };
 
-export type ClientConfigError = {
+export type ConfigError = {
   type: SaleErrorTypes;
   data?: Record<string, unknown>;
 };
@@ -48,10 +48,10 @@ export const useClientConfig = ({
   >();
   const [clientConfig, setClientConfig] = useState<ClientConfig>(defaultClientConfig);
   const [clientConfigError, setClientConfigError] = useState<
-  ClientConfigError | undefined
+  ConfigError | undefined
   >(undefined);
   const [checkoutError, setCheckoutError] = useState<
-  ClientConfigError | undefined
+  ConfigError | undefined
   >(undefined);
   const [allCurrencies, setAllCurrencies] = useState<SaleWidgetCurrency[]>([]);
 
