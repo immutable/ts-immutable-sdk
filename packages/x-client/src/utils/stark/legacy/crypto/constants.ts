@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import BN from 'bn.js';
-// import { curves, ec as Ec } from 'elliptic';
-import * as elliptic from 'elliptic';
+// @ts-ignore
+import elliptic from 'elliptic';
 import hashJS from 'hash.js';
 
 import { constantPointsHex } from './points';
