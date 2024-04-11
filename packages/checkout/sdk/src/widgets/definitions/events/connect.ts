@@ -1,5 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { WalletProviderName } from '../../../types';
+import { EIP6963ProviderInfo, WalletProviderName } from '../../../types';
 
 /**
  * Enum representing possible Connect Widget event types.
@@ -21,6 +21,8 @@ export type ConnectionSuccess = {
   provider: Web3Provider;
   /** The wallet provider name of the connected provider. */
   walletProviderName: WalletProviderName | undefined;
+  /** The wallet provider EIP-6963 metadata. */
+  walletProviderInfo: EIP6963ProviderInfo | undefined;
 };
 
 /**

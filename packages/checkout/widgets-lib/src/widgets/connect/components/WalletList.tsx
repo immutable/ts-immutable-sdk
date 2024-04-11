@@ -1,7 +1,7 @@
 import { Box } from '@biom3/react';
 import {
   ChainId,
-  CheckoutErrorType,
+  CheckoutErrorType, EIP6963ProviderDetail,
   WalletProviderName, WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
 import {
@@ -27,8 +27,6 @@ import { useWalletConnect } from '../../../lib/hooks/useWalletConnect';
 import { useInjectedProviders } from '../../../lib/hooks/useInjectedProviders';
 import { walletListStyle } from './WalletListStyles';
 import {
-  EIP1193Provider,
-  EIP6963ProviderDetail,
   getProviderSlugFromRdns,
   isPassportProvider,
 } from '../../../lib/provider';
@@ -222,7 +220,7 @@ export function WalletList(props: WalletListProps) {
   };
 
   const handleWalletItemClick = useCallback(
-    async (providerDetail: EIP6963ProviderDetail<EIP1193Provider>) => {
+    async (providerDetail: EIP6963ProviderDetail) => {
       setShowChangedYourMindDrawer(false);
       setShowUnableToConnectDrawer(false);
       setChosenProviderDetail(providerDetail);

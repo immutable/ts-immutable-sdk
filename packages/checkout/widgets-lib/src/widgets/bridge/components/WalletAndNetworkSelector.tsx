@@ -32,7 +32,7 @@ import {
   brigdeWalletWrapperStyles,
   submitButtonWrapperStyles,
 } from './WalletAndNetworkSelectorStyles';
-import { BridgeActions, BridgeContext, WalletProviderInfo } from '../context/BridgeContext';
+import { BridgeActions, BridgeContext } from '../context/BridgeContext';
 import { NetworkItem } from './NetworkItem';
 import { WalletNetworkButton } from './WalletNetworkButton';
 import { WalletDrawer } from '../../../components/WalletDrawer/WalletDrawer';
@@ -356,13 +356,13 @@ export function WalletAndNetworkSelector() {
         from: {
           web3Provider: fromWalletWeb3Provider,
           walletAddress: fromWalletAddress.toLowerCase(),
-          walletProviderInfo: fromWallet?.providerDetail.info as WalletProviderInfo,
+          walletProviderInfo: fromWallet?.providerDetail.info,
           network: fromNetwork,
         },
         to: {
           web3Provider: toWalletWeb3Provider,
           walletAddress: toWalletAddress.toLowerCase(),
-          walletProviderInfo: toWallet?.providerDetail.info as WalletProviderInfo,
+          walletProviderInfo: toWallet?.providerDetail.info,
           network: toNetwork,
         },
       },

@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Checkout, WalletProviderRdns } from '@imtbl/checkout-sdk';
-import { Web3Provider } from '@ethersproject/providers';
 import {
+  Checkout,
   EIP1193Provider,
   EIP6963ProviderDetail,
+  WalletProviderRdns,
+} from '@imtbl/checkout-sdk';
+import { Web3Provider } from '@ethersproject/providers';
+import { getMetaMaskProviderDetail, getPassportProviderDetail } from '@imtbl/checkout-sdk/dist/provider/providerDetail';
+import {
   InjectedProvidersManager,
 } from '../provider';
-import { getMetaMaskProviderDetail, getPassportProviderDetail } from '../provider/providerDetail';
 
 const DEFAULT_PRIORITY_INDEX = 999;
 
@@ -30,7 +33,7 @@ declare global {
 let passportWeb3Provider: Web3Provider;
 const processProviders = (
   checkout: Checkout | null,
-  injectedProviders: EIP6963ProviderDetail<EIP1193Provider>[],
+  injectedProviders: EIP6963ProviderDetail[],
   priorityWalletRdns: WalletProviderRdns | string[] = [],
   blacklistWalletRdns: WalletProviderRdns | string[] = [],
 ) => {
@@ -75,7 +78,7 @@ export const useInjectedProviders = ({ checkout }: UseInjectedProvidersParams) =
     providers.find((provider) => provider.info.rdns === rdns)
   ), [providers]);
 
-  const filterAndProcessProviders = useCallback(async (injectedProviders: EIP6963ProviderDetail<EIP1193Provider>[]) => {
+  const filterAndProcessProviders = useCallback(async (injectedProviders: EIP6963ProviderDetail[]) => {
     const connectConfig = await checkout?.config.remote.getConfig('connect') as ConnectConfig;
     const priorityWalletRdns = connectConfig.injected?.priorityWalletRdns ?? [];
     const blacklistWalletRdns = connectConfig.injected?.blacklistWalletRdns ?? [];
@@ -95,7 +98,7 @@ export const useInjectedProviders = ({ checkout }: UseInjectedProvidersParams) =
         await filterAndProcessProviders(injectedProviders);
       });
 
-    filterAndProcessProviders(InjectedProvidersManager.getInstance().getProviders());
+    filterAndProcessProviders([...InjectedProvidersManager.getInstance().getProviders()]);
     return () => cancelSubscription();
   }, []);
 

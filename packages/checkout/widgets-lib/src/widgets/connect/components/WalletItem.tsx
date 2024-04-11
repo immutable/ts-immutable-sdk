@@ -1,16 +1,16 @@
 import { MenuItem } from '@biom3/react';
 import { useTranslation } from 'react-i18next';
 import { ReactElement, useState } from 'react';
-import { WalletProviderName } from '@imtbl/checkout-sdk';
+import { EIP6963ProviderDetail, WalletProviderName } from '@imtbl/checkout-sdk';
 import { RawImage } from '../../../components/RawImage/RawImage';
-import { EIP1193Provider, EIP6963ProviderDetail, getProviderSlugFromRdns } from '../../../lib/provider';
+import { getProviderSlugFromRdns } from '../../../lib/provider';
 import useIsSmallScreen from '../../../lib/hooks/useIsSmallScreen';
 
 export interface WalletProps<RC extends ReactElement | undefined = undefined> {
   loading?: boolean;
   recommended?: boolean;
-  onWalletItemClick: (providerDetail: EIP6963ProviderDetail<EIP1193Provider>) => void;
-  providerDetail: EIP6963ProviderDetail<EIP1193Provider>;
+  onWalletItemClick: (providerDetail: EIP6963ProviderDetail) => void;
+  providerDetail: EIP6963ProviderDetail;
   rc?: RC;
 }
 
