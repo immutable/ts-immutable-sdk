@@ -175,13 +175,6 @@ describe('sortAndDeduplicateCurrencies', () => {
         currencyType: SaleWidgetCurrencyType.SWAPPABLE,
       },
       {
-        name: 'USDC',
-        symbol: 'USDC',
-        address: '0x3B2d8A1931736Fc321C24864BceEe981B11c3c57',
-        decimals: 6,
-        currencyType: SaleWidgetCurrencyType.SWAPPABLE,
-      },
-      {
         name: 'Monopoly',
         symbol: 'MPLY',
         address: '0x5fc1aBC911386e2A9FEfc874ab15E20A3434D2B9',

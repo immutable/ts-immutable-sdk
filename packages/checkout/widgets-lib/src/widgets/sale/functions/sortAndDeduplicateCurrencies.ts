@@ -26,6 +26,13 @@ export const sortAndDeduplicateCurrencies = (
     }
   }
 
+  if (baseCurrency) {
+    const baseCurrencyKey = baseCurrency.name.toLowerCase();
+    if (currenciesMap.has(baseCurrencyKey)) {
+      currenciesMap.delete(baseCurrencyKey);
+    }
+  }
+
   const sortedAndUniqueCurrencies = baseCurrency
     ? [baseCurrency, ...currenciesMap.values()]
     : [...currenciesMap.values()];
