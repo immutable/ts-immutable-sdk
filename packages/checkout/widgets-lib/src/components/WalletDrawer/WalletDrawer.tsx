@@ -3,13 +3,13 @@ import { FormControlWrapper } from 'components/FormComponents/FormControlWrapper
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { EIP1193Provider, EIP6963ProviderDetail } from '@imtbl/checkout-sdk';
-import { walletConnectProviderInfo } from '@imtbl/checkout-sdk/dist/provider/providerDetail';
 import { WalletItem } from './WalletItem';
 import { walletItemListStyles } from './WalletDrawerStyles';
 import { WalletConnectItem } from './WalletConnectItem';
 import { useWalletConnect } from '../../lib/hooks/useWalletConnect';
 import { WalletChangeEvent } from './WalletDrawerEvents';
 import { listItemVariants, listVariants } from '../../lib/animation/listAnimation';
+import { walletConnectProviderInfo } from '../../lib/walletConnect';
 
 interface WalletDrawerProps {
   testId: string;

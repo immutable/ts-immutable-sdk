@@ -111,6 +111,9 @@ export class Checkout {
     this.availability = availabilityService(this.config.isDevelopment, this.config.isProduction);
     this.passport = config.passport;
 
+    // Initialise injected providers via EIP-6963
+    InjectedProvidersManager.getInstance().initialise();
+
     track('checkout_sdk', 'initialised');
   }
 
@@ -255,6 +258,14 @@ export class Checkout {
    */
   public findInjectedProvider(args: { rdns: string }): EIP6963ProviderDetail | undefined {
     return InjectedProvidersManager.getInstance().findProvider(args);
+  }
+
+  /**
+   * Subscribes to changes in the injected providers.
+   * @param listener - The listener to be called when the injected providers change.
+   */
+  public onInjectedProvidersChange(listener: (providers: EIP6963ProviderDetail[]) => void) {
+    return InjectedProvidersManager.getInstance().subscribe(listener);
   }
 
   /**
