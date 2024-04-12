@@ -22,7 +22,7 @@ type UseClientConfigParams = {
   environmentId: string;
   checkout: Checkout | undefined;
   provider: Web3Provider | undefined;
-  defaultCurrency?: string;
+  defaultCurrency?: 'USDC';
 };
 
 export const defaultClientConfig: ClientConfig = {
@@ -125,9 +125,9 @@ export const useClientConfig = ({
   useEffect(() => {
     if (clientConfig.currencies.length === 0) return;
 
-    const selectedSettlementCurrency = clientConfig.currencies.find((c) => c.name === defaultCurrency)
+    const defaultSelectedCurrency = clientConfig.currencies.find((c) => c.name === defaultCurrency)
       || clientConfig.currencies.find((c) => c.base);
-    setSelectedCurrency(selectedSettlementCurrency);
+    setSelectedCurrency(defaultSelectedCurrency);
   }, [defaultCurrency, clientConfig]);
 
   return {
