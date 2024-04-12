@@ -3,39 +3,38 @@ import { SaleWidgetCurrency, SaleWidgetCurrencyType } from '../types';
 export const sortAndDeduplicateCurrencies = (
   currencies: SaleWidgetCurrency[],
 ): SaleWidgetCurrency[] => {
-  const currenciesMap = new Map<string, SaleWidgetCurrency>();
+  const settlementCurrencies = new Map<string, SaleWidgetCurrency>();
+  const swappableCurrencies = new Map<string, SaleWidgetCurrency>();
 
   let baseCurrency: SaleWidgetCurrency | undefined;
 
   for (const currency of currencies) {
     const currencyNameKey = currency.name.toLowerCase();
     if (
-      currency.base && currency.currencyType === SaleWidgetCurrencyType.SETTLEMENT
+      currency.base
+      && currency.currencyType === SaleWidgetCurrencyType.SETTLEMENT
     ) {
       if (!baseCurrency) {
         baseCurrency = currency;
       }
-    } else {
-      const existingCurrency = currenciesMap.get(currencyNameKey);
-      if (
-        !existingCurrency || (existingCurrency.currencyType === SaleWidgetCurrencyType.SWAPPABLE
-          && currency.currencyType === SaleWidgetCurrencyType.SETTLEMENT)
-      ) {
-        currenciesMap.set(currencyNameKey, currency);
+    }
+
+    if (baseCurrency?.name !== currency.name) {
+      if (currency.currencyType === SaleWidgetCurrencyType.SETTLEMENT) {
+        settlementCurrencies.set(currencyNameKey, currency);
+      } else if (currency.currencyType === SaleWidgetCurrencyType.SWAPPABLE) {
+        if (!settlementCurrencies.has(currencyNameKey)) {
+          swappableCurrencies.set(currencyNameKey, currency);
+        }
       }
     }
   }
 
-  if (baseCurrency) {
-    const baseCurrencyKey = baseCurrency.name.toLowerCase();
-    if (currenciesMap.has(baseCurrencyKey)) {
-      currenciesMap.delete(baseCurrencyKey);
-    }
-  }
-
-  const sortedAndUniqueCurrencies = baseCurrency
-    ? [baseCurrency, ...currenciesMap.values()]
-    : [...currenciesMap.values()];
+  const sortedAndUniqueCurrencies = [
+    ...(baseCurrency ? [baseCurrency] : []),
+    ...settlementCurrencies.values(),
+    ...swappableCurrencies.values(),
+  ];
 
   return sortedAndUniqueCurrencies;
 };

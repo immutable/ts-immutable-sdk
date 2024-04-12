@@ -5,12 +5,11 @@ describe('sortAndDeduplicateCurrencies', () => {
   it('should remove duplicates and sort currencies by: base -> settlement -> swappable', () => {
     const allCurrencies: SaleWidgetCurrency[] = [
       {
-        base: true,
-        decimals: 6,
-        name: 'USDC',
-        address: '0x3b2d8a1931736fc321c24864bceee981b11c3c57',
-        exchangeId: 'usd-coin',
-        currencyType: SaleWidgetCurrencyType.SETTLEMENT,
+        name: 'Monopoly',
+        symbol: 'MPLY',
+        address: '0x5fc1aBC911386e2A9FEfc874ab15E20A3434D2B9',
+        decimals: 18,
+        currencyType: SaleWidgetCurrencyType.SWAPPABLE,
       },
       {
         base: false,
@@ -57,6 +56,13 @@ describe('sortAndDeduplicateCurrencies', () => {
         currencyType: SaleWidgetCurrencyType.SWAPPABLE,
       },
       {
+        name: 'zkSRE',
+        symbol: 'zkSRE',
+        address: '0x43566cAB87CC147C95e2895E7b972E19993520e4',
+        decimals: 18,
+        currencyType: SaleWidgetCurrencyType.SWAPPABLE,
+      },
+      {
         name: 'zkPSP',
         symbol: 'zkPSP',
         address: '0x88B35dF96CbEDF2946586147557F7D5D0CCE7e5c',
@@ -78,6 +84,14 @@ describe('sortAndDeduplicateCurrencies', () => {
         currencyType: SaleWidgetCurrencyType.SWAPPABLE,
       },
       {
+        base: true,
+        decimals: 6,
+        name: 'USDC',
+        address: '0x3b2d8a1931736fc321c24864bceee981b11c3c57',
+        exchangeId: 'usd-coin',
+        currencyType: SaleWidgetCurrencyType.SETTLEMENT,
+      },
+      {
         name: 'zkCORE',
         symbol: 'zkCORE',
         address: '0x4B96E7b7eA673A996F140d5De411a97b7eab934E',
@@ -89,13 +103,6 @@ describe('sortAndDeduplicateCurrencies', () => {
         symbol: 'USDC',
         address: '0x3B2d8A1931736Fc321C24864BceEe981B11c3c57',
         decimals: 6,
-        currencyType: SaleWidgetCurrencyType.SWAPPABLE,
-      },
-      {
-        name: 'Monopoly',
-        symbol: 'MPLY',
-        address: '0x5fc1aBC911386e2A9FEfc874ab15E20A3434D2B9',
-        decimals: 18,
         currencyType: SaleWidgetCurrencyType.SWAPPABLE,
       },
     ];
@@ -126,6 +133,13 @@ describe('sortAndDeduplicateCurrencies', () => {
         currencyType: SaleWidgetCurrencyType.SETTLEMENT,
       },
       {
+        name: 'Monopoly',
+        symbol: 'MPLY',
+        address: '0x5fc1aBC911386e2A9FEfc874ab15E20A3434D2B9',
+        decimals: 18,
+        currencyType: SaleWidgetCurrencyType.SWAPPABLE,
+      },
+      {
         name: 'Immutable Token',
         symbol: 'IMX',
         address: 'native',
@@ -147,6 +161,13 @@ describe('sortAndDeduplicateCurrencies', () => {
         currencyType: SaleWidgetCurrencyType.SWAPPABLE,
       },
       {
+        name: 'zkSRE',
+        symbol: 'zkSRE',
+        address: '0x43566cAB87CC147C95e2895E7b972E19993520e4',
+        decimals: 18,
+        currencyType: SaleWidgetCurrencyType.SWAPPABLE,
+      },
+      {
         name: 'zkPSP',
         symbol: 'zkPSP',
         address: '0x88B35dF96CbEDF2946586147557F7D5D0CCE7e5c',
@@ -161,23 +182,9 @@ describe('sortAndDeduplicateCurrencies', () => {
         currencyType: SaleWidgetCurrencyType.SWAPPABLE,
       },
       {
-        name: 'zkSRE',
-        symbol: 'zkSRE',
-        address: '0x43566cAB87CC147C95e2895E7b972E19993520e4',
-        decimals: 18,
-        currencyType: SaleWidgetCurrencyType.SWAPPABLE,
-      },
-      {
         name: 'zkCORE',
         symbol: 'zkCORE',
         address: '0x4B96E7b7eA673A996F140d5De411a97b7eab934E',
-        decimals: 18,
-        currencyType: SaleWidgetCurrencyType.SWAPPABLE,
-      },
-      {
-        name: 'Monopoly',
-        symbol: 'MPLY',
-        address: '0x5fc1aBC911386e2A9FEfc874ab15E20A3434D2B9',
         decimals: 18,
         currencyType: SaleWidgetCurrencyType.SWAPPABLE,
       },
