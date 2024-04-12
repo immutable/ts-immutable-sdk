@@ -1,82 +1,140 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { useState, useEffect } from 'react';
+import { Environment } from '@imtbl/config';
+import { Checkout, TokenFilterTypes } from '@imtbl/checkout-sdk';
+import { Web3Provider } from '@ethersproject/providers';
 import { PRIMARY_SALES_API_BASE_URL } from '../utils/config';
-import { ClientConfig, ClientConfigCurrency } from '../types';
 
-type ClientConfigResponse = {
-  contract_id: string;
-  currencies: {
-    name: string;
-    decimals: number;
-    erc20_address: string;
-  }[];
-};
-
-const toClientConfig = (response: ClientConfigResponse): ClientConfig => ({
-  contractId: response.contract_id,
-  currencies: response.currencies.map((c) => ({
-    ...c,
-    erc20Address: c.erc20_address,
-  })),
-});
+import {
+  ClientConfig,
+  ClientConfigCurrency,
+  SaleErrorTypes,
+  SaleWidgetCurrency,
+  SaleWidgetCurrencyType,
+} from '../types';
+import { sortAndDeduplicateCurrencies } from '../functions/sortAndDeduplicateCurrencies';
+import {
+  ClientConfigResponse,
+  transformToClientConfig,
+} from '../functions/transformToClientConfig';
 
 type UseClientConfigParams = {
-  environment: string;
+  environment: Environment;
   environmentId: string;
+  checkout: Checkout | undefined;
+  provider: Web3Provider | undefined;
   defaultCurrency?: 'USDC';
 };
 
 export const defaultClientConfig: ClientConfig = {
   contractId: '',
   currencies: [],
+  currencyConversion: {},
+};
+
+export type ConfigError = {
+  type: SaleErrorTypes;
+  data?: Record<string, unknown>;
 };
 
 export const useClientConfig = ({
   environment,
   environmentId,
+  checkout,
+  provider,
   defaultCurrency,
 }: UseClientConfigParams) => {
-  const [currency, setCurrency] = useState<ClientConfigCurrency | undefined>();
+  const [selectedCurrency, setSelectedCurrency] = useState<
+  ClientConfigCurrency | undefined
+  >();
   const [clientConfig, setClientConfig] = useState<ClientConfig>(defaultClientConfig);
+  const [clientConfigError, setClientConfigError] = useState<
+  ConfigError | undefined
+  >(undefined);
+  const [allCurrencies, setAllCurrencies] = useState<SaleWidgetCurrency[]>([]);
 
   useEffect(() => {
     if (!environment || !environmentId) return;
 
-    (async () => {
-      const baseUrl = `${PRIMARY_SALES_API_BASE_URL[environment]}/${environmentId}/client-config`;
-
+    const fetchSwappableCurrencies = async () => {
+      if (!checkout || !provider) {
+        return [];
+      }
       try {
-        const response = await fetch(baseUrl, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+        const checkoutNetworkInfo = await checkout.getNetworkInfo({
+          provider,
+        });
+        const swapAllowList = await checkout.getTokenAllowList({
+          type: TokenFilterTypes.SWAP,
+          chainId: checkoutNetworkInfo.chainId,
         });
 
-        if (!response.ok) {
-          throw new Error(`${response.status} - ${response.statusText}`);
-        }
+        return swapAllowList.tokens.map((token) => ({
+          ...token,
+          currencyType: SaleWidgetCurrencyType.SWAPPABLE,
+        }));
+      } catch (error) {
+        console.warn("Error fetching swappable currencies", error); // eslint-disable-line
+        return [];
+      }
+    };
+
+    const fetchSettlementCurrencies = async () => {
+      try {
+        const baseUrl = `${PRIMARY_SALES_API_BASE_URL[environment]}/${environmentId}/client-config`;
+        const response = await fetch(baseUrl, {
+          method: 'GET',
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          headers: { 'Content-Type': 'application/json' },
+        });
+
+        if (!response.ok) throw new Error(`${response.status} - ${response.statusText}`);
 
         const data: ClientConfigResponse = await response.json();
+        const config = transformToClientConfig(data);
+        setClientConfig(config);
 
-        setClientConfig(toClientConfig(data));
+        return config.currencies.map((currency) => ({
+          ...currency,
+          currencyType: SaleWidgetCurrencyType.SETTLEMENT,
+        }));
       } catch (error) {
-        // eslint-disable-next-line no-console
-        console.warn('Error fetching client config', error);
+        setClientConfigError({
+          type: SaleErrorTypes.DEFAULT,
+          data: { reason: 'Error fetching settlement currencies' },
+        });
+        return [];
       }
+    };
+
+    (async () => {
+      const [swappableCurrencies, settlementCurrencies] = await Promise.all([
+        fetchSwappableCurrencies(),
+        fetchSettlementCurrencies(),
+      ]);
+
+      const combinedCurrencies: SaleWidgetCurrency[] = [
+        ...settlementCurrencies,
+        ...swappableCurrencies,
+      ];
+
+      const transformedCurrencies = sortAndDeduplicateCurrencies(combinedCurrencies);
+      setAllCurrencies(transformedCurrencies);
     })();
-  }, [environment, environmentId]);
+  }, [environment, environmentId, checkout, provider]);
 
   useEffect(() => {
     if (clientConfig.currencies.length === 0) return;
 
-    const selectedCurrency = clientConfig.currencies.find((c) => c.name === defaultCurrency)
-      || clientConfig.currencies[0];
-    setCurrency(selectedCurrency);
+    const defaultSelectedCurrency = clientConfig.currencies.find((c) => c.name === defaultCurrency)
+      || clientConfig.currencies.find((c) => c.base);
+    setSelectedCurrency(defaultSelectedCurrency);
   }, [defaultCurrency, clientConfig]);
 
   return {
     clientConfig,
-    currency,
+    selectedCurrency,
+    setSelectedCurrency,
+    allCurrencies,
+    clientConfigError,
   };
 };
