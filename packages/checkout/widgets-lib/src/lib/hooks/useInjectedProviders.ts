@@ -3,13 +3,11 @@ import {
   Checkout,
   EIP1193Provider,
   EIP6963ProviderDetail,
+  getMetaMaskProviderDetail,
+  getPassportProviderDetail,
   WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
-import { getMetaMaskProviderDetail, getPassportProviderDetail } from '@imtbl/checkout-sdk/dist/provider/providerDetail';
-import {
-  InjectedProvidersManager,
-} from '../provider';
 
 const DEFAULT_PRIORITY_INDEX = 999;
 
@@ -92,15 +90,16 @@ export const useInjectedProviders = ({ checkout }: UseInjectedProvidersParams) =
   }, [checkout, setProviders]);
 
   useEffect(() => {
-    const cancelSubscription = InjectedProvidersManager
-      .getInstance()
-      .subscribe(async (injectedProviders: EIP6963ProviderDetail[]) => {
+    if (!checkout) return () => {};
+    const cancelSubscription = checkout.onInjectedProvidersChange(
+      async (injectedProviders: EIP6963ProviderDetail[]) => {
         await filterAndProcessProviders(injectedProviders);
-      });
+      },
+    );
 
-    filterAndProcessProviders([...InjectedProvidersManager.getInstance().getProviders()]);
+    filterAndProcessProviders([...checkout.getInjectedProviders()]);
     return () => cancelSubscription();
-  }, []);
+  }, [checkout]);
 
   return {
     findProvider,
