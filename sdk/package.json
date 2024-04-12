@@ -16,6 +16,7 @@
     "@ethersproject/providers": "^5.7.2",
     "@ethersproject/strings": "^5.7.0",
     "@ethersproject/wallet": "^5.7.0",
+    "@imtbl/core-sdk": "^2.7.0",
     "@imtbl/react-analytics": "0.2.1-alpha",
     "@jest/globals": "^29.5.0",
     "@magic-ext/oidc": "4.2.0",
