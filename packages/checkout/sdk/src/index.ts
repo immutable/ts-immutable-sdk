@@ -1,6 +1,9 @@
 // Widgets
 import './widgets/definitions/global';
 
+// FIX: global import to fix CSP unsafe-eval requirement
+import 'regenerator-runtime/runtime';
+
 export * from './widgets/definitions/events';
 export * from './widgets/definitions/types';
 export * from './widgets/definitions/parameters';
