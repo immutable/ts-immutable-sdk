@@ -112,52 +112,12 @@ export interface ProviderEventMap extends Record<string, any> {
   [ProviderEvent.ACCOUNTS_CHANGED]: [AccountsChangedEvent];
 }
 
-export interface EIP1193Provider {
-  request(args: EIP1193RequestArguments): Promise<unknown>;
-  on<TEvent extends keyof EIP1193EventMap>(event: TEvent, listener: EIP1193EventMap[TEvent]): void;
-  removeListener<TEvent extends keyof EIP1193EventMap>(event: TEvent, listener: EIP1193EventMap[TEvent]): void;
-}
-
-interface EIP1193RequestArguments {
-  readonly method: string;
-  readonly params?: readonly unknown[] | object;
-}
-
-export class ProviderRpcError extends Error {
-  code: number;
-
-  details: string;
-
-  constructor(code: number, message: string) {
-    super(message);
-    this.code = code;
-    this.details = message;
-  }
-}
-
-export type ProviderConnectInfo = {
-  chainId: string
-};
-
-export type ProviderMessage = {
-  type: string
-  data: unknown
-};
-
-export type EIP1193EventMap = {
-  accountsChanged(accounts: string[]): void
-  chainChanged(chainId: string): void
-  connect(connectInfo: ProviderConnectInfo): void
-  disconnect(error: ProviderRpcError): void
-  message(message: ProviderMessage): void
-};
-
 /**
  * Event detail from the `eip6963:announceProvider` event.
  */
 export interface EIP6963ProviderDetail {
   info: EIP6963ProviderInfo;
-  provider: EIP1193Provider;
+  provider: Provider;
 }
 
 /**
