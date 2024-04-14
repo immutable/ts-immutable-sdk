@@ -172,7 +172,9 @@ export function SaleContextProvider(props: {
   >(undefined);
 
   const [fundingRoutes, setFundingRoutes] = useState<FundingRoute[]>([]);
-  const [disabledPaymentTypes, setDisabledPaymentTypes] = useState<SalePaymentTypes[]>([]);
+  const [disabledPaymentTypes, setDisabledPaymentTypes] = useState<
+  SalePaymentTypes[]
+  >([]);
 
   const disablePaymentTypes = (types: SalePaymentTypes[]) => {
     setDisabledPaymentTypes((prev) => Array.from(new Set([...(prev || []), ...types])));
@@ -180,12 +182,16 @@ export function SaleContextProvider(props: {
 
   const [invalidParameters, setInvalidParameters] = useState<boolean>(false);
 
-  const { currency, clientConfig } = useClientConfig({
+  const {
+    selectedCurrency, clientConfig, clientConfigError,
+  } = useClientConfig({
     environmentId,
     environment: config.environment,
+    checkout,
+    provider,
   });
 
-  const fromTokenAddress = currency?.erc20Address || '';
+  const fromTokenAddress = selectedCurrency?.address || '';
 
   const goBackToPaymentMethods = useCallback(
     (type?: SalePaymentTypes | undefined, data?: Record<string, unknown>) => {
@@ -303,6 +309,11 @@ export function SaleContextProvider(props: {
     goToErrorView(signError.type, signError.data);
   }, [signError]);
 
+  useEffect(() => {
+    if (!clientConfigError) return;
+    goToErrorView(clientConfigError.type, clientConfigError.data);
+  }, [clientConfigError]);
+
   const { smartCheckout, smartCheckoutResult, smartCheckoutError } = useSmartCheckout({
     provider,
     checkout,
@@ -327,7 +338,7 @@ export function SaleContextProvider(props: {
             data: getTopUpViewData(
               smartCheckoutError,
               fromTokenAddress,
-              currency?.name!,
+              selectedCurrency?.name!,
             ),
           },
         },
