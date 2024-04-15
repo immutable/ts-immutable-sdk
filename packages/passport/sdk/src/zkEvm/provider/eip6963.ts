@@ -12,7 +12,7 @@ export const passportProviderInfo = {
 export function announceProvider(
   detail: EIP6963ProviderDetail,
 ) {
-  if (!window) return;
+  if (typeof window === 'undefined') return;
   const event: CustomEvent<EIP6963ProviderDetail> = new CustomEvent(
     'eip6963:announceProvider',
     { detail: Object.freeze(detail) },
