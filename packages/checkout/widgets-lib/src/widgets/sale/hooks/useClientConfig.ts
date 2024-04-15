@@ -126,7 +126,7 @@ export const useClientConfig = ({
     if (clientConfig.currencies.length === 0) return;
 
     const defaultSelectedCurrency = clientConfig.currencies.find((c) => c.name === defaultCurrency)
-      || clientConfig.currencies.find((c) => c.base);
+      || clientConfig.currencies.find((c) => c.base) || clientConfig.currencies?.[0];
     setSelectedCurrency(defaultSelectedCurrency);
   }, [defaultCurrency, clientConfig]);
 
