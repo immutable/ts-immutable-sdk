@@ -105,8 +105,16 @@ export const MainPage = () => {
   }, [walletWidget, bridgeWidget, onRampWidget, swapWidget]);
 
   // button click functions to open/close widgets
-  const openConnectWidget = useCallback((targetChainId?: ChainId) => {
-    connectWidget.mount('connect-target', {targetChainId: targetChainId});
+  const openConnectWidget = useCallback((targetChainId?: ChainId, blockWallets: boolean = false) => {
+    const connectParams = {targetChainId: targetChainId};
+    if (blockWallets) {
+      connectParams.blocklistWalletRdns = [
+        'com.immutable.passport',
+        'io.metamask',
+        'xyz.frontier.wallet',
+      ];
+    }
+    connectWidget.mount('connect-target', connectParams);
   }, [connectWidget])
 
   const openWalletWidget = useCallback(() => {
@@ -164,6 +172,7 @@ export const MainPage = () => {
         <Box sx={{ padding: 'base.spacing.x4', display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', gap: 'base.spacing.x6', alignItems: 'center', flexWrap: 'wrap' }}>
           <Button onClick={() => openConnectWidget()}>Connect</Button>
           <Button onClick={() => openConnectWidget(checkout.config.isProduction ? ChainId.ETHEREUM : ChainId.SEPOLIA)}>Connect (Layer 1)</Button>
+          <Button onClick={() => openConnectWidget(undefined, true)}>Connect (Blocked)</Button>
           <Button onClick={openWalletWidget}>Wallet</Button>
           <Button onClick={openSwapWidget}>Swap</Button>
           <Button onClick={openBridgeWidget}>Bridge</Button>
