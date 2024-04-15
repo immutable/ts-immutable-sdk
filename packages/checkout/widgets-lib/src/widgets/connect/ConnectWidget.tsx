@@ -60,6 +60,7 @@ export default function ConnectWidget({
   checkout,
   targetChainId,
   allowedChains,
+  blocklistWalletRdns,
   deepLink = ConnectWidgetViews.CONNECT_WALLET,
 }: ConnectWidgetInputs) {
   const { t } = useTranslation();
@@ -186,7 +187,11 @@ export default function ConnectWidget({
             <LoadingView loadingText="Loading" />
           )}
           {view.type === ConnectWidgetViews.CONNECT_WALLET && (
-            <ConnectWallet targetChainId={targetChain} allowedChains={allowedChains ?? [targetChain]} />
+            <ConnectWallet
+              targetChainId={targetChain}
+              allowedChains={allowedChains ?? [targetChain]}
+              blocklistWalletRdns={blocklistWalletRdns}
+            />
           )}
           {view.type === ConnectWidgetViews.SWITCH_NETWORK && isZkEvmChainId(targetChain) && (
             <SwitchNetworkZkEVM />
