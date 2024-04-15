@@ -1,6 +1,6 @@
 import {
   useCallback,
-  useContext, useEffect, useMemo, useRef, useState,
+  useContext, useEffect, useMemo, useState,
 } from 'react';
 import {
   Body, Box, Heading, OptionKey,
@@ -116,7 +116,7 @@ export function SwapForm({ data, theme }: SwapFromProps) {
   const defaultTokenImage = getDefaultTokenImage(checkout?.config.environment, theme);
 
   const formatTokenOptionsId = useCallback((symbol: string, address?: string) => (isNativeToken(address)
-    ? `${symbol.toLowerCase()}-${NATIVE}`
+    ? NATIVE
     : `${symbol.toLowerCase()}-${address!.toLowerCase()}`), []);
 
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
@@ -126,7 +126,6 @@ export function SwapForm({ data, theme }: SwapFromProps) {
   const [loading, setLoading] = useState(false);
   const [conversion, setConversion] = useState(BigNumber.from(0));
   const [swapFromToConversionText, setSwapFromToConversionText] = useState('');
-  const hasSetDefaultState = useRef(false);
 
   const { track } = useAnalytics();
 
@@ -182,31 +181,27 @@ export function SwapForm({ data, theme }: SwapFromProps) {
     setTokensOptionsForm(fromOptions);
 
     // Set initial token options if provided
-    if (!hasSetDefaultState.current) {
-      hasSetDefaultState.current = true;
-
-      if (data?.fromTokenAddress) {
-        setFromToken(
-          allowedTokens.find((token) => (isNativeToken(token.address)
+    if (data?.fromTokenAddress && !fromToken) {
+      setFromToken(
+        allowedTokens.find((token) => (isNativeToken(token.address)
             && data?.fromTokenAddress?.toLowerCase() === NATIVE)
             || token.address?.toLowerCase()
             === data?.fromTokenAddress?.toLowerCase()),
-        );
-        setFromBalance(
-          tokenBalances.find(
-            (tokenBalance) => (
-              isNativeToken(tokenBalance.token.address)
+      );
+      setFromBalance(
+        tokenBalances.find(
+          (tokenBalance) => (
+            isNativeToken(tokenBalance.token.address)
               && data?.fromTokenAddress?.toLowerCase() === NATIVE)
               || (tokenBalance.token.address?.toLowerCase() === data?.fromTokenAddress?.toLowerCase()),
-          )?.formattedBalance ?? '',
-        );
-      }
+        )?.formattedBalance ?? '',
+      );
+    }
 
-      if (shouldSetToAddress(data?.toTokenAddress, data?.fromTokenAddress)) {
-        setToToken(allowedTokens.find((token) => (
-          isNativeToken(token.address) && data?.toTokenAddress?.toLowerCase() === NATIVE
-        ) || (token.address?.toLowerCase() === data?.toTokenAddress?.toLowerCase())));
-      }
+    if (shouldSetToAddress(data?.toTokenAddress, data?.fromTokenAddress) && !toToken) {
+      setToToken(allowedTokens.find((token) => (
+        isNativeToken(token.address) && data?.toTokenAddress?.toLowerCase() === NATIVE
+      ) || (token.address?.toLowerCase() === data?.toTokenAddress?.toLowerCase())));
     }
   }, [
     tokenBalances,
@@ -214,7 +209,6 @@ export function SwapForm({ data, theme }: SwapFromProps) {
     cryptoFiatState.conversions,
     data?.fromTokenAddress,
     data?.toTokenAddress,
-    hasSetDefaultState.current,
     setFromToken,
     setFromBalance,
     setToToken,
