@@ -3,6 +3,11 @@
 /* eslint-disable class-methods-use-this */
 import axios, { AxiosResponse } from 'axios';
 import { ethers } from 'ethers';
+import { CHILD_ERC20 } from 'contracts/ABIs/ChildERC20';
+import {
+  concat, defaultAbiCoder, hexlify, keccak256, zeroPad,
+} from 'ethers/lib/utils';
+import { ROOT_AXELAR_ADAPTOR } from 'contracts/ABIs/RootAxelarBridgeAdaptor';
 import {
   NATIVE,
   ETHEREUM_NATIVE_TOKEN_ADDRESS,
@@ -15,6 +20,15 @@ import {
   tenderlyAPIEndpoints,
   axelarChains,
   bridgeMethods,
+  childWIMXs,
+  rootIMXs,
+  WITHDRAW_SIG,
+  childAdaptors,
+  rootAdaptors,
+  childChains,
+  SLOT_PREFIX_CONTRACT_CALL_APPROVED,
+  SLOT_POS_CONTRACT_CALL_APPROVED,
+  axelarGateways,
 } from './constants/bridges';
 import { ROOT_ERC20_BRIDGE_FLOW_RATE } from './contracts/ABIs/RootERC20BridgeFlowRate';
 import { ERC20 } from './contracts/ABIs/ERC20';
@@ -54,6 +68,7 @@ import {
   BridgeBundledTxRequest,
   BridgeBundledTxResponse,
   DynamicGasEstimatesResponse,
+  Address,
 } from './types';
 import { GMPStatus, GMPStatusResponse, GasPaidStatus } from './types/axelar';
 import { queryTransactionStatus } from './lib/gmpRecovery';
@@ -169,7 +184,7 @@ export class TokenBridge {
     let bridgeFee: ethers.BigNumber = ethers.BigNumber.from(0);
     const imtblFee: ethers.BigNumber = ethers.BigNumber.from(0);
 
-    if ('token' in req && req.token !== 'NATIVE') {
+    if ('token' in req && req.token !== NATIVE) {
       let approvalLimit = BridgeMethodsGasLimit.APPROVE_TOKEN;
       if (req.token === 'USDC') {
         approvalLimit = BridgeMethodsGasLimit.APPROVE_TOKEN_USDC;
@@ -195,7 +210,7 @@ export class TokenBridge {
 
       let sourceLimit = BridgeMethodsGasLimit[`${req.action}_SOURCE`];
       if ('token' in req && req.action === 'DEPOSIT') {
-        if (req.token === 'NATIVE') {
+        if (req.token === NATIVE) {
           sourceLimit = BridgeMethodsGasLimit.DEPOSIT_SOURCE_ETH;
         } else if (req.token === 'USDC') {
           sourceLimit = BridgeMethodsGasLimit.DEPOSIT_SOURCE_USDC;
@@ -253,7 +268,7 @@ export class TokenBridge {
 
     const gasPriceInWei = getGasPriceInWei(feeData) ?? ethers.BigNumber.from(0);
 
-    const txValue = (token.toUpperCase() !== 'NATIVE') ? bridgeFee.toString() : amount.add(bridgeFee).toString();
+    const txValue = (token.toUpperCase() !== NATIVE) ? bridgeFee.toString() : amount.add(bridgeFee).toString();
 
     return {
       data,
@@ -350,7 +365,7 @@ export class TokenBridge {
     );
 
     // If the token is NATIVE, no approval is required
-    if (req.token.toUpperCase() === 'NATIVE') {
+    if (req.token.toUpperCase() === NATIVE) {
       return {
         contractToApprove: null,
         unsignedTx: null,
@@ -466,7 +481,7 @@ export class TokenBridge {
   ) {
     const getContractRes = await this.getBridgeContract(sourceChainId);
     // Handle return if it is a native token
-    if (token.toUpperCase() === 'NATIVE') {
+    if (token.toUpperCase() === NATIVE) {
       // Encode the function data into a payload
       let data: string;
       if (sender === recipient) {
@@ -629,7 +644,13 @@ export class TokenBridge {
       );
     }
     // Withdraw request
-    return this.getUnsignedBridgeWithdrawBundledTxPrivate();
+    return this.getUnsignedBridgeWithdrawBundledTxPrivate(
+      req.senderAddress,
+      req.recipientAddress,
+      req.token,
+      req.amount,
+      req.gasMultiplier,
+    );
   }
 
   private async getUnsignedBridgeDepositBundledTxPrivate(
@@ -718,19 +739,97 @@ export class TokenBridge {
     };
   }
 
-  private async getUnsignedBridgeWithdrawBundledTxPrivate(): Promise<BridgeBundledTxResponse> {
-    // TODO
+  private async getUnsignedBridgeWithdrawBundledTxPrivate(
+    sender: string,
+    recipient: string,
+    token: FungibleToken,
+    amount: ethers.BigNumber,
+    gasMultiplier: number,
+  ): Promise<BridgeBundledTxResponse> {
+    const [allowance, feeData, rootGas] = await Promise.all([
+      this.getAllowance(this.config.bridgeInstance.childChainID, token, sender),
+      this.config.childProvider.getFeeData(),
+      await this.getDynamicWithdrawGas(
+        this.config.bridgeInstance.rootChainID,
+        sender,
+        recipient,
+        token,
+        amount,
+      ),
+    ]);
+    // Get axelar fee
+    const axelarFee = await this.getAxelarFee(
+      this.config.bridgeInstance.childChainID,
+      this.config.bridgeInstance.rootChainID,
+      rootGas,
+      gasMultiplier,
+    );
+
+    let contractToApprove: string | null;
+    let unsignedApprovalTx: ethers.providers.TransactionRequest | null;
+    let sourceChainFee: ethers.BigNumber = ethers.BigNumber.from(0);
+    let approvalFee: ethers.BigNumber = ethers.BigNumber.from(0);
+    const bridgeFee: ethers.BigNumber = axelarFee;
+    const imtblFee: ethers.BigNumber = ethers.BigNumber.from(0);
+
+    // Approval required only for WIMX tokens with insufficient allowance.
+    if (token.toUpperCase() === this.getWrappedIMX(this.config.bridgeInstance.childChainID).toUpperCase()
+      && allowance.lt(amount)) {
+      contractToApprove = token;
+      const erc20Contract: ethers.Contract = await withBridgeError<ethers.Contract>(
+        async () => new ethers.Contract(token, ERC20, this.config.childProvider),
+        BridgeErrorType.PROVIDER_ERROR,
+      );
+      const data: string = await withBridgeError<string>(async () => erc20Contract.interface
+        .encodeFunctionData('approve', [
+          this.config.bridgeContracts.childERC20Bridge,
+          amount.sub(allowance),
+        ]), BridgeErrorType.INTERNAL_ERROR);
+      unsignedApprovalTx = {
+        data,
+        to: token,
+        value: 0,
+        from: sender,
+        chainId: parseInt(this.config.bridgeInstance.childChainID, 10),
+      };
+      approvalFee = this.calculateGasFee(feeData, BridgeMethodsGasLimit.APPROVE_TOKEN);
+    } else {
+      contractToApprove = null;
+      unsignedApprovalTx = null;
+    }
+
+    // Withdraw transaction & fees.
+    const txData = await this.getTxData(
+      sender,
+      recipient,
+      amount,
+      token,
+      this.config.bridgeInstance.childChainID,
+    );
+    const txValue = (token.toUpperCase() === NATIVE)
+      ? amount.add(bridgeFee).toString() : bridgeFee.toString();
+    const unsignedBridgeTx : ethers.providers.TransactionRequest = {
+      data: txData,
+      to: this.config.bridgeContracts.rootERC20BridgeFlowRate,
+      value: txValue,
+      from: sender,
+      chainId: parseInt(this.config.bridgeInstance.rootChainID, 10),
+    };
+    sourceChainFee = this.calculateGasFee(feeData, BridgeMethodsGasLimit.WITHDRAW_SOURCE);
+
+    const totalFees: ethers.BigNumber = sourceChainFee.add(approvalFee).add(bridgeFee).add(imtblFee);
+
     return {
       feeData: {
-        sourceChainGas: ethers.BigNumber.from(0),
-        approvalFee: ethers.BigNumber.from(0),
-        bridgeFee: ethers.BigNumber.from(0),
-        imtblFee: ethers.BigNumber.from(0),
-        totalFees: ethers.BigNumber.from(0),
+        sourceChainGas: sourceChainFee,
+        approvalFee,
+        bridgeFee,
+        imtblFee,
+        totalFees,
       },
-      contractToApprove: null,
-      unsignedApprovalTx: null,
-      unsignedBridgeTx: {},
+      contractToApprove,
+      unsignedApprovalTx,
+      unsignedBridgeTx,
     };
   }
 
@@ -799,7 +898,7 @@ export class TokenBridge {
       sourceChainId,
     );
 
-    const txValue = (token.toUpperCase() !== 'NATIVE')
+    const txValue = (token.toUpperCase() !== NATIVE)
       ? fees.bridgeFee.toString() : amount.add(fees.bridgeFee).toString();
 
     return {
@@ -888,7 +987,7 @@ export class TokenBridge {
     );
 
     // tx value for simulation mocked as amount + 1 wei for a native bridge and 1 wei for token bridges
-    const txValue = (token.toUpperCase() !== 'NATIVE') ? '1' : amount.add('1').toString();
+    const txValue = (token.toUpperCase() !== NATIVE) ? '1' : amount.add('1').toString();
 
     simulations.push({
       network_id: sourceChainId,
@@ -901,9 +1000,7 @@ export class TokenBridge {
     });
 
     let axiosResponse:AxiosResponse;
-
     const tenderlyAPI = this.getTenderlyEndpoint(sourceChainId);
-
     try {
       axiosResponse = await axios.post(
         tenderlyAPI,
@@ -971,9 +1068,123 @@ export class TokenBridge {
     return tenderlyGasEstimatesRes;
   }
 
+  public async getDynamicWithdrawGas(
+    destinationChainId: string,
+    sender: string,
+    recipient: string,
+    token: FungibleToken,
+    amount: ethers.BigNumber,
+  ): Promise<number> {
+    let rootToken: string;
+    if (token.toUpperCase() === NATIVE
+      || token.toUpperCase() === this.getWrappedIMX(destinationChainId).toUpperCase()) {
+      rootToken = this.getRootIMX(destinationChainId);
+    } else {
+      // Find root token
+      const erc20Contract: ethers.Contract = await withBridgeError<ethers.Contract>(
+        async () => new ethers.Contract(token, CHILD_ERC20, this.config.childProvider),
+        BridgeErrorType.PROVIDER_ERROR,
+      );
+      rootToken = await withBridgeError<Address>(() => erc20Contract.rootToken(), BridgeErrorType.PROVIDER_ERROR);
+    }
+    // Encode payload
+    const payload = defaultAbiCoder.encode(
+      ['bytes32', 'address', 'address', 'address', 'uint256'],
+      [WITHDRAW_SIG, rootToken, sender, recipient, amount],
+    );
+    // Generate unique command ID based on payload and current time.
+    const commandId = keccak256(
+      defaultAbiCoder.encode(['bytes', 'uint256'], [payload, new Date().getTime()]),
+    );
+    const sourceChain = this.getChildchain(destinationChainId);
+    const sourceAddress = this.getChildAdaptor(destinationChainId);
+    const destinationAddress = this.getRootAdaptor(destinationChainId);
+    const payloadHash = keccak256(payload);
+    // Calculate slot key for given command ID.
+    const command = defaultAbiCoder.encode(
+      ['bytes32', 'bytes32', 'string', 'string', 'address', 'bytes32'],
+      [SLOT_PREFIX_CONTRACT_CALL_APPROVED, commandId, sourceChain, sourceAddress, destinationAddress, payloadHash],
+    );
+    const commandHash = keccak256(command);
+    const slot = keccak256(concat([commandHash, hexlify(zeroPad(hexlify(SLOT_POS_CONTRACT_CALL_APPROVED), 32))]));
+
+    // Encode execute data
+    const axelarAdapterContract: ethers.Contract = await withBridgeError<ethers.Contract>(
+      async () => new ethers.Contract(destinationAddress, ROOT_AXELAR_ADAPTOR, this.config.rootProvider),
+      BridgeErrorType.PROVIDER_ERROR,
+    );
+    const executeData = await withBridgeError<string>(
+      async () => axelarAdapterContract.interface
+        .encodeFunctionData('execute', [commandId, sourceChain, sourceAddress, payload]),
+      BridgeErrorType.INTERNAL_ERROR,
+    );
+
+    // Build simulation
+    const axelarGateway = this.getAxelarGateway(destinationChainId);
+    const simulations = [{
+      network_id: destinationChainId,
+      estimate_gas: true,
+      simulation_type: 'quick',
+      from: sender,
+      to: destinationAddress,
+      input: executeData,
+      state_objects: {
+        [axelarGateway]: {
+          storage: {
+            // Override storage to approve this command.
+            [slot]: '0x0000000000000000000000000000000000000000000000000000000000000001',
+          },
+        },
+      },
+    }];
+
+    let axiosResponse:AxiosResponse;
+    const tenderlyAPI = this.getTenderlyEndpoint(destinationChainId);
+    try {
+      axiosResponse = await axios.post(
+        tenderlyAPI,
+        {
+          simulations,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+    } catch (error: any) {
+      axiosResponse = error.response;
+    }
+
+    if (axiosResponse.data.error) {
+      throw new BridgeError(
+        `Estimating gas failed with the reason: ${axiosResponse.data.error.message}`,
+        BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
+      );
+    }
+
+    const simResults = axiosResponse.data.simulation_results;
+    if (simResults.length !== 1 || simResults[0].simulation.gas_used === undefined) {
+      throw new BridgeError(
+        'Estimating gas did not return simulation results',
+        BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
+      );
+    }
+
+    console.log(simResults);
+
+    return simResults[0].simulation.gas_used;
+  }
+
   private async getAllowance(sourceChainId:string, token: string, sender: string): Promise<ethers.BigNumber> {
     if (token.toUpperCase() === NATIVE) {
       // Return immediately for native token.
+      return ethers.BigNumber.from(0);
+    }
+    if (sourceChainId === this.config.bridgeInstance.childChainID
+      && ethers.utils.getAddress(token) !== ethers.utils.getAddress(this.getWrappedIMX(sourceChainId))
+    ) {
+      // Return immediately for non wrapped IMX on child chain.
       return ethers.BigNumber.from(0);
     }
     let provider: ethers.providers.Provider;
@@ -1021,7 +1232,7 @@ export class TokenBridge {
     }
 
     // If the token is not native, it must be a valid address
-    if (token.toUpperCase() !== 'NATIVE' && !ethers.utils.isAddress(token)) {
+    if (token.toUpperCase() !== NATIVE && !ethers.utils.isAddress(token)) {
       throw new BridgeError(
         `token address ${token} is not a valid address`,
         BridgeErrorType.INVALID_ADDRESS,
@@ -1094,6 +1305,90 @@ export class TokenBridge {
         BridgeErrorType.UNSUPPORTED_ERROR,
       );
     }
+  }
+
+  private getWrappedIMX(source: string) {
+    let wIMX:string;
+    if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
+      || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
+      wIMX = childWIMXs.mainnet;
+    } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
+      || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
+      wIMX = childWIMXs.testnet;
+    } else {
+      wIMX = childWIMXs.devnet;
+    }
+    return wIMX;
+  }
+
+  private getRootIMX(source: string) {
+    let rootIMX:string;
+    if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
+      || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
+      rootIMX = rootIMXs.mainnet;
+    } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
+      || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
+      rootIMX = rootIMXs.testnet;
+    } else {
+      rootIMX = rootIMXs.devnet;
+    }
+    return rootIMX;
+  }
+
+  private getChildAdaptor(source: string) {
+    let adaptor:string;
+    if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
+      || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
+      adaptor = childAdaptors.mainnet;
+    } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
+      || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
+      adaptor = childAdaptors.testnet;
+    } else {
+      adaptor = childAdaptors.devnet;
+    }
+    return adaptor;
+  }
+
+  private getRootAdaptor(source: string) {
+    let adaptor:string;
+    if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
+      || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
+      adaptor = rootAdaptors.mainnet;
+    } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
+      || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
+      adaptor = rootAdaptors.testnet;
+    } else {
+      adaptor = rootAdaptors.devnet;
+    }
+    return adaptor;
+  }
+
+  private getChildchain(source: string) {
+    let chain:string;
+    if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
+      || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
+      chain = childChains.mainnet;
+    } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
+      || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
+      chain = childChains.testnet;
+    } else {
+      chain = childChains.devnet;
+    }
+    return chain;
+  }
+
+  private getAxelarGateway(source: string) {
+    let gateway:string;
+    if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
+      || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
+      gateway = axelarGateways.mainnet;
+    } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
+      || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
+      gateway = axelarGateways.testnet;
+    } else {
+      gateway = axelarGateways.devnet;
+    }
+    return gateway;
   }
 
   private getAxelarEndpoint(source:string) {
@@ -1463,7 +1758,7 @@ export class TokenBridge {
     contractPromises.push(rootBridge.withdrawalDelay());
 
     for (let token of req.tokens) {
-      if (token.toUpperCase() === 'NATIVE') {
+      if (token.toUpperCase() === NATIVE) {
         token = ETHEREUM_NATIVE_TOKEN_ADDRESS;
       }
       contractPromises.push(rootBridge.flowRateBuckets(token));
@@ -1686,7 +1981,7 @@ export class TokenBridge {
   public async getTokenMapping(req: TokenMappingRequest): Promise<TokenMappingResponse> {
     // eslint-disable-next-line no-console
 
-    if (req.rootToken.toUpperCase() === 'NATIVE'
+    if (req.rootToken.toUpperCase() === NATIVE
     || req.rootToken === this.config.bridgeContracts.rootChainWrappedETH) {
       const childBridge = await withBridgeError<ethers.Contract>(
         async () => {
@@ -1730,7 +2025,7 @@ export class TokenBridge {
     if (rootTokenChildAddress === req.rootToken) {
       return {
         rootToken: req.rootToken,
-        childToken: 'NATIVE',
+        childToken: NATIVE,
       };
     }
     return {
