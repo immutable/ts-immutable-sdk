@@ -22,7 +22,7 @@ type UseClientConfigParams = {
   environmentId: string;
   checkout: Checkout | undefined;
   provider: Web3Provider | undefined;
-  defaultCurrency?: 'USDC';
+  defaultCurrency?: string;
 };
 
 export const defaultClientConfig: ClientConfig = {
@@ -41,7 +41,7 @@ export const useClientConfig = ({
   environmentId,
   checkout,
   provider,
-  defaultCurrency,
+  defaultCurrency = 'USDC',
 }: UseClientConfigParams) => {
   const [selectedCurrency, setSelectedCurrency] = useState<
   ClientConfigCurrency | undefined
