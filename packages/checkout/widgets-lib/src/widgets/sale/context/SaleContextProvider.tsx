@@ -4,6 +4,7 @@ import {
   RoutingOutcomeType,
   SmartCheckoutResult,
   SalePaymentTypes,
+  SmartCheckoutInsufficient,
 } from '@imtbl/checkout-sdk';
 import { Passport } from '@imtbl/passport';
 import {
@@ -44,6 +45,7 @@ import { getTopUpViewData } from '../functions/smartCheckoutUtils';
 
 import { useSmartCheckout } from '../hooks/useSmartCheckout';
 import { useClientConfig, defaultClientConfig } from '../hooks/useClientConfig';
+import { BigNumber } from 'ethers';
 
 type SaleContextProps = {
   config: StrongCheckoutWidgetsConfig;
@@ -182,14 +184,14 @@ export function SaleContextProvider(props: {
 
   const [invalidParameters, setInvalidParameters] = useState<boolean>(false);
 
-  const {
-    selectedCurrency, clientConfig, clientConfigError,
-  } = useClientConfig({
-    environmentId,
-    environment: config.environment,
-    checkout,
-    provider,
-  });
+  const { selectedCurrency, clientConfig, clientConfigError } = useClientConfig(
+    {
+      environmentId,
+      environment: config.environment,
+      checkout,
+      provider,
+    },
+  );
 
   const fromTokenAddress = selectedCurrency?.address || '';
 
@@ -363,44 +365,170 @@ export function SaleContextProvider(props: {
       return;
     }
 
-    if (smartCheckoutResult.sufficient) {
-      sign(SignPaymentTypes.CRYPTO);
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: SaleWidgetViews.PAY_WITH_COINS,
+    const result = {
+      sufficient: false,
+      transactionRequirements: [
+        {
+          sufficient: false,
+          type: 'NATIVE',
+          delta: {
+            balance: {
+              type: 'BigNumber',
+              hex: '0x9fdf434e83ac83',
+            },
+            formattedBalance: '0.045000001470049411',
+          },
+          current: {
+            balance: {
+              type: 'BigNumber',
+              hex: '0x00',
+            },
+            formattedBalance: '0.0',
+            token: {
+              address: 'native',
+              decimals: 18,
+              name: 'tIMX',
+              symbol: 'tIMX',
+            },
+            type: 'NATIVE',
+          },
+          required: {
+            balance: {
+              type: 'BigNumber',
+              hex: '0x9fdf434e83ac83',
+            },
+            formattedBalance: '0.045000001470049411',
+            token: {
+              address: 'native',
+              decimals: 18,
+              name: 'tIMX',
+              symbol: 'tIMX',
+            },
+            type: 'NATIVE',
           },
         },
-      });
-    }
-    if (!smartCheckoutResult.sufficient) {
-      switch (smartCheckoutResult.router.routingOutcome.type) {
-        case RoutingOutcomeType.ROUTES_FOUND:
-          setFundingRoutes(
-            smartCheckoutResult.router.routingOutcome.fundingRoutes,
-          );
-          viewDispatch({
-            payload: {
-              type: ViewActions.UPDATE_VIEW,
-              view: {
-                type: SaleWidgetViews.FUND_WITH_SMART_CHECKOUT,
-                subView: FundWithSmartCheckoutSubViews.FUNDING_ROUTE_SELECT,
-              },
+        {
+          sufficient: true,
+          type: 'ERC20',
+          delta: {
+            balance: {
+              type: 'BigNumber',
+              hex: '-0x05e69ec0',
             },
-          });
+            formattedBalance: '-99.0',
+          },
+          current: {
+            balance: {
+              type: 'BigNumber',
+              hex: '0x05f5e100',
+            },
+            formattedBalance: '100.0',
+            token: {
+              address: '0x3b2d8a1931736fc321c24864bceee981b11c3c57',
+              name: 'USDC',
+              symbol: 'USDC',
+              decimals: 6,
+            },
+          },
+          required: {
+            balance: {
+              type: 'BigNumber',
+              hex: '0x0f4240',
+            },
+            formattedBalance: '1.0',
+            token: {
+              address: '0x3b2d8a1931736fc321c24864bceee981b11c3c57',
+              name: 'USDC',
+              symbol: 'USDC',
+              decimals: 6,
+            },
+          },
+        },
+      ],
+      router: {
+        availableRoutingOptions: {
+          onRamp: true,
+          swap: true,
+          bridge: true,
+        },
+        routingOutcome: {
+          type: 'ROUTES_FOUND',
+          fundingRoutes: [
+            {
+              priority: 1,
+              steps: [
+                {
+                  type: 'ONRAMP',
+                  chainId: 13473,
+                  fundingItem: {
+                    type: 'NATIVE',
+                    fundsRequired: {
+                      amount: {
+                        type: 'BigNumber',
+                        hex: '0x9fdf434e83ac83',
+                      },
+                      formattedAmount: '0.045000001470049411',
+                    },
+                    userBalance: {
+                      balance: BigNumber.from('10'),
+                      formattedBalance: '0.0',
+                    },
+                    token: {
+                      address: 'native',
+                      decimals: 18,
+                      name: 'tIMX',
+                      symbol: 'tIMX',
+                    },
+                  },
+                },
+              ],
+            },
+            {
+              priority: 1,
+              steps: [
+                {
+                  type: 'ONRAMP',
+                  chainId: 13473,
+                  fundingItem: {
+                    type: 'NATIVE',
+                    fundsRequired: {
+                      amount: {
+                        type: 'BigNumber',
+                        hex: '0x9fdf434e83ac83',
+                      },
+                      formattedAmount: '0.045000001470049411',
+                    },
+                    userBalance: {
+                      balance: BigNumber.from('10'),
+                      formattedBalance: '0.0',
+                    },
+                    token: {
+                      address: 'native',
+                      decimals: 18,
+                      name: 'tIMX',
+                      symbol: 'tIMX',
+                    },
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      },
+    } as SmartCheckoutInsufficient;
 
-          break;
-        case RoutingOutcomeType.NO_ROUTES_FOUND:
-        case RoutingOutcomeType.NO_ROUTE_OPTIONS:
-        default:
-          setFundingRoutes([]);
-          setPaymentMethod(undefined);
-          disablePaymentTypes([SalePaymentTypes.CRYPTO]);
-          goBackToPaymentMethods(undefined);
-          break;
-      }
-    }
+    if (RoutingOutcomeType.ROUTES_FOUND !== result.router.routingOutcome.type) return;
+
+    setFundingRoutes(result.router.routingOutcome.fundingRoutes);
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: SaleWidgetViews.FUND_WITH_SMART_CHECKOUT,
+          subView: FundWithSmartCheckoutSubViews.FUNDING_ROUTE_SELECT,
+        },
+      },
+    });
   }, [smartCheckoutResult, smartCheckoutError, sign, amount, fromTokenAddress]);
 
   useEffect(() => {
