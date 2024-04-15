@@ -58,7 +58,6 @@ import {
   FlowRateWithdrawRequest,
   FlowRateWithdrawResponse,
   FlowRateInfoRequest,
-  CalculateBridgeFeeResponse,
   RootBridgePendingWithdrawal,
   TxStatusResponseItem,
   PendingWithdrawal,
@@ -148,12 +147,16 @@ export class TokenBridge {
    *   });
    */
   public async getFee(req: BridgeFeeRequest): Promise<BridgeFeeResponse> {
-    await this.validateChainConfiguration();
-
-    if (req.action !== BridgeFeeActions.FINALISE_WITHDRAWAL) {
-      await this.validateChainIds(req.sourceChainId, req.destinationChainId);
-    }
-    return await this.getFeePrivate(req);
+    const [, , res] = await Promise.all([
+      this.initialise(),
+      async () => {
+        if (req.action !== BridgeFeeActions.FINALISE_WITHDRAWAL) {
+          await this.validateChainIds(req.sourceChainId, req.destinationChainId);
+        }
+      },
+      this.getFeePrivate(req),
+    ]);
+    return res;
   }
 
   private async getFeePrivate(req: BridgeFeeRequest): Promise<BridgeFeeResponse> {
@@ -179,116 +182,59 @@ export class TokenBridge {
       );
     }
 
-    let sourceChainGas: ethers.BigNumber = ethers.BigNumber.from(0);
+    let feeData;
+    if (req.sourceChainId === this.config.bridgeInstance.rootChainID) {
+      feeData = await this.config.rootProvider.getFeeData();
+    } else {
+      feeData = await this.config.childProvider.getFeeData();
+    }
+
+    let sourceChainFee: ethers.BigNumber = ethers.BigNumber.from(0);
     let approvalFee: ethers.BigNumber = ethers.BigNumber.from(0);
     let bridgeFee: ethers.BigNumber = ethers.BigNumber.from(0);
     const imtblFee: ethers.BigNumber = ethers.BigNumber.from(0);
 
-    if ('token' in req && req.token !== NATIVE) {
-      let approvalLimit = BridgeMethodsGasLimit.APPROVE_TOKEN;
-      if (req.token === 'USDC') {
-        approvalLimit = BridgeMethodsGasLimit.APPROVE_TOKEN_USDC;
-      } else if (req.token === 'GOG') {
-        approvalLimit = BridgeMethodsGasLimit.APPROVE_TOKEN_GOG;
-      } else if (req.token === 'IMX') {
-        approvalLimit = BridgeMethodsGasLimit.APPROVE_TOKEN_IMX;
+    // Get approval fee
+    if ('token' in req && req.token.toUpperCase() !== NATIVE) {
+      if (req.sourceChainId === this.config.bridgeInstance.rootChainID) {
+        approvalFee = this.calculateGasFee(feeData, BridgeMethodsGasLimit.APPROVE_TOKEN);
+      } else if (req.sourceChainId === this.config.bridgeInstance.childChainID
+        && req.token.toUpperCase() === this.getWrappedIMX(this.config.bridgeInstance.childChainID).toUpperCase()) {
+        // On child chain, only WIMX requires approval.
+        approvalFee = this.calculateGasFee(feeData, BridgeMethodsGasLimit.APPROVE_TOKEN);
       }
-      approvalFee = await this.getGasEstimates(
-        this.config.rootProvider,
-        approvalLimit,
-      );
     }
 
+    // Get source fee & bridge fee
     if (req.action === BridgeFeeActions.FINALISE_WITHDRAWAL) {
-      sourceChainGas = await this.getGasEstimates(
-        this.config.rootProvider,
-        BridgeMethodsGasLimit.FINALISE_WITHDRAWAL,
-      );
+      sourceChainFee = this.calculateGasFee(feeData, BridgeMethodsGasLimit.FINALISE_WITHDRAWAL);
     } else {
-      const sourceProvider:ethers.providers.Provider = (req.action === BridgeFeeActions.WITHDRAW)
-        ? this.config.childProvider : this.config.rootProvider;
-
-      let sourceLimit = BridgeMethodsGasLimit[`${req.action}_SOURCE`];
-      if ('token' in req && req.action === 'DEPOSIT') {
-        if (req.token === NATIVE) {
-          sourceLimit = BridgeMethodsGasLimit.DEPOSIT_SOURCE_ETH;
-        } else if (req.token === 'USDC') {
-          sourceLimit = BridgeMethodsGasLimit.DEPOSIT_SOURCE_USDC;
-        } else if (req.token === 'GOG') {
-          sourceLimit = BridgeMethodsGasLimit.DEPOSIT_SOURCE_GOG;
-        } else if (req.token === 'IMX') {
-          sourceLimit = BridgeMethodsGasLimit.DEPOSIT_SOURCE_IMX;
-        }
+      let axelarGasLimit;
+      if (req.action === 'DEPOSIT') {
+        sourceChainFee = this.calculateGasFee(feeData, BridgeMethodsGasLimit.DEPOSIT_SOURCE);
+        axelarGasLimit = BridgeMethodsGasLimit.DEPOSIT_DESTINATION;
+      } else {
+        sourceChainFee = this.calculateGasFee(feeData, BridgeMethodsGasLimit.WITHDRAW_SOURCE);
+        axelarGasLimit = BridgeMethodsGasLimit.WITHDRAW_DESTINATION;
       }
-      sourceChainGas = await this.getGasEstimates(
-        sourceProvider,
-        sourceLimit,
-      );
-
-      const feeResult = await this.calculateBridgeFee(
+      // Get bridge fee
+      bridgeFee = await this.getAxelarFee(
         req.sourceChainId,
         req.destinationChainId,
-        BridgeMethodsGasLimit[`${req.action}_DESTINATION`],
+        axelarGasLimit,
         req.gasMultiplier,
       );
-
-      bridgeFee = feeResult.bridgeFee;
     }
 
-    const totalFees: ethers.BigNumber = sourceChainGas.add(approvalFee).add(bridgeFee).add(imtblFee);
+    const totalFees: ethers.BigNumber = sourceChainFee.add(approvalFee).add(bridgeFee).add(imtblFee);
 
     return {
-      sourceChainGas,
+      sourceChainGas: sourceChainFee,
       approvalFee,
       bridgeFee,
-      imtblFee, // no network fee charged currently
+      imtblFee,
       totalFees,
     };
-  }
-
-  private async getSimulatedTx(
-    provider: ethers.providers.Provider,
-    dummyAddress: string,
-    amount: ethers.BigNumber,
-    token: string,
-    sourceChainId: string,
-    bridgeFee: ethers.BigNumber,
-  ) {
-    const getContractRes = await this.getBridgeContract(sourceChainId);
-
-    const data = await this.getTxData(
-      dummyAddress,
-      dummyAddress,
-      amount,
-      token,
-      sourceChainId,
-    );
-
-    const feeData: FeeData = await provider.getFeeData();
-
-    const gasPriceInWei = getGasPriceInWei(feeData) ?? ethers.BigNumber.from(0);
-
-    const txValue = (token.toUpperCase() !== NATIVE) ? bridgeFee.toString() : amount.add(bridgeFee).toString();
-
-    return {
-      data,
-      from: dummyAddress,
-      to: getContractRes.contractAddress,
-      value: txValue,
-      chainId: parseInt(sourceChainId, 10),
-      gasPrice: gasPriceInWei,
-    };
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  private async getGasEstimates(
-    provider: ethers.providers.Provider,
-    txnGasLimitInWei: number,
-  ): Promise<ethers.BigNumber> {
-    const feeData: FeeData = await provider.getFeeData();
-    const gasPriceInWei = getGasPriceInWei(feeData);
-    if (!gasPriceInWei) return ethers.BigNumber.from(0);
-    return gasPriceInWei.mul(txnGasLimitInWei);
   }
 
   private calculateGasFee(
@@ -349,82 +295,18 @@ export class TokenBridge {
   public async getUnsignedApproveBridgeTx(
     req: ApproveBridgeRequest,
   ): Promise<ApproveBridgeResponse> {
-    await this.validateChainConfiguration();
-    return await this.getUnsignedApproveBridgeTxPrivate(req);
-  }
-
-  public async getUnsignedApproveBridgeTxPrivate(
-    req: ApproveBridgeRequest,
-  ): Promise<ApproveBridgeResponse> {
-    await this.validateDepositArgs(
-      req.token,
-      req.senderAddress,
-      req.amount,
-      req.sourceChainId,
-      req.destinationChainId,
-    );
-
-    // If the token is NATIVE, no approval is required
-    if (req.token.toUpperCase() === NATIVE) {
-      return {
-        contractToApprove: null,
-        unsignedTx: null,
-      };
-    }
-
-    let sourceProvider:ethers.providers.Provider;
-    let sourceBridgeAddress: string;
-    if (req.sourceChainId === this.config.bridgeInstance.rootChainID) {
-      sourceProvider = this.config.rootProvider;
-      sourceBridgeAddress = this.config.bridgeContracts.rootERC20BridgeFlowRate;
-    } else {
-      sourceProvider = this.config.childProvider;
-      sourceBridgeAddress = this.config.bridgeContracts.childERC20Bridge;
-    }
-
-    const erc20Contract: ethers.Contract = await withBridgeError<ethers.Contract>(
-      async () => new ethers.Contract(req.token, ERC20, sourceProvider),
-      BridgeErrorType.PROVIDER_ERROR,
-    );
-
-    // Get the current approved allowance of the RootERC20Predicate
-    const allowance: ethers.BigNumber = await withBridgeError<ethers.BigNumber>(() => erc20Contract
-      .allowance(
-        req.senderAddress,
-        sourceBridgeAddress,
-      ), BridgeErrorType.PROVIDER_ERROR);
-
-    // If the allowance is greater than or equal to the deposit amount, no approval is required
-    if (allowance.gte(req.amount)) {
-      return {
-        contractToApprove: null,
-        unsignedTx: null,
-      };
-    }
-    // Calculate the amount of tokens that need to be approved for deposit
-    const approvalAmountRequired = req.amount.sub(
-      allowance,
-    );
-
-    // Encode the approve function call data for the ERC20 contract
-    const data: string = await withBridgeError<string>(async () => erc20Contract.interface
-      .encodeFunctionData('approve', [
-        sourceBridgeAddress,
-        approvalAmountRequired,
-      ]), BridgeErrorType.INTERNAL_ERROR);
-
-    // Create the unsigned transaction for the approval
-    const unsignedTx: ethers.providers.TransactionRequest = {
-      data,
-      to: req.token,
-      value: 0,
-      from: req.senderAddress,
-      chainId: parseInt(req.sourceChainId, 10),
-    };
-
+    const res = await this.getUnsignedBridgeBundledTx({
+      senderAddress: req.senderAddress,
+      recipientAddress: req.senderAddress,
+      token: req.token,
+      amount: req.amount,
+      sourceChainId: req.sourceChainId,
+      destinationChainId: req.destinationChainId,
+      gasMultiplier: 1.1,
+    });
     return {
-      contractToApprove: sourceBridgeAddress,
-      unsignedTx,
+      contractToApprove: res.contractToApprove,
+      unsignedTx: res.unsignedApprovalTx,
     };
   }
 
@@ -594,29 +476,19 @@ export class TokenBridge {
   public async getUnsignedBridgeTx(
     req: BridgeTxRequest,
   ): Promise<BridgeTxResponse> {
-    await this.validateChainConfiguration();
-    await this.validateDepositArgs(
-      req.token,
-      req.senderAddress,
-      req.amount,
-      req.sourceChainId,
-      req.destinationChainId,
-    );
-
-    // Convert the addresses to correct format addresses (e.g. prepend 0x if not already)
-    const receipient = ethers.utils.getAddress(req.recipientAddress);
-    const sender = ethers.utils.getAddress(req.senderAddress);
-
-    return this.getBridgeTx(
-      sender,
-      receipient,
-      req.amount,
-      req.token,
-      req.sourceChainId,
-      req.destinationChainId,
-      this.config.rootProvider,
-      req.gasMultiplier,
-    );
+    const res = await this.getUnsignedBridgeBundledTx({
+      senderAddress: req.senderAddress,
+      recipientAddress: req.senderAddress,
+      token: req.token,
+      amount: req.amount,
+      sourceChainId: req.sourceChainId,
+      destinationChainId: req.destinationChainId,
+      gasMultiplier: req.gasMultiplier,
+    });
+    return {
+      feeData: res.feeData,
+      unsignedTx: res.unsignedBridgeTx,
+    };
   }
 
   /**
@@ -867,51 +739,6 @@ export class TokenBridge {
     }
   }
 
-  private async getBridgeTx(
-    sender:string,
-    recipient:string,
-    amount:ethers.BigNumber,
-    token:string,
-    sourceChainId: string,
-    destinationChainId: string,
-    provider: ethers.providers.Provider,
-    gasMultiplier: number = 1.1,
-  ): Promise<BridgeTxResponse> {
-    await this.checkReceiver(destinationChainId, recipient);
-
-    const getContractRes = await this.getBridgeContract(sourceChainId);
-
-    const fees:BridgeFeeResponse = await this.getFeePrivate({
-      action: getContractRes.contractAction,
-      gasMultiplier,
-      sourceChainId,
-      destinationChainId,
-      token,
-      amount,
-    });
-
-    const data = await this.getTxData(
-      sender,
-      recipient,
-      amount,
-      token,
-      sourceChainId,
-    );
-
-    const txValue = (token.toUpperCase() !== NATIVE)
-      ? fees.bridgeFee.toString() : amount.add(fees.bridgeFee).toString();
-
-    return {
-      feeData: fees,
-      unsignedTx: {
-        data,
-        to: getContractRes.contractAddress,
-        value: txValue,
-        chainId: parseInt(sourceChainId, 10),
-      },
-    };
-  }
-
   private async validateBridgeReqArgs(
     req: BridgeBundledTxRequest,
   ) {
@@ -1068,7 +895,7 @@ export class TokenBridge {
     return tenderlyGasEstimatesRes;
   }
 
-  public async getDynamicWithdrawGas(
+  private async getDynamicWithdrawGas(
     destinationChainId: string,
     sender: string,
     recipient: string,
@@ -1207,39 +1034,6 @@ export class TokenBridge {
         sender,
         bridgeContract,
       ), BridgeErrorType.PROVIDER_ERROR);
-  }
-
-  private async validateDepositArgs(
-    token: string,
-    senderOrRecipientAddress: string,
-    amount: ethers.BigNumber,
-    sourceChainId: string,
-    destinationChainId: string,
-  ) {
-    if (!ethers.utils.isAddress(senderOrRecipientAddress)) {
-      throw new BridgeError(
-        `address ${senderOrRecipientAddress} is not a valid address`,
-        BridgeErrorType.INVALID_ADDRESS,
-      );
-    }
-
-    // The deposit amount cannot be <= 0
-    if (amount.isNegative() || amount.isZero()) {
-      throw new BridgeError(
-        `deposit amount ${amount.toString()} is invalid`,
-        BridgeErrorType.INVALID_AMOUNT,
-      );
-    }
-
-    // If the token is not native, it must be a valid address
-    if (token.toUpperCase() !== NATIVE && !ethers.utils.isAddress(token)) {
-      throw new BridgeError(
-        `token address ${token} is not a valid address`,
-        BridgeErrorType.INVALID_ADDRESS,
-      );
-    }
-
-    this.validateChainIds(sourceChainId, destinationChainId);
   }
 
   private async validateChainIds(
@@ -1420,75 +1214,13 @@ export class TokenBridge {
   }
 
   /**
- * Calculate the gas amount for a transaction using axelarjs-sdk.
- * @param {*} source - The source chainId.
- * @param {*} destination - The destination chainId.
- * @param {*} gasLimit - The gas limit for the desired operation.
+ * Query the axelar fee for a transaction using axelarjs-sdk.
+ * @param {*} sourceChainId - The source chainId.
+ * @param {*} destinationChainId - The destination chainId.
+ * @param {*} destinationChainGaslimit - The gas limit for the desired operation.
  * @param {*} gasMultiplier - The gas multiplier to add buffer to the fees.
  * @returns {ethers.BigNumber} - The Axelar Gas amount in the source chain currency.
  */
-  // eslint-disable-next-line class-methods-use-this
-  private async calculateBridgeFee(
-    source:string,
-    destination:string,
-    gasLimit: number,
-    gasMultiplier: number = 1.1,
-  ): Promise<CalculateBridgeFeeResponse> {
-    const sourceAxelar:AxelarChainDetails = axelarChains[source];
-    const destinationAxelar:AxelarChainDetails = axelarChains[destination];
-
-    if (!sourceAxelar) {
-      throw new BridgeError(
-        `Source chainID ${source} can not be matched to an Axelar chain.`,
-        BridgeErrorType.AXELAR_CHAIN_NOT_FOUND,
-      );
-    }
-
-    if (!destinationAxelar) {
-      throw new BridgeError(
-        `Destination chainID ${destination} can not be matched to an Axelar chain.`,
-        BridgeErrorType.AXELAR_CHAIN_NOT_FOUND,
-      );
-    }
-
-    const axelarAPIEndpoint:string = this.getAxelarEndpoint(source);
-
-    let axiosResponse:AxiosResponse;
-
-    const estimateGasReq = {
-      method: 'estimateGasFee',
-      sourceChain: sourceAxelar.id,
-      destinationChain: destinationAxelar.id,
-      symbol: sourceAxelar.symbol,
-      gasLimit,
-      gasMultiplier,
-    };
-
-    try {
-      axiosResponse = await axios.post(axelarAPIEndpoint, estimateGasReq);
-    } catch (error: any) {
-      axiosResponse = error.response;
-    }
-
-    if (axiosResponse.data.error) {
-      throw new BridgeError(
-        `Estimating Axelar Gas failed with the reason: ${axiosResponse.data.message}`,
-        BridgeErrorType.AXELAR_GAS_ESTIMATE_FAILED,
-      );
-    }
-
-    try {
-      return {
-        bridgeFee: ethers.BigNumber.from(`${axiosResponse.data}`),
-      };
-    } catch (err) {
-      throw new BridgeError(
-        `Estimating Axelar Gas failed with the reason: ${err}`,
-        BridgeErrorType.AXELAR_GAS_ESTIMATE_FAILED,
-      );
-    }
-  }
-
   private async getAxelarFee(
     sourceChainId: string,
     destinationChainId: string,

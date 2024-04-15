@@ -237,14 +237,6 @@ export interface BridgeFeeResponse {
 }
 
 /**
- * @typedef {Object} CalculateBridgeFeeResponse
- * @property {ethers.BigNumber} bridgeFee - Fee charged by Axelar to validate and execute the bridge message.
- */
-export interface CalculateBridgeFeeResponse {
-  bridgeFee: ethers.BigNumber;
-}
-
-/**
  * @typedef {Object} ApproveBridgeRequest
  * @property {string} senderAddress - The address of the depositor.
  * @property {FungibleToken} token - The token to be approved.
