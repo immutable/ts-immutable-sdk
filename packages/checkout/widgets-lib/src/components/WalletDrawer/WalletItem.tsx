@@ -1,15 +1,15 @@
 import { MenuItem } from '@biom3/react';
 import { ReactElement, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { EIP6963ProviderDetail } from '@imtbl/checkout-sdk';
 import { RawImage } from '../RawImage/RawImage';
-import { EIP1193Provider, EIP6963ProviderDetail } from '../../lib/provider';
 
 export interface WalletItemProps<RC extends ReactElement | undefined = undefined> {
   loading?: boolean;
   recommended?: boolean;
   testId: string;
-  providerDetail: EIP6963ProviderDetail<EIP1193Provider>;
-  onWalletItemClick: (providerDetail: EIP6963ProviderDetail<EIP1193Provider>) => Promise<void>;
+  providerDetail: EIP6963ProviderDetail;
+  onWalletItemClick: (providerDetail: EIP6963ProviderDetail) => Promise<void>;
   rc?: RC;
 }
 

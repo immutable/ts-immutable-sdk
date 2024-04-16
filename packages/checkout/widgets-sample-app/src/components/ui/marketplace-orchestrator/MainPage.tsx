@@ -59,6 +59,9 @@ export const MainPage = () => {
   const onRampWidget = useMemo(() => widgetsFactory.create(WidgetType.ONRAMP), [widgetsFactory]);
 
   connectWidget.addListener(ConnectEventType.CLOSE_WIDGET, () => { connectWidget.unmount() });
+  connectWidget.addListener(ConnectEventType.SUCCESS, (event) => {
+    console.log('Connect success', event);
+  });
   walletWidget.addListener(WalletEventType.CLOSE_WIDGET, () => { walletWidget.unmount() });
   bridgeWidget.addListener(BridgeEventType.CLOSE_WIDGET, () => { bridgeWidget.unmount() });
   swapWidget.addListener(SwapEventType.CLOSE_WIDGET, () => swapWidget.unmount());

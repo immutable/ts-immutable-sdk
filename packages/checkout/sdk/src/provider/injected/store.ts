@@ -1,5 +1,5 @@
 import type { Rdns } from './register';
-import type { EIP6963ProviderDetail } from '../types/eip6963';
+import type { EIP6963ProviderDetail } from '../../types/eip6963';
 import { requestProviders } from './utils';
 
 export type Listener = (

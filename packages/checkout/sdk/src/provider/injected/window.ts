@@ -1,7 +1,7 @@
 import type {
   EIP6963AnnounceProviderEvent,
   EIP6963RequestProviderEvent,
-} from '../types/eip6963';
+} from '../../types/eip6963';
 
 export {};
 

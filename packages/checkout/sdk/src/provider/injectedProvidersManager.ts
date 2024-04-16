@@ -1,10 +1,10 @@
-import { createStore } from './injected';
-import { EIP6963ProviderDetail } from './types/eip6963';
+import { createStore, Store } from './injected';
+import { EIP6963ProviderDetail } from '../types';
 
 export class InjectedProvidersManager {
   private static instance: InjectedProvidersManager;
 
-  private store: any;
+  private store: Store;
 
   private resetTimeout: any;
 
@@ -23,11 +23,15 @@ export class InjectedProvidersManager {
     return InjectedProvidersManager.instance;
   }
 
-  public getProviders(): EIP6963ProviderDetail[] {
+  public findProvider(args: { rdns: string }) {
+    return this.store.findProvider(args);
+  }
+
+  public getProviders(): readonly EIP6963ProviderDetail[] {
     return this.store.getProviders();
   }
 
-  public subscribe(callback: any) {
+  public subscribe(callback: any): () => void {
     return this.store.subscribe(callback);
   }
 
@@ -49,6 +53,7 @@ export class InjectedProvidersManager {
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
   public requestProviders() {
     window.dispatchEvent(new CustomEvent('eip6963:requestProvider'));
   }
