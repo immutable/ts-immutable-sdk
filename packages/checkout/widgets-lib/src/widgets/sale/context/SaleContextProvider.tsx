@@ -189,6 +189,7 @@ export function SaleContextProvider(props: {
     environment: config.environment,
     checkout,
     provider,
+    amount,
   });
 
   const fromTokenAddress = selectedCurrency?.address || '';

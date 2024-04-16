@@ -22,6 +22,7 @@ type UseClientConfigParams = {
   environmentId: string;
   checkout: Checkout | undefined;
   provider: Web3Provider | undefined;
+  amount: string;
   defaultCurrency?: string;
 };
 
@@ -41,6 +42,7 @@ export const useClientConfig = ({
   environmentId,
   checkout,
   provider,
+  amount,
   defaultCurrency = 'USDC',
 }: UseClientConfigParams) => {
   const [selectedCurrency, setSelectedCurrency] = useState<
@@ -73,14 +75,14 @@ export const useClientConfig = ({
           currencyType: SaleWidgetCurrencyType.SWAPPABLE,
         }));
       } catch (error) {
-        console.warn("Error fetching swappable currencies", error); // eslint-disable-line
+        console.warn('Error fetching swappable currencies', error); // eslint-disable-line
         return [];
       }
     };
 
     const fetchSettlementCurrencies = async () => {
       try {
-        const baseUrl = `${PRIMARY_SALES_API_BASE_URL[environment]}/${environmentId}/client-config`;
+        const baseUrl = `${PRIMARY_SALES_API_BASE_URL[environment]}/${environmentId}/client-config?amount=${amount}`;
         const response = await fetch(baseUrl, {
           method: 'GET',
           // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -126,7 +128,8 @@ export const useClientConfig = ({
     if (clientConfig.currencies.length === 0) return;
 
     const defaultSelectedCurrency = clientConfig.currencies.find((c) => c.name === defaultCurrency)
-      || clientConfig.currencies.find((c) => c.base) || clientConfig.currencies?.[0];
+      || clientConfig.currencies.find((c) => c.base)
+      || clientConfig.currencies?.[0];
     setSelectedCurrency(defaultSelectedCurrency);
   }, [defaultCurrency, clientConfig]);
 
