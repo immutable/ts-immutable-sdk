@@ -8,6 +8,7 @@ import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import {
   FundWithSmartCheckoutSubViews,
+  OrderSummarySubViews,
   SaleWidgetViews,
 } from '../../../context/view-context/SaleViewContextTypes';
 import {
@@ -31,6 +32,7 @@ export function PaymentMethods() {
     setPaymentMethod,
     disabledPaymentTypes,
     invalidParameters,
+    multicurrency,
   } = useSaleContext();
   const { sendPageView, sendCloseEvent, sendSelectedPaymentMethod } = useSaleEvent();
 
@@ -68,6 +70,19 @@ export function PaymentMethods() {
     }
 
     if (paymentMethod && paymentMethod === SalePaymentTypes.CRYPTO) {
+      if (multicurrency) {
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: {
+              type: SaleWidgetViews.ORDER_SUMMARY,
+              subView: OrderSummarySubViews.INIT,
+            },
+          },
+        });
+        return;
+      }
+
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
