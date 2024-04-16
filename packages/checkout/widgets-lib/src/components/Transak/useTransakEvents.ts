@@ -66,7 +66,6 @@ const ANALYTICS_EVENTS: Record<string, AnalyticEvent> = {
 type UseTransakEventsProps = {
   userJourney: UserJourney;
   ref: RefObject<HTMLIFrameElement> | undefined;
-  email: string;
   userId: string;
   isPassportWallet: boolean;
 } & TransakEventHandlers;
@@ -74,7 +73,7 @@ type UseTransakEventsProps = {
 export const useTransakEvents = (props: UseTransakEventsProps) => {
   const { track } = useAnalytics();
   const {
-    userJourney, ref, email, userId, isPassportWallet, failedToLoadTimeoutInMs, onFailedToLoad,
+    userJourney, ref, userId, isPassportWallet, failedToLoadTimeoutInMs, onFailedToLoad,
   } = props;
   const [initialised, setInitialsed] = useState<boolean>(false);
   const failedToLoadTimeout = failedToLoadTimeoutInMs || FAILED_TO_LOAD_TIMEOUT_IN_MS;
@@ -111,7 +110,6 @@ export const useTransakEvents = (props: UseTransakEventsProps) => {
         ...eventData,
         userJourney,
         extras: {
-          email,
           userId,
           isPassportWallet,
         },

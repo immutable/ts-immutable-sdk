@@ -15,7 +15,6 @@ export type TransakNFTCheckoutParams = {
   exchangeScreenTitle: string;
   partnerOrderId?: string;
   walletAddress?: string;
-  email?: string;
 };
 
 type UseTransakIframeProps = {

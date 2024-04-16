@@ -12,7 +12,6 @@ import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsPr
 export type TransakIframeProps = {
   id: string;
   type: TransakWidgetType;
-  email: string;
   contractId: string;
   environment: Environment;
   walletAddress: string;
@@ -24,7 +23,6 @@ export function TransakIframe(props: TransakIframeProps) {
   const {
     id,
     type,
-    email,
     walletAddress,
     isPassportWallet,
     nftData,
@@ -49,7 +47,6 @@ export function TransakIframe(props: TransakIframeProps) {
   const { onLoad, initialised } = useTransakEvents({
     userJourney: UserJourney.SALE,
     ref: iframeRef,
-    email,
     userId: walletAddress,
     isPassportWallet,
     onOpen,
@@ -72,7 +69,6 @@ export function TransakIframe(props: TransakIframeProps) {
       cryptoCurrencyCode,
       estimatedGasLimit,
       exchangeScreenTitle,
-      email,
       walletAddress,
       partnerOrderId,
     },
