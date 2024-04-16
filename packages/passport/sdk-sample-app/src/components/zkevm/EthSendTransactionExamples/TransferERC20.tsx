@@ -34,7 +34,7 @@ function TransferERC20({ disabled, handleExampleSubmitted }: RequestExampleProps
     setAmountConvertError('');
     const rawAmount = amount.trim() === '' ? '0' : amount;
 
-    if (!toAddress || !contractAddress) {
+    if (!fromAddress || !toAddress || !contractAddress) {
       return;
     }
 
