@@ -1,4 +1,4 @@
-import { Environment } from '@imtbl/config';
+import { Environment, ModuleConfiguration } from '@imtbl/config';
 import { providers } from 'ethers';
 
 export const TESTNET_CHAIN_NAME = 'imtbl-zkevm-testnet';
@@ -20,19 +20,27 @@ export interface OrderbookModuleConfiguration {
   provider: providers.JsonRpcProvider;
 }
 
+export function getConfiguredProvider(url: string, apiKey?: string): providers.JsonRpcProvider {
+  return new providers.JsonRpcProvider({
+    url,
+    headers: apiKey ? {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      'x-immutable-api-key': apiKey!,
+    } : undefined,
+  });
+}
+
 export function getOrderbookConfig(
-  environment: Environment,
+  config: ModuleConfiguration<OrderbookOverrides>,
 ): OrderbookModuleConfiguration | null {
-  switch (environment) {
+  switch (config.baseConfig.environment) {
     case Environment.SANDBOX:
       return {
         seaportContractAddress: '0x7d117aA8BD6D31c4fa91722f246388f38ab1942c',
         zoneContractAddress: '0x8831867E347AB87FA30199C5B695F0A31604Bb52',
         apiEndpoint: 'https://api.sandbox.immutable.com',
         chainName: TESTNET_CHAIN_NAME,
-        provider: new providers.JsonRpcProvider(
-          'https://rpc.testnet.immutable.com',
-        ),
+        provider: getConfiguredProvider('https://rpc.testnet.immutable.com', config.baseConfig.apiKey),
       };
     // not yet deployed
     case Environment.PRODUCTION:
@@ -41,9 +49,7 @@ export function getOrderbookConfig(
         zoneContractAddress: '0x00338b92Bec262078B3e49BF12bbEA058916BF91',
         apiEndpoint: 'https://api.immutable.com',
         chainName: MAINNET_CHAIN_NAME,
-        provider: new providers.JsonRpcProvider(
-          'https://rpc.immutable.com',
-        ),
+        provider: getConfiguredProvider('https://rpc.immutable.com', config.baseConfig.apiKey),
       };
     default:
       return null;

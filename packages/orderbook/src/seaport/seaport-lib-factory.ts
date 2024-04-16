@@ -1,5 +1,5 @@
 import { Seaport as SeaportLib } from '@opensea/seaport-js';
-import { JsonRpcProvider, JsonRpcSigner } from 'ethers-v6';
+import { FetchRequest, JsonRpcProvider, JsonRpcSigner } from 'ethers-v6';
 import { providers } from 'ethers';
 import { SEAPORT_CONTRACT_VERSION_V1_5 } from './constants';
 
@@ -11,8 +11,14 @@ export type SeaportVersion =
 // safely instantiate a V6 provider for the V5 provider URL.
 function convertToV6Provider(
   provider: providers.JsonRpcProvider,
+  apiKey?: string,
 ): JsonRpcProvider {
-  const overwrittenProvider = new JsonRpcProvider(provider.connection.url);
+  const fetch = new FetchRequest(provider.connection.url);
+  if (apiKey) {
+    fetch.setHeader('x-immutable-api-key', apiKey);
+  }
+
+  const overwrittenProvider = new JsonRpcProvider(fetch);
 
   // Need to override the getSigner method to mimic V5 behaviour
   overwrittenProvider.getSigner = async function getSigner(
@@ -47,10 +53,10 @@ export class SeaportLibFactory {
     private readonly provider: providers.JsonRpcProvider,
   ) { }
 
-  create(orderSeaportVersion?: SeaportVersion, orderSeaportAddress?: string): SeaportLib {
+  create(orderSeaportAddress?: string, apiKey?: string): SeaportLib {
     const seaportContractAddress = orderSeaportAddress ?? this.defaultSeaportContractAddress;
 
-    return new SeaportLib(convertToV6Provider(this.provider), {
+    return new SeaportLib(convertToV6Provider(this.provider, apiKey), {
       balanceAndApprovalChecksOnOrderCreation: true,
       overrides: {
         contractAddress: seaportContractAddress,
