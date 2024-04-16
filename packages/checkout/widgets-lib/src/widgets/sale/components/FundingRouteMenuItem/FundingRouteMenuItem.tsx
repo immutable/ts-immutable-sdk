@@ -1,97 +1,96 @@
-import {
-  Button, Heading, HorizontalMenu, MenuItem,
-} from '@biom3/react';
-import { ChainId, FundingRoute } from '@imtbl/checkout-sdk';
-import { useContext, useEffect, useState } from 'react';
-import { getChainNameById } from 'lib/chains';
+import { Heading, MenuItem } from '@biom3/react';
+// import { ChainId, FundingRoute } from '@imtbl/checkout-sdk';
+import { useEffect, useState } from 'react';
+// import { getChainNameById } from 'lib/chains';
 import { useTranslation } from 'react-i18next';
-import { CryptoFiatContext } from '../../../../context/crypto-fiat-context/CryptoFiatContext';
+import { SaleWidgetCurrency } from 'widgets/sale/types';
 import { calculateCryptoToFiat, tokenValueFormat } from '../../../../lib/utils';
-import { useSaleContext } from '../../context/SaleContextProvider';
-import { fundingRouteFees } from '../../functions/smartCheckoutUtils';
+// import { fundingRouteFees } from '../../functions/smartCheckoutUtils';
 
-// Taken from packages/checkout/widgets-lib/src/widgets/wallet/components/NetworkMenu/NetworkMenu.tsx
-const networkIcon = {
-  [ChainId.IMTBL_ZKEVM_DEVNET]: 'Immutable',
-  [ChainId.IMTBL_ZKEVM_MAINNET]: 'Immutable',
-  [ChainId.IMTBL_ZKEVM_TESTNET]: 'Immutable',
-  [ChainId.ETHEREUM]: 'EthToken',
-  [ChainId.SEPOLIA]: 'EthToken',
-};
+// // Taken from packages/checkout/widgets-lib/src/widgets/wallet/components/NetworkMenu/NetworkMenu.tsx
+// const networkIcon = {
+//   [ChainId.IMTBL_ZKEVM_DEVNET]: 'Immutable',
+//   [ChainId.IMTBL_ZKEVM_MAINNET]: 'Immutable',
+//   [ChainId.IMTBL_ZKEVM_TESTNET]: 'Immutable',
+//   [ChainId.ETHEREUM]: 'EthToken',
+//   [ChainId.SEPOLIA]: 'EthToken',
+// };
 
-const logoColour = {
-  [ChainId.IMTBL_ZKEVM_DEVNET]: 'base.color.text.link.primary',
-  [ChainId.IMTBL_ZKEVM_TESTNET]: 'base.color.text.link.primary',
-  [ChainId.IMTBL_ZKEVM_MAINNET]: 'base.color.text.link.primary',
-  [ChainId.ETHEREUM]: 'base.color.accent.5',
-  [ChainId.SEPOLIA]: 'base.color.accent.5',
-};
+// const logoColour = {
+//   [ChainId.IMTBL_ZKEVM_DEVNET]: 'base.color.text.link.primary',
+//   [ChainId.IMTBL_ZKEVM_TESTNET]: 'base.color.text.link.primary',
+//   [ChainId.IMTBL_ZKEVM_MAINNET]: 'base.color.text.link.primary',
+//   [ChainId.ETHEREUM]: 'base.color.accent.5',
+//   [ChainId.SEPOLIA]: 'base.color.accent.5',
+// };
 
 export interface FundingRouteMenuItemProps {
   onClick: () => void;
-  fundingRoute: FundingRoute;
+  currency: SaleWidgetCurrency;
   toggleVisible?: boolean;
   selected?: boolean;
   size?: 'small' | 'medium';
+  conversions: Map<string, number>;
 }
 export function FundingRouteMenuItem({
-  onClick, fundingRoute, toggleVisible, selected, size = 'small',
+  onClick,
+  currency,
+  toggleVisible,
+  selected,
+  size = 'small',
+  conversions,
 }: FundingRouteMenuItemProps) {
   const { t } = useTranslation();
-  const firstFundingStep = fundingRoute.steps[0];
-
-  const { cryptoFiatState } = useContext(CryptoFiatContext);
-
-  const { isPassportWallet } = useSaleContext();
+  // const firstFundingStep = fundingRoute.steps[0];
 
   const [feesUsd, setFeesUsd] = useState<string | undefined>(undefined);
   const [usdBalance, setUsdBalance] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    if (!cryptoFiatState.conversions) {
+    if (!conversions || !conversions.size) {
       return;
     }
     try {
-      setFeesUsd(fundingRouteFees(fundingRoute, cryptoFiatState.conversions));
+      // setFeesUsd(fundingRouteFees(fundingRoute, conversions));
       setUsdBalance(
         calculateCryptoToFiat(
-          firstFundingStep.fundingItem.userBalance.formattedBalance,
-          firstFundingStep.fundingItem.token.symbol,
-          cryptoFiatState.conversions,
+          currency.userBalance.formattedBalance,
+          currency.symbol,
+          conversions,
         ),
       );
     } catch {
       setFeesUsd(undefined);
       setUsdBalance(undefined);
     }
-  }, [cryptoFiatState, fundingRoute]);
+  }, [conversions, currency]);
 
-  const networkLabel = () => (
-    <HorizontalMenu.Button
-      rc={<a />}
-      sx={{
-        pointerEvents: 'none',
-        cursor: 'default',
-        height: '100%',
-        marginLeft: 'base.spacing.x2',
-        fontSize: 'base.text.body.xxSmall.regular.fontSize',
-        fontWeight: 'base.text.body.xxSmall.regular.fontWeight',
-        color: 'base.color.brand.4',
-        paddingLeft: 'base.spacing.x2',
-        paddingRight: 'base.spacing.x2',
-      }}
-      size="small"
-    >
-      <Button.Icon
-        icon={networkIcon[firstFundingStep.chainId]}
-        sx={{
-          width: '14px',
-          fill: logoColour[firstFundingStep.chainId],
-        }}
-      />
-      {getChainNameById(firstFundingStep.chainId)}
-    </HorizontalMenu.Button>
-  );
+  // const networkLabel = () => (
+  //   <HorizontalMenu.Button
+  //     rc={<a />}
+  //     sx={{
+  //       pointerEvents: 'none',
+  //       cursor: 'default',
+  //       height: '100%',
+  //       marginLeft: 'base.spacing.x2',
+  //       fontSize: 'base.text.body.xxSmall.regular.fontSize',
+  //       fontWeight: 'base.text.body.xxSmall.regular.fontWeight',
+  //       color: 'base.color.brand.4',
+  //       paddingLeft: 'base.spacing.x2',
+  //       paddingRight: 'base.spacing.x2',
+  //     }}
+  //     size="small"
+  //   >
+  //     <Button.Icon
+  //       icon={networkIcon[firstFundingStep.chainId]}
+  //       sx={{
+  //         width: '14px',
+  //         fill: logoColour[firstFundingStep.chainId],
+  //       }}
+  //     />
+  //     {getChainNameById(firstFundingStep.chainId)}
+  //   </HorizontalMenu.Button>
+  // );
 
   return (
     <MenuItem
@@ -105,12 +104,14 @@ export function FundingRouteMenuItem({
       <MenuItem.FramedIcon icon="Coins" circularFrame />
       <MenuItem.PriceDisplay
         use={<Heading size="xSmall" />}
-        fiatAmount={`${t('views.FUND_WITH_SMART_CHECKOUT.currency.usdEstimate')}${usdBalance}`}
-        price={tokenValueFormat(firstFundingStep.fundingItem.userBalance.formattedBalance)}
+        fiatAmount={`${t(
+          'views.FUND_WITH_SMART_CHECKOUT.currency.usdEstimate',
+        )}${usdBalance}`}
+        price={tokenValueFormat(currency.userBalance.formattedBalance)}
       />
       <MenuItem.Label sx={{ display: 'flex', wordBreak: 'default' }}>
-        {firstFundingStep.fundingItem.token.symbol}
-        {isPassportWallet ? null : networkLabel()}
+        {currency.symbol}
+        {/* {isPassportWallet ? null : networkLabel()} */}
       </MenuItem.Label>
       <MenuItem.Caption>
         Fees ≈ USD $

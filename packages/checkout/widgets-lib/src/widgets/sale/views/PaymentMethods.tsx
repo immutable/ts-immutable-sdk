@@ -8,6 +8,7 @@ import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import {
   FundWithSmartCheckoutSubViews,
+  OrderSummarySubViews,
   SaleWidgetViews,
 } from '../../../context/view-context/SaleViewContextTypes';
 import {
@@ -37,6 +38,16 @@ export function PaymentMethods() {
   const handleOptionClick = (type: SalePaymentTypes) => setPaymentMethod(type);
 
   useEffect(() => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: SaleWidgetViews.ORDER_SUMMARY,
+          subView: OrderSummarySubViews.INIT,
+        },
+      },
+    });
+
     if (paymentMethod) {
       sendSelectedPaymentMethod(paymentMethod, SaleWidgetViews.PAYMENT_METHODS);
     }

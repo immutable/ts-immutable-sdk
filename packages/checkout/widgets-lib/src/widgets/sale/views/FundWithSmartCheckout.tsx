@@ -10,14 +10,14 @@ import {
   FundWithSmartCheckoutSubViews,
   SaleWidgetViews,
 } from '../../../context/view-context/SaleViewContextTypes';
-import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import { ViewContext } from '../../../context/view-context/ViewContext';
 import { LoadingView } from '../../../views/loading/LoadingView';
-import { FundingRouteExecute } from '../components/FundingRouteExecute/FundingRouteExecute';
-import { FundingRouteSelect } from '../components/FundingRouteSelect/FundingRouteSelect';
 import { useSaleContext } from '../context/SaleContextProvider';
 import { useSaleEvent } from '../hooks/useSaleEvents';
 import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
-import { smartCheckoutTokensList } from '../functions/smartCheckoutUtils';
+import { FundingRouteSelect } from '../components/FundingRouteSelect/FundingRouteSelect';
+import { SaleWidgetCurrency } from '../types';
+// import { smartCheckoutTokensList } from '../functions/smartCheckoutUtils';
 
 type FundWithSmartCheckoutProps = {
   subView: FundWithSmartCheckoutSubViews;
@@ -32,23 +32,29 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
   >(undefined);
   const [fundingRouteStepIndex, setFundingRouteStepIndex] = useState<number>(0);
   const {
-    querySmartCheckout, fundingRoutes, smartCheckoutResult, collectionName, fromTokenAddress,
+    querySmartCheckout, fundingRoutes, smartCheckoutResult, collectionName, fromTokenAddress, allCurrencies,
   } = useSaleContext();
-  const { cryptoFiatDispatch } = useContext(CryptoFiatContext);
+  const { cryptoFiatDispatch, cryptoFiatState } = useContext(CryptoFiatContext);
 
-  const onFundingRouteSelected = (fundingRoute: FundingRoute) => {
-    setSelectedFundingRoute(fundingRoute);
+  const onFundingRouteSelected = (currency: SaleWidgetCurrency) => {
+    // setSelectedFundingRoute(fundingRoute);
   };
 
   useEffect(() => {
+    // FIXME: if fromTokenAddress times out throw error
     if (subView !== FundWithSmartCheckoutSubViews.INIT || !fromTokenAddress) return;
+
+    // TODO: iterate thru all tokens and check if they have enough balance for each
     querySmartCheckout();
   }, [subView, fromTokenAddress]);
 
   useEffect(() => {
-    if (!cryptoFiatDispatch || !smartCheckoutResult) return;
+    // refresh conversion rates
+    if (!cryptoFiatDispatch || allCurrencies.length === 0) {
+      return;
+    }
 
-    const tokenSymbols = smartCheckoutTokensList(smartCheckoutResult);
+    const tokenSymbols = allCurrencies.map((currency) => currency.symbol);
 
     cryptoFiatDispatch({
       payload: {
@@ -56,44 +62,48 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
         tokenSymbols,
       },
     });
-  }, [cryptoFiatDispatch, smartCheckoutResult]);
+  }, [cryptoFiatDispatch, allCurrencies]);
 
-  const fundingRouteStep = useMemo(() => {
-    if (!selectedFundingRoute) {
-      return undefined;
-    }
-    return selectedFundingRoute.steps[fundingRouteStepIndex];
-  }, [selectedFundingRoute, fundingRouteStepIndex]);
+
+  // const fundingRouteStep = useMemo(() => {
+  //   if (!selectedFundingRoute) {
+  //     return undefined;
+  //   }
+  //   return selectedFundingRoute.steps[fundingRouteStepIndex];
+  // }, [selectedFundingRoute, fundingRouteStepIndex]);
 
   const onFundingRouteExecuted = () => {
-    if (!selectedFundingRoute) {
-      return;
-    }
-    if (fundingRouteStepIndex === selectedFundingRoute.steps.length - 1) {
-      setFundingRouteStepIndex(0);
-      setSelectedFundingRoute(undefined);
-      // ! Recurse with SC to trigger another query and confirm they have the required balance
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: SaleWidgetViews.FUND_WITH_SMART_CHECKOUT,
-            subView: FundWithSmartCheckoutSubViews.INIT,
-          },
-        },
-      });
-    } else {
-      setFundingRouteStepIndex(fundingRouteStepIndex + 1);
-    }
+    // if (!selectedFundingRoute) {
+    //   return;
+    // }
+    // if (fundingRouteStepIndex === selectedFundingRoute.steps.length - 1) {
+    //   setFundingRouteStepIndex(0);
+    //   setSelectedFundingRoute(undefined);
+    //   // ! Recurse with SC to trigger another query and confirm they have the required balance
+    //   viewDispatch({
+    //     payload: {
+    //       type: ViewActions.UPDATE_VIEW,
+    //       view: {
+    //         type: SaleWidgetViews.FUND_WITH_SMART_CHECKOUT,
+    //         subView: FundWithSmartCheckoutSubViews.INIT,
+    //       },
+    //     },
+    //   });
+    // } else {
+    //   setFundingRouteStepIndex(fundingRouteStepIndex + 1);
+    // }
   };
 
-  useEffect(
-    () => sendPageView(SaleWidgetViews.FUND_WITH_SMART_CHECKOUT, {
-      subView,
-      ...(!!fundingRouteStep && { fundingStep: fundingRouteStep.type }),
-    }),
-    [],
-  );
+  // useEffect(
+  //   () => {
+  //     // trigger analytics
+  //     sendPageView(SaleWidgetViews.FUND_WITH_SMART_CHECKOUT, {
+  //       subView,
+  //       ...(!!fundingRouteStep && { fundingStep: fundingRouteStep.type }),
+  //     });
+  //   },
+  //   [],
+  // );
 
   return (
     <Box>
@@ -102,17 +112,17 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
       )}
       {subView === FundWithSmartCheckoutSubViews.FUNDING_ROUTE_SELECT && (
         <FundingRouteSelect
-          fundingRoutes={fundingRoutes}
+          currencies={allCurrencies}
           collectionName={collectionName}
-          onFundingRouteSelected={onFundingRouteSelected}
+          onSelect={onFundingRouteSelected}
         />
       )}
-      {subView === FundWithSmartCheckoutSubViews.FUNDING_ROUTE_EXECUTE && (
+      {/* {subView === FundWithSmartCheckoutSubViews.FUNDING_ROUTE_EXECUTE && (
         <FundingRouteExecute
           onFundingRouteExecuted={onFundingRouteExecuted}
           fundingRouteStep={fundingRouteStep}
         />
-      )}
+      )} */}
     </Box>
   );
 }

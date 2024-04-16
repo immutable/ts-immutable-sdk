@@ -1,4 +1,6 @@
-import { useReducer, ReactNode, useEffect } from 'react';
+import {
+  useReducer, ReactNode, useEffect, useRef,
+} from 'react';
 import { CryptoFiat, CryptoFiatConfiguration } from '@imtbl/cryptofiat';
 import { Environment } from '@imtbl/config';
 import {
@@ -16,37 +18,51 @@ interface CryptoFiatProviderProps {
 
 export const DEFAULT_TOKEN_SYMBOLS = ['ETH', 'IMX'];
 
-export function CryptoFiatProvider({ environment, children }: CryptoFiatProviderProps) {
+export function CryptoFiatProvider({
+  environment,
+  children,
+}: CryptoFiatProviderProps) {
   const [cryptoFiatState, cryptoFiatDispatch] = useReducer(
     cryptoFiatReducer,
     initialCryptoFiatState,
   );
-
+  const fetching = useRef(false);
   const { cryptoFiat, fiatSymbol, tokenSymbols } = cryptoFiatState;
 
   useEffect(() => {
     cryptoFiatDispatch({
       payload: {
         type: CryptoFiatActions.SET_CRYPTO_FIAT,
-        cryptoFiat: new CryptoFiat(new CryptoFiatConfiguration({
-          baseConfig: {
-            environment,
-          },
-        })),
+        cryptoFiat: new CryptoFiat(
+          new CryptoFiatConfiguration({
+            baseConfig: {
+              environment,
+            },
+          }),
+        ),
       },
     });
   }, []);
 
   useEffect(() => {
-    if (!cryptoFiat || !fiatSymbol) return;
+    if (!cryptoFiat || !fiatSymbol || fetching.current) {
+      return;
+    }
 
     (async () => {
+      fetching.current = true;
+
+      const symbolsList = [
+        ...new Set([...tokenSymbols, ...DEFAULT_TOKEN_SYMBOLS]),
+      ];
+
       const conversions = await getCryptoToFiatConversion(
         cryptoFiat,
         fiatSymbol,
-        [...new Set([...tokenSymbols, ...DEFAULT_TOKEN_SYMBOLS])],
+        symbolsList,
       );
 
+      fetching.current = false;
       cryptoFiatDispatch({
         payload: {
           type: CryptoFiatActions.SET_CONVERSIONS,

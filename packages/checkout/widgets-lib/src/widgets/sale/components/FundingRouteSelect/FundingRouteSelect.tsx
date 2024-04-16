@@ -1,20 +1,14 @@
 import {
   Body, Box, Button, Heading,
 } from '@biom3/react';
-import { FundingRoute } from '@imtbl/checkout-sdk';
 import { useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { SaleWidgetCurrency } from 'widgets/sale/types';
+import { BigNumber } from 'ethers';
+import { CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext';
 import { FooterLogo } from '../../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../../components/SimpleLayout/SimpleLayout';
-import {
-  FundWithSmartCheckoutSubViews,
-  SaleWidgetViews,
-} from '../../../../context/view-context/SaleViewContextTypes';
-import {
-  ViewActions,
-  ViewContext,
-} from '../../../../context/view-context/ViewContext';
 import { FundingRouteMenuItem } from '../FundingRouteMenuItem/FundingRouteMenuItem';
 import { FundingRouteDrawer } from '../FundingRouteSelectDrawer/FundingRouteDrawer';
 import { PurchaseMenuItem } from '../PurchaseMenuItem/PurchaseMenuItem';
@@ -24,45 +18,55 @@ import { useSaleContext } from '../../context/SaleContextProvider';
 
 type FundingRouteSelectProps = {
   collectionName: string;
-  fundingRoutes: FundingRoute[];
-  onFundingRouteSelected: (fundingRoute: FundingRoute) => void;
+  currencies: SaleWidgetCurrency[];
+  onSelect: (currency: SaleWidgetCurrency) => void;
 };
 
 export function FundingRouteSelect({
-  fundingRoutes,
+  // fundingRoutes,
   collectionName,
-  onFundingRouteSelected,
+  currencies,
+  onSelect,
 }: FundingRouteSelectProps) {
   const { t } = useTranslation();
   const [smartCheckoutDrawerVisible, setSmartCheckoutDrawerVisible] = useState(false);
-  const [activeFundingRouteIndex, setActiveFundingRouteIndex] = useState(0);
-  const { viewDispatch } = useContext(ViewContext);
+  const [selectedCurrencyIndex, setselectedCurrencyIndex] = useState(0);
+  const { cryptoFiatState } = useContext(CryptoFiatContext);
+  // const { viewDispatch } = useContext(ViewContext);
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
-  const { goBackToPaymentMethods } = useSaleContext();
+  const { goBackToPaymentMethods, amount } = useSaleContext();
 
   const onClickContinue = () => {
-    onFundingRouteSelected(fundingRoutes[activeFundingRouteIndex]);
-    viewDispatch({
-      payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: {
-          type: SaleWidgetViews.FUND_WITH_SMART_CHECKOUT,
-          subView: FundWithSmartCheckoutSubViews.FUNDING_ROUTE_EXECUTE,
-        },
-      },
-    });
+    // proceed with selected currency if settlement
+    // if not start swap
+    // onSelect(fundingRoutes[selectedCurrencyIndex]);
+    // viewDispatch({
+    //   payload: {
+    //     type: ViewActions.UPDATE_VIEW,
+    //     view: {
+    //       type: SaleWidgetViews.FUND_WITH_SMART_CHECKOUT,
+    //       subView: FundWithSmartCheckoutSubViews.FUNDING_ROUTE_EXECUTE,
+    //     },
+    //   },
+    // });
   };
 
   const closeDrawer = (selectedFundingRouteIndex: number) => {
-    setActiveFundingRouteIndex(selectedFundingRouteIndex);
+    // close drawer, set selected currency
+    setselectedCurrencyIndex(selectedFundingRouteIndex);
     setSmartCheckoutDrawerVisible(false);
   };
 
   const onSmartCheckoutDropdownClick = () => {
+    if (currencies.length === 0) return;
+
+    // close drawer
     setSmartCheckoutDrawerVisible(true);
   };
+
+  if (!currencies) return null;
 
   return (
     <SimpleLayout
@@ -88,7 +92,7 @@ export function FundingRouteSelect({
           {t('views.FUND_WITH_SMART_CHECKOUT.fundingRouteSelect.heading')}
         </Heading>
 
-        {fundingRoutes.length === 0
+        {currencies.length === 0
           ? [
             <Body key="noRoutesAvailableText" size="small">
               {t(
@@ -104,19 +108,21 @@ export function FundingRouteSelect({
           : [
             <FundingRouteMenuItem
               data-testid="funding-route-select-selected-route"
-              onClick={
-                  fundingRoutes.length > 1
-                    ? onSmartCheckoutDropdownClick
-                    : () => {}
-                }
-              fundingRoute={fundingRoutes[activeFundingRouteIndex]}
-              selected
-              toggleVisible={fundingRoutes.length > 1}
+              onClick={onSmartCheckoutDropdownClick}
+              currency={{
+                ...currencies[selectedCurrencyIndex],
+                userBalance: {
+                  balance: BigNumber.from(amount),
+                  formattedBalance: amount,
+                },
+              }}
+              conversions={cryptoFiatState.conversions}
+              toggleVisible={currencies.length > 1}
               key="selectedFundingRouteMenuItem"
             />,
             <PurchaseMenuItem
               key="purchaseMenuItem"
-              fundingRoute={fundingRoutes[activeFundingRouteIndex]}
+              currency={currencies[selectedCurrencyIndex]}
               collectionName={collectionName}
             />,
             <Button
@@ -143,8 +149,9 @@ export function FundingRouteSelect({
       <FundingRouteDrawer
         visible={smartCheckoutDrawerVisible}
         onCloseDrawer={closeDrawer}
-        fundingRoutes={fundingRoutes}
-        activeFundingRouteIndex={activeFundingRouteIndex}
+        currencies={currencies}
+        selectedIndex={selectedCurrencyIndex}
+        conversions={cryptoFiatState.conversions}
       />
     </SimpleLayout>
   );

@@ -1,5 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { SaleItem, TransactionRequirement } from '@imtbl/checkout-sdk';
+import { UserBalance } from '@imtbl/checkout-sdk/dist/types';
 
 export type SignedOrderProduct = {
   productId: string;
@@ -119,13 +120,14 @@ export type ClientConfig = {
 
 export type SaleWidgetCurrency = {
   name: string;
-  symbol?: string;
+  symbol: string;
   decimals: number;
-  address?: string;
-  icon?: string;
-  base?: boolean;
+  address: string;
+  base: boolean;
+  icon: string;
   exchangeId?: string;
   currencyType: SaleWidgetCurrencyType;
+  userBalance: UserBalance;
 };
 
 export enum SaleWidgetCurrencyType {

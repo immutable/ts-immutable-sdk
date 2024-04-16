@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Environment } from '@imtbl/config';
 import { Checkout, TokenFilterTypes } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
+import { BigNumber } from 'ethers';
 import { PRIMARY_SALES_API_BASE_URL } from '../utils/config';
 
 import {
@@ -18,11 +19,12 @@ import {
 } from '../functions/transformToClientConfig';
 
 type UseClientConfigParams = {
+  amount: string;
   environment: Environment;
   environmentId: string;
   checkout: Checkout | undefined;
   provider: Web3Provider | undefined;
-  defaultCurrency?: 'USDC';
+  defaultCurrency?: string;
 };
 
 export const defaultClientConfig: ClientConfig = {
@@ -37,11 +39,12 @@ export type ConfigError = {
 };
 
 export const useClientConfig = ({
+  amount,
   environment,
   environmentId,
   checkout,
   provider,
-  defaultCurrency,
+  defaultCurrency = 'USDC',
 }: UseClientConfigParams) => {
   const [selectedCurrency, setSelectedCurrency] = useState<
   ClientConfigCurrency | undefined
@@ -70,7 +73,13 @@ export const useClientConfig = ({
 
         return swapAllowList.tokens.map((token) => ({
           ...token,
+          base: false,
           currencyType: SaleWidgetCurrencyType.SWAPPABLE,
+          userBalance: {
+            balance: BigNumber.from(1),
+            formattedBalance: '1.2',
+          },
+
         }));
       } catch (error) {
         console.warn("Error fetching swappable currencies", error); // eslint-disable-line
@@ -80,7 +89,7 @@ export const useClientConfig = ({
 
     const fetchSettlementCurrencies = async () => {
       try {
-        const baseUrl = `${PRIMARY_SALES_API_BASE_URL[environment]}/${environmentId}/client-config`;
+        const baseUrl = `${PRIMARY_SALES_API_BASE_URL[environment]}/${environmentId}/client-config?amount=${amount}`;
         const response = await fetch(baseUrl, {
           method: 'GET',
           // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -95,6 +104,11 @@ export const useClientConfig = ({
 
         return config.currencies.map((currency) => ({
           ...currency,
+          symbol: currency.name,
+          userBalance: {
+            balance: BigNumber.from(1),
+            formattedBalance: '1.2',
+          },
           currencyType: SaleWidgetCurrencyType.SETTLEMENT,
         }));
       } catch (error) {
@@ -115,7 +129,7 @@ export const useClientConfig = ({
       const combinedCurrencies: SaleWidgetCurrency[] = [
         ...settlementCurrencies,
         ...swappableCurrencies,
-      ];
+      ] as SaleWidgetCurrency[];
 
       const transformedCurrencies = sortAndDeduplicateCurrencies(combinedCurrencies);
       setAllCurrencies(transformedCurrencies);
@@ -126,7 +140,7 @@ export const useClientConfig = ({
     if (clientConfig.currencies.length === 0) return;
 
     const defaultSelectedCurrency = clientConfig.currencies.find((c) => c.name === defaultCurrency)
-      || clientConfig.currencies.find((c) => c.base);
+      || clientConfig.currencies.find((c) => c.base) || clientConfig.currencies?.[0];
     setSelectedCurrency(defaultSelectedCurrency);
   }, [defaultCurrency, clientConfig]);
 

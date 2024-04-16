@@ -1,42 +1,47 @@
-import {
-  Drawer,
-} from '@biom3/react';
-import { FundingRoute } from '@imtbl/checkout-sdk';
+import { Drawer } from '@biom3/react';
 import { useTranslation } from 'react-i18next';
+import { SaleWidgetCurrency } from 'widgets/sale/types';
 import { FundingRouteMenuItem } from '../FundingRouteMenuItem/FundingRouteMenuItem';
 
 type FundingRouteDrawerProps = {
   visible: boolean;
   onCloseDrawer: (selectedFundingRouteIndex: number) => void;
-  fundingRoutes: FundingRoute[];
-  activeFundingRouteIndex: number;
+  currencies: SaleWidgetCurrency[];
+  selectedIndex: number;
+  conversions: Map<string, number>;
 };
 
 export function FundingRouteDrawer({
-  visible, onCloseDrawer, fundingRoutes, activeFundingRouteIndex,
-}:
-FundingRouteDrawerProps) {
+  conversions,
+  visible,
+  onCloseDrawer,
+  currencies,
+  selectedIndex,
+}: FundingRouteDrawerProps) {
   const { t } = useTranslation();
-  const onClickMenuItem = (selectedFundingRouteIndex: number) => {
-    onCloseDrawer(selectedFundingRouteIndex);
+  const onClickMenuItem = (index: number) => {
+    onCloseDrawer(index);
   };
 
   return (
     <Drawer
       size="full"
-      onCloseDrawer={() => onCloseDrawer(activeFundingRouteIndex)}
+      onCloseDrawer={() => onCloseDrawer(selectedIndex)}
       visible={visible}
       showHeaderBar
-      headerBarTitle={t('views.FUND_WITH_SMART_CHECKOUT.fundingRouteDrawer.header')}
+      headerBarTitle={t(
+        'views.FUND_WITH_SMART_CHECKOUT.fundingRouteDrawer.header',
+      )}
     >
       <Drawer.Content>
-        {fundingRoutes.map((fundingRoute: FundingRoute, i: number) => (
+        {currencies.map((currency: SaleWidgetCurrency, idx: number) => (
           <FundingRouteMenuItem
-            onClick={() => onClickMenuItem(i)}
-            fundingRoute={fundingRoute}
-            selected={activeFundingRouteIndex === i}
-            key={fundingRoute.steps[0].fundingItem.type + fundingRoute.steps[0].fundingItem.token}
+            onClick={() => onClickMenuItem(idx)}
+            currency={currency}
+            selected={selectedIndex === idx}
+            key={`${currency.name}-${currency.symbol}`}
             size="medium"
+            conversions={conversions}
           />
         ))}
       </Drawer.Content>

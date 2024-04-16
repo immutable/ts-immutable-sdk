@@ -93,7 +93,6 @@ export class CryptoFiat {
     if (!tokenSymbols || tokenSymbols.length === 0) {
       throw new Error('Error missing token symbols to convert');
     }
-
     const currencies = fiatSymbols.filter((fiatSymbol) => fiatSymbol !== '');
     if (currencies.length === 0) currencies.push(DEFAULT_FIAT_SYMBOL);
 

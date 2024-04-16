@@ -5,6 +5,7 @@ export enum SaleWidgetViews {
   PAYMENT_METHODS = 'PAYMENT_METHODS',
   PAY_WITH_COINS = 'PAY_WITH_COINS',
   PAY_WITH_CARD = 'PAY_WITH_CARD',
+  ORDER_SUMMARY = 'ORDER_SUMMARY',
   FUND_WITH_SMART_CHECKOUT = 'FUND_WITH_SMART_CHECKOUT',
   SALE_SUCCESS = 'SALE_SUCCESS',
   SALE_FAIL = 'SALE_FAIL',
@@ -15,6 +16,7 @@ export type SaleWidgetView =
   | SaleWithCoinsView
   | SaleWithCardView
   | SaleSmartCheckoutView
+  | OrderSummaryView
   | SaleSuccessView
   | SaleFailView;
 
@@ -34,6 +36,10 @@ interface SaleSmartCheckoutView extends ViewType {
   type: SaleWidgetViews.FUND_WITH_SMART_CHECKOUT;
   subView: FundWithSmartCheckoutSubViews;
 }
+interface OrderSummaryView extends ViewType {
+  type: SaleWidgetViews.ORDER_SUMMARY;
+  subView: OrderSummarySubViews;
+}
 interface SaleSuccessView extends ViewType {
   type: SaleWidgetViews.SALE_SUCCESS;
 }
@@ -51,4 +57,9 @@ export enum FundWithSmartCheckoutSubViews {
   LOADING = 'LOADING',
   FUNDING_ROUTE_SELECT = 'FUNDING_ROUTE_SELECT',
   FUNDING_ROUTE_EXECUTE = 'FUNDING_ROUTE_EXECUTE',
+}
+
+export enum OrderSummarySubViews {
+  INIT = 'INIT',
+  REVIEW_ORDER = 'REVIEW_ORDER',
 }

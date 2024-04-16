@@ -68,30 +68,30 @@ export const fundingRouteFees = (
   return formatFiatString(totalUsd);
 };
 
-export const smartCheckoutTokensList = (
-  smartCheckoutResult: SmartCheckoutResult,
-) => {
-  if (smartCheckoutResult.sufficient
-    || smartCheckoutResult.router.routingOutcome.type !== RoutingOutcomeType.ROUTES_FOUND) {
-    return [];
-  }
+// export const smartCheckoutTokensList = (
+//   smartCheckoutResult: SmartCheckoutResult,
+// ) => {
+//   if (smartCheckoutResult.sufficient
+//     || smartCheckoutResult.router.routingOutcome.type !== RoutingOutcomeType.ROUTES_FOUND) {
+//     return [];
+//   }
 
-  const tokenSymbols: string[] = [];
-  for (const requirement of smartCheckoutResult.transactionRequirements) {
-    const { token } = (requirement.current as TokenBalance);
-    if (!tokenSymbols.includes(token.symbol)) {
-      tokenSymbols.push(token.symbol);
-    }
-  }
-  for (const fundingRoute of smartCheckoutResult.router.routingOutcome.fundingRoutes) {
-    for (const step of fundingRoute.steps) {
-      if (!tokenSymbols.includes(step.fundingItem.token.symbol)) {
-        tokenSymbols.push(step.fundingItem.token.symbol);
-      }
-    }
-  }
-  return tokenSymbols;
-};
+//   const tokenSymbols: string[] = [];
+//   for (const requirement of smartCheckoutResult.transactionRequirements) {
+//     const { token } = (requirement.current as TokenBalance);
+//     if (!tokenSymbols.includes(token.symbol)) {
+//       tokenSymbols.push(token.symbol);
+//     }
+//   }
+//   for (const fundingRoute of smartCheckoutResult.router.routingOutcome.fundingRoutes) {
+//     for (const step of fundingRoute.steps) {
+//       if (!tokenSymbols.includes(step.fundingItem.token.symbol)) {
+//         tokenSymbols.push(step.fundingItem.token.symbol);
+//       }
+//     }
+//   }
+//   return tokenSymbols;
+// };
 
 export const filterSmartCheckoutResult = (
   smartCheckoutResult: SmartCheckoutResult,

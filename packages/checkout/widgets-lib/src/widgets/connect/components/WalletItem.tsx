@@ -1,6 +1,6 @@
 import { MenuItem } from '@biom3/react';
 import { useTranslation } from 'react-i18next';
-import { ReactElement, useState } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 import { WalletProviderName } from '@imtbl/checkout-sdk';
 import { RawImage } from '../../../components/RawImage/RawImage';
 import { EIP1193Provider, EIP6963ProviderDetail, getProviderSlugFromRdns } from '../../../lib/provider';
@@ -30,6 +30,13 @@ export function WalletItem<
   const isPassport = providerSlug === WalletProviderName.PASSPORT;
   const isPassportOrMetamask = isPassport || providerSlug === WalletProviderName.METAMASK;
   const offsetStyles = { marginLeft: '65px' };
+
+  useEffect(() => {
+    if (recommended) {
+      // click itself
+      onWalletItemClick(providerDetail);
+    }
+  }, [recommended]);
 
   return (
     <MenuItem
