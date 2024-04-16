@@ -30,7 +30,7 @@ import {
   SEAPORT_CONTRACT_VERSION_V1_5,
 } from './constants';
 import { getOrderComponentsFromMessage } from './components';
-import { SeaportLibFactory, SeaportVersion } from './seaport-lib-factory';
+import { SeaportLibFactory } from './seaport-lib-factory';
 import { prepareTransaction } from './transaction';
 import { mapImmutableOrderToSeaportOrderComponents } from './map-to-seaport-order';
 
@@ -40,6 +40,7 @@ export class Seaport {
     private provider: providers.JsonRpcProvider,
     private seaportContractAddress: string,
     private zoneContractAddress: string,
+    private apiKey?: string,
   ) {}
 
   async prepareSeaportOrder(
@@ -317,13 +318,7 @@ export class Seaport {
 
   private getSeaportLib(order?: Order): SeaportLib {
     const seaportAddress = order?.protocol_data?.seaport_address ?? this.seaportContractAddress;
-
-    const seaportVersion: SeaportVersion = SEAPORT_CONTRACT_VERSION_V1_5;
-    // if (order?.protocol_data?.seaport_version === SEAPORT_CONTRACT_VERSION_V1_5) {
-    //   seaportVersion = SEAPORT_CONTRACT_VERSION_V1_5;
-    // }
-
-    return this.seaportLibFactory.create(seaportVersion, seaportAddress);
+    return this.seaportLibFactory.create(seaportAddress, this.apiKey);
   }
 
   private static getExpirationISOTimeFromExtraData(extraData: string): string {

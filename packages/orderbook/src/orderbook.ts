@@ -92,6 +92,7 @@ export class Orderbook {
       this.orderbookConfig.provider,
       this.orderbookConfig.seaportContractAddress,
       this.orderbookConfig.zoneContractAddress,
+      config.baseConfig.apiKey,
     );
   }
 
