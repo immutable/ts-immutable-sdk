@@ -45,7 +45,7 @@ function TransferERC20({ disabled, handleExampleSubmitted }: RequestExampleProps
       if (useTransferFrom) {
         data = erc20Transfer.encodeFunctionData('transferFrom', [fromAddress, toAddress, amount]);
       }
-      
+
       setParams([{
         from: fromAddress,
         to: contractAddress,
@@ -88,7 +88,7 @@ function TransferERC20({ disabled, handleExampleSubmitted }: RequestExampleProps
   }, [params, handleExampleSubmitted]);
 
   return (
-    <Accordion.Item eventKey="4">
+    <Accordion.Item eventKey="3">
       <Accordion.Header>Transfer ERC20</Accordion.Header>
       <Accordion.Body>
         <Form noValidate onSubmit={handleSubmit} className="mb-4">

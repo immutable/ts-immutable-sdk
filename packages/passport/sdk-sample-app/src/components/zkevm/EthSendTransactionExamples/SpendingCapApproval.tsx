@@ -86,7 +86,7 @@ function SpendingCapApproval({ disabled, handleExampleSubmitted }: RequestExampl
   }, [params, handleExampleSubmitted]);
 
   return (
-    <Accordion.Item eventKey="3">
+    <Accordion.Item eventKey="2">
       <Accordion.Header>Spending Cap Approval</Accordion.Header>
       <Accordion.Body>
         <Form onSubmit={handleSubmit} className="mb-4">

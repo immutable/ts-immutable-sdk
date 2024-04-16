@@ -100,7 +100,7 @@ function NFTApproval({ disabled, handleExampleSubmitted }: RequestExampleProps) 
   }, [params, handleExampleSubmitted]);
 
   return (
-    <Accordion.Item eventKey="5">
+    <Accordion.Item eventKey="4">
       <Accordion.Header>NFT Approve</Accordion.Header>
       <Accordion.Body>
         <Form onSubmit={handleSubmit} className="mb-4">
