@@ -23,7 +23,7 @@ export function BalanceDrawer({
 
   return (
     <Drawer
-      size="full"
+      size="threeQuarter"
       onCloseDrawer={() => onCloseDrawer(activeFundingRouteIndex)}
       visible={visible}
       showHeaderBar
@@ -41,7 +41,6 @@ export function BalanceDrawer({
               fundingRoute.steps[0].fundingItem.type
               + fundingRoute.steps[0].fundingItem.token
             }
-            size="medium"
           />
         ))}
       </Drawer.Content>
