@@ -9,6 +9,7 @@ export enum ConnectEventType {
   SUCCESS = 'success',
   FAILURE = 'failure',
   LANGUAGE_CHANGED = 'language-changed',
+  WALLETCONNECT_PROVIDER_UPDATED = 'walletconnect-provider-updated',
 }
 
 /**
@@ -33,3 +34,20 @@ export type ConnectionFailed = {
   /** The reason for the failed connection. */
   reason: string;
 };
+
+export type WalletConnectProviderChanged = {
+  ethereumProvider: any; // EthereumProvider;
+  walletConnectManager: WalletConnectManager;
+};
+
+/**
+ * Provides access to the underlying WalletConnect modal and provider.
+ */
+export interface WalletConnectManager {
+  isInitialised: () => boolean;
+  isEnabled: () => boolean;
+  getModal: () => any; // WalletConnectModal;
+  getProvider: () => Promise<any>; // EthereumProvider>;
+  loadWalletListings: () => Promise<Response | undefined>;
+  getWalletLogoUrl: (walletSlug?: string) => Promise<string | undefined>;
+}

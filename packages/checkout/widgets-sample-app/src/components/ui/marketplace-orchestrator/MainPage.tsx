@@ -58,6 +58,9 @@ export const MainPage = () => {
   const swapWidget = useMemo(() => widgetsFactory.create(WidgetType.SWAP), [widgetsFactory]);
   const onRampWidget = useMemo(() => widgetsFactory.create(WidgetType.ONRAMP), [widgetsFactory]);
 
+  connectWidget.addListener(ConnectEventType.WALLETCONNECT_PROVIDER_UPDATED, (event) => {
+    console.log('WalletConnnect provider ready', event);
+  });
   connectWidget.addListener(ConnectEventType.CLOSE_WIDGET, () => { connectWidget.unmount() });
   connectWidget.addListener(ConnectEventType.SUCCESS, (event) => {
     console.log('Connect success', event);

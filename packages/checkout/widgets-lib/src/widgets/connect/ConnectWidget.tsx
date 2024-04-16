@@ -4,7 +4,12 @@ import React, {
 } from 'react';
 import {
   ChainId,
-  Checkout, ConnectWidgetParams, EIP1193Provider, getMetaMaskProviderDetail, getPassportProviderDetail,
+  Checkout,
+  ConnectWidgetParams,
+  EIP1193Provider,
+  getMetaMaskProviderDetail,
+  getPassportProviderDetail,
+  WalletConnectManager as IWalletConnectManager,
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { useTranslation } from 'react-i18next';
@@ -13,6 +18,7 @@ import {
   sendCloseWidgetEvent,
   sendConnectFailedEvent,
   sendConnectSuccessEvent,
+  sendWalletConnectProviderUpdatedEvent,
 } from './connectWidgetEvents';
 import {
   ConnectActions,
@@ -42,7 +48,8 @@ import { EventTargetContext } from '../../context/event-target-context/EventTarg
 import { UserJourney, useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { identifyUser } from '../../lib/analytics/identifyUser';
 import { isMetaMaskProvider, isPassportProvider, isWalletConnectProvider } from '../../lib/provider';
-import { walletConnectProviderInfo } from '../../lib/walletConnect';
+import { WalletConnectManager, walletConnectProviderInfo } from '../../lib/walletConnect';
+import { useWalletConnect } from '../../lib/hooks/useWalletConnect';
 
 export type ConnectWidgetInputs = ConnectWidgetParams & {
   config: StrongCheckoutWidgetsConfig
@@ -65,6 +72,7 @@ export default function ConnectWidget({
 }: ConnectWidgetInputs) {
   const { t } = useTranslation();
   const { environment } = config;
+  const { isWalletConnectEnabled, ethereumProvider } = useWalletConnect();
 
   const errorText = t('views.ERROR_VIEW.actionText');
 
@@ -144,6 +152,16 @@ export default function ConnectWidget({
     if (viewState.view.type !== SharedViews.ERROR_VIEW) return;
     sendConnectFailedEvent(eventTarget, viewState.view.error.message);
   }, [viewState]);
+
+  useEffect(() => {
+    if (isWalletConnectEnabled) {
+      sendWalletConnectProviderUpdatedEvent(
+        eventTarget,
+        ethereumProvider,
+        WalletConnectManager.getInstance() as unknown as IWalletConnectManager,
+      );
+    }
+  }, [isWalletConnectEnabled, ethereumProvider]);
 
   const handleConnectSuccess = useCallback(async () => {
     if (!provider) return;
