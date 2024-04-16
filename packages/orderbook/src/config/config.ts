@@ -20,12 +20,15 @@ export interface OrderbookModuleConfiguration {
   provider: providers.JsonRpcProvider;
 }
 
-export function getConfiguredProvider(url: string, apiKey?: string): providers.JsonRpcProvider {
+export function getConfiguredProvider(
+  url: string,
+  rateLimitingKey?: string,
+): providers.JsonRpcProvider {
   return new providers.JsonRpcProvider({
     url,
-    headers: apiKey ? {
+    headers: rateLimitingKey ? {
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      'x-immutable-api-key': apiKey!,
+      'x-api-key': rateLimitingKey!,
     } : undefined,
   });
 }
@@ -40,7 +43,7 @@ export function getOrderbookConfig(
         zoneContractAddress: '0x8831867E347AB87FA30199C5B695F0A31604Bb52',
         apiEndpoint: 'https://api.sandbox.immutable.com',
         chainName: TESTNET_CHAIN_NAME,
-        provider: getConfiguredProvider('https://rpc.testnet.immutable.com', config.baseConfig.apiKey),
+        provider: getConfiguredProvider('https://rpc.testnet.immutable.com', config.baseConfig.rateLimitingKey),
       };
     // not yet deployed
     case Environment.PRODUCTION:
@@ -49,7 +52,7 @@ export function getOrderbookConfig(
         zoneContractAddress: '0x00338b92Bec262078B3e49BF12bbEA058916BF91',
         apiEndpoint: 'https://api.immutable.com',
         chainName: MAINNET_CHAIN_NAME,
-        provider: getConfiguredProvider('https://rpc.immutable.com', config.baseConfig.apiKey),
+        provider: getConfiguredProvider('https://rpc.immutable.com', config.baseConfig.rateLimitingKey),
       };
     default:
       return null;

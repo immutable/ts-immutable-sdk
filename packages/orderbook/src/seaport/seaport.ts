@@ -40,7 +40,7 @@ export class Seaport {
     private provider: providers.JsonRpcProvider,
     private seaportContractAddress: string,
     private zoneContractAddress: string,
-    private apiKey?: string,
+    private rateLimitingKey?: string,
   ) {}
 
   async prepareSeaportOrder(
@@ -318,7 +318,7 @@ export class Seaport {
 
   private getSeaportLib(order?: Order): SeaportLib {
     const seaportAddress = order?.protocol_data?.seaport_address ?? this.seaportContractAddress;
-    return this.seaportLibFactory.create(seaportAddress, this.apiKey);
+    return this.seaportLibFactory.create(seaportAddress, this.rateLimitingKey);
   }
 
   private static getExpirationISOTimeFromExtraData(extraData: string): string {

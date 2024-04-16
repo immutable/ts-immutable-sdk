@@ -11,11 +11,11 @@ export type SeaportVersion =
 // safely instantiate a V6 provider for the V5 provider URL.
 function convertToV6Provider(
   provider: providers.JsonRpcProvider,
-  apiKey?: string,
+  rateLimitingKey?: string,
 ): JsonRpcProvider {
   const fetch = new FetchRequest(provider.connection.url);
-  if (apiKey) {
-    fetch.setHeader('x-immutable-api-key', apiKey);
+  if (rateLimitingKey) {
+    fetch.setHeader('x-api-key', rateLimitingKey);
   }
 
   const overwrittenProvider = new JsonRpcProvider(fetch);
@@ -53,10 +53,10 @@ export class SeaportLibFactory {
     private readonly provider: providers.JsonRpcProvider,
   ) { }
 
-  create(orderSeaportAddress?: string, apiKey?: string): SeaportLib {
+  create(orderSeaportAddress?: string, rateLimitingKey?: string): SeaportLib {
     const seaportContractAddress = orderSeaportAddress ?? this.defaultSeaportContractAddress;
 
-    return new SeaportLib(convertToV6Provider(this.provider, apiKey), {
+    return new SeaportLib(convertToV6Provider(this.provider, rateLimitingKey), {
       balanceAndApprovalChecksOnOrderCreation: true,
       overrides: {
         contractAddress: seaportContractAddress,

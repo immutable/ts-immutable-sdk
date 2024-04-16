@@ -59,7 +59,7 @@ export class Orderbook {
     if (config.overrides?.jsonRpcProviderUrl) {
       finalConfig.provider = getConfiguredProvider(
         config.overrides?.jsonRpcProviderUrl!,
-        config.baseConfig.apiKey,
+        config.baseConfig.rateLimitingKey,
       );
     }
 
@@ -80,7 +80,7 @@ export class Orderbook {
       apiEndpoint,
       chainName,
       this.orderbookConfig.seaportContractAddress,
-      config.baseConfig.apiKey,
+      config.baseConfig.rateLimitingKey,
     ).create();
 
     const seaportLibFactory = new SeaportLibFactory(
@@ -92,7 +92,7 @@ export class Orderbook {
       this.orderbookConfig.provider,
       this.orderbookConfig.seaportContractAddress,
       this.orderbookConfig.zoneContractAddress,
-      config.baseConfig.apiKey,
+      config.baseConfig.rateLimitingKey,
     );
   }
 
