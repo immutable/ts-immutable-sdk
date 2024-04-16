@@ -27,16 +27,20 @@ const logoColour = {
   [ChainId.SEPOLIA]: 'base.color.accent.5',
 };
 
-export interface FundingRouteMenuItemProps {
+export interface BalanceItemProps {
   onClick: () => void;
   fundingRoute: FundingRoute;
   toggleVisible?: boolean;
   selected?: boolean;
   size?: 'small' | 'medium';
 }
-export function FundingRouteMenuItem({
-  onClick, fundingRoute, toggleVisible, selected, size = 'small',
-}: FundingRouteMenuItemProps) {
+export function BalanceItem({
+  onClick,
+  fundingRoute,
+  toggleVisible,
+  selected,
+  size = 'small',
+}: BalanceItemProps) {
   const { t } = useTranslation();
   const firstFundingStep = fundingRoute.steps[0];
 
@@ -105,8 +109,12 @@ export function FundingRouteMenuItem({
       <MenuItem.FramedIcon icon="Coins" circularFrame />
       <MenuItem.PriceDisplay
         use={<Heading size="xSmall" />}
-        fiatAmount={`${t('views.FUND_WITH_SMART_CHECKOUT.currency.usdEstimate')}${usdBalance}`}
-        price={tokenValueFormat(firstFundingStep.fundingItem.userBalance.formattedBalance)}
+        fiatAmount={`${t(
+          'views.FUND_WITH_SMART_CHECKOUT.currency.usdEstimate',
+        )}${usdBalance}`}
+        price={tokenValueFormat(
+          firstFundingStep.fundingItem.userBalance.formattedBalance,
+        )}
       />
       <MenuItem.Label sx={{ display: 'flex', wordBreak: 'default' }}>
         {firstFundingStep.fundingItem.token.symbol}

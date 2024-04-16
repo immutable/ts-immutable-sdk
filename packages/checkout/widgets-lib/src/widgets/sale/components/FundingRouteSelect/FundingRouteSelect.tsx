@@ -15,8 +15,8 @@ import {
   ViewActions,
   ViewContext,
 } from '../../../../context/view-context/ViewContext';
-import { FundingRouteMenuItem } from '../FundingRouteMenuItem/FundingRouteMenuItem';
-import { FundingRouteDrawer } from '../FundingRouteSelectDrawer/FundingRouteDrawer';
+import { BalanceItem } from '../BalanceItem/BalanceItem';
+import { BalanceDrawer } from '../BalanceDrawer/BalanceDrawer';
 import { PurchaseMenuItem } from '../PurchaseMenuItem/PurchaseMenuItem';
 import { sendSaleWidgetCloseEvent } from '../../SaleWidgetEvents';
 import { EventTargetContext } from '../../../../context/event-target-context/EventTargetContext';
@@ -102,7 +102,7 @@ export function FundingRouteSelect({
             </Button>,
           ]
           : [
-            <FundingRouteMenuItem
+            <BalanceItem
               data-testid="funding-route-select-selected-route"
               onClick={
                   fundingRoutes.length > 1
@@ -140,7 +140,7 @@ export function FundingRouteSelect({
             </Button>,
           ]}
       </Box>
-      <FundingRouteDrawer
+      <BalanceDrawer
         visible={smartCheckoutDrawerVisible}
         onCloseDrawer={closeDrawer}
         fundingRoutes={fundingRoutes}
