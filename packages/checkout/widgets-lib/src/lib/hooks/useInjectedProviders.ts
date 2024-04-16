@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Checkout, WalletProviderRdns } from '@imtbl/checkout-sdk';
-import { Web3Provider } from '@ethersproject/providers';
 import {
+  Checkout,
   EIP1193Provider,
   EIP6963ProviderDetail,
-  InjectedProvidersManager,
-} from '../provider';
-import { getMetaMaskProviderDetail, getPassportProviderDetail } from '../provider/providerDetail';
+  getMetaMaskProviderDetail,
+  getPassportProviderDetail,
+  WalletProviderRdns,
+} from '@imtbl/checkout-sdk';
+import { Web3Provider } from '@ethersproject/providers';
 
 const DEFAULT_PRIORITY_INDEX = 999;
 
@@ -30,7 +31,7 @@ declare global {
 let passportWeb3Provider: Web3Provider;
 const processProviders = (
   checkout: Checkout | null,
-  injectedProviders: EIP6963ProviderDetail<EIP1193Provider>[],
+  injectedProviders: EIP6963ProviderDetail[],
   priorityWalletRdns: WalletProviderRdns | string[] = [],
   blacklistWalletRdns: WalletProviderRdns | string[] = [],
 ) => {
@@ -75,7 +76,7 @@ export const useInjectedProviders = ({ checkout }: UseInjectedProvidersParams) =
     providers.find((provider) => provider.info.rdns === rdns)
   ), [providers]);
 
-  const filterAndProcessProviders = useCallback(async (injectedProviders: EIP6963ProviderDetail<EIP1193Provider>[]) => {
+  const filterAndProcessProviders = useCallback(async (injectedProviders: EIP6963ProviderDetail[]) => {
     const connectConfig = await checkout?.config.remote.getConfig('connect') as ConnectConfig;
     const priorityWalletRdns = connectConfig.injected?.priorityWalletRdns ?? [];
     const blacklistWalletRdns = connectConfig.injected?.blacklistWalletRdns ?? [];
@@ -89,15 +90,16 @@ export const useInjectedProviders = ({ checkout }: UseInjectedProvidersParams) =
   }, [checkout, setProviders]);
 
   useEffect(() => {
-    const cancelSubscription = InjectedProvidersManager
-      .getInstance()
-      .subscribe(async (injectedProviders: EIP6963ProviderDetail[]) => {
+    if (!checkout) return () => {};
+    const cancelSubscription = checkout.onInjectedProvidersChange(
+      async (injectedProviders: EIP6963ProviderDetail[]) => {
         await filterAndProcessProviders(injectedProviders);
-      });
+      },
+    );
 
-    filterAndProcessProviders(InjectedProvidersManager.getInstance().getProviders());
+    filterAndProcessProviders([...checkout.getInjectedProviders()]);
     return () => cancelSubscription();
-  }, []);
+  }, [checkout]);
 
   return {
     findProvider,

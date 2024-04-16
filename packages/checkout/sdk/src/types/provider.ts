@@ -40,7 +40,7 @@ export type ValidateProviderOptions = {
   allowUnsupportedProvider: boolean;
 };
 
-export const validateProviderDefaults:ValidateProviderOptions = {
+export const validateProviderDefaults: ValidateProviderOptions = {
   allowMistmatchedChainId: false,
   allowUnsupportedProvider: false,
 };

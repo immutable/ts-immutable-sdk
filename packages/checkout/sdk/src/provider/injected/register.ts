@@ -1,4 +1,4 @@
-import { EIP1193Provider } from '../types/eip1193';
+import { EIP1193Provider } from '../../types/eip1193';
 
 export interface Register {}
 
