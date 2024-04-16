@@ -1,12 +1,15 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { Accordion, Form } from 'react-bootstrap';
 import InputGroup from 'react-bootstrap/InputGroup';
 import { usePassportProvider } from '@/context/PassportProvider';
 import WorkflowButton from '@/components/WorkflowButton';
 import { RequestExampleProps } from '@/types';
 import { Interface } from 'ethers/lib/utils';
-import { ethers } from 'ethers';
-import { Checkbox } from '@biom3/react';
 
 function TransferERC20({ disabled, handleExampleSubmitted }: RequestExampleProps) {
   const [fromAddress, setFromAddress] = useState<string>('');
@@ -37,7 +40,6 @@ function TransferERC20({ disabled, handleExampleSubmitted }: RequestExampleProps
 
     try {
       if (Number(rawAmount) < 0) {
-        console.log((Number(rawAmount) < 0))
         setAmountConvertError(amountRange);
       }
 
@@ -60,7 +62,7 @@ function TransferERC20({ disabled, handleExampleSubmitted }: RequestExampleProps
         data: '0x',
       }]);
     }
-  }, [fromAddress, toAddress, contractAddress, amount]);
+  }, [fromAddress, toAddress, contractAddress, amount, erc20Transfer, useTransferFrom]);
 
   useEffect(() => {
     const getAddress = async () => {
@@ -74,8 +76,6 @@ function TransferERC20({ disabled, handleExampleSubmitted }: RequestExampleProps
 
     getAddress().catch(console.log);
   }, [zkEvmProvider, setFromAddress]);
-
-
 
   const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -120,7 +120,7 @@ function TransferERC20({ disabled, handleExampleSubmitted }: RequestExampleProps
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Check
-              onClick={() => { 
+              onClick={() => {
                 setUseTransferFrom(!useTransferFrom);
               }}
               type="checkbox"
