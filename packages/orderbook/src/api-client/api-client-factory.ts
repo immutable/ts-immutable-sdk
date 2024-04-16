@@ -16,7 +16,7 @@ export class ImmutableApiClientFactory {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       HEADERS: rateLimitingKey ? {
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        'x-immutable-api-key': rateLimitingKey!,
+        'x-api-key': rateLimitingKey!,
       } : undefined,
     });
   }
