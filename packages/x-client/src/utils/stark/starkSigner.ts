@@ -1,4 +1,5 @@
-import { ec } from 'elliptic';
+// @ts-ignore
+import elliptic from 'elliptic';
 import * as encUtils from 'enc-utils';
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import BN from 'bn.js';
@@ -7,7 +8,7 @@ import { starkEc } from './legacy/crypto';
 import { Errors } from './errors';
 
 export class StandardStarkSigner implements StarkSigner {
-  private keyPair: ec.KeyPair;
+  private keyPair: elliptic.ec.KeyPair;
 
   constructor(private privateKey: string) {
     this.keyPair = starkEc.keyFromPrivate(privateKey, 'hex');
@@ -23,7 +24,7 @@ export class StandardStarkSigner implements StarkSigner {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  private serialize(sig: ec.Signature): string {
+  private serialize(sig: elliptic.ec.Signature): string {
     return encUtils.addHexPrefix(
       encUtils.padLeft(sig.r.toString('hex'), 64)
         + encUtils.padLeft(sig.s.toString('hex'), 64),

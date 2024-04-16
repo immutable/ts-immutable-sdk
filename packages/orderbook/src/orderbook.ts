@@ -1,7 +1,7 @@
 import { ModuleConfiguration } from '@imtbl/config';
-import { providers } from 'ethers';
 import { ImmutableApiClient, ImmutableApiClientFactory } from './api-client';
 import {
+  getConfiguredProvider,
   getOrderbookConfig,
   OrderbookModuleConfiguration,
   OrderbookOverrides,
@@ -49,7 +49,7 @@ export class Orderbook {
   private orderbookConfig: OrderbookModuleConfiguration;
 
   constructor(config: ModuleConfiguration<OrderbookOverrides>) {
-    const obConfig = getOrderbookConfig(config.baseConfig.environment);
+    const obConfig = getOrderbookConfig(config);
 
     const finalConfig: OrderbookModuleConfiguration = {
       ...obConfig,
@@ -57,8 +57,9 @@ export class Orderbook {
     } as OrderbookModuleConfiguration;
 
     if (config.overrides?.jsonRpcProviderUrl) {
-      finalConfig.provider = new providers.JsonRpcProvider(
-        config.overrides.jsonRpcProviderUrl,
+      finalConfig.provider = getConfiguredProvider(
+        config.overrides?.jsonRpcProviderUrl!,
+        config.baseConfig.rateLimitingKey,
       );
     }
 
@@ -79,6 +80,7 @@ export class Orderbook {
       apiEndpoint,
       chainName,
       this.orderbookConfig.seaportContractAddress,
+      config.baseConfig.rateLimitingKey,
     ).create();
 
     const seaportLibFactory = new SeaportLibFactory(
@@ -90,6 +92,7 @@ export class Orderbook {
       this.orderbookConfig.provider,
       this.orderbookConfig.seaportContractAddress,
       this.orderbookConfig.zoneContractAddress,
+      config.baseConfig.rateLimitingKey,
     );
   }
 
