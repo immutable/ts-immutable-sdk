@@ -106,7 +106,13 @@ export const MainPage = () => {
 
   // button click functions to open/close widgets
   const openConnectWidget = useCallback((targetChainId?: ChainId, blockWallets: boolean = false) => {
-    const connectParams = {targetChainId: targetChainId};
+    const connectParams: {
+      targetChainId?: ChainId,
+      blocklistWalletRdns: string[],
+    } = {
+      targetChainId: targetChainId,
+      blocklistWalletRdns: [],
+    };
     if (blockWallets) {
       connectParams.blocklistWalletRdns = [
         'com.immutable.passport',
