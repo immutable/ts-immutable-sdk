@@ -34,10 +34,7 @@ describe('signTypedDataV4', () => {
   };
   const guardianClient = {
     validateMessage: jest.fn(),
-    withConfirmationScreen: jest.fn(() => (task: () => void) => task()),
-    loading: jest.fn(),
   };
-  const withConfirmationScreenStub = jest.fn();
 
   beforeEach(() => {
     jest.resetAllMocks();
@@ -46,8 +43,6 @@ describe('signTypedDataV4', () => {
     (getSignedTypedData as jest.Mock).mockResolvedValueOnce(
       combinedSignature,
     );
-    withConfirmationScreenStub.mockImplementation(() => (task: () => void) => task());
-    guardianClient.withConfirmationScreen = withConfirmationScreenStub;
     rpcProvider.detectNetwork.mockResolvedValue({ chainId });
   });
 

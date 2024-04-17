@@ -194,15 +194,17 @@ export class ZkEvmProvider implements Provider {
           throw new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
         }
 
-        const ethSigner = await this.#getSigner();
+        return this.#guardianClient.withConfirmationScreen({ width: 480, height: 720 })(async () => {
+          const ethSigner = await this.#getSigner();
 
-        return sendTransaction({
-          params: request.params || [],
-          ethSigner,
-          guardianClient: this.#guardianClient,
-          rpcProvider: this.#rpcProvider,
-          relayerClient: this.#relayerClient,
-          zkevmAddress: this.#zkEvmAddress,
+          return sendTransaction({
+            params: request.params || [],
+            ethSigner,
+            guardianClient: this.#guardianClient,
+            rpcProvider: this.#rpcProvider,
+            relayerClient: this.#relayerClient,
+            zkevmAddress: this.#zkEvmAddress!,
+          });
         });
       }
       case 'eth_accounts': {
@@ -214,15 +216,17 @@ export class ZkEvmProvider implements Provider {
           throw new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
         }
 
-        const ethSigner = await this.#getSigner();
+        return this.#guardianClient.withConfirmationScreen({ width: 480, height: 720 })(async () => {
+          const ethSigner = await this.#getSigner();
 
-        return signTypedDataV4({
-          method: request.method,
-          params: request.params || [],
-          ethSigner,
-          rpcProvider: this.#rpcProvider,
-          relayerClient: this.#relayerClient,
-          guardianClient: this.#guardianClient,
+          return signTypedDataV4({
+            method: request.method,
+            params: request.params || [],
+            ethSigner,
+            rpcProvider: this.#rpcProvider,
+            relayerClient: this.#relayerClient,
+            guardianClient: this.#guardianClient,
+          });
         });
       }
       case 'eth_chainId': {

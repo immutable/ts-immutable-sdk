@@ -29,7 +29,9 @@ describe('ZkEvmProvider', () => {
   const magicAdapter = {
     login: jest.fn(),
   } as Partial<MagicAdapter> as MagicAdapter;
-  const guardianClient = {} as GuardianClient;
+  const guardianClient = {
+    withConfirmationScreen: jest.fn().mockImplementation(() => (task: () => void) => task()),
+  } as unknown as GuardianClient;
 
   beforeEach(() => {
     passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
@@ -37,6 +39,9 @@ describe('ZkEvmProvider', () => {
     (Web3Provider as unknown as jest.Mock).mockImplementation(() => ({
       getSigner: jest.fn().mockImplementation(() => ethSigner),
     }));
+
+    (guardianClient.withConfirmationScreen as jest.Mock)
+      .mockImplementation(() => (task: () => void) => task());
   });
 
   const getProvider = () => {
@@ -112,6 +117,15 @@ describe('ZkEvmProvider', () => {
       );
     });
 
+    it('should open a confirmation screen', async () => {
+      authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
+      const provider = getProvider();
+      await provider.request({ method: 'eth_requestAccounts' });
+      await provider.request({ method: 'eth_sendTransaction', params: [transaction] });
+
+      expect(guardianClient.withConfirmationScreen).toBeCalledTimes(1);
+    });
+
     it('should call sendTransaction with the correct params', async () => {
       const transactionHash = '0x789';
       authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
@@ -171,6 +185,15 @@ describe('ZkEvmProvider', () => {
         rpcProvider: expect.any(Object),
         relayerClient: expect.any(RelayerClient),
       });
+    });
+
+    it('should open a confirmation screen', async () => {
+      authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
+      const provider = getProvider();
+      await provider.request({ method: 'eth_requestAccounts' });
+      await provider.request({ method: 'eth_signTypedData_v4', params: [address, typedDataPayload] });
+
+      expect(guardianClient.withConfirmationScreen).toBeCalledTimes(1);
     });
   });
 

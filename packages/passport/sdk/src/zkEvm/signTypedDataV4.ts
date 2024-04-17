@@ -69,20 +69,19 @@ export const signTypedDataV4 = async ({
   rpcProvider,
   relayerClient,
   guardianClient,
-}: SignTypedDataV4Params): Promise<string> => guardianClient
-  .withConfirmationScreen({ width: 480, height: 720 })(async () => {
-    const fromAddress: string = params[0];
-    const typedDataParam: string | object = params[1];
+}: SignTypedDataV4Params): Promise<string> => {
+  const fromAddress: string = params[0];
+  const typedDataParam: string | object = params[1];
 
-    if (!fromAddress || !typedDataParam) {
-      throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `${method} requires an address and a typed data JSON`);
-    }
+  if (!fromAddress || !typedDataParam) {
+    throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `${method} requires an address and a typed data JSON`);
+  }
 
-    const { chainId } = await rpcProvider.detectNetwork();
-    const typedData = transformTypedData(typedDataParam, chainId);
+  const { chainId } = await rpcProvider.detectNetwork();
+  const typedData = transformTypedData(typedDataParam, chainId);
 
-    await guardianClient.validateMessage({ chainID: String(chainId), payload: typedData });
-    const relayerSignature = await relayerClient.imSignTypedData(fromAddress, typedData);
+  await guardianClient.validateMessage({ chainID: String(chainId), payload: typedData });
+  const relayerSignature = await relayerClient.imSignTypedData(fromAddress, typedData);
 
-    return getSignedTypedData(typedData, relayerSignature, BigNumber.from(chainId), fromAddress, ethSigner);
-  });
+  return getSignedTypedData(typedData, relayerSignature, BigNumber.from(chainId), fromAddress, ethSigner);
+};
