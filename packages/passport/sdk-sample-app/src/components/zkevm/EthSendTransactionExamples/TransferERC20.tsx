@@ -8,15 +8,30 @@ import { Accordion, Form } from 'react-bootstrap';
 import InputGroup from 'react-bootstrap/InputGroup';
 import { usePassportProvider } from '@/context/PassportProvider';
 import WorkflowButton from '@/components/WorkflowButton';
-import { RequestExampleProps } from '@/types';
+import { RequestExampleProps, EnvironmentNames } from '@/types';
 import { Interface } from 'ethers/lib/utils';
+import { useImmutableProvider } from '@/context/ImmutableProvider';
+
+const getErc20DefaultContractAddress = (environment: EnvironmentNames) => {
+  switch (environment) {
+    case EnvironmentNames.SANDBOX:
+      return '0x7bbe61ba86dc1b128b7c6228a4834bf2c1394240';
+    case EnvironmentNames.PRODUCTION:
+      return '0x52a6c53869ce09a731cd772f245b97a4401d3348';
+    case EnvironmentNames.DEV:
+      return '0xba919c45c487c6a7d4e7bc5b42d4ff143a80f041';
+    default:
+      return '';
+  }
+};
 
 function TransferERC20({ disabled, handleExampleSubmitted }: RequestExampleProps) {
+  const { environment } = useImmutableProvider();
   const [fromAddress, setFromAddress] = useState<string>('');
   const [toAddress, setToAddress] = useState<string>('');
   const [useTransferFrom, setUseTransferFrom] = useState<boolean>(false);
   const [amount, setAmount] = useState<string>('0');
-  const [contractAddress, setContractAddress] = useState<string>('');
+  const [contractAddress, setContractAddress] = useState<string>(getErc20DefaultContractAddress(environment));
   const { zkEvmProvider } = usePassportProvider();
   const [params, setParams] = useState<any[]>([]);
   const [amountConvertError, setAmountConvertError] = useState<string>('');
@@ -146,6 +161,7 @@ function TransferERC20({ disabled, handleExampleSubmitted }: RequestExampleProps
               required
               disabled={disabled}
               type="text"
+              value={contractAddress}
               onChange={(e) => setContractAddress(e.target.value)}
             />
           </Form.Group>
