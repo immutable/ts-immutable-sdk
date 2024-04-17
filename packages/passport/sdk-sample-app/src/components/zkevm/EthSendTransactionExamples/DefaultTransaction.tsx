@@ -80,7 +80,7 @@ function ShowGenericConfirmationScreen({ disabled, handleExampleSubmitted }: Req
   }, [params, handleExampleSubmitted]);
 
   return (
-    <Accordion.Item eventKey="5">
+    <Accordion.Item eventKey="1">
       <Accordion.Header>Default Transaction</Accordion.Header>
       <Accordion.Body>
         <Form noValidate onSubmit={handleSubmit} className="mb-4">
