@@ -1,5 +1,5 @@
 import { Box, Heading } from '@biom3/react';
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 import { SalePaymentTypes } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
@@ -20,8 +20,11 @@ import { PaymentOptions } from '../components/PaymentOptions';
 import { useSaleContext } from '../context/SaleContextProvider';
 import { useSaleEvent } from '../hooks/useSaleEvents';
 import { SaleErrorTypes, SignPaymentTypes } from '../types';
+import { CreditCardWarningDrawer } from '../components/CreditCardWarningDrawer';
 
 export function PaymentMethods() {
+  const [showCreditCardWarning, setShowCreditCardWarning] = useState(false);
+
   const { t } = useTranslation();
   const { viewDispatch } = useContext(ViewContext);
   const {
@@ -34,7 +37,13 @@ export function PaymentMethods() {
   } = useSaleContext();
   const { sendPageView, sendCloseEvent, sendSelectedPaymentMethod } = useSaleEvent();
 
-  const handleOptionClick = (type: SalePaymentTypes) => setPaymentMethod(type);
+  const handleOptionClick = (type: SalePaymentTypes) => {
+    if (type === SalePaymentTypes.CREDIT) {
+      setShowCreditCardWarning(true);
+    } else {
+      setPaymentMethod(type);
+    }
+  };
 
   useEffect(() => {
     if (paymentMethod) {
@@ -120,6 +129,11 @@ export function PaymentMethods() {
           />
         </Box>
       </Box>
+      <CreditCardWarningDrawer
+        visible={showCreditCardWarning}
+        setShowCreditCardWarning={setShowCreditCardWarning}
+        setPaymentMethod={setPaymentMethod}
+      />
     </SimpleLayout>
   );
 }
