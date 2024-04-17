@@ -295,6 +295,10 @@
         "processing1": "Initialising payment",
         "processing2": "Securing your assets",
         "processing3": "Finalising payment"
+      },
+      "creditCardWarningDrawer": {
+        "heading": "We recommend debit over credit",
+        "body": "Most banks will charge cash advance fees or block the transaction altogether when using credit card on these types of purchases."
       }
     },
     "PAY_WITH_COINS": {
