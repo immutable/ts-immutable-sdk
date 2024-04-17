@@ -1,7 +1,11 @@
 import React, {
-  useCallback, useEffect, useMemo, useState,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
 } from 'react';
 import { Accordion, Form } from 'react-bootstrap';
+import InputGroup from 'react-bootstrap/InputGroup';
 import { usePassportProvider } from '@/context/PassportProvider';
 import WorkflowButton from '@/components/WorkflowButton';
 import { RequestExampleProps, EnvironmentNames } from '@/types';
@@ -21,46 +25,59 @@ const getErc20DefaultContractAddress = (environment: EnvironmentNames) => {
   }
 };
 
-function SpendingCapApproval({ disabled, handleExampleSubmitted }: RequestExampleProps) {
+function TransferERC20({ disabled, handleExampleSubmitted }: RequestExampleProps) {
   const { environment } = useImmutableProvider();
-  const iface = useMemo(() => {
+  const [fromAddress, setFromAddress] = useState<string>('');
+  const [toAddress, setToAddress] = useState<string>('');
+  const [useTransferFrom, setUseTransferFrom] = useState<boolean>(false);
+  const [amount, setAmount] = useState<string>('0');
+  const [contractAddress, setContractAddress] = useState<string>(getErc20DefaultContractAddress(environment));
+  const { zkEvmProvider } = usePassportProvider();
+  const [params, setParams] = useState<any[]>([]);
+  const [amountConvertError, setAmountConvertError] = useState<string>('');
+  const amountRange = 'Amount should larger than 0 with maximum 18 digits in decimal';
+
+  const erc20Transfer = useMemo(() => {
     const abi = [
-      'function approve(address spender, uint256 amount)',
+      'function transfer(address to, uint256 amount)',
+      'function transferFrom(address from, address to, uint256 amount)',
     ];
     return new Interface(abi);
   }, []);
-  const [fromAddress, setFromAddress] = useState<string>('');
-  const [erc20ContractAddress, setErc20ContractAddress] = useState<string>(getErc20DefaultContractAddress(environment));
-  const [spender, setSpender] = useState<string>();
-  const [amount, setAmount] = useState<string>('1');
-  const [amountConvertError, setAmountConvertError] = useState<string>('');
-  const [params, setParams] = useState<any[]>([]);
-  const amountRange = 'Amount should larger than 0';
 
-  const { zkEvmProvider } = usePassportProvider();
   useEffect(() => {
     setAmountConvertError('');
-    const allowAmount = amount.trim() === '' ? '0' : amount;
+    const rawAmount = amount.trim() === '' ? '0' : amount;
+
+    if (!fromAddress || !toAddress || !contractAddress) {
+      return;
+    }
+
     try {
-      if (Number(allowAmount) < 0) {
+      if (Number(rawAmount) < 0) {
         setAmountConvertError(amountRange);
       }
-      const data = iface.encodeFunctionData('approve', [spender, allowAmount]);
+
+      let data = erc20Transfer.encodeFunctionData('transfer', [toAddress, amount]);
+      if (useTransferFrom) {
+        data = erc20Transfer.encodeFunctionData('transferFrom', [fromAddress, toAddress, amount]);
+      }
+
       setParams([{
         from: fromAddress,
-        to: erc20ContractAddress,
+        to: contractAddress,
         value: '0',
         data,
       }]);
     } catch (err) {
       setParams([{
         from: fromAddress,
-        to: erc20ContractAddress,
+        to: contractAddress,
         value: '0',
         data: '0x',
       }]);
     }
-  }, [fromAddress, erc20ContractAddress, spender, amount, iface]);
+  }, [fromAddress, toAddress, contractAddress, amount, erc20Transfer, useTransferFrom]);
 
   useEffect(() => {
     const getAddress = async () => {
@@ -86,10 +103,10 @@ function SpendingCapApproval({ disabled, handleExampleSubmitted }: RequestExampl
   }, [params, handleExampleSubmitted]);
 
   return (
-    <Accordion.Item eventKey="2">
-      <Accordion.Header>Spending Cap Approval</Accordion.Header>
+    <Accordion.Item eventKey="3">
+      <Accordion.Header>Transfer ERC20</Accordion.Header>
       <Accordion.Body>
-        <Form onSubmit={handleSubmit} className="mb-4">
+        <Form noValidate onSubmit={handleSubmit} className="mb-4">
           <Form.Group className="mb-3">
             <Form.Label>
               Preview
@@ -110,53 +127,62 @@ function SpendingCapApproval({ disabled, handleExampleSubmitted }: RequestExampl
             </Form.Label>
             <Form.Control
               required
-              disabled
+              disabled={!useTransferFrom || disabled}
               type="text"
-              placeholder="From Address"
               value={fromAddress}
+              onChange={(e) => setFromAddress(e.target.value)}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Check
+              onClick={() => {
+                setUseTransferFrom(!useTransferFrom);
+              }}
+              type="checkbox"
+              label="Use transferFrom method"
             />
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>
-              ERC20
+              To
             </Form.Label>
             <Form.Control
               required
               disabled={disabled}
               type="text"
-              value={erc20ContractAddress}
-              onChange={(e) => setErc20ContractAddress(e.target.value)}
+              onChange={(e) => setToAddress(e.target.value)}
             />
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>
-              Spender
+              Contract Address
             </Form.Label>
             <Form.Control
               required
               disabled={disabled}
               type="text"
-              placeholder="Spender's Address"
-              onChange={(e) => setSpender(e.target.value)}
-              value={spender}
+              value={contractAddress}
+              onChange={(e) => setContractAddress(e.target.value)}
             />
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>
-              Allow Amount
+              Amount
             </Form.Label>
-            <Form.Control
-              required
-              type="number"
-              disabled={disabled}
-              isValid={amountConvertError === ''}
-              isInvalid={amountConvertError !== ''}
-              onChange={(e) => setAmount(e.target.value)}
-              value={amount}
-            />
-            <Form.Control.Feedback type="invalid" tooltip>
-              {amountConvertError}
-            </Form.Control.Feedback>
+            <InputGroup hasValidation>
+              <Form.Control
+                required
+                disabled={disabled}
+                type="number"
+                value={amount}
+                isValid={amountConvertError === ''}
+                isInvalid={amountConvertError !== ''}
+                onChange={(e) => setAmount(e.target.value)}
+              />
+              <Form.Control.Feedback type="invalid" tooltip>
+                {amountConvertError}
+              </Form.Control.Feedback>
+            </InputGroup>
           </Form.Group>
           <WorkflowButton
             disabled={disabled}
@@ -170,4 +196,4 @@ function SpendingCapApproval({ disabled, handleExampleSubmitted }: RequestExampl
   );
 }
 
-export default SpendingCapApproval;
+export default TransferERC20;
