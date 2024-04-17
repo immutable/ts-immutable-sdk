@@ -180,6 +180,7 @@ export default class AuthManager {
           third_party_a_id: anonymousId || '',
         },
         popupWindowFeatures,
+        prompt: 'login',
       });
 
       return AuthManager.mapOidcUserToDomainModel(oidcUser);
