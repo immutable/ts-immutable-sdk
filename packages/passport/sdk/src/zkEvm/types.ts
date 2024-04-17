@@ -111,3 +111,28 @@ export type AccountsChangedEvent = Array<string>;
 export interface ProviderEventMap extends Record<string, any> {
   [ProviderEvent.ACCOUNTS_CHANGED]: [AccountsChangedEvent];
 }
+
+/**
+ * Event detail from the `eip6963:announceProvider` event.
+ */
+export interface EIP6963ProviderDetail {
+  info: EIP6963ProviderInfo;
+  provider: Provider;
+}
+
+/**
+ * Metadata of the EIP-1193 Provider.
+ */
+export interface EIP6963ProviderInfo {
+  icon: `data:image/${string}`; // RFC-2397
+  name: string;
+  rdns: string;
+  uuid: string;
+}
+
+/**
+ * Event type to announce an EIP-1193 Provider.
+ */
+export interface EIP6963AnnounceProviderEvent extends CustomEvent<EIP6963ProviderDetail> {
+  type: 'eip6963:announceProvider'
+}
