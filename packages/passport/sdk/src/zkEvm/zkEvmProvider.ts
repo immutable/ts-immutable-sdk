@@ -170,7 +170,7 @@ export class ZkEvmProvider implements Provider {
           return [this.#zkEvmAddress];
         }
 
-        const flow = trackFlow('passport', 'eth_requestAccounts');
+        const flow = trackFlow('passport', 'ethRequestAccounts');
 
         try {
           const user = await this.#authManager.getUserOrLogin();
@@ -216,13 +216,13 @@ export class ZkEvmProvider implements Provider {
           throw new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
         }
 
-        const flow = trackFlow('passport', 'eth_sendTransaction');
+        const flow = trackFlow('passport', 'ethSendTransaction');
 
         try {
           const ethSigner = await this.#getSigner();
           flow.addEvent('userObtained');
 
-          return sendTransaction({
+          return await sendTransaction({
             params: request.params || [],
             ethSigner,
             guardianClient: this.#guardianClient,
@@ -251,13 +251,13 @@ export class ZkEvmProvider implements Provider {
           throw new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
         }
 
-        const flow = trackFlow('passport', 'eth_sendTransaction');
+        const flow = trackFlow('passport', 'ethSignTypedDataV4');
 
         try {
           const ethSigner = await this.#getSigner();
           flow.addEvent('userObtained');
 
-          return signTypedDataV4({
+          return await signTypedDataV4({
             method: request.method,
             params: request.params || [],
             ethSigner,

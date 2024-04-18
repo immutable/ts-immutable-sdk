@@ -112,7 +112,7 @@ export class RelayerClient {
       'passport',
       'postToRelayer',
       Math.round(performance.now() - startTime),
-      { method: request.method },
+      { rpcMethod: request.method },
     );
 
     const jsonResponse = await response.json();
