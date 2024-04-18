@@ -1,7 +1,6 @@
 import {
   FundingRoute,
   SaleItem,
-  RoutingOutcomeType,
   SmartCheckoutResult,
   SalePaymentTypes,
 } from '@imtbl/checkout-sdk';
@@ -18,10 +17,7 @@ import {
 } from 'react';
 import { Environment } from '@imtbl/config';
 import { ConnectLoaderState } from '../../../context/connect-loader-context/ConnectLoaderContext';
-import {
-  FundWithSmartCheckoutSubViews,
-  SaleWidgetViews,
-} from '../../../context/view-context/SaleViewContextTypes';
+import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 import {
   SharedViews,
   ViewActions,
@@ -174,7 +170,7 @@ export function SaleContextProvider(props: {
   SalePaymentTypes | undefined
   >(undefined);
 
-  const [fundingRoutes, setFundingRoutes] = useState<FundingRoute[]>([]);
+  const [fundingRoutes] = useState<FundingRoute[]>([]);
   const [disabledPaymentTypes, setDisabledPaymentTypes] = useState<
   SalePaymentTypes[]
   >([]);
@@ -360,51 +356,6 @@ export function SaleContextProvider(props: {
     },
     [smartCheckout],
   );
-
-  useEffect(() => {
-    if (!smartCheckoutResult) {
-      return;
-    }
-
-    if (smartCheckoutResult.sufficient) {
-      sign(SignPaymentTypes.CRYPTO);
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: SaleWidgetViews.PAY_WITH_COINS,
-          },
-        },
-      });
-    }
-    if (!smartCheckoutResult.sufficient) {
-      switch (smartCheckoutResult.router.routingOutcome.type) {
-        case RoutingOutcomeType.ROUTES_FOUND:
-          setFundingRoutes(
-            smartCheckoutResult.router.routingOutcome.fundingRoutes,
-          );
-          viewDispatch({
-            payload: {
-              type: ViewActions.UPDATE_VIEW,
-              view: {
-                type: SaleWidgetViews.FUND_WITH_SMART_CHECKOUT,
-                subView: FundWithSmartCheckoutSubViews.FUNDING_ROUTE_SELECT,
-              },
-            },
-          });
-
-          break;
-        case RoutingOutcomeType.NO_ROUTES_FOUND:
-        case RoutingOutcomeType.NO_ROUTE_OPTIONS:
-        default:
-          setFundingRoutes([]);
-          setPaymentMethod(undefined);
-          disablePaymentTypes([SalePaymentTypes.CRYPTO]);
-          goBackToPaymentMethods(undefined);
-          break;
-      }
-    }
-  }, [smartCheckoutResult, smartCheckoutError, sign, amount, fromTokenAddress]);
 
   useEffect(() => {
     const invalidItems = !items || items.length === 0;

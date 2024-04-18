@@ -7,7 +7,9 @@ import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import {
-  FundWithSmartCheckoutSubViews, SaleWidgetViews,
+  FundWithSmartCheckoutSubViews,
+  OrderSummarySubViews,
+  SaleWidgetViews,
 } from '../../../context/view-context/SaleViewContextTypes';
 import {
   SharedViews,
@@ -69,7 +71,15 @@ export function PaymentMethods() {
 
     if (paymentMethod && paymentMethod === SalePaymentTypes.CRYPTO) {
       if (multicurrency) {
-        // TODO: go to summary view
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: {
+              type: SaleWidgetViews.ORDER_SUMMARY,
+              subView: OrderSummarySubViews.INIT,
+            },
+          },
+        });
         return;
       }
 
