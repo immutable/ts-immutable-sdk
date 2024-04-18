@@ -75,7 +75,7 @@ const trackFlowFn = (
   const flowStartEventName = getEventName(flowName, 'start');
   const flowId = generateFlowId();
   const startTime = performance.now();
-  const flowStartTime = startTime + performance.timeOrigin;
+  const flowStartTime = Math.round(startTime + performance.timeOrigin);
 
   let flowProperties = mergeProperties(properties, {
     flowId,
