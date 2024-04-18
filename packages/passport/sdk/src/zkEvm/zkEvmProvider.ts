@@ -179,7 +179,7 @@ export class ZkEvmProvider implements Provider {
           this.#initialiseEthSigner(user);
 
           if (!isZkEvmUser(user)) {
-            flow.addEvent('beginUserRegistration');
+            flow.addEvent('startUserRegistration');
 
             const ethSigner = await this.#getSigner();
             flow.addEvent('ethSignerResolved');
@@ -200,12 +200,12 @@ export class ZkEvmProvider implements Provider {
 
           return [this.#zkEvmAddress];
         } catch (error) {
+          let errorMessage = 'Unknown error';
           if (error instanceof Error) {
-            flow.addEvent('error', {
-              errorMessage: error.message,
-            });
+            errorMessage = error.message;
           }
 
+          flow.addEvent('error', { errorMessage });
           throw error;
         } finally {
           flow.end();
@@ -216,16 +216,31 @@ export class ZkEvmProvider implements Provider {
           throw new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
         }
 
-        const ethSigner = await this.#getSigner();
+        const flow = trackFlow('passport', 'eth_sendTransaction');
 
-        return sendTransaction({
-          params: request.params || [],
-          ethSigner,
-          guardianClient: this.#guardianClient,
-          rpcProvider: this.#rpcProvider,
-          relayerClient: this.#relayerClient,
-          zkevmAddress: this.#zkEvmAddress,
-        });
+        try {
+          const ethSigner = await this.#getSigner();
+          flow.addEvent('userObtained');
+
+          return sendTransaction({
+            params: request.params || [],
+            ethSigner,
+            guardianClient: this.#guardianClient,
+            rpcProvider: this.#rpcProvider,
+            relayerClient: this.#relayerClient,
+            zkevmAddress: this.#zkEvmAddress,
+          });
+        } catch (error) {
+          let errorMessage = 'Unknown error';
+          if (error instanceof Error) {
+            errorMessage = error.message;
+          }
+
+          flow.addEvent('error', { errorMessage });
+          throw error;
+        } finally {
+          flow.end();
+        }
       }
       case 'eth_accounts': {
         return this.#zkEvmAddress ? [this.#zkEvmAddress] : [];
@@ -236,16 +251,31 @@ export class ZkEvmProvider implements Provider {
           throw new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
         }
 
-        const ethSigner = await this.#getSigner();
+        const flow = trackFlow('passport', 'eth_sendTransaction');
 
-        return signTypedDataV4({
-          method: request.method,
-          params: request.params || [],
-          ethSigner,
-          rpcProvider: this.#rpcProvider,
-          relayerClient: this.#relayerClient,
-          guardianClient: this.#guardianClient,
-        });
+        try {
+          const ethSigner = await this.#getSigner();
+          flow.addEvent('userObtained');
+
+          return signTypedDataV4({
+            method: request.method,
+            params: request.params || [],
+            ethSigner,
+            rpcProvider: this.#rpcProvider,
+            relayerClient: this.#relayerClient,
+            guardianClient: this.#guardianClient,
+          });
+        } catch (error) {
+          let errorMessage = 'Unknown error';
+          if (error instanceof Error) {
+            errorMessage = error.message;
+          }
+
+          flow.addEvent('error', { errorMessage });
+          throw error;
+        } finally {
+          flow.end();
+        }
       }
       case 'eth_chainId': {
         // Call detect network to fetch the chainId so to take advantage of
