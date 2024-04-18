@@ -11,7 +11,6 @@ import GuardianClient from '../guardian';
 
 jest.mock('./walletHelpers');
 jest.mock('../network/retry');
-const withConfirmationScreenStub = jest.fn();
 
 describe('sendTransaction', () => {
   const signedTransaction = 'signedTransaction123';
@@ -36,8 +35,6 @@ describe('sendTransaction', () => {
   };
   const guardianClient = {
     validateEVMTransaction: jest.fn(),
-    withConfirmationScreen: jest.fn(() => (task: () => void) => task()),
-    loading: jest.fn(),
   };
   const ethSigner = {
     getAddress: jest.fn(),
@@ -63,10 +60,6 @@ describe('sendTransaction', () => {
       signedTransactions,
     );
     relayerClient.ethSendTransaction.mockResolvedValue(relayerTransactionId);
-    withConfirmationScreenStub.mockImplementation(
-      () => (task: () => void) => task(),
-    );
-    guardianClient.withConfirmationScreen = withConfirmationScreenStub;
     rpcProvider.detectNetwork.mockResolvedValue({ chainId });
   });
 
