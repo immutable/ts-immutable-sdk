@@ -575,6 +575,7 @@ export class Checkout {
       web3Provider,
       itemRequirements,
       params.transactionOrGasAmount,
+      params.routingOptions,
     );
   }
 
