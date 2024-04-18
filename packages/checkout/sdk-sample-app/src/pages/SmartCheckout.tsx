@@ -15,7 +15,9 @@ import Listings from '../components/Listings';
 export default function SmartCheckout() {
   const [environment, setEnvironment] = useState(Environment.SANDBOX);
   const checkout = useMemo(() => {
-    return new Checkout({ baseConfig: { environment: environment } });
+    return new Checkout({ baseConfig: {
+      environment: environment,
+    }});
   }, [environment]);
   const [provider, setProvider] = useState<Web3Provider>();
 

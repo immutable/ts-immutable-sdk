@@ -39,6 +39,9 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
   const [error, setError] = useState<any>(null);
   const [success, setSuccess] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [onRampChecked, setOnRampChecked] = useState<boolean>(true);
+  const [bridgeChecked, setBridgeChecked] = useState<boolean>(true);
+  const [swapChecked, setSwapChecked] = useState<boolean>(true);
 
   const [seaportContractAddress, setSeaportContractAddress] = useState<string>('');
 
@@ -136,6 +139,11 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
           provider,
           itemRequirements,
           transactionOrGasAmount,
+          routingOptions: {
+            onRamp: onRampChecked,
+            swap: swapChecked,
+            bridge: bridgeChecked,
+          },
         }
       );
       console.log('Smart checkout result', result);
@@ -434,6 +442,43 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
     setGasContractAddressError('');
   }
 
+  const fundingRoutesForm = () => {
+    return(
+      <>
+        <Body>Set Funding Options</Body>
+        <Box sx={{ display: 'flex' }}>
+          <FormControl sx={{ padding: 'base.spacing.x4' }}>
+            <FormControl.Label>OnRamp</FormControl.Label>
+            <Checkbox
+              checked={onRampChecked}
+              onChange={() => {
+                setOnRampChecked(!onRampChecked);
+              }}
+            />
+          </FormControl>
+          <FormControl sx={{ padding: 'base.spacing.x4' }}>
+            <FormControl.Label>Swap</FormControl.Label>
+            <Checkbox
+              checked={swapChecked}
+              onChange={() => {
+                setSwapChecked(!swapChecked);
+              }}
+            />
+          </FormControl>
+          <FormControl sx={{ padding: 'base.spacing.x4' }}>
+            <FormControl.Label>Bridge</FormControl.Label>
+            <Checkbox
+              checked={bridgeChecked}
+              onChange={() => {
+                setBridgeChecked(!bridgeChecked);
+              }}
+            />
+          </FormControl>
+        </Box>
+      </>
+    )
+  }
+
   const gasAmountForm = () => {
     return(
       <>
@@ -524,6 +569,7 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
         paddingTop: 'base.spacing.x4',
         paddingBottom: 'base.spacing.x8'
       }} >
+        {fundingRoutesForm()}
         {gasAmountForm()}
       </Box>
       <LoadingButton onClick={smartCheckout} loading={loading}>
