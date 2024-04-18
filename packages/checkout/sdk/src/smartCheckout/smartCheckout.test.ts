@@ -14,11 +14,15 @@ import { gasCalculator } from './gas';
 import { CheckoutConfiguration } from '../config';
 import { balanceCheck } from './balanceCheck';
 import { routingCalculator } from './routing/routingCalculator';
+import { getAvailableRoutingOptions } from './routing';
+import { isOnRampAvailable, isSwapAvailable } from './routing/geoBlocking';
 
 jest.mock('./allowance');
 jest.mock('./gas');
 jest.mock('./balanceCheck');
+jest.mock('./routing');
 jest.mock('./routing/routingCalculator');
+jest.mock('./routing/geoBlocking');
 
 describe('smartCheckout', () => {
   let mockProvider: Web3Provider;
@@ -36,6 +40,15 @@ describe('smartCheckout', () => {
       type: RoutingOutcomeType.NO_ROUTES_FOUND,
       message: 'No routes found',
     });
+
+    (getAvailableRoutingOptions as jest.Mock).mockResolvedValue({
+      onRamp: true,
+      swap: true,
+      bridge: true,
+    });
+
+    (isOnRampAvailable as jest.Mock).mockResolvedValue(true);
+    (isSwapAvailable as jest.Mock).mockResolvedValue(true);
   });
 
   describe('smartCheckout', () => {
@@ -440,9 +453,9 @@ describe('smartCheckout', () => {
         ],
         router: {
           availableRoutingOptions: {
-            onRamp: undefined,
-            swap: undefined,
-            bridge: undefined,
+            onRamp: true,
+            swap: true,
+            bridge: true,
           },
           routingOutcome: {
             type: RoutingOutcomeType.NO_ROUTES_FOUND,
@@ -660,9 +673,9 @@ describe('smartCheckout', () => {
         ],
         router: {
           availableRoutingOptions: {
-            onRamp: undefined,
-            swap: undefined,
-            bridge: undefined,
+            onRamp: true,
+            swap: true,
+            bridge: true,
           },
           routingOutcome: {
             type: RoutingOutcomeType.NO_ROUTES_FOUND,
@@ -769,9 +782,9 @@ describe('smartCheckout', () => {
         ],
         router: {
           availableRoutingOptions: {
-            onRamp: undefined,
-            swap: undefined,
-            bridge: undefined,
+            onRamp: true,
+            swap: true,
+            bridge: true,
           },
           routingOutcome: {
             type: RoutingOutcomeType.NO_ROUTES_FOUND,
@@ -779,6 +792,85 @@ describe('smartCheckout', () => {
           },
         },
       });
+    });
+
+    // eslint-disable-next-line max-len
+    it('should handle sufficient true and return router as a promise when includeFundingRoutesOnSufficient is true', async () => {
+      (hasERC20Allowances as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        allowances: [],
+      });
+      (hasERC721Allowances as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        allowances: [],
+      });
+      (gasCalculator as jest.Mock).mockResolvedValue(null);
+      (balanceCheck as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        balanceRequirements: [],
+      });
+
+      const itemRequirements: ItemRequirement[] = [
+        {
+          type: ItemType.ERC20,
+          tokenAddress: '0xERC20',
+          amount: BigNumber.from(1),
+          spenderAddress: '0x1',
+        },
+      ];
+      const transactionOrGasAmount: GasAmount = {
+        type: TransactionOrGasType.GAS,
+        gasToken: { type: GasTokenType.NATIVE, limit: BigNumber.from(1) },
+      };
+
+      const resultPromise = smartCheckout(
+        {} as CheckoutConfiguration,
+        mockProvider,
+        itemRequirements,
+        transactionOrGasAmount,
+        true, // flag to include routing options even when sufficient
+      );
+
+      expect((await resultPromise).sufficient).toBeTruthy();
+      expect((await resultPromise).router).toBeInstanceOf(Promise);
+
+      const router = await (await resultPromise).router;
+      expect(router).toHaveProperty('availableRoutingOptions');
+      expect(router).toHaveProperty('routingOutcome');
+    });
+
+    it('should return router data immediately when funds are insufficient, without waiting for a promise', async () => {
+      (hasERC20Allowances as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        allowances: [],
+      });
+      (hasERC721Allowances as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        allowances: [],
+      });
+      (balanceCheck as jest.Mock).mockResolvedValue({
+        sufficient: false,
+        balanceRequirements: [],
+      });
+
+      const itemRequirements: ItemRequirement[] = [
+        {
+          type: ItemType.NATIVE,
+          amount: BigNumber.from(1),
+        },
+      ];
+
+      const result = await smartCheckout(
+        {} as CheckoutConfiguration,
+        mockProvider,
+        itemRequirements,
+        undefined,
+      );
+
+      expect(result.sufficient).toBeFalsy();
+      expect(result.router).not.toBeInstanceOf(Promise);
+      expect(result.router).toHaveProperty('availableRoutingOptions');
+      expect(result.router).toHaveProperty('routingOutcome');
     });
   });
 });
