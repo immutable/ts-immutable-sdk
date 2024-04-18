@@ -2,6 +2,7 @@ import { StaticJsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { Signer } from '@ethersproject/abstract-signer';
 import { utils } from 'ethers';
+import { trackFlow } from '@imtbl/metrics';
 import {
   JsonRpcRequestCallback,
   JsonRpcRequestPayload,
@@ -169,25 +170,46 @@ export class ZkEvmProvider implements Provider {
           return [this.#zkEvmAddress];
         }
 
-        const user = await this.#authManager.getUserOrLogin();
-        this.#initialiseEthSigner(user);
+        const flow = trackFlow('passport', 'eth_requestAccounts');
 
-        if (!isZkEvmUser(user)) {
-          const ethSigner = await this.#getSigner();
-          this.#zkEvmAddress = await registerZkEvmUser({
-            ethSigner,
-            authManager: this.#authManager,
-            multiRollupApiClients: this.#multiRollupApiClients,
-            accessToken: user.accessToken,
-            rpcProvider: this.#rpcProvider,
-          });
-        } else {
-          this.#zkEvmAddress = user.zkEvm.ethAddress;
+        try {
+          const user = await this.#authManager.getUserOrLogin();
+          flow.addEvent('userObtained');
+
+          this.#initialiseEthSigner(user);
+
+          if (!isZkEvmUser(user)) {
+            flow.addEvent('beginUserRegistration');
+
+            const ethSigner = await this.#getSigner();
+            flow.addEvent('ethSignerResolved');
+
+            this.#zkEvmAddress = await registerZkEvmUser({
+              ethSigner,
+              authManager: this.#authManager,
+              multiRollupApiClients: this.#multiRollupApiClients,
+              accessToken: user.accessToken,
+              rpcProvider: this.#rpcProvider,
+            });
+            flow.addEvent('endUserRegistration');
+          } else {
+            this.#zkEvmAddress = user.zkEvm.ethAddress;
+          }
+
+          this.#eventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [this.#zkEvmAddress]);
+
+          return [this.#zkEvmAddress];
+        } catch (error) {
+          if (error instanceof Error) {
+            flow.addEvent('error', {
+              errorMessage: error.message,
+            });
+          }
+
+          throw error;
+        } finally {
+          flow.end();
         }
-
-        this.#eventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [this.#zkEvmAddress]);
-
-        return [this.#zkEvmAddress];
       }
       case 'eth_sendTransaction': {
         if (!this.#zkEvmAddress) {

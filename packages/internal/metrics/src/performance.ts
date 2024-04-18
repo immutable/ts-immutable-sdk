@@ -3,9 +3,8 @@ import { track, TrackProperties } from './track';
 
 type PerformanceEventProperties =
   | (TrackProperties & {
-    duration: never;
-  })
-  | undefined;
+    duration?: never;
+  });
 
 /**
  * Track an event and it's performance. Works similarly to `track`, but also includes a duration.
@@ -63,8 +62,8 @@ const generateFlowId = () => {
 };
 
 type FlowEventProperties = PerformanceEventProperties & {
-  flowId: never;
-  flowStartTime: never;
+  flowId?: never;
+  flowStartTime?: never;
 };
 
 const trackFlowFn = (
