@@ -54,7 +54,7 @@ export function CreditCardWarningDrawer({
             size="large"
             onClick={() => setPaymentMethod(SalePaymentTypes.CREDIT)}
           >
-            Try anyway
+            {t('views.PAYMENT_METHODS.creditCardWarningDrawer.ctaButton')}
           </Button>
         </Box>
       </Drawer.Content>
