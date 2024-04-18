@@ -237,6 +237,12 @@
           "caption": "The coins I have in another wallet or network.",
           "subcaption": "Fees ",
           "disabledCaption": ""
+        },
+        "advanced": {
+          "heading": "Advanced options",
+          "caption": "Perform a fast bridge or CEX deposit.",
+          "subcaption": "Fees ",
+          "disabledCaption": ""
         }
       }
     },

@@ -237,6 +237,12 @@
           "caption": "다른 지갑이나 네트워크에 있는 내 코인.",
           "subcaption": "수수료",
           "disabledCaption": ""
+        },
+        "advanced": {
+          "heading": "고급 옵션",
+          "caption": "빠른 브릿지 또는 CEX 입금을 수행합니다.",
+          "subcaption": "수수료",
+          "disabledCaption": ""
         }
       }
     },
