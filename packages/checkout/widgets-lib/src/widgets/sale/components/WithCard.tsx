@@ -25,6 +25,7 @@ export function WithCard(props: WithCardProps) {
     onOrderFailed,
   } = props;
   const {
+    recipientEmail,
     recipientAddress,
     isPassportWallet,
     signResponse,
@@ -59,6 +60,7 @@ export function WithCard(props: WithCardProps) {
     <TransakIframe
       id="transak-iframe"
       type="nft-checkout"
+      email={recipientEmail}
       walletAddress={recipientAddress}
       isPassportWallet={isPassportWallet}
       exchangeScreenTitle={t('views.PAY_WITH_CARD.screenTitle')}
