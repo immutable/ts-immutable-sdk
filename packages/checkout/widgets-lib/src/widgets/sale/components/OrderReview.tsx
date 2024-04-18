@@ -8,11 +8,11 @@ import { EventTargetContext } from '../../../context/event-target-context/EventT
 import { sendSaleWidgetCloseEvent } from '../SaleWidgetEvents';
 import { SelectCoinDropdown } from './SelectCoinDropdown';
 import { CoinsDrawer } from './CoinsDrawer';
-import { SettlementCurrency } from '../views/balances.mock';
+import { CoinBalance } from '../types';
 
 type OrderReviewProps = {
   collectionName: string;
-  currencies: SettlementCurrency[];
+  currencies: CoinBalance[];
   conversions: Map<string, number>;
 };
 

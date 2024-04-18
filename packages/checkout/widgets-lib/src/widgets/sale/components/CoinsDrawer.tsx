@@ -1,11 +1,11 @@
 import { Box, Caption, Drawer } from '@biom3/react';
 import { useTranslation } from 'react-i18next';
 import { CoinsDrawerItem } from './CoinsDrawerItem';
-import { SettlementCurrency } from '../views/balances.mock';
+import { CoinBalance } from '../types';
 
 type CoinsDrawerProps = {
   conversions: Map<string, number>;
-  currencies: SettlementCurrency[];
+  currencies: CoinBalance[];
   onSelect: (index: number) => void;
   onClose: () => void;
   selectedIndex: number;
@@ -51,9 +51,9 @@ export function CoinsDrawer({
             </Caption>
           </Box>
 
-          {currencies.map((currency: SettlementCurrency, idx: number) => (
+          {currencies.map((currency: CoinBalance, idx: number) => (
             <CoinsDrawerItem
-              key={`${currency.name}-${currency.symbol}`}
+              key={`${currency.token.symbol}-${currency.type}`}
               onClick={handleOnclick(idx)}
               currency={currency}
               selected={selectedIndex === idx}

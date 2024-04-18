@@ -13,7 +13,7 @@ import {
   CryptoFiatContext,
 } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { OrderReview } from '../components/OrderReview';
-import { allCurrencies } from './balances.mock';
+import { useTokenBalances } from '../hooks/useTokenBalances';
 
 type OrderSummaryProps = {
   subView: OrderSummarySubViews;
@@ -21,23 +21,20 @@ type OrderSummaryProps = {
 
 export function OrderSummary({ subView }: OrderSummaryProps) {
   const { t } = useTranslation();
-  const {
-    smartCheckoutResult,
-    querySmartCheckout,
-    fromTokenAddress,
-    collectionName,
-  } = useSaleContext();
+  const { fromTokenAddress, collectionName } = useSaleContext();
 
   const { viewDispatch } = useContext(ViewContext);
   const { cryptoFiatDispatch, cryptoFiatState } = useContext(CryptoFiatContext);
 
+  const [balances, getBalances] = useTokenBalances();
+
   useEffect(() => {
     if (subView !== OrderSummarySubViews.INIT || !fromTokenAddress) return;
-    querySmartCheckout();
+    getBalances();
   }, [subView, fromTokenAddress]);
 
   useEffect(() => {
-    if (!smartCheckoutResult) return;
+    if (balances.length === 0) return;
 
     viewDispatch({
       payload: {
@@ -48,15 +45,15 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
         },
       },
     });
-  }, [smartCheckoutResult]);
+  }, [balances]);
 
   useEffect(() => {
     // refresh conversion rates
-    if (!cryptoFiatDispatch || allCurrencies.length === 0) {
+    if (!cryptoFiatDispatch || balances.length === 0) {
       return;
     }
 
-    const tokenSymbols = allCurrencies.map((currency) => currency.symbol);
+    const tokenSymbols = balances.map((balance) => balance.token.symbol);
 
     cryptoFiatDispatch({
       payload: {
@@ -64,7 +61,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
         tokenSymbols,
       },
     });
-  }, [cryptoFiatDispatch, allCurrencies]);
+  }, [cryptoFiatDispatch, balances]);
 
   return (
     <Box>
@@ -77,7 +74,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
       )}
       {subView === OrderSummarySubViews.REVIEW_ORDER && (
         <OrderReview
-          currencies={allCurrencies}
+          currencies={balances}
           conversions={cryptoFiatState.conversions}
           collectionName={collectionName}
         />

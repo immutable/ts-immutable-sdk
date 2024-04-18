@@ -7,10 +7,10 @@ import {
 } from 'lib/utils';
 import { useTranslation } from 'react-i18next';
 import { useSaleContext } from '../context/SaleContextProvider';
-import { SettlementCurrency } from '../views/balances.mock';
+import { CoinBalance } from '../types';
 
 type CoinDrawerItemProps = {
-  currency: SettlementCurrency;
+  currency: CoinBalance;
   conversions: Map<string, number>;
   onClick: () => void;
   selected: boolean;
@@ -26,8 +26,8 @@ export function CoinsDrawerItem({
   const { environment } = useSaleContext();
 
   const fiatAmount = calculateCryptoToFiat(
-    currency.userBalance.formattedBalance,
-    currency.symbol,
+    currency.formattedBalance,
+    currency.token.symbol,
     conversions,
   );
 
@@ -40,8 +40,8 @@ export function CoinsDrawerItem({
       selected={selected}
     >
       <MenuItem.FramedImage
-        imageUrl={currency.icon}
-        alt={currency.name}
+        imageUrl={currency.token.icon}
+        alt={currency.token.name}
         defaultImageUrl={getDefaultTokenImage(environment, WidgetTheme.DARK)}
         circularFrame
       />
@@ -50,10 +50,10 @@ export function CoinsDrawerItem({
         fiatAmount={t('views.ORDER_SUMMARY.currency.fiat', {
           amount: fiatAmount,
         })}
-        price={tokenValueFormat(currency.userBalance.formattedBalance)}
+        price={tokenValueFormat(currency.formattedBalance)}
       />
       <MenuItem.Label sx={{ display: 'flex', wordBreak: 'default' }}>
-        {currency.symbol}
+        {currency.token.symbol}
       </MenuItem.Label>
     </MenuItem>
   );

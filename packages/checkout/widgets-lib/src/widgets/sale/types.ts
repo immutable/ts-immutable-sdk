@@ -1,5 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { SaleItem, TransactionRequirement } from '@imtbl/checkout-sdk';
+import { SaleItem, TransactionRequirement, TokenBalance } from '@imtbl/checkout-sdk';
 
 export type SignedOrderProduct = {
   productId: string;
@@ -121,3 +121,7 @@ export enum SignPaymentTypes {
   CRYPTO = 'crypto',
   FIAT = 'fiat',
 }
+
+export type CoinBalance = TokenBalance & {
+  swappable: boolean;
+};
