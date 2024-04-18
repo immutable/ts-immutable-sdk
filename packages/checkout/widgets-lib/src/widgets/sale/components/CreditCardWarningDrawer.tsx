@@ -20,9 +20,10 @@ export function CreditCardWarningDrawer({
 
   return (
     <Drawer
-      size="threeQuarter"
+      size="full"
       visible={visible}
-      showHeaderBar={false}
+      showHeaderBar
+      headerBarTitle=""
       onCloseDrawer={() => setShowCreditCardWarning(false)}
     >
       <Drawer.Content>
@@ -31,7 +32,7 @@ export function CreditCardWarningDrawer({
           <Heading
             sx={{
               marginTop: 'base.spacing.x6',
-              marginBottom: 'base.spacing.x2',
+              marginBottom: 'base.spacing.x5',
               textAlign: 'center',
             }}
           >
@@ -48,7 +49,7 @@ export function CreditCardWarningDrawer({
             {t('views.PAYMENT_METHODS.creditCardWarningDrawer.body')}
           </Body>
           <Button
-            sx={{ width: '100%', marginTop: 'base.spacing.x6' }}
+            sx={{ width: '100%', marginTop: 'base.spacing.x14' }}
             testId="credit-card-button"
             variant="primary"
             size="large"
