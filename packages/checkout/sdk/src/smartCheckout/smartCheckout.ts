@@ -8,10 +8,7 @@ import {
   SmartCheckoutResult,
 } from '../types/smartCheckout';
 import { itemAggregator } from './aggregators';
-import {
-  hasERC20Allowances,
-  hasERC721Allowances,
-} from './allowance';
+import { hasERC20Allowances, hasERC721Allowances } from './allowance';
 import { balanceCheck } from './balanceCheck';
 import { CheckoutConfiguration } from '../config';
 import { allowanceAggregator } from './aggregators/allowanceAggregator';
@@ -27,21 +24,35 @@ export const smartCheckout = async (
   provider: Web3Provider,
   itemRequirements: ItemRequirement[],
   transactionOrGasAmount?: FulfillmentTransaction | GasAmount,
+  includeFundingRoutesOnSufficient: boolean = false,
 ): Promise<SmartCheckoutResult> => {
   const ownerAddress = await provider.getSigner().getAddress();
 
   let aggregatedItems = itemAggregator(itemRequirements);
 
-  const erc20AllowancePromise = hasERC20Allowances(provider, ownerAddress, aggregatedItems);
-  const erc721AllowancePromise = hasERC721Allowances(provider, ownerAddress, aggregatedItems);
+  const erc20AllowancePromise = hasERC20Allowances(
+    provider,
+    ownerAddress,
+    aggregatedItems,
+  );
+  const erc721AllowancePromise = hasERC721Allowances(
+    provider,
+    ownerAddress,
+    aggregatedItems,
+  );
 
-  const resolvedAllowances = await measureAsyncExecution<{ sufficient: boolean, allowances: Allowance[] }[]>(
+  const resolvedAllowances = await measureAsyncExecution<
+  { sufficient: boolean; allowances: Allowance[] }[]
+  >(
     config,
     'Time to calculate token allowances',
     Promise.all([erc20AllowancePromise, erc721AllowancePromise]),
   );
 
-  const aggregatedAllowances = allowanceAggregator(resolvedAllowances[0], resolvedAllowances[1]);
+  const aggregatedAllowances = allowanceAggregator(
+    resolvedAllowances[0],
+    resolvedAllowances[1],
+  );
 
   // Skip gas calculation if transactionOrGasAmount is not provided
   let gasItem = null;
@@ -66,36 +77,49 @@ export const smartCheckout = async (
   const { sufficient } = balanceCheckResult;
   const transactionRequirements = balanceCheckResult.balanceRequirements;
 
-  if (sufficient) {
+  if (sufficient && !includeFundingRoutesOnSufficient) {
     return {
       sufficient,
       transactionRequirements,
     };
   }
 
-  const availableRoutingOptions = await measureAsyncExecution<AvailableRoutingOptions>(
-    config,
-    'Time to fetch available routing options',
-    getAvailableRoutingOptions(config, provider),
-  );
-
-  const routingOutcome = await measureAsyncExecution<RoutingOutcome>(
-    config,
-    'Total time to run the routing calculator',
-    routingCalculator(
+  // Fetch and calculate routing options async
+  const routerPromise = (async () => {
+    const availableRoutingOptions = await measureAsyncExecution<AvailableRoutingOptions>(
       config,
-      ownerAddress,
-      balanceCheckResult,
+      'Time to fetch available routing options',
+      getAvailableRoutingOptions(config, provider),
+    );
+    return {
       availableRoutingOptions,
-    ),
-  );
+      routingOutcome: await measureAsyncExecution<RoutingOutcome>(
+        config,
+        'Total time to run the routing calculator',
+        routingCalculator(
+          config,
+          ownerAddress,
+          balanceCheckResult,
+          availableRoutingOptions,
+        ),
+      ),
+    };
+  })();
 
+  // Return routing options as promise to unblock the UI
+  if (sufficient) {
+    return {
+      sufficient,
+      transactionRequirements,
+      router: routerPromise,
+    };
+  }
+
+  // Get router calculation for insufficient funds
+  const router = await routerPromise;
   return {
     sufficient,
     transactionRequirements,
-    router: {
-      availableRoutingOptions,
-      routingOutcome,
-    },
+    router,
   };
 };
