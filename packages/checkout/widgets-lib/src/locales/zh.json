@@ -241,6 +241,12 @@
           "caption": "我在其他钱包或网络中的代币。",
           "subcaption": "费用",
           "disabledCaption": ""
+        },
+        "advanced": {
+          "heading": "高级选项",
+          "caption": "进行快速桥接或CEX存款。",
+          "subcaption": "费用",
+          "disabledCaption": ""
         }
       }
     },

@@ -244,6 +244,12 @@
           "caption": "別のウォレットやネットワークにある私のコイン。",
           "subcaption": "手数料",
           "disabledCaption": ""
+        },
+        "advanced": {
+          "heading": "高度なオプション",
+          "caption": "迅速なブリッジまたはCEX入金を実行します。",
+          "subcaption": "手数料",
+          "disabledCaption": ""
         }
       }
     },

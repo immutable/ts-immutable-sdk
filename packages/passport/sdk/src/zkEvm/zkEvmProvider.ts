@@ -219,16 +219,18 @@ export class ZkEvmProvider implements Provider {
         const flow = trackFlow('passport', 'ethSendTransaction');
 
         try {
-          const ethSigner = await this.#getSigner();
-          flow.addEvent('userObtained');
+          return await this.#guardianClient.withConfirmationScreen({ width: 480, height: 720 })(async () => {
+            const ethSigner = await this.#getSigner();
+            flow.addEvent('userObtained');
 
-          return await sendTransaction({
-            params: request.params || [],
-            ethSigner,
-            guardianClient: this.#guardianClient,
-            rpcProvider: this.#rpcProvider,
-            relayerClient: this.#relayerClient,
-            zkevmAddress: this.#zkEvmAddress,
+            return await sendTransaction({
+              params: request.params || [],
+              ethSigner,
+              guardianClient: this.#guardianClient,
+              rpcProvider: this.#rpcProvider,
+              relayerClient: this.#relayerClient,
+              zkevmAddress: this.#zkEvmAddress!,
+            });
           });
         } catch (error) {
           let errorMessage = 'Unknown error';
@@ -254,16 +256,18 @@ export class ZkEvmProvider implements Provider {
         const flow = trackFlow('passport', 'ethSignTypedDataV4');
 
         try {
-          const ethSigner = await this.#getSigner();
-          flow.addEvent('userObtained');
+          return await this.#guardianClient.withConfirmationScreen({ width: 480, height: 720 })(async () => {
+            const ethSigner = await this.#getSigner();
+            flow.addEvent('userObtained');
 
-          return await signTypedDataV4({
-            method: request.method,
-            params: request.params || [],
-            ethSigner,
-            rpcProvider: this.#rpcProvider,
-            relayerClient: this.#relayerClient,
-            guardianClient: this.#guardianClient,
+            return await signTypedDataV4({
+              method: request.method,
+              params: request.params || [],
+              ethSigner,
+              rpcProvider: this.#rpcProvider,
+              relayerClient: this.#relayerClient,
+              guardianClient: this.#guardianClient,
+            });
           });
         } catch (error) {
           let errorMessage = 'Unknown error';

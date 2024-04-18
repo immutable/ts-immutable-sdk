@@ -13,6 +13,7 @@ import {
   GasEstimateType,
   IMTBLWidgetEvents,
 } from '@imtbl/checkout-sdk';
+import { Environment } from '@imtbl/config';
 import { DEFAULT_TOKEN_SYMBOLS } from 'context/crypto-fiat-context/CryptoFiatProvider';
 import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { Web3Provider } from '@ethersproject/providers';
@@ -57,6 +58,11 @@ interface TopUpViewProps {
   subheading?: [key: string, options?: $Dictionary];
 }
 
+export const TOOLKIT_BASE_URL = {
+  [Environment.SANDBOX]: 'https://checkout-playground.sandbox.immutable.com',
+  [Environment.PRODUCTION]: 'https://toolkit.immutable.com',
+};
+
 export function TopUpView({
   widgetEvent,
   checkout,
@@ -80,6 +86,8 @@ export function TopUpView({
 
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { conversions, fiatSymbol } = cryptoFiatState;
+
+  const environment = checkout?.config.environment ?? Environment.SANDBOX;
 
   const {
     eventTargetState: { eventTarget },
@@ -246,6 +254,18 @@ export function TopUpView({
     localTrack('OnRamp', { ...data, widgetEvent });
   };
 
+  const onClickAdvancedOptions = () => {
+    const toolkitBaseUrl = TOOLKIT_BASE_URL[environment];
+    const data = {
+      tokenAddress: tokenAddress ?? '',
+      amount: amount ?? '',
+    };
+
+    localTrack('AdvancedOptions', { ...data, widgetEvent });
+
+    window.open(`${toolkitBaseUrl}/faster-bridge/`, '_blank');
+  };
+
   const renderFees = (txt: string): ReactNode => (
     <Box
       sx={{
@@ -296,6 +316,15 @@ export function TopUpView({
       ),
       isAvailable: true,
       isEnabled: showBridgeOption,
+    },
+    {
+      testId: 'advanced',
+      icon: 'JumpTo',
+      textConfigKey: 'views.TOP_UP_VIEW.topUpOptions.advanced',
+      onClickEvent: onClickAdvancedOptions,
+      fee: () => renderFees(''),
+      isAvailable: true,
+      isEnabled: true,
     },
   ];
 
