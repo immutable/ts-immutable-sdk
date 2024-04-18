@@ -244,6 +244,25 @@
         }
       }
     },
+    "ORDER_SUMMARY": {
+      "loading": {
+        "balances": "正在计算数字" 
+      },
+      "currency": {
+        "fiat": "≈ USD ${{amount}}", 
+        "fees": "费用"  
+      },
+      "coinsDrawer": {
+        "header": "支付方式…", 
+        "caption1": "硬币", 
+        "caption2": "余额" 
+      },
+      "orderReview": {
+        "heading": "选择支付方式",
+        "continue": "继续",
+        "payWithCard": "不用了，我用卡支付"
+      }
+    },
     "FUND_WITH_SMART_CHECKOUT": {
       "loading": {
         "checkingBalances": "正在计算数字"

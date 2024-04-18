@@ -240,6 +240,25 @@
         }
       }
     },
+    "ORDER_SUMMARY": {
+      "loading": {
+        "balances": "숫자 계산 중"
+      },
+      "currency": {
+        "fiat": "≈ USD ${{amount}}", 
+        "fees": "수수료"  
+      },
+      "coinsDrawer": {
+        "header": "결제 수단...",
+        "caption1": "코인",  
+        "caption2": "잔액"
+      },
+      "orderReview": {
+        "heading": "결제 수단 선택",
+        "continue": "계속하기", 
+        "payWithCard": "아니요, 카드로 결제할게요"  
+      }
+    },
     "FUND_WITH_SMART_CHECKOUT": {
       "loading": {
         "checkingBalances": "숫자를 계산하는 중"
