@@ -56,6 +56,7 @@ type SaleContextProps = {
   checkout: ConnectLoaderState['checkout'];
   passport?: Passport;
   excludePaymentTypes: SalePaymentTypes[];
+  multicurrency: boolean;
 };
 
 type SaleContextValues = SaleContextProps & {
@@ -130,6 +131,7 @@ const SaleContext = createContext<SaleContextValues>({
   clientConfig: defaultClientConfig,
   signTokenIds: [],
   excludePaymentTypes: [],
+  multicurrency: false,
 });
 
 SaleContext.displayName = 'SaleSaleContext';
@@ -154,6 +156,7 @@ export function SaleContextProvider(props: {
       passport,
       collectionName,
       excludePaymentTypes,
+      multicurrency,
     },
   } = props;
 
@@ -450,6 +453,7 @@ export function SaleContextProvider(props: {
       clientConfig,
       signTokenIds: tokenIds,
       excludePaymentTypes,
+      multicurrency,
     }),
     [
       config,
@@ -480,6 +484,7 @@ export function SaleContextProvider(props: {
       clientConfig,
       tokenIds,
       excludePaymentTypes,
+      multicurrency,
     ],
   );
 

@@ -7,8 +7,7 @@ import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import {
-  FundWithSmartCheckoutSubViews,
-  SaleWidgetViews,
+  FundWithSmartCheckoutSubViews, SaleWidgetViews,
 } from '../../../context/view-context/SaleViewContextTypes';
 import {
   SharedViews,
@@ -31,6 +30,7 @@ export function PaymentMethods() {
     setPaymentMethod,
     disabledPaymentTypes,
     invalidParameters,
+    multicurrency,
   } = useSaleContext();
   const { sendPageView, sendCloseEvent, sendSelectedPaymentMethod } = useSaleEvent();
 
@@ -68,6 +68,11 @@ export function PaymentMethods() {
     }
 
     if (paymentMethod && paymentMethod === SalePaymentTypes.CRYPTO) {
+      if (multicurrency) {
+        // TODO: go to summary view
+        return;
+      }
+
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
