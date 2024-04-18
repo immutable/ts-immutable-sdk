@@ -38,8 +38,7 @@ export function PaymentMethods() {
 
   useEffect(() => {
     if (paymentMethod) {
-      //
-      sendSelectedPaymentMethod(paymentMethod, SaleWidgetViews.PAYMENT_METHODS);
+      sendSelectedPaymentMethod(paymentMethod, SaleWidgetViews.PAYMENT_METHODS); // checkoutPrimarySalePaymentMethods_SelectMenuItem
     }
 
     if (

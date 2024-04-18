@@ -40,11 +40,11 @@ export function PayWithCoins() {
       signResponse,
       waitForTrnsactionSettlement,
       (txn) => {
-        sendTransactionSuccessEvent(txn);
+        sendTransactionSuccessEvent(txn); // not an analytics event
       },
       (error, txns) => {
         const details = { transactionId: signResponse?.transactionId };
-        sendFailedEvent(error.toString(), error, txns, undefined, details);
+        sendFailedEvent(error.toString(), error, txns, undefined, details); // checkoutPrimarySalePaymentMethods_FailEventFailed
       },
     );
   };

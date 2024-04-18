@@ -102,7 +102,7 @@ export function PayWithCard() {
       quantity,
       signData,
       transactionId: signData?.transactionId,
-    });
+    }); // checkoutPrimarySalePayWithCard_OrderCreatedEvent
   };
 
   useEffect(() => sendPageView(SaleWidgetViews.PAY_WITH_CARD), []); // checkoutPrimarySalePayWithCardViewed
