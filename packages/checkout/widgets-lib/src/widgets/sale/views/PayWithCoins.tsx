@@ -59,12 +59,12 @@ export function PayWithCoins() {
   useEffect(() => {
     if (executeResponse?.done === true) {
       const details = { transactionId: signResponse?.transactionId };
-      sendSuccessEvent(SaleWidgetViews.SALE_SUCCESS, executeResponse?.transactions, signTokenIds, details);
-      sendCloseEvent(SaleWidgetViews.SALE_SUCCESS);
+      sendSuccessEvent(SaleWidgetViews.SALE_SUCCESS, executeResponse?.transactions, signTokenIds, details); // checkoutPrimarySaleSaleSuccess_SuccessEventSucceeded
+      sendCloseEvent(SaleWidgetViews.SALE_SUCCESS); // checkoutPrimarySaleSaleSuccess_CloseButtonPressed
     }
   }, [executeResponse]);
 
-  useEffect(() => sendPageView(SaleWidgetViews.PAY_WITH_COINS), []);
+  useEffect(() => sendPageView(SaleWidgetViews.PAY_WITH_COINS), []); // checkoutPrimarySalePayWithCoinsViewed
 
   return <LoadingView loadingText={loadingText} />;
 }

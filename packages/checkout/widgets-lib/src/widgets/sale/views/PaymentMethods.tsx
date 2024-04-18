@@ -38,6 +38,7 @@ export function PaymentMethods() {
 
   useEffect(() => {
     if (paymentMethod) {
+      //
       sendSelectedPaymentMethod(paymentMethod, SaleWidgetViews.PAYMENT_METHODS);
     }
 
@@ -80,7 +81,7 @@ export function PaymentMethods() {
     }
   }, [paymentMethod]);
 
-  useEffect(() => sendPageView(SaleWidgetViews.PAYMENT_METHODS), []);
+  useEffect(() => sendPageView(SaleWidgetViews.PAYMENT_METHODS), []); // checkoutPrimarySalePaymentMethodsViewed
   useEffect(() => {
     if (!invalidParameters) return;
     goToErrorView(SaleErrorTypes.INVALID_PARAMETERS);
@@ -91,7 +92,7 @@ export function PaymentMethods() {
       testId="payment-methods"
       header={(
         <HeaderNavigation
-          onCloseButtonClick={() => sendCloseEvent(SaleWidgetViews.PAYMENT_METHODS)}
+          onCloseButtonClick={() => sendCloseEvent(SaleWidgetViews.PAYMENT_METHODS)} // checkoutPrimarySalePaymentMethods_CloseButtonPressed
         />
       )}
       footer={<FooterLogo />}

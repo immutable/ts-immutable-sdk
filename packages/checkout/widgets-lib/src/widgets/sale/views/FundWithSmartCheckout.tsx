@@ -92,6 +92,7 @@ export function FundWithSmartCheckout({ subView }: FundWithSmartCheckoutProps) {
       subView,
       ...(!!fundingRouteStep && { fundingStep: fundingRouteStep.type }),
     }),
+    // checkoutPrimarySaleFundWithSmartCheckoutViewed
     [],
   );
 

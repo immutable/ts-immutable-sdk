@@ -64,8 +64,8 @@ export function PayWithCard() {
       transactionId: signData?.transactionId,
     };
 
-    sendSuccessEvent(SaleWidgetViews.SALE_SUCCESS, [], signTokenIds, details);
-    sendCloseEvent(SaleWidgetViews.SALE_SUCCESS);
+    sendSuccessEvent(SaleWidgetViews.SALE_SUCCESS, [], signTokenIds, details); // checkoutPrimarySaleSaleSuccess_SuccessEventSucceeded
+    sendCloseEvent(SaleWidgetViews.SALE_SUCCESS); // checkoutPrimarySaleSaleSuccess_CloseButtonPressed
   };
 
   const onOrderCreated = (data: Record<string, unknown> = {}) => {
@@ -105,7 +105,7 @@ export function PayWithCard() {
     });
   };
 
-  useEffect(() => sendPageView(SaleWidgetViews.PAY_WITH_CARD), []);
+  useEffect(() => sendPageView(SaleWidgetViews.PAY_WITH_CARD), []); // checkoutPrimarySalePayWithCardViewed
 
   return (
     <SimpleLayout

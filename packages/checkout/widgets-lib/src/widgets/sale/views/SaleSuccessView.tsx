@@ -12,7 +12,7 @@ export function SaleSuccessView({ data }: SaleSuccessViewProps) {
   const { sendCloseEvent, sendSuccessEvent } = useSaleEvent();
 
   const closeWidget = () => {
-    sendCloseEvent(SaleWidgetViews.SALE_SUCCESS);
+    sendCloseEvent(SaleWidgetViews.SALE_SUCCESS); // checkoutPrimarySaleSaleSuccess_CloseButtonPressed
   };
 
   return (
