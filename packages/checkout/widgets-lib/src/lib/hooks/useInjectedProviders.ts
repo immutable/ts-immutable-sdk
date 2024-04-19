@@ -18,7 +18,7 @@ export interface UseInjectedProvidersParams {
 type ConnectConfig = {
   injected: {
     priorityWalletRdns: WalletProviderRdns | string[];
-    blacklistWalletRdns: WalletProviderRdns | string[];
+    blocklistWalletRdns: WalletProviderRdns | string[];
   };
 };
 
@@ -33,19 +33,15 @@ const processProviders = (
   checkout: Checkout | null,
   injectedProviders: EIP6963ProviderDetail[],
   priorityWalletRdns: WalletProviderRdns | string[] = [],
-  blacklistWalletRdns: WalletProviderRdns | string[] = [],
+  blocklistWalletRdns: WalletProviderRdns | string[] = [],
 ) => {
   const getIndex = (rdns: string) => {
     const index = priorityWalletRdns.indexOf(rdns);
     return index >= 0 ? index : DEFAULT_PRIORITY_INDEX;
   };
 
-  // Filter & sort providers
-  const filteredProviders = injectedProviders
-    .filter(({ info }) => !blacklistWalletRdns.includes(info.rdns))
-    .sort((a, b) => (
-      getIndex(a.info.rdns) - getIndex(b.info.rdns)
-    ));
+  // Injected providers
+  const filteredProviders = [...injectedProviders];
 
   // Attempt to fallback to window.ethereum if no EIP-6963 providers are found
   // Assuming this is MetaMask on mobile
@@ -63,7 +59,12 @@ const processProviders = (
     filteredProviders.unshift(getPassportProviderDetail(passportWeb3Provider.provider as EIP1193Provider));
   }
 
-  return filteredProviders;
+  // Filter & sort providers
+  return filteredProviders
+    .filter(({ info }) => !blocklistWalletRdns.includes(info.rdns))
+    .sort((a, b) => (
+      getIndex(a.info.rdns) - getIndex(b.info.rdns)
+    ));
 };
 
 /**
@@ -79,12 +80,12 @@ export const useInjectedProviders = ({ checkout }: UseInjectedProvidersParams) =
   const filterAndProcessProviders = useCallback(async (injectedProviders: EIP6963ProviderDetail[]) => {
     const connectConfig = await checkout?.config.remote.getConfig('connect') as ConnectConfig;
     const priorityWalletRdns = connectConfig.injected?.priorityWalletRdns ?? [];
-    const blacklistWalletRdns = connectConfig.injected?.blacklistWalletRdns ?? [];
+    const blocklistWalletRdns = connectConfig.injected?.blocklistWalletRdns ?? [];
     const filteredProviders = processProviders(
       checkout,
       injectedProviders,
       priorityWalletRdns,
-      blacklistWalletRdns,
+      blocklistWalletRdns,
     );
     setProviders(filteredProviders);
   }, [checkout, setProviders]);

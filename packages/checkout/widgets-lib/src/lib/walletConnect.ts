@@ -210,12 +210,11 @@ export class WalletConnectManager {
     return undefined;
   }
 
-  public async getWalletLogoUrl(): Promise<string | undefined> {
+  public async getWalletLogoUrl(walletSlug?: string): Promise<string | undefined> {
     if (!this.walletListings) {
       this.walletListings = await this.loadWalletListings();
     }
-    const walletName = this.ethereumProvider?.session?.peer.metadata.name;
-
+    const walletName = walletSlug || this.ethereumProvider?.session?.peer.metadata.name;
     if (!this.walletListings || !walletName) {
       return undefined;
     }
