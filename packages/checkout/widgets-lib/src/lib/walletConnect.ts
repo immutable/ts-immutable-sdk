@@ -68,6 +68,8 @@ const sandboxWalletWhitelist = [metamaskId];
 export class WalletConnectManager {
   private static instance: WalletConnectManager;
 
+  private isInitialising: boolean = false;
+
   private initialised: boolean = false;
 
   private enabled: boolean = false;
@@ -83,6 +85,8 @@ export class WalletConnectManager {
   private ethereumProvider!: EthereumProvider;
 
   private walletListings!: any;
+
+  private providerQueue: any[] = [];
 
   private validateConfig(config: WalletConnectConfiguration): boolean {
     if (!config.projectId || config.projectId === '') {
@@ -162,29 +166,41 @@ export class WalletConnectManager {
     }
     return new Promise((resolve) => {
       if (!this.ethereumProvider) {
-        EthereumProvider.init({
-          projectId: this.walletConnectConfig.projectId,
-          chains: this.environment === Environment.PRODUCTION
-            ? [ChainId.ETHEREUM]
-            : [ChainId.SEPOLIA],
-          optionalChains: this.environment === Environment.PRODUCTION
-            ? [ChainId.IMTBL_ZKEVM_MAINNET, ChainId.ETHEREUM]
-            : [ChainId.IMTBL_ZKEVM_TESTNET, ChainId.SEPOLIA],
-          showQrModal: false,
-          metadata: this.walletConnectConfig.metadata,
-          qrModalOptions: {
-            themeMode: this.theme,
-          },
-          rpcMap: {
-            [ChainId.ETHEREUM]: 'https://checkout-api.immutable.com/v1/rpc/eth-mainnet',
-            [ChainId.IMTBL_ZKEVM_MAINNET]: 'https://rpc.immutable.com',
-            [ChainId.SEPOLIA]: 'https://checkout-api.sandbox.immutable.com/v1/rpc/eth-sepolia',
-            [ChainId.IMTBL_ZKEVM_TESTNET]: 'https://rpc.testnet.immutable.com',
-          },
-        }).then((wcEthereumProvider: EthereumProvider) => {
-          this.ethereumProvider = wcEthereumProvider;
-          resolve(this.ethereumProvider);
-        });
+        if (this.isInitialising) {
+          this.providerQueue.push(resolve);
+        } else {
+          this.isInitialising = true;
+          EthereumProvider.init({
+            projectId: this.walletConnectConfig.projectId,
+            chains: this.environment === Environment.PRODUCTION
+              ? [ChainId.ETHEREUM]
+              : [ChainId.SEPOLIA],
+            optionalChains: this.environment === Environment.PRODUCTION
+              ? [ChainId.IMTBL_ZKEVM_MAINNET, ChainId.ETHEREUM]
+              : [ChainId.IMTBL_ZKEVM_TESTNET, ChainId.SEPOLIA],
+            showQrModal: false,
+            metadata: this.walletConnectConfig.metadata,
+            qrModalOptions: {
+              themeMode: this.theme,
+            },
+            rpcMap: {
+              [ChainId.ETHEREUM]: 'https://checkout-api.immutable.com/v1/rpc/eth-mainnet',
+              [ChainId.IMTBL_ZKEVM_MAINNET]: 'https://rpc.immutable.com',
+              [ChainId.SEPOLIA]: 'https://checkout-api.sandbox.immutable.com/v1/rpc/eth-sepolia',
+              [ChainId.IMTBL_ZKEVM_TESTNET]: 'https://rpc.testnet.immutable.com',
+            },
+          })
+            .then((wcEthereumProvider: EthereumProvider) => {
+              this.ethereumProvider = wcEthereumProvider;
+              resolve(this.ethereumProvider);
+
+              // Resolve anything in the provider queue
+              this.isInitialising = false;
+              this.providerQueue.forEach((resolveFn) => {
+                resolveFn(this.ethereumProvider);
+              });
+            });
+        }
       } else {
         resolve(this.ethereumProvider);
       }
