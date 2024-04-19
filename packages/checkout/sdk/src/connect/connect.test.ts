@@ -20,7 +20,9 @@ describe('connect', () => {
       ethereum: {
         request: providerRequestMock,
       },
-      removeEventListener: () => {},
+      dispatchEvent: jest.fn(),
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
     }));
   });
 

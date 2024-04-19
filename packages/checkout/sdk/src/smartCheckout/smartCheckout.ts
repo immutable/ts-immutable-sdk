@@ -27,6 +27,7 @@ export const smartCheckout = async (
   provider: Web3Provider,
   itemRequirements: ItemRequirement[],
   transactionOrGasAmount?: FulfillmentTransaction | GasAmount,
+  routingOptions?: AvailableRoutingOptions,
 ): Promise<SmartCheckoutResult> => {
   const ownerAddress = await provider.getSigner().getAddress();
 
@@ -78,6 +79,9 @@ export const smartCheckout = async (
     'Time to fetch available routing options',
     getAvailableRoutingOptions(config, provider),
   );
+  if (routingOptions?.onRamp === false) availableRoutingOptions.onRamp = false;
+  if (routingOptions?.swap === false) availableRoutingOptions.swap = false;
+  if (routingOptions?.bridge === false) availableRoutingOptions.bridge = false;
 
   const routingOutcome = await measureAsyncExecution<RoutingOutcome>(
     config,

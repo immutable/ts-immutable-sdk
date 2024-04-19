@@ -2,7 +2,7 @@ import { StaticJsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { Signer } from '@ethersproject/abstract-signer';
 import { utils } from 'ethers';
-import { trackFlow } from '@imtbl/metrics';
+import { identify, trackFlow } from '@imtbl/metrics';
 import {
   JsonRpcRequestCallback,
   JsonRpcRequestPayload,
@@ -198,6 +198,9 @@ export class ZkEvmProvider implements Provider {
           }
 
           this.#eventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [this.#zkEvmAddress]);
+          identify({
+            passportId: user.profile.sub,
+          });
 
           return [this.#zkEvmAddress];
         } catch (error) {
