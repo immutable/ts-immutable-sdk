@@ -71,9 +71,11 @@ export const useWalletConnect = () => {
                     provider?.connect();
                   }
                 }
-                // eslint-disable-next-line no-console
               })
-              .catch((err) => console.log('activate existing pairing error', err));
+              .catch((err) => {
+                // eslint-disable-next-line no-console
+                console.error('activate existing pairing error', err);
+              });
           }
         } catch (err) {
           // eslint-disable-next-line no-console
