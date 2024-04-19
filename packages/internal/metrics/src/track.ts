@@ -22,7 +22,7 @@ const trackFn = (
   moduleName: string,
   eventName: string,
   properties?: TrackProperties,
-) => {
+): void => {
   const event = {
     event: `${moduleName}.${eventName}`,
     time: new Date().toISOString(),

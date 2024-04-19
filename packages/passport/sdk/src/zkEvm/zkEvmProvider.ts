@@ -174,7 +174,7 @@ export class ZkEvmProvider implements Provider {
 
         try {
           const user = await this.#authManager.getUserOrLogin();
-          flow.addEvent('userObtained');
+          flow.addEvent('endGetUserOrLogin');
 
           this.#initialiseEthSigner(user);
 
@@ -190,6 +190,7 @@ export class ZkEvmProvider implements Provider {
               multiRollupApiClients: this.#multiRollupApiClients,
               accessToken: user.accessToken,
               rpcProvider: this.#rpcProvider,
+              flow,
             });
             flow.addEvent('endUserRegistration');
           } else {
@@ -221,7 +222,7 @@ export class ZkEvmProvider implements Provider {
         try {
           return await this.#guardianClient.withConfirmationScreen({ width: 480, height: 720 })(async () => {
             const ethSigner = await this.#getSigner();
-            flow.addEvent('userObtained');
+            flow.addEvent('endGetSigner');
 
             return await sendTransaction({
               params: request.params || [],
@@ -230,6 +231,7 @@ export class ZkEvmProvider implements Provider {
               rpcProvider: this.#rpcProvider,
               relayerClient: this.#relayerClient,
               zkevmAddress: this.#zkEvmAddress!,
+              flow,
             });
           });
         } catch (error) {
@@ -258,7 +260,7 @@ export class ZkEvmProvider implements Provider {
         try {
           return await this.#guardianClient.withConfirmationScreen({ width: 480, height: 720 })(async () => {
             const ethSigner = await this.#getSigner();
-            flow.addEvent('userObtained');
+            flow.addEvent('endGetSigner');
 
             return await signTypedDataV4({
               method: request.method,
@@ -267,6 +269,7 @@ export class ZkEvmProvider implements Provider {
               rpcProvider: this.#rpcProvider,
               relayerClient: this.#relayerClient,
               guardianClient: this.#guardianClient,
+              flow,
             });
           });
         } catch (error) {

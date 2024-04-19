@@ -1,4 +1,5 @@
 import { StaticJsonRpcProvider, Web3Provider } from '@ethersproject/providers';
+import { trackFlow } from '@imtbl/metrics';
 import AuthManager from 'authManager';
 import { utils } from 'ethers';
 import { ZkEvmProvider, ZkEvmProviderInput } from './zkEvmProvider';
@@ -14,6 +15,7 @@ import { signTypedDataV4 } from './signTypedDataV4';
 import MagicAdapter from '../magicAdapter';
 
 jest.mock('@ethersproject/providers');
+jest.mock('@imtbl/metrics');
 jest.mock('./relayerClient');
 jest.mock('./user');
 jest.mock('./sendTransaction');
@@ -39,7 +41,10 @@ describe('ZkEvmProvider', () => {
     (Web3Provider as unknown as jest.Mock).mockImplementation(() => ({
       getSigner: jest.fn().mockImplementation(() => ethSigner),
     }));
-
+    (trackFlow as unknown as jest.Mock).mockImplementation(() => ({
+      addEvent: jest.fn(),
+      end: jest.fn(),
+    }));
     (guardianClient.withConfirmationScreen as jest.Mock)
       .mockImplementation(() => (task: () => void) => task());
   });
@@ -146,6 +151,7 @@ describe('ZkEvmProvider', () => {
         rpcProvider: expect.any(Object),
         relayerClient: expect.any(RelayerClient),
         zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
+        flow: expect.any(Object),
       });
     });
   });
@@ -184,6 +190,7 @@ describe('ZkEvmProvider', () => {
         ethSigner,
         rpcProvider: expect.any(Object),
         relayerClient: expect.any(RelayerClient),
+        flow: expect.any(Object),
       });
     });
 

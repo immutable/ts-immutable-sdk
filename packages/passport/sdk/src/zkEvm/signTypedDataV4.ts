@@ -2,6 +2,7 @@ import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import GuardianClient from 'guardian';
 import { Signer } from '@ethersproject/abstract-signer';
+import { Flow } from '@imtbl/metrics';
 import { getSignedTypedData } from './walletHelpers';
 import { TypedDataPayload } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
@@ -14,6 +15,7 @@ export type SignTypedDataV4Params = {
   method: string;
   params: Array<any>;
   guardianClient: GuardianClient;
+  flow: Flow;
 };
 
 const REQUIRED_TYPED_DATA_PROPERTIES = ['types', 'domain', 'primaryType', 'message'];
@@ -69,6 +71,7 @@ export const signTypedDataV4 = async ({
   rpcProvider,
   relayerClient,
   guardianClient,
+  flow,
 }: SignTypedDataV4Params): Promise<string> => {
   const fromAddress: string = params[0];
   const typedDataParam: string | object = params[1];
@@ -79,9 +82,22 @@ export const signTypedDataV4 = async ({
 
   const { chainId } = await rpcProvider.detectNetwork();
   const typedData = transformTypedData(typedDataParam, chainId);
+  flow.addEvent('endDetectNetwork');
 
   await guardianClient.validateMessage({ chainID: String(chainId), payload: typedData });
-  const relayerSignature = await relayerClient.imSignTypedData(fromAddress, typedData);
+  flow.addEvent('endValidateMessage');
 
-  return getSignedTypedData(typedData, relayerSignature, BigNumber.from(chainId), fromAddress, ethSigner);
+  const relayerSignature = await relayerClient.imSignTypedData(fromAddress, typedData);
+  flow.addEvent('endRelayerSignTypedData');
+
+  const signature = await getSignedTypedData(
+    typedData,
+    relayerSignature,
+    BigNumber.from(chainId),
+    fromAddress,
+    ethSigner,
+  );
+  flow.addEvent('getSignedTypedData');
+
+  return signature;
 };

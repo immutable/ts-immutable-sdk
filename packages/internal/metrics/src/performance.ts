@@ -6,6 +6,18 @@ type PerformanceEventProperties =
     duration?: never;
   });
 
+export type Flow = {
+  details: {
+    moduleName: string;
+    flowName: string;
+    flowId: string;
+    flowStartTime: number;
+  };
+  addEvent: (eventName: string, properties?: PerformanceEventProperties) => void;
+  addFlowProperties: (properties: PerformanceEventProperties) => void;
+  end: (endProperties?: PerformanceEventProperties) => void;
+};
+
 /**
  * Track an event and it's performance. Works similarly to `track`, but also includes a duration.
  * @param moduleName Name of the module being tracked (for namespacing purposes), e.g. `passport`
@@ -70,7 +82,7 @@ const trackFlowFn = (
   moduleName: string,
   flowName: string,
   properties?: FlowEventProperties,
-) => {
+): Flow => {
   // Track the start of the flow
   const flowStartEventName = getEventName(flowName, 'start');
   const flowId = generateFlowId();
