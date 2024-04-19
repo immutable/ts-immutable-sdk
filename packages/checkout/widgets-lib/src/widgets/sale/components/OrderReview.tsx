@@ -8,11 +8,11 @@ import { EventTargetContext } from '../../../context/event-target-context/EventT
 import { sendSaleWidgetCloseEvent } from '../SaleWidgetEvents';
 import { SelectCoinDropdown } from './SelectCoinDropdown';
 import { CoinsDrawer } from './CoinsDrawer';
-import { CoinBalance } from '../types';
+import { FundingBalance } from '../types';
 
 type OrderReviewProps = {
   collectionName: string;
-  currencies: CoinBalance[];
+  currencies: FundingBalance[];
   conversions: Map<string, number>;
 };
 

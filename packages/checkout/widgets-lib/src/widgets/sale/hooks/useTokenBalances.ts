@@ -1,59 +1,117 @@
-import { RoutingOutcomeType, TokenBalance } from '@imtbl/checkout-sdk';
+import {
+  FundingStepType,
+  ItemType,
+  RoutingOutcomeType,
+  TokenInfo,
+} from '@imtbl/checkout-sdk';
 import { useRef, useState } from 'react';
 import { BalanceCheckResult, fetchBalances } from '../functions/fetchBalances';
-import { CoinBalance } from '../types';
+import { FundingBalance, FundingBalanceType } from '../types';
 import { useSaleContext } from '../context/SaleContextProvider';
 
-const transformToCoinBalance = (
-  balance: TokenBalance,
-  swappable = false,
-): CoinBalance => ({ swappable, ...balance });
+const FUNDING_ROUTES_ALLOWLIST = [
+  FundingStepType.SWAP,
+  FundingStepType.ONRAMP,
+  FundingStepType.BRIDGE,
+];
 
 export const useTokenBalances = () => {
   const {
     fromTokenAddress, clientConfig, provider, checkout,
   } = useSaleContext();
-  const [balances, setBalances] = useState<CoinBalance[]>([]);
+  const [balances, setBalances] = useState<FundingBalance[]>([]);
+  const [balancesResult, setBalancesResult] = useState<BalanceCheckResult[]>([]);
   const fetching = useRef(false);
+  const [loadingBalances, setLoadingBalances] = useState(false);
 
-  const onBalanceUpdate = ({
-    currency,
+  const onProgress = ({
+    // currency,
     smartCheckoutResult,
   }: BalanceCheckResult) => {
-    const { sufficient, transactionRequirements } = smartCheckoutResult;
-    const erc20Req = transactionRequirements[0];
+    console.log('🚀 ~ smartCheckoutResult:', smartCheckoutResult);
 
-    // Push to balances if sufficient
-    if (sufficient) {
+    const erc20Req = smartCheckoutResult.transactionRequirements[0];
+
+    if (smartCheckoutResult.sufficient && erc20Req.sufficient) {
+      // Push to balances if sufficient
+      console.log('🚀 ~ erc20Req:', erc20Req);
+
+      // get sufficient funding item
       setBalances((prev) => [
         ...prev,
-        transformToCoinBalance(erc20Req.current as TokenBalance, false),
+        {
+          type: FundingBalanceType.SUFFICIENT,
+          fundingItem: {
+            type: ItemType.ERC20,
+            token: (erc20Req.current.type !== ItemType.ERC721
+              && erc20Req.current.token) as TokenInfo,
+            fundsRequired: {
+              amount: erc20Req.required.balance,
+              formattedAmount: erc20Req.required.formattedBalance,
+            },
+            userBalance: {
+              balance: erc20Req.current.balance,
+              formattedBalance: erc20Req.current.formattedBalance,
+            },
+          },
+        },
       ]);
     }
 
-    // else, checj if it's swappable, then push to balances
+    // else, check if it's swappable, then push to balances
+
+    if (
+      !smartCheckoutResult.sufficient
+      && smartCheckoutResult.router.routingOutcome.type
+        === RoutingOutcomeType.ROUTES_FOUND
+    ) {
+      // filter funding routes with more than 1 step
+      const singleStepRoutes = smartCheckoutResult.router.routingOutcome.fundingRoutes.filter(
+        (route) => route.steps.length === 1 && FUNDING_ROUTES_ALLOWLIST.includes(route.steps[0].type),
+      );
+
+      // extract all funding items with ERC20
+      const erc20FundingSteps = singleStepRoutes.flatMap(
+        (route) => route.steps.filter((step) => step.fundingItem.type === ItemType.ERC20),
+      );
+
+      // push to balances
+      erc20FundingSteps.forEach((fundingStep) => {
+        console.log('🚀 ~ fundingStep:', fundingStep.type);
+
+        setBalances((prev) => [...prev, { ...fundingStep }]);
+      });
+    }
   };
 
-  const getBalances = () => {
+  const queryBalances = () => {
     if (!fromTokenAddress || !provider || !checkout || !clientConfig) return;
 
     if (fetching.current) return;
 
     (async () => {
       fetching.current = true;
+      setLoadingBalances(true);
       try {
-        await fetchBalances(
+        const results = await fetchBalances(
           provider,
           checkout,
           clientConfig.currencies,
           clientConfig.currencyConversion,
-          onBalanceUpdate,
+          onProgress,
         );
+
+        setBalancesResult(results);
+      } catch {
+        setLoadingBalances(false);
       } finally {
+        setLoadingBalances(false);
         fetching.current = false;
       }
     })();
   };
 
-  return [balances, getBalances] as const;
+  return {
+    balances, queryBalances, loadingBalances, balancesResult,
+  };
 };
