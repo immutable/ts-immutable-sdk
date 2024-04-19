@@ -134,7 +134,7 @@ export const sendTransaction = async ({
   ]);
 
   const relayerId = await relayerClient.ethSendTransaction(zkevmAddress, signedTransactions);
-  flow.addEvent('endEthSendTransaction');
+  flow.addEvent('endRelayerSendTransaction');
 
   const retrieveRelayerTransaction = async () => {
     const tx = await relayerClient.imGetTransactionByHash(relayerId);
