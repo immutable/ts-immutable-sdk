@@ -124,7 +124,7 @@ export const useWalletConnect = () => {
             setWalletConnectBusy(true);
             reject(error);
           });
-      } else if (!ethereumProvider?.session) {
+      } else if (!ethereumProvider?.session || !restoreSession) {
         // if we don't have a display uri and no connected session
         // call connect to generate display_uri event
         ethereumProvider?.connect();

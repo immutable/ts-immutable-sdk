@@ -41,11 +41,13 @@ import { identifyUser } from '../../../lib/analytics/identifyUser';
 export interface WalletListProps {
   targetChainId: ChainId;
   allowedChains: ChainId[];
+  blocklistWalletRdns?: string[];
 }
 
 export function WalletList(props: WalletListProps) {
   const { t } = useTranslation();
   const { targetChainId, allowedChains } = props;
+  const blocklistWalletRdns = props?.blocklistWalletRdns || [];
   const {
     connectDispatch,
     connectState: { checkout },
@@ -61,13 +63,17 @@ export function WalletList(props: WalletListProps) {
   const [chosenProviderDetail, setChosenProviderDetail] = useState<EIP6963ProviderDetail>();
 
   const filteredProviders = useMemo(() => (
-    providers.filter((provider) => (!(provider.info.rdns === WalletProviderRdns.PASSPORT)))
+    providers
+      .filter((provider) => (!(provider.info.rdns === WalletProviderRdns.PASSPORT)))
+      .filter((provider) => (!blocklistWalletRdns.includes(provider.info.rdns)))
   ), [providers]);
 
   // Don't allow Passport if targetChainId is L1
   const passportProviderDetail = useMemo(() => (
     targetChainId !== getL1ChainId(checkout!.config)
-    && providers.find((provider) => provider.info.rdns === WalletProviderRdns.PASSPORT)
+    && providers
+      .filter((provider) => (!blocklistWalletRdns.includes(provider.info.rdns)))
+      .find((provider) => provider.info.rdns === WalletProviderRdns.PASSPORT)
   ), [providers, checkout]);
 
   const selectWeb3Provider = useCallback((web3Provider: Web3Provider, providerName: string) => {
@@ -197,7 +203,7 @@ export function WalletList(props: WalletListProps) {
     });
     await openWalletConnectModal({
       connectCallback,
-      restoreSession: true,
+      restoreSession: false,
     });
   };
 

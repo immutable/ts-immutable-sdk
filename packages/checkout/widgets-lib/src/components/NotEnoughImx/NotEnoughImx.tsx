@@ -12,6 +12,7 @@ import {
   actionButtonContainerStyles,
   logoContainerStyles,
 } from './NotEnoughImxStyles';
+import { IMAGE_RESIZER_URL } from '../../lib';
 
 type NotEnoughImxProps = {
   environment: Environment;
@@ -45,6 +46,7 @@ export function NotEnoughImx({
         <Box testId="not-enough-gas-bottom-sheet" sx={containerStyles}>
           <CloudImage
             imageUrl={imxLogo}
+            imageResizeServiceUrl={IMAGE_RESIZER_URL[environment]}
             sx={{ w: 'base.icon.size.600', h: 'base.icon.size.600' }}
           />
           <Heading
