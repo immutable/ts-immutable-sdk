@@ -236,42 +236,55 @@ export const routingCalculator = async (
   // Ensures only 1 balance requirement is insufficient
   const insufficientRequirement = getInsufficientRequirement(balanceRequirements);
 
-  const routePromises = [];
+  const routePromises: Promise<any>[] = [];
+  const routeSteps: string[] = [];
 
-  routePromises.push(getBridgeFundingStep(
-    config,
-    readOnlyProviders,
-    availableRoutingOptions,
-    insufficientRequirement,
-    tokenBalances,
-  ));
+  if (availableRoutingOptions.bridge) {
+    routeSteps.push('bridgeFundingStep');
+    routePromises.push(getBridgeFundingStep(
+      config,
+      readOnlyProviders,
+      availableRoutingOptions,
+      insufficientRequirement,
+      tokenBalances,
+    ));
+  }
 
-  routePromises.push(getSwapFundingSteps(
-    config,
-    availableRoutingOptions,
-    insufficientRequirement,
-    ownerAddress,
-    tokenBalances,
-    allowList.swap,
-    balanceRequirements,
-  ));
+  if (availableRoutingOptions.swap) {
+    routeSteps.push('swapFundingSteps');
+    routePromises.push(getSwapFundingSteps(
+      config,
+      availableRoutingOptions,
+      insufficientRequirement,
+      ownerAddress,
+      tokenBalances,
+      allowList.swap,
+      balanceRequirements,
+    ));
+  }
 
-  routePromises.push(getOnRampFundingStep(
-    config,
-    availableRoutingOptions,
-    insufficientRequirement,
-  ));
+  if (availableRoutingOptions.onRamp) {
+    routeSteps.push('onRampFundingStep');
+    routePromises.push(getOnRampFundingStep(
+      config,
+      availableRoutingOptions,
+      insufficientRequirement,
+    ));
+  }
 
-  routePromises.push(getBridgeAndSwapFundingSteps(
-    config,
-    readOnlyProviders,
-    availableRoutingOptions,
-    insufficientRequirement,
-    ownerAddress,
-    tokenBalances,
-    allowList,
-    balanceRequirements,
-  ));
+  if (availableRoutingOptions.swap && availableRoutingOptions.bridge) {
+    routeSteps.push('bridgeAndSwapFundingSteps');
+    routePromises.push(getBridgeAndSwapFundingSteps(
+      config,
+      readOnlyProviders,
+      availableRoutingOptions,
+      insufficientRequirement,
+      ownerAddress,
+      tokenBalances,
+      allowList,
+      balanceRequirements,
+    ));
+  }
 
   const resolved = await measureAsyncExecution<any[]>(
     config,
@@ -284,10 +297,23 @@ export const routingCalculator = async (
   let onRampFundingStep: OnRampFundingStep | undefined;
   let bridgeAndSwapFundingSteps: BridgeAndSwapRoute[] = [];
   resolved.forEach((result, index) => {
-    if (index === 0) bridgeFundingStep = result as BridgeFundingStep | undefined;
-    if (index === 1) swapFundingSteps = result as SwapFundingStep[];
-    if (index === 2) onRampFundingStep = result as OnRampFundingStep | undefined;
-    if (index === 3) bridgeAndSwapFundingSteps = result as BridgeAndSwapRoute[];
+    const routeStep = routeSteps[index];
+    switch (routeStep) {
+      case 'bridgeFundingStep':
+        bridgeFundingStep = result as BridgeFundingStep | undefined;
+        break;
+      case 'swapFundingSteps':
+        swapFundingSteps = result as SwapFundingStep[];
+        break;
+      case 'onRampFundingStep':
+        onRampFundingStep = result as OnRampFundingStep | undefined;
+        break;
+      case 'bridgeAndSwapFundingSteps':
+        bridgeAndSwapFundingSteps = result as BridgeAndSwapRoute[];
+        break;
+      default:
+        break;
+    }
   });
 
   if (!bridgeFundingStep
