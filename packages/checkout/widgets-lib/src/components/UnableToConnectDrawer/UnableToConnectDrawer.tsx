@@ -11,6 +11,7 @@ import { Checkout } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { getRemoteImage } from 'lib/utils';
 import { useTranslation } from 'react-i18next';
+import { IMAGE_RESIZER_URL } from '../../lib';
 
 export interface UnableToConnectDrawerProps {
   visible: boolean;
@@ -57,6 +58,7 @@ export function UnableToConnectDrawer({
         >
           <CloudImage
             imageUrl={walletErrorYellowUrl}
+            imageResizeServiceUrl={IMAGE_RESIZER_URL[checkout.config.environment]}
             sx={{ paddingTop: 'base.spacing.x4', paddingBottom: 'base.spacing.x9' }}
           />
           <ButtCon
