@@ -141,10 +141,12 @@ export const getRequiredToken = (
   switch (balanceRequirement.type) {
     case ItemType.ERC20:
       address = balanceRequirement.required.token.address!;
-      amount = balanceRequirement.delta.balance;
+      amount = balanceRequirement.delta.balance.isNegative()
+      ? balanceRequirement.required.balance : balanceRequirement.delta.balance;
       break;
     case ItemType.NATIVE:
-      amount = balanceRequirement.delta.balance;
+      amount = balanceRequirement.delta.balance.isNegative()
+      ? balanceRequirement.required.balance : balanceRequirement.delta.balance;
       break;
     default: break;
   }
@@ -324,6 +326,7 @@ export const swapRoute = async (
   if (!isBalanceRequirementTokenValid(balanceRequirement)) return fundingSteps;
 
   const requiredToken = getRequiredToken(balanceRequirement);
+  const name = (balanceRequirement.required as any)?.token?.name);
 
   const chainId = getL2ChainId(config);
   const l2TokenBalanceResult = tokenBalanceResults.get(chainId);
@@ -338,6 +341,7 @@ export const swapRoute = async (
     requiredToken,
     swappableTokens,
   );
+
 
   const quoteTokenAddresses = Array.from(quotes.keys());
   for (const quoteTokenAddress of quoteTokenAddresses) {

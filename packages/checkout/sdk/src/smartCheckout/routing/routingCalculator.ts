@@ -41,13 +41,17 @@ const hasAvailableRoutingOptions = (availableRoutingOptions: AvailableRoutingOpt
 
 export const getInsufficientRequirement = (
   balanceRequirements: BalanceCheckResult,
+  includeFundingRoutesOnSufficient: boolean,
 ): BalanceRequirement | undefined => {
   let insufficientBalanceCount = 0;
   let insufficientRequirement;
   for (const balanceRequirement of balanceRequirements.balanceRequirements) {
-    if (!balanceRequirement.sufficient) {
+    if (!balanceRequirement.sufficient || includeFundingRoutesOnSufficient) {
       insufficientBalanceCount++;
-      insufficientRequirement = balanceRequirement;
+      insufficientRequirement = {
+        ...balanceRequirement,
+        sufficient: includeFundingRoutesOnSufficient ? false : balanceRequirement.sufficient,
+      };
     }
   }
   if (insufficientBalanceCount === 1) return insufficientRequirement;
@@ -193,6 +197,7 @@ export const routingCalculator = async (
   ownerAddress: string,
   balanceRequirements: BalanceCheckResult,
   availableRoutingOptions: AvailableRoutingOptions,
+  includeFundingRoutesOnSufficient: boolean,
 ): Promise<RoutingOutcome> => {
   if (!hasAvailableRoutingOptions(availableRoutingOptions)) {
     return {
@@ -234,7 +239,7 @@ export const routingCalculator = async (
   );
 
   // Ensures only 1 balance requirement is insufficient
-  const insufficientRequirement = getInsufficientRequirement(balanceRequirements);
+  const insufficientRequirement = getInsufficientRequirement(balanceRequirements, includeFundingRoutesOnSufficient);
 
   const routePromises: Promise<any>[] = [];
   const routeSteps: string[] = [];

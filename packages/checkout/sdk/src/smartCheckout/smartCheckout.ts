@@ -25,7 +25,7 @@ export const smartCheckout = async (
   itemRequirements: ItemRequirement[],
   transactionOrGasAmount?: FulfillmentTransaction | GasAmount,
   routingOptions?: AvailableRoutingOptions,
-  includeFundingRoutesOnSufficient: boolean = false,
+  includeFundingRoutesOnSufficient: boolean = true,
 ): Promise<SmartCheckoutResult> => {
   const ownerAddress = await provider.getSigner().getAddress();
 
@@ -105,6 +105,7 @@ export const smartCheckout = async (
           ownerAddress,
           balanceCheckResult,
           availableRoutingOptions,
+          includeFundingRoutesOnSufficient,
         ),
       ),
     };
