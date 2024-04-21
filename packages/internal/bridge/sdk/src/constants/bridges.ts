@@ -72,6 +72,15 @@ export const rootIMXs:Record<string, string> = {
 };
 
 /**
+ * @typedef {Object} childETHs - Child ETH address for the testnet & mainnet.
+ */
+export const childETHs:Record<string, string> = {
+  mainnet: '0x52a6c53869ce09a731cd772f245b97a4401d3348',
+  testnet: '0xe9E96d1aad82562b7588F03f49aD34186f996478',
+  devnet: '',
+};
+
+/**
  * @typedef {Object} childAdaptors - Child Adaptor address for the testnet & mainnet.
  */
 export const childAdaptors:Record<string, string> = {

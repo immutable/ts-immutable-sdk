@@ -29,6 +29,7 @@ import {
   SLOT_PREFIX_CONTRACT_CALL_APPROVED,
   SLOT_POS_CONTRACT_CALL_APPROVED,
   axelarGateways,
+  childETHs,
 } from './constants/bridges';
 import { ROOT_ERC20_BRIDGE_FLOW_RATE } from './contracts/ABIs/RootERC20BridgeFlowRate';
 import { ERC20 } from './contracts/ABIs/ERC20';
@@ -199,7 +200,7 @@ export class TokenBridge {
       if (req.sourceChainId === this.config.bridgeInstance.rootChainID) {
         approvalFee = this.calculateGasFee(feeData, BridgeMethodsGasLimit.APPROVE_TOKEN);
       } else if (req.sourceChainId === this.config.bridgeInstance.childChainID
-        && req.token.toUpperCase() === this.getWrappedIMX(this.config.bridgeInstance.childChainID).toUpperCase()) {
+        && this.isWrappedIMX(req.token, this.config.bridgeInstance.childChainID)) {
         // On child chain, only WIMX requires approval.
         approvalFee = this.calculateGasFee(feeData, BridgeMethodsGasLimit.APPROVE_TOKEN);
       }
@@ -492,13 +493,83 @@ export class TokenBridge {
   }
 
   /**
-   * TODO
+   * Generates the optional approval transaction AND an unsigned deposit or withdrawal transaction for a user to sign
+   * and submit to the bridge.
+   * It is the combination of bridgeSdk.getUnsignedApproveBridgeTx and bridgeSdk.getUnsignedBridgeTx.
+   *
+   * @param {BridgeBundledTxRequest} req - The tx request object containing the required data for depositing or withdrawing tokens.
+   * @returns {Promise<BridgeBundledTxResponse>} - A promise that resolves to an object containing the optional contract to approve,
+   * optional unsigned approval transaction, fee data and unsigned transaction data.
+   * @throws {BridgeError} - If an error occurs during the generation of the unsigned transaction, a BridgeError
+   * will be thrown with a specific error type.
+   *
+   * Possible BridgeError types include:
+   * - UNSUPPORTED_ERROR: The operation is not supported. Currently thrown when attempting to deposit native tokens.
+   * - INVALID_ADDRESS: An Ethereum address provided in the request is invalid. This could be the depositor's,
+   * recipient's or the token's address.
+   * - INVALID_AMOUNT: The deposit amount provided in the request is invalid (less than or equal to 0).
+   * - INTERNAL_ERROR: An unexpected error occurred during the execution, likely due to the bridge SDK implementation.
+   *
+   * @example
+   * const depositERC20Request = {
+   *   senderAddress: '0x123456...', // Senders address
+   *   recipientAddress: '0x123456...', // Recipient address
+   *   token: '0x123456...', // ERC20 token address
+   *   amount: ethers.utils.parseUnits('100', 18), // Bridge amount in wei
+   *   sourceChainId: '1', // Ethereum
+   *   destinationChainId: '13371', // Immutable zkEVM
+   *   gasMultiplier: 1.2, // Buffer to add to the gas estimate, 1.2 = 20% buffer
+   * };
+   *
+   * @example
+   * const depositEtherTokenRequest = {
+   *   senderAddress: '0x123456...', // Senders address
+   *   recipientAddress: '0x123456...', // Recipient address
+   *   token: 'NATIVE', // The chain's native token
+   *   amount: ethers.utils.parseUnits('100', 18), // Bridge amount in wei
+   *   sourceChainId: '1', // Ethereum
+   *   destinationChainId: '13371', // Immutable zkEVM
+   *   gasMultiplier: 1.2, // Buffer to add to the gas estimate, 1.2 = 20% buffer
+   * };
+   *
+   * @example
+   * const withdrawERC20Request = {
+   *   senderAddress: '0x123456...', // Senders address
+   *   recipientAddress: '0x123456...', // Recipient address
+   *   token: '0x123456...', // ERC20 token address
+   *   amount: ethers.utils.parseUnits('100', 18), // Bridge amount in wei
+   *   sourceChainId: '13371', // Immutable zkEVM
+   *   destinationChainId: '1', // Ethereum
+   *   gasMultiplier: 1.2, // Buffer to add to the gas estimate, 1.2 = 20% buffer
+   * };
+   *
+   * @example
+   * const withdrawIMXTokenRequest = {
+   *   senderAddress: '0x123456...', // Senders address
+   *   recipientAddress: '0x123456...', // Recipient address
+   *   token: 'NATIVE', // The chain's native token
+   *   amount: ethers.utils.parseUnits('100', 18), // Bridge amount in wei
+   *   sourceChainId: '13371', // Immutable zkEVM
+   *   destinationChainId: '1', // Ethereum
+   *   gasMultiplier: 1.2, // Buffer to add to the gas estimate, 1.2 = 20% buffer
+   * };
+   *
+   * bridgeSdk.getUnsignedBridgeBundledTx(depositERC20Request)
+   *   .then((depositResponse) => {
+   *     console.log('Fee Data', depositResponse.feeData);
+   *     console.log('Optional contract to approve', depositResponse.contractToApprove);
+   *     console.log('Optional unsigned approval Tx', depositResponse.unsignedApprovalTx);
+   *     console.log('Unsigned bridge Tx', depositResponse.unsignedBridgeTx);
+   *   })
+   *   .catch((error) => {
+   *     console.error('Error:', error.message);
+   *   });
    */
   public async getUnsignedBridgeBundledTx(req: BridgeBundledTxRequest): Promise<BridgeBundledTxResponse> {
     const [, , , res] = await Promise.all([
       this.initialise(), // Initialisation will only be exeucted once
       this.validateBridgeReqArgs(req),
-      this.checkReceiver(req.destinationChainId, req.recipientAddress),
+      this.checkReceiver(req.token, req.destinationChainId, req.recipientAddress),
       this.getUnsignedBridgeBundledTxPrivate(req),
     ]);
     return res;
@@ -645,8 +716,7 @@ export class TokenBridge {
     const imtblFee: ethers.BigNumber = ethers.BigNumber.from(0);
 
     // Approval required only for WIMX tokens with insufficient allowance.
-    if (token.toUpperCase() === this.getWrappedIMX(this.config.bridgeInstance.childChainID).toUpperCase()
-      && allowance.lt(amount)) {
+    if (this.isWrappedIMX(token, this.config.bridgeInstance.childChainID) && allowance.lt(amount)) {
       contractToApprove = token;
       const erc20Contract: ethers.Contract = await withBridgeError<ethers.Contract>(
         async () => new ethers.Contract(token, ERC20, this.config.childProvider),
@@ -706,13 +776,22 @@ export class TokenBridge {
   }
 
   private async checkReceiver(
+    token: FungibleToken,
     destinationChainId: string,
     address: string,
   ): Promise<void> {
     let provider;
     if (destinationChainId === this.config.bridgeInstance.rootChainID) {
+      if (!this.isChildETH(token, destinationChainId)) {
+        // Return immediately for withdrawing non ETH.
+        return;
+      }
       provider = this.config.rootProvider;
     } else {
+      if (!this.isRootIMX(token, destinationChainId)) {
+        // Return immediately for depositing non IMX.
+        return;
+      }
       provider = this.config.childProvider;
     }
     const bytecode = await provider.getCode(address);
@@ -790,7 +869,7 @@ export class TokenBridge {
       // Encode function data
       const txData = await withBridgeError<string>(async () => erc20Contract.interface
         .encodeFunctionData('approve', [
-          token,
+          this.config.bridgeContracts.rootERC20BridgeFlowRate,
           amount,
         ]), BridgeErrorType.INTERNAL_ERROR);
 
@@ -904,7 +983,7 @@ export class TokenBridge {
   ): Promise<number> {
     let rootToken: string;
     if (token.toUpperCase() === NATIVE
-      || token.toUpperCase() === this.getWrappedIMX(destinationChainId).toUpperCase()) {
+      || this.isWrappedIMX(token, destinationChainId)) {
       rootToken = this.getRootIMX(destinationChainId);
     } else {
       // Find root token
@@ -998,8 +1077,6 @@ export class TokenBridge {
       );
     }
 
-    console.log(simResults);
-
     return simResults[0].simulation.gas_used;
   }
 
@@ -1009,13 +1086,13 @@ export class TokenBridge {
       return ethers.BigNumber.from(0);
     }
     if (sourceChainId === this.config.bridgeInstance.childChainID
-      && ethers.utils.getAddress(token) !== ethers.utils.getAddress(this.getWrappedIMX(sourceChainId))
+      && !this.isWrappedIMX(token, sourceChainId)
     ) {
       // Return immediately for non wrapped IMX on child chain.
       return ethers.BigNumber.from(0);
     }
     let provider: ethers.providers.Provider;
-    let bridgeContract;
+    let bridgeContract: string;
     if (sourceChainId === this.config.bridgeInstance.rootChainID) {
       provider = this.config.rootProvider;
       bridgeContract = this.config.bridgeContracts.rootERC20BridgeFlowRate;
@@ -1115,6 +1192,10 @@ export class TokenBridge {
     return wIMX;
   }
 
+  private isWrappedIMX(token: FungibleToken, source: string) {
+    return token.toUpperCase() === this.getWrappedIMX(source).toUpperCase();
+  }
+
   private getRootIMX(source: string) {
     let rootIMX:string;
     if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
@@ -1127,6 +1208,28 @@ export class TokenBridge {
       rootIMX = rootIMXs.devnet;
     }
     return rootIMX;
+  }
+
+  private isRootIMX(token: FungibleToken, source: string) {
+    return token.toUpperCase() === this.getRootIMX(source).toUpperCase();
+  }
+
+  private getChildETH(source: string) {
+    let eth:string;
+    if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
+      || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
+      eth = childETHs.mainnet;
+    } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
+      || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
+      eth = childETHs.testnet;
+    } else {
+      eth = childETHs.devnet;
+    }
+    return eth;
+  }
+
+  private isChildETH(token: FungibleToken, source: string) {
+    return token.toUpperCase() === this.getChildETH(source).toUpperCase();
   }
 
   private getChildAdaptor(source: string) {
@@ -1251,7 +1354,7 @@ export class TokenBridge {
       sourceChain: sourceAxelar.id,
       destinationChain: destinationAxelar.id,
       symbol: sourceAxelar.symbol,
-      destinationChainGaslimit,
+      gasLimit: destinationChainGaslimit,
       gasMultiplier,
     };
 
