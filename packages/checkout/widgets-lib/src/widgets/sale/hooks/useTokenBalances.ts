@@ -30,9 +30,34 @@ export const useTokenBalances = () => {
   }: BalanceCheckResult) => {
     console.log('🚀 ~ smartCheckoutResult:', smartCheckoutResult);
 
-    const erc20Req = smartCheckoutResult.transactionRequirements[0];
+    if (smartCheckoutResult.sufficient) {
+      smartCheckoutResult.router?.then((router) => {
+        if (
+          router.routingOutcome.type
+            === RoutingOutcomeType.ROUTES_FOUND
+        ) {
+          // filter funding routes with more than 1 step
+          const routes = router.routingOutcome.fundingRoutes.filter(
+            (route) => route.steps.length === 1 && FUNDING_ROUTES_ALLOWLIST.includes(route.steps[0].type),
+          );
 
-    if (smartCheckoutResult.sufficient && erc20Req.sufficient) {
+          // extract all funding items with ERC20
+          const steps = routes.flatMap(
+            (route) => route.steps.filter((step) => [ItemType.ERC20, ItemType.NATIVE].includes(step.fundingItem.type)),
+          );
+
+          // push to balances
+          steps.forEach((fundingStep) => {
+            console.log('🚀 ~ fundingStep:', fundingStep.type);
+
+            setBalances((prev) => [...prev, { ...fundingStep }]);
+          });
+        }
+      });
+    }
+
+    if (smartCheckoutResult.sufficient) {
+      const erc20Req = smartCheckoutResult.transactionRequirements[0];
       // Push to balances if sufficient
       console.log('🚀 ~ erc20Req:', erc20Req);
 
@@ -71,12 +96,12 @@ export const useTokenBalances = () => {
       );
 
       // extract all funding items with ERC20
-      const erc20FundingSteps = singleStepRoutes.flatMap(
-        (route) => route.steps.filter((step) => step.fundingItem.type === ItemType.ERC20),
+      const fundingSteps = singleStepRoutes.flatMap(
+        (route) => route.steps.filter((step) => [ItemType.ERC20, ItemType.NATIVE].includes(step.fundingItem.type)),
       );
 
       // push to balances
-      erc20FundingSteps.forEach((fundingStep) => {
+      fundingSteps.forEach((fundingStep) => {
         console.log('🚀 ~ fundingStep:', fundingStep.type);
 
         setBalances((prev) => [...prev, { ...fundingStep }]);
