@@ -2,7 +2,7 @@ import { StaticJsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { Signer } from '@ethersproject/abstract-signer';
 import { utils } from 'ethers';
-import { identify } from '@imtbl/metrics';
+import { identify, trackFlow } from '@imtbl/metrics';
 import {
   JsonRpcRequestCallback,
   JsonRpcRequestPayload,
@@ -170,46 +170,84 @@ export class ZkEvmProvider implements Provider {
           return [this.#zkEvmAddress];
         }
 
-        const user = await this.#authManager.getUserOrLogin();
-        this.#initialiseEthSigner(user);
+        const flow = trackFlow('passport', 'ethRequestAccounts');
 
-        if (!isZkEvmUser(user)) {
-          const ethSigner = await this.#getSigner();
-          this.#zkEvmAddress = await registerZkEvmUser({
-            ethSigner,
-            authManager: this.#authManager,
-            multiRollupApiClients: this.#multiRollupApiClients,
-            accessToken: user.accessToken,
-            rpcProvider: this.#rpcProvider,
+        try {
+          const user = await this.#authManager.getUserOrLogin();
+          flow.addEvent('endGetUserOrLogin');
+
+          this.#initialiseEthSigner(user);
+
+          if (!isZkEvmUser(user)) {
+            flow.addEvent('startUserRegistration');
+
+            const ethSigner = await this.#getSigner();
+            flow.addEvent('ethSignerResolved');
+
+            this.#zkEvmAddress = await registerZkEvmUser({
+              ethSigner,
+              authManager: this.#authManager,
+              multiRollupApiClients: this.#multiRollupApiClients,
+              accessToken: user.accessToken,
+              rpcProvider: this.#rpcProvider,
+              flow,
+            });
+            flow.addEvent('endUserRegistration');
+          } else {
+            this.#zkEvmAddress = user.zkEvm.ethAddress;
+          }
+
+          this.#eventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [this.#zkEvmAddress]);
+          identify({
+            passportId: user.profile.sub,
           });
-        } else {
-          this.#zkEvmAddress = user.zkEvm.ethAddress;
+
+          return [this.#zkEvmAddress];
+        } catch (error) {
+          let errorMessage = 'Unknown error';
+          if (error instanceof Error) {
+            errorMessage = error.message;
+          }
+
+          flow.addEvent('error', { errorMessage });
+          throw error;
+        } finally {
+          flow.end();
         }
-
-        this.#eventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [this.#zkEvmAddress]);
-        identify({
-          passportId: user.profile.sub,
-        });
-
-        return [this.#zkEvmAddress];
       }
       case 'eth_sendTransaction': {
         if (!this.#zkEvmAddress) {
           throw new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
         }
 
-        return this.#guardianClient.withConfirmationScreen({ width: 480, height: 720 })(async () => {
-          const ethSigner = await this.#getSigner();
+        const flow = trackFlow('passport', 'ethSendTransaction');
 
-          return sendTransaction({
-            params: request.params || [],
-            ethSigner,
-            guardianClient: this.#guardianClient,
-            rpcProvider: this.#rpcProvider,
-            relayerClient: this.#relayerClient,
-            zkevmAddress: this.#zkEvmAddress!,
+        try {
+          return await this.#guardianClient.withConfirmationScreen({ width: 480, height: 720 })(async () => {
+            const ethSigner = await this.#getSigner();
+            flow.addEvent('endGetSigner');
+
+            return await sendTransaction({
+              params: request.params || [],
+              ethSigner,
+              guardianClient: this.#guardianClient,
+              rpcProvider: this.#rpcProvider,
+              relayerClient: this.#relayerClient,
+              zkevmAddress: this.#zkEvmAddress!,
+              flow,
+            });
           });
-        });
+        } catch (error) {
+          let errorMessage = 'Unknown error';
+          if (error instanceof Error) {
+            errorMessage = error.message;
+          }
+
+          flow.addEvent('error', { errorMessage });
+          throw error;
+        } finally {
+          flow.end();
+        }
       }
       case 'eth_accounts': {
         return this.#zkEvmAddress ? [this.#zkEvmAddress] : [];
@@ -220,18 +258,34 @@ export class ZkEvmProvider implements Provider {
           throw new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
         }
 
-        return this.#guardianClient.withConfirmationScreen({ width: 480, height: 720 })(async () => {
-          const ethSigner = await this.#getSigner();
+        const flow = trackFlow('passport', 'ethSignTypedDataV4');
 
-          return signTypedDataV4({
-            method: request.method,
-            params: request.params || [],
-            ethSigner,
-            rpcProvider: this.#rpcProvider,
-            relayerClient: this.#relayerClient,
-            guardianClient: this.#guardianClient,
+        try {
+          return await this.#guardianClient.withConfirmationScreen({ width: 480, height: 720 })(async () => {
+            const ethSigner = await this.#getSigner();
+            flow.addEvent('endGetSigner');
+
+            return await signTypedDataV4({
+              method: request.method,
+              params: request.params || [],
+              ethSigner,
+              rpcProvider: this.#rpcProvider,
+              relayerClient: this.#relayerClient,
+              guardianClient: this.#guardianClient,
+              flow,
+            });
           });
-        });
+        } catch (error) {
+          let errorMessage = 'Unknown error';
+          if (error instanceof Error) {
+            errorMessage = error.message;
+          }
+
+          flow.addEvent('error', { errorMessage });
+          throw error;
+        } finally {
+          flow.end();
+        }
       }
       case 'eth_chainId': {
         // Call detect network to fetch the chainId so to take advantage of

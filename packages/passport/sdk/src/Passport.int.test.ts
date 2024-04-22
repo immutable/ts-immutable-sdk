@@ -84,7 +84,7 @@ describe('Passport', () => {
       getUser: mockGetUser,
     }));
     (GuardianClient as jest.Mock).mockImplementation(() => ({
-      validateEVMTransaction: jest.fn(),
+      validateEVMTransaction: jest.fn().mockResolvedValue(undefined),
       withConfirmationScreen: () => (task: () => void) => task(),
     }));
     (Magic as jest.Mock).mockImplementation(() => ({
