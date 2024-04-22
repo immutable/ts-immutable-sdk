@@ -1,0 +1,33 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+export enum Routes {
+  'Home' = 'home',
+  'Setup' = 'setup',
+  'Buy' = 'buy',
+  'BuyV2' = 'v2/buy',
+  'Sell' = 'sell',
+  'Deposit' = 'deposit',
+  'History' = 'history',
+  'PrepareWithdrawal' = 'prepare-withdrawal',
+  'CompleteWithdrawal' = 'complete-withdrawal',
+  'Transfer' = 'transfer',
+  'TransferV2' = 'v2/transfer',
+  'BatchNftTransfer' = 'batch-nft-transfer',
+  'Sign' = 'sign',
+  'GetPublicKey' = 'get-public-key',
+  'Cancel' = 'cancel',
+  'Claim' = 'claim',
+  'ClaimUSInstant' = 'claim-instant',
+  'ClaimUSOverTime' = 'claim-over-time',
+  'ClaimUSOverTimeDetails' = 'claim-over-time-details',
+  'FiatToCrypto' = 'fiat-to-crypto',
+  'CryptoToFiat' = 'crypto-to-fiat',
+  'Offramp' = 'offramp',
+  'Onramp' = 'onramp',
+  'NFTCheckoutPrimary' = 'nft-checkout-primary',
+  'NFTCheckoutSecondary' = 'nft-checkout-secondary',
+  'MakeOffer' = 'make-offer',
+  'CancelOffer' = 'cancel-offer',
+  'AcceptOffer' = 'accept-offer',
+}
+
+export const messagingUrls = [Routes.BatchNftTransfer, Routes.Sign];

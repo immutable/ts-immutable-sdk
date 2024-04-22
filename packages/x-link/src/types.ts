@@ -1,4 +1,5 @@
-import { ERC721TokenType, ETHTokenType, ERC20TokenType } from '@imtbl/imx-sdk';
+// import { ERC721TokenType, ETHTokenType, ERC20TokenType } from '@imtbl/imx-sdk';
+import { ERC721TokenType, ETHTokenType, ERC20TokenType } from './sdk-types';
 
 export interface Fee {
   recipient: string;
@@ -124,6 +125,7 @@ export namespace Params {
   export type BatchNftTransfer = TransferV2;
   export type CompleteWithdrawal = TokenWithAmount;
   export type History = {};
+  export type Claim = {};
 
   /**
      * @deprecated
