@@ -56,6 +56,7 @@ describe('Top Up View', () => {
       cySmartGet('menu-item-onramp').should('exist');
       cySmartGet('menu-item-swap').should('exist');
       cySmartGet('menu-item-bridge').should('exist');
+      cySmartGet('menu-item-advanced').should('exist');
     });
 
     it('should hide onramp option', () => {

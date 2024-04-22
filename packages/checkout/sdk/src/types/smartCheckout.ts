@@ -327,6 +327,8 @@ export interface SmartCheckoutParams {
   itemRequirements: (NativeItemRequirement | ERC20ItemRequirement | ERC721ItemRequirement)[];
   /** The transaction or gas amount. */
   transactionOrGasAmount?: FulfillmentTransaction | GasAmount,
+  /** The overrides for funding routes to consider */
+  routingOptions?: AvailableRoutingOptions,
 }
 
 /**

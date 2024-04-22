@@ -3,7 +3,7 @@ import {
   Drawer, Box, Button, Heading, CloudImage,
 } from '@biom3/react';
 import { useCallback, useState } from 'react';
-import { ETH_TOKEN_SYMBOL } from 'lib';
+import { ETH_TOKEN_SYMBOL, IMAGE_RESIZER_URL } from 'lib';
 import { Environment } from '@imtbl/config';
 import { getRemoteImage } from 'lib/utils';
 import { useTranslation } from 'react-i18next';
@@ -71,6 +71,7 @@ NotEnoughGasProps) {
                 ? notEnoughEth
                 : notEnoughImx
             }
+          imageResizeServiceUrl={IMAGE_RESIZER_URL[environment]}
           sx={{ w: '90px', h: tokenSymbol === ETH_TOKEN_SYMBOL ? '110px' : '90px' }}
         />
         <Heading

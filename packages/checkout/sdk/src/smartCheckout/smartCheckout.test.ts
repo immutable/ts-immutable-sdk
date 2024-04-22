@@ -14,7 +14,9 @@ import { gasCalculator } from './gas';
 import { CheckoutConfiguration } from '../config';
 import { balanceCheck } from './balanceCheck';
 import { routingCalculator } from './routing/routingCalculator';
+import { getAvailableRoutingOptions } from './routing';
 
+jest.mock('./routing');
 jest.mock('./allowance');
 jest.mock('./gas');
 jest.mock('./balanceCheck');
@@ -36,6 +38,16 @@ describe('smartCheckout', () => {
       type: RoutingOutcomeType.NO_ROUTES_FOUND,
       message: 'No routes found',
     });
+
+    (getAvailableRoutingOptions as jest.Mock).mockResolvedValue({
+      onRamp: true,
+      swap: true,
+      bridge: true,
+    });
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   describe('smartCheckout', () => {
@@ -440,9 +452,9 @@ describe('smartCheckout', () => {
         ],
         router: {
           availableRoutingOptions: {
-            onRamp: undefined,
-            swap: undefined,
-            bridge: undefined,
+            onRamp: true,
+            swap: true,
+            bridge: true,
           },
           routingOutcome: {
             type: RoutingOutcomeType.NO_ROUTES_FOUND,
@@ -660,9 +672,9 @@ describe('smartCheckout', () => {
         ],
         router: {
           availableRoutingOptions: {
-            onRamp: undefined,
-            swap: undefined,
-            bridge: undefined,
+            onRamp: true,
+            swap: true,
+            bridge: true,
           },
           routingOutcome: {
             type: RoutingOutcomeType.NO_ROUTES_FOUND,
@@ -769,13 +781,128 @@ describe('smartCheckout', () => {
         ],
         router: {
           availableRoutingOptions: {
-            onRamp: undefined,
-            swap: undefined,
-            bridge: undefined,
+            onRamp: true,
+            swap: true,
+            bridge: true,
           },
           routingOutcome: {
             type: RoutingOutcomeType.NO_ROUTES_FOUND,
             message: 'No routes found',
+          },
+        },
+      });
+    });
+
+    it('should return swap funding route when available', async () => {
+      (routingCalculator as jest.Mock).mockResolvedValue({
+        type: RoutingOutcomeType.NO_ROUTES_FOUND,
+        message: 'Smart Checkout did not find any funding routes to fulfill the transaction',
+      });
+
+      (hasERC20Allowances as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        allowances: [],
+      });
+
+      (hasERC721Allowances as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        allowances: [],
+      });
+
+      (balanceCheck as jest.Mock).mockResolvedValue({
+        sufficient: false,
+        balanceRequirements: [
+          {
+            type: ItemType.ERC20,
+            sufficient: false,
+            required: {
+              balance: BigNumber.from(1),
+              formattedBalance: '1.0',
+              token: {
+                name: 'zkTKN',
+                symbol: 'zkTKN',
+                decimals: 18,
+                address: '0xERC20',
+              },
+            },
+            current: {
+              balance: BigNumber.from(1),
+              formattedBalance: '1.0',
+              token: {
+                name: 'zkTKN',
+                symbol: 'zkTKN',
+                decimals: 18,
+                address: '0xERC20',
+              },
+            },
+            delta: {
+              balance: BigNumber.from(1),
+              formattedBalance: '1.0',
+            },
+          },
+        ],
+      });
+
+      const itemRequirements: ItemRequirement[] = [
+        {
+          type: ItemType.ERC20,
+          tokenAddress: '0xERC20',
+          amount: BigNumber.from(1),
+          spenderAddress: '0x1',
+        },
+      ];
+
+      const result = await smartCheckout(
+        {} as CheckoutConfiguration,
+        mockProvider,
+        itemRequirements,
+        undefined,
+        {
+          swap: false,
+        },
+      );
+
+      expect(result).toEqual({
+        sufficient: false,
+        transactionRequirements: [
+          {
+            type: ItemType.ERC20,
+            sufficient: false,
+            required: {
+              balance: BigNumber.from(1),
+              formattedBalance: '1.0',
+              token: {
+                name: 'zkTKN',
+                symbol: 'zkTKN',
+                decimals: 18,
+                address: '0xERC20',
+              },
+            },
+            current: {
+              balance: BigNumber.from(1),
+              formattedBalance: '1.0',
+              token: {
+                name: 'zkTKN',
+                symbol: 'zkTKN',
+                decimals: 18,
+                address: '0xERC20',
+              },
+            },
+            delta: {
+              balance: BigNumber.from(1),
+              formattedBalance: '1.0',
+            },
+          },
+        ],
+        router: {
+          availableRoutingOptions: {
+            onRamp: true,
+            swap: false,
+            bridge: true,
+          },
+          routingOutcome: {
+            type: RoutingOutcomeType.NO_ROUTES_FOUND,
+            message: 'Smart Checkout did not find any funding routes to fulfill the transaction',
           },
         },
       });

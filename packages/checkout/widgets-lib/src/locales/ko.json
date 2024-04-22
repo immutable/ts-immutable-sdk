@@ -237,6 +237,12 @@
           "caption": "다른 지갑이나 네트워크에 있는 내 코인.",
           "subcaption": "수수료",
           "disabledCaption": ""
+        },
+        "advanced": {
+          "heading": "고급 옵션",
+          "caption": "빠른 브릿지 또는 CEX 입금을 수행합니다.",
+          "subcaption": "수수료",
+          "disabledCaption": ""
         }
       }
     },
@@ -314,7 +320,13 @@
         "processing1": "결제 초기화 중",
         "processing2": "자산 보호 중",
         "processing3": "결제 완료 중"
+      },
+      "creditCardWarningDrawer": {
+        "heading": "신용카드보다는 체크카드 사용을 권장합니다",
+        "body": "이런 종류의 구매에 신용카드를 사용할 경우 대부분의 은행에서 현금 서비스 수수료를 부과하거나 거래를 전체적으로 차단할 수 있습니다.",
+        "ctaButton": "그래도 시도하기"
       }
+
     },
     "PAY_WITH_COINS": {
       "header": {
