@@ -244,6 +244,12 @@
           "caption": "別のウォレットやネットワークにある私のコイン。",
           "subcaption": "手数料",
           "disabledCaption": ""
+        },
+        "advanced": {
+          "heading": "高度なオプション",
+          "caption": "迅速なブリッジまたはCEX入金を実行します。",
+          "subcaption": "手数料",
+          "disabledCaption": ""
         }
       }
     },
@@ -302,7 +308,13 @@
         "processing1": "支払いを初期化中",
         "processing2": "資産を確保中",
         "processing3": "支払いを完了中"
+      },
+      "creditCardWarningDrawer": {
+        "heading": "デビットカードの使用をお勧めします",
+        "body": "この種の購入にクレジットカードを使用する場合、ほとんどの銀行は現金前払い手数料を請求するか、または取引を完全にブロックします。",
+        "ctaButton": "それでも試す"
       }
+
     },
     "PAY_WITH_COINS": {
       "header": {

@@ -70,7 +70,15 @@ describe('network functions', () => {
   let mockedHttpClient: jest.Mocked<HttpClient>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    windowSpy = jest.spyOn(window, 'window', 'get');
+    windowSpy.mockImplementation(() => ({
+      ethereum: {
+        request: jest.fn(),
+      },
+      dispatchEvent: jest.fn(),
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+    }));
 
     mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
     (RemoteConfigFetcher as unknown as jest.Mock).mockReturnValue({
@@ -92,22 +100,12 @@ describe('network functions', () => {
     }, mockedHttpClient);
   });
 
+  afterEach(() => {
+    windowSpy.mockRestore();
+    jest.clearAllMocks();
+  });
+
   describe('switchWalletNetwork()', () => {
-    beforeEach(() => {
-      windowSpy = jest.spyOn(window, 'window', 'get');
-
-      windowSpy.mockImplementation(() => ({
-        ethereum: {
-          request: jest.fn(),
-        },
-        removeEventListener: () => {},
-      }));
-    });
-
-    afterEach(() => {
-      windowSpy.mockRestore();
-    });
-
     it('should make request for the user to switch network', async () => {
       (Web3Provider as unknown as jest.Mock).mockReturnValue({
         provider: providerMock,

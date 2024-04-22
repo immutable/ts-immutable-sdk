@@ -241,6 +241,12 @@
           "caption": "我在其他钱包或网络中的代币。",
           "subcaption": "费用",
           "disabledCaption": ""
+        },
+        "advanced": {
+          "heading": "高级选项",
+          "caption": "进行快速桥接或CEX存款。",
+          "subcaption": "费用",
+          "disabledCaption": ""
         }
       }
     },
@@ -299,6 +305,11 @@
         "processing1": "正在初始化支付",
         "processing2": "正在保护您的资产",
         "processing3": "正在完成支付"
+      },
+      "creditCardWarningDrawer": {
+        "heading": "我们推荐使用借记卡而非信用卡",
+        "body": "在这类购买中使用信用卡时，大多数银行将收取现金预付费用或完全阻止交易。",
+        "ctaButton": "尝试一下"
       }
     },
     "PAY_WITH_COINS": {
