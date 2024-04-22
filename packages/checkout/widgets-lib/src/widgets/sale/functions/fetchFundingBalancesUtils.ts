@@ -12,13 +12,14 @@ import {
 } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import {
-  ClientConfigCurrency, FundingBalance,
+  ClientConfigCurrency,
+  FundingBalance,
   FundingBalanceResult,
   FundingBalanceType,
   SufficientFundingStep,
 } from '../types';
 
-export const MAX_GAS_LIMIT = '30000000';
+const MAX_GAS_LIMIT = '30000000';
 
 export const getERC20ItemRequirement = (
   amount: string,
@@ -173,7 +174,7 @@ export const getFnToDigestFundingBalanceResult = (
     if (smartCheckoutResult.sufficient && smartCheckoutResult.router) {
       smartCheckoutResult.router?.then((router) => {
         const deferredFundingSteps = getAlternativeFundingSteps(router);
-        console.log('🚀 ~ DeferredSmartCheckoutResult:', smartCheckoutResult); // eslint-disable-line
+        console.log("🚀 ~ DeferredSmartCheckoutResult:", smartCheckoutResult); // eslint-disable-line
 
         if (
           Array.isArray(deferredFundingSteps)
