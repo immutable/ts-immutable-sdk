@@ -4,14 +4,12 @@ import {
   FulfillmentTransaction,
   GasAmount,
   ItemRequirement,
+  RouterCallback,
   RoutingOutcome,
   SmartCheckoutResult,
 } from '../types/smartCheckout';
 import { itemAggregator } from './aggregators';
-import {
-  hasERC20Allowances,
-  hasERC721Allowances,
-} from './allowance';
+import { hasERC20Allowances, hasERC721Allowances } from './allowance';
 import { balanceCheck } from './balanceCheck';
 import { CheckoutConfiguration } from '../config';
 import { allowanceAggregator } from './aggregators/allowanceAggregator';
@@ -27,21 +25,35 @@ export const smartCheckout = async (
   provider: Web3Provider,
   itemRequirements: ItemRequirement[],
   transactionOrGasAmount?: FulfillmentTransaction | GasAmount,
+  routerCallback?: RouterCallback,
 ): Promise<SmartCheckoutResult> => {
   const ownerAddress = await provider.getSigner().getAddress();
 
   let aggregatedItems = itemAggregator(itemRequirements);
 
-  const erc20AllowancePromise = hasERC20Allowances(provider, ownerAddress, aggregatedItems);
-  const erc721AllowancePromise = hasERC721Allowances(provider, ownerAddress, aggregatedItems);
+  const erc20AllowancePromise = hasERC20Allowances(
+    provider,
+    ownerAddress,
+    aggregatedItems,
+  );
+  const erc721AllowancePromise = hasERC721Allowances(
+    provider,
+    ownerAddress,
+    aggregatedItems,
+  );
 
-  const resolvedAllowances = await measureAsyncExecution<{ sufficient: boolean, allowances: Allowance[] }[]>(
+  const resolvedAllowances = await measureAsyncExecution<
+  { sufficient: boolean; allowances: Allowance[] }[]
+  >(
     config,
     'Time to calculate token allowances',
     Promise.all([erc20AllowancePromise, erc721AllowancePromise]),
   );
 
-  const aggregatedAllowances = allowanceAggregator(resolvedAllowances[0], resolvedAllowances[1]);
+  const aggregatedAllowances = allowanceAggregator(
+    resolvedAllowances[0],
+    resolvedAllowances[1],
+  );
 
   // Skip gas calculation if transactionOrGasAmount is not provided
   let gasItem = null;
@@ -87,8 +99,18 @@ export const smartCheckout = async (
       ownerAddress,
       balanceCheckResult,
       availableRoutingOptions,
+      routerCallback,
     ),
   );
+
+  routerCallback?.complete?.({
+    sufficient,
+    transactionRequirements,
+    router: {
+      availableRoutingOptions,
+      routingOutcome,
+    },
+  });
 
   return {
     sufficient,

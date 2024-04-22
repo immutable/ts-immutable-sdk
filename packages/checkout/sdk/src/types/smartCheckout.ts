@@ -569,16 +569,26 @@ export type SmartCheckoutInsufficient = {
 };
 
 /**
- * An optional object that contains the next and complete callbacks for the router.
+ * Represents the funding steps
+ */
+export type FundingSteps =
+  | BridgeFundingStep
+  | SwapFundingStep[]
+  | BridgeAndSwapRoute[]
+  | OnRampFundingStep;
+
+/**
+ * An optional object that contains the next and complete callbacks for the router
  */
 export type RouterCallback = {
   /** The next callback to be executed for each route */
   next?: (
     route:
     | BridgeFundingStep
-    | SwapFundingStep
+    | SwapFundingStep[]
+    | BridgeAndSwapRoute[]
     | OnRampFundingStep
-    | BridgeAndSwapRoute
+    | undefined
   ) => void;
   /** The complete callback to be executed once all routes are found */
   complete?: (result: SmartCheckoutResult) => void;
