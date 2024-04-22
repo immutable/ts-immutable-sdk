@@ -1,7 +1,6 @@
 import {
   FundingRoute,
   SaleItem,
-  RoutingOutcomeType,
   SmartCheckoutResult,
   SalePaymentTypes,
 } from '@imtbl/checkout-sdk';
@@ -18,10 +17,7 @@ import {
 } from 'react';
 import { Environment } from '@imtbl/config';
 import { ConnectLoaderState } from '../../../context/connect-loader-context/ConnectLoaderContext';
-import {
-  FundWithSmartCheckoutSubViews,
-  SaleWidgetViews,
-} from '../../../context/view-context/SaleViewContextTypes';
+import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 import {
   SharedViews,
   ViewActions,
@@ -56,6 +52,7 @@ type SaleContextProps = {
   checkout: ConnectLoaderState['checkout'];
   passport?: Passport;
   excludePaymentTypes: SalePaymentTypes[];
+  multicurrency: boolean;
 };
 
 type SaleContextValues = SaleContextProps & {
@@ -130,6 +127,7 @@ const SaleContext = createContext<SaleContextValues>({
   clientConfig: defaultClientConfig,
   signTokenIds: [],
   excludePaymentTypes: [],
+  multicurrency: false,
 });
 
 SaleContext.displayName = 'SaleSaleContext';
@@ -154,6 +152,7 @@ export function SaleContextProvider(props: {
       passport,
       collectionName,
       excludePaymentTypes,
+      multicurrency,
     },
   } = props;
 
@@ -171,7 +170,7 @@ export function SaleContextProvider(props: {
   SalePaymentTypes | undefined
   >(undefined);
 
-  const [fundingRoutes, setFundingRoutes] = useState<FundingRoute[]>([]);
+  const [fundingRoutes] = useState<FundingRoute[]>([]);
   const [disabledPaymentTypes, setDisabledPaymentTypes] = useState<
   SalePaymentTypes[]
   >([]);
@@ -182,13 +181,10 @@ export function SaleContextProvider(props: {
 
   const [invalidParameters, setInvalidParameters] = useState<boolean>(false);
 
-  const {
-    selectedCurrency, clientConfig, clientConfigError,
-  } = useClientConfig({
+  const { selectedCurrency, clientConfig, clientConfigError } = useClientConfig({
+    amount,
     environmentId,
     environment: config.environment,
-    checkout,
-    provider,
   });
 
   const fromTokenAddress = selectedCurrency?.address || '';
@@ -359,51 +355,6 @@ export function SaleContextProvider(props: {
   );
 
   useEffect(() => {
-    if (!smartCheckoutResult) {
-      return;
-    }
-
-    if (smartCheckoutResult.sufficient) {
-      sign(SignPaymentTypes.CRYPTO);
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: SaleWidgetViews.PAY_WITH_COINS,
-          },
-        },
-      });
-    }
-    if (!smartCheckoutResult.sufficient) {
-      switch (smartCheckoutResult.router.routingOutcome.type) {
-        case RoutingOutcomeType.ROUTES_FOUND:
-          setFundingRoutes(
-            smartCheckoutResult.router.routingOutcome.fundingRoutes,
-          );
-          viewDispatch({
-            payload: {
-              type: ViewActions.UPDATE_VIEW,
-              view: {
-                type: SaleWidgetViews.FUND_WITH_SMART_CHECKOUT,
-                subView: FundWithSmartCheckoutSubViews.FUNDING_ROUTE_SELECT,
-              },
-            },
-          });
-
-          break;
-        case RoutingOutcomeType.NO_ROUTES_FOUND:
-        case RoutingOutcomeType.NO_ROUTE_OPTIONS:
-        default:
-          setFundingRoutes([]);
-          setPaymentMethod(undefined);
-          disablePaymentTypes([SalePaymentTypes.CRYPTO]);
-          goBackToPaymentMethods(undefined);
-          break;
-      }
-    }
-  }, [smartCheckoutResult, smartCheckoutError, sign, amount, fromTokenAddress]);
-
-  useEffect(() => {
     const invalidItems = !items || items.length === 0;
     const invalidAmount = !amount || amount === '0';
 
@@ -450,6 +401,7 @@ export function SaleContextProvider(props: {
       clientConfig,
       signTokenIds: tokenIds,
       excludePaymentTypes,
+      multicurrency,
     }),
     [
       config,
@@ -480,6 +432,7 @@ export function SaleContextProvider(props: {
       clientConfig,
       tokenIds,
       excludePaymentTypes,
+      multicurrency,
     ],
   );
 

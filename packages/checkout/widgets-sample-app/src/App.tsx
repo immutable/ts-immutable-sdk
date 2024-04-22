@@ -30,7 +30,7 @@ function App() {
         <div>
           <a
             href={
-              "/sale?amount=1&environmentId=249d9b0b-ee16-4dd5-91ee-96bece3b0473&collectionName=Iguanas&excludePaymentTypes=credit"
+              "/sale?amount=1&environmentId=249d9b0b-ee16-4dd5-91ee-96bece3b0473&collectionName=Iguanas&excludePaymentTypes=credit&multicurrency=true"
             }
           >
             Sale Widget
