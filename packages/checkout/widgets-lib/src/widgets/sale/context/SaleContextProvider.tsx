@@ -91,6 +91,7 @@ type SaleContextValues = SaleContextProps & {
   fromTokenAddress: string;
   clientConfig: ClientConfig;
   signTokenIds: string[];
+  selectedCurrency: ClientConfigCurrency | undefined;
 };
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -128,6 +129,7 @@ const SaleContext = createContext<SaleContextValues>({
   signTokenIds: [],
   excludePaymentTypes: [],
   multicurrency: false,
+  selectedCurrency: undefined,
 });
 
 SaleContext.displayName = 'SaleSaleContext';
@@ -402,6 +404,7 @@ export function SaleContextProvider(props: {
       signTokenIds: tokenIds,
       excludePaymentTypes,
       multicurrency,
+      selectedCurrency
     }),
     [
       config,
@@ -433,6 +436,7 @@ export function SaleContextProvider(props: {
       tokenIds,
       excludePaymentTypes,
       multicurrency,
+      selectedCurrency,
     ],
   );
 
