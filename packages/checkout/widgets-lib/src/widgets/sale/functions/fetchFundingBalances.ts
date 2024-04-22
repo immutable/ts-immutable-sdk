@@ -40,7 +40,6 @@ export const fetchFundingBalances = async (
   const spenderAddress = (await signer?.getAddress()) || '';
 
   const balancePromises = currencies.map(async (currency) => {
-    // const amount = conversions?.[currency.name]?.amount?.toString() || '0';
     const amount = getAmountByCurrency(currency) || '0';
     const itemRequirements = getERC20ItemRequirement(
       amount,
