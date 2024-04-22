@@ -6,22 +6,29 @@ import {
   tokenValueFormat,
 } from 'lib/utils';
 import { useTranslation } from 'react-i18next';
+import { ReactElement } from 'react';
 import { useSaleContext } from '../context/SaleContextProvider';
 import { FundingBalance } from '../types';
 
-type CoinDrawerItemProps = {
+export interface CoinDrawerItemProps<
+  RC extends ReactElement | undefined = undefined,
+> {
   balance: FundingBalance;
   conversions: Map<string, number>;
   onClick: () => void;
   selected: boolean;
-};
+  rc?: RC;
+}
 
-export function CoinsDrawerItem({
+export function CoinsDrawerItem<
+  RC extends ReactElement | undefined = undefined,
+>({
   balance: currency,
   conversions,
   onClick,
   selected,
-}: CoinDrawerItemProps) {
+  rc = <span />,
+}: CoinDrawerItemProps<RC>) {
   const { t } = useTranslation();
   const { environment } = useSaleContext();
 
@@ -35,6 +42,7 @@ export function CoinsDrawerItem({
 
   return (
     <MenuItem
+      rc={rc}
       sx={{ marginBottom: 'base.spacing.x1' }}
       emphasized
       size="medium"

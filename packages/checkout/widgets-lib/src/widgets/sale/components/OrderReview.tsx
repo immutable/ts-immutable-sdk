@@ -77,6 +77,7 @@ export function OrderReview({
             balance={fundingBalances[selectedCurrencyIndex]}
             conversions={conversions}
             canOpen={fundingBalances.length > 1}
+            loading={loadingBalances}
           />
         </Box>
       </Box>

@@ -1,4 +1,4 @@
-import { Heading, MenuItem } from '@biom3/react';
+import { Heading, MenuItem, ShimmerCircle } from '@biom3/react';
 import { useTranslation } from 'react-i18next';
 import { calculateCryptoToFiat, tokenValueFormat } from 'lib/utils';
 import { FundingBalance } from '../types';
@@ -8,6 +8,7 @@ type SelectCoinDropdownProps = {
   conversions: Map<string, number>;
   canOpen: boolean;
   onClick: () => void;
+  loading?: boolean;
 };
 
 export function SelectCoinDropdown({
@@ -15,6 +16,7 @@ export function SelectCoinDropdown({
   conversions,
   canOpen,
   onClick,
+  loading,
 }: SelectCoinDropdownProps) {
   const { t } = useTranslation();
 
@@ -31,10 +33,8 @@ export function SelectCoinDropdown({
       {canOpen && (
         <MenuItem.StatefulButtCon icon="ChevronExpand" onClick={onClick} />
       )}
-      <MenuItem.FramedImage
-        imageUrl={token.icon}
-        alt={token.name}
-      />
+      {!canOpen && loading && <ShimmerCircle radius="base.icon.size.400" />}
+      <MenuItem.FramedImage imageUrl={token.icon} alt={token.name} />
       <MenuItem.PriceDisplay
         use={<Heading size="xSmall" />}
         fiatAmount={t('views.ORDER_SUMMARY.currency.fiat', {

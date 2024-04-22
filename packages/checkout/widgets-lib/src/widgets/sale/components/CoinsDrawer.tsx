@@ -1,7 +1,9 @@
 import {
   Box, Caption, Drawer, MenuItem,
 } from '@biom3/react';
+import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { listVariants, listItemVariants } from 'lib/animation/listAnimation';
 import { CoinsDrawerItem } from './CoinsDrawerItem';
 import { FundingBalance } from '../types';
 
@@ -38,7 +40,11 @@ export function CoinsDrawer({
       onCloseDrawer={onClose}
       headerBarTitle={t('views.ORDER_SUMMARY.coinsDrawer.header')}
     >
-      <Drawer.Content>
+      <Drawer.Content
+        rc={
+          <motion.div variants={listVariants} initial="hidden" animate="show" />
+        }
+      >
         <Box sx={{ padding: 'base.spacing.x2' }}>
           <Box
             sx={{
@@ -60,14 +66,21 @@ export function CoinsDrawer({
               balance={balance}
               selected={selectedIndex === idx}
               conversions={conversions}
+              rc={<motion.div variants={listItemVariants} custom={idx} />}
             />
           ))}
           {loading && (
-            <MenuItem
-              shimmer
-              emphasized
-              testId="funding-balance-item-shimmer"
-            />
+            <motion.div
+              variants={listItemVariants}
+              custom={balances.length}
+              key="funding-balance-item-shimmer"
+            >
+              <MenuItem
+                shimmer
+                emphasized
+                testId="funding-balance-item-shimmer"
+              />
+            </motion.div>
           )}
         </Box>
       </Drawer.Content>
