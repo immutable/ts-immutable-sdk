@@ -1,0 +1,35 @@
+{
+  "targets": {
+    "build": {
+      "cache": {
+        "enabled": true
+      },
+      "dependsOn": [
+        {
+          "projects": [
+            "@imtbl/blockchain-data",
+            "@imtbl/bridge-sdk",
+            "@imtbl/checkout-sdk",
+            "@imtbl/config",
+            "@imtbl/cryptofiat",
+            "@imtbl/dex-sdk",
+            "@imtbl/factory-sdk",
+            "@imtbl/game-bridge",
+            "@imtbl/generated-clients",
+            "@imtbl/guardian",
+            "@imtbl/metrics",
+            "@imtbl/orderbook",
+            "@imtbl/passport",
+            "@imtbl/toolkit",
+            "@imtbl/version-check",
+            "@imtbl/x-client",
+            "@imtbl/x-provider"
+          ],
+          "target": "build",
+          "params": "ignore"
+        }
+      ]
+    }
+  },
+  "name": "@imtbl/sdk"
+}
