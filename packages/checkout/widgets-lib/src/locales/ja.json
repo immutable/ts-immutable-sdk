@@ -247,6 +247,25 @@
         }
       }
     },
+    "ORDER_SUMMARY": {
+      "loading": {
+        "balances": "数字を計算中" 
+      },
+      "currency": {
+        "fiat": "≈ USD ${{amount}}",  
+        "fees": "手数料"
+      },
+      "coinsDrawer": {
+        "header": "支払い方法…",
+        "caption1": "コイン",
+        "caption2": "残高"
+      },
+      "orderReview": {
+        "heading": "お支払い方法", 
+        "continue": "続ける", 
+        "payWithCard": "いいえ、カードで支払います"
+      }
+    },
     "FUND_WITH_SMART_CHECKOUT": {
       "loading": {
         "checkingBalances": "数値を計算しています"

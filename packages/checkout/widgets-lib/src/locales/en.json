@@ -240,6 +240,25 @@
         }
       }
     },
+    "ORDER_SUMMARY": {
+      "loading": {
+        "balances": "Crunching numbers"
+      },
+      "currency": {
+        "fiat": "≈ USD ${{amount}}",
+        "fees": "Fees"
+      },
+      "coinsDrawer": {
+        "header": "Pay with...",
+        "caption1": "Coins",
+        "caption2": "Balance"
+      },
+      "orderReview": {
+        "heading": "Pay with your",
+        "continue": "Continue",
+        "payWithCard": "No thanks, I'll pay with card"
+      }
+    },
     "FUND_WITH_SMART_CHECKOUT": {
       "loading": {
         "checkingBalances": "Crunching numbers"
