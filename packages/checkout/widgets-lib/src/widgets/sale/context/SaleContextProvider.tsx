@@ -27,6 +27,7 @@ import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfi
 import { useSignOrder } from '../hooks/useSignOrder';
 import {
   ClientConfig,
+  ClientConfigCurrency,
   ExecuteOrderResponse,
   ExecutedTransaction,
   SaleErrorTypes,
@@ -404,7 +405,7 @@ export function SaleContextProvider(props: {
       signTokenIds: tokenIds,
       excludePaymentTypes,
       multicurrency,
-      selectedCurrency
+      selectedCurrency,
     }),
     [
       config,

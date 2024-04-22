@@ -48,16 +48,6 @@ export function PaymentMethods() {
   };
 
   useEffect(() => {
-    viewDispatch({
-      payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: {
-          type: SaleWidgetViews.ORDER_SUMMARY,
-          subView: OrderSummarySubViews.INIT,
-        },
-      },
-    });
-
     if (paymentMethod) {
       sendSelectedPaymentMethod(paymentMethod, SaleWidgetViews.PAYMENT_METHODS);
     }

@@ -28,7 +28,7 @@ export function OrderReview({
   } = useContext(EventTargetContext);
   const { t } = useTranslation();
 
-  const [showCoinsDrawer, setShowCoinsDrawer] = useState(true);
+  const [showCoinsDrawer, setShowCoinsDrawer] = useState(false);
   const [selectedCurrencyIndex, setSelectedCurrencyIndex] = useState(0);
 
   const openDrawer = () => {

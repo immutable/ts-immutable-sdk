@@ -19,7 +19,7 @@ export const useFundingBalances = () => {
   const [loadingBalances, setLoadingBalances] = useState(false);
 
   const queryFundingBalances = () => {
-    if (!fromTokenAddress || !provider || !checkout || !clientConfig) return;
+    if (!fromTokenAddress || !provider || !checkout || !clientConfig || !selectedCurrency) return;
 
     if (fetching.current) return;
 
