@@ -10,14 +10,14 @@ import { useSaleContext } from '../context/SaleContextProvider';
 import { FundingBalance } from '../types';
 
 type CoinDrawerItemProps = {
-  currency: FundingBalance;
+  balance: FundingBalance;
   conversions: Map<string, number>;
   onClick: () => void;
   selected: boolean;
 };
 
 export function CoinsDrawerItem({
-  currency,
+  balance: currency,
   conversions,
   onClick,
   selected,

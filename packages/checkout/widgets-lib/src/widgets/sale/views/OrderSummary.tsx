@@ -13,7 +13,7 @@ import {
   CryptoFiatContext,
 } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { OrderReview } from '../components/OrderReview';
-import { useTokenBalances } from '../hooks/useTokenBalances';
+import { useFundingBalances } from '../hooks/useFundingBalances';
 import { getTopUpViewData } from '../functions/getTopUpViewData';
 import { SaleErrorTypes } from '../types';
 
@@ -29,36 +29,18 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
   const { cryptoFiatDispatch, cryptoFiatState } = useContext(CryptoFiatContext);
 
   const {
-    balances, loadingBalances, queryBalances, balancesResult,
-  } = useTokenBalances();
+    fundingBalances, fundingBalancesResult, loadingBalances, queryFundingBalances,
+  } = useFundingBalances();
 
-  useEffect(() => {
-    if (loadingBalances || !balancesResult.length) return;
-    if (balances.length > 0) return;
-
-    try {
-      const smartCheckoutResult = balancesResult.find((result) => result.currency.base)?.smartCheckoutResult!;
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: SharedViews.TOP_UP_VIEW,
-            data: getTopUpViewData(smartCheckoutResult.transactionRequirements),
-          },
-        },
-      });
-    } catch (error: any) {
-      goToErrorView(SaleErrorTypes.SMART_CHECKOUT_EXECUTE_ERROR, error);
-    }
-  }, [balances, loadingBalances, balancesResult]);
-
+  // Initialise funding balances
   useEffect(() => {
     if (subView !== OrderSummarySubViews.INIT || !fromTokenAddress) return;
-    queryBalances();
+    queryFundingBalances();
   }, [subView, fromTokenAddress]);
 
+  // If one ore more balances found, go to Order Review
   useEffect(() => {
-    if (balances.length === 0) return;
+    if (fundingBalances.length === 0) return;
 
     viewDispatch({
       payload: {
@@ -69,23 +51,45 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
         },
       },
     });
-  }, [balances]);
+  }, [fundingBalances]);
 
+  // If no balances, Go to Top Up View
   useEffect(() => {
-    // refresh conversion rates
-    if (!cryptoFiatDispatch || balances.length === 0) {
+    if (loadingBalances || !fundingBalancesResult.length) return;
+    if (fundingBalances.length > 0) return;
+
+    try {
+      // suggest to top up base currency balance
+      const smartCheckoutResult = fundingBalancesResult.find((result) => result.currency.base)?.smartCheckoutResult!;
+      const data = getTopUpViewData(smartCheckoutResult.transactionRequirements);
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SharedViews.TOP_UP_VIEW,
+            data,
+          },
+        },
+      });
+    } catch (error: any) {
+      goToErrorView(SaleErrorTypes.SMART_CHECKOUT_EXECUTE_ERROR, error);
+    }
+  }, [fundingBalances, loadingBalances, fundingBalancesResult]);
+
+  // Refresh conversion rates, once all balances are loaded
+  useEffect(() => {
+    if (!cryptoFiatDispatch || fundingBalances.length === 0 || loadingBalances) {
       return;
     }
 
-    const tokenSymbols = balances.map(({ fundingItem }) => fundingItem.token.symbol);
-
+    const tokenSymbols = fundingBalances.map(({ fundingItem }) => fundingItem.token.symbol);
     cryptoFiatDispatch({
       payload: {
         type: CryptoFiatActions.SET_TOKEN_SYMBOLS,
         tokenSymbols,
       },
     });
-  }, [cryptoFiatDispatch, balances]);
+  }, [cryptoFiatDispatch, fundingBalances, loadingBalances]);
 
   return (
     <Box>
@@ -98,9 +102,10 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
       )}
       {subView === OrderSummarySubViews.REVIEW_ORDER && (
         <OrderReview
-          currencies={balances}
+          fundingBalances={fundingBalances}
           conversions={cryptoFiatState.conversions}
           collectionName={collectionName}
+          loadingBalances={loadingBalances}
         />
       )}
     </Box>

@@ -4,14 +4,14 @@ import { calculateCryptoToFiat, tokenValueFormat } from 'lib/utils';
 import { FundingBalance } from '../types';
 
 type SelectCoinDropdownProps = {
-  currency: FundingBalance;
+  balance: FundingBalance;
   conversions: Map<string, number>;
   canOpen: boolean;
   onClick: () => void;
 };
 
 export function SelectCoinDropdown({
-  currency,
+  balance: currency,
   conversions,
   canOpen,
   onClick,

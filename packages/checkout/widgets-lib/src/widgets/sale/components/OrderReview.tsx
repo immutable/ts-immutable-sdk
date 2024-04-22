@@ -12,21 +12,23 @@ import { FundingBalance } from '../types';
 
 type OrderReviewProps = {
   collectionName: string;
-  currencies: FundingBalance[];
+  fundingBalances: FundingBalance[];
   conversions: Map<string, number>;
+  loadingBalances: boolean;
 };
 
 export function OrderReview({
-  currencies,
+  fundingBalances,
   conversions,
   collectionName,
+  loadingBalances,
 }: OrderReviewProps) {
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
   const { t } = useTranslation();
 
-  const [showCoinsDrawer, setShowCoinsDrawer] = useState(false);
+  const [showCoinsDrawer, setShowCoinsDrawer] = useState(true);
   const [selectedCurrencyIndex, setSelectedCurrencyIndex] = useState(0);
 
   const openDrawer = () => {
@@ -72,19 +74,20 @@ export function OrderReview({
         <Box sx={{ paddingX: 'base.spacing.x2' }}>
           <SelectCoinDropdown
             onClick={openDrawer}
-            currency={currencies[selectedCurrencyIndex]}
+            balance={fundingBalances[selectedCurrencyIndex]}
             conversions={conversions}
-            canOpen={currencies.length > 1}
+            canOpen={fundingBalances.length > 1}
           />
         </Box>
       </Box>
       <CoinsDrawer
         conversions={conversions}
-        currencies={currencies}
+        balances={fundingBalances}
         onSelect={onSelect}
         onClose={closeDrawer}
         selectedIndex={selectedCurrencyIndex}
         visible={showCoinsDrawer}
+        loading={loadingBalances}
       />
     </SimpleLayout>
   );

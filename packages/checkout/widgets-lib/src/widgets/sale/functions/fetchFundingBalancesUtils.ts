@@ -1,28 +1,26 @@
-import { Web3Provider } from '@ethersproject/providers';
 import {
-  Checkout,
   TransactionRequirement,
   GasAmount,
   GasTokenType,
   ItemType,
   SmartCheckoutResult,
-  TransactionOrGasType, TokenInfo,
+  TransactionOrGasType,
+  TokenInfo,
   RoutingOutcomeType,
   ERC20ItemRequirement,
   SmartCheckoutRouter,
 } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import {
-  ClientConfigCurrency,
-  ClientConfigCurrencyConversion,
-  FundingBalance,
+  ClientConfigCurrency, FundingBalance,
+  FundingBalanceResult,
   FundingBalanceType,
   SufficientFundingStep,
 } from '../types';
 
 export const MAX_GAS_LIMIT = '30000000';
 
-const getItemRequirements = (
+export const getERC20ItemRequirement = (
   amount: string,
   spenderAddress: string,
   tokenAddress: string,
@@ -35,7 +33,7 @@ const getItemRequirements = (
   },
 ];
 
-const getGasEstimate = (): GasAmount => ({
+export const getGasEstimate = (): GasAmount => ({
   type: TransactionOrGasType.GAS,
   gasToken: {
     type: GasTokenType.NATIVE,
@@ -43,23 +41,23 @@ const getGasEstimate = (): GasAmount => ({
   },
 });
 
-const executePromisesInParallel = async <T>(
+export const wrapPromisesWithOnResolve = async <T>(
   awaitedFns: Promise<T>[],
   onResolve: (value: T) => void,
 ): Promise<T[]> => {
-  const runningPromises = awaitedFns.map(async (fn) => {
+  const promises = awaitedFns.map(async (fn) => {
     const value = await fn;
     onResolve(value);
     return value;
   });
 
-  return await Promise.all(runningPromises);
+  return await Promise.all(promises);
 };
 
-const tokenInfo = (req: TransactionRequirement) =>
+export const tokenInfo = (req: TransactionRequirement) =>
   (req.current.type !== ItemType.ERC721 && req.current.token) as TokenInfo; // eslint-disable-line
 
-const getSufficientFundingStep = (
+export const getSufficientFundingStep = (
   requirement: TransactionRequirement,
 ): SufficientFundingStep => ({
   type: FundingBalanceType.SUFFICIENT,
@@ -77,7 +75,7 @@ const getSufficientFundingStep = (
   },
 });
 
-const getAlternativeFundingSteps = (router: SmartCheckoutRouter) => {
+export const getAlternativeFundingSteps = (router: SmartCheckoutRouter) => {
   if (router.routingOutcome.type === RoutingOutcomeType.ROUTES_FOUND) {
     const fundingRoutes = router.routingOutcome.fundingRoutes.filter(
       (route) => route.steps.length === 1,
@@ -94,7 +92,7 @@ const getAlternativeFundingSteps = (router: SmartCheckoutRouter) => {
   return [];
 };
 
-const getFundingBalances = (
+export const getFundingBalances = (
   smartCheckoutResult: SmartCheckoutResult,
 ): FundingBalance[] | null => {
   if (smartCheckoutResult.sufficient === true) {
@@ -114,7 +112,7 @@ const getFundingBalances = (
   return null;
 };
 
-const sortFundingBalances = (baseSymbol?: string) => (a: FundingBalance, b: FundingBalance) => {
+export const getFnToSortFundingBalancesByPriority = (baseSymbol?: string) => (a: FundingBalance, b: FundingBalance) => {
   const aIsBase = a.fundingItem
       && a.fundingItem.token
       && a.fundingItem.token.symbol === baseSymbol
@@ -146,94 +144,54 @@ const sortFundingBalances = (baseSymbol?: string) => (a: FundingBalance, b: Fund
   return 0;
 };
 
-const getSortedBalancesList = (currency?: ClientConfigCurrency) => {
-  let allBalances: FundingBalance[] = [];
+export const getFnToPushAndSortFundingBalances = (
+  baseCurrency: ClientConfigCurrency,
+): ((balances: FundingBalance[]) => FundingBalance[]) => {
+  let currentBalances: FundingBalance[] = [];
+  const sortByBaseAndPriority = getFnToSortFundingBalancesByPriority(
+    baseCurrency.name,
+  );
 
-  return (balances: FundingBalance[]) => {
-    allBalances = [...balances, ...allBalances].sort(
-      sortFundingBalances(currency?.name),
+  return (newBalances: FundingBalance[]) => {
+    currentBalances = [...currentBalances, ...newBalances].sort(
+      sortByBaseAndPriority,
     );
-
-    return allBalances;
+    return currentBalances;
   };
 };
 
-const digestBalanceResult = (
+export const getFnToDigestFundingBalanceResult = (
   onBalanceResult: (balances: FundingBalance[]) => void,
-  selectedCurrency: ClientConfigCurrency | undefined,
-) => {
-  const pushAndSort = getSortedBalancesList(selectedCurrency);
+  baseCurrency: ClientConfigCurrency,
+): ((result: FundingBalanceResult) => void) => {
+  const pushFoundBalances = getFnToPushAndSortFundingBalances(baseCurrency);
 
   // TODO: remove later
   const getDeferredBalances = ({
-    currency,
     smartCheckoutResult,
-  }: BalanceCheckResult) => {
+  }: FundingBalanceResult) => {
     if (smartCheckoutResult.sufficient && smartCheckoutResult.router) {
       smartCheckoutResult.router?.then((router) => {
         const deferredFundingSteps = getAlternativeFundingSteps(router);
+        console.log('🚀 ~ DeferredSmartCheckoutResult:', smartCheckoutResult); // eslint-disable-line
 
         if (
           Array.isArray(deferredFundingSteps)
           && deferredFundingSteps.length > 0
         ) {
-          onBalanceResult(pushAndSort(deferredFundingSteps));
+          onBalanceResult(pushFoundBalances(deferredFundingSteps));
         }
       });
     }
   };
 
-  return (result: BalanceCheckResult) => {
+  return (result: FundingBalanceResult) => {
     // TODO: remove later
     getDeferredBalances(result);
 
     const fundingBalances = getFundingBalances(result.smartCheckoutResult);
     if (Array.isArray(fundingBalances) && fundingBalances.length > 0) {
-      onBalanceResult(pushAndSort(fundingBalances));
+      onBalanceResult(pushFoundBalances(fundingBalances));
     }
   };
-};
-
-export type BalanceCheckResult = {
-  currency: ClientConfigCurrency;
-  smartCheckoutResult: SmartCheckoutResult;
-};
-
-export const fetchBalances = async (
-  provider: Web3Provider,
-  checkout: Checkout,
-  currencies: ClientConfigCurrency[],
-  conversions: ClientConfigCurrencyConversion,
-  selectedCurrency: ClientConfigCurrency | undefined,
-  onBalancesFound: (balances: FundingBalance[]) => void,
-): Promise<BalanceCheckResult[]> => {
-  const signer = provider?.getSigner();
-  const spenderAddress = (await signer?.getAddress()) || '';
-
-  const gasless = (provider.provider as any)?.isPassport;
-
-  const balancePromises = currencies.map(async (currency) => {
-    const amount = conversions?.[currency.name]?.amount?.toString() || '0';
-    const itemRequirements = getItemRequirements(
-      amount,
-      spenderAddress,
-      currency.address,
-    );
-
-    const transactionOrGasAmount = gasless ? undefined : getGasEstimate();
-    const smartCheckoutResult = await checkout.smartCheckout({
-      provider,
-      itemRequirements,
-      transactionOrGasAmount,
-      routingOptions: { bridge: false, onRamp: false, swap: true },
-    });
-
-    return { currency, smartCheckoutResult };
-  });
-
-  const results = await executePromisesInParallel(
-    balancePromises,
-    digestBalanceResult(onBalancesFound, selectedCurrency),
-  );
-  return results;
 };

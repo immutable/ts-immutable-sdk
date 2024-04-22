@@ -1,24 +1,28 @@
-import { Box, Caption, Drawer } from '@biom3/react';
+import {
+  Box, Caption, Drawer, MenuItem,
+} from '@biom3/react';
 import { useTranslation } from 'react-i18next';
 import { CoinsDrawerItem } from './CoinsDrawerItem';
 import { FundingBalance } from '../types';
 
 type CoinsDrawerProps = {
   conversions: Map<string, number>;
-  currencies: FundingBalance[];
+  balances: FundingBalance[];
   onSelect: (index: number) => void;
   onClose: () => void;
   selectedIndex: number;
   visible: boolean;
+  loading: boolean;
 };
 
 export function CoinsDrawer({
   conversions,
-  currencies,
+  balances,
   onClose,
   onSelect,
   selectedIndex,
   visible,
+  loading,
 }: CoinsDrawerProps) {
   const { t } = useTranslation();
   const handleOnclick = (index: number) => () => {
@@ -49,16 +53,22 @@ export function CoinsDrawer({
               {t('views.ORDER_SUMMARY.coinsDrawer.caption2')}
             </Caption>
           </Box>
-
-          {currencies.map((currency: FundingBalance, idx: number) => (
+          {balances.map((balance: FundingBalance, idx: number) => (
             <CoinsDrawerItem
-              key={`${currency.fundingItem.token.symbol}-${currency.type}`}
+              key={`${balance.fundingItem.token.symbol}-${balance.type}`}
               onClick={handleOnclick(idx)}
-              currency={currency}
+              balance={balance}
               selected={selectedIndex === idx}
               conversions={conversions}
             />
           ))}
+          {loading && (
+            <MenuItem
+              shimmer
+              emphasized
+              testId="funding-balance-item-shimmer"
+            />
+          )}
         </Box>
       </Drawer.Content>
     </Drawer>

@@ -2,6 +2,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import {
   SaleItem,
   TransactionRequirement, FundingStep, FundingItem,
+  SmartCheckoutResult,
 } from '@imtbl/checkout-sdk';
 
 export type SignedOrderProduct = {
@@ -135,3 +136,8 @@ export type SufficientFundingStep = {
 };
 
 export type FundingBalance = FundingStep | SufficientFundingStep;
+
+export type FundingBalanceResult = {
+  currency: ClientConfigCurrency;
+  smartCheckoutResult: SmartCheckoutResult;
+};

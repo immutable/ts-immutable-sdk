@@ -28,6 +28,7 @@ export const smartCheckout = async (
   itemRequirements: ItemRequirement[],
   transactionOrGasAmount?: FulfillmentTransaction | GasAmount,
   routingOptions?: AvailableRoutingOptions,
+  includeFundingRoutesOnSufficient: boolean = true,
 ): Promise<SmartCheckoutResult> => {
   const ownerAddress = await provider.getSigner().getAddress();
 
@@ -67,39 +68,54 @@ export const smartCheckout = async (
   const { sufficient } = balanceCheckResult;
   const transactionRequirements = balanceCheckResult.balanceRequirements;
 
-  if (sufficient) {
+  if (sufficient && !includeFundingRoutesOnSufficient) {
     return {
       sufficient,
       transactionRequirements,
     };
   }
 
-  const availableRoutingOptions = await measureAsyncExecution<AvailableRoutingOptions>(
-    config,
-    'Time to fetch available routing options',
-    getAvailableRoutingOptions(config, provider),
-  );
-  if (routingOptions?.onRamp === false) availableRoutingOptions.onRamp = false;
-  if (routingOptions?.swap === false) availableRoutingOptions.swap = false;
-  if (routingOptions?.bridge === false) availableRoutingOptions.bridge = false;
-
-  const routingOutcome = await measureAsyncExecution<RoutingOutcome>(
-    config,
-    'Total time to run the routing calculator',
-    routingCalculator(
+  const routerPromise = (async () => {
+    const availableRoutingOptions = await measureAsyncExecution<AvailableRoutingOptions>(
       config,
-      ownerAddress,
-      balanceCheckResult,
+      'Time to fetch available routing options',
+      getAvailableRoutingOptions(config, provider),
+    );
+    if (routingOptions?.onRamp === false) availableRoutingOptions.onRamp = false;
+    if (routingOptions?.swap === false) availableRoutingOptions.swap = false;
+    if (routingOptions?.bridge === false) availableRoutingOptions.bridge = false;
+
+    return {
       availableRoutingOptions,
-    ),
-  );
+      routingOutcome: await measureAsyncExecution<RoutingOutcome>(
+        config,
+        'Total time to run the routing calculator',
+        routingCalculator(
+          config,
+          ownerAddress,
+          balanceCheckResult,
+          availableRoutingOptions,
+          includeFundingRoutesOnSufficient,
+        ),
+      ),
+    };
+  })();
+
+  // Return routing options as promise to unblock the UI
+  if (sufficient) {
+    return {
+      sufficient,
+      transactionRequirements,
+      router: routerPromise,
+    };
+  }
+
+  // Get router calculation for insufficient funds
+  const router = await routerPromise;
 
   return {
     sufficient,
     transactionRequirements,
-    router: {
-      availableRoutingOptions,
-      routingOutcome,
-    },
+    router,
   };
 };
