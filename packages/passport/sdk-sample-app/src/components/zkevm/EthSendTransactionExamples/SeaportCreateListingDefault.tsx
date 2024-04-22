@@ -50,7 +50,7 @@ function SeaportCreateListingDefault({ disabled, handleExampleSubmitted }: Reque
 
   return (
     <Accordion.Item eventKey="4">
-      <Accordion.Header>Seaport Create Listing (Generic)</Accordion.Header>
+      <Accordion.Header>Seaport Create Listing (Hardcoded example)</Accordion.Header>
       <Accordion.Body>
         <Alert variant="warning">
           Note: This method only returns a signed message, it does not submit an order to the orderbook.

@@ -156,19 +156,6 @@ function SeaportCreateListing({ disabled, handleExampleSubmitted }: RequestExamp
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>
-              Currency Amount
-            </Form.Label>
-            <Form.Control
-              required
-              type="text"
-              value={buyAmount}
-              isValid={transaction && !transactionError}
-              isInvalid={!!transactionError}
-              onChange={(e) => setBuyAmount(e.target.value)}
-            />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>
               Currency Type
             </Form.Label>
             <Form.Select
@@ -183,7 +170,7 @@ function SeaportCreateListing({ disabled, handleExampleSubmitted }: RequestExamp
           {buyType === 'ERC20' && (
           <Form.Group className="mb-3">
             <Form.Label>
-              Token Contract Address
+              Currency Contract Address
             </Form.Label>
             <Form.Control
               required
@@ -194,6 +181,19 @@ function SeaportCreateListing({ disabled, handleExampleSubmitted }: RequestExamp
             />
           </Form.Group>
           )}
+          <Form.Group className="mb-3">
+            <Form.Label>
+              Currency Amount
+            </Form.Label>
+            <Form.Control
+              required
+              type="text"
+              value={buyAmount}
+              isValid={transaction && !transactionError}
+              isInvalid={!!transactionError}
+              onChange={(e) => setBuyAmount(e.target.value)}
+            />
+          </Form.Group>
           <Stack direction="horizontal" gap={3}>
             <WorkflowButton
               disabled={disabled || isBuldingTransaction || !!transaction || !!transactionError}
