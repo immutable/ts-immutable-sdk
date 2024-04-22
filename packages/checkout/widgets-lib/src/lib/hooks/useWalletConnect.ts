@@ -27,9 +27,8 @@ export const useWalletConnect = () => {
   const openWalletConnectModal = useCallback(async ({
     connectCallback,
     restoreSession = true,
-  }: OpenWalletConnectModalParams) => (
-    new Promise((resolve, reject) => {
-      if (!ethereumProvider || !walletConnectModal) reject('WalletConnect not initialized');
+  }: OpenWalletConnectModalParams) => {
+    const openModal = async (provider: EthereumProvider, resolve, reject) => {
       setWalletConnectBusy(true);
 
       if (restoreSession) {
@@ -41,12 +40,12 @@ export const useWalletConnect = () => {
         // if not we need to create a new session
 
         try {
-          const existingPairings = ethereumProvider?.signer.client.core.pairing.getPairings();
+          const existingPairings = provider?.signer.client.core.pairing.getPairings();
           if (existingPairings && existingPairings.length > 0 && existingPairings[0].topic !== '') {
-            ethereumProvider?.signer.client.core.pairing.activate({ topic: existingPairings[0].topic })
+            provider?.signer.client.core.pairing.activate({ topic: existingPairings[0].topic })
               .then(() => {
-                if (connectCallback && ethereumProvider.connected && ethereumProvider.session) {
-                  connectCallback(ethereumProvider);
+                if (connectCallback && provider.connected && provider.session) {
+                  connectCallback(provider);
                   displayUri.current = '';
                   resolve({}); // required to resolve when restore is successful
                 } else {
@@ -69,11 +68,14 @@ export const useWalletConnect = () => {
                   } else {
                     // if we don't have a display uri and no connected session
                     // call connect to generate display_uri event
-                    ethereumProvider?.connect();
+                    provider?.connect();
                   }
                 }
+              })
+              .catch((err) => {
                 // eslint-disable-next-line no-console
-              }).catch((err) => console.log('activate existing pairing error', err));
+                console.error('activate existing pairing error', err);
+              });
           }
         } catch (err) {
           // eslint-disable-next-line no-console
@@ -82,7 +84,7 @@ export const useWalletConnect = () => {
       }
 
       // Hook into next available display_uri
-      ethereumProvider?.once('display_uri', (data) => {
+      provider?.once('display_uri', (data) => {
         // save the displayUri in case the user closes the modal without connecting
         displayUri.current = data;
         walletConnectModal?.openModal({
@@ -99,19 +101,19 @@ export const useWalletConnect = () => {
           });
       });
 
-      ethereumProvider?.once('connect', () => {
+      provider?.once('connect', () => {
         walletConnectModal?.closeModal();
         // reset the display uri once it has been successfully used for connection
         displayUri.current = '';
 
-        if (connectCallback && ethereumProvider.connected) {
-          connectCallback(ethereumProvider);
+        if (connectCallback && provider.connected) {
+          connectCallback(provider);
         }
       });
 
       // if we have a display uri that hasn't been used and no connected session
       // open the modal
-      if (displayUri.current !== '' && !ethereumProvider?.session) {
+      if (displayUri.current !== '' && !provider?.session) {
         walletConnectModal?.openModal({
           uri: displayUri.current,
         })
@@ -124,13 +126,26 @@ export const useWalletConnect = () => {
             setWalletConnectBusy(true);
             reject(error);
           });
-      } else if (!ethereumProvider?.session || !restoreSession) {
+      } else if (!provider?.session || !restoreSession) {
         // if we don't have a display uri and no connected session
         // call connect to generate display_uri event
-        ethereumProvider?.connect();
+        provider?.connect();
       }
-    })
-  ), [ethereumProvider, walletConnectModal]);
+    };
+
+    return new Promise((resolve, reject) => {
+      if (!ethereumProvider || !walletConnectModal) {
+        // Provider not ready so wait for it
+        WalletConnectManager.getInstance()
+          .getProvider()
+          .then((provider) => {
+            openModal(provider, resolve, reject);
+          });
+      } else {
+        openModal(ethereumProvider, resolve, reject);
+      }
+    });
+  }, [ethereumProvider, walletConnectModal, isWalletConnectEnabled]);
 
   const getWalletLogoUrl = useCallback(async () => await WalletConnectManager.getInstance().getWalletLogoUrl(), []);
   const getWalletName = useCallback(() => {
