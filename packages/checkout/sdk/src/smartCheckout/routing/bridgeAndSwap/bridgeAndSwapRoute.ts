@@ -3,6 +3,7 @@ import { JsonRpcProvider } from '@ethersproject/providers';
 import { CheckoutConfiguration, getL2ChainId } from '../../../config';
 import {
   AvailableRoutingOptions,
+  BridgeAndSwapRoute,
   BridgeFundingStep,
   ChainId,
   GetBalanceResult,
@@ -14,15 +15,16 @@ import {
   BalanceERC20Requirement,
   BalanceNativeRequirement,
 } from '../../balanceCheck/types';
-import {
-  TokenBalanceResult,
-} from '../types';
+import { TokenBalanceResult } from '../types';
 import { BridgeRequirement, bridgeRoute } from '../bridge/bridgeRoute';
 import { swapRoute } from '../swap/swapRoute';
 import { getBalancesByChain } from './getBalancesByChain';
 import { constructBridgeRequirements } from './constructBridgeRequirements';
 import { fetchL1ToL2Mappings } from './fetchL1ToL2Mappings';
-import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS, L1ToL2TokenAddressMapping } from '../indexer/fetchL1Representation';
+import {
+  INDEXER_ETH_ROOT_CONTRACT_ADDRESS,
+  L1ToL2TokenAddressMapping,
+} from '../indexer/fetchL1Representation';
 import { getDexQuotes } from './getDexQuotes';
 import { isMatchingAddress } from '../../../utils/utils';
 
@@ -59,9 +61,7 @@ export const filterSwappableTokensByBridgeableAddresses = (
     // Filter out the token that is required from the swappable tokens list
     if (isMatchingAddress(addresses.l2address, requiredTokenAddress)) continue;
 
-    const tokenInfo = swappableTokens.find(
-      (token) => isMatchingAddress(token.address, addresses.l2address),
-    );
+    const tokenInfo = swappableTokens.find((token) => isMatchingAddress(token.address, addresses.l2address));
     if (!tokenInfo) continue;
     filteredSwappableTokens.push(tokenInfo);
   }
@@ -111,22 +111,16 @@ const modifyTokenBalancesWithBridgedAmount = (
 
     balanceMap.set(l2address, {
       balance: newBalance,
-      formattedBalance: utils.formatUnits(
-        newBalance,
-        tokenInfo.decimals,
-      ),
+      formattedBalance: utils.formatUnits(newBalance, tokenInfo.decimals),
       token: tokenInfo,
     });
   }
 
   const updatedBalances = Array.from(balanceMap.values());
-  modifiedTokenBalances.set(
-    getL2ChainId(config),
-    {
-      success: true,
-      balances: updatedBalances,
-    },
-  );
+  modifiedTokenBalances.set(getL2ChainId(config), {
+    success: true,
+    balances: updatedBalances,
+  });
 
   return modifiedTokenBalances;
 };
@@ -146,9 +140,8 @@ export const reapplyOriginalSwapBalances = (
 
     let originalBalance = BigNumber.from(0);
     let originalFormattedBalance = '0';
-    const l2balance = tokenBalance.balances.find(
-      (balance) => isMatchingAddress(balance.token.address, fundingItem.token.address),
-    );
+    // eslint-disable-next-line max-len
+    const l2balance = tokenBalance.balances.find((balance) => isMatchingAddress(balance.token.address, fundingItem.token.address));
     if (l2balance) {
       originalBalance = l2balance.balance;
       originalFormattedBalance = l2balance.formattedBalance;
@@ -172,25 +165,26 @@ export const constructBridgeAndSwapRoutes = (
 
   for (const bridgeFundingStep of bridgeFundingSteps) {
     if (!bridgeFundingStep) continue;
-    const mapping = l1tol2Addresses.find(
-      (addresses) => {
-        if (bridgeFundingStep.fundingItem.token.address === undefined) {
-          return isMatchingAddress(addresses.l1address, INDEXER_ETH_ROOT_CONTRACT_ADDRESS) && addresses.l2address;
-        }
+    const mapping = l1tol2Addresses.find((addresses) => {
+      if (bridgeFundingStep.fundingItem.token.address === undefined) {
         return (
           isMatchingAddress(
             addresses.l1address,
-            bridgeFundingStep.fundingItem.token.address,
-          )
-          && addresses.l2address
+            INDEXER_ETH_ROOT_CONTRACT_ADDRESS,
+          ) && addresses.l2address
         );
-      },
-    );
+      }
+      return (
+        isMatchingAddress(
+          addresses.l1address,
+          bridgeFundingStep.fundingItem.token.address,
+        ) && addresses.l2address
+      );
+    });
     if (!mapping) continue;
 
-    const swapFundingStep = swapFundingSteps.find(
-      (step) => isMatchingAddress(step.fundingItem.token.address, mapping.l2address),
-    );
+    // eslint-disable-next-line max-len
+    const swapFundingStep = swapFundingSteps.find((step) => isMatchingAddress(step.fundingItem.token.address, mapping.l2address));
     if (!swapFundingStep) continue;
 
     bridgeAndSwapRoutes.push({
@@ -202,10 +196,6 @@ export const constructBridgeAndSwapRoutes = (
   return bridgeAndSwapRoutes;
 };
 
-export type BridgeAndSwapRoute = {
-  bridgeFundingStep: BridgeFundingStep,
-  swapFundingStep: SwapFundingStep,
-};
 export const bridgeAndSwapRoute = async (
   config: CheckoutConfiguration,
   readOnlyProviders: Map<ChainId, JsonRpcProvider>,
@@ -220,14 +210,16 @@ export const bridgeAndSwapRoute = async (
   const { l1balances, l2balances } = getBalancesByChain(config, tokenBalances);
   const requiredTokenAddress = insufficientRequirement.required.token.address;
 
-  if (abortBridgeAndSwap(
-    bridgeableTokens,
-    swappableTokens,
-    l1balances,
-    l2balances,
-    availableRoutingOptions,
-    requiredTokenAddress,
-  )) return [];
+  if (
+    abortBridgeAndSwap(
+      bridgeableTokens,
+      swappableTokens,
+      l1balances,
+      l2balances,
+      availableRoutingOptions,
+      requiredTokenAddress,
+    )
+  ) return [];
 
   // Fetch L2 to L1 address mapping and based on the L1 address existing then
   // filter the bridgeable and swappable tokens list further to only include
@@ -262,7 +254,10 @@ export const bridgeAndSwapRoute = async (
   if (bridgeRequirements.length === 0) return [];
 
   // Create a mapping of bridge routes to L2 addresses
-  const bridgePromises = new Map<string, Promise<BridgeFundingStep | undefined>>();
+  const bridgePromises = new Map<
+  string,
+  Promise<BridgeFundingStep | undefined>
+  >();
   // Create map of bridgeable tokens to make it easier to get the amount that was bridged when modifying the users balance later
   const bridgeableRequirementsMap = new Map<string, BridgeRequirement>();
   const bridgedTokens: BridgeRequirement[] = [];
