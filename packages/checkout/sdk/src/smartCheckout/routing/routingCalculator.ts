@@ -213,7 +213,7 @@ const handleRouteProgress = (
   const route = { priority, steps };
   fundingRoutes.push(route);
 
-  if (onFundingRoute) onFundingRoute(route);
+  onFundingRoute?.(route);
 };
 
 export const routingCalculator = async (
