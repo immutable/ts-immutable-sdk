@@ -6,16 +6,18 @@ import { useTranslation } from 'react-i18next';
 export interface PaymentOptionProps<
   RC extends ReactElement | undefined = undefined,
 > {
+  rc?: RC;
   type: SalePaymentTypes;
   onClick: (type: SalePaymentTypes) => void;
   disabled?: boolean;
-  rc?: RC;
+  caption?: string;
 }
 
 export function PaymentOption<RC extends ReactElement | undefined = undefined>({
   type,
   onClick,
   disabled = false,
+  caption,
   rc = <span />,
 }: PaymentOptionProps<RC>) {
   const { t } = useTranslation();
@@ -54,7 +56,7 @@ export function PaymentOption<RC extends ReactElement | undefined = undefined>({
       </MenuItem.Label>
       {!disabled && <MenuItem.IntentIcon />}
       <MenuItem.Caption>
-        {t(
+        {caption || t(
           `views.PAYMENT_METHODS.options.${type}.${
             disabled ? 'disabledCaption' : 'caption'
           }`,

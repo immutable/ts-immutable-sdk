@@ -1,7 +1,12 @@
 import { Box } from '@biom3/react';
 import { useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SharedViews, ViewActions, ViewContext } from 'context/view-context/ViewContext';
+import {
+  SharedViews,
+  ViewActions,
+  ViewContext,
+} from 'context/view-context/ViewContext';
+import { SalePaymentTypes } from '@imtbl/checkout-sdk';
 import {
   OrderSummarySubViews,
   SaleWidgetViews,
@@ -23,13 +28,27 @@ type OrderSummaryProps = {
 
 export function OrderSummary({ subView }: OrderSummaryProps) {
   const { t } = useTranslation();
-  const { fromTokenAddress, collectionName, goToErrorView } = useSaleContext();
+  const {
+    items,
+    fromTokenAddress,
+    collectionName,
+    disabledPaymentTypes,
+    goToErrorView,
+    goBackToPaymentMethods,
+  } = useSaleContext();
 
   const { viewDispatch } = useContext(ViewContext);
   const { cryptoFiatDispatch, cryptoFiatState } = useContext(CryptoFiatContext);
 
+  const onPayWithCard = disabledPaymentTypes.includes(SalePaymentTypes.DEBIT)
+    ? undefined
+    : () => goBackToPaymentMethods(SalePaymentTypes.DEBIT);
+
   const {
-    fundingBalances, fundingBalancesResult, loadingBalances, queryFundingBalances,
+    fundingBalances,
+    fundingBalancesResult,
+    loadingBalances,
+    queryFundingBalances,
   } = useFundingBalances();
 
   // Initialise funding balances
@@ -60,8 +79,12 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
 
     try {
       // suggest to top up base currency balance
-      const smartCheckoutResult = fundingBalancesResult.find((result) => result.currency.base)?.smartCheckoutResult!;
-      const data = getTopUpViewData(smartCheckoutResult.transactionRequirements);
+      const smartCheckoutResult = fundingBalancesResult.find(
+        (result) => result.currency.base,
+      )?.smartCheckoutResult!;
+      const data = getTopUpViewData(
+        smartCheckoutResult.transactionRequirements,
+      );
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -78,11 +101,17 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
 
   // Refresh conversion rates, once all balances are loaded
   useEffect(() => {
-    if (!cryptoFiatDispatch || fundingBalances.length === 0 || loadingBalances) {
+    if (
+      !cryptoFiatDispatch
+      || fundingBalances.length === 0
+      || loadingBalances
+    ) {
       return;
     }
 
-    const tokenSymbols = fundingBalances.map(({ fundingItem }) => fundingItem.token.symbol);
+    const tokenSymbols = fundingBalances.map(
+      ({ fundingItem }) => fundingItem.token.symbol,
+    );
     cryptoFiatDispatch({
       payload: {
         type: CryptoFiatActions.SET_TOKEN_SYMBOLS,
@@ -106,6 +135,9 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
           conversions={cryptoFiatState.conversions}
           collectionName={collectionName}
           loadingBalances={loadingBalances}
+          items={items}
+          onBackButtonClick={goBackToPaymentMethods}
+          onPayWithCard={onPayWithCard}
         />
       )}
     </Box>

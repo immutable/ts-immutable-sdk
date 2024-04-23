@@ -30,7 +30,7 @@ const defaultItems: SaleItem[] = [
     qty: 2,
     name: "Lab Iguana",
     image:
-      "https://pokemon-nfts.mystagingwebsite.com/wp-content/uploads/2023/11/645-300x300.png",
+      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2023/12/img-IsR4OA7a9IStLeQ9cPo75tII.png",
     description: "Lab Iguana",
   },
 ];

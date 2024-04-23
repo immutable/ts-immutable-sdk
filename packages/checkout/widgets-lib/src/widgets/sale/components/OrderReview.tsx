@@ -1,6 +1,7 @@
 import { Box, Heading } from '@biom3/react';
 import { useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { SaleItem } from '@imtbl/checkout-sdk';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -9,19 +10,26 @@ import { sendSaleWidgetCloseEvent } from '../SaleWidgetEvents';
 import { SelectCoinDropdown } from './SelectCoinDropdown';
 import { CoinsDrawer } from './CoinsDrawer';
 import { FundingBalance } from '../types';
+import { OrderItems } from './OrderItems';
 
 type OrderReviewProps = {
   collectionName: string;
   fundingBalances: FundingBalance[];
   conversions: Map<string, number>;
   loadingBalances: boolean;
+  items: SaleItem[];
+  onBackButtonClick: () => void;
+  onPayWithCard?: () => void;
 };
 
 export function OrderReview({
+  items,
   fundingBalances,
   conversions,
   collectionName,
   loadingBalances,
+  onBackButtonClick,
+  onPayWithCard,
 }: OrderReviewProps) {
   const {
     eventTargetState: { eventTarget },
@@ -48,11 +56,18 @@ export function OrderReview({
       testId="order-review"
       header={(
         <HeaderNavigation
+          showBack
           onCloseButtonClick={() => sendSaleWidgetCloseEvent(eventTarget)}
+          onBackButtonClick={onBackButtonClick}
           title={collectionName}
         />
       )}
       footer={<FooterLogo />}
+      bodyStyleOverrides={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+      }}
     >
       <Box
         sx={{
@@ -72,15 +87,20 @@ export function OrderReview({
           {t('views.ORDER_SUMMARY.orderReview.heading')}
         </Heading>
         <Box sx={{ paddingX: 'base.spacing.x2' }}>
-          <SelectCoinDropdown
-            onClick={openDrawer}
+          <OrderItems
+            items={items}
             balance={fundingBalances[selectedCurrencyIndex]}
             conversions={conversions}
-            canOpen={fundingBalances.length > 1}
-            loading={loadingBalances}
           />
         </Box>
       </Box>
+      <SelectCoinDropdown
+        onClick={openDrawer}
+        balance={fundingBalances[selectedCurrencyIndex]}
+        conversions={conversions}
+        canOpen={fundingBalances.length > 1}
+        loading={loadingBalances}
+      />
       <CoinsDrawer
         conversions={conversions}
         balances={fundingBalances}
@@ -89,6 +109,7 @@ export function OrderReview({
         selectedIndex={selectedCurrencyIndex}
         visible={showCoinsDrawer}
         loading={loadingBalances}
+        onPayWithCard={onPayWithCard}
       />
     </SimpleLayout>
   );

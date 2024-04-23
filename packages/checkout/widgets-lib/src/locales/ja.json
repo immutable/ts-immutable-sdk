@@ -255,21 +255,29 @@
     },
     "ORDER_SUMMARY": {
       "loading": {
-        "balances": "数字を計算中" 
+        "balances": "数値を計算しています"
       },
       "currency": {
-        "fiat": "≈ USD ${{amount}}",  
-        "fees": "手数料"
+        "fiat": "≈ USD ${{amount}}",
+        "price": "{{symbol}} {{amount}}"
+      },
+      "orderItem": {
+        "quantity": "数量 x{{qty}}"
       },
       "coinsDrawer": {
-        "header": "支払い方法…",
+        "header": "で支払う...",
         "caption1": "コイン",
-        "caption2": "残高"
+        "caption2": "残高",
+        "divider": "その他のオプション",
+        "payWithCard": {
+          "caption": "代わりにカードでこの商品を購入"
+        }
       },
       "orderReview": {
-        "heading": "お支払い方法", 
-        "continue": "続ける", 
-        "payWithCard": "いいえ、カードで支払います"
+        "heading": "支払い概要",
+        "continue": "続行",
+        "payWith": "{{symbol}} で支払う",
+        "balance": "残高 ${{amount}}"
       }
     },
     "FUND_WITH_SMART_CHECKOUT": {
@@ -333,7 +341,6 @@
         "body": "この種の購入にクレジットカードを使用する場合、ほとんどの銀行は現金前払い手数料を請求するか、または取引を完全にブロックします。",
         "ctaButton": "それでも試す"
       }
-
     },
     "PAY_WITH_COINS": {
       "header": {
@@ -687,14 +694,14 @@
     },
     "walletConnectionError": {
       "unableToConnect": {
-          "heading": "接続できません",
-          "body": "ウォレットを確認してもう一度お試しください。または、閉じて別のオプションを試してください。",
-          "actionButtonText": "もう一度試す"
+        "heading": "接続できません",
+        "body": "ウォレットを確認してもう一度お試しください。または、閉じて別のオプションを試してください。",
+        "actionButtonText": "もう一度試す"
       },
       "changedYourMind": {
-          "heading": "考えを変えましたか？",
-          "body": "ポップアップが有効になっていることを確認し、ウォレットのプロンプトに従って接続してください。",
-          "actionButtonText": "もう一度試す"
+        "heading": "考えを変えましたか？",
+        "body": "ポップアップが有効になっていることを確認し、ウォレットのプロンプトに従って接続してください。",
+        "actionButtonText": "もう一度試す"
       }
     }
   }

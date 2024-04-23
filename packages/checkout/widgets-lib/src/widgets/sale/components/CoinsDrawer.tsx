@@ -1,17 +1,20 @@
 import {
-  Box, Caption, Drawer, MenuItem,
+  Box, Caption, Drawer, MenuItem, Divider,
 } from '@biom3/react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { listVariants, listItemVariants } from 'lib/animation/listAnimation';
+import { SalePaymentTypes } from '@imtbl/checkout-sdk';
 import { CoinsDrawerItem } from './CoinsDrawerItem';
 import { FundingBalance } from '../types';
+import { PaymentOption } from './PaymentOption';
 
 type CoinsDrawerProps = {
   conversions: Map<string, number>;
   balances: FundingBalance[];
   onSelect: (index: number) => void;
   onClose: () => void;
+  onPayWithCard?: () => void;
   selectedIndex: number;
   visible: boolean;
   loading: boolean;
@@ -20,11 +23,12 @@ type CoinsDrawerProps = {
 export function CoinsDrawer({
   conversions,
   balances,
-  onClose,
-  onSelect,
   selectedIndex,
   visible,
   loading,
+  onClose,
+  onSelect,
+  onPayWithCard,
 }: CoinsDrawerProps) {
   const { t } = useTranslation();
   const handleOnclick = (index: number) => () => {
@@ -45,11 +49,12 @@ export function CoinsDrawer({
           <motion.div variants={listVariants} initial="hidden" animate="show" />
         }
       >
-        <Box sx={{ padding: 'base.spacing.x2' }}>
+        <Box sx={{ padding: 'base.spacing.x4' }}>
           <Box
             sx={{
               display: 'flex',
               justifyContent: 'space-between',
+              mb: 'base.spacing.x4',
             }}
           >
             <Caption size="small">
@@ -81,6 +86,31 @@ export function CoinsDrawer({
                 testId="funding-balance-item-shimmer"
               />
             </motion.div>
+          )}
+          {onPayWithCard && (
+            <>
+              <Divider
+                size="small"
+                rc={<Caption weight="bold" />}
+                sx={{ my: 'base.spacing.x4' }}
+              >
+                {t('views.ORDER_SUMMARY.coinsDrawer.divider')}
+              </Divider>
+              <PaymentOption
+                key="funding-balance-item-card"
+                type={SalePaymentTypes.DEBIT}
+                onClick={onPayWithCard}
+                caption={t(
+                  'views.ORDER_SUMMARY.coinsDrawer.payWithCard.caption',
+                )}
+                rc={(
+                  <motion.div
+                    variants={listItemVariants}
+                    custom={balances.length + (loading ? 1 : 0)}
+                  />
+                )}
+              />
+            </>
           )}
         </Box>
       </Drawer.Content>

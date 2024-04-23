@@ -1,4 +1,4 @@
-import { Box } from '@biom3/react';
+import { Box, BoxProps } from '@biom3/react';
 import {
   simpleLayoutStyle,
   headerStyle,
@@ -17,6 +17,7 @@ export interface SimpleLayoutProps {
   testId?: string;
   floatHeader?: boolean;
   footerBackgroundColor?: string;
+  bodyStyleOverrides?: BoxProps['sx'];
 }
 
 export function SimpleLayout({
@@ -27,6 +28,7 @@ export function SimpleLayout({
   testId,
   floatHeader = false,
   footerBackgroundColor,
+  bodyStyleOverrides,
 }: SimpleLayoutProps) {
   return (
     <Box sx={responsiveStyles}>
@@ -43,7 +45,7 @@ export function SimpleLayout({
             </Box>
           )}
           {children && (
-            <Box sx={bodyStyle}>
+            <Box sx={{ ...bodyStyle, ...bodyStyleOverrides }}>
               {children}
             </Box>
           )}
