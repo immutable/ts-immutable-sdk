@@ -6,8 +6,10 @@ import {
   FundingBalanceResult,
 } from '../types';
 import {
+  getAlternativeFundingSteps,
   getERC20ItemRequirement,
-  getFnToDigestFundingBalanceResult,
+  getFnToPushAndSortFundingBalances,
+  getFundingBalances,
   getGasEstimate,
   wrapPromisesWithOnResolve,
 } from './fetchFundingBalancesUtils';
@@ -21,6 +23,7 @@ export type FundingBalanceParams = {
   getAmountByCurrency: (currency: ClientConfigCurrency) => string;
   getIsGasless: () => boolean;
   onFundingBalance: (balances: FundingBalance[]) => void;
+  onComplete?: (balances: FundingBalance[]) => void;
 };
 
 export const fetchFundingBalances = async (
@@ -34,10 +37,18 @@ export const fetchFundingBalances = async (
     getAmountByCurrency,
     baseCurrency,
     getIsGasless,
+    onComplete,
   } = params;
 
   const signer = provider?.getSigner();
   const spenderAddress = (await signer?.getAddress()) || '';
+
+  const pushToFoundBalances = getFnToPushAndSortFundingBalances(baseCurrency);
+  const updateFundingBalances = (balances: FundingBalance[] | null) => {
+    if (Array.isArray(balances) && balances.length > 0) {
+      onFundingBalance(pushToFoundBalances(balances));
+    }
+  };
 
   const balancePromises = currencies.map(async (currency) => {
     const amount = getAmountByCurrency(currency) || '0';
@@ -50,27 +61,29 @@ export const fetchFundingBalances = async (
     const transactionOrGasAmount = getIsGasless()
       ? undefined
       : getGasEstimate();
+
     const smartCheckoutResult = await checkout.smartCheckout({
       provider,
       itemRequirements,
       transactionOrGasAmount,
       routingOptions: { bridge: false, onRamp: false, swap: true },
+      onComplete: () => {
+        onComplete?.(pushToFoundBalances([]));
+      },
+      onFundingRoute: (route) => {
+        updateFundingBalances(getAlternativeFundingSteps([route]));
+      },
     });
 
     return { currency, smartCheckoutResult };
   });
 
-  const onFundingBalanceResult = getFnToDigestFundingBalanceResult(
-    onFundingBalance,
-    baseCurrency,
-  );
-
   const results = await wrapPromisesWithOnResolve(
     balancePromises,
-    onFundingBalanceResult,
+    ({ smartCheckoutResult }) => {
+      updateFundingBalances(getFundingBalances(smartCheckoutResult));
+    },
   );
-
-  console.log('🚀 ~ FundingBalanceResults:', results); // eslint-disable-line
 
   return results;
 };

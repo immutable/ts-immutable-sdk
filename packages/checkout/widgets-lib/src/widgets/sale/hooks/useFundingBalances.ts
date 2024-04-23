@@ -40,13 +40,15 @@ export const useFundingBalances = () => {
           onFundingBalance: (foundBalances) => {
             setFundingBalances([...foundBalances]);
           },
+          onComplete: () => {
+            setLoadingBalances(false);
+          },
         });
 
         setFundingBalancesResult(results);
       } catch {
         setLoadingBalances(false);
       } finally {
-        setLoadingBalances(false);
         fetching.current = false;
       }
     })();

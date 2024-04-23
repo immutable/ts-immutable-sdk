@@ -6,15 +6,14 @@ import {
   SmartCheckoutResult,
   TransactionOrGasType,
   TokenInfo,
-  RoutingOutcomeType,
   ERC20ItemRequirement,
-  SmartCheckoutRouter,
+  FundingRoute,
+  RoutingOutcomeType,
 } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import {
   ClientConfigCurrency,
   FundingBalance,
-  FundingBalanceResult,
   FundingBalanceType,
   SufficientFundingStep,
 } from '../types';
@@ -76,21 +75,19 @@ export const getSufficientFundingStep = (
   },
 });
 
-export const getAlternativeFundingSteps = (router: SmartCheckoutRouter) => {
-  if (router.routingOutcome.type === RoutingOutcomeType.ROUTES_FOUND) {
-    const fundingRoutes = router.routingOutcome.fundingRoutes.filter(
-      (route) => route.steps.length === 1,
-    );
-
-    const fundingSteps = fundingRoutes.flatMap((route) => route.steps.filter(
-      (step) =>
-          [ItemType.ERC20, ItemType.NATIVE].includes(step.fundingItem.type) // eslint-disable-line
-    ));
-
-    return fundingSteps;
+export const getAlternativeFundingSteps = (fundingRoutes: FundingRoute[]) => {
+  if (fundingRoutes.length === 0) {
+    return [];
   }
 
-  return [];
+  const routes = fundingRoutes.filter((route) => route.steps.length === 1);
+
+  const tokens = [ItemType.ERC20, ItemType.NATIVE];
+  const steps = routes.flatMap(
+    (route) => route.steps.filter((step) => tokens.includes(step.fundingItem.type)),
+  );
+
+  return steps;
 };
 
 export const getFundingBalances = (
@@ -106,8 +103,14 @@ export const getFundingBalances = (
     }
   }
 
-  if (smartCheckoutResult.sufficient === false) {
-    return getAlternativeFundingSteps(smartCheckoutResult.router);
+  if (
+    smartCheckoutResult.sufficient === false
+    && smartCheckoutResult.router.routingOutcome.type
+      === RoutingOutcomeType.ROUTES_FOUND
+  ) {
+    return getAlternativeFundingSteps(
+      smartCheckoutResult.router.routingOutcome.fundingRoutes,
+    );
   }
 
   return null;
@@ -154,45 +157,13 @@ export const getFnToPushAndSortFundingBalances = (
   );
 
   return (newBalances: FundingBalance[]) => {
+    if (newBalances.length === 0) {
+      return currentBalances;
+    }
+
     currentBalances = [...currentBalances, ...newBalances].sort(
       sortByBaseAndPriority,
     );
     return currentBalances;
-  };
-};
-
-export const getFnToDigestFundingBalanceResult = (
-  onBalanceResult: (balances: FundingBalance[]) => void,
-  baseCurrency: ClientConfigCurrency,
-): ((result: FundingBalanceResult) => void) => {
-  const pushFoundBalances = getFnToPushAndSortFundingBalances(baseCurrency);
-
-  // TODO: remove later
-  const getDeferredBalances = ({
-    smartCheckoutResult,
-  }: FundingBalanceResult) => {
-    if (smartCheckoutResult.sufficient && smartCheckoutResult.router) {
-      smartCheckoutResult.router?.then((router) => {
-        const deferredFundingSteps = getAlternativeFundingSteps(router);
-        console.log("🚀 ~ DeferredSmartCheckoutResult:", smartCheckoutResult); // eslint-disable-line
-
-        if (
-          Array.isArray(deferredFundingSteps)
-          && deferredFundingSteps.length > 0
-        ) {
-          onBalanceResult(pushFoundBalances(deferredFundingSteps));
-        }
-      });
-    }
-  };
-
-  return (result: FundingBalanceResult) => {
-    // TODO: remove later
-    getDeferredBalances(result);
-
-    const fundingBalances = getFundingBalances(result.smartCheckoutResult);
-    if (Array.isArray(fundingBalances) && fundingBalances.length > 0) {
-      onBalanceResult(pushFoundBalances(fundingBalances));
-    }
   };
 };
