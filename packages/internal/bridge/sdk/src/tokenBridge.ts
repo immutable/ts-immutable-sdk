@@ -632,7 +632,7 @@ export class TokenBridge {
       const data: string = await withBridgeError<string>(async () => erc20Contract.interface
         .encodeFunctionData('approve', [
           this.config.bridgeContracts.rootERC20BridgeFlowRate,
-          amount.sub(allowance),
+          amount,
         ]), BridgeErrorType.INTERNAL_ERROR);
       unsignedApprovalTx = {
         data,
@@ -725,7 +725,7 @@ export class TokenBridge {
       const data: string = await withBridgeError<string>(async () => erc20Contract.interface
         .encodeFunctionData('approve', [
           this.config.bridgeContracts.childERC20Bridge,
-          amount.sub(allowance),
+          amount,
         ]), BridgeErrorType.INTERNAL_ERROR);
       unsignedApprovalTx = {
         data,

@@ -12,6 +12,7 @@ import { BigNumber, ethers } from 'ethers';
 import { BridgeError, BridgeErrorType } from 'errors';
 import { GMPStatus, GasPaidStatus } from 'types/axelar';
 import { queryTransactionStatus } from 'lib/gmpRecovery';
+import { ERC20 } from 'contracts/ABIs/ERC20';
 
 jest.mock('axios', () => ({
   post: jest.fn().mockReturnValue({
@@ -42,12 +43,6 @@ describe('Token Bridge', () => {
 
   describe('getUnsignedBridgeBundledTx', () => {
     let tokenBridge: TokenBridge;
-    const mockERC20Contract = {
-      allowance: jest.fn(),
-      interface: {
-        encodeFunctionData: jest.fn(),
-      },
-    };
 
     const originalValidateBridgeReqArgs = TokenBridge.prototype['validateBridgeReqArgs'];
     const originalValidateChainConfiguration = TokenBridge.prototype['validateChainConfiguration'];
@@ -64,7 +59,6 @@ describe('Token Bridge', () => {
     });
 
     beforeEach(() => {
-      jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20Contract as any);
       jest.spyOn(TokenBridge.prototype as any, 'validateChainConfiguration')
         .mockImplementation(async () => 'Valid');
       jest.spyOn(TokenBridge.prototype as any, 'validateBridgeReqArgs')
@@ -95,8 +89,8 @@ describe('Token Bridge', () => {
       const allowance = ethers.utils.parseUnits('50', 18);
       const amount = ethers.utils.parseUnits('100', 18);
 
-      mockERC20Contract.allowance.mockResolvedValue(allowance);
-      mockERC20Contract.interface.encodeFunctionData.mockResolvedValue('0xdata');
+      jest.spyOn(TokenBridge.prototype as any, 'getAllowance')
+        .mockImplementation(async () => allowance);
 
       const req = {
         senderAddress: '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816',
@@ -110,9 +104,15 @@ describe('Token Bridge', () => {
 
       const result = await tokenBridge.getUnsignedBridgeBundledTx(req);
 
+      const erc20Contract = new ethers.Contract('0x2f14582947E292a2eCd20C430B46f2d27CFE213c', ERC20, undefined);
+      const expectedData = erc20Contract.interface.encodeFunctionData('approve', [
+        bridgeConfig.bridgeContracts.rootERC20BridgeFlowRate,
+        amount,
+      ]);
+
       expect(result.contractToApprove).toBe('0x2f14582947E292a2eCd20C430B46f2d27CFE213c');
       expect(result.unsignedApprovalTx).toBeDefined();
-      expect(result.unsignedApprovalTx?.data).toBe('0xdata');
+      expect(result.unsignedApprovalTx?.data).toBe(expectedData);
       expect(result.unsignedApprovalTx?.to).toBe(req.token);
       expect(result.unsignedApprovalTx?.from).toBe(req.senderAddress);
       expect(result.unsignedApprovalTx?.value).toBe(0);
@@ -128,8 +128,8 @@ describe('Token Bridge', () => {
       const allowance = ethers.utils.parseUnits('100', 18);
       const amount = ethers.utils.parseUnits('100', 18);
 
-      mockERC20Contract.allowance.mockResolvedValue(allowance);
-      mockERC20Contract.interface.encodeFunctionData.mockResolvedValue('0xdata');
+      jest.spyOn(TokenBridge.prototype as any, 'getAllowance')
+        .mockImplementation(async () => allowance);
 
       const req = {
         senderAddress: '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816',
@@ -178,28 +178,22 @@ describe('Token Bridge', () => {
 
   describe('getUnsignedApproveBridgeTx', () => {
     let tokenBridge: TokenBridge;
-    const mockERC20Contract = {
-      allowance: jest.fn(),
-      interface: {
-        encodeFunctionData: jest.fn(),
-      },
-    };
 
     const originalValidateBridgeReqArgs = TokenBridge.prototype['validateBridgeReqArgs'];
     const originalValidateChainConfiguration = TokenBridge.prototype['validateChainConfiguration'];
 
+    const mockRootProvider = new ethers.providers.JsonRpcProvider('x');
+    const mockChildProvider = new ethers.providers.JsonRpcProvider('x');
+    const bridgeConfig = new BridgeConfiguration({
+      baseConfig: new ImmutableConfiguration({
+        environment: Environment.SANDBOX,
+      }),
+      bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
+      rootProvider: mockRootProvider,
+      childProvider: mockChildProvider,
+    });
+
     beforeEach(() => {
-      const mockRootProvider = new ethers.providers.JsonRpcProvider('x');
-      const mockChildProvider = new ethers.providers.JsonRpcProvider('x');
-      const bridgeConfig = new BridgeConfiguration({
-        baseConfig: new ImmutableConfiguration({
-          environment: Environment.SANDBOX,
-        }),
-        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
-        rootProvider: mockRootProvider,
-        childProvider: mockChildProvider,
-      });
-      jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20Contract as any);
       jest.spyOn(TokenBridge.prototype as any, 'validateChainConfiguration')
         .mockImplementation(async () => 'Valid');
       jest.spyOn(TokenBridge.prototype as any, 'validateBridgeReqArgs')
@@ -230,8 +224,8 @@ describe('Token Bridge', () => {
       const allowance = ethers.utils.parseUnits('50', 18);
       const amount = ethers.utils.parseUnits('100', 18);
 
-      mockERC20Contract.allowance.mockResolvedValue(allowance);
-      mockERC20Contract.interface.encodeFunctionData.mockResolvedValue('0xdata');
+      jest.spyOn(TokenBridge.prototype as any, 'getAllowance')
+        .mockImplementation(async () => allowance);
 
       const req = {
         senderAddress: '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816',
@@ -243,8 +237,14 @@ describe('Token Bridge', () => {
 
       const result = await tokenBridge.getUnsignedApproveBridgeTx(req);
 
+      const erc20Contract = new ethers.Contract('0x2f14582947E292a2eCd20C430B46f2d27CFE213c', ERC20, undefined);
+      const expectedData = erc20Contract.interface.encodeFunctionData('approve', [
+        bridgeConfig.bridgeContracts.rootERC20BridgeFlowRate,
+        amount,
+      ]);
+
       expect(result.unsignedTx).toBeDefined();
-      expect(result.unsignedTx?.data).toBe('0xdata');
+      expect(result.unsignedTx?.data).toBe(expectedData);
       expect(result.unsignedTx?.to).toBe(req.token);
       expect(result.unsignedTx?.from).toBe(req.senderAddress);
       expect(result.unsignedTx?.value).toBe(0);
@@ -255,8 +255,8 @@ describe('Token Bridge', () => {
       const allowance = ethers.utils.parseUnits('200', 18);
       const amount = ethers.utils.parseUnits('100', 18);
 
-      mockERC20Contract.allowance.mockResolvedValue(allowance);
-      mockERC20Contract.interface.encodeFunctionData.mockResolvedValue('0xdata');
+      jest.spyOn(TokenBridge.prototype as any, 'getAllowance')
+        .mockImplementation(async () => allowance);
 
       const req = {
         senderAddress: '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816',
