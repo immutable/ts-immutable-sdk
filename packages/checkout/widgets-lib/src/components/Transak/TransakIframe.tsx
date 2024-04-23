@@ -76,6 +76,7 @@ export function TransakIframe(props: TransakIframeProps) {
       walletAddress,
       partnerOrderId,
     },
+    onError: onFailedToLoad,
   });
 
   return (
