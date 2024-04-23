@@ -11,6 +11,7 @@
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.0.0",
     "@swc/jest": "^0.2.24",
+    "@testing-library/jest-dom": "^5.16.5",
     "@types/jest": "^29.4.3",
     "eslint": "^8.40.0",
     "jest": "^29.4.3",

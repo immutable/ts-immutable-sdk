@@ -1,5 +1,5 @@
 module.exports = {
-  testEnvironment: 'node',
+  testEnvironment: 'jsdom',
   moduleDirectories: ['node_modules', '<rootDir>/src'],
   modulePathIgnorePatterns: ['<rootDir>/dist/', '<rootDir>/backup/'],
   testRegex: '^.+\\.test\\.(js|ts|jsx|tsx)$',
