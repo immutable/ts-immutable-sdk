@@ -7,7 +7,8 @@
     "packages/x-client/",
     "packages/orderbook/",
     "packages/passport/sdk/",
-    "packages/x-provider/"
+    "packages/x-provider/",
+    "packages/x-link/"
   ],
   "name": "ts-immutable-sdk",
   "entryPointStrategy": "packages",
