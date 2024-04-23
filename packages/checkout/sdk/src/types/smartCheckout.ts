@@ -539,7 +539,6 @@ export type SmartCheckoutSufficient = {
   sufficient: true,
   /** The transaction requirements smart checkout determined were required for the transaction. */
   transactionRequirements: TransactionRequirement[],
-  router?: Promise<SmartCheckoutRouter>
 };
 
 /**
