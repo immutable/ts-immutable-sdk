@@ -8,9 +8,7 @@ import {
 } from './routingCalculator';
 import { CheckoutConfiguration } from '../../config';
 import { getAllTokenBalances } from './tokenBalances';
-import {
-  TokenBalanceResult,
-} from './types';
+import { TokenBalanceResult } from './types';
 import { bridgeRoute } from './bridge/bridgeRoute';
 import {
   ChainId,
@@ -54,10 +52,176 @@ describe('routingCalculator', () => {
 
   beforeEach(() => {
     const mockedHttpClient = new HttpClient() as jest.Mocked<HttpClient>;
-    config = new CheckoutConfiguration({
-      baseConfig: { environment: Environment.SANDBOX },
-    }, mockedHttpClient);
+    config = new CheckoutConfiguration(
+      {
+        baseConfig: { environment: Environment.SANDBOX },
+      },
+      mockedHttpClient,
+    );
     jest.spyOn(console, 'info').mockImplementation(() => {});
+  });
+
+  it('should invoke onFundingRoute callback with each found route', async () => {
+    (allowListCheck as jest.Mock).mockImplementation(() => ({
+      onRamp: [],
+      swap: [
+        {
+          name: 'ERC20_1',
+          symbol: 'ERC20_1',
+          decimals: 18,
+          address: '0xERC20_1',
+        },
+        {
+          name: 'ERC20_2',
+          symbol: 'ERC20_2',
+          decimals: 18,
+          address: '0xERC20_2',
+        },
+      ],
+    }));
+
+    const balanceERC20Requirement = {
+      type: ItemType.ERC20,
+      sufficient: false,
+      delta: {
+        balance: BigNumber.from(1),
+        formattedBalance: '1',
+      },
+      current: {
+        type: ItemType.ERC20,
+        balance: BigNumber.from(1),
+        formattedBalance: '1',
+        token: {
+          name: 'ERC20_1',
+          symbol: 'ERC20_1',
+          decimals: 18,
+          address: '0xERC20_1',
+        },
+      },
+      required: {
+        type: ItemType.ERC20,
+        balance: BigNumber.from(2),
+        formattedBalance: '2',
+        token: {
+          name: 'ERC20_1',
+          symbol: 'ERC20_1',
+          decimals: 18,
+          address: '0xERC20_1',
+        },
+      },
+    } as BalanceRequirement;
+
+    const balanceRequirements = {
+      sufficient: false,
+      balanceRequirements: [balanceERC20Requirement],
+    };
+
+    const availableRoutingOptions = {
+      onRamp: true,
+      swap: true,
+      bridge: true,
+    };
+
+    (getAllTokenBalances as jest.Mock).mockResolvedValue(
+      new Map([
+        [ChainId.SEPOLIA, []],
+        [
+          ChainId.IMTBL_ZKEVM_TESTNET,
+          {
+            success: true,
+            balances: [
+              {
+                balance: BigNumber.from(10),
+                formattedBalance: '10',
+                token: {
+                  name: 'ERC20',
+                  symbol: 'ERC20',
+                  decimals: 18,
+                  address: '0xERC20_2',
+                },
+              },
+              {
+                balance: BigNumber.from(10),
+                formattedBalance: '10',
+                token: {
+                  name: 'IMX',
+                  symbol: 'IMX',
+                  decimals: 18,
+                },
+              },
+            ],
+          },
+        ],
+      ]),
+    );
+
+    (bridgeRoute as jest.Mock).mockResolvedValue(undefined);
+
+    const swapFundingStep = {
+      type: FundingStepType.SWAP,
+      chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+      fundingItem: {
+        type: ItemType.ERC20,
+        fundsRequired: {
+          amount: BigNumber.from(1),
+          formattedAmount: utils.formatUnits(BigNumber.from(1), 18),
+        },
+        userBalance: {
+          balance: BigNumber.from(10),
+          formattedBalance: '10',
+        },
+        token: {
+          name: 'ERC20',
+          symbol: 'ERC20',
+          decimals: 18,
+          address: '0xERC20_2',
+        },
+      },
+    };
+    (swapRoute as jest.Mock).mockResolvedValue([swapFundingStep]);
+
+    const mockCallback = jest.fn();
+
+    (createReadOnlyProviders as jest.Mock).mockResolvedValue(
+      new Map([
+        [ChainId.SEPOLIA, {} as JsonRpcProvider],
+        [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+      ]),
+    );
+
+    await routingCalculator(
+      config,
+      '0x123',
+      balanceRequirements,
+      availableRoutingOptions,
+      mockCallback,
+    );
+    expect(mockCallback).toHaveBeenCalledTimes(1);
+
+    expect(mockCallback).toHaveBeenCalledWith({
+      priority: 1,
+      steps: [swapFundingStep],
+    });
+  });
+
+  it('should not invoke onFundingRoute callback if no routes are found', async () => {
+    const mockCallback = jest.fn();
+    const availableRoutingOptions = {
+      onRamp: false,
+      swap: false,
+      bridge: false,
+    };
+    const balanceRequirements = {} as BalanceCheckResult;
+
+    await routingCalculator(
+      config,
+      '0x123',
+      balanceRequirements,
+      availableRoutingOptions,
+      mockCallback,
+    );
+
+    expect(mockCallback).not.toHaveBeenCalled();
   });
 
   it('should return no options if no routing options are available', async () => {
@@ -68,56 +232,60 @@ describe('routingCalculator', () => {
     };
 
     const balanceRequirements = {} as BalanceCheckResult;
-    (createReadOnlyProviders as jest.Mock).mockResolvedValue(new Map([
-      [ChainId.SEPOLIA, {} as JsonRpcProvider],
-      [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
-    ]));
+    (createReadOnlyProviders as jest.Mock).mockResolvedValue(
+      new Map([
+        [ChainId.SEPOLIA, {} as JsonRpcProvider],
+        [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+      ]),
+    );
 
     const routingOptions = await routingCalculator(
       config,
       '0x123',
       balanceRequirements,
       availableRoutingOptions,
+      () => {},
     );
-    expect(routingOptions)
-      .toEqual({
-        type: RoutingOutcomeType.NO_ROUTE_OPTIONS,
-        message: 'No routing options are available',
-      });
+    expect(routingOptions).toEqual({
+      type: RoutingOutcomeType.NO_ROUTE_OPTIONS,
+      message: 'No routing options are available',
+    });
   });
 
   it('should return no options if no routing options are defined', async () => {
     const availableRoutingOptions = {};
     const balanceRequirements = {} as BalanceCheckResult;
-    (createReadOnlyProviders as jest.Mock).mockResolvedValue(new Map([
-      [ChainId.SEPOLIA, {} as JsonRpcProvider],
-      [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
-    ]));
+    (createReadOnlyProviders as jest.Mock).mockResolvedValue(
+      new Map([
+        [ChainId.SEPOLIA, {} as JsonRpcProvider],
+        [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+      ]),
+    );
 
     const routingOptions = await routingCalculator(
       config,
       '0x123',
       balanceRequirements,
       availableRoutingOptions,
+      () => {},
     );
-    expect(routingOptions)
-      .toEqual({
-        type: RoutingOutcomeType.NO_ROUTE_OPTIONS,
-        message: 'No routing options are available',
-      });
+    expect(routingOptions).toEqual({
+      type: RoutingOutcomeType.NO_ROUTE_OPTIONS,
+      message: 'No routing options are available',
+    });
   });
 
   it('should return bridge funding step', async () => {
-    (allowListCheck as jest.Mock).mockImplementation(() => (
-      {
-        bridge: [{
+    (allowListCheck as jest.Mock).mockImplementation(() => ({
+      bridge: [
+        {
           name: 'ETH-ERC20',
           symbol: 'ETH-ERC20',
           decimals: 18,
           address: '0x123',
-        }],
-      }
-    ));
+        },
+      ],
+    }));
 
     const balanceERC20Requirement: BalanceERC20Requirement = {
       type: ItemType.ERC20,
@@ -161,9 +329,9 @@ describe('routingCalculator', () => {
       bridge: true,
     };
 
-    (getAllTokenBalances as jest.Mock).mockResolvedValue(new Map([
-      [ChainId.SEPOLIA, []],
-    ]));
+    (getAllTokenBalances as jest.Mock).mockResolvedValue(
+      new Map([[ChainId.SEPOLIA, []]]),
+    );
 
     const bridgeFundingStep = {
       type: FundingStepType.BRIDGE,
@@ -195,56 +363,61 @@ describe('routingCalculator', () => {
           amount: BigNumber.from(0),
           formattedAmount: '0',
         },
-        bridgeFees: [{
-          type: FeeType.BRIDGE_FEE,
-          amount: BigNumber.from(0),
-          formattedAmount: '0',
-        }],
+        bridgeFees: [
+          {
+            type: FeeType.BRIDGE_FEE,
+            amount: BigNumber.from(0),
+            formattedAmount: '0',
+          },
+        ],
       },
     };
     (bridgeRoute as jest.Mock).mockResolvedValue(bridgeFundingStep);
 
-    (createReadOnlyProviders as jest.Mock).mockResolvedValue(new Map([
-      [ChainId.SEPOLIA, {} as JsonRpcProvider],
-      [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
-    ]));
+    (createReadOnlyProviders as jest.Mock).mockResolvedValue(
+      new Map([
+        [ChainId.SEPOLIA, {} as JsonRpcProvider],
+        [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+      ]),
+    );
 
     const routingOptions = await routingCalculator(
       config,
       '0x123',
       balanceRequirements,
       availableRoutingOptions,
+      () => {},
     );
-    expect(routingOptions)
-      .toEqual({
-        type: RoutingOutcomeType.ROUTES_FOUND,
-        fundingRoutes: [{
+
+    expect(routingOptions).toEqual({
+      type: RoutingOutcomeType.ROUTES_FOUND,
+      fundingRoutes: [
+        {
           priority: 1,
           steps: [bridgeFundingStep],
-        }],
-      });
+        },
+      ],
+    });
   });
 
   it('should return swap funding step', async () => {
-    (allowListCheck as jest.Mock).mockImplementation(() => (
-      {
-        onRamp: [],
-        swap: [
-          {
-            name: 'ERC20_1',
-            symbol: 'ERC20_1',
-            decimals: 18,
-            address: '0xERC20_1',
-          },
-          {
-            name: 'ERC20_2',
-            symbol: 'ERC20_2',
-            decimals: 18,
-            address: '0xERC20_2',
-          },
-        ],
-      }
-    ));
+    (allowListCheck as jest.Mock).mockImplementation(() => ({
+      onRamp: [],
+      swap: [
+        {
+          name: 'ERC20_1',
+          symbol: 'ERC20_1',
+          decimals: 18,
+          address: '0xERC20_1',
+        },
+        {
+          name: 'ERC20_2',
+          symbol: 'ERC20_2',
+          decimals: 18,
+          address: '0xERC20_2',
+        },
+      ],
+    }));
 
     const balanceERC20Requirement = {
       type: ItemType.ERC20,
@@ -288,33 +461,38 @@ describe('routingCalculator', () => {
       bridge: true,
     };
 
-    (getAllTokenBalances as jest.Mock).mockResolvedValue(new Map([
-      [ChainId.SEPOLIA, []],
-      [ChainId.IMTBL_ZKEVM_TESTNET, {
-        success: true,
-        balances: [
+    (getAllTokenBalances as jest.Mock).mockResolvedValue(
+      new Map([
+        [ChainId.SEPOLIA, []],
+        [
+          ChainId.IMTBL_ZKEVM_TESTNET,
           {
-            balance: BigNumber.from(10),
-            formattedBalance: '10',
-            token: {
-              name: 'ERC20',
-              symbol: 'ERC20',
-              decimals: 18,
-              address: '0xERC20_2',
-            },
-          },
-          {
-            balance: BigNumber.from(10),
-            formattedBalance: '10',
-            token: {
-              name: 'IMX',
-              symbol: 'IMX',
-              decimals: 18,
-            },
+            success: true,
+            balances: [
+              {
+                balance: BigNumber.from(10),
+                formattedBalance: '10',
+                token: {
+                  name: 'ERC20',
+                  symbol: 'ERC20',
+                  decimals: 18,
+                  address: '0xERC20_2',
+                },
+              },
+              {
+                balance: BigNumber.from(10),
+                formattedBalance: '10',
+                token: {
+                  name: 'IMX',
+                  symbol: 'IMX',
+                  decimals: 18,
+                },
+              },
+            ],
           },
         ],
-      }],
-    ]));
+      ]),
+    );
 
     (bridgeRoute as jest.Mock).mockResolvedValue(undefined);
 
@@ -341,53 +519,55 @@ describe('routingCalculator', () => {
     };
     (swapRoute as jest.Mock).mockResolvedValue([swapFundingStep]);
 
-    (createReadOnlyProviders as jest.Mock).mockResolvedValue(new Map([
-      [ChainId.SEPOLIA, {} as JsonRpcProvider],
-      [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
-    ]));
+    (createReadOnlyProviders as jest.Mock).mockResolvedValue(
+      new Map([
+        [ChainId.SEPOLIA, {} as JsonRpcProvider],
+        [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+      ]),
+    );
 
     const routingOptions = await routingCalculator(
       config,
       '0x123',
       balanceRequirements,
       availableRoutingOptions,
+      () => {},
     );
-    expect(routingOptions)
-      .toEqual({
-        type: RoutingOutcomeType.ROUTES_FOUND,
-        fundingRoutes: [{
+    expect(routingOptions).toEqual({
+      type: RoutingOutcomeType.ROUTES_FOUND,
+      fundingRoutes: [
+        {
           priority: 1,
           steps: [swapFundingStep],
-        }],
-      });
+        },
+      ],
+    });
   });
 
   it('should return multiple swap funding steps', async () => {
-    (allowListCheck as jest.Mock).mockImplementation(() => (
-      {
-        onRamp: [],
-        swap: [
-          {
-            name: 'ERC20_1',
-            symbol: 'ERC20_1',
-            decimals: 18,
-            address: '0xERC20_1',
-          },
-          {
-            name: 'ERC20_2',
-            symbol: 'ERC20_2',
-            decimals: 18,
-            address: '0xERC20_2',
-          },
-          {
-            name: 'ERC20_3',
-            symbol: 'ERC20_3',
-            decimals: 18,
-            address: '0xERC20_3',
-          },
-        ],
-      }
-    ));
+    (allowListCheck as jest.Mock).mockImplementation(() => ({
+      onRamp: [],
+      swap: [
+        {
+          name: 'ERC20_1',
+          symbol: 'ERC20_1',
+          decimals: 18,
+          address: '0xERC20_1',
+        },
+        {
+          name: 'ERC20_2',
+          symbol: 'ERC20_2',
+          decimals: 18,
+          address: '0xERC20_2',
+        },
+        {
+          name: 'ERC20_3',
+          symbol: 'ERC20_3',
+          decimals: 18,
+          address: '0xERC20_3',
+        },
+      ],
+    }));
 
     const balanceERC20Requirement = {
       type: ItemType.ERC20,
@@ -431,43 +611,48 @@ describe('routingCalculator', () => {
       bridge: true,
     };
 
-    (getAllTokenBalances as jest.Mock).mockResolvedValue(new Map([
-      [ChainId.SEPOLIA, []],
-      [ChainId.IMTBL_ZKEVM_TESTNET, {
-        success: true,
-        balances: [
+    (getAllTokenBalances as jest.Mock).mockResolvedValue(
+      new Map([
+        [ChainId.SEPOLIA, []],
+        [
+          ChainId.IMTBL_ZKEVM_TESTNET,
           {
-            balance: BigNumber.from(10),
-            formattedBalance: '10',
-            token: {
-              name: 'ERC20',
-              symbol: 'ERC20',
-              decimals: 18,
-              address: '0xERC20_2',
-            },
-          },
-          {
-            balance: BigNumber.from(10),
-            formattedBalance: '10',
-            token: {
-              name: 'ERC20_3',
-              symbol: 'ERC20_3',
-              decimals: 18,
-              address: '0xERC20_3',
-            },
-          },
-          {
-            balance: BigNumber.from(10),
-            formattedBalance: '10',
-            token: {
-              name: 'IMX',
-              symbol: 'IMX',
-              decimals: 18,
-            },
+            success: true,
+            balances: [
+              {
+                balance: BigNumber.from(10),
+                formattedBalance: '10',
+                token: {
+                  name: 'ERC20',
+                  symbol: 'ERC20',
+                  decimals: 18,
+                  address: '0xERC20_2',
+                },
+              },
+              {
+                balance: BigNumber.from(10),
+                formattedBalance: '10',
+                token: {
+                  name: 'ERC20_3',
+                  symbol: 'ERC20_3',
+                  decimals: 18,
+                  address: '0xERC20_3',
+                },
+              },
+              {
+                balance: BigNumber.from(10),
+                formattedBalance: '10',
+                token: {
+                  name: 'IMX',
+                  symbol: 'IMX',
+                  decimals: 18,
+                },
+              },
+            ],
           },
         ],
-      }],
-    ]));
+      ]),
+    );
 
     (bridgeRoute as jest.Mock).mockResolvedValue(undefined);
 
@@ -515,36 +700,44 @@ describe('routingCalculator', () => {
       },
     };
 
-    (swapRoute as jest.Mock).mockResolvedValue([swapFundingStep1, swapFundingStep2]);
+    (swapRoute as jest.Mock).mockResolvedValue([
+      swapFundingStep1,
+      swapFundingStep2,
+    ]);
 
-    (createReadOnlyProviders as jest.Mock).mockResolvedValue(new Map([
-      [ChainId.SEPOLIA, {} as JsonRpcProvider],
-      [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
-    ]));
+    (createReadOnlyProviders as jest.Mock).mockResolvedValue(
+      new Map([
+        [ChainId.SEPOLIA, {} as JsonRpcProvider],
+        [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+      ]),
+    );
 
     const routingOptions = await routingCalculator(
       config,
       '0x123',
       balanceRequirements,
       availableRoutingOptions,
+      () => {},
     );
-    expect(routingOptions)
-      .toEqual({
-        type: RoutingOutcomeType.ROUTES_FOUND,
-        fundingRoutes: [{
+    expect(routingOptions).toEqual({
+      type: RoutingOutcomeType.ROUTES_FOUND,
+      fundingRoutes: [
+        {
           priority: 1,
           steps: [swapFundingStep1],
-        }, {
+        },
+        {
           priority: 1,
           steps: [swapFundingStep2],
-        }],
-      });
+        },
+      ],
+    });
   });
 
   it('should return onRamp funding step', async () => {
-    (allowListCheck as jest.Mock).mockImplementation(() => (
-      {
-        onRamp: [{
+    (allowListCheck as jest.Mock).mockImplementation(() => ({
+      onRamp: [
+        {
           name: 'ERC20_1',
           symbol: 'ERC20_1',
           decimals: 18,
@@ -555,10 +748,10 @@ describe('routingCalculator', () => {
           symbol: 'ERC20_2',
           decimals: 18,
           address: '0xERC20_2',
-        }],
-        swap: [],
-      }
-    ));
+        },
+      ],
+      swap: [],
+    }));
 
     const balanceERC20Requirement = {
       type: ItemType.ERC20,
@@ -602,33 +795,38 @@ describe('routingCalculator', () => {
       bridge: false,
     };
 
-    (getAllTokenBalances as jest.Mock).mockResolvedValue(new Map([
-      [ChainId.SEPOLIA, []],
-      [ChainId.IMTBL_ZKEVM_TESTNET, {
-        success: true,
-        balances: [
+    (getAllTokenBalances as jest.Mock).mockResolvedValue(
+      new Map([
+        [ChainId.SEPOLIA, []],
+        [
+          ChainId.IMTBL_ZKEVM_TESTNET,
           {
-            balance: BigNumber.from(10),
-            formattedBalance: '10',
-            token: {
-              name: 'ERC20_2',
-              symbol: 'ERC20_2',
-              decimals: 18,
-              address: '0xERC20_2',
-            },
-          },
-          {
-            balance: BigNumber.from(10),
-            formattedBalance: '10',
-            token: {
-              name: 'IMX',
-              symbol: 'IMX',
-              decimals: 18,
-            },
+            success: true,
+            balances: [
+              {
+                balance: BigNumber.from(10),
+                formattedBalance: '10',
+                token: {
+                  name: 'ERC20_2',
+                  symbol: 'ERC20_2',
+                  decimals: 18,
+                  address: '0xERC20_2',
+                },
+              },
+              {
+                balance: BigNumber.from(10),
+                formattedBalance: '10',
+                token: {
+                  name: 'IMX',
+                  symbol: 'IMX',
+                  decimals: 18,
+                },
+              },
+            ],
           },
         ],
-      }],
-    ]));
+      ]),
+    );
 
     const onRampFundingStep = {
       type: FundingStepType.ONRAMP,
@@ -654,47 +852,49 @@ describe('routingCalculator', () => {
 
     (swapRoute as jest.Mock).mockResolvedValue(undefined);
 
-    (createReadOnlyProviders as jest.Mock).mockResolvedValue(new Map([
-      [ChainId.SEPOLIA, {} as JsonRpcProvider],
-      [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
-    ]));
+    (createReadOnlyProviders as jest.Mock).mockResolvedValue(
+      new Map([
+        [ChainId.SEPOLIA, {} as JsonRpcProvider],
+        [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+      ]),
+    );
 
     const routingOptions = await routingCalculator(
       config,
       '0x123',
       balanceRequirements,
       availableRoutingOptions,
+      () => {},
     );
-    expect(routingOptions)
-      .toEqual({
-        type: RoutingOutcomeType.ROUTES_FOUND,
-        fundingRoutes: [{
+    expect(routingOptions).toEqual({
+      type: RoutingOutcomeType.ROUTES_FOUND,
+      fundingRoutes: [
+        {
           priority: 1,
           steps: [onRampFundingStep],
-        }],
-      });
+        },
+      ],
+    });
   });
 
   it('should return bridge, swap and bridge & swap funding step', async () => {
-    (allowListCheck as jest.Mock).mockImplementation(() => (
-      {
-        onRamp: [],
-        swap: [
-          {
-            name: 'ERC20_1',
-            symbol: 'ERC20_1',
-            decimals: 18,
-            address: '0xERC20_1',
-          },
-          {
-            name: 'ERC20_2',
-            symbol: 'ERC20_2',
-            decimals: 18,
-            address: '0xERC20_2',
-          },
-        ],
-      }
-    ));
+    (allowListCheck as jest.Mock).mockImplementation(() => ({
+      onRamp: [],
+      swap: [
+        {
+          name: 'ERC20_1',
+          symbol: 'ERC20_1',
+          decimals: 18,
+          address: '0xERC20_1',
+        },
+        {
+          name: 'ERC20_2',
+          symbol: 'ERC20_2',
+          decimals: 18,
+          address: '0xERC20_2',
+        },
+      ],
+    }));
 
     const balanceERC20Requirement = {
       type: ItemType.ERC20,
@@ -738,56 +938,64 @@ describe('routingCalculator', () => {
       bridge: true,
     };
 
-    (getAllTokenBalances as jest.Mock).mockResolvedValue(new Map([
-      [ChainId.SEPOLIA, {
-        success: true,
-        balances: [
+    (getAllTokenBalances as jest.Mock).mockResolvedValue(
+      new Map([
+        [
+          ChainId.SEPOLIA,
           {
-            balance: BigNumber.from(10),
-            formattedBalance: '10',
-            token: {
-              name: 'ETH',
-              symbol: 'ETH',
-              decimals: 18,
-            },
-          },
-          {
-            balance: BigNumber.from(10),
-            formattedBalance: '10',
-            token: {
-              name: 'IMX',
-              symbol: 'IMX',
-              decimals: 18,
-              address: '0xIMX',
-            },
-          },
-        ],
-      }],
-      [ChainId.IMTBL_ZKEVM_TESTNET, {
-        success: true,
-        balances: [
-          {
-            balance: BigNumber.from(10),
-            formattedBalance: '10',
-            token: {
-              name: 'ERC20',
-              symbol: 'ERC20',
-              decimals: 18,
-              address: '0xERC20_2',
-            },
-          },
-          {
-            balance: BigNumber.from(10),
-            formattedBalance: '10',
-            token: {
-              name: 'IMX',
-              symbol: 'IMX',
-              decimals: 18,
-            },
+            success: true,
+            balances: [
+              {
+                balance: BigNumber.from(10),
+                formattedBalance: '10',
+                token: {
+                  name: 'ETH',
+                  symbol: 'ETH',
+                  decimals: 18,
+                },
+              },
+              {
+                balance: BigNumber.from(10),
+                formattedBalance: '10',
+                token: {
+                  name: 'IMX',
+                  symbol: 'IMX',
+                  decimals: 18,
+                  address: '0xIMX',
+                },
+              },
+            ],
           },
         ],
-      }],
-    ]));
+        [
+          ChainId.IMTBL_ZKEVM_TESTNET,
+          {
+            success: true,
+            balances: [
+              {
+                balance: BigNumber.from(10),
+                formattedBalance: '10',
+                token: {
+                  name: 'ERC20',
+                  symbol: 'ERC20',
+                  decimals: 18,
+                  address: '0xERC20_2',
+                },
+              },
+              {
+                balance: BigNumber.from(10),
+                formattedBalance: '10',
+                token: {
+                  name: 'IMX',
+                  symbol: 'IMX',
+                  decimals: 18,
+                },
+              },
+            ],
+          },
+        ],
+      ]),
+    );
 
     const bridgeFundingStep = {
       type: FundingStepType.BRIDGE,
@@ -819,11 +1027,13 @@ describe('routingCalculator', () => {
           amount: BigNumber.from(0),
           formattedAmount: '0',
         },
-        bridgeFees: [{
-          type: FeeType.BRIDGE_FEE,
-          amount: BigNumber.from(0),
-          formattedAmount: '0',
-        }],
+        bridgeFees: [
+          {
+            type: FeeType.BRIDGE_FEE,
+            amount: BigNumber.from(0),
+            formattedAmount: '0',
+          },
+        ],
       },
     };
     (bridgeRoute as jest.Mock).mockResolvedValue(bridgeFundingStep);
@@ -900,38 +1110,37 @@ describe('routingCalculator', () => {
       },
     ]);
 
-    (createReadOnlyProviders as jest.Mock).mockResolvedValue(new Map([
-      [ChainId.SEPOLIA, {} as JsonRpcProvider],
-      [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
-    ]));
+    (createReadOnlyProviders as jest.Mock).mockResolvedValue(
+      new Map([
+        [ChainId.SEPOLIA, {} as JsonRpcProvider],
+        [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+      ]),
+    );
 
     const routingOptions = await routingCalculator(
       config,
       '0x123',
       balanceRequirements,
       availableRoutingOptions,
+      () => {},
     );
-    expect(routingOptions)
-      .toEqual({
-        type: RoutingOutcomeType.ROUTES_FOUND,
-        fundingRoutes: [
-          {
-            priority: 1,
-            steps: [swapFundingStep],
-          },
-          {
-            priority: 2,
-            steps: [bridgeFundingStep],
-          },
-          {
-            priority: 3,
-            steps: [
-              bridgeImxFundingStep,
-              swapImxFundingStep,
-            ],
-          },
-        ],
-      });
+    expect(routingOptions).toEqual({
+      type: RoutingOutcomeType.ROUTES_FOUND,
+      fundingRoutes: [
+        {
+          priority: 1,
+          steps: [swapFundingStep],
+        },
+        {
+          priority: 2,
+          steps: [bridgeFundingStep],
+        },
+        {
+          priority: 3,
+          steps: [bridgeImxFundingStep, swapImxFundingStep],
+        },
+      ],
+    });
   });
 
   it('should not recommend bridge or swap if multiple insufficient ERC20 requirements', async () => {
@@ -979,14 +1188,16 @@ describe('routingCalculator', () => {
 
     (allowListCheck as jest.Mock).mockResolvedValue(availableRoutingOptions);
 
-    (getAllTokenBalances as jest.Mock).mockResolvedValue(new Map([
-      [ChainId.SEPOLIA, []],
-    ]));
+    (getAllTokenBalances as jest.Mock).mockResolvedValue(
+      new Map([[ChainId.SEPOLIA, []]]),
+    );
 
-    (createReadOnlyProviders as jest.Mock).mockResolvedValue(new Map([
-      [ChainId.SEPOLIA, {} as JsonRpcProvider],
-      [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
-    ]));
+    (createReadOnlyProviders as jest.Mock).mockResolvedValue(
+      new Map([
+        [ChainId.SEPOLIA, {} as JsonRpcProvider],
+        [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+      ]),
+    );
 
     (bridgeRoute as jest.Mock).mockResolvedValue({
       type: FundingStepType.BRIDGE,
@@ -1007,12 +1218,13 @@ describe('routingCalculator', () => {
       '0x123',
       balanceRequirements,
       availableRoutingOptions,
+      () => {},
     );
-    expect(routingOptions)
-      .toEqual({
-        type: RoutingOutcomeType.NO_ROUTES_FOUND,
-        message: 'Smart Checkout did not find any funding routes to fulfill the transaction',
-      });
+    expect(routingOptions).toEqual({
+      type: RoutingOutcomeType.NO_ROUTES_FOUND,
+      message:
+        'Smart Checkout did not find any funding routes to fulfill the transaction',
+    });
   });
 
   it('should return no routes', async () => {
@@ -1029,14 +1241,16 @@ describe('routingCalculator', () => {
 
     (allowListCheck as jest.Mock).mockResolvedValue(availableRoutingOptions);
 
-    (getAllTokenBalances as jest.Mock).mockResolvedValue(new Map([
-      [ChainId.SEPOLIA, []],
-    ]));
+    (getAllTokenBalances as jest.Mock).mockResolvedValue(
+      new Map([[ChainId.SEPOLIA, []]]),
+    );
 
-    (createReadOnlyProviders as jest.Mock).mockResolvedValue(new Map([
-      [ChainId.SEPOLIA, {} as JsonRpcProvider],
-      [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
-    ]));
+    (createReadOnlyProviders as jest.Mock).mockResolvedValue(
+      new Map([
+        [ChainId.SEPOLIA, {} as JsonRpcProvider],
+        [ChainId.IMTBL_ZKEVM_TESTNET, {} as JsonRpcProvider],
+      ]),
+    );
 
     (bridgeRoute as jest.Mock).mockResolvedValue(undefined);
 
@@ -1045,12 +1259,13 @@ describe('routingCalculator', () => {
       '0x123',
       balanceRequirements,
       availableRoutingOptions,
+      () => {},
     );
-    expect(routingOptions)
-      .toEqual({
-        type: RoutingOutcomeType.NO_ROUTES_FOUND,
-        message: 'Smart Checkout did not find any funding routes to fulfill the transaction',
-      });
+    expect(routingOptions).toEqual({
+      type: RoutingOutcomeType.NO_ROUTES_FOUND,
+      message:
+        'Smart Checkout did not find any funding routes to fulfill the transaction',
+    });
   });
 
   it('should error if call to read only provider errors', async () => {
@@ -1096,9 +1311,9 @@ describe('routingCalculator', () => {
       bridge: true,
     };
 
-    (getAllTokenBalances as jest.Mock).mockResolvedValue(new Map([
-      [ChainId.SEPOLIA, []],
-    ]));
+    (getAllTokenBalances as jest.Mock).mockResolvedValue(
+      new Map([[ChainId.SEPOLIA, []]]),
+    );
 
     (bridgeRoute as jest.Mock).mockResolvedValue({
       type: FundingStepType.BRIDGE,
@@ -1114,7 +1329,9 @@ describe('routingCalculator', () => {
       },
     });
 
-    (createReadOnlyProviders as jest.Mock).mockRejectedValue(new Error('Error from create readonly providers'));
+    (createReadOnlyProviders as jest.Mock).mockRejectedValue(
+      new Error('Error from create readonly providers'),
+    );
 
     let type;
     let data;
@@ -1125,6 +1342,7 @@ describe('routingCalculator', () => {
         '0x123',
         balanceRequirements,
         availableRoutingOptions,
+        () => {},
       );
     } catch (err: any) {
       type = err.type;
@@ -1192,30 +1410,33 @@ describe('routingCalculator', () => {
       } as BalanceRequirement;
 
       const balances = new Map<ChainId, TokenBalanceResult>([
-        [ChainId.IMTBL_ZKEVM_TESTNET, {
-          success: true,
-          balances: [
-            {
-              balance: BigNumber.from(10),
-              formattedBalance: '10',
-              token: {
-                name: 'ERC20',
-                symbol: 'ERC20',
-                decimals: 18,
-                address: '0xERC20_2',
+        [
+          ChainId.IMTBL_ZKEVM_TESTNET,
+          {
+            success: true,
+            balances: [
+              {
+                balance: BigNumber.from(10),
+                formattedBalance: '10',
+                token: {
+                  name: 'ERC20',
+                  symbol: 'ERC20',
+                  decimals: 18,
+                  address: '0xERC20_2',
+                },
               },
-            },
-            {
-              balance: BigNumber.from(10),
-              formattedBalance: '10',
-              token: {
-                name: 'IMX',
-                symbol: 'IMX',
-                decimals: 18,
+              {
+                balance: BigNumber.from(10),
+                formattedBalance: '10',
+                token: {
+                  name: 'IMX',
+                  symbol: 'IMX',
+                  decimals: 18,
+                },
               },
-            },
-          ],
-        }],
+            ],
+          },
+        ],
       ]);
 
       const swapFundingSteps = await getSwapFundingSteps(
@@ -1249,30 +1470,33 @@ describe('routingCalculator', () => {
 
     it('should return empty array if the insufficient requirement is undefined', async () => {
       const balances = new Map<ChainId, TokenBalanceResult>([
-        [ChainId.IMTBL_ZKEVM_TESTNET, {
-          success: true,
-          balances: [
-            {
-              balance: BigNumber.from(10),
-              formattedBalance: '10',
-              token: {
-                name: 'ERC20',
-                symbol: 'ERC20',
-                decimals: 18,
-                address: '0xERC20_2',
+        [
+          ChainId.IMTBL_ZKEVM_TESTNET,
+          {
+            success: true,
+            balances: [
+              {
+                balance: BigNumber.from(10),
+                formattedBalance: '10',
+                token: {
+                  name: 'ERC20',
+                  symbol: 'ERC20',
+                  decimals: 18,
+                  address: '0xERC20_2',
+                },
               },
-            },
-            {
-              balance: BigNumber.from(10),
-              formattedBalance: '10',
-              token: {
-                name: 'IMX',
-                symbol: 'IMX',
-                decimals: 18,
+              {
+                balance: BigNumber.from(10),
+                formattedBalance: '10',
+                token: {
+                  name: 'IMX',
+                  symbol: 'IMX',
+                  decimals: 18,
+                },
               },
-            },
-          ],
-        }],
+            ],
+          },
+        ],
       ]);
 
       const swapFundingSteps = await getSwapFundingSteps(
@@ -1337,30 +1561,33 @@ describe('routingCalculator', () => {
       } as BalanceRequirement;
 
       const balances = new Map<ChainId, TokenBalanceResult>([
-        [ChainId.SEPOLIA, {
-          success: true,
-          balances: [
-            {
-              balance: BigNumber.from(10),
-              formattedBalance: '10',
-              token: {
-                name: 'ERC20',
-                symbol: 'ERC20',
-                decimals: 18,
-                address: '0xERC20_2',
+        [
+          ChainId.SEPOLIA,
+          {
+            success: true,
+            balances: [
+              {
+                balance: BigNumber.from(10),
+                formattedBalance: '10',
+                token: {
+                  name: 'ERC20',
+                  symbol: 'ERC20',
+                  decimals: 18,
+                  address: '0xERC20_2',
+                },
               },
-            },
-            {
-              balance: BigNumber.from(10),
-              formattedBalance: '10',
-              token: {
-                name: 'IMX',
-                symbol: 'IMX',
-                decimals: 18,
+              {
+                balance: BigNumber.from(10),
+                formattedBalance: '10',
+                token: {
+                  name: 'IMX',
+                  symbol: 'IMX',
+                  decimals: 18,
+                },
               },
-            },
-          ],
-        }],
+            ],
+          },
+        ],
       ]);
 
       const swapFundingSteps = await getSwapFundingSteps(
@@ -1425,31 +1652,37 @@ describe('routingCalculator', () => {
       } as BalanceRequirement;
 
       const balances = new Map<ChainId, TokenBalanceResult>([
-        [ChainId.IMTBL_ZKEVM_TESTNET, {
-          error: new CheckoutError('Error', CheckoutErrorType.GET_BALANCE_ERROR),
-          success: true,
-          balances: [
-            {
-              balance: BigNumber.from(10),
-              formattedBalance: '10',
-              token: {
-                name: 'ERC20',
-                symbol: 'ERC20',
-                decimals: 18,
-                address: '0xERC20_2',
+        [
+          ChainId.IMTBL_ZKEVM_TESTNET,
+          {
+            error: new CheckoutError(
+              'Error',
+              CheckoutErrorType.GET_BALANCE_ERROR,
+            ),
+            success: true,
+            balances: [
+              {
+                balance: BigNumber.from(10),
+                formattedBalance: '10',
+                token: {
+                  name: 'ERC20',
+                  symbol: 'ERC20',
+                  decimals: 18,
+                  address: '0xERC20_2',
+                },
               },
-            },
-            {
-              balance: BigNumber.from(10),
-              formattedBalance: '10',
-              token: {
-                name: 'IMX',
-                symbol: 'IMX',
-                decimals: 18,
+              {
+                balance: BigNumber.from(10),
+                formattedBalance: '10',
+                token: {
+                  name: 'IMX',
+                  symbol: 'IMX',
+                  decimals: 18,
+                },
               },
-            },
-          ],
-        }],
+            ],
+          },
+        ],
       ]);
 
       const swapFundingSteps = await getSwapFundingSteps(
@@ -1514,30 +1747,33 @@ describe('routingCalculator', () => {
       } as BalanceRequirement;
 
       const balances = new Map<ChainId, TokenBalanceResult>([
-        [ChainId.IMTBL_ZKEVM_TESTNET, {
-          success: false,
-          balances: [
-            {
-              balance: BigNumber.from(10),
-              formattedBalance: '10',
-              token: {
-                name: 'ERC20',
-                symbol: 'ERC20',
-                decimals: 18,
-                address: '0xERC20_2',
+        [
+          ChainId.IMTBL_ZKEVM_TESTNET,
+          {
+            success: false,
+            balances: [
+              {
+                balance: BigNumber.from(10),
+                formattedBalance: '10',
+                token: {
+                  name: 'ERC20',
+                  symbol: 'ERC20',
+                  decimals: 18,
+                  address: '0xERC20_2',
+                },
               },
-            },
-            {
-              balance: BigNumber.from(10),
-              formattedBalance: '10',
-              token: {
-                name: 'IMX',
-                symbol: 'IMX',
-                decimals: 18,
+              {
+                balance: BigNumber.from(10),
+                formattedBalance: '10',
+                token: {
+                  name: 'IMX',
+                  symbol: 'IMX',
+                  decimals: 18,
+                },
               },
-            },
-          ],
-        }],
+            ],
+          },
+        ],
       ]);
 
       const swapFundingSteps = await getSwapFundingSteps(
@@ -1617,30 +1853,33 @@ describe('routingCalculator', () => {
       } as BalanceRequirement;
 
       const balances = new Map<ChainId, TokenBalanceResult>([
-        [ChainId.IMTBL_ZKEVM_TESTNET, {
-          success: true,
-          balances: [
-            {
-              balance: BigNumber.from(10),
-              formattedBalance: '10',
-              token: {
-                name: 'ERC20',
-                symbol: 'ERC20',
-                decimals: 18,
-                address: '0xERC20_2',
+        [
+          ChainId.IMTBL_ZKEVM_TESTNET,
+          {
+            success: true,
+            balances: [
+              {
+                balance: BigNumber.from(10),
+                formattedBalance: '10',
+                token: {
+                  name: 'ERC20',
+                  symbol: 'ERC20',
+                  decimals: 18,
+                  address: '0xERC20_2',
+                },
               },
-            },
-            {
-              balance: BigNumber.from(10),
-              formattedBalance: '10',
-              token: {
-                name: 'IMX',
-                symbol: 'IMX',
-                decimals: 18,
+              {
+                balance: BigNumber.from(10),
+                formattedBalance: '10',
+                token: {
+                  name: 'IMX',
+                  symbol: 'IMX',
+                  decimals: 18,
+                },
               },
-            },
-          ],
-        }],
+            ],
+          },
+        ],
       ]);
 
       const swapFundingSteps = await getSwapFundingSteps(
@@ -1754,12 +1993,14 @@ describe('routingCalculator', () => {
           decimals: 18,
         },
       ],
-      swap: [{
-        name: 'ERC20_2',
-        symbol: 'ERC20_2',
-        decimals: 18,
-        address: '0xERC20_2',
-      }],
+      swap: [
+        {
+          name: 'ERC20_2',
+          symbol: 'ERC20_2',
+          decimals: 18,
+          address: '0xERC20_2',
+        },
+      ],
     };
 
     const balanceRequirements: BalanceCheckResult = {
@@ -1796,14 +2037,11 @@ describe('routingCalculator', () => {
     });
 
     it('should not get bridge and swap funding step if l1 balances error', async () => {
-      tokenBalances.set(
-        ChainId.SEPOLIA,
-        {
-          success: true,
-          error: new CheckoutError('error', CheckoutErrorType.GET_BALANCE_ERROR),
-          balances: [],
-        },
-      );
+      tokenBalances.set(ChainId.SEPOLIA, {
+        success: true,
+        error: new CheckoutError('error', CheckoutErrorType.GET_BALANCE_ERROR),
+        balances: [],
+      });
       const result = await getBridgeAndSwapFundingSteps(
         config,
         readonlyProviders,
@@ -1818,13 +2056,10 @@ describe('routingCalculator', () => {
     });
 
     it('should not get bridge and swap funding step if l1 balances success false', async () => {
-      tokenBalances.set(
-        ChainId.SEPOLIA,
-        {
-          success: false,
-          balances: [],
-        },
-      );
+      tokenBalances.set(ChainId.SEPOLIA, {
+        success: false,
+        balances: [],
+      });
       const result = await getBridgeAndSwapFundingSteps(
         config,
         readonlyProviders,
@@ -1855,14 +2090,11 @@ describe('routingCalculator', () => {
 
     it('should not get bridge and swap funding step if l2 balances error', async () => {
       tokenBalances.set(ChainId.SEPOLIA, l1balances);
-      tokenBalances.set(
-        ChainId.IMTBL_ZKEVM_TESTNET,
-        {
-          success: true,
-          error: new CheckoutError('error', CheckoutErrorType.GET_BALANCE_ERROR),
-          balances: [],
-        },
-      );
+      tokenBalances.set(ChainId.IMTBL_ZKEVM_TESTNET, {
+        success: true,
+        error: new CheckoutError('error', CheckoutErrorType.GET_BALANCE_ERROR),
+        balances: [],
+      });
       const result = await getBridgeAndSwapFundingSteps(
         config,
         readonlyProviders,
@@ -1878,13 +2110,10 @@ describe('routingCalculator', () => {
 
     it('should not get bridge and swap funding step if l2 balances success false', async () => {
       tokenBalances.set(ChainId.SEPOLIA, l1balances);
-      tokenBalances.set(
-        ChainId.IMTBL_ZKEVM_TESTNET,
-        {
-          success: false,
-          balances: [],
-        },
-      );
+      tokenBalances.set(ChainId.IMTBL_ZKEVM_TESTNET, {
+        success: false,
+        balances: [],
+      });
       const result = await getBridgeAndSwapFundingSteps(
         config,
         readonlyProviders,
@@ -1978,13 +2207,12 @@ describe('routingCalculator', () => {
         tokenAllowList,
         balanceRequirements,
       );
-      expect(result)
-        .toEqual([
-          {
-            bridgeFundingStep,
-            swapFundingStep,
-          },
-        ]);
+      expect(result).toEqual([
+        {
+          bridgeFundingStep,
+          swapFundingStep,
+        },
+      ]);
       expect(bridgeAndSwapRoute).toBeCalledWith(
         config,
         readonlyProviders,
