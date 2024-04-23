@@ -13,9 +13,9 @@ export type TransakNFTCheckoutParams = {
   cryptoCurrencyCode: string;
   estimatedGasLimit: number;
   exchangeScreenTitle: string;
+  walletAddress: string;
+  email: string;
   partnerOrderId?: string;
-  walletAddress?: string;
-  email?: string;
 };
 
 type UseTransakIframeProps = {

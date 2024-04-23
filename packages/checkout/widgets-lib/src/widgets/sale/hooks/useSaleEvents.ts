@@ -23,7 +23,6 @@ export const useSaleEvent = () => {
   const { track, page } = useAnalytics();
   const {
     recipientAddress: userId,
-    recipientEmail: email,
     signResponse,
     paymentMethod,
   } = useSaleContext();
@@ -36,7 +35,6 @@ export const useSaleEvent = () => {
     userJourney: UserJourney.SALE,
   };
   const userProps = {
-    email,
     userId,
     paymentMethod,
   };
