@@ -70,7 +70,11 @@ export default class ConfirmationScreen {
             break;
           }
           case ReceiveMessage.TRANSACTION_ERROR: {
-            reject(new Error('Transaction error'));
+            reject(new Error('Error during transaction confirmation'));
+            break;
+          }
+          case ReceiveMessage.TRANSACTION_REJECTED: {
+            reject(new Error('User rejected transaction'));
             break;
           }
           default:
@@ -116,8 +120,12 @@ export default class ConfirmationScreen {
             resolve({ confirmed: true });
             break;
           }
+          case ReceiveMessage.MESSAGE_ERROR: {
+            reject(new Error('Error during message confirmation'));
+            break;
+          }
           case ReceiveMessage.MESSAGE_REJECTED: {
-            reject(new Error('Message rejected'));
+            reject(new Error('User rejected message'));
             break;
           }
 
