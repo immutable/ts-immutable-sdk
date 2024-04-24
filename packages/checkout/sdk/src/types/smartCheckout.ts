@@ -341,7 +341,7 @@ export interface SmartCheckoutParams {
   transactionOrGasAmount?: FulfillmentTransaction | GasAmount;
   /** The overrides for funding routes to consider */
   routingOptions?: AvailableRoutingOptions;
-  /** The callback to be execured once all funding routes are found */
+  /** The callback to be executed once all funding routes are found */
   onComplete?: (result: SmartCheckoutResult) => void;
   /** The callback to be executed on each funding route found */
   onFundingRoute?: (fundingRoute: FundingRoute) => void;
