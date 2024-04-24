@@ -161,33 +161,6 @@ export default class ConfirmationScreen {
     this.confirmationWindow?.close();
   }
 
-  logout(): Promise<{ logout: boolean }> {
-    return new Promise((resolve, rejects) => {
-      const iframe = document.createElement('iframe');
-      iframe.setAttribute('id', CONFIRMATION_IFRAME_ID);
-      iframe.setAttribute('src', this.getHref('logout'));
-      iframe.setAttribute('style', CONFIRMATION_IFRAME_STYLE);
-      const logoutHandler = ({ data, origin }: MessageEvent) => {
-        if (
-          origin !== this.config.passportDomain
-          || data.eventType !== PASSPORT_EVENT_TYPE
-        ) {
-          return;
-        }
-        window.removeEventListener('message', logoutHandler);
-        iframe.remove();
-
-        if (data.messageType === ReceiveMessage.LOGOUT_SUCCESS) {
-          resolve({ logout: true });
-        }
-        rejects(new Error('Unsupported logout type'));
-      };
-
-      window.addEventListener('message', logoutHandler);
-      document.body.appendChild(iframe);
-    });
-  }
-
   showConfirmationScreen(href: string, messageHandler: MessageHandler, resolve: Function) {
     this.confirmationWindow!.location.href = href;
     // https://stackoverflow.com/questions/9388380/capture-the-close-event-of-popup-window-in-javascript/48240128#48240128
