@@ -10,21 +10,23 @@ type SelectCoinDropdownProps = {
   conversions: Map<string, number>;
   canOpen: boolean;
   onClick: () => void;
+  onProceed: (balance: FundingBalance) => void;
   loading?: boolean;
   priceDisplay?: boolean;
 };
 
 export function SelectCoinDropdown({
-  balance: currency,
+  balance,
   conversions,
   canOpen,
   onClick,
+  onProceed,
   loading,
   priceDisplay,
 }: SelectCoinDropdownProps) {
   const { t } = useTranslation();
 
-  const { token, userBalance, fundsRequired } = currency.fundingItem;
+  const { token, userBalance, fundsRequired } = balance.fundingItem;
 
   const fiatAmount = calculateCryptoToFiat(
     userBalance.formattedBalance,
@@ -80,7 +82,7 @@ export function SelectCoinDropdown({
         )}
         {!canOpen && loading && <ShimmerCircle radius="base.icon.size.400" />}
       </MenuItem>
-      <Button size="large">
+      <Button size="large" onClick={() => onProceed(balance)}>
         {t('views.ORDER_SUMMARY.orderReview.continue')}
       </Button>
     </Stack>

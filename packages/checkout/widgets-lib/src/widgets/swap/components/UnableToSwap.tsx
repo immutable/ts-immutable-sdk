@@ -22,7 +22,7 @@ export function UnableToSwap({ visible, onCloseDrawer }: UnableToSwapProps) {
   return (
     <Drawer
       size="full"
-      onCloseDrawer={onCloseDrawer}
+      onCloseDrawer={visible ? onCloseDrawer : undefined}
       visible={visible}
       showHeaderBar={false}
     >

@@ -41,6 +41,13 @@ export const useClientConfig = ({
   ConfigError | undefined
   >(undefined);
 
+  const setCurrencyByName = (name: string) => {
+    const currency = clientConfig.currencies.find((c) => c.name === name);
+    if (currency) {
+      setSelectedCurrency(currency);
+    }
+  };
+
   useEffect(() => {
     if (!environment || !environmentId || !amount) return;
 
@@ -77,7 +84,9 @@ export const useClientConfig = ({
   useEffect(() => {
     if (clientConfig.currencies.length === 0) return;
 
-    const defaultSelectedCurrency = clientConfig.currencies.find((c) => c.name === defaultCurrency)
+    const defaultSelectedCurrency = clientConfig.currencies.find(
+      (c) => c.name.toLowerCase() === defaultCurrency.toLocaleLowerCase(),
+    )
       || clientConfig.currencies.find((c) => c.base)
       || clientConfig.currencies?.[0];
     setSelectedCurrency(defaultSelectedCurrency);
@@ -87,5 +96,6 @@ export const useClientConfig = ({
     clientConfig,
     selectedCurrency,
     clientConfigError,
+    setSelectedCurrency: setCurrencyByName,
   };
 };

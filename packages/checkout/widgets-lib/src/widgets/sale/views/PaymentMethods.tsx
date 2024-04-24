@@ -56,7 +56,7 @@ export function PaymentMethods() {
       paymentMethod
       && [SalePaymentTypes.DEBIT, SalePaymentTypes.CREDIT].includes(paymentMethod)
     ) {
-      sign(SignPaymentTypes.FIAT, () => {
+      sign(SignPaymentTypes.FIAT, undefined, () => {
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,

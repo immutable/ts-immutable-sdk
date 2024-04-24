@@ -20,6 +20,7 @@ type OrderReviewProps = {
   items: SaleItem[];
   onBackButtonClick: () => void;
   onPayWithCard?: () => void;
+  onProceedToBuy: (fundingBalance: FundingBalance) => void;
 };
 
 export function OrderReview({
@@ -30,6 +31,7 @@ export function OrderReview({
   loadingBalances,
   onBackButtonClick,
   onPayWithCard,
+  onProceedToBuy,
 }: OrderReviewProps) {
   const {
     eventTargetState: { eventTarget },
@@ -96,6 +98,7 @@ export function OrderReview({
       </Box>
       <SelectCoinDropdown
         onClick={openDrawer}
+        onProceed={onProceedToBuy}
         balance={fundingBalances[selectedCurrencyIndex]}
         conversions={conversions}
         canOpen={fundingBalances.length > 1}

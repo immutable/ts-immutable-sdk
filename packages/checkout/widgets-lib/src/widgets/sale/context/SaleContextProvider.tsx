@@ -59,6 +59,7 @@ type SaleContextProps = {
 type SaleContextValues = SaleContextProps & {
   sign: (
     paymentType: SignPaymentTypes,
+    tokenAddress?: string,
     callback?: (response: SignResponse | undefined) => void
   ) => Promise<SignResponse | undefined>;
   execute: (
@@ -93,6 +94,7 @@ type SaleContextValues = SaleContextProps & {
   clientConfig: ClientConfig;
   signTokenIds: string[];
   selectedCurrency: ClientConfigCurrency | undefined;
+  setSelectedCurrency: (name: string) => void;
 };
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -131,6 +133,7 @@ const SaleContext = createContext<SaleContextValues>({
   excludePaymentTypes: [],
   multicurrency: false,
   selectedCurrency: undefined,
+  setSelectedCurrency: () => {},
 });
 
 SaleContext.displayName = 'SaleSaleContext';
@@ -184,7 +187,12 @@ export function SaleContextProvider(props: {
 
   const [invalidParameters, setInvalidParameters] = useState<boolean>(false);
 
-  const { selectedCurrency, clientConfig, clientConfigError } = useClientConfig({
+  const {
+    selectedCurrency,
+    clientConfig,
+    clientConfigError,
+    setSelectedCurrency,
+  } = useClientConfig({
     amount,
     environmentId,
     environment: config.environment,
@@ -239,15 +247,17 @@ export function SaleContextProvider(props: {
   const sign = useCallback(
     async (
       type: SignPaymentTypes,
+      tokenAddress?: string,
       callback?: (r?: SignResponse) => void,
     ): Promise<SignResponse | undefined> => {
-      const invalidFromTokenAddress = !fromTokenAddress || !fromTokenAddress.startsWith('0x');
+      const selectedTokenAddress = tokenAddress || fromTokenAddress;
+      const invalidFromTokenAddress = !selectedTokenAddress || !selectedTokenAddress.startsWith('0x');
       if (invalidFromTokenAddress) {
         setInvalidParameters(true);
         return undefined;
       }
 
-      const response = await signOrder(type, fromTokenAddress);
+      const response = await signOrder(type, selectedTokenAddress);
       if (!response) return undefined;
 
       callback?.(response);
@@ -406,6 +416,7 @@ export function SaleContextProvider(props: {
       excludePaymentTypes,
       multicurrency,
       selectedCurrency,
+      setSelectedCurrency,
     }),
     [
       config,
@@ -438,6 +449,7 @@ export function SaleContextProvider(props: {
       excludePaymentTypes,
       multicurrency,
       selectedCurrency,
+      setSelectedCurrency,
     ],
   );
 

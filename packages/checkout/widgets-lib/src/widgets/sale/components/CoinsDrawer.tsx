@@ -49,49 +49,67 @@ export function CoinsDrawer({
           <motion.div variants={listVariants} initial="hidden" animate="show" />
         }
       >
-        <Box sx={{ padding: 'base.spacing.x4' }}>
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              mb: 'base.spacing.x4',
-            }}
-          >
-            <Caption size="small">
-              {t('views.ORDER_SUMMARY.coinsDrawer.caption1')}
-            </Caption>
-            <Caption size="small">
-              {t('views.ORDER_SUMMARY.coinsDrawer.caption2')}
-            </Caption>
-          </Box>
-          {balances.map((balance: FundingBalance, idx: number) => (
-            <CoinsDrawerItem
-              key={`${balance.fundingItem.token.symbol}-${balance.type}`}
-              onClick={handleOnclick(idx)}
-              balance={balance}
-              selected={selectedIndex === idx}
-              conversions={conversions}
-              rc={<motion.div variants={listItemVariants} custom={idx} />}
-            />
-          ))}
-          {loading && (
-            <motion.div
-              variants={listItemVariants}
-              custom={balances.length}
-              key="funding-balance-item-shimmer"
+        <Box
+          sx={{
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            px: 'base.spacing.x4',
+          }}
+        >
+          <Box>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                mb: 'base.spacing.x4',
+              }}
             >
-              <MenuItem
-                shimmer
-                emphasized
-                testId="funding-balance-item-shimmer"
+              <Caption size="small">
+                {t('views.ORDER_SUMMARY.coinsDrawer.caption1')}
+              </Caption>
+              <Caption size="small">
+                {t('views.ORDER_SUMMARY.coinsDrawer.caption2')}
+              </Caption>
+            </Box>
+            {balances.map((balance: FundingBalance, idx: number) => (
+              <CoinsDrawerItem
+                key={`${balance.fundingItem.token.symbol}-${balance.type}`}
+                onClick={handleOnclick(idx)}
+                balance={balance}
+                selected={selectedIndex === idx}
+                conversions={conversions}
+                rc={<motion.div variants={listItemVariants} custom={idx} />}
               />
-            </motion.div>
-          )}
+            ))}
+            {loading && (
+              <motion.div
+                variants={listItemVariants}
+                custom={balances.length}
+                key="funding-balance-item-shimmer"
+              >
+                <MenuItem
+                  shimmer
+                  emphasized
+                  testId="funding-balance-item-shimmer"
+                />
+              </motion.div>
+            )}
+          </Box>
           {onPayWithCard && (
-            <>
+            <Box
+              sx={{ pb: 'base.spacing.x4' }}
+              rc={(
+                <motion.div
+                  variants={listItemVariants}
+                  custom={balances.length + (loading ? 1 : 0)}
+                />
+              )}
+            >
               <Divider
                 size="small"
-                rc={<Caption weight="bold" />}
+                rc={<Caption />}
                 sx={{ my: 'base.spacing.x4' }}
               >
                 {t('views.ORDER_SUMMARY.coinsDrawer.divider')}
@@ -103,14 +121,8 @@ export function CoinsDrawer({
                 caption={t(
                   'views.ORDER_SUMMARY.coinsDrawer.payWithCard.caption',
                 )}
-                rc={(
-                  <motion.div
-                    variants={listItemVariants}
-                    custom={balances.length + (loading ? 1 : 0)}
-                  />
-                )}
               />
-            </>
+            </Box>
           )}
         </Box>
       </Drawer.Content>

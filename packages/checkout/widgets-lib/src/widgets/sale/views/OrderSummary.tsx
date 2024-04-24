@@ -20,7 +20,13 @@ import {
 import { OrderReview } from '../components/OrderReview';
 import { useFundingBalances } from '../hooks/useFundingBalances';
 import { getTopUpViewData } from '../functions/getTopUpViewData';
-import { SaleErrorTypes } from '../types';
+import {
+  FundingBalance,
+  FundingBalanceType,
+  SaleErrorTypes,
+  SignPaymentTypes,
+} from '../types';
+import { FundingRouteExecute } from '../components/FundingRouteExecute/FundingRouteExecute';
 
 type OrderSummaryProps = {
   subView: OrderSummarySubViews;
@@ -35,14 +41,58 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
     disabledPaymentTypes,
     goToErrorView,
     goBackToPaymentMethods,
+    sign,
+    selectedCurrency,
   } = useSaleContext();
 
-  const { viewDispatch } = useContext(ViewContext);
+  const { viewDispatch, viewState } = useContext(ViewContext);
   const { cryptoFiatDispatch, cryptoFiatState } = useContext(CryptoFiatContext);
 
   const onPayWithCard = disabledPaymentTypes.includes(SalePaymentTypes.DEBIT)
     ? undefined
     : () => goBackToPaymentMethods(SalePaymentTypes.DEBIT);
+
+  const signAndProceed = (tokenAddress?: string) => {
+    sign(SignPaymentTypes.CRYPTO, tokenAddress);
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: SaleWidgetViews.PAY_WITH_COINS,
+        },
+      },
+    });
+  };
+
+  const onFundingRouteExecuted = () => {
+    signAndProceed(selectedCurrency?.address);
+  };
+
+  const onProceedToBuy = (fundingBalance: FundingBalance) => {
+    const {
+      type,
+      fundingItem: { token },
+    } = fundingBalance;
+
+    if (type === FundingBalanceType.SUFFICIENT) {
+      signAndProceed(token.address);
+      return;
+    }
+
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: SaleWidgetViews.ORDER_SUMMARY,
+          subView: OrderSummarySubViews.EXECUTE_FUNDING_ROUTE,
+          data: {
+            fundingBalance,
+            onFundingRouteExecuted,
+          },
+        },
+      },
+    });
+  };
 
   const {
     fundingBalances,
@@ -138,6 +188,13 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
           items={items}
           onBackButtonClick={goBackToPaymentMethods}
           onPayWithCard={onPayWithCard}
+          onProceedToBuy={onProceedToBuy}
+        />
+      )}
+      {subView === OrderSummarySubViews.EXECUTE_FUNDING_ROUTE && (
+        <FundingRouteExecute
+          fundingRouteStep={viewState.view.data.fundingBalance}
+          onFundingRouteExecuted={onFundingRouteExecuted}
         />
       )}
     </Box>
