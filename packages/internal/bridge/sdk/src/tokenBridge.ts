@@ -1003,7 +1003,7 @@ export class TokenBridge {
       defaultAbiCoder.encode(['bytes', 'uint256'], [payload, new Date().getTime()]),
     );
     const sourceChain = this.getChildchain(destinationChainId);
-    const sourceAddress = this.getChildAdaptor(destinationChainId);
+    const sourceAddress = ethers.utils.getAddress(this.getChildAdaptor(destinationChainId)).toString();
     const destinationAddress = this.getRootAdaptor(destinationChainId);
     const payloadHash = keccak256(payload);
     // Calculate slot key for given command ID.
