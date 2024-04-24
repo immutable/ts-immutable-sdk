@@ -141,10 +141,12 @@ export const getRequiredToken = (
   switch (balanceRequirement.type) {
     case ItemType.ERC20:
       address = balanceRequirement.required.token.address!;
-      amount = balanceRequirement.delta.balance;
+      amount = balanceRequirement.delta.balance.isNegative()
+        ? balanceRequirement.required.balance : balanceRequirement.delta.balance;
       break;
     case ItemType.NATIVE:
-      amount = balanceRequirement.delta.balance;
+      amount = balanceRequirement.delta.balance.isNegative()
+        ? balanceRequirement.required.balance : balanceRequirement.delta.balance;
       break;
     default: break;
   }
