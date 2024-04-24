@@ -250,7 +250,7 @@ describe('smartCheckout', () => {
       });
     });
 
-    it('should invoke onComplete callback with sufficient checkout', (done) => {
+    it('should invoke onComplete callback once funding routes are returned', (done) => {
       (hasERC20Allowances as jest.Mock).mockResolvedValue({
         sufficient: true,
         allowances: [],
@@ -452,96 +452,6 @@ describe('smartCheckout', () => {
         undefined,
         mockOnComplete,
       );
-    });
-
-    it('should invoke onComplete callback with insufficient checkout', async () => {
-      (hasERC20Allowances as jest.Mock).mockResolvedValue({
-        sufficient: true,
-        allowances: [],
-      });
-
-      (hasERC721Allowances as jest.Mock).mockResolvedValue({
-        sufficient: true,
-        allowances: [],
-      });
-
-      (gasCalculator as jest.Mock).mockResolvedValue(null);
-
-      (balanceCheck as jest.Mock).mockResolvedValue({
-        sufficient: false,
-        balanceRequirements: [
-          {
-            type: ItemType.NATIVE,
-            sufficient: false,
-            required: {
-              balance: BigNumber.from(2),
-              formattedBalance: '2.0',
-              token: {
-                name: 'IMX',
-                symbol: 'IMX',
-                decimals: 18,
-                address: '0x1010',
-              },
-            },
-            current: {
-              balance: BigNumber.from(1),
-              formattedBalance: '1.0',
-              token: {
-                name: 'IMX',
-                symbol: 'IMX',
-                decimals: 18,
-                address: '0x1010',
-              },
-            },
-            delta: {
-              balance: BigNumber.from(1),
-              formattedBalance: '1.0',
-            },
-          },
-        ],
-      });
-
-      const itemRequirements: ItemRequirement[] = [
-        {
-          type: ItemType.NATIVE,
-          amount: BigNumber.from(1),
-        },
-      ];
-
-      const mockOnComplete = jest.fn();
-
-      const result = await smartCheckout(
-        {} as CheckoutConfiguration,
-        mockProvider,
-        itemRequirements,
-        undefined,
-        undefined,
-        mockOnComplete,
-      );
-
-      expect(mockOnComplete).toHaveBeenCalledTimes(1);
-      expect(mockOnComplete).toHaveBeenCalledWith(
-        expect.objectContaining({
-          sufficient: false,
-          transactionRequirements: expect.any(Array),
-          router: expect.objectContaining({
-            routingOutcome: expect.objectContaining({
-              type: RoutingOutcomeType.NO_ROUTES_FOUND,
-              message: 'No routes found',
-            }),
-          }),
-        }),
-      );
-
-      expect(result).toMatchObject({
-        sufficient: false,
-        transactionRequirements: expect.any(Array),
-        router: expect.objectContaining({
-          routingOutcome: expect.objectContaining({
-            type: RoutingOutcomeType.NO_ROUTES_FOUND,
-          }),
-        }),
-      });
     });
 
     it('should return sufficient false with item requirements', async () => {
