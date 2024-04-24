@@ -393,7 +393,7 @@ describe('routingCalculator', () => {
       type: RoutingOutcomeType.ROUTES_FOUND,
       fundingRoutes: [
         {
-          priority: 1,
+          priority: 2,
           steps: [bridgeFundingStep],
         },
       ],
@@ -870,7 +870,7 @@ describe('routingCalculator', () => {
       type: RoutingOutcomeType.ROUTES_FOUND,
       fundingRoutes: [
         {
-          priority: 1,
+          priority: 3,
           steps: [onRampFundingStep],
         },
       ],
@@ -1136,7 +1136,7 @@ describe('routingCalculator', () => {
           steps: [bridgeFundingStep],
         },
         {
-          priority: 3,
+          priority: 4,
           steps: [bridgeImxFundingStep, swapImxFundingStep],
         },
       ],
