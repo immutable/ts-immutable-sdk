@@ -5,8 +5,7 @@ import commonJs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import dts from 'rollup-plugin-dts';
 import replace from '@rollup/plugin-replace';
-import pkg from './package.json' assert { type: 'json' };
-import moduleReleases from './module-release.json' assert { type: 'json' };
+// import moduleReleases from './module-release.json' assert { type: 'json' };
 import terser from '@rollup/plugin-terser';
 import nodePolyfills from 'rollup-plugin-polyfill-node';
 import babel from '@rollup/plugin-babel';
@@ -14,9 +13,9 @@ import babel from '@rollup/plugin-babel';
 // RELEASE_TYPE environment variable is set by the CI/CD pipeline
 const releaseType = process.env.RELEASE_TYPE || 'alpha';
 
-const packages = JSON.parse(
-  readFileSync('./workspace-packages.json', { encoding: 'utf8' })
-);
+const pkg = JSON.parse(readFileSync(new URL('package.json', import.meta.url), 'utf8'));
+const packages = JSON.parse(readFileSync(new URL('workspace-packages.json', import.meta.url), 'utf8'));
+const moduleReleases = JSON.parse(readFileSync(new URL('module-release.json', import.meta.url), 'utf8'));
 
 const getPackages = () => packages.map((pkg) => pkg.name);
 

@@ -5,5 +5,13 @@
     "build": {
       "cache": true
     }
-  }
+  },
+  "plugins": [
+    {
+      "plugin": "@nx/rollup/plugin",
+      "options": {
+        "buildTargetName": "build"
+      }
+    }
+  ]
 }
