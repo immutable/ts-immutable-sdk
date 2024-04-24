@@ -571,7 +571,7 @@ export type SmartCheckoutInsufficient = {
   /** The transaction requirements smart checkout determined were required for the transaction. */
   transactionRequirements: TransactionRequirement[];
   /** The type containing the funding routes the user can take to fulfill the transaction requirements */
-  router: SmartCheckoutRouter;
+  router?: SmartCheckoutRouter;
 };
 
 /**

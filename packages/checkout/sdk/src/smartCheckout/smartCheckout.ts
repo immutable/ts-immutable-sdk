@@ -124,7 +124,7 @@ export const smartCheckout = async (
   if (routingOptions?.swap === false) availableRoutingOptions.swap = false;
   if (routingOptions?.bridge === false) availableRoutingOptions.bridge = false;
 
-  if (sufficient) {
+  if (sufficient || onComplete) {
     processRoutes(
       config,
       provider,
