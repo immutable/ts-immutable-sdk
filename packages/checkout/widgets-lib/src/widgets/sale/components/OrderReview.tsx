@@ -1,7 +1,7 @@
 import { Box, Heading } from '@biom3/react';
 import { useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SaleItem } from '@imtbl/checkout-sdk';
+import { SaleItem, TransactionRequirement } from '@imtbl/checkout-sdk';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -18,6 +18,7 @@ type OrderReviewProps = {
   conversions: Map<string, number>;
   loadingBalances: boolean;
   items: SaleItem[];
+  transactionRequirement?: TransactionRequirement;
   onBackButtonClick: () => void;
   onPayWithCard?: () => void;
   onProceedToBuy: (fundingBalance: FundingBalance) => void;
@@ -29,6 +30,7 @@ export function OrderReview({
   conversions,
   collectionName,
   loadingBalances,
+  transactionRequirement,
   onBackButtonClick,
   onPayWithCard,
   onProceedToBuy,
@@ -113,6 +115,7 @@ export function OrderReview({
         visible={showCoinsDrawer}
         loading={loadingBalances}
         onPayWithCard={onPayWithCard}
+        transactionRequirement={transactionRequirement}
       />
     </SimpleLayout>
   );

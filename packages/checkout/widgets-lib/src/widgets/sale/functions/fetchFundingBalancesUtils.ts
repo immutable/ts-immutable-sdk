@@ -83,9 +83,7 @@ export const getAlternativeFundingSteps = (fundingRoutes: FundingRoute[]) => {
   const routes = fundingRoutes.filter((route) => route.steps.length === 1);
 
   const tokens = [ItemType.ERC20, ItemType.NATIVE];
-  const steps = routes.flatMap(
-    (route) => route.steps.filter((step) => tokens.includes(step.fundingItem.type)),
-  );
+  const steps = routes.flatMap((route) => route.steps.filter((step) => tokens.includes(step.fundingItem.type)));
 
   return steps;
 };
@@ -161,9 +159,10 @@ export const getFnToPushAndSortFundingBalances = (
       return currentBalances;
     }
 
-    currentBalances = [...currentBalances, ...newBalances].sort(
-      sortByBaseAndPriority,
-    );
+    currentBalances = Array.from(
+      new Set([...currentBalances, ...newBalances]),
+    ).sort(sortByBaseAndPriority);
+
     return currentBalances;
   };
 };

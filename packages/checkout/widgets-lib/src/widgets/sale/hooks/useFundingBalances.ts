@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { TransactionRequirement } from '@imtbl/checkout-sdk';
 import { fetchFundingBalances } from '../functions/fetchFundingBalances';
 import { FundingBalance, FundingBalanceResult } from '../types';
 import { useSaleContext } from '../context/SaleContextProvider';
@@ -12,6 +13,9 @@ export const useFundingBalances = () => {
     checkout,
     selectedCurrency,
   } = useSaleContext();
+  const [transactionRequirement, setTransactionRequirement] = useState<
+  TransactionRequirement | undefined
+  >();
   const [fundingBalances, setFundingBalances] = useState<FundingBalance[]>([]);
   const [fundingBalancesResult, setFundingBalancesResult] = useState<
   FundingBalanceResult[]
@@ -19,7 +23,13 @@ export const useFundingBalances = () => {
   const [loadingBalances, setLoadingBalances] = useState(false);
 
   const queryFundingBalances = () => {
-    if (!fromTokenAddress || !provider || !checkout || !clientConfig || !selectedCurrency) return;
+    if (
+      !fromTokenAddress
+      || !provider
+      || !checkout
+      || !clientConfig
+      || !selectedCurrency
+    ) return;
 
     if (fetching.current) return;
 
@@ -43,6 +53,9 @@ export const useFundingBalances = () => {
           onComplete: () => {
             setLoadingBalances(false);
           },
+          onFundingRequirement: (requirement) => {
+            setTransactionRequirement(requirement);
+          },
         });
 
         setFundingBalancesResult(results);
@@ -58,6 +71,7 @@ export const useFundingBalances = () => {
     fundingBalances,
     loadingBalances,
     fundingBalancesResult,
+    transactionRequirement,
     queryFundingBalances,
   };
 };

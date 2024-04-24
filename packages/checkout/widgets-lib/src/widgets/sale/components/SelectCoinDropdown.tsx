@@ -76,7 +76,6 @@ export function SelectCoinDropdown({
             })}
           />
         )}
-
         {canOpen && (
           <MenuItem.StatefulButtCon icon="ChevronExpand" onClick={onClick} />
         )}

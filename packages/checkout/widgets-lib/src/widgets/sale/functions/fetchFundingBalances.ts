@@ -1,5 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { Checkout } from '@imtbl/checkout-sdk';
+import { Checkout, TransactionRequirement } from '@imtbl/checkout-sdk';
 import {
   ClientConfigCurrency,
   FundingBalance,
@@ -23,6 +23,7 @@ export type FundingBalanceParams = {
   getAmountByCurrency: (currency: ClientConfigCurrency) => string;
   getIsGasless: () => boolean;
   onFundingBalance: (balances: FundingBalance[]) => void;
+  onFundingRequirement: (fundingItemRequirement: TransactionRequirement) => void;
   onComplete?: (balances: FundingBalance[]) => void;
 };
 
@@ -33,11 +34,12 @@ export const fetchFundingBalances = async (
     provider,
     checkout,
     currencies,
+    baseCurrency,
     onFundingBalance,
     getAmountByCurrency,
-    baseCurrency,
     getIsGasless,
     onComplete,
+    onFundingRequirement,
   } = params;
 
   const signer = provider?.getSigner();
@@ -80,8 +82,13 @@ export const fetchFundingBalances = async (
 
   const results = await wrapPromisesWithOnResolve(
     balancePromises,
-    ({ smartCheckoutResult }) => {
+    ({ currency, smartCheckoutResult }) => {
       updateFundingBalances(getFundingBalances(smartCheckoutResult));
+
+      if (currency.base) {
+        const fundingItemRequirement = smartCheckoutResult.transactionRequirements[0];
+        onFundingRequirement(fundingItemRequirement);
+      }
     },
   );
 

@@ -264,13 +264,26 @@
         "divider": "More options",
         "payWithCard": {
           "caption": "Buy this items with card instead"
-        }
+        },
+        "stepType": {
+          "SWAP": "Swap {{symbol}} ≈ {{amount}}",
+          "ONRAMP": "Buy {{symbol}} ≈ {{amount}}",
+          "BRIDGE": "Move {{symbol}} ≈ {{amount}}",
+          "SUFFICIENT": "Pay {{symbol}} {{amount}}",
+          "delta": {
+            "SWAP": "Pay {{required.symbol}} {{required.amount}} & Swap {{symbol}} ≈ {{amount}}",
+            "ONRAMP": "Pay {{required.symbol}} {{required.amount}} & Buy {{symbol}} ≈ {{amount}}",
+            "BRIDGE": "Pay {{required.symbol}} {{required.amount}} & Move {{symbol}} ≈ {{amount}}",
+            "SUFFICIENT": "Pay {{symbol}} {{amount}}"
+          }
+        },
+        "fee": "Fees {{symbol}} ≈ {{amount}}"
       },
       "orderReview": {
         "heading": "Payment summary",
         "continue": "Proceed",
         "payWith": "Pay with {{symbol}}",
-        "balance": "Balance ${{amount}}"
+        "balance": "Balance {{amount}}"
       }
     },
     "FUND_WITH_SMART_CHECKOUT": {

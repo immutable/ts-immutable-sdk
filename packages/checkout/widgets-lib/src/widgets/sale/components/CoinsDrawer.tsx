@@ -4,7 +4,7 @@ import {
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { listVariants, listItemVariants } from 'lib/animation/listAnimation';
-import { SalePaymentTypes } from '@imtbl/checkout-sdk';
+import { SalePaymentTypes, TransactionRequirement } from '@imtbl/checkout-sdk';
 import { CoinsDrawerItem } from './CoinsDrawerItem';
 import { FundingBalance } from '../types';
 import { PaymentOption } from './PaymentOption';
@@ -12,12 +12,13 @@ import { PaymentOption } from './PaymentOption';
 type CoinsDrawerProps = {
   conversions: Map<string, number>;
   balances: FundingBalance[];
-  onSelect: (index: number) => void;
-  onClose: () => void;
-  onPayWithCard?: () => void;
   selectedIndex: number;
   visible: boolean;
   loading: boolean;
+  transactionRequirement?: TransactionRequirement;
+  onSelect: (index: number) => void;
+  onClose: () => void;
+  onPayWithCard?: () => void;
 };
 
 export function CoinsDrawer({
@@ -26,6 +27,7 @@ export function CoinsDrawer({
   selectedIndex,
   visible,
   loading,
+  transactionRequirement,
   onClose,
   onSelect,
   onPayWithCard,
@@ -63,7 +65,7 @@ export function CoinsDrawer({
               sx={{
                 display: 'flex',
                 justifyContent: 'space-between',
-                mb: 'base.spacing.x4',
+                mb: 'base.spacing.x2',
               }}
             >
               <Caption size="small">
@@ -80,6 +82,7 @@ export function CoinsDrawer({
                 balance={balance}
                 selected={selectedIndex === idx}
                 conversions={conversions}
+                transactionRequirement={transactionRequirement}
                 rc={<motion.div variants={listItemVariants} custom={idx} />}
               />
             ))}
