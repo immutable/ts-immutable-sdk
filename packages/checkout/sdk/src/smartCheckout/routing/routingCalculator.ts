@@ -307,14 +307,12 @@ export const routingCalculator = async (
         insufficientRequirement,
         tokenBalances,
       ).then((result) => {
-        if (result) {
-          handleRouteProgress(
-            result,
-            PRIORITIES.bridge,
-            fundingRoutes,
-            onFundingRoute,
-          );
-        }
+        handleRouteProgress(
+          result,
+          PRIORITIES.bridge,
+          fundingRoutes,
+          onFundingRoute,
+        );
       }),
     );
   }
