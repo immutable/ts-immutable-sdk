@@ -1,23 +1,19 @@
 import { JsonRpcProvider } from '@ethersproject/providers';
-import {
-  BalanceCheckResult,
-  BalanceRequirement,
-} from '../balanceCheck/types';
+import { BalanceCheckResult, BalanceRequirement } from '../balanceCheck/types';
 import {
   AvailableRoutingOptions,
   BridgeFundingStep,
   ChainId,
+  FundingRoute,
+  FundingStep,
   ItemType,
   OnRampFundingStep,
-  RoutesFound,
   RoutingOutcome,
   RoutingOutcomeType,
   SwapFundingStep,
   TokenInfo,
 } from '../../types';
-import {
-  TokenBalanceResult,
-} from './types';
+import { TokenBalanceResult } from './types';
 import { getAllTokenBalances } from './tokenBalances';
 import {
   CheckoutConfiguration,
@@ -29,15 +25,20 @@ import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { swapRoute } from './swap/swapRoute';
 import { allowListCheck } from '../allowList';
 import { RoutingTokensAllowList } from '../allowList/types';
-import { BridgeAndSwapRoute, bridgeAndSwapRoute } from './bridgeAndSwap/bridgeAndSwapRoute';
+import {
+  BridgeAndSwapRoute,
+  bridgeAndSwapRoute,
+} from './bridgeAndSwap/bridgeAndSwapRoute';
 import { BridgeRequirement, bridgeRoute } from './bridge/bridgeRoute';
 import { onRampRoute } from './onRamp';
 import { INDEXER_ETH_ROOT_CONTRACT_ADDRESS } from './indexer/fetchL1Representation';
 import { measureAsyncExecution } from '../../logger/debugLogger';
 
-const hasAvailableRoutingOptions = (availableRoutingOptions: AvailableRoutingOptions) => (
-  availableRoutingOptions.bridge || availableRoutingOptions.swap || availableRoutingOptions.onRamp
-);
+const hasAvailableRoutingOptions = (
+  availableRoutingOptions: AvailableRoutingOptions,
+) => availableRoutingOptions.bridge
+  || availableRoutingOptions.swap
+  || availableRoutingOptions.onRamp;
 
 export const getInsufficientRequirement = (
   balanceRequirements: BalanceCheckResult,
@@ -64,7 +65,10 @@ export const getBridgeFundingStep = async (
 ): Promise<BridgeFundingStep | undefined> => {
   let bridgeFundingStep;
   if (insufficientRequirement === undefined) return undefined;
-  if (insufficientRequirement.type !== ItemType.NATIVE && insufficientRequirement.type !== ItemType.ERC20) {
+  if (
+    insufficientRequirement.type !== ItemType.NATIVE
+    && insufficientRequirement.type !== ItemType.ERC20
+  ) {
     return undefined;
   }
 
@@ -107,7 +111,8 @@ export const getSwapFundingSteps = async (
 
   if (swapTokenAllowList.length === 0) return fundingSteps;
   const swappableTokens: string[] = swapTokenAllowList
-    .filter((token) => token.address).map((token) => token.address as string);
+    .filter((token) => token.address)
+    .map((token) => token.address as string);
 
   if (swappableTokens.length === 0) return fundingSteps;
 
@@ -152,7 +157,10 @@ export const getBridgeAndSwapFundingSteps = async (
   });
   const swapTokenAllowList = tokenAllowList?.swap ?? [];
 
-  if (insufficientRequirement.type !== ItemType.NATIVE && insufficientRequirement.type !== ItemType.ERC20) {
+  if (
+    insufficientRequirement.type !== ItemType.NATIVE
+    && insufficientRequirement.type !== ItemType.ERC20
+  ) {
     return [];
   }
 
@@ -188,11 +196,41 @@ export const getOnRampFundingStep = async (
   return onRampFundingStep;
 };
 
+const PRIORITIES = {
+  swap: 1,
+  bridge: 2,
+  onRamp: 3,
+  bridgeAndSwap: 4,
+};
+
+const handleRouteProgress = (
+  result: FundingStep | BridgeAndSwapRoute | undefined,
+  priority: number,
+  fundingRoutes: FundingRoute[],
+  onFundingRoute?: (fundingRoute: FundingRoute) => void,
+) => {
+  if (!result) return;
+
+  let steps;
+  if ('bridgeFundingStep' in result && 'swapFundingStep' in result) {
+    // Handling BridgeAndSwapRoute
+    steps = [result.bridgeFundingStep, result.swapFundingStep];
+  } else {
+    // Handling individual SwapFundingStep, BridgeFundingStep, or OnRampFundingStep
+    steps = [result];
+  }
+  const route = { priority, steps };
+  fundingRoutes.push(route);
+
+  onFundingRoute?.(route);
+};
+
 export const routingCalculator = async (
   config: CheckoutConfiguration,
   ownerAddress: string,
   balanceRequirements: BalanceCheckResult,
   availableRoutingOptions: AvailableRoutingOptions,
+  onFundingRoute?: (fundingRoute: FundingRoute) => void,
 ): Promise<RoutingOutcome> => {
   if (!hasAvailableRoutingOptions(availableRoutingOptions)) {
     return {
@@ -212,7 +250,9 @@ export const routingCalculator = async (
     );
   }
 
-  const tokenBalances = await measureAsyncExecution<Map<ChainId, TokenBalanceResult>>(
+  const tokenBalances = await measureAsyncExecution<
+  Map<ChainId, TokenBalanceResult>
+  >(
     config,
     'Time to get token balances inside router',
     getAllTokenBalances(
@@ -226,150 +266,114 @@ export const routingCalculator = async (
   const allowList = await measureAsyncExecution<RoutingTokensAllowList>(
     config,
     'Time to get routing allowlist',
-    allowListCheck(
-      config,
-      tokenBalances,
-      availableRoutingOptions,
-    ),
+    allowListCheck(config, tokenBalances, availableRoutingOptions),
   );
 
   // Ensures only 1 balance requirement is insufficient
   const insufficientRequirement = getInsufficientRequirement(balanceRequirements);
 
   const routePromises: Promise<any>[] = [];
-  const routeSteps: string[] = [];
-
-  if (availableRoutingOptions.bridge) {
-    routeSteps.push('bridgeFundingStep');
-    routePromises.push(getBridgeFundingStep(
-      config,
-      readOnlyProviders,
-      availableRoutingOptions,
-      insufficientRequirement,
-      tokenBalances,
-    ));
-  }
+  const fundingRoutes: FundingRoute[] = [];
 
   if (availableRoutingOptions.swap) {
-    routeSteps.push('swapFundingSteps');
-    routePromises.push(getSwapFundingSteps(
-      config,
-      availableRoutingOptions,
-      insufficientRequirement,
-      ownerAddress,
-      tokenBalances,
-      allowList.swap,
-      balanceRequirements,
-    ));
+    routePromises.push(
+      getSwapFundingSteps(
+        config,
+        availableRoutingOptions,
+        insufficientRequirement,
+        ownerAddress,
+        tokenBalances,
+        allowList.swap,
+        balanceRequirements,
+      ).then((result) => {
+        result.forEach((step) => {
+          handleRouteProgress(
+            step,
+            PRIORITIES.swap,
+            fundingRoutes,
+            onFundingRoute,
+          );
+        });
+      }),
+    );
+  }
+
+  if (availableRoutingOptions.bridge) {
+    routePromises.push(
+      getBridgeFundingStep(
+        config,
+        readOnlyProviders,
+        availableRoutingOptions,
+        insufficientRequirement,
+        tokenBalances,
+      ).then((result) => {
+        handleRouteProgress(
+          result,
+          PRIORITIES.bridge,
+          fundingRoutes,
+          onFundingRoute,
+        );
+      }),
+    );
   }
 
   if (availableRoutingOptions.onRamp) {
-    routeSteps.push('onRampFundingStep');
-    routePromises.push(getOnRampFundingStep(
-      config,
-      availableRoutingOptions,
-      insufficientRequirement,
-    ));
+    routePromises.push(
+      getOnRampFundingStep(
+        config,
+        availableRoutingOptions,
+        insufficientRequirement,
+      ).then((result) => {
+        handleRouteProgress(
+          result,
+          PRIORITIES.onRamp,
+          fundingRoutes,
+          onFundingRoute,
+        );
+      }),
+    );
   }
 
   if (availableRoutingOptions.swap && availableRoutingOptions.bridge) {
-    routeSteps.push('bridgeAndSwapFundingSteps');
-    routePromises.push(getBridgeAndSwapFundingSteps(
-      config,
-      readOnlyProviders,
-      availableRoutingOptions,
-      insufficientRequirement,
-      ownerAddress,
-      tokenBalances,
-      allowList,
-      balanceRequirements,
-    ));
+    routePromises.push(
+      getBridgeAndSwapFundingSteps(
+        config,
+        readOnlyProviders,
+        availableRoutingOptions,
+        insufficientRequirement,
+        ownerAddress,
+        tokenBalances,
+        allowList,
+        balanceRequirements,
+      ).then((result) => {
+        result.forEach((route) => {
+          handleRouteProgress(
+            route,
+            PRIORITIES.bridgeAndSwap,
+            fundingRoutes,
+            onFundingRoute,
+          );
+        });
+      }),
+    );
   }
 
-  const resolved = await measureAsyncExecution<any[]>(
+  await measureAsyncExecution<any[]>(
     config,
     'Time to resolve all routes',
     Promise.all(routePromises),
   );
 
-  let bridgeFundingStep: BridgeFundingStep | undefined;
-  let swapFundingSteps: SwapFundingStep[] = [];
-  let onRampFundingStep: OnRampFundingStep | undefined;
-  let bridgeAndSwapFundingSteps: BridgeAndSwapRoute[] = [];
-  resolved.forEach((result, index) => {
-    const routeStep = routeSteps[index];
-    switch (routeStep) {
-      case 'bridgeFundingStep':
-        bridgeFundingStep = result as BridgeFundingStep | undefined;
-        break;
-      case 'swapFundingSteps':
-        swapFundingSteps = result as SwapFundingStep[];
-        break;
-      case 'onRampFundingStep':
-        onRampFundingStep = result as OnRampFundingStep | undefined;
-        break;
-      case 'bridgeAndSwapFundingSteps':
-        bridgeAndSwapFundingSteps = result as BridgeAndSwapRoute[];
-        break;
-      default:
-        break;
-    }
-  });
-
-  if (!bridgeFundingStep
-    && swapFundingSteps.length === 0
-    && !onRampFundingStep
-    && bridgeAndSwapFundingSteps.length === 0) {
+  if (fundingRoutes.length === 0) {
     return {
       type: RoutingOutcomeType.NO_ROUTES_FOUND,
-      message: 'Smart Checkout did not find any funding routes to fulfill the transaction',
+      message:
+        'Smart Checkout did not find any funding routes to fulfill the transaction',
     };
   }
 
-  const response: RoutesFound = {
+  return {
     type: RoutingOutcomeType.ROUTES_FOUND,
-    fundingRoutes: [],
+    fundingRoutes,
   };
-
-  let priority = 0;
-
-  if (swapFundingSteps.length > 0) {
-    priority++;
-    swapFundingSteps.forEach((swapFundingStep) => {
-      response.fundingRoutes.push({
-        priority,
-        steps: [swapFundingStep],
-      });
-    });
-  }
-
-  if (bridgeFundingStep) {
-    priority++;
-    response.fundingRoutes.push({
-      priority,
-      steps: [bridgeFundingStep],
-    });
-  }
-
-  if (onRampFundingStep) {
-    priority++;
-    response.fundingRoutes.push({
-      priority,
-      steps: [onRampFundingStep],
-    });
-  }
-
-  if (bridgeAndSwapFundingSteps) {
-    priority++;
-    bridgeAndSwapFundingSteps.forEach((bridgeAndSwapFundingStep) => {
-      const bridgeStep = bridgeAndSwapFundingStep.bridgeFundingStep;
-      const swapStep = bridgeAndSwapFundingStep.swapFundingStep;
-      response.fundingRoutes.push({
-        priority,
-        steps: [bridgeStep, swapStep],
-      });
-    });
-  }
-
-  return response;
 };

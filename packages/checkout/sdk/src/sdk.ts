@@ -576,6 +576,8 @@ export class Checkout {
       itemRequirements,
       params.transactionOrGasAmount,
       params.routingOptions,
+      params.onComplete,
+      params.onFundingRoute,
     );
   }
 
