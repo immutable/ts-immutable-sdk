@@ -79,7 +79,6 @@ type SaleContextValues = SaleContextProps & {
     data?: Record<string, unknown>
   ) => void;
   goToErrorView: (type: SaleErrorTypes, data?: Record<string, unknown>) => void;
-  goToSuccessView: (data?: Record<string, unknown>) => void;
   querySmartCheckout: (
     callback?: (r?: SmartCheckoutResult) => void
   ) => Promise<SmartCheckoutResult | undefined>;
@@ -115,7 +114,6 @@ const SaleContext = createContext<SaleContextValues>({
   setPaymentMethod: () => {},
   goBackToPaymentMethods: () => {},
   goToErrorView: () => {},
-  goToSuccessView: () => {},
   config: {} as StrongCheckoutWidgetsConfig,
   querySmartCheckout: () => Promise.resolve(undefined),
   smartCheckoutResult: undefined,
@@ -280,26 +278,6 @@ export function SaleContextProvider(props: {
     [paymentMethod, setPaymentMethod, executeResponse],
   );
 
-  const goToSuccessView = useCallback(
-    (data?: Record<string, unknown>) => {
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: SaleWidgetViews.SALE_SUCCESS,
-            data: {
-              paymentMethod,
-              transactions: executeResponse.transactions,
-              tokenIds,
-              ...data,
-            },
-          },
-        },
-      });
-    },
-    [[paymentMethod, executeResponse, tokenIds]],
-  );
-
   useEffect(() => {
     if (!signError) return;
     goToErrorView(signError.type, signError.data);
@@ -390,7 +368,6 @@ export function SaleContextProvider(props: {
       setPaymentMethod,
       goBackToPaymentMethods,
       goToErrorView,
-      goToSuccessView,
       isPassportWallet: !!(provider?.provider as any)?.isPassport,
       querySmartCheckout,
       smartCheckoutResult,
@@ -421,7 +398,6 @@ export function SaleContextProvider(props: {
       paymentMethod,
       goBackToPaymentMethods,
       goToErrorView,
-      goToSuccessView,
       sign,
       querySmartCheckout,
       smartCheckoutResult,

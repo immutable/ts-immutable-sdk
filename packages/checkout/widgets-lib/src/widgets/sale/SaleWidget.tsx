@@ -32,7 +32,6 @@ import { PayWithCard } from './views/PayWithCard';
 import { PayWithCoins } from './views/PayWithCoins';
 import { PaymentMethods } from './views/PaymentMethods';
 import { SaleErrorView } from './views/SaleErrorView';
-import { SaleSuccessView } from './views/SaleSuccessView';
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import { TopUpView } from '../../views/top-up/TopUpView';
 import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
@@ -153,9 +152,6 @@ export default function SaleWidget(props: SaleWidgetProps) {
                 viewState.view.data?.transactionHash!,
               )}
             />
-          )}
-          {viewState.view.type === SaleWidgetViews.SALE_SUCCESS && provider && (
-            <SaleSuccessView data={viewState.view.data} />
           )}
           {viewState.view.type === SaleWidgetViews.FUND_WITH_SMART_CHECKOUT && (
             <FundWithSmartCheckout subView={viewState.view.subView} />
