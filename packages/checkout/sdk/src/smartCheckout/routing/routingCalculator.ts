@@ -196,12 +196,21 @@ export const getOnRampFundingStep = async (
   return onRampFundingStep;
 };
 
+const PRIORITIES = {
+  swap: 1,
+  bridge: 2,
+  onRamp: 3,
+  bridgeAndSwap: 4,
+};
+
 const handleRouteProgress = (
-  result: FundingStep | BridgeAndSwapRoute,
+  result: FundingStep | BridgeAndSwapRoute | undefined,
   priority: number,
   fundingRoutes: FundingRoute[],
   onFundingRoute?: (fundingRoute: FundingRoute) => void,
 ) => {
+  if (!result) return;
+
   let steps;
   if ('bridgeFundingStep' in result && 'swapFundingStep' in result) {
     // Handling BridgeAndSwapRoute
@@ -265,7 +274,6 @@ export const routingCalculator = async (
 
   const routePromises: Promise<any>[] = [];
   const fundingRoutes: FundingRoute[] = [];
-  let priority = 0;
 
   if (availableRoutingOptions.swap) {
     routePromises.push(
@@ -278,12 +286,14 @@ export const routingCalculator = async (
         allowList.swap,
         balanceRequirements,
       ).then((result) => {
-        if (result.length) {
-          priority++;
-          result.forEach((step) => {
-            handleRouteProgress(step, priority, fundingRoutes, onFundingRoute);
-          });
-        }
+        result.forEach((step) => {
+          handleRouteProgress(
+            step,
+            PRIORITIES.swap,
+            fundingRoutes,
+            onFundingRoute,
+          );
+        });
       }),
     );
   }
@@ -298,8 +308,12 @@ export const routingCalculator = async (
         tokenBalances,
       ).then((result) => {
         if (result) {
-          priority++;
-          handleRouteProgress(result, priority, fundingRoutes, onFundingRoute);
+          handleRouteProgress(
+            result,
+            PRIORITIES.bridge,
+            fundingRoutes,
+            onFundingRoute,
+          );
         }
       }),
     );
@@ -312,10 +326,12 @@ export const routingCalculator = async (
         availableRoutingOptions,
         insufficientRequirement,
       ).then((result) => {
-        if (result) {
-          priority++;
-          handleRouteProgress(result, priority, fundingRoutes, onFundingRoute);
-        }
+        handleRouteProgress(
+          result,
+          PRIORITIES.onRamp,
+          fundingRoutes,
+          onFundingRoute,
+        );
       }),
     );
   }
@@ -333,10 +349,12 @@ export const routingCalculator = async (
         balanceRequirements,
       ).then((result) => {
         result.forEach((route) => {
-          if (result) {
-            priority++;
-            handleRouteProgress(route, priority, fundingRoutes, onFundingRoute);
-          }
+          handleRouteProgress(
+            route,
+            PRIORITIES.bridgeAndSwap,
+            fundingRoutes,
+            onFundingRoute,
+          );
         });
       }),
     );
