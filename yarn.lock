@@ -4329,7 +4329,7 @@ __metadata:
     "@imtbl/config": 0.0.0
     "@jest/globals": ^29.5.0
     "@rollup/plugin-commonjs": ^24.0.1
-    "@rollup/plugin-json": ^6.0.0
+    "@rollup/plugin-json": ^6.1.0
     "@rollup/plugin-node-resolve": ^15.0.2
     "@rollup/plugin-replace": ^5.0.2
     "@rollup/plugin-typescript": ^11.0.0
@@ -4401,7 +4401,7 @@ __metadata:
     "@parcel/packager-ts": ^2.8.3
     "@parcel/transformer-typescript-types": ^2.8.3
     "@rollup/plugin-commonjs": ^24.0.1
-    "@rollup/plugin-json": ^6.0.0
+    "@rollup/plugin-json": ^6.1.0
     "@rollup/plugin-node-resolve": ^15.0.2
     "@rollup/plugin-replace": ^5.0.2
     "@rollup/plugin-terser": ^0.4.3
@@ -4471,7 +4471,7 @@ __metadata:
     "@imtbl/version-check": 0.0.0
     "@rive-app/react-canvas": ^4.8.3
     "@rollup/plugin-commonjs": ^24.0.1
-    "@rollup/plugin-json": ^6.0.0
+    "@rollup/plugin-json": ^6.1.0
     "@rollup/plugin-node-resolve": ^15.0.2
     "@rollup/plugin-replace": ^5.0.2
     "@rollup/plugin-terser": ^0.4.3
@@ -4566,7 +4566,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/dex-sdk@workspace:packages/internal/dex/sdk"
   dependencies:
-    "@rollup/plugin-json": ^6.0.0
+    "@rollup/plugin-json": ^6.1.0
     "@swc/core": ^1.3.36
     "@swc/jest": ^0.2.24
     "@typechain/ethers-v5": ^10.2.0
@@ -4593,7 +4593,7 @@ __metadata:
     "@imtbl/config": 0.0.0
     "@jest/globals": ^29.5.0
     "@rollup/plugin-commonjs": ^24.0.1
-    "@rollup/plugin-json": ^6.0.0
+    "@rollup/plugin-json": ^6.1.0
     "@rollup/plugin-node-resolve": ^15.0.2
     "@rollup/plugin-typescript": ^11.0.0
     "@swc/core": ^1.3.36
@@ -4639,7 +4639,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/guardian@workspace:packages/internal/guardian"
   dependencies:
-    "@rollup/plugin-json": ^6.0.0
+    "@rollup/plugin-json": ^6.1.0
     "@swc/core": ^1.3.36
     "@swc/jest": ^0.2.24
     "@typechain/ethers-v5": ^10.2.0
@@ -4823,7 +4823,7 @@ __metadata:
     "@rive-app/react-canvas": ^4.8.3
     "@rollup/plugin-babel": ^6.0.4
     "@rollup/plugin-commonjs": ^24.0.1
-    "@rollup/plugin-json": ^6.0.0
+    "@rollup/plugin-json": ^6.1.0
     "@rollup/plugin-node-resolve": ^15.0.2
     "@rollup/plugin-replace": ^5.0.2
     "@rollup/plugin-terser": ^0.4.3
@@ -7836,20 +7836,6 @@ __metadata:
   peerDependencies:
     rollup: ^1.20.0 || ^2.0.0
   checksum: 867bc9339b4ccf0b9ff3b2617a95b3b8920115163f86c8e3b1f068a14ca25949472d3c05b09a5ac38ca0fe2185756e34617eaeb219d4a2b6e2307c501c7d4552
-  languageName: node
-  linkType: hard
-
-"@rollup/plugin-json@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "@rollup/plugin-json@npm:6.0.0"
-  dependencies:
-    "@rollup/pluginutils": ^5.0.1
-  peerDependencies:
-    rollup: ^1.20.0||^2.0.0||^3.0.0
-  peerDependenciesMeta:
-    rollup:
-      optional: true
-  checksum: 77cfc941edaf77a5307977704ffaba706d83bea66f265b2b68f14be2a0af6d08b0fb1b04fdd773146c84cc70938ff64b00ae946808fd6ac057058af824d78128
   languageName: node
   linkType: hard
 
@@ -29895,6 +29881,7 @@ __metadata:
     "@emotion/react": ^11.11.3
     "@nx/rollup": 18.3.1
     "@release-it-plugins/workspaces": ^4.0.0
+    "@rollup/plugin-json": ^6.1.0
     "@typescript-eslint/eslint-plugin": ^5.57.1
     "@typescript-eslint/parser": ^5.57.1
     eslint: ^8.40.0
