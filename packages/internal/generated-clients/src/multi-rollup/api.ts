@@ -17,7 +17,6 @@
 export * from './domain/activities-api';
 export * from './domain/chains-api';
 export * from './domain/collections-api';
-export * from './domain/demopage-api';
 export * from './domain/metadata-api';
 export * from './domain/nft-owners-api';
 export * from './domain/nfts-api';
@@ -25,5 +24,4 @@ export * from './domain/orders-api';
 export * from './domain/passport-api';
 export * from './domain/passport-profile-api';
 export * from './domain/tokens-api';
-export * from './domain/verification-api';
 
