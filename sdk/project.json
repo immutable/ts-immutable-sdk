@@ -27,6 +27,11 @@
           ],
           "target": "build",
           "params": "ignore"
+        },
+        {
+          "projects":["@imtbl/sdk"],
+          "target": "bootstrap",
+          "params": "ignore"
         }
       ]
     }
