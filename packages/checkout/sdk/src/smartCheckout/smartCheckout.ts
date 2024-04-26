@@ -5,6 +5,7 @@ import {
   FundingRoute,
   GasAmount,
   ItemRequirement,
+  ItemType,
   RoutingOutcome,
   SmartCheckoutResult,
 } from '../types/smartCheckout';
@@ -20,6 +21,31 @@ import { Allowance } from './allowance/types';
 import { BalanceCheckResult, BalanceRequirement } from './balanceCheck/types';
 import { measureAsyncExecution } from '../logger/debugLogger';
 
+export const overrideSufficientBalanceCheckResult = (
+  balanceCheckResult: BalanceCheckResult,
+): BalanceCheckResult => {
+  const modifiedRequirements = balanceCheckResult.balanceRequirements.map(
+    (requirement) => {
+      if (requirement.type === ItemType.ERC20 && requirement.sufficient) {
+        return {
+          ...requirement,
+          sufficient: false,
+          delta: {
+            balance: requirement.required.balance,
+            formattedBalance: requirement.required.formattedBalance,
+          },
+        };
+      }
+      return requirement;
+    },
+  );
+
+  return {
+    sufficient: false,
+    balanceRequirements: modifiedRequirements,
+  };
+};
+
 const processRoutes = async (
   config: CheckoutConfiguration,
   provider: Web3Provider,
@@ -31,13 +57,17 @@ const processRoutes = async (
   onComplete?: (result: SmartCheckoutResult) => void,
   onFundingRoute?: (fundingRoute: FundingRoute) => void,
 ): Promise<RoutingOutcome> => {
+  const finalBalanceCheckResult = sufficient
+    ? overrideSufficientBalanceCheckResult(balanceCheckResult)
+    : balanceCheckResult;
+
   const routingOutcome = await measureAsyncExecution<RoutingOutcome>(
     config,
     'Total time to run the routing calculator',
     routingCalculator(
       config,
       ownerAddress,
-      balanceCheckResult,
+      finalBalanceCheckResult,
       availableRoutingOptions,
       onFundingRoute,
     ),
@@ -124,7 +154,7 @@ export const smartCheckout = async (
   if (routingOptions?.swap === false) availableRoutingOptions.swap = false;
   if (routingOptions?.bridge === false) availableRoutingOptions.bridge = false;
 
-  if (sufficient || onComplete) {
+  if (onComplete) {
     processRoutes(
       config,
       provider,
@@ -136,6 +166,13 @@ export const smartCheckout = async (
       onComplete,
       onFundingRoute,
     );
+    return {
+      sufficient,
+      transactionRequirements,
+    };
+  }
+
+  if (sufficient) {
     return {
       sufficient,
       transactionRequirements,
