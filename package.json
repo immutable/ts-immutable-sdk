@@ -44,7 +44,6 @@
   },
   "scripts": {
     "bootstrap": "test -f sdk/workspace-packages.json || yarn prepare",
-    "prepare":"cd sdk && yarn bootstrap",
     "build": "NODE_OPTIONS=--max-old-space-size=14366 wsrun -y 4 -p @imtbl/sdk -p @imtbl/checkout-widgets -e -r --serial build && yarn syncpack:format && yarn wsrun -p @imtbl/sdk -a -m copyBrowserBundles",
     "build:onlysdk": "NODE_OPTIONS=--max-old-space-size=14366 wsrun -y 4 -p @imtbl/sdk --stages build && yarn syncpack:format",
     "docs:build": "typedoc",
@@ -52,6 +51,7 @@
     "lint": "wsrun --exclude-missing -e lint --no-error-on-unmatched-pattern",
     "lint:ci": "./lint-ci.sh",
     "postinstall": "husky install; ./.husky/install_gitleaks.sh",
+    "prepare": "cd sdk && yarn bootstrap",
     "release": "release-it",
     "scan:secrets": "./.husky/run_gitleaks.sh",
     "syncpack:check": "yarn syncpack list-mismatches",
