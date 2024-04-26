@@ -57,7 +57,7 @@ const processRoutes = async (
   onComplete?: (result: SmartCheckoutResult) => void,
   onFundingRoute?: (fundingRoute: FundingRoute) => void,
 ): Promise<RoutingOutcome> => {
-  const finalBalanceCheckResult = sufficient
+  const finalBalanceCheckResult = sufficient && onComplete
     ? overrideSufficientBalanceCheckResult(balanceCheckResult)
     : balanceCheckResult;
 
