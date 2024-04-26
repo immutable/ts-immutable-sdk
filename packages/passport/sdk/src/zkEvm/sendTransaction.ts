@@ -1,8 +1,9 @@
+import { BigNumber, BigNumberish } from 'ethers';
 import {
   StaticJsonRpcProvider,
   TransactionRequest,
 } from '@ethersproject/providers';
-import { BigNumber, BigNumberish } from 'ethers';
+import { Flow } from '@imtbl/metrics';
 import { Signer } from '@ethersproject/abstract-signer';
 import { getEip155ChainId, getNonce, getSignedMetaTransactions } from './walletHelpers';
 import { MetaTransaction, RelayerTransactionStatus } from './types';
@@ -21,6 +22,7 @@ export type EthSendTransactionParams = {
   relayerClient: RelayerClient;
   zkevmAddress: string,
   params: Array<any>;
+  flow: Flow;
 };
 
 const getMetaTransactions = async (
@@ -75,6 +77,7 @@ export const sendTransaction = async ({
   relayerClient,
   guardianClient,
   zkevmAddress,
+  flow,
 }: EthSendTransactionParams): Promise<string> => {
   const transactionRequest: TransactionRequest = params[0];
   if (!transactionRequest.to) {
@@ -83,8 +86,11 @@ export const sendTransaction = async ({
 
   const { chainId } = await rpcProvider.detectNetwork();
   const chainIdBigNumber = BigNumber.from(chainId);
+  flow.addEvent('endDetectNetwork');
 
   const nonce = await getNonce(rpcProvider, zkevmAddress);
+  flow.addEvent('endGetNonce');
+
   const metaTransaction: MetaTransaction = {
     to: transactionRequest.to,
     data: transactionRequest.data,
@@ -101,26 +107,34 @@ export const sendTransaction = async ({
     ethSigner,
     relayerClient,
   );
+  flow.addEvent('endGetMetaTransactions');
 
   // Parallelize the validation and signing of the transaction
+  const validateEVMTransactionPromise = guardianClient.validateEVMTransaction({
+    chainId: getEip155ChainId(chainId),
+    nonce: convertBigNumberishToString(nonce),
+    metaTransactions,
+  });
+  validateEVMTransactionPromise.then(() => flow.addEvent('endValidateEVMTransaction'));
+
+  // NOTE: We sign again because we now are adding the fee transaction, so the
+  // whole payload is different and needs a new signature.
+  const getSignedMetaTransactionsPromise = getSignedMetaTransactions(
+    metaTransactions,
+    nonce,
+    chainIdBigNumber,
+    zkevmAddress,
+    ethSigner,
+  );
+  getSignedMetaTransactionsPromise.then(() => flow.addEvent('endGetSignedMetaTransactions'));
+
   const [, signedTransactions] = await Promise.all([
-    guardianClient.validateEVMTransaction({
-      chainId: getEip155ChainId(chainId),
-      nonce: convertBigNumberishToString(nonce),
-      metaTransactions,
-    }),
-    // NOTE: We sign again because we now are adding the fee transaction, so the
-    // whole payload is different and needs a new signature.
-    getSignedMetaTransactions(
-      metaTransactions,
-      nonce,
-      chainIdBigNumber,
-      zkevmAddress,
-      ethSigner,
-    ),
+    validateEVMTransactionPromise,
+    getSignedMetaTransactionsPromise,
   ]);
 
   const relayerId = await relayerClient.ethSendTransaction(zkevmAddress, signedTransactions);
+  flow.addEvent('endRelayerSendTransaction');
 
   const retrieveRelayerTransaction = async () => {
     const tx = await relayerClient.imGetTransactionByHash(relayerId);
@@ -139,6 +153,7 @@ export const sendTransaction = async ({
     interval: TRANSACTION_HASH_RETRIEVAL_WAIT,
     finalErr: new JsonRpcError(RpcErrorCode.RPC_SERVER_ERROR, 'transaction hash not generated in time'),
   });
+  flow.addEvent('endRetrieveRelayerTransaction');
 
   if (![
     RelayerTransactionStatus.SUBMITTED,

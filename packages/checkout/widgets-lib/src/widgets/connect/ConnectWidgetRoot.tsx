@@ -68,6 +68,7 @@ export class Connect extends Base<WidgetType.CONNECT> {
                 config={this.strongConfig()}
                 checkout={this.checkout}
                 targetChainId={this.parameters.targetChainId}
+                blocklistWalletRdns={this.parameters.blocklistWalletRdns}
               />
             </Suspense>
           </ThemeProvider>

@@ -1,5 +1,5 @@
 import { Box, Heading } from '@biom3/react';
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 import { SalePaymentTypes } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +8,7 @@ import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import {
   FundWithSmartCheckoutSubViews,
+  OrderSummarySubViews,
   SaleWidgetViews,
 } from '../../../context/view-context/SaleViewContextTypes';
 import {
@@ -20,8 +21,11 @@ import { PaymentOptions } from '../components/PaymentOptions';
 import { useSaleContext } from '../context/SaleContextProvider';
 import { useSaleEvent } from '../hooks/useSaleEvents';
 import { SaleErrorTypes, SignPaymentTypes } from '../types';
+import { CreditCardWarningDrawer } from '../components/CreditCardWarningDrawer';
 
 export function PaymentMethods() {
+  const [showCreditCardWarning, setShowCreditCardWarning] = useState(false);
+
   const { t } = useTranslation();
   const { viewDispatch } = useContext(ViewContext);
   const {
@@ -31,14 +35,21 @@ export function PaymentMethods() {
     setPaymentMethod,
     disabledPaymentTypes,
     invalidParameters,
+    multicurrency,
   } = useSaleContext();
   const { sendPageView, sendCloseEvent, sendSelectedPaymentMethod } = useSaleEvent();
 
-  const handleOptionClick = (type: SalePaymentTypes) => setPaymentMethod(type);
+  const handleOptionClick = (type: SalePaymentTypes) => {
+    if (type === SalePaymentTypes.CREDIT) {
+      setShowCreditCardWarning(true);
+    } else {
+      setPaymentMethod(type);
+    }
+  };
 
   useEffect(() => {
     if (paymentMethod) {
-      sendSelectedPaymentMethod(paymentMethod, SaleWidgetViews.PAYMENT_METHODS);
+      sendSelectedPaymentMethod(paymentMethod, SaleWidgetViews.PAYMENT_METHODS); // checkoutPrimarySalePaymentMethods_SelectMenuItem
     }
 
     if (
@@ -68,6 +79,19 @@ export function PaymentMethods() {
     }
 
     if (paymentMethod && paymentMethod === SalePaymentTypes.CRYPTO) {
+      if (multicurrency) {
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: {
+              type: SaleWidgetViews.ORDER_SUMMARY,
+              subView: OrderSummarySubViews.INIT,
+            },
+          },
+        });
+        return;
+      }
+
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -80,7 +104,7 @@ export function PaymentMethods() {
     }
   }, [paymentMethod]);
 
-  useEffect(() => sendPageView(SaleWidgetViews.PAYMENT_METHODS), []);
+  useEffect(() => sendPageView(SaleWidgetViews.PAYMENT_METHODS), []); // checkoutPrimarySalePaymentMethodsViewed
   useEffect(() => {
     if (!invalidParameters) return;
     goToErrorView(SaleErrorTypes.INVALID_PARAMETERS);
@@ -91,7 +115,7 @@ export function PaymentMethods() {
       testId="payment-methods"
       header={(
         <HeaderNavigation
-          onCloseButtonClick={() => sendCloseEvent(SaleWidgetViews.PAYMENT_METHODS)}
+          onCloseButtonClick={() => sendCloseEvent(SaleWidgetViews.PAYMENT_METHODS)} // checkoutPrimarySalePaymentMethods_CloseButtonPressed
         />
       )}
       footer={<FooterLogo />}
@@ -120,6 +144,11 @@ export function PaymentMethods() {
           />
         </Box>
       </Box>
+      <CreditCardWarningDrawer
+        visible={showCreditCardWarning}
+        setShowCreditCardWarning={setShowCreditCardWarning}
+        setPaymentMethod={setPaymentMethod}
+      />
     </SimpleLayout>
   );
 }

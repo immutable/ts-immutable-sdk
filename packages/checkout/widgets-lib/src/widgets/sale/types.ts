@@ -117,22 +117,6 @@ export type ClientConfig = {
   currencyConversion: ClientConfigCurrencyConversion;
 };
 
-export type SaleWidgetCurrency = {
-  name: string;
-  symbol?: string;
-  decimals: number;
-  address?: string;
-  icon?: string;
-  base?: boolean;
-  exchangeId?: string;
-  currencyType: SaleWidgetCurrencyType;
-};
-
-export enum SaleWidgetCurrencyType {
-  SWAPPABLE = 'swappable',
-  SETTLEMENT = 'settlement',
-}
-
 export enum SignPaymentTypes {
   CRYPTO = 'crypto',
   FIAT = 'fiat',

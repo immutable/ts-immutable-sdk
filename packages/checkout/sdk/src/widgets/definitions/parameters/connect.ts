@@ -11,4 +11,6 @@ export type ConnectWidgetParams = {
   language?: WidgetLanguage;
   /** The target chain to connect to as part of the connection process (defaults to Immutable zkEVM / Immutable zkEVM Testnet) */
   targetChainId?: ChainId;
+  /** List of wallets rdns to exclude from the connect widget */
+  blocklistWalletRdns?: string[];
 };

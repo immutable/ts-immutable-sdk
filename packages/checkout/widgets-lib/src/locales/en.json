@@ -237,7 +237,32 @@
           "caption": "The coins I have in another wallet or network.",
           "subcaption": "Fees ",
           "disabledCaption": ""
+        },
+        "advanced": {
+          "heading": "Advanced options",
+          "caption": "Perform a fast bridge or CEX deposit.",
+          "subcaption": "Fees ",
+          "disabledCaption": ""
         }
+      }
+    },
+    "ORDER_SUMMARY": {
+      "loading": {
+        "balances": "Crunching numbers"
+      },
+      "currency": {
+        "fiat": "≈ USD ${{amount}}",
+        "fees": "Fees"
+      },
+      "coinsDrawer": {
+        "header": "Pay with...",
+        "caption1": "Coins",
+        "caption2": "Balance"
+      },
+      "orderReview": {
+        "heading": "Pay with your",
+        "continue": "Continue",
+        "payWithCard": "No thanks, I'll pay with card"
       }
     },
     "FUND_WITH_SMART_CHECKOUT": {
@@ -295,6 +320,11 @@
         "processing1": "Initialising payment",
         "processing2": "Securing your assets",
         "processing3": "Finalising payment"
+      },
+      "creditCardWarningDrawer": {
+        "heading": "We recommend debit over credit",
+        "body": "Most banks will charge cash advance fees or block the transaction altogether when using credit card on these types of purchases.",
+        "ctaButton": "Try anyway"
       }
     },
     "PAY_WITH_COINS": {
