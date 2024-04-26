@@ -39,12 +39,13 @@ export const IMTBL_ZKEVM_NATIVE_TOKEN_ADDRESS = '0x00000000000000000000000000000
 export const ETHEREUM_NATIVE_TOKEN_ADDRESS = '0x0000000000000000000000000000000000000eee';
 
 /**
- * @constant {string} WITHDRAW_SIG - Signature of the withdraw command.
+ * @constant {string} WITHDRAW_SIG - Signature of the withdraw command, this is keccak256("WITHDRAW").
  */
 export const WITHDRAW_SIG = '0x7a8dc26796a1e50e6e190b70259f58f6a4edd5b22280ceecc82b687b8e982869';
 
 /**
- * @constant {string} SLOT_PREFIX_CONTRACT_CALL_APPROVED - The prefix of the storage slot to store contract call approved mapping.
+ * @constant {string} SLOT_PREFIX_CONTRACT_CALL_APPROVED - The prefix of the storage slot to store contract call approved mapping
+ * in axelar gateway proxy.
  */
 export const SLOT_PREFIX_CONTRACT_CALL_APPROVED = '0x07b0d4304f82012bd3b70b1d531c160e326067c90829e2a3d386722ad10b89c3';
 

@@ -905,71 +905,13 @@ export class TokenBridge {
       value: txValue,
     });
 
-    let axiosResponse:AxiosResponse;
-    const tenderlyAPI = this.getTenderlyEndpoint(sourceChainId);
-    try {
-      axiosResponse = await axios.post(
-        tenderlyAPI,
-        {
-          simulations,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      );
-    } catch (error: any) {
-      axiosResponse = error.response;
-    }
-
-    if (axiosResponse.data.error) {
-      throw new BridgeError(
-        `Estimating gas failed with the reason: ${axiosResponse.data.error.message}`,
-        BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
-      );
-    }
-
-    if (axiosResponse.data.simulation_results.length !== simulations.length) {
-      throw new BridgeError(
-        'Estimating gas failed with mismatched responses',
-        BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
-      );
-    }
-
+    const gas = await this.submitTenderlySimulations(sourceChainId, simulations);
     const tenderlyGasEstimatesRes = {} as DynamicGasEstimatesResponse;
-    const simResults = axiosResponse.data.simulation_results;
-
-    if (simResults.length === 1) {
-      if (simResults[0].simulation.error_message) {
-        throw new BridgeError(
-          `Estimating deposit gas failed with the reason: ${simResults[0].simulation.error_message}`,
-          BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
-        );
-      } else {
-        tenderlyGasEstimatesRes.sourceChainGas = simResults[0].simulation.gas_used;
-        tenderlyGasEstimatesRes.approvalGas = 0;
-      }
-    } else if (axiosResponse.data.simulation_results.length === 2) {
-      if (simResults[0].simulation.error_message) {
-        throw new BridgeError(
-          `Estimating approval gas failed with the reason: ${simResults[0].simulation.error_message}`,
-          BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
-        );
-      } else if (simResults[1].simulation.error_message) {
-        throw new BridgeError(
-          `Estimating deposit gas failed with the reason: ${simResults[1].simulation.error_message}`,
-          BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
-        );
-      } else {
-        tenderlyGasEstimatesRes.approvalGas = simResults[0].simulation.gas_used;
-        tenderlyGasEstimatesRes.sourceChainGas = simResults[1].simulation.gas_used;
-      }
+    if (gas.length === 1) {
+      tenderlyGasEstimatesRes.approvalGas = 0;
+      [tenderlyGasEstimatesRes.sourceChainGas] = gas;
     } else {
-      throw new BridgeError(
-        `Estimating gas failed with unexpected number responses ${axiosResponse.data.simulation_results.length}`,
-        BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
-      );
+      [tenderlyGasEstimatesRes.approvalGas, tenderlyGasEstimatesRes.sourceChainGas] = gas;
     }
     return tenderlyGasEstimatesRes;
   }
@@ -1044,8 +986,13 @@ export class TokenBridge {
       },
     }];
 
+    const gas = await this.submitTenderlySimulations(destinationChainId, simulations);
+    return gas[0];
+  }
+
+  private async submitTenderlySimulations(chainId: string, simulations: Array<any>): Promise<Array<number>> {
     let axiosResponse:AxiosResponse;
-    const tenderlyAPI = this.getTenderlyEndpoint(destinationChainId);
+    const tenderlyAPI = this.getTenderlyEndpoint(chainId);
     try {
       axiosResponse = await axios.post(
         tenderlyAPI,
@@ -1070,14 +1017,32 @@ export class TokenBridge {
     }
 
     const simResults = axiosResponse.data.simulation_results;
-    if (simResults.length !== 1 || simResults[0].simulation.gas_used === undefined) {
+    if (simResults.length !== simulations.length) {
       throw new BridgeError(
-        'Estimating gas did not return simulation results',
+        'Estimating gas failed with mismatched responses',
         BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
       );
     }
 
-    return simResults[0].simulation.gas_used;
+    const gas: Array<number> = [];
+
+    for (let i = 0; i < simResults.length; i++) {
+      if (simResults[i].simulation.error_message) {
+        throw new BridgeError(
+          `Estimating deposit gas failed with the reason: ${simResults[0].simulation.error_message}`,
+          BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
+        );
+      }
+      if (simResults[i].simulation.gas_used === undefined) {
+        throw new BridgeError(
+          'Estimating gas did not return simulation results',
+          BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
+        );
+      }
+      gas.push(simResults[i].simulation.gas_used);
+    }
+
+    return gas;
   }
 
   private async getAllowance(sourceChainId:string, token: string, sender: string): Promise<ethers.BigNumber> {
