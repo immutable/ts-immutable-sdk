@@ -78,8 +78,8 @@ describe('Passport', () => {
       getProviderSilent: getProviderSilentMock,
     });
     (MultiRollupApiClients as jest.Mock).mockReturnValue({
-      passportApi: {
-        getLinkedAddresses: getLinkedAddressesMock,
+      passportProfileApi: {
+        getUserInfo: getLinkedAddressesMock,
       },
     });
     passport = new Passport({
@@ -308,6 +308,7 @@ describe('Passport', () => {
       getUserMock.mockReturnValue(mockUser);
       getLinkedAddressesMock.mockReturnValue({
         data: {
+          sub: 'sub',
           linked_addresses: [],
         },
       });
