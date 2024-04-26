@@ -43,6 +43,8 @@
     "responselike": "^2.0.0"
   },
   "scripts": {
+    "bootstrap": "test -f sdk/workspace-packages.json || yarn prepare",
+    "prepare":"cd sdk && yarn bootstrap",
     "build": "NODE_OPTIONS=--max-old-space-size=14366 wsrun -y 4 -p @imtbl/sdk -p @imtbl/checkout-widgets -e -r --serial build && yarn syncpack:format && yarn wsrun -p @imtbl/sdk -a -m copyBrowserBundles",
     "build:onlysdk": "NODE_OPTIONS=--max-old-space-size=14366 wsrun -y 4 -p @imtbl/sdk --stages build && yarn syncpack:format",
     "docs:build": "typedoc",

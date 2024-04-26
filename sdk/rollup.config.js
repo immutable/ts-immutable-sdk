@@ -20,25 +20,7 @@ const moduleReleases = JSON.parse(readFileSync(new URL('module-release.json', im
 const workspacePackages = new URL('workspace-packages.json', import.meta.url);
 let packages;
 if (!existsSync(workspacePackages)) {
-  console.log('workspace-packages.json not found');
-  try {
-    console.log('Running yarn packageList && yarn updateDependencies && yarn regenModules');
-    console.log('exec is',exec);
-    console.log(import.meta.url);
-    exec('cd sdk && yarn packageList && yarn updateDependencies && yarn regenModules', (err, stdout, stderr) => { 
-      if (err) {
-        console.error('Failed to run yarn packageList && yarn updateDependencies && yarn regenModules');
-        console.error(err);
-        process.exit(1);
-      }
-      console.log(stdout);
-    });
-  } catch (e) {
-    console.error('Failed to run yarn packageList && yarn updateDependencies && yarn regenModules');
-    console.error(e);
-    process.exit(1);
-  }
-  packages = JSON.parse(readFileSync(workspacePackages, 'utf8'));
+  console.error('workspace-packages.json not found. Please run "yarn bootstrap" first');
 } else {
   packages = JSON.parse(readFileSync(workspacePackages, 'utf8'));
 }
