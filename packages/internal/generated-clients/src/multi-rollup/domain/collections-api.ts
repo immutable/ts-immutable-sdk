@@ -357,6 +357,51 @@ export const CollectionsApiAxiosParamCreator = function (configuration?: Configu
             };
         },
         /**
+         * Unlink a collection from an environment
+         * @param {string} chainName The name of chain
+         * @param {string} environmentId The environment ID
+         * @param {string} contractAddress The address of NFT contract
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        unlinkCollection: async (chainName: string, environmentId: string, contractAddress: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'chainName' is not null or undefined
+            assertParamExists('unlinkCollection', 'chainName', chainName)
+            // verify required parameter 'environmentId' is not null or undefined
+            assertParamExists('unlinkCollection', 'environmentId', environmentId)
+            // verify required parameter 'contractAddress' is not null or undefined
+            assertParamExists('unlinkCollection', 'contractAddress', contractAddress)
+            const localVarPath = `/v1/chains/{chain_name}/environments/{environment_id}/collections/{contract_address}/unlink`
+                .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)))
+                .replace(`{${"environment_id"}}`, encodeURIComponent(String(environmentId)))
+                .replace(`{${"contract_address"}}`, encodeURIComponent(String(contractAddress)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Updates a collection by contract address
          * @summary Updates a collection by contract address
          * @param {string} contractAddress The address contract
@@ -501,6 +546,18 @@ export const CollectionsApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Unlink a collection from an environment
+         * @param {string} chainName The name of chain
+         * @param {string} environmentId The environment ID
+         * @param {string} contractAddress The address of NFT contract
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async unlinkCollection(chainName: string, environmentId: string, contractAddress: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.unlinkCollection(chainName, environmentId, contractAddress, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Updates a collection by contract address
          * @summary Updates a collection by contract address
          * @param {string} contractAddress The address contract
@@ -582,6 +639,15 @@ export const CollectionsApiFactory = function (configuration?: Configuration, ba
          */
         refreshCollectionMetadata(requestParameters: CollectionsApiRefreshCollectionMetadataRequest, options?: AxiosRequestConfig): AxiosPromise<RefreshCollectionMetadataResult> {
             return localVarFp.refreshCollectionMetadata(requestParameters.contractAddress, requestParameters.chainName, requestParameters.refreshCollectionMetadataRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Unlink a collection from an environment
+         * @param {CollectionsApiUnlinkCollectionRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        unlinkCollection(requestParameters: CollectionsApiUnlinkCollectionRequest, options?: AxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.unlinkCollection(requestParameters.chainName, requestParameters.environmentId, requestParameters.contractAddress, options).then((request) => request(axios, basePath));
         },
         /**
          * Updates a collection by contract address
@@ -800,6 +866,34 @@ export interface CollectionsApiRefreshCollectionMetadataRequest {
 }
 
 /**
+ * Request parameters for unlinkCollection operation in CollectionsApi.
+ * @export
+ * @interface CollectionsApiUnlinkCollectionRequest
+ */
+export interface CollectionsApiUnlinkCollectionRequest {
+    /**
+     * The name of chain
+     * @type {string}
+     * @memberof CollectionsApiUnlinkCollection
+     */
+    readonly chainName: string
+
+    /**
+     * The environment ID
+     * @type {string}
+     * @memberof CollectionsApiUnlinkCollection
+     */
+    readonly environmentId: string
+
+    /**
+     * The address of NFT contract
+     * @type {string}
+     * @memberof CollectionsApiUnlinkCollection
+     */
+    readonly contractAddress: string
+}
+
+/**
  * Request parameters for updateCollection operation in CollectionsApi.
  * @export
  * @interface CollectionsApiUpdateCollectionRequest
@@ -904,6 +998,17 @@ export class CollectionsApi extends BaseAPI {
      */
     public refreshCollectionMetadata(requestParameters: CollectionsApiRefreshCollectionMetadataRequest, options?: AxiosRequestConfig) {
         return CollectionsApiFp(this.configuration).refreshCollectionMetadata(requestParameters.contractAddress, requestParameters.chainName, requestParameters.refreshCollectionMetadataRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Unlink a collection from an environment
+     * @param {CollectionsApiUnlinkCollectionRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CollectionsApi
+     */
+    public unlinkCollection(requestParameters: CollectionsApiUnlinkCollectionRequest, options?: AxiosRequestConfig) {
+        return CollectionsApiFp(this.configuration).unlinkCollection(requestParameters.chainName, requestParameters.environmentId, requestParameters.contractAddress, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

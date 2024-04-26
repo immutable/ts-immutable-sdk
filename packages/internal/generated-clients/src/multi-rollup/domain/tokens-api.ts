@@ -242,6 +242,51 @@ export const TokensApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
+         * Unlink a token from an environment
+         * @param {string} chainName The name of chain
+         * @param {string} environmentId The environment ID
+         * @param {string} contractAddress The address of token contract
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        unlinkToken: async (chainName: string, environmentId: string, contractAddress: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'chainName' is not null or undefined
+            assertParamExists('unlinkToken', 'chainName', chainName)
+            // verify required parameter 'environmentId' is not null or undefined
+            assertParamExists('unlinkToken', 'environmentId', environmentId)
+            // verify required parameter 'contractAddress' is not null or undefined
+            assertParamExists('unlinkToken', 'contractAddress', contractAddress)
+            const localVarPath = `/v1/chains/{chain_name}/environments/{environment_id}/tokens/{contract_address}/unlink`
+                .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)))
+                .replace(`{${"environment_id"}}`, encodeURIComponent(String(environmentId)))
+                .replace(`{${"contract_address"}}`, encodeURIComponent(String(contractAddress)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Updates a token by contract address
          * @summary Updates a token by contract address
          * @param {string} contractAddress The address contract
@@ -357,6 +402,18 @@ export const TokensApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Unlink a token from an environment
+         * @param {string} chainName The name of chain
+         * @param {string} environmentId The environment ID
+         * @param {string} contractAddress The address of token contract
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async unlinkToken(chainName: string, environmentId: string, contractAddress: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.unlinkToken(chainName, environmentId, contractAddress, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Updates a token by contract address
          * @summary Updates a token by contract address
          * @param {string} contractAddress The address contract
@@ -418,6 +475,15 @@ export const TokensApiFactory = function (configuration?: Configuration, basePat
          */
         listEnvironmentTokens(requestParameters: TokensApiListEnvironmentTokensRequest, options?: AxiosRequestConfig): AxiosPromise<ListTokensResult> {
             return localVarFp.listEnvironmentTokens(requestParameters.chainName, requestParameters.environmentId, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Unlink a token from an environment
+         * @param {TokensApiUnlinkTokenRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        unlinkToken(requestParameters: TokensApiUnlinkTokenRequest, options?: AxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.unlinkToken(requestParameters.chainName, requestParameters.environmentId, requestParameters.contractAddress, options).then((request) => request(axios, basePath));
         },
         /**
          * Updates a token by contract address
@@ -559,6 +625,34 @@ export interface TokensApiListEnvironmentTokensRequest {
 }
 
 /**
+ * Request parameters for unlinkToken operation in TokensApi.
+ * @export
+ * @interface TokensApiUnlinkTokenRequest
+ */
+export interface TokensApiUnlinkTokenRequest {
+    /**
+     * The name of chain
+     * @type {string}
+     * @memberof TokensApiUnlinkToken
+     */
+    readonly chainName: string
+
+    /**
+     * The environment ID
+     * @type {string}
+     * @memberof TokensApiUnlinkToken
+     */
+    readonly environmentId: string
+
+    /**
+     * The address of token contract
+     * @type {string}
+     * @memberof TokensApiUnlinkToken
+     */
+    readonly contractAddress: string
+}
+
+/**
  * Request parameters for updateToken operation in TokensApi.
  * @export
  * @interface TokensApiUpdateTokenRequest
@@ -639,6 +733,17 @@ export class TokensApi extends BaseAPI {
      */
     public listEnvironmentTokens(requestParameters: TokensApiListEnvironmentTokensRequest, options?: AxiosRequestConfig) {
         return TokensApiFp(this.configuration).listEnvironmentTokens(requestParameters.chainName, requestParameters.environmentId, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Unlink a token from an environment
+     * @param {TokensApiUnlinkTokenRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof TokensApi
+     */
+    public unlinkToken(requestParameters: TokensApiUnlinkTokenRequest, options?: AxiosRequestConfig) {
+        return TokensApiFp(this.configuration).unlinkToken(requestParameters.chainName, requestParameters.environmentId, requestParameters.contractAddress, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

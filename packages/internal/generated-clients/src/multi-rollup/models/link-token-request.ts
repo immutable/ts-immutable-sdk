@@ -38,5 +38,19 @@ export interface LinkTokenRequest {
      * @memberof LinkTokenRequest
      */
     'environment_name': string;
+    /**
+     * The source chain
+     * @type {string}
+     * @memberof LinkTokenRequest
+     */
+    'source_chain'?: LinkTokenRequestSourceChainEnum;
 }
+
+export const LinkTokenRequestSourceChainEnum = {
+    Ethereum: 'ETHEREUM',
+    Polygon: 'POLYGON'
+} as const;
+
+export type LinkTokenRequestSourceChainEnum = typeof LinkTokenRequestSourceChainEnum[keyof typeof LinkTokenRequestSourceChainEnum];
+
 

@@ -15,19 +15,16 @@
 
 
 /**
- * The verification status for a given contract
+ * Response page
  * @export
- * @enum {string}
+ * @interface PageResponse
  */
-
-export const AssetVerificationStatus = {
-    Verified: 'verified',
-    Unverified: 'unverified',
-    Spam: 'spam',
-    Inactive: 'inactive'
-} as const;
-
-export type AssetVerificationStatus = typeof AssetVerificationStatus[keyof typeof AssetVerificationStatus];
-
-
+export interface PageResponse {
+    /**
+     * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+     * @type {string}
+     * @memberof PageResponse
+     */
+    'next_cursor'?: string;
+}
 

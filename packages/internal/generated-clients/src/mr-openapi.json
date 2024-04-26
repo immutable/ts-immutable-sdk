@@ -57,6 +57,10 @@
       "x-displayName": "demopage"
     },
     {
+      "name": "verification",
+      "x-displayName": "verification"
+    },
+    {
       "name": "listings",
       "description": "Listings Endpoints",
       "x-displayName": "listings"
@@ -69,6 +73,11 @@
       "name": "passport",
       "description": "Passport operations",
       "x-displayName": "passport"
+    },
+    {
+      "name": "passport profile",
+      "description": "Passport Profile endpoints",
+      "x-displayName": "passport profile"
     }
   ],
   "paths": {
@@ -877,6 +886,154 @@
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/environments/{environment_id}/collections/{contract_address}/unlink": {
+      "delete": {
+        "description": "Unlink a collection from an environment",
+        "security": [
+          {
+            "BearerAuth": [
+              "update:collections"
+            ]
+          }
+        ],
+        "tags": [
+          "collections"
+        ],
+        "operationId": "UnlinkCollection",
+        "x-internal": true,
+        "parameters": [
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "examples": {
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              }
+            }
+          },
+          {
+            "name": "environment_id",
+            "description": "The environment ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "contract_address",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The address of NFT contract",
+            "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully unlinked"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorisedRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/environments/{environment_id}/tokens/{contract_address}/unlink": {
+      "delete": {
+        "description": "Unlink a token from an environment",
+        "security": [
+          {
+            "BearerAuth": [
+              "update:tokens"
+            ]
+          }
+        ],
+        "tags": [
+          "tokens"
+        ],
+        "operationId": "UnlinkToken",
+        "x-internal": true,
+        "parameters": [
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "examples": {
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              }
+            }
+          },
+          {
+            "name": "environment_id",
+            "description": "The environment ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "contract_address",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The address of token contract",
+            "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully unlinked"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorisedRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenRequest"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
@@ -2662,6 +2819,172 @@
         }
       }
     },
+    "/v1/internal/chains/{chain_name}/verification-requests": {
+      "post": {
+        "x-internal": true,
+        "description": "Creates a verification request for a given contract",
+        "tags": [
+          "verification"
+        ],
+        "operationId": "CreateVerificationRequest",
+        "security": [
+          {
+            "BearerAuth": [
+              "update:collections",
+              "update:tokens"
+            ]
+          }
+        ],
+        "summary": "Creates a verification request for a given contract",
+        "parameters": [
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "examples": {
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              }
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The request body",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateVerificationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateVerificationResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorisedRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      },
+      "get": {
+        "description": "List all verification requests",
+        "x-internal": true,
+        "tags": [
+          "verification"
+        ],
+        "operationId": "ListVerificationRequests",
+        "summary": "List all verification requests",
+        "security": [
+          {
+            "ImmutableApiKey": [
+              "update:collections",
+              "update:tokens"
+            ]
+          },
+          {
+            "BearerAuth": [
+              "update:collections",
+              "update:tokens"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "chain_name",
+            "in": "path",
+            "description": "The name of chain",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "examples": {
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              }
+            }
+          },
+          {
+            "name": "contract_address",
+            "in": "query",
+            "required": false,
+            "description": "List of contract addresses to filter by",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
+              }
+            }
+          },
+          {
+            "name": "verification_request_status",
+            "in": "query",
+            "required": false,
+            "description": "List of verification request status to filter by",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/VerificationRequestStatus"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListVerificationRequestResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorisedRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/v1/chains/{chain_name}/orders/cancel": {
       "post": {
         "tags": [
@@ -3350,117 +3673,6 @@
         }
       }
     },
-    "/v1/chains/{chain_name}/passport/counterfactual-address": {
-      "post": {
-        "x-internal": true,
-        "deprecated": true,
-        "summary": "Create a counterfactual address",
-        "description": "Create a counterfactual address for a user based on their Ethereum address",
-        "tags": [
-          "passport"
-        ],
-        "operationId": "createCounterfactualAddress",
-        "security": [
-          {
-            "BearerAuth": [
-              "transact"
-            ]
-          }
-        ],
-        "parameters": [
-          {
-            "name": "chain_name",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/ChainName"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateCounterfactualAddressRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Counterfactual address created response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CreateCounterfactualAddressRes"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "BadRequestError",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIError400"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "UnauthorizedError",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIError401"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "ForbiddenError",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIError403"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "TooManyRequestsError",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIError429"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "InternalServerError",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIError500"
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BasicAPIError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/v2/chains/{chain_name}/passport/counterfactual-address": {
       "post": {
         "x-internal": true,
@@ -3772,6 +3984,185 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/APIError429"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicAPIError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/passport/typeddata-metadata": {
+      "post": {
+        "x-internal": true,
+        "summary": "Get typeddata metadata",
+        "description": "Get typeddata metadata for a given encoded typeddata",
+        "tags": [
+          "passport"
+        ],
+        "operationId": "getTypedDataMetadata",
+        "security": [
+          {
+            "BearerAuth": [
+              "transact"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "chain_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetTypedDataMetadataRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Get typeddata metadata response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetTypedDataMetadataRes"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NotFoundError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError404"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "TooManyRequestsError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError429"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicAPIError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/passport-profile/v1/user/info": {
+      "get": {
+        "summary": "Get all info for a Passport user",
+        "description": "Get all the info for an authenticated Passport user",
+        "tags": [
+          "passport profile"
+        ],
+        "operationId": "getUserInfo",
+        "security": [
+          {
+            "BearerAuth": [
+              "openid"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Passport user's info",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserInfo"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
                 }
               }
             }
@@ -4362,6 +4753,14 @@
             "type": "string",
             "description": "The name of environment",
             "example": "Staging Environment"
+          },
+          "source_chain": {
+            "type": "string",
+            "description": "The source chain",
+            "enum": [
+              "ETHEREUM",
+              "POLYGON"
+            ]
           }
         },
         "required": [
@@ -5118,11 +5517,18 @@
         "description": "The verification status for a given contract",
         "type": "string",
         "enum": [
-          "pending",
           "verified",
           "unverified",
           "spam",
           "inactive"
+        ]
+      },
+      "VerificationRequestStatus": {
+        "description": "The status of the verification request",
+        "type": "string",
+        "enum": [
+          "completed",
+          "pending"
         ]
       },
       "GetNFTResult": {
@@ -5710,6 +6116,138 @@
           "assets"
         ]
       },
+      "CreateVerificationRequest": {
+        "type": "object",
+        "properties": {
+          "contract_address": {
+            "description": "The contract address",
+            "type": "string",
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          }
+        },
+        "required": [
+          "contract_address"
+        ]
+      },
+      "CreateVerificationResult": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "The id of the verification request",
+            "type": "string",
+            "format": "uuid",
+            "example": "4e28df8d-f65c-4c11-ba04-6a9dd47b179b"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "ListVerificationRequestResult": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "description": "List of verification requests",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VerificationRequest"
+            }
+          }
+        },
+        "required": [
+          "result"
+        ]
+      },
+      "VerificationRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "The id of the verification request",
+            "type": "string",
+            "format": "uuid",
+            "example": "4e28df8d-f65c-4c11-ba04-6a9dd47b179b"
+          },
+          "chain": {
+            "$ref": "#/components/schemas/Chain"
+          },
+          "contract_address": {
+            "description": "The contract address",
+            "type": "string",
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          },
+          "org_name": {
+            "description": "The name of the organisation associated with this contract",
+            "nullable": true,
+            "type": "string",
+            "example": "Immutable"
+          },
+          "project_name": {
+            "description": "The name of the project associated with this contract",
+            "nullable": true,
+            "type": "string",
+            "example": "Immutable project name"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "description": "The name of the collection",
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          },
+          "symbol": {
+            "type": "string",
+            "nullable": true,
+            "description": "The symbol of contract",
+            "example": "BASP"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "The description of collection",
+            "example": "Some description"
+          },
+          "org_id": {
+            "type": "string",
+            "nullable": true,
+            "description": "The id of the organisation associated with this contract",
+            "example": "753da67a-5d3b-42c7-b87a-eba3d17a6362"
+          },
+          "requester_email": {
+            "type": "string",
+            "nullable": true,
+            "description": "The email address of the user who requested the contract to be verified",
+            "example": "user@immutable.com"
+          },
+          "contract_type": {
+            "$ref": "#/components/schemas/VerificationRequestContractType"
+          },
+          "verification_request_status": {
+            "$ref": "#/components/schemas/VerificationRequestStatus"
+          }
+        },
+        "required": [
+          "id",
+          "chain",
+          "contract_address",
+          "name",
+          "symbol",
+          "description",
+          "contract_type",
+          "project_name",
+          "org_name",
+          "org_id",
+          "requester_email",
+          "verification_request_status"
+        ]
+      },
+      "VerificationRequestContractType": {
+        "description": "The contract type associated with the given request",
+        "type": "string",
+        "enum": [
+          "ERC20",
+          "ERC721",
+          "ERC1155"
+        ]
+      },
       "MintAsset": {
         "type": "object",
         "properties": {
@@ -5895,12 +6433,14 @@
           },
           "modified_by": {
             "type": "string"
+          },
+          "image_url": {
+            "type": "string",
+            "nullable": false,
+            "example": "https://www.example.com/image.png",
+            "description": "The url to the image of the erc20 token"
           }
-        },
-        "required": [
-          "verification_status",
-          "modified_by"
-        ]
+        }
       },
       "DemoPage": {
         "type": "string",
@@ -6685,6 +7225,9 @@
             "description": "Time the Order is last updated",
             "format": "date-time",
             "example": "2022-03-07T07:20:50.52Z"
+          },
+          "fill_status": {
+            "$ref": "#/components/schemas/FillStatus"
           }
         },
         "example": {
@@ -6724,6 +7267,10 @@
           "status": {
             "name": "ACTIVE"
           },
+          "fill_status": {
+            "numerator": 1,
+            "denominator": 2
+          },
           "type": "LISTING",
           "updated_at": "2022-03-07T07:20:50.52Z"
         },
@@ -6743,7 +7290,8 @@
           "protocol_data",
           "salt",
           "signature",
-          "status"
+          "status",
+          "fill_status"
         ]
       },
       "Trade": {
@@ -7433,7 +7981,8 @@
             "description": "Seaport order type",
             "example": "FULL_RESTRICTED",
             "enum": [
-              "FULL_RESTRICTED"
+              "FULL_RESTRICTED",
+              "PARTIAL_RESTRICTED"
             ]
           },
           "counter": {
@@ -7505,6 +8054,25 @@
           "log_index"
         ]
       },
+      "FillStatus": {
+        "type": "object",
+        "properties": {
+          "numerator": {
+            "type": "string",
+            "description": "The numerator of the fill status",
+            "example": "1"
+          },
+          "denominator": {
+            "type": "string",
+            "description": "The denominator of the fill status",
+            "example": "2"
+          }
+        },
+        "required": [
+          "numerator",
+          "denominator"
+        ]
+      },
       "APIError501": {
         "allOf": [
           {
@@ -7533,26 +8101,6 @@
             ]
           }
         ]
-      },
-      "CreateCounterfactualAddressRequestDeprecated": {
-        "type": "object",
-        "required": [
-          "ethereumAddress",
-          "ethereumSignature"
-        ],
-        "properties": {
-          "ethereumAddress": {
-            "description": "The user's UAK address",
-            "type": "string",
-            "maxLength": 42
-          },
-          "ethereumSignature": {
-            "description": "The signature generated with the UAK",
-            "type": "string",
-            "maxLength": 132
-          }
-        },
-        "additionalProperties": false
       },
       "CreateCounterfactualAddressRequest": {
         "type": "object",
@@ -7677,7 +8225,10 @@
           "collection_name",
           "collection_image",
           "asset_image",
-          "asset_name"
+          "asset_name",
+          "is_smart_contract",
+          "is_contract_verified",
+          "contract_name"
         ],
         "properties": {
           "transaction_type": {
@@ -7702,6 +8253,114 @@
           "asset_name": {
             "type": "string",
             "description": "NFT Asset image"
+          },
+          "is_smart_contract": {
+            "type": "boolean",
+            "description": "Indicate if it is a Smart Contract or EOA"
+          },
+          "is_contract_verified": {
+            "type": "boolean",
+            "description": "Is Contract Verified"
+          },
+          "contract_name": {
+            "type": "string",
+            "description": "Smart Contract Name"
+          }
+        }
+      },
+      "ERC20TransferMetadata": {
+        "type": "object",
+        "required": [
+          "transaction_type",
+          "to_address",
+          "amount",
+          "decimals",
+          "symbol",
+          "image_url"
+        ],
+        "properties": {
+          "transaction_type": {
+            "type": "string",
+            "description": "Transaction type",
+            "enum": [
+              "ERC20_TRANSFER"
+            ]
+          },
+          "to_address": {
+            "type": "string",
+            "description": "The address to transfer the token to",
+            "example": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+          },
+          "amount": {
+            "type": "string",
+            "description": "A string representing the amount of tokens to transfer",
+            "example": "10000000000000000"
+          },
+          "decimals": {
+            "type": "integer",
+            "description": "The token decimals",
+            "example": 18
+          },
+          "symbol": {
+            "type": "string",
+            "description": "The symbol of the token being transferred",
+            "example": "AAA"
+          },
+          "image_url": {
+            "type": "string",
+            "description": "The image of the token being transferred",
+            "example": "https://some-url"
+          }
+        }
+      },
+      "ERC20TransferFromMetadata": {
+        "type": "object",
+        "required": [
+          "transaction_type",
+          "from_address",
+          "to_address",
+          "amount",
+          "decimals",
+          "symbol",
+          "image_url"
+        ],
+        "properties": {
+          "transaction_type": {
+            "type": "string",
+            "description": "Transaction type",
+            "enum": [
+              "ERC20_TRANSFER_FROM"
+            ]
+          },
+          "from_address": {
+            "type": "string",
+            "description": "The address to transfer the token from",
+            "example": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+          },
+          "to_address": {
+            "type": "string",
+            "description": "The address to transfer the token to",
+            "example": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+          },
+          "amount": {
+            "type": "string",
+            "description": "A string representing the amount of tokens to transfer",
+            "example": "10000000000000000"
+          },
+          "decimals": {
+            "type": "integer",
+            "description": "The token decimals",
+            "example": 18
+          },
+          "symbol": {
+            "type": "string",
+            "description": "The symbol of the token being transferred",
+            "example": "AAA"
+          },
+          "image_url": {
+            "type": "string",
+            "description": "The image of the token being transferred",
+            "example": "https://some-url"
           }
         }
       },
@@ -7711,7 +8370,10 @@
           "transaction_type",
           "amount",
           "token_symbol",
-          "spender"
+          "spender",
+          "is_smart_contract",
+          "is_contract_verified",
+          "contract_name"
         ],
         "properties": {
           "transaction_type": {
@@ -7732,6 +8394,18 @@
           "spender": {
             "type": "string",
             "description": "Spender address"
+          },
+          "is_smart_contract": {
+            "type": "boolean",
+            "description": "Indicate if it is a Smart Contract or EOA"
+          },
+          "is_contract_verified": {
+            "type": "boolean",
+            "description": "Is Contract Verified"
+          },
+          "contract_name": {
+            "type": "string",
+            "description": "Smart Contract Name"
           }
         }
       },
@@ -7740,7 +8414,10 @@
         "required": [
           "transaction_type",
           "collection_name",
-          "collection_image"
+          "collection_image",
+          "is_smart_contract",
+          "is_contract_verified",
+          "contract_name"
         ],
         "properties": {
           "transaction_type": {
@@ -7758,6 +8435,134 @@
           "collection_image": {
             "type": "string",
             "description": "NFT Collection image"
+          },
+          "is_smart_contract": {
+            "type": "boolean",
+            "description": "Indicate if it is a Smart Contract or EOA"
+          },
+          "is_contract_verified": {
+            "type": "boolean",
+            "description": "Is Contract Verified"
+          },
+          "contract_name": {
+            "type": "string",
+            "description": "Smart Contract Name"
+          }
+        }
+      },
+      "ERC721TransferFromMetadata": {
+        "type": "object",
+        "required": [
+          "transaction_type",
+          "from_address",
+          "to_address",
+          "collection_name",
+          "token_id",
+          "asset_name",
+          "asset_image"
+        ],
+        "properties": {
+          "transaction_type": {
+            "type": "string",
+            "description": "Transaction type",
+            "enum": [
+              "ERC721_TRANSFER_FROM"
+            ]
+          },
+          "from_address": {
+            "type": "string",
+            "description": "The address to transfer the token from",
+            "example": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+          },
+          "to_address": {
+            "type": "string",
+            "description": "The address to transfer the token to",
+            "example": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+          },
+          "collection_name": {
+            "type": "string",
+            "description": "The collection name the ERC721 belongs to"
+          },
+          "token_id": {
+            "type": "string",
+            "description": "ID of the ERC721",
+            "example": "1"
+          },
+          "asset_name": {
+            "type": "string",
+            "description": "The name of the ERC721",
+            "example": "Sword"
+          },
+          "asset_image": {
+            "type": "string",
+            "description": "The image of the ERC721",
+            "example": "https://some-url"
+          }
+        }
+      },
+      "ERC721SafeTransferFromBatchMetadata": {
+        "type": "object",
+        "required": [
+          "transaction_type",
+          "from_address",
+          "collection_name",
+          "items"
+        ],
+        "properties": {
+          "transaction_type": {
+            "type": "string",
+            "description": "Transaction type",
+            "enum": [
+              "ERC721_SAFE_TRANSFER_FROM_BATCH"
+            ]
+          },
+          "from_address": {
+            "type": "string",
+            "description": "The address to transfer the token from",
+            "example": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+          },
+          "collection_name": {
+            "type": "string",
+            "description": "The collection name the ERC721 belongs to",
+            "example": "Guild of Guardians Heroes"
+          },
+          "items": {
+            "type": "array",
+            "description": "The ERC721s to transfer and where to transfer them to",
+            "items": {
+              "$ref": "#/components/schemas/ERC721SafeTransferFromBatchItem"
+            }
+          }
+        }
+      },
+      "ERC721SafeTransferFromBatchItem": {
+        "type": "object",
+        "required": [
+          "to_address",
+          "token_id",
+          "asset_name",
+          "asset_image"
+        ],
+        "properties": {
+          "to_address": {
+            "type": "string",
+            "description": "The address to transfer the token to",
+            "example": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+          },
+          "token_id": {
+            "type": "string",
+            "description": "ID of the ERC721",
+            "example": "1"
+          },
+          "asset_name": {
+            "type": "string",
+            "description": "The name of the ERC721",
+            "example": "Sword"
+          },
+          "asset_image": {
+            "type": "string",
+            "description": "The image of the ERC721",
+            "example": "https://some-url"
           }
         }
       },
@@ -7779,7 +8584,7 @@
           },
           "is_smart_contract": {
             "type": "boolean",
-            "description": "Is Smart Contract"
+            "description": "Indicate if it is a Smart Contract or EOA"
           },
           "is_contract_verified": {
             "type": "boolean",
@@ -7791,10 +8596,28 @@
           }
         }
       },
+      "UnknownTypedDataMetadata": {
+        "type": "object",
+        "required": [
+          "typed_data_type"
+        ],
+        "properties": {
+          "typed_data_type": {
+            "type": "string",
+            "description": "Unknown typed data type",
+            "enum": [
+              "UNKNOWN"
+            ]
+          }
+        }
+      },
       "SeaportFulfillAvailableAdvancedOrdersMetadata": {
         "type": "object",
         "required": [
           "transaction_type",
+          "is_smart_contract",
+          "is_contract_verified",
+          "contract_name",
           "buy",
           "sell",
           "fees"
@@ -7806,6 +8629,18 @@
             "enum": [
               "SEAPORT_FULFILL_AVAILABLE_ADVANCED_ORDERS"
             ]
+          },
+          "is_smart_contract": {
+            "type": "boolean",
+            "description": "Indicate if it is a Smart Contract or EOA"
+          },
+          "is_contract_verified": {
+            "type": "boolean",
+            "description": "Is Contract Verified"
+          },
+          "contract_name": {
+            "type": "string",
+            "description": "Smart Contract Name"
           },
           "orders": {
             "type": "array",
@@ -8037,11 +8872,74 @@
           "decimals"
         ]
       },
+      "SeaportCreateListingMetadata": {
+        "type": "object",
+        "required": [
+          "typed_data_type",
+          "buy",
+          "sell",
+          "fees"
+        ],
+        "properties": {
+          "typed_data_type": {
+            "type": "string",
+            "description": "Typed data type",
+            "enum": [
+              "SEAPORT_CREATE_LISTING_METADATA"
+            ]
+          },
+          "buy": {
+            "type": "object",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SeaportNativeItem"
+              },
+              {
+                "$ref": "#/components/schemas/SeaportERC20Item"
+              }
+            ],
+            "example": [
+              {
+                "type": "ERC721",
+                "contract_address": "0x87c07c927eba711cbc55ec628a670acd48d0b525",
+                "contract_name": "Guild of Guardians Heroes",
+                "name": "Bestowing Saint",
+                "token_id": 1
+              }
+            ]
+          },
+          "sell": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeaportERC721Item"
+            },
+            "example": [
+              {
+                "type": "NATIVE",
+                "amount": "9750000000000000000",
+                "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+              }
+            ]
+          },
+          "fees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeaportFee"
+            }
+          }
+        }
+      },
       "GetTransactionMetadataRes": {
         "type": "object",
         "oneOf": [
           {
             "$ref": "#/components/schemas/ERC20ApproveMetadata"
+          },
+          {
+            "$ref": "#/components/schemas/ERC20TransferMetadata"
+          },
+          {
+            "$ref": "#/components/schemas/ERC20TransferFromMetadata"
           },
           {
             "$ref": "#/components/schemas/ERC721ApproveMetadata"
@@ -8050,12 +8948,306 @@
             "$ref": "#/components/schemas/NFTSetApprovalForAllMetadata"
           },
           {
+            "$ref": "#/components/schemas/ERC721TransferFromMetadata"
+          },
+          {
+            "$ref": "#/components/schemas/ERC721SafeTransferFromBatchMetadata"
+          },
+          {
             "$ref": "#/components/schemas/SeaportFulfillAvailableAdvancedOrdersMetadata"
           },
           {
             "$ref": "#/components/schemas/UnknownMetadata"
           }
         ]
+      },
+      "GetTypedDataMetadataRes": {
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/SeaportCreateListingMetadata"
+          },
+          {
+            "$ref": "#/components/schemas/UnknownTypedDataMetadata"
+          }
+        ]
+      },
+      "GetTypedDataMetadataRequest": {
+        "type": "object",
+        "required": [
+          "payload"
+        ],
+        "properties": {
+          "payload": {
+            "$ref": "#/components/schemas/EIP712Message"
+          }
+        }
+      },
+      "EIP712Message": {
+        "type": "object",
+        "properties": {
+          "types": {
+            "type": "object",
+            "properties": {
+              "EIP712Domain": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "type"
+                  ]
+                }
+              }
+            },
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "type"
+                ]
+              }
+            },
+            "required": [
+              "EIP712Domain"
+            ]
+          },
+          "primaryType": {
+            "type": "string"
+          },
+          "domain": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "version": {
+                "type": "string"
+              },
+              "chainId": {
+                "type": "integer"
+              },
+              "verifyingContract": {
+                "type": "string"
+              },
+              "salt": {
+                "type": "string"
+              }
+            }
+          },
+          "message": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "types",
+          "primaryType",
+          "domain",
+          "message"
+        ]
+      },
+      "EthAddress": {
+        "description": "Ethereum address",
+        "type": "string",
+        "example": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045"
+      },
+      "CreatedAt": {
+        "description": "Created at",
+        "type": "string",
+        "format": "date-time",
+        "example": "2021-08-31T00:00:00Z"
+      },
+      "UpdatedAt": {
+        "description": "Updated at",
+        "type": "string",
+        "format": "date-time",
+        "example": "2021-08-31T00:00:00Z"
+      },
+      "Image": {
+        "description": "Image",
+        "type": "string",
+        "example": "https://test.com/image.png"
+      },
+      "TokenId": {
+        "description": "Token ID",
+        "type": "string",
+        "example": 0
+      },
+      "Network": {
+        "description": "Network",
+        "type": "string",
+        "example": "zkEvm",
+        "enum": [
+          "starkEx",
+          "zkEvm"
+        ]
+      },
+      "Name": {
+        "description": "Name",
+        "type": "string",
+        "example": "Test"
+      },
+      "Symbol": {
+        "description": "Symbol",
+        "type": "string",
+        "example": "TST"
+      },
+      "Description": {
+        "description": "Description",
+        "type": "string",
+        "example": "Test"
+      },
+      "Balance": {
+        "description": "Balance",
+        "type": "string",
+        "example": 0
+      },
+      "NftCollection": {
+        "description": "Collection",
+        "type": "object",
+        "required": [
+          "network",
+          "name",
+          "contract_address",
+          "balance"
+        ],
+        "properties": {
+          "network": {
+            "$ref": "#/components/schemas/Network"
+          },
+          "name": {
+            "$ref": "#/components/schemas/Name"
+          },
+          "contract_address": {
+            "$ref": "#/components/schemas/EthAddress"
+          },
+          "image": {
+            "$ref": "#/components/schemas/Image"
+          },
+          "icon": {
+            "$ref": "#/components/schemas/Image"
+          },
+          "balance": {
+            "$ref": "#/components/schemas/Balance"
+          },
+          "owners": {
+            "description": "Owners of the collection",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EthAddress"
+            }
+          }
+        }
+      },
+      "CollectionList": {
+        "description": "Collection list",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/NftCollection"
+        }
+      },
+      "CollectionItem": {
+        "description": "Item in a collection",
+        "type": "object",
+        "required": [
+          "network",
+          "token_id",
+          "owner"
+        ],
+        "properties": {
+          "network": {
+            "$ref": "#/components/schemas/Network"
+          },
+          "name": {
+            "$ref": "#/components/schemas/Name"
+          },
+          "description": {
+            "$ref": "#/components/schemas/Description"
+          },
+          "image": {
+            "$ref": "#/components/schemas/Image"
+          },
+          "animation_url": {
+            "$ref": "#/components/schemas/Image"
+          },
+          "token_id": {
+            "$ref": "#/components/schemas/TokenId"
+          },
+          "owner": {
+            "$ref": "#/components/schemas/EthAddress"
+          }
+        }
+      },
+      "WalletType": {
+        "description": "Wallet type",
+        "type": "string",
+        "example": "MetaMask"
+      },
+      "Signature": {
+        "description": "Signature",
+        "type": "string",
+        "example": "0x..."
+      },
+      "PageResponse": {
+        "description": "Response page",
+        "type": "object",
+        "properties": {
+          "next_cursor": {
+            "$ref": "#/components/schemas/PageCursor"
+          }
+        }
+      },
+      "UserInfo": {
+        "type": "object",
+        "required": [
+          "sub",
+          "linked_addresses"
+        ],
+        "properties": {
+          "sub": {
+            "type": "string",
+            "description": "The user's id"
+          },
+          "email": {
+            "type": "string",
+            "description": "The user's email address"
+          },
+          "passport_address": {
+            "type": "string",
+            "description": "The user's Passport address if it has been registered",
+            "pattern": "^0x[0-9a-fA-F]*$",
+            "maxLength": 42
+          },
+          "linked_addresses": {
+            "type": "array",
+            "minItems": 0,
+            "description": "The user's list of linked addresses",
+            "items": {
+              "description": "The user's linked address",
+              "type": "string",
+              "pattern": "^0x[0-9a-fA-F]*$",
+              "maxLength": 42
+            }
+          }
+        }
       }
     }
   },
@@ -8071,11 +9263,19 @@
         "metadata",
         "tokens",
         "demopage",
+        "verification",
         "listings",
         "orders",
         "passport"
       ],
       "description": "Passport MR API"
+    },
+    {
+      "name": "passportprofile",
+      "tags": [
+        "passport profile"
+      ],
+      "description": "Passport Profile Service API"
     }
   ]
 }

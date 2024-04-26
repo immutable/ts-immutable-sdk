@@ -28,13 +28,19 @@ export interface UpdateTokenRequest {
      * @type {AssetVerificationStatus}
      * @memberof UpdateTokenRequest
      */
-    'verification_status': AssetVerificationStatus;
+    'verification_status'?: AssetVerificationStatus;
     /**
      * 
      * @type {string}
      * @memberof UpdateTokenRequest
      */
-    'modified_by': string;
+    'modified_by'?: string;
+    /**
+     * The url to the image of the erc20 token
+     * @type {string}
+     * @memberof UpdateTokenRequest
+     */
+    'image_url'?: string;
 }
 
 

@@ -15,19 +15,22 @@
 
 
 /**
- * The verification status for a given contract
+ * 
  * @export
- * @enum {string}
+ * @interface EIP712MessageTypesEIP712DomainInner
  */
-
-export const AssetVerificationStatus = {
-    Verified: 'verified',
-    Unverified: 'unverified',
-    Spam: 'spam',
-    Inactive: 'inactive'
-} as const;
-
-export type AssetVerificationStatus = typeof AssetVerificationStatus[keyof typeof AssetVerificationStatus];
-
-
+export interface EIP712MessageTypesEIP712DomainInner {
+    /**
+     * 
+     * @type {string}
+     * @memberof EIP712MessageTypesEIP712DomainInner
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof EIP712MessageTypesEIP712DomainInner
+     */
+    'type': string;
+}
 

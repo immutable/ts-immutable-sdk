@@ -15,19 +15,16 @@
 
 
 /**
- * The verification status for a given contract
+ * 
  * @export
- * @enum {string}
+ * @interface CreateVerificationResult
  */
-
-export const AssetVerificationStatus = {
-    Verified: 'verified',
-    Unverified: 'unverified',
-    Spam: 'spam',
-    Inactive: 'inactive'
-} as const;
-
-export type AssetVerificationStatus = typeof AssetVerificationStatus[keyof typeof AssetVerificationStatus];
-
-
+export interface CreateVerificationResult {
+    /**
+     * The id of the verification request
+     * @type {string}
+     * @memberof CreateVerificationResult
+     */
+    'id': string;
+}
 

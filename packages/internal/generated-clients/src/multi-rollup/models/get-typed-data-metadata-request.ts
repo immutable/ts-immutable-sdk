@@ -13,21 +13,21 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import { EIP712Message } from './eip712-message';
 
 /**
- * The verification status for a given contract
+ * 
  * @export
- * @enum {string}
+ * @interface GetTypedDataMetadataRequest
  */
-
-export const AssetVerificationStatus = {
-    Verified: 'verified',
-    Unverified: 'unverified',
-    Spam: 'spam',
-    Inactive: 'inactive'
-} as const;
-
-export type AssetVerificationStatus = typeof AssetVerificationStatus[keyof typeof AssetVerificationStatus];
-
-
+export interface GetTypedDataMetadataRequest {
+    /**
+     * 
+     * @type {EIP712Message}
+     * @memberof GetTypedDataMetadataRequest
+     */
+    'payload': EIP712Message;
+}
 

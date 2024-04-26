@@ -15,19 +15,17 @@
 
 
 /**
- * The verification status for a given contract
+ * The status of the verification request
  * @export
  * @enum {string}
  */
 
-export const AssetVerificationStatus = {
-    Verified: 'verified',
-    Unverified: 'unverified',
-    Spam: 'spam',
-    Inactive: 'inactive'
+export const VerificationRequestStatus = {
+    Completed: 'completed',
+    Pending: 'pending'
 } as const;
 
-export type AssetVerificationStatus = typeof AssetVerificationStatus[keyof typeof AssetVerificationStatus];
+export type VerificationRequestStatus = typeof VerificationRequestStatus[keyof typeof VerificationRequestStatus];
 
 
 
