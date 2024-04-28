@@ -6,10 +6,9 @@ import {
   MultiRollupApiClients,
 } from '@imtbl/generated-clients';
 import { IMXClient } from '@imtbl/x-client';
-import { ChainName } from 'network/chains';
 import { Environment } from '@imtbl/config';
 
-import { setPassportClientId, identify, track } from '@imtbl/metrics';
+import { identify, setPassportClientId, track } from '@imtbl/metrics';
 
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
@@ -300,13 +299,7 @@ export class Passport {
       return [];
     }
     const headers = { Authorization: `Bearer ${user.accessToken}` };
-    const linkedAddressesResult = await this.multiRollupApiClients.passportApi.getLinkedAddresses(
-      {
-        chainName: ChainName.ETHEREUM,
-        userId: user?.profile.sub,
-      },
-      { headers },
-    );
-    return linkedAddressesResult.data.linked_addresses;
+    const getUserInfoResult = await this.multiRollupApiClients.passportProfileApi.getUserInfo({ headers });
+    return getUserInfoResult.data.linked_addresses;
   }
 }

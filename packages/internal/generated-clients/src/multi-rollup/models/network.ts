@@ -15,19 +15,17 @@
 
 
 /**
- * The verification status for a given contract
+ * Network
  * @export
  * @enum {string}
  */
 
-export const AssetVerificationStatus = {
-    Verified: 'verified',
-    Unverified: 'unverified',
-    Spam: 'spam',
-    Inactive: 'inactive'
+export const Network = {
+    StarkEx: 'starkEx',
+    ZkEvm: 'zkEvm'
 } as const;
 
-export type AssetVerificationStatus = typeof AssetVerificationStatus[keyof typeof AssetVerificationStatus];
+export type Network = typeof Network[keyof typeof Network];
 
 
 

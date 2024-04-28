@@ -30,6 +30,24 @@ export interface SeaportFulfillAvailableAdvancedOrdersMetadata {
      */
     'transaction_type': SeaportFulfillAvailableAdvancedOrdersMetadataTransactionTypeEnum;
     /**
+     * Indicate if it is a Smart Contract or EOA
+     * @type {boolean}
+     * @memberof SeaportFulfillAvailableAdvancedOrdersMetadata
+     */
+    'is_smart_contract': boolean;
+    /**
+     * Is Contract Verified
+     * @type {boolean}
+     * @memberof SeaportFulfillAvailableAdvancedOrdersMetadata
+     */
+    'is_contract_verified': boolean;
+    /**
+     * Smart Contract Name
+     * @type {string}
+     * @memberof SeaportFulfillAvailableAdvancedOrdersMetadata
+     */
+    'contract_name': string;
+    /**
      * 
      * @type {Array<SeaportAdvancedOrder>}
      * @memberof SeaportFulfillAvailableAdvancedOrdersMetadata

@@ -34,19 +34,13 @@ import { APIError500 } from '../models';
 // @ts-ignore
 import { AssetVerificationStatus } from '../models';
 // @ts-ignore
-import { CollectionContractType } from '../models';
-// @ts-ignore
 import { GetCollectionResult } from '../models';
-// @ts-ignore
-import { LinkCollectionRequest } from '../models';
 // @ts-ignore
 import { ListCollectionsResult } from '../models';
 // @ts-ignore
 import { RefreshCollectionMetadataRequest } from '../models';
 // @ts-ignore
 import { RefreshCollectionMetadataResult } from '../models';
-// @ts-ignore
-import { UpdateCollectionRequest } from '../models';
 /**
  * CollectionsApi - axios parameter creator
  * @export
@@ -85,54 +79,6 @@ export const CollectionsApiAxiosParamCreator = function (configuration?: Configu
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * Link a collection with an environment
-         * @summary Link a collection with an environment
-         * @param {string} chainName The name of chain
-         * @param {string} environmentId The environment ID
-         * @param {LinkCollectionRequest} linkCollectionRequest The request body
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        linkCollection: async (chainName: string, environmentId: string, linkCollectionRequest: LinkCollectionRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'chainName' is not null or undefined
-            assertParamExists('linkCollection', 'chainName', chainName)
-            // verify required parameter 'environmentId' is not null or undefined
-            assertParamExists('linkCollection', 'environmentId', environmentId)
-            // verify required parameter 'linkCollectionRequest' is not null or undefined
-            assertParamExists('linkCollection', 'linkCollectionRequest', linkCollectionRequest)
-            const localVarPath = `/v1/chains/{chain_name}/environments/{environment_id}/collections/link`
-                .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)))
-                .replace(`{${"environment_id"}}`, encodeURIComponent(String(environmentId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication BearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(linkCollectionRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -249,63 +195,6 @@ export const CollectionsApiAxiosParamCreator = function (configuration?: Configu
             };
         },
         /**
-         * List all collections linked to a specific environment ID
-         * @summary List all collections linked to a specific environment ID
-         * @param {string} chainName The name of chain
-         * @param {string} environmentId The id of the Environment
-         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
-         * @param {number} [pageSize] Maximum number of items to return
-         * @param {CollectionContractType} [contractType] Filter which contract type to return
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        listEnvironmentCollections: async (chainName: string, environmentId: string, pageCursor?: string, pageSize?: number, contractType?: CollectionContractType, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'chainName' is not null or undefined
-            assertParamExists('listEnvironmentCollections', 'chainName', chainName)
-            // verify required parameter 'environmentId' is not null or undefined
-            assertParamExists('listEnvironmentCollections', 'environmentId', environmentId)
-            const localVarPath = `/v1/chains/{chain_name}/environments/{environment_id}/collections`
-                .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)))
-                .replace(`{${"environment_id"}}`, encodeURIComponent(String(environmentId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication BearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            if (pageCursor !== undefined) {
-                localVarQueryParameter['page_cursor'] = pageCursor;
-            }
-
-            if (pageSize !== undefined) {
-                localVarQueryParameter['page_size'] = pageSize;
-            }
-
-            if (contractType !== undefined) {
-                localVarQueryParameter['contract_type'] = contractType;
-            }
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
          * Refresh collection metadata
          * @summary Refresh collection metadata
          * @param {string} contractAddress The address contract
@@ -356,57 +245,6 @@ export const CollectionsApiAxiosParamCreator = function (configuration?: Configu
                 options: localVarRequestOptions,
             };
         },
-        /**
-         * Updates a collection by contract address
-         * @summary Updates a collection by contract address
-         * @param {string} contractAddress The address contract
-         * @param {string} chainName The name of chain
-         * @param {UpdateCollectionRequest} updateCollectionRequest The request body
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        updateCollection: async (contractAddress: string, chainName: string, updateCollectionRequest: UpdateCollectionRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'contractAddress' is not null or undefined
-            assertParamExists('updateCollection', 'contractAddress', contractAddress)
-            // verify required parameter 'chainName' is not null or undefined
-            assertParamExists('updateCollection', 'chainName', chainName)
-            // verify required parameter 'updateCollectionRequest' is not null or undefined
-            assertParamExists('updateCollection', 'updateCollectionRequest', updateCollectionRequest)
-            const localVarPath = `/v1/internal/chains/{chain_name}/collections/{contract_address}`
-                .replace(`{${"contract_address"}}`, encodeURIComponent(String(contractAddress)))
-                .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication ImmutableApiKey required
-            await setApiKeyToObject(localVarHeaderParameter, "x-immutable-api-key", configuration)
-
-            // authentication BearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(updateCollectionRequest, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
     }
 };
 
@@ -427,19 +265,6 @@ export const CollectionsApiFp = function(configuration?: Configuration) {
          */
         async getCollection(contractAddress: string, chainName: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetCollectionResult>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getCollection(contractAddress, chainName, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * Link a collection with an environment
-         * @summary Link a collection with an environment
-         * @param {string} chainName The name of chain
-         * @param {string} environmentId The environment ID
-         * @param {LinkCollectionRequest} linkCollectionRequest The request body
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async linkCollection(chainName: string, environmentId: string, linkCollectionRequest: LinkCollectionRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetCollectionResult>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.linkCollection(chainName, environmentId, linkCollectionRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -473,21 +298,6 @@ export const CollectionsApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * List all collections linked to a specific environment ID
-         * @summary List all collections linked to a specific environment ID
-         * @param {string} chainName The name of chain
-         * @param {string} environmentId The id of the Environment
-         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
-         * @param {number} [pageSize] Maximum number of items to return
-         * @param {CollectionContractType} [contractType] Filter which contract type to return
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async listEnvironmentCollections(chainName: string, environmentId: string, pageCursor?: string, pageSize?: number, contractType?: CollectionContractType, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListCollectionsResult>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listEnvironmentCollections(chainName, environmentId, pageCursor, pageSize, contractType, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
          * Refresh collection metadata
          * @summary Refresh collection metadata
          * @param {string} contractAddress The address contract
@@ -498,19 +308,6 @@ export const CollectionsApiFp = function(configuration?: Configuration) {
          */
         async refreshCollectionMetadata(contractAddress: string, chainName: string, refreshCollectionMetadataRequest: RefreshCollectionMetadataRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RefreshCollectionMetadataResult>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.refreshCollectionMetadata(contractAddress, chainName, refreshCollectionMetadataRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * Updates a collection by contract address
-         * @summary Updates a collection by contract address
-         * @param {string} contractAddress The address contract
-         * @param {string} chainName The name of chain
-         * @param {UpdateCollectionRequest} updateCollectionRequest The request body
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async updateCollection(contractAddress: string, chainName: string, updateCollectionRequest: UpdateCollectionRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetCollectionResult>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updateCollection(contractAddress, chainName, updateCollectionRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -534,16 +331,6 @@ export const CollectionsApiFactory = function (configuration?: Configuration, ba
             return localVarFp.getCollection(requestParameters.contractAddress, requestParameters.chainName, options).then((request) => request(axios, basePath));
         },
         /**
-         * Link a collection with an environment
-         * @summary Link a collection with an environment
-         * @param {CollectionsApiLinkCollectionRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        linkCollection(requestParameters: CollectionsApiLinkCollectionRequest, options?: AxiosRequestConfig): AxiosPromise<GetCollectionResult> {
-            return localVarFp.linkCollection(requestParameters.chainName, requestParameters.environmentId, requestParameters.linkCollectionRequest, options).then((request) => request(axios, basePath));
-        },
-        /**
          * List all collections
          * @summary List all collections
          * @param {CollectionsApiListCollectionsRequest} requestParameters Request parameters.
@@ -564,16 +351,6 @@ export const CollectionsApiFactory = function (configuration?: Configuration, ba
             return localVarFp.listCollectionsByNFTOwner(requestParameters.accountAddress, requestParameters.chainName, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
         },
         /**
-         * List all collections linked to a specific environment ID
-         * @summary List all collections linked to a specific environment ID
-         * @param {CollectionsApiListEnvironmentCollectionsRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        listEnvironmentCollections(requestParameters: CollectionsApiListEnvironmentCollectionsRequest, options?: AxiosRequestConfig): AxiosPromise<ListCollectionsResult> {
-            return localVarFp.listEnvironmentCollections(requestParameters.chainName, requestParameters.environmentId, requestParameters.pageCursor, requestParameters.pageSize, requestParameters.contractType, options).then((request) => request(axios, basePath));
-        },
-        /**
          * Refresh collection metadata
          * @summary Refresh collection metadata
          * @param {CollectionsApiRefreshCollectionMetadataRequest} requestParameters Request parameters.
@@ -582,16 +359,6 @@ export const CollectionsApiFactory = function (configuration?: Configuration, ba
          */
         refreshCollectionMetadata(requestParameters: CollectionsApiRefreshCollectionMetadataRequest, options?: AxiosRequestConfig): AxiosPromise<RefreshCollectionMetadataResult> {
             return localVarFp.refreshCollectionMetadata(requestParameters.contractAddress, requestParameters.chainName, requestParameters.refreshCollectionMetadataRequest, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * Updates a collection by contract address
-         * @summary Updates a collection by contract address
-         * @param {CollectionsApiUpdateCollectionRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        updateCollection(requestParameters: CollectionsApiUpdateCollectionRequest, options?: AxiosRequestConfig): AxiosPromise<GetCollectionResult> {
-            return localVarFp.updateCollection(requestParameters.contractAddress, requestParameters.chainName, requestParameters.updateCollectionRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -615,34 +382,6 @@ export interface CollectionsApiGetCollectionRequest {
      * @memberof CollectionsApiGetCollection
      */
     readonly chainName: string
-}
-
-/**
- * Request parameters for linkCollection operation in CollectionsApi.
- * @export
- * @interface CollectionsApiLinkCollectionRequest
- */
-export interface CollectionsApiLinkCollectionRequest {
-    /**
-     * The name of chain
-     * @type {string}
-     * @memberof CollectionsApiLinkCollection
-     */
-    readonly chainName: string
-
-    /**
-     * The environment ID
-     * @type {string}
-     * @memberof CollectionsApiLinkCollection
-     */
-    readonly environmentId: string
-
-    /**
-     * The request body
-     * @type {LinkCollectionRequest}
-     * @memberof CollectionsApiLinkCollection
-     */
-    readonly linkCollectionRequest: LinkCollectionRequest
 }
 
 /**
@@ -730,48 +469,6 @@ export interface CollectionsApiListCollectionsByNFTOwnerRequest {
 }
 
 /**
- * Request parameters for listEnvironmentCollections operation in CollectionsApi.
- * @export
- * @interface CollectionsApiListEnvironmentCollectionsRequest
- */
-export interface CollectionsApiListEnvironmentCollectionsRequest {
-    /**
-     * The name of chain
-     * @type {string}
-     * @memberof CollectionsApiListEnvironmentCollections
-     */
-    readonly chainName: string
-
-    /**
-     * The id of the Environment
-     * @type {string}
-     * @memberof CollectionsApiListEnvironmentCollections
-     */
-    readonly environmentId: string
-
-    /**
-     * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
-     * @type {string}
-     * @memberof CollectionsApiListEnvironmentCollections
-     */
-    readonly pageCursor?: string
-
-    /**
-     * Maximum number of items to return
-     * @type {number}
-     * @memberof CollectionsApiListEnvironmentCollections
-     */
-    readonly pageSize?: number
-
-    /**
-     * Filter which contract type to return
-     * @type {CollectionContractType}
-     * @memberof CollectionsApiListEnvironmentCollections
-     */
-    readonly contractType?: CollectionContractType
-}
-
-/**
  * Request parameters for refreshCollectionMetadata operation in CollectionsApi.
  * @export
  * @interface CollectionsApiRefreshCollectionMetadataRequest
@@ -800,34 +497,6 @@ export interface CollectionsApiRefreshCollectionMetadataRequest {
 }
 
 /**
- * Request parameters for updateCollection operation in CollectionsApi.
- * @export
- * @interface CollectionsApiUpdateCollectionRequest
- */
-export interface CollectionsApiUpdateCollectionRequest {
-    /**
-     * The address contract
-     * @type {string}
-     * @memberof CollectionsApiUpdateCollection
-     */
-    readonly contractAddress: string
-
-    /**
-     * The name of chain
-     * @type {string}
-     * @memberof CollectionsApiUpdateCollection
-     */
-    readonly chainName: string
-
-    /**
-     * The request body
-     * @type {UpdateCollectionRequest}
-     * @memberof CollectionsApiUpdateCollection
-     */
-    readonly updateCollectionRequest: UpdateCollectionRequest
-}
-
-/**
  * CollectionsApi - object-oriented interface
  * @export
  * @class CollectionsApi
@@ -844,18 +513,6 @@ export class CollectionsApi extends BaseAPI {
      */
     public getCollection(requestParameters: CollectionsApiGetCollectionRequest, options?: AxiosRequestConfig) {
         return CollectionsApiFp(this.configuration).getCollection(requestParameters.contractAddress, requestParameters.chainName, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * Link a collection with an environment
-     * @summary Link a collection with an environment
-     * @param {CollectionsApiLinkCollectionRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof CollectionsApi
-     */
-    public linkCollection(requestParameters: CollectionsApiLinkCollectionRequest, options?: AxiosRequestConfig) {
-        return CollectionsApiFp(this.configuration).linkCollection(requestParameters.chainName, requestParameters.environmentId, requestParameters.linkCollectionRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -883,18 +540,6 @@ export class CollectionsApi extends BaseAPI {
     }
 
     /**
-     * List all collections linked to a specific environment ID
-     * @summary List all collections linked to a specific environment ID
-     * @param {CollectionsApiListEnvironmentCollectionsRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof CollectionsApi
-     */
-    public listEnvironmentCollections(requestParameters: CollectionsApiListEnvironmentCollectionsRequest, options?: AxiosRequestConfig) {
-        return CollectionsApiFp(this.configuration).listEnvironmentCollections(requestParameters.chainName, requestParameters.environmentId, requestParameters.pageCursor, requestParameters.pageSize, requestParameters.contractType, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
      * Refresh collection metadata
      * @summary Refresh collection metadata
      * @param {CollectionsApiRefreshCollectionMetadataRequest} requestParameters Request parameters.
@@ -904,18 +549,6 @@ export class CollectionsApi extends BaseAPI {
      */
     public refreshCollectionMetadata(requestParameters: CollectionsApiRefreshCollectionMetadataRequest, options?: AxiosRequestConfig) {
         return CollectionsApiFp(this.configuration).refreshCollectionMetadata(requestParameters.contractAddress, requestParameters.chainName, requestParameters.refreshCollectionMetadataRequest, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * Updates a collection by contract address
-     * @summary Updates a collection by contract address
-     * @param {CollectionsApiUpdateCollectionRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof CollectionsApi
-     */
-    public updateCollection(requestParameters: CollectionsApiUpdateCollectionRequest, options?: AxiosRequestConfig) {
-        return CollectionsApiFp(this.configuration).updateCollection(requestParameters.contractAddress, requestParameters.chainName, requestParameters.updateCollectionRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

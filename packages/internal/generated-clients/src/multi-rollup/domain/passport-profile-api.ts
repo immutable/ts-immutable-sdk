@@ -21,19 +21,28 @@ import globalAxios from 'axios';
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
+// @ts-ignore
+import { APIError401 } from '../models';
+// @ts-ignore
+import { APIError500 } from '../models';
+// @ts-ignore
+import { BasicAPIError } from '../models';
+// @ts-ignore
+import { UserInfo } from '../models';
 /**
- * DemopageApi - axios parameter creator
+ * PassportProfileApi - axios parameter creator
  * @export
  */
-export const DemopageApiAxiosParamCreator = function (configuration?: Configuration) {
+export const PassportProfileApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Demopage
+         * Get all the info for an authenticated Passport user
+         * @summary Get all info for a Passport user
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        demoPage: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/demopage`;
+        getUserInfo: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/passport-profile/v1/user/info`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -44,6 +53,10 @@ export const DemopageApiAxiosParamCreator = function (configuration?: Configurat
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
 
     
@@ -60,57 +73,60 @@ export const DemopageApiAxiosParamCreator = function (configuration?: Configurat
 };
 
 /**
- * DemopageApi - functional programming interface
+ * PassportProfileApi - functional programming interface
  * @export
  */
-export const DemopageApiFp = function(configuration?: Configuration) {
-    const localVarAxiosParamCreator = DemopageApiAxiosParamCreator(configuration)
+export const PassportProfileApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = PassportProfileApiAxiosParamCreator(configuration)
     return {
         /**
-         * Demopage
+         * Get all the info for an authenticated Passport user
+         * @summary Get all info for a Passport user
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async demoPage(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.demoPage(options);
+        async getUserInfo(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserInfo>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getUserInfo(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
 };
 
 /**
- * DemopageApi - factory interface
+ * PassportProfileApi - factory interface
  * @export
  */
-export const DemopageApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
-    const localVarFp = DemopageApiFp(configuration)
+export const PassportProfileApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = PassportProfileApiFp(configuration)
     return {
         /**
-         * Demopage
+         * Get all the info for an authenticated Passport user
+         * @summary Get all info for a Passport user
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        demoPage(options?: AxiosRequestConfig): AxiosPromise<string> {
-            return localVarFp.demoPage(options).then((request) => request(axios, basePath));
+        getUserInfo(options?: AxiosRequestConfig): AxiosPromise<UserInfo> {
+            return localVarFp.getUserInfo(options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
- * DemopageApi - object-oriented interface
+ * PassportProfileApi - object-oriented interface
  * @export
- * @class DemopageApi
+ * @class PassportProfileApi
  * @extends {BaseAPI}
  */
-export class DemopageApi extends BaseAPI {
+export class PassportProfileApi extends BaseAPI {
     /**
-     * Demopage
+     * Get all the info for an authenticated Passport user
+     * @summary Get all info for a Passport user
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DemopageApi
+     * @memberof PassportProfileApi
      */
-    public demoPage(options?: AxiosRequestConfig) {
-        return DemopageApiFp(this.configuration).demoPage(options).then((request) => request(this.axios, this.basePath));
+    public getUserInfo(options?: AxiosRequestConfig) {
+        return PassportProfileApiFp(this.configuration).getUserInfo(options).then((request) => request(this.axios, this.basePath));
     }
 }
 

@@ -21,6 +21,9 @@ import { Chain } from './chain';
 import { Fee } from './fee';
 // May contain unused imports in some cases
 // @ts-ignore
+import { FillStatus } from './fill-status';
+// May contain unused imports in some cases
+// @ts-ignore
 import { Item } from './item';
 // May contain unused imports in some cases
 // @ts-ignore
@@ -131,6 +134,12 @@ export interface Order {
      * @memberof Order
      */
     'updated_at': string;
+    /**
+     * 
+     * @type {FillStatus}
+     * @memberof Order
+     */
+    'fill_status': FillStatus;
 }
 
 export const OrderTypeEnum = {

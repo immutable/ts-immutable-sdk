@@ -15,19 +15,18 @@
 
 
 /**
- * The verification status for a given contract
+ * The contract type associated with the given request
  * @export
  * @enum {string}
  */
 
-export const AssetVerificationStatus = {
-    Verified: 'verified',
-    Unverified: 'unverified',
-    Spam: 'spam',
-    Inactive: 'inactive'
+export const VerificationRequestContractType = {
+    Erc20: 'ERC20',
+    Erc721: 'ERC721',
+    Erc1155: 'ERC1155'
 } as const;
 
-export type AssetVerificationStatus = typeof AssetVerificationStatus[keyof typeof AssetVerificationStatus];
+export type VerificationRequestContractType = typeof VerificationRequestContractType[keyof typeof VerificationRequestContractType];
 
 
 

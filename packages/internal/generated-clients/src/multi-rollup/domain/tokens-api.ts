@@ -24,10 +24,6 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 // @ts-ignore
 import { APIError400 } from '../models';
 // @ts-ignore
-import { APIError401 } from '../models';
-// @ts-ignore
-import { APIError403 } from '../models';
-// @ts-ignore
 import { APIError404 } from '../models';
 // @ts-ignore
 import { APIError500 } from '../models';
@@ -36,11 +32,7 @@ import { AssetVerificationStatus } from '../models';
 // @ts-ignore
 import { GetTokenResult } from '../models';
 // @ts-ignore
-import { LinkTokenRequest } from '../models';
-// @ts-ignore
 import { ListTokensResult } from '../models';
-// @ts-ignore
-import { UpdateTokenRequest } from '../models';
 /**
  * TokensApi - axios parameter creator
  * @export
@@ -79,54 +71,6 @@ export const TokensApiAxiosParamCreator = function (configuration?: Configuratio
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * Link a ERC20 token with an environment
-         * @summary Link a ERC20 token with an environment
-         * @param {string} chainName The name of chain
-         * @param {string} environmentId The environment ID
-         * @param {LinkTokenRequest} linkTokenRequest The request body
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        linkToken: async (chainName: string, environmentId: string, linkTokenRequest: LinkTokenRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'chainName' is not null or undefined
-            assertParamExists('linkToken', 'chainName', chainName)
-            // verify required parameter 'environmentId' is not null or undefined
-            assertParamExists('linkToken', 'environmentId', environmentId)
-            // verify required parameter 'linkTokenRequest' is not null or undefined
-            assertParamExists('linkToken', 'linkTokenRequest', linkTokenRequest)
-            const localVarPath = `/v1/chains/{chain_name}/environments/{environment_id}/tokens/link`
-                .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)))
-                .replace(`{${"environment_id"}}`, encodeURIComponent(String(environmentId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication BearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(linkTokenRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -189,109 +133,6 @@ export const TokensApiAxiosParamCreator = function (configuration?: Configuratio
                 options: localVarRequestOptions,
             };
         },
-        /**
-         * List all tokens linked to a specific environment ID
-         * @summary List all tokens linked to a specific environment ID
-         * @param {string} chainName The name of chain
-         * @param {string} environmentId The id of the Environment
-         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
-         * @param {number} [pageSize] Maximum number of items to return
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        listEnvironmentTokens: async (chainName: string, environmentId: string, pageCursor?: string, pageSize?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'chainName' is not null or undefined
-            assertParamExists('listEnvironmentTokens', 'chainName', chainName)
-            // verify required parameter 'environmentId' is not null or undefined
-            assertParamExists('listEnvironmentTokens', 'environmentId', environmentId)
-            const localVarPath = `/v1/chains/{chain_name}/environments/{environment_id}/tokens`
-                .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)))
-                .replace(`{${"environment_id"}}`, encodeURIComponent(String(environmentId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication BearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            if (pageCursor !== undefined) {
-                localVarQueryParameter['page_cursor'] = pageCursor;
-            }
-
-            if (pageSize !== undefined) {
-                localVarQueryParameter['page_size'] = pageSize;
-            }
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * Updates a token by contract address
-         * @summary Updates a token by contract address
-         * @param {string} contractAddress The address contract
-         * @param {string} chainName The name of chain
-         * @param {UpdateTokenRequest} updateTokenRequest The request body
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        updateToken: async (contractAddress: string, chainName: string, updateTokenRequest: UpdateTokenRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'contractAddress' is not null or undefined
-            assertParamExists('updateToken', 'contractAddress', contractAddress)
-            // verify required parameter 'chainName' is not null or undefined
-            assertParamExists('updateToken', 'chainName', chainName)
-            // verify required parameter 'updateTokenRequest' is not null or undefined
-            assertParamExists('updateToken', 'updateTokenRequest', updateTokenRequest)
-            const localVarPath = `/v1/internal/chains/{chain_name}/tokens/{contract_address}`
-                .replace(`{${"contract_address"}}`, encodeURIComponent(String(contractAddress)))
-                .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication ImmutableApiKey required
-            await setApiKeyToObject(localVarHeaderParameter, "x-immutable-api-key", configuration)
-
-            // authentication BearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(updateTokenRequest, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
     }
 };
 
@@ -315,19 +156,6 @@ export const TokensApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Link a ERC20 token with an environment
-         * @summary Link a ERC20 token with an environment
-         * @param {string} chainName The name of chain
-         * @param {string} environmentId The environment ID
-         * @param {LinkTokenRequest} linkTokenRequest The request body
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async linkToken(chainName: string, environmentId: string, linkTokenRequest: LinkTokenRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetTokenResult>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.linkToken(chainName, environmentId, linkTokenRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
          * List ERC20 tokens
          * @summary List ERC20 tokens
          * @param {string} chainName The name of chain
@@ -340,33 +168,6 @@ export const TokensApiFp = function(configuration?: Configuration) {
          */
         async listERC20Tokens(chainName: string, fromUpdatedAt?: string, verificationStatus?: Array<AssetVerificationStatus>, pageCursor?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListTokensResult>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listERC20Tokens(chainName, fromUpdatedAt, verificationStatus, pageCursor, pageSize, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * List all tokens linked to a specific environment ID
-         * @summary List all tokens linked to a specific environment ID
-         * @param {string} chainName The name of chain
-         * @param {string} environmentId The id of the Environment
-         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
-         * @param {number} [pageSize] Maximum number of items to return
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async listEnvironmentTokens(chainName: string, environmentId: string, pageCursor?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListTokensResult>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listEnvironmentTokens(chainName, environmentId, pageCursor, pageSize, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * Updates a token by contract address
-         * @summary Updates a token by contract address
-         * @param {string} contractAddress The address contract
-         * @param {string} chainName The name of chain
-         * @param {UpdateTokenRequest} updateTokenRequest The request body
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async updateToken(contractAddress: string, chainName: string, updateTokenRequest: UpdateTokenRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetTokenResult>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updateToken(contractAddress, chainName, updateTokenRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -390,16 +191,6 @@ export const TokensApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.getERC20Token(requestParameters.contractAddress, requestParameters.chainName, options).then((request) => request(axios, basePath));
         },
         /**
-         * Link a ERC20 token with an environment
-         * @summary Link a ERC20 token with an environment
-         * @param {TokensApiLinkTokenRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        linkToken(requestParameters: TokensApiLinkTokenRequest, options?: AxiosRequestConfig): AxiosPromise<GetTokenResult> {
-            return localVarFp.linkToken(requestParameters.chainName, requestParameters.environmentId, requestParameters.linkTokenRequest, options).then((request) => request(axios, basePath));
-        },
-        /**
          * List ERC20 tokens
          * @summary List ERC20 tokens
          * @param {TokensApiListERC20TokensRequest} requestParameters Request parameters.
@@ -408,26 +199,6 @@ export const TokensApiFactory = function (configuration?: Configuration, basePat
          */
         listERC20Tokens(requestParameters: TokensApiListERC20TokensRequest, options?: AxiosRequestConfig): AxiosPromise<ListTokensResult> {
             return localVarFp.listERC20Tokens(requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.verificationStatus, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * List all tokens linked to a specific environment ID
-         * @summary List all tokens linked to a specific environment ID
-         * @param {TokensApiListEnvironmentTokensRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        listEnvironmentTokens(requestParameters: TokensApiListEnvironmentTokensRequest, options?: AxiosRequestConfig): AxiosPromise<ListTokensResult> {
-            return localVarFp.listEnvironmentTokens(requestParameters.chainName, requestParameters.environmentId, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * Updates a token by contract address
-         * @summary Updates a token by contract address
-         * @param {TokensApiUpdateTokenRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        updateToken(requestParameters: TokensApiUpdateTokenRequest, options?: AxiosRequestConfig): AxiosPromise<GetTokenResult> {
-            return localVarFp.updateToken(requestParameters.contractAddress, requestParameters.chainName, requestParameters.updateTokenRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -451,34 +222,6 @@ export interface TokensApiGetERC20TokenRequest {
      * @memberof TokensApiGetERC20Token
      */
     readonly chainName: string
-}
-
-/**
- * Request parameters for linkToken operation in TokensApi.
- * @export
- * @interface TokensApiLinkTokenRequest
- */
-export interface TokensApiLinkTokenRequest {
-    /**
-     * The name of chain
-     * @type {string}
-     * @memberof TokensApiLinkToken
-     */
-    readonly chainName: string
-
-    /**
-     * The environment ID
-     * @type {string}
-     * @memberof TokensApiLinkToken
-     */
-    readonly environmentId: string
-
-    /**
-     * The request body
-     * @type {LinkTokenRequest}
-     * @memberof TokensApiLinkToken
-     */
-    readonly linkTokenRequest: LinkTokenRequest
 }
 
 /**
@@ -524,69 +267,6 @@ export interface TokensApiListERC20TokensRequest {
 }
 
 /**
- * Request parameters for listEnvironmentTokens operation in TokensApi.
- * @export
- * @interface TokensApiListEnvironmentTokensRequest
- */
-export interface TokensApiListEnvironmentTokensRequest {
-    /**
-     * The name of chain
-     * @type {string}
-     * @memberof TokensApiListEnvironmentTokens
-     */
-    readonly chainName: string
-
-    /**
-     * The id of the Environment
-     * @type {string}
-     * @memberof TokensApiListEnvironmentTokens
-     */
-    readonly environmentId: string
-
-    /**
-     * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
-     * @type {string}
-     * @memberof TokensApiListEnvironmentTokens
-     */
-    readonly pageCursor?: string
-
-    /**
-     * Maximum number of items to return
-     * @type {number}
-     * @memberof TokensApiListEnvironmentTokens
-     */
-    readonly pageSize?: number
-}
-
-/**
- * Request parameters for updateToken operation in TokensApi.
- * @export
- * @interface TokensApiUpdateTokenRequest
- */
-export interface TokensApiUpdateTokenRequest {
-    /**
-     * The address contract
-     * @type {string}
-     * @memberof TokensApiUpdateToken
-     */
-    readonly contractAddress: string
-
-    /**
-     * The name of chain
-     * @type {string}
-     * @memberof TokensApiUpdateToken
-     */
-    readonly chainName: string
-
-    /**
-     * The request body
-     * @type {UpdateTokenRequest}
-     * @memberof TokensApiUpdateToken
-     */
-    readonly updateTokenRequest: UpdateTokenRequest
-}
-
-/**
  * TokensApi - object-oriented interface
  * @export
  * @class TokensApi
@@ -606,18 +286,6 @@ export class TokensApi extends BaseAPI {
     }
 
     /**
-     * Link a ERC20 token with an environment
-     * @summary Link a ERC20 token with an environment
-     * @param {TokensApiLinkTokenRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof TokensApi
-     */
-    public linkToken(requestParameters: TokensApiLinkTokenRequest, options?: AxiosRequestConfig) {
-        return TokensApiFp(this.configuration).linkToken(requestParameters.chainName, requestParameters.environmentId, requestParameters.linkTokenRequest, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
      * List ERC20 tokens
      * @summary List ERC20 tokens
      * @param {TokensApiListERC20TokensRequest} requestParameters Request parameters.
@@ -627,30 +295,6 @@ export class TokensApi extends BaseAPI {
      */
     public listERC20Tokens(requestParameters: TokensApiListERC20TokensRequest, options?: AxiosRequestConfig) {
         return TokensApiFp(this.configuration).listERC20Tokens(requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.verificationStatus, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * List all tokens linked to a specific environment ID
-     * @summary List all tokens linked to a specific environment ID
-     * @param {TokensApiListEnvironmentTokensRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof TokensApi
-     */
-    public listEnvironmentTokens(requestParameters: TokensApiListEnvironmentTokensRequest, options?: AxiosRequestConfig) {
-        return TokensApiFp(this.configuration).listEnvironmentTokens(requestParameters.chainName, requestParameters.environmentId, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * Updates a token by contract address
-     * @summary Updates a token by contract address
-     * @param {TokensApiUpdateTokenRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof TokensApi
-     */
-    public updateToken(requestParameters: TokensApiUpdateTokenRequest, options?: AxiosRequestConfig) {
-        return TokensApiFp(this.configuration).updateToken(requestParameters.contractAddress, requestParameters.chainName, requestParameters.updateTokenRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

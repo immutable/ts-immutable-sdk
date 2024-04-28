@@ -47,57 +47,16 @@ import { GetLinkedAddressesResDeprecated } from '../models';
 import { GetTransactionMetadataRequest } from '../models';
 // @ts-ignore
 import { GetTransactionMetadataRes } from '../models';
+// @ts-ignore
+import { GetTypedDataMetadataRequest } from '../models';
+// @ts-ignore
+import { GetTypedDataMetadataRes } from '../models';
 /**
  * PassportApi - axios parameter creator
  * @export
  */
 export const PassportApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
-        /**
-         * Create a counterfactual address for a user based on their Ethereum address
-         * @summary Create a counterfactual address
-         * @param {string} chainName 
-         * @param {CreateCounterfactualAddressRequest} createCounterfactualAddressRequest 
-         * @param {*} [options] Override http request option.
-         * @deprecated
-         * @throws {RequiredError}
-         */
-        createCounterfactualAddress: async (chainName: string, createCounterfactualAddressRequest: CreateCounterfactualAddressRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'chainName' is not null or undefined
-            assertParamExists('createCounterfactualAddress', 'chainName', chainName)
-            // verify required parameter 'createCounterfactualAddressRequest' is not null or undefined
-            assertParamExists('createCounterfactualAddress', 'createCounterfactualAddressRequest', createCounterfactualAddressRequest)
-            const localVarPath = `/v1/chains/{chain_name}/passport/counterfactual-address`
-                .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication BearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(createCounterfactualAddressRequest, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
         /**
          * Create a counterfactual address for a user based on their Ethereum address
          * @summary Create a counterfactual address v2
@@ -267,6 +226,50 @@ export const PassportApiAxiosParamCreator = function (configuration?: Configurat
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Get typeddata metadata for a given encoded typeddata
+         * @summary Get typeddata metadata
+         * @param {string} chainName 
+         * @param {GetTypedDataMetadataRequest} getTypedDataMetadataRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getTypedDataMetadata: async (chainName: string, getTypedDataMetadataRequest: GetTypedDataMetadataRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'chainName' is not null or undefined
+            assertParamExists('getTypedDataMetadata', 'chainName', chainName)
+            // verify required parameter 'getTypedDataMetadataRequest' is not null or undefined
+            assertParamExists('getTypedDataMetadata', 'getTypedDataMetadataRequest', getTypedDataMetadataRequest)
+            const localVarPath = `/v1/chains/{chain_name}/passport/typeddata-metadata`
+                .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(getTypedDataMetadataRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -277,19 +280,6 @@ export const PassportApiAxiosParamCreator = function (configuration?: Configurat
 export const PassportApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = PassportApiAxiosParamCreator(configuration)
     return {
-        /**
-         * Create a counterfactual address for a user based on their Ethereum address
-         * @summary Create a counterfactual address
-         * @param {string} chainName 
-         * @param {CreateCounterfactualAddressRequest} createCounterfactualAddressRequest 
-         * @param {*} [options] Override http request option.
-         * @deprecated
-         * @throws {RequiredError}
-         */
-        async createCounterfactualAddress(chainName: string, createCounterfactualAddressRequest: CreateCounterfactualAddressRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateCounterfactualAddressRes>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createCounterfactualAddress(chainName, createCounterfactualAddressRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
         /**
          * Create a counterfactual address for a user based on their Ethereum address
          * @summary Create a counterfactual address v2
@@ -338,6 +328,18 @@ export const PassportApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getTransactionMetadata(chainName, getTransactionMetadataRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
+        /**
+         * Get typeddata metadata for a given encoded typeddata
+         * @summary Get typeddata metadata
+         * @param {string} chainName 
+         * @param {GetTypedDataMetadataRequest} getTypedDataMetadataRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getTypedDataMetadata(chainName: string, getTypedDataMetadataRequest: GetTypedDataMetadataRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetTypedDataMetadataRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getTypedDataMetadata(chainName, getTypedDataMetadataRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
     }
 };
 
@@ -348,17 +350,6 @@ export const PassportApiFp = function(configuration?: Configuration) {
 export const PassportApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = PassportApiFp(configuration)
     return {
-        /**
-         * Create a counterfactual address for a user based on their Ethereum address
-         * @summary Create a counterfactual address
-         * @param {PassportApiCreateCounterfactualAddressRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @deprecated
-         * @throws {RequiredError}
-         */
-        createCounterfactualAddress(requestParameters: PassportApiCreateCounterfactualAddressRequest, options?: AxiosRequestConfig): AxiosPromise<CreateCounterfactualAddressRes> {
-            return localVarFp.createCounterfactualAddress(requestParameters.chainName, requestParameters.createCounterfactualAddressRequest, options).then((request) => request(axios, basePath));
-        },
         /**
          * Create a counterfactual address for a user based on their Ethereum address
          * @summary Create a counterfactual address v2
@@ -400,29 +391,18 @@ export const PassportApiFactory = function (configuration?: Configuration, baseP
         getTransactionMetadata(requestParameters: PassportApiGetTransactionMetadataRequest, options?: AxiosRequestConfig): AxiosPromise<GetTransactionMetadataRes> {
             return localVarFp.getTransactionMetadata(requestParameters.chainName, requestParameters.getTransactionMetadataRequest, options).then((request) => request(axios, basePath));
         },
+        /**
+         * Get typeddata metadata for a given encoded typeddata
+         * @summary Get typeddata metadata
+         * @param {PassportApiGetTypedDataMetadataRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getTypedDataMetadata(requestParameters: PassportApiGetTypedDataMetadataRequest, options?: AxiosRequestConfig): AxiosPromise<GetTypedDataMetadataRes> {
+            return localVarFp.getTypedDataMetadata(requestParameters.chainName, requestParameters.getTypedDataMetadataRequest, options).then((request) => request(axios, basePath));
+        },
     };
 };
-
-/**
- * Request parameters for createCounterfactualAddress operation in PassportApi.
- * @export
- * @interface PassportApiCreateCounterfactualAddressRequest
- */
-export interface PassportApiCreateCounterfactualAddressRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof PassportApiCreateCounterfactualAddress
-     */
-    readonly chainName: string
-
-    /**
-     * 
-     * @type {CreateCounterfactualAddressRequest}
-     * @memberof PassportApiCreateCounterfactualAddress
-     */
-    readonly createCounterfactualAddressRequest: CreateCounterfactualAddressRequest
-}
 
 /**
  * Request parameters for createCounterfactualAddressV2 operation in PassportApi.
@@ -502,25 +482,33 @@ export interface PassportApiGetTransactionMetadataRequest {
 }
 
 /**
+ * Request parameters for getTypedDataMetadata operation in PassportApi.
+ * @export
+ * @interface PassportApiGetTypedDataMetadataRequest
+ */
+export interface PassportApiGetTypedDataMetadataRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof PassportApiGetTypedDataMetadata
+     */
+    readonly chainName: string
+
+    /**
+     * 
+     * @type {GetTypedDataMetadataRequest}
+     * @memberof PassportApiGetTypedDataMetadata
+     */
+    readonly getTypedDataMetadataRequest: GetTypedDataMetadataRequest
+}
+
+/**
  * PassportApi - object-oriented interface
  * @export
  * @class PassportApi
  * @extends {BaseAPI}
  */
 export class PassportApi extends BaseAPI {
-    /**
-     * Create a counterfactual address for a user based on their Ethereum address
-     * @summary Create a counterfactual address
-     * @param {PassportApiCreateCounterfactualAddressRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @deprecated
-     * @throws {RequiredError}
-     * @memberof PassportApi
-     */
-    public createCounterfactualAddress(requestParameters: PassportApiCreateCounterfactualAddressRequest, options?: AxiosRequestConfig) {
-        return PassportApiFp(this.configuration).createCounterfactualAddress(requestParameters.chainName, requestParameters.createCounterfactualAddressRequest, options).then((request) => request(this.axios, this.basePath));
-    }
-
     /**
      * Create a counterfactual address for a user based on their Ethereum address
      * @summary Create a counterfactual address v2
@@ -568,6 +556,18 @@ export class PassportApi extends BaseAPI {
      */
     public getTransactionMetadata(requestParameters: PassportApiGetTransactionMetadataRequest, options?: AxiosRequestConfig) {
         return PassportApiFp(this.configuration).getTransactionMetadata(requestParameters.chainName, requestParameters.getTransactionMetadataRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get typeddata metadata for a given encoded typeddata
+     * @summary Get typeddata metadata
+     * @param {PassportApiGetTypedDataMetadataRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PassportApi
+     */
+    public getTypedDataMetadata(requestParameters: PassportApiGetTypedDataMetadataRequest, options?: AxiosRequestConfig) {
+        return PassportApiFp(this.configuration).getTypedDataMetadata(requestParameters.chainName, requestParameters.getTypedDataMetadataRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

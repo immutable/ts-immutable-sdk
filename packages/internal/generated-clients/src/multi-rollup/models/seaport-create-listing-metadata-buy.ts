@@ -13,21 +13,17 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import { SeaportERC20Item } from './seaport-erc20-item';
+// May contain unused imports in some cases
+// @ts-ignore
+import { SeaportNativeItem } from './seaport-native-item';
 
 /**
- * The verification status for a given contract
+ * @type SeaportCreateListingMetadataBuy
  * @export
- * @enum {string}
  */
-
-export const AssetVerificationStatus = {
-    Verified: 'verified',
-    Unverified: 'unverified',
-    Spam: 'spam',
-    Inactive: 'inactive'
-} as const;
-
-export type AssetVerificationStatus = typeof AssetVerificationStatus[keyof typeof AssetVerificationStatus];
-
+export type SeaportCreateListingMetadataBuy = SeaportERC20Item | SeaportNativeItem;
 
 
