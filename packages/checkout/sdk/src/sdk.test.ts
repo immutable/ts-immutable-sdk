@@ -702,11 +702,18 @@ describe('Connect', () => {
     let networkInfoResult: NetworkInfo;
     let getTokenAllowListResult: GetTokenAllowListResult;
 
-    const defaultWidgetUrl = 'https://global-stg.transak.com?apiKey=41ad2da7-ed5a-4d89-a90b-c751865effc2'
-      + '&network=immutablezkevm&defaultPaymentMethod=credit_debit_card&disablePaymentMethods='
-      + 'sepa_bank_transfer,gbp_bank_transfer,pm_cash_app,pm_jwire,pm_paymaya,pm_bpi,pm_ubp,pm_grabpay,'
-      + 'pm_shopeepay,pm_gcash,pm_pix,pm_astropay,pm_pse,inr_bank_transfer&productsAvailed=buy'
-      + '&exchangeScreenTitle=Buy&themeColor=0D0D0D';
+    const defaultURL = 'https://global-stg.transak.com';
+    const defaultParams = {
+      apiKey: '41ad2da7-ed5a-4d89-a90b-c751865effc2',
+      network: 'immutablezkevm',
+      defaultPaymentMethod: 'credit_debit_card',
+      disablePaymentMethods: '',
+      productsAvailed: 'buy',
+      exchangeScreenTitle: 'Buy',
+      themeColor: '0D0D0D',
+    };
+
+    const defaultWidgetUrl = `${defaultURL}?${new URLSearchParams(defaultParams).toString()}`;
 
     beforeEach(() => {
       createWidgetUrlMock = jest.fn().mockResolvedValue(defaultWidgetUrl);

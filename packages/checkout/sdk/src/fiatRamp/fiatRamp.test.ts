@@ -10,8 +10,7 @@ const defaultParams = {
   apiKey: 'mock-api-key',
   network: 'immutablezkevm',
   defaultPaymentMethod: 'credit_debit_card',
-  disablePaymentMethods:
-    'sepa_bank_transfer,gbp_bank_transfer,pm_cash_app,pm_jwire,pm_paymaya,pm_bpi,pm_ubp,pm_grabpay,pm_shopeepay,pm_gcash,pm_pix,pm_astropay,pm_pse,inr_bank_transfer', // eslint-disable-line max-len
+  disablePaymentMethods: '',
   productsAvailed: 'buy',
   exchangeScreenTitle: 'Buy',
   themeColor: '0D0D0D',
