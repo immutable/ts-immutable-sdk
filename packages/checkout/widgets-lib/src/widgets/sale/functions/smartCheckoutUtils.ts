@@ -9,7 +9,8 @@ import {
   ItemType,
   RoutingOutcome,
   RoutingOutcomeType,
-  SmartCheckoutResult, TokenBalance,
+  SmartCheckoutResult,
+  TokenBalance,
   TransactionOrGasType,
 } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
@@ -18,8 +19,11 @@ import { SmartCheckoutError } from '../types';
 
 export const MAX_GAS_LIMIT = '30000000';
 
-export const getItemRequirements = (amount: string, spenderAddress: string, tokenAddress: string)
-: ERC20ItemRequirement[] => [
+export const getItemRequirements = (
+  amount: string,
+  spenderAddress: string,
+  tokenAddress: string,
+): ERC20ItemRequirement[] => [
   {
     type: ItemType.ERC20,
     tokenAddress,
@@ -61,7 +65,11 @@ export const fundingRouteFees = (
   let totalUsd: number = 0;
   for (const fee of fees) {
     if (fee.token) {
-      const feeUsd = calculateCryptoToFiat(fee.formattedAmount, fee.token.symbol, conversions);
+      const feeUsd = calculateCryptoToFiat(
+        fee.formattedAmount,
+        fee.token.symbol,
+        conversions,
+      );
       totalUsd += parseFloat(feeUsd);
     }
   }
@@ -71,19 +79,23 @@ export const fundingRouteFees = (
 export const smartCheckoutTokensList = (
   smartCheckoutResult: SmartCheckoutResult,
 ) => {
-  if (smartCheckoutResult.sufficient
-    || smartCheckoutResult.router.routingOutcome.type !== RoutingOutcomeType.ROUTES_FOUND) {
+  if (
+    smartCheckoutResult.sufficient
+    || smartCheckoutResult.router?.routingOutcome.type
+      !== RoutingOutcomeType.ROUTES_FOUND
+  ) {
     return [];
   }
 
   const tokenSymbols: string[] = [];
   for (const requirement of smartCheckoutResult.transactionRequirements) {
-    const { token } = (requirement.current as TokenBalance);
+    const { token } = requirement.current as TokenBalance;
     if (!tokenSymbols.includes(token.symbol)) {
       tokenSymbols.push(token.symbol);
     }
   }
-  for (const fundingRoute of smartCheckoutResult.router.routingOutcome.fundingRoutes) {
+  for (const fundingRoute of smartCheckoutResult.router.routingOutcome
+    .fundingRoutes) {
     for (const step of fundingRoute.steps) {
       if (!tokenSymbols.includes(step.fundingItem.token.symbol)) {
         tokenSymbols.push(step.fundingItem.token.symbol);
@@ -118,7 +130,7 @@ export const filterSmartCheckoutResult = (
   // if the transaction has been made sufficient, no need to filter
   if (
     filteredSmartCheckoutResult.sufficient
-    || filteredSmartCheckoutResult.router.routingOutcome.type
+    || filteredSmartCheckoutResult.router?.routingOutcome.type
       !== RoutingOutcomeType.ROUTES_FOUND
   ) {
     return filteredSmartCheckoutResult;
@@ -130,12 +142,12 @@ export const filterSmartCheckoutResult = (
     // FundingStepType.ONRAMP,
     // FundingStepType.BRIDGE,
   ] as FundingStepType[];
-  const filteredFundingRoutes = filteredSmartCheckoutResult.router.routingOutcome.fundingRoutes.filter(
+  const filteredFundingRoutes = filteredSmartCheckoutResult.router?.routingOutcome.fundingRoutes.filter(
     (route) => !route.steps.some((step) => stepTypesToFiler.includes(step.type)),
   );
 
   let routingOutcome: RoutingOutcome;
-  if (filteredFundingRoutes.length === 0) {
+  if (filteredFundingRoutes?.length === 0) {
     routingOutcome = {
       type: RoutingOutcomeType.NO_ROUTES_FOUND,
       message:

@@ -642,6 +642,8 @@ describe('Connect', () => {
       params.itemRequirements,
       params.transactionOrGasAmount,
       undefined,
+      undefined,
+      undefined,
     );
   });
 
