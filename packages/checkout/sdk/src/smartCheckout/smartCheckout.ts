@@ -48,7 +48,6 @@ export const overrideSufficientBalanceCheckResult = (
 
 const processRoutes = async (
   config: CheckoutConfiguration,
-  provider: Web3Provider,
   ownerAddress: string,
   sufficient: boolean,
   availableRoutingOptions: AvailableRoutingOptions,
@@ -157,7 +156,6 @@ export const smartCheckout = async (
   if (onComplete) {
     processRoutes(
       config,
-      provider,
       ownerAddress,
       sufficient,
       availableRoutingOptions,
@@ -181,7 +179,6 @@ export const smartCheckout = async (
 
   const routingOutcome = await processRoutes(
     config,
-    provider,
     ownerAddress,
     sufficient,
     availableRoutingOptions,

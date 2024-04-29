@@ -1201,5 +1201,79 @@ describe('smartCheckout', () => {
       );
       expect(result.balanceRequirements[0].sufficient).toBe(true);
     });
+
+    it('should return correct sufficient status and still calculate funding routes', async () => {
+      (hasERC20Allowances as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        allowances: [],
+      });
+
+      (hasERC721Allowances as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        allowances: [],
+      });
+
+      const mockBalanceCheckResult = {
+        sufficient: true,
+        balanceRequirements: [
+          {
+            type: ItemType.ERC20,
+            sufficient: true,
+            required: {
+              balance: BigNumber.from(100),
+              formattedBalance: '100.0',
+            },
+            current: {
+              balance: BigNumber.from(90),
+              formattedBalance: '90.0',
+            },
+            delta: {
+              balance: BigNumber.from(-10),
+              formattedBalance: '-10.0',
+            },
+          },
+        ],
+      };
+
+      (balanceCheck as jest.Mock).mockResolvedValue(mockBalanceCheckResult);
+
+      const itemRequirements: ItemRequirement[] = [
+        {
+          type: ItemType.ERC20,
+          tokenAddress: '0xERC20',
+          amount: BigNumber.from(10),
+          spenderAddress: '0x1',
+        },
+      ];
+
+      const onCompletePromise = new Promise((resolve) => {
+        const mockOnComplete = jest.fn().mockImplementation((result) => {
+          resolve(result);
+        });
+        smartCheckout(
+          {} as CheckoutConfiguration,
+          mockProvider,
+          itemRequirements,
+          undefined,
+          undefined,
+          mockOnComplete,
+        );
+      });
+
+      const result = await onCompletePromise;
+
+      expect(routingCalculator).toHaveBeenCalled();
+      expect(result).toEqual(
+        expect.objectContaining({
+          sufficient: true,
+          transactionRequirements: expect.arrayContaining([
+            expect.objectContaining({
+              type: ItemType.ERC20,
+              sufficient: true,
+            }),
+          ]),
+        }),
+      );
+    });
   });
 });
