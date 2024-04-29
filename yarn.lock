@@ -3487,7 +3487,7 @@ __metadata:
     "@imtbl/passport": 0.0.0
     "@imtbl/react-analytics": 0.2.1-alpha
     "@imtbl/version-check": 0.0.0
-    "@rive-app/react-canvas": ^4.8.3
+    "@rive-app/react-canvas-lite": ^4.9.0
     "@rollup/plugin-commonjs": ^24.0.1
     "@rollup/plugin-json": ^6.0.0
     "@rollup/plugin-node-resolve": ^15.0.2
@@ -3838,7 +3838,7 @@ __metadata:
     "@magic-ext/oidc": 4.2.0
     "@metamask/detect-provider": ^2.0.0
     "@opensea/seaport-js": 4.0.0
-    "@rive-app/react-canvas": ^4.8.3
+    "@rive-app/react-canvas-lite": ^4.9.0
     "@rollup/plugin-babel": ^6.0.4
     "@rollup/plugin-commonjs": ^24.0.1
     "@rollup/plugin-json": ^6.0.0
@@ -6471,21 +6471,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rive-app/canvas@npm:2.10.3":
-  version: 2.10.3
-  resolution: "@rive-app/canvas@npm:2.10.3"
-  checksum: 3fef1b3326240ff9910f49d0bc088ebfab2ec69142a4aa2f83c7af218c3106c66d2c5a264799f88a8838147a6c68c09d462b4d0db5b0c071dff1115b18d820bf
+"@rive-app/canvas-lite@npm:2.15.0":
+  version: 2.15.0
+  resolution: "@rive-app/canvas-lite@npm:2.15.0"
+  checksum: b38a97b91f3e53dcb283df23ad9fb3f77344c78efaf0d69bd88b916b5de78cec03f9f927c587e51d030724e423e1af3ee73d0638e5b7f8f706de90323608f7d6
   languageName: node
   linkType: hard
 
-"@rive-app/react-canvas@npm:^4.8.3":
-  version: 4.8.3
-  resolution: "@rive-app/react-canvas@npm:4.8.3"
+"@rive-app/react-canvas-lite@npm:^4.9.0":
+  version: 4.9.0
+  resolution: "@rive-app/react-canvas-lite@npm:4.9.0"
   dependencies:
-    "@rive-app/canvas": 2.10.3
+    "@rive-app/canvas-lite": 2.15.0
   peerDependencies:
     react: ^16.8.0 || ^17.0.0 || ^18.0.0
-  checksum: bf6ee76df56ff78879a1ed75d3bbb8e1256dce9850345f7a29b28cc90277d35fbc936f62509ca48a098425676d51fbc36d9dc90757a64184c5948f9726921a68
+  checksum: 5ce62a84acce48de4569a1a05282c8ea46e2008e5c43f6fc97f65234020f0aa85941796fa7de0536a052aecfd8311841e377cd827c1e88facf96bfed6d4b8c13
   languageName: node
   linkType: hard
 
