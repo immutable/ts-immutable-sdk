@@ -12,7 +12,6 @@ type UseClientConfigParams = {
   amount: string;
   environment: Environment;
   environmentId: string;
-  defaultCurrency?: string;
 };
 
 export const defaultClientConfig: ClientConfig = {
@@ -30,7 +29,6 @@ export const useClientConfig = ({
   amount,
   environment,
   environmentId,
-  defaultCurrency = 'USDC',
 }: UseClientConfigParams) => {
   const [selectedCurrency, setSelectedCurrency] = useState<
   ClientConfigCurrency | undefined
@@ -77,11 +75,10 @@ export const useClientConfig = ({
   useEffect(() => {
     if (clientConfig.currencies.length === 0) return;
 
-    const defaultSelectedCurrency = clientConfig.currencies.find((c) => c.name === defaultCurrency)
-      || clientConfig.currencies.find((c) => c.base)
+    const defaultSelectedCurrency = clientConfig.currencies.find((c) => c.base)
       || clientConfig.currencies?.[0];
     setSelectedCurrency(defaultSelectedCurrency);
-  }, [defaultCurrency, clientConfig]);
+  }, [clientConfig]);
 
   return {
     clientConfig,
