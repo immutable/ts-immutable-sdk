@@ -5,7 +5,7 @@ import {
   WalletProviderName, WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
 import {
-  useCallback, useContext, useMemo, useState,
+  useCallback, useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
@@ -39,6 +39,7 @@ import { BrowserWalletItem } from './BrowserWalletItem';
 import { identifyUser } from '../../../lib/analytics/identifyUser';
 
 export interface WalletListProps {
+  targetWalletRdns?: string;
   targetChainId: ChainId;
   allowedChains: ChainId[];
   blocklistWalletRdns?: string[];
@@ -46,7 +47,7 @@ export interface WalletListProps {
 
 export function WalletList(props: WalletListProps) {
   const { t } = useTranslation();
-  const { targetChainId, allowedChains } = props;
+  const { targetWalletRdns, targetChainId, allowedChains } = props;
   const blocklistWalletRdns = props?.blocklistWalletRdns || [];
   const {
     connectDispatch,
@@ -57,7 +58,7 @@ export function WalletList(props: WalletListProps) {
   const { providers } = useInjectedProviders({ checkout });
   const [showWalletDrawer, setShowWalletDrawer] = useState(false);
   const { isWalletConnectEnabled, openWalletConnectModal } = useWalletConnect();
-
+  const walletConnectItemRef = useRef(null);
   const [showChangedYourMindDrawer, setShowChangedYourMindDrawer] = useState(false);
   const [showUnableToConnectDrawer, setShowUnableToConnectDrawer] = useState(false);
   const [chosenProviderDetail, setChosenProviderDetail] = useState<EIP6963ProviderDetail>();
@@ -261,6 +262,23 @@ export function WalletList(props: WalletListProps) {
     setShowWalletDrawer(true);
   }, [track]);
 
+  useEffect(() => {
+    // Auto-trigger wallet connection via rdns
+    if (targetWalletRdns && targetWalletRdns?.length > 0) {
+      if (targetWalletRdns === WalletProviderRdns.PASSPORT && passportProviderDetail) {
+        handleWalletItemClick(passportProviderDetail);
+      } if (targetWalletRdns === WalletProviderRdns.WALLETCONNECT && walletConnectItemRef.current) {
+        (walletConnectItemRef.current as any).connect();
+      } else {
+        const targetProviderDetail = filteredProviders
+          .find((providerDetail) => providerDetail.info.rdns === targetWalletRdns);
+        if (targetProviderDetail) {
+          handleWalletItemClick(targetProviderDetail);
+        }
+      }
+    }
+  }, [filteredProviders, targetWalletRdns]);
+
   return (
     <Box
       testId="wallet-list"
@@ -319,7 +337,7 @@ export function WalletList(props: WalletListProps) {
           key="walletconnect"
           style={{ width: '100%' }}
         >
-          <WalletConnectItem onConnect={handleWalletConnectConnection} />
+          <WalletConnectItem ref={walletConnectItemRef} onConnect={handleWalletConnectConnection} />
         </motion.div>
       )}
 
