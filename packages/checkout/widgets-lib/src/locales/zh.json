@@ -59,11 +59,7 @@
     },
     "ERROR_VIEW": {
       "heading": "出了些问题",
-      "body": [
-        "您可以再试一次或联系",
-        "支持",
-        "寻求帮助。"
-      ],
+      "body": ["您可以再试一次或联系", "支持", "寻求帮助。"],
       "actionText": "再试一次"
     },
     "SERVICE_UNAVAILABLE_ERROR_VIEW": {
@@ -252,21 +248,39 @@
     },
     "ORDER_SUMMARY": {
       "loading": {
-        "balances": "正在计算数字" 
+        "balances": "正在计算数字"
       },
       "currency": {
-        "fiat": "≈ USD ${{amount}}", 
-        "fees": "费用"  
+        "fiat": "≈ USD ${{amount}}",
+        "fees": "费用"
       },
       "coinsDrawer": {
-        "header": "支付方式…", 
-        "caption1": "硬币", 
-        "caption2": "余额" 
+        "header": "支付方式…",
+        "caption1": "硬币",
+        "caption2": "余额",
+        "divider": "更多选项",
+        "payWithCard": {
+          "caption": "使用银行卡购买此商品"
+        },
+        "stepType": {
+          "SWAP": "交换 {{symbol}} ≈ {{amount}}",
+          "ONRAMP": "购买 {{symbol}} ≈ {{amount}}",
+          "BRIDGE": "移动 {{symbol}} ≈ {{amount}}",
+          "SUFFICIENT": "支付 {{symbol}} {{amount}}",
+          "delta": {
+            "SWAP": "支付 {{required.symbol}} {{required.amount}} & 交换 {{symbol}} ≈ {{amount}}",
+            "ONRAMP": "支付 {{required.symbol}} {{required.amount}} & 购买 {{symbol}} ≈ {{amount}}",
+            "BRIDGE": "支付 {{required.symbol}} {{required.amount}} & 移动 {{symbol}} ≈ {{amount}}",
+            "SUFFICIENT": "Pay {{symbol}} {{amount}}"
+          }
+        },
+        "fee": "费用 {{symbol}} ≈ {{amount}}"
       },
       "orderReview": {
-        "heading": "选择支付方式",
+        "heading": "付款摘要",
         "continue": "继续",
-        "payWithCard": "不用了，我用卡支付"
+        "payWith": "使用{{symbol}}支付",
+        "balance": "余额{{amount}}"
       }
     },
     "FUND_WITH_SMART_CHECKOUT": {
@@ -296,12 +310,12 @@
         "crypto": {
           "heading": "硬币",
           "caption": "请用钱包里的硬币付款，或用卡购买硬币。",
-          "disabledCaption": "目前无法进行此购买。" 
+          "disabledCaption": "目前无法进行此购买。"
         },
         "debit": {
           "heading": "借记卡",
           "caption": "使用卡支付的推荐方式。",
-          "disabledCaption": "我们正在处理此事。请使用硬币继续，如果需要，我们将指导您如何添加它们。" 
+          "disabledCaption": "我们正在处理此事。请使用硬币继续，如果需要，我们将指导您如何添加它们。"
         },
         "credit": {
           "heading": "信用卡",
