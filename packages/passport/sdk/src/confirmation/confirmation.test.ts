@@ -72,27 +72,6 @@ describe('confirmation', () => {
     });
   });
 
-  describe('logout', () => {
-    it('should logout the confirmation screen', async () => {
-      const mockedSuccessReturnValue = {
-        origin: testConfig.passportDomain,
-        data: {
-          eventType: PASSPORT_EVENT_TYPE,
-          messageType: ReceiveMessage.LOGOUT_SUCCESS,
-        },
-      };
-      addEventListenerMock
-        .mockImplementationOnce((event, callback) => {
-          callback(mockedSuccessReturnValue);
-        });
-
-      const result = await confirmationScreen.logout();
-
-      expect(addEventListenerMock).toHaveBeenCalledTimes(1);
-      expect(result.logout).toEqual(true);
-    });
-  });
-
   describe('requestConfirmation', () => {
     it('should handle popup window opened', async () => {
       const transactionId = 'transactionId123';

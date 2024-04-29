@@ -103,7 +103,7 @@ export const getFundingBalances = (
 
   if (
     smartCheckoutResult.sufficient === false
-      && smartCheckoutResult.router.routingOutcome.type
+      && smartCheckoutResult?.router?.routingOutcome.type
         === RoutingOutcomeType.ROUTES_FOUND
   ) {
     return getAlternativeFundingSteps(
