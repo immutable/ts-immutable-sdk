@@ -3,7 +3,6 @@ import { IMXClient } from '@imtbl/x-client';
 import { ImxApiClients, MultiRollupApiClients, imxApiConfig } from '@imtbl/generated-clients';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
-import { ConfirmationScreen } from './confirmation';
 import { Passport } from './Passport';
 import { PassportImxProvider, PassportImxProviderFactory } from './starkEx';
 import { OidcConfiguration } from './types';
@@ -36,7 +35,6 @@ describe('Passport', () => {
   let getDeviceFlowEndSessionEndpointMock: jest.Mock;
   let magicLoginMock: jest.Mock;
   let magicLogoutMock: jest.Mock;
-  let confirmationLogoutMock: jest.Mock;
   let getUserMock: jest.Mock;
   let requestRefreshTokenMock: jest.Mock;
   let getProviderMock: jest.Mock;
@@ -47,7 +45,6 @@ describe('Passport', () => {
     authLoginMock = jest.fn().mockReturnValue(mockUser);
     loginCallbackMock = jest.fn();
     magicLoginMock = jest.fn();
-    confirmationLogoutMock = jest.fn();
     magicLogoutMock = jest.fn();
     logoutMock = jest.fn();
     removeUserMock = jest.fn();
@@ -65,9 +62,6 @@ describe('Passport', () => {
       getDeviceFlowEndSessionEndpoint: getDeviceFlowEndSessionEndpointMock,
       getUser: getUserMock,
       requestRefreshTokenAfterRegistration: requestRefreshTokenMock,
-    });
-    (ConfirmationScreen as jest.Mock).mockReturnValue({
-      logout: confirmationLogoutMock,
     });
     (MagicAdapter as jest.Mock).mockReturnValue({
       login: magicLoginMock,
@@ -207,7 +201,6 @@ describe('Passport', () => {
 
         expect(logoutMock).toBeCalledTimes(1);
         expect(magicLogoutMock).toBeCalledTimes(1);
-        expect(confirmationLogoutMock).toBeCalledTimes(1);
       });
     });
 
@@ -218,7 +211,6 @@ describe('Passport', () => {
         const logoutMockOrder = logoutMock.mock.invocationCallOrder[0];
         const magicLogoutMockOrder = magicLogoutMock.mock.invocationCallOrder[0];
 
-        expect(confirmationLogoutMock).toBeCalledTimes(1);
         expect(logoutMock).toBeCalledTimes(1);
         expect(magicLogoutMock).toBeCalledTimes(1);
         expect(magicLogoutMockOrder).toBeLessThan(logoutMockOrder);
