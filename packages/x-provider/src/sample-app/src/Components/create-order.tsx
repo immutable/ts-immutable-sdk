@@ -6,7 +6,6 @@ import {
   TextInput,
   Heading,
   Select,
-  Option,
 } from '@biom3/react';
 import { ChangeEvent, useContext, useState } from 'react';
 
@@ -72,9 +71,9 @@ export const CreateOrder = () => {
           <FormControl sx={{ mb: 'base.spacing.x2' }}>
             <FormControl.Label>Type:</FormControl.Label>
             <Select disabled selectedOption={'ETH'}>
-              <Option optionKey='ETH' selected>
-                <Option.Label>ETH</Option.Label>
-              </Option>
+              <Select.Option optionKey='ETH' selected>
+                <Select.Option.Label>ETH</Select.Option.Label>
+              </Select.Option>
             </Select>
           </FormControl>
           <FormControl sx={{ mb: 'base.spacing.x2' }}>
@@ -88,9 +87,9 @@ export const CreateOrder = () => {
           <FormControl sx={{ mb: 'base.spacing.x2' }}>
             <FormControl.Label>Type:</FormControl.Label>
             <Select disabled selectedOption={'ERC721'}>
-              <Option optionKey='ERC721' selected>
-                <Option.Label>ERC721</Option.Label>
-              </Option>
+              <Select.Option optionKey='ERC721' selected>
+                <Select.Option.Label>ERC721</Select.Option.Label>
+              </Select.Option>
             </Select>
           </FormControl>
         </Box>

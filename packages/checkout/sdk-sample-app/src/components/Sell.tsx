@@ -3,7 +3,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
-import { Box, FormControl, Select, TextInput, Option, OptionKey, Body } from '@biom3/react';
+import { Box, FormControl, Select, TextInput, OptionKey, Body } from '@biom3/react';
 import { utils } from 'ethers';
 import { ERC20BuyToken } from '@imtbl/checkout-sdk/dist/types';
 
@@ -188,12 +188,12 @@ export default function Sell({ checkout, provider }: SellProps) {
                   defaultLabel='Select Listing Token'
                   validationStatus={listingTypeError ? 'error' : 'success'}
                 >
-                  <Option optionKey="native">
-                    <Option.Label>Native</Option.Label>
-                  </Option>
-                  <Option optionKey="erc20">
-                    <Option.Label>ERC20</Option.Label>
-                  </Option>
+                  <Select.Option optionKey="native">
+                    <Select.Option.Label>Native</Select.Option.Label>
+                  </Select.Option>
+                  <Select.Option optionKey="erc20">
+                    <Select.Option.Label>ERC20</Select.Option.Label>
+                  </Select.Option>
                 </Select>
                 {listingTypeError && (
                   <FormControl.Validation>{listingTypeError}</FormControl.Validation>
