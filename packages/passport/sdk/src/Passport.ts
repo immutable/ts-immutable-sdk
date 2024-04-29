@@ -236,12 +236,6 @@ export class Passport {
   }
 
   public async logout(): Promise<void> {
-    try {
-      await this.confirmationScreen.logout();
-    } catch (err) {
-      logger.warn('Failed to logout from confirmation screen', err);
-    }
-
     if (this.config.oidcConfiguration.logoutMode === 'silent') {
       await Promise.allSettled([
         this.authManager.logout(),
