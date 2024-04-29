@@ -267,7 +267,7 @@ export function WalletList(props: WalletListProps) {
     if (targetWalletRdns && targetWalletRdns?.length > 0) {
       if (targetWalletRdns === WalletProviderRdns.PASSPORT && passportProviderDetail) {
         handleWalletItemClick(passportProviderDetail);
-      } if (targetWalletRdns === WalletProviderRdns.WALLETCONNECT && walletConnectItemRef.current) {
+      } else if (targetWalletRdns === WalletProviderRdns.WALLETCONNECT && walletConnectItemRef.current) {
         (walletConnectItemRef.current as any).connect();
       } else {
         const targetProviderDetail = filteredProviders
