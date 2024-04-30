@@ -27,6 +27,7 @@ import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfi
 import { useSignOrder } from '../hooks/useSignOrder';
 import {
   ClientConfig,
+  ClientConfigCurrency,
   ExecuteOrderResponse,
   ExecutedTransaction,
   SaleErrorTypes,
@@ -58,6 +59,7 @@ type SaleContextProps = {
 type SaleContextValues = SaleContextProps & {
   sign: (
     paymentType: SignPaymentTypes,
+    tokenAddress?: string,
     callback?: (response: SignResponse | undefined) => void
   ) => Promise<SignResponse | undefined>;
   execute: (
@@ -79,6 +81,7 @@ type SaleContextValues = SaleContextProps & {
     data?: Record<string, unknown>
   ) => void;
   goToErrorView: (type: SaleErrorTypes, data?: Record<string, unknown>) => void;
+  goToSuccessView: (data?: Record<string, unknown>) => void;
   querySmartCheckout: (
     callback?: (r?: SmartCheckoutResult) => void
   ) => Promise<SmartCheckoutResult | undefined>;
@@ -90,6 +93,7 @@ type SaleContextValues = SaleContextProps & {
   fromTokenAddress: string;
   clientConfig: ClientConfig;
   signTokenIds: string[];
+  selectedCurrency: ClientConfigCurrency | undefined;
 };
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -114,6 +118,7 @@ const SaleContext = createContext<SaleContextValues>({
   setPaymentMethod: () => {},
   goBackToPaymentMethods: () => {},
   goToErrorView: () => {},
+  goToSuccessView: () => {},
   config: {} as StrongCheckoutWidgetsConfig,
   querySmartCheckout: () => Promise.resolve(undefined),
   smartCheckoutResult: undefined,
@@ -126,6 +131,7 @@ const SaleContext = createContext<SaleContextValues>({
   signTokenIds: [],
   excludePaymentTypes: [],
   multicurrency: false,
+  selectedCurrency: undefined,
 });
 
 SaleContext.displayName = 'SaleSaleContext';
@@ -179,7 +185,11 @@ export function SaleContextProvider(props: {
 
   const [invalidParameters, setInvalidParameters] = useState<boolean>(false);
 
-  const { selectedCurrency, clientConfig, clientConfigError } = useClientConfig({
+  const {
+    selectedCurrency,
+    clientConfig,
+    clientConfigError,
+  } = useClientConfig({
     amount,
     environmentId,
     environment: config.environment,
@@ -234,15 +244,17 @@ export function SaleContextProvider(props: {
   const sign = useCallback(
     async (
       type: SignPaymentTypes,
+      tokenAddress?: string,
       callback?: (r?: SignResponse) => void,
     ): Promise<SignResponse | undefined> => {
-      const invalidFromTokenAddress = !fromTokenAddress || !fromTokenAddress.startsWith('0x');
+      const selectedTokenAddress = tokenAddress || fromTokenAddress;
+      const invalidFromTokenAddress = !selectedTokenAddress || !selectedTokenAddress.startsWith('0x');
       if (invalidFromTokenAddress) {
         setInvalidParameters(true);
         return undefined;
       }
 
-      const response = await signOrder(type, fromTokenAddress);
+      const response = await signOrder(type, selectedTokenAddress);
       if (!response) return undefined;
 
       callback?.(response);
@@ -276,6 +288,26 @@ export function SaleContextProvider(props: {
     },
 
     [paymentMethod, setPaymentMethod, executeResponse],
+  );
+
+  const goToSuccessView = useCallback(
+    (data?: Record<string, unknown>) => {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SaleWidgetViews.SALE_SUCCESS,
+            data: {
+              paymentMethod,
+              transactions: executeResponse.transactions,
+              tokenIds,
+              ...data,
+            },
+          },
+        },
+      });
+    },
+    [[paymentMethod, executeResponse, tokenIds]],
   );
 
   useEffect(() => {
@@ -368,6 +400,7 @@ export function SaleContextProvider(props: {
       setPaymentMethod,
       goBackToPaymentMethods,
       goToErrorView,
+      goToSuccessView,
       isPassportWallet: !!(provider?.provider as any)?.isPassport,
       querySmartCheckout,
       smartCheckoutResult,
@@ -379,6 +412,7 @@ export function SaleContextProvider(props: {
       signTokenIds: tokenIds,
       excludePaymentTypes,
       multicurrency,
+      selectedCurrency,
     }),
     [
       config,
@@ -398,6 +432,7 @@ export function SaleContextProvider(props: {
       paymentMethod,
       goBackToPaymentMethods,
       goToErrorView,
+      goToSuccessView,
       sign,
       querySmartCheckout,
       smartCheckoutResult,
@@ -409,6 +444,7 @@ export function SaleContextProvider(props: {
       tokenIds,
       excludePaymentTypes,
       multicurrency,
+      selectedCurrency,
     ],
   );
 
