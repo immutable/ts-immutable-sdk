@@ -275,9 +275,9 @@
           "BRIDGE": "{{symbol}}を{{amount}}で移動",
           "SUFFICIENT": "{{symbol}} {{amount}}で支払う",
           "delta": {
-            "SWAP": "{{required.symbol}} {{required.amount}}を支払い、{{symbol}}を{{amount}}でスワップ",
-            "ONRAMP": "{{required.symbol}} {{required.amount}}を支払い、{{symbol}}を{{amount}}で購入",
-            "BRIDGE": "{{required.symbol}} {{required.amount}}を支払い、{{symbol}}を{{amount}}で移動",
+            "SWAP": "{{symbol}}を{{amount}}でスワップ",
+            "ONRAMP": "{{symbol}}を{{amount}}で購入",
+            "BRIDGE": "{{symbol}}を{{amount}}で移動",
             "SUFFICIENT": "{{symbol}} {{amount}}で支払う"
           }
         },

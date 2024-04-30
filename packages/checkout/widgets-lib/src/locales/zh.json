@@ -268,10 +268,10 @@
           "BRIDGE": "移动 {{symbol}} ≈ {{amount}}",
           "SUFFICIENT": "支付 {{symbol}} {{amount}}",
           "delta": {
-            "SWAP": "支付 {{required.symbol}} {{required.amount}} & 交换 {{symbol}} ≈ {{amount}}",
-            "ONRAMP": "支付 {{required.symbol}} {{required.amount}} & 购买 {{symbol}} ≈ {{amount}}",
-            "BRIDGE": "支付 {{required.symbol}} {{required.amount}} & 移动 {{symbol}} ≈ {{amount}}",
-            "SUFFICIENT": "Pay {{symbol}} {{amount}}"
+            "SWAP": "交换 {{symbol}} ≈ {{amount}}",
+            "ONRAMP": "购买 {{symbol}} ≈ {{amount}}",
+            "BRIDGE": "移动 {{symbol}} ≈ {{amount}}",
+            "SUFFICIENT": "支付 {{symbol}} {{amount}}",
           }
         },
         "fee": "费用 {{symbol}} ≈ {{amount}}"

@@ -268,9 +268,9 @@
           "BRIDGE": "{{symbol}} ≈ {{amount}} 이동",
           "SUFFICIENT": "{{symbol}} {{amount}} 지불",
           "delta": {
-            "SWAP": "{{required.symbol}} {{required.amount}} 지불 & {{symbol}} ≈ {{amount}} 교환",
-            "ONRAMP": "{{required.symbol}} {{required.amount}} 지불 & {{symbol}} ≈ {{amount}} 구매",
-            "BRIDGE": "{{required.symbol}} {{required.amount}} 지불 & {{symbol}} ≈ {{amount}} 이동",
+            "SWAP": "{{symbol}} ≈ {{amount}} 교환",
+            "ONRAMP": "{{symbol}} ≈ {{amount}} 구매",
+            "BRIDGE": "{{symbol}} ≈ {{amount}} 이동",
             "SUFFICIENT": "{{symbol}} {{amount}} 지불"
           }
         },
