@@ -24,6 +24,11 @@ jest.mock('axios', () => ({
 
 jest.mock('lib/gmpRecovery');
 
+jest.mock('./lib/validation', () => ({
+  ...jest.requireActual('./lib/validation'),
+  validateChainConfiguration: async () => {},
+}));
+
 describe('Token Bridge', () => {
   it('Constructor works correctly', async () => {
     const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
@@ -61,12 +66,6 @@ describe('Token Bridge', () => {
     });
 
     beforeEach(() => {
-      jest.mock('./lib/validation', () => ({
-        ...jest.requireActual('./lib/validation'),
-        validateChainConfiguration: jest.fn().mockReturnValue(async () => {}),
-      }));
-
-      // I expect this to not fail, because of the above mocking, but it does fail.
       validateChainConfiguration(bridgeConfig);
 
       jest.spyOn(TokenBridge.prototype as any, 'validateBridgeReqArgs')
