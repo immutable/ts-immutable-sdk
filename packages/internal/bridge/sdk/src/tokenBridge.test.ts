@@ -13,7 +13,6 @@ import { BridgeError, BridgeErrorType } from 'errors';
 import { GMPStatus, GasPaidStatus } from 'types/axelar';
 import { queryTransactionStatus } from 'lib/gmpRecovery';
 import { ERC20 } from 'contracts/ABIs/ERC20';
-// import * as validation from './lib/validation';
 import { validateChainConfiguration } from './lib/validation';
 
 jest.mock('axios', () => ({
@@ -52,7 +51,6 @@ describe('Token Bridge', () => {
     let tokenBridge: TokenBridge;
 
     const originalValidateBridgeReqArgs = TokenBridge.prototype['validateBridgeReqArgs'];
-    // const originalValidateChainConfiguration = TokenBridge.prototype['validateChainConfiguration'];
 
     const mockRootProvider = new ethers.providers.JsonRpcProvider('x');
     const mockChildProvider = new ethers.providers.JsonRpcProvider('x');
@@ -66,8 +64,6 @@ describe('Token Bridge', () => {
     });
 
     beforeEach(() => {
-      validateChainConfiguration(bridgeConfig);
-
       jest.spyOn(TokenBridge.prototype as any, 'validateBridgeReqArgs')
         .mockImplementation(async () => 'Valid');
       jest.spyOn(TokenBridge.prototype as any, 'getDynamicDepositGas')
@@ -88,7 +84,6 @@ describe('Token Bridge', () => {
     afterEach(() => {
       jest.clearAllMocks();
       TokenBridge.prototype['validateBridgeReqArgs'] = originalValidateBridgeReqArgs;
-      // TokenBridge.prototype['validateChainConfiguration'] = originalValidateChainConfiguration;
     });
 
     it('returns the both approval tx and bridge tx when allowance is insufficient for ERC20', async () => {
@@ -187,7 +182,6 @@ describe('Token Bridge', () => {
     let tokenBridge: TokenBridge;
 
     const originalValidateBridgeReqArgs = TokenBridge.prototype['validateBridgeReqArgs'];
-    const originalValidateChainConfiguration = TokenBridge.prototype['validateChainConfiguration'];
 
     const mockRootProvider = new ethers.providers.JsonRpcProvider('x');
     const mockChildProvider = new ethers.providers.JsonRpcProvider('x');
@@ -201,8 +195,6 @@ describe('Token Bridge', () => {
     });
 
     beforeEach(() => {
-      jest.spyOn(TokenBridge.prototype as any, 'validateChainConfiguration')
-        .mockImplementation(async () => 'Valid');
       jest.spyOn(TokenBridge.prototype as any, 'validateBridgeReqArgs')
         .mockImplementation(async () => 'Valid');
       jest.spyOn(TokenBridge.prototype as any, 'getDynamicDepositGas')
@@ -223,7 +215,6 @@ describe('Token Bridge', () => {
     afterEach(() => {
       jest.clearAllMocks();
       TokenBridge.prototype['validateBridgeReqArgs'] = originalValidateBridgeReqArgs;
-      TokenBridge.prototype['validateChainConfiguration'] = originalValidateChainConfiguration;
     });
 
     it('returns the unsigned approval transaction when allowance is less than deposit amount', async () => {
@@ -295,7 +286,6 @@ describe('Token Bridge', () => {
   describe('getUnsignedBridgeTx', () => {
     let tokenBridge: TokenBridge;
     const originalValidateBridgeReqArgs = TokenBridge.prototype['validateBridgeReqArgs'];
-    const originalValidateChainConfiguration = TokenBridge.prototype['validateChainConfiguration'];
 
     const mockRootProvider = new ethers.providers.JsonRpcProvider('x');
     const mockChildProvider = new ethers.providers.JsonRpcProvider('x');
@@ -309,8 +299,6 @@ describe('Token Bridge', () => {
     });
 
     beforeEach(() => {
-      jest.spyOn(TokenBridge.prototype as any, 'validateChainConfiguration')
-        .mockImplementation(async () => 'Valid');
       jest.spyOn(TokenBridge.prototype as any, 'validateBridgeReqArgs')
         .mockImplementation(async () => 'Valid');
       jest.spyOn(TokenBridge.prototype as any, 'getDynamicDepositGas')
@@ -333,7 +321,6 @@ describe('Token Bridge', () => {
     afterEach(() => {
       jest.clearAllMocks();
       TokenBridge.prototype['validateBridgeReqArgs'] = originalValidateBridgeReqArgs;
-      TokenBridge.prototype['validateChainConfiguration'] = originalValidateChainConfiguration;
     });
 
     it('ERC20 token with valid arguments is successful', async () => {
@@ -674,8 +661,6 @@ describe('Token Bridge', () => {
         childProvider: voidChildProvider,
       });
       jest.spyOn(ethers, 'Contract').mockReturnValue(mockERC20Contract as any);
-      jest.spyOn(TokenBridge.prototype as any, 'validateChainConfiguration')
-        .mockImplementation(async () => 'Valid');
       jest.spyOn(voidRootProvider, 'getFeeData')
         .mockImplementation(async () => ({
           lastBaseFeePerGas: BigNumber.from('50'),
@@ -1278,8 +1263,6 @@ describe('Token Bridge', () => {
     });
 
     beforeEach(() => {
-      jest.spyOn(TokenBridge.prototype as any, 'validateChainConfiguration')
-        .mockImplementation(async () => 'Valid');
       jest.spyOn(TokenBridge.prototype as any, 'validateBridgeReqArgs')
         .mockImplementation(async () => 'Valid');
       tokenBridge = new TokenBridge(bridgeConfig);
@@ -1426,8 +1409,6 @@ describe('Token Bridge', () => {
     });
 
     beforeEach(() => {
-      jest.spyOn(TokenBridge.prototype as any, 'validateChainConfiguration')
-        .mockImplementation(async () => 'Valid');
       jest.spyOn(TokenBridge.prototype as any, 'validateBridgeReqArgs')
         .mockImplementation(async () => 'Valid');
       tokenBridge = new TokenBridge(bridgeConfig);
