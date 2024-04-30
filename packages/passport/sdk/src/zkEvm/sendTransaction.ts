@@ -1,12 +1,19 @@
-import { BigNumber, BigNumberish } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 import {
   StaticJsonRpcProvider,
   TransactionRequest,
 } from '@ethersproject/providers';
 import { Flow } from '@imtbl/metrics';
 import { Signer } from '@ethersproject/abstract-signer';
-import { getEip155ChainId, getNonce, getSignedMetaTransactions } from './walletHelpers';
-import { MetaTransaction, RelayerTransactionStatus } from './types';
+import {
+  digestOfTransactionsAndNonce,
+  encodeMessageSubDigest,
+  getEip155ChainId,
+  getNonce,
+  getNormalisedTransactions,
+  getSignedMetaTransactions,
+} from './walletHelpers';
+import { FeeOption, MetaTransaction, RelayerTransactionStatus } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { retryWithDelay } from '../network/retry';
 import { RelayerClient } from './relayerClient';
@@ -25,49 +32,73 @@ export type EthSendTransactionParams = {
   flow: Flow;
 };
 
-const getMetaTransactions = async (
+const getFeeOption = async (
   metaTransaction: MetaTransaction,
-  nonce: BigNumberish,
   chainId: BigNumber,
   walletAddress: string,
-  signer: Signer,
   relayerClient: RelayerClient,
-): Promise<MetaTransaction[]> => {
-  // NOTE: We sign the transaction before getting the fee options because
-  // accurate estimation of a transaction gas cost is only possible if the smart
-  // wallet contract can actually execute it (in a simulated environment) - and
-  // it can only execute signed transactions.
-  const signedTransaction = await getSignedMetaTransactions(
-    [metaTransaction],
-    nonce,
-    chainId,
-    walletAddress,
-    signer,
-  );
+): Promise<FeeOption> => {
+  const nonce = metaTransaction.nonce || BigNumber.from(0); // NOTE: We don't need a valid nonce to estimate the fee
+  const normalisedMetaTransaction = getNormalisedTransactions([metaTransaction]);
 
-  // TODO: ID-698 Add support for non-native gas payments (e.g ERC20, feeTransaction initialisation must change)
+  const digest = digestOfTransactionsAndNonce(nonce, normalisedMetaTransaction);
+  const completePayload = encodeMessageSubDigest(chainId, walletAddress, digest);
 
-  // NOTE: "Fee Options" represent the multiple ways we could pay for the gas
-  // used in this transaction. Each fee option has a "recipientAddress" we
-  // should transfer the payment to, an amount and a currency. We choose one
-  // option and build a transaction that sends the expected currency amount for
-  // that option to the specified address.
-  const feeOptions = await relayerClient.imGetFeeOptions(walletAddress, signedTransaction);
+  const hash = utils.keccak256(completePayload);
+
+  const feeOptions = await relayerClient.imGetFeeOptions(walletAddress, hash);
   const imxFeeOption = feeOptions.find((feeOption) => feeOption.tokenSymbol === 'IMX');
   if (!imxFeeOption) {
     throw new Error('Failed to retrieve fees for IMX token');
   }
 
-  const feeMetaTransaction: MetaTransaction = {
-    nonce,
-    to: imxFeeOption.recipientAddress,
-    value: imxFeeOption.tokenPrice,
+  return imxFeeOption;
+};
+
+/**
+ * Prepares the meta transactions array to be signed by estimating the fee and
+ * getting the nonce from the smart wallet.
+ *
+ */
+const buildMetaTransactions = async (
+  transactionRequest: TransactionRequest,
+  rpcProvider: StaticJsonRpcProvider,
+  relayerClient: RelayerClient,
+  zkevmAddress: string,
+  chainIdBigNumber: BigNumber,
+): Promise<[MetaTransaction, ...MetaTransaction[]]> => {
+  if (!transactionRequest.to) {
+    throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'eth_sendTransaction requires a "to" field');
+  }
+
+  const metaTransaction: MetaTransaction = {
+    to: transactionRequest.to,
+    data: transactionRequest.data,
+    nonce: BigNumber.from(0), // NOTE: We don't need a valid nonce to estimate the fee
+    value: transactionRequest.value,
     revertOnError: true,
   };
-  if (BigNumber.from(feeMetaTransaction.value).isZero()) {
-    return [metaTransaction];
+
+  // Estimate the fee and get the nonce from the smart wallet
+  const [nonce, feeOption] = await Promise.all([
+    getNonce(rpcProvider, zkevmAddress),
+    getFeeOption(metaTransaction, chainIdBigNumber, zkevmAddress, relayerClient),
+  ]);
+
+  // Build the meta transactions array with a valid nonce and fee transaction
+  const metaTransactions: [MetaTransaction, ...MetaTransaction[]] = [{ ...metaTransaction, nonce }];
+  // Add a fee transaction if the fee is non-zero
+  const feeValue = BigNumber.from(feeOption.tokenPrice);
+  if (!feeValue.isZero()) {
+    metaTransactions.push({
+      nonce,
+      to: feeOption.recipientAddress,
+      value: feeValue,
+      revertOnError: true,
+    });
   }
-  return [metaTransaction, feeMetaTransaction];
+
+  return metaTransactions;
 };
 
 export const sendTransaction = async ({
@@ -79,35 +110,22 @@ export const sendTransaction = async ({
   zkevmAddress,
   flow,
 }: EthSendTransactionParams): Promise<string> => {
-  const transactionRequest: TransactionRequest = params[0];
-  if (!transactionRequest.to) {
-    throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'eth_sendTransaction requires a "to" field');
-  }
-
   const { chainId } = await rpcProvider.detectNetwork();
   const chainIdBigNumber = BigNumber.from(chainId);
-  flow.addEvent('endDetectNetwork');
 
-  const nonce = await getNonce(rpcProvider, zkevmAddress);
-  flow.addEvent('endGetNonce');
-
-  const metaTransaction: MetaTransaction = {
-    to: transactionRequest.to,
-    data: transactionRequest.data,
-    nonce,
-    value: transactionRequest.value,
-    revertOnError: true,
-  };
-
-  const metaTransactions = await getMetaTransactions(
-    metaTransaction,
-    nonce,
-    chainIdBigNumber,
-    zkevmAddress,
-    ethSigner,
+  // Prepare the meta transactions by adding an optional fee transaction
+  const metaTransactions = await buildMetaTransactions(
+    params[0],
+    rpcProvider,
     relayerClient,
+    zkevmAddress,
+    chainIdBigNumber,
   );
-  flow.addEvent('endGetMetaTransactions');
+
+  const { nonce } = metaTransactions[0];
+  if (!nonce) {
+    throw new Error('Failed to retrieve nonce from the smart wallet');
+  }
 
   // Parallelize the validation and signing of the transaction
   const validateEVMTransactionPromise = guardianClient.validateEVMTransaction({

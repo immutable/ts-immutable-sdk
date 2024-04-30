@@ -76,7 +76,7 @@ export const getNonce = async (
   throw new Error('Unexpected result from contract.nonce() call.');
 };
 
-const encodeMessageSubDigest = (chainId: BigNumber, walletAddress: string, digest: string): string => (
+export const encodeMessageSubDigest = (chainId: BigNumber, walletAddress: string, digest: string): string => (
   utils.solidityPack(
     ['string', 'uint256', 'address', 'bytes32'],
     [ETH_SIGN_PREFIX, chainId, walletAddress, digest],
