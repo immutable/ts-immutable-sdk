@@ -95,6 +95,7 @@ export function CoinsDrawerItem<
     userBalance.formattedBalance,
     token.symbol,
     conversions,
+    null,
   );
 
   const fees = Object.entries(calculateFeeAmount(balance));
