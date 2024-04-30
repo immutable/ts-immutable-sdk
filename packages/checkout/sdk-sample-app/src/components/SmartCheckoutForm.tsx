@@ -15,7 +15,7 @@ import {
 import { Web3Provider } from '@ethersproject/providers';
 import { useEffect, useState } from 'react';
 import { BigNumber, utils } from 'ethers';
-import { Body, Box, Button, FormControl, Heading, Select, TextInput, Option, OptionKey, Checkbox } from '@biom3/react';
+import { Body, Box, Button, FormControl, Heading, Select, TextInput, OptionKey, Checkbox } from '@biom3/react';
 import LoadingButton from './LoadingButton';
 import { ErrorMessage, SuccessMessage } from './messages';
 
@@ -340,15 +340,15 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
               onSelectChange={selectItemType}
               defaultLabel='Select Item Type'
             >
-              <Option optionKey="native">
-                <Option.Label>Native</Option.Label>
-              </Option>
-              <Option optionKey="erc20">
-                <Option.Label>ERC20</Option.Label>
-              </Option>
-              <Option optionKey="erc721">
-                <Option.Label>ERC721</Option.Label>
-              </Option>
+              <Select.Option optionKey="native">
+                <Select.Option.Label>Native</Select.Option.Label>
+              </Select.Option>
+              <Select.Option optionKey="erc20">
+                <Select.Option.Label>ERC20</Select.Option.Label>
+              </Select.Option>
+              <Select.Option optionKey="erc721">
+                <Select.Option.Label>ERC721</Select.Option.Label>
+              </Select.Option>
             </Select>
             </td>
             <td>

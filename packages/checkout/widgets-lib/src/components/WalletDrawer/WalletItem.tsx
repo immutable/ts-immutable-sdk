@@ -1,5 +1,5 @@
 import { MenuItem } from '@biom3/react';
-import { ReactElement, useState } from 'react';
+import { cloneElement, ReactElement, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EIP6963ProviderDetail } from '@imtbl/checkout-sdk';
 import { RawImage } from '../RawImage/RawImage';
@@ -28,20 +28,21 @@ export function WalletItem<
 
   return (
     <MenuItem
-      rc={rc}
+      rc={cloneElement(rc, {
+        onClick: async () => {
+          if (loading) return;
+          setBusy(true);
+          // let the parent handle errors
+          try {
+            await onWalletItemClick(providerDetail);
+          } finally {
+            setBusy(false);
+          }
+        },
+      })}
       testId={`${testId}-wallet-list-${providerDetail.info.rdns}`}
       size="medium"
       emphasized
-      onClick={async () => {
-        if (loading) return;
-        setBusy(true);
-        // let the parent handle errors
-        try {
-          await onWalletItemClick(providerDetail);
-        } finally {
-          setBusy(false);
-        }
-      }}
       sx={{ position: 'relative' }}
     >
       <RawImage
