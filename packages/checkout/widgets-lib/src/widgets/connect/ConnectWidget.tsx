@@ -65,6 +65,7 @@ export default function ConnectWidget({
   sendCloseEventOverride,
   web3Provider,
   checkout,
+  targetWalletRdns,
   targetChainId,
   allowedChains,
   blocklistWalletRdns,
@@ -206,6 +207,7 @@ export default function ConnectWidget({
           )}
           {view.type === ConnectWidgetViews.CONNECT_WALLET && (
             <ConnectWallet
+              targetWalletRdns={targetWalletRdns}
               targetChainId={targetChain}
               allowedChains={allowedChains ?? [targetChain]}
               blocklistWalletRdns={blocklistWalletRdns}

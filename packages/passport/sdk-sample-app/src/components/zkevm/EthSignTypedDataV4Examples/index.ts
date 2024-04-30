@@ -1,5 +1,5 @@
-import SeaportCreateListing from '../EthSendTransactionExamples/SeaportCreateListing';
-import SeaportCreateListingDefault from '../EthSendTransactionExamples/SeaportCreateListingDefault';
+import SeaportCreateListing from './SeaportCreateListing';
+import SeaportCreateListingDefault from './SeaportCreateListingDefault';
 import SignEtherMail from './SignEtherMail';
 import ValidateEtherMail from './ValidateEtherMail';
 import ValidateSignature from './ValidateSignature';

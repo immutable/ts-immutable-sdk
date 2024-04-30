@@ -14,6 +14,9 @@ describe('getWalletAllowList', () => {
         {
           walletProviderName: WalletProviderName.METAMASK,
         },
+        {
+          walletProviderName: WalletProviderName.WALLETCONNECT,
+        },
       ],
     },
     {
@@ -22,6 +25,9 @@ describe('getWalletAllowList', () => {
       exclude: [
         {
           walletProviderName: WalletProviderName.METAMASK,
+        },
+        {
+          walletProviderName: WalletProviderName.WALLETCONNECT,
         },
       ],
       result: [
@@ -39,6 +45,9 @@ describe('getWalletAllowList', () => {
         },
         {
           walletProviderName: WalletProviderName.METAMASK,
+        },
+        {
+          walletProviderName: WalletProviderName.WALLETCONNECT,
         },
       ],
     },

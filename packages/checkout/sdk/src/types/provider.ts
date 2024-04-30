@@ -6,6 +6,7 @@ import { Web3Provider } from '@ethersproject/providers';
 export enum WalletProviderName {
   PASSPORT = 'passport',
   METAMASK = 'metamask',
+  WALLETCONNECT = 'walletconnect',
 }
 
 /**
@@ -14,6 +15,7 @@ export enum WalletProviderName {
 export enum WalletProviderRdns {
   PASSPORT = 'com.immutable.passport',
   METAMASK = 'io.metamask',
+  WALLETCONNECT = 'walletconnect',
 }
 
 /**
