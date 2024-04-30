@@ -103,22 +103,13 @@ export enum BridgeFeeActions {
  */
 export enum BridgeMethodsGasLimit { // @TODO test methods on chain and put correct values here
   DEPOSIT_SOURCE = 150000,
-  DEPOSIT_DESTINATION = 200000,
-  WITHDRAW_SOURCE = 150000,
+  DEPOSIT_DESTINATION = 250000,
+  WITHDRAW_SOURCE = 250000,
   WITHDRAW_DESTINATION = 250000,
   MAP_TOKEN_SOURCE = 200000,
   MAP_TOKEN_DESTINATION = 200000,
   FINALISE_WITHDRAWAL = 200000,
   APPROVE_TOKEN = 55000,
-
-  DEPOSIT_SOURCE_ETH = 125000,
-  DEPOSIT_SOURCE_USDC = 158000,
-  DEPOSIT_SOURCE_GOG = 142000,
-  DEPOSIT_SOURCE_IMX = 148000,
-
-  APPROVE_TOKEN_USDC = 55600,
-  APPROVE_TOKEN_GOG = 46300,
-  APPROVE_TOKEN_IMX = 47000,
 }
 
 export interface FeeData {
@@ -237,14 +228,6 @@ export interface BridgeFeeResponse {
 }
 
 /**
- * @typedef {Object} CalculateBridgeFeeResponse
- * @property {ethers.BigNumber} bridgeFee - Fee charged by Axelar to validate and execute the bridge message.
- */
-export interface CalculateBridgeFeeResponse {
-  bridgeFee: ethers.BigNumber;
-}
-
-/**
  * @typedef {Object} ApproveBridgeRequest
  * @property {string} senderAddress - The address of the depositor.
  * @property {FungibleToken} token - The token to be approved.
@@ -297,6 +280,40 @@ export interface BridgeTxRequest {
 export interface BridgeTxResponse {
   feeData: BridgeFeeResponse,
   unsignedTx: ethers.providers.TransactionRequest;
+}
+
+/**
+ * @typedef {Object} BridgeBundledTxRequest
+ * @property {Address} senderAddress - The address of the depositor.
+ * @property {Address} recipientAddress - The address of the recipient.
+ * @property {FungibleToken} token - The token to be deposited.
+ * @property {ethers.BigNumber} amount - The amount to be deposited.
+ * @property {string} sourceChainId - The chain ID of the source chain.
+ * @property {string} destinationChainId - The chain ID of the destination chain.
+*/
+export interface BridgeBundledTxRequest {
+  senderAddress: Address;
+  recipientAddress: Address;
+  token: FungibleToken;
+  amount: ethers.BigNumber;
+  sourceChainId: string;
+  destinationChainId: string;
+  gasMultiplier: number;
+}
+
+/**
+ * @typedef {Object} BridgeBundledTxResponse
+ * @property {BridgeFeeResponse} fees - The fees associated with the Bridge transaction.
+ * @property {string | null} contractToApprove - The contract to approve for the approval transaction, or null if no approval is required.
+ * @property {ethers.providers.TransactionRequest | null} unsignedApprovalTx - The unsigned transaction for the token approval, or null
+ * if no approval is required.
+ * @property {ethers.providers.TransactionRequest} unsignedBridgeTx - The unsigned transaction for the deposit / withdrawal.
+ */
+export interface BridgeBundledTxResponse {
+  feeData: BridgeFeeResponse,
+  contractToApprove: string | null,
+  unsignedApprovalTx: ethers.providers.TransactionRequest | null;
+  unsignedBridgeTx: ethers.providers.TransactionRequest;
 }
 
 /**
@@ -471,4 +488,9 @@ export interface TokenMappingRequest {
 export interface TokenMappingResponse {
   rootToken: FungibleToken;
   childToken: FungibleToken | null;
+}
+
+export interface DynamicGasEstimatesResponse {
+  approvalGas: number,
+  sourceChainGas: number,
 }
