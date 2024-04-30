@@ -1,5 +1,9 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { SaleItem, TransactionRequirement } from '@imtbl/checkout-sdk';
+import {
+  SaleItem,
+  TransactionRequirement, FundingStep, FundingItem,
+  SmartCheckoutResult,
+} from '@imtbl/checkout-sdk';
 
 export type SignedOrderProduct = {
   productId: string;
@@ -121,3 +125,19 @@ export enum SignPaymentTypes {
   CRYPTO = 'crypto',
   FIAT = 'fiat',
 }
+
+export enum FundingBalanceType {
+  SUFFICIENT = 'SUFFICIENT',
+}
+
+export type SufficientFundingStep = {
+  type: FundingBalanceType.SUFFICIENT;
+  fundingItem: FundingItem;
+};
+
+export type FundingBalance = FundingStep | SufficientFundingStep;
+
+export type FundingBalanceResult = {
+  currency: ClientConfigCurrency;
+  smartCheckoutResult: SmartCheckoutResult;
+};
