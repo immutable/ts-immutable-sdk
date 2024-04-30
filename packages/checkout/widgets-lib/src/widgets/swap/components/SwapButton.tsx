@@ -4,6 +4,7 @@ import { TransactionResponse } from '@imtbl/dex-sdk';
 import { CheckoutErrorType } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
 import { getL2ChainId } from 'lib';
+import { isPassportProvider } from 'lib/provider';
 import { PrefilledSwapForm, SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import {
   ViewContext,
@@ -67,7 +68,7 @@ export function SwapButton({
     });
     if (!isValid) return;
     if (!checkout || !provider || !transaction) return;
-    if (insufficientFundsForGas) {
+    if (insufficientFundsForGas && !isPassportProvider(provider)) {
       openNotEnoughImxDrawer();
       return;
     }
