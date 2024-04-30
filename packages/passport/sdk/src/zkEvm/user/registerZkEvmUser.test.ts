@@ -3,6 +3,7 @@ import { Signer } from '@ethersproject/abstract-signer';
 import { signRaw } from '@imtbl/toolkit';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { ChainId, ChainName } from 'network/chains';
+import { Flow } from '@imtbl/metrics';
 import { registerZkEvmUser } from './registerZkEvmUser';
 import AuthManager from '../../authManager';
 import { mockListChains, mockUserZkEvm } from '../../test/mocks';
@@ -30,6 +31,9 @@ describe('registerZkEvmUser', () => {
   const jsonRPCProvider = {
     detectNetwork: jest.fn(),
   };
+  const flow = {
+    addEvent: jest.fn(),
+  };
   const ethereumAddress = '0x3082e7c88f1c8b4e24be4a75dee018ad362d84d4';
   const ethereumSignature = '0xcc63b10814e3ab4b2dff6762a6712e40c23db00c11f2c54bcc699babdbf1d2bc3096fec623da4784fafb7f6da65338d91e3c846ef52e856c2f5f86c4cf10790900';
   const accessToken = 'accessToken123';
@@ -39,21 +43,22 @@ describe('registerZkEvmUser', () => {
     (Signer as unknown as jest.Mock).mockImplementation(() => ethSignerMock);
     ethSignerMock.getAddress.mockResolvedValue(ethereumAddress);
     (signRaw as jest.Mock).mockResolvedValue(ethereumSignature);
-    multiRollupApiClients.chainsApi.listChains.mockImplementation(() => mockListChains);
+    multiRollupApiClients.chainsApi.listChains.mockResolvedValue(mockListChains);
     jsonRPCProvider.detectNetwork.mockResolvedValue({ chainId: ChainId.IMTBL_ZKEVM_TESTNET });
   });
 
   describe('when createCounterfactualAddressV2 doesn\'t return a 201', () => {
     it('should throw an error', async () => {
-      multiRollupApiClients.passportApi.createCounterfactualAddressV2.mockImplementation(() => {
-        throw new Error('Internal server error');
-      });
+      multiRollupApiClients.passportApi.createCounterfactualAddressV2.mockRejectedValue(
+        new Error('Internal server error'),
+      );
       await expect(async () => registerZkEvmUser({
         authManager: authManager as unknown as AuthManager,
         ethSigner: ethSignerMock as unknown as Signer,
         multiRollupApiClients: multiRollupApiClients as unknown as MultiRollupApiClients,
         accessToken,
         rpcProvider: jsonRPCProvider as unknown as StaticJsonRpcProvider,
+        flow: flow as unknown as Flow,
       })).rejects.toThrow('Failed to create counterfactual address: Error: Internal server error');
     });
   });
@@ -72,6 +77,7 @@ describe('registerZkEvmUser', () => {
       multiRollupApiClients: multiRollupApiClients as unknown as MultiRollupApiClients,
       accessToken,
       rpcProvider: jsonRPCProvider as unknown as StaticJsonRpcProvider,
+      flow: flow as unknown as Flow,
     });
 
     expect(result).toEqual(mockUserZkEvm.zkEvm.ethAddress);

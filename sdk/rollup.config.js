@@ -11,7 +11,6 @@ import terser from '@rollup/plugin-terser';
 import nodePolyfills from 'rollup-plugin-polyfill-node';
 import babel from '@rollup/plugin-babel';
 
-
 // RELEASE_TYPE environment variable is set by the CI/CD pipeline
 const releaseType = process.env.RELEASE_TYPE || 'alpha';
 
@@ -48,8 +47,8 @@ const getFileBuild = (inputFilename) => [
       nodeResolve({
         resolveOnly: getPackages(),
       }),
-      commonJs(),
       json(),
+      commonJs(),
       typescript({
         declaration: true,
         declarationDir: './dist/types',

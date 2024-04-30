@@ -244,7 +244,32 @@
           "caption": "別のウォレットやネットワークにある私のコイン。",
           "subcaption": "手数料",
           "disabledCaption": ""
+        },
+        "advanced": {
+          "heading": "高度なオプション",
+          "caption": "迅速なブリッジまたはCEX入金を実行します。",
+          "subcaption": "手数料",
+          "disabledCaption": ""
         }
+      }
+    },
+    "ORDER_SUMMARY": {
+      "loading": {
+        "balances": "数字を計算中" 
+      },
+      "currency": {
+        "fiat": "≈ USD ${{amount}}",  
+        "fees": "手数料"
+      },
+      "coinsDrawer": {
+        "header": "支払い方法…",
+        "caption1": "コイン",
+        "caption2": "残高"
+      },
+      "orderReview": {
+        "heading": "お支払い方法", 
+        "continue": "続ける", 
+        "payWithCard": "いいえ、カードで支払います"
       }
     },
     "FUND_WITH_SMART_CHECKOUT": {
@@ -302,7 +327,13 @@
         "processing1": "支払いを初期化中",
         "processing2": "資産を確保中",
         "processing3": "支払いを完了中"
+      },
+      "creditCardWarningDrawer": {
+        "heading": "デビットカードの使用をお勧めします",
+        "body": "この種の購入にクレジットカードを使用する場合、ほとんどの銀行は現金前払い手数料を請求するか、または取引を完全にブロックします。",
+        "ctaButton": "それでも試す"
       }
+
     },
     "PAY_WITH_COINS": {
       "header": {

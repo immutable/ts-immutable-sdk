@@ -1,7 +1,15 @@
 import { WalletConnectModal } from '@walletconnect/modal';
 import EthereumProvider from '@walletconnect/ethereum-provider';
-import { ChainId, WidgetTheme } from '@imtbl/checkout-sdk';
+import { ChainId, EIP6963ProviderInfo, WidgetTheme } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
+
+export const walletConnectProviderInfo = {
+  name: 'Other',
+  rdns: 'walletconnect',
+  // eslint-disable-next-line max-len
+  icon: 'data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNDggNDgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGc+PHBhdGggZD0iTTEwLjQyMzYgMTQuODY4NkMxNy45NTA3IDcuNTIzNzcgMzAuMTY5NCA3LjUyMzc3IDM3LjY5NjQgMTQuODY4NkwzOC42MDI2IDE1Ljc1OTNDMzguOTgyNiAxNi4xMjQ0IDM4Ljk4MjYgMTYuNzIzMSAzOC42MDI2IDE3LjA4ODFMMzUuNTA0MSAyMC4xMTA4QzM1LjMxNDEgMjAuMzAwNiAzNS4wMDcxIDIwLjMwMDYgMzQuODE3MSAyMC4xMTA4TDMzLjU3NDggMTguODk4OEMyOC4zMTMyIDEzLjc3MzUgMTkuODA2OSAxMy43NzM1IDE0LjU0NTIgMTguODk4OEwxMy4yMTUyIDIwLjE5ODRDMTMuMDI1MiAyMC4zODgyIDEyLjcxODMgMjAuMzg4MiAxMi41MjgzIDIwLjE5ODRMOS40Mjk3OCAxNy4xNzU3QzkuMDQ5NzcgMTYuODEwNyA5LjA0OTc3IDE2LjIxMiA5LjQyOTc4IDE1Ljg0N0wxMC40MjM2IDE0Ljg2ODZaTTQ0LjExMjcgMjEuMTE4M0w0Ni44NzUgMjMuODA1MUM0Ny4yNTUgMjQuMTcwMSA0Ny4yNTUgMjQuNzY4OCA0Ni44NzUgMjUuMTMzOUwzNC40MzcxIDM3LjI2ODJDMzQuMDU3MSAzNy42MzMyIDMzLjQ0MzMgMzcuNjMzMiAzMy4wNzc5IDM3LjI2ODJMMjQuMjUgMjguNjUzQzI0LjE2MjMgMjguNTY1NCAyNC4wMDE2IDI4LjU2NTQgMjMuOTEzOSAyOC42NTNMMTUuMDg2IDM3LjI2ODJDMTQuNzA2IDM3LjYzMzIgMTQuMDkyMiAzNy42MzMyIDEzLjcyNjggMzcuMjY4MkwxLjI0NTAzIDI1LjEzMzlDMC44NjUwMiAyNC43Njg4IDAuODY1MDIgMjQuMTcwMSAxLjI0NTAzIDIzLjgwNTFMNC4wMDczOCAyMS4xMTgzQzQuMzg3MzkgMjAuNzUzMyA1LjAwMTI1IDIwLjc1MzMgNS4zNjY2NCAyMS4xMTgzTDE0LjE5NDUgMjkuNzMzNUMxNC4yODIyIDI5LjgyMTEgMTQuNDQyOSAyOS44MjExIDE0LjUzMDYgMjkuNzMzNUwyMy4zNTg1IDIxLjExODNDMjMuNzM4NSAyMC43NTMzIDI0LjM1MjMgMjAuNzUzMyAyNC43MTc3IDIxLjExODNMMzMuNTQ1NiAyOS43MzM1QzMzLjYzMzMgMjkuODIxMSAzMy43OTQgMjkuODIxMSAzMy44ODE3IDI5LjczMzVMNDIuNzA5NiAyMS4xMTgzQzQzLjExODggMjAuNzUzMyA0My43MzI3IDIwLjc1MzMgNDQuMTEyNyAyMS4xMTgzWiIgZmlsbD0iIzM2OEFGQSI+PC9wYXRoPjwvZz48L3N2Zz4=',
+  uuid: 'walletconnect',
+} as EIP6963ProviderInfo;
 
 export type WalletConnectConfiguration = {
   projectId: string;
@@ -60,6 +68,8 @@ const sandboxWalletWhitelist = [metamaskId];
 export class WalletConnectManager {
   private static instance: WalletConnectManager;
 
+  private isInitialising: boolean = false;
+
   private initialised: boolean = false;
 
   private enabled: boolean = false;
@@ -75,6 +85,8 @@ export class WalletConnectManager {
   private ethereumProvider!: EthereumProvider;
 
   private walletListings!: any;
+
+  private providerQueue: any[] = [];
 
   private validateConfig(config: WalletConnectConfiguration): boolean {
     if (!config.projectId || config.projectId === '') {
@@ -154,29 +166,41 @@ export class WalletConnectManager {
     }
     return new Promise((resolve) => {
       if (!this.ethereumProvider) {
-        EthereumProvider.init({
-          projectId: this.walletConnectConfig.projectId,
-          chains: this.environment === Environment.PRODUCTION
-            ? [ChainId.ETHEREUM]
-            : [ChainId.SEPOLIA],
-          optionalChains: this.environment === Environment.PRODUCTION
-            ? [ChainId.IMTBL_ZKEVM_MAINNET, ChainId.ETHEREUM]
-            : [ChainId.IMTBL_ZKEVM_TESTNET, ChainId.SEPOLIA],
-          showQrModal: false,
-          metadata: this.walletConnectConfig.metadata,
-          qrModalOptions: {
-            themeMode: this.theme,
-          },
-          rpcMap: {
-            [ChainId.ETHEREUM]: 'https://checkout-api.immutable.com/v1/rpc/eth-mainnet',
-            [ChainId.IMTBL_ZKEVM_MAINNET]: 'https://rpc.immutable.com',
-            [ChainId.SEPOLIA]: 'https://checkout-api.sandbox.immutable.com/v1/rpc/eth-sepolia',
-            [ChainId.IMTBL_ZKEVM_TESTNET]: 'https://rpc.testnet.immutable.com',
-          },
-        }).then((wcEthereumProvider: EthereumProvider) => {
-          this.ethereumProvider = wcEthereumProvider;
-          resolve(this.ethereumProvider);
-        });
+        if (this.isInitialising) {
+          this.providerQueue.push(resolve);
+        } else {
+          this.isInitialising = true;
+          EthereumProvider.init({
+            projectId: this.walletConnectConfig.projectId,
+            chains: this.environment === Environment.PRODUCTION
+              ? [ChainId.ETHEREUM]
+              : [ChainId.SEPOLIA],
+            optionalChains: this.environment === Environment.PRODUCTION
+              ? [ChainId.IMTBL_ZKEVM_MAINNET, ChainId.ETHEREUM]
+              : [ChainId.IMTBL_ZKEVM_TESTNET, ChainId.SEPOLIA],
+            showQrModal: false,
+            metadata: this.walletConnectConfig.metadata,
+            qrModalOptions: {
+              themeMode: this.theme,
+            },
+            rpcMap: {
+              [ChainId.ETHEREUM]: 'https://checkout-api.immutable.com/v1/rpc/eth-mainnet',
+              [ChainId.IMTBL_ZKEVM_MAINNET]: 'https://rpc.immutable.com',
+              [ChainId.SEPOLIA]: 'https://checkout-api.sandbox.immutable.com/v1/rpc/eth-sepolia',
+              [ChainId.IMTBL_ZKEVM_TESTNET]: 'https://rpc.testnet.immutable.com',
+            },
+          })
+            .then((wcEthereumProvider: EthereumProvider) => {
+              this.ethereumProvider = wcEthereumProvider;
+              resolve(this.ethereumProvider);
+
+              // Resolve anything in the provider queue
+              this.isInitialising = false;
+              this.providerQueue.forEach((resolveFn) => {
+                resolveFn(this.ethereumProvider);
+              });
+            });
+        }
       } else {
         resolve(this.ethereumProvider);
       }
@@ -202,12 +226,11 @@ export class WalletConnectManager {
     return undefined;
   }
 
-  public async getWalletLogoUrl(): Promise<string | undefined> {
+  public async getWalletLogoUrl(walletSlug?: string): Promise<string | undefined> {
     if (!this.walletListings) {
       this.walletListings = await this.loadWalletListings();
     }
-    const walletName = this.ethereumProvider?.session?.peer.metadata.name;
-
+    const walletName = walletSlug || this.ethereumProvider?.session?.peer.metadata.name;
     if (!this.walletListings || !walletName) {
       return undefined;
     }

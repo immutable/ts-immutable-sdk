@@ -10,6 +10,7 @@ import { walletContracts } from '@0xsequence/abi';
 import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import { Signer } from '@ethersproject/abstract-signer';
 import { v1 as sequenceCoreV1 } from '@0xsequence/core';
+import { trackDuration } from '@imtbl/metrics';
 import { MetaTransaction, MetaTransactionNormalised, TypedDataPayload } from './types';
 
 const SIGNATURE_WEIGHT = 1; // Weight of a single signature in the multi-sig
@@ -99,7 +100,15 @@ export const getSignedMetaTransactions = async (
 
   // Sign the digest
   const hashArray = utils.arrayify(hash);
+
+  const startTime = performance.now();
   const ethsigNoType = await signer.signMessage(hashArray);
+  trackDuration(
+    'passport',
+    'magicSignMessageGetSignedMetaTransactions',
+    Math.round(performance.now() - startTime),
+  );
+
   const signedDigest = `${ethsigNoType}${ETH_SIGN_FLAG}`;
 
   // Add metadata
@@ -151,7 +160,15 @@ export const getSignedTypedData = async (
   // Sign the sub digest
   // https://github.com/immutable/wallet-contracts/blob/7824b5f24b2e0eb2dc465ecb5cd71f3984556b73/src/contracts/modules/commons/ModuleAuth.sol#L155
   const hashArray = utils.arrayify(hash);
+
+  const startTime = performance.now();
   const ethsigNoType = await signer.signMessage(hashArray);
+  trackDuration(
+    'passport',
+    'magicSignMessageTypedData',
+    Math.round(performance.now() - startTime),
+  );
+
   const signedDigest = `${ethsigNoType}${ETH_SIGN_FLAG}`;
 
   // Combine the relayer and user signatures; sort by address to match the imageHash order

@@ -1,6 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { WalletProviderName } from '@imtbl/checkout-sdk';
-import { EIP6963ProviderDetail } from './types/eip6963';
+import { EIP6963ProviderDetail, WalletProviderName } from '@imtbl/checkout-sdk';
 
 export function isPassportProvider(provider?: Web3Provider | null) {
   return (provider?.provider as any)?.isPassport === true;

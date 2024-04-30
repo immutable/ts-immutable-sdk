@@ -48,11 +48,18 @@ export interface NFTOwner {
      */
     'account_address': string;
     /**
-     * The quantity of owned tokens (uint256 as string)
+     * (deprecated - use balance instead) The quantity of owned tokens (uint256 as string)
+     * @type {string}
+     * @memberof NFTOwner
+     * @deprecated
+     */
+    'quantity': string;
+    /**
+     * The amount of owned tokens (uint256 as string)
      * @type {string}
      * @memberof NFTOwner
      */
-    'quantity': string;
+    'balance': string;
     /**
      * When the NFT owner was last updated
      * @type {string}

@@ -313,8 +313,8 @@ export function BridgeReviewSummary() {
         fromNetwork,
         fromWallet: {
           address: fromAddress,
-          rdns: from?.walletProviderInfo.rdns,
-          uuid: from?.walletProviderInfo.uuid,
+          rdns: from?.walletProviderInfo?.rdns,
+          uuid: from?.walletProviderInfo?.uuid,
           isPassportWallet: isPassportProvider(from?.web3Provider),
           isMetaMask: isMetaMaskProvider(from?.web3Provider),
         },
@@ -322,8 +322,8 @@ export function BridgeReviewSummary() {
         toNetwork,
         toWallet: {
           address: toAddress,
-          rdns: to?.walletProviderInfo.rdns,
-          uuid: to?.walletProviderInfo.uuid,
+          rdns: to?.walletProviderInfo?.rdns,
+          uuid: to?.walletProviderInfo?.uuid,
           isPassportWallet: isPassportProvider(to?.web3Provider),
           isMetaMask: isMetaMaskProvider(to?.web3Provider),
         },

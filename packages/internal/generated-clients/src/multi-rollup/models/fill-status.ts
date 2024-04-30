@@ -17,20 +17,20 @@
 /**
  * 
  * @export
- * @interface CreateCounterfactualAddressRequestDeprecated
+ * @interface FillStatus
  */
-export interface CreateCounterfactualAddressRequestDeprecated {
+export interface FillStatus {
     /**
-     * The user\'s UAK address
+     * The numerator of the fill status
      * @type {string}
-     * @memberof CreateCounterfactualAddressRequestDeprecated
+     * @memberof FillStatus
      */
-    'ethereumAddress': string;
+    'numerator': string;
     /**
-     * The signature generated with the UAK
+     * The denominator of the fill status
      * @type {string}
-     * @memberof CreateCounterfactualAddressRequestDeprecated
+     * @memberof FillStatus
      */
-    'ethereumSignature': string;
+    'denominator': string;
 }
 

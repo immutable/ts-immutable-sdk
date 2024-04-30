@@ -114,7 +114,7 @@ function SeaportFulfillAvailableAdvancedOrders({ disabled, handleExampleSubmitte
   }, [handleExampleSubmitted, transaction]);
 
   return (
-    <Accordion.Item eventKey="3">
+    <Accordion.Item eventKey="5">
       <Accordion.Header>Seaport Fulfill Available Advanced Orders</Accordion.Header>
       <Accordion.Body>
         <Form onSubmit={handleSubmit} className="mb-4">

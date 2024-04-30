@@ -1,5 +1,6 @@
 import { StaticJsonRpcProvider, TransactionRequest } from '@ethersproject/providers';
 import { Signer } from '@ethersproject/abstract-signer';
+import { Flow } from '@imtbl/metrics';
 import { getEip155ChainId, getNonce, getSignedMetaTransactions } from './walletHelpers';
 import { sendTransaction } from './sendTransaction';
 import { chainId, chainIdEip155, mockUserZkEvm } from '../test/mocks';
@@ -11,7 +12,6 @@ import GuardianClient from '../guardian';
 
 jest.mock('./walletHelpers');
 jest.mock('../network/retry');
-const withConfirmationScreenStub = jest.fn();
 
 describe('sendTransaction', () => {
   const signedTransaction = 'signedTransaction123';
@@ -36,12 +36,13 @@ describe('sendTransaction', () => {
   };
   const guardianClient = {
     validateEVMTransaction: jest.fn(),
-    withConfirmationScreen: jest.fn(() => (task: () => void) => task()),
-    loading: jest.fn(),
   };
   const ethSigner = {
     getAddress: jest.fn(),
   } as Partial<Signer> as Signer;
+  const flow = {
+    addEvent: jest.fn(),
+  };
 
   const imxFeeOption = {
     tokenPrice: '1',
@@ -63,11 +64,8 @@ describe('sendTransaction', () => {
       signedTransactions,
     );
     relayerClient.ethSendTransaction.mockResolvedValue(relayerTransactionId);
-    withConfirmationScreenStub.mockImplementation(
-      () => (task: () => void) => task(),
-    );
-    guardianClient.withConfirmationScreen = withConfirmationScreenStub;
     rpcProvider.detectNetwork.mockResolvedValue({ chainId });
+    guardianClient.validateEVMTransaction.mockResolvedValue(undefined);
   });
 
   it('calls relayerClient.ethSendTransaction with the correct arguments', async () => {
@@ -83,6 +81,7 @@ describe('sendTransaction', () => {
       relayerClient: relayerClient as unknown as RelayerClient,
       zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
       guardianClient: guardianClient as unknown as GuardianClient,
+      flow: flow as unknown as Flow,
     });
 
     expect(result).toEqual(transactionHash);
@@ -115,6 +114,7 @@ describe('sendTransaction', () => {
       relayerClient: relayerClient as unknown as RelayerClient,
       zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
       guardianClient: guardianClient as unknown as GuardianClient,
+      flow: flow as unknown as Flow,
     });
 
     expect(result).toEqual(transactionHash);
@@ -154,6 +154,7 @@ describe('sendTransaction', () => {
       relayerClient: relayerClient as unknown as RelayerClient,
       zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
       guardianClient: guardianClient as unknown as GuardianClient,
+      flow: flow as unknown as Flow,
     });
 
     expect(result).toEqual(transactionHash);
@@ -199,6 +200,7 @@ describe('sendTransaction', () => {
         relayerClient: relayerClient as unknown as RelayerClient,
         zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
         guardianClient: guardianClient as unknown as GuardianClient,
+        flow: flow as unknown as Flow,
       }),
     ).rejects.toThrow(
       new JsonRpcError(
@@ -222,6 +224,7 @@ describe('sendTransaction', () => {
         relayerClient: relayerClient as unknown as RelayerClient,
         zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
         guardianClient: guardianClient as unknown as GuardianClient,
+        flow: flow as unknown as Flow,
       }),
     ).rejects.toThrow(
       new JsonRpcError(

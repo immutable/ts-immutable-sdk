@@ -57,6 +57,7 @@ import {
   TokenInfo,
   GetTokenInfoParams,
   AddNetworkParams,
+  EIP6963ProviderDetail,
 } from './types';
 import { CheckoutConfiguration } from './config';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
@@ -73,6 +74,7 @@ import { isMatchingAddress } from './utils/utils';
 import { WidgetConfiguration } from './widgets/definitions/configurations';
 import { SemanticVersion } from './widgets/definitions/types';
 import { validateAndBuildVersion } from './widgets/version';
+import { InjectedProvidersManager } from './provider/injectedProvidersManager';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
@@ -108,6 +110,9 @@ export class Checkout {
     this.readOnlyProviders = new Map<ChainId, ethers.providers.JsonRpcProvider>();
     this.availability = availabilityService(this.config.isDevelopment, this.config.isProduction);
     this.passport = config.passport;
+
+    // Initialise injected providers via EIP-6963
+    InjectedProvidersManager.getInstance().initialise();
 
     track('checkout_sdk', 'initialised');
   }
@@ -237,6 +242,30 @@ export class Checkout {
       params.walletProviderName,
       this.passport,
     );
+  }
+
+  /**
+   * Returns a list of EIP-6963 injected providers and their metadata.
+   */
+  public getInjectedProviders(): readonly EIP6963ProviderDetail[] {
+    return InjectedProvidersManager.getInstance().getProviders();
+  }
+
+  /**
+   * Finds an injected provider by its RDNS.
+   * @param {rdns: string} args - The parameters for finding the injected provider.
+   * @returns {EIP6963ProviderDetail | undefined} - The found provider and metadata or undefined.
+   */
+  public findInjectedProvider(args: { rdns: string }): EIP6963ProviderDetail | undefined {
+    return InjectedProvidersManager.getInstance().findProvider(args);
+  }
+
+  /**
+   * Subscribes to changes in the injected providers.
+   * @param listener - The listener to be called when the injected providers change.
+   */
+  public onInjectedProvidersChange(listener: (providers: EIP6963ProviderDetail[]) => void) {
+    return InjectedProvidersManager.getInstance().subscribe(listener);
   }
 
   /**
@@ -546,6 +575,9 @@ export class Checkout {
       web3Provider,
       itemRequirements,
       params.transactionOrGasAmount,
+      params.routingOptions,
+      params.onComplete,
+      params.onFundingRoute,
     );
   }
 

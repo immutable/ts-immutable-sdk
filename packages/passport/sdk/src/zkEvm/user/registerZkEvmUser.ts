@@ -3,6 +3,7 @@ import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { signRaw } from '@imtbl/toolkit';
 import { getEip155ChainId } from 'zkEvm/walletHelpers';
 import { Signer } from '@ethersproject/abstract-signer';
+import { Flow } from '@imtbl/metrics';
 import AuthManager from '../../authManager';
 import { JsonRpcError, RpcErrorCode } from '../JsonRpcError';
 
@@ -12,6 +13,7 @@ export type RegisterZkEvmUserInput = {
   multiRollupApiClients: MultiRollupApiClients,
   accessToken: string;
   rpcProvider: StaticJsonRpcProvider;
+  flow: Flow;
 };
 
 const MESSAGE_TO_SIGN = 'Only sign this message from Immutable Passport';
@@ -22,12 +24,26 @@ export async function registerZkEvmUser({
   multiRollupApiClients,
   accessToken,
   rpcProvider,
+  flow,
 }: RegisterZkEvmUserInput): Promise<string> {
+  // Parallelize the operations that can happen concurrently
+  const getAddressPromise = ethSigner.getAddress();
+  getAddressPromise.then(() => flow.addEvent('endGetAddress'));
+
+  const signRawPromise = signRaw(MESSAGE_TO_SIGN, ethSigner);
+  signRawPromise.then(() => flow.addEvent('endSignRaw'));
+
+  const detectNetworkPromise = rpcProvider.detectNetwork();
+  detectNetworkPromise.then(() => flow.addEvent('endDetectNetwork'));
+
+  const listChainsPromise = multiRollupApiClients.chainsApi.listChains();
+  listChainsPromise.then(() => flow.addEvent('endListChains'));
+
   const [ethereumAddress, ethereumSignature, network, chainListResponse] = await Promise.all([
-    ethSigner.getAddress(),
-    signRaw(MESSAGE_TO_SIGN, ethSigner),
-    rpcProvider.detectNetwork(),
-    multiRollupApiClients.chainsApi.listChains(),
+    getAddressPromise,
+    signRawPromise,
+    detectNetworkPromise,
+    listChainsPromise,
   ]);
 
   const eipChainId = getEip155ChainId(network.chainId);
@@ -49,6 +65,7 @@ export async function registerZkEvmUser({
     }, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
+    flow.addEvent('endCreateCounterfactualAddress');
 
     authManager.forceUserRefreshInBackground();
 

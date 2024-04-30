@@ -27,7 +27,7 @@ export interface UnknownMetadata {
      */
     'transaction_type': UnknownMetadataTransactionTypeEnum;
     /**
-     * Is Smart Contract
+     * Indicate if it is a Smart Contract or EOA
      * @type {boolean}
      * @memberof UnknownMetadata
      */

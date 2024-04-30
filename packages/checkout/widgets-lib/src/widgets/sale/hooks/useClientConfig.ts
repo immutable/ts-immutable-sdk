@@ -1,56 +1,57 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { Environment } from '@imtbl/config';
 import { PRIMARY_SALES_API_BASE_URL } from '../utils/config';
-import { ClientConfig, ClientConfigCurrency } from '../types';
 
-type ClientConfigResponse = {
-  contract_id: string;
-  currencies: {
-    name: string;
-    decimals: number;
-    erc20_address: string;
-  }[];
-};
-
-const toClientConfig = (response: ClientConfigResponse): ClientConfig => ({
-  contractId: response.contract_id,
-  currencies: response.currencies.map((c) => ({
-    ...c,
-    erc20Address: c.erc20_address,
-  })),
-});
+import { ClientConfig, ClientConfigCurrency, SaleErrorTypes } from '../types';
+import {
+  ClientConfigResponse,
+  transformToClientConfig,
+} from '../functions/transformToClientConfig';
 
 type UseClientConfigParams = {
-  environment: string;
+  amount: string;
+  environment: Environment;
   environmentId: string;
-  defaultCurrency?: 'USDC';
 };
 
 export const defaultClientConfig: ClientConfig = {
   contractId: '',
   currencies: [],
+  currencyConversion: {},
+};
+
+export type ConfigError = {
+  type: SaleErrorTypes;
+  data?: Record<string, unknown>;
 };
 
 export const useClientConfig = ({
+  amount,
   environment,
   environmentId,
-  defaultCurrency,
 }: UseClientConfigParams) => {
-  const [currency, setCurrency] = useState<ClientConfigCurrency | undefined>();
+  const [selectedCurrency, setSelectedCurrency] = useState<
+  ClientConfigCurrency | undefined
+  >();
+  const fetching = useRef(false);
   const [clientConfig, setClientConfig] = useState<ClientConfig>(defaultClientConfig);
+  const [clientConfigError, setClientConfigError] = useState<
+  ConfigError | undefined
+  >(undefined);
 
   useEffect(() => {
-    if (!environment || !environmentId) return;
+    if (!environment || !environmentId || !amount) return;
 
     (async () => {
-      const baseUrl = `${PRIMARY_SALES_API_BASE_URL[environment]}/${environmentId}/client-config`;
+      if (fetching.current) return;
 
       try {
+        fetching.current = true;
+        const baseUrl = `${PRIMARY_SALES_API_BASE_URL[environment]}/${environmentId}/client-config?amount=${amount}`;
         const response = await fetch(baseUrl, {
           method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          headers: { 'Content-Type': 'application/json' },
         });
 
         if (!response.ok) {
@@ -58,25 +59,30 @@ export const useClientConfig = ({
         }
 
         const data: ClientConfigResponse = await response.json();
-
-        setClientConfig(toClientConfig(data));
+        const config = transformToClientConfig(data);
+        setClientConfig(config);
       } catch (error) {
-        // eslint-disable-next-line no-console
-        console.warn('Error fetching client config', error);
+        setClientConfigError({
+          type: SaleErrorTypes.DEFAULT,
+          data: { reason: 'Error fetching settlement currencies' },
+        });
+      } finally {
+        fetching.current = false;
       }
     })();
-  }, [environment, environmentId]);
+  }, [environment, environmentId, amount]);
 
   useEffect(() => {
     if (clientConfig.currencies.length === 0) return;
 
-    const selectedCurrency = clientConfig.currencies.find((c) => c.name === defaultCurrency)
-      || clientConfig.currencies[0];
-    setCurrency(selectedCurrency);
-  }, [defaultCurrency, clientConfig]);
+    const defaultSelectedCurrency = clientConfig.currencies.find((c) => c.base)
+      || clientConfig.currencies?.[0];
+    setSelectedCurrency(defaultSelectedCurrency);
+  }, [clientConfig]);
 
   return {
     clientConfig,
-    currency,
+    selectedCurrency,
+    clientConfigError,
   };
 };

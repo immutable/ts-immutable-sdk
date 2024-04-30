@@ -29,6 +29,7 @@ import {
   SwapFailed,
   SwapRejected,
   SwapSuccess,
+  WalletConnectProviderChanged,
   WalletDisconnect,
   WalletEventType,
   WalletNetworkSwitch,
@@ -125,6 +126,7 @@ export type WidgetEventData = {
     [ConnectEventType.SUCCESS]: ConnectionSuccess,
     [ConnectEventType.FAILURE]: ConnectionFailed,
     [ConnectEventType.CLOSE_WIDGET]: {},
+    [ConnectEventType.WALLETCONNECT_PROVIDER_UPDATED]: WalletConnectProviderChanged,
   } & OrchestrationMapping & ProviderEventMapping,
 
   [WidgetType.WALLET]: {

@@ -4,7 +4,12 @@ import React, {
 } from 'react';
 import {
   ChainId,
-  Checkout, ConnectWidgetParams,
+  Checkout,
+  ConnectWidgetParams,
+  EIP1193Provider,
+  getMetaMaskProviderDetail,
+  getPassportProviderDetail,
+  WalletConnectManager as IWalletConnectManager,
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { useTranslation } from 'react-i18next';
@@ -13,6 +18,7 @@ import {
   sendCloseWidgetEvent,
   sendConnectFailedEvent,
   sendConnectSuccessEvent,
+  sendWalletConnectProviderUpdatedEvent,
 } from './connectWidgetEvents';
 import {
   ConnectActions,
@@ -41,6 +47,9 @@ import { ErrorView } from '../../views/error/ErrorView';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { UserJourney, useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { identifyUser } from '../../lib/analytics/identifyUser';
+import { isMetaMaskProvider, isPassportProvider, isWalletConnectProvider } from '../../lib/provider';
+import { WalletConnectManager, walletConnectProviderInfo } from '../../lib/walletConnect';
+import { useWalletConnect } from '../../lib/hooks/useWalletConnect';
 
 export type ConnectWidgetInputs = ConnectWidgetParams & {
   config: StrongCheckoutWidgetsConfig
@@ -56,12 +65,15 @@ export default function ConnectWidget({
   sendCloseEventOverride,
   web3Provider,
   checkout,
+  targetWalletRdns,
   targetChainId,
   allowedChains,
+  blocklistWalletRdns,
   deepLink = ConnectWidgetViews.CONNECT_WALLET,
 }: ConnectWidgetInputs) {
   const { t } = useTranslation();
   const { environment } = config;
+  const { isWalletConnectEnabled, ethereumProvider } = useWalletConnect();
 
   const errorText = t('views.ERROR_VIEW.actionText');
 
@@ -142,6 +154,16 @@ export default function ConnectWidget({
     sendConnectFailedEvent(eventTarget, viewState.view.error.message);
   }, [viewState]);
 
+  useEffect(() => {
+    if (isWalletConnectEnabled) {
+      sendWalletConnectProviderUpdatedEvent(
+        eventTarget,
+        ethereumProvider,
+        WalletConnectManager.getInstance() as unknown as IWalletConnectManager,
+      );
+    }
+  }, [isWalletConnectEnabled, ethereumProvider]);
+
   const handleConnectSuccess = useCallback(async () => {
     if (!provider) return;
     // WT-1698 Analytics - Identify user here
@@ -153,7 +175,27 @@ export default function ConnectWidget({
     addProviderListenersForWidgetRoot(provider);
     await identifyUser(identify, provider);
     sendProviderUpdatedEvent({ provider });
-    sendConnectSuccessEvent(eventTarget, provider, walletProviderName ?? undefined);
+
+    // Find the wallet provider info via injected with Passport and MetaMask fallbacks
+    let walletProviderInfo;
+    if (isWalletConnectProvider(provider)) {
+      walletProviderInfo = walletConnectProviderInfo;
+    } else {
+      const injectedProviderDetails = checkout.getInjectedProviders();
+      walletProviderInfo = injectedProviderDetails.find((providerDetail) => (
+        providerDetail.provider === provider.provider
+      ));
+      if (!walletProviderInfo) {
+        if (isPassportProvider(provider)) {
+          walletProviderInfo = getPassportProviderDetail(provider.provider as EIP1193Provider).info;
+        }
+        if (isMetaMaskProvider(provider)) {
+          walletProviderInfo = getMetaMaskProviderDetail(provider.provider as EIP1193Provider).info;
+        }
+      }
+    }
+
+    sendConnectSuccessEvent(eventTarget, provider, walletProviderName ?? undefined, walletProviderInfo);
   }, [provider, identify]);
 
   return (
@@ -164,7 +206,12 @@ export default function ConnectWidget({
             <LoadingView loadingText="Loading" />
           )}
           {view.type === ConnectWidgetViews.CONNECT_WALLET && (
-            <ConnectWallet targetChainId={targetChain} allowedChains={allowedChains ?? [targetChain]} />
+            <ConnectWallet
+              targetWalletRdns={targetWalletRdns}
+              targetChainId={targetChain}
+              allowedChains={allowedChains ?? [targetChain]}
+              blocklistWalletRdns={blocklistWalletRdns}
+            />
           )}
           {view.type === ConnectWidgetViews.SWITCH_NETWORK && isZkEvmChainId(targetChain) && (
             <SwitchNetworkZkEVM />

@@ -15,16 +15,16 @@
 
 
 /**
- * 
+ * Response page
  * @export
- * @interface CreateCounterfactualAddressResDeprecated
+ * @interface PageResponse
  */
-export interface CreateCounterfactualAddressResDeprecated {
+export interface PageResponse {
     /**
-     * The user\'s counterfactual address
+     * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
      * @type {string}
-     * @memberof CreateCounterfactualAddressResDeprecated
+     * @memberof PageResponse
      */
-    'counterfactualAddress': string;
+    'next_cursor'?: string;
 }
 

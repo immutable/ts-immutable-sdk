@@ -1,11 +1,11 @@
 import { Box } from '@biom3/react';
 import {
   ChainId,
-  CheckoutErrorType,
+  CheckoutErrorType, EIP6963ProviderDetail,
   WalletProviderName, WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
 import {
-  useCallback, useContext, useMemo, useState,
+  useCallback, useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
@@ -27,8 +27,6 @@ import { useWalletConnect } from '../../../lib/hooks/useWalletConnect';
 import { useInjectedProviders } from '../../../lib/hooks/useInjectedProviders';
 import { walletListStyle } from './WalletListStyles';
 import {
-  EIP1193Provider,
-  EIP6963ProviderDetail,
   getProviderSlugFromRdns,
   isPassportProvider,
 } from '../../../lib/provider';
@@ -41,13 +39,16 @@ import { BrowserWalletItem } from './BrowserWalletItem';
 import { identifyUser } from '../../../lib/analytics/identifyUser';
 
 export interface WalletListProps {
+  targetWalletRdns?: string;
   targetChainId: ChainId;
   allowedChains: ChainId[];
+  blocklistWalletRdns?: string[];
 }
 
 export function WalletList(props: WalletListProps) {
   const { t } = useTranslation();
-  const { targetChainId, allowedChains } = props;
+  const { targetWalletRdns, targetChainId, allowedChains } = props;
+  const blocklistWalletRdns = props?.blocklistWalletRdns || [];
   const {
     connectDispatch,
     connectState: { checkout },
@@ -57,19 +58,23 @@ export function WalletList(props: WalletListProps) {
   const { providers } = useInjectedProviders({ checkout });
   const [showWalletDrawer, setShowWalletDrawer] = useState(false);
   const { isWalletConnectEnabled, openWalletConnectModal } = useWalletConnect();
-
+  const walletConnectItemRef = useRef(null);
   const [showChangedYourMindDrawer, setShowChangedYourMindDrawer] = useState(false);
   const [showUnableToConnectDrawer, setShowUnableToConnectDrawer] = useState(false);
   const [chosenProviderDetail, setChosenProviderDetail] = useState<EIP6963ProviderDetail>();
 
   const filteredProviders = useMemo(() => (
-    providers.filter((provider) => (!(provider.info.rdns === WalletProviderRdns.PASSPORT)))
+    providers
+      .filter((provider) => (!(provider.info.rdns === WalletProviderRdns.PASSPORT)))
+      .filter((provider) => (!blocklistWalletRdns.includes(provider.info.rdns)))
   ), [providers]);
 
   // Don't allow Passport if targetChainId is L1
   const passportProviderDetail = useMemo(() => (
     targetChainId !== getL1ChainId(checkout!.config)
-    && providers.find((provider) => provider.info.rdns === WalletProviderRdns.PASSPORT)
+    && providers
+      .filter((provider) => (!blocklistWalletRdns.includes(provider.info.rdns)))
+      .find((provider) => provider.info.rdns === WalletProviderRdns.PASSPORT)
   ), [providers, checkout]);
 
   const selectWeb3Provider = useCallback((web3Provider: Web3Provider, providerName: string) => {
@@ -199,7 +204,7 @@ export function WalletList(props: WalletListProps) {
     });
     await openWalletConnectModal({
       connectCallback,
-      restoreSession: true,
+      restoreSession: false,
     });
   };
 
@@ -222,7 +227,7 @@ export function WalletList(props: WalletListProps) {
   };
 
   const handleWalletItemClick = useCallback(
-    async (providerDetail: EIP6963ProviderDetail<EIP1193Provider>) => {
+    async (providerDetail: EIP6963ProviderDetail) => {
       setShowChangedYourMindDrawer(false);
       setShowUnableToConnectDrawer(false);
       setChosenProviderDetail(providerDetail);
@@ -256,6 +261,23 @@ export function WalletList(props: WalletListProps) {
     });
     setShowWalletDrawer(true);
   }, [track]);
+
+  useEffect(() => {
+    // Auto-trigger wallet connection via rdns
+    if (targetWalletRdns && targetWalletRdns?.length > 0) {
+      if (targetWalletRdns === WalletProviderRdns.PASSPORT && passportProviderDetail) {
+        handleWalletItemClick(passportProviderDetail);
+      } else if (targetWalletRdns === WalletProviderRdns.WALLETCONNECT && walletConnectItemRef.current) {
+        (walletConnectItemRef.current as any).connect();
+      } else {
+        const targetProviderDetail = filteredProviders
+          .find((providerDetail) => providerDetail.info.rdns === targetWalletRdns);
+        if (targetProviderDetail) {
+          handleWalletItemClick(targetProviderDetail);
+        }
+      }
+    }
+  }, [filteredProviders, targetWalletRdns]);
 
   return (
     <Box
@@ -315,7 +337,7 @@ export function WalletList(props: WalletListProps) {
           key="walletconnect"
           style={{ width: '100%' }}
         >
-          <WalletConnectItem onConnect={handleWalletConnectConnection} />
+          <WalletConnectItem ref={walletConnectItemRef} onConnect={handleWalletConnectConnection} />
         </motion.div>
       )}
 

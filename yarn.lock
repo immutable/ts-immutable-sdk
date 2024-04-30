@@ -3447,6 +3447,7 @@ __metadata:
     "@rollup/plugin-replace": ^5.0.2
     "@rollup/plugin-terser": ^0.4.3
     "@rollup/plugin-typescript": ^11.0.0
+    "@types/uuid": ^8.3.4
     axios: ^1.6.5
     babel-jest: ^29.5.0
     eslint: ^8.40.0
@@ -3460,6 +3461,7 @@ __metadata:
     typedoc: ^0.24.8
     typedoc-plugin-markdown: ^3.15.2
     typescript: ^4.9.5
+    uuid: ^8.3.2
   languageName: unknown
   linkType: soft
 
@@ -3793,6 +3795,7 @@ __metadata:
     "@types/jwt-encode": ^1.0.1
     "@types/react": ^18.0.28
     "@types/react-dom": ^18.0.11
+    "@types/uuid": ^8.3.4
     "@typescript-eslint/eslint-plugin": ^5.57.1
     "@typescript-eslint/parser": ^5.57.1
     axios: ^1.6.5
@@ -3810,6 +3813,7 @@ __metadata:
     rollup: ^3.17.2
     ts-node: ^10.9.1
     typescript: ^4.9.5
+    uuid: ^8.3.2
   languageName: unknown
   linkType: soft
 
@@ -3903,6 +3907,7 @@ __metadata:
     stream-http: ^3.2.0
     typescript: ^4.9.5
     url: ^0.11.0
+    uuid: ^8.3.2
   peerDependencies:
     react: ^18.2.0
     react-dom: ^18.2.0
@@ -3976,7 +3981,6 @@ __metadata:
     "@imtbl/generated-clients": 0.0.0
     "@rollup/plugin-typescript": ^11.0.0
     "@swc/jest": ^0.2.24
-    "@types/elliptic": ^6.4.18
     "@types/jest": ^29.4.3
     axios: ^1.6.5
     bn.js: ^5.2.1
@@ -9022,15 +9026,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/bn.js@npm:*":
-  version: 5.1.5
-  resolution: "@types/bn.js@npm:5.1.5"
-  dependencies:
-    "@types/node": "*"
-  checksum: c87b28c4af74545624f8a3dae5294b16aa190c222626e8d4b2e327b33b1a3f1eeb43e7a24d914a9774bca43d8cd6e1cb0325c1f4b3a244af6693a024e1d918e6
-  languageName: node
-  linkType: hard
-
 "@types/bn.js@npm:^4.11.5":
   version: 4.11.6
   resolution: "@types/bn.js@npm:4.11.6"
@@ -9112,15 +9107,6 @@ __metadata:
   dependencies:
     "@types/ms": "*"
   checksum: a9a9bb40a199e9724aa944e139a7659173a9b274798ea7efbc277cb084bc37d32fc4c00877c3496fac4fed70a23243d284adb75c00b5fdabb38a22154d18e5df
-  languageName: node
-  linkType: hard
-
-"@types/elliptic@npm:^6.4.18":
-  version: 6.4.18
-  resolution: "@types/elliptic@npm:6.4.18"
-  dependencies:
-    "@types/bn.js": "*"
-  checksum: c27613c530fb95441e5e6b456c8c9bc26568ca14c546aae6d7c1d8d46869f79a2272feaef266ac00bdb68b2671e6351ed01b91b82266eac30ca9092720825d16
   languageName: node
   linkType: hard
 
@@ -9643,6 +9629,13 @@ __metadata:
   version: 2.0.3
   resolution: "@types/trusted-types@npm:2.0.3"
   checksum: 4794804bc4a4a173d589841b6d26cf455ff5dc4f3e704e847de7d65d215f2e7043d8757e4741ce3a823af3f08260a8d04a1a6e9c5ec9b20b7b04586956a6b005
+  languageName: node
+  linkType: hard
+
+"@types/uuid@npm:^8.3.4":
+  version: 8.3.4
+  resolution: "@types/uuid@npm:8.3.4"
+  checksum: 6f11f3ff70f30210edaa8071422d405e9c1d4e53abbe50fdce365150d3c698fe7bbff65c1e71ae080cbfb8fded860dbb5e174da96fdbbdfcaa3fb3daa474d20f
   languageName: node
   linkType: hard
 

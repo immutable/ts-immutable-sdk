@@ -1,6 +1,8 @@
 import { Box } from '@biom3/react';
 
 import { SalePaymentTypes } from '@imtbl/checkout-sdk';
+import { listItemVariants, listVariants } from 'lib/animation/listAnimation';
+import { motion } from 'framer-motion';
 import { PaymentOption } from './PaymentOption';
 
 const defaultPaymentOptions: SalePaymentTypes[] = [
@@ -27,13 +29,22 @@ export function PaymentOptions(props: PaymentOptionsProps) {
         justifyContent: 'center',
         alignItems: 'flex-start',
       }}
+      rc={
+        <motion.div variants={listVariants} initial="hidden" animate="show" />
+      }
     >
-      {defaultPaymentOptions.map((type) => (
+      {defaultPaymentOptions.map((type, idx: number) => (
         <PaymentOption
-          disabled={disabledOptions.includes(type)}
-          onClick={onClick}
+          key={`payment-type-${type}`}
           type={type}
-          key={`${Math.random()}-${type}`}
+          onClick={onClick}
+          disabled={disabledOptions.includes(type)}
+          rc={(
+            <motion.div
+              custom={idx}
+              variants={listItemVariants}
+            />
+          )}
         />
       ))}
     </Box>

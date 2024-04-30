@@ -32,6 +32,8 @@ import {
   SLOT_PREFIX_CONTRACT_CALL_APPROVED,
   SLOT_POS_CONTRACT_CALL_APPROVED,
   axelarGateways,
+  childETHs,
+  rootIMXs,
 } from './constants/bridges';
 import { ROOT_ERC20_BRIDGE_FLOW_RATE } from './contracts/ABIs/RootERC20BridgeFlowRate';
 import { ERC20 } from './contracts/ABIs/ERC20';
@@ -1017,6 +1019,42 @@ export class TokenBridge {
 
   private isWrappedIMX(token: FungibleToken, source: string) {
     return token.toUpperCase() === this.getWrappedIMX(source).toUpperCase();
+  }
+
+  private getRootIMX(source: string) {
+    let rootIMX:string;
+    if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
+      || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
+      rootIMX = rootIMXs.mainnet;
+    } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
+      || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
+      rootIMX = rootIMXs.testnet;
+    } else {
+      rootIMX = rootIMXs.devnet;
+    }
+    return rootIMX;
+  }
+
+  private isRootIMX(token: FungibleToken, source: string) {
+    return token.toUpperCase() === this.getRootIMX(source).toUpperCase();
+  }
+
+  private getChildETH(source: string) {
+    let eth:string;
+    if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
+      || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
+      eth = childETHs.mainnet;
+    } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
+      || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
+      eth = childETHs.testnet;
+    } else {
+      eth = childETHs.devnet;
+    }
+    return eth;
+  }
+
+  private isChildETH(token: FungibleToken, source: string) {
+    return token.toUpperCase() === this.getChildETH(source).toUpperCase();
   }
 
   private getChildAdaptor(source: string) {

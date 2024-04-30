@@ -3,16 +3,19 @@ import { IMXClient } from '@imtbl/x-client';
 import { ImxApiClients, MultiRollupApiClients, imxApiConfig } from '@imtbl/generated-clients';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
-import { ConfirmationScreen } from './confirmation';
 import { Passport } from './Passport';
 import { PassportImxProvider, PassportImxProviderFactory } from './starkEx';
 import { OidcConfiguration } from './types';
 import { mockUser, mockLinkedAddresses, mockUserImx } from './test/mocks';
+import { announceProvider, passportProviderInfo } from './zkEvm/provider/eip6963';
+import { ZkEvmProvider } from './zkEvm';
 
 jest.mock('./authManager');
 jest.mock('./magicAdapter');
 jest.mock('./starkEx');
 jest.mock('./confirmation');
+jest.mock('./zkEvm');
+jest.mock('./zkEvm/provider/eip6963');
 jest.mock('@imtbl/generated-clients');
 
 const oidcConfiguration: OidcConfiguration = {
@@ -32,7 +35,6 @@ describe('Passport', () => {
   let getDeviceFlowEndSessionEndpointMock: jest.Mock;
   let magicLoginMock: jest.Mock;
   let magicLogoutMock: jest.Mock;
-  let confirmationLogoutMock: jest.Mock;
   let getUserMock: jest.Mock;
   let requestRefreshTokenMock: jest.Mock;
   let getProviderMock: jest.Mock;
@@ -43,7 +45,6 @@ describe('Passport', () => {
     authLoginMock = jest.fn().mockReturnValue(mockUser);
     loginCallbackMock = jest.fn();
     magicLoginMock = jest.fn();
-    confirmationLogoutMock = jest.fn();
     magicLogoutMock = jest.fn();
     logoutMock = jest.fn();
     removeUserMock = jest.fn();
@@ -62,9 +63,6 @@ describe('Passport', () => {
       getUser: getUserMock,
       requestRefreshTokenAfterRegistration: requestRefreshTokenMock,
     });
-    (ConfirmationScreen as jest.Mock).mockReturnValue({
-      logout: confirmationLogoutMock,
-    });
     (MagicAdapter as jest.Mock).mockReturnValue({
       login: magicLoginMock,
       logout: magicLogoutMock,
@@ -74,8 +72,8 @@ describe('Passport', () => {
       getProviderSilent: getProviderSilentMock,
     });
     (MultiRollupApiClients as jest.Mock).mockReturnValue({
-      passportApi: {
-        getLinkedAddresses: getLinkedAddressesMock,
+      passportProfileApi: {
+        getUserInfo: getLinkedAddressesMock,
       },
     });
     passport = new Passport({
@@ -156,6 +154,38 @@ describe('Passport', () => {
     });
   });
 
+  describe('connectEvm', () => {
+    it('should execute connectEvm without error and return the provider', async () => {
+      const provider = await passport.connectEvm();
+
+      expect(provider).toBeInstanceOf(ZkEvmProvider);
+      expect(ZkEvmProvider).toHaveBeenCalled();
+    });
+
+    it('should announce the provider by default', async () => {
+      passportProviderInfo.uuid = 'mock123';
+      const provider = await passport.connectEvm();
+
+      expect(announceProvider).toHaveBeenCalledWith({
+        info: passportProviderInfo,
+        provider,
+      });
+    });
+
+    it('should not announce the provider if called with options announceProvider false', async () => {
+      const passportInstance = new Passport({
+        baseConfig: new ImmutableConfiguration({
+          environment: Environment.SANDBOX,
+        }),
+        ...oidcConfiguration,
+      });
+
+      await passportInstance.connectEvm({ announceProvider: false });
+
+      expect(announceProvider).not.toHaveBeenCalled();
+    });
+  });
+
   describe('loginCallback', () => {
     it('should execute login callback', async () => {
       await passport.loginCallback();
@@ -171,7 +201,6 @@ describe('Passport', () => {
 
         expect(logoutMock).toBeCalledTimes(1);
         expect(magicLogoutMock).toBeCalledTimes(1);
-        expect(confirmationLogoutMock).toBeCalledTimes(1);
       });
     });
 
@@ -182,7 +211,6 @@ describe('Passport', () => {
         const logoutMockOrder = logoutMock.mock.invocationCallOrder[0];
         const magicLogoutMockOrder = magicLogoutMock.mock.invocationCallOrder[0];
 
-        expect(confirmationLogoutMock).toBeCalledTimes(1);
         expect(logoutMock).toBeCalledTimes(1);
         expect(magicLogoutMock).toBeCalledTimes(1);
         expect(magicLogoutMockOrder).toBeLessThan(logoutMockOrder);
@@ -272,6 +300,7 @@ describe('Passport', () => {
       getUserMock.mockReturnValue(mockUser);
       getLinkedAddressesMock.mockReturnValue({
         data: {
+          sub: 'sub',
           linked_addresses: [],
         },
       });

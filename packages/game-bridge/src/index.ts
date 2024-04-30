@@ -37,6 +37,7 @@ const PASSPORT_FUNCTIONS = {
   logout: 'logout',
   getEmail: 'getEmail',
   getPassportId: 'getPassportId',
+  getLinkedAddresses: 'getLinkedAddresses',
   imx: {
     getAddress: 'getAddress',
     isRegisteredOffchain: 'isRegisteredOffchain',
@@ -422,6 +423,19 @@ window.callFunction = async (jsonData: string) => {
           requestId,
           success: true,
           result: userProfile?.sub,
+        });
+        break;
+      }
+      case PASSPORT_FUNCTIONS.getLinkedAddresses: {
+        const linkedAddresses = await passportClient?.getLinkedAddresses();
+        track(moduleName, 'performedGetLinkedAddresses', {
+          timeMs: Date.now() - markStart,
+        });
+        callbackToGame({
+          responseFor: fxName,
+          requestId,
+          success: true,
+          result: linkedAddresses,
         });
         break;
       }

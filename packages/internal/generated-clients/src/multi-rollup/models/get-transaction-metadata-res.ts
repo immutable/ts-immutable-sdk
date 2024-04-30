@@ -18,7 +18,22 @@
 import { ERC20ApproveMetadata } from './erc20-approve-metadata';
 // May contain unused imports in some cases
 // @ts-ignore
+import { ERC20TransferFromMetadata } from './erc20-transfer-from-metadata';
+// May contain unused imports in some cases
+// @ts-ignore
+import { ERC20TransferMetadata } from './erc20-transfer-metadata';
+// May contain unused imports in some cases
+// @ts-ignore
 import { ERC721ApproveMetadata } from './erc721-approve-metadata';
+// May contain unused imports in some cases
+// @ts-ignore
+import { ERC721SafeTransferFromBatchItem } from './erc721-safe-transfer-from-batch-item';
+// May contain unused imports in some cases
+// @ts-ignore
+import { ERC721SafeTransferFromBatchMetadata } from './erc721-safe-transfer-from-batch-metadata';
+// May contain unused imports in some cases
+// @ts-ignore
+import { ERC721TransferFromMetadata } from './erc721-transfer-from-metadata';
 // May contain unused imports in some cases
 // @ts-ignore
 import { NFTSetApprovalForAllMetadata } from './nftset-approval-for-all-metadata';
@@ -36,6 +51,6 @@ import { UnknownMetadata } from './unknown-metadata';
  * @type GetTransactionMetadataRes
  * @export
  */
-export type GetTransactionMetadataRes = ERC20ApproveMetadata | ERC721ApproveMetadata | NFTSetApprovalForAllMetadata | SeaportFulfillAvailableAdvancedOrdersMetadata | UnknownMetadata;
+export type GetTransactionMetadataRes = ERC20ApproveMetadata | ERC20TransferFromMetadata | ERC20TransferMetadata | ERC721ApproveMetadata | ERC721SafeTransferFromBatchMetadata | ERC721TransferFromMetadata | NFTSetApprovalForAllMetadata | SeaportFulfillAvailableAdvancedOrdersMetadata | UnknownMetadata;
 
 

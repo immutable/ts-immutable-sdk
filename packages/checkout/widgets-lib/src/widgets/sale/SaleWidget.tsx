@@ -32,19 +32,22 @@ import { PayWithCard } from './views/PayWithCard';
 import { PayWithCoins } from './views/PayWithCoins';
 import { PaymentMethods } from './views/PaymentMethods';
 import { SaleErrorView } from './views/SaleErrorView';
-import { SaleSuccessView } from './views/SaleSuccessView';
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import { TopUpView } from '../../views/top-up/TopUpView';
 import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
+import { OrderSummary } from './views/OrderSummary';
 
 type OptionalWidgetParams = Pick<SaleWidgetParams, 'excludePaymentTypes'>;
 type RequiredWidgetParams = Required<
 Omit<SaleWidgetParams, 'walletProviderName'>
 >;
 
-type WidgetParams = RequiredWidgetParams & OptionalWidgetParams;
+type WidgetParams = RequiredWidgetParams &
+OptionalWidgetParams & {
+  multicurrency: boolean;
+};
 export interface SaleWidgetProps extends WidgetParams {
   config: StrongCheckoutWidgetsConfig;
 }
@@ -58,6 +61,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
     environmentId,
     collectionName,
     excludePaymentTypes,
+    multicurrency = false,
   } = props;
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
@@ -122,6 +126,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
           passport: checkout?.passport,
           collectionName,
           excludePaymentTypes,
+          multicurrency,
         }}
       >
         <CryptoFiatProvider environment={config.environment}>
@@ -148,11 +153,11 @@ export default function SaleWidget(props: SaleWidgetProps) {
               )}
             />
           )}
-          {viewState.view.type === SaleWidgetViews.SALE_SUCCESS && provider && (
-            <SaleSuccessView data={viewState.view.data} />
-          )}
           {viewState.view.type === SaleWidgetViews.FUND_WITH_SMART_CHECKOUT && (
             <FundWithSmartCheckout subView={viewState.view.subView} />
+          )}
+          {viewState.view.type === SaleWidgetViews.ORDER_SUMMARY && (
+            <OrderSummary subView={viewState.view.subView} />
           )}
           {viewState.view.type === SharedViews.TOP_UP_VIEW && (
             <TopUpView

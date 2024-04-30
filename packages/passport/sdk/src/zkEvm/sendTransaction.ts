@@ -1,8 +1,9 @@
+import { BigNumber, BigNumberish } from 'ethers';
 import {
   StaticJsonRpcProvider,
   TransactionRequest,
 } from '@ethersproject/providers';
-import { BigNumber, BigNumberish } from 'ethers';
+import { Flow } from '@imtbl/metrics';
 import { Signer } from '@ethersproject/abstract-signer';
 import { getEip155ChainId, getNonce, getSignedMetaTransactions } from './walletHelpers';
 import { MetaTransaction, RelayerTransactionStatus } from './types';
@@ -21,6 +22,7 @@ export type EthSendTransactionParams = {
   relayerClient: RelayerClient;
   zkevmAddress: string,
   params: Array<any>;
+  flow: Flow;
 };
 
 const getMetaTransactions = async (
@@ -68,92 +70,104 @@ const getMetaTransactions = async (
   return [metaTransaction, feeMetaTransaction];
 };
 
-export const sendTransaction = ({
+export const sendTransaction = async ({
   params,
   ethSigner,
   rpcProvider,
   relayerClient,
   guardianClient,
   zkevmAddress,
-}: EthSendTransactionParams): Promise<string> => guardianClient
-  .withConfirmationScreen({ width: 480, height: 720 })(async () => {
-    const transactionRequest: TransactionRequest = params[0];
-    if (!transactionRequest.to) {
-      throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'eth_sendTransaction requires a "to" field');
-    }
+  flow,
+}: EthSendTransactionParams): Promise<string> => {
+  const transactionRequest: TransactionRequest = params[0];
+  if (!transactionRequest.to) {
+    throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'eth_sendTransaction requires a "to" field');
+  }
 
-    const { chainId } = await rpcProvider.detectNetwork();
-    const chainIdBigNumber = BigNumber.from(chainId);
+  const { chainId } = await rpcProvider.detectNetwork();
+  const chainIdBigNumber = BigNumber.from(chainId);
+  flow.addEvent('endDetectNetwork');
 
-    const nonce = await getNonce(rpcProvider, zkevmAddress);
-    const metaTransaction: MetaTransaction = {
-      to: transactionRequest.to,
-      data: transactionRequest.data,
-      nonce,
-      value: transactionRequest.value,
-      revertOnError: true,
-    };
+  const nonce = await getNonce(rpcProvider, zkevmAddress);
+  flow.addEvent('endGetNonce');
 
-    const metaTransactions = await getMetaTransactions(
-      metaTransaction,
-      nonce,
-      chainIdBigNumber,
-      zkevmAddress,
-      ethSigner,
-      relayerClient,
-    );
+  const metaTransaction: MetaTransaction = {
+    to: transactionRequest.to,
+    data: transactionRequest.data,
+    nonce,
+    value: transactionRequest.value,
+    revertOnError: true,
+  };
 
-    // Parallelize the validation and signing of the transaction
-    const [, signedTransactions] = await Promise.all([
-      guardianClient.validateEVMTransaction({
-        chainId: getEip155ChainId(chainId),
-        nonce: convertBigNumberishToString(nonce),
-        metaTransactions,
-      }),
-      // NOTE: We sign again because we now are adding the fee transaction, so the
-      // whole payload is different and needs a new signature.
-      getSignedMetaTransactions(
-        metaTransactions,
-        nonce,
-        chainIdBigNumber,
-        zkevmAddress,
-        ethSigner,
-      ),
-    ]);
+  const metaTransactions = await getMetaTransactions(
+    metaTransaction,
+    nonce,
+    chainIdBigNumber,
+    zkevmAddress,
+    ethSigner,
+    relayerClient,
+  );
+  flow.addEvent('endGetMetaTransactions');
 
-    const relayerId = await relayerClient.ethSendTransaction(zkevmAddress, signedTransactions);
-
-    const retrieveRelayerTransaction = async () => {
-      const tx = await relayerClient.imGetTransactionByHash(relayerId);
-      // NOTE: The transaction hash is only available from the Relayer once the
-      // transaction is actually submitted onchain. Hence we need to poll the
-      // Relayer get transaction endpoint until the status transitions to one that
-      // has the hash available.
-      if (tx.status === RelayerTransactionStatus.PENDING) {
-        throw new Error();
-      }
-      return tx;
-    };
-
-    const relayerTransaction = await retryWithDelay(retrieveRelayerTransaction, {
-      retries: MAX_TRANSACTION_HASH_RETRIEVAL_RETRIES,
-      interval: TRANSACTION_HASH_RETRIEVAL_WAIT,
-      finalErr: new JsonRpcError(RpcErrorCode.RPC_SERVER_ERROR, 'transaction hash not generated in time'),
-    });
-
-    if (![
-      RelayerTransactionStatus.SUBMITTED,
-      RelayerTransactionStatus.SUCCESSFUL,
-    ].includes(relayerTransaction.status)) {
-      let errorMessage = `Transaction failed to submit with status ${relayerTransaction.status}.`;
-      if (relayerTransaction.statusMessage) {
-        errorMessage += ` Error message: ${relayerTransaction.statusMessage}`;
-      }
-      throw new JsonRpcError(
-        RpcErrorCode.RPC_SERVER_ERROR,
-        errorMessage,
-      );
-    }
-
-    return relayerTransaction.hash;
+  // Parallelize the validation and signing of the transaction
+  const validateEVMTransactionPromise = guardianClient.validateEVMTransaction({
+    chainId: getEip155ChainId(chainId),
+    nonce: convertBigNumberishToString(nonce),
+    metaTransactions,
   });
+  validateEVMTransactionPromise.then(() => flow.addEvent('endValidateEVMTransaction'));
+
+  // NOTE: We sign again because we now are adding the fee transaction, so the
+  // whole payload is different and needs a new signature.
+  const getSignedMetaTransactionsPromise = getSignedMetaTransactions(
+    metaTransactions,
+    nonce,
+    chainIdBigNumber,
+    zkevmAddress,
+    ethSigner,
+  );
+  getSignedMetaTransactionsPromise.then(() => flow.addEvent('endGetSignedMetaTransactions'));
+
+  const [, signedTransactions] = await Promise.all([
+    validateEVMTransactionPromise,
+    getSignedMetaTransactionsPromise,
+  ]);
+
+  const relayerId = await relayerClient.ethSendTransaction(zkevmAddress, signedTransactions);
+  flow.addEvent('endRelayerSendTransaction');
+
+  const retrieveRelayerTransaction = async () => {
+    const tx = await relayerClient.imGetTransactionByHash(relayerId);
+    // NOTE: The transaction hash is only available from the Relayer once the
+    // transaction is actually submitted onchain. Hence we need to poll the
+    // Relayer get transaction endpoint until the status transitions to one that
+    // has the hash available.
+    if (tx.status === RelayerTransactionStatus.PENDING) {
+      throw new Error();
+    }
+    return tx;
+  };
+
+  const relayerTransaction = await retryWithDelay(retrieveRelayerTransaction, {
+    retries: MAX_TRANSACTION_HASH_RETRIEVAL_RETRIES,
+    interval: TRANSACTION_HASH_RETRIEVAL_WAIT,
+    finalErr: new JsonRpcError(RpcErrorCode.RPC_SERVER_ERROR, 'transaction hash not generated in time'),
+  });
+  flow.addEvent('endRetrieveRelayerTransaction');
+
+  if (![
+    RelayerTransactionStatus.SUBMITTED,
+    RelayerTransactionStatus.SUCCESSFUL,
+  ].includes(relayerTransaction.status)) {
+    let errorMessage = `Transaction failed to submit with status ${relayerTransaction.status}.`;
+    if (relayerTransaction.statusMessage) {
+      errorMessage += ` Error message: ${relayerTransaction.statusMessage}`;
+    }
+    throw new JsonRpcError(
+      RpcErrorCode.RPC_SERVER_ERROR,
+      errorMessage,
+    );
+  }
+
+  return relayerTransaction.hash;
+};

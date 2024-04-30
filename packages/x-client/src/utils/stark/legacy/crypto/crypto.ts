@@ -4,9 +4,11 @@
 import assert from 'assert';
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import BN from 'bn.js';
-import { ec } from 'elliptic';
+// @ts-ignore
+import elliptic from 'elliptic';
 import * as encUtils from 'enc-utils';
-import { hdkey } from 'ethereumjs-wallet';
+// import { hdkey } from 'ethereumjs-wallet';
+import * as ethereumJsWallet from 'ethereumjs-wallet';
 import hashJS from 'hash.js';
 
 import {
@@ -81,37 +83,37 @@ export function grindKey(privateKey: string): string {
   return key.mod(ORDER).toString('hex');
 }
 
-export function getKeyPair(privateKey: string): ec.KeyPair {
+export function getKeyPair(privateKey: string): elliptic.ec.KeyPair {
   return starkEc.keyFromPrivate(privateKey, 'hex');
 }
 
 export function getPrivateKeyFromPath(seed: string, path: string): string {
-  return hdkey
+  return ethereumJsWallet.hdkey
     .fromMasterSeed(Buffer.from(seed.slice(2), 'hex')) // assuming seed is '0x...'
     .derivePath(path)
     .getWallet()
     .getPrivateKeyString();
 }
 
-export function getKeyPairFromPath(seed: string, path: string): ec.KeyPair {
+export function getKeyPairFromPath(seed: string, path: string): elliptic.ec.KeyPair {
   assert(isHexPrefixed(seed), MISSING_HEX_PREFIX);
   const privateKey = getPrivateKeyFromPath(seed, path);
   return getKeyPair(grindKey(privateKey));
 }
 
-export function getPublic(keyPair: ec.KeyPair, compressed = false): string {
+export function getPublic(keyPair: elliptic.ec.KeyPair, compressed = false): string {
   return keyPair.getPublic(compressed, 'hex');
 }
 
-export function getStarkPublicKey(keyPair: ec.KeyPair): string {
+export function getStarkPublicKey(keyPair: elliptic.ec.KeyPair): string {
   return getPublic(keyPair, true);
 }
 
-export function getKeyPairFromPublicKey(publicKey: string): ec.KeyPair {
+export function getKeyPairFromPublicKey(publicKey: string): elliptic.ec.KeyPair {
   return starkEc.keyFromPublic(encUtils.hexToArray(publicKey));
 }
 
-export function getKeyPairFromPrivateKey(privateKey: string): ec.KeyPair {
+export function getKeyPairFromPrivateKey(privateKey: string): elliptic.ec.KeyPair {
   return starkEc.keyFromPrivate(privateKey, 'hex');
 }
 
