@@ -1,4 +1,6 @@
-import { Link as OldLink, ConfigurableIframeOptions } from '@imtbl/imx-sdk';
+// import { Link as OldLink, ConfigurableIframeOptions } from '@imtbl/imx-sdk';
+import { Link as OldLink } from './sdk';
+import { ConfigurableIframeOptions } from './sdk-types';
 
 import { Params, Results } from './types';
 

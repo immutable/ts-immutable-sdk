@@ -1,4 +1,7 @@
-import { ERC721TokenType, ETHTokenType, ERC20TokenType } from '@imtbl/imx-sdk';
+// import { ERC721TokenType, ETHTokenType, ERC20TokenType } from '@imtbl/imx-sdk';
+import { ERC721TokenType, ETHTokenType, ERC20TokenType } from './sdk-types';
+
+export { ERC721TokenType, ETHTokenType, ERC20TokenType };
 
 export interface Fee {
   recipient: string;
@@ -9,23 +12,23 @@ export interface Fee {
   percentage: number;
 }
 
-export interface ETHToken {
+export type ETHToken = {
   type: ETHTokenType.ETH;
-}
+};
 
-export interface ERC20Token {
+export type ERC20Token = {
   type: ERC20TokenType.ERC20;
   tokenAddress: string;
   symbol: string;
-}
+};
 
-export interface ERC721Token {
+export type ERC721Token = {
   type: ERC721TokenType.ERC721;
   tokenId: string;
   tokenAddress: string;
-}
+};
 
-type TokenWithAmount = ETHToken & { amount: string } | ERC20Token & { amount: string } | ERC721Token;
+export type TokenWithAmount = ETHToken & { amount: string } | ERC20Token & { amount: string } | ERC721Token;
 
 export enum ProviderPreference {
   GAMESTOP = 'gamestop',
@@ -124,6 +127,7 @@ export namespace Params {
   export type BatchNftTransfer = TransferV2;
   export type CompleteWithdrawal = TokenWithAmount;
   export type History = {};
+  export type Claim = {};
 
   /**
      * @deprecated
