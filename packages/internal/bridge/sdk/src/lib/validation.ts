@@ -80,3 +80,39 @@ export async function checkReceiver(
     }
   }
 }
+
+export async function validateChainIds(
+  sourceChainId: string,
+  destinationChainId: string,
+  config: BridgeConfiguration,
+) {
+  const isSourceChainRootOrChildChain = sourceChainId === config.bridgeInstance.rootChainID
+    || sourceChainId === config.bridgeInstance.childChainID;
+
+  // The source chain must be one of either the configured root chain or the configured child chain
+  if (!isSourceChainRootOrChildChain) {
+    throw new BridgeError(
+      `the sourceChainId ${sourceChainId} is not a valid`,
+      BridgeErrorType.INVALID_SOURCE_CHAIN_ID,
+    );
+  }
+
+  const isDestinationChainRootOrChildChain = destinationChainId === config.bridgeInstance.rootChainID
+    || destinationChainId === config.bridgeInstance.childChainID;
+
+  // If the token is not native, it must be a valid address
+  if (!isDestinationChainRootOrChildChain) {
+    throw new BridgeError(
+      `the destinationChainId ${destinationChainId} is not a valid`,
+      BridgeErrorType.INVALID_DESTINATION_CHAIN_ID,
+    );
+  }
+
+  // The source chain and destination chain should not be the same
+  if (sourceChainId === destinationChainId) {
+    throw new BridgeError(
+      `the sourceChainId ${sourceChainId} cannot be the same as the destinationChainId ${destinationChainId}`,
+      BridgeErrorType.CHAIN_IDS_MATCH,
+    );
+  }
+}

@@ -13,7 +13,7 @@ import { BridgeError, BridgeErrorType } from 'errors';
 import { GMPStatus, GasPaidStatus } from 'types/axelar';
 import { queryTransactionStatus } from 'lib/gmpRecovery';
 import { ERC20 } from 'contracts/ABIs/ERC20';
-import { validateChainConfiguration } from './lib/validation';
+import { validateChainConfiguration, validateChainIds } from './lib/validation';
 
 jest.mock('axios', () => ({
   post: jest.fn().mockReturnValue({
@@ -26,6 +26,7 @@ jest.mock('lib/gmpRecovery');
 jest.mock('./lib/validation', () => ({
   ...jest.requireActual('./lib/validation'),
   validateChainConfiguration: async () => {},
+  validateChainIds: async () => {},
 }));
 
 describe('Token Bridge', () => {
@@ -393,7 +394,7 @@ describe('Token Bridge', () => {
   describe('validateBridgeReqArgs ', () => {
     let tokenBridge: TokenBridge;
 
-    const originalValidateChainIds = TokenBridge.prototype['validateChainIds'];
+    // const originalValidateChainIds = TokenBridge.prototype['validateChainIds'];
 
     beforeEach(() => {
       const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
@@ -406,14 +407,12 @@ describe('Token Bridge', () => {
         rootProvider: voidRootProvider,
         childProvider: voidChildProvider,
       });
-      jest.spyOn(TokenBridge.prototype as any, 'validateChainIds')
-        .mockImplementation(async () => 'Valid');
       tokenBridge = new TokenBridge(bridgeConfig);
     });
 
     afterEach(() => {
       jest.clearAllMocks();
-      TokenBridge.prototype['validateChainIds'] = originalValidateChainIds;
+      // TokenBridge.prototype['validateChainIds'] = originalValidateChainIds;
     });
     it('does not throw an error when everything setup correctly', async () => {
       expect.assertions(0);
@@ -559,75 +558,6 @@ describe('Token Bridge', () => {
       } catch (error: any) {
         expect(error).toBeInstanceOf(BridgeError);
         expect(error.type).toBe(BridgeErrorType.INVALID_AMOUNT);
-      }
-    });
-  });
-
-  describe('validateChainIds', () => {
-    let tokenBridge: TokenBridge;
-    beforeEach(() => {
-      const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
-      const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
-      const bridgeConfig = new BridgeConfiguration({
-        baseConfig: new ImmutableConfiguration({
-          environment: Environment.SANDBOX,
-        }),
-        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
-        rootProvider: voidRootProvider,
-        childProvider: voidChildProvider,
-      });
-      tokenBridge = new TokenBridge(bridgeConfig);
-    });
-
-    afterEach(() => {
-      jest.clearAllMocks();
-    });
-    it('does not throw an error when everything setup correctly', async () => {
-      expect.assertions(0);
-      try {
-        await tokenBridge['validateChainIds'](
-          ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
-          ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
-        );
-      } catch (error: any) {
-        expect(error).toBeInstanceOf(BridgeError);
-        expect(error.type).toBe(BridgeErrorType.INVALID_SOURCE_CHAIN_ID);
-      }
-    });
-    it('throws an error when the sourceChainId is not one of the ones set in the initializer', async () => {
-      expect.assertions(2);
-      try {
-        await tokenBridge['validateChainIds'](
-          '100',
-          ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
-        );
-      } catch (error: any) {
-        expect(error).toBeInstanceOf(BridgeError);
-        expect(error.type).toBe(BridgeErrorType.INVALID_SOURCE_CHAIN_ID);
-      }
-    });
-    it('throws an error when the destinationChainId is not one of the ones set in the initializer', async () => {
-      expect.assertions(2);
-      try {
-        await tokenBridge['validateChainIds'](
-          ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
-          '100',
-        );
-      } catch (error: any) {
-        expect(error).toBeInstanceOf(BridgeError);
-        expect(error.type).toBe(BridgeErrorType.INVALID_DESTINATION_CHAIN_ID);
-      }
-    });
-    it('throws an error when the sourceChainId is the same as the  destinationChainId', async () => {
-      expect.assertions(2);
-      try {
-        await tokenBridge['validateChainIds'](
-          ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
-          ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
-        );
-      } catch (error: any) {
-        expect(error).toBeInstanceOf(BridgeError);
-        expect(error.type).toBe(BridgeErrorType.CHAIN_IDS_MATCH);
       }
     });
   });

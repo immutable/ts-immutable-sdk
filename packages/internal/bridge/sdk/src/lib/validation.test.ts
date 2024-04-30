@@ -3,7 +3,7 @@ import { BridgeConfiguration } from 'config';
 import { ETH_SEPOLIA_TO_ZKEVM_TESTNET, childETHs } from 'constants/bridges';
 import { BridgeError, BridgeErrorType } from 'errors';
 import { ethers } from 'ethers';
-import { checkReceiver, validateChainConfiguration } from './validation';
+import { checkReceiver, validateChainConfiguration, validateChainIds } from './validation';
 
 describe('Validation', () => {
   describe('validateChainConfiguration', () => {
@@ -179,5 +179,77 @@ describe('Validation', () => {
     // These involve generating bytecode that has both invalid and valid receive functions.
     it.todo('Throws error when withdrawing ETH and address is a contract that has an invalid receive function');
     it.todo('Does not throw error when withdrawing ETH and address is a contract that has a valid receive function');
+  });
+
+  describe('validateChainIds', () => {
+    let bridgeConfig: BridgeConfiguration;
+    beforeEach(() => {
+      const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
+      const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
+      bridgeConfig = new BridgeConfiguration({
+        baseConfig: new ImmutableConfiguration({
+          environment: Environment.SANDBOX,
+        }),
+        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
+        rootProvider: voidRootProvider,
+        childProvider: voidChildProvider,
+      });
+    });
+
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+    it('does not throw an error when everything setup correctly', async () => {
+      expect.assertions(0);
+      try {
+        await validateChainIds(
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
+          bridgeConfig,
+        );
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(BridgeError);
+        expect(error.type).toBe(BridgeErrorType.INVALID_SOURCE_CHAIN_ID);
+      }
+    });
+    it('throws an error when the sourceChainId is not one of the ones set in the initializer', async () => {
+      expect.assertions(2);
+      try {
+        await validateChainIds(
+          '100',
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
+          bridgeConfig,
+        );
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(BridgeError);
+        expect(error.type).toBe(BridgeErrorType.INVALID_SOURCE_CHAIN_ID);
+      }
+    });
+    it('throws an error when the destinationChainId is not one of the ones set in the initializer', async () => {
+      expect.assertions(2);
+      try {
+        await validateChainIds(
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          '100',
+          bridgeConfig,
+        );
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(BridgeError);
+        expect(error.type).toBe(BridgeErrorType.INVALID_DESTINATION_CHAIN_ID);
+      }
+    });
+    it('throws an error when the sourceChainId is the same as the destinationChainId', async () => {
+      expect.assertions(2);
+      try {
+        await validateChainIds(
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          bridgeConfig,
+        );
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(BridgeError);
+        expect(error.type).toBe(BridgeErrorType.CHAIN_IDS_MATCH);
+      }
+    });
   });
 });

@@ -8,7 +8,7 @@ import {
   concat, defaultAbiCoder, hexlify, keccak256, zeroPad,
 } from 'ethers/lib/utils';
 import { ROOT_AXELAR_ADAPTOR } from 'contracts/ABIs/RootAxelarBridgeAdaptor';
-import { checkReceiver, validateChainConfiguration } from 'lib/validation';
+import { checkReceiver, validateChainConfiguration, validateChainIds } from 'lib/validation';
 import { getRootIMX } from 'lib/utils';
 import {
   NATIVE,
@@ -151,7 +151,7 @@ export class TokenBridge {
       this.initialise(),
       async () => {
         if (req.action !== BridgeFeeActions.FINALISE_WITHDRAWAL) {
-          await this.validateChainIds(req.sourceChainId, req.destinationChainId);
+          await validateChainIds(req.sourceChainId, req.destinationChainId, this.config);
         }
       },
       this.getFeePrivate(req),
@@ -778,7 +778,7 @@ export class TokenBridge {
     req: BridgeBundledTxRequest,
   ) {
     // Validate chain ID.
-    await this.validateChainIds(req.sourceChainId, req.destinationChainId);
+    await validateChainIds(req.sourceChainId, req.destinationChainId, this.config);
 
     // Validate address
     if (!ethers.utils.isAddress(req.senderAddress) || !ethers.utils.isAddress(req.recipientAddress)) {
@@ -1032,41 +1032,6 @@ export class TokenBridge {
         sender,
         bridgeContract,
       ), BridgeErrorType.PROVIDER_ERROR);
-  }
-
-  private async validateChainIds(
-    sourceChainId: string,
-    destinationChainId: string,
-  ) {
-    const isSourceChainRootOrChildChain = sourceChainId === this.config.bridgeInstance.rootChainID
-      || sourceChainId === this.config.bridgeInstance.childChainID;
-
-    // The source chain must be one of either the configured root chain or the configured child chain
-    if (!isSourceChainRootOrChildChain) {
-      throw new BridgeError(
-        `the sourceChainId ${sourceChainId} is not a valid`,
-        BridgeErrorType.INVALID_SOURCE_CHAIN_ID,
-      );
-    }
-
-    const isDestinationChainRootOrChildChain = destinationChainId === this.config.bridgeInstance.rootChainID
-      || destinationChainId === this.config.bridgeInstance.childChainID;
-
-    // If the token is not native, it must be a valid address
-    if (!isDestinationChainRootOrChildChain) {
-      throw new BridgeError(
-        `the destinationChainId ${destinationChainId} is not a valid`,
-        BridgeErrorType.INVALID_DESTINATION_CHAIN_ID,
-      );
-    }
-
-    // The source chain and destination chain should not be the same
-    if (sourceChainId === destinationChainId) {
-      throw new BridgeError(
-        `the sourceChainId ${sourceChainId} cannot be the same as the destinationChainId ${destinationChainId}`,
-        BridgeErrorType.CHAIN_IDS_MATCH,
-      );
-    }
   }
 
   private getWrappedIMX(source: string) {
