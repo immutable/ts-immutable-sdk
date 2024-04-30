@@ -8,7 +8,9 @@ import {
   concat, defaultAbiCoder, hexlify, keccak256, zeroPad,
 } from 'ethers/lib/utils';
 import { ROOT_AXELAR_ADAPTOR } from 'contracts/ABIs/RootAxelarBridgeAdaptor';
-import { checkReceiver, validateChainConfiguration, validateChainIds } from 'lib/validation';
+import {
+  checkReceiver, validateBridgeReqArgs, validateChainConfiguration, validateChainIds,
+} from 'lib/validation';
 import { getRootIMX } from 'lib/utils';
 import {
   NATIVE,
@@ -367,13 +369,11 @@ export class TokenBridge {
       // Encode the function data into a payload
       let data: string;
       if (sender === recipient) {
-        console.log('native deposit');
         data = await withBridgeError<string>(async () => getContractRes.contract.interface.encodeFunctionData(
           getContractRes.contractMethods.native,
           [amount],
         ), BridgeErrorType.INTERNAL_ERROR);
       } else {
-        console.log('native depositTo');
         data = await withBridgeError<string>(async () => getContractRes.contract.interface.encodeFunctionData(
           getContractRes.contractMethods.nativeTo,
           [recipient, amount],
@@ -389,13 +389,11 @@ export class TokenBridge {
     // Encode the function data into a payload
     let data: string;
     if (sender === recipient) {
-      console.log('token deposit');
       data = await withBridgeError<string>(async () => getContractRes.contract.interface.encodeFunctionData(
         getContractRes.contractMethods.token,
         [erc20Token, amount],
       ), BridgeErrorType.INTERNAL_ERROR);
     } else {
-      console.log('token depositTo');
       data = await withBridgeError<string>(async () => getContractRes.contract.interface.encodeFunctionData(
         getContractRes.contractMethods.tokenTo,
         [erc20Token, recipient, amount],
@@ -567,7 +565,7 @@ export class TokenBridge {
   public async getUnsignedBridgeBundledTx(req: BridgeBundledTxRequest): Promise<BridgeBundledTxResponse> {
     const [, , , res] = await Promise.all([
       this.initialise(), // Initialisation will only be exeucted once
-      this.validateBridgeReqArgs(req),
+      validateBridgeReqArgs(req, this.config),
       checkReceiver(req.token, req.destinationChainId, req.recipientAddress, this.config),
       this.getUnsignedBridgeBundledTxPrivate(req),
     ]);
@@ -772,37 +770,6 @@ export class TokenBridge {
       unsignedApprovalTx,
       unsignedBridgeTx,
     };
-  }
-
-  private async validateBridgeReqArgs(
-    req: BridgeBundledTxRequest,
-  ) {
-    // Validate chain ID.
-    await validateChainIds(req.sourceChainId, req.destinationChainId, this.config);
-
-    // Validate address
-    if (!ethers.utils.isAddress(req.senderAddress) || !ethers.utils.isAddress(req.recipientAddress)) {
-      throw new BridgeError(
-        `address ${req.senderAddress} or ${req.recipientAddress} is not a valid address`,
-        BridgeErrorType.INVALID_ADDRESS,
-      );
-    }
-
-    // Validate amount
-    if (req.amount.isNegative() || req.amount.isZero()) {
-      throw new BridgeError(
-        `deposit amount ${req.amount.toString()} is invalid`,
-        BridgeErrorType.INVALID_AMOUNT,
-      );
-    }
-
-    // If the token is not native, it must be a valid address
-    if (req.token.toUpperCase() !== NATIVE && !ethers.utils.isAddress(req.token)) {
-      throw new BridgeError(
-        `token address ${req.token} is not a valid address`,
-        BridgeErrorType.INVALID_ADDRESS,
-      );
-    }
   }
 
   private async getDynamicDepositGas(
@@ -1230,7 +1197,6 @@ export class TokenBridge {
     try {
       pendingWithdrawalResponses = await Promise.all(pendingWithdrawalPromises);
     } catch (err) {
-      console.log('err', err);
       throw new BridgeError(
         `Failed to fetch the pending withdrawals with: ${err}`,
         BridgeErrorType.FLOW_RATE_ERROR,

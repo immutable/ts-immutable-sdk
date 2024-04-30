@@ -1,5 +1,6 @@
 import { ethers } from 'ethers';
-import { FungibleToken } from 'types';
+import { BridgeBundledTxRequest, FungibleToken } from 'types';
+import { NATIVE } from 'constants/bridges';
 import { BridgeConfiguration } from '../config';
 import { BridgeError, BridgeErrorType, withBridgeError } from '../errors';
 import { isChildETH, isRootIMX } from './utils';
@@ -113,6 +114,38 @@ export async function validateChainIds(
     throw new BridgeError(
       `the sourceChainId ${sourceChainId} cannot be the same as the destinationChainId ${destinationChainId}`,
       BridgeErrorType.CHAIN_IDS_MATCH,
+    );
+  }
+}
+
+export async function validateBridgeReqArgs(
+  req: BridgeBundledTxRequest,
+  config: BridgeConfiguration,
+) {
+  // Validate chain ID.
+  await validateChainIds(req.sourceChainId, req.destinationChainId, config);
+
+  // Validate address
+  if (!ethers.utils.isAddress(req.senderAddress) || !ethers.utils.isAddress(req.recipientAddress)) {
+    throw new BridgeError(
+      `address ${req.senderAddress} or ${req.recipientAddress} is not a valid address`,
+      BridgeErrorType.INVALID_ADDRESS,
+    );
+  }
+
+  // Validate amount
+  if (req.amount.isNegative() || req.amount.isZero()) {
+    throw new BridgeError(
+      `deposit amount ${req.amount.toString()} is invalid`,
+      BridgeErrorType.INVALID_AMOUNT,
+    );
+  }
+
+  // If the token is not native, it must be a valid address
+  if (req.token.toUpperCase() !== NATIVE && !ethers.utils.isAddress(req.token)) {
+    throw new BridgeError(
+      `token address ${req.token} is not a valid address`,
+      BridgeErrorType.INVALID_ADDRESS,
     );
   }
 }
