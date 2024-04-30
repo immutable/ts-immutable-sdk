@@ -18,8 +18,6 @@ export class RetryProvider extends ethers.providers.JsonRpcProvider {
 
   async send(method: any, params: any): Promise<any> {
     for (let i = 0; i < this.retryCount; i++) {
-      // eslint-disable-next-line
-      console.log(`RCP send attempt ${i + 1}`);
       try {
         // eslint-disable-next-line no-await-in-loop
         return await super.send(method, params);
