@@ -9,7 +9,7 @@
     "@0xsequence/abi": "^1.4.3",
     "@0xsequence/core": "^1.4.3",
     "@biom3/design-tokens": "^0.3.7",
-    "@biom3/react": "^0.22.1",
+    "@biom3/react": "^0.22.2",
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/abstract-signer": "^5.7.0",
     "@ethersproject/keccak256": "^5.7.0",
