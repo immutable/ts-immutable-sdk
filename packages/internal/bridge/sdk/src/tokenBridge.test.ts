@@ -13,6 +13,8 @@ import { BridgeError, BridgeErrorType } from 'errors';
 import { GMPStatus, GasPaidStatus } from 'types/axelar';
 import { queryTransactionStatus } from 'lib/gmpRecovery';
 import { ERC20 } from 'contracts/ABIs/ERC20';
+// import * as validation from './lib/validation';
+import { validateChainConfiguration } from './lib/validation';
 
 jest.mock('axios', () => ({
   post: jest.fn().mockReturnValue({
@@ -45,7 +47,7 @@ describe('Token Bridge', () => {
     let tokenBridge: TokenBridge;
 
     const originalValidateBridgeReqArgs = TokenBridge.prototype['validateBridgeReqArgs'];
-    const originalValidateChainConfiguration = TokenBridge.prototype['validateChainConfiguration'];
+    // const originalValidateChainConfiguration = TokenBridge.prototype['validateChainConfiguration'];
 
     const mockRootProvider = new ethers.providers.JsonRpcProvider('x');
     const mockChildProvider = new ethers.providers.JsonRpcProvider('x');
@@ -59,8 +61,14 @@ describe('Token Bridge', () => {
     });
 
     beforeEach(() => {
-      jest.spyOn(TokenBridge.prototype as any, 'validateChainConfiguration')
-        .mockImplementation(async () => 'Valid');
+      jest.mock('./lib/validation', () => ({
+        ...jest.requireActual('./lib/validation'),
+        validateChainConfiguration: jest.fn().mockReturnValue(async () => {}),
+      }));
+
+      // I expect this to not fail, because of the above mocking, but it does fail.
+      validateChainConfiguration(bridgeConfig);
+
       jest.spyOn(TokenBridge.prototype as any, 'validateBridgeReqArgs')
         .mockImplementation(async () => 'Valid');
       jest.spyOn(TokenBridge.prototype as any, 'getDynamicDepositGas')
@@ -81,7 +89,7 @@ describe('Token Bridge', () => {
     afterEach(() => {
       jest.clearAllMocks();
       TokenBridge.prototype['validateBridgeReqArgs'] = originalValidateBridgeReqArgs;
-      TokenBridge.prototype['validateChainConfiguration'] = originalValidateChainConfiguration;
+      // TokenBridge.prototype['validateChainConfiguration'] = originalValidateChainConfiguration;
     });
 
     it('returns the both approval tx and bridge tx when allowance is insufficient for ERC20', async () => {
@@ -634,91 +642,6 @@ describe('Token Bridge', () => {
       } catch (error: any) {
         expect(error).toBeInstanceOf(BridgeError);
         expect(error.type).toBe(BridgeErrorType.CHAIN_IDS_MATCH);
-      }
-    });
-  });
-
-  describe('validateChainConfiguration', () => {
-    afterEach(() => {
-      jest.clearAllMocks();
-    });
-    it('does not throw an error when everything setup correctly', async () => {
-      const mockRootProvider = {
-        getNetwork: jest.fn().mockReturnValue({ chainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID }),
-      } as unknown as ethers.providers.Web3Provider;
-      const mockChildProvider = {
-        getNetwork: jest.fn().mockReturnValue({ chainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID }),
-      } as unknown as ethers.providers.Web3Provider;
-
-      const bridgeConfig = new BridgeConfiguration({
-        baseConfig: new ImmutableConfiguration({
-          environment: Environment.SANDBOX,
-        }),
-        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
-        rootProvider: mockRootProvider,
-        childProvider: mockChildProvider,
-      });
-      const tokenBridge:TokenBridge = new TokenBridge(bridgeConfig);
-
-      expect.assertions(0);
-      try {
-        await tokenBridge['validateChainConfiguration']();
-      } catch (error: any) {
-        expect(error).toBeInstanceOf(BridgeError);
-        expect(error.type).toBe(BridgeErrorType.UNSUPPORTED_ERROR);
-      }
-    });
-    it('throws an error when the rootProvider chainId is not the one set in the config', async () => {
-      const mockRootProvider = {
-        getNetwork: jest.fn().mockReturnValue({ chainId: 100 }),
-      } as unknown as ethers.providers.Web3Provider;
-      const mockChildProvider = {
-        getNetwork: jest.fn().mockReturnValue({ chainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID }),
-      } as unknown as ethers.providers.Web3Provider;
-
-      const bridgeConfig = new BridgeConfiguration({
-        baseConfig: new ImmutableConfiguration({
-          environment: Environment.SANDBOX,
-        }),
-        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
-        rootProvider: mockRootProvider,
-        childProvider: mockChildProvider,
-      });
-      const tokenBridge:TokenBridge = new TokenBridge(bridgeConfig);
-
-      expect.assertions(2);
-      try {
-        await tokenBridge['validateChainConfiguration']();
-      } catch (error: any) {
-        expect(error).toBeInstanceOf(BridgeError);
-        expect(error.type).toBe(BridgeErrorType.UNSUPPORTED_ERROR);
-      }
-    });
-
-    it('throws an error when the childProvider chainId is not the one set in the config', async () => {
-      const mockRootProvider = {
-        getNetwork: jest.fn().mockReturnValue({ chainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID }),
-      } as unknown as ethers.providers.Web3Provider;
-      const mockChildProvider = {
-        getNetwork: jest.fn().mockReturnValue({ chainId: '100' }),
-      } as unknown as ethers.providers.Web3Provider;
-
-      const bridgeConfig = new BridgeConfiguration({
-        baseConfig: new ImmutableConfiguration({
-          environment: Environment.SANDBOX,
-        }),
-        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
-        rootProvider: mockRootProvider,
-        childProvider: mockChildProvider,
-      });
-      const tokenBridge:TokenBridge = new TokenBridge(bridgeConfig);
-
-      expect.assertions(2);
-      try {
-        await tokenBridge['validateChainConfiguration']();
-      } catch (error: any) {
-        expect(error).toBeInstanceOf(BridgeError);
-        expect(error.type).toBe(BridgeErrorType.UNSUPPORTED_ERROR);
       }
     });
   });

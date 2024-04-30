@@ -8,6 +8,7 @@ import {
   concat, defaultAbiCoder, hexlify, keccak256, zeroPad,
 } from 'ethers/lib/utils';
 import { ROOT_AXELAR_ADAPTOR } from 'contracts/ABIs/RootAxelarBridgeAdaptor';
+import { validateChainConfiguration } from 'lib/validation';
 import {
   NATIVE,
   ETHEREUM_NATIVE_TOKEN_ADDRESS,
@@ -99,11 +100,11 @@ export class TokenBridge {
 
   /**
    * Initialise the TokenBridge instance.
-   *
+   * TODO add initialise tests
    */
   public async initialise(): Promise<void> {
     if (!this.initialised) {
-      await this.validateChainConfiguration();
+      await validateChainConfiguration(this.config);
       this.initialised = true;
     }
   }
@@ -1109,36 +1110,6 @@ export class TokenBridge {
       throw new BridgeError(
         `the sourceChainId ${sourceChainId} cannot be the same as the destinationChainId ${destinationChainId}`,
         BridgeErrorType.CHAIN_IDS_MATCH,
-      );
-    }
-  }
-
-  // Query the rootchain and childchain providers to ensure the chainID is as expected by the SDK.
-  // This is to prevent the SDK from being used on the wrong chain, especially after a chain reset.
-  private async validateChainConfiguration(): Promise<void> {
-    const errMessage = 'Please upgrade to the latest version of the Bridge SDK or provide valid configuration';
-
-    const rootNetwork = await withBridgeError<ethers.providers.Network>(
-      async () => this.config.rootProvider.getNetwork(),
-      BridgeErrorType.ROOT_PROVIDER_ERROR,
-    );
-
-    if (rootNetwork!.chainId.toString() !== this.config.bridgeInstance.rootChainID) {
-      throw new BridgeError(
-        `Rootchain provider chainID ${rootNetwork!.chainId} does not match expected chainID ${this.config.bridgeInstance.rootChainID}. ${errMessage}`,
-        BridgeErrorType.UNSUPPORTED_ERROR,
-      );
-    }
-
-    const childNetwork = await withBridgeError<ethers.providers.Network>(
-      async () => this.config.childProvider.getNetwork(),
-      BridgeErrorType.CHILD_PROVIDER_ERROR,
-    );
-
-    if (childNetwork.chainId.toString() !== this.config.bridgeInstance.childChainID) {
-      throw new BridgeError(
-        `Childchain provider chainID ${childNetwork.chainId} does not match expected chainID ${this.config.bridgeInstance.childChainID}. ${errMessage}`,
-        BridgeErrorType.UNSUPPORTED_ERROR,
       );
     }
   }
