@@ -271,7 +271,7 @@
             "SWAP": "交换 {{symbol}} ≈ {{amount}}",
             "ONRAMP": "购买 {{symbol}} ≈ {{amount}}",
             "BRIDGE": "移动 {{symbol}} ≈ {{amount}}",
-            "SUFFICIENT": "支付 {{symbol}} {{amount}}",
+            "SUFFICIENT": "支付 {{symbol}} {{amount}}"
           }
         },
         "fee": "费用 {{symbol}} ≈ {{amount}}"
