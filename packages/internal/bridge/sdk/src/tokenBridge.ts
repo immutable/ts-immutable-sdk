@@ -8,7 +8,8 @@ import {
   concat, defaultAbiCoder, hexlify, keccak256, zeroPad,
 } from 'ethers/lib/utils';
 import { ROOT_AXELAR_ADAPTOR } from 'contracts/ABIs/RootAxelarBridgeAdaptor';
-import { validateChainConfiguration } from 'lib/validation';
+import { checkReceiver, validateChainConfiguration } from 'lib/validation';
+import { getRootIMX } from 'lib/utils';
 import {
   NATIVE,
   ETHEREUM_NATIVE_TOKEN_ADDRESS,
@@ -22,7 +23,6 @@ import {
   axelarChains,
   bridgeMethods,
   childWIMXs,
-  rootIMXs,
   WITHDRAW_SIG,
   childAdaptors,
   rootAdaptors,
@@ -30,7 +30,6 @@ import {
   SLOT_PREFIX_CONTRACT_CALL_APPROVED,
   SLOT_POS_CONTRACT_CALL_APPROVED,
   axelarGateways,
-  childETHs,
 } from './constants/bridges';
 import { ROOT_ERC20_BRIDGE_FLOW_RATE } from './contracts/ABIs/RootERC20BridgeFlowRate';
 import { ERC20 } from './contracts/ABIs/ERC20';
@@ -100,7 +99,6 @@ export class TokenBridge {
 
   /**
    * Initialise the TokenBridge instance.
-   * TODO add initialise tests
    */
   public async initialise(): Promise<void> {
     if (!this.initialised) {
@@ -570,7 +568,7 @@ export class TokenBridge {
     const [, , , res] = await Promise.all([
       this.initialise(), // Initialisation will only be exeucted once
       this.validateBridgeReqArgs(req),
-      this.checkReceiver(req.token, req.destinationChainId, req.recipientAddress),
+      checkReceiver(req.token, req.destinationChainId, req.recipientAddress, this.config),
       this.getUnsignedBridgeBundledTxPrivate(req),
     ]);
     return res;
@@ -776,49 +774,6 @@ export class TokenBridge {
     };
   }
 
-  private async checkReceiver(
-    token: FungibleToken,
-    destinationChainId: string,
-    address: string,
-  ): Promise<void> {
-    let provider;
-    if (destinationChainId === this.config.bridgeInstance.rootChainID) {
-      if (!this.isChildETH(token, destinationChainId)) {
-        // Return immediately for withdrawing non ETH.
-        return;
-      }
-      provider = this.config.rootProvider;
-    } else {
-      if (!this.isRootIMX(token, destinationChainId)) {
-        // Return immediately for depositing non IMX.
-        return;
-      }
-      provider = this.config.childProvider;
-    }
-    const bytecode = await provider.getCode(address);
-    // No code : "0x" then the address is not a contract so it is a valid receiver.
-    if (bytecode.length <= 2) return;
-
-    const ABI = ['function receive()'];
-    const contract = new ethers.Contract(address, ABI, provider);
-
-    try {
-      // try to estimate gas for the receive function, if it works it exists
-      await contract.estimateGas.receive();
-    } catch {
-      try {
-        // if receive fails, try to estimate this way which will work if a fallback function is present
-        await provider.estimateGas({ to: address });
-      } catch {
-        // no receive or fallback
-        throw new BridgeError(
-          `address ${address} is not a valid receipient`,
-          BridgeErrorType.INVALID_RECIPIENT,
-        );
-      }
-    }
-  }
-
   private async validateBridgeReqArgs(
     req: BridgeBundledTxRequest,
   ) {
@@ -927,7 +882,7 @@ export class TokenBridge {
     let rootToken: string;
     if (token.toUpperCase() === NATIVE
       || this.isWrappedIMX(token, destinationChainId)) {
-      rootToken = this.getRootIMX(destinationChainId);
+      rootToken = getRootIMX(destinationChainId);
     } else {
       // Find root token
       const erc20Contract: ethers.Contract = await withBridgeError<ethers.Contract>(
@@ -1130,42 +1085,6 @@ export class TokenBridge {
 
   private isWrappedIMX(token: FungibleToken, source: string) {
     return token.toUpperCase() === this.getWrappedIMX(source).toUpperCase();
-  }
-
-  private getRootIMX(source: string) {
-    let rootIMX:string;
-    if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
-      || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
-      rootIMX = rootIMXs.mainnet;
-    } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
-      || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
-      rootIMX = rootIMXs.testnet;
-    } else {
-      rootIMX = rootIMXs.devnet;
-    }
-    return rootIMX;
-  }
-
-  private isRootIMX(token: FungibleToken, source: string) {
-    return token.toUpperCase() === this.getRootIMX(source).toUpperCase();
-  }
-
-  private getChildETH(source: string) {
-    let eth:string;
-    if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
-      || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
-      eth = childETHs.mainnet;
-    } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
-      || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
-      eth = childETHs.testnet;
-    } else {
-      eth = childETHs.devnet;
-    }
-    return eth;
-  }
-
-  private isChildETH(token: FungibleToken, source: string) {
-    return token.toUpperCase() === this.getChildETH(source).toUpperCase();
   }
 
   private getChildAdaptor(source: string) {
