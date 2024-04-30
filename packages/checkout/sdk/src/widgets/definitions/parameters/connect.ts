@@ -1,4 +1,4 @@
-import { ChainId } from '../../../types';
+import { ChainId, WalletProviderRdns } from '../../../types';
 import { WidgetLanguage } from '../configurations';
 
 export enum ConnectTargetLayer {
@@ -11,6 +11,8 @@ export type ConnectWidgetParams = {
   language?: WidgetLanguage;
   /** The target chain to connect to as part of the connection process (defaults to Immutable zkEVM / Immutable zkEVM Testnet) */
   targetChainId?: ChainId;
+  /** The target wallet to establish a connection with */
+  targetWalletRdns?: string | WalletProviderRdns;
   /** List of wallets rdns to exclude from the connect widget */
   blocklistWalletRdns?: string[];
 };
