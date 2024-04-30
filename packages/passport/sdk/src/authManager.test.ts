@@ -17,12 +17,18 @@ jest.mock('oidc-client-ts', () => ({
   WebStorageStateStore: jest.fn(),
 }));
 
+const authDomain = 'auth.immutable.com';
+const clientId = '11111';
+const redirectUri = 'https://test.com';
+const logoutEndpoint = '/oidc';
+const logoutRedirectUri = `${redirectUri}logout/callback`;
+
 const getConfig = (values?: Partial<PassportModuleConfiguration>) => new PassportConfiguration({
   baseConfig: new ImmutableConfiguration({
     environment: Environment.SANDBOX,
   }),
-  clientId: '11111',
-  redirectUri: 'https://test.com',
+  clientId,
+  redirectUri,
   scope: 'email profile',
   ...values,
 });
@@ -116,7 +122,7 @@ describe('AuthManager', () => {
           authorization_endpoint: `${config.authenticationDomain}/authorize`,
           token_endpoint: `${config.authenticationDomain}/oauth/token`,
           userinfo_endpoint: `${config.authenticationDomain}/userinfo`,
-          end_session_endpoint: `${config.authenticationDomain}/v2/oidc`
+          end_session_endpoint: `${config.authenticationDomain}/oidc`
             + `?client_id=${config.oidcConfiguration.clientId}`,
         },
         popup_redirect_uri: config.oidcConfiguration.redirectUri,
@@ -142,16 +148,18 @@ describe('AuthManager', () => {
     });
 
     describe('when a logoutRedirectUri is specified', () => {
-      it('should set the endSessionEndpoint `returnTo` and `client_id` query string params', () => {
-        const configWithLogoutRedirectUri = getConfig({
-          logoutRedirectUri: 'https://test.com/logout/callback',
-        });
-
+      it('should set the endSessionEndpoint `post_logout_redirect_uri` and `client_id` query string params', () => {
+        const configWithLogoutRedirectUri = getConfig({ logoutRedirectUri });
         const am = new AuthManager(configWithLogoutRedirectUri);
+
+        const uri = new URL('/oidc', 'https://auth.immutable.com');
+        uri.searchParams.append('client_id', clientId);
+        uri.searchParams.append('post_logout_redirect_uri', logoutRedirectUri);
+
         expect(am).toBeDefined();
         expect(UserManager).toBeCalledWith(expect.objectContaining({
           metadata: expect.objectContaining({
-            end_session_endpoint: 'https://auth.immutable.com/v2/oidc?client_id=11111&returnTo=https%3A%2F%2Ftest.com%2Flogout%2Fcallback',
+            end_session_endpoint: uri.toString(),
           }),
         }));
       });
@@ -164,7 +172,6 @@ describe('AuthManager', () => {
         mockSigninPopup.mockResolvedValue(mockOidcUser);
 
         const result = await authManager.login();
-
         expect(result).toEqual(mockUser);
       });
     });
@@ -482,27 +489,37 @@ describe('AuthManager', () => {
   });
 
   describe('getDeviceFlowEndSessionEndpoint', () => {
-    describe('when a logoutRedirectUri is specified', () => {
-      it('should set the endSessionEndpoint `returnTo` and `client_id` query string params', () => {
-        const am = new AuthManager(getConfig({
-          logoutRedirectUri: 'https://test.com/logout/callback',
-        }));
-
-        const result = am.getDeviceFlowEndSessionEndpoint();
-
-        expect(result).toEqual(
-          'https://auth.immutable.com/v2/oidc?client_id=11111&returnTo=https%3A%2F%2Ftest.com%2Flogout%2Fcallback',
-        );
+    describe('with a logged in user', () => {
+      beforeEach(() => {
+        mockSigninSilent.mockReturnValue(mockOidcUser);
       });
-    });
 
-    describe('when no logoutRedirectUri is specified', () => {
-      it('should return the endSessionEndpoint without a `returnTo` or `client_id` query string params', () => {
-        const am = new AuthManager(getConfig());
+      describe('when a logoutRedirectUri is specified', () => {
+        it('should set the endSessionEndpoint `post_logout_redirect_uri` and `client_id` query string params', async () => {
+          const am = new AuthManager(getConfig({ logoutRedirectUri }));
+          const result = await am.getDeviceFlowEndSessionEndpoint();
+          const uri = new URL(result);
 
-        const result = am.getDeviceFlowEndSessionEndpoint();
+          expect(uri.hostname).toEqual(authDomain);
+          expect(uri.pathname).toEqual(logoutEndpoint);
+          expect(uri.searchParams.get('client_id')).toEqual(clientId);
+          expect(uri.searchParams.get('id_token_hint')).toEqual(mockUser.idToken);
+          expect(uri.searchParams.get('post_logout_redirect_uri')).toEqual(logoutRedirectUri);
+        });
+      });
 
-        expect(result).toEqual('https://auth.immutable.com/v2/oidc');
+      describe('when no post_logout_redirect_uri is specified', () => {
+        it('should return the endSessionEndpoint without a `post_logout_redirect_uri` or `client_id` query string params', async () => {
+          const am = new AuthManager(getConfig());
+          const result = await am.getDeviceFlowEndSessionEndpoint();
+          const uri = new URL(result);
+
+          expect(uri.hostname).toEqual(authDomain);
+          expect(uri.pathname).toEqual(logoutEndpoint);
+          expect(uri.searchParams.get('client_id')).toEqual(clientId);
+          expect(uri.searchParams.get('id_token_hint')).toEqual(mockUser.idToken);
+          expect(uri.searchParams.get('post_logout_redirect_uri')).toBeNull();
+        });
       });
     });
   });

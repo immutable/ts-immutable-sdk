@@ -3,6 +3,7 @@ import {
   ErrorTimeout,
   InMemoryWebStorage,
   User as OidcUser,
+  SignoutRedirectArgs,
   UserManager,
   UserManagerSettings,
   WebStorageStateStore,
@@ -37,15 +38,19 @@ const formUrlEncodedHeader = {
   },
 };
 
+const logoutEndpoint = '/oidc';
+const authorizeEndpoint = '/?authorize';
+
 const getAuthConfiguration = (config: PassportConfiguration): UserManagerSettings => {
   const { authenticationDomain, oidcConfiguration } = config;
 
   const store = typeof window !== 'undefined' ? window.localStorage : new InMemoryWebStorage();
   const userStore = new WebStorageStateStore({ store });
 
-  let endSessionEndpoint = `${authenticationDomain}/v2/oidc?client_id=${oidcConfiguration.clientId}`;
+  const endSessionEndpoint = new URL(logoutEndpoint, authenticationDomain);
+  endSessionEndpoint.searchParams.append('client_id', oidcConfiguration.clientId);
   if (oidcConfiguration.logoutRedirectUri) {
-    endSessionEndpoint += `&returnTo=${encodeURIComponent(oidcConfiguration.logoutRedirectUri)}`;
+    endSessionEndpoint.searchParams.append('post_logout_redirect_uri', oidcConfiguration.logoutRedirectUri);
   }
 
   const baseConfiguration: UserManagerSettings = {
@@ -57,7 +62,7 @@ const getAuthConfiguration = (config: PassportConfiguration): UserManagerSetting
       authorization_endpoint: `${authenticationDomain}/authorize`,
       token_endpoint: `${authenticationDomain}/oauth/token`,
       userinfo_endpoint: `${authenticationDomain}/userinfo`,
-      end_session_endpoint: endSessionEndpoint,
+      end_session_endpoint: endSessionEndpoint.toString(),
     },
     mergeClaims: true,
     automaticSilentRenew: false, // Disabled until https://github.com/authts/oidc-client-ts/issues/430 has been resolved
@@ -296,17 +301,26 @@ export default class AuthManager {
 
     // https://auth0.com/docs/secure/attack-protection/state-parameters
     const state = base64URLEncode(crypto.randomBytes(32));
+
+    const {
+      redirectUri, scope, audience, clientId,
+    } = this.config.oidcConfiguration;
+
     this.deviceCredentialsManager.savePKCEData({ state, verifier });
 
-    return `${this.config.authenticationDomain}/authorize?`
-      + 'response_type=code'
-      + `&code_challenge=${challenge}`
-      + '&code_challenge_method=S256'
-      + `&client_id=${this.config.oidcConfiguration.clientId}`
-      + `&redirect_uri=${this.config.oidcConfiguration.redirectUri}`
-      + `&scope=${this.config.oidcConfiguration.scope}`
-      + `&state=${state}`
-      + `&audience=${this.config.oidcConfiguration.audience}`;
+    const pKCEAuthorizationUrl = new URL(authorizeEndpoint, this.config.authenticationDomain);
+
+    pKCEAuthorizationUrl.searchParams.append('response_type', 'code');
+    pKCEAuthorizationUrl.searchParams.append('code_challenge', challenge);
+    pKCEAuthorizationUrl.searchParams.append('code_challenge_method', 'S256');
+    pKCEAuthorizationUrl.searchParams.append('client_id', clientId);
+    pKCEAuthorizationUrl.searchParams.append('redirect_uri', redirectUri);
+    pKCEAuthorizationUrl.searchParams.append('state', state);
+
+    if (scope) pKCEAuthorizationUrl.searchParams.append('scope', scope);
+    if (audience) pKCEAuthorizationUrl.searchParams.append('audience', audience);
+
+    return pKCEAuthorizationUrl.toString();
   }
 
   public async loginWithPKCEFlowCallback(authorizationCode: string, state: string): Promise<User> {
@@ -348,33 +362,46 @@ export default class AuthManager {
   public async logout(): Promise<void> {
     return withPassportError<void>(
       async () => {
-        if (this.logoutMode === 'silent') {
-          return this.userManager.signoutSilent();
-        }
+        const user = await this.getUser();
+        const { oidcConfiguration } = this.config;
 
-        return this.userManager.signoutRedirect();
+        const logoutArgs: SignoutRedirectArgs = {
+          id_token_hint: user?.idToken,
+          post_logout_redirect_uri: oidcConfiguration.logoutRedirectUri,
+        };
+
+        if (this.logoutMode === 'silent') {
+          return this.userManager.signoutSilent(logoutArgs);
+        }
+        return this.userManager.signoutRedirect(logoutArgs);
       },
       PassportErrorType.LOGOUT_ERROR,
     );
+  }
+
+  public async logoutSilentCallback(url: string): Promise<void> {
+    return this.userManager.signoutSilentCallback(url);
   }
 
   public async removeUser(): Promise<void> {
     return this.userManager.removeUser();
   }
 
-  public getDeviceFlowEndSessionEndpoint(): string {
+  public async getDeviceFlowEndSessionEndpoint(): Promise<string> {
     const { authenticationDomain, oidcConfiguration } = this.config;
-    let endSessionEndpoint = `${authenticationDomain}/v2/oidc`;
+
+    const endSessionEndpoint = new URL(logoutEndpoint, authenticationDomain);
+    endSessionEndpoint.searchParams.append('client_id', oidcConfiguration.clientId);
+
+    const user = await this.getUser();
+    if (user?.idToken) {
+      endSessionEndpoint.searchParams.append('id_token_hint', user?.idToken);
+    }
     if (oidcConfiguration.logoutRedirectUri) {
-      endSessionEndpoint += `?client_id=${oidcConfiguration.clientId}`
-        + `&returnTo=${encodeURIComponent(oidcConfiguration.logoutRedirectUri)}`;
+      endSessionEndpoint.searchParams.append('post_logout_redirect_uri', oidcConfiguration.logoutRedirectUri);
     }
 
-    return endSessionEndpoint;
-  }
-
-  public async logoutSilentCallback(url: string): Promise<void> {
-    return this.userManager.signoutSilentCallback(url);
+    return endSessionEndpoint.toString();
   }
 
   public forceUserRefreshInBackground() {
