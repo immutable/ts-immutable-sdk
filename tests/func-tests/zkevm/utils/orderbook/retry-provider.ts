@@ -22,6 +22,11 @@ export class RetryProvider extends ethers.providers.JsonRpcProvider {
         // eslint-disable-next-line no-await-in-loop
         return await super.send(method, params);
       } catch (error: any) {
+        // eslint-disable-next-line
+        console.log(`RCP request failed`);
+        // eslint-disable-next-line
+        console.log(error)
+
         if (i === this.retryCount - 1) {
           throw error;
         }
