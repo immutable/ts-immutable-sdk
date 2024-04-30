@@ -578,6 +578,7 @@ export class Checkout {
       params.routingOptions,
       params.onComplete,
       params.onFundingRoute,
+      params.isFractionalBalance,
     );
   }
 
