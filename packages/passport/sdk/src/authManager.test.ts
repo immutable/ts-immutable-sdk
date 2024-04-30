@@ -116,7 +116,7 @@ describe('AuthManager', () => {
           authorization_endpoint: `${config.authenticationDomain}/authorize`,
           token_endpoint: `${config.authenticationDomain}/oauth/token`,
           userinfo_endpoint: `${config.authenticationDomain}/userinfo`,
-          end_session_endpoint: `${config.authenticationDomain}/v2/logout`
+          end_session_endpoint: `${config.authenticationDomain}/v2/oidc`
             + `?client_id=${config.oidcConfiguration.clientId}`,
         },
         popup_redirect_uri: config.oidcConfiguration.redirectUri,
@@ -151,7 +151,7 @@ describe('AuthManager', () => {
         expect(am).toBeDefined();
         expect(UserManager).toBeCalledWith(expect.objectContaining({
           metadata: expect.objectContaining({
-            end_session_endpoint: 'https://auth.immutable.com/v2/logout?client_id=11111&returnTo=https%3A%2F%2Ftest.com%2Flogout%2Fcallback',
+            end_session_endpoint: 'https://auth.immutable.com/v2/oidc?client_id=11111&returnTo=https%3A%2F%2Ftest.com%2Flogout%2Fcallback',
           }),
         }));
       });
@@ -491,7 +491,7 @@ describe('AuthManager', () => {
         const result = am.getDeviceFlowEndSessionEndpoint();
 
         expect(result).toEqual(
-          'https://auth.immutable.com/v2/logout?client_id=11111&returnTo=https%3A%2F%2Ftest.com%2Flogout%2Fcallback',
+          'https://auth.immutable.com/v2/oidc?client_id=11111&returnTo=https%3A%2F%2Ftest.com%2Flogout%2Fcallback',
         );
       });
     });
@@ -502,7 +502,7 @@ describe('AuthManager', () => {
 
         const result = am.getDeviceFlowEndSessionEndpoint();
 
-        expect(result).toEqual('https://auth.immutable.com/v2/logout');
+        expect(result).toEqual('https://auth.immutable.com/v2/oidc');
       });
     });
   });

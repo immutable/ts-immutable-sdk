@@ -43,7 +43,7 @@ const getAuthConfiguration = (config: PassportConfiguration): UserManagerSetting
   const store = typeof window !== 'undefined' ? window.localStorage : new InMemoryWebStorage();
   const userStore = new WebStorageStateStore({ store });
 
-  let endSessionEndpoint = `${authenticationDomain}/v2/logout?client_id=${oidcConfiguration.clientId}`;
+  let endSessionEndpoint = `${authenticationDomain}/v2/oidc?client_id=${oidcConfiguration.clientId}`;
   if (oidcConfiguration.logoutRedirectUri) {
     endSessionEndpoint += `&returnTo=${encodeURIComponent(oidcConfiguration.logoutRedirectUri)}`;
   }
@@ -364,7 +364,7 @@ export default class AuthManager {
 
   public getDeviceFlowEndSessionEndpoint(): string {
     const { authenticationDomain, oidcConfiguration } = this.config;
-    let endSessionEndpoint = `${authenticationDomain}/v2/logout`;
+    let endSessionEndpoint = `${authenticationDomain}/v2/oidc`;
     if (oidcConfiguration.logoutRedirectUri) {
       endSessionEndpoint += `?client_id=${oidcConfiguration.clientId}`
         + `&returnTo=${encodeURIComponent(oidcConfiguration.logoutRedirectUri)}`;
