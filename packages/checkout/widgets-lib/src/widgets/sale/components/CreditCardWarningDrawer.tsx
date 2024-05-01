@@ -6,29 +6,19 @@ import { CreditCardWarningHero } from 'components/Hero/CreditCardWarningHero';
 import { useTranslation } from 'react-i18next';
 import { useSaleContext } from '../context/SaleContextProvider';
 
-type CreditCardWarningDrawerProps = {
-  visible: boolean;
-  setShowCreditCardWarning: (show: boolean) => void;
-};
-
-export function CreditCardWarningDrawer({
-  visible,
-  setShowCreditCardWarning,
-}: CreditCardWarningDrawerProps) {
+export function CreditCardWarningDrawer() {
   const { t } = useTranslation();
-  const { setPaymentMethod } = useSaleContext();
+  const { showCreditCardWarning, setShowCreditCardWarning, setPaymentMethod } = useSaleContext();
 
   const handleCtaButtonClick = () => {
-    setShowCreditCardWarning(false);
     setPaymentMethod(SalePaymentTypes.CREDIT);
   };
 
   return (
     <Drawer
       size="threeQuarter"
-      visible={visible}
+      visible={showCreditCardWarning}
       showHeaderBar={false}
-      onCloseDrawer={() => setShowCreditCardWarning(false)}
     >
       <Drawer.Content>
         <ButtCon

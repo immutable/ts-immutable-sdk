@@ -22,11 +22,7 @@ import { useSaleContext } from '../context/SaleContextProvider';
 import { useSaleEvent } from '../hooks/useSaleEvents';
 import { SaleErrorTypes, SignPaymentTypes } from '../types';
 
-interface PaymentMethodsProps {
-  setShowCreditCardWarning: (showCreditCardWarning: boolean) => void;
-}
-
-export function PaymentMethods(props: PaymentMethodsProps) {
+export function PaymentMethods() {
   const { t } = useTranslation();
   const { viewDispatch } = useContext(ViewContext);
   const {
@@ -39,14 +35,9 @@ export function PaymentMethods(props: PaymentMethodsProps) {
     multicurrency,
   } = useSaleContext();
   const { sendPageView, sendCloseEvent, sendSelectedPaymentMethod } = useSaleEvent();
-  const { setShowCreditCardWarning } = props;
 
   const handleOptionClick = (type: SalePaymentTypes) => {
-    if (type === SalePaymentTypes.CREDIT) {
-      setShowCreditCardWarning(true);
-    } else {
-      setPaymentMethod(type);
-    }
+    setPaymentMethod(type);
   };
 
   useEffect(() => {
