@@ -73,6 +73,7 @@ export const fetchFundingBalances = async (
       itemRequirements,
       transactionOrGasAmount,
       routingOptions: { bridge: false, onRamp: false, swap: true },
+      fundingRouteFullAmount: true,
       onComplete: () => {
         onComplete?.(pushToFoundBalances([]));
       },
