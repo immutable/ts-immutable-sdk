@@ -1,5 +1,5 @@
 import {
-  Select, Option, Box, OptionKey,
+  Select, Box, OptionKey,
 } from '@biom3/react';
 import { useMemo, useState } from 'react';
 import { FormControlWrapper } from '../FormControlWrapper/FormControlWrapper';
@@ -86,7 +86,7 @@ export function SelectForm({
             option.
           */}
           {options.filter((o) => o.id === selectedOption)?.map((option) => (
-            <Option
+            <Select.Option
               key={option.id}
               optionKey={option.id}
               testId={option.testId}
@@ -94,18 +94,18 @@ export function SelectForm({
               disabled={disabled}
             >
               {!option.icon && (
-                <Option.Icon icon="Coins" variant="bold" />
+                <Select.Option.Icon icon="Coins" variant="bold" />
               )}
               {option.icon && (
-                <Option.FramedImage
+                <Select.Option.FramedImage
                   imageUrl={option.icon}
                   circularFrame
                   defaultImageUrl={defaultTokenImage}
                   sx={{ background: 'base.color.translucent.standard.100' }}
                 />
               )}
-              <Option.Label>{option.symbol}</Option.Label>
-            </Option>
+              <Select.Option.Label>{option.symbol}</Select.Option.Label>
+            </Select.Option>
           ))}
         </Select>
       </FormControlWrapper>

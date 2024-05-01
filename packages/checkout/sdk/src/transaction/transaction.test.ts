@@ -3,20 +3,26 @@ import { ethers } from 'ethers';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { sendTransaction } from './transaction';
 import { ChainId, NetworkInfo } from '../types';
+import { IMMUTABLE_ZKVEM_GAS_OVERRIDES } from '../env';
 
 describe('transaction', () => {
+  beforeEach(() => {
+    jest.resetAllMocks();
+  });
+
   it('should send the transaction and return success', async () => {
     const transactionResponse = {
       hash: '123',
       from: '0x234',
       confirmations: 5,
     };
+    const mockSendTransaction = jest.fn().mockResolvedValue(transactionResponse);
     const mockProvider = {
       getNetwork: jest.fn().mockReturnValue({
         chainId: ChainId.IMTBL_ZKEVM_TESTNET,
       } as NetworkInfo),
       getSigner: jest.fn().mockReturnValue({
-        sendTransaction: () => transactionResponse,
+        sendTransaction: mockSendTransaction,
       }),
     } as unknown as Web3Provider;
 
@@ -34,6 +40,7 @@ describe('transaction', () => {
     await expect(sendTransaction(mockProvider, transaction)).resolves.toEqual({
       transactionResponse,
     });
+    expect(mockSendTransaction).toHaveBeenCalledWith(transaction);
   });
 
   it('should return errored status if transaction errors', async () => {
@@ -161,6 +168,41 @@ describe('transaction', () => {
         expect(err.message).toEqual('unpredictable gas limit');
         expect(err.type).toEqual(CheckoutErrorType.UNPREDICTABLE_GAS_LIMIT);
       }
+    },
+  );
+
+  it(
+    'should include txn gas limits for zkEVM chains if the gasPrice is not defined on the transaction',
+    async () => {
+      const transactionResponse = {
+        hash: '123',
+        from: '0x234',
+        confirmations: 5,
+      };
+      const mockSendTransaction = jest.fn().mockResolvedValue(transactionResponse);
+      const mockProvider = {
+        getNetwork: jest.fn().mockReturnValue({
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        } as NetworkInfo),
+        getSigner: jest.fn().mockReturnValue({
+          sendTransaction: mockSendTransaction,
+        }),
+      } as unknown as Web3Provider;
+
+      const transaction = {
+        to: '0xAAA',
+        from: '0x234',
+        chainId: ChainId.ETHEREUM,
+      };
+
+      await expect(sendTransaction(mockProvider, transaction)).resolves.toEqual({
+        transactionResponse,
+      });
+      expect(mockSendTransaction).toHaveBeenCalledWith({
+        ...transaction,
+        maxFeePerGas: IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxFeePerGas,
+        maxPriorityFeePerGas: IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxPriorityFeePerGas,
+      });
     },
   );
 });
