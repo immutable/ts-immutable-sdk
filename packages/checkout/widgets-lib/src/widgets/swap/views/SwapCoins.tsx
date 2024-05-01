@@ -20,6 +20,7 @@ import { NotEnoughImx } from '../../../components/NotEnoughImx/NotEnoughImx';
 import { IMX_TOKEN_SYMBOL } from '../../../lib';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { isPassportProvider } from '../../../lib/provider';
 
 export interface SwapCoinsProps {
   theme: WidgetTheme;
@@ -49,6 +50,7 @@ export function SwapCoins({
   const {
     connectLoaderState: {
       checkout,
+      provider,
     },
   } = useContext(ConnectLoaderContext);
 
@@ -70,7 +72,7 @@ export function SwapCoins({
   }, []);
 
   useEffect(() => {
-    if (hasZeroBalance(tokenBalances, IMX_TOKEN_SYMBOL)) {
+    if (hasZeroBalance(tokenBalances, IMX_TOKEN_SYMBOL) && !isPassportProvider(provider)) {
       setShowNotEnoughImxDrawer(true);
     }
   }, [tokenBalances]);

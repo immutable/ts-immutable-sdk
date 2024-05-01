@@ -53,7 +53,7 @@ export function WithCard(props: WithCardProps) {
   );
 
   const onFailedToLoad = () => {
-    goToErrorView(SaleErrorTypes.TRANSACTION_FAILED);
+    goToErrorView(SaleErrorTypes.TRANSAK_FAILED);
   };
 
   return (
