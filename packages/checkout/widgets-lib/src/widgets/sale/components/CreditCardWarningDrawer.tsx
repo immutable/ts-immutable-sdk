@@ -18,6 +18,11 @@ export function CreditCardWarningDrawer({
   const { t } = useTranslation();
   const { setPaymentMethod } = useSaleContext();
 
+  const handleCtaButtonClick = () => {
+    setShowCreditCardWarning(false);
+    setPaymentMethod(SalePaymentTypes.CREDIT);
+  };
+
   return (
     <Drawer
       size="threeQuarter"
@@ -64,7 +69,7 @@ export function CreditCardWarningDrawer({
             testId="credit-card-button"
             variant="primary"
             size="large"
-            onClick={() => setPaymentMethod(SalePaymentTypes.CREDIT)}
+            onClick={handleCtaButtonClick}
           >
             {t('views.PAYMENT_METHODS.creditCardWarningDrawer.ctaButton')}
           </Button>
