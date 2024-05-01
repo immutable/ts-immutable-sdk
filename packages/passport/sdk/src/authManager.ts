@@ -309,7 +309,6 @@ export default class AuthManager {
     this.deviceCredentialsManager.savePKCEData({ state, verifier });
 
     const pKCEAuthorizationUrl = new URL(authorizeEndpoint, this.config.authenticationDomain);
-
     pKCEAuthorizationUrl.searchParams.append('response_type', 'code');
     pKCEAuthorizationUrl.searchParams.append('code_challenge', challenge);
     pKCEAuthorizationUrl.searchParams.append('code_challenge_method', 'S256');
@@ -359,17 +358,20 @@ export default class AuthManager {
     return response.data;
   }
 
+  public async getLogoutArgs(): Promise<SignoutRedirectArgs> {
+    const user = await this.getUser();
+    const { oidcConfiguration } = this.config;
+
+    return {
+      id_token_hint: user?.idToken,
+      post_logout_redirect_uri: oidcConfiguration.logoutRedirectUri,
+    };
+  }
+
   public async logout(): Promise<void> {
     return withPassportError<void>(
       async () => {
-        const user = await this.getUser();
-        const { oidcConfiguration } = this.config;
-
-        const logoutArgs: SignoutRedirectArgs = {
-          id_token_hint: user?.idToken,
-          post_logout_redirect_uri: oidcConfiguration.logoutRedirectUri,
-        };
-
+        const logoutArgs = await this.getLogoutArgs();
         if (this.logoutMode === 'silent') {
           return this.userManager.signoutSilent(logoutArgs);
         }
@@ -393,13 +395,9 @@ export default class AuthManager {
     const endSessionEndpoint = new URL(logoutEndpoint, authenticationDomain);
     endSessionEndpoint.searchParams.append('client_id', oidcConfiguration.clientId);
 
-    const user = await this.getUser();
-    if (user?.idToken) {
-      endSessionEndpoint.searchParams.append('id_token_hint', user?.idToken);
-    }
-    if (oidcConfiguration.logoutRedirectUri) {
-      endSessionEndpoint.searchParams.append('post_logout_redirect_uri', oidcConfiguration.logoutRedirectUri);
-    }
+    const logoutArgs = await this.getLogoutArgs();
+    if (logoutArgs.id_token_hint) endSessionEndpoint.searchParams.append('id_token_hint', logoutArgs.id_token_hint);
+    if (logoutArgs.post_logout_redirect_uri) endSessionEndpoint.searchParams.append('post_logout_redirect_uri', logoutArgs.post_logout_redirect_uri);
 
     return endSessionEndpoint.toString();
   }

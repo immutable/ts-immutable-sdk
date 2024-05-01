@@ -286,6 +286,16 @@ describe('AuthManager', () => {
   });
 
   describe('logout', () => {
+    it('should build the correct logout object', async () => {
+      mockSigninSilent.mockReturnValue(mockOidcUser);
+
+      const am = new AuthManager(getConfig({ logoutRedirectUri }));
+      const logoutArgs = await am.getLogoutArgs();
+
+      expect(logoutArgs.id_token_hint).toEqual(mockOidcUser.id_token);
+      expect(logoutArgs.post_logout_redirect_uri).toEqual(logoutRedirectUri);
+    });
+
     it('should call redirect logout if logout mode is redirect', async () => {
       const configuration = getConfig({
         logoutMode: 'redirect',
