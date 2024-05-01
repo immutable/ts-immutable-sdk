@@ -38,7 +38,7 @@ const formUrlEncodedHeader = {
   },
 };
 
-const logoutEndpoint = '/oidc';
+const logoutEndpoint = '/oidc/logout';
 const authorizeEndpoint = '/?authorize';
 
 const getAuthConfiguration = (config: PassportConfiguration): UserManagerSettings => {
@@ -360,11 +360,8 @@ export default class AuthManager {
 
   public async getLogoutArgs(): Promise<SignoutRedirectArgs> {
     const user = await this.getUser();
-    const { oidcConfiguration } = this.config;
-
     return {
       id_token_hint: user?.idToken,
-      post_logout_redirect_uri: oidcConfiguration.logoutRedirectUri,
     };
   }
 

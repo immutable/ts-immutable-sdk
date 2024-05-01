@@ -20,7 +20,7 @@ jest.mock('oidc-client-ts', () => ({
 const authDomain = 'auth.immutable.com';
 const clientId = '11111';
 const redirectUri = 'https://test.com';
-const logoutEndpoint = '/oidc';
+const logoutEndpoint = '/oidc/logout';
 const logoutRedirectUri = `${redirectUri}logout/callback`;
 
 const getConfig = (values?: Partial<PassportModuleConfiguration>) => new PassportConfiguration({
