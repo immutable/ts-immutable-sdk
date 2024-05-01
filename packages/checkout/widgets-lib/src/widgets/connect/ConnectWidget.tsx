@@ -7,6 +7,7 @@ import {
   Checkout,
   ConnectWidgetParams,
   EIP1193Provider,
+  EIP6963ProviderInfo,
   getMetaMaskProviderDetail,
   getPassportProviderDetail,
   WalletConnectManager as IWalletConnectManager,
@@ -177,14 +178,17 @@ export default function ConnectWidget({
     sendProviderUpdatedEvent({ provider });
 
     // Find the wallet provider info via injected with Passport and MetaMask fallbacks
-    let walletProviderInfo;
+    let walletProviderInfo: EIP6963ProviderInfo | undefined;
     if (isWalletConnectProvider(provider)) {
       walletProviderInfo = walletConnectProviderInfo;
     } else {
       const injectedProviderDetails = checkout.getInjectedProviders();
-      walletProviderInfo = injectedProviderDetails.find((providerDetail) => (
+      const walletProviderDetail = injectedProviderDetails.find((providerDetail) => (
         providerDetail.provider === provider.provider
       ));
+      if (walletProviderDetail) {
+        walletProviderInfo = walletProviderDetail.info;
+      }
       if (!walletProviderInfo) {
         if (isPassportProvider(provider)) {
           walletProviderInfo = getPassportProviderDetail(provider.provider as EIP1193Provider).info;
