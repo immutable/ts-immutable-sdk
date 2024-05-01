@@ -21,7 +21,7 @@ import { Allowance } from './allowance/types';
 import { BalanceCheckResult, BalanceRequirement } from './balanceCheck/types';
 import { measureAsyncExecution } from '../logger/debugLogger';
 
-export const overrideSufficientBalanceCheckResult = (
+export const overrideBalanceCheckResult = (
   balanceCheckResult: BalanceCheckResult,
 ): BalanceCheckResult => {
   const modifiedRequirements = balanceCheckResult.balanceRequirements.map(
@@ -53,11 +53,12 @@ const processRoutes = async (
   availableRoutingOptions: AvailableRoutingOptions,
   transactionRequirements: BalanceRequirement[],
   balanceCheckResult: BalanceCheckResult,
+  fundingRouteFullAmount: boolean,
   onComplete?: (result: SmartCheckoutResult) => void,
   onFundingRoute?: (fundingRoute: FundingRoute) => void,
 ): Promise<RoutingOutcome> => {
-  const finalBalanceCheckResult = sufficient && onComplete
-    ? overrideSufficientBalanceCheckResult(balanceCheckResult)
+  const finalBalanceCheckResult = !fundingRouteFullAmount || (sufficient && onComplete)
+    ? overrideBalanceCheckResult(balanceCheckResult)
     : balanceCheckResult;
 
   const routingOutcome = await measureAsyncExecution<RoutingOutcome>(
@@ -92,6 +93,7 @@ export const smartCheckout = async (
   routingOptions?: AvailableRoutingOptions,
   onComplete?: (result: SmartCheckoutResult) => void,
   onFundingRoute?: (fundingRoute: FundingRoute) => void,
+  fundingRouteFullAmount: boolean = false,
 ): Promise<SmartCheckoutResult> => {
   const ownerAddress = await provider.getSigner().getAddress();
 
@@ -161,6 +163,7 @@ export const smartCheckout = async (
       availableRoutingOptions,
       transactionRequirements,
       balanceCheckResult,
+      fundingRouteFullAmount,
       onComplete,
       onFundingRoute,
     );
@@ -184,6 +187,7 @@ export const smartCheckout = async (
     availableRoutingOptions,
     transactionRequirements,
     balanceCheckResult,
+    fundingRouteFullAmount,
     onComplete,
     onFundingRoute,
   );
