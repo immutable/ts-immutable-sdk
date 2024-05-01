@@ -273,7 +273,6 @@ describe('Validation', () => {
 
     afterEach(() => {
       jest.clearAllMocks();
-      // TokenBridge.prototype['validateChainIds'] = originalValidateChainIds;
     });
     it('does not throw an error when everything setup correctly', async () => {
       expect.assertions(0);
