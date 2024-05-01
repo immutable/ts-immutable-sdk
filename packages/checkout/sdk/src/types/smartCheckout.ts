@@ -345,8 +345,8 @@ export interface SmartCheckoutParams {
   onComplete?: (result: SmartCheckoutResult) => void;
   /** The callback to be executed on each funding route found */
   onFundingRoute?: (fundingRoute: FundingRoute) => void;
-  /** A flag to enable or disable fractional balance */
-  isFractionalBalance?: boolean;
+  /** A flag to get funding routes based pm full or partial amonut */
+  fundingRouteFullAmount?: boolean;
 }
 
 /**

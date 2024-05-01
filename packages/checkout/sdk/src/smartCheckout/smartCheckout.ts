@@ -53,11 +53,11 @@ const processRoutes = async (
   availableRoutingOptions: AvailableRoutingOptions,
   transactionRequirements: BalanceRequirement[],
   balanceCheckResult: BalanceCheckResult,
-  isFractionalBalance: boolean,
+  fundingRouteFullAmount: boolean,
   onComplete?: (result: SmartCheckoutResult) => void,
   onFundingRoute?: (fundingRoute: FundingRoute) => void,
 ): Promise<RoutingOutcome> => {
-  const finalBalanceCheckResult = !isFractionalBalance || (sufficient && onComplete)
+  const finalBalanceCheckResult = !fundingRouteFullAmount || (sufficient && onComplete)
     ? overrideBalanceCheckResult(balanceCheckResult)
     : balanceCheckResult;
 
@@ -93,7 +93,7 @@ export const smartCheckout = async (
   routingOptions?: AvailableRoutingOptions,
   onComplete?: (result: SmartCheckoutResult) => void,
   onFundingRoute?: (fundingRoute: FundingRoute) => void,
-  isFractionalBalance: boolean = true,
+  fundingRouteFullAmount: boolean = true,
 ): Promise<SmartCheckoutResult> => {
   const ownerAddress = await provider.getSigner().getAddress();
 
@@ -163,7 +163,7 @@ export const smartCheckout = async (
       availableRoutingOptions,
       transactionRequirements,
       balanceCheckResult,
-      isFractionalBalance,
+      fundingRouteFullAmount,
       onComplete,
       onFundingRoute,
     );
@@ -187,7 +187,7 @@ export const smartCheckout = async (
     availableRoutingOptions,
     transactionRequirements,
     balanceCheckResult,
-    isFractionalBalance,
+    fundingRouteFullAmount,
     onComplete,
     onFundingRoute,
   );
