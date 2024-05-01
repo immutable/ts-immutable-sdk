@@ -350,7 +350,7 @@ export const swapRoute = async (
     // If no balance found on L2 for this quoted token then continue
     if (!userBalanceOfQuotedToken) continue;
     // Check the amount of quoted token required against the user balance
-    const amountOfQuoteTokenRequired = quote.quote.amount;
+    const amountOfQuoteTokenRequired = quote.quote.amountWithMaxSlippage;
 
     // If user does not have enough balance to perform the swap with this token then continue
     if (userBalanceOfQuotedToken.balance.lt(amountOfQuoteTokenRequired.value)) continue;
