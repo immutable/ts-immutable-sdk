@@ -32,6 +32,7 @@ export function SelectCoinDropdown({
     userBalance.formattedBalance,
     token.symbol,
     conversions,
+    '',
   );
 
   return (
@@ -67,9 +68,11 @@ export function SelectCoinDropdown({
         {priceDisplay && (
           <MenuItem.PriceDisplay
             use={<Heading size="xSmall" />}
-            fiatAmount={t('views.ORDER_SUMMARY.currency.fiat', {
-              amount: fiatAmount,
-            })}
+            fiatAmount={
+              fiatAmount
+                ? t('views.ORDER_SUMMARY.currency.fiat', { amount: fiatAmount })
+                : undefined
+            }
             price={t('views.ORDER_SUMMARY.currency.price', {
               symbol: token.symbol,
               amount: tokenValueFormat(fundsRequired.formattedAmount),

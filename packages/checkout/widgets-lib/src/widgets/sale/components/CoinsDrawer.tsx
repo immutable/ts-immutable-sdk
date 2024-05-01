@@ -4,7 +4,7 @@ import {
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { listVariants, listItemVariants } from 'lib/animation/listAnimation';
-import { SalePaymentTypes, TransactionRequirement } from '@imtbl/checkout-sdk';
+import { SalePaymentTypes, TransactionRequirement, WidgetTheme } from '@imtbl/checkout-sdk';
 import { CoinsDrawerItem } from './CoinsDrawerItem';
 import { FundingBalance } from '../types';
 import { PaymentOptions } from './PaymentOptions';
@@ -20,6 +20,7 @@ type CoinsDrawerProps = {
   onClose: () => void;
   onPayWithCard?: (paymentType: SalePaymentTypes) => void;
   disabledPaymentTypes?: SalePaymentTypes[];
+  theme: WidgetTheme;
 };
 
 export function CoinsDrawer({
@@ -33,6 +34,7 @@ export function CoinsDrawer({
   onSelect,
   onPayWithCard,
   disabledPaymentTypes,
+  theme,
 }: CoinsDrawerProps) {
   const { t } = useTranslation();
   const handleOnclick = (index: number) => () => {
@@ -80,6 +82,7 @@ export function CoinsDrawer({
             {balances.map((balance: FundingBalance, idx: number) => (
               <CoinsDrawerItem
                 key={`${balance.fundingItem.token.symbol}-${balance.type}`}
+                theme={theme}
                 onClick={handleOnclick(idx)}
                 balance={balance}
                 selected={selectedIndex === idx}

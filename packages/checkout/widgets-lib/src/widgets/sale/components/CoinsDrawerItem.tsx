@@ -74,6 +74,7 @@ export interface CoinDrawerItemProps<
   selected: boolean;
   transactionRequirement?: TransactionRequirement;
   onClick: () => void;
+  theme: WidgetTheme;
 }
 
 export function CoinsDrawerItem<
@@ -85,6 +86,7 @@ export function CoinsDrawerItem<
   selected,
   transactionRequirement,
   onClick,
+  theme,
 }: CoinDrawerItemProps<RC>) {
   const { t } = useTranslation();
   const { environment } = useSaleContext();
@@ -95,7 +97,7 @@ export function CoinsDrawerItem<
     userBalance.formattedBalance,
     token.symbol,
     conversions,
-    undefined,
+    '',
   );
 
   const fees = Object.entries(calculateFeeAmount(balance));
@@ -103,23 +105,25 @@ export function CoinsDrawerItem<
   return (
     <MenuItem
       rc={rc}
-      sx={{ marginBottom: 'base.spacing.x1' }}
+      sx={{ mb: 'base.spacing.x1' }}
       emphasized
       size="medium"
       onClick={onClick}
       selected={selected}
     >
       <MenuItem.FramedImage
-        imageUrl={token.icon}
-        alt={token.name}
-        defaultImageUrl={getDefaultTokenImage(environment, WidgetTheme.DARK)}
         circularFrame
+        alt={token.name}
+        imageUrl={token.icon}
+        defaultImageUrl={getDefaultTokenImage(environment, theme)}
       />
       <MenuItem.PriceDisplay
         use={<Heading size="xSmall" />}
-        fiatAmount={t('views.ORDER_SUMMARY.currency.fiat', {
-          amount: fiatAmount,
-        })}
+        fiatAmount={
+          fiatAmount
+            ? t('views.ORDER_SUMMARY.currency.fiat', { amount: fiatAmount })
+            : undefined
+        }
         price={tokenValueFormat(userBalance.formattedBalance)}
       />
       <MenuItem.Label sx={{ display: 'flex', wordBreak: 'default' }}>

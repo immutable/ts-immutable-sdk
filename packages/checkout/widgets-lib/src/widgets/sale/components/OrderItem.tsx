@@ -35,6 +35,7 @@ export function OrderItem<RC extends ReactElement | undefined = undefined>({
       key={item.name}
       sx={{
         pointerEvents: 'none',
+        mb: 'base.spacing.x1',
       }}
     >
       <MenuItem.FramedImage imageUrl={item.image} />
