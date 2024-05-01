@@ -122,7 +122,7 @@ describe('AuthManager', () => {
           authorization_endpoint: `${config.authenticationDomain}/authorize`,
           token_endpoint: `${config.authenticationDomain}/oauth/token`,
           userinfo_endpoint: `${config.authenticationDomain}/userinfo`,
-          end_session_endpoint: `${config.authenticationDomain}/oidc`
+          end_session_endpoint: `${config.authenticationDomain}${logoutEndpoint}`
             + `?client_id=${config.oidcConfiguration.clientId}`,
         },
         popup_redirect_uri: config.oidcConfiguration.redirectUri,
@@ -152,7 +152,7 @@ describe('AuthManager', () => {
         const configWithLogoutRedirectUri = getConfig({ logoutRedirectUri });
         const am = new AuthManager(configWithLogoutRedirectUri);
 
-        const uri = new URL('/oidc', 'https://auth.immutable.com');
+        const uri = new URL(logoutEndpoint, `https://${authDomain}`);
         uri.searchParams.append('client_id', clientId);
         uri.searchParams.append('post_logout_redirect_uri', logoutRedirectUri);
 
@@ -287,12 +287,12 @@ describe('AuthManager', () => {
 
   describe('logout', () => {
     it('should build the correct logout object', async () => {
-      mockSigninSilent.mockReturnValue(mockOidcUser);
+      mockGetUser.mockReturnValue(mockOidcUser);
 
       const am = new AuthManager(getConfig({ logoutRedirectUri }));
       const logoutArgs = await am.getLogoutArgs();
 
-      expect(logoutArgs.id_token_hint).toEqual(mockOidcUser.id_token);
+      expect(logoutArgs.id_token_hint).toEqual(mockUser.idToken);
       expect(logoutArgs.post_logout_redirect_uri).toEqual(logoutRedirectUri);
     });
 
@@ -500,12 +500,10 @@ describe('AuthManager', () => {
 
   describe('getDeviceFlowEndSessionEndpoint', () => {
     describe('with a logged in user', () => {
-      beforeEach(() => {
-        mockSigninSilent.mockReturnValue(mockOidcUser);
-      });
-
       describe('when a logoutRedirectUri is specified', () => {
         it('should set the endSessionEndpoint `post_logout_redirect_uri` and `client_id` query string params', async () => {
+          mockGetUser.mockReturnValue(mockOidcUser);
+
           const am = new AuthManager(getConfig({ logoutRedirectUri }));
           const result = await am.getDeviceFlowEndSessionEndpoint();
           const uri = new URL(result);
@@ -520,6 +518,8 @@ describe('AuthManager', () => {
 
       describe('when no post_logout_redirect_uri is specified', () => {
         it('should return the endSessionEndpoint without a `post_logout_redirect_uri` or `client_id` query string params', async () => {
+          mockGetUser.mockReturnValue(mockOidcUser);
+
           const am = new AuthManager(getConfig());
           const result = await am.getDeviceFlowEndSessionEndpoint();
           const uri = new URL(result);
