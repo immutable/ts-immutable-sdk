@@ -39,7 +39,7 @@ const formUrlEncodedHeader = {
 };
 
 const logoutEndpoint = '/oidc/logout';
-const authorizeEndpoint = '/?authorize';
+const authorizeEndpoint = '/authorize';
 
 const getAuthConfiguration = (config: PassportConfiguration): UserManagerSettings => {
   const { authenticationDomain, oidcConfiguration } = config;
@@ -48,9 +48,9 @@ const getAuthConfiguration = (config: PassportConfiguration): UserManagerSetting
   const userStore = new WebStorageStateStore({ store });
 
   const endSessionEndpoint = new URL(logoutEndpoint, authenticationDomain);
-  endSessionEndpoint.searchParams.append('client_id', oidcConfiguration.clientId);
+  endSessionEndpoint.searchParams.set('client_id', oidcConfiguration.clientId);
   if (oidcConfiguration.logoutRedirectUri) {
-    endSessionEndpoint.searchParams.append('post_logout_redirect_uri', oidcConfiguration.logoutRedirectUri);
+    endSessionEndpoint.searchParams.set('post_logout_redirect_uri', oidcConfiguration.logoutRedirectUri);
   }
 
   const baseConfiguration: UserManagerSettings = {
@@ -309,15 +309,15 @@ export default class AuthManager {
     this.deviceCredentialsManager.savePKCEData({ state, verifier });
 
     const pKCEAuthorizationUrl = new URL(authorizeEndpoint, this.config.authenticationDomain);
-    pKCEAuthorizationUrl.searchParams.append('response_type', 'code');
-    pKCEAuthorizationUrl.searchParams.append('code_challenge', challenge);
-    pKCEAuthorizationUrl.searchParams.append('code_challenge_method', 'S256');
-    pKCEAuthorizationUrl.searchParams.append('client_id', clientId);
-    pKCEAuthorizationUrl.searchParams.append('redirect_uri', redirectUri);
-    pKCEAuthorizationUrl.searchParams.append('state', state);
+    pKCEAuthorizationUrl.searchParams.set('response_type', 'code');
+    pKCEAuthorizationUrl.searchParams.set('code_challenge', challenge);
+    pKCEAuthorizationUrl.searchParams.set('code_challenge_method', 'S256');
+    pKCEAuthorizationUrl.searchParams.set('client_id', clientId);
+    pKCEAuthorizationUrl.searchParams.set('redirect_uri', redirectUri);
+    pKCEAuthorizationUrl.searchParams.set('state', state);
 
-    if (scope) pKCEAuthorizationUrl.searchParams.append('scope', scope);
-    if (audience) pKCEAuthorizationUrl.searchParams.append('audience', audience);
+    if (scope) pKCEAuthorizationUrl.searchParams.set('scope', scope);
+    if (audience) pKCEAuthorizationUrl.searchParams.set('audience', audience);
 
     return pKCEAuthorizationUrl.toString();
   }
@@ -393,11 +393,11 @@ export default class AuthManager {
     const { authenticationDomain, oidcConfiguration } = this.config;
 
     const endSessionEndpoint = new URL(logoutEndpoint, authenticationDomain);
-    endSessionEndpoint.searchParams.append('client_id', oidcConfiguration.clientId);
+    endSessionEndpoint.searchParams.set('client_id', oidcConfiguration.clientId);
 
     const logoutArgs = await this.getLogoutArgs();
-    if (logoutArgs.id_token_hint) endSessionEndpoint.searchParams.append('id_token_hint', logoutArgs.id_token_hint);
-    if (logoutArgs.post_logout_redirect_uri) endSessionEndpoint.searchParams.append('post_logout_redirect_uri', logoutArgs.post_logout_redirect_uri);
+    if (logoutArgs.id_token_hint) endSessionEndpoint.searchParams.set('id_token_hint', logoutArgs.id_token_hint);
+    if (logoutArgs.post_logout_redirect_uri) endSessionEndpoint.searchParams.set('post_logout_redirect_uri', logoutArgs.post_logout_redirect_uri);
 
     return endSessionEndpoint.toString();
   }
