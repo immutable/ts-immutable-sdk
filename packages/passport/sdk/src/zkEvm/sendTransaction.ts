@@ -70,6 +70,21 @@ const getMetaTransactions = async (
   return [metaTransaction, feeMetaTransaction];
 };
 
+/**
+ * Send the transaction to the relayer, which will submit it to the zkEVM chain.
+ * @param params - The parameters of the transaction.
+ * @param ethSigner - The signer to sign the transaction.
+ * @param rpcProvider - The provider to get the chain ID.
+ * @param relayerClient - The client to interact with the relayer.
+ * @param guardianClient - The client to interact with the guardian.
+ * @param zkevmAddress - The address of the zkEVM wallet.
+ * @returns The transaction hash.
+ * @throws JsonRpcError if there is an error sending the transaction.
+ * @remarks A returned transaction hash does not guarantee that the transaction was successful.
+ *          The transaction hash only indicates that the transaction was submitted onchain.
+ *          The caller should poll the transaction status to determine if the transaction was successful.
+ * @see [Blockchain Data APIs - Polling](https://docs.immutable.com/docs/zkevm/products/blockchain-data/polling/)
+ */
 export const sendTransaction = async ({
   params,
   ethSigner,
