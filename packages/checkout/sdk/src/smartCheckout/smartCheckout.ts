@@ -93,7 +93,7 @@ export const smartCheckout = async (
   routingOptions?: AvailableRoutingOptions,
   onComplete?: (result: SmartCheckoutResult) => void,
   onFundingRoute?: (fundingRoute: FundingRoute) => void,
-  fundingRouteFullAmount: boolean = true,
+  fundingRouteFullAmount: boolean = false,
 ): Promise<SmartCheckoutResult> => {
   const ownerAddress = await provider.getSigner().getAddress();
 
