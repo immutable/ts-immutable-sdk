@@ -26,12 +26,12 @@ const defaultPassportConfig = {
 
 const defaultItems: SaleItem[] = [
   {
-    productId: "lab",
+    productId: "biker",
     qty: 2,
-    name: "Lab Iguana",
+    name: "Biker Iguana",
     image:
       "https://pokemon-nfts.mystagingwebsite.com/wp-content/uploads/2023/11/645-300x300.png",
-    description: "Lab Iguana",
+    description: "Biker Iguana",
   },
 ];
 
