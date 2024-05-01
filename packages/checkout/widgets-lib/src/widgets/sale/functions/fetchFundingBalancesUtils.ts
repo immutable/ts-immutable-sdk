@@ -11,6 +11,8 @@ import {
   RoutingOutcomeType,
 } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
+import { getTokenImageByAddress, isNativeToken } from 'lib/utils';
+import { Environment } from '@imtbl/config';
 import {
   ClientConfigCurrency,
   FundingBalance,
@@ -54,16 +56,31 @@ export const wrapPromisesWithOnResolve = async <T>(
   return await Promise.all(promises);
 };
 
-export const tokenInfo = (req: TransactionRequirement) =>
-    (req.current.type !== ItemType.ERC721 && req.current.token) as TokenInfo; // eslint-disable-line
+const getTokenInfoFromRequirement = (req: TransactionRequirement) =>
+  (req.current.type !== ItemType.ERC721 && req.current.token) as TokenInfo; // eslint-disable-line
+
+const getTokenInfo = (
+  tokenInfo: TokenInfo,
+  environment: Environment,
+): TokenInfo => {
+  const address = isNativeToken(tokenInfo.address)
+    ? tokenInfo.symbol
+    : tokenInfo.address ?? '';
+
+  return {
+    ...tokenInfo,
+    icon: getTokenImageByAddress(environment, address),
+  };
+};
 
 export const getSufficientFundingStep = (
   requirement: TransactionRequirement,
+  environment: Environment,
 ): SufficientFundingStep => ({
   type: FundingBalanceType.SUFFICIENT,
   fundingItem: {
     type: ItemType.ERC20,
-    token: tokenInfo(requirement),
+    token: getTokenInfo(getTokenInfoFromRequirement(requirement), environment),
     fundsRequired: {
       amount: requirement.required.balance,
       formattedAmount: requirement.required.formattedBalance,
@@ -75,7 +92,10 @@ export const getSufficientFundingStep = (
   },
 });
 
-export const getAlternativeFundingSteps = (fundingRoutes: FundingRoute[]) => {
+export const getAlternativeFundingSteps = (
+  fundingRoutes: FundingRoute[],
+  environment: Environment,
+) => {
   if (fundingRoutes.length === 0) {
     return [];
   }
@@ -85,11 +105,18 @@ export const getAlternativeFundingSteps = (fundingRoutes: FundingRoute[]) => {
   const tokens = [ItemType.ERC20, ItemType.NATIVE];
   const steps = routes.flatMap((route) => route.steps.filter((step) => tokens.includes(step.fundingItem.type)));
 
-  return steps;
+  return steps.map((step) => ({
+    ...step,
+    fundingItem: {
+      ...step.fundingItem,
+      token: getTokenInfo(step.fundingItem.token, environment),
+    },
+  }));
 };
 
 export const getFundingBalances = (
   smartCheckoutResult: SmartCheckoutResult,
+  environment: Environment,
 ): FundingBalance[] | null => {
   if (smartCheckoutResult.sufficient === true) {
     const erc20Req = smartCheckoutResult.transactionRequirements.find(
@@ -97,17 +124,18 @@ export const getFundingBalances = (
     );
 
     if (erc20Req && erc20Req.type === ItemType.ERC20) {
-      return [getSufficientFundingStep(erc20Req)];
+      return [getSufficientFundingStep(erc20Req, environment)];
     }
   }
 
   if (
     smartCheckoutResult.sufficient === false
-      && smartCheckoutResult?.router?.routingOutcome.type
-        === RoutingOutcomeType.ROUTES_FOUND
+    && smartCheckoutResult?.router?.routingOutcome.type
+      === RoutingOutcomeType.ROUTES_FOUND
   ) {
     return getAlternativeFundingSteps(
       smartCheckoutResult.router.routingOutcome.fundingRoutes,
+      environment,
     );
   }
 
@@ -116,13 +144,13 @@ export const getFundingBalances = (
 
 export const getFnToSortFundingBalancesByPriority = (baseSymbol?: string) => (a: FundingBalance, b: FundingBalance) => {
   const aIsBase = a.fundingItem
-        && a.fundingItem.token
-        && a.fundingItem.token.symbol === baseSymbol
+      && a.fundingItem.token
+      && a.fundingItem.token.symbol === baseSymbol
     ? -1
     : 0;
   const bIsBase = b.fundingItem
-        && b.fundingItem.token
-        && b.fundingItem.token.symbol === baseSymbol
+      && b.fundingItem.token
+      && b.fundingItem.token.symbol === baseSymbol
     ? -1
     : 0;
 
@@ -132,7 +160,7 @@ export const getFnToSortFundingBalancesByPriority = (baseSymbol?: string) => (a:
 
   if (
     a.type === FundingBalanceType.SUFFICIENT
-        && b.type === FundingBalanceType.SUFFICIENT
+      && b.type === FundingBalanceType.SUFFICIENT
   ) {
     return 0;
   }

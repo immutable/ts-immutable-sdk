@@ -1,6 +1,12 @@
 import { Box, Heading } from '@biom3/react';
 import { useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import {
+  SaleItem,
+  SalePaymentTypes,
+  TransactionRequirement,
+  WidgetTheme,
+} from '@imtbl/checkout-sdk';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -8,18 +14,35 @@ import { EventTargetContext } from '../../../context/event-target-context/EventT
 import { sendSaleWidgetCloseEvent } from '../SaleWidgetEvents';
 import { SelectCoinDropdown } from './SelectCoinDropdown';
 import { CoinsDrawer } from './CoinsDrawer';
-import { SettlementCurrency } from '../views/balances.mock';
+import { FundingBalance } from '../types';
+import { OrderItems } from './OrderItems';
 
 type OrderReviewProps = {
   collectionName: string;
-  currencies: SettlementCurrency[];
+  fundingBalances: FundingBalance[];
   conversions: Map<string, number>;
+  loadingBalances: boolean;
+  items: SaleItem[];
+  transactionRequirement?: TransactionRequirement;
+  onBackButtonClick: () => void;
+  onProceedToBuy: (fundingBalance: FundingBalance) => void;
+  onPayWithCard?: (paymentType: SalePaymentTypes) => void;
+  disabledPaymentTypes?: SalePaymentTypes[];
+  theme: WidgetTheme;
 };
 
 export function OrderReview({
-  currencies,
+  items,
+  fundingBalances,
   conversions,
   collectionName,
+  loadingBalances,
+  transactionRequirement,
+  onBackButtonClick,
+  onPayWithCard,
+  onProceedToBuy,
+  disabledPaymentTypes,
+  theme,
 }: OrderReviewProps) {
   const {
     eventTargetState: { eventTarget },
@@ -46,11 +69,18 @@ export function OrderReview({
       testId="order-review"
       header={(
         <HeaderNavigation
+          showBack
           onCloseButtonClick={() => sendSaleWidgetCloseEvent(eventTarget)}
+          onBackButtonClick={onBackButtonClick}
           title={collectionName}
         />
       )}
       footer={<FooterLogo />}
+      bodyStyleOverrides={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+      }}
     >
       <Box
         sx={{
@@ -70,21 +100,33 @@ export function OrderReview({
           {t('views.ORDER_SUMMARY.orderReview.heading')}
         </Heading>
         <Box sx={{ paddingX: 'base.spacing.x2' }}>
-          <SelectCoinDropdown
-            onClick={openDrawer}
-            currency={currencies[selectedCurrencyIndex]}
+          <OrderItems
+            items={items}
+            balance={fundingBalances[selectedCurrencyIndex]}
             conversions={conversions}
-            canOpen={currencies.length > 1}
           />
         </Box>
       </Box>
-      <CoinsDrawer
+      <SelectCoinDropdown
+        onClick={openDrawer}
+        onProceed={onProceedToBuy}
+        balance={fundingBalances[selectedCurrencyIndex]}
         conversions={conversions}
-        currencies={currencies}
+        canOpen={fundingBalances.length > 1}
+        loading={loadingBalances}
+      />
+      <CoinsDrawer
+        theme={theme}
+        conversions={conversions}
+        balances={fundingBalances}
         onSelect={onSelect}
         onClose={closeDrawer}
         selectedIndex={selectedCurrencyIndex}
         visible={showCoinsDrawer}
+        loading={loadingBalances}
+        onPayWithCard={onPayWithCard}
+        transactionRequirement={transactionRequirement}
+        disabledPaymentTypes={disabledPaymentTypes}
       />
     </SimpleLayout>
   );

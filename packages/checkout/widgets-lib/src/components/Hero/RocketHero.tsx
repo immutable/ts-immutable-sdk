@@ -5,12 +5,11 @@ import { CHECKOUT_CDN_BASE_URL } from 'lib';
 import { heroBackGroundStyles, heroImageStyles } from './HeroImageStyles';
 
 interface RocketHeroProps {
-  environment: Environment
+  environment: Environment;
 }
 
-export function RocketHero({
-  environment,
-}: RocketHeroProps) {
+export function RocketHero({ environment }: RocketHeroProps) {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   const { RiveComponent } = useRive({
     src: `${CHECKOUT_CDN_BASE_URL[environment]}/v1/blob/img/rocket.riv`,
     autoplay: true,
@@ -19,11 +18,13 @@ export function RocketHero({
   });
 
   return (
-    <Box sx={{ ...heroBackGroundStyles, background: 'base.color.translucent.emphasis.100' }}>
-      <Box
-        sx={heroImageStyles}
-        rc={<RiveComponent />}
-      />
+    <Box
+      sx={{
+        ...heroBackGroundStyles,
+        background: 'base.color.translucent.emphasis.100',
+      }}
+    >
+      <Box sx={heroImageStyles} rc={<RiveComponent />} />
     </Box>
   );
 }
