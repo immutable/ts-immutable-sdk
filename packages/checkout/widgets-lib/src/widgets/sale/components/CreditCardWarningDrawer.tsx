@@ -4,19 +4,19 @@ import {
 import { SalePaymentTypes } from '@imtbl/checkout-sdk';
 import { CreditCardWarningHero } from 'components/Hero/CreditCardWarningHero';
 import { useTranslation } from 'react-i18next';
+import { useSaleContext } from '../context/SaleContextProvider';
 
 type CreditCardWarningDrawerProps = {
   visible: boolean;
   setShowCreditCardWarning: (show: boolean) => void;
-  setPaymentMethod: (type: SalePaymentTypes) => void;
 };
 
 export function CreditCardWarningDrawer({
   visible,
   setShowCreditCardWarning,
-  setPaymentMethod,
 }: CreditCardWarningDrawerProps) {
   const { t } = useTranslation();
+  const { setPaymentMethod } = useSaleContext();
 
   return (
     <Drawer

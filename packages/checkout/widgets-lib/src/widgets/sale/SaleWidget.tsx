@@ -5,6 +5,7 @@ import {
   useMemo,
   useReducer,
   useRef,
+  useState,
 } from 'react';
 
 import {
@@ -38,6 +39,7 @@ import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsPr
 import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { OrderSummary } from './views/OrderSummary';
+import { CreditCardWarningDrawer } from './components/CreditCardWarningDrawer';
 
 type OptionalWidgetParams = Pick<SaleWidgetParams, 'excludePaymentTypes'>;
 type RequiredWidgetParams = Required<
@@ -79,6 +81,8 @@ export default function SaleWidget(props: SaleWidgetProps) {
     () => ({ viewState, viewDispatch }),
     [viewState, viewDispatch],
   );
+
+  const [showCreditCardWarning, setShowCreditCardWarning] = useState(false);
 
   const loadingText = viewState.view.data?.loadingText || t('views.LOADING_VIEW.text');
 
@@ -134,7 +138,9 @@ export default function SaleWidget(props: SaleWidgetProps) {
             <LoadingView loadingText={loadingText} />
           )}
           {viewState.view.type === SaleWidgetViews.PAYMENT_METHODS && (
-            <PaymentMethods />
+            <PaymentMethods
+              setShowCreditCardWarning={setShowCreditCardWarning}
+            />
           )}
           {viewState.view.type === SaleWidgetViews.PAY_WITH_CARD && (
             <PayWithCard />
@@ -183,6 +189,10 @@ export default function SaleWidget(props: SaleWidgetProps) {
               subheading={viewState.view.data?.subheading}
             />
           )}
+          <CreditCardWarningDrawer
+            visible={showCreditCardWarning}
+            setShowCreditCardWarning={setShowCreditCardWarning}
+          />
         </CryptoFiatProvider>
       </SaleContextProvider>
     </ViewContext.Provider>
