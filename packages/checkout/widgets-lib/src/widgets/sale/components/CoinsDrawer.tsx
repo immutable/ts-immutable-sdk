@@ -7,7 +7,7 @@ import { listVariants, listItemVariants } from 'lib/animation/listAnimation';
 import { SalePaymentTypes, TransactionRequirement } from '@imtbl/checkout-sdk';
 import { CoinsDrawerItem } from './CoinsDrawerItem';
 import { FundingBalance } from '../types';
-import { PaymentOption } from './PaymentOption';
+import { PaymentOptions } from './PaymentOptions';
 
 type CoinsDrawerProps = {
   conversions: Map<string, number>;
@@ -18,7 +18,8 @@ type CoinsDrawerProps = {
   transactionRequirement?: TransactionRequirement;
   onSelect: (index: number) => void;
   onClose: () => void;
-  onPayWithCard?: () => void;
+  onPayWithCard?: (paymentType: SalePaymentTypes) => void;
+  disabledPaymentTypes?: SalePaymentTypes[];
 };
 
 export function CoinsDrawer({
@@ -31,6 +32,7 @@ export function CoinsDrawer({
   onClose,
   onSelect,
   onPayWithCard,
+  disabledPaymentTypes,
 }: CoinsDrawerProps) {
   const { t } = useTranslation();
   const handleOnclick = (index: number) => () => {
@@ -117,13 +119,19 @@ export function CoinsDrawer({
               >
                 {t('views.ORDER_SUMMARY.coinsDrawer.divider')}
               </Divider>
-              <PaymentOption
-                key="funding-balance-item-card"
-                type={SalePaymentTypes.DEBIT}
+              <PaymentOptions
                 onClick={onPayWithCard}
-                caption={t(
-                  'views.ORDER_SUMMARY.coinsDrawer.payWithCard.caption',
+                paymentOptions={[SalePaymentTypes.DEBIT, SalePaymentTypes.CREDIT].filter(
+                  (type) => !disabledPaymentTypes?.includes(type),
                 )}
+                captions={{
+                  [SalePaymentTypes.DEBIT]: t(
+                    'views.ORDER_SUMMARY.coinsDrawer.payWithCard.caption',
+                  ),
+                  [SalePaymentTypes.CREDIT]: t(
+                    'views.ORDER_SUMMARY.coinsDrawer.payWithCard.caption',
+                  ),
+                }}
               />
             </Box>
           )}

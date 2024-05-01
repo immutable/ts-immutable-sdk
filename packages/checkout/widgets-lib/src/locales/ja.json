@@ -259,7 +259,10 @@
       },
       "currency": {
         "fiat": "≈ USD ${{amount}}",
-        "fees": "手数料"
+        "price": "{{symbol}} {{amount}}"
+      },
+      "orderItem": {
+        "quantity": "数量 x{{qty}}"
       },
       "coinsDrawer": {
         "header": "支払い方法…",

@@ -48,9 +48,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
   const { viewDispatch, viewState } = useContext(ViewContext);
   const { cryptoFiatDispatch, cryptoFiatState } = useContext(CryptoFiatContext);
 
-  const onPayWithCard = disabledPaymentTypes.includes(SalePaymentTypes.DEBIT)
-    ? undefined
-    : () => goBackToPaymentMethods(SalePaymentTypes.DEBIT);
+  const onPayWithCard = (paymentType: SalePaymentTypes) => goBackToPaymentMethods(paymentType);
 
   const signAndProceed = (tokenAddress?: string) => {
     sign(SignPaymentTypes.CRYPTO, tokenAddress);
@@ -182,15 +180,16 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
       )}
       {subView === OrderSummarySubViews.REVIEW_ORDER && (
         <OrderReview
+          items={items}
           fundingBalances={fundingBalances}
           conversions={cryptoFiatState.conversions}
           collectionName={collectionName}
           loadingBalances={loadingBalances}
-          items={items}
           onBackButtonClick={goBackToPaymentMethods}
-          onPayWithCard={onPayWithCard}
           onProceedToBuy={onProceedToBuy}
           transactionRequirement={transactionRequirement}
+          onPayWithCard={onPayWithCard}
+          disabledPaymentTypes={disabledPaymentTypes}
         />
       )}
       {subView === OrderSummarySubViews.EXECUTE_FUNDING_ROUTE && (

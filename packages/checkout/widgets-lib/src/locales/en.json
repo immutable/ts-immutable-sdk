@@ -252,7 +252,10 @@
       },
       "currency": {
         "fiat": "≈ USD ${{amount}}",
-        "fees": "Fees"
+        "price": "{{symbol}} {{amount}}"
+      },
+      "orderItem": {
+        "quantity": "Qty x{{qty}}"
       },
       "coinsDrawer": {
         "header": "Pay with...",
