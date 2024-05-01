@@ -45,6 +45,7 @@ import { UnableToSwap } from './UnableToSwap';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import useDebounce from '../../../lib/hooks/useDebounce';
 import { CancellablePromise } from '../../../lib/async/cancellablePromise';
+import { isPassportProvider } from '../../../lib/provider';
 
 enum SwapDirection {
   FROM = 'FROM',
@@ -512,11 +513,14 @@ export function SwapForm({ data, theme }: SwapFromProps) {
     }
   }, [debouncedToAmount, toToken, fromToken]);
 
-  // during swaps, having enough IMX to cover the gas fee means
+  // during swaps, having enough IMX to cover the gas fee means (only relevant for non-Passport wallets)
   // 1. swapping from any token to any token costs IMX - so do a check
   // 2. If the swap from token is also IMX, include the additional amount into the calc
   //    as user will need enough imx for the swap amount and the gas
   const insufficientFundsForGas = useMemo(() => {
+    if (!provider) return true;
+    if (isPassportProvider(provider)) return false;
+
     const imxBalance = tokenBalances.find((b) => b.token.address?.toLowerCase() === NATIVE);
     if (!imxBalance) return true;
 
@@ -527,7 +531,7 @@ export function SwapForm({ data, theme }: SwapFromProps) {
       : BigNumber.from('0');
 
     return gasAmount.add(additionalAmount).gt(imxBalance.balance);
-  }, [gasFeeValue, tokenBalances, fromToken, fromAmount]);
+  }, [gasFeeValue, tokenBalances, fromToken, fromAmount, provider]);
 
   // -------------//
   //     FROM     //
