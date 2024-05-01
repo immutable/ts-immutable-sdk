@@ -99,17 +99,20 @@ export function CoinsDrawerItem<
     conversions,
     '',
   );
-
   const fees = Object.entries(calculateFeeAmount(balance));
+
+  const menuProps = {
+    onClick,
+    selected,
+  };
 
   return (
     <MenuItem
       rc={rc}
       sx={{ mb: 'base.spacing.x1' }}
-      emphasized
       size="medium"
-      onClick={onClick}
-      selected={selected}
+      emphasized
+      {...menuProps}
     >
       <MenuItem.FramedImage
         circularFrame
