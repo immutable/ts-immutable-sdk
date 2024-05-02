@@ -255,7 +255,7 @@
         "price": "{{symbol}} {{amount}}"
       },
       "orderItem": {
-        "quantity": "Qty x{{qty}}"
+        "quantity": "Quantity x{{qty}}"
       },
       "coinsDrawer": {
         "header": "Pay with...",

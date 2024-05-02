@@ -44,7 +44,7 @@ export const useFundingBalances = () => {
           routingOptions: { bridge: false, onRamp: false, swap: true },
           baseCurrency: selectedCurrency,
           getAmountByCurrency: (currency) => clientConfig.currencyConversion?.[
-            currency.name
+            currency.name.toUpperCase()
           ]?.amount?.toString(),
           getIsGasless: () => (provider.provider as any)?.isPassport || false,
           onFundingBalance: (foundBalances) => {
