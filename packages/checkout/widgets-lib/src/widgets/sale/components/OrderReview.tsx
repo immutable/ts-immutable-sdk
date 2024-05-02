@@ -5,9 +5,7 @@ import {
   SaleItem,
   SalePaymentTypes,
   TransactionRequirement,
-  WidgetTheme,
 } from '@imtbl/checkout-sdk';
-import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
@@ -28,7 +26,6 @@ type OrderReviewProps = {
   onProceedToBuy: (fundingBalance: FundingBalance) => void;
   onPayWithCard?: (paymentType: SalePaymentTypes) => void;
   disabledPaymentTypes?: SalePaymentTypes[];
-  theme: WidgetTheme;
 };
 
 export function OrderReview({
@@ -42,7 +39,6 @@ export function OrderReview({
   onPayWithCard,
   onProceedToBuy,
   disabledPaymentTypes,
-  theme,
 }: OrderReviewProps) {
   const {
     eventTargetState: { eventTarget },
@@ -75,7 +71,6 @@ export function OrderReview({
           title={collectionName}
         />
       )}
-      footer={<FooterLogo />}
       bodyStyleOverrides={{
         display: 'flex',
         flexDirection: 'column',
@@ -116,7 +111,6 @@ export function OrderReview({
         loading={loadingBalances}
       />
       <CoinsDrawer
-        theme={theme}
         conversions={conversions}
         balances={fundingBalances}
         onSelect={onSelect}

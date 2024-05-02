@@ -1,10 +1,9 @@
-import { Heading, MenuItem } from '@biom3/react';
+import { Heading, MenuItem, prettyFormatNumber } from '@biom3/react';
 import {
   Fee,
   FundingStepType,
   ItemType,
   TransactionRequirement,
-  WidgetTheme,
 } from '@imtbl/checkout-sdk';
 import {
   calculateCryptoToFiat,
@@ -74,7 +73,6 @@ export interface CoinDrawerItemProps<
   selected: boolean;
   transactionRequirement?: TransactionRequirement;
   onClick: () => void;
-  theme: WidgetTheme;
 }
 
 export function CoinsDrawerItem<
@@ -86,10 +84,12 @@ export function CoinsDrawerItem<
   selected,
   transactionRequirement,
   onClick,
-  theme,
 }: CoinDrawerItemProps<RC>) {
   const { t } = useTranslation();
-  const { environment } = useSaleContext();
+  const {
+    environment,
+    config: { theme },
+  } = useSaleContext();
 
   const { token, userBalance, fundsRequired } = balance.fundingItem;
 
@@ -142,12 +142,16 @@ export function CoinsDrawerItem<
               symbol:
                 transactionRequirement?.current.type !== ItemType.ERC721
                 && transactionRequirement?.current.token.symbol,
-              amount: tokenValueFormat(
-                transactionRequirement?.current.formattedBalance || 0,
+              amount: prettyFormatNumber(
+                tokenValueFormat(
+                  transactionRequirement?.current.formattedBalance || 0,
+                ),
               ),
             },
             symbol: balance.fundingItem.token.symbol,
-            amount: tokenValueFormat(fundsRequired.formattedAmount),
+            amount: prettyFormatNumber(
+              tokenValueFormat(fundsRequired.formattedAmount),
+            ),
           },
         )}
         {fees.length > 0 && ' | '}
@@ -156,7 +160,7 @@ export function CoinsDrawerItem<
             <span key={symbol}>
               {t('views.ORDER_SUMMARY.coinsDrawer.fee', {
                 symbol,
-                amount: tokenValueFormat(formattedAmount),
+                amount: prettyFormatNumber(tokenValueFormat(formattedAmount)),
               })}
               &nbsp;
             </span>
