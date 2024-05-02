@@ -27,6 +27,8 @@ import {
   SignPaymentTypes,
 } from '../types';
 import { FundingRouteExecute } from '../components/FundingRouteExecute/FundingRouteExecute';
+import { useSaleEvent } from '../hooks/useSaleEvents';
+import { getPaymentTokenDetails } from '../utils/analytics';
 
 type OrderSummaryProps = {
   subView: OrderSummarySubViews;
@@ -34,6 +36,7 @@ type OrderSummaryProps = {
 
 export function OrderSummary({ subView }: OrderSummaryProps) {
   const { t } = useTranslation();
+  const { sendPageView, sendProceedToPay } = useSaleEvent();
   const {
     items,
     fromTokenAddress,
@@ -67,13 +70,17 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
   };
 
   const onProceedToBuy = (fundingBalance: FundingBalance) => {
-    const {
-      type,
-      fundingItem: { token },
-    } = fundingBalance;
+    const { type, fundingItem } = fundingBalance;
+
+    sendProceedToPay(
+      SaleWidgetViews.ORDER_SUMMARY,
+      fundingItem,
+      cryptoFiatState.conversions,
+    );
+    // checkoutPrimarySaleProceedToPay
 
     if (type === FundingBalanceType.SUFFICIENT) {
-      signAndProceed(token.address);
+      signAndProceed(fundingItem.token.address);
       return;
     }
 
@@ -161,6 +168,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
     const tokenSymbols = fundingBalances.map(
       ({ fundingItem }) => fundingItem.token.symbol,
     );
+
     cryptoFiatDispatch({
       payload: {
         type: CryptoFiatActions.SET_TOKEN_SYMBOLS,
@@ -168,6 +176,25 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
       },
     });
   }, [cryptoFiatDispatch, fundingBalances, loadingBalances]);
+
+  // Trigger page loaded event
+  useEffect(() => {
+    if (loadingBalances || !items.length || !cryptoFiatState.conversions) {
+      return;
+    }
+
+    const tokens = fundingBalances.map(
+      ({ fundingItem }) => getPaymentTokenDetails(fundingItem, cryptoFiatState.conversions),
+    );
+
+    sendPageView(SaleWidgetViews.ORDER_SUMMARY, {
+      subView: OrderSummarySubViews.REVIEW_ORDER,
+      tokens,
+      items,
+      collectionName,
+    });
+    // checkoutPrimarySaleOrderSummaryViewed
+  }, [items, collectionName, fundingBalances, loadingBalances, cryptoFiatState]);
 
   return (
     <Box>
