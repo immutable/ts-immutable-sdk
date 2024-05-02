@@ -86,7 +86,5 @@ export function sendWalletConnectProviderUpdatedEvent(
       },
     },
   );
-  // eslint-disable-next-line no-console
-  console.log('walletConnect provider updated event:', eventTarget, successEvent);
   if (eventTarget !== undefined) eventTarget.dispatchEvent(successEvent);
 }
