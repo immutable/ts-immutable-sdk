@@ -519,8 +519,6 @@ export function SwapForm({ data, theme }: SwapFromProps) {
   //    as user will need enough imx for the swap amount and the gas
   const insufficientFundsForGas = useMemo(() => {
     if (!provider) return true;
-    // eslint-disable-next-line no-console
-    console.log('insufficientFundsForGas checking', isPassportProvider(provider), provider);
     if (isPassportProvider(provider)) return false;
 
     const imxBalance = tokenBalances.find((b) => b.token.address?.toLowerCase() === NATIVE);

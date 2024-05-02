@@ -72,8 +72,6 @@ export function SwapCoins({
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line no-console
-    console.log('tokenBalances', tokenBalances, 'isPassportProvider', isPassportProvider(provider), provider);
     if (hasZeroBalance(tokenBalances, IMX_TOKEN_SYMBOL) && !isPassportProvider(provider)) {
       setShowNotEnoughImxDrawer(true);
     }
