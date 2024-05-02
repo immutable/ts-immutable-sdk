@@ -9,6 +9,10 @@ import {
 } from 'ethers/lib/utils';
 import { ROOT_AXELAR_ADAPTOR } from 'contracts/ABIs/RootAxelarBridgeAdaptor';
 import {
+  checkReceiver, validateBridgeReqArgs, validateChainConfiguration, validateChainIds,
+} from 'lib/validation';
+import { getRootIMX } from 'lib/utils';
+import {
   NATIVE,
   ETHEREUM_NATIVE_TOKEN_ADDRESS,
   ETH_MAINNET_TO_ZKEVM_MAINNET,
@@ -21,7 +25,6 @@ import {
   axelarChains,
   bridgeMethods,
   childWIMXs,
-  rootIMXs,
   WITHDRAW_SIG,
   childAdaptors,
   rootAdaptors,
@@ -30,6 +33,7 @@ import {
   SLOT_POS_CONTRACT_CALL_APPROVED,
   axelarGateways,
   childETHs,
+  rootIMXs,
 } from './constants/bridges';
 import { ROOT_ERC20_BRIDGE_FLOW_RATE } from './contracts/ABIs/RootERC20BridgeFlowRate';
 import { ERC20 } from './contracts/ABIs/ERC20';
@@ -99,11 +103,10 @@ export class TokenBridge {
 
   /**
    * Initialise the TokenBridge instance.
-   *
    */
   public async initialise(): Promise<void> {
     if (!this.initialised) {
-      await this.validateChainConfiguration();
+      await validateChainConfiguration(this.config);
       this.initialised = true;
     }
   }
@@ -152,7 +155,7 @@ export class TokenBridge {
       this.initialise(),
       async () => {
         if (req.action !== BridgeFeeActions.FINALISE_WITHDRAWAL) {
-          await this.validateChainIds(req.sourceChainId, req.destinationChainId);
+          await validateChainIds(req.sourceChainId, req.destinationChainId, this.config);
         }
       },
       this.getFeePrivate(req),
@@ -368,13 +371,11 @@ export class TokenBridge {
       // Encode the function data into a payload
       let data: string;
       if (sender === recipient) {
-        console.log('native deposit');
         data = await withBridgeError<string>(async () => getContractRes.contract.interface.encodeFunctionData(
           getContractRes.contractMethods.native,
           [amount],
         ), BridgeErrorType.INTERNAL_ERROR);
       } else {
-        console.log('native depositTo');
         data = await withBridgeError<string>(async () => getContractRes.contract.interface.encodeFunctionData(
           getContractRes.contractMethods.nativeTo,
           [recipient, amount],
@@ -390,13 +391,11 @@ export class TokenBridge {
     // Encode the function data into a payload
     let data: string;
     if (sender === recipient) {
-      console.log('token deposit');
       data = await withBridgeError<string>(async () => getContractRes.contract.interface.encodeFunctionData(
         getContractRes.contractMethods.token,
         [erc20Token, amount],
       ), BridgeErrorType.INTERNAL_ERROR);
     } else {
-      console.log('token depositTo');
       data = await withBridgeError<string>(async () => getContractRes.contract.interface.encodeFunctionData(
         getContractRes.contractMethods.tokenTo,
         [erc20Token, recipient, amount],
@@ -568,8 +567,8 @@ export class TokenBridge {
   public async getUnsignedBridgeBundledTx(req: BridgeBundledTxRequest): Promise<BridgeBundledTxResponse> {
     const [, , , res] = await Promise.all([
       this.initialise(), // Initialisation will only be exeucted once
-      this.validateBridgeReqArgs(req),
-      this.checkReceiver(req.token, req.destinationChainId, req.recipientAddress),
+      validateBridgeReqArgs(req, this.config),
+      checkReceiver(req.token, req.destinationChainId, req.recipientAddress, this.config),
       this.getUnsignedBridgeBundledTxPrivate(req),
     ]);
     return res;
@@ -775,80 +774,6 @@ export class TokenBridge {
     };
   }
 
-  private async checkReceiver(
-    token: FungibleToken,
-    destinationChainId: string,
-    address: string,
-  ): Promise<void> {
-    let provider;
-    if (destinationChainId === this.config.bridgeInstance.rootChainID) {
-      if (!this.isChildETH(token, destinationChainId)) {
-        // Return immediately for withdrawing non ETH.
-        return;
-      }
-      provider = this.config.rootProvider;
-    } else {
-      if (!this.isRootIMX(token, destinationChainId)) {
-        // Return immediately for depositing non IMX.
-        return;
-      }
-      provider = this.config.childProvider;
-    }
-    const bytecode = await provider.getCode(address);
-    // No code : "0x" then the address is not a contract so it is a valid receiver.
-    if (bytecode.length <= 2) return;
-
-    const ABI = ['function receive()'];
-    const contract = new ethers.Contract(address, ABI, provider);
-
-    try {
-      // try to estimate gas for the receive function, if it works it exists
-      await contract.estimateGas.receive();
-    } catch {
-      try {
-        // if receive fails, try to estimate this way which will work if a fallback function is present
-        await provider.estimateGas({ to: address });
-      } catch {
-        // no receive or fallback
-        throw new BridgeError(
-          `address ${address} is not a valid receipient`,
-          BridgeErrorType.INVALID_RECIPIENT,
-        );
-      }
-    }
-  }
-
-  private async validateBridgeReqArgs(
-    req: BridgeBundledTxRequest,
-  ) {
-    // Validate chain ID.
-    await this.validateChainIds(req.sourceChainId, req.destinationChainId);
-
-    // Validate address
-    if (!ethers.utils.isAddress(req.senderAddress) || !ethers.utils.isAddress(req.recipientAddress)) {
-      throw new BridgeError(
-        `address ${req.senderAddress} or ${req.recipientAddress} is not a valid address`,
-        BridgeErrorType.INVALID_ADDRESS,
-      );
-    }
-
-    // Validate amount
-    if (req.amount.isNegative() || req.amount.isZero()) {
-      throw new BridgeError(
-        `deposit amount ${req.amount.toString()} is invalid`,
-        BridgeErrorType.INVALID_AMOUNT,
-      );
-    }
-
-    // If the token is not native, it must be a valid address
-    if (req.token.toUpperCase() !== NATIVE && !ethers.utils.isAddress(req.token)) {
-      throw new BridgeError(
-        `token address ${req.token} is not a valid address`,
-        BridgeErrorType.INVALID_ADDRESS,
-      );
-    }
-  }
-
   private async getDynamicDepositGas(
     sourceChainId: string,
     sender: string,
@@ -926,7 +851,7 @@ export class TokenBridge {
     let rootToken: string;
     if (token.toUpperCase() === NATIVE
       || this.isWrappedIMX(token, destinationChainId)) {
-      rootToken = this.getRootIMX(destinationChainId);
+      rootToken = getRootIMX(destinationChainId);
     } else {
       // Find root token
       const erc20Contract: ethers.Contract = await withBridgeError<ethers.Contract>(
@@ -1076,71 +1001,6 @@ export class TokenBridge {
         sender,
         bridgeContract,
       ), BridgeErrorType.PROVIDER_ERROR);
-  }
-
-  private async validateChainIds(
-    sourceChainId: string,
-    destinationChainId: string,
-  ) {
-    const isSourceChainRootOrChildChain = sourceChainId === this.config.bridgeInstance.rootChainID
-      || sourceChainId === this.config.bridgeInstance.childChainID;
-
-    // The source chain must be one of either the configured root chain or the configured child chain
-    if (!isSourceChainRootOrChildChain) {
-      throw new BridgeError(
-        `the sourceChainId ${sourceChainId} is not a valid`,
-        BridgeErrorType.INVALID_SOURCE_CHAIN_ID,
-      );
-    }
-
-    const isDestinationChainRootOrChildChain = destinationChainId === this.config.bridgeInstance.rootChainID
-      || destinationChainId === this.config.bridgeInstance.childChainID;
-
-    // If the token is not native, it must be a valid address
-    if (!isDestinationChainRootOrChildChain) {
-      throw new BridgeError(
-        `the destinationChainId ${destinationChainId} is not a valid`,
-        BridgeErrorType.INVALID_DESTINATION_CHAIN_ID,
-      );
-    }
-
-    // The source chain and destination chain should not be the same
-    if (sourceChainId === destinationChainId) {
-      throw new BridgeError(
-        `the sourceChainId ${sourceChainId} cannot be the same as the destinationChainId ${destinationChainId}`,
-        BridgeErrorType.CHAIN_IDS_MATCH,
-      );
-    }
-  }
-
-  // Query the rootchain and childchain providers to ensure the chainID is as expected by the SDK.
-  // This is to prevent the SDK from being used on the wrong chain, especially after a chain reset.
-  private async validateChainConfiguration(): Promise<void> {
-    const errMessage = 'Please upgrade to the latest version of the Bridge SDK or provide valid configuration';
-
-    const rootNetwork = await withBridgeError<ethers.providers.Network>(
-      async () => this.config.rootProvider.getNetwork(),
-      BridgeErrorType.ROOT_PROVIDER_ERROR,
-    );
-
-    if (rootNetwork!.chainId.toString() !== this.config.bridgeInstance.rootChainID) {
-      throw new BridgeError(
-        `Rootchain provider chainID ${rootNetwork!.chainId} does not match expected chainID ${this.config.bridgeInstance.rootChainID}. ${errMessage}`,
-        BridgeErrorType.UNSUPPORTED_ERROR,
-      );
-    }
-
-    const childNetwork = await withBridgeError<ethers.providers.Network>(
-      async () => this.config.childProvider.getNetwork(),
-      BridgeErrorType.CHILD_PROVIDER_ERROR,
-    );
-
-    if (childNetwork.chainId.toString() !== this.config.bridgeInstance.childChainID) {
-      throw new BridgeError(
-        `Childchain provider chainID ${childNetwork.chainId} does not match expected chainID ${this.config.bridgeInstance.childChainID}. ${errMessage}`,
-        BridgeErrorType.UNSUPPORTED_ERROR,
-      );
-    }
   }
 
   private getWrappedIMX(source: string) {
@@ -1375,7 +1235,6 @@ export class TokenBridge {
     try {
       pendingWithdrawalResponses = await Promise.all(pendingWithdrawalPromises);
     } catch (err) {
-      console.log('err', err);
       throw new BridgeError(
         `Failed to fetch the pending withdrawals with: ${err}`,
         BridgeErrorType.FLOW_RATE_ERROR,
