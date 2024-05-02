@@ -13,6 +13,7 @@ import {
   validateGetFee,
 } from 'lib/validation';
 import { getRootIMX } from 'lib/utils';
+import { TenderlySimulation } from 'types/tenderly';
 import {
   NATIVE,
   ETHEREUM_NATIVE_TOKEN_ADDRESS,
@@ -762,7 +763,7 @@ export class TokenBridge {
     token: FungibleToken,
     amount: ethers.BigNumber,
   ): Promise<DynamicGasEstimatesResponse> {
-    const simulations: Array<any> = [];
+    const simulations: Array<TenderlySimulation> = [];
 
     // Encode approval function for non-native tokens.
     if (token.toUpperCase() !== NATIVE) {
@@ -896,7 +897,10 @@ export class TokenBridge {
     return gas[0];
   }
 
-  private async submitTenderlySimulations(chainId: string, simulations: Array<any>): Promise<Array<number>> {
+  private async submitTenderlySimulations(
+    chainId: string,
+    simulations: Array<TenderlySimulation>,
+  ): Promise<Array<number>> {
     let axiosResponse:AxiosResponse;
     const tenderlyAPI = this.getTenderlyEndpoint(chainId);
     try {
