@@ -17,7 +17,7 @@ jest.mock('oidc-client-ts', () => ({
   WebStorageStateStore: jest.fn(),
 }));
 
-const authDomain = 'auth.immutable.com';
+const authenticationDomain = 'auth.immutable.com';
 const clientId = '11111';
 const redirectUri = 'https://test.com';
 const logoutEndpoint = '/oidc/logout';
@@ -152,7 +152,7 @@ describe('AuthManager', () => {
         const configWithLogoutRedirectUri = getConfig({ logoutRedirectUri });
         const am = new AuthManager(configWithLogoutRedirectUri);
 
-        const uri = new URL(logoutEndpoint, `https://${authDomain}`);
+        const uri = new URL(logoutEndpoint, `https://${authenticationDomain}`);
         uri.searchParams.append('client_id', clientId);
         uri.searchParams.append('post_logout_redirect_uri', logoutRedirectUri);
 
@@ -508,7 +508,7 @@ describe('AuthManager', () => {
           const result = await am.getDeviceFlowEndSessionEndpoint();
           const uri = new URL(result);
 
-          expect(uri.hostname).toEqual(authDomain);
+          expect(uri.hostname).toEqual(authenticationDomain);
           expect(uri.pathname).toEqual(logoutEndpoint);
           expect(uri.searchParams.get('client_id')).toEqual(clientId);
           expect(uri.searchParams.get('id_token_hint')).toEqual(mockUser.idToken);
@@ -524,7 +524,7 @@ describe('AuthManager', () => {
           const result = await am.getDeviceFlowEndSessionEndpoint();
           const uri = new URL(result);
 
-          expect(uri.hostname).toEqual(authDomain);
+          expect(uri.hostname).toEqual(authenticationDomain);
           expect(uri.pathname).toEqual(logoutEndpoint);
           expect(uri.searchParams.get('client_id')).toEqual(clientId);
           expect(uri.searchParams.get('id_token_hint')).toEqual(mockUser.idToken);

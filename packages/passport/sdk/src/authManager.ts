@@ -47,7 +47,7 @@ const getAuthConfiguration = (config: PassportConfiguration): UserManagerSetting
   const store = typeof window !== 'undefined' ? window.localStorage : new InMemoryWebStorage();
   const userStore = new WebStorageStateStore({ store });
 
-  const endSessionEndpoint = new URL(logoutEndpoint, authenticationDomain);
+  const endSessionEndpoint = new URL(logoutEndpoint, authenticationDomain.replace(/^(?:https?:\/\/)?(.*)/, 'https://$1'));
   endSessionEndpoint.searchParams.set('client_id', oidcConfiguration.clientId);
   if (oidcConfiguration.logoutRedirectUri) {
     endSessionEndpoint.searchParams.set('post_logout_redirect_uri', oidcConfiguration.logoutRedirectUri);
