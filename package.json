@@ -89,7 +89,8 @@
       "packages/checkout/widgets-lib",
       "packages/blockchain-data/sdk",
       "packages/blockchain-data/sample-app",
-      "packages/game-bridge"
+      "packages/game-bridge",
+      "packages/webhook/sdk"
     ],
     "nohoist": [
       "samples/**",
