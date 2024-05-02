@@ -62,4 +62,5 @@ export enum FundWithSmartCheckoutSubViews {
 export enum OrderSummarySubViews {
   INIT = 'INIT',
   REVIEW_ORDER = 'REVIEW_ORDER',
+  EXECUTE_FUNDING_ROUTE = 'EXECUTE_FUNDING_ROUTE',
 }

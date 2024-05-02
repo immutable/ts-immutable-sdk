@@ -252,17 +252,38 @@
       },
       "currency": {
         "fiat": "≈ USD ${{amount}}",
-        "fees": "Fees"
+        "price": "{{symbol}} {{amount}}"
+      },
+      "orderItem": {
+        "quantity": "Qty x{{qty}}"
       },
       "coinsDrawer": {
         "header": "Pay with...",
         "caption1": "Coins",
-        "caption2": "Balance"
+        "caption2": "Balance",
+        "divider": "More options",
+        "payWithCard": {
+          "caption": "Buy this items with card instead"
+        },
+        "stepType": {
+          "SWAP": "Swap {{symbol}} ≈ {{amount}}",
+          "ONRAMP": "Buy {{symbol}} ≈ {{amount}}",
+          "BRIDGE": "Move {{symbol}} ≈ {{amount}}",
+          "SUFFICIENT": "Pay {{symbol}} {{amount}}",
+          "delta": {
+            "SWAP": "Swap {{symbol}} ≈ {{amount}}",
+            "ONRAMP": "Buy {{symbol}} ≈ {{amount}}",
+            "BRIDGE": "Move {{symbol}} ≈ {{amount}}",
+            "SUFFICIENT": "Pay {{symbol}} {{amount}}"
+          }
+        },
+        "fee": "Fees {{symbol}} ≈ {{amount}}"
       },
       "orderReview": {
-        "heading": "Pay with your",
-        "continue": "Continue",
-        "payWithCard": "No thanks, I'll pay with card"
+        "heading": "Payment summary",
+        "continue": "Proceed",
+        "payWith": "Pay with {{symbol}}",
+        "balance": "Balance {{amount}}"
       }
     },
     "FUND_WITH_SMART_CHECKOUT": {
