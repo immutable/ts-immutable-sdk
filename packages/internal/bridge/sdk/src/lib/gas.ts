@@ -13,3 +13,12 @@ export const getGasPriceInWei = (feeData: FeeData): BigNumber | null => {
   if (feeData.gasPrice) return BigNumber.from(feeData.gasPrice);
   return null;
 };
+
+export function calculateGasFee(
+  feeData: FeeData,
+  gasLimit: number,
+): BigNumber {
+  const gasPriceInWei = getGasPriceInWei(feeData);
+  if (!gasPriceInWei) return BigNumber.from(0);
+  return gasPriceInWei.mul(gasLimit);
+}
