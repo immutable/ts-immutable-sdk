@@ -9,6 +9,7 @@
     "@ethersproject/providers": "^5.7.2",
     "@imtbl/config": "0.0.0",
     "@imtbl/generated-clients": "0.0.0",
+    "@imtbl/webhook": "0.0.0",
     "axios": "^1.6.5",
     "ethers": "^5.7.2"
   },
@@ -31,6 +32,9 @@
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
   "license": "Apache-2.0",
   "main": "dist/index.js",
+  "peerDependencies": {
+    "pg": "^8.11.5"
+  },
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
@@ -42,8 +46,5 @@
     "typecheck": "tsc --noEmit --jsx preserve"
   },
   "type": "module",
-  "types": "dist/index.d.ts",
-  "peerDependencies": {
-    "pg": "*"
-  }
+  "types": "dist/index.d.ts"
 }

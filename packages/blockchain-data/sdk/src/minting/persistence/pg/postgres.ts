@@ -1,16 +1,16 @@
 import { Pool } from 'pg';
 import { client } from '../../dbClient/postgres';
-import { MintRequest, MintingPersistence, SubmittedMintRequest } from '../type';
+import { CreateMintRequest, MintingPersistence, SubmittedMintRequest } from '../type';
 
 export const mintingPersistence: MintingPersistence<Pool> = {
   client,
-  recordMint: async (request: MintRequest) => {
+  recordMint: async (request: CreateMintRequest) => {
     const r = await client.query(
       `
       INSERT INTO im_assets (asset_id, contract_address, owner_address, metadata) 
       VALUES ($1, $2, $3, $4) ON CONFLICT (asset_id) DO NOTHING;
       `,
-      [request.asset_id, request.contract_address, request.wallet_address, request.metadata]
+      [request.asset_id, request.contract_address, request.owner_address, request.metadata]
     );
     if (r.rowCount === 0) {
       throw new Error('Duplicated mint');

@@ -1,7 +1,5 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
-CREATE UNIQUE INDEX IF NOT EXISTS user_wallet_user_id_uindex ON user_wallet (user_id);
-
 CREATE TABLE IF NOT EXISTS im_assets (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   asset_id UUID NOT NULL, 

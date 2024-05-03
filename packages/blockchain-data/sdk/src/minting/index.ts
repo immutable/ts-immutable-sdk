@@ -1,5 +1,6 @@
-import { mint, processMint, recordMint } from './minting-handler';
+import { submitMintingRequests, processMint, recordMint } from './minting';
+import { mintingPersistence as mintingPersistencePg } from './persistence/pg/postgres';
 
 export {
-  mint, processMint, recordMint
+  submitMintingRequests, processMint, recordMint, mintingPersistencePg
 };
