@@ -25,6 +25,7 @@ export type { ExpiredOrderStatus } from './models/ExpiredOrderStatus';
 export { FailedOrderCancellation } from './models/FailedOrderCancellation';
 export { Fee } from './models/Fee';
 export type { FilledOrderStatus } from './models/FilledOrderStatus';
+export type { FillStatus } from './models/FillStatus';
 export type { FulfillableOrder } from './models/FulfillableOrder';
 export type { FulfillmentDataRequest } from './models/FulfillmentDataRequest';
 export type { InactiveOrderStatus } from './models/InactiveOrderStatus';

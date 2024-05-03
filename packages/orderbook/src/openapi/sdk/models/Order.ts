@@ -4,6 +4,7 @@
 
 import type { Chain } from './Chain';
 import type { Fee } from './Fee';
+import type { FillStatus } from './FillStatus';
 import type { Item } from './Item';
 import type { OrderStatus } from './OrderStatus';
 import type { ProtocolData } from './ProtocolData';
@@ -49,6 +50,7 @@ export type Order = {
    * Time the Order is last updated
    */
   updated_at: string;
+  fill_status: FillStatus;
 };
 
 export namespace Order {
