@@ -5,6 +5,13 @@ import { Fee as OpenapiFee, OrdersService, OrderStatus } from './openapi/sdk';
 // Strictly re-export only the OrderStatusName enum from the openapi types
 export { OrderStatusName } from './openapi/sdk';
 
+export interface ERC1155Item {
+  type: 'ERC1155';
+  contractAddress: string;
+  tokenId: string;
+  amount: string;
+}
+
 export interface ERC721Item {
   type: 'ERC721';
   contractAddress: string;
@@ -29,7 +36,7 @@ export interface RoyaltyInfo {
 
 export interface PrepareListingParams {
   makerAddress: string;
-  sell: ERC721Item;
+  sell: ERC721Item | ERC1155Item;
   buy: ERC20Item | NativeItem;
   orderExpiry?: Date;
 }
@@ -162,7 +169,7 @@ export interface Order {
   type: 'LISTING';
   accountAddress: string;
   buy: (ERC20Item | NativeItem)[];
-  sell: ERC721Item[];
+  sell: (ERC721Item | ERC1155Item)[];
   fees: Fee[];
   chain: {
     id: string;
@@ -170,6 +177,10 @@ export interface Order {
   };
   createdAt: string;
   updatedAt: string;
+  fillStatus: {
+    numerator: string,
+    denominator: string,
+  };
   /**
    * Time after which the Order is considered active
    */
@@ -180,7 +191,7 @@ export interface Order {
   endAt: string;
   orderHash: string;
   protocolData: {
-    orderType: 'FULL_RESTRICTED';
+    orderType: 'FULL_RESTRICTED' | 'PARTIAL_RESTRICTED';
     zoneAddress: string;
     counter: string;
     seaportAddress: string;
@@ -219,7 +230,7 @@ export interface Trade {
     name: string;
   };
   buy: (ERC20Item | NativeItem)[];
-  sell: ERC721Item[];
+  sell: (ERC721Item | ERC1155Item)[];
   buyerFees: Fee[];
   sellerAddress: string;
   buyerAddress: string;
