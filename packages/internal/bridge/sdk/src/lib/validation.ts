@@ -162,7 +162,7 @@ export function validateGetFee(req: BridgeFeeRequest, config: BridgeConfiguratio
   ) {
     throw new BridgeError(
       `Deposit must be from the root chain (${config.bridgeInstance.rootChainID}) to the child chain (${config.bridgeInstance.childChainID})`,
-      BridgeErrorType.UNSUPPORTED_ERROR,
+      BridgeErrorType.INVALID_SOURCE_OR_DESTINATION_CHAIN,
     );
   }
 
@@ -175,7 +175,7 @@ export function validateGetFee(req: BridgeFeeRequest, config: BridgeConfiguratio
   ) {
     throw new BridgeError(
       `Withdraw must be from the child chain (${config.bridgeInstance.childChainID}) to the root chain (${config.bridgeInstance.rootChainID})`,
-      BridgeErrorType.UNSUPPORTED_ERROR,
+      BridgeErrorType.INVALID_SOURCE_OR_DESTINATION_CHAIN,
     );
   }
 
@@ -184,7 +184,7 @@ export function validateGetFee(req: BridgeFeeRequest, config: BridgeConfiguratio
     && req.sourceChainId !== config.bridgeInstance.rootChainID) {
     throw new BridgeError(
       `Finalised withdrawals must be on the root chain (${config.bridgeInstance.rootChainID})`,
-      BridgeErrorType.UNSUPPORTED_ERROR,
+      BridgeErrorType.INVALID_SOURCE_CHAIN_ID,
     );
   }
 }
