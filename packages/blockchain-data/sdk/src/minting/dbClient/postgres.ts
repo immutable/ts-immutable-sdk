@@ -1,6 +1,8 @@
-import { Pool } from 'pg';
+/* eslint-disable @typescript-eslint/naming-convention */
+import pg from 'pg';
 
-// TODO: make this configurable
+const { Pool } = pg;
+
 const client = new Pool({
   user: process.env.PG_USER || 'postgres',
   host: process.env.PG_HOST || 'localhost',

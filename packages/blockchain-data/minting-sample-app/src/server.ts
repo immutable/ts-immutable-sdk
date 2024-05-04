@@ -4,8 +4,8 @@
 import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { recordMint, processMint, mintingPersistencePg } from '@imtbl/blockchain-data';
-import { createWallet, getUserWalletByUserId } from './user';
-import { metadata } from './metadata';
+import { createWallet, getUserWalletByUserId } from './user.js';
+import { metadata } from './metadata.js';
 import { init } from '@imtbl/webhook';
 
 
@@ -18,7 +18,7 @@ const app = express();
 
 // Basic middleware
 app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 
 
 // **** Routes **** //
@@ -60,7 +60,7 @@ app.post('/api/process_webhook_event', async (req, res) => {
       zkevmMintRequestUpdated: (e) => processMint(mintingPersistencePg, e)
     });
     res.send({});
-  } catch(e) {
+  } catch (e) {
     console.error(e);
     res.status(500).send({});
   }

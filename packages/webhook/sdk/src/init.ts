@@ -3,7 +3,7 @@ import MessageValidator from 'sns-validator';
 const validator = new MessageValidator();
 const defaultHandlers = {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  zkevmMintRequestUpdated: async (event: any) => {}, // TODO: correct type
+  zkevmMintRequestUpdated: async (event: any) => { }, // TODO: correct type
 };
 
 export const init = async (
@@ -28,7 +28,7 @@ export const init = async (
   });
 
   if (msg.Type === 'Notification') {
-    const event = JSON.parse(msg);
+    const event = JSON.parse(msg.Message);
     console.log('event', event);
     switch (event.event_name) {
       case 'imtbl_zkevm_mint_request_updated':
