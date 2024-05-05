@@ -1,5 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-interface Logger {
+export interface Logger {
   info: (message: string) => void;
   error: (message: any) => void;
 }

@@ -4,8 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "npx ts-node build.ts",
-    "lint": "npx eslint --ext .ts src/",
-    "lint:tests": "npx eslint --ext .ts spec/",
+    "lint": "eslint ./src --ext .ts,.jsx,.tsx,.js --max-warnings=0",
     "start": "node -r module-alias/register ./dist --env=production",
     "dev": "nodemon",
     "test": "nodemon --config ./spec/nodemon.json",
@@ -56,8 +55,6 @@
     "@types/morgan": "^1.9.9",
     "@types/node": "^20.12.8",
     "@types/supertest": "^6.0.2",
-    "@typescript-eslint/eslint-plugin": "^7.8.0",
-    "@typescript-eslint/parser": "^7.8.0",
     "eslint": "^8.57.0",
     "eslint-plugin-node": "^11.1.0",
     "find": "^0.3.0",
