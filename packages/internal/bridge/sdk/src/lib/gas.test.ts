@@ -62,7 +62,29 @@ describe('gas', () => {
         maxPriorityFeePerGas: BigNumber.from(2),
         gasPrice: BigNumber.from(11),
       }, 100);
-      expect(fee).toEqual(BigNumber.from(300));
+      // (2 + 2) * 100 = 400
+      expect(fee.toString()).toEqual('400');
+    });
+
+    it('uses gasPrice when 1559 data is not valid', () => {
+      const fee = calculateGasFee({
+        lastBaseFeePerGas: null,
+        maxFeePerGas: BigNumber.from(22),
+        maxPriorityFeePerGas: BigNumber.from(2),
+        gasPrice: BigNumber.from(11),
+      }, 100);
+      // (11) * 100 = 400
+      expect(fee.toString()).toEqual('1100');
+    });
+
+    it('returns 0 when input is null', () => {
+      const fee = calculateGasFee({
+        lastBaseFeePerGas: null,
+        maxFeePerGas: BigNumber.from(22),
+        maxPriorityFeePerGas: null,
+        gasPrice: null,
+      }, 100);
+      expect(fee.toString()).toEqual('0');
     });
   });
 });

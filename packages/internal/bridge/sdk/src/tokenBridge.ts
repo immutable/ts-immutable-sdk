@@ -12,8 +12,9 @@ import {
   checkReceiver, validateBridgeReqArgs, validateChainConfiguration, validateChainIds,
   validateGetFee,
 } from 'lib/validation';
-import { calculateGasFee, getRootIMX } from 'lib/utils';
+import { getRootIMX } from 'lib/utils';
 import { TenderlySimulation } from 'types/tenderly';
+import { calculateGasFee } from 'lib/gas';
 import {
   NATIVE,
   ETHEREUM_NATIVE_TOKEN_ADDRESS,

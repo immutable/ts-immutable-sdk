@@ -1,7 +1,8 @@
 import { FeeData } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 
-const doesChainSupportEIP1559 = (feeData: FeeData) => !!feeData.maxFeePerGas && !!feeData.maxPriorityFeePerGas;
+const doesChainSupportEIP1559 = (feeData: FeeData) => !!feeData.maxFeePerGas
+    && !!feeData.maxPriorityFeePerGas && !!feeData.lastBaseFeePerGas;
 
 export const getGasPriceInWei = (feeData: FeeData): BigNumber | null => {
   if (doesChainSupportEIP1559(feeData)) {
