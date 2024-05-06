@@ -582,7 +582,7 @@ window.callFunction = async (jsonData: string) => {
       }
       case PASSPORT_FUNCTIONS.zkEvm.getTransactionReceipt: {
         const request = JSON.parse(data);
-        const result = await getZkEvmProvider().request({
+        const response = await getZkEvmProvider().request({
           method: 'eth_getTransactionReceipt',
           params: [request.txHash],
         });
@@ -590,10 +590,12 @@ window.callFunction = async (jsonData: string) => {
           timeMs: Date.now() - markStart,
         });
         callbackToGame({
-          responseFor: fxName,
-          requestId,
-          success: true,
-          result,
+          ...{
+            responseFor: fxName,
+            requestId,
+            success: true,
+          },
+          ...response,
         });
         break;
       }
