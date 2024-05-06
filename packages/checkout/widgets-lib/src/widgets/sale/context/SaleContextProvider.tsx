@@ -181,6 +181,7 @@ export function SaleContextProvider(props: {
 
   const setPaymentMethod = (type: SalePaymentTypes | undefined) => {
     if (type === SalePaymentTypes.CREDIT && !showCreditCardWarning) {
+      setPaymentMethodState(undefined);
       setShowCreditCardWarning(true);
       return;
     }
