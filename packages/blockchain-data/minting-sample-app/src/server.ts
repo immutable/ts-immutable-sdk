@@ -4,9 +4,10 @@
 import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { recordMint, processMint, mintingPersistencePg } from '@imtbl/blockchain-data';
-import { createWallet, getUserWalletByUserId } from './user.js';
 import { metadata } from './metadata.js';
 import { init } from '@imtbl/webhook';
+import { ethers } from 'ethers';
+import { Environment } from '@imtbl/config';
 
 
 // **** Variables **** //
@@ -22,21 +23,14 @@ app.use(express.urlencoded({ extended: true }));
 
 
 // **** Routes **** //
-app.post('/api/assets', async (req, res) => {
-  if (!req.body.userId) {
-    res.status(400).send('userId is required');
-    return;
-  }
-  try {
-    const assetId = uuidv4();
-    // create user if not exists
-    // TODO: grab from passport
-    await createWallet(req.body.userId);
-    // get wallet address against user id from db.
-    const userWallet = await getUserWalletByUserId(req.body.userId);
-    // DEBUG
-    console.log('userWallet', userWallet);
+app.post('/api/mint', async (req, res) => {
+  // FIXME: protect this endpoint with your authentication method.
+  // FIXME: replace wallet with your way of retrieving user wallet.
+  const wallet = ethers.Wallet.createRandom();
+  // FIXME: The asset
+  const assetId = uuidv4();
 
+  try {
     const contractAddress = process.env['CONTRACT_ADDRESS'];
 
     if (!contractAddress) {
@@ -45,7 +39,12 @@ app.post('/api/assets', async (req, res) => {
       return;
     }
 
-    await recordMint(mintingPersistencePg, { owner_address: userWallet.wallet_address, asset_id: assetId, contract_address: contractAddress, metadata });
+    await recordMint(mintingPersistencePg, {
+      owner_address: wallet.address,
+      asset_id: assetId,
+      contract_address: contractAddress,
+      metadata
+    });
     res.send({});
   } catch (e: any) {
     console.error(e);
@@ -56,7 +55,7 @@ app.post('/api/assets', async (req, res) => {
 app.post('/api/process_webhook_event', async (req, res) => {
   console.log('req.body', req.body);
   try {
-    await init(req.body, {
+    await init(req.body, process.env.IMBTL_ENV as Environment, {
       zkevmMintRequestUpdated: (e) => processMint(mintingPersistencePg, e)
     });
     res.send({});

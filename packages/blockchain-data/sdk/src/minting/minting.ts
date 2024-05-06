@@ -234,6 +234,6 @@ export const processMint = async <DBClient>(
     ownerAddress,
     metadataId: event.data.metadata_id,
     imtblZkevmMintRequestUpdatedId: event.event_id,
-    error: JSON.stringify(event.data.error),
+    error: event.data.error ? JSON.stringify(event.data.error) : null,
   });
 };

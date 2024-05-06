@@ -13,7 +13,6 @@
     "@swc/jest": "^0.2.24",
     "@typechain/ethers-v5": "^10.2.0",
     "@types/jest": "^29.4.3",
-    "@types/pg": "^8.11.5",
     "@types/sns-validator": "^0.3.3",
     "dotenv": "^16.0.3",
     "eslint": "^8.40.0",

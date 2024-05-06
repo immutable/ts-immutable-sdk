@@ -24,7 +24,7 @@ export type SubmittedMintRequest = {
   ownerAddress: string;
   metadataId: string;
   imtblZkevmMintRequestUpdatedId: string;
-  error: string;
+  error: any | null;
 };
 
 export interface MintingPersistence<DBClient> {

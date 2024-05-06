@@ -1,4 +1,5 @@
 import MessageValidator from 'sns-validator';
+import { Environment } from '@imtbl/config';
 
 const validator = new MessageValidator();
 const defaultHandlers = {
@@ -6,8 +7,14 @@ const defaultHandlers = {
   zkevmMintRequestUpdated: async (event: any) => { }, // TODO: correct type
 };
 
+const allowedTopicArnPrefix = {
+  [Environment.PRODUCTION]: 'arn:aws:sns:us-east-2:362750628221:',
+  [Environment.SANDBOX]: 'arn:aws:sns:us-east-2:783421985614:'
+};
+
 export const init = async (
   body: string | Record<string, unknown>,
+  env: Environment,
   handlers: typeof defaultHandlers = defaultHandlers
 ) => {
   const msg: any = await new Promise((resolve, reject) => {
@@ -26,6 +33,11 @@ export const init = async (
       return resolve(message);
     });
   });
+
+  // check for topic arn prefix
+  if (!msg.TopicArn.startsWith(allowedTopicArnPrefix[env])) {
+    throw new Error('Invalid topic arn');
+  }
 
   if (msg.Type === 'Notification') {
     const event = JSON.parse(msg.Message);
