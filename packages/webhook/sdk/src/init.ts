@@ -40,7 +40,6 @@ export const init = async (
 
   if (msg.Type === 'Notification') {
     const event = JSON.parse(msg.Message);
-    console.log('event', event);
     switch (event.event_name) {
       case 'imtbl_zkevm_mint_request_updated':
         await handlers.zkevmMintRequestUpdated(event);
