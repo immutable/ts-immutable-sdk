@@ -56,7 +56,10 @@ app.post('/api/process_webhook_event', async (req, res) => {
   console.log('req.body', req.body);
   try {
     await init(req.body, process.env.IMBTL_ENV as Environment, {
-      zkevmMintRequestUpdated: (e) => processMint(mintingPersistencePg, e)
+      zkevmMintRequestUpdated: async (e) => {
+        await processMint(mintingPersistencePg, e);
+        // Do something else
+      }
     });
     res.send({});
   } catch (e) {
