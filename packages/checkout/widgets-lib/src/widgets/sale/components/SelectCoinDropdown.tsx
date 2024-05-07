@@ -1,9 +1,19 @@
 import {
-  Button, Heading, MenuItem, ShimmerCircle, Stack,
+  Button,
+  Heading,
+  MenuItem,
+  ShimmerCircle,
+  Stack,
+  prettyFormatNumber,
 } from '@biom3/react';
 import { useTranslation } from 'react-i18next';
-import { calculateCryptoToFiat, tokenValueFormat } from 'lib/utils';
+import {
+  calculateCryptoToFiat,
+  getDefaultTokenImage,
+  tokenValueFormat,
+} from 'lib/utils';
 import { FundingBalance } from '../types';
+import { useSaleContext } from '../context/SaleContextProvider';
 
 type SelectCoinDropdownProps = {
   balance: FundingBalance;
@@ -25,10 +35,21 @@ export function SelectCoinDropdown({
   priceDisplay,
 }: SelectCoinDropdownProps) {
   const { t } = useTranslation();
+  const {
+    environment,
+    config: { theme },
+  } = useSaleContext();
 
   const { token, userBalance, fundsRequired } = balance.fundingItem;
 
   const fiatAmount = calculateCryptoToFiat(
+    fundsRequired.formattedAmount,
+    token.symbol,
+    conversions,
+    '',
+  );
+
+  const balanceFiatAmount = calculateCryptoToFiat(
     userBalance.formattedBalance,
     token.symbol,
     conversions,
@@ -51,9 +72,10 @@ export function SelectCoinDropdown({
     >
       <MenuItem size="medium">
         <MenuItem.FramedImage
-          imageUrl={token.icon}
           alt={token.name}
           circularFrame
+          imageUrl={token.icon}
+          defaultImageUrl={getDefaultTokenImage(environment, theme)}
         />
         <MenuItem.Label>
           {t('views.ORDER_SUMMARY.orderReview.payWith', {
@@ -61,9 +83,19 @@ export function SelectCoinDropdown({
           })}
         </MenuItem.Label>
         <MenuItem.Caption rc={<Heading size="xSmall" />}>
-          {t('views.ORDER_SUMMARY.orderReview.balance', {
-            amount: tokenValueFormat(userBalance.formattedBalance),
-          })}
+          {`${t('views.ORDER_SUMMARY.orderReview.balance', {
+            amount: prettyFormatNumber(
+              tokenValueFormat(userBalance.formattedBalance),
+            ),
+          })} ${
+            balanceFiatAmount
+              ? t('views.ORDER_SUMMARY.currency.fiat', {
+                amount: prettyFormatNumber(
+                  tokenValueFormat(balanceFiatAmount),
+                ),
+              })
+              : ''
+          }`}
         </MenuItem.Caption>
         {priceDisplay && (
           <MenuItem.PriceDisplay

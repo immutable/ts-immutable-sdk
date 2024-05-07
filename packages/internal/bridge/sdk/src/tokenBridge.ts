@@ -941,7 +941,7 @@ export class TokenBridge {
     for (let i = 0; i < simResults.length; i++) {
       if (simResults[i].simulation.error_message) {
         throw new BridgeError(
-          `Estimating deposit gas failed with the reason: ${simResults[0].simulation.error_message}`,
+          `Estimating deposit gas failed with the reason: ${simResults[i].simulation.error_message}`,
           BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
         );
       }
