@@ -62,3 +62,7 @@ export function getAxelarEndpoint(source:string) {
 export function getTenderlyEndpoint(source:string) {
   return getAddresses(source, tenderlyAPIEndpoints);
 }
+
+export const exportedForTesting = {
+  getAddresses,
+};
