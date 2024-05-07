@@ -13,6 +13,7 @@ import {
   validateGetFee,
 } from 'lib/validation';
 import { getRootIMX } from 'lib/utils';
+import { TenderlySimulation } from 'types/tenderly';
 import {
   NATIVE,
   ETHEREUM_NATIVE_TOKEN_ADDRESS,
@@ -762,7 +763,7 @@ export class TokenBridge {
     token: FungibleToken,
     amount: ethers.BigNumber,
   ): Promise<DynamicGasEstimatesResponse> {
-    const simulations: Array<any> = [];
+    const simulations: Array<TenderlySimulation> = [];
 
     // Encode approval function for non-native tokens.
     if (token.toUpperCase() !== NATIVE) {
@@ -875,7 +876,7 @@ export class TokenBridge {
 
     // Build simulation
     const axelarGateway = this.getAxelarGateway(destinationChainId);
-    const simulations = [{
+    const simulations: Array<TenderlySimulation> = [{
       network_id: destinationChainId,
       estimate_gas: true,
       simulation_type: 'quick',
@@ -896,7 +897,12 @@ export class TokenBridge {
     return gas[0];
   }
 
-  private async submitTenderlySimulations(chainId: string, simulations: Array<any>): Promise<Array<number>> {
+  // TODO this function should have tests. We can write these when we introduce a separate class
+  // for tenderly stuff
+  private async submitTenderlySimulations(
+    chainId: string,
+    simulations: Array<TenderlySimulation>,
+  ): Promise<Array<number>> {
     let axiosResponse:AxiosResponse;
     const tenderlyAPI = this.getTenderlyEndpoint(chainId);
     try {
