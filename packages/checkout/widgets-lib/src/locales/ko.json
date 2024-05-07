@@ -618,14 +618,17 @@
       "total": "수수료 총액",
       "fees": {
         "fiatPricePrefix": "USD $",
-        "gasFeeSwap": {
-          "label": "가스 수수료 스왑"
-        },
         "gasFeeMove": {
-          "label": "가스 수수료 이동"
+          "label": "가스 수수료"
         },
-        "gasFeeApproval": {
-          "label": "가스 수수료 승인"
+        "approvalFee": {
+          "label": "승인 수수료"
+        },
+        "swapGasFee": {
+          "label": "가스 수수료"
+        },
+        "swapSecondaryFee": {
+          "label": "{{amount}} 스왑 수수료 (견적에 포함)"
         },
         "serviceFee": {
           "label": "서비스 수수료"
