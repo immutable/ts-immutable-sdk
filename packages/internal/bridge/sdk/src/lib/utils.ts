@@ -9,18 +9,22 @@ import {
 } from 'constants/bridges';
 import { FungibleToken } from 'types';
 
-export function getChildETH(source: string) {
-  let eth:string;
+function getAddresses(source:string, addresses:Record<string, string>) {
+  let address:string;
   if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
     || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
-    eth = childETHs.mainnet;
+    address = addresses.mainnet;
   } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
     || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
-    eth = childETHs.testnet;
+    address = addresses.testnet;
   } else {
-    eth = childETHs.devnet;
+    address = addresses.devnet;
   }
-  return eth;
+  return address;
+}
+
+export function getChildETH(source: string) {
+  return getAddresses(source, childETHs);
 }
 
 export function isChildETH(token: FungibleToken, source: string) {
@@ -28,17 +32,7 @@ export function isChildETH(token: FungibleToken, source: string) {
 }
 
 export function getRootIMX(source: string) {
-  let rootIMX:string;
-  if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
-    || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
-    rootIMX = rootIMXs.mainnet;
-  } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
-    || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
-    rootIMX = rootIMXs.testnet;
-  } else {
-    rootIMX = rootIMXs.devnet;
-  }
-  return rootIMX;
+  return getAddresses(source, rootIMXs);
 }
 
 export function isRootIMX(token: FungibleToken, source: string) {
@@ -46,85 +40,25 @@ export function isRootIMX(token: FungibleToken, source: string) {
 }
 
 export function getChildAdaptor(source: string) {
-  let adaptor:string;
-  if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
-    || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
-    adaptor = childAdaptors.mainnet;
-  } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
-    || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
-    adaptor = childAdaptors.testnet;
-  } else {
-    adaptor = childAdaptors.devnet;
-  }
-  return adaptor;
+  return getAddresses(source, childAdaptors);
 }
 
 export function getRootAdaptor(source: string) {
-  let adaptor:string;
-  if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
-    || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
-    adaptor = rootAdaptors.mainnet;
-  } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
-    || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
-    adaptor = rootAdaptors.testnet;
-  } else {
-    adaptor = rootAdaptors.devnet;
-  }
-  return adaptor;
+  return getAddresses(source, rootAdaptors);
 }
 
 export function getChildchain(source: string) {
-  let chain:string;
-  if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
-    || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
-    chain = childChains.mainnet;
-  } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
-    || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
-    chain = childChains.testnet;
-  } else {
-    chain = childChains.devnet;
-  }
-  return chain;
+  return getAddresses(source, childChains);
 }
 
 export function getAxelarGateway(source: string) {
-  let gateway:string;
-  if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
-    || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
-    gateway = axelarGateways.mainnet;
-  } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
-    || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
-    gateway = axelarGateways.testnet;
-  } else {
-    gateway = axelarGateways.devnet;
-  }
-  return gateway;
+  return getAddresses(source, axelarGateways);
 }
 
 export function getAxelarEndpoint(source:string) {
-  let axelarAPIEndpoint:string;
-  if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
-    || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
-    axelarAPIEndpoint = axelarAPIEndpoints.mainnet;
-  } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
-    || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
-    axelarAPIEndpoint = axelarAPIEndpoints.testnet;
-  } else {
-    axelarAPIEndpoint = axelarAPIEndpoints.devnet;
-  }
-  return axelarAPIEndpoint;
+  return getAddresses(source, axelarAPIEndpoints);
 }
 
 export function getTenderlyEndpoint(source:string) {
-  let tenderlyAPIEndpoint:string;
-  if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
-    || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
-    tenderlyAPIEndpoint = tenderlyAPIEndpoints.mainnet;
-  } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
-    || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
-    tenderlyAPIEndpoint = tenderlyAPIEndpoints.testnet;
-  } else {
-    tenderlyAPIEndpoint = tenderlyAPIEndpoints.devnet;
-  }
-  return tenderlyAPIEndpoint;
+  return getAddresses(source, tenderlyAPIEndpoints);
 }
