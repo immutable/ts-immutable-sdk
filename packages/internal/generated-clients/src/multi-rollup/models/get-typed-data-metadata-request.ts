@@ -15,27 +15,19 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { AssetVerificationStatus } from './asset-verification-status';
+import { EIP712Message } from './eip712-message';
 
 /**
  * 
  * @export
- * @interface UpdateCollectionRequest
+ * @interface GetTypedDataMetadataRequest
  */
-export interface UpdateCollectionRequest {
+export interface GetTypedDataMetadataRequest {
     /**
      * 
-     * @type {AssetVerificationStatus}
-     * @memberof UpdateCollectionRequest
+     * @type {EIP712Message}
+     * @memberof GetTypedDataMetadataRequest
      */
-    'verification_status': AssetVerificationStatus;
-    /**
-     * 
-     * @type {string}
-     * @memberof UpdateCollectionRequest
-     */
-    'modified_by': string;
+    'payload': EIP712Message;
 }
-
-
 

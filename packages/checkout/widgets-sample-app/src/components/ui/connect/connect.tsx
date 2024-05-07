@@ -1,11 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import {
-  Checkout,
-  WidgetType,
-  WidgetTheme,
-  ConnectEventType
-} from '@imtbl/checkout-sdk';
+import { Checkout, ConnectEventType, WalletProviderRdns, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { WidgetsFactory } from '@imtbl/checkout-widgets';
 
@@ -21,7 +16,18 @@ function ConnectUI() {
 
   useEffect(() => {
     (async () => {
-      setFactory(new WidgetsFactory(checkout, {theme: WidgetTheme.DARK}));
+      setFactory(new WidgetsFactory(checkout, {
+        theme: WidgetTheme.DARK,
+        walletConnect: {
+          projectId: '938b553484e344b1e0b4bb80edf8c362',
+          metadata: {
+            name: 'Checkout Marketplace',
+            description: 'Checkout Marketplace',
+            url: 'http://localhost:3000/marketplace-orchestrator',
+            icons: []
+          }
+        }
+      }));
     })()
   }, [checkout]);
 
@@ -34,7 +40,35 @@ function ConnectUI() {
     connect.addListener(ConnectEventType.CLOSE_WIDGET, (data: any) => {
       connect.unmount();
     })
-  }, [connect])
+  }, [connect]);
+
+  const connectWC = useCallback(async () => {
+    if(!connect && !provider) return;
+    connect!.mount(CONNECT_TARGET_ID, {
+      targetWalletRdns: WalletProviderRdns.WALLETCONNECT,
+    });
+  }, [connect, provider, checkout]);
+
+  const connectMetaMask = useCallback(async () => {
+    if(!connect && !provider) return;
+    connect!.mount(CONNECT_TARGET_ID, {
+      targetWalletRdns: WalletProviderRdns.METAMASK,
+    });
+  }, [connect, provider, checkout]);
+
+  const connectPassport = useCallback(async () => {
+    if(!connect && !provider) return;
+    connect!.mount(CONNECT_TARGET_ID, {
+      targetWalletRdns: WalletProviderRdns.PASSPORT,
+    });
+  }, [connect, provider, checkout]);
+
+  const connectCoinbase = useCallback(async () => {
+    if(!connect && !provider) return;
+    connect!.mount(CONNECT_TARGET_ID, {
+      targetWalletRdns: 'com.coinbase.wallet'
+    });
+  }, [connect, provider, checkout]);
 
   return (
     <div>
@@ -46,6 +80,10 @@ function ConnectUI() {
       <button onClick={() => connect?.update({ config: { language: 'ja'}})}>JA</button>
       <button onClick={() => connect?.update({ config: { language: 'ko'}})}>KO</button>
       <button onClick={() => connect?.update({ config: { language: 'zh'}})}>ZH</button>
+      <button onClick={() => connectMetaMask()}>Connect MetaMask</button>
+      <button onClick={() => connectWC()}>Connect WC</button>
+      <button onClick={() => connectPassport()}>Connect Passport</button>
+      <button onClick={() => connectCoinbase()}>Connect Coinbase</button>
     </div>
   );
 }

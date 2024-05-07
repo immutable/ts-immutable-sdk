@@ -44,6 +44,24 @@ export interface ERC20ApproveMetadata {
      * @memberof ERC20ApproveMetadata
      */
     'spender': string;
+    /**
+     * Indicate if it is a Smart Contract or EOA
+     * @type {boolean}
+     * @memberof ERC20ApproveMetadata
+     */
+    'is_smart_contract': boolean;
+    /**
+     * Is Contract Verified
+     * @type {boolean}
+     * @memberof ERC20ApproveMetadata
+     */
+    'is_contract_verified': boolean;
+    /**
+     * Smart Contract Name
+     * @type {string}
+     * @memberof ERC20ApproveMetadata
+     */
+    'contract_name': string;
 }
 
 export const ERC20ApproveMetadataTransactionTypeEnum = {

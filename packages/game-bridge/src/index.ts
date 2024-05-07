@@ -37,6 +37,7 @@ const PASSPORT_FUNCTIONS = {
   logout: 'logout',
   getEmail: 'getEmail',
   getPassportId: 'getPassportId',
+  getLinkedAddresses: 'getLinkedAddresses',
   imx: {
     getAddress: 'getAddress',
     isRegisteredOffchain: 'isRegisteredOffchain',
@@ -49,6 +50,7 @@ const PASSPORT_FUNCTIONS = {
     sendTransaction: 'zkEvmSendTransaction',
     requestAccounts: 'zkEvmRequestAccounts',
     getBalance: 'zkEvmGetBalance',
+    getTransactionReceipt: 'zkEvmGetTransactionReceipt',
   },
 };
 
@@ -425,6 +427,19 @@ window.callFunction = async (jsonData: string) => {
         });
         break;
       }
+      case PASSPORT_FUNCTIONS.getLinkedAddresses: {
+        const linkedAddresses = await passportClient?.getLinkedAddresses();
+        track(moduleName, 'performedGetLinkedAddresses', {
+          timeMs: Date.now() - markStart,
+        });
+        callbackToGame({
+          responseFor: fxName,
+          requestId,
+          success: true,
+          result: linkedAddresses,
+        });
+        break;
+      }
       case PASSPORT_FUNCTIONS.imx.getAddress: {
         const address = await getProvider().getAddress();
         track(moduleName, 'performedImxGetAddress', {
@@ -562,6 +577,25 @@ window.callFunction = async (jsonData: string) => {
           requestId,
           success: true,
           result,
+        });
+        break;
+      }
+      case PASSPORT_FUNCTIONS.zkEvm.getTransactionReceipt: {
+        const request = JSON.parse(data);
+        const response = await getZkEvmProvider().request({
+          method: 'eth_getTransactionReceipt',
+          params: [request.txHash],
+        });
+        track(moduleName, 'performedZkevmGetTransactionReceipt', {
+          timeMs: Date.now() - markStart,
+        });
+        callbackToGame({
+          ...{
+            responseFor: fxName,
+            requestId,
+            success: true,
+          },
+          ...response,
         });
         break;
       }

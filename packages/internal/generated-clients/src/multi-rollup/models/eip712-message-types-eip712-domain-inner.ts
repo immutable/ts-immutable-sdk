@@ -17,20 +17,20 @@
 /**
  * 
  * @export
- * @interface CreateCounterfactualAddressRequestDeprecated
+ * @interface EIP712MessageTypesEIP712DomainInner
  */
-export interface CreateCounterfactualAddressRequestDeprecated {
+export interface EIP712MessageTypesEIP712DomainInner {
     /**
-     * The user\'s UAK address
+     * 
      * @type {string}
-     * @memberof CreateCounterfactualAddressRequestDeprecated
+     * @memberof EIP712MessageTypesEIP712DomainInner
      */
-    'ethereumAddress': string;
+    'name': string;
     /**
-     * The signature generated with the UAK
+     * 
      * @type {string}
-     * @memberof CreateCounterfactualAddressRequestDeprecated
+     * @memberof EIP712MessageTypesEIP712DomainInner
      */
-    'ethereumSignature': string;
+    'type': string;
 }
 

@@ -17,26 +17,32 @@
 /**
  * 
  * @export
- * @interface LinkTokenRequest
+ * @interface UserInfo
  */
-export interface LinkTokenRequest {
+export interface UserInfo {
     /**
-     * String created by signing wallet address and timestamp
+     * The user\'s id
      * @type {string}
-     * @memberof LinkTokenRequest
+     * @memberof UserInfo
      */
-    'signature': string;
+    'sub': string;
     /**
-     * The address of the contract
+     * The user\'s email address
      * @type {string}
-     * @memberof LinkTokenRequest
+     * @memberof UserInfo
      */
-    'contract_address': string;
+    'email'?: string;
     /**
-     * The name of environment
+     * The user\'s Passport address if it has been registered
      * @type {string}
-     * @memberof LinkTokenRequest
+     * @memberof UserInfo
      */
-    'environment_name': string;
+    'passport_address'?: string;
+    /**
+     * The user\'s list of linked addresses
+     * @type {Array<string>}
+     * @memberof UserInfo
+     */
+    'linked_addresses': Array<string>;
 }
 

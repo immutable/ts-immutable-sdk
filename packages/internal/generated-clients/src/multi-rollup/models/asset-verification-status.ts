@@ -21,7 +21,6 @@
  */
 
 export const AssetVerificationStatus = {
-    Pending: 'pending',
     Verified: 'verified',
     Unverified: 'unverified',
     Spam: 'spam',

@@ -13,29 +13,24 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import { AssetVerificationStatus } from './asset-verification-status';
 
 /**
  * 
  * @export
- * @interface UpdateTokenRequest
+ * @interface FillStatus
  */
-export interface UpdateTokenRequest {
+export interface FillStatus {
     /**
-     * 
-     * @type {AssetVerificationStatus}
-     * @memberof UpdateTokenRequest
-     */
-    'verification_status': AssetVerificationStatus;
-    /**
-     * 
+     * The numerator of the fill status
      * @type {string}
-     * @memberof UpdateTokenRequest
+     * @memberof FillStatus
      */
-    'modified_by': string;
+    'numerator': string;
+    /**
+     * The denominator of the fill status
+     * @type {string}
+     * @memberof FillStatus
+     */
+    'denominator': string;
 }
-
-
 

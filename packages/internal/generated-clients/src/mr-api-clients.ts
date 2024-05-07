@@ -6,6 +6,7 @@ import {
   NftsApi,
   OrdersApi,
   PassportApi,
+  PassportProfileApi,
 } from './multi-rollup';
 import { MultiRollupAPIConfiguration } from './config';
 
@@ -26,6 +27,8 @@ export class MultiRollupApiClients {
 
   public passportApi: PassportApi;
 
+  public passportProfileApi: PassportProfileApi;
+
   constructor(config: MultiRollupAPIConfiguration) {
     this.config = config;
     this.activitiesApi = new ActivitiesApi(config.indexer);
@@ -35,5 +38,6 @@ export class MultiRollupApiClients {
     this.nftsApi = new NftsApi(config.indexer);
     this.ordersApi = new OrdersApi(config.orderBook);
     this.passportApi = new PassportApi(config.passport);
+    this.passportProfileApi = new PassportProfileApi(config.passport);
   }
 }

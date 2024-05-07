@@ -53,7 +53,8 @@ export interface ProtocolData {
 }
 
 export const ProtocolDataOrderTypeEnum = {
-    FullRestricted: 'FULL_RESTRICTED'
+    FullRestricted: 'FULL_RESTRICTED',
+    PartialRestricted: 'PARTIAL_RESTRICTED'
 } as const;
 
 export type ProtocolDataOrderTypeEnum = typeof ProtocolDataOrderTypeEnum[keyof typeof ProtocolDataOrderTypeEnum];

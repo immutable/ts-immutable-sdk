@@ -10,7 +10,6 @@ export enum ReceiveMessage {
   MESSAGE_CONFIRMED = 'message_confirmed',
   MESSAGE_ERROR = 'message_error',
   MESSAGE_REJECTED = 'message_rejected',
-  LOGOUT_SUCCESS = 'logout_success',
 }
 
 export type ConfirmationResult = {

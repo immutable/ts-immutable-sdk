@@ -13,6 +13,7 @@ export const setTransactionGasLimits = async (
 
   const { chainId } = await web3Provider.getNetwork();
   if (!isZkEvmChainId(chainId)) return rawTx;
+  if (typeof rawTx.gasPrice !== 'undefined') return rawTx;
 
   rawTx.maxFeePerGas = IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxFeePerGas;
   rawTx.maxPriorityFeePerGas = IMMUTABLE_ZKVEM_GAS_OVERRIDES.maxPriorityFeePerGas;

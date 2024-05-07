@@ -1,5 +1,5 @@
 import { MenuItem } from '@biom3/react';
-import { ReactElement, useState } from 'react';
+import { cloneElement, ReactElement, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export interface WalletConnectItemProps<RC extends ReactElement | undefined = undefined> {
@@ -21,20 +21,21 @@ export function WalletConnectItem<
 
   return (
     <MenuItem
-      rc={rc}
+      rc={cloneElement(rc, {
+        onClick: async () => {
+          if (loading) return;
+          setBusy(true);
+          // let the parent handle errors
+          try {
+            await onWalletItemClick();
+          } finally {
+            setBusy(false);
+          }
+        },
+      })}
       testId={`${testId}-wallet-list-walletconnect`}
       size="medium"
       emphasized
-      onClick={async () => {
-        if (loading) return;
-        setBusy(true);
-        // let the parent handle errors
-        try {
-          await onWalletItemClick();
-        } finally {
-          setBusy(false);
-        }
-      }}
     >
       <MenuItem.FramedLogo
         logo="WalletConnectSymbol"

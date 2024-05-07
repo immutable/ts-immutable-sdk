@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers';
 import { Web3Provider } from '@ethersproject/providers';
-import { smartCheckout } from './smartCheckout';
+import { overrideBalanceCheckResult, smartCheckout } from './smartCheckout';
 import {
   GasAmount,
   GasTokenType,
@@ -15,6 +15,7 @@ import { CheckoutConfiguration } from '../config';
 import { balanceCheck } from './balanceCheck';
 import { routingCalculator } from './routing/routingCalculator';
 import { getAvailableRoutingOptions } from './routing';
+import { BalanceCheckResult } from './balanceCheck/types';
 
 jest.mock('./routing');
 jest.mock('./allowance');
@@ -1112,6 +1113,162 @@ describe('smartCheckout', () => {
           },
         },
       });
+    });
+  });
+
+  describe('overrideBalanceCheckResult', () => {
+    it('should correctly override sufficient flags and deltas for ERC20 items', () => {
+      const mockBalanceCheckResult: BalanceCheckResult = {
+        sufficient: true,
+        balanceRequirements: [
+          {
+            sufficient: true,
+            type: ItemType.NATIVE,
+            delta: {
+              balance: BigNumber.from(0),
+              formattedBalance: '0.0',
+            },
+            current: {
+              balance: BigNumber.from(100),
+              formattedBalance: '100.0',
+              token: {
+                address: 'native',
+                decimals: 18,
+                name: 'tIMX',
+                symbol: 'tIMX',
+              },
+              type: ItemType.NATIVE,
+            },
+            required: {
+              balance: BigNumber.from(100),
+              formattedBalance: '100.0',
+              token: {
+                address: 'native',
+                decimals: 18,
+                name: 'tIMX',
+                symbol: 'tIMX',
+              },
+              type: ItemType.NATIVE,
+            },
+          },
+          {
+            sufficient: true,
+            type: ItemType.ERC20,
+            delta: {
+              balance: BigNumber.from(-50),
+              formattedBalance: '-50.0',
+            },
+            current: {
+              type: ItemType.ERC20,
+              balance: BigNumber.from(50),
+              formattedBalance: '50.0',
+              token: {
+                address: '0x3b2d8a1931736fc321c24864bceee981b11c3c57',
+                name: 'USDC',
+                symbol: 'USDC',
+                decimals: 6,
+              },
+            },
+            required: {
+              type: ItemType.ERC20,
+              balance: BigNumber.from(100),
+              formattedBalance: '100.0',
+              token: {
+                address: '0x3b2d8a1931736fc321c24864bceee981b11c3c57',
+                name: 'USDC',
+                symbol: 'USDC',
+                decimals: 6,
+              },
+            },
+          },
+        ],
+      };
+
+      const result = overrideBalanceCheckResult(mockBalanceCheckResult);
+
+      expect(result.sufficient).toBe(false);
+      expect(result.balanceRequirements[1].sufficient).toBe(false);
+      expect(result.balanceRequirements[1].delta.balance.toString()).toBe(
+        '100',
+      );
+      expect(result.balanceRequirements[1].delta.formattedBalance).toBe(
+        '100.0',
+      );
+      expect(result.balanceRequirements[0].sufficient).toBe(true);
+    });
+
+    it('should return correct sufficient status and still calculate funding routes', async () => {
+      (hasERC20Allowances as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        allowances: [],
+      });
+
+      (hasERC721Allowances as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        allowances: [],
+      });
+
+      const mockBalanceCheckResult = {
+        sufficient: true,
+        balanceRequirements: [
+          {
+            type: ItemType.ERC20,
+            sufficient: true,
+            required: {
+              balance: BigNumber.from(100),
+              formattedBalance: '100.0',
+            },
+            current: {
+              balance: BigNumber.from(90),
+              formattedBalance: '90.0',
+            },
+            delta: {
+              balance: BigNumber.from(-10),
+              formattedBalance: '-10.0',
+            },
+          },
+        ],
+      };
+
+      (balanceCheck as jest.Mock).mockResolvedValue(mockBalanceCheckResult);
+
+      const itemRequirements: ItemRequirement[] = [
+        {
+          type: ItemType.ERC20,
+          tokenAddress: '0xERC20',
+          amount: BigNumber.from(10),
+          spenderAddress: '0x1',
+        },
+      ];
+
+      const onCompletePromise = new Promise((resolve) => {
+        const mockOnComplete = jest.fn().mockImplementation((result) => {
+          resolve(result);
+        });
+        smartCheckout(
+          {} as CheckoutConfiguration,
+          mockProvider,
+          itemRequirements,
+          undefined,
+          undefined,
+          mockOnComplete,
+        );
+      });
+
+      const result = await onCompletePromise;
+
+      expect(routingCalculator).toHaveBeenCalled();
+      expect(result).toEqual(
+        expect.objectContaining({
+          sufficient: true,
+          transactionRequirements: expect.arrayContaining([
+            expect.objectContaining({
+              type: ItemType.ERC20,
+              sufficient: true,
+            }),
+          ]),
+        }),
+      );
     });
   });
 });

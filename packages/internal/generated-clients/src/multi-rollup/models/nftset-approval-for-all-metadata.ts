@@ -38,6 +38,24 @@ export interface NFTSetApprovalForAllMetadata {
      * @memberof NFTSetApprovalForAllMetadata
      */
     'collection_image': string;
+    /**
+     * Indicate if it is a Smart Contract or EOA
+     * @type {boolean}
+     * @memberof NFTSetApprovalForAllMetadata
+     */
+    'is_smart_contract': boolean;
+    /**
+     * Is Contract Verified
+     * @type {boolean}
+     * @memberof NFTSetApprovalForAllMetadata
+     */
+    'is_contract_verified': boolean;
+    /**
+     * Smart Contract Name
+     * @type {string}
+     * @memberof NFTSetApprovalForAllMetadata
+     */
+    'contract_name': string;
 }
 
 export const NFTSetApprovalForAllMetadataTransactionTypeEnum = {

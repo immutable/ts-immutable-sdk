@@ -15,22 +15,17 @@
 
 
 /**
- * Resource not found
+ * The status of the verification request
  * @export
- * @interface ModelError
+ * @enum {string}
  */
-export interface ModelError {
-    /**
-     * Error trace id
-     * @type {string}
-     * @memberof ModelError
-     */
-    'id'?: string;
-    /**
-     * Error message
-     * @type {string}
-     * @memberof ModelError
-     */
-    'message': string;
-}
+
+export const VerificationRequestStatus = {
+    Completed: 'completed',
+    Pending: 'pending'
+} as const;
+
+export type VerificationRequestStatus = typeof VerificationRequestStatus[keyof typeof VerificationRequestStatus];
+
+
 

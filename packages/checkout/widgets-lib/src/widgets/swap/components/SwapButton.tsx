@@ -4,6 +4,7 @@ import { TransactionResponse } from '@imtbl/dex-sdk';
 import { CheckoutErrorType } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
 import { getL2ChainId } from 'lib';
+import { BigNumber } from 'ethers';
 import { PrefilledSwapForm, SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import {
   ViewContext,
@@ -18,6 +19,7 @@ import { SwapFormData } from './swapFormTypes';
 import { TransactionRejected } from '../../../components/TransactionRejected/TransactionRejected';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { isPassportProvider } from '../../../lib/provider';
 
 export interface SwapButtonProps {
   loading: boolean
@@ -117,7 +119,10 @@ export function SwapButton({
       }
       const txn = await checkout.sendTransaction({
         provider,
-        transaction: transaction.swap.transaction,
+        transaction: {
+          ...transaction.swap.transaction,
+          gasPrice: (isPassportProvider(provider) ? BigNumber.from(0) : undefined),
+        },
       });
 
       viewDispatch({
