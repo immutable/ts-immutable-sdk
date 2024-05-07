@@ -3,7 +3,7 @@ import {
   IMTBLWidgetEvents,
   SaleEventType,
   WidgetType,
-  SalePaymentTypes,
+  SalePaymentTypes, SalePaymentToken,
 } from '@imtbl/checkout-sdk';
 import { ExecutedTransaction } from './types';
 
@@ -107,5 +107,22 @@ export const sendSalePaymentMethodEvent = (
   });
   // eslint-disable-next-line no-console
   console.log('Sale payment method event:', event);
+  if (eventTarget !== undefined) eventTarget.dispatchEvent(event);
+};
+
+export const sendSalePaymentTokenEvent = (
+  eventTarget: Window | EventTarget,
+  details: SalePaymentToken,
+) => {
+  const event = new CustomEvent<
+  WidgetEvent<WidgetType.SALE, SaleEventType.PAYMENT_TOKEN>
+  >(IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT, {
+    detail: {
+      type: SaleEventType.PAYMENT_TOKEN,
+      data: { ...details },
+    },
+  });
+  // eslint-disable-next-line no-console
+  console.log('Sale payment token selected event:', event);
   if (eventTarget !== undefined) eventTarget.dispatchEvent(event);
 };

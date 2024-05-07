@@ -21,6 +21,7 @@ import {
 import { EnvironmentNames } from '@/types';
 import useLocalStorage from '@/hooks/useLocalStorage';
 import { ImxApiClients, createConfig } from '@imtbl/generated-clients';
+import { BlockchainData, BlockchainDataModuleConfiguration } from '@imtbl/blockchain-data';
 
 const getSdkConfig = (environment: EnvironmentNames): ImxModuleConfiguration => {
   switch (environment) {
@@ -48,6 +49,33 @@ const getSdkConfig = (environment: EnvironmentNames): ImxModuleConfiguration => 
             coreContractAddress: '0xd05323731807A35599BF9798a1DE15e89d6D6eF1',
             registrationContractAddress: '0x7EB840223a3b1E0e8D54bF8A6cd83df5AFfC88B2',
           }),
+        },
+      };
+    }
+    default: {
+      throw new Error('Invalid environment');
+    }
+  }
+};
+
+const getBlockchainDataConfig = (environment: EnvironmentNames): BlockchainDataModuleConfiguration => {
+  switch (environment) {
+    case EnvironmentNames.PRODUCTION: {
+      const baseConfig = new ImmutableConfiguration({ environment: Environment.PRODUCTION });
+      return {
+        baseConfig,
+      };
+    }
+    case EnvironmentNames.SANDBOX: {
+      const baseConfig = new ImmutableConfiguration({ environment: Environment.SANDBOX });
+      return { baseConfig };
+    }
+    case EnvironmentNames.DEV: {
+      const baseConfig = new ImmutableConfiguration({ environment: Environment.SANDBOX });
+      return {
+        baseConfig,
+        overrides: {
+          basePath: 'https://api.dev.immutable.com',
         },
       };
     }
@@ -156,6 +184,7 @@ const ImmutableContext = createContext<{
   passportClient: Passport,
   sdkClient: ImmutableX,
   orderbookClient: Orderbook,
+  blockchainData: BlockchainData,
   environment: EnvironmentNames,
   setEnvironment?:(environment: EnvironmentNames) => void;
 }>({
@@ -163,6 +192,7 @@ const ImmutableContext = createContext<{
       orderbookClient: new Orderbook(getOrderbookConfig(EnvironmentNames.DEV)),
       passportClient: new Passport(getPassportConfig(EnvironmentNames.DEV)),
       environment: EnvironmentNames.DEV,
+      blockchainData: new BlockchainData(getBlockchainDataConfig(EnvironmentNames.DEV)),
     });
 
 export function ImmutableProvider({
@@ -182,19 +212,25 @@ export function ImmutableProvider({
     useContext(ImmutableContext).passportClient,
   );
 
+  const [blockchainData, setBlockchainData] = useState<BlockchainData>(
+    useContext(ImmutableContext).blockchainData,
+  );
+
   useEffect(() => {
     setSdkClient(new ImmutableX(getSdkConfig(environment)));
     setOrderbookClient(new Orderbook(getOrderbookConfig(environment)));
     setPassportClient(new Passport(getPassportConfig(environment)));
+    setBlockchainData(new BlockchainData(getBlockchainDataConfig(environment)));
   }, [environment]);
 
   const providerValues = useMemo(() => ({
     sdkClient,
     orderbookClient,
     passportClient,
+    blockchainData,
     environment,
     setEnvironment,
-  }), [sdkClient, orderbookClient, passportClient, environment, setEnvironment]);
+  }), [sdkClient, orderbookClient, passportClient, blockchainData, environment, setEnvironment]);
 
   return (
     <ImmutableContext.Provider value={providerValues}>
@@ -208,6 +244,7 @@ export function useImmutableProvider() {
     sdkClient,
     orderbookClient,
     passportClient,
+    blockchainData,
     environment,
     setEnvironment,
   } = useContext(ImmutableContext);
@@ -215,6 +252,7 @@ export function useImmutableProvider() {
     sdkClient,
     orderbookClient,
     passportClient,
+    blockchainData,
     environment,
     setEnvironment,
   };

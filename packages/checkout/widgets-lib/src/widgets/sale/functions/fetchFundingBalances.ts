@@ -56,34 +56,43 @@ export const fetchFundingBalances = async (
     }
   };
 
-  const balancePromises = currencies.map(async (currency) => {
-    const amount = getAmountByCurrency(currency) || '0';
-    const itemRequirements = getERC20ItemRequirement(
-      amount,
-      spenderAddress,
-      currency.address,
-    );
+  const balancePromises: Promise<FundingBalanceResult>[] = currencies
+    .map(async (currency) => {
+      const amount = getAmountByCurrency(currency);
 
-    const transactionOrGasAmount = getIsGasless()
-      ? undefined
-      : getGasEstimate();
+      if (!amount) {
+        return null;
+      }
 
-    const smartCheckoutResult = await checkout.smartCheckout({
-      provider,
-      itemRequirements,
-      transactionOrGasAmount,
-      routingOptions: { bridge: false, onRamp: false, swap: true },
-      fundingRouteFullAmount: true,
-      onComplete: () => {
-        onComplete?.(pushToFoundBalances([]));
-      },
-      onFundingRoute: (route) => {
-        updateFundingBalances(getAlternativeFundingSteps([route], environment));
-      },
-    });
+      const itemRequirements = getERC20ItemRequirement(
+        amount,
+        spenderAddress,
+        currency.address,
+      );
 
-    return { currency, smartCheckoutResult };
-  });
+      const transactionOrGasAmount = getIsGasless()
+        ? undefined
+        : getGasEstimate();
+
+      const smartCheckoutResult = await checkout.smartCheckout({
+        provider,
+        itemRequirements,
+        transactionOrGasAmount,
+        routingOptions: { bridge: false, onRamp: false, swap: true },
+        fundingRouteFullAmount: true,
+        onComplete: () => {
+          onComplete?.(pushToFoundBalances([]));
+        },
+        onFundingRoute: (route) => {
+          updateFundingBalances(
+            getAlternativeFundingSteps([route], environment),
+          );
+        },
+      });
+
+      return { currency, smartCheckoutResult };
+    })
+    .filter(Boolean) as Promise<FundingBalanceResult>[];
 
   const results = await wrapPromisesWithOnResolve(
     balancePromises,

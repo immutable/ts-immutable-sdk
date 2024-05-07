@@ -5,9 +5,8 @@ import {
   SaleItem,
   SalePaymentTypes,
   TransactionRequirement,
-  WidgetTheme,
 } from '@imtbl/checkout-sdk';
-import { FooterLogo } from '../../../components/Footer/FooterLogo';
+import { OrderSummarySubViews } from 'context/view-context/SaleViewContextTypes';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
@@ -16,6 +15,7 @@ import { SelectCoinDropdown } from './SelectCoinDropdown';
 import { CoinsDrawer } from './CoinsDrawer';
 import { FundingBalance } from '../types';
 import { OrderItems } from './OrderItems';
+import { useSaleEvent } from '../hooks/useSaleEvents';
 
 type OrderReviewProps = {
   collectionName: string;
@@ -28,7 +28,6 @@ type OrderReviewProps = {
   onProceedToBuy: (fundingBalance: FundingBalance) => void;
   onPayWithCard?: (paymentType: SalePaymentTypes) => void;
   disabledPaymentTypes?: SalePaymentTypes[];
-  theme: WidgetTheme;
 };
 
 export function OrderReview({
@@ -42,12 +41,12 @@ export function OrderReview({
   onPayWithCard,
   onProceedToBuy,
   disabledPaymentTypes,
-  theme,
 }: OrderReviewProps) {
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
   const { t } = useTranslation();
+  const { sendSelectedPaymentToken } = useSaleEvent();
 
   const [showCoinsDrawer, setShowCoinsDrawer] = useState(false);
   const [selectedCurrencyIndex, setSelectedCurrencyIndex] = useState(0);
@@ -62,6 +61,10 @@ export function OrderReview({
 
   const onSelect = (selectedIndex: number) => {
     setSelectedCurrencyIndex(selectedIndex);
+
+    const { fundingItem } = fundingBalances[selectedCurrencyIndex];
+    sendSelectedPaymentToken(OrderSummarySubViews.REVIEW_ORDER, fundingItem, conversions);
+    // checkoutPrimarySalePaymentTokenSelected
   };
 
   return (
@@ -75,7 +78,6 @@ export function OrderReview({
           title={collectionName}
         />
       )}
-      footer={<FooterLogo />}
       bodyStyleOverrides={{
         display: 'flex',
         flexDirection: 'column',
@@ -116,7 +118,6 @@ export function OrderReview({
         loading={loadingBalances}
       />
       <CoinsDrawer
-        theme={theme}
         conversions={conversions}
         balances={fundingBalances}
         onSelect={onSelect}

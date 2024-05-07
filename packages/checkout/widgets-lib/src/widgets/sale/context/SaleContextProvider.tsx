@@ -74,6 +74,8 @@ type SaleContextValues = SaleContextProps & {
   signError: SignOrderError | undefined;
   executeResponse: ExecuteOrderResponse | undefined;
   isPassportWallet: boolean;
+  showCreditCardWarning: boolean;
+  setShowCreditCardWarning: (show: boolean) => void;
   paymentMethod: SalePaymentTypes | undefined;
   setPaymentMethod: (paymentMethod: SalePaymentTypes | undefined) => void;
   goBackToPaymentMethods: (
@@ -114,6 +116,8 @@ const SaleContext = createContext<SaleContextValues>({
   executeResponse: undefined,
   passport: undefined,
   isPassportWallet: false,
+  showCreditCardWarning: false,
+  setShowCreditCardWarning: () => {},
   paymentMethod: undefined,
   setPaymentMethod: () => {},
   goBackToPaymentMethods: () => {},
@@ -170,9 +174,20 @@ export function SaleContextProvider(props: {
     recipientAddress: '',
   });
 
-  const [paymentMethod, setPaymentMethod] = useState<
+  const [showCreditCardWarning, setShowCreditCardWarning] = useState(false);
+  const [paymentMethod, setPaymentMethodState] = useState<
   SalePaymentTypes | undefined
   >(undefined);
+
+  const setPaymentMethod = (type: SalePaymentTypes | undefined) => {
+    if (type === SalePaymentTypes.CREDIT && !showCreditCardWarning) {
+      setShowCreditCardWarning(true);
+      return;
+    }
+
+    setPaymentMethodState(type);
+    setShowCreditCardWarning(false);
+  };
 
   const [fundingRoutes] = useState<FundingRoute[]>([]);
   const [disabledPaymentTypes, setDisabledPaymentTypes] = useState<
@@ -185,15 +200,13 @@ export function SaleContextProvider(props: {
 
   const [invalidParameters, setInvalidParameters] = useState<boolean>(false);
 
-  const {
-    selectedCurrency,
-    clientConfig,
-    clientConfigError,
-  } = useClientConfig({
-    amount,
-    environmentId,
-    environment: config.environment,
-  });
+  const { selectedCurrency, clientConfig, clientConfigError } = useClientConfig(
+    {
+      amount,
+      environmentId,
+      environment: config.environment,
+    },
+  );
 
   const fromTokenAddress = selectedCurrency?.address || '';
 
@@ -396,6 +409,8 @@ export function SaleContextProvider(props: {
       checkout,
       recipientAddress,
       recipientEmail,
+      showCreditCardWarning,
+      setShowCreditCardWarning,
       paymentMethod,
       setPaymentMethod,
       goBackToPaymentMethods,
@@ -429,6 +444,8 @@ export function SaleContextProvider(props: {
       signResponse,
       signError,
       executeResponse,
+      showCreditCardWarning,
+      setShowCreditCardWarning,
       paymentMethod,
       goBackToPaymentMethods,
       goToErrorView,

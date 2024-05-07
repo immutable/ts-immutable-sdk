@@ -464,7 +464,7 @@ describe('Validation', () => {
       );
     });
 
-    it('throws an error when sourceChainId is not a valid chainId', async () => {
+    it('throws an error when depositing and sourceChainId is not the root chainId', async () => {
       expect.assertions(2);
       try {
         validateGetFee(
@@ -478,7 +478,7 @@ describe('Validation', () => {
         );
       } catch (error: any) {
         expect(error).toBeInstanceOf(BridgeError);
-        expect(error.type).toBe(BridgeErrorType.UNSUPPORTED_ERROR);
+        expect(error.type).toBe(BridgeErrorType.INVALID_SOURCE_OR_DESTINATION_CHAIN);
       }
     });
 
@@ -496,7 +496,7 @@ describe('Validation', () => {
         );
       } catch (error: any) {
         expect(error).toBeInstanceOf(BridgeError);
-        expect(error.type).toBe(BridgeErrorType.UNSUPPORTED_ERROR);
+        expect(error.type).toBe(BridgeErrorType.INVALID_SOURCE_OR_DESTINATION_CHAIN);
       }
     });
 
@@ -514,7 +514,7 @@ describe('Validation', () => {
         );
       } catch (error: any) {
         expect(error).toBeInstanceOf(BridgeError);
-        expect(error.type).toBe(BridgeErrorType.UNSUPPORTED_ERROR);
+        expect(error.type).toBe(BridgeErrorType.INVALID_SOURCE_OR_DESTINATION_CHAIN);
       }
     });
 
@@ -530,7 +530,7 @@ describe('Validation', () => {
         );
       } catch (error: any) {
         expect(error).toBeInstanceOf(BridgeError);
-        expect(error.type).toBe(BridgeErrorType.UNSUPPORTED_ERROR);
+        expect(error.type).toBe(BridgeErrorType.INVALID_SOURCE_CHAIN_ID);
       }
     });
 
@@ -548,7 +548,7 @@ describe('Validation', () => {
         );
       } catch (error: any) {
         expect(error).toBeInstanceOf(BridgeError);
-        expect(error.type).toBe(BridgeErrorType.UNSUPPORTED_ERROR);
+        expect(error.type).toBe(BridgeErrorType.INVALID_SOURCE_OR_DESTINATION_CHAIN);
       }
     });
 
@@ -566,7 +566,7 @@ describe('Validation', () => {
         );
       } catch (error: any) {
         expect(error).toBeInstanceOf(BridgeError);
-        expect(error.type).toBe(BridgeErrorType.UNSUPPORTED_ERROR);
+        expect(error.type).toBe(BridgeErrorType.INVALID_SOURCE_OR_DESTINATION_CHAIN);
       }
     });
   });

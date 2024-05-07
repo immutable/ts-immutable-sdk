@@ -4,26 +4,21 @@ import {
 import { SalePaymentTypes } from '@imtbl/checkout-sdk';
 import { CreditCardWarningHero } from 'components/Hero/CreditCardWarningHero';
 import { useTranslation } from 'react-i18next';
+import { useSaleContext } from '../context/SaleContextProvider';
 
-type CreditCardWarningDrawerProps = {
-  visible: boolean;
-  setShowCreditCardWarning: (show: boolean) => void;
-  setPaymentMethod: (type: SalePaymentTypes) => void;
-};
-
-export function CreditCardWarningDrawer({
-  visible,
-  setShowCreditCardWarning,
-  setPaymentMethod,
-}: CreditCardWarningDrawerProps) {
+export function CreditCardWarningDrawer() {
   const { t } = useTranslation();
+  const { showCreditCardWarning, setShowCreditCardWarning, setPaymentMethod } = useSaleContext();
+
+  const handleCtaButtonClick = () => {
+    setPaymentMethod(SalePaymentTypes.CREDIT);
+  };
 
   return (
     <Drawer
       size="threeQuarter"
-      visible={visible}
+      visible={showCreditCardWarning}
       showHeaderBar={false}
-      onCloseDrawer={() => setShowCreditCardWarning(false)}
     >
       <Drawer.Content>
         <ButtCon
@@ -64,7 +59,7 @@ export function CreditCardWarningDrawer({
             testId="credit-card-button"
             variant="primary"
             size="large"
-            onClick={() => setPaymentMethod(SalePaymentTypes.CREDIT)}
+            onClick={handleCtaButtonClick}
           >
             {t('views.PAYMENT_METHODS.creditCardWarningDrawer.ctaButton')}
           </Button>
