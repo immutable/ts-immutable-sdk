@@ -72,18 +72,22 @@ export default class ConfirmationScreen {
             break;
           }
           case ReceiveMessage.TRANSACTION_CONFIRMED: {
+            this.closeWindow();
             resolve({ confirmed: true });
             break;
           }
           case ReceiveMessage.TRANSACTION_ERROR: {
+            this.closeWindow();
             reject(new Error('Error during transaction confirmation'));
             break;
           }
           case ReceiveMessage.TRANSACTION_REJECTED: {
+            this.closeWindow();
             reject(new Error('User rejected transaction'));
             break;
           }
           default:
+            this.closeWindow();
             reject(new Error('Unsupported message type'));
         }
       };
@@ -119,26 +123,26 @@ export default class ConfirmationScreen {
             break;
           }
           case ReceiveMessage.MESSAGE_CONFIRMED: {
+            this.closeWindow();
             resolve({ confirmed: true });
             break;
           }
           case ReceiveMessage.MESSAGE_ERROR: {
+            this.closeWindow();
             reject(new Error('Error during message confirmation'));
             break;
           }
           case ReceiveMessage.MESSAGE_REJECTED: {
+            this.closeWindow();
             reject(new Error('User rejected message'));
             break;
           }
-
           default:
+            this.closeWindow();
             reject(new Error('Unsupported message type'));
         }
       };
-      if (!this.confirmationWindow) {
-        resolve({ confirmed: false });
-        return;
-      }
+
       window.addEventListener('message', messageHandler);
       const href = this.getHref('zkevm/message', { messageID, etherAddress });
       this.showConfirmationScreen(href, messageHandler, resolve);
