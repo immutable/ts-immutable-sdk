@@ -36,7 +36,7 @@ export const formatBridgeFees = (estimates: GasEstimateBridgeToL2Result | undefi
   if (estimates.fees.approvalFee?.gt(0)) {
     const formattedApprovalGas = utils.formatUnits(estimates.fees.approvalFee, estimates.token.decimals);
     fees.push({
-      label: t('drawers.feesBreakdown.fees.gasFeeApproval.label'),
+      label: t('drawers.feesBreakdown.fees.approvalFee.label'),
       fiatAmount: `~ ${t('drawers.feesBreakdown.fees.fiatPricePrefix')}${calculateCryptoToFiat(
         formattedApprovalGas,
         estimates.token.symbol,

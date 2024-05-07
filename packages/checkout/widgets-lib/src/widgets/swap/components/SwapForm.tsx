@@ -46,6 +46,9 @@ import { ConnectLoaderContext } from '../../../context/connect-loader-context/Co
 import useDebounce from '../../../lib/hooks/useDebounce';
 import { CancellablePromise } from '../../../lib/async/cancellablePromise';
 import { isPassportProvider } from '../../../lib/provider';
+import { formatSwapFees } from '../functions/swapFees';
+import { processGasFree } from '../functions/processGasFree';
+import { processSecondaryFees } from '../functions/processSecondaryFees';
 
 enum SwapDirection {
   FROM = 'FROM',
@@ -151,6 +154,10 @@ export function SwapForm({ data, theme }: SwapFromProps) {
   const [gasFeeToken, setGasFeeToken] = useState<TokenInfo | undefined>(undefined);
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
   const [tokensOptionsFrom, setTokensOptionsForm] = useState<CoinSelectorOptionProps[]>([]);
+  const formattedFees = useMemo(
+    (): any => (quote ? formatSwapFees(quote, cryptoFiatState, t) : []),
+    [quote, cryptoFiatState, t],
+  );
 
   // Drawers
   const [showNotEnoughImxDrawer, setShowNotEnoughImxDrawer] = useState(false);
@@ -288,10 +295,13 @@ export function SwapForm({ data, theme }: SwapFromProps) {
       quoteRequest = currentQuoteRequest;
 
       const resolved = await currentQuoteRequest;
-      const quoteResult = resolved[0];
+
+      // Conversion based on 1 unit
       const conversionResult = resolved[1];
       setConversion(conversionResult.quote.amount.value);
 
+      let quoteResult = processGasFree(provider, resolved[0]);
+      quoteResult = processSecondaryFees(fromToken, quoteResult);
       const estimate = quoteResult.swap.gasFeeEstimate;
       let gasFeeTotal = BigNumber.from(estimate?.value || 0);
       if (quoteResult.approval?.gasFeeEstimate) {
@@ -379,9 +389,12 @@ export function SwapForm({ data, theme }: SwapFromProps) {
       quoteRequest = currentQuoteRequest;
       const resolved = await currentQuoteRequest;
 
-      const quoteResult = resolved[0];
+      // Conversion based on 1 unit
       const conversionResult = resolved[1];
       setConversion(conversionResult.quote.amount.value);
+
+      let quoteResult = processGasFree(provider, resolved[0]);
+      quoteResult = processSecondaryFees(fromToken, quoteResult);
 
       const estimate = quoteResult.swap.gasFeeEstimate;
       let gasFeeTotal = BigNumber.from(estimate?.value || 0);
@@ -808,14 +821,7 @@ export function SwapForm({ data, theme }: SwapFromProps) {
           gasFeeFiatValue={gasFeeFiatValue}
           gasFeeToken={gasFeeToken}
           gasFeeValue={gasFeeValue}
-          fees={[
-            {
-              label: t('drawers.feesBreakdown.fees.gasFeeSwap.label'),
-              fiatAmount: `~ ${t('drawers.feesBreakdown.fees.fiatPricePrefix')}${gasFeeFiatValue}`,
-              amount: tokenValueFormat(gasFeeValue),
-              prefix: '~',
-            },
-          ]}
+          fees={formattedFees}
           onFeesClick={() => {
             track({
               userJourney: UserJourney.SWAP,

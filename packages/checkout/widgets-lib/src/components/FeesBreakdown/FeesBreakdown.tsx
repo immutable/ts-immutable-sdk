@@ -3,6 +3,7 @@ import {
 } from '@biom3/react';
 import { formatZeroAmount, tokenValueFormat } from 'lib/utils';
 import { useTranslation } from 'react-i18next';
+import { Token } from '@imtbl/dex-sdk';
 import { feeItemContainerStyles, feeItemLoadingStyles, feesBreakdownContentStyles } from './FeesBreakdownStyles';
 import { FeeItem } from './FeeItem';
 import { FooterLogo } from '../Footer/FooterLogo';
@@ -12,6 +13,7 @@ type Fee = {
   amount: string;
   fiatAmount: string;
   prefix?: string;
+  token: Token;
 };
 
 type FeesBreakdownProps = {
@@ -62,13 +64,14 @@ export function FeesBreakdown({
               amount,
               fiatAmount,
               prefix,
+              token,
             }) => (
               <FeeItem
                 key={label}
                 label={label}
                 amount={amount}
                 fiatAmount={fiatAmount}
-                tokenSymbol={tokenSymbol}
+                tokenSymbol={token.symbol ?? ''}
                 prefix={prefix}
               />
             ))
