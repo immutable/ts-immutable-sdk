@@ -12,7 +12,8 @@
     "passport": "prod",
     "orderbook": "prod",
     "checkout": "prod",
-    "x": "prod"
+    "x": "prod",
+    "webhook": "prod"
   },
   "fileCopy": [
     {

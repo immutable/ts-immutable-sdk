@@ -121,6 +121,10 @@
     "./x": {
       "types": "./dist/x.d.ts",
       "import": "./dist/x.js"
+    },
+    "./webhook": {
+      "types": "./dist/webhook.d.ts",
+      "import": "./dist/webhook.js"
     }
   },
   "files": [
