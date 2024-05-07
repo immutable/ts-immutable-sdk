@@ -3,12 +3,9 @@
  */
 import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
-import { recordMint, processMint, mintingPersistencePg } from '@imtbl/blockchain-data';
+import { blockchainData, config, webhook } from '@imtbl/sdk';
 import { metadata } from './metadata.js';
-import { init } from '@imtbl/webhook';
 import { ethers } from 'ethers';
-import { Environment } from '@imtbl/config';
-
 
 // **** Variables **** //
 
@@ -39,7 +36,7 @@ app.post('/api/mint', async (req, res) => {
       return;
     }
 
-    await recordMint(mintingPersistencePg, {
+    await blockchainData.recordMint(blockchainData.mintingPersistencePg, {
       owner_address: wallet.address,
       asset_id: assetId,
       contract_address: contractAddress,
@@ -55,9 +52,9 @@ app.post('/api/mint', async (req, res) => {
 app.post('/api/process_webhook_event', async (req, res) => {
   console.log('req.body', req.body);
   try {
-    await init(req.body, process.env.IMBTL_ENV as Environment, {
+    await webhook.init(req.body, process.env.IMBTL_ENV as config.Environment, {
       zkevmMintRequestUpdated: async (e) => {
-        await processMint(mintingPersistencePg, e);
+        await blockchainData.processMint(blockchainData.mintingPersistencePg, e);
         // Do something else
       }
     });
