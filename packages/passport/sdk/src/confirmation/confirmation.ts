@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { TransactionApprovalRequestChainTypeEnum } from '@imtbl/guardian';
 import {
   ConfirmationResult,
@@ -8,11 +7,7 @@ import {
 } from './types';
 import { openPopupCenter } from './popup';
 import { PassportConfiguration } from '../config';
-import {
-  getBlockedContents,
-  getOverlay,
-  getRefocusContents,
-} from './overlay';
+import Overlay from './overlay';
 
 const CONFIRMATION_WINDOW_TITLE = 'Confirm this transaction';
 const CONFIRMATION_WINDOW_HEIGHT = 720;
@@ -29,11 +24,9 @@ export default class ConfirmationScreen {
 
   private confirmationWindow: Window | undefined;
 
-  private overlay: HTMLDivElement | undefined;
-
   private popupOptions: { width: number; height: number } | undefined;
 
-  private tryAgainListener: (() => void) | undefined;
+  private overlay: Overlay | undefined;
 
   constructor(config: PassportConfiguration) {
     this.config = config;
@@ -61,35 +54,6 @@ export default class ConfirmationScreen {
     chainType: TransactionApprovalRequestChainTypeEnum,
     chainId?: string,
   ): Promise<ConfirmationResult> {
-    let href = '';
-    if (chainType === TransactionApprovalRequestChainTypeEnum.Starkex) {
-      href = this.getHref('transaction', { transactionId, etherAddress, chainType });
-    } else {
-      href = this.getHref('zkevm/transaction', {
-        transactionID: transactionId, etherAddress, chainType, chainID: chainId,
-      });
-    }
-
-    // If we do not have a reference to the popup then create one
-    if (!this.confirmationWindow) {
-      try {
-        this.confirmationWindow = openPopupCenter({
-          url: href,
-          title: CONFIRMATION_WINDOW_TITLE,
-          width: this.popupOptions?.width || CONFIRMATION_WINDOW_WIDTH,
-          height: this.popupOptions?.height || CONFIRMATION_WINDOW_HEIGHT,
-        });
-      } catch {
-        this.appendOverlay(href, true);
-      }
-    }
-
-    if (this.overlay) {
-      this.updateTryAgainButton(href);
-    } else {
-      this.appendOverlay(href, false);
-    }
-
     return new Promise((resolve, reject) => {
       const messageHandler = ({ data, origin }: MessageEvent) => {
         if (
@@ -124,6 +88,14 @@ export default class ConfirmationScreen {
         }
       };
 
+      let href = '';
+      if (chainType === TransactionApprovalRequestChainTypeEnum.Starkex) {
+        href = this.getHref('transaction', { transactionId, etherAddress, chainType });
+      } else {
+        href = this.getHref('zkevm/transaction', {
+          transactionID: transactionId, etherAddress, chainType, chainID: chainId,
+        });
+      }
       window.addEventListener('message', messageHandler);
       this.showConfirmationScreen(href, messageHandler, resolve);
     });
@@ -174,7 +146,6 @@ export default class ConfirmationScreen {
   }
 
   loading(popupOptions?: { width: number; height: number }) {
-    console.log('loading is called');
     if (this.config.crossSdkBridgeEnabled) {
       // There is no need to open a confirmation window if cross-sdk bridge is enabled
       return;
@@ -190,22 +161,39 @@ export default class ConfirmationScreen {
         width: popupOptions?.width || CONFIRMATION_WINDOW_WIDTH,
         height: popupOptions?.height || CONFIRMATION_WINDOW_HEIGHT,
       });
-      this.appendOverlay(this.getHref('loading'), false);
+      this.overlay = new Overlay(false);
     } catch (e) {
       // The popup is blocked
-      this.appendOverlay(this.getHref('loading'), true);
+      this.overlay = new Overlay(true);
     }
+
+    this.overlay.createOrUpdateOverlay(
+      () => this.recreateConfirmationWindow(this.getHref('loading')),
+      () => this.closeWindow(),
+    );
   }
 
   closeWindow() {
     this.confirmationWindow?.close();
-    this.overlay?.remove();
+    this.confirmationWindow = undefined;
+    this.overlay?.removeOverlay();
+    this.overlay = undefined;
   }
 
   showConfirmationScreen(href: string, messageHandler: MessageHandler, resolve: Function) {
+    // If popup blocked, the confirmation window will not exist
     if (this.confirmationWindow) {
       this.confirmationWindow.location.href = href; // update confirmation window before calling close on old window
     }
+
+    if (!this.overlay) {
+      if (this.confirmationWindow) {
+        this.overlay = new Overlay(false);
+      } else {
+        this.overlay = new Overlay(true);
+      }
+    }
+    this.overlay.createOrUpdateOverlay(() => this.recreateConfirmationWindow(href), () => this.closeWindow());
 
     // https://stackoverflow.com/questions/9388380/capture-the-close-event-of-popup-window-in-javascript/48240128#48240128
     const timer = setInterval(() => {
@@ -217,69 +205,14 @@ export default class ConfirmationScreen {
     }, CONFIRMATION_WINDOW_CLOSED_POLLING_DURATION);
   }
 
-  appendOverlay(href: string, showBlockedContents: boolean) {
-    if (this.overlay) {
-      this.overlay.remove();
-    }
-
-    const overlay = document.createElement('div');
-
-    overlay.innerHTML = getOverlay(
-      showBlockedContents ? getBlockedContents() : getRefocusContents(),
-    );
-
-    document.body.insertAdjacentElement('beforeend', overlay);
-    this.overlay = overlay;
-
-    this.tryAgainListener = () => this.recreateConfirmationWindow(href);
-
-    // This brief timeout ensures the buttons exist before attaching the event listener
-    setTimeout(() => {
-      const tryAgainButton = overlay.querySelector('.passport-overlay-try-again');
-      if (tryAgainButton && this.tryAgainListener) {
-        tryAgainButton.addEventListener('click', this.tryAgainListener);
-      }
-      const closeButton = overlay.querySelector('.passport-overlay-close');
-      if (closeButton) {
-        closeButton.addEventListener('click', () => {
-          this.confirmationWindow?.close();
-          this.overlay?.remove();
-        });
-      }
-    }, 0);
-  }
-
-  updateTryAgainButton(href: string) {
-    const tryAgainButton = this.overlay?.querySelector('.passport-overlay-try-again');
-    if (tryAgainButton && this.tryAgainListener) {
-      tryAgainButton.removeEventListener('click', this.tryAgainListener);
-      this.tryAgainListener = () => this.recreateConfirmationWindow(href);
-      tryAgainButton.addEventListener('click', this.tryAgainListener);
-    }
-  }
-
-  removeOverlay = () => {
-    this.overlay?.remove();
-  };
-
   private recreateConfirmationWindow(href: string) {
     try {
-      /*
-       * Need to obtain a reference to the current this.confirmationWindow to close the window after
-       * recreating the popup. This ensures that the timer that detects the popup close does not
-       * reject the transaction. The purpose of recreating the popup entirely is because the focus()
-       * method is not a reliable way to bring the popup to the front.
-      */
-      const previousWindow = this.confirmationWindow;
       this.confirmationWindow = openPopupCenter({
         url: href,
         title: CONFIRMATION_WINDOW_TITLE,
         width: this.popupOptions?.width || CONFIRMATION_WINDOW_WIDTH,
         height: this.popupOptions?.height || CONFIRMATION_WINDOW_HEIGHT,
       });
-      previousWindow?.close();
-    } catch (e) {
-      this.appendOverlay(href, true);
-    }
+    } catch { /* Empty */ }
   }
 }
