@@ -1,3 +1,4 @@
+import { PASSPORT_OVERLAY_CLOSE, PASSPORT_OVERLAY_TRY_AGAIN } from './constants';
 import { getBlockedOverlay, getRefocusOverlay } from './elements';
 
 export default class Overlay {
@@ -6,6 +7,8 @@ export default class Overlay {
   private isBlockedOverlay: boolean;
 
   private tryAgainListener: (() => void) | undefined;
+
+  private onCloseListener: (() => void) | undefined;
 
   constructor(isBlockedOverlay: boolean = false) {
     this.isBlockedOverlay = isBlockedOverlay;
@@ -30,7 +33,7 @@ export default class Overlay {
   }
 
   private updateTryAgainButton(tryAgainOnClick: () => void) {
-    const tryAgainButton = this.overlay?.querySelector('.passport-overlay-try-again');
+    const tryAgainButton = this.overlay?.querySelector(`.${PASSPORT_OVERLAY_TRY_AGAIN}`);
     if (tryAgainButton) {
       if (this.tryAgainListener) {
         tryAgainButton.removeEventListener('click', this.tryAgainListener);
@@ -41,8 +44,12 @@ export default class Overlay {
   }
 
   private updateCloseButton(onCloseClick: () => void) {
-    const closeButton = this.overlay?.querySelector('.passport-overlay-close');
+    const closeButton = this.overlay?.querySelector(`.${PASSPORT_OVERLAY_CLOSE}`);
     if (closeButton) {
+      if (this.onCloseListener) {
+        closeButton.removeEventListener('click', this.onCloseListener);
+      }
+      this.onCloseListener = onCloseClick;
       closeButton.addEventListener('click', onCloseClick);
     }
   }
