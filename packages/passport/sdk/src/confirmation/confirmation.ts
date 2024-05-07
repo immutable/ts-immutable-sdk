@@ -7,7 +7,7 @@ import {
 } from './types';
 import { openPopupCenter } from './popup';
 import { PassportConfiguration } from '../config';
-import Overlay from './overlay';
+import Overlay from '../overlay/overlay';
 
 const CONFIRMATION_WINDOW_TITLE = 'Confirm this transaction';
 const CONFIRMATION_WINDOW_HEIGHT = 720;

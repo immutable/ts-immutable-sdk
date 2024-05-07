@@ -1,4 +1,4 @@
-import { getBlockedContents, getOverlay, getRefocusContents } from './overlayHtml';
+import { getBlockedOverlay, getRefocusOverlay } from './elements';
 
 export default class Overlay {
   private overlay: HTMLDivElement | undefined;
@@ -24,10 +24,10 @@ export default class Overlay {
     if (!this.overlay) {
       const overlay = document.createElement('div');
 
-      overlay.innerHTML = getOverlay(
-        this.isBlockedOverlay ? getBlockedContents() : getRefocusContents(),
-      );
+      overlay.innerHTML = this.isBlockedOverlay ? getBlockedOverlay() : getRefocusOverlay();
 
+      // TODO: check whether first or last element gets higher priority
+      // https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentElement
       document.body.insertAdjacentElement('beforeend', overlay);
       this.overlay = overlay;
     }
@@ -57,35 +57,3 @@ export default class Overlay {
     }
   }
 }
-
-// appendOverlay(href: string, showBlockedContents: boolean) {
-//   if (this.overlay) {
-//     this.overlay.remove();
-//   }
-
-//   const overlay = document.createElement('div');
-
-//   overlay.innerHTML = getOverlay(
-//     showBlockedContents ? getBlockedContents() : getRefocusContents(),
-//   );
-
-//   document.body.insertAdjacentElement('beforeend', overlay);
-//   this.overlay = overlay;
-
-//   this.tryAgainListener = () => this.recreateConfirmationWindow(href);
-
-//   // This brief timeout ensures the buttons exist before attaching the event listener
-//   setTimeout(() => { // todo: see if needed
-//     const tryAgainButton = overlay.querySelector('.passport-overlay-try-again');
-//     if (tryAgainButton && this.tryAgainListener) {
-//       tryAgainButton.addEventListener('click', this.tryAgainListener);
-//     }
-//     const closeButton = overlay.querySelector('.passport-overlay-close');
-//     if (closeButton) {
-//       closeButton.addEventListener('click', () => {
-//         this.confirmationWindow?.close();
-//         this.overlay?.remove();
-//       });
-//     }
-//   }, 0);
-// }
