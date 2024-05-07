@@ -55,7 +55,10 @@ app.post('/api/process_webhook_event', async (req, res) => {
     await webhook.init(req.body, process.env.IMBTL_ENV as config.Environment, {
       zkevmMintRequestUpdated: async (e) => {
         await blockchainData.processMint(blockchainData.mintingPersistencePg, e);
-        // Do something else
+        // do other things for this event
+      },
+      others: async (e) => {
+        // Do something for other events
       }
     });
     res.send({});

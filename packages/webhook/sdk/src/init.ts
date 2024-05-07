@@ -2,10 +2,6 @@ import MessageValidator from 'sns-validator';
 import { Environment } from '@imtbl/config';
 
 const validator = new MessageValidator();
-const defaultHandlers = {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  zkevmMintRequestUpdated: async (event: any) => { }, // TODO: correct type
-};
 
 const allowedTopicArnPrefix = {
   [Environment.PRODUCTION]: 'arn:aws:sns:us-east-2:362750628221:',
@@ -15,7 +11,10 @@ const allowedTopicArnPrefix = {
 export const init = async (
   body: string | Record<string, unknown>,
   env: Environment,
-  handlers: typeof defaultHandlers = defaultHandlers
+  handlers: {
+    zkevmMintRequestUpdated: (event: any) => Promise<void>;
+    others?: (event: any) => Promise<void>;
+  }
 ) => {
   const msg: any = await new Promise((resolve, reject) => {
     validator.validate(body, (err, message: any) => {
@@ -47,7 +46,9 @@ export const init = async (
         await handlers.zkevmMintRequestUpdated(event);
         break;
       default:
-        console.log('event not handled', event.event_name);
+        if (handlers.others) {
+          await handlers.others(event);
+        }
         break;
     }
   }

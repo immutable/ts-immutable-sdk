@@ -9,7 +9,6 @@
     "@ethersproject/providers": "^5.7.2",
     "@imtbl/config": "0.0.0",
     "@imtbl/generated-clients": "0.0.0",
-    "@imtbl/webhook": "0.0.0",
     "axios": "^1.6.5",
     "ethers": "^5.7.2"
   },
