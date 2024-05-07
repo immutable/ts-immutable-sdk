@@ -31,6 +31,7 @@ import {
   GetTokenAllowListResult,
   TokenInfo,
   BuyToken,
+  ERC721SellToken,
 } from './types';
 import { getAllBalances, getBalance, getERC20Balance } from './balances';
 import { sendTransaction } from './transaction';
@@ -580,9 +581,10 @@ describe('Connect', () => {
     const orders = [
       {
         sellToken: {
+          type: ItemType.ERC721,
           id: '0',
           collectionAddress: '0xERC721',
-        },
+        } as ERC721SellToken,
         buyToken: {
           type: ItemType.NATIVE,
           amount: '10',

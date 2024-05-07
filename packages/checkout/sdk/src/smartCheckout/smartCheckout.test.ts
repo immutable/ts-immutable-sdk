@@ -9,7 +9,7 @@ import {
   RoutingOutcomeType,
   TransactionOrGasType,
 } from '../types';
-import { hasERC20Allowances, hasERC721Allowances } from './allowance';
+import { hasERC20Allowances, hasERC721Allowances, hasERC1155Allowances } from './allowance';
 import { gasCalculator } from './gas';
 import { CheckoutConfiguration } from '../config';
 import { balanceCheck } from './balanceCheck';
@@ -59,6 +59,11 @@ describe('smartCheckout', () => {
       });
 
       (hasERC721Allowances as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        allowances: [],
+      });
+
+      (hasERC1155Allowances as jest.Mock).mockResolvedValue({
         sufficient: true,
         allowances: [],
       });
@@ -258,6 +263,11 @@ describe('smartCheckout', () => {
       });
 
       (hasERC721Allowances as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        allowances: [],
+      });
+
+      (hasERC1155Allowances as jest.Mock).mockResolvedValue({
         sufficient: true,
         allowances: [],
       });
@@ -462,6 +472,11 @@ describe('smartCheckout', () => {
       });
 
       (hasERC721Allowances as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        allowances: [],
+      });
+
+      (hasERC1155Allowances as jest.Mock).mockResolvedValue({
         sufficient: true,
         allowances: [],
       });
@@ -676,6 +691,11 @@ describe('smartCheckout', () => {
       });
 
       (hasERC721Allowances as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        allowances: [],
+      });
+
+      (hasERC1155Allowances as jest.Mock).mockResolvedValue({
         sufficient: true,
         allowances: [],
       });
@@ -900,6 +920,11 @@ describe('smartCheckout', () => {
         allowances: [],
       });
 
+      (hasERC1155Allowances as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        allowances: [],
+      });
+
       (balanceCheck as jest.Mock).mockResolvedValue({
         sufficient: false,
         balanceRequirements: [
@@ -1011,6 +1036,11 @@ describe('smartCheckout', () => {
       });
 
       (hasERC721Allowances as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        allowances: [],
+      });
+
+      (hasERC1155Allowances as jest.Mock).mockResolvedValue({
         sufficient: true,
         allowances: [],
       });
@@ -1204,6 +1234,11 @@ describe('smartCheckout', () => {
       });
 
       (hasERC721Allowances as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        allowances: [],
+      });
+
+      (hasERC1155Allowances as jest.Mock).mockResolvedValue({
         sufficient: true,
         allowances: [],
       });

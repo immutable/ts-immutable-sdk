@@ -92,9 +92,10 @@ export const buy = async (
     waitFulfillmentSettlements: true,
   },
 ): Promise<BuyResult> => {
-  if (orders.length === 0) {
+  // While the function signature supports multiple orders, we only support a single order for now
+  if (orders.length !== 1) {
     throw new CheckoutError(
-      'No orders were provided to the orders array. Please provide at least one order.',
+      'Exactly one order must be provided to the orders array.',
       CheckoutErrorType.FULFILL_ORDER_LISTING_ERROR,
     );
   }
@@ -118,7 +119,7 @@ export const buy = async (
   getAllBalances(config, provider, fulfillerAddress, getL1ChainId(config));
   getAllBalances(config, provider, fulfillerAddress, getL2ChainId(config));
 
-  const { id, takerFees } = orders[0];
+  const { id, takerFees, fillAmount } = orders[0];
 
   let orderChainName: string;
   try {
@@ -139,6 +140,13 @@ export const buy = async (
         error: err,
         orderId: id,
       },
+    );
+  }
+
+  if (order.result.sell[0].type === 'ERC1155' && !fillAmount) {
+    throw new CheckoutError(
+      'A fill amount must be provided when filling an ERC1155 listing.',
+      CheckoutErrorType.FULFILL_ORDER_LISTING_ERROR,
     );
   }
 
@@ -178,7 +186,7 @@ export const buy = async (
     const { actions } = await measureAsyncExecution<FulfillOrderResponse>(
       config,
       'Time to call fulfillOrder from the orderbook',
-      orderbook.fulfillOrder(id, fulfillerAddress, fees),
+      orderbook.fulfillOrder(id, fulfillerAddress, fees, fillAmount),
     );
 
     orderActions = actions;
@@ -255,6 +263,11 @@ export const buy = async (
   feeArray.forEach((item: any) => {
     amount = amount.add(BigNumber.from(item.amount));
   });
+
+  // In the event that the user is filling an ERC1155 listing, the amount required will be scaled by the fill ratio
+  if (order.result.sell[0].type === 'ERC1155' && fillAmount) {
+    amount = amount.mul(BigNumber.from(fillAmount)).div(BigNumber.from(order.result.sell[0].amount));
+  }
 
   const itemRequirements = [
     getItemRequirement(type, contractAddress, amount, spenderAddress),

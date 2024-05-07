@@ -121,7 +121,7 @@ export type {
   SellResultFailed,
   SellResultInsufficientFunds,
   SellResultSuccess,
-  SellToken,
+  ERC721SellToken as SellToken,
   SendTransactionParams,
   SendTransactionResult,
   SmartCheckoutInsufficient,

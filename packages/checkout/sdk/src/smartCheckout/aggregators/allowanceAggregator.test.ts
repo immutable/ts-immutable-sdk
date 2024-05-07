@@ -43,7 +43,11 @@ describe('allowanceAggregator', () => {
         },
       }],
     };
-    const result = allowanceAggregator(erc20Allowances, erc721Allowances);
+    const erc1155Allowances: ItemAllowance = {
+      sufficient: true,
+      allowances: [],
+    };
+    const result = allowanceAggregator(erc20Allowances, erc721Allowances, erc1155Allowances);
     expect(result).toEqual([{
       sufficient: false,
       type: ItemType.ERC20,
@@ -96,7 +100,11 @@ describe('allowanceAggregator', () => {
         },
       ],
     };
-    const result = allowanceAggregator(erc20Allowances, erc721Allowances);
+    const erc1155Allowances: ItemAllowance = {
+      sufficient: true,
+      allowances: [],
+    };
+    const result = allowanceAggregator(erc20Allowances, erc721Allowances, erc1155Allowances);
     expect(result).toEqual([{
       sufficient: false,
       type: ItemType.ERC721,
@@ -140,7 +148,11 @@ describe('allowanceAggregator', () => {
         approvalTransaction: undefined,
       }],
     };
-    const result = allowanceAggregator(erc20Allowances, erc721Allowances);
+    const erc1155Allowances: ItemAllowance = {
+      sufficient: true,
+      allowances: [],
+    };
+    const result = allowanceAggregator(erc20Allowances, erc721Allowances, erc1155Allowances);
     expect(result).toEqual(expect.arrayContaining([
       {
         sufficient: false,
@@ -197,7 +209,11 @@ describe('allowanceAggregator', () => {
         },
       ],
     };
-    const result = allowanceAggregator(erc20Allowances, erc721Allowances);
+    const erc1155Allowances: ItemAllowance = {
+      sufficient: true,
+      allowances: [],
+    };
+    const result = allowanceAggregator(erc20Allowances, erc721Allowances, erc1155Allowances);
     expect(result).toEqual([]);
   });
 });
