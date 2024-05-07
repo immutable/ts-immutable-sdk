@@ -12,7 +12,9 @@ import {
   checkReceiver, validateBridgeReqArgs, validateChainConfiguration, validateChainIds,
   validateGetFee,
 } from 'lib/validation';
-import { getRootIMX } from 'lib/utils';
+import {
+  getAxelarEndpoint, getAxelarGateway, getChildAdaptor, getChildchain, getRootAdaptor, getRootIMX, getTenderlyEndpoint,
+} from 'lib/utils';
 import {
   NATIVE,
   ETHEREUM_NATIVE_TOKEN_ADDRESS,
@@ -21,20 +23,12 @@ import {
   ZKEVM_DEVNET_CHAIN_ID,
   ZKEVM_MAINNET_CHAIN_ID,
   ZKEVM_TESTNET_CHAIN_ID,
-  axelarAPIEndpoints,
-  tenderlyAPIEndpoints,
   axelarChains,
   bridgeMethods,
   childWIMXs,
   WITHDRAW_SIG,
-  childAdaptors,
-  rootAdaptors,
-  childChains,
   SLOT_PREFIX_CONTRACT_CALL_APPROVED,
   SLOT_POS_CONTRACT_CALL_APPROVED,
-  axelarGateways,
-  childETHs,
-  rootIMXs,
 } from './constants/bridges';
 import { ROOT_ERC20_BRIDGE_FLOW_RATE } from './contracts/ABIs/RootERC20BridgeFlowRate';
 import { ERC20 } from './contracts/ABIs/ERC20';
@@ -850,9 +844,9 @@ export class TokenBridge {
     const commandId = keccak256(
       defaultAbiCoder.encode(['bytes', 'uint256'], [payload, new Date().getTime()]),
     );
-    const sourceChain = this.getChildchain(destinationChainId);
-    const sourceAddress = ethers.utils.getAddress(this.getChildAdaptor(destinationChainId)).toString();
-    const destinationAddress = this.getRootAdaptor(destinationChainId);
+    const sourceChain = getChildchain(destinationChainId);
+    const sourceAddress = ethers.utils.getAddress(getChildAdaptor(destinationChainId)).toString();
+    const destinationAddress = getRootAdaptor(destinationChainId);
     const payloadHash = keccak256(payload);
     // Calculate slot key for given command ID.
     const command = defaultAbiCoder.encode(
@@ -874,7 +868,7 @@ export class TokenBridge {
     );
 
     // Build simulation
-    const axelarGateway = this.getAxelarGateway(destinationChainId);
+    const axelarGateway = getAxelarGateway(destinationChainId);
     const simulations = [{
       network_id: destinationChainId,
       estimate_gas: true,
@@ -898,7 +892,7 @@ export class TokenBridge {
 
   private async submitTenderlySimulations(chainId: string, simulations: Array<any>): Promise<Array<number>> {
     let axiosResponse:AxiosResponse;
-    const tenderlyAPI = this.getTenderlyEndpoint(chainId);
+    const tenderlyAPI = getTenderlyEndpoint(chainId);
     try {
       axiosResponse = await axios.post(
         tenderlyAPI,
@@ -1002,126 +996,6 @@ export class TokenBridge {
     return token.toUpperCase() === this.getWrappedIMX(source).toUpperCase();
   }
 
-  private getRootIMX(source: string) {
-    let rootIMX:string;
-    if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
-      || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
-      rootIMX = rootIMXs.mainnet;
-    } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
-      || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
-      rootIMX = rootIMXs.testnet;
-    } else {
-      rootIMX = rootIMXs.devnet;
-    }
-    return rootIMX;
-  }
-
-  private isRootIMX(token: FungibleToken, source: string) {
-    return token.toUpperCase() === this.getRootIMX(source).toUpperCase();
-  }
-
-  private getChildETH(source: string) {
-    let eth:string;
-    if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
-      || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
-      eth = childETHs.mainnet;
-    } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
-      || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
-      eth = childETHs.testnet;
-    } else {
-      eth = childETHs.devnet;
-    }
-    return eth;
-  }
-
-  private isChildETH(token: FungibleToken, source: string) {
-    return token.toUpperCase() === this.getChildETH(source).toUpperCase();
-  }
-
-  private getChildAdaptor(source: string) {
-    let adaptor:string;
-    if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
-      || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
-      adaptor = childAdaptors.mainnet;
-    } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
-      || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
-      adaptor = childAdaptors.testnet;
-    } else {
-      adaptor = childAdaptors.devnet;
-    }
-    return adaptor;
-  }
-
-  private getRootAdaptor(source: string) {
-    let adaptor:string;
-    if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
-      || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
-      adaptor = rootAdaptors.mainnet;
-    } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
-      || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
-      adaptor = rootAdaptors.testnet;
-    } else {
-      adaptor = rootAdaptors.devnet;
-    }
-    return adaptor;
-  }
-
-  private getChildchain(source: string) {
-    let chain:string;
-    if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
-      || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
-      chain = childChains.mainnet;
-    } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
-      || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
-      chain = childChains.testnet;
-    } else {
-      chain = childChains.devnet;
-    }
-    return chain;
-  }
-
-  private getAxelarGateway(source: string) {
-    let gateway:string;
-    if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
-      || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
-      gateway = axelarGateways.mainnet;
-    } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
-      || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
-      gateway = axelarGateways.testnet;
-    } else {
-      gateway = axelarGateways.devnet;
-    }
-    return gateway;
-  }
-
-  private getAxelarEndpoint(source:string) {
-    let axelarAPIEndpoint:string;
-    if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
-      || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
-      axelarAPIEndpoint = axelarAPIEndpoints.mainnet;
-    } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
-      || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
-      axelarAPIEndpoint = axelarAPIEndpoints.testnet;
-    } else {
-      axelarAPIEndpoint = axelarAPIEndpoints.devnet;
-    }
-    return axelarAPIEndpoint;
-  }
-
-  private getTenderlyEndpoint(source:string) {
-    let tenderlyAPIEndpoint:string;
-    if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
-      || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
-      tenderlyAPIEndpoint = tenderlyAPIEndpoints.mainnet;
-    } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
-      || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
-      tenderlyAPIEndpoint = tenderlyAPIEndpoints.testnet;
-    } else {
-      tenderlyAPIEndpoint = tenderlyAPIEndpoints.devnet;
-    }
-    return tenderlyAPIEndpoint;
-  }
-
   /**
  * Query the axelar fee for a transaction using axelarjs-sdk.
  * @param {*} sourceChainId - The source chainId.
@@ -1153,7 +1027,7 @@ export class TokenBridge {
       );
     }
 
-    const axelarAPIEndpoint:string = this.getAxelarEndpoint(sourceChainId);
+    const axelarAPIEndpoint:string = getAxelarEndpoint(sourceChainId);
 
     const estimateGasReq = {
       method: 'estimateGasFee',
@@ -1284,7 +1158,7 @@ export class TokenBridge {
   ): Promise<Array<TxStatusResponseItem>> {
     const txStatusItems:Array<TxStatusResponseItem> = [];
     const statusPromises:Array<Promise<GMPStatusResponse>> = [];
-    const axelarAPIEndpoint:string = this.getAxelarEndpoint(sourceChainId);
+    const axelarAPIEndpoint:string = getAxelarEndpoint(sourceChainId);
     const unpaidGasStatus = [GasPaidStatus.GAS_UNPAID, GasPaidStatus.GAS_PAID_NOT_ENOUGH_GAS];
     const abiCoder = new ethers.utils.AbiCoder();
 
