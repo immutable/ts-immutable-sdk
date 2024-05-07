@@ -24,24 +24,26 @@ app.post('/api/mint', async (req, res) => {
   // FIXME: protect this endpoint with your authentication method.
   // FIXME: replace wallet with your way of retrieving user wallet.
   const wallet = ethers.Wallet.createRandom();
-  // FIXME: The asset
+  // FIXME: Use your own asset id if desired.
   const assetId = uuidv4();
+  const contractAddress = process.env['CONTRACT_ADDRESS'];
+
+  if (!contractAddress) {
+    console.error("contract_address is not set in env");
+    res.status(500).send('internal server error');
+    return;
+  }
 
   try {
-    const contractAddress = process.env['CONTRACT_ADDRESS'];
-
-    if (!contractAddress) {
-      console.error("contract_address is not set in env");
-      res.status(500).send('internal server error');
-      return;
-    }
-
-    await blockchainData.recordMint(blockchainData.mintingPersistencePg, {
-      owner_address: wallet.address,
-      asset_id: assetId,
-      contract_address: contractAddress,
-      metadata
-    });
+    await blockchainData.recordMint(
+      blockchainData.mintingPersistencePg, // use the mintingPersistence for postgres
+      {
+        owner_address: wallet.address,
+        asset_id: assetId,
+        contract_address: contractAddress,
+        metadata
+      }
+    );
     res.send({});
   } catch (e: any) {
     console.error(e);

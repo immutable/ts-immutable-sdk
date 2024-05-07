@@ -184,9 +184,35 @@ export const submitMintingRequests = async <DBClient>(
   }
 };
 
+type MintRequestEvent = {
+  event_name: string;
+  chain: string;
+  event_id: string;
+  data: {
+    chain: {
+      id: string;
+      name: string;
+    },
+    contract_address: string;
+    owner_address: string;
+    reference_id: string;
+    metadata_id: string;
+    token_id: string | null;
+    status: string;
+    transaction_hash: string | null;
+    activity_id: string | null;
+    error: {
+      code: string;
+      message: string;
+    } | null;
+    created_at: string;
+    updated_at: string;
+  }
+};
+
 export const processMint = async <DBClient>(
   mintingPersistence: MintingPersistence<DBClient>,
-  event: any,
+  event: MintRequestEvent,
   logger: Logger = console
 ) => {
   if (event.event_name !== 'imtbl_zkevm_mint_request_updated') {

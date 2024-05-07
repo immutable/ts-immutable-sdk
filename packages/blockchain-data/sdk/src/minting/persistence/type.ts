@@ -17,7 +17,7 @@ export type MintRequest = {
 };
 
 export type SubmittedMintRequest = {
-  tokenId: string;
+  tokenId: string | null;
   status: string;
   assetId: string;
   contractAddress: string;
