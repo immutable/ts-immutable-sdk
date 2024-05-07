@@ -32,8 +32,8 @@
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "peerDependencies": {
-    "pg": "^8.11.5",
-    "@types/pg": "^8.11.5"
+    "@types/pg": "^8.11.5",
+    "pg": "^8.11.5"
   },
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",

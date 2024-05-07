@@ -69,12 +69,12 @@ const getFileBuild = (inputFilename) => [
     plugins: [
       dts({
         respectExternal: true,
-        compilerOptions: {
-          skipLibCheck: true,
-        }
+        // compilerOptions: {
+        //   skipLibCheck: true,
+        // }
       }),
     ],
-    external: ['events'] 
+    external: ['pg'] 
   },
 ];
 

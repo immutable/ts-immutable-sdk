@@ -1,30 +1,8 @@
 {
   "name": "minting-sample-app",
   "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "build": "npx ts-node build.ts",
-    "lint": "eslint ./src --ext .ts,.jsx,.tsx,.js --max-warnings=0",
-    "start": "node -r module-alias/register ./dist --env=production",
-    "dev": "nodemon",
-    "test": "nodemon --config ./spec/nodemon.json",
-    "test:no-reloading": "npx ts-node --files -r tsconfig-paths/register ./spec"
-  },
-  "nodemonConfig": {
-    "watch": [
-      "src"
-    ],
-    "ext": "ts",
-    "ignore": [
-      "src/public"
-    ],
-    "exec": "NODE_OPTIONS=\"--loader ts-node/esm\" ./node_modules/.bin/ts-node --files -r tsconfig-paths/register ./src"
-  },
   "_moduleAliases": {
     "@src": "dist"
-  },
-  "engines": {
-    "node": ">=8.10.0"
   },
   "dependencies": {
     "cookie-parser": "^1.4.6",
@@ -65,5 +43,27 @@
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.4.5"
-  }
+  },
+  "engines": {
+    "node": ">=8.10.0"
+  },
+  "nodemonConfig": {
+    "watch": [
+      "src"
+    ],
+    "ext": "ts",
+    "ignore": [
+      "src/public"
+    ],
+    "exec": "NODE_OPTIONS=\"--loader ts-node/esm\" ./node_modules/.bin/ts-node --files -r tsconfig-paths/register ./src"
+  },
+  "scripts": {
+    "build": "npx ts-node build.ts",
+    "dev": "nodemon",
+    "lint": "eslint ./src --ext .ts,.jsx,.tsx,.js --max-warnings=0",
+    "start": "node -r module-alias/register ./dist --env=production",
+    "test": "nodemon --config ./spec/nodemon.json",
+    "test:no-reloading": "npx ts-node --files -r tsconfig-paths/register ./spec"
+  },
+  "type": "module"
 }

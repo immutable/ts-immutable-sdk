@@ -26,9 +26,6 @@ const updateVersion = (map, dependency, version) => {
 
   const existingVersion = map.get(dependency);
 
-
-  console.log(dependency, existingVersion, version);
-
   if (
     !existingVersion ||
     semver.gt(parseVersion(version), parseVersion(existingVersion))
