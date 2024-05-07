@@ -3536,7 +3536,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/config@0.0.0, @imtbl/config@workspace:packages/config":
+"@imtbl/config@0.0.0, @imtbl/config@^0.0.0, @imtbl/config@workspace:packages/config":
   version: 0.0.0-use.local
   resolution: "@imtbl/config@workspace:packages/config"
   dependencies:
@@ -3956,6 +3956,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/webhook@workspace:packages/webhook/sdk"
   dependencies:
+    "@imtbl/config": ^0.0.0
     "@rollup/plugin-typescript": ^11.0.0
     "@swc/core": ^1.3.36
     "@swc/jest": ^0.2.24
