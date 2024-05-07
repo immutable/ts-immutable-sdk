@@ -23,11 +23,7 @@ export default class Overlay {
   private appendOverlay() {
     if (!this.overlay) {
       const overlay = document.createElement('div');
-
       overlay.innerHTML = this.isBlockedOverlay ? getBlockedOverlay() : getRefocusOverlay();
-
-      // TODO: check whether first or last element gets higher priority
-      // https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentElement
       document.body.insertAdjacentElement('beforeend', overlay);
       this.overlay = overlay;
     }
