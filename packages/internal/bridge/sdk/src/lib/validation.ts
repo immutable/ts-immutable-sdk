@@ -1,5 +1,7 @@
 import { ethers } from 'ethers';
-import { BridgeBundledTxRequest, FungibleToken } from 'types';
+import {
+  BridgeBundledTxRequest, BridgeFeeActions, BridgeFeeRequest, FungibleToken,
+} from 'types';
 import { NATIVE } from 'constants/bridges';
 import { BridgeConfiguration } from '../config';
 import { BridgeError, BridgeErrorType, withBridgeError } from '../errors';
@@ -146,6 +148,43 @@ export async function validateBridgeReqArgs(
     throw new BridgeError(
       `token address ${req.token} is not a valid address`,
       BridgeErrorType.INVALID_ADDRESS,
+    );
+  }
+}
+
+export function validateGetFee(req: BridgeFeeRequest, config: BridgeConfiguration) {
+  if (
+    req.action === BridgeFeeActions.DEPOSIT
+    && (
+      req.sourceChainId !== config.bridgeInstance.rootChainID
+    || req.destinationChainId !== config.bridgeInstance.childChainID
+    )
+  ) {
+    throw new BridgeError(
+      `Deposit must be from the root chain (${config.bridgeInstance.rootChainID}) to the child chain (${config.bridgeInstance.childChainID})`,
+      BridgeErrorType.INVALID_SOURCE_OR_DESTINATION_CHAIN,
+    );
+  }
+
+  if (
+    req.action === BridgeFeeActions.WITHDRAW
+    && (
+      req.sourceChainId !== config.bridgeInstance.childChainID
+    || req.destinationChainId !== config.bridgeInstance.rootChainID
+    )
+  ) {
+    throw new BridgeError(
+      `Withdraw must be from the child chain (${config.bridgeInstance.childChainID}) to the root chain (${config.bridgeInstance.rootChainID})`,
+      BridgeErrorType.INVALID_SOURCE_OR_DESTINATION_CHAIN,
+    );
+  }
+
+  // TODO doesn't it make sense that the source chain would be on the child chain?
+  if (req.action === BridgeFeeActions.FINALISE_WITHDRAWAL
+    && req.sourceChainId !== config.bridgeInstance.rootChainID) {
+    throw new BridgeError(
+      `Finalised withdrawals must be on the root chain (${config.bridgeInstance.rootChainID})`,
+      BridgeErrorType.INVALID_SOURCE_CHAIN_ID,
     );
   }
 }
