@@ -14,13 +14,20 @@ export default class Overlay {
     this.isBlockedOverlay = isBlockedOverlay;
   }
 
-  createOrUpdateOverlay(
-    tryAgainOnClick: () => void,
-    onCloseClick: () => void,
-  ) {
+  append(tryAgainOnClick: () => void, onCloseClick: () => void) {
     this.appendOverlay();
     this.updateTryAgainButton(tryAgainOnClick);
     this.updateCloseButton(onCloseClick);
+  }
+
+  update(tryAgainOnClick: () => void) {
+    this.updateTryAgainButton(tryAgainOnClick);
+  }
+
+  remove() {
+    if (this.overlay) {
+      this.overlay.remove();
+    }
   }
 
   private appendOverlay() {
@@ -51,12 +58,6 @@ export default class Overlay {
       }
       this.onCloseListener = onCloseClick;
       closeButton.addEventListener('click', onCloseClick);
-    }
-  }
-
-  removeOverlay() {
-    if (this.overlay) {
-      this.overlay.remove();
     }
   }
 }

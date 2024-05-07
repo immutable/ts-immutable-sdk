@@ -171,7 +171,7 @@ export default class ConfirmationScreen {
       this.overlay = new Overlay(true);
     }
 
-    this.overlay.createOrUpdateOverlay(
+    this.overlay.append(
       () => this.recreateConfirmationWindow(this.getHref('loading')),
       () => this.closeWindow(),
     );
@@ -179,7 +179,7 @@ export default class ConfirmationScreen {
 
   closeWindow() {
     this.confirmationWindow?.close();
-    this.overlay?.removeOverlay();
+    this.overlay?.remove();
     this.overlay = undefined;
   }
 
@@ -195,7 +195,7 @@ export default class ConfirmationScreen {
       return;
     }
 
-    this.overlay.createOrUpdateOverlay(() => this.recreateConfirmationWindow(href), () => this.closeWindow());
+    this.overlay.update(() => this.recreateConfirmationWindow(href));
 
     // https://stackoverflow.com/questions/9388380/capture-the-close-event-of-popup-window-in-javascript/48240128#48240128
     const timer = setInterval(() => {
