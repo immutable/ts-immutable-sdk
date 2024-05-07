@@ -7,7 +7,7 @@ export default class Overlay {
 
   private tryAgainListener: (() => void) | undefined;
 
-  constructor(isBlockedOverlay: boolean) {
+  constructor(isBlockedOverlay: boolean = false) {
     this.isBlockedOverlay = isBlockedOverlay;
   }
 
