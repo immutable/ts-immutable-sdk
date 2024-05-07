@@ -14,6 +14,7 @@ import {
 } from 'lib/validation';
 import { getRootIMX } from 'lib/utils';
 import { TenderlySimulation } from 'types/tenderly';
+import { calculateGasFee } from 'lib/gas';
 import {
   NATIVE,
   ETHEREUM_NATIVE_TOKEN_ADDRESS,
@@ -41,13 +42,11 @@ import { ROOT_ERC20_BRIDGE_FLOW_RATE } from './contracts/ABIs/RootERC20BridgeFlo
 import { ERC20 } from './contracts/ABIs/ERC20';
 import { BridgeError, BridgeErrorType, withBridgeError } from './errors';
 import { CHILD_ERC20_BRIDGE } from './contracts/ABIs/ChildERC20Bridge';
-import { getGasPriceInWei } from './lib/gasPriceInWei';
 import { BridgeConfiguration } from './config';
 import {
   BridgeFeeRequest,
   BridgeFeeResponse,
   BridgeMethodsGasLimit,
-  FeeData,
   BridgeTxRequest,
   BridgeFeeActions,
   ApproveBridgeRequest,
@@ -183,24 +182,24 @@ export class TokenBridge {
     // Get approval fee
     if ('token' in req && req.token.toUpperCase() !== NATIVE) {
       if (req.sourceChainId === this.config.bridgeInstance.rootChainID) {
-        approvalFee = this.calculateGasFee(feeData, BridgeMethodsGasLimit.APPROVE_TOKEN);
+        approvalFee = calculateGasFee(feeData, BridgeMethodsGasLimit.APPROVE_TOKEN);
       } else if (req.sourceChainId === this.config.bridgeInstance.childChainID
         && this.isWrappedIMX(req.token, this.config.bridgeInstance.childChainID)) {
         // On child chain, only WIMX requires approval.
-        approvalFee = this.calculateGasFee(feeData, BridgeMethodsGasLimit.APPROVE_TOKEN);
+        approvalFee = calculateGasFee(feeData, BridgeMethodsGasLimit.APPROVE_TOKEN);
       }
     }
 
     // Get source fee & bridge fee
     if (req.action === BridgeFeeActions.FINALISE_WITHDRAWAL) {
-      sourceChainFee = this.calculateGasFee(feeData, BridgeMethodsGasLimit.FINALISE_WITHDRAWAL);
+      sourceChainFee = calculateGasFee(feeData, BridgeMethodsGasLimit.FINALISE_WITHDRAWAL);
     } else {
       let axelarGasLimit;
       if (req.action === 'DEPOSIT') {
-        sourceChainFee = this.calculateGasFee(feeData, BridgeMethodsGasLimit.DEPOSIT_SOURCE);
+        sourceChainFee = calculateGasFee(feeData, BridgeMethodsGasLimit.DEPOSIT_SOURCE);
         axelarGasLimit = BridgeMethodsGasLimit.DEPOSIT_DESTINATION;
       } else {
-        sourceChainFee = this.calculateGasFee(feeData, BridgeMethodsGasLimit.WITHDRAW_SOURCE);
+        sourceChainFee = calculateGasFee(feeData, BridgeMethodsGasLimit.WITHDRAW_SOURCE);
         axelarGasLimit = BridgeMethodsGasLimit.WITHDRAW_DESTINATION;
       }
       // Get bridge fee
@@ -221,15 +220,6 @@ export class TokenBridge {
       imtblFee,
       totalFees,
     };
-  }
-
-  private calculateGasFee(
-    feeData: FeeData,
-    gasLimit: number,
-  ): ethers.BigNumber {
-    const gasPriceInWei = getGasPriceInWei(feeData);
-    if (!gasPriceInWei) return ethers.BigNumber.from(0);
-    return gasPriceInWei.mul(gasLimit);
   }
 
   /**
@@ -622,7 +612,7 @@ export class TokenBridge {
         from: sender,
         chainId: parseInt(this.config.bridgeInstance.rootChainID, 10),
       };
-      approvalFee = this.calculateGasFee(feeData, rootGas.approvalGas);
+      approvalFee = calculateGasFee(feeData, rootGas.approvalGas);
     } else {
       contractToApprove = null;
       unsignedApprovalTx = null;
@@ -645,7 +635,7 @@ export class TokenBridge {
       from: sender,
       chainId: parseInt(this.config.bridgeInstance.rootChainID, 10),
     };
-    sourceChainFee = this.calculateGasFee(feeData, rootGas.sourceChainGas);
+    sourceChainFee = calculateGasFee(feeData, rootGas.sourceChainGas);
 
     const totalFees: ethers.BigNumber = sourceChainFee.add(approvalFee).add(bridgeFee).add(imtblFee);
 
@@ -715,7 +705,7 @@ export class TokenBridge {
         from: sender,
         chainId: parseInt(this.config.bridgeInstance.childChainID, 10),
       };
-      approvalFee = this.calculateGasFee(feeData, BridgeMethodsGasLimit.APPROVE_TOKEN);
+      approvalFee = calculateGasFee(feeData, BridgeMethodsGasLimit.APPROVE_TOKEN);
     } else {
       contractToApprove = null;
       unsignedApprovalTx = null;
@@ -738,7 +728,7 @@ export class TokenBridge {
       from: sender,
       chainId: parseInt(this.config.bridgeInstance.rootChainID, 10),
     };
-    sourceChainFee = this.calculateGasFee(feeData, BridgeMethodsGasLimit.WITHDRAW_SOURCE);
+    sourceChainFee = calculateGasFee(feeData, BridgeMethodsGasLimit.WITHDRAW_SOURCE);
 
     const totalFees: ethers.BigNumber = sourceChainFee.add(approvalFee).add(bridgeFee).add(imtblFee);
 
