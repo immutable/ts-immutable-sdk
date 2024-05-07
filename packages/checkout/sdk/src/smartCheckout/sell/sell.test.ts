@@ -17,7 +17,7 @@ import { createOrderbookInstance } from '../../instance';
 import { CheckoutErrorType } from '../../errors';
 import {
   getUnsignedMessage,
-  getUnsignedERC721Transactions,
+  getUnsignedSellTransactions,
   signApprovalTransactions,
   signMessage,
 } from '../actions';
@@ -135,7 +135,7 @@ describe('sell', () => {
         orderComponents: {},
         signedMessage: '0xSIGNED',
       });
-      (getUnsignedERC721Transactions as jest.Mock).mockResolvedValue({
+      (getUnsignedSellTransactions as jest.Mock).mockResolvedValue({
         approvalTransactions: [{ from: '0xAPPROVAL' }],
       });
       (signApprovalTransactions as jest.Mock).mockResolvedValue({
@@ -145,6 +145,7 @@ describe('sell', () => {
       const orderExpiry = new Date('2022-03-25');
       const order: SellOrder = {
         sellToken: {
+          type: ItemType.ERC721,
           id,
           collectionAddress: contractAddress,
         },
@@ -304,13 +305,14 @@ describe('sell', () => {
         orderComponents: {},
         signedMessage: '0xSIGNED',
       });
-      (getUnsignedERC721Transactions as jest.Mock).mockResolvedValue({
+      (getUnsignedSellTransactions as jest.Mock).mockResolvedValue({
         approvalTransactions: [{ from: '0xAPPROVAL' }],
       });
       (signApprovalTransactions as jest.Mock).mockResolvedValue({});
 
       const orders:Array<SellOrder> = [{
         sellToken: {
+          type: ItemType.ERC721,
           id,
           collectionAddress: contractAddress,
         },
@@ -426,7 +428,7 @@ describe('sell', () => {
           },
         },
       );
-      (getUnsignedERC721Transactions as jest.Mock).mockResolvedValue({
+      (getUnsignedSellTransactions as jest.Mock).mockResolvedValue({
         approvalTransactions: [{ from: '0xAPPROVAL' }],
       });
       (signApprovalTransactions as jest.Mock).mockResolvedValue({
@@ -437,6 +439,7 @@ describe('sell', () => {
 
       const orders:Array<SellOrder> = [{
         sellToken: {
+          type: ItemType.ERC721,
           id,
           collectionAddress: contractAddress,
         },
@@ -504,6 +507,7 @@ describe('sell', () => {
       try {
         const orders:Array<SellOrder> = [{
           sellToken: {
+            type: ItemType.ERC721,
             id,
             collectionAddress: contractAddress,
           },
@@ -573,6 +577,7 @@ describe('sell', () => {
       try {
         const orders:Array<SellOrder> = [{
           sellToken: {
+            type: ItemType.ERC721,
             id,
             collectionAddress: contractAddress,
           },
@@ -670,7 +675,7 @@ describe('sell', () => {
       };
       (getUnsignedMessage as jest.Mock).mockReturnValue(unsignedMessage);
       (signMessage as jest.Mock).mockRejectedValue(new Error('error from sign message'));
-      (getUnsignedERC721Transactions as jest.Mock).mockResolvedValue({
+      (getUnsignedSellTransactions as jest.Mock).mockResolvedValue({
         approvalTransactions: [{ from: '0xAPPROVAL' }],
       });
       (signApprovalTransactions as jest.Mock).mockResolvedValue({
@@ -679,6 +684,7 @@ describe('sell', () => {
 
       const orders:Array<SellOrder> = [{
         sellToken: {
+          type: ItemType.ERC721,
           id,
           collectionAddress: contractAddress,
         },
@@ -766,11 +772,12 @@ describe('sell', () => {
       });
       (getUnsignedMessage as jest.Mock).mockReturnValue({});
       (signMessage as jest.Mock).mockResolvedValue({});
-      (getUnsignedERC721Transactions as jest.Mock).mockRejectedValue(new Error('error from get unsigned transactions'));
+      (getUnsignedSellTransactions as jest.Mock).mockRejectedValue(new Error('error from get unsigned transactions'));
       (signApprovalTransactions as jest.Mock).mockResolvedValue({});
 
       const orders:Array<SellOrder> = [{
         sellToken: {
+          type: ItemType.ERC721,
           id,
           collectionAddress: contractAddress,
         },
@@ -793,7 +800,7 @@ describe('sell', () => {
       ).rejects.toThrowError('error from get unsigned transactions');
 
       expect(smartCheckout).toBeCalledTimes(1);
-      expect(getUnsignedERC721Transactions).toBeCalledTimes(1);
+      expect(getUnsignedSellTransactions).toBeCalledTimes(1);
       expect(signMessage).toBeCalledTimes(0);
       expect(signApprovalTransactions).toBeCalledTimes(0);
       expect(mockCreateListing).toBeCalledTimes(0);
@@ -854,13 +861,14 @@ describe('sell', () => {
       });
       (getUnsignedMessage as jest.Mock).mockReturnValue({});
       (signMessage as jest.Mock).mockResolvedValue({});
-      (getUnsignedERC721Transactions as jest.Mock).mockResolvedValue({
+      (getUnsignedSellTransactions as jest.Mock).mockResolvedValue({
         approvalTransactions: [{ from: '0xAPPROVAL' }],
       });
       (signApprovalTransactions as jest.Mock).mockRejectedValue(new Error('error from sign approval transactions'));
 
       const orders:Array<SellOrder> = [{
         sellToken: {
+          type: ItemType.ERC721,
           id,
           collectionAddress: contractAddress,
         },
@@ -884,7 +892,7 @@ describe('sell', () => {
 
       expect(smartCheckout).toBeCalledTimes(1);
       expect(signApprovalTransactions).toBeCalledTimes(1);
-      expect(getUnsignedERC721Transactions).toBeCalledTimes(1);
+      expect(getUnsignedSellTransactions).toBeCalledTimes(1);
       expect(signMessage).toBeCalledTimes(0);
       expect(mockCreateListing).toBeCalledTimes(0);
     });
@@ -934,7 +942,7 @@ describe('sell', () => {
       });
       (getUnsignedMessage as jest.Mock).mockReturnValue(undefined);
       (signMessage as jest.Mock).mockResolvedValue({});
-      (getUnsignedERC721Transactions as jest.Mock).mockResolvedValue({});
+      (getUnsignedSellTransactions as jest.Mock).mockResolvedValue({});
       (signApprovalTransactions as jest.Mock).mockResolvedValue({
         type: SignTransactionStatusType.SUCCESS,
       });
@@ -945,6 +953,7 @@ describe('sell', () => {
 
       const orders:Array<SellOrder> = [{
         sellToken: {
+          type: ItemType.ERC721,
           id,
           collectionAddress: contractAddress,
         },
@@ -1052,7 +1061,7 @@ describe('sell', () => {
         orderComponents: {},
         signedMessage: '0xSIGNED',
       });
-      (getUnsignedERC721Transactions as jest.Mock).mockResolvedValue({
+      (getUnsignedSellTransactions as jest.Mock).mockResolvedValue({
         approvalTransactions: [{ from: '0xAPPROVAL' }],
       });
       (signApprovalTransactions as jest.Mock).mockResolvedValue({});
@@ -1063,6 +1072,7 @@ describe('sell', () => {
 
       const orders:Array<SellOrder> = [{
         sellToken: {
+          type: ItemType.ERC721,
           id: collectionId,
           collectionAddress: contractAddress,
         },

@@ -17,7 +17,7 @@ import {
 import { smartCheckout } from '..';
 import {
   getUnsignedERC20ApprovalTransactions,
-  getUnsignedERC721Transactions,
+  getUnsignedSellTransactions,
   getUnsignedFulfillmentTransactions,
   signApprovalTransactions,
   signFulfillmentTransactions,
@@ -916,7 +916,7 @@ describe('buy', () => {
           ],
         }),
       });
-      (getUnsignedERC721Transactions as jest.Mock).mockResolvedValue({
+      (getUnsignedSellTransactions as jest.Mock).mockResolvedValue({
         approvalTransactions: [{ from: '0xAPPROVAL' }],
         fulfillmentTransactions: [{ from: '0xTRANSACTION' }],
       });
@@ -1021,7 +1021,7 @@ describe('buy', () => {
           ],
         }),
       });
-      (getUnsignedERC721Transactions as jest.Mock).mockResolvedValue({
+      (getUnsignedSellTransactions as jest.Mock).mockResolvedValue({
         approvalTransactions: [{ from: '0xAPPROVAL' }],
         fulfillmentTransactions: [{ from: '0xTRANSACTION' }],
       });
@@ -1137,7 +1137,7 @@ describe('buy', () => {
           ],
         }),
       });
-      (getUnsignedERC721Transactions as jest.Mock).mockResolvedValue({
+      (getUnsignedSellTransactions as jest.Mock).mockResolvedValue({
         approvalTransactions: [{ from: '0xAPPROVAL' }],
         fulfillmentTransactions: [{ from: '0xTRANSACTION' }],
       });
@@ -1426,33 +1426,6 @@ describe('buy', () => {
         name: 'multiple taker fees applies only the first',
         orders: [{
           id: '1',
-          takerFees: [
-            { amount: { token: '0.1' }, recipient: '0xFEERECIPIENT' },
-            { amount: { token: '0.1' }, recipient: '0xFEERECIPIENT' },
-          ] as OrderFee[],
-        }],
-        expectedTakerFee: [
-          {
-            recipientAddress: '0xFEERECIPIENT',
-            amount: '100000000000000000',
-          },
-          {
-            recipientAddress: '0xFEERECIPIENT',
-            amount: '100000000000000000',
-          },
-        ],
-      },
-      {
-        name: 'multiple orders and multiple taker fees applies only the first taker fee to first order',
-        orders: [{
-          id: '1',
-          takerFees: [
-            { amount: { token: '0.1' }, recipient: '0xFEERECIPIENT' },
-            { amount: { token: '0.1' }, recipient: '0xFEERECIPIENT' },
-          ] as OrderFee[],
-        },
-        {
-          id: '2',
           takerFees: [
             { amount: { token: '0.1' }, recipient: '0xFEERECIPIENT' },
             { amount: { token: '0.1' }, recipient: '0xFEERECIPIENT' },

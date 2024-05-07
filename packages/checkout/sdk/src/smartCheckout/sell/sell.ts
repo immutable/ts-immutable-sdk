@@ -10,6 +10,7 @@ import {
 import { BigNumber, Contract, utils } from 'ethers';
 import {
   ERC721Item,
+  ERC1155Item,
   GasTokenType,
   ItemType,
   TransactionOrGasType,
@@ -25,7 +26,7 @@ import { CheckoutConfiguration } from '../../config';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { smartCheckout } from '../smartCheckout';
 import {
-  getUnsignedERC721Transactions,
+  getUnsignedSellTransactions,
   getUnsignedMessage,
   signApprovalTransactions,
   signMessage,
@@ -44,6 +45,19 @@ export const getERC721Requirement = (
   id,
   contractAddress,
   spenderAddress,
+});
+
+export const getERC1155Requirement = (
+  id: string,
+  contractAddress: string,
+  spenderAddress: string,
+  amount: string,
+): ERC1155Item => ({
+  type: ItemType.ERC1155,
+  id,
+  contractAddress,
+  spenderAddress,
+  amount,
 });
 
 export const getBuyToken = (
@@ -75,9 +89,10 @@ export const sell = async (
   let listing: PrepareListingResponse;
   let spenderAddress = '';
 
-  if (orders.length === 0) {
+  // While the function signature supports multiple orders, we only support a single order for now
+  if (orders.length !== 1) {
     throw new CheckoutError(
-      'No orders were provided to the orders array. Please provide at least one order.',
+      'Exactly 1 order must be provided in the orders array.',
       CheckoutErrorType.PREPARE_ORDER_LISTING_ERROR,
     );
   }
@@ -123,9 +138,10 @@ export const sell = async (
         makerAddress: walletAddress,
         buy: buyTokenOrNative,
         sell: {
-          type: ItemType.ERC721,
+          type: sellToken.type,
           contractAddress: sellToken.collectionAddress,
           tokenId: sellToken.id,
+          amount: sellToken.type === 'ERC1155' ? sellToken.amount : '',
         },
         orderExpiry,
       }),
@@ -143,7 +159,9 @@ export const sell = async (
   }
 
   const itemRequirements = [
-    getERC721Requirement(sellToken.id, sellToken.collectionAddress, spenderAddress),
+    sellToken.type === ItemType.ERC721
+      ? getERC721Requirement(sellToken.id, sellToken.collectionAddress, spenderAddress)
+      : getERC1155Requirement(sellToken.id, sellToken.collectionAddress, spenderAddress, sellToken.amount),
   ];
 
   let smartCheckoutResult;
@@ -170,7 +188,7 @@ export const sell = async (
   }
 
   if (smartCheckoutResult.sufficient) {
-    const unsignedTransactions = await getUnsignedERC721Transactions(listing.actions);
+    const unsignedTransactions = await getUnsignedSellTransactions(listing.actions);
     const approvalResult = await signApprovalTransactions(provider, unsignedTransactions.approvalTransactions);
     if (approvalResult.type === SignTransactionStatusType.FAILED) {
       return {
