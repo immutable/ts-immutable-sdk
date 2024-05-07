@@ -14,8 +14,5 @@ export function sendProviderUpdatedEvent(
       },
     },
   );
-  // TODO: please remove or if necessary keep the eslint ignore
-  // eslint-disable-next-line no-console
-  console.log('provider updated event:', providerUpdatedEvent);
   if (window !== undefined) window.dispatchEvent(providerUpdatedEvent);
 }

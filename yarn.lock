@@ -2236,9 +2236,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.22.2":
-  version: 0.22.2
-  resolution: "@biom3/react@npm:0.22.2"
+"@biom3/react@npm:^0.22.8":
+  version: 0.22.8
+  resolution: "@biom3/react@npm:0.22.8"
   dependencies:
     "@biom3/design-tokens": ~0.3.7
     buffer: ^6.0.3
@@ -2257,7 +2257,7 @@ __metadata:
     framer-motion: ^10.12.12
     react: ^18.2.0
     react-dom: ^18.2.0
-  checksum: dce78bd23583810f0312aa93977da45ba40b09ca1efdbe0321ab197dbfefc885317238ecf9d576bb14b993cbf37f6de8010df370bf02e11b9850d3e7a9770459
+  checksum: 15c61ea9aee059ee7785ebd95090e57b25411e580c2003a0424025ca783961359fa3173678c50470e9f2abc9ad45009a173c37c7d81805deb8d8226e735bc5de
   languageName: node
   linkType: hard
 
@@ -3371,7 +3371,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-sdk-sample-app@workspace:packages/checkout/sdk-sample-app"
   dependencies:
-    "@biom3/react": ^0.22.2
+    "@biom3/react": ^0.22.8
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
@@ -3447,7 +3447,7 @@ __metadata:
   resolution: "@imtbl/checkout-widgets-sample-app@workspace:packages/checkout/widgets-sample-app"
   dependencies:
     "@biom3/design-tokens": ^0.3.7
-    "@biom3/react": ^0.22.2
+    "@biom3/react": ^0.22.8
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
@@ -3477,7 +3477,7 @@ __metadata:
   resolution: "@imtbl/checkout-widgets@workspace:packages/checkout/widgets-lib"
   dependencies:
     "@biom3/design-tokens": ^0.3.7
-    "@biom3/react": ^0.22.2
+    "@biom3/react": ^0.22.8
     "@ethersproject/providers": ^5.7.2
     "@imtbl/bridge-sdk": 0.0.0
     "@imtbl/checkout-sdk": 0.0.0
@@ -3722,7 +3722,7 @@ __metadata:
   resolution: "@imtbl/passport-sdk-sample-app@workspace:packages/passport/sdk-sample-app"
   dependencies:
     "@biom3/design-tokens": ^0.3.7
-    "@biom3/react": ^0.22.2
+    "@biom3/react": ^0.22.8
     "@imtbl/config": 0.0.0
     "@imtbl/passport": 0.0.0
     "@imtbl/x-client": 0.0.0
@@ -3814,7 +3814,7 @@ __metadata:
     "@babel/plugin-transform-class-properties": ^7.24.1
     "@babel/plugin-transform-private-methods": ^7.24.1
     "@biom3/design-tokens": ^0.3.7
-    "@biom3/react": ^0.22.2
+    "@biom3/react": ^0.22.8
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
     "@ethersproject/keccak256": ^5.7.0
@@ -29848,7 +29848,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "x-provider-sample-app@workspace:packages/x-provider/src/sample-app"
   dependencies:
-    "@biom3/react": ^0.22.2
+    "@biom3/react": ^0.22.8
     "@imtbl/sdk": 0.0.0
     "@svgr/webpack": ^8.0.1
     "@testing-library/jest-dom": ^5.16.5

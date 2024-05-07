@@ -1,3 +1,5 @@
+import { TokenInfo } from '../../../types';
+
 /**
  * Enum representing possible Sale Widget event types.
  */
@@ -12,6 +14,7 @@ export enum SaleEventType {
   REQUEST_BRIDGE = 'request-bridge',
   REQUEST_ONRAMP = 'request-onramp',
   REQUEST_SWAP = 'request-swap',
+  PAYMENT_TOKEN = 'payment-token',
 }
 
 /**
@@ -77,6 +80,23 @@ export type SaleTransactionSuccess = {
 export type SalePaymentMethod = {
   /** Chosen payment method */
   paymentMethod: SalePaymentTypes | undefined;
+};
+
+/**
+ * Type representing a Sale Widget with type PAYMENT_TOKEN.
+ * @property {Object} transactions
+ */
+export type SalePaymentToken = {
+  /** Chosen payment token */
+  type: string;
+  token: TokenInfo;
+  amount: string;
+  balance: string;
+  fiat: {
+    amount: string;
+    balance: string;
+    symbol: string;
+  }
 };
 
 /**
