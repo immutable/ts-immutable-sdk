@@ -50,6 +50,7 @@ const PASSPORT_FUNCTIONS = {
     sendTransaction: 'zkEvmSendTransaction',
     requestAccounts: 'zkEvmRequestAccounts',
     getBalance: 'zkEvmGetBalance',
+    getTransactionReceipt: 'zkEvmGetTransactionReceipt',
   },
 };
 
@@ -576,6 +577,25 @@ window.callFunction = async (jsonData: string) => {
           requestId,
           success: true,
           result,
+        });
+        break;
+      }
+      case PASSPORT_FUNCTIONS.zkEvm.getTransactionReceipt: {
+        const request = JSON.parse(data);
+        const response = await getZkEvmProvider().request({
+          method: 'eth_getTransactionReceipt',
+          params: [request.txHash],
+        });
+        track(moduleName, 'performedZkevmGetTransactionReceipt', {
+          timeMs: Date.now() - markStart,
+        });
+        callbackToGame({
+          ...{
+            responseFor: fxName,
+            requestId,
+            success: true,
+          },
+          ...response,
         });
         break;
       }

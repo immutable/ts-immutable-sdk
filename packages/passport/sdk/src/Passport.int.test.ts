@@ -25,6 +25,10 @@ jest.mock('magic-sdk');
 jest.mock('oidc-client-ts');
 jest.mock('@imtbl/x-client');
 
+const authenticationDomain = 'example.com';
+const redirectUri = 'example.com';
+const logoutRedirectUri = 'example.com';
+const clientId = 'clientId123';
 const mockOidcUser = {
   profile: {
     sub: 'sub123',
@@ -48,9 +52,9 @@ const mockOidcUserZkevm = {
 };
 
 const oidcConfiguration: OidcConfiguration = {
-  clientId: '11111',
-  redirectUri: 'https://test.com',
-  logoutRedirectUri: 'https://test.com',
+  clientId,
+  redirectUri,
+  logoutRedirectUri,
 };
 
 const getZkEvmProvider = () => {
@@ -59,9 +63,9 @@ const getZkEvmProvider = () => {
       environment: Environment.SANDBOX,
     }),
     audience: 'platform_api',
-    clientId: 'clientId123',
-    logoutRedirectUri: 'https://example.com/logout',
-    redirectUri: 'https://example.com/login',
+    clientId,
+    redirectUri,
+    logoutRedirectUri,
     scope: 'openid offline_access profile email transact',
   });
 
@@ -134,7 +138,7 @@ describe('Passport', () => {
         const baseConfig = new ImmutableConfiguration({ environment: Environment.SANDBOX });
         const immutableXClient = new IMXClient({ baseConfig });
         const overrides = {
-          authenticationDomain: 'authenticationDomain123',
+          authenticationDomain,
           imxPublicApiDomain: 'guardianDomain123',
           magicProviderId: 'providerId123',
           magicPublishableApiKey: 'publishableKey123',

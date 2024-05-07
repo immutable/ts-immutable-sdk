@@ -1,5 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { Checkout, TransactionRequirement } from '@imtbl/checkout-sdk';
+import { Environment } from '@imtbl/config';
 import {
   ClientConfigCurrency,
   FundingBalance,
@@ -23,7 +24,9 @@ export type FundingBalanceParams = {
   getAmountByCurrency: (currency: ClientConfigCurrency) => string;
   getIsGasless: () => boolean;
   onFundingBalance: (balances: FundingBalance[]) => void;
-  onFundingRequirement: (fundingItemRequirement: TransactionRequirement) => void;
+  onFundingRequirement: (
+    fundingItemRequirement: TransactionRequirement
+  ) => void;
   onComplete?: (balances: FundingBalance[]) => void;
 };
 
@@ -44,6 +47,7 @@ export const fetchFundingBalances = async (
 
   const signer = provider?.getSigner();
   const spenderAddress = (await signer?.getAddress()) || '';
+  const environment = checkout.config.environment as Environment;
 
   const pushToFoundBalances = getFnToPushAndSortFundingBalances(baseCurrency);
   const updateFundingBalances = (balances: FundingBalance[] | null) => {
@@ -52,38 +56,50 @@ export const fetchFundingBalances = async (
     }
   };
 
-  const balancePromises = currencies.map(async (currency) => {
-    const amount = getAmountByCurrency(currency) || '0';
-    const itemRequirements = getERC20ItemRequirement(
-      amount,
-      spenderAddress,
-      currency.address,
-    );
+  const balancePromises: Promise<FundingBalanceResult>[] = currencies
+    .map(async (currency) => {
+      const amount = getAmountByCurrency(currency);
 
-    const transactionOrGasAmount = getIsGasless()
-      ? undefined
-      : getGasEstimate();
+      if (!amount) {
+        return null;
+      }
 
-    const smartCheckoutResult = await checkout.smartCheckout({
-      provider,
-      itemRequirements,
-      transactionOrGasAmount,
-      routingOptions: { bridge: false, onRamp: false, swap: true },
-      onComplete: () => {
-        onComplete?.(pushToFoundBalances([]));
-      },
-      onFundingRoute: (route) => {
-        updateFundingBalances(getAlternativeFundingSteps([route]));
-      },
-    });
+      const itemRequirements = getERC20ItemRequirement(
+        amount,
+        spenderAddress,
+        currency.address,
+      );
 
-    return { currency, smartCheckoutResult };
-  });
+      const transactionOrGasAmount = getIsGasless()
+        ? undefined
+        : getGasEstimate();
+
+      const smartCheckoutResult = await checkout.smartCheckout({
+        provider,
+        itemRequirements,
+        transactionOrGasAmount,
+        routingOptions: { bridge: false, onRamp: false, swap: true },
+        fundingRouteFullAmount: true,
+        onComplete: () => {
+          onComplete?.(pushToFoundBalances([]));
+        },
+        onFundingRoute: (route) => {
+          updateFundingBalances(
+            getAlternativeFundingSteps([route], environment),
+          );
+        },
+      });
+
+      return { currency, smartCheckoutResult };
+    })
+    .filter(Boolean) as Promise<FundingBalanceResult>[];
 
   const results = await wrapPromisesWithOnResolve(
     balancePromises,
     ({ currency, smartCheckoutResult }) => {
-      updateFundingBalances(getFundingBalances(smartCheckoutResult));
+      updateFundingBalances(
+        getFundingBalances(smartCheckoutResult, environment),
+      );
 
       if (currency.base) {
         const fundingItemRequirement = smartCheckoutResult.transactionRequirements[0];

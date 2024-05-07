@@ -14,10 +14,15 @@ const defaultPaymentOptions: SalePaymentTypes[] = [
 export interface PaymentOptionsProps {
   onClick: (type: SalePaymentTypes) => void;
   disabledOptions?: SalePaymentTypes[];
+  paymentOptions?: SalePaymentTypes[];
+  captions?: Partial<Record<SalePaymentTypes, string>>;
 }
 
 export function PaymentOptions(props: PaymentOptionsProps) {
-  const { disabledOptions = [], onClick } = props;
+  const {
+    disabledOptions = [], paymentOptions, onClick, captions,
+  } = props;
+  const options = paymentOptions || defaultPaymentOptions;
 
   return (
     <Box
@@ -33,12 +38,13 @@ export function PaymentOptions(props: PaymentOptionsProps) {
         <motion.div variants={listVariants} initial="hidden" animate="show" />
       }
     >
-      {defaultPaymentOptions.map((type, idx: number) => (
+      {options.map((type, idx: number) => (
         <PaymentOption
           key={`payment-type-${type}`}
           type={type}
           onClick={onClick}
           disabled={disabledOptions.includes(type)}
+          caption={captions?.[type]}
           rc={(
             <motion.div
               custom={idx}

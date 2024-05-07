@@ -152,7 +152,7 @@ const toSignResponse = (
 
 export const useSignOrder = (input: SignOrderInput) => {
   const {
-    provider, items, recipientAddress, environment, environmentId,
+    provider, items, environment, environmentId,
   } = input;
   const [signError, setSignError] = useState<SignOrderError | undefined>(
     undefined,
@@ -255,8 +255,11 @@ export const useSignOrder = (input: SignOrderInput) => {
       fromTokenAddress: string,
     ): Promise<SignResponse | undefined> => {
       try {
+        const signer = provider?.getSigner();
+        const address = await signer?.getAddress() || '';
+
         const data: SignApiRequest = {
-          recipient_address: recipientAddress,
+          recipient_address: address,
           payment_type: paymentType,
           currency_filter: SignCurrencyFilter.CONTRACT_ADDRESS,
           currency_value: fromTokenAddress,
@@ -318,7 +321,7 @@ export const useSignOrder = (input: SignOrderInput) => {
       }
       return undefined;
     },
-    [items, recipientAddress, environmentId, environment, provider],
+    [items, environmentId, environment, provider],
   );
 
   const execute = async (

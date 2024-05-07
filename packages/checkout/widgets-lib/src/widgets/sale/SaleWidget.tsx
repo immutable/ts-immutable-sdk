@@ -38,6 +38,7 @@ import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsPr
 import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { OrderSummary } from './views/OrderSummary';
+import { CreditCardWarningDrawer } from './components/CreditCardWarningDrawer';
 
 type OptionalWidgetParams = Pick<SaleWidgetParams, 'excludePaymentTypes'>;
 type RequiredWidgetParams = Required<
@@ -183,6 +184,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
               subheading={viewState.view.data?.subheading}
             />
           )}
+          <CreditCardWarningDrawer />
         </CryptoFiatProvider>
       </SaleContextProvider>
     </ViewContext.Provider>

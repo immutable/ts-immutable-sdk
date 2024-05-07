@@ -1,9 +1,6 @@
 import { BigNumber } from 'ethers';
 import { Web3Provider } from '@ethersproject/providers';
-import {
-  overrideSufficientBalanceCheckResult,
-  smartCheckout,
-} from './smartCheckout';
+import { overrideBalanceCheckResult, smartCheckout } from './smartCheckout';
 import {
   GasAmount,
   GasTokenType,
@@ -1119,7 +1116,7 @@ describe('smartCheckout', () => {
     });
   });
 
-  describe('overrideSufficientBalanceCheckResult', () => {
+  describe('overrideBalanceCheckResult', () => {
     it('should correctly override sufficient flags and deltas for ERC20 items', () => {
       const mockBalanceCheckResult: BalanceCheckResult = {
         sufficient: true,
@@ -1187,9 +1184,7 @@ describe('smartCheckout', () => {
         ],
       };
 
-      const result = overrideSufficientBalanceCheckResult(
-        mockBalanceCheckResult,
-      );
+      const result = overrideBalanceCheckResult(mockBalanceCheckResult);
 
       expect(result.sufficient).toBe(false);
       expect(result.balanceRequirements[1].sufficient).toBe(false);
