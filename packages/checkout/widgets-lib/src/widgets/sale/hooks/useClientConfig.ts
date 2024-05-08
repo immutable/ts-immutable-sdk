@@ -7,9 +7,10 @@ import {
   ClientConfigResponse,
   transformToClientConfig,
 } from '../functions/transformToClientConfig';
+import { SaleItem } from '@imtbl/checkout-sdk';
 
 type UseClientConfigParams = {
-  amount: string;
+  items: SaleItem[];
   environment: Environment;
   environmentId: string;
 };
@@ -26,10 +27,11 @@ export type ConfigError = {
 };
 
 export const useClientConfig = ({
-  amount,
+  items,
   environment,
   environmentId,
 }: UseClientConfigParams) => {
+  const amount = '0';
   const [selectedCurrency, setSelectedCurrency] = useState<
   ClientConfigCurrency | undefined
   >();

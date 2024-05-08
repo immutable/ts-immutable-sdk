@@ -40,7 +40,6 @@ const useParams = () => {
   const urlParams = new URLSearchParams(window.location.search);
 
   const login = urlParams.get("login") as string;
-  const amount = urlParams.get("amount") as string;
   const environmentId = urlParams.get("environmentId") as string;
   const collectionName = urlParams.get("collectionName") as string;
   const excludePaymentTypes = urlParams
@@ -51,7 +50,6 @@ const useParams = () => {
 
   return {
     login,
-    amount,
     environmentId,
     collectionName,
     excludePaymentTypes,
@@ -91,7 +89,6 @@ export function SaleUI() {
   const params = useParams();
   const {
     login,
-    amount,
     environmentId,
     collectionName,
     excludePaymentTypes,
@@ -123,32 +120,32 @@ export function SaleUI() {
       factory.create(WidgetType.SALE, {
         config: { theme: WidgetTheme.DARK, multicurrency },
       }),
-    [factory, amount, environmentId, collectionName, defaultItems]
+    [factory,  environmentId, collectionName, defaultItems]
   );
   const bridgeWidget = useMemo(
     () =>
       factory.create(WidgetType.BRIDGE, {
         config: { theme: WidgetTheme.DARK },
       }),
-    [factory, amount, environmentId, collectionName, defaultItems]
+    [factory,  environmentId, collectionName, defaultItems]
   );
   const swapWidget = useMemo(
     () =>
       factory.create(WidgetType.SWAP, { config: { theme: WidgetTheme.DARK } }),
-    [factory, amount, environmentId, collectionName, defaultItems]
+    [factory,  environmentId, collectionName, defaultItems]
   );
   const onrampWidget = useMemo(
     () =>
       factory.create(WidgetType.ONRAMP, {
         config: { theme: WidgetTheme.DARK },
       }),
-    [factory, amount, environmentId, collectionName, defaultItems]
+    [factory,  environmentId, collectionName, defaultItems]
   );
 
   // mount sale widget and subscribe to close event
   useEffect(() => {
     saleWidget.mount("sale", {
-      amount,
+      
       environmentId,
       collectionName,
       items: defaultItems,
@@ -250,7 +247,6 @@ export function SaleUI() {
       <button
         onClick={() =>
           saleWidget.mount("sale", {
-            amount,
             environmentId,
             collectionName,
             items: defaultItems,

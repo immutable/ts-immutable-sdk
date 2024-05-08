@@ -57,7 +57,6 @@ export default function SaleWidget(props: SaleWidgetProps) {
   const { t } = useTranslation();
   const {
     config,
-    amount,
     items,
     environmentId,
     collectionName,
@@ -119,7 +118,6 @@ export default function SaleWidget(props: SaleWidgetProps) {
         value={{
           config,
           items,
-          amount,
           environment: config.environment,
           environmentId,
           provider,

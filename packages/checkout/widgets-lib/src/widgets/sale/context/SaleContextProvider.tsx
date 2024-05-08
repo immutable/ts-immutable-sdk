@@ -47,7 +47,6 @@ type SaleContextProps = {
   environment: Environment;
   environmentId: string;
   items: SaleItem[];
-  amount: string;
   collectionName: string;
   provider: ConnectLoaderState['provider'];
   checkout: ConnectLoaderState['checkout'];
@@ -101,7 +100,6 @@ type SaleContextValues = SaleContextProps & {
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const SaleContext = createContext<SaleContextValues>({
   items: [],
-  amount: '',
   collectionName: '',
   provider: undefined,
   checkout: undefined,
@@ -154,7 +152,6 @@ export function SaleContextProvider(props: {
       environment,
       environmentId,
       items,
-      amount,
       provider,
       checkout,
       passport,
@@ -202,7 +199,7 @@ export function SaleContextProvider(props: {
 
   const { selectedCurrency, clientConfig, clientConfigError } = useClientConfig(
     {
-      amount,
+      items,
       environmentId,
       environment: config.environment,
     },
@@ -337,7 +334,6 @@ export function SaleContextProvider(props: {
     provider,
     checkout,
     items,
-    amount,
     tokenAddress: fromTokenAddress,
   });
 
@@ -379,12 +375,11 @@ export function SaleContextProvider(props: {
 
   useEffect(() => {
     const invalidItems = !items || items.length === 0;
-    const invalidAmount = !amount || amount === '0';
 
-    if (invalidItems || invalidAmount || !collectionName || !environmentId) {
+    if (invalidItems || !collectionName || !environmentId) {
       setInvalidParameters(true);
     }
-  }, [items, amount, collectionName, environmentId]);
+  }, [items, collectionName, environmentId]);
 
   useEffect(() => {
     if (excludePaymentTypes?.length <= 0) return;
@@ -395,7 +390,6 @@ export function SaleContextProvider(props: {
     () => ({
       config,
       items,
-      amount,
       fromTokenAddress,
       sign,
       signResponse,
@@ -434,7 +428,6 @@ export function SaleContextProvider(props: {
       environment,
       environmentId,
       items,
-      amount,
       fromTokenAddress,
       collectionName,
       provider,
