@@ -10,8 +10,11 @@ import {
 import { ROOT_AXELAR_ADAPTOR } from 'contracts/ABIs/RootAxelarBridgeAdaptor';
 import {
   checkReceiver, validateBridgeReqArgs, validateChainConfiguration, validateChainIds,
+  validateGetFee,
 } from 'lib/validation';
 import { getRootIMX } from 'lib/utils';
+import { TenderlySimulation } from 'types/tenderly';
+import { calculateGasFee } from 'lib/gas';
 import {
   NATIVE,
   ETHEREUM_NATIVE_TOKEN_ADDRESS,
@@ -39,13 +42,11 @@ import { ROOT_ERC20_BRIDGE_FLOW_RATE } from './contracts/ABIs/RootERC20BridgeFlo
 import { ERC20 } from './contracts/ABIs/ERC20';
 import { BridgeError, BridgeErrorType, withBridgeError } from './errors';
 import { CHILD_ERC20_BRIDGE } from './contracts/ABIs/ChildERC20Bridge';
-import { getGasPriceInWei } from './lib/gasPriceInWei';
 import { BridgeConfiguration } from './config';
 import {
   BridgeFeeRequest,
   BridgeFeeResponse,
   BridgeMethodsGasLimit,
-  FeeData,
   BridgeTxRequest,
   BridgeFeeActions,
   ApproveBridgeRequest,
@@ -164,27 +165,7 @@ export class TokenBridge {
   }
 
   private async getFeePrivate(req: BridgeFeeRequest): Promise<BridgeFeeResponse> {
-    if (req.action === BridgeFeeActions.DEPOSIT && req.sourceChainId !== this.config.bridgeInstance.rootChainID) {
-      throw new BridgeError(
-        `Deposit must be from the root chain (${this.config.bridgeInstance.rootChainID}) to the child chain (${this.config.bridgeInstance.childChainID})`,
-        BridgeErrorType.UNSUPPORTED_ERROR,
-      );
-    }
-
-    if (req.action === BridgeFeeActions.WITHDRAW && req.sourceChainId !== this.config.bridgeInstance.childChainID) {
-      throw new BridgeError(
-        `Withdraw must be from the child chain (${this.config.bridgeInstance.childChainID}) to the root chain (${this.config.bridgeInstance.rootChainID})`,
-        BridgeErrorType.UNSUPPORTED_ERROR,
-      );
-    }
-
-    if (req.action === BridgeFeeActions.FINALISE_WITHDRAWAL
-      && req.sourceChainId !== this.config.bridgeInstance.rootChainID) {
-      throw new BridgeError(
-        `Finalised withdrawals must be on the root chain (${this.config.bridgeInstance.rootChainID})`,
-        BridgeErrorType.UNSUPPORTED_ERROR,
-      );
-    }
+    validateGetFee(req, this.config);
 
     let feeData;
     if (req.sourceChainId === this.config.bridgeInstance.rootChainID) {
@@ -201,24 +182,24 @@ export class TokenBridge {
     // Get approval fee
     if ('token' in req && req.token.toUpperCase() !== NATIVE) {
       if (req.sourceChainId === this.config.bridgeInstance.rootChainID) {
-        approvalFee = this.calculateGasFee(feeData, BridgeMethodsGasLimit.APPROVE_TOKEN);
+        approvalFee = calculateGasFee(feeData, BridgeMethodsGasLimit.APPROVE_TOKEN);
       } else if (req.sourceChainId === this.config.bridgeInstance.childChainID
         && this.isWrappedIMX(req.token, this.config.bridgeInstance.childChainID)) {
         // On child chain, only WIMX requires approval.
-        approvalFee = this.calculateGasFee(feeData, BridgeMethodsGasLimit.APPROVE_TOKEN);
+        approvalFee = calculateGasFee(feeData, BridgeMethodsGasLimit.APPROVE_TOKEN);
       }
     }
 
     // Get source fee & bridge fee
     if (req.action === BridgeFeeActions.FINALISE_WITHDRAWAL) {
-      sourceChainFee = this.calculateGasFee(feeData, BridgeMethodsGasLimit.FINALISE_WITHDRAWAL);
+      sourceChainFee = calculateGasFee(feeData, BridgeMethodsGasLimit.FINALISE_WITHDRAWAL);
     } else {
       let axelarGasLimit;
       if (req.action === 'DEPOSIT') {
-        sourceChainFee = this.calculateGasFee(feeData, BridgeMethodsGasLimit.DEPOSIT_SOURCE);
+        sourceChainFee = calculateGasFee(feeData, BridgeMethodsGasLimit.DEPOSIT_SOURCE);
         axelarGasLimit = BridgeMethodsGasLimit.DEPOSIT_DESTINATION;
       } else {
-        sourceChainFee = this.calculateGasFee(feeData, BridgeMethodsGasLimit.WITHDRAW_SOURCE);
+        sourceChainFee = calculateGasFee(feeData, BridgeMethodsGasLimit.WITHDRAW_SOURCE);
         axelarGasLimit = BridgeMethodsGasLimit.WITHDRAW_DESTINATION;
       }
       // Get bridge fee
@@ -239,15 +220,6 @@ export class TokenBridge {
       imtblFee,
       totalFees,
     };
-  }
-
-  private calculateGasFee(
-    feeData: FeeData,
-    gasLimit: number,
-  ): ethers.BigNumber {
-    const gasPriceInWei = getGasPriceInWei(feeData);
-    if (!gasPriceInWei) return ethers.BigNumber.from(0);
-    return gasPriceInWei.mul(gasLimit);
   }
 
   /**
@@ -640,7 +612,7 @@ export class TokenBridge {
         from: sender,
         chainId: parseInt(this.config.bridgeInstance.rootChainID, 10),
       };
-      approvalFee = this.calculateGasFee(feeData, rootGas.approvalGas);
+      approvalFee = calculateGasFee(feeData, rootGas.approvalGas);
     } else {
       contractToApprove = null;
       unsignedApprovalTx = null;
@@ -663,7 +635,7 @@ export class TokenBridge {
       from: sender,
       chainId: parseInt(this.config.bridgeInstance.rootChainID, 10),
     };
-    sourceChainFee = this.calculateGasFee(feeData, rootGas.sourceChainGas);
+    sourceChainFee = calculateGasFee(feeData, rootGas.sourceChainGas);
 
     const totalFees: ethers.BigNumber = sourceChainFee.add(approvalFee).add(bridgeFee).add(imtblFee);
 
@@ -733,7 +705,7 @@ export class TokenBridge {
         from: sender,
         chainId: parseInt(this.config.bridgeInstance.childChainID, 10),
       };
-      approvalFee = this.calculateGasFee(feeData, BridgeMethodsGasLimit.APPROVE_TOKEN);
+      approvalFee = calculateGasFee(feeData, BridgeMethodsGasLimit.APPROVE_TOKEN);
     } else {
       contractToApprove = null;
       unsignedApprovalTx = null;
@@ -756,7 +728,7 @@ export class TokenBridge {
       from: sender,
       chainId: parseInt(this.config.bridgeInstance.rootChainID, 10),
     };
-    sourceChainFee = this.calculateGasFee(feeData, BridgeMethodsGasLimit.WITHDRAW_SOURCE);
+    sourceChainFee = calculateGasFee(feeData, BridgeMethodsGasLimit.WITHDRAW_SOURCE);
 
     const totalFees: ethers.BigNumber = sourceChainFee.add(approvalFee).add(bridgeFee).add(imtblFee);
 
@@ -781,7 +753,7 @@ export class TokenBridge {
     token: FungibleToken,
     amount: ethers.BigNumber,
   ): Promise<DynamicGasEstimatesResponse> {
-    const simulations: Array<any> = [];
+    const simulations: Array<TenderlySimulation> = [];
 
     // Encode approval function for non-native tokens.
     if (token.toUpperCase() !== NATIVE) {
@@ -894,7 +866,7 @@ export class TokenBridge {
 
     // Build simulation
     const axelarGateway = this.getAxelarGateway(destinationChainId);
-    const simulations = [{
+    const simulations: Array<TenderlySimulation> = [{
       network_id: destinationChainId,
       estimate_gas: true,
       simulation_type: 'quick',
@@ -915,7 +887,12 @@ export class TokenBridge {
     return gas[0];
   }
 
-  private async submitTenderlySimulations(chainId: string, simulations: Array<any>): Promise<Array<number>> {
+  // TODO this function should have tests. We can write these when we introduce a separate class
+  // for tenderly stuff
+  private async submitTenderlySimulations(
+    chainId: string,
+    simulations: Array<TenderlySimulation>,
+  ): Promise<Array<number>> {
     let axiosResponse:AxiosResponse;
     const tenderlyAPI = this.getTenderlyEndpoint(chainId);
     try {
