@@ -1,4 +1,4 @@
-import { mintingPersistence as mintingPersistencePg } from 'persistence/pg/postgres';
+import { mintingPersistence as mintingPersistencePg } from './persistence/pg/postgres';
 import {
   submitMintingRequests, processMint, recordMint
 } from './minting';
