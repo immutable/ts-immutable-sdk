@@ -9,43 +9,10 @@ import { formatSwapFees } from './swapFees';
 import { CryptoFiatState } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { calculateCryptoToFiat, tokenValueFormat } from '../../../lib/utils';
 
-// const tokenValueFormat = value => `Formatted: ${value}`;
 jest.mock('../../../lib/utils');
-// const calculateCryptoToFiat = (value, symbol, conversions) => `FiatValue:${value}`;
 
 describe('formatSwapFees', () => {
   const mockTranslate = ((labelKey) => labelKey) as any;
-  // const mockQuote = {
-  //   quote: {
-  //     amount: {} as Amount,
-  //     amountWithMaxSlippage: {} as Amount,
-  //     slippage: 0,
-  //     fees: [{
-  //       recipient: '0x123',
-  //       basisPoints: 100,
-  //       amount: {
-  //         value: BigNumber.from(100),
-  //         token: {
-  //           symbol: 'ETH',
-  //           address: '0x123',
-  //           chainId: 1,
-  //           decimals: 18,
-  //         },
-  //       },
-  //     } as Fee],
-  //   } as Quote,
-  //   swap: {
-  //     gasFeeEstimate: {
-  //       value: BigNumber.from(100),
-  //     },
-  //   },
-  //   approval: {
-  //     gasFeeEstimate: {
-  //       value: BigNumber.from(50),
-  //     },
-  //   },
-  // } as TransactionResponse;
-
   beforeEach(() => {
     jest.clearAllMocks();
   });

@@ -155,7 +155,7 @@ export function SwapForm({ data, theme }: SwapFromProps) {
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
   const [tokensOptionsFrom, setTokensOptionsForm] = useState<CoinSelectorOptionProps[]>([]);
   const formattedFees = useMemo(
-    (): any => (quote ? formatSwapFees(quote, cryptoFiatState, t) : []),
+    () => (quote ? formatSwapFees(quote, cryptoFiatState, t) : []),
     [quote, cryptoFiatState, t],
   );
 
