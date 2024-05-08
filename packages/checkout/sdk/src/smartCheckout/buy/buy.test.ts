@@ -116,6 +116,12 @@ describe('buy', () => {
                 amount: '1000000000000000000',
               },
             ],
+            sell: [
+              {
+                type: 'ERC721',
+                amount: '1',
+              },
+            ],
             fees: [
               {
                 amount: '1000000000000000000',
@@ -178,6 +184,7 @@ describe('buy', () => {
             amount: '25000000000000000',
           },
         ],
+        undefined,
       );
     });
 
@@ -275,6 +282,12 @@ describe('buy', () => {
                 contractAddress: '0xCONTRACTADDRESS',
               },
             ],
+            sell: [
+              {
+                type: 'ERC721',
+                amount: '1',
+              },
+            ],
             fees: [
               {
                 amount: '1000000000000000000',
@@ -346,6 +359,7 @@ describe('buy', () => {
             amount: '25000000000000000',
           },
         ],
+        undefined,
       );
     });
 
@@ -446,6 +460,12 @@ describe('buy', () => {
                 contractAddress: '0xCONTRACTADDRESS',
               },
             ],
+            sell: [
+              {
+                type: 'ERC721',
+                amount: '1',
+              },
+            ],
             fees: [
               {
                 amount: '1000000000000000000',
@@ -519,6 +539,7 @@ describe('buy', () => {
             amount: '25000000000000000',
           },
         ],
+        undefined,
       );
     });
 
@@ -619,6 +640,12 @@ describe('buy', () => {
                   contractAddress: '0xCONTRACTADDRESS',
                 },
               ],
+              sell: [
+                {
+                  type: 'ERC721',
+                  amount: '1',
+                },
+              ],
               fees: [
                 {
                   amount: '1000000000000000000',
@@ -704,6 +731,12 @@ describe('buy', () => {
                   amount: '1000000000000000000',
                 },
               ],
+              sell: [
+                {
+                  type: 'ERC721',
+                  amount: '1',
+                },
+              ],
               fees: [
                 {
                   amount: '1000000000000000000',
@@ -757,6 +790,13 @@ describe('buy', () => {
               {
                 type: 'ERC20',
                 amount: '1000000000000000000',
+                contractAddress: '0x123',
+              },
+            ],
+            sell: [
+              {
+                type: 'ERC721',
+                amount: '1',
                 contractAddress: '0x123',
               },
             ],
@@ -891,6 +931,12 @@ describe('buy', () => {
                 amount: '1',
               },
             ],
+            sell: [
+              {
+                type: 'ERC721',
+                amount: '1',
+              },
+            ],
             fees: [
               {
                 amount: '1',
@@ -993,6 +1039,12 @@ describe('buy', () => {
             buy: [
               {
                 type: 'NATIVE',
+                amount: '1',
+              },
+            ],
+            sell: [
+              {
+                type: 'ERC721',
                 amount: '1',
               },
             ],
@@ -1112,6 +1164,12 @@ describe('buy', () => {
                 amount: '1',
               },
             ],
+            sell: [
+              {
+                type: 'ERC721',
+                amount: '1',
+              },
+            ],
             fees: [
               {
                 amount: '1',
@@ -1195,6 +1253,12 @@ describe('buy', () => {
                 contractAddress: '0x123',
               },
             ],
+            sell: [
+              {
+                type: 'ERC721',
+                amount: '1',
+              },
+            ],
             fees: [
               {
                 amount: '1',
@@ -1240,6 +1304,12 @@ describe('buy', () => {
                 amount: '1',
               },
             ],
+            sell: [
+              {
+                type: 'ERC721',
+                amount: '1',
+              },
+            ],
             fees: [
               {
                 amount: '1',
@@ -1282,6 +1352,12 @@ describe('buy', () => {
             buy: [
               {
                 type: 'NATIVE',
+                amount: '1',
+              },
+            ],
+            sell: [
+              {
+                type: 'ERC721',
                 amount: '1',
               },
             ],
@@ -1331,6 +1407,12 @@ describe('buy', () => {
             buy: [
               {
                 type: 'NATIVE',
+                amount: '1',
+              },
+            ],
+            sell: [
+              {
+                type: 'ERC721',
                 amount: '1',
               },
             ],
@@ -1442,6 +1524,33 @@ describe('buy', () => {
           },
         ],
       },
+      {
+        name: 'multiple orders and multiple taker fees applies only the first taker fee to first order',
+        orders: [{
+          id: '1',
+          takerFees: [
+            { amount: { token: '0.1' }, recipient: '0xFEERECIPIENT' },
+            { amount: { token: '0.1' }, recipient: '0xFEERECIPIENT' },
+          ] as OrderFee[],
+        },
+        {
+          id: '2',
+          takerFees: [
+            { amount: { token: '0.1' }, recipient: '0xFEERECIPIENT' },
+            { amount: { token: '0.1' }, recipient: '0xFEERECIPIENT' },
+          ] as OrderFee[],
+        }],
+        expectedTakerFee: [
+          {
+            recipientAddress: '0xFEERECIPIENT',
+            amount: '100000000000000000',
+          },
+          {
+            recipientAddress: '0xFEERECIPIENT',
+            amount: '100000000000000000',
+          },
+        ],
+      },
     ];
     nativeOrderTakerFeeTestCases.forEach((testCase) => {
       it(`should add takerFees: ${testCase.name} (order in NATIVE)`, async () => {
@@ -1503,6 +1612,12 @@ describe('buy', () => {
                   amount: '1000000000000000000',
                 },
               ],
+              sell: [
+                {
+                  type: 'ERC721',
+                  amount: '1',
+                },
+              ],
               fees: [
                 {
                   amount: '1000000000000000000',
@@ -1552,6 +1667,7 @@ describe('buy', () => {
           testCase.orders[0].id,
           '0xADDRESS',
           testCase.expectedTakerFee,
+          undefined,
         );
       });
     });
@@ -1704,6 +1820,12 @@ describe('buy', () => {
                   contractAddress: '0xCONTRACTADDRESS',
                 },
               ],
+              sell: [
+                {
+                  type: 'ERC721',
+                  amount: '1',
+                },
+              ],
               fees: [
                 {
                   amount: '1000000',
@@ -1762,6 +1884,7 @@ describe('buy', () => {
           testCase.orders[0].id,
           '0xADDRESS',
           testCase.expectedTakerFee,
+          undefined,
         );
       });
     });

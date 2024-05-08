@@ -92,10 +92,9 @@ export const buy = async (
     waitFulfillmentSettlements: true,
   },
 ): Promise<BuyResult> => {
-  // While the function signature supports multiple orders, we only support a single order for now
-  if (orders.length !== 1) {
+  if (orders.length === 0) {
     throw new CheckoutError(
-      'Exactly one order must be provided to the orders array.',
+      'No orders were provided to the orders array. Please provide at least one order.',
       CheckoutErrorType.FULFILL_ORDER_LISTING_ERROR,
     );
   }
@@ -140,13 +139,6 @@ export const buy = async (
         error: err,
         orderId: id,
       },
-    );
-  }
-
-  if (order.result.sell[0].type === 'ERC1155' && !fillAmount) {
-    throw new CheckoutError(
-      'A fill amount must be provided when filling an ERC1155 listing.',
-      CheckoutErrorType.FULFILL_ORDER_LISTING_ERROR,
     );
   }
 
