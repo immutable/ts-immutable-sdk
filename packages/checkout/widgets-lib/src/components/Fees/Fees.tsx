@@ -7,6 +7,7 @@ import {
 import { TokenInfo } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
+import { Token } from '@imtbl/dex-sdk';
 import { formatZeroAmount, tokenValueFormat } from '../../lib/utils';
 import { FeesBreakdown } from '../FeesBreakdown/FeesBreakdown';
 import { gasAmountAccordionStyles, gasAmountHeadingStyles } from './FeeStyles';
@@ -20,6 +21,7 @@ interface FeesProps {
     amount: string;
     label: string;
     prefix?: string;
+    token: Token;
   }[];
   onFeesClick?: () => void;
   loading?: boolean;
