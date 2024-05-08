@@ -3,8 +3,10 @@ import { BridgeConfiguration } from 'config';
 import { ETH_SEPOLIA_TO_ZKEVM_TESTNET, NATIVE, childETHs } from 'constants/bridges';
 import { BridgeError, BridgeErrorType } from 'errors';
 import { BigNumber, ethers } from 'ethers';
+import { BridgeFeeActions } from 'types';
 import {
   checkReceiver, validateBridgeReqArgs, validateChainConfiguration, validateChainIds,
+  validateGetFee,
 } from './validation';
 
 describe('Validation', () => {
@@ -426,6 +428,145 @@ describe('Validation', () => {
       } catch (error: any) {
         expect(error).toBeInstanceOf(BridgeError);
         expect(error.type).toBe(BridgeErrorType.INVALID_AMOUNT);
+      }
+    });
+  });
+
+  describe('validateGetFee', () => {
+    let bridgeConfig: BridgeConfiguration;
+
+    beforeEach(() => {
+      const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
+      const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
+      bridgeConfig = new BridgeConfiguration({
+        baseConfig: new ImmutableConfiguration({
+          environment: Environment.SANDBOX,
+        }),
+        bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
+        rootProvider: voidRootProvider,
+        childProvider: voidChildProvider,
+      });
+    });
+
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it('does not throw an error when everything setup correctly', async () => {
+      validateGetFee(
+        {
+          action: BridgeFeeActions.DEPOSIT,
+          sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+          destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
+          gasMultiplier: 1.1,
+        },
+        bridgeConfig,
+      );
+    });
+
+    it('throws an error when depositing and sourceChainId is not the root chainId', async () => {
+      expect.assertions(2);
+      try {
+        validateGetFee(
+          {
+            action: BridgeFeeActions.DEPOSIT,
+            sourceChainId: '1293123',
+            destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
+            gasMultiplier: 1.1,
+          },
+          bridgeConfig,
+        );
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(BridgeError);
+        expect(error.type).toBe(BridgeErrorType.INVALID_SOURCE_OR_DESTINATION_CHAIN);
+      }
+    });
+
+    it('throws an error when depositing and sourceChainId is destinationChainId', async () => {
+      expect.assertions(2);
+      try {
+        validateGetFee(
+          {
+            action: BridgeFeeActions.DEPOSIT,
+            sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+            destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+            gasMultiplier: 1.1,
+          },
+          bridgeConfig,
+        );
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(BridgeError);
+        expect(error.type).toBe(BridgeErrorType.INVALID_SOURCE_OR_DESTINATION_CHAIN);
+      }
+    });
+
+    it('throws an error when withdrawing and sourceChainId is destinationChainId', async () => {
+      expect.assertions(2);
+      try {
+        validateGetFee(
+          {
+            action: BridgeFeeActions.WITHDRAW,
+            sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
+            destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
+            gasMultiplier: 1.1,
+          },
+          bridgeConfig,
+        );
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(BridgeError);
+        expect(error.type).toBe(BridgeErrorType.INVALID_SOURCE_OR_DESTINATION_CHAIN);
+      }
+    });
+
+    it('throws an error when finalising and sourceChainId is not rootChain', async () => {
+      expect.assertions(2);
+      try {
+        validateGetFee(
+          {
+            action: BridgeFeeActions.FINALISE_WITHDRAWAL,
+            sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
+          },
+          bridgeConfig,
+        );
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(BridgeError);
+        expect(error.type).toBe(BridgeErrorType.INVALID_SOURCE_CHAIN_ID);
+      }
+    });
+
+    it('throws an error when depositing and sourceChainId is childChain', async () => {
+      expect.assertions(2);
+      try {
+        validateGetFee(
+          {
+            action: BridgeFeeActions.DEPOSIT,
+            sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
+            destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+            gasMultiplier: 1.1,
+          },
+          bridgeConfig,
+        );
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(BridgeError);
+        expect(error.type).toBe(BridgeErrorType.INVALID_SOURCE_OR_DESTINATION_CHAIN);
+      }
+    });
+
+    it('throws an error when withdrawing and sourceChainId is rootChain', async () => {
+      expect.assertions(2);
+      try {
+        validateGetFee(
+          {
+            action: BridgeFeeActions.WITHDRAW,
+            sourceChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID,
+            destinationChainId: ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID,
+            gasMultiplier: 1.1,
+          },
+          bridgeConfig,
+        );
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(BridgeError);
+        expect(error.type).toBe(BridgeErrorType.INVALID_SOURCE_OR_DESTINATION_CHAIN);
       }
     });
   });

@@ -9,7 +9,6 @@ import { isPassportProvider } from '../../../lib/provider';
  * @param currentQuote
  */
 export const processGasFree = (checkProvider: Web3Provider, currentQuote: TransactionResponse) => {
-  console.log('Processing gas free', checkProvider, currentQuote);
   if (!isPassportProvider(checkProvider)) {
     return currentQuote;
   }
