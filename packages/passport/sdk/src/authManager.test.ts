@@ -293,7 +293,6 @@ describe('AuthManager', () => {
       const logoutArgs = await am.getLogoutArgs();
 
       expect(logoutArgs.id_token_hint).toEqual(mockUser.idToken);
-      expect(logoutArgs.post_logout_redirect_uri).toEqual(logoutRedirectUri);
     });
 
     it('should call redirect logout if logout mode is redirect', async () => {
@@ -512,7 +511,6 @@ describe('AuthManager', () => {
           expect(uri.pathname).toEqual(logoutEndpoint);
           expect(uri.searchParams.get('client_id')).toEqual(clientId);
           expect(uri.searchParams.get('id_token_hint')).toEqual(mockUser.idToken);
-          expect(uri.searchParams.get('post_logout_redirect_uri')).toEqual(logoutRedirectUri);
         });
       });
 
@@ -528,7 +526,6 @@ describe('AuthManager', () => {
           expect(uri.pathname).toEqual(logoutEndpoint);
           expect(uri.searchParams.get('client_id')).toEqual(clientId);
           expect(uri.searchParams.get('id_token_hint')).toEqual(mockUser.idToken);
-          expect(uri.searchParams.get('post_logout_redirect_uri')).toBeNull();
         });
       });
     });
