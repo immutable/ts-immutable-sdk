@@ -13,7 +13,8 @@
     "orderbook": "prod",
     "checkout": "prod",
     "x": "prod",
-    "webhook": "prod"
+    "webhook": "prod",
+    "minting_backend": "prod"
   },
   "fileCopy": [
     {

@@ -3,9 +3,6 @@ import { mr, BlockchainData as Types } from '@imtbl/generated-clients';
 import { APIError } from './types/errors';
 import { BlockchainData } from './blockchain-data';
 import { BlockchainDataModuleConfiguration } from './config';
-import {
-  submitMintingRequests, processMint, recordMint, mintingPersistencePg
-} from './minting';
 
 /**
  * @deprecated since version 1.1.5
@@ -20,5 +17,4 @@ export {
   BlockchainData,
   BlockchainDataModuleConfiguration,
   ActivityType,
-  submitMintingRequests, processMint, recordMint, mintingPersistencePg
 };
