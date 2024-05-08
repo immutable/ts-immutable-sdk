@@ -13,6 +13,7 @@ jest.mock('../../../lib/utils');
 
 describe('formatSwapFees', () => {
   const mockTranslate = ((labelKey) => labelKey) as any;
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
