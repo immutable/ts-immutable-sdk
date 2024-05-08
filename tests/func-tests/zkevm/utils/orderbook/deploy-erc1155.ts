@@ -1,6 +1,6 @@
 import { config } from 'dotenv';
 import { Wallet, providers } from 'ethers';
-import { deployERC721Token } from './erc721';
+import { deployERC1155Token } from './erc1155';
 
 config();
 
@@ -14,4 +14,4 @@ if (!seaportAddress || !deployerKey || !rpcUrl) {
 
 const deployerWallet = new Wallet(deployerKey, new providers.JsonRpcProvider(rpcUrl));
 
-deployERC721Token(deployerWallet, seaportAddress);
+deployERC1155Token(deployerWallet, seaportAddress);

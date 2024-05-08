@@ -7,7 +7,7 @@ export async function waitForOrderToBeOfStatus(
   attemps = 0,
 ): Promise<orderbook.Order> {
   if (attemps > 50) {
-    throw new Error('Order never became active');
+    throw new Error(`Order ${orderId} never became ${status}`);
   }
 
   const { result: order } = await sdk.getListing(orderId);
