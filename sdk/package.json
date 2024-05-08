@@ -47,6 +47,7 @@
     "oidc-client-ts": "2.2.1",
     "os-browserify": "^0.3.0",
     "pako": "^2.1.0",
+    "pg": "^8.11.5",
     "react-i18next": "^13.5.0",
     "sns-validator": "^0.3.5",
     "stream-browserify": "^3.0.0",
@@ -141,10 +142,6 @@
   "module": "./dist/index.js",
   "overrides": {
     "@openzeppelin/contracts": "3.4.2-solc-0.7"
-  },
-  "peerDependencies": {
-    "@types/pg": "^8.11.6",
-    "pg": "^8.11.6"
   },
   "repository": "immutable/ts-immutable-sdk.git",
   "resolutions": {

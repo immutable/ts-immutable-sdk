@@ -1,4 +1,4 @@
-import { Pool } from 'pg';
+import type { Pool } from 'pg';
 import { client } from '../../dbClient/postgres';
 import { CreateMintRequest, MintingPersistence, SubmittedMintRequest } from '../type';
 
