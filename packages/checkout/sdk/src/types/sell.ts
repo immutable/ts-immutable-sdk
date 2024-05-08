@@ -1,5 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { SellOrder } from './smartCheckout';
+import { SellOrder, SellOverrides } from './smartCheckout';
 
 /**
  * Interface representing the parameters for {@link Checkout.sell}
@@ -10,4 +10,5 @@ import { SellOrder } from './smartCheckout';
 export interface SellParams {
   provider: Web3Provider;
   orders: Array<SellOrder>;
+  overrides?: SellOverrides;
 }

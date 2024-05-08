@@ -20,6 +20,7 @@ import {
   CheckoutStatus,
   SmartCheckoutResult,
   SmartCheckoutSufficient,
+  SellOverrides,
 } from '../../types';
 import * as instance from '../../instance';
 import { CheckoutConfiguration } from '../../config';
@@ -84,6 +85,7 @@ export const sell = async (
   config: CheckoutConfiguration,
   provider: Web3Provider,
   orders: Array<SellOrder>,
+  sellOverrides: SellOverrides = {},
 ): Promise<SellResult> => {
   let orderbook: Orderbook;
   let listing: PrepareListingResponse;
@@ -127,7 +129,7 @@ export const sell = async (
       'Time to get the address from the provider',
       provider.getSigner().getAddress(),
     );
-    orderbook = instance.createOrderbookInstance(config);
+    orderbook = sellOverrides.orderbook ? sellOverrides.orderbook : instance.createOrderbookInstance(config);
     const { seaportContractAddress } = orderbook.config();
     spenderAddress = seaportContractAddress;
     const sellItem = sellToken.type === ItemType.ERC721
