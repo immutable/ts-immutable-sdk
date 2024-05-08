@@ -362,12 +362,13 @@ export const NftsApiAxiosParamCreator = function (configuration?: Configuration)
          * @param {string} accountAddress Account address
          * @param {string} chainName The name of chain
          * @param {string} [contractAddress] The address of contract
+         * @param {string} [fromUpdatedAt] Datetime to use as the oldest updated timestamp
          * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {number} [pageSize] Maximum number of items to return
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listNFTsByAccountAddress: async (accountAddress: string, chainName: string, contractAddress?: string, pageCursor?: string, pageSize?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listNFTsByAccountAddress: async (accountAddress: string, chainName: string, contractAddress?: string, fromUpdatedAt?: string, pageCursor?: string, pageSize?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'accountAddress' is not null or undefined
             assertParamExists('listNFTsByAccountAddress', 'accountAddress', accountAddress)
             // verify required parameter 'chainName' is not null or undefined
@@ -388,6 +389,12 @@ export const NftsApiAxiosParamCreator = function (configuration?: Configuration)
 
             if (contractAddress !== undefined) {
                 localVarQueryParameter['contract_address'] = contractAddress;
+            }
+
+            if (fromUpdatedAt !== undefined) {
+                localVarQueryParameter['from_updated_at'] = (fromUpdatedAt as any instanceof Date) ?
+                    (fromUpdatedAt as any).toISOString() :
+                    fromUpdatedAt;
             }
 
             if (pageCursor !== undefined) {
@@ -509,13 +516,14 @@ export const NftsApiFp = function(configuration?: Configuration) {
          * @param {string} accountAddress Account address
          * @param {string} chainName The name of chain
          * @param {string} [contractAddress] The address of contract
+         * @param {string} [fromUpdatedAt] Datetime to use as the oldest updated timestamp
          * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {number} [pageSize] Maximum number of items to return
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listNFTsByAccountAddress(accountAddress: string, chainName: string, contractAddress?: string, pageCursor?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListNFTsByOwnerResult>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listNFTsByAccountAddress(accountAddress, chainName, contractAddress, pageCursor, pageSize, options);
+        async listNFTsByAccountAddress(accountAddress: string, chainName: string, contractAddress?: string, fromUpdatedAt?: string, pageCursor?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListNFTsByOwnerResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listNFTsByAccountAddress(accountAddress, chainName, contractAddress, fromUpdatedAt, pageCursor, pageSize, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -596,7 +604,7 @@ export const NftsApiFactory = function (configuration?: Configuration, basePath?
          * @throws {RequiredError}
          */
         listNFTsByAccountAddress(requestParameters: NftsApiListNFTsByAccountAddressRequest, options?: AxiosRequestConfig): AxiosPromise<ListNFTsByOwnerResult> {
-            return localVarFp.listNFTsByAccountAddress(requestParameters.accountAddress, requestParameters.chainName, requestParameters.contractAddress, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
+            return localVarFp.listNFTsByAccountAddress(requestParameters.accountAddress, requestParameters.chainName, requestParameters.contractAddress, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -839,6 +847,13 @@ export interface NftsApiListNFTsByAccountAddressRequest {
     readonly contractAddress?: string
 
     /**
+     * Datetime to use as the oldest updated timestamp
+     * @type {string}
+     * @memberof NftsApiListNFTsByAccountAddress
+     */
+    readonly fromUpdatedAt?: string
+
+    /**
      * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
      * @type {string}
      * @memberof NftsApiListNFTsByAccountAddress
@@ -941,7 +956,7 @@ export class NftsApi extends BaseAPI {
      * @memberof NftsApi
      */
     public listNFTsByAccountAddress(requestParameters: NftsApiListNFTsByAccountAddressRequest, options?: AxiosRequestConfig) {
-        return NftsApiFp(this.configuration).listNFTsByAccountAddress(requestParameters.accountAddress, requestParameters.chainName, requestParameters.contractAddress, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
+        return NftsApiFp(this.configuration).listNFTsByAccountAddress(requestParameters.accountAddress, requestParameters.chainName, requestParameters.contractAddress, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
