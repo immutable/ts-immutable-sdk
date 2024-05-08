@@ -1,4 +1,6 @@
 import { ItemType, TransactionRequirement } from '@imtbl/checkout-sdk';
+import { BigNumber, utils } from 'ethers';
+import { getAmountWith1PercentSlippage } from './utils';
 
 const tokenInfo = (req?: TransactionRequirement) => {
   if (req && req.current.type !== ItemType.ERC721) {
@@ -16,14 +18,18 @@ export const getTopUpViewData = (
   const erc20 = transactionRequirements.find(
     ({ type }) => type === ItemType.ERC20,
   );
+  const erc20WithSlippage = getAmountWith1PercentSlippage(BigNumber.from(erc20?.delta?.balance || BigNumber.from(0)));
+  const formattedErc20Amount = utils.formatUnits(erc20WithSlippage, tokenInfo(erc20)?.decimals);
+  const nativeWithSlippage = getAmountWith1PercentSlippage(BigNumber.from(native?.delta?.balance || BigNumber.from(0)));
+  const formattedNativeAmount = utils.formatUnits(nativeWithSlippage, tokenInfo(native)?.decimals);
 
   const balances = {
     erc20: {
-      value: erc20?.delta.formattedBalance,
+      value: formattedErc20Amount,
       symbol: tokenInfo(erc20)?.symbol,
     },
     native: {
-      value: native?.delta.formattedBalance,
+      value: formattedNativeAmount,
       symbol: tokenInfo(native)?.symbol,
     },
   };
@@ -31,7 +37,7 @@ export const getTopUpViewData = (
 
   // default to insufficient ERC20
   let subheading = ['views.PAYMENT_METHODS.topUp.subheading.erc20', balances];
-  let amount = erc20?.delta.formattedBalance || '0';
+  let amount = formattedErc20Amount;
   let tokenAddress = tokenInfo(erc20)?.address;
 
   // if both NATIVE & ERC20 are insufficient
@@ -41,7 +47,7 @@ export const getTopUpViewData = (
 
   // if only NATIVE is insufficient
   if (native && erc20 && !native.sufficient && erc20.sufficient) {
-    amount = native?.delta.formattedBalance || '0';
+    amount = formattedNativeAmount;
     tokenAddress = tokenInfo(native)?.address;
     subheading = ['views.PAYMENT_METHODS.topUp.subheading.native', balances];
   }

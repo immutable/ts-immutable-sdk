@@ -1,3 +1,5 @@
+import { BigNumber } from 'ethers';
+import { Percent } from '@uniswap/sdk-core';
 import { ExecutedTransaction } from '../types';
 
 export const toStringifyTransactions = (transactions: ExecutedTransaction[]) => transactions
@@ -32,4 +34,9 @@ export const hexToText = (value: string): string => {
   }
 
   return text;
+};
+
+export const getAmountWith1PercentSlippage = (value : BigNumber): BigNumber => {
+  const percentWithSlippage = new Percent(101, 100);
+  return BigNumber.from(percentWithSlippage.multiply(value.toString()).quotient.toString());
 };

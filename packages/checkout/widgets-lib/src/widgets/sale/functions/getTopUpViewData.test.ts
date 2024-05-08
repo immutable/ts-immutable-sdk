@@ -3,7 +3,7 @@ import {
   TokenBalance,
   TransactionRequirement,
 } from '@imtbl/checkout-sdk';
-import { BigNumber } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { getTopUpViewData } from './getTopUpViewData';
 
 describe('getTopUpViewData', () => {
@@ -16,7 +16,20 @@ describe('getTopUpViewData', () => {
       decimals: 18,
       icon: 'ERC20Icon',
     },
-    balance: BigNumber.from(100),
+    balance: ethers.utils.parseEther('100'),
+    formattedBalance: '100',
+  };
+
+  const erc20BalanceWith2DecimalPlaces: TokenBalance = {
+    type: ItemType.ERC20,
+    token: {
+      name: 'ERC20',
+      symbol: 'ERC20Symbol',
+      address: 'ERC20TokenAddress',
+      decimals: 2,
+      icon: 'ERC20Icon',
+    },
+    balance: BigNumber.from('10000'),
     formattedBalance: '100',
   };
 
@@ -29,7 +42,7 @@ describe('getTopUpViewData', () => {
       decimals: 18,
       icon: 'NATIVEIcon',
     },
-    balance: BigNumber.from(50),
+    balance: ethers.utils.parseEther('50'),
     formattedBalance: '50',
   };
 
@@ -39,12 +52,12 @@ describe('getTopUpViewData', () => {
     current: erc20Balance,
     required: {
       ...erc20Balance,
-      balance: BigNumber.from(50),
+      balance: ethers.utils.parseEther('50'),
       formattedBalance: '50',
     },
     delta: {
       ...erc20Balance,
-      balance: BigNumber.from(50),
+      balance: ethers.utils.parseEther('50'),
       formattedBalance: '50',
     },
   };
@@ -55,12 +68,28 @@ describe('getTopUpViewData', () => {
     current: erc20Balance,
     required: {
       ...erc20Balance,
-      balance: BigNumber.from(200),
+      balance: ethers.utils.parseEther('200'),
       formattedBalance: '200',
     },
     delta: {
       ...erc20Balance,
-      balance: BigNumber.from(100),
+      balance: ethers.utils.parseEther('100'),
+      formattedBalance: '100',
+    },
+  };
+
+  const insufficientERC20With2DecimalPlaces: TransactionRequirement = {
+    type: ItemType.ERC20,
+    sufficient: false,
+    current: erc20BalanceWith2DecimalPlaces,
+    required: {
+      ...erc20Balance,
+      balance: BigNumber.from('20000'),
+      formattedBalance: '200',
+    },
+    delta: {
+      ...erc20Balance,
+      balance: BigNumber.from('10000'),
       formattedBalance: '100',
     },
   };
@@ -71,12 +100,12 @@ describe('getTopUpViewData', () => {
     current: nativeBalance,
     required: {
       ...nativeBalance,
-      balance: BigNumber.from(20),
+      balance: ethers.utils.parseEther('20'),
       formattedBalance: '20',
     },
     delta: {
       ...nativeBalance,
-      balance: BigNumber.from(30),
+      balance: ethers.utils.parseEther('30'),
       formattedBalance: '30',
     },
   };
@@ -87,12 +116,12 @@ describe('getTopUpViewData', () => {
     current: nativeBalance,
     required: {
       ...nativeBalance,
-      balance: BigNumber.from(70),
+      balance: ethers.utils.parseEther('70'),
       formattedBalance: '70',
     },
     delta: {
       ...nativeBalance,
-      balance: BigNumber.from(20),
+      balance: ethers.utils.parseEther('20'),
       formattedBalance: '20',
     },
   };
@@ -103,14 +132,31 @@ describe('getTopUpViewData', () => {
       subheading: [
         'views.PAYMENT_METHODS.topUp.subheading.both',
         {
-          erc20: { value: '100', symbol: 'ERC20Symbol' },
-          native: { value: '20', symbol: 'NATIVESymbol' },
+          erc20: { value: '101.0', symbol: 'ERC20Symbol' },
+          native: { value: '20.2', symbol: 'NATIVESymbol' },
         },
       ],
-      amount: '100',
+      amount: '101.0',
       tokenAddress: 'ERC20TokenAddress',
     };
     const result = getTopUpViewData([insufficientNative, insufficientERC20]);
+    expect(result).toEqual(expected);
+  });
+
+  it('should return correct data when both NATIVE and ERC20 with different token are insufficient', () => {
+    const expected = {
+      heading: ['views.PAYMENT_METHODS.topUp.heading'],
+      subheading: [
+        'views.PAYMENT_METHODS.topUp.subheading.both',
+        {
+          erc20: { value: '101.0', symbol: 'ERC20Symbol' },
+          native: { value: '20.2', symbol: 'NATIVESymbol' },
+        },
+      ],
+      amount: '101.0',
+      tokenAddress: 'ERC20TokenAddress',
+    };
+    const result = getTopUpViewData([insufficientNative, insufficientERC20With2DecimalPlaces]);
     expect(result).toEqual(expected);
   });
 
@@ -120,11 +166,11 @@ describe('getTopUpViewData', () => {
       subheading: [
         'views.PAYMENT_METHODS.topUp.subheading.native',
         {
-          erc20: { value: '50', symbol: 'ERC20Symbol' },
-          native: { value: '20', symbol: 'NATIVESymbol' },
+          erc20: { value: '50.5', symbol: 'ERC20Symbol' },
+          native: { value: '20.2', symbol: 'NATIVESymbol' },
         },
       ],
-      amount: '20',
+      amount: '20.2',
       tokenAddress: 'NATIVETokenAddress',
     };
     const result = getTopUpViewData([sufficientERC20, insufficientNative]);
@@ -137,11 +183,11 @@ describe('getTopUpViewData', () => {
       subheading: [
         'views.PAYMENT_METHODS.topUp.subheading.erc20',
         {
-          erc20: { value: '100', symbol: 'ERC20Symbol' },
-          native: { value: '30', symbol: 'NATIVESymbol' },
+          erc20: { value: '101.0', symbol: 'ERC20Symbol' },
+          native: { value: '30.3', symbol: 'NATIVESymbol' },
         },
       ],
-      amount: '100',
+      amount: '101.0',
       tokenAddress: 'ERC20TokenAddress',
     };
     const result = getTopUpViewData([insufficientERC20, sufficientNative]);
@@ -154,11 +200,11 @@ describe('getTopUpViewData', () => {
       subheading: [
         'views.PAYMENT_METHODS.topUp.subheading.erc20',
         {
-          erc20: { value: '50', symbol: 'ERC20Symbol' },
-          native: { value: '30', symbol: 'NATIVESymbol' },
+          erc20: { value: '50.5', symbol: 'ERC20Symbol' },
+          native: { value: '30.3', symbol: 'NATIVESymbol' },
         },
       ],
-      amount: '50',
+      amount: '50.5',
       tokenAddress: 'ERC20TokenAddress',
     };
     const result = getTopUpViewData([sufficientERC20, sufficientNative]);
@@ -172,17 +218,17 @@ describe('getTopUpViewData', () => {
         sufficient: true,
         current: {
           ...nativeBalance,
-          balance: BigNumber.from(0),
+          balance: ethers.utils.parseEther('0'),
           formattedBalance: '0',
         },
         required: {
           ...nativeBalance,
-          balance: BigNumber.from(30),
+          balance: ethers.utils.parseEther('30'),
           formattedBalance: '30',
         },
         delta: {
           ...nativeBalance,
-          balance: BigNumber.from(30),
+          balance: ethers.utils.parseEther('30'),
           formattedBalance: '30',
         },
       },
@@ -191,17 +237,17 @@ describe('getTopUpViewData', () => {
         sufficient: true,
         current: {
           ...erc20Balance,
-          balance: BigNumber.from(0),
+          balance: ethers.utils.parseEther('0'),
           formattedBalance: '0',
         },
         required: {
           ...erc20Balance,
-          balance: BigNumber.from(50),
+          balance: ethers.utils.parseEther('50'),
           formattedBalance: '50',
         },
         delta: {
           ...erc20Balance,
-          balance: BigNumber.from(50),
+          balance: ethers.utils.parseEther('50'),
           formattedBalance: '50',
         },
       },
@@ -212,11 +258,11 @@ describe('getTopUpViewData', () => {
       subheading: [
         'views.PAYMENT_METHODS.topUp.subheading.erc20',
         {
-          erc20: { value: '50', symbol: 'ERC20Symbol' },
-          native: { value: '30', symbol: 'NATIVESymbol' },
+          erc20: { value: '50.5', symbol: 'ERC20Symbol' },
+          native: { value: '30.3', symbol: 'NATIVESymbol' },
         },
       ],
-      amount: '50',
+      amount: '50.5',
       tokenAddress: 'ERC20TokenAddress',
     };
     const result = getTopUpViewData(zeroBalances);
