@@ -442,7 +442,8 @@
       "toFormInput": {
         "heading": "至",
         "selectDefaultText": "选择钱包和网络",
-        "walletSelectorHeading": "至钱包"
+        "walletSelectorHeading": "至钱包",
+        "networkSelectorHeading": "To network"
       },
       "submitButton": {
         "text": "下一步"

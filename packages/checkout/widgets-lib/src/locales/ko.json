@@ -442,7 +442,8 @@
       "toFormInput": {
         "heading": "To",
         "selectDefaultText": "지갑과 네트워크를 선택하세요",
-        "walletSelectorHeading": "지갑으로"
+        "walletSelectorHeading": "지갑으로",
+        "networkSelectorHeading": "To network"
       },
       "submitButton": {
         "text": "다음"

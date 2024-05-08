@@ -449,7 +449,8 @@
       "toFormInput": {
         "heading": "To",
         "selectDefaultText": "ウォレットとネットワークを選択",
-        "walletSelectorHeading": "To wallet"
+        "walletSelectorHeading": "To wallet",
+        "networkSelectorHeading": "To network"
       },
       "submitButton": {
         "text": "次へ"

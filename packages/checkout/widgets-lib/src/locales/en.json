@@ -442,7 +442,8 @@
       "toFormInput": {
         "heading": "To",
         "selectDefaultText": "Select wallet and network",
-        "walletSelectorHeading": "To wallet"
+        "walletSelectorHeading": "To wallet",
+        "networkSelectorHeading": "To network"
       },
       "submitButton": {
         "text": "Next"
