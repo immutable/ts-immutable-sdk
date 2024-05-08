@@ -89,10 +89,9 @@ export const sell = async (
   let listing: PrepareListingResponse;
   let spenderAddress = '';
 
-  // While the function signature supports multiple orders, we only support a single order for now
-  if (orders.length !== 1) {
+  if (orders.length === 0) {
     throw new CheckoutError(
-      'Exactly 1 order must be provided in the orders array.',
+      'No orders were provided to the orders array. Please provide at least one order.',
       CheckoutErrorType.PREPARE_ORDER_LISTING_ERROR,
     );
   }
@@ -131,18 +130,26 @@ export const sell = async (
     orderbook = instance.createOrderbookInstance(config);
     const { seaportContractAddress } = orderbook.config();
     spenderAddress = seaportContractAddress;
+    const sellItem = sellToken.type === ItemType.ERC721
+      ? {
+        type: sellToken.type,
+        contractAddress: sellToken.collectionAddress,
+        tokenId: sellToken.id,
+      }
+      : {
+        type: sellToken.type,
+        contractAddress: sellToken.collectionAddress,
+        tokenId: sellToken.id,
+        amount: sellToken.amount,
+      };
+
     listing = await measureAsyncExecution<PrepareListingResponse>(
       config,
       'Time to prepare the listing from the orderbook',
       orderbook.prepareListing({
         makerAddress: walletAddress,
         buy: buyTokenOrNative,
-        sell: {
-          type: sellToken.type,
-          contractAddress: sellToken.collectionAddress,
-          tokenId: sellToken.id,
-          amount: sellToken.type === 'ERC1155' ? sellToken.amount : '',
-        },
+        sell: sellItem,
         orderExpiry,
       }),
     );
