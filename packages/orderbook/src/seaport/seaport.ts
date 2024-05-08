@@ -290,7 +290,7 @@ export class Seaport {
 
     return seaportLib.createOrder(
       {
-        allowPartialFills: false,
+        allowPartialFills: listingItem.type === 'ERC1155',
         offer: [offerItem],
         consideration: [
           {

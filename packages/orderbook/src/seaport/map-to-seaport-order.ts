@@ -5,7 +5,7 @@ import {
 } from '@opensea/seaport-js/lib/types';
 import { constants } from 'ethers';
 import { ItemType, OrderType } from './constants';
-import { ERC721Item, Order } from '../openapi/sdk';
+import { ERC721Item, ERC1155Item, Order } from '../openapi/sdk';
 
 export function mapImmutableOrderToSeaportOrderComponents(
   order: Order,
@@ -61,14 +61,29 @@ export function mapImmutableOrderToSeaportOrderComponents(
       conduitKey: constants.HashZero,
       consideration: [...considerationItems],
       offer: order.sell.map((sellItem) => {
-        const erc721Item = sellItem as ERC721Item;
-        return {
-          startAmount: '1',
-          endAmount: '1',
-          itemType: ItemType.ERC721,
-          token: erc721Item.contract_address!,
-          identifierOrCriteria: erc721Item.token_id,
-        };
+        let tokenItem;
+        switch (sellItem.type) {
+          case 'ERC1155':
+            tokenItem = sellItem as ERC1155Item;
+            return {
+              startAmount: tokenItem.amount,
+              endAmount: tokenItem.amount,
+              itemType: ItemType.ERC1155,
+              recipient: order.account_address,
+              token: tokenItem.contract_address!,
+              identifierOrCriteria: tokenItem.token_id,
+            };
+          default: // ERC721
+            tokenItem = sellItem as ERC721Item;
+            return {
+              startAmount: '1',
+              endAmount: '1',
+              itemType: ItemType.ERC721,
+              recipient: order.account_address,
+              token: tokenItem.contract_address!,
+              identifierOrCriteria: tokenItem.token_id,
+            };
+        }
       }),
       counter,
       endTime: Math.round(new Date(order.end_at).getTime() / 1000).toString(),
@@ -80,7 +95,7 @@ export function mapImmutableOrderToSeaportOrderComponents(
       zone: zoneAddress,
       // this should be the fee exclusive number of items the user signed for
       totalOriginalConsiderationItems: considerationItems.length,
-      orderType: OrderType.FULL_RESTRICTED,
+      orderType: order.sell[0].type === 'ERC1155' ? OrderType.PARTIAL_RESTRICTED : OrderType.FULL_RESTRICTED,
       zoneHash: constants.HashZero,
     },
     tips: fees,
