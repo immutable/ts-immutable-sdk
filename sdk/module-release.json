@@ -16,6 +16,7 @@
     "webhook": "prod",
     "minting_backend": "prod"
   },
+  "excludeForBrowser": ["minting_backend", "webhook"],
   "fileCopy": [
     {
       "src": "../packages/checkout/widgets-lib/dist/index.js",
