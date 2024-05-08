@@ -47,7 +47,7 @@ const getBlockedContents = () => `
     </p>
   `;
 
-const getRefocusContents = () => `
+const getGenericContents = () => `
     <p style="color: #b6b6b6; text-align: center; margin: 0">
       Secure pop-up didn't open?<br />We'll help you re-launch
     </p>
@@ -113,4 +113,4 @@ const getOverlay = (contents: string): string => `
   `;
 
 export const getBlockedOverlay = () => getOverlay(getBlockedContents());
-export const getRefocusOverlay = () => getOverlay(getRefocusContents());
+export const getGenericOverlay = () => getOverlay(getGenericContents());

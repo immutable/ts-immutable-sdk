@@ -165,10 +165,10 @@ export default class ConfirmationScreen {
         width: popupOptions?.width || CONFIRMATION_WINDOW_WIDTH,
         height: popupOptions?.height || CONFIRMATION_WINDOW_HEIGHT,
       });
-      this.overlay = new Overlay();
+      this.overlay = new Overlay(this.config.popupOverlayOptions);
     } catch (e) {
       // If an error is thrown here then the popup is blocked
-      this.overlay = new Overlay(true);
+      this.overlay = new Overlay(this.config.popupOverlayOptions, true);
     }
 
     this.overlay.append(
