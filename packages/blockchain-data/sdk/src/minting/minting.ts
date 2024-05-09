@@ -2,9 +2,9 @@
 /* eslint-disable no-continue */
 /* eslint-disable no-await-in-loop */
 import { BlockchainData as Types } from '@imtbl/generated-clients';
-import { BlockchainData } from '@imtbl/blockchain-data';
 import { CreateMintRequest, MintRequest, MintingPersistence } from './persistence/type';
 import { Logger } from './logger/type';
+import { BlockchainData } from '../blockchain-data';
 
 // TODO: expose metrics
 //       - submitting status count, conflicting status count
