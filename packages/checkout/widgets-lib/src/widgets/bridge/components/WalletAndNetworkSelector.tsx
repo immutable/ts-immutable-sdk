@@ -251,7 +251,6 @@ export function WalletAndNetworkSelector() {
   );
 
   const handleSettingToNetwork = useCallback((toAddress: string) => {
-    // L1 can only transfer to L2 but L2 can transfer to L1 & L2
     // If the toWallet is Passport the toNetwork can only be L2
     // If the user selects the same wallet (e.g. MetaMask) for from AND to this can only be a bridge
     const theToNetwork = fromWalletAddress === toAddress && fromNetwork === imtblZkEvmNetworkChainId

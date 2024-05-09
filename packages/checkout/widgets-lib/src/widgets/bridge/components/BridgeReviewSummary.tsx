@@ -104,7 +104,7 @@ export function BridgeReviewSummary() {
   // Not enough ETH to cover gas
   const [showNotEnoughGasDrawer, setShowNotEnoughGasDrawer] = useState(false);
 
-  const l2Transfer = useMemo(() => from?.network === to?.network, [from, to]);
+  const isTransfer = useMemo(() => from?.network === to?.network, [from, to]);
   const insufficientFundsForGas = useMemo(() => {
     if (!estimates) return false;
     if (!token) return true;
@@ -240,7 +240,7 @@ export function BridgeReviewSummary() {
     );
   }, [checkout, tokenBridge]);
   useInterval(() => {
-    if (l2Transfer) {
+    if (isTransfer) {
       fetchTransferGasEstimate();
     } else {
       fetchBridgeGasEstimate();
@@ -255,7 +255,7 @@ export function BridgeReviewSummary() {
   useEffect(() => {
     (async () => {
       setLoading(true);
-      if (l2Transfer) {
+      if (isTransfer) {
         await fetchTransferGasEstimate();
       } else {
         await fetchBridgeGasEstimate();
@@ -324,7 +324,7 @@ export function BridgeReviewSummary() {
   }, [insufficientFundsForGas]);
 
   const submitBridge = useCallback(async () => {
-    if (!l2Transfer && (!approveTransaction || !transaction)) return;
+    if (!isTransfer && (!approveTransaction || !transaction)) return;
 
     if (insufficientFundsForGas) {
       setShowNotEnoughGasDrawer(true);
@@ -371,7 +371,7 @@ export function BridgeReviewSummary() {
         amount,
         fiatAmount: fromFiatAmount,
         tokenAddress: token?.address,
-        moveType: l2Transfer ? 'transfer' : 'bridge',
+        moveType: isTransfer ? 'transfer' : 'bridge',
       },
     });
 

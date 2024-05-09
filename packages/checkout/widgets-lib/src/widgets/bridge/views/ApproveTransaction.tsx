@@ -192,7 +192,7 @@ export function ApproveTransaction({ bridgeTransaction }: ApproveTransactionProp
 
   const handleApproveBridgeClick = useCallback(async () => {
     let bridgeRejected = false;
-    // Force unwrap as bridgeTransaction being defined is a required for this callback to be invoked
+    // Force unwrap as bridgeTransaction being defined is a requirement for this callback to be invoked
     const { approveTransaction, transaction } = bridgeTransaction!;
     if (!checkout || !from?.web3Provider || !transaction) {
       showErrorView();
