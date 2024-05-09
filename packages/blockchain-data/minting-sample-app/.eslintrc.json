@@ -1,0 +1,11 @@
+{
+  "extends": ["../../../.eslintrc"],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "./tsconfig.json",
+    "tsconfigRootDir": "."
+  },
+  "rules": {
+    "@typescript-eslint/comma-dangle": "off"
+  }
+}
