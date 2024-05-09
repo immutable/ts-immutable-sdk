@@ -28,6 +28,8 @@ export default class ConfirmationScreen {
 
   private overlay: Overlay | undefined;
 
+  private timer: NodeJS.Timeout | undefined;
+
   constructor(config: PassportConfiguration) {
     this.config = config;
   }
@@ -158,7 +160,6 @@ export default class ConfirmationScreen {
     this.popupOptions = popupOptions;
 
     try {
-      // confirmationWindow need to call close on in try again, then reopen
       this.confirmationWindow = openPopupCenter({
         url: this.getHref('loading'),
         title: CONFIRMATION_WINDOW_TITLE,
@@ -172,7 +173,17 @@ export default class ConfirmationScreen {
     }
 
     this.overlay.append(
-      () => this.recreateConfirmationWindow(this.getHref('loading')),
+      () => {
+        try {
+          this.confirmationWindow?.close();
+          this.confirmationWindow = openPopupCenter({
+            url: this.getHref('loading'),
+            title: CONFIRMATION_WINDOW_TITLE,
+            width: this.popupOptions?.width || CONFIRMATION_WINDOW_WIDTH,
+            height: this.popupOptions?.height || CONFIRMATION_WINDOW_HEIGHT,
+          });
+        } catch { /* Empty */ }
+      },
       () => this.closeWindow(),
     );
   }
@@ -195,27 +206,35 @@ export default class ConfirmationScreen {
       return;
     }
 
-    this.overlay.update(() => this.recreateConfirmationWindow(href));
-
     // https://stackoverflow.com/questions/9388380/capture-the-close-event-of-popup-window-in-javascript/48240128#48240128
-    const timer = setInterval(() => {
+    const timerCallback = () => {
       if (this.confirmationWindow?.closed) {
-        clearInterval(timer);
+        clearInterval(this.timer);
         window.removeEventListener('message', messageHandler);
         resolve({ confirmed: false });
         this.confirmationWindow = undefined;
       }
-    }, CONFIRMATION_WINDOW_CLOSED_POLLING_DURATION);
+    };
+    this.timer = setInterval(
+      timerCallback,
+      CONFIRMATION_WINDOW_CLOSED_POLLING_DURATION,
+    );
+    this.overlay.update(() => this.recreateConfirmationWindow(href, timerCallback));
   }
 
-  private recreateConfirmationWindow(href: string) {
+  private recreateConfirmationWindow(href: string, timerCallback: () => void) {
     try {
+      // Clears and recreates the timer to ensure when the confirmation window
+      // is closed and recreated the transaction is not rejected.
+      clearInterval(this.timer);
+      this.confirmationWindow?.close();
       this.confirmationWindow = openPopupCenter({
         url: href,
         title: CONFIRMATION_WINDOW_TITLE,
         width: this.popupOptions?.width || CONFIRMATION_WINDOW_WIDTH,
         height: this.popupOptions?.height || CONFIRMATION_WINDOW_HEIGHT,
       });
+      this.timer = setInterval(timerCallback, CONFIRMATION_WINDOW_CLOSED_POLLING_DURATION);
     } catch { /* Empty */ }
   }
 }
