@@ -10,6 +10,10 @@ import {
   NATIVE,
 } from './constants';
 
+export const tokenSymbolNameOverrides = {
+  timx: 'imx',
+};
+
 export const sortTokensByAmount = (
   config: CheckoutConfiguration,
   tokens: GetBalanceResult[],
@@ -71,7 +75,8 @@ export const calculateCryptoToFiat = (
 ): string => {
   if (!amount) return zeroString;
 
-  const conversion = conversions.get(symbol.toLowerCase());
+  const name = tokenSymbolNameOverrides[symbol.toLowerCase()] || symbol.toLowerCase();
+  const conversion = conversions.get(name);
   if (!conversion) return zeroString;
 
   const parsedAmount = parseFloat(amount);
