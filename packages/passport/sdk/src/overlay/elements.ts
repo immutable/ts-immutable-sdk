@@ -49,7 +49,7 @@ const getBlockedContents = () => `
 
 const getGenericContents = () => `
     <p style="color: #b6b6b6; text-align: center; margin: 0">
-      Secure pop-up didn't open?<br />We'll help you re-launch
+      Secure pop-up not showing?<br />We'll help you re-launch
     </p>
   `;
 
