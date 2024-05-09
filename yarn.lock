@@ -3906,6 +3906,7 @@ __metadata:
     oidc-client-ts: 2.2.1
     os-browserify: ^0.3.0
     pako: ^2.1.0
+    pg: ^8.11.5
     react-i18next: ^13.5.0
     rollup: ^3.17.2
     rollup-plugin-dts: ^5.3.0
