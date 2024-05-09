@@ -1,4 +1,4 @@
-import { BigNumber, utils } from 'ethers';
+import { BigNumber } from 'ethers';
 import {
   StaticJsonRpcProvider,
   TransactionRequest,
@@ -6,7 +6,7 @@ import {
 import { Flow } from '@imtbl/metrics';
 import { Signer } from '@ethersproject/abstract-signer';
 import {
-  digestOfTransactionsAndNonce,
+  digestOfTransactions,
   encodeMessageSubDigest,
   getEip155ChainId,
   getNonce,
@@ -38,15 +38,11 @@ const getFeeOption = async (
   walletAddress: string,
   relayerClient: RelayerClient,
 ): Promise<FeeOption> => {
-  const nonce = metaTransaction.nonce || BigNumber.from(0); // NOTE: We don't need a valid nonce to estimate the fee
   const normalisedMetaTransaction = getNormalisedTransactions([metaTransaction]);
-
-  const digest = digestOfTransactionsAndNonce(nonce, normalisedMetaTransaction);
+  const digest = digestOfTransactions(normalisedMetaTransaction);
   const completePayload = encodeMessageSubDigest(chainId, walletAddress, digest);
+  const feeOptions = await relayerClient.imGetFeeOptions(walletAddress, completePayload);
 
-  const hash = utils.keccak256(completePayload);
-
-  const feeOptions = await relayerClient.imGetFeeOptions(walletAddress, hash);
   const imxFeeOption = feeOptions.find((feeOption) => feeOption.tokenSymbol === 'IMX');
   if (!imxFeeOption) {
     throw new Error('Failed to retrieve fees for IMX token');
