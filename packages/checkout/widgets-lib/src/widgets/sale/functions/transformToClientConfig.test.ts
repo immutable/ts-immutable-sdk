@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { ClientConfig, SignPaymentTypes } from '../types';
+import { ClientConfig } from '../types';
 import {
-  ClientConfigResponse,
+  ClientConfigApiResponse,
   transformToClientConfig,
 } from './transformToClientConfig';
 
 describe('transformToClientConfig', () => {
   it('should return input object with camel case keys', () => {
-    const fromClientConfig: ClientConfigResponse = {
-      contract_id: '65696ef06c55501aab4da5e7',
+    const fromClientConfig: ClientConfigApiResponse = {
+      contract_id: '',
       currencies: [
         {
           base: true,
@@ -32,75 +32,131 @@ describe('transformToClientConfig', () => {
           name: 'ETH',
         },
       ],
-      currency_conversion: {
+      products: {
+        lab: {
+          pricing: {
+            ETH: {
+              amount: 0.00317,
+              currency: 'ETH',
+              type: 'crypto',
+            },
+            GOG: {
+              amount: 39.84294,
+              currency: 'GOG',
+              type: 'crypto',
+            },
+            USD: {
+              amount: 9.6096,
+              currency: 'USD',
+              type: 'fiat',
+            },
+            USDC: {
+              amount: 9.6,
+              currency: 'USDC',
+              type: 'crypto',
+            },
+          },
+          product_id: 'lab',
+          quantity: 1,
+        },
+      },
+      total_amount: {
         ETH: {
-          amount: 0.000284,
-          name: 'ETH',
+          amount: 0.00317,
+          currency: 'ETH',
           type: 'crypto',
         },
         GOG: {
-          amount: 6.00203,
-          name: 'GOG',
+          amount: 39.84294,
+          currency: 'GOG',
           type: 'crypto',
         },
         USD: {
-          amount: 0.999392,
-          name: 'USD',
+          amount: 9.6096,
+          currency: 'USD',
           type: 'fiat',
         },
         USDC: {
-          amount: 1,
-          name: 'USDC',
+          amount: 9.6,
+          currency: 'USDC',
           type: 'crypto',
         },
       },
     };
 
     const toClientConfig: ClientConfig = {
-      contractId: '65696ef06c55501aab4da5e7',
+      contractId: '',
       currencies: [
         {
           base: true,
           decimals: 6,
-          name: 'USDC',
           address: '0x3b2d8a1931736fc321c24864bceee981b11c3c57',
           exchangeId: 'usd-coin',
+          name: 'USDC',
         },
         {
           base: false,
           decimals: 18,
-          name: 'GOG',
           address: '0xb8ee289c64c1a0dc0311364721ada8c3180d838c',
           exchangeId: 'guild-of-guardians',
+          name: 'GOG',
         },
         {
           base: false,
           decimals: 18,
-          name: 'ETH',
           address: '0xe9e96d1aad82562b7588f03f49ad34186f996478',
           exchangeId: 'ethereum',
+          name: 'ETH',
         },
       ],
-      currencyConversion: {
+      products: {
+        lab: {
+          pricing: {
+            ETH: {
+              amount: 0.00317,
+              currency: 'ETH',
+              type: 'crypto',
+            },
+            GOG: {
+              amount: 39.84294,
+              currency: 'GOG',
+              type: 'crypto',
+            },
+            USD: {
+              amount: 9.6096,
+              currency: 'USD',
+              type: 'fiat',
+            },
+            USDC: {
+              amount: 9.6,
+              currency: 'USDC',
+              type: 'crypto',
+            },
+          },
+          productId: 'lab',
+          quantity: 1,
+        },
+      },
+      totalAmount: {
         ETH: {
-          amount: 0.000284,
-          name: 'ETH',
-          type: SignPaymentTypes.CRYPTO,
+          amount: 0.00317,
+          currency: 'ETH',
+          type: 'crypto',
         },
         GOG: {
-          amount: 6.00203,
-          name: 'GOG',
-          type: SignPaymentTypes.CRYPTO,
+          amount: 39.84294,
+          currency: 'GOG',
+          type: 'crypto',
         },
         USD: {
-          amount: 0.999392,
-          name: 'USD',
-          type: SignPaymentTypes.FIAT,
+          amount: 9.6096,
+          currency: 'USD',
+          type: 'fiat',
         },
         USDC: {
-          amount: 1,
-          name: 'USDC',
-          type: SignPaymentTypes.CRYPTO,
+          amount: 9.6,
+          currency: 'USDC',
+          type: 'crypto',
         },
       },
     };
