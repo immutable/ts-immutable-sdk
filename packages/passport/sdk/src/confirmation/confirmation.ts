@@ -197,7 +197,7 @@ export default class ConfirmationScreen {
   showConfirmationScreen(href: string, messageHandler: MessageHandler, resolve: Function) {
     // If popup blocked, the confirmation window will not exist
     if (this.confirmationWindow) {
-      this.confirmationWindow.location.href = href; // update confirmation window before calling close on old window
+      this.confirmationWindow.location.href = href;
     }
 
     // This indicates the user closed the overlay so the transaction should be rejected
