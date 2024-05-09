@@ -45,6 +45,7 @@ interface BridgeReview extends ViewType {
 interface BridgeInProgress extends ViewType {
   type: BridgeWidgetViews.IN_PROGRESS,
   transactionHash: string,
+  isTransfer: boolean,
 }
 
 interface BridgeFailure extends ViewType {

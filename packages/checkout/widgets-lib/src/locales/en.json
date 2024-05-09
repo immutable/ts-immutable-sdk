@@ -515,7 +515,8 @@
     "IN_PROGRESS": {
       "heading": "Move in progress",
       "body1": "Your funds have been sent, with less than 20 mins remaining until they're received. You can return and view progress by clicking on the rocket icon.",
-      "body2": "You can close this window."
+      "body2": "You can close this window.",
+      "transferHeading": "Funds transferred"
     },
     "TRANSACTIONS": {
       "layoutHeading": "In progress",

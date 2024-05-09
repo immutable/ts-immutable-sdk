@@ -211,6 +211,7 @@ export default function BridgeWidget({
           {viewState.view.type === BridgeWidgetViews.IN_PROGRESS && (
             <MoveInProgress
               transactionHash={viewState.view.transactionHash}
+              isTransfer={viewState.view.isTransfer}
             />
           )}
           {viewState.view.type === BridgeWidgetViews.BRIDGE_FAILURE

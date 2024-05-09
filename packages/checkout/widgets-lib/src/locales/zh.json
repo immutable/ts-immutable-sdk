@@ -515,7 +515,8 @@
     "IN_PROGRESS": {
       "heading": "转移进行中",
       "body1": "您的资金已经发送，距离收到不到20分钟。您可以点击火箭图标返回并查看进展。",
-      "body2": "您可以关闭这个窗口。"
+      "body2": "您可以关闭这个窗口。",
+      "transferHeading": "Funds transferred"
     },
     "TRANSACTIONS": {
       "layoutHeading": "进行中",

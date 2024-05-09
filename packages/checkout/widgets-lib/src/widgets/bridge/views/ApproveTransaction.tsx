@@ -168,6 +168,7 @@ export function ApproveTransaction({ bridgeTransaction }: ApproveTransactionProp
           view: {
             type: BridgeWidgetViews.IN_PROGRESS,
             transactionHash: txHash,
+            isTransfer: true,
           },
         },
       });
@@ -264,6 +265,7 @@ export function ApproveTransaction({ bridgeTransaction }: ApproveTransactionProp
           view: {
             type: BridgeWidgetViews.IN_PROGRESS,
             transactionHash: receipt.transactionHash,
+            isTransfer: false,
           },
         },
       });
