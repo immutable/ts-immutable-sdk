@@ -61,6 +61,7 @@ import {
 import { Fees } from '../../../components/Fees/Fees';
 import { formatBridgeFees } from '../functions/BridgeFees';
 import { RawImage } from '../../../components/RawImage/RawImage';
+import { getErc20Contract } from '../functions/TransferErc20';
 
 const testId = 'bridge-review-summary';
 
@@ -103,6 +104,7 @@ export function BridgeReviewSummary() {
   // Not enough ETH to cover gas
   const [showNotEnoughGasDrawer, setShowNotEnoughGasDrawer] = useState(false);
 
+  const l2Transfer = useMemo(() => from?.network === to?.network, [from, to]);
   const insufficientFundsForGas = useMemo(() => {
     if (!estimates) return false;
     if (!token) return true;
@@ -146,7 +148,42 @@ export function BridgeReviewSummary() {
 
   const toNetwork = useMemo(() => to?.network, [to]);
 
-  const fetchGasEstimate = useCallback(async () => {
+  const fetchTransferGasEstimate = useCallback(async () => {
+    if (!tokenBridge || !amount || !from || !to || !token) return;
+
+    const tokenToTransfer = token?.address?.toLowerCase() ?? NATIVE.toUpperCase();
+    let estimate: BigNumber;
+    const gasEstimateResult = {
+      gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+      fees: {},
+      token: checkout.config.networkMap.get(from!.network)?.nativeCurrency,
+    } as GasEstimateBridgeToL2Result;
+    if (tokenToTransfer === NATIVE.toLowerCase()) {
+      const request = {
+        to: toAddress,
+        value: utils.parseUnits(amount, token.decimals),
+      };
+      estimate = await from.web3Provider.estimateGas(request);
+    } else {
+      const erc20 = getErc20Contract(tokenToTransfer, from.web3Provider.getSigner());
+      const parsedAmount = utils.parseUnits(amount, token.decimals);
+      estimate = await erc20.estimateGas.transfer(toAddress, parsedAmount);
+    }
+    gasEstimateResult.fees.sourceChainGas = estimate;
+    gasEstimateResult.fees.totalFees = estimate;
+    setEstimates(gasEstimateResult);
+    const estimatedAmount = utils.formatUnits(estimate, DEFAULT_TOKEN_DECIMALS);
+    setGasFee(estimatedAmount);
+    setGasFeeFiatValue(
+      calculateCryptoToFiat(
+        estimatedAmount,
+        NATIVE.toUpperCase(),
+        cryptoFiatState.conversions,
+      ),
+    );
+  }, [checkout, from, to, token, amount]);
+
+  const fetchBridgeGasEstimate = useCallback(async () => {
     if (!tokenBridge || !amount || !from || !to || !token) return;
 
     const bundledTxn = await tokenBridge!.getUnsignedBridgeBundledTx({
@@ -208,7 +245,13 @@ export function BridgeReviewSummary() {
       ),
     );
   }, [checkout, tokenBridge]);
-  useInterval(() => fetchGasEstimate(), DEFAULT_QUOTE_REFRESH_INTERVAL);
+  useInterval(() => {
+    if (l2Transfer) {
+      fetchTransferGasEstimate();
+    } else {
+      fetchBridgeGasEstimate();
+    }
+  }, DEFAULT_QUOTE_REFRESH_INTERVAL);
 
   const formatFeeBreakdown = useCallback(
     (): any => formatBridgeFees(estimates, cryptoFiatState, t),
@@ -218,7 +261,11 @@ export function BridgeReviewSummary() {
   useEffect(() => {
     (async () => {
       setLoading(true);
-      await fetchGasEstimate();
+      if (l2Transfer) {
+        await fetchTransferGasEstimate();
+      } else {
+        await fetchBridgeGasEstimate();
+      }
       setLoading(false);
     })();
   }, []);
@@ -283,7 +330,7 @@ export function BridgeReviewSummary() {
   }, [insufficientFundsForGas]);
 
   const submitBridge = useCallback(async () => {
-    if (!approveTransaction || !transaction) return;
+    if (!l2Transfer && (!approveTransaction || !transaction)) return;
 
     if (insufficientFundsForGas) {
       setShowNotEnoughGasDrawer(true);
@@ -330,6 +377,7 @@ export function BridgeReviewSummary() {
         amount,
         fiatAmount: fromFiatAmount,
         tokenAddress: token?.address,
+        moveType: l2Transfer ? 'transfer' : 'bridge',
       },
     });
 

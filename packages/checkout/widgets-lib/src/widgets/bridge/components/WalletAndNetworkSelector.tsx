@@ -250,10 +250,13 @@ export function WalletAndNetworkSelector() {
     [checkout, toWalletWeb3Provider],
   );
 
-  const handleSettingToNetwork = useCallback(() => {
+  const handleSettingToNetwork = useCallback((toAddress: string) => {
     // L1 can only transfer to L2 but L2 can transfer to L1 & L2
     // If the toWallet is Passport the toNetwork can only be L2
-    const theToNetwork = imtblZkEvmNetworkChainId;
+    // If the user selects the same wallet (e.g. MetaMask) for from AND to this can only be a bridge
+    const theToNetwork = fromWalletAddress === toAddress && fromNetwork === imtblZkEvmNetworkChainId
+      ? l1NetworkChainId
+      : imtblZkEvmNetworkChainId;
     setToNetwork(theToNetwork);
     setToWalletDrawerOpen(false);
 
@@ -266,7 +269,7 @@ export function WalletAndNetworkSelector() {
         chainId: theToNetwork,
       },
     });
-  }, [fromNetwork]);
+  }, [fromWalletAddress, fromNetwork]);
 
   const handleWalletConnectToWalletConnection = useCallback(
     (provider: Web3Provider) => {
@@ -276,7 +279,7 @@ export function WalletAndNetworkSelector() {
         .getAddress()
         .then((address) => {
           setToWalletAddress(address.toLowerCase());
-          handleSettingToNetwork();
+          handleSettingToNetwork(address.toLowerCase());
 
           track({
             userJourney: UserJourney.BRIDGE,
@@ -300,7 +303,7 @@ export function WalletAndNetworkSelector() {
         setToWallet(event);
         const address = await fromWalletWeb3Provider!.getSigner().getAddress();
         setToWalletAddress(address.toLowerCase());
-        handleSettingToNetwork();
+        handleSettingToNetwork(address.toLowerCase());
 
         track({
           userJourney: UserJourney.BRIDGE,
@@ -321,12 +324,11 @@ export function WalletAndNetworkSelector() {
 
         if (isWalletConnectProvider(connectedProvider)) {
           handleWalletConnectToWalletConnection(connectedProvider);
-          handleSettingToNetwork();
         } else {
           setToWalletWeb3Provider(connectedProvider);
           const address = await connectedProvider!.getSigner().getAddress();
           setToWalletAddress(address.toLowerCase());
-          handleSettingToNetwork();
+          handleSettingToNetwork(address.toLowerCase());
 
           track({
             userJourney: UserJourney.BRIDGE,
@@ -415,6 +417,7 @@ export function WalletAndNetworkSelector() {
           isPassportWallet: isPassportProvider(toWalletWeb3Provider),
           isMetaMask: isMetaMaskProvider(toWalletWeb3Provider),
         },
+        moveType: fromNetwork && fromNetwork === toNetwork ? 'transfer' : 'bridge',
       },
     });
 
@@ -483,6 +486,7 @@ export function WalletAndNetworkSelector() {
             walletName={fromWalletProviderName}
             walletAddress={abbreviateAddress(fromWalletAddress)}
             chainId={fromNetwork}
+            disableNetworkButton={fromWalletProviderName === WalletProviderName.PASSPORT.toString()}
             onWalletClick={() => {
               // TODO: Force an account selection here
               setFromWalletDrawerOpen(true);
@@ -539,13 +543,15 @@ export function WalletAndNetworkSelector() {
             chainId={imtblZkEvmNetworkChainId}
           />
           {/** Show L1 option for everything but Passport */}
-          <NetworkItem
-            key={l1NetworkName}
-            testId={testId}
-            chainName={l1NetworkName}
-            onNetworkClick={fromNetworkDrawerOpen ? handleFromNetworkSelection : handleToNetworkSelection}
-            chainId={l1NetworkChainId}
-          />
+          {(fromWallet?.providerDetail.info.rdns !== WalletProviderRdns.PASSPORT) && (
+            <NetworkItem
+              key={l1NetworkName}
+              testId={testId}
+              chainName={l1NetworkName}
+              onNetworkClick={fromNetworkDrawerOpen ? handleFromNetworkSelection : handleToNetworkSelection}
+              chainId={l1NetworkChainId}
+            />
+          )}
         </Drawer.Content>
       </Drawer>
 
@@ -567,7 +573,8 @@ export function WalletAndNetworkSelector() {
             walletAddress={abbreviateAddress(toWalletAddress)}
             chainId={toNetwork!}
             disableNetworkButton={fromNetwork === l1NetworkChainId
-              || toWalletProviderName === WalletProviderName.PASSPORT.toString()}
+              || toWalletProviderName === WalletProviderName.PASSPORT.toString()
+              || from?.walletAddress === to?.walletAddress}
             onWalletClick={() => {
               setToWalletDrawerOpen(true);
             }}

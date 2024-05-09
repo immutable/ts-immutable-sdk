@@ -54,8 +54,8 @@ interface BridgeFailure extends ViewType {
 
 interface BridgeApproveTransaction extends ViewType {
   type: BridgeWidgetViews.APPROVE_TRANSACTION,
-  approveTransaction: ApproveBridgeResponse;
-  transaction: BridgeTxResponse;
+  approveTransaction: ApproveBridgeResponse | undefined;
+  transaction: BridgeTxResponse | undefined;
 }
 
 interface BridgeTransactions extends ViewType {

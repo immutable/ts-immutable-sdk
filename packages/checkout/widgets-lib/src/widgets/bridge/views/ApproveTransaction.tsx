@@ -9,6 +9,7 @@ import { CheckoutErrorType } from '@imtbl/checkout-sdk';
 import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { useTranslation } from 'react-i18next';
+import { utils } from 'ethers';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
@@ -21,18 +22,30 @@ import { WalletApproveHero } from '../../../components/Hero/WalletApproveHero';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
+import { NATIVE } from '../../../lib';
+import { getErc20Contract } from '../functions/TransferErc20';
 
-export interface ApproveTransactionProps {
+export interface BridgeTransaction {
   approveTransaction: ApproveBridgeResponse;
   transaction: BridgeTxResponse;
 }
 
-export function ApproveTransaction({ approveTransaction, transaction }: ApproveTransactionProps) {
+/**
+ * @param bridgeTransaction if provided the transaction is a bridge, if not it's a transfer
+ */
+export interface ApproveTransactionProps {
+  bridgeTransaction: BridgeTransaction | undefined;
+}
+
+export function ApproveTransaction({ bridgeTransaction }: ApproveTransactionProps) {
   const { t } = useTranslation();
   const { bridgeState } = useContext(BridgeContext);
   const {
     checkout,
     from,
+    to,
+    token,
+    amount,
   } = bridgeState;
   const { viewDispatch } = useContext(ViewContext);
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
@@ -43,6 +56,9 @@ export function ApproveTransaction({ approveTransaction, transaction }: ApproveT
     page({
       userJourney: UserJourney.BRIDGE,
       screen: 'ApproveTransaction',
+      extras: {
+        moveType: bridgeTransaction ? 'bridge' : 'transfer',
+      },
     });
   }, []);
 
@@ -115,8 +131,68 @@ export function ApproveTransaction({ approveTransaction, transaction }: ApproveT
     });
   };
 
+  const handleApproveTransferClick = useCallback(async () => {
+    if (!checkout || !from?.web3Provider) {
+      showErrorView();
+      return;
+    }
+
+    if (actionDisabled) return;
+    setActionDisabled(true);
+    setTxProcessing(true);
+    const tokenToTransfer = token?.address?.toLowerCase() ?? NATIVE.toUpperCase();
+    let txHash: string;
+    try {
+      if (tokenToTransfer === NATIVE.toLowerCase()) {
+        const request = {
+          to: to?.walletAddress,
+          value: utils.parseUnits(amount, token?.decimals),
+        };
+        const result = await checkout.sendTransaction({
+          provider: from.web3Provider,
+          transaction: request,
+        });
+        txHash = result.transactionResponse.hash;
+      } else {
+        const erc20 = getErc20Contract(tokenToTransfer, from.web3Provider.getSigner());
+        const parsedAmount = utils.parseUnits(amount, token?.decimals);
+        const response = await checkout.providerCall(
+          from.web3Provider,
+          async () => await erc20.transfer(to?.walletAddress, parsedAmount),
+        );
+        txHash = response.hash;
+      }
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: BridgeWidgetViews.IN_PROGRESS,
+            transactionHash: txHash,
+          },
+        },
+      });
+    } catch (e: any) {
+      setTxProcessing(false);
+      if (e.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
+        setRejectedBridge(true);
+      } else {
+        handleExceptions(e);
+      }
+    } finally {
+      setActionDisabled(false);
+    }
+  }, [
+    checkout,
+    from,
+    showErrorView,
+    viewDispatch,
+    actionDisabled,
+  ]);
+
   const handleApproveBridgeClick = useCallback(async () => {
     let bridgeRejected = false;
+    // Force unwrap as bridgeTransaction being defined is a required for this callback to be invoked
+    const { approveTransaction, transaction } = bridgeTransaction!;
     if (!checkout || !from?.web3Provider || !transaction) {
       showErrorView();
       return;
@@ -207,8 +283,7 @@ export function ApproveTransaction({ approveTransaction, transaction }: ApproveT
     from,
     showErrorView,
     viewDispatch,
-    transaction,
-    approveTransaction,
+    bridgeTransaction,
     actionDisabled,
   ]);
 
@@ -232,7 +307,7 @@ export function ApproveTransaction({ approveTransaction, transaction }: ApproveT
               <FooterButton
                 loading={txProcessing}
                 actionText={t(`views.APPROVE_TRANSACTION.${rejectedBridge ? 'footer.retryText' : 'footer.buttonText'}`)}
-                onActionClick={handleApproveBridgeClick}
+                onActionClick={bridgeTransaction ? handleApproveBridgeClick : handleApproveTransferClick}
               />
               <FooterLogo />
             </Box>

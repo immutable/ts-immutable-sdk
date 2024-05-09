@@ -242,8 +242,9 @@ export default function BridgeWidget({
 
           {viewState.view.type === BridgeWidgetViews.APPROVE_TRANSACTION && (
             <ApproveTransaction
-              approveTransaction={viewState.view.approveTransaction}
-              transaction={viewState.view.transaction}
+              bridgeTransaction={viewState.view.approveTransaction && viewState.view.transaction
+                ? { approveTransaction: viewState.view.approveTransaction, transaction: viewState.view.transaction }
+                : undefined}
             />
           )}
           {viewState.view.type === BridgeWidgetViews.TRANSACTIONS && (
