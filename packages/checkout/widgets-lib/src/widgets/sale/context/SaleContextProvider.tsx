@@ -197,13 +197,12 @@ export function SaleContextProvider(props: {
 
   const [invalidParameters, setInvalidParameters] = useState<boolean>(false);
 
-  const { selectedCurrency, clientConfig, clientConfigError } = useClientConfig(
-    {
-      items,
-      environmentId,
-      environment: config.environment,
-    },
-  );
+  const { selectedCurrency, clientConfig, clientConfigError } = useClientConfig({
+    items,
+    provider,
+    environmentId,
+    environment: config.environment,
+  });
 
   const fromTokenAddress = selectedCurrency?.address || '';
 
