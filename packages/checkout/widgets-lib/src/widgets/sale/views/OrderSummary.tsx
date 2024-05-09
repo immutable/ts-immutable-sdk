@@ -46,6 +46,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
     goBackToPaymentMethods,
     sign,
     selectedCurrency,
+    clientConfig,
   } = useSaleContext();
 
   const { viewDispatch, viewState } = useContext(ViewContext);
@@ -208,6 +209,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
       {subView === OrderSummarySubViews.REVIEW_ORDER && (
         <OrderReview
           items={items}
+          pricing={clientConfig.products}
           fundingBalances={fundingBalances}
           conversions={cryptoFiatState.conversions}
           collectionName={collectionName}

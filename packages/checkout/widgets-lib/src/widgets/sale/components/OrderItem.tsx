@@ -1,37 +1,45 @@
-import { Heading, MenuItem } from '@biom3/react';
+import { Heading, MenuItem, MenuItemSize } from '@biom3/react';
 import { SaleItem } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
 import { calculateCryptoToFiat, tokenValueFormat } from 'lib/utils';
 import { ReactElement } from 'react';
-import { FundingBalance } from '../types';
+import { ClientConfigPricing, FundingBalance } from '../types';
 
 export interface OrderItemProps<
   RC extends ReactElement | undefined = undefined,
 > {
   item: SaleItem;
   balance: FundingBalance;
+  pricing: ClientConfigPricing | undefined;
   conversions: Map<string, number>;
+  size?: MenuItemSize;
   rc?: RC;
 }
 
 export function OrderItem<RC extends ReactElement | undefined = undefined>({
   item,
   balance,
+  pricing,
   conversions,
+  size,
   rc = <span />,
 }: OrderItemProps<RC>) {
   const { t } = useTranslation();
 
-  const { token, fundsRequired } = balance.fundingItem;
+  const { token } = balance.fundingItem;
+  const amount = pricing?.amount || 0;
 
-  const amount = fundsRequired.formattedAmount;
-  const fiatAmount = calculateCryptoToFiat(amount, token.symbol, conversions);
+  const fiatAmount = calculateCryptoToFiat(
+    amount.toString(),
+    token.symbol,
+    conversions,
+  );
 
   return (
     <MenuItem
       rc={rc}
       emphasized
-      size="medium"
+      size={size || 'medium'}
       key={item.name}
       sx={{
         pointerEvents: 'none',
@@ -41,20 +49,20 @@ export function OrderItem<RC extends ReactElement | undefined = undefined>({
       <MenuItem.FramedImage imageUrl={item.image} />
       <MenuItem.Label>{item.name}</MenuItem.Label>
       <MenuItem.Caption>
-        {item.qty > 1
-          ? t('views.ORDER_SUMMARY.orderItem.quantity', { qty: item.qty })
-          : null}
+        {t('views.ORDER_SUMMARY.orderItem.quantity', { qty: item.qty })}
       </MenuItem.Caption>
-      <MenuItem.PriceDisplay
-        use={<Heading size="xSmall" />}
-        price={t('views.ORDER_SUMMARY.currency.price', {
-          symbol: token.symbol,
-          amount: tokenValueFormat(amount),
-        })}
-        fiatAmount={t('views.ORDER_SUMMARY.currency.fiat', {
-          amount: fiatAmount,
-        })}
-      />
+      {amount > 0 && (
+        <MenuItem.PriceDisplay
+          use={<Heading size="xSmall" />}
+          price={t('views.ORDER_SUMMARY.currency.price', {
+            symbol: token.symbol,
+            amount: tokenValueFormat(amount),
+          })}
+          fiatAmount={t('views.ORDER_SUMMARY.currency.fiat', {
+            amount: fiatAmount,
+          })}
+        />
+      )}
     </MenuItem>
   );
 }

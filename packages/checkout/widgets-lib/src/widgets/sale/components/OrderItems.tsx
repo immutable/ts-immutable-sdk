@@ -4,15 +4,22 @@ import { listVariants, listItemVariants } from 'lib/animation/listAnimation';
 
 import { motion } from 'framer-motion';
 import { OrderItem } from './OrderItem';
-import { FundingBalance } from '../types';
+import { ClientConfigProduct, FundingBalance } from '../types';
+import { getPricingBySymbol } from '../utils/pricing';
 
 type OrderItemsProps = {
   items: SaleItem[];
   balance: FundingBalance;
+  pricing: Record<string, ClientConfigProduct>;
   conversions: Map<string, number>;
 };
 
-export function OrderItems({ items, balance, conversions }: OrderItemsProps) {
+export function OrderItems({
+  items,
+  balance,
+  pricing,
+  conversions,
+}: OrderItemsProps) {
   return (
     <Box
       rc={
@@ -25,6 +32,12 @@ export function OrderItems({ items, balance, conversions }: OrderItemsProps) {
           item={item}
           balance={balance}
           conversions={conversions}
+          size={items.length > 1 ? 'small' : 'medium'}
+          pricing={getPricingBySymbol(
+            balance.fundingItem.token.symbol,
+            pricing?.[item.productId]?.pricing,
+            conversions,
+          )}
           rc={<motion.div variants={listItemVariants} custom={idx} />}
         />
       ))}
