@@ -75,6 +75,7 @@ import { WidgetConfiguration } from './widgets/definitions/configurations';
 import { SemanticVersion } from './widgets/definitions/types';
 import { validateAndBuildVersion } from './widgets/version';
 import { InjectedProvidersManager } from './provider/injectedProvidersManager';
+import { handleProviderError } from './transaction';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
@@ -479,6 +480,28 @@ export class Checkout {
       } as ValidateProviderOptions,
     );
     return await transaction.sendTransaction(web3Provider, params.transaction);
+  }
+
+  /**
+   * Wraps a Web3Provider call to validate the provider and handle errors.
+   * @param {Web3Provider} web3Provider - The provider to connect to the network.
+   * @param {(web3Provider: Web3Provider) => T)} block - The block executing the provider call.
+   * @returns {Promise<T>} Returns the result of the provided block param.
+   */
+  public async providerCall<T>(web3Provider: Web3Provider, block: (web3Provider: Web3Provider) => T) {
+    const validatedProvider = await provider.validateProvider(
+      this.config,
+      web3Provider,
+      {
+        allowUnsupportedProvider: true,
+        allowMistmatchedChainId: true,
+      } as ValidateProviderOptions,
+    );
+    try {
+      return await block(validatedProvider);
+    } catch (err: any) {
+      throw handleProviderError(err);
+    }
   }
 
   /**
