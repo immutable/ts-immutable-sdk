@@ -90,9 +90,7 @@
       "packages/blockchain-data/sdk",
       "packages/blockchain-data/sample-app",
       "packages/game-bridge",
-      "packages/webhook/sdk",
-      "packages/minting-backend/sdk",
-      "packages/minting-backend/minting-sample-app"
+      "packages/webhook/sdk"
     ],
     "nohoist": [
       "samples/**",

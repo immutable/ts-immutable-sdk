@@ -13,10 +13,9 @@
     "orderbook": "prod",
     "checkout": "prod",
     "x": "prod",
-    "webhook": "prod",
-    "minting_backend": "prod"
+    "webhook": "prod"
   },
-  "excludeForBrowser": ["minting_backend", "webhook"],
+  "excludeForBrowser": ["webhook"],
   "fileCopy": [
     {
       "src": "../packages/checkout/widgets-lib/dist/index.js",
