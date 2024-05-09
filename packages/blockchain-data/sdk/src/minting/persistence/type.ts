@@ -27,8 +27,7 @@ export type SubmittedMintRequest = {
   error: any | null;
 };
 
-export interface MintingPersistence<DBClient> {
-  client: DBClient;
+export interface MintingPersistence {
   recordMint: (request: CreateMintRequest) => Promise<void>;
   getNextBatchForSubmission: (limit: number) => Promise<MintRequest[]>;
   updateMintingStatusToSubmitted: (id: string[]) => Promise<void>;

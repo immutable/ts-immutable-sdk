@@ -1,9 +1,7 @@
-import type { Pool } from 'pg';
 import { client } from '../../dbClient/postgres';
 import { CreateMintRequest, MintingPersistence, SubmittedMintRequest } from '../type';
 
-export const mintingPersistence: MintingPersistence<Pool> = {
-  client,
+export const mintingPersistence: MintingPersistence = {
   recordMint: async (request: CreateMintRequest) => {
     const r = await client.query(
       `

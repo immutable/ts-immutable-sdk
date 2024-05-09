@@ -10,8 +10,8 @@ import { BlockchainData } from '../blockchain-data';
 //       - submitting status count, conflicting status count
 //       - failed events count
 
-export const recordMint = async <DBClient>(
-  mintingPersistence: MintingPersistence<DBClient>,
+export const recordMint = async (
+  mintingPersistence: MintingPersistence,
   mintRequest: CreateMintRequest
 ) => {
   mintingPersistence.recordMint(mintRequest);
@@ -22,8 +22,8 @@ const defaultMintingDelay = 1000;
 // Each process will NOT mint the same asset.
 // Monitor your database to see if parallel processes are saturating the database CPU and triggering excessive vacuuming.
 // default batch size will be treated as 100 when it exceeds 100 because minting API has a limit of 100 assets per request.
-export const submitMintingRequests = async <DBClient>(
-  mintingPersistence: MintingPersistence<DBClient>,
+export const submitMintingRequests = async (
+  mintingPersistence: MintingPersistence,
   blockchainDataSDKClient: BlockchainData,
   {
     defaultBatchSize = 100,
@@ -210,8 +210,8 @@ type MintRequestEvent = {
   }
 };
 
-export const processMint = async <DBClient>(
-  mintingPersistence: MintingPersistence<DBClient>,
+export const processMint = async (
+  mintingPersistence: MintingPersistence,
   event: MintRequestEvent,
   logger: Logger = console
 ) => {
