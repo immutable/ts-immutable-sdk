@@ -41,6 +41,12 @@ export interface ActivityNFT {
      * @memberof ActivityNFT
      */
     'token_id': string;
+    /**
+     * The amount of tokens exchanged
+     * @type {string}
+     * @memberof ActivityNFT
+     */
+    'amount': string;
 }
 
 

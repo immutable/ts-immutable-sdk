@@ -1211,6 +1211,17 @@
             "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
           },
           {
+            "name": "from_updated_at",
+            "in": "query",
+            "description": "Datetime to use as the oldest updated timestamp",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "2022-08-16T17:43:26.991388Z",
+              "format": "date-time"
+            }
+          },
+          {
             "name": "page_cursor",
             "in": "query",
             "description": "Encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
@@ -1522,6 +1533,20 @@
               "testnet": {
                 "value": "imtbl-zkevm-testnet",
                 "summary": "Immutable zkEVM Public Testnet"
+              }
+            }
+          },
+          {
+            "name": "account_address",
+            "in": "query",
+            "required": false,
+            "description": "List of account addresses to filter by",
+            "schema": {
+              "type": "array",
+              "maxItems": 30,
+              "items": {
+                "type": "string",
+                "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
               }
             }
           },
@@ -2918,8 +2943,9 @@
     },
     "/v1/chains/{chain_name}/passport/users/{user_id}/linked-addresses": {
       "get": {
+        "deprecated": true,
         "summary": "Get Ethereum linked addresses for a user",
-        "description": "Get all the Ethereum linked addresses for a user based on its userId",
+        "description": "This API has been deprecated, please use https://docs.immutable.com/zkevm/api/reference/#/operations/getUserInfo instead to get a list of linked addresses.",
         "tags": [
           "passport"
         ],
@@ -3609,12 +3635,18 @@
             "description": "An `uint256` token id as string",
             "type": "string",
             "example": "1"
+          },
+          "amount": {
+            "description": "The amount of tokens exchanged",
+            "type": "string",
+            "example": "1"
           }
         },
         "required": [
           "contract_type",
           "contract_address",
-          "token_id"
+          "token_id",
+          "amount"
         ]
       },
       "ActivityToken": {
@@ -5298,9 +5330,16 @@
           },
           "token_id": {
             "type": "string",
-            "description": "An optional `uint256` token id as string. It is recommended to omit token_id for more efficient minting",
+            "description": "An optional `uint256` token id as string. Required for ERC1155 collections.",
             "example": "1",
             "nullable": true
+          },
+          "amount": {
+            "type": "string",
+            "description": "Optional mount of tokens to mint. Required for ERC1155 collections. ERC712 collections can omit this field or set it to 1",
+            "example": "1",
+            "nullable": true,
+            "minLength": 1
           },
           "metadata": {
             "$ref": "#/components/schemas/NFTMetadataRequest"
@@ -5378,6 +5417,12 @@
             "example": "1",
             "nullable": true,
             "description": "An `uint256` token id as string. Only available when the mint request succeeds"
+          },
+          "amount": {
+            "type": "string",
+            "example": "1",
+            "nullable": true,
+            "description": "An `uint256` amount as string. Only relevant for mint requests on ERC1155 contracts"
           },
           "activity_id": {
             "type": "string",
@@ -6954,7 +6999,7 @@
         "properties": {
           "order_type": {
             "type": "string",
-            "description": "Seaport order type",
+            "description": "Seaport order type. Orders containing ERC721 tokens will need to pass in the order type as FULL_RESTRICTED while orders with ERC1155 tokens will need to pass in the order_type as PARTIAL_RESTRICTED",
             "example": "FULL_RESTRICTED",
             "enum": [
               "FULL_RESTRICTED",
@@ -7031,6 +7076,7 @@
         ]
       },
       "FillStatus": {
+        "description": "The ratio of the order that has been filled, an order that has been fully filled will have the same numerator and denominator values.",
         "type": "object",
         "properties": {
           "numerator": {
@@ -7872,17 +7918,7 @@
             ]
           },
           "sell": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SeaportERC721Item"
-            },
-            "example": [
-              {
-                "type": "NATIVE",
-                "amount": "9750000000000000000",
-                "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
-              }
-            ]
+            "$ref": "#/components/schemas/SeaportERC721Item"
           },
           "fees": {
             "type": "array",
