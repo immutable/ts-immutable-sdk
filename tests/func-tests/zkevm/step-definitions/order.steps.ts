@@ -4,19 +4,23 @@ import { orderbook } from '@imtbl/sdk';
 import { Environment } from '@imtbl/config';
 import {
   connectToTestERC1155Token,
-  connectToTestERC721Token,
+  connectToTestERC721Token, createListing, fulfillListing,
   getConfigFromEnv,
-  getRandomTokenId,
+  getRandomTokenId, getTrades, prepareERC1155Listing, prepareERC721Listing,
   waitForOrderToBeOfStatus,
 } from '../utils/orderbook';
-import { GAS_OVERRIDES } from '../utils/orderbook/gas';
 import { actionAll } from '../utils/orderbook/actions';
 import { RetryProvider } from '../utils/orderbook/retry-provider';
+import {
+  andIHaveAFundedFulfillerAccount, andTheOffererAccountHasERC1155Tokens,
+  andTheOffererAccountHasERC721Token,
+  givenIHaveAFundedOffererAccount,
+} from './shared';
 
 const feature = loadFeature('features/order.feature', { tagFilter: process.env.TAGS });
 
 defineFeature(feature, (test) => {
-  test('creating and fulfilling a ERC721 listing', ({
+  test('creating and fulfilling a ERC721 listing', async ({
     given,
     when,
     then,
@@ -46,86 +50,34 @@ defineFeature(feature, (test) => {
     const offerer = new Wallet(Wallet.createRandom().privateKey, provider);
     const fulfiller = new Wallet(Wallet.createRandom().privateKey, provider);
     const testTokenId = getRandomTokenId();
-
-    const imxForApproval = 0.01 * 1e18;
-    const imxForFulfillment = 0.04 * 1e18;
     const listingPrice = 0.0001 * 1e18;
     let listingId: string = '';
 
-    given(/^I have a funded offerer account with a minted NFT$/, async () => {
-      const fundingTx = await bankerWallet.sendTransaction({
-        to: offerer.address,
-        value: `${imxForApproval}`,
-        ...GAS_OVERRIDES,
-      });
+    givenIHaveAFundedOffererAccount(given, bankerWallet, offerer);
 
-      await fundingTx.wait(1);
+    andTheOffererAccountHasERC721Token(and, bankerWallet, offerer, erc721ContractAddress, testTokenId);
 
-      const testToken = await connectToTestERC721Token(bankerWallet, erc721ContractAddress);
-      const mintTx = await testToken.mint(offerer.address, testTokenId, GAS_OVERRIDES);
-      await mintTx.wait(1);
-    });
+    andIHaveAFundedFulfillerAccount(and, bankerWallet, fulfiller);
 
-    and(/^I have a funded fulfiller account$/, async () => {
-      const fundingTx = await bankerWallet.sendTransaction({
-        to: fulfiller.address,
-        value: `${(listingPrice + imxForFulfillment)}`,
-        ...GAS_OVERRIDES,
-      });
+    when(/^I create a listing to sell 1 token$/, async () => {
+      const prepareListing = await prepareERC721Listing(sdk, offerer, erc721ContractAddress, testTokenId, listingPrice);
 
-      await fundingTx.wait(1);
-    });
+      const signatures = await actionAll(prepareListing.actions, offerer);
 
-    when(/^I create a listing$/, async () => {
-      const listing = await sdk.prepareListing({
-        makerAddress: offerer.address,
-        buy: {
-          amount: `${listingPrice}`,
-          type: 'NATIVE',
-        },
-        sell: {
-          contractAddress: erc721ContractAddress,
-          tokenId: testTokenId,
-          type: 'ERC721',
-        },
-      });
-
-      const signatures = await actionAll(listing.actions, offerer);
-
-      const { result } = await sdk.createListing({
-        orderComponents: listing.orderComponents,
-        orderHash: listing.orderHash,
-        orderSignature: signatures[0],
-        makerFees: [],
-      });
+      const { result } = await createListing(sdk, prepareListing, signatures[0]);
       listingId = result.id;
     });
 
     then(/^the listing should be (.*)$/, async (status: string) => {
-      let orderStatus;
-      if (status === 'active') {
-        orderStatus = orderbook.OrderStatusName.ACTIVE;
-      } else if (status === 'filled') {
-        orderStatus = orderbook.OrderStatusName.FILLED;
-      } else {
-        throw new Error(`Unrecognized order status: ${status}`);
-      }
-
-      await waitForOrderToBeOfStatus(sdk, listingId, orderStatus);
+      await waitForOrderToBeOfStatus(sdk, listingId, status);
     });
 
     and(/^when I fulfill the listing$/, async () => {
-      const fulfillment = await sdk.fulfillOrder(
-        listingId,
-        fulfiller.address,
-        [],
-      );
-
-      await actionAll(fulfillment.actions, fulfiller);
+      await fulfillListing(sdk, listingId, fulfiller);
     });
 
-    then(/^the listing should be filled$/, async () => {
-      await waitForOrderToBeOfStatus(sdk, listingId, orderbook.OrderStatusName.FILLED);
+    then(/^the listing should be (.*)$/, async (status: string) => {
+      await waitForOrderToBeOfStatus(sdk, listingId, status);
     });
 
     and(/^the NFT should be transferred to the fulfiller$/, async () => {
@@ -134,21 +86,13 @@ defineFeature(feature, (test) => {
       expect(ownerOf).toEqual(fulfiller.address);
     });
 
-    and(/^the trade data should be available$/, async () => {
+    and(/^(\d+) trade should be available$/, async (count) => {
       let attempt = 0;
-      let targetTrade: orderbook.Trade | undefined;
-      while (attempt < 5 && !targetTrade) {
+      let targetTrades: orderbook.Trade[] | undefined;
+      while (attempt < 5 && !targetTrades) {
         // eslint-disable-next-line no-await-in-loop
-        const trades = await sdk.listTrades({
-          accountAddress: fulfiller.address,
-          sortBy: 'indexed_at',
-          sortDirection: 'desc',
-          pageSize: 10,
-        });
-
-        // eslint-disable-next-line @typescript-eslint/no-loop-func
-        targetTrade = trades.result.find((t) => t.orderId === listingId);
-        if (!targetTrade) {
+        targetTrades = await getTrades(sdk, listingId, fulfiller);
+        if (targetTrades.length !== count) {
           // eslint-disable-next-line no-await-in-loop, no-promise-executor-return
           await new Promise((resolve) => setTimeout(resolve, 5_000));
         }
@@ -156,7 +100,7 @@ defineFeature(feature, (test) => {
         attempt++;
       }
 
-      expect(targetTrade).toBeDefined();
+      expect(targetTrades).toBeDefined();
     });
   }, 120_000);
 
@@ -190,78 +134,35 @@ defineFeature(feature, (test) => {
     const offerer = new Wallet(Wallet.createRandom().privateKey, provider);
     const fulfiller = new Wallet(Wallet.createRandom().privateKey, provider);
     const testTokenId = getRandomTokenId();
-
-    const imxForApproval = 0.01 * 1e18;
-    const imxForFulfillment = 0.04 * 1e18;
     const listingPrice = 0.0001 * 1e18;
     let listingId: string = '';
 
-    given(/^I have a funded offerer account with (\d+) ERC1155 tokens$/, async (amount) => {
-      const fundingTx = await bankerWallet.sendTransaction({
-        to: offerer.address,
-        value: `${imxForApproval}`,
-        ...GAS_OVERRIDES,
-      });
+    givenIHaveAFundedOffererAccount(given, bankerWallet, offerer);
 
-      await fundingTx.wait(1);
+    andTheOffererAccountHasERC1155Tokens(and, bankerWallet, offerer, erc1155ContractAddress, testTokenId);
 
-      const testToken = await connectToTestERC1155Token(bankerWallet, erc1155ContractAddress);
-      const mintTx = await testToken.safeMint(offerer.address, testTokenId, amount, '0x', GAS_OVERRIDES);
-      await mintTx.wait(1);
-    });
-
-    and(/^I have a funded fulfiller account$/, async () => {
-      const fundingTx = await bankerWallet.sendTransaction({
-        to: fulfiller.address,
-        value: `${(listingPrice + imxForFulfillment)}`,
-        ...GAS_OVERRIDES,
-      });
-
-      await fundingTx.wait(1);
-    });
+    andIHaveAFundedFulfillerAccount(and, bankerWallet, fulfiller);
 
     when(/^I create a listing to sell (\d+) tokens$/, async (amount) => {
-      const listing = await sdk.prepareListing({
-        makerAddress: offerer.address,
-        buy: {
-          amount: `${listingPrice}`,
-          type: 'NATIVE',
-        },
-        sell: {
-          contractAddress: erc1155ContractAddress,
-          tokenId: testTokenId,
-          type: 'ERC1155',
-          amount: amount.toString(),
-        },
-      });
+      // eslint-disable-next-line max-len
+      const prepareListing = await prepareERC1155Listing(sdk, offerer, erc1155ContractAddress, testTokenId, listingPrice, amount.toString());
 
-      const signatures = await actionAll(listing.actions, offerer);
+      const signatures = await actionAll(prepareListing.actions, offerer);
 
-      const { result } = await sdk.createListing({
-        orderComponents: listing.orderComponents,
-        orderHash: listing.orderHash,
-        orderSignature: signatures[0],
-        makerFees: [],
-      });
+      const { result } = await createListing(sdk, prepareListing, signatures[0]);
       listingId = result.id;
     });
 
-    then(/^the listing should be active$/, async () => {
-      await waitForOrderToBeOfStatus(sdk, listingId, orderbook.OrderStatusName.ACTIVE);
+    then(/^the listing should be (.*)$/, async (status: string) => {
+      await waitForOrderToBeOfStatus(sdk, listingId, status);
     });
 
     and(/^when I fulfill the listing to buy (\d+) tokens$/, async (amount) => {
-      const fulfillment = await sdk.fulfillOrder(
-        listingId,
-        fulfiller.address,
-        [],
-        amount.toString(),
-      );
-      await actionAll(fulfillment.actions, fulfiller);
+      await fulfillListing(sdk, listingId, fulfiller, amount.toString());
     });
 
-    then(/^the listing should be filled$/, async () => {
-      await waitForOrderToBeOfStatus(sdk, listingId, orderbook.OrderStatusName.FILLED);
+    then(/^the listing should be (.*)$/, async (status: string) => {
+      await waitForOrderToBeOfStatus(sdk, listingId, status);
     });
 
     and(/^(\d+) tokens should be transferred to the fulfiller$/, async (amount) => {
@@ -270,21 +171,13 @@ defineFeature(feature, (test) => {
       expect(balance.toString()).toEqual(amount.toString());
     });
 
-    and(/^the trade data should be available$/, async () => {
+    and(/^(\d+) trade should be available$/, async (count) => {
       let attempt = 0;
-      let targetTrade: orderbook.Trade | undefined;
-      while (attempt < 5 && !targetTrade) {
+      let targetTrades: orderbook.Trade[] | undefined;
+      while (attempt < 5 && !targetTrades) {
         // eslint-disable-next-line no-await-in-loop
-        const trades = await sdk.listTrades({
-          accountAddress: fulfiller.address,
-          sortBy: 'indexed_at',
-          sortDirection: 'desc',
-          pageSize: 10,
-        });
-
-        // eslint-disable-next-line @typescript-eslint/no-loop-func
-        targetTrade = trades.result.find((t) => t.orderId === listingId);
-        if (!targetTrade) {
+        targetTrades = await getTrades(sdk, listingId, fulfiller);
+        if (targetTrades.length !== count) {
           // eslint-disable-next-line no-await-in-loop, no-promise-executor-return
           await new Promise((resolve) => setTimeout(resolve, 5_000));
         }
@@ -292,7 +185,7 @@ defineFeature(feature, (test) => {
         attempt++;
       }
 
-      expect(targetTrade).toBeDefined();
+      expect(targetTrades).toBeDefined();
     });
   }, 120_000);
 
@@ -326,79 +219,35 @@ defineFeature(feature, (test) => {
     const offerer = new Wallet(Wallet.createRandom().privateKey, provider);
     const fulfiller = new Wallet(Wallet.createRandom().privateKey, provider);
     const testTokenId = getRandomTokenId();
-
-    const imxForApproval = 0.01 * 1e18;
-    const imxForFulfillment = 0.04 * 1e18;
     const listingPrice = 0.0001 * 1e18;
     let listingId: string = '';
 
-    given(/^I have a funded offerer account with (\d+) ERC1155 tokens$/, async (amount) => {
-      const fundingTx = await bankerWallet.sendTransaction({
-        to: offerer.address,
-        value: `${imxForApproval}`,
-        ...GAS_OVERRIDES,
-      });
+    givenIHaveAFundedOffererAccount(given, bankerWallet, offerer);
 
-      await fundingTx.wait(1);
+    andTheOffererAccountHasERC1155Tokens(and, bankerWallet, offerer, erc1155ContractAddress, testTokenId);
 
-      const testToken = await connectToTestERC1155Token(bankerWallet, erc1155ContractAddress);
-      const mintTx = await testToken.safeMint(offerer.address, testTokenId, amount, '0x', GAS_OVERRIDES);
-      await mintTx.wait(1);
-    });
-
-    and(/^I have a funded fulfiller account$/, async () => {
-      const fundingTx = await bankerWallet.sendTransaction({
-        to: fulfiller.address,
-        value: `${(listingPrice + imxForFulfillment)}`,
-        ...GAS_OVERRIDES,
-      });
-
-      await fundingTx.wait(1);
-    });
+    andIHaveAFundedFulfillerAccount(and, bankerWallet, fulfiller);
 
     when(/^I create a listing to sell (\d+) tokens$/, async (amount) => {
-      const listing = await sdk.prepareListing({
-        makerAddress: offerer.address,
-        buy: {
-          amount: `${listingPrice}`,
-          type: 'NATIVE',
-        },
-        sell: {
-          contractAddress: erc1155ContractAddress,
-          tokenId: testTokenId,
-          type: 'ERC1155',
-          amount: amount.toString(),
-        },
-      });
+      // eslint-disable-next-line max-len
+      const prepareListing = await prepareERC1155Listing(sdk, offerer, erc1155ContractAddress, testTokenId, listingPrice, amount.toString());
 
-      const signatures = await actionAll(listing.actions, offerer);
+      const signatures = await actionAll(prepareListing.actions, offerer);
 
-      const { result } = await sdk.createListing({
-        orderComponents: listing.orderComponents,
-        orderHash: listing.orderHash,
-        orderSignature: signatures[0],
-        makerFees: [],
-      });
+      const { result } = await createListing(sdk, prepareListing, signatures[0]);
       listingId = result.id;
     });
 
-    then(/^the listing should be active$/, async () => {
-      await waitForOrderToBeOfStatus(sdk, listingId, orderbook.OrderStatusName.ACTIVE);
+    then(/^the listing should be (.*)$/, async (status: string) => {
+      await waitForOrderToBeOfStatus(sdk, listingId, status);
     });
 
     and(/^when I fulfill the listing to buy (\d+) tokens$/, async (amount) => {
-      const fulfillment = await sdk.fulfillOrder(
-        listingId,
-        fulfiller.address,
-        [],
-        amount.toString(),
-      );
-
-      await actionAll(fulfillment.actions, fulfiller);
+      await fulfillListing(sdk, listingId, fulfiller, amount.toString());
     });
 
-    then(/^the listing should be active$/, async () => {
-      await waitForOrderToBeOfStatus(sdk, listingId, orderbook.OrderStatusName.ACTIVE);
+    then(/^the listing should be (.*)$/, async (status: string) => {
+      await waitForOrderToBeOfStatus(sdk, listingId, status);
     });
 
     and(/^(\d+) tokens should be transferred to the fulfiller$/, async (amount) => {
@@ -407,20 +256,12 @@ defineFeature(feature, (test) => {
       expect(balance.toString()).toEqual(amount.toString());
     });
 
-    and(/^(\d+) trade data should be available$/, async (count) => {
+    and(/^(\d+) trade should be available$/, async (count) => {
       let attempt = 0;
       let targetTrades: orderbook.Trade[] | undefined;
       while (attempt < 5 && !targetTrades) {
         // eslint-disable-next-line no-await-in-loop
-        const trades = await sdk.listTrades({
-          accountAddress: fulfiller.address,
-          sortBy: 'indexed_at',
-          sortDirection: 'desc',
-          pageSize: 10,
-        });
-
-        // eslint-disable-next-line @typescript-eslint/no-loop-func
-        targetTrades = trades.result.filter((t) => t.orderId === listingId);
+        targetTrades = await getTrades(sdk, listingId, fulfiller);
         if (targetTrades.length !== count) {
           // eslint-disable-next-line no-await-in-loop, no-promise-executor-return
           await new Promise((resolve) => setTimeout(resolve, 5_000));
@@ -433,18 +274,11 @@ defineFeature(feature, (test) => {
     });
 
     and(/^when I fulfill the listing to buy (\d+) tokens$/, async (amount) => {
-      const fulfillment = await sdk.fulfillOrder(
-        listingId,
-        fulfiller.address,
-        [],
-        amount.toString(),
-      );
-
-      await actionAll(fulfillment.actions, fulfiller);
+      await fulfillListing(sdk, listingId, fulfiller, amount.toString());
     });
 
-    then(/^the listing should be filled$/, async () => {
-      await waitForOrderToBeOfStatus(sdk, listingId, orderbook.OrderStatusName.FILLED);
+    then(/^the listing should be (.*)$/, async (status: string) => {
+      await waitForOrderToBeOfStatus(sdk, listingId, status);
     });
 
     and(/^(\d+) tokens should be transferred to the fulfiller$/, async (amount) => {
@@ -453,20 +287,12 @@ defineFeature(feature, (test) => {
       expect(balance.toString()).toEqual(amount.toString());
     });
 
-    and(/^(\d+) trade data should be available$/, async (count) => {
+    and(/^(\d+) trades should be available$/, async (count) => {
       let attempt = 0;
       let targetTrades: orderbook.Trade[] | undefined;
       while (attempt < 5 && !targetTrades) {
         // eslint-disable-next-line no-await-in-loop
-        const trades = await sdk.listTrades({
-          accountAddress: fulfiller.address,
-          sortBy: 'indexed_at',
-          sortDirection: 'desc',
-          pageSize: 10,
-        });
-
-        // eslint-disable-next-line @typescript-eslint/no-loop-func
-        targetTrades = trades.result.filter((t) => t.orderId === listingId);
+        targetTrades = await getTrades(sdk, listingId, fulfiller);
         if (targetTrades.length !== count) {
           // eslint-disable-next-line no-await-in-loop, no-promise-executor-return
           await new Promise((resolve) => setTimeout(resolve, 5_000));
