@@ -26,7 +26,7 @@ export const submitMintingRequests = async (
   mintingPersistence: MintingPersistence,
   blockchainDataSDKClient: BlockchainData,
   {
-    defaultBatchSize = 100,
+    defaultBatchSize = 1000,
     chainName = 'imtbl-zkevm-testnet',
     maxNumberOfTries = 3,
   },
@@ -43,8 +43,7 @@ export const submitMintingRequests = async (
       mintingResponse
         ? parseInt(mintingResponse.imx_remaining_mint_requests, 10)
         : defaultBatchSize,
-      defaultBatchSize,
-      100
+      defaultBatchSize
     );
 
     if (
@@ -76,22 +75,24 @@ export const submitMintingRequests = async (
       continue;
     }
 
-    // group by contract address
-    const preContractAddressAssets = pendingMints.reduce(
-      (acc, row) => {
-        acc[row.contract_address] = acc[row.contract_address] || [];
-        acc[row.contract_address].push(row);
-        return acc;
-      },
-      {} as {
-        [contractAddress: string]: MintRequest[];
+    // chunk assets by every 100 assets. every chunk should all be for the same contract address.
+    const chunkedAssets = pendingMints.sort(
+      (a, b) => (a.contract_address > b.contract_address ? 1 : -1)
+    ).reduce((acc, row) => {
+      if (acc.length === 0) {
+        return [{ contractAddress: row.contract_address, assets: [row] }];
       }
-    );
+      const lastBatch = acc[acc.length - 1];
+      if (lastBatch.contractAddress === row.contract_address && lastBatch.assets.length < 100) {
+        return [...acc.slice(0, -1), { ...lastBatch, assets: [...lastBatch.assets, row] }];
+      }
+      return [...acc, { contractAddress: row.contract_address, assets: [row] }];
+    }, [] as { assets: MintRequest[], contractAddress: string }[]);
 
     // submit minting request for each contract address in parallel
     const mintingResults = await Promise.allSettled<Types.CreateMintRequestResult>(
-      Object.entries(preContractAddressAssets).map(
-        async ([contractAddress, assets]) => {
+      chunkedAssets.map(
+        async ({ contractAddress, assets }) => {
           const mintingRequest = {
             chainName,
             contractAddress,
