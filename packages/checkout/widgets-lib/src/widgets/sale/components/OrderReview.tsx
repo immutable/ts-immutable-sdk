@@ -13,7 +13,7 @@ import { EventTargetContext } from '../../../context/event-target-context/EventT
 import { sendSaleWidgetCloseEvent } from '../SaleWidgetEvents';
 import { SelectCoinDropdown } from './SelectCoinDropdown';
 import { CoinsDrawer } from './CoinsDrawer';
-import { FundingBalance } from '../types';
+import { ClientConfigProduct, FundingBalance } from '../types';
 import { OrderItems } from './OrderItems';
 import { useSaleEvent } from '../hooks/useSaleEvents';
 
@@ -23,6 +23,7 @@ type OrderReviewProps = {
   conversions: Map<string, number>;
   loadingBalances: boolean;
   items: SaleItem[];
+  pricing: Record<string, ClientConfigProduct>;
   transactionRequirement?: TransactionRequirement;
   onBackButtonClick: () => void;
   onProceedToBuy: (fundingBalance: FundingBalance) => void;
@@ -32,6 +33,7 @@ type OrderReviewProps = {
 
 export function OrderReview({
   items,
+  pricing,
   fundingBalances,
   conversions,
   collectionName,
@@ -82,29 +84,35 @@ export function OrderReview({
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
+        height: '0',
       }}
     >
+      <Heading
+        size="small"
+        sx={{
+          px: 'base.spacing.x4',
+          pb: 'base.spacing.x4',
+        }}
+      >
+        {t('views.ORDER_SUMMARY.orderReview.heading')}
+      </Heading>
       <Box
         sx={{
           display: 'flex',
           flexDirection: 'column',
-          paddingX: 'base.spacing.x2',
-          paddingY: 'base.spacing.x8',
+          px: 'base.spacing.x2',
+          pb: 'base.spacing.x8',
+          maxh: '60%',
+          height: '100%',
+          overflowY: 'auto',
           rowGap: 'base.spacing.x4',
         }}
       >
-        <Heading
-          size="small"
-          sx={{
-            paddingX: 'base.spacing.x4',
-          }}
-        >
-          {t('views.ORDER_SUMMARY.orderReview.heading')}
-        </Heading>
-        <Box sx={{ paddingX: 'base.spacing.x2' }}>
+        <Box sx={{ px: 'base.spacing.x2' }}>
           <OrderItems
             items={items}
             balance={fundingBalances[selectedCurrencyIndex]}
+            pricing={pricing}
             conversions={conversions}
           />
         </Box>
@@ -116,6 +124,7 @@ export function OrderReview({
         conversions={conversions}
         canOpen={fundingBalances.length > 1}
         loading={loadingBalances}
+        priceDisplay={items.length > 1}
       />
       <CoinsDrawer
         conversions={conversions}
