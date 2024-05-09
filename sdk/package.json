@@ -47,7 +47,6 @@
     "oidc-client-ts": "2.2.1",
     "os-browserify": "^0.3.0",
     "pako": "^2.1.0",
-    "pg": "^8.11.5",
     "react-i18next": "^13.5.0",
     "sns-validator": "^0.3.5",
     "stream-browserify": "^3.0.0",
@@ -156,5 +155,8 @@
     "updateExports": "node scripts/updateExports.js"
   },
   "type": "module",
-  "types": "./dist/index.d.ts"
+  "types": "./dist/index.d.ts",
+  "optionalDependencies": {
+    "pg": "^8.11.5"
+  }
 }
