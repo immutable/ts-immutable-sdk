@@ -105,20 +105,23 @@ export type ClientConfigCurrency = {
   name: string;
 };
 
-export type CurrencyConversionDetail = {
+export type ClientConfigPricing = {
   amount: number;
-  name: string;
-  type: SignPaymentTypes;
+  currency: string;
+  type: string;
 };
 
-export type ClientConfigCurrencyConversion = {
-  [key: string]: CurrencyConversionDetail;
+export type ClientConfigProduct = {
+  productId: string;
+  quantity: number;
+  pricing: Record<string, ClientConfigPricing>;
 };
 
 export type ClientConfig = {
   contractId: string;
-  currencies: ClientConfigCurrency[];
-  currencyConversion: ClientConfigCurrencyConversion;
+  currencies: Array<ClientConfigCurrency>;
+  products: Record<string, ClientConfigProduct>;
+  totalAmount: Record<string, ClientConfigPricing>;
 };
 
 export enum SignPaymentTypes {
