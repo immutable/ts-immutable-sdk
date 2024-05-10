@@ -1,10 +1,10 @@
 import { MenuItem, ButtCon } from '@biom3/react';
 import { Web3Provider } from '@ethersproject/providers';
 import { useEffect, useState } from 'react';
-import { WalletProviderName } from '@imtbl/checkout-sdk';
 import { getWalletLogoByName } from 'lib/logoUtils';
 import { useTranslation } from 'react-i18next';
 import { abbreviateWalletAddress } from 'lib/utils';
+import { getWalletProviderNameByProvider } from 'lib/provider';
 import {
   UserJourney,
   useAnalytics,
@@ -30,16 +30,6 @@ export function WalletAddress({
   const { t } = useTranslation();
 
   const { track } = useAnalytics();
-
-  const walletProviderName = () => {
-    if ((provider?.provider as any)?.isMetaMask) {
-      return WalletProviderName.METAMASK;
-    }
-    if ((provider?.provider as any)?.isPassport) {
-      return WalletProviderName.PASSPORT;
-    }
-    return WalletProviderName.WALLETCONNECT;
-  };
 
   const ctaIcon = () => {
     if ((provider?.provider as any)?.isPassport && !showL1Warning) {
@@ -84,7 +74,7 @@ export function WalletAddress({
   return (
     <MenuItem testId="wallet-address" emphasized size="medium">
       <MenuItem.FramedLogo
-        logo={getWalletLogoByName(walletProviderName())}
+        logo={getWalletLogoByName(getWalletProviderNameByProvider(provider))}
         sx={{ backgroundColor: 'base.color.translucent.standard.200' }}
       />
 
