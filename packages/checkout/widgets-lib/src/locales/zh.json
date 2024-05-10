@@ -95,6 +95,9 @@
       },
       "disconnectButton": {
         "label": "断开钱包连接"
+      },
+      "walletAddress": {
+        "label": "钱包地址"
       }
     },
     "COIN_INFO": {

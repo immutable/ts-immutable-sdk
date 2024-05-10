@@ -95,6 +95,9 @@
       },
       "disconnectButton": {
         "label": "Disconnect Wallet"
+      },
+      "walletAddress": {
+        "label": "Wallet Address"
       }
     },
     "COIN_INFO": {

@@ -99,6 +99,9 @@
       },
       "disconnectButton": {
         "label": "ウォレットを切断"
+      },
+      "walletAddress": {
+        "label": "ウォレットアドレス"
       }
     },
     "COIN_INFO": {
