@@ -56,7 +56,7 @@ export default class Overlay {
   }
 
   private updateTryAgainButton(tryAgainOnClick: () => void) {
-    const tryAgainButton = this.overlay?.querySelector(`#${PASSPORT_OVERLAY_TRY_AGAIN_ID}`);
+    const tryAgainButton = document.getElementById(PASSPORT_OVERLAY_TRY_AGAIN_ID);
     if (tryAgainButton) {
       if (this.tryAgainListener) {
         tryAgainButton.removeEventListener('click', this.tryAgainListener);
@@ -67,7 +67,7 @@ export default class Overlay {
   }
 
   private updateCloseButton(onCloseClick: () => void) {
-    const closeButton = this.overlay?.querySelector(`#${PASSPORT_OVERLAY_CLOSE_ID}`);
+    const closeButton = document.getElementById(PASSPORT_OVERLAY_CLOSE_ID);
     if (closeButton) {
       if (this.onCloseListener) {
         closeButton.removeEventListener('click', this.onCloseListener);
