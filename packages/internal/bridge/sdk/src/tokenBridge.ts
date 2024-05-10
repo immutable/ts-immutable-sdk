@@ -17,6 +17,7 @@ import {
 } from 'lib/utils';
 import { TenderlySimulation } from 'types/tenderly';
 import { calculateGasFee } from 'lib/gas';
+import { getWithdrawRootToken, genAxelarWithdrawPayload, genUniqueAxelarCommandId } from 'lib/axelarUtils';
 import {
   NATIVE,
   ETHEREUM_NATIVE_TOKEN_ADDRESS,
@@ -65,7 +66,7 @@ import {
   DynamicGasEstimatesResponse,
 } from './types';
 import {
-  GMPStatus, GMPStatusResponse, GasPaidStatus, genAxelarWithdrawPayload, genUniqueAxelarCommandId, getWithdrawRootToken,
+  GMPStatus, GMPStatusResponse, GasPaidStatus,
 } from './types/axelar';
 import { queryTransactionStatus } from './lib/gmpRecovery';
 
