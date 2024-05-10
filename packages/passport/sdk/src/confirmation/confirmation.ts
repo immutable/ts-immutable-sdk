@@ -28,12 +28,13 @@ export default class ConfirmationScreen {
 
   private overlay: Overlay | undefined;
 
-  private overlayClosed: boolean = false;
+  private overlayClosed: boolean;
 
   private timer: NodeJS.Timeout | undefined;
 
   constructor(config: PassportConfiguration) {
     this.config = config;
+    this.overlayClosed = false;
   }
 
   private getHref(relativePath: string, queryStringParams?: { [key: string]: any }) {
