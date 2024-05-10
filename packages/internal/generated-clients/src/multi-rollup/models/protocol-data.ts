@@ -21,7 +21,7 @@
  */
 export interface ProtocolData {
     /**
-     * Seaport order type
+     * Seaport order type. Orders containing ERC721 tokens will need to pass in the order type as FULL_RESTRICTED while orders with ERC1155 tokens will need to pass in the order_type as PARTIAL_RESTRICTED
      * @type {string}
      * @memberof ProtocolData
      */

@@ -54,6 +54,7 @@ type SaleContextProps = {
   passport?: Passport;
   excludePaymentTypes: SalePaymentTypes[];
   multicurrency: boolean;
+  waitFulfillmentSettlements: boolean;
 };
 
 type SaleContextValues = SaleContextProps & {
@@ -64,7 +65,6 @@ type SaleContextValues = SaleContextProps & {
   ) => Promise<SignResponse | undefined>;
   execute: (
     signResponse: SignResponse | undefined,
-    waitForTrnsactionSettlement: boolean,
     onTxnSuccess: (txn: ExecutedTransaction) => void,
     onTxnError: (error: any, txns: ExecutedTransaction[]) => void
   ) => Promise<ExecutedTransaction[]>;
@@ -136,6 +136,7 @@ const SaleContext = createContext<SaleContextValues>({
   excludePaymentTypes: [],
   multicurrency: false,
   selectedCurrency: undefined,
+  waitFulfillmentSettlements: true,
 });
 
 SaleContext.displayName = 'SaleSaleContext';
@@ -161,6 +162,7 @@ export function SaleContextProvider(props: {
       collectionName,
       excludePaymentTypes,
       multicurrency,
+      waitFulfillmentSettlements,
     },
   } = props;
 
@@ -252,6 +254,7 @@ export function SaleContextProvider(props: {
     recipientAddress,
     environmentId,
     environment,
+    waitFulfillmentSettlements,
   });
 
   const sign = useCallback(
@@ -428,6 +431,7 @@ export function SaleContextProvider(props: {
       excludePaymentTypes,
       multicurrency,
       selectedCurrency,
+      waitFulfillmentSettlements,
     }),
     [
       config,
@@ -462,6 +466,7 @@ export function SaleContextProvider(props: {
       excludePaymentTypes,
       multicurrency,
       selectedCurrency,
+      waitFulfillmentSettlements,
     ],
   );
 

@@ -38,7 +38,7 @@ const formUrlEncodedHeader = {
   },
 };
 
-const logoutEndpoint = '/oidc/logout';
+const logoutEndpoint = '/v2/logout';
 const authorizeEndpoint = '/authorize';
 
 const getAuthConfiguration = (config: PassportConfiguration): UserManagerSettings => {

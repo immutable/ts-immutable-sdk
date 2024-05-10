@@ -145,13 +145,14 @@ export const NftOwnersApiAxiosParamCreator = function (configuration?: Configura
          * @summary List owners by contract address
          * @param {string} contractAddress The address of contract
          * @param {string} chainName The name of chain
+         * @param {Array<string>} [accountAddress] List of account addresses to filter by
          * @param {string} [fromUpdatedAt] Datetime to use as the oldest updated timestamp
          * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {number} [pageSize] Maximum number of items to return
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listOwnersByContractAddress: async (contractAddress: string, chainName: string, fromUpdatedAt?: string, pageCursor?: string, pageSize?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listOwnersByContractAddress: async (contractAddress: string, chainName: string, accountAddress?: Array<string>, fromUpdatedAt?: string, pageCursor?: string, pageSize?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'contractAddress' is not null or undefined
             assertParamExists('listOwnersByContractAddress', 'contractAddress', contractAddress)
             // verify required parameter 'chainName' is not null or undefined
@@ -169,6 +170,10 @@ export const NftOwnersApiAxiosParamCreator = function (configuration?: Configura
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            if (accountAddress) {
+                localVarQueryParameter['account_address'] = accountAddress;
+            }
 
             if (fromUpdatedAt !== undefined) {
                 localVarQueryParameter['from_updated_at'] = (fromUpdatedAt as any instanceof Date) ?
@@ -239,14 +244,15 @@ export const NftOwnersApiFp = function(configuration?: Configuration) {
          * @summary List owners by contract address
          * @param {string} contractAddress The address of contract
          * @param {string} chainName The name of chain
+         * @param {Array<string>} [accountAddress] List of account addresses to filter by
          * @param {string} [fromUpdatedAt] Datetime to use as the oldest updated timestamp
          * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {number} [pageSize] Maximum number of items to return
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listOwnersByContractAddress(contractAddress: string, chainName: string, fromUpdatedAt?: string, pageCursor?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListCollectionOwnersResult>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listOwnersByContractAddress(contractAddress, chainName, fromUpdatedAt, pageCursor, pageSize, options);
+        async listOwnersByContractAddress(contractAddress: string, chainName: string, accountAddress?: Array<string>, fromUpdatedAt?: string, pageCursor?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListCollectionOwnersResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listOwnersByContractAddress(contractAddress, chainName, accountAddress, fromUpdatedAt, pageCursor, pageSize, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -287,7 +293,7 @@ export const NftOwnersApiFactory = function (configuration?: Configuration, base
          * @throws {RequiredError}
          */
         listOwnersByContractAddress(requestParameters: NftOwnersApiListOwnersByContractAddressRequest, options?: AxiosRequestConfig): AxiosPromise<ListCollectionOwnersResult> {
-            return localVarFp.listOwnersByContractAddress(requestParameters.contractAddress, requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
+            return localVarFp.listOwnersByContractAddress(requestParameters.contractAddress, requestParameters.chainName, requestParameters.accountAddress, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -390,6 +396,13 @@ export interface NftOwnersApiListOwnersByContractAddressRequest {
     readonly chainName: string
 
     /**
+     * List of account addresses to filter by
+     * @type {Array<string>}
+     * @memberof NftOwnersApiListOwnersByContractAddress
+     */
+    readonly accountAddress?: Array<string>
+
+    /**
      * Datetime to use as the oldest updated timestamp
      * @type {string}
      * @memberof NftOwnersApiListOwnersByContractAddress
@@ -451,7 +464,7 @@ export class NftOwnersApi extends BaseAPI {
      * @memberof NftOwnersApi
      */
     public listOwnersByContractAddress(requestParameters: NftOwnersApiListOwnersByContractAddressRequest, options?: AxiosRequestConfig) {
-        return NftOwnersApiFp(this.configuration).listOwnersByContractAddress(requestParameters.contractAddress, requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
+        return NftOwnersApiFp(this.configuration).listOwnersByContractAddress(requestParameters.contractAddress, requestParameters.chainName, requestParameters.accountAddress, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

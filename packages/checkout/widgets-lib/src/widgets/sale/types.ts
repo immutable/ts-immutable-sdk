@@ -52,6 +52,7 @@ export type SignOrderInput = {
   recipientAddress: string;
   environment: string;
   environmentId: string;
+  waitFulfillmentSettlements: boolean;
 };
 
 export type SignOrderError = {
