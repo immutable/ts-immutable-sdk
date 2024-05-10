@@ -122,13 +122,20 @@ export function SwapForm({ data, theme }: SwapFromProps) {
     () => (quote ? formatSwapFees(quote, cryptoFiatState, t) : []),
     [quote, cryptoFiatState, t],
   );
+  const [conversionToken, setConversionToken] = useState<TokenInfo | null>(null);
+  const [conversionAmount, setConversionAmount] = useState<string>('');
   const swapConversionRateTooltip = useMemo(
     () => {
-      if (!quote) return '';
-      const originalAmount = (direction === SwapDirection.FROM) ? fromAmount : toAmount;
-      return formatQuoteConversionRate(originalAmount, quote, 'views.SWAP.swapForm.conversionRate', t);
+      if (!quote || !conversionAmount || !conversionToken) return '';
+      return formatQuoteConversionRate(
+        conversionAmount,
+        conversionToken as TokenInfo,
+        quote,
+        'views.SWAP.swapForm.conversionRate',
+        t,
+      );
     },
-    [fromAmount, toAmount, direction, quote, t],
+    [conversionAmount, conversionToken, quote, t],
   );
 
   // Drawers
@@ -231,7 +238,8 @@ export function SwapForm({ data, theme }: SwapFromProps) {
     if (quoteRequest) {
       quoteRequest.cancel();
     }
-
+    setConversionAmount('');
+    setConversionToken(null);
     setGasFeeFiatValue('');
     setQuote(null);
   };
@@ -276,6 +284,8 @@ export function SwapForm({ data, theme }: SwapFromProps) {
         (token) => token.address?.toLocaleLowerCase() === estimateToken?.address?.toLocaleLowerCase(),
       );
 
+      setConversionToken(fromToken);
+      setConversionAmount(fromAmount);
       setQuote(quoteResult);
       setGasFeeValue(gasFee);
       setGasFeeToken({
@@ -354,8 +364,10 @@ export function SwapForm({ data, theme }: SwapFromProps) {
         DEFAULT_TOKEN_DECIMALS,
       );
       const estimateToken = estimate?.token;
-
       const gasToken = allowedTokens.find((token) => token.symbol === estimateToken?.symbol);
+
+      setConversionToken(toToken);
+      setConversionAmount(toAmount);
       setQuote(quoteResult);
       setGasFeeValue(gasFee);
       setGasFeeToken({

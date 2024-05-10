@@ -5,6 +5,7 @@ import {
   Quote,
   TransactionResponse,
 } from '@imtbl/dex-sdk';
+import { TokenInfo } from '@imtbl/checkout-sdk';
 import { TFunction } from 'i18next';
 import { formatQuoteConversionRate } from './swapConversionRate';
 
@@ -17,6 +18,13 @@ describe('formatQuoteConversionRate', () => {
 
   it('should calculate the correct conversion rate', () => {
     const fromAmount = '1';
+    const fromToken = {
+      name: 'ETH',
+      symbol: 'ETH',
+      address: '0x123',
+      chainId: 1,
+      decimals: 18,
+    } as TokenInfo;
     const mockQuote = {
       quote: {
         amount: {
@@ -57,7 +65,7 @@ describe('formatQuoteConversionRate', () => {
     } as TransactionResponse;
     const labelKey = 'conversion.label';
 
-    formatQuoteConversionRate(fromAmount, mockQuote, labelKey, mockTranslate as unknown as TFunction);
+    formatQuoteConversionRate(fromAmount, fromToken, mockQuote, labelKey, mockTranslate as unknown as TFunction);
 
     expect(mockTranslate).toHaveBeenCalledWith(labelKey, {
       fromSymbol: 'ETH',
@@ -69,6 +77,13 @@ describe('formatQuoteConversionRate', () => {
 
   it('should handle fromAmount with decimals', () => {
     const fromAmount = '1.50';
+    const fromToken = {
+      name: 'ETH',
+      symbol: 'ETH',
+      address: '0x123',
+      chainId: 1,
+      decimals: 18,
+    } as TokenInfo;
     const mockQuote = {
       quote: {
         amount: {
@@ -109,7 +124,7 @@ describe('formatQuoteConversionRate', () => {
     } as TransactionResponse;
     const labelKey = 'conversion.label';
 
-    formatQuoteConversionRate(fromAmount, mockQuote, labelKey, mockTranslate as unknown as TFunction);
+    formatQuoteConversionRate(fromAmount, fromToken, mockQuote, labelKey, mockTranslate as unknown as TFunction);
 
     expect(mockTranslate).toHaveBeenCalledWith(labelKey, {
       fromSymbol: 'ETH',

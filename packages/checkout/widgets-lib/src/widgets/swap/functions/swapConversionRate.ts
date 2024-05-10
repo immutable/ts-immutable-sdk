@@ -1,10 +1,12 @@
 import { TransactionResponse } from '@imtbl/dex-sdk';
 import { BigNumber, utils } from 'ethers';
 import { TFunction } from 'i18next';
+import { TokenInfo } from '@imtbl/checkout-sdk';
 import { formatZeroAmount, tokenValueFormat } from '../../../lib/utils';
 
 export const formatQuoteConversionRate = (
   amount: string,
+  token: TokenInfo,
   quote: TransactionResponse,
   labelKey: string,
   t: TFunction,
@@ -12,7 +14,7 @@ export const formatQuoteConversionRate = (
   // Grab the token from the quote secondary fees
   // NOTE: This has a dependency on the secondary fee and needs to change if we change that fee
   const secondaryFee = quote.quote.fees[0];
-  const fromToken = secondaryFee.amount.token;
+  const fromToken = token;
   const toToken = quote.quote.amount.token;
 
   // Parse the fromAmount input, multiply by 10^decimals to convert to integer units
