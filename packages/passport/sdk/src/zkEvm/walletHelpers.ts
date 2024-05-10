@@ -28,32 +28,33 @@ const META_TRANSACTIONS_TYPE = `tuple(
   bytes data
 )[]`;
 
-export function getNormalisedTransactions(txs: MetaTransaction[]): MetaTransactionNormalised[] {
-  return txs.map((t) => ({
-    delegateCall: t.delegateCall === true,
-    revertOnError: t.revertOnError === true,
-    gasLimit: t.gasLimit ?? constants.Zero,
-    target: t.to ?? constants.AddressZero,
-    value: t.value ?? constants.Zero,
-    data: t.data ?? [],
-  }));
-}
+export const getNormalisedTransactions = (txs: MetaTransaction[]): MetaTransactionNormalised[] => txs.map((t) => ({
+  delegateCall: t.delegateCall === true,
+  revertOnError: t.revertOnError === true,
+  gasLimit: t.gasLimit ?? constants.Zero,
+  target: t.to ?? constants.AddressZero,
+  value: t.value ?? constants.Zero,
+  data: t.data ?? [],
+}));
 
-export function digestOfTransactionsAndNonce(nonce: BigNumberish, normalisedTransactions: MetaTransactionNormalised[]) {
+export const digestOfTransactionsAndNonce = (
+  nonce: BigNumberish,
+  normalisedTransactions: MetaTransactionNormalised[],
+): string => {
   const packMetaTransactionsNonceData = utils.defaultAbiCoder.encode(
     ['uint256', META_TRANSACTIONS_TYPE],
     [nonce, normalisedTransactions],
   );
   return utils.keccak256(packMetaTransactionsNonceData);
-}
+};
 
-export function digestOfTransactions(normalisedTransactions: MetaTransactionNormalised[]): string {
+export const digestOfTransactions = (normalisedTransactions: MetaTransactionNormalised[]): string => {
   const packMetaTransactionsNonceData = utils.defaultAbiCoder.encode(
     [META_TRANSACTIONS_TYPE],
     [normalisedTransactions],
   );
   return utils.keccak256(packMetaTransactionsNonceData);
-}
+};
 
 export const getNonce = async (
   rpcProvider: StaticJsonRpcProvider,

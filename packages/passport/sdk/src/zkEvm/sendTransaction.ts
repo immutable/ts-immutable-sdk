@@ -1,8 +1,5 @@
 import { BigNumber } from 'ethers';
-import {
-  StaticJsonRpcProvider,
-  TransactionRequest,
-} from '@ethersproject/providers';
+import { StaticJsonRpcProvider, TransactionRequest } from '@ethersproject/providers';
 import { Flow } from '@imtbl/metrics';
 import { Signer } from '@ethersproject/abstract-signer';
 import {
@@ -82,7 +79,10 @@ const buildMetaTransactions = async (
   ]);
 
   // Build the meta transactions array with a valid nonce and fee transaction
-  const metaTransactions: [MetaTransaction, ...MetaTransaction[]] = [{ ...metaTransaction, nonce }];
+  const metaTransactions: [MetaTransaction, ...MetaTransaction[]] = [{
+    ...metaTransaction,
+    nonce,
+  }];
   // Add a fee transaction if the fee is non-zero
   const feeValue = BigNumber.from(feeOption.tokenPrice);
   if (!feeValue.isZero()) {
@@ -108,6 +108,7 @@ export const sendTransaction = async ({
 }: EthSendTransactionParams): Promise<string> => {
   const { chainId } = await rpcProvider.detectNetwork();
   const chainIdBigNumber = BigNumber.from(chainId);
+  flow.addEvent('endDetectNetwork');
 
   // Prepare the meta transactions by adding an optional fee transaction
   const metaTransactions = await buildMetaTransactions(
@@ -117,6 +118,7 @@ export const sendTransaction = async ({
     zkevmAddress,
     chainIdBigNumber,
   );
+  flow.addEvent('endBuildMetaTransactions');
 
   const { nonce } = metaTransactions[0];
   if (!nonce) {
