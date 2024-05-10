@@ -22,6 +22,11 @@ export const init = async (
         return reject(err);
       }
 
+      // check for topic arn prefix
+      if (!msg.TopicArn.startsWith(allowedTopicArnPrefix[env])) {
+        throw new Error('Invalid topic arn');
+      }
+
       if (message?.Type === 'SubscriptionConfirmation') {
         fetch(message.SubscribeURL).then(() => {
           resolve(message);
@@ -32,11 +37,6 @@ export const init = async (
       return resolve(message);
     });
   });
-
-  // check for topic arn prefix
-  if (!msg.TopicArn.startsWith(allowedTopicArnPrefix[env])) {
-    throw new Error('Invalid topic arn');
-  }
 
   if (msg.Type === 'Notification') {
     const event = JSON.parse(msg.Message);
