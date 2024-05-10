@@ -3,19 +3,15 @@ import { defineFeature, loadFeature } from 'jest-cucumber';
 import { orderbook } from '@imtbl/sdk';
 import { Environment } from '@imtbl/config';
 import {
-  connectToTestERC1155Token,
-  connectToTestERC721Token, createListing, fulfillListing,
   getConfigFromEnv,
-  getRandomTokenId, getTrades, prepareERC1155Listing,
-  waitForOrderToBeOfStatus,
+  getRandomTokenId,
 } from '../utils/orderbook';
-import { actionAll } from '../utils/orderbook/actions';
 import { RetryProvider } from '../utils/orderbook/retry-provider';
 import {
   andIHaveAFundedFulfillerAccount, andTheOffererAccountHasERC1155Tokens,
-  andTheOffererAccountHasERC721Token,
-  givenIHaveAFundedOffererAccount,
-  whenICreateAListing,
+  andTheOffererAccountHasERC721Token, andERC721TokenShouldBeTransferredToTheFulfiller, andTradeShouldBeAvailable,
+  givenIHaveAFundedOffererAccount, thenTheListingShouldBeOfStatus,
+  whenICreateAListing, whenIFulfillTheListingToBuy, andERC1155TokensShouldBeTransferredToTheFulfiller,
 } from './shared';
 
 const feature = loadFeature('features/order.feature', { tagFilter: process.env.TAGS });
@@ -33,29 +29,34 @@ defineFeature(feature, (test) => {
   const provider = new RetryProvider(rpcUrl);
   const bankerWallet = new Wallet(bankerKey, provider);
 
+  const orderbookConfig = getConfigFromEnv();
+  const sdk = new orderbook.Orderbook({
+    baseConfig: {
+      environment: Environment.SANDBOX,
+    },
+    overrides: {
+      ...orderbookConfig,
+    },
+  });
+
   test('creating and fulfilling a ERC721 listing', async ({
     given,
     when,
     then,
     and,
   }) => {
-    const orderbookConfig = getConfigFromEnv();
-    const sdk = new orderbook.Orderbook({
-      baseConfig: {
-        environment: Environment.SANDBOX,
-      },
-      overrides: {
-        ...orderbookConfig,
-      },
-    });
-
     const offerer = new Wallet(Wallet.createRandom().privateKey, provider);
     const fulfiller = new Wallet(Wallet.createRandom().privateKey, provider);
     const testTokenId = getRandomTokenId();
+
     let listingId: string = '';
+
+    // these callback functions are required to update / retrieve test level state variables from shared steps.
     const setListingId = (id: string) => {
       listingId = id;
     };
+
+    const getListingId = () => listingId;
 
     givenIHaveAFundedOffererAccount(given, bankerWallet, offerer);
 
@@ -65,40 +66,15 @@ defineFeature(feature, (test) => {
 
     whenICreateAListing(when, sdk, offerer, erc721ContractAddress, testTokenId, setListingId);
 
-    then(/^the listing should be (.*)$/, async (status: string) => {
-      await waitForOrderToBeOfStatus(sdk, listingId, status);
-    });
+    thenTheListingShouldBeOfStatus(then, sdk, getListingId);
 
-    and(/^when I fulfill the listing$/, async () => {
-      await fulfillListing(sdk, listingId, fulfiller);
-    });
+    whenIFulfillTheListingToBuy(when, sdk, fulfiller, getListingId);
 
-    then(/^the listing should be (.*)$/, async (status: string) => {
-      await waitForOrderToBeOfStatus(sdk, listingId, status);
-    });
+    thenTheListingShouldBeOfStatus(then, sdk, getListingId);
 
-    and(/^the NFT should be transferred to the fulfiller$/, async () => {
-      const testToken = await connectToTestERC721Token(bankerWallet, erc721ContractAddress);
-      const ownerOf = await testToken.ownerOf(testTokenId);
-      expect(ownerOf).toEqual(fulfiller.address);
-    });
+    andERC721TokenShouldBeTransferredToTheFulfiller(and, bankerWallet, erc721ContractAddress, testTokenId, fulfiller);
 
-    and(/^(\d+) trade should be available$/, async (count) => {
-      let attempt = 0;
-      let targetTrades: orderbook.Trade[] | undefined;
-      while (attempt < 5 && !targetTrades) {
-        // eslint-disable-next-line no-await-in-loop
-        targetTrades = await getTrades(sdk, listingId, fulfiller);
-        if (targetTrades.length !== count) {
-          // eslint-disable-next-line no-await-in-loop, no-promise-executor-return
-          await new Promise((resolve) => setTimeout(resolve, 5_000));
-        }
-
-        attempt++;
-      }
-
-      expect(targetTrades).toBeDefined();
-    });
+    andTradeShouldBeAvailable(and, sdk, fulfiller, getListingId);
   }, 120_000);
 
   test('create and completely fill a ERC1155 listing', ({
@@ -107,21 +83,18 @@ defineFeature(feature, (test) => {
     then,
     and,
   }) => {
-    const orderbookConfig = getConfigFromEnv();
-    const sdk = new orderbook.Orderbook({
-      baseConfig: {
-        environment: Environment.SANDBOX,
-      },
-      overrides: {
-        ...orderbookConfig,
-      },
-    });
-
     const offerer = new Wallet(Wallet.createRandom().privateKey, provider);
     const fulfiller = new Wallet(Wallet.createRandom().privateKey, provider);
     const testTokenId = getRandomTokenId();
-    const listingPrice = 0.0001 * 1e18;
+
     let listingId: string = '';
+
+    // these callback functions are required to update / retrieve test level state variables from shared steps.
+    const setListingId = (id: string) => {
+      listingId = id;
+    };
+
+    const getListingId = () => listingId;
 
     givenIHaveAFundedOffererAccount(given, bankerWallet, offerer);
 
@@ -129,50 +102,18 @@ defineFeature(feature, (test) => {
 
     andIHaveAFundedFulfillerAccount(and, bankerWallet, fulfiller);
 
-    when(/^I create a listing to sell (\d+) tokens$/, async (amount) => {
-      // eslint-disable-next-line max-len
-      const prepareListing = await prepareERC1155Listing(sdk, offerer, erc1155ContractAddress, testTokenId, listingPrice, amount.toString());
+    whenICreateAListing(when, sdk, offerer, erc1155ContractAddress, testTokenId, setListingId);
 
-      const signatures = await actionAll(prepareListing.actions, offerer);
+    thenTheListingShouldBeOfStatus(then, sdk, getListingId);
 
-      const { result } = await createListing(sdk, prepareListing, signatures[0]);
-      listingId = result.id;
-    });
+    whenIFulfillTheListingToBuy(when, sdk, fulfiller, getListingId);
 
-    then(/^the listing should be (.*)$/, async (status: string) => {
-      await waitForOrderToBeOfStatus(sdk, listingId, status);
-    });
+    thenTheListingShouldBeOfStatus(then, sdk, getListingId);
 
-    and(/^when I fulfill the listing to buy (\d+) tokens$/, async (amount) => {
-      await fulfillListing(sdk, listingId, fulfiller, amount.toString());
-    });
+    // eslint-disable-next-line max-len
+    andERC1155TokensShouldBeTransferredToTheFulfiller(and, bankerWallet, erc1155ContractAddress, testTokenId, fulfiller);
 
-    then(/^the listing should be (.*)$/, async (status: string) => {
-      await waitForOrderToBeOfStatus(sdk, listingId, status);
-    });
-
-    and(/^(\d+) tokens should be transferred to the fulfiller$/, async (amount) => {
-      const testToken = await connectToTestERC1155Token(bankerWallet, erc1155ContractAddress);
-      const balance = await testToken.balanceOf(fulfiller.address, testTokenId);
-      expect(balance.toString()).toEqual(amount.toString());
-    });
-
-    and(/^(\d+) trade should be available$/, async (count) => {
-      let attempt = 0;
-      let targetTrades: orderbook.Trade[] | undefined;
-      while (attempt < 5 && !targetTrades) {
-        // eslint-disable-next-line no-await-in-loop
-        targetTrades = await getTrades(sdk, listingId, fulfiller);
-        if (targetTrades.length !== count) {
-          // eslint-disable-next-line no-await-in-loop, no-promise-executor-return
-          await new Promise((resolve) => setTimeout(resolve, 5_000));
-        }
-
-        attempt++;
-      }
-
-      expect(targetTrades).toBeDefined();
-    });
+    andTradeShouldBeAvailable(and, sdk, fulfiller, getListingId);
   }, 120_000);
 
   test('create and partially fill a ERC1155 listing', ({
@@ -181,102 +122,44 @@ defineFeature(feature, (test) => {
     then,
     and,
   }) => {
-    const orderbookConfig = getConfigFromEnv();
-    const sdk = new orderbook.Orderbook({
-      baseConfig: {
-        environment: Environment.SANDBOX,
-      },
-      overrides: {
-        ...orderbookConfig,
-      },
-    });
-
     const offerer = new Wallet(Wallet.createRandom().privateKey, provider);
     const fulfiller = new Wallet(Wallet.createRandom().privateKey, provider);
     const testTokenId = getRandomTokenId();
-    const listingPrice = 0.0001 * 1e18;
+
     let listingId: string = '';
 
+    // these callback functions are required to update / retrieve test level state variables from shared steps.
+    const setListingId = (id: string) => {
+      listingId = id;
+    };
+
+    const getListingId = () => listingId;
     givenIHaveAFundedOffererAccount(given, bankerWallet, offerer);
 
     andTheOffererAccountHasERC1155Tokens(and, bankerWallet, offerer, erc1155ContractAddress, testTokenId);
 
     andIHaveAFundedFulfillerAccount(and, bankerWallet, fulfiller);
 
-    when(/^I create a listing to sell (\d+) tokens$/, async (amount) => {
-      // eslint-disable-next-line max-len
-      const prepareListing = await prepareERC1155Listing(sdk, offerer, erc1155ContractAddress, testTokenId, listingPrice, amount.toString());
+    whenICreateAListing(when, sdk, offerer, erc1155ContractAddress, testTokenId, setListingId);
 
-      const signatures = await actionAll(prepareListing.actions, offerer);
+    thenTheListingShouldBeOfStatus(then, sdk, getListingId);
 
-      const { result } = await createListing(sdk, prepareListing, signatures[0]);
-      listingId = result.id;
-    });
+    whenIFulfillTheListingToBuy(when, sdk, fulfiller, getListingId);
 
-    then(/^the listing should be (.*)$/, async (status: string) => {
-      await waitForOrderToBeOfStatus(sdk, listingId, status);
-    });
+    thenTheListingShouldBeOfStatus(then, sdk, getListingId);
 
-    and(/^when I fulfill the listing to buy (\d+) tokens$/, async (amount) => {
-      await fulfillListing(sdk, listingId, fulfiller, amount.toString());
-    });
+    // eslint-disable-next-line max-len
+    andERC1155TokensShouldBeTransferredToTheFulfiller(and, bankerWallet, erc1155ContractAddress, testTokenId, fulfiller);
 
-    then(/^the listing should be (.*)$/, async (status: string) => {
-      await waitForOrderToBeOfStatus(sdk, listingId, status);
-    });
+    andTradeShouldBeAvailable(and, sdk, fulfiller, getListingId);
 
-    and(/^(\d+) tokens should be transferred to the fulfiller$/, async (amount) => {
-      const testToken = await connectToTestERC1155Token(bankerWallet, erc1155ContractAddress);
-      const balance = await testToken.balanceOf(fulfiller.address, testTokenId);
-      expect(balance.toString()).toEqual(amount.toString());
-    });
+    whenIFulfillTheListingToBuy(when, sdk, fulfiller, getListingId);
 
-    and(/^(\d+) trade should be available$/, async (count) => {
-      let attempt = 0;
-      let targetTrades: orderbook.Trade[] | undefined;
-      while (attempt < 5 && !targetTrades) {
-        // eslint-disable-next-line no-await-in-loop
-        targetTrades = await getTrades(sdk, listingId, fulfiller);
-        if (targetTrades.length !== count) {
-          // eslint-disable-next-line no-await-in-loop, no-promise-executor-return
-          await new Promise((resolve) => setTimeout(resolve, 5_000));
-        }
+    thenTheListingShouldBeOfStatus(then, sdk, getListingId);
 
-        attempt++;
-      }
+    // eslint-disable-next-line max-len
+    andERC1155TokensShouldBeTransferredToTheFulfiller(and, bankerWallet, erc1155ContractAddress, testTokenId, fulfiller);
 
-      expect(targetTrades).toBeDefined();
-    });
-
-    and(/^when I fulfill the listing to buy (\d+) tokens$/, async (amount) => {
-      await fulfillListing(sdk, listingId, fulfiller, amount.toString());
-    });
-
-    then(/^the listing should be (.*)$/, async (status: string) => {
-      await waitForOrderToBeOfStatus(sdk, listingId, status);
-    });
-
-    and(/^(\d+) tokens should be transferred to the fulfiller$/, async (amount) => {
-      const testToken = await connectToTestERC1155Token(bankerWallet, erc1155ContractAddress);
-      const balance = await testToken.balanceOf(fulfiller.address, testTokenId);
-      expect(balance.toString()).toEqual(amount.toString());
-    });
-
-    and(/^(\d+) trades should be available$/, async (count) => {
-      let attempt = 0;
-      let targetTrades: orderbook.Trade[] | undefined;
-      while (attempt < 5 && !targetTrades) {
-        // eslint-disable-next-line no-await-in-loop
-        targetTrades = await getTrades(sdk, listingId, fulfiller);
-        if (targetTrades.length !== count) {
-          // eslint-disable-next-line no-await-in-loop, no-promise-executor-return
-          await new Promise((resolve) => setTimeout(resolve, 5_000));
-        }
-
-        attempt++;
-      }
-
-      expect(targetTrades).toBeDefined();
-    });
+    andTradeShouldBeAvailable(and, sdk, fulfiller, getListingId);
   }, 120_000);
 });
