@@ -13,8 +13,8 @@
     "orderbook": "prod",
     "checkout": "prod",
     "x": "prod",
-    "webhook": "prod",
-    "minting_backend": "prod"
+    "webhook": "alpha",
+    "minting_backend": "alpha"
   },
   "excludeForBrowser": ["webhook", "minting_backend"],
   "fileCopy": [
