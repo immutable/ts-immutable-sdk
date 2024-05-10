@@ -4,7 +4,7 @@ import { TFunction } from 'i18next';
 import { formatZeroAmount, tokenValueFormat } from '../../../lib/utils';
 
 export const formatQuoteConversionRate = (
-  fromAmount: string,
+  amount: string,
   quote: TransactionResponse,
   labelKey: string,
   t: TFunction,
@@ -16,7 +16,7 @@ export const formatQuoteConversionRate = (
   const toToken = quote.quote.amount.token;
 
   // Parse the fromAmount input, multiply by 10^decimals to convert to integer units
-  const parsedFromAmount = parseFloat(fromAmount);
+  const parsedFromAmount = parseFloat(amount);
   const expandedFromAmount = parsedFromAmount * (10 ** fromToken.decimals);
   const relativeFromAmount = BigNumber.from(expandedFromAmount.toFixed(0));
   const relativeToAmount = BigNumber.from(quote.quote.amount.value);

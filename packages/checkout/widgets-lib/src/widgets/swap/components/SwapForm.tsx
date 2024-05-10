@@ -123,8 +123,12 @@ export function SwapForm({ data, theme }: SwapFromProps) {
     [quote, cryptoFiatState, t],
   );
   const swapConversionRateTooltip = useMemo(
-    () => (quote ? formatQuoteConversionRate(fromAmount, quote, 'views.SWAP.swapForm.conversionRate', t) : ''),
-    [fromAmount, quote, t],
+    () => {
+      if (!quote) return '';
+      const amount = (direction === SwapDirection.FROM) ? fromAmount : toAmount;
+      return formatQuoteConversionRate(amount, quote, 'views.SWAP.swapForm.conversionRate', t);
+    },
+    [fromAmount, toAmount, direction, quote, t],
   );
 
   // Drawers
