@@ -454,7 +454,7 @@
       },
       "fees": {
         "title": "가스 요금",
-        "fiatPricePrefix": "~ USD $"
+        "fiatPricePrefix": "≈ USD $"
       },
       "content": {
         "title": "얼마나 많이 이동하시겠습니까?",
@@ -490,7 +490,7 @@
       "submitButton": {
         "buttonText": "이동 확인"
       },
-      "fiatPricePrefix": "~ USD $"
+      "fiatPricePrefix": "≈ USD $"
     },
     "BRIDGE_FAILURE": {
       "bridgeFailureText": {
@@ -617,8 +617,21 @@
       "heading": "수수료 내역",
       "total": "수수료 총액",
       "fees": {
-        "gas": {
+        "fiatPricePrefix": "USD $",
+        "gasFeeMove": {
           "label": "가스 수수료"
+        },
+        "approvalFee": {
+          "label": "승인 수수료"
+        },
+        "swapGasFee": {
+          "label": "가스 수수료"
+        },
+        "swapSecondaryFee": {
+          "label": "{{amount}} 스왑 수수료 (견적에 포함)"
+        },
+        "serviceFee": {
+          "label": "서비스 수수료"
         }
       }
     },

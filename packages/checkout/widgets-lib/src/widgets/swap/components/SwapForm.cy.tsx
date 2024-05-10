@@ -607,8 +607,8 @@ describe('SwapForm', () => {
         },
       ];
       cySmartGet('@fromAmountInStub').should('have.been.calledWith', ...params);
-      cySmartGet('fees-gas-fee__priceDisplay__price').should('have.text', '~ IMX 0.112300');
-      cySmartGet('fees-gas-fee__priceDisplay__fiatAmount').should('have.text', '~ USD $0.08');
+      cySmartGet('fees-gas-fee__priceDisplay__price').should('have.text', '≈ IMX 0.112300');
+      cySmartGet('fees-gas-fee__priceDisplay__fiatAmount').should('have.text', '≈ USD $0.08');
     });
 
     it('should fetch a quote after from amount max button is clicked', () => {
@@ -834,8 +834,8 @@ describe('SwapForm', () => {
         },
       ];
       cySmartGet('@fromAmountInStub').should('have.been.calledWith', ...params);
-      cySmartGet('fees-gas-fee__priceDisplay__price').should('have.text', '~ IMX 0.224600');
-      cySmartGet('fees-gas-fee__priceDisplay__fiatAmount').should('have.text', '~ USD $0.17');
+      cySmartGet('fees-gas-fee__priceDisplay__price').should('have.text', '≈ IMX 0.224600');
+      cySmartGet('fees-gas-fee__priceDisplay__fiatAmount').should('have.text', '≈ USD $0.17');
     });
   });
 
