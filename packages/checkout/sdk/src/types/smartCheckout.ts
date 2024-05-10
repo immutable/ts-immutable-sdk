@@ -1,4 +1,3 @@
-import { Orderbook } from '@imtbl/orderbook';
 import {
   TransactionRequest,
   TransactionResponse,
@@ -77,13 +76,10 @@ export type BuyResultInsufficientFunds = {
 /**
  * Represents the overrides available for {@link Checkout.buy}
  * @property {boolean} waitFulfillmentSettlements
- * @property {Orderbook} orderbook
  */
 export type BuyOverrides = {
   /** If the buy should wait for the fulfillment transactions to settle */
   waitFulfillmentSettlements?: boolean;
-  /** Allow override of the orderbook module for dev testing */
-  orderbook?: Orderbook;
 };
 
 /*
@@ -267,20 +263,10 @@ export type BuyOrder = {
 };
 
 /**
- * Represents the overrides available for {@link Checkout.sell}
- * @property {Orderbook} orderbook
- */
-export type SellOverrides = {
-  /** Allow override of the orderbook module for dev testing */
-  orderbook?: Orderbook;
-};
-
-/**
  * The type representing the sell order to create a listing from
  * @property {SellToken} sellToken
  * @property {BuyToken} buyToken
  * @property {OrderFee[]} makerFees
- * @property {SellOverrides} sellOverrides
  */
 export type SellOrder = {
   /** the token to be listed for sale */
@@ -291,8 +277,6 @@ export type SellOrder = {
   makerFees?: OrderFee[];
   /** optional order expiry date. Default order expiry to 2 years from now */
   orderExpiry?: Date;
-  /** overrides */
-  sellOverrides?: SellOverrides;
 };
 
 /**
