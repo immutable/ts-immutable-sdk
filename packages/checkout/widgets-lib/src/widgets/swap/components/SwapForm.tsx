@@ -49,8 +49,8 @@ import { isPassportProvider } from '../../../lib/provider';
 import { formatSwapFees } from '../functions/swapFees';
 import { processGasFree } from '../functions/processGasFree';
 import { processSecondaryFees } from '../functions/processSecondaryFees';
-import { formatQuoteConversionRate } from '../functions/swapConversionRate';
 import { processQuoteToken } from '../functions/processQuoteToken';
+import { formatQuoteConversionRate } from '../functions/swapConversionRate';
 
 enum SwapDirection {
   FROM = 'FROM',
@@ -125,8 +125,8 @@ export function SwapForm({ data, theme }: SwapFromProps) {
   const swapConversionRateTooltip = useMemo(
     () => {
       if (!quote) return '';
-      const amount = (direction === SwapDirection.FROM) ? fromAmount : toAmount;
-      return formatQuoteConversionRate(amount, quote, 'views.SWAP.swapForm.conversionRate', t);
+      const originalAmount = (direction === SwapDirection.FROM) ? fromAmount : toAmount;
+      return formatQuoteConversionRate(originalAmount, quote, 'views.SWAP.swapForm.conversionRate', t);
     },
     [fromAmount, toAmount, direction, quote, t],
   );
