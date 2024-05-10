@@ -1,4 +1,6 @@
-import { MenuItem, ButtCon, AllIconKeys } from '@biom3/react';
+import {
+  MenuItem, ButtCon, AllIconKeys, SxProps,
+} from '@biom3/react';
 import { Web3Provider } from '@ethersproject/providers';
 import { useEffect, useMemo, useState } from 'react';
 import { getWalletLogoByName } from 'lib/logoUtils';
@@ -10,9 +12,13 @@ import {
   useAnalytics,
 } from '../../../../context/analytics-provider/SegmentAnalyticsProvider';
 
-const isCopiedStyle = {
+const isCopiedStyle: SxProps = {
   background: 'base.color.status.success.bright',
   fill: 'base.color.status.success.bright',
+};
+
+const isCopiedIconStyle: SxProps = {
+  fill: 'base.color.fixed.black.1000',
 };
 
 export function WalletAddress({
@@ -75,6 +81,9 @@ export function WalletAddress({
         iconVariant="bold"
         size="small"
         icon={ctaIcon}
+        iconSx={{
+          ...(isCopied ? isCopiedIconStyle : {}),
+        }}
         onClick={handleIconClick}
         sx={{
           cursor: 'pointer',
