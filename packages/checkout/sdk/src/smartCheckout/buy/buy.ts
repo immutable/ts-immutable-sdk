@@ -104,7 +104,7 @@ export const buy = async (
   let decimals = 18;
 
   const gasLimit = constants.estimatedFulfillmentGasGwei;
-  const orderbook = overrides.orderbook ? overrides.orderbook : instance.createOrderbookInstance(config);
+  const orderbook = instance.createOrderbookInstance(config);
   const blockchainClient = instance.createBlockchainDataInstance(config);
 
   const fulfillerAddress = await measureAsyncExecution<string>(

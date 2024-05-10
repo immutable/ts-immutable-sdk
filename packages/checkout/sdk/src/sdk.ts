@@ -542,7 +542,7 @@ export class Checkout {
       params.provider,
     );
 
-    return await sell.sell(this.config, web3Provider, params.orders, params.overrides);
+    return await sell.sell(this.config, web3Provider, params.orders);
   }
 
   /**
