@@ -47,9 +47,9 @@ describe('formatSwapFees', () => {
     expect(fees).toEqual([
       {
         label: 'drawers.feesBreakdown.fees.swapGasFee.label',
-        fiatAmount: '~ drawers.feesBreakdown.fees.fiatPricePrefixFiatValue:1',
+        fiatAmount: '≈ drawers.feesBreakdown.fees.fiatPricePrefixFiatValue:1',
         amount: 'Formatted:1',
-        prefix: '~ ',
+        prefix: '≈ ',
         token: {
           decimals: 18,
           symbol: 'ETH',
@@ -95,7 +95,7 @@ describe('formatSwapFees', () => {
     expect(fees).toEqual([
       {
         label: 'drawers.feesBreakdown.fees.swapSecondaryFee.label',
-        fiatAmount: '~ drawers.feesBreakdown.fees.fiatPricePrefixFiatValue:0.5',
+        fiatAmount: '≈ drawers.feesBreakdown.fees.fiatPricePrefixFiatValue:0.5',
         amount: 'Formatted:0.5',
         prefix: '',
         token: {

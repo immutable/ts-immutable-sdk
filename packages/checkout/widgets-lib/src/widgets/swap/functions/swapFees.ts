@@ -4,7 +4,7 @@ import { BigNumber, utils } from 'ethers';
 import { CryptoFiatState } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { calculateCryptoToFiat, tokenValueFormat } from '../../../lib/utils';
 
-type FormattedFee = {
+export type FormattedFee = {
   label: string;
   fiatAmount: string;
   amount: string;
@@ -26,13 +26,13 @@ export const formatSwapFees = (
   const fees: FormattedFee[] = [];
   if (!swapQuote.swap) return fees;
 
-  const addFee = (estimate: Amount | undefined, label: string, prefix: string = '~ ') => {
+  const addFee = (estimate: Amount | undefined, label: string, prefix: string = '≈ ') => {
     const value = BigNumber.from(estimate?.value ?? 0);
     if (estimate && value.gt(0)) {
       const formattedFee = utils.formatUnits(value, estimate.token.decimals);
       fees.push({
         label,
-        fiatAmount: `~ ${t('drawers.feesBreakdown.fees.fiatPricePrefix')}${calculateCryptoToFiat(
+        fiatAmount: `≈ ${t('drawers.feesBreakdown.fees.fiatPricePrefix')}${calculateCryptoToFiat(
           formattedFee,
           estimate.token.symbol || '',
           cryptoFiatState.conversions,
