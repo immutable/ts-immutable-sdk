@@ -6,7 +6,7 @@ import {
   connectToTestERC1155Token,
   connectToTestERC721Token, createListing, fulfillListing,
   getConfigFromEnv,
-  getRandomTokenId, getTrades, prepareERC1155Listing, prepareERC721Listing,
+  getRandomTokenId, getTrades, prepareERC1155Listing,
   waitForOrderToBeOfStatus,
 } from '../utils/orderbook';
 import { actionAll } from '../utils/orderbook/actions';
@@ -15,28 +15,30 @@ import {
   andIHaveAFundedFulfillerAccount, andTheOffererAccountHasERC1155Tokens,
   andTheOffererAccountHasERC721Token,
   givenIHaveAFundedOffererAccount,
+  whenICreateAListing,
 } from './shared';
 
 const feature = loadFeature('features/order.feature', { tagFilter: process.env.TAGS });
 
 defineFeature(feature, (test) => {
+  const bankerKey = process.env.ZKEVM_ORDERBOOK_BANKER;
+  const erc721ContractAddress = process.env.ZKEVM_ORDERBOOK_ERC721;
+  const erc1155ContractAddress = process.env.ZKEVM_ORDERBOOK_ERC1155;
+  const rpcUrl = process.env.ZKEVM_RPC_ENDPOINT;
+
+  if (!bankerKey || !erc721ContractAddress || !rpcUrl || !erc1155ContractAddress) {
+    throw new Error('missing config for orderbook tests');
+  }
+
+  const provider = new RetryProvider(rpcUrl);
+  const bankerWallet = new Wallet(bankerKey, provider);
+
   test('creating and fulfilling a ERC721 listing', async ({
     given,
     when,
     then,
     and,
   }) => {
-    const bankerKey = process.env.ZKEVM_ORDERBOOK_BANKER;
-    const erc721ContractAddress = process.env.ZKEVM_ORDERBOOK_ERC721;
-    const rpcUrl = process.env.ZKEVM_RPC_ENDPOINT;
-
-    if (!bankerKey || !erc721ContractAddress || !rpcUrl) {
-      throw new Error('missing config for orderbook tests');
-    }
-
-    const provider = new RetryProvider(rpcUrl);
-    const bankerWallet = new Wallet(bankerKey, provider);
-
     const orderbookConfig = getConfigFromEnv();
     const sdk = new orderbook.Orderbook({
       baseConfig: {
@@ -50,8 +52,10 @@ defineFeature(feature, (test) => {
     const offerer = new Wallet(Wallet.createRandom().privateKey, provider);
     const fulfiller = new Wallet(Wallet.createRandom().privateKey, provider);
     const testTokenId = getRandomTokenId();
-    const listingPrice = 0.0001 * 1e18;
     let listingId: string = '';
+    const setListingId = (id: string) => {
+      listingId = id;
+    };
 
     givenIHaveAFundedOffererAccount(given, bankerWallet, offerer);
 
@@ -59,14 +63,7 @@ defineFeature(feature, (test) => {
 
     andIHaveAFundedFulfillerAccount(and, bankerWallet, fulfiller);
 
-    when(/^I create a listing to sell 1 token$/, async () => {
-      const prepareListing = await prepareERC721Listing(sdk, offerer, erc721ContractAddress, testTokenId, listingPrice);
-
-      const signatures = await actionAll(prepareListing.actions, offerer);
-
-      const { result } = await createListing(sdk, prepareListing, signatures[0]);
-      listingId = result.id;
-    });
+    whenICreateAListing(when, sdk, offerer, erc721ContractAddress, testTokenId, setListingId);
 
     then(/^the listing should be (.*)$/, async (status: string) => {
       await waitForOrderToBeOfStatus(sdk, listingId, status);
@@ -110,17 +107,6 @@ defineFeature(feature, (test) => {
     then,
     and,
   }) => {
-    const bankerKey = process.env.ZKEVM_ORDERBOOK_BANKER;
-    const erc1155ContractAddress = process.env.ZKEVM_ORDERBOOK_ERC1155;
-    const rpcUrl = process.env.ZKEVM_RPC_ENDPOINT;
-
-    if (!bankerKey || !erc1155ContractAddress || !rpcUrl) {
-      throw new Error('missing config for orderbook tests');
-    }
-
-    const provider = new RetryProvider(rpcUrl);
-    const bankerWallet = new Wallet(bankerKey, provider);
-
     const orderbookConfig = getConfigFromEnv();
     const sdk = new orderbook.Orderbook({
       baseConfig: {
@@ -195,17 +181,6 @@ defineFeature(feature, (test) => {
     then,
     and,
   }) => {
-    const bankerKey = process.env.ZKEVM_ORDERBOOK_BANKER;
-    const erc1155ContractAddress = process.env.ZKEVM_ORDERBOOK_ERC1155;
-    const rpcUrl = process.env.ZKEVM_RPC_ENDPOINT;
-
-    if (!bankerKey || !erc1155ContractAddress || !rpcUrl) {
-      throw new Error('missing config for orderbook tests');
-    }
-
-    const provider = new RetryProvider(rpcUrl);
-    const bankerWallet = new Wallet(bankerKey, provider);
-
     const orderbookConfig = getConfigFromEnv();
     const sdk = new orderbook.Orderbook({
       baseConfig: {
