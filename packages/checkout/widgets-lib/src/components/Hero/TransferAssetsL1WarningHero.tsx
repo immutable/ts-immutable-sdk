@@ -3,7 +3,14 @@ import { Box } from '@biom3/react';
 
 export function TransferAssetsL1WarningHero() {
   return (
-    <Box testId="transfer-assets-l1-warning-hero">
+    <Box
+      testId="transfer-assets-l1-warning-hero"
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        padding: 'base.spacing.x4',
+      }}
+    >
       <Box>
         <svg
           xmlns="http://www.w3.org/2000/svg"
