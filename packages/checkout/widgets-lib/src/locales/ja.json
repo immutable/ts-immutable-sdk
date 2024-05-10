@@ -461,7 +461,7 @@
       },
       "fees": {
         "title": "ガス手数料",
-        "fiatPricePrefix": "~ USD $"
+        "fiatPricePrefix": "≈ USD $"
       },
       "content": {
         "title": "いくら移動しますか？",
@@ -497,7 +497,7 @@
       "submitButton": {
         "buttonText": "移動を確認"
       },
-      "fiatPricePrefix": "~ USD $"
+      "fiatPricePrefix": "≈ USD $"
     },
     "BRIDGE_FAILURE": {
       "bridgeFailureText": {

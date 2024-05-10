@@ -454,7 +454,7 @@
       },
       "fees": {
         "title": "가스 요금",
-        "fiatPricePrefix": "~ USD $"
+        "fiatPricePrefix": "≈ USD $"
       },
       "content": {
         "title": "얼마나 많이 이동하시겠습니까?",
@@ -490,7 +490,7 @@
       "submitButton": {
         "buttonText": "이동 확인"
       },
-      "fiatPricePrefix": "~ USD $"
+      "fiatPricePrefix": "≈ USD $"
     },
     "BRIDGE_FAILURE": {
       "bridgeFailureText": {

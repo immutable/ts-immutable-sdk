@@ -454,7 +454,7 @@
       },
       "fees": {
         "title": "燃气费",
-        "fiatPricePrefix": "~ 美元 $"
+        "fiatPricePrefix": "≈ 美元 $"
       },
       "content": {
         "title": "您想要转移多少金额？",
@@ -490,7 +490,7 @@
       "submitButton": {
         "buttonText": "确认转移"
       },
-      "fiatPricePrefix": "~ 美元 $"
+      "fiatPricePrefix": "≈ 美元 $"
     },
     "BRIDGE_FAILURE": {
       "bridgeFailureText": {
