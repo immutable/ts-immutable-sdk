@@ -61,28 +61,24 @@ export const mintingPersistence: MintingPersistence = {
       submittedMintRequest.imtblZkevmMintRequestUpdatedId,
       submittedMintRequest.error]);
   },
-  markAsConflict: async (assetIds: string[], contractAddress: string, imtblZkevmMintRequestUpdatedId: string) => {
+  markAsConflict: async (assetIds: string[], contractAddress: string) => {
     await client.query(`
       UPDATE im_assets 
       SET minting_status = 'conflicting' 
       WHERE asset_id = ANY($1) 
-        AND contract_address = $2 
-        AND (
-          last_imtbl_zkevm_mint_request_updated_id <= $3 OR 
-          last_imtbl_zkevm_mint_request_updated_id is null
-        );
-            `, [assetIds, contractAddress, imtblZkevmMintRequestUpdatedId]);
+        AND contract_address = $2;
+            `, [assetIds, contractAddress]);
   },
   resetMintingStatus: async (ids: string[]) => {
     await client.query(`
             UPDATE im_assets SET minting_status = null WHERE id = ANY($1) and contract_address = $2;
             `, [ids]);
   },
-  markForRetry: async (ids: string[], maxNumberOfTries: number) => {
+  markForRetry: async (ids: string[]) => {
     await client.query(`
       UPDATE im_assets 
-      SET minting_status = null, tried_count = tried_count + 1 WHERE id = ANY($1) and tried_count <= $2;
-      `, [ids, maxNumberOfTries]);
+      SET minting_status = null, tried_count = tried_count + 1 WHERE id = ANY($1);
+      `, [ids]);
   },
   updateMintingStatusToSubmissionFailed: async (ids: string[]) => {
     await client.query(`

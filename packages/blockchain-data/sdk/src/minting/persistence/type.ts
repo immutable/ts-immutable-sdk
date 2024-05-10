@@ -37,11 +37,10 @@ export interface MintingPersistence {
   ) => Promise<void>;
   markAsConflict: (
     assetIds: string[],
-    contractAddress: string,
-    imtblZkevmMintRequestUpdatedId: string
+    contractAddress: string
   ) => Promise<void>;
   resetMintingStatus: (ids: string[]) => Promise<void>;
-  markForRetry: (ids: string[], maxNumberOfTries: number) => Promise<void>;
+  markForRetry: (ids: string[]) => Promise<void>;
   getMintingRequest: (
     contractAddress: string,
     referenceId: string

@@ -129,7 +129,6 @@ export const submitMintingRequests = async (
                 await mintingPersistence.markAsConflict(
                   e.details.values,
                   contractAddress,
-                  e.event_id
                 );
 
                 // remove non conflicting assets status so that they can be retried.
@@ -142,7 +141,7 @@ export const submitMintingRequests = async (
                 logger.error(e2);
               }
             } else {
-              // separate assets into "need to be retired" and "exceeded max number of tries."
+              // separate assets into "need to be retied" and "exceeded max number of tries."
               const { assetsToRetry, assetsExceededMaxNumberOfTries } = assets.reduce(
                 (acc, { tried_count = 0, id }) => {
                   if (tried_count < maxNumberOfTries) {
@@ -163,8 +162,7 @@ export const submitMintingRequests = async (
 
               // remove all assets status so that they can be retried.
               await mintingPersistence.markForRetry(
-                assetsToRetry,
-                maxNumberOfTries
+                assetsToRetry
               );
 
               // mark assets that have exceeded the max number of tries as submission_failed
