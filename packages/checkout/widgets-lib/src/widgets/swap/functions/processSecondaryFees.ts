@@ -20,7 +20,7 @@ export const processSecondaryFees = (fromToken: TokenInfo, currentQuote: Transac
         ...fee.amount,
         token: {
           ...fee.amount.token,
-          symbol: (fromToken.address === fee.amount.token.address) ? fromToken.symbol : '',
+          symbol: (fromToken.address === fee.amount.token.address) ? fromToken.symbol : fee.amount.token.symbol,
         },
       },
     };

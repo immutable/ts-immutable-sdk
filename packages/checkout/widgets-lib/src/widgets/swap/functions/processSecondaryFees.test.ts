@@ -118,7 +118,7 @@ describe('processSecondaryFees', () => {
               address: '0x000',
               chainId: 1,
               decimals: 18,
-              symbol: '',
+              symbol: undefined,
             },
           },
         } as Fee],
@@ -177,7 +177,7 @@ describe('processSecondaryFees', () => {
           amount: {
             value: BigNumber.from(100),
             token: {
-              symbol: '',
+              symbol: undefined,
               address: '0x000',
               chainId: 1,
               decimals: 18,
