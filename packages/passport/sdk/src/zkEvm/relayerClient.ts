@@ -1,5 +1,5 @@
-import { BytesLike } from 'ethers';
 import { StaticJsonRpcProvider } from '@ethersproject/providers';
+import { BytesLike } from '@ethersproject/bytes';
 import AuthManager from 'authManager';
 import { trackDuration } from '@imtbl/metrics';
 import { PassportConfiguration } from '../config';

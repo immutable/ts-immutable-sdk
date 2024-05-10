@@ -1,7 +1,7 @@
 import { SDKBase, InstanceWithExtensions } from '@magic-sdk/provider';
 import { Magic } from 'magic-sdk';
 import { OpenIdExtension } from '@magic-ext/oidc';
-import { ethers } from 'ethers';
+import { ExternalProvider } from '@ethersproject/providers';
 import { trackDuration } from '@imtbl/metrics';
 import { PassportErrorType, withPassportError } from './errors/passportError';
 import { PassportConfiguration } from './config';
@@ -40,8 +40,8 @@ export default class MagicAdapter {
 
   async login(
     idToken: string,
-  ): Promise<ethers.providers.ExternalProvider> {
-    return withPassportError<ethers.providers.ExternalProvider>(async () => {
+  ): Promise<ExternalProvider> {
+    return withPassportError<ExternalProvider>(async () => {
       const startTime = performance.now();
 
       const magicClient = await this.magicClient;
@@ -56,7 +56,7 @@ export default class MagicAdapter {
         Math.round(performance.now() - startTime),
       );
 
-      return magicClient.rpcProvider as unknown as ethers.providers.ExternalProvider;
+      return magicClient.rpcProvider as unknown as ExternalProvider;
     }, PassportErrorType.WALLET_CONNECTION_ERROR);
   }
 

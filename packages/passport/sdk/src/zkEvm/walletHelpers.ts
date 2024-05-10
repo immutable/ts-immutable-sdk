@@ -1,11 +1,12 @@
-import {
-  BigNumber,
-  BigNumberish,
-  Contract,
-  constants,
-  utils,
-  errors,
-} from 'ethers';
+import { Zero, AddressZero } from '@ethersproject/constants';
+import { arrayify } from '@ethersproject/bytes';
+import { keccak256 } from '@ethersproject/keccak256';
+import { ErrorCode } from '@ethersproject/logger';
+import { defaultAbiCoder, Interface } from '@ethersproject/abi';
+import { _TypedDataEncoder } from '@ethersproject/hash';
+import { pack } from '@ethersproject/solidity';
+import { Contract } from '@ethersproject/contracts';
+import { BigNumber, BigNumberish } from '@ethersproject/bignumber';
 import { walletContracts } from '@0xsequence/abi';
 import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import { Signer } from '@ethersproject/abstract-signer';
@@ -32,19 +33,19 @@ export function getNormalisedTransactions(txs: MetaTransaction[]): MetaTransacti
   return txs.map((t) => ({
     delegateCall: t.delegateCall === true,
     revertOnError: t.revertOnError === true,
-    gasLimit: t.gasLimit ?? constants.Zero,
-    target: t.to ?? constants.AddressZero,
-    value: t.value ?? constants.Zero,
+    gasLimit: t.gasLimit ?? Zero,
+    target: t.to ?? AddressZero,
+    value: t.value ?? Zero,
     data: t.data ?? [],
   }));
 }
 
 export function digestOfTransactionsAndNonce(nonce: BigNumberish, normalisedTransactions: MetaTransactionNormalised[]) {
-  const packMetaTransactionsNonceData = utils.defaultAbiCoder.encode(
+  const packMetaTransactionsNonceData = defaultAbiCoder.encode(
     ['uint256', META_TRANSACTIONS_TYPE],
     [nonce, normalisedTransactions],
   );
-  return utils.keccak256(packMetaTransactionsNonceData);
+  return keccak256(packMetaTransactionsNonceData);
 }
 
 export const getNonce = async (
@@ -64,7 +65,7 @@ export const getNonce = async (
   } catch (error) {
     if (error instanceof Error
       && 'code' in error
-      && error.code === errors.CALL_EXCEPTION) {
+      && error.code === ErrorCode.CALL_EXCEPTION) {
       // The most likely reason for a CALL_EXCEPTION is that the smart contract wallet
       // has not been deployed yet, so we should default to a nonce of 0.
       return BigNumber.from(0);
@@ -77,7 +78,7 @@ export const getNonce = async (
 };
 
 const encodeMessageSubDigest = (chainId: BigNumber, walletAddress: string, digest: string): string => (
-  utils.solidityPack(
+  pack(
     ['string', 'uint256', 'address', 'bytes32'],
     [ETH_SIGN_PREFIX, chainId, walletAddress, digest],
   )
@@ -96,10 +97,10 @@ export const getSignedMetaTransactions = async (
   const digest = digestOfTransactionsAndNonce(nonce, normalisedMetaTransactions);
   const completePayload = encodeMessageSubDigest(chainId, walletAddress, digest);
 
-  const hash = utils.keccak256(completePayload);
+  const hash = keccak256(completePayload);
 
   // Sign the digest
-  const hashArray = utils.arrayify(hash);
+  const hashArray = arrayify(hash);
 
   const startTime = performance.now();
   const ethsigNoType = await signer.signMessage(hashArray);
@@ -126,7 +127,7 @@ export const getSignedMetaTransactions = async (
   });
 
   // Encode the transaction;
-  const walletInterface = new utils.Interface(walletContracts.mainModule.abi);
+  const walletInterface = new Interface(walletContracts.mainModule.abi);
   return walletInterface.encodeFunctionData(walletInterface.getFunction('execute'), [
     normalisedMetaTransactions,
     nonce,
@@ -152,14 +153,14 @@ export const getSignedTypedData = async (
   delete types.EIP712Domain;
 
   // Hash the EIP712 payload and generate the complete payload
-  const { _TypedDataEncoder: typedDataEncoder } = utils;
-  const typedDataHash = typedDataEncoder.hash(typedData.domain, types, typedData.message);
+  // Implmented with reference to https://github.com/ethers-io/ethers.js/discussions/2738
+  const typedDataHash = _TypedDataEncoder.hash(typedData.domain, types, typedData.message);
   const messageSubDigest = encodeMessageSubDigest(chainId, walletAddress, typedDataHash);
-  const hash = utils.keccak256(messageSubDigest);
+  const hash = keccak256(messageSubDigest);
 
   // Sign the sub digest
   // https://github.com/immutable/wallet-contracts/blob/7824b5f24b2e0eb2dc465ecb5cd71f3984556b73/src/contracts/modules/commons/ModuleAuth.sol#L155
-  const hashArray = utils.arrayify(hash);
+  const hashArray = arrayify(hash);
 
   const startTime = performance.now();
   const ethsigNoType = await signer.signMessage(hashArray);
