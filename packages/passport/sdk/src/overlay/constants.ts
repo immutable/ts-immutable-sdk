@@ -1,8 +1,8 @@
 /* eslint-disable max-len */
 
-export const PASSPORT_OVERLAY = 'passport-overlay';
-export const PASSPORT_OVERLAY_CLOSE = `${PASSPORT_OVERLAY}-close`;
-export const PASSPORT_OVERLAY_TRY_AGAIN = `${PASSPORT_OVERLAY}-try-again`;
+export const PASSPORT_OVERLAY_ID = 'passport-overlay';
+export const PASSPORT_OVERLAY_CLOSE_ID = `${PASSPORT_OVERLAY_ID}-close`;
+export const PASSPORT_OVERLAY_TRY_AGAIN_ID = `${PASSPORT_OVERLAY_ID}-try-again`;
 
 export const CLOSE_BUTTON_SVG = `
   <svg

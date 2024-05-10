@@ -2,14 +2,14 @@ import {
   CLOSE_BUTTON_SVG,
   POPUP_BLOCKED_SVG,
   IMMUTABLE_LOGO_SVG,
-  PASSPORT_OVERLAY_CLOSE,
-  PASSPORT_OVERLAY,
-  PASSPORT_OVERLAY_TRY_AGAIN,
+  PASSPORT_OVERLAY_CLOSE_ID,
+  PASSPORT_OVERLAY_ID,
+  PASSPORT_OVERLAY_TRY_AGAIN_ID,
 } from './constants';
 
 const getCloseButton = (): string => `
     <button
-      class="${PASSPORT_OVERLAY_CLOSE}"
+      id="${PASSPORT_OVERLAY_CLOSE_ID}"
       style="
         background: #f3f3f326;
         border: none;
@@ -55,7 +55,7 @@ const getGenericContents = () => `
 
 const getTryAgainButton = () => `
     <button
-      class="${PASSPORT_OVERLAY_TRY_AGAIN}"
+      id="${PASSPORT_OVERLAY_TRY_AGAIN_ID}"
       style="
         margin-top: 27px;
         color: #f3f3f3;
@@ -74,7 +74,7 @@ const getTryAgainButton = () => `
 
 const getOverlay = (contents: string): string => `
     <div
-      class="${PASSPORT_OVERLAY}"
+      id="${PASSPORT_OVERLAY_ID}"
       style="
         position: fixed;
         top: 0;

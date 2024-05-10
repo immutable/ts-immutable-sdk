@@ -1,5 +1,5 @@
 import { PopupOverlayOptions } from 'types';
-import { PASSPORT_OVERLAY_CLOSE, PASSPORT_OVERLAY_TRY_AGAIN } from './constants';
+import { PASSPORT_OVERLAY_CLOSE_ID, PASSPORT_OVERLAY_TRY_AGAIN_ID } from './constants';
 import { getBlockedOverlay, getGenericOverlay } from './elements';
 
 export default class Overlay {
@@ -56,7 +56,7 @@ export default class Overlay {
   }
 
   private updateTryAgainButton(tryAgainOnClick: () => void) {
-    const tryAgainButton = this.overlay?.querySelector(`.${PASSPORT_OVERLAY_TRY_AGAIN}`);
+    const tryAgainButton = this.overlay?.querySelector(`#${PASSPORT_OVERLAY_TRY_AGAIN_ID}`);
     if (tryAgainButton) {
       if (this.tryAgainListener) {
         tryAgainButton.removeEventListener('click', this.tryAgainListener);
@@ -67,7 +67,7 @@ export default class Overlay {
   }
 
   private updateCloseButton(onCloseClick: () => void) {
-    const closeButton = this.overlay?.querySelector(`.${PASSPORT_OVERLAY_CLOSE}`);
+    const closeButton = this.overlay?.querySelector(`#${PASSPORT_OVERLAY_CLOSE_ID}`);
     if (closeButton) {
       if (this.onCloseListener) {
         closeButton.removeEventListener('click', this.onCloseListener);
