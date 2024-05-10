@@ -32,7 +32,7 @@ jobs:
         run: yarn syncpack:check
 
       - name: Build
-        run: yarn build
+        run: yarn bootstrap && yarn nx build @imtbl/sdk
 
       - name: Typecheck
         run: yarn typecheck
@@ -60,7 +60,7 @@ jobs:
         run: yarn install --immutable
 
       - name: Build
-        run: yarn build
+        run: yarn bootstrap && yarn nx build @imtbl/sdk
 
       - name: Test
         run: yarn test

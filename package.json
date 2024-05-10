@@ -10,7 +10,9 @@
   "devDependencies": {
     "@actions/core": "^1.10.1",
     "@emotion/react": "^11.11.3",
+    "@nx/rollup": "18.3.1",
     "@release-it-plugins/workspaces": "^4.0.0",
+    "@rollup/plugin-json": "^6.1.0",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
     "eslint": "^8.40.0",
@@ -20,6 +22,7 @@
     "husky": "^8.0.3",
     "lint-staged": "^13.2.0",
     "node-gyp": "^9.3.1",
+    "nx": "18.3.1",
     "release-it": "^16.1.3",
     "syncpack": "^9.8.4",
     "typedoc": "^0.24.8",
@@ -41,6 +44,7 @@
     "responselike": "^2.0.0"
   },
   "scripts": {
+    "bootstrap": "test -f sdk/workspace-packages.json || yarn prepare",
     "build": "NODE_OPTIONS=--max-old-space-size=14366 wsrun -y 4 -p @imtbl/sdk -p @imtbl/checkout-widgets -e -r --serial build && yarn syncpack:format && yarn wsrun -p @imtbl/sdk -a -m copyBrowserBundles",
     "build:onlysdk": "NODE_OPTIONS=--max-old-space-size=14366 wsrun -y 4 -p @imtbl/sdk --stages build && yarn syncpack:format",
     "docs:build": "typedoc",
@@ -48,6 +52,7 @@
     "lint": "wsrun --exclude-missing -e lint --no-error-on-unmatched-pattern",
     "lint:ci": "./lint-ci.sh",
     "postinstall": "husky install; ./.husky/install_gitleaks.sh",
+    "prepare": "cd sdk && yarn bootstrap",
     "release": "release-it",
     "scan:secrets": "./.husky/run_gitleaks.sh",
     "syncpack:check": "yarn syncpack list-mismatches",

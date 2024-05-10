@@ -40,7 +40,7 @@ To test this SDK locally, you can:
 yarn
 
 # Build
-yarn build
+yarn bootstrap && yarn nx build @imtbl/sdk
 
 # Runs all tests, but skip the ones that require a VPN
 yarn test
