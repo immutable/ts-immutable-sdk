@@ -6,6 +6,7 @@ import {
   axelarGateways,
   axelarAPIEndpoints,
   tenderlyAPIEndpoints,
+  childWIMXs,
 } from 'constants/bridges';
 import { FungibleToken } from 'types';
 
@@ -23,7 +24,7 @@ function getAddresses(source:string, addresses:Record<string, string>) {
   return address;
 }
 
-export function getChildETH(source: string) {
+function getChildETH(source: string) {
   return getAddresses(source, childETHs);
 }
 
@@ -61,6 +62,14 @@ export function getAxelarEndpoint(source:string) {
 
 export function getTenderlyEndpoint(source:string) {
   return getAddresses(source, tenderlyAPIEndpoints);
+}
+
+function getWrappedIMX(source: string) {
+  return getAddresses(source, childWIMXs);
+}
+
+export function isWrappedIMX(token: FungibleToken, source: string) {
+  return token.toUpperCase() === getWrappedIMX(source).toUpperCase();
 }
 
 export const exportedForTesting = {
