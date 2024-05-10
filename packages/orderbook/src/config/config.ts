@@ -40,7 +40,9 @@ export function getOrderbookConfig(
     case Environment.SANDBOX:
       return {
         seaportContractAddress: '0x7d117aA8BD6D31c4fa91722f246388f38ab1942c',
-        zoneContractAddress: '0x8831867E347AB87FA30199C5B695F0A31604Bb52',
+        // eslint-disable-next-line max-len
+        // zoneContractAddress: '0x8831867E347AB87FA30199C5B695F0A31604Bb52', // ImmutableSignedZoneV1
+        zoneContractAddress: '0x1004f9615E79462c711Ff05a386BdbA91a7628C3', // ImmutableSignedZoneV2
         apiEndpoint: 'https://api.sandbox.immutable.com',
         chainName: TESTNET_CHAIN_NAME,
         provider: getConfiguredProvider('https://rpc.testnet.immutable.com', config.baseConfig.rateLimitingKey),
@@ -49,7 +51,9 @@ export function getOrderbookConfig(
     case Environment.PRODUCTION:
       return {
         seaportContractAddress: '0x6c12aD6F0bD274191075Eb2E78D7dA5ba6453424',
-        zoneContractAddress: '0x00338b92Bec262078B3e49BF12bbEA058916BF91',
+        // eslint-disable-next-line max-len
+        // zoneContractAddress: '0x00338b92Bec262078B3e49BF12bbEA058916BF91', // ImmutableSignedZoneV1
+        zoneContractAddress: '0x1004f9615E79462c711Ff05a386BdbA91a7628C3', // ImmutableSignedZoneV2
         apiEndpoint: 'https://api.immutable.com',
         chainName: MAINNET_CHAIN_NAME,
         provider: getConfiguredProvider('https://rpc.immutable.com', config.baseConfig.rateLimitingKey),
