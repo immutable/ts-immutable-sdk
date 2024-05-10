@@ -47,6 +47,14 @@ export function digestOfTransactionsAndNonce(nonce: BigNumberish, normalisedTran
   return utils.keccak256(packMetaTransactionsNonceData);
 }
 
+export function digestOfTransactions(normalisedTransactions: MetaTransactionNormalised[]): string {
+  const packMetaTransactionsNonceData = utils.defaultAbiCoder.encode(
+    [META_TRANSACTIONS_TYPE],
+    [normalisedTransactions],
+  );
+  return utils.keccak256(packMetaTransactionsNonceData);
+}
+
 export const getNonce = async (
   rpcProvider: StaticJsonRpcProvider,
   smartContractWalletAddress: string,
