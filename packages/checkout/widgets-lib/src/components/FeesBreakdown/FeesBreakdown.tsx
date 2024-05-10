@@ -3,22 +3,14 @@ import {
 } from '@biom3/react';
 import { formatZeroAmount, tokenValueFormat } from 'lib/utils';
 import { useTranslation } from 'react-i18next';
-import { Token } from '@imtbl/dex-sdk';
 import { feeItemContainerStyles, feeItemLoadingStyles, feesBreakdownContentStyles } from './FeesBreakdownStyles';
 import { FeeItem } from './FeeItem';
 import { FooterLogo } from '../Footer/FooterLogo';
-
-type Fee = {
-  label: string;
-  amount: string;
-  fiatAmount: string;
-  prefix?: string;
-  token: Token;
-};
+import { FormattedFee } from '../../widgets/swap/functions/swapFees';
 
 type FeesBreakdownProps = {
   onCloseDrawer?: () => void;
-  fees: Fee[];
+  fees: FormattedFee[];
   children?: any;
   visible?: boolean;
   totalFiatAmount?: string;
@@ -84,7 +76,7 @@ export function FeesBreakdown({
                 label={t('drawers.feesBreakdown.total')}
                 amount={tokenValueFormat(totalAmount)}
                 fiatAmount={totalFiatAmount
-                  ? `~ ${t('drawers.feesBreakdown.fees.fiatPricePrefix')}${totalFiatAmount}`
+                  ? `≈ ${t('drawers.feesBreakdown.fees.fiatPricePrefix')}${totalFiatAmount}`
                   : formatZeroAmount('0')}
                 tokenSymbol={tokenSymbol}
                 boldLabel
