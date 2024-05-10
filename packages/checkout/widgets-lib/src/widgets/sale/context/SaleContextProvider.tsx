@@ -136,7 +136,7 @@ const SaleContext = createContext<SaleContextValues>({
   excludePaymentTypes: [],
   multicurrency: false,
   selectedCurrency: undefined,
-  waitFulfillmentSettlements: false,
+  waitFulfillmentSettlements: true,
 });
 
 SaleContext.displayName = 'SaleSaleContext';

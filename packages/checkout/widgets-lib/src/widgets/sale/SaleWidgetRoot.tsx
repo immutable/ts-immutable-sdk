@@ -138,9 +138,7 @@ export class Sale extends Base<WidgetType.SALE> {
                   excludePaymentTypes={this.parameters.excludePaymentTypes!}
                   language="en"
                   multicurrency={!!this.properties?.config?.multicurrency}
-                  waitFulfillmentSettlements={
-                    !!this.properties?.config?.waitFulfillmentSettlements
-                  }
+                  waitFulfillmentSettlements={this.properties?.config?.waitFulfillmentSettlements ?? true}
                 />
               </Suspense>
             </ConnectLoader>
