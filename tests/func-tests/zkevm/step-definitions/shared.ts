@@ -1,7 +1,9 @@
+import { orderbook } from '@imtbl/sdk';
 import { DefineStepFunction } from 'jest-cucumber';
 import { Wallet } from 'ethers';
 import { connectToTestERC1155Token, connectToTestERC721Token } from '../utils/orderbook';
 import { GAS_OVERRIDES } from '../utils/orderbook/gas';
+import { actionAll } from '../utils/orderbook/actions';
 
 const imxForApproval = 0.01 * 1e18;
 const imxForFulfillment = 0.04 * 1e18;
@@ -64,5 +66,39 @@ export const andIHaveAFundedFulfillerAccount = (
     });
 
     await fundingTx.wait(1);
+  });
+};
+
+export const whenICreateAListing = (
+  when: DefineStepFunction,
+  sdk: orderbook.Orderbook,
+  offerer: Wallet,
+  contractAddress: string,
+  testTokenId: string,
+  setListingId: (listingId: string) => void,
+) => {
+  when(/^I create a listing to sell 1 token$/, async (): Promise<void> => {
+    const listing = await sdk.prepareListing({
+      makerAddress: offerer.address,
+      buy: {
+        amount: `${listingPrice}`,
+        type: 'NATIVE',
+      },
+      sell: {
+        contractAddress,
+        tokenId: testTokenId,
+        type: 'ERC721',
+      },
+    });
+
+    const signatures = await actionAll(listing.actions, offerer);
+    const { result } = await sdk.createListing({
+      orderComponents: listing.orderComponents,
+      orderHash: listing.orderHash,
+      orderSignature: signatures[0],
+      makerFees: [],
+    });
+
+    setListingId(result.id);
   });
 };
