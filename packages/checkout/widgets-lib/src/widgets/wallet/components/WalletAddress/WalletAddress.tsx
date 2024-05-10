@@ -3,6 +3,8 @@ import { Web3Provider } from '@ethersproject/providers';
 import { useEffect, useState } from 'react';
 import { WalletProviderName } from '@imtbl/checkout-sdk';
 import { getWalletLogoByName } from 'lib/logoUtils';
+import { useTranslation } from 'react-i18next';
+import { abbreviateWalletAddress } from 'lib/utils';
 import {
   UserJourney,
   useAnalytics,
@@ -13,10 +15,19 @@ const isCopiedStyle = {
   fill: 'base.color.status.success.bright',
 };
 
-export function WalletAddress({ provider }: { provider?: Web3Provider }) {
+export function WalletAddress({
+  provider,
+  showL1Warning,
+  setShowL1Warning,
+}: {
+  provider?: Web3Provider;
+  showL1Warning: boolean;
+  setShowL1Warning: (show: boolean) => void;
+}) {
   const [walletAddress, setWalletAddress] = useState<string>('');
   const [isCopied, setIsCopied] = useState(false);
-  // const [showL1Warning, setShowL1Warning] = useState(false);
+
+  const { t } = useTranslation();
 
   const { track } = useAnalytics();
 
@@ -31,14 +42,14 @@ export function WalletAddress({ provider }: { provider?: Web3Provider }) {
   };
 
   const ctaIcon = () => {
-    if ((provider?.provider as any)?.isMetaMask) {
-      if (isCopied) {
-        return 'Tick';
-      }
-      return 'CopyText';
+    if ((provider?.provider as any)?.isPassport && !showL1Warning) {
+      return 'ShowPassword';
     }
 
-    return 'ShowPassword';
+    if (isCopied) {
+      return 'Tick';
+    }
+    return 'CopyText';
   };
 
   useEffect(() => {
@@ -52,7 +63,7 @@ export function WalletAddress({ provider }: { provider?: Web3Provider }) {
   }, [provider]);
 
   const handleIconClick = () => {
-    if (ctaIcon() === 'CopyText' && walletAddress) {
+    if (walletAddress && ctaIcon() === 'CopyText') {
       track({
         userJourney: UserJourney.WALLET,
         screen: 'Settings',
@@ -64,7 +75,7 @@ export function WalletAddress({ provider }: { provider?: Web3Provider }) {
       setIsCopied(true);
       setTimeout(() => {
         setIsCopied(false);
-      }, 3000);
+      }, 1000);
     } else if (ctaIcon() === 'ShowPassword') {
       setShowL1Warning(true);
     }
@@ -88,9 +99,9 @@ export function WalletAddress({ provider }: { provider?: Web3Provider }) {
           ...(isCopied ? isCopiedStyle : {}),
         }}
       />
-      <MenuItem.Label>Wallet Address</MenuItem.Label>
+      <MenuItem.Label>{t('views.SETTINGS.walletAddress.label')}</MenuItem.Label>
       <MenuItem.Caption testId="wallet-address">
-        {walletAddress}
+        {abbreviateWalletAddress(walletAddress)}
       </MenuItem.Caption>
     </MenuItem>
   );
