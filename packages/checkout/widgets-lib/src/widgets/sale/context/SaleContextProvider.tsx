@@ -26,8 +26,8 @@ import {
 import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 import { useSignOrder } from '../hooks/useSignOrder';
 import {
-  ClientConfig,
-  ClientConfigCurrency,
+  OrderQuote,
+  OrderQuoteCurrency,
   ExecuteOrderResponse,
   ExecutedTransaction,
   SaleErrorTypes,
@@ -40,7 +40,7 @@ import {
 import { getTopUpViewData } from '../functions/smartCheckoutUtils';
 
 import { useSmartCheckout } from '../hooks/useSmartCheckout';
-import { useClientConfig, defaultClientConfig } from '../hooks/useClientConfig';
+import { useQuoteOrder, defaultOrderQuote } from '../hooks/useQuoteOrder';
 
 type SaleContextProps = {
   config: StrongCheckoutWidgetsConfig;
@@ -92,9 +92,9 @@ type SaleContextValues = SaleContextProps & {
   disabledPaymentTypes: SalePaymentTypes[];
   invalidParameters: boolean;
   fromTokenAddress: string;
-  clientConfig: ClientConfig;
+  orderQuote: OrderQuote;
   signTokenIds: string[];
-  selectedCurrency: ClientConfigCurrency | undefined;
+  selectedCurrency: OrderQuoteCurrency | undefined;
 };
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -129,7 +129,7 @@ const SaleContext = createContext<SaleContextValues>({
   disabledPaymentTypes: [],
   invalidParameters: false,
   fromTokenAddress: '',
-  clientConfig: defaultClientConfig,
+  orderQuote: defaultOrderQuote,
   signTokenIds: [],
   excludePaymentTypes: [],
   multicurrency: false,
@@ -197,7 +197,7 @@ export function SaleContextProvider(props: {
 
   const [invalidParameters, setInvalidParameters] = useState<boolean>(false);
 
-  const { selectedCurrency, clientConfig, clientConfigError } = useClientConfig({
+  const { selectedCurrency, orderQuote, orderQuoteError } = useQuoteOrder({
     items,
     provider,
     environmentId,
@@ -325,9 +325,9 @@ export function SaleContextProvider(props: {
   }, [signError]);
 
   useEffect(() => {
-    if (!clientConfigError) return;
-    goToErrorView(clientConfigError.type, clientConfigError.data);
-  }, [clientConfigError]);
+    if (!orderQuoteError) return;
+    goToErrorView(orderQuoteError.type, orderQuoteError.data);
+  }, [orderQuoteError]);
 
   const { smartCheckout, smartCheckoutResult, smartCheckoutError } = useSmartCheckout({
     provider,
@@ -416,7 +416,7 @@ export function SaleContextProvider(props: {
       fundingRoutes,
       disabledPaymentTypes,
       invalidParameters,
-      clientConfig,
+      orderQuote,
       signTokenIds: tokenIds,
       excludePaymentTypes,
       multicurrency,
@@ -449,7 +449,7 @@ export function SaleContextProvider(props: {
       fundingRoutes,
       disabledPaymentTypes,
       invalidParameters,
-      clientConfig,
+      orderQuote,
       tokenIds,
       excludePaymentTypes,
       multicurrency,

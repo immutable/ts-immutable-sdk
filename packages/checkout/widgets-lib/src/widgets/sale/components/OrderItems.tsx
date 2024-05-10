@@ -4,13 +4,13 @@ import { listVariants, listItemVariants } from 'lib/animation/listAnimation';
 
 import { motion } from 'framer-motion';
 import { OrderItem } from './OrderItem';
-import { ClientConfigProduct, FundingBalance } from '../types';
+import { OrderQuoteProduct, FundingBalance } from '../types';
 import { getPricingBySymbol } from '../utils/pricing';
 
 type OrderItemsProps = {
   items: SaleItem[];
   balance: FundingBalance;
-  pricing: Record<string, ClientConfigProduct>;
+  pricing: Record<string, OrderQuoteProduct>;
   conversions: Map<string, number>;
 };
 

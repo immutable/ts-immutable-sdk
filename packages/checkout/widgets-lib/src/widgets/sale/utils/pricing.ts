@@ -1,11 +1,11 @@
 import { tokenSymbolNameOverrides } from 'lib/utils';
-import { ClientConfigPricing } from '../types';
+import { OrderQuotePricing } from '../types';
 
 export const getPricingBySymbol = (
   symbol: string,
-  prices: Record<string, ClientConfigPricing> | undefined,
+  prices: Record<string, OrderQuotePricing> | undefined,
   conversions: Map<string, number>,
-): ClientConfigPricing | undefined => {
+): OrderQuotePricing | undefined => {
   if (!prices) {
     return undefined;
   }

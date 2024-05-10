@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import {
-  ClientConfig,
-} from '../types';
+import { OrderQuote } from '../types';
 
-export type ClientConfigApiResponse = {
-  contract_id: string;
+export type OrderQuoteApiResponse = {
+  config: {
+    contract_id: string;
+  },
   currencies: Array<{
     base: boolean
     decimals: number
@@ -28,15 +28,17 @@ export type ClientConfigApiResponse = {
   }>
 };
 
-export const transformToClientConfig = (
+export const transformToOrderQuote = (
   {
-    contract_id,
+    config,
     currencies,
     products,
     total_amount,
-  }: ClientConfigApiResponse,
-): ClientConfig => ({
-  contractId: contract_id,
+  }: OrderQuoteApiResponse,
+): OrderQuote => ({
+  config: {
+    contractId: config.contract_id,
+  },
   currencies: currencies.map(({ erc20_address, exchange_id, ...fields }) => ({
     ...fields,
     address: erc20_address,

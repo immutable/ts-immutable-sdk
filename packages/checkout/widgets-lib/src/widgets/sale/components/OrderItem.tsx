@@ -3,14 +3,14 @@ import { SaleItem } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
 import { calculateCryptoToFiat, tokenValueFormat } from 'lib/utils';
 import { ReactElement } from 'react';
-import { ClientConfigPricing, FundingBalance } from '../types';
+import { OrderQuotePricing, FundingBalance } from '../types';
 
 export interface OrderItemProps<
   RC extends ReactElement | undefined = undefined,
 > {
   item: SaleItem;
   balance: FundingBalance;
-  pricing: ClientConfigPricing | undefined;
+  pricing: OrderQuotePricing | undefined;
   conversions: Map<string, number>;
   size?: MenuItemSize;
   rc?: RC;

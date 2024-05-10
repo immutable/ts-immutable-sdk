@@ -4,18 +4,20 @@ import { SaleItem } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { PRIMARY_SALES_API_BASE_URL } from '../utils/config';
 
-import { ClientConfig, ClientConfigCurrency, SaleErrorTypes } from '../types';
-import { transformToClientConfig } from '../functions/transformToClientConfig';
+import { OrderQuote, OrderQuoteCurrency, SaleErrorTypes } from '../types';
+import { transformToOrderQuote } from '../functions/transformToOrderQuote';
 
-type UseClientConfigParams = {
+type UseQuoteOrderParams = {
   items: SaleItem[];
   environmentId: string;
   environment: Environment;
   provider: Web3Provider | undefined;
 };
 
-export const defaultClientConfig: ClientConfig = {
-  contractId: '',
+export const defaultOrderQuote: OrderQuote = {
+  config: {
+    contractId: '',
+  },
   currencies: [],
   products: {},
   totalAmount: {},
@@ -26,24 +28,24 @@ export type ConfigError = {
   data?: Record<string, unknown>;
 };
 
-export const useClientConfig = ({
+export const useQuoteOrder = ({
   items,
   environment,
   environmentId,
   provider,
-}: UseClientConfigParams) => {
+}: UseQuoteOrderParams) => {
   const [selectedCurrency, setSelectedCurrency] = useState<
-  ClientConfigCurrency | undefined
+  OrderQuoteCurrency | undefined
   >();
   const fetching = useRef(false);
   const [queryParams, setQueryParams] = useState<string>('');
-  const [clientConfig, setClientConfig] = useState<ClientConfig>(defaultClientConfig);
-  const [clientConfigError, setClientConfigError] = useState<
+  const [orderQuote, setOrderQuote] = useState<OrderQuote>(defaultOrderQuote);
+  const [orderQuoteError, setOrderQuoteError] = useState<
   ConfigError | undefined
   >(undefined);
 
   const setError = (error: unknown) => {
-    setClientConfigError({
+    setOrderQuoteError({
       type: SaleErrorTypes.SERVICE_BREAKDOWN,
       data: { reason: 'Error fetching settlement currencies', error },
     });
@@ -79,7 +81,7 @@ export const useClientConfig = ({
 
       try {
         fetching.current = true;
-        const baseUrl = `${PRIMARY_SALES_API_BASE_URL[environment]}/${environmentId}/client-config?${queryParams}`;
+        const baseUrl = `${PRIMARY_SALES_API_BASE_URL[environment]}/${environmentId}/order/quote?${queryParams}`;
 
         // eslint-disable-next-line
         const response = await fetch(baseUrl, {
@@ -92,8 +94,8 @@ export const useClientConfig = ({
           throw new Error(`${response.status} - ${response.statusText}`);
         }
 
-        const config = transformToClientConfig(await response.json());
-        setClientConfig(config);
+        const config = transformToOrderQuote(await response.json());
+        setOrderQuote(config);
       } catch (error) {
         setError(error);
       } finally {
@@ -104,17 +106,17 @@ export const useClientConfig = ({
 
   useEffect(() => {
     // Set default currency
-    if (clientConfig.currencies.length === 0) return;
+    if (orderQuote.currencies.length === 0) return;
 
-    const defaultSelectedCurrency = clientConfig.currencies.find((c) => c.base)
-      || clientConfig.currencies?.[0];
+    const defaultSelectedCurrency = orderQuote.currencies.find((c) => c.base)
+      || orderQuote.currencies?.[0];
 
     setSelectedCurrency(defaultSelectedCurrency);
-  }, [clientConfig]);
+  }, [orderQuote]);
 
   return {
-    clientConfig,
+    orderQuote,
     selectedCurrency,
-    clientConfigError,
+    orderQuoteError,
   };
 };

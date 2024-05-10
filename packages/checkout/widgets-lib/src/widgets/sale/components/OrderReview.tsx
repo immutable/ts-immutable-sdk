@@ -13,7 +13,7 @@ import { EventTargetContext } from '../../../context/event-target-context/EventT
 import { sendSaleWidgetCloseEvent } from '../SaleWidgetEvents';
 import { SelectCoinDropdown } from './SelectCoinDropdown';
 import { CoinsDrawer } from './CoinsDrawer';
-import { ClientConfigProduct, FundingBalance } from '../types';
+import { OrderQuoteProduct, FundingBalance } from '../types';
 import { OrderItems } from './OrderItems';
 import { useSaleEvent } from '../hooks/useSaleEvents';
 
@@ -23,7 +23,7 @@ type OrderReviewProps = {
   conversions: Map<string, number>;
   loadingBalances: boolean;
   items: SaleItem[];
-  pricing: Record<string, ClientConfigProduct>;
+  pricing: Record<string, OrderQuoteProduct>;
   transactionRequirement?: TransactionRequirement;
   onBackButtonClick: () => void;
   onProceedToBuy: (fundingBalance: FundingBalance) => void;

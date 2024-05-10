@@ -1,14 +1,16 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { ClientConfig } from '../types';
+import { OrderQuote } from '../types';
 import {
-  ClientConfigApiResponse,
-  transformToClientConfig,
-} from './transformToClientConfig';
+  OrderQuoteApiResponse,
+  transformToOrderQuote,
+} from './transformToOrderQuote';
 
-describe('transformToClientConfig', () => {
+describe('transformToOrderQuote', () => {
   it('should return input object with camel case keys', () => {
-    const fromClientConfig: ClientConfigApiResponse = {
-      contract_id: '',
+    const from: OrderQuoteApiResponse = {
+      config: {
+        contract_id: '',
+      },
       currencies: [
         {
           base: true,
@@ -84,8 +86,10 @@ describe('transformToClientConfig', () => {
       },
     };
 
-    const toClientConfig: ClientConfig = {
-      contractId: '',
+    const expected: OrderQuote = {
+      config: {
+        contractId: '',
+      },
       currencies: [
         {
           base: true,
@@ -161,8 +165,6 @@ describe('transformToClientConfig', () => {
       },
     };
 
-    expect(transformToClientConfig(fromClientConfig)).toStrictEqual(
-      toClientConfig,
-    );
+    expect(transformToOrderQuote(from)).toStrictEqual(expected);
   });
 });

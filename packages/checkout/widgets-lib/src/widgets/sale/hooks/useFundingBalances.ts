@@ -10,7 +10,7 @@ export const useFundingBalances = () => {
   const fetching = useRef(false);
   const {
     fromTokenAddress,
-    clientConfig,
+    orderQuote,
     provider,
     checkout,
     selectedCurrency,
@@ -30,7 +30,7 @@ export const useFundingBalances = () => {
       !fromTokenAddress
       || !provider
       || !checkout
-      || !clientConfig
+      || !orderQuote
       || !selectedCurrency
     ) return;
 
@@ -43,11 +43,11 @@ export const useFundingBalances = () => {
         const results = await fetchFundingBalances({
           provider,
           checkout,
-          currencies: clientConfig.currencies,
+          currencies: orderQuote.currencies,
           routingOptions: { bridge: false, onRamp: false, swap: true },
           baseCurrency: selectedCurrency,
           getAmountByCurrency: (currency) => {
-            const pricing = getPricingBySymbol(currency.name, clientConfig.totalAmount, cryptoFiatState.conversions);
+            const pricing = getPricingBySymbol(currency.name, orderQuote.totalAmount, cryptoFiatState.conversions);
             return pricing ? pricing.amount.toString() : '';
           },
           getIsGasless: () => (provider.provider as any)?.isPassport || false,

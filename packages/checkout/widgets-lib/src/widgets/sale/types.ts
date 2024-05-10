@@ -97,7 +97,7 @@ export enum SmartCheckoutErrorTypes {
   FRACTIONAL_BALANCE_BLOCKED = 'FRACTIONAL_BALANCE_BLOCKED',
 }
 
-export type ClientConfigCurrency = {
+export type OrderQuoteCurrency = {
   base: boolean;
   decimals: number;
   address: string;
@@ -105,23 +105,25 @@ export type ClientConfigCurrency = {
   name: string;
 };
 
-export type ClientConfigPricing = {
+export type OrderQuotePricing = {
   amount: number;
   currency: string;
   type: string;
 };
 
-export type ClientConfigProduct = {
+export type OrderQuoteProduct = {
   productId: string;
   quantity: number;
-  pricing: Record<string, ClientConfigPricing>;
+  pricing: Record<string, OrderQuotePricing>;
 };
 
-export type ClientConfig = {
-  contractId: string;
-  currencies: Array<ClientConfigCurrency>;
-  products: Record<string, ClientConfigProduct>;
-  totalAmount: Record<string, ClientConfigPricing>;
+export type OrderQuote = {
+  config: {
+    contractId: string;
+  },
+  currencies: Array<OrderQuoteCurrency>;
+  products: Record<string, OrderQuoteProduct>;
+  totalAmount: Record<string, OrderQuotePricing>;
 };
 
 export enum SignPaymentTypes {
@@ -141,6 +143,6 @@ export type SufficientFundingStep = {
 export type FundingBalance = FundingStep | SufficientFundingStep;
 
 export type FundingBalanceResult = {
-  currency: ClientConfigCurrency;
+  currency: OrderQuoteCurrency;
   smartCheckoutResult: SmartCheckoutResult;
 };
