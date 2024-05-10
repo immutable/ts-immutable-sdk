@@ -1,6 +1,6 @@
 import { MenuItem, ButtCon } from '@biom3/react';
 import { Web3Provider } from '@ethersproject/providers';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { getWalletLogoByName } from 'lib/logoUtils';
 import { useTranslation } from 'react-i18next';
 import { abbreviateWalletAddress } from 'lib/utils';
@@ -31,16 +31,12 @@ export function WalletAddress({
 
   const { track } = useAnalytics();
 
-  const ctaIcon = () => {
+  const ctaIcon = useMemo(() => {
     if ((provider?.provider as any)?.isPassport && !showL1Warning) {
       return 'ShowPassword';
     }
-
-    if (isCopied) {
-      return 'Tick';
-    }
-    return 'CopyText';
-  };
+    return isCopied ? 'Tick' : 'CopyText';
+  }, [provider, showL1Warning, isCopied]);
 
   useEffect(() => {
     if (!provider) return;
@@ -53,7 +49,8 @@ export function WalletAddress({
   }, [provider]);
 
   const handleIconClick = () => {
-    if (walletAddress && ctaIcon() === 'CopyText') {
+    const icon = ctaIcon;
+    if (walletAddress && icon === 'CopyText') {
       track({
         userJourney: UserJourney.WALLET,
         screen: 'Settings',
@@ -61,12 +58,11 @@ export function WalletAddress({
         controlType: 'Button',
       });
       navigator.clipboard.writeText(walletAddress);
-
       setIsCopied(true);
       setTimeout(() => {
         setIsCopied(false);
       }, 1000);
-    } else if (ctaIcon() === 'ShowPassword') {
+    } else if (icon === 'ShowPassword') {
       setShowL1Warning(true);
     }
   };
@@ -82,7 +78,7 @@ export function WalletAddress({
         variant="tertiary"
         iconVariant="bold"
         size="small"
-        icon={ctaIcon()}
+        icon={ctaIcon}
         onClick={handleIconClick}
         sx={{
           cursor: 'pointer',
