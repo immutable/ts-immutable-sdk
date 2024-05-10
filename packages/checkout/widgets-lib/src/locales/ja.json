@@ -102,6 +102,10 @@
       },
       "walletAddress": {
         "label": "ウォレットアドレス"
+      },
+      "transferAssetsL1Warning": {
+        "heading": "Ethereumのパスポートに資産を送らないでください",
+        "body": "パスポートはまだEthereumに存在していないため、そこに資金を送ると失われます。Immutable zkEVMまたはImmutable Xでのみ転送してください。"
       }
     },
     "COIN_INFO": {

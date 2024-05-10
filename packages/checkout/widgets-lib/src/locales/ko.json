@@ -98,6 +98,10 @@
       },
       "walletAddress": {
         "label": "지갑 주소"
+      },
+      "transferAssetsL1Warning": {
+        "heading": "이더리움에 있는 패스포트로 자산을 보내지 마세요",
+        "body": "패스포트는 아직 이더리움에 존재하지 않으므로 자금이 손실됩니다. Immutable zkEVM 또는 Immutable X에서만 전송하세요."
       }
     },
     "COIN_INFO": {
