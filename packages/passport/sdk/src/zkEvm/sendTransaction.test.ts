@@ -70,7 +70,7 @@ describe('sendTransaction', () => {
     guardianClient.validateEVMTransaction.mockResolvedValue(undefined);
   });
 
-  describe('successful imGetTransactionByHash retrievals', () => {
+  describe('when the relayer returns a transaction with a "SUCCESSFUL" status', () => {
     beforeEach(() => {
       (retryWithDelay as jest.Mock).mockResolvedValue({
         status: RelayerTransactionStatus.SUCCESSFUL,
