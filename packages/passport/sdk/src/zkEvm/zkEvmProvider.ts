@@ -1,7 +1,7 @@
 import { StaticJsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
+import { hexlify } from '@ethersproject/bytes';
 import { Signer } from '@ethersproject/abstract-signer';
-import { utils } from 'ethers';
 import { identify, trackFlow } from '@imtbl/metrics';
 import {
   JsonRpcRequestCallback,
@@ -295,7 +295,7 @@ export class ZkEvmProvider implements Provider {
         // that detectNetwork call _uncachedDetectNetwork which will force
         // the provider to re-fetch the chainId from remote.
         const { chainId } = await this.#rpcProvider.detectNetwork();
-        return utils.hexlify(chainId);
+        return hexlify(chainId);
       }
       // Pass through methods
       case 'eth_gasPrice':

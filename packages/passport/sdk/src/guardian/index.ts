@@ -1,6 +1,7 @@
 import * as guardian from '@imtbl/guardian';
 import { TransactionApprovalRequestChainTypeEnum, TransactionEvaluationResponse } from '@imtbl/guardian';
-import { BigNumber, ethers } from 'ethers';
+import { BigNumber, BigNumberish } from '@ethersproject/bignumber';
+import { AddressZero } from '@ethersproject/constants';
 import { PassportError, PassportErrorType } from 'errors/passportError';
 import AuthManager from '../authManager';
 import { ConfirmationScreen } from '../confirmation';
@@ -34,7 +35,7 @@ const transactionRejectedCrossSdkBridgeError = 'Transaction requires confirmatio
   + ' supported in this environment. Please contact Immutable support if you need to enable this feature.';
 
 export const convertBigNumberishToString = (
-  value: ethers.BigNumberish,
+  value: BigNumberish,
 ): string => BigNumber.from(value).toString();
 
 const transformGuardianTransactions = (
@@ -45,7 +46,7 @@ const transformGuardianTransactions = (
       delegateCall: t.delegateCall === true,
       revertOnError: t.revertOnError === true,
       gasLimit: t.gasLimit ? convertBigNumberishToString(t.gasLimit) : '0',
-      target: t.to ?? ethers.constants.AddressZero,
+      target: t.to ?? AddressZero,
       value: t.value ? convertBigNumberishToString(t.value) : '0',
       data: t.data ? t.data.toString() : '0x',
     }));

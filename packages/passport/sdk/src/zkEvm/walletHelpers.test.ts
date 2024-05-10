@@ -1,6 +1,7 @@
-import {
-  BigNumber, Wallet, Contract, errors,
-} from 'ethers';
+import { ErrorCode } from '@ethersproject/logger';
+import { BigNumber } from '@ethersproject/bignumber';
+import { Wallet } from '@ethersproject/wallet';
+import { Contract } from '@ethersproject/contracts';
 import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import { getNonce, getSignedMetaTransactions, getSignedTypedData } from './walletHelpers';
 import { TypedDataPayload } from './types';
@@ -134,7 +135,7 @@ describe('getNonce', () => {
     describe('and the error is a call_exception', () => {
       it('should return 0', async () => {
         const error = new Error('call revert exception');
-        Object.defineProperty(error, 'code', { value: errors.CALL_EXCEPTION });
+        Object.defineProperty(error, 'code', { value: ErrorCode.CALL_EXCEPTION });
 
         nonceMock.mockRejectedValue(error);
 
@@ -147,7 +148,7 @@ describe('getNonce', () => {
     describe('and the error is NOT a call_exception', () => {
       it('should throw the error', async () => {
         const error = new Error('call revert exception');
-        Object.defineProperty(error, 'code', { value: errors.NETWORK_ERROR });
+        Object.defineProperty(error, 'code', { value: ErrorCode.NETWORK_ERROR });
         nonceMock.mockRejectedValue(error);
 
         await expect(() => getNonce(rpcProvider, walletAddress)).rejects.toThrow(error);

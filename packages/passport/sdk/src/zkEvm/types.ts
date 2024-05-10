@@ -1,4 +1,5 @@
-import { BigNumberish, BytesLike } from 'ethers';
+import { BigNumberish } from '@ethersproject/bignumber';
+import { BytesLike } from '@ethersproject/bytes';
 import { JsonRpcError } from './JsonRpcError';
 
 export enum RelayerTransactionStatus {

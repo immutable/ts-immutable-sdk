@@ -1,7 +1,7 @@
 import { StaticJsonRpcProvider, Web3Provider } from '@ethersproject/providers';
+import { hexlify } from '@ethersproject/bytes';
 import { identify, trackFlow } from '@imtbl/metrics';
 import AuthManager from 'authManager';
-import { utils } from 'ethers';
 import { ZkEvmProvider, ZkEvmProviderInput } from './zkEvmProvider';
 import { sendTransaction } from './sendTransaction';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
@@ -298,7 +298,7 @@ describe('ZkEvmProvider', () => {
 
       expect(detectNetworkMock).toBeCalledTimes(1);
       expect(sendMock).not.toBeCalled();
-      expect(result).toBe(utils.hexlify(chainId));
+      expect(result).toBe(hexlify(chainId));
     });
   });
 

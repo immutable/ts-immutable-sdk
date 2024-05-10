@@ -1,5 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { Signer } from 'ethers';
+import { Signer } from '@ethersproject/abstract-signer';
 import AuthManager from 'authManager';
 import { mockUserImx } from 'test/mocks';
 import { AxiosError } from 'axios';
