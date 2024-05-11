@@ -148,13 +148,13 @@ describe('AuthManager', () => {
     });
 
     describe('when a logoutRedirectUri is specified', () => {
-      it('should set the endSessionEndpoint `post_logout_redirect_uri` and `client_id` query string params', () => {
+      it('should set the endSessionEndpoint `returnTo` and `client_id` query string params', () => {
         const configWithLogoutRedirectUri = getConfig({ logoutRedirectUri });
         const am = new AuthManager(configWithLogoutRedirectUri);
 
         const uri = new URL(logoutEndpoint, `https://${authenticationDomain}`);
         uri.searchParams.append('client_id', clientId);
-        uri.searchParams.append('post_logout_redirect_uri', logoutRedirectUri);
+        uri.searchParams.append('returnTo', logoutRedirectUri);
 
         expect(am).toBeDefined();
         expect(UserManager).toBeCalledWith(expect.objectContaining({
@@ -286,15 +286,6 @@ describe('AuthManager', () => {
   });
 
   describe('logout', () => {
-    it('should build the correct logout object', async () => {
-      mockGetUser.mockReturnValue(mockOidcUser);
-
-      const am = new AuthManager(getConfig({ logoutRedirectUri }));
-      const logoutArgs = await am.getLogoutArgs();
-
-      expect(logoutArgs.id_token_hint).toEqual(mockUser.idToken);
-    });
-
     it('should call redirect logout if logout mode is redirect', async () => {
       const configuration = getConfig({
         logoutMode: 'redirect',
@@ -500,7 +491,7 @@ describe('AuthManager', () => {
   describe('getDeviceFlowEndSessionEndpoint', () => {
     describe('with a logged in user', () => {
       describe('when a logoutRedirectUri is specified', () => {
-        it('should set the endSessionEndpoint `post_logout_redirect_uri` and `client_id` query string params', async () => {
+        it('should set the endSessionEndpoint `returnTo` and `client_id` query string params', async () => {
           mockGetUser.mockReturnValue(mockOidcUser);
 
           const am = new AuthManager(getConfig({ logoutRedirectUri }));
@@ -510,12 +501,12 @@ describe('AuthManager', () => {
           expect(uri.hostname).toEqual(authenticationDomain);
           expect(uri.pathname).toEqual(logoutEndpoint);
           expect(uri.searchParams.get('client_id')).toEqual(clientId);
-          expect(uri.searchParams.get('id_token_hint')).toEqual(mockUser.idToken);
+          expect(uri.searchParams.get('returnTo')).toEqual(logoutRedirectUri);
         });
       });
 
       describe('when no post_logout_redirect_uri is specified', () => {
-        it('should return the endSessionEndpoint without a `post_logout_redirect_uri` or `client_id` query string params', async () => {
+        it('should return the endSessionEndpoint without a `returnTo` or `client_id` query string params', async () => {
           mockGetUser.mockReturnValue(mockOidcUser);
 
           const am = new AuthManager(getConfig());
@@ -525,7 +516,6 @@ describe('AuthManager', () => {
           expect(uri.hostname).toEqual(authenticationDomain);
           expect(uri.pathname).toEqual(logoutEndpoint);
           expect(uri.searchParams.get('client_id')).toEqual(clientId);
-          expect(uri.searchParams.get('id_token_hint')).toEqual(mockUser.idToken);
         });
       });
     });
