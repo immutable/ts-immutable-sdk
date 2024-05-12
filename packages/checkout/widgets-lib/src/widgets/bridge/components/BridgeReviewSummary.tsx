@@ -40,6 +40,7 @@ import { NetworkSwitchDrawer } from 'components/NetworkSwitchDrawer/NetworkSwitc
 import { Web3Provider } from '@ethersproject/providers';
 import { useWalletConnect } from 'lib/hooks/useWalletConnect';
 import { NotEnoughGas } from 'components/NotEnoughGas/NotEnoughGas';
+import { BridgeBundledTxResponse } from '@imtbl/bridge-sdk/dist/types';
 import { networkIconStyles } from './WalletNetworkButtonStyles';
 import {
   arrowIconStyles,
@@ -149,15 +150,31 @@ export function BridgeReviewSummary() {
   const fetchGasEstimate = useCallback(async () => {
     if (!tokenBridge || !amount || !from || !to || !token) return;
 
-    const bundledTxn = await tokenBridge!.getUnsignedBridgeBundledTx({
-      senderAddress: fromAddress,
-      recipientAddress: toAddress,
-      token: token.address ?? NATIVE.toUpperCase(),
-      amount: utils.parseUnits(amount, token.decimals),
-      sourceChainId: from?.network.toString(),
-      destinationChainId: to?.network.toString(),
-      gasMultiplier: 1.1,
-    });
+    let bundledTxn: BridgeBundledTxResponse;
+    try {
+      bundledTxn = await tokenBridge!.getUnsignedBridgeBundledTx({
+        senderAddress: fromAddress,
+        recipientAddress: toAddress,
+        token: token.address ?? NATIVE.toUpperCase(),
+        amount: utils.parseUnits(amount, token.decimals),
+        sourceChainId: from?.network.toString(),
+        destinationChainId: to?.network.toString(),
+        gasMultiplier: 1.1,
+      });
+    } catch (err) {
+      // Try again if fail to obtain txns
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: BridgeWidgetViews.WALLET_NETWORK_SELECTION,
+          },
+        },
+      });
+      // eslint-disable-next-line no-console
+      console.error('Get unsigned bridge txns failed', err);
+      return;
+    }
 
     const unsignedApproveTransaction = {
       contractToApprove: bundledTxn.contractToApprove,
