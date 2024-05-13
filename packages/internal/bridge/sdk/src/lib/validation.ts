@@ -5,7 +5,9 @@ import {
 import { NATIVE } from 'constants/bridges';
 import { BridgeConfiguration } from '../config';
 import { BridgeError, BridgeErrorType, withBridgeError } from '../errors';
-import { isChildETH, isRootIMX } from './utils';
+import {
+  isChildETH, isRootIMX, isValidDeposit, isValidWithdraw,
+} from './utils';
 
 // TODO consider moving these to be member methods of the config class
 
@@ -153,12 +155,10 @@ export async function validateBridgeReqArgs(
 }
 
 export function validateGetFee(req: BridgeFeeRequest, config: BridgeConfiguration) {
+  // TODO do these functions get tested?
   if (
     req.action === BridgeFeeActions.DEPOSIT
-    && (
-      req.sourceChainId !== config.bridgeInstance.rootChainID
-    || req.destinationChainId !== config.bridgeInstance.childChainID
-    )
+    && !isValidDeposit(req.sourceChainId, req.destinationChainId, config.bridgeInstance)
   ) {
     throw new BridgeError(
       `Deposit must be from the root chain (${config.bridgeInstance.rootChainID}) to the child chain (${config.bridgeInstance.childChainID})`,
@@ -168,10 +168,7 @@ export function validateGetFee(req: BridgeFeeRequest, config: BridgeConfiguratio
 
   if (
     req.action === BridgeFeeActions.WITHDRAW
-    && (
-      req.sourceChainId !== config.bridgeInstance.childChainID
-    || req.destinationChainId !== config.bridgeInstance.rootChainID
-    )
+    && !isValidWithdraw(req.sourceChainId, req.destinationChainId, config.bridgeInstance)
   ) {
     throw new BridgeError(
       `Withdraw must be from the child chain (${config.bridgeInstance.childChainID}) to the root chain (${config.bridgeInstance.rootChainID})`,

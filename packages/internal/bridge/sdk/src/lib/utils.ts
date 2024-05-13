@@ -6,8 +6,9 @@ import {
   axelarGateways,
   axelarAPIEndpoints,
   tenderlyAPIEndpoints,
+  childWIMXs,
 } from 'constants/bridges';
-import { FungibleToken } from 'types';
+import { BridgeInstance, FungibleToken } from 'types';
 
 function getAddresses(source:string, addresses:Record<string, string>) {
   let address:string;
@@ -61,6 +62,60 @@ export function getAxelarEndpoint(source:string) {
 
 export function getTenderlyEndpoint(source:string) {
   return getAddresses(source, tenderlyAPIEndpoints);
+}
+
+function getWrappedIMX(source: string) {
+  return getAddresses(source, childWIMXs);
+}
+
+export function isWrappedIMX(token: FungibleToken, source: string) {
+  return token.toUpperCase() === getWrappedIMX(source).toUpperCase();
+}
+
+/**
+ * Assumes the destination chain is correct (i.e. it doesn't check the destination chain)
+ */
+export function isDeposit(sourceChainId: string, bridgeInstance: BridgeInstance): boolean {
+  return sourceChainId === bridgeInstance.rootChainID;
+}
+
+/**
+ * Assumes the destination chain is correct (i.e. it doesn't check the destination chain)
+ */
+export function isWithdraw(sourceChainId: string, bridgeInstance: BridgeInstance): boolean {
+  return sourceChainId === bridgeInstance.childChainID;
+}
+
+export function isWithdrawNotWrappedIMX(
+  token: FungibleToken,
+  sourceChainId: string,
+  bridgeInstance: BridgeInstance,
+): boolean {
+  return isWithdraw(sourceChainId, bridgeInstance) && !isRootIMX(token, sourceChainId);
+}
+
+export function isWithdrawWrappedIMX(
+  token: FungibleToken,
+  sourceChainId: string,
+  bridgeInstance: BridgeInstance,
+): boolean {
+  return isWithdraw(sourceChainId, bridgeInstance) && isRootIMX(token, sourceChainId);
+}
+
+/**
+ * This is the same as `isDeposit`, but takes an extra parameter - the `destinationChainId` - to check that both
+ * of the chain IDs are correct.
+ */
+export function isValidDeposit(sourceChainId: string, destinationChainId: string, bridgeInstance: BridgeInstance) {
+  return sourceChainId === bridgeInstance.rootChainID && destinationChainId === bridgeInstance.childChainID;
+}
+
+/**
+ * This is the same as `isWithdraw`, but takes an extra parameter - the `destinationChainId` - to check that both
+ * of the chain IDs are correct.
+ */
+export function isValidWithdraw(sourceChainId: string, destinationChainId: string, bridgeInstance: BridgeInstance) {
+  return sourceChainId === bridgeInstance.childChainID && destinationChainId === bridgeInstance.rootChainID;
 }
 
 export const exportedForTesting = {
