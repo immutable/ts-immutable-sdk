@@ -159,22 +159,30 @@ export function BridgeReviewSummary() {
     } as GasEstimateBridgeToL2Result;
     let estimatePromise: Promise<BigNumber>;
     if (tokenToTransfer === NATIVE.toLowerCase()) {
-      estimatePromise = from.web3Provider.estimateGas({
+      estimatePromise = checkout.providerCall(from.web3Provider, async (provider) => await provider.estimateGas({
         to: toAddress,
+        // If 'from' not provided it assumes the transaction is being sent from the zero address.
+        // Estimation will fail unless the amount is within the zero addresses balance.
+        from: fromAddress,
         value: utils.parseUnits(amount, token.decimals),
-      });
+      }));
     } else {
       const erc20 = getErc20Contract(tokenToTransfer, from.web3Provider.getSigner());
       estimatePromise = erc20.estimateGas.transfer(toAddress, utils.parseUnits(amount, token.decimals));
     }
-    const [estimate, gasPrice] = await Promise.all([estimatePromise, from.web3Provider.getGasPrice()]);
-    const gas = estimate.mul(gasPrice);
-    const formattedEstimate = utils.formatUnits(gas, DEFAULT_TOKEN_DECIMALS);
-    gasEstimateResult.fees.sourceChainGas = gas;
-    gasEstimateResult.fees.totalFees = gas;
-    setEstimates(gasEstimateResult);
-    setGasFee(formattedEstimate);
-    setGasFeeFiatValue(calculateCryptoToFiat(formattedEstimate, NATIVE.toUpperCase(), cryptoFiatState.conversions));
+    try {
+      const [estimate, gasPrice] = await Promise.all([estimatePromise, from.web3Provider.getGasPrice()]);
+      const gas = estimate.mul(gasPrice);
+      const formattedEstimate = utils.formatUnits(gas, DEFAULT_TOKEN_DECIMALS);
+      gasEstimateResult.fees.sourceChainGas = gas;
+      gasEstimateResult.fees.totalFees = gas;
+      setEstimates(gasEstimateResult);
+      setGasFee(formattedEstimate);
+      setGasFeeFiatValue(calculateCryptoToFiat(formattedEstimate, NATIVE.toUpperCase(), cryptoFiatState.conversions));
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('Unable to fetch gas estimate', e);
+    }
   }, [checkout, from, to, token, amount]);
 
   const fetchBridgeGasEstimate = useCallback(async () => {
