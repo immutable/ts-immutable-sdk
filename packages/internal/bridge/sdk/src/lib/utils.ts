@@ -24,7 +24,7 @@ function getAddresses(source:string, addresses:Record<string, string>) {
   return address;
 }
 
-export function getChildETH(source: string) {
+function getChildETH(source: string) {
   return getAddresses(source, childETHs);
 }
 

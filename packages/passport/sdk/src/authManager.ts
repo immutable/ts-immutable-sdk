@@ -3,7 +3,6 @@ import {
   ErrorTimeout,
   InMemoryWebStorage,
   User as OidcUser,
-  SignoutRedirectArgs,
   UserManager,
   UserManagerSettings,
   WebStorageStateStore,
@@ -50,7 +49,7 @@ const getAuthConfiguration = (config: PassportConfiguration): UserManagerSetting
   const endSessionEndpoint = new URL(logoutEndpoint, authenticationDomain.replace(/^(?:https?:\/\/)?(.*)/, 'https://$1'));
   endSessionEndpoint.searchParams.set('client_id', oidcConfiguration.clientId);
   if (oidcConfiguration.logoutRedirectUri) {
-    endSessionEndpoint.searchParams.set('post_logout_redirect_uri', oidcConfiguration.logoutRedirectUri);
+    endSessionEndpoint.searchParams.set('returnTo', oidcConfiguration.logoutRedirectUri);
   }
 
   const baseConfiguration: UserManagerSettings = {
@@ -358,22 +357,13 @@ export default class AuthManager {
     return response.data;
   }
 
-  public async getLogoutArgs(): Promise<SignoutRedirectArgs> {
-    const user = await this.getUser();
-
-    return {
-      id_token_hint: user?.idToken,
-    };
-  }
-
   public async logout(): Promise<void> {
     return withPassportError<void>(
       async () => {
-        const logoutArgs = await this.getLogoutArgs();
         if (this.logoutMode === 'silent') {
-          return this.userManager.signoutSilent(logoutArgs);
+          return this.userManager.signoutSilent();
         }
-        return this.userManager.signoutRedirect(logoutArgs);
+        return this.userManager.signoutRedirect();
       },
       PassportErrorType.LOGOUT_ERROR,
     );
@@ -393,9 +383,7 @@ export default class AuthManager {
     const endSessionEndpoint = new URL(logoutEndpoint, authenticationDomain);
     endSessionEndpoint.searchParams.set('client_id', oidcConfiguration.clientId);
 
-    const logoutArgs = await this.getLogoutArgs();
-    if (logoutArgs.id_token_hint) endSessionEndpoint.searchParams.set('id_token_hint', logoutArgs.id_token_hint);
-    if (logoutArgs.post_logout_redirect_uri) endSessionEndpoint.searchParams.set('post_logout_redirect_uri', logoutArgs.post_logout_redirect_uri);
+    if (oidcConfiguration.logoutRedirectUri) endSessionEndpoint.searchParams.set('returnTo', oidcConfiguration.logoutRedirectUri);
 
     return endSessionEndpoint.toString();
   }

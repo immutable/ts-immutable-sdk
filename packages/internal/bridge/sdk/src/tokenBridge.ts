@@ -12,7 +12,7 @@ import {
   validateGetFee,
 } from 'lib/validation';
 import {
-  getAxelarEndpoint, getAxelarGateway, getChildAdaptor, getChildchain, getRootAdaptor, getRootIMX, getTenderlyEndpoint,
+  getAxelarEndpoint, getAxelarGateway, getChildAdaptor, getChildchain, getRootAdaptor, getTenderlyEndpoint,
   isDeposit,
   isWithdrawNotWrappedIMX,
   isWithdrawWrappedIMX,
@@ -21,6 +21,7 @@ import {
 import { TenderlySimulation } from 'types/tenderly';
 import { calculateGasFee } from 'lib/gas';
 import { createContract } from 'contracts/ABIs/createContract';
+import { getWithdrawRootToken, genAxelarWithdrawPayload, genUniqueAxelarCommandId } from 'lib/axelarUtils';
 import {
   NATIVE,
   ETHEREUM_NATIVE_TOKEN_ADDRESS,
@@ -29,7 +30,6 @@ import {
   ZKEVM_TESTNET_CHAIN_ID,
   axelarChains,
   bridgeMethods,
-  WITHDRAW_SIG,
   SLOT_PREFIX_CONTRACT_CALL_APPROVED,
   SLOT_POS_CONTRACT_CALL_APPROVED,
 } from './constants/bridges';
@@ -68,9 +68,10 @@ import {
   BridgeBundledTxRequest,
   BridgeBundledTxResponse,
   DynamicGasEstimatesResponse,
-  Address,
 } from './types';
-import { GMPStatus, GMPStatusResponse, GasPaidStatus } from './types/axelar';
+import {
+  GMPStatus, GMPStatusResponse, GasPaidStatus,
+} from './types/axelar';
 import { queryTransactionStatus } from './lib/gmpRecovery';
 
 /**
@@ -806,24 +807,14 @@ export class TokenBridge {
     token: FungibleToken,
     amount: ethers.BigNumber,
   ): Promise<number> {
-    let rootToken: string;
-    if (token.toUpperCase() === NATIVE
-      || isWrappedIMX(token, destinationChainId)) {
-      rootToken = getRootIMX(destinationChainId);
-    } else {
-      // Find root token
-      const erc20Contract = await createContract(token, ERC20, this.config.childProvider);
-      rootToken = await withBridgeError<Address>(() => erc20Contract.rootToken(), BridgeErrorType.PROVIDER_ERROR);
-    }
-    // Encode payload
-    const payload = defaultAbiCoder.encode(
-      ['bytes32', 'address', 'address', 'address', 'uint256'],
-      [WITHDRAW_SIG, rootToken, sender, recipient, amount],
+    const rootToken = await getWithdrawRootToken(token, destinationChainId, this.config.childProvider);
+    const payload = genAxelarWithdrawPayload(
+      rootToken,
+      sender,
+      recipient,
+      amount.toString(),
     );
-    // Generate unique command ID based on payload and current time.
-    const commandId = keccak256(
-      defaultAbiCoder.encode(['bytes', 'uint256'], [payload, new Date().getTime()]),
-    );
+    const commandId = genUniqueAxelarCommandId(payload);
     const sourceChain = getChildchain(destinationChainId);
     const sourceAddress = ethers.utils.getAddress(getChildAdaptor(destinationChainId)).toString();
     const destinationAddress = getRootAdaptor(destinationChainId);

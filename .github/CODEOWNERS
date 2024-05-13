@@ -15,5 +15,6 @@
 /packages/checkout @immutable/commerce
 /packages/checkout/widgets-lib @immutable/commerce
 /packages/blockchain-data @immutable/assets
+/packages/minting-backend @shineli1984
 /packages/game-bridge @immutable/sdk
 /samples @immutable/sdk
