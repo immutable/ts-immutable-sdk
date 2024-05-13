@@ -1,4 +1,6 @@
 import { Box, OptionKey } from '@biom3/react';
+import { WidgetTheme } from '@imtbl/checkout-sdk';
+import { Environment } from '@imtbl/config';
 import {
   inputStyle,
   selectInputBoxStyle,
@@ -31,6 +33,8 @@ interface SelectInputProps {
   onSelectChange: (value: OptionKey) => void;
   selectedOption?: OptionKey;
   defaultTokenImage: string;
+  environment?: Environment;
+  theme?: WidgetTheme;
 }
 
 export function SelectInput({
@@ -56,6 +60,8 @@ export function SelectInput({
   selectedOption,
   coinSelectorHeading,
   defaultTokenImage,
+  environment,
+  theme,
 }: SelectInputProps) {
   return (
     <Box sx={selectInputBoxStyle}>
@@ -71,6 +77,8 @@ export function SelectInput({
           selectedOption={selectedOption}
           coinSelectorHeading={coinSelectorHeading}
           defaultTokenImage={defaultTokenImage}
+          environment={environment}
+          theme={theme}
         />
       </Box>
       <Box sx={inputStyle}>
