@@ -79,7 +79,7 @@ describe('sendTransaction', () => {
     });
 
     it('calls relayerClient.imGetFeeOptions with the correct arguments', async () => {
-      (walletHelpers.encodeMessageSubDigest as jest.Mock).mockReturnValue('encodedMessageSubDigest123');
+      (walletHelpers.encodedTransactions as jest.Mock).mockReturnValue('encodedTransactions123');
 
       await sendTransaction({
         params: [transactionRequest],
@@ -93,7 +93,7 @@ describe('sendTransaction', () => {
 
       expect(relayerClient.imGetFeeOptions).toHaveBeenCalledWith(
         mockUserZkEvm.zkEvm.ethAddress,
-        'encodedMessageSubDigest123',
+        'encodedTransactions123',
       );
     });
 

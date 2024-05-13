@@ -3,8 +3,7 @@ import { StaticJsonRpcProvider, TransactionRequest } from '@ethersproject/provid
 import { Flow } from '@imtbl/metrics';
 import { Signer } from '@ethersproject/abstract-signer';
 import {
-  digestOfTransactions,
-  encodeMessageSubDigest,
+  encodedTransactions,
   getEip155ChainId,
   getNonce,
   getNormalisedTransactions,
@@ -31,14 +30,12 @@ export type EthSendTransactionParams = {
 
 const getFeeOption = async (
   metaTransaction: MetaTransaction,
-  chainId: BigNumber,
   walletAddress: string,
   relayerClient: RelayerClient,
 ): Promise<FeeOption> => {
   const normalisedMetaTransaction = getNormalisedTransactions([metaTransaction]);
-  const digest = digestOfTransactions(normalisedMetaTransaction);
-  const completePayload = encodeMessageSubDigest(chainId, walletAddress, digest);
-  const feeOptions = await relayerClient.imGetFeeOptions(walletAddress, completePayload);
+  const transactions = encodedTransactions(normalisedMetaTransaction);
+  const feeOptions = await relayerClient.imGetFeeOptions(walletAddress, transactions);
 
   const imxFeeOption = feeOptions.find((feeOption) => feeOption.tokenSymbol === 'IMX');
   if (!imxFeeOption) {
@@ -58,7 +55,6 @@ const buildMetaTransactions = async (
   rpcProvider: StaticJsonRpcProvider,
   relayerClient: RelayerClient,
   zkevmAddress: string,
-  chainIdBigNumber: BigNumber,
 ): Promise<[MetaTransaction, ...MetaTransaction[]]> => {
   if (!transactionRequest.to) {
     throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'eth_sendTransaction requires a "to" field');
@@ -75,7 +71,7 @@ const buildMetaTransactions = async (
   // Estimate the fee and get the nonce from the smart wallet
   const [nonce, feeOption] = await Promise.all([
     getNonce(rpcProvider, zkevmAddress),
-    getFeeOption(metaTransaction, chainIdBigNumber, zkevmAddress, relayerClient),
+    getFeeOption(metaTransaction, zkevmAddress, relayerClient),
   ]);
 
   // Build the meta transactions array with a valid nonce and fee transaction
@@ -116,7 +112,6 @@ export const sendTransaction = async ({
     rpcProvider,
     relayerClient,
     zkevmAddress,
-    chainIdBigNumber,
   );
   flow.addEvent('endBuildMetaTransactions');
 
