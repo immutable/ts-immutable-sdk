@@ -1,5 +1,6 @@
 import {
   Box, Caption, Drawer, MenuItem, Divider,
+  MenuItemSize,
 } from '@biom3/react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
@@ -39,6 +40,11 @@ export function CoinsDrawer({
     onSelect(index);
     onClose();
   };
+
+  let size: MenuItemSize = 'medium';
+  if (balances.length > 3) {
+    size = 'small';
+  }
 
   return (
     <Drawer
@@ -85,6 +91,7 @@ export function CoinsDrawer({
                 selected={selectedIndex === idx}
                 conversions={conversions}
                 transactionRequirement={transactionRequirement}
+                size={size}
                 rc={<motion.div variants={listItemVariants} custom={idx} />}
               />
             ))}
@@ -97,6 +104,7 @@ export function CoinsDrawer({
                 <MenuItem
                   shimmer
                   emphasized
+                  size={size}
                   testId="funding-balance-item-shimmer"
                 />
               </motion.div>
@@ -121,6 +129,7 @@ export function CoinsDrawer({
               </Divider>
               <PaymentOptions
                 onClick={onPayWithCard}
+                size={size}
                 paymentOptions={[SalePaymentTypes.DEBIT, SalePaymentTypes.CREDIT].filter(
                   (type) => !disabledPaymentTypes?.includes(type),
                 )}

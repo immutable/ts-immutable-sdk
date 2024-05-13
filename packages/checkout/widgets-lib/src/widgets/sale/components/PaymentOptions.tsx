@@ -1,4 +1,4 @@
-import { Box } from '@biom3/react';
+import { Box, MenuItemSize } from '@biom3/react';
 
 import { SalePaymentTypes } from '@imtbl/checkout-sdk';
 import { listItemVariants, listVariants } from 'lib/animation/listAnimation';
@@ -16,11 +16,12 @@ export interface PaymentOptionsProps {
   disabledOptions?: SalePaymentTypes[];
   paymentOptions?: SalePaymentTypes[];
   captions?: Partial<Record<SalePaymentTypes, string>>;
+  size?: MenuItemSize;
 }
 
 export function PaymentOptions(props: PaymentOptionsProps) {
   const {
-    disabledOptions = [], paymentOptions, onClick, captions,
+    disabledOptions = [], paymentOptions, onClick, captions, size,
   } = props;
   const options = paymentOptions || defaultPaymentOptions;
 
@@ -42,6 +43,7 @@ export function PaymentOptions(props: PaymentOptionsProps) {
         <PaymentOption
           key={`payment-type-${type}`}
           type={type}
+          size={size}
           onClick={onClick}
           disabled={disabledOptions.includes(type)}
           caption={captions?.[type]}

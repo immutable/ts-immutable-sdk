@@ -1,7 +1,9 @@
-import { Heading, MenuItem, prettyFormatNumber } from '@biom3/react';
+import {
+  Heading, MenuItem, MenuItemSize, prettyFormatNumber,
+} from '@biom3/react';
 import {
   Fee,
-  FundingStepType, TransactionRequirement
+  FundingStepType, TransactionRequirement,
 } from '@imtbl/checkout-sdk';
 import {
   calculateCryptoToFiat,
@@ -66,6 +68,7 @@ export interface CoinDrawerItemProps<
   RC extends ReactElement | undefined = undefined,
 > {
   rc?: RC;
+  size: MenuItemSize;
   balance: FundingBalance;
   conversions: Map<string, number>;
   selected: boolean;
@@ -81,6 +84,7 @@ export function CoinsDrawerItem<
   conversions,
   selected,
   onClick,
+  size,
 }: CoinDrawerItemProps<RC>) {
   const { t } = useTranslation();
   const {
@@ -107,7 +111,7 @@ export function CoinsDrawerItem<
     <MenuItem
       rc={rc}
       sx={{ mb: 'base.spacing.x1' }}
-      size="medium"
+      size={size}
       emphasized
       {...menuProps}
     >
