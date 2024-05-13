@@ -126,10 +126,10 @@ export function CoinsDrawer({
                 )}
                 captions={{
                   [SalePaymentTypes.DEBIT]: t(
-                    'views.ORDER_SUMMARY.coinsDrawer.payWithCard.caption',
+                    'views.PAYMENT_METHODS.options.debit.caption',
                   ),
                   [SalePaymentTypes.CREDIT]: t(
-                    'views.ORDER_SUMMARY.coinsDrawer.payWithCard.caption',
+                    'views.PAYMENT_METHODS.options.credit.caption',
                   ),
                 }}
               />

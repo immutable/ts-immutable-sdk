@@ -1,9 +1,7 @@
 import { Heading, MenuItem, prettyFormatNumber } from '@biom3/react';
 import {
   Fee,
-  FundingStepType,
-  ItemType,
-  TransactionRequirement,
+  FundingStepType, TransactionRequirement
 } from '@imtbl/checkout-sdk';
 import {
   calculateCryptoToFiat,
@@ -82,7 +80,6 @@ export function CoinsDrawerItem<
   balance,
   conversions,
   selected,
-  transactionRequirement,
   onClick,
 }: CoinDrawerItemProps<RC>) {
   const { t } = useTranslation();
@@ -91,7 +88,7 @@ export function CoinsDrawerItem<
     config: { theme },
   } = useSaleContext();
 
-  const { token, userBalance, fundsRequired } = balance.fundingItem;
+  const { token, userBalance } = balance.fundingItem;
 
   const fiatAmount = calculateCryptoToFiat(
     userBalance.formattedBalance,
@@ -133,28 +130,6 @@ export function CoinsDrawerItem<
         {token.symbol}
       </MenuItem.Label>
       <MenuItem.Caption>
-        {t(
-          `views.ORDER_SUMMARY.coinsDrawer.stepType${
-            transactionRequirement?.sufficient ? '.' : '.delta.'
-          }${balance.type}`,
-          {
-            required: {
-              symbol:
-                transactionRequirement?.current.type !== ItemType.ERC721
-                && transactionRequirement?.current.token.symbol,
-              amount: prettyFormatNumber(
-                tokenValueFormat(
-                  transactionRequirement?.current.formattedBalance || 0,
-                ),
-              ),
-            },
-            symbol: balance.fundingItem.token.symbol,
-            amount: prettyFormatNumber(
-              tokenValueFormat(fundsRequired.formattedAmount),
-            ),
-          },
-        )}
-        {fees.length > 0 && ' | '}
         {fees.length > 0
           && fees.map(([symbol, { formattedAmount }]) => (
             <span key={symbol}>

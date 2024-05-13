@@ -262,9 +262,6 @@
         "caption1": "코인",
         "caption2": "잔액",
         "divider": "더 많은 옵션",
-        "payWithCard": {
-          "caption": "대신 카드로 구매"
-        },
         "stepType": {
           "SWAP": "{{symbol}} ≈ {{amount}} 교환",
           "ONRAMP": "{{symbol}} ≈ {{amount}} 구매",
@@ -277,7 +274,7 @@
             "SUFFICIENT": "{{symbol}} {{amount}} 지불"
           }
         },
-        "fee": "수수료 {{symbol}} ≈ {{amount}}"
+        "fee": "교환 수수료 ~ {{symbol}} {{amount}}"
       },
       "orderReview": {
         "heading": "결제 요약",
