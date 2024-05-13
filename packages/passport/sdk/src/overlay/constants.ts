@@ -9,7 +9,7 @@ export const CLOSE_BUTTON_SVG = `
     viewBox="0 0 20 20"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    style="width: 20px"
+    style="width: 20px !important;"
     >
       <path
         d="M16.25 5.75833L14.2417 3.75L10 7.99167L5.75833 3.75L3.75 5.75833L7.99167 10L3.75 14.2417L5.75833 16.25L10 12.0083L14.2417 16.25L16.25 14.2417L12.0083 10L16.25 5.75833Z"
@@ -23,7 +23,7 @@ export const POPUP_BLOCKED_SVG = `
   viewBox="0 0 17 16"
   fill="none"
   xmlns="http://www.w3.org/2000/svg"
-  style="width: 16px"
+  style="width: 16px !important;"
   >
     <path
       fill-rule="evenodd"
@@ -36,7 +36,10 @@ export const POPUP_BLOCKED_SVG = `
 
 export const IMMUTABLE_LOGO_SVG = `
   <svg
-    style="max-width: 123px; margin-bottom: 24px"
+    style="
+      max-width: 123px !important;
+      margin-bottom: 24px !important;
+    "
     viewBox="0 0 124 112"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
