@@ -19,6 +19,20 @@ export const CONFIRMATION_IFRAME_STYLE = 'display: none; position: absolute;widt
 
 type MessageHandler = (arg0: MessageEvent) => void;
 
+type PostMessageData = {
+  eventType: string;
+  messageType: SendMessage.CONFIRMATION_DATA_READY;
+  path: string;
+  query: { [key: string]: string };
+};
+
+const getPostMessageData = (relativePath: string, query: { [key: string]: string }): PostMessageData => ({
+  eventType: PASSPORT_EVENT_TYPE,
+  messageType: SendMessage.CONFIRMATION_DATA_READY,
+  path: relativePath,
+  query,
+});
+
 export default class ConfirmationScreen {
   private config: PassportConfiguration;
 
@@ -97,16 +111,22 @@ export default class ConfirmationScreen {
         }
       };
 
+      let postMessageData;
       let href = '';
       if (chainType === TransactionApprovalRequestChainTypeEnum.Starkex) {
         href = this.getHref('transaction', { transactionId, etherAddress, chainType });
+        postMessageData = getPostMessageData('transaction', { transactionId, etherAddress, chainType });
       } else {
         href = this.getHref('zkevm/transaction', {
           transactionID: transactionId, etherAddress, chainType, chainID: chainId,
         });
+        postMessageData = getPostMessageData('zkevm/transaction', {
+          transactionID: transactionId, etherAddress, chainType, chainID: chainId as string,
+        });
       }
+      console.log('postMessageData', { postMessageData });
       window.addEventListener('message', messageHandler);
-      this.showConfirmationScreen(href, messageHandler, resolve);
+      this.showConfirmationScreen(href, postMessageData, messageHandler, resolve);
     });
   }
 
@@ -150,7 +170,8 @@ export default class ConfirmationScreen {
 
       window.addEventListener('message', messageHandler);
       const href = this.getHref('zkevm/message', { messageID, etherAddress });
-      this.showConfirmationScreen(href, messageHandler, resolve);
+      const postMessageData = getPostMessageData('zkevm/message', { messageID, etherAddress });
+      this.showConfirmationScreen(href, postMessageData, messageHandler, resolve);
     });
   }
 
@@ -200,10 +221,12 @@ export default class ConfirmationScreen {
     this.overlay = undefined;
   }
 
-  showConfirmationScreen(href: string, messageHandler: MessageHandler, resolve: Function) {
+  showConfirmationScreen(href: string, postMessageData: any, messageHandler: MessageHandler, resolve: Function) {
+    console.log('showConfirmationScreen', { href, postMessageData });
     // If popup blocked, the confirmation window will not exist
     if (this.confirmationWindow) {
-      this.confirmationWindow.location.href = href;
+      this.confirmationWindow.location = href;
+      this.confirmationWindow.postMessage(postMessageData, this.config.passportDomain);
     }
 
     // This indicates the user closed the overlay so the transaction should be rejected

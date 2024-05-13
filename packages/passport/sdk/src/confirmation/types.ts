@@ -1,5 +1,6 @@
 export enum SendMessage {
   CONFIRMATION_START = 'confirmation_start',
+  CONFIRMATION_DATA_READY = 'confirmation_data_ready',
 }
 
 export enum ReceiveMessage {
