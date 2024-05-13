@@ -48,12 +48,12 @@ export const digestOfTransactionsAndNonce = (
   return utils.keccak256(packMetaTransactionsNonceData);
 };
 
-export const encodedTransactions = (normalisedTransactions: MetaTransactionNormalised[]): string => {
-  return utils.defaultAbiCoder.encode(
-    [META_TRANSACTIONS_TYPE],
-    [normalisedTransactions],
-  );
-};
+export const encodedTransactions = (
+  normalisedTransactions: MetaTransactionNormalised[],
+): string => utils.defaultAbiCoder.encode(
+  [META_TRANSACTIONS_TYPE],
+  [normalisedTransactions],
+);
 
 export const getNonce = async (
   rpcProvider: StaticJsonRpcProvider,
