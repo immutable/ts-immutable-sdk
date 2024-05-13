@@ -482,7 +482,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.22.5":
+"@biom3/react@npm:^0.22.8":
   version: 0.22.8
   resolution: "@biom3/react@npm:0.22.8"
   dependencies:
@@ -1096,12 +1096,12 @@ __metadata:
 
 "@imtbl/sdk@file:../../../sdk::locator=func-tests-imx%40workspace%3A.":
   version: 0.0.0
-  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=02d790&locator=func-tests-imx%40workspace%3A."
+  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=6df6ec&locator=func-tests-imx%40workspace%3A."
   dependencies:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
     "@biom3/design-tokens": ^0.3.7
-    "@biom3/react": ^0.22.5
+    "@biom3/react": ^0.22.8
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
     "@ethersproject/keccak256": ^5.7.0
@@ -1147,7 +1147,7 @@ __metadata:
   peerDependencies:
     react: ^18.2.0
     react-dom: ^18.2.0
-  checksum: 803ac54c1364a281f3f12b7ed79306f4c82a86cd4224f4b557634ea99c94d68259553b0e53b5ca56ed748144868c1f1d43f42039ad5b060ed0c1ceec89959c8b
+  checksum: 7328c8f060783db7da233be759495035fe89567d8e3e5ea4939986ef291495d231465cdf506e5ac506865c12ff8f129875eb49c6d41d6eed4e4caa68f0375417
   languageName: node
   linkType: hard
 
