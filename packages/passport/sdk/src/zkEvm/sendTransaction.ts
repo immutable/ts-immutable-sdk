@@ -30,7 +30,6 @@ export type EthSendTransactionParams = {
 
 const getFeeOption = async (
   metaTransaction: MetaTransaction,
-  chainId: BigNumber,
   walletAddress: string,
   relayerClient: RelayerClient,
 ): Promise<FeeOption> => {
@@ -56,7 +55,6 @@ const buildMetaTransactions = async (
   rpcProvider: StaticJsonRpcProvider,
   relayerClient: RelayerClient,
   zkevmAddress: string,
-  chainIdBigNumber: BigNumber,
 ): Promise<[MetaTransaction, ...MetaTransaction[]]> => {
   if (!transactionRequest.to) {
     throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'eth_sendTransaction requires a "to" field');
@@ -73,7 +71,7 @@ const buildMetaTransactions = async (
   // Estimate the fee and get the nonce from the smart wallet
   const [nonce, feeOption] = await Promise.all([
     getNonce(rpcProvider, zkevmAddress),
-    getFeeOption(metaTransaction, chainIdBigNumber, zkevmAddress, relayerClient),
+    getFeeOption(metaTransaction, zkevmAddress, relayerClient),
   ]);
 
   // Build the meta transactions array with a valid nonce and fee transaction
@@ -114,7 +112,6 @@ export const sendTransaction = async ({
     rpcProvider,
     relayerClient,
     zkevmAddress,
-    chainIdBigNumber,
   );
   flow.addEvent('endBuildMetaTransactions');
 
