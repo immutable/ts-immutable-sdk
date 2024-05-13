@@ -3,8 +3,7 @@ import { StaticJsonRpcProvider, TransactionRequest } from '@ethersproject/provid
 import { Flow } from '@imtbl/metrics';
 import { Signer } from '@ethersproject/abstract-signer';
 import {
-  digestOfTransactions,
-  encodeMessageSubDigest,
+  encodedTransactions,
   getEip155ChainId,
   getNonce,
   getNormalisedTransactions,
@@ -36,9 +35,8 @@ const getFeeOption = async (
   relayerClient: RelayerClient,
 ): Promise<FeeOption> => {
   const normalisedMetaTransaction = getNormalisedTransactions([metaTransaction]);
-  const digest = digestOfTransactions(normalisedMetaTransaction);
-  const completePayload = encodeMessageSubDigest(chainId, walletAddress, digest);
-  const feeOptions = await relayerClient.imGetFeeOptions(walletAddress, completePayload);
+  const transactions = encodedTransactions(normalisedMetaTransaction);
+  const feeOptions = await relayerClient.imGetFeeOptions(walletAddress, transactions);
 
   const imxFeeOption = feeOptions.find((feeOption) => feeOption.tokenSymbol === 'IMX');
   if (!imxFeeOption) {
