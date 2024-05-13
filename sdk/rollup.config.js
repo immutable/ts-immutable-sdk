@@ -71,6 +71,7 @@ const getFileBuild = (inputFilename) => [
         respectExternal: true,
       }),
     ],
+    external: ['pg'] 
   },
 ];
 
@@ -107,7 +108,7 @@ export default [
   },
   // Browser Bundle
   {
-    input: 'src/index.ts',
+    input: 'src/browser.index.ts',
     output: {
       file: 'dist/index.browser.js',
       format: 'umd',
