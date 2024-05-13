@@ -20,7 +20,7 @@ import {
 } from 'lib/utils';
 import { TenderlySimulation } from 'types/tenderly';
 import { calculateGasFee } from 'lib/gas';
-import { createContract } from 'contracts/ABIs/createContract';
+import { createContract } from 'contracts/createContract';
 import { getWithdrawRootToken, genAxelarWithdrawPayload, genUniqueAxelarCommandId } from 'lib/axelarUtils';
 import {
   NATIVE,

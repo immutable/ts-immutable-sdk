@@ -5,7 +5,7 @@ import { CHILD_ERC20 } from 'contracts/ABIs/ChildERC20';
 import { withBridgeError, BridgeErrorType } from 'errors';
 import { ethers } from 'ethers';
 import { keccak256, defaultAbiCoder } from 'ethers/lib/utils';
-import { createContract } from 'contracts/ABIs/createContract';
+import { createContract } from 'contracts/createContract';
 import { isWrappedIMX, getRootIMX } from './utils';
 
 /**
