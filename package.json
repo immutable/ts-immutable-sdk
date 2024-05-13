@@ -88,6 +88,7 @@
       "packages/checkout/widgets-sample-app",
       "packages/checkout/widgets-lib",
       "packages/blockchain-data/sdk",
+      "packages/minting-backend/sample-app",
       "packages/game-bridge",
       "packages/webhook/sdk",
       "packages/minting-backend/sdk"

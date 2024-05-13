@@ -1,0 +1,22 @@
+// schema.prisma
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Allowlist {
+  address   String  @id
+  phase   Int
+}
+
+model Mints {
+  address  String  @id
+  uuid    String
+  phase   Int 
+  status  String
+}
