@@ -125,9 +125,18 @@ describe('confirmation', () => {
       confirmationScreen.loading();
       const res = await confirmationScreen.requestMessageConfirmation(messageId, etherAddress);
       expect(res.confirmed).toEqual(false);
-      expect(mockNewWindow.location.href).toEqual(
-        'https://passport.sandbox.immutable.com/'
-        + `transaction-confirmation/zkevm/message?messageID=${messageId}&etherAddress=${etherAddress}`,
+      expect(postMessageMock).toHaveBeenCalledTimes(1);
+      expect(postMessageMock).toHaveBeenCalledWith(
+        {
+          eventType: 'imx_passport_confirmation',
+          messageType: 'confirmation_data_ready',
+          path: 'zkevm/message',
+          query: {
+            etherAddress,
+            messageID: messageId,
+          },
+        },
+        'https://passport.sandbox.immutable.com',
       );
     });
 
@@ -149,7 +158,7 @@ describe('confirmation', () => {
 
       await confirmationScreen.requestMessageConfirmation(messageId, etherAddress);
 
-      expect(postMessageMock).toHaveBeenCalledTimes(1);
+      expect(postMessageMock).toHaveBeenCalledTimes(2);
       expect(postMessageMock).toHaveBeenCalledWith(
         {
           eventType: 'imx_passport_confirmation',

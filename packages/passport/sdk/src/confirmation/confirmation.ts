@@ -124,7 +124,6 @@ export default class ConfirmationScreen {
           transactionID: transactionId, etherAddress, chainType, chainID: chainId as string,
         });
       }
-      console.log('postMessageData', { postMessageData });
       window.addEventListener('message', messageHandler);
       this.showConfirmationScreen(href, postMessageData, messageHandler, resolve);
     });
@@ -221,11 +220,14 @@ export default class ConfirmationScreen {
     this.overlay = undefined;
   }
 
-  showConfirmationScreen(href: string, postMessageData: any, messageHandler: MessageHandler, resolve: Function) {
-    console.log('showConfirmationScreen', { href, postMessageData });
+  showConfirmationScreen(
+    href: string,
+    postMessageData: PostMessageData,
+    messageHandler: MessageHandler,
+    resolve: Function,
+  ) {
     // If popup blocked, the confirmation window will not exist
     if (this.confirmationWindow) {
-      this.confirmationWindow.location = href;
       this.confirmationWindow.postMessage(postMessageData, this.config.passportDomain);
     }
 
