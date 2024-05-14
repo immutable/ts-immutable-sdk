@@ -9,12 +9,24 @@ import {
   UnsignedTransferRequest,
 } from '@imtbl/x-client';
 import AuthManager from 'authManager';
-import { PassportError, PassportErrorType } from 'errors/passportError';
+import { PassportErrorType } from 'errors/passportError';
 import GuardianClient from 'guardian';
 import MagicAdapter from 'magicAdapter';
 import { PassportImxProvider } from 'starkEx/passportImxProvider';
 import { PassportEventMap, PassportEvents } from 'types';
 import TypedEventEmitter from 'utils/typedEventEmitter';
+
+enum WorkflowErrorMap {
+  transfer = PassportErrorType.TRANSFER_ERROR,
+  createOrder = PassportErrorType.CREATE_ORDER_ERROR,
+  cancelOrder = PassportErrorType.CANCEL_ORDER_ERROR,
+  createTrade = PassportErrorType.CREATE_TRADE_ERROR,
+  batchNftTransfer = PassportErrorType.TRANSFER_ERROR,
+  exchangeTransfer = PassportErrorType.EXCHANGE_TRANSFER_ERROR,
+  getAddress = PassportErrorType.NOT_LOGGED_IN_ERROR,
+  isRegisteredOffchain = PassportErrorType.NOT_LOGGED_IN_ERROR,
+
+}
 
 describe('passportImxProvider auth tests', () => {
   const mockAuthManager = {
@@ -66,14 +78,13 @@ describe('passportImxProvider auth tests', () => {
     });
 
     it(`should return an error for ${methodName}`, async () => {
-      expect(async () => await passportImxProvider[methodName!](args))
-        .rejects
-        .toThrow(
-          new PassportError(
-            'User has been logged out',
-            PassportErrorType.NOT_LOGGED_IN_ERROR,
-          ),
-        );
+      try {
+        await passportImxProvider[methodName!](args);
+      } catch (err: any) {
+        const { message, type } = err;
+        expect(message).toEqual('User has been logged out');
+        expect(type).toEqual(WorkflowErrorMap[methodName]);
+      }
     });
   });
 
@@ -92,14 +103,13 @@ describe('passportImxProvider auth tests', () => {
     });
 
     it(`should return an error for ${methodName}`, async () => {
-      await expect(async () => passportImxProvider[methodName!](args))
-        .rejects
-        .toThrow(
-          new PassportError(
-            'User has been logged out',
-            PassportErrorType.NOT_LOGGED_IN_ERROR,
-          ),
-        );
+      try {
+        await passportImxProvider[methodName!](args);
+      } catch (err: any) {
+        const { message, type } = err;
+        expect(message).toEqual('User has been logged out');
+        expect(type).toEqual(WorkflowErrorMap[methodName]);
+      }
     });
   });
 });
