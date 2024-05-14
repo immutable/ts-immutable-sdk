@@ -7,8 +7,9 @@ import {
   axelarAPIEndpoints,
   tenderlyAPIEndpoints,
   childWIMXs,
+  NATIVE,
 } from 'constants/bridges';
-import { BridgeInstance, FungibleToken } from 'types';
+import { BridgeFeeRequest, BridgeInstance, FungibleToken } from 'types';
 
 function getAddresses(source:string, addresses:Record<string, string>) {
   let address:string;
@@ -116,6 +117,11 @@ export function isValidDeposit(sourceChainId: string, destinationChainId: string
  */
 export function isValidWithdraw(sourceChainId: string, destinationChainId: string, bridgeInstance: BridgeInstance) {
   return sourceChainId === bridgeInstance.childChainID && destinationChainId === bridgeInstance.rootChainID;
+}
+
+// Return true if a BridgeFeeRequest is for a native token bridge interaction.
+export function isNativeTokenBridgeFeeRequest(req: BridgeFeeRequest): boolean {
+  return !('token' in req) || req.token.toUpperCase() === NATIVE;
 }
 
 export const exportedForTesting = {

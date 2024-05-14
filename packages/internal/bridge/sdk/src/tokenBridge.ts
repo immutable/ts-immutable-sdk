@@ -14,6 +14,7 @@ import {
 import {
   getAxelarEndpoint, getAxelarGateway, getChildAdaptor, getChildchain, getRootAdaptor, getTenderlyEndpoint,
   isDeposit,
+  isNativeTokenBridgeFeeRequest,
   isWithdrawNotWrappedIMX,
   isWithdrawWrappedIMX,
   isWrappedIMX,
@@ -160,10 +161,6 @@ export class TokenBridge {
     return res;
   }
 
-  private static isNativeTokenBridgeFeeRequest(req: BridgeFeeRequest): boolean {
-    return !('token' in req) || req.token.toUpperCase() === NATIVE;
-  }
-
   private async getFeePrivate(req: BridgeFeeRequest): Promise<BridgeFeeResponse> {
     validateGetFee(req, this.config);
 
@@ -180,14 +177,9 @@ export class TokenBridge {
     const imtblFee: ethers.BigNumber = ethers.BigNumber.from(0);
 
     // Get approval fee
-    if (!TokenBridge.isNativeTokenBridgeFeeRequest(req)) {
-      // if (!('token' in req)) {
-      //   throw new Error('womp womp. shouldn\'t need to do this check');
-      // }
+    if (!isNativeTokenBridgeFeeRequest(req)) {
       if (isDeposit(req.sourceChainId, this.config.bridgeInstance)) {
         approvalFee = calculateGasFee(feeData, BridgeMethodsGasLimit.APPROVE_TOKEN);
-        // de morgans: ~(~p v q) === p ^ ~q
-        // Therefore, req will have `token` field. But because we do this check in a separate function, TS doesn't seem to care.
       } else if (isWithdrawWrappedIMX(req.token, req.sourceChainId, this.config.bridgeInstance)) {
         // On child chain, only WIMX requires approval.
         approvalFee = calculateGasFee(feeData, BridgeMethodsGasLimit.APPROVE_TOKEN);
