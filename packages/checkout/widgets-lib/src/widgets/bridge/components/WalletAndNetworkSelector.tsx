@@ -541,8 +541,8 @@ export function WalletAndNetworkSelector() {
             onNetworkClick={fromNetworkDrawerOpen ? handleFromNetworkSelection : handleToNetworkSelection}
             chainId={imtblZkEvmNetworkChainId}
           />
-          {/** Show L1 option for everything but Passport */}
-          {(fromWallet?.providerDetail.info.rdns !== WalletProviderRdns.PASSPORT) && (
+          {/** If selecting from network, show L1 option for everything but Passport */}
+          {(toNetworkDrawerOpen || fromWallet?.providerDetail.info.rdns !== WalletProviderRdns.PASSPORT) && (
             <NetworkItem
               key={l1NetworkName}
               testId={testId}
@@ -573,7 +573,7 @@ export function WalletAndNetworkSelector() {
             chainId={toNetwork!}
             disableNetworkButton={fromNetwork === l1NetworkChainId
               || toWalletProviderName === WalletProviderName.PASSPORT.toString()
-              || from?.walletAddress === to?.walletAddress}
+              || fromWalletAddress === toWalletAddress}
             onWalletClick={() => {
               setToWalletDrawerOpen(true);
             }}
