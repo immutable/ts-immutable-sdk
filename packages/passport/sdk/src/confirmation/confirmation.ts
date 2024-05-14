@@ -22,15 +22,19 @@ type MessageHandler = (arg0: MessageEvent) => void;
 type PostMessageData = {
   eventType: string;
   messageType: SendMessage.CONFIRMATION_DATA_READY;
-  path: string;
-  query: { [key: string]: string };
+  messageData: {
+    path: string;
+    query: { [key: string]: string };
+  }
 };
 
 const getPostMessageData = (relativePath: string, query: { [key: string]: string }): PostMessageData => ({
   eventType: PASSPORT_EVENT_TYPE,
   messageType: SendMessage.CONFIRMATION_DATA_READY,
-  path: relativePath,
-  query,
+  messageData: {
+    path: relativePath,
+    query,
+  },
 });
 
 export default class ConfirmationScreen {
