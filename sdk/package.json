@@ -8,8 +8,8 @@
   "dependencies": {
     "@0xsequence/abi": "^1.4.3",
     "@0xsequence/core": "^1.4.3",
-    "@biom3/design-tokens": "^0.3.1",
-    "@biom3/react": "^0.20.11",
+    "@biom3/design-tokens": "^0.3.7",
+    "@biom3/react": "^0.22.8",
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/abstract-signer": "^5.7.0",
     "@ethersproject/keccak256": "^5.7.0",
@@ -21,7 +21,7 @@
     "@magic-ext/oidc": "4.2.0",
     "@metamask/detect-provider": "^2.0.0",
     "@opensea/seaport-js": "4.0.0",
-    "@rive-app/react-canvas": "^4.8.3",
+    "@rive-app/react-canvas-lite": "^4.9.0",
     "@uniswap/router-sdk": "^1.4.0",
     "@uniswap/sdk-core": "^3.0.1",
     "@uniswap/v3-sdk": "^3.9.0",
@@ -48,6 +48,7 @@
     "os-browserify": "^0.3.0",
     "pako": "^2.1.0",
     "react-i18next": "^13.5.0",
+    "sns-validator": "^0.3.5",
     "stream-browserify": "^3.0.0",
     "stream-http": "^3.2.0",
     "url": "^0.11.0",
@@ -64,9 +65,11 @@
     "@imtbl/cryptofiat": "0.0.0",
     "@imtbl/generated-clients": "0.0.0",
     "@imtbl/guardian": "0.0.0",
+    "@imtbl/minting-backend": "0.0.0",
     "@imtbl/orderbook": "0.0.0",
     "@imtbl/passport": "0.0.0",
     "@imtbl/version-check": "0.0.0",
+    "@imtbl/webhook": "0.0.0",
     "@imtbl/x-client": "0.0.0",
     "@imtbl/x-provider": "0.0.0",
     "@rollup/plugin-babel": "^6.0.4",
@@ -119,6 +122,14 @@
     "./x": {
       "types": "./dist/x.d.ts",
       "import": "./dist/x.js"
+    },
+    "./webhook": {
+      "types": "./dist/webhook.d.ts",
+      "import": "./dist/webhook.js"
+    },
+    "./minting_backend": {
+      "types": "./dist/minting_backend.d.ts",
+      "import": "./dist/minting_backend.js"
     }
   },
   "files": [
@@ -128,16 +139,15 @@
   "license": "Apache-2.0",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
+  "optionalDependencies": {
+    "pg": "^8.11.5"
+  },
   "overrides": {
     "@openzeppelin/contracts": "3.4.2-solc-0.7"
   },
-  "peerDependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
-  },
   "repository": "immutable/ts-immutable-sdk.git",
   "resolutions": {
-    "@biom3/design-tokens": "^0.3.1",
+    "@biom3/design-tokens": "^0.3.7",
     "@openzeppelin/contracts": "3.4.2-solc-0.7"
   },
   "scripts": {

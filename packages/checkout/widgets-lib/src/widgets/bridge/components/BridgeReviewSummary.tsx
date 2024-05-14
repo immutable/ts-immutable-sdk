@@ -149,26 +149,25 @@ export function BridgeReviewSummary() {
   const fetchGasEstimate = useCallback(async () => {
     if (!tokenBridge || !amount || !from || !to || !token) return;
 
-    const [unsignedApproveTransaction, unsignedTransaction] = await Promise.all(
-      [
-        tokenBridge!.getUnsignedApproveBridgeTx({
-          senderAddress: fromAddress,
-          token: token.address ?? NATIVE.toUpperCase(),
-          amount: utils.parseUnits(amount, token.decimals),
-          sourceChainId: from?.network.toString(),
-          destinationChainId: to?.network.toString(),
-        }),
-        tokenBridge!.getUnsignedBridgeTx({
-          senderAddress: fromAddress,
-          recipientAddress: toAddress,
-          token: token.address ?? NATIVE.toUpperCase(),
-          amount: utils.parseUnits(amount, token.decimals),
-          sourceChainId: from?.network.toString(),
-          destinationChainId: to?.network.toString(),
-          gasMultiplier: 1.1,
-        }),
-      ],
-    );
+    const bundledTxn = await tokenBridge!.getUnsignedBridgeBundledTx({
+      senderAddress: fromAddress,
+      recipientAddress: toAddress,
+      token: token.address ?? NATIVE.toUpperCase(),
+      amount: utils.parseUnits(amount, token.decimals),
+      sourceChainId: from?.network.toString(),
+      destinationChainId: to?.network.toString(),
+      gasMultiplier: 1.1,
+    });
+
+    const unsignedApproveTransaction = {
+      contractToApprove: bundledTxn.contractToApprove,
+      unsignedTx: bundledTxn.unsignedApprovalTx,
+    };
+
+    const unsignedTransaction = {
+      feeData: bundledTxn.feeData,
+      unsignedTx: bundledTxn.unsignedBridgeTx,
+    };
 
     setApproveTransaction(unsignedApproveTransaction);
     setTransaction(unsignedTransaction);
@@ -212,7 +211,7 @@ export function BridgeReviewSummary() {
   useInterval(() => fetchGasEstimate(), DEFAULT_QUOTE_REFRESH_INTERVAL);
 
   const formatFeeBreakdown = useCallback(
-    (): any => formatBridgeFees(estimates, cryptoFiatState, t),
+    () => formatBridgeFees(estimates, cryptoFiatState, t),
     [estimates],
   );
 

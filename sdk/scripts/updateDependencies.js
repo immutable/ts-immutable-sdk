@@ -39,6 +39,7 @@ const updateVersion = (map, dependency, version) => {
 const collectDependenciesRecusively = async (sdkWorkspace) => {
   const dependenciesMap = new Map();
   const peerDependenciesMap = new Map();
+  const optionalDependenciesMap = new Map();
 
   // Recursively go through a workspace and update the dependencies
   const processWorkspace = (workspace) => {
@@ -59,11 +60,20 @@ const collectDependenciesRecusively = async (sdkWorkspace) => {
 
     // UpdateVersion for dependencies
     dependencies.forEach((dep) => {
-      updateVersion(
-        dependenciesMap,
-        packageName(dep.scope, dep.name),
-        dep.range
-      );
+      // check for optional dependencies metadata
+      if (manifest.dependenciesMeta?.get(dep.name)?.get(null)?.optional) {
+        updateVersion(
+          optionalDependenciesMap,
+          packageName(dep.scope, dep.name),
+          dep.range
+        );
+      } else {
+        updateVersion(
+          dependenciesMap,
+          packageName(dep.scope, dep.name),
+          dep.range
+        );
+      }
 
       const depWorkspace = workspace.project.tryWorkspaceByIdent(dep);
       if (depWorkspace) {
@@ -87,6 +97,7 @@ const collectDependenciesRecusively = async (sdkWorkspace) => {
   return {
     dependencies: Object.fromEntries(dependenciesMap.entries()),
     peerDependencies: Object.fromEntries(peerDependenciesMap.entries()),
+    optionalDependencies: Object.fromEntries(optionalDependenciesMap.entries()),
   };
 };
 
@@ -115,7 +126,7 @@ const main = async () => {
     throw Error(`${SDK_PACKAGE} package not found`);
   }
 
-  const { dependencies, peerDependencies } =
+  const { dependencies, peerDependencies, optionalDependencies } =
     await collectDependenciesRecusively(targetWorkspace);
 
   const packageJson = JSON.parse(
@@ -126,6 +137,11 @@ const main = async () => {
   // Only add peerDependencies if there are any
   if (Object.values(peerDependencies).length > 0) {
     packageJson.peerDependencies = peerDependencies;
+  }
+
+  // only add optionalDependencies if there are any
+  if (Object.values(optionalDependencies).length > 0) {
+    packageJson.optionalDependencies = optionalDependencies;
   }
 
   fs.writeFileSync(

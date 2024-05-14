@@ -4,7 +4,8 @@ import {
   ConnectEventType,
   WalletProviderName,
   WidgetType,
-  EIP6963ProviderInfo, WalletConnectManager,
+  WalletConnectManager,
+  EIP6963ProviderInfo,
 } from '@imtbl/checkout-sdk';
 
 import { Web3Provider } from '@ethersproject/providers';
@@ -85,7 +86,5 @@ export function sendWalletConnectProviderUpdatedEvent(
       },
     },
   );
-  // eslint-disable-next-line no-console
-  console.log('walletConnect provider updated event:', eventTarget, successEvent);
   if (eventTarget !== undefined) eventTarget.dispatchEvent(successEvent);
 }

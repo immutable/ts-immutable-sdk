@@ -345,6 +345,8 @@ export interface SmartCheckoutParams {
   onComplete?: (result: SmartCheckoutResult) => void;
   /** The callback to be executed on each funding route found */
   onFundingRoute?: (fundingRoute: FundingRoute) => void;
+  /** A flag to get funding routes based on full or partial amount */
+  fundingRouteFullAmount?: boolean;
 }
 
 /**

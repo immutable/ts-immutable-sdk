@@ -5,4 +5,5 @@ import { WidgetConfiguration } from './widget';
  */
 export type SaleWidgetConfiguration = {
   multicurrency?: boolean;
+  waitFulfillmentSettlements?: boolean;
 } & WidgetConfiguration;

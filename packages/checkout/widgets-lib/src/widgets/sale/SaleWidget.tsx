@@ -38,6 +38,7 @@ import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsPr
 import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
 import { OrderSummary } from './views/OrderSummary';
+import { CreditCardWarningDrawer } from './components/CreditCardWarningDrawer';
 
 type OptionalWidgetParams = Pick<SaleWidgetParams, 'excludePaymentTypes'>;
 type RequiredWidgetParams = Required<
@@ -47,6 +48,7 @@ Omit<SaleWidgetParams, 'walletProviderName'>
 type WidgetParams = RequiredWidgetParams &
 OptionalWidgetParams & {
   multicurrency: boolean;
+  waitFulfillmentSettlements: boolean;
 };
 export interface SaleWidgetProps extends WidgetParams {
   config: StrongCheckoutWidgetsConfig;
@@ -62,6 +64,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
     collectionName,
     excludePaymentTypes,
     multicurrency = false,
+    waitFulfillmentSettlements = true,
   } = props;
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
@@ -127,6 +130,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
           collectionName,
           excludePaymentTypes,
           multicurrency,
+          waitFulfillmentSettlements,
         }}
       >
         <CryptoFiatProvider environment={config.environment}>
@@ -183,6 +187,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
               subheading={viewState.view.data?.subheading}
             />
           )}
+          <CreditCardWarningDrawer />
         </CryptoFiatProvider>
       </SaleContextProvider>
     </ViewContext.Provider>

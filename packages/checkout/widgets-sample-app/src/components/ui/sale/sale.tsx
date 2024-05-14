@@ -9,6 +9,7 @@ import {
   SaleItem,
   SalePaymentTypes,
   SwapEventType,
+  WidgetLanguage,
   WidgetTheme,
   WidgetType,
 } from "@imtbl/checkout-sdk";
@@ -26,12 +27,12 @@ const defaultPassportConfig = {
 
 const defaultItems: SaleItem[] = [
   {
-    productId: "lab",
-    qty: 2,
-    name: "Lab Iguana",
+    productId: "biker",
+    qty: 1,
+    name: "Biker Iguana",
     image:
-      "https://pokemon-nfts.mystagingwebsite.com/wp-content/uploads/2023/11/645-300x300.png",
-    description: "Lab Iguana",
+      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2023/12/img-IsR4OA7a9IStLeQ9cPo75tII.png",
+    description: "Biker Iguana",
   },
 ];
 
@@ -276,7 +277,9 @@ export function SaleUI() {
       </button>
       <select
         onChange={(e) =>
-          saleWidget.update({ config: { language: e.target.value } })
+          saleWidget.update({
+            config: { language: e.target.value as WidgetLanguage },
+          })
         }
       >
         <option value="en">EN</option>

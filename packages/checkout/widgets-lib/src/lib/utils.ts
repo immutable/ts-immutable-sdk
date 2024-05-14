@@ -67,9 +67,8 @@ export const calculateCryptoToFiat = (
   amount: string,
   symbol: string,
   conversions: Map<string, number>,
+  zeroString: string = '0.00',
 ): string => {
-  const zeroString = '0.00';
-
   if (!amount) return zeroString;
 
   const conversion = conversions.get(symbol.toLowerCase());

@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { MenuItem } from '@biom3/react';
-import { useState } from 'react';
+import { forwardRef, useImperativeHandle, useState } from 'react';
 import { useWalletConnect } from '../../../lib/hooks/useWalletConnect';
 
 export type WalletConnectItemProps = {
@@ -8,13 +8,28 @@ export type WalletConnectItemProps = {
   loading?: boolean;
 };
 
-export function WalletConnectItem({
+export const WalletConnectItem = forwardRef(({
   onConnect,
   loading = false,
-}: WalletConnectItemProps) {
+}: WalletConnectItemProps, ref) => {
   const { t } = useTranslation();
   const { walletConnectBusy } = useWalletConnect();
   const [busy, setBusy] = useState(false);
+
+  const connect = async () => {
+    if (loading) return;
+    setBusy(true);
+    // let the parent handle errors
+    try {
+      await onConnect();
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  useImperativeHandle(ref, () => ({
+    connect,
+  }));
 
   return (
     <MenuItem
@@ -22,16 +37,7 @@ export function WalletConnectItem({
       size="medium"
       emphasized
       disabled={walletConnectBusy}
-      onClick={async () => {
-        if (loading) return;
-        setBusy(true);
-        // let the parent handle errors
-        try {
-          await onConnect();
-        } finally {
-          setBusy(false);
-        }
-      }}
+      onClick={connect}
       sx={{ marginBottom: 'base.spacing.x1' }}
     >
       <MenuItem.FramedLogo
@@ -53,4 +59,4 @@ export function WalletConnectItem({
       ))}
     </MenuItem>
   );
-}
+});

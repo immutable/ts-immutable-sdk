@@ -255,21 +255,42 @@
     },
     "ORDER_SUMMARY": {
       "loading": {
-        "balances": "数字を計算中" 
+        "balances": "数字を計算中"
       },
       "currency": {
-        "fiat": "≈ USD ${{amount}}",  
-        "fees": "手数料"
+        "fiat": "≈ USD ${{amount}}",
+        "price": "{{symbol}} {{amount}}"
+      },
+      "orderItem": {
+        "quantity": "数量 x{{qty}}"
       },
       "coinsDrawer": {
         "header": "支払い方法…",
         "caption1": "コイン",
-        "caption2": "残高"
+        "caption2": "残高",
+        "divider": "その他のオプション",
+        "payWithCard": {
+          "caption": "代わりにカードで購入"
+        },
+        "stepType": {
+          "SWAP": "{{symbol}}を{{amount}}でスワップ",
+          "ONRAMP": "{{symbol}}を{{amount}}で購入",
+          "BRIDGE": "{{symbol}}を{{amount}}で移動",
+          "SUFFICIENT": "{{symbol}} {{amount}}で支払う",
+          "delta": {
+            "SWAP": "{{symbol}}を{{amount}}でスワップ",
+            "ONRAMP": "{{symbol}}を{{amount}}で購入",
+            "BRIDGE": "{{symbol}}を{{amount}}で移動",
+            "SUFFICIENT": "{{symbol}} {{amount}}で支払う"
+          }
+        },
+        "fee": "手数料 {{symbol}} ≈ {{amount}}"
       },
       "orderReview": {
-        "heading": "お支払い方法", 
-        "continue": "続ける", 
-        "payWithCard": "いいえ、カードで支払います"
+        "heading": "支払いの概要",
+        "continue": "続行",
+        "payWith": "{{symbol}}で支払う",
+        "balance": "残高{{amount}}"
       }
     },
     "FUND_WITH_SMART_CHECKOUT": {
@@ -333,7 +354,6 @@
         "body": "この種の購入にクレジットカードを使用する場合、ほとんどの銀行は現金前払い手数料を請求するか、または取引を完全にブロックします。",
         "ctaButton": "それでも試す"
       }
-
     },
     "PAY_WITH_COINS": {
       "header": {
@@ -441,7 +461,7 @@
       },
       "fees": {
         "title": "ガス手数料",
-        "fiatPricePrefix": "~ USD $"
+        "fiatPricePrefix": "≈ USD $"
       },
       "content": {
         "title": "いくら移動しますか？",
@@ -477,7 +497,7 @@
       "submitButton": {
         "buttonText": "移動を確認"
       },
-      "fiatPricePrefix": "~ USD $"
+      "fiatPricePrefix": "≈ USD $"
     },
     "BRIDGE_FAILURE": {
       "bridgeFailureText": {
@@ -604,8 +624,21 @@
       "heading": "手数料の内訳",
       "total": "総手数料",
       "fees": {
-        "gas": {
+        "fiatPricePrefix": "USD $",
+        "gasFeeMove": {
           "label": "ガス手数料"
+        },
+        "approvalFee": {
+          "label": "承認手数料"
+        },
+        "swapGasFee": {
+          "label": "ガス手数料"
+        },
+        "swapSecondaryFee": {
+          "label": "{{amount}} スワップ手数料（見積もりに含まれる）"
+        },
+        "serviceFee": {
+          "label": "サービス手数料"
         }
       }
     },
@@ -687,14 +720,14 @@
     },
     "walletConnectionError": {
       "unableToConnect": {
-          "heading": "接続できません",
-          "body": "ウォレットを確認してもう一度お試しください。または、閉じて別のオプションを試してください。",
-          "actionButtonText": "もう一度試す"
+        "heading": "接続できません",
+        "body": "ウォレットを確認してもう一度お試しください。または、閉じて別のオプションを試してください。",
+        "actionButtonText": "もう一度試す"
       },
       "changedYourMind": {
-          "heading": "考えを変えましたか？",
-          "body": "ポップアップが有効になっていることを確認し、ウォレットのプロンプトに従って接続してください。",
-          "actionButtonText": "もう一度試す"
+        "heading": "考えを変えましたか？",
+        "body": "ポップアップが有効になっていることを確認し、ウォレットのプロンプトに従って接続してください。",
+        "actionButtonText": "もう一度試す"
       }
     }
   }

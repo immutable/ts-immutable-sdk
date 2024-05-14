@@ -1,17 +1,26 @@
 import { IconProps, MenuItem } from '@biom3/react';
 import { SalePaymentTypes } from '@imtbl/checkout-sdk';
+import { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export interface PaymentOptionProps {
+export interface PaymentOptionProps<
+  RC extends ReactElement | undefined = undefined,
+> {
+  rc?: RC;
   type: SalePaymentTypes;
   onClick: (type: SalePaymentTypes) => void;
   disabled?: boolean;
+  caption?: string;
 }
 
-export function PaymentOption(props: PaymentOptionProps) {
+export function PaymentOption<RC extends ReactElement | undefined = undefined>({
+  type,
+  onClick,
+  disabled = false,
+  caption,
+  rc = <span />,
+}: PaymentOptionProps<RC>) {
   const { t } = useTranslation();
-  const { type, onClick, disabled } = props;
-  // const optionText = options[type];
 
   const icon: Record<SalePaymentTypes, IconProps['icon']> = {
     [SalePaymentTypes.CRYPTO]: 'Coins',
@@ -21,22 +30,37 @@ export function PaymentOption(props: PaymentOptionProps) {
 
   const handleClick = () => onClick(type);
 
+  const menuItemProps = {
+    disabled,
+    emphasized: true,
+    onClick: disabled ? undefined : handleClick,
+  };
+
   return (
     <MenuItem
+      rc={rc}
       size="medium"
-      emphasized
-      onClick={disabled ? undefined : handleClick}
       sx={{
-        ...(disabled && { opacity: '0.5', cursor: 'not-allowed' }),
         marginBottom: 'base.spacing.x1',
+        userSelect: 'none',
+        ...(disabled && {
+          filter: 'opacity(0.5)',
+          cursor: 'not-allowed !important',
+        }),
       }}
-      disabled={disabled}
+      {...menuItemProps}
     >
       <MenuItem.FramedIcon icon={icon[type]} />
-      <MenuItem.Label size="medium">{t(`views.PAYMENT_METHODS.options.${type}.heading`)}</MenuItem.Label>
+      <MenuItem.Label size="medium">
+        {t(`views.PAYMENT_METHODS.options.${type}.heading`)}
+      </MenuItem.Label>
       {!disabled && <MenuItem.IntentIcon />}
       <MenuItem.Caption>
-        {t(`views.PAYMENT_METHODS.options.${type}.${disabled ? 'disabledCaption' : 'caption'}`)}
+        {caption || t(
+          `views.PAYMENT_METHODS.options.${type}.${
+            disabled ? 'disabledCaption' : 'caption'
+          }`,
+        )}
       </MenuItem.Caption>
     </MenuItem>
   );

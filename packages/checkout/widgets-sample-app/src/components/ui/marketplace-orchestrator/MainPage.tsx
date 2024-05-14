@@ -28,7 +28,7 @@ const checkout = new Checkout({
     environment: Environment.SANDBOX,
     publishableKey: 'pk_imapik-test-pCHFU0GpQImZx9UzSnU3',
   },
-})
+});
 
 export const MainPage = () => {
   // local state for enabling/disabling and changing buttons
@@ -58,13 +58,7 @@ export const MainPage = () => {
   const swapWidget = useMemo(() => widgetsFactory.create(WidgetType.SWAP), [widgetsFactory]);
   const onRampWidget = useMemo(() => widgetsFactory.create(WidgetType.ONRAMP), [widgetsFactory]);
 
-  connectWidget.addListener(ConnectEventType.WALLETCONNECT_PROVIDER_UPDATED, (event) => {
-    console.log('WalletConnnect provider ready', event);
-  });
   connectWidget.addListener(ConnectEventType.CLOSE_WIDGET, () => { connectWidget.unmount() });
-  connectWidget.addListener(ConnectEventType.SUCCESS, (event) => {
-    console.log('Connect success', event);
-  });
   walletWidget.addListener(WalletEventType.CLOSE_WIDGET, () => { walletWidget.unmount() });
   bridgeWidget.addListener(BridgeEventType.CLOSE_WIDGET, () => { bridgeWidget.unmount() });
   swapWidget.addListener(SwapEventType.CLOSE_WIDGET, () => swapWidget.unmount());
@@ -77,9 +71,6 @@ export const MainPage = () => {
     });
     walletWidget.addListener(WalletEventType.NETWORK_SWITCH, (eventData: WalletNetworkSwitch) => {
       setWeb3Provider(eventData.provider)
-    });
-    swapWidget.addListener(ProviderEventType.PROVIDER_UPDATED, (data: ProviderUpdated) => {
-      console.log("swap widget provider updated", data)
     });
   }, [connectWidget, walletWidget, swapWidget]);
 

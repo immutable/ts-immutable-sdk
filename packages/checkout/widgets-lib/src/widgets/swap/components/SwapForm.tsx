@@ -3,7 +3,7 @@ import {
   useContext, useEffect, useMemo, useState,
 } from 'react';
 import {
-  Body, Box, Heading, OptionKey,
+  Box, Heading, Icon, OptionKey, Tooltip,
 } from '@biom3/react';
 import { BigNumber, utils } from 'ethers';
 import { TokenInfo, WidgetTheme } from '@imtbl/checkout-sdk';
@@ -45,46 +45,17 @@ import { UnableToSwap } from './UnableToSwap';
 import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import useDebounce from '../../../lib/hooks/useDebounce';
 import { CancellablePromise } from '../../../lib/async/cancellablePromise';
+import { isPassportProvider } from '../../../lib/provider';
+import { formatSwapFees } from '../functions/swapFees';
+import { processGasFree } from '../functions/processGasFree';
+import { processSecondaryFees } from '../functions/processSecondaryFees';
+import { processQuoteToken } from '../functions/processQuoteToken';
+import { formatQuoteConversionRate } from '../functions/swapConversionRate';
 
 enum SwapDirection {
   FROM = 'FROM',
   TO = 'TO',
 }
-
-const swapValuesToText = ({
-  swapFromToken,
-  swapToToken,
-  swapFromAmount,
-  swapToAmount,
-  conversion,
-}: {
-  swapFromToken?: TokenInfo;
-  swapFromAmount: string;
-  swapToToken?: TokenInfo;
-  swapToAmount: string;
-  conversion: BigNumber;
-}): {
-  fromToConversion: string,
-  swapToAmount: string,
-} => {
-  const resp = {
-    fromToConversion: '',
-    swapToAmount: '',
-  };
-
-  if (!swapToAmount) return resp;
-  resp.swapToAmount = tokenValueFormat(swapToAmount);
-
-  if (swapFromAmount && swapFromToken && swapToToken) {
-    const formattedConversion = formatZeroAmount(tokenValueFormat(
-      utils.formatUnits(conversion, swapToToken.decimals),
-    ), true);
-
-    resp.fromToConversion = `1 ${swapFromToken.symbol} ≈ ${formattedConversion} ${swapToToken.symbol}`;
-  }
-
-  return resp;
-};
 
 // Ensures that the to token address does not match the from token address
 const shouldSetToAddress = (toAddress: string | undefined, fromAddress: string | undefined): boolean => {
@@ -124,9 +95,6 @@ export function SwapForm({ data, theme }: SwapFromProps) {
 
   const [direction, setDirection] = useState<SwapDirection>(SwapDirection.FROM);
   const [loading, setLoading] = useState(false);
-  const [conversion, setConversion] = useState(BigNumber.from(0));
-  const [swapFromToConversionText, setSwapFromToConversionText] = useState('');
-
   const { track } = useAnalytics();
 
   // Form State
@@ -150,6 +118,25 @@ export function SwapForm({ data, theme }: SwapFromProps) {
   const [gasFeeToken, setGasFeeToken] = useState<TokenInfo | undefined>(undefined);
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
   const [tokensOptionsFrom, setTokensOptionsForm] = useState<CoinSelectorOptionProps[]>([]);
+  const formattedFees = useMemo(
+    () => (quote ? formatSwapFees(quote, cryptoFiatState, t) : []),
+    [quote, cryptoFiatState, t],
+  );
+  const [conversionToken, setConversionToken] = useState<TokenInfo | null>(null);
+  const [conversionAmount, setConversionAmount] = useState<string>('');
+  const swapConversionRateTooltip = useMemo(
+    () => {
+      if (!quote || !conversionAmount || !conversionToken) return '';
+      return formatQuoteConversionRate(
+        conversionAmount,
+        conversionToken as TokenInfo,
+        quote,
+        'views.SWAP.swapForm.conversionRate',
+        t,
+      );
+    },
+    [conversionAmount, conversionToken, quote, t],
+  );
 
   // Drawers
   const [showNotEnoughImxDrawer, setShowNotEnoughImxDrawer] = useState(false);
@@ -251,7 +238,8 @@ export function SwapForm({ data, theme }: SwapFromProps) {
     if (quoteRequest) {
       quoteRequest.cancel();
     }
-    setSwapFromToConversionText('');
+    setConversionAmount('');
+    setConversionToken(null);
     setGasFeeFiatValue('');
     setQuote(null);
   };
@@ -263,8 +251,6 @@ export function SwapForm({ data, theme }: SwapFromProps) {
     if (!toToken) return;
 
     try {
-      if (!silently) setSwapFromToConversionText('');
-
       const quoteResultPromise = quotesProcessor.fromAmountIn(
         exchange,
         provider,
@@ -272,24 +258,17 @@ export function SwapForm({ data, theme }: SwapFromProps) {
         fromAmount,
         toToken,
       );
-      const conversionResultPromise = quotesProcessor.fromAmountIn(
-        exchange,
-        provider,
-        fromToken,
-        '1',
-        toToken,
-      );
 
       const currentQuoteRequest = CancellablePromise.all<TransactionResponse>([
         quoteResultPromise,
-        conversionResultPromise,
       ]);
       quoteRequest = currentQuoteRequest;
 
       const resolved = await currentQuoteRequest;
-      const quoteResult = resolved[0];
-      const conversionResult = resolved[1];
-      setConversion(conversionResult.quote.amount.value);
+
+      let quoteResult = processGasFree(provider, resolved[0]);
+      quoteResult = processSecondaryFees(fromToken, quoteResult);
+      quoteResult = processQuoteToken(toToken, quoteResult);
 
       const estimate = quoteResult.swap.gasFeeEstimate;
       let gasFeeTotal = BigNumber.from(estimate?.value || 0);
@@ -301,11 +280,12 @@ export function SwapForm({ data, theme }: SwapFromProps) {
         DEFAULT_TOKEN_DECIMALS,
       );
       const estimateToken = estimate?.token;
-
       const gasToken = allowedTokens.find(
         (token) => token.address?.toLocaleLowerCase() === estimateToken?.address?.toLocaleLowerCase(),
       );
 
+      setConversionToken(fromToken);
+      setConversionAmount(fromAmount);
       setQuote(quoteResult);
       setGasFeeValue(gasFee);
       setGasFeeToken({
@@ -336,6 +316,9 @@ export function SwapForm({ data, theme }: SwapFromProps) {
       resetFormErrors();
     } catch (error: any) {
       if (!error.cancelled) {
+        // eslint-disable-next-line no-console
+        console.error('Error fetching quote.', error);
+
         resetQuote();
         setShowNotEnoughImxDrawer(false);
         setShowUnableToSwapDrawer(true);
@@ -354,8 +337,6 @@ export function SwapForm({ data, theme }: SwapFromProps) {
     if (!toToken) return;
 
     try {
-      if (!silently) setSwapFromToConversionText('');
-
       const quoteResultPromise = quotesProcessor.fromAmountOut(
         exchange,
         provider,
@@ -363,24 +344,15 @@ export function SwapForm({ data, theme }: SwapFromProps) {
         toAmount,
         fromToken,
       );
-      const conversionResultPromise = quotesProcessor.fromAmountIn(
-        exchange,
-        provider,
-        fromToken,
-        '1',
-        toToken,
-      );
 
       const currentQuoteRequest = CancellablePromise.all<TransactionResponse>([
         quoteResultPromise,
-        conversionResultPromise,
       ]);
       quoteRequest = currentQuoteRequest;
       const resolved = await currentQuoteRequest;
 
-      const quoteResult = resolved[0];
-      const conversionResult = resolved[1];
-      setConversion(conversionResult.quote.amount.value);
+      let quoteResult = processGasFree(provider, resolved[0]);
+      quoteResult = processSecondaryFees(fromToken, quoteResult);
 
       const estimate = quoteResult.swap.gasFeeEstimate;
       let gasFeeTotal = BigNumber.from(estimate?.value || 0);
@@ -392,8 +364,10 @@ export function SwapForm({ data, theme }: SwapFromProps) {
         DEFAULT_TOKEN_DECIMALS,
       );
       const estimateToken = estimate?.token;
-
       const gasToken = allowedTokens.find((token) => token.symbol === estimateToken?.symbol);
+
+      setConversionToken(toToken);
+      setConversionAmount(toAmount);
       setQuote(quoteResult);
       setGasFeeValue(gasFee);
       setGasFeeToken({
@@ -512,11 +486,14 @@ export function SwapForm({ data, theme }: SwapFromProps) {
     }
   }, [debouncedToAmount, toToken, fromToken]);
 
-  // during swaps, having enough IMX to cover the gas fee means
+  // during swaps, having enough IMX to cover the gas fee means (only relevant for non-Passport wallets)
   // 1. swapping from any token to any token costs IMX - so do a check
   // 2. If the swap from token is also IMX, include the additional amount into the calc
   //    as user will need enough imx for the swap amount and the gas
   const insufficientFundsForGas = useMemo(() => {
+    if (!provider) return true;
+    if (isPassportProvider(provider)) return false;
+
     const imxBalance = tokenBalances.find((b) => b.token.address?.toLowerCase() === NATIVE);
     if (!imxBalance) return true;
 
@@ -527,7 +504,7 @@ export function SwapForm({ data, theme }: SwapFromProps) {
       : BigNumber.from('0');
 
     return gasAmount.add(additionalAmount).gt(imxBalance.balance);
-  }, [gasFeeValue, tokenBalances, fromToken, fromAmount]);
+  }, [gasFeeValue, tokenBalances, fromToken, fromAmount, provider]);
 
   // -------------//
   //     FROM     //
@@ -678,17 +655,6 @@ export function SwapForm({ data, theme }: SwapFromProps) {
     return isSwapFormValid;
   };
 
-  useEffect(() => {
-    if (!quote || !conversion) return;
-    setSwapFromToConversionText(swapValuesToText({
-      swapFromToken: fromToken,
-      swapFromAmount: fromAmount,
-      swapToToken: toToken,
-      swapToAmount: toAmount,
-      conversion,
-    }).fromToConversion);
-  }, [quote, conversion]);
-
   return (
     <>
       <Box sx={{
@@ -769,14 +735,21 @@ export function SwapForm({ data, theme }: SwapFromProps) {
               }}
             >
               <Heading size="xSmall">{t('views.SWAP.swapForm.to.label')}</Heading>
-              <Body
-                sx={{
-                  color: 'base.color.brand.4',
-                }}
-                size="small"
-              >
-                {swapFromToConversionText}
-              </Body>
+              {swapConversionRateTooltip?.length > 0 && (
+                <Tooltip>
+                  <Tooltip.Target>
+                    <Icon
+                      icon="InformationCircle"
+                      sx={{
+                        w: 'base.icon.size.300',
+                      }}
+                    />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
+                    {swapConversionRateTooltip}
+                  </Tooltip.Content>
+                </Tooltip>
+              )}
             </Box>
             <SelectInput
               testId="toTokenInputs"
@@ -800,31 +773,26 @@ export function SwapForm({ data, theme }: SwapFromProps) {
             />
           </Box>
         </Box>
-        <Fees
-          gasFeeFiatValue={gasFeeFiatValue}
-          gasFeeToken={gasFeeToken}
-          gasFeeValue={gasFeeValue}
-          fees={[
-            {
-              label: t('drawers.feesBreakdown.fees.gasFeeSwap.label'),
-              fiatAmount: `~ ${t('drawers.feesBreakdown.fees.fiatPricePrefix')}${gasFeeFiatValue}`,
-              amount: tokenValueFormat(gasFeeValue),
-              prefix: '~',
-            },
-          ]}
-          onFeesClick={() => {
-            track({
-              userJourney: UserJourney.SWAP,
-              screen: 'SwapCoins',
-              control: 'ViewFees',
-              controlType: 'Button',
-            });
-          }}
-          sx={{
-            paddingBottom: '0',
-          }}
-          loading={loading}
-        />
+        {!isPassportProvider(provider) && (
+          <Fees
+            gasFeeFiatValue={gasFeeFiatValue}
+            gasFeeToken={gasFeeToken}
+            gasFeeValue={gasFeeValue}
+            fees={formattedFees}
+            onFeesClick={() => {
+              track({
+                userJourney: UserJourney.SWAP,
+                screen: 'SwapCoins',
+                control: 'ViewFees',
+                controlType: 'Button',
+              });
+            }}
+            sx={{
+              paddingBottom: '0',
+            }}
+            loading={loading}
+          />
+        )}
       </Box>
       <SwapButton
         validator={SwapFormValidator}

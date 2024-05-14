@@ -5,6 +5,8 @@ import {
 import {
   IMTBLWidgetEvents, TokenFilterTypes, TokenInfo, WidgetTheme,
 } from '@imtbl/checkout-sdk';
+import { IMAGE_RESIZER_URL } from 'lib';
+import { Environment } from '@imtbl/config';
 import { ShowMenuItem } from './BalanceItemStyles';
 import { BalanceInfo } from '../../functions/tokenBalances';
 import { WalletContext } from '../../context/WalletContext';
@@ -44,6 +46,7 @@ export function BalanceItem({
   );
 
   const isPassport = isPassportProvider(provider);
+  const environment = checkout?.config.environment ?? Environment.PRODUCTION;
 
   useEffect(() => {
     const getOnRampAllowedTokens = async () => {
@@ -89,8 +92,9 @@ export function BalanceItem({
   return (
     <MenuItem testId={`balance-item-${balanceInfo.symbol}`} emphasized>
       <MenuItem.FramedImage
+        imageResizeServiceUrl={IMAGE_RESIZER_URL[environment]}
         imageUrl={balanceInfo.icon}
-        defaultImageUrl={getDefaultTokenImage(checkout?.config.environment, theme)}
+        defaultImageUrl={getDefaultTokenImage(environment, theme)}
         circularFrame
       />
       <MenuItem.Label>{balanceInfo.symbol}</MenuItem.Label>
