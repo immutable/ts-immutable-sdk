@@ -3,20 +3,22 @@ import {
 } from '@biom3/react';
 import { formatZeroAmount, tokenValueFormat } from 'lib/utils';
 import { useTranslation } from 'react-i18next';
+import { TokenInfo } from '@imtbl/checkout-sdk';
 import { feeItemContainerStyles, feeItemLoadingStyles, feesBreakdownContentStyles } from './FeesBreakdownStyles';
 import { FeeItem } from './FeeItem';
 import { FooterLogo } from '../Footer/FooterLogo';
 
-type Fee = {
+export type FeesBreakdownItem = {
   label: string;
   amount: string;
   fiatAmount: string;
   prefix?: string;
+  token?: TokenInfo;
 };
 
 type FeesBreakdownProps = {
   onCloseDrawer?: () => void;
-  fees: Fee[];
+  fees: FeesBreakdownItem[];
   children?: any;
   visible?: boolean;
   totalFiatAmount?: string;
@@ -62,13 +64,14 @@ export function FeesBreakdown({
               amount,
               fiatAmount,
               prefix,
+              token,
             }) => (
               <FeeItem
                 key={label}
                 label={label}
                 amount={amount}
                 fiatAmount={fiatAmount}
-                tokenSymbol={tokenSymbol}
+                tokenSymbol={token?.symbol || tokenSymbol}
                 prefix={prefix}
               />
             ))

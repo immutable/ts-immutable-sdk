@@ -62,9 +62,9 @@ export const sortNetworksCompareFn = (
   return 1;
 };
 
-export const formatFiatString = (amount: number) => {
-  const factor = 10 ** 2;
-  return (Math.round(amount * factor) / factor).toFixed(2);
+export const formatFiatString = (amount: number, decimals: number = 2): string => {
+  const factor = 10 ** decimals;
+  return (Math.round(amount * factor) / factor).toFixed(decimals);
 };
 
 export const calculateCryptoToFiat = (
@@ -72,6 +72,7 @@ export const calculateCryptoToFiat = (
   symbol: string,
   conversions: Map<string, number>,
   zeroString: string = '0.00',
+  maxDecimals: number = 2,
 ): string => {
   if (!amount) return zeroString;
 
@@ -80,8 +81,9 @@ export const calculateCryptoToFiat = (
   if (!conversion) return zeroString;
 
   const parsedAmount = parseFloat(amount);
+  console.log('🚀 ~ amount:', amount, parsedAmount, parsedAmount * conversion);
   if (parseFloat(amount) === 0 || Number.isNaN(parsedAmount)) return zeroString;
-  return formatFiatString(parsedAmount * conversion);
+  return formatFiatString(parsedAmount * conversion, maxDecimals);
 };
 
 export const formatZeroAmount = (
@@ -172,4 +174,10 @@ export function getDefaultTokenImage(
   return theme === WidgetTheme.LIGHT
     ? getRemoteImage(environment, '/tokens/defaultonlight.svg')
     : getRemoteImage(environment, '/tokens/defaultondark.svg');
+}
+
+export function getShortWalletAddress(address: string, separator = '...', firstChars = 5, lastChars = 4) {
+  if (!address) return '';
+
+  return `${address.slice(0, firstChars)}${separator}${address.slice(-lastChars)}`;
 }

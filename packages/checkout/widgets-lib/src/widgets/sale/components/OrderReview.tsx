@@ -1,12 +1,18 @@
 import { Box, Heading } from '@biom3/react';
-import { useContext, useState } from 'react';
+import {
+  useContext, useEffect, useMemo, useState,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  FundingStepType,
   SaleItem,
-  SalePaymentTypes,
-  TransactionRequirement,
+  SalePaymentTypes, TransactionRequirement,
 } from '@imtbl/checkout-sdk';
-import { OrderSummarySubViews } from 'context/view-context/SaleViewContextTypes';
+import {
+  OrderSummarySubViews,
+  SaleWidgetViews,
+} from 'context/view-context/SaleViewContextTypes';
+import { calculateCryptoToFiat } from 'lib/utils';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
@@ -16,6 +22,11 @@ import { CoinsDrawer } from './CoinsDrawer';
 import { OrderQuoteProduct, FundingBalance } from '../types';
 import { OrderItems } from './OrderItems';
 import { useSaleEvent } from '../hooks/useSaleEvents';
+import {
+  getFundingBalanceFeeBreakDown,
+  getFundingBalanceTotalFees,
+} from '../functions/fundingBalanceFees';
+import { FeesDisplay, OrderFees } from './OrderFees';
 
 type OrderReviewProps = {
   collectionName: string;
@@ -48,10 +59,16 @@ export function OrderReview({
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
   const { t } = useTranslation();
-  const { sendSelectedPaymentToken } = useSaleEvent();
+  const { sendSelectedPaymentToken, sendViewFeesEvent } = useSaleEvent();
 
   const [showCoinsDrawer, setShowCoinsDrawer] = useState(false);
   const [selectedCurrencyIndex, setSelectedCurrencyIndex] = useState(0);
+  const [swapFees, setSwapFees] = useState<FeesDisplay>({
+    token: undefined,
+    amount: '',
+    fiatAmount: '',
+    breakdown: [],
+  });
 
   const openDrawer = () => {
     setShowCoinsDrawer(true);
@@ -64,10 +81,53 @@ export function OrderReview({
   const onSelect = (selectedIndex: number) => {
     setSelectedCurrencyIndex(selectedIndex);
 
-    const { fundingItem } = fundingBalances[selectedCurrencyIndex];
-    sendSelectedPaymentToken(OrderSummarySubViews.REVIEW_ORDER, fundingItem, conversions);
+    const { fundingItem } = fundingBalances[selectedIndex];
+    sendSelectedPaymentToken(
+      OrderSummarySubViews.REVIEW_ORDER,
+      fundingItem,
+      conversions,
+    );
     // checkoutPrimarySalePaymentTokenSelected
   };
+
+  const fundingBalance = useMemo(
+    () => fundingBalances[selectedCurrencyIndex],
+    [fundingBalances, selectedCurrencyIndex],
+  );
+
+  useEffect(() => {
+    if (!conversions?.size) {
+      return;
+    }
+
+    if (fundingBalance.type !== FundingStepType.SWAP) {
+      return;
+    }
+
+    const [[, fee]] = Object.entries(
+      getFundingBalanceTotalFees(fundingBalance),
+    );
+    if (!fee || !fee.token) {
+      return;
+    }
+
+    const values = {
+      token: fee.token,
+      amount: fee.formattedAmount,
+      fiatAmount: calculateCryptoToFiat(
+        fee.formattedAmount,
+        fee.token.symbol,
+        conversions,
+      ),
+      breakdown: getFundingBalanceFeeBreakDown(fundingBalance, conversions),
+    };
+
+    setSwapFees(values);
+  }, [fundingBalance, conversions]);
+
+  const multiple = items.length > 1;
+  const withFees = !loadingBalances
+    && fundingBalance.type === FundingStepType.SWAP;
 
   return (
     <SimpleLayout
@@ -102,8 +162,8 @@ export function OrderReview({
           flexDirection: 'column',
           px: 'base.spacing.x2',
           pb: 'base.spacing.x8',
-          maxh: '60%',
-          height: '100%',
+          flex: 1,
+          maxh: withFees ? '45%' : '60%',
           overflowY: 'scroll',
           scrollbarWidth: 'none',
           rowGap: 'base.spacing.x4',
@@ -115,9 +175,38 @@ export function OrderReview({
             balance={fundingBalances[selectedCurrencyIndex]}
             pricing={pricing}
             conversions={conversions}
-          />
+          >
+            {!multiple && withFees && (
+              <OrderFees
+                swapFees={swapFees}
+                sx={{
+                  bradtl: '0',
+                  bradtr: '0',
+                  brad: 'base.borderRadius.x6',
+                  border: '0px solid transparent',
+                  borderTopWidth: 'base.border.size.200',
+                  borderTopColor: 'base.color.translucent.inverse.1000',
+                }}
+                onFeesClick={() => sendViewFeesEvent(SaleWidgetViews.ORDER_SUMMARY)}
+              />
+            )}
+          </OrderItems>
         </Box>
       </Box>
+      {multiple && withFees && (
+        <OrderFees
+          swapFees={swapFees}
+          sx={{
+            mb: '-12px',
+            bradtl: 'base.borderRadius.x6',
+            bradtr: 'base.borderRadius.x6',
+            border: '0px solid transparent',
+            borderTopWidth: 'base.border.size.100',
+            borderTopColor: 'base.color.translucent.emphasis.400',
+          }}
+          onFeesClick={() => sendViewFeesEvent(SaleWidgetViews.ORDER_SUMMARY)}
+        />
+      )}
       <SelectCoinDropdown
         onClick={openDrawer}
         onProceed={onProceedToBuy}

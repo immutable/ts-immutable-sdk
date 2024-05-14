@@ -3,27 +3,23 @@ import {
   Body,
   Box,
   PriceDisplay, ShimmerBox,
+  SxProps,
 } from '@biom3/react';
 import { TokenInfo } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { formatZeroAmount, tokenValueFormat } from '../../lib/utils';
-import { FeesBreakdown } from '../FeesBreakdown/FeesBreakdown';
+import { FeesBreakdown, FeesBreakdownItem } from '../FeesBreakdown/FeesBreakdown';
 import { gasAmountAccordionStyles, gasAmountHeadingStyles } from './FeeStyles';
 
 interface FeesProps {
   gasFeeValue: string;
   gasFeeToken?: TokenInfo;
   gasFeeFiatValue: string;
-  fees: {
-    fiatAmount: string;
-    amount: string;
-    label: string;
-    prefix?: string;
-  }[];
+  fees: FeesBreakdownItem[];
   onFeesClick?: () => void;
   loading?: boolean;
-  sx?: any;
+  sx?: SxProps;
 }
 
 export function Fees({
@@ -31,7 +27,7 @@ export function Fees({
 }: FeesProps) {
   const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
   const { t } = useTranslation();
-  if (!gasFeeValue && !loading) return <Box />;
+  if (!gasFeeValue && !loading) return null;
 
   const gasFee = formatZeroAmount(tokenValueFormat(gasFeeValue));
   const gasTokenSymbol = gasFeeToken?.symbol;
