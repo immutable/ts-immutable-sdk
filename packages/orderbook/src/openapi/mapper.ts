@@ -9,6 +9,7 @@ import {
   FeeType,
   Page,
   Trade,
+  ERC1155Item,
 } from '../types';
 
 export function mapFromOpenApiOrder(order: OpenApiOrder): Order {
@@ -31,7 +32,7 @@ export function mapFromOpenApiOrder(order: OpenApiOrder): Order {
     throw new Error('Buy items must be either ERC20 or NATIVE');
   });
 
-  const sellItems: ERC721Item[] = order.sell.map((item) => {
+  const sellItems: (ERC721Item | ERC1155Item)[] = order.sell.map((item) => {
     if (item.type === 'ERC721') {
       return {
         type: 'ERC721',
@@ -40,7 +41,16 @@ export function mapFromOpenApiOrder(order: OpenApiOrder): Order {
       };
     }
 
-    throw new Error('Sell items must ERC721');
+    if (item.type === 'ERC1155') {
+      return {
+        type: 'ERC1155',
+        contractAddress: item.contract_address,
+        tokenId: item.token_id,
+        amount: item.amount,
+      };
+    }
+
+    throw new Error('Sell items must ERC721 or ERC1155');
   });
 
   return {
@@ -54,6 +64,7 @@ export function mapFromOpenApiOrder(order: OpenApiOrder): Order {
       recipientAddress: fee.recipient_address,
       type: fee.type as unknown as FeeType,
     })),
+    fillStatus: order.fill_status,
     chain: order.chain,
     createdAt: order.created_at,
     endAt: order.end_at,
@@ -93,12 +104,21 @@ export function mapFromOpenApiTrade(trade: OpenApiTrade): Trade {
     throw new Error('Buy items must be either ERC20 or NATIVE');
   });
 
-  const sellItems: ERC721Item[] = trade.sell.map((item) => {
+  const sellItems: (ERC721Item | ERC1155Item)[] = trade.sell.map((item) => {
     if (item.type === 'ERC721') {
       return {
         type: 'ERC721',
         contractAddress: item.contract_address,
         tokenId: item.token_id,
+      };
+    }
+
+    if (item.type === 'ERC1155') {
+      return {
+        type: 'ERC1155',
+        contractAddress: item.contract_address,
+        tokenId: item.token_id,
+        amount: item.amount,
       };
     }
 

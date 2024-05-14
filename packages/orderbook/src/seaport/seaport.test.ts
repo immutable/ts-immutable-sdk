@@ -400,6 +400,7 @@ describe('Seaport', () => {
         chain: { id: '1', name: 'imtbl-zkevm-local' },
         created_at: new Date().toISOString(),
         end_at: new Date().toISOString(),
+        fill_status: { numerator: '0', denominator: '0' },
         id: '1',
         order_hash: randomAddress(),
         protocol_data: {
@@ -466,6 +467,7 @@ describe('Seaport', () => {
                     parameters: anything(),
                     signature: immutableOrder.signature,
                   },
+                  unitsToFill: undefined,
                   extraData: fakeExtraData,
                   tips: [],
                 },
