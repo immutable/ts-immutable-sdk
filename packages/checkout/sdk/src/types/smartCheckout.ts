@@ -523,7 +523,7 @@ export type ERC1155Item = {
   /** The contract address of the approver. */
   spenderAddress: string;
   /** The amount of the ERC1155 token ID being spent. */
-  amount: string;
+  amount: BigNumber;
 };
 
 /**
