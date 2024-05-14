@@ -2261,6 +2261,31 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@biom3/react@npm:^0.23.3":
+  version: 0.23.3
+  resolution: "@biom3/react@npm:0.23.3"
+  dependencies:
+    "@biom3/design-tokens": ~0.3.7
+    buffer: ^6.0.3
+    csstype: ^3.1.2
+    localforage: ^1.10.0
+    lodash.debounce: ^4.0.8
+    lodash.get: ^4.4.2
+    lodash.isequal: ^4.5.0
+    lodash.throttle: ^4.1.1
+    react-is: ^18.2.0
+    react-keyed-flatten-children: ^3.0.0
+    ts-deepmerge: ^6.2.0
+  peerDependencies:
+    "@emotion/react": ^11.11.4
+    "@rive-app/react-canvas-lite": ^4.9.0
+    framer-motion: ^10.12.12
+    react: ^18.2.0
+    react-dom: ^18.2.0
+  checksum: 8fcba2edf8f9ca12233fe123fe02478bec48b485a640bbf4e8da210cdb06c1deffde5369390f09e42853e2645d6dd440c5278af627f228bc7c95eea173c6d70a
+  languageName: node
+  linkType: hard
+
 "@chevrotain/types@npm:^9.1.0":
   version: 9.1.0
   resolution: "@chevrotain/types@npm:9.1.0"
@@ -3371,7 +3396,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-sdk-sample-app@workspace:packages/checkout/sdk-sample-app"
   dependencies:
-    "@biom3/react": ^0.22.8
+    "@biom3/react": ^0.23.3
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
