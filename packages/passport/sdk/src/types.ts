@@ -69,6 +69,11 @@ export interface PassportOverrides {
   imxApiClients?: ImxApiClients; // needs to be optional because ImxApiClients is not exposed publicly
 }
 
+export interface PopupOverlayOptions {
+  disableGenericPopupOverlay?: boolean;
+  disableBlockedPopupOverlay?: boolean;
+}
+
 export interface PassportModuleConfiguration extends ModuleConfiguration<PassportOverrides>,
   OidcConfiguration {
   /**
@@ -76,6 +81,10 @@ export interface PassportModuleConfiguration extends ModuleConfiguration<Passpor
    * and not directly on the web.
    */
   crossSdkBridgeEnabled?: boolean;
+  /**
+   * Options for disabling the Passport popup overlays.
+   */
+  popupOverlayOptions?: PopupOverlayOptions;
 }
 
 type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };

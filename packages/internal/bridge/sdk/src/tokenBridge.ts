@@ -3,7 +3,6 @@
 /* eslint-disable class-methods-use-this */
 import axios, { AxiosResponse } from 'axios';
 import { ethers } from 'ethers';
-import { CHILD_ERC20 } from 'contracts/ABIs/ChildERC20';
 import {
   concat, defaultAbiCoder, hexlify, keccak256, zeroPad,
 } from 'ethers/lib/utils';
@@ -13,22 +12,20 @@ import {
   validateGetFee,
 } from 'lib/validation';
 import {
-  getAxelarEndpoint, getAxelarGateway, getChildAdaptor, getChildchain, getRootAdaptor, getRootIMX, getTenderlyEndpoint,
+  getAxelarEndpoint, getAxelarGateway, getChildAdaptor, getChildchain, getRootAdaptor, getTenderlyEndpoint,
+  isWrappedIMX,
 } from 'lib/utils';
 import { TenderlySimulation } from 'types/tenderly';
 import { calculateGasFee } from 'lib/gas';
+import { getWithdrawRootToken, genAxelarWithdrawPayload, genUniqueAxelarCommandId } from 'lib/axelarUtils';
 import {
   NATIVE,
   ETHEREUM_NATIVE_TOKEN_ADDRESS,
-  ETH_MAINNET_TO_ZKEVM_MAINNET,
-  ETH_SEPOLIA_TO_ZKEVM_TESTNET,
   ZKEVM_DEVNET_CHAIN_ID,
   ZKEVM_MAINNET_CHAIN_ID,
   ZKEVM_TESTNET_CHAIN_ID,
   axelarChains,
   bridgeMethods,
-  childWIMXs,
-  WITHDRAW_SIG,
   SLOT_PREFIX_CONTRACT_CALL_APPROVED,
   SLOT_POS_CONTRACT_CALL_APPROVED,
 } from './constants/bridges';
@@ -67,9 +64,10 @@ import {
   BridgeBundledTxRequest,
   BridgeBundledTxResponse,
   DynamicGasEstimatesResponse,
-  Address,
 } from './types';
-import { GMPStatus, GMPStatusResponse, GasPaidStatus } from './types/axelar';
+import {
+  GMPStatus, GMPStatusResponse, GasPaidStatus,
+} from './types/axelar';
 import { queryTransactionStatus } from './lib/gmpRecovery';
 
 /**
@@ -178,7 +176,7 @@ export class TokenBridge {
       if (req.sourceChainId === this.config.bridgeInstance.rootChainID) {
         approvalFee = calculateGasFee(feeData, BridgeMethodsGasLimit.APPROVE_TOKEN);
       } else if (req.sourceChainId === this.config.bridgeInstance.childChainID
-        && this.isWrappedIMX(req.token, this.config.bridgeInstance.childChainID)) {
+        && isWrappedIMX(req.token, this.config.bridgeInstance.childChainID)) {
         // On child chain, only WIMX requires approval.
         approvalFee = calculateGasFee(feeData, BridgeMethodsGasLimit.APPROVE_TOKEN);
       }
@@ -681,7 +679,7 @@ export class TokenBridge {
     const imtblFee: ethers.BigNumber = ethers.BigNumber.from(0);
 
     // Approval required only for WIMX tokens with insufficient allowance.
-    if (this.isWrappedIMX(token, this.config.bridgeInstance.childChainID) && allowance.lt(amount)) {
+    if (isWrappedIMX(token, this.config.bridgeInstance.childChainID) && allowance.lt(amount)) {
       contractToApprove = token;
       const erc20Contract: ethers.Contract = await withBridgeError<ethers.Contract>(
         async () => new ethers.Contract(token, ERC20, this.config.childProvider),
@@ -814,27 +812,14 @@ export class TokenBridge {
     token: FungibleToken,
     amount: ethers.BigNumber,
   ): Promise<number> {
-    let rootToken: string;
-    if (token.toUpperCase() === NATIVE
-      || this.isWrappedIMX(token, destinationChainId)) {
-      rootToken = getRootIMX(destinationChainId);
-    } else {
-      // Find root token
-      const erc20Contract: ethers.Contract = await withBridgeError<ethers.Contract>(
-        async () => new ethers.Contract(token, CHILD_ERC20, this.config.childProvider),
-        BridgeErrorType.PROVIDER_ERROR,
-      );
-      rootToken = await withBridgeError<Address>(() => erc20Contract.rootToken(), BridgeErrorType.PROVIDER_ERROR);
-    }
-    // Encode payload
-    const payload = defaultAbiCoder.encode(
-      ['bytes32', 'address', 'address', 'address', 'uint256'],
-      [WITHDRAW_SIG, rootToken, sender, recipient, amount],
+    const rootToken = await getWithdrawRootToken(token, destinationChainId, this.config.childProvider);
+    const payload = genAxelarWithdrawPayload(
+      rootToken,
+      sender,
+      recipient,
+      amount.toString(),
     );
-    // Generate unique command ID based on payload and current time.
-    const commandId = keccak256(
-      defaultAbiCoder.encode(['bytes', 'uint256'], [payload, new Date().getTime()]),
-    );
+    const commandId = genUniqueAxelarCommandId(payload);
     const sourceChain = getChildchain(destinationChainId);
     const sourceAddress = ethers.utils.getAddress(getChildAdaptor(destinationChainId)).toString();
     const destinationAddress = getRootAdaptor(destinationChainId);
@@ -947,7 +932,7 @@ export class TokenBridge {
       return ethers.BigNumber.from(0);
     }
     if (sourceChainId === this.config.bridgeInstance.childChainID
-      && !this.isWrappedIMX(token, sourceChainId)
+      && !isWrappedIMX(token, sourceChainId)
     ) {
       // Return immediately for non wrapped IMX on child chain.
       return ethers.BigNumber.from(0);
@@ -972,24 +957,6 @@ export class TokenBridge {
         sender,
         bridgeContract,
       ), BridgeErrorType.PROVIDER_ERROR);
-  }
-
-  private getWrappedIMX(source: string) {
-    let wIMX:string;
-    if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
-      || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
-      wIMX = childWIMXs.mainnet;
-    } else if (source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.rootChainID
-      || source === ETH_SEPOLIA_TO_ZKEVM_TESTNET.childChainID) {
-      wIMX = childWIMXs.testnet;
-    } else {
-      wIMX = childWIMXs.devnet;
-    }
-    return wIMX;
-  }
-
-  private isWrappedIMX(token: FungibleToken, source: string) {
-    return token.toUpperCase() === this.getWrappedIMX(source).toUpperCase();
   }
 
   /**

@@ -2,7 +2,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import { Checkout, TransactionRequirement } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import {
-  ClientConfigCurrency,
+  OrderQuoteCurrency,
   FundingBalance,
   FundingBalanceResult,
 } from '../types';
@@ -18,10 +18,10 @@ import {
 export type FundingBalanceParams = {
   provider: Web3Provider;
   checkout: Checkout;
-  currencies: ClientConfigCurrency[];
-  baseCurrency: ClientConfigCurrency;
+  currencies: OrderQuoteCurrency[];
+  baseCurrency: OrderQuoteCurrency;
   routingOptions: { bridge: boolean; onRamp: boolean; swap: boolean };
-  getAmountByCurrency: (currency: ClientConfigCurrency) => string;
+  getAmountByCurrency: (currency: OrderQuoteCurrency) => string;
   getIsGasless: () => boolean;
   onFundingBalance: (balances: FundingBalance[]) => void;
   onFundingRequirement: (

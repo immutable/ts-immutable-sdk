@@ -95,6 +95,13 @@
       },
       "disconnectButton": {
         "label": "断开钱包连接"
+      },
+      "walletAddress": {
+        "label": "钱包地址"
+      },
+      "transferAssetsL1Warning": {
+        "heading": "不要将资产发送到以太坊上的Passport",
+        "body": "Passport尚未存在于以太坊上，因此您的资金将在那里丢失。仅在Immutable zkEVM或Immutable X上转账。"
       }
     },
     "COIN_INFO": {

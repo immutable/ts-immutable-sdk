@@ -26,8 +26,8 @@ import {
 import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 import { useSignOrder } from '../hooks/useSignOrder';
 import {
-  ClientConfig,
-  ClientConfigCurrency,
+  OrderQuote,
+  OrderQuoteCurrency,
   ExecuteOrderResponse,
   ExecutedTransaction,
   SaleErrorTypes,
@@ -40,14 +40,13 @@ import {
 import { getTopUpViewData } from '../functions/smartCheckoutUtils';
 
 import { useSmartCheckout } from '../hooks/useSmartCheckout';
-import { useClientConfig, defaultClientConfig } from '../hooks/useClientConfig';
+import { useQuoteOrder, defaultOrderQuote } from '../hooks/useQuoteOrder';
 
 type SaleContextProps = {
   config: StrongCheckoutWidgetsConfig;
   environment: Environment;
   environmentId: string;
   items: SaleItem[];
-  amount: string;
   collectionName: string;
   provider: ConnectLoaderState['provider'];
   checkout: ConnectLoaderState['checkout'];
@@ -93,15 +92,14 @@ type SaleContextValues = SaleContextProps & {
   disabledPaymentTypes: SalePaymentTypes[];
   invalidParameters: boolean;
   fromTokenAddress: string;
-  clientConfig: ClientConfig;
+  orderQuote: OrderQuote;
   signTokenIds: string[];
-  selectedCurrency: ClientConfigCurrency | undefined;
+  selectedCurrency: OrderQuoteCurrency | undefined;
 };
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const SaleContext = createContext<SaleContextValues>({
   items: [],
-  amount: '',
   collectionName: '',
   provider: undefined,
   checkout: undefined,
@@ -131,7 +129,7 @@ const SaleContext = createContext<SaleContextValues>({
   disabledPaymentTypes: [],
   invalidParameters: false,
   fromTokenAddress: '',
-  clientConfig: defaultClientConfig,
+  orderQuote: defaultOrderQuote,
   signTokenIds: [],
   excludePaymentTypes: [],
   multicurrency: false,
@@ -155,7 +153,6 @@ export function SaleContextProvider(props: {
       environment,
       environmentId,
       items,
-      amount,
       provider,
       checkout,
       passport,
@@ -202,13 +199,12 @@ export function SaleContextProvider(props: {
 
   const [invalidParameters, setInvalidParameters] = useState<boolean>(false);
 
-  const { selectedCurrency, clientConfig, clientConfigError } = useClientConfig(
-    {
-      amount,
-      environmentId,
-      environment: config.environment,
-    },
-  );
+  const { selectedCurrency, orderQuote, orderQuoteError } = useQuoteOrder({
+    items,
+    provider,
+    environmentId,
+    environment: config.environment,
+  });
 
   const fromTokenAddress = selectedCurrency?.address || '';
 
@@ -332,15 +328,14 @@ export function SaleContextProvider(props: {
   }, [signError]);
 
   useEffect(() => {
-    if (!clientConfigError) return;
-    goToErrorView(clientConfigError.type, clientConfigError.data);
-  }, [clientConfigError]);
+    if (!orderQuoteError) return;
+    goToErrorView(orderQuoteError.type, orderQuoteError.data);
+  }, [orderQuoteError]);
 
   const { smartCheckout, smartCheckoutResult, smartCheckoutError } = useSmartCheckout({
     provider,
     checkout,
     items,
-    amount,
     tokenAddress: fromTokenAddress,
   });
 
@@ -382,12 +377,11 @@ export function SaleContextProvider(props: {
 
   useEffect(() => {
     const invalidItems = !items || items.length === 0;
-    const invalidAmount = !amount || amount === '0';
 
-    if (invalidItems || invalidAmount || !collectionName || !environmentId) {
+    if (invalidItems || !collectionName || !environmentId) {
       setInvalidParameters(true);
     }
-  }, [items, amount, collectionName, environmentId]);
+  }, [items, collectionName, environmentId]);
 
   useEffect(() => {
     if (excludePaymentTypes?.length <= 0) return;
@@ -398,7 +392,6 @@ export function SaleContextProvider(props: {
     () => ({
       config,
       items,
-      amount,
       fromTokenAddress,
       sign,
       signResponse,
@@ -426,7 +419,7 @@ export function SaleContextProvider(props: {
       fundingRoutes,
       disabledPaymentTypes,
       invalidParameters,
-      clientConfig,
+      orderQuote,
       signTokenIds: tokenIds,
       excludePaymentTypes,
       multicurrency,
@@ -438,7 +431,6 @@ export function SaleContextProvider(props: {
       environment,
       environmentId,
       items,
-      amount,
       fromTokenAddress,
       collectionName,
       provider,
@@ -461,7 +453,7 @@ export function SaleContextProvider(props: {
       fundingRoutes,
       disabledPaymentTypes,
       invalidParameters,
-      clientConfig,
+      orderQuote,
       tokenIds,
       excludePaymentTypes,
       multicurrency,
