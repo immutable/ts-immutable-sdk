@@ -656,7 +656,7 @@ export class TokenBridge {
     const [allowance, feeData, rootGas] = await Promise.all([
       this.getAllowance(this.config.bridgeInstance.childChainID, token, sender),
       this.config.childProvider.getFeeData(),
-      await this.getDynamicWithdrawGas(
+      await this.getDynamicWithdrawGasRootChain(
         this.config.bridgeInstance.rootChainID,
         sender,
         recipient,
@@ -800,7 +800,10 @@ export class TokenBridge {
     return tenderlyGasEstimatesRes;
   }
 
-  private async getDynamicWithdrawGas(
+  /**
+   * Use Tenderly simulations to estimate the gas cost of the destination (root) chain transaction of a withdraw
+   */
+  private async getDynamicWithdrawGasRootChain(
     destinationChainId: string,
     sender: string,
     recipient: string,
@@ -819,6 +822,7 @@ export class TokenBridge {
     const sourceAddress = ethers.utils.getAddress(getChildAdaptor(destinationChainId)).toString();
     const destinationAddress = getRootAdaptor(destinationChainId);
     const payloadHash = keccak256(payload);
+
     // Calculate slot key for given command ID.
     const command = defaultAbiCoder.encode(
       ['bytes32', 'bytes32', 'string', 'string', 'address', 'bytes32'],
