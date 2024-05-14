@@ -15,7 +15,6 @@ type UseSmartCheckoutInput = {
   checkout: Checkout | undefined;
   provider: Web3Provider | undefined;
   items: SaleItem[];
-  amount: string;
   tokenAddress: string;
 };
 
@@ -23,9 +22,9 @@ export const useSmartCheckout = ({
   checkout,
   provider,
   items,
-  amount,
   tokenAddress,
 }: UseSmartCheckoutInput) => {
+  const amount = '0';
   const [smartCheckoutResult, setSmartCheckoutResult] = useState<
   SmartCheckoutResult | undefined
   >(undefined);

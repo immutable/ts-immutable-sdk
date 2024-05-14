@@ -14,7 +14,7 @@ import { BigNumber } from 'ethers';
 import { getTokenImageByAddress, isNativeToken } from 'lib/utils';
 import { Environment } from '@imtbl/config';
 import {
-  ClientConfigCurrency,
+  OrderQuoteCurrency,
   FundingBalance,
   FundingBalanceType,
   SufficientFundingStep,
@@ -175,7 +175,7 @@ export const getFnToSortFundingBalancesByPriority = (baseSymbol?: string) => (a:
 };
 
 export const getFnToPushAndSortFundingBalances = (
-  baseCurrency: ClientConfigCurrency,
+  baseCurrency: OrderQuoteCurrency,
 ): ((balances: FundingBalance[]) => FundingBalance[]) => {
   let currentBalances: FundingBalance[] = [];
   const sortByBaseAndPriority = getFnToSortFundingBalancesByPriority(
