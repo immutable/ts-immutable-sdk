@@ -3,7 +3,7 @@ import {
   UnsignedExchangeTransferRequest,
 } from '@imtbl/x-client';
 import { convertToSignableToken } from '@imtbl/toolkit';
-import { RegisteredUserAndSigners } from 'types';
+import { RegisteredUserAndSigners } from '../../types';
 import { PassportErrorType, withPassportError } from '../../errors/passportError';
 
 type TransfersParams = {

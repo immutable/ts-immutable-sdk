@@ -1,5 +1,5 @@
 import { imx } from '@imtbl/generated-clients';
-import { RegisteredUserAndSigners } from 'types';
+import { RegisteredUserAndSigners } from '../../types';
 import { PassportErrorType, withPassportError } from '../../errors/passportError';
 import GuardianClient from '../../guardian';
 
