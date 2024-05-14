@@ -30,8 +30,8 @@ export type SubmittedMintRequest = {
 export interface MintingPersistence {
   recordMint: (request: CreateMintRequest) => Promise<void>;
   getNextBatchForSubmission: (limit: number) => Promise<MintRequest[]>;
-  updateMintingStatusToSubmitted: (id: string[]) => Promise<void>;
-  updateMintingStatusToSubmissionFailed: (id: string[]) => Promise<void>;
+  updateMintingStatusToSubmitted: (ids: string[]) => Promise<void>;
+  updateMintingStatusToSubmissionFailed: (ids: string[]) => Promise<void>;
   syncMintingStatus: (
     submittedMintRequest: SubmittedMintRequest
   ) => Promise<void>;
@@ -44,5 +44,5 @@ export interface MintingPersistence {
   getMintingRequest: (
     contractAddress: string,
     referenceId: string
-  ) => Promise<MintRequest>;
+  ) => Promise<MintRequest | null>;
 }

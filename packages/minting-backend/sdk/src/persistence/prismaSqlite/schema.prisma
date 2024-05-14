@@ -31,8 +31,3 @@ model ImAssets {
   @@map("im_assets")
   @@unique([assetId, contractAddress], name: "im_assets_uindex")
 }
-
-model Allowlist {
-  address   String  @id
-  phase   Int
-}

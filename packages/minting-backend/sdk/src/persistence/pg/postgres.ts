@@ -71,7 +71,7 @@ export const mintingPersistence: MintingPersistence = {
   },
   resetMintingStatus: async (ids: string[]) => {
     await client.query(`
-            UPDATE im_assets SET minting_status = null WHERE id = ANY($1) and contract_address = $2;
+            UPDATE im_assets SET minting_status = null WHERE id = ANY($1);
             `, [ids]);
   },
   markForRetry: async (ids: string[]) => {
@@ -89,6 +89,6 @@ export const mintingPersistence: MintingPersistence = {
     const res = await client.query(`
       SELECT * FROM im_assets WHERE contract_address = $1 and asset_id = $2;
     `, [contractAddress, referenceId]);
-    return res.rows[0];
+    return res.rows[0] || null;
   }
 };

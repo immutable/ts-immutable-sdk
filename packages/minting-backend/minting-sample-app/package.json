@@ -13,7 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "@fastify/cors": "^9.0.1",
-    "@imtbl/sdk": "^1.34.0-alpha",
+    "@imtbl/sdk": "file:.yalc/@imtbl/sdk",
     "@prisma/client": "^5.12.1",
     "@types/jsonwebtoken": "^9.0.6",
     "aws-sdk": "^2.1603.0",
@@ -32,6 +32,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.12.7",
+    "@types/pg": "^8.11.6",
     "@types/sns-validator": "^0.3.3",
     "@types/uuid": "^9.0.8",
     "artillery": "^2.0.11",

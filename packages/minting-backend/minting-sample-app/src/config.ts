@@ -14,9 +14,9 @@ const serverConfig: ServerConfig = {
     HUB_API_KEY: process.env.SANDBOX_HUB_IMMUTABLE_API_KEY!,
     RPS_API_KEY: process.env.SANDBOX_RPS_IMMUTABLE_API_KEY!,
     HOST_IP: "localhost",
-    PORT: 3001,
+    PORT: 3000,
     chainName: "imtbl-zkevm-testnet",
-    collectionAddress: "0x76bedf3f6d486922d77db2e1a43cea4bf9c22ef7",
+    collectionAddress: "0x9199b28e675d528cb016b8118c7ce6a45fb30502",
     mintRequestURL: (chainName: string, collectionAddress: string, referenceId: string) => `https://api.sandbox.immutable.com/v1/chains/${chainName}/collections/${collectionAddress}/nfts/mint-requests/${referenceId}`,
     enableWebhookVerification: true, //Should the server verify the webhook SNS messages?
     allowedTopicArn: "arn:aws:sns:us-east-2:783421985614:*", //Used for webhook SNS verification

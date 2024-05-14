@@ -175,7 +175,7 @@ fastify.post("/mint/passport", async (request: FastifyRequest, reply: FastifyRep
   logger.info(`Attempting to mint NFT wallet address ${walletAddress} with UUID ${assetId}`);
   try {
     // Record the minting operation in the database
-    await mintingBackend.recordMint(mintingBackend.mintingPersistencePg, {
+    await mintingBackend.recordMint(mintingBackend.mintingPersistencePrismaSqlite, {
       asset_id: assetId,
       contract_address: serverConfig[environment].collectionAddress,
       owner_address: walletAddress,
@@ -282,7 +282,7 @@ fastify.post("/mint/eoa", async (request: eoaMintRequest, reply: FastifyReply) =
   try {
     // Record the minting operation in the database
     await mintingBackend.recordMint(
-      mintingBackend.mintingPersistencePg,
+      mintingBackend.mintingPersistencePrismaSqlite,
       {
         asset_id: assetId,
         contract_address: serverConfig[environment].collectionAddress,
@@ -340,11 +340,11 @@ fastify.get("/get-mint-request/:referenceId", async (request: FastifyRequest<{ P
 });
 
 if (serverConfig[environment].enableWebhookVerification) {
-  fastify.post("/webhook", async (request: FastifyRequest<any>, reply: any) => {
+  fastify.post("/api/process_webhook_event", async (request: FastifyRequest<any>, reply: any) => {
     console.log(request);
     await webhook.init(request.body as any, environment, {
       zkevmMintRequestUpdated: async (event) => {
-        mintingBackend.processMint(mintingBackend.mintingPersistencePg, event);
+        mintingBackend.processMint(mintingBackend.mintingPersistencePrismaSqlite, event);
       }
     });
 
@@ -406,7 +406,7 @@ const start = async () => {
     const blockchainDataClient = new blockchainData.BlockchainData(config);
 
     mintingBackend.submitMintingRequests(
-      mintingBackend.mintingPersistencePg,
+      mintingBackend.mintingPersistencePrismaSqlite,
       blockchainDataClient,
       {},
       console

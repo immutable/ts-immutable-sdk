@@ -6,7 +6,8 @@
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
     "@imtbl/blockchain-data": "0.0.0",
-    "@imtbl/config": "0.0.0"
+    "@imtbl/config": "0.0.0",
+    "@prisma/client": "5.13.0"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.0.0",
@@ -26,7 +27,8 @@
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "optionalDependencies": {
-    "pg": "^8.11.5"
+    "pg": "^8.11.5",
+    "prisma": "^5.13.0"
   },
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",

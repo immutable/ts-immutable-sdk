@@ -2,19 +2,20 @@ import { PrismaClient } from "@prisma/client";
 import logger from "../logger";
 import axios from "axios";
 import serverConfig, { environment } from "../config";
+import { client } from "../dbClient";
 
 export async function updateMintStatus(prisma: PrismaClient): Promise<void> {
   try {
-    const pendingMints = await prisma.mints.findMany({
+    const pendingMints = await prisma.imAssets.findMany({
       where: {
-        status: {
+        mintingStatus: {
           not: "succeeded",
         },
       },
     });
     for (const mint of pendingMints) {
       try {
-        const uuid = mint.uuid;
+        const uuid = mint.assetId;
         const response = await axios.get(serverConfig[environment].mintRequestURL(serverConfig[environment].chainName, serverConfig[environment].collectionAddress, uuid), {
           headers: {
             "x-immutable-api-key": serverConfig[environment].HUB_API_KEY,
@@ -26,30 +27,30 @@ export async function updateMintStatus(prisma: PrismaClient): Promise<void> {
           if (response.data.result[0].status === "succeeded") {
             await prisma.$transaction(async (prisma) => {
               // Update the status of minted tokens
-              await prisma.mints.updateMany({
-                where: { uuid },
-                data: { status: "succeeded" },
+              await prisma.imAssets.updateMany({
+                where: { assetId: uuid },
+                data: { assetId: "succeeded" },
               });
 
               // Log the successful mint
               logger.info(`Mint with UUID ${uuid} succeeded. Updating status.`);
             });
           } else if (response.data.result[0].status === "failed") {
-            await prisma.mints.updateMany({
-              where: { uuid },
-              data: { status: "failed" },
+            await prisma.imAssets.updateMany({
+              where: { assetId: uuid },
+              data: { mintingStatus: "failed" },
             });
             logger.info(`Mint with UUID ${uuid} failed. Updating status.`);
           }
         } else {
-          await prisma.mints.updateMany({
-            where: { uuid },
-            data: { status: "500" },
+          await prisma.imAssets.updateMany({
+            where: { assetId: uuid },
+            data: { mintingStatus: "not_found_on_remote" },
           });
           logger.error(`No mint found with UUID ${uuid}.`);
         }
       } catch (error) {
-        logger.error(`Error processing mint with UUID ${mint.uuid}.`);
+        logger.error(`Error processing mint with UUID ${mint.assetId}.`);
         console.log(error);
       }
     }
@@ -59,6 +60,5 @@ export async function updateMintStatus(prisma: PrismaClient): Promise<void> {
 }
 
 (async () => {
-  const prisma = new PrismaClient();
-  await updateMintStatus(prisma);
+  await updateMintStatus(client);
 })();
