@@ -31,7 +31,7 @@ export function WithCard(props: WithCardProps) {
     signResponse,
     goToErrorView,
     environment,
-    clientConfig,
+    orderQuote,
   } = useSaleContext();
   const executeTxn = signResponse?.transactions.find((txn) => txn.methodCall.startsWith('execute'));
 
@@ -77,7 +77,7 @@ export function WithCard(props: WithCardProps) {
       onOrderFailed={onOrderFailed}
       onFailedToLoad={onFailedToLoad}
       environment={environment}
-      contractId={clientConfig.contractId}
+      contractId={orderQuote.config.contractId}
     />
   );
 }
