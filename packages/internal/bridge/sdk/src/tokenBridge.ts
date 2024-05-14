@@ -181,9 +181,9 @@ export class TokenBridge {
 
     // Get approval fee
     if (!TokenBridge.isNativeTokenBridgeFeeRequest(req)) {
-      if (!('token' in req)) {
-        throw new Error('womp womp. shouldn\'t need to do this check');
-      }
+      // if (!('token' in req)) {
+      //   throw new Error('womp womp. shouldn\'t need to do this check');
+      // }
       if (isDeposit(req.sourceChainId, this.config.bridgeInstance)) {
         approvalFee = calculateGasFee(feeData, BridgeMethodsGasLimit.APPROVE_TOKEN);
         // de morgans: ~(~p v q) === p ^ ~q
