@@ -83,7 +83,21 @@ describe('confirmation', () => {
       );
 
       expect(res.confirmed).toEqual(false);
-      expect(mockNewWindow.location.href).toEqual('https://passport.sandbox.immutable.com/transaction-confirmation/transaction?transactionId=transactionId123&etherAddress=0x1234&chainType=starkex');
+      expect(postMessageMock).toHaveBeenCalledWith(
+        {
+          eventType: 'imx_passport_confirmation',
+          messageType: 'confirmation_data_ready',
+          messageData: {
+            path: 'transaction',
+            query: {
+              chainType: 'starkex',
+              etherAddress: mockEtherAddress,
+              transactionId,
+            },
+          },
+        },
+        'https://passport.sandbox.immutable.com',
+      );
     });
 
     it('should send `confirmation_start` postMessage', async () => {
@@ -107,7 +121,22 @@ describe('confirmation', () => {
         TransactionApprovalRequestChainTypeEnum.Starkex,
       );
 
-      expect(postMessageMock).toHaveBeenCalledTimes(1);
+      expect(postMessageMock).toHaveBeenCalledTimes(2);
+      expect(postMessageMock).toHaveBeenCalledWith(
+        {
+          eventType: 'imx_passport_confirmation',
+          messageType: 'confirmation_data_ready',
+          messageData: {
+            path: 'transaction',
+            query: {
+              chainType: 'starkex',
+              etherAddress: mockEtherAddress,
+              transactionId,
+            },
+          },
+        },
+        'https://passport.sandbox.immutable.com',
+      );
       expect(postMessageMock).toHaveBeenCalledWith(
         {
           eventType: 'imx_passport_confirmation',
@@ -130,10 +159,12 @@ describe('confirmation', () => {
         {
           eventType: 'imx_passport_confirmation',
           messageType: 'confirmation_data_ready',
-          path: 'zkevm/message',
-          query: {
-            etherAddress,
-            messageID: messageId,
+          messageData: {
+            path: 'zkevm/message',
+            query: {
+              etherAddress,
+              messageID: messageId,
+            },
           },
         },
         'https://passport.sandbox.immutable.com',
