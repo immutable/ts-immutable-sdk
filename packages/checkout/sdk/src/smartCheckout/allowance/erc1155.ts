@@ -7,7 +7,7 @@ import { ERC1155ABI } from '../../env';
 
 // Returns true if the spender address is approved for all ERC1155s of this collection
 // Note: ERC1155 only support approvedForAll
-export const getERC1155ApprovedForAll = async (
+export const isERC1155ApprovedForAll = async (
   provider: Web3Provider,
   ownerAddress: string,
   contractAddress: string,
@@ -35,7 +35,7 @@ export const getERC1155ApprovedForAll = async (
 };
 
 // Returns a populated transaction to setApprovalForAll for the spender against the ERC1155 collection.
-export const getERC1155ApproveTransaction = async (
+export const getSetERC1155ApprovalForAllTransaction = async (
   provider: Web3Provider,
   ownerAddress: string,
   contractAddress: string,
@@ -78,7 +78,7 @@ export const hasERC1155Allowances = async (
 
   const allowances = await Promise.all(
     erc1155ItemRequirements.map(async (req) => {
-      const collectionIsApproved = await getERC1155ApprovedForAll(
+      const collectionIsApproved = await isERC1155ApprovedForAll(
         provider,
         ownerAddress,
         req.contractAddress,
@@ -92,7 +92,7 @@ export const hasERC1155Allowances = async (
         } as SufficientAllowance;
       }
 
-      const transaction = await getERC1155ApproveTransaction(
+      const transaction = await getSetERC1155ApprovalForAllTransaction(
         provider,
         ownerAddress,
         req.contractAddress,
