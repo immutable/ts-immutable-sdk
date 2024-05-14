@@ -57,7 +57,7 @@ export const getERC1155Requirement = (
   id,
   contractAddress,
   spenderAddress,
-  amount,
+  amount: BigNumber.from(amount),
 });
 
 export const getBuyToken = (
