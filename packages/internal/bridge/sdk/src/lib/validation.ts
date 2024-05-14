@@ -3,6 +3,7 @@ import {
   BridgeBundledTxRequest, BridgeFeeActions, BridgeFeeRequest, FungibleToken,
 } from 'types';
 import { NATIVE } from 'constants/bridges';
+import { createContract } from 'contracts/createContract';
 import { BridgeConfiguration } from '../config';
 import { BridgeError, BridgeErrorType, withBridgeError } from '../errors';
 import {
@@ -67,7 +68,7 @@ export async function checkReceiver(
   if (bytecode.length <= 2) return;
 
   const ABI = ['function receive()'];
-  const contract = new ethers.Contract(address, ABI, provider);
+  const contract = await createContract(address, ABI, provider);
 
   try {
     // try to estimate gas for the receive function, if it works it exists
