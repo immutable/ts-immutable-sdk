@@ -39,7 +39,7 @@ describe('passportImxProvider auth tests', () => {
 
   const mockGuardianClient = {
     withDefaultConfirmationScreenTask: (task: () => any) => task,
-    withConfirmationScreenTask: (task: () => any) => (() => task()),
+    withConfirmationScreenTask: () => (task: () => any) => task,
   };
 
   const passportImxProvider = new PassportImxProvider({
@@ -77,7 +77,7 @@ describe('passportImxProvider auth tests', () => {
     });
   });
 
-  describe.only.each([
+  describe.each([
     ['transfer' as const, {} as UnsignedTransferRequest],
     ['createOrder' as const, {} as UnsignedOrderRequest],
     ['cancelOrder' as const, {} as imx.GetSignableCancelOrderRequest],
