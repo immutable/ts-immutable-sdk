@@ -2,13 +2,16 @@ import { utils } from 'ethers';
 import { Fee, FundingStepType, TokenInfo } from '@imtbl/checkout-sdk';
 import {
   calculateCryptoToFiat,
-  getShortWalletAddress,
+  abbreviateWalletAddress,
   tokenValueFormat,
 } from 'lib/utils';
-import { FeesBreakdownItem } from 'components/FeesBreakdown/FeesBreakdown';
+import { FormattedFee } from 'widgets/swap/functions/swapFees';
 import { FundingBalance } from '../types';
 
-const getTotalFeesBySymbol = (fees: Fee[], tokenInfo?: TokenInfo): FeesBySymbol => fees
+const getTotalFeesBySymbol = (
+  fees: Fee[],
+  tokenInfo?: TokenInfo,
+): FeesBySymbol => fees
   .filter((fee) => fee.amount.gt(0) && fee.token)
   .reduce((acc, fee) => {
     if (!fee.token) return acc;
@@ -19,7 +22,8 @@ const getTotalFeesBySymbol = (fees: Fee[], tokenInfo?: TokenInfo): FeesBySymbol 
       symbol: fee.token.symbol || tokenInfo?.symbol || '',
     };
 
-    const key = token.symbol || getShortWalletAddress(token.address!).toLowerCase();
+    const address = abbreviateWalletAddress(token.address!, '...').toLowerCase();
+    const key = token.symbol || address;
     if (!key) return acc;
 
     if (acc[key]) {
@@ -69,8 +73,8 @@ export const getFundingBalanceTotalFees = (
 export const getFundingBalanceFeeBreakDown = (
   balance: FundingBalance,
   conversions: Map<string, number>,
-): FeesBreakdownItem[] => {
-  const feesBreakdown: FeesBreakdownItem[] = [];
+): FormattedFee[] => {
+  const feesBreakdown: FormattedFee[] = [];
 
   if (balance.type !== FundingStepType.SWAP) {
     return [];
@@ -94,6 +98,7 @@ export const getFundingBalanceFeeBreakDown = (
       )}`,
       amount: `${tokenValueFormat(formattedApprovalGas)}`,
       prefix: '~ ',
+      token: fees.approvalGasFee.token!,
     });
   }
 
@@ -113,6 +118,7 @@ export const getFundingBalanceFeeBreakDown = (
       )}`,
       amount: `${tokenValueFormat(formattedSwapGas)}`,
       prefix: '~ ',
+      token: fees.swapGasFee.token!,
     });
   }
 
@@ -132,7 +138,7 @@ export const getFundingBalanceFeeBreakDown = (
         )}`,
         amount: `${tokenValueFormat(swapFee.formattedAmount)}`,
         prefix: '~ ',
-        token: swapFee.token,
+        token: swapFee.token!,
       });
     });
   }

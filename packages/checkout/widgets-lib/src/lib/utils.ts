@@ -176,8 +176,10 @@ export function getDefaultTokenImage(
     : getRemoteImage(environment, '/tokens/defaultondark.svg');
 }
 
-export function getShortWalletAddress(address: string, separator = '...', firstChars = 5, lastChars = 4) {
-  if (!address) return '';
-
-  return `${address.slice(0, firstChars)}${separator}${address.slice(-lastChars)}`;
+export function abbreviateWalletAddress(address: string, separator = '.....', firstChars = 5, lastChars = 4): string {
+  // first 5 characters, ellipses, and the last 4 characters
+  // e.g. 0x1234567890abcdef => 0x123.....cdef
+  const firstPart = address.slice(0, firstChars);
+  const lastPart = address.slice(-lastChars);
+  return `${firstPart}${separator}${lastPart}`;
 }

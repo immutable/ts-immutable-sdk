@@ -6,7 +6,8 @@ import { useTranslation } from 'react-i18next';
 import {
   FundingStepType,
   SaleItem,
-  SalePaymentTypes, TransactionRequirement,
+  SalePaymentTypes,
+  TransactionRequirement,
 } from '@imtbl/checkout-sdk';
 import {
   OrderSummarySubViews,
@@ -126,8 +127,7 @@ export function OrderReview({
   }, [fundingBalance, conversions]);
 
   const multiple = items.length > 1;
-  const withFees = !loadingBalances
-    && fundingBalance.type === FundingStepType.SWAP;
+  const withFees = !loadingBalances && fundingBalance.type === FundingStepType.SWAP;
 
   return (
     <SimpleLayout

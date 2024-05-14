@@ -43,10 +43,10 @@ export interface SeaportCreateListingMetadata {
     'buy': SeaportCreateListingMetadataBuy;
     /**
      * 
-     * @type {Array<SeaportERC721Item>}
+     * @type {SeaportERC721Item}
      * @memberof SeaportCreateListingMetadata
      */
-    'sell': Array<SeaportERC721Item>;
+    'sell': SeaportERC721Item;
     /**
      * 
      * @type {Array<SeaportFee>}

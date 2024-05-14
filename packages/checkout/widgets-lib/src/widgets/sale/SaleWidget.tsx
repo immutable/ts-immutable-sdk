@@ -48,6 +48,7 @@ Omit<SaleWidgetParams, 'walletProviderName'>
 type WidgetParams = RequiredWidgetParams &
 OptionalWidgetParams & {
   multicurrency: boolean;
+  waitFulfillmentSettlements: boolean;
 };
 export interface SaleWidgetProps extends WidgetParams {
   config: StrongCheckoutWidgetsConfig;
@@ -62,6 +63,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
     collectionName,
     excludePaymentTypes,
     multicurrency = false,
+    waitFulfillmentSettlements = true,
   } = props;
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
@@ -126,6 +128,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
           collectionName,
           excludePaymentTypes,
           multicurrency,
+          waitFulfillmentSettlements,
         }}
       >
         <CryptoFiatProvider environment={config.environment}>

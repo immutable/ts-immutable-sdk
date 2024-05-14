@@ -81,7 +81,9 @@ export class Sale extends Base<WidgetType.SALE> {
       validatedParams.collectionName = '';
     }
 
-    if (params.excludePaymentTypes !== undefined && !Array.isArray(params.excludePaymentTypes)) {
+    if (
+      params.excludePaymentTypes !== undefined && !Array.isArray(params.excludePaymentTypes)
+    ) {
       // eslint-disable-next-line no-console
       console.warn('[IMTBL]: invalid "excludePaymentTypes" widget input');
       validatedParams.excludePaymentTypes = [];
@@ -115,7 +117,11 @@ export class Sale extends Base<WidgetType.SALE> {
                 sendSaleWidgetCloseEvent(window);
               }}
             >
-              <Suspense fallback={<LoadingView loadingText={t('views.LOADING_VIEW.text')} />}>
+              <Suspense
+                fallback={
+                  <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
+                }
+              >
                 <SaleWidget
                   config={config}
                   items={this.parameters.items!}
@@ -124,6 +130,7 @@ export class Sale extends Base<WidgetType.SALE> {
                   excludePaymentTypes={this.parameters.excludePaymentTypes!}
                   language="en"
                   multicurrency={!!this.properties?.config?.multicurrency}
+                  waitFulfillmentSettlements={this.properties?.config?.waitFulfillmentSettlements ?? true}
                 />
               </Suspense>
             </ConnectLoader>

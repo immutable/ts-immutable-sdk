@@ -43,7 +43,7 @@ export function OrderItems({
           item={item}
           balance={balance}
           conversions={conversions}
-          size={items.length > 1 ? 'small' : 'medium'}
+          size={singleItem ? 'medium' : 'small'}
           pricing={getPricingBySymbol(
             balance.fundingItem.token.symbol,
             pricing?.[item.productId]?.pricing,

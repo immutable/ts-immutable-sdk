@@ -22,7 +22,6 @@ export const useSmartCheckout = ({
   checkout,
   provider,
   items,
-  
   tokenAddress,
 }: UseSmartCheckoutInput) => {
   const amount = '0';

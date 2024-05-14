@@ -5,6 +5,7 @@ import { ViewContextTestComponent } from 'context/view-context/test-components/V
 import { cySmartGet } from '../../lib/testUtils';
 import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
 import { FeesBreakdown } from './FeesBreakdown';
+import { FormattedFee } from '../../widgets/swap/functions/swapFees';
 
 describe('FeesBreakdown', () => {
   beforeEach(() => {
@@ -29,7 +30,7 @@ describe('FeesBreakdown', () => {
     cySmartGet('fees-breakdown-content').should('be.visible');
     cySmartGet('fee-item-total-fees').should('be.visible');
     cySmartGet('total-fees__price').should('have.text', 'IMX 1');
-    cySmartGet('total-fees__fiatAmount').should('have.text', '~ USD $0.70');
+    cySmartGet('total-fees__fiatAmount').should('have.text', '≈ USD $0.70');
   });
 
   it('should not include totals if only fees are provided', () => {
@@ -38,12 +39,12 @@ describe('FeesBreakdown', () => {
         label: 'Gas fee',
         fiatAmount: 'Approx USD $1234.0',
         amount: '0.12345',
-      },
+      } as FormattedFee,
       {
         label: 'Maker fee',
         fiatAmount: 'Approx USD $5544.0',
         amount: '1234.444',
-      },
+      } as FormattedFee,
     ];
     mount(
       <ViewContextTestComponent>
@@ -76,12 +77,12 @@ describe('FeesBreakdown', () => {
         label: 'Gas fee',
         fiatAmount: 'Approx USD $1234.0',
         amount: '0.12345',
-      },
+      } as FormattedFee,
       {
         label: 'Maker fee',
         fiatAmount: 'Approx USD $5544.0',
         amount: '1234.444',
-      },
+      } as FormattedFee,
     ];
     mount(
       <ViewContextTestComponent>

@@ -152,7 +152,7 @@ const toSignResponse = (
 
 export const useSignOrder = (input: SignOrderInput) => {
   const {
-    provider, items, environment, environmentId,
+    provider, items, environment, environmentId, waitFulfillmentSettlements,
   } = input;
   const [signError, setSignError] = useState<SignOrderError | undefined>(
     undefined,
@@ -186,7 +186,6 @@ export const useSignOrder = (input: SignOrderInput) => {
       data: string,
       gasLimit: number,
       method: string,
-      waitForTrnsactionSettlement: boolean,
     ): Promise<[hash: string | undefined, error: any]> => {
       let transactionHash: string | undefined;
 
@@ -202,7 +201,7 @@ export const useSignOrder = (input: SignOrderInput) => {
 
         setExecuteTransactions({ method, hash: txnResponse?.hash });
 
-        if (waitForTrnsactionSettlement) {
+        if (waitFulfillmentSettlements) {
           await txnResponse?.wait();
         }
 
@@ -326,7 +325,6 @@ export const useSignOrder = (input: SignOrderInput) => {
 
   const execute = async (
     signData: SignResponse | undefined,
-    waitForTrnsactionSettlement: boolean,
     onTxnSuccess: (txn: ExecutedTransaction) => void,
     onTxnError: (error: any, txns: ExecutedTransaction[]) => void,
   ): Promise<ExecutedTransaction[]> => {
@@ -360,7 +358,6 @@ export const useSignOrder = (input: SignOrderInput) => {
         data,
         gasEstimate,
         method,
-        waitForTrnsactionSettlement,
       );
 
       if (txnError || !hash) {

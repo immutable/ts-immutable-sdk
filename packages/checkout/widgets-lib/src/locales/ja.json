@@ -99,6 +99,13 @@
       },
       "disconnectButton": {
         "label": "ウォレットを切断"
+      },
+      "walletAddress": {
+        "label": "ウォレットアドレス"
+      },
+      "transferAssetsL1Warning": {
+        "heading": "Ethereumのパスポートに資産を送らないでください",
+        "body": "パスポートはまだEthereumに存在していないため、そこに資金を送ると失われます。Immutable zkEVMまたはImmutable Xでのみ転送してください。"
       }
     },
     "COIN_INFO": {
@@ -458,7 +465,7 @@
       },
       "fees": {
         "title": "ガス手数料",
-        "fiatPricePrefix": "~ USD $"
+        "fiatPricePrefix": "≈ USD $"
       },
       "content": {
         "title": "いくら移動しますか？",
@@ -494,7 +501,7 @@
       "submitButton": {
         "buttonText": "移動を確認"
       },
-      "fiatPricePrefix": "~ USD $"
+      "fiatPricePrefix": "≈ USD $"
     },
     "BRIDGE_FAILURE": {
       "bridgeFailureText": {
@@ -621,8 +628,21 @@
       "heading": "手数料の内訳",
       "total": "総手数料",
       "fees": {
-        "gas": {
+        "fiatPricePrefix": "USD $",
+        "gasFeeMove": {
           "label": "ガス手数料"
+        },
+        "approvalFee": {
+          "label": "承認手数料"
+        },
+        "swapGasFee": {
+          "label": "ガス手数料"
+        },
+        "swapSecondaryFee": {
+          "label": "{{amount}} スワップ手数料（見積もりに含まれる）"
+        },
+        "serviceFee": {
+          "label": "サービス手数料"
         }
       }
     },

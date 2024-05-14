@@ -9,14 +9,15 @@ import { TokenInfo } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { formatZeroAmount, tokenValueFormat } from '../../lib/utils';
-import { FeesBreakdown, FeesBreakdownItem } from '../FeesBreakdown/FeesBreakdown';
+import { FeesBreakdown } from '../FeesBreakdown/FeesBreakdown';
 import { gasAmountAccordionStyles, gasAmountHeadingStyles } from './FeeStyles';
+import { FormattedFee } from '../../widgets/swap/functions/swapFees';
 
 interface FeesProps {
   gasFeeValue: string;
   gasFeeToken?: TokenInfo;
   gasFeeFiatValue: string;
-  fees: FeesBreakdownItem[];
+  fees: FormattedFee[];
   onFeesClick?: () => void;
   loading?: boolean;
   sx?: SxProps;
@@ -78,8 +79,8 @@ export function Fees({
           {!loading && (
             <PriceDisplay
               testId="fees-gas-fee__priceDisplay"
-              fiatAmount={`~ ${t('drawers.feesBreakdown.fees.fiatPricePrefix')}${gasFeeFiatValue}`}
-              price={`~ ${gasTokenSymbol} ${formatZeroAmount(tokenValueFormat(gasFee))}`}
+              fiatAmount={`≈ ${t('drawers.feesBreakdown.fees.fiatPricePrefix')}${gasFeeFiatValue}`}
+              price={`≈ ${gasTokenSymbol} ${formatZeroAmount(tokenValueFormat(gasFee))}`}
             />
           )}
         </Accordion.TargetRightSlot>

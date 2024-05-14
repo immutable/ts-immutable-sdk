@@ -211,7 +211,7 @@ export function BridgeReviewSummary() {
   useInterval(() => fetchGasEstimate(), DEFAULT_QUOTE_REFRESH_INTERVAL);
 
   const formatFeeBreakdown = useCallback(
-    (): any => formatBridgeFees(estimates, cryptoFiatState, t),
+    () => formatBridgeFees(estimates, cryptoFiatState, t),
     [estimates],
   );
 

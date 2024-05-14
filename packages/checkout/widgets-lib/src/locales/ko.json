@@ -95,6 +95,13 @@
       },
       "disconnectButton": {
         "label": "지갑 연결 해제"
+      },
+      "walletAddress": {
+        "label": "지갑 주소"
+      },
+      "transferAssetsL1Warning": {
+        "heading": "이더리움에 있는 패스포트로 자산을 보내지 마세요",
+        "body": "패스포트는 아직 이더리움에 존재하지 않으므로 자금이 손실됩니다. Immutable zkEVM 또는 Immutable X에서만 전송하세요."
       }
     },
     "COIN_INFO": {
@@ -451,7 +458,7 @@
       },
       "fees": {
         "title": "가스 요금",
-        "fiatPricePrefix": "~ USD $"
+        "fiatPricePrefix": "≈ USD $"
       },
       "content": {
         "title": "얼마나 많이 이동하시겠습니까?",
@@ -487,7 +494,7 @@
       "submitButton": {
         "buttonText": "이동 확인"
       },
-      "fiatPricePrefix": "~ USD $"
+      "fiatPricePrefix": "≈ USD $"
     },
     "BRIDGE_FAILURE": {
       "bridgeFailureText": {
@@ -614,8 +621,21 @@
       "heading": "수수료 내역",
       "total": "수수료 총액",
       "fees": {
-        "gas": {
+        "fiatPricePrefix": "USD $",
+        "gasFeeMove": {
           "label": "가스 수수료"
+        },
+        "approvalFee": {
+          "label": "승인 수수료"
+        },
+        "swapGasFee": {
+          "label": "가스 수수료"
+        },
+        "swapSecondaryFee": {
+          "label": "{{amount}} 스왑 수수료 (견적에 포함)"
+        },
+        "serviceFee": {
+          "label": "서비스 수수료"
         }
       }
     },
