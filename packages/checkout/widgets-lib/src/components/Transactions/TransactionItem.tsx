@@ -7,7 +7,7 @@ import {
 } from '@biom3/react';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { Transaction } from 'lib/clients/checkoutApiType';
-import { MouseEvent, useMemo } from 'react';
+import { MouseEvent, useMemo, useState } from 'react';
 import { containerStyles } from './transactionItemStyles';
 import { TransactionDetails } from './TransactionDetails';
 
@@ -35,7 +35,11 @@ export function TransactionItem({
   defaultTokenImage,
 }: TransactionItemProps) {
   const { track } = useAnalytics();
-
+  const [iconError, setIconError] = useState<boolean>(false);
+  const tokenUrl = useMemo(
+    () => ((!icon || iconError) ? defaultTokenImage : icon),
+    [icon, iconError, defaultTokenImage],
+  );
   const txnDetailsLink = useMemo(() => `${details.link}${details.hash}`, [details]);
 
   const handleDetailsLinkClick = (
@@ -79,7 +83,16 @@ export function TransactionItem({
       >
         <Accordion.TargetLeftSlot sx={{ pr: 'base.spacing.x2' }}>
           <MenuItem size="xSmall">
-            <MenuItem.FramedImage imageUrl={icon} circularFrame defaultImageUrl={defaultTokenImage} />
+            <MenuItem.FramedImage
+              circularFrame
+              use={(
+                <img
+                  src={tokenUrl}
+                  alt={label}
+                  onError={() => setIconError(true)}
+                />
+              )}
+            />
             <MenuItem.Label>
               {label}
             </MenuItem.Label>

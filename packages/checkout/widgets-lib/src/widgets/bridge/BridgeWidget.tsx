@@ -203,7 +203,12 @@ export default function BridgeWidget({
             <WalletNetworkSelectionView />
           )}
           {viewState.view.type === BridgeWidgetViews.BRIDGE_FORM && (
-            <Bridge amount={amount} tokenAddress={tokenAddress} defaultTokenImage={defaultTokenImage} />
+            <Bridge
+              amount={amount}
+              tokenAddress={tokenAddress}
+              defaultTokenImage={defaultTokenImage}
+              theme={theme}
+            />
           )}
           {viewState.view.type === BridgeWidgetViews.BRIDGE_REVIEW && (
             <BridgeReview />
