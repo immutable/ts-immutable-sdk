@@ -2,7 +2,9 @@ import { imx } from '@imtbl/generated-clients';
 import { ETHAmount, UnsignedOrderRequest } from '@imtbl/x-client';
 import GuardianClient from '../../guardian';
 import { PassportError, PassportErrorType } from '../../errors/passportError';
-import { mockErrorMessage, mockStarkSignature, mockUserImx } from '../../test/mocks';
+import {
+  mockErrorMessage, mockGetRegisteredImxUserAndSigners, mockStarkSignature, mockStarkSigner, mockUserImx,
+} from '../../test/mocks';
 import { cancelOrder, createOrder } from './order';
 
 jest.mock('../../guardian');
@@ -15,11 +17,6 @@ describe('order', () => {
   });
 
   afterEach(jest.resetAllMocks);
-
-  const mockStarkSigner = {
-    signMessage: jest.fn(),
-    getAddress: jest.fn(),
-  };
 
   describe('createOrder', () => {
     let mockGetSignableCreateOrder: jest.Mock;
@@ -117,17 +114,16 @@ describe('order', () => {
 
       const result = await createOrder({
         ordersApi: mockOrdersApi,
-        starkSigner: mockStarkSigner,
-        user: mockUserImx,
         request: orderRequest as UnsignedOrderRequest,
         guardianClient: mockGuardianClient,
+        getRegisteredImxUserAndSigners: mockGetRegisteredImxUserAndSigners,
       });
 
       expect(mockGetSignableCreateOrder).toBeCalledWith(mockSignableOrderRequest, mockHeader);
       expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
       expect(mockGuardianClient.evaluateImxTransaction)
         .toBeCalledWith({ payloadHash: mockSignableOrderResponse.data.payload_hash });
-      expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
+      expect((await mockGetRegisteredImxUserAndSigners()).starkSigner.signMessage).toBeCalledWith(mockPayloadHash);
       expect(mockCreateOrder).toBeCalledWith(
         mockCreateOrderRequest,
         mockHeader,
@@ -140,10 +136,9 @@ describe('order', () => {
 
       await expect(() => createOrder({
         ordersApi: mockOrdersApi,
-        starkSigner: mockStarkSigner,
-        user: mockUserImx,
         request: orderRequest as UnsignedOrderRequest,
         guardianClient: mockGuardianClient,
+        getRegisteredImxUserAndSigners: mockGetRegisteredImxUserAndSigners,
       })).rejects.toThrow(
         new PassportError(
           mockErrorMessage,
@@ -178,10 +173,9 @@ describe('order', () => {
 
       await expect(() => createOrder({
         ordersApi: mockOrdersApi,
-        starkSigner: mockStarkSigner,
-        user: mockUserImx,
         request: orderRequest as UnsignedOrderRequest,
         guardianClient: mockGuardianClient,
+        getRegisteredImxUserAndSigners: mockGetRegisteredImxUserAndSigners,
       })).rejects.toThrowError(new PassportError(
         'Transaction rejected by user',
         PassportErrorType.CREATE_ORDER_ERROR,
@@ -254,17 +248,16 @@ describe('order', () => {
 
       const result = await cancelOrder({
         ordersApi: mockOrdersApi,
-        starkSigner: mockStarkSigner,
-        user: mockUserImx,
         request: cancelOrderRequest,
         guardianClient: mockGuardianClient,
+        getRegisteredImxUserAndSigners: mockGetRegisteredImxUserAndSigners,
       });
 
       expect(mockGetSignableCancelOrder).toBeCalledWith(
         mockSignableCancelOrderRequest,
         mockHeader,
       );
-      expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
+      expect((await mockGetRegisteredImxUserAndSigners()).starkSigner.signMessage).toBeCalledWith(mockPayloadHash);
       expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
       expect(mockGuardianClient.evaluateImxTransaction)
         .toBeCalledWith({ payloadHash: mockPayloadHash });
@@ -289,10 +282,9 @@ describe('order', () => {
 
       await expect(() => cancelOrder({
         ordersApi: mockOrdersApi,
-        starkSigner: mockStarkSigner,
-        user: mockUserImx,
         request: cancelOrderRequest,
         guardianClient: mockGuardianClient,
+        getRegisteredImxUserAndSigners: mockGetRegisteredImxUserAndSigners,
       })).rejects.toThrowError(new PassportError(
         'Transaction rejected by user',
         PassportErrorType.CANCEL_ORDER_ERROR,
@@ -304,10 +296,9 @@ describe('order', () => {
 
       await expect(() => cancelOrder({
         ordersApi: mockOrdersApi,
-        starkSigner: mockStarkSigner,
-        user: mockUserImx,
         request: cancelOrderRequest,
         guardianClient: mockGuardianClient,
+        getRegisteredImxUserAndSigners: mockGetRegisteredImxUserAndSigners,
       })).rejects.toThrow(
         new PassportError(
           mockErrorMessage,

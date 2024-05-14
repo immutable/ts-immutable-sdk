@@ -1,44 +1,41 @@
 import { imx } from '@imtbl/generated-clients';
 import {
-  StarkSigner,
   NftTransferDetails,
   UnsignedTransferRequest,
 } from '@imtbl/x-client';
 import { convertToSignableToken } from '@imtbl/toolkit';
+import { RegisteredUserAndSigners } from 'starkEx';
 import {
   PassportErrorType,
   withPassportError,
 } from '../../errors/passportError';
-import { UserImx } from '../../types';
 import GuardianClient from '../../guardian';
 
 const ERC721 = 'ERC721';
 
 type TransferRequest = {
   request: UnsignedTransferRequest;
-  user: UserImx;
-  starkSigner: StarkSigner;
   transfersApi: imx.TransfersApi;
   guardianClient: GuardianClient;
+  getRegisteredImxUserAndSigners: () => Promise<RegisteredUserAndSigners>;
 };
 
 type BatchTransfersParams = {
   request: Array<NftTransferDetails>;
-  user: UserImx;
-  starkSigner: StarkSigner;
   transfersApi: imx.TransfersApi;
   guardianClient: GuardianClient;
+  getRegisteredImxUserAndSigners: () => Promise<RegisteredUserAndSigners>,
 };
 
 export async function transfer({
   request,
   transfersApi,
-  starkSigner,
-  user,
   guardianClient,
+  getRegisteredImxUserAndSigners,
 }: TransferRequest): Promise<imx.CreateTransferResponseV1> {
   return withPassportError<imx.CreateTransferResponseV1>(
     guardianClient.withDefaultConfirmationScreenTask(async () => {
+      const { user, starkSigner } = await getRegisteredImxUserAndSigners();
       const transferAmount = request.type === ERC721 ? '1' : request.amount;
       const getSignableTransferRequest: imx.GetSignableTransferRequestV1 = {
         sender: user.imx.ethAddress,
@@ -100,17 +97,17 @@ export async function transfer({
 }
 
 export async function batchNftTransfer({
-  user,
-  starkSigner,
   request,
   transfersApi,
   guardianClient,
+  getRegisteredImxUserAndSigners,
 }: BatchTransfersParams): Promise<imx.CreateTransferResponse> {
   // eslint-disable-next-line function-paren-newline
   return withPassportError<imx.CreateTransferResponse>(
     guardianClient.withConfirmationScreenTask(
       { width: 480, height: 784 },
     )(async () => {
+      const { user, starkSigner } = await getRegisteredImxUserAndSigners();
       const { ethAddress } = user.imx;
 
       const signableRequests = request.map(

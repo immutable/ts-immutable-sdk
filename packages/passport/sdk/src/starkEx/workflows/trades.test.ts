@@ -1,6 +1,8 @@
 import { imx } from '@imtbl/generated-clients';
 import { createTrade } from './trades';
-import { mockErrorMessage, mockStarkSignature, mockUserImx } from '../../test/mocks';
+import {
+  mockErrorMessage, mockGetRegisteredImxUserAndSigners, mockStarkSignature, mockStarkSigner, mockUserImx,
+} from '../../test/mocks';
 import { PassportError, PassportErrorType } from '../../errors/passportError';
 import GuardianClient from '../../guardian';
 
@@ -55,10 +57,6 @@ const mockReturnValue = {
   status: 'success',
   trade_id: 123,
 };
-const mockStarkSigner = {
-  signMessage: jest.fn(),
-  getAddress: jest.fn(),
-};
 
 describe('Trades', () => {
   const mockGuardianClient = new GuardianClient({} as any);
@@ -87,10 +85,9 @@ describe('Trades', () => {
 
       const result = await createTrade({
         tradesApi: mockTradesApi,
-        starkSigner: mockStarkSigner,
-        user: mockUserImx,
         request: mockSignableTradeRequest.getSignableTradeRequest,
         guardianClient: mockGuardianClient,
+        getRegisteredImxUserAndSigners: mockGetRegisteredImxUserAndSigners,
       });
 
       expect(mockGetSignableTrade).toBeCalledWith(mockSignableTradeRequest, mockHeader);
@@ -111,10 +108,9 @@ describe('Trades', () => {
 
       await expect(() => createTrade({
         tradesApi: mockTradesApi,
-        starkSigner: mockStarkSigner,
-        user: mockUserImx,
         request: mockSignableTradeRequest.getSignableTradeRequest,
         guardianClient: mockGuardianClient,
+        getRegisteredImxUserAndSigners: mockGetRegisteredImxUserAndSigners,
       })).rejects.toThrowError('Transaction rejected by user');
 
       expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
@@ -127,10 +123,9 @@ describe('Trades', () => {
 
       await expect(() => createTrade({
         tradesApi: mockTradesApi,
-        starkSigner: mockStarkSigner,
-        user: mockUserImx,
         request: mockSignableTradeRequest.getSignableTradeRequest,
         guardianClient: mockGuardianClient,
+        getRegisteredImxUserAndSigners: mockGetRegisteredImxUserAndSigners,
       })).rejects.toThrow(
         new PassportError(
           mockErrorMessage,

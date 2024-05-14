@@ -1,4 +1,5 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
+import { RegisteredUserAndSigners } from 'starkEx';
 import { User, UserImx, UserZkEvm } from '../types';
 import { PassportConfiguration } from '../config';
 import { ChainId } from '../network/chains';
@@ -71,3 +72,15 @@ export const mockListChains = {
     ],
   },
 };
+
+export const mockStarkSigner = {
+  getAddress: jest.fn(),
+  signMessage: jest.fn(),
+};
+
+export const mockRegisteredImxUserAndSigners = {
+  starkSigner: mockStarkSigner,
+  user: mockUserImx,
+} as unknown as RegisteredUserAndSigners;
+
+export const mockGetRegisteredImxUserAndSigners = () => Promise.resolve(mockRegisteredImxUserAndSigners);

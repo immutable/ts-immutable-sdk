@@ -1,39 +1,36 @@
 import { imx } from '@imtbl/generated-clients';
 import {
-  StarkSigner,
   UnsignedOrderRequest,
 } from '@imtbl/x-client';
 import { convertToSignableToken } from '@imtbl/toolkit';
+import { RegisteredUserAndSigners } from 'starkEx/passportImxProvider';
 import { PassportErrorType, withPassportError } from '../../errors/passportError';
-import { UserImx } from '../../types';
 import GuardianClient from '../../guardian';
 
 type CancelOrderParams = {
   request: imx.GetSignableCancelOrderRequest;
   ordersApi: imx.OrdersApi;
-  user: UserImx;
-  starkSigner: StarkSigner;
   guardianClient: GuardianClient;
+  getRegisteredImxUserAndSigners: () => Promise<RegisteredUserAndSigners>
 };
 
 type CreateOrderParams = {
   request: UnsignedOrderRequest;
   ordersApi: imx.OrdersApi;
-  user: UserImx;
-  starkSigner: StarkSigner;
-  guardianClient: GuardianClient;
+  guardianClient: GuardianClient,
+  getRegisteredImxUserAndSigners: () => Promise<RegisteredUserAndSigners>
 };
 
 const ERC721 = 'ERC721';
 
 export async function createOrder({
-  starkSigner,
-  user,
   request,
   ordersApi,
   guardianClient,
+  getRegisteredImxUserAndSigners,
 }: CreateOrderParams): Promise<imx.CreateOrderResponse> {
   return withPassportError<imx.CreateOrderResponse>(guardianClient.withDefaultConfirmationScreenTask(async () => {
+    const { user, starkSigner } = await getRegisteredImxUserAndSigners();
     const { ethAddress } = user.imx;
     const amountSell = request.sell.type === ERC721 ? '1' : request.sell.amount;
     const amountBuy = request.buy.type === ERC721 ? '1' : request.buy.amount;
@@ -96,13 +93,13 @@ export async function createOrder({
 }
 
 export async function cancelOrder({
-  user,
-  starkSigner,
   request,
   ordersApi,
   guardianClient,
+  getRegisteredImxUserAndSigners,
 }: CancelOrderParams): Promise<imx.CancelOrderResponse> {
   return withPassportError<imx.CancelOrderResponse>(guardianClient.withDefaultConfirmationScreenTask(async () => {
+    const { user, starkSigner } = await getRegisteredImxUserAndSigners();
     const getSignableCancelOrderRequest: imx.GetSignableCancelOrderRequest = {
       order_id: request.order_id,
     };

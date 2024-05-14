@@ -1,25 +1,23 @@
 import { imx } from '@imtbl/generated-clients';
-import { StarkSigner } from '@imtbl/x-client';
+import { RegisteredUserAndSigners } from 'starkEx';
 import { PassportErrorType, withPassportError } from '../../errors/passportError';
-import { UserImx } from '../../types';
 import GuardianClient from '../../guardian';
 
 type CreateTradeParams = {
   request: imx.GetSignableTradeRequest;
   tradesApi: imx.TradesApi;
-  user: UserImx;
-  starkSigner: StarkSigner;
   guardianClient: GuardianClient,
+  getRegisteredImxUserAndSigners: () => Promise<RegisteredUserAndSigners>;
 };
 
 export async function createTrade({
   request,
   tradesApi,
-  user,
-  starkSigner,
   guardianClient,
+  getRegisteredImxUserAndSigners,
 }: CreateTradeParams): Promise<imx.CreateTradeResponse> {
   return withPassportError<imx.CreateTradeResponse>(guardianClient.withDefaultConfirmationScreenTask(async () => {
+    const { user, starkSigner } = await getRegisteredImxUserAndSigners();
     const { ethAddress } = user.imx;
     const getSignableTradeRequest: imx.GetSignableTradeRequest = {
       expiration_timestamp: request.expiration_timestamp,

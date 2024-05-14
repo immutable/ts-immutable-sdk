@@ -1,7 +1,9 @@
 import { imx } from '@imtbl/generated-clients';
 import { ETHAmount } from '@imtbl/x-client';
 import { exchangeTransfer } from './exchange';
-import { mockErrorMessage, mockStarkSignature, mockUserImx } from '../../test/mocks';
+import {
+  mockErrorMessage, mockGetRegisteredImxUserAndSigners, mockStarkSignature, mockUserImx,
+} from '../../test/mocks';
 import { PassportError, PassportErrorType } from '../../errors/passportError';
 
 describe('exchangeTransfer', () => {
@@ -11,11 +13,6 @@ describe('exchangeTransfer', () => {
   const createExchangeTransferMock = jest.fn();
   const mockStarkAddress = '0x1111...';
   let exchangesApiMock: imx.ExchangesApi;
-
-  const mockStarkSigner = {
-    getAddress: jest.fn(),
-    signMessage: jest.fn(),
-  };
 
   const ethAmount: ETHAmount = {
     type: 'ETH',
@@ -36,6 +33,10 @@ describe('exchangeTransfer', () => {
   });
 
   it('should returns success exchange transfer result', async () => {
+    const mockStarkSigner = (await mockGetRegisteredImxUserAndSigners()).starkSigner;
+    const mockSignMessage = mockStarkSigner.signMessage as jest.Mock;
+    const mockGetAddress = mockStarkSigner.getAddress as jest.Mock;
+    (mockStarkSigner.signMessage as jest.Mock).mockResolvedValue('starkSignature');
     const mockGetExchangeSignableTransferResponse = {
       data: {
         payload_hash: 'hash123',
@@ -59,14 +60,14 @@ describe('exchangeTransfer', () => {
       },
     };
 
-    mockStarkSigner.getAddress.mockResolvedValue(mockStarkAddress);
+    mockGetAddress.mockResolvedValue(mockStarkAddress);
     getExchangeSignableTransferMock.mockResolvedValue(
       mockGetExchangeSignableTransferResponse,
     );
     createExchangeTransferMock.mockResolvedValue(
       mockCreateExchangeTransferResponse,
     );
-    mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
+    mockSignMessage.mockResolvedValue(mockStarkSignature);
 
     const mockHeader = {
       headers: {
@@ -76,10 +77,9 @@ describe('exchangeTransfer', () => {
     };
 
     const response: imx.CreateTransferResponseV1 = await exchangeTransfer({
-      user: mockUserImx,
-      starkSigner: mockStarkSigner,
       request: exchangeTransferRequest,
       exchangesApi: exchangesApiMock,
+      getRegisteredImxUserAndSigners: mockGetRegisteredImxUserAndSigners,
     });
 
     expect(createExchangeTransferMock).toHaveBeenCalledWith(
@@ -132,10 +132,9 @@ describe('exchangeTransfer', () => {
     );
 
     await expect(() => exchangeTransfer({
-      user: mockUserImx,
-      starkSigner: mockStarkSigner,
       request: exchangeTransferRequest,
       exchangesApi: exchangesApiMock,
+      getRegisteredImxUserAndSigners: mockGetRegisteredImxUserAndSigners,
     })).rejects.toThrow(
       new PassportError(
         mockErrorMessage,

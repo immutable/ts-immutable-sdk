@@ -39,7 +39,7 @@ export interface PassportImxProviderOptions {
   guardianClient: GuardianClient;
 }
 
-type RegisteredUserAndSigners = {
+export type RegisteredUserAndSigners = {
   user: UserImx;
   starkSigner: StarkSigner;
   ethSigner: EthSigner;
@@ -172,14 +172,11 @@ export class PassportImxProvider implements IMXProvider {
   }
 
   async transfer(request: UnsignedTransferRequest): Promise<imx.CreateTransferResponseV1> {
-    const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
-
     return transfer({
       request,
-      user,
-      starkSigner,
       transfersApi: this.immutableXClient.transfersApi,
       guardianClient: this.guardianClient,
+      getRegisteredImxUserAndSigners: () => this.#getRegisteredImxUserAndSigners(),
     });
   }
 
@@ -213,67 +210,52 @@ export class PassportImxProvider implements IMXProvider {
   }
 
   async createOrder(request: UnsignedOrderRequest): Promise<imx.CreateOrderResponse> {
-    const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
-
     return createOrder({
       request,
-      user,
-      starkSigner,
       ordersApi: this.immutableXClient.ordersApi,
       guardianClient: this.guardianClient,
+      getRegisteredImxUserAndSigners: () => this.#getRegisteredImxUserAndSigners(),
     });
   }
 
   async cancelOrder(
     request: imx.GetSignableCancelOrderRequest,
   ): Promise<imx.CancelOrderResponse> {
-    const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
-
     return cancelOrder({
       request,
-      user,
-      starkSigner,
       ordersApi: this.immutableXClient.ordersApi,
       guardianClient: this.guardianClient,
+      getRegisteredImxUserAndSigners: () => this.#getRegisteredImxUserAndSigners(),
     });
   }
 
   async createTrade(request: imx.GetSignableTradeRequest): Promise<imx.CreateTradeResponse> {
-    const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
-
     return createTrade({
       request,
-      user,
-      starkSigner,
       tradesApi: this.immutableXClient.tradesApi,
       guardianClient: this.guardianClient,
+      getRegisteredImxUserAndSigners: () => this.#getRegisteredImxUserAndSigners(),
     });
   }
 
   async batchNftTransfer(
     request: NftTransferDetails[],
   ): Promise<imx.CreateTransferResponse> {
-    const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
-
     return batchNftTransfer({
       request,
-      user,
-      starkSigner,
       transfersApi: this.immutableXClient.transfersApi,
       guardianClient: this.guardianClient,
+      getRegisteredImxUserAndSigners: () => this.#getRegisteredImxUserAndSigners(),
     });
   }
 
   async exchangeTransfer(
     request: UnsignedExchangeTransferRequest,
   ): Promise<imx.CreateTransferResponseV1> {
-    const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
-
     return exchangeTransfer({
       request,
-      user,
-      starkSigner,
       exchangesApi: this.immutableXClient.exchangeApi,
+      getRegisteredImxUserAndSigners: () => this.#getRegisteredImxUserAndSigners(),
     });
   }
 
