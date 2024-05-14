@@ -168,3 +168,11 @@ export function getDefaultTokenImage(
     ? getRemoteImage(environment, '/tokens/defaultonlight.svg')
     : getRemoteImage(environment, '/tokens/defaultondark.svg');
 }
+
+export function abbreviateWalletAddress(address: string): string {
+  // first 5 characters, ellipses, and the last 4 characters
+  // e.g. 0x1234567890abcdef => 0x123.....cdef
+  const firstPart = address.slice(0, 5);
+  const lastPart = address.slice(-4);
+  return `${firstPart}.....${lastPart}`;
+}

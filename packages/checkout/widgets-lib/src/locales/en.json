@@ -95,6 +95,13 @@
       },
       "disconnectButton": {
         "label": "Disconnect Wallet"
+      },
+      "walletAddress": {
+        "label": "Wallet Address"
+      },
+      "transferAssetsL1Warning": {
+        "heading": "Do not send assets to Passport on Ethereum",
+        "body": "Passport does not yet exist on Ethereum, so your funds will get lost there. Only transfer on Immutable zkEVM or Immutable X. "
       }
     },
     "COIN_INFO": {
