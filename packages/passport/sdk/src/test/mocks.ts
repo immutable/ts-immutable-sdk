@@ -1,6 +1,7 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { RegisteredUserAndSigners } from 'starkEx';
-import { User, UserImx, UserZkEvm } from '../types';
+import {
+  RegisteredUserAndSigners, User, UserImx, UserZkEvm,
+} from '../types';
 import { PassportConfiguration } from '../config';
 import { ChainId } from '../network/chains';
 

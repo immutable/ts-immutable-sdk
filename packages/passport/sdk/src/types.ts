@@ -150,3 +150,9 @@ export type IMXSigners = {
   starkSigner: StarkSigner,
   ethSigner: EthSigner;
 };
+
+export type RegisteredUserAndSigners = {
+  user: UserImx;
+  starkSigner: StarkSigner;
+  ethSigner: EthSigner;
+};

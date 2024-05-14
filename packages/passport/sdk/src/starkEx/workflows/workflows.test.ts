@@ -78,13 +78,16 @@ describe('passportImxProvider auth tests', () => {
     });
 
     it(`should return an error for ${methodName}`, async () => {
+      let message = '';
+      let type = '';
       try {
         await passportImxProvider[methodName!](args);
       } catch (err: any) {
-        const { message, type } = err;
-        expect(message).toEqual('User has been logged out');
-        expect(type).toEqual(WorkflowErrorMap[methodName]);
+        message = err.message;
+        type = err.type;
       }
+      expect(message).toEqual('User has been logged out');
+      expect(type).toEqual(WorkflowErrorMap[methodName]);
     });
   });
 
@@ -103,13 +106,16 @@ describe('passportImxProvider auth tests', () => {
     });
 
     it(`should return an error for ${methodName}`, async () => {
+      let message = '';
+      let type = '';
       try {
         await passportImxProvider[methodName!](args);
       } catch (err: any) {
-        const { message, type } = err;
-        expect(message).toEqual('User has been logged out');
-        expect(type).toEqual(WorkflowErrorMap[methodName]);
+        message = err.message;
+        type = err.type;
       }
+      expect(message).toEqual('User has been logged out');
+      expect(type).toEqual(WorkflowErrorMap[methodName]);
     });
   });
 });

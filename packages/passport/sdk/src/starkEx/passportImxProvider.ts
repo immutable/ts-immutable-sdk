@@ -1,10 +1,8 @@
 import { TransactionResponse } from '@ethersproject/abstract-provider';
 import {
   AnyToken,
-  EthSigner,
   IMXClient,
   NftTransferDetails,
-  StarkSigner,
   TokenAmount,
   UnsignedExchangeTransferRequest,
   UnsignedOrderRequest,
@@ -20,7 +18,8 @@ import TypedEventEmitter from '../utils/typedEventEmitter';
 import AuthManager from '../authManager';
 import GuardianClient from '../guardian';
 import {
-  PassportEventMap, PassportEvents, UserImx, User, IMXSigners, isUserImx,
+  PassportEventMap, PassportEvents, User, IMXSigners, isUserImx,
+  RegisteredUserAndSigners,
 } from '../types';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import {
@@ -38,12 +37,6 @@ export interface PassportImxProviderOptions {
   imxApiClients: ImxApiClients;
   guardianClient: GuardianClient;
 }
-
-export type RegisteredUserAndSigners = {
-  user: UserImx;
-  starkSigner: StarkSigner;
-  ethSigner: EthSigner;
-};
 
 export class PassportImxProvider implements IMXProvider {
   protected readonly authManager: AuthManager;

@@ -4,7 +4,7 @@ import {
   UnsignedTransferRequest,
 } from '@imtbl/x-client';
 import { convertToSignableToken } from '@imtbl/toolkit';
-import { RegisteredUserAndSigners } from 'starkEx';
+import { RegisteredUserAndSigners } from 'types';
 import {
   PassportErrorType,
   withPassportError,

@@ -3,7 +3,7 @@ import {
   UnsignedOrderRequest,
 } from '@imtbl/x-client';
 import { convertToSignableToken } from '@imtbl/toolkit';
-import { RegisteredUserAndSigners } from 'starkEx/passportImxProvider';
+import { RegisteredUserAndSigners } from 'types';
 import { PassportErrorType, withPassportError } from '../../errors/passportError';
 import GuardianClient from '../../guardian';
 
