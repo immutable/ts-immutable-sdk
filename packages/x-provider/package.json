@@ -47,7 +47,7 @@
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
-    "build": "NODE_ENV=production rollup --config rollup.config.js",
+    "build": "tsc",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "prepare": "wsrun -r build",
     "test": "jest",
