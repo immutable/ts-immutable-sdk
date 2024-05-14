@@ -1,13 +1,13 @@
 import { SxProps } from '@biom3/react';
 import { TokenInfo } from '@imtbl/checkout-sdk';
 import { Fees } from 'components/Fees/Fees';
-import { FeesBreakdownItem } from 'components/FeesBreakdown/FeesBreakdown';
+import { FormattedFee } from 'widgets/swap/functions/swapFees';
 
 export type FeesDisplay = {
   token: TokenInfo | undefined;
   amount: string;
   fiatAmount: string;
-  breakdown: FeesBreakdownItem[];
+  formattedFees: FormattedFee[];
 };
 
 export type OrderFeesProps = {
@@ -21,7 +21,7 @@ export function OrderFees({ sx, swapFees, onFeesClick }: OrderFeesProps) {
       gasFeeFiatValue={swapFees.fiatAmount}
       gasFeeToken={swapFees.token}
       gasFeeValue={swapFees.amount}
-      fees={swapFees.breakdown}
+      fees={swapFees.formattedFees}
       onFeesClick={onFeesClick}
       sx={sx}
       loading={false}

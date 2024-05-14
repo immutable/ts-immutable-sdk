@@ -68,7 +68,7 @@ export function OrderReview({
     token: undefined,
     amount: '',
     fiatAmount: '',
-    breakdown: [],
+    formattedFees: [],
   });
 
   const openDrawer = () => {
@@ -112,7 +112,7 @@ export function OrderReview({
       return;
     }
 
-    const values = {
+    setSwapFees({
       token: fee.token,
       amount: fee.formattedAmount,
       fiatAmount: calculateCryptoToFiat(
@@ -120,10 +120,8 @@ export function OrderReview({
         fee.token.symbol,
         conversions,
       ),
-      breakdown: getFundingBalanceFeeBreakDown(fundingBalance, conversions),
-    };
-
-    setSwapFees(values);
+      formattedFees: getFundingBalanceFeeBreakDown(fundingBalance, conversions),
+    });
   }, [fundingBalance, conversions]);
 
   const multiple = items.length > 1;
