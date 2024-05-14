@@ -64,9 +64,13 @@ export function ChangeWallet({ onChangeWalletClick }: ChangeWalletProps) {
         {(isWalletConnect && walletLogoUrl) ? (
           <Box sx={wcWalletLogoWrapperStyles}>
             <FramedImage
-              imageUrl={walletLogoUrl}
-              alt="walletconnect"
               sx={wcWalletLogoStyles}
+              use={(
+                <img
+                  src={walletLogoUrl}
+                  alt="walletconnect"
+                />
+              )}
             />
             <Logo logo="WalletConnectSymbol" sx={wcStickerLogoStyles} />
           </Box>

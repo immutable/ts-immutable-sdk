@@ -32,6 +32,7 @@ export namespace ProtocolData {
    */
   export enum order_type {
     FULL_RESTRICTED = 'FULL_RESTRICTED',
+    PARTIAL_RESTRICTED = 'PARTIAL_RESTRICTED',
   }
 
 

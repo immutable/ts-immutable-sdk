@@ -1,6 +1,7 @@
 import { Seaport as SeaportLib } from '@opensea/seaport-js';
 import {
   ApprovalAction,
+  CreateInputItem,
   CreateOrderAction,
   ExchangeAction,
   OrderComponents,
@@ -12,6 +13,7 @@ import { mapFromOpenApiOrder } from 'openapi/mapper';
 import {
   Action,
   ActionType,
+  ERC1155Item,
   ERC20Item,
   ERC721Item,
   FulfillOrderResponse,
@@ -45,7 +47,7 @@ export class Seaport {
 
   async prepareSeaportOrder(
     offerer: string,
-    listingItem: ERC721Item,
+    listingItem: ERC721Item | ERC1155Item,
     considerationItem: ERC20Item | NativeItem,
     orderStart: Date,
     orderExpiry: Date,
@@ -104,6 +106,7 @@ export class Seaport {
     order: Order,
     account: string,
     extraData: string,
+    unitsToFill?: string,
   ): Promise<FulfillOrderResponse> {
     const { orderComponents, tips } = this.mapImmutableOrderToSeaportOrderComponents(order);
     const seaportLib = this.getSeaportLib(order);
@@ -116,6 +119,7 @@ export class Seaport {
             parameters: orderComponents,
             signature: order.signature,
           },
+          unitsToFill,
           extraData,
           tips,
         },
@@ -264,22 +268,30 @@ export class Seaport {
 
   private createSeaportOrder(
     offerer: string,
-    listingItem: ERC721Item,
+    listingItem: ERC721Item | ERC1155Item,
     considerationItem: ERC20Item | NativeItem,
     orderStart: Date,
     orderExpiry: Date,
   ): Promise<OrderUseCase<CreateOrderAction>> {
     const seaportLib = this.getSeaportLib();
+
+    const offerItem: CreateInputItem = listingItem.type === 'ERC721'
+      ? {
+        itemType: ItemType.ERC721,
+        token: listingItem.contractAddress,
+        identifier: listingItem.tokenId,
+      }
+      : {
+        itemType: ItemType.ERC1155,
+        token: listingItem.contractAddress,
+        identifier: listingItem.tokenId,
+        amount: listingItem.amount,
+      };
+
     return seaportLib.createOrder(
       {
-        allowPartialFills: false,
-        offer: [
-          {
-            itemType: ItemType.ERC721,
-            token: listingItem.contractAddress,
-            identifier: listingItem.tokenId,
-          },
-        ],
+        allowPartialFills: listingItem.type === 'ERC1155',
+        offer: [offerItem],
         consideration: [
           {
             token:
