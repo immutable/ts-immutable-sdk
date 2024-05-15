@@ -135,7 +135,7 @@ describe('erc1155', () => {
           },
           {
             type: ItemType.ERC1155,
-            amount: '5',
+            amount: BigNumber.from(5),
             contractAddress: '0xERC1155',
             id: '0',
             spenderAddress: '0xSEAPORT',
@@ -174,7 +174,7 @@ describe('erc1155', () => {
         },
         {
           type: ItemType.ERC1155,
-          amount: '5',
+          amount: BigNumber.from(5),
           contractAddress: '0xERC1155',
           id: '0',
           spenderAddress: '0xSEAPORT',
@@ -209,21 +209,21 @@ describe('erc1155', () => {
         {
           type: ItemType.ERC1155,
           contractAddress: '0xERC1155',
-          amount: '5',
+          amount: BigNumber.from(5),
           id: '0',
           spenderAddress: '0xSEAPORT',
         },
         {
           type: ItemType.ERC1155,
           contractAddress: '0xERC1155',
-          amount: '5',
+          amount: BigNumber.from(5),
           id: '1',
           spenderAddress: '0xSEAPORT',
         },
         {
           type: ItemType.ERC1155,
           contractAddress: '0xERC1155',
-          amount: '5',
+          amount: BigNumber.from(5),
           id: '2',
           spenderAddress: '0x00000000',
         },

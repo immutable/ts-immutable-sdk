@@ -13,6 +13,7 @@ import {
   ItemType,
   SellOrder,
   TransactionOrGasType,
+  ERC1155SellToken,
 } from '../../types';
 import { smartCheckout } from '../smartCheckout';
 import { createOrderbookInstance } from '../../instance';
@@ -381,7 +382,7 @@ describe('sell', () => {
           type: ItemType.ERC1155,
           contractAddress: order.sellToken.collectionAddress,
           tokenId: order.sellToken.id,
-          amount: order.sellToken.amount,
+          amount: (order.sellToken as ERC1155SellToken).amount,
         },
         orderExpiry: order.orderExpiry,
       });

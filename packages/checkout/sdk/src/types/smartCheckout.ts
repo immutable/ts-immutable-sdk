@@ -423,6 +423,14 @@ export type ERC721ItemRequirement = {
   spenderAddress: string;
 };
 
+/**
+ * Represents an ERC1155 item requirement for a transaction.
+ * @property {ItemType.ERC1155} type
+ * @property {string} contractAddress
+ * @property {string} id
+ * @property {string} spenderAddress
+ * @property {BigNumber} amount
+ */
 export type ERC1155ItemRequirement = {
   /** The type to indicate this is a ERC1155 item requirement. */
   type: ItemType.ERC1155;
@@ -433,7 +441,7 @@ export type ERC1155ItemRequirement = {
   /** The contract address of the approver. */
   spenderAddress: string;
   /** The amount of the ERC1155 token ID being spent. */
-  amount: string;
+  amount: BigNumber;
 };
 
 /**

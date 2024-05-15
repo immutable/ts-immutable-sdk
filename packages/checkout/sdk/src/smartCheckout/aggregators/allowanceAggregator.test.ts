@@ -97,7 +97,7 @@ describe('allowanceAggregator', () => {
           approvalTransaction: undefined,
           type: ItemType.ERC1155,
           itemRequirement: {
-            amount: '10',
+            amount: BigNumber.from(10),
             type: ItemType.ERC1155,
             contractAddress: '0xERC1155',
             id: '0xID',
@@ -215,7 +215,7 @@ describe('allowanceAggregator', () => {
           approvalTransaction: undefined,
           type: ItemType.ERC1155,
           itemRequirement: {
-            amount: '10',
+            amount: BigNumber.from(10),
             type: ItemType.ERC1155,
             contractAddress: '0xERC1155',
             id: '0xID',
@@ -300,7 +300,7 @@ describe('allowanceAggregator', () => {
           sufficient: true,
           itemRequirement: {
             type: ItemType.ERC1155,
-            amount: '5',
+            amount: BigNumber.from(5),
             contractAddress: '0xERC1155',
             id: '0xID',
             spenderAddress: '0xSEAPORT',
