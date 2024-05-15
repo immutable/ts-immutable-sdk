@@ -79,6 +79,7 @@ fastify.get("/eligibility/:address", async (request: FastifyRequest<{ Params: { 
   try {
     // Calculate the current time to check active mint phases
     const currentTime = Math.floor(Date.now() / 1000);
+    console.log(serverConfig[environment].mintPhases);
     const phaseEligibility = serverConfig[environment].mintPhases.map((phase, index) => {
       const isActive = currentTime >= phase.startTime && currentTime <= phase.endTime;
       const isAllowListed = allowlists[index].includes(address);
@@ -278,7 +279,7 @@ fastify.post("/mint/eoa", async (request: eoaMintRequest, reply: FastifyReply) =
   // Perform the minting process within a transaction
   // Conduct transactional operations related to minting
   const assetId = uuidv4();
-  logger.info(`Attempting to mint NFT wallet address ${walletAddress} with UUID ${assetId}`);
+  logger.info(`Record intention to mint NFT to wallet address ${walletAddress} with UUID ${assetId}`);
   try {
     // Record the minting operation in the database
     await mintingBackend.recordMint(

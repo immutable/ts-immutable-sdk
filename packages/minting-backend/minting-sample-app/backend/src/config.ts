@@ -28,8 +28,8 @@ const serverConfig: ServerConfig = {
     mintPhases: [
       {
         name: "Guaranteed",
-        startTime: 1629913600,
-        endTime: 1714916592,
+        startTime: 1715743355,
+        endTime: 1735743376,
       },
       {
         name: "Waitlist",
