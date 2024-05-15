@@ -21,6 +21,35 @@ export const setTransactionGasLimits = async (
   return rawTx;
 };
 
+export const handleProviderError = (err: any) => {
+  if (err.code === ethers.errors.INSUFFICIENT_FUNDS) {
+    return new CheckoutError(
+      err.message,
+      CheckoutErrorType.INSUFFICIENT_FUNDS,
+      { error: err },
+    );
+  }
+  if (err.code === ethers.errors.ACTION_REJECTED) {
+    return new CheckoutError(
+      err.message,
+      CheckoutErrorType.USER_REJECTED_REQUEST_ERROR,
+      { error: err },
+    );
+  }
+  if (err.code === ethers.errors.UNPREDICTABLE_GAS_LIMIT) {
+    return new CheckoutError(
+      err.message,
+      CheckoutErrorType.UNPREDICTABLE_GAS_LIMIT,
+      { error: err },
+    );
+  }
+  return new CheckoutError(
+    err.message,
+    CheckoutErrorType.TRANSACTION_FAILED,
+    { error: err },
+  );
+};
+
 export const sendTransaction = async (
   web3Provider: Web3Provider,
   transaction: TransactionRequest,
@@ -35,31 +64,6 @@ export const sendTransaction = async (
       transactionResponse,
     };
   } catch (err: any) {
-    if (err.code === ethers.errors.INSUFFICIENT_FUNDS) {
-      throw new CheckoutError(
-        err.message,
-        CheckoutErrorType.INSUFFICIENT_FUNDS,
-        { error: err },
-      );
-    }
-    if (err.code === ethers.errors.ACTION_REJECTED) {
-      throw new CheckoutError(
-        err.message,
-        CheckoutErrorType.USER_REJECTED_REQUEST_ERROR,
-        { error: err },
-      );
-    }
-    if (err.code === ethers.errors.UNPREDICTABLE_GAS_LIMIT) {
-      throw new CheckoutError(
-        err.message,
-        CheckoutErrorType.UNPREDICTABLE_GAS_LIMIT,
-        { error: err },
-      );
-    }
-    throw new CheckoutError(
-      err.message,
-      CheckoutErrorType.TRANSACTION_FAILED,
-      { error: err },
-    );
+    throw handleProviderError(err);
   }
 };
