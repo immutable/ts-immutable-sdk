@@ -50,7 +50,7 @@ describe('confirmation', () => {
         origin: testConfig.passportDomain,
         data: {
           eventType: PASSPORT_EVENT_TYPE,
-          messageType: ReceiveMessage.CONFIRMATION_WINDOW_READY,
+          messageType: ReceiveMessage.CONFIRMATION_LOADING_WINDOW_READY,
         },
       };
       addEventListenerMock
@@ -118,6 +118,13 @@ describe('confirmation', () => {
 
     it('should send `confirmation_start` postMessage', async () => {
       const transactionId = 'transactionId123';
+      const mockedLoadingWindowReadyValue = {
+        origin: testConfig.passportDomain,
+        data: {
+          eventType: PASSPORT_EVENT_TYPE,
+          messageType: ReceiveMessage.CONFIRMATION_LOADING_WINDOW_READY,
+        },
+      };
       const mockedWindowReadyValue = {
         origin: testConfig.passportDomain,
         data: {
@@ -125,6 +132,10 @@ describe('confirmation', () => {
           messageType: ReceiveMessage.CONFIRMATION_WINDOW_READY,
         },
       };
+      addEventListenerMock
+        .mockImplementationOnce((event, callback) => {
+          callback(mockedLoadingWindowReadyValue);
+        });
       addEventListenerMock
         .mockImplementationOnce((event, callback) => {
           callback(mockedWindowReadyValue);
@@ -175,6 +186,13 @@ describe('confirmation', () => {
     it('should send `confirmation_start` postMessage', async () => {
       const messageId = 'transactionId123';
       const etherAddress = 'etherAddress123';
+      const mockedLoadingWindowReadyValue = {
+        origin: testConfig.passportDomain,
+        data: {
+          eventType: PASSPORT_EVENT_TYPE,
+          messageType: ReceiveMessage.CONFIRMATION_LOADING_WINDOW_READY,
+        },
+      };
       const mockedWindowReadyValue = {
         origin: testConfig.passportDomain,
         data: {
@@ -184,9 +202,13 @@ describe('confirmation', () => {
       };
       addEventListenerMock
         .mockImplementationOnce((event, callback) => {
+          callback(mockedLoadingWindowReadyValue);
+        });
+      addEventListenerMock
+        .mockImplementationOnce((event, callback) => {
           callback(mockedWindowReadyValue);
         });
-      confirmationScreen.loading();
+      await confirmationScreen.loading();
 
       await confirmationScreen.requestMessageConfirmation(messageId, etherAddress);
 

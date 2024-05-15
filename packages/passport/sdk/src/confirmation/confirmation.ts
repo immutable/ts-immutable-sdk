@@ -247,31 +247,19 @@ export default class ConfirmationScreen {
           return;
         }
         switch (data.messageType as ReceiveMessage) {
-          case ReceiveMessage.CONFIRMATION_WINDOW_READY: {
+          case ReceiveMessage.CONFIRMATION_LOADING_WINDOW_READY: {
             resolve({ ready: true });
             window.removeEventListener('message', messageHandler);
             break;
           }
           default:
             this.closeWindow();
+            window.removeEventListener('message', messageHandler);
             reject(new Error('Unsupported message type'));
         }
       };
 
       window.addEventListener('message', messageHandler);
-      // https://stackoverflow.com/questions/9388380/capture-the-close-event-of-popup-window-in-javascript/48240128#48240128
-      const timerCallback = () => {
-        if (this.confirmationWindow?.closed || this.overlayClosed) {
-          clearInterval(this.timer);
-          window.removeEventListener('message', messageHandler);
-          this.overlayClosed = false;
-          this.confirmationWindow = undefined;
-        }
-      };
-      this.timer = setInterval(
-        timerCallback,
-        CONFIRMATION_WINDOW_CLOSED_POLLING_DURATION,
-      );
     });
   }
 

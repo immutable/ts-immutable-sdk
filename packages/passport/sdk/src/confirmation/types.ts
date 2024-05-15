@@ -56,6 +56,7 @@ export type PostMessageData = {
 };
 
 export enum ReceiveMessage {
+  CONFIRMATION_LOADING_WINDOW_READY = 'confirmation_loading_window_ready',
   CONFIRMATION_WINDOW_READY = 'confirmation_window_ready',
   CONFIRMATION_TYPE_ERROR = 'confirmation_type_error',
   TRANSACTION_CONFIRMED = 'transaction_confirmed',
