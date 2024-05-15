@@ -52,8 +52,9 @@ export function getOrderbookConfig(
       return {
         seaportContractAddress: '0x6c12aD6F0bD274191075Eb2E78D7dA5ba6453424',
         // eslint-disable-next-line max-len
-        // zoneContractAddress: '0x00338b92Bec262078B3e49BF12bbEA058916BF91', // ImmutableSignedZoneV1
-        zoneContractAddress: '0x1004f9615E79462c711Ff05a386BdbA91a7628C3', // ImmutableSignedZoneV2
+        zoneContractAddress: '0x00338b92Bec262078B3e49BF12bbEA058916BF91', // ImmutableSignedZoneV1
+        // eslint-disable-next-line max-len
+        // zoneContractAddress: '0x1004f9615E79462c711Ff05a386BdbA91a7628C3', // ImmutableSignedZoneV2
         apiEndpoint: 'https://api.immutable.com',
         chainName: MAINNET_CHAIN_NAME,
         provider: getConfiguredProvider('https://rpc.immutable.com', config.baseConfig.rateLimitingKey),
