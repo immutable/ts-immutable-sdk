@@ -88,11 +88,11 @@ describe('confirmation', () => {
           eventType: 'imx_passport_confirmation',
           messageType: 'confirmation_data_ready',
           messageData: {
-            path: 'transaction',
-            query: {
+            confirmationType: 'starkex_transaction',
+            confirmationMetadata: {
               chainType: 'starkex',
               etherAddress: mockEtherAddress,
-              transactionId,
+              transactionID: transactionId,
             },
           },
         },
@@ -125,21 +125,6 @@ describe('confirmation', () => {
       expect(postMessageMock).toHaveBeenCalledWith(
         {
           eventType: 'imx_passport_confirmation',
-          messageType: 'confirmation_data_ready',
-          messageData: {
-            path: 'transaction',
-            query: {
-              chainType: 'starkex',
-              etherAddress: mockEtherAddress,
-              transactionId,
-            },
-          },
-        },
-        'https://passport.sandbox.immutable.com',
-      );
-      expect(postMessageMock).toHaveBeenCalledWith(
-        {
-          eventType: 'imx_passport_confirmation',
           messageType: 'confirmation_start',
         },
         'https://passport.sandbox.immutable.com',
@@ -160,8 +145,8 @@ describe('confirmation', () => {
           eventType: 'imx_passport_confirmation',
           messageType: 'confirmation_data_ready',
           messageData: {
-            path: 'zkevm/message',
-            query: {
+            confirmationType: 'zkevm_message',
+            confirmationMetadata: {
               etherAddress,
               messageID: messageId,
             },

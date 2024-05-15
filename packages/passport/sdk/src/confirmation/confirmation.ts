@@ -1,7 +1,10 @@
 import { TransactionApprovalRequestChainTypeEnum } from '@imtbl/guardian';
 import {
+  ConfirmationDataReadyMessageData,
   ConfirmationResult,
+  ConfirmationTypeEnum,
   PASSPORT_EVENT_TYPE,
+  PostMessageData,
   ReceiveMessage,
   SendMessage,
 } from './types';
@@ -19,22 +22,12 @@ export const CONFIRMATION_IFRAME_STYLE = 'display: none; position: absolute;widt
 
 type MessageHandler = (arg0: MessageEvent) => void;
 
-type PostMessageData = {
-  eventType: string;
-  messageType: SendMessage.CONFIRMATION_DATA_READY;
-  messageData: {
-    path: string;
-    query: { [key: string]: string };
-  }
-};
-
-const getPostMessageData = (relativePath: string, query: { [key: string]: string }): PostMessageData => ({
+const getPostMessageData = (
+  messageData: ConfirmationDataReadyMessageData,
+): PostMessageData => ({
   eventType: PASSPORT_EVENT_TYPE,
   messageType: SendMessage.CONFIRMATION_DATA_READY,
-  messageData: {
-    path: relativePath,
-    query,
-  },
+  messageData,
 });
 
 export default class ConfirmationScreen {
@@ -99,6 +92,11 @@ export default class ConfirmationScreen {
             resolve({ confirmed: true });
             break;
           }
+          case ReceiveMessage.CONFIRMATION_TYPE_ERROR: {
+            this.closeWindow();
+            reject(new Error('Unsupported confirmation type'));
+            break;
+          }
           case ReceiveMessage.TRANSACTION_ERROR: {
             this.closeWindow();
             reject(new Error('Error during transaction confirmation'));
@@ -119,13 +117,26 @@ export default class ConfirmationScreen {
       let href = '';
       if (chainType === TransactionApprovalRequestChainTypeEnum.Starkex) {
         href = this.getHref('transaction', { transactionId, etherAddress, chainType });
-        postMessageData = getPostMessageData('transaction', { transactionId, etherAddress, chainType });
+        postMessageData = getPostMessageData({
+          confirmationType: ConfirmationTypeEnum.starkex_transaction,
+          confirmationMetadata: {
+            transactionID: transactionId,
+            etherAddress,
+            chainType,
+          },
+        });
       } else {
         href = this.getHref('zkevm/transaction', {
           transactionID: transactionId, etherAddress, chainType, chainID: chainId,
         });
-        postMessageData = getPostMessageData('zkevm/transaction', {
-          transactionID: transactionId, etherAddress, chainType, chainID: chainId as string,
+        postMessageData = getPostMessageData({
+          confirmationType: ConfirmationTypeEnum.zkevm_transaction,
+          confirmationMetadata: {
+            transactionID: transactionId,
+            etherAddress,
+            chainType,
+            chainID: chainId as string,
+          },
         });
       }
       window.addEventListener('message', messageHandler);
@@ -160,6 +171,11 @@ export default class ConfirmationScreen {
             reject(new Error('Error during message confirmation'));
             break;
           }
+          case ReceiveMessage.CONFIRMATION_TYPE_ERROR: {
+            this.closeWindow();
+            reject(new Error('Unsupported confirmation type'));
+            break;
+          }
           case ReceiveMessage.MESSAGE_REJECTED: {
             this.closeWindow();
             reject(new Error('User rejected message'));
@@ -173,7 +189,13 @@ export default class ConfirmationScreen {
 
       window.addEventListener('message', messageHandler);
       const href = this.getHref('zkevm/message', { messageID, etherAddress });
-      const postMessageData = getPostMessageData('zkevm/message', { messageID, etherAddress });
+      const postMessageData = getPostMessageData({
+        confirmationType: ConfirmationTypeEnum.zkevm_message,
+        confirmationMetadata: {
+          messageID,
+          etherAddress,
+        },
+      });
       this.showConfirmationScreen(href, postMessageData, messageHandler, resolve);
     });
   }
