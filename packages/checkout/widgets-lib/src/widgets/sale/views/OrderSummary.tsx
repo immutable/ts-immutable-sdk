@@ -152,7 +152,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
         },
       });
     } catch (error: any) {
-      goToErrorView(SaleErrorTypes.SMART_CHECKOUT_EXECUTE_ERROR, error);
+      goToErrorView(SaleErrorTypes.FUNDING_ROUTE_EXECUTE_ERROR, error);
     }
   }, [fundingBalances, loadingBalances, fundingBalancesResult]);
 
@@ -202,7 +202,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
       {subView === OrderSummarySubViews.INIT && (
         <LoadingView
           loadingText={t(
-            'views.FUND_WITH_SMART_CHECKOUT.loading.checkingBalances',
+            'views.ORDER_SUMMARY.loading.balances',
           )}
         />
       )}

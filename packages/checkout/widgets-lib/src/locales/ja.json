@@ -297,25 +297,6 @@
         "balance": "残高{{amount}}"
       }
     },
-    "FUND_WITH_SMART_CHECKOUT": {
-      "loading": {
-        "checkingBalances": "数値を計算しています"
-      },
-      "currency": {
-        "usdEstimate": "≈ USD $",
-        "fees": "手数料"
-      },
-      "fundingRouteDrawer": {
-        "header": "利用可能な残高"
-      },
-      "fundingRouteSelect": {
-        "heading": "で支払う",
-        "noRoutesAvailable": "コインの残高が不足しています。代わりにカードで続行してください。",
-        "continue": "続行",
-        "payWithCardInstead": "いいえ、カードで支払います",
-        "payWithCard": "カードで支払う"
-      }
-    },
     "PAYMENT_METHODS": {
       "header": {
         "heading": "どの支払い方法をご希望ですか？"
@@ -416,12 +397,7 @@
           "primaryAction": "もう一度試す",
           "secondaryAction": "キャンセル"
         },
-        "SMART_CHECKOUT_ERROR": {
-          "description": "ウォレットの残高を確認できません。もう一度お試しください。",
-          "primaryAction": "もう一度試す",
-          "secondaryAction": "キャンセル"
-        },
-        "SMART_CHECKOUT_EXECUTE_ERROR": {
+        "FUNDING_ROUTE_EXECUTE_ERROR": {
           "description": "資金を移動する際に何かがうまくいかなかったようです。もう一度お試しください。",
           "primaryAction": "もう一度試す",
           "secondaryAction": "キャンセル"
