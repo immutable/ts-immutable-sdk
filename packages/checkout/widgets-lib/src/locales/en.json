@@ -260,7 +260,7 @@
       },
       "currency": {
         "fiat": "≈ USD ${{amount}}",
-        "price": "{{symbol}} {{amount}}",
+        "price": "{{symbol}} {{amount}}"
       },
       "orderItem": {
         "quantity": "Quantity x{{qty}}"
