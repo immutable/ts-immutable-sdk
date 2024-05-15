@@ -21,7 +21,7 @@
     "postpack": "pinst --enable"
   },
   "dependencies": {
-    "@imtbl/contracts": "^2.2.5",
+    "@imtbl/contracts": "2.2.6",
     "@imtbl/sdk": "file:../../../sdk",
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.0",
     "@nomicfoundation/hardhat-toolbox": "^2.0.2",

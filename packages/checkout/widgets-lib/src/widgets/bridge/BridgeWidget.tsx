@@ -203,7 +203,12 @@ export default function BridgeWidget({
             <WalletNetworkSelectionView />
           )}
           {viewState.view.type === BridgeWidgetViews.BRIDGE_FORM && (
-            <Bridge amount={amount} tokenAddress={tokenAddress} defaultTokenImage={defaultTokenImage} />
+            <Bridge
+              amount={amount}
+              tokenAddress={tokenAddress}
+              defaultTokenImage={defaultTokenImage}
+              theme={theme}
+            />
           )}
           {viewState.view.type === BridgeWidgetViews.BRIDGE_REVIEW && (
             <BridgeReview />
@@ -211,6 +216,7 @@ export default function BridgeWidget({
           {viewState.view.type === BridgeWidgetViews.IN_PROGRESS && (
             <MoveInProgress
               transactionHash={viewState.view.transactionHash}
+              isTransfer={viewState.view.isTransfer}
             />
           )}
           {viewState.view.type === BridgeWidgetViews.BRIDGE_FAILURE
@@ -242,8 +248,9 @@ export default function BridgeWidget({
 
           {viewState.view.type === BridgeWidgetViews.APPROVE_TRANSACTION && (
             <ApproveTransaction
-              approveTransaction={viewState.view.approveTransaction}
-              transaction={viewState.view.transaction}
+              bridgeTransaction={viewState.view.approveTransaction && viewState.view.transaction
+                ? { approveTransaction: viewState.view.approveTransaction, transaction: viewState.view.transaction }
+                : undefined}
             />
           )}
           {viewState.view.type === BridgeWidgetViews.TRANSACTIONS && (

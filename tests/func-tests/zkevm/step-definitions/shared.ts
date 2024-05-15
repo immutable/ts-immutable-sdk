@@ -10,8 +10,8 @@ import {
 import { GAS_OVERRIDES } from '../utils/orderbook/gas';
 import { actionAll } from '../utils/orderbook/actions';
 
-const imxForApproval = 0.01 * 1e18;
-const imxForFulfillment = 0.04 * 1e18;
+const imxForApproval = 0.02 * 1e18;
+const imxForFulfillment = 0.05 * 1e18;
 const listingPrice = 0.0001 * 1e18;
 
 export const givenIHaveAFundedOffererAccount = (
