@@ -4,8 +4,6 @@ import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
 import { Body, Box, FormControl, TextInput } from '@biom3/react';
-import { Orderbook } from '@imtbl/orderbook';
-import { Environment } from '@imtbl/config';
 
 interface BuyProps {
   checkout: Checkout;
@@ -15,12 +13,18 @@ interface BuyProps {
 export default function Buy({ checkout, provider }: BuyProps) {
   const [orderId, setOrderId] = useState<string>('');
   const [orderIdError, setOrderIdError] = useState<any>(null);
+  const [unitsToFill, setUnitsToFill] = useState<string>('1');
+  const [unitsToFillError, setUnitsToFillError] = useState<string>('');
   const [error, setError] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   async function buyClick() {
     if (!orderId) {
       setOrderIdError('Please enter an order ID');
+      return;
+    }
+    if (!unitsToFill) {
+      setUnitsToFillError('Please enter units to fill');
       return;
     }
     if (!checkout) {
@@ -36,7 +40,7 @@ export default function Buy({ checkout, provider }: BuyProps) {
     try {
       const buyResult = await checkout.buy({
         provider,
-        orders: [{id: orderId, takerFees: [{amount: {percentageDecimal: 0.01}, recipient: '0x96654086969DCaa88933E753Aa52d46EAB269Ff7'}]}],
+        orders: [{id: orderId, fillAmount: unitsToFill, takerFees: [{amount: {percentageDecimal: 0.01}, recipient: '0x96654086969DCaa88933E753Aa52d46EAB269Ff7'}]}],
       });
       console.log('Buy result', buyResult);
       setLoading(false);
@@ -56,6 +60,12 @@ export default function Buy({ checkout, provider }: BuyProps) {
     setOrderIdError('');
   }
 
+  const updateUnitsToFill = (event: any) => {
+    const value = event.target.value;
+    setUnitsToFill(value);
+    setUnitsToFillError('');
+  }
+
   useEffect(() => {
     setError(null);
     setLoading(false);
@@ -68,6 +78,18 @@ export default function Buy({ checkout, provider }: BuyProps) {
         <TextInput onChange={updateOrderId} />
         {orderIdError && (
           <FormControl.Validation>{orderIdError}</FormControl.Validation>
+        )}
+      </FormControl>
+      <br />
+      <FormControl validationStatus={unitsToFillError ? 'error' : 'success'} >
+        <FormControl.Label>Units To Fill</FormControl.Label>
+        <TextInput
+          value={unitsToFill}
+          type='number'
+          onChange={updateUnitsToFill}
+        />
+        {unitsToFillError && (
+          <FormControl.Validation>{unitsToFillError}</FormControl.Validation>
         )}
       </FormControl>
       <br />
