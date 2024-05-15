@@ -89,6 +89,7 @@ describe('sendTransaction', () => {
         zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
         guardianClient: guardianClient as unknown as GuardianClient,
         flow: flow as unknown as Flow,
+        isScreenReadyPromise: Promise.resolve({ ready: true }),
       });
 
       expect(relayerClient.imGetFeeOptions).toHaveBeenCalledWith(
@@ -106,6 +107,7 @@ describe('sendTransaction', () => {
         zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
         guardianClient: guardianClient as unknown as GuardianClient,
         flow: flow as unknown as Flow,
+        isScreenReadyPromise: Promise.resolve({ ready: true }),
       });
 
       expect(result).toEqual(transactionHash);
@@ -134,6 +136,7 @@ describe('sendTransaction', () => {
         zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
         guardianClient: guardianClient as unknown as GuardianClient,
         flow: flow as unknown as Flow,
+        isScreenReadyPromise: Promise.resolve({ ready: true }),
       });
 
       expect(result).toEqual(transactionHash);
@@ -150,6 +153,7 @@ describe('sendTransaction', () => {
               nonce,
             },
           ],
+          isScreenReadyPromise: Promise.resolve({ ready: true }),
         },
       );
 
@@ -170,6 +174,7 @@ describe('sendTransaction', () => {
         zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
         guardianClient: guardianClient as unknown as GuardianClient,
         flow: flow as unknown as Flow,
+        isScreenReadyPromise: Promise.resolve({ ready: true }),
       });
 
       expect(result).toEqual(transactionHash);
@@ -193,6 +198,7 @@ describe('sendTransaction', () => {
               nonce,
             },
           ],
+          isScreenReadyPromise: Promise.resolve({ ready: true }),
         },
       );
       expect(relayerClient.ethSendTransaction).toHaveBeenCalledWith(
@@ -220,6 +226,7 @@ describe('sendTransaction', () => {
           zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
           guardianClient: guardianClient as unknown as GuardianClient,
           flow: flow as unknown as Flow,
+          isScreenReadyPromise: Promise.resolve({ ready: true }),
         }),
       ).rejects.toThrow(
         new JsonRpcError(
@@ -248,6 +255,7 @@ describe('sendTransaction', () => {
           zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
           guardianClient: guardianClient as unknown as GuardianClient,
           flow: flow as unknown as Flow,
+          isScreenReadyPromise: Promise.resolve({ ready: true }),
         }),
       ).rejects.toThrow(
         new JsonRpcError(

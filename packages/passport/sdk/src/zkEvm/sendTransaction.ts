@@ -14,6 +14,7 @@ import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { retryWithDelay } from '../network/retry';
 import { RelayerClient } from './relayerClient';
 import GuardianClient, { convertBigNumberishToString } from '../guardian';
+import { LoadingResult } from '../confirmation';
 
 const MAX_TRANSACTION_HASH_RETRIEVAL_RETRIES = 30;
 const TRANSACTION_HASH_RETRIEVAL_WAIT = 1000;
@@ -26,6 +27,7 @@ export type EthSendTransactionParams = {
   zkevmAddress: string,
   params: Array<any>;
   flow: Flow;
+  isScreenReadyPromise: Promise<LoadingResult | undefined>;
 };
 
 const getFeeOption = async (
@@ -101,6 +103,7 @@ export const sendTransaction = async ({
   guardianClient,
   zkevmAddress,
   flow,
+  isScreenReadyPromise,
 }: EthSendTransactionParams): Promise<string> => {
   const { chainId } = await rpcProvider.detectNetwork();
   const chainIdBigNumber = BigNumber.from(chainId);
@@ -125,6 +128,7 @@ export const sendTransaction = async ({
     chainId: getEip155ChainId(chainId),
     nonce: convertBigNumberishToString(nonce),
     metaTransactions,
+    isScreenReadyPromise,
   });
   validateEVMTransactionPromise.then(() => flow.addEvent('endValidateEVMTransaction'));
 

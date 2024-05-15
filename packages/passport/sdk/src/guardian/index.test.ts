@@ -57,7 +57,7 @@ describe('Guardian', () => {
       mockGetTransactionByID.mockResolvedValue({ data: { id: '1234' } });
       mockEvaluateTransaction.mockResolvedValue({ data: { confirmationRequired: false } });
 
-      await getGuardianClient().evaluateImxTransaction({ payloadHash: 'hash' });
+      await getGuardianClient().evaluateImxTransaction({ payloadHash: 'hash', isScreenReadyPromise: Promise.resolve({ ready: true }) });
 
       expect(mockConfirmationScreen.requestConfirmation).toBeCalledTimes(0);
       expect(mockEvaluateTransaction).toBeCalledWith({
@@ -72,9 +72,20 @@ describe('Guardian', () => {
       mockGetTransactionByID.mockResolvedValue({ data: { id: '1234' } });
       mockEvaluateTransaction.mockResolvedValue({ data: { confirmationRequired: false } });
 
-      await getGuardianClient().evaluateImxTransaction({ payloadHash: 'hash' });
+      await getGuardianClient().evaluateImxTransaction({ payloadHash: 'hash', isScreenReadyPromise: Promise.resolve({ ready: true }) });
 
       expect(mockConfirmationScreen.requestConfirmation).toBeCalledTimes(0);
+    });
+
+    it('should throw an error if the confirmation screen is not ready', async () => {
+      mockGetTransactionByID.mockResolvedValueOnce({ data: { id: '1234' } });
+      mockEvaluateTransaction
+        .mockResolvedValueOnce({ data: { confirmationRequired: true } });
+      (mockConfirmationScreen.requestConfirmation as jest.Mock).mockResolvedValueOnce({ confirmed: false });
+
+      await expect(getGuardianClient().evaluateImxTransaction(
+        { payloadHash: 'hash', isScreenReadyPromise: Promise.resolve(undefined) },
+      )).rejects.toThrow('Confirmation screen is not ready. retry it again.');
     });
 
     it('should show the confirmation screen when some of the confirmations are required', async () => {
@@ -83,7 +94,7 @@ describe('Guardian', () => {
         .mockResolvedValueOnce({ data: { confirmationRequired: true } });
       (mockConfirmationScreen.requestConfirmation as jest.Mock).mockResolvedValueOnce({ confirmed: true });
 
-      await getGuardianClient().evaluateImxTransaction({ payloadHash: 'hash' });
+      await getGuardianClient().evaluateImxTransaction({ payloadHash: 'hash', isScreenReadyPromise: Promise.resolve({ ready: true }) });
 
       expect(mockConfirmationScreen.requestConfirmation).toHaveBeenCalledWith('hash', mockUserImx.imx.ethAddress, 'starkex');
     });
@@ -94,7 +105,7 @@ describe('Guardian', () => {
         .mockResolvedValueOnce({ data: { confirmationRequired: true } });
       (mockConfirmationScreen.requestConfirmation as jest.Mock).mockResolvedValueOnce({ confirmed: false });
 
-      await expect(getGuardianClient().evaluateImxTransaction({ payloadHash: 'hash' })).rejects.toThrow('Transaction rejected by user');
+      await expect(getGuardianClient().evaluateImxTransaction({ payloadHash: 'hash', isScreenReadyPromise: Promise.resolve({ ready: true }) })).rejects.toThrow('Transaction rejected by user');
     });
 
     describe('crossSdkBridgeEnabled', () => {
@@ -105,7 +116,7 @@ describe('Guardian', () => {
 
         const guardianClient = getGuardianClient(true);
 
-        await expect(guardianClient.evaluateImxTransaction({ payloadHash: 'hash' }))
+        await expect(guardianClient.evaluateImxTransaction({ payloadHash: 'hash', isScreenReadyPromise: Promise.resolve({ ready: true }) }))
           .rejects
           .toThrow('Transaction requires confirmation but this functionality is not supported in this environment. Please contact Immutable support if you need to enable this feature.');
       });
@@ -293,7 +304,17 @@ describe('Guardian', () => {
   describe('validateMessage', () => {
     afterEach(jest.resetAllMocks);
 
-    const mockPayload = { chainID: '0x1234', payload: {} as guardian.EIP712Message, user: mockUserZkEvm };
+    const mockPayload = {
+      chainID: '0x1234', payload: {} as guardian.EIP712Message, user: mockUserZkEvm, isScreenReadyPromise: Promise.resolve({ ready: true }),
+    };
+    it('should throw an error if the confirmation screen is not ready', async () => {
+      mockEvaluateMessage.mockRejectedValueOnce(new Error('401: Unauthorized'));
+      await expect(getGuardianClient().validateMessage({
+        ...mockPayload,
+        isScreenReadyPromise: Promise.resolve(undefined),
+      })).rejects.toThrow('Message failed to validate with error: 401: Unauthorized');
+    });
+
     it('surfaces error message if message evaluation fails', async () => {
       mockEvaluateMessage.mockRejectedValueOnce(new Error('401: Unauthorized'));
       await expect(getGuardianClient().validateMessage(mockPayload))

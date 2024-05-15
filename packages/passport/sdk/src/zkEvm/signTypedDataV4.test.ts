@@ -60,6 +60,7 @@ describe('signTypedDataV4', () => {
         relayerClient: relayerClient as unknown as RelayerClient,
         guardianClient: guardianClient as unknown as GuardianClient,
         flow: flow as unknown as Flow,
+        isScreenReadyPromise: Promise.resolve({ ready: true }),
       });
 
       expect(result).toEqual(combinedSignature);
@@ -87,6 +88,7 @@ describe('signTypedDataV4', () => {
         relayerClient: relayerClient as unknown as RelayerClient,
         guardianClient: guardianClient as any,
         flow: flow as unknown as Flow,
+        isScreenReadyPromise: Promise.resolve({ ready: true }),
       });
 
       expect(result).toEqual(combinedSignature);
@@ -115,6 +117,7 @@ describe('signTypedDataV4', () => {
           relayerClient: relayerClient as unknown as RelayerClient,
           guardianClient: guardianClient as any,
           flow: flow as unknown as Flow,
+          isScreenReadyPromise: Promise.resolve({ ready: true }),
         })
       )).rejects.toThrow(
         new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'eth_signTypedData_v4 requires an address and a typed data JSON'),
@@ -133,6 +136,7 @@ describe('signTypedDataV4', () => {
           relayerClient: relayerClient as unknown as RelayerClient,
           guardianClient: guardianClient as any,
           flow: flow as unknown as Flow,
+          isScreenReadyPromise: Promise.resolve({ ready: true }),
         })
       )).rejects.toMatchObject({
         code: RpcErrorCode.INVALID_PARAMS,
@@ -159,6 +163,7 @@ describe('signTypedDataV4', () => {
           relayerClient: relayerClient as unknown as RelayerClient,
           guardianClient: guardianClient as any,
           flow: flow as unknown as Flow,
+          isScreenReadyPromise: Promise.resolve({ ready: true }),
         })
       )).rejects.toThrow(
         new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'Invalid typed data argument. The following properties are required: types, domain, primaryType, message'),
@@ -185,6 +190,7 @@ describe('signTypedDataV4', () => {
           relayerClient: relayerClient as unknown as RelayerClient,
           guardianClient: guardianClient as any,
           flow: flow as unknown as Flow,
+          isScreenReadyPromise: Promise.resolve({ ready: true }),
         })
       )).rejects.toThrow(
         new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `Invalid chainId, expected ${chainId}`),
@@ -210,6 +216,7 @@ describe('signTypedDataV4', () => {
       relayerClient: relayerClient as unknown as RelayerClient,
       guardianClient: guardianClient as any,
       flow: flow as unknown as Flow,
+      isScreenReadyPromise: Promise.resolve({ ready: true }),
     });
 
     expect(result).toEqual(combinedSignature);

@@ -3,7 +3,7 @@ import { TransactionApprovalRequestChainTypeEnum, TransactionEvaluationResponse 
 import { BigNumber, ethers } from 'ethers';
 import { PassportError, PassportErrorType } from 'errors/passportError';
 import AuthManager from '../authManager';
-import { ConfirmationScreen } from '../confirmation';
+import { ConfirmationScreen, LoadingResult } from '../confirmation';
 import { retryWithDelay } from '../network/retry';
 import { JsonRpcError, RpcErrorCode } from '../zkEvm/JsonRpcError';
 import { MetaTransaction, TypedDataPayload } from '../zkEvm/types';
@@ -17,17 +17,20 @@ export type GuardianClientParams = {
 
 export type GuardianEvaluateImxTransactionParams = {
   payloadHash: string;
+  isScreenReadyPromise: Promise<LoadingResult | undefined>;
 };
 
 type GuardianEVMValidationParams = {
   chainId: string;
   nonce: string;
   metaTransactions: MetaTransaction[];
+  isScreenReadyPromise?: Promise<LoadingResult | undefined>;
 };
 
 type GuardianMessageValidationParams = {
   chainID: string;
   payload: TypedDataPayload;
+  isScreenReadyPromise?: Promise<LoadingResult | undefined>;
 };
 
 const transactionRejectedCrossSdkBridgeError = 'Transaction requires confirmation but this functionality is not'
@@ -86,18 +89,20 @@ export default class GuardianClient {
     width: number;
     height: number;
   }) {
-    return <T>(task: () => Promise<T>): Promise<T> => this.withConfirmationScreenTask(popupWindowSize)(task)();
+    return <T>(task: (isScreenReadyPromise: Promise<LoadingResult | undefined>)
+    => Promise<T>): Promise<T> => this.withConfirmationScreenTask(popupWindowSize)(task)();
   }
 
   public withConfirmationScreenTask(popupWindowSize?: {
     width: number;
     height: number;
   }) {
-    return <T>(task: () => Promise<T>): (() => Promise<T>) => async () => {
-      this.confirmationScreen.loading(popupWindowSize);
+    return <T>(task: (isScreenReadyPromise: Promise<LoadingResult | undefined>)
+    => Promise<T>): (() => Promise<T>) => async () => {
+      const isScreenReadyPromise = this.confirmationScreen.loading(popupWindowSize);
 
       try {
-        return await task();
+        return await task(isScreenReadyPromise);
       } catch (err) {
         this.confirmationScreen.closeWindow();
         throw err;
@@ -105,11 +110,14 @@ export default class GuardianClient {
     };
   }
 
-  public withDefaultConfirmationScreenTask<T>(task: () => Promise<T>): (() => Promise<T>) {
+  public withDefaultConfirmationScreenTask<T>(task: (isScreenReadyPromise: Promise<LoadingResult | undefined>)
+  => Promise<T>): (() => Promise<T>) {
     return this.withConfirmationScreenTask()(task);
   }
 
-  public async evaluateImxTransaction({ payloadHash }: GuardianEvaluateImxTransactionParams): Promise<void> {
+  public async evaluateImxTransaction(
+    { payloadHash, isScreenReadyPromise }: GuardianEvaluateImxTransactionParams,
+  ): Promise<void> {
     const finallyFn = () => {
       this.confirmationScreen.closeWindow();
     };
@@ -127,7 +135,10 @@ export default class GuardianClient {
     if (!transactionRes.data.id) {
       throw new Error("Transaction doesn't exists");
     }
-
+    const screen = await isScreenReadyPromise;
+    if (!screen || !screen.ready) {
+      throw new Error('Confirmation screen is not ready. retry it again.');
+    }
     const evaluateImxRes = await this.transactionAPI.evaluateTransaction({
       id: payloadHash,
       transactionEvaluationRequest: {
@@ -193,6 +204,7 @@ export default class GuardianClient {
     chainId,
     nonce,
     metaTransactions,
+    isScreenReadyPromise,
   }: GuardianEVMValidationParams): Promise<void> {
     const transactionEvaluationResponse = await this.evaluateEVMTransaction({
       chainId,
@@ -210,6 +222,10 @@ export default class GuardianClient {
 
     if (confirmationRequired && !!transactionId) {
       const user = await this.authManager.getUserZkEvm();
+      const screen = await isScreenReadyPromise;
+      if (!screen || !screen.ready) {
+        throw new Error('Confirmation screen is not ready. retry it again.');
+      }
       const confirmationResult = await this.confirmationScreen.requestConfirmation(
         transactionId,
         user.zkEvm.ethAddress,
@@ -247,13 +263,17 @@ export default class GuardianClient {
     }
   }
 
-  public async validateMessage({ chainID, payload }: GuardianMessageValidationParams) {
+  public async validateMessage({ chainID, payload, isScreenReadyPromise }: GuardianMessageValidationParams) {
     const { messageId, confirmationRequired } = await this.evaluateMessage({ chainID, payload });
     if (confirmationRequired && this.crossSdkBridgeEnabled) {
       throw new JsonRpcError(RpcErrorCode.TRANSACTION_REJECTED, transactionRejectedCrossSdkBridgeError);
     }
     if (confirmationRequired && !!messageId) {
       const user = await this.authManager.getUserZkEvm();
+      const screen = await isScreenReadyPromise;
+      if (!screen || !screen.ready) {
+        throw new Error('Confirmation screen is not ready. retry it again.');
+      }
       const confirmationResult = await this.confirmationScreen.requestMessageConfirmation(
         messageId,
         user.zkEvm.ethAddress,

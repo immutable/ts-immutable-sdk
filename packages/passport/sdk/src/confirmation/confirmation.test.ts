@@ -45,6 +45,22 @@ describe('confirmation', () => {
       expect(mockedOpen).toHaveBeenCalledTimes(1);
     });
 
+    it('should resolve ready: true when the confirmation window is ready', async () => {
+      const mockedWindowReadyValue = {
+        origin: testConfig.passportDomain,
+        data: {
+          eventType: PASSPORT_EVENT_TYPE,
+          messageType: ReceiveMessage.CONFIRMATION_WINDOW_READY,
+        },
+      };
+      addEventListenerMock
+        .mockImplementationOnce((event, callback) => {
+          callback(mockedWindowReadyValue);
+        });
+      const result = await confirmationScreen.loading();
+      expect(result).toEqual({ ready: true });
+    });
+
     describe('crossSdkBridgeEnabled', () => {
       it('does not open the confirmation popup if the cross sdk bridge flag is enabled', () => {
         const config = new PassportConfiguration({

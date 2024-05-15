@@ -11,6 +11,7 @@ import {
 } from '../../errors/passportError';
 import { UserImx } from '../../types';
 import GuardianClient from '../../guardian';
+import { LoadingResult } from '../../confirmation';
 
 const ERC721 = 'ERC721';
 
@@ -38,63 +39,66 @@ export async function transfer({
   guardianClient,
 }: TransferRequest): Promise<imx.CreateTransferResponseV1> {
   return withPassportError<imx.CreateTransferResponseV1>(
-    guardianClient.withDefaultConfirmationScreenTask(async () => {
-      const transferAmount = request.type === ERC721 ? '1' : request.amount;
-      const getSignableTransferRequest: imx.GetSignableTransferRequestV1 = {
-        sender: user.imx.ethAddress,
-        token: convertToSignableToken(request),
-        amount: transferAmount,
-        receiver: request.receiver,
-      };
+    guardianClient.withDefaultConfirmationScreenTask(
+      async (isScreenReadyPromise: Promise<LoadingResult | undefined>) => {
+        const transferAmount = request.type === ERC721 ? '1' : request.amount;
+        const getSignableTransferRequest: imx.GetSignableTransferRequestV1 = {
+          sender: user.imx.ethAddress,
+          token: convertToSignableToken(request),
+          amount: transferAmount,
+          receiver: request.receiver,
+        };
 
-      const headers = {
-        Authorization: `Bearer ${user.accessToken}`,
-      };
+        const headers = {
+          Authorization: `Bearer ${user.accessToken}`,
+        };
 
-      const signableResult = await transfersApi.getSignableTransferV1(
-        {
-          getSignableTransferRequest,
-        },
-        { headers },
-      );
+        const signableResult = await transfersApi.getSignableTransferV1(
+          {
+            getSignableTransferRequest,
+          },
+          { headers },
+        );
 
-      await guardianClient.evaluateImxTransaction({
-        payloadHash: signableResult.data.payload_hash,
-      });
+        await guardianClient.evaluateImxTransaction({
+          payloadHash: signableResult.data.payload_hash,
+          isScreenReadyPromise,
+        });
 
-      const signableResultData = signableResult.data;
-      const { payload_hash: payloadHash } = signableResultData;
-      const starkSignature = await starkSigner.signMessage(payloadHash);
-      const senderStarkKey = await starkSigner.getAddress();
+        const signableResultData = signableResult.data;
+        const { payload_hash: payloadHash } = signableResultData;
+        const starkSignature = await starkSigner.signMessage(payloadHash);
+        const senderStarkKey = await starkSigner.getAddress();
 
-      const transferSigningParams = {
-        sender_stark_key: signableResultData.sender_stark_key || senderStarkKey,
-        sender_vault_id: signableResultData.sender_vault_id,
-        receiver_stark_key: signableResultData.receiver_stark_key,
-        receiver_vault_id: signableResultData.receiver_vault_id,
-        asset_id: signableResultData.asset_id,
-        amount: signableResultData.amount,
-        nonce: signableResultData.nonce,
-        expiration_timestamp: signableResultData.expiration_timestamp,
-        stark_signature: starkSignature,
-      };
+        const transferSigningParams = {
+          sender_stark_key: signableResultData.sender_stark_key || senderStarkKey,
+          sender_vault_id: signableResultData.sender_vault_id,
+          receiver_stark_key: signableResultData.receiver_stark_key,
+          receiver_vault_id: signableResultData.receiver_vault_id,
+          asset_id: signableResultData.asset_id,
+          amount: signableResultData.amount,
+          nonce: signableResultData.nonce,
+          expiration_timestamp: signableResultData.expiration_timestamp,
+          stark_signature: starkSignature,
+        };
 
-      const createTransferRequest = {
-        createTransferRequest: transferSigningParams,
-      };
+        const createTransferRequest = {
+          createTransferRequest: transferSigningParams,
+        };
 
-      const { data: responseData } = await transfersApi.createTransferV1(
-        createTransferRequest,
-        { headers },
-      );
+        const { data: responseData } = await transfersApi.createTransferV1(
+          createTransferRequest,
+          { headers },
+        );
 
-      return {
-        sent_signature: responseData.sent_signature,
-        status: responseData.status?.toString(),
-        time: responseData.time,
-        transfer_id: responseData.transfer_id,
-      };
-    }),
+        return {
+          sent_signature: responseData.sent_signature,
+          status: responseData.status?.toString(),
+          time: responseData.time,
+          transfer_id: responseData.transfer_id,
+        };
+      },
+    ),
     PassportErrorType.TRANSFER_ERROR,
   );
 }
@@ -110,7 +114,7 @@ export async function batchNftTransfer({
   return withPassportError<imx.CreateTransferResponse>(
     guardianClient.withConfirmationScreenTask(
       { width: 480, height: 784 },
-    )(async () => {
+    )(async (isScreenReadyPromise: Promise<LoadingResult | undefined>) => {
       const { ethAddress } = user.imx;
 
       const signableRequests = request.map(
@@ -138,6 +142,7 @@ export async function batchNftTransfer({
 
       await guardianClient.evaluateImxTransaction({
         payloadHash: signableResult.data.signable_responses[0]?.payload_hash,
+        isScreenReadyPromise,
       });
 
       const requests = await Promise.all(

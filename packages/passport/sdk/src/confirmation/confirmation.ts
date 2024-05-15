@@ -3,6 +3,7 @@ import {
   ConfirmationDataReadyMessageData,
   ConfirmationResult,
   ConfirmationTypeEnum,
+  LoadingResult,
   PASSPORT_EVENT_TYPE,
   PostMessageData,
   ReceiveMessage,
@@ -200,44 +201,78 @@ export default class ConfirmationScreen {
     });
   }
 
-  loading(popupOptions?: { width: number; height: number }) {
-    if (this.config.crossSdkBridgeEnabled) {
-      // There is no need to open a confirmation window if cross-sdk bridge is enabled
-      return;
-    }
+  loading(popupOptions?: { width: number; height: number }): Promise<LoadingResult | undefined> {
+    return new Promise((resolve, reject) => {
+      if (this.config.crossSdkBridgeEnabled) {
+        // There is no need to open a confirmation window if cross-sdk bridge is enabled
+        return;
+      }
+      this.popupOptions = popupOptions;
+      try {
+        this.confirmationWindow = openPopupCenter({
+          url: this.getHref('loading'),
+          title: CONFIRMATION_WINDOW_TITLE,
+          width: popupOptions?.width || CONFIRMATION_WINDOW_WIDTH,
+          height: popupOptions?.height || CONFIRMATION_WINDOW_HEIGHT,
+        });
+        this.overlay = new Overlay(this.config.popupOverlayOptions);
+      } catch (e) {
+        // If an error is thrown here then the popup is blocked
+        this.overlay = new Overlay(this.config.popupOverlayOptions, true);
+      }
 
-    this.popupOptions = popupOptions;
+      this.overlay.append(
+        () => {
+          try {
+            this.confirmationWindow?.close();
+            this.confirmationWindow = openPopupCenter({
+              url: this.getHref('loading'),
+              title: CONFIRMATION_WINDOW_TITLE,
+              width: this.popupOptions?.width || CONFIRMATION_WINDOW_WIDTH,
+              height: this.popupOptions?.height || CONFIRMATION_WINDOW_HEIGHT,
+            });
+          } catch { /* Empty */ }
+        },
+        () => {
+          this.overlayClosed = true;
+          this.closeWindow();
+        },
+      );
 
-    try {
-      this.confirmationWindow = openPopupCenter({
-        url: this.getHref('loading'),
-        title: CONFIRMATION_WINDOW_TITLE,
-        width: popupOptions?.width || CONFIRMATION_WINDOW_WIDTH,
-        height: popupOptions?.height || CONFIRMATION_WINDOW_HEIGHT,
-      });
-      this.overlay = new Overlay(this.config.popupOverlayOptions);
-    } catch (e) {
-      // If an error is thrown here then the popup is blocked
-      this.overlay = new Overlay(this.config.popupOverlayOptions, true);
-    }
+      const messageHandler = ({ data, origin }: MessageEvent) => {
+        if (
+          origin !== this.config.passportDomain
+          || data.eventType !== PASSPORT_EVENT_TYPE
+        ) {
+          return;
+        }
+        switch (data.messageType as ReceiveMessage) {
+          case ReceiveMessage.CONFIRMATION_WINDOW_READY: {
+            resolve({ ready: true });
+            window.removeEventListener('message', messageHandler);
+            break;
+          }
+          default:
+            this.closeWindow();
+            reject(new Error('Unsupported message type'));
+        }
+      };
 
-    this.overlay.append(
-      () => {
-        try {
-          this.confirmationWindow?.close();
-          this.confirmationWindow = openPopupCenter({
-            url: this.getHref('loading'),
-            title: CONFIRMATION_WINDOW_TITLE,
-            width: this.popupOptions?.width || CONFIRMATION_WINDOW_WIDTH,
-            height: this.popupOptions?.height || CONFIRMATION_WINDOW_HEIGHT,
-          });
-        } catch { /* Empty */ }
-      },
-      () => {
-        this.overlayClosed = true;
-        this.closeWindow();
-      },
-    );
+      window.addEventListener('message', messageHandler);
+      // https://stackoverflow.com/questions/9388380/capture-the-close-event-of-popup-window-in-javascript/48240128#48240128
+      const timerCallback = () => {
+        if (this.confirmationWindow?.closed || this.overlayClosed) {
+          clearInterval(this.timer);
+          window.removeEventListener('message', messageHandler);
+          this.overlayClosed = false;
+          this.confirmationWindow = undefined;
+        }
+      };
+      this.timer = setInterval(
+        timerCallback,
+        CONFIRMATION_WINDOW_CLOSED_POLLING_DURATION,
+      );
+    });
   }
 
   closeWindow() {

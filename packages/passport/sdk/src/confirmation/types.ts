@@ -70,4 +70,8 @@ export type ConfirmationResult = {
   confirmed: boolean;
 };
 
+export type LoadingResult = {
+  ready: boolean;
+};
+
 export const PASSPORT_EVENT_TYPE = 'imx_passport_confirmation';

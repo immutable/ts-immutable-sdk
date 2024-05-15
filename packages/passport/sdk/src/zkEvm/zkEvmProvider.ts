@@ -28,6 +28,7 @@ import { registerZkEvmUser } from './user';
 import { sendTransaction } from './sendTransaction';
 import GuardianClient from '../guardian';
 import { signTypedDataV4 } from './signTypedDataV4';
+import { LoadingResult } from '../confirmation';
 
 export type ZkEvmProviderInput = {
   authManager: AuthManager;
@@ -223,10 +224,11 @@ export class ZkEvmProvider implements Provider {
         const flow = trackFlow('passport', 'ethSendTransaction');
 
         try {
-          return await this.#guardianClient.withConfirmationScreen({ width: 480, height: 720 })(async () => {
+          return await this.#guardianClient.withConfirmationScreen(
+            { width: 480, height: 720 },
+          )(async (isScreenReadyPromise: Promise<LoadingResult | undefined>) => {
             const ethSigner = await this.#getSigner();
             flow.addEvent('endGetSigner');
-
             return await sendTransaction({
               params: request.params || [],
               ethSigner,
@@ -235,6 +237,7 @@ export class ZkEvmProvider implements Provider {
               relayerClient: this.#relayerClient,
               zkevmAddress: this.#zkEvmAddress!,
               flow,
+              isScreenReadyPromise,
             });
           });
         } catch (error) {
@@ -261,7 +264,9 @@ export class ZkEvmProvider implements Provider {
         const flow = trackFlow('passport', 'ethSignTypedDataV4');
 
         try {
-          return await this.#guardianClient.withConfirmationScreen({ width: 480, height: 720 })(async () => {
+          return await this.#guardianClient.withConfirmationScreen(
+            { width: 480, height: 720 },
+          )(async (isScreenReadyPromise: Promise<LoadingResult | undefined>) => {
             const ethSigner = await this.#getSigner();
             flow.addEvent('endGetSigner');
 
@@ -273,6 +278,7 @@ export class ZkEvmProvider implements Provider {
               relayerClient: this.#relayerClient,
               guardianClient: this.#guardianClient,
               flow,
+              isScreenReadyPromise,
             });
           });
         } catch (error) {

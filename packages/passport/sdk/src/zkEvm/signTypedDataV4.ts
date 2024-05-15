@@ -7,6 +7,7 @@ import { getSignedTypedData } from './walletHelpers';
 import { TypedDataPayload } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { RelayerClient } from './relayerClient';
+import { LoadingResult } from '../confirmation';
 
 export type SignTypedDataV4Params = {
   ethSigner: Signer;
@@ -16,6 +17,7 @@ export type SignTypedDataV4Params = {
   params: Array<any>;
   guardianClient: GuardianClient;
   flow: Flow;
+  isScreenReadyPromise: Promise<LoadingResult | undefined>;
 };
 
 const REQUIRED_TYPED_DATA_PROPERTIES = ['types', 'domain', 'primaryType', 'message'];
@@ -72,6 +74,7 @@ export const signTypedDataV4 = async ({
   relayerClient,
   guardianClient,
   flow,
+  isScreenReadyPromise,
 }: SignTypedDataV4Params): Promise<string> => {
   const fromAddress: string = params[0];
   const typedDataParam: string | object = params[1];
@@ -84,7 +87,7 @@ export const signTypedDataV4 = async ({
   const typedData = transformTypedData(typedDataParam, chainId);
   flow.addEvent('endDetectNetwork');
 
-  await guardianClient.validateMessage({ chainID: String(chainId), payload: typedData });
+  await guardianClient.validateMessage({ chainID: String(chainId), payload: typedData, isScreenReadyPromise });
   flow.addEvent('endValidateMessage');
 
   const relayerSignature = await relayerClient.imSignTypedData(fromAddress, typedData);
