@@ -5,7 +5,6 @@ import {
 import { useTranslation } from 'react-i18next';
 import {
   FundingStepType,
-  SaleItem,
   SalePaymentTypes,
   TransactionRequirement,
 } from '@imtbl/checkout-sdk';
@@ -20,7 +19,7 @@ import { EventTargetContext } from '../../../context/event-target-context/EventT
 import { sendSaleWidgetCloseEvent } from '../SaleWidgetEvents';
 import { SelectCoinDropdown } from './SelectCoinDropdown';
 import { CoinsDrawer } from './CoinsDrawer';
-import { OrderQuoteProduct, FundingBalance } from '../types';
+import { FundingBalance } from '../types';
 import { OrderItems } from './OrderItems';
 import { useSaleEvent } from '../hooks/useSaleEvents';
 import {
@@ -28,24 +27,20 @@ import {
   getFundingBalanceTotalFees,
 } from '../functions/fundingBalanceFees';
 import { FeesDisplay, OrderFees } from './OrderFees';
+import { useSaleContext } from '../context/SaleContextProvider';
 
 type OrderReviewProps = {
   collectionName: string;
   fundingBalances: FundingBalance[];
   conversions: Map<string, number>;
   loadingBalances: boolean;
-  items: SaleItem[];
-  pricing: Record<string, OrderQuoteProduct>;
   transactionRequirement?: TransactionRequirement;
   onBackButtonClick: () => void;
   onProceedToBuy: (fundingBalance: FundingBalance) => void;
   onPayWithCard?: (paymentType: SalePaymentTypes) => void;
-  disabledPaymentTypes?: SalePaymentTypes[];
 };
 
 export function OrderReview({
-  items,
-  pricing,
   fundingBalances,
   conversions,
   collectionName,
@@ -54,12 +49,14 @@ export function OrderReview({
   onBackButtonClick,
   onPayWithCard,
   onProceedToBuy,
-  disabledPaymentTypes,
 }: OrderReviewProps) {
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
   const { t } = useTranslation();
+  const {
+    provider, items, orderQuote, disabledPaymentTypes,
+  } = useSaleContext();
   const { sendSelectedPaymentToken, sendViewFeesEvent } = useSaleEvent();
 
   const [showCoinsDrawer, setShowCoinsDrawer] = useState(false);
@@ -93,11 +90,11 @@ export function OrderReview({
 
   const fundingBalance = useMemo(
     () => fundingBalances[selectedCurrencyIndex],
-    [fundingBalances, selectedCurrencyIndex],
+    [fundingBalances, selectedCurrencyIndex, provider],
   );
 
   useEffect(() => {
-    if (!conversions?.size) {
+    if (!conversions?.size || !provider) {
       return;
     }
 
@@ -120,9 +117,13 @@ export function OrderReview({
         fee.token.symbol,
         conversions,
       ),
-      formattedFees: getFundingBalanceFeeBreakDown(fundingBalance, conversions, t),
+      formattedFees: getFundingBalanceFeeBreakDown(
+        fundingBalance,
+        conversions,
+        t,
+      ),
     });
-  }, [fundingBalance, conversions]);
+  }, [fundingBalance, conversions, provider]);
 
   const multiple = items.length > 1;
   const withFees = !loadingBalances && fundingBalance.type === FundingStepType.SWAP;
@@ -170,8 +171,8 @@ export function OrderReview({
         <Box sx={{ px: 'base.spacing.x2' }}>
           <OrderItems
             items={items}
-            balance={fundingBalances[selectedCurrencyIndex]}
-            pricing={pricing}
+            balance={fundingBalance}
+            pricing={orderQuote.products}
             conversions={conversions}
           >
             {!multiple && withFees && (
@@ -208,7 +209,7 @@ export function OrderReview({
       <SelectCoinDropdown
         onClick={openDrawer}
         onProceed={onProceedToBuy}
-        balance={fundingBalances[selectedCurrencyIndex]}
+        balance={fundingBalance}
         conversions={conversions}
         canOpen={fundingBalances.length > 1}
         loading={loadingBalances}

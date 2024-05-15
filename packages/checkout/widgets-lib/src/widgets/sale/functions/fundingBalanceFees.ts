@@ -61,15 +61,15 @@ const getTotalFeesBySymbol = (
 export const getFundingBalanceTotalFees = (
   balance: FundingBalance,
 ): FeesBySymbol => {
-  let fees: Fee[] = [];
-  if (balance.type === FundingStepType.SWAP) {
-    fees = [
-      balance.fees.approvalGasFee,
-      balance.fees.swapGasFee,
-      ...balance.fees.swapFees,
-    ];
+  if (balance.type !== FundingStepType.SWAP) {
+    return {};
   }
 
+  const fees = [
+    balance.fees.approvalGasFee,
+    balance.fees.swapGasFee,
+    ...balance.fees.swapFees,
+  ];
   const totalFees = getTotalFeesBySymbol(fees, balance.fundingItem.token);
 
   return totalFees;
@@ -108,24 +108,21 @@ export const getFundingBalanceFeeBreakDown = (
     }
   };
 
-  const { fees } = balance;
-  console.log('🚀 ~ fees:', fees);
-
   // Format gas fee
   addFee(
-    fees.swapGasFee,
+    balance.fees.swapGasFee,
     t('drawers.feesBreakdown.fees.swapGasFee.label'),
   );
 
   // Format gas fee approval
   addFee(
-    fees.approvalGasFee,
+    balance.fees.approvalGasFee,
     t('drawers.feesBreakdown.fees.approvalFee.label'),
   );
 
   // Format the secondary fees
   const totalSwapFeesBySymbol = Object.entries(
-    getTotalFeesBySymbol(fees.swapFees, balance.fundingItem.token),
+    getTotalFeesBySymbol(balance.fees.swapFees, balance.fundingItem.token),
   );
 
   totalSwapFeesBySymbol.forEach(([, swapFee]) => {

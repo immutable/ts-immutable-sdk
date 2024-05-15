@@ -41,12 +41,10 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
     items,
     fromTokenAddress,
     collectionName,
-    disabledPaymentTypes,
     goToErrorView,
     goBackToPaymentMethods,
     sign,
     selectedCurrency,
-    orderQuote,
   } = useSaleContext();
 
   const { viewDispatch, viewState } = useContext(ViewContext);
@@ -208,8 +206,6 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
       )}
       {subView === OrderSummarySubViews.REVIEW_ORDER && (
         <OrderReview
-          items={items}
-          pricing={orderQuote.products}
           fundingBalances={fundingBalances}
           conversions={cryptoFiatState.conversions}
           collectionName={collectionName}
@@ -218,7 +214,6 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
           onProceedToBuy={onProceedToBuy}
           transactionRequirement={transactionRequirement}
           onPayWithCard={onPayWithCard}
-          disabledPaymentTypes={disabledPaymentTypes}
         />
       )}
       {subView === OrderSummarySubViews.EXECUTE_FUNDING_ROUTE && (
