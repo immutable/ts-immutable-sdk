@@ -104,8 +104,7 @@ export function OrderReview({
           pb: 'base.spacing.x8',
           maxh: '60%',
           height: '100%',
-          overflowY: 'scroll',
-          scrollbarWidth: 'none',
+          overflowY: 'auto',
           rowGap: 'base.spacing.x4',
         }}
       >

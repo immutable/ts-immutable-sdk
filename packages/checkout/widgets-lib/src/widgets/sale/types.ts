@@ -1,7 +1,8 @@
 import { Web3Provider } from '@ethersproject/providers';
 import {
   SaleItem,
-  TransactionRequirement, FundingStep, FundingItem,
+  FundingStep,
+  FundingItem,
   SmartCheckoutResult,
 } from '@imtbl/checkout-sdk';
 
@@ -60,14 +61,6 @@ export type SignOrderError = {
   data?: Record<string, unknown>;
 };
 
-export type SmartCheckoutError = {
-  type: SaleErrorTypes;
-  data?: {
-    error: Error;
-    transactionRequirements?: TransactionRequirement[];
-  };
-};
-
 export type ExecutedTransaction = {
   method: string;
   hash: string | undefined;
@@ -90,12 +83,7 @@ export enum SaleErrorTypes {
   WALLET_REJECTED = 'WALLET_REJECTED',
   WALLET_REJECTED_NO_FUNDS = 'WALLET_REJECTED_NO_FUNDS',
   WALLET_POPUP_BLOCKED = 'WALLET_POPUP_BLOCKED',
-  SMART_CHECKOUT_ERROR = 'SMART_CHECKOUT_ERROR',
-  SMART_CHECKOUT_EXECUTE_ERROR = 'SMART_CHECKOUT_EXECUTE_ERROR',
-}
-
-export enum SmartCheckoutErrorTypes {
-  FRACTIONAL_BALANCE_BLOCKED = 'FRACTIONAL_BALANCE_BLOCKED',
+  FUNDING_ROUTE_EXECUTE_ERROR = 'FUNDING_ROUTE_EXECUTE_ERROR',
 }
 
 export type OrderQuoteCurrency = {

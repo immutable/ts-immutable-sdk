@@ -293,25 +293,6 @@
         "balance": "余额{{amount}}"
       }
     },
-    "FUND_WITH_SMART_CHECKOUT": {
-      "loading": {
-        "checkingBalances": "正在计算数字"
-      },
-      "currency": {
-        "usdEstimate": "≈ 美元 $",
-        "fees": "费用"
-      },
-      "fundingRouteDrawer": {
-        "header": "可用余额"
-      },
-      "fundingRouteSelect": {
-        "heading": "用您的支付",
-        "noRoutesAvailable": "硬币余额不足。请改用卡继续操作。",
-        "continue": "继续",
-        "payWithCardInstead": "不用了，我要用卡支付",
-        "payWithCard": "用卡支付"
-      }
-    },
     "PAYMENT_METHODS": {
       "header": {
         "heading": "您希望如何支付？"
@@ -412,12 +393,7 @@
           "primaryAction": "我已经解决了这个问题，再试一次",
           "secondaryAction": "取消"
         },
-        "SMART_CHECKOUT_ERROR": {
-          "description": "无法检查您的钱包余额。请再试一次。",
-          "primaryAction": "再试一次",
-          "secondaryAction": "取消"
-        },
-        "SMART_CHECKOUT_EXECUTE_ERROR": {
+        "FUNDING_ROUTE_EXECUTE_ERROR": {
           "description": "抱歉，转移资金时出错。请再试一次。",
           "primaryAction": "再试一次",
           "secondaryAction": "取消"
