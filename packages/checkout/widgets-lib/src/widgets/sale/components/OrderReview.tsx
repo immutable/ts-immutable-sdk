@@ -120,7 +120,7 @@ export function OrderReview({
         fee.token.symbol,
         conversions,
       ),
-      formattedFees: getFundingBalanceFeeBreakDown(fundingBalance, conversions),
+      formattedFees: getFundingBalanceFeeBreakDown(fundingBalance, conversions, t),
     });
   }, [fundingBalance, conversions]);
 

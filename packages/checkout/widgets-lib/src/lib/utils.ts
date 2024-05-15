@@ -81,7 +81,6 @@ export const calculateCryptoToFiat = (
   if (!conversion) return zeroString;
 
   const parsedAmount = parseFloat(amount);
-  console.log('🚀 ~ amount:', amount, parsedAmount, parsedAmount * conversion);
   if (parseFloat(amount) === 0 || Number.isNaN(parsedAmount)) return zeroString;
   return formatFiatString(parsedAmount * conversion, maxDecimals);
 };

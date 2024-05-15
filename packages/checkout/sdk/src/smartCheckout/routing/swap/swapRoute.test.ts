@@ -274,6 +274,7 @@ describe('swapRoute', () => {
               type: FeeType.SWAP_FEE,
               amount: BigNumber.from(3),
               formattedAmount: utils.formatUnits(BigNumber.from(3), 18),
+              basisPoints: 0,
               token: {
                 decimals: 18,
                 name: 'IMX',
@@ -404,6 +405,7 @@ describe('swapRoute', () => {
               type: FeeType.SWAP_FEE,
               amount: BigNumber.from(3),
               formattedAmount: utils.formatUnits(BigNumber.from(3), 18),
+              basisPoints: 0,
               token: {
                 decimals: 18,
                 name: 'IMX',
@@ -546,6 +548,7 @@ describe('swapRoute', () => {
               type: FeeType.SWAP_FEE,
               amount: BigNumber.from(3),
               formattedAmount: utils.formatUnits(BigNumber.from(3), 18),
+              basisPoints: 0,
               token: {
                 decimals: 18,
                 name: 'IMX',
@@ -599,6 +602,7 @@ describe('swapRoute', () => {
               type: FeeType.SWAP_FEE,
               amount: BigNumber.from(3),
               formattedAmount: utils.formatUnits(BigNumber.from(3), 18),
+              basisPoints: 0,
               token: {
                 decimals: 18,
                 name: 'IMX',

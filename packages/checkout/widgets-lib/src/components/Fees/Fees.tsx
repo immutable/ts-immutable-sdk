@@ -80,7 +80,7 @@ export function Fees({
             <PriceDisplay
               testId="fees-gas-fee__priceDisplay"
               fiatAmount={`≈ ${t('drawers.feesBreakdown.fees.fiatPricePrefix')}${gasFeeFiatValue}`}
-              price={`≈ ${gasTokenSymbol} ${formatZeroAmount(tokenValueFormat(gasFee))}`}
+              price={`~ ${gasTokenSymbol} ${formatZeroAmount(tokenValueFormat(gasFee))}`}
             />
           )}
         </Accordion.TargetRightSlot>

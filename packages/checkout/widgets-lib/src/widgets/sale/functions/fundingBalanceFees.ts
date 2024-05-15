@@ -6,7 +6,10 @@ import {
   tokenValueFormat,
 } from 'lib/utils';
 import { FormattedFee } from 'widgets/swap/functions/swapFees';
+import { TFunction } from 'i18next';
 import { FundingBalance } from '../types';
+
+export type FeesBySymbol = Record<string, Fee>;
 
 const getTotalFeesBySymbol = (
   fees: Fee[],
@@ -22,7 +25,10 @@ const getTotalFeesBySymbol = (
       symbol: fee.token.symbol || tokenInfo?.symbol || '',
     };
 
-    const address = abbreviateWalletAddress(token.address!, '...').toLowerCase();
+    const address = abbreviateWalletAddress(
+      token.address!,
+      '...',
+    ).toLowerCase();
     const key = token.symbol || address;
     if (!key) return acc;
 
@@ -52,7 +58,6 @@ const getTotalFeesBySymbol = (
     return acc;
   }, {} as FeesBySymbol);
 
-export type FeesBySymbol = Record<string, Fee>;
 export const getFundingBalanceTotalFees = (
   balance: FundingBalance,
 ): FeesBySymbol => {
@@ -73,6 +78,7 @@ export const getFundingBalanceTotalFees = (
 export const getFundingBalanceFeeBreakDown = (
   balance: FundingBalance,
   conversions: Map<string, number>,
+  t: TFunction,
 ): FormattedFee[] => {
   const feesBreakdown: FormattedFee[] = [];
 
@@ -80,68 +86,58 @@ export const getFundingBalanceFeeBreakDown = (
     return [];
   }
 
-  const { fees } = balance;
+  const addFee = (fee: Fee, label: string, prefix: string = '~ ') => {
+    if (fee.amount.gt(0)) {
+      const formattedFee = utils.formatUnits(fee.amount, fee?.token?.decimals);
 
-  if (fees.approvalGasFee.amount.gt(0)) {
-    const formattedApprovalGas = utils.formatUnits(
-      fees.approvalGasFee.amount,
-      fees.approvalGasFee?.token?.decimals,
-    );
-    feesBreakdown.push({
-      label: 'Approval Gas Fee',
-      fiatAmount: `≈ USD $${calculateCryptoToFiat(
-        formattedApprovalGas,
-        fees.approvalGasFee.token?.symbol || '',
-        conversions,
-        '-.--',
-        4,
-      )}`,
-      amount: `${tokenValueFormat(formattedApprovalGas)}`,
-      prefix: '~ ',
-      token: fees.approvalGasFee.token!,
-    });
-  }
-
-  if (fees.swapGasFee.amount.gt(0)) {
-    const formattedSwapGas = utils.formatUnits(
-      fees.swapGasFee.amount,
-      fees.swapGasFee?.token?.decimals,
-    );
-    feesBreakdown.push({
-      label: 'Swap Gas Fee',
-      fiatAmount: `≈ USD $${calculateCryptoToFiat(
-        formattedSwapGas,
-        fees.swapGasFee.token?.symbol || '',
-        conversions,
-        '-.--',
-        4,
-      )}`,
-      amount: `${tokenValueFormat(formattedSwapGas)}`,
-      prefix: '~ ',
-      token: fees.swapGasFee.token!,
-    });
-  }
-
-  const totalSwapFeesBySymbol = Object.entries(
-    getTotalFeesBySymbol(fees.swapFees, balance.fundingItem.token),
-  );
-  if (totalSwapFeesBySymbol.length > 0) {
-    totalSwapFeesBySymbol.forEach(([symbol, swapFee]) => {
       feesBreakdown.push({
-        label: 'Swap Fees',
-        fiatAmount: `≈ USD $${calculateCryptoToFiat(
-          swapFee.formattedAmount,
-          symbol,
+        label,
+        fiatAmount: `≈ ${t(
+          'drawers.feesBreakdown.fees.fiatPricePrefix',
+        )}${calculateCryptoToFiat(
+          formattedFee,
+          fee.token?.symbol || '',
           conversions,
           '-.--',
           4,
         )}`,
-        amount: `${tokenValueFormat(swapFee.formattedAmount)}`,
-        prefix: '~ ',
-        token: swapFee.token!,
+        amount: `${tokenValueFormat(formattedFee)}`,
+        prefix,
+        token: fee?.token!,
       });
-    });
-  }
+    }
+  };
+
+  const { fees } = balance;
+  console.log('🚀 ~ fees:', fees);
+
+  // Format gas fee
+  addFee(
+    fees.swapGasFee,
+    t('drawers.feesBreakdown.fees.swapGasFee.label'),
+  );
+
+  // Format gas fee approval
+  addFee(
+    fees.approvalGasFee,
+    t('drawers.feesBreakdown.fees.approvalFee.label'),
+  );
+
+  // Format the secondary fees
+  const totalSwapFeesBySymbol = Object.entries(
+    getTotalFeesBySymbol(fees.swapFees, balance.fundingItem.token),
+  );
+
+  totalSwapFeesBySymbol.forEach(([, swapFee]) => {
+    const basisPoints: number = swapFee?.basisPoints ?? 0;
+    addFee(
+      swapFee,
+      t('drawers.feesBreakdown.fees.swapSecondaryFee.label', {
+        amount: basisPoints ? `${basisPoints / 100}%` : '',
+      }),
+      '',
+    );
+  });
 
   return feesBreakdown;
 };
