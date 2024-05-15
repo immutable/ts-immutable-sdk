@@ -7,6 +7,11 @@
       },
       "walletSelection": {
         "heading": "选择一个钱包"
+      },
+      "nonPassportDrawer": {
+        "heading": "非Passport用户需要IMX来支付燃气费。",
+        "body1": "我们建议使用<layerswapLink>Layerswap</layerswapLink>将资金桥接到Immutable zkEVM，并打开加油功能，以便您能收到一些IMX。",
+        "body2": "或者，可以使用免燃气费的Immutable Passport轻松支付和玩游戏。"
       }
     },
     "CONNECT_SUCCESS": {

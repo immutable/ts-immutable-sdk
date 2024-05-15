@@ -7,6 +7,11 @@
       },
       "walletSelection": {
         "heading": "Choose a wallet"
+      },
+      "nonPassportDrawer": {
+        "heading": "Non-Passport users will need IMX for gas.",
+        "body1": "We recommend using <layerswapLink>Layerswap</layerswapLink> to bridge funds onto Immutable zkEVM, with refuel switched on so you receive some IMX.",
+        "body2": "Alternatively, pay and play easily with a gas free Immutable Passport."
       }
     },
     "CONNECT_SUCCESS": {
