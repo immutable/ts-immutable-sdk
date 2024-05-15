@@ -17,15 +17,6 @@ let allowlists: string[][] = [];
 let jwk: string;
 let totalMintCount: number;
 
-const metadata = {
-  name: "Paradise Pass",
-  description:
-    "Unlock the Gold tier in Paradise Pass with the Paradise Pass Gold NFT! Take part in daily and weekly challenges, or just hold the NFT and occasionally visit your Paradise Island to earn Moani tokens. Embark on a rewarding journey in Paradise Tycoon, both before and after the World Creation Event.",
-  image: "https://paradisetycoon.com/nft/ppass/media/paradisepass.png",
-  animation_url: "https://paradisetycoon.com/nft/ppass/media/paradisepass.mp4",
-  attributes: [],
-};
-
 // Enable CORS with specified options for API security and flexibility
 fastify.register(cors, {
   origin: "*", // Allow all origins
@@ -180,7 +171,7 @@ fastify.post("/mint/passport", async (request: FastifyRequest, reply: FastifyRep
       asset_id: assetId,
       contract_address: serverConfig[environment].collectionAddress,
       owner_address: walletAddress,
-      metadata
+      metadata: serverConfig[environment].metadata,
     });
 
     totalMintCount++;
@@ -288,7 +279,7 @@ fastify.post("/mint/eoa", async (request: eoaMintRequest, reply: FastifyReply) =
         asset_id: assetId,
         contract_address: serverConfig[environment].collectionAddress,
         owner_address: walletAddress,
-        metadata
+        metadata: serverConfig[environment].metadata,
       }
     );
 

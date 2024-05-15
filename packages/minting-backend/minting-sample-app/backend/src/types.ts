@@ -21,8 +21,6 @@ interface EnvironmentConfig {
   collectionAddress: string;
   mintRequestURL: (chainName: string, collectionAddress: string, referenceId: string) => string;
   enableWebhookVerification: boolean;
-  allowedTopicArn: string;
-  metadataDir: string;
   maxTokenSupplyAcrossAllPhases: number; // Optional for generalization
   enableFileLogging: boolean;
   logLevel: string;

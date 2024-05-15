@@ -16,11 +16,9 @@ const serverConfig: ServerConfig = {
     HOST_IP: "localhost",
     PORT: 3000,
     chainName: "imtbl-zkevm-testnet",
-    collectionAddress: "0x9199b28e675d528cb016b8118c7ce6a45fb30502",
+    collectionAddress: "",
     mintRequestURL: (chainName: string, collectionAddress: string, referenceId: string) => `https://api.sandbox.immutable.com/v1/chains/${chainName}/collections/${collectionAddress}/nfts/mint-requests/${referenceId}`,
     enableWebhookVerification: true, //Should the server verify the webhook SNS messages?
-    allowedTopicArn: "arn:aws:sns:us-east-2:783421985614:*", //Used for webhook SNS verification
-    metadataDir: "tokens/metadata", //Where the token metadata resides, {filename} will be replaced with the token ID
     enableFileLogging: true, //Should logs be output to files or just console?
     maxTokenSupplyAcrossAllPhases: 1500,
     logLevel: "debug",
@@ -38,10 +36,10 @@ const serverConfig: ServerConfig = {
       },
     ],
     metadata: {
-      name: "Paradise Pass",
-      description: "Unlock the Gold tier in Paradise Pass with the Paradise Pass Gold NFT! Embark on a rewarding journey in Paradise Tycoon.",
-      image: "https://paradisetycoon.com/nft/ppass/media/paradisepass.png",
-      animation_url: "https://paradisetycoon.com/nft/ppass/media/paradisepass.mp4",
+      name: "Your NFT name",
+      description: "Your NFT description",
+      image: "https://image-url.png",
+      animation_url: "https://video.mp4",
       attributes: [],
     },
   },
@@ -55,8 +53,6 @@ const serverConfig: ServerConfig = {
     collectionAddress: "0x88b87272649b3495d99b1702f358286b19f8c3da",
     mintRequestURL: (chainName: string, collectionAddress: string, referenceId: string) => `https://api.immutable.com/v1/chains/${chainName}/collections/${collectionAddress}/nfts/mint-requests/${referenceId}`,
     enableWebhookVerification: true, //Should the server verify the webhook SNS messages?
-    allowedTopicArn: "arn:aws:sns:us-east-2:362750628221:*", //Used for webhook SNS verification
-    metadataDir: "tokens/metadata", //Where the token metadata resides, {filename} will be replaced with the token ID
     enableFileLogging: true, //Should logs be output to files or just console?
     maxTokenSupplyAcrossAllPhases: 1500,
     logLevel: "debug",
@@ -74,10 +70,10 @@ const serverConfig: ServerConfig = {
       },
     ],
     metadata: {
-      name: "Paradise Pass",
-      description: "Unlock the Gold tier in Paradise Pass with the Paradise Pass Gold NFT! Embark on a rewarding journey in Paradise Tycoon.",
-      image: "https://paradisetycoon.com/nft/ppass/media/paradisepass.png",
-      animation_url: "https://paradisetycoon.com/nft/ppass/media/paradisepass.mp4",
+      name: "Your NFT name",
+      description: "Your NFT description",
+      image: "https://image-url.png",
+      animation_url: "https://video.mp4",
       attributes: [],
     },
   },
