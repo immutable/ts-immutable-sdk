@@ -64,7 +64,10 @@ describe('PassportImxProvider', () => {
     login: jest.fn(),
   };
 
-  const mockGuardianClient = {};
+  const mockGuardianClient = {
+    withDefaultConfirmationScreenTask: (task: () => any) => task,
+    withConfirmationScreenTask: () => (task: () => any) => task,
+  };
 
   const getSignerMock = jest.fn();
 
@@ -136,12 +139,14 @@ describe('PassportImxProvider', () => {
 
   describe('transfer', () => {
     it('calls transfer workflow', async () => {
+      const withDefaultConfirmationSpy = jest.spyOn(mockGuardianClient, 'withDefaultConfirmationScreenTask');
       const returnValue = {} as imx.CreateTransferResponseV1;
       const request = {} as UnsignedTransferRequest;
 
       (transfer as jest.Mock).mockResolvedValue(returnValue);
       const result = await passportImxProvider.transfer(request);
 
+      expect(withDefaultConfirmationSpy).toBeCalled();
       expect(transfer as jest.Mock)
         .toHaveBeenCalledWith({
           request,
@@ -179,11 +184,13 @@ describe('PassportImxProvider', () => {
 
   describe('createOrder', () => {
     it('calls createOrder workflow', async () => {
+      const withDefaultConfirmationScreenSpy = jest.spyOn(mockGuardianClient, 'withDefaultConfirmationScreenTask');
       const returnValue = {} as imx.CreateOrderResponse;
       const request = {} as UnsignedOrderRequest;
 
       (createOrder as jest.Mock).mockResolvedValue(returnValue);
       const result = await passportImxProvider.createOrder(request);
+      expect(withDefaultConfirmationScreenSpy).toBeCalled();
 
       expect(createOrder)
         .toHaveBeenCalledWith({
@@ -200,11 +207,14 @@ describe('PassportImxProvider', () => {
 
   describe('cancelOrder', () => {
     it('calls cancelOrder workflow', async () => {
+      const withDefaultConfirmationScreenSpy = jest.spyOn(mockGuardianClient, 'withDefaultConfirmationScreenTask');
       const returnValue = {} as imx.CancelOrderResponse;
       const request = {} as imx.GetSignableCancelOrderRequest;
 
       (cancelOrder as jest.Mock).mockResolvedValue(returnValue);
       const result = await passportImxProvider.cancelOrder(request);
+
+      expect(withDefaultConfirmationScreenSpy).toBeCalled();
 
       expect(cancelOrder)
         .toHaveBeenCalledWith({
@@ -244,10 +254,12 @@ describe('PassportImxProvider', () => {
     it('calls batchNftTransfer workflow', async () => {
       const returnValue = {} as imx.CreateTransferResponse;
       const request = [] as NftTransferDetails[];
+      const withConfirmationScreenSpy = jest.spyOn(mockGuardianClient, 'withConfirmationScreenTask');
 
       (batchNftTransfer as jest.Mock).mockResolvedValue(returnValue);
       const result = await passportImxProvider.batchNftTransfer(request);
 
+      expect(withConfirmationScreenSpy).toBeCalledWith({ height: 784, width: 480 });
       expect(batchNftTransfer)
         .toHaveBeenCalledWith({
           request,

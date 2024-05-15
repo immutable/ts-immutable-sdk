@@ -22,7 +22,7 @@ import GuardianClient from '../guardian';
 import {
   PassportEventMap, PassportEvents, UserImx, User, IMXSigners, isUserImx,
 } from '../types';
-import { PassportError, PassportErrorType } from '../errors/passportError';
+import { PassportError, PassportErrorType, withPassportError } from '../errors/passportError';
 import {
   batchNftTransfer, cancelOrder, createOrder, createTrade, exchangeTransfer, transfer,
 } from './workflows';
@@ -172,15 +172,20 @@ export class PassportImxProvider implements IMXProvider {
   }
 
   async transfer(request: UnsignedTransferRequest): Promise<imx.CreateTransferResponseV1> {
-    const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
+    return withPassportError<imx.CreateTransferResponseV1>(
+      this.guardianClient.withDefaultConfirmationScreenTask(async () => {
+        const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
 
-    return transfer({
-      request,
-      user,
-      starkSigner,
-      transfersApi: this.immutableXClient.transfersApi,
-      guardianClient: this.guardianClient,
-    });
+        return transfer({
+          request,
+          user,
+          starkSigner,
+          transfersApi: this.immutableXClient.transfersApi,
+          guardianClient: this.guardianClient,
+        });
+      }),
+      PassportErrorType.TRANSFER_ERROR,
+    );
   }
 
   async registerOffchain(): Promise<imx.RegisterUserResponse> {
@@ -213,55 +218,72 @@ export class PassportImxProvider implements IMXProvider {
   }
 
   async createOrder(request: UnsignedOrderRequest): Promise<imx.CreateOrderResponse> {
-    const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
-
-    return createOrder({
-      request,
-      user,
-      starkSigner,
-      ordersApi: this.immutableXClient.ordersApi,
-      guardianClient: this.guardianClient,
-    });
+    return withPassportError<imx.CreateOrderResponse>(this.guardianClient.withDefaultConfirmationScreenTask(
+      async () => {
+        const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
+        return createOrder({
+          request,
+          user,
+          starkSigner,
+          ordersApi: this.immutableXClient.ordersApi,
+          guardianClient: this.guardianClient,
+        });
+      },
+    ), PassportErrorType.CREATE_ORDER_ERROR);
   }
 
   async cancelOrder(
     request: imx.GetSignableCancelOrderRequest,
   ): Promise<imx.CancelOrderResponse> {
-    const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
+    return withPassportError<imx.CancelOrderResponse>(this.guardianClient.withDefaultConfirmationScreenTask(
+      async () => {
+        const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
 
-    return cancelOrder({
-      request,
-      user,
-      starkSigner,
-      ordersApi: this.immutableXClient.ordersApi,
-      guardianClient: this.guardianClient,
-    });
+        return cancelOrder({
+          request,
+          user,
+          starkSigner,
+          ordersApi: this.immutableXClient.ordersApi,
+          guardianClient: this.guardianClient,
+        });
+      },
+    ), PassportErrorType.CREATE_ORDER_ERROR);
   }
 
   async createTrade(request: imx.GetSignableTradeRequest): Promise<imx.CreateTradeResponse> {
-    const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
+    return withPassportError<imx.CreateTradeResponse>(this.guardianClient.withDefaultConfirmationScreenTask(
+      async () => {
+        const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
 
-    return createTrade({
-      request,
-      user,
-      starkSigner,
-      tradesApi: this.immutableXClient.tradesApi,
-      guardianClient: this.guardianClient,
-    });
+        return createTrade({
+          request,
+          user,
+          starkSigner,
+          tradesApi: this.immutableXClient.tradesApi,
+          guardianClient: this.guardianClient,
+        });
+      },
+    ), PassportErrorType.CREATE_TRADE_ERROR);
   }
 
   async batchNftTransfer(
     request: NftTransferDetails[],
   ): Promise<imx.CreateTransferResponse> {
-    const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
+  // eslint-disable-next-line function-paren-newline
+    return withPassportError<imx.CreateTransferResponse>(
+      this.guardianClient.withConfirmationScreenTask(
+        { width: 480, height: 784 },
+      )(async () => {
+        const { user, starkSigner } = await this.#getRegisteredImxUserAndSigners();
 
-    return batchNftTransfer({
-      request,
-      user,
-      starkSigner,
-      transfersApi: this.immutableXClient.transfersApi,
-      guardianClient: this.guardianClient,
-    });
+        return batchNftTransfer({
+          request,
+          user,
+          starkSigner,
+          transfersApi: this.immutableXClient.transfersApi,
+          guardianClient: this.guardianClient,
+        });
+      }), PassportErrorType.TRANSFER_ERROR);
   }
 
   async exchangeTransfer(
