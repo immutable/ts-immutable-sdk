@@ -74,6 +74,17 @@ However, ** please do not use SQLite in production ** for its weak support of co
 
 We recommend using postgres for the persistance. Immutable's sdk provides a postgres persistence for this purpose. You can replace `mintingBackend.mintingPersistencePrismaSqlite` with `mintingBackend.mintingPersistencePg` in the `server.ts` and change prisma schema according to the one provided by our sdk: [Postgres seed.sql](https://github.com/immutable/ts-immutable-sdk/blob/main/packages/minting-backend/sdk/src/minting/persistence/pg/seed.sql).
 
+## Utility
+
+Retry failed mints or mints recorded but does not exist in Immutable Minting API.
+```
+npm run retrymints
+```
+
+update minting status according to status from Immutable Minting API.
+```
+npm run updatemints
+```
 
 ## To-Do List
 - [ ] Add ERC1155 support once the minting API is ready

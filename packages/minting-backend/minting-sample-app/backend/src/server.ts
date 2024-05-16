@@ -331,18 +331,16 @@ fastify.get("/get-mint-request/:referenceId", async (request: FastifyRequest<{ P
   }
 });
 
-if (serverConfig[environment].enableWebhookVerification) {
-  fastify.post("/api/process_webhook_event", async (request: FastifyRequest<any>, reply: any) => {
-    console.log(request);
-    await webhook.init(request.body as any, environment, {
-      zkevmMintRequestUpdated: async (event) => {
-        mintingBackend.processMint(mintingBackend.mintingPersistencePrismaSqlite, event);
-      }
-    });
-
-    reply.send({ status: "ok" });
+fastify.post("/api/process_webhook_event", async (request: FastifyRequest<any>, reply: any) => {
+  console.log(request);
+  await webhook.init(request.body as any, environment, {
+    zkevmMintRequestUpdated: async (event) => {
+      mintingBackend.processMint(mintingBackend.mintingPersistencePrismaSqlite, event);
+    }
   });
-}
+
+  reply.send({ status: "ok" });
+});
 
 // Start the server
 const start = async () => {

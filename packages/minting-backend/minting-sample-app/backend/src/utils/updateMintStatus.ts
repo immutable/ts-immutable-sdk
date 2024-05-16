@@ -1,41 +1,44 @@
 import { PrismaClient } from "@prisma/client";
 import logger from "../logger";
-import axios from "axios";
 import serverConfig, { environment } from "../config";
 import { client } from "../dbClient";
+import { blockchainDataClient } from "../blockchainDataClient";
 
 export async function updateMintStatus(prisma: PrismaClient): Promise<void> {
   try {
     const pendingMints = await prisma.imAssets.findMany({
       where: {
-        mintingStatus: {
-          not: "succeeded",
-        },
+        OR: [{
+          mintingStatus: {
+            not: "succeeded",
+          },
+        }, {
+          mintingStatus: null
+        }],
       },
     });
     for (const mint of pendingMints) {
       try {
         const uuid = mint.assetId;
-        const response = await axios.get(serverConfig[environment].mintRequestURL(serverConfig[environment].chainName, serverConfig[environment].collectionAddress, uuid), {
-          headers: {
-            "x-immutable-api-key": serverConfig[environment].HUB_API_KEY,
-            "x-api-key": serverConfig[environment].RPS_API_KEY,
-          },
+        const response = await blockchainDataClient.getMintRequest({
+          chainName: serverConfig[environment].chainName,
+          contractAddress: serverConfig[environment].collectionAddress,
+          referenceId: uuid,
         });
-        logger.debug(`Checking status of mint with UUID ${uuid}: ${JSON.stringify(response.data, null, 2)}`);
-        if (response.data.result.length > 0) {
-          if (response.data.result[0].status === "succeeded") {
+        logger.debug(`Checking status of mint with UUID ${uuid}: ${JSON.stringify(response, null, 2)}`);
+        if (response.result.length > 0) {
+          if (response.result[0].status === "succeeded") {
             await prisma.$transaction(async (prisma) => {
               // Update the status of minted tokens
               await prisma.imAssets.updateMany({
                 where: { assetId: uuid },
-                data: { assetId: "succeeded" },
+                data: { mintingStatus: "succeeded" },
               });
 
               // Log the successful mint
               logger.info(`Mint with UUID ${uuid} succeeded. Updating status.`);
             });
-          } else if (response.data.result[0].status === "failed") {
+          } else if (response.result[0].status === "failed") {
             await prisma.imAssets.updateMany({
               where: { assetId: uuid },
               data: { mintingStatus: "failed" },
