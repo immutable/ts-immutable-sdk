@@ -76,8 +76,7 @@ export function isWrappedIMX(token: FungibleToken, source: string) {
 }
 
 /**
- * This is the same as `isDeposit`, but takes an extra parameter - the `destinationChainId` - to check that both
- * of the chain IDs are correct.
+ * Checks that the source and destination chains are such that this is a valid deposit bridge transaction.
  */
 export function isValidDeposit(direction: BridgeDirection, bridgeInstance: BridgeInstance) {
   return direction.sourceChainId === bridgeInstance.rootChainID
@@ -96,8 +95,7 @@ export function shouldBeDepositOrFinaliseWithdraw(sourceChainId: string, bridgeI
 }
 
 /**
- * This is the same as `isWithdraw`, but takes an extra parameter - the `destinationChainId` - to check that both
- * of the chain IDs are correct.
+ * Checks that the source and destination chains are such that this is a valid withdraw bridge transaction.
  */
 export function isValidWithdraw(direction: BridgeDirection, bridgeInstance: BridgeInstance) {
   return direction.sourceChainId === bridgeInstance.childChainID
