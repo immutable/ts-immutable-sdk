@@ -413,12 +413,7 @@
           "primaryAction": "I've fixed this, Try again",
           "secondaryAction": "Cancel"
         },
-        "SMART_CHECKOUT_ERROR": {
-          "description": "Unable to check your wallets balance. Please try again.",
-          "primaryAction": "Try again",
-          "secondaryAction": "Cancel"
-        },
-        "SMART_CHECKOUT_EXECUTE_ERROR": {
+        "FUNDING_ROUTE_EXECUTE_ERROR": {
           "description": "Sorry, something went wrong while moving funds. Please try again.",
           "primaryAction": "Try again",
           "secondaryAction": "Cancel"
