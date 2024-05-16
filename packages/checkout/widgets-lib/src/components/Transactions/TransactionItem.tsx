@@ -5,9 +5,9 @@ import {
   MenuItem,
   Link,
 } from '@biom3/react';
-import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
-import { Transaction } from 'lib/clients/checkoutApiType';
 import { MouseEvent, useMemo, useState } from 'react';
+import { UserJourney, useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { Transaction } from '../../lib/clients';
 import { containerStyles } from './transactionItemStyles';
 import { TransactionDetails } from './TransactionDetails';
 

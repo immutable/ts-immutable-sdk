@@ -1,8 +1,8 @@
 import { ethers } from 'ethers';
 import {
   BridgeBundledTxRequest, BridgeFeeActions, BridgeFeeRequest, FungibleToken,
-} from 'types';
-import { NATIVE } from 'constants/bridges';
+} from '../types';
+import { NATIVE } from '../constants/bridges';
 import { BridgeConfiguration } from '../config';
 import { BridgeError, BridgeErrorType, withBridgeError } from '../errors';
 import { isChildETH, isRootIMX } from './utils';

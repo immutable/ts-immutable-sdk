@@ -11,8 +11,8 @@ import {
   NetworkInfo,
   SwitchNetworkParams,
 } from '@imtbl/checkout-sdk';
-import { logoColour, networkIcon } from 'lib';
 import { useTranslation } from 'react-i18next';
+import { logoColour, networkIcon } from '../../../../lib';
 import { WalletContext } from '../../context/WalletContext';
 import { sendNetworkSwitchEvent } from '../../WalletWidgetEvents';
 import {

@@ -2,17 +2,17 @@
 /* eslint-disable @typescript-eslint/dot-notation */
 /* eslint-disable @typescript-eslint/naming-convention */
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { TokenBridge } from 'tokenBridge';
-import { BridgeConfiguration } from 'config';
-import { ETH_SEPOLIA_TO_ZKEVM_TESTNET, NATIVE } from 'constants/bridges';
+import { BigNumber, ethers } from 'ethers';
+import { TokenBridge } from './tokenBridge';
+import { BridgeConfiguration } from './config';
+import { ETH_SEPOLIA_TO_ZKEVM_TESTNET, NATIVE } from './constants/bridges';
 import {
   BridgeFeeActions, BridgeTxRequest, BridgeTxResponse, StatusResponse,
-} from 'types';
-import { BigNumber, ethers } from 'ethers';
-import { BridgeError, BridgeErrorType } from 'errors';
-import { GMPStatus, GasPaidStatus } from 'types/axelar';
-import { queryTransactionStatus } from 'lib/gmpRecovery';
-import { ERC20 } from 'contracts/ABIs/ERC20';
+} from './types';
+import { BridgeError, BridgeErrorType } from './errors';
+import { GMPStatus, GasPaidStatus } from './types/axelar';
+import { queryTransactionStatus } from './lib/gmpRecovery';
+import { ERC20 } from './contracts/ABIs/ERC20';
 import { validateBridgeReqArgs, validateChainConfiguration, validateChainIds } from './lib/validation';
 
 jest.mock('axios', () => ({

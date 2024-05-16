@@ -5,14 +5,14 @@ import {
   ItemType,
   TransactionRequirement,
 } from '@imtbl/checkout-sdk';
+import { useTranslation } from 'react-i18next';
+import { ReactElement } from 'react';
+import { BigNumber, utils } from 'ethers';
 import {
   calculateCryptoToFiat,
   getDefaultTokenImage,
   tokenValueFormat,
-} from 'lib/utils';
-import { useTranslation } from 'react-i18next';
-import { ReactElement } from 'react';
-import { BigNumber, utils } from 'ethers';
+} from '../../../lib/utils';
 import { useSaleContext } from '../context/SaleContextProvider';
 import { FundingBalance } from '../types';
 

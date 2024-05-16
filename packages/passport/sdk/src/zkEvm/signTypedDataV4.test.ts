@@ -1,8 +1,8 @@
 import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
-import GuardianClient from 'guardian';
 import { Signer } from '@ethersproject/abstract-signer';
 import { Flow } from '@imtbl/metrics';
+import GuardianClient from '../guardian';
 import { getEip155ChainId, getSignedTypedData } from './walletHelpers';
 import {
   chainId,

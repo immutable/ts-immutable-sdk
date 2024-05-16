@@ -1,8 +1,8 @@
 import { Box, Button } from '@biom3/react';
 import { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useWalletConnect } from 'lib/hooks/useWalletConnect';
-import { isWalletConnectProvider } from 'lib/provider';
+import { useWalletConnect } from '../../../lib/hooks/useWalletConnect';
+import { isWalletConnectProvider } from '../../../lib/provider';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';

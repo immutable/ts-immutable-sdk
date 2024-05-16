@@ -9,18 +9,18 @@ import {
   WidgetTheme,
   WidgetType,
 } from '@imtbl/checkout-sdk';
-import { Base } from 'widgets/BaseWidgetRoot';
+import { getL2ChainId } from '../../lib';
+import {
+  isValidWalletProvider,
+} from '../../lib/validations/widgetValidators';
+import { ThemeProvider } from '../../components/ThemeProvider/ThemeProvider';
+import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
+import { LoadingView } from '../../views/loading/LoadingView';
 import {
   ConnectLoader,
   ConnectLoaderParams,
-} from 'components/ConnectLoader/ConnectLoader';
-import { getL2ChainId } from 'lib';
-import {
-  isValidWalletProvider,
-} from 'lib/validations/widgetValidators';
-import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
-import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
-import { LoadingView } from 'views/loading/LoadingView';
+} from '../../components/ConnectLoader/ConnectLoader';
+import { Base } from '../BaseWidgetRoot';
 import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
 import i18n from '../../i18n';
 

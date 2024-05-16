@@ -7,12 +7,12 @@ import {
   Icon,
   MenuItem,
 } from '@biom3/react';
-import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
-import { Transaction, TransactionStatus } from 'lib/clients/checkoutApiType';
 import { useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
-import { ViewActions, ViewContext } from 'context/view-context/ViewContext';
+import { UserJourney, useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { Transaction, TransactionStatus } from '../../lib/clients';
+import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
+import { ViewActions, ViewContext } from '../../context/view-context/ViewContext';
 import { actionsContainerStyles, actionsLayoutStyles, containerStyles } from './transactionItemStyles';
 import { TransactionDetails } from './TransactionDetails';
 

@@ -1,7 +1,7 @@
 import { describe, expect } from '@jest/globals';
-import { CryptoFiatConfiguration } from 'config';
 import axios from 'axios';
 import { Environment } from '@imtbl/config';
+import { CryptoFiatConfiguration } from './config';
 import { CryptoFiat } from './cryptofiat';
 
 jest.mock('axios');

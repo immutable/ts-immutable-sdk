@@ -3,8 +3,8 @@ import {
 } from '@biom3/react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { listVariants, listItemVariants } from 'lib/animation/listAnimation';
 import { SalePaymentTypes, TransactionRequirement } from '@imtbl/checkout-sdk';
+import { listVariants, listItemVariants } from '../../../lib/animation/listAnimation';
 import { CoinsDrawerItem } from './CoinsDrawerItem';
 import { FundingBalance } from '../types';
 import { PaymentOptions } from './PaymentOptions';

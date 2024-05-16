@@ -1,6 +1,6 @@
 import { ChainId, ChainName } from '@imtbl/checkout-sdk';
 import { MenuItem } from '@biom3/react';
-import { networkIcon } from 'lib';
+import { networkIcon } from '../../../lib';
 import { networkItemStyles } from './NetworkItemStyles';
 
 export interface BridgeNetworkProps {

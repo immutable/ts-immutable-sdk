@@ -1,9 +1,9 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { Signer } from 'ethers';
-import AuthManager from 'authManager';
-import { mockUserImx } from 'test/mocks';
 import { AxiosError } from 'axios';
 import { ImxApiClients } from '@imtbl/generated-clients';
+import AuthManager from '../../authManager';
+import { mockUserImx } from '../../test/mocks';
 import registerPassportStarkEx from './registration';
 import { PassportError, PassportErrorType } from '../../errors/passportError';
 import registerOffchain from './registerOffchain';

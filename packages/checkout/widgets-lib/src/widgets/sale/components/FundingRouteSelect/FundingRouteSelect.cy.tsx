@@ -11,7 +11,7 @@ import {
 import { mount } from 'cypress/react18';
 import { BigNumber, utils } from 'ethers';
 import { cy, describe } from 'local-cypress';
-import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
+import { ViewContextTestComponent } from '../../../../context/view-context/test-components/ViewContextTestComponent';
 import { CustomAnalyticsProvider } from '../../../../context/analytics-provider/CustomAnalyticsProvider';
 import { cyIntercept, cySmartGet } from '../../../../lib/testUtils';
 import { FundingRouteSelect } from './FundingRouteSelect';

@@ -8,12 +8,12 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { AXELAR_SCAN_URL } from 'lib';
-import { Transaction, TransactionStatus } from 'lib/clients';
-import { CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext';
-import { calculateCryptoToFiat, getTokenImageByAddress, isNativeToken } from 'lib/utils';
 import { formatUnits } from 'ethers/lib/utils';
 import { useTranslation } from 'react-i18next';
+import { AXELAR_SCAN_URL } from '../../lib';
+import { Transaction, TransactionStatus } from '../../lib/clients';
+import { CryptoFiatContext } from '../../context/crypto-fiat-context/CryptoFiatContext';
+import { calculateCryptoToFiat, getTokenImageByAddress, isNativeToken } from '../../lib/utils';
 import { TransactionItem } from './TransactionItem';
 import { KnownNetworkMap } from './transactionsType';
 import { containerStyles, transactionsListStyle } from './TransactionListStyles';

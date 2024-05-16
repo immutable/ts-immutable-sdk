@@ -1,5 +1,5 @@
 import { FeeAmount } from '@uniswap/v3-sdk';
-import { ERC20 } from 'types';
+import { ERC20 } from '../../types';
 import { computePoolAddress } from './computePoolAddress';
 import {
   generateERC20Pairs,

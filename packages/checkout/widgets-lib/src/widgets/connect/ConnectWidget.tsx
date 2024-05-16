@@ -14,7 +14,7 @@ import {
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { useTranslation } from 'react-i18next';
-import { isL1EthChainId, isZkEvmChainId } from 'lib/utils';
+import { isL1EthChainId, isZkEvmChainId } from '../../lib/utils';
 import {
   sendCloseWidgetEvent,
   sendConnectFailedEvent,

@@ -1,14 +1,14 @@
 import { JsonRpcProvider, JsonRpcBatchProvider } from '@ethersproject/providers';
 import { Contract } from '@ethersproject/contracts';
 import { BigNumber } from '@ethersproject/bignumber';
-import { InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError, NoRoutesAvailableError } from 'errors';
-import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
 import { constants, utils } from 'ethers';
-import { SecondaryFee } from 'types';
 import { Environment } from '@imtbl/config';
-import { Router, addAmount, newAmount } from 'lib';
 import { PaymentsExtended, SwapRouter } from '@uniswap/router-sdk';
-import { WIMX__factory } from 'contracts/types';
+import { InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError, NoRoutesAvailableError } from './errors';
+import { ERC20__factory } from './contracts/types/factories/ERC20__factory';
+import { SecondaryFee } from './types';
+import { Router, addAmount, newAmount } from './lib';
+import { WIMX__factory } from './contracts/types';
 import { AVERAGE_SECONDARY_FEE_EXTRA_GAS, IMMUTABLE_TESTNET_CHAIN_ID } from './constants';
 import { Exchange } from './exchange';
 import {

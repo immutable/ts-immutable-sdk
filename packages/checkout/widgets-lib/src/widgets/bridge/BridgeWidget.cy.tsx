@@ -1,16 +1,16 @@
 import { mount } from 'cypress/react18';
 import { beforeEach, cy } from 'local-cypress';
-import { cyIntercept, cySmartGet } from 'lib/testUtils';
 import {
   ChainId, Checkout, SwitchNetworkResult, WalletProviderName, WidgetTheme,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
-import { StrongCheckoutWidgetsConfig } from 'lib/withDefaultWidgetConfig';
 import { Passport } from '@imtbl/passport';
 import { BigNumber } from 'ethers';
 import { TokenBridge } from '@imtbl/bridge-sdk';
-import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
-import { Transaction } from 'lib/clients';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { cyIntercept, cySmartGet } from '../../lib/testUtils';
+import { ViewContextTestComponent } from '../../context/view-context/test-components/ViewContextTestComponent';
+import { Transaction } from '../../lib/clients';
 import BridgeWidget from './BridgeWidget';
 import mockTransactionPending from './test-components/BridgeTransactionWithdrawalPending.json';
 import mockTransactionInProgress from './test-components/BridgeTransactionInProgress.json';

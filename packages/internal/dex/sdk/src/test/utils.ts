@@ -3,12 +3,12 @@ import { BigNumber, BigNumberish, utils, providers } from 'ethers';
 import { Pool, Route, TickMath } from '@uniswap/v3-sdk';
 import { SwapRouter } from '@uniswap/router-sdk';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { PromiseOrValue } from 'contracts/types/common';
-import { QuoteResult } from 'lib/getQuotesForRoutes';
-import { NativeTokenService } from 'lib/nativeTokenService';
-import { ExchangeModuleConfiguration, SecondaryFee, CoinAmount, Coin, ERC20, Native, Amount } from 'types';
-import { ImmutableSwapProxy__factory } from 'contracts/types';
-import { IV3SwapRouter } from 'contracts/types/ImmutableSwapProxy';
+import { PromiseOrValue } from '../contracts/types/common';
+import { QuoteResult } from '../lib/getQuotesForRoutes';
+import { NativeTokenService } from '../lib/nativeTokenService';
+import { ExchangeModuleConfiguration, SecondaryFee, CoinAmount, Coin, ERC20, Native, Amount } from '../types';
+import { ImmutableSwapProxy__factory } from '../contracts/types';
+import { IV3SwapRouter } from '../contracts/types/ImmutableSwapProxy';
 import { erc20ToUniswapToken, newAmount, Router, RoutingContracts } from '../lib';
 
 export const TEST_BASE_FEE = BigNumber.from('49'); // 49 wei

@@ -1,8 +1,8 @@
 import {
   anything, deepEqual, instance, mock, when,
 } from 'ts-mockito';
-import { ListingResult, OrdersService } from 'openapi/sdk';
 import { OrderComponents } from '@opensea/seaport-js/lib/types';
+import { ListingResult, OrdersService } from '../openapi/sdk';
 import { ItemType } from '../seaport';
 import { ImmutableApiClient } from './api-client';
 

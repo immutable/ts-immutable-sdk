@@ -3,10 +3,10 @@ import {
   useContext, useEffect, useMemo, useState,
 } from 'react';
 import { IMTBLWidgetEvents, WidgetTheme } from '@imtbl/checkout-sdk';
-import { fetchTokenSymbols } from 'lib/fetchTokenSymbols';
-import { CryptoFiatActions, CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext';
-import { ButtonNavigationStyles } from 'components/Header/HeaderStyles';
 import { useTranslation } from 'react-i18next';
+import { fetchTokenSymbols } from '../../../lib/fetchTokenSymbols';
+import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
+import { ButtonNavigationStyles } from '../../../components/Header/HeaderStyles';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';

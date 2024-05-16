@@ -1,6 +1,6 @@
 import { FeeAmount, Pool, TickMath } from '@uniswap/v3-sdk';
 import { Token } from '@uniswap/sdk-core';
-import { uniswapTokenToERC20 } from 'lib/utils';
+import { uniswapTokenToERC20 } from '../utils';
 import { generateAllAcyclicPaths } from '../router';
 
 const token0 = new Token(

@@ -8,7 +8,7 @@ import {
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { Web3Provider } from '@ethersproject/providers';
-import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
+import { ViewContextTestComponent } from '../../context/view-context/test-components/ViewContextTestComponent';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import SwapWidget from './SwapWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';

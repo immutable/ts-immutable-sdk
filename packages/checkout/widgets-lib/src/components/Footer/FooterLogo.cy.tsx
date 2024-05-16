@@ -1,5 +1,5 @@
 import { mount } from 'cypress/react18';
-import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
+import { ViewContextTestComponent } from '../../context/view-context/test-components/ViewContextTestComponent';
 import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
 import { cySmartGet } from '../../lib/testUtils';
 import { FooterLogo } from './FooterLogo';

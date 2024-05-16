@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import {
   GMPError, GMPStatus, GMPStatusResponse, GasPaidInfo,
-} from 'types/axelar';
+} from '../types/axelar';
 
 const parseGMPStatus = (response: any): GMPStatus | string => {
   const { error, status } = response;

@@ -27,9 +27,9 @@ import {
   useRef,
   useState,
 } from 'react';
-import BridgeWidget from 'widgets/bridge/BridgeWidget';
 import { useTranslation } from 'react-i18next';
-import OnRampWidget from 'widgets/on-ramp/OnRampWidget';
+import BridgeWidget from '../../../bridge/BridgeWidget';
+import OnRampWidget from '../../../on-ramp/OnRampWidget';
 import {
   ConnectLoaderActions,
   ConnectLoaderContext,

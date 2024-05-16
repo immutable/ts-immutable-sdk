@@ -1,10 +1,10 @@
 import { Provider } from '@ethersproject/providers';
-import { Address } from 'types';
-import { WITHDRAW_SIG, NATIVE } from 'constants/bridges';
-import { CHILD_ERC20 } from 'contracts/ABIs/ChildERC20';
-import { withBridgeError, BridgeErrorType } from 'errors';
 import { ethers } from 'ethers';
 import { keccak256, defaultAbiCoder } from 'ethers/lib/utils';
+import { Address } from '../types';
+import { WITHDRAW_SIG, NATIVE } from '../constants/bridges';
+import { CHILD_ERC20 } from '../contracts/ABIs/ChildERC20';
+import { withBridgeError, BridgeErrorType } from '../errors';
 import { isWrappedIMX, getRootIMX } from './utils';
 
 /**

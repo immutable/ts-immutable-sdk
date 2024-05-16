@@ -10,6 +10,7 @@ import {
   ExchangeAction,
   OrderComponents,
 } from '@opensea/seaport-js/lib/types';
+import { BigNumber, providers } from 'ethers';
 import {
   ActionType,
   TransactionAction,
@@ -18,9 +19,8 @@ import {
   NativeItem,
   SignableAction,
   TransactionPurpose,
-} from 'types';
-import { BigNumber, providers } from 'ethers';
-import { ProtocolData, Order, OrderStatusName } from 'openapi/sdk';
+} from '../types';
+import { ProtocolData, Order, OrderStatusName } from '../openapi/sdk';
 import {
   EIP_712_ORDER_TYPE,
   ItemType,

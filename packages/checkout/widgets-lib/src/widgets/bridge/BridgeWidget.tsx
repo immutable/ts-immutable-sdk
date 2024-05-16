@@ -10,12 +10,7 @@ import {
   useMemo,
   useReducer,
 } from 'react';
-import { StrongCheckoutWidgetsConfig } from 'lib/withDefaultWidgetConfig';
-import { CryptoFiatProvider } from 'context/crypto-fiat-context/CryptoFiatProvider';
 import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
-import { BridgeClaimWithdrawalFailure, BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
-import { StatusView } from 'components/Status/StatusView';
-import { StatusType } from 'components/Status/StatusType';
 import { ImmutableConfiguration } from '@imtbl/config';
 import {
   BridgeConfiguration,
@@ -24,13 +19,21 @@ import {
   ETH_SEPOLIA_TO_ZKEVM_TESTNET,
   TokenBridge,
 } from '@imtbl/bridge-sdk';
-import { getL1ChainId, getL2ChainId } from 'lib';
-import { Transactions } from 'components/Transactions/Transactions';
-import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
-import { TopUpView } from 'views/top-up/TopUpView';
 import { useTranslation } from 'react-i18next';
-import { ClaimWithdrawalInProgress } from 'components/Transactions/ClaimWithdrawalInProgress';
-import { getDefaultTokenImage } from 'lib/utils';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
+import {
+  BridgeClaimWithdrawalFailure, BridgeWidgetViews,
+  BridgeClaimWithdrawalSuccess,
+} from '../../context/view-context/BridgeViewContextTypes';
+import { StatusView } from '../../components/Status/StatusView';
+import { StatusType } from '../../components/Status/StatusType';
+import { getL1ChainId, getL2ChainId } from '../../lib';
+import { Transactions } from '../../components/Transactions/Transactions';
+import { UserJourney, useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { TopUpView } from '../../views/top-up/TopUpView';
+import { ClaimWithdrawalInProgress } from '../../components/Transactions/ClaimWithdrawalInProgress';
+import { getDefaultTokenImage } from '../../lib/utils';
 import {
   ViewActions,
   ViewContext,
@@ -57,9 +60,6 @@ import {
   sendBridgeFailedEvent,
   sendBridgeWidgetCloseEvent,
 } from './BridgeWidgetEvents';
-import {
-  BridgeClaimWithdrawalSuccess,
-} from '../../context/view-context/BridgeViewContextTypes';
 import { ClaimWithdrawal } from './views/ClaimWithdrawal';
 
 export type BridgeWidgetInputs = BridgeWidgetParams & {

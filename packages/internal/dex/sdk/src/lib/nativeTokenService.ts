@@ -1,4 +1,4 @@
-import { Coin, CoinAmount, ERC20, Native } from 'types';
+import { Coin, CoinAmount, ERC20, Native } from '../types';
 import { newAmount } from './utils';
 
 export const canUnwrapToken = (token: Coin): token is Native => token.type === 'native';

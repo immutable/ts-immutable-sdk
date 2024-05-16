@@ -160,7 +160,8 @@
     "regenModules": "yarn generateIndex && yarn updateExports",
     "typecheck": "tsc --noEmit --jsx preserve",
     "updateDependencies": "yarn packageList && node ./scripts/updateDependencies.js",
-    "updateExports": "node scripts/updateExports.js"
+    "updateExports": "node scripts/updateExports.js",
+    "updateMain": "node scripts/updateMains.js dev"
   },
   "type": "module",
   "types": "./dist/index.d.ts"

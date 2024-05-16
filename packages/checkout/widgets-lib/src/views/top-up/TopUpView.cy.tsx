@@ -8,9 +8,9 @@ import {
 import { Environment } from '@imtbl/config';
 import { BigNumber } from 'ethers';
 import { Web3Provider } from '@ethersproject/providers';
-import { UserJourney } from 'context/analytics-provider/SegmentAnalyticsProvider';
-import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
-import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
+import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
+import { ViewContextTestComponent } from '../../context/view-context/test-components/ViewContextTestComponent';
 import { TopUpView } from './TopUpView';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { orchestrationEvents } from '../../lib/orchestrationEvents';

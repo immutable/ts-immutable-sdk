@@ -1,12 +1,12 @@
 import { Box } from '@biom3/react';
 import { useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { SalePaymentTypes } from '@imtbl/checkout-sdk';
 import {
   SharedViews,
   ViewActions,
   ViewContext,
-} from 'context/view-context/ViewContext';
-import { SalePaymentTypes } from '@imtbl/checkout-sdk';
+} from '../../../context/view-context/ViewContext';
 import {
   OrderSummarySubViews,
   SaleWidgetViews,

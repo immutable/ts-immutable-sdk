@@ -6,7 +6,7 @@ import {
   SalePaymentTypes,
   TransactionRequirement,
 } from '@imtbl/checkout-sdk';
-import { OrderSummarySubViews } from 'context/view-context/SaleViewContextTypes';
+import { OrderSummarySubViews } from '../../../context/view-context/SaleViewContextTypes';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';

@@ -7,8 +7,8 @@ import {
   axelarAPIEndpoints,
   tenderlyAPIEndpoints,
   childWIMXs,
-} from 'constants/bridges';
-import { FungibleToken } from 'types';
+} from '../constants/bridges';
+import { FungibleToken } from '../types';
 
 function getAddresses(source:string, addresses:Record<string, string>) {
   let address:string;

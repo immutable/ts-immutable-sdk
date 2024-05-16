@@ -5,8 +5,8 @@ import {
   useReducer,
 } from 'react';
 import { IMTBLWidgetEvents, WalletWidgetParams } from '@imtbl/checkout-sdk';
-import { UserJourney } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { useTranslation } from 'react-i18next';
+import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import {
   initialWalletState,
   WalletActions,

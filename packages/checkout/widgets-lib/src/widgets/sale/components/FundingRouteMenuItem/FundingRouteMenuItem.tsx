@@ -3,8 +3,8 @@ import {
 } from '@biom3/react';
 import { ChainId, FundingRoute } from '@imtbl/checkout-sdk';
 import { useContext, useEffect, useState } from 'react';
-import { getChainNameById } from 'lib/chains';
 import { useTranslation } from 'react-i18next';
+import { getChainNameById } from '../../../../lib/chains';
 import { CryptoFiatContext } from '../../../../context/crypto-fiat-context/CryptoFiatContext';
 import { calculateCryptoToFiat, tokenValueFormat } from '../../../../lib/utils';
 import { useSaleContext } from '../../context/SaleContextProvider';

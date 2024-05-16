@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Environment } from "@imtbl/config";
-import { config, passport } from "@imtbl/sdk";
+import { Environment, ImmutableConfiguration } from "@imtbl/config";
 import { WidgetsFactory } from "@imtbl/checkout-widgets";
 import {
   BridgeEventType,
@@ -103,9 +102,9 @@ const usePassportInstance = (passportConfig: any) => {
     return undefined;
   }
 
-  const passportInstance = new passport.Passport({
-    baseConfig: new config.ImmutableConfiguration({
-      environment: environment || config.Environment.SANDBOX,
+  const passportInstance = new Passport({
+    baseConfig: new ImmutableConfiguration({
+      environment: environment || Environment.SANDBOX,
     }),
     clientId,
     redirectUri,
@@ -177,7 +176,7 @@ export function SaleUI() {
   // mount sale widget and subscribe to close event
   useEffect(() => {
     saleWidget.mount("sale", {
-      
+
       environmentId,
       collectionName,
       items: defaultItems,

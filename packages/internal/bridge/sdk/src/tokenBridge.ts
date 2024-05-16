@@ -6,18 +6,18 @@ import { ethers } from 'ethers';
 import {
   concat, defaultAbiCoder, hexlify, keccak256, zeroPad,
 } from 'ethers/lib/utils';
-import { ROOT_AXELAR_ADAPTOR } from 'contracts/ABIs/RootAxelarBridgeAdaptor';
+import { ROOT_AXELAR_ADAPTOR } from './contracts/ABIs/RootAxelarBridgeAdaptor';
 import {
   checkReceiver, validateBridgeReqArgs, validateChainConfiguration, validateChainIds,
   validateGetFee,
-} from 'lib/validation';
+} from './lib/validation';
 import {
   getAxelarEndpoint, getAxelarGateway, getChildAdaptor, getChildchain, getRootAdaptor, getTenderlyEndpoint,
   isWrappedIMX,
-} from 'lib/utils';
-import { TenderlySimulation } from 'types/tenderly';
-import { calculateGasFee } from 'lib/gas';
-import { getWithdrawRootToken, genAxelarWithdrawPayload, genUniqueAxelarCommandId } from 'lib/axelarUtils';
+} from './lib/utils';
+import { TenderlySimulation } from './types/tenderly';
+import { calculateGasFee } from './lib/gas';
+import { getWithdrawRootToken, genAxelarWithdrawPayload, genUniqueAxelarCommandId } from './lib/axelarUtils';
 import {
   NATIVE,
   ETHEREUM_NATIVE_TOKEN_ADDRESS,

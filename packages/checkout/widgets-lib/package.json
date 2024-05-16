@@ -75,8 +75,8 @@
     "immutable"
   ],
   "license": "ISC",
-  "main": "dist/main.js",
-  "module": "dist/index.js",
+  "main": "src/index.ts",
+  "module": "src/index.ts",
   "private": true,
   "scripts": {
     "build": "yarn clean && rollup --config rollup.config.js",
@@ -93,5 +93,5 @@
     "typecheck": "tsc --noEmit"
   },
   "type": "module",
-  "types": "dist/index.d.ts"
+  "types": "src/index.ts"
 }

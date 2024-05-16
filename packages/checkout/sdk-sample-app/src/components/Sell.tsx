@@ -4,8 +4,6 @@ import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
 import { Box, FormControl, Select, TextInput, OptionKey, Body } from '@biom3/react';
-import { utils } from 'ethers';
-import { ERC20BuyToken } from '@imtbl/checkout-sdk/dist/types';
 
 interface SellProps {
   checkout: Checkout;

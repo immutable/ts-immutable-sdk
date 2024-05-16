@@ -1,8 +1,8 @@
 import { Box } from '@biom3/react';
 
 import { SalePaymentTypes } from '@imtbl/checkout-sdk';
-import { listItemVariants, listVariants } from 'lib/animation/listAnimation';
 import { motion } from 'framer-motion';
+import { listItemVariants, listVariants } from '../../../lib/animation/listAnimation';
 import { PaymentOption } from './PaymentOption';
 
 const defaultPaymentOptions: SalePaymentTypes[] = [

@@ -2,10 +2,6 @@ import { Body, Box, Heading } from '@biom3/react';
 import {
   ReactNode, useContext, useEffect, useState,
 } from 'react';
-import {
-  UserJourney,
-  useAnalytics,
-} from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { StandardAnalyticsControlTypes } from '@imtbl/react-analytics';
 import {
   Checkout,
@@ -14,11 +10,15 @@ import {
   IMTBLWidgetEvents,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
-import { DEFAULT_TOKEN_SYMBOLS } from 'context/crypto-fiat-context/CryptoFiatProvider';
-import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { Web3Provider } from '@ethersproject/providers';
 import { useTranslation } from 'react-i18next';
 import { $Dictionary } from 'i18next/typescript/helpers';
+import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
+import { DEFAULT_TOKEN_SYMBOLS } from '../../context/crypto-fiat-context/CryptoFiatProvider';
+import {
+  UserJourney,
+  useAnalytics,
+} from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { FooterLogo } from '../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';

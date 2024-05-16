@@ -1,4 +1,4 @@
-import { tokenSymbolNameOverrides } from 'lib/utils';
+import { tokenSymbolNameOverrides } from '../../../lib/utils';
 import { OrderQuotePricing } from '../types';
 
 export const getPricingBySymbol = (

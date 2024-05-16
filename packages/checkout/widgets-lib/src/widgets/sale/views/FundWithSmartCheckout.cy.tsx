@@ -1,7 +1,7 @@
 import { mount } from 'cypress/react18';
 import { cy, describe } from 'local-cypress';
 import { Checkout } from '@imtbl/checkout-sdk';
-import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
+import { ViewContextTestComponent } from '../../../context/view-context/test-components/ViewContextTestComponent';
 import { cySmartGet } from '../../../lib/testUtils';
 import { FundWithSmartCheckout } from './FundWithSmartCheckout';
 import { FundWithSmartCheckoutSubViews } from '../../../context/view-context/SaleViewContextTypes';

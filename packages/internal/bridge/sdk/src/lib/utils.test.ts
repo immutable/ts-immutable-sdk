@@ -1,4 +1,4 @@
-import { ETH_MAINNET_TO_ZKEVM_MAINNET, ETH_SEPOLIA_TO_ZKEVM_TESTNET } from 'constants/bridges';
+import { ETH_MAINNET_TO_ZKEVM_MAINNET, ETH_SEPOLIA_TO_ZKEVM_TESTNET } from '../constants/bridges';
 import { exportedForTesting } from './utils';
 
 describe('utils', () => {

@@ -1,7 +1,6 @@
 import {
   useCallback, useContext, useMemo, useState, useEffect,
 } from 'react';
-import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import {
   Body, Box, Button, Heading, Icon, Logo, MenuItem,
 } from '@biom3/react';
@@ -9,14 +8,19 @@ import {
   GasEstimateBridgeToL2Result,
   GasEstimateType,
 } from '@imtbl/checkout-sdk';
-import { abbreviateAddress } from 'lib/addressUtils';
-import { CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext';
+import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
+import { BigNumber, utils } from 'ethers';
+import { useTranslation } from 'react-i18next';
+import { Web3Provider } from '@ethersproject/providers';
+import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
+import { abbreviateAddress } from '../../../lib/addressUtils';
+import { CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import {
   isMetaMaskProvider,
   isPassportProvider,
   isWalletConnectProvider,
-} from 'lib/provider';
-import { calculateCryptoToFiat, isNativeToken } from 'lib/utils';
+} from '../../../lib/provider';
+import { calculateCryptoToFiat, isNativeToken } from '../../../lib/utils';
 import {
   DEFAULT_QUOTE_REFRESH_INTERVAL,
   DEFAULT_TOKEN_DECIMALS,
@@ -27,19 +31,15 @@ import {
   getL1ChainId,
   networkIcon,
   removeChainChangedListener,
-} from 'lib';
-import { useInterval } from 'lib/hooks/useInterval';
-import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
-import { BigNumber, utils } from 'ethers';
+} from '../../../lib';
+import { useInterval } from '../../../lib/hooks/useInterval';
 import {
   UserJourney,
   useAnalytics,
-} from 'context/analytics-provider/SegmentAnalyticsProvider';
-import { useTranslation } from 'react-i18next';
-import { NetworkSwitchDrawer } from 'components/NetworkSwitchDrawer/NetworkSwitchDrawer';
-import { Web3Provider } from '@ethersproject/providers';
-import { useWalletConnect } from 'lib/hooks/useWalletConnect';
-import { NotEnoughGas } from 'components/NotEnoughGas/NotEnoughGas';
+} from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { NetworkSwitchDrawer } from '../../../components/NetworkSwitchDrawer/NetworkSwitchDrawer';
+import { useWalletConnect } from '../../../lib/hooks/useWalletConnect';
+import { NotEnoughGas } from '../../../components/NotEnoughGas/NotEnoughGas';
 import { networkIconStyles } from './WalletNetworkButtonStyles';
 import {
   arrowIconStyles,

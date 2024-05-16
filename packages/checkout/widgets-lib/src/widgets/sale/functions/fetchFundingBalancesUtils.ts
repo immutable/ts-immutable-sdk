@@ -11,8 +11,8 @@ import {
   RoutingOutcomeType,
 } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
-import { getTokenImageByAddress, isNativeToken } from 'lib/utils';
 import { Environment } from '@imtbl/config';
+import { getTokenImageByAddress, isNativeToken } from '../../../lib/utils';
 import {
   OrderQuoteCurrency,
   FundingBalance,

@@ -2,9 +2,9 @@ import {
   Box, Icon, Body, EllipsizedText,
 } from '@biom3/react';
 import { ChainSlug } from '@imtbl/checkout-sdk';
-import { logoColour, networkIcon, networkName } from 'lib';
-import { getChainIdBySlug } from 'lib/chains';
-import { Transaction } from 'lib/clients';
+import { logoColour, networkIcon, networkName } from '../../lib';
+import { getChainIdBySlug } from '../../lib/chains';
+import { Transaction } from '../../lib/clients';
 
 export interface TransactionDetailsProps {
   transaction: Transaction;

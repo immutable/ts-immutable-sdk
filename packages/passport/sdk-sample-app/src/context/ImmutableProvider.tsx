@@ -198,6 +198,7 @@ const ImmutableContext = createContext<{
 export function ImmutableProvider({
   children,
 }: { children: JSX.Element | JSX.Element[] }) {
+  console.log(Environment);
   const [environment, setEnvironment] = useLocalStorage(
     'IMX_PASSPORT_SAMPLE_ENVIRONMENT',
     useContext(ImmutableContext).environment,

@@ -11,7 +11,7 @@ import {
   calculateCryptoToFiat,
   getDefaultTokenImage,
   tokenValueFormat,
-} from 'lib/utils';
+} from '../../../lib/utils';
 import { FundingBalance } from '../types';
 import { useSaleContext } from '../context/SaleContextProvider';
 
