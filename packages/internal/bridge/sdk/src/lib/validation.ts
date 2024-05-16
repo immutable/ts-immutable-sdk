@@ -3,9 +3,12 @@ import {
   BridgeBundledTxRequest, BridgeFeeActions, BridgeFeeRequest, FungibleToken,
 } from 'types';
 import { NATIVE } from 'constants/bridges';
+import { createContract } from 'contracts/createContract';
 import { BridgeConfiguration } from '../config';
 import { BridgeError, BridgeErrorType, withBridgeError } from '../errors';
-import { isChildETH, isRootIMX } from './utils';
+import {
+  isChildETH, isRootIMX, isValidDeposit, isValidWithdraw,
+} from './utils';
 
 // TODO consider moving these to be member methods of the config class
 
@@ -65,7 +68,7 @@ export async function checkReceiver(
   if (bytecode.length <= 2) return;
 
   const ABI = ['function receive()'];
-  const contract = new ethers.Contract(address, ABI, provider);
+  const contract = await createContract(address, ABI, provider);
 
   try {
     // try to estimate gas for the receive function, if it works it exists
@@ -153,38 +156,31 @@ export async function validateBridgeReqArgs(
 }
 
 export function validateGetFee(req: BridgeFeeRequest, config: BridgeConfiguration) {
-  if (
-    req.action === BridgeFeeActions.DEPOSIT
-    && (
-      req.sourceChainId !== config.bridgeInstance.rootChainID
-    || req.destinationChainId !== config.bridgeInstance.childChainID
-    )
-  ) {
-    throw new BridgeError(
-      `Deposit must be from the root chain (${config.bridgeInstance.rootChainID}) to the child chain (${config.bridgeInstance.childChainID})`,
-      BridgeErrorType.INVALID_SOURCE_OR_DESTINATION_CHAIN,
-    );
-  }
-
-  if (
-    req.action === BridgeFeeActions.WITHDRAW
-    && (
-      req.sourceChainId !== config.bridgeInstance.childChainID
-    || req.destinationChainId !== config.bridgeInstance.rootChainID
-    )
-  ) {
-    throw new BridgeError(
-      `Withdraw must be from the child chain (${config.bridgeInstance.childChainID}) to the root chain (${config.bridgeInstance.rootChainID})`,
-      BridgeErrorType.INVALID_SOURCE_OR_DESTINATION_CHAIN,
-    );
-  }
-
-  // TODO doesn't it make sense that the source chain would be on the child chain?
   if (req.action === BridgeFeeActions.FINALISE_WITHDRAWAL
     && req.sourceChainId !== config.bridgeInstance.rootChainID) {
     throw new BridgeError(
       `Finalised withdrawals must be on the root chain (${config.bridgeInstance.rootChainID})`,
       BridgeErrorType.INVALID_SOURCE_CHAIN_ID,
+    );
+  }
+
+  if (!('destinationChainId' in req)) {
+    throw new BridgeError(
+      'DEPOSIT or WITHDRAW used without destinationChainId',
+      BridgeErrorType.INVALID_DESTINATION_CHAIN_ID,
+    );
+  }
+
+  const direction = {
+    sourceChainId: req.sourceChainId,
+    destinationChainId: req.destinationChainId,
+    action: req.action,
+  };
+
+  if (!isValidDeposit(direction, config.bridgeInstance) && !isValidWithdraw(direction, config.bridgeInstance)) {
+    throw new BridgeError(
+      'This request is neither a valid deposit nor a valid withdrawal',
+      BridgeErrorType.INVALID_SOURCE_OR_DESTINATION_CHAIN,
     );
   }
 }
