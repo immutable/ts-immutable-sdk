@@ -118,7 +118,7 @@ export const buy = async (
   getAllBalances(config, provider, fulfillerAddress, getL1ChainId(config));
   getAllBalances(config, provider, fulfillerAddress, getL2ChainId(config));
 
-  const { id, takerFees } = orders[0];
+  const { id, takerFees, fillAmount } = orders[0];
 
   let orderChainName: string;
   try {
@@ -178,7 +178,7 @@ export const buy = async (
     const { actions } = await measureAsyncExecution<FulfillOrderResponse>(
       config,
       'Time to call fulfillOrder from the orderbook',
-      orderbook.fulfillOrder(id, fulfillerAddress, fees),
+      orderbook.fulfillOrder(id, fulfillerAddress, fees, fillAmount),
     );
 
     orderActions = actions;
@@ -255,6 +255,11 @@ export const buy = async (
   feeArray.forEach((item: any) => {
     amount = amount.add(BigNumber.from(item.amount));
   });
+
+  // In the event that the user is filling an ERC1155 listing, the amount required will be scaled by the fill ratio
+  if (order.result.sell[0].type === 'ERC1155' && fillAmount) {
+    amount = amount.mul(BigNumber.from(fillAmount)).div(BigNumber.from(order.result.sell[0].amount));
+  }
 
   const itemRequirements = [
     getItemRequirement(type, contractAddress, amount, spenderAddress),

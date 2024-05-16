@@ -18,9 +18,10 @@ import { CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFi
 
 export interface MoveInProgressProps {
   transactionHash: string;
+  isTransfer: boolean;
 }
 
-export function MoveInProgress({ transactionHash }: MoveInProgressProps) {
+export function MoveInProgress({ transactionHash, isTransfer }: MoveInProgressProps) {
   const { t } = useTranslation();
   const { eventTargetState: { eventTarget } } = useContext(EventTargetContext);
   const { page } = useAnalytics();
@@ -53,6 +54,7 @@ export function MoveInProgress({ transactionHash }: MoveInProgressProps) {
         amount,
         fiatAmount,
         tokenAddress: token?.address,
+        moveType: isTransfer ? 'transfer' : 'bridge',
       },
     });
   }, []);
@@ -79,15 +81,18 @@ export function MoveInProgress({ transactionHash }: MoveInProgressProps) {
                 }}
                 testId="settings-button"
               />
-              <Badge
-                isAnimated
-                variant="guidance"
-                sx={{
-                  position: 'absolute',
-                  right: 'base.spacing.x14',
-                  top: 'base.spacing.x1',
-                }}
-              />
+              {!isTransfer
+                && (
+                  <Badge
+                    isAnimated
+                    variant="guidance"
+                    sx={{
+                      position: 'absolute',
+                      right: 'base.spacing.x14',
+                      top: 'base.spacing.x1',
+                    }}
+                  />
+                )}
             </>
           )}
         />
@@ -98,8 +103,8 @@ export function MoveInProgress({ transactionHash }: MoveInProgressProps) {
       heroContent={<RocketHero environment={checkout.config.environment} />}
       floatHeader
     >
-      <SimpleTextBody heading={t('views.IN_PROGRESS.heading')}>
-        {t('views.IN_PROGRESS.body1')}
+      <SimpleTextBody heading={t(isTransfer ? 'views.IN_PROGRESS.transferHeading' : 'views.IN_PROGRESS.heading')}>
+        {!isTransfer && t('views.IN_PROGRESS.body1')}
         <br />
         <br />
         {t('views.IN_PROGRESS.body2')}

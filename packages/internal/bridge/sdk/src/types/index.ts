@@ -197,7 +197,7 @@ export interface WithdrawERC20FeeRequest {
 /**
  * @typedef {Object} FinaliseFeeRequest
  * @property {BridgeFeeActions} method - The method for which the bridge fee is being requested.
- * @property {string} sourceChainId - The chain ID of the source chain.
+ * @property {string} sourceChainId - The chain ID of the chain we are finalising the withdrawal on. This is ALWAYS the root chain.
  */
 export interface FinaliseFeeRequest {
   action: BridgeFeeActions.FINALISE_WITHDRAWAL,
@@ -493,4 +493,10 @@ export interface TokenMappingResponse {
 export interface DynamicGasEstimatesResponse {
   approvalGas: number,
   sourceChainGas: number,
+}
+
+export interface BridgeDirection {
+  action: BridgeFeeActions.DEPOSIT | BridgeFeeActions.WITHDRAW,
+  sourceChainId: string,
+  destinationChainId: string,
 }

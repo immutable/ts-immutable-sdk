@@ -97,8 +97,9 @@ export class ImmutableApiClient {
       throw new Error('Only one item can be listed at a time');
     }
 
-    if (Number(orderComponents.offer[0].itemType) !== ItemType.ERC721) {
-      throw new Error('Only ERC721 tokens can be listed');
+    if (Number(orderComponents.offer[0].itemType) !== ItemType.ERC721
+        && Number(orderComponents.offer[0].itemType) !== ItemType.ERC1155) {
+      throw new Error('Only ERC721 / ERC1155 tokens can be listed');
     }
 
     const orderTypes = [
@@ -134,20 +135,25 @@ export class ImmutableApiClient {
         ).toISOString(),
         order_hash: orderHash,
         protocol_data: {
-          order_type: ProtocolData.order_type.FULL_RESTRICTED,
+          order_type: Number(orderComponents.offer[0].itemType) === ItemType.ERC1155
+            ? ProtocolData.order_type.PARTIAL_RESTRICTED : ProtocolData.order_type.FULL_RESTRICTED,
           zone_address: orderComponents.zone,
           seaport_address: this.seaportAddress,
           seaport_version: SEAPORT_CONTRACT_VERSION_V1_5,
           counter: orderComponents.counter.toString(),
         },
         salt: orderComponents.salt,
-        sell: [
-          {
+        sell: Number(orderComponents.offer[0].itemType) === ItemType.ERC1155
+          ? [{
+            contract_address: orderComponents.offer[0].token,
+            token_id: orderComponents.offer[0].identifierOrCriteria,
+            type: 'ERC1155',
+            amount: orderComponents.offer[0].startAmount,
+          }] : [{
             contract_address: orderComponents.offer[0].token,
             token_id: orderComponents.offer[0].identifierOrCriteria,
             type: 'ERC721',
-          },
-        ],
+          }],
         signature: orderSignature,
         start_at: new Date(
           parseInt(`${orderComponents.startTime.toString()}000`, 10),

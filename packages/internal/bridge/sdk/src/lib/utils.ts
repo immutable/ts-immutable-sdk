@@ -9,7 +9,10 @@ import {
   childWIMXs,
   NATIVE,
 } from 'constants/bridges';
-import { BridgeFeeRequest, BridgeInstance, FungibleToken } from 'types';
+import {
+  BridgeDirection,
+  BridgeFeeActions, BridgeFeeRequest, BridgeInstance, FungibleToken,
+} from 'types';
 
 function getAddresses(source:string, addresses:Record<string, string>) {
   let address:string;
@@ -74,54 +77,52 @@ export function isWrappedIMX(token: FungibleToken, source: string) {
 }
 
 /**
- * Assumes the destination chain is correct (i.e. it doesn't check the destination chain)
+ * Checks that the source and destination chains are such that this is a valid deposit bridge transaction.
  */
-export function isDeposit(sourceChainId: string, bridgeInstance: BridgeInstance): boolean {
+export function isValidDeposit(direction: BridgeDirection, bridgeInstance: BridgeInstance) {
+  return direction.sourceChainId === bridgeInstance.rootChainID
+    && direction.destinationChainId === bridgeInstance.childChainID
+    && direction.action === BridgeFeeActions.DEPOSIT;
+}
+
+/**
+ * @returns true if and only if the source chain is the root chain,
+ *          indicating that this should be a deposit or withdraw finalisation, without doing validation.
+ * Useful for if we believe a transaction should be a deposit or withdraw finalisation,
+ * so you can construct relevant data types to then do the checks
+ */
+export function shouldBeDepositOrFinaliseWithdraw(sourceChainId: string, bridgeInstance: BridgeInstance) {
   return sourceChainId === bridgeInstance.rootChainID;
 }
 
 /**
- * Assumes the destination chain is correct (i.e. it doesn't check the destination chain)
+ * Checks that the source and destination chains are such that this is a valid withdraw bridge transaction.
  */
-export function isWithdraw(sourceChainId: string, bridgeInstance: BridgeInstance): boolean {
-  return sourceChainId === bridgeInstance.childChainID;
+export function isValidWithdraw(direction: BridgeDirection, bridgeInstance: BridgeInstance) {
+  return direction.sourceChainId === bridgeInstance.childChainID
+    && direction.destinationChainId === bridgeInstance.rootChainID
+    && direction.action === BridgeFeeActions.WITHDRAW;
 }
 
-export function isWithdrawNotWrappedIMX(
+export function isWithdrawNativeIMX(
   token: FungibleToken,
-  sourceChainId: string,
+  direction: BridgeDirection,
   bridgeInstance: BridgeInstance,
 ): boolean {
-  return isWithdraw(sourceChainId, bridgeInstance) && !isRootIMX(token, sourceChainId);
-}
-
-export function isWithdrawWrappedIMX(
-  token: FungibleToken,
-  sourceChainId: string,
-  bridgeInstance: BridgeInstance,
-): boolean {
-  return isWithdraw(sourceChainId, bridgeInstance) && isRootIMX(token, sourceChainId);
-}
-
-/**
- * This is the same as `isDeposit`, but takes an extra parameter - the `destinationChainId` - to check that both
- * of the chain IDs are correct.
- */
-export function isValidDeposit(sourceChainId: string, destinationChainId: string, bridgeInstance: BridgeInstance) {
-  return sourceChainId === bridgeInstance.rootChainID && destinationChainId === bridgeInstance.childChainID;
-}
-
-/**
- * This is the same as `isWithdraw`, but takes an extra parameter - the `destinationChainId` - to check that both
- * of the chain IDs are correct.
- */
-export function isValidWithdraw(sourceChainId: string, destinationChainId: string, bridgeInstance: BridgeInstance) {
-  return sourceChainId === bridgeInstance.childChainID && destinationChainId === bridgeInstance.rootChainID;
+  return isValidWithdraw(direction, bridgeInstance) && !isWrappedIMX(token, direction.sourceChainId);
 }
 
 // Return true if a BridgeFeeRequest is for a native token bridge interaction.
 export function isNativeTokenBridgeFeeRequest(req: BridgeFeeRequest): boolean {
   return !('token' in req) || req.token.toUpperCase() === NATIVE;
+}
+
+export function isWithdrawWrappedIMX(
+  token: FungibleToken,
+  direction: BridgeDirection,
+  bridgeInstance: BridgeInstance,
+): boolean {
+  return isValidWithdraw(direction, bridgeInstance) && isWrappedIMX(token, direction.sourceChainId);
 }
 
 export const exportedForTesting = {

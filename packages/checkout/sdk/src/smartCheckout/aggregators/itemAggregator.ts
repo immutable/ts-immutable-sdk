@@ -78,6 +78,36 @@ export const erc721ItemAggregator = (
   return aggregatedItemRequirements.concat(Array.from(aggregatedMap.values()));
 };
 
+export const erc1155ItemAggregator = (
+  itemRequirements: ItemRequirement[],
+): ItemRequirement[] => {
+  const aggregatedMap = new Map<string, ItemRequirement>();
+  const aggregatedItemRequirements: ItemRequirement[] = [];
+
+  itemRequirements.forEach((itemRequirement) => {
+    const { type } = itemRequirement;
+
+    if (type !== ItemType.ERC1155) {
+      aggregatedItemRequirements.push(itemRequirement);
+      return;
+    }
+
+    const {
+      contractAddress, spenderAddress, id, amount,
+    } = itemRequirement;
+    const key = `${contractAddress}${spenderAddress}${id}`;
+    const aggregateItem = aggregatedMap.get(key);
+    if (aggregateItem && aggregateItem.type === ItemType.ERC1155) {
+      aggregateItem.amount = BigNumber.from(aggregateItem.amount).add(amount);
+    } else {
+      aggregatedMap.set(key, { ...itemRequirement });
+    }
+  });
+
+  return aggregatedItemRequirements.concat(Array.from(aggregatedMap.values()));
+};
+
 export const itemAggregator = (
   itemRequirements: ItemRequirement[],
-): ItemRequirement[] => erc721ItemAggregator(erc20ItemAggregator(nativeAggregator(itemRequirements)));
+  // eslint-disable-next-line max-len
+): ItemRequirement[] => erc1155ItemAggregator(erc721ItemAggregator(erc20ItemAggregator(nativeAggregator(itemRequirements))));

@@ -16,7 +16,6 @@ import {
 } from 'components/ConnectLoader/ConnectLoader';
 import { getL2ChainId } from 'lib';
 import {
-  isValidAmount,
   isValidWalletProvider,
 } from 'lib/validations/widgetValidators';
 import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
@@ -61,12 +60,6 @@ export class Sale extends Base<WidgetType.SALE> {
       // eslint-disable-next-line no-console
       console.warn('[IMTBL]: invalid "walletProviderName" widget input');
       validatedParams.walletProviderName = undefined;
-    }
-
-    if (!isValidAmount(params.amount)) {
-      // eslint-disable-next-line no-console
-      console.warn('[IMTBL]: invalid "amount" widget input');
-      validatedParams.amount = '';
     }
 
     // TODO: fix the logic here when proper , currently saying if valid then reset to empty array.
@@ -131,13 +124,11 @@ export class Sale extends Base<WidgetType.SALE> {
               >
                 <SaleWidget
                   config={config}
-                  amount={this.parameters.amount!}
                   items={this.parameters.items!}
                   environmentId={this.parameters.environmentId!}
                   collectionName={this.parameters.collectionName!}
                   excludePaymentTypes={this.parameters.excludePaymentTypes!}
                   language="en"
-                  multicurrency={!!this.properties?.config?.multicurrency}
                   waitFulfillmentSettlements={this.properties?.config?.waitFulfillmentSettlements ?? true}
                 />
               </Suspense>
