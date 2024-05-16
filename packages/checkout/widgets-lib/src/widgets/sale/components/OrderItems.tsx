@@ -8,7 +8,7 @@ import { OrderItem } from './OrderItem';
 import { OrderQuoteProduct, FundingBalance } from '../types';
 import { getPricingBySymbol } from '../utils/pricing';
 
-const singleItemSx: SxProps = {
+const withFeesSx: SxProps = {
   mb: '0',
   bradbl: '0',
   bradbr: '0',
@@ -27,10 +27,8 @@ export function OrderItems({
   balance,
   pricing,
   conversions,
-  children,
+  children: feesChildren,
 }: OrderItemsProps) {
-  const singleItem = items.length === 1 && children;
-
   return (
     <Box
       rc={
@@ -43,17 +41,17 @@ export function OrderItems({
           item={item}
           balance={balance}
           conversions={conversions}
-          size={singleItem ? 'medium' : 'small'}
+          size={items.length >= 3 ? 'small' : 'medium'}
           pricing={getPricingBySymbol(
             balance.fundingItem.token.symbol,
             pricing?.[item.productId]?.pricing,
             conversions,
           )}
-          sx={singleItem ? singleItemSx : undefined}
+          sx={idx === items.length - 1 && feesChildren ? withFeesSx : undefined}
           rc={<motion.div variants={listItemVariants} custom={idx} />}
         />
       ))}
-      {children}
+      {feesChildren}
     </Box>
   );
 }

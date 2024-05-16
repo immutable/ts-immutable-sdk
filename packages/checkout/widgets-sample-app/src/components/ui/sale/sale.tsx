@@ -34,38 +34,38 @@ const defaultItems: SaleItem[] = [
       "https://iguanas.mystagingwebsite.com/wp-content/uploads/2024/02/img-Qq0Lek5jO8O9ueAZwDmdAImI-600x600-1.png",
     description: "Biker Iguana",
   },
-  // {
-  //   productId: "lab",
-  //   qty: 3,
-  //   name: "Lab Iguana",
-  //   image:
-  //     "https://iguanas.mystagingwebsite.com/wp-content/uploads/2023/12/img-IsR4OA7a9IStLeQ9cPo75tII.png",
-  //   description: "Lab Iguana",
-  // },
-  // {
-  //   productId: "baseball",
-  //   qty: 2,
-  //   name: "Baseball Iguana",
-  //   image:
-  //     "https://iguanas.mystagingwebsite.com/wp-content/uploads/2023/12/img-tGcvA5pnoUAA2oNANHpA5CXB.png",
-  //   description: "Baseball Iguana",
-  // },
-  // {
-  //   productId: "firefighter",
-  //   qty: 1,
-  //   name: "Fire Fighter Iguana",
-  //   image:
-  //     "https://iguanas.mystagingwebsite.com/wp-content/uploads/2023/12/img-NRXmr7k1jH9kZqXr029CEKt4.png",
-  //   description: "Fire Fighter Iguana",
-  // },
-  // {
-  //   productId: "soccer",
-  //   qty: 5,
-  //   name: "Soccer Iguana",
-  //   image:
-  //     "https://iguanas.mystagingwebsite.com/wp-content/uploads/2023/12/img-msXHlIXmyy6IhDaMkP2Dp0HY.png",
-  //   description: "Soccer Iguana",
-  // }
+  {
+    productId: "lab",
+    qty: 3,
+    name: "Lab Iguana",
+    image:
+      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2023/12/img-IsR4OA7a9IStLeQ9cPo75tII.png",
+    description: "Lab Iguana",
+  },
+  {
+    productId: "baseball",
+    qty: 2,
+    name: "Baseball Iguana",
+    image:
+      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2023/12/img-tGcvA5pnoUAA2oNANHpA5CXB.png",
+    description: "Baseball Iguana",
+  },
+  {
+    productId: "firefighter",
+    qty: 1,
+    name: "Fire Fighter Iguana",
+    image:
+      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2023/12/img-NRXmr7k1jH9kZqXr029CEKt4.png",
+    description: "Fire Fighter Iguana",
+  },
+  {
+    productId: "soccer",
+    qty: 5,
+    name: "Soccer Iguana",
+    image:
+      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2023/12/img-msXHlIXmyy6IhDaMkP2Dp0HY.png",
+    description: "Soccer Iguana",
+  }
 ];
 
 const useParams = () => {
