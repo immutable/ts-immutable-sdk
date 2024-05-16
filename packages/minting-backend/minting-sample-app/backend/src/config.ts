@@ -17,7 +17,6 @@ const serverConfig: ServerConfig = {
     PORT: 3000,
     chainName: "imtbl-zkevm-testnet",
     collectionAddress: "",
-    mintRequestURL: (chainName: string, collectionAddress: string, referenceId: string) => `https://api.sandbox.immutable.com/v1/chains/${chainName}/collections/${collectionAddress}/nfts/mint-requests/${referenceId}`,
     enableFileLogging: true, //Should logs be output to files or just console?
     maxTokenSupplyAcrossAllPhases: 1500,
     logLevel: "debug",
@@ -49,8 +48,7 @@ const serverConfig: ServerConfig = {
     HOST_IP: "localhost",
     PORT: 3000,
     chainName: "imtbl-zkevm-mainnet",
-    collectionAddress: "0x88b87272649b3495d99b1702f358286b19f8c3da",
-    mintRequestURL: (chainName: string, collectionAddress: string, referenceId: string) => `https://api.immutable.com/v1/chains/${chainName}/collections/${collectionAddress}/nfts/mint-requests/${referenceId}`,
+    collectionAddress: "",
     enableFileLogging: true, //Should logs be output to files or just console?
     maxTokenSupplyAcrossAllPhases: 1500,
     logLevel: "debug",
