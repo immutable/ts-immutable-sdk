@@ -9,8 +9,6 @@ import { ERC721Item, ERC1155Item, Order } from '../openapi/sdk';
 
 export function mapImmutableOrderToSeaportOrderComponents(
   order: Order,
-  counter: string,
-  zoneAddress: string,
 ): { orderComponents: OrderComponents, tips: Array<TipInputItem> } {
   const considerationItems: ConsiderationItem[] = order.buy.map((buyItem) => {
     switch (buyItem.type) {
@@ -85,14 +83,14 @@ export function mapImmutableOrderToSeaportOrderComponents(
             };
         }
       }),
-      counter,
+      counter: order.protocol_data.counter,
       endTime: Math.round(new Date(order.end_at).getTime() / 1000).toString(),
       startTime: Math.round(
         new Date(order.start_at).getTime() / 1000,
       ).toString(),
       salt: order.salt,
       offerer: order.account_address,
-      zone: zoneAddress,
+      zone: order.protocol_data.zone_address,
       // this should be the fee exclusive number of items the user signed for
       totalOriginalConsiderationItems: considerationItems.length,
       orderType: order.sell[0].type === 'ERC1155' ? OrderType.PARTIAL_RESTRICTED : OrderType.FULL_RESTRICTED,

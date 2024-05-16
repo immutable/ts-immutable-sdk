@@ -6,7 +6,6 @@ import {
   ExchangeAction,
   OrderComponents,
   OrderUseCase,
-  TipInputItem,
 } from '@opensea/seaport-js/lib/types';
 import { providers } from 'ethers';
 import { mapFromOpenApiOrder } from 'openapi/mapper';
@@ -108,7 +107,7 @@ export class Seaport {
     extraData: string,
     unitsToFill?: string,
   ): Promise<FulfillOrderResponse> {
-    const { orderComponents, tips } = this.mapImmutableOrderToSeaportOrderComponents(order);
+    const { orderComponents, tips } = mapImmutableOrderToSeaportOrderComponents(order);
     const seaportLib = this.getSeaportLib(order);
 
     const { actions: seaportActions } = await seaportLib.fulfillOrders({
@@ -177,7 +176,7 @@ export class Seaport {
       expiration: string;
     }> {
     const fulfillOrderDetails = fulfillingOrders.map((o) => {
-      const { orderComponents, tips } = this.mapImmutableOrderToSeaportOrderComponents(o.order);
+      const { orderComponents, tips } = mapImmutableOrderToSeaportOrderComponents(o.order);
 
       return {
         order: {
@@ -241,7 +240,7 @@ export class Seaport {
 
   async cancelOrders(orders: Order[], account: string): Promise<TransactionAction> {
     const orderComponents = orders.map(
-      (order) => this.mapImmutableOrderToSeaportOrderComponents(order).orderComponents,
+      (order) => mapImmutableOrderToSeaportOrderComponents(order).orderComponents,
     );
     const seaportLib = this.getSeaportLib(orders[0]);
 
@@ -256,14 +255,6 @@ export class Seaport {
       ),
       purpose: TransactionPurpose.CANCEL,
     };
-  }
-
-  private mapImmutableOrderToSeaportOrderComponents(order: Order): {
-    orderComponents: OrderComponents;
-    tips: Array<TipInputItem>;
-  } {
-    const orderCounter = order.protocol_data.counter;
-    return mapImmutableOrderToSeaportOrderComponents(order, orderCounter, this.zoneContractAddress);
   }
 
   private createSeaportOrder(
