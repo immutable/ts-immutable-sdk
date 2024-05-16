@@ -4,7 +4,7 @@
 import axios, { AxiosResponse } from 'axios';
 import { ethers } from 'ethers';
 import {
-  concat, defaultAbiCoder, hexlify, keccak256, zeroPad,
+  concat, defaultAbiCoder, hexValue, hexlify, keccak256, zeroPad,
 } from 'ethers/lib/utils';
 import { ROOT_AXELAR_ADAPTOR } from 'contracts/ABIs/RootAxelarBridgeAdaptor';
 import {
@@ -828,12 +828,9 @@ export class TokenBridge {
         ]), BridgeErrorType.INTERNAL_ERROR);
 
       simulations.push({
-        network_id: sourceChainId,
-        estimate_gas: true,
-        simulation_type: 'quick',
         from: sender,
         to: token,
-        input: txData,
+        data: txData,
       });
     }
 
@@ -853,15 +850,13 @@ export class TokenBridge {
     );
 
     // tx value for simulation mocked as amount + 1 wei for a native bridge and 1 wei for token bridges
-    const txValue = (token.toUpperCase() !== NATIVE) ? '1' : amount.add('1').toString();
+    // hexValue() is required to remove leading zeros, which tenderly does not support.
+    const txValue = (token.toUpperCase() !== NATIVE) ? '0x1' : hexValue(amount.add('1').toHexString());
 
     simulations.push({
-      network_id: sourceChainId,
-      estimate_gas: true,
-      simulation_type: 'quick',
       from: sender,
       to: this.config.bridgeContracts.rootERC20BridgeFlowRate,
-      input: txData,
+      data: txData,
       value: txValue,
     });
 
@@ -918,23 +913,19 @@ export class TokenBridge {
     // Build simulation
     const axelarGateway = getAxelarGateway(destinationChainId);
     const simulations: Array<TenderlySimulation> = [{
-      network_id: destinationChainId,
-      estimate_gas: true,
-      simulation_type: 'quick',
       from: sender,
       to: destinationAddress,
-      input: executeData,
-      state_objects: {
-        [axelarGateway]: {
-          storage: {
-            // Override storage to approve this command.
-            [slot]: '0x0000000000000000000000000000000000000000000000000000000000000001',
-          },
-        },
-      },
+      data: executeData,
     }];
 
-    const gas = await this.submitTenderlySimulations(destinationChainId, simulations);
+    const gas = await this.submitTenderlySimulations(destinationChainId, simulations, {
+      [axelarGateway]: {
+        stateDiff: {
+          // Override storage to approve this command.
+          [slot]: '0x0000000000000000000000000000000000000000000000000000000000000001',
+        },
+      },
+    });
     return gas[0];
   }
 
@@ -943,6 +934,7 @@ export class TokenBridge {
   private async submitTenderlySimulations(
     chainId: string,
     simulations: Array<TenderlySimulation>,
+    state_objects?: Record<string, Record<string, Record<string, string>>>,
   ): Promise<Array<number>> {
     let axiosResponse:AxiosResponse;
     const tenderlyAPI = getTenderlyEndpoint(chainId);
@@ -950,7 +942,14 @@ export class TokenBridge {
       axiosResponse = await axios.post(
         tenderlyAPI,
         {
-          simulations,
+          jsonrpc: '2.0',
+          id: 0,
+          method: 'tenderly_estimateGasBundle',
+          params: [
+            simulations,
+            'latest',
+            state_objects,
+          ],
         },
         {
           headers: {
@@ -969,7 +968,7 @@ export class TokenBridge {
       );
     }
 
-    const simResults = axiosResponse.data.simulation_results;
+    const simResults = axiosResponse.data.result;
     if (simResults.length !== simulations.length) {
       throw new BridgeError(
         'Estimating gas failed with mismatched responses',
@@ -980,19 +979,19 @@ export class TokenBridge {
     const gas: Array<number> = [];
 
     for (let i = 0; i < simResults.length; i++) {
-      if (simResults[i].simulation.error_message) {
+      if (simResults[i].error) {
         throw new BridgeError(
-          `Estimating deposit gas failed with the reason: ${simResults[i].simulation.error_message}`,
+          `Estimating deposit gas failed with the reason: ${simResults[i].error.message}`,
           BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
         );
       }
-      if (simResults[i].simulation.gas_used === undefined) {
+      if (simResults[i].gasUsed === undefined) {
         throw new BridgeError(
           'Estimating gas did not return simulation results',
           BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
         );
       }
-      gas.push(simResults[i].simulation.gas_used);
+      gas.push(simResults[i].gasUsed);
     }
 
     return gas;
