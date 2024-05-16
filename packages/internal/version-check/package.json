@@ -30,6 +30,7 @@
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "NODE_ENV=production rollup --config rollup.config.js",
+    "dev": "rollup --config rollup.config.js -w",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "start:checkout-js-server": "http-server -p 8080 -c-1 ../../../sdk/dist",
     "start:checkout-web-server": "http-server -p 8081 -c-1 ./src/checkout-widgets-test",

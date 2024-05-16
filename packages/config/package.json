@@ -36,6 +36,7 @@
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "NODE_ENV=production rollup --config rollup.config.js",
+    "dev": "rollup --config rollup.config.js -w",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "test": "jest",
     "test:watch": "jest --watch",
