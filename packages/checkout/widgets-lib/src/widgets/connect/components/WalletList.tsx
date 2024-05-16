@@ -1,11 +1,18 @@
 import { Box } from '@biom3/react';
 import {
   ChainId,
-  CheckoutErrorType, EIP6963ProviderDetail,
-  WalletProviderName, WalletProviderRdns,
+  CheckoutErrorType,
+  EIP6963ProviderDetail,
+  WalletProviderName,
+  WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
 import {
-  useCallback, useContext, useEffect, useMemo, useRef, useState,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
 } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
@@ -31,12 +38,16 @@ import {
   isPassportProvider,
 } from '../../../lib/provider';
 import { addProviderListenersForWidgetRoot, getL1ChainId } from '../../../lib';
-import { listItemVariants, listVariants } from '../../../lib/animation/listAnimation';
+import {
+  listItemVariants,
+  listVariants,
+} from '../../../lib/animation/listAnimation';
 import { WalletDrawer } from '../../../components/WalletDrawer/WalletDrawer';
 import { WalletChangeEvent } from '../../../components/WalletDrawer/WalletDrawerEvents';
 import { WalletConnectItem } from './WalletConnectItem';
 import { BrowserWalletItem } from './BrowserWalletItem';
 import { identifyUser } from '../../../lib/analytics/identifyUser';
+import { NonPassportWarningDrawer } from './NonPassportWarningDrawer';
 
 export interface WalletListProps {
   targetWalletRdns?: string;
@@ -61,43 +72,59 @@ export function WalletList(props: WalletListProps) {
   const walletConnectItemRef = useRef(null);
   const [showChangedYourMindDrawer, setShowChangedYourMindDrawer] = useState(false);
   const [showUnableToConnectDrawer, setShowUnableToConnectDrawer] = useState(false);
+  const [showNonPassportWarning, setShowNonPassportWarning] = useState(false);
   const [chosenProviderDetail, setChosenProviderDetail] = useState<EIP6963ProviderDetail>();
 
-  const filteredProviders = useMemo(() => (
-    providers
-      .filter((provider) => (!(provider.info.rdns === WalletProviderRdns.PASSPORT)))
-      .filter((provider) => (!blocklistWalletRdns.includes(provider.info.rdns)))
-  ), [providers]);
+  const filteredProviders = useMemo(
+    () => providers
+      .filter(
+        (provider) => !(provider.info.rdns === WalletProviderRdns.PASSPORT),
+      )
+      .filter(
+        (provider) => !blocklistWalletRdns.includes(provider.info.rdns),
+      ),
+    [providers],
+  );
 
   // Don't allow Passport if targetChainId is L1
-  const passportProviderDetail = useMemo(() => (
-    targetChainId !== getL1ChainId(checkout!.config)
-    && providers
-      .filter((provider) => (!blocklistWalletRdns.includes(provider.info.rdns)))
-      .find((provider) => provider.info.rdns === WalletProviderRdns.PASSPORT)
-  ), [providers, checkout]);
+  const passportProviderDetail = useMemo(
+    () => targetChainId !== getL1ChainId(checkout!.config)
+      && providers
+        .filter((provider) => !blocklistWalletRdns.includes(provider.info.rdns))
+        .find((provider) => provider.info.rdns === WalletProviderRdns.PASSPORT),
+    [providers, checkout],
+  );
 
-  const selectWeb3Provider = useCallback((web3Provider: Web3Provider, providerName: string) => {
-    connectDispatch({
-      payload: {
-        type: ConnectActions.SET_PROVIDER,
-        provider: web3Provider,
-      },
-    });
-    connectDispatch({
-      payload: {
-        type: ConnectActions.SET_WALLET_PROVIDER_NAME,
-        walletProviderName: providerName as WalletProviderName,
-      },
-    });
-  }, []);
+  const selectWeb3Provider = useCallback(
+    (web3Provider: Web3Provider, providerName: string) => {
+      connectDispatch({
+        payload: {
+          type: ConnectActions.SET_PROVIDER,
+          provider: web3Provider,
+        },
+      });
+      connectDispatch({
+        payload: {
+          type: ConnectActions.SET_WALLET_PROVIDER_NAME,
+          walletProviderName: providerName as WalletProviderName,
+        },
+      });
+    },
+    [],
+  );
 
   const handleConnectViewUpdate = async (provider: Web3Provider) => {
     const isPassport = isPassportProvider(provider);
-    const chainId = await provider.provider.request!({ method: 'eth_chainId', params: [] });
+    const chainId = await provider.provider.request!({
+      method: 'eth_chainId',
+      params: [],
+    });
     // eslint-disable-next-line radix
     const parsedChainId = parseInt(chainId.toString());
-    if (parsedChainId !== targetChainId && !allowedChains?.includes(parsedChainId)) {
+    if (
+      parsedChainId !== targetChainId
+      && !allowedChains?.includes(parsedChainId)
+    ) {
       // TODO: What do we do with Passport here as it can't connect to L1
       if (isPassport) {
         viewDispatch({
@@ -125,50 +152,53 @@ export function WalletList(props: WalletListProps) {
     });
   };
 
-  const selectProviderDetail = useCallback(async (providerDetail: EIP6963ProviderDetail) => {
-    if (!checkout) return;
-
-    try {
-      const isMetaMask = providerDetail.info.rdns === WalletProviderRdns.METAMASK;
-      const web3Provider = new Web3Provider(providerDetail.provider as any);
+  const selectProviderDetail = useCallback(
+    async (providerDetail: EIP6963ProviderDetail) => {
+      if (!checkout) return;
 
       try {
-        // TODO: Find a nice way to detect if the wallet supports switching accounts via requestPermissions
-        const changeAccount = isMetaMask;
-        const connectResult = await checkout.connect({
-          provider: web3Provider,
-          requestWalletPermissions: changeAccount,
-        });
+        const isMetaMask = providerDetail.info.rdns === WalletProviderRdns.METAMASK;
+        const web3Provider = new Web3Provider(providerDetail.provider as any);
 
-        // Set up EIP-1193 provider event listeners for widget root instances
-        addProviderListenersForWidgetRoot(connectResult.provider);
-        await identifyUser(identify, connectResult.provider);
+        try {
+          // TODO: Find a nice way to detect if the wallet supports switching accounts via requestPermissions
+          const changeAccount = isMetaMask;
+          const connectResult = await checkout.connect({
+            provider: web3Provider,
+            requestWalletPermissions: changeAccount,
+          });
 
-        selectWeb3Provider(
-          web3Provider,
-          getProviderSlugFromRdns(providerDetail.info.rdns),
-        );
-        await handleConnectViewUpdate(web3Provider);
-      } catch (err: CheckoutErrorType | any) {
-        if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
-        // eslint-disable-next-line no-console
-          console.error('Connect rejected', err);
+          // Set up EIP-1193 provider event listeners for widget root instances
+          addProviderListenersForWidgetRoot(connectResult.provider);
+          await identifyUser(identify, connectResult.provider);
 
-          setShowChangedYourMindDrawer(true);
-        } else {
-          // eslint-disable-next-line no-console
-          console.error('Connect error', err);
+          selectWeb3Provider(
+            web3Provider,
+            getProviderSlugFromRdns(providerDetail.info.rdns),
+          );
+          await handleConnectViewUpdate(web3Provider);
+        } catch (err: CheckoutErrorType | any) {
+          if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
+            // eslint-disable-next-line no-console
+            console.error('Connect rejected', err);
 
-          setShowUnableToConnectDrawer(true);
+            setShowChangedYourMindDrawer(true);
+          } else {
+            // eslint-disable-next-line no-console
+            console.error('Connect error', err);
+
+            setShowUnableToConnectDrawer(true);
+          }
         }
-      }
-    } catch (err: any) {
-      // eslint-disable-next-line no-console
-      console.error('Connect unknown error', err);
+      } catch (err: any) {
+        // eslint-disable-next-line no-console
+        console.error('Connect unknown error', err);
 
-      setShowUnableToConnectDrawer(true);
-    }
-  }, [checkout]);
+        setShowUnableToConnectDrawer(true);
+      }
+    },
+    [checkout],
+  );
 
   const connectCallback = async (ethereumProvider) => {
     if (ethereumProvider.connected && ethereumProvider.session) {
@@ -228,6 +258,17 @@ export function WalletList(props: WalletListProps) {
 
   const handleWalletItemClick = useCallback(
     async (providerDetail: EIP6963ProviderDetail) => {
+      const isPassport = providerDetail.info.rdns === WalletProviderRdns.PASSPORT;
+      const hasSeenNonPassportWarning = localStorage.getItem(
+        'hasSeenNonPassportWarning',
+      );
+
+      if (!isPassport && !hasSeenNonPassportWarning) {
+        setChosenProviderDetail(providerDetail);
+        setShowNonPassportWarning(true);
+        return;
+      }
+
       setShowChangedYourMindDrawer(false);
       setShowUnableToConnectDrawer(false);
       setChosenProviderDetail(providerDetail);
@@ -265,13 +306,20 @@ export function WalletList(props: WalletListProps) {
   useEffect(() => {
     // Auto-trigger wallet connection via rdns
     if (targetWalletRdns && targetWalletRdns?.length > 0) {
-      if (targetWalletRdns === WalletProviderRdns.PASSPORT && passportProviderDetail) {
+      if (
+        targetWalletRdns === WalletProviderRdns.PASSPORT
+        && passportProviderDetail
+      ) {
         handleWalletItemClick(passportProviderDetail);
-      } else if (targetWalletRdns === WalletProviderRdns.WALLETCONNECT && walletConnectItemRef.current) {
+      } else if (
+        targetWalletRdns === WalletProviderRdns.WALLETCONNECT
+        && walletConnectItemRef.current
+      ) {
         (walletConnectItemRef.current as any).connect();
       } else {
-        const targetProviderDetail = filteredProviders
-          .find((providerDetail) => providerDetail.info.rdns === targetWalletRdns);
+        const targetProviderDetail = filteredProviders.find(
+          (providerDetail) => providerDetail.info.rdns === targetWalletRdns,
+        );
         if (targetProviderDetail) {
           handleWalletItemClick(targetProviderDetail);
         }
@@ -279,16 +327,20 @@ export function WalletList(props: WalletListProps) {
     }
   }, [filteredProviders, targetWalletRdns]);
 
+  const handleCtaButtonClick = async () => {
+    if (chosenProviderDetail) {
+      localStorage.setItem('hasSeenNonPassportWarning', 'true');
+      setShowNonPassportWarning(false);
+      await selectProviderDetail(chosenProviderDetail);
+    }
+  };
+
   return (
     <Box
       testId="wallet-list"
-      rc={(
-        <motion.div
-          variants={listVariants}
-          initial="hidden"
-          animate="show"
-        />
-      )}
+      rc={
+        <motion.div variants={listVariants} initial="hidden" animate="show" />
+      }
       sx={walletListStyle}
     >
       {passportProviderDetail && (
@@ -327,17 +379,27 @@ export function WalletList(props: WalletListProps) {
           key="browserwallet"
           style={{ width: '100%' }}
         >
-          <BrowserWalletItem onClick={onBrowserWalletsClick} providers={filteredProviders} />
+          <BrowserWalletItem
+            onClick={onBrowserWalletsClick}
+            providers={filteredProviders}
+          />
         </motion.div>
       )}
       {isWalletConnectEnabled && (
         <motion.div
           variants={listItemVariants}
-          custom={0 + (passportProviderDetail ? 1 : 0) + (filteredProviders.length > 0 ? 1 : 0)}
+          custom={
+            0
+            + (passportProviderDetail ? 1 : 0)
+            + (filteredProviders.length > 0 ? 1 : 0)
+          }
           key="walletconnect"
           style={{ width: '100%' }}
         >
-          <WalletConnectItem ref={walletConnectItemRef} onConnect={handleWalletConnectConnection} />
+          <WalletConnectItem
+            ref={walletConnectItemRef}
+            onConnect={handleWalletConnectConnection}
+          />
         </motion.div>
       )}
 
@@ -368,6 +430,12 @@ export function WalletList(props: WalletListProps) {
         checkout={checkout!}
         onCloseDrawer={() => setShowUnableToConnectDrawer(false)}
         onTryAgain={() => setShowUnableToConnectDrawer(false)}
+      />
+
+      <NonPassportWarningDrawer
+        visible={showNonPassportWarning}
+        onCloseDrawer={() => setShowNonPassportWarning(false)}
+        handleCtaButtonClick={handleCtaButtonClick}
       />
     </Box>
   );
