@@ -327,7 +327,7 @@ export function WalletList(props: WalletListProps) {
     }
   }, [filteredProviders, targetWalletRdns]);
 
-  const handleCtaButtonClick = async () => {
+  const handleNonPassportWarningDrawerButtonClick = async () => {
     if (chosenProviderDetail) {
       localStorage.setItem('hasSeenNonPassportWarning', 'true');
       setShowNonPassportWarning(false);
@@ -435,7 +435,7 @@ export function WalletList(props: WalletListProps) {
       <NonPassportWarningDrawer
         visible={showNonPassportWarning}
         onCloseDrawer={() => setShowNonPassportWarning(false)}
-        handleCtaButtonClick={handleCtaButtonClick}
+        handleCtaButtonClick={handleNonPassportWarningDrawerButtonClick}
       />
     </Box>
   );
