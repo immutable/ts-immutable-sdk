@@ -156,33 +156,31 @@ export async function validateBridgeReqArgs(
 }
 
 export function validateGetFee(req: BridgeFeeRequest, config: BridgeConfiguration) {
-  // TODO do these functions get tested?
-  if (
-    req.action === BridgeFeeActions.DEPOSIT
-    && !isValidDeposit(req.sourceChainId, req.destinationChainId, config.bridgeInstance)
-  ) {
-    throw new BridgeError(
-      `Deposit must be from the root chain (${config.bridgeInstance.rootChainID}) to the child chain (${config.bridgeInstance.childChainID})`,
-      BridgeErrorType.INVALID_SOURCE_OR_DESTINATION_CHAIN,
-    );
-  }
-
-  if (
-    req.action === BridgeFeeActions.WITHDRAW
-    && !isValidWithdraw(req.sourceChainId, req.destinationChainId, config.bridgeInstance)
-  ) {
-    throw new BridgeError(
-      `Withdraw must be from the child chain (${config.bridgeInstance.childChainID}) to the root chain (${config.bridgeInstance.rootChainID})`,
-      BridgeErrorType.INVALID_SOURCE_OR_DESTINATION_CHAIN,
-    );
-  }
-
-  // TODO doesn't it make sense that the source chain would be on the child chain?
   if (req.action === BridgeFeeActions.FINALISE_WITHDRAWAL
     && req.sourceChainId !== config.bridgeInstance.rootChainID) {
     throw new BridgeError(
       `Finalised withdrawals must be on the root chain (${config.bridgeInstance.rootChainID})`,
       BridgeErrorType.INVALID_SOURCE_CHAIN_ID,
+    );
+  }
+
+  if (!('destinationChainId' in req)) {
+    throw new BridgeError(
+      'DEPOSIT or WITHDRAW used without destinationChainId',
+      BridgeErrorType.INVALID_DESTINATION_CHAIN_ID,
+    );
+  }
+
+  const direction = {
+    sourceChainId: req.sourceChainId,
+    destinationChainId: req.destinationChainId,
+    action: req.action,
+  };
+
+  if (!isValidDeposit(direction, config.bridgeInstance) && !isValidWithdraw(direction, config.bridgeInstance)) {
+    throw new BridgeError(
+      'This request is neither a valid deposit nor a valid withdrawal',
+      BridgeErrorType.INVALID_SOURCE_OR_DESTINATION_CHAIN,
     );
   }
 }

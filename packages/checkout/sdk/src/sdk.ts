@@ -11,13 +11,17 @@ import * as provider from './provider';
 import * as wallet from './wallet';
 import * as network from './network';
 import * as transaction from './transaction';
+import { handleProviderError } from './transaction';
 import * as gasEstimatorService from './gasEstimate';
 import * as buy from './smartCheckout/buy';
 import * as cancel from './smartCheckout/cancel';
 import * as sell from './smartCheckout/sell';
 import * as smartCheckout from './smartCheckout';
 import {
+  AddNetworkParams,
   BuyParams,
+  BuyResult,
+  CancelResult,
   ChainId,
   CheckConnectionParams,
   CheckConnectionResult,
@@ -26,6 +30,11 @@ import {
   ConnectResult,
   CreateProviderParams,
   CreateProviderResult,
+  EIP6963ProviderDetail,
+  FiatRampParams,
+  GasEstimateBridgeToL2Result,
+  GasEstimateParams,
+  GasEstimateSwapResult,
   GetAllBalancesParams,
   GetAllBalancesResult,
   GetBalanceParams,
@@ -35,29 +44,21 @@ import {
   GetNetworkParams,
   GetTokenAllowListParams,
   GetTokenAllowListResult,
+  GetTokenInfoParams,
   GetWalletAllowListParams,
   GetWalletAllowListResult,
   NetworkInfo,
+  OnRampProviderFees,
+  SellResult,
   SendTransactionParams,
   SendTransactionResult,
+  SmartCheckoutParams,
+  SmartCheckoutResult,
   SwitchNetworkParams,
   SwitchNetworkResult,
-  ValidateProviderOptions,
-  GasEstimateParams,
-  GasEstimateSwapResult,
-  GasEstimateBridgeToL2Result,
-  SmartCheckoutParams,
   TokenFilterTypes,
-  OnRampProviderFees,
-  FiatRampParams,
-  SmartCheckoutResult,
-  CancelResult,
-  BuyResult,
-  SellResult,
   TokenInfo,
-  GetTokenInfoParams,
-  AddNetworkParams,
-  EIP6963ProviderDetail,
+  ValidateProviderOptions,
 } from './types';
 import { CheckoutConfiguration } from './config';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
@@ -479,6 +480,31 @@ export class Checkout {
       } as ValidateProviderOptions,
     );
     return await transaction.sendTransaction(web3Provider, params.transaction);
+  }
+
+  /**
+   * Wraps a Web3Provider call to validate the provider and handle errors.
+   * @param {Web3Provider} web3Provider - The provider to connect to the network.
+   * @param {(web3Provider: Web3Provider) => Promise<T>)} block - The block executing the provider call.
+   * @returns {Promise<T>} Returns the result of the provided block param.
+   */
+  public async providerCall<T>(
+    web3Provider: Web3Provider,
+    block: (web3Provider: Web3Provider) => Promise<T>,
+  ): Promise<T> {
+    const validatedProvider = await provider.validateProvider(
+      this.config,
+      web3Provider,
+      {
+        allowUnsupportedProvider: true,
+        allowMistmatchedChainId: true,
+      } as ValidateProviderOptions,
+    );
+    try {
+      return await block(validatedProvider);
+    } catch (err: any) {
+      throw handleProviderError(err);
+    }
   }
 
   /**

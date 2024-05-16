@@ -13,10 +13,12 @@ import {
 } from 'lib/validation';
 import {
   getAxelarEndpoint, getAxelarGateway, getChildAdaptor, getChildchain, getRootAdaptor, getTenderlyEndpoint,
-  isDeposit,
-  isWithdrawNotWrappedIMX,
+  isValidDeposit,
+  isValidWithdraw,
+  isWithdrawNativeIMX,
   isWithdrawWrappedIMX,
   isWrappedIMX,
+  shouldBeDepositOrFinaliseWithdraw,
 } from 'lib/utils';
 import { TenderlySimulation } from 'types/tenderly';
 import { calculateGasFee } from 'lib/gas';
@@ -68,6 +70,7 @@ import {
   BridgeBundledTxRequest,
   BridgeBundledTxResponse,
   DynamicGasEstimatesResponse,
+  BridgeDirection,
 } from './types';
 import {
   GMPStatus, GMPStatusResponse, GasPaidStatus,
@@ -160,11 +163,16 @@ export class TokenBridge {
     return res;
   }
 
-  private async getFeePrivate(req: BridgeFeeRequest): Promise<BridgeFeeResponse> {
-    validateGetFee(req, this.config);
+  private async getFinaliseWithdrawFee(): Promise<ethers.BigNumber> {
+    const feeData = await this.config.rootProvider.getFeeData();
+    const sourceChainFee = calculateGasFee(feeData, BridgeMethodsGasLimit.FINALISE_WITHDRAWAL);
+    return sourceChainFee;
+  }
 
+  private async getDepositOrWithdrawFee(req: BridgeFeeRequest):
+  Promise<{ sourceChainFee: ethers.BigNumber, approvalFee: ethers.BigNumber, bridgeFee: ethers.BigNumber }> {
     let feeData;
-    if (isDeposit(req.sourceChainId, this.config.bridgeInstance)) {
+    if (req.sourceChainId === this.config.bridgeInstance.rootChainID) {
       feeData = await this.config.rootProvider.getFeeData();
     } else {
       feeData = await this.config.childProvider.getFeeData();
@@ -173,40 +181,79 @@ export class TokenBridge {
     let sourceChainFee: ethers.BigNumber = ethers.BigNumber.from(0);
     let approvalFee: ethers.BigNumber = ethers.BigNumber.from(0);
     let bridgeFee: ethers.BigNumber = ethers.BigNumber.from(0);
-    const imtblFee: ethers.BigNumber = ethers.BigNumber.from(0);
+
+    let direction: BridgeDirection;
+    if (req.action === BridgeFeeActions.DEPOSIT) {
+      direction = {
+        sourceChainId: req.sourceChainId,
+        destinationChainId: req.destinationChainId,
+        action: BridgeFeeActions.DEPOSIT,
+      };
+    } else if (req.action === BridgeFeeActions.WITHDRAW) {
+      direction = {
+        sourceChainId: req.sourceChainId,
+        destinationChainId: req.destinationChainId,
+        action: BridgeFeeActions.WITHDRAW,
+      };
+    } else {
+      // Throws if you call this function when action is FINALISE_WITHDRAW
+      throw new BridgeError('Invalid action', BridgeErrorType.INTERNAL_ERROR);
+    }
+
+    if (
+      !(isValidDeposit(direction, this.config.bridgeInstance) || isValidWithdraw(direction, this.config.bridgeInstance))
+    ) {
+      throw new BridgeError('Invalid direction', BridgeErrorType.INTERNAL_ERROR);
+    }
 
     // Get approval fee
     if ('token' in req && req.token.toUpperCase() !== NATIVE) {
-      if (isDeposit(req.sourceChainId, this.config.bridgeInstance)) {
+      if (isValidDeposit(direction, this.config.bridgeInstance)) {
         approvalFee = calculateGasFee(feeData, BridgeMethodsGasLimit.APPROVE_TOKEN);
-      } else if (isWithdrawWrappedIMX(req.token, req.sourceChainId, this.config.bridgeInstance)) {
+      } else if (isWithdrawWrappedIMX(req.token, direction, this.config.bridgeInstance)) {
         // On child chain, only WIMX requires approval.
         approvalFee = calculateGasFee(feeData, BridgeMethodsGasLimit.APPROVE_TOKEN);
       }
     }
 
     // Get source fee & bridge fee
-    if (req.action === BridgeFeeActions.FINALISE_WITHDRAWAL) {
-      sourceChainFee = calculateGasFee(feeData, BridgeMethodsGasLimit.FINALISE_WITHDRAWAL);
+    let axelarGasLimit;
+    if (req.action === BridgeFeeActions.DEPOSIT) {
+      sourceChainFee = calculateGasFee(feeData, BridgeMethodsGasLimit.DEPOSIT_SOURCE);
+      axelarGasLimit = BridgeMethodsGasLimit.DEPOSIT_DESTINATION;
     } else {
-      let axelarGasLimit;
-      if (req.action === BridgeFeeActions.DEPOSIT) {
-        sourceChainFee = calculateGasFee(feeData, BridgeMethodsGasLimit.DEPOSIT_SOURCE);
-        axelarGasLimit = BridgeMethodsGasLimit.DEPOSIT_DESTINATION;
-      } else {
-        sourceChainFee = calculateGasFee(feeData, BridgeMethodsGasLimit.WITHDRAW_SOURCE);
-        axelarGasLimit = BridgeMethodsGasLimit.WITHDRAW_DESTINATION;
-      }
-      // Get bridge fee
-      bridgeFee = await this.getAxelarFee(
-        req.sourceChainId,
-        req.destinationChainId,
-        axelarGasLimit,
-        req.gasMultiplier,
-      );
+      sourceChainFee = calculateGasFee(feeData, BridgeMethodsGasLimit.WITHDRAW_SOURCE);
+      axelarGasLimit = BridgeMethodsGasLimit.WITHDRAW_DESTINATION;
+    }
+    // Get bridge fee
+    bridgeFee = await this.getAxelarFee(
+      req.sourceChainId,
+      req.destinationChainId,
+      axelarGasLimit,
+      req.gasMultiplier,
+    );
+    return { sourceChainFee, approvalFee, bridgeFee };
+  }
+
+  private async getFeePrivate(req: BridgeFeeRequest): Promise<BridgeFeeResponse> {
+    validateGetFee(req, this.config);
+
+    let sourceChainFee: ethers.BigNumber = ethers.BigNumber.from(0);
+    let approvalFee: ethers.BigNumber = ethers.BigNumber.from(0);
+    let bridgeFee: ethers.BigNumber = ethers.BigNumber.from(0);
+
+    if (req.action === BridgeFeeActions.FINALISE_WITHDRAWAL) {
+      sourceChainFee = await this.getFinaliseWithdrawFee();
+    } else {
+      const fees = await this.getDepositOrWithdrawFee(req);
+      sourceChainFee = fees.sourceChainFee;
+      approvalFee = fees.approvalFee;
+      bridgeFee = fees.bridgeFee;
     }
 
-    const totalFees: ethers.BigNumber = sourceChainFee.add(approvalFee).add(bridgeFee).add(imtblFee);
+    const totalFees: ethers.BigNumber = sourceChainFee.add(approvalFee).add(bridgeFee);
+
+    const imtblFee = ethers.BigNumber.from('0'); // This currently only exists for interface compatibility
 
     return {
       sourceChainGas: sourceChainFee,
@@ -284,9 +331,9 @@ export class TokenBridge {
   /**
    * Get the smart contract function names depending on whether the request is a deposit or withdrawal.
    */
-  private async getBridgeMethods(sourceChainId: string) {
+  private async getBridgeMethods(direction: BridgeDirection) {
     let contractMethods: Record<string, string>;
-    if (isDeposit(sourceChainId, this.config.bridgeInstance)) {
+    if (isValidDeposit(direction, this.config.bridgeInstance)) {
       contractMethods = bridgeMethods.deposit;
     } else {
       contractMethods = bridgeMethods.withdraw;
@@ -298,8 +345,8 @@ export class TokenBridge {
   /**
    * Get the bridge contract which will be interacted with. Root bridge if deposit, child bridge if withdrawal.
    */
-  private async getBridgeContract(sourceChainId: string) {
-    if (isDeposit(sourceChainId, this.config.bridgeInstance)) {
+  private async getBridgeContract(direction: BridgeDirection) {
+    if (isValidDeposit(direction, this.config.bridgeInstance)) {
       const rootBridgeAddress = this.config.bridgeContracts.rootERC20BridgeFlowRate;
       return await createContract(rootBridgeAddress, ROOT_ERC20_BRIDGE_FLOW_RATE, this.config.rootProvider);
     }
@@ -332,10 +379,10 @@ export class TokenBridge {
     recipient: string,
     amount: ethers.BigNumber,
     token: string,
-    sourceChainId: string,
+    direction: BridgeDirection,
   ) {
-    const currentBridgeMethods = await this.getBridgeMethods(sourceChainId);
-    const bridgeContract = await this.getBridgeContract(sourceChainId);
+    const currentBridgeMethods = await this.getBridgeMethods(direction);
+    const bridgeContract = await this.getBridgeContract(direction);
 
     let functionName: string;
     let parameters: any[];
@@ -545,8 +592,24 @@ export class TokenBridge {
   }
 
   private async getUnsignedBridgeBundledTxPrivate(req: BridgeBundledTxRequest): Promise<BridgeBundledTxResponse> {
-    if (isDeposit(req.sourceChainId, this.config.bridgeInstance)) {
+    let direction: BridgeDirection;
+    if (shouldBeDepositOrFinaliseWithdraw(req.sourceChainId, this.config.bridgeInstance)) {
+      direction = {
+        sourceChainId: req.sourceChainId,
+        destinationChainId: req.destinationChainId,
+        action: BridgeFeeActions.DEPOSIT,
+      };
+    } else {
+      direction = {
+        sourceChainId: req.sourceChainId,
+        destinationChainId: req.destinationChainId,
+        action: BridgeFeeActions.WITHDRAW,
+      };
+    }
+
+    if (isValidDeposit(direction, this.config.bridgeInstance)) {
       return this.getUnsignedBridgeDepositBundledTxPrivate(
+        direction,
         req.senderAddress,
         req.recipientAddress,
         req.token,
@@ -554,17 +617,23 @@ export class TokenBridge {
         req.gasMultiplier,
       );
     }
-    // Withdraw request
-    return this.getUnsignedBridgeWithdrawBundledTxPrivate(
-      req.senderAddress,
-      req.recipientAddress,
-      req.token,
-      req.amount,
-      req.gasMultiplier,
-    );
+    if (isValidWithdraw(direction, this.config.bridgeInstance)) {
+      // Withdraw request
+      return this.getUnsignedBridgeWithdrawBundledTxPrivate(
+        direction,
+        req.senderAddress,
+        req.recipientAddress,
+        req.token,
+        req.amount,
+        req.gasMultiplier,
+      );
+    }
+
+    throw new BridgeError('Invalid Bridge Bundled TX', BridgeErrorType.INVALID_TRANSACTION);
   }
 
   private async getUnsignedBridgeDepositBundledTxPrivate(
+    direction: BridgeDirection,
     sender: string,
     recipient: string,
     token: FungibleToken,
@@ -572,7 +641,7 @@ export class TokenBridge {
     gasMultiplier: number,
   ): Promise<BridgeBundledTxResponse> {
     const [allowance, feeData, rootGas, axelarFee] = await Promise.all([
-      this.getAllowance(this.config.bridgeInstance.rootChainID, token, sender),
+      this.getAllowance(direction, token, sender),
       this.config.rootProvider.getFeeData(),
       this.getDynamicDepositGas(this.config.bridgeInstance.rootChainID, sender, recipient, token, amount),
       this.getAxelarFee(
@@ -618,7 +687,7 @@ export class TokenBridge {
       recipient,
       amount,
       token,
-      this.config.bridgeInstance.rootChainID,
+      direction,
     );
     const txValue = (token.toUpperCase() === NATIVE)
       ? amount.add(bridgeFee).toString() : bridgeFee.toString();
@@ -648,6 +717,7 @@ export class TokenBridge {
   }
 
   private async getUnsignedBridgeWithdrawBundledTxPrivate(
+    direction: BridgeDirection,
     sender: string,
     recipient: string,
     token: FungibleToken,
@@ -655,10 +725,10 @@ export class TokenBridge {
     gasMultiplier: number,
   ): Promise<BridgeBundledTxResponse> {
     const [allowance, feeData, rootGas] = await Promise.all([
-      this.getAllowance(this.config.bridgeInstance.childChainID, token, sender),
+      this.getAllowance(direction, token, sender),
       this.config.childProvider.getFeeData(),
-      await this.getDynamicWithdrawGas(
-        this.config.bridgeInstance.rootChainID,
+      await this.getDynamicWithdrawGasRootChain(
+        direction.destinationChainId,
         sender,
         recipient,
         token,
@@ -708,7 +778,7 @@ export class TokenBridge {
       recipient,
       amount,
       token,
-      this.config.bridgeInstance.childChainID,
+      direction,
     );
     const txValue = (token.toUpperCase() === NATIVE)
       ? amount.add(bridgeFee).toString() : bridgeFee.toString();
@@ -768,13 +838,19 @@ export class TokenBridge {
       });
     }
 
+    const direction: BridgeDirection = {
+      action: BridgeFeeActions.DEPOSIT,
+      sourceChainId,
+      destinationChainId: this.config.bridgeInstance.childChainID,
+    };
+
     // Get tx data
     const txData = await this.getTxData(
       sender,
       recipient,
       amount,
       token,
-      sourceChainId,
+      direction,
     );
 
     // tx value for simulation mocked as amount + 1 wei for a native bridge and 1 wei for token bridges
@@ -801,7 +877,10 @@ export class TokenBridge {
     return tenderlyGasEstimatesRes;
   }
 
-  private async getDynamicWithdrawGas(
+  /**
+   * Use Tenderly simulations to estimate the gas cost of the destination (root) chain transaction of a withdraw
+   */
+  private async getDynamicWithdrawGasRootChain(
     destinationChainId: string,
     sender: string,
     recipient: string,
@@ -820,6 +899,7 @@ export class TokenBridge {
     const sourceAddress = ethers.utils.getAddress(getChildAdaptor(destinationChainId)).toString();
     const destinationAddress = getRootAdaptor(destinationChainId);
     const payloadHash = keccak256(payload);
+
     // Calculate slot key for given command ID.
     const command = defaultAbiCoder.encode(
       ['bytes32', 'bytes32', 'string', 'string', 'address', 'bytes32'],
@@ -923,19 +1003,19 @@ export class TokenBridge {
     return gas;
   }
 
-  private async getAllowance(sourceChainId:string, token: string, sender: string): Promise<ethers.BigNumber> {
+  private async getAllowance(direction: BridgeDirection, token: string, sender: string): Promise<ethers.BigNumber> {
     if (token.toUpperCase() === NATIVE) {
       // Return immediately for native token.
       return ethers.BigNumber.from(0);
     }
-    if (isWithdrawNotWrappedIMX(token, sourceChainId, this.config.bridgeInstance)) {
+    if (isWithdrawNativeIMX(token, direction, this.config.bridgeInstance)) {
       // Return immediately for non wrapped IMX on child chain.
       return ethers.BigNumber.from(0);
     }
 
     let provider: ethers.providers.Provider;
     let bridgeContract: string;
-    if (isDeposit(sourceChainId, this.config.bridgeInstance)) {
+    if (isValidDeposit(direction, this.config.bridgeInstance)) {
       provider = this.config.rootProvider;
       bridgeContract = this.config.bridgeContracts.rootERC20BridgeFlowRate;
     } else {

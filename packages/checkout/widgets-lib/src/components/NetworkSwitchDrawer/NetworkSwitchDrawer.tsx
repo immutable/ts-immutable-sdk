@@ -110,8 +110,14 @@ export function NetworkSwitchDrawer({
       >
         <AspectRatioImage
           aspectRatio="21:9"
-          responsiveSizes={[450, 512, 640, 720, 860, 1024, 1280, 1440]}
-          imageUrl={showEthImage ? ethImageUrl : zkevmImageUrl}
+          use={(
+            <img
+              src={showEthImage ? ethImageUrl : zkevmImageUrl}
+              alt={t('drawers.networkSwitch.heading', {
+                wallet: walletDisplayName,
+              })}
+            />
+          )}
         />
         <ButtCon
           icon="Close"
