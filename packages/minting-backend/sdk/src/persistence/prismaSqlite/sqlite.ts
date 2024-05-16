@@ -37,7 +37,7 @@ export const mintingPersistence: MintingPersistence = {
       take: limit
     });
 
-    const assetIds = assets.map((asset) => asset.id);
+    const assetIds = assets.map((asset: { id: string; }) => asset.id);
 
     await client.imAssets.updateMany({
       where: {
@@ -57,7 +57,7 @@ export const mintingPersistence: MintingPersistence = {
         }
       }
     });
-    return updatedAssets.map((asset) => ({
+    return updatedAssets.map((asset: any) => ({
       id: asset.id,
       contract_address: asset.contractAddress,
       wallet_address: asset.ownerAddress,
@@ -93,7 +93,7 @@ export const mintingPersistence: MintingPersistence = {
     // Check if the asset exists and the condition for updating is met
     if (existingAsset && (
       existingAsset.lastImtblZkevmMintRequestUpdatedId === null
-        || existingAsset.lastImtblZkevmMintRequestUpdatedId < submittedMintRequest.imtblZkevmMintRequestUpdatedId)
+      || existingAsset.lastImtblZkevmMintRequestUpdatedId < submittedMintRequest.imtblZkevmMintRequestUpdatedId)
     ) {
       // Perform update if the existing record's lastImtblZkevmMintRequestUpdatedId is less than the new one or is null
       await client.imAssets.update({
