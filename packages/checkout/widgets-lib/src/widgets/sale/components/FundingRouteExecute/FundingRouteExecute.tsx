@@ -119,7 +119,7 @@ export function FundingRouteExecute({
         view: {
           type: SaleWidgetViews.SALE_FAIL,
           data: {
-            errorType: SaleErrorTypes.SMART_CHECKOUT_EXECUTE_ERROR,
+            errorType: SaleErrorTypes.FUNDING_ROUTE_EXECUTE_ERROR,
             errorData,
           },
         },
@@ -312,7 +312,7 @@ export function FundingRouteExecute({
       {view === FundingRouteExecuteViews.LOADING && (
         <LoadingView
           loadingText={t(
-            'views.FUND_WITH_SMART_CHECKOUT.loading.checkingBalances',
+            'views.ORDER_SUMMARY.loading.balances',
           )}
         />
       )}

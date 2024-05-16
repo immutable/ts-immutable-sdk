@@ -129,7 +129,6 @@ export class Sale extends Base<WidgetType.SALE> {
                   collectionName={this.parameters.collectionName!}
                   excludePaymentTypes={this.parameters.excludePaymentTypes!}
                   language="en"
-                  multicurrency={!!this.properties?.config?.multicurrency}
                   waitFulfillmentSettlements={this.properties?.config?.waitFulfillmentSettlements ?? true}
                 />
               </Suspense>

@@ -293,25 +293,6 @@
         "balance": "잔액 {{amount}}"
       }
     },
-    "FUND_WITH_SMART_CHECKOUT": {
-      "loading": {
-        "checkingBalances": "숫자를 계산하는 중"
-      },
-      "currency": {
-        "usdEstimate": "≈ USD $",
-        "fees": "수수료"
-      },
-      "fundingRouteDrawer": {
-        "header": "사용 가능한 잔액"
-      },
-      "fundingRouteSelect": {
-        "heading": "Pay with your",
-        "noRoutesAvailable": "코인 잔액이 부족합니다. 대신 카드로 진행하세요.",
-        "continue": "계속",
-        "payWithCardInstead": "괜찮습니다, 카드로 결제할게요",
-        "payWithCard": "카드로 결제하기"
-      }
-    },
     "PAYMENT_METHODS": {
       "header": {
         "heading": "어떤 결제 방법을 원하시나요?"
@@ -412,12 +393,7 @@
           "primaryAction": "이 문제를 해결했습니다. 다시 시도하세요.",
           "secondaryAction": "취소"
         },
-        "SMART_CHECKOUT_ERROR": {
-          "description": "지갑 잔액을 확인할 수 없습니다. 다시 시도하세요.",
-          "primaryAction": "다시 시도",
-          "secondaryAction": "취소"
-        },
-        "SMART_CHECKOUT_EXECUTE_ERROR": {
+        "FUNDING_ROUTE_EXECUTE_ERROR": {
           "description": "죄송합니다, 자금 이동 중 문제가 발생했습니다. 다시 시도하세요.",
           "primaryAction": "다시 시도",
           "secondaryAction": "취소"

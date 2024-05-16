@@ -108,12 +108,7 @@ export function SaleErrorView({
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
     },
-    [SaleErrorTypes.SMART_CHECKOUT_ERROR]: {
-      onActionClick: goBackToPaymentMethods,
-      onSecondaryActionClick: closeWidget,
-      statusType: StatusType.INFORMATION,
-    },
-    [SaleErrorTypes.SMART_CHECKOUT_EXECUTE_ERROR]: {
+    [SaleErrorTypes.FUNDING_ROUTE_EXECUTE_ERROR]: {
       onActionClick: goBackToPaymentMethods,
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
