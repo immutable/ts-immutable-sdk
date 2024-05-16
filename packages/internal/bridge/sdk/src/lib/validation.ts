@@ -177,23 +177,9 @@ export function validateGetFee(req: BridgeFeeRequest, config: BridgeConfiguratio
     action: req.action,
   };
 
-  // TODO do these functions get tested?
-  if (
-    direction.action === BridgeFeeActions.DEPOSIT
-    && !isValidDeposit(direction, config.bridgeInstance)
-  ) {
+  if (!isValidDeposit(direction, config.bridgeInstance) && !isValidWithdraw(direction, config.bridgeInstance)) {
     throw new BridgeError(
-      `Deposit must be from the root chain (${config.bridgeInstance.rootChainID}) to the child chain (${config.bridgeInstance.childChainID})`,
-      BridgeErrorType.INVALID_SOURCE_OR_DESTINATION_CHAIN,
-    );
-  }
-
-  if (
-    direction.action === BridgeFeeActions.WITHDRAW
-    && !isValidWithdraw(direction, config.bridgeInstance)
-  ) {
-    throw new BridgeError(
-      `Withdraw must be from the child chain (${config.bridgeInstance.childChainID}) to the root chain (${config.bridgeInstance.rootChainID})`,
+      'This request is neither a valid deposit nor a valid withdrawal',
       BridgeErrorType.INVALID_SOURCE_OR_DESTINATION_CHAIN,
     );
   }

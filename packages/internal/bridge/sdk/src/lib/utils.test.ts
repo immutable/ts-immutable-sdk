@@ -35,7 +35,7 @@ describe('utils', () => {
   });
 
   describe('isWithdrawNativeIMX', () => {
-    it('should return false for non-wrapped IMX but not withdraw', () => {
+    it('should return false for native IMX but not withdraw', () => {
       const token: FungibleToken = rootIMXs.mainnet;
       const bridgeInstance: BridgeInstance = {
         rootChainID: '123',
@@ -118,7 +118,7 @@ describe('utils', () => {
       const request: WithdrawERC20FeeRequest = {
         action: BridgeFeeActions.WITHDRAW,
         sourceChainId: bridgeInstance.childChainID,
-        destinationChainId: bridgeInstance.childChainID,
+        destinationChainId: bridgeInstance.rootChainID,
         gasMultiplier: 1,
         amount: BigNumber.from('10000'),
         token,

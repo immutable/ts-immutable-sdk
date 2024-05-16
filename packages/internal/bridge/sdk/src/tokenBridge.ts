@@ -616,15 +616,19 @@ export class TokenBridge {
         req.gasMultiplier,
       );
     }
-    // Withdraw request
-    return this.getUnsignedBridgeWithdrawBundledTxPrivate(
-      direction,
-      req.senderAddress,
-      req.recipientAddress,
-      req.token,
-      req.amount,
-      req.gasMultiplier,
-    );
+    if (isValidWithdraw(direction, this.config.bridgeInstance)) {
+      // Withdraw request
+      return this.getUnsignedBridgeWithdrawBundledTxPrivate(
+        direction,
+        req.senderAddress,
+        req.recipientAddress,
+        req.token,
+        req.amount,
+        req.gasMultiplier,
+      );
+    }
+
+    throw new BridgeError('Invalid Bridge Bundled TX', BridgeErrorType.INVALID_TRANSACTION);
   }
 
   private async getUnsignedBridgeDepositBundledTxPrivate(
