@@ -105,7 +105,7 @@ export function isValidWithdraw(direction: BridgeDirection, bridgeInstance: Brid
     && direction.action === BridgeFeeActions.WITHDRAW;
 }
 
-export function isWithdrawNotWrappedIMX(
+export function isWithdrawNativeIMX(
   token: FungibleToken,
   direction: BridgeDirection,
   bridgeInstance: BridgeInstance,

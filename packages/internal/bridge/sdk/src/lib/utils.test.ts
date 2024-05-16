@@ -7,7 +7,7 @@ import {
 } from 'types';
 import { BigNumber } from 'ethers';
 import {
-  exportedForTesting, isValidDeposit, isValidWithdraw, isWithdrawNotWrappedIMX, isWithdrawWrappedIMX,
+  exportedForTesting, isValidDeposit, isValidWithdraw, isWithdrawNativeIMX, isWithdrawWrappedIMX,
 } from './utils';
 
 describe('utils', () => {
@@ -34,7 +34,7 @@ describe('utils', () => {
     });
   });
 
-  describe('isWithdrawNotWrappedIMX', () => {
+  describe('isWithdrawNativeIMX', () => {
     it('should return false for non-wrapped IMX but not withdraw', () => {
       const token: FungibleToken = rootIMXs.mainnet;
       const bridgeInstance: BridgeInstance = {
@@ -48,7 +48,7 @@ describe('utils', () => {
         action: BridgeFeeActions.DEPOSIT,
       };
 
-      const result = isWithdrawNotWrappedIMX(token, direction, bridgeInstance);
+      const result = isWithdrawNativeIMX(token, direction, bridgeInstance);
       expect(result).toEqual(false);
     });
 
@@ -65,7 +65,7 @@ describe('utils', () => {
         action: BridgeFeeActions.WITHDRAW,
       };
 
-      const result = isWithdrawNotWrappedIMX(token, direction, bridgeInstance);
+      const result = isWithdrawNativeIMX(token, direction, bridgeInstance);
       expect(result).toEqual(false);
     });
 
@@ -82,7 +82,7 @@ describe('utils', () => {
         action: BridgeFeeActions.WITHDRAW,
       };
 
-      const result = isWithdrawNotWrappedIMX(token, direction, bridgeInstance);
+      const result = isWithdrawNativeIMX(token, direction, bridgeInstance);
       expect(result).toEqual(true);
     });
   });

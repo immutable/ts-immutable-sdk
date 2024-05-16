@@ -15,7 +15,7 @@ import {
   getAxelarEndpoint, getAxelarGateway, getChildAdaptor, getChildchain, getRootAdaptor, getTenderlyEndpoint,
   isValidDeposit,
   isValidWithdraw,
-  isWithdrawNotWrappedIMX,
+  isWithdrawNativeIMX,
   isWithdrawWrappedIMX,
   isWrappedIMX,
   shouldBeDepositOrFinaliseWithdraw,
@@ -999,7 +999,7 @@ export class TokenBridge {
       // Return immediately for native token.
       return ethers.BigNumber.from(0);
     }
-    if (isWithdrawNotWrappedIMX(token, direction, this.config.bridgeInstance)) {
+    if (isWithdrawNativeIMX(token, direction, this.config.bridgeInstance)) {
       // Return immediately for non wrapped IMX on child chain.
       return ethers.BigNumber.from(0);
     }
