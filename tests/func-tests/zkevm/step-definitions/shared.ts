@@ -194,6 +194,6 @@ export const andTradeShouldBeAvailable = (
       attempt++;
     }
 
-    expect(targetTrades).toBeDefined();
+    expect(targetTrades?.length === count);
   });
 };
