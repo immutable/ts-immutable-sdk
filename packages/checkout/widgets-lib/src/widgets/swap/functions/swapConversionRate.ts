@@ -54,6 +54,6 @@ export const formatQuoteConversionRate = (
     fromSymbol: fromToken.symbol,
     toSymbol: toToken.symbol,
     rate: formattedConversion,
-    fee: secondaryFee.basisPoints / 100,
+    fee: (secondaryFee?.basisPoints ?? 0) / 100,
   });
 };
