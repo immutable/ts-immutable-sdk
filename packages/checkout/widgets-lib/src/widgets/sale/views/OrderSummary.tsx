@@ -112,7 +112,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
     queryFundingBalances();
   }, [subView, fromTokenAddress]);
 
-  // If one ore more balances found, go to Order Review
+  // If one or more balances found, go to Order Review
   useEffect(() => {
     if (fundingBalances.length === 0) return;
 

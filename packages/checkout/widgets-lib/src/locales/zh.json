@@ -286,7 +286,10 @@
       "orderReview": {
         "heading": "付款摘要",
         "continue": "继续",
-        "payWith": "使用{{symbol}}支付",
+        "payWith": {
+          "SWAP": "使用{{symbol}}进行交换和支付",
+          "SUFFICIENT": "使用{{symbol}}支付"
+        },
         "balance": "余额{{amount}}"
       }
     },

@@ -293,7 +293,10 @@
       "orderReview": {
         "heading": "支払いの概要",
         "continue": "続行",
-        "payWith": "{{symbol}}で支払う",
+        "payWith": {
+          "SWAP": "{{symbol}}でスワップ＆支払い",
+          "SUFFICIENT": "{{symbol}}で支払う"
+        },
         "balance": "残高{{amount}}"
       }
     },

@@ -286,7 +286,10 @@
       "orderReview": {
         "heading": "결제 요약",
         "continue": "계속",
-        "payWith": "{{symbol}}로 결제",
+        "payWith": {
+          "SWAP": "{{symbol}}로 스왑 및 결제하기",
+          "SUFFICIENT": "{{symbol}}로 결제"
+        },
         "balance": "잔액 {{amount}}"
       }
     },
