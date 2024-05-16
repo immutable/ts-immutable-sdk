@@ -1,6 +1,8 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { utils } from 'ethers';
 import {
+  ERC1155Item,
+  ERC1155ItemRequirement,
   ERC20Item,
   ERC20ItemRequirement,
   ERC721Item,
@@ -15,7 +17,7 @@ import { ERC20ABI } from '../../env';
 
 export async function getItemRequirementsFromRequirements(
   provider: Web3Provider,
-  requirements: (NativeItemRequirement | ERC20ItemRequirement | ERC721ItemRequirement)[],
+  requirements: (NativeItemRequirement | ERC20ItemRequirement | ERC721ItemRequirement | ERC1155ItemRequirement)[],
 ): Promise<ItemRequirement[]> {
   // Get all decimal values by calling contracts for each ERC20
   const decimalPromises:any = [];
@@ -35,13 +37,18 @@ export async function getItemRequirementsFromRequirements(
         ...itemRequirementParam,
         amount: utils.parseUnits(itemRequirementParam.amount, 18),
       } as NativeItem;
-    } if (itemRequirementParam.type === ItemType.ERC20) {
+    }
+
+    if (itemRequirementParam.type === ItemType.ERC20) {
       return {
         ...itemRequirementParam,
         amount: utils.parseUnits(itemRequirementParam.amount, decimals[index]),
       } as ERC20Item;
     }
-    return itemRequirementParam as ERC721Item;
+
+    // Amount for ERC1155s does not need unit parsing. Although 1155s can have amounts > 1,
+    // there is no concept of decimals for ERC1155s
+    return itemRequirementParam as ERC721Item | ERC1155Item;
   });
 
   return itemRequirements;
