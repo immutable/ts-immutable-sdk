@@ -10,6 +10,10 @@ import {
   NATIVE,
 } from './constants';
 
+export const tokenSymbolNameOverrides = {
+  timx: 'imx',
+};
+
 export const sortTokensByAmount = (
   config: CheckoutConfiguration,
   tokens: GetBalanceResult[],
@@ -71,7 +75,8 @@ export const calculateCryptoToFiat = (
 ): string => {
   if (!amount) return zeroString;
 
-  const conversion = conversions.get(symbol.toLowerCase());
+  const name = tokenSymbolNameOverrides[symbol.toLowerCase()] || symbol.toLowerCase();
+  const conversion = conversions.get(name);
   if (!conversion) return zeroString;
 
   const parsedAmount = parseFloat(amount);
@@ -167,4 +172,12 @@ export function getDefaultTokenImage(
   return theme === WidgetTheme.LIGHT
     ? getRemoteImage(environment, '/tokens/defaultonlight.svg')
     : getRemoteImage(environment, '/tokens/defaultondark.svg');
+}
+
+export function abbreviateWalletAddress(address: string): string {
+  // first 5 characters, ellipses, and the last 4 characters
+  // e.g. 0x1234567890abcdef => 0x123.....cdef
+  const firstPart = address.slice(0, 5);
+  const lastPart = address.slice(-4);
+  return `${firstPart}.....${lastPart}`;
 }

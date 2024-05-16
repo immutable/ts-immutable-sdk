@@ -105,10 +105,7 @@ export function SelectCoinDropdown({
                 ? t('views.ORDER_SUMMARY.currency.fiat', { amount: fiatAmount })
                 : undefined
             }
-            price={t('views.ORDER_SUMMARY.currency.price', {
-              symbol: token.symbol,
-              amount: tokenValueFormat(fundsRequired.formattedAmount),
-            })}
+            price={tokenValueFormat(fundsRequired.formattedAmount)}
           />
         )}
         {canOpen && (

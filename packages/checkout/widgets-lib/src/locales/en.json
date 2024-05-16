@@ -95,6 +95,13 @@
       },
       "disconnectButton": {
         "label": "Disconnect Wallet"
+      },
+      "walletAddress": {
+        "label": "Wallet Address"
+      },
+      "transferAssetsL1Warning": {
+        "heading": "Do not send assets to Passport on Ethereum",
+        "body": "Passport does not yet exist on Ethereum, so your funds will get lost there. Only transfer on Immutable zkEVM or Immutable X. "
       }
     },
     "COIN_INFO": {
@@ -406,12 +413,7 @@
           "primaryAction": "I've fixed this, Try again",
           "secondaryAction": "Cancel"
         },
-        "SMART_CHECKOUT_ERROR": {
-          "description": "Unable to check your wallets balance. Please try again.",
-          "primaryAction": "Try again",
-          "secondaryAction": "Cancel"
-        },
-        "SMART_CHECKOUT_EXECUTE_ERROR": {
+        "FUNDING_ROUTE_EXECUTE_ERROR": {
           "description": "Sorry, something went wrong while moving funds. Please try again.",
           "primaryAction": "Try again",
           "secondaryAction": "Cancel"
@@ -443,7 +445,8 @@
       "toFormInput": {
         "heading": "To",
         "selectDefaultText": "Select wallet and network",
-        "walletSelectorHeading": "To wallet"
+        "walletSelectorHeading": "To wallet",
+        "networkSelectorHeading": "To network"
       },
       "submitButton": {
         "text": "Next"
@@ -515,7 +518,8 @@
     "IN_PROGRESS": {
       "heading": "Move in progress",
       "body1": "Your funds have been sent, with less than 20 mins remaining until they're received. You can return and view progress by clicking on the rocket icon.",
-      "body2": "You can close this window."
+      "body2": "You can close this window.",
+      "transferHeading": "Funds transferred"
     },
     "TRANSACTIONS": {
       "layoutHeading": "In progress",

@@ -209,12 +209,15 @@ export class Orderbook {
    * @param {string} listingId - The listingId to fulfil.
    * @param {string} takerAddress - The address of the account fulfilling the order.
    * @param {FeeValue[]} takerFees - Taker ecosystem fees to be paid.
+   * @param {string} amountToFill - Amount of the order to fill, defaults to sell item amount.
+   *                                Only applies to ERC1155 orders
    * @return {FulfillOrderResponse} Approval and fulfilment transactions.
    */
   async fulfillOrder(
     listingId: string,
     takerAddress: string,
     takerFees: FeeValue[],
+    amountToFill?: string,
   ): Promise<FulfillOrderResponse> {
     const fulfillmentDataRes = await this.apiClient.fulfillmentData([
       {
@@ -246,7 +249,7 @@ export class Orderbook {
       );
     }
 
-    return this.seaport.fulfillOrder(orderResult, takerAddress, extraData);
+    return this.seaport.fulfillOrder(orderResult, takerAddress, extraData, amountToFill);
   }
 
   async fulfillBulkOrders(

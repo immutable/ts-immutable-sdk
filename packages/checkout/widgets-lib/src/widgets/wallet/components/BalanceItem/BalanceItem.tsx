@@ -5,7 +5,6 @@ import {
 import {
   IMTBLWidgetEvents, TokenFilterTypes, TokenInfo, WidgetTheme,
 } from '@imtbl/checkout-sdk';
-import { IMAGE_RESIZER_URL } from 'lib';
 import { Environment } from '@imtbl/config';
 import { ShowMenuItem } from './BalanceItemStyles';
 import { BalanceInfo } from '../../functions/tokenBalances';
@@ -44,9 +43,15 @@ export function BalanceItem({
   const [onRampAllowedTokens, setOnRampAllowedTokens] = useState<TokenInfo[]>(
     [],
   );
+  const [iconError, setIconError] = useState<boolean>(false);
 
   const isPassport = isPassportProvider(provider);
-  const environment = checkout?.config.environment ?? Environment.PRODUCTION;
+
+  const tokenUrl = useMemo(() => {
+    if (!checkout) return '';
+    const environment = checkout?.config.environment ?? Environment.PRODUCTION;
+    return iconError ? getDefaultTokenImage(environment, theme) : balanceInfo.icon;
+  }, [balanceInfo.icon, checkout, theme, iconError]);
 
   useEffect(() => {
     const getOnRampAllowedTokens = async () => {
@@ -92,9 +97,13 @@ export function BalanceItem({
   return (
     <MenuItem testId={`balance-item-${balanceInfo.symbol}`} emphasized>
       <MenuItem.FramedImage
-        imageResizeServiceUrl={IMAGE_RESIZER_URL[environment]}
-        imageUrl={balanceInfo.icon}
-        defaultImageUrl={getDefaultTokenImage(environment, theme)}
+        use={(
+          <img
+            src={tokenUrl}
+            alt={balanceInfo.symbol}
+            onError={() => setIconError(true)}
+          />
+        )}
         circularFrame
       />
       <MenuItem.Label>{balanceInfo.symbol}</MenuItem.Label>

@@ -28,24 +28,32 @@ const META_TRANSACTIONS_TYPE = `tuple(
   bytes data
 )[]`;
 
-export function getNormalisedTransactions(txs: MetaTransaction[]): MetaTransactionNormalised[] {
-  return txs.map((t) => ({
-    delegateCall: t.delegateCall === true,
-    revertOnError: t.revertOnError === true,
-    gasLimit: t.gasLimit ?? constants.Zero,
-    target: t.to ?? constants.AddressZero,
-    value: t.value ?? constants.Zero,
-    data: t.data ?? [],
-  }));
-}
+export const getNormalisedTransactions = (txs: MetaTransaction[]): MetaTransactionNormalised[] => txs.map((t) => ({
+  delegateCall: t.delegateCall === true,
+  revertOnError: t.revertOnError === true,
+  gasLimit: t.gasLimit ?? constants.Zero,
+  target: t.to ?? constants.AddressZero,
+  value: t.value ?? constants.Zero,
+  data: t.data ?? [],
+}));
 
-export function digestOfTransactionsAndNonce(nonce: BigNumberish, normalisedTransactions: MetaTransactionNormalised[]) {
+export const digestOfTransactionsAndNonce = (
+  nonce: BigNumberish,
+  normalisedTransactions: MetaTransactionNormalised[],
+): string => {
   const packMetaTransactionsNonceData = utils.defaultAbiCoder.encode(
     ['uint256', META_TRANSACTIONS_TYPE],
     [nonce, normalisedTransactions],
   );
   return utils.keccak256(packMetaTransactionsNonceData);
-}
+};
+
+export const encodedTransactions = (
+  normalisedTransactions: MetaTransactionNormalised[],
+): string => utils.defaultAbiCoder.encode(
+  [META_TRANSACTIONS_TYPE],
+  [normalisedTransactions],
+);
 
 export const getNonce = async (
   rpcProvider: StaticJsonRpcProvider,
@@ -76,7 +84,7 @@ export const getNonce = async (
   throw new Error('Unexpected result from contract.nonce() call.');
 };
 
-const encodeMessageSubDigest = (chainId: BigNumber, walletAddress: string, digest: string): string => (
+export const encodeMessageSubDigest = (chainId: BigNumber, walletAddress: string, digest: string): string => (
   utils.solidityPack(
     ['string', 'uint256', 'address', 'bytes32'],
     [ETH_SIGN_PREFIX, chainId, walletAddress, digest],
