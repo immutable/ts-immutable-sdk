@@ -12,6 +12,7 @@ import { recoverMessageAddress, verifyMessage, isAddress } from "viem";
 import { v4 as uuidv4 } from "uuid";
 import { blockchainData, mintingBackend, webhook, config as sdkConfig } from '@imtbl/sdk';
 import { client } from './dbClient';
+import { blockchainDataClient } from "./blockchainDataClient";
 
 let allowlists: string[][] = [];
 let jwk: string;
@@ -311,14 +312,13 @@ fastify.get("/get-mint-request/:referenceId", async (request: FastifyRequest<{ P
   const { referenceId } = request.params;
 
   try {
-    const response = await axios.get(`${serverConfig[environment].API_URL}/v1/chains/${serverConfig[environment].chainName}/collections/${serverConfig[environment].collectionAddress}/nfts/mint-requests/${referenceId}`, {
-      headers: {
-        "x-immutable-api-key": serverConfig[environment].HUB_API_KEY,
-        "x-api-key": serverConfig[environment].RPS_API_KEY,
-      },
+    const response = await blockchainDataClient.getMintRequest({
+      chainName: serverConfig[environment].chainName,
+      contractAddress: serverConfig[environment].collectionAddress,
+      referenceId,
     });
 
-    reply.send(response.data);
+    reply.send(response);
   } catch (error) {
     if (axios.isAxiosError(error)) {
       logger.error("Error querying mint request:", error.message);
@@ -380,26 +380,11 @@ const start = async () => {
       logger.info(`Active phase: ${returnActivePhase()}`);
     }
 
-    const config: blockchainData.BlockchainDataModuleConfiguration = {
-      baseConfig: new sdkConfig.ImmutableConfiguration({
-        environment: environment,
-      }),
-      overrides: {
-        basePath: serverConfig[environment].API_URL,
-        headers: {
-          "x-immutable-api-key": serverConfig[environment].HUB_API_KEY!,
-          "x-api-key": serverConfig[environment].RPS_API_KEY!,
-        },
-      },
-    };
-
-    const blockchainDataClient = new blockchainData.BlockchainData(config);
-
     mintingBackend.submitMintingRequests(
       mintingBackend.mintingPersistencePrismaSqlite,
       blockchainDataClient,
       {},
-      console
+      logger
     )
   } catch (err) {
     logger.error(`Error starting server: ${err}`);
