@@ -11,7 +11,8 @@
       "nonPassportDrawer": {
         "heading": "パスポート未使用者はガス代としてIMXが必要です。",
         "body1": "資金をImmutable zkEVMにブリッジするには、<layerswapLink>Layerswap</layerswapLink>の使用をお勧めします。リファエルをオンにしてIMXを受け取ります。",
-        "body2": "または、ガス無料のImmutable Passportで簡単に支払いとプレイができます。"
+        "body2": "または、ガス無料のImmutable Passportで簡単に支払いとプレイができます。",
+        "buttonText": "それでも進む"
       }    
     },
     "CONNECT_SUCCESS": {
