@@ -14,5 +14,6 @@ jest.*.js
 # sample apps
 **sample-app**/
 **playground**/
+samples/apps/passport/
 
 # put module specific ignore paths here

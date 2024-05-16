@@ -1,0 +1,30 @@
+{
+  "name": "passport-poc",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.36.0",
+    "buffer": "^6.0.3",
+    "connectkit": "^1.7.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.23.0",
+    "viem": "2.x",
+    "wagmi": "^2.8.7"
+  },
+  "devDependencies": {
+    "@imtbl/sdk": "^1.30.0",
+    "@types/react": "^18.2.18",
+    "@types/react-dom": "^18.2.7",
+    "@vitejs/plugin-react": "^4.0.4",
+    "typescript": "^5.0.2",
+    "vite": "^4.5.3",
+    "vite-plugin-node-polyfills": "^0.21.0"
+  }
+}
