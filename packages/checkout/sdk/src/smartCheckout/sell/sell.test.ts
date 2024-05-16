@@ -242,7 +242,7 @@ describe('sell', () => {
         id,
         contractAddress,
         spenderAddress: seaportContractAddress,
-        amount,
+        amount: BigNumber.from(amount),
       };
 
       const erc1155TransactionRequirement = {
@@ -1376,7 +1376,7 @@ describe('sell', () => {
         id,
         contractAddress,
         spenderAddress,
-        amount,
+        amount: BigNumber.from(55),
       });
     });
   });
