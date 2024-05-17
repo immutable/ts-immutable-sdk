@@ -62,9 +62,9 @@ export const sortNetworksCompareFn = (
   return 1;
 };
 
-export const formatFiatString = (amount: number) => {
-  const factor = 10 ** 2;
-  return (Math.round(amount * factor) / factor).toFixed(2);
+export const formatFiatString = (amount: number, decimals: number = 2): string => {
+  const factor = 10 ** decimals;
+  return (Math.round(amount * factor) / factor).toFixed(decimals);
 };
 
 export const calculateCryptoToFiat = (
@@ -72,6 +72,7 @@ export const calculateCryptoToFiat = (
   symbol: string,
   conversions: Map<string, number>,
   zeroString: string = '0.00',
+  maxDecimals: number = 2,
 ): string => {
   if (!amount) return zeroString;
 
@@ -81,7 +82,7 @@ export const calculateCryptoToFiat = (
 
   const parsedAmount = parseFloat(amount);
   if (parseFloat(amount) === 0 || Number.isNaN(parsedAmount)) return zeroString;
-  return formatFiatString(parsedAmount * conversion);
+  return formatFiatString(parsedAmount * conversion, maxDecimals);
 };
 
 export const formatZeroAmount = (
@@ -174,10 +175,10 @@ export function getDefaultTokenImage(
     : getRemoteImage(environment, '/tokens/defaultondark.svg');
 }
 
-export function abbreviateWalletAddress(address: string): string {
+export function abbreviateWalletAddress(address: string, separator = '.....', firstChars = 5, lastChars = 4): string {
   // first 5 characters, ellipses, and the last 4 characters
   // e.g. 0x1234567890abcdef => 0x123.....cdef
-  const firstPart = address.slice(0, 5);
-  const lastPart = address.slice(-4);
-  return `${firstPart}.....${lastPart}`;
+  const firstPart = address.slice(0, firstChars);
+  const lastPart = address.slice(-lastChars);
+  return `${firstPart}${separator}${lastPart}`;
 }
