@@ -1,7 +1,7 @@
-import { client } from '../../dbClient/postgres';
+import type { Pool } from 'pg';
 import { CreateMintRequest, MintingPersistence, SubmittedMintRequest } from '../type';
 
-export const mintingPersistence: MintingPersistence = {
+export const mintingPersistence = (client: Pool): MintingPersistence => ({
   recordMint: async (request: CreateMintRequest) => {
     const r = await client.query(
       `
@@ -91,4 +91,4 @@ export const mintingPersistence: MintingPersistence = {
     `, [contractAddress, referenceId]);
     return res.rows[0] || null;
   }
-};
+});

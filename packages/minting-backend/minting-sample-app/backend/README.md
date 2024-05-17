@@ -43,14 +43,17 @@ The sample code provided is for reference purposes only. It has undergone best e
        maxPerWallet: 2,
      }],
    ```
-Keep in mind that you can configure a single phase if you're not planning a phased approach but just a start/end time.
-   
+   Keep in mind that you can configure a single phase if you're not planning a phased approach but just a start/end time.
+
 This sample app only support the same metadata for all the mints. it is defined in the `metadata` field in the same `src/config.ts` file. Please make amend logic inside `server.ts` for calls to `mintingBackend.recordMint` to give metadata per token.
 
 4. Run the DB migrations:
+
    ```
    npx prisma migrate dev
    ```
+
+Every time you change primsa schema you need to run the above.
 
 5. Load your database, https://sqlitebrowser.org/ is great for this. You can also write a script that uses the Prisma client to load the database. Make sure you have your address allowlisted, and quantity is 1, isLocked is 0, hasMinted is 0.
 
@@ -69,24 +72,27 @@ This sample app only support the same metadata for all the mints. it is defined 
    Use the above URL for the webhook endpoint with the path `/webhook`. For example: `https://ten-rooms-vanish.loca.lt/webhook`.
 
 8. Use Postgresql instead of SQLite
-This example uses SQLite as database for its portability and self-contain-ness.
-However, ** please do not use SQLite in production ** for its weak support of concurrency.
+   This example uses SQLite as database for its portability and self-contain-ness.
+   However, ** please do not use SQLite in production ** for its weak support of concurrency.
 
 We recommend using postgres for the persistance. Immutable's sdk provides a postgres persistence for this purpose. You can replace `mintingBackend.mintingPersistencePrismaSqlite` with `mintingBackend.mintingPersistencePg` in the `server.ts` and change prisma schema according to the one provided by our sdk: [Postgres seed.sql](https://github.com/immutable/ts-immutable-sdk/blob/main/packages/minting-backend/sdk/src/minting/persistence/pg/seed.sql).
 
 ## Utility
 
 Retry failed mints or mints recorded but does not exist in Immutable Minting API.
+
 ```
 npm run retrymints
 ```
 
 update minting status according to status from Immutable Minting API.
+
 ```
 npm run updatemints
 ```
 
 ## To-Do List
+
 - [ ] Add ERC1155 support once the minting API is ready
 - [ ] Add the ability to choose whether you want mintByQuantity or mintByID
 - [ ] this sample app will be ported over to use postgres in the future.

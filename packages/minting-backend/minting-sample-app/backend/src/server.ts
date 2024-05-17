@@ -10,13 +10,15 @@ import logger from "./logger";
 import { ExtendedMintPhase, eoaMintRequest } from "./types";
 import { recoverMessageAddress, verifyMessage, isAddress } from "viem";
 import { v4 as uuidv4 } from "uuid";
-import { blockchainData, mintingBackend, webhook, config as sdkConfig } from '@imtbl/sdk';
+import { mintingBackend, webhook } from '@imtbl/sdk';
 import { client } from './dbClient';
 import { blockchainDataClient } from "./blockchainDataClient";
 
 let allowlists: string[][] = [];
 let jwk: string;
 let totalMintCount: number;
+
+const mintingPersistence = mintingBackend.mintingPersistencePrismaSqlite(client);
 
 // Enable CORS with specified options for API security and flexibility
 fastify.register(cors, {
@@ -168,7 +170,7 @@ fastify.post("/mint/passport", async (request: FastifyRequest, reply: FastifyRep
   logger.info(`Attempting to mint NFT wallet address ${walletAddress} with UUID ${assetId}`);
   try {
     // Record the minting operation in the database
-    await mintingBackend.recordMint(mintingBackend.mintingPersistencePrismaSqlite, {
+    await mintingBackend.recordMint(mintingPersistence, {
       asset_id: assetId,
       contract_address: serverConfig[environment].collectionAddress,
       owner_address: walletAddress,
@@ -275,7 +277,7 @@ fastify.post("/mint/eoa", async (request: eoaMintRequest, reply: FastifyReply) =
   try {
     // Record the minting operation in the database
     await mintingBackend.recordMint(
-      mintingBackend.mintingPersistencePrismaSqlite,
+      mintingPersistence,
       {
         asset_id: assetId,
         contract_address: serverConfig[environment].collectionAddress,
@@ -335,7 +337,7 @@ fastify.post("/api/process_webhook_event", async (request: FastifyRequest<any>, 
   console.log(request);
   await webhook.init(request.body as any, environment, {
     zkevmMintRequestUpdated: async (event) => {
-      mintingBackend.processMint(mintingBackend.mintingPersistencePrismaSqlite, event);
+      mintingBackend.processMint(mintingPersistence, event);
     }
   });
 
@@ -381,7 +383,7 @@ const start = async () => {
     }
 
     mintingBackend.submitMintingRequests(
-      mintingBackend.mintingPersistencePrismaSqlite,
+      mintingBackend.mintingPersistencePrismaSqlite(client),
       blockchainDataClient,
       {},
       logger

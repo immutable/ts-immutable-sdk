@@ -3,9 +3,10 @@
 import {
   CreateMintRequest, MintingPersistence, SubmittedMintRequest
 } from '../type';
-import { client } from '../../dbClient/prismaSqlite';
 
-export const mintingPersistence: MintingPersistence = {
+// client is a PrismaClient instance. it needs to be generated with
+// additional schema defined inside (TODO: point to repo) file.
+export const mintingPersistence = (client: any): MintingPersistence => ({
   recordMint: async (request: CreateMintRequest) => {
     const result = await client.imAssets.upsert({
       where: {
@@ -93,7 +94,7 @@ export const mintingPersistence: MintingPersistence = {
     // Check if the asset exists and the condition for updating is met
     if (existingAsset && (
       existingAsset.lastImtblZkevmMintRequestUpdatedId === null
-      || existingAsset.lastImtblZkevmMintRequestUpdatedId < submittedMintRequest.imtblZkevmMintRequestUpdatedId)
+        || existingAsset.lastImtblZkevmMintRequestUpdatedId < submittedMintRequest.imtblZkevmMintRequestUpdatedId)
     ) {
       // Perform update if the existing record's lastImtblZkevmMintRequestUpdatedId is less than the new one or is null
       await client.imAssets.update({
@@ -215,4 +216,4 @@ export const mintingPersistence: MintingPersistence = {
       wallet_address: asset.ownerAddress
     };
   }
-};
+});

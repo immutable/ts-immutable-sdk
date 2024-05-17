@@ -40,7 +40,7 @@ export const submitMintingRequests = async (
     });
 
     let batchSize = Math.min(
-      mintingResponse
+      mintingResponse?.imx_remaining_mint_requests
         ? parseInt(mintingResponse.imx_remaining_mint_requests, 10)
         : defaultBatchSize,
       defaultBatchSize
