@@ -21,7 +21,6 @@
     "@magic-ext/oidc": "4.2.0",
     "@metamask/detect-provider": "^2.0.0",
     "@opensea/seaport-js": "4.0.0",
-    "@prisma/client": "5.13.0",
     "@rive-app/react-canvas-lite": "^4.9.0",
     "@uniswap/router-sdk": "^1.4.0",
     "@uniswap/sdk-core": "^3.0.1",

@@ -6,8 +6,7 @@
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
     "@imtbl/blockchain-data": "0.0.0",
-    "@imtbl/config": "0.0.0",
-    "@prisma/client": "5.13.0"
+    "@imtbl/config": "0.0.0"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.0.0",
