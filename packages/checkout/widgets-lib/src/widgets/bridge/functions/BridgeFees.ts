@@ -2,8 +2,13 @@ import { BigNumber, utils } from 'ethers';
 import { GasEstimateBridgeToL2Result } from '@imtbl/checkout-sdk';
 import { calculateCryptoToFiat, tokenValueFormat } from '../../../lib/utils';
 import { FormattedFee } from '../../swap/functions/swapFees';
+import { CryptoFiatState } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 
-export const formatBridgeFees = (estimates: GasEstimateBridgeToL2Result | undefined, cryptoFiatState, t): any[] => {
+export const formatBridgeFees = (
+  estimates: GasEstimateBridgeToL2Result | undefined,
+  cryptoFiatState: CryptoFiatState,
+  t,
+): any[] => {
   const fees: FormattedFee[] = [];
   if (!estimates?.fees || !estimates.token) return fees;
 
