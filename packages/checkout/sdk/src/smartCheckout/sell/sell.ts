@@ -6,6 +6,7 @@ import {
   Orderbook,
   PrepareListingResponse,
   constants,
+  ERC721Item as OrderbookERC721Item,
 } from '@imtbl/orderbook';
 import { BigNumber, Contract, utils } from 'ethers';
 import {
@@ -130,7 +131,8 @@ export const sell = async (
     orderbook = instance.createOrderbookInstance(config);
     const { seaportContractAddress } = orderbook.config();
     spenderAddress = seaportContractAddress;
-    const sellItem = sellToken.type === ItemType.ERC1155
+
+    const sellItem = 'type' in sellToken && sellToken.type === ItemType.ERC1155
       ? {
         type: sellToken.type,
         contractAddress: sellToken.collectionAddress,
@@ -138,11 +140,10 @@ export const sell = async (
         amount: sellToken.amount,
       }
       : {
-        // For backwards compatibility type can be undefined for ERC721
-        type: sellToken.type || ItemType.ERC721,
+        type: ItemType.ERC721,
         contractAddress: sellToken.collectionAddress,
         tokenId: sellToken.id,
-      };
+      } as OrderbookERC721Item;
 
     listing = await measureAsyncExecution<PrepareListingResponse>(
       config,
@@ -167,7 +168,7 @@ export const sell = async (
   }
 
   const itemRequirements = [
-    sellToken.type === ItemType.ERC1155
+    'type' in sellToken && sellToken.type === ItemType.ERC1155
       ? getERC1155Requirement(sellToken.id, sellToken.collectionAddress, spenderAddress, sellToken.amount)
       : getERC721Requirement(sellToken.id, sellToken.collectionAddress, spenderAddress),
   ];
