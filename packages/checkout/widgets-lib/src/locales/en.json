@@ -636,7 +636,8 @@
           "label": "{{amount}} Swap fee (factored into quote)"
         },
         "serviceFee": {
-          "label": "Service fee"
+          "depositLabel": "zkEVM gas fees",
+          "withdrawLabel": "Ethereum gas fees"
         }
       }
     },

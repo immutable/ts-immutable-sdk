@@ -623,7 +623,8 @@
           "label": "{{amount}} スワップ手数料（見積もりに含まれる）"
         },
         "serviceFee": {
-          "label": "サービス手数料"
+          "depositLabel": "zkEVM ガス手数料",
+          "withdrawLabel": "Ethereum ガス手数料"
         }
       }
     },
