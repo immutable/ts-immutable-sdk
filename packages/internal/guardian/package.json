@@ -38,7 +38,7 @@
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "NODE_ENV=production rollup --config rollup.config.js",
-    "dev": "rollup --config rollup.config.js -w"
+    "dev": "tsc --noEmit false --incremental --declaration --watch"
   },
   "type": "module",
   "types": "dist/index.d.ts"

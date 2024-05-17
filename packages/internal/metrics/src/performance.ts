@@ -1,4 +1,4 @@
-import { errorBoundary } from 'utils/errorBoundary';
+import { errorBoundary } from './utils/errorBoundary';
 import { track, TrackProperties } from './track';
 
 type PerformanceEventProperties =

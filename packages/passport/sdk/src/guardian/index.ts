@@ -1,7 +1,7 @@
 import * as guardian from '@imtbl/guardian';
 import { TransactionApprovalRequestChainTypeEnum, TransactionEvaluationResponse } from '@imtbl/guardian';
 import { BigNumber, ethers } from 'ethers';
-import { PassportError, PassportErrorType } from 'errors/passportError';
+import { PassportError, PassportErrorType } from '../errors/passportError';
 import AuthManager from '../authManager';
 import { ConfirmationScreen } from '../confirmation';
 import { retryWithDelay } from '../network/retry';
