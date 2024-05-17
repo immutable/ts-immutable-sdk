@@ -80,12 +80,15 @@ const useParams = () => {
 
   const multicurrency = urlParams.get("multicurrency") === "true";
 
+  const baseCurrencyOverride = urlParams.get("baseCurrencyOverride") as string ?? undefined;
+
   return {
     login,
     environmentId,
     collectionName,
     excludePaymentTypes,
     multicurrency,
+    baseCurrencyOverride,
   };
 };
 
@@ -125,6 +128,7 @@ export function SaleUI() {
     collectionName,
     excludePaymentTypes,
     multicurrency,
+    baseCurrencyOverride,
   } = params;
   const [passportConfig, setPassportConfig] = useState(
     JSON.stringify(defaultPassportConfig, null, 2)
@@ -177,11 +181,11 @@ export function SaleUI() {
   // mount sale widget and subscribe to close event
   useEffect(() => {
     saleWidget.mount("sale", {
-      
       environmentId,
       collectionName,
       items: defaultItems,
       excludePaymentTypes,
+      baseCurrencyOverride,
     });
     saleWidget.addListener(SaleEventType.CLOSE_WIDGET, () => {
       saleWidget.unmount();
@@ -283,6 +287,7 @@ export function SaleUI() {
             collectionName,
             items: defaultItems,
             excludePaymentTypes,
+            baseCurrencyOverride,
           })
         }
       >

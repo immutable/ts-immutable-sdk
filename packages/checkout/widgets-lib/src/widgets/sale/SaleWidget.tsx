@@ -60,8 +60,10 @@ export default function SaleWidget(props: SaleWidgetProps) {
     environmentId,
     collectionName,
     excludePaymentTypes,
+    baseCurrencyOverride,
     waitFulfillmentSettlements = true,
   } = props;
+
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
   const chainId = useRef<ChainId>();
@@ -124,6 +126,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
           passport: checkout?.passport,
           collectionName,
           excludePaymentTypes,
+          baseCurrencyOverride,
           waitFulfillmentSettlements,
         }}
       >

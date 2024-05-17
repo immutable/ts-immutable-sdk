@@ -12,6 +12,7 @@ type UseQuoteOrderParams = {
   environmentId: string;
   environment: Environment;
   provider: Web3Provider | undefined;
+  baseCurrencyOverride?: string;
 };
 
 export const defaultOrderQuote: OrderQuote = {
@@ -33,6 +34,7 @@ export const useQuoteOrder = ({
   environment,
   environmentId,
   provider,
+  baseCurrencyOverride,
 }: UseQuoteOrderParams) => {
   const [selectedCurrency, setSelectedCurrency] = useState<
   OrderQuoteCurrency | undefined
@@ -108,7 +110,12 @@ export const useQuoteOrder = ({
     // Set default currency
     if (orderQuote.currencies.length === 0) return;
 
-    const defaultSelectedCurrency = orderQuote.currencies.find((c) => c.base)
+    const preferredCurrency = baseCurrencyOverride
+      ? orderQuote.currencies.find((c) => c.name === baseCurrencyOverride)
+      : undefined;
+
+    const defaultSelectedCurrency = preferredCurrency
+      || orderQuote.currencies.find((c) => c.base)
       || orderQuote.currencies?.[0];
 
     setSelectedCurrency(defaultSelectedCurrency);
