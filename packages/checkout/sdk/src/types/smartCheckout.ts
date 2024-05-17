@@ -324,7 +324,7 @@ export type SellToken = ERC721SellToken | ERC1155SellToken;
  * @property {string} collectionAddress
  */
 export type ERC721SellToken = {
-  type: ItemType.ERC721;
+  type: ItemType.ERC721 | undefined;
   /**  The ERC721 token id */
   id: string;
   /** The ERC721 collection address */

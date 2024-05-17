@@ -130,17 +130,18 @@ export const sell = async (
     orderbook = instance.createOrderbookInstance(config);
     const { seaportContractAddress } = orderbook.config();
     spenderAddress = seaportContractAddress;
-    const sellItem = sellToken.type === ItemType.ERC721
+    const sellItem = sellToken.type === ItemType.ERC1155
       ? {
         type: sellToken.type,
         contractAddress: sellToken.collectionAddress,
         tokenId: sellToken.id,
+        amount: sellToken.amount,
       }
       : {
-        type: sellToken.type,
+        // For backwards compatibility type can be undefined for ERC721
+        type: sellToken.type || ItemType.ERC721,
         contractAddress: sellToken.collectionAddress,
         tokenId: sellToken.id,
-        amount: sellToken.amount,
       };
 
     listing = await measureAsyncExecution<PrepareListingResponse>(
@@ -166,9 +167,9 @@ export const sell = async (
   }
 
   const itemRequirements = [
-    sellToken.type === ItemType.ERC721
-      ? getERC721Requirement(sellToken.id, sellToken.collectionAddress, spenderAddress)
-      : getERC1155Requirement(sellToken.id, sellToken.collectionAddress, spenderAddress, sellToken.amount),
+    sellToken.type === ItemType.ERC1155
+      ? getERC1155Requirement(sellToken.id, sellToken.collectionAddress, spenderAddress, sellToken.amount)
+      : getERC721Requirement(sellToken.id, sellToken.collectionAddress, spenderAddress),
   ];
 
   let smartCheckoutResult;
