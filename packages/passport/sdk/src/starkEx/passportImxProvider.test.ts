@@ -234,8 +234,10 @@ describe('PassportImxProvider', () => {
       const returnValue = {} as imx.CreateTradeResponse;
       const request = {} as imx.GetSignableTradeRequest;
 
+      const withDefaultConfirmationScreenSpy = jest.spyOn(mockGuardianClient, 'withDefaultConfirmationScreenTask');
       (createTrade as jest.Mock).mockResolvedValue(returnValue);
       const result = await passportImxProvider.createTrade(request);
+      expect(withDefaultConfirmationScreenSpy).toBeCalled();
 
       expect(createTrade)
         .toHaveBeenCalledWith({
