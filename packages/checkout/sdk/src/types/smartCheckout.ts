@@ -270,7 +270,7 @@ export type BuyOrder = {
  */
 export type SellOrder = {
   /** the token to be listed for sale */
-  sellToken: DeprecatedERC721SellToken | ERC721SellToken | ERC1155SellToken;
+  sellToken: SellToken;
   /** the token info of the price of the item */
   buyToken: BuyToken;
   /** optional array of makerFees to be applied to the listing */
