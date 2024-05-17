@@ -316,7 +316,7 @@ export type ERC20BuyToken = {
  * Represents the token listed for sale.
  * ERC721SellToken or ERC1155SellToken {@link Checkout.smartCheckout}.
  */
-export type SellToken = ERC721SellToken | ERC1155SellToken;
+export type SellToken = DeprecatedERC721SellToken | ERC721SellToken | ERC1155SellToken;
 
 /**
  * The ERC721SellToken type
