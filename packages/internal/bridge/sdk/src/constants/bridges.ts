@@ -157,9 +157,9 @@ export const axelarAPIEndpoints:Record<string, string> = {
  * @typedef {Object} tenderlyAPIEndpoints - API endpoints for the testnet & mainnet Axelar environment configurations
  */
 export const tenderlyAPIEndpoints:Record<string, string> = {
-  mainnet: 'https://bridge-api.immutable.com/v1/tenderly/simulate',
-  testnet: 'https://bridge-api.sandbox.immutable.com/v1/tenderly/simulate',
-  devnet: 'https://bridge-api.dev.immutable.com/v1/tenderly/simulate',
+  mainnet: 'https://bridge-api.immutable.com/v1/tenderly/estimate',
+  testnet: 'https://bridge-api.sandbox.immutable.com/v1/tenderly/estimate',
+  devnet: 'https://bridge-api.dev.immutable.com/v1/tenderly/estimate',
 };
 
 /**
