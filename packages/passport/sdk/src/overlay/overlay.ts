@@ -15,13 +15,10 @@ export default class Overlay {
 
   private onCloseListener: (() => void) | undefined;
 
-  private addedFonts: boolean;
-
   constructor(popupOverlayOptions: PopupOverlayOptions, isBlockedOverlay: boolean = false) {
     this.disableBlockedPopupOverlay = popupOverlayOptions.disableBlockedPopupOverlay || false;
     this.disableGenericPopupOverlay = popupOverlayOptions.disableGenericPopupOverlay || false;
     this.isBlockedOverlay = isBlockedOverlay;
-    this.addedFonts = false;
   }
 
   append(tryAgainOnClick: () => void, onCloseClick: () => void) {
