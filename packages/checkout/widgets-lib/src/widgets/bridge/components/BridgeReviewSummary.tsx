@@ -80,7 +80,7 @@ export function BridgeReviewSummary() {
 
   const { cryptoFiatState } = useContext(CryptoFiatContext);
   const [loading, setLoading] = useState(false);
-  const [estimates, setEstimates] = useState<any | undefined>(undefined);
+  const [estimates, setEstimates] = useState<GasEstimateBridgeToL2Result | undefined>(undefined);
   const [gasFee, setGasFee] = useState<string>('');
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
   const [approveTransaction, setApproveTransaction] = useState<
