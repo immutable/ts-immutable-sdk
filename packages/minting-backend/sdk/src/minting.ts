@@ -40,7 +40,7 @@ export const submitMintingRequests = async (
     });
 
     let batchSize = Math.min(
-      mintingResponse
+      mintingResponse?.imx_remaining_mint_requests
         ? parseInt(mintingResponse.imx_remaining_mint_requests, 10)
         : defaultBatchSize,
       defaultBatchSize
@@ -178,12 +178,12 @@ export const submitMintingRequests = async (
     mintingResponse = mintingResults
       .reverse()
       .find(
-        (r): r is PromiseFulfilledResult<Types.CreateMintRequestResult> => r.status === 'fulfilled'
+        (r: any): r is PromiseFulfilledResult<Types.CreateMintRequestResult> => r.status === 'fulfilled'
       )?.value;
   }
 };
 
-type MintRequestEvent = {
+export type MintRequestEvent = {
   event_name: string;
   chain: string;
   event_id: string;
