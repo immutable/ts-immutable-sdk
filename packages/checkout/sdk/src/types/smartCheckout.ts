@@ -739,6 +739,8 @@ export type Fee = {
   formattedAmount: string;
   /** The token info for the fee */
   token?: TokenInfo;
+  /** The basis points for the secondary fee */
+  basisPoints?: number;
 };
 
 /**
