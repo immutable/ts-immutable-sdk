@@ -17,14 +17,14 @@ interface ImmutableXConfigurationParams {
   chainID: number;
   coreContractAddress: string;
   registrationContractAddress: string;
-  registrationV4ContractAddress: string;
+  registrationV4ContractAddress?: string;
   baseConfig?: ImmutableConfiguration;
 }
 
 export interface EthConfiguration {
   coreContractAddress: string;
   registrationContractAddress: string;
-  registrationV4ContractAddress: string;
+  registrationV4ContractAddress?: string;
   chainID: number;
 }
 
