@@ -146,32 +146,31 @@ export async function completeERC20WithdrawalV2Workflow({
   return ethSigner.sendTransaction(populatedTransaction);
 }
 
-// export async function completeAllERC20WithdrawalWorkflow({
-//   ethSigner,
-//   starkPublicKey,
-//   token,
-//   config,
-// }: CompleteERC20WithdrawalWorkflowParams) {
-//   const imxConfig = config.immutableXConfig;
-//   const assetType = await getEncodeAssetInfo('asset', 'ERC20', imxConfig, {
-//     token_address: token.tokenAddress,
-//   });
+export async function completeAllERC20WithdrawalWorkflow({
+  ethSigner,
+  starkPublicKey,
+  token,
+  config,
+}: CompleteERC20WithdrawalWorkflowParams) {
+  const imxConfig = config.immutableXConfig;
+  const assetType = await getEncodeAssetInfo('asset', 'ERC20', imxConfig, {
+    token_address: token.tokenAddress,
+  });
 
-//   const registrationContract = RegistrationV4.connect(
-//     imxConfig.ethConfiguration.registrationV4ContractAddress,
-//     ethSigner,
-//   );
+  const registrationContract = Contracts.RegistrationV4.connect(
+    imxConfig.ethConfiguration.registrationV4ContractAddress,
+    ethSigner,
+  );
 
-//   const ethAddress = await ethSigner.getAddress();
-//   const populatedTransaction =
-//     await registrationContract.populateTransaction.withdrawAll(
-//       ethAddress,
-//       starkPublicKey,
-//       assetType.asset_id,
-//     );
+  const ethAddress = await ethSigner.getAddress();
+  const populatedTransaction = await registrationContract.populateTransaction.withdrawAll(
+    ethAddress,
+    starkPublicKey,
+    assetType.asset_id,
+  );
 
-//   return ethSigner.sendTransaction(populatedTransaction);
-// }
+  return ethSigner.sendTransaction(populatedTransaction);
+}
 
 // export async function registerAndCompleteAllERC20WithdrawalWorkflow({
 //   walletConnection,
