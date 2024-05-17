@@ -1,6 +1,7 @@
 import { Amount, Token, TransactionResponse } from '@imtbl/dex-sdk';
 import { TFunction } from 'i18next';
 import { BigNumber, utils } from 'ethers';
+import { TokenInfo } from '@imtbl/checkout-sdk';
 import { CryptoFiatState } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { calculateCryptoToFiat, tokenValueFormat } from '../../../lib/utils';
 
@@ -9,7 +10,7 @@ export type FormattedFee = {
   fiatAmount: string;
   amount: string;
   prefix?: string;
-  token: Token;
+  token: Token | TokenInfo;
 };
 
 /**
