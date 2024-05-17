@@ -282,9 +282,6 @@
         "caption1": "コイン",
         "caption2": "残高",
         "divider": "その他のオプション",
-        "payWithCard": {
-          "caption": "代わりにカードで購入"
-        },
         "stepType": {
           "SWAP": "{{symbol}}を{{amount}}でスワップ",
           "ONRAMP": "{{symbol}}を{{amount}}で購入",
@@ -297,12 +294,15 @@
             "SUFFICIENT": "{{symbol}} {{amount}}で支払う"
           }
         },
-        "fee": "手数料 {{symbol}} ≈ {{amount}}"
+        "fee": "交換手数料 ~ {{symbol}} {{amount}}"
       },
       "orderReview": {
         "heading": "支払いの概要",
         "continue": "続行",
-        "payWith": "{{symbol}}で支払う",
+        "payWith": {
+          "SWAP": "{{symbol}}でスワップ＆支払い",
+          "SUFFICIENT": "{{symbol}}で支払う"
+        },
         "balance": "残高{{amount}}"
       }
     },

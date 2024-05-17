@@ -276,9 +276,6 @@
         "caption1": "Coins",
         "caption2": "Balance",
         "divider": "More options",
-        "payWithCard": {
-          "caption": "Buy this items with card instead"
-        },
         "stepType": {
           "SWAP": "Swap {{symbol}} ≈ {{amount}}",
           "ONRAMP": "Buy {{symbol}} ≈ {{amount}}",
@@ -291,12 +288,15 @@
             "SUFFICIENT": "Pay {{symbol}} {{amount}}"
           }
         },
-        "fee": "Fees {{symbol}} ≈ {{amount}}"
+        "fee": "Swap fee ~ {{symbol}} {{amount}}"
       },
       "orderReview": {
         "heading": "Payment summary",
         "continue": "Proceed",
-        "payWith": "Pay with {{symbol}}",
+        "payWith": {
+          "SWAP": "Swap & Pay with {{symbol}}",
+          "SUFFICIENT": "Pay with {{symbol}}"
+        },
         "balance": "Balance {{amount}}"
       }
     },
