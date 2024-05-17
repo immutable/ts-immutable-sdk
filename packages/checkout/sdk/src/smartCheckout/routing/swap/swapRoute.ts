@@ -4,6 +4,7 @@ import { CheckoutConfiguration, getL2ChainId } from '../../../config';
 import {
   AvailableRoutingOptions,
   ChainId,
+  Fee as SwapFee,
   FeeType,
   FundingStepType,
   GetBalanceResult,
@@ -51,12 +52,13 @@ const constructFees = (
     };
   }
 
-  const fees = [];
+  const fees: SwapFee[] = [];
   for (const swapFee of swapFees) {
     fees.push({
       type: FeeType.SWAP_FEE,
       amount: swapFee.amount.value,
       formattedAmount: utils.formatUnits(swapFee.amount.value, swapFee.amount.token.decimals),
+      basisPoints: swapFee.basisPoints,
       token: {
         name: swapFee.amount.token.name ?? '',
         symbol: swapFee.amount.token.symbol ?? '',
