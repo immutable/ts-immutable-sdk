@@ -9,7 +9,7 @@ export const formatBridgeFees = (
   isDeposit: boolean,
   cryptoFiatState: CryptoFiatState,
   t,
-): any[] => {
+): FormattedFee[] => {
   const fees: FormattedFee[] = [];
   if (!estimates?.fees || !estimates.token) return fees;
 
