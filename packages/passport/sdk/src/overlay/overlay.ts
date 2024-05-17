@@ -1,6 +1,6 @@
 import { PopupOverlayOptions } from 'types';
 import { PASSPORT_OVERLAY_CLOSE_ID, PASSPORT_OVERLAY_TRY_AGAIN_ID } from './constants';
-import { getBlockedOverlay, getGenericOverlay } from './elements';
+import { addLink, getBlockedOverlay, getGenericOverlay } from './elements';
 
 export default class Overlay {
   private disableGenericPopupOverlay: boolean;
@@ -15,10 +15,13 @@ export default class Overlay {
 
   private onCloseListener: (() => void) | undefined;
 
+  private addedFonts: boolean;
+
   constructor(popupOverlayOptions: PopupOverlayOptions, isBlockedOverlay: boolean = false) {
     this.disableBlockedPopupOverlay = popupOverlayOptions.disableBlockedPopupOverlay || false;
     this.disableGenericPopupOverlay = popupOverlayOptions.disableGenericPopupOverlay || false;
     this.isBlockedOverlay = isBlockedOverlay;
+    this.addedFonts = false;
   }
 
   append(tryAgainOnClick: () => void, onCloseClick: () => void) {
@@ -48,21 +51,9 @@ export default class Overlay {
 
   private appendOverlay() {
     if (!this.overlay) {
-      const link1: HTMLLinkElement = document.createElement('link');
-      link1.href = 'https://fonts.googleapis.com';
-      link1.rel = 'preconnect';
-      document.head.appendChild(link1);
-
-      const link2: HTMLLinkElement = document.createElement('link');
-      link2.href = 'https://fonts.gstatic.com';
-      link2.rel = 'preconnect';
-      link2.crossOrigin = 'anonymous';
-      document.head.appendChild(link2);
-
-      const link3: HTMLLinkElement = document.createElement('link');
-      link3.href = 'https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap';
-      link3.rel = 'stylesheet';
-      document.head.appendChild(link3);
+      addLink({ id: 'link-googleapis', href: 'https://fonts.googleapis.com' });
+      addLink({ id: 'link-gstatic', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' });
+      addLink({ id: 'link-roboto', href: 'https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap', rel: 'stylesheet' });
 
       const overlay = document.createElement('div');
       overlay.innerHTML = this.isBlockedOverlay ? getBlockedOverlay() : getGenericOverlay();

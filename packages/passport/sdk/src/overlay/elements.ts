@@ -123,5 +123,28 @@ const getOverlay = (contents: string): string => `
     </div>
   `;
 
+type LinkParams = {
+  id: string;
+  href: string;
+  rel?: string;
+  crossOrigin?: string;
+};
+export function addLink({
+  id,
+  href,
+  rel,
+  crossOrigin,
+}: LinkParams): void {
+  const fullId = `${PASSPORT_OVERLAY_ID}-${id}`;
+  if (!document.getElementById(fullId)) {
+    const link: HTMLLinkElement = document.createElement('link');
+    link.id = fullId;
+    link.href = href;
+    if (rel) link.rel = rel;
+    if (crossOrigin) link.crossOrigin = crossOrigin;
+    document.head.appendChild(link);
+  }
+}
+
 export const getBlockedOverlay = () => getOverlay(getBlockedContents());
 export const getGenericOverlay = () => getOverlay(getGenericContents());
