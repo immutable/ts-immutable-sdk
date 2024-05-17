@@ -3,10 +3,10 @@ import {
 } from '@biom3/react';
 import { formatZeroAmount, tokenValueFormat } from 'lib/utils';
 import { useTranslation } from 'react-i18next';
+import { FormattedFee } from 'widgets/swap/functions/swapFees';
 import { feeItemContainerStyles, feeItemLoadingStyles, feesBreakdownContentStyles } from './FeesBreakdownStyles';
 import { FeeItem } from './FeeItem';
 import { FooterLogo } from '../Footer/FooterLogo';
-import { FormattedFee } from '../../widgets/swap/functions/swapFees';
 
 type FeesBreakdownProps = {
   onCloseDrawer?: () => void;
@@ -63,7 +63,7 @@ export function FeesBreakdown({
                 label={label}
                 amount={amount}
                 fiatAmount={fiatAmount}
-                tokenSymbol={token.symbol ?? ''}
+                tokenSymbol={token.symbol ?? tokenSymbol}
                 prefix={prefix}
               />
             ))
