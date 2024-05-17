@@ -8,7 +8,7 @@ import {
   OrderUseCase,
 } from '@opensea/seaport-js/lib/types';
 import { providers } from 'ethers';
-import { mapFromOpenApiOrder } from 'openapi/mapper';
+import { mapFromOpenApiOrder } from '../openapi/mapper';
 import {
   Action,
   ActionType,

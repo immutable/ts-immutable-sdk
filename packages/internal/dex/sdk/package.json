@@ -41,7 +41,7 @@
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "NODE_ENV=production rollup --config rollup.config.js",
-    "dev": "rollup --config rollup.config.js -w",
+    "dev": "tsc --noEmit false --incremental --declaration --watch",
     "generate-types": "typechain --target ethers-v5 --out-dir ./src/contracts/types ./src/contracts/ABIs/*.json",
     "lint": "eslint ./src --ext .ts --max-warnings=0",
     "lint:fix": "cd ../../../.. && yarn wsrun -p @imtbl/dex-sdk -c lint --fix",

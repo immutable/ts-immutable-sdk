@@ -7,7 +7,7 @@ import {
   ProtocolData,
   TradeResult,
   CancelOrdersResult,
-} from 'openapi/sdk';
+} from '../openapi/sdk';
 import {
   CreateListingParams,
   FeeType,

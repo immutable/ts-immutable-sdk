@@ -1,10 +1,10 @@
 import { EthSigner, StarkSigner } from '@imtbl/x-client';
 import AuthManager from 'authManager';
-import { PassportErrorType, withPassportError } from 'errors/passportError';
-import { retryWithDelay } from 'network/retry';
 import { User } from 'types';
 import axios from 'axios';
 import { ImxApiClients, imx } from '@imtbl/generated-clients';
+import { retryWithDelay } from '../../network/retry';
+import { PassportErrorType, withPassportError } from '../../errors/passportError';
 import registerPassportStarkEx from './registration';
 
 async function forceUserRefresh(authManager: AuthManager) {
