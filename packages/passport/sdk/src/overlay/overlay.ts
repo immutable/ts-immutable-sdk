@@ -48,6 +48,22 @@ export default class Overlay {
 
   private appendOverlay() {
     if (!this.overlay) {
+      const link1: HTMLLinkElement = document.createElement('link');
+      link1.href = 'https://fonts.googleapis.com';
+      link1.rel = 'preconnect';
+      document.head.appendChild(link1);
+
+      const link2: HTMLLinkElement = document.createElement('link');
+      link2.href = 'https://fonts.gstatic.com';
+      link2.rel = 'preconnect';
+      link2.crossOrigin = 'anonymous';
+      document.head.appendChild(link2);
+
+      const link3: HTMLLinkElement = document.createElement('link');
+      link3.href = 'https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap';
+      link3.rel = 'stylesheet';
+      document.head.appendChild(link3);
+
       const overlay = document.createElement('div');
       overlay.innerHTML = this.isBlockedOverlay ? getBlockedOverlay() : getGenericOverlay();
       document.body.insertAdjacentElement('beforeend', overlay);

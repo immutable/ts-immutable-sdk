@@ -93,6 +93,7 @@ const getOverlay = (contents: string): string => `
         height: 100% !important;
         background: rgba(13, 13, 13, 0.48) !important;
         backdrop-filter: blur(28px) !important;
+        -webkit-backdrop-filter: blur(28px) !important;
         display: flex !important;
         flex-direction: column !important;
         justify-content: center !important;
