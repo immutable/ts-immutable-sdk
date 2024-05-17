@@ -12,6 +12,7 @@ import {
   getFnToPushAndSortFundingBalances,
   getFundingBalances,
   getGasEstimate,
+  processGasFreeBalances,
   wrapPromisesWithOnResolve,
 } from './fetchFundingBalancesUtils';
 
@@ -52,7 +53,9 @@ export const fetchFundingBalances = async (
   const pushToFoundBalances = getFnToPushAndSortFundingBalances(baseCurrency);
   const updateFundingBalances = (balances: FundingBalance[] | null) => {
     if (Array.isArray(balances) && balances.length > 0) {
-      onFundingBalance(pushToFoundBalances(balances));
+      onFundingBalance(
+        pushToFoundBalances(processGasFreeBalances(balances, provider)),
+      );
     }
   };
 
