@@ -1,4 +1,6 @@
-import { Heading, MenuItem, MenuItemSize } from '@biom3/react';
+import {
+  Heading, MenuItem, MenuItemSize, SxProps,
+} from '@biom3/react';
 import { SaleItem } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
 import { calculateCryptoToFiat, tokenValueFormat } from 'lib/utils';
@@ -14,6 +16,7 @@ export interface OrderItemProps<
   conversions: Map<string, number>;
   size?: MenuItemSize;
   rc?: RC;
+  sx?: SxProps;
 }
 
 export function OrderItem<RC extends ReactElement | undefined = undefined>({
@@ -22,6 +25,7 @@ export function OrderItem<RC extends ReactElement | undefined = undefined>({
   pricing,
   conversions,
   size,
+  sx,
   rc = <span />,
 }: OrderItemProps<RC>) {
   const { t } = useTranslation();
@@ -44,6 +48,7 @@ export function OrderItem<RC extends ReactElement | undefined = undefined>({
       sx={{
         pointerEvents: 'none',
         mb: 'base.spacing.x1',
+        ...sx,
       }}
     >
       <MenuItem.FramedImage imageUrl={item.image} />
