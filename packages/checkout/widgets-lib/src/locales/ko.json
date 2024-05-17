@@ -7,6 +7,12 @@
       },
       "walletSelection": {
         "heading": "지갑 선택"
+      },
+      "nonPassportDrawer": {
+        "heading": "비 패스포트 사용자는 가스 비용으로 IMX가 필요합니다.",
+        "body1": "자금을 Immutable zkEVM으로 브리징하기 위해 <layerswapLink>Layerswap</layerswapLink>을 사용하는 것을 권장합니다. 리퓨엘이 켜져 있으면 IMX를 받을 수 있습니다.",
+        "body2": "또는 가스 비용이 없는 Immutable Passport로 쉽게 결제하고 플레이하세요.",
+        "buttonText": "어쨌든 진행"
       }
     },
     "CONNECT_SUCCESS": {
