@@ -82,7 +82,7 @@
     "build": "yarn clean && rollup --config rollup.config.js",
     "build:analyse": "yarn build --plugin visualizer",
     "build:local": "yarn clean && yarn build && mkdir -p ../widgets-sample-app/public/lib/js && cp dist/*.js ../widgets-sample-app/public/lib/js/",
-    "dev": "NODE_ENV=development npx rollup --config rollup.config.js",
+    "dev": "NODE_ENV=development rollup --config rollup.config.js",
     "clean": "rm -rf ./dist",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix",
