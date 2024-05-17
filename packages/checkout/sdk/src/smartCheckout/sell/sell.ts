@@ -10,6 +10,7 @@ import {
 import { BigNumber, Contract, utils } from 'ethers';
 import {
   ERC721Item,
+  ERC1155Item,
   GasTokenType,
   ItemType,
   TransactionOrGasType,
@@ -25,7 +26,7 @@ import { CheckoutConfiguration } from '../../config';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { smartCheckout } from '../smartCheckout';
 import {
-  getUnsignedERC721Transactions,
+  getUnsignedSellTransactions,
   getUnsignedMessage,
   signApprovalTransactions,
   signMessage,
@@ -44,6 +45,19 @@ export const getERC721Requirement = (
   id,
   contractAddress,
   spenderAddress,
+});
+
+export const getERC1155Requirement = (
+  id: string,
+  contractAddress: string,
+  spenderAddress: string,
+  amount: string,
+): ERC1155Item => ({
+  type: ItemType.ERC1155,
+  id,
+  contractAddress,
+  spenderAddress,
+  amount: BigNumber.from(amount),
 });
 
 export const getBuyToken = (
@@ -116,17 +130,26 @@ export const sell = async (
     orderbook = instance.createOrderbookInstance(config);
     const { seaportContractAddress } = orderbook.config();
     spenderAddress = seaportContractAddress;
+    const sellItem = sellToken.type === ItemType.ERC721
+      ? {
+        type: sellToken.type,
+        contractAddress: sellToken.collectionAddress,
+        tokenId: sellToken.id,
+      }
+      : {
+        type: sellToken.type,
+        contractAddress: sellToken.collectionAddress,
+        tokenId: sellToken.id,
+        amount: sellToken.amount,
+      };
+
     listing = await measureAsyncExecution<PrepareListingResponse>(
       config,
       'Time to prepare the listing from the orderbook',
       orderbook.prepareListing({
         makerAddress: walletAddress,
         buy: buyTokenOrNative,
-        sell: {
-          type: ItemType.ERC721,
-          contractAddress: sellToken.collectionAddress,
-          tokenId: sellToken.id,
-        },
+        sell: sellItem,
         orderExpiry,
       }),
     );
@@ -143,7 +166,9 @@ export const sell = async (
   }
 
   const itemRequirements = [
-    getERC721Requirement(sellToken.id, sellToken.collectionAddress, spenderAddress),
+    sellToken.type === ItemType.ERC721
+      ? getERC721Requirement(sellToken.id, sellToken.collectionAddress, spenderAddress)
+      : getERC1155Requirement(sellToken.id, sellToken.collectionAddress, spenderAddress, sellToken.amount),
   ];
 
   let smartCheckoutResult;
@@ -170,7 +195,7 @@ export const sell = async (
   }
 
   if (smartCheckoutResult.sufficient) {
-    const unsignedTransactions = await getUnsignedERC721Transactions(listing.actions);
+    const unsignedTransactions = await getUnsignedSellTransactions(listing.actions);
     const approvalResult = await signApprovalTransactions(provider, unsignedTransactions.approvalTransactions);
     if (approvalResult.type === SignTransactionStatusType.FAILED) {
       return {

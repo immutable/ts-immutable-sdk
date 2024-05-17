@@ -133,4 +133,51 @@ describe('formatQuoteConversionRate', () => {
       fee: 1,
     });
   });
+
+  it('should handle an empty fee array', () => {
+    const fromAmount = '1.50';
+    const fromToken = {
+      name: 'ETH',
+      symbol: 'ETH',
+      address: '0x123',
+      chainId: 1,
+      decimals: 18,
+    } as TokenInfo;
+    const mockQuote = {
+      quote: {
+        amount: {
+          value: BigNumber.from('2000000000000000000'),
+          token: {
+            symbol: 'DAI',
+            address: '0x456',
+            chainId: 1,
+            decimals: 18,
+          },
+        } as Amount,
+        amountWithMaxSlippage: {} as Amount,
+        slippage: 0,
+        fees: [],
+      } as Quote,
+      swap: {
+        gasFeeEstimate: {
+          value: BigNumber.from(100),
+        },
+      },
+      approval: {
+        gasFeeEstimate: {
+          value: BigNumber.from(50),
+        },
+      },
+    } as TransactionResponse;
+    const labelKey = 'conversion.label';
+
+    formatQuoteConversionRate(fromAmount, fromToken, mockQuote, labelKey, mockTranslate as unknown as TFunction);
+
+    expect(mockTranslate).toHaveBeenCalledWith(labelKey, {
+      fromSymbol: 'ETH',
+      toSymbol: 'DAI',
+      rate: '1.33',
+      fee: 0,
+    });
+  });
 });
