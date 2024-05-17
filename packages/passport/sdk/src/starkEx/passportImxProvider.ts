@@ -268,7 +268,6 @@ export class PassportImxProvider implements IMXProvider {
   async batchNftTransfer(
     request: NftTransferDetails[],
   ): Promise<imx.CreateTransferResponse> {
-  // eslint-disable-next-line function-paren-newline
     return this.guardianClient.withConfirmationScreenTask(
       { width: 480, height: 784 },
     )(async () => {

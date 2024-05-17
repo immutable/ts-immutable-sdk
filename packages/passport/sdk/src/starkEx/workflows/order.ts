@@ -108,7 +108,7 @@ export async function cancelOrder({
     };
 
     const headers = {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       Authorization: `Bearer ${user.accessToken}`,
     };
     const getSignableCancelOrderResponse = await ordersApi.getSignableCancelOrderV3({
