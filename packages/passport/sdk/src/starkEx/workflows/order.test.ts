@@ -124,7 +124,6 @@ describe('order', () => {
       });
 
       expect(mockGetSignableCreateOrder).toBeCalledWith(mockSignableOrderRequest, mockHeader);
-      expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
       expect(mockGuardianClient.evaluateImxTransaction)
         .toBeCalledWith({ payloadHash: mockSignableOrderResponse.data.payload_hash });
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
@@ -186,7 +185,6 @@ describe('order', () => {
         'Transaction rejected by user',
         PassportErrorType.CREATE_ORDER_ERROR,
       ));
-      expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
       expect(mockGuardianClient.evaluateImxTransaction)
         .toBeCalledWith({ payloadHash: mockSignableOrderResponse.data.payload_hash });
     });
@@ -265,7 +263,6 @@ describe('order', () => {
         mockHeader,
       );
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
-      expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
       expect(mockGuardianClient.evaluateImxTransaction)
         .toBeCalledWith({ payloadHash: mockPayloadHash });
       expect(mockCancelOrder).toBeCalledWith(

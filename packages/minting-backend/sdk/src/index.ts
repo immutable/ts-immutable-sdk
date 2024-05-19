@@ -1,7 +1,11 @@
+import { mintingPersistence as mintingPersistencePg } from './persistence/pg/postgres';
+import { mintingPersistence as mintingPersistencePrismaSqlite } from './persistence/prismaSqlite/sqlite';
 import {
-  mintingPersistencePg, processMint, recordMint, submitMintingRequests
-} from './minting/index';
+  submitMintingRequests, processMint, recordMint
+} from './minting';
 
 export {
-  mintingPersistencePg, processMint, recordMint, submitMintingRequests
+  submitMintingRequests, processMint, recordMint,
+  // database clients
+  mintingPersistencePg, mintingPersistencePrismaSqlite
 };

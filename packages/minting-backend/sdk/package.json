@@ -26,7 +26,8 @@
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "optionalDependencies": {
-    "pg": "^8.11.5"
+    "pg": "^8.11.5",
+    "prisma": "^5.13.0"
   },
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
