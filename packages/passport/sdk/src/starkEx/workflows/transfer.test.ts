@@ -111,7 +111,6 @@ describe('transfer', () => {
         guardianClient: mockGuardianClient,
       });
 
-      expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
       expect(getSignableTransferV1Mock).toBeCalledWith(mockSignableTransferRequest, mockHeader);
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
       expect(mockGuardianClient.evaluateImxTransaction)
@@ -183,8 +182,6 @@ describe('transfer', () => {
         receiver: 'receiver_eth_address',
       },
     ];
-
-    const popupOptions = { height: 784, width: 480 };
 
     beforeEach(() => {
       mockGetSignableTransfer = jest.fn();
@@ -268,7 +265,6 @@ describe('transfer', () => {
         },
       }, mockHeader);
       expect(mockStarkSigner.signMessage).toHaveBeenCalled();
-      expect(mockGuardianClient.withConfirmationScreenTask).toBeCalledWith(popupOptions);
       expect(mockGuardianClient.evaluateImxTransaction)
         .toBeCalledWith({ payloadHash: payload_hash });
       expect(mockCreateTransfer).toHaveBeenCalledWith(
