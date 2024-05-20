@@ -5,7 +5,8 @@ import {
   Contracts,
   ERC20Token,
   ImmutableXConfiguration,
-  // WalletConnection,
+  WalletConnection,
+  signRegisterEthAddress,
 } from '@imtbl/x-client';
 import {
   getSignableRegistrationOnchain,
@@ -29,8 +30,8 @@ type CompleteERC20WithdrawalWorkflowParams = {
   config: ProviderConfiguration;
 };
 
-// type RegisterAndCompleteAllERC20WithdrawalWorkflowParams =
-//   CompleteERC20WithdrawalWorkflowParams & { walletConnection: WalletConnection };
+type RegisterAndCompleteAllERC20WithdrawalWorkflowParams =
+  CompleteERC20WithdrawalWorkflowParams & { walletConnection: WalletConnection };
 
 async function executeRegisterAndWithdrawERC20({
   ethSigner,
@@ -118,93 +119,90 @@ export async function completeERC20WithdrawalAction({
   );
 }
 
-// export async function completeERC20WithdrawalV2Workflow({
-//   ethSigner,
-//   token,
-//   config,
-// }: CompleteERC20WithdrawalWorkflowParams) {
-//   // is it fine to call validateChain here?
-//   await validateChain(ethSigner, config.immutableXConfig);
+export async function completeERC20WithdrawalV2Workflow({
+  ethSigner,
+  token,
+  config,
+}: CompleteERC20WithdrawalWorkflowParams) {
+  // is it fine to call validateChain here?
+  await validateChain(ethSigner, config.immutableXConfig);
 
-//   const imxConfig = config.immutableXConfig;
-//   const assetType = await getEncodeAssetInfo('asset', 'ERC20', imxConfig, {
-//     token_address: token.tokenAddress,
-//   });
+  const imxConfig = config.immutableXConfig;
+  const assetType = await getEncodeAssetInfo('asset', 'ERC20', imxConfig, {
+    token_address: token.tokenAddress,
+  });
 
-//   const coreContract = Contracts.CoreV4.connect(
-//     imxConfig.ethConfiguration.coreContractAddress,
-//     ethSigner,
-//   );
+  const coreContract = Contracts.CoreV4.connect(
+    imxConfig.ethConfiguration.coreContractAddress,
+    ethSigner,
+  );
 
-//   const ownerKey = await ethSigner.getAddress();
+  const ownerKey = await ethSigner.getAddress();
 
-//   const populatedTransaction = await coreContract.populateTransaction.withdraw(
-//     ownerKey,
-//     assetType.asset_type,
-//   );
+  const populatedTransaction = await coreContract.populateTransaction.withdraw(
+    ownerKey,
+    assetType.asset_type,
+  );
 
-//   return ethSigner.sendTransaction(populatedTransaction);
-// }
+  return ethSigner.sendTransaction(populatedTransaction);
+}
 
-// export async function completeAllERC20WithdrawalWorkflow({
-//   ethSigner,
-//   starkPublicKey,
-//   token,
-//   config,
-// }: CompleteERC20WithdrawalWorkflowParams) {
-//   const imxConfig = config.immutableXConfig;
-//   const assetType = await getEncodeAssetInfo('asset', 'ERC20', imxConfig, {
-//     token_address: token.tokenAddress,
-//   });
+export async function completeAllERC20WithdrawalWorkflow({
+  ethSigner,
+  starkPublicKey,
+  token,
+  config,
+}: CompleteERC20WithdrawalWorkflowParams) {
+  const imxConfig = config.immutableXConfig;
+  const assetType = await getEncodeAssetInfo('asset', 'ERC20', imxConfig, {
+    token_address: token.tokenAddress,
+  });
 
-//   const registrationContract = RegistrationV4.connect(
-//     imxConfig.ethConfiguration.registrationV4ContractAddress,
-//     ethSigner,
-//   );
+  const registrationContract = Contracts.RegistrationV4.connect(
+    imxConfig.ethConfiguration.registrationV4ContractAddress as string,
+    ethSigner,
+  );
 
-//   const ethAddress = await ethSigner.getAddress();
-//   const populatedTransaction =
-//     await registrationContract.populateTransaction.withdrawAll(
-//       ethAddress,
-//       starkPublicKey,
-//       assetType.asset_id,
-//     );
+  const ethAddress = await ethSigner.getAddress();
+  const populatedTransaction = await registrationContract.populateTransaction.withdrawAll(
+    ethAddress,
+    starkPublicKey,
+    assetType.asset_id,
+  );
 
-//   return ethSigner.sendTransaction(populatedTransaction);
-// }
+  return ethSigner.sendTransaction(populatedTransaction);
+}
 
-// export async function registerAndCompleteAllERC20WithdrawalWorkflow({
-//   walletConnection,
-//   ethSigner,
-//   starkPublicKey,
-//   token,
-//   config,
-// }: RegisterAndCompleteAllERC20WithdrawalWorkflowParams) {
-//   const imxConfig = config.immutableXConfig;
-//   const assetType = await getEncodeAssetInfo('asset', 'ERC20', imxConfig, {
-//     token_address: token.tokenAddress,
-//   });
+export async function registerAndCompleteAllERC20WithdrawalWorkflow({
+  walletConnection,
+  starkPublicKey,
+  token,
+  config,
+}: RegisterAndCompleteAllERC20WithdrawalWorkflowParams) {
+  const imxConfig = config.immutableXConfig;
+  const assetType = await getEncodeAssetInfo('asset', 'ERC20', imxConfig, {
+    token_address: token.tokenAddress,
+  });
 
-//   const registrationContract = Contracts.RegistrationV4.connect(
-//     imxConfig.ethConfiguration.registrationV4ContractAddress,
-//     walletConnection.ethSigner,
-//   );
+  const registrationContract = Contracts.RegistrationV4.connect(
+    imxConfig.ethConfiguration.registrationV4ContractAddress as string,
+    walletConnection.ethSigner,
+  );
 
-//   const ethAddress = await walletConnection.ethSigner.getAddress();
+  const ethAddress = await walletConnection.ethSigner.getAddress();
 
-//   const starkSignature = await signRegisterEthAddress(
-//     walletConnection.starkSigner,
-//     ethAddress,
-//     starkPublicKey,
-//   );
+  const starkSignature = await signRegisterEthAddress(
+    walletConnection.starkSigner,
+    ethAddress,
+    starkPublicKey,
+  );
 
-//   const populatedTransaction =
-//     await registrationContract.populateTransaction.registerAndWithdrawAll(
-//       ethAddress,
-//       starkPublicKey,
-//       starkSignature,
-//       assetType.asset_id,
-//     );
+  const populatedTransaction = await registrationContract.populateTransaction.registerAndWithdrawAll(
+    ethAddress,
+    starkPublicKey,
+    starkSignature,
+    assetType.asset_id,
+  );
 
-//   return walletConnection.ethSigner.sendTransaction(populatedTransaction);
-// }
+  return walletConnection.ethSigner.sendTransaction(populatedTransaction);
+}
