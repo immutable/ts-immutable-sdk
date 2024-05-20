@@ -122,6 +122,7 @@ export const sell = async (
   }
 
   const buyTokenOrNative = getBuyToken(buyToken, decimals);
+  const sellTokenHasType = 'type' in sellToken;
 
   try {
     const walletAddress = await measureAsyncExecution<string>(
@@ -133,8 +134,7 @@ export const sell = async (
     const { seaportContractAddress } = orderbook.config();
     spenderAddress = seaportContractAddress;
 
-    const hasType = 'type' in sellToken;
-    const sellItem: OrderbookERC721Item | OrderbookERC1155Item = hasType && sellToken.type === ItemType.ERC1155
+    const sellItem: OrderbookERC721Item | OrderbookERC1155Item = sellTokenHasType && sellToken.type === ItemType.ERC1155
       ? {
         type: ItemType.ERC1155,
         contractAddress: sellToken.collectionAddress,
@@ -170,7 +170,7 @@ export const sell = async (
   }
 
   const itemRequirements: (ERC721Item | ERC1155Item)[] = [];
-  if ('type' in sellToken && sellToken.type === ItemType.ERC1155) {
+  if (sellTokenHasType && sellToken.type === ItemType.ERC1155) {
     const erc1155ItemRequirement = getERC1155Requirement(
       sellToken.id,
       sellToken.collectionAddress,
