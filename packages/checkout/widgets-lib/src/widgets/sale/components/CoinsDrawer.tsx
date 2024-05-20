@@ -1,5 +1,9 @@
 import {
-  Box, Caption, Drawer, MenuItem, Divider,
+  Box,
+  Caption,
+  Drawer,
+  MenuItem,
+  Divider,
   MenuItemSize,
 } from '@biom3/react';
 import { motion } from 'framer-motion';
@@ -120,19 +124,23 @@ export function CoinsDrawer({
                 />
               )}
             >
-              <Divider
-                size="small"
-                rc={<Caption />}
-                sx={{ my: 'base.spacing.x4' }}
-              >
-                {t('views.ORDER_SUMMARY.coinsDrawer.divider')}
-              </Divider>
+              {(disabledPaymentTypes?.includes(SalePaymentTypes.CREDIT)
+                && disabledPaymentTypes?.includes(SalePaymentTypes.DEBIT)) ?? (
+                <Divider
+                  size="small"
+                  rc={<Caption />}
+                  sx={{ my: 'base.spacing.x4' }}
+                >
+                  {t('views.ORDER_SUMMARY.coinsDrawer.divider')}
+                </Divider>
+              )}
               <PaymentOptions
                 onClick={onPayWithCard}
                 size={size}
-                paymentOptions={[SalePaymentTypes.DEBIT, SalePaymentTypes.CREDIT].filter(
-                  (type) => !disabledPaymentTypes?.includes(type),
-                )}
+                paymentOptions={[
+                  SalePaymentTypes.DEBIT,
+                  SalePaymentTypes.CREDIT,
+                ].filter((type) => !disabledPaymentTypes?.includes(type))}
                 captions={{
                   [SalePaymentTypes.DEBIT]: t(
                     'views.PAYMENT_METHODS.options.debit.caption',
