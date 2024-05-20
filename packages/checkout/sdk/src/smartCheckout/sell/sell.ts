@@ -7,6 +7,7 @@ import {
   PrepareListingResponse,
   constants,
   ERC721Item as OrderbookERC721Item,
+  ERC1155Item as OrderbookERC1155Item,
 } from '@imtbl/orderbook';
 import { BigNumber, Contract, utils } from 'ethers';
 import {
@@ -132,9 +133,10 @@ export const sell = async (
     const { seaportContractAddress } = orderbook.config();
     spenderAddress = seaportContractAddress;
 
-    const sellItem = 'type' in sellToken && sellToken.type === ItemType.ERC1155
+    const hasType = 'type' in sellToken;
+    const sellItem: OrderbookERC721Item | OrderbookERC1155Item = hasType && sellToken.type === ItemType.ERC1155
       ? {
-        type: sellToken.type,
+        type: ItemType.ERC1155,
         contractAddress: sellToken.collectionAddress,
         tokenId: sellToken.id,
         amount: sellToken.amount,
@@ -143,7 +145,7 @@ export const sell = async (
         type: ItemType.ERC721,
         contractAddress: sellToken.collectionAddress,
         tokenId: sellToken.id,
-      } as OrderbookERC721Item;
+      };
 
     listing = await measureAsyncExecution<PrepareListingResponse>(
       config,
@@ -167,11 +169,19 @@ export const sell = async (
     );
   }
 
-  const itemRequirements = [
-    'type' in sellToken && sellToken.type === ItemType.ERC1155
-      ? getERC1155Requirement(sellToken.id, sellToken.collectionAddress, spenderAddress, sellToken.amount)
-      : getERC721Requirement(sellToken.id, sellToken.collectionAddress, spenderAddress),
-  ];
+  const itemRequirements: (ERC721Item | ERC1155Item)[] = [];
+  if ('type' in sellToken && sellToken.type === ItemType.ERC1155) {
+    const erc1155ItemRequirement = getERC1155Requirement(
+      sellToken.id,
+      sellToken.collectionAddress,
+      spenderAddress,
+      sellToken.amount,
+    );
+    itemRequirements.push(erc1155ItemRequirement);
+  } else {
+    const erc721ItemRequirement = getERC721Requirement(sellToken.id, sellToken.collectionAddress, spenderAddress);
+    itemRequirements.push(erc721ItemRequirement);
+  }
 
   let smartCheckoutResult;
   const isPassport = (provider.provider as any)?.isPassport;
