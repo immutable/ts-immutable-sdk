@@ -134,7 +134,7 @@ describe('formatQuoteConversionRate', () => {
     });
   });
 
-  it('should handle fromAmount greater than 1000', () => {
+  it('should handle fromAmount greater than 1000 (with 18 decimals)', () => {
     const fromAmount = '1000.50';
     const fromToken = {
       name: 'ETH',
