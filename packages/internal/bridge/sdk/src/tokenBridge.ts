@@ -16,6 +16,7 @@ import {
   isValidDeposit,
   isValidWithdraw,
   isWithdrawNativeIMX,
+  isNativeTokenBridgeFeeRequest,
   isWithdrawWrappedIMX,
   isWrappedIMX,
   shouldBeDepositOrFinaliseWithdraw,
@@ -207,7 +208,7 @@ export class TokenBridge {
     }
 
     // Get approval fee
-    if ('token' in req && req.token.toUpperCase() !== NATIVE) {
+    if (!isNativeTokenBridgeFeeRequest(req)) {
       if (isValidDeposit(direction, this.config.bridgeInstance)) {
         approvalFee = calculateGasFee(feeData, BridgeMethodsGasLimit.APPROVE_TOKEN);
       } else if (isWithdrawWrappedIMX(req.token, direction, this.config.bridgeInstance)) {
