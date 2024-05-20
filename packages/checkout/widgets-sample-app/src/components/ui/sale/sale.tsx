@@ -150,7 +150,7 @@ export function SaleUI() {
   const saleWidget = useMemo(
     () =>
       factory.create(WidgetType.SALE, {
-        config: { theme: WidgetTheme.DARK, multicurrency },
+        config: { theme: WidgetTheme.DARK },
       }),
     [factory,  environmentId, collectionName, defaultItems]
   );
@@ -177,7 +177,7 @@ export function SaleUI() {
   // mount sale widget and subscribe to close event
   useEffect(() => {
     saleWidget.mount("sale", {
-      
+
       environmentId,
       collectionName,
       items: defaultItems,
@@ -208,7 +208,7 @@ export function SaleUI() {
     saleWidget.addListener(SaleEventType.REQUEST_ONRAMP, (event) => {
       saleWidget.unmount();
 
-      onrampWidget.mount("onramp");
+      onrampWidget.mount("onramp", event);
       onrampWidget.addListener(OnRampEventType.CLOSE_WIDGET, () => {
         onrampWidget.unmount();
       });
