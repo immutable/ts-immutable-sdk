@@ -6,7 +6,7 @@ export const mintingPersistence = (client: Pool): MintingPersistence => ({
     const r = await client.query(
       `
       INSERT INTO im_assets (asset_id, contract_address, owner_address, metadata) 
-      VALUES ($1, $2, $3, $4) ON CONFLICT (asset_id) DO NOTHING;
+      VALUES ($1, $2, $3, $4) ON CONFLICT (asset_id, contract_address) DO NOTHING;
       `,
       [request.asset_id, request.contract_address, request.owner_address, request.metadata]
     );
