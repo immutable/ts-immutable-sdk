@@ -112,18 +112,22 @@ export function CoinsDrawer({
                 />
               )}
             >
-              <Divider
-                size="small"
-                rc={<Caption />}
-                sx={{ my: 'base.spacing.x4' }}
-              >
-                {t('views.ORDER_SUMMARY.coinsDrawer.divider')}
-              </Divider>
+              {(disabledPaymentTypes?.includes(SalePaymentTypes.CREDIT)
+                && disabledPaymentTypes?.includes(SalePaymentTypes.DEBIT)) ?? (
+                <Divider
+                  size="small"
+                  rc={<Caption />}
+                  sx={{ my: 'base.spacing.x4' }}
+                >
+                  {t('views.ORDER_SUMMARY.coinsDrawer.divider')}
+                </Divider>
+              )}
               <PaymentOptions
                 onClick={onPayWithCard}
-                paymentOptions={[SalePaymentTypes.DEBIT, SalePaymentTypes.CREDIT].filter(
-                  (type) => !disabledPaymentTypes?.includes(type),
-                )}
+                paymentOptions={[
+                  SalePaymentTypes.DEBIT,
+                  SalePaymentTypes.CREDIT,
+                ].filter((type) => !disabledPaymentTypes?.includes(type))}
                 captions={{
                   [SalePaymentTypes.DEBIT]: t(
                     'views.ORDER_SUMMARY.coinsDrawer.payWithCard.caption',
