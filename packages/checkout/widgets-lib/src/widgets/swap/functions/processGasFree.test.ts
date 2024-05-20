@@ -6,7 +6,7 @@ import {
   Quote,
   TransactionResponse,
 } from '@imtbl/dex-sdk';
-import { isPassportProvider } from '../../../lib/provider';
+import { isGasFree } from '../../../lib/provider';
 import { processGasFree } from './processGasFree';
 
 jest.mock('../../../lib/provider');
@@ -68,20 +68,20 @@ describe('processGasFree', () => {
   });
 
   it('should return the unmodified quote if the provider is not a passport provider', () => {
-    (isPassportProvider as jest.Mock).mockReturnValue(false);
+    (isGasFree as jest.Mock).mockReturnValue(false);
     const result = processGasFree(mockMetaMaskProvider, mockQuote);
     expect(result).toEqual(mockQuote);
   });
 
   it('should set gas fees to zero if the provider is a passport provider', () => {
-    (isPassportProvider as jest.Mock).mockReturnValue(true);
+    (isGasFree as jest.Mock).mockReturnValue(true);
     const result = processGasFree(mockPassportProvider, mockQuote);
     expect(result.swap.gasFeeEstimate!.value).toEqual(BigNumber.from(0));
     expect(result.approval!.gasFeeEstimate!.value).toEqual(BigNumber.from(0));
   });
 
   it('should handle quotes without swap or approval gas fees gracefully', () => {
-    (isPassportProvider as jest.Mock).mockReturnValue(true);
+    (isGasFree as jest.Mock).mockReturnValue(true);
     const incompleteQuote = { ...mockQuote, swap: undefined, approval: undefined } as unknown as TransactionResponse;
 
     const result = processGasFree(mockPassportProvider, incompleteQuote);
