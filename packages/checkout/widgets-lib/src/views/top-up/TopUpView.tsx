@@ -19,7 +19,6 @@ import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { Web3Provider } from '@ethersproject/providers';
 import { useTranslation } from 'react-i18next';
 import { $Dictionary } from 'i18next/typescript/helpers';
-import { FooterLogo } from '../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
 import {
@@ -337,7 +336,6 @@ export function TopUpView({
           showBack
         />
       )}
-      footer={<FooterLogo />}
     >
       <Box sx={{ paddingX: 'base.spacing.x4', paddingY: 'base.spacing.x4' }}>
         <Heading size="small">{title}</Heading>
