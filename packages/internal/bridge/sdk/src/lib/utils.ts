@@ -7,10 +7,11 @@ import {
   axelarAPIEndpoints,
   tenderlyAPIEndpoints,
   childWIMXs,
+  NATIVE,
 } from 'constants/bridges';
 import {
   BridgeDirection,
-  BridgeFeeActions, BridgeInstance, FungibleToken,
+  BridgeFeeActions, BridgeFeeRequest, BridgeInstance, FungibleToken,
 } from 'types';
 
 function getAddresses(source:string, addresses:Record<string, string>) {
@@ -109,6 +110,11 @@ export function isWithdrawNativeIMX(
   bridgeInstance: BridgeInstance,
 ): boolean {
   return isValidWithdraw(direction, bridgeInstance) && !isWrappedIMX(token, direction.sourceChainId);
+}
+
+// Return true if a BridgeFeeRequest is for a native token bridge interaction.
+export function isNativeTokenBridgeFeeRequest(req: BridgeFeeRequest): boolean {
+  return !('token' in req) || req.token.toUpperCase() === NATIVE;
 }
 
 export function isWithdrawWrappedIMX(

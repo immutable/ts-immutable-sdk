@@ -16,6 +16,7 @@ import {
   isValidDeposit,
   isValidWithdraw,
   isWithdrawNativeIMX,
+  isNativeTokenBridgeFeeRequest,
   isWithdrawWrappedIMX,
   isWrappedIMX,
   shouldBeDepositOrFinaliseWithdraw,
@@ -207,7 +208,7 @@ export class TokenBridge {
     }
 
     // Get approval fee
-    if ('token' in req && req.token.toUpperCase() !== NATIVE) {
+    if (!isNativeTokenBridgeFeeRequest(req)) {
       if (isValidDeposit(direction, this.config.bridgeInstance)) {
         approvalFee = calculateGasFee(feeData, BridgeMethodsGasLimit.APPROVE_TOKEN);
       } else if (isWithdrawWrappedIMX(req.token, direction, this.config.bridgeInstance)) {
@@ -384,39 +385,40 @@ export class TokenBridge {
     const currentBridgeMethods = await this.getBridgeMethods(direction);
     const bridgeContract = await this.getBridgeContract(direction);
 
+    let functionName: string;
+    let parameters: any[];
     /**
      * Handle bridge transaction for native token
      */
     if (token.toUpperCase() === NATIVE) {
       if (sender === recipient) {
         // Deposit or withdraw native token
-        return await withBridgeError<string>(async () => bridgeContract.interface.encodeFunctionData(
-          currentBridgeMethods.native,
-          [amount],
-        ), BridgeErrorType.INTERNAL_ERROR);
+        functionName = currentBridgeMethods.native;
+        parameters = [amount];
+      } else {
+        // Deposit or withdraw native token TO
+        functionName = currentBridgeMethods.nativeTo;
+        parameters = [recipient, amount];
       }
-      // Deposit or withdraw native token TO
-      return await withBridgeError<string>(async () => bridgeContract.interface.encodeFunctionData(
-        currentBridgeMethods.nativeTo,
-        [recipient, amount],
-      ), BridgeErrorType.INTERNAL_ERROR);
+    } else {
+      /**
+       * Handle bridge transaction for ERC20
+       */
+      const erc20Token = ethers.utils.getAddress(token);
+      if (sender === recipient) {
+        // Deposit or withdraw ERC20
+        functionName = currentBridgeMethods.token;
+        parameters = [erc20Token, amount];
+      } else {
+        // Deposit or withdraw ERC20 TO.
+        functionName = currentBridgeMethods.tokenTo;
+        parameters = [erc20Token, recipient, amount];
+      }
     }
 
-    /**
-     * Handle bridge transaction for ERC20
-     */
-    const erc20Token = ethers.utils.getAddress(token);
-    if (sender === recipient) {
-      // Deposit or withdraw ERC20
-      return await withBridgeError<string>(async () => bridgeContract.interface.encodeFunctionData(
-        currentBridgeMethods.token,
-        [erc20Token, amount],
-      ), BridgeErrorType.INTERNAL_ERROR);
-    }
-    // Deposit or withdraw ERC20 TO.
     return await withBridgeError<string>(async () => bridgeContract.interface.encodeFunctionData(
-      currentBridgeMethods.tokenTo,
-      [erc20Token, recipient, amount],
+      functionName,
+      parameters,
     ), BridgeErrorType.INTERNAL_ERROR);
   }
 
