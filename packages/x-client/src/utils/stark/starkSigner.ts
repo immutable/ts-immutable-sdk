@@ -1,5 +1,6 @@
 // @ts-ignore
 import elliptic from 'elliptic';
+// @ts-ignore
 import * as encUtils from 'enc-utils';
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import BN from 'bn.js';
@@ -28,6 +29,17 @@ export class StandardStarkSigner implements StarkSigner {
     return encUtils.addHexPrefix(
       encUtils.padLeft(sig.r.toString('hex'), 64)
         + encUtils.padLeft(sig.s.toString('hex'), 64),
+    );
+  }
+
+  public async sign(msg: string) {
+    return this.keyPair.sign(this.fixMsgHashLen(msg));
+  }
+
+  public getYCoordinate(): string {
+    return encUtils.sanitizeBytes(
+      this.keyPair.getPublic().getY().toString(16),
+      2,
     );
   }
 

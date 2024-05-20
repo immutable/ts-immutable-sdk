@@ -1,7 +1,12 @@
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import BN from 'bn.js';
+// @ts-ignore
+import elliptic from 'elliptic';
 import * as encUtils from 'enc-utils';
 import { Signer } from '@ethersproject/abstract-signer';
+import { solidityKeccak256 } from 'ethers/lib/utils';
+import { StarkSigner } from '../../types';
+import { starkEcOrder } from '../stark/starkCurve';
 
 type SignatureOptions = {
   r: BN;
@@ -76,4 +81,39 @@ export async function signMessage(
     ethAddress,
     ethSignature,
   };
+}
+
+export function serializePackedSignature(
+  // elliptic signature object
+  // eslint-disable-line @typescript-eslint/no-explicit-any
+  sig: any,
+  pubY: string,
+): string {
+  return encUtils.sanitizeHex(
+    encUtils.padLeft(sig.r.toString(16), 64)
+    + encUtils.padLeft(sig.s.toString(16), 64, '0')
+    + encUtils.padLeft(
+      new BN(encUtils.removeHexPrefix(pubY), 'hex').toString(16),
+      64,
+      '0',
+    ),
+  );
+}
+
+export async function signRegisterEthAddress(
+  starkSigner: StarkSigner,
+  ethAddress: string,
+  starkPublicKey: string,
+): Promise<string> {
+  const hash: string = solidityKeccak256(
+    ['string', 'address', 'uint256'],
+    ['UserRegistration:', ethAddress, starkPublicKey],
+  );
+  const msgHash: BN = new BN(encUtils.removeHexPrefix(hash), 16);
+  const modMsgHash: BN = msgHash.mod(starkEcOrder);
+  const signature: elliptic.ec.Signature = await starkSigner.sign(
+    modMsgHash.toString(16),
+  );
+  const pubY: string = encUtils.sanitizeHex(starkSigner.getYCoordinate());
+  return serializePackedSignature(signature, pubY);
 }
