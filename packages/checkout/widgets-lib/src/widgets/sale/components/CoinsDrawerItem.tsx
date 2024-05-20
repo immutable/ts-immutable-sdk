@@ -1,10 +1,8 @@
-import { Heading, MenuItem, prettyFormatNumber } from '@biom3/react';
 import {
-  Fee,
-  FundingStepType,
-  ItemType,
-  TransactionRequirement,
-} from '@imtbl/checkout-sdk';
+  Box,
+  Heading, MenuItem, MenuItemSize, prettyFormatNumber,
+} from '@biom3/react';
+import { TransactionRequirement } from '@imtbl/checkout-sdk';
 import {
   calculateCryptoToFiat,
   getDefaultTokenImage,
@@ -12,62 +10,16 @@ import {
 } from 'lib/utils';
 import { useTranslation } from 'react-i18next';
 import { ReactElement } from 'react';
-import { BigNumber, utils } from 'ethers';
+
 import { useSaleContext } from '../context/SaleContextProvider';
 import { FundingBalance } from '../types';
-
-type FeesBySymbol = Record<
-string,
-{ amount: BigNumber; formattedAmount: string; symbol: string }
->;
-const calculateFeeAmount = (balance: FundingBalance): FeesBySymbol => {
-  let fees: Fee[] = [];
-  if (balance.type === FundingStepType.SWAP) {
-    fees = [
-      balance.fees.approvalGasFee,
-      balance.fees.swapGasFee,
-      ...balance.fees.swapFees,
-    ];
-  }
-
-  const totalFees = fees
-    .filter((fee) => fee.amount.gt(0) && fee.token)
-    .reduce((acc, { amount, token }) => {
-      if (!token) return acc;
-
-      if (acc[token.symbol]) {
-        const newAmount = acc[token.symbol].amount.add(amount);
-        return {
-          ...acc,
-          [token.symbol]: {
-            ...acc[token.symbol],
-            amount: newAmount,
-            formattedAmount: utils.formatUnits(newAmount, token.decimals),
-          },
-        };
-      }
-
-      if (token.symbol) {
-        return {
-          ...acc,
-          [token.symbol]: {
-            amount,
-            symbol: token.symbol,
-            formattedAmount: utils.formatUnits(amount, token.decimals),
-          },
-        };
-      }
-
-      return acc;
-    }, {} as FeesBySymbol);
-
-  return totalFees;
-};
+import { getFundingBalanceTotalFees } from '../functions/fundingBalanceFees';
 
 export interface CoinDrawerItemProps<
   RC extends ReactElement | undefined = undefined,
 > {
   rc?: RC;
+  size: MenuItemSize;
   balance: FundingBalance;
   conversions: Map<string, number>;
   selected: boolean;
@@ -82,8 +34,8 @@ export function CoinsDrawerItem<
   balance,
   conversions,
   selected,
-  transactionRequirement,
   onClick,
+  size,
 }: CoinDrawerItemProps<RC>) {
   const { t } = useTranslation();
   const {
@@ -91,7 +43,7 @@ export function CoinsDrawerItem<
     config: { theme },
   } = useSaleContext();
 
-  const { token, userBalance, fundsRequired } = balance.fundingItem;
+  const { token, userBalance } = balance.fundingItem;
 
   const fiatAmount = calculateCryptoToFiat(
     userBalance.formattedBalance,
@@ -99,7 +51,7 @@ export function CoinsDrawerItem<
     conversions,
     '',
   );
-  const fees = Object.entries(calculateFeeAmount(balance));
+  const fees = Object.entries(getFundingBalanceTotalFees(balance));
 
   const menuProps = {
     onClick,
@@ -110,7 +62,7 @@ export function CoinsDrawerItem<
     <MenuItem
       rc={rc}
       sx={{ mb: 'base.spacing.x1' }}
-      size="medium"
+      size={size}
       emphasized
       {...menuProps}
     >
@@ -133,37 +85,14 @@ export function CoinsDrawerItem<
         {token.symbol}
       </MenuItem.Label>
       <MenuItem.Caption>
-        {t(
-          `views.ORDER_SUMMARY.coinsDrawer.stepType${
-            transactionRequirement?.sufficient ? '.' : '.delta.'
-          }${balance.type}`,
-          {
-            required: {
-              symbol:
-                transactionRequirement?.current.type !== ItemType.ERC721
-                && transactionRequirement?.current.token.symbol,
-              amount: prettyFormatNumber(
-                tokenValueFormat(
-                  transactionRequirement?.current.formattedBalance || 0,
-                ),
-              ),
-            },
-            symbol: balance.fundingItem.token.symbol,
-            amount: prettyFormatNumber(
-              tokenValueFormat(fundsRequired.formattedAmount),
-            ),
-          },
-        )}
-        {fees.length > 0 && ' | '}
         {fees.length > 0
-          && fees.map(([symbol, { formattedAmount }]) => (
-            <span key={symbol}>
+          && fees.map(([key, { token: tokenInfo, formattedAmount }]) => (
+            <Box key={key} rc={<span />} sx={{ d: 'block' }}>
               {t('views.ORDER_SUMMARY.coinsDrawer.fee', {
-                symbol,
+                symbol: tokenInfo?.symbol || key,
                 amount: prettyFormatNumber(tokenValueFormat(formattedAmount)),
               })}
-              &nbsp;
-            </span>
+            </Box>
           ))}
       </MenuItem.Caption>
     </MenuItem>
