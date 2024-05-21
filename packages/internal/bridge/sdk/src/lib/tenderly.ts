@@ -5,8 +5,6 @@ import { BridgeError, BridgeErrorType } from 'errors';
 import { TenderlySimulation } from 'types/tenderly';
 import { getTenderlyEndpoint } from './utils';
 
-// TODO this function should have tests. We can write these when we introduce a separate class
-// for tenderly stuff
 // TODO generate a type for these state objects. Readability could be improved from the double nested Record
 /**
  * Submits tenderly simulations, returning an array of gas usage estimates
