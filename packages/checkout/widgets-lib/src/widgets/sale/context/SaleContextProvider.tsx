@@ -44,6 +44,7 @@ type SaleContextProps = {
   checkout: ConnectLoaderState['checkout'];
   passport?: Passport;
   excludePaymentTypes: SalePaymentTypes[];
+  preferredCurrency?: string;
   waitFulfillmentSettlements: boolean;
 };
 
@@ -115,6 +116,7 @@ const SaleContext = createContext<SaleContextValues>({
   orderQuote: defaultOrderQuote,
   signTokenIds: [],
   excludePaymentTypes: [],
+  preferredCurrency: undefined,
   selectedCurrency: undefined,
   waitFulfillmentSettlements: true,
 });
@@ -140,6 +142,7 @@ export function SaleContextProvider(props: {
       passport,
       collectionName,
       excludePaymentTypes,
+      preferredCurrency,
       waitFulfillmentSettlements,
     },
   } = props;
@@ -182,6 +185,7 @@ export function SaleContextProvider(props: {
     provider,
     environmentId,
     environment: config.environment,
+    preferredCurrency,
   });
 
   const fromTokenAddress = selectedCurrency?.address || '';
