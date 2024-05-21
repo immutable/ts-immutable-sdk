@@ -8,6 +8,8 @@ import PassportRedirect from './components/PassportRedirect.tsx';
 const PUBLISHABLE_KEY = 'PUBLISHABLE_KEY';
 const CLIENT_ID = 'CLIENT_ID';
 
+export const PASSPORT_CONNECTOR_ID = 'com.immutable.passport';
+
 export const passportInstance = new passport.Passport({
   baseConfig: {
     environment: config.Environment.PRODUCTION,
