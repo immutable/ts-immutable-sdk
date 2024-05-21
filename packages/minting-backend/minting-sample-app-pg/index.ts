@@ -19,6 +19,15 @@ const pgClient = new Pool({
 // persistence setup for minting backend
 const mintingPersistence = mintingBackend.mintingPersistencePg(pgClient);
 
+const minting = new mintingBackend.MintingBackendModule({
+  baseConfig: {
+    environment: config.Environment.SANDBOX,
+    apiKey: process.env.IM_API_KEY,
+  },
+  persistence: mintingPersistence,
+  logger: console,
+})
+
 // blockchainData client for submit minting.
 export const blockchainDataClient = new blockchainData.BlockchainData({
   baseConfig: {
@@ -32,7 +41,7 @@ export interface MintRequest {
 }
 
 // mint route
-fastify.post('/mint', async (request: FastifyRequest<{Body: MintRequest}>, reply: FastifyReply) => {
+fastify.post('/mint', async (request: FastifyRequest<{ Body: MintRequest }>, reply: FastifyReply) => {
   const collectionAddress = process.env.COLLECTION_ADDRESS as string;
   const assetId = uuidv4();
   const mintTo = request.body.mintTo;
@@ -42,7 +51,7 @@ fastify.post('/mint', async (request: FastifyRequest<{Body: MintRequest}>, reply
     image: 'https://placehold.co/600x400',
   };
 
-  await mintingBackend.recordMint(mintingPersistence, {
+  await minting.recordMint({
     asset_id: assetId,
     contract_address: collectionAddress,
     owner_address: mintTo,
@@ -53,12 +62,7 @@ fastify.post('/mint', async (request: FastifyRequest<{Body: MintRequest}>, reply
 
 const url = "/api/process_webhook_event" // Set this url on the wbehook config screen in hub.immutable.com
 fastify.post(url, async (request: FastifyRequest<any>, reply: any) => {
-  await webhook.init(request.body as any, config.Environment.SANDBOX, {
-    zkevmMintRequestUpdated: async (event) => {
-      mintingBackend.processMint(mintingPersistence, event);
-    }
-  });
-
+  await minting.processMint(request.body as any);
   reply.send({ status: "ok" });
 });
 
@@ -71,12 +75,7 @@ const start = async () => {
     await fastify.listen({ port: 3000 })
 
     // long running process to submit minting requests
-    await mintingBackend.submitMintingRequests(
-      mintingBackend.mintingPersistencePg(pgClient),
-      blockchainDataClient,
-      {},
-      console
-    )
+    await minting.submitMintingRequests({});
 
   } catch (err) {
     fastify.log.error(err)
