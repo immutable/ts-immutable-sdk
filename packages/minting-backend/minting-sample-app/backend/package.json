@@ -14,7 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "@fastify/cors": "^9.0.1",
-    "@imtbl/sdk": "1.35.1-alpha",
+    "@imtbl/sdk": "1.36.1-alpha",
     "@prisma/client": "^5.12.1",
     "@types/jsonwebtoken": "^9.0.6",
     "aws-sdk": "^2.1603.0",

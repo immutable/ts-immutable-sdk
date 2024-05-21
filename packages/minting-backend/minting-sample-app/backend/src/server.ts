@@ -10,7 +10,7 @@ import logger from "./logger";
 import { ExtendedMintPhase, eoaMintRequest } from "./types";
 import { recoverMessageAddress, verifyMessage, isAddress } from "viem";
 import { v4 as uuidv4 } from "uuid";
-import { mintingBackend, webhook } from '@imtbl/sdk';
+import { mintingBackend } from '@imtbl/sdk';
 import { client } from './dbClient';
 import { blockchainDataClient } from "./blockchainDataClient";
 
@@ -19,6 +19,16 @@ let jwk: string;
 let totalMintCount: number;
 
 const mintingPersistence = mintingBackend.mintingPersistencePrismaSqlite(client);
+
+const minting = new mintingBackend.MintingBackendModule({
+  baseConfig: {
+    environment: environment,
+    apiKey: serverConfig[environment].HUB_API_KEY,
+    rateLimitingKey: serverConfig[environment].RPS_API_KEY,
+  },
+  persistence: mintingPersistence,
+  logger
+})
 
 // Enable CORS with specified options for API security and flexibility
 fastify.register(cors, {
@@ -170,7 +180,7 @@ fastify.post("/mint/passport", async (request: FastifyRequest, reply: FastifyRep
   logger.info(`Attempting to mint NFT wallet address ${walletAddress} with UUID ${assetId}`);
   try {
     // Record the minting operation in the database
-    await mintingBackend.recordMint(mintingPersistence, {
+    await minting.recordMint({
       asset_id: assetId,
       contract_address: serverConfig[environment].collectionAddress,
       owner_address: walletAddress,
@@ -276,15 +286,12 @@ fastify.post("/mint/eoa", async (request: eoaMintRequest, reply: FastifyReply) =
   logger.info(`Record intention to mint NFT to wallet address ${walletAddress} with UUID ${assetId}`);
   try {
     // Record the minting operation in the database
-    await mintingBackend.recordMint(
-      mintingPersistence,
-      {
-        asset_id: assetId,
-        contract_address: serverConfig[environment].collectionAddress,
-        owner_address: walletAddress,
-        metadata: serverConfig[environment].metadata,
-      }
-    );
+    await minting.recordMint({
+      asset_id: assetId,
+      contract_address: serverConfig[environment].collectionAddress,
+      owner_address: walletAddress,
+      metadata: serverConfig[environment].metadata,
+    });
 
     totalMintCount++;
     logger.info(`Total mint count: ${totalMintCount}`);
@@ -335,11 +342,7 @@ fastify.get("/get-mint-request/:referenceId", async (request: FastifyRequest<{ P
 
 fastify.post("/api/process_webhook_event", async (request: FastifyRequest<any>, reply: any) => {
   console.log(request);
-  await webhook.init(request.body as any, environment, {
-    zkevmMintRequestUpdated: async (event) => {
-      mintingBackend.processMint(mintingPersistence, event);
-    }
-  });
+  await minting.processMint(request.body as any);;
 
   reply.send({ status: "ok" });
 });
@@ -382,12 +385,7 @@ const start = async () => {
       logger.info(`Active phase: ${returnActivePhase()}`);
     }
 
-    mintingBackend.submitMintingRequests(
-      mintingBackend.mintingPersistencePrismaSqlite(client),
-      blockchainDataClient,
-      {},
-      logger
-    )
+    await minting.submitMintingRequests({})
   } catch (err) {
     logger.error(`Error starting server: ${err}`);
     // Optionally, you might want to handle specific errors differently here
