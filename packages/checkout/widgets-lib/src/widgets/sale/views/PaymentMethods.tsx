@@ -85,7 +85,7 @@ export function PaymentMethods() {
 
   useEffect(() => {
     // We need OrderQuote on this page view, but don't want to slow load of page by waiting for it
-    if (!orderQuote || !orderQuote?.totalAmount?.USD?.amount) return;
+    if (!orderQuote || orderQuote?.totalAmount?.USD?.amount === undefined) return;
     sendPageView(SaleWidgetViews.PAYMENT_METHODS);
   }, [orderQuote]); // checkoutPrimarySalePaymentMethodsViewed
 
