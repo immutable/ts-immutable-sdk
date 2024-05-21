@@ -112,7 +112,7 @@ export type OrderQuote = {
   },
   currencies: Array<OrderQuoteCurrency>;
   products: Record<string, OrderQuoteProduct>;
-  totalAmount: Record<string, OrderQuotePricing>;
+  totalAmount?: Record<string, OrderQuotePricing>;
 };
 
 export enum SignPaymentTypes {

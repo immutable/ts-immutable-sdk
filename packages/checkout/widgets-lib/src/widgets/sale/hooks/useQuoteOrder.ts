@@ -21,7 +21,7 @@ export const defaultOrderQuote: OrderQuote = {
   },
   currencies: [],
   products: {},
-  totalAmount: {},
+  totalAmount: undefined,
 };
 
 export type ConfigError = {
