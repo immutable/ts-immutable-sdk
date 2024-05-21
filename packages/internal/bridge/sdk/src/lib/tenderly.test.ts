@@ -6,25 +6,6 @@ import { getTenderlyEndpoint } from './utils';
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-/*
-      tenderlyAPI,
-      {
-        jsonrpc: '2.0',
-        id: 0,
-        method: 'tenderly_estimateGasBundle',
-        params: [
-          simulations,
-          'latest',
-          state_objects,
-        ],
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      },
-*/
-
 const axiosHeaders = {
   headers: {
     // eslint-disable-next-line @typescript-eslint/naming-convention

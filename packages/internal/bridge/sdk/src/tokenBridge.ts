@@ -24,6 +24,7 @@ import { TenderlySimulation } from 'types/tenderly';
 import { calculateGasFee } from 'lib/gas';
 import { createContract } from 'contracts/createContract';
 import { getWithdrawRootToken, genAxelarWithdrawPayload, genUniqueAxelarCommandId } from 'lib/axelarUtils';
+import { submitTenderlySimulations } from 'lib/tenderly';
 import {
   NATIVE,
   ETHEREUM_NATIVE_TOKEN_ADDRESS,
@@ -861,7 +862,8 @@ export class TokenBridge {
       value: txValue,
     });
 
-    const gas = await this.submitTenderlySimulations(sourceChainId, simulations);
+    // TODO this specific branch does not have tests written
+    const gas = await submitTenderlySimulations(sourceChainId, simulations);
     const tenderlyGasEstimatesRes = {} as DynamicGasEstimatesResponse;
     if (gas.length === 1) {
       tenderlyGasEstimatesRes.approvalGas = 0;
@@ -923,7 +925,7 @@ export class TokenBridge {
       data: executeData,
     }];
 
-    const gas = await this.submitTenderlySimulations(destinationChainId, simulations, {
+    const gas = await submitTenderlySimulations(destinationChainId, simulations, {
       [axelarGateway]: {
         stateDiff: {
           // Override storage to approve this command.
