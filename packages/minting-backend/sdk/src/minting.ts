@@ -5,6 +5,7 @@ import { BlockchainData as Types } from '@imtbl/generated-clients';
 import { BlockchainData } from '@imtbl/blockchain-data';
 import { CreateMintRequest, MintRequest, MintingPersistence } from './persistence/type';
 import { Logger } from './logger/type';
+import { trackProcessMint, trackRecordMint, trackSubmitMintingRequests } from './analytics';
 
 // TODO: expose metrics
 //       - submitting status count, conflicting status count
@@ -14,6 +15,7 @@ export const recordMint = async (
   mintingPersistence: MintingPersistence,
   mintRequest: CreateMintRequest
 ) => {
+  trackRecordMint();
   mintingPersistence.recordMint(mintRequest);
 };
 
@@ -32,6 +34,7 @@ export const submitMintingRequests = async (
   },
   logger: Logger = console
 ) => {
+  trackSubmitMintingRequests();
   let mintingResponse: Types.CreateMintRequestResult | undefined;
   // eslint-disable-next-line no-constant-condition
   while (true) {
@@ -214,6 +217,7 @@ export const processMint = async (
   event: MintRequestEvent,
   logger: Logger = console
 ) => {
+  trackProcessMint();
   if (event.event_name !== 'imtbl_zkevm_mint_request_updated') {
     logger.info(
       `${event.event_name} is not imtbl_zkevm_mint_request_updated, skip.`
