@@ -31,6 +31,7 @@ export function PaymentMethods() {
     setPaymentMethod,
     disabledPaymentTypes,
     invalidParameters,
+    orderQuote,
   } = useSaleContext();
   const { sendPageView, sendCloseEvent, sendSelectedPaymentMethod } = useSaleEvent();
 
@@ -82,7 +83,12 @@ export function PaymentMethods() {
     }
   }, [paymentMethod]);
 
-  useEffect(() => sendPageView(SaleWidgetViews.PAYMENT_METHODS), []); // checkoutPrimarySalePaymentMethodsViewed
+  useEffect(() => {
+    // We need OrderQuote on this page view, but don't want to slow load of page by waiting for it
+    if (!orderQuote || !orderQuote?.totalAmount?.USD?.amount) return;
+    sendPageView(SaleWidgetViews.PAYMENT_METHODS);
+  }, [orderQuote]); // checkoutPrimarySalePaymentMethodsViewed
+
   useEffect(() => {
     if (!invalidParameters) return;
     goToErrorView(SaleErrorTypes.INVALID_PARAMETERS);

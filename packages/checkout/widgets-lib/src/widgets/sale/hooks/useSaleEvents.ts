@@ -1,24 +1,24 @@
-import { useContext } from 'react';
-import { StandardAnalyticsActions } from '@imtbl/react-analytics';
 import { FundingItem, SalePaymentTypes } from '@imtbl/checkout-sdk';
+import { StandardAnalyticsActions } from '@imtbl/react-analytics';
+import { useContext } from 'react';
 import {
+  AnalyticsControlTypes,
   UserJourney,
   useAnalytics,
-  AnalyticsControlTypes,
 } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
+import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 import {
   sendSaleFailedEvent,
-  sendSaleSuccessEvent,
-  sendSaleWidgetCloseEvent,
-  sendSaleTransactionSuccessEvent,
   sendSalePaymentMethodEvent,
   sendSalePaymentTokenEvent,
+  sendSaleSuccessEvent,
+  sendSaleTransactionSuccessEvent,
+  sendSaleWidgetCloseEvent,
 } from '../SaleWidgetEvents';
-import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
-import { ExecutedTransaction } from '../types';
 import { useSaleContext } from '../context/SaleContextProvider';
 import { toPascalCase, toStringifyTransactions } from '../functions/utils';
+import { ExecutedTransaction } from '../types';
 import { getPaymentTokenDetails } from '../utils/analytics';
 
 export const useSaleEvent = () => {
@@ -27,6 +27,7 @@ export const useSaleEvent = () => {
     recipientAddress: userId,
     signResponse,
     paymentMethod,
+    orderQuote,
   } = useSaleContext();
   const {
     eventTargetState: { eventTarget },
@@ -39,6 +40,7 @@ export const useSaleEvent = () => {
   const userProps = {
     userId,
     paymentMethod,
+    orderQuote,
   };
   const orderProps = {
     amount: signResponse?.order.totalAmount,
@@ -140,6 +142,7 @@ export const useSaleEvent = () => {
       control: 'Select',
       controlType: 'MenuItem',
       extras: {
+        ...userProps,
         paymentMethod: type,
       },
     });
@@ -158,6 +161,7 @@ export const useSaleEvent = () => {
       control: 'Select',
       controlType: 'MenuItem',
       extras: {
+        ...userProps,
         ...details,
       },
     });
@@ -169,7 +173,10 @@ export const useSaleEvent = () => {
       ...commonProps,
       screen: toPascalCase(screen),
       action: 'Viewed',
-      extras: { ...data },
+      extras: {
+        ...userProps,
+        ...data,
+      },
     });
   };
 
@@ -183,6 +190,7 @@ export const useSaleEvent = () => {
       control: 'OrderCreated',
       controlType: 'Event',
       extras: {
+        ...userProps,
         ...details,
       },
     });
