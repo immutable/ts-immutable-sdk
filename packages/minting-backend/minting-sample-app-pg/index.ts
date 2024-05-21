@@ -1,5 +1,5 @@
 import Fastify, { FastifyReply, FastifyRequest } from 'fastify'
-import { mintingBackend, blockchainData, config, webhook } from '@imtbl/sdk';
+import { mintingBackend, config } from '@imtbl/sdk';
 import { Pool } from 'pg';
 import { v4 as uuidv4 } from 'uuid';
 
