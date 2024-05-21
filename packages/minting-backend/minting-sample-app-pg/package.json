@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@imtbl/sdk": "^1.36.0-alpha",
+    "@imtbl/sdk": "1.36.1-alpha",
     "@types/pg": "^8.11.6",
     "@types/uuid": "^9.0.8",
     "fastify": "^4.27.0",
