@@ -6,8 +6,11 @@ import {
 } from './transformToOrderQuote';
 
 describe('transformToOrderQuote', () => {
-  it('should return input object with camel case keys', () => {
-    const from: OrderQuoteApiResponse = {
+  let quoteResponse: OrderQuoteApiResponse;
+  let expectedResponse: OrderQuote;
+
+  beforeEach(() => {
+    quoteResponse = {
       config: {
         contract_id: '',
       },
@@ -86,7 +89,7 @@ describe('transformToOrderQuote', () => {
       },
     };
 
-    const expected: OrderQuote = {
+    expectedResponse = {
       config: {
         contractId: '',
       },
@@ -164,7 +167,31 @@ describe('transformToOrderQuote', () => {
         },
       },
     };
+  });
 
-    expect(transformToOrderQuote(from)).toStrictEqual(expected);
+  it('should transform response into order quote object', () => {
+    expect(transformToOrderQuote(quoteResponse)).toStrictEqual(
+      expectedResponse,
+    );
+  });
+
+  it('should filter currencies by preferred currency (no case sensitive)', () => {
+    const result = transformToOrderQuote(quoteResponse, 'goG');
+    expect(result.currencies.length).toBe(1);
+    expect(result.currencies).toStrictEqual([
+      {
+        base: true,
+        decimals: 18,
+        address: '0xb8ee289c64c1a0dc0311364721ada8c3180d838c',
+        exchangeId: 'guild-of-guardians',
+        name: 'GOG',
+      },
+    ]);
+  });
+
+  it('should not filter if invalid preferred currency', () => {
+    expect(transformToOrderQuote(quoteResponse, 'tIMX')).toStrictEqual(
+      expectedResponse,
+    );
   });
 });

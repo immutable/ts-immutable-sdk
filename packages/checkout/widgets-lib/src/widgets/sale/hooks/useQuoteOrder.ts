@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Environment } from '@imtbl/config';
 import { SaleItem } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
+import { compareStr } from 'lib/utils';
 import { PRIMARY_SALES_API_BASE_URL } from '../utils/config';
 
 import { OrderQuote, OrderQuoteCurrency, SaleErrorTypes } from '../types';
@@ -96,7 +97,10 @@ export const useQuoteOrder = ({
           throw new Error(`${response.status} - ${response.statusText}`);
         }
 
-        const config = transformToOrderQuote(await response.json());
+        const config = transformToOrderQuote(
+          await response.json(),
+          preferredCurrency,
+        );
         setOrderQuote(config);
       } catch (error) {
         setError(error);
@@ -111,7 +115,7 @@ export const useQuoteOrder = ({
     if (orderQuote.currencies.length === 0) return;
 
     const baseCurrencyOverride = preferredCurrency
-      ? orderQuote.currencies.find((c) => c.name === preferredCurrency)
+      ? orderQuote.currencies.find((c) => compareStr(c.name, preferredCurrency))
       : undefined;
 
     const defaultSelectedCurrency = baseCurrencyOverride

@@ -182,3 +182,7 @@ export function abbreviateWalletAddress(address: string, separator = '.....', fi
   const lastPart = address.slice(-lastChars);
   return `${firstPart}${separator}${lastPart}`;
 }
+
+export function compareStr(a: string, b: string): boolean {
+  return a.toLowerCase() === b.toLowerCase();
+}
