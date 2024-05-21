@@ -51,7 +51,11 @@ export function OrderItem<RC extends ReactElement | undefined = undefined>({
         ...sx,
       }}
     >
-      <MenuItem.FramedImage imageUrl={item.image} />
+      <MenuItem.FramedImage
+        use={(
+          <img src={item.image} alt={item.name} />
+        )}
+      />
       <MenuItem.Label>{item.name}</MenuItem.Label>
       <MenuItem.Caption>
         {t('views.ORDER_SUMMARY.orderItem.quantity', { qty: item.qty })}
