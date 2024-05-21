@@ -26,17 +26,9 @@ const minting = new mintingBackend.MintingBackendModule({
   },
   persistence: mintingPersistence,
   logger: console,
-})
-
-// blockchainData client for submit minting.
-export const blockchainDataClient = new blockchainData.BlockchainData({
-  baseConfig: {
-    environment: config.Environment.SANDBOX,
-    apiKey: process.env.IM_API_KEY,
-  },
 });
 
-export interface MintRequest {
+interface MintRequest {
   mintTo: string;
 }
 
