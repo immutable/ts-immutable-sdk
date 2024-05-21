@@ -78,8 +78,8 @@ export async function isRegisteredOnChain(
 ): Promise<boolean> {
   await validateChain(ethSigner, config.immutableXConfig);
 
-  const registrationContract = Contracts.Registration.connect(
-    config.immutableXConfig.ethConfiguration.registrationContractAddress,
+  const registrationContract = Contracts.RegistrationV4.connect(
+      config.immutableXConfig.ethConfiguration.registrationV4ContractAddress || config.immutableXConfig.ethConfiguration.registrationContractAddress,
     ethSigner,
   );
 
