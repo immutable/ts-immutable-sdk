@@ -69,8 +69,12 @@ export function CoinsDrawerItem<
       <MenuItem.FramedImage
         circularFrame
         alt={token.name}
-        imageUrl={token.icon}
-        defaultImageUrl={getDefaultTokenImage(environment, theme)}
+        use={(
+          <img
+            src={token.icon ?? getDefaultTokenImage(environment, theme)}
+            alt={token.name}
+          />
+        )}
       />
       <MenuItem.PriceDisplay
         use={<Heading size="xSmall" />}
