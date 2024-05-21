@@ -2,7 +2,6 @@ import { AnyToken, TokenAmount } from '@imtbl/x-client';
 import { ProviderConfiguration } from '../config';
 import { Signers } from './types';
 import {
-  prepareWithdrawalAction,
   completeEthWithdrawalAction,
   completeERC20WithdrawalAction,
   completeERC721WithdrawalAction,
@@ -37,7 +36,7 @@ export async function prepareWithdrawal({
 // TODO: remove once fixed
 // eslint-disable-next-line consistent-return
 export async function completeWithdrawal({
-  signers: { ethSigner },
+  signers: { ethSigner, starkSigner },
   starkPublicKey,
   token,
   config,
@@ -46,7 +45,9 @@ export async function completeWithdrawal({
   // eslint-disable-next-line default-case
   switch (token.type) {
     case 'ETH':
-      return completeEthWithdrawalAction({ ethSigner, starkPublicKey, config });
+      return completeEthWithdrawalAction({
+        ethSigner, starkSigner, starkPublicKey, config,
+      });
     case 'ERC20':
       return completeERC20WithdrawalAction({
         ethSigner,
