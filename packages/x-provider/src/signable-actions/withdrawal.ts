@@ -51,16 +51,17 @@ export async function completeWithdrawal({
     case 'ERC20':
       return completeERC20WithdrawalAction({
         ethSigner,
+        starkSigner,
         starkPublicKey,
         token,
         config,
       });
-    case 'ERC721':
-      return completeERC721WithdrawalAction({
-        ethSigner,
-        starkPublicKey,
-        token,
-        config,
-      });
+    // case 'ERC721':
+    //   return completeERC721WithdrawalAction({
+    //     ethSigner,
+    //     starkPublicKey,
+    //     token,
+    //     config,
+    //   });
   }
 }
