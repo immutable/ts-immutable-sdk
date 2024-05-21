@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-console */
 /* eslint-disable class-methods-use-this */
 import axios, { AxiosResponse } from 'axios';
@@ -12,7 +11,7 @@ import {
   validateGetFee,
 } from 'lib/validation';
 import {
-  getAxelarEndpoint, getAxelarGateway, getChildAdaptor, getChildchain, getRootAdaptor, getTenderlyEndpoint,
+  getAxelarEndpoint, getAxelarGateway, getChildAdaptor, getChildchain, getRootAdaptor,
   isValidDeposit,
   isValidWithdraw,
   isWithdrawNativeIMX,
@@ -933,74 +932,6 @@ export class TokenBridge {
       },
     });
     return gas[0];
-  }
-
-  // TODO this function should have tests. We can write these when we introduce a separate class
-  // for tenderly stuff
-  private async submitTenderlySimulations(
-    chainId: string,
-    simulations: Array<TenderlySimulation>,
-    state_objects?: Record<string, Record<string, Record<string, string>>>,
-  ): Promise<Array<number>> {
-    let axiosResponse:AxiosResponse;
-    const tenderlyAPI = getTenderlyEndpoint(chainId);
-    try {
-      axiosResponse = await axios.post(
-        tenderlyAPI,
-        {
-          jsonrpc: '2.0',
-          id: 0,
-          method: 'tenderly_estimateGasBundle',
-          params: [
-            simulations,
-            'latest',
-            state_objects,
-          ],
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      );
-    } catch (error: any) {
-      axiosResponse = error.response;
-    }
-
-    if (axiosResponse.data.error) {
-      throw new BridgeError(
-        `Estimating gas failed with the reason: ${axiosResponse.data.error.message}`,
-        BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
-      );
-    }
-
-    const simResults = axiosResponse.data.result;
-    if (simResults.length !== simulations.length) {
-      throw new BridgeError(
-        'Estimating gas failed with mismatched responses',
-        BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
-      );
-    }
-
-    const gas: Array<number> = [];
-
-    for (let i = 0; i < simResults.length; i++) {
-      if (simResults[i].error) {
-        throw new BridgeError(
-          `Estimating deposit gas failed with the reason: ${simResults[i].error.message}`,
-          BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
-        );
-      }
-      if (simResults[i].gasUsed === undefined) {
-        throw new BridgeError(
-          'Estimating gas did not return simulation results',
-          BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
-        );
-      }
-      gas.push(simResults[i].gasUsed);
-    }
-
-    return gas;
   }
 
   private async getAllowance(direction: BridgeDirection, token: string, sender: string): Promise<ethers.BigNumber> {
