@@ -46,6 +46,7 @@ type SaleContextProps = {
   excludePaymentTypes: SalePaymentTypes[];
   preferredCurrency?: string;
   waitFulfillmentSettlements: boolean;
+  hideExcludedPaymentTypes: boolean;
 };
 
 type SaleContextValues = SaleContextProps & {
@@ -119,6 +120,7 @@ const SaleContext = createContext<SaleContextValues>({
   preferredCurrency: undefined,
   selectedCurrency: undefined,
   waitFulfillmentSettlements: true,
+  hideExcludedPaymentTypes: false,
 });
 
 SaleContext.displayName = 'SaleSaleContext';
@@ -144,6 +146,7 @@ export function SaleContextProvider(props: {
       excludePaymentTypes,
       preferredCurrency,
       waitFulfillmentSettlements,
+      hideExcludedPaymentTypes,
     },
   } = props;
 
@@ -360,6 +363,7 @@ export function SaleContextProvider(props: {
       excludePaymentTypes,
       selectedCurrency,
       waitFulfillmentSettlements,
+      hideExcludedPaymentTypes,
     }),
     [
       config,
@@ -390,6 +394,7 @@ export function SaleContextProvider(props: {
       excludePaymentTypes,
       selectedCurrency,
       waitFulfillmentSettlements,
+      hideExcludedPaymentTypes,
     ],
   );
 
