@@ -150,7 +150,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
         },
       });
     } catch (error: any) {
-      goToErrorView(SaleErrorTypes.FUNDING_ROUTE_EXECUTE_ERROR, error);
+      goToErrorView(SaleErrorTypes.SERVICE_BREAKDOWN, error);
     }
   }, [fundingBalances, loadingBalances, fundingBalancesResult]);
 
