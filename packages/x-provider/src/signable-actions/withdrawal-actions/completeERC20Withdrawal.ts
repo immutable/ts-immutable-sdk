@@ -56,14 +56,14 @@ export async function completeERC20WithdrawalAction({
     token_address: token.tokenAddress,
   });
 
-  if (!isRegistered) {
-    return executeRegisterAndWithdrawAllFungible(
-      ethSigner,
-      starkSigner,
-      starkPublicKey,
-      assetType.asset_type,
-      config.immutableXConfig,
-    );
+  if (isRegistered) {
+    return executeWithdrawAllFungible(ethSigner, starkPublicKey, assetType.asset_type, config.immutableXConfig);
   }
-  return executeWithdrawAllFungible(ethSigner, starkPublicKey, assetType.asset_type, config.immutableXConfig);
+  return executeRegisterAndWithdrawAllFungible(
+    ethSigner,
+    starkSigner,
+    starkPublicKey,
+    assetType.asset_type,
+    config.immutableXConfig,
+  );
 }

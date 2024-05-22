@@ -28,15 +28,17 @@ export async function executeRegisterAndWithdrawAllFungible(
 ): Promise<TransactionResponse> {
   const etherKey = await ethSigner.getAddress();
 
+  const starkSignature = await signRegisterEthAddress(
+    starkSigner,
+    etherKey,
+    starkPublicKey,
+  );
+
+  // we use registration v4 contract as a wrapper for the core contract
+  // so that v3 and v4 withdrawals, AND on-chain registration can be executed in a single transaction
   const contract = Contracts.RegistrationV4.connect(
     config.ethConfiguration.registrationV4ContractAddress || config.ethConfiguration.registrationContractAddress,
     ethSigner,
-  );
-
-  const starkSignature = await signRegisterEthAddress(
-    starkSigner,
-    await ethSigner.getAddress(),
-    starkPublicKey,
   );
 
   const populatedTransaction = await contract.populateTransaction.registerAndWithdrawAll(
@@ -55,6 +57,9 @@ export async function executeWithdrawAllFungible(
   assetType: string,
   config: ImmutableXConfiguration,
 ): Promise<TransactionResponse> {
+  // we use registration v4 contract as a wrapper for the core contract
+  // so that v3 and v4 withdrawals can be executed in a single transaction
+  // (if there are pending withdrawable funds for both)
   const contract = Contracts.RegistrationV4.connect(
     config.ethConfiguration.registrationV4ContractAddress || config.ethConfiguration.registrationContractAddress,
     ethSigner,
@@ -101,14 +106,14 @@ export async function completeEthWithdrawalAction({
 
   const assetType = await getEncodeAssetInfo('asset', EthTokenType, config.immutableXConfig);
 
-  if (!isRegistered) {
-    return executeRegisterAndWithdrawAllFungible(
-      ethSigner,
-      starkSigner,
-      starkPublicKey,
-      assetType.asset_type,
-      config.immutableXConfig,
-    );
+  if (isRegistered) {
+    return executeWithdrawAllFungible(ethSigner, starkPublicKey, assetType.asset_type, config.immutableXConfig);
   }
-  return executeWithdrawAllFungible(ethSigner, starkPublicKey, assetType.asset_type, config.immutableXConfig);
+  return executeRegisterAndWithdrawAllFungible(
+    ethSigner,
+    starkSigner,
+    starkPublicKey,
+    assetType.asset_type,
+    config.immutableXConfig,
+  );
 }
