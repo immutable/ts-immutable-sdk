@@ -6,11 +6,6 @@ import {
 } from '@imtbl/x-client';
 import { signRaw } from '@imtbl/toolkit';
 import { isAxiosError } from 'axios';
-// import { solidityKeccak256 } from 'ethers/lib/utils';
-// import BN from 'bn.js';
-// import * as encUtils from 'enc-utils';
-// @ts-ignore - no types available
-// import elliptic from 'elliptic';
 import { Signers } from './types';
 import { validateChain } from './helpers';
 import { ProviderConfiguration } from '../config';
@@ -77,9 +72,9 @@ export async function isRegisteredOnChain(
   config: ProviderConfiguration,
 ): Promise<boolean> {
   await validateChain(ethSigner, config.immutableXConfig);
-
+  const imxConfig = config.immutableXConfig;
   const registrationContract = Contracts.RegistrationV4.connect(
-      config.immutableXConfig.ethConfiguration.registrationV4ContractAddress || config.immutableXConfig.ethConfiguration.registrationContractAddress,
+    imxConfig.ethConfiguration.registrationV4ContractAddress || imxConfig.ethConfiguration.registrationContractAddress,
     ethSigner,
   );
 
@@ -111,21 +106,3 @@ export async function getSignableRegistrationOnchain(
     verification_signature: response.data.verification_signature,
   };
 }
-
-// export async function signRegisterEthAddress(
-//   starkSigner: StarkSigner,
-//   ethAddress: string,
-//   starkPublicKey: string,
-// ): Promise<string> {
-//   const hash: string = solidityKeccak256(
-//     ['string', 'address', 'uint256'],
-//     ['UserRegistration:', ethAddress, starkPublicKey],
-//   );
-//   const msgHash: BN = new BN(encUtils.removeHexPrefix(hash), 16);
-//   const modMsgHash: BN = msgHash.mod(starkEcOrder);
-//   const signature: elliptic.ec.Signature = await starkSigner.sign(
-//     modMsgHash.toString(16),
-//   );
-//   const pubY: string = encUtils.sanitizeHex(starkSigner.getYCoordinate());
-//   return serializePackedSignature(signature, pubY);
-// }
