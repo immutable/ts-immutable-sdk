@@ -489,9 +489,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.22.8":
-  version: 0.22.8
-  resolution: "@biom3/react@npm:0.22.8"
+"@biom3/react@npm:^0.23.3":
+  version: 0.23.5
+  resolution: "@biom3/react@npm:0.23.5"
   dependencies:
     "@biom3/design-tokens": ~0.3.7
     buffer: ^6.0.3
@@ -507,10 +507,11 @@ __metadata:
   peerDependencies:
     "@emotion/react": ^11.11.4
     "@rive-app/react-canvas-lite": ^4.9.0
+    embla-carousel-react: ^8.0.4
     framer-motion: ^10.12.12
     react: ^18.2.0
     react-dom: ^18.2.0
-  checksum: 15c61ea9aee059ee7785ebd95090e57b25411e580c2003a0424025ca783961359fa3173678c50470e9f2abc9ad45009a173c37c7d81805deb8d8226e735bc5de
+  checksum: e60db6399b7a98e9d5b220cf1a38d4c0faeb010ee8d1c554770af83fe9125bf80e13d4505f20b045c45345a8440b89fc0869bd9abbc27fea2197112da0c9ba20
   languageName: node
   linkType: hard
 
@@ -1104,12 +1105,12 @@ __metadata:
 
 "@imtbl/sdk@file:../../../sdk::locator=func-tests-imx%40workspace%3A.":
   version: 0.0.0
-  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=cf1bed&locator=func-tests-imx%40workspace%3A."
+  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=704e21&locator=func-tests-imx%40workspace%3A."
   dependencies:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
     "@biom3/design-tokens": ^0.3.7
-    "@biom3/react": ^0.22.8
+    "@biom3/react": ^0.23.3
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
     "@ethersproject/keccak256": ^5.7.0
@@ -1148,6 +1149,7 @@ __metadata:
     os-browserify: ^0.3.0
     pako: ^2.1.0
     pg: ^8.11.5
+    prisma: ^5.13.0
     react-i18next: ^13.5.0
     sns-validator: ^0.3.5
     stream-browserify: ^3.0.0
@@ -1157,7 +1159,9 @@ __metadata:
   dependenciesMeta:
     pg:
       optional: true
-  checksum: 7a45f971059833b39e4a6652bb5460d07e7435e3853dc759740c057581c35a0d61748435631b12ee76fd88e80f1a2ec135d03f4f81d3f98442b9f9f63d2fbbdd
+    prisma:
+      optional: true
+  checksum: 54fa41add4ca395ee5e5acc20df0aec8ebc339b9c13a2bed88f9ab79e3d577b154e301aed3bc16247bc495a1c08055811c9a60fd6eeaf5d388a6bf46be7d8e0c
   languageName: node
   linkType: hard
 
@@ -2557,6 +2561,52 @@ __metadata:
   version: 0.11.0
   resolution: "@pkgjs/parseargs@npm:0.11.0"
   checksum: 6ad6a00fc4f2f2cfc6bff76fb1d88b8ee20bc0601e18ebb01b6d4be583733a860239a521a7fbca73b612e66705078809483549d2b18f370eb346c5155c8e4a0f
+  languageName: node
+  linkType: hard
+
+"@prisma/debug@npm:5.14.0":
+  version: 5.14.0
+  resolution: "@prisma/debug@npm:5.14.0"
+  checksum: 523934576f882aa91d6c0df59b103216fdd2705ab93c55ef804fc02e6affd3b87c6adfa71d4f595b54c1247fa85b94c5dcff4b9b7c394780a9f2c0df7f70daf8
+  languageName: node
+  linkType: hard
+
+"@prisma/engines-version@npm:5.14.0-25.e9771e62de70f79a5e1c604a2d7c8e2a0a874b48":
+  version: 5.14.0-25.e9771e62de70f79a5e1c604a2d7c8e2a0a874b48
+  resolution: "@prisma/engines-version@npm:5.14.0-25.e9771e62de70f79a5e1c604a2d7c8e2a0a874b48"
+  checksum: 73e11ac06e052742af23a297db7f4434cbfe604cf6adc19675a9f54c8a130bf1a45709e914231defce56053cc7aca993918b156cccee31491aec9ebbc6fd2751
+  languageName: node
+  linkType: hard
+
+"@prisma/engines@npm:5.14.0":
+  version: 5.14.0
+  resolution: "@prisma/engines@npm:5.14.0"
+  dependencies:
+    "@prisma/debug": 5.14.0
+    "@prisma/engines-version": 5.14.0-25.e9771e62de70f79a5e1c604a2d7c8e2a0a874b48
+    "@prisma/fetch-engine": 5.14.0
+    "@prisma/get-platform": 5.14.0
+  checksum: e8e3ace8d97c6bd992fccf632e56eb5f10a36ad2712c615e9b43d9fb721f156c94741cbbda4508f124320e366e60ab52f697c6d64de175da7f9e486ff503ff89
+  languageName: node
+  linkType: hard
+
+"@prisma/fetch-engine@npm:5.14.0":
+  version: 5.14.0
+  resolution: "@prisma/fetch-engine@npm:5.14.0"
+  dependencies:
+    "@prisma/debug": 5.14.0
+    "@prisma/engines-version": 5.14.0-25.e9771e62de70f79a5e1c604a2d7c8e2a0a874b48
+    "@prisma/get-platform": 5.14.0
+  checksum: 069ef84325863e105e3962ea232a278c908f45b2c7cd11bf031991ee8ca461520c6c283cd2628fa34b37abfdd05c18fa7383a931a209535db2b0b3a903741768
+  languageName: node
+  linkType: hard
+
+"@prisma/get-platform@npm:5.14.0":
+  version: 5.14.0
+  resolution: "@prisma/get-platform@npm:5.14.0"
+  dependencies:
+    "@prisma/debug": 5.14.0
+  checksum: 4cbe630c24b6969cb901953da05e154e1fcf40f1cf8025f4374a8cf6240b428415104cf193d3957d1752890d47e3fd958493d91cf58299aa4d4069ed229b7df6
   languageName: node
   linkType: hard
 
@@ -9324,7 +9374,7 @@ __metadata:
     pinst: ^3.0.0
     solidity-coverage: ^0.8.1
     ts-jest: ^29.1.1
-    ts-node: ^10.9.1
+    ts-node: ^10.9.2
     typescript: ^5.3.2
   languageName: unknown
   linkType: soft
@@ -14250,6 +14300,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"prisma@npm:^5.13.0":
+  version: 5.14.0
+  resolution: "prisma@npm:5.14.0"
+  dependencies:
+    "@prisma/engines": 5.14.0
+  bin:
+    prisma: build/index.js
+  checksum: 37ee212e8b2386d771f984643b8aef3c0d9ca7588c5bab79e248dc189ccbfb475eeeb431a044977ea565a8e632dc12543147ad329a38b8ad1c35014bd242752f
+  languageName: node
+  linkType: hard
+
 "proc-log@npm:^3.0.0":
   version: 3.0.0
   resolution: "proc-log@npm:3.0.0"
@@ -16485,7 +16546,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ts-node@npm:^10.9.1":
+"ts-node@npm:^10.9.2":
   version: 10.9.2
   resolution: "ts-node@npm:10.9.2"
   dependencies:
