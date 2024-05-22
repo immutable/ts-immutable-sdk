@@ -50,6 +50,9 @@ export function CoinsDrawer({
     size = 'small';
   }
 
+  const otherPaymentOptions = [SalePaymentTypes.DEBIT, SalePaymentTypes.CREDIT];
+  const withOtherOptions = !otherPaymentOptions.every((type) => disabledPaymentTypes?.includes(type));
+
   return (
     <Drawer
       size="full"
@@ -124,8 +127,7 @@ export function CoinsDrawer({
                 />
               )}
             >
-              {(disabledPaymentTypes?.includes(SalePaymentTypes.CREDIT)
-                && disabledPaymentTypes?.includes(SalePaymentTypes.DEBIT)) ?? (
+              {withOtherOptions && (
                 <Divider
                   size="small"
                   rc={<Caption />}
@@ -137,10 +139,9 @@ export function CoinsDrawer({
               <PaymentOptions
                 onClick={onPayWithCard}
                 size={size}
-                paymentOptions={[
-                  SalePaymentTypes.DEBIT,
-                  SalePaymentTypes.CREDIT,
-                ].filter((type) => !disabledPaymentTypes?.includes(type))}
+                hideDisabledOptions
+                paymentOptions={otherPaymentOptions}
+                disabledOptions={disabledPaymentTypes}
                 captions={{
                   [SalePaymentTypes.DEBIT]: t(
                     'views.PAYMENT_METHODS.options.debit.caption',
