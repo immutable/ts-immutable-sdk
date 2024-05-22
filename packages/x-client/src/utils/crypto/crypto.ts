@@ -111,9 +111,10 @@ export async function signRegisterEthAddress(
   );
   const msgHash: BN = new BN(encUtils.removeHexPrefix(hash), 16);
   const modMsgHash: BN = msgHash.mod(starkEcOrder);
-  const signature: elliptic.ec.Signature = await starkSigner.sign(
+  const sigString: string = await starkSigner.signMessage(
     modMsgHash.toString(16),
   );
-  const pubY: string = encUtils.sanitizeHex(starkSigner.getYCoordinate());
+  const signature: elliptic.ec.Signature = deserializeSignature(sigString);
+  const pubY: string = encUtils.sanitizeHex(await starkSigner.getYCoordinate());
   return serializePackedSignature(signature, pubY);
 }

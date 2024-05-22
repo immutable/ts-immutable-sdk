@@ -21,18 +21,10 @@ export interface StarkSigner {
   getAddress(): string | Promise<string>;
 
   /**
-   * Signs the prefixed-message
-   * @params message - this must be a UTF8-message
-   * @returns the signed prefixed-message (elliptic.ec.Signature)
-   */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  sign(message: string): Promise<any>;
-
-  /**
    * Get the Y-coordinate of the public key
    * @returns the Y-coordinate of the public key
    */
-  getYCoordinate(): string;
+  getYCoordinate(): Promise<string>;
 }
 
 /**

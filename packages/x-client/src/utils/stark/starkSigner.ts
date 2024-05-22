@@ -32,15 +32,12 @@ export class StandardStarkSigner implements StarkSigner {
     );
   }
 
-  public async sign(msg: string) {
-    return this.keyPair.sign(this.fixMsgHashLen(msg));
-  }
-
-  public getYCoordinate(): string {
-    return encUtils.sanitizeBytes(
+  public getYCoordinate(): Promise<string> {
+    const coordinate = encUtils.sanitizeBytes(
       this.keyPair.getPublic().getY().toString(16),
       2,
     );
+    return Promise.resolve(coordinate);
   }
 
   /*
