@@ -622,7 +622,8 @@
           "label": "{{amount}} 스왑 수수료 (견적에 포함)"
         },
         "serviceFee": {
-          "label": "서비스 수수료"
+          "depositLabel": "zkEVM 가스 수수료",
+          "withdrawLabel": "Ethereum 가스 수수료"
         }
       }
     },
