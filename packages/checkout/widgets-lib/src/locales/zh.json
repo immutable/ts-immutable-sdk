@@ -622,7 +622,8 @@
           "label": "{{amount}} 交换费（已计入报价）"
         },
         "serviceFee": {
-          "label": "服务费"
+          "depositLabel": "zkEVM 气体费用",
+          "withdrawLabel": "Ethereum 气体费用"
         }
       }
     },

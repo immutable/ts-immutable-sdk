@@ -25,6 +25,7 @@ import {
   NATIVE,
   addChainChangedListener,
   getL1ChainId,
+  getL2ChainId,
   networkIcon,
   removeChainChangedListener,
 } from 'lib';
@@ -80,7 +81,7 @@ export function BridgeReviewSummary() {
 
   const { cryptoFiatState } = useContext(CryptoFiatContext);
   const [loading, setLoading] = useState(false);
-  const [estimates, setEstimates] = useState<any | undefined>(undefined);
+  const [estimates, setEstimates] = useState<GasEstimateBridgeToL2Result | undefined>(undefined);
   const [gasFee, setGasFee] = useState<string>('');
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
   const [approveTransaction, setApproveTransaction] = useState<
@@ -105,6 +106,10 @@ export function BridgeReviewSummary() {
   const [showNotEnoughGasDrawer, setShowNotEnoughGasDrawer] = useState(false);
 
   const isTransfer = useMemo(() => from?.network === to?.network, [from, to]);
+  const isDeposit = useMemo(
+    () => (getL2ChainId(checkout.config) === to?.network),
+    [from, to, checkout],
+  );
   const insufficientFundsForGas = useMemo(() => {
     if (!estimates) return false;
     if (!token) return true;
@@ -231,7 +236,6 @@ export function BridgeReviewSummary() {
       },
       token: checkout.config.networkMap.get(from!.network)?.nativeCurrency,
     } as GasEstimateBridgeToL2Result;
-
     setEstimates(gasEstimateResult);
     const estimatedAmount = utils.formatUnits(
       gasEstimateResult?.fees.totalFees || 0,
@@ -256,8 +260,8 @@ export function BridgeReviewSummary() {
   }, DEFAULT_QUOTE_REFRESH_INTERVAL);
 
   const formatFeeBreakdown = useCallback(
-    () => formatBridgeFees(estimates, cryptoFiatState, t),
-    [estimates],
+    () => formatBridgeFees(estimates, isDeposit, cryptoFiatState, t),
+    [estimates, isDeposit],
   );
 
   useEffect(() => {
