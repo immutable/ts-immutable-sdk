@@ -41,8 +41,6 @@ export async function completeWithdrawal({
   token,
   config,
 }: CompleteWithdrawalParams) {
-  // TODO: please add a reasonable default here
-  // eslint-disable-next-line default-case
   switch (token.type) {
     case 'ETH':
       return completeEthWithdrawalAction({
@@ -56,12 +54,15 @@ export async function completeWithdrawal({
         token,
         config,
       });
-    // case 'ERC721':
-    //   return completeERC721WithdrawalAction({
-    //     ethSigner,
-    //     starkPublicKey,
-    //     token,
-    //     config,
-    //   });
+    case 'ERC721':
+      return completeERC721WithdrawalAction({
+        ethSigner,
+        starkSigner,
+        starkPublicKey,
+        token,
+        config,
+      });
+    default:
+      throw new Error('Unsupported token type');
   }
 }

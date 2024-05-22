@@ -16,12 +16,14 @@ type CompleteEthWithdrawalActionParams = {
   config: ProviderConfiguration;
 };
 
+const EthTokenType = 'ETH';
+
 // works with ETH or ERC20
 export async function executeRegisterAndWithdrawAllFungible(
   ethSigner: Signer,
   starkSigner: StarkSigner,
-  assetType: string,
   starkPublicKey: string,
+  assetType: string,
   config: ImmutableXConfiguration,
 ): Promise<TransactionResponse> {
   const etherKey = await ethSigner.getAddress();
@@ -49,8 +51,8 @@ export async function executeRegisterAndWithdrawAllFungible(
 
 export async function executeWithdrawAllFungible(
   ethSigner: Signer,
-  assetType: string,
   starkPublicKey: string,
+  assetType: string,
   config: ImmutableXConfiguration,
 ): Promise<TransactionResponse> {
   const contract = Contracts.RegistrationV4.connect(
@@ -83,8 +85,8 @@ export async function completeEthWithdrawalAction({
     ethSigner,
     starkPublicKey,
     await ethSigner.getAddress(),
-    { type: 'ETH' },
-    config,
+    { type: EthTokenType },
+    config.immutableXConfig,
   );
 
   if (v3Balance.isZero() && v4Balance.isZero()) {
@@ -97,21 +99,16 @@ export async function completeEthWithdrawalAction({
     config,
   );
 
-  const assetType = await getEncodeAssetInfo('asset', 'ETH', config.immutableXConfig);
+  const assetType = await getEncodeAssetInfo('asset', EthTokenType, config.immutableXConfig);
 
   if (!isRegistered) {
     return executeRegisterAndWithdrawAllFungible(
       ethSigner,
       starkSigner,
-      assetType.asset_type,
       starkPublicKey,
+      assetType.asset_type,
       config.immutableXConfig,
     );
   }
-  return executeWithdrawAllFungible(
-    ethSigner,
-    assetType.asset_type,
-    starkPublicKey,
-    config.immutableXConfig,
-  );
+  return executeWithdrawAllFungible(ethSigner, starkPublicKey, assetType.asset_type, config.immutableXConfig);
 }

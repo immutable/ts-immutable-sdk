@@ -15,6 +15,8 @@ type CompleteERC20WithdrawalWorkflowParams = {
   config: ProviderConfiguration;
 };
 
+const ERC20TokenType = 'ERC20';
+
 // equivilant to Core SDK completeERC20WithdrawalV1Workflow
 // in src/workflows/withdrawal/completeERC20Withdrawal.ts
 export async function completeERC20WithdrawalAction({
@@ -34,10 +36,10 @@ export async function completeERC20WithdrawalAction({
     starkPublicKey,
     await ethSigner.getAddress(),
     {
-      type: 'ERC20',
+      type: ERC20TokenType,
       tokenAddress: token.tokenAddress,
     },
-    config,
+    config.immutableXConfig,
   );
 
   if (v3Balance.isZero() && v4Balance.isZero()) {
@@ -50,7 +52,7 @@ export async function completeERC20WithdrawalAction({
     config,
   );
 
-  const assetType = await getEncodeAssetInfo('asset', 'ERC20', config.immutableXConfig, {
+  const assetType = await getEncodeAssetInfo('asset', ERC20TokenType, config.immutableXConfig, {
     token_address: token.tokenAddress,
   });
 
@@ -58,15 +60,10 @@ export async function completeERC20WithdrawalAction({
     return executeRegisterAndWithdrawAllFungible(
       ethSigner,
       starkSigner,
-      assetType.asset_type,
       starkPublicKey,
+      assetType.asset_type,
       config.immutableXConfig,
     );
   }
-  return executeWithdrawAllFungible(
-    ethSigner,
-    assetType.asset_type,
-    starkPublicKey,
-    config.immutableXConfig,
-  );
+  return executeWithdrawAllFungible(ethSigner, starkPublicKey, assetType.asset_type, config.immutableXConfig);
 }
