@@ -3,6 +3,7 @@ import { Box, MenuItemSize } from '@biom3/react';
 import { SalePaymentTypes } from '@imtbl/checkout-sdk';
 import { listItemVariants, listVariants } from 'lib/animation/listAnimation';
 import { motion } from 'framer-motion';
+import { useMemo } from 'react';
 import { PaymentOption } from './PaymentOption';
 
 const defaultPaymentOptions: SalePaymentTypes[] = [
@@ -17,13 +18,24 @@ export interface PaymentOptionsProps {
   paymentOptions?: SalePaymentTypes[];
   captions?: Partial<Record<SalePaymentTypes, string>>;
   size?: MenuItemSize;
+  hideDisabledOptions?: boolean;
 }
 
 export function PaymentOptions(props: PaymentOptionsProps) {
   const {
-    disabledOptions = [], paymentOptions, onClick, captions, size,
+    disabledOptions = [],
+    paymentOptions,
+    onClick,
+    captions,
+    size,
+    hideDisabledOptions,
   } = props;
-  const options = paymentOptions || defaultPaymentOptions;
+  const options = useMemo(
+    () => (paymentOptions || defaultPaymentOptions).filter(
+      (option) => !hideDisabledOptions || !disabledOptions.includes(option),
+    ),
+    [paymentOptions, disabledOptions, hideDisabledOptions],
+  );
 
   return (
     <Box
@@ -47,12 +59,7 @@ export function PaymentOptions(props: PaymentOptionsProps) {
           onClick={onClick}
           disabled={disabledOptions.includes(type)}
           caption={captions?.[type]}
-          rc={(
-            <motion.div
-              custom={idx}
-              variants={listItemVariants}
-            />
-          )}
+          rc={<motion.div custom={idx} variants={listItemVariants} />}
         />
       ))}
     </Box>
