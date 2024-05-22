@@ -78,17 +78,19 @@ const useParams = () => {
     .get("excludePaymentTypes")
     ?.split(",") as SalePaymentTypes[];
 
-  const multicurrency = urlParams.get("multicurrency") === "true";
-
-  const preferredCurrency = urlParams.get("preferredCurrency") as string ?? undefined;
+  const preferredCurrency =
+    (urlParams.get("preferredCurrency") as string) ?? undefined;
+  const hideExcludedPaymentTypes = Boolean(
+    urlParams.get("hideExcludedPaymentTypes")
+  );
 
   return {
     login,
     environmentId,
     collectionName,
     excludePaymentTypes,
-    multicurrency,
     preferredCurrency,
+    hideExcludedPaymentTypes,
   };
 };
 
@@ -127,8 +129,8 @@ export function SaleUI() {
     environmentId,
     collectionName,
     excludePaymentTypes,
-    multicurrency,
     preferredCurrency,
+    hideExcludedPaymentTypes,
   } = params;
   const [passportConfig, setPassportConfig] = useState(
     JSON.stringify(defaultPassportConfig, null, 2)
@@ -154,28 +156,28 @@ export function SaleUI() {
   const saleWidget = useMemo(
     () =>
       factory.create(WidgetType.SALE, {
-        config: { theme: WidgetTheme.DARK },
+        config: { theme: WidgetTheme.DARK, hideExcludedPaymentTypes },
       }),
-    [factory,  environmentId, collectionName, defaultItems]
+    [factory, environmentId, collectionName, defaultItems]
   );
   const bridgeWidget = useMemo(
     () =>
       factory.create(WidgetType.BRIDGE, {
         config: { theme: WidgetTheme.DARK },
       }),
-    [factory,  environmentId, collectionName, defaultItems]
+    [factory, environmentId, collectionName, defaultItems]
   );
   const swapWidget = useMemo(
     () =>
       factory.create(WidgetType.SWAP, { config: { theme: WidgetTheme.DARK } }),
-    [factory,  environmentId, collectionName, defaultItems]
+    [factory, environmentId, collectionName, defaultItems]
   );
   const onrampWidget = useMemo(
     () =>
       factory.create(WidgetType.ONRAMP, {
         config: { theme: WidgetTheme.DARK },
       }),
-    [factory,  environmentId, collectionName, defaultItems]
+    [factory, environmentId, collectionName, defaultItems]
   );
 
   // mount sale widget and subscribe to close event

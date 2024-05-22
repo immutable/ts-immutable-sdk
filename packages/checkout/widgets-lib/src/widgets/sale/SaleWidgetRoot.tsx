@@ -124,12 +124,13 @@ export class Sale extends Base<WidgetType.SALE> {
               >
                 <SaleWidget
                   config={config}
+                  language="en"
                   items={this.parameters.items!}
                   environmentId={this.parameters.environmentId!}
                   collectionName={this.parameters.collectionName!}
                   excludePaymentTypes={this.parameters.excludePaymentTypes!}
                   preferredCurrency={this.parameters.preferredCurrency!}
-                  language="en"
+                  hideExcludedPaymentTypes={this.properties?.config?.hideExcludedPaymentTypes ?? false}
                   waitFulfillmentSettlements={this.properties?.config?.waitFulfillmentSettlements ?? true}
                 />
               </Suspense>

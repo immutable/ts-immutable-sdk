@@ -29,8 +29,9 @@ export function PaymentMethods() {
     goToErrorView,
     paymentMethod,
     setPaymentMethod,
-    disabledPaymentTypes,
     invalidParameters,
+    disabledPaymentTypes,
+    hideExcludedPaymentTypes,
   } = useSaleContext();
   const { sendPageView, sendCloseEvent, sendSelectedPaymentMethod } = useSaleEvent();
 
@@ -117,6 +118,7 @@ export function PaymentMethods() {
         </Heading>
         <Box sx={{ paddingX: 'base.spacing.x2' }}>
           <PaymentOptions
+            hideDisabledOptions={hideExcludedPaymentTypes}
             disabledOptions={disabledPaymentTypes}
             onClick={handleOptionClick}
           />

@@ -5,4 +5,5 @@ import { WidgetConfiguration } from './widget';
  */
 export type SaleWidgetConfiguration = {
   waitFulfillmentSettlements?: boolean;
+  hideExcludedPaymentTypes?: boolean;
 } & WidgetConfiguration;
