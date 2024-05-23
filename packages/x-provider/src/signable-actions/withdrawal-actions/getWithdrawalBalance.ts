@@ -63,7 +63,6 @@ async function getERC721WithdrawalBalance(
         tokenAddress: token.tokenAddress,
         tokenId: token.tokenId,
       });
-    console.log(mintableToken);
     const assetType = await getEncodeAssetInfo(
       'mintable-asset',
       'ERC721',
@@ -86,8 +85,6 @@ async function getERC721WithdrawalBalance(
     if (!e.response || !(e.response && e.response.status !== 404)) {
       throw e;
     }
-    console.log('@@@@@@');
-    console.log(e);
     // token is not a mintable ERC721 token
     const assetType = await getEncodeAssetInfo(
       'asset',

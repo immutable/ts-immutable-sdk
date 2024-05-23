@@ -1,4 +1,5 @@
 import { Contracts } from '@imtbl/x-client';
+import { BigNumber } from '@ethersproject/bignumber';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 import {
   getSignableRegistrationOnchain,
@@ -11,7 +12,6 @@ import {
   transactionResponse,
 } from '../../test/helpers';
 import { completeEthWithdrawalAction } from './completeEthWithdrawal';
-import {BigNumber} from "@ethersproject/bignumber";
 
 jest.mock('@imtbl/x-client');
 jest.mock('@imtbl/toolkit');
