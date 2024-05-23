@@ -78,7 +78,7 @@ describe('Deposit ETH', () => {
       test(`should make the correct api requests when user is ${
         testcase.isRegistered ? '' : 'not'
       } registered on-chain`, async () => {
-        (Contracts.Registration.connect as jest.Mock).mockReturnValue({
+        (Contracts.RegistrationV4.connect as jest.Mock).mockReturnValue({
           isRegistered: async () => testcase.isRegistered,
         });
 

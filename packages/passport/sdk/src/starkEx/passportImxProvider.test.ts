@@ -53,6 +53,7 @@ describe('PassportImxProvider', () => {
   const mockStarkSigner = {
     signMessage: jest.fn(),
     getAddress: jest.fn(),
+    getYCoordinate: jest.fn(),
   } as StarkSigner;
 
   const mockEthSigner = {

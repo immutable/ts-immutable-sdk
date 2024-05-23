@@ -11,6 +11,7 @@ import {
   testConfig,
   transactionResponse,
 } from '../../test/helpers';
+import {BigNumber} from "@ethersproject/bignumber";
 
 jest.mock('@imtbl/x-client');
 jest.mock('@imtbl/toolkit');
@@ -28,9 +29,12 @@ describe('completeERC20Withdrawal action', () => {
       jest.restoreAllMocks();
       (getEncodeAssetInfo as jest.Mock).mockResolvedValue(encodeAssetResponse);
       (isRegisteredOnChain as jest.Mock).mockResolvedValue(true);
-      (Contracts.Core.connect as jest.Mock).mockReturnValue({
+      (Contracts.CoreV4.connect as jest.Mock).mockReturnValue({
+        getWithdrawalBalance: jest.fn().mockReturnValue(BigNumber.from('1000000000000000000')),
+      });
+      (Contracts.RegistrationV4.connect as jest.Mock).mockReturnValue({
         populateTransaction: {
-          withdraw: jest.fn().mockResolvedValue(transactionResponse),
+          withdrawAll: jest.fn().mockResolvedValue(transactionResponse),
         },
       });
     });
@@ -38,6 +42,7 @@ describe('completeERC20Withdrawal action', () => {
       const signers = await generateSigners(privateKey1);
       const response = await completeERC20WithdrawalAction({
         ethSigner: signers.ethSigner,
+        starkSigner: signers.starkSigner,
         config: testConfig,
         starkPublicKey: '789912305',
         token: {
@@ -57,9 +62,12 @@ describe('completeERC20Withdrawal action', () => {
         operator_signature: 'operator-signature',
         payload_hash: 'payload hash',
       });
-      (Contracts.Registration.connect as jest.Mock).mockReturnValue({
+      (Contracts.CoreV4.connect as jest.Mock).mockReturnValue({
+        getWithdrawalBalance: jest.fn().mockReturnValue(BigNumber.from('1000000000000000000')),
+      });
+      (Contracts.RegistrationV4.connect as jest.Mock).mockReturnValue({
         populateTransaction: {
-          registerAndWithdraw: jest.fn().mockResolvedValue(transactionResponse),
+          registerAndWithdrawAll: jest.fn().mockResolvedValue(transactionResponse),
         },
       });
     });
@@ -68,6 +76,7 @@ describe('completeERC20Withdrawal action', () => {
       const signers = await generateSigners(privateKey1);
       const response = await completeERC20WithdrawalAction({
         ethSigner: signers.ethSigner,
+        starkSigner: signers.starkSigner,
         config: testConfig,
         starkPublicKey: '789912305',
         token: {

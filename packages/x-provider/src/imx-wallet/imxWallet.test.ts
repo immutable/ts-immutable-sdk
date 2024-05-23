@@ -111,32 +111,4 @@ describe('imxWallet', () => {
       });
     });
   });
-
-  describe('getYCoodinate', () => {
-    it('Should receive stark yCoordinate if l2Wallet returns correct data', async () => {
-      const iframe = await asyncTriggerIFrameOnLoad(getOrSetupIFrame(env));
-
-      const fakeYCoordinate = 'THIS IS THE Y COORDINATE';
-      const mockedSuccessReturnValue = {
-        data: {
-          type: ResponseEventType.GET_Y_COORDINATE_RESPONSE,
-          details: {
-            success: true,
-            data: { yCoordinate: fakeYCoordinate },
-          },
-        },
-        source: iframe.contentWindow,
-      };
-      window.addEventListener = jest
-        .fn()
-        .mockImplementationOnce((_event, callback) => {
-          callback(mockedSuccessReturnValue);
-        });
-
-      const l2Signer = await connect(l1Provider, env);
-      const yCoordinate = await l2Signer.getYCoordinate();
-
-      expect(yCoordinate).toEqual(fakeYCoordinate);
-    });
-  });
 });

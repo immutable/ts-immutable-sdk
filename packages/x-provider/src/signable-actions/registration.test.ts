@@ -18,7 +18,7 @@ describe('Registration', () => {
     test('should check stark public key and not throw an error', async () => {
       const signers = await generateSigners(privateKey1);
 
-      (Contracts.Registration.connect as jest.Mock).mockReturnValue({
+      (Contracts.RegistrationV4.connect as jest.Mock).mockReturnValue({
         isRegistered: jest.fn().mockResolvedValue(true),
       });
 
@@ -31,7 +31,7 @@ describe('Registration', () => {
       const signers = await generateSigners(privateKey1);
       const err = new Error('some error');
 
-      (Contracts.Registration.connect as jest.Mock).mockReturnValue({
+      (Contracts.RegistrationV4.connect as jest.Mock).mockReturnValue({
         isRegistered: jest.fn().mockRejectedValue(() => {
           throw err;
         }),

@@ -57,52 +57,54 @@ async function getERC721WithdrawalBalance(
   mintsApi: MintsApi,
   config: ImmutableXConfiguration,
 ): Promise<BigNumber> {
-  return await mintsApi
-    .getMintableTokenDetailsByClientTokenId({
-      tokenAddress: token.tokenAddress,
-      tokenId: token.tokenId,
-    })
-    .then(async (mintableToken) => {
-      const assetType = await getEncodeAssetInfo(
-        'mintable-asset',
-        'ERC721',
-        config,
-        {
-          id: token.tokenId,
-          token_address: token.tokenAddress,
-          ...(mintableToken.data.blueprint && {
-            blueprint: mintableToken.data.blueprint,
-          }),
-        },
-      );
-      return await getWithdrawalBalance(
-        signer,
-        ownerKey,
-        assetType.asset_id,
-        config,
-      );
-    })
-    .catch(async (error) => {
-      if (error.response?.status === 404) {
-        // token is not a mintable ERC721 token
-        const assetType = await getEncodeAssetInfo(
-          'asset',
-          'ERC721',
-          config,
-          {
-            token_id: token.tokenId,
-            token_address: token.tokenAddress,
-          },
-        );
-        return await getWithdrawalBalance(
-          signer,
-          ownerKey,
-          assetType.asset_id,
-          config,
-        );
-      }
-      throw error; // unable to recover from any other kind of error
-    });
+  try {
+    const mintableToken = await mintsApi
+      .getMintableTokenDetailsByClientTokenId({
+        tokenAddress: token.tokenAddress,
+        tokenId: token.tokenId,
+      });
+    console.log(mintableToken);
+    const assetType = await getEncodeAssetInfo(
+      'mintable-asset',
+      'ERC721',
+      config,
+      {
+        id: token.tokenId,
+        token_address: token.tokenAddress,
+        ...(mintableToken.data.blueprint && {
+          blueprint: mintableToken.data.blueprint,
+        }),
+      },
+    );
+    return await getWithdrawalBalance(
+      signer,
+      ownerKey,
+      assetType.asset_id,
+      config,
+    );
+  } catch (e: any) {
+    if (!e.response || !(e.response && e.response.status !== 404)) {
+      throw e;
+    }
+    console.log('@@@@@@');
+    console.log(e);
+    // token is not a mintable ERC721 token
+    const assetType = await getEncodeAssetInfo(
+      'asset',
+      'ERC721',
+      config,
+      {
+        token_id: token.tokenId,
+        token_address: token.tokenAddress,
+      },
+    );
+    return await getWithdrawalBalance(
+      signer,
+      ownerKey,
+      assetType.asset_id,
+      config,
+    );
+  }
 }
 
 export async function getWithdrawalBalanceWorkflow(

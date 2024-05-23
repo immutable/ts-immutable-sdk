@@ -41,6 +41,7 @@ export async function completeWithdrawal({
   token,
   config,
 }: CompleteWithdrawalParams) {
+  // eslint-disable-next-line default-case
   switch (token.type) {
     case 'ETH':
       return completeEthWithdrawalAction({
@@ -62,7 +63,5 @@ export async function completeWithdrawal({
         token,
         config,
       });
-    default:
-      throw new Error('Unsupported token type');
   }
 }
