@@ -40,7 +40,6 @@ Feature: orderbook
         And 100 ERC1155 tokens should be transferred to the fulfiller
         And 2 trades should be available
 
-    @sam
     Scenario: create and bulk fill multiple listings
         Given I have a funded offerer account
         And the offerer account has 100 ERC1155 tokens
