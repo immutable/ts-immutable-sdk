@@ -109,6 +109,23 @@ export async function fulfillListing(
   return await actionAll(fulfillmentResponse.actions, fulfiller);
 }
 
+export async function bulkFulfillListings(
+  sdk: orderbook.Orderbook,
+  listings: { listingId: string, unitsToFill?: string }[],
+  fulfiller: Wallet,
+): Promise<string[]> {
+  const fulfillmentResponse = await sdk.fulfillBulkOrders(
+    listings.map((l) => ({ listingId: l.listingId, amountToFill: l.unitsToFill, takerFees: [] })),
+    fulfiller.address,
+  );
+
+  if (!fulfillmentResponse.sufficientBalance) {
+    throw new Error('Insufficient balance to fulfill orders');
+  }
+
+  return await actionAll(fulfillmentResponse.actions, fulfiller);
+}
+
 export async function getTrades(
   sdk: orderbook.Orderbook,
   listingId: string,

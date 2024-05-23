@@ -39,3 +39,21 @@ Feature: orderbook
         # Checks for the total amount of tokens transferred - 100 = 90 from first fulfilment + 10 from second fulfilment
         And 100 ERC1155 tokens should be transferred to the fulfiller
         And 2 trades should be available
+
+    @sam
+    Scenario: create and bulk fill multiple listings
+        Given I have a funded offerer account
+        And the offerer account has 100 ERC1155 tokens
+        And the offerer account has 1 ERC721 token
+        And I have a funded fulfiller account
+        When I create a listing to sell 100 ERC1155 tokens
+        When I create a listing to sell 1 ERC721 token
+        Then the listings should be of status active
+        When I bulk fulfill the listings with a partial fill of 90 units for the ERC1155 listing
+        # Assert only the ERC721 is filled
+        Then the listing should be of status filled
+        And 90 ERC1155 tokens should be transferred to the fulfiller
+        # Assert only the ERC1155 is still active
+        Then the listing should be of status active
+        # Assert only the ERC1155 trade in this scenario
+        And 1 trade should be available

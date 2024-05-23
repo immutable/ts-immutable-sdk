@@ -23,7 +23,7 @@ import {
   TransactionAction,
   TransactionPurpose,
 } from '../types';
-import { FulfillableOrder, Order, ProtocolData } from '../openapi/sdk';
+import { Order, ProtocolData } from '../openapi/sdk';
 import {
   EIP_712_ORDER_TYPE,
   ItemType,
@@ -191,7 +191,11 @@ export class Seaport {
   }
 
   async fulfillBulkOrders(
-    fulfillingOrders: Array<FulfillableOrder>,
+    fulfillingOrders: {
+      extraData: string;
+      order: Order;
+      unitsToFill?: string
+    }[],
     account: string,
   ): Promise<{
       actions: Action[];
@@ -205,7 +209,8 @@ export class Seaport {
           parameters: orderComponents,
           signature: o.order.signature,
         },
-        extraData: o.extra_data,
+        unitsToFill: o.unitsToFill,
+        extraData: o.extraData,
         tips,
       };
     });

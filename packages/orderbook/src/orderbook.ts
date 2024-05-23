@@ -270,9 +270,24 @@ export class Orderbook {
     );
 
     try {
+      const fulfillableOrdersWithUnits = fulfillmentDataRes.result.fulfillable_orders
+        .map((fulfillmentData) => {
+        // Find the listing that corresponds to the order for the units
+          const listing = listings.find((l) => l.listingId === fulfillmentData.order.id);
+          if (!listing) {
+            throw new Error(`Could not find listing for order ${fulfillmentData.order.id}`);
+          }
+
+          return {
+            extraData: fulfillmentData.extra_data,
+            order: fulfillmentData.order,
+            unitsToFill: listing.amountToFill,
+          };
+        });
+
       return {
         ...(await this.seaport.fulfillBulkOrders(
-          fulfillmentDataRes.result.fulfillable_orders,
+          fulfillableOrdersWithUnits,
           takerAddress,
         )),
         fulfillableOrders: fulfillmentDataRes.result.fulfillable_orders.map(
