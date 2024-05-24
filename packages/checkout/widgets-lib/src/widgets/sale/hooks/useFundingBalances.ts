@@ -8,7 +8,6 @@ import { getPricingBySymbol } from '../utils/pricing';
 
 export const useFundingBalances = () => {
   const fetching = useRef(false);
-  const completedCount = useRef(0);
   const {
     fromTokenAddress,
     orderQuote,
@@ -56,11 +55,7 @@ export const useFundingBalances = () => {
             setFundingBalances([...foundBalances]);
           },
           onComplete: () => {
-            completedCount.current += 1;
-            if (completedCount.current === orderQuote.currencies.length) {
-              setLoadingBalances(false);
-              completedCount.current = 0;
-            }
+            setLoadingBalances(false);
           },
           onFundingRequirement: (requirement) => {
             setTransactionRequirement(requirement);
