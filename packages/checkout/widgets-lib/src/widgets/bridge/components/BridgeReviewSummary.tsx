@@ -16,7 +16,7 @@ import {
   isPassportProvider,
   isWalletConnectProvider,
 } from 'lib/provider';
-import { calculateCryptoToFiat, isNativeToken } from 'lib/utils';
+import { calculateCryptoToFiat, getChainImage, isNativeToken } from 'lib/utils';
 import {
   DEFAULT_QUOTE_REFRESH_INTERVAL,
   DEFAULT_TOKEN_DECIMALS,
@@ -26,7 +26,7 @@ import {
   addChainChangedListener,
   getL1ChainId,
   getL2ChainId,
-  networkIcon,
+  networkName,
   removeChainChangedListener,
 } from 'lib';
 import { useInterval } from 'lib/hooks/useInterval';
@@ -41,7 +41,6 @@ import { NetworkSwitchDrawer } from 'components/NetworkSwitchDrawer/NetworkSwitc
 import { Web3Provider } from '@ethersproject/providers';
 import { useWalletConnect } from 'lib/hooks/useWalletConnect';
 import { NotEnoughGas } from 'components/NotEnoughGas/NotEnoughGas';
-import { networkIconStyles } from './WalletNetworkButtonStyles';
 import {
   arrowIconStyles,
   arrowIconWrapperStyles,
@@ -52,6 +51,7 @@ import {
   topMenuItemStyles,
   wcStickerLogoStyles,
   wcWalletLogoStyles,
+  networkIconStyles,
 } from './BridgeReviewSummaryStyles';
 import { BridgeActions, BridgeContext } from '../context/BridgeContext';
 import {
@@ -76,6 +76,7 @@ export function BridgeReviewSummary() {
     },
     bridgeDispatch,
   } = useContext(BridgeContext);
+  const { environment } = checkout.config;
 
   const { track } = useAnalytics();
 
@@ -477,9 +478,14 @@ export function BridgeReviewSummary() {
           </Body>
         </MenuItem.Label>
         {fromNetwork && (
-          <MenuItem.IntentIcon
-            icon={networkIcon[fromNetwork] as any}
-            sx={networkIconStyles(fromNetwork)}
+          <MenuItem.FramedImage
+            use={(
+              <img
+                src={getChainImage(environment, fromNetwork)}
+                alt={networkName[fromNetwork]}
+              />
+            )}
+            sx={networkIconStyles}
           />
         )}
       </MenuItem>
@@ -524,9 +530,14 @@ export function BridgeReviewSummary() {
           </Body>
         </MenuItem.Label>
         {toNetwork && (
-          <MenuItem.IntentIcon
-            icon={networkIcon[toNetwork] as any}
-            sx={networkIconStyles(toNetwork)}
+          <MenuItem.FramedImage
+            use={(
+              <img
+                src={getChainImage(environment, toNetwork)}
+                alt={networkName[toNetwork]}
+              />
+            )}
+            sx={networkIconStyles}
           />
         )}
       </MenuItem>

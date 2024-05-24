@@ -1,16 +1,19 @@
 import {
-  Box, Icon, Body, EllipsizedText,
+  Box, Icon, Body, EllipsizedText, FramedImage,
 } from '@biom3/react';
 import { ChainSlug } from '@imtbl/checkout-sdk';
-import { logoColour, networkIcon, networkName } from 'lib';
+import { networkName } from 'lib';
 import { getChainIdBySlug } from 'lib/chains';
 import { Transaction } from 'lib/clients';
+import { Environment } from '@imtbl/config';
+import { getChainImage } from '../../lib/utils';
 
 export interface TransactionDetailsProps {
   transaction: Transaction;
+  environment: Environment;
 }
 
-export function TransactionDetails({ transaction }: TransactionDetailsProps) {
+export function TransactionDetails({ transaction, environment }: TransactionDetailsProps) {
   const fromChain = getChainIdBySlug(transaction.details.from_chain as ChainSlug);
   const toChain = getChainIdBySlug(transaction.details.to_chain as ChainSlug);
   return (
@@ -20,13 +23,17 @@ export function TransactionDetails({ transaction }: TransactionDetailsProps) {
       gap: 'base.spacing.x2',
     }}
     >
-      <Icon
-        icon={networkIcon[fromChain] as any}
+      <FramedImage
         sx={{
-          w: 'base.icon.size.250',
-          fill: logoColour[fromChain],
+          w: 'base.icon.size.400',
+          h: 'base.icon.size.400',
         }}
-        variant="bold"
+        use={(
+          <img
+            src={getChainImage(environment, fromChain)}
+            alt={networkName[fromChain]}
+          />
+        )}
       />
       <Box sx={{
         display: 'flex',
@@ -52,13 +59,17 @@ export function TransactionDetails({ transaction }: TransactionDetailsProps) {
         }}
       />
       <Box sx={{ flexGrow: '1' }} />
-      <Icon
-        icon={networkIcon[toChain] as any}
+      <FramedImage
         sx={{
-          w: 'base.icon.size.250',
-          fill: logoColour[toChain],
+          w: 'base.icon.size.400',
+          h: 'base.icon.size.400',
         }}
-        variant="bold"
+        use={(
+          <img
+            src={getChainImage(environment, toChain)}
+            alt={networkName[toChain]}
+          />
+        )}
       />
       <Box sx={{
         display: 'flex',

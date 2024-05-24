@@ -154,6 +154,10 @@ export function getRemoteImage(environment: Environment | undefined, path: strin
   return `${CHECKOUT_CDN_BASE_URL[environment ?? Environment.PRODUCTION]}/v1/blob/img${path}`;
 }
 
+export function getChainImage(environment: Environment | undefined, chainId: ChainId) {
+  return getRemoteImage(environment, `/chains/${chainId}.png`);
+}
+
 export function getEthTokenImage(environment: Environment | undefined) {
   return getRemoteImage(environment, '/tokens/eth.svg');
 }
