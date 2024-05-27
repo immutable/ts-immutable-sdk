@@ -9,7 +9,7 @@ export const MAX_FEE_DECIMAL_PLACES = 6; // will allow 0.000001 (0.0001%) as the
 const calculateFeesPercent = (
   orderFee:OrderFee,
   amountBn: BigNumber,
-  tokenQuantity: number = 1,
+  tokenQuantity: BigNumber = BigNumber.from(1),
 ): BigNumber => {
   const feePercentage = orderFee.amount as FeePercentage;
 
@@ -18,11 +18,10 @@ const calculateFeesPercent = (
 
   const bnFeeAmount = amountBn
     .mul(BigNumber.from(feePercentageMultiplier))
-    .div(BigNumber.from(tokenQuantity))
-    .mul(BigNumber.from(tokenQuantity))
     .div(10 ** MAX_FEE_DECIMAL_PLACES);
 
-  return bnFeeAmount;
+  // always round down to have a fee amount divisible by the token quantity
+  return bnFeeAmount.sub(bnFeeAmount.mod(tokenQuantity));
 };
 
 const calculateFeesToken = (
@@ -38,7 +37,7 @@ export const calculateFees = (
   orderFees: Array<OrderFee>,
   weiAmount: string,
   decimals: number = 18,
-  tokenQuantity: number = 1,
+  tokenQuantity: BigNumber = BigNumber.from(1),
 ):Array<FeeValue> => {
   let totalTokenFees: BigNumber = BigNumber.from(0);
 

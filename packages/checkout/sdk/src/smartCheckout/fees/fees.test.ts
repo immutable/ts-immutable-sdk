@@ -105,7 +105,7 @@ describe('orderbook fees', () => {
     const result = calculateFees(makerFees, amount, decimals, 10);
 
     expect(result).toEqual([{
-      amount: '4032258064516129030',
+      amount: '403225806451612900',
       recipientAddress: '0x222',
     }]);
   });

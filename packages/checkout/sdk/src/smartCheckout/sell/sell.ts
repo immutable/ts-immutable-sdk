@@ -238,7 +238,7 @@ export const sell = async (
     };
 
     if (makerFees !== undefined) {
-      const tokenQuantity = sellToken.type === ItemType.ERC721 ? 1 : parseInt(sellToken.amount, 10);
+      const tokenQuantity = sellToken.type === ItemType.ERC721 ? BigNumber.from(1) : BigNumber.from(sellToken.amount);
       const orderBookFees = calculateFees(makerFees, buyTokenOrNative.amount, decimals, tokenQuantity);
       if (orderBookFees.length !== makerFees.length) {
         throw new CheckoutError(
