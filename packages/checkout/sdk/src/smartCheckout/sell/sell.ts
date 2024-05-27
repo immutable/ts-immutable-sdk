@@ -250,7 +250,15 @@ export const sell = async (
     };
 
     if (makerFees !== undefined) {
-      const tokenQuantity = sellToken.type === ItemType.ERC721 ? BigNumber.from(1) : BigNumber.from(sellToken.amount);
+      const isDeprecatedTokenType = 'type' in sellToken;
+      let tokenQuantity = BigNumber.from(1);
+
+      // if type exists in sellToken then it is valid ERC721 or ERC1155 and not deprecated
+      if (!isDeprecatedTokenType) {
+        const erc1155Token = sellToken as unknown as ERC1155Item | ERC721Item;
+        if (erc1155Token.type === ItemType.ERC1155) tokenQuantity = BigNumber.from(erc1155Token.amount);
+      }
+
       const orderBookFees = calculateFees(makerFees, buyTokenOrNative.amount, decimals, tokenQuantity);
       if (orderBookFees.length !== makerFees.length) {
         throw new CheckoutError(

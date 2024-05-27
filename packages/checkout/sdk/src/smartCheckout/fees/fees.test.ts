@@ -1,4 +1,4 @@
-import { utils } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 import { calculateFees } from './fees';
 import { BuyToken, ItemType } from '../../types';
 import { CheckoutErrorType } from '../../errors';
@@ -102,7 +102,7 @@ describe('orderbook fees', () => {
       recipient: '0x222',
     }];
 
-    const result = calculateFees(makerFees, amount, decimals, 10);
+    const result = calculateFees(makerFees, amount, decimals, BigNumber.from(10));
 
     expect(result).toEqual([{
       amount: '403225806451612900',
