@@ -81,7 +81,7 @@ export class Wallet extends Base<WidgetType.WALLET> {
       <React.StrictMode>
         <CustomAnalyticsProvider checkout={this.checkout}>
           <ThemeProvider id="wallet-container" config={this.strongConfig()}>
-            <HandoverProvider>
+            <HandoverProvider checkout={this.checkout}>
               <ConnectLoader
                 widgetConfig={this.strongConfig()}
                 params={connectLoaderParams}

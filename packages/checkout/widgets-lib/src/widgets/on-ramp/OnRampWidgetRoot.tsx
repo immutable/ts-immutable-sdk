@@ -76,7 +76,7 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
       <React.StrictMode>
         <CustomAnalyticsProvider checkout={this.checkout}>
           <ThemeProvider id="onramp-container" config={this.strongConfig()}>
-            <HandoverProvider>
+            <HandoverProvider checkout={this.checkout}>
               <ConnectLoader
                 widgetConfig={this.strongConfig()}
                 params={connectLoaderParams}

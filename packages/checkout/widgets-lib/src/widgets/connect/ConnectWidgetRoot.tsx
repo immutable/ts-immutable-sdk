@@ -64,7 +64,7 @@ export class Connect extends Base<WidgetType.CONNECT> {
       <React.StrictMode>
         <CustomAnalyticsProvider checkout={this.checkout}>
           <ThemeProvider id="connect-container" config={this.strongConfig()}>
-            <HandoverProvider>
+            <HandoverProvider checkout={this.checkout}>
               <Suspense fallback={<LoadingView loadingText={t('views.LOADING_VIEW.text')} />}>
                 <ConnectWidget
                   config={this.strongConfig()}
