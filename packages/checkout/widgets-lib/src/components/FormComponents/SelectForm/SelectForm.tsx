@@ -4,10 +4,10 @@ import {
 import { useMemo, useState } from 'react';
 import { Environment } from '@imtbl/config';
 import { WidgetTheme } from '@imtbl/checkout-sdk';
+import { TokenImage } from 'components/TokenImage/TokenImage';
 import { FormControlWrapper } from '../FormControlWrapper/FormControlWrapper';
 import { CoinSelector } from '../../CoinSelector/CoinSelector';
 import { CoinSelectorOptionProps } from '../../CoinSelector/CoinSelectorOption';
-import { getDefaultTokenImage } from '../../../lib/utils';
 
 interface SelectFormProps {
   testId: string;
@@ -41,7 +41,6 @@ export function SelectForm({
   theme = WidgetTheme.DARK,
 }: SelectFormProps) {
   const [coinSelectorOpen, setCoinSelectorOpen] = useState<boolean>(false);
-  const [iconError, setIconError] = useState<boolean>(false);
   const coinSelectorOptions = useMemo(() => options.map((option) => ({
     ...option,
     testId,
@@ -59,10 +58,6 @@ export function SelectForm({
   };
 
   const filteredOption = options?.find((o) => o.id === selectedOption) as CoinSelectorOptionProps ?? selectedOption;
-  const tokenUrl = useMemo(() => {
-    if (typeof filteredOption === 'undefined') return '';
-    return iconError ? getDefaultTokenImage(environment, theme) : filteredOption.icon;
-  }, [filteredOption, environment, theme, iconError]);
 
   return (
     <Box>
@@ -103,10 +98,11 @@ export function SelectForm({
               {filteredOption.icon && (
                 <Select.Option.FramedImage
                   use={(
-                    <img
-                      src={tokenUrl}
-                      alt={filteredOption.id}
-                      onError={() => setIconError(true)}
+                    <TokenImage
+                      environment={environment}
+                      theme={theme}
+                      token={filteredOption.id}
+                      name={filteredOption.name}
                     />
                   )}
                   circularFrame
