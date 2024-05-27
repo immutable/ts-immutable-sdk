@@ -2,8 +2,8 @@ import React, { createContext } from 'react';
 
 export interface Handover {
   children: React.ReactNode;
-  animation: string;
-  animationState: string;
+  animationUrl?: string;
+  animationState?: string;
   onAnimationComplete?: () => void;
 }
 

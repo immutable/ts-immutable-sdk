@@ -5,8 +5,18 @@ interface HandoverProviderProps {
   children: React.ReactNode;
 }
 
+export enum HandoverType {
+  GLOBAL = 'global',
+  DRAWER = 'drawer',
+  LOADER = 'loader',
+}
+
+type HandoverState = {
+  [key in HandoverType]?: Handover;
+};
+
 export function HandoverProvider({ children }: HandoverProviderProps) {
-  const [handovers, setHandovers] = useState<{ [id: string]: Handover }>({});
+  const [handovers, setHandovers] = useState<HandoverState>({});
 
   const value = useMemo(() => ({ handovers, setHandovers }), [handovers]);
 
