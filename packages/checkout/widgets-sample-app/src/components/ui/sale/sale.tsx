@@ -27,45 +27,45 @@ const defaultPassportConfig = {
 
 const defaultItems: SaleItem[] = [
   {
-    productId: "biker",
+    productId: "kangaroo",
     qty: 1,
-    name: "Biker Iguana",
+    name: "Kangaroo",
     image:
-      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2024/02/img-Qq0Lek5jO8O9ueAZwDmdAImI-600x600-1.png",
-    description: "Biker Iguana",
+      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2024/05/character-image-10-1.png",
+    description: "Kangaroo",
   },
   {
-    productId: "lab",
+    productId: "kookaburra",
     qty: 3,
-    name: "Lab Iguana",
+    name: "Kookaburra",
     image:
-      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2023/12/img-IsR4OA7a9IStLeQ9cPo75tII.png",
-    description: "Lab Iguana",
+      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2024/05/character-image-4-1.png",
+    description: "Kookaburra",
   },
   {
-    productId: "baseball",
+    productId: "quokka",
     qty: 2,
-    name: "Baseball Iguana",
+    name: "Quokka",
     image:
-      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2023/12/img-tGcvA5pnoUAA2oNANHpA5CXB.png",
-    description: "Baseball Iguana",
+      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2024/05/character-image-8-1.png",
+    description: "Quokka",
   },
   {
-    productId: "firefighter",
+    productId: "ibis",
     qty: 1,
-    name: "Fire Fighter Iguana",
+    name: "Ibis",
     image:
-      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2023/12/img-NRXmr7k1jH9kZqXr029CEKt4.png",
-    description: "Fire Fighter Iguana",
+      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2024/05/character-image-1-1.png",
+    description: "Ibis",
   },
   {
-    productId: "soccer",
+    productId: "emu",
     qty: 5,
-    name: "Soccer Iguana",
+    name: "Emu",
     image:
-      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2023/12/img-msXHlIXmyy6IhDaMkP2Dp0HY.png",
-    description: "Soccer Iguana",
-  }
+      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2024/05/character-image-5-1.png",
+    description: "Emu",
+  },
 ];
 
 const useParams = () => {
