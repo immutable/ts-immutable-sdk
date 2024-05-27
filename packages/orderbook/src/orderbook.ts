@@ -259,7 +259,6 @@ export class Orderbook {
    * @param {Array<FulfillmentListing>} listings - The details of the listings to fulfil, amounts
    *                                               to fill and taker ecosystem fees to be paid.
    * @param {string} takerAddress - The address of the account fulfilling the order.
-   * @param {FeeValue[]} takerFees - Taker ecosystem fees to be paid.
    * @return {FulfillBulkOrdersResponse} Approval and fulfilment transactions.
    */
   async fulfillBulkOrders(
