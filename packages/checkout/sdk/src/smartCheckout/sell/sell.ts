@@ -250,11 +250,10 @@ export const sell = async (
     };
 
     if (makerFees !== undefined) {
-      const isDeprecatedTokenType = 'type' in sellToken;
       let tokenQuantity = BigNumber.from(1);
 
-      // if type exists in sellToken then it is valid ERC721 or ERC1155 and not deprecated
-      if (!isDeprecatedTokenType) {
+      // if type exists in sellToken then it is valid ERC721 or ERC1155 and not deprecated type
+      if ('type' in sellToken) {
         const erc1155Token = sellToken as unknown as ERC1155Item | ERC721Item;
         if (erc1155Token.type === ItemType.ERC1155) tokenQuantity = BigNumber.from(erc1155Token.amount);
       }
