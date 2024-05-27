@@ -9,6 +9,7 @@ export const MAX_FEE_DECIMAL_PLACES = 6; // will allow 0.000001 (0.0001%) as the
 const calculateFeesPercent = (
   orderFee:OrderFee,
   amountBn: BigNumber,
+  tokenQuantity: number = 1,
 ): BigNumber => {
   const feePercentage = orderFee.amount as FeePercentage;
 
@@ -17,6 +18,8 @@ const calculateFeesPercent = (
 
   const bnFeeAmount = amountBn
     .mul(BigNumber.from(feePercentageMultiplier))
+    .div(BigNumber.from(tokenQuantity))
+    .mul(BigNumber.from(tokenQuantity))
     .div(10 ** MAX_FEE_DECIMAL_PLACES);
 
   return bnFeeAmount;
@@ -34,8 +37,8 @@ const calculateFeesToken = (
 export const calculateFees = (
   orderFees: Array<OrderFee>,
   weiAmount: string,
-  tokenQuantity: number,
   decimals: number = 18,
+  tokenQuantity: number = 1,
 ):Array<FeeValue> => {
   let totalTokenFees: BigNumber = BigNumber.from(0);
 
@@ -51,22 +54,7 @@ export const calculateFees = (
   for (const orderFee of orderFees) {
     let currentFeeBn = BigNumber.from(0);
     if (Object.hasOwn(orderFee.amount, 'percentageDecimal')) {
-      currentFeeBn = calculateFeesPercent(orderFee, amountBn);
-
-      const feePercentage = orderFee.amount as FeePercentage;
-      const feePercentageMultiplier = Math.round(feePercentage.percentageDecimal * (10 ** MAX_FEE_DECIMAL_PLACES));
-      const totalFee = amountBn.mul(BigNumber.from(feePercentageMultiplier));
-      const adjusted = totalFee.div(tokenQuantity);
-      const finalFee = adjusted.mul(BigNumber.from(tokenQuantity));
-
-      // eslint-disable-next-line no-console
-      console.log('final fee');
-      // eslint-disable-next-line no-console
-      console.log(finalFee.toString());
-      // eslint-disable-next-line no-console
-      console.log('old fee');
-      // eslint-disable-next-line no-console
-      console.log(currentFeeBn.toString());
+      currentFeeBn = calculateFeesPercent(orderFee, amountBn, tokenQuantity);
 
       totalTokenFees = totalTokenFees.add(currentFeeBn);
     } else if (Object.hasOwn(orderFee.amount, 'token')) {

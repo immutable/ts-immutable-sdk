@@ -94,6 +94,22 @@ describe('orderbook fees', () => {
     }]);
   });
 
+  it('TD-1453 sell token quantity > 1 and non divisible fee amount', async () => {
+    const decimals = 18;
+    const amount = utils.parseUnits('40.32258064516129033', 18).toString();
+    const makerFees = [{
+      amount: { percentageDecimal: 0.01 },
+      recipient: '0x222',
+    }];
+
+    const result = calculateFees(makerFees, amount, decimals, 10);
+
+    expect(result).toEqual([{
+      amount: '4032258064516129030',
+      recipientAddress: '0x222',
+    }]);
+  });
+
   it('should calculate the fees with multiple percentageDecimals', async () => {
     const decimals = 18;
     const amount = utils.parseUnits('10', 18).toString();

@@ -166,7 +166,8 @@ export const buy = async (
 
   let fees: FeeValue[] = [];
   if (takerFees && takerFees.length > 0) {
-    fees = calculateFees(takerFees, buyToken.amount, decimals);
+    const tokenQuantity = order.result.sell[0].type === ItemType.ERC721 ? 1 : parseInt(order.result.sell[0].amount, 10);
+    fees = calculateFees(takerFees, buyToken.amount, decimals, tokenQuantity);
   }
 
   let unsignedApprovalTransactions: TransactionRequest[] = [];

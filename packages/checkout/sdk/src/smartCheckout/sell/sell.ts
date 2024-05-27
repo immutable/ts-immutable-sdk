@@ -238,9 +238,8 @@ export const sell = async (
     };
 
     if (makerFees !== undefined) {
-      //
       const tokenQuantity = sellToken.type === ItemType.ERC721 ? 1 : parseInt(sellToken.amount, 10);
-      const orderBookFees = calculateFees(makerFees, buyTokenOrNative.amount, tokenQuantity, decimals);
+      const orderBookFees = calculateFees(makerFees, buyTokenOrNative.amount, decimals, tokenQuantity);
       if (orderBookFees.length !== makerFees.length) {
         throw new CheckoutError(
           'One of the fees is too small, must be greater than 0.000001',
