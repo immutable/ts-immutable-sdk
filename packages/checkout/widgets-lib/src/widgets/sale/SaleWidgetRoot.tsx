@@ -15,19 +15,19 @@ import {
   ConnectLoaderParams,
 } from 'components/ConnectLoader/ConnectLoader';
 import { getL2ChainId } from 'lib';
-import {
-  isValidWalletProvider,
-} from 'lib/validations/widgetValidators';
+import { isValidWalletProvider } from 'lib/validations/widgetValidators';
 import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
 import { LoadingView } from 'views/loading/LoadingView';
+import { HandoverProvider } from 'context/handover-context/HandoverProvider';
 import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
 import i18n from '../../i18n';
 
 const SaleWidget = React.lazy(() => import('./SaleWidget'));
 
 export class Sale extends Base<WidgetType.SALE> {
-  protected eventTopic: IMTBLWidgetEvents = IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT;
+  protected eventTopic: IMTBLWidgetEvents =
+    IMTBLWidgetEvents.IMTBL_SALE_WIDGET_EVENT;
 
   // TODO: add specific validation logic for the sale items
   private isValidProucts(products: SaleItem[]): boolean {
@@ -45,7 +45,8 @@ export class Sale extends Base<WidgetType.SALE> {
 
     if (config) {
       validatedConfig = config;
-      if (config.theme === WidgetTheme.LIGHT) validatedConfig.theme = WidgetTheme.LIGHT;
+      if (config.theme === WidgetTheme.LIGHT)
+        validatedConfig.theme = WidgetTheme.LIGHT;
       else validatedConfig.theme = WidgetTheme.DARK;
     }
 
@@ -82,7 +83,8 @@ export class Sale extends Base<WidgetType.SALE> {
     }
 
     if (
-      params.excludePaymentTypes !== undefined && !Array.isArray(params.excludePaymentTypes)
+      params.excludePaymentTypes !== undefined &&
+      !Array.isArray(params.excludePaymentTypes)
     ) {
       // eslint-disable-next-line no-console
       console.warn('[IMTBL]: invalid "excludePaymentTypes" widget input');
@@ -110,17 +112,13 @@ export class Sale extends Base<WidgetType.SALE> {
       <React.StrictMode>
         <CustomAnalyticsProvider checkout={this.checkout}>
           <ThemeProvider id="sale-container" config={config}>
-            <ConnectLoader
-              widgetConfig={config}
-              params={connectLoaderParams}
-              closeEvent={() => {
-                sendSaleWidgetCloseEvent(window);
-              }}
-            >
-              <Suspense
-                fallback={
-                  <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
-                }
+            <HandoverProvider>
+              <ConnectLoader
+                widgetConfig={config}
+                params={connectLoaderParams}
+                closeEvent={() => {
+                  sendSaleWidgetCloseEvent(window);
+                }}
               >
                 <SaleWidget
                   config={config}
@@ -130,14 +128,18 @@ export class Sale extends Base<WidgetType.SALE> {
                   collectionName={this.parameters.collectionName!}
                   excludePaymentTypes={this.parameters.excludePaymentTypes!}
                   preferredCurrency={this.parameters.preferredCurrency!}
-                  hideExcludedPaymentTypes={this.properties?.config?.hideExcludedPaymentTypes ?? false}
-                  waitFulfillmentSettlements={this.properties?.config?.waitFulfillmentSettlements ?? true}
+                  hideExcludedPaymentTypes={
+                    this.properties?.config?.hideExcludedPaymentTypes ?? false
+                  }
+                  waitFulfillmentSettlements={
+                    this.properties?.config?.waitFulfillmentSettlements ?? true
+                  }
                 />
-              </Suspense>
-            </ConnectLoader>
+              </ConnectLoader>
+            </HandoverProvider>
           </ThemeProvider>
         </CustomAnalyticsProvider>
-      </React.StrictMode>,
+      </React.StrictMode>
     );
   }
 }

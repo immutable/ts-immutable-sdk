@@ -15,6 +15,7 @@ import { isValidAddress, isValidAmount } from 'lib/validations/widgetValidators'
 import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
 import { LoadingView } from 'views/loading/LoadingView';
+import { HandoverProvider } from 'context/handover-context/HandoverProvider';
 import { sendOnRampWidgetCloseEvent } from './OnRampWidgetEvents';
 import i18n from '../../i18n';
 
@@ -75,19 +76,21 @@ export class OnRamp extends Base<WidgetType.ONRAMP> {
       <React.StrictMode>
         <CustomAnalyticsProvider checkout={this.checkout}>
           <ThemeProvider id="onramp-container" config={this.strongConfig()}>
-            <ConnectLoader
-              widgetConfig={this.strongConfig()}
-              params={connectLoaderParams}
-              closeEvent={() => sendOnRampWidgetCloseEvent(window)}
-            >
-              <Suspense fallback={<LoadingView loadingText={t('views.ONRAMP.initialLoadingText')} />}>
-                <OnRampWidget
-                  tokenAddress={this.parameters.tokenAddress}
-                  amount={this.parameters.amount}
-                  config={this.strongConfig()}
-                />
-              </Suspense>
-            </ConnectLoader>
+            <HandoverProvider>
+              <ConnectLoader
+                widgetConfig={this.strongConfig()}
+                params={connectLoaderParams}
+                closeEvent={() => sendOnRampWidgetCloseEvent(window)}
+              >
+                <Suspense fallback={<LoadingView loadingText={t('views.ONRAMP.initialLoadingText')} />}>
+                  <OnRampWidget
+                    tokenAddress={this.parameters.tokenAddress}
+                    amount={this.parameters.amount}
+                    config={this.strongConfig()}
+                  />
+                </Suspense>
+              </ConnectLoader>
+            </HandoverProvider>
           </ThemeProvider>
         </CustomAnalyticsProvider>
       </React.StrictMode>,
