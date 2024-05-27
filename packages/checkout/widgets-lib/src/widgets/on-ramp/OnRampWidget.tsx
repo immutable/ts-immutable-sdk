@@ -133,9 +133,9 @@ export default function OnRampWidget({
         <OnRampMain
           passport={checkout?.passport}
           showIframe={showIframe}
-          tokenAmount={viewState.view.data?.amount ?? amount}
+          tokenAmount={amount ?? viewState.view.data?.amount}
           tokenAddress={
-            viewState.view.data?.tokenAddress ?? tknAddr
+              tknAddr ?? viewState.view.data?.tokenAddress
           }
         />
       )}

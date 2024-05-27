@@ -270,7 +270,7 @@ export type BuyOrder = {
  */
 export type SellOrder = {
   /** the token to be listed for sale */
-  sellToken: ERC721SellToken | ERC1155SellToken;
+  sellToken: SellToken;
   /** the token info of the price of the item */
   buyToken: BuyToken;
   /** optional array of makerFees to be applied to the listing */
@@ -316,7 +316,7 @@ export type ERC20BuyToken = {
  * Represents the token listed for sale.
  * ERC721SellToken or ERC1155SellToken {@link Checkout.smartCheckout}.
  */
-export type SellToken = ERC721SellToken | ERC1155SellToken;
+export type SellToken = DeprecatedERC721SellToken | ERC721SellToken | ERC1155SellToken;
 
 /**
  * The ERC721SellToken type
@@ -325,6 +325,19 @@ export type SellToken = ERC721SellToken | ERC1155SellToken;
  */
 export type ERC721SellToken = {
   type: ItemType.ERC721;
+  /**  The ERC721 token id */
+  id: string;
+  /** The ERC721 collection address */
+  collectionAddress: string;
+};
+
+/**
+ * The original ERC721SellToken type, before the introduction of the ItemType enum
+ * @property {string} id
+ * @property {string} collectionAddress
+ * @deprecated
+ */
+export type DeprecatedERC721SellToken = {
   /**  The ERC721 token id */
   id: string;
   /** The ERC721 collection address */
@@ -739,6 +752,8 @@ export type Fee = {
   formattedAmount: string;
   /** The token info for the fee */
   token?: TokenInfo;
+  /** The basis points for the secondary fee */
+  basisPoints?: number;
 };
 
 /**

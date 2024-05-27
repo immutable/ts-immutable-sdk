@@ -1,6 +1,6 @@
 import { PopupOverlayOptions } from 'types';
 import { PASSPORT_OVERLAY_CLOSE_ID, PASSPORT_OVERLAY_TRY_AGAIN_ID } from './constants';
-import { getBlockedOverlay, getGenericOverlay } from './elements';
+import { addLink, getBlockedOverlay, getGenericOverlay } from './elements';
 
 export default class Overlay {
   private disableGenericPopupOverlay: boolean;
@@ -48,6 +48,10 @@ export default class Overlay {
 
   private appendOverlay() {
     if (!this.overlay) {
+      addLink({ id: 'link-googleapis', href: 'https://fonts.googleapis.com' });
+      addLink({ id: 'link-gstatic', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' });
+      addLink({ id: 'link-roboto', href: 'https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap', rel: 'stylesheet' });
+
       const overlay = document.createElement('div');
       overlay.innerHTML = this.isBlockedOverlay ? getBlockedOverlay() : getGenericOverlay();
       document.body.insertAdjacentElement('beforeend', overlay);

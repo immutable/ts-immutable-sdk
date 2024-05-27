@@ -7,6 +7,12 @@
       },
       "walletSelection": {
         "heading": "选择一个钱包"
+      },
+      "nonPassportDrawer": {
+        "heading": "非Passport用户需要IMX来支付燃气费。",
+        "body1": "我们建议使用<layerswapLink>Layerswap</layerswapLink>将资金桥接到Immutable zkEVM，并打开加油功能，以便您能收到一些IMX。",
+        "body2": "或者，可以使用免燃气费的Immutable Passport轻松支付和玩游戏。",
+        "buttonText": "继续操作"
       }
     },
     "CONNECT_SUCCESS": {
@@ -269,9 +275,6 @@
         "caption1": "硬币",
         "caption2": "余额",
         "divider": "更多选项",
-        "payWithCard": {
-          "caption": "使用银行卡购买此商品"
-        },
         "stepType": {
           "SWAP": "交换 {{symbol}} ≈ {{amount}}",
           "ONRAMP": "购买 {{symbol}} ≈ {{amount}}",
@@ -284,12 +287,15 @@
             "SUFFICIENT": "支付 {{symbol}} {{amount}}"
           }
         },
-        "fee": "费用 {{symbol}} ≈ {{amount}}"
+        "fee": "交换费用 ~ {{symbol}} {{amount}}"
       },
       "orderReview": {
         "heading": "付款摘要",
         "continue": "继续",
-        "payWith": "使用{{symbol}}支付",
+        "payWith": {
+          "SWAP": "使用{{symbol}}进行交换和支付",
+          "SUFFICIENT": "使用{{symbol}}支付"
+        },
         "balance": "余额{{amount}}"
       }
     },
@@ -616,7 +622,8 @@
           "label": "{{amount}} 交换费（已计入报价）"
         },
         "serviceFee": {
-          "label": "服务费"
+          "depositLabel": "zkEVM 气体费用",
+          "withdrawLabel": "Ethereum 气体费用"
         }
       }
     },

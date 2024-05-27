@@ -1,10 +1,9 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-console */
 /* eslint-disable class-methods-use-this */
 import axios, { AxiosResponse } from 'axios';
 import { ethers } from 'ethers';
 import {
-  concat, defaultAbiCoder, hexlify, keccak256, zeroPad,
+  concat, defaultAbiCoder, hexValue, hexlify, keccak256, zeroPad,
 } from 'ethers/lib/utils';
 import { ROOT_AXELAR_ADAPTOR } from 'contracts/ABIs/RootAxelarBridgeAdaptor';
 import {
@@ -12,10 +11,11 @@ import {
   validateGetFee,
 } from 'lib/validation';
 import {
-  getAxelarEndpoint, getAxelarGateway, getChildAdaptor, getChildchain, getRootAdaptor, getTenderlyEndpoint,
+  getAxelarEndpoint, getAxelarGateway, getChildAdaptor, getChildchain, getRootAdaptor,
   isValidDeposit,
   isValidWithdraw,
   isWithdrawNativeIMX,
+  isNativeTokenBridgeFeeRequest,
   isWithdrawWrappedIMX,
   isWrappedIMX,
   shouldBeDepositOrFinaliseWithdraw,
@@ -24,6 +24,7 @@ import { TenderlySimulation } from 'types/tenderly';
 import { calculateGasFee } from 'lib/gas';
 import { createContract } from 'contracts/createContract';
 import { getWithdrawRootToken, genAxelarWithdrawPayload, genUniqueAxelarCommandId } from 'lib/axelarUtils';
+import { submitTenderlySimulations } from 'lib/tenderly';
 import {
   NATIVE,
   ETHEREUM_NATIVE_TOKEN_ADDRESS,
@@ -207,7 +208,7 @@ export class TokenBridge {
     }
 
     // Get approval fee
-    if ('token' in req && req.token.toUpperCase() !== NATIVE) {
+    if (!isNativeTokenBridgeFeeRequest(req)) {
       if (isValidDeposit(direction, this.config.bridgeInstance)) {
         approvalFee = calculateGasFee(feeData, BridgeMethodsGasLimit.APPROVE_TOKEN);
       } else if (isWithdrawWrappedIMX(req.token, direction, this.config.bridgeInstance)) {
@@ -384,39 +385,40 @@ export class TokenBridge {
     const currentBridgeMethods = await this.getBridgeMethods(direction);
     const bridgeContract = await this.getBridgeContract(direction);
 
+    let functionName: string;
+    let parameters: any[];
     /**
      * Handle bridge transaction for native token
      */
     if (token.toUpperCase() === NATIVE) {
       if (sender === recipient) {
         // Deposit or withdraw native token
-        return await withBridgeError<string>(async () => bridgeContract.interface.encodeFunctionData(
-          currentBridgeMethods.native,
-          [amount],
-        ), BridgeErrorType.INTERNAL_ERROR);
+        functionName = currentBridgeMethods.native;
+        parameters = [amount];
+      } else {
+        // Deposit or withdraw native token TO
+        functionName = currentBridgeMethods.nativeTo;
+        parameters = [recipient, amount];
       }
-      // Deposit or withdraw native token TO
-      return await withBridgeError<string>(async () => bridgeContract.interface.encodeFunctionData(
-        currentBridgeMethods.nativeTo,
-        [recipient, amount],
-      ), BridgeErrorType.INTERNAL_ERROR);
+    } else {
+      /**
+       * Handle bridge transaction for ERC20
+       */
+      const erc20Token = ethers.utils.getAddress(token);
+      if (sender === recipient) {
+        // Deposit or withdraw ERC20
+        functionName = currentBridgeMethods.token;
+        parameters = [erc20Token, amount];
+      } else {
+        // Deposit or withdraw ERC20 TO.
+        functionName = currentBridgeMethods.tokenTo;
+        parameters = [erc20Token, recipient, amount];
+      }
     }
 
-    /**
-     * Handle bridge transaction for ERC20
-     */
-    const erc20Token = ethers.utils.getAddress(token);
-    if (sender === recipient) {
-      // Deposit or withdraw ERC20
-      return await withBridgeError<string>(async () => bridgeContract.interface.encodeFunctionData(
-        currentBridgeMethods.token,
-        [erc20Token, amount],
-      ), BridgeErrorType.INTERNAL_ERROR);
-    }
-    // Deposit or withdraw ERC20 TO.
     return await withBridgeError<string>(async () => bridgeContract.interface.encodeFunctionData(
-      currentBridgeMethods.tokenTo,
-      [erc20Token, recipient, amount],
+      functionName,
+      parameters,
     ), BridgeErrorType.INTERNAL_ERROR);
   }
 
@@ -828,12 +830,9 @@ export class TokenBridge {
         ]), BridgeErrorType.INTERNAL_ERROR);
 
       simulations.push({
-        network_id: sourceChainId,
-        estimate_gas: true,
-        simulation_type: 'quick',
         from: sender,
         to: token,
-        input: txData,
+        data: txData,
       });
     }
 
@@ -853,19 +852,18 @@ export class TokenBridge {
     );
 
     // tx value for simulation mocked as amount + 1 wei for a native bridge and 1 wei for token bridges
-    const txValue = (token.toUpperCase() !== NATIVE) ? '1' : amount.add('1').toString();
+    // hexValue() is required to remove leading zeros, which tenderly does not support.
+    const txValue = (token.toUpperCase() !== NATIVE) ? '0x1' : hexValue(amount.add('1').toHexString());
 
     simulations.push({
-      network_id: sourceChainId,
-      estimate_gas: true,
-      simulation_type: 'quick',
       from: sender,
       to: this.config.bridgeContracts.rootERC20BridgeFlowRate,
-      input: txData,
+      data: txData,
       value: txValue,
     });
 
-    const gas = await this.submitTenderlySimulations(sourceChainId, simulations);
+    // TODO this specific branch does not have tests written
+    const gas = await submitTenderlySimulations(sourceChainId, simulations);
     const tenderlyGasEstimatesRes = {} as DynamicGasEstimatesResponse;
     if (gas.length === 1) {
       tenderlyGasEstimatesRes.approvalGas = 0;
@@ -922,84 +920,20 @@ export class TokenBridge {
     // Build simulation
     const axelarGateway = getAxelarGateway(destinationChainId);
     const simulations: Array<TenderlySimulation> = [{
-      network_id: destinationChainId,
-      estimate_gas: true,
-      simulation_type: 'quick',
       from: sender,
       to: destinationAddress,
-      input: executeData,
-      state_objects: {
-        [axelarGateway]: {
-          storage: {
-            // Override storage to approve this command.
-            [slot]: '0x0000000000000000000000000000000000000000000000000000000000000001',
-          },
-        },
-      },
+      data: executeData,
     }];
 
-    const gas = await this.submitTenderlySimulations(destinationChainId, simulations);
+    const gas = await submitTenderlySimulations(destinationChainId, simulations, {
+      [axelarGateway]: {
+        stateDiff: {
+          // Override storage to approve this command.
+          [slot]: '0x0000000000000000000000000000000000000000000000000000000000000001',
+        },
+      },
+    });
     return gas[0];
-  }
-
-  // TODO this function should have tests. We can write these when we introduce a separate class
-  // for tenderly stuff
-  private async submitTenderlySimulations(
-    chainId: string,
-    simulations: Array<TenderlySimulation>,
-  ): Promise<Array<number>> {
-    let axiosResponse:AxiosResponse;
-    const tenderlyAPI = getTenderlyEndpoint(chainId);
-    try {
-      axiosResponse = await axios.post(
-        tenderlyAPI,
-        {
-          simulations,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      );
-    } catch (error: any) {
-      axiosResponse = error.response;
-    }
-
-    if (axiosResponse.data.error) {
-      throw new BridgeError(
-        `Estimating gas failed with the reason: ${axiosResponse.data.error.message}`,
-        BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
-      );
-    }
-
-    const simResults = axiosResponse.data.simulation_results;
-    if (simResults.length !== simulations.length) {
-      throw new BridgeError(
-        'Estimating gas failed with mismatched responses',
-        BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
-      );
-    }
-
-    const gas: Array<number> = [];
-
-    for (let i = 0; i < simResults.length; i++) {
-      if (simResults[i].simulation.error_message) {
-        throw new BridgeError(
-          `Estimating deposit gas failed with the reason: ${simResults[i].simulation.error_message}`,
-          BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
-        );
-      }
-      if (simResults[i].simulation.gas_used === undefined) {
-        throw new BridgeError(
-          'Estimating gas did not return simulation results',
-          BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
-        );
-      }
-      gas.push(simResults[i].simulation.gas_used);
-    }
-
-    return gas;
   }
 
   private async getAllowance(direction: BridgeDirection, token: string, sender: string): Promise<ethers.BigNumber> {

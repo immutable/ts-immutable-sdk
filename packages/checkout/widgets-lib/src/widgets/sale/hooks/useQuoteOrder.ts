@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Environment } from '@imtbl/config';
 import { SaleItem } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
+import { compareStr } from 'lib/utils';
 import { PRIMARY_SALES_API_BASE_URL } from '../utils/config';
 
 import { OrderQuote, OrderQuoteCurrency, SaleErrorTypes } from '../types';
@@ -12,6 +13,7 @@ type UseQuoteOrderParams = {
   environmentId: string;
   environment: Environment;
   provider: Web3Provider | undefined;
+  preferredCurrency?: string;
 };
 
 export const defaultOrderQuote: OrderQuote = {
@@ -33,6 +35,7 @@ export const useQuoteOrder = ({
   environment,
   environmentId,
   provider,
+  preferredCurrency,
 }: UseQuoteOrderParams) => {
   const [selectedCurrency, setSelectedCurrency] = useState<
   OrderQuoteCurrency | undefined
@@ -94,7 +97,10 @@ export const useQuoteOrder = ({
           throw new Error(`${response.status} - ${response.statusText}`);
         }
 
-        const config = transformToOrderQuote(await response.json());
+        const config = transformToOrderQuote(
+          await response.json(),
+          preferredCurrency,
+        );
         setOrderQuote(config);
       } catch (error) {
         setError(error);
@@ -108,7 +114,12 @@ export const useQuoteOrder = ({
     // Set default currency
     if (orderQuote.currencies.length === 0) return;
 
-    const defaultSelectedCurrency = orderQuote.currencies.find((c) => c.base)
+    const baseCurrencyOverride = preferredCurrency
+      ? orderQuote.currencies.find((c) => compareStr(c.name, preferredCurrency))
+      : undefined;
+
+    const defaultSelectedCurrency = baseCurrencyOverride
+      || orderQuote.currencies.find((c) => c.base)
       || orderQuote.currencies?.[0];
 
     setSelectedCurrency(defaultSelectedCurrency);

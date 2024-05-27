@@ -53,6 +53,184 @@ describe('sell', () => {
   });
 
   describe('sell', () => {
+    it('should call smart checkout and execute the transactions for a deprecated typed ERC721 order', async () => {
+      const id = '0';
+      const contractAddress = '0xERC721';
+
+      const erc721ItemRequirement = {
+        type: ItemType.ERC721,
+        id,
+        contractAddress,
+        spenderAddress: seaportContractAddress,
+      };
+
+      const erc721TransactionRequirement = {
+        type: ItemType.ERC721,
+        sufficient: true,
+        required: {
+          type: ItemType.ERC721,
+          balance: BigNumber.from(1),
+          formattedBalance: '1',
+          contractAddress: '0xab8bb5bc4FB1Cfc060f77f87B558c98abDa65130',
+          id: '0',
+        },
+        current: {
+          type: ItemType.ERC721,
+          balance: BigNumber.from(1),
+          formattedBalance: '1',
+          contractAddress: '0xab8bb5bc4FB1Cfc060f77f87B558c98abDa65130',
+          id: '0',
+        },
+        delta: {
+          balance: BigNumber.from(0),
+          formattedBalance: '0',
+        },
+      };
+
+      (smartCheckout as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        transactionRequirements: [
+          erc721TransactionRequirement,
+        ],
+      });
+
+      const mockCreateListing = jest.fn().mockResolvedValue({
+        result: {
+          id: '1234',
+        },
+      });
+
+      const prepareListing = jest.fn().mockResolvedValue({
+        actions: [
+          {
+            type: ActionType.SIGNABLE,
+            purpose: SignablePurpose.CREATE_LISTING,
+            message: {
+              domain: '',
+              types: '',
+              value: '',
+            },
+          },
+        ],
+      });
+
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
+        config: jest.fn().mockReturnValue({
+          seaportContractAddress,
+        }),
+        prepareListing,
+        createListing: mockCreateListing,
+      });
+
+      (getUnsignedMessage as jest.Mock).mockReturnValue(
+        {
+          orderHash: 'hash',
+          orderComponents: {},
+          unsignedMessage: {
+            domain: {} as TypedDataDomain,
+            types: { types: [] },
+            value: { values: '' },
+          },
+        },
+      );
+      (signMessage as jest.Mock).mockResolvedValue({
+        orderHash: 'hash',
+        orderComponents: {},
+        signedMessage: '0xSIGNED',
+      });
+      (getUnsignedSellTransactions as jest.Mock).mockResolvedValue({
+        approvalTransactions: [{ from: '0xAPPROVAL' }],
+      });
+      (signApprovalTransactions as jest.Mock).mockResolvedValue({
+        type: SignTransactionStatusType.SUCCESS,
+      });
+
+      const orderExpiry = new Date('2022-03-25');
+      const order: SellOrder = {
+        sellToken: {
+          id,
+          collectionAddress: contractAddress,
+        },
+        buyToken: {
+          type: ItemType.NATIVE,
+          amount: '1',
+        },
+        makerFees: [{
+          amount: { percentageDecimal: 0.025 },
+          recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
+        }],
+        orderExpiry,
+      };
+
+      const result = await sell(
+        config,
+        mockProvider,
+        [order],
+      );
+
+      expect(result).toEqual({
+        smartCheckoutResult: {
+          sufficient: true,
+          transactionRequirements: [erc721TransactionRequirement],
+        },
+        status: CheckoutStatus.SUCCESS,
+        orderIds: ['1234'],
+      });
+
+      expect(smartCheckout).toBeCalledWith(
+        config,
+        mockProvider,
+        [erc721ItemRequirement],
+        {
+          type: TransactionOrGasType.GAS,
+          gasToken: {
+            type: GasTokenType.NATIVE,
+            limit: BigNumber.from(constants.estimatedFulfillmentGasGwei),
+          },
+        },
+      );
+      expect(prepareListing).toBeCalledWith({
+        makerAddress: walletAddress,
+        buy: {
+          type: ItemType.NATIVE,
+          amount: '1000000000000000000',
+        },
+        sell: {
+          type: ItemType.ERC721,
+          contractAddress: order.sellToken.collectionAddress,
+          tokenId: order.sellToken.id,
+        },
+        orderExpiry: order.orderExpiry,
+      });
+      expect(signMessage).toBeCalledWith(
+        mockProvider,
+        {
+          orderHash: 'hash',
+          orderComponents: {},
+          unsignedMessage: {
+            domain: {} as TypedDataDomain,
+            types: { types: [] },
+            value: { values: '' },
+          },
+        },
+      );
+      expect(signApprovalTransactions).toBeCalledWith(
+        mockProvider,
+        [{ from: '0xAPPROVAL' }],
+      );
+      expect(mockCreateListing).toBeCalledWith(
+        {
+          makerFees: [{
+            amount: '25000000000000000',
+            recipientAddress: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
+          }],
+          orderComponents: {},
+          orderHash: 'hash',
+          orderSignature: '0xSIGNED',
+        },
+      );
+    });
+
     it('should call smart checkout and execute the transactions for ERC721 order', async () => {
       const id = '0';
       const contractAddress = '0xERC721';

@@ -7,7 +7,13 @@
       },
       "walletSelection": {
         "heading": "ウォレットを選択"
-      }
+      },
+      "nonPassportDrawer": {
+        "heading": "パスポート未使用者はガス代としてIMXが必要です。",
+        "body1": "資金をImmutable zkEVMにブリッジするには、<layerswapLink>Layerswap</layerswapLink>の使用をお勧めします。リファエルをオンにしてIMXを受け取ります。",
+        "body2": "または、ガス無料のImmutable Passportで簡単に支払いとプレイができます。",
+        "buttonText": "それでも進む"
+      }    
     },
     "CONNECT_SUCCESS": {
       "status": "接続が安全です",
@@ -276,9 +282,6 @@
         "caption1": "コイン",
         "caption2": "残高",
         "divider": "その他のオプション",
-        "payWithCard": {
-          "caption": "代わりにカードで購入"
-        },
         "stepType": {
           "SWAP": "{{symbol}}を{{amount}}でスワップ",
           "ONRAMP": "{{symbol}}を{{amount}}で購入",
@@ -291,12 +294,15 @@
             "SUFFICIENT": "{{symbol}} {{amount}}で支払う"
           }
         },
-        "fee": "手数料 {{symbol}} ≈ {{amount}}"
+        "fee": "交換手数料 ~ {{symbol}} {{amount}}"
       },
       "orderReview": {
         "heading": "支払いの概要",
         "continue": "続行",
-        "payWith": "{{symbol}}で支払う",
+        "payWith": {
+          "SWAP": "{{symbol}}でスワップ＆支払い",
+          "SUFFICIENT": "{{symbol}}で支払う"
+        },
         "balance": "残高{{amount}}"
       }
     },
@@ -623,7 +629,8 @@
           "label": "{{amount}} スワップ手数料（見積もりに含まれる）"
         },
         "serviceFee": {
-          "label": "サービス手数料"
+          "depositLabel": "zkEVM ガス手数料",
+          "withdrawLabel": "Ethereum ガス手数料"
         }
       }
     },
