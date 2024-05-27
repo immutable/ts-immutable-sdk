@@ -12,6 +12,8 @@ import {
   andTheOffererAccountHasERC721Token, andERC721TokenShouldBeTransferredToTheFulfiller, andTradeShouldBeAvailable,
   givenIHaveAFundedOffererAccount, thenTheListingShouldBeOfStatus,
   whenICreateAListing, whenIFulfillTheListingToBuy, andERC1155TokensShouldBeTransferredToTheFulfiller,
+  thenTheListingsShouldBeOfStatus,
+  whenIFulfillBulkListings,
 } from './shared';
 
 const feature = loadFeature('features/order.feature', { tagFilter: process.env.TAGS });
@@ -161,5 +163,58 @@ defineFeature(feature, (test) => {
     andERC1155TokensShouldBeTransferredToTheFulfiller(and, bankerWallet, erc1155ContractAddress, testTokenId, fulfiller);
 
     andTradeShouldBeAvailable(and, sdk, fulfiller, getListingId);
+  }, 120_000);
+
+  test('create and bulk fill multiple listings', ({
+    given,
+    when,
+    then,
+    and,
+  }) => {
+    const offerer = new Wallet(Wallet.createRandom().privateKey, provider);
+    const fulfiller = new Wallet(Wallet.createRandom().privateKey, provider);
+    const testERC721TokenId = getRandomTokenId();
+    const testERC1155TokenId = getRandomTokenId();
+
+    let erc721listingId: string = '';
+    // We will partially fill the erc1155 listing ID
+    let erc1155listingId: string = '';
+
+    // these callback functions are required to update / retrieve test level state variables from shared steps.
+    const setERC721ListingId = (id: string) => {
+      erc721listingId = id;
+    };
+
+    const setERC1155ListingId = (id: string) => {
+      erc1155listingId = id;
+    };
+
+    const getERC721ListingId = () => erc721listingId;
+    const getERC1155ListingId = () => erc1155listingId;
+
+    givenIHaveAFundedOffererAccount(given, bankerWallet, offerer);
+
+    andTheOffererAccountHasERC1155Tokens(and, bankerWallet, offerer, erc1155ContractAddress, testERC1155TokenId);
+
+    andTheOffererAccountHasERC721Token(and, bankerWallet, offerer, erc721ContractAddress, testERC721TokenId);
+
+    andIHaveAFundedFulfillerAccount(and, bankerWallet, fulfiller);
+
+    whenICreateAListing(when, sdk, offerer, erc1155ContractAddress, testERC1155TokenId, setERC1155ListingId);
+
+    whenICreateAListing(when, sdk, offerer, erc721ContractAddress, testERC721TokenId, setERC721ListingId);
+
+    thenTheListingsShouldBeOfStatus(then, sdk, [getERC721ListingId, getERC1155ListingId]);
+
+    whenIFulfillBulkListings(when, sdk, fulfiller, getERC721ListingId, getERC1155ListingId);
+
+    thenTheListingShouldBeOfStatus(then, sdk, getERC721ListingId);
+
+    // eslint-disable-next-line max-len
+    andERC1155TokensShouldBeTransferredToTheFulfiller(and, bankerWallet, erc1155ContractAddress, testERC1155TokenId, fulfiller);
+
+    thenTheListingShouldBeOfStatus(then, sdk, getERC1155ListingId);
+
+    andTradeShouldBeAvailable(and, sdk, fulfiller, getERC1155ListingId);
   }, 120_000);
 });
