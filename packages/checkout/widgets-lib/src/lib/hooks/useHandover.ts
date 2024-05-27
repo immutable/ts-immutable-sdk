@@ -2,13 +2,15 @@ import { useContext, useCallback } from 'react';
 import { Handover } from 'context/handover-context/HandoverContext';
 import { HandoverContext } from '../../context/handover-context/HandoverContext';
 
-const useHandover = () => {
+export const useHandover = () => {
   const context = useContext(HandoverContext);
   if (!context) {
     throw new Error('useHandover must be used within a HandoverProvider');
   }
 
   const { handovers, setHandovers } = useContext(HandoverContext);
+
+  const getHandover = useCallback((id: string) => handovers[id], [handovers]);
 
   const addHandover = useCallback(
     (id: string, handover: Handover) => {
@@ -17,7 +19,7 @@ const useHandover = () => {
     [setHandovers],
   );
 
-  const removeHandover = useCallback(
+  const closeHandover = useCallback(
     (id: string) => {
       setHandovers((prev) => {
         const newHandovers = { ...prev };
@@ -28,23 +30,10 @@ const useHandover = () => {
     [setHandovers],
   );
 
-  const startHandover = useCallback((id: string) => {
-    console.log(`Starting handover: ${id}`);
-    // logic for starting the handover
-  }, []);
-
-  const stopHandover = useCallback((id: string) => {
-    console.log(`Stopping handover: ${id}`);
-    // logic for stopping the handover
-  }, []);
-
   return {
     handovers,
+    getHandover,
     addHandover,
-    removeHandover,
-    startHandover,
-    stopHandover,
+    closeHandover,
   };
 };
-
-export default useHandover;
