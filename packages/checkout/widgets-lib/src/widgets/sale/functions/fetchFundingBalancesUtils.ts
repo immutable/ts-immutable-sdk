@@ -9,10 +9,16 @@ import {
   ERC20ItemRequirement,
   FundingRoute,
   RoutingOutcomeType,
+  FundingStepType,
+  Fee,
 } from '@imtbl/checkout-sdk';
+
 import { BigNumber } from 'ethers';
 import { getTokenImageByAddress, isNativeToken } from 'lib/utils';
 import { Environment } from '@imtbl/config';
+import { Web3Provider } from '@ethersproject/providers';
+import { isGasFree } from 'lib/provider';
+import { SwapFees } from '@imtbl/checkout-sdk/dist/types';
 import {
   OrderQuoteCurrency,
   FundingBalance,
@@ -194,3 +200,38 @@ export const getFnToPushAndSortFundingBalances = (
     return currentBalances;
   };
 };
+
+const getZeroFee = (fee: Fee): Fee => ({
+  ...fee,
+  amount: BigNumber.from(0),
+  formattedAmount: '0',
+});
+
+const getGasFreeBalanceAdjustment = (
+  balance: FundingBalance,
+  provider?: Web3Provider,
+): FundingBalance => {
+  if (balance.type !== FundingStepType.SWAP) {
+    return balance;
+  }
+
+  if (!isGasFree(provider)) {
+    return balance;
+  }
+
+  const adjustedFees: SwapFees = {
+    ...balance.fees,
+    approvalGasFee: getZeroFee(balance.fees.approvalGasFee),
+    swapGasFee: getZeroFee(balance.fees.swapGasFee),
+  };
+
+  return {
+    ...balance,
+    fees: adjustedFees,
+  };
+};
+
+export const processGasFreeBalances = (
+  balances: FundingBalance[],
+  provider?: Web3Provider,
+) => balances.map((balance) => getGasFreeBalanceAdjustment(balance, provider));

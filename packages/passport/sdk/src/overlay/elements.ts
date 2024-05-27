@@ -93,6 +93,7 @@ const getOverlay = (contents: string): string => `
         height: 100% !important;
         background: rgba(13, 13, 13, 0.48) !important;
         backdrop-filter: blur(28px) !important;
+        -webkit-backdrop-filter: blur(28px) !important;
         display: flex !important;
         flex-direction: column !important;
         justify-content: center !important;
@@ -121,6 +122,29 @@ const getOverlay = (contents: string): string => `
       </div>
     </div>
   `;
+
+type LinkParams = {
+  id: string;
+  href: string;
+  rel?: string;
+  crossOrigin?: string;
+};
+export function addLink({
+  id,
+  href,
+  rel,
+  crossOrigin,
+}: LinkParams): void {
+  const fullId = `${PASSPORT_OVERLAY_ID}-${id}`;
+  if (!document.getElementById(fullId)) {
+    const link: HTMLLinkElement = document.createElement('link');
+    link.id = fullId;
+    link.href = href;
+    if (rel) link.rel = rel;
+    if (crossOrigin) link.crossOrigin = crossOrigin;
+    document.head.appendChild(link);
+  }
+}
 
 export const getBlockedOverlay = () => getOverlay(getBlockedContents());
 export const getGenericOverlay = () => getOverlay(getGenericContents());

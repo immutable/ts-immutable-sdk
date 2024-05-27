@@ -3,6 +3,7 @@ import {
   Body,
   Box,
   PriceDisplay, ShimmerBox,
+  SxProps,
 } from '@biom3/react';
 import { TokenInfo } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
@@ -19,7 +20,7 @@ interface FeesProps {
   fees: FormattedFee[];
   onFeesClick?: () => void;
   loading?: boolean;
-  sx?: any;
+  sx?: SxProps;
 }
 
 export function Fees({
@@ -27,7 +28,7 @@ export function Fees({
 }: FeesProps) {
   const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
   const { t } = useTranslation();
-  if (!gasFeeValue && !loading) return <Box />;
+  if (!gasFeeValue && !loading) return null;
 
   const gasFee = formatZeroAmount(tokenValueFormat(gasFeeValue));
   const gasTokenSymbol = gasFeeToken?.symbol;
@@ -79,7 +80,7 @@ export function Fees({
             <PriceDisplay
               testId="fees-gas-fee__priceDisplay"
               fiatAmount={`≈ ${t('drawers.feesBreakdown.fees.fiatPricePrefix')}${gasFeeFiatValue}`}
-              price={`≈ ${gasTokenSymbol} ${formatZeroAmount(tokenValueFormat(gasFee))}`}
+              price={`~ ${gasTokenSymbol} ${formatZeroAmount(tokenValueFormat(gasFee))}`}
             />
           )}
         </Accordion.TargetRightSlot>

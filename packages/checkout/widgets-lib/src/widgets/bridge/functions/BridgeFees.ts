@@ -2,8 +2,14 @@ import { BigNumber, utils } from 'ethers';
 import { GasEstimateBridgeToL2Result } from '@imtbl/checkout-sdk';
 import { calculateCryptoToFiat, tokenValueFormat } from '../../../lib/utils';
 import { FormattedFee } from '../../swap/functions/swapFees';
+import { CryptoFiatState } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 
-export const formatBridgeFees = (estimates: GasEstimateBridgeToL2Result | undefined, cryptoFiatState, t): any[] => {
+export const formatBridgeFees = (
+  estimates: GasEstimateBridgeToL2Result | undefined,
+  isDeposit: boolean,
+  cryptoFiatState: CryptoFiatState,
+  t,
+): FormattedFee[] => {
   const fees: FormattedFee[] = [];
   if (!estimates?.fees || !estimates.token) return fees;
 
@@ -12,7 +18,9 @@ export const formatBridgeFees = (estimates: GasEstimateBridgeToL2Result | undefi
   if (estimates.fees.imtblFee) serviceFee = serviceFee.add(estimates.fees.imtblFee);
   if (serviceFee.gt(0)) {
     fees.push({
-      label: t('drawers.feesBreakdown.fees.serviceFee.label'),
+      label: isDeposit
+        ? t('drawers.feesBreakdown.fees.serviceFee.depositLabel')
+        : t('drawers.feesBreakdown.fees.serviceFee.withdrawLabel'),
       fiatAmount: `≈ ${t('drawers.feesBreakdown.fees.fiatPricePrefix')}${calculateCryptoToFiat(
         utils.formatUnits(serviceFee, estimates.token.decimals),
         estimates.token.symbol,

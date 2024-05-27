@@ -9,7 +9,7 @@ jest.mock('../../guardian');
 
 describe('transfer', () => {
   const mockGuardianClient = new GuardianClient({} as any);
-
+  const isScreenReadyPromise = Promise.resolve({ ready: true });
   beforeEach(() => {
     (mockGuardianClient.withDefaultConfirmationScreenTask as jest.Mock).mockImplementation((task) => task);
     (mockGuardianClient.withConfirmationScreenTask as jest.Mock).mockImplementation(() => (task: any) => task);
@@ -109,13 +109,13 @@ describe('transfer', () => {
         user: mockUserImx,
         request: mockTransferRequest as UnsignedTransferRequest,
         guardianClient: mockGuardianClient,
+        isScreenReadyPromise,
       });
 
-      expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
       expect(getSignableTransferV1Mock).toBeCalledWith(mockSignableTransferRequest, mockHeader);
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
       expect(mockGuardianClient.evaluateImxTransaction)
-        .toBeCalledWith({ payloadHash: mockPayloadHash });
+        .toBeCalledWith({ payloadHash: mockPayloadHash, isScreenReadyPromise });
       expect(createTransferV1Mock).toBeCalledWith(mockCreateTransferRequest, mockHeader);
       expect(result).toEqual(mockReturnValue);
     });
@@ -129,6 +129,7 @@ describe('transfer', () => {
         user: mockUserImx,
         request: mockTransferRequest as UnsignedTransferRequest,
         guardianClient: mockGuardianClient,
+        isScreenReadyPromise,
       })).rejects.toThrow(
         new PassportError(
           mockErrorMessage,
@@ -164,6 +165,7 @@ describe('transfer', () => {
         user: mockUserImx,
         request: mockTransferRequest as UnsignedTransferRequest,
         guardianClient: mockGuardianClient,
+        isScreenReadyPromise,
       })).rejects.toThrow(new PassportError(
         'Transaction rejected by user',
         PassportErrorType.TRANSFER_ERROR,
@@ -183,8 +185,6 @@ describe('transfer', () => {
         receiver: 'receiver_eth_address',
       },
     ];
-
-    const popupOptions = { height: 784, width: 480 };
 
     beforeEach(() => {
       mockGetSignableTransfer = jest.fn();
@@ -244,6 +244,7 @@ describe('transfer', () => {
         request: transferRequest,
         transfersApi: mockTransferApi,
         guardianClient: mockGuardianClient,
+        isScreenReadyPromise,
       });
 
       expect(result).toEqual({
@@ -268,9 +269,8 @@ describe('transfer', () => {
         },
       }, mockHeader);
       expect(mockStarkSigner.signMessage).toHaveBeenCalled();
-      expect(mockGuardianClient.withConfirmationScreenTask).toBeCalledWith(popupOptions);
       expect(mockGuardianClient.evaluateImxTransaction)
-        .toBeCalledWith({ payloadHash: payload_hash });
+        .toBeCalledWith({ payloadHash: payload_hash, isScreenReadyPromise });
       expect(mockCreateTransfer).toHaveBeenCalledWith(
         {
           createTransferRequestV2: {
@@ -302,6 +302,7 @@ describe('transfer', () => {
         request: transferRequest,
         transfersApi: mockTransferApi,
         guardianClient: mockGuardianClient,
+        isScreenReadyPromise,
       })).rejects.toThrow(
         new PassportError(
           mockErrorMessage,
@@ -346,6 +347,7 @@ describe('transfer', () => {
         request: transferRequest,
         transfersApi: mockTransferApi,
         guardianClient: mockGuardianClient,
+        isScreenReadyPromise,
       })).rejects.toThrow(
         new PassportError(
           'Transaction rejected by user',

@@ -1,6 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { Checkout, TransactionRequirement } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
+import { compareStr } from 'lib/utils';
 import {
   OrderQuoteCurrency,
   FundingBalance,
@@ -12,6 +13,7 @@ import {
   getFnToPushAndSortFundingBalances,
   getFundingBalances,
   getGasEstimate,
+  processGasFreeBalances,
   wrapPromisesWithOnResolve,
 } from './fetchFundingBalancesUtils';
 
@@ -52,9 +54,13 @@ export const fetchFundingBalances = async (
   const pushToFoundBalances = getFnToPushAndSortFundingBalances(baseCurrency);
   const updateFundingBalances = (balances: FundingBalance[] | null) => {
     if (Array.isArray(balances) && balances.length > 0) {
-      onFundingBalance(pushToFoundBalances(balances));
+      onFundingBalance(
+        pushToFoundBalances(processGasFreeBalances(balances, provider)),
+      );
     }
   };
+
+  const isBaseCurrency = (name: string) => compareStr(name, baseCurrency.name);
 
   const balancePromises: Promise<FundingBalanceResult>[] = currencies
     .map(async (currency) => {
@@ -74,20 +80,24 @@ export const fetchFundingBalances = async (
         ? undefined
         : getGasEstimate();
 
+      const handleOnComplete = () => {
+        onComplete?.(pushToFoundBalances([]));
+      };
+
+      const handleOnFundingRoute = (route) => {
+        updateFundingBalances(getAlternativeFundingSteps([route], environment));
+      };
+
       const smartCheckoutResult = await checkout.smartCheckout({
         provider,
         itemRequirements,
         transactionOrGasAmount,
         routingOptions: { bridge: false, onRamp: false, swap: true },
         fundingRouteFullAmount: true,
-        onComplete: () => {
-          onComplete?.(pushToFoundBalances([]));
-        },
-        onFundingRoute: (route) => {
-          updateFundingBalances(
-            getAlternativeFundingSteps([route], environment),
-          );
-        },
+        onComplete: isBaseCurrency(currency.name)
+          ? handleOnComplete
+          : undefined,
+        onFundingRoute: handleOnFundingRoute,
       });
 
       return { currency, smartCheckoutResult };
@@ -101,7 +111,7 @@ export const fetchFundingBalances = async (
         getFundingBalances(smartCheckoutResult, environment),
       );
 
-      if (currency.base) {
+      if (isBaseCurrency(currency.name)) {
         const fundingItemRequirement = smartCheckoutResult.transactionRequirements[0];
         onFundingRequirement(fundingItemRequirement);
       }

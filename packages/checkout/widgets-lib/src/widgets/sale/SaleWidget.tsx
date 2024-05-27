@@ -27,7 +27,6 @@ import { LoadingView } from '../../views/loading/LoadingView';
 import { SaleWidgetViews } from '../../context/view-context/SaleViewContextTypes';
 import { widgetTheme } from '../../lib/theme';
 import { SaleContextProvider } from './context/SaleContextProvider';
-import { FundWithSmartCheckout } from './views/FundWithSmartCheckout';
 import { PayWithCard } from './views/PayWithCard';
 import { PayWithCoins } from './views/PayWithCoins';
 import { PaymentMethods } from './views/PaymentMethods';
@@ -47,7 +46,7 @@ Omit<SaleWidgetParams, 'walletProviderName'>
 
 type WidgetParams = RequiredWidgetParams &
 OptionalWidgetParams & {
-  multicurrency: boolean;
+  hideExcludedPaymentTypes: boolean;
   waitFulfillmentSettlements: boolean;
 };
 export interface SaleWidgetProps extends WidgetParams {
@@ -62,9 +61,11 @@ export default function SaleWidget(props: SaleWidgetProps) {
     environmentId,
     collectionName,
     excludePaymentTypes,
-    multicurrency = false,
+    preferredCurrency,
+    hideExcludedPaymentTypes,
     waitFulfillmentSettlements = true,
   } = props;
+
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
   const chainId = useRef<ChainId>();
@@ -127,8 +128,9 @@ export default function SaleWidget(props: SaleWidgetProps) {
           passport: checkout?.passport,
           collectionName,
           excludePaymentTypes,
-          multicurrency,
+          preferredCurrency,
           waitFulfillmentSettlements,
+          hideExcludedPaymentTypes,
         }}
       >
         <CryptoFiatProvider environment={config.environment}>
@@ -154,9 +156,6 @@ export default function SaleWidget(props: SaleWidgetProps) {
                 viewState.view.data?.transactionHash!,
               )}
             />
-          )}
-          {viewState.view.type === SaleWidgetViews.FUND_WITH_SMART_CHECKOUT && (
-            <FundWithSmartCheckout subView={viewState.view.subView} />
           )}
           {viewState.view.type === SaleWidgetViews.ORDER_SUMMARY && (
             <OrderSummary subView={viewState.view.subView} />

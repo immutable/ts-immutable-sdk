@@ -9,6 +9,7 @@ jest.mock('../../guardian');
 
 describe('order', () => {
   const mockGuardianClient = new GuardianClient({} as any);
+  const isScreenReadyPromise = Promise.resolve({ ready: true });
 
   beforeEach(() => {
     (mockGuardianClient.withDefaultConfirmationScreenTask as jest.Mock).mockImplementation((task) => task);
@@ -121,12 +122,12 @@ describe('order', () => {
         user: mockUserImx,
         request: orderRequest as UnsignedOrderRequest,
         guardianClient: mockGuardianClient,
+        isScreenReadyPromise,
       });
 
       expect(mockGetSignableCreateOrder).toBeCalledWith(mockSignableOrderRequest, mockHeader);
-      expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
       expect(mockGuardianClient.evaluateImxTransaction)
-        .toBeCalledWith({ payloadHash: mockSignableOrderResponse.data.payload_hash });
+        .toBeCalledWith({ payloadHash: mockSignableOrderResponse.data.payload_hash, isScreenReadyPromise });
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
       expect(mockCreateOrder).toBeCalledWith(
         mockCreateOrderRequest,
@@ -144,6 +145,7 @@ describe('order', () => {
         user: mockUserImx,
         request: orderRequest as UnsignedOrderRequest,
         guardianClient: mockGuardianClient,
+        isScreenReadyPromise,
       })).rejects.toThrow(
         new PassportError(
           mockErrorMessage,
@@ -182,13 +184,13 @@ describe('order', () => {
         user: mockUserImx,
         request: orderRequest as UnsignedOrderRequest,
         guardianClient: mockGuardianClient,
+        isScreenReadyPromise,
       })).rejects.toThrowError(new PassportError(
         'Transaction rejected by user',
         PassportErrorType.CREATE_ORDER_ERROR,
       ));
-      expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
       expect(mockGuardianClient.evaluateImxTransaction)
-        .toBeCalledWith({ payloadHash: mockSignableOrderResponse.data.payload_hash });
+        .toBeCalledWith({ payloadHash: mockSignableOrderResponse.data.payload_hash, isScreenReadyPromise });
     });
   });
 
@@ -258,6 +260,7 @@ describe('order', () => {
         user: mockUserImx,
         request: cancelOrderRequest,
         guardianClient: mockGuardianClient,
+        isScreenReadyPromise,
       });
 
       expect(mockGetSignableCancelOrder).toBeCalledWith(
@@ -265,9 +268,8 @@ describe('order', () => {
         mockHeader,
       );
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
-      expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
       expect(mockGuardianClient.evaluateImxTransaction)
-        .toBeCalledWith({ payloadHash: mockPayloadHash });
+        .toBeCalledWith({ payloadHash: mockPayloadHash, isScreenReadyPromise });
       expect(mockCancelOrder).toBeCalledWith(
         mockCancelOrderRequest,
         mockHeader,
@@ -293,6 +295,7 @@ describe('order', () => {
         user: mockUserImx,
         request: cancelOrderRequest,
         guardianClient: mockGuardianClient,
+        isScreenReadyPromise,
       })).rejects.toThrowError(new PassportError(
         'Transaction rejected by user',
         PassportErrorType.CANCEL_ORDER_ERROR,
@@ -308,6 +311,7 @@ describe('order', () => {
         user: mockUserImx,
         request: cancelOrderRequest,
         guardianClient: mockGuardianClient,
+        isScreenReadyPromise,
       })).rejects.toThrow(
         new PassportError(
           mockErrorMessage,

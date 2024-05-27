@@ -258,6 +258,8 @@ export type BuyOrder = {
   id: string;
   /** array of order fees to apply to the order */
   takerFees?: OrderFee[];
+  /** The amount of the order to fill - only applies to ERC1155 orders */
+  fillAmount?: string;
 };
 
 /**
@@ -311,15 +313,51 @@ export type ERC20BuyToken = {
 };
 
 /**
- * The SellToken type
+ * Represents the token listed for sale.
+ * ERC721SellToken or ERC1155SellToken {@link Checkout.smartCheckout}.
+ */
+export type SellToken = DeprecatedERC721SellToken | ERC721SellToken | ERC1155SellToken;
+
+/**
+ * The ERC721SellToken type
  * @property {string} id
  * @property {string} collectionAddress
  */
-export type SellToken = {
+export type ERC721SellToken = {
+  type: ItemType.ERC721;
   /**  The ERC721 token id */
   id: string;
   /** The ERC721 collection address */
   collectionAddress: string;
+};
+
+/**
+ * The original ERC721SellToken type, before the introduction of the ItemType enum
+ * @property {string} id
+ * @property {string} collectionAddress
+ * @deprecated
+ */
+export type DeprecatedERC721SellToken = {
+  /**  The ERC721 token id */
+  id: string;
+  /** The ERC721 collection address */
+  collectionAddress: string;
+};
+
+/**
+ * The ERC1155SellToken type
+ * @property {string} id
+ * @property {string} collectionAddress
+ * @property {string} amount
+ */
+export type ERC1155SellToken = {
+  type: ItemType.ERC1155;
+  /**  The ERC1155 token id */
+  id: string;
+  /** The ERC1155 collection address */
+  collectionAddress: string;
+  /** The amount of the token to be sold */
+  amount: string;
 };
 
 /**
@@ -336,6 +374,7 @@ export interface SmartCheckoutParams {
     | NativeItemRequirement
     | ERC20ItemRequirement
     | ERC721ItemRequirement
+    | ERC1155ItemRequirement
   )[];
   /** The transaction or gas amount. */
   transactionOrGasAmount?: FulfillmentTransaction | GasAmount;
@@ -398,10 +437,31 @@ export type ERC721ItemRequirement = {
 };
 
 /**
- * Represents the item requirements for a transaction.
- * NativeItem, ERC20Item or ERC721Item {@link Checkout.smartCheckout}.
+ * Represents an ERC1155 item requirement for a transaction.
+ * @property {ItemType.ERC1155} type
+ * @property {string} contractAddress
+ * @property {string} id
+ * @property {string} spenderAddress
+ * @property {BigNumber} amount
  */
-export type ItemRequirement = NativeItem | ERC20Item | ERC721Item;
+export type ERC1155ItemRequirement = {
+  /** The type to indicate this is a ERC1155 item requirement. */
+  type: ItemType.ERC1155;
+  /** The contract address of the ERC1155 collection. */
+  contractAddress: string;
+  /** The ID of this ERC1155 in the collection. */
+  id: string;
+  /** The contract address of the approver. */
+  spenderAddress: string;
+  /** The amount of the ERC1155 token ID being spent. */
+  amount: BigNumber;
+};
+
+/**
+ * Represents the item requirements for a transaction.
+ * NativeItem, ERC20Item, ERC721Item or ERC1155Item {@link Checkout.smartCheckout}.
+ */
+export type ItemRequirement = NativeItem | ERC20Item | ERC721Item | ERC1155Item;
 
 /**
  * An enum representing the item types
@@ -409,11 +469,13 @@ export type ItemRequirement = NativeItem | ERC20Item | ERC721Item;
  * @property {string} NATIVE - If the item is a native token.
  * @property {string} ERC20 - If the item is an ERC20 token.
  * @property {string} ERC721 - If the item is an ERC721 token.
+ * @property {string} ERC1155 - If the item is an ERC1155 token.
  */
 export enum ItemType {
   NATIVE = 'NATIVE',
   ERC20 = 'ERC20',
   ERC721 = 'ERC721',
+  ERC1155 = 'ERC1155',
 }
 
 /**
@@ -462,6 +524,27 @@ export type ERC721Item = {
   id: string;
   /** The contract address of the approver. */
   spenderAddress: string;
+};
+
+/**
+ * Represents an ERC1155 item.
+ * @property {ItemType} type
+ * @property {string} contractAddress
+ * @property {string} id
+ * @property {string} spenderAddress
+ * @property {string} amount
+ */
+export type ERC1155Item = {
+  /** The type to indicate this is a ERC1155 item requirement. */
+  type: ItemType.ERC1155;
+  /** The contract address of the ERC1155 collection. */
+  contractAddress: string;
+  /** The ID of this ERC1155 in the collection. */
+  id: string;
+  /** The contract address of the approver. */
+  spenderAddress: string;
+  /** The amount of the ERC1155 token ID being spent. */
+  amount: BigNumber;
 };
 
 /**
@@ -669,6 +752,8 @@ export type Fee = {
   formattedAmount: string;
   /** The token info for the fee */
   token?: TokenInfo;
+  /** The basis points for the secondary fee */
+  basisPoints?: number;
 };
 
 /**

@@ -23,7 +23,7 @@ export const init = async (
       }
 
       // check for topic arn prefix
-      if (!msg.TopicArn.startsWith(allowedTopicArnPrefix[env])) {
+      if (!message.TopicArn.startsWith(allowedTopicArnPrefix[env])) {
         throw new Error('Invalid topic arn');
       }
 

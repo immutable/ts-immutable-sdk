@@ -6,7 +6,6 @@ import {
   ExchangeAction,
   OrderComponents,
   OrderUseCase,
-  TipInputItem,
 } from '@opensea/seaport-js/lib/types';
 import { providers } from 'ethers';
 import { mapFromOpenApiOrder } from 'openapi/mapper';
@@ -24,7 +23,7 @@ import {
   TransactionAction,
   TransactionPurpose,
 } from '../types';
-import { FulfillableOrder, Order } from '../openapi/sdk';
+import { Order, ProtocolData } from '../openapi/sdk';
 import {
   EIP_712_ORDER_TYPE,
   ItemType,
@@ -108,23 +107,45 @@ export class Seaport {
     extraData: string,
     unitsToFill?: string,
   ): Promise<FulfillOrderResponse> {
-    const { orderComponents, tips } = this.mapImmutableOrderToSeaportOrderComponents(order);
+    const { orderComponents, tips } = mapImmutableOrderToSeaportOrderComponents(order);
     const seaportLib = this.getSeaportLib(order);
 
-    const { actions: seaportActions } = await seaportLib.fulfillOrders({
-      accountAddress: account,
-      fulfillOrderDetails: [
-        {
-          order: {
-            parameters: orderComponents,
-            signature: order.signature,
-          },
-          unitsToFill,
-          extraData,
-          tips,
+    let seaportActions;
+    // Temporary workaround for the fees scaling issue in case of
+    // partial fills when using `fulfillOrders` SDK function.
+    if (order.protocol_data.order_type === ProtocolData.order_type.PARTIAL_RESTRICTED) {
+      const useCase = await seaportLib.fulfillOrder({
+        order: {
+          parameters: orderComponents,
+          signature: order.signature,
         },
-      ],
-    });
+        unitsToFill,
+        tips,
+        extraData,
+        accountAddress: account,
+      });
+
+      seaportActions = useCase.actions;
+    } else if (order.protocol_data.order_type === ProtocolData.order_type.FULL_RESTRICTED) {
+      const useCase = await seaportLib.fulfillOrders({
+        accountAddress: account,
+        fulfillOrderDetails: [
+          {
+            order: {
+              parameters: orderComponents,
+              signature: order.signature,
+            },
+            unitsToFill,
+            extraData,
+            tips,
+          },
+        ],
+      });
+
+      seaportActions = useCase.actions;
+    } else {
+      throw new Error('Failed to fulfill order because order type is unknown');
+    }
 
     const fulfillmentActions: TransactionAction[] = [];
 
@@ -170,21 +191,26 @@ export class Seaport {
   }
 
   async fulfillBulkOrders(
-    fulfillingOrders: Array<FulfillableOrder>,
+    fulfillingOrders: {
+      extraData: string;
+      order: Order;
+      unitsToFill?: string
+    }[],
     account: string,
   ): Promise<{
       actions: Action[];
       expiration: string;
     }> {
     const fulfillOrderDetails = fulfillingOrders.map((o) => {
-      const { orderComponents, tips } = this.mapImmutableOrderToSeaportOrderComponents(o.order);
+      const { orderComponents, tips } = mapImmutableOrderToSeaportOrderComponents(o.order);
 
       return {
         order: {
           parameters: orderComponents,
           signature: o.order.signature,
         },
-        extraData: o.extra_data,
+        unitsToFill: o.unitsToFill,
+        extraData: o.extraData,
         tips,
       };
     });
@@ -241,7 +267,7 @@ export class Seaport {
 
   async cancelOrders(orders: Order[], account: string): Promise<TransactionAction> {
     const orderComponents = orders.map(
-      (order) => this.mapImmutableOrderToSeaportOrderComponents(order).orderComponents,
+      (order) => mapImmutableOrderToSeaportOrderComponents(order).orderComponents,
     );
     const seaportLib = this.getSeaportLib(orders[0]);
 
@@ -256,14 +282,6 @@ export class Seaport {
       ),
       purpose: TransactionPurpose.CANCEL,
     };
-  }
-
-  private mapImmutableOrderToSeaportOrderComponents(order: Order): {
-    orderComponents: OrderComponents;
-    tips: Array<TipInputItem>;
-  } {
-    const orderCounter = order.protocol_data.counter;
-    return mapImmutableOrderToSeaportOrderComponents(order, orderCounter, this.zoneContractAddress);
   }
 
   private createSeaportOrder(

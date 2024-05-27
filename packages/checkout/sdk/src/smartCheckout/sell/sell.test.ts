@@ -2,7 +2,9 @@ import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
 import { ActionType, SignablePurpose, constants } from '@imtbl/orderbook';
 import { BigNumber, TypedDataDomain } from 'ethers';
-import { getBuyToken, getERC721Requirement, sell } from './sell';
+import {
+  getBuyToken, getERC1155Requirement, getERC721Requirement, sell,
+} from './sell';
 import { CheckoutConfiguration } from '../../config';
 import {
   CheckoutStatus,
@@ -11,13 +13,14 @@ import {
   ItemType,
   SellOrder,
   TransactionOrGasType,
+  ERC1155SellToken,
 } from '../../types';
 import { smartCheckout } from '../smartCheckout';
 import { createOrderbookInstance } from '../../instance';
 import { CheckoutErrorType } from '../../errors';
 import {
   getUnsignedMessage,
-  getUnsignedERC721Transactions,
+  getUnsignedSellTransactions,
   signApprovalTransactions,
   signMessage,
 } from '../actions';
@@ -50,7 +53,7 @@ describe('sell', () => {
   });
 
   describe('sell', () => {
-    it('should call smart checkout and execute the transactions', async () => {
+    it('should call smart checkout and execute the transactions for a deprecated typed ERC721 order', async () => {
       const id = '0';
       const contractAddress = '0xERC721';
 
@@ -135,7 +138,7 @@ describe('sell', () => {
         orderComponents: {},
         signedMessage: '0xSIGNED',
       });
-      (getUnsignedERC721Transactions as jest.Mock).mockResolvedValue({
+      (getUnsignedSellTransactions as jest.Mock).mockResolvedValue({
         approvalTransactions: [{ from: '0xAPPROVAL' }],
       });
       (signApprovalTransactions as jest.Mock).mockResolvedValue({
@@ -228,6 +231,368 @@ describe('sell', () => {
       );
     });
 
+    it('should call smart checkout and execute the transactions for ERC721 order', async () => {
+      const id = '0';
+      const contractAddress = '0xERC721';
+
+      const erc721ItemRequirement = {
+        type: ItemType.ERC721,
+        id,
+        contractAddress,
+        spenderAddress: seaportContractAddress,
+      };
+
+      const erc721TransactionRequirement = {
+        type: ItemType.ERC721,
+        sufficient: true,
+        required: {
+          type: ItemType.ERC721,
+          balance: BigNumber.from(1),
+          formattedBalance: '1',
+          contractAddress: '0xab8bb5bc4FB1Cfc060f77f87B558c98abDa65130',
+          id: '0',
+        },
+        current: {
+          type: ItemType.ERC721,
+          balance: BigNumber.from(1),
+          formattedBalance: '1',
+          contractAddress: '0xab8bb5bc4FB1Cfc060f77f87B558c98abDa65130',
+          id: '0',
+        },
+        delta: {
+          balance: BigNumber.from(0),
+          formattedBalance: '0',
+        },
+      };
+
+      (smartCheckout as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        transactionRequirements: [
+          erc721TransactionRequirement,
+        ],
+      });
+
+      const mockCreateListing = jest.fn().mockResolvedValue({
+        result: {
+          id: '1234',
+        },
+      });
+
+      const prepareListing = jest.fn().mockResolvedValue({
+        actions: [
+          {
+            type: ActionType.SIGNABLE,
+            purpose: SignablePurpose.CREATE_LISTING,
+            message: {
+              domain: '',
+              types: '',
+              value: '',
+            },
+          },
+        ],
+      });
+
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
+        config: jest.fn().mockReturnValue({
+          seaportContractAddress,
+        }),
+        prepareListing,
+        createListing: mockCreateListing,
+      });
+
+      (getUnsignedMessage as jest.Mock).mockReturnValue(
+        {
+          orderHash: 'hash',
+          orderComponents: {},
+          unsignedMessage: {
+            domain: {} as TypedDataDomain,
+            types: { types: [] },
+            value: { values: '' },
+          },
+        },
+      );
+      (signMessage as jest.Mock).mockResolvedValue({
+        orderHash: 'hash',
+        orderComponents: {},
+        signedMessage: '0xSIGNED',
+      });
+      (getUnsignedSellTransactions as jest.Mock).mockResolvedValue({
+        approvalTransactions: [{ from: '0xAPPROVAL' }],
+      });
+      (signApprovalTransactions as jest.Mock).mockResolvedValue({
+        type: SignTransactionStatusType.SUCCESS,
+      });
+
+      const orderExpiry = new Date('2022-03-25');
+      const order: SellOrder = {
+        sellToken: {
+          type: ItemType.ERC721,
+          id,
+          collectionAddress: contractAddress,
+        },
+        buyToken: {
+          type: ItemType.NATIVE,
+          amount: '1',
+        },
+        makerFees: [{
+          amount: { percentageDecimal: 0.025 },
+          recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
+        }],
+        orderExpiry,
+      };
+
+      const result = await sell(
+        config,
+        mockProvider,
+        [order],
+      );
+
+      expect(result).toEqual({
+        smartCheckoutResult: {
+          sufficient: true,
+          transactionRequirements: [erc721TransactionRequirement],
+        },
+        status: CheckoutStatus.SUCCESS,
+        orderIds: ['1234'],
+      });
+
+      expect(smartCheckout).toBeCalledWith(
+        config,
+        mockProvider,
+        [erc721ItemRequirement],
+        {
+          type: TransactionOrGasType.GAS,
+          gasToken: {
+            type: GasTokenType.NATIVE,
+            limit: BigNumber.from(constants.estimatedFulfillmentGasGwei),
+          },
+        },
+      );
+      expect(prepareListing).toBeCalledWith({
+        makerAddress: walletAddress,
+        buy: {
+          type: ItemType.NATIVE,
+          amount: '1000000000000000000',
+        },
+        sell: {
+          type: ItemType.ERC721,
+          contractAddress: order.sellToken.collectionAddress,
+          tokenId: order.sellToken.id,
+        },
+        orderExpiry: order.orderExpiry,
+      });
+      expect(signMessage).toBeCalledWith(
+        mockProvider,
+        {
+          orderHash: 'hash',
+          orderComponents: {},
+          unsignedMessage: {
+            domain: {} as TypedDataDomain,
+            types: { types: [] },
+            value: { values: '' },
+          },
+        },
+      );
+      expect(signApprovalTransactions).toBeCalledWith(
+        mockProvider,
+        [{ from: '0xAPPROVAL' }],
+      );
+      expect(mockCreateListing).toBeCalledWith(
+        {
+          makerFees: [{
+            amount: '25000000000000000',
+            recipientAddress: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
+          }],
+          orderComponents: {},
+          orderHash: 'hash',
+          orderSignature: '0xSIGNED',
+        },
+      );
+    });
+
+    it('should call smart checkout and execute the transactions for ERC1155 order', async () => {
+      const id = '0';
+      const contractAddress = '0xERC1155';
+      const amount = '5';
+
+      const erc1155ItemRequirement = {
+        type: ItemType.ERC1155,
+        id,
+        contractAddress,
+        spenderAddress: seaportContractAddress,
+        amount: BigNumber.from(amount),
+      };
+
+      const erc1155TransactionRequirement = {
+        type: ItemType.ERC1155,
+        sufficient: true,
+        required: {
+          type: ItemType.ERC1155,
+          balance: BigNumber.from(5),
+          formattedBalance: '5',
+          contractAddress: '0xab8bb5bc4FB1Cfc060f77f87B558c98abDa65130',
+          id: '0',
+        },
+        current: {
+          type: ItemType.ERC1155,
+          balance: BigNumber.from(5),
+          formattedBalance: '5',
+          contractAddress: '0xab8bb5bc4FB1Cfc060f77f87B558c98abDa65130',
+          id: '0',
+        },
+        delta: {
+          balance: BigNumber.from(0),
+          formattedBalance: '0',
+        },
+      };
+
+      (smartCheckout as jest.Mock).mockResolvedValue({
+        sufficient: true,
+        transactionRequirements: [
+          erc1155TransactionRequirement,
+        ],
+      });
+
+      const mockCreateListing = jest.fn().mockResolvedValue({
+        result: {
+          id: '1234',
+        },
+      });
+
+      const prepareListing = jest.fn().mockResolvedValue({
+        actions: [
+          {
+            type: ActionType.SIGNABLE,
+            purpose: SignablePurpose.CREATE_LISTING,
+            message: {
+              domain: '',
+              types: '',
+              value: '',
+            },
+          },
+        ],
+      });
+
+      (createOrderbookInstance as jest.Mock).mockReturnValue({
+        config: jest.fn().mockReturnValue({
+          seaportContractAddress,
+        }),
+        prepareListing,
+        createListing: mockCreateListing,
+      });
+
+      (getUnsignedMessage as jest.Mock).mockReturnValue(
+        {
+          orderHash: 'hash',
+          orderComponents: {},
+          unsignedMessage: {
+            domain: {} as TypedDataDomain,
+            types: { types: [] },
+            value: { values: '' },
+          },
+        },
+      );
+      (signMessage as jest.Mock).mockResolvedValue({
+        orderHash: 'hash',
+        orderComponents: {},
+        signedMessage: '0xSIGNED',
+      });
+      (getUnsignedSellTransactions as jest.Mock).mockResolvedValue({
+        approvalTransactions: [{ from: '0xAPPROVAL' }],
+      });
+      (signApprovalTransactions as jest.Mock).mockResolvedValue({
+        type: SignTransactionStatusType.SUCCESS,
+      });
+
+      const orderExpiry = new Date('2050-03-25');
+      const order: SellOrder = {
+        sellToken: {
+          type: ItemType.ERC1155,
+          id,
+          collectionAddress: contractAddress,
+          amount,
+        },
+        buyToken: {
+          type: ItemType.NATIVE,
+          amount: '10',
+        },
+        makerFees: [{
+          amount: { percentageDecimal: 0.025 },
+          recipient: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
+        }],
+        orderExpiry,
+      };
+
+      const result = await sell(
+        config,
+        mockProvider,
+        [order],
+      );
+
+      expect(result).toEqual({
+        smartCheckoutResult: {
+          sufficient: true,
+          transactionRequirements: [erc1155TransactionRequirement],
+        },
+        status: CheckoutStatus.SUCCESS,
+        orderIds: ['1234'],
+      });
+
+      expect(smartCheckout).toBeCalledWith(
+        config,
+        mockProvider,
+        [erc1155ItemRequirement],
+        {
+          type: TransactionOrGasType.GAS,
+          gasToken: {
+            type: GasTokenType.NATIVE,
+            limit: BigNumber.from(constants.estimatedFulfillmentGasGwei),
+          },
+        },
+      );
+      expect(prepareListing).toBeCalledWith({
+        makerAddress: walletAddress,
+        buy: {
+          type: ItemType.NATIVE,
+          amount: '10000000000000000000',
+        },
+        sell: {
+          type: ItemType.ERC1155,
+          contractAddress: order.sellToken.collectionAddress,
+          tokenId: order.sellToken.id,
+          amount: (order.sellToken as ERC1155SellToken).amount,
+        },
+        orderExpiry: order.orderExpiry,
+      });
+      expect(signMessage).toBeCalledWith(
+        mockProvider,
+        {
+          orderHash: 'hash',
+          orderComponents: {},
+          unsignedMessage: {
+            domain: {} as TypedDataDomain,
+            types: { types: [] },
+            value: { values: '' },
+          },
+        },
+      );
+      expect(signApprovalTransactions).toBeCalledWith(
+        mockProvider,
+        [{ from: '0xAPPROVAL' }],
+      );
+      expect(mockCreateListing).toBeCalledWith(
+        {
+          makerFees: [{
+            amount: '250000000000000000',
+            recipientAddress: '0xEac347177DbA4a190B632C7d9b8da2AbfF57c772',
+          }],
+          orderComponents: {},
+          orderHash: 'hash',
+          orderSignature: '0xSIGNED',
+        },
+      );
+    });
+
     it('should call smart checkout and not execute transactions when sufficient false', async () => {
       const id = '0';
       const contractAddress = '0xERC721';
@@ -304,13 +669,14 @@ describe('sell', () => {
         orderComponents: {},
         signedMessage: '0xSIGNED',
       });
-      (getUnsignedERC721Transactions as jest.Mock).mockResolvedValue({
+      (getUnsignedSellTransactions as jest.Mock).mockResolvedValue({
         approvalTransactions: [{ from: '0xAPPROVAL' }],
       });
       (signApprovalTransactions as jest.Mock).mockResolvedValue({});
 
       const orders:Array<SellOrder> = [{
         sellToken: {
+          type: ItemType.ERC721,
           id,
           collectionAddress: contractAddress,
         },
@@ -426,7 +792,7 @@ describe('sell', () => {
           },
         },
       );
-      (getUnsignedERC721Transactions as jest.Mock).mockResolvedValue({
+      (getUnsignedSellTransactions as jest.Mock).mockResolvedValue({
         approvalTransactions: [{ from: '0xAPPROVAL' }],
       });
       (signApprovalTransactions as jest.Mock).mockResolvedValue({
@@ -437,6 +803,7 @@ describe('sell', () => {
 
       const orders:Array<SellOrder> = [{
         sellToken: {
+          type: ItemType.ERC721,
           id,
           collectionAddress: contractAddress,
         },
@@ -504,6 +871,7 @@ describe('sell', () => {
       try {
         const orders:Array<SellOrder> = [{
           sellToken: {
+            type: ItemType.ERC721,
             id,
             collectionAddress: contractAddress,
           },
@@ -573,6 +941,7 @@ describe('sell', () => {
       try {
         const orders:Array<SellOrder> = [{
           sellToken: {
+            type: ItemType.ERC721,
             id,
             collectionAddress: contractAddress,
           },
@@ -670,7 +1039,7 @@ describe('sell', () => {
       };
       (getUnsignedMessage as jest.Mock).mockReturnValue(unsignedMessage);
       (signMessage as jest.Mock).mockRejectedValue(new Error('error from sign message'));
-      (getUnsignedERC721Transactions as jest.Mock).mockResolvedValue({
+      (getUnsignedSellTransactions as jest.Mock).mockResolvedValue({
         approvalTransactions: [{ from: '0xAPPROVAL' }],
       });
       (signApprovalTransactions as jest.Mock).mockResolvedValue({
@@ -679,6 +1048,7 @@ describe('sell', () => {
 
       const orders:Array<SellOrder> = [{
         sellToken: {
+          type: ItemType.ERC721,
           id,
           collectionAddress: contractAddress,
         },
@@ -766,11 +1136,12 @@ describe('sell', () => {
       });
       (getUnsignedMessage as jest.Mock).mockReturnValue({});
       (signMessage as jest.Mock).mockResolvedValue({});
-      (getUnsignedERC721Transactions as jest.Mock).mockRejectedValue(new Error('error from get unsigned transactions'));
+      (getUnsignedSellTransactions as jest.Mock).mockRejectedValue(new Error('error from get unsigned transactions'));
       (signApprovalTransactions as jest.Mock).mockResolvedValue({});
 
       const orders:Array<SellOrder> = [{
         sellToken: {
+          type: ItemType.ERC721,
           id,
           collectionAddress: contractAddress,
         },
@@ -793,7 +1164,7 @@ describe('sell', () => {
       ).rejects.toThrowError('error from get unsigned transactions');
 
       expect(smartCheckout).toBeCalledTimes(1);
-      expect(getUnsignedERC721Transactions).toBeCalledTimes(1);
+      expect(getUnsignedSellTransactions).toBeCalledTimes(1);
       expect(signMessage).toBeCalledTimes(0);
       expect(signApprovalTransactions).toBeCalledTimes(0);
       expect(mockCreateListing).toBeCalledTimes(0);
@@ -854,13 +1225,14 @@ describe('sell', () => {
       });
       (getUnsignedMessage as jest.Mock).mockReturnValue({});
       (signMessage as jest.Mock).mockResolvedValue({});
-      (getUnsignedERC721Transactions as jest.Mock).mockResolvedValue({
+      (getUnsignedSellTransactions as jest.Mock).mockResolvedValue({
         approvalTransactions: [{ from: '0xAPPROVAL' }],
       });
       (signApprovalTransactions as jest.Mock).mockRejectedValue(new Error('error from sign approval transactions'));
 
       const orders:Array<SellOrder> = [{
         sellToken: {
+          type: ItemType.ERC721,
           id,
           collectionAddress: contractAddress,
         },
@@ -884,7 +1256,7 @@ describe('sell', () => {
 
       expect(smartCheckout).toBeCalledTimes(1);
       expect(signApprovalTransactions).toBeCalledTimes(1);
-      expect(getUnsignedERC721Transactions).toBeCalledTimes(1);
+      expect(getUnsignedSellTransactions).toBeCalledTimes(1);
       expect(signMessage).toBeCalledTimes(0);
       expect(mockCreateListing).toBeCalledTimes(0);
     });
@@ -934,7 +1306,7 @@ describe('sell', () => {
       });
       (getUnsignedMessage as jest.Mock).mockReturnValue(undefined);
       (signMessage as jest.Mock).mockResolvedValue({});
-      (getUnsignedERC721Transactions as jest.Mock).mockResolvedValue({});
+      (getUnsignedSellTransactions as jest.Mock).mockResolvedValue({});
       (signApprovalTransactions as jest.Mock).mockResolvedValue({
         type: SignTransactionStatusType.SUCCESS,
       });
@@ -945,6 +1317,7 @@ describe('sell', () => {
 
       const orders:Array<SellOrder> = [{
         sellToken: {
+          type: ItemType.ERC721,
           id,
           collectionAddress: contractAddress,
         },
@@ -1052,7 +1425,7 @@ describe('sell', () => {
         orderComponents: {},
         signedMessage: '0xSIGNED',
       });
-      (getUnsignedERC721Transactions as jest.Mock).mockResolvedValue({
+      (getUnsignedSellTransactions as jest.Mock).mockResolvedValue({
         approvalTransactions: [{ from: '0xAPPROVAL' }],
       });
       (signApprovalTransactions as jest.Mock).mockResolvedValue({});
@@ -1063,6 +1436,7 @@ describe('sell', () => {
 
       const orders:Array<SellOrder> = [{
         sellToken: {
+          type: ItemType.ERC721,
           id: collectionId,
           collectionAddress: contractAddress,
         },
@@ -1162,6 +1536,25 @@ describe('sell', () => {
         id,
         contractAddress,
         spenderAddress,
+      });
+    });
+  });
+
+  describe('getERC1155Requirement', () => {
+    it('should return an ERC1155 item requirement', () => {
+      const id = '0';
+      const contractAddress = '0xERC1155';
+      const spenderAddress = '0xSEAPORT';
+      const amount = '55';
+
+      const result = getERC1155Requirement(id, contractAddress, spenderAddress, amount);
+
+      expect(result).toEqual({
+        type: ItemType.ERC1155,
+        id,
+        contractAddress,
+        spenderAddress,
+        amount: BigNumber.from(55),
       });
     });
   });

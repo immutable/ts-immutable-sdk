@@ -7,7 +7,6 @@ import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import {
-  FundWithSmartCheckoutSubViews,
   OrderSummarySubViews,
   SaleWidgetViews,
 } from '../../../context/view-context/SaleViewContextTypes';
@@ -30,9 +29,9 @@ export function PaymentMethods() {
     goToErrorView,
     paymentMethod,
     setPaymentMethod,
-    disabledPaymentTypes,
     invalidParameters,
-    multicurrency,
+    disabledPaymentTypes,
+    hideExcludedPaymentTypes,
   } = useSaleContext();
   const { sendPageView, sendCloseEvent, sendSelectedPaymentMethod } = useSaleEvent();
 
@@ -72,25 +71,12 @@ export function PaymentMethods() {
     }
 
     if (paymentMethod && paymentMethod === SalePaymentTypes.CRYPTO) {
-      if (multicurrency) {
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: {
-              type: SaleWidgetViews.ORDER_SUMMARY,
-              subView: OrderSummarySubViews.INIT,
-            },
-          },
-        });
-        return;
-      }
-
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
-            type: SaleWidgetViews.FUND_WITH_SMART_CHECKOUT,
-            subView: FundWithSmartCheckoutSubViews.INIT,
+            type: SaleWidgetViews.ORDER_SUMMARY,
+            subView: OrderSummarySubViews.INIT,
           },
         },
       });
@@ -132,6 +118,7 @@ export function PaymentMethods() {
         </Heading>
         <Box sx={{ paddingX: 'base.spacing.x2' }}>
           <PaymentOptions
+            hideDisabledOptions={hideExcludedPaymentTypes}
             disabledOptions={disabledPaymentTypes}
             onClick={handleOptionClick}
           />

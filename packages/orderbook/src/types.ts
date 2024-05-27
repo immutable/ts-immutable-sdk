@@ -124,7 +124,8 @@ export type Action = TransactionAction | SignableAction;
 
 export interface FulfillmentListing {
   listingId: string,
-  takerFees: Array<FeeValue>
+  takerFees: Array<FeeValue>,
+  amountToFill?: string,
 }
 
 export type FulfillBulkOrdersResponse

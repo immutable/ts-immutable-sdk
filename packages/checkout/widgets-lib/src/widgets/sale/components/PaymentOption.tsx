@@ -1,4 +1,4 @@
-import { IconProps, MenuItem } from '@biom3/react';
+import { IconProps, MenuItem, MenuItemSize } from '@biom3/react';
 import { SalePaymentTypes } from '@imtbl/checkout-sdk';
 import { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -11,6 +11,7 @@ export interface PaymentOptionProps<
   onClick: (type: SalePaymentTypes) => void;
   disabled?: boolean;
   caption?: string;
+  size?: MenuItemSize;
 }
 
 export function PaymentOption<RC extends ReactElement | undefined = undefined>({
@@ -18,6 +19,7 @@ export function PaymentOption<RC extends ReactElement | undefined = undefined>({
   onClick,
   disabled = false,
   caption,
+  size,
   rc = <span />,
 }: PaymentOptionProps<RC>) {
   const { t } = useTranslation();
@@ -39,7 +41,7 @@ export function PaymentOption<RC extends ReactElement | undefined = undefined>({
   return (
     <MenuItem
       rc={rc}
-      size="medium"
+      size={size || 'medium'}
       sx={{
         marginBottom: 'base.spacing.x1',
         userSelect: 'none',

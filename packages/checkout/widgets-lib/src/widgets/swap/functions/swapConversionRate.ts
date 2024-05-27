@@ -19,8 +19,7 @@ export const formatQuoteConversionRate = (
 
   // Parse the fromAmount input, multiply by 10^decimals to convert to integer units
   const parsedFromAmount = parseFloat(amount);
-  const expandedFromAmount = parsedFromAmount * (10 ** fromToken.decimals);
-  const relativeFromAmount = BigNumber.from(expandedFromAmount.toFixed(0));
+  const relativeFromAmount = utils.parseUnits(parsedFromAmount.toString(), fromToken.decimals);
   const relativeToAmount = BigNumber.from(quote.quote.amount.value);
 
   // Determine the maximum decimal places to equalize to
@@ -54,6 +53,6 @@ export const formatQuoteConversionRate = (
     fromSymbol: fromToken.symbol,
     toSymbol: toToken.symbol,
     rate: formattedConversion,
-    fee: secondaryFee.basisPoints / 100,
+    fee: (secondaryFee?.basisPoints ?? 0) / 100,
   });
 };

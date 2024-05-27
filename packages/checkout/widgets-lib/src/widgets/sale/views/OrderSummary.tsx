@@ -41,12 +41,10 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
     items,
     fromTokenAddress,
     collectionName,
-    disabledPaymentTypes,
     goToErrorView,
     goBackToPaymentMethods,
     sign,
     selectedCurrency,
-    orderQuote,
   } = useSaleContext();
 
   const { viewDispatch, viewState } = useContext(ViewContext);
@@ -114,7 +112,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
     queryFundingBalances();
   }, [subView, fromTokenAddress]);
 
-  // If one ore more balances found, go to Order Review
+  // If one or more balances found, go to Order Review
   useEffect(() => {
     if (fundingBalances.length === 0) return;
 
@@ -152,7 +150,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
         },
       });
     } catch (error: any) {
-      goToErrorView(SaleErrorTypes.SMART_CHECKOUT_EXECUTE_ERROR, error);
+      goToErrorView(SaleErrorTypes.SERVICE_BREAKDOWN, error);
     }
   }, [fundingBalances, loadingBalances, fundingBalancesResult]);
 
@@ -202,14 +200,12 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
       {subView === OrderSummarySubViews.INIT && (
         <LoadingView
           loadingText={t(
-            'views.FUND_WITH_SMART_CHECKOUT.loading.checkingBalances',
+            'views.ORDER_SUMMARY.loading.balances',
           )}
         />
       )}
       {subView === OrderSummarySubViews.REVIEW_ORDER && (
         <OrderReview
-          items={items}
-          pricing={orderQuote.products}
           fundingBalances={fundingBalances}
           conversions={cryptoFiatState.conversions}
           collectionName={collectionName}
@@ -218,7 +214,6 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
           onProceedToBuy={onProceedToBuy}
           transactionRequirement={transactionRequirement}
           onPayWithCard={onPayWithCard}
-          disabledPaymentTypes={disabledPaymentTypes}
         />
       )}
       {subView === OrderSummarySubViews.EXECUTE_FUNDING_ROUTE && (

@@ -7,6 +7,12 @@
       },
       "walletSelection": {
         "heading": "Choose a wallet"
+      },
+      "nonPassportDrawer": {
+        "heading": "Non-Passport users will need IMX for gas.",
+        "body1": "We recommend using <layerswapLink>Layerswap</layerswapLink> to bridge funds onto Immutable zkEVM, with refuel switched on so you receive some IMX.",
+        "body2": "Alternatively, pay and play easily with a gas free Immutable Passport.",
+        "buttonText": "Proceed anyway"
       }
     },
     "CONNECT_SUCCESS": {
@@ -270,9 +276,6 @@
         "caption1": "Coins",
         "caption2": "Balance",
         "divider": "More options",
-        "payWithCard": {
-          "caption": "Buy this items with card instead"
-        },
         "stepType": {
           "SWAP": "Swap {{symbol}} ≈ {{amount}}",
           "ONRAMP": "Buy {{symbol}} ≈ {{amount}}",
@@ -285,12 +288,15 @@
             "SUFFICIENT": "Pay {{symbol}} {{amount}}"
           }
         },
-        "fee": "Fees {{symbol}} ≈ {{amount}}"
+        "fee": "Swap fee ~ {{symbol}} {{amount}}"
       },
       "orderReview": {
         "heading": "Payment summary",
         "continue": "Proceed",
-        "payWith": "Pay with {{symbol}}",
+        "payWith": {
+          "SWAP": "Swap & Pay with {{symbol}}",
+          "SUFFICIENT": "Pay with {{symbol}}"
+        },
         "balance": "Balance {{amount}}"
       }
     },
@@ -413,12 +419,7 @@
           "primaryAction": "I've fixed this, Try again",
           "secondaryAction": "Cancel"
         },
-        "SMART_CHECKOUT_ERROR": {
-          "description": "Unable to check your wallets balance. Please try again.",
-          "primaryAction": "Try again",
-          "secondaryAction": "Cancel"
-        },
-        "SMART_CHECKOUT_EXECUTE_ERROR": {
+        "FUNDING_ROUTE_EXECUTE_ERROR": {
           "description": "Sorry, something went wrong while moving funds. Please try again.",
           "primaryAction": "Try again",
           "secondaryAction": "Cancel"
@@ -641,7 +642,8 @@
           "label": "{{amount}} Swap fee (factored into quote)"
         },
         "serviceFee": {
-          "label": "Service fee"
+          "depositLabel": "zkEVM gas fees",
+          "withdrawLabel": "Ethereum gas fees"
         }
       }
     },

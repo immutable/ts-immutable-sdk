@@ -72,15 +72,21 @@ export function SelectCoinDropdown({
     >
       <MenuItem size="medium">
         <MenuItem.FramedImage
-          alt={token.name}
           circularFrame
-          imageUrl={token.icon}
-          defaultImageUrl={getDefaultTokenImage(environment, theme)}
+          use={(
+            <img
+              src={token.icon ?? getDefaultTokenImage(environment, theme)}
+              alt={token.name}
+            />
+          )}
         />
         <MenuItem.Label>
-          {t('views.ORDER_SUMMARY.orderReview.payWith', {
-            symbol: token.symbol,
-          })}
+          {t(
+            `views.ORDER_SUMMARY.orderReview.payWith.${balance.type}`,
+            {
+              symbol: token.symbol,
+            },
+          )}
         </MenuItem.Label>
         <MenuItem.Caption rc={<Heading size="xSmall" />}>
           {`${t('views.ORDER_SUMMARY.orderReview.balance', {

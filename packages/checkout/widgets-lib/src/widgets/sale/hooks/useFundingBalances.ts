@@ -34,7 +34,7 @@ export const useFundingBalances = () => {
       || !selectedCurrency
     ) return;
 
-    if (fetching.current) return;
+    if (fetching.current || loadingBalances) return;
 
     (async () => {
       fetching.current = true;

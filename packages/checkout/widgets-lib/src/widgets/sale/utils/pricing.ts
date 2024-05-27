@@ -28,7 +28,7 @@ export const getPricingBySymbol = (
     return {
       currency: symbol,
       type: prices.USDC.type,
-      amount: prices.USDC.amount * conversion,
+      amount: prices.USDC.amount / conversion,
     };
   }
 

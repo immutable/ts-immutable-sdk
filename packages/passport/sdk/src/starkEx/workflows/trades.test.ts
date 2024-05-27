@@ -62,6 +62,7 @@ const mockStarkSigner = {
 
 describe('Trades', () => {
   const mockGuardianClient = new GuardianClient({} as any);
+  const isScreenReadyPromise = Promise.resolve({ ready: true });
 
   beforeEach(() => {
     (mockGuardianClient.withDefaultConfirmationScreenTask as jest.Mock).mockImplementation((task) => task);
@@ -91,13 +92,13 @@ describe('Trades', () => {
         user: mockUserImx,
         request: mockSignableTradeRequest.getSignableTradeRequest,
         guardianClient: mockGuardianClient,
+        isScreenReadyPromise,
       });
 
       expect(mockGetSignableTrade).toBeCalledWith(mockSignableTradeRequest, mockHeader);
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
-      expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
       expect(mockGuardianClient.evaluateImxTransaction)
-        .toBeCalledWith({ payloadHash: mockPayloadHash });
+        .toBeCalledWith({ payloadHash: mockPayloadHash, isScreenReadyPromise });
       expect(mockCreateTrade).toBeCalledWith(
         mockCreateTradeRequest,
         mockHeader,
@@ -115,11 +116,11 @@ describe('Trades', () => {
         user: mockUserImx,
         request: mockSignableTradeRequest.getSignableTradeRequest,
         guardianClient: mockGuardianClient,
+        isScreenReadyPromise,
       })).rejects.toThrowError('Transaction rejected by user');
 
-      expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
       expect(mockGuardianClient.evaluateImxTransaction)
-        .toBeCalledWith({ payloadHash: mockPayloadHash });
+        .toBeCalledWith({ payloadHash: mockPayloadHash, isScreenReadyPromise });
     });
 
     it('should return error if failed to call public api', async () => {
@@ -131,6 +132,7 @@ describe('Trades', () => {
         user: mockUserImx,
         request: mockSignableTradeRequest.getSignableTradeRequest,
         guardianClient: mockGuardianClient,
+        isScreenReadyPromise,
       })).rejects.toThrow(
         new PassportError(
           mockErrorMessage,

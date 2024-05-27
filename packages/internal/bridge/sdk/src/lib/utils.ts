@@ -7,8 +7,12 @@ import {
   axelarAPIEndpoints,
   tenderlyAPIEndpoints,
   childWIMXs,
+  NATIVE,
 } from 'constants/bridges';
-import { FungibleToken } from 'types';
+import {
+  BridgeDirection,
+  BridgeFeeActions, BridgeFeeRequest, BridgeInstance, FungibleToken,
+} from 'types';
 
 function getAddresses(source:string, addresses:Record<string, string>) {
   let address:string;
@@ -70,6 +74,55 @@ function getWrappedIMX(source: string) {
 
 export function isWrappedIMX(token: FungibleToken, source: string) {
   return token.toUpperCase() === getWrappedIMX(source).toUpperCase();
+}
+
+/**
+ * Checks that the source and destination chains are such that this is a valid deposit bridge transaction.
+ */
+export function isValidDeposit(direction: BridgeDirection, bridgeInstance: BridgeInstance) {
+  return direction.sourceChainId === bridgeInstance.rootChainID
+    && direction.destinationChainId === bridgeInstance.childChainID
+    && direction.action === BridgeFeeActions.DEPOSIT;
+}
+
+/**
+ * @returns true if and only if the source chain is the root chain,
+ *          indicating that this should be a deposit or withdraw finalisation, without doing validation.
+ * Useful for if we believe a transaction should be a deposit or withdraw finalisation,
+ * so you can construct relevant data types to then do the checks
+ */
+export function shouldBeDepositOrFinaliseWithdraw(sourceChainId: string, bridgeInstance: BridgeInstance) {
+  return sourceChainId === bridgeInstance.rootChainID;
+}
+
+/**
+ * Checks that the source and destination chains are such that this is a valid withdraw bridge transaction.
+ */
+export function isValidWithdraw(direction: BridgeDirection, bridgeInstance: BridgeInstance) {
+  return direction.sourceChainId === bridgeInstance.childChainID
+    && direction.destinationChainId === bridgeInstance.rootChainID
+    && direction.action === BridgeFeeActions.WITHDRAW;
+}
+
+export function isWithdrawNativeIMX(
+  token: FungibleToken,
+  direction: BridgeDirection,
+  bridgeInstance: BridgeInstance,
+): boolean {
+  return isValidWithdraw(direction, bridgeInstance) && !isWrappedIMX(token, direction.sourceChainId);
+}
+
+// Return true if a BridgeFeeRequest is for a native token bridge interaction.
+export function isNativeTokenBridgeFeeRequest(req: BridgeFeeRequest): boolean {
+  return !('token' in req) || req.token.toUpperCase() === NATIVE;
+}
+
+export function isWithdrawWrappedIMX(
+  token: FungibleToken,
+  direction: BridgeDirection,
+  bridgeInstance: BridgeInstance,
+): boolean {
+  return isValidWithdraw(direction, bridgeInstance) && isWrappedIMX(token, direction.sourceChainId);
 }
 
 export const exportedForTesting = {
