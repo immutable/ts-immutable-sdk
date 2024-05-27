@@ -45,6 +45,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
     goBackToPaymentMethods,
     sign,
     selectedCurrency,
+    setPaymentMethod,
   } = useSaleContext();
 
   const { viewDispatch, viewState } = useContext(ViewContext);
@@ -140,6 +141,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
       const data = getTopUpViewData(
         smartCheckoutResult.transactionRequirements,
       );
+      setPaymentMethod(undefined);
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,

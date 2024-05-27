@@ -104,9 +104,13 @@ export function MoveInProgress({ transactionHash, isTransfer }: MoveInProgressPr
       floatHeader
     >
       <SimpleTextBody heading={t(isTransfer ? 'views.IN_PROGRESS.transferHeading' : 'views.IN_PROGRESS.heading')}>
-        {!isTransfer && t('views.IN_PROGRESS.body1')}
-        <br />
-        <br />
+        {!isTransfer && (
+          <>
+            {t('views.IN_PROGRESS.body1')}
+            <br />
+            <br />
+          </>
+        )}
         {t('views.IN_PROGRESS.body2')}
       </SimpleTextBody>
     </SimpleLayout>
