@@ -97,7 +97,9 @@ export const fetchFundingBalances = async (
         onComplete: isBaseCurrency(currency.name)
           ? handleOnComplete
           : undefined,
-        onFundingRoute: handleOnFundingRoute,
+        onFundingRoute: isBaseCurrency(currency.name)
+          ? handleOnFundingRoute
+          : undefined,
       });
 
       return { currency, smartCheckoutResult };
@@ -107,13 +109,15 @@ export const fetchFundingBalances = async (
   const results = await wrapPromisesWithOnResolve(
     balancePromises,
     ({ currency, smartCheckoutResult }) => {
-      updateFundingBalances(
-        getFundingBalances(smartCheckoutResult, environment),
-      );
-
       if (isBaseCurrency(currency.name)) {
         const fundingItemRequirement = smartCheckoutResult.transactionRequirements[0];
         onFundingRequirement(fundingItemRequirement);
+      }
+
+      if (smartCheckoutResult.sufficient) {
+        updateFundingBalances(
+          getFundingBalances(smartCheckoutResult, environment),
+        );
       }
     },
   );
