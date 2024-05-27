@@ -252,6 +252,16 @@ export class Orderbook {
     return this.seaport.fulfillOrder(orderResult, takerAddress, extraData, amountToFill);
   }
 
+  /**
+   * Get unsigned transactions that can be submitted to fulfil multiple open orders. If approval
+   * transactions exist, they must be signed and submitted to the chain before the fulfilment
+   * transaction can be submitted or it will be reverted.
+   * @param {Array<FulfillmentListing>} listings - The details of the listings to fulfil, amounts
+   *                                               to fill and taker ecosystem fees to be paid.
+   * @param {string} takerAddress - The address of the account fulfilling the order.
+   * @param {FeeValue[]} takerFees - Taker ecosystem fees to be paid.
+   * @return {FulfillBulkOrdersResponse} Approval and fulfilment transactions.
+   */
   async fulfillBulkOrders(
     listings: Array<FulfillmentListing>,
     takerAddress: string,
