@@ -1,6 +1,5 @@
 import MessageValidator from 'sns-validator';
 import { Environment } from '@imtbl/config';
-import { setEnvironment, track } from '@imtbl/metrics';
 
 const validator = new MessageValidator();
 
@@ -8,8 +7,6 @@ const allowedTopicArnPrefix = {
   [Environment.PRODUCTION]: 'arn:aws:sns:us-east-2:362750628221:',
   [Environment.SANDBOX]: 'arn:aws:sns:us-east-2:783421985614:'
 };
-
-const moduleName = 'webhook';
 
 export const init = async (
   body: string | Record<string, unknown>,
@@ -19,9 +16,6 @@ export const init = async (
     others?: (event: any) => Promise<void>;
   }
 ) => {
-  setEnvironment(env);
-
-  track(moduleName, 'init');
   const msg: any = await new Promise((resolve, reject) => {
     validator.validate(body, (err, message: any) => {
       if (err) {
@@ -34,7 +28,6 @@ export const init = async (
       }
 
       if (message?.Type === 'SubscriptionConfirmation') {
-        track(moduleName, 'SubscriptionConfirmation');
         fetch(message.SubscribeURL).then(() => {
           resolve(message);
         }).catch((e) => {
