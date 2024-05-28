@@ -3,15 +3,16 @@ import { Environment } from '@imtbl/config';
 import { getDefaultTokenImage } from 'lib/utils';
 import { WidgetTheme } from '@imtbl/checkout-sdk';
 
-export type ImageProps = {
-  name: string;
-  theme: WidgetTheme;
-  environment: Environment;
+type ImageProps = {
+  name?: string;
   src?: string;
+  theme?: WidgetTheme;
+  environment?: Environment;
   defaultImage?: string;
-} & {
-  [key: string]: unknown;
-};
+} & (
+  | { defaultImage: string; theme?: WidgetTheme; environment?: Environment }
+  | { defaultImage?: never; theme: WidgetTheme; environment: Environment }
+);
 
 export function TokenImage({
   src,
@@ -24,7 +25,9 @@ export function TokenImage({
   const [error, setError] = useState<boolean>(false);
   const url = useMemo(
     () => (!src || error
-      ? defaultImage || getDefaultTokenImage(environment, theme)
+      ? defaultImage
+          || (theme && getDefaultTokenImage(environment, theme))
+          || ''
       : src),
     [src, error],
   );
