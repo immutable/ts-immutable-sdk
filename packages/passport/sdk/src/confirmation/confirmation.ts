@@ -21,6 +21,8 @@ const CONFIRMATION_WINDOW_CLOSED_POLLING_DURATION = 1000;
 export const CONFIRMATION_IFRAME_ID = 'passport-confirm';
 export const CONFIRMATION_IFRAME_STYLE = 'display: none; position: absolute;width:0px;height:0px;border:0;';
 
+const SDK_VERSION = '__SDK_VERSION__';
+
 type MessageHandler = (arg0: MessageEvent) => void;
 
 const getPostMessageData = (
@@ -210,7 +212,7 @@ export default class ConfirmationScreen {
       this.popupOptions = popupOptions;
       try {
         this.confirmationWindow = openPopupCenter({
-          url: this.getHref('loading'),
+          url: this.getHref(`loading?sdkVersion=${SDK_VERSION}`),
           title: CONFIRMATION_WINDOW_TITLE,
           width: popupOptions?.width || CONFIRMATION_WINDOW_WIDTH,
           height: popupOptions?.height || CONFIRMATION_WINDOW_HEIGHT,
@@ -226,7 +228,7 @@ export default class ConfirmationScreen {
           try {
             this.confirmationWindow?.close();
             this.confirmationWindow = openPopupCenter({
-              url: this.getHref('loading'),
+              url: this.getHref(`loading?sdkVersion=${SDK_VERSION}`),
               title: CONFIRMATION_WINDOW_TITLE,
               width: this.popupOptions?.width || CONFIRMATION_WINDOW_WIDTH,
               height: this.popupOptions?.height || CONFIRMATION_WINDOW_HEIGHT,
