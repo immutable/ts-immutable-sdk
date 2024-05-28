@@ -24,7 +24,6 @@ import { topUpBridgeOption, topUpOnRampOption } from './helpers';
 import { sendSwapWidgetCloseEvent } from './SwapWidgetEvents';
 import i18n from '../../i18n';
 import { GeoblockLoader } from './GeoblockLoader';
-import { Handover } from '../../components/Handover/Handover';
 
 const SwapWidget = React.lazy(() => import('./SwapWidget'));
 
@@ -117,58 +116,56 @@ export class Swap extends Base<WidgetType.SWAP> {
         <CustomAnalyticsProvider checkout={this.checkout}>
           <ThemeProvider id="swap-container" config={this.strongConfig()}>
             <HandoverProvider>
-              <Handover id="global" checkout={this.checkout}>
-                <GeoblockLoader
-                  checkout={this.checkout}
-                  loadingView={<LoadingView loadingText={t('views.LOADING_VIEW.text')} />}
-                  widget={
-                  (
-                    <ConnectLoader
-                      params={connectLoaderParams}
-                      widgetConfig={this.strongConfig()}
-                      closeEvent={() => sendSwapWidgetCloseEvent(window)}
-                    >
-                      <Suspense fallback={<LoadingView loadingText={t('views.LOADING_VIEW.text')} />}>
-                        <SwapWidget
-                          fromTokenAddress={this.parameters.fromTokenAddress}
-                          toTokenAddress={this.parameters.toTokenAddress}
-                          amount={this.parameters.amount}
-                          config={this.strongConfig()}
-                        />
-                      </Suspense>
-                    </ConnectLoader>
-                  )
-                }
-                  serviceUnavailableView={
-                  (
-                    <ServiceUnavailableErrorView
-                      service={ServiceType.SWAP}
-                      onCloseClick={() => sendSwapWidgetCloseEvent(window)}
-                      primaryActionText={
-                        topUpOptions && topUpOptions?.length > 0
-                          ? t(topUpOptions[0].textKey)
-                          : undefined
-                      }
-                      onPrimaryButtonClick={
-                        topUpOptions && topUpOptions?.length > 0
-                          ? topUpOptions[0].action
-                          : undefined
-                      }
-                      secondaryActionText={
-                        topUpOptions?.length === 2
-                          ? t(topUpOptions[1].textKey)
-                          : undefined
-                      }
-                      onSecondaryButtonClick={
-                        topUpOptions?.length === 2
-                          ? topUpOptions[1].action
-                          : undefined
-                      }
-                    />
-                  )
-                }
-                />
-              </Handover>
+              <GeoblockLoader
+                checkout={this.checkout}
+                loadingView={<LoadingView loadingText={t('views.LOADING_VIEW.text')} />}
+                widget={
+                (
+                  <ConnectLoader
+                    params={connectLoaderParams}
+                    widgetConfig={this.strongConfig()}
+                    closeEvent={() => sendSwapWidgetCloseEvent(window)}
+                  >
+                    <Suspense fallback={<LoadingView loadingText={t('views.LOADING_VIEW.text')} />}>
+                      <SwapWidget
+                        fromTokenAddress={this.parameters.fromTokenAddress}
+                        toTokenAddress={this.parameters.toTokenAddress}
+                        amount={this.parameters.amount}
+                        config={this.strongConfig()}
+                      />
+                    </Suspense>
+                  </ConnectLoader>
+                )
+              }
+                serviceUnavailableView={
+                (
+                  <ServiceUnavailableErrorView
+                    service={ServiceType.SWAP}
+                    onCloseClick={() => sendSwapWidgetCloseEvent(window)}
+                    primaryActionText={
+                      topUpOptions && topUpOptions?.length > 0
+                        ? t(topUpOptions[0].textKey)
+                        : undefined
+                    }
+                    onPrimaryButtonClick={
+                      topUpOptions && topUpOptions?.length > 0
+                        ? topUpOptions[0].action
+                        : undefined
+                    }
+                    secondaryActionText={
+                      topUpOptions?.length === 2
+                        ? t(topUpOptions[1].textKey)
+                        : undefined
+                    }
+                    onSecondaryButtonClick={
+                      topUpOptions?.length === 2
+                        ? topUpOptions[1].action
+                        : undefined
+                    }
+                  />
+                )
+              }
+              />
             </HandoverProvider>
           </ThemeProvider>
         </CustomAnalyticsProvider>
