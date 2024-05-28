@@ -1,4 +1,4 @@
-import { utils } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 import { calculateFees } from './fees';
 import { BuyToken, ItemType } from '../../types';
 import { CheckoutErrorType } from '../../errors';
@@ -90,6 +90,22 @@ describe('orderbook fees', () => {
 
     expect(result).toEqual([{
       amount: '12500000000000000',
+      recipientAddress: '0x222',
+    }]);
+  });
+
+  it('TD-1453 sell token quantity > 1 and non divisible fee amount', async () => {
+    const decimals = 18;
+    const amount = utils.parseUnits('40.32258064516129033', 18).toString();
+    const makerFees = [{
+      amount: { percentageDecimal: 0.01 },
+      recipient: '0x222',
+    }];
+
+    const result = calculateFees(makerFees, amount, decimals, BigNumber.from(10));
+
+    expect(result).toEqual([{
+      amount: '403225806451612900',
       recipientAddress: '0x222',
     }]);
   });
