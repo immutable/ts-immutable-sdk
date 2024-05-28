@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { Handover, HandoverContext } from './HandoverContext';
+import { HandoverContent, HandoverContext } from './HandoverContext';
+import { Handover } from '../../components/Handover/Handover';
 
 interface HandoverProviderProps {
   children: React.ReactNode;
@@ -12,7 +13,7 @@ export enum HandoverType {
 }
 
 type HandoverState = {
-  [key in HandoverType]?: Handover;
+  [key in HandoverType]?: HandoverContent;
 };
 
 export function HandoverProvider({ children }: HandoverProviderProps) {
@@ -22,7 +23,9 @@ export function HandoverProvider({ children }: HandoverProviderProps) {
 
   return (
     <HandoverContext.Provider value={value}>
-      {children}
+      <Handover id="global">
+        {children}
+      </Handover>
     </HandoverContext.Provider>
   );
 }
