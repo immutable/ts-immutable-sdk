@@ -101,7 +101,7 @@ export function SelectForm({
                     <TokenImage
                       environment={environment}
                       theme={theme}
-                      token={filteredOption.id}
+                      src={filteredOption.icon}
                       name={filteredOption.name}
                     />
                   )}
