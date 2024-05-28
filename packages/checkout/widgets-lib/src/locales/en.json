@@ -332,12 +332,12 @@
         "debit": {
           "heading": "Debit Card",
           "caption": "The recommended way to pay with card.",
-          "disabledCaption": "Currently working on this. Proceed with Coins & you’ll be guided on how to add them if needed."
+          "disabledCaption": "Unavailable for your selection. We recommend adding coins"
         },
         "credit": {
           "heading": "Credit Card",
           "caption": "Not recommended since transactions may be blocked by your bank.",
-          "disabledCaption": "Currently working on this. Proceed with Coins & you’ll be guided on how to add them if needed."
+          "disabledCaption": "Unavailable for your selection. We recommend adding coins"
         }
       },
       "topUp": {
