@@ -13,6 +13,7 @@ import { useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { ViewActions, ViewContext } from 'context/view-context/ViewContext';
+import { Environment } from '@imtbl/config';
 import { actionsContainerStyles, actionsLayoutStyles, containerStyles } from './transactionItemStyles';
 import { TransactionDetails } from './TransactionDetails';
 
@@ -23,6 +24,7 @@ type TransactionItemWithdrawPendingProps = {
   amount: string,
   icon: string,
   defaultTokenImage: string,
+  environment: Environment,
 };
 
 export function TransactionItemWithdrawPending({
@@ -32,6 +34,7 @@ export function TransactionItemWithdrawPending({
   amount,
   icon,
   defaultTokenImage,
+  environment,
 }: TransactionItemWithdrawPendingProps) {
   const { viewDispatch } = useContext(ViewContext);
   const { track } = useAnalytics();
@@ -189,7 +192,7 @@ export function TransactionItemWithdrawPending({
               px: 'base.spacing.x2',
             }}
           />
-          <TransactionDetails transaction={transaction} />
+          <TransactionDetails transaction={transaction} environment={environment} />
         </Accordion.ExpandedContent>
       </Accordion>
     </Box>

@@ -41,6 +41,7 @@ export function TransactionList({
   const { cryptoFiatState } = useContext(CryptoFiatContext);
   const { t } = useTranslation();
   const [link, setLink] = useState('');
+  const { environment } = checkout.config;
 
   useEffect(() => {
     if (!checkout) return;
@@ -87,12 +88,13 @@ export function TransactionList({
               return (
                 <TransactionItemWithdrawPending
                   key={hash}
-                  label={token.name}
+                  label={token.symbol}
                   transaction={transaction}
                   fiatAmount={`${t('views.TRANSACTIONS.fiatPricePrefix')}${fiat}`}
                   amount={amount}
                   icon={getTransactionItemIcon(transaction)}
                   defaultTokenImage={defaultTokenImage}
+                  environment={environment}
                 />
               );
             }
@@ -100,13 +102,14 @@ export function TransactionList({
             return (
               <TransactionItem
                 key={hash}
-                label={token.name}
+                label={token.symbol}
                 details={{ text: t('views.TRANSACTIONS.status.inProgress.stepInfo'), link, hash }}
                 transaction={transaction}
                 fiatAmount={`${t('views.TRANSACTIONS.fiatPricePrefix')}${fiat}`}
                 amount={amount}
                 icon={getTransactionItemIcon(transaction)}
                 defaultTokenImage={defaultTokenImage}
+                environment={environment}
               />
             );
           })}
