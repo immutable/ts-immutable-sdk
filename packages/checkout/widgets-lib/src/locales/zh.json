@@ -312,12 +312,12 @@
         "debit": {
           "heading": "借记卡",
           "caption": "使用卡支付的推荐方式。",
-          "disabledCaption": "我们正在处理此事。请使用硬币继续，如果需要，我们将指导您如何添加它们。"
+          "disabledCaption": "您选择的项目不可用。我们建议增加硬币。"
         },
         "credit": {
           "heading": "信用卡",
           "caption": "不推荐使用，因为您的银行可能会阻止交易。",
-          "disabledCaption": "我们正在处理此事。请使用硬币继续，如果需要，我们将指导您如何添加它们。"
+          "disabledCaption": "您选择的项目不可用。我们建议增加硬币。"
         }
       },
       "topUp": {
