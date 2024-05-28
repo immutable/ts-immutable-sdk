@@ -110,7 +110,7 @@ export class Sale extends Base<WidgetType.SALE> {
       <React.StrictMode>
         <CustomAnalyticsProvider checkout={this.checkout}>
           <ThemeProvider id="sale-container" config={config}>
-            <HandoverProvider checkout={this.checkout}>
+            <HandoverProvider>
               <ConnectLoader
                 widgetConfig={config}
                 params={connectLoaderParams}

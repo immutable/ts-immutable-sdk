@@ -116,7 +116,7 @@ export class Swap extends Base<WidgetType.SWAP> {
       <React.StrictMode>
         <CustomAnalyticsProvider checkout={this.checkout}>
           <ThemeProvider id="swap-container" config={this.strongConfig()}>
-            <HandoverProvider checkout={this.checkout}>
+            <HandoverProvider>
               <Handover id="global" checkout={this.checkout}>
                 <GeoblockLoader
                   checkout={this.checkout}

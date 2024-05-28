@@ -1,4 +1,4 @@
-import { Button, Drawer, Select } from '@biom3/react';
+import { Drawer, Select } from '@biom3/react';
 import { FormControlWrapper } from 'components/FormComponents/FormControlWrapper/FormControlWrapper';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
@@ -10,7 +10,6 @@ import { useWalletConnect } from '../../lib/hooks/useWalletConnect';
 import { WalletChangeEvent } from './WalletDrawerEvents';
 import { listItemVariants, listVariants } from '../../lib/animation/listAnimation';
 import { walletConnectProviderInfo } from '../../lib/walletConnect';
-import { useHandover } from '../../lib/hooks/useHandover';
 
 interface WalletDrawerProps {
   testId: string;
@@ -38,27 +37,21 @@ export function WalletDrawer({
   const { isWalletConnectEnabled, openWalletConnectModal } = useWalletConnect();
   const [walletItemLoading, setWalletItemLoading] = useState(false);
   const { heading, defaultText } = drawerText;
-  const { addHandover } = useHandover();
 
   const handleWalletItemClick = async (providerDetail: EIP6963ProviderDetail) => {
-    addHandover('global', {
-      children: (
-        <Button>Hello</Button>
-      ),
-    });
-    // setWalletItemLoading(true);
-    // try {
-    //   await onWalletChange({
-    //     walletType: 'injected',
-    //     provider: providerDetail.provider,
-    //     providerDetail,
-    //   });
-    // } catch (err) {
-    //   // eslint-disable-next-line no-console
-    //   console.error(err);
-    // } finally {
-    //   setWalletItemLoading(false);
-    // }
+    setWalletItemLoading(true);
+    try {
+      await onWalletChange({
+        walletType: 'injected',
+        provider: providerDetail.provider,
+        providerDetail,
+      });
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error(err);
+    } finally {
+      setWalletItemLoading(false);
+    }
   };
 
   const handleWalletConnectClick = async () => {

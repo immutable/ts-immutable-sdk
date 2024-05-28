@@ -67,7 +67,7 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
       <React.StrictMode>
         <CustomAnalyticsProvider checkout={this.checkout}>
           <ThemeProvider id="bridge-container" config={this.strongConfig()}>
-            <HandoverProvider checkout={this.checkout}>
+            <HandoverProvider>
               <Suspense fallback={<LoadingView loadingText={t('views.LOADING_VIEW.text')} />}>
                 <BridgeWidget
                   checkout={this.checkout}
