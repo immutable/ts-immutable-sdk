@@ -23,6 +23,7 @@ export const mintingPersistence = (client: any): MintingPersistence => {
           contractAddress: request.contract_address,
           ownerAddress: request.owner_address,
           metadata: JSON.stringify(request.metadata), // Serialize JSON metadata
+          amount: request.amount || null,
         },
       });
 
@@ -69,6 +70,7 @@ export const mintingPersistence = (client: any): MintingPersistence => {
         metadata: asset.metadata ? JSON.parse(asset.metadata) : null,
         owner_address: asset.ownerAddress,
         tried_count: asset.triedCount,
+        amount: asset.amount || null
       }));
     },
     updateMintingStatusToSubmitted: async (ids: string[]) => {
@@ -216,7 +218,8 @@ export const mintingPersistence = (client: any): MintingPersistence => {
         metadata: asset.metadata ? JSON.parse(asset.metadata) : null,
         owner_address: asset.ownerAddress,
         tried_count: asset.triedCount,
-        wallet_address: asset.ownerAddress
+        wallet_address: asset.ownerAddress,
+        amount: asset.amount || null
       };
     }
   };

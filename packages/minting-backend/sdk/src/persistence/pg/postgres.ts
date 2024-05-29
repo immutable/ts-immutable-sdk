@@ -8,10 +8,10 @@ export const mintingPersistence = (client: Pool): MintingPersistence => {
     recordMint: async (request: CreateMintRequest) => {
       const r = await client.query(
         `
-        INSERT INTO im_assets (asset_id, contract_address, owner_address, metadata) 
-        VALUES ($1, $2, $3, $4) ON CONFLICT (asset_id, contract_address) DO NOTHING;
+        INSERT INTO im_assets (asset_id, contract_address, owner_address, metadata, amount) 
+        VALUES ($1, $2, $3, $4, $5) ON CONFLICT (asset_id, contract_address) DO NOTHING;
         `,
-        [request.asset_id, request.contract_address, request.owner_address, request.metadata]
+        [request.asset_id, request.contract_address, request.owner_address, request.metadata, request.amount]
       );
       if (r.rowCount === 0) {
         throw new Error('Duplicated mint');

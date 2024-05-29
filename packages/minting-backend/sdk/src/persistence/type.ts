@@ -4,6 +4,7 @@ export type CreateMintRequest = {
   asset_id: string; // the web2 game item id
   metadata: any;
   owner_address: string;
+  amount?: number;
 };
 
 export type MintRequest = {
@@ -14,6 +15,7 @@ export type MintRequest = {
   metadata: any;
   owner_address: string;
   tried_count: number;
+  amount: number | null;
 };
 
 export type SubmittedMintRequest = {
