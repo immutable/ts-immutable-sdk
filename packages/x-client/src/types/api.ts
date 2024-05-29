@@ -35,6 +35,7 @@ export interface AcceptPrimarySaleUnauthorizedBody extends imx.AcceptPrimarySale
 export interface AddMetadataSchemaToCollectionRequest extends imx.AddMetadataSchemaToCollectionRequest {}
 export interface AssetsApiGetAssetRequest extends imx.AssetsApiGetAssetRequest {}
 export interface AssetsApiListAssetsRequest extends imx.AssetsApiListAssetsRequest {}
+export interface Balance extends imx.Balance {}
 export interface BalancesApiGetBalanceRequest extends imx.BalancesApiGetBalanceRequest {}
 export interface BalancesApiListBalancesRequest extends imx.BalancesApiListBalancesRequest {}
 export interface CancelOrderResponse extends imx.CancelOrderResponse {}
@@ -51,6 +52,7 @@ export interface CreatePrimarySaleNotFoundBody extends imx.CreatePrimarySaleNotF
 export interface CreatePrimarySaleUnauthorizedBody extends imx.CreatePrimarySaleUnauthorizedBody {}
 export interface CreateTradeResponse extends imx.CreateTradeResponse {}
 export interface CreateTransferResponseV1 extends imx.CreateTransferResponseV1 {}
+export interface CreateWithdrawalResponse extends imx.CreateWithdrawalResponse {}
 export interface DepositsApiGetDepositRequest extends imx.DepositsApiGetDepositRequest {}
 export interface DepositsApiListDepositsRequest extends imx.DepositsApiListDepositsRequest {}
 export interface ExchangesApiCreateExchangeRequest extends imx.ExchangesApiCreateExchangeRequest {}
@@ -62,6 +64,7 @@ export interface GetSignableTradeRequest extends imx.GetSignableTradeRequest {}
 export interface MetadataApiGetMetadataSchemaRequest extends imx.MetadataApiGetMetadataSchemaRequest {}
 export interface MetadataSchemaRequest extends imx.MetadataSchemaRequest {}
 export interface MintFee extends imx.MintFee {}
+export interface MintResultDetails extends imx.MintResultDetails {}
 export interface MintRequest extends imx.MintRequest {}
 export interface MintTokenDataV2 extends imx.MintTokenDataV2 {}
 export interface MintTokensResponse extends imx.MintTokensResponse {}
