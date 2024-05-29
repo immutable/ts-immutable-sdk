@@ -332,6 +332,7 @@ export function BridgeForm(props: BridgeFormProps) {
               onTextInputChange={(value) => handleBridgeAmountChange(value)}
               onTextInputEnter={submitBridgeValues}
               textAlign="right"
+              inputMode="decimal"
               errorMessage={t(amountError)}
             />
           </Box>
