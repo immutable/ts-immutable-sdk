@@ -6,10 +6,6 @@ import {
   ImmutableXConfiguration,
 } from '@imtbl/x-client';
 import { TransactionResponse } from '@ethersproject/providers';
-import {
-  getSignableRegistrationOnchain,
-  isRegisteredOnChain,
-} from '../registration';
 import { validateChain } from '../helpers';
 import { Signers } from '../types';
 import { ProviderConfiguration } from '../../config';
@@ -35,7 +31,7 @@ async function executeDepositERC721(
   vaultId: number,
   config: ImmutableXConfiguration,
 ): Promise<TransactionResponse> {
-  const coreContract = Contracts.Core.connect(
+  const coreContract = Contracts.CoreV4.connect(
     config.ethConfiguration.coreContractAddress,
     ethSigner,
   );
@@ -60,7 +56,6 @@ export async function depositERC721({
   const { immutableXConfig } = config;
   const depositsApi = new imx.DepositsApi(immutableXConfig.apiConfiguration);
   const encodingApi = new imx.EncodingApi(immutableXConfig.apiConfiguration);
-  const usersApi = new imx.UsersApi(immutableXConfig.apiConfiguration);
 
   const data: ERC721TokenData = {
     token_address: deposit.tokenAddress,
@@ -100,12 +95,6 @@ export async function depositERC721({
   const starkPublicKey = signableDepositResult.data.stark_key;
   const vaultId = signableDepositResult.data.vault_id;
 
-  const isRegistered = await isRegisteredOnChain(
-    starkPublicKey,
-    ethSigner,
-    config,
-  );
-
   // Approve whether an amount of token from an account can be spent by a third-party account
   const tokenContract = Contracts.IERC721.connect(
     deposit.tokenAddress,
@@ -115,26 +104,6 @@ export async function depositERC721({
   const isApprovedForAll = await tokenContract.isApprovedForAll(user, operator);
   if (!isApprovedForAll) {
     await tokenContract.setApprovalForAll(operator, true);
-  }
-
-  if (!isRegistered) {
-    const signableResult = await getSignableRegistrationOnchain(
-      user,
-      starkPublicKey,
-      usersApi,
-    );
-
-    const coreContract = Contracts.Core.connect(
-      immutableXConfig.ethConfiguration.coreContractAddress,
-      ethSigner,
-    );
-    // Note: proxy registration contract registerAndDepositNft method is not used as
-    // it currently fails erc721 transfer ownership check
-    await coreContract.registerUser(
-      user,
-      starkPublicKey,
-      signableResult.operator_signature,
-    );
   }
 
   return executeDepositERC721(
