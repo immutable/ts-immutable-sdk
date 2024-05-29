@@ -18,7 +18,6 @@ describe('Deposit ETH', () => {
   describe('depositETH()', () => {
     let getSignableDepositMock: jest.Mock;
     let encodeAssetMock: jest.Mock;
-    let getSignableRegistrationMock: jest.Mock;
 
     const signableDepositRequest = {
       tokenAddress: 'kljh5kl3j4biu3b59385',
@@ -39,8 +38,6 @@ describe('Deposit ETH', () => {
       amount: '1000000000000000000',
     };
 
-    const getSignableRegistrationResponse = {};
-
     beforeEach(() => {
       jest.restoreAllMocks();
 
@@ -58,14 +55,7 @@ describe('Deposit ETH', () => {
         encodeAsset: encodeAssetMock,
       });
 
-      getSignableRegistrationMock = jest.fn().mockResolvedValue({
-        data: getSignableRegistrationResponse,
-      });
-      (imx.UsersApi as jest.Mock).mockReturnValue({
-        getSignableRegistration: getSignableRegistrationMock,
-      });
-
-      (Contracts.Core.connect as jest.Mock).mockReturnValue({
+      (Contracts.CoreV4.connect as jest.Mock).mockReturnValue({
         populateTransaction: {
           registerAndDepositEth: async () => 'test',
           // eslint-disable-next-line @typescript-eslint/naming-convention
