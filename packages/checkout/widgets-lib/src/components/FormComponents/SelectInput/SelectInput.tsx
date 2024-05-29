@@ -7,7 +7,7 @@ import {
   selectStyle,
 } from './SelectInputStyles';
 import { SelectForm } from '../SelectForm/SelectForm';
-import { TextInputForm, TextInputType } from '../TextInputForm/TextInputForm';
+import { InputMode, TextInputForm, TextInputType } from '../TextInputForm/TextInputForm';
 import { CoinSelectorOptionProps } from '../../CoinSelector/CoinSelectorOption';
 
 interface SelectInputProps {
@@ -20,6 +20,7 @@ interface SelectInputProps {
   textInputSubtext?: string;
   textInputErrorMessage?: string;
   textInputType?: TextInputType;
+  testInputMode?: InputMode;
   selectSubtext?: string;
   selectErrorMessage?: string;
   coinSelectorHeading: string;
@@ -50,6 +51,7 @@ export function SelectInput({
   textInputTextAlign,
   textInputSubtext,
   textInputErrorMessage,
+  testInputMode,
   selectTextAlign,
   selectSubtext,
   selectErrorMessage,
@@ -96,6 +98,7 @@ export function SelectInput({
           onTextInputFocus={onTextInputFocus}
           maxButtonClick={textInputMaxButtonClick}
           disabled={textInputDisabled}
+          inputMode={testInputMode}
         />
       </Box>
     </Box>
