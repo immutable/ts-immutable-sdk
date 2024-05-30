@@ -199,7 +199,7 @@ export default class AuthManager {
             resolve(AuthManager.mapOidcUserToDomainModel(oidcUser));
           })
           .catch((error: unknown) => {
-            // reject with the error if it is not caused by a blocked popup
+            // Reject with the error if it is not caused by a blocked popup
             if (!(error instanceof Error) || error.message !== 'Attempted to navigate on a disposed window') {
               reject(error);
             }
