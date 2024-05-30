@@ -1,7 +1,7 @@
 import Fastify, { FastifyReply, FastifyRequest } from 'fastify'
 import { mintingBackend, config } from '@imtbl/sdk';
 import { Pool } from 'pg';
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4, stringify, parse } from 'uuid';
 
 const fastify = Fastify({
   logger: true
@@ -36,6 +36,7 @@ interface MintRequest {
 fastify.post('/mint', async (request: FastifyRequest<{ Body: MintRequest }>, reply: FastifyReply) => {
   const collectionAddress = process.env.COLLECTION_ADDRESS as string;
   const assetId = uuidv4();
+  const assetIdBuffer = parse(assetId);
   const mintTo = request.body.mintTo;
   const metadata = {
     name: 'My NFT',
@@ -47,7 +48,9 @@ fastify.post('/mint', async (request: FastifyRequest<{ Body: MintRequest }>, rep
     asset_id: assetId,
     contract_address: collectionAddress,
     owner_address: mintTo,
-    metadata
+    metadata,
+    // amount: 5, // for 1155 only
+    // token_id: Buffer.from(assetIdBuffer).readUint32BE(0).toString(10), // required for 1155 only. 721 can omit this.
   });
   reply.send({});
 });

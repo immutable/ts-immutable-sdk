@@ -8,10 +8,13 @@ export const mintingPersistence = (client: Pool): MintingPersistence => {
     recordMint: async (request: CreateMintRequest) => {
       const r = await client.query(
         `
-        INSERT INTO im_assets (asset_id, contract_address, owner_address, metadata, amount) 
-        VALUES ($1, $2, $3, $4, $5) ON CONFLICT (asset_id, contract_address) DO NOTHING;
+        INSERT INTO im_assets (asset_id, contract_address, owner_address, metadata, amount, token_id) 
+        VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (asset_id, contract_address) DO NOTHING;
         `,
-        [request.asset_id, request.contract_address, request.owner_address, request.metadata, request.amount]
+        [
+          request.asset_id, request.contract_address, request.owner_address,
+          request.metadata, request.amount, request.token_id
+        ]
       );
       if (r.rowCount === 0) {
         throw new Error('Duplicated mint');
@@ -41,8 +44,9 @@ export const mintingPersistence = (client: Pool): MintingPersistence => {
           minting_status, 
           metadata_id, 
           last_imtbl_zkevm_mint_request_updated_id, 
-          error
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) ON CONFLICT (asset_id, contract_address)
+          error,
+          amount
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (asset_id, contract_address)
         DO UPDATE SET 
           owner_address = $3,
           token_id = $4,
@@ -62,7 +66,9 @@ export const mintingPersistence = (client: Pool): MintingPersistence => {
         submittedMintRequest.status,
         submittedMintRequest.metadataId,
         submittedMintRequest.imtblZkevmMintRequestUpdatedId,
-        submittedMintRequest.error]);
+        submittedMintRequest.error,
+        submittedMintRequest.amount
+      ]);
     },
     markAsConflict: async (assetIds: string[], contractAddress: string) => {
       await client.query(`

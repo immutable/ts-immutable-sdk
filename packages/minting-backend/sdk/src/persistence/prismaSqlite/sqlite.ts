@@ -24,6 +24,7 @@ export const mintingPersistence = (client: any): MintingPersistence => {
           ownerAddress: request.owner_address,
           metadata: JSON.stringify(request.metadata), // Serialize JSON metadata
           amount: request.amount || null,
+          tokenId: request.token_id || null,
         },
       });
 
@@ -70,7 +71,8 @@ export const mintingPersistence = (client: any): MintingPersistence => {
         metadata: asset.metadata ? JSON.parse(asset.metadata) : null,
         owner_address: asset.ownerAddress,
         tried_count: asset.triedCount,
-        amount: asset.amount || null
+        amount: asset.amount || null,
+        token_id: asset.tokenId || null,
       }));
     },
     updateMintingStatusToSubmitted: async (ids: string[]) => {
@@ -116,6 +118,7 @@ export const mintingPersistence = (client: any): MintingPersistence => {
             metadataId: submittedMintRequest.metadataId,
             lastImtblZkevmMintRequestUpdatedId: submittedMintRequest.imtblZkevmMintRequestUpdatedId,
             error: submittedMintRequest.error,
+            amount: submittedMintRequest.amount || null
           }
         });
       } else if (!existingAsset) {
@@ -130,6 +133,7 @@ export const mintingPersistence = (client: any): MintingPersistence => {
             metadataId: submittedMintRequest.metadataId,
             lastImtblZkevmMintRequestUpdatedId: submittedMintRequest.imtblZkevmMintRequestUpdatedId,
             error: submittedMintRequest.error,
+            amount: submittedMintRequest.amount || null
           }
         });
       }
