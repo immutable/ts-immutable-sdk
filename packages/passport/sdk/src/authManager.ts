@@ -30,7 +30,7 @@ import {
   isUserImx,
 } from './types';
 import { PassportConfiguration } from './config';
-import Overlay from './overlay/overlay';
+import Overlay from './overlay';
 
 const formUrlEncodedHeader = {
   headers: {
@@ -199,39 +199,43 @@ export default class AuthManager {
             resolve(AuthManager.mapOidcUserToDomainModel(oidcUser));
           })
           .catch((error: unknown) => {
-            // If the popup was blocked, append the blocked popup overlay.
-            if (error instanceof Error && error.message === 'Attempted to navigate on a disposed window') {
-              const overlay = new Overlay(this.config.popupOverlayOptions, true);
-              let popupHasOpened: boolean = false;
-              overlay.append(
-                async () => {
-                  try {
-                    if (!popupHasOpened) {
-                    // The user is attempting to open the popup again. It's safe to assume that this will not fail,
-                    // as there are no async operations between the button interaction & the popup being opened.
-                      popupHasOpened = true;
-                      const oidcUser = await signinPopup();
-                      overlay.remove();
-                      resolve(AuthManager.mapOidcUserToDomainModel(oidcUser));
-                    } else {
-                      // The popup has already been opened. By calling `window.open` with the same target as the
-                      // previously opened popup, no new window will be opened. Instead, the existing popup
-                      // will be focused and brought to the front reliably.
-                      window.open('', popupWindowTarget);
-                    }
-                  } catch (retryError: unknown) {
-                    overlay.remove();
-                    reject(retryError);
-                  }
-                },
-                () => {
-                  overlay.remove();
-                  reject(new Error('Popup closed by user'));
-                },
-              );
-            } else {
+            // reject with the error if it is not caused by a blocked popup
+            if (!(error instanceof Error) || error.message !== 'Attempted to navigate on a disposed window') {
               reject(error);
             }
+
+            // Popup was blocked; append the blocked popup overlay to allow the user to try again.
+            let popupHasBeenOpened: boolean = false;
+            const overlay = new Overlay(this.config.popupOverlayOptions, true);
+            overlay.append(
+              async () => {
+                try {
+                  if (!popupHasBeenOpened) {
+                    // The user is attempting to open the popup again. It's safe to assume that this will not fail,
+                    // as there are no async operations between the button interaction & the popup being opened.
+                    popupHasBeenOpened = true;
+                    const oidcUser = await signinPopup();
+                    overlay.remove();
+                    resolve(AuthManager.mapOidcUserToDomainModel(oidcUser));
+                  } else {
+                    // The popup has already been opened. By calling `window.open` with the same target as the
+                    // previously opened popup, no new window will be opened. Instead, the existing popup
+                    // will be focused. This works as expected in most browsers at the time of implementation, but
+                    // the following exceptions do exist:
+                    // - Safari: Only the initial call will focus the window, subsequent calls will do nothing.
+                    // - Firefox: The window will not be focussed, nothing will happen.
+                    window.open('', popupWindowTarget);
+                  }
+                } catch (retryError: unknown) {
+                  overlay.remove();
+                  reject(retryError);
+                }
+              },
+              () => {
+                overlay.remove();
+                reject(new Error('Popup closed by user'));
+              },
+            );
           });
       });
     }, PassportErrorType.AUTHENTICATION_ERROR);

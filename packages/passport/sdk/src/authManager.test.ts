@@ -2,6 +2,7 @@ import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { User as OidcUser, UserManager, WebStorageStateStore } from 'oidc-client-ts';
 import jwt_decode from 'jwt-decode';
 import AuthManager from './authManager';
+import Overlay from './overlay';
 import { PassportError, PassportErrorType } from './errors/passportError';
 import { PassportConfiguration } from './config';
 import { mockUser, mockUserImx, mockUserZkEvm } from './test/mocks';
@@ -9,13 +10,14 @@ import { isTokenExpired } from './utils/token';
 import { isUserZkEvm, PassportModuleConfiguration } from './types';
 
 jest.mock('jwt-decode');
-jest.mock('./utils/token');
 jest.mock('oidc-client-ts', () => ({
   ...jest.requireActual('oidc-client-ts'),
   InMemoryWebStorage: jest.fn(),
   UserManager: jest.fn(),
   WebStorageStateStore: jest.fn(),
 }));
+jest.mock('./utils/token');
+jest.mock('./overlay');
 
 const authenticationDomain = 'auth.immutable.com';
 const clientId = '11111';
@@ -87,6 +89,8 @@ describe('AuthManager', () => {
   let mockSigninSilent: jest.Mock;
   let mockSignoutSilent: jest.Mock;
   let mockStoreUser: jest.Mock;
+  let mockOverlayAppend: jest.Mock;
+  let mockOverlayRemove: jest.Mock;
 
   beforeEach(() => {
     mockSigninPopup = jest.fn();
@@ -96,6 +100,8 @@ describe('AuthManager', () => {
     mockSigninSilent = jest.fn();
     mockSignoutSilent = jest.fn();
     mockStoreUser = jest.fn();
+    mockOverlayAppend = jest.fn();
+    mockOverlayRemove = jest.fn();
     (UserManager as jest.Mock).mockReturnValue({
       signinPopup: mockSigninPopup,
       signinPopupCallback: mockSigninPopupCallback,
@@ -104,6 +110,10 @@ describe('AuthManager', () => {
       getUser: mockGetUser,
       signinSilent: mockSigninSilent,
       storeUser: mockStoreUser,
+    });
+    (Overlay as jest.Mock).mockReturnValue({
+      append: mockOverlayAppend,
+      remove: mockOverlayRemove,
     });
     authManager = new AuthManager(getConfig());
   });
@@ -249,6 +259,79 @@ describe('AuthManager', () => {
           PassportErrorType.AUTHENTICATION_ERROR,
         ),
       );
+    });
+
+    describe('when the popup is blocked', () => {
+      beforeEach(() => {
+        mockSigninPopup.mockRejectedValueOnce(new Error('Attempted to navigate on a disposed window'));
+      });
+
+      it('should render the blocked popup overlay', async () => {
+        const configWithPopupOverlayOptions = getConfig({
+          popupOverlayOptions: {
+            disableGenericPopupOverlay: false,
+            disableBlockedPopupOverlay: false,
+          },
+        });
+        const am = new AuthManager(configWithPopupOverlayOptions);
+
+        mockSigninPopup.mockReturnValue(mockOidcUser);
+        // Simulate `tryAgainOnClick` being called so that the `login()` promise can resolve
+        mockOverlayAppend.mockImplementation(async (tryAgainOnClick: () => Promise<void>) => {
+          await tryAgainOnClick();
+        });
+
+        const result = await am.login();
+
+        expect(result).toEqual(mockUser);
+        expect(Overlay).toHaveBeenCalledWith(configWithPopupOverlayOptions.popupOverlayOptions, true);
+        expect(mockOverlayAppend).toHaveBeenCalledTimes(1);
+      });
+
+      describe('when tryAgainOnClick is called once', () => {
+        beforeEach(() => {
+          mockOverlayAppend.mockImplementation(async (tryAgainOnClick: () => Promise<void>) => {
+            await tryAgainOnClick();
+          });
+        });
+
+        it('should return a user', async () => {
+          mockSigninPopup.mockReturnValue(mockOidcUser);
+
+          const result = await authManager.login();
+
+          expect(result).toEqual(mockUser);
+          expect(mockSigninPopup).toHaveBeenCalledTimes(2);
+          expect(mockOverlayRemove).toHaveBeenCalled();
+        });
+
+        describe('and the user closes the popup', () => {
+          it('should throw an error', async () => {
+            mockSigninPopup.mockRejectedValueOnce(new Error('Popup closed by user'));
+
+            await expect(() => authManager.login()).rejects.toThrow(
+              new Error('Popup closed by user'),
+            );
+
+            expect(mockSigninPopup).toHaveBeenCalledTimes(2);
+            expect(mockOverlayRemove).toHaveBeenCalled();
+          });
+        });
+      });
+
+      describe('when onCloseClick is called', () => {
+        it('should remove the overlay', async () => {
+          mockOverlayAppend.mockImplementation(async (_: () => Promise<void>, onCloseClick: () => void) => {
+            onCloseClick();
+          });
+
+          await expect(() => authManager.login()).rejects.toThrow(
+            new Error('Popup closed by user'),
+          );
+
+          expect(mockOverlayRemove).toHaveBeenCalled();
+        });
+      });
     });
   });
 
