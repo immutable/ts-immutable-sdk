@@ -79,6 +79,7 @@
     "@rollup/plugin-replace": "^5.0.2",
     "@rollup/plugin-terser": "^0.4.3",
     "@rollup/plugin-typescript": "^11.0.0",
+    "@stdlib/number-float64-base-normalize": "0.0.8",
     "@yarnpkg/cli": "3.5.0",
     "@yarnpkg/core": "3.5.0",
     "eslint": "^8.40.0",
@@ -144,14 +145,12 @@
     "prisma": "^5.13.0"
   },
   "overrides": {
-    "@openzeppelin/contracts": "3.4.2-solc-0.7",
-    "@stdlib/number-float64-base-normalize": "0.0.8"
+    "@openzeppelin/contracts": "3.4.2-solc-0.7"
   },
   "repository": "immutable/ts-immutable-sdk.git",
   "resolutions": {
     "@biom3/design-tokens": "^0.3.7",
-    "@openzeppelin/contracts": "3.4.2-solc-0.7",
-    "@stdlib/number-float64-base-normalize": "0.0.8"
+    "@openzeppelin/contracts": "3.4.2-solc-0.7"
   },
   "scripts": {
     "build": "yarn packageList && yarn updateDependencies && yarn regenModules && rm -rf dist && NODE_ENV=production node --max-old-space-size=8192 ../node_modules/rollup/dist/bin/rollup --config rollup.config.js && rm -rf dist/types",
