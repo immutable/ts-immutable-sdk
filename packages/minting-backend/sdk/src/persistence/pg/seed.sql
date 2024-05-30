@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS im_assets (
   metadata_id UUID NULL,
   tried_count INT DEFAULT 0,
   last_imtbl_zkevm_mint_request_updated_id UUID NULL,
+  amount INT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
