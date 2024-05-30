@@ -3878,6 +3878,7 @@ __metadata:
     "@rollup/plugin-replace": ^5.0.2
     "@rollup/plugin-terser": ^0.4.3
     "@rollup/plugin-typescript": ^11.0.0
+    "@stdlib/number-float64-base-normalize": 0.0.8
     "@uniswap/router-sdk": ^1.4.0
     "@uniswap/sdk-core": ^3.0.1
     "@uniswap/v3-sdk": ^3.9.0
@@ -8063,6 +8064,21 @@ __metadata:
     "@stdlib/number-float64-base-to-words": ^0.0.x
     "@stdlib/utils-library-manifest": ^0.0.x
   checksum: 7ee053f6b6eaa4b5a040e1eee144b2159654aa0f57c6861bb2318025288d8e7f25db13c52f9bcbc1af3d312befab0466b4964286c9689e85094fce6c50f1d897
+  conditions: (os=aix | os=darwin | os=freebsd | os=linux | os=macos | os=openbsd | os=sunos | os=win32 | os=windows)
+  languageName: node
+  linkType: hard
+
+"@stdlib/number-float64-base-normalize@npm:0.0.8":
+  version: 0.0.8
+  resolution: "@stdlib/number-float64-base-normalize@npm:0.0.8"
+  dependencies:
+    "@stdlib/constants-float64-smallest-normal": ^0.0.x
+    "@stdlib/math-base-assert-is-infinite": ^0.0.x
+    "@stdlib/math-base-assert-is-nan": ^0.0.x
+    "@stdlib/math-base-special-abs": ^0.0.x
+    "@stdlib/types": ^0.0.x
+    "@stdlib/utils-define-nonenumerable-read-only-property": ^0.0.x
+  checksum: 677062923b00824bdb13263fdd1a9e721cacd4add2a9db014652a9cd77a053e531725f35313dbc80507f1b5a812d77b2ca6860008e38346d16f710fd427471f8
   conditions: (os=aix | os=darwin | os=freebsd | os=linux | os=macos | os=openbsd | os=sunos | os=win32 | os=windows)
   languageName: node
   linkType: hard
