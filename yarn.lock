@@ -3815,7 +3815,7 @@ __metadata:
     jwt-encode: ^1.0.1
     magic-sdk: ^21.2.0
     msw: ^1.2.2
-    oidc-client-ts: 2.2.1
+    oidc-client-ts: 2.4.0
     prettier: ^2.8.7
     rollup: ^3.17.2
     ts-node: ^10.9.1
@@ -3905,7 +3905,7 @@ __metadata:
     jwt-decode: ^3.1.2
     lru-memorise: 0.3.0
     magic-sdk: ^21.2.0
-    oidc-client-ts: 2.2.1
+    oidc-client-ts: 2.4.0
     os-browserify: ^0.3.0
     pako: ^2.1.0
     pg: ^8.11.5
@@ -3957,7 +3957,7 @@ __metadata:
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
     magic-sdk: ^21.2.0
-    oidc-client-ts: 2.2.1
+    oidc-client-ts: 2.4.0
     prettier: ^2.8.7
     rollup: ^3.17.2
     ts-node: ^10.9.1
@@ -4060,7 +4060,7 @@ __metadata:
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
     magic-sdk: ^21.2.0
-    oidc-client-ts: 2.2.1
+    oidc-client-ts: 2.4.0
     prettier: ^2.8.7
     rollup: ^3.17.2
     ts-node: ^10.9.1
@@ -13826,7 +13826,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"crypto-js@npm:^4.1.1, crypto-js@npm:^4.2.0":
+"crypto-js@npm:^4.2.0":
   version: 4.2.0
   resolution: "crypto-js@npm:4.2.0"
   checksum: f051666dbc077c8324777f44fbd3aaea2986f198fe85092535130d17026c7c2ccf2d23ee5b29b36f7a4a07312db2fae23c9094b644cc35f7858b1b4fcaf27774
@@ -22612,13 +22612,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"oidc-client-ts@npm:2.2.1":
-  version: 2.2.1
-  resolution: "oidc-client-ts@npm:2.2.1"
+"oidc-client-ts@npm:2.4.0":
+  version: 2.4.0
+  resolution: "oidc-client-ts@npm:2.4.0"
   dependencies:
-    crypto-js: ^4.1.1
+    crypto-js: ^4.2.0
     jwt-decode: ^3.1.2
-  checksum: 83bc815d59a1221bdf2a39aff505941f1bf9aba542a59cc9cbe677b85fc06d4f555d55c1b0a6ad8ca76c57bacc423e1b03de5b7cef3d93c403126143f1152943
+  checksum: 8467db689298221f706d3358961efb0ddc789f6bd7d4765e71ae5fe62067999d2ce6e8e7584b9d991b8caa6f7fb383f75841e1cfa9e05808c34632de374f5e68
   languageName: node
   linkType: hard
 
