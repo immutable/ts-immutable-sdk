@@ -1,65 +1,72 @@
 import { Signer } from '@ethersproject/abstract-signer';
 import { TransactionResponse } from '@ethersproject/providers';
-import { imx } from '@imtbl/generated-clients';
 import {
-  Contracts,
-  ImmutableXConfiguration,
+  Contracts, ImmutableXConfiguration, signRegisterEthAddress, StarkSigner,
 } from '@imtbl/x-client';
 import { ProviderConfiguration } from '../../config';
-import {
-  getSignableRegistrationOnchain,
-  isRegisteredOnChain,
-} from '../registration';
+import { isRegisteredOnChain } from '../registration';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 import { validateChain } from '../helpers';
+import { getWithdrawalBalances } from './getWithdrawalBalance';
 
 type CompleteEthWithdrawalActionParams = {
   ethSigner: Signer;
+  starkSigner: StarkSigner;
   starkPublicKey: string;
   config: ProviderConfiguration;
 };
 
-async function executeRegisterAndWithdrawEth(
+const EthTokenType = 'ETH';
+
+// works with ETH or ERC20
+export async function executeRegisterAndWithdrawAllFungible(
   ethSigner: Signer,
-  assetType: string,
+  starkSigner: StarkSigner,
   starkPublicKey: string,
+  assetType: string,
   config: ImmutableXConfiguration,
 ): Promise<TransactionResponse> {
   const etherKey = await ethSigner.getAddress();
-  const usersApi = new imx.UsersApi(config.apiConfiguration);
-  const signableResult = await getSignableRegistrationOnchain(
+
+  const starkSignature = await signRegisterEthAddress(
+    starkSigner,
     etherKey,
     starkPublicKey,
-    usersApi,
   );
 
-  const contract = Contracts.Registration.connect(
-    config.ethConfiguration.registrationContractAddress,
+  // we use registration v4 contract as a wrapper for the core contract
+  // so that v3 and v4 withdrawals, AND on-chain registration can be executed in a single transaction
+  const contract = Contracts.RegistrationV4.connect(
+    config.ethConfiguration.registrationV4ContractAddress || config.ethConfiguration.registrationContractAddress,
     ethSigner,
   );
 
-  const populatedTransaction = await contract.populateTransaction.registerAndWithdraw(
+  const populatedTransaction = await contract.populateTransaction.registerAndWithdrawAll(
     etherKey,
     starkPublicKey,
-    signableResult.operator_signature,
+    starkSignature,
     assetType,
   );
 
   return ethSigner.sendTransaction(populatedTransaction);
 }
 
-async function executeWithdrawEth(
+export async function executeWithdrawAllFungible(
   ethSigner: Signer,
-  assetType: string,
   starkPublicKey: string,
+  assetType: string,
   config: ImmutableXConfiguration,
 ): Promise<TransactionResponse> {
-  const contract = Contracts.Core.connect(
-    config.ethConfiguration.coreContractAddress,
+  // we use registration v4 contract as a wrapper for the core contract
+  // so that v3 and v4 withdrawals can be executed in a single transaction
+  // (if there are pending withdrawable funds for both)
+  const contract = Contracts.RegistrationV4.connect(
+    config.ethConfiguration.registrationV4ContractAddress || config.ethConfiguration.registrationContractAddress,
     ethSigner,
   );
 
-  const populatedTransaction = await contract.populateTransaction.withdraw(
+  const populatedTransaction = await contract.populateTransaction.withdrawAll(
+    await ethSigner.getAddress(),
     starkPublicKey,
     assetType,
   );
@@ -69,13 +76,27 @@ async function executeWithdrawEth(
 
 export async function completeEthWithdrawalAction({
   ethSigner,
+  starkSigner,
   starkPublicKey,
   config,
-}: CompleteEthWithdrawalActionParams) {
+}: CompleteEthWithdrawalActionParams): Promise<TransactionResponse> {
   await validateChain(ethSigner, config.immutableXConfig);
 
-  const imxConfig = config.immutableXConfig;
-  const assetType = await getEncodeAssetInfo('asset', 'ETH', imxConfig);
+  // get withdrawal balances
+  const {
+    v3Balance,
+    v4Balance,
+  } = await getWithdrawalBalances(
+    ethSigner,
+    starkPublicKey,
+    await ethSigner.getAddress(),
+    { type: EthTokenType },
+    config.immutableXConfig,
+  );
+
+  if (v3Balance.isZero() && v4Balance.isZero()) {
+    throw new Error('No balance to withdraw');
+  }
 
   const isRegistered = await isRegisteredOnChain(
     starkPublicKey,
@@ -83,18 +104,16 @@ export async function completeEthWithdrawalAction({
     config,
   );
 
-  if (!isRegistered) {
-    return executeRegisterAndWithdrawEth(
-      ethSigner,
-      assetType.asset_type,
-      starkPublicKey,
-      imxConfig,
-    );
+  const assetType = await getEncodeAssetInfo('asset', EthTokenType, config.immutableXConfig);
+
+  if (isRegistered) {
+    return executeWithdrawAllFungible(ethSigner, starkPublicKey, assetType.asset_type, config.immutableXConfig);
   }
-  return executeWithdrawEth(
+  return executeRegisterAndWithdrawAllFungible(
     ethSigner,
-    assetType.asset_type,
+    starkSigner,
     starkPublicKey,
-    imxConfig,
+    assetType.asset_type,
+    config.immutableXConfig,
   );
 }

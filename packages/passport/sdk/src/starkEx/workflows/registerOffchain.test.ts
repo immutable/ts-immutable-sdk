@@ -4,6 +4,7 @@ import AuthManager from 'authManager';
 import { mockUserImx } from 'test/mocks';
 import { AxiosError } from 'axios';
 import { ImxApiClients } from '@imtbl/generated-clients';
+import { StarkSigner } from '@imtbl/x-client';
 import registerPassportStarkEx from './registration';
 import { PassportError, PassportErrorType } from '../../errors/passportError';
 import registerOffchain from './registerOffchain';
@@ -24,7 +25,11 @@ const mockAuthManager = {
 
 const mockEthSigner = { getAddress: jest.fn() } as unknown as Signer;
 
-const mockStarkSigner = { getAddress: jest.fn() } as unknown as Signer;
+const mockStarkSigner = {
+  signMessage: jest.fn(),
+  getAddress: jest.fn(),
+  getYCoordinate: jest.fn(),
+} as unknown as StarkSigner;
 
 const mockReturnHash = '0x123';
 

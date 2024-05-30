@@ -1,112 +1,69 @@
 import { Signer } from '@ethersproject/abstract-signer';
-import { TransactionResponse } from '@ethersproject/providers';
-import { imx } from '@imtbl/generated-clients';
-import {
-  Contracts,
-  ERC20Token,
-  ImmutableXConfiguration,
-} from '@imtbl/x-client';
-import {
-  getSignableRegistrationOnchain,
-  isRegisteredOnChain,
-} from '../registration';
+import { ERC20Token, StarkSigner } from '@imtbl/x-client';
+import { isRegisteredOnChain } from '../registration';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 import { validateChain } from '../helpers';
 import { ProviderConfiguration } from '../../config';
-
-type ExecuteRegisterAndWithdrawERC20Params = {
-  ethSigner: Signer;
-  assetType: string;
-  starkPublicKey: string;
-  config: ProviderConfiguration;
-};
+import { getWithdrawalBalances } from './getWithdrawalBalance';
+import { executeRegisterAndWithdrawAllFungible, executeWithdrawAllFungible } from './completeEthWithdrawal';
 
 type CompleteERC20WithdrawalWorkflowParams = {
   ethSigner: Signer;
+  starkSigner: StarkSigner;
   starkPublicKey: string;
   token: ERC20Token;
   config: ProviderConfiguration;
 };
 
-async function executeRegisterAndWithdrawERC20({
-  ethSigner,
-  assetType,
-  starkPublicKey,
-  config,
-}: ExecuteRegisterAndWithdrawERC20Params): Promise<TransactionResponse> {
-  const etherKey = await ethSigner.getAddress();
-  const imxConfig = config.immutableXConfig;
-  const usersApi = new imx.UsersApi(imxConfig.apiConfiguration);
-  const signableResult = await getSignableRegistrationOnchain(
-    etherKey,
-    starkPublicKey,
-    usersApi,
-  );
+const ERC20TokenType = 'ERC20';
 
-  const contract = Contracts.Registration.connect(
-    config.immutableXConfig.ethConfiguration.registrationContractAddress,
-    ethSigner,
-  );
-
-  const populatedTransaction = await contract.populateTransaction.registerAndWithdraw(
-    etherKey,
-    starkPublicKey,
-    signableResult.operator_signature,
-    assetType,
-  );
-
-  return ethSigner.sendTransaction(populatedTransaction);
-}
-
-async function executeWithdrawERC20(
-  ethSigner: Signer,
-  assetType: string,
-  starkPublicKey: string,
-  config: ImmutableXConfiguration,
-): Promise<TransactionResponse> {
-  const contract = Contracts.Core.connect(
-    config.ethConfiguration.coreContractAddress,
-    ethSigner,
-  );
-
-  const populatedTransaction = await contract.populateTransaction.withdraw(
-    starkPublicKey,
-    assetType,
-  );
-
-  return ethSigner.sendTransaction(populatedTransaction);
-}
-
+// equivilant to Core SDK completeERC20WithdrawalV1Workflow
+// in src/workflows/withdrawal/completeERC20Withdrawal.ts
 export async function completeERC20WithdrawalAction({
   ethSigner,
+  starkSigner,
   starkPublicKey,
   token,
   config,
 }: CompleteERC20WithdrawalWorkflowParams) {
   await validateChain(ethSigner, config.immutableXConfig);
 
-  const imxConfig = config.immutableXConfig;
-  const assetType = await getEncodeAssetInfo('asset', 'ERC20', imxConfig, {
-    token_address: token.tokenAddress,
-  });
+  const {
+    v3Balance,
+    v4Balance,
+  } = await getWithdrawalBalances(
+    ethSigner,
+    starkPublicKey,
+    await ethSigner.getAddress(),
+    {
+      type: ERC20TokenType,
+      tokenAddress: token.tokenAddress,
+    },
+    config.immutableXConfig,
+  );
+
+  if (v3Balance.isZero() && v4Balance.isZero()) {
+    throw new Error('No balance to withdraw');
+  }
+
   const isRegistered = await isRegisteredOnChain(
     starkPublicKey,
     ethSigner,
     config,
   );
 
-  if (!isRegistered) {
-    return executeRegisterAndWithdrawERC20({
-      ethSigner,
-      assetType: assetType.asset_type,
-      starkPublicKey,
-      config,
-    });
+  const assetType = await getEncodeAssetInfo('asset', ERC20TokenType, config.immutableXConfig, {
+    token_address: token.tokenAddress,
+  });
+
+  if (isRegistered) {
+    return executeWithdrawAllFungible(ethSigner, starkPublicKey, assetType.asset_type, config.immutableXConfig);
   }
-  return executeWithdrawERC20(
+  return executeRegisterAndWithdrawAllFungible(
     ethSigner,
-    assetType.asset_type,
+    starkSigner,
     starkPublicKey,
-    imxConfig,
+    assetType.asset_type,
+    config.immutableXConfig,
   );
 }
