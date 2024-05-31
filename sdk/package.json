@@ -1,6 +1,6 @@
 {
   "name": "@imtbl/sdk",
-  "description": "Immutable Unified SDK",
+  "description": "Immutable Typescript SDK",
   "version": "0.0.0",
   "author": "Immutable",
   "browser": "./dist/index.browser.js",
@@ -161,7 +161,7 @@
     "packageList": "./scripts/generate-package-list.sh",
     "regenModules": "yarn generateIndex && yarn updateExports",
     "typecheck": "tsc --noEmit --jsx preserve",
-    "updateDependencies": "yarn packageList && node ./scripts/updateDependencies.js",
+    "updateDependencies": "yarn packageList && node ./scripts/updateDependencies.js && yarn syncpack:format",
     "updateExports": "node scripts/updateExports.js"
   },
   "type": "module",
