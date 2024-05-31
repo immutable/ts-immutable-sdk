@@ -43,6 +43,13 @@ const EthereumMethods: EthereumMethod[] = [
     exampleComponents: EthSendTransactionExamples,
   },
   {
+    name: 'personal_sign',
+    params: [
+      { name: 'address' },
+      { name: 'message' },
+    ],
+  },
+  {
     name: 'eth_signTypedData_v4',
     params: [
       { name: 'address' },
