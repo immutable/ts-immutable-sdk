@@ -1,0 +1,38 @@
+name: Detect Node Engine Version Change
+
+on:
+  pull_request:
+    branches:
+      - main
+  merge_group:
+    branches:
+      - main
+
+jobs:
+  detect:
+    name: Detect Node engine version change
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Get Node engine version from package.json
+        id: get_package_json_node_engine_version
+        run: |
+          node_engine_major_version=$(jq -r '.engines.node' ./sdk/package.json | sed 's/^>=//' | cut -d. -f1)
+          echo "::set-output name=node_engine_major_version::$node_engine_major_version"
+
+      - name: Get Node.js version from .nvmrc
+        id: get_nvmrc_node_version
+        run: echo "::set-output name=nvmrc_node_version::$(head -n 1 .nvmrc | cut -d. -f1)"
+
+      - name: Check Node.js engine version change
+        run: |
+          package_version_major=$(echo "${{ steps.get_package_json_node_engine_version.outputs.node_engine_major_version }}")
+          nvmrc_version_major=$(echo "${{ steps.get_nvmrc_node_version.outputs.nvmrc_node_version }}")
+          if [ "$package_version_major" != "$nvmrc_version_major" ]; then
+            echo "Node.js engine version has changed"
+            exit 1
+          else
+            echo "Node.js engine version has not changed"
+          fi
