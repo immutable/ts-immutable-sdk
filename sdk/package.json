@@ -1,6 +1,6 @@
 {
   "name": "@imtbl/sdk",
-  "description": "Immutable Unified SDK",
+  "description": "Immutable Typescript SDK",
   "version": "0.0.0",
   "author": "Immutable",
   "browser": "./dist/index.browser.js",
