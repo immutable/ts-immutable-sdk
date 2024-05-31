@@ -5,7 +5,9 @@ import { BlockchainData as Types } from '@imtbl/generated-clients';
 import { BlockchainData } from '@imtbl/blockchain-data';
 import { CreateMintRequest, MintRequest, MintingPersistence } from './persistence/type';
 import { Logger } from './logger/type';
-import { trackProcessMint, trackRecordMint, trackSubmitMintingRequests } from './analytics';
+import {
+  trackError, trackProcessMint, trackRecordMint, trackSubmitMintingRequests
+} from './analytics';
 
 // TODO: expose metrics
 //       - submitting status count, conflicting status count
@@ -124,6 +126,7 @@ export const submitMintingRequests = async (
             return response;
           } catch (e: any) {
             logger.error(e);
+            trackError(e);
 
             if (
               e.code === 'CONFLICT_ERROR'
@@ -144,6 +147,7 @@ export const submitMintingRequests = async (
                 );
               } catch (e2) {
                 logger.error(e2);
+                trackError(e);
               }
             } else {
               // separate assets into "need to be retied" and "exceeded max number of tries."
