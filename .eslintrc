@@ -6,6 +6,7 @@
     "rollup.config.*",
     "node_modules/",
     "dist/",
+    "samples/",
     "**sample-app**/",
     "**playground**/"
   ],

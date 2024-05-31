@@ -1,4 +1,5 @@
 import { Box } from '@biom3/react';
+import EthereumProvider from '@walletconnect/ethereum-provider';
 import {
   ChainId,
   CheckoutErrorType,
@@ -200,12 +201,18 @@ export function WalletList(props: WalletListProps) {
     [checkout],
   );
 
-  const connectCallback = async (ethereumProvider) => {
+  const connectCallback = async (ethereumProvider: EthereumProvider) => {
     if (ethereumProvider.connected && ethereumProvider.session) {
-      const web3Provider = new Web3Provider(ethereumProvider as any);
+      const web3Provider = new Web3Provider(ethereumProvider);
       selectWeb3Provider(web3Provider, 'walletconnect');
 
       const chainId = await web3Provider.getSigner().getChainId();
+
+      if (ethereumProvider.chainId !== targetChainId) {
+        // @ts-ignore allow protected method `switchEthereumChain` to be called
+        await ethereumProvider.switchEthereumChain(targetChainId);
+      }
+
       if (chainId !== targetChainId) {
         viewDispatch({
           payload: {
@@ -213,7 +220,6 @@ export function WalletList(props: WalletListProps) {
             view: { type: ConnectWidgetViews.SWITCH_NETWORK },
           },
         });
-        return;
       }
 
       viewDispatch({

@@ -250,7 +250,12 @@ export const sell = async (
     };
 
     if (makerFees !== undefined) {
-      const orderBookFees = calculateFees(makerFees, buyTokenOrNative.amount, decimals);
+      let tokenQuantity = BigNumber.from(1);
+
+      // if type exists in sellToken then it is valid ERC721 or ERC1155 and not deprecated type
+      if (sellTokenHasType && sellToken.type === ItemType.ERC1155) tokenQuantity = BigNumber.from(sellToken.amount);
+
+      const orderBookFees = calculateFees(makerFees, buyTokenOrNative.amount, decimals, tokenQuantity);
       if (orderBookFees.length !== makerFees.length) {
         throw new CheckoutError(
           'One of the fees is too small, must be greater than 0.000001',

@@ -1,6 +1,6 @@
 import React, { createContext } from 'react';
 
-export interface Handover {
+export interface HandoverContent {
   children: React.ReactNode;
   animationUrl?: string;
   animationState?: string;
@@ -8,9 +8,9 @@ export interface Handover {
 }
 
 interface HandoverContextProps {
-  handovers: { [id: string]: Handover };
+  handovers: { [id: string]: HandoverContent };
   setHandovers: React.Dispatch<
-  React.SetStateAction<{ [id: string]: Handover }>
+  React.SetStateAction<{ [id: string]: HandoverContent }>
   >;
 }
 

@@ -44,6 +44,7 @@ export const EIP1193ContextProvider = ({children}: EIP1193ContextProvider) => {
 
   useEffect(() => {
     if(provider && provider.provider) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (provider.provider as any)?.on('accountsChanged', (accounts: string[]) => {
         setWalletAddress(accounts.length > 0 ? accounts[0].toLowerCase() : "");
       })

@@ -9,6 +9,7 @@ import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAna
 import { Transaction } from 'lib/clients/checkoutApiType';
 import { MouseEvent, useMemo } from 'react';
 import { TokenImage } from 'components/TokenImage/TokenImage';
+import { Environment } from '@imtbl/config';
 import { containerStyles } from './transactionItemStyles';
 import { TransactionDetails } from './TransactionDetails';
 
@@ -24,6 +25,7 @@ type TransactionItemProps = {
   amount: string,
   icon: string,
   defaultTokenImage: string,
+  environment: Environment,
 };
 
 export function TransactionItem({
@@ -34,6 +36,7 @@ export function TransactionItem({
   amount,
   icon,
   defaultTokenImage,
+  environment,
 }: TransactionItemProps) {
   const { track } = useAnalytics();
   const txnDetailsLink = useMemo(() => `${details.link}${details.hash}`, [details]);
@@ -126,7 +129,7 @@ export function TransactionItem({
               px: 'base.spacing.x2',
             }}
           />
-          <TransactionDetails transaction={transaction} />
+          <TransactionDetails transaction={transaction} environment={environment} />
         </Accordion.ExpandedContent>
       </Accordion>
     </Box>

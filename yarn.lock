@@ -3815,7 +3815,7 @@ __metadata:
     jwt-encode: ^1.0.1
     magic-sdk: ^21.2.0
     msw: ^1.2.2
-    oidc-client-ts: 2.2.1
+    oidc-client-ts: 2.4.0
     prettier: ^2.8.7
     rollup: ^3.17.2
     ts-node: ^10.9.1
@@ -3878,6 +3878,7 @@ __metadata:
     "@rollup/plugin-replace": ^5.0.2
     "@rollup/plugin-terser": ^0.4.3
     "@rollup/plugin-typescript": ^11.0.0
+    "@stdlib/number-float64-base-normalize": 0.0.8
     "@uniswap/router-sdk": ^1.4.0
     "@uniswap/sdk-core": ^3.0.1
     "@uniswap/v3-sdk": ^3.9.0
@@ -3904,7 +3905,7 @@ __metadata:
     jwt-decode: ^3.1.2
     lru-memorise: 0.3.0
     magic-sdk: ^21.2.0
-    oidc-client-ts: 2.2.1
+    oidc-client-ts: 2.4.0
     os-browserify: ^0.3.0
     pako: ^2.1.0
     pg: ^8.11.5
@@ -3956,7 +3957,7 @@ __metadata:
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
     magic-sdk: ^21.2.0
-    oidc-client-ts: 2.2.1
+    oidc-client-ts: 2.4.0
     prettier: ^2.8.7
     rollup: ^3.17.2
     ts-node: ^10.9.1
@@ -4059,7 +4060,7 @@ __metadata:
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
     magic-sdk: ^21.2.0
-    oidc-client-ts: 2.2.1
+    oidc-client-ts: 2.4.0
     prettier: ^2.8.7
     rollup: ^3.17.2
     ts-node: ^10.9.1
@@ -8063,6 +8064,21 @@ __metadata:
     "@stdlib/number-float64-base-to-words": ^0.0.x
     "@stdlib/utils-library-manifest": ^0.0.x
   checksum: 7ee053f6b6eaa4b5a040e1eee144b2159654aa0f57c6861bb2318025288d8e7f25db13c52f9bcbc1af3d312befab0466b4964286c9689e85094fce6c50f1d897
+  conditions: (os=aix | os=darwin | os=freebsd | os=linux | os=macos | os=openbsd | os=sunos | os=win32 | os=windows)
+  languageName: node
+  linkType: hard
+
+"@stdlib/number-float64-base-normalize@npm:0.0.8":
+  version: 0.0.8
+  resolution: "@stdlib/number-float64-base-normalize@npm:0.0.8"
+  dependencies:
+    "@stdlib/constants-float64-smallest-normal": ^0.0.x
+    "@stdlib/math-base-assert-is-infinite": ^0.0.x
+    "@stdlib/math-base-assert-is-nan": ^0.0.x
+    "@stdlib/math-base-special-abs": ^0.0.x
+    "@stdlib/types": ^0.0.x
+    "@stdlib/utils-define-nonenumerable-read-only-property": ^0.0.x
+  checksum: 677062923b00824bdb13263fdd1a9e721cacd4add2a9db014652a9cd77a053e531725f35313dbc80507f1b5a812d77b2ca6860008e38346d16f710fd427471f8
   conditions: (os=aix | os=darwin | os=freebsd | os=linux | os=macos | os=openbsd | os=sunos | os=win32 | os=windows)
   languageName: node
   linkType: hard
@@ -13810,7 +13826,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"crypto-js@npm:^4.1.1, crypto-js@npm:^4.2.0":
+"crypto-js@npm:^4.2.0":
   version: 4.2.0
   resolution: "crypto-js@npm:4.2.0"
   checksum: f051666dbc077c8324777f44fbd3aaea2986f198fe85092535130d17026c7c2ccf2d23ee5b29b36f7a4a07312db2fae23c9094b644cc35f7858b1b4fcaf27774
@@ -15786,6 +15802,15 @@ __metadata:
   peerDependencies:
     eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0
   checksum: 23001801f14c1d16bf0a837ca7970d9dd94e7b560384b41db378b49b6e32dc43d6e2790de1bd737a652a86f81a08d6a91f402525061b47719328f586a57e86c3
+  languageName: node
+  linkType: hard
+
+"eslint-plugin-react-refresh@npm:latest":
+  version: 0.4.7
+  resolution: "eslint-plugin-react-refresh@npm:0.4.7"
+  peerDependencies:
+    eslint: ">=7"
+  checksum: b2fe14d4ed158b6380ffd9831a5ebed4c79828ea806536d5db0aa8370f8a3878b198d77fc7da18bfd862cd9eb19ed4472cc9977f727f81679f80dcb48f8a3861
   languageName: node
   linkType: hard
 
@@ -22596,13 +22621,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"oidc-client-ts@npm:2.2.1":
-  version: 2.2.1
-  resolution: "oidc-client-ts@npm:2.2.1"
+"oidc-client-ts@npm:2.4.0":
+  version: 2.4.0
+  resolution: "oidc-client-ts@npm:2.4.0"
   dependencies:
-    crypto-js: ^4.1.1
+    crypto-js: ^4.2.0
     jwt-decode: ^3.1.2
-  checksum: 83bc815d59a1221bdf2a39aff505941f1bf9aba542a59cc9cbe677b85fc06d4f555d55c1b0a6ad8ca76c57bacc423e1b03de5b7cef3d93c403126143f1152943
+  checksum: 8467db689298221f706d3358961efb0ddc789f6bd7d4765e71ae5fe62067999d2ce6e8e7584b9d991b8caa6f7fb383f75841e1cfa9e05808c34632de374f5e68
   languageName: node
   linkType: hard
 
@@ -28041,6 +28066,7 @@ __metadata:
     eslint: ^8.40.0
     eslint-config-airbnb: ^19.0.4
     eslint-config-airbnb-typescript: ^17.0.0
+    eslint-plugin-react-refresh: latest
     http-server: ^14.1.1
     husky: ^8.0.3
     lint-staged: ^13.2.0

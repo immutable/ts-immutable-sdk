@@ -104,6 +104,8 @@ export const submitMintingRequests = async (
                 reference_id: row.asset_id,
                 owner_address: row.owner_address,
                 metadata: row.metadata,
+                token_id: row.token_id,
+                amount: row.amount ? `${row.amount}` : null,
               })),
             },
           };
@@ -209,6 +211,7 @@ export type MintRequestEvent = {
     } | null;
     created_at: string;
     updated_at: string;
+    amount?: number;
   }
 };
 
@@ -264,5 +267,6 @@ export const processMint = async (
     metadataId: event.data.metadata_id,
     imtblZkevmMintRequestUpdatedId: event.event_id,
     error: event.data.error ? JSON.stringify(event.data.error) : null,
+    amount: event.data.amount || null,
   });
 };

@@ -1,5 +1,8 @@
 import {
-  Body, Box, Button, HorizontalMenu,
+  Body,
+  Box,
+  FramedImage,
+  HorizontalMenu,
 } from '@biom3/react';
 import {
   useCallback, useContext, useEffect, useState,
@@ -11,7 +14,6 @@ import {
   NetworkInfo,
   SwitchNetworkParams,
 } from '@imtbl/checkout-sdk';
-import { logoColour, networkIcon } from 'lib';
 import { useTranslation } from 'react-i18next';
 import { WalletContext } from '../../context/WalletContext';
 import { sendNetworkSwitchEvent } from '../../WalletWidgetEvents';
@@ -22,7 +24,7 @@ import {
   networkHeadingStyle,
   networkMenuStyles,
 } from './NetworkMenuStyles';
-import { sortNetworksCompareFn } from '../../../../lib/utils';
+import { getChainImage, sortNetworksCompareFn } from '../../../../lib/utils';
 import {
   ViewContext,
   ViewActions,
@@ -117,12 +119,13 @@ export function NetworkMenu() {
                 size="small"
                 onClick={() => switchNetwork(networkItem.chainId)}
               >
-                <Button.Icon
-                  icon={networkIcon[networkItem.chainId]}
-                  iconVariant="bold"
-                  sx={logoStyle(
-                    logoColour[networkItem.chainId],
-                    networkItem.chainId === network?.chainId,
+                <FramedImage
+                  sx={logoStyle(networkItem.chainId === network?.chainId)}
+                  use={(
+                    <img
+                      src={getChainImage(checkout?.config.environment, networkItem.chainId)}
+                      alt={networkItem.name}
+                    />
                   )}
                 />
                 {networkItem.name}
