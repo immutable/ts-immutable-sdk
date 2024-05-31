@@ -148,8 +148,6 @@ const main = async () => {
     packageJson.optionalDependencies = optionalDependencies;
   }
 
-  console.log(JSON.stringify(packageJson, null, 2));
-
   fs.writeFileSync(
     path.resolve(__dirname, 'package.json'),
     JSON.stringify(packageJson, null, 2)
