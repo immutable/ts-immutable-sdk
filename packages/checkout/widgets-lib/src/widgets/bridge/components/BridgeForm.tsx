@@ -188,20 +188,15 @@ export function BridgeForm(props: BridgeFormProps) {
   };
 
   const handleBridgeAmountChange = (value: string) => {
-    // Ensure that starting with a decimal is formatted correctly
-    let inputValue = value;
-    if (inputValue === '.') {
-      inputValue = '0.';
-    }
-    setFormAmount(inputValue);
+    setFormAmount(value);
     if (amountError) {
-      const validateAmountError = validateAmount(inputValue, formToken?.formattedBalance);
+      const validateAmountError = validateAmount(value, formToken?.formattedBalance);
       setAmountError(validateAmountError);
     }
 
     if (!formToken) return;
     setAmountFiatValue(calculateCryptoToFiat(
-      inputValue,
+      value,
       formToken.token.symbol,
       cryptoFiatState.conversions,
     ));
