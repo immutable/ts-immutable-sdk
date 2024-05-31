@@ -15805,6 +15805,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"eslint-plugin-react-refresh@npm:latest":
+  version: 0.4.7
+  resolution: "eslint-plugin-react-refresh@npm:0.4.7"
+  peerDependencies:
+    eslint: ">=7"
+  checksum: b2fe14d4ed158b6380ffd9831a5ebed4c79828ea806536d5db0aa8370f8a3878b198d77fc7da18bfd862cd9eb19ed4472cc9977f727f81679f80dcb48f8a3861
+  languageName: node
+  linkType: hard
+
 "eslint-plugin-react@npm:^7.27.1, eslint-plugin-react@npm:^7.31.7":
   version: 7.33.0
   resolution: "eslint-plugin-react@npm:7.33.0"
@@ -28057,6 +28066,7 @@ __metadata:
     eslint: ^8.40.0
     eslint-config-airbnb: ^19.0.4
     eslint-config-airbnb-typescript: ^17.0.0
+    eslint-plugin-react-refresh: latest
     http-server: ^14.1.1
     husky: ^8.0.3
     lint-staged: ^13.2.0
