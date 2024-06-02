@@ -2,6 +2,7 @@ import { ImmutableConfiguration, ModuleConfiguration } from '@imtbl/config';
 import { BlockchainData } from '@imtbl/blockchain-data';
 import { init } from '@imtbl/webhook';
 import { setEnvironment, setPublishableApiKey } from '@imtbl/metrics';
+import { trackUncaughtException } from 'analytics';
 import { mintingPersistence as mintingPersistencePg } from './persistence/pg/postgres';
 import { mintingPersistence as mintingPersistencePrismaSqlite } from './persistence/prismaSqlite/sqlite';
 import {
@@ -79,3 +80,5 @@ export class MintingBackendModule {
     });
   }
 }
+
+process.on('uncaughtExceptionMonitor', trackUncaughtException);

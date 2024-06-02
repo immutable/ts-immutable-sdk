@@ -41,3 +41,26 @@ export const trackRecordMint = () => {
     // ignore
   }
 };
+
+export const trackError = (error: Error) => {
+  try {
+    track(moduleName, 'error', {
+      name: error.name,
+      message: error.message
+    });
+  } catch {
+    // ignore
+  }
+};
+
+export const trackUncaughtException = (error: Error, origin: string) => {
+  try {
+    track(moduleName, 'error', {
+      name: error.name,
+      message: error.message,
+      origin,
+    });
+  } catch {
+    // ignore
+  }
+};
