@@ -12,7 +12,7 @@ const allowedTopicArnPrefix = {
  * handle will validate webhook message origin and verify signature of the message and calls corresponding handlers passed in.
  * @param body The request body to a webhook endpoint in json string or js object form.
  * @param env The Immutable environment the webhook is set up for.
- * @param handlers The optional handlers object for different events. The `others` handler is a fallback handler for any other event that is not handled by the specific handlers.
+ * @param handlers The optional handlers object for different events. The `all` handler will be triggered for all event types.
  * @returns The event object from the webhook message after validation and verification.
  */
 export const handle = async (
@@ -20,8 +20,7 @@ export const handle = async (
   env: Environment,
   handlers?: {
     zkevmMintRequestUpdated?: (event: any) => Promise<void>;
-    // there will be more handlers added
-    others?: (event: any) => Promise<void>;
+    all?: (event: any) => Promise<void>;
   }
 ) => {
   const msg: any = await new Promise((resolve, reject) => {
@@ -55,10 +54,10 @@ export const handle = async (
         }
         break;
       default:
-        if (handlers?.others) {
-          await handlers?.others(event);
-        }
         break;
+    }
+    if (handlers?.all) {
+      await handlers?.all(event);
     }
   }
 
