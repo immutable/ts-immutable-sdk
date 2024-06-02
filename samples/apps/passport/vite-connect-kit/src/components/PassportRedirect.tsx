@@ -7,10 +7,10 @@ function PassportRedirect({
   
   useEffect(() => {
     passportInstance.loginCallback();
-  }, [passportInstance])
+  }, [])
 
   return (
-    <div>Loading...</div>
+    <div>Redirect...</div>
   )
 }
 
