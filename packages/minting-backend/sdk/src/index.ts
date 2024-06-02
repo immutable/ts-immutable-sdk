@@ -28,7 +28,7 @@ const noopHandlers = {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   zkevmMintRequestUpdated: async (event: MintRequestEvent) => { },
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  others: async (..._args: any) => { }
+  all: async (..._args: any) => { }
 };
 
 export class MintingBackendModule {
@@ -76,7 +76,7 @@ export class MintingBackendModule {
         await processMint(this.persistence, event, this.logger);
         otherHandlers.zkevmMintRequestUpdated(event);
       },
-      others: otherHandlers.others
+      all: otherHandlers.all
     });
   }
 }
