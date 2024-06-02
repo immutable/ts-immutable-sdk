@@ -1,6 +1,6 @@
 import { ImmutableConfiguration, ModuleConfiguration } from '@imtbl/config';
 import { BlockchainData } from '@imtbl/blockchain-data';
-import { init } from '@imtbl/webhook';
+import { handle } from '@imtbl/webhook';
 import { setEnvironment, setPublishableApiKey } from '@imtbl/metrics';
 import { trackUncaughtException } from 'analytics';
 import { mintingPersistence as mintingPersistencePg } from './persistence/pg/postgres';
@@ -71,7 +71,7 @@ export class MintingBackendModule {
   }
 
   async processMint(body: string | Record<string, unknown>, otherHandlers = noopHandlers) {
-    await init(body, this.baseConfig.environment, {
+    await handle(body, this.baseConfig.environment, {
       zkevmMintRequestUpdated: async (event: MintRequestEvent) => {
         await processMint(this.persistence, event, this.logger);
         otherHandlers.zkevmMintRequestUpdated(event);

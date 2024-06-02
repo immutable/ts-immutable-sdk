@@ -8,11 +8,19 @@ const allowedTopicArnPrefix = {
   [Environment.SANDBOX]: 'arn:aws:sns:us-east-2:783421985614:'
 };
 
-export const init = async (
+/**
+ * handle will validate webhook message origin and verify signature of the message and calls corresponding handlers passed in.
+ * @param body The request body to a webhook endpoint in json string or js object form.
+ * @param env The Immutable environment the webhook is set up for.
+ * @param handlers The optional handlers object for different events. The `others` handler is a fallback handler for any other event that is not handled by the specific handlers.
+ * @returns The event object from the webhook message after validation and verification.
+ */
+export const handle = async (
   body: string | Record<string, unknown>,
   env: Environment,
-  handlers: {
-    zkevmMintRequestUpdated: (event: any) => Promise<void>;
+  handlers?: {
+    zkevmMintRequestUpdated?: (event: any) => Promise<void>;
+    // there will be more handlers added
     others?: (event: any) => Promise<void>;
   }
 ) => {
@@ -38,17 +46,21 @@ export const init = async (
     });
   });
 
+  const event = JSON.parse(msg.Message);
   if (msg.Type === 'Notification') {
-    const event = JSON.parse(msg.Message);
     switch (event.event_name) {
       case 'imtbl_zkevm_mint_request_updated':
-        await handlers.zkevmMintRequestUpdated(event);
+        if (handlers?.zkevmMintRequestUpdated) {
+          await handlers?.zkevmMintRequestUpdated(event);
+        }
         break;
       default:
-        if (handlers.others) {
-          await handlers.others(event);
+        if (handlers?.others) {
+          await handlers?.others(event);
         }
         break;
     }
   }
+
+  return event;
 };
