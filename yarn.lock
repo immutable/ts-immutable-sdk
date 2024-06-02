@@ -3639,6 +3639,7 @@ __metadata:
     "@imtbl/x-client": 0.0.0
     "@imtbl/x-provider": 0.0.0
     eslint: ^8.40.0
+    ethers: ^5.7.2
     parcel: ^2.8.3
   languageName: unknown
   linkType: soft
