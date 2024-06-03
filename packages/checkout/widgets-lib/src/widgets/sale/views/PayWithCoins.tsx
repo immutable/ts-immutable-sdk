@@ -12,6 +12,7 @@ export function PayWithCoins() {
   const { t } = useTranslation();
 
   const processing = useRef(false);
+  const processed = useRef(false);
   const {
     sendPageView,
     sendTransactionSuccessEvent,
@@ -58,9 +59,18 @@ export function PayWithCoins() {
 
   const onAfterExecuteCallback = useCallback(() => {
     addHandover({
+      duration: 2000,
       animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
       children: (
-        <Heading>{t('views.PAYMENT_METHODS.handover.afterApprove')}</Heading>
+        <Heading>{t('views.PAYMENT_METHODS.handover.afterExecute')}</Heading>
+      ),
+    });
+
+    addHandover({
+      duration: 2000,
+      animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
+      children: (
+        <Heading>{t('views.PAYMENT_METHODS.handover.success')}</Heading>
       ),
     });
   }, [addHandover]);
@@ -83,9 +93,12 @@ export function PayWithCoins() {
       processing.current = true;
 
       addHandover({
+        duration: 2000,
         animationUrl: getRemoteImage(environment, '/handover.riv'),
         children: (
-          <Heading sx={{ px: 'base.spacing.x6' }}>Preparing Order</Heading>
+          <Heading sx={{ px: 'base.spacing.x6' }}>
+            {t('views.PAYMENT_METHODS.handover.initial')}
+          </Heading>
         ),
       });
 
@@ -94,21 +107,28 @@ export function PayWithCoins() {
   }, [signResponse]);
 
   useEffect(() => {
-    if (executeResponse?.done === true) {
+    if (executeResponse?.done === true && processed.current === false) {
+      processed.current = true;
       const details = { transactionId: signResponse?.transactionId };
-      sendSuccessEvent(
-        SaleWidgetViews.SALE_SUCCESS,
-        executeResponse?.transactions,
-        signTokenIds,
-        details,
-      ); // checkoutPrimarySaleSaleSuccess_SuccessEventSucceeded
-      sendCloseEvent(SaleWidgetViews.SALE_SUCCESS); // checkoutPrimarySaleSaleSuccess_CloseButtonPressed
-      console.log('@@@ sale success', executeResponse);
+      setTimeout(() => {
+        sendSuccessEvent(
+          SaleWidgetViews.SALE_SUCCESS,
+          executeResponse?.transactions,
+          signTokenIds,
+          details,
+        ); // checkoutPrimarySaleSaleSuccess_SuccessEventSucceeded
+        sendCloseEvent(SaleWidgetViews.SALE_SUCCESS); // checkoutPrimarySaleSaleSuccess_CloseButtonPressed
+      }, 4000);
     }
-  }, [executeResponse]);
+  }, [
+    executeResponse,
+    sendSuccessEvent,
+    sendCloseEvent,
+    signTokenIds,
+    signResponse,
+  ]);
 
   useEffect(() => sendPageView(SaleWidgetViews.PAY_WITH_COINS), []); // checkoutPrimarySalePayWithCoinsViewed
 
-  // return <LoadingView loadingText={loadingText} />;
   return null;
 }
