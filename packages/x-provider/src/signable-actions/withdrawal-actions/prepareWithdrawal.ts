@@ -19,13 +19,12 @@ export type PrepareWithdrawalWorkflowParams = TokenAmount & {
 
 export async function prepareWithdrawalAction(
   params: PrepareWithdrawalWorkflowParams,
+  withdrawalsApi: imx.WithdrawalsApi,
 ): Promise<imx.CreateWithdrawalResponse> {
   const {
     signers: { ethSigner, starkSigner },
-    config,
   } = params;
   await validateChain(ethSigner, params.config);
-  const withdrawalsApi = new imx.WithdrawalsApi(config.apiConfiguration);
   const withdrawalAmount = params.type === 'ERC721' ? '1' : params.amount;
   const signableWithdrawalResult = await withdrawalsApi.getSignableWithdrawalV2(
     {

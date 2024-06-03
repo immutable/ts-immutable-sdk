@@ -54,8 +54,6 @@ describe('prepareWithdrawal', () => {
     test('prepare withdrawal for ERC721', async () => {
       const signers = await generateSigners(privateKey1);
       const ethKey = await signers.ethSigner.getAddress();
-      console.log('ethKey', ethKey);
-      console.log('stark key', await signers.starkSigner.getAddress());
 
       (signMessage as jest.Mock).mockReturnValue({
         message: getSignableWithdrawalResponse.signable_message,
@@ -70,7 +68,8 @@ describe('prepareWithdrawal', () => {
         tokenId: '1',
         tokenAddress: 'asd',
       };
-      const resposne = await prepareWithdrawalAction(request);
+      const withdrawalsApi = new imx.WithdrawalsApi(testConfig.immutableXConfig.apiConfiguration);
+      const resposne = await prepareWithdrawalAction(request, withdrawalsApi);
 
       expect(resposne).toEqual(createWithdrawalResponse);
       expect(getSignableWithdrawalMock).toHaveBeenCalledWith({
@@ -115,7 +114,8 @@ describe('prepareWithdrawal', () => {
         amount: '1.02',
         tokenAddress: 'asd',
       };
-      const resposne = await prepareWithdrawalAction(request);
+      const withdrawalsApi = new imx.WithdrawalsApi(testConfig.immutableXConfig.apiConfiguration);
+      const resposne = await prepareWithdrawalAction(request, withdrawalsApi);
 
       expect(resposne).toEqual(createWithdrawalResponse);
       expect(getSignableWithdrawalMock).toHaveBeenCalledWith({
