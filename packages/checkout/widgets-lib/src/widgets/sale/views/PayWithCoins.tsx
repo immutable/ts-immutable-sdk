@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
-// import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { Heading } from '@biom3/react';
 import { getRemoteImage } from 'lib/utils';
-import { Environment } from '@imtbl/config';
 import { useHandover } from 'lib/hooks/useHandover';
 import { HandoverTarget } from 'context/handover-context/HandoverContext';
 import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
@@ -10,7 +9,8 @@ import { useSaleContext } from '../context/SaleContextProvider';
 import { useSaleEvent } from '../hooks/useSaleEvents';
 
 export function PayWithCoins() {
-  // const { t } = useTranslation();
+  const { t } = useTranslation();
+
   const processing = useRef(false);
   const {
     sendPageView,
@@ -20,59 +20,49 @@ export function PayWithCoins() {
     sendSuccessEvent,
   } = useSaleEvent();
   const {
-    executeAll, signResponse, executeResponse, signTokenIds,
+    executeAll,
+    signResponse,
+    executeResponse,
+    signTokenIds,
+    environment,
   } = useSaleContext();
 
   const { addHandover } = useHandover({ id: HandoverTarget.GLOBAL });
 
   const onBeforeApproveCallback = useCallback(() => {
-    setTimeout(() => {
-      addHandover({
-        animationUrl: getRemoteImage(
-          Environment.SANDBOX,
-          '/approve-handover.riv',
-        ),
-        children: (
-          <Heading>Waiting for you to approve access to your coins</Heading>
-        ),
-      });
-    }, 0);
+    addHandover({
+      animationUrl: getRemoteImage(environment, '/approve-handover.riv'),
+      children: (
+        <Heading>{t('views.PAYMENT_METHODS.handover.beforeApprove')}</Heading>
+      ),
+    });
   }, [addHandover]);
 
   const onAfterApproveCallback = useCallback(() => {
-    setTimeout(() => {
-      addHandover({
-        animationUrl: getRemoteImage(
-          Environment.SANDBOX,
-          '/approve-handover.riv',
-        ),
-        children: <Heading>Coins ready for item purchase</Heading>,
-      });
-    }, 0);
+    addHandover({
+      animationUrl: getRemoteImage(environment, '/approve-handover.riv'),
+      children: (
+        <Heading>{t('views.PAYMENT_METHODS.handover.afterApprove')}</Heading>
+      ),
+    });
   }, [addHandover]);
 
   const onBeforeExecuteCallback = useCallback(() => {
-    setTimeout(() => {
-      addHandover({
-        animationUrl: getRemoteImage(
-          Environment.SANDBOX,
-          '/execute-handover.riv',
-        ),
-        children: <Heading>Finalising your order </Heading>,
-      });
-    }, 0);
+    addHandover({
+      animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
+      children: (
+        <Heading>{t('views.PAYMENT_METHODS.handover.beforeExecute')}</Heading>
+      ),
+    });
   }, [addHandover]);
 
   const onAfterExecuteCallback = useCallback(() => {
-    setTimeout(() => {
-      addHandover({
-        animationUrl: getRemoteImage(
-          Environment.SANDBOX,
-          '/execute-handover.riv',
-        ),
-        children: <Heading>Processing purchase</Heading>,
-      });
-    }, 0);
+    addHandover({
+      animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
+      children: (
+        <Heading>{t('views.PAYMENT_METHODS.handover.afterApprove')}</Heading>
+      ),
+    });
   }, [addHandover]);
 
   const sendTransaction = async () => {
@@ -93,7 +83,7 @@ export function PayWithCoins() {
       processing.current = true;
 
       addHandover({
-        animationUrl: getRemoteImage(Environment.SANDBOX, '/handover.riv'),
+        animationUrl: getRemoteImage(environment, '/handover.riv'),
         children: (
           <Heading sx={{ px: 'base.spacing.x6' }}>Preparing Order</Heading>
         ),
