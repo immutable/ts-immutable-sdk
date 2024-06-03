@@ -55,7 +55,7 @@ export function OrderReview({
   } = useContext(EventTargetContext);
   const { t } = useTranslation();
   const {
-    provider, items, orderQuote, disabledPaymentTypes,
+    provider, items, orderQuote, disabledPaymentTypes, config: { theme, environment },
   } = useSaleContext();
   const { sendSelectedPaymentToken, sendViewFeesEvent } = useSaleEvent();
 
@@ -226,6 +226,8 @@ export function OrderReview({
         onPayWithCard={onPayWithCard}
         transactionRequirement={transactionRequirement}
         disabledPaymentTypes={disabledPaymentTypes}
+        theme={theme}
+        environment={environment}
       />
     </SimpleLayout>
   );
