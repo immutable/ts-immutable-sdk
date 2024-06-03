@@ -1,11 +1,17 @@
 import { Signer } from '@ethersproject/abstract-signer';
-import { ERC20Token, StarkSigner } from '@imtbl/x-client';
+import { TransactionResponse } from '@ethersproject/providers';
+import {
+  Contracts,
+  ERC20Token,
+  ImmutableXConfiguration,
+  StarkSigner,
+  signRegisterEthAddress,
+} from '@imtbl/x-client';
 import { isRegisteredOnChain } from '../registration';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 import { validateChain } from '../helpers';
 import { ProviderConfiguration } from '../../config';
 import { getWithdrawalBalances } from './getWithdrawalBalance';
-import { executeRegisterAndWithdrawAllFungible, executeWithdrawAllFungible } from './completeEthWithdrawal';
 
 type CompleteERC20WithdrawalWorkflowParams = {
   ethSigner: Signer;
@@ -16,6 +22,61 @@ type CompleteERC20WithdrawalWorkflowParams = {
 };
 
 const ERC20TokenType = 'ERC20';
+
+async function executeRegisterAndWithdrawAllERC20(
+  ethSigner: Signer,
+  starkSigner: StarkSigner,
+  starkPublicKey: string,
+  assetType: string,
+  config: ImmutableXConfiguration,
+): Promise<TransactionResponse> {
+  const etherKey = await ethSigner.getAddress();
+
+  const starkSignature = await signRegisterEthAddress(
+    starkSigner,
+    etherKey,
+    starkPublicKey,
+  );
+
+  // we use registration v4 contract as a wrapper for the core contract
+  // so that v3 and v4 withdrawals, AND on-chain registration can be executed in a single transaction
+  const contract = Contracts.RegistrationV4.connect(
+    config.ethConfiguration.registrationV4ContractAddress || config.ethConfiguration.registrationContractAddress,
+    ethSigner,
+  );
+
+  const populatedTransaction = await contract.populateTransaction.registerAndWithdrawAll(
+    etherKey,
+    starkPublicKey,
+    starkSignature,
+    assetType,
+  );
+
+  return ethSigner.sendTransaction(populatedTransaction);
+}
+
+async function executeWithdrawAllERC20(
+  ethSigner: Signer,
+  starkPublicKey: string,
+  assetType: string,
+  config: ImmutableXConfiguration,
+): Promise<TransactionResponse> {
+  // we use registration v4 contract as a wrapper for the core contract
+  // so that v3 and v4 withdrawals can be executed in a single transaction
+  // (if there are pending withdrawable funds for both)
+  const contract = Contracts.RegistrationV4.connect(
+    config.ethConfiguration.registrationV4ContractAddress || config.ethConfiguration.registrationContractAddress,
+    ethSigner,
+  );
+
+  const populatedTransaction = await contract.populateTransaction.withdrawAll(
+    await ethSigner.getAddress(),
+    starkPublicKey,
+    assetType,
+  );
+
+  return ethSigner.sendTransaction(populatedTransaction);
+}
 
 // equivilant to Core SDK completeERC20WithdrawalV1Workflow
 // in src/workflows/withdrawal/completeERC20Withdrawal.ts
@@ -57,9 +118,9 @@ export async function completeERC20WithdrawalAction({
   });
 
   if (isRegistered) {
-    return executeWithdrawAllFungible(ethSigner, starkPublicKey, assetType.asset_type, config.immutableXConfig);
+    return executeWithdrawAllERC20(ethSigner, starkPublicKey, assetType.asset_type, config.immutableXConfig);
   }
-  return executeRegisterAndWithdrawAllFungible(
+  return executeRegisterAndWithdrawAllERC20(
     ethSigner,
     starkSigner,
     starkPublicKey,

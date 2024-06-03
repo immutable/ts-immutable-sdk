@@ -5,7 +5,7 @@ import {
   completeEthWithdrawalAction,
   completeERC20WithdrawalAction,
   completeERC721WithdrawalAction,
-  prepareWithdrawalV2Action,
+  prepareWithdrawalAction,
 } from './withdrawal-actions';
 
 type CompleteWithdrawalParams = {
@@ -26,7 +26,7 @@ export async function prepareWithdrawal({
   withdrawal,
   config,
 }: PrepareWithdrawalParams) {
-  return prepareWithdrawalV2Action({
+  return prepareWithdrawalAction({
     signers,
     config: config.immutableXConfig,
     ...withdrawal,

@@ -18,8 +18,7 @@ type CompleteEthWithdrawalActionParams = {
 
 const EthTokenType = 'ETH';
 
-// works with ETH or ERC20
-export async function executeRegisterAndWithdrawAllFungible(
+async function executeRegisterAndWithdrawAllEth(
   ethSigner: Signer,
   starkSigner: StarkSigner,
   starkPublicKey: string,
@@ -51,7 +50,7 @@ export async function executeRegisterAndWithdrawAllFungible(
   return ethSigner.sendTransaction(populatedTransaction);
 }
 
-export async function executeWithdrawAllFungible(
+async function executeWithdrawAllEth(
   ethSigner: Signer,
   starkPublicKey: string,
   assetType: string,
@@ -107,9 +106,9 @@ export async function completeEthWithdrawalAction({
   const assetType = await getEncodeAssetInfo('asset', EthTokenType, config.immutableXConfig);
 
   if (isRegistered) {
-    return executeWithdrawAllFungible(ethSigner, starkPublicKey, assetType.asset_type, config.immutableXConfig);
+    return executeWithdrawAllEth(ethSigner, starkPublicKey, assetType.asset_type, config.immutableXConfig);
   }
-  return executeRegisterAndWithdrawAllFungible(
+  return executeRegisterAndWithdrawAllEth(
     ethSigner,
     starkSigner,
     starkPublicKey,
