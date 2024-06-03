@@ -328,13 +328,11 @@
           "native": "通过以下选项之一，为燃气添加{{native.value}} {{native.symbol}}。"
         }
       },
-      "loading": {
-        "ready1": "正在收集您的订单",
-        "ready2": "正在与钱包交流",
-        "ready3": "正在准备资产",
-        "processing1": "正在初始化支付",
-        "processing2": "正在保护您的资产",
-        "processing3": "正在完成支付"
+      "handover": {
+        "beforeApprove": "等待您批准访问您的硬币",
+        "afterApprove": "硬币已准备好购买物品",
+        "beforeExecute": "等待您在钱包中确认",
+        "afterExecute": "处理中"
       },
       "creditCardWarningDrawer": {
         "heading": "我们推荐使用借记卡而非信用卡",

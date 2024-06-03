@@ -335,13 +335,11 @@
           "native": "残高が不足しているため、{{native.value}} {{native.symbol}}を追加する必要があります。"
         }
       },
-      "loading": {
-        "ready1": "注文を受け取り中",
-        "ready2": "ウォレットと通信中",
-        "ready3": "資産を準備中",
-        "processing1": "支払いを初期化中",
-        "processing2": "資産を確保中",
-        "processing3": "支払いを完了中"
+      "handover": {
+        "beforeApprove": "コインへのアクセスを承認するのを待っています",
+        "afterApprove": "コインはアイテム購入の準備ができています",
+        "beforeExecute": "ウォレットでの確認を待っています",
+        "afterExecute": "購入処理中"
       },
       "creditCardWarningDrawer": {
         "heading": "デビットカードの使用をお勧めします",

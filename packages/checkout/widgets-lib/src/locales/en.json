@@ -348,13 +348,11 @@
           "native": "Add {{native.value}} {{native.symbol}} for gas, through one of the following options."
         }
       },
-      "loading": {
-        "ready1": "Collecting your order",
-        "ready2": "Talking to wallet",
-        "ready3": "Readying assets",
-        "processing1": "Initialising payment",
-        "processing2": "Securing your assets",
-        "processing3": "Finalising payment"
+      "handover": {
+        "beforeApprove": "Waiting for you to approve access to your coins",
+        "afterApprove":"Coins ready for item purchase",
+        "beforeExecute": "Waiting for you to confirm in your wallet",
+        "afterExecute": "Processing purchase"
       },
       "creditCardWarningDrawer": {
         "heading": "We recommend debit over credit",
