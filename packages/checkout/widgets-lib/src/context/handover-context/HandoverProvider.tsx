@@ -45,7 +45,7 @@ export function HandoverProvider({ children }: HandoverProviderProps) {
         return newHandovers;
       });
     },
-    [setHandovers],
+    [],
   );
 
   const processQueue = useCallback((handoverId: HandoverTarget, autoClose: boolean = false) => {
@@ -95,19 +95,22 @@ export function HandoverProvider({ children }: HandoverProviderProps) {
     }
   }, [handoverQueue, handoverBusy, handovers]);
 
-  const addHandover = (
-    handoverContent: HandoverContent,
-    handoverId: HandoverTarget = HandoverTarget.GLOBAL,
-  ) => {
-    // Add the handover content to the queue / ensure no mutation of the queue
-    setHandoverQueue((prevQueue) => {
-      const updatedQueue = { ...prevQueue };
-      const queuedContent = [...(updatedQueue[handoverId] ?? [])];
-      queuedContent.push(handoverContent);
-      updatedQueue[handoverId] = queuedContent;
-      return updatedQueue;
-    });
-  };
+  const addHandover = useCallback(
+    (
+      handoverContent: HandoverContent,
+      handoverId: HandoverTarget = HandoverTarget.GLOBAL,
+    ) => {
+      // Add the handover content to the queue / ensure no mutation of the queue
+      setHandoverQueue((prevQueue) => {
+        const updatedQueue = { ...prevQueue };
+        const queuedContent = [...(updatedQueue[handoverId] ?? [])];
+        queuedContent.push(handoverContent);
+        updatedQueue[handoverId] = queuedContent;
+        return updatedQueue;
+      });
+    },
+    [],
+  );
 
   useEffect(() => {
     Object.keys(handoverQueue).forEach((handoverId) => {
@@ -130,9 +133,7 @@ export function HandoverProvider({ children }: HandoverProviderProps) {
 
   return (
     <HandoverContext.Provider value={value}>
-      <Handover id="global">
-        {children}
-      </Handover>
+      <Handover id={HandoverTarget.GLOBAL}>{children}</Handover>
     </HandoverContext.Provider>
   );
 }
