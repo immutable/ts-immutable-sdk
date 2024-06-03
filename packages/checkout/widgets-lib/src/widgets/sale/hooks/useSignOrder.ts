@@ -365,6 +365,7 @@ export const useSignOrder = (input: SignOrderInput) => {
     return true;
   };
 
+<<<<<<< HEAD
   const executeAll = useCallback(
     async (
       signData: SignResponse | undefined,
@@ -376,6 +377,23 @@ export const useSignOrder = (input: SignOrderInput) => {
           type: SaleErrorTypes.DEFAULT,
           data: { reason: 'No sign data' },
         });
+=======
+  const execute = async (
+    signData: SignResponse | undefined,
+    onTxnSuccess: (txn: ExecutedTransaction) => void,
+    onTxnError: (error: any, txns: ExecutedTransaction[]) => void,
+    isManualExecution: boolean,
+    onBeforeApproveCallback?: () => void,
+    onAfterApproveCallback?: () => void,
+    onBeforeExecuteCallback?: () => void,
+    onAfterExecuteCallback?: () => void,
+  ): Promise<ExecutedTransaction[]> => {
+    if (!signData || !provider) {
+      setSignError({
+        type: SaleErrorTypes.DEFAULT,
+        data: { reason: 'No sign data' },
+      });
+>>>>>>> 4f2b4352b (Add before and after callbacks to execute method)
 
         return [];
       }
