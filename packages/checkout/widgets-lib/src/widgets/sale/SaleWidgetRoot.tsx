@@ -15,12 +15,11 @@ import {
   ConnectLoaderParams,
 } from 'components/ConnectLoader/ConnectLoader';
 import { getL2ChainId } from 'lib';
-import {
-  isValidWalletProvider,
-} from 'lib/validations/widgetValidators';
+import { isValidWalletProvider } from 'lib/validations/widgetValidators';
 import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
 import { LoadingView } from 'views/loading/LoadingView';
+import { HandoverProvider } from 'context/handover-context/HandoverProvider';
 import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
 import i18n from '../../i18n';
 
@@ -82,7 +81,8 @@ export class Sale extends Base<WidgetType.SALE> {
     }
 
     if (
-      params.excludePaymentTypes !== undefined && !Array.isArray(params.excludePaymentTypes)
+      params.excludePaymentTypes !== undefined
+      && !Array.isArray(params.excludePaymentTypes)
     ) {
       // eslint-disable-next-line no-console
       console.warn('[IMTBL]: invalid "excludePaymentTypes" widget input');
@@ -110,29 +110,38 @@ export class Sale extends Base<WidgetType.SALE> {
       <React.StrictMode>
         <CustomAnalyticsProvider checkout={this.checkout}>
           <ThemeProvider id="sale-container" config={config}>
-            <ConnectLoader
-              widgetConfig={config}
-              params={connectLoaderParams}
-              closeEvent={() => {
-                sendSaleWidgetCloseEvent(window);
-              }}
-            >
-              <Suspense
-                fallback={
-                  <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
-                }
+            <HandoverProvider>
+              <ConnectLoader
+                widgetConfig={config}
+                params={connectLoaderParams}
+                closeEvent={() => {
+                  sendSaleWidgetCloseEvent(window);
+                }}
               >
-                <SaleWidget
-                  config={config}
-                  items={this.parameters.items!}
-                  environmentId={this.parameters.environmentId!}
-                  collectionName={this.parameters.collectionName!}
-                  excludePaymentTypes={this.parameters.excludePaymentTypes!}
-                  language="en"
-                  waitFulfillmentSettlements={this.properties?.config?.waitFulfillmentSettlements ?? true}
-                />
-              </Suspense>
-            </ConnectLoader>
+                <Suspense
+                  fallback={
+                    <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
+                  }
+                >
+                  <SaleWidget
+                    config={config}
+                    language="en"
+                    items={this.parameters.items!}
+                    environmentId={this.parameters.environmentId!}
+                    collectionName={this.parameters.collectionName!}
+                    excludePaymentTypes={this.parameters.excludePaymentTypes!}
+                    preferredCurrency={this.parameters.preferredCurrency!}
+                    hideExcludedPaymentTypes={
+                      this.properties?.config?.hideExcludedPaymentTypes ?? false
+                    }
+                    waitFulfillmentSettlements={
+                      this.properties?.config?.waitFulfillmentSettlements
+                      ?? true
+                    }
+                  />
+                </Suspense>
+              </ConnectLoader>
+            </HandoverProvider>
           </ThemeProvider>
         </CustomAnalyticsProvider>
       </React.StrictMode>,

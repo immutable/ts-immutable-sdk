@@ -10,6 +10,7 @@ import {
   ERC1155Item as OrderbookERC1155Item,
 } from '@imtbl/orderbook';
 import { BigNumber, Contract, utils } from 'ethers';
+import { track } from '@imtbl/metrics';
 import {
   ERC721Item,
   ERC1155Item,
@@ -90,6 +91,8 @@ export const sell = async (
   let orderbook: Orderbook;
   let listing: PrepareListingResponse;
   let spenderAddress = '';
+
+  track('checkout_sdk', 'sell_initiated');
 
   if (orders.length === 0) {
     throw new CheckoutError(
@@ -250,7 +253,12 @@ export const sell = async (
     };
 
     if (makerFees !== undefined) {
-      const orderBookFees = calculateFees(makerFees, buyTokenOrNative.amount, decimals);
+      let tokenQuantity = BigNumber.from(1);
+
+      // if type exists in sellToken then it is valid ERC721 or ERC1155 and not deprecated type
+      if (sellTokenHasType && sellToken.type === ItemType.ERC1155) tokenQuantity = BigNumber.from(sellToken.amount);
+
+      const orderBookFees = calculateFees(makerFees, buyTokenOrNative.amount, decimals, tokenQuantity);
       if (orderBookFees.length !== makerFees.length) {
         throw new CheckoutError(
           'One of the fees is too small, must be greater than 0.000001',

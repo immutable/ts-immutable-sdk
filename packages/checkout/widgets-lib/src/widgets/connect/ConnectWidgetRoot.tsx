@@ -8,6 +8,7 @@ import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyt
 import { LoadingView } from 'views/loading/LoadingView';
 import { Environment } from '@imtbl/config';
 import { getChainNameById } from 'lib/chains';
+import { HandoverProvider } from 'context/handover-context/HandoverProvider';
 import i18n from '../../i18n';
 import { Base } from '../BaseWidgetRoot';
 
@@ -63,15 +64,17 @@ export class Connect extends Base<WidgetType.CONNECT> {
       <React.StrictMode>
         <CustomAnalyticsProvider checkout={this.checkout}>
           <ThemeProvider id="connect-container" config={this.strongConfig()}>
-            <Suspense fallback={<LoadingView loadingText={t('views.LOADING_VIEW.text')} />}>
-              <ConnectWidget
-                config={this.strongConfig()}
-                checkout={this.checkout}
-                targetWalletRdns={this.parameters.targetWalletRdns}
-                targetChainId={this.parameters.targetChainId}
-                blocklistWalletRdns={this.parameters.blocklistWalletRdns}
-              />
-            </Suspense>
+            <HandoverProvider>
+              <Suspense fallback={<LoadingView loadingText={t('views.LOADING_VIEW.text')} />}>
+                <ConnectWidget
+                  config={this.strongConfig()}
+                  checkout={this.checkout}
+                  targetWalletRdns={this.parameters.targetWalletRdns}
+                  targetChainId={this.parameters.targetChainId}
+                  blocklistWalletRdns={this.parameters.blocklistWalletRdns}
+                />
+              </Suspense>
+            </HandoverProvider>
           </ThemeProvider>
         </CustomAnalyticsProvider>
       </React.StrictMode>,

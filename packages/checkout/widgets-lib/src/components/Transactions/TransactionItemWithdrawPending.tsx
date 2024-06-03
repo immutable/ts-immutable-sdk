@@ -9,10 +9,12 @@ import {
 } from '@biom3/react';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { Transaction, TransactionStatus } from 'lib/clients/checkoutApiType';
-import { useContext, useMemo, useState } from 'react';
+import { useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { ViewActions, ViewContext } from 'context/view-context/ViewContext';
+import { TokenImage } from 'components/TokenImage/TokenImage';
+import { Environment } from '@imtbl/config';
 import { actionsContainerStyles, actionsLayoutStyles, containerStyles } from './transactionItemStyles';
 import { TransactionDetails } from './TransactionDetails';
 
@@ -23,6 +25,7 @@ type TransactionItemWithdrawPendingProps = {
   amount: string,
   icon: string,
   defaultTokenImage: string,
+  environment: Environment,
 };
 
 export function TransactionItemWithdrawPending({
@@ -32,15 +35,11 @@ export function TransactionItemWithdrawPending({
   amount,
   icon,
   defaultTokenImage,
+  environment,
 }: TransactionItemWithdrawPendingProps) {
   const { viewDispatch } = useContext(ViewContext);
   const { track } = useAnalytics();
   const translation = useTranslation();
-  const [iconError, setIconError] = useState<boolean>(false);
-  const tokenUrl = useMemo(
-    () => ((!icon || iconError) ? defaultTokenImage : icon),
-    [icon, iconError, defaultTokenImage],
-  );
   const dateNowUnixMs = useMemo(() => new Date().getTime(), []);
   const withdrawalReadyDate = useMemo(
     () => (transaction.details.current_status.withdrawal_ready_at
@@ -157,10 +156,10 @@ export function TransactionItemWithdrawPending({
             <MenuItem.FramedImage
               circularFrame
               use={(
-                <img
-                  src={tokenUrl}
-                  alt={label}
-                  onError={() => setIconError(true)}
+                <TokenImage
+                  src={icon}
+                  name={label}
+                  defaultImage={defaultTokenImage}
                 />
               )}
             />
@@ -189,7 +188,7 @@ export function TransactionItemWithdrawPending({
               px: 'base.spacing.x2',
             }}
           />
-          <TransactionDetails transaction={transaction} />
+          <TransactionDetails transaction={transaction} environment={environment} />
         </Accordion.ExpandedContent>
       </Accordion>
     </Box>

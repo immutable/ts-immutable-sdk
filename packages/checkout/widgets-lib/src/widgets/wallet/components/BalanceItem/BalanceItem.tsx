@@ -6,12 +6,13 @@ import {
   IMTBLWidgetEvents, TokenFilterTypes, TokenInfo, WidgetTheme,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
+import { TokenImage } from 'components/TokenImage/TokenImage';
 import { ShowMenuItem } from './BalanceItemStyles';
 import { BalanceInfo } from '../../functions/tokenBalances';
 import { WalletContext } from '../../context/WalletContext';
 import { orchestrationEvents } from '../../../../lib/orchestrationEvents';
 import { getL1ChainId, getL2ChainId } from '../../../../lib/networkUtils';
-import { formatZeroAmount, getDefaultTokenImage, tokenValueFormat } from '../../../../lib/utils';
+import { formatZeroAmount, tokenValueFormat } from '../../../../lib/utils';
 import { ConnectLoaderContext } from '../../../../context/connect-loader-context/ConnectLoaderContext';
 import { isPassportProvider } from '../../../../lib/provider';
 import { EventTargetContext } from '../../../../context/event-target-context/EventTargetContext';
@@ -43,15 +44,8 @@ export function BalanceItem({
   const [onRampAllowedTokens, setOnRampAllowedTokens] = useState<TokenInfo[]>(
     [],
   );
-  const [iconError, setIconError] = useState<boolean>(false);
 
   const isPassport = isPassportProvider(provider);
-
-  const tokenUrl = useMemo(() => {
-    if (!checkout) return '';
-    const environment = checkout?.config.environment ?? Environment.PRODUCTION;
-    return iconError ? getDefaultTokenImage(environment, theme) : balanceInfo.icon;
-  }, [balanceInfo.icon, checkout, theme, iconError]);
 
   useEffect(() => {
     const getOnRampAllowedTokens = async () => {
@@ -98,10 +92,11 @@ export function BalanceItem({
     <MenuItem testId={`balance-item-${balanceInfo.symbol}`} emphasized>
       <MenuItem.FramedImage
         use={(
-          <img
-            src={tokenUrl}
-            alt={balanceInfo.symbol}
-            onError={() => setIconError(true)}
+          <TokenImage
+            theme={theme}
+            src={balanceInfo.icon}
+            name={balanceInfo.symbol}
+            environment={checkout?.config.environment ?? Environment.PRODUCTION}
           />
         )}
         circularFrame

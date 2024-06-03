@@ -1,6 +1,6 @@
 {
   "name": "@imtbl/sdk",
-  "description": "Immutable Unified SDK",
+  "description": "Immutable Typescript SDK",
   "version": "0.0.0",
   "author": "Immutable",
   "browser": "./dist/index.browser.js",
@@ -22,6 +22,7 @@
     "@metamask/detect-provider": "^2.0.0",
     "@opensea/seaport-js": "4.0.0",
     "@rive-app/react-canvas-lite": "^4.9.0",
+    "@stdlib/number-float64-base-normalize": "0.0.8",
     "@uniswap/router-sdk": "^1.4.0",
     "@uniswap/sdk-core": "^3.0.1",
     "@uniswap/v3-sdk": "^3.9.0",
@@ -44,7 +45,7 @@
     "jwt-decode": "^3.1.2",
     "lru-memorise": "0.3.0",
     "magic-sdk": "^21.2.0",
-    "oidc-client-ts": "2.2.1",
+    "oidc-client-ts": "2.4.0",
     "os-browserify": "^0.3.0",
     "pako": "^2.1.0",
     "react-i18next": "^13.5.0",
@@ -160,7 +161,7 @@
     "packageList": "./scripts/generate-package-list.sh",
     "regenModules": "yarn generateIndex && yarn updateExports",
     "typecheck": "tsc --noEmit --jsx preserve",
-    "updateDependencies": "yarn packageList && node ./scripts/updateDependencies.js",
+    "updateDependencies": "yarn packageList && node ./scripts/updateDependencies.js && yarn syncpack:format",
     "updateExports": "node scripts/updateExports.js"
   },
   "type": "module",

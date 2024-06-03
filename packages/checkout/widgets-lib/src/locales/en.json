@@ -276,9 +276,6 @@
         "caption1": "Coins",
         "caption2": "Balance",
         "divider": "More options",
-        "payWithCard": {
-          "caption": "Buy this items with card instead"
-        },
         "stepType": {
           "SWAP": "Swap {{symbol}} ≈ {{amount}}",
           "ONRAMP": "Buy {{symbol}} ≈ {{amount}}",
@@ -291,12 +288,15 @@
             "SUFFICIENT": "Pay {{symbol}} {{amount}}"
           }
         },
-        "fee": "Fees {{symbol}} ≈ {{amount}}"
+        "fee": "Swap fee ~ {{symbol}} {{amount}}"
       },
       "orderReview": {
         "heading": "Payment summary",
         "continue": "Proceed",
-        "payWith": "Pay with {{symbol}}",
+        "payWith": {
+          "SWAP": "Swap & Pay with {{symbol}}",
+          "SUFFICIENT": "Pay with {{symbol}}"
+        },
         "balance": "Balance {{amount}}"
       }
     },
@@ -332,12 +332,12 @@
         "debit": {
           "heading": "Debit Card",
           "caption": "The recommended way to pay with card.",
-          "disabledCaption": "Currently working on this. Proceed with Coins & you’ll be guided on how to add them if needed."
+          "disabledCaption": "Unavailable for your selection. We recommend adding coins"
         },
         "credit": {
           "heading": "Credit Card",
           "caption": "Not recommended since transactions may be blocked by your bank.",
-          "disabledCaption": "Currently working on this. Proceed with Coins & you’ll be guided on how to add them if needed."
+          "disabledCaption": "Unavailable for your selection. We recommend adding coins"
         }
       },
       "topUp": {
@@ -642,7 +642,8 @@
           "label": "{{amount}} Swap fee (factored into quote)"
         },
         "serviceFee": {
-          "label": "Service fee"
+          "depositLabel": "zkEVM gas fees",
+          "withdrawLabel": "Ethereum gas fees"
         }
       }
     },

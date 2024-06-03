@@ -5,6 +5,7 @@ import { SaleItem } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
 import { calculateCryptoToFiat, tokenValueFormat } from 'lib/utils';
 import { ReactElement } from 'react';
+import { TokenImage } from 'components/TokenImage/TokenImage';
 import { OrderQuotePricing, FundingBalance } from '../types';
 
 export interface OrderItemProps<
@@ -51,7 +52,9 @@ export function OrderItem<RC extends ReactElement | undefined = undefined>({
         ...sx,
       }}
     >
-      <MenuItem.FramedImage imageUrl={item.image} />
+      <MenuItem.FramedImage
+        use={<TokenImage src={item.image} name={item.name} defaultImage={item.image} />}
+      />
       <MenuItem.Label>{item.name}</MenuItem.Label>
       <MenuItem.Caption>
         {t('views.ORDER_SUMMARY.orderItem.quantity', { qty: item.qty })}

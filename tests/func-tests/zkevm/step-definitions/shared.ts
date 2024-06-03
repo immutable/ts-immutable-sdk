@@ -2,6 +2,7 @@ import { orderbook } from '@imtbl/sdk';
 import { DefineStepFunction } from 'jest-cucumber';
 import { Wallet } from 'ethers';
 import {
+  bulkFulfillListings,
   connectToTestERC1155Token,
   connectToTestERC721Token,
   fulfillListing, getTrades,
@@ -130,6 +131,20 @@ export const thenTheListingShouldBeOfStatus = (
   });
 };
 
+export const thenTheListingsShouldBeOfStatus = (
+  then: DefineStepFunction,
+  sdk: orderbook.Orderbook,
+  getListingIds: (() => string)[],
+) => {
+  then(/^the listings should be of status (.*)$/, async (status: string) => {
+    for (const getListingId of getListingIds) {
+      const listingId = getListingId();
+      // eslint-disable-next-line no-await-in-loop
+      await waitForOrderToBeOfStatus(sdk, listingId, status);
+    }
+  });
+};
+
 export const whenIFulfillTheListingToBuy = (
   when: DefineStepFunction,
   sdk: orderbook.Orderbook,
@@ -139,6 +154,23 @@ export const whenIFulfillTheListingToBuy = (
   when(/^I fulfill the listing to buy (\d+) tokens?$/, async (amount) => {
     const listingId = getListingId();
     await fulfillListing(sdk, listingId, fulfiller, amount.toString());
+  });
+};
+
+export const whenIFulfillBulkListings = (
+  when: DefineStepFunction,
+  sdk: orderbook.Orderbook,
+  fulfiller: Wallet,
+  getERC721ListingId: () => string,
+  getERC1155ListingId: () => string,
+) => {
+  when(/^I bulk fulfill the listings with a partial fill of (\d+) units for the ERC1155 listing?$/, async (amount) => {
+    const erc721ListingId = getERC721ListingId();
+    const erc1155ListingId = getERC1155ListingId();
+    await bulkFulfillListings(sdk, [
+      { listingId: erc721ListingId },
+      { listingId: erc1155ListingId, unitsToFill: amount.toString() },
+    ], fulfiller);
   });
 };
 

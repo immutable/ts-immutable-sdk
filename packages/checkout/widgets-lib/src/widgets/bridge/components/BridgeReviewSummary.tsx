@@ -16,7 +16,7 @@ import {
   isPassportProvider,
   isWalletConnectProvider,
 } from 'lib/provider';
-import { calculateCryptoToFiat, isNativeToken } from 'lib/utils';
+import { calculateCryptoToFiat, getChainImage, isNativeToken } from 'lib/utils';
 import {
   DEFAULT_QUOTE_REFRESH_INTERVAL,
   DEFAULT_TOKEN_DECIMALS,
@@ -25,7 +25,8 @@ import {
   NATIVE,
   addChainChangedListener,
   getL1ChainId,
-  networkIcon,
+  getL2ChainId,
+  networkName,
   removeChainChangedListener,
 } from 'lib';
 import { useInterval } from 'lib/hooks/useInterval';
@@ -40,7 +41,6 @@ import { NetworkSwitchDrawer } from 'components/NetworkSwitchDrawer/NetworkSwitc
 import { Web3Provider } from '@ethersproject/providers';
 import { useWalletConnect } from 'lib/hooks/useWalletConnect';
 import { NotEnoughGas } from 'components/NotEnoughGas/NotEnoughGas';
-import { networkIconStyles } from './WalletNetworkButtonStyles';
 import {
   arrowIconStyles,
   arrowIconWrapperStyles,
@@ -51,6 +51,7 @@ import {
   topMenuItemStyles,
   wcStickerLogoStyles,
   wcWalletLogoStyles,
+  networkIconStyles,
 } from './BridgeReviewSummaryStyles';
 import { BridgeActions, BridgeContext } from '../context/BridgeContext';
 import {
@@ -75,12 +76,13 @@ export function BridgeReviewSummary() {
     },
     bridgeDispatch,
   } = useContext(BridgeContext);
+  const { environment } = checkout.config;
 
   const { track } = useAnalytics();
 
   const { cryptoFiatState } = useContext(CryptoFiatContext);
   const [loading, setLoading] = useState(false);
-  const [estimates, setEstimates] = useState<any | undefined>(undefined);
+  const [estimates, setEstimates] = useState<GasEstimateBridgeToL2Result | undefined>(undefined);
   const [gasFee, setGasFee] = useState<string>('');
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
   const [approveTransaction, setApproveTransaction] = useState<
@@ -105,6 +107,10 @@ export function BridgeReviewSummary() {
   const [showNotEnoughGasDrawer, setShowNotEnoughGasDrawer] = useState(false);
 
   const isTransfer = useMemo(() => from?.network === to?.network, [from, to]);
+  const isDeposit = useMemo(
+    () => (getL2ChainId(checkout.config) === to?.network),
+    [from, to, checkout],
+  );
   const insufficientFundsForGas = useMemo(() => {
     if (!estimates) return false;
     if (!token) return true;
@@ -231,7 +237,6 @@ export function BridgeReviewSummary() {
       },
       token: checkout.config.networkMap.get(from!.network)?.nativeCurrency,
     } as GasEstimateBridgeToL2Result;
-
     setEstimates(gasEstimateResult);
     const estimatedAmount = utils.formatUnits(
       gasEstimateResult?.fees.totalFees || 0,
@@ -256,8 +261,8 @@ export function BridgeReviewSummary() {
   }, DEFAULT_QUOTE_REFRESH_INTERVAL);
 
   const formatFeeBreakdown = useCallback(
-    () => formatBridgeFees(estimates, cryptoFiatState, t),
-    [estimates],
+    () => formatBridgeFees(estimates, isDeposit, cryptoFiatState, t),
+    [estimates, isDeposit],
   );
 
   useEffect(() => {
@@ -473,9 +478,14 @@ export function BridgeReviewSummary() {
           </Body>
         </MenuItem.Label>
         {fromNetwork && (
-          <MenuItem.IntentIcon
-            icon={networkIcon[fromNetwork] as any}
-            sx={networkIconStyles(fromNetwork)}
+          <MenuItem.FramedImage
+            use={(
+              <img
+                src={getChainImage(environment, fromNetwork)}
+                alt={networkName[fromNetwork]}
+              />
+            )}
+            sx={networkIconStyles}
           />
         )}
       </MenuItem>
@@ -520,9 +530,14 @@ export function BridgeReviewSummary() {
           </Body>
         </MenuItem.Label>
         {toNetwork && (
-          <MenuItem.IntentIcon
-            icon={networkIcon[toNetwork] as any}
-            sx={networkIconStyles(toNetwork)}
+          <MenuItem.FramedImage
+            use={(
+              <img
+                src={getChainImage(environment, toNetwork)}
+                alt={networkName[toNetwork]}
+              />
+            )}
+            sx={networkIconStyles}
           />
         )}
       </MenuItem>

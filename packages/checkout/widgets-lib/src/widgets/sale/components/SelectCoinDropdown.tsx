@@ -8,10 +8,9 @@ import {
 } from '@biom3/react';
 import { useTranslation } from 'react-i18next';
 import {
-  calculateCryptoToFiat,
-  getDefaultTokenImage,
-  tokenValueFormat,
+  calculateCryptoToFiat, tokenValueFormat,
 } from 'lib/utils';
+import { TokenImage } from 'components/TokenImage/TokenImage';
 import { FundingBalance } from '../types';
 import { useSaleContext } from '../context/SaleContextProvider';
 
@@ -72,13 +71,18 @@ export function SelectCoinDropdown({
     >
       <MenuItem size="medium">
         <MenuItem.FramedImage
-          alt={token.name}
           circularFrame
-          imageUrl={token.icon}
-          defaultImageUrl={getDefaultTokenImage(environment, theme)}
+          use={(
+            <TokenImage
+              environment={environment}
+              theme={theme}
+              name={token.name}
+              src={token.icon}
+            />
+          )}
         />
         <MenuItem.Label>
-          {t('views.ORDER_SUMMARY.orderReview.payWith', {
+          {t(`views.ORDER_SUMMARY.orderReview.payWith.${balance.type}`, {
             symbol: token.symbol,
           })}
         </MenuItem.Label>

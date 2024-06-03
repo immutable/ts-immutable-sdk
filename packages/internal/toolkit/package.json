@@ -16,7 +16,7 @@
     "enc-utils": "^3.0.0",
     "ethers": "^5.7.2",
     "magic-sdk": "^21.2.0",
-    "oidc-client-ts": "2.2.1"
+    "oidc-client-ts": "2.4.0"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.0.0",
@@ -50,6 +50,7 @@
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "NODE_ENV=production rollup --config rollup.config.js",
+    "dev": "rollup --config rollup.config.js -w",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "prepare": "wsrun -r build",
     "test": "jest",

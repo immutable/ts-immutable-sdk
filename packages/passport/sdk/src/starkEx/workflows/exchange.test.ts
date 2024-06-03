@@ -15,6 +15,7 @@ describe('exchangeTransfer', () => {
   const mockStarkSigner = {
     getAddress: jest.fn(),
     signMessage: jest.fn(),
+    getYCoordinate: jest.fn(),
   };
 
   const ethAmount: ETHAmount = {

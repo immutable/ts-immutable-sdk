@@ -108,29 +108,7 @@ describe('submitTenderlySimulations', () => {
     );
   });
 
-  it('should throw an error if axios call fails', async () => {
-    const chainId = '123'; // 123 will fallback to dev
-    const apiEndpoint = getTenderlyEndpoint(chainId);
-    const simulations:TenderlySimulation[] = [
-      { from: '0x123', to: '0x456' },
-    ];
-
-    const axiosDataParameter = generateAxiosData(simulations, undefined);
-
-    const errorMessage = 'this is an error!!';
-
-    mockedAxios.post.mockRejectedValueOnce(new Error(errorMessage));
-
-    await expect(submitTenderlySimulations(chainId, simulations)).rejects.toThrowError(`API request to Tenderly failed with error: Error: ${errorMessage}`);
-    expect(axios.post).toHaveBeenCalledTimes(1);
-    expect(axios.post).toHaveBeenCalledWith(
-      apiEndpoint,
-      axiosDataParameter,
-      axiosHeaders,
-    );
-  });
-
-  it('dingshould throw an error if the response contains an error', async () => {
+  it('should throw an error if the response contains an error', async () => {
     const chainId = '123'; // 123 will fallback to dev
     const apiEndpoint = getTenderlyEndpoint(chainId);
     const simulations:TenderlySimulation[] = [
@@ -150,7 +128,7 @@ describe('submitTenderlySimulations', () => {
 
     mockedAxios.post.mockResolvedValueOnce({ data: expectedResponse });
 
-    await expect(submitTenderlySimulations(chainId, simulations)).rejects.toThrowError(`Estimating gas failed with the reason: ${errorMessage}`);
+    await expect(submitTenderlySimulations(chainId, simulations)).rejects.toThrowError(errorMessage);
     expect(axios.post).toHaveBeenCalledTimes(1);
     expect(axios.post).toHaveBeenCalledWith(
       apiEndpoint,
@@ -225,7 +203,7 @@ describe('submitTenderlySimulations', () => {
     await expect(
       submitTenderlySimulations(chainId, simulations),
     ).rejects.toThrowError(
-      `Estimating gas simulation failed with the reason: ${errorMessage}`,
+      `Estimating deposit gas failed with the reason: ${errorMessage}`,
     );
     expect(axios.post).toHaveBeenCalledTimes(1);
     expect(axios.post).toHaveBeenCalledWith(
@@ -267,7 +245,7 @@ describe('submitTenderlySimulations', () => {
     await expect(
       submitTenderlySimulations(chainId, simulations),
     ).rejects.toThrowError(
-      `Estimating gas simulation failed with the reason: ${errorMessage}`,
+      `Estimating deposit gas failed with the reason: ${errorMessage}`,
     );
     expect(axios.post).toHaveBeenCalledTimes(1);
     expect(axios.post).toHaveBeenCalledWith(

@@ -27,45 +27,45 @@ const defaultPassportConfig = {
 
 const defaultItems: SaleItem[] = [
   {
-    productId: "biker",
+    productId: "kangaroo",
     qty: 1,
-    name: "Biker Iguana",
+    name: "Kangaroo",
     image:
-      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2024/02/img-Qq0Lek5jO8O9ueAZwDmdAImI-600x600-1.png",
-    description: "Biker Iguana",
+      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2024/05/character-image-10-1.png",
+    description: "Kangaroo",
   },
   {
-    productId: "lab",
+    productId: "kookaburra",
     qty: 3,
-    name: "Lab Iguana",
+    name: "Kookaburra",
     image:
-      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2023/12/img-IsR4OA7a9IStLeQ9cPo75tII.png",
-    description: "Lab Iguana",
+      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2024/05/character-image-4-1.png",
+    description: "Kookaburra",
   },
   {
-    productId: "baseball",
+    productId: "quokka",
     qty: 2,
-    name: "Baseball Iguana",
+    name: "Quokka",
     image:
-      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2023/12/img-tGcvA5pnoUAA2oNANHpA5CXB.png",
-    description: "Baseball Iguana",
+      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2024/05/character-image-8-1.png",
+    description: "Quokka",
   },
   {
-    productId: "firefighter",
+    productId: "ibis",
     qty: 1,
-    name: "Fire Fighter Iguana",
+    name: "Ibis",
     image:
-      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2023/12/img-NRXmr7k1jH9kZqXr029CEKt4.png",
-    description: "Fire Fighter Iguana",
+      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2024/05/character-image-1-1.png",
+    description: "Ibis",
   },
   {
-    productId: "soccer",
+    productId: "emu",
     qty: 5,
-    name: "Soccer Iguana",
+    name: "Emu",
     image:
-      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2023/12/img-msXHlIXmyy6IhDaMkP2Dp0HY.png",
-    description: "Soccer Iguana",
-  }
+      "https://iguanas.mystagingwebsite.com/wp-content/uploads/2024/05/character-image-5-1.png",
+    description: "Emu",
+  },
 ];
 
 const useParams = () => {
@@ -78,14 +78,19 @@ const useParams = () => {
     .get("excludePaymentTypes")
     ?.split(",") as SalePaymentTypes[];
 
-  const multicurrency = urlParams.get("multicurrency") === "true";
+  const preferredCurrency =
+    (urlParams.get("preferredCurrency") as string) ?? undefined;
+  const hideExcludedPaymentTypes = Boolean(
+    urlParams.get("hideExcludedPaymentTypes")
+  );
 
   return {
     login,
     environmentId,
     collectionName,
     excludePaymentTypes,
-    multicurrency,
+    preferredCurrency,
+    hideExcludedPaymentTypes,
   };
 };
 
@@ -124,7 +129,8 @@ export function SaleUI() {
     environmentId,
     collectionName,
     excludePaymentTypes,
-    multicurrency,
+    preferredCurrency,
+    hideExcludedPaymentTypes,
   } = params;
   const [passportConfig, setPassportConfig] = useState(
     JSON.stringify(defaultPassportConfig, null, 2)
@@ -144,44 +150,56 @@ export function SaleUI() {
     [passportInstance]
   );
   const factory = useMemo(
-    () => new WidgetsFactory(checkout, { theme: WidgetTheme.DARK }),
+    () =>
+      new WidgetsFactory(checkout, {
+        theme: WidgetTheme.DARK,
+        walletConnect: {
+          projectId: "938b553484e344b1e0b4bb80edf8c362",
+          metadata: {
+            name: "Checkout Marketplace",
+            description: "Checkout Marketplace",
+            url: "http://localhost:3000/marketplace-orchestrator",
+            icons: [],
+          },
+        },
+      }),
     [checkout]
   );
   const saleWidget = useMemo(
     () =>
       factory.create(WidgetType.SALE, {
-        config: { theme: WidgetTheme.DARK, multicurrency },
+        config: { theme: WidgetTheme.DARK, hideExcludedPaymentTypes },
       }),
-    [factory,  environmentId, collectionName, defaultItems]
+    [factory, environmentId, collectionName, defaultItems]
   );
   const bridgeWidget = useMemo(
     () =>
       factory.create(WidgetType.BRIDGE, {
         config: { theme: WidgetTheme.DARK },
       }),
-    [factory,  environmentId, collectionName, defaultItems]
+    [factory, environmentId, collectionName, defaultItems]
   );
   const swapWidget = useMemo(
     () =>
       factory.create(WidgetType.SWAP, { config: { theme: WidgetTheme.DARK } }),
-    [factory,  environmentId, collectionName, defaultItems]
+    [factory, environmentId, collectionName, defaultItems]
   );
   const onrampWidget = useMemo(
     () =>
       factory.create(WidgetType.ONRAMP, {
         config: { theme: WidgetTheme.DARK },
       }),
-    [factory,  environmentId, collectionName, defaultItems]
+    [factory, environmentId, collectionName, defaultItems]
   );
 
   // mount sale widget and subscribe to close event
   useEffect(() => {
     saleWidget.mount("sale", {
-      
       environmentId,
       collectionName,
       items: defaultItems,
       excludePaymentTypes,
+      preferredCurrency,
     });
     saleWidget.addListener(SaleEventType.CLOSE_WIDGET, () => {
       saleWidget.unmount();
@@ -208,7 +226,7 @@ export function SaleUI() {
     saleWidget.addListener(SaleEventType.REQUEST_ONRAMP, (event) => {
       saleWidget.unmount();
 
-      onrampWidget.mount("onramp");
+      onrampWidget.mount("onramp", event);
       onrampWidget.addListener(OnRampEventType.CLOSE_WIDGET, () => {
         onrampWidget.unmount();
       });
@@ -283,6 +301,7 @@ export function SaleUI() {
             collectionName,
             items: defaultItems,
             excludePaymentTypes,
+            preferredCurrency,
           })
         }
       >

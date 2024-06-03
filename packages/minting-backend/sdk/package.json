@@ -6,7 +6,9 @@
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
     "@imtbl/blockchain-data": "0.0.0",
-    "@imtbl/config": "0.0.0"
+    "@imtbl/config": "0.0.0",
+    "@imtbl/metrics": "0.0.0",
+    "@imtbl/webhook": "0.0.0"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.0.0",
@@ -33,6 +35,7 @@
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "NODE_ENV=production rollup --config rollup.config.js",
+    "dev": "rollup --config rollup.config.js -w",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "test": "jest --passWithNoTests",
     "test:e2e": "jest --runInBand --testMatch \"**/?(*.)+(e2e).[jt]s?(x)\"",

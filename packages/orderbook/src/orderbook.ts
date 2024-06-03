@@ -252,6 +252,15 @@ export class Orderbook {
     return this.seaport.fulfillOrder(orderResult, takerAddress, extraData, amountToFill);
   }
 
+  /**
+   * Get unsigned transactions that can be submitted to fulfil multiple open orders. If approval
+   * transactions exist, they must be signed and submitted to the chain before the fulfilment
+   * transaction can be submitted or it will be reverted.
+   * @param {Array<FulfillmentListing>} listings - The details of the listings to fulfil, amounts
+   *                                               to fill and taker ecosystem fees to be paid.
+   * @param {string} takerAddress - The address of the account fulfilling the order.
+   * @return {FulfillBulkOrdersResponse} Approval and fulfilment transactions.
+   */
   async fulfillBulkOrders(
     listings: Array<FulfillmentListing>,
     takerAddress: string,
@@ -270,9 +279,24 @@ export class Orderbook {
     );
 
     try {
+      const fulfillableOrdersWithUnits = fulfillmentDataRes.result.fulfillable_orders
+        .map((fulfillmentData) => {
+        // Find the listing that corresponds to the order for the units
+          const listing = listings.find((l) => l.listingId === fulfillmentData.order.id);
+          if (!listing) {
+            throw new Error(`Could not find listing for order ${fulfillmentData.order.id}`);
+          }
+
+          return {
+            extraData: fulfillmentData.extra_data,
+            order: fulfillmentData.order,
+            unitsToFill: listing.amountToFill,
+          };
+        });
+
       return {
         ...(await this.seaport.fulfillBulkOrders(
-          fulfillmentDataRes.result.fulfillable_orders,
+          fulfillableOrdersWithUnits,
           takerAddress,
         )),
         fulfillableOrders: fulfillmentDataRes.result.fulfillable_orders.map(

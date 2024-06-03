@@ -52,6 +52,7 @@ export function WalletAndNetworkSelector() {
   } = useContext(BridgeContext);
   const { viewDispatch } = useContext(ViewContext);
   const { providers } = useInjectedProviders({ checkout });
+  const { environment } = checkout.config;
 
   const { track } = useAnalytics();
 
@@ -491,6 +492,7 @@ export function WalletAndNetworkSelector() {
               setFromWalletDrawerOpen(true);
             }}
             onNetworkClick={() => setFromNetworkDrawerOpen(true)}
+            environment={environment}
           />
 
           <Box>
@@ -540,6 +542,7 @@ export function WalletAndNetworkSelector() {
             chainName={imtblZkEvmNetworkName}
             onNetworkClick={fromNetworkDrawerOpen ? handleFromNetworkSelection : handleToNetworkSelection}
             chainId={imtblZkEvmNetworkChainId}
+            environment={environment}
           />
           {/** If selecting from network, show L1 option for everything but Passport */}
           {(toNetworkDrawerOpen || fromWallet?.providerDetail.info.rdns !== WalletProviderRdns.PASSPORT) && (
@@ -549,6 +552,7 @@ export function WalletAndNetworkSelector() {
               chainName={l1NetworkName}
               onNetworkClick={fromNetworkDrawerOpen ? handleFromNetworkSelection : handleToNetworkSelection}
               chainId={l1NetworkChainId}
+              environment={environment}
             />
           )}
         </Drawer.Content>
@@ -580,6 +584,7 @@ export function WalletAndNetworkSelector() {
             onNetworkClick={() => {
               setToNetworkDrawerOpen(true);
             }}
+            environment={environment}
           />
           <Box sx={submitButtonWrapperStyles}>
             <Button

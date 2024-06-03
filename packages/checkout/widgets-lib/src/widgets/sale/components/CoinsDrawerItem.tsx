@@ -1,13 +1,13 @@
 import {
   Box,
-  Heading, MenuItem, MenuItemSize, prettyFormatNumber,
+  Heading,
+  MenuItem,
+  MenuItemSize,
+  prettyFormatNumber,
 } from '@biom3/react';
 import { TransactionRequirement } from '@imtbl/checkout-sdk';
-import {
-  calculateCryptoToFiat,
-  getDefaultTokenImage,
-  tokenValueFormat,
-} from 'lib/utils';
+import { calculateCryptoToFiat, tokenValueFormat } from 'lib/utils';
+import { TokenImage } from 'components/TokenImage/TokenImage';
 import { useTranslation } from 'react-i18next';
 import { ReactElement } from 'react';
 
@@ -69,8 +69,14 @@ export function CoinsDrawerItem<
       <MenuItem.FramedImage
         circularFrame
         alt={token.name}
-        imageUrl={token.icon}
-        defaultImageUrl={getDefaultTokenImage(environment, theme)}
+        use={(
+          <TokenImage
+            environment={environment}
+            theme={theme}
+            name={token.name}
+            src={token.icon}
+          />
+        )}
       />
       <MenuItem.PriceDisplay
         use={<Heading size="xSmall" />}

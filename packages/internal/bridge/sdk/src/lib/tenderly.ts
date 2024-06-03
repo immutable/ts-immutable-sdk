@@ -49,10 +49,7 @@ export async function submitTenderlySimulations(
       },
     );
   } catch (error: any) {
-    throw new BridgeError(
-      `API request to Tenderly failed with error: ${error}`,
-      BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
-    );
+    axiosResponse = error.response;
   }
 
   if (axiosResponse.data.error) {
@@ -75,7 +72,7 @@ export async function submitTenderlySimulations(
   for (let i = 0; i < simResults.length; i++) {
     if (simResults[i].error) {
       throw new BridgeError(
-        `Estimating gas simulation failed with the reason: ${simResults[i].error.message}`,
+        `Estimating deposit gas failed with the reason: ${simResults[i].error.message}`,
         BridgeErrorType.TENDERLY_GAS_ESTIMATE_FAILED,
       );
     }

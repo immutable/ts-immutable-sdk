@@ -48,7 +48,7 @@ describe('getPricingBySymbol', () => {
     expect(getPricingBySymbol('tIMX', mockPrices, mockConversions)).toEqual({
       currency: 'tIMX',
       type: 'crypto',
-      amount: mockPrices.USDC.amount * mockConversions.get('imx')!,
+      amount: 0.9756097560975611,
     });
   });
 

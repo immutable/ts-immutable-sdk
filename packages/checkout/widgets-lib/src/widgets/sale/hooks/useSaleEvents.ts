@@ -208,6 +208,23 @@ export const useSaleEvent = () => {
     });
   };
 
+  const sendViewFeesEvent = (
+    screen: string,
+    controlType: AnalyticsControlTypes = 'Button',
+    action: StandardAnalyticsActions = 'Pressed',
+  ) => {
+    track({
+      ...commonProps,
+      screen: toPascalCase(screen),
+      control: 'ViewFees',
+      controlType,
+      action,
+      extras: {
+        ...userProps,
+      },
+    });
+  };
+
   return {
     track,
     page,
@@ -220,5 +237,6 @@ export const useSaleEvent = () => {
     sendSelectedPaymentMethod,
     sendSelectedPaymentToken,
     sendProceedToPay,
+    sendViewFeesEvent,
   };
 };

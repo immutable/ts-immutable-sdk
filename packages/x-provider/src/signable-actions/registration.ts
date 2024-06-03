@@ -2,6 +2,7 @@ import { imx } from '@imtbl/generated-clients';
 import {
   Contracts,
   EthSigner,
+  // StarkSigner,
 } from '@imtbl/x-client';
 import { signRaw } from '@imtbl/toolkit';
 import { isAxiosError } from 'axios';
@@ -71,9 +72,9 @@ export async function isRegisteredOnChain(
   config: ProviderConfiguration,
 ): Promise<boolean> {
   await validateChain(ethSigner, config.immutableXConfig);
-
-  const registrationContract = Contracts.Registration.connect(
-    config.immutableXConfig.ethConfiguration.registrationContractAddress,
+  const imxConfig = config.immutableXConfig;
+  const registrationContract = Contracts.RegistrationV4.connect(
+    imxConfig.ethConfiguration.registrationV4ContractAddress || imxConfig.ethConfiguration.registrationContractAddress,
     ethSigner,
   );
 

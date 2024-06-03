@@ -7,7 +7,9 @@ import {
 } from '@biom3/react';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { Transaction } from 'lib/clients/checkoutApiType';
-import { MouseEvent, useMemo, useState } from 'react';
+import { MouseEvent, useMemo } from 'react';
+import { TokenImage } from 'components/TokenImage/TokenImage';
+import { Environment } from '@imtbl/config';
 import { containerStyles } from './transactionItemStyles';
 import { TransactionDetails } from './TransactionDetails';
 
@@ -23,6 +25,7 @@ type TransactionItemProps = {
   amount: string,
   icon: string,
   defaultTokenImage: string,
+  environment: Environment,
 };
 
 export function TransactionItem({
@@ -33,13 +36,9 @@ export function TransactionItem({
   amount,
   icon,
   defaultTokenImage,
+  environment,
 }: TransactionItemProps) {
   const { track } = useAnalytics();
-  const [iconError, setIconError] = useState<boolean>(false);
-  const tokenUrl = useMemo(
-    () => ((!icon || iconError) ? defaultTokenImage : icon),
-    [icon, iconError, defaultTokenImage],
-  );
   const txnDetailsLink = useMemo(() => `${details.link}${details.hash}`, [details]);
 
   const handleDetailsLinkClick = (
@@ -86,10 +85,10 @@ export function TransactionItem({
             <MenuItem.FramedImage
               circularFrame
               use={(
-                <img
-                  src={tokenUrl}
-                  alt={label}
-                  onError={() => setIconError(true)}
+                <TokenImage
+                  src={icon}
+                  name={label}
+                  defaultImage={defaultTokenImage}
                 />
               )}
             />
@@ -130,7 +129,7 @@ export function TransactionItem({
               px: 'base.spacing.x2',
             }}
           />
-          <TransactionDetails transaction={transaction} />
+          <TransactionDetails transaction={transaction} environment={environment} />
         </Accordion.ExpandedContent>
       </Accordion>
     </Box>

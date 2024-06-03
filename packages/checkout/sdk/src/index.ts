@@ -15,6 +15,7 @@ export { IMMUTABLE_API_BASE_URL } from './env';
 export {
   getPassportProviderDetail,
   getMetaMaskProviderDetail,
+  validateProvider,
 } from './provider';
 
 export {

@@ -4,6 +4,8 @@ export type CreateMintRequest = {
   asset_id: string; // the web2 game item id
   metadata: any;
   owner_address: string;
+  amount?: number; // for ERC1155 only
+  token_id?: string; // token id is only required for ERC1155
 };
 
 export type MintRequest = {
@@ -14,6 +16,8 @@ export type MintRequest = {
   metadata: any;
   owner_address: string;
   tried_count: number;
+  amount?: number;
+  token_id?: string;
 };
 
 export type SubmittedMintRequest = {
@@ -25,6 +29,7 @@ export type SubmittedMintRequest = {
   metadataId: string;
   imtblZkevmMintRequestUpdatedId: string;
   error: any | null;
+  amount: number | null;
 };
 
 export interface MintingPersistence {

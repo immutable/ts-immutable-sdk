@@ -154,6 +154,10 @@ export function getRemoteImage(environment: Environment | undefined, path: strin
   return `${CHECKOUT_CDN_BASE_URL[environment ?? Environment.PRODUCTION]}/v1/blob/img${path}`;
 }
 
+export function getChainImage(environment: Environment | undefined, chainId: ChainId) {
+  return getRemoteImage(environment, `/chains/${chainId}.png`);
+}
+
 export function getEthTokenImage(environment: Environment | undefined) {
   return getRemoteImage(environment, '/tokens/eth.svg');
 }
@@ -181,4 +185,8 @@ export function abbreviateWalletAddress(address: string, separator = '.....', fi
   const firstPart = address.slice(0, firstChars);
   const lastPart = address.slice(-lastChars);
   return `${firstPart}${separator}${lastPart}`;
+}
+
+export function compareStr(a: string, b: string): boolean {
+  return a.toLowerCase() === b.toLowerCase();
 }

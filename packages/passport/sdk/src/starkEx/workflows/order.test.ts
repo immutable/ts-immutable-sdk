@@ -19,6 +19,7 @@ describe('order', () => {
   const mockStarkSigner = {
     signMessage: jest.fn(),
     getAddress: jest.fn(),
+    getYCoordinate: jest.fn(),
   };
 
   describe('createOrder', () => {

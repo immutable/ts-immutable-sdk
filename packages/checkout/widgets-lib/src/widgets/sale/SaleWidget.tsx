@@ -46,6 +46,7 @@ Omit<SaleWidgetParams, 'walletProviderName'>
 
 type WidgetParams = RequiredWidgetParams &
 OptionalWidgetParams & {
+  hideExcludedPaymentTypes: boolean;
   waitFulfillmentSettlements: boolean;
 };
 export interface SaleWidgetProps extends WidgetParams {
@@ -60,8 +61,11 @@ export default function SaleWidget(props: SaleWidgetProps) {
     environmentId,
     collectionName,
     excludePaymentTypes,
+    preferredCurrency,
+    hideExcludedPaymentTypes,
     waitFulfillmentSettlements = true,
   } = props;
+
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
   const chainId = useRef<ChainId>();
@@ -124,7 +128,9 @@ export default function SaleWidget(props: SaleWidgetProps) {
           passport: checkout?.passport,
           collectionName,
           excludePaymentTypes,
+          preferredCurrency,
           waitFulfillmentSettlements,
+          hideExcludedPaymentTypes,
         }}
       >
         <CryptoFiatProvider environment={config.environment}>

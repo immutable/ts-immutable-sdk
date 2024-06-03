@@ -23,7 +23,7 @@ import {
   TransactionAction,
   TransactionPurpose,
 } from '../types';
-import { FulfillableOrder, Order } from '../openapi/sdk';
+import { Order, ProtocolData } from '../openapi/sdk';
 import {
   EIP_712_ORDER_TYPE,
   ItemType,
@@ -110,20 +110,42 @@ export class Seaport {
     const { orderComponents, tips } = mapImmutableOrderToSeaportOrderComponents(order);
     const seaportLib = this.getSeaportLib(order);
 
-    const { actions: seaportActions } = await seaportLib.fulfillOrders({
-      accountAddress: account,
-      fulfillOrderDetails: [
-        {
-          order: {
-            parameters: orderComponents,
-            signature: order.signature,
-          },
-          unitsToFill,
-          extraData,
-          tips,
+    let seaportActions;
+    // Temporary workaround for the fees scaling issue in case of
+    // partial fills when using `fulfillOrders` SDK function.
+    if (order.protocol_data.order_type === ProtocolData.order_type.PARTIAL_RESTRICTED) {
+      const useCase = await seaportLib.fulfillOrder({
+        order: {
+          parameters: orderComponents,
+          signature: order.signature,
         },
-      ],
-    });
+        unitsToFill,
+        tips,
+        extraData,
+        accountAddress: account,
+      });
+
+      seaportActions = useCase.actions;
+    } else if (order.protocol_data.order_type === ProtocolData.order_type.FULL_RESTRICTED) {
+      const useCase = await seaportLib.fulfillOrders({
+        accountAddress: account,
+        fulfillOrderDetails: [
+          {
+            order: {
+              parameters: orderComponents,
+              signature: order.signature,
+            },
+            unitsToFill,
+            extraData,
+            tips,
+          },
+        ],
+      });
+
+      seaportActions = useCase.actions;
+    } else {
+      throw new Error('Failed to fulfill order because order type is unknown');
+    }
 
     const fulfillmentActions: TransactionAction[] = [];
 
@@ -169,7 +191,11 @@ export class Seaport {
   }
 
   async fulfillBulkOrders(
-    fulfillingOrders: Array<FulfillableOrder>,
+    fulfillingOrders: {
+      extraData: string;
+      order: Order;
+      unitsToFill?: string
+    }[],
     account: string,
   ): Promise<{
       actions: Action[];
@@ -183,7 +209,8 @@ export class Seaport {
           parameters: orderComponents,
           signature: o.order.signature,
         },
-        extraData: o.extra_data,
+        unitsToFill: o.unitsToFill,
+        extraData: o.extraData,
         tips,
       };
     });
