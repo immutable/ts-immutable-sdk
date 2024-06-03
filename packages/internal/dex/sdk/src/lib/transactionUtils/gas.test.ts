@@ -2,7 +2,8 @@ import { buildBlock, expectToBeDefined, formatAmount, NATIVE_TEST_TOKEN } from '
 import { newAmount } from 'lib/utils';
 import { BigNumber, providers } from 'ethers';
 import { IMMUTABLE_TESTNET_RPC_URL, IMMUTABLE_TESTNET_CHAIN_ID } from 'constants/chains';
-import { calculateGasFee, fetchGasPrice } from './gas';
+import { AVERAGE_SECONDARY_FEE_EXTRA_GAS } from '../../constants';
+import { calculateGasFee, calculateGasFeeViaSwapProxy, fetchGasPrice } from './gas';
 
 describe('calculateGasFee', () => {
   describe('when given a price and gas used', () => {
@@ -10,10 +11,28 @@ describe('calculateGasFee', () => {
       const gasPrice = newAmount(BigNumber.from('1500000000'), NATIVE_TEST_TOKEN); // 1.5 gwei or 1500000000 wei
 
       const gasUsedInTransaction = BigNumber.from('200000');
-      const gasFeeEstimate = calculateGasFee(false, gasPrice, gasUsedInTransaction);
+      const gasFeeEstimate = calculateGasFee(gasPrice, gasUsedInTransaction);
 
       expectToBeDefined(gasFeeEstimate);
       expect(gasFeeEstimate.value.toString()).toEqual('300000000000000');
+    });
+  });
+});
+
+describe('calculateGasFeeViaProxy', () => {
+  describe('when given a price and gas used', () => {
+    it('calculates gas fee from gas used and gas price', async () => {
+      const gasPrice = newAmount(BigNumber.from('1500000000'), NATIVE_TEST_TOKEN); // 1.5 gwei or 1500000000 wei
+
+      const gasUsedInTransaction = BigNumber.from('200000');
+      const gasFeeEstimate = calculateGasFeeViaSwapProxy(gasPrice, gasUsedInTransaction);
+
+      expectToBeDefined(gasFeeEstimate);
+      const expectedResult =
+        BigNumber.from('300000000000000').add(
+          gasPrice.value.mul(AVERAGE_SECONDARY_FEE_EXTRA_GAS),
+        ).toString();
+      expect(gasFeeEstimate.value.toString()).toEqual(expectedResult);
     });
   });
 });
