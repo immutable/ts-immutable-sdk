@@ -1,5 +1,4 @@
 import { useContext, useCallback, useMemo } from 'react';
-import { HandoverContent } from 'context/handover-context/HandoverContext';
 import { HandoverContext } from '../../context/handover-context/HandoverContext';
 
 export const useHandover = ({ id }: { id?: string } = {}) => {
@@ -8,32 +7,24 @@ export const useHandover = ({ id }: { id?: string } = {}) => {
     throw new Error('useHandover must be used within a HandoverProvider');
   }
 
-  const { handovers, setHandovers } = context;
+  const {
+    handovers,
+    closeHandover,
+    addHandover,
+    loader,
+    isLoading,
+    showLoader,
+    hideLoader,
+  } = context;
   const handover = useMemo(() => handovers[id ?? 'global'], [id, handovers]);
-
   const getHandover = useCallback((handoverId: string) => handovers[handoverId], [handovers]);
 
-  const addHandover = useCallback(
-    (handoverId: string, handoverContent: HandoverContent) => {
-      setHandovers((prev) => ({ ...prev, [handoverId]: handoverContent }));
-    },
-    [setHandovers],
-  );
-
-  const closeHandover = useCallback(
-    (handoverId: string) => {
-      setHandovers((prev) => {
-        const newHandovers = { ...prev };
-        delete newHandovers[handoverId];
-        return newHandovers;
-      });
-    },
-    [setHandovers],
-  );
-
   return {
+    loader,
+    isLoading,
+    showLoader,
+    hideLoader,
     handover,
-    handovers,
     getHandover,
     addHandover,
     closeHandover,

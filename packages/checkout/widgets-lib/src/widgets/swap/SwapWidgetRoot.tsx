@@ -118,7 +118,6 @@ export class Swap extends Base<WidgetType.SWAP> {
             <HandoverProvider>
               <GeoblockLoader
                 checkout={this.checkout}
-                loadingView={<LoadingView loadingText={t('views.LOADING_VIEW.text')} />}
                 widget={
                 (
                   <ConnectLoader

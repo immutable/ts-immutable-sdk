@@ -3,6 +3,7 @@ import * as passport from '@imtbl/passport';
 import * as config from '@imtbl/config';
 import * as provider from '@imtbl/x-provider';
 import { track, identify } from '@imtbl/metrics';
+import { providers } from 'ethers';
 
 /* eslint-disable no-undef */
 const scope = 'openid offline_access profile email transact';
@@ -48,6 +49,7 @@ const PASSPORT_FUNCTIONS = {
   zkEvm: {
     connectEvm: 'connectEvm',
     sendTransaction: 'zkEvmSendTransaction',
+    sendTransactionWithConfirmation: 'zkEvmSendTransactionWithConfirmation',
     requestAccounts: 'zkEvmRequestAccounts',
     getBalance: 'zkEvmGetBalance',
     getTransactionReceipt: 'zkEvmGetTransactionReceipt',
@@ -545,6 +547,27 @@ window.callFunction = async (jsonData: string) => {
           requestId,
           success: true,
           result: transactionHash,
+        });
+        break;
+      }
+      case PASSPORT_FUNCTIONS.zkEvm.sendTransactionWithConfirmation: {
+        const transaction = JSON.parse(data);
+        const zkEvmProvider = getZkEvmProvider();
+        const web3Provider = new providers.Web3Provider(zkEvmProvider);
+        const signer = web3Provider.getSigner();
+
+        const tx = await signer.sendTransaction(transaction);
+        const response = await tx.wait();
+        track(moduleName, 'performedZkevmSendTransactionWithConfirmation', {
+          timeMs: Date.now() - markStart,
+        });
+        callbackToGame({
+          ...{
+            responseFor: fxName,
+            requestId,
+            success: true,
+          },
+          ...response,
         });
         break;
       }

@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import {
+  LoadingOverlay,
   Stack,
 } from '@biom3/react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -21,12 +22,31 @@ const contentAnimation = {
 };
 
 export function Handover({ id, children }: { id: string, children?: React.ReactNode }) {
-  const { handover } = useHandover({ id });
+  const { handover, loader } = useHandover({ id });
+
+  let renderChildren: any = [];
+  if (handover?.children) {
+    if (React.isValidElement(handover.children) && handover.children.type === Fragment) {
+      renderChildren = handover.children.props.children;
+    } else {
+      renderChildren = handover.children;
+    }
+  }
 
   return (
     <>
       {children}
-      {(handover?.children && (
+      {(loader && (
+        <LoadingOverlay visible>
+          <LoadingOverlay.Content>
+            <LoadingOverlay.Content.LoopingText
+              text={[...loader.text]}
+              textDuration={loader.duration}
+            />
+          </LoadingOverlay.Content>
+        </LoadingOverlay>
+      ))}
+      {(handover && (renderChildren || handover.animationUrl) && (
         <Stack
           sx={{
             backgroundColor: 'base.color.neutral.1000',
@@ -40,8 +60,8 @@ export function Handover({ id, children }: { id: string, children?: React.ReactN
             right: '0px',
           }}
         >
-          {(handover?.animationUrl && (
-            <HandoverAnimation url={handover.animationUrl} />
+          {(handover?.animationUrl && handover?.animationUrl.length > 0 && (
+            <HandoverAnimation url={handover.animationUrl} animationName={handover.animationName} />
           ))}
           <Stack
             sx={{
@@ -53,7 +73,7 @@ export function Handover({ id, children }: { id: string, children?: React.ReactN
             gap="base.spacing.x4"
           >
             <AnimatePresence>
-              {React.Children.map(handover.children, (child, index) => (
+              {React.Children.map(renderChildren, (child, index) => (
                 <motion.div
                   key={(child as any)?.key ?? `Key${index}`} // Ensure each child has a unique key
                   variants={contentAnimation}

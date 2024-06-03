@@ -133,6 +133,10 @@ const main = async () => {
     fs.readFileSync(path.resolve(__dirname, 'package.json'), 'utf8')
   );
 
+  // manually add @stdlib/number-float64-base-normalize as it's not a
+  // dependency of any of the SDK packages
+  dependencies['@stdlib/number-float64-base-normalize'] = '0.0.8';
+
   packageJson.dependencies = dependencies;
   // Only add peerDependencies if there are any
   if (Object.values(peerDependencies).length > 0) {

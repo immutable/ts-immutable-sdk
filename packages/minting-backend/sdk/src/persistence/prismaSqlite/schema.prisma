@@ -25,6 +25,7 @@ model ImAssets {
   metadataId                            String?  // Previously @db.Uuid in Postgres
   triedCount                            Int      @default(0)
   lastImtblZkevmMintRequestUpdatedId    String?  // Previously @db.Uuid in Postgres
+  amount                                Int?
   createdAt                             DateTime @default(now()) // Stored as TEXT
   updatedAt                             DateTime @default(now()) // Stored as TEXT
 

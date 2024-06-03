@@ -3639,6 +3639,7 @@ __metadata:
     "@imtbl/x-client": 0.0.0
     "@imtbl/x-provider": 0.0.0
     eslint: ^8.40.0
+    ethers: ^5.7.2
     parcel: ^2.8.3
   languageName: unknown
   linkType: soft
@@ -15802,6 +15803,15 @@ __metadata:
   peerDependencies:
     eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0
   checksum: 23001801f14c1d16bf0a837ca7970d9dd94e7b560384b41db378b49b6e32dc43d6e2790de1bd737a652a86f81a08d6a91f402525061b47719328f586a57e86c3
+  languageName: node
+  linkType: hard
+
+"eslint-plugin-react-refresh@npm:latest":
+  version: 0.4.7
+  resolution: "eslint-plugin-react-refresh@npm:0.4.7"
+  peerDependencies:
+    eslint: ">=7"
+  checksum: b2fe14d4ed158b6380ffd9831a5ebed4c79828ea806536d5db0aa8370f8a3878b198d77fc7da18bfd862cd9eb19ed4472cc9977f727f81679f80dcb48f8a3861
   languageName: node
   linkType: hard
 
@@ -28057,6 +28067,7 @@ __metadata:
     eslint: ^8.40.0
     eslint-config-airbnb: ^19.0.4
     eslint-config-airbnb-typescript: ^17.0.0
+    eslint-plugin-react-refresh: latest
     http-server: ^14.1.1
     husky: ^8.0.3
     lint-staged: ^13.2.0
