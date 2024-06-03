@@ -1,5 +1,4 @@
 import { Signer } from '@ethersproject/abstract-signer';
-import { imx } from '@imtbl/generated-clients';
 import {
   Contracts,
   ERC721Token,
@@ -253,11 +252,8 @@ export async function completeERC721WithdrawalAction({
   starkPublicKey,
   token,
   config,
-}: CompleteERC721WithdrawalActionParams) {
+}: CompleteERC721WithdrawalActionParams, mintsApi: MintsApi) {
   await validateChain(ethSigner, config.immutableXConfig);
-
-  const mintsApi = new imx.MintsApi(config.immutableXConfig.apiConfiguration);
-
   const {
     v3Balance,
     v4Balance,

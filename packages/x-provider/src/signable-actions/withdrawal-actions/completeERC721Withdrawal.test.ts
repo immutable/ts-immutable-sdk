@@ -24,6 +24,7 @@ jest.mock('@imtbl/generated-clients');
 
 async function act(): Promise<TransactionResponse> {
   const signers = await generateSigners(privateKey1);
+  const mintsApi = new imx.MintsApi(testConfig.immutableXConfig.apiConfiguration);
   return await completeERC721WithdrawalAction({
     ethSigner: signers.ethSigner,
     starkSigner: signers.starkSigner,
@@ -34,7 +35,7 @@ async function act(): Promise<TransactionResponse> {
       tokenId: '23',
       tokenAddress: '0x23cv1',
     },
-  });
+  }, mintsApi);
 }
 
 // TODO fix MintsApi mocking so that getMintableTokenDetailsByClientTokenId does not return undefined
@@ -162,6 +163,7 @@ describe.skip('completeERC721Withdrawal action', () => {
 
     it('should throw error', async () => {
       const signers = await generateSigners(privateKey1);
+      const mintsApi = new imx.MintsApi(testConfig.immutableXConfig.apiConfiguration);
       await expect(
         completeERC721WithdrawalAction({
           ethSigner: signers.ethSigner,
@@ -173,7 +175,7 @@ describe.skip('completeERC721Withdrawal action', () => {
             tokenId: '23',
             tokenAddress: '0x23cv1',
           },
-        }),
+        }, mintsApi),
       ).rejects.toThrowError();
     });
   });
