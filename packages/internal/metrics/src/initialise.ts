@@ -81,6 +81,8 @@ let initialised = false;
 export const isInitialised = () => initialised;
 
 export const initialise = async () => {
+  // Set to true early to prevent multiple initialisation
+  // calls from happening if multiple instances available
   initialised = true;
   try {
     const runtimeDetails = flattenProperties(getRuntimeDetails());

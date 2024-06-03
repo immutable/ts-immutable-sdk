@@ -1,3 +1,4 @@
+import { TrackProperties } from 'track';
 import { getItem, setItem } from './localStorage';
 import { Detail } from './constants';
 
@@ -48,18 +49,19 @@ export const removeSentEvents = (numberOfEvents: number) => {
   setItem(Store.EVENTS, EVENT_STORE);
 };
 
-export const flattenProperties = (
-  properties: Record<string, string | number | boolean>,
-) => {
+export const flattenProperties = (properties: TrackProperties) => {
   const propertyMap: [string, string][] = [];
   Object.entries(properties).forEach(([key, value]) => {
-    if (
-      typeof key === 'string'
-      || typeof value === 'string'
-      || typeof value === 'number'
-      || typeof value === 'boolean'
-    ) {
+    if (typeof key !== 'string') {
+      return;
+    }
+
+    if (['string', 'number', 'boolean'].includes(typeof value)) {
       propertyMap.push([key, value.toString()]);
+    }
+
+    if (Array.isArray(value)) {
+      propertyMap.push([key, JSON.stringify(value)]);
     }
   });
   return propertyMap;
