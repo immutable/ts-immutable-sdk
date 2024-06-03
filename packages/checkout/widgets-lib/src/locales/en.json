@@ -349,10 +349,12 @@
         }
       },
       "handover": {
+        "initial": "Preparing Order",
         "beforeApprove": "Waiting for you to approve access to your coins",
         "afterApprove":"Coins ready for item purchase",
         "beforeExecute": "Waiting for you to confirm in your wallet",
-        "afterExecute": "Processing purchase"
+        "afterExecute": "Processing purchase",
+        "success": "Purchase complete"
       },
       "creditCardWarningDrawer": {
         "heading": "We recommend debit over credit",

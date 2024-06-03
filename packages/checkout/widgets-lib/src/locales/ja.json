@@ -336,10 +336,12 @@
         }
       },
       "handover": {
+        "initial": "注文を準備中",
         "beforeApprove": "コインへのアクセスを承認するのを待っています",
         "afterApprove": "コインはアイテム購入の準備ができています",
         "beforeExecute": "ウォレットでの確認を待っています",
-        "afterExecute": "購入処理中"
+        "afterExecute": "購入処理中",
+        "success": "購入完了"
       },
       "creditCardWarningDrawer": {
         "heading": "デビットカードの使用をお勧めします",

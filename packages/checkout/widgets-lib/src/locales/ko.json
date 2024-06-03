@@ -329,10 +329,12 @@
         }
       },
       "handover": {
+        "initial": "주문 준비 중",
         "beforeApprove": "코인에 대한 접근을 승인하는 중입니다",
         "afterApprove": "아이템 구매를 위한 코인이 준비되었습니다",
         "beforeExecute": "지갑에서 확인 중입니다",
-        "afterExecute": "구매 처리 중"
+        "afterExecute": "구매 처리 중",
+        "success": "구매 완료"
       },
       "creditCardWarningDrawer": {
         "heading": "신용카드보다는 체크카드 사용을 권장합니다",

@@ -329,10 +329,12 @@
         }
       },
       "handover": {
+        "initial": "正在准备订单",
         "beforeApprove": "等待您批准访问您的硬币",
         "afterApprove": "硬币已准备好购买物品",
         "beforeExecute": "等待您在钱包中确认",
-        "afterExecute": "处理中"
+        "afterExecute": "处理中",
+        "success": "购买完成"
       },
       "creditCardWarningDrawer": {
         "heading": "我们推荐使用借记卡而非信用卡",
