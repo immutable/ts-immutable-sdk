@@ -259,6 +259,7 @@ describe('AuthManager', () => {
           PassportErrorType.AUTHENTICATION_ERROR,
         ),
       );
+      expect(mockOverlayAppend).not.toHaveBeenCalled();
     });
 
     describe('when the popup is blocked', () => {

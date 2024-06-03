@@ -202,6 +202,7 @@ export default class AuthManager {
             // Reject with the error if it is not caused by a blocked popup
             if (!(error instanceof Error) || error.message !== 'Attempted to navigate on a disposed window') {
               reject(error);
+              return;
             }
 
             // Popup was blocked; append the blocked popup overlay to allow the user to try again.
