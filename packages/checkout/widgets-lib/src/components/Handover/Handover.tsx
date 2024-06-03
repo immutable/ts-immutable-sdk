@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import {
+  LoadingOverlay,
   Stack,
 } from '@biom3/react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -21,7 +22,7 @@ const contentAnimation = {
 };
 
 export function Handover({ id, children }: { id: string, children?: React.ReactNode }) {
-  const { handover } = useHandover({ id });
+  const { handover, loader } = useHandover({ id });
 
   let renderChildren: any = [];
   if (handover?.children) {
@@ -35,6 +36,16 @@ export function Handover({ id, children }: { id: string, children?: React.ReactN
   return (
     <>
       {children}
+      {(loader && (
+        <LoadingOverlay visible>
+          <LoadingOverlay.Content>
+            <LoadingOverlay.Content.LoopingText
+              text={[...loader.text]}
+              textDuration={loader.duration}
+            />
+          </LoadingOverlay.Content>
+        </LoadingOverlay>
+      ))}
       {(handover && (renderChildren || handover.animationUrl) && (
         <Stack
           sx={{

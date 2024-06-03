@@ -4,7 +4,12 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { HandoverContent, HandoverContext, HandoverTarget } from './HandoverContext';
+import {
+  HandoverContent,
+  HandoverContext,
+  HandoverLoader,
+  HandoverTarget,
+} from './HandoverContext';
 import { Handover } from '../../components/Handover/Handover';
 
 interface HandoverProviderProps {
@@ -25,6 +30,12 @@ export function HandoverProvider({ children }: HandoverProviderProps) {
   const [handovers, setHandovers] = useState<HandoverState>({});
   const [handoverQueue, setHandoverQueue] = useState<HandoverQueue>({});
   const [handoverBusy, setHandoverBusy] = useState<{ [key in HandoverTarget]?: boolean }>({});
+
+  const [loader, setLoader] = useState<HandoverLoader | null>(null);
+  const isLoading = useMemo(() => loader !== null, [loader]);
+  const hideLoader = useCallback(() => {
+    setLoader(null);
+  }, [setLoader]);
 
   const closeHandover = useCallback(
     (handoverId: HandoverTarget = HandoverTarget.GLOBAL) => {
@@ -105,10 +116,17 @@ export function HandoverProvider({ children }: HandoverProviderProps) {
   }, [handoverQueue, handoverBusy, processQueue]);
 
   const value = useMemo(() => ({
+    loader,
+    isLoading,
+    hideLoader,
+    showLoader: (handoverLoader: HandoverLoader) => {
+      const text = Array.isArray(handoverLoader.text) ? handoverLoader.text : [handoverLoader.text];
+      setLoader({ ...handoverLoader, text: [...text] });
+    },
     handovers,
     addHandover,
     closeHandover,
-  }), [handovers]);
+  }), [loader, isLoading, hideLoader, handovers, addHandover, closeHandover]);
 
   return (
     <HandoverContext.Provider value={value}>
