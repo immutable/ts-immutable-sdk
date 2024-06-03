@@ -38,8 +38,7 @@ async function act(): Promise<TransactionResponse> {
   }, mintsApi);
 }
 
-// TODO fix MintsApi mocking so that getMintableTokenDetailsByClientTokenId does not return undefined
-describe.skip('completeERC721Withdrawal action', () => {
+describe('completeERC721Withdrawal action', () => {
   describe('when ERC721 is mintable', () => {
     const mintableErc721Token: imx.MintableTokenDetails = {
       token_id: '23',
