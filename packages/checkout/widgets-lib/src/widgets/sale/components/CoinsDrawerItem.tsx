@@ -5,13 +5,13 @@ import {
   MenuItemSize,
   prettyFormatNumber,
 } from '@biom3/react';
-import { TransactionRequirement } from '@imtbl/checkout-sdk';
+import { TransactionRequirement, WidgetTheme } from '@imtbl/checkout-sdk';
 import { calculateCryptoToFiat, tokenValueFormat } from 'lib/utils';
 import { TokenImage } from 'components/TokenImage/TokenImage';
 import { useTranslation } from 'react-i18next';
 import { ReactElement } from 'react';
 
-import { useSaleContext } from '../context/SaleContextProvider';
+import { Environment } from '@imtbl/config';
 import { FundingBalance } from '../types';
 import { getFundingBalanceTotalFees } from '../functions/fundingBalanceFees';
 
@@ -25,6 +25,8 @@ export interface CoinDrawerItemProps<
   selected: boolean;
   transactionRequirement?: TransactionRequirement;
   onClick: () => void;
+  environment: Environment;
+  theme: WidgetTheme
 }
 
 export function CoinsDrawerItem<
@@ -36,12 +38,10 @@ export function CoinsDrawerItem<
   selected,
   onClick,
   size,
+  environment,
+  theme,
 }: CoinDrawerItemProps<RC>) {
   const { t } = useTranslation();
-  const {
-    environment,
-    config: { theme },
-  } = useSaleContext();
 
   const { token, userBalance } = balance.fundingItem;
 
