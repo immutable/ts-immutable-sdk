@@ -85,7 +85,7 @@ type SignApiError = {
 const toSignedProduct = (
   product: SignApiProduct,
   currency: string,
-  item?: SaleItem,
+  item?: SaleItem
 ): SignedOrderProduct => ({
   productId: product.product_id,
   image: item?.image || '',
@@ -101,7 +101,7 @@ const toSignedProduct = (
 
 const toSignResponse = (
   signApiResponse: SignApiResponse,
-  items: SaleItem[],
+  items: SaleItem[]
 ): SignResponse => {
   const { order, transactions } = signApiResponse;
 
@@ -112,11 +112,13 @@ const toSignResponse = (
         erc20Address: order.currency.erc20_address,
       },
       products: order.products
-        .map((product) => toSignedProduct(
-          product,
-          order.currency.name,
-          items.find((item) => item.productId === product.product_id),
-        ))
+        .map((product) =>
+          toSignedProduct(
+            product,
+            order.currency.name,
+            items.find((item) => item.productId === product.product_id)
+          )
+        )
         .reduce((acc, product) => {
           const index = acc.findIndex((n) => n.name === product.name);
 
@@ -146,7 +148,7 @@ const toSignResponse = (
     })),
     transactionId: hexToText(
       transactions.find((txn) => txn.method_call.startsWith('execute'))?.params
-        .reference || '',
+        .reference || ''
     ),
   };
 };
@@ -160,17 +162,18 @@ export const useSignOrder = (input: SignOrderInput) => {
     waitFulfillmentSettlements,
   } = input;
   const [signError, setSignError] = useState<SignOrderError | undefined>(
-    undefined,
+    undefined
   );
   const [signResponse, setSignResponse] = useState<SignResponse | undefined>(
-    undefined,
+    undefined
   );
   const [executeResponse, setExecuteResponse] = useState<ExecuteOrderResponse>({
     done: false,
     transactions: [],
   });
   const [tokenIds, setTokenIds] = useState<string[]>([]);
-  const [currentTransactionIndex, setCurrentTransactionIndex] = useState<number>(0);
+  const [currentTransactionIndex, setCurrentTransactionIndex] =
+    useState<number>(0);
 
   const setExecuteTransactions = (transaction: ExecutedTransaction) => {
     setExecuteResponse((prev) => ({
@@ -179,19 +182,21 @@ export const useSignOrder = (input: SignOrderInput) => {
     }));
   };
 
-  const setExecuteDone = () => setExecuteResponse((prev) => ({ ...prev, done: true }));
+  const setExecuteDone = () =>
+    setExecuteResponse((prev) => ({ ...prev, done: true }));
 
-  const setExecuteFailed = () => setExecuteResponse({
-    done: false,
-    transactions: [],
-  });
+  const setExecuteFailed = () =>
+    setExecuteResponse({
+      done: false,
+      transactions: [],
+    });
 
   const sendTransaction = useCallback(
     async (
       to: string,
       data: string,
       gasLimit: number,
-      method: string,
+      method: string
     ): Promise<[hash: string | undefined, error: any]> => {
       let transactionHash: string | undefined;
 
@@ -230,15 +235,15 @@ export const useSignOrder = (input: SignOrderInput) => {
         }
 
         if (
-          reason.includes('failed to submit')
-          && reason.includes('highest gas limit')
+          reason.includes('failed to submit') &&
+          reason.includes('highest gas limit')
         ) {
           errorType = SaleErrorTypes.WALLET_REJECTED_NO_FUNDS;
         }
 
         if (
-          reason.includes('status failed')
-          || reason.includes('transaction failed')
+          reason.includes('status failed') ||
+          reason.includes('transaction failed')
         ) {
           errorType = SaleErrorTypes.TRANSACTION_FAILED;
         }
@@ -251,13 +256,13 @@ export const useSignOrder = (input: SignOrderInput) => {
         return [undefined, err];
       }
     },
-    [provider],
+    [provider]
   );
 
   const sign = useCallback(
     async (
       paymentType: SignPaymentTypes,
-      fromTokenAddress: string,
+      fromTokenAddress: string
     ): Promise<SignResponse | undefined> => {
       try {
         const signer = provider?.getSigner();
@@ -326,13 +331,13 @@ export const useSignOrder = (input: SignOrderInput) => {
       }
       return undefined;
     },
-    [items, environmentId, environment, provider],
+    [items, environmentId, environment, provider]
   );
 
   const executeTransaction = async (
     transaction: SignedTransaction,
     onTxnSuccess: (txn: ExecutedTransaction) => void,
-    onTxnError: (error: any, txns: ExecutedTransaction[]) => void,
+    onTxnError: (error: any, txns: ExecutedTransaction[]) => void
   ) => {
     const {
       tokenAddress: to,
@@ -345,7 +350,7 @@ export const useSignOrder = (input: SignOrderInput) => {
       to,
       data,
       gasEstimate,
-      method,
+      method
     );
 
     if (txnError || !hash) {
@@ -386,7 +391,7 @@ export const useSignOrder = (input: SignOrderInput) => {
         const success = await executeTransaction(
           transaction,
           onTxnSuccess,
-          onTxnError,
+          onTxnError
         );
         if (!success) {
           successful = false;

@@ -58,7 +58,9 @@ type SaleContextValues = SaleContextProps & {
   executeAll: (
     signResponse: SignResponse | undefined,
     onTxnSuccess: (txn: ExecutedTransaction) => void,
-    onTxnError: (error: any, txns: ExecutedTransaction[]) => void
+    onTxnError: (error: any, txns: ExecutedTransaction[]) => void,
+    onApproveCallback?: () => void,
+    onExecuteCallback?: () => void
   ) => Promise<ExecutedTransaction[]>;
   executeNextTransaction: (
     onTxnSuccess: (txn: ExecutedTransaction) => void,
