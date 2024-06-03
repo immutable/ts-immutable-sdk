@@ -133,13 +133,13 @@ export type BridgeFeeRequest = DepositNativeFeeRequest
 /**
  * @typedef {Object} DepositNativeFeeRequest
  * @property {BridgeFeeActions} method - The method for which the bridge fee is being requested.
- * @property {number} gasMultiplier - How much buffer to add to the gas fee.
+ * @property {number} gasMultiplier - How much buffer to add to the gas fee, or 'auto' to use Axelar's automatic gas multiplier
  * @property {string} sourceChainId - The chain ID of the source chain.
  * @property {string} destinationChainId - The chain ID of the destination chain.
  */
 export interface DepositNativeFeeRequest {
   action: BridgeFeeActions.DEPOSIT,
-  gasMultiplier: number;
+  gasMultiplier: number | string;
   sourceChainId: string;
   destinationChainId: string;
 }
@@ -147,7 +147,7 @@ export interface DepositNativeFeeRequest {
 /**
  * @typedef {Object} DepositERC20FeeRequest
  * @property {BridgeFeeActions} method - The method for which the bridge fee is being requested.
- * @property {number} gasMultiplier - How much buffer to add to the gas fee.
+ * @property {number} gasMultiplier - How much buffer to add to the gas fee, or 'auto' to use Axelar's automatic gas multiplier
  * @property {string} sourceChainId - The chain ID of the source chain.
  * @property {string} destinationChainId - The chain ID of the destination chain.
  * @property {FungibleToken} token - The token to be deposited.
@@ -155,7 +155,7 @@ export interface DepositNativeFeeRequest {
  */
 export interface DepositERC20FeeRequest {
   action: BridgeFeeActions.DEPOSIT,
-  gasMultiplier: number;
+  gasMultiplier: number | string;
   sourceChainId: string;
   destinationChainId: string;
   token: FungibleToken;
@@ -165,13 +165,13 @@ export interface DepositERC20FeeRequest {
 /**
  * @typedef {Object} WithdrawNativeFeeRequest
  * @property {BridgeFeeActions} method - The method for which the bridge fee is being requested.
- * @property {number} gasMultiplier - How much buffer to add to the gas fee.
+ * @property {number} gasMultiplier - How much buffer to add to the gas fee, or 'auto' to use Axelar's automatic gas multiplier
  * @property {string} sourceChainId - The chain ID of the source chain.
  * @property {string} destinationChainId - The chain ID of the destination chain.
  */
 export interface WithdrawNativeFeeRequest {
   action: BridgeFeeActions.WITHDRAW,
-  gasMultiplier: number;
+  gasMultiplier: number | string;
   sourceChainId: string;
   destinationChainId: string;
 }
@@ -179,7 +179,7 @@ export interface WithdrawNativeFeeRequest {
 /**
  * @typedef {Object} WithdrawERC20FeeRequest
  * @property {BridgeFeeActions} method - The method for which the bridge fee is being requested.
- * @property {number} gasMultiplier - How much buffer to add to the gas fee.
+ * @property {number} gasMultiplier - How much buffer to add to the gas fee, or 'auto' to use Axelar's automatic gas multiplier
  * @property {string} sourceChainId - The chain ID of the source chain.
  * @property {string} destinationChainId - The chain ID of the destination chain.
  * @property {FungibleToken} token - The token to be withdrawn.
@@ -187,7 +187,7 @@ export interface WithdrawNativeFeeRequest {
  */
 export interface WithdrawERC20FeeRequest {
   action: BridgeFeeActions.WITHDRAW,
-  gasMultiplier: number;
+  gasMultiplier: number | string;
   sourceChainId: string;
   destinationChainId: string;
   token: FungibleToken;
@@ -298,7 +298,7 @@ export interface BridgeBundledTxRequest {
   amount: ethers.BigNumber;
   sourceChainId: string;
   destinationChainId: string;
-  gasMultiplier: number;
+  gasMultiplier: number | string;
 }
 
 /**
