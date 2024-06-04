@@ -28,7 +28,7 @@ export function PayWithCoins() {
     environment,
   } = useSaleContext();
 
-  const { addHandover } = useHandover({ id: HandoverTarget.GLOBAL });
+  const { addHandover, closeHandover } = useHandover({ id: HandoverTarget.GLOBAL });
 
   const onBeforeApproveCallback = useCallback(() => {
     addHandover({
@@ -84,6 +84,7 @@ export function PayWithCoins() {
       (error, txns) => {
         const details = { transactionId: signResponse?.transactionId };
         sendFailedEvent(error.toString(), error, txns, undefined, details); // checkoutPrimarySalePaymentMethods_FailEventFailed
+        closeHandover();
       },
     );
   };
@@ -92,15 +93,16 @@ export function PayWithCoins() {
     if (signResponse !== undefined && processing.current === false) {
       processing.current = true;
 
-      addHandover({
-        duration: 2000,
-        animationUrl: getRemoteImage(environment, '/handover.riv'),
-        children: (
-          <Heading sx={{ px: 'base.spacing.x6' }}>
-            {t('views.PAYMENT_METHODS.handover.initial')}
-          </Heading>
-        ),
-      });
+      // TODO: Might not need this as we only would want to call sendTransaction once and the useEffect at the bottom
+      // of this component will show the initial
+      // addHandover({
+      //   animationUrl: getRemoteImage(environment, '/handover.riv'),
+      //   children: (
+      //     <Heading sx={{ px: 'base.spacing.x6' }}>
+      //       {t('views.PAYMENT_METHODS.handover.initial')}
+      //     </Heading>
+      //   ),
+      // });
 
       sendTransaction();
     }
@@ -130,5 +132,14 @@ export function PayWithCoins() {
 
   useEffect(() => sendPageView(SaleWidgetViews.PAY_WITH_COINS), []); // checkoutPrimarySalePayWithCoinsViewed
 
-  return null;
+  useEffect(() => addHandover({
+    animationUrl: getRemoteImage(environment, '/handover.riv'),
+    animationName: 'Start',
+    children: (
+      <Heading sx={{ px: 'base.spacing.x6' }}>
+        {t('views.PAYMENT_METHODS.handover.initial')}
+      </Heading>
+    ),
+  }), [environment]);
+  return <>Boo</>;
 }
