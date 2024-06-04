@@ -363,6 +363,7 @@ export const useSignOrder = (input: SignOrderInput) => {
     signData: SignResponse | undefined,
     onTxnSuccess: (txn: ExecutedTransaction) => void,
     onTxnError: (error: SignOrderError, txns: ExecutedTransaction[]) => void,
+    onTxnStep?: (method: string, step: ExecuteTransactionStep) => void,
   ): Promise<ExecutedTransaction[]> => {
     if (!signData || !provider) {
       setSignError({
@@ -378,30 +379,30 @@ export const useSignOrder = (input: SignOrderInput) => {
     );
 
     let successful = true;
-      for (const transaction of transactions) {
-        if (onTxnStep) {
-          onTxnStep(transaction.methodCall, ExecuteTransactionStep.BEFORE);
-        }
-
-        // eslint-disable-next-line no-await-in-loop
-        const success = await executeTransaction(
-          transaction,
-          onTxnSuccess,
-          onTxnError
-        );
-
-        if (onTxnStep) {
-          onTxnStep(transaction.methodCall, ExecuteTransactionStep.AFTER);
-        }
-
-        if (!success) {
-          successful = false;
-          break;
-        }
+    for (const transaction of transactions) {
+      if (onTxnStep) {
+        onTxnStep(transaction.methodCall, ExecuteTransactionStep.BEFORE);
       }
-      (successful ? setExecuteDone : setExecuteFailed)();
 
-      return executeResponse.transactions;
+      // eslint-disable-next-line no-await-in-loop
+      const success = await executeTransaction(
+        transaction,
+        onTxnSuccess,
+        onTxnError,
+      );
+
+      if (onTxnStep) {
+        onTxnStep(transaction.methodCall, ExecuteTransactionStep.AFTER);
+      }
+
+      if (!success) {
+        successful = false;
+        break;
+      }
+    }
+    (successful ? setExecuteDone : setExecuteFailed)();
+
+    return executeResponse.transactions;
   };
 
   const executeNextTransaction = async (
