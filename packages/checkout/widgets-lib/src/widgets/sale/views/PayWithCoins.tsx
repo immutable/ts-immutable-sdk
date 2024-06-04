@@ -47,6 +47,7 @@ export function PayWithCoins() {
         };
         sendFailedEvent(String(error?.data?.error), error, txns, undefined, details); // checkoutPrimarySalePaymentMethods_FailEventFailed
       },
+      false,
     );
   };
 
