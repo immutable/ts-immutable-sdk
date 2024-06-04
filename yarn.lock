@@ -3729,7 +3729,7 @@ __metadata:
   resolution: "@imtbl/orderbook@workspace:packages/orderbook"
   dependencies:
     "@imtbl/config": 0.0.0
-    "@opensea/seaport-js": 4.0.0
+    "@opensea/seaport-js": 4.0.1
     "@rollup/plugin-typescript": ^11.0.0
     "@swc/jest": ^0.2.24
     "@typechain/ethers-v5": ^10.2.0
@@ -3870,7 +3870,7 @@ __metadata:
     "@jest/globals": ^29.5.0
     "@magic-ext/oidc": 4.2.0
     "@metamask/detect-provider": ^2.0.0
-    "@opensea/seaport-js": 4.0.0
+    "@opensea/seaport-js": 4.0.1
     "@rive-app/react-canvas-lite": ^4.9.0
     "@rollup/plugin-babel": ^6.0.4
     "@rollup/plugin-commonjs": ^24.0.1
@@ -5361,13 +5361,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opensea/seaport-js@npm:4.0.0":
-  version: 4.0.0
-  resolution: "@opensea/seaport-js@npm:4.0.0"
+"@opensea/seaport-js@npm:4.0.1":
+  version: 4.0.1
+  resolution: "@opensea/seaport-js@npm:4.0.1"
   dependencies:
     ethers: ^6.9.0
     merkletreejs: ^0.3.11
-  checksum: dcc921db35818da0111c7884e7aeb26a3b2e1909ad9395fd467ae429dbdca319e4673115d91c378fc7b6bf422c80fb0f56477813c7c45c3f0d66e7dfbc0ad02b
+  checksum: 8a38d0e6b20d4a9c9474a1de4cfc1a93cd0d19e1ff2fd018c8423845075399812c88ce618245e6ce92c4bba0d0ce38c15427cff1f687ad50777c35b19b684bdf
   languageName: node
   linkType: hard
 
