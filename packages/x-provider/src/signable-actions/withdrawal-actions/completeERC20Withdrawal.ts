@@ -23,7 +23,7 @@ type CompleteERC20WithdrawalWorkflowParams = {
 
 const ERC20TokenType = 'ERC20';
 
-async function executeRegisterAndWithdrawAllERC20(
+export async function executeRegisterAndWithdrawAllERC20(
   ethSigner: Signer,
   starkSigner: StarkSigner,
   starkPublicKey: string,
@@ -55,7 +55,7 @@ async function executeRegisterAndWithdrawAllERC20(
   return ethSigner.sendTransaction(populatedTransaction);
 }
 
-async function executeWithdrawAllERC20(
+export async function executeWithdrawAllERC20(
   ethSigner: Signer,
   starkPublicKey: string,
   assetType: string,
@@ -72,6 +72,25 @@ async function executeWithdrawAllERC20(
   const populatedTransaction = await contract.populateTransaction.withdrawAll(
     await ethSigner.getAddress(),
     starkPublicKey,
+    assetType,
+  );
+
+  return ethSigner.sendTransaction(populatedTransaction);
+}
+
+export async function executeWithdrawERC20(
+  ethSigner: Signer,
+  starkPublicKey: string,
+  assetType: string,
+  config: ImmutableXConfiguration,
+): Promise<TransactionResponse> {
+  const contract = Contracts.CoreV4.connect(
+    config.ethConfiguration.coreContractAddress,
+    ethSigner,
+  );
+
+  const populatedTransaction = await contract.populateTransaction.withdraw(
+    await ethSigner.getAddress(),
     assetType,
   );
 
@@ -103,28 +122,31 @@ export async function completeERC20WithdrawalAction({
     config.immutableXConfig,
   );
 
-  if (v3Balance.isZero() && v4Balance.isZero()) {
-    throw new Error('No balance to withdraw');
-  }
-
-  const isRegistered = await isRegisteredOnChain(
-    starkPublicKey,
-    ethSigner,
-    config,
-  );
-
   const assetType = await getEncodeAssetInfo('asset', ERC20TokenType, config.immutableXConfig, {
     token_address: token.tokenAddress,
   });
 
-  if (isRegistered) {
-    return executeWithdrawAllERC20(ethSigner, starkPublicKey, assetType.asset_type, config.immutableXConfig);
+  if (!v3Balance.isZero() && !v3Balance.isNegative()) {
+    const isRegistered = await isRegisteredOnChain(
+      starkPublicKey,
+      ethSigner,
+      config,
+    );
+    if (isRegistered) {
+      return executeWithdrawAllERC20(ethSigner, starkPublicKey, assetType.asset_type, config.immutableXConfig);
+    }
+    return executeRegisterAndWithdrawAllERC20(
+      ethSigner,
+      starkSigner,
+      starkPublicKey,
+      assetType.asset_type,
+      config.immutableXConfig,
+    );
   }
-  return executeRegisterAndWithdrawAllERC20(
-    ethSigner,
-    starkSigner,
-    starkPublicKey,
-    assetType.asset_type,
-    config.immutableXConfig,
-  );
+
+  if (!v4Balance.isZero() && !v4Balance.isNegative()) {
+    return executeWithdrawERC20(ethSigner, starkPublicKey, assetType.asset_type, config.immutableXConfig);
+  }
+
+  throw new Error('No balance to withdraw');
 }
