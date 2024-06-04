@@ -538,6 +538,9 @@ export function SwapForm({ data, theme }: SwapFromProps) {
   };
 
   const onFromTextInputChange = (value) => {
+    if (value === fromAmount) {
+      return;
+    }
     resetFormErrors();
     resetQuote();
     setToAmount('');
@@ -595,6 +598,9 @@ export function SwapForm({ data, theme }: SwapFromProps) {
   };
 
   const onToTextInputChange = (value) => {
+    if (value === toAmount) {
+      return;
+    }
     resetFormErrors();
     resetQuote();
     setFromFiatValue('');

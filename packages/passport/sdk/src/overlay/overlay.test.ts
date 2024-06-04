@@ -1,4 +1,4 @@
-import Overlay from './overlay';
+import Overlay from './index';
 
 describe('overlay', () => {
   beforeEach(() => {
