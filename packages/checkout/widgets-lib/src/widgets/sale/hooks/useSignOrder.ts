@@ -170,7 +170,7 @@ export const useSignOrder = (input: SignOrderInput) => {
     transactions: [],
   });
   const [tokenIds, setTokenIds] = useState<string[]>([]);
-  const [currentTransactionNumber, setCurrentTransactionNumber] = useState<number>(0);
+  const [currentTransactionIndex, setCurrentTransactionIndex] = useState<number>(0);
 
   const setExecuteTransactions = (transaction: ExecutedTransaction) => {
     setExecuteResponse((prev) => ({
@@ -396,7 +396,7 @@ export const useSignOrder = (input: SignOrderInput) => {
       }
       (successful ? setExecuteDone : setExecuteFailed)();
     } else {
-      setCurrentTransactionNumber(0);
+      setCurrentTransactionIndex(0);
     }
 
     return executeResponse.transactions;
@@ -408,10 +408,10 @@ export const useSignOrder = (input: SignOrderInput) => {
   ): Promise<boolean> => {
     if (
       !signResponse
-      || currentTransactionNumber >= signResponse.transactions.length
+      || currentTransactionIndex >= signResponse.transactions.length
     ) return false;
 
-    const transaction = signResponse.transactions[currentTransactionNumber];
+    const transaction = signResponse.transactions[currentTransactionIndex];
     const success = await executeTransaction(
       transaction,
       onTxnSuccess,
@@ -419,7 +419,7 @@ export const useSignOrder = (input: SignOrderInput) => {
     );
 
     if (success) {
-      setCurrentTransactionNumber((prev) => prev + 1);
+      setCurrentTransactionIndex((prev) => prev + 1);
     }
 
     return success;
@@ -433,6 +433,6 @@ export const useSignOrder = (input: SignOrderInput) => {
     executeResponse,
     tokenIds,
     executeNextTransaction,
-    currentTransactionNumber,
+    currentTransactionIndex,
   };
 };
