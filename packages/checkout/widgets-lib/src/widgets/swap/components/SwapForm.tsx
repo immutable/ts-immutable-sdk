@@ -518,7 +518,7 @@ export function SwapForm({ data, theme }: SwapFromProps) {
       fromToken.symbol,
       cryptoFiatState.conversions,
     ));
-  }, [fromAmount, fromToken]);
+  }, [fromAmount, fromToken, cryptoFiatState.conversions]);
 
   const onFromSelectChange = useCallback((value: OptionKey) => {
     const selected = tokenBalances
