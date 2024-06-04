@@ -48,7 +48,9 @@ const getBlockedContents = () => `
         margin: 0 !important;
       "
     >
-      Please adjust your browser settings <br />and try again below
+      Please try again below.<br />
+      If the problem continues, adjust your<br />
+      browser settings.
     </p>
   `;
 

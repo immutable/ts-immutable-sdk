@@ -81,4 +81,10 @@ export class MintingBackendModule {
   }
 }
 
-process.on('uncaughtExceptionMonitor', trackUncaughtException);
+if (typeof process !== 'undefined' && process.on) {
+  try {
+    process.on('uncaughtExceptionMonitor', trackUncaughtException);
+  } catch {
+    // ignore
+  }
+}
