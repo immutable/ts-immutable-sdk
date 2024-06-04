@@ -3,30 +3,34 @@ import {
   useEffect,
   useState,
 } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useHandover } from '../../lib/hooks/useHandover';
 
 type GeoblockLoaderParams = {
   widget: React.ReactNode;
   serviceUnavailableView: React.ReactNode;
-  loadingView: React.ReactNode;
   checkout: Checkout,
 };
 
 export function GeoblockLoader({
   widget,
   serviceUnavailableView,
-  loadingView,
   checkout,
 }: GeoblockLoaderParams) {
-  const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
+  const { showLoader, hideLoader, isLoading } = useHandover();
+  const [requested, setRequested] = useState(false);
   const [available, setAvailable] = useState(false);
 
   useEffect(() => {
     (async () => {
       try {
+        showLoader({ text: t('views.LOADING_VIEW.text') });
+        setRequested(true);
         setAvailable(await checkout.isSwapAvailable());
-        setLoading(false);
+        hideLoader();
       } catch {
-        setLoading(false);
+        hideLoader();
         setAvailable(false);
       }
     })();
@@ -36,11 +40,9 @@ export function GeoblockLoader({
     // eslint-disable-next-line react/jsx-no-useless-fragment
     <>
       {
-        // eslint-disable-next-line no-nested-ternary
-        loading ? loadingView
-          : available
-            ? widget
-            : serviceUnavailableView
+        requested && !isLoading && (available
+          ? widget
+          : serviceUnavailableView)
       }
     </>
   );

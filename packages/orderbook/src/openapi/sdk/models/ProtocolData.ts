@@ -4,7 +4,7 @@
 
 export type ProtocolData = {
   /**
-   * Seaport order type
+   * Seaport order type. Orders containing ERC721 tokens will need to pass in the order type as FULL_RESTRICTED while orders with ERC1155 tokens will need to pass in the order_type as PARTIAL_RESTRICTED
    */
   order_type: ProtocolData.order_type;
   /**
@@ -28,7 +28,7 @@ export type ProtocolData = {
 export namespace ProtocolData {
 
   /**
-   * Seaport order type
+   * Seaport order type. Orders containing ERC721 tokens will need to pass in the order type as FULL_RESTRICTED while orders with ERC1155 tokens will need to pass in the order_type as PARTIAL_RESTRICTED
    */
   export enum order_type {
     FULL_RESTRICTED = 'FULL_RESTRICTED',

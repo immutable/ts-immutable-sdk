@@ -1,5 +1,5 @@
-import { init } from './init';
+import { handle } from './init';
 
 export {
-  init,
+  handle,
 };
