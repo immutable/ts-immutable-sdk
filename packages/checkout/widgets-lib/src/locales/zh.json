@@ -230,7 +230,7 @@
     },
     "TOP_UP_VIEW": {
       "header": {
-        "title": "您想如何添加代币？"
+        "title": "你想如何添加代币？"
       },
       "topUpOptions": {
         "onramp": {
@@ -252,8 +252,8 @@
           "disabledCaption": ""
         },
         "advanced": {
-          "heading": "高级选项",
-          "caption": "进行快速桥接或CEX存款。",
+          "heading": "从另一个网络桥接代币",
+          "caption": "多种网络和CEX选项可用",
           "subcaption": "费用",
           "disabledCaption": ""
         }

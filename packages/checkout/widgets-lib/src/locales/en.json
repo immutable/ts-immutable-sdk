@@ -231,7 +231,7 @@
     },
     "TOP_UP_VIEW": {
       "header": {
-        "title": "How would you like to add coins?"
+        "title": "How would you like to add tokens?"
       },
       "topUpOptions": {
         "onramp": {
@@ -253,8 +253,8 @@
           "disabledCaption": ""
         },
         "advanced": {
-          "heading": "Advanced options",
-          "caption": "Perform a fast bridge or CEX deposit.",
+          "heading": "Bridge tokens from another network",
+          "caption": "Multiple network and CEX options available",
           "subcaption": "Fees ",
           "disabledCaption": ""
         }

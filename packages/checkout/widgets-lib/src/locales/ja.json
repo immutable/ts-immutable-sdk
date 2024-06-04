@@ -237,7 +237,7 @@
     },
     "TOP_UP_VIEW": {
       "header": {
-        "title": "コインを追加する方法は？"
+        "title": "どのようにトークンを追加しますか？"
       },
       "topUpOptions": {
         "onramp": {
@@ -259,8 +259,8 @@
           "disabledCaption": ""
         },
         "advanced": {
-          "heading": "高度なオプション",
-          "caption": "迅速なブリッジまたはCEX入金を実行します。",
+          "heading": "他のネットワークからトークンをブリッジする",
+          "caption": "複数のネットワークとCEXのオプションが利用可能",
           "subcaption": "手数料",
           "disabledCaption": ""
         }

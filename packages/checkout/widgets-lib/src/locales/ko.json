@@ -230,7 +230,7 @@
     },
     "TOP_UP_VIEW": {
       "header": {
-        "title": "코인을 어떻게 추가하시겠습니까?"
+        "title": "토큰을 어떻게 추가하시겠습니까?"
       },
       "topUpOptions": {
         "onramp": {
@@ -252,8 +252,8 @@
           "disabledCaption": ""
         },
         "advanced": {
-          "heading": "고급 옵션",
-          "caption": "빠른 브릿지 또는 CEX 입금을 수행합니다.",
+          "heading": "다른 네트워크에서 토큰 브리지",
+          "caption": "여러 네트워크 및 CEX 옵션 사용 가능",
           "subcaption": "수수료",
           "disabledCaption": ""
         }
