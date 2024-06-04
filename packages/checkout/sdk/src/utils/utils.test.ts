@@ -1,5 +1,5 @@
 import { ChainId } from '../types';
-import { isMatchingAddress, isZkEvmChainId } from './utils';
+import { formatTokenAmount, isMatchingAddress, isZkEvmChainId } from './utils';
 
 describe('utils', () => {
   it('should return true if addresses are the same', () => {
@@ -36,6 +36,22 @@ describe('utils', () => {
     it('should return false if not zkEVM chain', () => {
       const chainId = isZkEvmChainId(ChainId.SEPOLIA);
       expect(chainId).toBeFalsy();
+    });
+  });
+
+  describe('formatTokenAmount', () => {
+    const formatTokenAmountPatterns = [
+      { amount: '0.1234567', expected: '0.123457' },
+      { amount: '0.1234561', expected: '0.123457' },
+      { amount: '0.1234560', expected: '0.123456' },
+      { amount: '0.1234', expected: '0.123400' },
+      { amount: '120.100001', expected: '120.100001' },
+      { amount: '120.1000011', expected: '120.100002' },
+      { amount: '120.1000019', expected: '120.100002' },
+      { amount: '120.10000101', expected: '120.100002' },
+    ];
+    it.each(formatTokenAmountPatterns)('.formatTokenAmount($amount)', ({ amount, expected }) => {
+      expect(formatTokenAmount(amount)).toEqual(expected);
     });
   });
 });
