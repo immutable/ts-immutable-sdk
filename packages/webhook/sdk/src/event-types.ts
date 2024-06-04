@@ -1,14 +1,24 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+
+export interface BlockChainMetadata {
+  log_index: string;
+  block_number: string;
+  transaction_hash: string;
+  transaction_index: string;
+}
+
+export interface Chain {
+  id: string;
+  name: string;
+}
+
 export interface ZkevmActivityMint {
   event_name: 'imtbl_zkevm_activity_mint';
   event_id: string;
   chain: string;
   data: {
     id: string;
-    chain: {
-      id: string;
-      name: string;
-    };
+    chain: Chain;
     details: {
       to: string;
       asset: {
@@ -20,12 +30,7 @@ export interface ZkevmActivityMint {
     };
     indexed_at: string;
     activity_type: string;
-    blockchain_metadata: {
-      log_index: string;
-      block_number: string;
-      transaction_hash: string;
-      transaction_index: string;
-    };
+    blockchain_metadata: BlockChainMetadata;
   };
 }
 
@@ -35,10 +40,7 @@ export interface ZkevmActivityBurn {
   chain: string;
   data: {
     id: string;
-    chain: {
-      id: string;
-      name: string;
-    };
+    chain: Chain;
     details: {
       from: string;
       asset: {
@@ -50,12 +52,7 @@ export interface ZkevmActivityBurn {
     };
     indexed_at: string;
     activity_type: string;
-    blockchain_metadata: {
-      log_index: string;
-      block_number: string;
-      transaction_hash: string;
-      transaction_index: string;
-    };
+    blockchain_metadata: BlockChainMetadata;
   };
 }
 
@@ -65,10 +62,7 @@ export interface ZkevmActivityTransfer {
   chain: string;
   data: {
     id: string;
-    chain: {
-      id: string;
-      name: string;
-    };
+    chain: Chain;
     details: {
       to: string;
       from: string;
@@ -81,12 +75,7 @@ export interface ZkevmActivityTransfer {
     };
     indexed_at: string;
     activity_type: string;
-    blockchain_metadata: {
-      log_index: string;
-      block_number: string;
-      transaction_hash: string;
-      transaction_index: string;
-    };
+    blockchain_metadata: BlockChainMetadata;
   };
 }
 
@@ -96,10 +85,7 @@ export interface ZkevmActivitySale {
   chain: string;
   data: {
     id: string;
-    chain: {
-      id: string;
-      name: string;
-    };
+    chain: Chain;
     details: {
       to: string;
       from: string;
@@ -127,12 +113,7 @@ export interface ZkevmActivitySale {
     };
     indexed_at: string;
     activity_type: string;
-    blockchain_metadata: {
-      log_index: string;
-      block_number: string;
-      transaction_hash: string;
-      transaction_index: string;
-    };
+    blockchain_metadata: BlockChainMetadata;
   };
 }
 
@@ -142,10 +123,7 @@ export interface ZkevmActivityDeposit {
   chain: string;
   data: {
     id: string;
-    chain: {
-      id: string;
-      name: string;
-    };
+    chain: Chain;
     details: {
       amount: string;
       asset: {
@@ -156,12 +134,7 @@ export interface ZkevmActivityDeposit {
     };
     indexed_at: string;
     activity_type: string;
-    blockchain_metadata: {
-      log_index: string;
-      block_number: string;
-      transaction_hash: string;
-      transaction_index: string;
-    };
+    blockchain_metadata: BlockChainMetadata;
   };
 }
 
@@ -171,10 +144,7 @@ export interface ZkevmActivityWithdrawal {
   chain: string;
   data: {
     id: string;
-    chain: {
-      id: string;
-      name: string;
-    };
+    chain: Chain;
     details: {
       amount: string;
       asset: {
@@ -185,12 +155,7 @@ export interface ZkevmActivityWithdrawal {
     };
     indexed_at: string;
     activity_type: string;
-    blockchain_metadata: {
-      log_index: string;
-      block_number: string;
-      transaction_hash: string;
-      transaction_index: string;
-    };
+    blockchain_metadata: BlockChainMetadata;
   };
 }
 
@@ -199,10 +164,7 @@ export interface ZkevmCollectionUpdated {
   event_id: string;
   chain: string;
   data: {
-    chain: {
-      id: string;
-      name: string;
-    };
+    chain: Chain;
     contract_address: string;
     indexed_at: string;
     updated_at: string;
@@ -224,10 +186,7 @@ export interface ZkevmNftUpdated {
   event_id: string;
   chain: string;
   data: {
-    chain: {
-      id: string;
-      name: string;
-    };
+    chain: Chain;
     contract_address: string;
     indexed_at: string;
     metadata_synced_at: string | null;
@@ -241,10 +200,7 @@ export interface ZkevmMintRequestUpdated {
   event_id: string;
   chain: string;
   data: {
-    chain: {
-      id: string;
-      name: string;
-    };
+    chain: Chain;
     contract_address: string;
     owner_address: string;
     reference_id: string;
@@ -265,10 +221,7 @@ export interface ZkevmMetadataUpdated {
   chain: string;
   data: {
     id: string;
-    chain: {
-      id: string;
-      name: string;
-    };
+    chain: Chain;
     contract_address: string;
     image: string | null;
     external_url: string | null;
@@ -290,10 +243,7 @@ export interface ZkevmTokenUpdated {
   event_id: string;
   chain: string;
   data: {
-    chain: {
-      id: string;
-      name: string;
-    };
+    chain: Chain;
     contract_address: string;
     indexed_at: string;
     updated_at: string;
