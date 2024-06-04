@@ -1,9 +1,10 @@
-import { Box, MenuItem } from '@biom3/react';
+import { Box, MenuItem, IconProps } from '@biom3/react';
 import { ReactNode } from 'react';
 
 export interface TopUpMenuItemProps {
   testId: string;
   icon: 'Wallet' | 'Coins' | 'Minting';
+  iconVariant?: IconProps['variant'];
   heading: string;
   caption: string;
   onClick: () => void;
@@ -12,7 +13,7 @@ export interface TopUpMenuItemProps {
 }
 
 export function TopUpMenuItem({
-  testId, icon, heading, caption, onClick, renderFeeFunction, isDisabled,
+  testId, icon, iconVariant, heading, caption, onClick, renderFeeFunction, isDisabled,
 }: TopUpMenuItemProps) {
   return (
     <Box testId="top-up-view" sx={{ paddingY: '1px' }}>
@@ -25,6 +26,7 @@ export function TopUpMenuItem({
       >
         <MenuItem.Icon
           icon={icon}
+          variant={iconVariant}
         />
         <MenuItem.Label size="medium">
           {heading}

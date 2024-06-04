@@ -291,6 +291,16 @@ export function TopUpView({
       isEnabled: showOnrampOption,
     },
     {
+      testId: 'advanced',
+      icon: 'Minting',
+      iconVariant: 'bold',
+      textConfigKey: 'views.TOP_UP_VIEW.topUpOptions.advanced',
+      onClickEvent: onClickAdvancedOptions,
+      fee: () => renderFees(''),
+      isAvailable: true,
+      isEnabled: true,
+    },
+    {
       testId: 'swap',
       icon: 'Swap',
       textConfigKey: 'views.TOP_UP_VIEW.topUpOptions.swap',
@@ -305,7 +315,7 @@ export function TopUpView({
     },
     {
       testId: 'bridge',
-      icon: 'Minting',
+      icon: 'ArrowForward',
       textConfigKey: 'views.TOP_UP_VIEW.topUpOptions.bridge',
       onClickEvent: onClickBridge,
       fee: () => renderFees(
@@ -315,15 +325,6 @@ export function TopUpView({
       ),
       isAvailable: true,
       isEnabled: showBridgeOption,
-    },
-    {
-      testId: 'advanced',
-      icon: 'JumpTo',
-      textConfigKey: 'views.TOP_UP_VIEW.topUpOptions.advanced',
-      onClickEvent: onClickAdvancedOptions,
-      fee: () => renderFees(''),
-      isAvailable: true,
-      isEnabled: true,
     },
   ];
 
