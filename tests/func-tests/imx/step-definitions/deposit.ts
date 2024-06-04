@@ -80,6 +80,13 @@ export class DepositEth {
     assert.ok(parseEther(response.balance!).gte(parseEther(amount)));
   }
 
+  // check the banker's ETH balance on L1
+  public async checkBankerL1EthBalance(amount: string) {
+    const banker = await this.stepSharedState.getBanker();
+    const onChainBalance = await banker.ethSigner.getBalance();
+    assert.ok(onChainBalance.gte(parseEther(amount)));
+  }
+
   // @then(
   //   'banker should have balance {string} increased by {string} eth',
   //   undefined,
