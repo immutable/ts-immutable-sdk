@@ -240,14 +240,14 @@
           "disabledCaption": ""
         },
         "swap": {
-          "heading": "스왑",
-          "caption": "내 잔액에 있는 코인으로.",
+          "heading": "이 네트워크에서 토큰 교환",
+          "caption": "불변 zkEVM 전용",
           "subcaption": "수수료",
           "disabledCaption": "귀하의 지역에서 사용할 수 없음"
         },
         "bridge": {
-          "heading": "이동",
-          "caption": "다른 지갑이나 네트워크에 있는 내 코인.",
+          "heading": "다른 지갑에서 토큰을 전송",
+          "caption": "불변 zkEVM 전용",
           "subcaption": "수수료",
           "disabledCaption": ""
         },

@@ -241,14 +241,14 @@
           "disabledCaption": ""
         },
         "swap": {
-          "heading": "Swap",
-          "caption": "With the coins I have in my balance.",
+          "heading": "Swap tokens on this network",
+          "caption": "Immutable zkEVM only",
           "subcaption": "Fees",
           "disabledCaption": "Not available in your region"
         },
         "bridge": {
-          "heading": "Move",
-          "caption": "The coins I have in another wallet or network.",
+          "heading": "Transfer tokens from another wallet",
+          "caption": "Immutable zkEVM only",
           "subcaption": "Fees ",
           "disabledCaption": ""
         },

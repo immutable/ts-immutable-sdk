@@ -247,14 +247,14 @@
           "disabledCaption": ""
         },
         "swap": {
-          "heading": "交換",
-          "caption": "私の残高にあるコインで。",
+          "heading": "このネットワークでトークンをスワップ",
+          "caption": "イミュータブル zkEVM のみ",
           "subcaption": "手数料",
           "disabledCaption": "お住まいの地域では利用できません"
         },
         "bridge": {
-          "heading": "移動",
-          "caption": "別のウォレットやネットワークにある私のコイン。",
+          "heading": "他のウォレットからトークンを送金する",
+          "caption": "イミュータブル zkEVM のみ",
           "subcaption": "手数料",
           "disabledCaption": ""
         },

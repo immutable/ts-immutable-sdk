@@ -240,14 +240,14 @@
           "disabledCaption": ""
         },
         "swap": {
-          "heading": "兑换",
-          "caption": "使用我在余额中的代币。",
+          "heading": "在此网络上交换代币",
+          "caption": "仅限不可变 zkEVM",
           "subcaption": "费用",
           "disabledCaption": "您所在的地区不可用"
         },
         "bridge": {
-          "heading": "转移",
-          "caption": "我在其他钱包或网络中的代币。",
+          "heading": "从另一个钱包转移代币",
+          "caption": "仅限不可变 zkEVM",
           "subcaption": "费用",
           "disabledCaption": ""
         },
