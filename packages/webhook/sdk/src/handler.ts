@@ -1,12 +1,12 @@
 import MessageValidator from 'sns-validator';
 import { Environment } from '@imtbl/config';
+import { imx } from '@imtbl/generated-clients';
 import {
   ZkevmActivityBurn, ZkevmActivityDeposit, ZkevmActivityMint, ZkevmActivitySale,
   ZkevmActivityTransfer, ZkevmActivityWithdrawal, ZkevmCollectionUpdated, ZkevmMetadataUpdated,
   ZkevmMintRequestUpdated, ZkevmNftUpdated, ZkevmOrderUpdated, ZkevmTokenUpdated,
   ZkevmTradeCreated
-} from 'event-types';
-import { imx } from '@imtbl/generated-clients';
+} from './event-types';
 
 const validator = new MessageValidator();
 
