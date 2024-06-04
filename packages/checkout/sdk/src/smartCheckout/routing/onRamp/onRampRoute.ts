@@ -7,7 +7,7 @@ import {
 import { BalanceERC20Requirement, BalanceNativeRequirement, BalanceRequirement } from '../../balanceCheck/types';
 import { allowListCheckForOnRamp } from '../../allowList';
 import { isNativeToken } from '../../../tokens';
-import { isMatchingAddress } from '../../../utils/utils';
+import { formatSmartCheckoutAmount, isMatchingAddress } from '../../../utils/utils';
 
 export const onRampRoute = async (
   config: CheckoutConfiguration,
@@ -42,7 +42,7 @@ export const onRampRoute = async (
       type: isNativeToken(required.token.address) ? ItemType.NATIVE : ItemType.ERC20,
       fundsRequired: {
         amount: delta.balance,
-        formattedAmount: delta.formattedBalance,
+        formattedAmount: formatSmartCheckoutAmount(delta.formattedBalance),
       },
       userBalance: {
         balance: current.balance,
