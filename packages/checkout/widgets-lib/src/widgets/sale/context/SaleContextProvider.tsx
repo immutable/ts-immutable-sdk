@@ -58,7 +58,8 @@ type SaleContextValues = SaleContextProps & {
   execute: (
     signResponse: SignResponse | undefined,
     onTxnSuccess: (txn: ExecutedTransaction) => void,
-    onTxnError: (error: any, txns: ExecutedTransaction[]) => void
+    onTxnError: (error: any, txns: ExecutedTransaction[]) => void,
+    isManualExecution: boolean
   ) => Promise<ExecutedTransaction[]>;
   recipientAddress: string;
   recipientEmail: string;
