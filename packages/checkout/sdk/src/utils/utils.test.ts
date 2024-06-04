@@ -1,5 +1,5 @@
 import { ChainId } from '../types';
-import { formatTokenAmount, isMatchingAddress, isZkEvmChainId } from './utils';
+import { formatSmartCheckoutAmount, isMatchingAddress, isZkEvmChainId } from './utils';
 
 describe('utils', () => {
   it('should return true if addresses are the same', () => {
@@ -39,7 +39,7 @@ describe('utils', () => {
     });
   });
 
-  describe('formatTokenAmount', () => {
+  describe('formatSmartCheckoutAmount', () => {
     const formatTokenAmountPatterns = [
       { amount: '0.1234567', expected: '0.123457' },
       { amount: '0.1234561', expected: '0.123457' },
@@ -51,7 +51,7 @@ describe('utils', () => {
       { amount: '120.10000101', expected: '120.100002' },
     ];
     it.each(formatTokenAmountPatterns)('.formatTokenAmount($amount)', ({ amount, expected }) => {
-      expect(formatTokenAmount(amount)).toEqual(expected);
+      expect(formatSmartCheckoutAmount(amount)).toEqual(expected);
     });
   });
 });

@@ -7,6 +7,7 @@ import { NetworkDetails, NetworkMap } from '../types';
 export const ENV_DEVELOPMENT = 'development' as Environment;
 
 export const DEFAULT_TOKEN_DECIMALS = 18;
+export const DEFAULT_TOKEN_FORMATTING_DECIMALS = 6;
 
 export const NATIVE = 'native';
 
