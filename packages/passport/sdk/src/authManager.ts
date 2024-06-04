@@ -30,6 +30,7 @@ import {
   isUserImx,
 } from './types';
 import { PassportConfiguration } from './config';
+import Overlay from './overlay';
 
 const formUrlEncodedHeader = {
   headers: {
@@ -175,18 +176,69 @@ export default class AuthManager {
    */
   public async login(anonymousId?: string): Promise<User> {
     return withPassportError<User>(async () => {
-      const rid = getDetail(Detail.RUNTIME_ID);
-      const popupWindowFeatures = { width: 410, height: 450 };
-      const oidcUser = await this.userManager.signinPopup({
-        extraQueryParams: {
-          ...(this.userManager.settings?.extraQueryParams ?? {}),
-          rid: rid || '',
-          third_party_a_id: anonymousId || '',
-        },
-        popupWindowFeatures,
-      });
+      const popupWindowTarget = 'passportLoginPrompt';
+      const signinPopup = async () => (
+        this.userManager.signinPopup({
+          extraQueryParams: {
+            ...(this.userManager.settings?.extraQueryParams ?? {}),
+            rid: getDetail(Detail.RUNTIME_ID) || '',
+            third_party_a_id: anonymousId || '',
+          },
+          popupWindowFeatures: {
+            width: 410,
+            height: 450,
+          },
+          popupWindowTarget,
+        })
+      );
 
-      return AuthManager.mapOidcUserToDomainModel(oidcUser);
+      // This promise attempts to open the signin popup, and displays the blocked popup overlay if necessary.
+      return new Promise((resolve, reject) => {
+        signinPopup()
+          .then((oidcUser) => {
+            resolve(AuthManager.mapOidcUserToDomainModel(oidcUser));
+          })
+          .catch((error: unknown) => {
+            // Reject with the error if it is not caused by a blocked popup
+            if (!(error instanceof Error) || error.message !== 'Attempted to navigate on a disposed window') {
+              reject(error);
+              return;
+            }
+
+            // Popup was blocked; append the blocked popup overlay to allow the user to try again.
+            let popupHasBeenOpened: boolean = false;
+            const overlay = new Overlay(this.config.popupOverlayOptions, true);
+            overlay.append(
+              async () => {
+                try {
+                  if (!popupHasBeenOpened) {
+                    // The user is attempting to open the popup again. It's safe to assume that this will not fail,
+                    // as there are no async operations between the button interaction & the popup being opened.
+                    popupHasBeenOpened = true;
+                    const oidcUser = await signinPopup();
+                    overlay.remove();
+                    resolve(AuthManager.mapOidcUserToDomainModel(oidcUser));
+                  } else {
+                    // The popup has already been opened. By calling `window.open` with the same target as the
+                    // previously opened popup, no new window will be opened. Instead, the existing popup
+                    // will be focused. This works as expected in most browsers at the time of implementation, but
+                    // the following exceptions do exist:
+                    // - Safari: Only the initial call will focus the window, subsequent calls will do nothing.
+                    // - Firefox: The window will not be focussed, nothing will happen.
+                    window.open('', popupWindowTarget);
+                  }
+                } catch (retryError: unknown) {
+                  overlay.remove();
+                  reject(retryError);
+                }
+              },
+              () => {
+                overlay.remove();
+                reject(new Error('Popup closed by user'));
+              },
+            );
+          });
+      });
     }, PassportErrorType.AUTHENTICATION_ERROR);
   }
 
