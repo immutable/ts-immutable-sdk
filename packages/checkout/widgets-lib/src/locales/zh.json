@@ -230,30 +230,36 @@
     },
     "TOP_UP_VIEW": {
       "header": {
-        "title": "您想如何添加代币？"
+        "title": "你想如何添加代币？"
       },
       "topUpOptions": {
-        "onramp": {
-          "heading": "购买",
-          "caption": "可通过卡、谷歌支付或苹果支付。",
+        "debit": {
+          "heading": "用借记卡购买",
+          "caption": "推荐的购买代币方法",
+          "subcaption": "费用",
+          "disabledCaption": ""
+        },
+        "credit": {
+          "heading": "用信用卡购买",
+          "caption": "由于失败和费用，不推荐使用",
           "subcaption": "费用",
           "disabledCaption": ""
         },
         "swap": {
-          "heading": "兑换",
-          "caption": "使用我在余额中的代币。",
+          "heading": "在此网络上交换代币",
+          "caption": "仅限不可变 zkEVM",
           "subcaption": "费用",
           "disabledCaption": "您所在的地区不可用"
         },
         "bridge": {
-          "heading": "转移",
-          "caption": "我在其他钱包或网络中的代币。",
+          "heading": "从另一个钱包转移代币",
+          "caption": "仅限不可变 zkEVM",
           "subcaption": "费用",
           "disabledCaption": ""
         },
         "advanced": {
-          "heading": "高级选项",
-          "caption": "进行快速桥接或CEX存款。",
+          "heading": "从另一个网络桥接代币",
+          "caption": "多种网络和CEX选项可用",
           "subcaption": "费用",
           "disabledCaption": ""
         }
@@ -321,7 +327,7 @@
         }
       },
       "topUp": {
-        "heading": "您需要添加一些硬币",
+        "heading": "你需要添加一些代币",
         "subheading": {
           "both": "添加{{erc20.value}} {{erc20.symbol}}和{{native.value}} {{native.symbol}}以支付本次购买及燃气费。",
           "erc20": "通过以下选项之一将{{erc20.value}} {{erc20.symbol}}添加到您的余额。",

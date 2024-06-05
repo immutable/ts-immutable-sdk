@@ -237,30 +237,36 @@
     },
     "TOP_UP_VIEW": {
       "header": {
-        "title": "コインを追加する方法は？"
+        "title": "どのようにトークンを追加しますか？"
       },
       "topUpOptions": {
-        "onramp": {
-          "heading": "購入",
-          "caption": "カード、Googleペイ、またはAppleペイが利用可能。",
+        "debit": {
+          "heading": "デビットカードで購入",
+          "caption": "トークンを購入する推奨方法",
+          "subcaption": "手数料",
+          "disabledCaption": ""
+        },
+        "credit": {
+          "heading": "クレジットカードで購入",
+          "caption": "失敗や手数料のためおすすめできません",
           "subcaption": "手数料",
           "disabledCaption": ""
         },
         "swap": {
-          "heading": "交換",
-          "caption": "私の残高にあるコインで。",
+          "heading": "このネットワークでトークンをスワップ",
+          "caption": "イミュータブル zkEVM のみ",
           "subcaption": "手数料",
           "disabledCaption": "お住まいの地域では利用できません"
         },
         "bridge": {
-          "heading": "移動",
-          "caption": "別のウォレットやネットワークにある私のコイン。",
+          "heading": "他のウォレットからトークンを送金する",
+          "caption": "イミュータブル zkEVM のみ",
           "subcaption": "手数料",
           "disabledCaption": ""
         },
         "advanced": {
-          "heading": "高度なオプション",
-          "caption": "迅速なブリッジまたはCEX入金を実行します。",
+          "heading": "他のネットワークからトークンをブリッジする",
+          "caption": "複数のネットワークとCEXのオプションが利用可能",
           "subcaption": "手数料",
           "disabledCaption": ""
         }
@@ -328,7 +334,7 @@
         }
       },
       "topUp": {
-        "heading": "残高が不足しています",
+        "heading": "トークンを追加する必要があります",
         "subheading": {
           "both": "この購入とガスをカバーするために{{erc20.value}} {{erc20.symbol}}と{{native.value}} {{native.symbol}}を追加する必要があります。",
           "erc20": "残高が不足しているため、{{erc20.value}} {{erc20.symbol}}を追加する必要があります。",
