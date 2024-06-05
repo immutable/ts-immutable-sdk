@@ -16,7 +16,7 @@ export function PayWithCoins() {
     sendSuccessEvent,
   } = useSaleEvent();
   const {
-    execute, signResponse, executeResponse, signTokenIds,
+    executeAll, signResponse, executeResponse, signTokenIds,
   } = useSaleContext();
   const executedTxns = executeResponse?.transactions.length || 0;
 
@@ -35,7 +35,7 @@ export function PayWithCoins() {
   }
 
   const sendTransaction = async () => {
-    execute(
+    executeAll(
       signResponse,
       (txn) => {
         sendTransactionSuccessEvent(txn); // not an analytics event
@@ -44,7 +44,6 @@ export function PayWithCoins() {
         const details = { transactionId: signResponse?.transactionId };
         sendFailedEvent(error.toString(), error, txns, undefined, details); // checkoutPrimarySalePaymentMethods_FailEventFailed
       },
-      false,
     );
   };
 
