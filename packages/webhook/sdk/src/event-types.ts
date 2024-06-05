@@ -209,9 +209,13 @@ export interface ZkevmMintRequestUpdated {
     status: string;
     transaction_hash: string | null;
     activity_id: string | null;
-    error: string | null;
+    error: {
+      code: string;
+      message: string;
+    } | null;
     created_at: string;
     updated_at: string;
+    amount?: number;
   };
 }
 

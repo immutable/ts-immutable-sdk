@@ -15,6 +15,29 @@ const allowedTopicArnPrefix = {
   [Environment.SANDBOX]: 'arn:aws:sns:us-east-2:783421985614:'
 };
 
+export type WebhookHandlers = {
+  zkevmMintRequestUpdated?: (event: ZkevmMintRequestUpdated) => Promise<void>;
+  zkEvmActivityMint?: (event: ZkevmActivityMint) => Promise<void>;
+  zkEvmActivityBurn?: (event: ZkevmActivityBurn) => Promise<void>;
+  zkEvmActivityTransfer?: (event: ZkevmActivityTransfer) => Promise<void>;
+  zkEvmActivitySale?: (event: ZkevmActivitySale) => Promise<void>;
+  zkEvmActivityDeposit?: (event: ZkevmActivityDeposit) => Promise<void>;
+  zkEvmActivityWithdrawal?: (event: ZkevmActivityWithdrawal) => Promise<void>;
+  zkEvmCollectionUpdated?: (event: ZkevmCollectionUpdated) => Promise<void>;
+  zkEvmNftUpdated?: (event: ZkevmNftUpdated) => Promise<void>;
+  zkEvmMetadataUpdated?: (event: ZkevmMetadataUpdated) => Promise<void>;
+  zkEvmTokenUpdated?: (event: ZkevmTokenUpdated) => Promise<void>;
+  zkEvmOrderUpdated?: (event: ZkevmOrderUpdated) => Promise<void>;
+  zkEvmTradeCreated?: (event: ZkevmTradeCreated) => Promise<void>;
+  xNftCreated?: (event: imx.Asset) => Promise<void>;
+  xNftUpdated?: (event: imx.Asset) => Promise<void>;
+  xOrderAccepted?: (event: imx.OrderV3) => Promise<void>;
+  xOrderFilled?: (event: imx.OrderV3) => Promise<void>;
+  xOrderCancelled?: (event: imx.OrderV3) => Promise<void>;
+  xTransferCreated?: (event: imx.Transfer) => Promise<void>;
+  all?: (event: any) => Promise<void>;
+};
+
 /**
  * handle will validate webhook message origin and verify signature of the message and calls corresponding handlers passed in.
  * @param body The request body to a webhook endpoint in json string or js object form.
@@ -25,28 +48,7 @@ const allowedTopicArnPrefix = {
 export const handle = async (
   body: string | Record<string, unknown>,
   env: Environment,
-  handlers?: {
-    zkevmMintRequestUpdated?: (event: ZkevmMintRequestUpdated) => Promise<void>;
-    zkEvmActivityMint?: (event: ZkevmActivityMint) => Promise<void>;
-    zkEvmActivityBurn?: (event: ZkevmActivityBurn) => Promise<void>;
-    zkEvmActivityTransfer?: (event: ZkevmActivityTransfer) => Promise<void>;
-    zkEvmActivitySale?: (event: ZkevmActivitySale) => Promise<void>;
-    zkEvmActivityDeposit?: (event: ZkevmActivityDeposit) => Promise<void>;
-    zkEvmActivityWithdrawal?: (event: ZkevmActivityWithdrawal) => Promise<void>;
-    zkEvmCollectionUpdated?: (event: ZkevmCollectionUpdated) => Promise<void>;
-    zkEvmNftUpdated?: (event: ZkevmNftUpdated) => Promise<void>;
-    zkEvmMetadataUpdated?: (event: ZkevmMetadataUpdated) => Promise<void>;
-    zkEvmTokenUpdated?: (event: ZkevmTokenUpdated) => Promise<void>;
-    zkEvmOrderUpdated?: (event: ZkevmOrderUpdated) => Promise<void>;
-    zkEvmTradeCreated?: (event: ZkevmTradeCreated) => Promise<void>;
-    xNftCreated?: (event: imx.Asset) => Promise<void>;
-    xNftUpdated?: (event: imx.Asset) => Promise<void>;
-    xOrderAccepted?: (event: imx.OrderV3) => Promise<void>;
-    xOrderFilled?: (event: imx.OrderV3) => Promise<void>;
-    xOrderCancelled?: (event: imx.OrderV3) => Promise<void>;
-    xTransferCreated?: (event: imx.Transfer) => Promise<void>;
-    all?: (event: any) => Promise<void>;
-  }
+  handlers?: WebhookHandlers
 ) => {
   const msg: any = await new Promise((resolve, reject) => {
     validator.validate(body, (err, message: any) => {
