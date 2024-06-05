@@ -13,7 +13,7 @@ import { ProviderConfiguration } from '../../config';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 import { isRegisteredOnChain } from '../registration';
 import { validateChain } from '../helpers';
-import { getWithdrawalBalances } from './getWithdrawalBalance';
+import { getWithdrawalBalancesERC721 } from './getWithdrawalBalance';
 
 interface MintableERC721Withdrawal {
   type: 'ERC721';
@@ -255,11 +255,10 @@ export async function completeERC721WithdrawalAction({
 }: CompleteERC721WithdrawalActionParams, mintsApi: MintsApi) {
   await validateChain(ethSigner, config.immutableXConfig);
   const ethAddress = await ethSigner.getAddress();
-
   const {
     v3Balance,
     v4Balance,
-  } = await getWithdrawalBalances(
+  } = await getWithdrawalBalancesERC721(
     ethSigner,
     starkPublicKey,
     ethAddress,
@@ -269,15 +268,14 @@ export async function completeERC721WithdrawalAction({
       tokenId: token.tokenId,
     },
     config.immutableXConfig,
+    mintsApi,
   );
-
   if (!v3Balance.isZero() && !v3Balance.isNegative()) {
     const isRegistered = await isRegisteredOnChain(
       starkPublicKey,
       ethSigner,
       config,
     );
-
     // if the user is already registered on-chain, we can withdraw using stark key as the owner key
     if (isRegistered) {
       return completeERC721Withdrawal(mintsApi, ethSigner, starkPublicKey, token, config.immutableXConfig);
