@@ -17,7 +17,7 @@ import { BalanceCheckResult, BalanceRequirement } from '../../balanceCheck/types
 import { TokenBalanceResult } from '../types';
 import { quoteFetcher } from './quoteFetcher';
 import { isNativeToken } from '../../../tokens';
-import { isMatchingAddress } from '../../../utils/utils';
+import { formatSmartCheckoutAmount, isMatchingAddress } from '../../../utils/utils';
 
 const constructFees = (
   approvalGasFee: Amount | null | undefined,
@@ -105,10 +105,10 @@ export const constructSwapRoute = (
       type,
       fundsRequired: {
         amount: fundsRequired,
-        formattedAmount: utils.formatUnits(
+        formattedAmount: formatSmartCheckoutAmount(utils.formatUnits(
           fundsRequired,
           userBalance.token.decimals,
-        ),
+        )),
       },
       userBalance: {
         balance: userBalance.balance,
