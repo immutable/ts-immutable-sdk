@@ -9,21 +9,19 @@ export const isZkEvmChainId = (chainId: ChainId) => chainId === ChainId.IMTBL_ZK
   || chainId === ChainId.IMTBL_ZKEVM_TESTNET
   || chainId === ChainId.IMTBL_ZKEVM_MAINNET;
 
-const trimRoundUpDecimals = (s: string, numDecimals: number): string => {
+const trimRoundUpDecimals = (s: string, maxDecimals: number): string => {
   const pointIndex = s.indexOf('.');
-  const extraDecimals = s.substring(pointIndex + numDecimals + 1);
-  if (extraDecimals && parseInt(extraDecimals, 10) >= 1) {
-    const trimmedDecimals = s.substring(0, pointIndex + numDecimals + 1);
-    const increment = 1 / (10 ** numDecimals);
-    return (parseFloat(trimmedDecimals) + increment).toFixed(numDecimals);
+  const extraDecimals = s.substring(pointIndex + maxDecimals + 1);
+  if (extraDecimals && parseFloat(extraDecimals) >= 1) {
+    const trimmedDecimals = s.substring(0, pointIndex + maxDecimals + 1);
+    const increment = 1 / (10 ** maxDecimals);
+    return (parseFloat(trimmedDecimals) + increment).toString();
   }
-  return parseFloat(s.substring(0, pointIndex + numDecimals + 1)).toFixed(numDecimals);
+  return parseFloat(s.substring(0, pointIndex + maxDecimals + 1)).toString();
 };
 
 /**
- * Rounds up a token amount to a set number of decimals.
- *
- * so it can be handled by Swap, Bridge, OnRamp Widgets.
+ * Rounds up a token amount to a set number of decimals, so it can be handled by Swap, Bridge, OnRamp Widgets.
  * @param amount
  * @param maxDecimals
  * @returns
