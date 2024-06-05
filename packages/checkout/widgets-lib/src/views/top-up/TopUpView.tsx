@@ -373,7 +373,7 @@ export function TopUpView({
               <TopUpMenuItem
                 key={t(`${element.textConfigKey}.heading`).toLowerCase()}
                 testId={element.testId}
-                icon={element.icon as 'Swap' | 'BankCard' | 'Minting' | 'ArrowForward'}
+                icon={element.icon!}
                 iconVariant={element.iconVariant}
                 intentIcon={element.intentIcon}
                 heading={t(`${element.textConfigKey}.heading`)}
