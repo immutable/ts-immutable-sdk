@@ -68,7 +68,7 @@ To run commands in a specific package, you have two options. You can either run 
 For example, to run the `start` command for the `checkout` package, you can either run the following command from any directory of the monorepo:
 
 ```bash
-yarn workspace @immutable/sdk-checkout start
+yarn workspace @imtbl/checkout-sdk start
 ```
 
 Or you can navigate to the `packages/checkout` directory and run the following command:
@@ -98,7 +98,7 @@ yarn start
 Some packages also come with a sample app that you can run in development mode. To run the sample app, you first need to run the SDK it depends on in development mode, and then run the sample app development mode in a seperate terminal. For example, to run the `checkout` sample app, you can use the following commands:
 
 ```bash
-yarn workspace @immutable/sdk-checkout start
+yarn workspace @imtbl/checkout-sdk start
 
 # Or from the root of the monorepo
 cd packages/checkout/sdk
@@ -108,7 +108,7 @@ yarn start
 Then, in a separate terminal:
 
 ```bash
-yarn workspace @immutable/sdk-checkout-sample-app start
+yarn workspace @imtbl/checkout-sdk-sample-app start
 
 # Or from the root of the monorepo
 cd packages/checkout/sample-app
