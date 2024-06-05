@@ -170,7 +170,6 @@ export const useSignOrder = (input: SignOrderInput) => {
     transactions: [],
   });
   const [tokenIds, setTokenIds] = useState<string[]>([]);
-  const [currentTransactionNumber, setCurrentTransactionNumber] = useState<number>(0);
 
   const setExecuteTransactions = (transaction: ExecutedTransaction) => {
     setExecuteResponse((prev) => ({
@@ -380,29 +379,29 @@ export const useSignOrder = (input: SignOrderInput) => {
         provider,
       );
 
-    let successful = true;
-    for (const transaction of transactions) {
-      if (onTxnStep) {
-        onTxnStep(transaction.methodCall, ExecuteTransactionStep.BEFORE);
-      }
+      let successful = true;
+      for (const transaction of transactions) {
+        if (onTxnStep) {
+          onTxnStep(transaction.methodCall, ExecuteTransactionStep.BEFORE);
+        }
 
-      // eslint-disable-next-line no-await-in-loop
-      const success = await executeTransaction(
-        transaction,
-        onTxnSuccess,
-        onTxnError,
-      );
+        // eslint-disable-next-line no-await-in-loop
+        const success = await executeTransaction(
+          transaction,
+          onTxnSuccess,
+          onTxnError,
+        );
 
-      if (onTxnStep) {
-        onTxnStep(transaction.methodCall, ExecuteTransactionStep.AFTER);
-      }
+        if (onTxnStep) {
+          onTxnStep(transaction.methodCall, ExecuteTransactionStep.AFTER);
+        }
 
-      if (!success) {
-        successful = false;
-        break;
+        if (!success) {
+          successful = false;
+          break;
+        }
       }
-    }
-    (successful ? setExecuteDone : setExecuteFailed)();
+      (successful ? setExecuteDone : setExecuteFailed)();
 
       return executeResponse.transactions;
     },
@@ -416,32 +415,6 @@ export const useSignOrder = (input: SignOrderInput) => {
     ],
   );
 
-  const executeNextTransaction = useCallback(
-    async (
-      onTxnSuccess: (txn: ExecutedTransaction) => void,
-      onTxnError: (error: any, txns: ExecutedTransaction[]) => void,
-    ): Promise<boolean> => {
-      if (
-        !signResponse
-        || currentTransactionIndex >= signResponse.transactions.length
-      ) return false;
-
-      const transaction = signResponse.transactions[currentTransactionIndex];
-      const success = await executeTransaction(
-        transaction,
-        onTxnSuccess,
-        onTxnError,
-      );
-
-      if (success) {
-        setCurrentTransactionIndex((prev) => prev + 1);
-      }
-
-      return success;
-    },
-    [currentTransactionIndex, signResponse, executeTransaction],
-  );
-
   return {
     sign,
     signResponse,
@@ -449,7 +422,5 @@ export const useSignOrder = (input: SignOrderInput) => {
     executeAll,
     executeResponse,
     tokenIds,
-    executeNextTransaction,
-    currentTransactionNumber,
   };
 };
