@@ -441,6 +441,5 @@ export const useSignOrder = (input: SignOrderInput) => {
     executeResponse,
     tokenIds,
     executeNextTransaction,
-    currentTransactionIndex,
   };
 };
