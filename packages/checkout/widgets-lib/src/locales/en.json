@@ -279,7 +279,7 @@
       },
       "coinsDrawer": {
         "header": "Pay with...",
-        "caption1": "Tokens",
+        "caption1": "Coins",
         "caption2": "Balance",
         "divider": "More options",
         "stepType": {
