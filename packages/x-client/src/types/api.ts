@@ -2,6 +2,8 @@
 /* eslint-disable max-len */
 import { imx } from '@imtbl/generated-clients';
 
+export { TransactionResponse } from '@ethersproject/providers';
+
 /**
  * Need to specifically export the classes and interfaces from the generated
  * clients imx object for rollup to bundle them correctly.

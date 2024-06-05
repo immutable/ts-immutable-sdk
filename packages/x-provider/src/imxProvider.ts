@@ -12,8 +12,6 @@ import {
 } from '@imtbl/x-client';
 import { TransactionResponse } from '@ethersproject/providers';
 
-export { TransactionResponse };
-
 export interface IMXProvider {
   /**
    * Get the Signer address
