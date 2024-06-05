@@ -290,25 +290,25 @@ describe('Guardian', () => {
     });
   });
 
-  describe('validateMessage', () => {
+  describe('evaluateEIP712Message', () => {
     afterEach(jest.resetAllMocks);
 
     const mockPayload = { chainID: '0x1234', payload: {} as guardian.EIP712Message, user: mockUserZkEvm };
     it('surfaces error message if message evaluation fails', async () => {
       mockEvaluateMessage.mockRejectedValueOnce(new Error('401: Unauthorized'));
-      await expect(getGuardianClient().validateMessage(mockPayload))
+      await expect(getGuardianClient().evaluateEIP712Message(mockPayload))
         .rejects.toThrow('Message failed to validate with error: 401: Unauthorized');
     });
     it('displays confirmation screen if confirmation is required', async () => {
       mockEvaluateMessage.mockResolvedValueOnce({ data: { confirmationRequired: true, messageId: 'asd123' } });
       (mockConfirmationScreen.requestMessageConfirmation as jest.Mock).mockResolvedValueOnce({ confirmed: true });
-      await getGuardianClient().validateMessage(mockPayload);
+      await getGuardianClient().evaluateEIP712Message(mockPayload);
       expect(mockConfirmationScreen.requestMessageConfirmation).toBeCalledTimes(1);
     });
     it('displays rejection error message if user rejects confirmation', async () => {
       mockEvaluateMessage.mockResolvedValueOnce({ data: { confirmationRequired: true, messageId: 'asd123' } });
       (mockConfirmationScreen.requestMessageConfirmation as jest.Mock).mockResolvedValueOnce({ confirmed: false });
-      await expect(getGuardianClient().validateMessage(mockPayload)).rejects.toEqual(new JsonRpcError(RpcErrorCode.TRANSACTION_REJECTED, 'Signature rejected by user'));
+      await expect(getGuardianClient().evaluateEIP712Message(mockPayload)).rejects.toEqual(new JsonRpcError(RpcErrorCode.TRANSACTION_REJECTED, 'Signature rejected by user'));
     });
   });
 });

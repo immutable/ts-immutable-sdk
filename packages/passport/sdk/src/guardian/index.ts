@@ -19,15 +19,20 @@ export type GuardianEvaluateImxTransactionParams = {
   payloadHash: string;
 };
 
-type GuardianEVMValidationParams = {
+type GuardianEVMTxnEvaluationParams = {
   chainId: string;
   nonce: string;
   metaTransactions: MetaTransaction[];
 };
 
-type GuardianMessageValidationParams = {
+type GuardianEIP712MessageEvaluationParams = {
   chainID: string;
   payload: TypedDataPayload;
+};
+
+type GuardianERC191MessageEvaluationParams = {
+  chainID: string;
+  payload: string;
 };
 
 const transactionRejectedCrossSdkBridgeError = 'Transaction requires confirmation but this functionality is not'
@@ -159,7 +164,7 @@ export default class GuardianClient {
     chainId,
     nonce,
     metaTransactions,
-  }: GuardianEVMValidationParams): Promise<TransactionEvaluationResponse> {
+  }: GuardianEVMTxnEvaluationParams): Promise<TransactionEvaluationResponse> {
     const user = await this.authManager.getUserZkEvm();
     const headers = { Authorization: `Bearer ${user.accessToken}` };
     const guardianTransactions = transformGuardianTransactions(metaTransactions);
@@ -193,7 +198,7 @@ export default class GuardianClient {
     chainId,
     nonce,
     metaTransactions,
-  }: GuardianEVMValidationParams): Promise<void> {
+  }: GuardianEVMTxnEvaluationParams): Promise<void> {
     const transactionEvaluationResponse = await this.evaluateEVMTransaction({
       chainId,
       nonce,
@@ -228,13 +233,13 @@ export default class GuardianClient {
     }
   }
 
-  private async evaluateMessage(
-    { chainID, payload }:GuardianMessageValidationParams,
+  private async handleEIP712MessageEvaluation(
+    { chainID, payload }:GuardianEIP712MessageEvaluationParams,
   ): Promise<guardian.MessageEvaluationResponse> {
     try {
       const user = await this.authManager.getUserZkEvm();
       if (user === null) {
-        throw new PassportError('evaluateMessage requires a valid ID token or refresh token. Please log in first', PassportErrorType.NOT_LOGGED_IN_ERROR);
+        throw new PassportError('handleEIP712MessageEvaluation requires a valid ID token or refresh token. Please log in first', PassportErrorType.NOT_LOGGED_IN_ERROR);
       }
       const messageEvalResponse = await this.messageAPI.evaluateMessage(
         { messageEvaluationRequest: { chainID, payload } },
@@ -247,8 +252,50 @@ export default class GuardianClient {
     }
   }
 
-  public async validateMessage({ chainID, payload }: GuardianMessageValidationParams) {
-    const { messageId, confirmationRequired } = await this.evaluateMessage({ chainID, payload });
+  public async evaluateEIP712Message({ chainID, payload }: GuardianEIP712MessageEvaluationParams) {
+    const { messageId, confirmationRequired } = await this.handleEIP712MessageEvaluation({ chainID, payload });
+    if (confirmationRequired && this.crossSdkBridgeEnabled) {
+      throw new JsonRpcError(RpcErrorCode.TRANSACTION_REJECTED, transactionRejectedCrossSdkBridgeError);
+    }
+    if (confirmationRequired && !!messageId) {
+      const user = await this.authManager.getUserZkEvm();
+      const confirmationResult = await this.confirmationScreen.requestMessageConfirmation(
+        messageId,
+        user.zkEvm.ethAddress,
+      );
+
+      if (!confirmationResult.confirmed) {
+        throw new JsonRpcError(
+          RpcErrorCode.TRANSACTION_REJECTED,
+          'Signature rejected by user',
+        );
+      }
+    } else {
+      this.confirmationScreen.closeWindow();
+    }
+  }
+
+  private async handleERC191MessageEvaluation(
+    { chainID, payload }:GuardianERC191MessageEvaluationParams,
+  ): Promise<guardian.MessageEvaluationResponse> {
+    try {
+      const user = await this.authManager.getUserZkEvm();
+      if (user === null) {
+        throw new PassportError('handleERC191MessageEvaluation requires a valid ID token or refresh token. Please log in first', PassportErrorType.NOT_LOGGED_IN_ERROR);
+      }
+      const messageEvalResponse = await this.messageAPI.evaluateErc191Message(
+        { eRC191MessageEvaluationRequest: { chainID, payload } },
+        { headers: { Authorization: `Bearer ${user.accessToken}` } },
+      );
+      return messageEvalResponse.data;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, `Message failed to validate with error: ${errorMessage}`);
+    }
+  }
+
+  public async evaluateERC191Message({ chainID, payload }: GuardianERC191MessageEvaluationParams) {
+    const { messageId, confirmationRequired } = await this.handleERC191MessageEvaluation({ chainID, payload });
     if (confirmationRequired && this.crossSdkBridgeEnabled) {
       throw new JsonRpcError(RpcErrorCode.TRANSACTION_REJECTED, transactionRejectedCrossSdkBridgeError);
     }

@@ -84,7 +84,7 @@ export const signTypedDataV4 = async ({
   const typedData = transformTypedData(typedDataParam, chainId);
   flow.addEvent('endDetectNetwork');
 
-  await guardianClient.validateMessage({ chainID: String(chainId), payload: typedData });
+  await guardianClient.evaluateEIP712Message({ chainID: String(chainId), payload: typedData });
   flow.addEvent('endValidateMessage');
 
   const relayerSignature = await relayerClient.imSignTypedData(fromAddress, typedData);

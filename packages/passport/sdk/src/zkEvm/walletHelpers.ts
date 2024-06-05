@@ -11,6 +11,7 @@ import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import { Signer } from '@ethersproject/abstract-signer';
 import { v1 as sequenceCoreV1 } from '@0xsequence/core';
 import { trackDuration } from '@imtbl/metrics';
+import { UnrecoveredSignature } from '@0xsequence/core/src/v1/signature';
 import { MetaTransaction, MetaTransactionNormalised, TypedDataPayload } from './types';
 
 const SIGNATURE_WEIGHT = 1; // Weight of a single signature in the multi-sig
@@ -142,9 +143,47 @@ export const getSignedMetaTransactions = async (
   ]);
 };
 
-const decodeRelayerTypedDataSignature = (relayerSignature: string) => {
+const decodeRelayerSignature = (relayerSignature: string): UnrecoveredSignature => {
   const signatureWithThreshold = `0x0000${relayerSignature}`;
   return sequenceCoreV1.signature.decodeSignature(signatureWithThreshold);
+};
+
+export const packSignatures = (
+  EOASignature: string,
+  EOAAddress: string,
+  relayerSignature: string,
+): string => {
+  const signedDigest = `${EOASignature}${ETH_SIGN_FLAG}`;
+
+  // Combine the relayer and user signatures; sort by address to match the imageHash order
+  const { signers: relayerSigners } = decodeRelayerSignature(relayerSignature);
+  const combinedSigners = [
+    ...relayerSigners,
+    {
+      isDynamic: false,
+      unrecovered: true,
+      weight: SIGNATURE_WEIGHT,
+      signature: signedDigest,
+      address: EOAAddress,
+    },
+  ];
+  const sortedSigners = combinedSigners.sort((a, b) => {
+    const bigA = BigNumber.from(a.address);
+    const bigB = BigNumber.from(b.address);
+
+    if (bigA.lte(bigB)) {
+      return -1;
+    } if (bigA.eq(bigB)) {
+      return 0;
+    }
+    return 1;
+  });
+
+  return sequenceCoreV1.signature.encodeSignature({
+    version: 1,
+    threshold: EIP712_SIGNATURE_THRESHOLD,
+    signers: sortedSigners,
+  });
 };
 
 export const getSignedTypedData = async (
@@ -170,44 +209,32 @@ export const getSignedTypedData = async (
   const hashArray = utils.arrayify(hash);
 
   const startTime = performance.now();
-  const ethsigNoType = await signer.signMessage(hashArray);
+  const eoaSignature = await signer.signMessage(hashArray);
   trackDuration(
     'passport',
     'magicSignMessageTypedData',
     Math.round(performance.now() - startTime),
   );
+  const eoaAddress = await signer.getAddress();
 
-  const signedDigest = `${ethsigNoType}${ETH_SIGN_FLAG}`;
+  return packSignatures(eoaSignature, eoaAddress, relayerSignature);
+};
 
-  // Combine the relayer and user signatures; sort by address to match the imageHash order
-  const { signers: relayerSigners } = decodeRelayerTypedDataSignature(relayerSignature);
-  const combinedSigners = [
-    ...relayerSigners,
-    {
-      isDynamic: false,
-      unrecovered: true,
-      weight: SIGNATURE_WEIGHT,
-      signature: signedDigest,
-      address: await signer.getAddress(),
-    },
-  ];
-  const sortedSigners = combinedSigners.sort((a, b) => {
-    const bigA = BigNumber.from(a.address);
-    const bigB = BigNumber.from(b.address);
+export const signERC191Message = async (
+  chainId: BigNumber,
+  payload: string,
+  signer: Signer,
+  walletAddress: string,
+): Promise<string> => {
+  // Generate digest
+  const digest = utils.keccak256(utils.toUtf8Bytes(payload));
 
-    if (bigA.lte(bigB)) {
-      return -1;
-    } if (bigA.eq(bigB)) {
-      return 0;
-    }
-    return 1;
-  });
+  // Generate subDigest
+  const subDigest = encodeMessageSubDigest(chainId, walletAddress, digest);
+  const subDigestHash = utils.keccak256(subDigest);
+  const subDigestHashArray = utils.arrayify(subDigestHash);
 
-  return sequenceCoreV1.signature.encodeSignature({
-    version: 1,
-    threshold: EIP712_SIGNATURE_THRESHOLD,
-    signers: sortedSigners,
-  });
+  return signer.signMessage(subDigestHashArray);
 };
 
 export const getEip155ChainId = (chainId: number) => `eip155:${chainId}`;

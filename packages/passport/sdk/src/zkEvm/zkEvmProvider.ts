@@ -261,25 +261,18 @@ export class ZkEvmProvider implements Provider {
         const flow = trackFlow('passport', 'personalSign');
 
         try {
-          // return await this.#guardianClient.withConfirmationScreen({ width: 480, height: 720 })(async () => {
-          //   const ethSigner = await this.#getSigner();
-          //   flow.addEvent('endGetSigner');
-          //
-          //   return await personalSign({
-          //     params: request.params || [],
-          //     rpcProvider: this.#rpcProvider,
-          //     ethSigner,
-          //     zkEvmAddress: this.#zkEvmAddress!,
-          //   });
-          // });
-          const ethSigner = await this.#getSigner();
-          flow.addEvent('endGetSigner');
+          return await this.#guardianClient.withConfirmationScreen({ width: 480, height: 720 })(async () => {
+            const ethSigner = await this.#getSigner();
+            flow.addEvent('endGetSigner');
 
-          return await personalSign({
-            params: request.params || [],
-            rpcProvider: this.#rpcProvider,
-            ethSigner,
-            zkEvmAddress: this.#zkEvmAddress!,
+            return await personalSign({
+              params: request.params || [],
+              ethSigner,
+              zkEvmAddress: this.#zkEvmAddress!,
+              rpcProvider: this.#rpcProvider,
+              guardianClient: this.#guardianClient,
+              relayerClient: this.#relayerClient,
+            });
           });
         } catch (error) {
           let errorMessage = 'Unknown error';

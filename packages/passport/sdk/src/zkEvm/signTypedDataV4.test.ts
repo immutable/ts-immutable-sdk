@@ -34,7 +34,7 @@ describe('signTypedDataV4', () => {
     imSignTypedData: jest.fn(),
   };
   const guardianClient = {
-    validateMessage: jest.fn(),
+    evaluateEIP712Message: jest.fn(),
   };
   const flow = {
     addEvent: jest.fn(),

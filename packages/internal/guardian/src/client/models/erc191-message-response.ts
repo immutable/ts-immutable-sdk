@@ -13,45 +13,42 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import type { EIP712Message } from './eip712-message';
 
 /**
  * 
  * @export
- * @interface EVMMessage
+ * @interface Erc191MessageResponse
  */
-export interface EVMMessage {
+export interface Erc191MessageResponse {
     /**
      * Confirmation Candidate ID
      * @type {string}
-     * @memberof EVMMessage
+     * @memberof Erc191MessageResponse
      */
     'id': string;
     /**
      * request user\'s ether address
      * @type {string}
-     * @memberof EVMMessage
+     * @memberof Erc191MessageResponse
      */
     'eth_address': string;
     /**
      * Status of the evm message
      * @type {string}
-     * @memberof EVMMessage
+     * @memberof Erc191MessageResponse
      */
     'status': string;
     /**
      * Which version is at
      * @type {string}
-     * @memberof EVMMessage
+     * @memberof Erc191MessageResponse
      */
     'version': string;
     /**
-     * 
-     * @type {EIP712Message}
-     * @memberof EVMMessage
+     * the raw message data to sign
+     * @type {string}
+     * @memberof Erc191MessageResponse
      */
-    'data': EIP712Message;
+    'data': string;
 }
 

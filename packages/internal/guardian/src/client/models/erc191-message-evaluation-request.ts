@@ -13,26 +13,23 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import type { EIP712Message } from './eip712-message';
 
 /**
  * 
  * @export
- * @interface MessageEvaluationRequest
+ * @interface ERC191MessageEvaluationRequest
  */
-export interface MessageEvaluationRequest {
+export interface ERC191MessageEvaluationRequest {
     /**
-     * 
-     * @type {EIP712Message}
-     * @memberof MessageEvaluationRequest
+     * the raw message data to sign
+     * @type {string}
+     * @memberof ERC191MessageEvaluationRequest
      */
-    'payload': EIP712Message;
+    'payload': string;
     /**
      * rollup chain ID
      * @type {string}
-     * @memberof MessageEvaluationRequest
+     * @memberof ERC191MessageEvaluationRequest
      */
     'chainID': string;
 }
