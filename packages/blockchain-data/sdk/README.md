@@ -12,31 +12,37 @@ yarn install
 
 All commands below need to be run in the context of the `blockhain-data` package. Read more about context [here](../../../README.md#context).
 
-Running Blockchain Data SDK in `dev` mode:
+Running in `dev` mode:
   
 ```bash
 yarn dev
 ```
 
-Building Blockchain Data SDK to `dist` directory with javascript output:
+Building to `dist` directory with javascript output:
   
 ```bash
 yarn build
 ```
 
-Running tests for Blockchain Data SDK:
+Running all tests:
 
 ```bash
 yarn test
 ```
 
-Linting Blockchain Data SDK:
+Running changed tests in watch mode:
+
+```bash
+yarn test:watch
+```
+
+Linting:
 
 ```bash
 yarn lint
 ```
 
-Typechecking Blockchain Data SDK:
+Typechecking:
 
 ```bash
 yarn typecheck
