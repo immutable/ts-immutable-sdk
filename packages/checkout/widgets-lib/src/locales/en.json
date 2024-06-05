@@ -135,12 +135,12 @@
         "from": {
           "label": "From",
           "inputPlaceholder": "0",
-          "selectorTitle": "What would you like to swap from?"
+          "selectorTitle": "What are you swapping from?"
         },
         "to": {
           "label": "To",
           "inputPlaceholder": "0",
-          "selectorTitle": "What would you like to swap to?"
+          "selectorTitle": "What are you swapping to?"
         },
         "buttonText": "Swap",
         "conversionRate": "1 {{fromSymbol}} ≈ {{rate}} {{toSymbol}}, inclusive of {{fee}}% fee"
