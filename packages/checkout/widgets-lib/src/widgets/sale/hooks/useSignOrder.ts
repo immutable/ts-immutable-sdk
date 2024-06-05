@@ -359,24 +359,26 @@ export const useSignOrder = (input: SignOrderInput) => {
     return true;
   };
 
-  const execute = async (
-    signData: SignResponse | undefined,
-    onTxnSuccess: (txn: ExecutedTransaction) => void,
-    onTxnError: (error: SignOrderError, txns: ExecutedTransaction[]) => void,
-    onTxnStep?: (method: string, step: ExecuteTransactionStep) => void,
-  ): Promise<ExecutedTransaction[]> => {
-    if (!signData || !provider) {
-      setSignError({
-        type: SaleErrorTypes.DEFAULT,
-        data: { reason: 'No sign data' },
-      });
-      return [];
-    }
+  const executeAll = useCallback(
+    async (
+      signData: SignResponse | undefined,
+      onTxnSuccess: (txn: ExecutedTransaction) => void,
+      onTxnError: (error: any, txns: ExecutedTransaction[]) => void,
+      onTxnStep?: (method: string, step: ExecuteTransactionStep) => void,
+    ): Promise<ExecutedTransaction[]> => {
+      if (!signData || !provider) {
+        setSignError({
+          type: SaleErrorTypes.DEFAULT,
+          data: { reason: 'No sign data' },
+        });
 
-    const transactions = await filterAllowedTransactions(
-      signData.transactions,
-      provider,
-    );
+        return [];
+      }
+
+      const transactions = await filterAllowedTransactions(
+        signData.transactions,
+        provider,
+      );
 
     let successful = true;
     for (const transaction of transactions) {
@@ -402,37 +404,49 @@ export const useSignOrder = (input: SignOrderInput) => {
     }
     (successful ? setExecuteDone : setExecuteFailed)();
 
-    return executeResponse.transactions;
-  };
+      return executeResponse.transactions;
+    },
+    [
+      provider,
+      executeTransaction,
+      setExecuteDone,
+      setExecuteFailed,
+      filterAllowedTransactions,
+      sendTransaction,
+    ],
+  );
 
-  const executeNextTransaction = async (
-    onTxnSuccess: (txn: ExecutedTransaction) => void,
-    onTxnError: (error: any, txns: ExecutedTransaction[]) => void,
-  ): Promise<boolean> => {
-    if (
-      !signResponse
-      || currentTransactionNumber >= signResponse.transactions.length
-    ) return false;
+  const executeNextTransaction = useCallback(
+    async (
+      onTxnSuccess: (txn: ExecutedTransaction) => void,
+      onTxnError: (error: any, txns: ExecutedTransaction[]) => void,
+    ): Promise<boolean> => {
+      if (
+        !signResponse
+        || currentTransactionIndex >= signResponse.transactions.length
+      ) return false;
 
-    const transaction = signResponse.transactions[currentTransactionNumber];
-    const success = await executeTransaction(
-      transaction,
-      onTxnSuccess,
-      onTxnError,
-    );
+      const transaction = signResponse.transactions[currentTransactionIndex];
+      const success = await executeTransaction(
+        transaction,
+        onTxnSuccess,
+        onTxnError,
+      );
 
-    if (success) {
-      setCurrentTransactionNumber((prev) => prev + 1);
-    }
+      if (success) {
+        setCurrentTransactionIndex((prev) => prev + 1);
+      }
 
-    return success;
-  };
+      return success;
+    },
+    [currentTransactionIndex, signResponse, executeTransaction],
+  );
 
   return {
     sign,
     signResponse,
     signError,
-    execute,
+    executeAll,
     executeResponse,
     tokenIds,
     executeNextTransaction,

@@ -55,11 +55,19 @@ type SaleContextValues = SaleContextProps & {
     tokenAddress?: string,
     callback?: (response: SignResponse | undefined) => void
   ) => Promise<SignResponse | undefined>;
-  execute: (
+  executeAll: (
     signResponse: SignResponse | undefined,
     onTxnSuccess: (txn: ExecutedTransaction) => void,
+<<<<<<< HEAD
     onTxnError: (error: SignOrderError, txns: ExecutedTransaction[]) => void
+=======
+    onTxnError: (error: any, txns: ExecutedTransaction[]) => void
+>>>>>>> 698497f97 (Rename execute to executeAll, add usecallbacks, remove isManualExecution flag)
   ) => Promise<ExecutedTransaction[]>;
+  executeNextTransaction: (
+    onTxnSuccess: (txn: ExecutedTransaction) => void,
+    onTxnError: (error: any, txns: ExecutedTransaction[]) => void
+  ) => Promise<boolean>;
   recipientAddress: string;
   recipientEmail: string;
   signResponse: SignResponse | undefined;
@@ -96,7 +104,8 @@ const SaleContext = createContext<SaleContextValues>({
   recipientAddress: '',
   recipientEmail: '',
   sign: () => Promise.resolve(undefined),
-  execute: () => Promise.resolve([]),
+  executeAll: () => Promise.resolve([]),
+  executeNextTransaction: () => Promise.resolve(false),
   signResponse: undefined,
   signError: undefined,
   executeResponse: undefined,
@@ -223,7 +232,8 @@ export function SaleContextProvider(props: {
 
   const {
     sign: signOrder,
-    execute,
+    executeAll,
+    executeNextTransaction,
     signResponse,
     signError,
     executeResponse,
@@ -338,7 +348,8 @@ export function SaleContextProvider(props: {
       sign,
       signResponse,
       signError,
-      execute,
+      executeAll,
+      executeNextTransaction,
       executeResponse,
       environmentId,
       collectionName,
