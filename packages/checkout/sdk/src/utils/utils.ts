@@ -22,6 +22,7 @@ const trimRoundUpDecimals = (s: string, maxDecimals: number): string => {
 
 /**
  * Rounds up a token amount to a set number of decimals, so it can be handled by Swap, Bridge, OnRamp Widgets.
+ * Widgets can only handle formatted values of 6 (DEFAULT_TOKEN_FORMATTING_DECIMALS) decimals.
  * @param amount
  * @param maxDecimals
  * @returns
