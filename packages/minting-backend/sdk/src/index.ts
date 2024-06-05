@@ -1,13 +1,12 @@
 import { ImmutableConfiguration, ModuleConfiguration } from '@imtbl/config';
 import { BlockchainData } from '@imtbl/blockchain-data';
-import { handle } from '@imtbl/webhook';
+import { ZkevmMintRequestUpdated, handle } from '@imtbl/webhook';
 import { setEnvironment, setPublishableApiKey } from '@imtbl/metrics';
 import { trackUncaughtException } from 'analytics';
 import { mintingPersistence as mintingPersistencePg } from './persistence/pg/postgres';
 import { mintingPersistence as mintingPersistencePrismaSqlite } from './persistence/prismaSqlite/sqlite';
 import {
-  submitMintingRequests, processMint, recordMint,
-  MintRequestEvent
+  submitMintingRequests, processMint, recordMint
 } from './minting';
 import { CreateMintRequest, MintingPersistence } from './persistence/type';
 import { Logger } from './logger/type';
@@ -26,9 +25,7 @@ export interface MintingBackendModuleConfiguration
 
 const noopHandlers = {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  zkevmMintRequestUpdated: async (event: MintRequestEvent) => { },
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  all: async (..._args: any) => { }
+  zkevmMintRequestUpdated: async (event: ZkevmMintRequestUpdated) => { }
 };
 
 export class MintingBackendModule {
@@ -72,11 +69,13 @@ export class MintingBackendModule {
 
   async processMint(body: string | Record<string, unknown>, otherHandlers = noopHandlers) {
     await handle(body, this.baseConfig.environment, {
-      zkevmMintRequestUpdated: async (event: MintRequestEvent) => {
+      zkevmMintRequestUpdated: async (event: ZkevmMintRequestUpdated) => {
         await processMint(this.persistence, event, this.logger);
-        otherHandlers.zkevmMintRequestUpdated(event);
-      },
-      all: otherHandlers.all
+
+        if (otherHandlers.zkevmMintRequestUpdated) {
+          otherHandlers.zkevmMintRequestUpdated(event);
+        }
+      }
     });
   }
 }

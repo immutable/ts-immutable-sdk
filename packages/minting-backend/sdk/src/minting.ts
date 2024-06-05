@@ -3,6 +3,7 @@
 /* eslint-disable no-await-in-loop */
 import { BlockchainData as Types } from '@imtbl/generated-clients';
 import { BlockchainData } from '@imtbl/blockchain-data';
+import { ZkevmMintRequestUpdated } from '@imtbl/webhook';
 import { CreateMintRequest, MintRequest, MintingPersistence } from './persistence/type';
 import { Logger } from './logger/type';
 import {
@@ -192,36 +193,9 @@ export const submitMintingRequests = async (
   }
 };
 
-export type MintRequestEvent = {
-  event_name: string;
-  chain: string;
-  event_id: string;
-  data: {
-    chain: {
-      id: string;
-      name: string;
-    },
-    contract_address: string;
-    owner_address: string;
-    reference_id: string;
-    metadata_id: string;
-    token_id: string | null;
-    status: string;
-    transaction_hash: string | null;
-    activity_id: string | null;
-    error: {
-      code: string;
-      message: string;
-    } | null;
-    created_at: string;
-    updated_at: string;
-    amount?: number;
-  }
-};
-
 export const processMint = async (
   mintingPersistence: MintingPersistence,
-  event: MintRequestEvent,
+  event: ZkevmMintRequestUpdated,
   logger: Logger = console
 ) => {
   trackProcessMint();
