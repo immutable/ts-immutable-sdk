@@ -1,3 +1,4 @@
+import fs from 'fs';
 import { strict as assert } from 'assert';
 import { Wallet } from '@ethersproject/wallet';
 import {
@@ -37,6 +38,17 @@ const provider = getProvider(env.network, env.alchemyApiKey);
 //   },
 // };
 
+const sharedStateFile = 'sharedState.json';
+
+type PersistedSharedState = {
+  users: {
+    [key: string]: {
+      ethPrivateKey: string;
+      starkPrivateKey: string;
+    };
+  };
+};
+
 export class Registration {
   constructor(protected stepSharedState: StepSharedState) {}
 
@@ -44,7 +56,31 @@ export class Registration {
     baseConfig: configuration,
   });
 
-  public async addNewWallet(addressVar: string) {
+  // eslint-disable-next-line class-methods-use-this
+  private async persistState(user: string, ethPrivateKey: string, starkPrivateKey: string) {
+    const state: PersistedSharedState = {
+      users: {
+        [user]: {
+          ethPrivateKey,
+          starkPrivateKey,
+        },
+      },
+    };
+    fs.writeFileSync(sharedStateFile, JSON.stringify(state, null, 2));
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  private async hydrateState(): Promise<PersistedSharedState | false> {
+    // check if file exists
+    if (!fs.existsSync(sharedStateFile)) {
+      return false;
+    }
+
+    const state = fs.readFileSync(sharedStateFile, 'utf8');
+    return JSON.parse(state);
+  }
+
+  public async addNewWallet(addressVar: string, persist?: boolean) {
     // L1 credentials
     const ethSigner = Wallet.createRandom().connect(provider);
 
@@ -52,11 +88,30 @@ export class Registration {
     const starkPrivateKey = generateStarkPrivateKey();
     const starkSigner = createStarkSigner(starkPrivateKey);
 
+    if (persist) {
+      await this.persistState(addressVar, ethSigner.privateKey, starkPrivateKey);
+    }
+
     this.stepSharedState.users[addressVar] = {
       ethSigner,
       starkSigner,
     };
     return ethSigner.publicKey;
+  }
+
+  public async restoreUserWallet(addressVar: string) {
+    const state = await this.hydrateState();
+    if (state) {
+      const user = state.users[addressVar];
+      const ethSigner = new Wallet(user.ethPrivateKey).connect(provider);
+      const starkSigner = createStarkSigner(user.starkPrivateKey);
+      this.stepSharedState.users[addressVar] = {
+        ethSigner,
+        starkSigner,
+      };
+    } else {
+      throw new Error('No persisted user state found');
+    }
   }
 
   public async register(addressVar: string) {
