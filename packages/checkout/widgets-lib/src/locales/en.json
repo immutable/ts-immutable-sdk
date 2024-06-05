@@ -234,9 +234,15 @@
         "title": "How would you like to add tokens?"
       },
       "topUpOptions": {
-        "onramp": {
-          "heading": "Buy",
-          "caption": "With card, Google pay or Apple pay available.",
+        "debit": {
+          "heading": "Buy with Debit Card",
+          "caption": "The recommended way to buy tokens",
+          "subcaption": "Fees ",
+          "disabledCaption": ""
+        },
+        "credit": {
+          "heading": "Buy with Credit Card",
+          "caption": "Not recommended due to failures & charges",
           "subcaption": "Fees ",
           "disabledCaption": ""
         },
@@ -273,7 +279,7 @@
       },
       "coinsDrawer": {
         "header": "Pay with...",
-        "caption1": "Coins",
+        "caption1": "Tokens",
         "caption2": "Balance",
         "divider": "More options",
         "stepType": {
@@ -341,7 +347,7 @@
         }
       },
       "topUp": {
-        "heading": "You’ll need to add some coins",
+        "heading": "You’ll need to add some tokens",
         "subheading": {
           "both": "Add {{erc20.value}} {{erc20.symbol}} and {{native.value}} {{native.symbol}} to cover this purchase plus gas.",
           "erc20": "Add {{erc20.value}} {{erc20.symbol}} to your balance through one of the following options.",

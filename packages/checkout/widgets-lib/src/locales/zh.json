@@ -233,9 +233,15 @@
         "title": "你想如何添加代币？"
       },
       "topUpOptions": {
-        "onramp": {
-          "heading": "购买",
-          "caption": "可通过卡、谷歌支付或苹果支付。",
+        "debit": {
+          "heading": "用借记卡购买",
+          "caption": "推荐的购买代币方法",
+          "subcaption": "费用",
+          "disabledCaption": ""
+        },
+        "credit": {
+          "heading": "用信用卡购买",
+          "caption": "由于失败和费用，不推荐使用",
           "subcaption": "费用",
           "disabledCaption": ""
         },
@@ -321,7 +327,7 @@
         }
       },
       "topUp": {
-        "heading": "您需要添加一些硬币",
+        "heading": "你需要添加一些代币",
         "subheading": {
           "both": "添加{{erc20.value}} {{erc20.symbol}}和{{native.value}} {{native.symbol}}以支付本次购买及燃气费。",
           "erc20": "通过以下选项之一将{{erc20.value}} {{erc20.symbol}}添加到您的余额。",

@@ -233,9 +233,15 @@
         "title": "토큰을 어떻게 추가하시겠습니까?"
       },
       "topUpOptions": {
-        "onramp": {
-          "heading": "구매",
-          "caption": "카드, 구글 페이 또는 애플 페이 가능.",
+        "debit": {
+          "heading": "직불 카드로 구매",
+          "caption": "토큰을 구매하는 권장 방법",
+          "subcaption": "수수료",
+          "disabledCaption": ""
+        },
+        "credit": {
+          "heading": "신용 카드로 구매",
+          "caption": "실패 및 요금 때문에 권장하지 않습니다",
           "subcaption": "수수료",
           "disabledCaption": ""
         },
@@ -321,7 +327,7 @@
         }
       },
       "topUp": {
-        "heading": "일부 코인을 추가해야합니다",
+        "heading": "토큰을 추가해야 합니다",
         "subheading": {
           "both": "이 구매 및 가스를 포함하여 이를 커버하기 위해 {{erc20.value}} {{erc20.symbol}} 및 {{native.value}} {{native.symbol}}를 추가하십시오.",
           "erc20": "다음 옵션 중 하나를 통해 균형에 {{erc20.value}} {{erc20.symbol}}를 추가하십시오.",
