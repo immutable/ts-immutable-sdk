@@ -1,8 +1,27 @@
-import { handle, WebhookHandlers } from './handler';
+import { handle } from './handler';
 
-export * from './event-types';
+export type {
+  BlockChainMetadata,
+  Chain,
+  ZkevmActivityBurn,
+  ZkevmActivityDeposit,
+  ZkevmActivityMint,
+  ZkevmActivitySale,
+  ZkevmActivityTransfer,
+  ZkevmActivityWithdrawal,
+  ZkevmCollectionUpdated,
+  ZkevmMetadataUpdated,
+  ZkevmMintRequestUpdated,
+  ZkevmNftUpdated,
+  ZkevmOrderUpdated,
+  ZkevmTokenUpdated,
+  ZkevmTradeCreated
+} from './event-types';
 
 export {
-  handle,
-  WebhookHandlers
+  handle
 };
+
+export type {
+  WebhookHandlers
+} from './handler';
