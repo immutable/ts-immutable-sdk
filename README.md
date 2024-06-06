@@ -8,10 +8,10 @@
 
 ---
 
-# Welcome to Immutable Unified TypeScript SDK
-This Unified SDK aims to enhance user experience, reduce complexity, and streamline development by offering a cohesive development environment.
+# Welcome to the Immutable TypeScript SDK
+This Typescript SDK aims to enhance user experience, reduce complexity, and streamline development by offering a cohesive development environment.
 
-The need for a Unified SDK arises from the challenges developers face when managing multiple SDKs, such as fragmented development experiences, increased complexity, slower project setup times, and resource overhead.
+The need for a Typescript SDK arises from the challenges developers face when managing multiple SDKs, such as fragmented development experiences, increased complexity, slower project setup times, and resource overhead.
 
 [Public facing README shipped with each SDK release is here](https://github.com/immutable/ts-immutable-sdk/blob/main/sdk/README.md)
 
@@ -44,7 +44,7 @@ The need for a Unified SDK arises from the challenges developers face when manag
 
 # Getting Started
 
-The Unified SDK is a monorepo that contains all the packages from different Immutable products. Each product area has its own package within the monorepo, and these packages are imported and re-exported by one root-level package.
+The Typescript SDK is a monorepo that contains all the packages from different Immutable products. Each product area has its own package within the monorepo, and these packages are imported and re-exported by one root-level package.
 
 To get started with the SDK, you need to install the dependencies and build the project. You can then work with the packages included in the SDK, such as running them in development mode, running tests, building, and linting.
 
@@ -142,7 +142,7 @@ yarn test
 
 ### Building
 
-Building SDK packages is generally done using Rollup, although certain packages may however have a more specialized build tool/process. This will bundle the package code into a single file that can be imported by other packages or applications. The build output is stored in the `dist` folder of the package. These build outputs also include typescript declaration files to provide typings to SDK consumers.
+Building SDK packages is generally done using Rollup, although certain packages may have a more specialized build tool/process. This will bundle the package code into a single file that can be imported by other packages or applications. The build output is stored in the `dist` folder of the package. These build outputs also include typescript declaration files to provide typings to SDK consumers.
 
 To build a package, you can use the following command in the context of that package:
 
@@ -196,9 +196,9 @@ If you need to test changes to any SDK package in the specific context of your o
 This will allow you to emulate an external consumer of the SDK, and test your changes in the context of your own application, using a local version of the SDK that you can modify and test as needed.
 
 # Technical Architecture
-The Unified SDK is designed as a Yarn Workspace monorepo that contains all the packages from different Immutable products. Each product area has its own package within the monorepo, and these packages are imported and re-exported by one root-level package.
+The Typescript SDK is designed as a Yarn Workspace monorepo that contains all the packages from different Immutable products. Each product area has its own package within the monorepo, and these packages are imported and re-exported by one root-level package.
 
-All code for each module is contained within its respective package, which allows for easy maintenance and updates. The root-level package serves as a single entry point to access all modules included in the Unified SDK.
+All code for each module is contained within its respective package, which allows for easy maintenance and updates. The root-level package serves as a single entry point to access all modules included in the Typescript SDK.
 
 To ensure compatibility with different platforms or devices, we externalize all third-party dependencies used by each module. This allows us to only bundle our code without including third-party dependencies which can get bundled by Node for customers who have their own build process.
 
@@ -208,9 +208,9 @@ Overall, this technical architecture provides a scalable solution that enables u
 
 # Packages
 
-The Unified SDK is a monorepo that contains all the packages from different Immutable products. Each product area has its own package within the monorepo, and these packages are imported and re-exported by one root-level package that serves as a single entry point to access all modules included in the Unified SDK for external consumers.
+The Typescript SDK is a monorepo that contains all the packages from different Immutable products. Each product area has its own package within the monorepo, and these packages are imported and re-exported by one root-level package that serves as a single entry point to access all modules included in the Typescript SDK for external consumers.
 
-The following is a list of packages included in the Unified SDK:
+The following is a list of packages included in the Typescript SDK:
 
 ### Blockchain Data
 
@@ -242,7 +242,7 @@ The Config package is built using TypeScript and Rollup. The package is exposed 
 
 The Game Bridge SDK package allows the Game SDKs (Unity and Unreal) to communicate with the TypeScript SDK. The Game SDKs are used to build games that interact with the Immutable platform. This enables communication between the Game and Typescript SDKs, allowing the Game SDKs to leverage the existing TypeScript SDK.
 
-The TS SDK and game-bridge are bundled into an index file (HTML for Unity, JS for Unreal), which is how the Game SDKs use them.
+The Typescript SDK and game-bridge are bundled into an index file (HTML for Unity, JS for Unreal), which is how the Game SDKs use them.
 
 More information can be found in the README file in the Game Bridge folder [here](/packages//game-bridge//README.md).
 
@@ -311,4 +311,4 @@ Internal maintainers' guide is available at Immutable's wiki `UnifiedSDK Interna
 
 # Samples
 
-The SDK also provides multiple sample frontend/backend applications in the root `samples` directory. These samples are meant to demonstrate how to use the SDK in a real-world application for external users and provide a base for building custom applications. Each sample has its own README file that provides additional information surrounding that sample app. 
+The Typescript SDK also provides multiple sample frontend/backend applications in the root `samples` directory. These samples are meant to demonstrate how to use the SDK in a real-world application for external users and provide a base for building custom applications. Each sample has its own README file that provides additional information surrounding that sample app. 
