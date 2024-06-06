@@ -71,7 +71,7 @@ For example, to run the `start` command for the `checkout` package, you can eith
 yarn workspace @imtbl/checkout-sdk start
 ```
 
-Or you can navigate to the `packages/checkout` directory and run the following command:
+Or you can navigate to the `packages/checkout/sdk` directory by running the following commands from the root of the repo:
 
 ```bash
 cd packages/checkout/sdk
@@ -111,7 +111,7 @@ Then, in a separate terminal:
 yarn workspace @imtbl/checkout-sdk-sample-app start
 
 # Or from the root of the monorepo
-cd packages/checkout/sample-app
+cd packages/checkout/sdk-sample-app
 yarn start
 ```
 
