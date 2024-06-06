@@ -23,7 +23,7 @@ type CompleteERC20WithdrawalWorkflowParams = {
 
 const ERC20TokenType = 'ERC20';
 
-export async function executeRegisterAndWithdrawAllERC20(
+export async function executeRegisterAndWithdrawAllFungible(
   ethSigner: Signer,
   starkSigner: StarkSigner,
   starkPublicKey: string,
@@ -135,7 +135,7 @@ export async function completeERC20WithdrawalAction({
     if (isRegistered) {
       return executeWithdrawAllERC20(ethSigner, starkPublicKey, assetType.asset_type, config.immutableXConfig);
     }
-    return executeRegisterAndWithdrawAllERC20(
+    return executeRegisterAndWithdrawAllFungible(
       ethSigner,
       starkSigner,
       starkPublicKey,

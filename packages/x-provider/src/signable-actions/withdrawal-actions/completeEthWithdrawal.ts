@@ -9,7 +9,7 @@ import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 import { validateChain } from '../helpers';
 import { getWithdrawalBalances } from './getWithdrawalBalance';
 import {
-  executeRegisterAndWithdrawAllERC20,
+  executeRegisterAndWithdrawAllFungible,
   executeWithdrawAllERC20,
   executeWithdrawERC20,
 } from './completeERC20Withdrawal';
@@ -54,7 +54,7 @@ export async function completeEthWithdrawalAction({
     if (isRegistered) {
       return executeWithdrawAllERC20(ethSigner, starkPublicKey, assetType.asset_type, config.immutableXConfig);
     }
-    return executeRegisterAndWithdrawAllERC20(
+    return executeRegisterAndWithdrawAllFungible(
       ethSigner,
       starkSigner,
       starkPublicKey,
