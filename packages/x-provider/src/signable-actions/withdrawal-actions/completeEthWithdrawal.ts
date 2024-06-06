@@ -10,8 +10,8 @@ import { validateChain } from '../helpers';
 import { getWithdrawalBalances } from './getWithdrawalBalance';
 import {
   executeRegisterAndWithdrawAllFungible,
-  executeWithdrawAllERC20,
-  executeWithdrawERC20,
+  executeWithdrawAllFungible,
+  executeWithdrawFungible,
 } from './completeERC20Withdrawal';
 
 type CompleteEthWithdrawalActionParams = {
@@ -52,7 +52,7 @@ export async function completeEthWithdrawalAction({
       config,
     );
     if (isRegistered) {
-      return executeWithdrawAllERC20(ethSigner, starkPublicKey, assetType.asset_type, config.immutableXConfig);
+      return executeWithdrawAllFungible(ethSigner, starkPublicKey, assetType.asset_type, config.immutableXConfig);
     }
     return executeRegisterAndWithdrawAllFungible(
       ethSigner,
@@ -63,7 +63,7 @@ export async function completeEthWithdrawalAction({
     );
   }
   if (!v4Balance.isZero() && !v4Balance.isNegative()) {
-    return executeWithdrawERC20(ethSigner, starkPublicKey, assetType.asset_type, config.immutableXConfig);
+    return executeWithdrawFungible(ethSigner, starkPublicKey, assetType.asset_type, config.immutableXConfig);
   }
   throw new Error('No balance to withdraw');
 }

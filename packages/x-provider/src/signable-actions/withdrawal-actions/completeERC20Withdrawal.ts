@@ -1,3 +1,5 @@
+// Note that this file contains withdrawal functions that are shared
+// by both ERC20 and ETH in completeERC20WithdrawalAction and completeEthWithdrawalAction
 import { Signer } from '@ethersproject/abstract-signer';
 import { TransactionResponse } from '@ethersproject/providers';
 import {
@@ -55,7 +57,7 @@ export async function executeRegisterAndWithdrawAllFungible(
   return ethSigner.sendTransaction(populatedTransaction);
 }
 
-export async function executeWithdrawAllERC20(
+export async function executeWithdrawAllFungible(
   ethSigner: Signer,
   starkPublicKey: string,
   assetType: string,
@@ -78,7 +80,7 @@ export async function executeWithdrawAllERC20(
   return ethSigner.sendTransaction(populatedTransaction);
 }
 
-export async function executeWithdrawERC20(
+export async function executeWithdrawFungible(
   ethSigner: Signer,
   starkPublicKey: string,
   assetType: string,
@@ -133,7 +135,7 @@ export async function completeERC20WithdrawalAction({
       config,
     );
     if (isRegistered) {
-      return executeWithdrawAllERC20(ethSigner, starkPublicKey, assetType.asset_type, config.immutableXConfig);
+      return executeWithdrawAllFungible(ethSigner, starkPublicKey, assetType.asset_type, config.immutableXConfig);
     }
     return executeRegisterAndWithdrawAllFungible(
       ethSigner,
@@ -145,7 +147,7 @@ export async function completeERC20WithdrawalAction({
   }
 
   if (!v4Balance.isZero() && !v4Balance.isNegative()) {
-    return executeWithdrawERC20(ethSigner, starkPublicKey, assetType.asset_type, config.immutableXConfig);
+    return executeWithdrawFungible(ethSigner, starkPublicKey, assetType.asset_type, config.immutableXConfig);
   }
 
   throw new Error('No balance to withdraw');
