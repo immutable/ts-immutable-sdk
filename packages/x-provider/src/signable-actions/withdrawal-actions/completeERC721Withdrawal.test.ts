@@ -2,6 +2,7 @@ import { Contracts } from '@imtbl/x-client';
 import { imx } from '@imtbl/generated-clients';
 import * as encUtils from 'enc-utils';
 import { TransactionResponse } from '@ethersproject/providers';
+import { BigNumber } from '@ethersproject/bignumber';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 import {
   getSignableRegistrationOnchain,
@@ -24,6 +25,7 @@ jest.mock('@imtbl/generated-clients');
 
 async function act(): Promise<TransactionResponse> {
   const signers = await generateSigners(privateKey1);
+  const mintsApi = new imx.MintsApi(testConfig.immutableXConfig.apiConfiguration);
   return await completeERC721WithdrawalAction({
     ethSigner: signers.ethSigner,
     starkSigner: signers.starkSigner,
@@ -34,11 +36,10 @@ async function act(): Promise<TransactionResponse> {
       tokenId: '23',
       tokenAddress: '0x23cv1',
     },
-  });
+  }, mintsApi);
 }
 
-// TODO fix MintsApi mocking so that getMintableTokenDetailsByClientTokenId does not return undefined
-describe.skip('completeERC721Withdrawal action', () => {
+describe('completeERC721Withdrawal action', () => {
   describe('when ERC721 is mintable', () => {
     const mintableErc721Token: imx.MintableTokenDetails = {
       token_id: '23',
@@ -68,7 +69,8 @@ describe.skip('completeERC721Withdrawal action', () => {
       });
     });
     it('should complete ERC721 withdrawal with on-chain registered user', async () => {
-      (Contracts.Core.connect as jest.Mock).mockReturnValue({
+      (Contracts.CoreV4.connect as jest.Mock).mockReturnValue({
+        getWithdrawalBalance: jest.fn().mockReturnValue(BigNumber.from('1')),
         populateTransaction: {
           withdrawAndMint: jest.fn().mockResolvedValue(transactionResponse),
         },
@@ -80,9 +82,12 @@ describe.skip('completeERC721Withdrawal action', () => {
       await expect(response).toEqual(transactionResponse);
     });
     it('should complete ERC721 withdrawal with unregistered user', async () => {
-      (Contracts.Registration.connect as jest.Mock).mockReturnValue({
+      (Contracts.CoreV4.connect as jest.Mock).mockReturnValue({
+        getWithdrawalBalance: jest.fn().mockReturnValue(BigNumber.from('1')),
+      });
+      (Contracts.RegistrationV4.connect as jest.Mock).mockReturnValue({
         populateTransaction: {
-          regsiterAndWithdrawAndMint: jest
+          registerWithdrawAndMint: jest
             .fn()
             .mockResolvedValue(transactionResponse),
         },
@@ -114,10 +119,18 @@ describe.skip('completeERC721Withdrawal action', () => {
         getMintableTokenDetailsByClientTokenId: jest
           .fn()
           .mockRejectedValue(error),
+        getMint: jest.fn(),
+        listMints: jest.fn(),
+        mintTokens: jest.fn(),
+        basePath: jest.fn(),
+        axios: jest.fn(),
+        configuration: jest.fn(),
       });
     });
+
     it('should complete ERC721 withdrawal with on-chain registered user', async () => {
-      (Contracts.Core.connect as jest.Mock).mockReturnValue({
+      (Contracts.CoreV4.connect as jest.Mock).mockReturnValue({
+        getWithdrawalBalance: jest.fn().mockReturnValue(BigNumber.from('1')),
         populateTransaction: {
           withdrawNft: jest.fn().mockResolvedValue(transactionResponse),
         },
@@ -126,8 +139,12 @@ describe.skip('completeERC721Withdrawal action', () => {
       const response = await act();
       await expect(response).toEqual(transactionResponse);
     });
+
     it('should complete ERC721 withdrawal with unregistered user', async () => {
-      (Contracts.Registration.connect as jest.Mock).mockReturnValue({
+      (Contracts.CoreV4.connect as jest.Mock).mockReturnValue({
+        getWithdrawalBalance: jest.fn().mockReturnValue(BigNumber.from('1')),
+      });
+      (Contracts.RegistrationV4.connect as jest.Mock).mockReturnValue({
         populateTransaction: {
           registerAndWithdrawNft: jest
             .fn()
@@ -162,6 +179,7 @@ describe.skip('completeERC721Withdrawal action', () => {
 
     it('should throw error', async () => {
       const signers = await generateSigners(privateKey1);
+      const mintsApi = new imx.MintsApi(testConfig.immutableXConfig.apiConfiguration);
       await expect(
         completeERC721WithdrawalAction({
           ethSigner: signers.ethSigner,
@@ -173,7 +191,7 @@ describe.skip('completeERC721Withdrawal action', () => {
             tokenId: '23',
             tokenAddress: '0x23cv1',
           },
-        }),
+        }, mintsApi),
       ).rejects.toThrowError();
     });
   });

@@ -63,6 +63,7 @@ async function getERC721WithdrawalBalance(
         tokenAddress: token.tokenAddress,
         tokenId: token.tokenId,
       });
+
     const assetType = await getEncodeAssetInfo(
       'mintable-asset',
       'ERC721',
@@ -81,26 +82,26 @@ async function getERC721WithdrawalBalance(
       assetType.asset_id,
       config,
     );
-  } catch (e: any) {
-    if (!e.response || !(e.response && e.response.status !== 404)) {
-      throw e;
+  } catch (error: any) {
+    if (error.response?.status === 404) {
+      // token is not a mintable ERC721 token
+      const assetType = await getEncodeAssetInfo(
+        'asset',
+        'ERC721',
+        config,
+        {
+          token_id: token.tokenId,
+          token_address: token.tokenAddress,
+        },
+      );
+      return await getWithdrawalBalance(
+        signer,
+        ownerKey,
+        assetType.asset_id,
+        config,
+      );
     }
-    // token is not a mintable ERC721 token
-    const assetType = await getEncodeAssetInfo(
-      'asset',
-      'ERC721',
-      config,
-      {
-        token_id: token.tokenId,
-        token_address: token.tokenAddress,
-      },
-    );
-    return await getWithdrawalBalance(
-      signer,
-      ownerKey,
-      assetType.asset_id,
-      config,
-    );
+    throw error; // unable to recover from any other kind of error
   }
 }
 
@@ -166,6 +167,40 @@ export async function getWithdrawalBalances(
     mintsApi,
     config,
   );
+  return {
+    v3Balance,
+    v4Balance,
+  };
+}
+
+export async function getWithdrawalBalancesERC721(
+  signer: Signer,
+  starkPublicKey: string,
+  ethAddress: string,
+  token: AnyToken,
+  config: ImmutableXConfiguration,
+  mintsApi: MintsApi,
+): Promise<{ v3Balance: BigNumber; v4Balance: BigNumber }> {
+  const encodingApi = new EncodingApi(config.apiConfiguration);
+
+  const v3Balance = await getWithdrawalBalanceWorkflow(
+    signer,
+    starkPublicKey,
+    token,
+    encodingApi,
+    mintsApi,
+    config,
+  );
+
+  const v4Balance = await getWithdrawalBalanceWorkflow(
+    signer,
+    ethAddress,
+    token,
+    encodingApi,
+    mintsApi,
+    config,
+  );
+
   return {
     v3Balance,
     v4Balance,
