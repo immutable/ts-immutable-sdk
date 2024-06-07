@@ -12,6 +12,7 @@ import {
   SaleErrorTypes,
   SignPaymentTypes,
   SignedTransaction,
+  ExecuteTransactionStep,
 } from '../types';
 import { PRIMARY_SALES_API_BASE_URL } from '../utils/config';
 import { hexToText } from '../functions/utils';
