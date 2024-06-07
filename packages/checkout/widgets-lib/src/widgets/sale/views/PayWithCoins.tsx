@@ -1,9 +1,19 @@
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { HandoverTarget } from 'context/handover-context/HandoverContext';
+import { useHandover } from 'lib/hooks/useHandover';
+import { getRemoteImage } from 'lib/utils';
+import { Heading } from '@biom3/react';
 import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 import { useSaleContext } from '../context/SaleContextProvider';
-import { LoadingView } from '../../../views/loading/LoadingView';
 import { useSaleEvent } from '../hooks/useSaleEvents';
+import { ExecuteTransactionStep } from '../types';
+
+enum TransactionMethod {
+  APPROVE = 'approve(address spender,uint256 amount)',
+  // eslint-disable-next-line max-len
+  EXECUTE = 'execute(address multicallSigner, bytes32 reference, address[] targets, bytes[] data, uint256 deadline, bytes signature)',
+}
 
 export function PayWithCoins() {
   const { t } = useTranslation();
@@ -16,23 +26,76 @@ export function PayWithCoins() {
     sendSuccessEvent,
   } = useSaleEvent();
   const {
-    executeAll, signResponse, executeResponse, signTokenIds,
+    executeAll,
+    signResponse,
+    executeResponse,
+    signTokenIds,
+    environment,
   } = useSaleContext();
-  const executedTxns = executeResponse?.transactions.length || 0;
 
-  let loadingText = [
-    t('views.PAYMENT_METHODS.loading.ready1'),
-    t('views.PAYMENT_METHODS.loading.ready2'),
-    t('views.PAYMENT_METHODS.loading.ready3'),
-  ];
+  const { addHandover } = useHandover({
+    id: HandoverTarget.GLOBAL,
+  });
 
-  if (executedTxns >= 1) {
-    loadingText = [
-      t('views.PAYMENT_METHODS.loading.processing1'),
-      t('views.PAYMENT_METHODS.loading.processing2'),
-      t('views.PAYMENT_METHODS.loading.processing3'),
-    ];
-  }
+  const onTxnStep = (method: string, step: ExecuteTransactionStep) => {
+    const key = `${method}-${step}`;
+
+    switch (key) {
+      case `${TransactionMethod.APPROVE}-${ExecuteTransactionStep.BEFORE}`:
+        addHandover({
+          animationUrl: getRemoteImage(environment, '/approve-handover.riv'),
+          children: (
+            <Heading>
+              {t('views.PAYMENT_METHODS.handover.beforeApprove')}
+            </Heading>
+          ),
+        });
+        break;
+      case `${TransactionMethod.APPROVE}-${ExecuteTransactionStep.AFTER}`:
+        addHandover({
+          animationUrl: getRemoteImage(environment, '/approve-handover.riv'),
+          children: (
+            <Heading>
+              {t('views.PAYMENT_METHODS.handover.afterApprove')}
+            </Heading>
+          ),
+        });
+        break;
+      case `${TransactionMethod.EXECUTE}-${ExecuteTransactionStep.BEFORE}`:
+        addHandover({
+          animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
+          children: (
+            <Heading>
+              {t('views.PAYMENT_METHODS.handover.beforeExecute')}
+            </Heading>
+          ),
+        });
+        break;
+      case `${TransactionMethod.EXECUTE}-${ExecuteTransactionStep.AFTER}`:
+        addHandover({
+          duration: 2000,
+          animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
+          children: (
+            <Heading>
+              {t('views.PAYMENT_METHODS.handover.afterExecute')}
+            </Heading>
+          ),
+        });
+
+        addHandover({
+          duration: 2000,
+          animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
+          children: (
+            <Heading>{t('views.PAYMENT_METHODS.handover.success')}</Heading>
+          ),
+        });
+        break;
+      default:
+        console.error(
+          'Unknown TransactionMethod and ExecuteTransactionStep combination',
+        );
+    }
+  };
 
   const sendTransaction = async () => {
     executeAll(
@@ -47,6 +110,7 @@ export function PayWithCoins() {
         };
         sendFailedEvent(String(error?.data?.error), error, txns, undefined, details); // checkoutPrimarySalePaymentMethods_FailEventFailed
       },
+      onTxnStep,
     );
   };
 
@@ -60,12 +124,31 @@ export function PayWithCoins() {
   useEffect(() => {
     if (executeResponse?.done === true) {
       const details = { transactionId: signResponse?.transactionId };
-      sendSuccessEvent(SaleWidgetViews.SALE_SUCCESS, executeResponse?.transactions, signTokenIds, details); // checkoutPrimarySaleSaleSuccess_SuccessEventSucceeded
-      sendCloseEvent(SaleWidgetViews.SALE_SUCCESS); // checkoutPrimarySaleSaleSuccess_CloseButtonPressed
+      setTimeout(() => {
+        sendSuccessEvent(
+          SaleWidgetViews.SALE_SUCCESS,
+          executeResponse?.transactions,
+          signTokenIds,
+          details,
+        ); // checkoutPrimarySaleSaleSuccess_SuccessEventSucceeded
+        sendCloseEvent(SaleWidgetViews.SALE_SUCCESS); // checkoutPrimarySaleSaleSuccess_CloseButtonPressed
+      }, 4000);
     }
   }, [executeResponse]);
 
   useEffect(() => sendPageView(SaleWidgetViews.PAY_WITH_COINS), []); // checkoutPrimarySalePayWithCoinsViewed
 
-  return <LoadingView loadingText={loadingText} />;
+  useEffect(
+    () => addHandover({
+      animationUrl: getRemoteImage(environment, '/handover.riv'),
+      animationName: 'Start',
+      children: (
+        <Heading sx={{ px: 'base.spacing.x6' }}>
+          {t('views.PAYMENT_METHODS.handover.initial')}
+        </Heading>
+      ),
+    }),
+    [environment],
+  );
+  return null;
 }
