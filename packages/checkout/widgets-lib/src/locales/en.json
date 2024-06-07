@@ -365,6 +365,22 @@
         "processing2": "Securing your assets",
         "processing3": "Finalising payment"
       },
+      "handover": {
+        "initial": "Preparing Order",
+        "beforeApprove": "Waiting for you to approve access to your coins",
+        "beforeApproveWithCta" :{
+          "heading": "We’ll need you to approve this in your wallet",
+          "ctaButton": "Open wallet"
+        },
+        "afterApprove":"Coins ready for item purchase",
+        "beforeExecute": "Waiting for you to confirm in your wallet",
+        "beforeExecuteWithCta": {
+          "heading": "We’ll need you to confirm this in your wallet",
+          "ctaButton": "Open wallet"
+        },
+        "afterExecute": "Processing purchase",
+        "success": "Purchase complete"
+      },
       "creditCardWarningDrawer": {
         "heading": "We recommend debit over credit",
         "body": "Most banks will charge cash advance fees or block the transaction altogether when using credit card on these types of purchases.",

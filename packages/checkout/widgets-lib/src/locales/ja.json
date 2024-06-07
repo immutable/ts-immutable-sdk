@@ -352,6 +352,22 @@
         "processing2": "資産を確保中",
         "processing3": "支払いを完了中"
       },
+      "handover": {
+        "initial": "注文準備中",
+        "beforeApprove": "コインへのアクセスを承認するのをお待ちしています",
+        "beforeApproveWithCta": {
+          "heading": "ウォレットでの承認が必要です",
+          "ctaButton": "ウォレットを開く"
+        },
+        "afterApprove": "アイテム購入のためのコイン準備完了",
+        "beforeExecute": "ウォレットでの確認をお待ちしています",
+        "beforeExecuteWithCta": {
+          "heading": "ウォレットでの確認が必要です",
+          "ctaButton": "ウォレットを開く"
+        },
+        "afterExecute": "購入処理中",
+        "success": "購入完了"
+      },
       "creditCardWarningDrawer": {
         "heading": "デビットカードの使用をお勧めします",
         "body": "この種の購入にクレジットカードを使用する場合、ほとんどの銀行は現金前払い手数料を請求するか、または取引を完全にブロックします。",
