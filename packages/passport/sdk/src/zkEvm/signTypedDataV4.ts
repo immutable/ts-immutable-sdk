@@ -3,7 +3,7 @@ import { BigNumber } from 'ethers';
 import GuardianClient from 'guardian';
 import { Signer } from '@ethersproject/abstract-signer';
 import { Flow } from '@imtbl/metrics';
-import { getSignedTypedData } from './walletHelpers';
+import { signAndPackTypedData } from './walletHelpers';
 import { TypedDataPayload } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { RelayerClient } from './relayerClient';
@@ -90,7 +90,7 @@ export const signTypedDataV4 = async ({
   const relayerSignature = await relayerClient.imSignTypedData(fromAddress, typedData);
   flow.addEvent('endRelayerSignTypedData');
 
-  const signature = await getSignedTypedData(
+  const signature = await signAndPackTypedData(
     typedData,
     relayerSignature,
     BigNumber.from(chainId),

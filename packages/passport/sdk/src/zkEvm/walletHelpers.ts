@@ -92,7 +92,7 @@ export const encodeMessageSubDigest = (chainId: BigNumber, walletAddress: string
   )
 );
 
-export const getSignedMetaTransactions = async (
+export const signMetaTransactions = async (
   metaTransactions: MetaTransaction[],
   nonce: BigNumberish,
   chainId: BigNumber,
@@ -186,7 +186,7 @@ export const packSignatures = (
   });
 };
 
-export const getSignedTypedData = async (
+export const signAndPackTypedData = async (
   typedData: TypedDataPayload,
   relayerSignature: string,
   chainId: BigNumber,

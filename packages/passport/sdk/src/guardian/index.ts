@@ -169,7 +169,7 @@ export default class GuardianClient {
     const headers = { Authorization: `Bearer ${user.accessToken}` };
     const guardianTransactions = transformGuardianTransactions(metaTransactions);
     try {
-      const transactionEvaluationResponseAxiosResponse = await this.transactionAPI.evaluateTransaction(
+      const response = await this.transactionAPI.evaluateTransaction(
         {
           id: 'evm',
           transactionEvaluationRequest: {
@@ -184,7 +184,8 @@ export default class GuardianClient {
         },
         { headers },
       );
-      return transactionEvaluationResponseAxiosResponse.data;
+
+      return response.data;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       throw new JsonRpcError(
@@ -239,7 +240,10 @@ export default class GuardianClient {
     try {
       const user = await this.authManager.getUserZkEvm();
       if (user === null) {
-        throw new PassportError('handleEIP712MessageEvaluation requires a valid ID token or refresh token. Please log in first', PassportErrorType.NOT_LOGGED_IN_ERROR);
+        throw new PassportError(
+          'User not logged in. Please log in first.',
+          PassportErrorType.NOT_LOGGED_IN_ERROR,
+        );
       }
       const messageEvalResponse = await this.messageAPI.evaluateMessage(
         { messageEvaluationRequest: { chainID, payload } },
@@ -248,7 +252,10 @@ export default class GuardianClient {
       return messageEvalResponse.data;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, `Message failed to validate with error: ${errorMessage}`);
+      throw new JsonRpcError(
+        RpcErrorCode.INTERNAL_ERROR,
+        `Message failed to validate with error: ${errorMessage}`,
+      );
     }
   }
 
@@ -282,7 +289,10 @@ export default class GuardianClient {
     try {
       const user = await this.authManager.getUserZkEvm();
       if (user === null) {
-        throw new PassportError('handleERC191MessageEvaluation requires a valid ID token or refresh token. Please log in first', PassportErrorType.NOT_LOGGED_IN_ERROR);
+        throw new PassportError(
+          'User not logged in. Please log in first.',
+          PassportErrorType.NOT_LOGGED_IN_ERROR,
+        );
       }
       const messageEvalResponse = await this.messageAPI.evaluateErc191Message(
         { eRC191MessageEvaluationRequest: { chainID, payload } },
@@ -291,7 +301,10 @@ export default class GuardianClient {
       return messageEvalResponse.data;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, `Message failed to validate with error: ${errorMessage}`);
+      throw new JsonRpcError(
+        RpcErrorCode.INTERNAL_ERROR,
+        `Message failed to validate with error: ${errorMessage}`,
+      );
     }
   }
 
