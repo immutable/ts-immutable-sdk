@@ -1,9 +1,10 @@
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HandoverTarget } from 'context/handover-context/HandoverContext';
 import { useHandover } from 'lib/hooks/useHandover';
 import { getRemoteImage } from 'lib/utils';
-import { Heading } from '@biom3/react';
+import { Button, Heading } from '@biom3/react';
+import { isPassportProvider } from 'lib/provider';
 import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 import { useSaleContext } from '../context/SaleContextProvider';
 import { useSaleEvent } from '../hooks/useSaleEvents';
@@ -14,6 +15,76 @@ enum TransactionMethod {
   // eslint-disable-next-line max-len
   EXECUTE = 'execute(address multicallSigner, bytes32 reference, address[] targets, bytes[] data, uint256 deadline, bytes signature)',
 }
+
+const getHandoverContent = (
+  t,
+  executeNextTransaction,
+  signResponse,
+  sendTransactionSuccessEvent,
+  sendFailedEvent,
+) => ({
+  beforeApproveWithCta: (
+    <>
+      <Heading>
+        {t('views.PAYMENT_METHODS.handover.beforeApproveWithCta.heading')}
+      </Heading>
+      <Button
+        onClick={() => executeNextTransaction(
+          (txn) => sendTransactionSuccessEvent(txn),
+          (error, txns) => {
+            const details = { transactionId: signResponse?.transactionId };
+            sendFailedEvent(
+              error.toString(),
+              error,
+              txns,
+              undefined,
+              details,
+            );
+          },
+        )}
+      >
+        {t('views.PAYMENT_METHODS.handover.beforeApproveWithCta.ctaButton')}
+      </Button>
+    </>
+  ),
+  beforeApprove: (
+    <Heading>{t('views.PAYMENT_METHODS.handover.beforeApprove')}</Heading>
+  ),
+  afterApprove: (
+    <Heading>{t('views.PAYMENT_METHODS.handover.afterApprove')}</Heading>
+  ),
+  beforeExecuteWithCta: (
+    <>
+      <Heading>
+        {t('views.PAYMENT_METHODS.handover.beforeApproveWithCta.heading')}
+      </Heading>
+      <Button
+        onClick={() => executeNextTransaction(
+          (txn) => sendTransactionSuccessEvent(txn),
+          (error, txns) => {
+            const details = { transactionId: signResponse?.transactionId };
+            sendFailedEvent(
+              error.toString(),
+              error,
+              txns,
+              undefined,
+              details,
+            );
+          },
+        )}
+      >
+        {t('views.PAYMENT_METHODS.handover.beforeApproveWithCta.ctaButton')}
+      </Button>
+    </>
+  ),
+  beforeExecute: (
+    <Heading>{t('views.PAYMENT_METHODS.handover.beforeApprove')}</Heading>
+  ),
+  afterExecute: (
+    <Heading>{t('views.PAYMENT_METHODS.handover.afterExecute')}</Heading>
+  ),
+  success: <Heading>{t('views.PAYMENT_METHODS.handover.success')}</Heading>,
+});
 
 export function PayWithCoins() {
   const { t } = useTranslation();
@@ -27,75 +98,72 @@ export function PayWithCoins() {
   } = useSaleEvent();
   const {
     executeAll,
+    executeNextTransaction,
     signResponse,
     executeResponse,
     signTokenIds,
     environment,
+    provider,
   } = useSaleContext();
 
   const { addHandover } = useHandover({
     id: HandoverTarget.GLOBAL,
   });
 
-  const onTxnStep = (method: string, step: ExecuteTransactionStep) => {
-    const key = `${method}-${step}`;
+  const handoverContent = getHandoverContent(
+    t,
+    executeNextTransaction,
+    signResponse,
+    sendTransactionSuccessEvent,
+    sendFailedEvent,
+  );
 
-    switch (key) {
-      case `${TransactionMethod.APPROVE}-${ExecuteTransactionStep.BEFORE}`:
-        addHandover({
-          animationUrl: getRemoteImage(environment, '/approve-handover.riv'),
-          children: (
-            <Heading>
-              {t('views.PAYMENT_METHODS.handover.beforeApprove')}
-            </Heading>
-          ),
-        });
-        break;
-      case `${TransactionMethod.APPROVE}-${ExecuteTransactionStep.AFTER}`:
-        addHandover({
-          animationUrl: getRemoteImage(environment, '/approve-handover.riv'),
-          children: (
-            <Heading>
-              {t('views.PAYMENT_METHODS.handover.afterApprove')}
-            </Heading>
-          ),
-        });
-        break;
-      case `${TransactionMethod.EXECUTE}-${ExecuteTransactionStep.BEFORE}`:
-        addHandover({
-          animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
-          children: (
-            <Heading>
-              {t('views.PAYMENT_METHODS.handover.beforeExecute')}
-            </Heading>
-          ),
-        });
-        break;
-      case `${TransactionMethod.EXECUTE}-${ExecuteTransactionStep.AFTER}`:
-        addHandover({
-          duration: 2000,
-          animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
-          children: (
-            <Heading>
-              {t('views.PAYMENT_METHODS.handover.afterExecute')}
-            </Heading>
-          ),
-        });
-
-        addHandover({
-          duration: 2000,
-          animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
-          children: (
-            <Heading>{t('views.PAYMENT_METHODS.handover.success')}</Heading>
-          ),
-        });
-        break;
-      default:
-        console.error(
-          'Unknown TransactionMethod and ExecuteTransactionStep combination',
-        );
-    }
-  };
+  const onTxnStep = useCallback(
+    (method: string, step: ExecuteTransactionStep) => {
+      const key = `${method}-${step}`;
+      switch (key) {
+        case `${TransactionMethod.APPROVE}-${ExecuteTransactionStep.BEFORE}`:
+          addHandover({
+            animationUrl: getRemoteImage(environment, '/approve-handover.riv'),
+            children: isPassportProvider(provider)
+              ? handoverContent.beforeApproveWithCta
+              : handoverContent.beforeApprove,
+          });
+          break;
+        case `${TransactionMethod.APPROVE}-${ExecuteTransactionStep.AFTER}`:
+          addHandover({
+            animationUrl: getRemoteImage(environment, '/approve-handover.riv'),
+            children: handoverContent.afterApprove,
+          });
+          break;
+        case `${TransactionMethod.EXECUTE}-${ExecuteTransactionStep.BEFORE}`:
+          addHandover({
+            animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
+            children: isPassportProvider(provider)
+              ? handoverContent.beforeExecuteWithCta
+              : handoverContent.beforeExecute,
+          });
+          break;
+        case `${TransactionMethod.EXECUTE}-${ExecuteTransactionStep.AFTER}`:
+          addHandover({
+            duration: 2000,
+            animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
+            children: handoverContent.afterExecute,
+          });
+          addHandover({
+            duration: 2000,
+            animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
+            children: handoverContent.success,
+          });
+          break;
+        default:
+          console.error(
+            'Unknown TransactionMethod and ExecuteTransactionStep combination',
+          );
+      }
+    },
+    [environment, provider, addHandover, handoverContent],
+  );
 
   const sendTransaction = async () => {
     executeAll(
