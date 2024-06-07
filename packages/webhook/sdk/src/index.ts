@@ -1,4 +1,4 @@
-import { handle } from './handler';
+import { handle, WebhookHandlers } from './handler';
 
 export type {
   BlockChainMetadata,
@@ -19,9 +19,6 @@ export type {
 } from './event-types';
 
 export {
-  handle
-};
-
-export type {
+  handle,
   WebhookHandlers
-} from './handler';
+};
