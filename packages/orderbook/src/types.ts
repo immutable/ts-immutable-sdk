@@ -47,6 +47,19 @@ export interface PrepareListingResponse {
   orderHash: string;
 }
 
+export interface PrepareBulkListingsParams {
+  makerAddress: string;
+  orderParams: Omit<PrepareListingParams, 'makerAddress'>[];
+}
+
+export interface PrepareBulkListingsResponse {
+  actions: Action[];
+  preparedOrders: {
+    orderComponents: OrderComponents;
+    orderHash: string;
+  }[]
+}
+
 export interface PrepareCancelOrdersResponse {
   signableAction: SignableAction;
 }

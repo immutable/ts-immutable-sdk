@@ -9,3 +9,15 @@ export function getOrderComponentsFromMessage(orderMessage: string): OrderCompon
 
   return orderComponents;
 }
+
+export function getBulkOrderComponentsFromMessage(orderMessage: string): OrderComponents[] {
+  const data = JSON.parse(orderMessage);
+  const orderComponents: OrderComponents[] = data.message.tree;
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const orderComponent of orderComponents) {
+    orderComponent.salt = BigNumber.from(orderComponent.salt).toHexString();
+  }
+
+  return orderComponents;
+}

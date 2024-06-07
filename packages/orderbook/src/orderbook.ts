@@ -31,6 +31,8 @@ import {
   OrderStatusName,
   PrepareCancelOrdersResponse,
   PrepareListingParams,
+  PrepareBulkListingsParams,
+  PrepareBulkListingsResponse,
   PrepareListingResponse,
   SignablePurpose,
   TradeResult,
@@ -158,6 +160,28 @@ export class Orderbook {
       page: mapFromOpenApiPage(apiListings.page),
       result: apiListings.result.map(mapFromOpenApiTrade),
     };
+  }
+
+  /**
+   * TODO
+   */
+  async prepareBulkListings(
+    {
+      makerAddress,
+      orderParams,
+    }: PrepareBulkListingsParams,
+  ): Promise<PrepareBulkListingsResponse> {
+    // TODO: If a single order is passed, delegate to prepareListing as the signature
+    // will be more gase efficient at settlement time
+    return this.seaport.prepareBulkSeaportOrders(
+      makerAddress,
+      orderParams.map((orderParam) => ({
+        listingItem: orderParam.sell,
+        considerationItem: orderParam.buy,
+        orderStart: new Date(),
+        orderExpiry: orderParam.orderExpiry || new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 2),
+      })),
+    );
   }
 
   /**
