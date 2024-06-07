@@ -1,4 +1,5 @@
 /.husky @immutable/sdk
+/.nvmrc @immutable/sdk
 /sdk @immutable/sdk
 /packages/x-client @immutable/sdk
 /packages/config @immutable/sdk
