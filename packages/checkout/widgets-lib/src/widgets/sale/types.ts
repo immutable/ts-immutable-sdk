@@ -135,3 +135,8 @@ export type FundingBalanceResult = {
   currency: OrderQuoteCurrency;
   smartCheckoutResult: SmartCheckoutResult;
 };
+
+export enum ExecuteTransactionStep {
+  BEFORE = 'before',
+  AFTER = 'after',
+}
