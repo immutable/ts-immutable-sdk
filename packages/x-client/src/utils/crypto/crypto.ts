@@ -4,7 +4,8 @@ import BN from 'bn.js';
 import elliptic from 'elliptic';
 import * as encUtils from 'enc-utils';
 import { Signer } from '@ethersproject/abstract-signer';
-import { solidityKeccak256 } from 'ethers/lib/utils';
+// eslint-disable-next-line import/extensions
+import { solidityKeccak256 } from 'ethers/lib/utils.js';
 import { StarkSigner } from '../../types';
 import { starkEcOrder } from '../stark/starkCurve';
 
