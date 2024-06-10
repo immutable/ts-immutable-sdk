@@ -65,13 +65,13 @@ yarn build
 
 To run commands in a specific package, you have two options. You can either run the command from any directory of the monorepo and specify the package name, or you can navigate to the package directory and run the command from there. Both options allow you to run yarn commands within the context of a specific package.
 
-For example, to run the `start` command for the `checkout` package, you can either run the following command from any directory of the monorepo:
+For example, to run the `start` command for the `checkout-sdk` package located at `/packages/checkout/sdk`, you can either run the following command from any directory of the monorepo:
 
 ```bash
 yarn workspace @imtbl/checkout-sdk start
 ```
 
-Or you can navigate to the `packages/checkout/sdk` directory by running the following commands from the root of the repo:
+Or you can navigate to the `/packages/checkout/sdk` directory by running the following commands from the root of the repo:
 
 ```bash
 cd packages/checkout/sdk
@@ -95,7 +95,7 @@ To run a package in development mode, you can use the following command in the c
 yarn start
 ```
 
-Some packages also come with a sample app that you can run in development mode. To run the sample app, you first need to run the SDK it depends on in development mode, and then run the sample app development mode in a seperate terminal. For example, to run the `checkout` sample app, you can use the following commands:
+Some packages also come with a sample app that you can run in development mode. To run the sample app, you first need to run the SDK it depends on in development mode, and then run the sample app development mode in a seperate terminal. For example, to run the `checkout-sdk-sample-app` located at `/packages/checkout/sdk-sample-app`, you can use the following commands:
 
 ```bash
 yarn workspace @imtbl/checkout-sdk start
