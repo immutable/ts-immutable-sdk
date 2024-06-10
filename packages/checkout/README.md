@@ -18,7 +18,7 @@ yarn install
 
 ### Checkout SDK Quick Start Guide
 
-All commands below need to be run in the context of the `checkout-sdk` package unless specified otherwise. Read more about context [here](../../../README.md#context).
+All commands below need to be run in the context of the `checkout-sdk` package in the `./sdk` folder unless specified otherwise. Read more about context [here](../../../README.md#context).
 
 Running in `dev` mode using the `immutable-devnet` network:
 
@@ -26,7 +26,7 @@ Running in `dev` mode using the `immutable-devnet` network:
 yarn start:dev
 ```
 
-Running in `sandbox`/`production` mode using the `immutable-testnet`/`mainnet` network based on the environment value set for the `SANDBOX_CONFIGURATION` config object in the `sdk.ts` file:
+Running in `sandbox`/`production` mode using the `immutable-testnet`/`mainnet` network based on the environment value set for the `SANDBOX_CONFIGURATION` config object in the `./sdk/src/sdk.ts` file:
 
 ```bash
 yarn start
@@ -36,21 +36,21 @@ Running the Checkout SDK Sample App with the Checkout SDK supporting hot reloadi
 
 ```bash
 # Run the Checkout SDK first
-# Context: checkout-sdk
+# Context: checkout-sdk in ./sdk
 yarn start
 
 # Run the Checkout SDK Sample App in a new terminal
-# Context: checkout-sdk-sample-app
+# Context: checkout-sdk-sample-app in ./sdk-sample-app
 yarn start
 ```
 
-Building to the `dist` directory for `dev` environment:
+Building to the `./sdk/dist` directory for `dev` environment:
 
 ```bash
 yarn build:dev
 ```
 
-Building to the `dist` directory for `sandbox`/`production` environment:
+Building to the `./sdk/dist` directory for `sandbox`/`production` environment:
 
 ```bash
 yarn build
@@ -86,7 +86,7 @@ Typechecking:
 yarn typecheck
 ```
 
-Generate Typescript API documentation (viewable in the newly generated docs folder at [packages/checkout/sdk/docs/README.md](/packages/checkout//sdk/docs/README.md)):
+Generate Typescript API documentation (viewable in the newly generated docs folder at [./sdk/docs/README.md](./sdk/docs/README.md)):
 
 ```bash
 yarn docs
@@ -94,17 +94,17 @@ yarn docs
 
 ### Widgets Library Quick Start Guide
 
-All commands below need to be run in the context of the `checkout-widgets` package unless specified otherwise. Read more about context [here](../../../README.md#context).
+All commands below need to be run in the context of the `checkout-widgets` package in the `./widgets-lib` folder unless specified otherwise. Read more about context [here](../../../README.md#context).
 
 Running in `dev` mode (widgets-lib depends upon checkout-sdk):
 
 ```bash
 # Run the Checkout SDK first
-# Context: checkout-sdk
+# Context: checkout-sdk in ./sdk
 yarn start:dev
 
 # Run the Widgets Library in a new terminal
-# Context: checkout-widgets
+# Context: checkout-widgets in ./widgets-lib
 yarn start
 ```
 
@@ -115,13 +115,13 @@ Running the Widgets Sample App with the Widgets Library supporting hot reloading
 # ...
 
 # Run the Widgets Sample App in a new terminal
-# Context: checkout-widgets-sample-app
+# Context: checkout-widgets-sample-app in ./widgets-sample-app
 yarn start
 ```
 
 **Read more about running locally [here](#widgets-development-locally).**
 
-Building the Widgets Library to the `dist` directory:
+Building the Widgets Library to the `./widgets-lib/dist` directory:
 
 ```bash
 yarn build
@@ -183,18 +183,21 @@ In production however, the widgets-lib package is built as a browser bundle and 
 
 To test this setup locally and force the widgets bundle to be loaded from `localhost` you will need to run
 
-```
-cd sdk
+```bash
+# Run the Checkout SDK first in local dev mode
+# Context: checkout-sdk in ./sdk
 yarn start:local
 ```
 
-```
-cd widgets-lib
+```bash
+# Build the Widgets Library in a new terminal in local mode
+# Context: checkout-widgets in ./widgets-lib
 yarn build:local
 ```
 
-```
-cd widgets-sample-app
+```bash
+# Run the Widgets Sample App in a new terminal
+# Context: checkout-widgets-sample-app in ./widgets-sample-app
 yarn start
 ```
 
