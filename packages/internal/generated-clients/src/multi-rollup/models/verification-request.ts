@@ -101,6 +101,12 @@ export interface VerificationRequest {
      * @memberof VerificationRequest
      */
     'verification_request_status': VerificationRequestStatus;
+    /**
+     * The tier of the organisation
+     * @type {string}
+     * @memberof VerificationRequest
+     */
+    'org_tier': string | null;
 }
 
 

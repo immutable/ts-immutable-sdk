@@ -18,7 +18,7 @@
 import { NFTMetadataAttribute } from './nftmetadata-attribute';
 
 /**
- * The NFT metadata
+ * The NFT metadata. Total size of this object should not exceed 16 KiB
  * @export
  * @interface NFTMetadataRequest
  */

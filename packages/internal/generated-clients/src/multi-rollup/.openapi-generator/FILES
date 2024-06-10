@@ -97,6 +97,7 @@ models/get-transaction-metadata-request.ts
 models/get-transaction-metadata-res.ts
 models/get-typed-data-metadata-request.ts
 models/get-typed-data-metadata-res.ts
+models/immutable-verification-status-enum.ts
 models/inactive-order-status.ts
 models/index.ts
 models/item.ts
@@ -161,6 +162,7 @@ models/seaport-fee.ts
 models/seaport-fulfill-available-advanced-orders-metadata.ts
 models/seaport-native-item.ts
 models/token-contract-type.ts
+models/token-type.ts
 models/token.ts
 models/trade-blockchain-metadata.ts
 models/trade-result.ts

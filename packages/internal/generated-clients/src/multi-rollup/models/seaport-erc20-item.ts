@@ -13,6 +13,9 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import { ImmutableVerificationStatusEnum } from './immutable-verification-status-enum';
 
 /**
  * 
@@ -56,6 +59,12 @@ export interface SeaportERC20Item {
      * @memberof SeaportERC20Item
      */
     'decimals': number;
+    /**
+     * 
+     * @type {ImmutableVerificationStatusEnum}
+     * @memberof SeaportERC20Item
+     */
+    'immutable_verification_status': ImmutableVerificationStatusEnum;
 }
 
 export const SeaportERC20ItemTypeEnum = {

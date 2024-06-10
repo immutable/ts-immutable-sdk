@@ -268,7 +268,7 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
          * @param {string} [sellItemTokenId] Sell item token identifier to filter by
          * @param {string} [fromUpdatedAt] From updated at including given date
          * @param {number} [pageSize] Maximum number of orders to return per page
-         * @param {ListListingsSortByEnum} [sortBy] Order field to sort by
+         * @param {ListListingsSortByEnum} [sortBy] Order field to sort by. &#x60;buy_item_amount&#x60; sorts by per token price, for example if 5 ERC-1155s are on sale for 10eth, it’s sorted as 2eth for &#x60;buy_item_amount&#x60;.
          * @param {ListListingsSortDirectionEnum} [sortDirection] Ascending or descending direction for sort
          * @param {string} [pageCursor] Page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {*} [options] Override http request option.
@@ -356,6 +356,7 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
          * @summary List all trades
          * @param {string} chainName 
          * @param {string} [accountAddress] 
+         * @param {string} [sellItemContractAddress] 
          * @param {string} [fromIndexedAt] From indexed at including given date
          * @param {number} [pageSize] Maximum number of trades to return per page
          * @param {ListTradesSortByEnum} [sortBy] Trade field to sort by
@@ -364,7 +365,7 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listTrades: async (chainName: string, accountAddress?: string, fromIndexedAt?: string, pageSize?: number, sortBy?: ListTradesSortByEnum, sortDirection?: ListTradesSortDirectionEnum, pageCursor?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listTrades: async (chainName: string, accountAddress?: string, sellItemContractAddress?: string, fromIndexedAt?: string, pageSize?: number, sortBy?: ListTradesSortByEnum, sortDirection?: ListTradesSortDirectionEnum, pageCursor?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'chainName' is not null or undefined
             assertParamExists('listTrades', 'chainName', chainName)
             const localVarPath = `/v1/chains/{chain_name}/trades`
@@ -382,6 +383,10 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
 
             if (accountAddress !== undefined) {
                 localVarQueryParameter['account_address'] = accountAddress;
+            }
+
+            if (sellItemContractAddress !== undefined) {
+                localVarQueryParameter['sell_item_contract_address'] = sellItemContractAddress;
             }
 
             if (fromIndexedAt !== undefined) {
@@ -500,7 +505,7 @@ export const OrdersApiFp = function(configuration?: Configuration) {
          * @param {string} [sellItemTokenId] Sell item token identifier to filter by
          * @param {string} [fromUpdatedAt] From updated at including given date
          * @param {number} [pageSize] Maximum number of orders to return per page
-         * @param {ListListingsSortByEnum} [sortBy] Order field to sort by
+         * @param {ListListingsSortByEnum} [sortBy] Order field to sort by. &#x60;buy_item_amount&#x60; sorts by per token price, for example if 5 ERC-1155s are on sale for 10eth, it’s sorted as 2eth for &#x60;buy_item_amount&#x60;.
          * @param {ListListingsSortDirectionEnum} [sortDirection] Ascending or descending direction for sort
          * @param {string} [pageCursor] Page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {*} [options] Override http request option.
@@ -515,6 +520,7 @@ export const OrdersApiFp = function(configuration?: Configuration) {
          * @summary List all trades
          * @param {string} chainName 
          * @param {string} [accountAddress] 
+         * @param {string} [sellItemContractAddress] 
          * @param {string} [fromIndexedAt] From indexed at including given date
          * @param {number} [pageSize] Maximum number of trades to return per page
          * @param {ListTradesSortByEnum} [sortBy] Trade field to sort by
@@ -523,8 +529,8 @@ export const OrdersApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listTrades(chainName: string, accountAddress?: string, fromIndexedAt?: string, pageSize?: number, sortBy?: ListTradesSortByEnum, sortDirection?: ListTradesSortDirectionEnum, pageCursor?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListTradeResult>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listTrades(chainName, accountAddress, fromIndexedAt, pageSize, sortBy, sortDirection, pageCursor, options);
+        async listTrades(chainName: string, accountAddress?: string, sellItemContractAddress?: string, fromIndexedAt?: string, pageSize?: number, sortBy?: ListTradesSortByEnum, sortDirection?: ListTradesSortDirectionEnum, pageCursor?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListTradeResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listTrades(chainName, accountAddress, sellItemContractAddress, fromIndexedAt, pageSize, sortBy, sortDirection, pageCursor, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -605,7 +611,7 @@ export const OrdersApiFactory = function (configuration?: Configuration, basePat
          * @throws {RequiredError}
          */
         listTrades(requestParameters: OrdersApiListTradesRequest, options?: AxiosRequestConfig): AxiosPromise<ListTradeResult> {
-            return localVarFp.listTrades(requestParameters.chainName, requestParameters.accountAddress, requestParameters.fromIndexedAt, requestParameters.pageSize, requestParameters.sortBy, requestParameters.sortDirection, requestParameters.pageCursor, options).then((request) => request(axios, basePath));
+            return localVarFp.listTrades(requestParameters.chainName, requestParameters.accountAddress, requestParameters.sellItemContractAddress, requestParameters.fromIndexedAt, requestParameters.pageSize, requestParameters.sortBy, requestParameters.sortDirection, requestParameters.pageCursor, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -792,7 +798,7 @@ export interface OrdersApiListListingsRequest {
     readonly pageSize?: number
 
     /**
-     * Order field to sort by
+     * Order field to sort by. &#x60;buy_item_amount&#x60; sorts by per token price, for example if 5 ERC-1155s are on sale for 10eth, it’s sorted as 2eth for &#x60;buy_item_amount&#x60;.
      * @type {'created_at' | 'updated_at' | 'buy_item_amount'}
      * @memberof OrdersApiListListings
      */
@@ -832,6 +838,13 @@ export interface OrdersApiListTradesRequest {
      * @memberof OrdersApiListTrades
      */
     readonly accountAddress?: string
+
+    /**
+     * 
+     * @type {string}
+     * @memberof OrdersApiListTrades
+     */
+    readonly sellItemContractAddress?: string
 
     /**
      * From indexed at including given date
@@ -957,7 +970,7 @@ export class OrdersApi extends BaseAPI {
      * @memberof OrdersApi
      */
     public listTrades(requestParameters: OrdersApiListTradesRequest, options?: AxiosRequestConfig) {
-        return OrdersApiFp(this.configuration).listTrades(requestParameters.chainName, requestParameters.accountAddress, requestParameters.fromIndexedAt, requestParameters.pageSize, requestParameters.sortBy, requestParameters.sortDirection, requestParameters.pageCursor, options).then((request) => request(this.axios, this.basePath));
+        return OrdersApiFp(this.configuration).listTrades(requestParameters.chainName, requestParameters.accountAddress, requestParameters.sellItemContractAddress, requestParameters.fromIndexedAt, requestParameters.pageSize, requestParameters.sortBy, requestParameters.sortDirection, requestParameters.pageCursor, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
