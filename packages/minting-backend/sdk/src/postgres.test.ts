@@ -95,7 +95,6 @@ describe('postgres minting backend', () => {
 
     // check the status is updated
     const { rows: rows2 } = await pool.query('SELECT * FROM im_assets WHERE minting_status = $1', ['succeeded']);
-    console.log(rows2);
     expect(rows2.length).toBe(1);
     expect(rows2[0].metadata_id).toBe(metadataId);
     expect(rows2[0].last_imtbl_zkevm_mint_request_updated_id).toBe(imtblZkevmMintRequestUpdatedId);
