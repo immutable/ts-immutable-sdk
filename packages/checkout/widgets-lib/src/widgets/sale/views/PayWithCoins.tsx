@@ -157,6 +157,7 @@ export function PayWithCoins() {
           });
           break;
         default:
+          // eslint-disable-next-line no-console
           console.error(
             'Unknown TransactionMethod and ExecuteTransactionStep combination',
           );
