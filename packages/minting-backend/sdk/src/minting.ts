@@ -35,12 +35,14 @@ export const submitMintingRequests = async (
     chainName = 'imtbl-zkevm-testnet',
     maxNumberOfTries = 3,
   },
-  logger: Logger = console
+  logger: Logger = console,
+  maxLoops = Infinity,
 ) => {
   trackSubmitMintingRequests();
   let mintingResponse: Types.CreateMintRequestResult | undefined;
+  let numberOfLoops = 0;
   // eslint-disable-next-line no-constant-condition
-  while (true) {
+  while (numberOfLoops++ < maxLoops) {
     await new Promise((resolve) => {
       setTimeout(resolve, defaultMintingDelay);
     });
