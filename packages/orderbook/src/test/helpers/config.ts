@@ -1,10 +1,11 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import dotenv from 'dotenv';
-import { OrderbookOverrides } from 'config';
+import { OrderbookModuleConfiguration } from 'config';
+import { getLocalhostProvider } from './provider';
 
 dotenv.config();
 
-export function getConfigFromEnv(): OrderbookOverrides {
+export function getConfigFromEnv(): OrderbookModuleConfiguration {
   if (
     !process.env.ORDERBOOK_MR_API_URL
     || !process.env.SEAPORT_CONTRACT_ADDRESS
@@ -20,6 +21,6 @@ export function getConfigFromEnv(): OrderbookOverrides {
     chainName: process.env.CHAIN_NAME,
     seaportContractAddress: process.env.SEAPORT_CONTRACT_ADDRESS,
     zoneContractAddress: process.env.ZONE_CONTRACT_ADDRESS,
-    jsonRpcProviderUrl: process.env.RPC_ENDPOINT,
+    provider: getLocalhostProvider(),
   };
 }
