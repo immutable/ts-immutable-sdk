@@ -1,4 +1,5 @@
 import { OrderComponents } from '@opensea/seaport-js/lib/types';
+import { getBulkOrderTree } from '@opensea/seaport-js/src/utils/eip712/bulk-orders';
 import { BigNumber } from 'ethers';
 
 export function getOrderComponentsFromMessage(orderMessage: string): OrderComponents {
@@ -20,4 +21,12 @@ export function getBulkOrderComponentsFromMessage(orderMessage: string): OrderCo
   }
 
   return orderComponents;
+}
+
+export function getBulkSeaportOrderSignatures(
+  signature: string,
+  orderComponents: OrderComponents[],
+): string[] {
+  const tree = getBulkOrderTree(orderComponents);
+  return orderComponents.map((_, i) => tree.getEncodedProofAndSignature(i, signature));
 }

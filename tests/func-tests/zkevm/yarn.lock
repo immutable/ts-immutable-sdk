@@ -1105,7 +1105,7 @@ __metadata:
 
 "@imtbl/sdk@file:../../../sdk::locator=func-tests-imx%40workspace%3A.":
   version: 0.0.0
-  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=1967e6&locator=func-tests-imx%40workspace%3A."
+  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=e4abd4&locator=func-tests-imx%40workspace%3A."
   dependencies:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
@@ -1123,6 +1123,7 @@ __metadata:
     "@metamask/detect-provider": ^2.0.0
     "@opensea/seaport-js": 4.0.0
     "@rive-app/react-canvas-lite": ^4.9.0
+    "@stdlib/number-float64-base-normalize": 0.0.8
     "@uniswap/router-sdk": ^1.4.0
     "@uniswap/sdk-core": ^3.0.1
     "@uniswap/v3-sdk": ^3.9.0
@@ -1145,7 +1146,7 @@ __metadata:
     jwt-decode: ^3.1.2
     lru-memorise: 0.3.0
     magic-sdk: ^21.2.0
-    oidc-client-ts: 2.2.1
+    oidc-client-ts: 2.4.0
     os-browserify: ^0.3.0
     pako: ^2.1.0
     pg: ^8.11.5
@@ -1161,7 +1162,7 @@ __metadata:
       optional: true
     prisma:
       optional: true
-  checksum: b75200fbe949534cd7dc7e51c9f75bf8d99d91e131646e4c407bd5d87277f014a70b73ef2dcf42817486aa30056ff8207d84264c21e9533b272077d40d23655f
+  checksum: e891dff51ef06c93c5085c60647bd1e08b78bba5dec6f441378f5208c22316f5dd5657a16d4bc0c00f786f972a41857a7f83eafd8ecf855029075478b9324dcb
   languageName: node
   linkType: hard
 
@@ -3988,6 +3989,21 @@ __metadata:
     "@stdlib/number-float64-base-to-words": ^0.0.x
     "@stdlib/utils-library-manifest": ^0.0.x
   checksum: 7ee053f6b6eaa4b5a040e1eee144b2159654aa0f57c6861bb2318025288d8e7f25db13c52f9bcbc1af3d312befab0466b4964286c9689e85094fce6c50f1d897
+  conditions: (os=aix | os=darwin | os=freebsd | os=linux | os=macos | os=openbsd | os=sunos | os=win32 | os=windows)
+  languageName: node
+  linkType: hard
+
+"@stdlib/number-float64-base-normalize@npm:0.0.8":
+  version: 0.0.8
+  resolution: "@stdlib/number-float64-base-normalize@npm:0.0.8"
+  dependencies:
+    "@stdlib/constants-float64-smallest-normal": ^0.0.x
+    "@stdlib/math-base-assert-is-infinite": ^0.0.x
+    "@stdlib/math-base-assert-is-nan": ^0.0.x
+    "@stdlib/math-base-special-abs": ^0.0.x
+    "@stdlib/types": ^0.0.x
+    "@stdlib/utils-define-nonenumerable-read-only-property": ^0.0.x
+  checksum: 677062923b00824bdb13263fdd1a9e721cacd4add2a9db014652a9cd77a053e531725f35313dbc80507f1b5a812d77b2ca6860008e38346d16f710fd427471f8
   conditions: (os=aix | os=darwin | os=freebsd | os=linux | os=macos | os=openbsd | os=sunos | os=win32 | os=windows)
   languageName: node
   linkType: hard
@@ -7369,7 +7385,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"crypto-js@npm:^4.1.1, crypto-js@npm:^4.2.0":
+"crypto-js@npm:^4.2.0":
   version: 4.2.0
   resolution: "crypto-js@npm:4.2.0"
   checksum: f051666dbc077c8324777f44fbd3aaea2986f198fe85092535130d17026c7c2ccf2d23ee5b29b36f7a4a07312db2fae23c9094b644cc35f7858b1b4fcaf27774
@@ -13655,13 +13671,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"oidc-client-ts@npm:2.2.1":
-  version: 2.2.1
-  resolution: "oidc-client-ts@npm:2.2.1"
+"oidc-client-ts@npm:2.4.0":
+  version: 2.4.0
+  resolution: "oidc-client-ts@npm:2.4.0"
   dependencies:
-    crypto-js: ^4.1.1
+    crypto-js: ^4.2.0
     jwt-decode: ^3.1.2
-  checksum: 83bc815d59a1221bdf2a39aff505941f1bf9aba542a59cc9cbe677b85fc06d4f555d55c1b0a6ad8ca76c57bacc423e1b03de5b7cef3d93c403126143f1152943
+  checksum: 8467db689298221f706d3358961efb0ddc789f6bd7d4765e71ae5fe62067999d2ce6e8e7584b9d991b8caa6f7fb383f75841e1cfa9e05808c34632de374f5e68
   languageName: node
   linkType: hard
 

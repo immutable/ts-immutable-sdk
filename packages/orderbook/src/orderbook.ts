@@ -13,6 +13,7 @@ import {
   mapFromOpenApiTrade,
 } from './openapi/mapper';
 import { Seaport } from './seaport';
+import { getBulkSeaportOrderSignatures } from './seaport/components';
 import { SeaportLibFactory } from './seaport/seaport-lib-factory';
 import {
   ActionType,
@@ -36,6 +37,8 @@ import {
   PrepareListingResponse,
   SignablePurpose,
   TradeResult,
+  CreateBulkListingsParams,
+  BulkListingsResult,
 } from './types';
 
 /**
@@ -163,7 +166,14 @@ export class Orderbook {
   }
 
   /**
-   * TODO
+   * Get required transactions and messages for signing prior to creating bulk listings
+   * through the createBulkListings method. This method only supports up to 10 listings
+   * at a time. It can also be used for individual listings to simplify integration code paths.
+   * @param {PrepareBulkListingsParams} prepareBulkListingsParams - Details about the listings
+   * to be created.
+   * @return {PrepareBulkListingsResponse} PrepareListingResponse includes
+   * any unsigned approval transactions, the typed bulk order message for signing and
+   * the order components that can be submitted to `createBulkListings` with the signature.
    */
   async prepareBulkListings(
     {
@@ -171,8 +181,32 @@ export class Orderbook {
       orderParams,
     }: PrepareBulkListingsParams,
   ): Promise<PrepareBulkListingsResponse> {
-    // TODO: If a single order is passed, delegate to prepareListing as the signature
-    // will be more gase efficient at settlement time
+    // Limit bulk listing creation to 10 orders to prevent API and order evaluation spam
+    if (orderParams.length > 10) {
+      throw new Error('Bulk listing creation is limited to 10 orders');
+    }
+
+    // In the event of a single order, delegate to prepareListing as the signature is more
+    // gas efficient
+    if (orderParams.length === 1) {
+      const prepareListingResponse = await this.prepareListing({
+        buy: orderParams[0].buy,
+        makerAddress,
+        sell: orderParams[0].sell,
+        orderExpiry: orderParams[0].orderExpiry,
+      });
+
+      return {
+        actions: prepareListingResponse.actions,
+        preparedOrders: [
+          {
+            orderComponents: prepareListingResponse.orderComponents,
+            orderHash: prepareListingResponse.orderHash,
+          },
+        ],
+      };
+    }
+
     return this.seaport.prepareBulkSeaportOrders(
       makerAddress,
       orderParams.map((orderParam) => ({
@@ -182,6 +216,65 @@ export class Orderbook {
         orderExpiry: orderParam.orderExpiry || new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 2),
       })),
     );
+  }
+
+  /**
+   * Create bulk listings.
+   * @param {CreateBulkListingsParams} createBulkListingParams - create bulk listings
+   * from with the given signature and order components. The createOrderParams array *must*
+   * be in the same order as the result of the prepareBulkListings method.
+   * @return {BulkListingsResult} The result of the listing creations from the Immutable orderbook
+   * API.
+   */
+  async createBulkListings(
+    { bulkOrderSignature, createOrderParams }: CreateBulkListingsParams,
+  ): Promise<BulkListingsResult> {
+    // In the event of a single order, delegate to createListing as the signature will not
+    // be generated from a tree
+    if (createOrderParams.length === 1) {
+      const createOrderResponse = await this.createListing({
+        ...createOrderParams[0],
+        orderSignature: bulkOrderSignature,
+      });
+
+      return {
+        result: [
+          {
+            success: !!createOrderResponse.result,
+            orderHash: createOrderParams[0].orderHash,
+            order: createOrderResponse.result,
+          },
+        ],
+      };
+    }
+
+    const orderComponents = createOrderParams.map((orderParam) => orderParam.orderComponents);
+    const signatures = getBulkSeaportOrderSignatures(
+      bulkOrderSignature,
+      orderComponents,
+    );
+
+    const createOrdersApiListingResponse = await Promise.all(
+      orderComponents.map((orderComponent, i) => {
+        const sig = signatures[i];
+        const listingParams = createOrderParams[i];
+        return this.apiClient.createListing({
+          orderComponents: orderComponent,
+          orderHash: listingParams.orderHash,
+          orderSignature: sig,
+          makerFees: listingParams.makerFees,
+          // Swallow failed creations - this gets mapped in the response to caller as failed
+        }).catch(() => undefined);
+      }),
+    );
+
+    return {
+      result: createOrdersApiListingResponse.map((apiListingResponse, i) => ({
+        success: !!apiListingResponse,
+        orderHash: createOrderParams[i].orderHash,
+        order: apiListingResponse ? mapFromOpenApiOrder(apiListingResponse.result) : undefined,
+      })),
+    };
   }
 
   /**

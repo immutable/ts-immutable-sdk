@@ -64,6 +64,11 @@ export interface PrepareCancelOrdersResponse {
   signableAction: SignableAction;
 }
 
+export interface CreateBulkListingsParams {
+  bulkOrderSignature: string;
+  createOrderParams: Omit<CreateListingParams, 'orderSignature'>[];
+}
+
 export interface CreateListingParams {
   orderComponents: OrderComponents;
   orderHash: string;
@@ -218,6 +223,14 @@ export interface Order {
 
 export interface ListingResult {
   result: Order;
+}
+
+export interface BulkListingsResult {
+  result: {
+    success: boolean;
+    orderHash: string;
+    order?: Order;
+  }[];
 }
 
 export interface ListListingsResult {

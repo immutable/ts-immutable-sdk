@@ -21,11 +21,16 @@ describe('prepareListing and createOrder bulk e2e', () => {
         environment: Environment.SANDBOX,
       },
       overrides: {
-        ...localConfigOverrides,
+        apiEndpoint: localConfigOverrides.apiEndpoint,
+        chainName: localConfigOverrides.chainName,
+        jsonRpcProviderUrl: localConfigOverrides.jsonRpcProviderUrl,
+        seaportContractAddress: localConfigOverrides.seaportContractAddress,
+        zoneContractAddress: localConfigOverrides.zoneContractAddress,
       },
     });
 
     const { contract } = await deployTestToken(offerer);
+    await contract.safeMint(offerer.address);
     await contract.safeMint(offerer.address);
 
     const bulkListings = await sdk.prepareBulkListings({
@@ -42,22 +47,36 @@ describe('prepareListing and createOrder bulk e2e', () => {
             type: 'ERC721',
           },
         },
+        {
+          buy: {
+            amount: '2000000',
+            type: 'NATIVE',
+          },
+          sell: {
+            contractAddress: contract.address,
+            tokenId: '1',
+            type: 'ERC721',
+          },
+        },
       ],
     });
 
     const signatures = await actionAll(bulkListings.actions, offerer);
-    console.log(JSON.stringify(bulkListings.preparedOrders, null, 2));
 
-    const res = await sdk.createListing({
-      orderComponents: bulkListings.preparedOrders[0].orderComponents,
-      orderHash: bulkListings.preparedOrders[0].orderHash,
-      orderSignature: signatures[0],
-      makerFees: [],
-    }).catch(e => {
-      console.log(JSON.stringify(e, null, 2));
-      throw e
+    const res = await sdk.createBulkListings({
+      bulkOrderSignature: signatures[0],
+      createOrderParams: bulkListings.preparedOrders.map((preparedOrder) => ({
+        makerFees: [],
+        orderComponents: preparedOrder.orderComponents,
+        orderHash: preparedOrder.orderHash,
+      })),
     });
 
-    // await waitForOrderToBeOfStatus(sdk, orderId, OrderStatusName.ACTIVE);
+    for (const result of res.result) {
+      if (!result.order) {
+        throw new Error('Order not created');
+      }
+      await waitForOrderToBeOfStatus(sdk, result.order.id, OrderStatusName.ACTIVE);
+    }
   }, 30_000);
 });

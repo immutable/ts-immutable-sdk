@@ -35,12 +35,16 @@ export const andTheOffererAccountHasERC721Token = (
   banker: Wallet,
   offerer: Wallet,
   contractAddress: string,
-  tokenId: string,
+  tokenIds: string[],
 ) => {
   and(/^the offerer account has (\d+) ERC721 token$/, async () => {
     const testToken = await connectToTestERC721Token(banker, contractAddress);
-    const mintTx = await testToken.mint(offerer.address, tokenId, GAS_OVERRIDES);
-    await mintTx.wait(1);
+    for (const tokenId of tokenIds) {
+      // eslint-disable-next-line no-await-in-loop
+      const mintTx = await testToken.mint(offerer.address, tokenId, GAS_OVERRIDES);
+      // eslint-disable-next-line no-await-in-loop
+      await mintTx.wait(1);
+    }
   });
 };
 
@@ -117,6 +121,68 @@ export const whenICreateAListing = (
     });
 
     setListingId(result.id);
+  });
+};
+
+export const whenICreateABulkListing = (
+  when: DefineStepFunction,
+  sdk: orderbook.Orderbook,
+  offerer: Wallet,
+  contractAddress: string,
+  tokenIds: string[],
+  setListingId: (listingId: string) => void,
+) => {
+  when(/^I bulk create listings to sell (\d+) (\w+) tokens?$/, async (amount, tokenType): Promise<void> => {
+    const orderParams: any[] = [];
+    for (const tokenId of tokenIds) {
+      let sellItem;
+      if (tokenType === 'ERC721') {
+        sellItem = {
+          contractAddress,
+          tokenId,
+          type: 'ERC721',
+        } as orderbook.ERC721Item;
+      } else {
+        sellItem = {
+          contractAddress,
+          tokenId,
+          type: 'ERC1155',
+          amount: amount.toString(),
+        } as orderbook.ERC1155Item;
+      }
+
+      orderParams.push({
+        buy: {
+          amount: `${listingPrice}`,
+          type: 'NATIVE',
+        },
+        sell: sellItem,
+      });
+    }
+
+    const listing = await sdk.prepareBulkListings({
+      makerAddress: offerer.address,
+      orderParams,
+    });
+
+    const signatures = await actionAll(listing.actions, offerer);
+    const { result } = await sdk.createBulkListings({
+      bulkOrderSignature: signatures[0],
+      createOrderParams: listing.preparedOrders.map((or) => ({
+        makerFees: [],
+        orderComponents: or.orderComponents,
+        orderHash: or.orderHash,
+      })),
+    });
+
+    for (const res of result) {
+      if (!res.success) {
+        throw new Error(`Failed to create listing for order hash: ${res.orderHash}`);
+      }
+    }
+
+    // Set the listing ID as the second order created to be filled in the next steps
+    setListingId(result[1].order?.id!);
   });
 };
 

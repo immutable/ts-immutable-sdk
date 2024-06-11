@@ -84,19 +84,12 @@ export class Seaport {
     }
 
     const orderMessageToSign = await createAction.getMessageToSign();
-    // The tree root is a zero property order that we dont need submitted to the API
-    const orders = getBulkOrderComponentsFromMessage(orderMessageToSign)
-      .filter((o) => o.offerer !== '0x0000000000000000000000000000000000000000');
-
-    // TODO: Comments to explain
-    const message = JSON.parse(orderMessageToSign);
-    delete message.types.EIP712Domain;
-    message.value = message.message;
+    const orders = getBulkOrderComponentsFromMessage(orderMessageToSign);
 
     listingActions.push({
       type: ActionType.SIGNABLE,
       purpose: SignablePurpose.CREATE_LISTING,
-      message,
+      message: await this.getTypedDataFromBulkOrderComponents({ tree: orders }, orderInputs.length),
     });
 
     return {
@@ -440,8 +433,8 @@ export class Seaport {
   }
 
   private async getTypedDataFromBulkOrderComponents(
-    orderComponents: OrderComponents,
-    message: string,
+    orderComponents: { tree: OrderComponents[] },
+    numberOfOrders: number,
   ): Promise<SignableAction['message']> {
     const { chainId } = await this.provider.getNetwork();
 
@@ -452,9 +445,15 @@ export class Seaport {
       verifyingContract: this.seaportContractAddress,
     };
 
+    const bulkOrderType = [{ name: 'tree', type: `OrderComponents[${numberOfOrders}]` }];
+
     return {
       domain: domainData,
-      types: EIP_712_ORDER_TYPE,
+      types: {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        BulkOrder: bulkOrderType,
+        ...EIP_712_ORDER_TYPE,
+      },
       value: orderComponents,
     };
   }
