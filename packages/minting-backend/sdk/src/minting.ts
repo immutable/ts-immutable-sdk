@@ -41,7 +41,6 @@ export const submitMintingRequests = async (
   trackSubmitMintingRequests();
   let mintingResponse: Types.CreateMintRequestResult | undefined;
   let numberOfLoops = 0;
-  // eslint-disable-next-line no-constant-condition
   while (numberOfLoops++ < maxLoops) {
     await new Promise((resolve) => {
       setTimeout(resolve, defaultMintingDelay);
