@@ -305,7 +305,7 @@ More information can be found in the README file in the X-Provider folder [here]
 # Contribution Guides
 See [CONTRIBUTING.md](https://github.com/immutable/ts-immutable-sdk/blob/main/CONTRIBUTING.md)
 
-Internal maintainers' guide is available at Immutable's wiki `UnifiedSDK Internal Development Guide`
+Internal maintainers' guide is available at Immutable's wiki [Typescript SDK Internal Development Guide here](https://immutable.atlassian.net/wiki/spaces/PPS/pages/2333477584/Typescript+SDK+Internal+Development+Guide+-+ts-immutable-sdk)
 - In the .github/CODEOWNERS file add your github team to the corresponding subfolder that your team will be responsible for.
 - [Example from GitHub](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners#example-of-a-codeowners-file)
 
