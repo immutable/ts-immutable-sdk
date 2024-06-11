@@ -186,9 +186,7 @@ export const useSignOrder = (input: SignOrderInput) => {
       data: string,
       gasLimit: number,
       method: string,
-    ): Promise<[hash: string | undefined, error: any]> => {
-      let transactionHash: string | undefined;
-
+    ): Promise<[hash: string | undefined, error?: SignOrderError]> => {
       try {
         const signer = provider?.getSigner();
         const gasPrice = await provider?.getGasPrice();
@@ -205,13 +203,15 @@ export const useSignOrder = (input: SignOrderInput) => {
           await txnResponse?.wait();
         }
 
-        transactionHash = txnResponse?.hash || '';
+        const transactionHash = txnResponse?.hash;
+        if (!transactionHash) {
+          throw new Error('Transaction hash is undefined');
+        }
         return [transactionHash, undefined];
       } catch (err) {
         const reason = `${
           (err as any)?.reason || (err as any)?.message || ''
         }`.toLowerCase();
-        transactionHash = (err as any)?.transactionHash;
 
         let errorType = SaleErrorTypes.WALLET_FAILED;
 
@@ -236,13 +236,12 @@ export const useSignOrder = (input: SignOrderInput) => {
         ) {
           errorType = SaleErrorTypes.TRANSACTION_FAILED;
         }
-
-        setSignError({
+        const error: SignOrderError = {
           type: errorType,
           data: { error: err },
-        });
-
-        return [undefined, err];
+        };
+        setSignError(error);
+        return [undefined, error];
       }
     },
     [provider],
@@ -326,14 +325,13 @@ export const useSignOrder = (input: SignOrderInput) => {
   const execute = async (
     signData: SignResponse | undefined,
     onTxnSuccess: (txn: ExecutedTransaction) => void,
-    onTxnError: (error: any, txns: ExecutedTransaction[]) => void,
+    onTxnError: (error: SignOrderError, txns: ExecutedTransaction[]) => void,
   ): Promise<ExecutedTransaction[]> => {
     if (!signData || !provider) {
       setSignError({
         type: SaleErrorTypes.DEFAULT,
         data: { reason: 'No sign data' },
       });
-
       return [];
     }
 
@@ -360,7 +358,7 @@ export const useSignOrder = (input: SignOrderInput) => {
         method,
       );
 
-      if (txnError || !hash) {
+      if (txnError) {
         successful = false;
         onTxnError(txnError, execTransactions);
         break;
