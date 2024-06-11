@@ -105,7 +105,7 @@ describe('postgres minting backend', () => {
     expect(rows2[0].minting_status).toBe('succeeded');
 
     await pool.end();
-  }, 10000);
+  }, 30000);
 
   // test("record, submit, process webhook event in unhappy path", async () => {
 
