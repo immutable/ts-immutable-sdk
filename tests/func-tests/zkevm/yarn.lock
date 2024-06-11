@@ -1105,7 +1105,7 @@ __metadata:
 
 "@imtbl/sdk@file:../../../sdk::locator=func-tests-imx%40workspace%3A.":
   version: 0.0.0
-  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=e4abd4&locator=func-tests-imx%40workspace%3A."
+  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=218f6f&locator=func-tests-imx%40workspace%3A."
   dependencies:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
@@ -1162,7 +1162,7 @@ __metadata:
       optional: true
     prisma:
       optional: true
-  checksum: e891dff51ef06c93c5085c60647bd1e08b78bba5dec6f441378f5208c22316f5dd5657a16d4bc0c00f786f972a41857a7f83eafd8ecf855029075478b9324dcb
+  checksum: a22cdb89e45fcf98a7833e00c7ceb3523bf22020a9c439c5c3fda7da8b466cadc161bf28474379ee95c4638b7de74d9d050fe42e1ea06402464046eb5e38005b
   languageName: node
   linkType: hard
 

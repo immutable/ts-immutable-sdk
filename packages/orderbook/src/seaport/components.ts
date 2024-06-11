@@ -1,5 +1,5 @@
 import { OrderComponents } from '@opensea/seaport-js/lib/types';
-import { getBulkOrderTree } from '@opensea/seaport-js/src/utils/eip712/bulk-orders';
+import { getBulkOrderTree } from '@opensea/seaport-js/lib/utils/eip712/bulk-orders';
 import { BigNumber } from 'ethers';
 
 export function getOrderComponentsFromMessage(orderMessage: string): OrderComponents {
@@ -13,7 +13,10 @@ export function getOrderComponentsFromMessage(orderMessage: string): OrderCompon
 
 export function getBulkOrderComponentsFromMessage(orderMessage: string): OrderComponents[] {
   const data = JSON.parse(orderMessage);
-  const orderComponents: OrderComponents[] = data.message.tree;
+  const orderComponents: OrderComponents[] = data.message.tree.flat(Infinity)
+    // Filter off the zero nodes in the tree. The will get rebuilt bu `getBulkOrderTree`
+    // when creating the listings
+    .filter((o: OrderComponents) => o.offerer !== '0x0000000000000000000000000000000000000000');
 
   // eslint-disable-next-line no-restricted-syntax
   for (const orderComponent of orderComponents) {

@@ -133,7 +133,7 @@ export const whenICreateABulkListing = (
   setListingId: (listingId: string) => void,
 ) => {
   when(/^I bulk create listings to sell (\d+) (\w+) tokens?$/, async (amount, tokenType): Promise<void> => {
-    const orderParams: any[] = [];
+    const listingParams: any[] = [];
     for (const tokenId of tokenIds) {
       let sellItem;
       if (tokenType === 'ERC721') {
@@ -151,7 +151,7 @@ export const whenICreateABulkListing = (
         } as orderbook.ERC1155Item;
       }
 
-      orderParams.push({
+      listingParams.push({
         buy: {
           amount: `${listingPrice}`,
           type: 'NATIVE',
@@ -160,15 +160,15 @@ export const whenICreateABulkListing = (
       });
     }
 
-    const listing = await sdk.prepareBulkListings({
+    const { actions, preparedListings } = await sdk.prepareBulkListings({
       makerAddress: offerer.address,
-      orderParams,
+      listingParams,
     });
 
-    const signatures = await actionAll(listing.actions, offerer);
+    const signatures = await actionAll(actions, offerer);
     const { result } = await sdk.createBulkListings({
       bulkOrderSignature: signatures[0],
-      createOrderParams: listing.preparedOrders.map((or) => ({
+      listingParams: preparedListings.map((or) => ({
         makerFees: [],
         orderComponents: or.orderComponents,
         orderHash: or.orderHash,

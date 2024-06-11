@@ -8,6 +8,7 @@ import {
   OrderComponents,
   OrderUseCase,
 } from '@opensea/seaport-js/lib/types';
+import { getBulkOrderTree, getBulkOrderTreeHeight } from '@opensea/seaport-js/lib/utils/eip712/bulk-orders';
 import { providers } from 'ethers';
 import { mapFromOpenApiOrder } from 'openapi/mapper';
 import {
@@ -89,12 +90,12 @@ export class Seaport {
     listingActions.push({
       type: ActionType.SIGNABLE,
       purpose: SignablePurpose.CREATE_LISTING,
-      message: await this.getTypedDataFromBulkOrderComponents({ tree: orders }, orderInputs.length),
+      message: await this.getTypedDataFromBulkOrderComponents(orders, orderInputs.length),
     });
 
     return {
       actions: listingActions,
-      preparedOrders: orders.map((orderComponent) => ({
+      preparedListings: orders.map((orderComponent) => ({
         orderComponents: orderComponent,
         orderHash: this.getSeaportLib().getOrderHash(orderComponent),
       })),
@@ -433,7 +434,7 @@ export class Seaport {
   }
 
   private async getTypedDataFromBulkOrderComponents(
-    orderComponents: { tree: OrderComponents[] },
+    orderComponents: OrderComponents[],
     numberOfOrders: number,
   ): Promise<SignableAction['message']> {
     const { chainId } = await this.provider.getNetwork();
@@ -445,7 +446,9 @@ export class Seaport {
       verifyingContract: this.seaportContractAddress,
     };
 
-    const bulkOrderType = [{ name: 'tree', type: `OrderComponents[${numberOfOrders}]` }];
+    const treeHeight = getBulkOrderTreeHeight(numberOfOrders);
+    const bulkOrderType = [{ name: 'tree', type: `OrderComponents${'[2]'.repeat(treeHeight)}` }];
+    const tree = getBulkOrderTree(orderComponents);
 
     return {
       domain: domainData,
@@ -454,7 +457,7 @@ export class Seaport {
         BulkOrder: bulkOrderType,
         ...EIP_712_ORDER_TYPE,
       },
-      value: orderComponents,
+      value: { tree: tree.getDataToSign() },
     };
   }
 

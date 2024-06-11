@@ -49,12 +49,12 @@ export interface PrepareListingResponse {
 
 export interface PrepareBulkListingsParams {
   makerAddress: string;
-  orderParams: Omit<PrepareListingParams, 'makerAddress'>[];
+  listingParams: Omit<PrepareListingParams, 'makerAddress'>[];
 }
 
 export interface PrepareBulkListingsResponse {
   actions: Action[];
-  preparedOrders: {
+  preparedListings: {
     orderComponents: OrderComponents;
     orderHash: string;
   }[]
@@ -66,7 +66,7 @@ export interface PrepareCancelOrdersResponse {
 
 export interface CreateBulkListingsParams {
   bulkOrderSignature: string;
-  createOrderParams: Omit<CreateListingParams, 'orderSignature'>[];
+  listingParams: Omit<CreateListingParams, 'orderSignature'>[];
 }
 
 export interface CreateListingParams {
