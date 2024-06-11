@@ -32,6 +32,7 @@ import {
   SignPaymentTypes,
   SignResponse,
   ExecuteTransactionStep,
+  SignedTransaction,
 } from '../types';
 import { useQuoteOrder, defaultOrderQuote } from '../hooks/useQuoteOrder';
 
@@ -62,7 +63,8 @@ type SaleContextValues = SaleContextProps & {
     onTxnError: (error: SignOrderError, txns: ExecutedTransaction[]) => void,
     onTxnStep?: (method: string, step: ExecuteTransactionStep) => void
   ) => Promise<ExecutedTransaction[]>;
-  executeNextTransaction: (
+  executeTransaction: (
+    transaction: SignedTransaction,
     onTxnSuccess: (txn: ExecutedTransaction) => void,
     onTxnError: (error: any, txns: ExecutedTransaction[]) => void
   ) => Promise<boolean>;
@@ -103,7 +105,7 @@ const SaleContext = createContext<SaleContextValues>({
   recipientEmail: '',
   sign: () => Promise.resolve(undefined),
   executeAll: () => Promise.resolve([]),
-  executeNextTransaction: () => Promise.resolve(false),
+  executeTransaction: () => Promise.resolve(false),
   signResponse: undefined,
   signError: undefined,
   executeResponse: undefined,
@@ -231,6 +233,7 @@ export function SaleContextProvider(props: {
   const {
     sign: signOrder,
     executeAll,
+    executeTransaction,
     signResponse,
     signError,
     executeResponse,
@@ -346,6 +349,7 @@ export function SaleContextProvider(props: {
       signResponse,
       signError,
       executeAll,
+      executeTransaction,
       executeResponse,
       environmentId,
       collectionName,

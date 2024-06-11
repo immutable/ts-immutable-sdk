@@ -333,12 +333,18 @@ export const useSignOrder = (input: SignOrderInput) => {
     onTxnSuccess: (txn: ExecutedTransaction) => void,
     onTxnError: (error: any, txns: ExecutedTransaction[]) => void,
   ) => {
+    if (!transaction) {
+      return false;
+    }
+
     const {
       tokenAddress: to,
       rawData: data,
       methodCall: method,
       gasEstimate,
     } = transaction;
+
+    console.log('@@@@@ Executing transaction', transaction);
 
     const [hash, txnError] = await sendTransaction(
       to,
@@ -353,7 +359,6 @@ export const useSignOrder = (input: SignOrderInput) => {
     }
 
     const execTransaction = { method, hash };
-    setExecuteTransactions(execTransaction);
     onTxnSuccess(execTransaction);
 
     return true;
@@ -374,6 +379,8 @@ export const useSignOrder = (input: SignOrderInput) => {
 
         return [];
       }
+
+      console.log('@@@@@ Executing all ', signData);
 
       const transactions = await filterAllowedTransactions(
         signData.transactions,
@@ -423,5 +430,6 @@ export const useSignOrder = (input: SignOrderInput) => {
     executeAll,
     executeResponse,
     tokenIds,
+    executeTransaction,
   };
 };
