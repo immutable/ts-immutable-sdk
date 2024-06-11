@@ -44,6 +44,10 @@ describe('prepareListing and createOrder bulk e2e', () => {
           tokenId: `${i}`,
           type: 'ERC721',
         },
+        makerFees: [{
+          amount: '10000',
+          recipientAddress: offerer.address,
+        }],
       });
       // eslint-disable-next-line no-plusplus
       i++;
@@ -51,21 +55,13 @@ describe('prepareListing and createOrder bulk e2e', () => {
 
     await contract.safeMint(offerer.address);
 
-    const bulkListings = await sdk.prepareBulkListings({
+    const { actions, createListings } = await sdk.prepareBulkListings({
       makerAddress: offerer.address,
       listingParams: orderParams,
     });
 
-    const signatures = await actionAll(bulkListings.actions, offerer);
-
-    const res = await sdk.createBulkListings({
-      bulkOrderSignature: signatures[0],
-      listingParams: bulkListings.preparedListings.map((preparedOrder) => ({
-        makerFees: [],
-        orderComponents: preparedOrder.orderComponents,
-        orderHash: preparedOrder.orderHash,
-      })),
-    });
+    const signatures = await actionAll(actions, offerer);
+    const res = await createListings(signatures[0]);
 
     for (const result of res.result) {
       if (!result.order) {
@@ -108,6 +104,7 @@ describe('prepareListing and createOrder bulk e2e', () => {
           tokenId: `${i}`,
           type: 'ERC721',
         },
+        makerFees: [],
       });
       // eslint-disable-next-line no-plusplus
       i++;

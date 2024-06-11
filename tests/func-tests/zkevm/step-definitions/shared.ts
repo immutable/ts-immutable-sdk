@@ -160,20 +160,13 @@ export const whenICreateABulkListing = (
       });
     }
 
-    const { actions, preparedListings } = await sdk.prepareBulkListings({
+    const { actions, createListings } = await sdk.prepareBulkListings({
       makerAddress: offerer.address,
       listingParams,
     });
 
     const signatures = await actionAll(actions, offerer);
-    const { result } = await sdk.createBulkListings({
-      bulkOrderSignature: signatures[0],
-      listingParams: preparedListings.map((or) => ({
-        makerFees: [],
-        orderComponents: or.orderComponents,
-        orderHash: or.orderHash,
-      })),
-    });
+    const { result } = await createListings(signatures[0]);
 
     for (const res of result) {
       if (!res.success) {

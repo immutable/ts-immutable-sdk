@@ -19,7 +19,7 @@ import {
   ERC721Item,
   FulfillOrderResponse,
   NativeItem,
-  PrepareBulkListingsResponse,
+  PrepareBulkSeaportOrders,
   PrepareListingResponse,
   SignableAction,
   SignablePurpose,
@@ -55,7 +55,7 @@ export class Seaport {
       orderStart: Date,
       orderExpiry: Date,
     }[],
-  ): Promise<PrepareBulkListingsResponse> {
+  ): Promise<PrepareBulkSeaportOrders> {
     const { actions: seaportActions } = await this.createSeaportOrders(
       offerer,
       orderInputs,

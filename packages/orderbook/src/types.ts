@@ -49,10 +49,20 @@ export interface PrepareListingResponse {
 
 export interface PrepareBulkListingsParams {
   makerAddress: string;
-  listingParams: Omit<PrepareListingParams, 'makerAddress'>[];
+  listingParams: {
+    sell: ERC721Item | ERC1155Item;
+    buy: ERC20Item | NativeItem;
+    makerFees: FeeValue[];
+    orderExpiry?: Date;
+  }[]
 }
 
 export interface PrepareBulkListingsResponse {
+  actions: Action[];
+  createListings: (signature: string) => Promise<BulkListingsResult>;
+}
+
+export interface PrepareBulkSeaportOrders {
   actions: Action[];
   preparedListings: {
     orderComponents: OrderComponents;
@@ -62,11 +72,6 @@ export interface PrepareBulkListingsResponse {
 
 export interface PrepareCancelOrdersResponse {
   signableAction: SignableAction;
-}
-
-export interface CreateBulkListingsParams {
-  bulkOrderSignature: string;
-  listingParams: Omit<CreateListingParams, 'orderSignature'>[];
 }
 
 export interface CreateListingParams {

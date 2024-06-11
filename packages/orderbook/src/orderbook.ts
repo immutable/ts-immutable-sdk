@@ -37,8 +37,6 @@ import {
   PrepareListingResponse,
   SignablePurpose,
   TradeResult,
-  CreateBulkListingsParams,
-  BulkListingsResult,
 } from './types';
 
 /**
@@ -166,14 +164,15 @@ export class Orderbook {
   }
 
   /**
-   * Get required transactions and messages for signing prior to creating bulk listings
-   * through the createBulkListings method. This method only supports up to 10 listings
+   * Get required transactions and messages for signing prior to creating bulk listings.
+   * Once the transactions are submitting and the message signed, call the createListings method
+   * provided in the return type with the signature. This method only supports up to 10 listings
    * at a time. It can also be used for individual listings to simplify integration code paths.
    * @param {PrepareBulkListingsParams} prepareBulkListingsParams - Details about the listings
    * to be created.
    * @return {PrepareBulkListingsResponse} PrepareListingResponse includes
    * any unsigned approval transactions, the typed bulk order message for signing and
-   * the order components that can be submitted to `createBulkListings` with the signature.
+   * the createListings method that can be called with the signature to create the listings.
    */
   async prepareBulkListings(
     {
@@ -198,16 +197,26 @@ export class Orderbook {
 
       return {
         actions: prepareListingResponse.actions,
-        preparedListings: [
-          {
+        createListings: async (signature: string) => {
+          const createListingResult = await this.createListing({
+            makerFees: [],
             orderComponents: prepareListingResponse.orderComponents,
             orderHash: prepareListingResponse.orderHash,
-          },
-        ],
+            orderSignature: signature,
+          });
+
+          return {
+            result: [{
+              success: !!createListingResult.result,
+              orderHash: prepareListingResponse.orderHash,
+              order: createListingResult.result,
+            }],
+          };
+        },
       };
     }
 
-    return this.seaport.prepareBulkSeaportOrders(
+    const { actions, preparedListings } = await this.seaport.prepareBulkSeaportOrders(
       makerAddress,
       listingParams.map((orderParam) => ({
         listingItem: orderParam.sell,
@@ -216,64 +225,39 @@ export class Orderbook {
         orderExpiry: orderParam.orderExpiry || new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 2),
       })),
     );
-  }
-
-  /**
-   * Create bulk listings.
-   * @param {CreateBulkListingsParams} createBulkListingParams - create bulk listings
-   * from with the given signature and order components. The createOrderParams array *must*
-   * be in the same order as the result of the prepareBulkListings method.
-   * @return {BulkListingsResult} The result of the listing creations from the Immutable orderbook
-   * API.
-   */
-  async createBulkListings(
-    { bulkOrderSignature, listingParams }: CreateBulkListingsParams,
-  ): Promise<BulkListingsResult> {
-    // In the event of a single order, delegate to createListing as the signature will not
-    // be generated from a tree
-    if (listingParams.length === 1) {
-      const createOrderResponse = await this.createListing({
-        ...listingParams[0],
-        orderSignature: bulkOrderSignature,
-      });
-
-      return {
-        result: [
-          {
-            success: !!createOrderResponse.result,
-            orderHash: listingParams[0].orderHash,
-            order: createOrderResponse.result,
-          },
-        ],
-      };
-    }
-
-    const orderComponents = listingParams.map((orderParam) => orderParam.orderComponents);
-    const signatures = getBulkSeaportOrderSignatures(
-      bulkOrderSignature,
-      orderComponents,
-    );
-
-    const createOrdersApiListingResponse = await Promise.all(
-      orderComponents.map((orderComponent, i) => {
-        const sig = signatures[i];
-        const listing = listingParams[i];
-        return this.apiClient.createListing({
-          orderComponents: orderComponent,
-          orderHash: listing.orderHash,
-          orderSignature: sig,
-          makerFees: listing.makerFees,
-          // Swallow failed creations - this gets mapped in the response to caller as failed
-        }).catch(() => undefined);
-      }),
-    );
 
     return {
-      result: createOrdersApiListingResponse.map((apiListingResponse, i) => ({
-        success: !!apiListingResponse,
-        orderHash: listingParams[i].orderHash,
-        order: apiListingResponse ? mapFromOpenApiOrder(apiListingResponse.result) : undefined,
-      })),
+      actions,
+      createListings: async (bulkOrderSignature: string) => {
+        const orderComponents = preparedListings.map((orderParam) => orderParam.orderComponents);
+        const signatures = getBulkSeaportOrderSignatures(
+          bulkOrderSignature,
+          orderComponents,
+        );
+
+        const createOrdersApiListingResponse = await Promise.all(
+          orderComponents.map((orderComponent, i) => {
+            const sig = signatures[i];
+            const listing = preparedListings[i];
+            const listingParam = listingParams[i];
+            return this.apiClient.createListing({
+              orderComponents: orderComponent,
+              orderHash: listing.orderHash,
+              orderSignature: sig,
+              makerFees: listingParam.makerFees,
+            // Swallow failed creations - this gets mapped in the response to caller as failed
+            }).catch(() => undefined);
+          }),
+        );
+
+        return {
+          result: createOrdersApiListingResponse.map((apiListingResponse, i) => ({
+            success: !!apiListingResponse,
+            orderHash: preparedListings[i].orderHash,
+            order: apiListingResponse ? mapFromOpenApiOrder(apiListingResponse.result) : undefined,
+          })),
+        };
+      },
     };
   }
 
