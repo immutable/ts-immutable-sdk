@@ -79,7 +79,7 @@ export function SelectForm({
         <Select
           testId={`${testId}-select`}
           size="large"
-          defaultLabel="Select coin"
+          defaultLabel="Select token"
           targetClickOveride={() => setCoinSelectorOpen(true)}
           selectedOption={getSelectedOption()}
           sx={{ minw: '170px' }}

@@ -3,7 +3,7 @@
     "CONNECT_WALLET": {
       "body": {
         "heading": "ウォレットを接続する",
-        "content": "購入、販売、取引、およびコインとコレクティブルを保存するには、デジタルウォレットを接続または作成する必要があります。"
+        "content": "トークンや収集品を購入、販売、取引、保管するには、デジタルウォレットを接続するか、新しいデジタルウォレットを作成する必要があります。"
       },
       "walletSelection": {
         "heading": "ウォレットを選択"
@@ -91,13 +91,13 @@
         "heading": "ネットワーク"
       },
       "totalTokenBalance": {
-        "heading": "コイン",
+        "heading": "トークン",
         "totalHeading": "価値"
       },
       "tokenBalancesList": {
         "noTokensFound": "トークンが見つかりません"
       },
-      "addCoins": "コインを追加"
+      "addCoins": "トークンを追加する"
     },
     "SETTINGS": {
       "header": {
@@ -116,19 +116,19 @@
     },
     "COIN_INFO": {
       "metamask": {
-        "heading": "コインとコレクティブルはネットワーク固有です",
-        "body": "コインを追加したり、ネットワーク間でコインを移動したりするには、ネットワークを切り替えることができます"
+        "heading": "トークンとコレクタブルはネットワークに固有のものです",
+        "body": "トークンを追加したり、別のネットワークに移動したりするには、ネットワークを切り替えることができます"
       },
       "passport": {
-        "heading": "コインとコレクティブルはネットワーク固有です",
-        "body1": "このネットワークはImmutable zkEVMと呼ばれます。Passportに他のコインがあり、ここに表示されない場合、それらは別のネットワークにあるかもしれません。",
+        "heading": "トークンとコレクタブルはネットワークに固有のものです",
+        "body1": "このネットワークは Immutable zkEVM と呼ばれています。パスポートに他のトークンがあり、ここに表示されない場合、それらは別のネットワーク上にあるかもしれません。",
         "body2": "詳細については、",
         "linkText": "FAQをご覧ください"
       }
     },
     "SWAP": {
       "header": {
-        "title": "コインをスワップ"
+        "title": "トークンを交換する"
       },
       "content": {
         "title": "何をスワップしたいですか？",
@@ -154,8 +154,8 @@
       "validation": {
         "noAmountInputted": "金額を入力してください",
         "insufficientBalance": "残高不足",
-        "noFromTokenSelected": "スワップするコインを選択してください",
-        "noToTokenSelected": "受け取るコインを選択してください"
+        "noFromTokenSelected": "交換するトークンを選択してください",
+        "noToTokenSelected": "受け取るトークンを選択してください"
       },
       "success": {
         "text": "成功",
@@ -211,7 +211,7 @@
     },
     "ONRAMP": {
       "header": {
-        "title": "コインを追加"
+        "title": "トークンを追加する"
       },
       "initialLoadingText": "Transakに移動しています",
       "IN_PROGRESS_LOADING": {
@@ -227,7 +227,7 @@
         }
       },
       "SUCCESS": {
-        "text": "コインが途中にあります",
+        "text": "トークンがまもなく到着します",
         "actionText": "完了"
       },
       "FAIL": {
@@ -240,6 +240,9 @@
         "title": "どのようにトークンを追加しますか？"
       },
       "topUpOptions": {
+        "onramp": {
+          "heading": "トークンを購入する"
+        },
         "debit": {
           "heading": "デビットカードで購入",
           "caption": "トークンを購入する推奨方法",
@@ -285,7 +288,7 @@
       },
       "coinsDrawer": {
         "header": "支払い方法…",
-        "caption1": "コイン",
+        "caption1": "トークン",
         "caption2": "残高",
         "divider": "その他のオプション",
         "stepType": {
@@ -318,19 +321,19 @@
       },
       "options": {
         "crypto": {
-          "heading": "コイン",
-          "caption": "財布の中のコインで支払うか、カードでコインを購入してください。",
+          "heading": "トークン",
+          "caption": "ウォレット内のトークンで支払うか、カードでトークンを購入してください",
           "disabledCaption": "現在、この支払い方法は利用できません。"
         },
         "debit": {
           "heading": "デビットカード",
           "caption": "カードでの支払いに推奨される方法です。",
-          "disabledCaption": "選択されたアイテムは利用できません。コインの追加をお勧めします。"
+          "disabledCaption": "こちらの選択は利用できません。トークンを追加することをお勧めします"
         },
         "credit": {
           "heading": "クレジットカード",
           "caption": "銀行によって取引がブロックされる可能性があるため、推奨されません。",
-          "disabledCaption": "選択されたアイテムは利用できません。コインの追加をお勧めします。"
+          "disabledCaption": "こちらの選択は利用できません。トークンを追加することをお勧めします"
         }
       },
       "topUp": {
@@ -358,7 +361,7 @@
     "PAY_WITH_COINS": {
       "header": {
         "heading": "あなたので支払う",
-        "caption": "ウォレットのコイン残高を使用して"
+        "caption": "ウォレット内のトークン残高を使用する"
       },
       "button": {
         "buyNow": "今すぐ購入"
@@ -453,7 +456,7 @@
     },
     "BRIDGE_FORM": {
       "header": {
-        "title": "コインを移動"
+        "title": "トークンを移動する"
       },
       "fees": {
         "title": "ガス手数料",
@@ -474,7 +477,7 @@
       "validation": {
         "noAmountInputted": "金額を入力してください",
         "insufficientBalance": "残高が不足しています",
-        "noTokenSelected": "移動するコインを選択してください"
+        "noTokenSelected": "移動するトークンを選択してください"
       }
     },
     "BRIDGE_REVIEW": {
@@ -527,7 +530,7 @@
         "withdrawalPending": {
           "actionButtonText": "続行",
           "withdrawalDelayText": "この移動は一時停止されました。戻ってください",
-          "withdrawalReadyText": "コインを受け取るためには行動が必要です",
+          "withdrawalReadyText": "トークンを受け取るにはアクションが必要です",
           "caption": "一時停止中"
         },
         "inProgress": {
@@ -569,7 +572,7 @@
     },
     "CLAIM_WITHDRAWAL": {
       "content": {
-        "heading": "コインを受け取るためのプロンプトに従ってください",
+        "heading": "プロンプトに従ってトークンを受け取る",
         "body": "引き出しを請求するには小額のガス手数料が必要です。",
         "body2": "目的地ウォレットアドレス："
       },
@@ -656,7 +659,7 @@
       "option": {
         "fiatPricePrefix": "約USD $"
       },
-      "noCoins": "ウォレットで選択できるコインがありません。"
+      "noCoins": "ウォレットには選択可能なトークンがありません。"
     },
     "notEnoughGas": {
       "content": {
@@ -665,7 +668,7 @@
       },
       "buttons": {
         "adjustAmount": "金額を調整",
-        "addMoreImx": "IMXコインを追加",
+        "addMoreImx": "IMXトークンを追加する",
         "copyAddress": "ウォレットアドレスをコピー",
         "cancel": "閉じる"
       }
@@ -673,17 +676,17 @@
     "notEnoughImx": {
       "content": {
         "noImx": {
-          "heading": "IMXコインが必要です",
-          "body": "スワップ手数料はIMXコインで支払われるため、スワップする前にこれを追加する必要があります。"
+          "heading": "スワップするにはIMXトークンが必要です",
+          "body": "スワップ手数料はIMXトークンで支払われるため、スワップを行う前にIMXトークンを追加する必要があります"
         },
         "insufficientImx": {
-          "heading": "IMXコインが不足しています",
-          "body": "指定された金額の手数料をカバーするためには、IMXコインを追加する必要があります。"
+          "heading": "もっとIMXトークンが必要です",
+          "body": "指定された金額の手数料をカバーするために、もっとIMXトークンを追加する必要があります"
         }
       },
       "buttons": {
         "adjustAmount": "金額を調整",
-        "addMoreImx": "IMXコインを追加",
+        "addMoreImx": "IMXトークンを追加する",
         "cancel": "閉じる"
       }
     },
@@ -700,8 +703,8 @@
       }
     },
     "unableToSwap": {
-      "heading": "このコインはスワップできません",
-      "body": "このコインのペアは現在スワップできません。別の選択肢を試してください。",
+      "heading": "このトークンを交換できません",
+      "body": "このトークンペアリングは現在交換できません。別のものを選択してください",
       "buttons": {
         "cancel": "閉じる"
       }
