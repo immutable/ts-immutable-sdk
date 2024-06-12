@@ -35,6 +35,7 @@ export const personalSign = async ({
     throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'personal_sign requires the signer to be the from address');
   }
 
+  // Convert message into a string if it's a hex
   const payload = hexToString(message);
   const { chainId } = await rpcProvider.detectNetwork();
   const chainIdBigNumber = BigNumber.from(chainId);
@@ -42,7 +43,7 @@ export const personalSign = async ({
   // Sign the message with the EOA without blocking
   const eoaSignaturePromise = signERC191Message(chainIdBigNumber, payload, ethSigner, fromAddress);
 
-  await guardianClient.evaluateERC191Message({ chainID: String(chainId), payload });
+  await guardianClient.evaluateERC191Message({ chainID: chainId, payload });
 
   const [eoaSignature, relayerSignature] = await Promise.all([
     eoaSignaturePromise,

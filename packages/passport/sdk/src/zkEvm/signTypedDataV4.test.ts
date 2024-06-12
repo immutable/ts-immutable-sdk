@@ -3,11 +3,10 @@ import { BigNumber } from 'ethers';
 import GuardianClient from 'guardian';
 import { Signer } from '@ethersproject/abstract-signer';
 import { Flow } from '@imtbl/metrics';
-import { getEip155ChainId, signAndPackTypedData } from './walletHelpers';
+import { signAndPackTypedData } from './walletHelpers';
 import {
   chainId,
   chainIdHex,
-  chainIdEip155,
 } from '../test/mocks';
 import { RelayerClient } from './relayerClient';
 import { signTypedDataV4 } from './signTypedDataV4';
@@ -43,7 +42,6 @@ describe('signTypedDataV4', () => {
   beforeEach(() => {
     jest.resetAllMocks();
     relayerClient.imSignTypedData.mockResolvedValue(relayerSignature);
-    (getEip155ChainId as jest.Mock).mockReturnValue(chainIdEip155);
     (signAndPackTypedData as jest.Mock).mockResolvedValueOnce(
       combinedSignature,
     );

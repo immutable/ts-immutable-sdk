@@ -8,6 +8,7 @@ import { retryWithDelay } from '../network/retry';
 import { JsonRpcError, RpcErrorCode } from '../zkEvm/JsonRpcError';
 import { MetaTransaction, TypedDataPayload } from '../zkEvm/types';
 import { PassportConfiguration } from '../config';
+import { getEip155ChainId } from '../zkEvm/walletHelpers';
 
 export type GuardianClientParams = {
   confirmationScreen: ConfirmationScreen;
@@ -31,7 +32,7 @@ type GuardianEIP712MessageEvaluationParams = {
 };
 
 type GuardianERC191MessageEvaluationParams = {
-  chainID: string;
+  chainID: number;
   payload: string;
 };
 
@@ -284,7 +285,7 @@ export default class GuardianClient {
   }
 
   private async handleERC191MessageEvaluation(
-    { chainID, payload }:GuardianERC191MessageEvaluationParams,
+    { chainID, payload }: GuardianERC191MessageEvaluationParams,
   ): Promise<guardian.MessageEvaluationResponse> {
     try {
       const user = await this.authManager.getUserZkEvm();
@@ -295,7 +296,12 @@ export default class GuardianClient {
         );
       }
       const messageEvalResponse = await this.messageAPI.evaluateErc191Message(
-        { eRC191MessageEvaluationRequest: { chainID, payload } },
+        {
+          eRC191MessageEvaluationRequest: {
+            chainID: getEip155ChainId(chainID),
+            payload,
+          },
+        },
         { headers: { Authorization: `Bearer ${user.accessToken}` } },
       );
       return messageEvalResponse.data;

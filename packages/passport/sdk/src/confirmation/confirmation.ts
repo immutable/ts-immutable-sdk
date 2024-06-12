@@ -155,7 +155,11 @@ export default class ConfirmationScreen {
       };
 
       window.addEventListener('message', messageHandler);
-      const href = this.getHref('zkevm/message', { messageID, etherAddress, messageType });
+      const href = this.getHref('zkevm/message', {
+        messageID,
+        etherAddress,
+        ...(messageType ? { messageType } : {}),
+      });
       this.showConfirmationScreen(href, messageHandler, resolve);
     });
   }

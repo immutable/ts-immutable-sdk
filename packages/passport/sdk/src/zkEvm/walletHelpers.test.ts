@@ -2,7 +2,9 @@ import {
   BigNumber, Wallet, Contract, errors,
 } from 'ethers';
 import { StaticJsonRpcProvider } from '@ethersproject/providers';
-import { getNonce, signMetaTransactions, signAndPackTypedData } from './walletHelpers';
+import {
+  getNonce, signMetaTransactions, signAndPackTypedData, packSignatures,
+} from './walletHelpers';
 import { TypedDataPayload } from './types';
 
 jest.mock('ethers', () => ({
@@ -15,7 +17,7 @@ const walletAddress = '0x7EEC32793414aAb720a90073607733d9e7B0ecD0';
 // User EOA private key
 const signer = new Wallet('0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80');
 
-describe('getSignedMetaTransactions', () => {
+describe('signMetaTransactions', () => {
   // NOTE: Generated with https://github.com/immutable/wallet-contracts/blob/348add7d2fde13d8f7f83aae0882ad2d97546d72/tests/ImmutableDeployment.spec.ts#L69
   it('should correctly generate the signature for a given transaction', async () => {
     const transactions = [
@@ -163,5 +165,19 @@ describe('getNonce', () => {
 
       expect(result).toEqual(BigNumber.from(20));
     });
+  });
+});
+
+describe('packSignatures', () => {
+  it('should correctly pack the signatures', () => {
+    // Note EOA signature is automatically prefixed with `0x`
+    const eoaSignature = '0x52a0079dd7a1be93a41fd029c98b680b31790748d176aef193b72f3bb8db16e126ec98994733d393eff53e0d7f2f2db6f649ad0243dbd0694e0c38e2d1fb56da1c';
+    const eoaAddress = '0x1b711a03f7908446a068a5ad96dea38c7eb4ca76';
+    // Note Relayer signature is NOT prefixed with `0x`
+    const relayerSignature = '0201cff469e561d9dce5b1185cd2ac1fa961f8fbde6100436353ef96529666cdbf574bac5b86be10f404f6b1508e7855295a99e7e2e605ec07a69c24fb3a65f229b821fd85c320feedccfa7c388e736a1c5a228c45c8ec1a1c0203';
+
+    const packedSignatures = packSignatures(eoaSignature, eoaAddress, relayerSignature);
+
+    expect(packedSignatures).toBe('0x0002000152a0079dd7a1be93a41fd029c98b680b31790748d176aef193b72f3bb8db16e126ec98994733d393eff53e0d7f2f2db6f649ad0243dbd0694e0c38e2d1fb56da1c020201cff469e561d9dce5b1185cd2ac1fa961f8fbde6100436353ef96529666cdbf574bac5b86be10f404f6b1508e7855295a99e7e2e605ec07a69c24fb3a65f229b821fd85c320feedccfa7c388e736a1c5a228c45c8ec1a1c0203');
   });
 });

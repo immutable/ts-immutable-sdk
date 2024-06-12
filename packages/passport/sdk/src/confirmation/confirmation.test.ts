@@ -123,11 +123,28 @@ describe('confirmation', () => {
       const messageId = 'transactionId123';
       const etherAddress = 'etherAddress123';
       confirmationScreen.loading();
+
       const res = await confirmationScreen.requestMessageConfirmation(messageId, etherAddress);
+
       expect(res.confirmed).toEqual(false);
       expect(mockNewWindow.location.href).toEqual(
         'https://passport.sandbox.immutable.com/'
         + `transaction-confirmation/zkevm/message?messageID=${messageId}&etherAddress=${etherAddress}`,
+      );
+    });
+
+    it('should pass the message type as a query string arg when it is provided', async () => {
+      const messageId = 'transactionId123';
+      const etherAddress = 'etherAddress123';
+      const messageType = 'erc191';
+      confirmationScreen.loading();
+
+      const res = await confirmationScreen.requestMessageConfirmation(messageId, etherAddress, messageType);
+
+      expect(res.confirmed).toEqual(false);
+      expect(mockNewWindow.location.href).toEqual(
+        'https://passport.sandbox.immutable.com/transaction-confirmation/zkevm/message?'
+            + `messageID=${messageId}&etherAddress=${etherAddress}&messageType=${messageType}`,
       );
     });
 
