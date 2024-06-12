@@ -41,7 +41,14 @@ export function HandoverProvider({ children }: HandoverProviderProps) {
     (handoverId: HandoverTarget = HandoverTarget.GLOBAL) => {
       setHandovers((prev) => {
         const newHandovers = { ...prev };
+        const handoverContent = newHandovers[handoverId];
+
         delete newHandovers[handoverId];
+
+        if (handoverContent?.onClose) {
+          handoverContent.onClose();
+        }
+
         return newHandovers;
       });
     },
