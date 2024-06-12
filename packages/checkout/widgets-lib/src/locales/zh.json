@@ -234,7 +234,7 @@
       },
       "topUpOptions": {
         "onramp": {
-          "heading": "买",
+          "heading": "购买代币",
           "caption": "可使用银行卡、Google Pay 或 Apple Pay",
           "subcaption": "费用",
           "disabledCaption": ""

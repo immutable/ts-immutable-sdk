@@ -234,7 +234,7 @@
       },
       "topUpOptions": {
         "onramp": {
-          "heading": "사다",
+          "heading": "토큰 구매",
           "caption": "카드, Google Pay 또는 Apple Pay가 가능합니다",
           "subcaption": "수수료",
           "disabledCaption": ""
