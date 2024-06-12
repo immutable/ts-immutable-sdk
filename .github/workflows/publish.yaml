@@ -150,24 +150,24 @@ jobs:
 
       - name: Create GitHub Release
         id: gh_release
-        if: contains(github.event.inputs.release_type || 'alpha', 'release') && github.event.inputs.dry_run || 'false' == 'false'
+        if: contains(github.event.inputs.release_type || 'alpha', 'release') && (github.event.inputs.dry_run || 'false') == 'false'
         run: gh release create ${{ steps.version.outputs.NEXT_VERSION }} --title ${{ steps.version.outputs.NEXT_VERSION }} --draft=false --prerelease=false --generate-notes --repo immutable/ts-immutable-sdk --target main
 
       - name: Get GitHub Release Name and URL
-        if: contains(github.event.inputs.release_type || 'alpha', 'release') && github.event.inputs.dry_run || 'false' == 'false'
+        if: contains(github.event.inputs.release_type || 'alpha', 'release') && (github.event.inputs.dry_run || 'false') == 'false'
         id: release
         run: |
           echo "RELEASE_NAME=$(gh release view --json name | jq -r .name)" >> $GITHUB_OUTPUT
           echo "RELEASE_URL=$(gh release view --json url | jq -r .url)" >> $GITHUB_OUTPUT
 
       - name: Notify SDK Slack Publish Success
-        if: ${{ success() && (steps.npm_release.conclusion == 'success' || steps.pre_release.conclusion == 'success') && github.event.inputs.dry_run || 'false' == 'false' }}
+        if: ${{ success() && (steps.npm_release.conclusion == 'success' || steps.pre_release.conclusion == 'success') && (github.event.inputs.dry_run || 'false') == 'false' }}
         uses: ./.github/actions/notify-slack-publish-status
         with:
           message: "✅ ${{ github.triggering_actor }} successfully published SDK version ${{steps.version.outputs.NEXT_VERSION}} to NPM.\n\nhttps://www.npmjs.com/package/@imtbl/sdk/v/${{steps.version.outputs.NEXT_VERSION}}"
 
       - name: Notify SDK Slack Publish Failure
-        if: ${{ failure() && (steps.npm_release.conclusion == 'failure' || steps.pre_release.conclusion == 'failure' || steps.gh_release.conclusion == 'failure') && github.event.inputs.dry_run || 'false' == 'false' }}
+        if: ${{ failure() && (steps.npm_release.conclusion == 'failure' || steps.pre_release.conclusion == 'failure' || steps.gh_release.conclusion == 'failure') && (github.event.inputs.dry_run || 'false') == 'false' }}
         uses: ./.github/actions/notify-slack-publish-status
         with:
           message: "❌ Failed to publish SDK version ${{steps.version.outputs.NEXT_VERSION}} to NPM. ${{ github.triggering_actor }} please check the logs for more details."
