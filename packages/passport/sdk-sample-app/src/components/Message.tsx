@@ -1,4 +1,4 @@
-import { ButtCon, Sticker } from '@biom3/react';
+import { Sticker } from '@biom3/react';
 import { Form } from 'react-bootstrap';
 import React, { useEffect } from 'react';
 import { useStatusProvider } from '@/context/StatusProvider';
