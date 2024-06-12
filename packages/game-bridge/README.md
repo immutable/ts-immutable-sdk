@@ -30,7 +30,7 @@ yarn lint
 
 ### About
 
-The Game Bridge is a package that provides a way to interact with the Typescript SDK from Unity and Unreal by wrapping around the entire SDK, outputting it in an (`index.js` & `index.js.map`)/`index.html` file that can then be imported into Unreal/Unity respectively.
+The Game Bridge package enables interaction between the Typescript SDK and Unity and Unreal SDKs. It does this by wrapping around the required SDK packages and generating an (index.js & index.js.map)/index.html file that can be imported into the Unreal and Unity SDKs, respectively.
 
 [Read more about how the game-bridge works here](https://immutable.atlassian.net/wiki/spaces/GSK/pages/2307129395/Game+SDK+Overview)
 
