@@ -157,6 +157,7 @@ export const whenICreateABulkListing = (
           type: 'NATIVE',
         },
         sell: sellItem,
+        makerFees: [],
       });
     }
 
