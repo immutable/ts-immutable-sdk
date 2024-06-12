@@ -22,9 +22,18 @@ export const mintingPersistence = (client: Pool): MintingPersistence => {
     },
     getNextBatchForSubmission: async (limit: number) => {
       const res = await client.query(`
-        UPDATE im_assets SET minting_status = 'submitting' WHERE minting_status IS NULL and id in (
-            select id from im_assets where minting_status is null limit $1 for update skip locked
-        ) returning *;
+      WITH limited_assets AS (
+        SELECT id 
+        FROM im_assets 
+        WHERE minting_status IS NULL 
+        LIMIT $1 
+        FOR UPDATE SKIP LOCKED
+      )
+      UPDATE im_assets 
+        SET minting_status = 'submitting' 
+      WHERE minting_status IS NULL 
+        AND id IN (SELECT id FROM limited_assets)
+      RETURNING *;
       `, [limit]);
       return res.rows;
     },
