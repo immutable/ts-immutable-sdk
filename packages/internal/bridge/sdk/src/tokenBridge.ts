@@ -639,7 +639,7 @@ export class TokenBridge {
     recipient: string,
     token: FungibleToken,
     amount: ethers.BigNumber,
-    gasMultiplier: number,
+    gasMultiplier: number | string,
   ): Promise<BridgeBundledTxResponse> {
     const [allowance, feeData, rootGas, axelarFee] = await Promise.all([
       this.getAllowance(direction, token, sender),
@@ -723,7 +723,7 @@ export class TokenBridge {
     recipient: string,
     token: FungibleToken,
     amount: ethers.BigNumber,
-    gasMultiplier: number,
+    gasMultiplier: number | string,
   ): Promise<BridgeBundledTxResponse> {
     const [allowance, feeData, rootGas] = await Promise.all([
       this.getAllowance(direction, token, sender),
@@ -977,7 +977,7 @@ export class TokenBridge {
     sourceChainId: string,
     destinationChainId: string,
     destinationChainGaslimit: number,
-    gasMultiplier: number = 1.1,
+    gasMultiplier: number | string = 'auto',
   ): Promise<ethers.BigNumber> {
     const sourceAxelar:AxelarChainDetails = axelarChains[sourceChainId];
     const destinationAxelar:AxelarChainDetails = axelarChains[destinationChainId];

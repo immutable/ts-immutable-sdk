@@ -72,8 +72,9 @@ export const handle = async (
     });
   });
 
-  const event = JSON.parse(msg.Message);
   if (msg.Type === 'Notification') {
+    // the msg.Message is only a valid JSON string when the message is of Type Notification
+    const event = JSON.parse(msg.Message);
     switch (event.event_name) {
       case 'imtbl_zkevm_mint_request_updated':
         if (handlers?.zkevmMintRequestUpdated) {
@@ -176,7 +177,8 @@ export const handle = async (
     if (handlers?.all) {
       await handlers?.all(event);
     }
+    return event;
   }
 
-  return event;
+  return null;
 };

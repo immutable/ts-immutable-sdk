@@ -12,7 +12,7 @@ export type CancelledOrderStatus = {
    */
   pending: boolean;
   /**
-   * Whether the cancellation was done on-chain or off-chain
+   * Whether the cancellation was done on-chain or off-chain or as a result of an underfunded account
    */
   cancellation_type: CancelledOrderStatus.cancellation_type;
 };
@@ -20,11 +20,12 @@ export type CancelledOrderStatus = {
 export namespace CancelledOrderStatus {
 
   /**
-   * Whether the cancellation was done on-chain or off-chain
+   * Whether the cancellation was done on-chain or off-chain or as a result of an underfunded account
    */
   export enum cancellation_type {
     ON_CHAIN = 'ON_CHAIN',
     OFF_CHAIN = 'OFF_CHAIN',
+    UNDERFUNDED = 'UNDERFUNDED',
   }
 
 

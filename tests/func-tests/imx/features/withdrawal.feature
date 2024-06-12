@@ -34,22 +34,23 @@ Feature: Withdrawal
     And banker is registered
     And banker has L2 balance "bankerBalance" of at least "0.00001"
     And banker transfer "0.00001" eth to "user1"
+    And banker L1 ETH balance is at least "0.1"
+    # this step is required so the user has enough ETH on L1 to perform the complete withdrawal step
+    And banker transfer "0.1" eth to "user1" on L1
     When user "user1" prepare withdrawal "withdrawal1" of ETH "0.00001"
     Then ETH withdrawal "withdrawal1" should be in "success" status
 
   @withdrawal @withdrawalETH @onchain @ethSignature @completeEthWithdrawal @skip
   Scenario: Complete withdraw ETH
-    Given A new Eth wallet "user1"
+    Given A stored Eth wallet "user1"
     And "user1" is registered
     Then user "user1" completes withdrawal of ETH
-
 
   # @withdrawal @completeWithdrawalNFT
   # Scenario: Complete withdraw ERC721
   #   Given A new Eth wallet "user1"
   #   And "user1" is registered
   #   Then user "user1" completes withdrawal of a withdrawable NFT
-
 
   # @withdrawal @completeERC20Withdrawal
   # Scenario: Complete withdraw ERC20
