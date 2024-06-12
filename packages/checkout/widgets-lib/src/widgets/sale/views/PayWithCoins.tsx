@@ -8,7 +8,7 @@ import { isPassportProvider } from 'lib/provider';
 import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 import { useSaleContext } from '../context/SaleContextProvider';
 import { useSaleEvent } from '../hooks/useSaleEvents';
-import { ExecuteTransactionStep } from '../types';
+import { ExecuteTransactionStep, SignedTransaction } from '../types';
 
 enum TransactionMethod {
   APPROVE = 'approve(address spender,uint256 amount)',
@@ -16,75 +16,98 @@ enum TransactionMethod {
   EXECUTE = 'execute(address multicallSigner, bytes32 reference, address[] targets, bytes[] data, uint256 deadline, bytes signature)',
 }
 
+const findTransactionByMethodCall = (
+  transactions: SignedTransaction[],
+  methodCall: string,
+): SignedTransaction | undefined => transactions.find((transaction) => transaction.methodCall === methodCall);
+
 const getHandoverContent = (
   t,
-  executeNextTransaction,
+  executeTransaction,
   signResponse,
   sendTransactionSuccessEvent,
   sendFailedEvent,
-) => ({
-  beforeApproveWithCta: (
-    <>
-      <Heading>
-        {t('views.PAYMENT_METHODS.handover.beforeApproveWithCta.heading')}
-      </Heading>
-      <Button
-        onClick={() => executeNextTransaction(
-          (txn) => sendTransactionSuccessEvent(txn),
-          (error, txns) => {
-            const details = { transactionId: signResponse?.transactionId };
-            sendFailedEvent(
-              error.toString(),
-              error,
-              txns,
-              undefined,
-              details,
-            );
-          },
-        )}
-      >
-        {t('views.PAYMENT_METHODS.handover.beforeApproveWithCta.ctaButton')}
-      </Button>
-    </>
-  ),
-  beforeApprove: (
-    <Heading>{t('views.PAYMENT_METHODS.handover.beforeApprove')}</Heading>
-  ),
-  afterApprove: (
-    <Heading>{t('views.PAYMENT_METHODS.handover.afterApprove')}</Heading>
-  ),
-  beforeExecuteWithCta: (
-    <>
-      <Heading>
-        {t('views.PAYMENT_METHODS.handover.beforeApproveWithCta.heading')}
-      </Heading>
-      <Button
-        onClick={() => executeNextTransaction(
-          (txn) => sendTransactionSuccessEvent(txn),
-          (error, txns) => {
-            const details = { transactionId: signResponse?.transactionId };
-            sendFailedEvent(
-              error.toString(),
-              error,
-              txns,
-              undefined,
-              details,
-            );
-          },
-        )}
-      >
-        {t('views.PAYMENT_METHODS.handover.beforeApproveWithCta.ctaButton')}
-      </Button>
-    </>
-  ),
-  beforeExecute: (
-    <Heading>{t('views.PAYMENT_METHODS.handover.beforeApprove')}</Heading>
-  ),
-  afterExecute: (
-    <Heading>{t('views.PAYMENT_METHODS.handover.afterExecute')}</Heading>
-  ),
-  success: <Heading>{t('views.PAYMENT_METHODS.handover.success')}</Heading>,
-});
+) => {
+  const approveTxn = signResponse
+    ? findTransactionByMethodCall(
+      signResponse.transactions,
+      TransactionMethod.APPROVE,
+    )
+    : undefined;
+  const executeTxn = signResponse
+    ? findTransactionByMethodCall(
+      signResponse.transactions,
+      TransactionMethod.EXECUTE,
+    )
+    : undefined;
+  return {
+    beforeApproveWithCta: (
+      <>
+        <Heading>
+          TIME TO APPROVE
+          {t('views.PAYMENT_METHODS.handover.beforeApproveWithCta.heading')}
+        </Heading>
+        <Button
+          onClick={() => executeTransaction(
+            approveTxn,
+            (txn) => sendTransactionSuccessEvent(txn),
+            (error, txns) => {
+              const details = { transactionId: signResponse?.transactionId };
+              sendFailedEvent(
+                error.toString(),
+                error,
+                txns,
+                undefined,
+                details,
+              );
+            },
+          )}
+        >
+          {t('views.PAYMENT_METHODS.handover.beforeApproveWithCta.ctaButton')}
+        </Button>
+      </>
+    ),
+    beforeApprove: (
+      <Heading>{t('views.PAYMENT_METHODS.handover.beforeApprove')}</Heading>
+    ),
+    afterApprove: (
+      <Heading>{t('views.PAYMENT_METHODS.handover.afterApprove')}</Heading>
+    ),
+    beforeExecuteWithCta: (
+      <>
+        <Heading>
+          TIME TO EXECUTE
+          {t('views.PAYMENT_METHODS.handover.beforeApproveWithCta.heading')}
+        </Heading>
+        <Button
+          onClick={() => executeTransaction(
+            executeTxn,
+            (txn) => sendTransactionSuccessEvent(txn),
+            (error, txns) => {
+              const details = { transactionId: signResponse?.transactionId };
+              sendFailedEvent(
+                error.toString(),
+                error,
+                txns,
+                undefined,
+                details,
+              );
+            },
+          )}
+        >
+          {t('views.PAYMENT_METHODS.handover.beforeApproveWithCta.ctaButton')}
+        </Button>
+      </>
+    ),
+    beforeExecute: (
+      <Heading>{t('views.PAYMENT_METHODS.handover.beforeApprove')}</Heading>
+    ),
+    afterExecute: (
+      <Heading>{t('views.PAYMENT_METHODS.handover.afterExecute')}</Heading>
+    ),
+    success: <Heading>{t('views.PAYMENT_METHODS.handover.success')}</Heading>,
+  };
+};
 
 export function PayWithCoins() {
   const { t } = useTranslation();
@@ -98,7 +121,7 @@ export function PayWithCoins() {
   } = useSaleEvent();
   const {
     executeAll,
-    executeNextTransaction,
+    executeTransaction,
     signResponse,
     executeResponse,
     signTokenIds,
@@ -112,7 +135,7 @@ export function PayWithCoins() {
 
   const handoverContent = getHandoverContent(
     t,
-    executeNextTransaction,
+    executeTransaction,
     signResponse,
     sendTransactionSuccessEvent,
     sendFailedEvent,
@@ -125,9 +148,7 @@ export function PayWithCoins() {
         case `${TransactionMethod.APPROVE}-${ExecuteTransactionStep.BEFORE}`:
           addHandover({
             animationUrl: getRemoteImage(environment, '/approve-handover.riv'),
-            children: isPassportProvider(provider)
-              ? handoverContent.beforeApproveWithCta
-              : handoverContent.beforeApprove,
+            children: handoverContent.beforeApprove,
           });
           break;
         case `${TransactionMethod.APPROVE}-${ExecuteTransactionStep.AFTER}`:
@@ -139,21 +160,7 @@ export function PayWithCoins() {
         case `${TransactionMethod.EXECUTE}-${ExecuteTransactionStep.BEFORE}`:
           addHandover({
             animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
-            children: isPassportProvider(provider)
-              ? handoverContent.beforeExecuteWithCta
-              : handoverContent.beforeExecute,
-          });
-          break;
-        case `${TransactionMethod.EXECUTE}-${ExecuteTransactionStep.AFTER}`:
-          addHandover({
-            duration: 2000,
-            animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
-            children: handoverContent.afterExecute,
-          });
-          addHandover({
-            duration: 2000,
-            animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
-            children: handoverContent.success,
+            children: handoverContent.beforeExecute,
           });
           break;
         default:
@@ -166,32 +173,65 @@ export function PayWithCoins() {
     [environment, provider, addHandover, handoverContent],
   );
 
-  const sendTransaction = async () => {
-    executeAll(
-      signResponse,
-      (txn) => {
-        sendTransactionSuccessEvent(txn); // not an analytics event
-      },
-      (error, txns) => {
-        const details = {
-          transactionId: signResponse?.transactionId,
-          errorType: error?.type,
-        };
-        sendFailedEvent(String(error?.data?.error), error, txns, undefined, details); // checkoutPrimarySalePaymentMethods_FailEventFailed
-      },
-      onTxnStep,
-    );
-  };
-
   useEffect(() => {
     if (signResponse !== undefined && processing.current === false) {
       processing.current = true;
-      sendTransaction();
+      // Execute all transactions one-by-one if the provider is not passport
+      // Otherwise, show the handover screen to let the user initate the transaction
+      if (!isPassportProvider(provider)) {
+        executeAll(
+          signResponse,
+          (txn) => {
+            sendTransactionSuccessEvent(txn); // not an analytics event
+          },
+          (error, txns) => {
+            const details = { transactionId: signResponse?.transactionId };
+            sendFailedEvent(error.toString(), error, txns, undefined, details); // checkoutPrimarySalePaymentMethods_FailEventFailed
+          },
+          onTxnStep,
+        );
+      } else {
+        addHandover({
+          animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
+          children: handoverContent.beforeApproveWithCta,
+        });
+      }
     }
   }, [signResponse]);
 
   useEffect(() => {
-    if (executeResponse?.done === true) {
+    console.log('@@@@@@@ executeResponse', executeResponse);
+    if (
+      isPassportProvider(provider)
+      && executeResponse?.transactions?.length === 1
+      && executeResponse?.transactions?.find(
+        (transaction) => transaction.method === TransactionMethod.APPROVE,
+      )
+    ) {
+      addHandover({
+        animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
+        children: handoverContent.afterApprove,
+        duration: 2000,
+      });
+
+      addHandover({
+        animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
+        children: handoverContent.beforeExecuteWithCta,
+      });
+    }
+
+    if (executeResponse?.transactions?.length === 2) {
+      addHandover({
+        duration: 2000,
+        animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
+        children: handoverContent.afterExecute,
+      });
+      addHandover({
+        duration: 2000,
+        animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
+        children: handoverContent.success,
+      });
+
       const details = { transactionId: signResponse?.transactionId };
       setTimeout(() => {
         sendSuccessEvent(
