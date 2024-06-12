@@ -241,10 +241,7 @@
       },
       "topUpOptions": {
         "onramp": {
-          "heading": "トークンを購入する",
-          "caption": "カード、Google Pay、またはApple Payが利用可能です",
-          "subcaption": "手数料",
-          "disabledCaption": ""
+          "heading": "トークンを購入する"
         },
         "debit": {
           "heading": "デビットカードで購入",

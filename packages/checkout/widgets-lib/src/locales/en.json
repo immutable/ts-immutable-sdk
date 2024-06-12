@@ -235,10 +235,7 @@
       },
       "topUpOptions": {
         "onramp": {
-          "heading": "Buy tokens",
-          "caption": "With card, Google pay or Apple pay available.",
-          "subcaption": "Fees ",
-          "disabledCaption": ""
+          "heading": "Buy tokens"
         },
         "debit": {
           "heading": "Buy with Debit Card",
