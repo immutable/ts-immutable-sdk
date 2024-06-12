@@ -3,7 +3,7 @@
     "CONNECT_WALLET": {
       "body": {
         "heading": "Connect a wallet",
-        "content": "You'll need to connect or create a digital wallet to buy, sell, trade and store your coins and collectibles."
+        "content": "You'll need to connect or create a digital wallet to buy, sell, trade and store your tokens and collectibles."
       },
       "walletSelection": {
         "heading": "Choose a wallet"
@@ -87,13 +87,13 @@
         "heading": "Network"
       },
       "totalTokenBalance": {
-        "heading": "Coins",
+        "heading": "Tokens",
         "totalHeading": "Value"
       },
       "tokenBalancesList": {
         "noTokensFound": "No tokens found"
       },
-      "addCoins": "Add coins"
+      "addCoins": "Add tokens"
     },
     "SETTINGS": {
       "header": {
@@ -112,19 +112,19 @@
     },
     "COIN_INFO": {
       "metamask": {
-        "heading": "Coins and collectibles are native to networks",
-        "body": "You can switch networks to add coins or move them from one network to another"
+        "heading": "Tokens and collectibles are native to networks",
+        "body": "You can switch networks to add tokens or move them from one network to another"
       },
       "passport": {
-        "heading": "Coins and collectibles are native to networks",
-        "body1": "This network is called Immutable zkEVM. If you have other coins in your Passport and can’t see them here, they might be on another network. ",
+        "heading": "Tokens and collectibles are native to networks",
+        "body1": "This network is called Immutable zkEVM. If you have other tokens in your Passport and can’t see them here, they might be on another network. ",
         "body2": " for more info.",
         "linkText": "Visit our FAQs"
       }
     },
     "SWAP": {
       "header": {
-        "title": "Swap coins"
+        "title": "Swap tokens"
       },
       "content": {
         "title": "What would you like to swap?",
@@ -151,8 +151,8 @@
       "validation": {
         "noAmountInputted": "Please input amount",
         "insufficientBalance": "Insufficient balance",
-        "noFromTokenSelected": "Select a coin to swap",
-        "noToTokenSelected": "Select a coin to receive"
+        "noFromTokenSelected": "Select a token to swap",
+        "noToTokenSelected": "Select a token to receive"
       },
       "success": {
         "text": "Success",
@@ -205,7 +205,7 @@
     },
     "ONRAMP": {
       "header": {
-        "title": "Add coins"
+        "title": "Add tokens"
       },
       "initialLoadingText": "Taking you to Transak",
       "IN_PROGRESS_LOADING": {
@@ -221,7 +221,7 @@
         }
       },
       "SUCCESS": {
-        "text": "Coins are on the way",
+        "text": "Tokens are on the way",
         "actionText": "Done"
       },
       "FAIL": {
@@ -234,6 +234,12 @@
         "title": "How would you like to add tokens?"
       },
       "topUpOptions": {
+        "onramp": {
+          "heading": "Buy",
+          "caption": "With card, Google pay or Apple pay available.",
+          "subcaption": "Fees ",
+          "disabledCaption": ""
+        },
         "debit": {
           "heading": "Buy with Debit Card",
           "caption": "The recommended way to buy tokens",
@@ -279,7 +285,7 @@
       },
       "coinsDrawer": {
         "header": "Pay with...",
-        "caption1": "Coins",
+        "caption1": "Tokens",
         "caption2": "Balance",
         "divider": "More options",
         "stepType": {
@@ -319,7 +325,7 @@
       },
       "fundingRouteSelect": {
         "heading": "Pay with your",
-        "noRoutesAvailable": "Insufficient coin balance. Please proceed with card instead.",
+        "noRoutesAvailable": "Insufficient token balance. Please proceed with card instead.",
         "continue": "Continue",
         "payWithCardInstead": "No thanks, I'll pay with card",
         "payWithCard": "Pay with card"
@@ -331,19 +337,19 @@
       },
       "options": {
         "crypto": {
-          "heading": "Coins",
-          "caption": "Pay with the coins in your wallet, or buy coins with card",
+          "heading": "Tokens",
+          "caption": "Pay with the tokens in your wallet, or buy tokens with card",
           "disabledCaption": "Currently not available for this purchase"
         },
         "debit": {
           "heading": "Debit Card",
           "caption": "The recommended way to pay with card.",
-          "disabledCaption": "Unavailable for your selection. We recommend adding coins"
+          "disabledCaption": "Unavailable for your selection. We recommend adding tokens"
         },
         "credit": {
           "heading": "Credit Card",
           "caption": "Not recommended since transactions may be blocked by your bank.",
-          "disabledCaption": "Unavailable for your selection. We recommend adding coins"
+          "disabledCaption": "Unavailable for your selection. We recommend adding tokens"
         }
       },
       "topUp": {
@@ -371,7 +377,7 @@
     "PAY_WITH_COINS": {
       "header": {
         "heading": "Pay with your",
-        "caption": "Using the coins balance in your wallet"
+        "caption": "Using the token balance in your wallet"
       },
       "button": {
         "buyNow": "Buy now"
@@ -466,7 +472,7 @@
     },
     "BRIDGE_FORM": {
       "header": {
-        "title": "Move coins"
+        "title": "Move tokens"
       },
       "fees": {
         "title": "Gas Fee",
@@ -487,7 +493,7 @@
       "validation": {
         "noAmountInputted": "Please input amount",
         "insufficientBalance": "Insufficient balance",
-        "noTokenSelected": "Select a coin to move"
+        "noTokenSelected": "Select a token to move"
       }
     },
     "BRIDGE_REVIEW": {
@@ -540,7 +546,7 @@
         "withdrawalPending": {
           "actionButtonText": "Proceed",
           "withdrawalDelayText": "This move has been paused, please return ",
-          "withdrawalReadyText": "Action required to receive your coins",
+          "withdrawalReadyText": "Action required to receive your tokens",
           "caption": "Paused"
         },
         "inProgress": {
@@ -582,7 +588,7 @@
     },
     "CLAIM_WITHDRAWAL": {
       "content": {
-        "heading": "Follow the prompts to receive your coins on ",
+        "heading": "Follow the prompts to receive your tokens on ",
         "body": "You’ll be asked to pay a small gas fee to claim your withdrawal.",
         "body2": "Destination wallet address: "
       },
@@ -669,7 +675,7 @@
       "option": {
         "fiatPricePrefix": "≈ USD $"
       },
-      "noCoins": "You have no available coins to select in your wallet."
+      "noCoins": "You have no available tokens to select in your wallet."
     },
     "notEnoughGas": {
       "content": {
@@ -678,7 +684,7 @@
       },
       "buttons": {
         "adjustAmount": "Adjust amount",
-        "addMoreImx": "Add IMX coins",
+        "addMoreImx": "Add IMX tokens",
         "copyAddress": "Copy wallet address",
         "cancel": "Dismiss"
       }
@@ -686,17 +692,17 @@
     "notEnoughImx": {
       "content": {
         "noImx": {
-          "heading": "You'll need IMX coins to swap",
-          "body": "Swap fees are paid in IMX coins, so you'll need to add this before you can swap"
+          "heading": "You'll need IMX tokens to swap",
+          "body": "Swap fees are paid in IMX tokens, so you'll need to add this before you can swap"
         },
         "insufficientImx": {
-          "heading": "You'll need more IMX coins",
-          "body": "In order to cover the fees for the amount specified, you'll need to add more IMX coins"
+          "heading": "You'll need more IMX tokens",
+          "body": "In order to cover the fees for the amount specified, you'll need to add more IMX tokens"
         }
       },
       "buttons": {
         "adjustAmount": "Adjust amount",
-        "addMoreImx": "Add IMX coins",
+        "addMoreImx": "Add IMX tokens",
         "cancel": "Dismiss"
       }
     },
@@ -713,8 +719,8 @@
       }
     },
     "unableToSwap": {
-      "heading": "Unable to swap this coin",
-      "body": "This coin pairing isn't available to swap right now. Try another selection.",
+      "heading": "Unable to swap this token",
+      "body": "This token pairing isn't available to swap right now. Try another selection.",
       "buttons": {
         "cancel": "Dismiss"
       }

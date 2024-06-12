@@ -3,7 +3,7 @@
     "CONNECT_WALLET": {
       "body": {
         "heading": "지갑 연결",
-        "content": "구매, 판매, 거래 및 코인과 수집품을 저장하려면 디지털 지갑을 연결하거나 만들어야 합니다."
+        "content": "토큰과 수집품을 구매, 판매, 거래 및 보관하려면 디지털 지갑을 연결하거나 새 디지털 지갑을 만들어야 합니다. "
       },
       "walletSelection": {
         "heading": "지갑 선택"
@@ -87,13 +87,13 @@
         "heading": "네트워크"
       },
       "totalTokenBalance": {
-        "heading": "코인",
+        "heading": "토큰",
         "totalHeading": "가치"
       },
       "tokenBalancesList": {
         "noTokensFound": "토큰을 찾을 수 없습니다"
       },
-      "addCoins": "동전 추가"
+      "addCoins": "토큰 추가"
     },
     "SETTINGS": {
       "header": {
@@ -112,19 +112,19 @@
     },
     "COIN_INFO": {
       "metamask": {
-        "heading": "코인과 수집품은 네트워크에 기반을 두고 있습니다",
-        "body": "네트워크를 전환하여 코인을 추가하거나 다른 네트워크로 옮길 수 있습니다"
+        "heading": "토큰과 수집품은 네트워크에 고유합니다",
+        "body": "네트워크를 변경하여 토큰을 추가하거나 한 네트워크에서 다른 네트워크로 이동할 수 있습니다"
       },
       "passport": {
-        "heading": "코인과 수집품은 네트워크에 기반을 두고 있습니다",
-        "body1": "이 네트워크는 Immutable zkEVM입니다. Passport에 다른 코인이 있고 여기서 볼 수 없다면 다른 네트워크에 있을 수 있습니다.",
+        "heading": "토큰과 수집품은 네트워크에 고유합니다",
+        "body1": "이 네트워크는 Immutable zkEVM이라고 합니다. 패스포트에 다른 토큰이 있어 여기에 표시되지 않는 경우, 다른 네트워크에 있을 수 있습니다.",
         "body2": " 자세한 정보를 위해 우리의 FAQ를 방문하세요.",
         "linkText": "FAQ 방문하기"
       }
     },
     "SWAP": {
       "header": {
-        "title": "코인 교환"
+        "title": "토큰 교환"
       },
       "content": {
         "title": "무엇을 교환하고 싶으신가요?",
@@ -150,8 +150,8 @@
       "validation": {
         "noAmountInputted": "금액을 입력해 주세요",
         "insufficientBalance": "잔고가 부족합니다",
-        "noFromTokenSelected": "교환할 코인을 선택하세요",
-        "noToTokenSelected": "받을 코인을 선택하세요"
+        "noFromTokenSelected": "교환할 토큰을 선택하세요",
+        "noToTokenSelected": "받을 토큰을 선택하세요"
       },
       "success": {
         "text": "성공",
@@ -204,7 +204,7 @@
     },
     "ONRAMP": {
       "header": {
-        "title": "코인 추가"
+        "title": "토큰 추가"
       },
       "initialLoadingText": "Transak으로 이동하는 중",
       "IN_PROGRESS_LOADING": {
@@ -220,7 +220,7 @@
         }
       },
       "SUCCESS": {
-        "text": "코인이 도착하는 중입니다",
+        "text": "토큰이 전달 중입니다",
         "actionText": "완료"
       },
       "FAIL": {
@@ -233,6 +233,12 @@
         "title": "토큰을 어떻게 추가하시겠습니까?"
       },
       "topUpOptions": {
+        "onramp": {
+          "heading": "사다",
+          "caption": "카드, Google Pay 또는 Apple Pay가 가능합니다",
+          "subcaption": "수수료",
+          "disabledCaption": ""
+        },
         "debit": {
           "heading": "직불 카드로 구매",
           "caption": "토큰을 구매하는 권장 방법",
@@ -278,7 +284,7 @@
       },
       "coinsDrawer": {
         "header": "결제 수단...",
-        "caption1": "코인",
+        "caption1": "토큰",
         "caption2": "잔액",
         "divider": "더 많은 옵션",
         "stepType": {
@@ -311,19 +317,19 @@
       },
       "options": {
         "crypto": {
-          "heading": "코인",
-          "caption": "지갑 안의 동전으로 지불하거나 카드로 동전을 구입하세요.",
+          "heading": "토큰",
+          "caption": "지갑에 있는 토큰으로 지불하거나 카드로 토큰을 구매하세요",
           "disabledCaption": "현재 이 구매에는 사용할 수 없습니다."
         },
         "debit": {
           "heading": "직불카드",
           "caption": "카드로 결제하는 권장 방법입니다.",
-          "disabledCaption": "선택하신 항목을 사용할 수 없습니다. 코인을 추가하시는 것을 권장합니다."
+          "disabledCaption": "선택한 항목을 사용할 수 없습니다. 토큰 추가를 권장합니다. "
         },
         "credit": {
           "heading": "신용카드",
           "caption": "은행에서 거래를 차단할 수 있으므로 권장하지 않습니다.",
-          "disabledCaption": "선택하신 항목을 사용할 수 없습니다. 코인을 추가하시는 것을 권장합니다."
+          "disabledCaption": "선택한 항목을 사용할 수 없습니다. 토큰 추가를 권장합니다. "
         }
       },
       "topUp": {
@@ -351,7 +357,7 @@
     "PAY_WITH_COINS": {
       "header": {
         "heading": "코인으로 결제",
-        "caption": "지갑에 있는 코인 잔액을 이용하여"
+        "caption": "지갑 안의 토큰 잔액을 사용하기"
       },
       "button": {
         "buyNow": "지금 구매"
@@ -446,7 +452,7 @@
     },
     "BRIDGE_FORM": {
       "header": {
-        "title": "코인 이동"
+        "title": "토큰 이동"
       },
       "fees": {
         "title": "가스 요금",
@@ -467,7 +473,7 @@
       "validation": {
         "noAmountInputted": "금액을 입력해 주세요",
         "insufficientBalance": "잔고가 부족합니다",
-        "noTokenSelected": "이동할 코인을 선택하세요"
+        "noTokenSelected": "이동할 토큰을 선택하세요"
       }
     },
     "BRIDGE_REVIEW": {
@@ -520,7 +526,7 @@
         "withdrawalPending": {
           "actionButtonText": "계속",
           "withdrawalDelayText": "이 이동은 일시 중지되었습니다. 돌아가세요",
-          "withdrawalReadyText": "코인을 받으려면 조치가 필요합니다",
+          "withdrawalReadyText": "토큰을 받으려면 조치가 필요합니다",
           "caption": "일시중지됨"
         },
         "inProgress": {
@@ -562,7 +568,7 @@
     },
     "CLAIM_WITHDRAWAL": {
       "content": {
-        "heading": "코인을 받으려면 프롬프트에 따라 진행하십시오",
+        "heading": "프롬프트를 따라 토큰을 받으세요",
         "body": "출금을 청구하려면 소액의 가스 수수료를 지불해야 합니다.",
         "body2": "목적지 지갑 주소: "
       },
@@ -649,7 +655,7 @@
       "option": {
         "fiatPricePrefix": "대략 USD $"
       },
-      "noCoins": "지갑에 선택 가능한 코인이 없습니다."
+      "noCoins": "지갑에 선택할 수 있는 토큰이 없습니다"
     },
     "notEnoughGas": {
       "content": {
@@ -658,7 +664,7 @@
       },
       "buttons": {
         "adjustAmount": "금액 조정",
-        "addMoreImx": "IMX 코인 추가",
+        "addMoreImx": "IMX 토큰 추가 ",
         "copyAddress": "지갑 주소 복사",
         "cancel": "취소"
       }
@@ -666,17 +672,17 @@
     "notEnoughImx": {
       "content": {
         "noImx": {
-          "heading": "IMX 코인이 필요합니다",
-          "body": "교환 수수료는 IMX 코인으로 지불되므로 교환 전에 이를 추가해야 합니다"
+          "heading": "스왑하려면 IMX 토큰이 필요합니다",
+          "body": "스왑 수수료는 IMX 토큰으로 지불되므로 스왑을 하기 전에 IMX 토큰을 추가해야 합니다"
         },
         "insufficientImx": {
-          "heading": "더 많은 IMX 코인이 필요합니다",
-          "body": "지정된 금액의 수수료를 충당하기 위해 더 많은 IMX 코인을 추가해야 합니다"
+          "heading": "더 많은 IMX 토큰이 필요합니다",
+          "body": "지정된 금액에 대한 수수료를 충당하기 위해 더 많은 IMX 토큰을 추가해야 합니다"
         }
       },
       "buttons": {
         "adjustAmount": "금액 조정",
-        "addMoreImx": "IMX 코인 추가",
+        "addMoreImx": "IMX 토큰 추가 ",
         "cancel": "취소"
       }
     },
@@ -693,8 +699,8 @@
       }
     },
     "unableToSwap": {
-      "heading": "해당 코인 교환 불가",
-      "body": "지금은 이 코인 페어를 교환할 수 없습니다. 다른 선택을 시도해보세요.",
+      "heading": "이 토큰을 교환할 수 없습니다",
+      "body": "이 토큰 페어링은 현재 교환할 수 없습니다. 다른 선택을 시도해 보세요",
       "buttons": {
         "cancel": "취소"
       }
