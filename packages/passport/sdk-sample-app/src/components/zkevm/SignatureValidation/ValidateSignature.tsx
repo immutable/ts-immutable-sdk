@@ -6,10 +6,18 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import { usePassportProvider } from '@/context/PassportProvider';
 import WorkflowButton from '@/components/WorkflowButton';
 import { RequestExampleProps } from '@/types';
-import { TypedDataPayload } from '@imtbl/passport';
-import { isSignatureValid } from './isSignatureValid';
+import { Provider } from '@imtbl/passport';
 
-function ValidateSignature({ disabled }: RequestExampleProps) {
+interface ValidateSignatureProps extends RequestExampleProps {
+  handleSignatureValidation: (
+    address: string,
+    payload: string,
+    signature: string,
+    provider: Provider,
+  ) => Promise<boolean>;
+}
+
+function ValidateSignature({ disabled, handleSignatureValidation }: ValidateSignatureProps) {
   const [address, setAddress] = useState<string>('');
   const [signature, setSignature] = useState<string>('');
   const [payload, setPayload] = useState<string>('');
@@ -34,9 +42,9 @@ function ValidateSignature({ disabled }: RequestExampleProps) {
         return;
       }
 
-      const isValid = await isSignatureValid(
+      const isValid = await handleSignatureValidation(
         address,
-        JSON.parse(payload) as TypedDataPayload,
+        payload,
         signature,
         zkEvmProvider,
       );
@@ -106,11 +114,11 @@ function ValidateSignature({ disabled }: RequestExampleProps) {
             {
               isValidSignature !== undefined
               && (
-              <p>
-                { isValidSignature ? '✅' : '❌' }
-                {' '}
-                { signatureValidationMessage }
-              </p>
+                <p>
+                  { isValidSignature ? '✅' : '❌' }
+                  {' '}
+                  { signatureValidationMessage }
+                </p>
               )
             }
           </Stack>
