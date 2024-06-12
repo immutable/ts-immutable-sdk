@@ -52,7 +52,7 @@ export function SaleErrorView({
         : closeWidget,
       statusType: StatusType.FAILURE,
       statusIconStyles: {
-        fill: biomeTheme.color.status.destructive.dim,
+        fill: biomeTheme.color.status.fatal.dim,
       },
     },
     [SaleErrorTypes.SERVICE_BREAKDOWN]: {

@@ -2234,20 +2234,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/design-tokens@npm:^0.3.7, @biom3/design-tokens@npm:~0.3.7":
-  version: 0.3.7
-  resolution: "@biom3/design-tokens@npm:0.3.7"
+"@biom3/design-tokens@npm:^0.4.0, @biom3/design-tokens@npm:~0.4.0":
+  version: 0.4.0
+  resolution: "@biom3/design-tokens@npm:0.4.0"
   dependencies:
     lodash.get: ^4.4.2
-  checksum: b583602227123d79e48cb49b5863ab9cc78848ebd24edfa20e101ac87b803c011151ef04fccb9f171cf3d338ea816d9228b90c4701eb2373dde30125ef73f8b0
+  checksum: 09a76130a18d337cf039dd59f9c8c834b1fdb16fe572b92d6e8851f27b197fb923c6da784558c11208743b3e8688fea3fb6c7b4b7bd5a741234764abf96b46d4
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.23.3":
-  version: 0.23.3
-  resolution: "@biom3/react@npm:0.23.3"
+"@biom3/react@npm:^0.24.1":
+  version: 0.24.1
+  resolution: "@biom3/react@npm:0.24.1"
   dependencies:
-    "@biom3/design-tokens": ~0.3.7
+    "@biom3/design-tokens": ~0.4.0
     buffer: ^6.0.3
     csstype: ^3.1.2
     localforage: ^1.10.0
@@ -2261,10 +2261,11 @@ __metadata:
   peerDependencies:
     "@emotion/react": ^11.11.4
     "@rive-app/react-canvas-lite": ^4.9.0
+    embla-carousel-react: ^8.0.4
     framer-motion: ^10.12.12
     react: ^18.2.0
     react-dom: ^18.2.0
-  checksum: 8fcba2edf8f9ca12233fe123fe02478bec48b485a640bbf4e8da210cdb06c1deffde5369390f09e42853e2645d6dd440c5278af627f228bc7c95eea173c6d70a
+  checksum: 3d875341933714e10e7c472dceb26a91f96488d29bf0ac120cd76eac5db3864191d4cdca1c9a3b5737b53ce2db655d51d8b2971c05b280a258c1838592ea7a91
   languageName: node
   linkType: hard
 
@@ -3378,7 +3379,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-sdk-sample-app@workspace:packages/checkout/sdk-sample-app"
   dependencies:
-    "@biom3/react": ^0.23.3
+    "@biom3/react": ^0.24.1
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
@@ -3453,8 +3454,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-widgets-sample-app@workspace:packages/checkout/widgets-sample-app"
   dependencies:
-    "@biom3/design-tokens": ^0.3.7
-    "@biom3/react": ^0.23.3
+    "@biom3/design-tokens": ^0.4.0
+    "@biom3/react": ^0.24.1
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
@@ -3483,8 +3484,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-widgets@workspace:packages/checkout/widgets-lib"
   dependencies:
-    "@biom3/design-tokens": ^0.3.7
-    "@biom3/react": ^0.23.3
+    "@biom3/design-tokens": ^0.4.0
+    "@biom3/react": ^0.24.1
     "@ethersproject/providers": ^5.7.2
     "@imtbl/bridge-sdk": 0.0.0
     "@imtbl/checkout-sdk": 0.0.0
@@ -3761,8 +3762,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/passport-sdk-sample-app@workspace:packages/passport/sdk-sample-app"
   dependencies:
-    "@biom3/design-tokens": ^0.3.7
-    "@biom3/react": ^0.23.3
+    "@biom3/design-tokens": ^0.4.0
+    "@biom3/react": ^0.24.1
     "@imtbl/config": 0.0.0
     "@imtbl/passport": 0.0.0
     "@imtbl/x-client": 0.0.0
@@ -3853,8 +3854,8 @@ __metadata:
     "@babel/core": ^7.21.0
     "@babel/plugin-transform-class-properties": ^7.24.1
     "@babel/plugin-transform-private-methods": ^7.24.1
-    "@biom3/design-tokens": ^0.3.7
-    "@biom3/react": ^0.23.3
+    "@biom3/design-tokens": ^0.4.0
+    "@biom3/react": ^0.24.1
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
     "@ethersproject/keccak256": ^5.7.0
@@ -30673,7 +30674,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "x-provider-sample-app@workspace:packages/x-provider/src/sample-app"
   dependencies:
-    "@biom3/react": ^0.23.3
+    "@biom3/react": ^0.24.1
     "@imtbl/sdk": 0.0.0
     "@svgr/webpack": ^8.0.1
     "@testing-library/jest-dom": ^5.16.5
