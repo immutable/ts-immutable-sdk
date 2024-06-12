@@ -26,6 +26,18 @@ on:
         description: "(Optional) Dry run"
         required: false
         default: false
+  push:
+    branches:
+      - main
+
+env:
+  RELEASE_TYPE: ${{ github.event.inputs.release_type || 'alpha' }}
+  UPGRADE_TYPE: ${{ github.event.inputs.upgrade_type || 'none' }}
+  DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event.inputs.release_type || 'alpha' }}-${{ github.event.inputs.upgrade_type || 'none' }}
+  cancel-in-progress: false
 
 jobs:
   Publish:
@@ -37,7 +49,7 @@ jobs:
       SDK_PUBLISH_SLACK_WEBHOOK: ${{ secrets.SDK_PUBLISH_SLACK_WEBHOOK }}
     steps:
       - name: Check Public Release Branch
-        if: contains(github.event.inputs.release_type, 'release') && (github.ref != 'refs/heads/main')
+        if: contains(env.RELEASE_TYPE , 'release') && (github.ref != 'refs/heads/main')
         run: failure("Public releases should be only done from main branch, current branch ${{ github.ref }}")
 
       - name: Checkout
@@ -62,17 +74,17 @@ jobs:
 
       - name: Workout next version string
         run: |
-          upgrade_type=${{ github.event.inputs.upgrade_type }}
-          if [ ${{ contains(github.event.inputs.upgrade_type, 'none') }} == true ]
+          upgrade_type=${{ env.UPGRADE_TYPE }}
+          if [ ${{ contains(env.UPGRADE_TYPE, 'none') }} == true ]
           then
             upgrade_type=""
-            revision_upgrade=$( ${{ contains(github.event.inputs.release_type, 'alpha') }} && echo '--revision' || echo '')
+            revision_upgrade=$( ${{ contains(env.RELEASE_TYPE, 'alpha') }} && echo '--revision' || echo '')
           else
             upgrade_type="--$upgrade_type"
           fi
           echo upgrade_type=$upgrade_type
           echo revision_upgrade=$revision_upgrade
-          ./.github/scripts/version-up.sh --${{ github.event.inputs.release_type }} $upgrade_type --apply $revision_upgrade
+          ./.github/scripts/version-up.sh --${{ env.RELEASE_TYPE }} $upgrade_type --apply $revision_upgrade
         shell: bash
 
       - name: Install dependencies
@@ -95,7 +107,7 @@ jobs:
           jq '.version = "${{steps.version.outputs.NEXT_VERSION}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
 
       - name: Build
-        run: export NODE_OPTIONS=--max-old-space-size=6144 && RELEASE_TYPE=${{ github.event.inputs.release_type }} yarn build
+        run: export NODE_OPTIONS=--max-old-space-size=6144 && RELEASE_TYPE=${{ env.RELEASE_TYPE }} yarn build
 
       - name: Typecheck
         run: yarn typecheck
@@ -105,33 +117,33 @@ jobs:
 
       - name: Push tags
         # Boolean inputs are not actually booleans, see https://github.com/actions/runner/issues/1483
-        if: github.event.inputs.dry_run == 'false'
+        if: (env.DRY_RUN) == 'false'
         run: |
           echo "$(git push --tags)"
 
       - name: Pre Release Step
-        if: contains(github.event.inputs.release_type, 'alpha')
+        if: contains(env.RELEASE_TYPE, 'alpha')
         id: pre_release
         uses: JS-DevTools/npm-publish@v3
         with:
           token: ${{ secrets.TS_IMMUTABLE_SDK_NPM_TOKEN }}
           access: public
           package: ./sdk/package.json
-          tag: ${{ contains(github.event.inputs.release_type, 'alpha') && 'alpha' }}
-          dry-run: ${{ github.event.inputs.dry_run }}
+          tag: ${{ contains(env.RELEASE_TYPE, 'alpha') && 'alpha' }}
+          dry-run: ${{ env.DRY_RUN }}
 
       - name: Authenticate NPM
-        if: contains(github.event.inputs.release_type, 'release')
+        if: contains(env.RELEASE_TYPE, 'release')
         run: npm config set //registry.npmjs.org/:_authToken ${{ secrets.TS_IMMUTABLE_SDK_NPM_TOKEN }}
 
       - name: Release
         id: npm_release
-        if: contains(github.event.inputs.release_type, 'release')
-        run: yarn release --ci --no-increment -c .release-it.json $( ${{ github.event.inputs.dry_run }} && echo "--dry-run" || echo "") --github.tokenRef=${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
+        if: contains(env.RELEASE_TYPE, 'release')
+        run: yarn release --ci --no-increment -c .release-it.json $( ${{ env.DRY_RUN }} && echo "--dry-run" || echo "") --github.tokenRef=${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
 
       - name: Warm up CDN
         id: warm_up_cdn
-        if: contains(github.event.inputs.release_type, 'release')
+        if: contains(env.RELEASE_TYPE, 'release')
         run: |
           wget https://cdn.jsdelivr.net/npm/@imtbl/sdk/dist/browser/checkout/widgets.js
           wget https://cdn.jsdelivr.net/npm/@imtbl/sdk/dist/browser/checkout/sdk.js
@@ -143,24 +155,24 @@ jobs:
 
       - name: Create GitHub Release
         id: gh_release
-        if: contains(github.event.inputs.release_type, 'release') && github.event.inputs.dry_run == 'false'
+        if: contains(env.RELEASE_TYPE, 'release') && env.DRY_RUN == 'false'
         run: gh release create ${{ steps.version.outputs.NEXT_VERSION }} --title ${{ steps.version.outputs.NEXT_VERSION }} --draft=false --prerelease=false --generate-notes --repo immutable/ts-immutable-sdk --target main
 
       - name: Get GitHub Release Name and URL
-        if: contains(github.event.inputs.release_type, 'release') && github.event.inputs.dry_run == 'false'
+        if: contains(env.RELEASE_TYPE, 'release') && env.DRY_RUN == 'false'
         id: release
         run: |
           echo "RELEASE_NAME=$(gh release view --json name | jq -r .name)" >> $GITHUB_OUTPUT
           echo "RELEASE_URL=$(gh release view --json url | jq -r .url)" >> $GITHUB_OUTPUT
 
       - name: Notify SDK Slack Publish Success
-        if: ${{ success() && (steps.npm_release.conclusion == 'success' || steps.pre_release.conclusion == 'success') && github.event.inputs.dry_run == 'false' }}
+        if: ${{ success() && (steps.npm_release.conclusion == 'success' || steps.pre_release.conclusion == 'success') && env.DRY_RUN == 'false' }}
         uses: ./.github/actions/notify-slack-publish-status
         with:
           message: "✅ ${{ github.triggering_actor }} successfully published SDK version ${{steps.version.outputs.NEXT_VERSION}} to NPM.\n\nhttps://www.npmjs.com/package/@imtbl/sdk/v/${{steps.version.outputs.NEXT_VERSION}}"
 
       - name: Notify SDK Slack Publish Failure
-        if: ${{ failure() && (steps.npm_release.conclusion == 'failure' || steps.pre_release.conclusion == 'failure' || steps.gh_release.conclusion == 'failure') && github.event.inputs.dry_run == 'false' }}
+        if: ${{ failure() && (steps.npm_release.conclusion == 'failure' || steps.pre_release.conclusion == 'failure' || steps.gh_release.conclusion == 'failure') && env.DRY_RUN == 'false' }}
         uses: ./.github/actions/notify-slack-publish-status
         with:
           message: "❌ Failed to publish SDK version ${{steps.version.outputs.NEXT_VERSION}} to NPM. ${{ github.triggering_actor }} please check the logs for more details."
