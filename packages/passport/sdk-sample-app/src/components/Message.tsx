@@ -37,9 +37,6 @@ function Message() {
           icon="Close"
           circularFrame
           sx={{
-            position: 'absolute',
-            top: '0.5rem',
-            right: '0.5rem',
             cursor: 'pointer',
           }}
           onClick={clearMessages}
