@@ -20,7 +20,7 @@
     "@jest/globals": "^29.5.0",
     "@magic-ext/oidc": "4.2.0",
     "@metamask/detect-provider": "^2.0.0",
-    "@opensea/seaport-js": "4.0.1",
+    "@opensea/seaport-js": "4.0.2",
     "@rive-app/react-canvas-lite": "^4.9.0",
     "@stdlib/number-float64-base-normalize": "0.0.8",
     "@uniswap/router-sdk": "^1.4.0",
