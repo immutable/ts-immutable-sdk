@@ -190,6 +190,7 @@ export const getIndexerBalance = async (
 
     const tokenData = item.token || {};
 
+    if (item.value == null) return;
     const balance = BigNumber.from(item.value);
 
     let decimals = parseInt(tokenData.decimals, 10);
