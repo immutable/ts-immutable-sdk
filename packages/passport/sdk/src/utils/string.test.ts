@@ -1,7 +1,7 @@
 import { hexToString } from './string';
 
 describe('string', () => {
-  describe.only('hexToString', () => {
+  describe('hexToString', () => {
     it('should return hex if it is not a valid hex', () => {
       const hex = '0x123';
       const hex2 = 'test';
