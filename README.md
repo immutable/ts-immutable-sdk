@@ -238,6 +238,8 @@ The Config package exposes a configuration class and some utilities to create a 
 
 The Config package is built using TypeScript and Rollup. The package is exposed to the SDK package that is published to NPM.
 
+More information can be found in the README file in the Config folder [here](/packages//config//README.md).
+
 ### Game Bridge
 
 The Game Bridge SDK package allows the Game SDKs (Unity and Unreal) to communicate with the TypeScript SDK. The Game SDKs are used to build games that interact with the Immutable platform. This enables communication between the Game and Typescript SDKs, allowing the Game SDKs to leverage the existing TypeScript SDK.
