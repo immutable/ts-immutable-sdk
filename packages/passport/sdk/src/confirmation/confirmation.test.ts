@@ -116,6 +116,30 @@ describe('confirmation', () => {
         'https://passport.sandbox.immutable.com',
       );
     });
+
+    describe('when the transaction is rejected', () => {
+      it('should resolve with confirmed: false', async () => {
+        const transactionId = 'transactionId123';
+        addEventListenerMock
+          .mockImplementationOnce((event, callback) => {
+            callback({
+              origin: testConfig.passportDomain,
+              data: {
+                eventType: PASSPORT_EVENT_TYPE,
+                messageType: ReceiveMessage.TRANSACTION_REJECTED,
+              },
+            });
+          });
+
+        const res = await confirmationScreen.requestConfirmation(
+          transactionId,
+          mockEtherAddress,
+          TransactionApprovalRequestChainTypeEnum.Starkex,
+        );
+
+        expect(res.confirmed).toEqual(false);
+      });
+    });
   });
 
   describe('requestMessageConfirmation', () => {
@@ -157,6 +181,29 @@ describe('confirmation', () => {
         },
         'https://passport.sandbox.immutable.com',
       );
+    });
+
+    describe('when the message is rejected', () => {
+      it('should resolve with confirmed: false', async () => {
+        const transactionId = 'transactionId123';
+        addEventListenerMock
+          .mockImplementationOnce((event, callback) => {
+            callback({
+              origin: testConfig.passportDomain,
+              data: {
+                eventType: PASSPORT_EVENT_TYPE,
+                messageType: ReceiveMessage.MESSAGE_REJECTED,
+              },
+            });
+          });
+
+        const res = await confirmationScreen.requestMessageConfirmation(
+          transactionId,
+          mockEtherAddress,
+        );
+
+        expect(res.confirmed).toEqual(false);
+      });
     });
   });
 });

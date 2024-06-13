@@ -201,7 +201,7 @@ export function BridgeReviewSummary() {
       amount: utils.parseUnits(amount, token.decimals),
       sourceChainId: from?.network.toString(),
       destinationChainId: to?.network.toString(),
-      gasMultiplier: 1.1,
+      gasMultiplier: 'auto',
     });
 
     const unsignedApproveTransaction = {

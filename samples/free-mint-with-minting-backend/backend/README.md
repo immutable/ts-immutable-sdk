@@ -69,7 +69,7 @@ Every time you change primsa schema you need to run the above.
    npx localtunnel --port 3000
    ```
 
-   Use the above URL for the webhook endpoint with the path `/webhook`. For example: `https://ten-rooms-vanish.loca.lt/webhook`.
+   Use the above URL for the webhook endpoint with the path `/api/process_webhook_event`. For example: `https://ten-rooms-vanish.loca.lt/api/process_webhook_event`.
 
 8. Use Postgresql instead of SQLite
    This example uses SQLite as database for its portability and self-contain-ness.

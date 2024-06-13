@@ -1,5 +1,4 @@
 import { Signer } from '@ethersproject/abstract-signer';
-import { imx } from '@imtbl/generated-clients';
 import {
   Contracts,
   ERC721Token,
@@ -14,7 +13,7 @@ import { ProviderConfiguration } from '../../config';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 import { isRegisteredOnChain } from '../registration';
 import { validateChain } from '../helpers';
-import { getWithdrawalBalances } from './getWithdrawalBalance';
+import { getWithdrawalBalancesERC721 } from './getWithdrawalBalance';
 
 interface MintableERC721Withdrawal {
   type: 'ERC721';
@@ -253,53 +252,48 @@ export async function completeERC721WithdrawalAction({
   starkPublicKey,
   token,
   config,
-}: CompleteERC721WithdrawalActionParams) {
+}: CompleteERC721WithdrawalActionParams, mintsApi: MintsApi) {
   await validateChain(ethSigner, config.immutableXConfig);
-
-  const mintsApi = new imx.MintsApi(config.immutableXConfig.apiConfiguration);
-
+  const ethAddress = await ethSigner.getAddress();
   const {
     v3Balance,
     v4Balance,
-  } = await getWithdrawalBalances(
+  } = await getWithdrawalBalancesERC721(
     ethSigner,
     starkPublicKey,
-    await ethSigner.getAddress(),
+    ethAddress,
     {
       type: ERC721TokenType,
       tokenAddress: token.tokenAddress,
       tokenId: token.tokenId,
     },
     config.immutableXConfig,
+    mintsApi,
   );
-
-  if (v3Balance.isZero() && v4Balance.isZero()) {
-    throw new Error('No balance to withdraw');
+  if (!v3Balance.isZero() && !v3Balance.isNegative()) {
+    const isRegistered = await isRegisteredOnChain(
+      starkPublicKey,
+      ethSigner,
+      config,
+    );
+    // if the user is already registered on-chain, we can withdraw using stark key as the owner key
+    if (isRegistered) {
+      return completeERC721Withdrawal(mintsApi, ethSigner, starkPublicKey, token, config.immutableXConfig);
+    }
+    // if not registered on-chain, we need to register the user on-chain using stark public key as the owner key
+    return completeERC721RegisterAndWithdrawal(
+      mintsApi,
+      ethSigner,
+      starkSigner,
+      token,
+      config.immutableXConfig,
+    );
   }
 
-  const ethAddress = await ethSigner.getAddress();
-
   // if v4 balance is NOT zero, the withdrawal was prepared using eth address (using v2/withdrawals API)
-  if (!v4Balance.isZero()) {
+  if (!v4Balance.isZero() && !v4Balance.isNegative()) {
     return completeERC721Withdrawal(mintsApi, ethSigner, ethAddress, token, config.immutableXConfig);
   }
 
-  const isRegistered = await isRegisteredOnChain(
-    starkPublicKey,
-    ethSigner,
-    config,
-  );
-
-  // if the user is already registered on-chain, we can withdraw using stark key as the owner key
-  if (isRegistered) {
-    return completeERC721Withdrawal(mintsApi, ethSigner, starkPublicKey, token, config.immutableXConfig);
-  }
-  // if not registered on-chain, we need to register the user on-chain using stark public key as the owner key
-  return completeERC721RegisterAndWithdrawal(
-    mintsApi,
-    ethSigner,
-    starkSigner,
-    token,
-    config.immutableXConfig,
-  );
+  throw new Error('No balance to withdraw');
 }

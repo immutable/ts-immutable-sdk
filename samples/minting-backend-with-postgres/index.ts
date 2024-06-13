@@ -2,6 +2,7 @@ import Fastify, { FastifyReply, FastifyRequest } from 'fastify'
 import { mintingBackend, config } from '@imtbl/sdk';
 import { Pool } from 'pg';
 import { v4 as uuidv4, parse } from 'uuid';
+import 'dotenv/config'
 
 const fastify = Fastify({
   logger: true
@@ -67,7 +68,7 @@ fastify.post(url, async (request: FastifyRequest<any>, reply: any) => {
  */
 const start = async () => {
   try {
-    await fastify.listen({ port: 3000 })
+    await fastify.listen({ port: 3000, host: "0.0.0.0" })
 
     // long running process to submit minting requests
     await minting.submitMintingRequests({});

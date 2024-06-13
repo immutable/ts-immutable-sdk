@@ -7,7 +7,7 @@ import {
 } from './types';
 import { openPopupCenter } from './popup';
 import { PassportConfiguration } from '../config';
-import Overlay from '../overlay/overlay';
+import Overlay from '../overlay';
 
 const CONFIRMATION_WINDOW_TITLE = 'Confirm this transaction';
 const CONFIRMATION_WINDOW_HEIGHT = 720;
@@ -81,14 +81,14 @@ export default class ConfirmationScreen {
             resolve({ confirmed: true });
             break;
           }
+          case ReceiveMessage.TRANSACTION_REJECTED: {
+            this.closeWindow();
+            resolve({ confirmed: false });
+            break;
+          }
           case ReceiveMessage.TRANSACTION_ERROR: {
             this.closeWindow();
             reject(new Error('Error during transaction confirmation'));
-            break;
-          }
-          case ReceiveMessage.TRANSACTION_REJECTED: {
-            this.closeWindow();
-            reject(new Error('User rejected transaction'));
             break;
           }
           default:
@@ -132,14 +132,14 @@ export default class ConfirmationScreen {
             resolve({ confirmed: true });
             break;
           }
+          case ReceiveMessage.MESSAGE_REJECTED: {
+            this.closeWindow();
+            resolve({ confirmed: false });
+            break;
+          }
           case ReceiveMessage.MESSAGE_ERROR: {
             this.closeWindow();
             reject(new Error('Error during message confirmation'));
-            break;
-          }
-          case ReceiveMessage.MESSAGE_REJECTED: {
-            this.closeWindow();
-            reject(new Error('User rejected message'));
             break;
           }
           default:

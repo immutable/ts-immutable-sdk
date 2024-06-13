@@ -3,7 +3,7 @@
     "CONNECT_WALLET": {
       "body": {
         "heading": "连接钱包",
-        "content": "您需要连接或创建数字钱包以购买、出售、交易和存储您的硬币和收藏品。"
+        "content": "您需要连接或创建一个数字钱包，以购买、出售、交易和存储您的代币和收藏品。"
       },
       "walletSelection": {
         "heading": "选择一个钱包"
@@ -87,13 +87,13 @@
         "heading": "网络"
       },
       "totalTokenBalance": {
-        "heading": "硬币",
+        "heading": "代币",
         "totalHeading": "价值"
       },
       "tokenBalancesList": {
         "noTokensFound": "未发现代币"
       },
-      "addCoins": "添加硬币"
+      "addCoins": "添加代币"
     },
     "SETTINGS": {
       "header": {
@@ -112,19 +112,19 @@
     },
     "COIN_INFO": {
       "metamask": {
-        "heading": "硬币和收藏品是网络原生的",
-        "body": "您可以切换网络来添加硬币或将它们从一个网络移动到另一个网络"
+        "heading": "代币和收藏品是网络的原生物",
+        "body": "您可以切换网络来添加代币或将它们从一个网络移动到另一个网络"
       },
       "passport": {
-        "heading": "硬币和收藏品是网络原生的",
-        "body1": "这个网络称为Immutable zkEVM。如果您在Passport中有其他硬币在这里看不到，它们可能在另一个网络上。",
+        "heading": "代币和收藏品是网络的原生物",
+        "body1": "该网络称为 Immutable zkEVM。如果您的护照中有其他代币并且在这里看不到它们，它们可能在其他网络上。",
         "body2": "欲了解更多信息，请",
         "linkText": "访问我们的常见问题"
       }
     },
     "SWAP": {
       "header": {
-        "title": "兑换硬币"
+        "title": "交换代币"
       },
       "content": {
         "title": "您想要兑换什么？",
@@ -150,8 +150,8 @@
       "validation": {
         "noAmountInputted": "请输入金额",
         "insufficientBalance": "余额不足",
-        "noFromTokenSelected": "选择一个要兑换的硬币",
-        "noToTokenSelected": "选择一个要接收的硬币"
+        "noFromTokenSelected": "选择要交换的代币",
+        "noToTokenSelected": "选择要接收的代币"
       },
       "success": {
         "text": "成功",
@@ -204,7 +204,7 @@
     },
     "ONRAMP": {
       "header": {
-        "title": "添加硬币"
+        "title": "添加代币"
       },
       "initialLoadingText": "带您前往Transak",
       "IN_PROGRESS_LOADING": {
@@ -220,7 +220,7 @@
         }
       },
       "SUCCESS": {
-        "text": "硬币正在途中",
+        "text": "代币正在传送中",
         "actionText": "完成"
       },
       "FAIL": {
@@ -230,30 +230,39 @@
     },
     "TOP_UP_VIEW": {
       "header": {
-        "title": "您想如何添加代币？"
+        "title": "你想如何添加代币？"
       },
       "topUpOptions": {
         "onramp": {
-          "heading": "购买",
-          "caption": "可通过卡、谷歌支付或苹果支付。",
+          "heading": "购买代币"
+        },
+        "debit": {
+          "heading": "用借记卡购买",
+          "caption": "推荐的购买代币方法",
+          "subcaption": "费用",
+          "disabledCaption": ""
+        },
+        "credit": {
+          "heading": "用信用卡购买",
+          "caption": "由于失败和费用，不推荐使用",
           "subcaption": "费用",
           "disabledCaption": ""
         },
         "swap": {
-          "heading": "兑换",
-          "caption": "使用我在余额中的代币。",
+          "heading": "在此网络上交换代币",
+          "caption": "仅限不可变 zkEVM",
           "subcaption": "费用",
           "disabledCaption": "您所在的地区不可用"
         },
         "bridge": {
-          "heading": "转移",
-          "caption": "我在其他钱包或网络中的代币。",
+          "heading": "从另一个钱包转移代币",
+          "caption": "仅限不可变 zkEVM",
           "subcaption": "费用",
           "disabledCaption": ""
         },
         "advanced": {
-          "heading": "高级选项",
-          "caption": "进行快速桥接或CEX存款。",
+          "heading": "从另一个网络桥接代币",
+          "caption": "多种网络和CEX选项可用",
           "subcaption": "费用",
           "disabledCaption": ""
         }
@@ -272,7 +281,7 @@
       },
       "coinsDrawer": {
         "header": "支付方式…",
-        "caption1": "硬币",
+        "caption1": "代币",
         "caption2": "余额",
         "divider": "更多选项",
         "stepType": {
@@ -305,23 +314,23 @@
       },
       "options": {
         "crypto": {
-          "heading": "硬币",
-          "caption": "请用钱包里的硬币付款，或用卡购买硬币。",
+          "heading": "代币",
+          "caption": "使用钱包里的代币付款，或用银行卡购买代币",
           "disabledCaption": "目前无法进行此购买。"
         },
         "debit": {
           "heading": "借记卡",
           "caption": "使用卡支付的推荐方式。",
-          "disabledCaption": "您选择的项目不可用。我们建议增加硬币。"
+          "disabledCaption": "无法选择。我们建议添加代币。"
         },
         "credit": {
           "heading": "信用卡",
           "caption": "不推荐使用，因为您的银行可能会阻止交易。",
-          "disabledCaption": "您选择的项目不可用。我们建议增加硬币。"
+          "disabledCaption": "无法选择。我们建议添加代币。"
         }
       },
       "topUp": {
-        "heading": "您需要添加一些硬币",
+        "heading": "你需要添加一些代币",
         "subheading": {
           "both": "添加{{erc20.value}} {{erc20.symbol}}和{{native.value}} {{native.symbol}}以支付本次购买及燃气费。",
           "erc20": "通过以下选项之一将{{erc20.value}} {{erc20.symbol}}添加到您的余额。",
@@ -345,7 +354,7 @@
     "PAY_WITH_COINS": {
       "header": {
         "heading": "用您的硬币支付",
-        "caption": "使用您钱包中的硬币余额"
+        "caption": "使用您钱包中的代币余额"
       },
       "button": {
         "buyNow": "立即购买"
@@ -440,7 +449,7 @@
     },
     "BRIDGE_FORM": {
       "header": {
-        "title": "转移硬币"
+        "title": "移动代币"
       },
       "fees": {
         "title": "燃气费",
@@ -461,7 +470,7 @@
       "validation": {
         "noAmountInputted": "请输入金额",
         "insufficientBalance": "余额不足",
-        "noTokenSelected": "选择一个要转移的硬币"
+        "noTokenSelected": "选择要移动的代币"
       }
     },
     "BRIDGE_REVIEW": {
@@ -514,7 +523,7 @@
         "withdrawalPending": {
           "actionButtonText": "继续",
           "withdrawalDelayText": "此操作已暂停，请返回",
-          "withdrawalReadyText": "需要采取行动以收取您的硬币",
+          "withdrawalReadyText": "需要采取措施来接收您的代币",
           "caption": "已暂停"
         },
         "inProgress": {
@@ -556,7 +565,7 @@
     },
     "CLAIM_WITHDRAWAL": {
       "content": {
-        "heading": "按照提示在此处收取您的硬币",
+        "heading": "按提示操作以接收您的代币",
         "body": "您将被要求支付一笔小额燃气费以领取您的提款。",
         "body2": "目标钱包地址："
       },
@@ -643,7 +652,7 @@
       "option": {
         "fiatPricePrefix": "约美元 $"
       },
-      "noCoins": "您的钱包中没有可用的硬币。"
+      "noCoins": "您的钱包中没有可选择的代币。"
     },
     "notEnoughGas": {
       "content": {
@@ -652,7 +661,7 @@
       },
       "buttons": {
         "adjustAmount": "调整金额",
-        "addMoreImx": "添加IMX币",
+        "addMoreImx": "添加 IMX 代币",
         "copyAddress": "复制钱包地址",
         "cancel": "关闭"
       }
@@ -660,17 +669,17 @@
     "notEnoughImx": {
       "content": {
         "noImx": {
-          "heading": "您需要IMX币来兑换",
-          "body": "兑换费用需要用IMX币支付，因此在您可以进行兑换之前需要添加此币"
+          "heading": "您需要IMX代币进行交换",
+          "body": "交换费用以IMX代币支付，因此在交换之前，您需要添加IMX代币"
         },
         "insufficientImx": {
-          "heading": "您需要更多IMX币",
-          "body": "为了支付指定金额的费用，您需要添加更多IMX币"
+          "heading": "您需要更多的IMX代币",
+          "body": "为了支付指定金额的费用，您需要添加更多的IMX代币"
         }
       },
       "buttons": {
         "adjustAmount": "调整金额",
-        "addMoreImx": "添加IMX币",
+        "addMoreImx": "添加 IMX 代币",
         "cancel": "关闭"
       }
     },
@@ -687,8 +696,8 @@
       }
     },
     "unableToSwap": {
-      "heading": "无法兑换此币种",
-      "body": "现在无法兑换这种币对。请尝试选择其他币种。",
+      "heading": "无法交换此代币",
+      "body": "这种代币配对当前无法交换。请尝试选择其他选项",
       "buttons": {
         "cancel": "关闭"
       }

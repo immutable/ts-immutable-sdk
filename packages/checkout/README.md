@@ -1,122 +1,181 @@
-<div align="center">
-  <p align="center">
-    <a href="https://docs.x.immutable.com/docs">
-      <img src="https://cdn.dribbble.com/users/1299339/screenshots/7133657/media/837237d447d36581ebd59ec36d30daea.gif" width="280"/>
-    </a>
-  </p>
-  <h1>Immutable Checkout SDK</h1>
-</div>
+# Checkout
 
-# Overview
+## Table of Contents
 
-> **Warning** **IMMUTABLE CHECKOUT SDK IS UNSTABLE** <br/>
-> Since it has not hit the version 1.0 yet, its public interface should not be considered final. Future releases may include breaking changes without further notice. We will do our best to keep this documentation updated providing visibility on breaking changes planned.
+- [Pre-requisites](#pre-requisites)
+- [Checkout SDK Quick Start Guide](#checkout-sdk-quick-start-guide)
+- [Widgets Library Quick Start Guide](#widgets-library-quick-start-guide)
+  - [Widgets Development Locally](#widgets-development-locally)
+- [Project structure](#project-structure)
 
-The Immutable Checkout SDK provides both programatical and user interfaces for interacting with various wallets and L2 networks. It provides all the tools to enable transaction ready gamers including on ramping, dex swaps, bridging and more.
+### Pre-requisites
 
-## Documentation
+Install dependencies for the workspace
 
-- Coming Soon &trade;
-
-# Project structure
-
-```
-/
-│
-└───sdk -> Checkout SDK
-│
-└───sdk-sample-app --> Sample app where the Checkout SDK is consumed
-│
-└───widgets-lib --> Checkout widgets
-│
-└───widgets-sample-app --> Sample app where the Checkout Widgets are consumed
-│
-└───README.md
+```bash
+yarn install
 ```
 
-# Running locally
+### Checkout SDK Quick Start Guide
 
-## Dependencies
+All commands below need to be run in the context of the `checkout-sdk` package in the `./sdk` folder unless specified otherwise. Read more about context [here](../../../README.md#context).
 
-CheckoutSDK has been built with and tested using the following dependencies.
+Running in `dev` mode using the `immutable-devnet` network:
 
-| Dependency | Version |
-| ---------- | ------- |
-| Node       | v16+    |
-| Yarn       | v3.5.0  |
-
-Node Module dependencies are still added to the package.json of each checkout module, however each module installs it's dependencies to a shared node_modules directory at the root level of the Unified SDK. This requires dependency versions to be aligned across all SDK submodules.
-
-Once you've added a new dependency, or if it's your first time, go to the root level of the Unified SDK and run `yarn install`.
-
-## Checkout SDK Development
-
-Running Checkout SDK in different modes:
-
-For local/development mode (uses immutable-devnet):
-
-```
-cd sdk
+```bash
 yarn start:dev
 ```
 
-For sandbox/production mode (uses immutable-testnet/mainnet based on config object):
+Running in `sandbox`/`production` mode using the `immutable-testnet`/`mainnet` network based on the environment value set for the `SANDBOX_CONFIGURATION` config object in the `./sdk/src/sdk.ts` file:
 
-```
-cd sdk
+```bash
 yarn start
 ```
 
-To run the SDK Sample App with the Checkout SDK hot reloading, you need to run both the Checkout SDK and the Checkout Sample App at the same time.
+Running the Checkout SDK Sample App with the Checkout SDK supporting hot reloading:
 
-In one terminal run;
+```bash
+# Run the Checkout SDK first
+# Context: checkout-sdk in ./sdk
+yarn start
 
-```
-cd sdk
+# Run the Checkout SDK Sample App in a new terminal
+# Context: checkout-sdk-sample-app in ./sdk-sample-app
 yarn start
 ```
 
-In another terminal run;
+Building to the `./sdk/dist` directory for `dev` environment:
 
+```bash
+yarn build:dev
 ```
-cd sdk-sample-app
+
+Building to the `./sdk/dist` directory for `sandbox`/`production` environment:
+
+```bash
+yarn build
+```
+
+Running all jest tests:
+
+```bash
+yarn test
+```
+
+Running changed tests on save in watch mode:
+
+```bash
+yarn test:watch
+```
+
+Linting:
+
+```bash
+yarn lint
+```
+
+Linting and attempting to auto-fix issues:
+
+```bash
+yarn lint:fix
+```
+
+Typechecking:
+
+```bash
+yarn typecheck
+```
+
+Generate Typescript API documentation (viewable in the newly generated docs folder at [./sdk/docs/README.md](./sdk/docs/README.md)):
+
+```bash
+yarn docs
+```
+
+### Widgets Library Quick Start Guide
+
+All commands below need to be run in the context of the `checkout-widgets` package in the `./widgets-lib` folder unless specified otherwise. Read more about context [here](../../../README.md#context).
+
+Running in `dev` mode (widgets-lib depends upon checkout-sdk):
+
+```bash
+# Run the Checkout SDK first
+# Context: checkout-sdk in ./sdk
+yarn start:dev
+
+# Run the Widgets Library in a new terminal
+# Context: checkout-widgets in ./widgets-lib
 yarn start
 ```
 
-Note: SDK sample app does not require mode settings.
+Running the Widgets Sample App with the Widgets Library supporting hot reloading:
 
-Now when you make changes in the SDK, Rollup will trigger a rebuild of the SDK and since the sample app is also being watched and one of it's dependencies has changed, it will also recompile and the change will automatically be pulled through.
+```bash
+# Run the above two commands first
+# ...
 
-The best way to work on the SDK is to run the sample app and the sdk, then create buttons for the endpoint you're developing and use them to trigger SDK calls.
-
-### Jest tests in the SDK
-
-All jest tests within the SDK are run in the jsdom environment. To configure this so that it works in our CI pipeline, please add the following comment to the top of your test file.
-
-```
-/*
- * @jest-environment jsdom
- */
-```
-
-## Widgets Development
-
-The widgets-sample-app depends upon the widgets-lib, which in turn depends upon the sdk. To get started you will need to run `yarn start` in all three directories. This will enable hot reloading for all areas.
-
-```
-cd sdk
+# Run the Widgets Sample App in a new terminal
+# Context: checkout-widgets-sample-app in ./widgets-sample-app
 yarn start
 ```
 
-```
-cd widgets-lib
-yarn start
+**Read more about running locally [here](#widgets-development-locally).**
+
+Building the Widgets Library to the `./widgets-lib/dist` directory:
+
+```bash
+yarn build
 ```
 
+Building the Widgets Library and outputting a bundle visualizer:
+
+```bash
+yarn build:analyze
 ```
-cd widgets-sample-app
-yarn start
+
+Running all jest tests:
+
+```bash
+yarn test
 ```
+
+Running changed jest tests on save in watch mode:
+
+```bash
+yarn test:watch
+```
+
+Running cypress tests headless:
+
+```bash
+yarn test:cypress
+```
+
+Running cypress tests:
+
+```bash
+yarn test:cypress:open
+```
+
+Linting:
+
+```bash
+yarn lint
+```
+
+Linting and attempting to auto-fix issues:
+
+```bash
+yarn lint:fix
+```
+
+Typechecking:
+
+```bash
+yarn typecheck
+```
+
+#### Widgets Development Locally
 
 When you develop locally, the widgets-sample-app installs and imports the widgets as an es module. `import { WidgetsFactory} from '@imtbl/checkout-widgets'` This helps local development with hot reloading. (it takes a lot longer to rebuild and minify a browser bundle).
 
@@ -124,18 +183,21 @@ In production however, the widgets-lib package is built as a browser bundle and 
 
 To test this setup locally and force the widgets bundle to be loaded from `localhost` you will need to run
 
-```
-cd sdk
+```bash
+# Run the Checkout SDK first in local dev mode
+# Context: checkout-sdk in ./sdk
 yarn start:local
 ```
 
-```
-cd widgets-lib
+```bash
+# Build the Widgets Library in a new terminal in local mode
+# Context: checkout-widgets in ./widgets-lib
 yarn build:local
 ```
 
-```
-cd widgets-sample-app
+```bash
+# Run the Widgets Sample App in a new terminal
+# Context: checkout-widgets-sample-app in ./widgets-sample-app
 yarn start
 ```
 
@@ -143,36 +205,20 @@ You will then need to make sure that you replace your creation of a `new Widgets
 
 In a production release, this script is loaded from a CDN. We are currently using `https://cdn.jsdelivr.net/npm/@imtbl/sdk/dist/browser/checkout/widgets.js`
 
-# Linting
-
-Linting gets run across the project when you try to commit to your banch and it wont let you push unless the linting passes.
-
-# Running tests
-
-Running jest tests
+### Project structure
 
 ```
-yarn test
+─ checkout
+      │
+      ├── sdk - Checkout SDK
+      │
+      ├── sdk-sample-app - Sample app where the Checkout SDK is consumed
+      │
+      ├── widgets-lib - Checkout widgets
+      │
+      ├── widgets-sample-app - Sample app where the Checkout Widgets are consumed
+      │
+      └── README.md
 ```
 
-Running cypress tests
-
-```
-yarn test:cypress:open
-```
-
-Running cypress tests (headless)
-
-```
-yarn test:cypress
-```
-
-# Release process
-
-## Staging
-
-- Coming Soon &trade;
-
-## Production
-
-- Coming Soon &trade;
+[Read more about the Checkout SDK here](../../README.md#checkout)
