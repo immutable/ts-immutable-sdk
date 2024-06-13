@@ -11,7 +11,6 @@ import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import { Signer } from '@ethersproject/abstract-signer';
 import { v1 as sequenceCoreV1 } from '@0xsequence/core';
 import { trackDuration } from '@imtbl/metrics';
-import { UnrecoveredSignature } from '@0xsequence/core/src/v1/signature';
 import { MetaTransaction, MetaTransactionNormalised, TypedDataPayload } from './types';
 
 const SIGNATURE_WEIGHT = 1; // Weight of a single signature in the multi-sig
@@ -143,7 +142,7 @@ export const signMetaTransactions = async (
   ]);
 };
 
-const decodeRelayerSignature = (relayerSignature: string): UnrecoveredSignature => {
+const decodeRelayerSignature = (relayerSignature: string) => {
   const signatureWithThreshold = `0x0000${relayerSignature}`;
   return sequenceCoreV1.signature.decodeSignature(signatureWithThreshold);
 };
