@@ -1,4 +1,5 @@
 /* eslint-disable spaced-comment */
+/* eslint-disable no-console */
 import { track } from '@imtbl/metrics';
 import { Signer } from '@ethersproject/abstract-signer';
 import { splitSignature } from '@ethersproject/bytes';
@@ -192,7 +193,6 @@ async function getKeyFromPath(
   if (!checkIfHashedKeyIsAboveLimit(privateKeySeed)) {
     return starkPrivateKey;
   }
-  // eslint-disable-next-line no-else-return
   console.log('checkIfHashedKeyIsAboveLimit', true);
   track('starkCurve', 'checkIfHashedKeyIsAboveLimit', { checkIfHashedKeyIsAboveLimit: true });
 
