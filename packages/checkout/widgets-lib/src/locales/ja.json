@@ -366,7 +366,17 @@
           "ctaButton": "ウォレットを開く"
         },
         "afterExecute": "購入処理中",
-        "success": "購入完了"
+        "success": "購入完了",
+        "singleTxnError": {
+          "heading": "コインにアクセスできません",
+          "primaryButton": "再試行",
+          "secondaryButton": "キャンセル"
+        },
+        "executeAllTxnsError": {
+          "heading": "購入を完了できません",
+          "primaryButton": "再試行",
+          "secondaryButton": "キャンセル"
+        }
       },
       "creditCardWarningDrawer": {
         "heading": "デビットカードの使用をお勧めします",

@@ -359,7 +359,17 @@
           "ctaButton": "打开钱包"
         },
         "afterExecute": "处理中购买",
-        "success": "购买完成"
+        "success": "购买完成",
+        "singleTxnError": {
+          "heading": "无法访问硬币",
+          "primaryButton": "重试",
+          "secondaryButton": "取消"
+        },
+        "executeAllTxnsError": {
+          "heading": "无法完成购买",
+          "primaryButton": "重试",
+          "secondaryButton": "取消"
+        }
       },
       "creditCardWarningDrawer": {
         "heading": "我们推荐使用借记卡而非信用卡",

@@ -359,7 +359,17 @@
           "ctaButton": "지갑 열기"
         },
         "afterExecute": "구매 처리 중",
-        "success": "구매 완료"
+        "success": "구매 완료",
+        "singleTxnError": {
+          "heading": "코인에 접근할 수 없습니다",
+          "primaryButton": "다시 시도",
+          "secondaryButton": "취소"
+        },
+        "executeAllTxnsError": {
+          "heading": "구매를 완료할 수 없습니다",
+          "primaryButton": "다시 시도",
+          "secondaryButton": "취소"
+        }
       },
       "creditCardWarningDrawer": {
         "heading": "신용카드보다는 체크카드 사용을 권장합니다",
