@@ -2,8 +2,8 @@
   "name": "@imtbl/passport-sdk-sample-app",
   "version": "0.1.0",
   "dependencies": {
-    "@biom3/design-tokens": "^0.3.7",
-    "@biom3/react": "^0.23.3",
+    "@biom3/design-tokens": "^0.4.0",
+    "@biom3/react": "^0.24.1",
     "@imtbl/config": "0.0.0",
     "@imtbl/passport": "0.0.0",
     "@imtbl/x-client": "0.0.0",
@@ -25,6 +25,7 @@
     "@types/react-dom": "^18.0.11",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
+    "embla-carousel-react": "^8.1.5",
     "eslint": "^8.40.0",
     "eslint-config-next": "13.3.1",
     "typescript": "^4.9.5"
