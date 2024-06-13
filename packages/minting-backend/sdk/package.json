@@ -40,7 +40,7 @@
     "dev": "rollup --config rollup.config.js -w",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "test": "jest --passWithNoTests",
-    "test:e2e": "jest --runInBand --testMatch \"**/?(*.)+(e2e).[jt]s?(x)\"",
+    "test:watch": "jest --watch",
     "typecheck": "tsc --noEmit --jsx preserve"
   },
   "type": "module",
