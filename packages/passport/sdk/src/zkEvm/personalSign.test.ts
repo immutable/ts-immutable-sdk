@@ -1,6 +1,7 @@
 import { Signer } from '@ethersproject/abstract-signer';
 import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
+import { Flow } from '@imtbl/metrics';
 import { personalSign } from './personalSign';
 import {
   packSignatures,
@@ -33,6 +34,9 @@ describe('personalSign', () => {
   const guardianClient = {
     evaluateERC191Message: jest.fn(),
   };
+  const flow = {
+    addEvent: jest.fn(),
+  };
 
   beforeEach(() => {
     jest.resetAllMocks();
@@ -55,6 +59,7 @@ describe('personalSign', () => {
         relayerClient: relayerClient as unknown as RelayerClient,
         guardianClient: guardianClient as unknown as GuardianClient,
         zkEvmAddress: eoaAddress,
+        flow: flow as unknown as Flow,
       });
 
       expect(result).toEqual(packedSignatures);
@@ -83,6 +88,7 @@ describe('personalSign', () => {
         relayerClient: relayerClient as unknown as RelayerClient,
         guardianClient: guardianClient as unknown as GuardianClient,
         zkEvmAddress: eoaAddress,
+        flow: flow as unknown as Flow,
       });
 
       expect(result).toEqual(packedSignatures);
@@ -109,6 +115,7 @@ describe('personalSign', () => {
         relayerClient: relayerClient as unknown as RelayerClient,
         guardianClient: guardianClient as unknown as GuardianClient,
         zkEvmAddress: eoaAddress,
+        flow: flow as unknown as Flow,
       })).rejects.toThrow('personal_sign requires an address and a message');
     });
   });

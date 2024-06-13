@@ -272,6 +272,7 @@ export class ZkEvmProvider implements Provider {
               rpcProvider: this.#rpcProvider,
               guardianClient: this.#guardianClient,
               relayerClient: this.#relayerClient,
+              flow,
             });
           });
         } catch (error) {

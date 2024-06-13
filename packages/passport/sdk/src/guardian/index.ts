@@ -1,11 +1,10 @@
 import * as guardian from '@imtbl/guardian';
 import { TransactionApprovalRequestChainTypeEnum, TransactionEvaluationResponse } from '@imtbl/guardian';
 import { BigNumber, ethers } from 'ethers';
-import { PassportError, PassportErrorType } from 'errors/passportError';
 import AuthManager from '../authManager';
 import { ConfirmationScreen } from '../confirmation';
 import { retryWithDelay } from '../network/retry';
-import { JsonRpcError, RpcErrorCode } from '../zkEvm/JsonRpcError';
+import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from '../zkEvm/JsonRpcError';
 import { MetaTransaction, TypedDataPayload } from '../zkEvm/types';
 import { PassportConfiguration } from '../config';
 import { getEip155ChainId } from '../zkEvm/walletHelpers';
@@ -241,9 +240,9 @@ export default class GuardianClient {
     try {
       const user = await this.authManager.getUserZkEvm();
       if (user === null) {
-        throw new PassportError(
+        throw new JsonRpcError(
+          ProviderErrorCode.UNAUTHORIZED,
           'User not logged in. Please log in first.',
-          PassportErrorType.NOT_LOGGED_IN_ERROR,
         );
       }
       const messageEvalResponse = await this.messageAPI.evaluateMessage(
@@ -290,9 +289,9 @@ export default class GuardianClient {
     try {
       const user = await this.authManager.getUserZkEvm();
       if (user === null) {
-        throw new PassportError(
+        throw new JsonRpcError(
+          ProviderErrorCode.UNAUTHORIZED,
           'User not logged in. Please log in first.',
-          PassportErrorType.NOT_LOGGED_IN_ERROR,
         );
       }
       const messageEvalResponse = await this.messageAPI.evaluateErc191Message(
