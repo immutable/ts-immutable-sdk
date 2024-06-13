@@ -13,12 +13,15 @@ export default function App() {
   useEffect(() => {
     if(!passportInstance) return
     passportInstance.connectEvm() // EIP-6963
-  }, [passportInstance])
+  }, [])
 
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <ConnectKitProvider>
+        <ConnectKitProvider onDisconnect={async () => {
+          const userinfo = await passportInstance.getUserInfo()
+          if (userinfo) await passportInstance.logout()
+        }}>
           <Connect />
         </ConnectKitProvider>
       </QueryClientProvider>

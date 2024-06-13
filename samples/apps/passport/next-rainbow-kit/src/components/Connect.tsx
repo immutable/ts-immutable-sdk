@@ -1,7 +1,7 @@
+import { passportInstance } from '@/app/passport';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useState } from 'react';
 import { useDisconnect } from 'wagmi';
-import { passportInstance } from '../main';
 
 export function Connect() {
   const { disconnect } = useDisconnect()

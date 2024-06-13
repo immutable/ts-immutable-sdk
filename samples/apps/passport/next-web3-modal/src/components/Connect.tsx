@@ -1,6 +1,6 @@
+import { passportInstance } from "@/app/passport"
 import { useState } from "react"
 import { useAccount, useDisconnect } from "wagmi"
-import { passportInstance } from "../main";
 
 export function Connect() {
   const { isConnected, isConnecting } = useAccount()

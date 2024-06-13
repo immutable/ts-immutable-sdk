@@ -6,7 +6,7 @@ Create a Passport application on Immutable Hub by following [these simple steps]
 
 **Step 2**
 
-Update `PUBLISHABLE_KEY` and `CLIENT_ID` in `src/main.tsx`
+Update `PUBLISHABLE_KEY` and `CLIENT_ID` in `src/app/passport.ts`
 
 ```ts
 // Immutable Publishable Key (you will find it in the Immutable Hub in the `API Keys` section)
