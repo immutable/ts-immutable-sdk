@@ -258,7 +258,7 @@ export function PayWithCoins() {
             animationName: 'Start',
             children: (
               <Heading>
-                {t('views.PAYMENT_METHODS.handover.beforeApprove')}
+                {t('views.PAYMENT_METHODS.handover.beforeExecute')}
               </Heading>
             ),
           });
