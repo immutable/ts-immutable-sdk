@@ -11,6 +11,7 @@
     "@metamask/detect-provider": "^2.0.0",
     "bootstrap": "^5.2.3",
     "bootstrap-icons": "^1.10.3",
+    "embla-carousel-react": "^8.1.5",
     "ethers": "^5.7.2",
     "framer-motion": "^11.0.6",
     "next": "13.3.1",
@@ -25,7 +26,6 @@
     "@types/react-dom": "^18.0.11",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
-    "embla-carousel-react": "^8.1.5",
     "eslint": "^8.40.0",
     "eslint-config-next": "13.3.1",
     "typescript": "^4.9.5"
