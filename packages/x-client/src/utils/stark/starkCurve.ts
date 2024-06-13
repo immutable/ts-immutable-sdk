@@ -1,4 +1,5 @@
 /* eslint-disable spaced-comment */
+import { track } from '@imtbl/metrics';
 import { Signer } from '@ethersproject/abstract-signer';
 import { splitSignature } from '@ethersproject/bytes';
 import hash from 'hash.js';
@@ -191,11 +192,17 @@ async function getKeyFromPath(
   if (!checkIfHashedKeyIsAboveLimit(privateKeySeed)) {
     return starkPrivateKey;
   }
+  // eslint-disable-next-line no-else-return
+  console.log('checkIfHashedKeyIsAboveLimit', true);
+  track('starkCurve', 'checkIfHashedKeyIsAboveLimit', { checkIfHashedKeyIsAboveLimit: true });
 
   // Check if the generated stark public key matches with the existing account value for that user.
   // We are only validating for Production environment.
   // For Sandbox account/key mismatch, solution is to discard the old account and create a new one.
   const imxResponse = await getStarkPublicKeyFromImx(ethAddress);
+  // eslint-disable-next-line no-console
+  console.log('imxResponse', imxResponse);
+  track('starkCurve', 'getStarkPublicKeyFromImx', { imxResponse: JSON.stringify(imxResponse) });
   // If the account is not found or account matches we just return the key pair at the end of this method.
   // Only need to so alternative method if the account is found but the stark public key does not match.
 
@@ -234,6 +241,8 @@ async function getKeyFromPath(
     starkPrivateKeyV201Compatible,
   ).getAddress();
 
+  track('starkCurve', 'grindKeyV201', { starkPublicKey });
+
   if (
     registeredStarkPublicKeyBN.eq(
       new BN(encUtils.removeHexPrefix(starkPublicKey), 16),
@@ -248,6 +257,8 @@ async function getKeyFromPath(
   const privateKeyString = legacy.getPrivateKeyFromPath(seed, path);
   const starkPrivateKeyLegacy = legacy.grindKey(privateKeyString);
   starkPublicKey = await createStarkSigner(starkPrivateKeyLegacy).getAddress();
+
+  track('starkCurve', 'legacy.grindKey', { starkPublicKey });
 
   if (
     registeredStarkPublicKeyBN.eq(
