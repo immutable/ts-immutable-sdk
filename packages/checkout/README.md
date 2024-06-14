@@ -18,7 +18,7 @@ yarn install
 
 ### Checkout SDK Quick Start Guide
 
-All commands below need to be run in the context of the `checkout-sdk` package in the `./sdk` folder unless specified otherwise. Read more about context [here](../../../README.md#context).
+All commands below need to be run in the context of the `checkout-sdk` package in the `./sdk` folder unless specified otherwise. Read more about context [here](../../README.md#context).
 
 Running in `dev` mode using the `immutable-devnet` network:
 
@@ -94,7 +94,7 @@ yarn docs
 
 ### Widgets Library Quick Start Guide
 
-All commands below need to be run in the context of the `checkout-widgets` package in the `./widgets-lib` folder unless specified otherwise. Read more about context [here](../../../README.md#context).
+All commands below need to be run in the context of the `checkout-widgets` package in the `./widgets-lib` folder unless specified otherwise. Read more about context [here](../../README.md#context).
 
 Running in `dev` mode (widgets-lib depends upon checkout-sdk):
 
