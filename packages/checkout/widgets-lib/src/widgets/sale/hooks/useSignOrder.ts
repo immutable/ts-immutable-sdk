@@ -379,8 +379,6 @@ export const useSignOrder = (input: SignOrderInput) => {
         return [];
       }
 
-      console.log('@@@@@ Executing all ', signData);
-
       const transactions = await filterAllowedTransactions(
         signData.transactions,
         provider,
@@ -435,10 +433,6 @@ export const useSignOrder = (input: SignOrderInput) => {
       );
 
       const transaction = transactions[currentTransactionIndex];
-
-      console.log('@@@@@ currentTransactionIndex', currentTransactionIndex);
-      console.log('@@@@@ executeNextTransaction transaction', transaction);
-      console.log('@@@@@ executeNextTransaction transactions', transactions);
 
       const success = await executeTransaction(
         transaction,

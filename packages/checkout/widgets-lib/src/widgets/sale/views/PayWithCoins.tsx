@@ -40,9 +40,9 @@ function UserInitatedTransactionHandover({
   sendFailedEvent,
   addHandover,
 }: {
-  headingText?: string;
-  ctaButtonText?: string;
-  errorHeadingText?: string;
+  headingText: string;
+  ctaButtonText: string;
+  errorHeadingText: string;
   errorButtonCtaText?: string;
   errorSecondaryButtonText?: string;
   onSecondaryButtonClick?: () => void;
@@ -54,11 +54,11 @@ function UserInitatedTransactionHandover({
   environment: Environment;
   sendTransactionSuccessEvent: (txn: ExecutedTransaction) => void;
   sendFailedEvent: (
-    error: string,
-    errorObject: any,
-    txns: ExecutedTransaction[],
-    errorDetails?: any,
-    details?: any
+    reason: string,
+    error: Record<string, unknown>,
+    transactions: ExecutedTransaction[],
+    screen: string | undefined,
+    details: Record<string, any>
   ) => void;
   addHandover: (handover: any) => void;
 }) {
