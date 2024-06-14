@@ -5,13 +5,19 @@ import { useTranslation } from 'react-i18next';
 import { HandoverTarget } from 'context/handover-context/HandoverContext';
 import { useHandover } from 'lib/hooks/useHandover';
 import { getRemoteImage } from 'lib/utils';
-import { Box, Button, Heading } from '@biom3/react';
+import { Button, Heading } from '@biom3/react';
 import { isPassportProvider } from 'lib/provider';
 import { SalePaymentTypes } from '@imtbl/checkout-sdk';
+import { Environment } from '@imtbl/config';
+import { HandoverError } from 'components/Handover/HandoverError';
 import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 import { useSaleContext } from '../context/SaleContextProvider';
 import { useSaleEvent } from '../hooks/useSaleEvents';
-import { ExecuteTransactionStep, ExecutedTransaction } from '../types';
+import {
+  ExecuteTransactionStep,
+  ExecutedTransaction,
+  SignResponse,
+} from '../types';
 import { filterAllowedTransactions } from '../functions/signUtils';
 
 enum TransactionMethod {
@@ -20,69 +26,7 @@ enum TransactionMethod {
   EXECUTE = 'execute(address multicallSigner, bytes32 reference, address[] targets, bytes[] data, uint256 deadline, bytes signature)',
 }
 
-function ErrorHandover({
-  headingText,
-  buttonCtaText,
-  onButtonCtaClick,
-  secondaryButtonText,
-  onSecondaryButtonClick,
-}: {
-  headingText: string | undefined;
-  buttonCtaText?: string | undefined;
-  onButtonCtaClick?: () => void;
-  secondaryButtonText?: string | undefined;
-  onSecondaryButtonClick?: () => void;
-}) {
-  console.log(
-    '@@@@@@@ ErrorHandover',
-    headingText,
-    buttonCtaText,
-    secondaryButtonText,
-  );
-  return (
-    <>
-      <Heading sx={{ paddingBottom: 'base.spacing.x6' }}>{headingText}</Heading>
-
-      {buttonCtaText && onButtonCtaClick && (
-        <Box
-          sx={{
-            paddingX: 'base.spacing.x4',
-            paddingBottom: 'base.spacing.x2',
-          }}
-        >
-          <Button
-            sx={{ width: '100%' }}
-            variant="primary"
-            size="large"
-            onClick={onButtonCtaClick}
-          >
-            {buttonCtaText}
-          </Button>
-        </Box>
-      )}
-
-      {secondaryButtonText && onSecondaryButtonClick && (
-        <Box
-          sx={{
-            paddingX: 'base.spacing.x4',
-            paddingBottom: 'base.spacing.x4',
-          }}
-        >
-          <Button
-            sx={{ width: '100%' }}
-            variant="tertiary"
-            size="large"
-            onClick={onSecondaryButtonClick}
-          >
-            {secondaryButtonText}
-          </Button>
-        </Box>
-      )}
-    </>
-  );
-}
-
-function HandoverWithCta({
+function UserInitatedTransactionHandover({
   headingText,
   ctaButtonText,
   errorHeadingText,
@@ -106,41 +50,32 @@ function HandoverWithCta({
     onTxnSuccess: (txn: ExecutedTransaction) => void,
     onTxnError: (error: any, txns: ExecutedTransaction[]) => void
   ) => Promise<boolean>;
-  signResponse: any;
-  environment: any;
+  signResponse: SignResponse | undefined;
+  environment: Environment;
   sendTransactionSuccessEvent: (txn: ExecutedTransaction) => void;
   sendFailedEvent: (
     error: string,
-    err: any,
-    txns: any,
-    undefined?: any,
+    errorObject: any,
+    txns: ExecutedTransaction[],
+    errorDetails?: any,
     details?: any
   ) => void;
   addHandover: (handover: any) => void;
 }) {
-  const [error, setError] = useState<string | null>(null);
-
-  console.log(
-    '@@@@@@@ HandoverWithCta',
-    headingText,
-    ctaButtonText,
-    errorHeadingText,
-    errorButtonCtaText,
-    errorSecondaryButtonText,
-  );
+  const [isError, setIsError] = useState<boolean>(false);
 
   const handleRetry = () => {
     executeNextTransaction(
       (txn) => {
         sendTransactionSuccessEvent(txn);
-        setError(null);
+        setIsError(false);
       },
       (err, txns) => {
         const details = {
           transactionId: signResponse?.transactionId,
         };
         sendFailedEvent(err.toString(), err, txns, undefined, details); // checkoutPrimarySalePaymentMethods_FailEventFailed
-        setError('Unable to send transaction');
+        setIsError(true);
       },
     );
   };
@@ -149,19 +84,19 @@ function HandoverWithCta({
     executeNextTransaction(
       (txn) => {
         sendTransactionSuccessEvent(txn);
-        setError(null);
+        setIsError(false);
       },
       (err, txns) => {
         const details = {
           transactionId: signResponse?.transactionId,
         };
         sendFailedEvent(err.toString(), err, txns, undefined, details); // checkoutPrimarySalePaymentMethods_FailEventFailed
-        setError('Unable to send transaction');
+        setIsError(true);
 
         addHandover({
           animationUrl: getRemoteImage(environment, '/approve-handover.riv'),
           children: (
-            <ErrorHandover
+            <HandoverError
               headingText={errorHeadingText}
               buttonCtaText={errorButtonCtaText}
               onButtonCtaClick={handleRetry}
@@ -187,8 +122,8 @@ function HandoverWithCta({
       >
         {ctaButtonText}
       </Button>
-      {error && (
-        <ErrorHandover
+      {isError && (
+        <HandoverError
           headingText={errorHeadingText}
           buttonCtaText={errorButtonCtaText}
           onButtonCtaClick={handleRetry}
@@ -228,7 +163,6 @@ export function PayWithCoins() {
   const onTxnStep = useCallback(
     (method: string, step: ExecuteTransactionStep) => {
       const key = `${method}-${step}`;
-
       switch (key) {
         case `${TransactionMethod.APPROVE}-${ExecuteTransactionStep.BEFORE}`:
           addHandover({
@@ -279,7 +213,7 @@ export function PayWithCoins() {
     addHandover({
       animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
       children: (
-        <ErrorHandover
+        <HandoverError
           headingText={t(
             'views.PAYMENT_METHODS.handover.executeAllTxnsError.heading',
           )}
@@ -320,8 +254,6 @@ export function PayWithCoins() {
         provider,
       );
 
-      console.log('@@@@@@ filtered transactions', transactions);
-
       const firstMethod = transactions[0].methodCall;
 
       const headingText = firstMethod === TransactionMethod.APPROVE
@@ -334,7 +266,7 @@ export function PayWithCoins() {
       addHandover({
         animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
         children: (
-          <HandoverWithCta
+          <UserInitatedTransactionHandover
             headingText={headingText}
             ctaButtonText={ctaButtonText}
             errorHeadingText={t(
@@ -376,7 +308,6 @@ export function PayWithCoins() {
   }, [signResponse, provider]);
 
   useEffect(() => {
-    console.log('@@@@@@@ executeResponse', executeResponse);
     if (
       isPassportProvider(provider)
       && executeResponse?.transactions?.length === 1
@@ -395,7 +326,7 @@ export function PayWithCoins() {
       addHandover({
         animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
         children: (
-          <HandoverWithCta
+          <UserInitatedTransactionHandover
             headingText={t('views.PAYMENT_METHODS.handover.beforeExecute')}
             ctaButtonText={t(
               'views.PAYMENT_METHODS.handover.beforeExecuteWithCta.ctaButton',
