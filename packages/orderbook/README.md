@@ -1,5 +1,12 @@
 # Order Book
 
+## Table of Contents
+
+- [Pre-requisites](#pre-requisites)
+- [Quick Start Guide](#quick-start-guide)
+- [Demo Scripts](#demo-scripts)
+- [About](#about)
+
 ### Pre-requisites
 
 Install dependencies for the workspace
