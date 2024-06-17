@@ -6,7 +6,7 @@ import {
   OrderbookModuleConfiguration,
   OrderbookOverrides,
 } from './config/config';
-import { CancelOrdersResult, Fee as OpenApiFee, Order } from './openapi/sdk';
+import { CancelOrdersResult, Fee as OpenApiFee } from './openapi/sdk';
 import {
   mapFromOpenApiOrder,
   mapFromOpenApiPage,
@@ -17,7 +17,7 @@ import { SeaportLibFactory } from './seaport/seaport-lib-factory';
 import {
   ActionType,
   CancelOrdersOnChainResponse,
-  CreateListingParams, ERC1155Item,
+  CreateListingParams,
   FeeType,
   FeeValue,
   FulfillBulkOrdersResponse,
@@ -35,25 +35,6 @@ import {
   SignablePurpose,
   TradeResult,
 } from './types';
-
-function determineFillableUnits(order: Order, amountToFill?: string): string | undefined {
-  if (order.sell[0].type === 'ERC1155' && !amountToFill) {
-    // fill status is expressed as a ratio
-    const { numerator, denominator } = order.fill_status;
-    const originalOfferAmt = BigInt(((order.sell[0] as unknown) as ERC1155Item).amount);
-
-    if (numerator === '0' || denominator === '0') {
-      return originalOfferAmt.toString();
-    }
-
-    // calculate the remaining amount to fill
-    // remaining = ((denominator - numerator) * originalOfferAmt) / denominator
-    return ((BigInt(denominator) - (BigInt(numerator)) * BigInt(originalOfferAmt))
-        / BigInt(denominator)).toString();
-  }
-
-  return amountToFill;
-}
 
 /**
  * zkEVM orderbook SDK
@@ -262,15 +243,13 @@ export class Orderbook {
     const extraData = fulfillmentDataRes.result.fulfillable_orders[0].extra_data;
     const orderResult = fulfillmentDataRes.result.fulfillable_orders[0].order;
 
-    const unitsToFill = determineFillableUnits(orderResult, amountToFill);
-
     if (orderResult.status.name !== OrderStatusName.ACTIVE) {
       throw new Error(
         `Cannot fulfil order that is not active. Current status: ${orderResult.status}`,
       );
     }
 
-    return this.seaport.fulfillOrder(orderResult, takerAddress, extraData, unitsToFill);
+    return this.seaport.fulfillOrder(orderResult, takerAddress, extraData, amountToFill);
   }
 
   /**
@@ -308,12 +287,10 @@ export class Orderbook {
             throw new Error(`Could not find listing for order ${fulfillmentData.order.id}`);
           }
 
-          const unitsToFill = determineFillableUnits(fulfillmentData.order, listing.amountToFill);
-
           return {
             extraData: fulfillmentData.extra_data,
             order: fulfillmentData.order,
-            unitsToFill,
+            unitsToFill: listing.amountToFill,
           };
         });
 
