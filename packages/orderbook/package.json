@@ -41,6 +41,7 @@
     "run:demo-fulfill-bulk": "jest --runInBand --testMatch \"**/(fulfillBulk.demo).[jt]s?(x)\"",
     "test": "jest",
     "test:e2e": "jest --runInBand --testMatch \"**/?(*.)+(e2e).[jt]s?(x)\"",
+    "test:watch": "jest --watch",
     "typecheck": "tsc --noEmit --jsx preserve"
   },
   "type": "module",
