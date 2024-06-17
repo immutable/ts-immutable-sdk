@@ -56,3 +56,14 @@ Feature: orderbook
         Then the listing should be of status active
         # Assert only the ERC1155 trade in this scenario
         And 1 trade should be available
+
+    Scenario: create and fill a ERC1155 listing without an explicit fulfill amount
+        Given I have a funded offerer account
+        And the offerer account has 100 ERC1155 tokens
+        And I have a funded fulfiller account
+        When I create a listing to sell 100 ERC1155 tokens
+        Then the listing should be of status active
+        When I fulfill the listing to buy tokens
+        Then the listing should be of status filled
+        And 100 ERC1155 tokens should be transferred to the fulfiller
+        And 1 trade should be available

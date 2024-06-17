@@ -13,7 +13,7 @@ import {
   givenIHaveAFundedOffererAccount, thenTheListingShouldBeOfStatus,
   whenICreateAListing, whenIFulfillTheListingToBuy, andERC1155TokensShouldBeTransferredToTheFulfiller,
   thenTheListingsShouldBeOfStatus,
-  whenIFulfillBulkListings,
+  whenIFulfillBulkListings, whenIFulfillTheListingToBuyWithoutExplicitFulfillmentAmt,
 } from './shared';
 
 const feature = loadFeature('features/order.feature', { tagFilter: process.env.TAGS });
@@ -216,5 +216,43 @@ defineFeature(feature, (test) => {
     thenTheListingShouldBeOfStatus(then, sdk, getERC1155ListingId);
 
     andTradeShouldBeAvailable(and, sdk, fulfiller, getERC1155ListingId);
+  }, 120_000);
+
+  test('create and fill a ERC1155 listing without an explicit fulfill amount', ({
+    given,
+    when,
+    then,
+    and,
+  }) => {
+    const offerer = new Wallet(Wallet.createRandom().privateKey, provider);
+    const fulfiller = new Wallet(Wallet.createRandom().privateKey, provider);
+    const testTokenId = getRandomTokenId();
+
+    let listingId: string = '';
+
+    // these callback functions are required to update / retrieve test level state variables from shared steps.
+    const setListingId = (id: string) => {
+      listingId = id;
+    };
+
+    const getListingId = () => listingId;
+    givenIHaveAFundedOffererAccount(given, bankerWallet, offerer);
+
+    andTheOffererAccountHasERC1155Tokens(and, bankerWallet, offerer, erc1155ContractAddress, testTokenId);
+
+    andIHaveAFundedFulfillerAccount(and, bankerWallet, fulfiller);
+
+    whenICreateAListing(when, sdk, offerer, erc1155ContractAddress, testTokenId, setListingId);
+
+    thenTheListingShouldBeOfStatus(then, sdk, getListingId);
+
+    whenIFulfillTheListingToBuyWithoutExplicitFulfillmentAmt(when, sdk, fulfiller, getListingId);
+
+    thenTheListingShouldBeOfStatus(then, sdk, getListingId);
+
+    // eslint-disable-next-line max-len
+    andERC1155TokensShouldBeTransferredToTheFulfiller(and, bankerWallet, erc1155ContractAddress, testTokenId, fulfiller);
+
+    andTradeShouldBeAvailable(and, sdk, fulfiller, getListingId);
   }, 120_000);
 });

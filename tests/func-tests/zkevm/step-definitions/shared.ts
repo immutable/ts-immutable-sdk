@@ -157,6 +157,18 @@ export const whenIFulfillTheListingToBuy = (
   });
 };
 
+export const whenIFulfillTheListingToBuyWithoutExplicitFulfillmentAmt = (
+  when: DefineStepFunction,
+  sdk: orderbook.Orderbook,
+  fulfiller: Wallet,
+  getListingId: () => string,
+) => {
+  when(/^I fulfill the listing to buy tokens?$/, async () => {
+    const listingId = getListingId();
+    await fulfillListing(sdk, listingId, fulfiller);
+  });
+};
+
 export const whenIFulfillBulkListings = (
   when: DefineStepFunction,
   sdk: orderbook.Orderbook,
