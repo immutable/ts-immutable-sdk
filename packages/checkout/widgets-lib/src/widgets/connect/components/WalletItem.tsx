@@ -1,4 +1,4 @@
-import { MenuItem } from '@biom3/react';
+import { Badge, Box, MenuItem } from '@biom3/react';
 import { useTranslation } from 'react-i18next';
 import { cloneElement, ReactElement, useState } from 'react';
 import { EIP6963ProviderDetail, WalletProviderName } from '@imtbl/checkout-sdk';
@@ -62,17 +62,28 @@ export function WalletItem<
         }}
       />
       <MenuItem.Label size="medium" sx={offsetStyles}>
-        {providerDetail.info.name}
+        {((recommended && isSmallScreenMode) && (
+          <Badge
+            variant="guidance"
+            isAnimated={false}
+            badgeContent={t('wallets.recommended')}
+            sx={{
+              display: 'inline-flex',
+              marginBottom: 'base.spacing.x1',
+            }}
+          />
+        ))}
+        <Box>{providerDetail.info.name}</Box>
       </MenuItem.Label>
       {(!busy && <MenuItem.IntentIcon />)}
-      <MenuItem.Caption sx={{ ...offsetStyles, width: '200px' }}>
+      <MenuItem.Caption sx={{ ...offsetStyles }}>
         {(isPassportOrMetamask) && t(`wallets.${providerSlug}.description`)}
       </MenuItem.Caption>
-      {((recommended || busy) && (
+      {(((recommended || busy) && !isSmallScreenMode) && (
         <MenuItem.Badge
           variant="guidance"
           isAnimated={busy}
-          badgeContent={busy || isSmallScreenMode ? '' : t('wallets.recommended')}
+          badgeContent={busy ? '' : t('wallets.recommended')}
         />
       ))}
     </MenuItem>
