@@ -12,7 +12,7 @@ export default function App() {
   useEffect(() => {
     if(!passportInstance) return
     passportInstance.connectEvm() // EIP-6963
-  }, [passportInstance])
+  }, [])
 
   return (
     <WagmiProvider config={config}>

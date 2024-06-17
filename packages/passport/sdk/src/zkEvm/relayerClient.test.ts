@@ -14,6 +14,7 @@ describe('relayerClient', () => {
   const user = {
     accessToken: 'accessToken123',
   };
+
   const rpcProvider: Partial<StaticJsonRpcProvider> = {
     detectNetwork: jest.fn().mockResolvedValue({ chainId, name: '' }),
   };
@@ -172,6 +173,41 @@ describe('relayerClient', () => {
         params: [{
           address,
           eip712Payload,
+          chainId: chainIdEip155,
+        }],
+      });
+    });
+  });
+
+  describe('imSign', () => {
+    it('calls relayer with the correct arguments', async () => {
+      const address = '0xd64b0d2d72bb1b3f18046b8a7fc6c9ee6bccd287';
+      const message = 'hello';
+      const relayerSignature = '0x123';
+
+      (global.fetch as jest.Mock).mockResolvedValue({
+        json: () => ({
+          result: relayerSignature,
+        }),
+      });
+
+      const result = await relayerClient.imSign(address, message);
+
+      expect(result).toEqual(relayerSignature);
+      expect(global.fetch).toHaveBeenCalledWith(`${config.relayerUrl}/v1/transactions`, expect.objectContaining({
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${user.accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      }));
+      expect(JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body)).toMatchObject({
+        id: 1,
+        jsonrpc: '2.0',
+        method: 'im_sign',
+        params: [{
+          address,
+          message,
           chainId: chainIdEip155,
         }],
       });

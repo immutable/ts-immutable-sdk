@@ -3,11 +3,10 @@ import { BigNumber } from 'ethers';
 import GuardianClient from 'guardian';
 import { Signer } from '@ethersproject/abstract-signer';
 import { Flow } from '@imtbl/metrics';
-import { getEip155ChainId, getSignedTypedData } from './walletHelpers';
+import { signAndPackTypedData } from './walletHelpers';
 import {
   chainId,
   chainIdHex,
-  chainIdEip155,
 } from '../test/mocks';
 import { RelayerClient } from './relayerClient';
 import { signTypedDataV4 } from './signTypedDataV4';
@@ -34,7 +33,7 @@ describe('signTypedDataV4', () => {
     imSignTypedData: jest.fn(),
   };
   const guardianClient = {
-    validateMessage: jest.fn(),
+    evaluateEIP712Message: jest.fn(),
   };
   const flow = {
     addEvent: jest.fn(),
@@ -43,8 +42,7 @@ describe('signTypedDataV4', () => {
   beforeEach(() => {
     jest.resetAllMocks();
     relayerClient.imSignTypedData.mockResolvedValue(relayerSignature);
-    (getEip155ChainId as jest.Mock).mockReturnValue(chainIdEip155);
-    (getSignedTypedData as jest.Mock).mockResolvedValueOnce(
+    (signAndPackTypedData as jest.Mock).mockResolvedValueOnce(
       combinedSignature,
     );
     rpcProvider.detectNetwork.mockResolvedValue({ chainId });
@@ -67,7 +65,7 @@ describe('signTypedDataV4', () => {
         address,
         eip712Payload,
       );
-      expect(getSignedTypedData).toHaveBeenCalledWith(
+      expect(signAndPackTypedData).toHaveBeenCalledWith(
         eip712Payload,
         relayerSignature,
         BigNumber.from(chainId),
@@ -94,7 +92,7 @@ describe('signTypedDataV4', () => {
         address,
         eip712Payload,
       );
-      expect(getSignedTypedData).toHaveBeenCalledWith(
+      expect(signAndPackTypedData).toHaveBeenCalledWith(
         eip712Payload,
         relayerSignature,
         BigNumber.from(chainId),
@@ -217,7 +215,7 @@ describe('signTypedDataV4', () => {
       address,
       payload,
     );
-    expect(getSignedTypedData).toHaveBeenCalledWith(
+    expect(signAndPackTypedData).toHaveBeenCalledWith(
       payload,
       relayerSignature,
       BigNumber.from(chainId),

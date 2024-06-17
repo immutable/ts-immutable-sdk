@@ -56,5 +56,11 @@ export interface Transaction {
      * @memberof Transaction
      */
     'transaction_metadata': { [key: string]: any; };
+    /**
+     * Name of request client
+     * @type {string}
+     * @memberof Transaction
+     */
+    'client_name'?: string;
 }
 
