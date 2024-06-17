@@ -459,5 +459,14 @@ describe('ZkEvmProvider', () => {
       expect(sendMock).toBeCalledWith(providerParams.method, providerParams.params);
       expect(result).toBe(returnValue);
     });
+
+    describe('eth_getBalance', () => {
+      it('defaults the `blockNumber` argument to `latest` if not provided', async () => {
+        const provider = getProvider();
+        await provider.request({ method: 'eth_getBalance', params: ['0x1'] });
+
+        expect(sendMock).toBeCalledWith('eth_getBalance', ['0x1', 'latest']);
+      });
+    });
   });
 });

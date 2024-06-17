@@ -298,8 +298,11 @@ export class ZkEvmProvider implements Provider {
         return utils.hexlify(chainId);
       }
       // Pass through methods
+      case 'eth_getBalance': {
+        const [address, blockNumber] = request.params || [];
+        return this.#rpcProvider.send(request.method, [address, blockNumber || 'latest']);
+      }
       case 'eth_gasPrice':
-      case 'eth_getBalance':
       case 'eth_getCode':
       case 'eth_getStorageAt':
       case 'eth_estimateGas':
