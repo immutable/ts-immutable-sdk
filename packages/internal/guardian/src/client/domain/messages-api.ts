@@ -13,29 +13,34 @@
  */
 
 
-import globalAxios, { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
-import { Configuration } from '../configuration';
+import type { Configuration } from '../configuration';
+import type { AxiosPromise, AxiosInstance, RawAxiosRequestConfig } from 'axios';
+import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { APIError400 } from '../models';
+import type { APIError400 } from '../models';
 // @ts-ignore
-import { APIError403 } from '../models';
+import type { APIError403 } from '../models';
 // @ts-ignore
-import { APIError404 } from '../models';
+import type { APIError404 } from '../models';
 // @ts-ignore
-import { APIError500 } from '../models';
+import type { APIError500 } from '../models';
 // @ts-ignore
-import { BasicAPIError } from '../models';
+import type { BasicAPIError } from '../models';
 // @ts-ignore
-import { EVMMessage } from '../models';
+import type { ERC191MessageEvaluationRequest } from '../models';
 // @ts-ignore
-import { MessageEvaluationRequest } from '../models';
+import type { EVMMessage } from '../models';
 // @ts-ignore
-import { MessageEvaluationResponse } from '../models';
+import type { Erc191MessageResponse } from '../models';
+// @ts-ignore
+import type { MessageEvaluationRequest } from '../models';
+// @ts-ignore
+import type { MessageEvaluationResponse } from '../models';
 /**
  * MessagesApi - axios parameter creator
  * @export
@@ -43,13 +48,51 @@ import { MessageEvaluationResponse } from '../models';
 export const MessagesApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
+         * Approve a pending erc191 message
+         * @summary Approve a pending erc191 message
+         * @param {string} messageID id for the message
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        approvePendingERC191Message: async (messageID: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'messageID' is not null or undefined
+            assertParamExists('approvePendingERC191Message', 'messageID', messageID)
+            const localVarPath = `/guardian/v1/erc191-messages/{messageID}/approve`
+                .replace(`{${"messageID"}}`, encodeURIComponent(String(messageID)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Approve a pending evm message
          * @summary Approve a pending evm message
          * @param {string} messageID id for the message
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        approvePendingMessage: async (messageID: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        approvePendingMessage: async (messageID: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'messageID' is not null or undefined
             assertParamExists('approvePendingMessage', 'messageID', messageID)
             const localVarPath = `/guardian/v1/messages/{messageID}/approve`
@@ -81,13 +124,53 @@ export const MessagesApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
+         * Check if a given erc191 message is valid
+         * @summary Evaluate an erc191 message to sign
+         * @param {ERC191MessageEvaluationRequest} eRC191MessageEvaluationRequest Specifies the kind of transaction
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        evaluateErc191Message: async (eRC191MessageEvaluationRequest: ERC191MessageEvaluationRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'eRC191MessageEvaluationRequest' is not null or undefined
+            assertParamExists('evaluateErc191Message', 'eRC191MessageEvaluationRequest', eRC191MessageEvaluationRequest)
+            const localVarPath = `/guardian/v1/erc191-messages/evaluate`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(eRC191MessageEvaluationRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Check if a given message is valid  for EVM
          * @summary Evaluate an evm message to sign
          * @param {MessageEvaluationRequest} messageEvaluationRequest Specifies the kind of transaction
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        evaluateMessage: async (messageEvaluationRequest: MessageEvaluationRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        evaluateMessage: async (messageEvaluationRequest: MessageEvaluationRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'messageEvaluationRequest' is not null or undefined
             assertParamExists('evaluateMessage', 'messageEvaluationRequest', messageEvaluationRequest)
             const localVarPath = `/guardian/v1/messages/evaluate`;
@@ -121,13 +204,51 @@ export const MessagesApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
+         * Get an erc191 message by id
+         * @summary Info for a specific erc191 message
+         * @param {string} messageID The id of the erc191 message
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getErc191MessageByID: async (messageID: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'messageID' is not null or undefined
+            assertParamExists('getErc191MessageByID', 'messageID', messageID)
+            const localVarPath = `/guardian/v1/erc191-messages/{messageID}`
+                .replace(`{${"messageID"}}`, encodeURIComponent(String(messageID)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Get an evm message by id
          * @summary Info for a specific evm message
          * @param {string} messageID The id of the evm message
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getMessageByID: async (messageID: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getMessageByID: async (messageID: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'messageID' is not null or undefined
             assertParamExists('getMessageByID', 'messageID', messageID)
             const localVarPath = `/guardian/v1/messages/{messageID}`
@@ -169,15 +290,43 @@ export const MessagesApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = MessagesApiAxiosParamCreator(configuration)
     return {
         /**
+         * Approve a pending erc191 message
+         * @summary Approve a pending erc191 message
+         * @param {string} messageID id for the message
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async approvePendingERC191Message(messageID: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.approvePendingERC191Message(messageID, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['MessagesApi.approvePendingERC191Message']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Approve a pending evm message
          * @summary Approve a pending evm message
          * @param {string} messageID id for the message
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async approvePendingMessage(messageID: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async approvePendingMessage(messageID: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.approvePendingMessage(messageID, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['MessagesApi.approvePendingMessage']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Check if a given erc191 message is valid
+         * @summary Evaluate an erc191 message to sign
+         * @param {ERC191MessageEvaluationRequest} eRC191MessageEvaluationRequest Specifies the kind of transaction
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async evaluateErc191Message(eRC191MessageEvaluationRequest: ERC191MessageEvaluationRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MessageEvaluationResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.evaluateErc191Message(eRC191MessageEvaluationRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['MessagesApi.evaluateErc191Message']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Check if a given message is valid  for EVM
@@ -186,9 +335,24 @@ export const MessagesApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async evaluateMessage(messageEvaluationRequest: MessageEvaluationRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MessageEvaluationResponse>> {
+        async evaluateMessage(messageEvaluationRequest: MessageEvaluationRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MessageEvaluationResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.evaluateMessage(messageEvaluationRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['MessagesApi.evaluateMessage']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Get an erc191 message by id
+         * @summary Info for a specific erc191 message
+         * @param {string} messageID The id of the erc191 message
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getErc191MessageByID(messageID: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Erc191MessageResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getErc191MessageByID(messageID, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['MessagesApi.getErc191MessageByID']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Get an evm message by id
@@ -197,9 +361,11 @@ export const MessagesApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getMessageByID(messageID: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<EVMMessage>> {
+        async getMessageByID(messageID: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<EVMMessage>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getMessageByID(messageID, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['MessagesApi.getMessageByID']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
 };
@@ -212,37 +378,81 @@ export const MessagesApiFactory = function (configuration?: Configuration, baseP
     const localVarFp = MessagesApiFp(configuration)
     return {
         /**
-         * Approve a pending evm message
-         * @summary Approve a pending evm message
-         * @param {string} messageID id for the message
+         * Approve a pending erc191 message
+         * @summary Approve a pending erc191 message
+         * @param {MessagesApiApprovePendingERC191MessageRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        approvePendingMessage(messageID: string, options?: any): AxiosPromise<void> {
-            return localVarFp.approvePendingMessage(messageID, options).then((request) => request(axios, basePath));
+        approvePendingERC191Message(requestParameters: MessagesApiApprovePendingERC191MessageRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.approvePendingERC191Message(requestParameters.messageID, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Approve a pending evm message
+         * @summary Approve a pending evm message
+         * @param {MessagesApiApprovePendingMessageRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        approvePendingMessage(requestParameters: MessagesApiApprovePendingMessageRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.approvePendingMessage(requestParameters.messageID, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Check if a given erc191 message is valid
+         * @summary Evaluate an erc191 message to sign
+         * @param {MessagesApiEvaluateErc191MessageRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        evaluateErc191Message(requestParameters: MessagesApiEvaluateErc191MessageRequest, options?: RawAxiosRequestConfig): AxiosPromise<MessageEvaluationResponse> {
+            return localVarFp.evaluateErc191Message(requestParameters.eRC191MessageEvaluationRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * Check if a given message is valid  for EVM
          * @summary Evaluate an evm message to sign
-         * @param {MessageEvaluationRequest} messageEvaluationRequest Specifies the kind of transaction
+         * @param {MessagesApiEvaluateMessageRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        evaluateMessage(messageEvaluationRequest: MessageEvaluationRequest, options?: any): AxiosPromise<MessageEvaluationResponse> {
-            return localVarFp.evaluateMessage(messageEvaluationRequest, options).then((request) => request(axios, basePath));
+        evaluateMessage(requestParameters: MessagesApiEvaluateMessageRequest, options?: RawAxiosRequestConfig): AxiosPromise<MessageEvaluationResponse> {
+            return localVarFp.evaluateMessage(requestParameters.messageEvaluationRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get an erc191 message by id
+         * @summary Info for a specific erc191 message
+         * @param {MessagesApiGetErc191MessageByIDRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getErc191MessageByID(requestParameters: MessagesApiGetErc191MessageByIDRequest, options?: RawAxiosRequestConfig): AxiosPromise<Erc191MessageResponse> {
+            return localVarFp.getErc191MessageByID(requestParameters.messageID, options).then((request) => request(axios, basePath));
         },
         /**
          * Get an evm message by id
          * @summary Info for a specific evm message
-         * @param {string} messageID The id of the evm message
+         * @param {MessagesApiGetMessageByIDRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getMessageByID(messageID: string, options?: any): AxiosPromise<EVMMessage> {
-            return localVarFp.getMessageByID(messageID, options).then((request) => request(axios, basePath));
+        getMessageByID(requestParameters: MessagesApiGetMessageByIDRequest, options?: RawAxiosRequestConfig): AxiosPromise<EVMMessage> {
+            return localVarFp.getMessageByID(requestParameters.messageID, options).then((request) => request(axios, basePath));
         },
     };
 };
+
+/**
+ * Request parameters for approvePendingERC191Message operation in MessagesApi.
+ * @export
+ * @interface MessagesApiApprovePendingERC191MessageRequest
+ */
+export interface MessagesApiApprovePendingERC191MessageRequest {
+    /**
+     * id for the message
+     * @type {string}
+     * @memberof MessagesApiApprovePendingERC191Message
+     */
+    readonly messageID: string
+}
 
 /**
  * Request parameters for approvePendingMessage operation in MessagesApi.
@@ -259,6 +469,20 @@ export interface MessagesApiApprovePendingMessageRequest {
 }
 
 /**
+ * Request parameters for evaluateErc191Message operation in MessagesApi.
+ * @export
+ * @interface MessagesApiEvaluateErc191MessageRequest
+ */
+export interface MessagesApiEvaluateErc191MessageRequest {
+    /**
+     * Specifies the kind of transaction
+     * @type {ERC191MessageEvaluationRequest}
+     * @memberof MessagesApiEvaluateErc191Message
+     */
+    readonly eRC191MessageEvaluationRequest: ERC191MessageEvaluationRequest
+}
+
+/**
  * Request parameters for evaluateMessage operation in MessagesApi.
  * @export
  * @interface MessagesApiEvaluateMessageRequest
@@ -270,6 +494,20 @@ export interface MessagesApiEvaluateMessageRequest {
      * @memberof MessagesApiEvaluateMessage
      */
     readonly messageEvaluationRequest: MessageEvaluationRequest
+}
+
+/**
+ * Request parameters for getErc191MessageByID operation in MessagesApi.
+ * @export
+ * @interface MessagesApiGetErc191MessageByIDRequest
+ */
+export interface MessagesApiGetErc191MessageByIDRequest {
+    /**
+     * The id of the erc191 message
+     * @type {string}
+     * @memberof MessagesApiGetErc191MessageByID
+     */
+    readonly messageID: string
 }
 
 /**
@@ -294,6 +532,18 @@ export interface MessagesApiGetMessageByIDRequest {
  */
 export class MessagesApi extends BaseAPI {
     /**
+     * Approve a pending erc191 message
+     * @summary Approve a pending erc191 message
+     * @param {MessagesApiApprovePendingERC191MessageRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MessagesApi
+     */
+    public approvePendingERC191Message(requestParameters: MessagesApiApprovePendingERC191MessageRequest, options?: RawAxiosRequestConfig) {
+        return MessagesApiFp(this.configuration).approvePendingERC191Message(requestParameters.messageID, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Approve a pending evm message
      * @summary Approve a pending evm message
      * @param {MessagesApiApprovePendingMessageRequest} requestParameters Request parameters.
@@ -301,8 +551,20 @@ export class MessagesApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MessagesApi
      */
-    public approvePendingMessage(requestParameters: MessagesApiApprovePendingMessageRequest, options?: AxiosRequestConfig) {
+    public approvePendingMessage(requestParameters: MessagesApiApprovePendingMessageRequest, options?: RawAxiosRequestConfig) {
         return MessagesApiFp(this.configuration).approvePendingMessage(requestParameters.messageID, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Check if a given erc191 message is valid
+     * @summary Evaluate an erc191 message to sign
+     * @param {MessagesApiEvaluateErc191MessageRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MessagesApi
+     */
+    public evaluateErc191Message(requestParameters: MessagesApiEvaluateErc191MessageRequest, options?: RawAxiosRequestConfig) {
+        return MessagesApiFp(this.configuration).evaluateErc191Message(requestParameters.eRC191MessageEvaluationRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -313,8 +575,20 @@ export class MessagesApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MessagesApi
      */
-    public evaluateMessage(requestParameters: MessagesApiEvaluateMessageRequest, options?: AxiosRequestConfig) {
+    public evaluateMessage(requestParameters: MessagesApiEvaluateMessageRequest, options?: RawAxiosRequestConfig) {
         return MessagesApiFp(this.configuration).evaluateMessage(requestParameters.messageEvaluationRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get an erc191 message by id
+     * @summary Info for a specific erc191 message
+     * @param {MessagesApiGetErc191MessageByIDRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MessagesApi
+     */
+    public getErc191MessageByID(requestParameters: MessagesApiGetErc191MessageByIDRequest, options?: RawAxiosRequestConfig) {
+        return MessagesApiFp(this.configuration).getErc191MessageByID(requestParameters.messageID, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -325,7 +599,8 @@ export class MessagesApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MessagesApi
      */
-    public getMessageByID(requestParameters: MessagesApiGetMessageByIDRequest, options?: AxiosRequestConfig) {
+    public getMessageByID(requestParameters: MessagesApiGetMessageByIDRequest, options?: RawAxiosRequestConfig) {
         return MessagesApiFp(this.configuration).getMessageByID(requestParameters.messageID, options).then((request) => request(this.axios, this.basePath));
     }
 }
+

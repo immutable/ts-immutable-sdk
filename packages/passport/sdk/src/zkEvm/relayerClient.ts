@@ -56,6 +56,20 @@ type ImGetFeeOptionsResponse = JsonRpc & {
   result: FeeOption[]
 };
 
+// ImSign types
+type ImSignRequest = {
+  method: 'im_sign';
+  params: {
+    chainId: string;
+    address: string;
+    message: string;
+  }[];
+};
+
+type ImSignResponse = JsonRpc & {
+  result: string;
+};
+
 // ImSignTypedData types
 type ImSignTypedDataRequest = {
   method: 'im_signTypedData';
@@ -74,7 +88,8 @@ export type RelayerTransactionRequest =
   | EthSendTransactionRequest
   | ImGetTransactionByHashRequest
   | ImGetFeeOptionsRequest
-  | ImSignTypedDataRequest;
+  | ImSignTypedDataRequest
+  | ImSignRequest;
 
 export class RelayerClient {
   private readonly config: PassportConfiguration;
@@ -171,6 +186,20 @@ export class RelayerClient {
       }],
     };
     const { result } = await this.postToRelayer<ImSignTypedDataResponse>(payload);
+    return result;
+  }
+
+  public async imSign(address: string, message: string): Promise<string> {
+    const { chainId } = await this.rpcProvider.detectNetwork();
+    const payload: ImSignRequest = {
+      method: 'im_sign',
+      params: [{
+        address,
+        message,
+        chainId: getEip155ChainId(chainId),
+      }],
+    };
+    const { result } = await this.postToRelayer<ImSignResponse>(payload);
     return result;
   }
 }
