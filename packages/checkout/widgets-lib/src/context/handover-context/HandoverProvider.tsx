@@ -91,8 +91,6 @@ export function HandoverProvider({ children }: HandoverProviderProps) {
           closeHandover(handoverId);
         }
       }
-
-      setHandoverQueue(updatedQueue);
     } else {
       // If the queue is empty and the current handover has a duration, safe to close
       const currentHandover = handovers[handoverId];
