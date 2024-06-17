@@ -15,10 +15,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { EIP712MessageDomain } from './eip712-message-domain';
+import type { EIP712MessageDomain } from './eip712-message-domain';
 // May contain unused imports in some cases
 // @ts-ignore
-import { EIP712MessageTypes } from './eip712-message-types';
+import type { EIP712MessageTypes } from './eip712-message-types';
 
 /**
  * 
@@ -49,8 +49,6 @@ export interface EIP712Message {
      * @type {object}
      * @memberof EIP712Message
      */
-    'message': {
-        [name: string]: any;
-    };
+    'message': object;
 }
 

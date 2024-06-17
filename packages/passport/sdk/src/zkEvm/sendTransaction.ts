@@ -7,7 +7,7 @@ import {
   getEip155ChainId,
   getNonce,
   getNormalisedTransactions,
-  getSignedMetaTransactions,
+  signMetaTransactions,
 } from './walletHelpers';
 import { FeeOption, MetaTransaction, RelayerTransactionStatus } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
@@ -130,7 +130,7 @@ export const sendTransaction = async ({
 
   // NOTE: We sign again because we now are adding the fee transaction, so the
   // whole payload is different and needs a new signature.
-  const getSignedMetaTransactionsPromise = getSignedMetaTransactions(
+  const getSignedMetaTransactionsPromise = signMetaTransactions(
     metaTransactions,
     nonce,
     chainIdBigNumber,

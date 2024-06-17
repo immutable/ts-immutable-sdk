@@ -11,6 +11,7 @@ import WorkflowButton from '@/components/WorkflowButton';
 import RequestExampleAccordion from '@/components/zkevm/RequestExampleAccordion';
 import EthSendTransactionExamples from './EthSendTransactionExamples';
 import EthSignTypedDataV4Examples from './EthSignTypedDataV4Examples';
+import PersonalSignExamples from './PersonalSignExamples';
 
 enum EthereumParamType {
   string = 'string',
@@ -41,6 +42,14 @@ const EthereumMethods: EthereumMethod[] = [
       { name: 'transaction', type: EthereumParamType.object },
     ],
     exampleComponents: EthSendTransactionExamples,
+  },
+  {
+    name: 'personal_sign',
+    params: [
+      { name: 'address' },
+      { name: 'message' },
+    ],
+    exampleComponents: PersonalSignExamples,
   },
   {
     name: 'eth_signTypedData_v4',

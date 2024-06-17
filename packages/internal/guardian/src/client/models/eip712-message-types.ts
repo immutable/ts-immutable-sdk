@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { EIP712MessageTypesEIP712DomainInner } from './eip712-message-types-eip712-domain-inner';
+import type { EIP712MessageTypesEIP712DomainInner } from './eip712-message-types-eip712-domain-inner';
 
 /**
  * 
