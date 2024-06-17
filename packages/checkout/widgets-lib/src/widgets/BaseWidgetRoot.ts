@@ -87,6 +87,13 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
       this.reactRoot = createRoot(this.widgetElement);
     }
 
+    if (params?.language) {
+      i18next.changeLanguage(params.language).then(() => {
+        // eslint-disable-next-line no-console
+        console.log('Language changed:', params.language);
+      });
+    }
+
     this.render();
   }
 
