@@ -7,14 +7,14 @@ import {
   WidgetProperties,
   WidgetConfigurations,
 } from '@imtbl/checkout-sdk';
-import { Connect } from 'widgets/connect/ConnectWidgetRoot';
-import { Swap } from 'widgets/swap/SwapWidgetRoot';
-import { OnRamp } from 'widgets/on-ramp/OnRampWidgetRoot';
-import { Wallet } from 'widgets/wallet/WalletWidgetRoot';
-import { Sale } from 'widgets/sale/SaleWidgetRoot';
 import { Web3Provider } from '@ethersproject/providers';
-import { Bridge } from 'widgets/bridge/BridgeWidgetRoot';
-import { WalletConnectManager } from 'lib/walletConnect';
+import { Connect } from './widgets/connect/ConnectWidgetRoot';
+import { Swap } from './widgets/swap/SwapWidgetRoot';
+import { OnRamp } from './widgets/on-ramp/OnRampWidgetRoot';
+import { Wallet } from './widgets/wallet/WalletWidgetRoot';
+import { Sale } from './widgets/sale/SaleWidgetRoot';
+import { Bridge } from './widgets/bridge/BridgeWidgetRoot';
+import { WalletConnectManager } from './lib/walletConnect';
 import {
   sendProviderUpdatedEvent,
   addProviderListenersForWidgetRoot,

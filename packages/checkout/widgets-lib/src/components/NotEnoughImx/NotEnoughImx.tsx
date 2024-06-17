@@ -4,7 +4,7 @@ import {
 } from '@biom3/react';
 import { useTranslation } from 'react-i18next';
 import { Environment } from '@imtbl/config';
-import { getImxTokenImage } from 'lib/utils';
+import { getImxTokenImage } from '../../lib/utils';
 import {
   containerStyles,
   contentTextStyles,

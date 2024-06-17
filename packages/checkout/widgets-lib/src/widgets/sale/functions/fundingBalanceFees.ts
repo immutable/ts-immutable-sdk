@@ -1,12 +1,12 @@
 import { utils } from 'ethers';
 import { Fee, FundingStepType, TokenInfo } from '@imtbl/checkout-sdk';
+import { TFunction } from 'i18next';
 import {
   calculateCryptoToFiat,
   abbreviateWalletAddress,
   tokenValueFormat,
-} from 'lib/utils';
-import { FormattedFee } from 'widgets/swap/functions/swapFees';
-import { TFunction } from 'i18next';
+} from '../../../lib/utils';
+import { FormattedFee } from '../../swap/functions/swapFees';
 import { FundingBalance } from '../types';
 
 export type FeesBySymbol = Record<string, Fee>;

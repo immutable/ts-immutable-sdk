@@ -2,7 +2,7 @@ import {
   ETH_MAINNET_TO_ZKEVM_MAINNET,
   ETH_SEPOLIA_TO_ZKEVM_DEVNET,
   ETH_SEPOLIA_TO_ZKEVM_TESTNET,
-} from 'constants/bridges';
+} from '../constants/bridges';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { ethers } from 'ethers';
 import {

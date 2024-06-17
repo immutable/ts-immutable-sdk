@@ -1,7 +1,7 @@
 import axios, { AxiosError, HttpStatusCode } from 'axios';
 import { Environment } from '@imtbl/config';
-import { ENV_DEVELOPMENT } from 'lib/constants';
 import { IMMUTABLE_API_BASE_URL } from '@imtbl/checkout-sdk';
+import { ENV_DEVELOPMENT } from '../constants';
 import { TransactionType, Transactions } from './checkoutApiType';
 
 type CacheData = {

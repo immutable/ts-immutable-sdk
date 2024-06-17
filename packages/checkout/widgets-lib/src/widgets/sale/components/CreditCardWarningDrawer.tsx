@@ -2,8 +2,8 @@ import {
   Body, Box, ButtCon, Button, Drawer, Heading,
 } from '@biom3/react';
 import { SalePaymentTypes } from '@imtbl/checkout-sdk';
-import { CreditCardWarningHero } from 'components/Hero/CreditCardWarningHero';
 import { useTranslation } from 'react-i18next';
+import { CreditCardWarningHero } from '../../../components/Hero/CreditCardWarningHero';
 import { useSaleContext } from '../context/SaleContextProvider';
 
 export function CreditCardWarningDrawer() {

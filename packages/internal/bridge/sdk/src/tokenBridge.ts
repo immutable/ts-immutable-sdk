@@ -5,11 +5,11 @@ import { ethers } from 'ethers';
 import {
   concat, defaultAbiCoder, hexValue, hexlify, keccak256, zeroPad,
 } from 'ethers/lib/utils';
-import { ROOT_AXELAR_ADAPTOR } from 'contracts/ABIs/RootAxelarBridgeAdaptor';
+import { ROOT_AXELAR_ADAPTOR } from './contracts/ABIs/RootAxelarBridgeAdaptor';
 import {
   checkReceiver, validateBridgeReqArgs, validateChainConfiguration, validateChainIds,
   validateGetFee,
-} from 'lib/validation';
+} from './lib/validation';
 import {
   getAxelarEndpoint, getAxelarGateway, getChildAdaptor, getChildchain, getRootAdaptor,
   isValidDeposit,
@@ -19,12 +19,12 @@ import {
   isWithdrawWrappedIMX,
   isWrappedIMX,
   shouldBeDepositOrFinaliseWithdraw,
-} from 'lib/utils';
-import { TenderlySimulation } from 'types/tenderly';
-import { calculateGasFee } from 'lib/gas';
-import { createContract } from 'contracts/createContract';
-import { getWithdrawRootToken, genAxelarWithdrawPayload, genUniqueAxelarCommandId } from 'lib/axelarUtils';
-import { submitTenderlySimulations } from 'lib/tenderly';
+} from './lib/utils';
+import { TenderlySimulation } from './types/tenderly';
+import { calculateGasFee } from './lib/gas';
+import { createContract } from './contracts/createContract';
+import { getWithdrawRootToken, genAxelarWithdrawPayload, genUniqueAxelarCommandId } from './lib/axelarUtils';
+import { submitTenderlySimulations } from './lib/tenderly';
 import {
   NATIVE,
   ETHEREUM_NATIVE_TOKEN_ADDRESS,
@@ -171,7 +171,7 @@ export class TokenBridge {
   }
 
   private async getDepositOrWithdrawFee(req: BridgeFeeRequest):
-  Promise<{ sourceChainFee: ethers.BigNumber, approvalFee: ethers.BigNumber, bridgeFee: ethers.BigNumber }> {
+    Promise<{ sourceChainFee: ethers.BigNumber, approvalFee: ethers.BigNumber, bridgeFee: ethers.BigNumber }> {
     let feeData;
     if (req.sourceChainId === this.config.bridgeInstance.rootChainID) {
       feeData = await this.config.rootProvider.getFeeData();
@@ -692,7 +692,7 @@ export class TokenBridge {
     );
     const txValue = (token.toUpperCase() === NATIVE)
       ? amount.add(bridgeFee).toString() : bridgeFee.toString();
-    const unsignedBridgeTx : ethers.providers.TransactionRequest = {
+    const unsignedBridgeTx: ethers.providers.TransactionRequest = {
       data: txData,
       to: this.config.bridgeContracts.rootERC20BridgeFlowRate,
       value: txValue,
@@ -783,7 +783,7 @@ export class TokenBridge {
     );
     const txValue = (token.toUpperCase() === NATIVE)
       ? amount.add(bridgeFee).toString() : bridgeFee.toString();
-    const unsignedBridgeTx : ethers.providers.TransactionRequest = {
+    const unsignedBridgeTx: ethers.providers.TransactionRequest = {
       data: txData,
       to: this.config.bridgeContracts.rootERC20BridgeFlowRate,
       value: txValue,
@@ -979,8 +979,8 @@ export class TokenBridge {
     destinationChainGaslimit: number,
     gasMultiplier: number | string = 'auto',
   ): Promise<ethers.BigNumber> {
-    const sourceAxelar:AxelarChainDetails = axelarChains[sourceChainId];
-    const destinationAxelar:AxelarChainDetails = axelarChains[destinationChainId];
+    const sourceAxelar: AxelarChainDetails = axelarChains[sourceChainId];
+    const destinationAxelar: AxelarChainDetails = axelarChains[destinationChainId];
 
     if (!sourceAxelar) {
       throw new BridgeError(
@@ -996,7 +996,7 @@ export class TokenBridge {
       );
     }
 
-    const axelarAPIEndpoint:string = getAxelarEndpoint(sourceChainId);
+    const axelarAPIEndpoint: string = getAxelarEndpoint(sourceChainId);
 
     const estimateGasReq = {
       method: 'estimateGasFee',
@@ -1007,7 +1007,7 @@ export class TokenBridge {
       gasMultiplier,
     };
 
-    let axiosResponse:AxiosResponse;
+    let axiosResponse: AxiosResponse;
 
     try {
       axiosResponse = await axios.post(axelarAPIEndpoint, estimateGasReq);
@@ -1040,7 +1040,7 @@ export class TokenBridge {
  * @throws {BridgeError} - If an error occurs during the query, a BridgeError will be thrown with a specific error type.
  */
   public async getTransactionStatus(req: TxStatusRequest): Promise<TxStatusResponse> {
-    const txStatusResponse:TxStatusResponse = {
+    const txStatusResponse: TxStatusResponse = {
       transactions: [],
     };
 
@@ -1048,13 +1048,13 @@ export class TokenBridge {
 
     const uniqueReceivers = await this.getUniqueReceivers(txStatusItems, req.sourceChainId);
 
-    const pendingWithdrawalPromises:Array<Promise<PendingWithdrawalsResponse>> = [];
+    const pendingWithdrawalPromises: Array<Promise<PendingWithdrawalsResponse>> = [];
 
     for (const address of uniqueReceivers) {
       pendingWithdrawalPromises.push(this.getPendingWithdrawals({ recipient: address }));
     }
 
-    let pendingWithdrawalResponses:Array<PendingWithdrawalsResponse> = [];
+    let pendingWithdrawalResponses: Array<PendingWithdrawalsResponse> = [];
 
     try {
       pendingWithdrawalResponses = await Promise.all(pendingWithdrawalPromises);
@@ -1098,10 +1098,10 @@ export class TokenBridge {
   }
 
   private async getUniqueReceivers(
-    txStatusItems:Array<TxStatusResponseItem>,
+    txStatusItems: Array<TxStatusResponseItem>,
     sourceChainId: string,
   ): Promise<Array<string>> {
-    const uniqueReceivers:Array<string> = [];
+    const uniqueReceivers: Array<string> = [];
 
     const isWithdraw = [
       ZKEVM_DEVNET_CHAIN_ID,
@@ -1122,12 +1122,12 @@ export class TokenBridge {
   }
 
   private async getAxelarStatus(
-    transactions:Array<TxStatusRequestItem>,
-    sourceChainId:string,
+    transactions: Array<TxStatusRequestItem>,
+    sourceChainId: string,
   ): Promise<Array<TxStatusResponseItem>> {
-    const txStatusItems:Array<TxStatusResponseItem> = [];
-    const statusPromises:Array<Promise<GMPStatusResponse>> = [];
-    const axelarAPIEndpoint:string = getAxelarEndpoint(sourceChainId);
+    const txStatusItems: Array<TxStatusResponseItem> = [];
+    const statusPromises: Array<Promise<GMPStatusResponse>> = [];
+    const axelarAPIEndpoint: string = getAxelarEndpoint(sourceChainId);
     const unpaidGasStatus = [GasPaidStatus.GAS_UNPAID, GasPaidStatus.GAS_PAID_NOT_ENOUGH_GAS];
     const abiCoder = new ethers.utils.AbiCoder();
 
@@ -1135,7 +1135,7 @@ export class TokenBridge {
       statusPromises.push(queryTransactionStatus(axelarAPIEndpoint, transaction.txHash));
     }
 
-    let statusResponses:Array<GMPStatusResponse>;
+    let statusResponses: Array<GMPStatusResponse>;
     try {
       statusResponses = await Promise.all(statusPromises);
     } catch (err) {
@@ -1238,7 +1238,7 @@ export class TokenBridge {
       contractPromises.push(rootBridge.flowRateBuckets(token));
       contractPromises.push(rootBridge.largeTransferThresholds(token));
     }
-    let contractPromisesRes:Array<any>;
+    let contractPromisesRes: Array<any>;
     try {
       contractPromisesRes = await Promise.all(contractPromises);
     } catch (err) {
@@ -1312,11 +1312,11 @@ export class TokenBridge {
       indices.push(i);
     }
 
-    const pending:Array<RootBridgePendingWithdrawal> = await rootBridge.getPendingWithdrawals(req.recipient, indices);
+    const pending: Array<RootBridgePendingWithdrawal> = await rootBridge.getPendingWithdrawals(req.recipient, indices);
 
     const timestampNow = Math.floor(Date.now() / 1000);
 
-    const withdrawalDelay:ethers.BigNumber = await rootBridge.withdrawalDelay();
+    const withdrawalDelay: ethers.BigNumber = await rootBridge.withdrawalDelay();
 
     for (let i = 0, l = pending.length; i < l; i++) {
       const timeoutEnd = pending[i].timestamp.add(withdrawalDelay).toNumber();
@@ -1348,7 +1348,7 @@ export class TokenBridge {
  * @throws {BridgeError} - If an error occurs during the query, a BridgeError will be thrown with a specific error type.
  * @dev this SDK method is currently stubbed
  */
-  public async getFlowRateWithdrawTx(req:FlowRateWithdrawRequest): Promise<FlowRateWithdrawResponse> {
+  public async getFlowRateWithdrawTx(req: FlowRateWithdrawRequest): Promise<FlowRateWithdrawResponse> {
     // eslint-disable-next-line no-console
 
     if (!req.recipient) {
@@ -1368,8 +1368,8 @@ export class TokenBridge {
     const rootBridgeAddress = this.config.bridgeContracts.rootERC20BridgeFlowRate;
     const rootBridge = await createContract(rootBridgeAddress, ROOT_ERC20_BRIDGE_FLOW_RATE, this.config.rootProvider);
 
-    const pending:Array<RootBridgePendingWithdrawal> = await
-    rootBridge.getPendingWithdrawals(req.recipient, [req.index]);
+    const pending: Array<RootBridgePendingWithdrawal> = await
+      rootBridge.getPendingWithdrawals(req.recipient, [req.index]);
 
     if (pending[0].withdrawer === ethers.constants.AddressZero
       || pending[0].token === ethers.constants.AddressZero
@@ -1381,7 +1381,7 @@ export class TokenBridge {
       );
     }
 
-    const withdrawalDelay:ethers.BigNumber = await rootBridge.withdrawalDelay();
+    const withdrawalDelay: ethers.BigNumber = await rootBridge.withdrawalDelay();
     const timeoutEnd = pending[0].timestamp.add(withdrawalDelay).toNumber();
     const timestampNow = Math.floor(Date.now() / 1000);
 
@@ -1400,7 +1400,7 @@ export class TokenBridge {
       };
     }
 
-    const data:string = await withBridgeError<string>(async () => rootBridge.interface.encodeFunctionData(
+    const data: string = await withBridgeError<string>(async () => rootBridge.interface.encodeFunctionData(
       'finaliseQueuedWithdrawal',
       [req.recipient, req.index],
     ), BridgeErrorType.INTERNAL_ERROR);
@@ -1438,7 +1438,7 @@ export class TokenBridge {
     // eslint-disable-next-line no-console
 
     if (req.rootToken.toUpperCase() === NATIVE
-    || req.rootToken === this.config.bridgeContracts.rootChainWrappedETH) {
+      || req.rootToken === this.config.bridgeContracts.rootChainWrappedETH) {
       const childBridgeAddress = this.config.bridgeContracts.childERC20Bridge;
       const childBridge = await createContract(childBridgeAddress, CHILD_ERC20_BRIDGE, this.config.childProvider);
       const childETHToken = await childBridge.childETHToken();

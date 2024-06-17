@@ -8,7 +8,7 @@ import {
   Link,
 } from '@biom3/react';
 import { Trans, useTranslation } from 'react-i18next';
-import { WalletWarningHero } from 'components/Hero/WalletWarningHero';
+import { WalletWarningHero } from '../../../components/Hero/WalletWarningHero';
 
 export function NonPassportWarningDrawer({
   visible,

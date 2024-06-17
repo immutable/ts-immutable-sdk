@@ -1,7 +1,7 @@
 import { SxProps } from '@biom3/react';
 import { TokenInfo } from '@imtbl/checkout-sdk';
-import { Fees } from 'components/Fees/Fees';
-import { FormattedFee } from 'widgets/swap/functions/swapFees';
+import { Fees } from '../../../components/Fees/Fees';
+import { FormattedFee } from '../../swap/functions/swapFees';
 
 export type FeesDisplay = {
   token: TokenInfo | undefined;

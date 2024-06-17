@@ -1,6 +1,6 @@
 import { BytesLike } from 'ethers';
 import { StaticJsonRpcProvider } from '@ethersproject/providers';
-import AuthManager from 'authManager';
+import AuthManager from '../authManager';
 import { trackDuration } from '@imtbl/metrics';
 import { PassportConfiguration } from '../config';
 import { FeeOption, RelayerTransaction, TypedDataPayload } from './types';

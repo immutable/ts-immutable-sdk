@@ -8,7 +8,7 @@ import {
   OrderUseCase,
 } from '@opensea/seaport-js/lib/types';
 import { providers } from 'ethers';
-import { mapFromOpenApiOrder } from 'openapi/mapper';
+import { mapFromOpenApiOrder } from '../openapi/mapper';
 import {
   Action,
   ActionType,
@@ -42,7 +42,7 @@ export class Seaport {
     private seaportContractAddress: string,
     private zoneContractAddress: string,
     private rateLimitingKey?: string,
-  ) {}
+  ) { }
 
   async prepareSeaportOrder(
     offerer: string,
@@ -176,9 +176,9 @@ export class Seaport {
     }[],
     account: string,
   ): Promise<{
-      actions: Action[];
-      expiration: string;
-    }> {
+    actions: Action[];
+    expiration: string;
+  }> {
     const fulfillOrderDetails = fulfillingOrders.map((o) => {
       const { orderComponents, tips } = mapImmutableOrderToSeaportOrderComponents(o.order);
 

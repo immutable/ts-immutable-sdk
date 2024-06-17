@@ -3,12 +3,12 @@ import {
   ChainId,
   ConnectWidgetParams, IMTBLWidgetEvents, WidgetProperties, WidgetType,
 } from '@imtbl/checkout-sdk';
-import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
-import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
-import { LoadingView } from 'views/loading/LoadingView';
 import { Environment } from '@imtbl/config';
-import { getChainNameById } from 'lib/chains';
-import { HandoverProvider } from 'context/handover-context/HandoverProvider';
+import { ThemeProvider } from '../../components/ThemeProvider/ThemeProvider';
+import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
+import { LoadingView } from '../../views/loading/LoadingView';
+import { getChainNameById } from '../../lib/chains';
+import { HandoverProvider } from '../../context/handover-context/HandoverProvider';
 import i18n from '../../i18n';
 import { Base } from '../BaseWidgetRoot';
 

@@ -25,3 +25,6 @@
     "src/modules/checkout"
   ]
 }
+
+// check out these excludes
+// remove all tsconfig.json files from the pacakges

@@ -4,7 +4,7 @@ import {
 import { useMemo, useState } from 'react';
 import { Environment } from '@imtbl/config';
 import { WidgetTheme } from '@imtbl/checkout-sdk';
-import { TokenImage } from 'components/TokenImage/TokenImage';
+import { TokenImage } from '../../TokenImage/TokenImage';
 import { FormControlWrapper } from '../FormControlWrapper/FormControlWrapper';
 import { CoinSelector } from '../../CoinSelector/CoinSelector';
 import { CoinSelectorOptionProps } from '../../CoinSelector/CoinSelectorOption';

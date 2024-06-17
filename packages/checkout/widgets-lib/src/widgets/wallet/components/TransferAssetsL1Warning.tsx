@@ -2,8 +2,8 @@ import {
   Body, Box, ButtCon, Drawer, Heading,
 } from '@biom3/react';
 import { useTranslation } from 'react-i18next';
-import { TransferAssetsL1WarningHero } from 'components/Hero/TransferAssetsL1WarningHero';
 import { Web3Provider } from '@ethersproject/providers';
+import { TransferAssetsL1WarningHero } from '../../../components/Hero/TransferAssetsL1WarningHero';
 import { WalletAddress } from './WalletAddress/WalletAddress';
 
 export function TransferAssetsL1Warning({

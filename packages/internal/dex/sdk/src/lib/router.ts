@@ -1,7 +1,7 @@
 import { Token, TradeType } from '@uniswap/sdk-core';
 import { Pool, Route } from '@uniswap/v3-sdk';
-import { NoRoutesAvailableError } from 'errors';
-import { CoinAmount, ERC20 } from 'types';
+import { NoRoutesAvailableError } from '../errors';
+import { CoinAmount, ERC20 } from '../types';
 import { providers } from 'ethers';
 import { erc20ToUniswapToken, poolEquals, uniswapTokenToERC20 } from './utils';
 import { getQuotesForRoutes, QuoteResult } from './getQuotesForRoutes';

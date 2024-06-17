@@ -1,9 +1,9 @@
+import { Environment, ImmutableConfiguration } from '@imtbl/config';
+import { ethers } from 'ethers';
 import {
   ZKEVM_DEVNET,
   ZKEVM_TESTNET,
-} from 'constants/factory';
-import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { ethers } from 'ethers';
+} from '../constants/factory';
 import {
   FactoryInstance, FactoryModuleConfiguration,
 } from '../types';

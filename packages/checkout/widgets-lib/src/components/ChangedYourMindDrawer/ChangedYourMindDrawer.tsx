@@ -9,8 +9,8 @@ import {
 } from '@biom3/react';
 import { Checkout } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
-import { getRemoteImage } from 'lib/utils';
 import { useTranslation } from 'react-i18next';
+import { getRemoteImage } from '../../lib/utils';
 
 export interface ChangedYourMindDrawerProps {
   visible: boolean;

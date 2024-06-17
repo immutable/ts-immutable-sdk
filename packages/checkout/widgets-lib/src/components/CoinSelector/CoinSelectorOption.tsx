@@ -1,6 +1,6 @@
 import { MenuItem, AllIconKeys } from '@biom3/react';
 import { useTranslation } from 'react-i18next';
-import { TokenImage } from 'components/TokenImage/TokenImage';
+import { TokenImage } from '../TokenImage/TokenImage';
 
 export interface CoinSelectorOptionProps {
   testId?: string;

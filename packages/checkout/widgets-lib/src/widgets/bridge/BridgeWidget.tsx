@@ -10,13 +10,6 @@ import {
   useMemo,
   useReducer,
 } from 'react';
-import { StrongCheckoutWidgetsConfig } from 'lib/withDefaultWidgetConfig';
-import { CryptoFiatProvider } from 'context/crypto-fiat-context/CryptoFiatProvider';
-import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
-import { BridgeClaimWithdrawalFailure, BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
-import { StatusView } from 'components/Status/StatusView';
-import { StatusType } from 'components/Status/StatusType';
-import { ImmutableConfiguration } from '@imtbl/config';
 import {
   BridgeConfiguration,
   ETH_MAINNET_TO_ZKEVM_MAINNET,
@@ -24,13 +17,19 @@ import {
   ETH_SEPOLIA_TO_ZKEVM_TESTNET,
   TokenBridge,
 } from '@imtbl/bridge-sdk';
-import { getL1ChainId, getL2ChainId } from 'lib';
-import { Transactions } from 'components/Transactions/Transactions';
-import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
-import { TopUpView } from 'views/top-up/TopUpView';
 import { useTranslation } from 'react-i18next';
-import { ClaimWithdrawalInProgress } from 'components/Transactions/ClaimWithdrawalInProgress';
-import { getDefaultTokenImage } from 'lib/utils';
+import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
+import { ImmutableConfiguration } from '@imtbl/config';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
+import { StatusView } from '../../components/Status/StatusView';
+import { StatusType } from '../../components/Status/StatusType';
+import { getL1ChainId, getL2ChainId } from '../../lib';
+import { Transactions } from '../../components/Transactions/Transactions';
+import { UserJourney, useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { TopUpView } from '../../views/top-up/TopUpView';
+import { ClaimWithdrawalInProgress } from '../../components/Transactions/ClaimWithdrawalInProgress';
+import { getDefaultTokenImage } from '../../lib/utils';
 import {
   ViewActions,
   ViewContext,
@@ -59,6 +58,8 @@ import {
 } from './BridgeWidgetEvents';
 import {
   BridgeClaimWithdrawalSuccess,
+  BridgeClaimWithdrawalFailure,
+  BridgeWidgetViews,
 } from '../../context/view-context/BridgeViewContextTypes';
 import { ClaimWithdrawal } from './views/ClaimWithdrawal';
 

@@ -11,8 +11,8 @@ import {
 import {
   OrderSummarySubViews,
   SaleWidgetViews,
-} from 'context/view-context/SaleViewContextTypes';
-import { calculateCryptoToFiat } from 'lib/utils';
+} from '../../../context/view-context/SaleViewContextTypes';
+import { calculateCryptoToFiat } from '../../../lib/utils';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';

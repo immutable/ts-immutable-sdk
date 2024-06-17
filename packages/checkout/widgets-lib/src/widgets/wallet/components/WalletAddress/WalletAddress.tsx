@@ -3,10 +3,10 @@ import {
 } from '@biom3/react';
 import { Web3Provider } from '@ethersproject/providers';
 import { useEffect, useMemo, useState } from 'react';
-import { getWalletLogoByName } from 'lib/logoUtils';
 import { useTranslation } from 'react-i18next';
-import { abbreviateWalletAddress } from 'lib/utils';
-import { getWalletProviderNameByProvider, isPassportProvider } from 'lib/provider';
+import { getWalletLogoByName } from '../../../../lib/logoUtils';
+import { abbreviateWalletAddress } from '../../../../lib/utils';
+import { getWalletProviderNameByProvider, isPassportProvider } from '../../../../lib/provider';
 import {
   UserJourney,
   useAnalytics,

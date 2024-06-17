@@ -1,4 +1,4 @@
-import { FactoryInstance } from 'types';
+import { FactoryInstance } from '../types';
 
 export const ZKEVM_DEVNET_CHAIN_ID = '13473';
 export const ZKEVM_DEVNET_FACTORY_ADDRESS = '0xTODO';

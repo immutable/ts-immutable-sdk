@@ -7,9 +7,9 @@ import {
 } from 'react';
 import { CheckoutErrorType } from '@imtbl/checkout-sdk';
 import { ApproveBridgeResponse, BridgeTxResponse } from '@imtbl/bridge-sdk';
-import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { useTranslation } from 'react-i18next';
 import { utils } from 'ethers';
+import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';

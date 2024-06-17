@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import axios, { AxiosResponse } from 'axios';
-import { BridgeError, BridgeErrorType } from 'errors';
-import { TenderlySimulation } from 'types/tenderly';
+import { BridgeError, BridgeErrorType } from '../errors';
+import { TenderlySimulation } from '../types/tenderly';
 import { getTenderlyEndpoint } from './utils';
 
 // TODO generate a type for these state objects. Readability could be improved from the double nested Record
@@ -27,7 +27,7 @@ export async function submitTenderlySimulations(
   simulations: Array<TenderlySimulation>,
   state_objects?: Record<string, Record<string, Record<string, string>>>,
 ): Promise<Array<number>> {
-  let axiosResponse:AxiosResponse;
+  let axiosResponse: AxiosResponse;
   const tenderlyAPI = getTenderlyEndpoint(chainId);
   try {
     axiosResponse = await axios.post(

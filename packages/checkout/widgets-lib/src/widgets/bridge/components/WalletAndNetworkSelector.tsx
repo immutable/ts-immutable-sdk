@@ -4,7 +4,6 @@ import {
   Drawer,
   Heading,
 } from '@biom3/react';
-import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import {
   useCallback,
   useContext,
@@ -14,22 +13,23 @@ import {
 } from 'react';
 import { ChainId, WalletProviderName, WalletProviderRdns } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
+import { useTranslation } from 'react-i18next';
+import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
 import {
   connectToProvider,
   getWalletProviderNameByProvider,
   isMetaMaskProvider,
   isPassportProvider,
   isWalletConnectProvider,
-} from 'lib/provider';
-import { getL1ChainId, getL2ChainId } from 'lib';
-import { getChainNameById } from 'lib/chains';
-import { ViewActions, ViewContext } from 'context/view-context/ViewContext';
-import { abbreviateAddress } from 'lib/addressUtils';
+} from '../../../lib/provider';
+import { getL1ChainId, getL2ChainId } from '../../../lib';
+import { getChainNameById } from '../../../lib/chains';
+import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import { abbreviateAddress } from '../../../lib/addressUtils';
 import {
   useAnalytics,
   UserJourney,
-} from 'context/analytics-provider/SegmentAnalyticsProvider';
-import { useTranslation } from 'react-i18next';
+} from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 import {
   bridgeHeadingStyles,
   brigdeWalletWrapperStyles,

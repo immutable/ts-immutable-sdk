@@ -6,12 +6,11 @@ import {
   prettyFormatNumber,
 } from '@biom3/react';
 import { TransactionRequirement, WidgetTheme } from '@imtbl/checkout-sdk';
-import { calculateCryptoToFiat, tokenValueFormat } from 'lib/utils';
-import { TokenImage } from 'components/TokenImage/TokenImage';
 import { useTranslation } from 'react-i18next';
 import { ReactElement } from 'react';
-
 import { Environment } from '@imtbl/config';
+import { calculateCryptoToFiat, tokenValueFormat } from '../../../lib/utils';
+import { TokenImage } from '../../../components/TokenImage/TokenImage';
 import { FundingBalance } from '../types';
 import { getFundingBalanceTotalFees } from '../functions/fundingBalanceFees';
 
