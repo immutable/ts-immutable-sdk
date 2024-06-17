@@ -1,24 +1,20 @@
+/* eslint-disable no-console */
+import { useHandover } from 'lib/hooks/useHandover';
+import { HandoverTarget } from 'context/handover-context/HandoverContext';
+import { useTranslation } from 'react-i18next';
 import {
   useCallback, useEffect, useRef, useState,
 } from 'react';
-import { useTranslation } from 'react-i18next';
-import { HandoverTarget } from 'context/handover-context/HandoverContext';
-import { useHandover } from 'lib/hooks/useHandover';
 import { getRemoteImage } from 'lib/utils';
-import { Button, Heading } from '@biom3/react';
+import { Heading } from '@biom3/react';
+import { SaleWidgetViews } from 'context/view-context/SaleViewContextTypes';
 import { isPassportProvider } from 'lib/provider';
+import { HandoverContent } from 'components/Handover/HandoverContent';
 import { SalePaymentTypes } from '@imtbl/checkout-sdk';
-import { Environment } from '@imtbl/config';
-import { HandoverError } from 'components/Handover/HandoverError';
-import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
+
 import { useSaleContext } from '../context/SaleContextProvider';
+import { ExecuteTransactionStep } from '../types';
 import { useSaleEvent } from '../hooks/useSaleEvents';
-import {
-  ExecuteTransactionStep,
-  ExecutedTransaction,
-  SignResponse,
-} from '../types';
-import { filterAllowedTransactions } from '../functions/signUtils';
 
 enum TransactionMethod {
   APPROVE = 'approve(address spender,uint256 amount)',
@@ -26,118 +22,60 @@ enum TransactionMethod {
   EXECUTE = 'execute(address multicallSigner, bytes32 reference, address[] targets, bytes[] data, uint256 deadline, bytes signature)',
 }
 
-function UserInitatedTransactionHandover({
-  headingText,
-  ctaButtonText,
-  errorHeadingText,
-  errorButtonCtaText,
-  errorSecondaryButtonText,
-  onSecondaryButtonClick,
-  executeNextTransaction,
-  signResponse,
-  environment,
-  sendTransactionSuccessEvent,
-  sendFailedEvent,
-  addHandover,
-}: {
-  headingText: string;
-  ctaButtonText: string;
-  errorHeadingText: string;
-  errorButtonCtaText?: string;
-  errorSecondaryButtonText?: string;
-  onSecondaryButtonClick?: () => void;
-  executeNextTransaction: (
-    onTxnSuccess: (txn: ExecutedTransaction) => void,
-    onTxnError: (error: any, txns: ExecutedTransaction[]) => void
-  ) => Promise<boolean>;
-  signResponse: SignResponse | undefined;
-  environment: Environment;
-  sendTransactionSuccessEvent: (txn: ExecutedTransaction) => void;
-  sendFailedEvent: (
-    reason: string,
-    error: Record<string, unknown>,
-    transactions: ExecutedTransaction[],
-    screen: string | undefined,
-    details: Record<string, any>
-  ) => void;
-  addHandover: (handover: any) => void;
-}) {
-  const [isError, setIsError] = useState<boolean>(false);
+const transactionTexts = {
+  [TransactionMethod.APPROVE]: {
+    before: {
+      headingTextKey:
+        'views.PAYMENT_METHODS.handover.approve.beforeWithCta.heading',
+      ctaButtonTextKey:
+        'views.PAYMENT_METHODS.handover.approve.beforeWithCta.ctaButton',
 
-  const handleRetry = () => {
-    executeNextTransaction(
-      (txn) => {
-        sendTransactionSuccessEvent(txn);
-        setIsError(false);
-      },
-      (err, txns) => {
-        const details = {
-          transactionId: signResponse?.transactionId,
-        };
-        sendFailedEvent(err.toString(), err, txns, undefined, details); // checkoutPrimarySalePaymentMethods_FailEventFailed
-        setIsError(true);
-      },
-    );
-  };
-
-  const handleTransaction = () => {
-    executeNextTransaction(
-      (txn) => {
-        sendTransactionSuccessEvent(txn);
-        setIsError(false);
-      },
-      (err, txns) => {
-        const details = {
-          transactionId: signResponse?.transactionId,
-        };
-        sendFailedEvent(err.toString(), err, txns, undefined, details); // checkoutPrimarySalePaymentMethods_FailEventFailed
-        setIsError(true);
-
-        addHandover({
-          animationUrl: getRemoteImage(environment, '/approve-handover.riv'),
-          children: (
-            <HandoverError
-              headingText={errorHeadingText}
-              buttonCtaText={errorButtonCtaText}
-              onButtonCtaClick={handleRetry}
-              secondaryButtonText={errorSecondaryButtonText}
-              onSecondaryButtonClick={onSecondaryButtonClick}
-            />
-          ),
-        });
-      },
-    );
-  };
-
-  return (
-    <>
-      <Heading sx={{ paddingBottom: 'base.spacing.x42' }}>
-        {headingText}
-      </Heading>
-      <Button
-        sx={{ width: '100%' }}
-        variant="primary"
-        size="large"
-        onClick={handleTransaction}
-      >
-        {ctaButtonText}
-      </Button>
-      {isError && (
-        <HandoverError
-          headingText={errorHeadingText}
-          buttonCtaText={errorButtonCtaText}
-          onButtonCtaClick={handleRetry}
-          secondaryButtonText={errorSecondaryButtonText}
-          onSecondaryButtonClick={onSecondaryButtonClick}
-        />
-      )}
-    </>
-  );
-}
+      animationUrl: '/approve-handover.riv',
+      animationName: 'Start',
+    },
+    after: {
+      headingTextKey: 'views.PAYMENT_METHODS.handover.approve.after',
+      animationUrl: '/approve-handover.riv',
+      animationName: 'Handover',
+    },
+    error: {
+      headingTextKey: 'views.PAYMENT_METHODS.handover.approve.error.heading',
+      ctaButtonTextKey:
+        'views.PAYMENT_METHODS.handover.approve.error.primaryButton',
+      secondaryButtonTextKey:
+        'views.PAYMENT_METHODS.handover.approve.error.secondaryButton',
+    },
+  },
+  [TransactionMethod.EXECUTE]: {
+    before: {
+      headingTextKey:
+        'views.PAYMENT_METHODS.handover.execute.beforeWithCta.heading',
+      ctaButtonTextKey:
+        'views.PAYMENT_METHODS.handover.execute.beforeWithCta.ctaButton',
+      animationUrl: '/execute-handover.riv',
+      animationName: 'Start',
+    },
+    after: {
+      headingTextKey: 'views.PAYMENT_METHODS.handover.execute.after',
+      animationUrl: '/execute-handover.riv',
+      animationName: 'Handover',
+    },
+    error: {
+      headingTextKey: 'views.PAYMENT_METHODS.handover.execute.error.heading',
+      ctaButtonTextKey:
+        'views.PAYMENT_METHODS.handover.execute.error.primaryButton',
+      secondaryButtonTextKey:
+        'views.PAYMENT_METHODS.handover.execute.error.secondaryButton',
+    },
+  },
+};
 
 export function PayWithCoins() {
-  const { t } = useTranslation();
+  console.log('@@@ PayWithTokens');
   const processing = useRef(false);
+  const [isError, setIsError] = useState(false);
+
+  const { t } = useTranslation();
   const {
     sendPageView,
     sendTransactionSuccessEvent,
@@ -145,10 +83,13 @@ export function PayWithCoins() {
     sendCloseEvent,
     sendSuccessEvent,
   } = useSaleEvent();
+
   const {
     executeAll,
     executeNextTransaction,
     signResponse,
+    filteredTransactions,
+    currentTransactionIndex,
     executeResponse,
     signTokenIds,
     environment,
@@ -160,7 +101,7 @@ export function PayWithCoins() {
     id: HandoverTarget.GLOBAL,
   });
 
-  const onTxnStep = useCallback(
+  const onTxnStepExecuteAll = useCallback(
     (method: string, step: ExecuteTransactionStep) => {
       const key = `${method}-${step}`;
       switch (key) {
@@ -170,7 +111,7 @@ export function PayWithCoins() {
             animationName: 'Start',
             children: (
               <Heading>
-                {t('views.PAYMENT_METHODS.handover.beforeApprove')}
+                {t('views.PAYMENT_METHODS.handover.approve.before')}
               </Heading>
             ),
           });
@@ -181,7 +122,7 @@ export function PayWithCoins() {
             animationName: 'Processing',
             children: (
               <Heading>
-                {t('views.PAYMENT_METHODS.handover.afterApprove')}
+                {t('views.PAYMENT_METHODS.handover.approve.after')}
               </Heading>
             ),
           });
@@ -192,11 +133,25 @@ export function PayWithCoins() {
             animationName: 'Start',
             children: (
               <Heading>
-                {t('views.PAYMENT_METHODS.handover.beforeExecute')}
+                {t('views.PAYMENT_METHODS.handover.execute.before')}
               </Heading>
             ),
           });
           break;
+
+        case `${TransactionMethod.EXECUTE}-${ExecuteTransactionStep.AFTER}`:
+          addHandover({
+            duration: 2000,
+            animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
+            animationName: 'Handover',
+            children: (
+              <Heading>
+                {t('views.PAYMENT_METHODS.handover.execute.pending')}
+              </Heading>
+            ),
+          });
+          break;
+
         default:
           // eslint-disable-next-line no-console
           console.error(
@@ -207,155 +162,182 @@ export function PayWithCoins() {
     [environment, addHandover, t],
   );
 
-  const handleExecuteAllTransactionsError = (error, transactions) => {
-    const details = { transactionId: signResponse?.transactionId };
-    sendFailedEvent(error.toString(), error, transactions, undefined, details);
-    addHandover({
-      animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
-      children: (
-        <HandoverError
-          headingText={t(
-            'views.PAYMENT_METHODS.handover.executeAllTxnsError.heading',
-          )}
-          buttonCtaText={t(
-            'views.PAYMENT_METHODS.handover.executeAllTxnsError.primaryButton',
-          )}
-          onButtonCtaClick={() => {
-            closeHandover();
-            goBackToPaymentMethods(SalePaymentTypes.CRYPTO);
-          }}
-          secondaryButtonText={t(
-            'views.PAYMENT_METHODS.handover.executeAllTxnsError.secondaryButton',
-          )}
-          onSecondaryButtonClick={() => {
-            closeHandover();
-            sendCloseEvent(SaleWidgetViews.SALE_FAIL);
-          }}
-        />
-      ),
-    });
-  };
+  const onTxnStepExecuteNextTransaction = useCallback(
+    (method: string, step: ExecuteTransactionStep) => {
+      const key = `${method}-${step}`;
+      switch (key) {
+        case `${TransactionMethod.APPROVE}-${ExecuteTransactionStep.AFTER}`:
+          addHandover({
+            animationUrl: getRemoteImage(environment, '/approve-handover.riv'),
+            animationName: 'Processing',
+            children: (
+              <Heading>
+                {t('views.PAYMENT_METHODS.handover.approve.after')}
+              </Heading>
+            ),
+          });
+          break;
 
-  const executeAllTransactions = async () => {
+        case `${TransactionMethod.EXECUTE}-${ExecuteTransactionStep.AFTER}`:
+          addHandover({
+            animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
+            animationName: 'Handover',
+            children: (
+              <Heading>
+                {t('views.PAYMENT_METHODS.handover.execute.after')}
+              </Heading>
+            ),
+          });
+          break;
+
+        default:
+      }
+    },
+    [environment, addHandover, t],
+  );
+
+  const executeAllTransactions = useCallback(async () => {
     executeAll(
       signResponse,
       (txn) => {
         sendTransactionSuccessEvent(txn); // not an analytics event
       },
-      (error, txns) => handleExecuteAllTransactionsError(error, txns),
-      onTxnStep,
+      (error, txns) => {
+        const details = { transactionId: signResponse?.transactionId };
+        sendFailedEvent(error.toString(), error, txns, undefined, details);
+        addHandover({
+          animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
+          children: (
+            <HandoverContent
+              headingText={t('views.PAYMENT_METHODS.handover.error.heading')}
+              primaryButtonText={t(
+                'views.PAYMENT_METHODS.handover.error.primaryButton',
+              )}
+              onPrimaryButtonClick={() => {
+                closeHandover();
+                goBackToPaymentMethods(SalePaymentTypes.CRYPTO);
+              }}
+              secondaryButtonText={t(
+                'views.PAYMENT_METHODS.handover.error.secondaryButton',
+              )}
+              onSecondaryButtonClick={() => {
+                closeHandover();
+                sendCloseEvent(SaleWidgetViews.SALE_FAIL);
+              }}
+            />
+          ),
+        });
+      },
+      onTxnStepExecuteAll,
     );
-  };
+  }, [signResponse, environment]);
 
-  const executeManualTransaction = async () => {
-    if (provider && signResponse) {
-      const transactions = await filterAllowedTransactions(
-        signResponse.transactions,
-        provider,
+  const executeUserInitiatedTransaction = useCallback(() => {
+    setIsError(false);
+
+    const transaction = filteredTransactions[currentTransactionIndex];
+
+    console.log('@@@ transaction', transaction);
+    console.log(
+      '@@@ currentTransactionIndex executeUserInitiatedTransaction',
+      currentTransactionIndex,
+    );
+
+    if (!transaction) return;
+
+    const config = transactionTexts[transaction.methodCall];
+
+    const headingTextBefore = t(config.before.headingTextKey) || '';
+    const ctaButtonTextBefore = t(config.before.ctaButtonTextKey) || '';
+
+    const handleTransaction = () => {
+      console.log('@@@ handleTransaction');
+      executeNextTransaction(
+        (txn) => {
+          sendTransactionSuccessEvent(txn);
+        },
+        (err, txns) => {
+          const details = {
+            transactionId: signResponse?.transactionId,
+          };
+          sendFailedEvent(err.toString(), err, txns, undefined, details);
+          setIsError(true);
+        },
+        onTxnStepExecuteNextTransaction,
       );
+    };
 
-      const firstMethod = transactions[0].methodCall;
+    addHandover({
+      animationUrl: getRemoteImage(environment, config.before.animationUrl),
+      animationName: config.before.animationName,
+      children: (
+        <HandoverContent
+          headingText={headingTextBefore}
+          primaryButtonText={ctaButtonTextBefore}
+          onPrimaryButtonClick={handleTransaction}
+        />
+      ),
+    });
+  }, [
+    filteredTransactions,
+    currentTransactionIndex,
+    signResponse,
+    environment,
+    executeNextTransaction,
+    sendTransactionSuccessEvent,
+    sendFailedEvent,
+    sendCloseEvent,
+  ]);
 
-      const headingText = firstMethod === TransactionMethod.APPROVE
-        ? t('views.PAYMENT_METHODS.handover.beforeApprove')
-        : t('views.PAYMENT_METHODS.handover.beforeExecute');
-      const ctaButtonText = firstMethod === TransactionMethod.APPROVE
-        ? t('views.PAYMENT_METHODS.handover.beforeApproveWithCta.ctaButton')
-        : t('views.PAYMENT_METHODS.handover.beforeExecuteWithCta.ctaButton');
+  useEffect(() => sendPageView(SaleWidgetViews.PAY_WITH_COINS), []); // checkoutPrimarySalePayWithCoinsViewed
 
-      addHandover({
-        animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
-        children: (
-          <UserInitatedTransactionHandover
-            headingText={headingText}
-            ctaButtonText={ctaButtonText}
-            errorHeadingText={t(
-              'views.PAYMENT_METHODS.handover.singleTxnError.heading',
-            )}
-            errorButtonCtaText={t(
-              'views.PAYMENT_METHODS.handover.singleTxnError.primaryButton',
-            )}
-            errorSecondaryButtonText={t(
-              'views.PAYMENT_METHODS.handover.singleTxnError.secondaryButton',
-            )}
-            onSecondaryButtonClick={() => {
-              closeHandover();
-              sendCloseEvent(SaleWidgetViews.SALE_FAIL); // checkoutPrimarySaleSaleFail_CloseButtonPressed
-            }}
-            executeNextTransaction={executeNextTransaction}
-            signResponse={signResponse}
-            environment={environment}
-            sendTransactionSuccessEvent={sendTransactionSuccessEvent}
-            sendFailedEvent={sendFailedEvent}
-            addHandover={addHandover}
-          />
-        ),
-        animationName: 'Start',
-      });
-    }
-  };
-
+  // Initial handover
   useEffect(() => {
-    if (signResponse !== undefined && processing.current === false) {
-      processing.current = true;
+    addHandover({
+      animationUrl: getRemoteImage(environment, '/handover.riv'),
+      animationName: 'Start',
+      children: (
+        <Heading sx={{ px: 'base.spacing.x6' }}>
+          {t('views.PAYMENT_METHODS.handover.initial')}
+        </Heading>
+      ),
+    });
+  }, [environment]);
 
-      if (!isPassportProvider(provider)) {
-        executeAllTransactions();
-      } else {
-        executeManualTransaction();
-      }
-    }
-  }, [signResponse, provider]);
-
+  // Once getting a response from the sign method, start executing transactions
   useEffect(() => {
     if (
-      isPassportProvider(provider)
-      && executeResponse?.transactions?.length === 1
-      && executeResponse?.transactions?.find(
-        (transaction) => transaction.method === TransactionMethod.APPROVE,
-      )
+      signResponse !== undefined
+      && filteredTransactions.length !== 0
+      && processing.current === false
     ) {
-      addHandover({
-        animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
-        children: (
-          <Heading>{t('views.PAYMENT_METHODS.handover.afterApprove')}</Heading>
-        ),
-        duration: 2000,
-      });
+      processing.current = true;
 
-      addHandover({
-        animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
-        children: (
-          <UserInitatedTransactionHandover
-            headingText={t('views.PAYMENT_METHODS.handover.beforeExecute')}
-            ctaButtonText={t(
-              'views.PAYMENT_METHODS.handover.beforeExecuteWithCta.ctaButton',
-            )}
-            errorHeadingText={t(
-              'views.PAYMENT_METHODS.handover.singleTxnError.heading',
-            )}
-            errorButtonCtaText={t(
-              'views.PAYMENT_METHODS.handover.singleTxnError.primaryButton',
-            )}
-            errorSecondaryButtonText={t(
-              'views.PAYMENT_METHODS.handover.singleTxnError.secondaryButton',
-            )}
-            onSecondaryButtonClick={() => {
-              closeHandover();
-              sendCloseEvent(SaleWidgetViews.SALE_FAIL); // checkoutPrimarySaleSaleFail_CloseButtonPressed
-            }}
-            executeNextTransaction={executeNextTransaction}
-            signResponse={signResponse}
-            environment={environment}
-            sendTransactionSuccessEvent={sendTransactionSuccessEvent}
-            sendFailedEvent={sendFailedEvent}
-            addHandover={addHandover}
-          />
-        ),
-      });
+      if (isPassportProvider(provider)) {
+        executeUserInitiatedTransaction();
+      } else {
+        executeAllTransactions();
+      }
     }
+  }, [signResponse, filteredTransactions, provider]);
 
-    if (executeResponse?.done === true) {
+  useEffect(() => {
+    console.log('@@@ currentTransactionIndex', currentTransactionIndex);
+    if (
+      currentTransactionIndex < filteredTransactions.length
+      && executeResponse
+      && !executeResponse.done
+      && isPassportProvider(provider)
+    ) {
+      executeUserInitiatedTransaction();
+    }
+  }, [currentTransactionIndex, filteredTransactions, executeResponse]);
+
+  useEffect(() => {
+    console.log('@@@ executeResponse', executeResponse);
+
+    if (executeResponse?.done) {
+      console.log('@@@ executeResponse done');
       const details = { transactionId: signResponse?.transactionId };
 
       sendSuccessEvent(
@@ -367,37 +349,52 @@ export function PayWithCoins() {
 
       addHandover({
         duration: 2000,
-        animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
-        animationName: 'Handover',
-        children: (
-          <Heading>{t('views.PAYMENT_METHODS.handover.afterExecute')}</Heading>
-        ),
-      });
-      addHandover({
-        duration: 2000,
-        animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
+        animationUrl: getRemoteImage(environment, '/handover.riv'),
         animationName: 'Success',
         children: (
-          <Heading>{t('views.PAYMENT_METHODS.handover.success')}</Heading>
+          <Heading sx={{ px: 'base.spacing.x6' }}>
+            {t('views.PAYMENT_METHODS.handover.success')}
+          </Heading>
         ),
         onClose: () => sendCloseEvent(SaleWidgetViews.SALE_SUCCESS), // checkoutPrimarySaleSaleSuccess_CloseButtonPressed
       });
+
+      sendSuccessEvent();
     }
-  }, [executeResponse, provider, signResponse]);
+  }, [executeResponse, signResponse, provider, environment, signTokenIds]);
 
-  useEffect(() => sendPageView(SaleWidgetViews.PAY_WITH_COINS), []); // checkoutPrimarySalePayWithCoinsViewed
+  useEffect(() => {
+    if (isError) {
+      const transaction = filteredTransactions[currentTransactionIndex];
 
-  useEffect(
-    () => addHandover({
-      animationUrl: getRemoteImage(environment, '/handover.riv'),
-      animationName: 'Start',
-      children: (
-        <Heading sx={{ px: 'base.spacing.x6' }}>
-          {t('views.PAYMENT_METHODS.handover.initial')}
-        </Heading>
-      ),
-    }),
-    [environment],
-  );
+      if (!transaction) return;
+
+      const config = transactionTexts[transaction.methodCall];
+
+      const errorHeadingText = t(config.error.headingTextKey) || '';
+      const errorButtonCtaText = t(config.error.ctaButtonTextKey) || '';
+      const errorSecondaryButtonText = t(config.secondaryButtonTextKey) || '';
+
+      addHandover({
+        animationUrl: getRemoteImage(environment, config.animationUrl),
+        animationName: config.animationName,
+        children: (
+          <HandoverContent
+            headingText={errorHeadingText}
+            primaryButtonText={errorButtonCtaText}
+            onPrimaryButtonClick={() => {
+              executeUserInitiatedTransaction();
+            }}
+            secondaryButtonText={errorSecondaryButtonText}
+            onSecondaryButtonClick={() => {
+              closeHandover();
+              sendCloseEvent(SaleWidgetViews.SALE_FAIL);
+            }}
+          />
+        ),
+      });
+    }
+  }, [isError]);
+
   return null;
 }
