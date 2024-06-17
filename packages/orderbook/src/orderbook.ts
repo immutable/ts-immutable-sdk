@@ -180,9 +180,9 @@ export class Orderbook {
       listingParams,
     }: PrepareBulkListingsParams,
   ): Promise<PrepareBulkListingsResponse> {
-    // Limit bulk listing creation to 10 orders to prevent API and order evaluation spam
-    if (listingParams.length > 10) {
-      throw new Error('Bulk listing creation is limited to 10 orders');
+    // Limit bulk listing creation to 20 orders to prevent API and order evaluation spam
+    if (listingParams.length > 20) {
+      throw new Error('Bulk listing creation is limited to 20 orders');
     }
 
     // In the event of a single order, delegate to prepareListing as the signature is more

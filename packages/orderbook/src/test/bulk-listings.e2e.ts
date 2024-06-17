@@ -11,8 +11,11 @@ import { getConfigFromEnv } from './helpers';
 import { actionAll } from './helpers/actions';
 import { PrepareBulkListingsParams } from '../types';
 
+// An array of each number between 1 and 20
+const supportedListings = Array.from({ length: 20 }, (_, i) => i + 1);
+
 describe('prepareListing and createOrder bulk e2e', () => {
-  it.each([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])('should create %d listings', async (numberOfListings) => {
+  it.each(supportedListings)('should create %d listings', async (numberOfListings) => {
     const provider = getLocalhostProvider();
     const offerer = getOffererWallet(provider);
 
@@ -71,7 +74,7 @@ describe('prepareListing and createOrder bulk e2e', () => {
     }
   }, 30_000);
 
-  it('should create fail to prepare more than 10 listings', async () => {
+  it('should create fail to prepare more than 20 listings', async () => {
     const provider = getLocalhostProvider();
     const offerer = getOffererWallet(provider);
 
@@ -90,7 +93,7 @@ describe('prepareListing and createOrder bulk e2e', () => {
     // Build the order params while minting the tokens
     const orderParams: PrepareBulkListingsParams['listingParams'] = [];
     let i = 0;
-    const tooManyListings = 11;
+    const tooManyListings = 21;
     while (i < tooManyListings) {
       await contract.safeMint(offerer.address);
 
@@ -115,6 +118,6 @@ describe('prepareListing and createOrder bulk e2e', () => {
     await expect(sdk.prepareBulkListings({
       makerAddress: offerer.address,
       listingParams: orderParams,
-    })).rejects.toEqual(new Error('Bulk listing creation is limited to 10 orders'));
-  });
+    })).rejects.toEqual(new Error('Bulk listing creation is limited to 20 orders'));
+  }, 30_000);
 });
