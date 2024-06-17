@@ -28,6 +28,7 @@ import { registerZkEvmUser } from './user';
 import { sendTransaction } from './sendTransaction';
 import GuardianClient from '../guardian';
 import { signTypedDataV4 } from './signTypedDataV4';
+import { personalSign } from './personalSign';
 
 export type ZkEvmProviderInput = {
   authManager: AuthManager;
@@ -251,6 +252,40 @@ export class ZkEvmProvider implements Provider {
       }
       case 'eth_accounts': {
         return this.#zkEvmAddress ? [this.#zkEvmAddress] : [];
+      }
+      case 'personal_sign': {
+        if (!this.#zkEvmAddress) {
+          throw new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
+        }
+
+        const flow = trackFlow('passport', 'personalSign');
+
+        try {
+          return await this.#guardianClient.withConfirmationScreen({ width: 480, height: 720 })(async () => {
+            const ethSigner = await this.#getSigner();
+            flow.addEvent('endGetSigner');
+
+            return await personalSign({
+              params: request.params || [],
+              ethSigner,
+              zkEvmAddress: this.#zkEvmAddress!,
+              rpcProvider: this.#rpcProvider,
+              guardianClient: this.#guardianClient,
+              relayerClient: this.#relayerClient,
+              flow,
+            });
+          });
+        } catch (error) {
+          let errorMessage = 'Unknown error';
+          if (error instanceof Error) {
+            errorMessage = error.message;
+          }
+
+          flow.addEvent('error', { errorMessage });
+          throw error;
+        } finally {
+          flow.end();
+        }
       }
       case 'eth_signTypedData':
       case 'eth_signTypedData_v4': {

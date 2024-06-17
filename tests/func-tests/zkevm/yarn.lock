@@ -480,20 +480,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/design-tokens@npm:^0.3.7, @biom3/design-tokens@npm:~0.3.7":
-  version: 0.3.7
-  resolution: "@biom3/design-tokens@npm:0.3.7"
+"@biom3/design-tokens@npm:^0.4.0, @biom3/design-tokens@npm:~0.4.0":
+  version: 0.4.0
+  resolution: "@biom3/design-tokens@npm:0.4.0"
   dependencies:
     lodash.get: ^4.4.2
-  checksum: b583602227123d79e48cb49b5863ab9cc78848ebd24edfa20e101ac87b803c011151ef04fccb9f171cf3d338ea816d9228b90c4701eb2373dde30125ef73f8b0
+  checksum: 09a76130a18d337cf039dd59f9c8c834b1fdb16fe572b92d6e8851f27b197fb923c6da784558c11208743b3e8688fea3fb6c7b4b7bd5a741234764abf96b46d4
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.23.3":
-  version: 0.23.5
-  resolution: "@biom3/react@npm:0.23.5"
+"@biom3/react@npm:^0.24.1":
+  version: 0.24.1
+  resolution: "@biom3/react@npm:0.24.1"
   dependencies:
-    "@biom3/design-tokens": ~0.3.7
+    "@biom3/design-tokens": ~0.4.0
     buffer: ^6.0.3
     csstype: ^3.1.2
     localforage: ^1.10.0
@@ -511,7 +511,7 @@ __metadata:
     framer-motion: ^10.12.12
     react: ^18.2.0
     react-dom: ^18.2.0
-  checksum: e60db6399b7a98e9d5b220cf1a38d4c0faeb010ee8d1c554770af83fe9125bf80e13d4505f20b045c45345a8440b89fc0869bd9abbc27fea2197112da0c9ba20
+  checksum: 3d875341933714e10e7c472dceb26a91f96488d29bf0ac120cd76eac5db3864191d4cdca1c9a3b5737b53ce2db655d51d8b2971c05b280a258c1838592ea7a91
   languageName: node
   linkType: hard
 
@@ -1105,12 +1105,12 @@ __metadata:
 
 "@imtbl/sdk@file:../../../sdk::locator=func-tests-imx%40workspace%3A.":
   version: 0.0.0
-  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=1967e6&locator=func-tests-imx%40workspace%3A."
+  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=972221&locator=func-tests-imx%40workspace%3A."
   dependencies:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
-    "@biom3/design-tokens": ^0.3.7
-    "@biom3/react": ^0.23.3
+    "@biom3/design-tokens": ^0.4.0
+    "@biom3/react": ^0.24.1
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
     "@ethersproject/keccak256": ^5.7.0
@@ -1121,8 +1121,9 @@ __metadata:
     "@jest/globals": ^29.5.0
     "@magic-ext/oidc": 4.2.0
     "@metamask/detect-provider": ^2.0.0
-    "@opensea/seaport-js": 4.0.0
+    "@opensea/seaport-js": 4.0.2
     "@rive-app/react-canvas-lite": ^4.9.0
+    "@stdlib/number-float64-base-normalize": 0.0.8
     "@uniswap/router-sdk": ^1.4.0
     "@uniswap/sdk-core": ^3.0.1
     "@uniswap/v3-sdk": ^3.9.0
@@ -1145,7 +1146,7 @@ __metadata:
     jwt-decode: ^3.1.2
     lru-memorise: 0.3.0
     magic-sdk: ^21.2.0
-    oidc-client-ts: 2.2.1
+    oidc-client-ts: 2.4.0
     os-browserify: ^0.3.0
     pako: ^2.1.0
     pg: ^8.11.5
@@ -1161,7 +1162,7 @@ __metadata:
       optional: true
     prisma:
       optional: true
-  checksum: b75200fbe949534cd7dc7e51c9f75bf8d99d91e131646e4c407bd5d87277f014a70b73ef2dcf42817486aa30056ff8207d84264c21e9533b272077d40d23655f
+  checksum: ff9a304bbe822028dd13295de657af04bcc19b4b5b0fd98fa49f624f05ece052041caaf690d33a495e7485dce9400c1eab48df0a3923b48534742697590f3364
   languageName: node
   linkType: hard
 
@@ -2374,13 +2375,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opensea/seaport-js@npm:4.0.0":
-  version: 4.0.0
-  resolution: "@opensea/seaport-js@npm:4.0.0"
+"@opensea/seaport-js@npm:4.0.2":
+  version: 4.0.2
+  resolution: "@opensea/seaport-js@npm:4.0.2"
   dependencies:
     ethers: ^6.9.0
     merkletreejs: ^0.3.11
-  checksum: dcc921db35818da0111c7884e7aeb26a3b2e1909ad9395fd467ae429dbdca319e4673115d91c378fc7b6bf422c80fb0f56477813c7c45c3f0d66e7dfbc0ad02b
+  checksum: dd156947e85fe98ed8ad22064132dd65a7b3dd4feb0197c29c6325c6a776b50cf62cb3e0030d3fe23f76bd49b0f16fbe54e757d1049a1f917bc3318f3b30ecc0
   languageName: node
   linkType: hard
 
@@ -3988,6 +3989,21 @@ __metadata:
     "@stdlib/number-float64-base-to-words": ^0.0.x
     "@stdlib/utils-library-manifest": ^0.0.x
   checksum: 7ee053f6b6eaa4b5a040e1eee144b2159654aa0f57c6861bb2318025288d8e7f25db13c52f9bcbc1af3d312befab0466b4964286c9689e85094fce6c50f1d897
+  conditions: (os=aix | os=darwin | os=freebsd | os=linux | os=macos | os=openbsd | os=sunos | os=win32 | os=windows)
+  languageName: node
+  linkType: hard
+
+"@stdlib/number-float64-base-normalize@npm:0.0.8":
+  version: 0.0.8
+  resolution: "@stdlib/number-float64-base-normalize@npm:0.0.8"
+  dependencies:
+    "@stdlib/constants-float64-smallest-normal": ^0.0.x
+    "@stdlib/math-base-assert-is-infinite": ^0.0.x
+    "@stdlib/math-base-assert-is-nan": ^0.0.x
+    "@stdlib/math-base-special-abs": ^0.0.x
+    "@stdlib/types": ^0.0.x
+    "@stdlib/utils-define-nonenumerable-read-only-property": ^0.0.x
+  checksum: 677062923b00824bdb13263fdd1a9e721cacd4add2a9db014652a9cd77a053e531725f35313dbc80507f1b5a812d77b2ca6860008e38346d16f710fd427471f8
   conditions: (os=aix | os=darwin | os=freebsd | os=linux | os=macos | os=openbsd | os=sunos | os=win32 | os=windows)
   languageName: node
   linkType: hard
@@ -7369,7 +7385,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"crypto-js@npm:^4.1.1, crypto-js@npm:^4.2.0":
+"crypto-js@npm:^4.2.0":
   version: 4.2.0
   resolution: "crypto-js@npm:4.2.0"
   checksum: f051666dbc077c8324777f44fbd3aaea2986f198fe85092535130d17026c7c2ccf2d23ee5b29b36f7a4a07312db2fae23c9094b644cc35f7858b1b4fcaf27774
@@ -13655,13 +13671,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"oidc-client-ts@npm:2.2.1":
-  version: 2.2.1
-  resolution: "oidc-client-ts@npm:2.2.1"
+"oidc-client-ts@npm:2.4.0":
+  version: 2.4.0
+  resolution: "oidc-client-ts@npm:2.4.0"
   dependencies:
-    crypto-js: ^4.1.1
+    crypto-js: ^4.2.0
     jwt-decode: ^3.1.2
-  checksum: 83bc815d59a1221bdf2a39aff505941f1bf9aba542a59cc9cbe677b85fc06d4f555d55c1b0a6ad8ca76c57bacc423e1b03de5b7cef3d93c403126143f1152943
+  checksum: 8467db689298221f706d3358961efb0ddc789f6bd7d4765e71ae5fe62067999d2ce6e8e7584b9d991b8caa6f7fb383f75841e1cfa9e05808c34632de374f5e68
   languageName: node
   linkType: hard
 
