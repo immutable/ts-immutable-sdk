@@ -46,8 +46,8 @@ const EthereumMethods: EthereumMethod[] = [
   {
     name: 'personal_sign',
     params: [
-      { name: 'address' },
       { name: 'message' },
+      { name: 'address' },
     ],
     exampleComponents: PersonalSignExamples,
   },
