@@ -101,13 +101,13 @@ describe('SwapForm', () => {
         </SwapWidgetTestComponent>,
       );
       cySmartGet('fromTokenInputs-select-form-select__target').should('be.visible');
-      cySmartGet('fromTokenInputs-select-form-select__target').should('have.text', 'Select coin');
+      cySmartGet('fromTokenInputs-select-form-select__target').should('have.text', 'Select token');
       cySmartGet('fromTokenInputs-text-form-text')
         .should('be.visible');
       cySmartGet('fromTokenInputs-text-form-text__input')
         .should('have.attr', 'placeholder', '0');
       cySmartGet('toTokenInputs-select-form-select__target').should('be.visible');
-      cySmartGet('toTokenInputs-select-form-select__target').should('have.text', 'Select coin');
+      cySmartGet('toTokenInputs-select-form-select__target').should('have.text', 'Select token');
       cySmartGet('toTokenInputs-text-form-text').should('be.visible');
       cySmartGet('toTokenInputs-text-form-text__input').should(
         'have.attr',
@@ -233,7 +233,7 @@ describe('SwapForm', () => {
       cySmartGet('fromTokenInputs-select-form-select__target').should('be.visible');
       cySmartGet('fromTokenInputs-select-form-select__target').should('have.text', 'ETH');
       cySmartGet('toTokenInputs-select-form-select__target').should('be.visible');
-      cySmartGet('toTokenInputs-select-form-select__target').should('have.text', 'Select coin');
+      cySmartGet('toTokenInputs-select-form-select__target').should('have.text', 'Select token');
     });
   });
 
@@ -1177,9 +1177,9 @@ describe('SwapForm', () => {
 
         cySmartGet('unable-to-swap-cancel-button').click();
         cySmartGet('unable-to-swap-bottom-sheet').should('not.exist');
-        cySmartGet('fromTokenInputs-select-form-select__target').should('have.text', 'Select coin');
+        cySmartGet('fromTokenInputs-select-form-select__target').should('have.text', 'Select token');
         cySmartGet('fromTokenInputs-text-form-text__input').should('have.text', '');
-        cySmartGet('toTokenInputs-select-form-select__target').should('have.text', 'Select coin');
+        cySmartGet('toTokenInputs-select-form-select__target').should('have.text', 'Select token');
         cySmartGet('toTokenInputs-text-form-text__input').should('have.text', '');
       });
     });

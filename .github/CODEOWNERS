@@ -20,3 +20,4 @@
 /packages/webhook @shineli1984
 /packages/game-bridge @immutable/sdk
 /samples @immutable/sdk
+* @immutable/sdk

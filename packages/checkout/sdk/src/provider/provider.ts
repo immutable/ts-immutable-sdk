@@ -37,7 +37,7 @@ export async function createProvider(
       providerDetail = InjectedProvidersManager.getInstance().findProvider({ rdns: passportProviderInfo.rdns });
       if (!providerDetail) {
         if (passport) {
-          web3Provider = new Web3Provider(passport.connectEvm());
+          web3Provider = new Web3Provider(passport.connectEvm({ announceProvider: false }));
         } else {
           // eslint-disable-next-line no-console
           console.error(
