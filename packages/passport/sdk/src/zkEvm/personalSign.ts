@@ -27,8 +27,8 @@ export const personalSign = async ({
   relayerClient,
   flow,
 }: PersonalSignParams): Promise<string> => {
-  const fromAddress: string = params[0];
-  const message: string = params[1];
+  const message: string = params[0];
+  const fromAddress: string = params[1];
 
   if (!fromAddress || !message) {
     throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'personal_sign requires an address and a message');

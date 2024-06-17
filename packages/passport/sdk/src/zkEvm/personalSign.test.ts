@@ -53,7 +53,7 @@ describe('personalSign', () => {
   describe('when a valid address and message are provided', () => {
     it('returns a signature', async () => {
       const result = await personalSign({
-        params: [eoaAddress, message],
+        params: [message, eoaAddress],
         ethSigner: ethSigner as unknown as Signer,
         rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,
@@ -82,7 +82,7 @@ describe('personalSign', () => {
       const hexMessage = '0x68656c6c6f'; // 'hello' in hex
 
       const result = await personalSign({
-        params: [eoaAddress, hexMessage],
+        params: [hexMessage, eoaAddress],
         ethSigner: ethSigner as unknown as Signer,
         rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,
