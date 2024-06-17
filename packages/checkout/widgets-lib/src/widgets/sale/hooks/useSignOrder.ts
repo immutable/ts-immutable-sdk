@@ -172,6 +172,9 @@ export const useSignOrder = (input: SignOrderInput) => {
   });
   const [tokenIds, setTokenIds] = useState<string[]>([]);
   const [currentTransactionIndex, setCurrentTransactionIndex] = useState<number>(0);
+  const [filteredTransactions, setFilteredTransactions] = useState<
+  SignedTransaction[]
+  >([]);
 
   const setExecuteTransactions = (transaction: ExecutedTransaction) => {
     setExecuteResponse((prev) => ({
@@ -181,6 +184,8 @@ export const useSignOrder = (input: SignOrderInput) => {
   };
 
   const setExecuteDone = () => setExecuteResponse((prev) => ({ ...prev, done: true }));
+
+  const setTransactionIndex = () => setCurrentTransactionIndex((prev) => prev + 1);
 
   const setExecuteFailed = () => setExecuteResponse({
     done: false,
@@ -192,7 +197,6 @@ export const useSignOrder = (input: SignOrderInput) => {
       to: string,
       data: string,
       gasLimit: number,
-      method: string,
     ): Promise<[hash: string | undefined, error?: SignOrderError]> => {
       try {
         const signer = provider?.getSigner();
@@ -203,8 +207,6 @@ export const useSignOrder = (input: SignOrderInput) => {
           gasPrice,
           gasLimit,
         });
-
-        setExecuteTransactions({ method, hash: txnResponse?.hash });
 
         if (waitFulfillmentSettlements) {
           await txnResponse?.wait();
@@ -251,7 +253,7 @@ export const useSignOrder = (input: SignOrderInput) => {
         return [undefined, error];
       }
     },
-    [provider],
+    [provider, waitFulfillmentSettlements],
   );
 
   const sign = useCallback(
@@ -320,6 +322,14 @@ export const useSignOrder = (input: SignOrderInput) => {
         setTokenIds(apiTokenIds);
         setSignResponse(responseData);
 
+        if (provider) {
+          const filterTransactions = await filterAllowedTransactions(
+            responseData.transactions,
+            provider,
+          );
+          setFilteredTransactions(filterTransactions);
+        }
+
         return responseData;
       } catch (e: any) {
         setSignError({ type: SaleErrorTypes.DEFAULT, data: { error: e } });
@@ -345,12 +355,7 @@ export const useSignOrder = (input: SignOrderInput) => {
       gasEstimate,
     } = transaction;
 
-    const [hash, txnError] = await sendTransaction(
-      to,
-      data,
-      gasEstimate,
-      method,
-    );
+    const [hash, txnError] = await sendTransaction(to, data, gasEstimate);
 
     if (txnError || !hash) {
       onTxnError(txnError, executeResponse.transactions);
@@ -358,6 +363,7 @@ export const useSignOrder = (input: SignOrderInput) => {
     }
 
     const execTransaction = { method, hash };
+    setExecuteTransactions(execTransaction);
     onTxnSuccess(execTransaction);
 
     return true;
@@ -424,15 +430,24 @@ export const useSignOrder = (input: SignOrderInput) => {
     async (
       onTxnSuccess: (txn: ExecutedTransaction) => void,
       onTxnError: (error: any, txns: ExecutedTransaction[]) => void,
+      onTxnStep?: (method: string, step: ExecuteTransactionStep) => void,
     ): Promise<boolean> => {
-      if (!signResponse || executeResponse.done || !provider) return false;
+      if (!filteredTransactions || executeResponse.done || !provider) return false;
 
-      const transactions = await filterAllowedTransactions(
-        signResponse.transactions,
-        provider,
+      const transaction = filteredTransactions[currentTransactionIndex];
+
+      console.log(
+        '!!! useSignOrder - currentTransactionIndex',
+        currentTransactionIndex,
+      );
+      console.log(
+        '!!! useSignOrder - filteredTransactions',
+        filteredTransactions,
       );
 
-      const transaction = transactions[currentTransactionIndex];
+      if (onTxnStep) {
+        onTxnStep(transaction.methodCall, ExecuteTransactionStep.BEFORE);
+      }
 
       const success = await executeTransaction(
         transaction,
@@ -441,28 +456,29 @@ export const useSignOrder = (input: SignOrderInput) => {
       );
 
       if (success) {
-        if (currentTransactionIndex === transactions.length - 1) {
+        if (onTxnStep) {
+          onTxnStep(transaction.methodCall, ExecuteTransactionStep.AFTER);
+        }
+        if (currentTransactionIndex === filteredTransactions.length - 1) {
+          console.log('!!! useSignOrder - setExecuteDone');
           setExecuteDone();
         } else {
-          setCurrentTransactionIndex((prev) => prev + 1);
+          console.log('!!! useSignOrder - setCurrentTransactionIndex');
+          setTransactionIndex();
         }
       }
 
       return success;
     },
-    [
-      currentTransactionIndex,
-      signResponse,
-      executeTransaction,
-      provider,
-      filterAllowedTransactions,
-    ],
+    [currentTransactionIndex, provider, filteredTransactions],
   );
 
   return {
     sign,
     signResponse,
     signError,
+    filteredTransactions,
+    currentTransactionIndex,
     executeAll,
     executeResponse,
     tokenIds,
