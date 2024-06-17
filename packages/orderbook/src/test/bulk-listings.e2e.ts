@@ -58,7 +58,7 @@ describe('prepareListing and createOrder bulk e2e', () => {
 
     await contract.safeMint(offerer.address);
 
-    const { actions, createListings } = await sdk.prepareBulkListings({
+    const { actions, completeListings: createListings } = await sdk.prepareBulkListings({
       makerAddress: offerer.address,
       listingParams: orderParams,
     });

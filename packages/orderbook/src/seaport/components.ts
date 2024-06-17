@@ -11,7 +11,11 @@ export function getOrderComponentsFromMessage(orderMessage: string): OrderCompon
   return orderComponents;
 }
 
-export function getBulkOrderComponentsFromMessage(orderMessage: string): OrderComponents[] {
+export function getBulkOrderComponentsFromMessage(orderMessage: string): {
+  components: OrderComponents[],
+  types: any,
+  value: any
+} {
   const data = JSON.parse(orderMessage);
   const orderComponents: OrderComponents[] = data.message.tree.flat(Infinity)
     // Filter off the zero nodes in the tree. The will get rebuilt bu `getBulkOrderTree`
@@ -23,7 +27,7 @@ export function getBulkOrderComponentsFromMessage(orderMessage: string): OrderCo
     orderComponent.salt = BigNumber.from(orderComponent.salt).toHexString();
   }
 
-  return orderComponents;
+  return { components: orderComponents, types: data.types, value: data.message };
 }
 
 export function getBulkSeaportOrderSignatures(

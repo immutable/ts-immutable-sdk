@@ -161,13 +161,13 @@ export const whenICreateABulkListing = (
       });
     }
 
-    const { actions, createListings } = await sdk.prepareBulkListings({
+    const { actions, completeListings } = await sdk.prepareBulkListings({
       makerAddress: offerer.address,
       listingParams,
     });
 
     const signatures = await actionAll(actions, offerer);
-    const { result } = await createListings(signatures[0]);
+    const { result } = await completeListings(signatures[0]);
 
     for (const res of result) {
       if (!res.success) {

@@ -8,7 +8,6 @@ import {
   OrderComponents,
   OrderUseCase,
 } from '@opensea/seaport-js/lib/types';
-import { getBulkOrderTree, getBulkOrderTreeHeight } from '@opensea/seaport-js/lib/utils/eip712/bulk-orders';
 import { providers } from 'ethers';
 import { mapFromOpenApiOrder } from 'openapi/mapper';
 import {
@@ -85,17 +84,17 @@ export class Seaport {
     }
 
     const orderMessageToSign = await createAction.getMessageToSign();
-    const orders = getBulkOrderComponentsFromMessage(orderMessageToSign);
+    const { components, types, value } = getBulkOrderComponentsFromMessage(orderMessageToSign);
 
     listingActions.push({
       type: ActionType.SIGNABLE,
       purpose: SignablePurpose.CREATE_LISTING,
-      message: await this.getTypedDataFromBulkOrderComponents(orders, orderInputs.length),
+      message: await this.getTypedDataFromBulkOrderComponents(types, value),
     });
 
     return {
       actions: listingActions,
-      preparedListings: orders.map((orderComponent) => ({
+      preparedListings: components.map((orderComponent) => ({
         orderComponents: orderComponent,
         orderHash: this.getSeaportLib().getOrderHash(orderComponent),
       })),
@@ -411,10 +410,15 @@ export class Seaport {
     );
   }
 
+  // Types and value are JSON parsed from the seaport-js string, so the types are
+  // reflected as any
   private async getTypedDataFromBulkOrderComponents(
-    orderComponents: OrderComponents[],
-    numberOfOrders: number,
+    types: any,
+    value: any,
   ): Promise<SignableAction['message']> {
+    // We must remove EIP712Domain from the types object
+    // eslint-disable-next-line no-param-reassign
+    delete types.EIP712Domain;
     const { chainId } = await this.provider.getNetwork();
 
     const domainData = {
@@ -424,18 +428,10 @@ export class Seaport {
       verifyingContract: this.seaportContractAddress,
     };
 
-    const treeHeight = getBulkOrderTreeHeight(numberOfOrders);
-    const bulkOrderType = [{ name: 'tree', type: `OrderComponents${'[2]'.repeat(treeHeight)}` }];
-    const tree = getBulkOrderTree(orderComponents);
-
     return {
       domain: domainData,
-      types: {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        BulkOrder: bulkOrderType,
-        ...EIP_712_ORDER_TYPE,
-      },
-      value: { tree: tree.getDataToSign() },
+      types,
+      value,
     };
   }
 

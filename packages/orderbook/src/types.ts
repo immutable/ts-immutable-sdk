@@ -59,7 +59,7 @@ export interface PrepareBulkListingsParams {
 
 export interface PrepareBulkListingsResponse {
   actions: Action[];
-  createListings: (signature: string) => Promise<BulkListingsResult>;
+  completeListings: (signature: string) => Promise<BulkListingsResult>;
 }
 
 export interface PrepareBulkSeaportOrders {

@@ -164,9 +164,9 @@ export class Orderbook {
   }
 
   /**
-   * Get required transactions and messages for signing prior to creating bulk listings.
-   * Once the transactions are submitting and the message signed, call the createListings method
-   * provided in the return type with the signature. This method only supports up to 10 listings
+   * Get required transactions and messages for signing to facilitate creating bulk listings.
+   * Once the transactions are submitted and the message signed, call the completeListings method
+   * provided in the return type with the signature. This method supports up to 20 listing creations
    * at a time. It can also be used for individual listings to simplify integration code paths.
    * @param {PrepareBulkListingsParams} prepareBulkListingsParams - Details about the listings
    * to be created.
@@ -197,7 +197,7 @@ export class Orderbook {
 
       return {
         actions: prepareListingResponse.actions,
-        createListings: async (signature: string) => {
+        completeListings: async (signature: string) => {
           const createListingResult = await this.createListing({
             makerFees: [],
             orderComponents: prepareListingResponse.orderComponents,
@@ -207,7 +207,7 @@ export class Orderbook {
 
           return {
             result: [{
-              success: !!createListingResult.result,
+              success: true,
               orderHash: prepareListingResponse.orderHash,
               order: createListingResult.result,
             }],
@@ -228,7 +228,7 @@ export class Orderbook {
 
     return {
       actions,
-      createListings: async (bulkOrderSignature: string) => {
+      completeListings: async (bulkOrderSignature: string) => {
         const orderComponents = preparedListings.map((orderParam) => orderParam.orderComponents);
         const signatures = getBulkSeaportOrderSignatures(
           bulkOrderSignature,
@@ -245,7 +245,7 @@ export class Orderbook {
               orderHash: listing.orderHash,
               orderSignature: sig,
               makerFees: listingParam.makerFees,
-            // Swallow failed creations - this gets mapped in the response to caller as failed
+            // Swallow failed creations - this gets mapped in the response to the caller as failed
             }).catch(() => undefined);
           }),
         );
