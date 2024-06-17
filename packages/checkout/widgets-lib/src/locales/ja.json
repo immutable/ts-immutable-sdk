@@ -354,25 +354,34 @@
       },
       "handover": {
         "initial": "注文準備中",
-        "beforeApprove": "コインへのアクセスを承認するのをお待ちしています",
-        "beforeApproveWithCta": {
-          "heading": "ウォレットでの承認が必要です",
-          "ctaButton": "ウォレットを開く"
+        "approve": {
+          "before": "コインへのアクセスを承認するのを待っています",
+          "beforeWithCta": {
+            "heading": "[承認] ウォレットでこれを承認する必要があります",
+            "ctaButton": "ウォレットを開く"
+          },
+          "error": {
+            "heading": "コインにアクセスできません",
+            "primaryButton": "再試行",
+            "secondaryButton": "キャンセル"
+          },
+          "after": "アイテム購入のためのコインが準備できました"
         },
-        "afterApprove": "アイテム購入のためのコイン準備完了",
-        "beforeExecute": "ウォレットでの確認をお待ちしています",
-        "beforeExecuteWithCta": {
-          "heading": "ウォレットでの確認が必要です",
-          "ctaButton": "ウォレットを開く"
+        "execute": {
+          "before": "ウォレットで確認するのを待っています",
+          "beforeWithCta": {
+            "heading": "[実行] ウォレットでこれを確認する必要があります",
+            "ctaButton": "ウォレットを開く"
+          },
+          "error": {
+            "heading": "コインにアクセスできません",
+            "primaryButton": "再試行",
+            "secondaryButton": "キャンセル"
+          },
+          "after": "購入処理中"
         },
-        "afterExecute": "購入処理中",
         "success": "購入完了",
-        "singleTxnError": {
-          "heading": "コインにアクセスできません",
-          "primaryButton": "再試行",
-          "secondaryButton": "キャンセル"
-        },
-        "executeAllTxnsError": {
+        "error": {
           "heading": "購入を完了できません",
           "primaryButton": "再試行",
           "secondaryButton": "キャンセル"

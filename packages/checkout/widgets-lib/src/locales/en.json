@@ -367,25 +367,34 @@
       },
       "handover": {
         "initial": "Preparing Order",
-        "beforeApprove": "Waiting for you to approve access to your coins",
-        "beforeApproveWithCta": {
-          "heading": "We’ll need you to approve this in your wallet",
-          "ctaButton": "Open wallet"
+        "approve": {
+          "before": "Waiting for you to approve access to your coins",
+          "beforeWithCta": {
+            "heading": "[APPROVE ]We’ll need you to approve this in your wallet",
+            "ctaButton": "Open wallet"
+          },
+          "error": {
+            "heading": "Unable to access coins",
+            "primaryButton": "Try again",
+            "secondaryButton": "Cancel"
+          },
+          "after": "Coins ready for item purchase"
         },
-        "afterApprove": "Coins ready for item purchase",
-        "beforeExecute": "Waiting for you to confirm in your wallet",
-        "beforeExecuteWithCta": {
-          "heading": "We’ll need you to confirm this in your wallet",
-          "ctaButton": "Open wallet"
+        "execute": {
+          "before": "Waiting for you to confirm in your wallet",
+          "beforeWithCta": {
+            "heading": "[EXECUTE] We’ll need you to confirm this in your wallet",
+            "ctaButton": "Open wallet"
+          },
+          "error": {
+              "heading": "Unable to access coins",
+              "primaryButton": "Try again",
+              "secondaryButton": "Cancel"
+            },
+          "after": "Processing purchase"
         },
-        "afterExecute": "Processing purchase",
         "success": "Purchase complete",
-        "singleTxnError": {
-          "heading": "Unable to access coins",
-          "primaryButton": "Try again",
-          "secondaryButton": "Cancel"
-        },
-        "executeAllTxnsError": {
+        "error": {
           "heading": "Unable to complete purchase",
           "primaryButton": "Try again",
           "secondaryButton": "Cancel"

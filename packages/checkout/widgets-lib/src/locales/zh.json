@@ -346,26 +346,35 @@
         "processing3": "正在完成支付"
       },
       "handover": {
-        "initial": "准备订单中",
-        "beforeApprove": "等待您批准访问您的硬币",
-        "beforeApproveWithCta": {
-          "heading": "我们需要您在钱包中批准此操作",
-          "ctaButton": "打开钱包"
+        "initial": "准备订单",
+        "approve": {
+          "before": "等待您批准对您的币的访问",
+          "beforeWithCta": {
+            "heading": "[批准] 我们需要您在钱包中批准此操作",
+            "ctaButton": "打开钱包"
+          },
+          "error": {
+            "heading": "无法访问币",
+            "primaryButton": "重试",
+            "secondaryButton": "取消"
+          },
+          "after": "币已准备好购买物品"
         },
-        "afterApprove": "硬币已准备好购买商品",
-        "beforeExecute": "等待您在钱包中确认",
-        "beforeExecuteWithCta": {
-          "heading": "我们需要您在钱包中确认此操作",
-          "ctaButton": "打开钱包"
+        "execute": {
+          "before": "等待您在钱包中确认",
+          "beforeWithCta": {
+            "heading": "[执行] 我们需要您在钱包中确认此操作",
+            "ctaButton": "打开钱包"
+          },
+          "error": {
+            "heading": "无法访问币",
+            "primaryButton": "重试",
+            "secondaryButton": "取消"
+          },
+          "after": "处理购买中"
         },
-        "afterExecute": "处理中购买",
         "success": "购买完成",
-        "singleTxnError": {
-          "heading": "无法访问硬币",
-          "primaryButton": "重试",
-          "secondaryButton": "取消"
-        },
-        "executeAllTxnsError": {
+        "error": {
           "heading": "无法完成购买",
           "primaryButton": "重试",
           "secondaryButton": "取消"

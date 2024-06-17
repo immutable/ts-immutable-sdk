@@ -347,25 +347,34 @@
       },
       "handover": {
         "initial": "주문 준비 중",
-        "beforeApprove": "코인 접근을 승인해 주시기 바랍니다",
-        "beforeApproveWithCta": {
-          "heading": "지갑에서 승인이 필요합니다",
-          "ctaButton": "지갑 열기"
+        "approve": {
+          "before": "코인에 대한 액세스 승인을 기다리고 있습니다",
+          "beforeWithCta": {
+            "heading": "[승인] 이 작업을 승인하려면 지갑에서 확인이 필요합니다",
+            "ctaButton": "지갑 열기"
+          },
+          "error": {
+            "heading": "코인에 액세스할 수 없습니다",
+            "primaryButton": "다시 시도",
+            "secondaryButton": "취소"
+          },
+          "after": "아이템 구매를 위한 코인이 준비되었습니다"
         },
-        "afterApprove": "아이템 구매를 위한 코인 준비 완료",
-        "beforeExecute": "지갑에서 확인해 주시기 바랍니다",
-        "beforeExecuteWithCta": {
-          "heading": "지갑에서 확인이 필요합니다",
-          "ctaButton": "지갑 열기"
+        "execute": {
+          "before": "지갑에서 확인을 기다리고 있습니다",
+          "beforeWithCta": {
+            "heading": "[실행] 이 작업을 지갑에서 확인해야 합니다",
+            "ctaButton": "지갑 열기"
+          },
+          "error": {
+            "heading": "코인에 액세스할 수 없습니다",
+            "primaryButton": "다시 시도",
+            "secondaryButton": "취소"
+          },
+          "after": "구매 처리 중"
         },
-        "afterExecute": "구매 처리 중",
         "success": "구매 완료",
-        "singleTxnError": {
-          "heading": "코인에 접근할 수 없습니다",
-          "primaryButton": "다시 시도",
-          "secondaryButton": "취소"
-        },
-        "executeAllTxnsError": {
+        "error": {
           "heading": "구매를 완료할 수 없습니다",
           "primaryButton": "다시 시도",
           "secondaryButton": "취소"
