@@ -26,7 +26,7 @@ import {
   TransactionAction,
   TransactionPurpose,
 } from '../types';
-import { Order, ProtocolData } from '../openapi/sdk';
+import { Order } from '../openapi/sdk';
 import {
   EIP_712_ORDER_TYPE,
   ItemType,
@@ -168,42 +168,20 @@ export class Seaport {
     const { orderComponents, tips } = mapImmutableOrderToSeaportOrderComponents(order);
     const seaportLib = this.getSeaportLib(order);
 
-    let seaportActions;
-    // Temporary workaround for the fees scaling issue in case of
-    // partial fills when using `fulfillOrders` SDK function.
-    if (order.protocol_data.order_type === ProtocolData.order_type.PARTIAL_RESTRICTED) {
-      const useCase = await seaportLib.fulfillOrder({
-        order: {
-          parameters: orderComponents,
-          signature: order.signature,
-        },
-        unitsToFill,
-        tips,
-        extraData,
-        accountAddress: account,
-      });
-
-      seaportActions = useCase.actions;
-    } else if (order.protocol_data.order_type === ProtocolData.order_type.FULL_RESTRICTED) {
-      const useCase = await seaportLib.fulfillOrders({
-        accountAddress: account,
-        fulfillOrderDetails: [
-          {
-            order: {
-              parameters: orderComponents,
-              signature: order.signature,
-            },
-            unitsToFill,
-            extraData,
-            tips,
+    const { actions: seaportActions } = await seaportLib.fulfillOrders({
+      accountAddress: account,
+      fulfillOrderDetails: [
+        {
+          order: {
+            parameters: orderComponents,
+            signature: order.signature,
           },
-        ],
-      });
-
-      seaportActions = useCase.actions;
-    } else {
-      throw new Error('Failed to fulfill order because order type is unknown');
-    }
+          unitsToFill,
+          extraData,
+          tips,
+        },
+      ],
+    });
 
     const fulfillmentActions: TransactionAction[] = [];
 

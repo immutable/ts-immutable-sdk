@@ -19,6 +19,8 @@ export const CONFIRMATION_IFRAME_STYLE = 'display: none; position: absolute;widt
 
 type MessageHandler = (arg0: MessageEvent) => void;
 
+type MessageType = 'erc191' | 'eip712';
+
 export default class ConfirmationScreen {
   private config: PassportConfiguration;
 
@@ -81,14 +83,14 @@ export default class ConfirmationScreen {
             resolve({ confirmed: true });
             break;
           }
+          case ReceiveMessage.TRANSACTION_REJECTED: {
+            this.closeWindow();
+            resolve({ confirmed: false });
+            break;
+          }
           case ReceiveMessage.TRANSACTION_ERROR: {
             this.closeWindow();
             reject(new Error('Error during transaction confirmation'));
-            break;
-          }
-          case ReceiveMessage.TRANSACTION_REJECTED: {
-            this.closeWindow();
-            reject(new Error('User rejected transaction'));
             break;
           }
           default:
@@ -110,7 +112,11 @@ export default class ConfirmationScreen {
     });
   }
 
-  requestMessageConfirmation(messageID: string, etherAddress: string): Promise<ConfirmationResult> {
+  requestMessageConfirmation(
+    messageID: string,
+    etherAddress: string,
+    messageType?: MessageType,
+  ): Promise<ConfirmationResult> {
     return new Promise((resolve, reject) => {
       const messageHandler = ({ data, origin }: MessageEvent) => {
         if (
@@ -132,14 +138,14 @@ export default class ConfirmationScreen {
             resolve({ confirmed: true });
             break;
           }
+          case ReceiveMessage.MESSAGE_REJECTED: {
+            this.closeWindow();
+            resolve({ confirmed: false });
+            break;
+          }
           case ReceiveMessage.MESSAGE_ERROR: {
             this.closeWindow();
             reject(new Error('Error during message confirmation'));
-            break;
-          }
-          case ReceiveMessage.MESSAGE_REJECTED: {
-            this.closeWindow();
-            reject(new Error('User rejected message'));
             break;
           }
           default:
@@ -149,7 +155,11 @@ export default class ConfirmationScreen {
       };
 
       window.addEventListener('message', messageHandler);
-      const href = this.getHref('zkevm/message', { messageID, etherAddress });
+      const href = this.getHref('zkevm/message', {
+        messageID,
+        etherAddress,
+        ...(messageType ? { messageType } : {}),
+      });
       this.showConfirmationScreen(href, messageHandler, resolve);
     });
   }

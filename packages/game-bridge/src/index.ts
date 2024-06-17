@@ -192,6 +192,7 @@ window.callFunction = async (jsonData: string) => {
           gameBridgeSha: sdkVersionSha,
           engine: engineVersion.engine,
           engineVersion: engineVersion.engineVersion,
+          engineSdkVersion: engineVersion.engineSdkVersion ?? '',
           platform: engineVersion.platform,
           platformVersion: engineVersion.platformVersion,
           deviceModel: engineVersion.deviceModel ?? 'N/A',

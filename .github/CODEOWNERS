@@ -1,4 +1,5 @@
 /.husky @immutable/sdk
+/.nvmrc @immutable/sdk
 /sdk @immutable/sdk
 /packages/x-client @immutable/sdk
 /packages/config @immutable/sdk
@@ -10,6 +11,7 @@
 /packages/internal/cryptofiat @immutable/commerce
 /packages/internal/dex @immutable/tokens
 /packages/internal/bridge @immutable/rollups
+/packages/internal/guardian @immutable/passport
 /packages/passport @immutable/passport
 /packages/x-provider @immutable/commerce
 /packages/checkout @immutable/commerce
@@ -19,3 +21,4 @@
 /packages/webhook @shineli1984
 /packages/game-bridge @immutable/sdk
 /samples @immutable/sdk
+* @immutable/sdk

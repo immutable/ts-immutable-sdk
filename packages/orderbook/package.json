@@ -5,7 +5,7 @@
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
     "@imtbl/config": "0.0.0",
-    "@opensea/seaport-js": "4.0.0",
+    "@opensea/seaport-js": "4.0.2",
     "axios": "^1.6.5",
     "ethers": "^5.7.2",
     "ethers-v6": "npm:ethers@6.11.1"

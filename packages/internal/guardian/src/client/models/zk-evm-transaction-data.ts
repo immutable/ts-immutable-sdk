@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { MetaTransaction } from './meta-transaction';
+import type { MetaTransaction } from './meta-transaction';
 
 /**
  * 

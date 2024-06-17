@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { EIP712Message } from './eip712-message';
+import type { EIP712Message } from './eip712-message';
 
 /**
  * 
@@ -30,7 +30,7 @@ export interface EVMMessage {
      */
     'id': string;
     /**
-     * candidate\'s ether address
+     * request user\'s ether address
      * @type {string}
      * @memberof EVMMessage
      */

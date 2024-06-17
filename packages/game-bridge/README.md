@@ -1,27 +1,37 @@
-<div align="center">
-  <p align="center">
-    <a href="https://docs.x.immutable.com/docs">
-      <img src="https://cdn.dribbble.com/users/1299339/screenshots/7133657/media/837237d447d36581ebd59ec36d30daea.gif" width="280"/>
-    </a>
-  </p>
-  <h1>Immutable Game Bridge</h1>
-</div>
+# Game Bridge
 
-## How to Create Index Files for Immutable Unity and Unreal SDK
+### Pre-requisites
 
-1. In the root directory of this repository, run:
+Install dependencies for the workspace
+
 ```bash
 yarn install
 ```
-2. Navigate to the game-bridge directory:
-```bash
-`cd packages/game-bridge`
-```
-3. Build the files:
+
+### Quick Start Guide
+
+All commands below need to be run in the context of the `game-bridge` package where this README is located. Read more about context [here](../../README.md#context).
+
+Building the Game Bridge for Unity and Unreal:
+
 ```bash
 yarn build
 ```
 
-The bundled index files will be generated in the following locations:
-- Unity: `game-bridge/dist/unity/index.html`
-- Unreal: `game-bridge/dist/unreal/index.js`
+Note: The above build will bundle the index files in the following locations (relative to this README):
+- Unity: `./dist/unity/index.html`
+- Unreal: `./dist/unreal/index.js`, `./dist/unreal/index.js.map`
+
+Linting:
+
+```bash
+yarn lint
+```
+
+### About
+
+The Game Bridge package enables interaction between the Typescript SDK and Unity and Unreal SDKs. It does this by wrapping around the required SDK packages and generating an (index.js & index.js.map)/index.html file that can be imported into the Unreal and Unity SDKs, respectively.
+
+[Read more about how the game-bridge works here](https://immutable.atlassian.net/wiki/spaces/GSK/pages/2307129395/Game+SDK+Overview)
+
+[Read more about the game-bridge package here](../../README.md#game-bridge)
