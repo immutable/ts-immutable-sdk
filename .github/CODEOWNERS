@@ -17,7 +17,6 @@
 /packages/passport @immutable/passport
 /packages/x-provider @immutable/commerce
 /packages/checkout @immutable/commerce
-/packages/orderbook @immutable/traders
 /packages/checkout/widgets-lib @immutable/commerce
 /packages/blockchain-data @immutable/assets
 /packages/minting-backend @shineli1984
