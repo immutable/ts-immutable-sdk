@@ -432,21 +432,9 @@ export const useSignOrder = (input: SignOrderInput) => {
       onTxnError: (error: any, txns: ExecutedTransaction[]) => void,
       onTxnStep?: (method: string, step: ExecuteTransactionStep) => void,
     ): Promise<boolean> => {
-      // eslint-disable-next-line no-debugger
-      // debugger;
-
       if (!filteredTransactions || executeResponse.done || !provider) return false;
 
       const transaction = filteredTransactions[currentTransactionIndex];
-
-      console.log(
-        '!!! useSignOrder - currentTransactionIndex',
-        currentTransactionIndex,
-      );
-      console.log(
-        '!!! useSignOrder - filteredTransactions',
-        filteredTransactions,
-      );
 
       if (onTxnStep) {
         onTxnStep(transaction.methodCall, ExecuteTransactionStep.BEFORE);
@@ -458,16 +446,10 @@ export const useSignOrder = (input: SignOrderInput) => {
         onTxnError,
       );
 
-      // eslint-disable-next-line no-debugger
-      // debugger;
-
       if (success) {
         if (currentTransactionIndex === filteredTransactions.length - 1) {
-          console.log('!!! useSignOrder - setExecuteDone');
-
           setExecuteDone();
         } else {
-          console.log('!!! useSignOrder - setCurrentTransactionIndex');
           setTransactionIndex();
         }
 
