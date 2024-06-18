@@ -23,7 +23,7 @@ const bridgeConfig = new BridgeConfiguration({
   childProvider: voidChildProvider,
 });
 
-function manuallyEncodeFunctionData(contract: Contract, functionName: string, parameters: any[]) {
+function encodeFunctionData(contract: Contract, functionName: string, parameters: any[]) {
   return contract.interface.encodeFunctionData(functionName, parameters);
 }
 
@@ -41,7 +41,7 @@ describe('transactions', () => {
           // Sender is the recipient (deposit*, not deposit*To)
           const result = await getBridgeTxCalldata(sender, sender, amount, token, depositMethods, bridgeContract);
 
-          const expectedCalldata2 = manuallyEncodeFunctionData(bridgeContract, depositMethods.native, [amount]);
+          const expectedCalldata2 = encodeFunctionData(bridgeContract, depositMethods.native, [amount]);
           expect(result).toEqual(expectedCalldata2);
         });
       });
@@ -56,7 +56,7 @@ describe('transactions', () => {
           // Sender is not the recipient (deposit*To, not deposit*)
           const result = await getBridgeTxCalldata(sender, recipient, amount, token, depositMethods, bridgeContract);
 
-          const expectedCalldata = manuallyEncodeFunctionData(
+          const expectedCalldata = encodeFunctionData(
             bridgeContract,
             depositMethods.nativeTo,
             [recipient, amount],
@@ -75,7 +75,7 @@ describe('transactions', () => {
           // Sender is the recipient (withdraw*, not withdraw*To)
           const result = await getBridgeTxCalldata(sender, sender, amount, token, withdrawMethods, bridgeContract);
 
-          const expectedCalldata = manuallyEncodeFunctionData(bridgeContract, withdrawMethods.native, [amount]);
+          const expectedCalldata = encodeFunctionData(bridgeContract, withdrawMethods.native, [amount]);
           expect(result).toEqual(expectedCalldata);
         });
       });
@@ -90,7 +90,7 @@ describe('transactions', () => {
           // Sender is not the recipient (withdraw*To, not withdraw*)
           const result = await getBridgeTxCalldata(sender, recipient, amount, token, withdrawMethods, bridgeContract);
 
-          const expectedCalldata = manuallyEncodeFunctionData(
+          const expectedCalldata = encodeFunctionData(
             bridgeContract,
             withdrawMethods.nativeTo,
             [recipient, amount],
@@ -110,7 +110,7 @@ describe('transactions', () => {
           // Sender is the recipient (deposit*, not deposit*To)
           const result = await getBridgeTxCalldata(sender, sender, amount, usdc, depositMethods, bridgeContract);
 
-          const expectedCalldata = manuallyEncodeFunctionData(bridgeContract, depositMethods.token, [usdc, amount]);
+          const expectedCalldata = encodeFunctionData(bridgeContract, depositMethods.token, [usdc, amount]);
           expect(result).toEqual(expectedCalldata);
         });
       });
@@ -124,7 +124,7 @@ describe('transactions', () => {
           // Sender is not the recipient (deposit*To, not deposit*)
           const result = await getBridgeTxCalldata(sender, recipient, amount, usdc, depositMethods, bridgeContract);
 
-          const expectedCalldata = manuallyEncodeFunctionData(
+          const expectedCalldata = encodeFunctionData(
             bridgeContract,
             depositMethods.tokenTo,
             [usdc, recipient, amount],
@@ -142,7 +142,7 @@ describe('transactions', () => {
           // Sender is the recipient (withdraw*, not withdraw*To)
           const result = await getBridgeTxCalldata(sender, sender, amount, usdc, withdrawMethods, bridgeContract);
 
-          const expectedCalldata = manuallyEncodeFunctionData(bridgeContract, withdrawMethods.token, [usdc, amount]);
+          const expectedCalldata = encodeFunctionData(bridgeContract, withdrawMethods.token, [usdc, amount]);
           expect(result).toEqual(expectedCalldata);
         });
       });
@@ -156,7 +156,7 @@ describe('transactions', () => {
           // Sender is not the recipient (withdraw*To, not withdraw*)
           const result = await getBridgeTxCalldata(sender, recipient, amount, usdc, withdrawMethods, bridgeContract);
 
-          const expectedCalldata = manuallyEncodeFunctionData(
+          const expectedCalldata = encodeFunctionData(
             bridgeContract,
             withdrawMethods.tokenTo,
             [usdc, recipient, amount],
