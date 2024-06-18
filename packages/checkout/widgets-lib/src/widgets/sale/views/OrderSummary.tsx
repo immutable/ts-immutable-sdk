@@ -14,7 +14,6 @@ import {
   OrderSummarySubViews,
   SaleWidgetViews,
 } from '../../../context/view-context/SaleViewContextTypes';
-import { LoadingView } from '../../../views/loading/LoadingView';
 import { useSaleContext } from '../context/SaleContextProvider';
 import {
   CryptoFiatActions,
@@ -31,6 +30,7 @@ import {
 } from '../types';
 import { FundingRouteExecute } from '../components/FundingRouteExecute/FundingRouteExecute';
 import { useSaleEvent } from '../hooks/useSaleEvents';
+import { LoadingHandover } from './LoadingHandover';
 
 type OrderSummaryProps = {
   subView: OrderSummarySubViews;
@@ -52,7 +52,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
 
   const { viewDispatch, viewState } = useContext(ViewContext);
   const { cryptoFiatDispatch, cryptoFiatState } = useContext(CryptoFiatContext);
-  const { addHandover } = useHandover({
+  const { addHandover, closeHandover } = useHandover({
     id: HandoverTarget.GLOBAL,
   });
 
@@ -132,6 +132,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
   useEffect(() => {
     if (fundingBalances.length === 0) return;
 
+    closeHandover();
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
@@ -196,7 +197,10 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
   return (
     <Box>
       {subView === OrderSummarySubViews.INIT && (
-        <LoadingView loadingText={t('views.ORDER_SUMMARY.loading.balances')} />
+        <LoadingHandover
+          text={t('views.ORDER_SUMMARY.loading.balances')}
+          environment={environment}
+        />
       )}
       {subView === OrderSummarySubViews.REVIEW_ORDER && (
         <OrderReview
