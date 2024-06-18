@@ -24,7 +24,9 @@ import { TenderlySimulation } from 'types/tenderly';
 import { calculateGasFee } from 'lib/gas';
 import { createContract } from 'contracts/createContract';
 import { getWithdrawRootToken, genAxelarWithdrawPayload, genUniqueAxelarCommandId } from 'lib/axelarUtils';
-import { submitTenderlySimulations } from 'lib/tenderly';
+import { StateObject, submitTenderlySimulations } from 'lib/tenderly';
+import { trueInHex } from 'constants/values';
+import { getBridgeTxCalldata } from 'lib/transactions';
 import {
   NATIVE,
   ETHEREUM_NATIVE_TOKEN_ADDRESS,
@@ -375,7 +377,7 @@ export class TokenBridge {
    * @param sourceChainId Chain ID of the source chain
    * @returns calldata for the requested bridge transaction (i.e. tx.data)
    */
-  private async getTxData(
+  private async getConfigAndBridgeTxCalldata(
     sender: string,
     recipient: string,
     amount: ethers.BigNumber,
@@ -385,41 +387,7 @@ export class TokenBridge {
     const currentBridgeMethods = await this.getBridgeMethods(direction);
     const bridgeContract = await this.getBridgeContract(direction);
 
-    let functionName: string;
-    let parameters: any[];
-    /**
-     * Handle bridge transaction for native token
-     */
-    if (token.toUpperCase() === NATIVE) {
-      if (sender === recipient) {
-        // Deposit or withdraw native token
-        functionName = currentBridgeMethods.native;
-        parameters = [amount];
-      } else {
-        // Deposit or withdraw native token TO
-        functionName = currentBridgeMethods.nativeTo;
-        parameters = [recipient, amount];
-      }
-    } else {
-      /**
-       * Handle bridge transaction for ERC20
-       */
-      const erc20Token = ethers.utils.getAddress(token);
-      if (sender === recipient) {
-        // Deposit or withdraw ERC20
-        functionName = currentBridgeMethods.token;
-        parameters = [erc20Token, amount];
-      } else {
-        // Deposit or withdraw ERC20 TO.
-        functionName = currentBridgeMethods.tokenTo;
-        parameters = [erc20Token, recipient, amount];
-      }
-    }
-
-    return await withBridgeError<string>(async () => bridgeContract.interface.encodeFunctionData(
-      functionName,
-      parameters,
-    ), BridgeErrorType.INTERNAL_ERROR);
+    return getBridgeTxCalldata(sender, recipient, amount, token, currentBridgeMethods, bridgeContract);
   }
 
   /**
@@ -683,7 +651,7 @@ export class TokenBridge {
     }
 
     // Deposit transaction & fees.
-    const txData = await this.getTxData(
+    const txData = await this.getConfigAndBridgeTxCalldata(
       sender,
       recipient,
       amount,
@@ -774,7 +742,7 @@ export class TokenBridge {
     }
 
     // Withdraw transaction & fees.
-    const txData = await this.getTxData(
+    const txData = await this.getConfigAndBridgeTxCalldata(
       sender,
       recipient,
       amount,
@@ -843,7 +811,7 @@ export class TokenBridge {
     };
 
     // Get tx data
-    const txData = await this.getTxData(
+    const txData = await this.getConfigAndBridgeTxCalldata(
       sender,
       recipient,
       amount,
@@ -903,7 +871,11 @@ export class TokenBridge {
       [SLOT_PREFIX_CONTRACT_CALL_APPROVED, commandId, sourceChain, sourceAddress, destinationAddress, payloadHash],
     );
     const commandHash = keccak256(command);
-    const slot = keccak256(concat([commandHash, hexlify(zeroPad(hexlify(SLOT_POS_CONTRACT_CALL_APPROVED), 32))]));
+    const gatewayCallApprovedSlot = keccak256(
+      concat(
+        [commandHash, hexlify(zeroPad(hexlify(SLOT_POS_CONTRACT_CALL_APPROVED), 32))],
+      ),
+    );
 
     // Encode execute data
     const axelarAdapterContract = await createContract(
@@ -925,14 +897,15 @@ export class TokenBridge {
       data: executeData,
     }];
 
-    const gas = await submitTenderlySimulations(destinationChainId, simulations, {
-      [axelarGateway]: {
-        stateDiff: {
-          // Override storage to approve this command.
-          [slot]: '0x0000000000000000000000000000000000000000000000000000000000000001',
-        },
+    const stateObject: StateObject = {
+      contractAddress: axelarGateway,
+      stateDiff: {
+        storageSlot: gatewayCallApprovedSlot,
+        value: trueInHex,
       },
-    });
+    };
+
+    const gas = await submitTenderlySimulations(destinationChainId, simulations, [stateObject]);
     return gas[0];
   }
 
