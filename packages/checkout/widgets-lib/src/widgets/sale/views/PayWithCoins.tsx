@@ -34,15 +34,6 @@ const executeNextTransactionTexts = {
       animationUrl: '/approve-handover.riv',
       animationName: 'Handover',
     },
-    error: {
-      headingTextKey: 'views.PAYMENT_METHODS.handover.approve.error.heading',
-      primaryButtonTextKey:
-        'views.PAYMENT_METHODS.handover.approve.error.primaryButton',
-      secondaryButtonTextKey:
-        'views.PAYMENT_METHODS.handover.approve.error.secondaryButton',
-      animationUrl: '/execute-handover.riv',
-      animationName: 'Start',
-    },
   },
   [TransactionMethod.EXECUTE]: {
     before: {
@@ -57,15 +48,6 @@ const executeNextTransactionTexts = {
       headingTextKey: 'views.PAYMENT_METHODS.handover.execute.after',
       animationUrl: '/execute-handover.riv',
       animationName: 'Handover',
-    },
-    error: {
-      headingTextKey: 'views.PAYMENT_METHODS.handover.execute.error.heading',
-      primaryButtonTextKey:
-        'views.PAYMENT_METHODS.handover.execute.error.primaryButton',
-      secondaryButtonTextKey:
-        'views.PAYMENT_METHODS.handover.execute.error.secondaryButton',
-      animationUrl: '/execute-handover.riv',
-      animationName: 'Start',
     },
   },
 };
