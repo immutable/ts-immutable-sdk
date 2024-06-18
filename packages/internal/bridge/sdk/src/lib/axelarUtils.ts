@@ -1,10 +1,9 @@
 import { Provider } from '@ethersproject/providers';
+import { ethers, utils } from 'ethers';
 import { Address } from '../types';
 import { WITHDRAW_SIG, NATIVE } from '../constants/bridges';
 import { CHILD_ERC20 } from '../contracts/ABIs/ChildERC20';
 import { withBridgeError, BridgeErrorType } from '../errors';
-import { ethers } from 'ethers';
-import { keccak256, defaultAbiCoder } from 'ethers/lib/utils';
 import { createContract } from '../contracts/createContract';
 import { isWrappedIMX, getRootIMX } from './utils';
 
@@ -16,8 +15,8 @@ import { isWrappedIMX, getRootIMX } from './utils';
  * @returns hash of payload and current time.
  */
 export function genUniqueAxelarCommandId(payload: string) {
-  return keccak256(
-    defaultAbiCoder.encode(['bytes', 'uint256'], [payload, new Date().getTime()]),
+  return utils.keccak256(
+    utils.defaultAbiCoder.encode(['bytes', 'uint256'], [payload, new Date().getTime()]),
   );
 }
 
@@ -31,7 +30,7 @@ export function genAxelarWithdrawPayload(
   recipient: string,
   amount: string,
 ) {
-  return defaultAbiCoder.encode(
+  return utils.defaultAbiCoder.encode(
     ['bytes32', 'address', 'address', 'address', 'uint256'],
     [WITHDRAW_SIG, rootToken, sender, recipient, amount],
   );

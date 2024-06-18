@@ -1,15 +1,14 @@
 import { Trade, toHex, encodeRouteToPath, Route } from '@uniswap/v3-sdk';
 import { PaymentsExtended, SwapRouter } from '@uniswap/router-sdk';
 import * as Uniswap from '@uniswap/sdk-core';
+import { utils } from 'ethers';
 import { Fees } from '../fees';
 import { isNative, toCurrencyAmount, toPublicAmount } from '../utils';
 import { QuoteResult } from '../getQuotesForRoutes';
 import { NativeTokenService, canUnwrapToken } from '../nativeTokenService';
-import { Coin, CoinAmount, Native } from '../../types';
-import { Interface } from 'ethers/lib/utils';
+import { Coin, CoinAmount, Native, SecondaryFee, TransactionDetails } from '../../types';
 import { IImmutableSwapProxy, ImmutableSwapProxyInterface } from '../../contracts/types/ImmutableSwapProxy';
 import { ImmutableSwapProxy__factory } from '../../contracts/types';
-import { SecondaryFee, TransactionDetails } from '../../types';
 import { calculateGasFee } from './gas';
 import { slippageToFraction } from './slippage';
 
@@ -30,8 +29,8 @@ function buildSinglePoolSwap(
   route: Route<Uniswap.Token, Uniswap.Token>,
   amountIn: string,
   amountOut: string,
-  routerContract: Interface,
-  paymentsContract: Interface,
+  routerContract: utils.Interface,
+  paymentsContract: utils.Interface,
 ) {
   const calldatas: string[] = [];
 
@@ -153,8 +152,8 @@ function buildMultiPoolSwap(
   route: Route<Uniswap.Token, Uniswap.Token>,
   amountIn: string,
   amountOut: string,
-  routerContract: Interface,
-  paymentsContract: Interface,
+  routerContract: utils.Interface,
+  paymentsContract: utils.Interface,
 ) {
   const path: string = encodeRouteToPath(route, trade.tradeType === Uniswap.TradeType.EXACT_OUTPUT);
   const calldatas: string[] = [];
@@ -280,8 +279,8 @@ function buildSwapParameters(
   trade: Trade<Uniswap.Token, Uniswap.Token, Uniswap.TradeType>,
   secondaryFees: SecondaryFee[],
   swapProxyContract: ImmutableSwapProxyInterface,
-  routerContract: Interface,
-  paymentsContract: Interface,
+  routerContract: utils.Interface,
+  paymentsContract: utils.Interface,
   maximumAmountIn: string,
   minimumAmountOut: string,
 ) {

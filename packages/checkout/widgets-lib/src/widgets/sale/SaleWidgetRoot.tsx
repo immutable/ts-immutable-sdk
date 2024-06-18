@@ -5,6 +5,7 @@ import {
   SaleItem,
   SaleWidgetParams,
   WidgetConfiguration,
+  WidgetLanguage,
   WidgetProperties,
   WidgetTheme,
   WidgetType,
@@ -125,8 +126,8 @@ export class Sale extends Base<WidgetType.SALE> {
                 >
                   <SaleWidget
                     config={config}
-                    language="en"
                     items={this.parameters.items!}
+                    language={this.parameters.language as WidgetLanguage}
                     environmentId={this.parameters.environmentId!}
                     collectionName={this.parameters.collectionName!}
                     excludePaymentTypes={this.parameters.excludePaymentTypes!}
