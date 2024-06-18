@@ -22,7 +22,16 @@ enum TransactionMethod {
   EXECUTE = 'execute(address multicallSigner, bytes32 reference, address[] targets, bytes[] data, uint256 deadline, bytes signature)',
 }
 
-const transactionTexts = {
+const executeAllTransactionsErrorText = {
+  heading: 'views.PAYMENT_METHODS.handover.error.heading',
+  primaryButtonTextKey: 'views.PAYMENT_METHODS.handover.error.primaryButton',
+  secondaryButtonTextKey:
+    'views.PAYMENT_METHODS.handover.error.secondaryButton',
+  animationUrl: '/execute-handover.riv',
+  animationName: 'Start',
+};
+
+const executeNextTransactionTexts = {
   [TransactionMethod.APPROVE]: {
     before: {
       headingTextKey:
@@ -40,10 +49,12 @@ const transactionTexts = {
     },
     error: {
       headingTextKey: 'views.PAYMENT_METHODS.handover.approve.error.heading',
-      ctaButtonTextKey:
+      primaryButtonTextKey:
         'views.PAYMENT_METHODS.handover.approve.error.primaryButton',
       secondaryButtonTextKey:
         'views.PAYMENT_METHODS.handover.approve.error.secondaryButton',
+      animationUrl: '/execute-handover.riv',
+      animationName: 'Start',
     },
   },
   [TransactionMethod.EXECUTE]: {
@@ -62,10 +73,12 @@ const transactionTexts = {
     },
     error: {
       headingTextKey: 'views.PAYMENT_METHODS.handover.execute.error.heading',
-      ctaButtonTextKey:
+      primaryButtonTextKey:
         'views.PAYMENT_METHODS.handover.execute.error.primaryButton',
       secondaryButtonTextKey:
         'views.PAYMENT_METHODS.handover.execute.error.secondaryButton',
+      animationUrl: '/execute-handover.riv',
+      animationName: 'Start',
     },
   },
 };
@@ -167,6 +180,9 @@ export function PayWithCoins() {
       const key = `${method}-${step}`;
       switch (key) {
         case `${TransactionMethod.APPROVE}-${ExecuteTransactionStep.AFTER}`:
+          // eslint-disable-next-line no-debugger
+          // debugger;
+
           addHandover({
             animationUrl: getRemoteImage(environment, '/approve-handover.riv'),
             animationName: 'Processing',
@@ -179,6 +195,9 @@ export function PayWithCoins() {
           break;
 
         case `${TransactionMethod.EXECUTE}-${ExecuteTransactionStep.AFTER}`:
+          // eslint-disable-next-line no-debugger
+          // debugger;
+
           addHandover({
             animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
             animationName: 'Handover',
@@ -211,14 +230,14 @@ export function PayWithCoins() {
             <HandoverContent
               headingText={t('views.PAYMENT_METHODS.handover.error.heading')}
               primaryButtonText={t(
-                'views.PAYMENT_METHODS.handover.error.primaryButton',
+                'views.PAYMENT_METHODS.handover.error.primaryButtonTextKey',
               )}
               onPrimaryButtonClick={() => {
                 closeHandover();
                 goBackToPaymentMethods(SalePaymentTypes.CRYPTO);
               }}
               secondaryButtonText={t(
-                'views.PAYMENT_METHODS.handover.error.secondaryButton',
+                'views.PAYMENT_METHODS.handover.error.secondaryButtonTextKey',
               )}
               onSecondaryButtonClick={() => {
                 closeHandover();
@@ -245,7 +264,7 @@ export function PayWithCoins() {
 
     if (!transaction) return;
 
-    const config = transactionTexts[transaction.methodCall];
+    const config = executeNextTransactionTexts[transaction.methodCall];
 
     const headingTextBefore = t(config.before.headingTextKey) || '';
     const ctaButtonTextBefore = t(config.before.ctaButtonTextKey) || '';
@@ -323,6 +342,9 @@ export function PayWithCoins() {
 
   useEffect(() => {
     console.log('@@@ currentTransactionIndex', currentTransactionIndex);
+
+    // eslint-disable-next-line no-debugger
+    // debugger;
     if (
       currentTransactionIndex < filteredTransactions.length
       && executeResponse
@@ -337,6 +359,9 @@ export function PayWithCoins() {
     console.log('@@@ executeResponse', executeResponse);
 
     if (executeResponse?.done) {
+      // eslint-disable-next-line no-debugger
+      // debugger;
+
       console.log('@@@ executeResponse done');
       const details = { transactionId: signResponse?.transactionId };
 
@@ -365,25 +390,50 @@ export function PayWithCoins() {
 
   useEffect(() => {
     if (isError) {
-      const transaction = filteredTransactions[currentTransactionIndex];
+      // eslint-disable-next-line no-debugger
+      // debugger;
 
-      if (!transaction) return;
+      let errorHeadingText;
+      let errorPrimaryButtonText;
+      let errorSecondaryButtonText;
+      let animationUrl;
+      let animationName;
 
-      const config = transactionTexts[transaction.methodCall];
+      if (isPassportProvider(provider)) {
+        const transaction = filteredTransactions[currentTransactionIndex];
 
-      const errorHeadingText = t(config.error.headingTextKey) || '';
-      const errorButtonCtaText = t(config.error.ctaButtonTextKey) || '';
-      const errorSecondaryButtonText = t(config.secondaryButtonTextKey) || '';
+        if (!transaction) return;
+
+        const config = executeNextTransactionTexts[transaction.methodCall];
+        errorHeadingText = t(config.error.headingTextKey) || '';
+        errorPrimaryButtonText = t(config.error.primaryButtonTextKey) || '';
+        errorSecondaryButtonText = t(config.error.secondaryButtonTextKey) || '';
+        animationUrl = getRemoteImage(environment, config.error.animationUrl);
+        animationName = config.error.animationName;
+      } else {
+        errorHeadingText = t(executeAllTransactionsErrorText.heading) || '';
+        errorPrimaryButtonText = t(executeAllTransactionsErrorText.primaryButtonTextKey) || '';
+        errorSecondaryButtonText = t(executeAllTransactionsErrorText.secondaryButtonTextKey) || '';
+        animationUrl = getRemoteImage(
+          environment,
+          executeAllTransactionsErrorText.animationUrl,
+        );
+        animationName = executeAllTransactionsErrorText.animationName;
+      }
 
       addHandover({
-        animationUrl: getRemoteImage(environment, config.animationUrl),
-        animationName: config.animationName,
+        animationUrl: getRemoteImage(environment, animationUrl),
+        animationName,
         children: (
           <HandoverContent
             headingText={errorHeadingText}
-            primaryButtonText={errorButtonCtaText}
+            primaryButtonText={errorPrimaryButtonText}
             onPrimaryButtonClick={() => {
-              executeUserInitiatedTransaction();
+              if (isPassportProvider(provider)) {
+                executeUserInitiatedTransaction();
+              } else {
+                goBackToPaymentMethods(SalePaymentTypes.CRYPTO);
+              }
             }}
             secondaryButtonText={errorSecondaryButtonText}
             onSecondaryButtonClick={() => {
