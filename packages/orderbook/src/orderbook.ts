@@ -188,18 +188,19 @@ export class Orderbook {
     // In the event of a single order, delegate to prepareListing as the signature is more
     // gas efficient
     if (listingParams.length === 1) {
-      const prepareListingResponse = await this.prepareListing({
-        buy: listingParams[0].buy,
+      const prepareListingResponse = await this.seaport.prepareSeaportOrder(
         makerAddress,
-        sell: listingParams[0].sell,
-        orderExpiry: listingParams[0].orderExpiry,
-      });
+        listingParams[0].sell,
+        listingParams[0].buy,
+        new Date(),
+        listingParams[0].orderExpiry || new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 2),
+      );
 
       return {
         actions: prepareListingResponse.actions,
         completeListings: async (signature: string) => {
           const createListingResult = await this.createListing({
-            makerFees: [],
+            makerFees: listingParams[0].makerFees,
             orderComponents: prepareListingResponse.orderComponents,
             orderHash: prepareListingResponse.orderHash,
             orderSignature: signature,
