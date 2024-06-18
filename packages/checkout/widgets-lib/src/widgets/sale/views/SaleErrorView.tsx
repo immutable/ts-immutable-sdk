@@ -1,12 +1,11 @@
 import { BaseTokens } from '@biom3/design-tokens';
-import { useContext } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SalePaymentTypes } from '@imtbl/checkout-sdk';
+import { HandoverTarget } from 'context/handover-context/HandoverContext';
+import { useHandover } from 'lib/hooks/useHandover';
+import { HandoverContent } from 'components/Handover/HandoverContent';
+import { getRemoteImage } from 'lib/utils';
 import { StatusType } from '../../../components/Status/StatusType';
-import {
-  StatusView,
-  StatusViewProps,
-} from '../../../components/Status/StatusView';
 import { SaleErrorTypes } from '../types';
 import { useSaleContext } from '../context/SaleContextProvider';
 import { sendSaleWidgetCloseEvent } from '../SaleWidgetEvents';
@@ -30,10 +29,12 @@ export function SaleErrorView({
   biomeTheme,
   transactionHash,
   blockExplorerLink,
-  errorType = SaleErrorTypes.DEFAULT,
+  errorType,
 }: SaleErrorViewProps) {
+  const initialHandoverDone = useRef(false);
+
   const { t } = useTranslation();
-  const { goBackToPaymentMethods } = useSaleContext();
+  const { goBackToPaymentMethods, environment } = useSaleContext();
   const {
     eventTargetState: { eventTarget },
   } = useContext(EventTargetContext);
@@ -42,9 +43,16 @@ export function SaleErrorView({
     sendSaleWidgetCloseEvent(eventTarget);
   };
 
+  const { addHandover, closeHandover } = useHandover({
+    id: HandoverTarget.GLOBAL,
+  });
+
   const errorHandlersConfig: Record<SaleErrorTypes, ErrorHandlerConfig> = {
     [SaleErrorTypes.TRANSACTION_FAILED]: {
-      onActionClick: goBackToPaymentMethods,
+      onActionClick: () => {
+        closeHandover();
+        goBackToPaymentMethods();
+      },
       onSecondaryActionClick: transactionHash
         ? () => {
           window.open(blockExplorerLink);
@@ -77,12 +85,18 @@ export function SaleErrorView({
       },
     },
     [SaleErrorTypes.TRANSAK_FAILED]: {
-      onActionClick: goBackToPaymentMethods,
+      onActionClick: () => {
+        closeHandover();
+        goBackToPaymentMethods();
+      },
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
     },
     [SaleErrorTypes.WALLET_FAILED]: {
-      onActionClick: goBackToPaymentMethods,
+      onActionClick: () => {
+        closeHandover();
+        goBackToPaymentMethods();
+      },
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
       statusIconStyles: {
@@ -90,26 +104,35 @@ export function SaleErrorView({
       },
     },
     [SaleErrorTypes.WALLET_REJECTED_NO_FUNDS]: {
-      onActionClick: goBackToPaymentMethods,
+      onActionClick: () => {
+        closeHandover();
+        goBackToPaymentMethods();
+      },
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
     },
     [SaleErrorTypes.WALLET_REJECTED]: {
       onActionClick: () => {
-        goBackToPaymentMethods(SalePaymentTypes.CRYPTO);
+        closeHandover();
+        initialHandoverDone.current = false;
+        goBackToPaymentMethods();
       },
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
     },
     [SaleErrorTypes.WALLET_POPUP_BLOCKED]: {
       onActionClick: () => {
-        goBackToPaymentMethods(SalePaymentTypes.CRYPTO);
+        closeHandover();
+        goBackToPaymentMethods();
       },
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
     },
     [SaleErrorTypes.FUNDING_ROUTE_EXECUTE_ERROR]: {
-      onActionClick: goBackToPaymentMethods,
+      onActionClick: () => {
+        closeHandover();
+        goBackToPaymentMethods();
+      },
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
     },
@@ -122,33 +145,52 @@ export function SaleErrorView({
       },
     },
     [SaleErrorTypes.DEFAULT]: {
-      onActionClick: goBackToPaymentMethods,
+      onActionClick: () => {
+        closeHandover();
+        goBackToPaymentMethods();
+      },
       onSecondaryActionClick: closeWidget,
       statusType: StatusType.INFORMATION,
     },
   };
 
-  const getErrorViewProps = (): StatusViewProps => {
-    const handlers = errorHandlersConfig[errorType] || {};
-    const secondaryActionText = errorType === SaleErrorTypes.TRANSACTION_FAILED && transactionHash
+  const getErrorViewProps = () => {
+    const handlers = errorHandlersConfig[errorType || SaleErrorTypes.DEFAULT] || {};
+    const secondaryButtonText = errorType === SaleErrorTypes.TRANSACTION_FAILED && transactionHash
       ? t(`views.SALE_FAIL.errors.${errorType}.secondaryAction`)
       : t(`views.SALE_FAIL.errors.${SaleErrorTypes.DEFAULT}.secondaryAction`);
 
     return {
-      testId: 'fail-view',
-      statusText: t(`views.SALE_FAIL.errors.${errorType}.description`),
-      actionText: t(`views.SALE_FAIL.errors.${errorType}.primaryAction`),
-      onActionClick: handlers?.onActionClick,
-      secondaryActionText,
-      onSecondaryActionClick: handlers?.onSecondaryActionClick,
-      onCloseClick: closeWidget,
-      statusType: handlers.statusType,
-      statusIconStyles: {
-        transform: 'rotate(180deg)',
-        fill: biomeTheme.color.status.guidance.dim,
-        ...handlers.statusIconStyles,
+      headingText: 'Unable to complete purchase',
+      subheadingText: t(`views.SALE_FAIL.errors.${errorType}.description`),
+      primaryButtonText: t(`views.SALE_FAIL.errors.${errorType}.primaryAction`),
+      onPrimaryButtonClick: () => {
+        if (handlers?.onActionClick) {
+          handlers?.onActionClick();
+        }
+        initialHandoverDone.current = false;
+      },
+      secondaryButtonText,
+      onSecondaryButtonClick: () => {
+        if (handlers?.onSecondaryActionClick) {
+          handlers.onSecondaryActionClick();
+        }
+        initialHandoverDone.current = false;
       },
     };
   };
-  return <StatusView {...getErrorViewProps()} />;
+
+  useEffect(() => {
+    if (initialHandoverDone.current || !environment || !errorType) return;
+
+    addHandover({
+      animationUrl: getRemoteImage(environment, '/handover.riv'),
+      animationName: 'Start',
+      children: <HandoverContent {...getErrorViewProps()} />,
+    });
+
+    initialHandoverDone.current = true;
+  }, [errorType, environment]);
+
+  return null;
 }
