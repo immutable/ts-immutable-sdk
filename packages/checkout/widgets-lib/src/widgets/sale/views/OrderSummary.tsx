@@ -1,4 +1,4 @@
-import { Box } from '@biom3/react';
+import { Box, Heading } from '@biom3/react';
 import { useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -7,6 +7,9 @@ import {
   ViewContext,
 } from 'context/view-context/ViewContext';
 import { SalePaymentTypes } from '@imtbl/checkout-sdk';
+import { getRemoteImage } from 'lib/utils';
+import { useHandover } from 'lib/hooks/useHandover';
+import { HandoverTarget } from 'context/handover-context/HandoverContext';
 import {
   OrderSummarySubViews,
   SaleWidgetViews,
@@ -44,10 +47,14 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
     sign,
     selectedCurrency,
     setPaymentMethod,
+    environment,
   } = useSaleContext();
 
   const { viewDispatch, viewState } = useContext(ViewContext);
   const { cryptoFiatDispatch, cryptoFiatState } = useContext(CryptoFiatContext);
+  const { addHandover } = useHandover({
+    id: HandoverTarget.GLOBAL,
+  });
 
   const onPayWithCard = (paymentType: SalePaymentTypes) => goBackToPaymentMethods(paymentType);
 
@@ -68,6 +75,16 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
   };
 
   const onProceedToBuy = (fundingBalance: FundingBalance) => {
+    addHandover({
+      animationUrl: getRemoteImage(environment, '/handover.riv'),
+      animationName: 'Start',
+      children: (
+        <Heading sx={{ px: 'base.spacing.x6' }}>
+          {t('views.PAYMENT_METHODS.handover.initial')}
+        </Heading>
+      ),
+    });
+
     const { type, fundingItem } = fundingBalance;
 
     sendProceedToPay(
@@ -179,11 +196,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
   return (
     <Box>
       {subView === OrderSummarySubViews.INIT && (
-        <LoadingView
-          loadingText={t(
-            'views.ORDER_SUMMARY.loading.balances',
-          )}
-        />
+        <LoadingView loadingText={t('views.ORDER_SUMMARY.loading.balances')} />
       )}
       {subView === OrderSummarySubViews.REVIEW_ORDER && (
         <OrderReview
