@@ -12,8 +12,10 @@ export function determineFillableUnits(order: Order, amountToFill?: string): str
 
     // calculate the remaining amount to fill
     // remaining = ((denominator - numerator) * originalOfferAmt) / denominator
-    return ((BigInt(denominator) - (BigInt(numerator)) * BigInt(originalOfferAmt))
-        / BigInt(denominator)).toString();
+    const remaining = ((BigInt(denominator) - BigInt(numerator)) * BigInt(originalOfferAmt))
+        / BigInt(denominator);
+
+    return remaining.toString();
   }
 
   return amountToFill;
