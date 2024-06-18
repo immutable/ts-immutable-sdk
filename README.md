@@ -278,9 +278,7 @@ The Passport SDK package is built using TypeScript and Rollup. The package is ex
 
 A sample app is also included in the Passport SDK folder to demonstrate how to use the Passport SDK package and for testing purposes. The sample app can be run in development mode to test changes and new features before deploying them to production.
 
-More information for the Passport SDK can be found in the README file in the Passport SDK folder [here](/packages//passport//sdk//README.md).
-
-More information for the Passport Sample App can be found in the README file in the Passport Sample App folder [here](/packages//passport//sdk-sample-app//README.md).
+More information for the Passport SDK and its sample app can be found in the README file in the Passport SDK folder [here](/packages//passport/README.md).
 
 ### Webhook
 
