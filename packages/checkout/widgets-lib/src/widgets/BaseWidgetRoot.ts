@@ -54,8 +54,6 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
   }
 
   private async setLanguage(language?: string) {
-    // eslint-disable-next-line no-console
-    console.log('setLanguage', language);
     if (language === null || language === undefined) return;
     i18next.changeLanguage(language).then(() => {
       // eslint-disable-next-line no-console

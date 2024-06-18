@@ -74,7 +74,6 @@ export class Bridge extends Base<WidgetType.BRIDGE> {
                   config={this.strongConfig()}
                   web3Provider={this.web3Provider}
                   tokenAddress={this.parameters.tokenAddress}
-                  language={this.parameters.language}
                   amount={this.parameters.amount}
                   walletProviderName={this.parameters.walletProviderName}
                 />
