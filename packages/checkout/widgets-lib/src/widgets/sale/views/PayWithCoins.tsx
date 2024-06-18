@@ -1,10 +1,7 @@
-/* eslint-disable no-console */
 import { useHandover } from 'lib/hooks/useHandover';
 import { HandoverTarget } from 'context/handover-context/HandoverContext';
 import { useTranslation } from 'react-i18next';
-import {
-  useCallback, useEffect, useRef, useState,
-} from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { getRemoteImage } from 'lib/utils';
 import { Heading } from '@biom3/react';
 import { SaleWidgetViews } from 'context/view-context/SaleViewContextTypes';
@@ -13,7 +10,7 @@ import { HandoverContent } from 'components/Handover/HandoverContent';
 import { SalePaymentTypes } from '@imtbl/checkout-sdk';
 
 import { useSaleContext } from '../context/SaleContextProvider';
-import { ExecuteTransactionStep } from '../types';
+import { ExecuteTransactionStep, SaleErrorTypes } from '../types';
 import { useSaleEvent } from '../hooks/useSaleEvents';
 
 enum TransactionMethod {
@@ -21,15 +18,6 @@ enum TransactionMethod {
   // eslint-disable-next-line max-len
   EXECUTE = 'execute(address multicallSigner, bytes32 reference, address[] targets, bytes[] data, uint256 deadline, bytes signature)',
 }
-
-const executeAllTransactionsErrorText = {
-  heading: 'views.PAYMENT_METHODS.handover.error.heading',
-  primaryButtonTextKey: 'views.PAYMENT_METHODS.handover.error.primaryButton',
-  secondaryButtonTextKey:
-    'views.PAYMENT_METHODS.handover.error.secondaryButton',
-  animationUrl: '/execute-handover.riv',
-  animationName: 'Start',
-};
 
 const executeNextTransactionTexts = {
   [TransactionMethod.APPROVE]: {
@@ -84,9 +72,7 @@ const executeNextTransactionTexts = {
 };
 
 export function PayWithCoins() {
-  console.log('@@@ PayWithTokens');
   const processing = useRef(false);
-  const [isError, setIsError] = useState(false);
 
   const { t } = useTranslation();
   const {
@@ -108,6 +94,7 @@ export function PayWithCoins() {
     environment,
     provider,
     goBackToPaymentMethods,
+    goToErrorView,
   } = useSaleContext();
 
   const { addHandover, closeHandover } = useHandover({
@@ -166,10 +153,6 @@ export function PayWithCoins() {
           break;
 
         default:
-          // eslint-disable-next-line no-console
-          console.error(
-            'Unknown TransactionMethod and ExecuteTransactionStep combination',
-          );
       }
     },
     [environment, addHandover, t],
@@ -180,9 +163,6 @@ export function PayWithCoins() {
       const key = `${method}-${step}`;
       switch (key) {
         case `${TransactionMethod.APPROVE}-${ExecuteTransactionStep.AFTER}`:
-          // eslint-disable-next-line no-debugger
-          // debugger;
-
           addHandover({
             animationUrl: getRemoteImage(environment, '/approve-handover.riv'),
             animationName: 'Processing',
@@ -195,9 +175,6 @@ export function PayWithCoins() {
           break;
 
         case `${TransactionMethod.EXECUTE}-${ExecuteTransactionStep.AFTER}`:
-          // eslint-disable-next-line no-debugger
-          // debugger;
-
           addHandover({
             animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
             animationName: 'Handover',
@@ -252,17 +229,7 @@ export function PayWithCoins() {
   }, [signResponse, environment]);
 
   const executeUserInitiatedTransaction = useCallback(() => {
-    setIsError(false);
-
     const transaction = filteredTransactions[currentTransactionIndex];
-
-    console.log('@@@ transaction', transaction);
-    console.log(
-      '@@@ currentTransactionIndex executeUserInitiatedTransaction',
-      currentTransactionIndex,
-    );
-
-    if (!transaction) return;
 
     const config = executeNextTransactionTexts[transaction.methodCall];
 
@@ -270,7 +237,6 @@ export function PayWithCoins() {
     const ctaButtonTextBefore = t(config.before.ctaButtonTextKey) || '';
 
     const handleTransaction = () => {
-      console.log('@@@ handleTransaction');
       executeNextTransaction(
         (txn) => {
           sendTransactionSuccessEvent(txn);
@@ -280,7 +246,6 @@ export function PayWithCoins() {
             transactionId: signResponse?.transactionId,
           };
           sendFailedEvent(err.toString(), err, txns, undefined, details);
-          setIsError(true);
         },
         onTxnStepExecuteNextTransaction,
       );
@@ -310,19 +275,6 @@ export function PayWithCoins() {
 
   useEffect(() => sendPageView(SaleWidgetViews.PAY_WITH_COINS), []); // checkoutPrimarySalePayWithCoinsViewed
 
-  // Initial handover
-  useEffect(() => {
-    addHandover({
-      animationUrl: getRemoteImage(environment, '/handover.riv'),
-      animationName: 'Start',
-      children: (
-        <Heading sx={{ px: 'base.spacing.x6' }}>
-          {t('views.PAYMENT_METHODS.handover.initial')}
-        </Heading>
-      ),
-    });
-  }, [environment]);
-
   // Once getting a response from the sign method, start executing transactions
   useEffect(() => {
     if (
@@ -333,7 +285,12 @@ export function PayWithCoins() {
       processing.current = true;
 
       if (isPassportProvider(provider)) {
-        executeUserInitiatedTransaction();
+        try {
+          executeUserInitiatedTransaction();
+        } catch (error) {
+          closeHandover(HandoverTarget.GLOBAL);
+          goToErrorView(SaleErrorTypes.SERVICE_BREAKDOWN, { error });
+        }
       } else {
         executeAllTransactions();
       }
@@ -341,28 +298,22 @@ export function PayWithCoins() {
   }, [signResponse, filteredTransactions, provider]);
 
   useEffect(() => {
-    console.log('@@@ currentTransactionIndex', currentTransactionIndex);
-
-    // eslint-disable-next-line no-debugger
-    // debugger;
+    if (!isPassportProvider(provider)) return;
     if (
       currentTransactionIndex < filteredTransactions.length
-      && executeResponse
-      && !executeResponse.done
-      && isPassportProvider(provider)
+      && !executeResponse?.done
     ) {
-      executeUserInitiatedTransaction();
+      try {
+        executeUserInitiatedTransaction();
+      } catch (error) {
+        closeHandover(HandoverTarget.GLOBAL);
+        goToErrorView(SaleErrorTypes.SERVICE_BREAKDOWN, { error });
+      }
     }
   }, [currentTransactionIndex, filteredTransactions, executeResponse]);
 
   useEffect(() => {
-    console.log('@@@ executeResponse', executeResponse);
-
     if (executeResponse?.done) {
-      // eslint-disable-next-line no-debugger
-      // debugger;
-
-      console.log('@@@ executeResponse done');
       const details = { transactionId: signResponse?.transactionId };
 
       sendSuccessEvent(
@@ -387,64 +338,6 @@ export function PayWithCoins() {
       sendSuccessEvent();
     }
   }, [executeResponse, signResponse, provider, environment, signTokenIds]);
-
-  useEffect(() => {
-    if (isError) {
-      // eslint-disable-next-line no-debugger
-      // debugger;
-
-      let errorHeadingText;
-      let errorPrimaryButtonText;
-      let errorSecondaryButtonText;
-      let animationUrl;
-      let animationName;
-
-      if (isPassportProvider(provider)) {
-        const transaction = filteredTransactions[currentTransactionIndex];
-
-        if (!transaction) return;
-
-        const config = executeNextTransactionTexts[transaction.methodCall];
-        errorHeadingText = t(config.error.headingTextKey) || '';
-        errorPrimaryButtonText = t(config.error.primaryButtonTextKey) || '';
-        errorSecondaryButtonText = t(config.error.secondaryButtonTextKey) || '';
-        animationUrl = getRemoteImage(environment, config.error.animationUrl);
-        animationName = config.error.animationName;
-      } else {
-        errorHeadingText = t(executeAllTransactionsErrorText.heading) || '';
-        errorPrimaryButtonText = t(executeAllTransactionsErrorText.primaryButtonTextKey) || '';
-        errorSecondaryButtonText = t(executeAllTransactionsErrorText.secondaryButtonTextKey) || '';
-        animationUrl = getRemoteImage(
-          environment,
-          executeAllTransactionsErrorText.animationUrl,
-        );
-        animationName = executeAllTransactionsErrorText.animationName;
-      }
-
-      addHandover({
-        animationUrl: getRemoteImage(environment, animationUrl),
-        animationName,
-        children: (
-          <HandoverContent
-            headingText={errorHeadingText}
-            primaryButtonText={errorPrimaryButtonText}
-            onPrimaryButtonClick={() => {
-              if (isPassportProvider(provider)) {
-                executeUserInitiatedTransaction();
-              } else {
-                goBackToPaymentMethods(SalePaymentTypes.CRYPTO);
-              }
-            }}
-            secondaryButtonText={errorSecondaryButtonText}
-            onSecondaryButtonClick={() => {
-              closeHandover();
-              sendCloseEvent(SaleWidgetViews.SALE_FAIL);
-            }}
-          />
-        ),
-      });
-    }
-  }, [isError]);
 
   return null;
 }
