@@ -1,6 +1,6 @@
 import { OrderComponents } from '@opensea/seaport-js/lib/types';
-import { getBulkOrderTree } from '@opensea/seaport-js/lib/utils/eip712/bulk-orders';
 import { BigNumber } from 'ethers';
+import { getBulkOrderTree } from './lib/bulk-orders';
 
 export function getOrderComponentsFromMessage(orderMessage: string): OrderComponents {
   const data = JSON.parse(orderMessage);
