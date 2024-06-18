@@ -1,10 +1,7 @@
 /* eslint-disable no-console */
 /* eslint-disable class-methods-use-this */
 import axios, { AxiosResponse } from 'axios';
-import { ethers } from 'ethers';
-import {
-  concat, defaultAbiCoder, hexValue, hexlify, keccak256, zeroPad,
-} from 'ethers/lib/utils';
+import { ethers, utils } from 'ethers';
 import { ROOT_AXELAR_ADAPTOR } from 'contracts/ABIs/RootAxelarBridgeAdaptor';
 import {
   checkReceiver, validateBridgeReqArgs, validateChainConfiguration, validateChainIds,
@@ -853,7 +850,7 @@ export class TokenBridge {
 
     // tx value for simulation mocked as amount + 1 wei for a native bridge and 1 wei for token bridges
     // hexValue() is required to remove leading zeros, which tenderly does not support.
-    const txValue = (token.toUpperCase() !== NATIVE) ? '0x1' : hexValue(amount.add('1').toHexString());
+    const txValue = (token.toUpperCase() !== NATIVE) ? '0x1' : utils.hexValue(amount.add('1').toHexString());
 
     simulations.push({
       from: sender,
@@ -895,15 +892,18 @@ export class TokenBridge {
     const sourceChain = getChildchain(destinationChainId);
     const sourceAddress = ethers.utils.getAddress(getChildAdaptor(destinationChainId)).toString();
     const destinationAddress = getRootAdaptor(destinationChainId);
-    const payloadHash = keccak256(payload);
+    const payloadHash = utils.keccak256(payload);
 
     // Calculate slot key for given command ID.
-    const command = defaultAbiCoder.encode(
+    const command = utils.defaultAbiCoder.encode(
       ['bytes32', 'bytes32', 'string', 'string', 'address', 'bytes32'],
       [SLOT_PREFIX_CONTRACT_CALL_APPROVED, commandId, sourceChain, sourceAddress, destinationAddress, payloadHash],
     );
-    const commandHash = keccak256(command);
-    const slot = keccak256(concat([commandHash, hexlify(zeroPad(hexlify(SLOT_POS_CONTRACT_CALL_APPROVED), 32))]));
+    const commandHash = utils.keccak256(command);
+    const slot = utils.keccak256(utils.concat([
+      commandHash,
+      utils.hexlify(utils.zeroPad(utils.hexlify(SLOT_POS_CONTRACT_CALL_APPROVED), 32)),
+    ]));
 
     // Encode execute data
     const axelarAdapterContract = await createContract(

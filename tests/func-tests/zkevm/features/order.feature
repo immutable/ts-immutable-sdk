@@ -13,6 +13,17 @@ Feature: orderbook
         And 1 ERC721 token should be transferred to the fulfiller
         And 1 trade should be available
 
+    Scenario: bulk creating and fulfilling ERC721 listings
+        Given I have a funded offerer account
+        And the offerer account has 2 ERC721 token
+        And I have a funded fulfiller account
+        When I bulk create listings to sell 2 ERC721 token
+        Then the listing should be of status active
+        When I fulfill the listing to buy 1 token
+        Then the listing should be of status filled
+        And 1 ERC721 token should be transferred to the fulfiller
+        And 1 trade should be available
+
     Scenario: create and completely fill a ERC1155 listing
         Given I have a funded offerer account
         And the offerer account has 100 ERC1155 tokens
