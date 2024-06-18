@@ -99,8 +99,6 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
     }
 
     this.setLanguage(params?.language);
-    // eslint-disable-next-line no-console
-    console.log('params ', params);
     this.render();
   }
 

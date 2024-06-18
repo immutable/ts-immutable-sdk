@@ -74,6 +74,7 @@ export default function BridgeWidget({
   config,
   amount,
   tokenAddress,
+  // language,
 }: BridgeWidgetInputs) {
   const { t } = useTranslation();
   const {

@@ -26,11 +26,11 @@ function BridgeUI() {
     <div>
       <h1 className="sample-heading">Checkout Bridge</h1>
       <div id={BRIDGE_TARGET_ID}></div>
-      <button onClick={() => bridge.mount(BRIDGE_TARGET_ID, { amount: '10' , language: 'ko'})}>Mount</button>
+      <button onClick={() => bridge.mount(BRIDGE_TARGET_ID, { amount: '10' })}>Mount</button>
       <button onClick={() => bridge.unmount()}>Unmount</button>
       <button onClick={() => bridge.update({ config: { theme: WidgetTheme.LIGHT } })}>Update Config Light</button>
       <button onClick={() => bridge.update({ config: { theme: WidgetTheme.DARK } })}>Update Config Dark</button>
-      {/* <select
+      <select
         onChange={(e) =>
           bridge.update({
             config: { language: e.target.value as WidgetLanguage },
@@ -41,7 +41,7 @@ function BridgeUI() {
         <option value="ja">JA</option>
         <option value="ko">KO</option>
         <option value="zh">ZH</option>
-      </select> */}
+      </select>
     </div>
   );
 }
