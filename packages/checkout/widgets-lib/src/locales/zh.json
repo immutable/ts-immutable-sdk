@@ -353,11 +353,6 @@
             "heading": "[批准] 我们需要您在钱包中批准此操作",
             "ctaButton": "打开钱包"
           },
-          "error": {
-            "heading": "无法访问币",
-            "primaryButton": "重试",
-            "secondaryButton": "取消"
-          },
           "after": "币已准备好购买物品"
         },
         "execute": {
@@ -366,18 +361,11 @@
             "heading": "[执行] 我们需要您在钱包中确认此操作",
             "ctaButton": "打开钱包"
           },
-          "error": {
-            "heading": "无法访问币",
-            "primaryButton": "重试",
-            "secondaryButton": "取消"
-          },
           "after": "处理购买中"
         },
         "success": "购买完成",
         "error": {
-          "heading": "无法完成购买",
-          "primaryButton": "重试",
-          "secondaryButton": "取消"
+          "heading": "无法完成购买"
         }
       },
       "creditCardWarningDrawer": {

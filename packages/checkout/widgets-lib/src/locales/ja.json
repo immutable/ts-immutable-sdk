@@ -360,11 +360,6 @@
             "heading": "[承認] ウォレットでこれを承認する必要があります",
             "ctaButton": "ウォレットを開く"
           },
-          "error": {
-            "heading": "コインにアクセスできません",
-            "primaryButton": "再試行",
-            "secondaryButton": "キャンセル"
-          },
           "after": "アイテム購入のためのコインが準備できました"
         },
         "execute": {
@@ -373,18 +368,11 @@
             "heading": "[実行] ウォレットでこれを確認する必要があります",
             "ctaButton": "ウォレットを開く"
           },
-          "error": {
-            "heading": "コインにアクセスできません",
-            "primaryButton": "再試行",
-            "secondaryButton": "キャンセル"
-          },
           "after": "購入処理中"
         },
         "success": "購入完了",
         "error": {
-          "heading": "購入を完了できません",
-          "primaryButton": "再試行",
-          "secondaryButton": "キャンセル"
+          "heading": "購入を完了できません"
         }
       },
       "creditCardWarningDrawer": {

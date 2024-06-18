@@ -161,7 +161,7 @@ export function SaleErrorView({
       : t(`views.SALE_FAIL.errors.${SaleErrorTypes.DEFAULT}.secondaryAction`);
 
     return {
-      headingText: 'Unable to complete purchase',
+      headingText: t('views.PAYMENT_METHODS.handover.error.heading'),
       subheadingText: t(`views.SALE_FAIL.errors.${errorType}.description`),
       primaryButtonText: t(`views.SALE_FAIL.errors.${errorType}.primaryAction`),
       onPrimaryButtonClick: () => {

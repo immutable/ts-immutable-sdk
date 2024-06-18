@@ -373,11 +373,6 @@
             "heading": "[APPROVE ]We’ll need you to approve this in your wallet",
             "ctaButton": "Open wallet"
           },
-          "error": {
-            "heading": "Unable to access coins",
-            "primaryButton": "Try again",
-            "secondaryButton": "Cancel"
-          },
           "after": "Coins ready for item purchase"
         },
         "execute": {
@@ -386,18 +381,11 @@
             "heading": "[EXECUTE] We’ll need you to confirm this in your wallet",
             "ctaButton": "Open wallet"
           },
-          "error": {
-              "heading": "Unable to access coins",
-              "primaryButton": "Try again",
-              "secondaryButton": "Cancel"
-            },
           "after": "Processing purchase"
         },
         "success": "Purchase complete",
         "error": {
-          "heading": "Unable to complete purchase",
-          "primaryButton": "Try again",
-          "secondaryButton": "Cancel"
+          "heading": "Unable to complete purchase"
         }
       },
       "creditCardWarningDrawer": {

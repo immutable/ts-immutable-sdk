@@ -353,11 +353,6 @@
             "heading": "[승인] 이 작업을 승인하려면 지갑에서 확인이 필요합니다",
             "ctaButton": "지갑 열기"
           },
-          "error": {
-            "heading": "코인에 액세스할 수 없습니다",
-            "primaryButton": "다시 시도",
-            "secondaryButton": "취소"
-          },
           "after": "아이템 구매를 위한 코인이 준비되었습니다"
         },
         "execute": {
@@ -366,18 +361,11 @@
             "heading": "[실행] 이 작업을 지갑에서 확인해야 합니다",
             "ctaButton": "지갑 열기"
           },
-          "error": {
-            "heading": "코인에 액세스할 수 없습니다",
-            "primaryButton": "다시 시도",
-            "secondaryButton": "취소"
-          },
           "after": "구매 처리 중"
         },
         "success": "구매 완료",
         "error": {
-          "heading": "구매를 완료할 수 없습니다",
-          "primaryButton": "다시 시도",
-          "secondaryButton": "취소"
+          "heading": "구매를 완료할 수 없습니다"
         }
       },
       "creditCardWarningDrawer": {
