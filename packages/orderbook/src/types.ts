@@ -47,6 +47,29 @@ export interface PrepareListingResponse {
   orderHash: string;
 }
 
+export interface PrepareBulkListingsParams {
+  makerAddress: string;
+  listingParams: {
+    sell: ERC721Item | ERC1155Item;
+    buy: ERC20Item | NativeItem;
+    makerFees: FeeValue[];
+    orderExpiry?: Date;
+  }[]
+}
+
+export interface PrepareBulkListingsResponse {
+  actions: Action[];
+  completeListings: (signature: string) => Promise<BulkListingsResult>;
+}
+
+export interface PrepareBulkSeaportOrders {
+  actions: Action[];
+  preparedListings: {
+    orderComponents: OrderComponents;
+    orderHash: string;
+  }[]
+}
+
 export interface PrepareCancelOrdersResponse {
   signableAction: SignableAction;
 }
@@ -205,6 +228,14 @@ export interface Order {
 
 export interface ListingResult {
   result: Order;
+}
+
+export interface BulkListingsResult {
+  result: {
+    success: boolean;
+    orderHash: string;
+    order?: Order;
+  }[];
 }
 
 export interface ListListingsResult {

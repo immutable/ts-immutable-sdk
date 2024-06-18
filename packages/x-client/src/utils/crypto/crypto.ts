@@ -4,7 +4,7 @@ import BN from 'bn.js';
 import elliptic from 'elliptic';
 import * as encUtils from 'enc-utils';
 import { Signer } from '@ethersproject/abstract-signer';
-import { solidityKeccak256 } from 'ethers/lib/utils';
+import { utils } from 'ethers';
 import { StarkSigner } from '../../types';
 import { starkEcOrder } from '../stark/starkCurve';
 
@@ -105,7 +105,7 @@ export async function signRegisterEthAddress(
   ethAddress: string,
   starkPublicKey: string,
 ): Promise<string> {
-  const hash: string = solidityKeccak256(
+  const hash: string = utils.solidityKeccak256(
     ['string', 'address', 'uint256'],
     ['UserRegistration:', ethAddress, starkPublicKey],
   );

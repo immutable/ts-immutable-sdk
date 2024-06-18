@@ -13,19 +13,20 @@
  */
 
 
-import globalAxios, { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
-import { Configuration } from '../configuration';
+import type { Configuration } from '../configuration';
+import type { AxiosPromise, AxiosInstance, RawAxiosRequestConfig } from 'axios';
+import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { APIError404 } from '../models';
+import type { APIError404 } from '../models';
 // @ts-ignore
-import { APIError500 } from '../models';
+import type { APIError500 } from '../models';
 // @ts-ignore
-import { TransactionEvaluationResponse } from '../models';
+import type { TransactionEvaluationResponse } from '../models';
 /**
  * StarkexTransactionsApi - axios parameter creator
  * @export
@@ -40,7 +41,7 @@ export const StarkexTransactionsApiAxiosParamCreator = function (configuration?:
          * @deprecated
          * @throws {RequiredError}
          */
-        evaluateStarkexTransaction: async (payloadHash: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        evaluateStarkexTransaction: async (payloadHash: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'payloadHash' is not null or undefined
             assertParamExists('evaluateStarkexTransaction', 'payloadHash', payloadHash)
             const localVarPath = `/guardian/v1/starkex/evaluate/{payloadHash}`
@@ -89,9 +90,11 @@ export const StarkexTransactionsApiFp = function(configuration?: Configuration) 
          * @deprecated
          * @throws {RequiredError}
          */
-        async evaluateStarkexTransaction(payloadHash: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TransactionEvaluationResponse>> {
+        async evaluateStarkexTransaction(payloadHash: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TransactionEvaluationResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.evaluateStarkexTransaction(payloadHash, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['StarkexTransactionsApi.evaluateStarkexTransaction']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
 };
@@ -106,13 +109,13 @@ export const StarkexTransactionsApiFactory = function (configuration?: Configura
         /**
          * Check if it is a valid transaction by payload hash
          * @summary Evaluate if it is an valid transaction
-         * @param {string} payloadHash Hash for the payload
+         * @param {StarkexTransactionsApiEvaluateStarkexTransactionRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @deprecated
          * @throws {RequiredError}
          */
-        evaluateStarkexTransaction(payloadHash: string, options?: any): AxiosPromise<TransactionEvaluationResponse> {
-            return localVarFp.evaluateStarkexTransaction(payloadHash, options).then((request) => request(axios, basePath));
+        evaluateStarkexTransaction(requestParameters: StarkexTransactionsApiEvaluateStarkexTransactionRequest, options?: RawAxiosRequestConfig): AxiosPromise<TransactionEvaluationResponse> {
+            return localVarFp.evaluateStarkexTransaction(requestParameters.payloadHash, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -147,7 +150,8 @@ export class StarkexTransactionsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof StarkexTransactionsApi
      */
-    public evaluateStarkexTransaction(requestParameters: StarkexTransactionsApiEvaluateStarkexTransactionRequest, options?: AxiosRequestConfig) {
+    public evaluateStarkexTransaction(requestParameters: StarkexTransactionsApiEvaluateStarkexTransactionRequest, options?: RawAxiosRequestConfig) {
         return StarkexTransactionsApiFp(this.configuration).evaluateStarkexTransaction(requestParameters.payloadHash, options).then((request) => request(this.axios, this.basePath));
     }
 }
+

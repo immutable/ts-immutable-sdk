@@ -5,7 +5,7 @@ import { BigNumber } from 'ethers';
 import {
   getEip155ChainId,
   getNonce,
-  getSignedMetaTransactions,
+  signMetaTransactions,
 } from './walletHelpers';
 import { sendTransaction } from './sendTransaction';
 import { chainId, chainIdEip155, mockUserZkEvm } from '../test/mocks';
@@ -62,7 +62,7 @@ describe('sendTransaction', () => {
     relayerClient.imGetFeeOptions.mockResolvedValue([imxFeeOption]);
     (getNonce as jest.Mock).mockResolvedValueOnce(nonce);
     (getEip155ChainId as jest.Mock).mockReturnValue(chainIdEip155);
-    (getSignedMetaTransactions as jest.Mock).mockResolvedValueOnce(
+    (signMetaTransactions as jest.Mock).mockResolvedValueOnce(
       signedTransactions,
     );
     relayerClient.ethSendTransaction.mockResolvedValue(relayerTransactionId);
