@@ -7,7 +7,6 @@ import { Heading } from '@biom3/react';
 import { SaleWidgetViews } from 'context/view-context/SaleViewContextTypes';
 import { isPassportProvider } from 'lib/provider';
 import { HandoverContent } from 'components/Handover/HandoverContent';
-import { SalePaymentTypes } from '@imtbl/checkout-sdk';
 
 import { useSaleContext } from '../context/SaleContextProvider';
 import { ExecuteTransactionStep, SaleErrorTypes } from '../types';
@@ -93,7 +92,6 @@ export function PayWithCoins() {
     signTokenIds,
     environment,
     provider,
-    goBackToPaymentMethods,
     goToErrorView,
   } = useSaleContext();
 
@@ -146,7 +144,7 @@ export function PayWithCoins() {
             animationName: 'Handover',
             children: (
               <Heading>
-                {t('views.PAYMENT_METHODS.handover.execute.pending')}
+                {t('views.PAYMENT_METHODS.handover.execute.after')}
               </Heading>
             ),
           });
@@ -200,29 +198,7 @@ export function PayWithCoins() {
       },
       (error, txns) => {
         const details = { transactionId: signResponse?.transactionId };
-        sendFailedEvent(error.toString(), error, txns, undefined, details);
-        addHandover({
-          animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
-          children: (
-            <HandoverContent
-              headingText={t('views.PAYMENT_METHODS.handover.error.heading')}
-              primaryButtonText={t(
-                'views.PAYMENT_METHODS.handover.error.primaryButtonTextKey',
-              )}
-              onPrimaryButtonClick={() => {
-                closeHandover();
-                goBackToPaymentMethods(SalePaymentTypes.CRYPTO);
-              }}
-              secondaryButtonText={t(
-                'views.PAYMENT_METHODS.handover.error.secondaryButtonTextKey',
-              )}
-              onSecondaryButtonClick={() => {
-                closeHandover();
-                sendCloseEvent(SaleWidgetViews.SALE_FAIL);
-              }}
-            />
-          ),
-        });
+        sendFailedEvent(error.toString(), error, txns, undefined, details); // checkoutPrimarySalePaymentMethods_FailEventFailed
       },
       onTxnStepExecuteAll,
     );
@@ -245,7 +221,7 @@ export function PayWithCoins() {
           const details = {
             transactionId: signResponse?.transactionId,
           };
-          sendFailedEvent(err.toString(), err, txns, undefined, details);
+          sendFailedEvent(err.toString(), err, txns, undefined, details); // checkoutPrimarySalePaymentMethods_FailEventFailed
         },
         onTxnStepExecuteNextTransaction,
       );
@@ -267,10 +243,6 @@ export function PayWithCoins() {
     currentTransactionIndex,
     signResponse,
     environment,
-    executeNextTransaction,
-    sendTransactionSuccessEvent,
-    sendFailedEvent,
-    sendCloseEvent,
   ]);
 
   useEffect(() => sendPageView(SaleWidgetViews.PAY_WITH_COINS), []); // checkoutPrimarySalePayWithCoinsViewed
