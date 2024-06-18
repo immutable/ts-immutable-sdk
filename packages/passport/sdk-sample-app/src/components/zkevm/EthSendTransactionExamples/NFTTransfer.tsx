@@ -4,7 +4,6 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { Interface } from 'ethers/lib/utils';
 import InputGroup from 'react-bootstrap/InputGroup';
 import {
   Accordion, Form, Image, Table,
@@ -14,6 +13,7 @@ import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { usePassportProvider } from '@/context/PassportProvider';
 import { NFT } from '@imtbl/generated-clients/dist/blockchain-data';
 import WorkflowButton from '@/components/WorkflowButton';
+import { utils } from 'ethers';
 
 type GroupedAsset = {
   contract_address: string;
@@ -50,7 +50,7 @@ function NFTTransfer({ disabled, handleExampleSubmitted }: RequestExampleProps) 
       'function safeTransferFrom(address from, address to, uint256 token_id)',
       'function safeTransferFromBatch((address, address[], uint256[]))',
     ];
-    return new Interface(abi);
+    return new utils.Interface(abi);
   }, []);
 
   useEffect(() => {
