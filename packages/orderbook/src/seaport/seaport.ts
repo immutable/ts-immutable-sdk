@@ -1,5 +1,5 @@
 import { Seaport as SeaportLib } from '@opensea/seaport-js';
-import {
+import type {
   ApprovalAction,
   CreateInputItem,
   CreateOrderAction,

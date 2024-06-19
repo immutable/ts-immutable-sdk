@@ -8,7 +8,8 @@
     "@opensea/seaport-js": "4.0.2",
     "axios": "^1.6.5",
     "ethers": "^5.7.2",
-    "ethers-v6": "npm:ethers@6.11.1"
+    "ethers-v6": "npm:ethers@6.11.1",
+    "merkletreejs": "^0.3.11"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.0.0",
