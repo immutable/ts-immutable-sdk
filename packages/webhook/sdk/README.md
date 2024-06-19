@@ -46,4 +46,4 @@ yarn typecheck
 
 This package consists of utilities to work with [Immutable webhooks](https://docs.immutable.com/docs/zkEVM/products/blockchain-data/webhooks)
 
-[Read more about the webook package here](../../../README.md#webhook)
+[Read more about the webhook package here](../../../README.md#webhook)
