@@ -48,7 +48,6 @@ Typechecking:
 yarn typecheck
 ```
 
-
 ### About
 
 This package consists of wrapper functions for interacting with Immutable Blockchain Data APIs.
