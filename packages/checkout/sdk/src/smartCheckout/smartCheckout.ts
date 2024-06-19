@@ -95,7 +95,12 @@ export const smartCheckout = async (
   onFundingRoute?: (fundingRoute: FundingRoute) => void,
   fundingRouteFullAmount: boolean = false,
 ): Promise<SmartCheckoutResult> => {
-  const ownerAddress = await provider.getSigner().getAddress();
+  const signer = provider.getSigner();
+  const ownerAddress = await signer.getAddress();
+
+  if (ownerAddress === undefined) {
+    throw new Error('Owner address is undefined');
+  }
 
   let aggregatedItems = itemAggregator(itemRequirements);
 

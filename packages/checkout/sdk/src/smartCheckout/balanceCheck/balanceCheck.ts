@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber, Contract } from 'ethers';
 import {
@@ -85,8 +86,16 @@ const getERC721Balances = async (
     // Convert ERC721 ownership into a balance result
     const erc721Owners = await Promise.all(erc721OwnershipPromises.values());
     const erc721OwnersPromiseIds = Array.from(erc721OwnershipPromises.keys());
+
+    debugger; // eslint-disable-line
+
     erc721Owners.forEach((erc721OwnerAddress, index) => {
       const itemRequirement = erc721s.get(erc721OwnersPromiseIds[index]);
+      console.log('🚀 ~ itemRequirement:', itemRequirement);
+      console.log('🚀 ~ ownerAddress:', ownerAddress);
+      console.log('🚀 ~ erc721OwnerAddress:', erc721OwnerAddress);
+      console.log('🚀 ~ isMatchingAddress:', isMatchingAddress(ownerAddress, erc721OwnerAddress));
+
       let itemCount = 0;
       if (itemRequirement && isMatchingAddress(ownerAddress, erc721OwnerAddress)) {
         itemCount = 1;
