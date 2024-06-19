@@ -29,7 +29,7 @@ TransactionMethod,
 ExecuteNextTransactionTextsConfig
 > = {
   [TransactionMethod.APPROVE]: {
-    before: {
+    [ExecuteTransactionStep.BEFORE]: {
       headingTextKey:
         'views.PAYMENT_METHODS.handover.approve.beforeWithCta.heading',
       ctaButtonTextKey:
@@ -38,7 +38,7 @@ ExecuteNextTransactionTextsConfig
       animationUrl: '/approve-handover.riv',
       animationName: 'Start',
     },
-    after: {
+    [ExecuteTransactionStep.AFTER]: {
       headingTextKey: 'views.PAYMENT_METHODS.handover.approve.after',
       animationUrl: '/approve-handover.riv',
       animationName: 'Handover',
