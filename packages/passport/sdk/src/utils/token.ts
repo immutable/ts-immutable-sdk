@@ -1,8 +1,8 @@
-import { IdTokenPayload } from '../types';
 import jwt_decode from 'jwt-decode';
 import {
   User as OidcUser,
 } from 'oidc-client-ts';
+import { IdTokenPayload } from '../types';
 
 export function isIdTokenExpired(idToken: string | undefined): boolean {
   if (!idToken) {

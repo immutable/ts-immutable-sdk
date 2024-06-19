@@ -1,9 +1,9 @@
 import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { signRaw } from '@imtbl/toolkit';
-import { getEip155ChainId } from '../walletHelpers';
 import { Signer } from '@ethersproject/abstract-signer';
 import { Flow } from '@imtbl/metrics';
+import { getEip155ChainId } from '../walletHelpers';
 import AuthManager from '../../authManager';
 import { JsonRpcError, RpcErrorCode } from '../JsonRpcError';
 

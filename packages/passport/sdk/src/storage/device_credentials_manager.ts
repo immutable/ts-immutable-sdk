@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
-import { DeviceTokenResponse, TokenPayload, PKCEData } from '../types';
 import jwt_decode from 'jwt-decode';
+import { DeviceTokenResponse, TokenPayload, PKCEData } from '../types';
 
 const KEY_PKCE_STATE = 'pkce_state';
 const KEY_PKCE_VERIFIER = 'pkce_verifier';
