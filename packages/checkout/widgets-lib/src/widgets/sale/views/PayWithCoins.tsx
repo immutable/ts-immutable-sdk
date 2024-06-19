@@ -9,11 +9,25 @@ import { isPassportProvider } from 'lib/provider';
 import { HandoverContent } from 'components/Handover/HandoverContent';
 
 import { useSaleContext } from '../context/SaleContextProvider';
-import { SaleErrorTypes } from '../types';
+import { ExecuteTransactionStep, SaleErrorTypes } from '../types';
 import { useSaleEvent } from '../hooks/useSaleEvents';
 import { TransactionMethod, useHandoverSteps } from '../hooks/useHandoverSteps';
 
-const executeNextTransactionTexts = {
+interface StepConfig {
+  headingTextKey: string;
+  animationUrl: string;
+  animationName: string;
+  ctaButtonTextKey?: string;
+}
+
+type ExecuteNextTransactionTextsConfig = {
+  [key in ExecuteTransactionStep]: StepConfig;
+};
+
+const executeNextTransactionTexts: Record<
+TransactionMethod,
+ExecuteNextTransactionTextsConfig
+> = {
   [TransactionMethod.APPROVE]: {
     before: {
       headingTextKey:

@@ -159,7 +159,6 @@ export function SaleErrorView({
     },
     [SaleErrorTypes.WALLET_REJECTED]: {
       onActionClick: () => {
-        initialHandoverDone.current = false;
         if (isPassportProvider(provider)) {
           retryLastTransaction();
         } else {
@@ -229,7 +228,6 @@ export function SaleErrorView({
         if (handlers?.onSecondaryActionClick) {
           handlers.onSecondaryActionClick();
         }
-        initialHandoverDone.current = false;
       },
     };
 
@@ -239,10 +237,8 @@ export function SaleErrorView({
       );
       props.onPrimaryButtonClick = () => {
         handlers.onActionClick?.();
-        initialHandoverDone.current = false;
       };
     }
-
     return props;
   };
 
