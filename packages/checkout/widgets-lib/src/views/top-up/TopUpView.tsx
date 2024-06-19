@@ -19,6 +19,7 @@ import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { Web3Provider } from '@ethersproject/providers';
 import { useTranslation } from 'react-i18next';
 import { $Dictionary } from 'i18next/typescript/helpers';
+import { useMount } from 'hooks/useMount';
 import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
 import {
@@ -111,12 +112,12 @@ export function TopUpView({
 
   const { page, track } = useAnalytics();
 
-  useEffect(() => {
+  useMount(() => {
     page({
       userJourney,
       screen: 'TopUp',
     });
-  }, []);
+  });
 
   useEffect(() => {
     if (!cryptoFiatDispatch) return;
