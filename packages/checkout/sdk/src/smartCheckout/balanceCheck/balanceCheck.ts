@@ -91,10 +91,10 @@ const getERC721Balances = async (
 
     erc721Owners.forEach((erc721OwnerAddress, index) => {
       const itemRequirement = erc721s.get(erc721OwnersPromiseIds[index]);
-      console.log('🚀 ~ itemRequirement:', itemRequirement);
-      console.log('🚀 ~ ownerAddress:', ownerAddress);
-      console.log('🚀 ~ erc721OwnerAddress:', erc721OwnerAddress);
-      console.log('🚀 ~ isMatchingAddress:', isMatchingAddress(ownerAddress, erc721OwnerAddress));
+      console.info('🚀 ~ itemRequirement:', itemRequirement);
+      console.info('🚀 ~ ownerAddress:', ownerAddress);
+      console.info('🚀 ~ erc721OwnerAddress:', erc721OwnerAddress);
+      console.info('🚀 ~ isMatchingAddress:', isMatchingAddress(ownerAddress, erc721OwnerAddress));
 
       let itemCount = 0;
       if (itemRequirement && isMatchingAddress(ownerAddress, erc721OwnerAddress)) {
