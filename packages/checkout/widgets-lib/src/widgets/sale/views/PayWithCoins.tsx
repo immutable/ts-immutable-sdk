@@ -9,14 +9,9 @@ import { isPassportProvider } from 'lib/provider';
 import { HandoverContent } from 'components/Handover/HandoverContent';
 
 import { useSaleContext } from '../context/SaleContextProvider';
-import { ExecuteTransactionStep, SaleErrorTypes } from '../types';
+import { SaleErrorTypes } from '../types';
 import { useSaleEvent } from '../hooks/useSaleEvents';
-
-enum TransactionMethod {
-  APPROVE = 'approve(address spender,uint256 amount)',
-  // eslint-disable-next-line max-len
-  EXECUTE = 'execute(address multicallSigner, bytes32 reference, address[] targets, bytes[] data, uint256 deadline, bytes signature)',
-}
+import { TransactionMethod, useHandoverSteps } from '../hooks/useHandoverSteps';
 
 const executeNextTransactionTexts = {
   [TransactionMethod.APPROVE]: {
@@ -77,100 +72,11 @@ export function PayWithCoins() {
     goToErrorView,
   } = useSaleContext();
 
+  const { onTxnStepExecuteNextTransaction, onTxnStepExecuteAll } = useHandoverSteps(environment);
+
   const { addHandover, closeHandover } = useHandover({
     id: HandoverTarget.GLOBAL,
   });
-
-  const onTxnStepExecuteAll = useCallback(
-    (method: string, step: ExecuteTransactionStep) => {
-      const key = `${method}-${step}`;
-      switch (key) {
-        case `${TransactionMethod.APPROVE}-${ExecuteTransactionStep.BEFORE}`:
-          addHandover({
-            animationUrl: getRemoteImage(environment, '/approve-handover.riv'),
-            animationName: 'Start',
-            children: (
-              <Heading>
-                {t('views.PAYMENT_METHODS.handover.approve.before')}
-              </Heading>
-            ),
-          });
-          break;
-        case `${TransactionMethod.APPROVE}-${ExecuteTransactionStep.AFTER}`:
-          addHandover({
-            animationUrl: getRemoteImage(environment, '/approve-handover.riv'),
-            animationName: 'Processing',
-            children: (
-              <Heading>
-                {t('views.PAYMENT_METHODS.handover.approve.after')}
-              </Heading>
-            ),
-          });
-          break;
-        case `${TransactionMethod.EXECUTE}-${ExecuteTransactionStep.BEFORE}`:
-          addHandover({
-            animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
-            animationName: 'Start',
-            children: (
-              <Heading>
-                {t('views.PAYMENT_METHODS.handover.execute.before')}
-              </Heading>
-            ),
-          });
-          break;
-
-        case `${TransactionMethod.EXECUTE}-${ExecuteTransactionStep.AFTER}`:
-          addHandover({
-            duration: 2000,
-            animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
-            animationName: 'Handover',
-            children: (
-              <Heading>
-                {t('views.PAYMENT_METHODS.handover.execute.after')}
-              </Heading>
-            ),
-          });
-          break;
-
-        default:
-      }
-    },
-    [environment, addHandover, t],
-  );
-
-  const onTxnStepExecuteNextTransaction = useCallback(
-    (method: string, step: ExecuteTransactionStep) => {
-      const key = `${method}-${step}`;
-      switch (key) {
-        case `${TransactionMethod.APPROVE}-${ExecuteTransactionStep.AFTER}`:
-          addHandover({
-            animationUrl: getRemoteImage(environment, '/approve-handover.riv'),
-            animationName: 'Processing',
-            children: (
-              <Heading>
-                {t('views.PAYMENT_METHODS.handover.approve.after')}
-              </Heading>
-            ),
-          });
-          break;
-
-        case `${TransactionMethod.EXECUTE}-${ExecuteTransactionStep.AFTER}`:
-          addHandover({
-            animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
-            animationName: 'Handover',
-            children: (
-              <Heading>
-                {t('views.PAYMENT_METHODS.handover.execute.after')}
-              </Heading>
-            ),
-          });
-          break;
-
-        default:
-      }
-    },
-    [environment, addHandover, t],
-  );
 
   const executeAllTransactions = useCallback(async () => {
     executeAll(
@@ -195,18 +101,23 @@ export function PayWithCoins() {
     const ctaButtonTextBefore = t(config.before.ctaButtonTextKey) || '';
 
     const handleTransaction = () => {
-      executeNextTransaction(
-        (txn) => {
-          sendTransactionSuccessEvent(txn);
-        },
-        (err, txns) => {
-          const details = {
-            transactionId: signResponse?.transactionId,
-          };
-          sendFailedEvent(err.toString(), err, txns, undefined, details); // checkoutPrimarySalePaymentMethods_FailEventFailed
-        },
-        onTxnStepExecuteNextTransaction,
-      );
+      try {
+        executeNextTransaction(
+          (txn) => {
+            sendTransactionSuccessEvent(txn);
+          },
+          (err, txns) => {
+            const details = {
+              transactionId: signResponse?.transactionId,
+            };
+            sendFailedEvent(err.toString(), err, txns, undefined, details); // checkoutPrimarySalePaymentMethods_FailEventFailed
+          },
+          onTxnStepExecuteNextTransaction,
+        );
+      } catch (error) {
+        closeHandover(HandoverTarget.GLOBAL);
+        goToErrorView(SaleErrorTypes.SERVICE_BREAKDOWN, { error });
+      }
     };
 
     addHandover({
@@ -239,12 +150,7 @@ export function PayWithCoins() {
       processing.current = true;
 
       if (isPassportProvider(provider)) {
-        try {
-          executeUserInitiatedTransaction();
-        } catch (error) {
-          closeHandover(HandoverTarget.GLOBAL);
-          goToErrorView(SaleErrorTypes.SERVICE_BREAKDOWN, { error });
-        }
+        executeUserInitiatedTransaction();
       } else {
         executeAllTransactions();
       }
@@ -253,6 +159,7 @@ export function PayWithCoins() {
 
   useEffect(() => {
     if (!isPassportProvider(provider)) return;
+
     if (
       currentTransactionIndex < filteredTransactions.length
       && !executeResponse?.done
