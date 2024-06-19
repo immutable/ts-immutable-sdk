@@ -1,4 +1,4 @@
-import { TransactionMethods } from '@opensea/seaport-js/lib/utils/usecase';
+import type { TransactionMethods } from '@opensea/seaport-js/lib/utils/usecase';
 import { PopulatedTransaction, BigNumber } from 'ethers';
 import { TransactionBuilder } from '../types';
 

@@ -28,6 +28,8 @@ import {
 } from '../functions/fundingBalanceFees';
 import { FeesDisplay, OrderFees } from './OrderFees';
 import { useSaleContext } from '../context/SaleContextProvider';
+import { getPaymentTokenDetails } from '../utils/analytics';
+import { useMount } from '../../../hooks/useMount';
 
 type OrderReviewProps = {
   collectionName: string;
@@ -55,9 +57,13 @@ export function OrderReview({
   } = useContext(EventTargetContext);
   const { t } = useTranslation();
   const {
-    provider, items, orderQuote, disabledPaymentTypes, config: { theme, environment },
+    provider,
+    items,
+    orderQuote,
+    disabledPaymentTypes,
+    config: { theme, environment },
   } = useSaleContext();
-  const { sendSelectedPaymentToken, sendViewFeesEvent } = useSaleEvent();
+  const { sendSelectedPaymentToken, sendViewFeesEvent, sendPageView } = useSaleEvent();
 
   const [showCoinsDrawer, setShowCoinsDrawer] = useState(false);
   const [selectedCurrencyIndex, setSelectedCurrencyIndex] = useState(0);
@@ -124,6 +130,27 @@ export function OrderReview({
       ),
     });
   }, [fundingBalance, conversions, provider]);
+
+  // Trigger page loaded event
+  useMount(
+    () => {
+      const tokens = fundingBalances.map(({ fundingItem }) => getPaymentTokenDetails(fundingItem, conversions));
+      sendPageView(SaleWidgetViews.ORDER_SUMMARY, {
+        subView: OrderSummarySubViews.REVIEW_ORDER,
+        tokens,
+        items,
+        collectionName,
+      });
+      // checkoutPrimarySaleOrderSummaryViewed
+    },
+    () => Boolean(
+      items.length
+          && fundingBalances.length
+          && !loadingBalances
+          && conversions.size,
+    ),
+    [items, fundingBalances, loadingBalances, conversions],
+  );
 
   const multiple = items.length > 1;
   const withFees = !loadingBalances && fundingBalance.type === FundingStepType.SWAP;

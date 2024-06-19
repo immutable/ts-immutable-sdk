@@ -1,10 +1,10 @@
 import {
   anything, deepEqual, instance, mock, when,
 } from 'ts-mockito';
-import { TransactionMethods } from '@opensea/seaport-js/lib/utils/usecase';
+import type { TransactionMethods } from '@opensea/seaport-js/lib/utils/usecase';
 import { ContractTransaction } from 'ethers-v6';
 import { Seaport as SeaportLib } from '@opensea/seaport-js';
-import {
+import type {
   ApprovalAction,
   CreateOrderAction,
   ExchangeAction,

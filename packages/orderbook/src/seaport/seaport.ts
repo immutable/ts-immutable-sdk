@@ -1,5 +1,5 @@
 import { Seaport as SeaportLib } from '@opensea/seaport-js';
-import {
+import type {
   ApprovalAction,
   CreateInputItem,
   CreateOrderAction,
@@ -36,6 +36,7 @@ import { getBulkOrderComponentsFromMessage, getOrderComponentsFromMessage } from
 import { SeaportLibFactory } from './seaport-lib-factory';
 import { prepareTransaction } from './transaction';
 import { mapImmutableOrderToSeaportOrderComponents } from './map-to-seaport-order';
+import { determineFillableUnits } from './fillable-units';
 
 export class Seaport {
   constructor(
@@ -175,7 +176,7 @@ export class Seaport {
             parameters: orderComponents,
             signature: order.signature,
           },
-          unitsToFill,
+          unitsToFill: determineFillableUnits(order, unitsToFill),
           extraData,
           tips,
         },
@@ -244,7 +245,7 @@ export class Seaport {
           parameters: orderComponents,
           signature: o.order.signature,
         },
-        unitsToFill: o.unitsToFill,
+        unitsToFill: determineFillableUnits(o.order, o.unitsToFill),
         extraData: o.extraData,
         tips,
       };

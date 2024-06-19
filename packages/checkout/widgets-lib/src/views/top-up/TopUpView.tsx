@@ -19,6 +19,7 @@ import {
 } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { DEFAULT_TOKEN_SYMBOLS } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
+import { useMount } from '../../hooks/useMount';
 import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
 import {
@@ -111,12 +112,12 @@ export function TopUpView({
 
   const { page, track } = useAnalytics();
 
-  useEffect(() => {
+  useMount(() => {
     page({
       userJourney,
       screen: 'TopUp',
     });
-  }, []);
+  });
 
   useEffect(() => {
     if (!cryptoFiatDispatch) return;
