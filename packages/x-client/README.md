@@ -10,7 +10,7 @@ yarn install
 
 ### Quick Start Guide
 
-All commands below need to be run in the context of the `x-client` package where this README is located. Read more about context [here](../../../README.md#context).
+All commands below need to be run in the context of the `x-client` package where this README is located. Read more about context [here](../../README.md#context).
 
 Running in `dev` mode:
 
