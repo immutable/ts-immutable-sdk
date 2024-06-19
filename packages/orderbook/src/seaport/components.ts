@@ -1,4 +1,4 @@
-import { OrderComponents } from '@opensea/seaport-js/lib/types';
+import type { OrderComponents } from '@opensea/seaport-js/lib/types';
 import { BigNumber } from 'ethers';
 import { getBulkOrderTree } from './lib/bulk-orders';
 
