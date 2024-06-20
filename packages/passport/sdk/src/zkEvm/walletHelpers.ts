@@ -219,6 +219,13 @@ export const signAndPackTypedData = async (
   return packSignatures(eoaSignature, eoaAddress, relayerSignature);
 };
 
+const prefixEIP191Message = (message: string): Uint8Array => {
+  const eip191prefix = utils.toUtf8Bytes('\x19Ethereum Signed Message:\n');
+  const messageBytes = utils.toUtf8Bytes(message);
+
+  return utils.concat([eip191prefix, utils.toUtf8Bytes(String(messageBytes.length)), messageBytes]);
+};
+
 export const signERC191Message = async (
   chainId: BigNumber,
   payload: string,
@@ -226,7 +233,8 @@ export const signERC191Message = async (
   walletAddress: string,
 ): Promise<string> => {
   // Generate digest
-  const digest = utils.keccak256(utils.toUtf8Bytes(payload));
+  const prefixedPayload = utils.keccak256(prefixEIP191Message(payload));
+  const digest = utils.keccak256(utils.toUtf8Bytes(prefixedPayload));
 
   // Generate subDigest
   const subDigest = encodeMessageSubDigest(chainId, walletAddress, digest);
