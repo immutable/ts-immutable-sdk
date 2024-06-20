@@ -368,12 +368,13 @@
       "handover": {
         "initial": "Preparing Order",
         "approve": {
-          "before": "Please approve your tokens",
+          "before": "Waiting for approval in your wallet",
           "beforeWithCta": {
-            "heading": "Waiting for approval",
+            "heading": "Please approve your tokens",
             "ctaButton": "Open wallet"
           },
-          "after": "Coins ready for item purchase"
+          "pending": "Waiting for approval",
+          "after": "Tokens ready for item purchase"
         },
         "execute": {
           "before": "Waiting for confirmation in your wallet",
@@ -381,6 +382,7 @@
             "heading": "Please confirm this purchase",
             "ctaButton": "Open wallet"
           },
+          "pending": "Waiting for purchase confirmation",
           "after": "Processing purchase"
         },
         "success": "Purchase complete",

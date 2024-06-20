@@ -348,11 +348,12 @@
       "handover": {
         "initial": "准备订单中",
         "approve": {
-          "before": "请批准您的代币",
+          "before": "等待您的钱包批准",
           "beforeWithCta": {
-            "heading": "等待批准",
+            "heading": "请批准您的代币",
             "ctaButton": "打开钱包"
           },
+          "pending": "等待批准",
           "after": "代币已准备好购买物品"
         },
         "execute": {
@@ -361,6 +362,7 @@
             "heading": "请确认此次购买",
             "ctaButton": "打开钱包"
           },
+          "pending": "等待购买确认",
           "after": "处理中"
         },
         "success": "购买完成",

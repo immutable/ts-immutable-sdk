@@ -38,6 +38,11 @@ ExecuteNextTransactionTextsConfig
       animationUrl: '/approve-handover.riv',
       animationName: 'Start',
     },
+    [ExecuteTransactionStep.PENDING]: {
+      headingTextKey: 'views.PAYMENT_METHODS.handover.approve.pending',
+      animationUrl: '/approve-handover.riv',
+      animationName: 'Processing',
+    },
     [ExecuteTransactionStep.AFTER]: {
       headingTextKey: 'views.PAYMENT_METHODS.handover.approve.after',
       animationUrl: '/approve-handover.riv',
@@ -52,6 +57,11 @@ ExecuteNextTransactionTextsConfig
         'views.PAYMENT_METHODS.handover.execute.beforeWithCta.ctaButton',
       animationUrl: '/execute-handover.riv',
       animationName: 'Start',
+    },
+    [ExecuteTransactionStep.PENDING]: {
+      headingTextKey: 'views.PAYMENT_METHODS.handover.execute.pending',
+      animationUrl: '/execute-handover.riv',
+      animationName: 'Processing',
     },
     [ExecuteTransactionStep.AFTER]: {
       headingTextKey: 'views.PAYMENT_METHODS.handover.execute.after',
@@ -114,7 +124,15 @@ export function PayWithCoins() {
     const headingTextBefore = t(config.before.headingTextKey) || '';
     const ctaButtonTextBefore = t(config.before.ctaButtonTextKey) || '';
 
+    const headingTextPending = t(config.pending.headingTextKey) || '';
+
     const handleTransaction = () => {
+      addHandover({
+        animationUrl: getRemoteImage(environment, config.pending.animationUrl),
+        animationName: config.pending.animationName,
+        children: <Heading>{headingTextPending}</Heading>,
+      });
+
       try {
         executeNextTransaction(
           (txn) => {

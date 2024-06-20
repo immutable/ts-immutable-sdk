@@ -138,5 +138,6 @@ export type FundingBalanceResult = {
 
 export enum ExecuteTransactionStep {
   BEFORE = 'before',
+  PENDING = 'pending',
   AFTER = 'after',
 }
