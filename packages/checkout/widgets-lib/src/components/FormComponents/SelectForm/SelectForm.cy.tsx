@@ -25,7 +25,7 @@ describe('SelectForm', () => {
             },
           ]}
           onSelectChange={() => {}}
-          coinSelectorHeading="Select coin"
+          coinSelectorHeading="Select token"
           selectedOption="imx"
           defaultTokenImage="default-token-image"
         />
@@ -54,7 +54,7 @@ describe('SelectForm', () => {
             },
           ]}
           onSelectChange={() => {}}
-          coinSelectorHeading="Select coin"
+          coinSelectorHeading="Select token"
           defaultTokenImage="default-token-image"
         />
       </ViewContextTestComponent>,
@@ -64,7 +64,7 @@ describe('SelectForm', () => {
     cySmartGet('select-form-test-coin-selector__option-eth').should('exist');
   });
 
-  it('should show select coin when no selected option', () => {
+  it('should show select token when no selected option', () => {
     mount(
       <ViewContextTestComponent>
         <SelectForm
@@ -84,42 +84,42 @@ describe('SelectForm', () => {
             },
           ]}
           onSelectChange={() => {}}
-          coinSelectorHeading="Select coin"
+          coinSelectorHeading="Select token"
           defaultTokenImage="default-token-image"
         />
       </ViewContextTestComponent>,
     );
-    cySmartGet('select-form-test-select__target__label').should('have.text', 'Select coin');
+    cySmartGet('select-form-test-select__target__label').should('have.text', 'Select token');
   });
 
-  it('should show select coin when options is empty', () => {
+  it('should show select token when options is empty', () => {
     mount(
       <ViewContextTestComponent>
         <SelectForm
           testId="select-form-test"
           options={[]}
           onSelectChange={() => {}}
-          coinSelectorHeading="Select coin"
+          coinSelectorHeading="Select token"
           defaultTokenImage="default-token-image"
         />
       </ViewContextTestComponent>,
     );
-    cySmartGet('select-form-test-select__target__label').should('have.text', 'Select coin');
+    cySmartGet('select-form-test-select__target__label').should('have.text', 'Select token');
   });
 
-  it('should show select coin when selected option not in options list', () => {
+  it('should show Select token when selected option not in options list', () => {
     mount(
       <ViewContextTestComponent>
         <SelectForm
           testId="select-form-test"
           options={[]}
           onSelectChange={() => {}}
-          coinSelectorHeading="Select coin"
+          coinSelectorHeading="Select token"
           selectedOption="imx"
           defaultTokenImage="default-token-image"
         />
       </ViewContextTestComponent>,
     );
-    cySmartGet('select-form-test-select__target__label').should('have.text', 'Select coin');
+    cySmartGet('select-form-test-select__target__label').should('have.text', 'Select token');
   });
 });

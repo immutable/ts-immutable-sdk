@@ -3,7 +3,7 @@ import { BigNumber } from 'ethers';
 import {
   FulfillmentTransaction, GasAmount, GasTokenType, ItemRequirement, ItemType, TransactionOrGasType,
 } from '../../types';
-import { InsufficientERC20, InsufficientERC721 } from '../allowance/types';
+import { InsufficientERC1155, InsufficientERC20, InsufficientERC721 } from '../allowance/types';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import { getGasPriceInWei } from '../../gasEstimate';
 
@@ -44,7 +44,7 @@ export const getGasItemRequirement = (
 
 export const gasCalculator = async (
   provider: Web3Provider,
-  insufficientItems: (InsufficientERC20 | InsufficientERC721)[],
+  insufficientItems: (InsufficientERC20 | InsufficientERC721 | InsufficientERC1155)[],
   transactionOrGas: FulfillmentTransaction | GasAmount,
 ): Promise<ItemRequirement | null> => {
   const estimateGasPromises = [];

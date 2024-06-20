@@ -10,11 +10,18 @@ import { ConnectContext } from '../context/ConnectContext';
 import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
 
 export interface ConnectWalletProps {
+  targetWalletRdns?: string,
   targetChainId: ChainId;
   allowedChains: ChainId[];
+  blocklistWalletRdns?: string[];
 }
 
-export function ConnectWallet({ targetChainId, allowedChains }: ConnectWalletProps) {
+export function ConnectWallet({
+  targetWalletRdns,
+  targetChainId,
+  allowedChains,
+  blocklistWalletRdns,
+}: ConnectWalletProps) {
   const { t } = useTranslation();
   const {
     connectState: { sendCloseEvent },
@@ -67,7 +74,12 @@ export function ConnectWallet({ targetChainId, allowedChains }: ConnectWalletPro
         </Body>
       </Box>
       <Box sx={{ paddingX: 'base.spacing.x2' }}>
-        <WalletList targetChainId={targetChainId} allowedChains={allowedChains} />
+        <WalletList
+          targetWalletRdns={targetWalletRdns}
+          targetChainId={targetChainId}
+          allowedChains={allowedChains}
+          blocklistWalletRdns={blocklistWalletRdns}
+        />
       </Box>
     </SimpleLayout>
   );

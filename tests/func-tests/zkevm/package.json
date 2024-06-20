@@ -9,7 +9,7 @@
     "jest-cucumber": "^3.0.1",
     "pinst": "^3.0.0",
     "ts-jest": "^29.1.1",
-    "ts-node": "^10.9.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.3.2"
   },
   "scripts": {
@@ -21,7 +21,7 @@
     "postpack": "pinst --enable"
   },
   "dependencies": {
-    "@imtbl/contracts": "^2.1.1",
+    "@imtbl/contracts": "2.2.6",
     "@imtbl/sdk": "file:../../../sdk",
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.0",
     "@nomicfoundation/hardhat-toolbox": "^2.0.2",

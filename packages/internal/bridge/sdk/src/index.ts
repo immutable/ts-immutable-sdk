@@ -25,7 +25,6 @@ export type {
   WithdrawERC20FeeRequest,
   FinaliseFeeRequest,
   BridgeFeeResponse,
-  CalculateBridgeFeeResponse,
   ApproveBridgeRequest,
   ApproveBridgeResponse,
   BridgeTxRequest,

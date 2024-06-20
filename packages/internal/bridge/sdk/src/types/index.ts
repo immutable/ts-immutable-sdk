@@ -103,8 +103,8 @@ export enum BridgeFeeActions {
  */
 export enum BridgeMethodsGasLimit { // @TODO test methods on chain and put correct values here
   DEPOSIT_SOURCE = 150000,
-  DEPOSIT_DESTINATION = 200000,
-  WITHDRAW_SOURCE = 150000,
+  DEPOSIT_DESTINATION = 250000,
+  WITHDRAW_SOURCE = 250000,
   WITHDRAW_DESTINATION = 250000,
   MAP_TOKEN_SOURCE = 200000,
   MAP_TOKEN_DESTINATION = 200000,
@@ -133,13 +133,13 @@ export type BridgeFeeRequest = DepositNativeFeeRequest
 /**
  * @typedef {Object} DepositNativeFeeRequest
  * @property {BridgeFeeActions} method - The method for which the bridge fee is being requested.
- * @property {number} gasMultiplier - How much buffer to add to the gas fee.
+ * @property {number} gasMultiplier - How much buffer to add to the gas fee, or 'auto' to use Axelar's automatic gas multiplier
  * @property {string} sourceChainId - The chain ID of the source chain.
  * @property {string} destinationChainId - The chain ID of the destination chain.
  */
 export interface DepositNativeFeeRequest {
   action: BridgeFeeActions.DEPOSIT,
-  gasMultiplier: number;
+  gasMultiplier: number | string;
   sourceChainId: string;
   destinationChainId: string;
 }
@@ -147,7 +147,7 @@ export interface DepositNativeFeeRequest {
 /**
  * @typedef {Object} DepositERC20FeeRequest
  * @property {BridgeFeeActions} method - The method for which the bridge fee is being requested.
- * @property {number} gasMultiplier - How much buffer to add to the gas fee.
+ * @property {number} gasMultiplier - How much buffer to add to the gas fee, or 'auto' to use Axelar's automatic gas multiplier
  * @property {string} sourceChainId - The chain ID of the source chain.
  * @property {string} destinationChainId - The chain ID of the destination chain.
  * @property {FungibleToken} token - The token to be deposited.
@@ -155,7 +155,7 @@ export interface DepositNativeFeeRequest {
  */
 export interface DepositERC20FeeRequest {
   action: BridgeFeeActions.DEPOSIT,
-  gasMultiplier: number;
+  gasMultiplier: number | string;
   sourceChainId: string;
   destinationChainId: string;
   token: FungibleToken;
@@ -165,13 +165,13 @@ export interface DepositERC20FeeRequest {
 /**
  * @typedef {Object} WithdrawNativeFeeRequest
  * @property {BridgeFeeActions} method - The method for which the bridge fee is being requested.
- * @property {number} gasMultiplier - How much buffer to add to the gas fee.
+ * @property {number} gasMultiplier - How much buffer to add to the gas fee, or 'auto' to use Axelar's automatic gas multiplier
  * @property {string} sourceChainId - The chain ID of the source chain.
  * @property {string} destinationChainId - The chain ID of the destination chain.
  */
 export interface WithdrawNativeFeeRequest {
   action: BridgeFeeActions.WITHDRAW,
-  gasMultiplier: number;
+  gasMultiplier: number | string;
   sourceChainId: string;
   destinationChainId: string;
 }
@@ -179,7 +179,7 @@ export interface WithdrawNativeFeeRequest {
 /**
  * @typedef {Object} WithdrawERC20FeeRequest
  * @property {BridgeFeeActions} method - The method for which the bridge fee is being requested.
- * @property {number} gasMultiplier - How much buffer to add to the gas fee.
+ * @property {number} gasMultiplier - How much buffer to add to the gas fee, or 'auto' to use Axelar's automatic gas multiplier
  * @property {string} sourceChainId - The chain ID of the source chain.
  * @property {string} destinationChainId - The chain ID of the destination chain.
  * @property {FungibleToken} token - The token to be withdrawn.
@@ -187,7 +187,7 @@ export interface WithdrawNativeFeeRequest {
  */
 export interface WithdrawERC20FeeRequest {
   action: BridgeFeeActions.WITHDRAW,
-  gasMultiplier: number;
+  gasMultiplier: number | string;
   sourceChainId: string;
   destinationChainId: string;
   token: FungibleToken;
@@ -197,7 +197,7 @@ export interface WithdrawERC20FeeRequest {
 /**
  * @typedef {Object} FinaliseFeeRequest
  * @property {BridgeFeeActions} method - The method for which the bridge fee is being requested.
- * @property {string} sourceChainId - The chain ID of the source chain.
+ * @property {string} sourceChainId - The chain ID of the chain we are finalising the withdrawal on. This is ALWAYS the root chain.
  */
 export interface FinaliseFeeRequest {
   action: BridgeFeeActions.FINALISE_WITHDRAWAL,
@@ -225,14 +225,6 @@ export interface BridgeFeeResponse {
   bridgeFee: ethers.BigNumber,
   imtblFee: ethers.BigNumber,
   totalFees: ethers.BigNumber,
-}
-
-/**
- * @typedef {Object} CalculateBridgeFeeResponse
- * @property {ethers.BigNumber} bridgeFee - Fee charged by Axelar to validate and execute the bridge message.
- */
-export interface CalculateBridgeFeeResponse {
-  bridgeFee: ethers.BigNumber;
 }
 
 /**
@@ -288,6 +280,40 @@ export interface BridgeTxRequest {
 export interface BridgeTxResponse {
   feeData: BridgeFeeResponse,
   unsignedTx: ethers.providers.TransactionRequest;
+}
+
+/**
+ * @typedef {Object} BridgeBundledTxRequest
+ * @property {Address} senderAddress - The address of the depositor.
+ * @property {Address} recipientAddress - The address of the recipient.
+ * @property {FungibleToken} token - The token to be deposited.
+ * @property {ethers.BigNumber} amount - The amount to be deposited.
+ * @property {string} sourceChainId - The chain ID of the source chain.
+ * @property {string} destinationChainId - The chain ID of the destination chain.
+*/
+export interface BridgeBundledTxRequest {
+  senderAddress: Address;
+  recipientAddress: Address;
+  token: FungibleToken;
+  amount: ethers.BigNumber;
+  sourceChainId: string;
+  destinationChainId: string;
+  gasMultiplier: number | string;
+}
+
+/**
+ * @typedef {Object} BridgeBundledTxResponse
+ * @property {BridgeFeeResponse} fees - The fees associated with the Bridge transaction.
+ * @property {string | null} contractToApprove - The contract to approve for the approval transaction, or null if no approval is required.
+ * @property {ethers.providers.TransactionRequest | null} unsignedApprovalTx - The unsigned transaction for the token approval, or null
+ * if no approval is required.
+ * @property {ethers.providers.TransactionRequest} unsignedBridgeTx - The unsigned transaction for the deposit / withdrawal.
+ */
+export interface BridgeBundledTxResponse {
+  feeData: BridgeFeeResponse,
+  contractToApprove: string | null,
+  unsignedApprovalTx: ethers.providers.TransactionRequest | null;
+  unsignedBridgeTx: ethers.providers.TransactionRequest;
 }
 
 /**
@@ -462,4 +488,15 @@ export interface TokenMappingRequest {
 export interface TokenMappingResponse {
   rootToken: FungibleToken;
   childToken: FungibleToken | null;
+}
+
+export interface DynamicGasEstimatesResponse {
+  approvalGas: number,
+  sourceChainGas: number,
+}
+
+export interface BridgeDirection {
+  action: BridgeFeeActions.DEPOSIT | BridgeFeeActions.WITHDRAW,
+  sourceChainId: string,
+  destinationChainId: string,
 }

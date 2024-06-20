@@ -56,8 +56,13 @@ export function ChangedYourMindDrawer({
           }}
         >
           <CloudImage
-            imageUrl={walletErrorRedUrl}
             sx={{ paddingTop: 'base.spacing.x4', paddingBottom: 'base.spacing.x9' }}
+            use={(
+              <img
+                src={walletErrorRedUrl}
+                alt={t('drawers.walletConnectionError.changedYourMind.heading')}
+              />
+            )}
           />
           <ButtCon
             icon="Close"

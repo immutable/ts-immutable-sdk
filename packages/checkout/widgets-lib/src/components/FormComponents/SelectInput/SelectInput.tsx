@@ -1,11 +1,13 @@
 import { Box, OptionKey } from '@biom3/react';
+import { WidgetTheme } from '@imtbl/checkout-sdk';
+import { Environment } from '@imtbl/config';
 import {
   inputStyle,
   selectInputBoxStyle,
   selectStyle,
 } from './SelectInputStyles';
 import { SelectForm } from '../SelectForm/SelectForm';
-import { TextInputForm, TextInputType } from '../TextInputForm/TextInputForm';
+import { InputMode, TextInputForm, TextInputType } from '../TextInputForm/TextInputForm';
 import { CoinSelectorOptionProps } from '../../CoinSelector/CoinSelectorOption';
 
 interface SelectInputProps {
@@ -18,6 +20,7 @@ interface SelectInputProps {
   textInputSubtext?: string;
   textInputErrorMessage?: string;
   textInputType?: TextInputType;
+  testInputMode?: InputMode;
   selectSubtext?: string;
   selectErrorMessage?: string;
   coinSelectorHeading: string;
@@ -31,6 +34,8 @@ interface SelectInputProps {
   onSelectChange: (value: OptionKey) => void;
   selectedOption?: OptionKey;
   defaultTokenImage: string;
+  environment?: Environment;
+  theme?: WidgetTheme;
 }
 
 export function SelectInput({
@@ -46,6 +51,7 @@ export function SelectInput({
   textInputTextAlign,
   textInputSubtext,
   textInputErrorMessage,
+  testInputMode,
   selectTextAlign,
   selectSubtext,
   selectErrorMessage,
@@ -56,6 +62,8 @@ export function SelectInput({
   selectedOption,
   coinSelectorHeading,
   defaultTokenImage,
+  environment,
+  theme,
 }: SelectInputProps) {
   return (
     <Box sx={selectInputBoxStyle}>
@@ -71,6 +79,8 @@ export function SelectInput({
           selectedOption={selectedOption}
           coinSelectorHeading={coinSelectorHeading}
           defaultTokenImage={defaultTokenImage}
+          environment={environment}
+          theme={theme}
         />
       </Box>
       <Box sx={inputStyle}>
@@ -88,6 +98,7 @@ export function SelectInput({
           onTextInputFocus={onTextInputFocus}
           maxButtonClick={textInputMaxButtonClick}
           disabled={textInputDisabled}
+          inputMode={testInputMode}
         />
       </Box>
     </Box>

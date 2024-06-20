@@ -3,7 +3,7 @@ import {
   Box,
   MenuItem,
 } from '@biom3/react';
-import { EIP1193Provider, EIP6963ProviderDetail } from '../../../lib/provider';
+import { EIP6963ProviderDetail } from '@imtbl/checkout-sdk';
 import { RawImage } from '../../../components/RawImage/RawImage';
 
 const maskImagePrefix = 'url(\'data:image/svg+xml;utf8,';
@@ -11,7 +11,7 @@ const svgXmlns = 'xmlns="http://www.w3.org/2000/svg"';
 
 export type BrowserWalletItemProps = {
   onClick: () => void;
-  providers?: EIP6963ProviderDetail<EIP1193Provider>[];
+  providers?: EIP6963ProviderDetail[];
 };
 
 export function BrowserWalletItem({

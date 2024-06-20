@@ -7,6 +7,7 @@ import {
 } from './types';
 import { openPopupCenter } from './popup';
 import { PassportConfiguration } from '../config';
+import Overlay from '../overlay';
 
 const CONFIRMATION_WINDOW_TITLE = 'Confirm this transaction';
 const CONFIRMATION_WINDOW_HEIGHT = 720;
@@ -18,13 +19,24 @@ export const CONFIRMATION_IFRAME_STYLE = 'display: none; position: absolute;widt
 
 type MessageHandler = (arg0: MessageEvent) => void;
 
+type MessageType = 'erc191' | 'eip712';
+
 export default class ConfirmationScreen {
   private config: PassportConfiguration;
 
   private confirmationWindow: Window | undefined;
 
+  private popupOptions: { width: number; height: number } | undefined;
+
+  private overlay: Overlay | undefined;
+
+  private overlayClosed: boolean;
+
+  private timer: NodeJS.Timeout | undefined;
+
   constructor(config: PassportConfiguration) {
     this.config = config;
+    this.overlayClosed = false;
   }
 
   private getHref(relativePath: string, queryStringParams?: { [key: string]: any }) {
@@ -57,6 +69,7 @@ export default class ConfirmationScreen {
         ) {
           return;
         }
+
         switch (data.messageType as ReceiveMessage) {
           case ReceiveMessage.CONFIRMATION_WINDOW_READY: {
             this.confirmationWindow?.postMessage({
@@ -66,22 +79,25 @@ export default class ConfirmationScreen {
             break;
           }
           case ReceiveMessage.TRANSACTION_CONFIRMED: {
+            this.closeWindow();
             resolve({ confirmed: true });
             break;
           }
+          case ReceiveMessage.TRANSACTION_REJECTED: {
+            this.closeWindow();
+            resolve({ confirmed: false });
+            break;
+          }
           case ReceiveMessage.TRANSACTION_ERROR: {
-            reject(new Error('Transaction error'));
+            this.closeWindow();
+            reject(new Error('Error during transaction confirmation'));
             break;
           }
           default:
+            this.closeWindow();
             reject(new Error('Unsupported message type'));
         }
       };
-      if (!this.confirmationWindow) {
-        resolve({ confirmed: false });
-        return;
-      }
-      window.addEventListener('message', messageHandler);
 
       let href = '';
       if (chainType === TransactionApprovalRequestChainTypeEnum.Starkex) {
@@ -91,11 +107,16 @@ export default class ConfirmationScreen {
           transactionID: transactionId, etherAddress, chainType, chainID: chainId,
         });
       }
+      window.addEventListener('message', messageHandler);
       this.showConfirmationScreen(href, messageHandler, resolve);
     });
   }
 
-  requestMessageConfirmation(messageID: string, etherAddress: string): Promise<ConfirmationResult> {
+  requestMessageConfirmation(
+    messageID: string,
+    etherAddress: string,
+    messageType?: MessageType,
+  ): Promise<ConfirmationResult> {
     return new Promise((resolve, reject) => {
       const messageHandler = ({ data, origin }: MessageEvent) => {
         if (
@@ -113,24 +134,32 @@ export default class ConfirmationScreen {
             break;
           }
           case ReceiveMessage.MESSAGE_CONFIRMED: {
+            this.closeWindow();
             resolve({ confirmed: true });
             break;
           }
           case ReceiveMessage.MESSAGE_REJECTED: {
-            reject(new Error('Message rejected'));
+            this.closeWindow();
+            resolve({ confirmed: false });
             break;
           }
-
+          case ReceiveMessage.MESSAGE_ERROR: {
+            this.closeWindow();
+            reject(new Error('Error during message confirmation'));
+            break;
+          }
           default:
+            this.closeWindow();
             reject(new Error('Unsupported message type'));
         }
       };
-      if (!this.confirmationWindow) {
-        resolve({ confirmed: false });
-        return;
-      }
+
       window.addEventListener('message', messageHandler);
-      const href = this.getHref('zkevm/message', { messageID, etherAddress });
+      const href = this.getHref('zkevm/message', {
+        messageID,
+        etherAddress,
+        ...(messageType ? { messageType } : {}),
+      });
       this.showConfirmationScreen(href, messageHandler, resolve);
     });
   }
@@ -141,54 +170,89 @@ export default class ConfirmationScreen {
       return;
     }
 
-    this.confirmationWindow = openPopupCenter({
-      url: this.getHref('loading'),
-      title: CONFIRMATION_WINDOW_TITLE,
-      width: popupOptions?.width || CONFIRMATION_WINDOW_WIDTH,
-      height: popupOptions?.height || CONFIRMATION_WINDOW_HEIGHT,
-    });
+    this.popupOptions = popupOptions;
+
+    try {
+      this.confirmationWindow = openPopupCenter({
+        url: this.getHref('loading'),
+        title: CONFIRMATION_WINDOW_TITLE,
+        width: popupOptions?.width || CONFIRMATION_WINDOW_WIDTH,
+        height: popupOptions?.height || CONFIRMATION_WINDOW_HEIGHT,
+      });
+      this.overlay = new Overlay(this.config.popupOverlayOptions);
+    } catch (e) {
+      // If an error is thrown here then the popup is blocked
+      this.overlay = new Overlay(this.config.popupOverlayOptions, true);
+    }
+
+    this.overlay.append(
+      () => {
+        try {
+          this.confirmationWindow?.close();
+          this.confirmationWindow = openPopupCenter({
+            url: this.getHref('loading'),
+            title: CONFIRMATION_WINDOW_TITLE,
+            width: this.popupOptions?.width || CONFIRMATION_WINDOW_WIDTH,
+            height: this.popupOptions?.height || CONFIRMATION_WINDOW_HEIGHT,
+          });
+        } catch { /* Empty */ }
+      },
+      () => {
+        this.overlayClosed = true;
+        this.closeWindow();
+      },
+    );
   }
 
   closeWindow() {
     this.confirmationWindow?.close();
-  }
-
-  logout(): Promise<{ logout: boolean }> {
-    return new Promise((resolve, rejects) => {
-      const iframe = document.createElement('iframe');
-      iframe.setAttribute('id', CONFIRMATION_IFRAME_ID);
-      iframe.setAttribute('src', this.getHref('logout'));
-      iframe.setAttribute('style', CONFIRMATION_IFRAME_STYLE);
-      const logoutHandler = ({ data, origin }: MessageEvent) => {
-        if (
-          origin !== this.config.passportDomain
-          || data.eventType !== PASSPORT_EVENT_TYPE
-        ) {
-          return;
-        }
-        window.removeEventListener('message', logoutHandler);
-        iframe.remove();
-
-        if (data.messageType === ReceiveMessage.LOGOUT_SUCCESS) {
-          resolve({ logout: true });
-        }
-        rejects(new Error('Unsupported logout type'));
-      };
-
-      window.addEventListener('message', logoutHandler);
-      document.body.appendChild(iframe);
-    });
+    this.overlay?.remove();
+    this.overlay = undefined;
   }
 
   showConfirmationScreen(href: string, messageHandler: MessageHandler, resolve: Function) {
-    this.confirmationWindow!.location.href = href;
+    // If popup blocked, the confirmation window will not exist
+    if (this.confirmationWindow) {
+      this.confirmationWindow.location.href = href;
+    }
+
+    // This indicates the user closed the overlay so the transaction should be rejected
+    if (!this.overlay) {
+      this.overlayClosed = false;
+      resolve({ confirmed: false });
+      return;
+    }
+
     // https://stackoverflow.com/questions/9388380/capture-the-close-event-of-popup-window-in-javascript/48240128#48240128
-    const timer = setInterval(() => {
-      if (this.confirmationWindow?.closed) {
-        clearInterval(timer);
+    const timerCallback = () => {
+      if (this.confirmationWindow?.closed || this.overlayClosed) {
+        clearInterval(this.timer);
         window.removeEventListener('message', messageHandler);
         resolve({ confirmed: false });
+        this.overlayClosed = false;
+        this.confirmationWindow = undefined;
       }
-    }, CONFIRMATION_WINDOW_CLOSED_POLLING_DURATION);
+    };
+    this.timer = setInterval(
+      timerCallback,
+      CONFIRMATION_WINDOW_CLOSED_POLLING_DURATION,
+    );
+    this.overlay.update(() => this.recreateConfirmationWindow(href, timerCallback));
+  }
+
+  private recreateConfirmationWindow(href: string, timerCallback: () => void) {
+    try {
+      // Clears and recreates the timer to ensure when the confirmation window
+      // is closed and recreated the transaction is not rejected.
+      clearInterval(this.timer);
+      this.confirmationWindow?.close();
+      this.confirmationWindow = openPopupCenter({
+        url: href,
+        title: CONFIRMATION_WINDOW_TITLE,
+        width: this.popupOptions?.width || CONFIRMATION_WINDOW_WIDTH,
+        height: this.popupOptions?.height || CONFIRMATION_WINDOW_HEIGHT,
+      });
+      this.timer = setInterval(timerCallback, CONFIRMATION_WINDOW_CLOSED_POLLING_DURATION);
+    } catch { /* Empty */ }
   }
 }

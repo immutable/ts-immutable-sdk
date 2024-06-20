@@ -2,6 +2,7 @@ import { StaticJsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { Signer } from '@ethersproject/abstract-signer';
 import { utils } from 'ethers';
+import { identify, trackFlow } from '@imtbl/metrics';
 import {
   JsonRpcRequestCallback,
   JsonRpcRequestPayload,
@@ -27,6 +28,7 @@ import { registerZkEvmUser } from './user';
 import { sendTransaction } from './sendTransaction';
 import GuardianClient from '../guardian';
 import { signTypedDataV4 } from './signTypedDataV4';
+import { personalSign } from './personalSign';
 
 export type ZkEvmProviderInput = {
   authManager: AuthManager;
@@ -169,44 +171,121 @@ export class ZkEvmProvider implements Provider {
           return [this.#zkEvmAddress];
         }
 
-        const user = await this.#authManager.getUserOrLogin();
-        this.#initialiseEthSigner(user);
+        const flow = trackFlow('passport', 'ethRequestAccounts');
 
-        if (!isZkEvmUser(user)) {
-          const ethSigner = await this.#getSigner();
-          this.#zkEvmAddress = await registerZkEvmUser({
-            ethSigner,
-            authManager: this.#authManager,
-            multiRollupApiClients: this.#multiRollupApiClients,
-            accessToken: user.accessToken,
-            rpcProvider: this.#rpcProvider,
+        try {
+          const user = await this.#authManager.getUserOrLogin();
+          flow.addEvent('endGetUserOrLogin');
+
+          this.#initialiseEthSigner(user);
+
+          if (!isZkEvmUser(user)) {
+            flow.addEvent('startUserRegistration');
+
+            const ethSigner = await this.#getSigner();
+            flow.addEvent('ethSignerResolved');
+
+            this.#zkEvmAddress = await registerZkEvmUser({
+              ethSigner,
+              authManager: this.#authManager,
+              multiRollupApiClients: this.#multiRollupApiClients,
+              accessToken: user.accessToken,
+              rpcProvider: this.#rpcProvider,
+              flow,
+            });
+            flow.addEvent('endUserRegistration');
+          } else {
+            this.#zkEvmAddress = user.zkEvm.ethAddress;
+          }
+
+          this.#eventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [this.#zkEvmAddress]);
+          identify({
+            passportId: user.profile.sub,
           });
-        } else {
-          this.#zkEvmAddress = user.zkEvm.ethAddress;
+
+          return [this.#zkEvmAddress];
+        } catch (error) {
+          let errorMessage = 'Unknown error';
+          if (error instanceof Error) {
+            errorMessage = error.message;
+          }
+
+          flow.addEvent('error', { errorMessage });
+          throw error;
+        } finally {
+          flow.end();
         }
-
-        this.#eventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [this.#zkEvmAddress]);
-
-        return [this.#zkEvmAddress];
       }
       case 'eth_sendTransaction': {
         if (!this.#zkEvmAddress) {
           throw new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
         }
 
-        const ethSigner = await this.#getSigner();
+        const flow = trackFlow('passport', 'ethSendTransaction');
 
-        return sendTransaction({
-          params: request.params || [],
-          ethSigner,
-          guardianClient: this.#guardianClient,
-          rpcProvider: this.#rpcProvider,
-          relayerClient: this.#relayerClient,
-          zkevmAddress: this.#zkEvmAddress,
-        });
+        try {
+          return await this.#guardianClient.withConfirmationScreen({ width: 480, height: 720 })(async () => {
+            const ethSigner = await this.#getSigner();
+            flow.addEvent('endGetSigner');
+
+            return await sendTransaction({
+              params: request.params || [],
+              ethSigner,
+              guardianClient: this.#guardianClient,
+              rpcProvider: this.#rpcProvider,
+              relayerClient: this.#relayerClient,
+              zkevmAddress: this.#zkEvmAddress!,
+              flow,
+            });
+          });
+        } catch (error) {
+          let errorMessage = 'Unknown error';
+          if (error instanceof Error) {
+            errorMessage = error.message;
+          }
+
+          flow.addEvent('error', { errorMessage });
+          throw error;
+        } finally {
+          flow.end();
+        }
       }
       case 'eth_accounts': {
         return this.#zkEvmAddress ? [this.#zkEvmAddress] : [];
+      }
+      case 'personal_sign': {
+        if (!this.#zkEvmAddress) {
+          throw new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
+        }
+
+        const flow = trackFlow('passport', 'personalSign');
+
+        try {
+          return await this.#guardianClient.withConfirmationScreen({ width: 480, height: 720 })(async () => {
+            const ethSigner = await this.#getSigner();
+            flow.addEvent('endGetSigner');
+
+            return await personalSign({
+              params: request.params || [],
+              ethSigner,
+              zkEvmAddress: this.#zkEvmAddress!,
+              rpcProvider: this.#rpcProvider,
+              guardianClient: this.#guardianClient,
+              relayerClient: this.#relayerClient,
+              flow,
+            });
+          });
+        } catch (error) {
+          let errorMessage = 'Unknown error';
+          if (error instanceof Error) {
+            errorMessage = error.message;
+          }
+
+          flow.addEvent('error', { errorMessage });
+          throw error;
+        } finally {
+          flow.end();
+        }
       }
       case 'eth_signTypedData':
       case 'eth_signTypedData_v4': {
@@ -214,16 +293,34 @@ export class ZkEvmProvider implements Provider {
           throw new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
         }
 
-        const ethSigner = await this.#getSigner();
+        const flow = trackFlow('passport', 'ethSignTypedDataV4');
 
-        return signTypedDataV4({
-          method: request.method,
-          params: request.params || [],
-          ethSigner,
-          rpcProvider: this.#rpcProvider,
-          relayerClient: this.#relayerClient,
-          guardianClient: this.#guardianClient,
-        });
+        try {
+          return await this.#guardianClient.withConfirmationScreen({ width: 480, height: 720 })(async () => {
+            const ethSigner = await this.#getSigner();
+            flow.addEvent('endGetSigner');
+
+            return await signTypedDataV4({
+              method: request.method,
+              params: request.params || [],
+              ethSigner,
+              rpcProvider: this.#rpcProvider,
+              relayerClient: this.#relayerClient,
+              guardianClient: this.#guardianClient,
+              flow,
+            });
+          });
+        } catch (error) {
+          let errorMessage = 'Unknown error';
+          if (error instanceof Error) {
+            errorMessage = error.message;
+          }
+
+          flow.addEvent('error', { errorMessage });
+          throw error;
+        } finally {
+          flow.end();
+        }
       }
       case 'eth_chainId': {
         // Call detect network to fetch the chainId so to take advantage of
@@ -236,18 +333,27 @@ export class ZkEvmProvider implements Provider {
         return utils.hexlify(chainId);
       }
       // Pass through methods
-      case 'eth_gasPrice':
       case 'eth_getBalance':
       case 'eth_getCode':
-      case 'eth_getStorageAt':
-      case 'eth_estimateGas':
+      case 'eth_getTransactionCount': {
+        const [address, blockNumber] = request.params || [];
+        return this.#rpcProvider.send(request.method, [address, blockNumber || 'latest']);
+      }
+      case 'eth_getStorageAt': {
+        const [address, storageSlot, blockNumber] = request.params || [];
+        return this.#rpcProvider.send(request.method, [address, storageSlot, blockNumber || 'latest']);
+      }
       case 'eth_call':
+      case 'eth_estimateGas': {
+        const [transaction, blockNumber] = request.params || [];
+        return this.#rpcProvider.send(request.method, [transaction, blockNumber || 'latest']);
+      }
+      case 'eth_gasPrice':
       case 'eth_blockNumber':
       case 'eth_getBlockByHash':
       case 'eth_getBlockByNumber':
       case 'eth_getTransactionByHash':
-      case 'eth_getTransactionReceipt':
-      case 'eth_getTransactionCount': {
+      case 'eth_getTransactionReceipt': {
         return this.#rpcProvider.send(request.method, request.params || []);
       }
       default: {

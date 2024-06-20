@@ -13,6 +13,8 @@ import { useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
 import { ViewActions, ViewContext } from 'context/view-context/ViewContext';
+import { TokenImage } from 'components/TokenImage/TokenImage';
+import { Environment } from '@imtbl/config';
 import { actionsContainerStyles, actionsLayoutStyles, containerStyles } from './transactionItemStyles';
 import { TransactionDetails } from './TransactionDetails';
 
@@ -23,6 +25,7 @@ type TransactionItemWithdrawPendingProps = {
   amount: string,
   icon: string,
   defaultTokenImage: string,
+  environment: Environment,
 };
 
 export function TransactionItemWithdrawPending({
@@ -32,11 +35,11 @@ export function TransactionItemWithdrawPending({
   amount,
   icon,
   defaultTokenImage,
+  environment,
 }: TransactionItemWithdrawPendingProps) {
   const { viewDispatch } = useContext(ViewContext);
   const { track } = useAnalytics();
   const translation = useTranslation();
-
   const dateNowUnixMs = useMemo(() => new Date().getTime(), []);
   const withdrawalReadyDate = useMemo(
     () => (transaction.details.current_status.withdrawal_ready_at
@@ -150,7 +153,16 @@ export function TransactionItemWithdrawPending({
       >
         <Accordion.TargetLeftSlot sx={{ pr: 'base.spacing.x2' }}>
           <MenuItem size="xSmall">
-            <MenuItem.FramedImage imageUrl={icon} circularFrame defaultImageUrl={defaultTokenImage} />
+            <MenuItem.FramedImage
+              circularFrame
+              use={(
+                <TokenImage
+                  src={icon}
+                  name={label}
+                  defaultImage={defaultTokenImage}
+                />
+              )}
+            />
             <MenuItem.Label>
               {label}
             </MenuItem.Label>
@@ -176,7 +188,7 @@ export function TransactionItemWithdrawPending({
               px: 'base.spacing.x2',
             }}
           />
-          <TransactionDetails transaction={transaction} />
+          <TransactionDetails transaction={transaction} environment={environment} />
         </Accordion.ExpandedContent>
       </Accordion>
     </Box>

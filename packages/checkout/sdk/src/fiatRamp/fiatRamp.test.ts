@@ -10,14 +10,15 @@ const defaultParams = {
   apiKey: 'mock-api-key',
   network: 'immutablezkevm',
   defaultPaymentMethod: 'credit_debit_card',
-  disablePaymentMethods: 'sepa_bank_transfer,gbp_bank_transfer,pm_cash_app,pm_jwire,pm_paymaya,pm_bpi,pm_ubp,pm_grabpay,pm_shopeepay,pm_gcash,pm_pix,pm_astropay,pm_pse,inr_bank_transfer', // eslint-disable-line max-len
+  disablePaymentMethods: '',
   productsAvailed: 'buy',
   exchangeScreenTitle: 'Buy',
   themeColor: '0D0D0D',
-  defaultFiatCurrency: 'usd',
 };
 
-const defaultWidgetUrl = `${defaultURL}?${new URLSearchParams(defaultParams).toString()}`;
+const defaultWidgetUrl = `${defaultURL}?${new URLSearchParams(
+  defaultParams,
+).toString()}`;
 
 jest.mock('../config/remoteConfigFetcher');
 
@@ -42,11 +43,14 @@ describe('FiatRampService', () => {
           },
         }),
       });
-      config = new CheckoutConfiguration({
-        baseConfig: {
-          environment: Environment.SANDBOX,
+      config = new CheckoutConfiguration(
+        {
+          baseConfig: {
+            environment: Environment.SANDBOX,
+          },
         },
-      }, mockedHttpClient);
+        mockedHttpClient,
+      );
       fiatRampService = new FiatRampService(config);
 
       const result = await fiatRampService.feeEstimate();
@@ -69,11 +73,14 @@ describe('FiatRampService', () => {
           },
         }),
       });
-      config = new CheckoutConfiguration({
-        baseConfig: {
-          environment: Environment.SANDBOX,
+      config = new CheckoutConfiguration(
+        {
+          baseConfig: {
+            environment: Environment.SANDBOX,
+          },
         },
-      }, mockedHttpClient);
+        mockedHttpClient,
+      );
       fiatRampService = new FiatRampService(config);
 
       const result = await fiatRampService.feeEstimate();
@@ -94,11 +101,14 @@ describe('FiatRampService', () => {
           },
         }),
       });
-      config = new CheckoutConfiguration({
-        baseConfig: {
-          environment: Environment.SANDBOX,
+      config = new CheckoutConfiguration(
+        {
+          baseConfig: {
+            environment: Environment.SANDBOX,
+          },
         },
-      }, mockedHttpClient);
+        mockedHttpClient,
+      );
       fiatRampService = new FiatRampService(config);
     });
     it(`should return widget url with non-configurable query params when onRampProvider is Transak' +
@@ -111,7 +121,9 @@ describe('FiatRampService', () => {
       expect(result).toContain(defaultWidgetUrl);
       expect(result).toContain('&defaultCryptoCurrency=IMX');
       expect(result).not.toContain('&email=');
-      expect(result).not.toContain('&isAutoFillUserData=true&disableWalletAddressForm=true');
+      expect(result).not.toContain(
+        '&isAutoFillUserData=true&disableWalletAddressForm=true',
+      );
       expect(result).not.toContain('&defaultCryptoAmount=');
       expect(result).not.toContain('&walletAddress=');
     });
@@ -131,7 +143,7 @@ describe('FiatRampService', () => {
     });
 
     it(`should return widget url with defaultFiatAmount and defaultCryptoCurrency query params when tokenAmount and
-    tokenSymbol are no present`, async () => {
+    tokenSymbol are not present`, async () => {
       const params: FiatRampWidgetParams = {
         exchangeType: ExchangeType.ONRAMP,
         isPassport: false,
@@ -156,7 +168,6 @@ describe('FiatRampService', () => {
       expect(result).toContain(defaultWidgetUrl);
       expect(result).toContain('&defaultCryptoAmount=100');
       expect(result).toContain('&cryptoCurrencyCode=ETH');
-      expect(result).toContain('&defaultFiatAmount=');
       expect(result).not.toContain('&defaultCryptoCurrency=IMX');
     });
 

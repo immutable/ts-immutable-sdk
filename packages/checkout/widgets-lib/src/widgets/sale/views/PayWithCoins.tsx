@@ -16,7 +16,7 @@ export function PayWithCoins() {
     sendSuccessEvent,
   } = useSaleEvent();
   const {
-    execute, signResponse, executeResponse, signTokenIds, provider,
+    execute, signResponse, executeResponse, signTokenIds,
   } = useSaleContext();
   const executedTxns = executeResponse?.transactions.length || 0;
 
@@ -35,16 +35,17 @@ export function PayWithCoins() {
   }
 
   const sendTransaction = async () => {
-    const waitForTrnsactionSettlement = !('isMetaMask' in (provider?.provider as any) && provider?.provider.isMetaMask);
     execute(
       signResponse,
-      waitForTrnsactionSettlement,
       (txn) => {
-        sendTransactionSuccessEvent(txn);
+        sendTransactionSuccessEvent(txn); // not an analytics event
       },
       (error, txns) => {
-        const details = { transactionId: signResponse?.transactionId };
-        sendFailedEvent(error.toString(), error, txns, undefined, details);
+        const details = {
+          transactionId: signResponse?.transactionId,
+          errorType: error?.type,
+        };
+        sendFailedEvent(String(error?.data?.error), error, txns, undefined, details); // checkoutPrimarySalePaymentMethods_FailEventFailed
       },
     );
   };
@@ -59,12 +60,12 @@ export function PayWithCoins() {
   useEffect(() => {
     if (executeResponse?.done === true) {
       const details = { transactionId: signResponse?.transactionId };
-      sendSuccessEvent(SaleWidgetViews.SALE_SUCCESS, executeResponse?.transactions, signTokenIds, details);
-      sendCloseEvent(SaleWidgetViews.SALE_SUCCESS);
+      sendSuccessEvent(SaleWidgetViews.SALE_SUCCESS, executeResponse?.transactions, signTokenIds, details); // checkoutPrimarySaleSaleSuccess_SuccessEventSucceeded
+      sendCloseEvent(SaleWidgetViews.SALE_SUCCESS); // checkoutPrimarySaleSaleSuccess_CloseButtonPressed
     }
   }, [executeResponse]);
 
-  useEffect(() => sendPageView(SaleWidgetViews.PAY_WITH_COINS), []);
+  useEffect(() => sendPageView(SaleWidgetViews.PAY_WITH_COINS), []); // checkoutPrimarySalePayWithCoinsViewed
 
   return <LoadingView loadingText={loadingText} />;
 }

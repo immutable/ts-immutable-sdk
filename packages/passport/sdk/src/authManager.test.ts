@@ -2,6 +2,7 @@ import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { User as OidcUser, UserManager, WebStorageStateStore } from 'oidc-client-ts';
 import jwt_decode from 'jwt-decode';
 import AuthManager from './authManager';
+import Overlay from './overlay';
 import { PassportError, PassportErrorType } from './errors/passportError';
 import { PassportConfiguration } from './config';
 import { mockUser, mockUserImx, mockUserZkEvm } from './test/mocks';
@@ -9,20 +10,27 @@ import { isTokenExpired } from './utils/token';
 import { isUserZkEvm, PassportModuleConfiguration } from './types';
 
 jest.mock('jwt-decode');
-jest.mock('./utils/token');
 jest.mock('oidc-client-ts', () => ({
   ...jest.requireActual('oidc-client-ts'),
   InMemoryWebStorage: jest.fn(),
   UserManager: jest.fn(),
   WebStorageStateStore: jest.fn(),
 }));
+jest.mock('./utils/token');
+jest.mock('./overlay');
+
+const authenticationDomain = 'auth.immutable.com';
+const clientId = '11111';
+const redirectUri = 'https://test.com';
+const logoutEndpoint = '/v2/logout';
+const logoutRedirectUri = `${redirectUri}logout/callback`;
 
 const getConfig = (values?: Partial<PassportModuleConfiguration>) => new PassportConfiguration({
   baseConfig: new ImmutableConfiguration({
     environment: Environment.SANDBOX,
   }),
-  clientId: '11111',
-  redirectUri: 'https://test.com',
+  clientId,
+  redirectUri,
   scope: 'email profile',
   ...values,
 });
@@ -81,6 +89,8 @@ describe('AuthManager', () => {
   let mockSigninSilent: jest.Mock;
   let mockSignoutSilent: jest.Mock;
   let mockStoreUser: jest.Mock;
+  let mockOverlayAppend: jest.Mock;
+  let mockOverlayRemove: jest.Mock;
 
   beforeEach(() => {
     mockSigninPopup = jest.fn();
@@ -90,6 +100,8 @@ describe('AuthManager', () => {
     mockSigninSilent = jest.fn();
     mockSignoutSilent = jest.fn();
     mockStoreUser = jest.fn();
+    mockOverlayAppend = jest.fn();
+    mockOverlayRemove = jest.fn();
     (UserManager as jest.Mock).mockReturnValue({
       signinPopup: mockSigninPopup,
       signinPopupCallback: mockSigninPopupCallback,
@@ -98,6 +110,10 @@ describe('AuthManager', () => {
       getUser: mockGetUser,
       signinSilent: mockSigninSilent,
       storeUser: mockStoreUser,
+    });
+    (Overlay as jest.Mock).mockReturnValue({
+      append: mockOverlayAppend,
+      remove: mockOverlayRemove,
     });
     authManager = new AuthManager(getConfig());
   });
@@ -116,7 +132,7 @@ describe('AuthManager', () => {
           authorization_endpoint: `${config.authenticationDomain}/authorize`,
           token_endpoint: `${config.authenticationDomain}/oauth/token`,
           userinfo_endpoint: `${config.authenticationDomain}/userinfo`,
-          end_session_endpoint: `${config.authenticationDomain}/v2/logout`
+          end_session_endpoint: `${config.authenticationDomain}${logoutEndpoint}`
             + `?client_id=${config.oidcConfiguration.clientId}`,
         },
         popup_redirect_uri: config.oidcConfiguration.redirectUri,
@@ -143,15 +159,17 @@ describe('AuthManager', () => {
 
     describe('when a logoutRedirectUri is specified', () => {
       it('should set the endSessionEndpoint `returnTo` and `client_id` query string params', () => {
-        const configWithLogoutRedirectUri = getConfig({
-          logoutRedirectUri: 'https://test.com/logout/callback',
-        });
-
+        const configWithLogoutRedirectUri = getConfig({ logoutRedirectUri });
         const am = new AuthManager(configWithLogoutRedirectUri);
+
+        const uri = new URL(logoutEndpoint, `https://${authenticationDomain}`);
+        uri.searchParams.append('client_id', clientId);
+        uri.searchParams.append('returnTo', logoutRedirectUri);
+
         expect(am).toBeDefined();
         expect(UserManager).toBeCalledWith(expect.objectContaining({
           metadata: expect.objectContaining({
-            end_session_endpoint: 'https://auth.immutable.com/v2/logout?client_id=11111&returnTo=https%3A%2F%2Ftest.com%2Flogout%2Fcallback',
+            end_session_endpoint: uri.toString(),
           }),
         }));
       });
@@ -164,7 +182,6 @@ describe('AuthManager', () => {
         mockSigninPopup.mockResolvedValue(mockOidcUser);
 
         const result = await authManager.login();
-
         expect(result).toEqual(mockUser);
       });
     });
@@ -242,6 +259,80 @@ describe('AuthManager', () => {
           PassportErrorType.AUTHENTICATION_ERROR,
         ),
       );
+      expect(mockOverlayAppend).not.toHaveBeenCalled();
+    });
+
+    describe('when the popup is blocked', () => {
+      beforeEach(() => {
+        mockSigninPopup.mockRejectedValueOnce(new Error('Attempted to navigate on a disposed window'));
+      });
+
+      it('should render the blocked popup overlay', async () => {
+        const configWithPopupOverlayOptions = getConfig({
+          popupOverlayOptions: {
+            disableGenericPopupOverlay: false,
+            disableBlockedPopupOverlay: false,
+          },
+        });
+        const am = new AuthManager(configWithPopupOverlayOptions);
+
+        mockSigninPopup.mockReturnValue(mockOidcUser);
+        // Simulate `tryAgainOnClick` being called so that the `login()` promise can resolve
+        mockOverlayAppend.mockImplementation(async (tryAgainOnClick: () => Promise<void>) => {
+          await tryAgainOnClick();
+        });
+
+        const result = await am.login();
+
+        expect(result).toEqual(mockUser);
+        expect(Overlay).toHaveBeenCalledWith(configWithPopupOverlayOptions.popupOverlayOptions, true);
+        expect(mockOverlayAppend).toHaveBeenCalledTimes(1);
+      });
+
+      describe('when tryAgainOnClick is called once', () => {
+        beforeEach(() => {
+          mockOverlayAppend.mockImplementation(async (tryAgainOnClick: () => Promise<void>) => {
+            await tryAgainOnClick();
+          });
+        });
+
+        it('should return a user', async () => {
+          mockSigninPopup.mockReturnValue(mockOidcUser);
+
+          const result = await authManager.login();
+
+          expect(result).toEqual(mockUser);
+          expect(mockSigninPopup).toHaveBeenCalledTimes(2);
+          expect(mockOverlayRemove).toHaveBeenCalled();
+        });
+
+        describe('and the user closes the popup', () => {
+          it('should throw an error', async () => {
+            mockSigninPopup.mockRejectedValueOnce(new Error('Popup closed by user'));
+
+            await expect(() => authManager.login()).rejects.toThrow(
+              new Error('Popup closed by user'),
+            );
+
+            expect(mockSigninPopup).toHaveBeenCalledTimes(2);
+            expect(mockOverlayRemove).toHaveBeenCalled();
+          });
+        });
+      });
+
+      describe('when onCloseClick is called', () => {
+        it('should remove the overlay', async () => {
+          mockOverlayAppend.mockImplementation(async (_: () => Promise<void>, onCloseClick: () => void) => {
+            onCloseClick();
+          });
+
+          await expect(() => authManager.login()).rejects.toThrow(
+            new Error('Popup closed by user'),
+          );
+
+          expect(mockOverlayRemove).toHaveBeenCalled();
+        });
+      });
     });
   });
 
@@ -482,27 +573,34 @@ describe('AuthManager', () => {
   });
 
   describe('getDeviceFlowEndSessionEndpoint', () => {
-    describe('when a logoutRedirectUri is specified', () => {
-      it('should set the endSessionEndpoint `returnTo` and `client_id` query string params', () => {
-        const am = new AuthManager(getConfig({
-          logoutRedirectUri: 'https://test.com/logout/callback',
-        }));
+    describe('with a logged in user', () => {
+      describe('when a logoutRedirectUri is specified', () => {
+        it('should set the endSessionEndpoint `returnTo` and `client_id` query string params', async () => {
+          mockGetUser.mockReturnValue(mockOidcUser);
 
-        const result = am.getDeviceFlowEndSessionEndpoint();
+          const am = new AuthManager(getConfig({ logoutRedirectUri }));
+          const result = await am.getDeviceFlowEndSessionEndpoint();
+          const uri = new URL(result);
 
-        expect(result).toEqual(
-          'https://auth.immutable.com/v2/logout?client_id=11111&returnTo=https%3A%2F%2Ftest.com%2Flogout%2Fcallback',
-        );
+          expect(uri.hostname).toEqual(authenticationDomain);
+          expect(uri.pathname).toEqual(logoutEndpoint);
+          expect(uri.searchParams.get('client_id')).toEqual(clientId);
+          expect(uri.searchParams.get('returnTo')).toEqual(logoutRedirectUri);
+        });
       });
-    });
 
-    describe('when no logoutRedirectUri is specified', () => {
-      it('should return the endSessionEndpoint without a `returnTo` or `client_id` query string params', () => {
-        const am = new AuthManager(getConfig());
+      describe('when no post_logout_redirect_uri is specified', () => {
+        it('should return the endSessionEndpoint without a `returnTo` or `client_id` query string params', async () => {
+          mockGetUser.mockReturnValue(mockOidcUser);
 
-        const result = am.getDeviceFlowEndSessionEndpoint();
+          const am = new AuthManager(getConfig());
+          const result = await am.getDeviceFlowEndSessionEndpoint();
+          const uri = new URL(result);
 
-        expect(result).toEqual('https://auth.immutable.com/v2/logout');
+          expect(uri.hostname).toEqual(authenticationDomain);
+          expect(uri.pathname).toEqual(logoutEndpoint);
+          expect(uri.searchParams.get('client_id')).toEqual(clientId);
+        });
       });
     });
   });

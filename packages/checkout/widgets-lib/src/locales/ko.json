@@ -3,10 +3,16 @@
     "CONNECT_WALLET": {
       "body": {
         "heading": "지갑 연결",
-        "content": "구매, 판매, 거래 및 코인과 수집품을 저장하려면 디지털 지갑을 연결하거나 만들어야 합니다."
+        "content": "토큰과 수집품을 구매, 판매, 거래 및 보관하려면 디지털 지갑을 연결하거나 새 디지털 지갑을 만들어야 합니다. "
       },
       "walletSelection": {
         "heading": "지갑 선택"
+      },
+      "nonPassportDrawer": {
+        "heading": "비 패스포트 사용자는 가스 비용으로 IMX가 필요합니다.",
+        "body1": "자금을 Immutable zkEVM으로 브리징하기 위해 <layerswapLink>Layerswap</layerswapLink>을 사용하는 것을 권장합니다. 리퓨엘이 켜져 있으면 IMX를 받을 수 있습니다.",
+        "body2": "또는 가스 비용이 없는 Immutable Passport로 쉽게 결제하고 플레이하세요.",
+        "buttonText": "어쨌든 진행"
       }
     },
     "CONNECT_SUCCESS": {
@@ -81,13 +87,13 @@
         "heading": "네트워크"
       },
       "totalTokenBalance": {
-        "heading": "코인",
+        "heading": "토큰",
         "totalHeading": "가치"
       },
       "tokenBalancesList": {
         "noTokensFound": "토큰을 찾을 수 없습니다"
       },
-      "addCoins": "동전 추가"
+      "addCoins": "토큰 추가"
     },
     "SETTINGS": {
       "header": {
@@ -95,23 +101,30 @@
       },
       "disconnectButton": {
         "label": "지갑 연결 해제"
+      },
+      "walletAddress": {
+        "label": "지갑 주소"
+      },
+      "transferAssetsL1Warning": {
+        "heading": "이더리움에 있는 패스포트로 자산을 보내지 마세요",
+        "body": "패스포트는 아직 이더리움에 존재하지 않으므로 자금이 손실됩니다. Immutable zkEVM 또는 Immutable X에서만 전송하세요."
       }
     },
     "COIN_INFO": {
       "metamask": {
-        "heading": "코인과 수집품은 네트워크에 기반을 두고 있습니다",
-        "body": "네트워크를 전환하여 코인을 추가하거나 다른 네트워크로 옮길 수 있습니다"
+        "heading": "토큰과 수집품은 네트워크에 고유합니다",
+        "body": "네트워크를 변경하여 토큰을 추가하거나 한 네트워크에서 다른 네트워크로 이동할 수 있습니다"
       },
       "passport": {
-        "heading": "코인과 수집품은 네트워크에 기반을 두고 있습니다",
-        "body1": "이 네트워크는 Immutable zkEVM입니다. Passport에 다른 코인이 있고 여기서 볼 수 없다면 다른 네트워크에 있을 수 있습니다.",
+        "heading": "토큰과 수집품은 네트워크에 고유합니다",
+        "body1": "이 네트워크는 Immutable zkEVM이라고 합니다. 패스포트에 다른 토큰이 있어 여기에 표시되지 않는 경우, 다른 네트워크에 있을 수 있습니다.",
         "body2": " 자세한 정보를 위해 우리의 FAQ를 방문하세요.",
         "linkText": "FAQ 방문하기"
       }
     },
     "SWAP": {
       "header": {
-        "title": "코인 교환"
+        "title": "토큰 교환"
       },
       "content": {
         "title": "무엇을 교환하고 싶으신가요?",
@@ -137,8 +150,8 @@
       "validation": {
         "noAmountInputted": "금액을 입력해 주세요",
         "insufficientBalance": "잔고가 부족합니다",
-        "noFromTokenSelected": "교환할 코인을 선택하세요",
-        "noToTokenSelected": "받을 코인을 선택하세요"
+        "noFromTokenSelected": "교환할 토큰을 선택하세요",
+        "noToTokenSelected": "받을 토큰을 선택하세요"
       },
       "success": {
         "text": "성공",
@@ -191,7 +204,7 @@
     },
     "ONRAMP": {
       "header": {
-        "title": "코인 추가"
+        "title": "토큰 추가"
       },
       "initialLoadingText": "Transak으로 이동하는 중",
       "IN_PROGRESS_LOADING": {
@@ -207,7 +220,7 @@
         }
       },
       "SUCCESS": {
-        "text": "코인이 도착하는 중입니다",
+        "text": "토큰이 전달 중입니다",
         "actionText": "완료"
       },
       "FAIL": {
@@ -217,46 +230,82 @@
     },
     "TOP_UP_VIEW": {
       "header": {
-        "title": "코인을 어떻게 추가하시겠습니까?"
+        "title": "토큰을 어떻게 추가하시겠습니까?"
       },
       "topUpOptions": {
         "onramp": {
-          "heading": "구매",
-          "caption": "카드, 구글 페이 또는 애플 페이 가능.",
+          "heading": "토큰 구매"
+        },
+        "debit": {
+          "heading": "직불 카드로 구매",
+          "caption": "토큰을 구매하는 권장 방법",
+          "subcaption": "수수료",
+          "disabledCaption": ""
+        },
+        "credit": {
+          "heading": "신용 카드로 구매",
+          "caption": "실패 및 요금 때문에 권장하지 않습니다",
           "subcaption": "수수료",
           "disabledCaption": ""
         },
         "swap": {
-          "heading": "스왑",
-          "caption": "내 잔액에 있는 코인으로.",
+          "heading": "이 네트워크에서 토큰 교환",
+          "caption": "불변 zkEVM 전용",
           "subcaption": "수수료",
           "disabledCaption": "귀하의 지역에서 사용할 수 없음"
         },
         "bridge": {
-          "heading": "이동",
-          "caption": "다른 지갑이나 네트워크에 있는 내 코인.",
+          "heading": "다른 지갑에서 토큰을 전송",
+          "caption": "불변 zkEVM 전용",
+          "subcaption": "수수료",
+          "disabledCaption": ""
+        },
+        "advanced": {
+          "heading": "다른 네트워크에서 토큰 브리지",
+          "caption": "여러 네트워크 및 CEX 옵션 사용 가능",
           "subcaption": "수수료",
           "disabledCaption": ""
         }
       }
     },
-    "FUND_WITH_SMART_CHECKOUT": {
+    "ORDER_SUMMARY": {
       "loading": {
-        "checkingBalances": "숫자를 계산하는 중"
+        "balances": "숫자 계산 중"
       },
       "currency": {
-        "usdEstimate": "≈ USD $",
-        "fees": "수수료"
+        "fiat": "≈ USD ${{amount}}",
+        "price": "{{symbol}} {{amount}}"
       },
-      "fundingRouteDrawer": {
-        "header": "사용 가능한 잔액"
+      "orderItem": {
+        "quantity": "수량 x{{qty}}"
       },
-      "fundingRouteSelect": {
-        "heading": "Pay with your",
-        "noRoutesAvailable": "코인 잔액이 부족합니다. 대신 카드로 진행하세요.",
+      "coinsDrawer": {
+        "header": "결제 수단...",
+        "caption1": "토큰",
+        "caption2": "잔액",
+        "divider": "더 많은 옵션",
+        "stepType": {
+          "SWAP": "{{symbol}} ≈ {{amount}} 교환",
+          "ONRAMP": "{{symbol}} ≈ {{amount}} 구매",
+          "BRIDGE": "{{symbol}} ≈ {{amount}} 이동",
+          "SUFFICIENT": "{{symbol}} {{amount}} 지불",
+          "delta": {
+            "SWAP": "{{symbol}} ≈ {{amount}} 교환",
+            "ONRAMP": "{{symbol}} ≈ {{amount}} 구매",
+            "BRIDGE": "{{symbol}} ≈ {{amount}} 이동",
+            "SUFFICIENT": "{{symbol}} {{amount}} 지불"
+          }
+        },
+        "fee": "교환 수수료 ~ {{symbol}} {{amount}}"
+      },
+      "orderReview": {
+        "heading": "결제 요약",
         "continue": "계속",
-        "payWithCardInstead": "괜찮습니다, 카드로 결제할게요",
-        "payWithCard": "카드로 결제하기"
+        "payWith": {
+          "SWAP": "{{symbol}}로 스왑 및 결제하기",
+          "SUFFICIENT": "{{symbol}}로 결제"
+        },
+        "balance": "잔액 {{amount}}"
       }
     },
     "PAYMENT_METHODS": {
@@ -265,23 +314,23 @@
       },
       "options": {
         "crypto": {
-          "heading": "코인",
-          "caption": "잔액에 코인이 있으면 가장 빠른 결제 방법입니다.",
+          "heading": "토큰",
+          "caption": "지갑에 있는 토큰으로 지불하거나 카드로 토큰을 구매하세요",
           "disabledCaption": "현재 이 구매에는 사용할 수 없습니다."
         },
         "debit": {
           "heading": "직불카드",
           "caption": "카드로 결제하는 권장 방법입니다.",
-          "disabledCaption": "현재 대규모 구매를 위해 이 결제 방법을 개선하는 중입니다."
+          "disabledCaption": "선택한 항목을 사용할 수 없습니다. 토큰 추가를 권장합니다. "
         },
         "credit": {
           "heading": "신용카드",
           "caption": "은행에서 거래를 차단할 수 있으므로 권장하지 않습니다.",
-          "disabledCaption": "현재 대규모 구매를 위해 이 결제 방법을 개선하는 중입니다."
+          "disabledCaption": "선택한 항목을 사용할 수 없습니다. 토큰 추가를 권장합니다. "
         }
       },
       "topUp": {
-        "heading": "일부 코인을 추가해야합니다",
+        "heading": "토큰을 추가해야 합니다",
         "subheading": {
           "both": "이 구매 및 가스를 포함하여 이를 커버하기 위해 {{erc20.value}} {{erc20.symbol}} 및 {{native.value}} {{native.symbol}}를 추가하십시오.",
           "erc20": "다음 옵션 중 하나를 통해 균형에 {{erc20.value}} {{erc20.symbol}}를 추가하십시오.",
@@ -295,12 +344,17 @@
         "processing1": "결제 초기화 중",
         "processing2": "자산 보호 중",
         "processing3": "결제 완료 중"
+      },
+      "creditCardWarningDrawer": {
+        "heading": "신용카드보다는 체크카드 사용을 권장합니다",
+        "body": "이런 종류의 구매에 신용카드를 사용할 경우 대부분의 은행에서 현금 서비스 수수료를 부과하거나 거래를 전체적으로 차단할 수 있습니다.",
+        "ctaButton": "그래도 시도하기"
       }
     },
     "PAY_WITH_COINS": {
       "header": {
         "heading": "코인으로 결제",
-        "caption": "지갑에 있는 코인 잔액을 이용하여"
+        "caption": "지갑 안의 토큰 잔액을 사용하기"
       },
       "button": {
         "buyNow": "지금 구매"
@@ -354,12 +408,7 @@
           "primaryAction": "이 문제를 해결했습니다. 다시 시도하세요.",
           "secondaryAction": "취소"
         },
-        "SMART_CHECKOUT_ERROR": {
-          "description": "지갑 잔액을 확인할 수 없습니다. 다시 시도하세요.",
-          "primaryAction": "다시 시도",
-          "secondaryAction": "취소"
-        },
-        "SMART_CHECKOUT_EXECUTE_ERROR": {
+        "FUNDING_ROUTE_EXECUTE_ERROR": {
           "description": "죄송합니다, 자금 이동 중 문제가 발생했습니다. 다시 시도하세요.",
           "primaryAction": "다시 시도",
           "secondaryAction": "취소"
@@ -391,7 +440,8 @@
       "toFormInput": {
         "heading": "To",
         "selectDefaultText": "지갑과 네트워크를 선택하세요",
-        "walletSelectorHeading": "지갑으로"
+        "walletSelectorHeading": "지갑으로",
+        "networkSelectorHeading": "To network"
       },
       "submitButton": {
         "text": "다음"
@@ -399,11 +449,11 @@
     },
     "BRIDGE_FORM": {
       "header": {
-        "title": "코인 이동"
+        "title": "토큰 이동"
       },
       "fees": {
         "title": "가스 요금",
-        "fiatPricePrefix": "~ USD $"
+        "fiatPricePrefix": "≈ USD $"
       },
       "content": {
         "title": "얼마나 많이 이동하시겠습니까?",
@@ -420,7 +470,7 @@
       "validation": {
         "noAmountInputted": "금액을 입력해 주세요",
         "insufficientBalance": "잔고가 부족합니다",
-        "noTokenSelected": "이동할 코인을 선택하세요"
+        "noTokenSelected": "이동할 토큰을 선택하세요"
       }
     },
     "BRIDGE_REVIEW": {
@@ -439,7 +489,7 @@
       "submitButton": {
         "buttonText": "이동 확인"
       },
-      "fiatPricePrefix": "~ USD $"
+      "fiatPricePrefix": "≈ USD $"
     },
     "BRIDGE_FAILURE": {
       "bridgeFailureText": {
@@ -463,7 +513,8 @@
     "IN_PROGRESS": {
       "heading": "이동 중",
       "body1": "자금이 송금되었습니다. 수령까지 남은 시간은 20분 미만입니다. 로켓 아이콘을 클릭하여 진행 상황을 확인할 수 있습니다.",
-      "body2": "이 창을 닫아도 됩니다."
+      "body2": "이 창을 닫아도 됩니다.",
+      "transferHeading": "Funds transferred"
     },
     "TRANSACTIONS": {
       "layoutHeading": "진행 중",
@@ -472,7 +523,7 @@
         "withdrawalPending": {
           "actionButtonText": "계속",
           "withdrawalDelayText": "이 이동은 일시 중지되었습니다. 돌아가세요",
-          "withdrawalReadyText": "코인을 받으려면 조치가 필요합니다",
+          "withdrawalReadyText": "토큰을 받으려면 조치가 필요합니다",
           "caption": "일시중지됨"
         },
         "inProgress": {
@@ -514,7 +565,7 @@
     },
     "CLAIM_WITHDRAWAL": {
       "content": {
-        "heading": "코인을 받으려면 프롬프트에 따라 진행하십시오",
+        "heading": "프롬프트를 따라 토큰을 받으세요",
         "body": "출금을 청구하려면 소액의 가스 수수료를 지불해야 합니다.",
         "body2": "목적지 지갑 주소: "
       },
@@ -566,8 +617,22 @@
       "heading": "수수료 내역",
       "total": "수수료 총액",
       "fees": {
-        "gas": {
+        "fiatPricePrefix": "USD $",
+        "gasFeeMove": {
           "label": "가스 수수료"
+        },
+        "approvalFee": {
+          "label": "승인 수수료"
+        },
+        "swapGasFee": {
+          "label": "가스 수수료"
+        },
+        "swapSecondaryFee": {
+          "label": "{{amount}} 스왑 수수료 (견적에 포함)"
+        },
+        "serviceFee": {
+          "depositLabel": "zkEVM 가스 수수료",
+          "withdrawLabel": "Ethereum 가스 수수료"
         }
       }
     },
@@ -587,7 +652,7 @@
       "option": {
         "fiatPricePrefix": "대략 USD $"
       },
-      "noCoins": "지갑에 선택 가능한 코인이 없습니다."
+      "noCoins": "지갑에 선택할 수 있는 토큰이 없습니다"
     },
     "notEnoughGas": {
       "content": {
@@ -596,7 +661,7 @@
       },
       "buttons": {
         "adjustAmount": "금액 조정",
-        "addMoreImx": "IMX 코인 추가",
+        "addMoreImx": "IMX 토큰 추가 ",
         "copyAddress": "지갑 주소 복사",
         "cancel": "취소"
       }
@@ -604,17 +669,17 @@
     "notEnoughImx": {
       "content": {
         "noImx": {
-          "heading": "IMX 코인이 필요합니다",
-          "body": "교환 수수료는 IMX 코인으로 지불되므로 교환 전에 이를 추가해야 합니다"
+          "heading": "스왑하려면 IMX 토큰이 필요합니다",
+          "body": "스왑 수수료는 IMX 토큰으로 지불되므로 스왑을 하기 전에 IMX 토큰을 추가해야 합니다"
         },
         "insufficientImx": {
-          "heading": "더 많은 IMX 코인이 필요합니다",
-          "body": "지정된 금액의 수수료를 충당하기 위해 더 많은 IMX 코인을 추가해야 합니다"
+          "heading": "더 많은 IMX 토큰이 필요합니다",
+          "body": "지정된 금액에 대한 수수료를 충당하기 위해 더 많은 IMX 토큰을 추가해야 합니다"
         }
       },
       "buttons": {
         "adjustAmount": "금액 조정",
-        "addMoreImx": "IMX 코인 추가",
+        "addMoreImx": "IMX 토큰 추가 ",
         "cancel": "취소"
       }
     },
@@ -631,8 +696,8 @@
       }
     },
     "unableToSwap": {
-      "heading": "해당 코인 교환 불가",
-      "body": "지금은 이 코인 페어를 교환할 수 없습니다. 다른 선택을 시도해보세요.",
+      "heading": "이 토큰을 교환할 수 없습니다",
+      "body": "이 토큰 페어링은 현재 교환할 수 없습니다. 다른 선택을 시도해 보세요",
       "buttons": {
         "cancel": "취소"
       }

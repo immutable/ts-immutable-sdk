@@ -19,6 +19,7 @@ import { isValidAddress, isValidAmount, isValidWalletProvider } from 'lib/valida
 import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
 import { LoadingView } from 'views/loading/LoadingView';
+import { HandoverProvider } from 'context/handover-context/HandoverProvider';
 import { topUpBridgeOption, topUpOnRampOption } from './helpers';
 import { sendSwapWidgetCloseEvent } from './SwapWidgetEvents';
 import i18n from '../../i18n';
@@ -114,10 +115,10 @@ export class Swap extends Base<WidgetType.SWAP> {
       <React.StrictMode>
         <CustomAnalyticsProvider checkout={this.checkout}>
           <ThemeProvider id="swap-container" config={this.strongConfig()}>
-            <GeoblockLoader
-              checkout={this.checkout}
-              loadingView={<LoadingView loadingText={t('views.LOADING_VIEW.text')} />}
-              widget={
+            <HandoverProvider>
+              <GeoblockLoader
+                checkout={this.checkout}
+                widget={
                 (
                   <ConnectLoader
                     params={connectLoaderParams}
@@ -135,7 +136,7 @@ export class Swap extends Base<WidgetType.SWAP> {
                   </ConnectLoader>
                 )
               }
-              serviceUnavailableView={
+                serviceUnavailableView={
                 (
                   <ServiceUnavailableErrorView
                     service={ServiceType.SWAP}
@@ -163,7 +164,8 @@ export class Swap extends Base<WidgetType.SWAP> {
                   />
                 )
               }
-            />
+              />
+            </HandoverProvider>
           </ThemeProvider>
         </CustomAnalyticsProvider>
       </React.StrictMode>,

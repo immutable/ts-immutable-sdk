@@ -8,6 +8,9 @@ import ConnectWidget from './pages/ConnectWidget';
 import { onLightBase } from '@biom3/design-tokens';
 import { BiomeCombinedProviders, Box } from '@biom3/react';
 import SmartCheckout from './pages/SmartCheckout';
+import {
+  PassportLoginCallback
+} from "./components/PassportLoginCallback";
 
 const router = createBrowserRouter([
   {
@@ -21,6 +24,10 @@ const router = createBrowserRouter([
   {
     path: '/smart-checkout',
     element: <SmartCheckout />,
+  },
+  {
+    path: '/login/callback',
+    element: <PassportLoginCallback />
   },
 ]);
 

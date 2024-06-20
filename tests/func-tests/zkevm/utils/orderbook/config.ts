@@ -1,7 +1,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import dotenv from 'dotenv';
 import { orderbook } from '@imtbl/sdk';
-import { getLocalhostProvider } from './provider';
 
 dotenv.config();
 
@@ -21,6 +20,6 @@ export function getConfigFromEnv(): orderbook.OrderbookModuleConfiguration {
     chainName: process.env.ZKEVM_CHAIN_NAME,
     seaportContractAddress: process.env.SEAPORT_CONTRACT_ADDRESS,
     zoneContractAddress: process.env.ZONE_CONTRACT_ADDRESS,
-    provider: getLocalhostProvider(),
+    jsonRpcProviderUrl: process.env.ZKEVM_RPC_ENDPOINT,
   };
 }

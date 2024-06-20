@@ -1,0 +1,1 @@
+The contents of this folder is copied directly from https://github.com/ProjectOpenSea/seaport-js/tree/main/src/utils/eip712 to work around an ESM module issue with the SDK. Once resolved this code can be removed and the import of get `getBulkOrderTree` can be reinstated.

@@ -1,6 +1,9 @@
-import { Box } from '@biom3/react';
+import { Box, MenuItemSize } from '@biom3/react';
 
 import { SalePaymentTypes } from '@imtbl/checkout-sdk';
+import { listItemVariants, listVariants } from 'lib/animation/listAnimation';
+import { motion } from 'framer-motion';
+import { useMemo } from 'react';
 import { PaymentOption } from './PaymentOption';
 
 const defaultPaymentOptions: SalePaymentTypes[] = [
@@ -12,10 +15,27 @@ const defaultPaymentOptions: SalePaymentTypes[] = [
 export interface PaymentOptionsProps {
   onClick: (type: SalePaymentTypes) => void;
   disabledOptions?: SalePaymentTypes[];
+  paymentOptions?: SalePaymentTypes[];
+  captions?: Partial<Record<SalePaymentTypes, string>>;
+  size?: MenuItemSize;
+  hideDisabledOptions?: boolean;
 }
 
 export function PaymentOptions(props: PaymentOptionsProps) {
-  const { disabledOptions = [], onClick } = props;
+  const {
+    disabledOptions = [],
+    paymentOptions,
+    onClick,
+    captions,
+    size,
+    hideDisabledOptions,
+  } = props;
+  const options = useMemo(
+    () => (paymentOptions || defaultPaymentOptions).filter(
+      (option) => !hideDisabledOptions || !disabledOptions.includes(option),
+    ),
+    [paymentOptions, disabledOptions, hideDisabledOptions],
+  );
 
   return (
     <Box
@@ -27,13 +47,19 @@ export function PaymentOptions(props: PaymentOptionsProps) {
         justifyContent: 'center',
         alignItems: 'flex-start',
       }}
+      rc={
+        <motion.div variants={listVariants} initial="hidden" animate="show" />
+      }
     >
-      {defaultPaymentOptions.map((type) => (
+      {options.map((type, idx: number) => (
         <PaymentOption
-          disabled={disabledOptions.includes(type)}
-          onClick={onClick}
+          key={`payment-type-${type}`}
           type={type}
-          key={`${Math.random()}-${type}`}
+          size={size}
+          onClick={onClick}
+          disabled={disabledOptions.includes(type)}
+          caption={captions?.[type]}
+          rc={<motion.div custom={idx} variants={listItemVariants} />}
         />
       ))}
     </Box>

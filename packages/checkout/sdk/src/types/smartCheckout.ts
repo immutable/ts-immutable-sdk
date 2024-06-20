@@ -1,16 +1,20 @@
-import { TransactionRequest, TransactionResponse, Web3Provider } from '@ethersproject/providers';
+import {
+  TransactionRequest,
+  TransactionResponse,
+  Web3Provider,
+} from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import { TokenInfo } from './tokenInfo';
 import { OrderFee } from './fees';
 
 /*
-* Type representing the result of the buy
-*/
+ * Type representing the result of the buy
+ */
 export type BuyResult =
-  BuyResultSuccess |
-  BuyResultFailed |
-  BuyResultFulfillmentsUnsettled |
-  BuyResultInsufficientFunds;
+  | BuyResultSuccess
+  | BuyResultFailed
+  | BuyResultFulfillmentsUnsettled
+  | BuyResultInsufficientFunds;
 
 /**
  * Represents the result of {@link Checkout.buy}
@@ -19,9 +23,9 @@ export type BuyResult =
  */
 export type BuyResultSuccess = {
   /** The status to indicate success */
-  status: CheckoutStatus.SUCCESS,
+  status: CheckoutStatus.SUCCESS;
   /** The sufficient result of smart checkout */
-  smartCheckoutResult: SmartCheckoutSufficient
+  smartCheckoutResult: SmartCheckoutSufficient;
 };
 
 /**
@@ -33,13 +37,13 @@ export type BuyResultSuccess = {
  */
 export type BuyResultFailed = {
   /** The status to indicate failure */
-  status: CheckoutStatus.FAILED,
+  status: CheckoutStatus.FAILED;
   /** The transaction hash of the failed transaction */
-  transactionHash: string,
+  transactionHash: string;
   /** The reason for the failure */
-  reason: string,
+  reason: string;
   /** The sufficient result of smart checkout */
-  smartCheckoutResult: SmartCheckoutSufficient
+  smartCheckoutResult: SmartCheckoutSufficient;
 };
 
 /**
@@ -50,11 +54,11 @@ export type BuyResultFailed = {
  */
 export type BuyResultFulfillmentsUnsettled = {
   /** The status to indicate success */
-  status: CheckoutStatus.FULFILLMENTS_UNSETTLED,
+  status: CheckoutStatus.FULFILLMENTS_UNSETTLED;
   /** The sufficient result of smart checkout */
-  smartCheckoutResult: SmartCheckoutSufficient,
+  smartCheckoutResult: SmartCheckoutSufficient;
   /** Array of transaction results */
-  transactions: TransactionResponse[],
+  transactions: TransactionResponse[];
 };
 
 /**
@@ -64,9 +68,9 @@ export type BuyResultFulfillmentsUnsettled = {
  */
 export type BuyResultInsufficientFunds = {
   /** The status to indicate insufficient funds */
-  status: CheckoutStatus.INSUFFICIENT_FUNDS,
+  status: CheckoutStatus.INSUFFICIENT_FUNDS;
   /** The insufficient result of smart checkout */
-  smartCheckoutResult: SmartCheckoutInsufficient
+  smartCheckoutResult: SmartCheckoutInsufficient;
 };
 
 /**
@@ -79,9 +83,12 @@ export type BuyOverrides = {
 };
 
 /*
-* Type representing the result of the sell
-*/
-export type SellResult = SellResultSuccess | SellResultFailed | SellResultInsufficientFunds;
+ * Type representing the result of the sell
+ */
+export type SellResult =
+  | SellResultSuccess
+  | SellResultFailed
+  | SellResultInsufficientFunds;
 
 /**
  * Represents the result of {@link Checkout.sell}
@@ -91,11 +98,11 @@ export type SellResult = SellResultSuccess | SellResultFailed | SellResultInsuff
  */
 export type SellResultSuccess = {
   /** The status to indicate success */
-  status: CheckoutStatus.SUCCESS,
+  status: CheckoutStatus.SUCCESS;
   /** The orders' ids */
-  orderIds: string[],
+  orderIds: string[];
   /** The sufficient result of smart checkout */
-  smartCheckoutResult: SmartCheckoutSufficient
+  smartCheckoutResult: SmartCheckoutSufficient;
 };
 
 /**
@@ -107,13 +114,13 @@ export type SellResultSuccess = {
  */
 export type SellResultFailed = {
   /** The status to indicate failure */
-  status: CheckoutStatus.FAILED,
+  status: CheckoutStatus.FAILED;
   /** The transaction hash of the failed transaction */
-  transactionHash: string,
+  transactionHash: string;
   /** The reason for the failure */
-  reason: string,
+  reason: string;
   /** The sufficient result of smart checkout */
-  smartCheckoutResult: SmartCheckoutSufficient
+  smartCheckoutResult: SmartCheckoutSufficient;
 };
 
 /**
@@ -123,18 +130,19 @@ export type SellResultFailed = {
  */
 export type SellResultInsufficientFunds = {
   /** The status to indicate insufficient funds */
-  status: CheckoutStatus.INSUFFICIENT_FUNDS,
+  status: CheckoutStatus.INSUFFICIENT_FUNDS;
   /** The insufficient result of smart checkout */
-  smartCheckoutResult: SmartCheckoutInsufficient
+  smartCheckoutResult: SmartCheckoutInsufficient;
 };
 
 /*
-* Type representing the result of the cancel
-*/
-export type CancelResult = CancelResultSuccess |
-CancelResultFailed |
-CancelResultFulfillmentsUnsettled |
-CancelResultGasless;
+ * Type representing the result of the cancel
+ */
+export type CancelResult =
+  | CancelResultSuccess
+  | CancelResultFailed
+  | CancelResultFulfillmentsUnsettled
+  | CancelResultGasless;
 
 /**
  * Represents the result of {@link Checkout.cancel}
@@ -142,7 +150,7 @@ CancelResultGasless;
  */
 export type CancelResultSuccess = {
   /** The status to indicate success */
-  status: CheckoutStatus.SUCCESS,
+  status: CheckoutStatus.SUCCESS;
 };
 
 /**
@@ -153,11 +161,11 @@ export type CancelResultSuccess = {
  */
 export type CancelResultFailed = {
   /** The status to indicate failure */
-  status: CheckoutStatus.FAILED,
+  status: CheckoutStatus.FAILED;
   /** The transaction hash of the failed transaction */
-  transactionHash: string,
+  transactionHash: string;
   /** The reason for the failure */
-  reason: string,
+  reason: string;
 };
 
 /**
@@ -167,9 +175,9 @@ export type CancelResultFailed = {
  */
 export type CancelResultFulfillmentsUnsettled = {
   /** The status to indicate the fulfillments have not yet settled on chain. */
-  status: CheckoutStatus.FULFILLMENTS_UNSETTLED,
+  status: CheckoutStatus.FULFILLMENTS_UNSETTLED;
   /** Array of transaction results */
-  transactions: TransactionResponse[],
+  transactions: TransactionResponse[];
 };
 
 /**
@@ -179,9 +187,9 @@ export type CancelResultFulfillmentsUnsettled = {
  * @property {PendingGaslessCancellation[]} pendingCancellations
  */
 export type CancelResultGasless = {
-  successfulCancellations: SuccessfulGaslessCancellation[],
-  failedCancellations: FailedGaslessCancellation[],
-  pendingCancellations: PendingGaslessCancellation[],
+  successfulCancellations: SuccessfulGaslessCancellation[];
+  failedCancellations: FailedGaslessCancellation[];
+  pendingCancellations: PendingGaslessCancellation[];
 };
 
 /**
@@ -247,9 +255,11 @@ export enum CheckoutStatus {
  */
 export type BuyOrder = {
   /** the id of the order to buy */
-  id: string,
+  id: string;
   /** array of order fees to apply to the order */
-  takerFees?: OrderFee[],
+  takerFees?: OrderFee[];
+  /** The amount of the order to fill - only applies to ERC1155 orders */
+  fillAmount?: string;
 };
 
 /**
@@ -260,11 +270,11 @@ export type BuyOrder = {
  */
 export type SellOrder = {
   /** the token to be listed for sale */
-  sellToken: SellToken,
+  sellToken: SellToken;
   /** the token info of the price of the item */
-  buyToken: BuyToken,
+  buyToken: BuyToken;
   /** optional array of makerFees to be applied to the listing */
-  makerFees?: OrderFee[],
+  makerFees?: OrderFee[];
   /** optional order expiry date. Default order expiry to 2 years from now */
   orderExpiry?: Date;
 };
@@ -303,15 +313,51 @@ export type ERC20BuyToken = {
 };
 
 /**
- * The SellToken type
+ * Represents the token listed for sale.
+ * ERC721SellToken or ERC1155SellToken {@link Checkout.smartCheckout}.
+ */
+export type SellToken = DeprecatedERC721SellToken | ERC721SellToken | ERC1155SellToken;
+
+/**
+ * The ERC721SellToken type
  * @property {string} id
  * @property {string} collectionAddress
  */
-export type SellToken = {
+export type ERC721SellToken = {
+  type: ItemType.ERC721;
   /**  The ERC721 token id */
-  id: string,
+  id: string;
   /** The ERC721 collection address */
-  collectionAddress: string
+  collectionAddress: string;
+};
+
+/**
+ * The original ERC721SellToken type, before the introduction of the ItemType enum
+ * @property {string} id
+ * @property {string} collectionAddress
+ * @deprecated
+ */
+export type DeprecatedERC721SellToken = {
+  /**  The ERC721 token id */
+  id: string;
+  /** The ERC721 collection address */
+  collectionAddress: string;
+};
+
+/**
+ * The ERC1155SellToken type
+ * @property {string} id
+ * @property {string} collectionAddress
+ * @property {string} amount
+ */
+export type ERC1155SellToken = {
+  type: ItemType.ERC1155;
+  /**  The ERC1155 token id */
+  id: string;
+  /** The ERC1155 collection address */
+  collectionAddress: string;
+  /** The amount of the token to be sold */
+  amount: string;
 };
 
 /**
@@ -324,9 +370,22 @@ export interface SmartCheckoutParams {
   /** The provider to use for smart checkout. */
   provider: Web3Provider;
   /** The item requirements for the transaction. */
-  itemRequirements: (NativeItemRequirement | ERC20ItemRequirement | ERC721ItemRequirement)[];
+  itemRequirements: (
+    | NativeItemRequirement
+    | ERC20ItemRequirement
+    | ERC721ItemRequirement
+    | ERC1155ItemRequirement
+  )[];
   /** The transaction or gas amount. */
-  transactionOrGasAmount: FulfillmentTransaction | GasAmount,
+  transactionOrGasAmount?: FulfillmentTransaction | GasAmount;
+  /** The overrides for funding routes to consider */
+  routingOptions?: AvailableRoutingOptions;
+  /** The callback to be executed once all funding routes are found */
+  onComplete?: (result: SmartCheckoutResult) => void;
+  /** The callback to be executed on each funding route found */
+  onFundingRoute?: (fundingRoute: FundingRoute) => void;
+  /** A flag to get funding routes based on full or partial amount */
+  fundingRouteFullAmount?: boolean;
 }
 
 /**
@@ -356,7 +415,7 @@ export type ERC20ItemRequirement = {
   /** The amount of the item. */
   amount: string;
   /** The contract address of the approver. */
-  spenderAddress: string,
+  spenderAddress: string;
 };
 
 /**
@@ -374,14 +433,35 @@ export type ERC721ItemRequirement = {
   /** The ID of this ERC721 in the collection. */
   id: string;
   /** The contract address of the approver. */
-  spenderAddress: string,
+  spenderAddress: string;
+};
+
+/**
+ * Represents an ERC1155 item requirement for a transaction.
+ * @property {ItemType.ERC1155} type
+ * @property {string} contractAddress
+ * @property {string} id
+ * @property {string} spenderAddress
+ * @property {BigNumber} amount
+ */
+export type ERC1155ItemRequirement = {
+  /** The type to indicate this is a ERC1155 item requirement. */
+  type: ItemType.ERC1155;
+  /** The contract address of the ERC1155 collection. */
+  contractAddress: string;
+  /** The ID of this ERC1155 in the collection. */
+  id: string;
+  /** The contract address of the approver. */
+  spenderAddress: string;
+  /** The amount of the ERC1155 token ID being spent. */
+  amount: BigNumber;
 };
 
 /**
  * Represents the item requirements for a transaction.
- * NativeItem, ERC20Item or ERC721Item {@link Checkout.smartCheckout}.
+ * NativeItem, ERC20Item, ERC721Item or ERC1155Item {@link Checkout.smartCheckout}.
  */
-export type ItemRequirement = NativeItem | ERC20Item | ERC721Item;
+export type ItemRequirement = NativeItem | ERC20Item | ERC721Item | ERC1155Item;
 
 /**
  * An enum representing the item types
@@ -389,11 +469,13 @@ export type ItemRequirement = NativeItem | ERC20Item | ERC721Item;
  * @property {string} NATIVE - If the item is a native token.
  * @property {string} ERC20 - If the item is an ERC20 token.
  * @property {string} ERC721 - If the item is an ERC721 token.
+ * @property {string} ERC1155 - If the item is an ERC1155 token.
  */
 export enum ItemType {
   NATIVE = 'NATIVE',
   ERC20 = 'ERC20',
   ERC721 = 'ERC721',
+  ERC1155 = 'ERC1155',
 }
 
 /**
@@ -423,7 +505,7 @@ export type ERC20Item = {
   /** The amount of the item. */
   amount: BigNumber;
   /** The contract address of the approver. */
-  spenderAddress: string,
+  spenderAddress: string;
 };
 
 /**
@@ -441,7 +523,28 @@ export type ERC721Item = {
   /**  The ID of this ERC721 in the collection. */
   id: string;
   /** The contract address of the approver. */
-  spenderAddress: string,
+  spenderAddress: string;
+};
+
+/**
+ * Represents an ERC1155 item.
+ * @property {ItemType} type
+ * @property {string} contractAddress
+ * @property {string} id
+ * @property {string} spenderAddress
+ * @property {string} amount
+ */
+export type ERC1155Item = {
+  /** The type to indicate this is a ERC1155 item requirement. */
+  type: ItemType.ERC1155;
+  /** The contract address of the ERC1155 collection. */
+  contractAddress: string;
+  /** The ID of this ERC1155 in the collection. */
+  id: string;
+  /** The contract address of the approver. */
+  spenderAddress: string;
+  /** The amount of the ERC1155 token ID being spent. */
+  amount: BigNumber;
 };
 
 /**
@@ -502,7 +605,7 @@ export enum GasTokenType {
  */
 export type NativeGas = {
   /** The type to indicate this is a native gas token. */
-  type: GasTokenType.NATIVE,
+  type: GasTokenType.NATIVE;
   /** The gas limit. */
   limit: BigNumber;
 };
@@ -515,7 +618,7 @@ export type NativeGas = {
  */
 export type ERC20Gas = {
   /** The type to indicate this is an ERC20 gas token. */
-  type: GasTokenType.ERC20,
+  type: GasTokenType.ERC20;
   /** The token address of the ERC20. */
   tokenAddress: string;
   /** The gas limit. */
@@ -525,7 +628,9 @@ export type ERC20Gas = {
 /**
  * The type representing the result of {@link Checkout.smartCheckout}.
  */
-export type SmartCheckoutResult = SmartCheckoutSufficient | SmartCheckoutInsufficient;
+export type SmartCheckoutResult =
+  | SmartCheckoutSufficient
+  | SmartCheckoutInsufficient;
 
 /**
  * Represents the result of {@link Checkout.smartCheckout} when smart checkout is sufficient.
@@ -533,10 +638,10 @@ export type SmartCheckoutResult = SmartCheckoutSufficient | SmartCheckoutInsuffi
  * @property {TransactionRequirement[]} transactionRequirements
  */
 export type SmartCheckoutSufficient = {
-/** Indicates that smart checkout determined the user had sufficient funds. */
-  sufficient: true,
+  /** Indicates that smart checkout determined the user had sufficient funds. */
+  sufficient: true;
   /** The transaction requirements smart checkout determined were required for the transaction. */
-  transactionRequirements: TransactionRequirement[],
+  transactionRequirements: TransactionRequirement[];
 };
 
 /**
@@ -547,11 +652,11 @@ export type SmartCheckoutSufficient = {
  */
 export type SmartCheckoutInsufficient = {
   /** Indicates that smart checkout determined the user has insufficient funds */
-  sufficient: false,
+  sufficient: false;
   /** The transaction requirements smart checkout determined were required for the transaction. */
-  transactionRequirements: TransactionRequirement[],
+  transactionRequirements: TransactionRequirement[];
   /** The type containing the funding routes the user can take to fulfill the transaction requirements */
-  router: SmartCheckoutRouter
+  router?: SmartCheckoutRouter;
 };
 
 /**
@@ -561,9 +666,9 @@ export type SmartCheckoutInsufficient = {
  */
 export type SmartCheckoutRouter = {
   /** The routing options available to the user */
-  availableRoutingOptions: AvailableRoutingOptions,
+  availableRoutingOptions: AvailableRoutingOptions;
   /** The routing outcome for the transaction which includes the funding routes if routes were found */
-  routingOutcome: RoutingOutcome
+  routingOutcome: RoutingOutcome;
 };
 
 /**
@@ -590,10 +695,10 @@ export type RoutingOutcome = RoutesFound | NoRoutesFound | NoRouteOptions;
  * @property {AvailableRoutingOptions} fundingRoutes
  */
 export type RoutesFound = {
-/** Indicates that funding routes were found for the transaction. */
-  type: RoutingOutcomeType.ROUTES_FOUND,
+  /** Indicates that funding routes were found for the transaction. */
+  type: RoutingOutcomeType.ROUTES_FOUND;
   /** The funding routes found for the transaction. */
-  fundingRoutes: FundingRoute[]
+  fundingRoutes: FundingRoute[];
 };
 
 /**
@@ -603,9 +708,9 @@ export type RoutesFound = {
  */
 export type NoRoutesFound = {
   /** Indicates that no funding routes were found for the transaction. */
-  type: RoutingOutcomeType.NO_ROUTES_FOUND,
+  type: RoutingOutcomeType.NO_ROUTES_FOUND;
   /** The message indicating why no funding routes were found. */
-  message: string
+  message: string;
 };
 
 /**
@@ -615,9 +720,9 @@ export type NoRoutesFound = {
  */
 export type NoRouteOptions = {
   /** Indicates that no routing options were available for the transaction. */
-  type: RoutingOutcomeType.NO_ROUTE_OPTIONS,
+  type: RoutingOutcomeType.NO_ROUTE_OPTIONS;
   /** The message indicating why no routing options were available. */
-  message: string
+  message: string;
 };
 
 /**
@@ -629,7 +734,7 @@ export type FundingRoute = {
   /** The priority of the route */
   priority: number;
   /** The steps associated with this funding route */
-  steps: FundingStep[]
+  steps: FundingStep[];
 };
 
 /**
@@ -647,6 +752,8 @@ export type Fee = {
   formattedAmount: string;
   /** The token info for the fee */
   token?: TokenInfo;
+  /** The basis points for the secondary fee */
+  basisPoints?: number;
 };
 
 /**
@@ -665,9 +772,12 @@ export enum FeeType {
 }
 
 /*
-* Type representing the various funding steps
-*/
-export type FundingStep = BridgeFundingStep | SwapFundingStep | OnRampFundingStep;
+ * Type representing the various funding steps
+ */
+export type FundingStep =
+  | BridgeFundingStep
+  | SwapFundingStep
+  | OnRampFundingStep;
 
 /**
  * Represents a bridge funding route
@@ -678,13 +788,13 @@ export type FundingStep = BridgeFundingStep | SwapFundingStep | OnRampFundingSte
  */
 export type BridgeFundingStep = {
   /** Indicates that this is a bridge funding step */
-  type: FundingStepType.BRIDGE,
+  type: FundingStepType.BRIDGE;
   /** The chain id the bridge should be executed on */
-  chainId: number,
+  chainId: number;
   /** The funding item for the bridge */
-  fundingItem: FundingItem,
+  fundingItem: FundingItem;
   /** The fees for the bridge */
-  fees: BridgeFees,
+  fees: BridgeFees;
 };
 
 /**
@@ -695,11 +805,11 @@ export type BridgeFundingStep = {
  */
 export type BridgeFees = {
   /** The approval gas fee for the bridge */
-  approvalGasFee: Fee,
+  approvalGasFee: Fee;
   /** The bridge gas fee for the bridge */
-  bridgeGasFee: Fee,
+  bridgeGasFee: Fee;
   /** Additional bridge fees for the bridge */
-  bridgeFees: Fee[],
+  bridgeFees: Fee[];
 };
 
 /**
@@ -711,13 +821,13 @@ export type BridgeFees = {
  */
 export type SwapFundingStep = {
   /** Indicates that this is a swap funding step */
-  type: FundingStepType.SWAP,
+  type: FundingStepType.SWAP;
   /** The chain id the swap should be executed on */
-  chainId: number,
+  chainId: number;
   /** The funding item for the swap */
-  fundingItem: FundingItem,
+  fundingItem: FundingItem;
   /** The fees for the swap */
-  fees: SwapFees,
+  fees: SwapFees;
 };
 
 /**
@@ -728,11 +838,11 @@ export type SwapFundingStep = {
  */
 export type SwapFees = {
   /** The approval gas fee for the swap */
-  approvalGasFee: Fee,
+  approvalGasFee: Fee;
   /** The swap gas fee for the swap */
-  swapGasFee: Fee,
+  swapGasFee: Fee;
   /** Additional swap fees for the swap */
-  swapFees: Fee[],
+  swapFees: Fee[];
 };
 
 /**
@@ -743,11 +853,11 @@ export type SwapFees = {
  */
 export type OnRampFundingStep = {
   /** Indicates that this is an onramp funding step */
-  type: FundingStepType.ONRAMP,
+  type: FundingStepType.ONRAMP;
   /** The chain id the onramp should provide funds to */
-  chainId: number,
+  chainId: number;
   /** The item to be onramped */
-  fundingItem: FundingItem
+  fundingItem: FundingItem;
 };
 
 /**
@@ -772,13 +882,13 @@ export enum FundingStepType {
  */
 export type FundingItem = {
   /** The type of the funding item */
-  type: ItemType.NATIVE | ItemType.ERC20,
+  type: ItemType.NATIVE | ItemType.ERC20;
   /** The amount of funds required of this funding item */
-  fundsRequired: FundsRequired,
+  fundsRequired: FundsRequired;
   /** The current user balance of this funding item */
-  userBalance: UserBalance,
+  userBalance: UserBalance;
   /** The token info for the funding item */
-  token: TokenInfo
+  token: TokenInfo;
 };
 
 /**
@@ -788,9 +898,9 @@ export type FundingItem = {
  */
 export type FundsRequired = {
   /** The amount of funds required */
-  amount: BigNumber,
+  amount: BigNumber;
   /** The formatted amount of funds required */
-  formattedAmount: string
+  formattedAmount: string;
 };
 
 /**
@@ -800,9 +910,9 @@ export type FundsRequired = {
  */
 export type UserBalance = {
   /** The balance of the funding item */
-  balance: BigNumber,
+  balance: BigNumber;
   /** The formatted balance of the funding item */
-  formattedBalance: string
+  formattedBalance: string;
 };
 
 /**
@@ -815,15 +925,15 @@ export type UserBalance = {
  */
 export type TransactionRequirement = {
   /** The type of the transaction requirement. */
-  type: ItemType,
+  type: ItemType;
   /** If the user address has sufficient funds to cover the transaction. */
   sufficient: boolean;
   /** The required item balance. */
-  required: ItemBalance,
+  required: ItemBalance;
   /** The current item balance. */
-  current: ItemBalance,
+  current: ItemBalance;
   /** The delta between the required and current balances. */
-  delta: BalanceDelta,
+  delta: BalanceDelta;
 };
 
 /**
@@ -854,7 +964,7 @@ export type TokenBalance = {
  */
 export type ERC721Balance = {
   /** Type to indicate this is an ERC721 token. */
-  type: ItemType.ERC721,
+  type: ItemType.ERC721;
   /** The balance of the item. */
   balance: BigNumber;
   /** The formatted balance of the item. */
@@ -898,7 +1008,9 @@ export type AvailableRoutingOptions = {
   bridge?: boolean;
 };
 
-export type FundingRouteFeeEstimate = SwapRouteFeeEstimate | BridgeRouteFeeEstimate;
+export type FundingRouteFeeEstimate =
+  | SwapRouteFeeEstimate
+  | BridgeRouteFeeEstimate;
 export type SwapRouteFeeEstimate = {
   type: FundingStepType.SWAP;
   estimatedAmount: BigNumber;

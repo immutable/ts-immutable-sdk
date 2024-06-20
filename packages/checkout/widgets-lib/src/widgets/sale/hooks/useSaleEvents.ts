@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import { StandardAnalyticsActions } from '@imtbl/react-analytics';
-import { SalePaymentTypes } from '@imtbl/checkout-sdk';
+import { FundingItem, SalePaymentTypes } from '@imtbl/checkout-sdk';
 import {
   UserJourney,
   useAnalytics,
@@ -13,17 +13,18 @@ import {
   sendSaleWidgetCloseEvent,
   sendSaleTransactionSuccessEvent,
   sendSalePaymentMethodEvent,
+  sendSalePaymentTokenEvent,
 } from '../SaleWidgetEvents';
 import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 import { ExecutedTransaction } from '../types';
 import { useSaleContext } from '../context/SaleContextProvider';
 import { toPascalCase, toStringifyTransactions } from '../functions/utils';
+import { getPaymentTokenDetails } from '../utils/analytics';
 
 export const useSaleEvent = () => {
   const { track, page } = useAnalytics();
   const {
     recipientAddress: userId,
-    recipientEmail: email,
     signResponse,
     paymentMethod,
   } = useSaleContext();
@@ -36,7 +37,6 @@ export const useSaleEvent = () => {
     userJourney: UserJourney.SALE,
   };
   const userProps = {
-    email,
     userId,
     paymentMethod,
   };
@@ -84,7 +84,13 @@ export const useSaleEvent = () => {
         tokenIds,
       },
     });
-    sendSaleSuccessEvent(eventTarget, paymentMethod, transactions, tokenIds, details.transactionId);
+    sendSaleSuccessEvent(
+      eventTarget,
+      paymentMethod,
+      transactions,
+      tokenIds,
+      details.transactionId,
+    );
   };
 
   const sendFailedEvent = (
@@ -110,14 +116,24 @@ export const useSaleEvent = () => {
         reason,
       },
     });
-    sendSaleFailedEvent(eventTarget, reason, error, paymentMethod, transactions, details.transactionId);
+    sendSaleFailedEvent(
+      eventTarget,
+      reason,
+      error,
+      paymentMethod,
+      transactions,
+      details.transactionId,
+    );
   };
 
   const sendTransactionSuccessEvent = (transaction: ExecutedTransaction) => {
     sendSaleTransactionSuccessEvent(eventTarget, paymentMethod, [transaction]);
   };
 
-  const sendSelectedPaymentMethod = (type: SalePaymentTypes, screen: string) => {
+  const sendSelectedPaymentMethod = (
+    type: SalePaymentTypes,
+    screen: string,
+  ) => {
     track({
       ...commonProps,
       screen: toPascalCase(screen),
@@ -130,12 +146,30 @@ export const useSaleEvent = () => {
     sendSalePaymentMethodEvent(eventTarget, type);
   };
 
+  const sendSelectedPaymentToken = (
+    screen: string,
+    fundingItem: FundingItem,
+    conversions: Map<string, number>,
+  ) => {
+    const details = getPaymentTokenDetails(fundingItem, conversions);
+    track({
+      ...commonProps,
+      screen: toPascalCase(screen),
+      control: 'Select',
+      controlType: 'MenuItem',
+      extras: {
+        ...details,
+      },
+    });
+    sendSalePaymentTokenEvent(eventTarget, details);
+  };
+
   const sendPageView = (screen: string, data?: Record<string, unknown>) => {
     page({
       ...commonProps,
       screen: toPascalCase(screen),
       action: 'Viewed',
-      ...data,
+      extras: { ...data },
     });
   };
 
@@ -154,6 +188,43 @@ export const useSaleEvent = () => {
     });
   };
 
+  const sendProceedToPay = (
+    screen: string,
+    fundingItem: FundingItem,
+    conversions: Map<string, number>,
+    controlType: AnalyticsControlTypes = 'Button',
+    action: StandardAnalyticsActions = 'Pressed',
+  ) => {
+    track({
+      ...commonProps,
+      screen: toPascalCase(screen),
+      control: 'ProceedToPay',
+      controlType,
+      action,
+      extras: {
+        ...userProps,
+        ...getPaymentTokenDetails(fundingItem, conversions),
+      },
+    });
+  };
+
+  const sendViewFeesEvent = (
+    screen: string,
+    controlType: AnalyticsControlTypes = 'Button',
+    action: StandardAnalyticsActions = 'Pressed',
+  ) => {
+    track({
+      ...commonProps,
+      screen: toPascalCase(screen),
+      control: 'ViewFees',
+      controlType,
+      action,
+      extras: {
+        ...userProps,
+      },
+    });
+  };
+
   return {
     track,
     page,
@@ -164,5 +235,8 @@ export const useSaleEvent = () => {
     sendTransactionSuccessEvent,
     sendOrderCreated,
     sendSelectedPaymentMethod,
+    sendSelectedPaymentToken,
+    sendProceedToPay,
+    sendViewFeesEvent,
   };
 };

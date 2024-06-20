@@ -30,7 +30,7 @@
     "typescript": "^4.9.5"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=20.11.0"
   },
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
   "keywords": [
@@ -43,8 +43,9 @@
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "NODE_ENV=production rollup --config rollup.config.js",
+    "dev": "rollup --config rollup.config.js -w",
     "lint": "eslint ./src --ext .ts --max-warnings=0",
-    "lint:fix": "cd ../../../ && yarn wsrun -p @imtbl/bridge-sdk -c lint --fix",
+    "lint:fix": "cd ../../../../ && yarn wsrun -p @imtbl/bridge-sdk -c lint --fix",
     "test": "jest test -- --silent=false",
     "test:watch": "jest --watch"
   },

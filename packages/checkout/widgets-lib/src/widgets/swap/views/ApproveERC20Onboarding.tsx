@@ -4,6 +4,7 @@ import {
 } from 'react';
 import { CheckoutErrorType, TokenInfo } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
+import { BigNumber } from 'ethers';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { sendSwapWidgetCloseEvent } from '../SwapWidgetEvents';
@@ -120,6 +121,8 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
       return;
     }
 
+    // eslint-disable-next-line no-console
+    console.error('Approve ERC20 failed', err);
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
@@ -130,6 +133,11 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
       },
     });
   };
+
+  const prepareTransaction = (transaction, isGasFree = false) => ({
+    ...transaction,
+    gasPrice: (isGasFree ? BigNumber.from(0) : undefined),
+  });
 
   /* --------------------- */
   // Approve spending step //
@@ -155,7 +163,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
     try {
       const txnResult = await checkout.sendTransaction({
         provider,
-        transaction: data.approveTransaction,
+        transaction: prepareTransaction(data.approveTransaction, isPassport),
       });
 
       setApprovalTxnLoading(true);
@@ -258,7 +266,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
     try {
       const txn = await checkout.sendTransaction({
         provider,
-        transaction: data.transaction,
+        transaction: prepareTransaction(data.transaction, isPassport),
       });
 
       setActionDisabled(false);

@@ -6,19 +6,13 @@ import {
   TokenInfo,
   Checkout,
   ChainId,
+  EIP6963ProviderInfo,
 } from '@imtbl/checkout-sdk';
 import { createContext } from 'react';
 
-export type WalletProviderInfo = {
-  name: string;
-  icon: string;
-  rdns: string;
-  uuid: string;
-};
-
 export type WalletAndNetworkDetails = {
   web3Provider: Web3Provider;
-  walletProviderInfo: WalletProviderInfo;
+  walletProviderInfo: EIP6963ProviderInfo | undefined;
   walletAddress: string;
   network: ChainId;
 };

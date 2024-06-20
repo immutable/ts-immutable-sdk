@@ -1,11 +1,12 @@
 name: Functional Tests (zkEVM)
 on:
-  push:
-    branches: [main]
   pull_request:
     branches: [main]
+  merge_group:
+    branches: [main]
+
 jobs:
-  test:
+  funcTestZkevm:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
@@ -27,8 +28,9 @@ jobs:
         env:
           ZKEVM_ORDERBOOK_BANKER: ${{ secrets.ZKEVM_ORDERBOOK_BANKER }}
           ZKEVM_ORDERBOOK_ERC721: "0xBE8B131f39825282Ace9eFf99C0Bb14972417b49"
+          ZKEVM_ORDERBOOK_ERC1155: "0x2efB9B7810B1d1520c0822aa20F1889ABd2c2146"
           SEAPORT_CONTRACT_ADDRESS: "0x7d117aA8BD6D31c4fa91722f246388f38ab1942c"
-          ZONE_CONTRACT_ADDRESS: "0x8831867E347AB87FA30199C5B695F0A31604Bb52"
+          ZONE_CONTRACT_ADDRESS: "0x1004f9615E79462c711Ff05a386BdbA91a7628C3"
           ZKEVM_RPC_ENDPOINT: "https://rpc.testnet.immutable.com"
           ORDERBOOK_MR_API_URL: "https://api.sandbox.immutable.com"
           ZKEVM_CHAIN_NAME: "imtbl-zkevm-testnet"

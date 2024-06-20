@@ -58,6 +58,7 @@ const mockReturnValue = {
 const mockStarkSigner = {
   signMessage: jest.fn(),
   getAddress: jest.fn(),
+  getYCoordinate: jest.fn(),
 };
 
 describe('Trades', () => {
@@ -95,7 +96,6 @@ describe('Trades', () => {
 
       expect(mockGetSignableTrade).toBeCalledWith(mockSignableTradeRequest, mockHeader);
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
-      expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
       expect(mockGuardianClient.evaluateImxTransaction)
         .toBeCalledWith({ payloadHash: mockPayloadHash });
       expect(mockCreateTrade).toBeCalledWith(
@@ -117,7 +117,6 @@ describe('Trades', () => {
         guardianClient: mockGuardianClient,
       })).rejects.toThrowError('Transaction rejected by user');
 
-      expect(mockGuardianClient.withDefaultConfirmationScreenTask).toBeCalled();
       expect(mockGuardianClient.evaluateImxTransaction)
         .toBeCalledWith({ payloadHash: mockPayloadHash });
     });

@@ -13,6 +13,7 @@ import {
   OrderStatusName,
 } from '@imtbl/orderbook';
 import { GetTokenResult } from '@imtbl/generated-clients/dist/multi-rollup';
+import { track } from '@imtbl/metrics';
 import * as instance from '../../instance';
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../config';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
@@ -92,6 +93,8 @@ export const buy = async (
     waitFulfillmentSettlements: true,
   },
 ): Promise<BuyResult> => {
+  track('checkout_sdk', 'buy_initiated');
+
   if (orders.length === 0) {
     throw new CheckoutError(
       'No orders were provided to the orders array. Please provide at least one order.',
@@ -118,7 +121,7 @@ export const buy = async (
   getAllBalances(config, provider, fulfillerAddress, getL1ChainId(config));
   getAllBalances(config, provider, fulfillerAddress, getL2ChainId(config));
 
-  const { id, takerFees } = orders[0];
+  const { id, takerFees, fillAmount } = orders[0];
 
   let orderChainName: string;
   try {
@@ -166,7 +169,9 @@ export const buy = async (
 
   let fees: FeeValue[] = [];
   if (takerFees && takerFees.length > 0) {
-    fees = calculateFees(takerFees, buyToken.amount, decimals);
+    // eslint-disable-next-line max-len
+    const tokenQuantity = order.result.sell[0].type === ItemType.ERC721 ? BigNumber.from(1) : BigNumber.from(order.result.sell[0].amount);
+    fees = calculateFees(takerFees, buyToken.amount, decimals, tokenQuantity);
   }
 
   let unsignedApprovalTransactions: TransactionRequest[] = [];
@@ -178,7 +183,7 @@ export const buy = async (
     const { actions } = await measureAsyncExecution<FulfillOrderResponse>(
       config,
       'Time to call fulfillOrder from the orderbook',
-      orderbook.fulfillOrder(id, fulfillerAddress, fees),
+      orderbook.fulfillOrder(id, fulfillerAddress, fees, fillAmount),
     );
 
     orderActions = actions;
@@ -255,6 +260,11 @@ export const buy = async (
   feeArray.forEach((item: any) => {
     amount = amount.add(BigNumber.from(item.amount));
   });
+
+  // In the event that the user is filling an ERC1155 listing, the amount required will be scaled by the fill ratio
+  if (order.result.sell[0].type === 'ERC1155' && fillAmount) {
+    amount = amount.mul(BigNumber.from(fillAmount)).div(BigNumber.from(order.result.sell[0].amount));
+  }
 
   const itemRequirements = [
     getItemRequirement(type, contractAddress, amount, spenderAddress),

@@ -18,7 +18,6 @@ describe('Deposit ERC721', () => {
   describe('depositERC721()', () => {
     let getSignableDepositMock: jest.Mock;
     let encodeAssetMock: jest.Mock;
-    let getSignableRegistrationMock: jest.Mock;
 
     const signableDepositRequest = {
       tokenAddress: 'kljh5kl3j4biu3b59385',
@@ -40,8 +39,6 @@ describe('Deposit ERC721', () => {
       amount: '1',
     };
 
-    const getSignableRegistrationResponse = {};
-
     beforeEach(() => {
       jest.restoreAllMocks();
 
@@ -59,18 +56,11 @@ describe('Deposit ERC721', () => {
         encodeAsset: encodeAssetMock,
       });
 
-      getSignableRegistrationMock = jest.fn().mockResolvedValue({
-        data: getSignableRegistrationResponse,
-      });
-      (imx.UsersApi as jest.Mock).mockReturnValue({
-        getSignableRegistration: getSignableRegistrationMock,
-      });
-
       (Contracts.IERC721.connect as jest.Mock).mockReturnValue({
         isApprovedForAll: async () => true,
       });
 
-      (Contracts.Core.connect as jest.Mock).mockReturnValue({
+      (Contracts.CoreV4.connect as jest.Mock).mockReturnValue({
         registerUser: async () => 'test',
         populateTransaction: {
           approve: async () => 'test',
@@ -85,7 +75,7 @@ describe('Deposit ERC721', () => {
       test(`should make the correct api requests when user is ${
         testcase.isRegistered ? '' : 'not'
       } registered on-chain`, async () => {
-        (Contracts.Registration.connect as jest.Mock).mockReturnValue({
+        (Contracts.RegistrationV4.connect as jest.Mock).mockReturnValue({
           isRegistered: async () => testcase.isRegistered,
         });
         const signers = await generateSigners(privateKey1);

@@ -22,5 +22,6 @@ export * from './domain/nft-owners-api';
 export * from './domain/nfts-api';
 export * from './domain/orders-api';
 export * from './domain/passport-api';
+export * from './domain/passport-profile-api';
 export * from './domain/tokens-api';
 

@@ -1,7 +1,10 @@
 import {
-  Select, Option, Box, OptionKey,
+  Select, Box, OptionKey,
 } from '@biom3/react';
 import { useMemo, useState } from 'react';
+import { Environment } from '@imtbl/config';
+import { WidgetTheme } from '@imtbl/checkout-sdk';
+import { TokenImage } from 'components/TokenImage/TokenImage';
 import { FormControlWrapper } from '../FormControlWrapper/FormControlWrapper';
 import { CoinSelector } from '../../CoinSelector/CoinSelector';
 import { CoinSelectorOptionProps } from '../../CoinSelector/CoinSelectorOption';
@@ -18,6 +21,8 @@ interface SelectFormProps {
   onSelectChange: (value: string) => void;
   coinSelectorHeading: string;
   defaultTokenImage: string;
+  environment?: Environment;
+  theme?: WidgetTheme,
 }
 
 export function SelectForm({
@@ -32,9 +37,10 @@ export function SelectForm({
   selectedOption,
   coinSelectorHeading,
   defaultTokenImage,
+  environment = Environment.PRODUCTION,
+  theme = WidgetTheme.DARK,
 }: SelectFormProps) {
   const [coinSelectorOpen, setCoinSelectorOpen] = useState<boolean>(false);
-
   const coinSelectorOptions = useMemo(() => options.map((option) => ({
     ...option,
     testId,
@@ -50,6 +56,8 @@ export function SelectForm({
     if (!options.find((o) => o.id === selectedOption)) return undefined;
     return selectedOption;
   };
+
+  const filteredOption = options?.find((o) => o.id === selectedOption) as CoinSelectorOptionProps ?? selectedOption;
 
   return (
     <Box>
@@ -71,42 +79,39 @@ export function SelectForm({
         <Select
           testId={`${testId}-select`}
           size="large"
-          defaultLabel="Select coin"
+          defaultLabel="Select token"
           targetClickOveride={() => setCoinSelectorOpen(true)}
           selectedOption={getSelectedOption()}
           sx={{ minw: '170px' }}
         >
-          {/*
-            because we are using the CoinSelector, the options are shown on the bottom sheet component
-            and so we are here rendering only the selected option.
-            If we will move away from the CoinSelector we will need to simply remove
-            `.filter((o) => o.id === selectedOption)?`
-            -----
-            The reason why we have the options here is only for a visual representation of the selected
-            option.
-          */}
-          {options.filter((o) => o.id === selectedOption)?.map((option) => (
-            <Option
-              key={option.id}
-              optionKey={option.id}
-              testId={option.testId}
+          {filteredOption && (
+            <Select.Option
+              key={filteredOption.id}
+              optionKey={filteredOption.id}
+              testId={filteredOption.testId}
               // select cannot currently be disabled so disabling at the option level for now
               disabled={disabled}
             >
-              {!option.icon && (
-                <Option.Icon icon="Coins" variant="bold" />
+              {!filteredOption.icon && (
+                <Select.Option.Icon icon="Coins" variant="bold" />
               )}
-              {option.icon && (
-                <Option.FramedImage
-                  imageUrl={option.icon}
+              {filteredOption.icon && (
+                <Select.Option.FramedImage
+                  use={(
+                    <TokenImage
+                      environment={environment}
+                      theme={theme}
+                      src={filteredOption.icon}
+                      name={filteredOption.name}
+                    />
+                  )}
                   circularFrame
-                  defaultImageUrl={defaultTokenImage}
                   sx={{ background: 'base.color.translucent.standard.100' }}
                 />
               )}
-              <Option.Label>{option.symbol}</Option.Label>
-            </Option>
-          ))}
+              <Select.Option.Label>{filteredOption.symbol}</Select.Option.Label>
+            </Select.Option>
+          )}
         </Select>
       </FormControlWrapper>
     </Box>

@@ -25,12 +25,14 @@ export class FiatRampService {
   }
 
   public async feeEstimate(): Promise<OnRampProviderFees> {
-    const config = (await this.config.remote.getConfig('onramp')) as OnRampConfig;
+    const config = (await this.config.remote.getConfig(
+      'onramp',
+    )) as OnRampConfig;
     return config[OnRampProvider.TRANSAK]?.fees;
   }
 
   public async createWidgetUrl(params: FiatRampWidgetParams): Promise<string> {
-    return (await this.getTransakWidgetUrl(params));
+    return await this.getTransakWidgetUrl(params);
   }
 
   private async getTransakWidgetUrl(
@@ -45,13 +47,10 @@ export class FiatRampService {
       apiKey: onRampConfig[OnRampProvider.TRANSAK].publishableApiKey,
       network: 'immutablezkevm',
       defaultPaymentMethod: 'credit_debit_card',
-      disablePaymentMethods: 'sepa_bank_transfer,gbp_bank_transfer,pm_cash_app,pm_jwire,pm_paymaya,'
-        + 'pm_bpi,pm_ubp,pm_grabpay,pm_shopeepay,pm_gcash,pm_pix,pm_astropay,pm_pse,inr_bank_transfer',
+      disablePaymentMethods: '',
       productsAvailed: 'buy',
       exchangeScreenTitle: 'Buy',
       themeColor: '0D0D0D',
-      defaultFiatCurrency: 'usd',
-      defaultFiatAmount: '50',
       defaultCryptoCurrency: params.tokenSymbol || 'IMX',
     };
 
@@ -64,11 +63,20 @@ export class FiatRampService {
       };
     }
 
+    // NOTE: only set tokenAmount and tokenSymbol if you want a fixed pre-selected token with no currency selector
+    // setting cryptoCurrencyCode code will force the user to buy that token, defaultCryptoAmount will not work without cryptoCurrencyCode
+    // setting defaultFiatAmount/fiatAmount + defaultFiatCurrency will take a higher priority over defaultCryptoAmount + cryptoCurrencyCode
     if (params.tokenAmount && params.tokenSymbol) {
       widgetParams = {
         ...widgetParams,
         defaultCryptoAmount: params.tokenAmount,
         cryptoCurrencyCode: params.tokenSymbol,
+      };
+    } else {
+      widgetParams = {
+        ...widgetParams,
+        defaultFiatAmount: 50,
+        defaultFiatCurrency: 'usd',
       };
     }
 

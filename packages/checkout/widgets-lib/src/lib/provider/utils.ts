@@ -1,6 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { WalletProviderName } from '@imtbl/checkout-sdk';
-import { EIP6963ProviderDetail } from './types/eip6963';
+import { EIP6963ProviderDetail, WalletProviderName } from '@imtbl/checkout-sdk';
 
 export function isPassportProvider(provider?: Web3Provider | null) {
   return (provider?.provider as any)?.isPassport === true;
@@ -50,4 +49,21 @@ export function getProviderSlugFromRdns(rdns: string) {
   }
 
   return providerSlug;
+}
+
+/**
+ * Checks conditions to operate a gas-free flow.
+ *
+ * TODO:
+ * - Phase 1 (2024): Allow all passport wallets to be gas-free.
+ * - Phase 2 & 3 (2025): Not all passport wallets will be gas-free.
+ *   Therefore, the gas-free condition must be checked against the relayer's
+ *   `im_getFeeOptions` endpoint, which should return zero for
+ *   passport accounts with gas sponsorship enabled.
+ *
+ * Refer to the docs for more details:
+ * https://docs.immutable.com/docs/zkevm/architecture/gas-sponsorship-for-gamers/
+ */
+export function isGasFree(provider?: Web3Provider | null) {
+  return isPassportProvider(provider);
 }

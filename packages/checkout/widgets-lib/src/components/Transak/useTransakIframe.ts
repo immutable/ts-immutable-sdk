@@ -1,4 +1,3 @@
-import pako from 'pako';
 import { useCallback, useEffect, useState } from 'react';
 import { Environment } from '@imtbl/config';
 
@@ -13,9 +12,9 @@ export type TransakNFTCheckoutParams = {
   cryptoCurrencyCode: string;
   estimatedGasLimit: number;
   exchangeScreenTitle: string;
+  walletAddress: string;
+  email: string;
   partnerOrderId?: string;
-  walletAddress?: string;
-  email?: string;
 };
 
 type UseTransakIframeProps = {
@@ -23,17 +22,21 @@ type UseTransakIframeProps = {
   contractId: string;
   environment: Environment;
   transakParams: TransakNFTCheckoutParams;
+  onError?: () => void;
 };
 
 const MAX_GAS_LIMIT = '30000000';
 
 // TODO: Move to common config file inside Checkout SDK while refactoring onRamp
 // TODO: Get transak config from checkout SDK
-// const { checkout, provider } = connectLoaderState;
-// const { baseUrl, apiKey, environment } = checkout.fiatExchangeConfig('transak')
-export const TRANSAK_API_BASE_URL = {
+export const TRANSAK_WIDGET_BASE_URL = {
   [Environment.SANDBOX]: 'https://global-stg.transak.com',
   [Environment.PRODUCTION]: 'https://global.transak.com/',
+};
+
+export const TRANSAK_API_BASE_URL = {
+  [Environment.SANDBOX]: 'https://api-stg.transak.com',
+  [Environment.PRODUCTION]: 'https://api.transak.com',
 };
 
 export const TRANSAK_ENVIRONMENT = {
@@ -47,50 +50,82 @@ export const TRANSAK_API_KEY = {
 };
 
 export const useTransakIframe = (props: UseTransakIframeProps) => {
-  const { contractId, environment, transakParams } = props;
+  const {
+    contractId, environment, transakParams, onError,
+  } = props;
   const [iframeSrc, setIframeSrc] = useState<string>('');
 
-  const getNFTCheckoutURL = useCallback(() => {
-    const {
-      calldata,
-      nftData: nfts,
-      estimatedGasLimit,
-      ...restTransakParams
-    } = transakParams;
+  const getNFTCheckoutURL = useCallback(async () => {
+    try {
+      const {
+        calldata,
+        nftData: nfts,
+        estimatedGasLimit,
+        cryptoCurrencyCode,
+        ...restWidgetParams
+      } = transakParams;
 
-    // FIXME: defaulting to first nft in the list
-    // as transak currently only supports on nft at a time
-    const nftData = nfts?.slice(0, 1).map((item) => ({
-      ...item,
-      imageURL: sanitizeToLatin1(item.imageURL),
-      nftName: sanitizeToLatin1(item.nftName),
-    }));
+      // FIXME: defaulting to first nft in the list
+      // as transak currently only supports on nft at a time
+      const nftData = nfts?.slice(0, 1)
+        .map((item) => ({
+          ...item,
+          imageURL: sanitizeToLatin1(item.imageURL),
+          nftName: sanitizeToLatin1(item.nftName),
+        }));
 
-    const gasLimit = estimatedGasLimit > 0 ? estimatedGasLimit : MAX_GAS_LIMIT;
+      const gasLimit = estimatedGasLimit > 0 ? estimatedGasLimit : MAX_GAS_LIMIT;
 
-    const params = {
-      apiKey: TRANSAK_API_KEY[environment],
-      isNFT: 'true',
-      disableWalletAddressForm: 'true',
-      contractId,
-      environment: TRANSAK_ENVIRONMENT[environment],
-      calldata: btoa(String.fromCharCode.apply(null, pako.deflate(calldata))),
-      nftData: btoa(JSON.stringify(nftData)),
-      estimatedGasLimit: gasLimit.toString(),
-      ...restTransakParams,
-      themeColor: '0D0D0D',
-    };
+      const params = {
+        contractId,
+        cryptoCurrencyCode,
+        calldata,
+        nftData,
+        estimatedGasLimit: gasLimit.toString(),
+      };
 
-    const baseUrl = `${TRANSAK_API_BASE_URL[environment]}?`;
-    const queryParams = new URLSearchParams(params);
-    const widgetUrl = `${baseUrl}${queryParams.toString()}`;
+      // eslint-disable-next-line max-len
+      const baseApiUrl = `${TRANSAK_API_BASE_URL[environment]}/cryptocoverage/api/v1/public/one-click-protocol/nft-transaction-id`;
 
-    return widgetUrl;
-  }, [props]);
+      const response = await fetch(baseApiUrl, {
+        method: 'POST',
+        headers: {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(params),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get NFT transaction ID');
+      }
+
+      const { id: nftTransactionId } = await response.json();
+
+      const baseWidgetUrl = `${TRANSAK_WIDGET_BASE_URL[environment]}?`;
+      const queryParams = new URLSearchParams({
+        apiKey: TRANSAK_API_KEY[environment],
+        environment: TRANSAK_ENVIRONMENT[environment],
+        isNFT: 'true',
+        nftTransactionId,
+        themeColor: '0D0D0D',
+        ...restWidgetParams,
+      });
+
+      return `${baseWidgetUrl}${queryParams.toString()}`;
+    } catch {
+      onError?.();
+    }
+
+    return '';
+  }, [contractId, environment, transakParams, onError]);
 
   useEffect(() => {
-    setIframeSrc(getNFTCheckoutURL());
-  }, [props]);
+    (async () => {
+      const checkoutUrl = await getNFTCheckoutURL();
+      setIframeSrc(checkoutUrl);
+    })();
+  }, []);
 
   return { iframeSrc };
 };

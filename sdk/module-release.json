@@ -12,8 +12,11 @@
     "passport": "prod",
     "orderbook": "prod",
     "checkout": "prod",
-    "x": "prod"
+    "x": "prod",
+    "webhook": "prod",
+    "minting_backend": "prod"
   },
+  "excludeForBrowser": ["webhook", "minting_backend"],
   "fileCopy": [
     {
       "src": "../packages/checkout/widgets-lib/dist/index.js",

@@ -2,14 +2,18 @@
 import { Signer } from '@ethersproject/abstract-signer';
 import { splitSignature } from '@ethersproject/bytes';
 import hash from 'hash.js';
-import { curves, ec } from 'elliptic';
+// @ts-ignore - elliptic types cause build to break...
+import elliptic from 'elliptic';
 import * as encUtils from 'enc-utils';
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import BN from 'bn.js';
-import { hdkey } from 'ethereumjs-wallet';
+// import { hdkey } from 'ethereumjs-wallet';
+import * as ethereumJsWallet from 'ethereumjs-wallet';
 import { createStarkSigner } from './starkSigner';
 import * as legacy from './legacy/crypto';
 import { getStarkPublicKeyFromImx } from './getStarkPublicKeyFromImx';
+
+const { curves, ec } = elliptic;
 
 /*
 Stark-friendly elliptic curve
@@ -154,7 +158,7 @@ export function checkIfHashedKeyIsAboveLimit(keySeed: BN) {
 }
 
 export function getPrivateKeyFromPath(seed: string, path: string): BN {
-  const privateKey = hdkey
+  const privateKey = ethereumJsWallet.hdkey
     .fromMasterSeed(Buffer.from(seed.slice(2), 'hex')) // assuming seed is '0x...'
     .derivePath(path)
     .getWallet()

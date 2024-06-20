@@ -27,22 +27,28 @@ import { LoadingView } from '../../views/loading/LoadingView';
 import { SaleWidgetViews } from '../../context/view-context/SaleViewContextTypes';
 import { widgetTheme } from '../../lib/theme';
 import { SaleContextProvider } from './context/SaleContextProvider';
-import { FundWithSmartCheckout } from './views/FundWithSmartCheckout';
 import { PayWithCard } from './views/PayWithCard';
 import { PayWithCoins } from './views/PayWithCoins';
 import { PaymentMethods } from './views/PaymentMethods';
 import { SaleErrorView } from './views/SaleErrorView';
-import { SaleSuccessView } from './views/SaleSuccessView';
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import { TopUpView } from '../../views/top-up/TopUpView';
 import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
 import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
+import { OrderSummary } from './views/OrderSummary';
+import { CreditCardWarningDrawer } from './components/CreditCardWarningDrawer';
 
 type OptionalWidgetParams = Pick<SaleWidgetParams, 'excludePaymentTypes'>;
-type RequiredWidgetParams = Required<Omit<SaleWidgetParams, 'walletProviderName'>>;
+type RequiredWidgetParams = Required<
+Omit<SaleWidgetParams, 'walletProviderName'>
+>;
 
-type WidgetParams = RequiredWidgetParams & OptionalWidgetParams;
+type WidgetParams = RequiredWidgetParams &
+OptionalWidgetParams & {
+  hideExcludedPaymentTypes: boolean;
+  waitFulfillmentSettlements: boolean;
+};
 export interface SaleWidgetProps extends WidgetParams {
   config: StrongCheckoutWidgetsConfig;
 }
@@ -51,12 +57,15 @@ export default function SaleWidget(props: SaleWidgetProps) {
   const { t } = useTranslation();
   const {
     config,
-    amount,
     items,
     environmentId,
     collectionName,
     excludePaymentTypes,
+    preferredCurrency,
+    hideExcludedPaymentTypes,
+    waitFulfillmentSettlements = true,
   } = props;
+
   const { connectLoaderState } = useContext(ConnectLoaderContext);
   const { checkout, provider } = connectLoaderState;
   const chainId = useRef<ChainId>();
@@ -94,9 +103,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: SaleWidgetViews.PAYMENT_METHODS,
-          },
+          view: { type: SaleWidgetViews.PAYMENT_METHODS },
         },
       });
     }
@@ -114,7 +121,6 @@ export default function SaleWidget(props: SaleWidgetProps) {
         value={{
           config,
           items,
-          amount,
           environment: config.environment,
           environmentId,
           provider,
@@ -122,6 +128,9 @@ export default function SaleWidget(props: SaleWidgetProps) {
           passport: checkout?.passport,
           collectionName,
           excludePaymentTypes,
+          preferredCurrency,
+          waitFulfillmentSettlements,
+          hideExcludedPaymentTypes,
         }}
       >
         <CryptoFiatProvider environment={config.environment}>
@@ -148,11 +157,8 @@ export default function SaleWidget(props: SaleWidgetProps) {
               )}
             />
           )}
-          {viewState.view.type === SaleWidgetViews.SALE_SUCCESS && provider && (
-            <SaleSuccessView data={viewState.view.data} />
-          )}
-          {viewState.view.type === SaleWidgetViews.FUND_WITH_SMART_CHECKOUT && (
-            <FundWithSmartCheckout subView={viewState.view.subView} />
+          {viewState.view.type === SaleWidgetViews.ORDER_SUMMARY && (
+            <OrderSummary subView={viewState.view.subView} />
           )}
           {viewState.view.type === SharedViews.TOP_UP_VIEW && (
             <TopUpView
@@ -164,12 +170,21 @@ export default function SaleWidget(props: SaleWidgetProps) {
               showSwapOption={config.isSwapEnabled}
               showBridgeOption={config.isBridgeEnabled}
               onCloseButtonClick={() => sendSaleWidgetCloseEvent(eventTarget)}
+              onBackButtonClick={() => {
+                viewDispatch({
+                  payload: {
+                    type: ViewActions.UPDATE_VIEW,
+                    view: { type: SaleWidgetViews.PAYMENT_METHODS },
+                  },
+                });
+              }}
               amount={viewState.view.data?.amount}
               tokenAddress={viewState.view.data?.tokenAddress}
               heading={viewState.view.data?.heading}
               subheading={viewState.view.data?.subheading}
             />
           )}
+          <CreditCardWarningDrawer />
         </CryptoFiatProvider>
       </SaleContextProvider>
     </ViewContext.Provider>

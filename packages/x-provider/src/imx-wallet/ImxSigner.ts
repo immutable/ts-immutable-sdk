@@ -6,7 +6,12 @@ import {
 } from './events';
 import { messageResponseListener } from './messageResponseListener';
 import { postRequestMessage } from './postRequestMessage';
-import { SignMessageRequest, SignMessageResponse } from './types';
+import {
+  GetYCoordinateMessageRequest,
+  GetYCoordinateMessageResponse,
+  SignMessageRequest,
+  SignMessageResponse,
+} from './types';
 
 export class ImxSigner implements StarkSigner {
   private publicAddress;
@@ -51,5 +56,32 @@ export class ImxSigner implements StarkSigner {
 
   public getIFrame(): HTMLIFrameElement {
     return this.iframe;
+  }
+
+  public getYCoordinate(): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const listener = (event: MessageEvent) => {
+        messageResponseListener<GetYCoordinateMessageResponse>(
+          this.iframe,
+          event,
+          ResponseEventType.GET_Y_COORDINATE_RESPONSE,
+          (messageDetails) => {
+            window.removeEventListener(COMMUNICATION_TYPE, listener);
+
+            if (!messageDetails.success) {
+              reject(new Error(messageDetails.error?.message));
+            }
+
+            resolve(messageDetails.data.yCoordinate);
+          },
+        );
+      };
+      window.addEventListener(COMMUNICATION_TYPE, listener);
+
+      postRequestMessage<GetYCoordinateMessageRequest>(this.iframe, {
+        type: RequestEventType.GET_Y_COORDINATE_REQUEST,
+        details: { starkPublicKey: this.publicAddress },
+      });
+    });
   }
 }

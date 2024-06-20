@@ -17,12 +17,11 @@ describe('GeoblockLoader', () => {
       <GeoblockLoader
         widget={<div id="inner-widget">Inner Widget</div>}
         serviceUnavailableView={<div id="unavailable-view">Service Unavailable</div>}
-        loadingView={<div id="loading-view">Loading</div>}
         checkout={checkout}
       />,
     );
 
-    cy.get('#loading-view').should('exist');
+    cy.get('span').contains('Loading').should('exist');
     cy.get('#unavailable-view').should('not.exist');
     cy.get('#inner-widget').should('not.exist');
   });
@@ -36,14 +35,13 @@ describe('GeoblockLoader', () => {
       <GeoblockLoader
         widget={<div id="inner-widget">Inner Widget</div>}
         serviceUnavailableView={<div id="unavailable-view">Service Unavailable</div>}
-        loadingView={<div id="loading-view">Loading</div>}
         checkout={checkout}
       />,
     );
 
     cy.get('#inner-widget').should('exist');
     cy.get('#unavailable-view').should('not.exist');
-    cy.get('#loading-view').should('not.exist');
+    cy.get('span').contains('Loading').should('not.exist');
   });
 
   it('should show service unavailable view if service is unavailable', () => {
@@ -55,14 +53,13 @@ describe('GeoblockLoader', () => {
       <GeoblockLoader
         widget={<div id="inner-widget">Inner Widget</div>}
         serviceUnavailableView={<div id="unavailable-view">Service Unavailable</div>}
-        loadingView={<div id="loading-view">Loading</div>}
         checkout={checkout}
       />,
     );
 
     cy.get('#unavailable-view').should('exist');
     cy.get('#inner-widget').should('not.exist');
-    cy.get('#loading-view').should('not.exist');
+    cy.get('span').contains('Loading').should('not.exist');
   });
 
   it('should show service unavailable view if error thrown', () => {
@@ -74,13 +71,12 @@ describe('GeoblockLoader', () => {
       <GeoblockLoader
         widget={<div id="inner-widget">Inner Widget</div>}
         serviceUnavailableView={<div id="unavailable-view">Service Unavailable</div>}
-        loadingView={<div id="loading-view">Loading</div>}
         checkout={checkout}
       />,
     );
 
     cy.get('#unavailable-view').should('exist');
     cy.get('#inner-widget').should('not.exist');
-    cy.get('#loading-view').should('not.exist');
+    cy.get('span').contains('Loading').should('not.exist');
   });
 });

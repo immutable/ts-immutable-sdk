@@ -1,100 +1,69 @@
 import { Signer } from '@ethersproject/abstract-signer';
 import { TransactionResponse } from '@ethersproject/providers';
-import { imx } from '@imtbl/generated-clients';
 import {
-  Contracts,
-  ImmutableXConfiguration,
+  StarkSigner,
 } from '@imtbl/x-client';
 import { ProviderConfiguration } from '../../config';
-import {
-  getSignableRegistrationOnchain,
-  isRegisteredOnChain,
-} from '../registration';
+import { isRegisteredOnChain } from '../registration';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 import { validateChain } from '../helpers';
+import { getWithdrawalBalances } from './getWithdrawalBalance';
+import {
+  executeRegisterAndWithdrawAllFungible,
+  executeWithdrawAllFungible,
+  executeWithdrawFungible,
+} from './completeERC20Withdrawal';
 
 type CompleteEthWithdrawalActionParams = {
   ethSigner: Signer;
+  starkSigner: StarkSigner;
   starkPublicKey: string;
   config: ProviderConfiguration;
 };
 
-async function executeRegisterAndWithdrawEth(
-  ethSigner: Signer,
-  assetType: string,
-  starkPublicKey: string,
-  config: ImmutableXConfiguration,
-): Promise<TransactionResponse> {
-  const etherKey = await ethSigner.getAddress();
-  const usersApi = new imx.UsersApi(config.apiConfiguration);
-  const signableResult = await getSignableRegistrationOnchain(
-    etherKey,
-    starkPublicKey,
-    usersApi,
-  );
-
-  const contract = Contracts.Registration.connect(
-    config.ethConfiguration.registrationContractAddress,
-    ethSigner,
-  );
-
-  const populatedTransaction = await contract.populateTransaction.registerAndWithdraw(
-    etherKey,
-    starkPublicKey,
-    signableResult.operator_signature,
-    assetType,
-  );
-
-  return ethSigner.sendTransaction(populatedTransaction);
-}
-
-async function executeWithdrawEth(
-  ethSigner: Signer,
-  assetType: string,
-  starkPublicKey: string,
-  config: ImmutableXConfiguration,
-): Promise<TransactionResponse> {
-  const contract = Contracts.Core.connect(
-    config.ethConfiguration.coreContractAddress,
-    ethSigner,
-  );
-
-  const populatedTransaction = await contract.populateTransaction.withdraw(
-    starkPublicKey,
-    assetType,
-  );
-
-  return ethSigner.sendTransaction(populatedTransaction);
-}
+const EthTokenType = 'ETH';
 
 export async function completeEthWithdrawalAction({
   ethSigner,
+  starkSigner,
   starkPublicKey,
   config,
-}: CompleteEthWithdrawalActionParams) {
+}: CompleteEthWithdrawalActionParams): Promise<TransactionResponse> {
   await validateChain(ethSigner, config.immutableXConfig);
 
-  const imxConfig = config.immutableXConfig;
-  const assetType = await getEncodeAssetInfo('asset', 'ETH', imxConfig);
-
-  const isRegistered = await isRegisteredOnChain(
-    starkPublicKey,
+  // get withdrawal balances
+  const {
+    v3Balance,
+    v4Balance,
+  } = await getWithdrawalBalances(
     ethSigner,
-    config,
+    starkPublicKey,
+    await ethSigner.getAddress(),
+    { type: EthTokenType },
+    config.immutableXConfig,
   );
 
-  if (!isRegistered) {
-    return executeRegisterAndWithdrawEth(
-      ethSigner,
-      assetType.asset_type,
+  const assetType = await getEncodeAssetInfo('asset', EthTokenType, config.immutableXConfig);
+
+  if (!v3Balance.isZero() && !v3Balance.isNegative()) {
+    const isRegistered = await isRegisteredOnChain(
       starkPublicKey,
-      imxConfig,
+      ethSigner,
+      config,
+    );
+    if (isRegistered) {
+      return executeWithdrawAllFungible(ethSigner, starkPublicKey, assetType.asset_type, config.immutableXConfig);
+    }
+    return executeRegisterAndWithdrawAllFungible(
+      ethSigner,
+      starkSigner,
+      starkPublicKey,
+      assetType.asset_type,
+      config.immutableXConfig,
     );
   }
-  return executeWithdrawEth(
-    ethSigner,
-    assetType.asset_type,
-    starkPublicKey,
-    imxConfig,
-  );
+  if (!v4Balance.isZero() && !v4Balance.isNegative()) {
+    return executeWithdrawFungible(ethSigner, starkPublicKey, assetType.asset_type, config.immutableXConfig);
+  }
+  throw new Error('No balance to withdraw');
 }

@@ -253,7 +253,10 @@ models/metadata-schema-request.ts
 models/mint-fee.ts
 models/mint-request.ts
 models/mint-result-details.ts
+models/mint-token-data-oaigen.ts
 models/mint-token-data-v2.ts
+models/mint-token-data.ts
+models/mint-token-oaigen.ts
 models/mint-token.ts
 models/mint-tokens-response.ts
 models/mint-user.ts

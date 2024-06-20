@@ -11,6 +11,7 @@ import { Checkout } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import Provider from '../components/Provider';
 import SendTransaction from '../components/SendTransaction';
+import GetInjectedProviders from '../components/GetInjectedProviders';
 
 export default function ConnectWidget() {
   const [environment, setEnvironment] = useState(Environment.SANDBOX);
@@ -84,8 +85,8 @@ export default function ConnectWidget() {
       >
         Connect
       </Divider>
-      <Connect 
-        checkout={checkout} 
+      <Connect
+        checkout={checkout}
         provider={provider}
         setProvider={setProvider} />
 
@@ -157,6 +158,16 @@ export default function ConnectWidget() {
         Get allowed lists
       </Divider>
       <GetAllowList checkout={checkout} provider={provider} />
+
+      <Divider
+        sx={{
+          marginTop: 'base.spacing.x6',
+          marginBottom: 'base.spacing.x2',
+        }}
+      >
+        Get injected providers
+      </Divider>
+      <GetInjectedProviders checkout={checkout} provider={provider} />
     </div>
   );
 }

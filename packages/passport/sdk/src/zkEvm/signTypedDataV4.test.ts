@@ -2,11 +2,11 @@ import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import GuardianClient from 'guardian';
 import { Signer } from '@ethersproject/abstract-signer';
-import { getEip155ChainId, getSignedTypedData } from './walletHelpers';
+import { Flow } from '@imtbl/metrics';
+import { signAndPackTypedData } from './walletHelpers';
 import {
   chainId,
   chainIdHex,
-  chainIdEip155,
 } from '../test/mocks';
 import { RelayerClient } from './relayerClient';
 import { signTypedDataV4 } from './signTypedDataV4';
@@ -33,21 +33,18 @@ describe('signTypedDataV4', () => {
     imSignTypedData: jest.fn(),
   };
   const guardianClient = {
-    validateMessage: jest.fn(),
-    withConfirmationScreen: jest.fn(() => (task: () => void) => task()),
-    loading: jest.fn(),
+    evaluateEIP712Message: jest.fn(),
   };
-  const withConfirmationScreenStub = jest.fn();
+  const flow = {
+    addEvent: jest.fn(),
+  };
 
   beforeEach(() => {
     jest.resetAllMocks();
     relayerClient.imSignTypedData.mockResolvedValue(relayerSignature);
-    (getEip155ChainId as jest.Mock).mockReturnValue(chainIdEip155);
-    (getSignedTypedData as jest.Mock).mockResolvedValueOnce(
+    (signAndPackTypedData as jest.Mock).mockResolvedValueOnce(
       combinedSignature,
     );
-    withConfirmationScreenStub.mockImplementation(() => (task: () => void) => task());
-    guardianClient.withConfirmationScreen = withConfirmationScreenStub;
     rpcProvider.detectNetwork.mockResolvedValue({ chainId });
   });
 
@@ -60,6 +57,7 @@ describe('signTypedDataV4', () => {
         rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,
         guardianClient: guardianClient as unknown as GuardianClient,
+        flow: flow as unknown as Flow,
       });
 
       expect(result).toEqual(combinedSignature);
@@ -67,7 +65,7 @@ describe('signTypedDataV4', () => {
         address,
         eip712Payload,
       );
-      expect(getSignedTypedData).toHaveBeenCalledWith(
+      expect(signAndPackTypedData).toHaveBeenCalledWith(
         eip712Payload,
         relayerSignature,
         BigNumber.from(chainId),
@@ -86,6 +84,7 @@ describe('signTypedDataV4', () => {
         rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,
         guardianClient: guardianClient as any,
+        flow: flow as unknown as Flow,
       });
 
       expect(result).toEqual(combinedSignature);
@@ -93,7 +92,7 @@ describe('signTypedDataV4', () => {
         address,
         eip712Payload,
       );
-      expect(getSignedTypedData).toHaveBeenCalledWith(
+      expect(signAndPackTypedData).toHaveBeenCalledWith(
         eip712Payload,
         relayerSignature,
         BigNumber.from(chainId),
@@ -113,6 +112,7 @@ describe('signTypedDataV4', () => {
           rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
           relayerClient: relayerClient as unknown as RelayerClient,
           guardianClient: guardianClient as any,
+          flow: flow as unknown as Flow,
         })
       )).rejects.toThrow(
         new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'eth_signTypedData_v4 requires an address and a typed data JSON'),
@@ -130,6 +130,7 @@ describe('signTypedDataV4', () => {
           rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
           relayerClient: relayerClient as unknown as RelayerClient,
           guardianClient: guardianClient as any,
+          flow: flow as unknown as Flow,
         })
       )).rejects.toMatchObject({
         code: RpcErrorCode.INVALID_PARAMS,
@@ -155,6 +156,7 @@ describe('signTypedDataV4', () => {
           rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
           relayerClient: relayerClient as unknown as RelayerClient,
           guardianClient: guardianClient as any,
+          flow: flow as unknown as Flow,
         })
       )).rejects.toThrow(
         new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'Invalid typed data argument. The following properties are required: types, domain, primaryType, message'),
@@ -180,6 +182,7 @@ describe('signTypedDataV4', () => {
           rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
           relayerClient: relayerClient as unknown as RelayerClient,
           guardianClient: guardianClient as any,
+          flow: flow as unknown as Flow,
         })
       )).rejects.toThrow(
         new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `Invalid chainId, expected ${chainId}`),
@@ -204,6 +207,7 @@ describe('signTypedDataV4', () => {
       rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
       relayerClient: relayerClient as unknown as RelayerClient,
       guardianClient: guardianClient as any,
+      flow: flow as unknown as Flow,
     });
 
     expect(result).toEqual(combinedSignature);
@@ -211,7 +215,7 @@ describe('signTypedDataV4', () => {
       address,
       payload,
     );
-    expect(getSignedTypedData).toHaveBeenCalledWith(
+    expect(signAndPackTypedData).toHaveBeenCalledWith(
       payload,
       relayerSignature,
       BigNumber.from(chainId),

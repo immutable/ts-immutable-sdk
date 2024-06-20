@@ -108,4 +108,10 @@ export const PASSPORT_URL = {
   [Environment.PRODUCTION]: 'https://passport.immutable.com/',
 };
 
+export const IMAGE_RESIZER_URL = {
+  [ENV_DEVELOPMENT]: 'https://image-resizer-cache.dev.immutable.com',
+  [Environment.SANDBOX]: 'https://image-resizer-cache.sandbox.immutable.com',
+  [Environment.PRODUCTION]: 'https://image-resizer-cache.immutable.com',
+};
+
 export const WITHDRAWAL_CLAIM_GAS_LIMIT = 91000;

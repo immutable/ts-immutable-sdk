@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { ZkEvmTransactionData } from './zk-evm-transaction-data';
+import type { ZkEvmTransactionData } from './zk-evm-transaction-data';
 
 /**
  * 

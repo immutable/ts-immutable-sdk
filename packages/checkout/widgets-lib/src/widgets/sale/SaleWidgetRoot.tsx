@@ -5,6 +5,7 @@ import {
   SaleItem,
   SaleWidgetParams,
   WidgetConfiguration,
+  WidgetLanguage,
   WidgetProperties,
   WidgetTheme,
   WidgetType,
@@ -15,13 +16,11 @@ import {
   ConnectLoaderParams,
 } from 'components/ConnectLoader/ConnectLoader';
 import { getL2ChainId } from 'lib';
-import {
-  isValidAmount,
-  isValidWalletProvider,
-} from 'lib/validations/widgetValidators';
+import { isValidWalletProvider } from 'lib/validations/widgetValidators';
 import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
 import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
 import { LoadingView } from 'views/loading/LoadingView';
+import { HandoverProvider } from 'context/handover-context/HandoverProvider';
 import { sendSaleWidgetCloseEvent } from './SaleWidgetEvents';
 import i18n from '../../i18n';
 
@@ -63,12 +62,6 @@ export class Sale extends Base<WidgetType.SALE> {
       validatedParams.walletProviderName = undefined;
     }
 
-    if (!isValidAmount(params.amount)) {
-      // eslint-disable-next-line no-console
-      console.warn('[IMTBL]: invalid "amount" widget input');
-      validatedParams.amount = '';
-    }
-
     // TODO: fix the logic here when proper , currently saying if valid then reset to empty array.
     if (!this.isValidProucts(params.items ?? [])) {
       // eslint-disable-next-line no-console
@@ -88,7 +81,10 @@ export class Sale extends Base<WidgetType.SALE> {
       validatedParams.collectionName = '';
     }
 
-    if (params.excludePaymentTypes !== undefined && !Array.isArray(params.excludePaymentTypes)) {
+    if (
+      params.excludePaymentTypes !== undefined
+      && !Array.isArray(params.excludePaymentTypes)
+    ) {
       // eslint-disable-next-line no-console
       console.warn('[IMTBL]: invalid "excludePaymentTypes" widget input');
       validatedParams.excludePaymentTypes = [];
@@ -115,25 +111,38 @@ export class Sale extends Base<WidgetType.SALE> {
       <React.StrictMode>
         <CustomAnalyticsProvider checkout={this.checkout}>
           <ThemeProvider id="sale-container" config={config}>
-            <ConnectLoader
-              widgetConfig={config}
-              params={connectLoaderParams}
-              closeEvent={() => {
-                sendSaleWidgetCloseEvent(window);
-              }}
-            >
-              <Suspense fallback={<LoadingView loadingText={t('views.LOADING_VIEW.text')} />}>
-                <SaleWidget
-                  config={config}
-                  amount={this.parameters.amount!}
-                  items={this.parameters.items!}
-                  environmentId={this.parameters.environmentId!}
-                  collectionName={this.parameters.collectionName!}
-                  excludePaymentTypes={this.parameters.excludePaymentTypes!}
-                  language="en"
-                />
-              </Suspense>
-            </ConnectLoader>
+            <HandoverProvider>
+              <ConnectLoader
+                widgetConfig={config}
+                params={connectLoaderParams}
+                closeEvent={() => {
+                  sendSaleWidgetCloseEvent(window);
+                }}
+              >
+                <Suspense
+                  fallback={
+                    <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
+                  }
+                >
+                  <SaleWidget
+                    config={config}
+                    items={this.parameters.items!}
+                    language={this.parameters.language as WidgetLanguage}
+                    environmentId={this.parameters.environmentId!}
+                    collectionName={this.parameters.collectionName!}
+                    excludePaymentTypes={this.parameters.excludePaymentTypes!}
+                    preferredCurrency={this.parameters.preferredCurrency!}
+                    hideExcludedPaymentTypes={
+                      this.properties?.config?.hideExcludedPaymentTypes ?? false
+                    }
+                    waitFulfillmentSettlements={
+                      this.properties?.config?.waitFulfillmentSettlements
+                      ?? true
+                    }
+                  />
+                </Suspense>
+              </ConnectLoader>
+            </HandoverProvider>
           </ThemeProvider>
         </CustomAnalyticsProvider>
       </React.StrictMode>,

@@ -4,6 +4,7 @@ import { CheckoutConfiguration, getL2ChainId } from '../../../config';
 import {
   AvailableRoutingOptions,
   ChainId,
+  Fee as SwapFee,
   FeeType,
   FundingStepType,
   GetBalanceResult,
@@ -16,7 +17,7 @@ import { BalanceCheckResult, BalanceRequirement } from '../../balanceCheck/types
 import { TokenBalanceResult } from '../types';
 import { quoteFetcher } from './quoteFetcher';
 import { isNativeToken } from '../../../tokens';
-import { isMatchingAddress } from '../../../utils/utils';
+import { formatSmartCheckoutAmount, isMatchingAddress } from '../../../utils/utils';
 
 const constructFees = (
   approvalGasFee: Amount | null | undefined,
@@ -51,12 +52,13 @@ const constructFees = (
     };
   }
 
-  const fees = [];
+  const fees: SwapFee[] = [];
   for (const swapFee of swapFees) {
     fees.push({
       type: FeeType.SWAP_FEE,
       amount: swapFee.amount.value,
       formattedAmount: utils.formatUnits(swapFee.amount.value, swapFee.amount.token.decimals),
+      basisPoints: swapFee.basisPoints,
       token: {
         name: swapFee.amount.token.name ?? '',
         symbol: swapFee.amount.token.symbol ?? '',
@@ -103,10 +105,10 @@ export const constructSwapRoute = (
       type,
       fundsRequired: {
         amount: fundsRequired,
-        formattedAmount: utils.formatUnits(
+        formattedAmount: formatSmartCheckoutAmount(utils.formatUnits(
           fundsRequired,
           userBalance.token.decimals,
-        ),
+        )),
       },
       userBalance: {
         balance: userBalance.balance,
@@ -350,7 +352,7 @@ export const swapRoute = async (
     // If no balance found on L2 for this quoted token then continue
     if (!userBalanceOfQuotedToken) continue;
     // Check the amount of quoted token required against the user balance
-    const amountOfQuoteTokenRequired = quote.quote.amount;
+    const amountOfQuoteTokenRequired = quote.quote.amountWithMaxSlippage;
 
     // If user does not have enough balance to perform the swap with this token then continue
     if (userBalanceOfQuotedToken.balance.lt(amountOfQuoteTokenRequired.value)) continue;
