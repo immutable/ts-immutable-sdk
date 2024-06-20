@@ -20,48 +20,68 @@ export function HandoverContent({
   return (
     <Box
       sx={{
+        height: '100%',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
       }}
     >
       <Box>
-        <Heading>{headingText}</Heading>
+        <Heading sx={{ paddingBottom: 'base.spacing.x4' }}>
+          {headingText}
+        </Heading>
 
         <Body
           size="small"
           sx={{
             textAlign: 'center',
             color: 'base.color.text.body.secondary',
-            paddingTop: 'base.spacing.x4',
           }}
         >
           {subheadingText}
         </Body>
       </Box>
 
-      <Box sx={{ paddingTop: 'base.spacing.x10' }}>
-        {primaryButtonText && onPrimaryButtonClick && (
+      {primaryButtonText && onPrimaryButtonClick && (
+        <Box
+          sx={{
+            paddingX: 'base.spacing.x4',
+            paddingBottom: 'base.spacing.x2',
+          }}
+        >
           <Button
-            sx={{ width: '100%' }}
+            sx={{
+              width: '100%',
+            }}
             variant="primary"
             size="large"
+            testId="handover-primary-button"
             onClick={onPrimaryButtonClick}
           >
             {primaryButtonText}
           </Button>
-        )}
-        {secondaryButtonText && onSecondaryButtonClick && (
+        </Box>
+      )}
+      {secondaryButtonText && onSecondaryButtonClick && (
+        <Box
+          sx={{
+            paddingX: 'base.spacing.x4',
+            paddingBottom: 'base.spacing.x4',
+          }}
+        >
           <Button
-            sx={{ width: '100%', paddingTop: 'base.spacing.x3' }}
+            sx={{
+              width: '100%',
+            }}
             variant="tertiary"
             size="large"
+            testId="handover-secondary-button"
             onClick={onSecondaryButtonClick}
           >
             {secondaryButtonText}
           </Button>
-        )}
-      </Box>
+        </Box>
+      )}
     </Box>
   );
 }
