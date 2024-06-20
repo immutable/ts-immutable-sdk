@@ -1,5 +1,5 @@
 import { Box } from '@biom3/react';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import {
   Fit,
   Layout,

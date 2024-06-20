@@ -45,7 +45,7 @@ ExecuteNextTransactionTextsConfig
     },
   },
   [TransactionMethod.EXECUTE]: {
-    before: {
+    [ExecuteTransactionStep.BEFORE]: {
       headingTextKey:
         'views.PAYMENT_METHODS.handover.execute.beforeWithCta.heading',
       ctaButtonTextKey:
@@ -53,7 +53,7 @@ ExecuteNextTransactionTextsConfig
       animationUrl: '/execute-handover.riv',
       animationName: 'Start',
     },
-    after: {
+    [ExecuteTransactionStep.AFTER]: {
       headingTextKey: 'views.PAYMENT_METHODS.handover.execute.after',
       animationUrl: '/execute-handover.riv',
       animationName: 'Handover',
