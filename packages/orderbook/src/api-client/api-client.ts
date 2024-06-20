@@ -29,11 +29,11 @@ export class ImmutableApiClient {
   async fulfillmentData(
     requests: Array<FulfillmentDataRequest>,
   ): Promise<{
-    result: {
-      fulfillable_orders: Array<FulfillableOrder>;
-      unfulfillable_orders: Array<UnfulfillableOrder>;
-    };
-  }> {
+      result: {
+        fulfillable_orders: Array<FulfillableOrder>;
+        unfulfillable_orders: Array<UnfulfillableOrder>;
+      };
+    }> {
     return this.orderbookService.fulfillmentData({
       chainName: this.chainName,
       requestBody: requests,
