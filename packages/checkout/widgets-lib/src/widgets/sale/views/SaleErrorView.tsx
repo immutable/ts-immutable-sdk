@@ -213,33 +213,14 @@ export function SaleErrorView({
       ? t(`views.SALE_FAIL.errors.${errorType}.secondaryAction`)
       : t(`views.SALE_FAIL.errors.${SaleErrorTypes.DEFAULT}.secondaryAction`);
 
-    const props: {
-      headingText: string;
-      subheadingText: string;
-      primaryButtonText?: string;
-      onPrimaryButtonClick?: () => void;
-      secondaryButtonText: string;
-      onSecondaryButtonClick: () => void;
-    } = {
+    return {
       headingText: t('views.PAYMENT_METHODS.handover.error.heading'),
       subheadingText: t(`views.SALE_FAIL.errors.${errorType}.description`),
+      primaryButtonText: t(`views.SALE_FAIL.errors.${errorType}.primaryAction`),
+      onPrimaryButtonClick: handlers?.onActionClick,
       secondaryButtonText,
-      onSecondaryButtonClick: () => {
-        if (handlers?.onSecondaryActionClick) {
-          handlers.onSecondaryActionClick();
-        }
-      },
+      onSecondaryButtonClick: handlers?.onSecondaryActionClick,
     };
-
-    if (handlers?.onActionClick) {
-      props.primaryButtonText = t(
-        `views.SALE_FAIL.errors.${errorType}.primaryAction`,
-      );
-      props.onPrimaryButtonClick = () => {
-        handlers.onActionClick?.();
-      };
-    }
-    return props;
   };
 
   useEffect(() => {
