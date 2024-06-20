@@ -74,7 +74,6 @@
       "packages/passport/sdk",
       "packages/passport/sdk-sample-app",
       "packages/orderbook",
-      "packages/internal/version-check",
       "packages/internal/metrics",
       "packages/internal/contracts",
       "packages/internal/toolkit",

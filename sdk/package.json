@@ -70,7 +70,6 @@
     "@imtbl/minting-backend": "0.0.0",
     "@imtbl/orderbook": "0.0.0",
     "@imtbl/passport": "0.0.0",
-    "@imtbl/version-check": "0.0.0",
     "@imtbl/webhook": "0.0.0",
     "@imtbl/x-client": "0.0.0",
     "@imtbl/x-provider": "0.0.0",
