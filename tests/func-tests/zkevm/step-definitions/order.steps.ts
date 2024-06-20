@@ -13,7 +13,8 @@ import {
   givenIHaveAFundedOffererAccount, thenTheListingShouldBeOfStatus,
   whenICreateAListing, whenIFulfillTheListingToBuy, andERC1155TokensShouldBeTransferredToTheFulfiller,
   thenTheListingsShouldBeOfStatus,
-  whenIFulfillBulkListings,
+  whenIFulfillBulkListings, whenIFulfillTheListingToBuyWithoutExplicitFulfillmentAmt,
+  whenICreateABulkListing,
 } from './shared';
 
 const feature = loadFeature('features/order.feature', { tagFilter: process.env.TAGS });
@@ -62,7 +63,7 @@ defineFeature(feature, (test) => {
 
     givenIHaveAFundedOffererAccount(given, bankerWallet, offerer);
 
-    andTheOffererAccountHasERC721Token(and, bankerWallet, offerer, erc721ContractAddress, testTokenId);
+    andTheOffererAccountHasERC721Token(and, bankerWallet, offerer, erc721ContractAddress, [testTokenId]);
 
     andIHaveAFundedFulfillerAccount(and, bankerWallet, fulfiller);
 
@@ -75,6 +76,45 @@ defineFeature(feature, (test) => {
     thenTheListingShouldBeOfStatus(then, sdk, getListingId);
 
     andERC721TokenShouldBeTransferredToTheFulfiller(and, bankerWallet, erc721ContractAddress, testTokenId, fulfiller);
+
+    andTradeShouldBeAvailable(and, sdk, fulfiller, getListingId);
+  }, 120_000);
+
+  test('bulk creating and fulfilling ERC721 listings', async ({
+    given,
+    when,
+    then,
+    and,
+  }) => {
+    const offerer = new Wallet(Wallet.createRandom().privateKey, provider);
+    const fulfiller = new Wallet(Wallet.createRandom().privateKey, provider);
+    const testTokenId1 = getRandomTokenId();
+    const testTokenId2 = getRandomTokenId();
+
+    let listingId: string = '';
+
+    // these callback functions are required to update / retrieve test level state variables from shared steps.
+    const setListingId = (id: string) => {
+      listingId = id;
+    };
+
+    const getListingId = () => listingId;
+
+    givenIHaveAFundedOffererAccount(given, bankerWallet, offerer);
+
+    andTheOffererAccountHasERC721Token(and, bankerWallet, offerer, erc721ContractAddress, [testTokenId1, testTokenId2]);
+
+    andIHaveAFundedFulfillerAccount(and, bankerWallet, fulfiller);
+
+    whenICreateABulkListing(when, sdk, offerer, erc721ContractAddress, [testTokenId1, testTokenId2], setListingId);
+
+    thenTheListingShouldBeOfStatus(then, sdk, getListingId);
+
+    whenIFulfillTheListingToBuy(when, sdk, fulfiller, getListingId);
+
+    thenTheListingShouldBeOfStatus(then, sdk, getListingId);
+
+    andERC721TokenShouldBeTransferredToTheFulfiller(and, bankerWallet, erc721ContractAddress, testTokenId2, fulfiller);
 
     andTradeShouldBeAvailable(and, sdk, fulfiller, getListingId);
   }, 120_000);
@@ -196,7 +236,7 @@ defineFeature(feature, (test) => {
 
     andTheOffererAccountHasERC1155Tokens(and, bankerWallet, offerer, erc1155ContractAddress, testERC1155TokenId);
 
-    andTheOffererAccountHasERC721Token(and, bankerWallet, offerer, erc721ContractAddress, testERC721TokenId);
+    andTheOffererAccountHasERC721Token(and, bankerWallet, offerer, erc721ContractAddress, [testERC721TokenId]);
 
     andIHaveAFundedFulfillerAccount(and, bankerWallet, fulfiller);
 
@@ -216,5 +256,90 @@ defineFeature(feature, (test) => {
     thenTheListingShouldBeOfStatus(then, sdk, getERC1155ListingId);
 
     andTradeShouldBeAvailable(and, sdk, fulfiller, getERC1155ListingId);
+  }, 120_000);
+
+  test('create and fully fill a ERC1155 listing without an explicit fulfill amount', ({
+    given,
+    when,
+    then,
+    and,
+  }) => {
+    const offerer = new Wallet(Wallet.createRandom().privateKey, provider);
+    const fulfiller = new Wallet(Wallet.createRandom().privateKey, provider);
+    const testTokenId = getRandomTokenId();
+
+    let listingId: string = '';
+
+    // these callback functions are required to update / retrieve test level state variables from shared steps.
+    const setListingId = (id: string) => {
+      listingId = id;
+    };
+
+    const getListingId = () => listingId;
+    givenIHaveAFundedOffererAccount(given, bankerWallet, offerer);
+
+    andTheOffererAccountHasERC1155Tokens(and, bankerWallet, offerer, erc1155ContractAddress, testTokenId);
+
+    andIHaveAFundedFulfillerAccount(and, bankerWallet, fulfiller);
+
+    whenICreateAListing(when, sdk, offerer, erc1155ContractAddress, testTokenId, setListingId);
+
+    thenTheListingShouldBeOfStatus(then, sdk, getListingId);
+
+    whenIFulfillTheListingToBuyWithoutExplicitFulfillmentAmt(when, sdk, fulfiller, getListingId);
+
+    thenTheListingShouldBeOfStatus(then, sdk, getListingId);
+
+    // eslint-disable-next-line max-len
+    andERC1155TokensShouldBeTransferredToTheFulfiller(and, bankerWallet, erc1155ContractAddress, testTokenId, fulfiller);
+
+    andTradeShouldBeAvailable(and, sdk, fulfiller, getListingId);
+  }, 120_000);
+
+  test('create and partially fill a ERC1155 listing, second fill without explicit amount', ({
+    given,
+    when,
+    then,
+    and,
+  }) => {
+    const offerer = new Wallet(Wallet.createRandom().privateKey, provider);
+    const fulfiller = new Wallet(Wallet.createRandom().privateKey, provider);
+    const testTokenId = getRandomTokenId();
+
+    let listingId: string = '';
+
+    // these callback functions are required to update / retrieve test level state variables from shared steps.
+    const setListingId = (id: string) => {
+      listingId = id;
+    };
+
+    const getListingId = () => listingId;
+    givenIHaveAFundedOffererAccount(given, bankerWallet, offerer);
+
+    andTheOffererAccountHasERC1155Tokens(and, bankerWallet, offerer, erc1155ContractAddress, testTokenId);
+
+    andIHaveAFundedFulfillerAccount(and, bankerWallet, fulfiller);
+
+    whenICreateAListing(when, sdk, offerer, erc1155ContractAddress, testTokenId, setListingId);
+
+    thenTheListingShouldBeOfStatus(then, sdk, getListingId);
+
+    whenIFulfillTheListingToBuy(when, sdk, fulfiller, getListingId);
+
+    thenTheListingShouldBeOfStatus(then, sdk, getListingId);
+
+    // eslint-disable-next-line max-len
+    andERC1155TokensShouldBeTransferredToTheFulfiller(and, bankerWallet, erc1155ContractAddress, testTokenId, fulfiller);
+
+    andTradeShouldBeAvailable(and, sdk, fulfiller, getListingId);
+
+    whenIFulfillTheListingToBuyWithoutExplicitFulfillmentAmt(when, sdk, fulfiller, getListingId);
+
+    thenTheListingShouldBeOfStatus(then, sdk, getListingId);
+
+    // eslint-disable-next-line max-len
+    andERC1155TokensShouldBeTransferredToTheFulfiller(and, bankerWallet, erc1155ContractAddress, testTokenId, fulfiller);
+
+    andTradeShouldBeAvailable(and, sdk, fulfiller, getListingId);
   }, 120_000);
 });

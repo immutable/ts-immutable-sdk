@@ -19,7 +19,7 @@ done
 git fetch --tags
 
 # get latest git tag
-LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+LATEST_TAG=$(git tag -l --sort=-v:refname | grep -v '\-alpha' | head -n 1)
 
 if [ -z "$LATEST_TAG" ]; then
   echo "No tags found. Exiting..."

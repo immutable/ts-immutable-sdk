@@ -11,8 +11,8 @@ import {
 import { GAS_OVERRIDES } from '../utils/orderbook/gas';
 import { actionAll } from '../utils/orderbook/actions';
 
-const imxForApproval = 0.02 * 1e18;
-const imxForFulfillment = 0.05 * 1e18;
+const imxForApproval = 0.03 * 1e18;
+const imxForFulfillment = 0.08 * 1e18;
 const listingPrice = 0.0001 * 1e18;
 
 export const givenIHaveAFundedOffererAccount = (
@@ -35,12 +35,16 @@ export const andTheOffererAccountHasERC721Token = (
   banker: Wallet,
   offerer: Wallet,
   contractAddress: string,
-  tokenId: string,
+  tokenIds: string[],
 ) => {
   and(/^the offerer account has (\d+) ERC721 token$/, async () => {
     const testToken = await connectToTestERC721Token(banker, contractAddress);
-    const mintTx = await testToken.mint(offerer.address, tokenId, GAS_OVERRIDES);
-    await mintTx.wait(1);
+    for (const tokenId of tokenIds) {
+      // eslint-disable-next-line no-await-in-loop
+      const mintTx = await testToken.mint(offerer.address, tokenId, GAS_OVERRIDES);
+      // eslint-disable-next-line no-await-in-loop
+      await mintTx.wait(1);
+    }
   });
 };
 
@@ -120,6 +124,62 @@ export const whenICreateAListing = (
   });
 };
 
+export const whenICreateABulkListing = (
+  when: DefineStepFunction,
+  sdk: orderbook.Orderbook,
+  offerer: Wallet,
+  contractAddress: string,
+  tokenIds: string[],
+  setListingId: (listingId: string) => void,
+) => {
+  when(/^I bulk create listings to sell (\d+) (\w+) tokens?$/, async (amount, tokenType): Promise<void> => {
+    const listingParams: any[] = [];
+    for (const tokenId of tokenIds) {
+      let sellItem;
+      if (tokenType === 'ERC721') {
+        sellItem = {
+          contractAddress,
+          tokenId,
+          type: 'ERC721',
+        } as orderbook.ERC721Item;
+      } else {
+        sellItem = {
+          contractAddress,
+          tokenId,
+          type: 'ERC1155',
+          amount: amount.toString(),
+        } as orderbook.ERC1155Item;
+      }
+
+      listingParams.push({
+        buy: {
+          amount: `${listingPrice}`,
+          type: 'NATIVE',
+        },
+        sell: sellItem,
+        makerFees: [],
+      });
+    }
+
+    const { actions, completeListings } = await sdk.prepareBulkListings({
+      makerAddress: offerer.address,
+      listingParams,
+    });
+
+    const signatures = await actionAll(actions, offerer);
+    const { result } = await completeListings(signatures[0]);
+
+    for (const res of result) {
+      if (!res.success) {
+        throw new Error(`Failed to create listing for order hash: ${res.orderHash}`);
+      }
+    }
+
+    // Set the listing ID as the second order created to be filled in the next steps
+    setListingId(result[1].order?.id!);
+  });
+};
+
 export const thenTheListingShouldBeOfStatus = (
   then: DefineStepFunction,
   sdk: orderbook.Orderbook,
@@ -154,6 +214,18 @@ export const whenIFulfillTheListingToBuy = (
   when(/^I fulfill the listing to buy (\d+) tokens?$/, async (amount) => {
     const listingId = getListingId();
     await fulfillListing(sdk, listingId, fulfiller, amount.toString());
+  });
+};
+
+export const whenIFulfillTheListingToBuyWithoutExplicitFulfillmentAmt = (
+  when: DefineStepFunction,
+  sdk: orderbook.Orderbook,
+  fulfiller: Wallet,
+  getListingId: () => string,
+) => {
+  when(/^I fulfill the listing to buy tokens?$/, async () => {
+    const listingId = getListingId();
+    await fulfillListing(sdk, listingId, fulfiller);
   });
 };
 

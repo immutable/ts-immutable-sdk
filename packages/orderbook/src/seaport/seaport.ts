@@ -1,8 +1,9 @@
 import { Seaport as SeaportLib } from '@opensea/seaport-js';
-import {
+import type {
   ApprovalAction,
   CreateInputItem,
   CreateOrderAction,
+  CreateBulkOrdersAction,
   ExchangeAction,
   OrderComponents,
   OrderUseCase,
@@ -17,6 +18,7 @@ import {
   ERC721Item,
   FulfillOrderResponse,
   NativeItem,
+  PrepareBulkSeaportOrders,
   PrepareListingResponse,
   SignableAction,
   SignablePurpose,
@@ -30,10 +32,11 @@ import {
   SEAPORT_CONTRACT_NAME,
   SEAPORT_CONTRACT_VERSION_V1_5,
 } from './constants';
-import { getOrderComponentsFromMessage } from './components';
+import { getBulkOrderComponentsFromMessage, getOrderComponentsFromMessage } from './components';
 import { SeaportLibFactory } from './seaport-lib-factory';
 import { prepareTransaction } from './transaction';
 import { mapImmutableOrderToSeaportOrderComponents } from './map-to-seaport-order';
+import { determineFillableUnits } from './fillable-units';
 
 export class Seaport {
   constructor(
@@ -43,6 +46,61 @@ export class Seaport {
     private zoneContractAddress: string,
     private rateLimitingKey?: string,
   ) {}
+
+  async prepareBulkSeaportOrders(
+    offerer: string,
+    orderInputs: {
+      listingItem: ERC721Item | ERC1155Item,
+      considerationItem: ERC20Item | NativeItem,
+      orderStart: Date,
+      orderExpiry: Date,
+    }[],
+  ): Promise<PrepareBulkSeaportOrders> {
+    const { actions: seaportActions } = await this.createSeaportOrders(
+      offerer,
+      orderInputs,
+    );
+
+    const approvalActions = seaportActions.filter((action) => action.type === 'approval') as
+      | ApprovalAction[]
+      | [];
+
+    const network = await this.provider.getNetwork();
+    const listingActions: Action[] = approvalActions.map((approvalAction) => ({
+      type: ActionType.TRANSACTION,
+      purpose: TransactionPurpose.APPROVAL,
+      buildTransaction: prepareTransaction(
+        approvalAction.transactionMethods,
+        network.chainId,
+        offerer,
+      ),
+    }));
+
+    const createAction: CreateBulkOrdersAction | undefined = seaportActions.find(
+      (action) => action.type === 'createBulk',
+    ) as CreateBulkOrdersAction | undefined;
+
+    if (!createAction) {
+      throw new Error('No create bulk order action found');
+    }
+
+    const orderMessageToSign = await createAction.getMessageToSign();
+    const { components, types, value } = getBulkOrderComponentsFromMessage(orderMessageToSign);
+
+    listingActions.push({
+      type: ActionType.SIGNABLE,
+      purpose: SignablePurpose.CREATE_LISTING,
+      message: await this.getTypedDataFromBulkOrderComponents(types, value),
+    });
+
+    return {
+      actions: listingActions,
+      preparedListings: components.map((orderComponent) => ({
+        orderComponents: orderComponent,
+        orderHash: this.getSeaportLib().getOrderHash(orderComponent),
+      })),
+    };
+  }
 
   async prepareSeaportOrder(
     offerer: string,
@@ -118,7 +176,7 @@ export class Seaport {
             parameters: orderComponents,
             signature: order.signature,
           },
-          unitsToFill,
+          unitsToFill: determineFillableUnits(order, unitsToFill),
           extraData,
           tips,
         },
@@ -187,7 +245,7 @@ export class Seaport {
           parameters: orderComponents,
           signature: o.order.signature,
         },
-        unitsToFill: o.unitsToFill,
+        unitsToFill: determineFillableUnits(o.order, o.unitsToFill),
         extraData: o.extraData,
         tips,
       };
@@ -262,6 +320,54 @@ export class Seaport {
     };
   }
 
+  private createSeaportOrders(
+    offerer: string,
+    orderInputs: {
+      listingItem: ERC721Item | ERC1155Item,
+      considerationItem: ERC20Item | NativeItem,
+      orderStart: Date,
+      orderExpiry: Date,
+    }[],
+  ): Promise<OrderUseCase<CreateBulkOrdersAction>> {
+    const seaportLib = this.getSeaportLib();
+
+    return seaportLib.createBulkOrders(orderInputs.map((orderInput) => {
+      const {
+        listingItem, considerationItem, orderStart, orderExpiry,
+      } = orderInput;
+
+      const offerItem: CreateInputItem = listingItem.type === 'ERC721'
+        ? {
+          itemType: ItemType.ERC721,
+          token: listingItem.contractAddress,
+          identifier: listingItem.tokenId,
+        }
+        : {
+          itemType: ItemType.ERC1155,
+          token: listingItem.contractAddress,
+          identifier: listingItem.tokenId,
+          amount: listingItem.amount,
+        };
+
+      return {
+        allowPartialFills: listingItem.type === 'ERC1155',
+        offer: [offerItem],
+        consideration: [
+          {
+            token:
+                considerationItem.type === 'ERC20' ? considerationItem.contractAddress : undefined,
+            amount: considerationItem.amount,
+            recipient: offerer,
+          },
+        ],
+        startTime: (orderStart.getTime() / 1000).toFixed(0),
+        endTime: (orderExpiry.getTime() / 1000).toFixed(0),
+        zone: this.zoneContractAddress,
+        restrictedByZone: true,
+      };
+    }), offerer);
+  }
+
   private createSeaportOrder(
     offerer: string,
     listingItem: ERC721Item | ERC1155Item,
@@ -303,6 +409,31 @@ export class Seaport {
       },
       offerer,
     );
+  }
+
+  // Types and value are JSON parsed from the seaport-js string, so the types are
+  // reflected as any
+  private async getTypedDataFromBulkOrderComponents(
+    types: any,
+    value: any,
+  ): Promise<SignableAction['message']> {
+    // We must remove EIP712Domain from the types object
+    // eslint-disable-next-line no-param-reassign
+    delete types.EIP712Domain;
+    const { chainId } = await this.provider.getNetwork();
+
+    const domainData = {
+      name: SEAPORT_CONTRACT_NAME,
+      version: SEAPORT_CONTRACT_VERSION_V1_5,
+      chainId,
+      verifyingContract: this.seaportContractAddress,
+    };
+
+    return {
+      domain: domainData,
+      types,
+      value,
+    };
   }
 
   private async getTypedDataFromOrderComponents(

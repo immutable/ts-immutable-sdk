@@ -28,7 +28,6 @@ import {
 } from '../types';
 import { FundingRouteExecute } from '../components/FundingRouteExecute/FundingRouteExecute';
 import { useSaleEvent } from '../hooks/useSaleEvents';
-import { getPaymentTokenDetails } from '../utils/analytics';
 
 type OrderSummaryProps = {
   subView: OrderSummarySubViews;
@@ -36,9 +35,8 @@ type OrderSummaryProps = {
 
 export function OrderSummary({ subView }: OrderSummaryProps) {
   const { t } = useTranslation();
-  const { sendPageView, sendProceedToPay } = useSaleEvent();
+  const { sendProceedToPay } = useSaleEvent();
   const {
-    items,
     fromTokenAddress,
     collectionName,
     goToErrorView,
@@ -177,25 +175,6 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
       },
     });
   }, [cryptoFiatDispatch, fundingBalances, loadingBalances]);
-
-  // Trigger page loaded event
-  useEffect(() => {
-    if (loadingBalances || !items.length || !cryptoFiatState.conversions) {
-      return;
-    }
-
-    const tokens = fundingBalances.map(
-      ({ fundingItem }) => getPaymentTokenDetails(fundingItem, cryptoFiatState.conversions),
-    );
-
-    sendPageView(SaleWidgetViews.ORDER_SUMMARY, {
-      subView: OrderSummarySubViews.REVIEW_ORDER,
-      tokens,
-      items,
-      collectionName,
-    });
-    // checkoutPrimarySaleOrderSummaryViewed
-  }, [items, collectionName, fundingBalances, loadingBalances, cryptoFiatState]);
 
   return (
     <Box>
