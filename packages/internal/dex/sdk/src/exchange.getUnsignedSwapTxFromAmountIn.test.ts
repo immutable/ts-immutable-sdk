@@ -6,9 +6,9 @@ import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
 import { constants, utils } from 'ethers';
 import { SecondaryFee } from 'types';
 import { Environment } from '@imtbl/config';
-import { Router, addAmount, newAmount } from './lib';
 import { PaymentsExtended, SwapRouter } from '@uniswap/router-sdk';
 import { WIMX__factory } from 'contracts/types';
+import { Router, addAmount, newAmount } from './lib';
 import { AVERAGE_SECONDARY_FEE_EXTRA_GAS, IMMUTABLE_TESTNET_CHAIN_ID } from './constants';
 import { Exchange } from './exchange';
 import {

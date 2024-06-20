@@ -1,12 +1,11 @@
 import { JsonRpcProvider, TransactionRequest } from '@ethersproject/providers';
 import { BigNumber } from '@ethersproject/bignumber';
-import { ERC20__factory } from '../../contracts/types/factories/ERC20__factory';
-import { ApproveError } from '../../errors';
 import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
+import { ERC20__factory } from '../../contracts/types/factories/ERC20__factory';
+import { ApproveError } from '../../errors';
 import { isERC20Amount, toPublicAmount } from '../utils';
-import { CoinAmount, Coin, ERC20, Native } from '../../types';
-import { SecondaryFee, TransactionDetails } from '../../types';
+import { CoinAmount, Coin, ERC20, Native, SecondaryFee, TransactionDetails } from '../../types';
 import { calculateGasFee } from './gas';
 
 type PreparedApproval = {

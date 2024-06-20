@@ -1,5 +1,5 @@
-import { BASIS_POINT_PRECISION } from '../constants/router';
 import { BigNumber } from 'ethers';
+import { BASIS_POINT_PRECISION } from '../constants/router';
 import { Coin, CoinAmount, SecondaryFee } from '../types';
 import { addAmount, newAmount, subtractAmount } from './utils';
 
