@@ -25,7 +25,7 @@ import {
 } from 'test/utils';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import { Fees } from '../fees';
-import { erc20ToUniswapToken, newAmount } from '../../lib';
+import { erc20ToUniswapToken, newAmount } from '../utils';
 import { QuoteResult } from '../getQuotesForRoutes';
 import { Coin, ERC20 } from '../../types';
 import { getSwap, adjustQuoteWithFees } from './swap';
