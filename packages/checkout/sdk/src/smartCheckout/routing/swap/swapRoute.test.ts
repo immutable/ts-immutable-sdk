@@ -25,6 +25,7 @@ import {
 } from '../../../types';
 import { quoteFetcher } from './quoteFetcher';
 import { HttpClient } from '../../../api/http';
+import { formatSmartCheckoutAmount } from '../../../utils/utils';
 
 jest.mock('../../../config/remoteConfigFetcher');
 jest.mock('./quoteFetcher');
@@ -236,7 +237,7 @@ describe('swapRoute', () => {
             type: ItemType.ERC20,
             fundsRequired: {
               amount: BigNumber.from(1),
-              formattedAmount: utils.formatUnits(BigNumber.from(1), 18),
+              formattedAmount: formatSmartCheckoutAmount(utils.formatUnits(BigNumber.from(1), 18)),
             },
             userBalance: {
               balance: BigNumber.from(10),
@@ -258,6 +259,7 @@ describe('swapRoute', () => {
                 decimals: 18,
                 name: 'IMX',
                 symbol: 'IMX',
+                address: undefined,
               },
             },
             swapGasFee: {
@@ -268,16 +270,19 @@ describe('swapRoute', () => {
                 decimals: 18,
                 name: 'IMX',
                 symbol: 'IMX',
+                address: undefined,
               },
             },
             swapFees: [{
               type: FeeType.SWAP_FEE,
               amount: BigNumber.from(3),
               formattedAmount: utils.formatUnits(BigNumber.from(3), 18),
+              basisPoints: 0,
               token: {
                 decimals: 18,
                 name: 'IMX',
                 symbol: 'IMX',
+                address: undefined,
               },
             }],
           },
@@ -366,7 +371,7 @@ describe('swapRoute', () => {
             type: ItemType.ERC20,
             fundsRequired: {
               amount: BigNumber.from(1),
-              formattedAmount: utils.formatUnits(BigNumber.from(1), 18),
+              formattedAmount: formatSmartCheckoutAmount(utils.formatUnits(BigNumber.from(1), 18)),
             },
             userBalance: {
               balance: BigNumber.from(10),
@@ -388,6 +393,7 @@ describe('swapRoute', () => {
                 decimals: 18,
                 name: 'IMX',
                 symbol: 'IMX',
+                address: undefined,
               },
             },
             swapGasFee: {
@@ -398,16 +404,19 @@ describe('swapRoute', () => {
                 decimals: 18,
                 name: 'IMX',
                 symbol: 'IMX',
+                address: undefined,
               },
             },
             swapFees: [{
               type: FeeType.SWAP_FEE,
               amount: BigNumber.from(3),
               formattedAmount: utils.formatUnits(BigNumber.from(3), 18),
+              basisPoints: 0,
               token: {
                 decimals: 18,
                 name: 'IMX',
                 symbol: 'IMX',
+                address: undefined,
               },
             }],
           },
@@ -508,7 +517,7 @@ describe('swapRoute', () => {
             type: ItemType.ERC20,
             fundsRequired: {
               amount: BigNumber.from(1),
-              formattedAmount: utils.formatUnits(BigNumber.from(1), 18),
+              formattedAmount: formatSmartCheckoutAmount(utils.formatUnits(BigNumber.from(1), 18)),
             },
             userBalance: {
               balance: BigNumber.from(10),
@@ -530,6 +539,7 @@ describe('swapRoute', () => {
                 decimals: 18,
                 name: 'IMX',
                 symbol: 'IMX',
+                address: undefined,
               },
             },
             swapGasFee: {
@@ -540,16 +550,19 @@ describe('swapRoute', () => {
                 decimals: 18,
                 name: 'IMX',
                 symbol: 'IMX',
+                address: undefined,
               },
             },
             swapFees: [{
               type: FeeType.SWAP_FEE,
               amount: BigNumber.from(3),
               formattedAmount: utils.formatUnits(BigNumber.from(3), 18),
+              basisPoints: 0,
               token: {
                 decimals: 18,
                 name: 'IMX',
                 symbol: 'IMX',
+                address: undefined,
               },
             }],
           },
@@ -561,7 +574,7 @@ describe('swapRoute', () => {
             type: ItemType.ERC20,
             fundsRequired: {
               amount: BigNumber.from(1),
-              formattedAmount: utils.formatUnits(BigNumber.from(1), 18),
+              formattedAmount: formatSmartCheckoutAmount(utils.formatUnits(BigNumber.from(1), 18)),
             },
             userBalance: {
               balance: BigNumber.from(10),
@@ -583,6 +596,7 @@ describe('swapRoute', () => {
                 decimals: 18,
                 name: 'IMX',
                 symbol: 'IMX',
+                address: undefined,
               },
             },
             swapGasFee: {
@@ -593,16 +607,19 @@ describe('swapRoute', () => {
                 decimals: 18,
                 name: 'IMX',
                 symbol: 'IMX',
+                address: undefined,
               },
             },
             swapFees: [{
               type: FeeType.SWAP_FEE,
               amount: BigNumber.from(3),
               formattedAmount: utils.formatUnits(BigNumber.from(3), 18),
+              basisPoints: 0,
               token: {
                 decimals: 18,
                 name: 'IMX',
                 symbol: 'IMX',
+                address: undefined,
               },
             }],
           },
@@ -1161,7 +1178,7 @@ describe('swapRoute', () => {
             type: ItemType.NATIVE,
             fundsRequired: {
               amount: BigNumber.from(100),
-              formattedAmount: utils.formatUnits(BigNumber.from(100), 18),
+              formattedAmount: formatSmartCheckoutAmount(utils.formatUnits(BigNumber.from(100), 18)),
             },
             userBalance: {
               balance: BigNumber.from(100),
@@ -1218,7 +1235,7 @@ describe('swapRoute', () => {
             type: ItemType.ERC20,
             fundsRequired: {
               amount: BigNumber.from(100),
-              formattedAmount: utils.formatUnits(BigNumber.from(100), 18),
+              formattedAmount: formatSmartCheckoutAmount(utils.formatUnits(BigNumber.from(100), 18)),
             },
             userBalance: {
               balance: BigNumber.from(100),

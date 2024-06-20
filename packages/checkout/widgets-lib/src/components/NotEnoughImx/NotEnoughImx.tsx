@@ -44,8 +44,13 @@ export function NotEnoughImx({
       <Drawer.Content>
         <Box testId="not-enough-gas-bottom-sheet" sx={containerStyles}>
           <CloudImage
-            imageUrl={imxLogo}
             sx={{ w: 'base.icon.size.600', h: 'base.icon.size.600' }}
+            use={(
+              <img
+                src={imxLogo}
+                alt={t(`drawers.notEnoughImx.content.${hasZeroImx ? 'noImx' : 'insufficientImx'}.heading`)}
+              />
+            )}
           />
           <Heading
             size="small"

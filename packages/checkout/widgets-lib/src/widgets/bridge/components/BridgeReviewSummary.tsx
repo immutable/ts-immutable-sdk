@@ -16,7 +16,7 @@ import {
   isPassportProvider,
   isWalletConnectProvider,
 } from 'lib/provider';
-import { calculateCryptoToFiat, isNativeToken } from 'lib/utils';
+import { calculateCryptoToFiat, getChainImage, isNativeToken } from 'lib/utils';
 import {
   DEFAULT_QUOTE_REFRESH_INTERVAL,
   DEFAULT_TOKEN_DECIMALS,
@@ -25,7 +25,8 @@ import {
   NATIVE,
   addChainChangedListener,
   getL1ChainId,
-  networkIcon,
+  getL2ChainId,
+  networkName,
   removeChainChangedListener,
 } from 'lib';
 import { useInterval } from 'lib/hooks/useInterval';
@@ -40,7 +41,6 @@ import { NetworkSwitchDrawer } from 'components/NetworkSwitchDrawer/NetworkSwitc
 import { Web3Provider } from '@ethersproject/providers';
 import { useWalletConnect } from 'lib/hooks/useWalletConnect';
 import { NotEnoughGas } from 'components/NotEnoughGas/NotEnoughGas';
-import { networkIconStyles } from './WalletNetworkButtonStyles';
 import {
   arrowIconStyles,
   arrowIconWrapperStyles,
@@ -51,6 +51,7 @@ import {
   topMenuItemStyles,
   wcStickerLogoStyles,
   wcWalletLogoStyles,
+  networkIconStyles,
 } from './BridgeReviewSummaryStyles';
 import { BridgeActions, BridgeContext } from '../context/BridgeContext';
 import {
@@ -61,6 +62,7 @@ import {
 import { Fees } from '../../../components/Fees/Fees';
 import { formatBridgeFees } from '../functions/BridgeFees';
 import { RawImage } from '../../../components/RawImage/RawImage';
+import { getErc20Contract } from '../functions/TransferErc20';
 
 const testId = 'bridge-review-summary';
 
@@ -74,12 +76,13 @@ export function BridgeReviewSummary() {
     },
     bridgeDispatch,
   } = useContext(BridgeContext);
+  const { environment } = checkout.config;
 
   const { track } = useAnalytics();
 
   const { cryptoFiatState } = useContext(CryptoFiatContext);
   const [loading, setLoading] = useState(false);
-  const [estimates, setEstimates] = useState<any | undefined>(undefined);
+  const [estimates, setEstimates] = useState<GasEstimateBridgeToL2Result | undefined>(undefined);
   const [gasFee, setGasFee] = useState<string>('');
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
   const [approveTransaction, setApproveTransaction] = useState<
@@ -103,6 +106,11 @@ export function BridgeReviewSummary() {
   // Not enough ETH to cover gas
   const [showNotEnoughGasDrawer, setShowNotEnoughGasDrawer] = useState(false);
 
+  const isTransfer = useMemo(() => from?.network === to?.network, [from, to]);
+  const isDeposit = useMemo(
+    () => (getL2ChainId(checkout.config) === to?.network),
+    [from, to, checkout],
+  );
   const insufficientFundsForGas = useMemo(() => {
     if (!estimates) return false;
     if (!token) return true;
@@ -146,29 +154,65 @@ export function BridgeReviewSummary() {
 
   const toNetwork = useMemo(() => to?.network, [to]);
 
-  const fetchGasEstimate = useCallback(async () => {
+  const fetchTransferGasEstimate = useCallback(async () => {
     if (!tokenBridge || !amount || !from || !to || !token) return;
 
-    const [unsignedApproveTransaction, unsignedTransaction] = await Promise.all(
-      [
-        tokenBridge!.getUnsignedApproveBridgeTx({
-          senderAddress: fromAddress,
-          token: token.address ?? NATIVE.toUpperCase(),
-          amount: utils.parseUnits(amount, token.decimals),
-          sourceChainId: from?.network.toString(),
-          destinationChainId: to?.network.toString(),
-        }),
-        tokenBridge!.getUnsignedBridgeTx({
-          senderAddress: fromAddress,
-          recipientAddress: toAddress,
-          token: token.address ?? NATIVE.toUpperCase(),
-          amount: utils.parseUnits(amount, token.decimals),
-          sourceChainId: from?.network.toString(),
-          destinationChainId: to?.network.toString(),
-          gasMultiplier: 1.1,
-        }),
-      ],
-    );
+    const tokenToTransfer = token?.address?.toLowerCase() ?? NATIVE.toUpperCase();
+    const gasEstimateResult = {
+      gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+      fees: {},
+      token: checkout.config.networkMap.get(from!.network)?.nativeCurrency,
+    } as GasEstimateBridgeToL2Result;
+    let estimatePromise: Promise<BigNumber>;
+    if (tokenToTransfer === NATIVE.toLowerCase()) {
+      estimatePromise = checkout.providerCall(from.web3Provider, async (provider) => await provider.estimateGas({
+        to: toAddress,
+        // If 'from' not provided it assumes the transaction is being sent from the zero address.
+        // Estimation will fail unless the amount is within the zero addresses balance.
+        from: fromAddress,
+        value: utils.parseUnits(amount, token.decimals),
+      }));
+    } else {
+      const erc20 = getErc20Contract(tokenToTransfer, from.web3Provider.getSigner());
+      estimatePromise = erc20.estimateGas.transfer(toAddress, utils.parseUnits(amount, token.decimals));
+    }
+    try {
+      const [estimate, gasPrice] = await Promise.all([estimatePromise, from.web3Provider.getGasPrice()]);
+      const gas = estimate.mul(gasPrice);
+      const formattedEstimate = utils.formatUnits(gas, DEFAULT_TOKEN_DECIMALS);
+      gasEstimateResult.fees.sourceChainGas = gas;
+      gasEstimateResult.fees.totalFees = gas;
+      setEstimates(gasEstimateResult);
+      setGasFee(formattedEstimate);
+      setGasFeeFiatValue(calculateCryptoToFiat(formattedEstimate, NATIVE.toUpperCase(), cryptoFiatState.conversions));
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('Unable to fetch gas estimate', e);
+    }
+  }, [checkout, from, to, token, amount]);
+
+  const fetchBridgeGasEstimate = useCallback(async () => {
+    if (!tokenBridge || !amount || !from || !to || !token) return;
+
+    const bundledTxn = await tokenBridge!.getUnsignedBridgeBundledTx({
+      senderAddress: fromAddress,
+      recipientAddress: toAddress,
+      token: token.address ?? NATIVE.toUpperCase(),
+      amount: utils.parseUnits(amount, token.decimals),
+      sourceChainId: from?.network.toString(),
+      destinationChainId: to?.network.toString(),
+      gasMultiplier: 'auto',
+    });
+
+    const unsignedApproveTransaction = {
+      contractToApprove: bundledTxn.contractToApprove,
+      unsignedTx: bundledTxn.unsignedApprovalTx,
+    };
+
+    const unsignedTransaction = {
+      feeData: bundledTxn.feeData,
+      unsignedTx: bundledTxn.unsignedBridgeTx,
+    };
 
     setApproveTransaction(unsignedApproveTransaction);
     setTransaction(unsignedTransaction);
@@ -193,7 +237,6 @@ export function BridgeReviewSummary() {
       },
       token: checkout.config.networkMap.get(from!.network)?.nativeCurrency,
     } as GasEstimateBridgeToL2Result;
-
     setEstimates(gasEstimateResult);
     const estimatedAmount = utils.formatUnits(
       gasEstimateResult?.fees.totalFees || 0,
@@ -209,17 +252,27 @@ export function BridgeReviewSummary() {
       ),
     );
   }, [checkout, tokenBridge]);
-  useInterval(() => fetchGasEstimate(), DEFAULT_QUOTE_REFRESH_INTERVAL);
+  useInterval(() => {
+    if (isTransfer) {
+      fetchTransferGasEstimate();
+    } else {
+      fetchBridgeGasEstimate();
+    }
+  }, DEFAULT_QUOTE_REFRESH_INTERVAL);
 
   const formatFeeBreakdown = useCallback(
-    (): any => formatBridgeFees(estimates, cryptoFiatState, t),
-    [estimates],
+    () => formatBridgeFees(estimates, isDeposit, cryptoFiatState, t),
+    [estimates, isDeposit],
   );
 
   useEffect(() => {
     (async () => {
       setLoading(true);
-      await fetchGasEstimate();
+      if (isTransfer) {
+        await fetchTransferGasEstimate();
+      } else {
+        await fetchBridgeGasEstimate();
+      }
       setLoading(false);
     })();
   }, []);
@@ -284,7 +337,7 @@ export function BridgeReviewSummary() {
   }, [insufficientFundsForGas]);
 
   const submitBridge = useCallback(async () => {
-    if (!approveTransaction || !transaction) return;
+    if (!isTransfer && (!approveTransaction || !transaction)) return;
 
     if (insufficientFundsForGas) {
       setShowNotEnoughGasDrawer(true);
@@ -314,8 +367,8 @@ export function BridgeReviewSummary() {
         fromNetwork,
         fromWallet: {
           address: fromAddress,
-          rdns: from?.walletProviderInfo.rdns,
-          uuid: from?.walletProviderInfo.uuid,
+          rdns: from?.walletProviderInfo?.rdns,
+          uuid: from?.walletProviderInfo?.uuid,
           isPassportWallet: isPassportProvider(from?.web3Provider),
           isMetaMask: isMetaMaskProvider(from?.web3Provider),
         },
@@ -323,14 +376,15 @@ export function BridgeReviewSummary() {
         toNetwork,
         toWallet: {
           address: toAddress,
-          rdns: to?.walletProviderInfo.rdns,
-          uuid: to?.walletProviderInfo.uuid,
+          rdns: to?.walletProviderInfo?.rdns,
+          uuid: to?.walletProviderInfo?.uuid,
           isPassportWallet: isPassportProvider(to?.web3Provider),
           isMetaMask: isMetaMaskProvider(to?.web3Provider),
         },
         amount,
         fiatAmount: fromFiatAmount,
         tokenAddress: token?.address,
+        moveType: isTransfer ? 'transfer' : 'bridge',
       },
     });
 
@@ -424,9 +478,14 @@ export function BridgeReviewSummary() {
           </Body>
         </MenuItem.Label>
         {fromNetwork && (
-          <MenuItem.IntentIcon
-            icon={networkIcon[fromNetwork] as any}
-            sx={networkIconStyles(fromNetwork)}
+          <MenuItem.FramedImage
+            use={(
+              <img
+                src={getChainImage(environment, fromNetwork)}
+                alt={networkName[fromNetwork]}
+              />
+            )}
+            sx={networkIconStyles}
           />
         )}
       </MenuItem>
@@ -471,9 +530,14 @@ export function BridgeReviewSummary() {
           </Body>
         </MenuItem.Label>
         {toNetwork && (
-          <MenuItem.IntentIcon
-            icon={networkIcon[toNetwork] as any}
-            sx={networkIconStyles(toNetwork)}
+          <MenuItem.FramedImage
+            use={(
+              <img
+                src={getChainImage(environment, toNetwork)}
+                alt={networkName[toNetwork]}
+              />
+            )}
+            sx={networkIconStyles}
           />
         )}
       </MenuItem>

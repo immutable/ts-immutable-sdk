@@ -50,6 +50,24 @@ export interface ERC721ApproveMetadata {
      * @memberof ERC721ApproveMetadata
      */
     'asset_name': string;
+    /**
+     * Indicate if it is a Smart Contract or EOA
+     * @type {boolean}
+     * @memberof ERC721ApproveMetadata
+     */
+    'is_smart_contract': boolean;
+    /**
+     * Is Contract Verified
+     * @type {boolean}
+     * @memberof ERC721ApproveMetadata
+     */
+    'is_contract_verified': boolean;
+    /**
+     * Smart Contract Name
+     * @type {string}
+     * @memberof ERC721ApproveMetadata
+     */
+    'contract_name': string;
 }
 
 export const ERC721ApproveMetadataTransactionTypeEnum = {

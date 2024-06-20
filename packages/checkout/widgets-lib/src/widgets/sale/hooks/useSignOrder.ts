@@ -14,6 +14,7 @@ import {
 } from '../types';
 import { PRIMARY_SALES_API_BASE_URL } from '../utils/config';
 import { hexToText } from '../functions/utils';
+import { filterAllowedTransactions } from '../functions/signUtils';
 
 type SignApiTransaction = {
   contract_address: string;
@@ -143,16 +144,15 @@ const toSignResponse = (
       rawData: transaction.raw_data,
     })),
     transactionId: hexToText(
-      transactions
-        .find((txn) => txn.method_call.startsWith('execute'))
-        ?.params.reference || '',
+      transactions.find((txn) => txn.method_call.startsWith('execute'))?.params
+        .reference || '',
     ),
   };
 };
 
 export const useSignOrder = (input: SignOrderInput) => {
   const {
-    provider, items, recipientAddress, environment, environmentId,
+    provider, items, environment, environmentId, waitFulfillmentSettlements,
   } = input;
   const [signError, setSignError] = useState<SignOrderError | undefined>(
     undefined,
@@ -186,10 +186,7 @@ export const useSignOrder = (input: SignOrderInput) => {
       data: string,
       gasLimit: number,
       method: string,
-      waitForTrnsactionSettlement: boolean,
-    ): Promise<[hash: string | undefined, error: any]> => {
-      let transactionHash: string | undefined;
-
+    ): Promise<[hash: string | undefined, error?: SignOrderError]> => {
       try {
         const signer = provider?.getSigner();
         const gasPrice = await provider?.getGasPrice();
@@ -202,17 +199,19 @@ export const useSignOrder = (input: SignOrderInput) => {
 
         setExecuteTransactions({ method, hash: txnResponse?.hash });
 
-        if (waitForTrnsactionSettlement) {
+        if (waitFulfillmentSettlements) {
           await txnResponse?.wait();
         }
 
-        transactionHash = txnResponse?.hash || '';
+        const transactionHash = txnResponse?.hash;
+        if (!transactionHash) {
+          throw new Error('Transaction hash is undefined');
+        }
         return [transactionHash, undefined];
       } catch (err) {
         const reason = `${
           (err as any)?.reason || (err as any)?.message || ''
         }`.toLowerCase();
-        transactionHash = (err as any)?.transactionHash;
 
         let errorType = SaleErrorTypes.WALLET_FAILED;
 
@@ -237,13 +236,12 @@ export const useSignOrder = (input: SignOrderInput) => {
         ) {
           errorType = SaleErrorTypes.TRANSACTION_FAILED;
         }
-
-        setSignError({
+        const error: SignOrderError = {
           type: errorType,
           data: { error: err },
-        });
-
-        return [undefined, err];
+        };
+        setSignError(error);
+        return [undefined, error];
       }
     },
     [provider],
@@ -255,8 +253,11 @@ export const useSignOrder = (input: SignOrderInput) => {
       fromTokenAddress: string,
     ): Promise<SignResponse | undefined> => {
       try {
+        const signer = provider?.getSigner();
+        const address = await signer?.getAddress() || '';
+
         const data: SignApiRequest = {
-          recipient_address: recipientAddress,
+          recipient_address: address,
           payment_type: paymentType,
           currency_filter: SignCurrencyFilter.CONTRACT_ADDRESS,
           currency_value: fromTokenAddress,
@@ -318,27 +319,31 @@ export const useSignOrder = (input: SignOrderInput) => {
       }
       return undefined;
     },
-    [items, recipientAddress, environmentId, environment, provider],
+    [items, environmentId, environment, provider],
   );
 
   const execute = async (
     signData: SignResponse | undefined,
-    waitForTrnsactionSettlement: boolean,
     onTxnSuccess: (txn: ExecutedTransaction) => void,
-    onTxnError: (error: any, txns: ExecutedTransaction[]) => void,
+    onTxnError: (error: SignOrderError, txns: ExecutedTransaction[]) => void,
   ): Promise<ExecutedTransaction[]> => {
-    if (!signData) {
+    if (!signData || !provider) {
       setSignError({
         type: SaleErrorTypes.DEFAULT,
         data: { reason: 'No sign data' },
       });
-
       return [];
     }
 
     let successful = true;
     const execTransactions: ExecutedTransaction[] = [];
-    for (const transaction of signData.transactions) {
+
+    const transactions = await filterAllowedTransactions(
+      signData.transactions,
+      provider,
+    );
+
+    for (const transaction of transactions) {
       const {
         tokenAddress: to,
         rawData: data,
@@ -351,10 +356,9 @@ export const useSignOrder = (input: SignOrderInput) => {
         data,
         gasEstimate,
         method,
-        waitForTrnsactionSettlement,
       );
 
-      if (txnError || !hash) {
+      if (txnError) {
         successful = false;
         onTxnError(txnError, execTransactions);
         break;

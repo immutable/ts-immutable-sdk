@@ -45,6 +45,7 @@ interface BridgeReview extends ViewType {
 interface BridgeInProgress extends ViewType {
   type: BridgeWidgetViews.IN_PROGRESS,
   transactionHash: string,
+  isTransfer: boolean,
 }
 
 interface BridgeFailure extends ViewType {
@@ -54,8 +55,8 @@ interface BridgeFailure extends ViewType {
 
 interface BridgeApproveTransaction extends ViewType {
   type: BridgeWidgetViews.APPROVE_TRANSACTION,
-  approveTransaction: ApproveBridgeResponse;
-  transaction: BridgeTxResponse;
+  approveTransaction: ApproveBridgeResponse | undefined;
+  transaction: BridgeTxResponse | undefined;
 }
 
 interface BridgeTransactions extends ViewType {

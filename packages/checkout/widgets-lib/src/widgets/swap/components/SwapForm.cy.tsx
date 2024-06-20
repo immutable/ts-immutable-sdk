@@ -101,13 +101,13 @@ describe('SwapForm', () => {
         </SwapWidgetTestComponent>,
       );
       cySmartGet('fromTokenInputs-select-form-select__target').should('be.visible');
-      cySmartGet('fromTokenInputs-select-form-select__target').should('have.text', 'Select coin');
+      cySmartGet('fromTokenInputs-select-form-select__target').should('have.text', 'Select token');
       cySmartGet('fromTokenInputs-text-form-text')
         .should('be.visible');
       cySmartGet('fromTokenInputs-text-form-text__input')
         .should('have.attr', 'placeholder', '0');
       cySmartGet('toTokenInputs-select-form-select__target').should('be.visible');
-      cySmartGet('toTokenInputs-select-form-select__target').should('have.text', 'Select coin');
+      cySmartGet('toTokenInputs-select-form-select__target').should('have.text', 'Select token');
       cySmartGet('toTokenInputs-text-form-text').should('be.visible');
       cySmartGet('toTokenInputs-text-form-text__input').should(
         'have.attr',
@@ -233,7 +233,7 @@ describe('SwapForm', () => {
       cySmartGet('fromTokenInputs-select-form-select__target').should('be.visible');
       cySmartGet('fromTokenInputs-select-form-select__target').should('have.text', 'ETH');
       cySmartGet('toTokenInputs-select-form-select__target').should('be.visible');
-      cySmartGet('toTokenInputs-select-form-select__target').should('have.text', 'Select coin');
+      cySmartGet('toTokenInputs-select-form-select__target').should('have.text', 'Select token');
     });
   });
 
@@ -453,7 +453,7 @@ describe('SwapForm', () => {
       );
 
       cySmartGet('toTokenInputs-select-form-select__target').click();
-      cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
+      cySmartGet('toTokenInputs-select-form-coin-selector__option-native').click();
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').blur();
       cySmartGet('swap-button').click();
       cySmartGet('fromTokenInputs-select-form-select-control-error')
@@ -534,7 +534,7 @@ describe('SwapForm', () => {
       cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
         .click();
       cySmartGet('toTokenInputs-select-form-select__target').click();
-      cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
+      cySmartGet('toTokenInputs-select-form-coin-selector__option-native').click();
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').trigger('change');
 
       const params = [
@@ -580,7 +580,7 @@ describe('SwapForm', () => {
       cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
         .click();
       cySmartGet('toTokenInputs-select-form-select__target').click();
-      cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
+      cySmartGet('toTokenInputs-select-form-coin-selector__option-native').click();
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').trigger('change');
       cySmartGet('@fromAmountInStub').should('have.been.called');
 
@@ -607,8 +607,8 @@ describe('SwapForm', () => {
         },
       ];
       cySmartGet('@fromAmountInStub').should('have.been.calledWith', ...params);
-      cySmartGet('fees-gas-fee__priceDisplay__price').should('have.text', '~ IMX 0.112300');
-      cySmartGet('fees-gas-fee__priceDisplay__fiatAmount').should('have.text', '~ USD $0.08');
+      cySmartGet('fees-gas-fee__priceDisplay__price').should('have.text', '≈ IMX 0.112300');
+      cySmartGet('fees-gas-fee__priceDisplay__fiatAmount').should('have.text', '≈ USD $0.08');
     });
 
     it('should fetch a quote after from amount max button is clicked', () => {
@@ -629,7 +629,7 @@ describe('SwapForm', () => {
       cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
         .click();
       cySmartGet('toTokenInputs-select-form-select__target').click();
-      cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
+      cySmartGet('toTokenInputs-select-form-coin-selector__option-native').click();
       cySmartGet('fromTokenInputs-text-form-max-button').click();
 
       const params = [
@@ -679,7 +679,7 @@ describe('SwapForm', () => {
       cySmartGet('@fromAmountInStub').should('not.have.been.called');
 
       cySmartGet('toTokenInputs-select-form-select__target').click();
-      cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
+      cySmartGet('toTokenInputs-select-form-coin-selector__option-native').click();
       cySmartGet('@fromAmountInStub').should('have.been.called');
     });
 
@@ -698,7 +698,7 @@ describe('SwapForm', () => {
       );
 
       cySmartGet('toTokenInputs-select-form-select__target').click();
-      cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
+      cySmartGet('toTokenInputs-select-form-coin-selector__option-native').click();
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').trigger('change');
       cySmartGet('@fromAmountInStub').should('not.have.been.called');
 
@@ -726,7 +726,7 @@ describe('SwapForm', () => {
       cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
         .click();
       cySmartGet('toTokenInputs-select-form-select__target').click();
-      cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
+      cySmartGet('toTokenInputs-select-form-coin-selector__option-native').click();
       cySmartGet('fromTokenInputs-text-form-text__input').type('0').trigger('change');
       cySmartGet('@fromAmountInStub').should('not.have.been.called');
 
@@ -807,7 +807,7 @@ describe('SwapForm', () => {
       cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
         .click();
       cySmartGet('toTokenInputs-select-form-select__target').click();
-      cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
+      cySmartGet('toTokenInputs-select-form-coin-selector__option-native').click();
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').trigger('change');
       cySmartGet('@fromAmountInStub').should('have.been.called');
 
@@ -834,8 +834,8 @@ describe('SwapForm', () => {
         },
       ];
       cySmartGet('@fromAmountInStub').should('have.been.calledWith', ...params);
-      cySmartGet('fees-gas-fee__priceDisplay__price').should('have.text', '~ IMX 0.224600');
-      cySmartGet('fees-gas-fee__priceDisplay__fiatAmount').should('have.text', '~ USD $0.17');
+      cySmartGet('fees-gas-fee__priceDisplay__price').should('have.text', '≈ IMX 0.224600');
+      cySmartGet('fees-gas-fee__priceDisplay__fiatAmount').should('have.text', '≈ USD $0.17');
     });
   });
 
@@ -972,7 +972,7 @@ describe('SwapForm', () => {
         cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
           .click();
         cySmartGet('toTokenInputs-select-form-select__target').click();
-        cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
+        cySmartGet('toTokenInputs-select-form-coin-selector__option-native').click();
 
         cySmartGet('fromTokenInputs-text-form-text__input').type('0.1').trigger('change');
         cySmartGet('@fromAmountInStub').should('have.been.called');
@@ -1069,7 +1069,7 @@ describe('SwapForm', () => {
         cySmartGet('toTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
           .click();
         cySmartGet('fromTokenInputs-select-form-select__target').click();
-        cySmartGet('fromTokenInputs-select-form-coin-selector__option-imx-native').click();
+        cySmartGet('fromTokenInputs-select-form-coin-selector__option-native').click();
 
         cySmartGet('toTokenInputs-text-form-text__input').type('0.00001').trigger('change');
         cySmartGet('@fromAmountInStub').should('have.been.called');
@@ -1130,7 +1130,7 @@ describe('SwapForm', () => {
         cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
           .click();
         cySmartGet('toTokenInputs-select-form-select__target').click();
-        cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
+        cySmartGet('toTokenInputs-select-form-coin-selector__option-native').click();
 
         cySmartGet('fromTokenInputs-text-form-text__input').type('0.1').trigger('change');
         cySmartGet('@fromAmountInStub').should('have.been.called');
@@ -1168,7 +1168,7 @@ describe('SwapForm', () => {
         cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
           .click();
         cySmartGet('toTokenInputs-select-form-select__target').click();
-        cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
+        cySmartGet('toTokenInputs-select-form-coin-selector__option-native').click();
 
         cySmartGet('fromTokenInputs-text-form-text__input').type('0.00001').trigger('change');
         cySmartGet('@fromAmountInStub').should('have.been.called');
@@ -1177,9 +1177,9 @@ describe('SwapForm', () => {
 
         cySmartGet('unable-to-swap-cancel-button').click();
         cySmartGet('unable-to-swap-bottom-sheet').should('not.exist');
-        cySmartGet('fromTokenInputs-select-form-select__target').should('have.text', 'Select coin');
+        cySmartGet('fromTokenInputs-select-form-select__target').should('have.text', 'Select token');
         cySmartGet('fromTokenInputs-text-form-text__input').should('have.text', '');
-        cySmartGet('toTokenInputs-select-form-select__target').should('have.text', 'Select coin');
+        cySmartGet('toTokenInputs-select-form-select__target').should('have.text', 'Select token');
         cySmartGet('toTokenInputs-text-form-text__input').should('have.text', '');
       });
     });

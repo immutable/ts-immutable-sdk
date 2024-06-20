@@ -2,6 +2,7 @@ import { SDKBase, InstanceWithExtensions } from '@magic-sdk/provider';
 import { Magic } from 'magic-sdk';
 import { OpenIdExtension } from '@magic-ext/oidc';
 import { ethers } from 'ethers';
+import { trackDuration } from '@imtbl/metrics';
 import { PassportErrorType, withPassportError } from './errors/passportError';
 import { PassportConfiguration } from './config';
 import { lazyDocumentReady } from './utils/lazyLoad';
@@ -41,11 +42,19 @@ export default class MagicAdapter {
     idToken: string,
   ): Promise<ethers.providers.ExternalProvider> {
     return withPassportError<ethers.providers.ExternalProvider>(async () => {
+      const startTime = performance.now();
+
       const magicClient = await this.magicClient;
       await magicClient.openid.loginWithOIDC({
         jwt: idToken,
         providerId: this.config.magicProviderId,
       });
+
+      trackDuration(
+        'passport',
+        'magicLogin',
+        Math.round(performance.now() - startTime),
+      );
 
       return magicClient.rpcProvider as unknown as ethers.providers.ExternalProvider;
     }, PassportErrorType.WALLET_CONNECTION_ERROR);

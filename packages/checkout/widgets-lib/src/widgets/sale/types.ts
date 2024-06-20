@@ -1,5 +1,10 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { SaleItem, TransactionRequirement } from '@imtbl/checkout-sdk';
+import {
+  SaleItem,
+  FundingStep,
+  FundingItem,
+  SmartCheckoutResult,
+} from '@imtbl/checkout-sdk';
 
 export type SignedOrderProduct = {
   productId: string;
@@ -48,19 +53,12 @@ export type SignOrderInput = {
   recipientAddress: string;
   environment: string;
   environmentId: string;
+  waitFulfillmentSettlements: boolean;
 };
 
 export type SignOrderError = {
   type: SaleErrorTypes;
   data?: Record<string, unknown>;
-};
-
-export type SmartCheckoutError = {
-  type: SaleErrorTypes;
-  data?: {
-    error: Error;
-    transactionRequirements?: TransactionRequirement[];
-  }
 };
 
 export type ExecutedTransaction = {
@@ -85,26 +83,55 @@ export enum SaleErrorTypes {
   WALLET_REJECTED = 'WALLET_REJECTED',
   WALLET_REJECTED_NO_FUNDS = 'WALLET_REJECTED_NO_FUNDS',
   WALLET_POPUP_BLOCKED = 'WALLET_POPUP_BLOCKED',
-  SMART_CHECKOUT_ERROR = 'SMART_CHECKOUT_ERROR',
-  SMART_CHECKOUT_EXECUTE_ERROR = 'SMART_CHECKOUT_EXECUTE_ERROR',
+  FUNDING_ROUTE_EXECUTE_ERROR = 'FUNDING_ROUTE_EXECUTE_ERROR',
 }
 
-export enum SmartCheckoutErrorTypes {
-  FRACTIONAL_BALANCE_BLOCKED = 'FRACTIONAL_BALANCE_BLOCKED',
-}
-
-export type ClientConfigCurrency = {
-  name: string;
+export type OrderQuoteCurrency = {
+  base: boolean;
   decimals: number;
-  erc20Address: string;
+  address: string;
+  exchangeId: string;
+  name: string;
 };
 
-export type ClientConfig = {
-  contractId: string;
-  currencies: ClientConfigCurrency[];
+export type OrderQuotePricing = {
+  amount: number;
+  currency: string;
+  type: string;
+};
+
+export type OrderQuoteProduct = {
+  productId: string;
+  quantity: number;
+  pricing: Record<string, OrderQuotePricing>;
+};
+
+export type OrderQuote = {
+  config: {
+    contractId: string;
+  },
+  currencies: Array<OrderQuoteCurrency>;
+  products: Record<string, OrderQuoteProduct>;
+  totalAmount: Record<string, OrderQuotePricing>;
 };
 
 export enum SignPaymentTypes {
   CRYPTO = 'crypto',
   FIAT = 'fiat',
 }
+
+export enum FundingBalanceType {
+  SUFFICIENT = 'SUFFICIENT',
+}
+
+export type SufficientFundingStep = {
+  type: FundingBalanceType.SUFFICIENT;
+  fundingItem: FundingItem;
+};
+
+export type FundingBalance = FundingStep | SufficientFundingStep;
+
+export type FundingBalanceResult = {
+  currency: OrderQuoteCurrency;
+  smartCheckoutResult: SmartCheckoutResult;
+};

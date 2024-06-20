@@ -1,5 +1,6 @@
 import { MenuItem, AllIconKeys } from '@biom3/react';
 import { useTranslation } from 'react-i18next';
+import { TokenImage } from 'components/TokenImage/TokenImage';
 
 export interface CoinSelectorOptionProps {
   testId?: string;
@@ -22,14 +23,12 @@ export function CoinSelectorOption({
 
   return (
     <MenuItem testId={`${testId}-coin-selector__option-${id}`} emphasized size="small" onClick={onClick}>
-      {!icon && <MenuItem.Icon icon="Coins" variant="bold" />}
-      {icon && (
-        <MenuItem.FramedImage
-          imageUrl={icon}
-          circularFrame
-          defaultImageUrl={defaultTokenImage}
-        />
-      )}
+      <MenuItem.FramedImage
+        circularFrame
+        use={(
+          <TokenImage src={icon} name={name} defaultImage={defaultTokenImage} />
+        )}
+      />
 
       <MenuItem.Label>{name}</MenuItem.Label>
       <MenuItem.Caption>{symbol}</MenuItem.Caption>

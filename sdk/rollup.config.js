@@ -9,7 +9,7 @@ import pkg from './package.json' assert { type: 'json' };
 import moduleReleases from './module-release.json' assert { type: 'json' };
 import terser from '@rollup/plugin-terser';
 import nodePolyfills from 'rollup-plugin-polyfill-node';
-
+import babel from '@rollup/plugin-babel';
 
 // RELEASE_TYPE environment variable is set by the CI/CD pipeline
 const releaseType = process.env.RELEASE_TYPE || 'alpha';
@@ -47,8 +47,8 @@ const getFileBuild = (inputFilename) => [
       nodeResolve({
         resolveOnly: getPackages(),
       }),
-      commonJs(),
       json(),
+      commonJs(),
       typescript({
         declaration: true,
         declarationDir: './dist/types',
@@ -71,6 +71,7 @@ const getFileBuild = (inputFilename) => [
         respectExternal: true,
       }),
     ],
+    external: ['pg'] 
   },
 ];
 
@@ -107,7 +108,7 @@ export default [
   },
   // Browser Bundle
   {
-    input: 'src/index.ts',
+    input: 'src/browser.index.ts',
     output: {
       file: 'dist/index.browser.js',
       format: 'umd',
@@ -122,9 +123,14 @@ export default [
         preferBuiltins: false,
       }),
       nodePolyfills(),
-      commonJs(),
-      typescript(),
       json(),
+      commonJs(),
+      babel({
+        babelHelpers: 'bundled',
+        include: ['../node_modules/ethers-v6/**', '../node_modules/@opensea/seaport-js/**'],
+        plugins: ['@babel/plugin-transform-class-properties', '@babel/plugin-transform-private-methods'],
+      }),
+      typescript(),
       replace({
         // Can't exclude node_modules here because some dependencies use process.env.NODE_ENV
         // this breaks in browsers

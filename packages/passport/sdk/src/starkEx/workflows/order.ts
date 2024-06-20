@@ -4,7 +4,7 @@ import {
   UnsignedOrderRequest,
 } from '@imtbl/x-client';
 import { convertToSignableToken } from '@imtbl/toolkit';
-import { PassportErrorType, withPassportError } from '../../errors/passportError';
+import { PassportErrorType, withPassportError } from 'errors/passportError';
 import { UserImx } from '../../types';
 import GuardianClient from '../../guardian';
 
@@ -33,7 +33,7 @@ export async function createOrder({
   ordersApi,
   guardianClient,
 }: CreateOrderParams): Promise<imx.CreateOrderResponse> {
-  return withPassportError<imx.CreateOrderResponse>(guardianClient.withDefaultConfirmationScreenTask(async () => {
+  return withPassportError<imx.CreateOrderResponse>(async () => {
     const { ethAddress } = user.imx;
     const amountSell = request.sell.type === ERC721 ? '1' : request.sell.amount;
     const amountBuy = request.buy.type === ERC721 ? '1' : request.buy.amount;
@@ -92,7 +92,7 @@ export async function createOrder({
     return {
       ...createOrderResponse.data,
     };
-  }), PassportErrorType.CREATE_ORDER_ERROR);
+  }, PassportErrorType.CREATE_ORDER_ERROR);
 }
 
 export async function cancelOrder({
@@ -102,7 +102,7 @@ export async function cancelOrder({
   ordersApi,
   guardianClient,
 }: CancelOrderParams): Promise<imx.CancelOrderResponse> {
-  return withPassportError<imx.CancelOrderResponse>(guardianClient.withDefaultConfirmationScreenTask(async () => {
+  return withPassportError<imx.CancelOrderResponse>(async () => {
     const getSignableCancelOrderRequest: imx.GetSignableCancelOrderRequest = {
       order_id: request.order_id,
     };
@@ -138,5 +138,5 @@ export async function cancelOrder({
       order_id: cancelOrderResponse.data.order_id,
       status: cancelOrderResponse.data.status,
     };
-  }), PassportErrorType.CANCEL_ORDER_ERROR);
+  }, PassportErrorType.CANCEL_ORDER_ERROR);
 }

@@ -32,6 +32,8 @@ import { APIError404 } from '../models';
 // @ts-ignore
 import { APIError500 } from '../models';
 // @ts-ignore
+import { AssetVerificationStatus } from '../models';
+// @ts-ignore
 import { GetCollectionResult } from '../models';
 // @ts-ignore
 import { ListCollectionsResult } from '../models';
@@ -88,13 +90,14 @@ export const CollectionsApiAxiosParamCreator = function (configuration?: Configu
          * @summary List all collections
          * @param {string} chainName The name of chain
          * @param {Array<string>} [contractAddress] List of contract addresses to filter by
+         * @param {Array<AssetVerificationStatus>} [verificationStatus] List of verification status to filter by
          * @param {string} [fromUpdatedAt] Datetime to use as the oldest updated timestamp
          * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {number} [pageSize] Maximum number of items to return
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listCollections: async (chainName: string, contractAddress?: Array<string>, fromUpdatedAt?: string, pageCursor?: string, pageSize?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listCollections: async (chainName: string, contractAddress?: Array<string>, verificationStatus?: Array<AssetVerificationStatus>, fromUpdatedAt?: string, pageCursor?: string, pageSize?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'chainName' is not null or undefined
             assertParamExists('listCollections', 'chainName', chainName)
             const localVarPath = `/v1/chains/{chain_name}/collections`
@@ -112,6 +115,10 @@ export const CollectionsApiAxiosParamCreator = function (configuration?: Configu
 
             if (contractAddress) {
                 localVarQueryParameter['contract_address'] = contractAddress;
+            }
+
+            if (verificationStatus) {
+                localVarQueryParameter['verification_status'] = verificationStatus;
             }
 
             if (fromUpdatedAt !== undefined) {
@@ -265,14 +272,15 @@ export const CollectionsApiFp = function(configuration?: Configuration) {
          * @summary List all collections
          * @param {string} chainName The name of chain
          * @param {Array<string>} [contractAddress] List of contract addresses to filter by
+         * @param {Array<AssetVerificationStatus>} [verificationStatus] List of verification status to filter by
          * @param {string} [fromUpdatedAt] Datetime to use as the oldest updated timestamp
          * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {number} [pageSize] Maximum number of items to return
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listCollections(chainName: string, contractAddress?: Array<string>, fromUpdatedAt?: string, pageCursor?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListCollectionsResult>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listCollections(chainName, contractAddress, fromUpdatedAt, pageCursor, pageSize, options);
+        async listCollections(chainName: string, contractAddress?: Array<string>, verificationStatus?: Array<AssetVerificationStatus>, fromUpdatedAt?: string, pageCursor?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListCollectionsResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listCollections(chainName, contractAddress, verificationStatus, fromUpdatedAt, pageCursor, pageSize, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -330,7 +338,7 @@ export const CollectionsApiFactory = function (configuration?: Configuration, ba
          * @throws {RequiredError}
          */
         listCollections(requestParameters: CollectionsApiListCollectionsRequest, options?: AxiosRequestConfig): AxiosPromise<ListCollectionsResult> {
-            return localVarFp.listCollections(requestParameters.chainName, requestParameters.contractAddress, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
+            return localVarFp.listCollections(requestParameters.chainName, requestParameters.contractAddress, requestParameters.verificationStatus, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(axios, basePath));
         },
         /**
          * List collections by NFT owner account address
@@ -395,6 +403,13 @@ export interface CollectionsApiListCollectionsRequest {
      * @memberof CollectionsApiListCollections
      */
     readonly contractAddress?: Array<string>
+
+    /**
+     * List of verification status to filter by
+     * @type {Array<AssetVerificationStatus>}
+     * @memberof CollectionsApiListCollections
+     */
+    readonly verificationStatus?: Array<AssetVerificationStatus>
 
     /**
      * Datetime to use as the oldest updated timestamp
@@ -509,7 +524,7 @@ export class CollectionsApi extends BaseAPI {
      * @memberof CollectionsApi
      */
     public listCollections(requestParameters: CollectionsApiListCollectionsRequest, options?: AxiosRequestConfig) {
-        return CollectionsApiFp(this.configuration).listCollections(requestParameters.chainName, requestParameters.contractAddress, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
+        return CollectionsApiFp(this.configuration).listCollections(requestParameters.chainName, requestParameters.contractAddress, requestParameters.verificationStatus, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

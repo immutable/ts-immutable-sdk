@@ -16,12 +16,13 @@ import {
 
 export const POLLING_FREQUENCY = 5000;
 
-// Store the event in the event store
+export type TrackProperties = Record<string, string | number | boolean>;
+
 const trackFn = (
   moduleName: string,
   eventName: string,
-  properties?: Record<string, string | number | boolean>,
-) => {
+  properties?: TrackProperties,
+): void => {
   const event = {
     event: `${moduleName}.${eventName}`,
     time: new Date().toISOString(),
@@ -29,6 +30,20 @@ const trackFn = (
   };
   addEvent(event);
 };
+
+/**
+ * Track an event completion.
+ * @param moduleName Name of the module being tracked (for namespacing purposes), e.g. `passport`
+ * @param eventName Name of the event, use camelCase e.g. `clickItem`
+ * @param properties Other properties to be sent with the event
+ *
+ * e.g.
+ *
+ * ```ts
+ * track("passport", "performTransaction");
+ * track("passport", "performTransaction", { transationType: "transfer" });
+ * ```
+ */
 export const track = errorBoundary(
   getGlobalisedCachedFunction('track', trackFn),
 );

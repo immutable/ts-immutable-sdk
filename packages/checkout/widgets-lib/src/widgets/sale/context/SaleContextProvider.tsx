@@ -1,9 +1,6 @@
 import {
   FundingRoute,
-  SaleItem,
-  RoutingOutcomeType,
-  SmartCheckoutResult,
-  SalePaymentTypes,
+  SaleItem, SalePaymentTypes,
 } from '@imtbl/checkout-sdk';
 import { Passport } from '@imtbl/passport';
 import {
@@ -18,10 +15,7 @@ import {
 } from 'react';
 import { Environment } from '@imtbl/config';
 import { ConnectLoaderState } from '../../../context/connect-loader-context/ConnectLoaderContext';
-import {
-  FundWithSmartCheckoutSubViews,
-  SaleWidgetViews,
-} from '../../../context/view-context/SaleViewContextTypes';
+import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 import {
   ViewActions,
   ViewContext,
@@ -29,43 +23,42 @@ import {
 import { StrongCheckoutWidgetsConfig } from '../../../lib/withDefaultWidgetConfig';
 import { useSignOrder } from '../hooks/useSignOrder';
 import {
-  ClientConfig,
+  OrderQuote,
+  OrderQuoteCurrency,
   ExecuteOrderResponse,
   ExecutedTransaction,
   SaleErrorTypes,
   SignOrderError,
   SignPaymentTypes,
   SignResponse,
-  SmartCheckoutError,
-  SmartCheckoutErrorTypes,
 } from '../types';
-
-import { useSmartCheckout } from '../hooks/useSmartCheckout';
-import { useClientConfig, defaultClientConfig } from '../hooks/useClientConfig';
+import { useQuoteOrder, defaultOrderQuote } from '../hooks/useQuoteOrder';
 
 type SaleContextProps = {
   config: StrongCheckoutWidgetsConfig;
   environment: Environment;
   environmentId: string;
   items: SaleItem[];
-  amount: string;
   collectionName: string;
   provider: ConnectLoaderState['provider'];
   checkout: ConnectLoaderState['checkout'];
   passport?: Passport;
   excludePaymentTypes: SalePaymentTypes[];
+  preferredCurrency?: string;
+  waitFulfillmentSettlements: boolean;
+  hideExcludedPaymentTypes: boolean;
 };
 
 type SaleContextValues = SaleContextProps & {
   sign: (
     paymentType: SignPaymentTypes,
+    tokenAddress?: string,
     callback?: (response: SignResponse | undefined) => void
   ) => Promise<SignResponse | undefined>;
   execute: (
     signResponse: SignResponse | undefined,
-    waitForTrnsactionSettlement: boolean,
     onTxnSuccess: (txn: ExecutedTransaction) => void,
-    onTxnError: (error: any, txns: ExecutedTransaction[]) => void
+    onTxnError: (error: SignOrderError, txns: ExecutedTransaction[]) => void
   ) => Promise<ExecutedTransaction[]>;
   recipientAddress: string;
   recipientEmail: string;
@@ -73,6 +66,8 @@ type SaleContextValues = SaleContextProps & {
   signError: SignOrderError | undefined;
   executeResponse: ExecuteOrderResponse | undefined;
   isPassportWallet: boolean;
+  showCreditCardWarning: boolean;
+  setShowCreditCardWarning: (show: boolean) => void;
   paymentMethod: SalePaymentTypes | undefined;
   setPaymentMethod: (paymentMethod: SalePaymentTypes | undefined) => void;
   goBackToPaymentMethods: (
@@ -81,23 +76,18 @@ type SaleContextValues = SaleContextProps & {
   ) => void;
   goToErrorView: (type: SaleErrorTypes, data?: Record<string, unknown>) => void;
   goToSuccessView: (data?: Record<string, unknown>) => void;
-  querySmartCheckout: (
-    callback?: (r?: SmartCheckoutResult) => void
-  ) => Promise<SmartCheckoutResult | undefined>;
-  smartCheckoutResult: SmartCheckoutResult | undefined;
-  smartCheckoutError: SmartCheckoutError | undefined;
   fundingRoutes: FundingRoute[];
   disabledPaymentTypes: SalePaymentTypes[];
   invalidParameters: boolean;
   fromTokenAddress: string;
-  clientConfig: ClientConfig;
+  orderQuote: OrderQuote;
   signTokenIds: string[];
+  selectedCurrency: OrderQuoteCurrency | undefined;
 };
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const SaleContext = createContext<SaleContextValues>({
   items: [],
-  amount: '',
   collectionName: '',
   provider: undefined,
   checkout: undefined,
@@ -112,22 +102,25 @@ const SaleContext = createContext<SaleContextValues>({
   executeResponse: undefined,
   passport: undefined,
   isPassportWallet: false,
+  showCreditCardWarning: false,
+  setShowCreditCardWarning: () => {},
   paymentMethod: undefined,
   setPaymentMethod: () => {},
   goBackToPaymentMethods: () => {},
   goToErrorView: () => {},
   goToSuccessView: () => {},
   config: {} as StrongCheckoutWidgetsConfig,
-  querySmartCheckout: () => Promise.resolve(undefined),
-  smartCheckoutResult: undefined,
-  smartCheckoutError: undefined,
   fundingRoutes: [],
   disabledPaymentTypes: [],
   invalidParameters: false,
   fromTokenAddress: '',
-  clientConfig: defaultClientConfig,
+  orderQuote: defaultOrderQuote,
   signTokenIds: [],
   excludePaymentTypes: [],
+  preferredCurrency: undefined,
+  selectedCurrency: undefined,
+  waitFulfillmentSettlements: true,
+  hideExcludedPaymentTypes: false,
 });
 
 SaleContext.displayName = 'SaleSaleContext';
@@ -146,12 +139,14 @@ export function SaleContextProvider(props: {
       environment,
       environmentId,
       items,
-      amount,
       provider,
       checkout,
       passport,
       collectionName,
       excludePaymentTypes,
+      preferredCurrency,
+      waitFulfillmentSettlements,
+      hideExcludedPaymentTypes,
     },
   } = props;
 
@@ -165,33 +160,41 @@ export function SaleContextProvider(props: {
     recipientAddress: '',
   });
 
-  const [paymentMethod, setPaymentMethod] = useState<
+  const [showCreditCardWarning, setShowCreditCardWarning] = useState(false);
+  const [paymentMethod, setPaymentMethodState] = useState<
   SalePaymentTypes | undefined
   >(undefined);
 
-  const [fundingRoutes, setFundingRoutes] = useState<FundingRoute[]>([]);
+  const setPaymentMethod = (type: SalePaymentTypes | undefined) => {
+    if (type === SalePaymentTypes.CREDIT && !showCreditCardWarning) {
+      setPaymentMethodState(undefined);
+      setShowCreditCardWarning(true);
+      return;
+    }
+
+    setPaymentMethodState(type);
+    setShowCreditCardWarning(false);
+  };
+
+  const [fundingRoutes] = useState<FundingRoute[]>([]);
   const [disabledPaymentTypes, setDisabledPaymentTypes] = useState<
   SalePaymentTypes[]
-  >(excludePaymentTypes || []);
-
-  const disablePaymentTypes = (types: SalePaymentTypes[]) => {
-    setDisabledPaymentTypes((prev) => [...prev, ...types]);
-  };
+  >([]);
 
   const [invalidParameters, setInvalidParameters] = useState<boolean>(false);
 
-  const { currency, clientConfig } = useClientConfig({
+  const { selectedCurrency, orderQuote, orderQuoteError } = useQuoteOrder({
+    items,
+    provider,
     environmentId,
     environment: config.environment,
+    preferredCurrency,
   });
 
-  const fromTokenAddress = currency?.erc20Address || '';
+  const fromTokenAddress = selectedCurrency?.address || '';
 
   const goBackToPaymentMethods = useCallback(
-    (
-      type?: SalePaymentTypes | undefined,
-      data?: Record<string, unknown>,
-    ) => {
+    (type?: SalePaymentTypes | undefined, data?: Record<string, unknown>) => {
       setPaymentMethod(type);
       viewDispatch({
         payload: {
@@ -232,20 +235,23 @@ export function SaleContextProvider(props: {
     recipientAddress,
     environmentId,
     environment,
+    waitFulfillmentSettlements,
   });
 
   const sign = useCallback(
     async (
       type: SignPaymentTypes,
+      tokenAddress?: string,
       callback?: (r?: SignResponse) => void,
     ): Promise<SignResponse | undefined> => {
-      const invalidFromTokenAddress = !fromTokenAddress || !fromTokenAddress.startsWith('0x');
+      const selectedTokenAddress = tokenAddress || fromTokenAddress;
+      const invalidFromTokenAddress = !selectedTokenAddress || !selectedTokenAddress.startsWith('0x');
       if (invalidFromTokenAddress) {
         setInvalidParameters(true);
         return undefined;
       }
 
-      const response = await signOrder(type, fromTokenAddress);
+      const response = await signOrder(type, selectedTokenAddress);
       if (!response) return undefined;
 
       callback?.(response);
@@ -306,89 +312,18 @@ export function SaleContextProvider(props: {
     goToErrorView(signError.type, signError.data);
   }, [signError]);
 
-  const { smartCheckout, smartCheckoutResult, smartCheckoutError } = useSmartCheckout({
-    provider,
-    checkout,
-    items,
-    amount,
-    tokenAddress: fromTokenAddress,
-  });
-
   useEffect(() => {
-    if (!smartCheckoutError) return;
-    if (
-      (smartCheckoutError.data?.error as Error)?.message
-      === SmartCheckoutErrorTypes.FRACTIONAL_BALANCE_BLOCKED
-    ) {
-      disablePaymentTypes([SalePaymentTypes.CRYPTO]);
-      goBackToPaymentMethods(undefined);
-      return;
-    }
-    goToErrorView(smartCheckoutError.type, smartCheckoutError.data);
-  }, [smartCheckoutError]);
-
-  const querySmartCheckout = useCallback(
-    async (callback?: (r?: SmartCheckoutResult) => void) => {
-      const result = await smartCheckout();
-      callback?.(result);
-      return result;
-    },
-    [smartCheckout],
-  );
-
-  useEffect(() => {
-    if (!smartCheckoutResult) {
-      return;
-    }
-
-    if (smartCheckoutResult.sufficient) {
-      sign(SignPaymentTypes.CRYPTO);
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: SaleWidgetViews.PAY_WITH_COINS,
-          },
-        },
-      });
-    }
-    if (!smartCheckoutResult.sufficient) {
-      switch (smartCheckoutResult.router.routingOutcome.type) {
-        case RoutingOutcomeType.ROUTES_FOUND:
-          setFundingRoutes(
-            smartCheckoutResult.router.routingOutcome.fundingRoutes,
-          );
-          viewDispatch({
-            payload: {
-              type: ViewActions.UPDATE_VIEW,
-              view: {
-                type: SaleWidgetViews.FUND_WITH_SMART_CHECKOUT,
-                subView: FundWithSmartCheckoutSubViews.FUNDING_ROUTE_SELECT,
-              },
-            },
-          });
-
-          break;
-        case RoutingOutcomeType.NO_ROUTES_FOUND:
-        case RoutingOutcomeType.NO_ROUTE_OPTIONS:
-        default:
-          setFundingRoutes([]);
-          setPaymentMethod(undefined);
-          disablePaymentTypes([SalePaymentTypes.CRYPTO]);
-          goBackToPaymentMethods(undefined);
-          break;
-      }
-    }
-  }, [smartCheckoutResult]);
+    if (!orderQuoteError) return;
+    goToErrorView(orderQuoteError.type, orderQuoteError.data);
+  }, [orderQuoteError]);
 
   useEffect(() => {
     const invalidItems = !items || items.length === 0;
-    const invalidAmount = !amount || amount === '0';
 
-    if (invalidItems || invalidAmount || !collectionName || !environmentId) {
+    if (invalidItems || !collectionName || !environmentId) {
       setInvalidParameters(true);
     }
-  }, [items, amount, collectionName, environmentId]);
+  }, [items, collectionName, environmentId]);
 
   useEffect(() => {
     if (excludePaymentTypes?.length <= 0) return;
@@ -399,7 +334,6 @@ export function SaleContextProvider(props: {
     () => ({
       config,
       items,
-      amount,
       fromTokenAddress,
       sign,
       signResponse,
@@ -413,28 +347,29 @@ export function SaleContextProvider(props: {
       checkout,
       recipientAddress,
       recipientEmail,
+      showCreditCardWarning,
+      setShowCreditCardWarning,
       paymentMethod,
       setPaymentMethod,
       goBackToPaymentMethods,
       goToErrorView,
       goToSuccessView,
       isPassportWallet: !!(provider?.provider as any)?.isPassport,
-      querySmartCheckout,
-      smartCheckoutResult,
-      smartCheckoutError,
       fundingRoutes,
       disabledPaymentTypes,
       invalidParameters,
-      clientConfig,
+      orderQuote,
       signTokenIds: tokenIds,
       excludePaymentTypes,
+      selectedCurrency,
+      waitFulfillmentSettlements,
+      hideExcludedPaymentTypes,
     }),
     [
       config,
       environment,
       environmentId,
       items,
-      amount,
       fromTokenAddress,
       collectionName,
       provider,
@@ -444,20 +379,22 @@ export function SaleContextProvider(props: {
       signResponse,
       signError,
       executeResponse,
+      showCreditCardWarning,
+      setShowCreditCardWarning,
       paymentMethod,
       goBackToPaymentMethods,
       goToErrorView,
       goToSuccessView,
       sign,
-      querySmartCheckout,
-      smartCheckoutResult,
-      smartCheckoutError,
       fundingRoutes,
       disabledPaymentTypes,
       invalidParameters,
-      clientConfig,
+      orderQuote,
       tokenIds,
       excludePaymentTypes,
+      selectedCurrency,
+      waitFulfillmentSettlements,
+      hideExcludedPaymentTypes,
     ],
   );
 

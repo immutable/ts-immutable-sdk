@@ -1,0 +1,171 @@
+import {
+  Box,
+  Caption,
+  Drawer,
+  MenuItem,
+  Divider,
+  MenuItemSize,
+} from '@biom3/react';
+import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
+import { listVariants, listItemVariants } from 'lib/animation/listAnimation';
+import {
+  SalePaymentTypes,
+  TransactionRequirement,
+  WidgetTheme,
+} from '@imtbl/checkout-sdk';
+import { Environment } from '@imtbl/config';
+import { CoinsDrawerItem } from './CoinsDrawerItem';
+import { FundingBalance } from '../types';
+import { PaymentOptions } from './PaymentOptions';
+
+type CoinsDrawerProps = {
+  conversions: Map<string, number>;
+  balances: FundingBalance[];
+  selectedIndex: number;
+  visible: boolean;
+  loading: boolean;
+  transactionRequirement?: TransactionRequirement;
+  onSelect: (index: number) => void;
+  onClose: () => void;
+  onPayWithCard?: (paymentType: SalePaymentTypes) => void;
+  disabledPaymentTypes?: SalePaymentTypes[];
+  theme: WidgetTheme;
+  environment: Environment;
+};
+
+export function CoinsDrawer({
+  conversions,
+  balances,
+  selectedIndex,
+  visible,
+  loading,
+  transactionRequirement,
+  onClose,
+  onSelect,
+  onPayWithCard,
+  disabledPaymentTypes,
+  theme,
+  environment,
+}: CoinsDrawerProps) {
+  const { t } = useTranslation();
+  const handleOnclick = (index: number) => () => {
+    onSelect(index);
+    onClose();
+  };
+
+  let size: MenuItemSize = 'medium';
+  if (balances.length > 3) {
+    size = 'small';
+  }
+
+  const otherPaymentOptions = [SalePaymentTypes.DEBIT, SalePaymentTypes.CREDIT];
+  const withOtherOptions = !otherPaymentOptions.every((type) => disabledPaymentTypes?.includes(type));
+
+  return (
+    <Drawer
+      size="full"
+      visible={visible}
+      showHeaderBar
+      onCloseDrawer={onClose}
+      headerBarTitle={t('views.ORDER_SUMMARY.coinsDrawer.header')}
+    >
+      <Drawer.Content
+        rc={
+          <motion.div variants={listVariants} initial="hidden" animate="show" />
+        }
+      >
+        <Box
+          sx={{
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            px: 'base.spacing.x4',
+          }}
+        >
+          <Box>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                mb: 'base.spacing.x2',
+              }}
+            >
+              <Caption size="small">
+                {t('views.ORDER_SUMMARY.coinsDrawer.caption1')}
+              </Caption>
+              <Caption size="small">
+                {t('views.ORDER_SUMMARY.coinsDrawer.caption2')}
+              </Caption>
+            </Box>
+            {balances?.map((balance: FundingBalance, idx: number) => (
+              <CoinsDrawerItem
+                key={`${balance.fundingItem.token.symbol}-${balance.type}`}
+                onClick={handleOnclick(idx)}
+                balance={balance}
+                selected={selectedIndex === idx}
+                conversions={conversions}
+                transactionRequirement={transactionRequirement}
+                size={size}
+                theme={theme}
+                environment={environment}
+                rc={<motion.div variants={listItemVariants} custom={idx} />}
+              />
+            ))}
+            {loading && (
+              <motion.div
+                variants={listItemVariants}
+                custom={balances.length}
+                key="funding-balance-item-shimmer"
+              >
+                <MenuItem
+                  shimmer
+                  emphasized
+                  size={size}
+                  testId="funding-balance-item-shimmer"
+                />
+              </motion.div>
+            )}
+          </Box>
+          {onPayWithCard && (
+            <Box
+              sx={{ pb: 'base.spacing.x4' }}
+              rc={(
+                <motion.div
+                  variants={listItemVariants}
+                  custom={balances.length + (loading ? 1 : 0)}
+                />
+              )}
+            >
+              {withOtherOptions && (
+                <Divider
+                  size="small"
+                  rc={<Caption />}
+                  sx={{ my: 'base.spacing.x4' }}
+                >
+                  {t('views.ORDER_SUMMARY.coinsDrawer.divider')}
+                </Divider>
+              )}
+              <PaymentOptions
+                onClick={onPayWithCard}
+                size={size}
+                hideDisabledOptions
+                paymentOptions={otherPaymentOptions}
+                disabledOptions={disabledPaymentTypes}
+                captions={{
+                  [SalePaymentTypes.DEBIT]: t(
+                    'views.PAYMENT_METHODS.options.debit.caption',
+                  ),
+                  [SalePaymentTypes.CREDIT]: t(
+                    'views.PAYMENT_METHODS.options.credit.caption',
+                  ),
+                }}
+              />
+            </Box>
+          )}
+        </Box>
+      </Drawer.Content>
+    </Drawer>
+  );
+}

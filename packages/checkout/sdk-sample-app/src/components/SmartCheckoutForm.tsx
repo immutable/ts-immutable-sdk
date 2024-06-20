@@ -15,7 +15,7 @@ import {
 import { Web3Provider } from '@ethersproject/providers';
 import { useEffect, useState } from 'react';
 import { BigNumber, utils } from 'ethers';
-import { Body, Box, Button, FormControl, Heading, Select, TextInput, Option, OptionKey, Checkbox } from '@biom3/react';
+import { Body, Box, Button, FormControl, Heading, Select, TextInput, OptionKey, Checkbox } from '@biom3/react';
 import LoadingButton from './LoadingButton';
 import { ErrorMessage, SuccessMessage } from './messages';
 
@@ -39,6 +39,9 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
   const [error, setError] = useState<any>(null);
   const [success, setSuccess] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [onRampChecked, setOnRampChecked] = useState<boolean>(true);
+  const [bridgeChecked, setBridgeChecked] = useState<boolean>(true);
+  const [swapChecked, setSwapChecked] = useState<boolean>(true);
 
   const [seaportContractAddress, setSeaportContractAddress] = useState<string>('');
 
@@ -136,6 +139,11 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
           provider,
           itemRequirements,
           transactionOrGasAmount,
+          routingOptions: {
+            onRamp: onRampChecked,
+            swap: swapChecked,
+            bridge: bridgeChecked,
+          },
         }
       );
       console.log('Smart checkout result', result);
@@ -332,15 +340,15 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
               onSelectChange={selectItemType}
               defaultLabel='Select Item Type'
             >
-              <Option optionKey="native">
-                <Option.Label>Native</Option.Label>
-              </Option>
-              <Option optionKey="erc20">
-                <Option.Label>ERC20</Option.Label>
-              </Option>
-              <Option optionKey="erc721">
-                <Option.Label>ERC721</Option.Label>
-              </Option>
+              <Select.Option optionKey="native">
+                <Select.Option.Label>Native</Select.Option.Label>
+              </Select.Option>
+              <Select.Option optionKey="erc20">
+                <Select.Option.Label>ERC20</Select.Option.Label>
+              </Select.Option>
+              <Select.Option optionKey="erc721">
+                <Select.Option.Label>ERC721</Select.Option.Label>
+              </Select.Option>
             </Select>
             </td>
             <td>
@@ -434,6 +442,43 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
     setGasContractAddressError('');
   }
 
+  const fundingRoutesForm = () => {
+    return(
+      <>
+        <Body>Set Funding Options</Body>
+        <Box sx={{ display: 'flex' }}>
+          <FormControl sx={{ padding: 'base.spacing.x4' }}>
+            <FormControl.Label>OnRamp</FormControl.Label>
+            <Checkbox
+              checked={onRampChecked}
+              onChange={() => {
+                setOnRampChecked(!onRampChecked);
+              }}
+            />
+          </FormControl>
+          <FormControl sx={{ padding: 'base.spacing.x4' }}>
+            <FormControl.Label>Swap</FormControl.Label>
+            <Checkbox
+              checked={swapChecked}
+              onChange={() => {
+                setSwapChecked(!swapChecked);
+              }}
+            />
+          </FormControl>
+          <FormControl sx={{ padding: 'base.spacing.x4' }}>
+            <FormControl.Label>Bridge</FormControl.Label>
+            <Checkbox
+              checked={bridgeChecked}
+              onChange={() => {
+                setBridgeChecked(!bridgeChecked);
+              }}
+            />
+          </FormControl>
+        </Box>
+      </>
+    )
+  }
+
   const gasAmountForm = () => {
     return(
       <>
@@ -524,6 +569,7 @@ export const SmartCheckoutForm = ({ checkout, provider }: SmartCheckoutProps) =>
         paddingTop: 'base.spacing.x4',
         paddingBottom: 'base.spacing.x8'
       }} >
+        {fundingRoutesForm()}
         {gasAmountForm()}
       </Box>
       <LoadingButton onClick={smartCheckout} loading={loading}>

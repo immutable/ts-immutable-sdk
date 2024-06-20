@@ -43,8 +43,8 @@ import { Withdrawal } from '../models';
 export const WithdrawalsApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Creates a withdrawal. Use https://docs.x.immutable.com/reference#/operations/getSignableWithdrawal to get request body params.
-         * @summary Creates a withdrawal of a token
+         * Creates a withdrawal. Use https://docs.x.immutable.com/reference/#/operations/getSignableWithdrawal to get request body params. This endpoint will be deprecated once StarkEx contract gets upgraded to v4, check https://docs.immutable.com/x/reference/#/operations/createWithdrawalV2.
+         * @summary Creates a withdrawal
          * @param {string} xImxEthAddress eth address
          * @param {string} xImxEthSignature eth signature
          * @param {CreateWithdrawalRequest} createWithdrawalRequest create a withdrawal
@@ -93,8 +93,8 @@ export const WithdrawalsApiAxiosParamCreator = function (configuration?: Configu
             };
         },
         /**
-         * Creates a withdrawal. Use https://docs.x.immutable.com/reference#/operations/getSignableWithdrawal to get request body params.
-         * @summary Creates a withdrawal of a token for starkex contracts that are higher than v3
+         * Creates a withdrawal. Use https://docs.immutable.com/x/reference/#/operations/getSignableWithdrawalV2 to get request body params.
+         * @summary Creates a withdrawal of a token for when StarkEx contract that is higher than v3
          * @param {string} xImxEthAddress eth address
          * @param {string} xImxEthSignature eth signature
          * @param {CreateWithdrawalRequestV2} createWithdrawalRequestV2 create a withdrawal
@@ -143,7 +143,7 @@ export const WithdrawalsApiAxiosParamCreator = function (configuration?: Configu
             };
         },
         /**
-         * Gets details of a signable withdrawal
+         * Gets details of a signable withdrawal. This endpoint will be deprecated once StarkEx contract gets upgraded to v4, check https://docs.immutable.com/x/reference/#/operations/getSignableWithdrawalV2.
          * @summary Gets details of a signable withdrawal
          * @param {GetSignableWithdrawalRequest} getSignableWithdrawalRequest get details of signable withdrawal
          * @param {*} [options] Override http request option.
@@ -379,8 +379,8 @@ export const WithdrawalsApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = WithdrawalsApiAxiosParamCreator(configuration)
     return {
         /**
-         * Creates a withdrawal. Use https://docs.x.immutable.com/reference#/operations/getSignableWithdrawal to get request body params.
-         * @summary Creates a withdrawal of a token
+         * Creates a withdrawal. Use https://docs.x.immutable.com/reference/#/operations/getSignableWithdrawal to get request body params. This endpoint will be deprecated once StarkEx contract gets upgraded to v4, check https://docs.immutable.com/x/reference/#/operations/createWithdrawalV2.
+         * @summary Creates a withdrawal
          * @param {string} xImxEthAddress eth address
          * @param {string} xImxEthSignature eth signature
          * @param {CreateWithdrawalRequest} createWithdrawalRequest create a withdrawal
@@ -392,8 +392,8 @@ export const WithdrawalsApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Creates a withdrawal. Use https://docs.x.immutable.com/reference#/operations/getSignableWithdrawal to get request body params.
-         * @summary Creates a withdrawal of a token for starkex contracts that are higher than v3
+         * Creates a withdrawal. Use https://docs.immutable.com/x/reference/#/operations/getSignableWithdrawalV2 to get request body params.
+         * @summary Creates a withdrawal of a token for when StarkEx contract that is higher than v3
          * @param {string} xImxEthAddress eth address
          * @param {string} xImxEthSignature eth signature
          * @param {CreateWithdrawalRequestV2} createWithdrawalRequestV2 create a withdrawal
@@ -405,7 +405,7 @@ export const WithdrawalsApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Gets details of a signable withdrawal
+         * Gets details of a signable withdrawal. This endpoint will be deprecated once StarkEx contract gets upgraded to v4, check https://docs.immutable.com/x/reference/#/operations/getSignableWithdrawalV2.
          * @summary Gets details of a signable withdrawal
          * @param {GetSignableWithdrawalRequest} getSignableWithdrawalRequest get details of signable withdrawal
          * @param {*} [options] Override http request option.
@@ -476,8 +476,8 @@ export const WithdrawalsApiFactory = function (configuration?: Configuration, ba
     const localVarFp = WithdrawalsApiFp(configuration)
     return {
         /**
-         * Creates a withdrawal. Use https://docs.x.immutable.com/reference#/operations/getSignableWithdrawal to get request body params.
-         * @summary Creates a withdrawal of a token
+         * Creates a withdrawal. Use https://docs.x.immutable.com/reference/#/operations/getSignableWithdrawal to get request body params. This endpoint will be deprecated once StarkEx contract gets upgraded to v4, check https://docs.immutable.com/x/reference/#/operations/createWithdrawalV2.
+         * @summary Creates a withdrawal
          * @param {string} xImxEthAddress eth address
          * @param {string} xImxEthSignature eth signature
          * @param {CreateWithdrawalRequest} createWithdrawalRequest create a withdrawal
@@ -488,8 +488,8 @@ export const WithdrawalsApiFactory = function (configuration?: Configuration, ba
             return localVarFp.createWithdrawal(xImxEthAddress, xImxEthSignature, createWithdrawalRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * Creates a withdrawal. Use https://docs.x.immutable.com/reference#/operations/getSignableWithdrawal to get request body params.
-         * @summary Creates a withdrawal of a token for starkex contracts that are higher than v3
+         * Creates a withdrawal. Use https://docs.immutable.com/x/reference/#/operations/getSignableWithdrawalV2 to get request body params.
+         * @summary Creates a withdrawal of a token for when StarkEx contract that is higher than v3
          * @param {string} xImxEthAddress eth address
          * @param {string} xImxEthSignature eth signature
          * @param {CreateWithdrawalRequestV2} createWithdrawalRequestV2 create a withdrawal
@@ -500,7 +500,7 @@ export const WithdrawalsApiFactory = function (configuration?: Configuration, ba
             return localVarFp.createWithdrawalV2(xImxEthAddress, xImxEthSignature, createWithdrawalRequestV2, options).then((request) => request(axios, basePath));
         },
         /**
-         * Gets details of a signable withdrawal
+         * Gets details of a signable withdrawal. This endpoint will be deprecated once StarkEx contract gets upgraded to v4, check https://docs.immutable.com/x/reference/#/operations/getSignableWithdrawalV2.
          * @summary Gets details of a signable withdrawal
          * @param {GetSignableWithdrawalRequest} getSignableWithdrawalRequest get details of signable withdrawal
          * @param {*} [options] Override http request option.
@@ -798,8 +798,8 @@ export interface WithdrawalsApiListWithdrawalsRequest {
  */
 export class WithdrawalsApi extends BaseAPI {
     /**
-     * Creates a withdrawal. Use https://docs.x.immutable.com/reference#/operations/getSignableWithdrawal to get request body params.
-     * @summary Creates a withdrawal of a token
+     * Creates a withdrawal. Use https://docs.x.immutable.com/reference/#/operations/getSignableWithdrawal to get request body params. This endpoint will be deprecated once StarkEx contract gets upgraded to v4, check https://docs.immutable.com/x/reference/#/operations/createWithdrawalV2.
+     * @summary Creates a withdrawal
      * @param {WithdrawalsApiCreateWithdrawalRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -810,8 +810,8 @@ export class WithdrawalsApi extends BaseAPI {
     }
 
     /**
-     * Creates a withdrawal. Use https://docs.x.immutable.com/reference#/operations/getSignableWithdrawal to get request body params.
-     * @summary Creates a withdrawal of a token for starkex contracts that are higher than v3
+     * Creates a withdrawal. Use https://docs.immutable.com/x/reference/#/operations/getSignableWithdrawalV2 to get request body params.
+     * @summary Creates a withdrawal of a token for when StarkEx contract that is higher than v3
      * @param {WithdrawalsApiCreateWithdrawalV2Request} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -822,7 +822,7 @@ export class WithdrawalsApi extends BaseAPI {
     }
 
     /**
-     * Gets details of a signable withdrawal
+     * Gets details of a signable withdrawal. This endpoint will be deprecated once StarkEx contract gets upgraded to v4, check https://docs.immutable.com/x/reference/#/operations/getSignableWithdrawalV2.
      * @summary Gets details of a signable withdrawal
      * @param {WithdrawalsApiGetSignableWithdrawalRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.

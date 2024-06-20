@@ -114,7 +114,7 @@ export class OrdersService {
      */
     pageSize?: PageSize,
     /**
-     * Order field to sort by
+     * Order field to sort by. `buy_item_amount` sorts by per token price, for example if 5 ERC-1155s are on sale for 10eth, it’s sorted as 2eth for `buy_item_amount`.
      */
     sortBy?: 'created_at' | 'updated_at' | 'buy_item_amount',
     /**
@@ -257,6 +257,7 @@ export class OrdersService {
   public listTrades({
     chainName,
     accountAddress,
+    sellItemContractAddress,
     fromIndexedAt,
     pageSize,
     sortBy,
@@ -265,6 +266,7 @@ export class OrdersService {
   }: {
     chainName: ChainName,
     accountAddress?: string,
+    sellItemContractAddress?: string,
     /**
      * From indexed at including given date
      */
@@ -294,6 +296,7 @@ export class OrdersService {
       },
       query: {
         'account_address': accountAddress,
+        'sell_item_contract_address': sellItemContractAddress,
         'from_indexed_at': fromIndexedAt,
         'page_size': pageSize,
         'sort_by': sortBy,

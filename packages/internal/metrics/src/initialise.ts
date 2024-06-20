@@ -6,11 +6,12 @@ import { flattenProperties, getDetail, storeDetail } from './utils/state';
 // WARNING: DO NOT CHANGE THE STRING BELOW. IT GETS REPLACED AT BUILD TIME.
 const SDK_VERSION = '__SDK_VERSION__';
 
-const getReferrer = () => {
+const getFrameParentDomain = () => {
   if (isNode()) {
     return '';
   }
 
+  // If available for supported browsers (all except Firefox)
   if (
     window.location.ancestorOrigins
     && window.location.ancestorOrigins.length > 0
@@ -18,6 +19,7 @@ const getReferrer = () => {
     return new URL(window.location.ancestorOrigins[0]).hostname;
   }
 
+  // Fallback to using the referrer
   return document.referrer ? new URL(window.document.referrer).hostname : '';
 };
 
@@ -25,10 +27,21 @@ const runtimeHost = () => {
   if (isNode()) {
     return '';
   }
-  if (window.opener || window.parent !== window) {
-    return getReferrer();
+
+  let domain;
+  try {
+    if (window.self !== window.top) {
+      domain = getFrameParentDomain();
+    }
+  } catch (error) {
+    // Do nothing
   }
-  return new URL(window.location.href).hostname;
+
+  // Fallback to current domain if can't detect parent domain
+  if (!domain) {
+    domain = window.location.hostname;
+  }
+  return domain;
 };
 
 type RuntimeDetails = {

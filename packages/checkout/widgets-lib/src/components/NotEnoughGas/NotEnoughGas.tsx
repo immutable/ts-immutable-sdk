@@ -66,12 +66,15 @@ NotEnoughGasProps) {
     >
       <Drawer.Content testId="not-enough-gas-bottom-sheet" sx={containerStyles}>
         <CloudImage
-          imageUrl={
-              tokenSymbol === ETH_TOKEN_SYMBOL
-                ? notEnoughEth
-                : notEnoughImx
-            }
           sx={{ w: '90px', h: tokenSymbol === ETH_TOKEN_SYMBOL ? '110px' : '90px' }}
+          use={(
+            <img
+              src={tokenSymbol === ETH_TOKEN_SYMBOL
+                ? notEnoughEth
+                : notEnoughImx}
+              alt={heading}
+            />
+          )}
         />
         <Heading
           size="small"

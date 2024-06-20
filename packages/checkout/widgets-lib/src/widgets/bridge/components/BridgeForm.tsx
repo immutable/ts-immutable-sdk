@@ -5,13 +5,14 @@ import {
   OptionKey,
 } from '@biom3/react';
 import {
-  GetBalanceResult,
+  GetBalanceResult, WidgetTheme,
 } from '@imtbl/checkout-sdk';
 import {
   useCallback, useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
 import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { useTranslation } from 'react-i18next';
+import { Environment } from '@imtbl/config';
 import { amountInputValidation } from '../../../lib/validations/amountInputValidations';
 import { BridgeActions, BridgeContext } from '../context/BridgeContext';
 import {
@@ -44,6 +45,8 @@ interface BridgeFormProps {
   defaultTokenAddress?: string;
   isTokenBalancesLoading?: boolean;
   defaultTokenImage: string;
+  environment?: Environment;
+  theme?: WidgetTheme;
 }
 
 export function BridgeForm(props: BridgeFormProps) {
@@ -69,6 +72,8 @@ export function BridgeForm(props: BridgeFormProps) {
     defaultTokenAddress,
     isTokenBalancesLoading,
     defaultTokenImage,
+    environment,
+    theme,
   } = props;
 
   const { track } = useAnalytics();
@@ -183,20 +188,15 @@ export function BridgeForm(props: BridgeFormProps) {
   };
 
   const handleBridgeAmountChange = (value: string) => {
-    // Ensure that starting with a decimal is formatted correctly
-    let inputValue = value;
-    if (inputValue === '.') {
-      inputValue = '0.';
-    }
-    setFormAmount(inputValue);
+    setFormAmount(value);
     if (amountError) {
-      const validateAmountError = validateAmount(inputValue, formToken?.formattedBalance);
+      const validateAmountError = validateAmount(value, formToken?.formattedBalance);
       setAmountError(validateAmountError);
     }
 
     if (!formToken) return;
     setAmountFiatValue(calculateCryptoToFiat(
-      inputValue,
+      value,
       formToken.token.symbol,
       cryptoFiatState.conversions,
     ));
@@ -314,6 +314,8 @@ export function BridgeForm(props: BridgeFormProps) {
               errorMessage={t(tokenError)}
               onSelectChange={(option) => handleSelectTokenChange(option)}
               defaultTokenImage={defaultTokenImage}
+              environment={environment}
+              theme={theme}
             />
             <TextInputForm
               testId="bridge-amount"
@@ -325,6 +327,7 @@ export function BridgeForm(props: BridgeFormProps) {
               onTextInputChange={(value) => handleBridgeAmountChange(value)}
               onTextInputEnter={submitBridgeValues}
               textAlign="right"
+              inputMode="decimal"
               errorMessage={t(amountError)}
             />
           </Box>

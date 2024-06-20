@@ -49,8 +49,7 @@ export function TransakIframe(props: TransakIframeProps) {
   const { onLoad, initialised } = useTransakEvents({
     userJourney: UserJourney.SALE,
     ref: iframeRef,
-    email,
-    userId: walletAddress,
+    walletAddress,
     isPassportWallet,
     onOpen,
     onOrderCreated,
@@ -76,6 +75,7 @@ export function TransakIframe(props: TransakIframeProps) {
       walletAddress,
       partnerOrderId,
     },
+    onError: onFailedToLoad,
   });
 
   return (

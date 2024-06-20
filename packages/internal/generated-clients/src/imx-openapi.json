@@ -2362,7 +2362,7 @@
     },
     "/v1/signable-withdrawal-details": {
       "post": {
-        "description": "Gets details of a signable withdrawal",
+        "description": "Gets details of a signable withdrawal. This endpoint will be deprecated once StarkEx contract gets upgraded to v4, check https://docs.immutable.com/x/reference/#/operations/getSignableWithdrawalV2.",
         "consumes": [
           "application/json"
         ],
@@ -2985,7 +2985,7 @@
         }
       },
       "post": {
-        "description": "Creates a withdrawal. Use https://docs.x.immutable.com/reference#/operations/getSignableWithdrawal to get request body params.",
+        "description": "Creates a withdrawal. Use https://docs.x.immutable.com/reference/#/operations/getSignableWithdrawal to get request body params. This endpoint will be deprecated once StarkEx contract gets upgraded to v4, check https://docs.immutable.com/x/reference/#/operations/createWithdrawalV2.",
         "consumes": [
           "application/json"
         ],
@@ -2995,7 +2995,7 @@
         "tags": [
           "withdrawals"
         ],
-        "summary": "Creates a withdrawal of a token",
+        "summary": "Creates a withdrawal",
         "operationId": "createWithdrawal",
         "parameters": [
           {
@@ -3865,7 +3865,7 @@
     },
     "/v2/withdrawals": {
       "post": {
-        "description": "Creates a withdrawal. Use https://docs.x.immutable.com/reference#/operations/getSignableWithdrawal to get request body params.",
+        "description": "Creates a withdrawal. Use https://docs.immutable.com/x/reference/#/operations/getSignableWithdrawalV2 to get request body params.",
         "consumes": [
           "application/json"
         ],
@@ -3875,7 +3875,7 @@
         "tags": [
           "withdrawals"
         ],
-        "summary": "Creates a withdrawal of a token for starkex contracts that are higher than v3",
+        "summary": "Creates a withdrawal of a token for when StarkEx contract that is higher than v3",
         "operationId": "createWithdrawalV2",
         "parameters": [
           {
@@ -7072,7 +7072,7 @@
           "type": "string"
         },
         "expiration_timestamp": {
-          "description": "Token in request to match in SDK implementation",
+          "description": "Expiration timestamp for this withdrawal",
           "type": "integer"
         },
         "nonce": {
@@ -7593,7 +7593,7 @@
           "type": "string"
         },
         "token": {
-          "$ref": "#/definitions/mintToken"
+          "$ref": "#/definitions/mintTokenOAIGen"
         },
         "transaction_id": {
           "description": "Sequential ID of transaction in Immutable X",
@@ -7675,6 +7675,59 @@
         "tx_id": {
           "description": "Mint Transaction ID",
           "type": "integer"
+        }
+      }
+    },
+    "MintToken": {
+      "type": "object",
+      "required": [
+        "data",
+        "type"
+      ],
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/mintTokenDataOAIGen"
+        },
+        "type": {
+          "description": "Type of this asset (ETH/ERC20/ERC721)",
+          "type": "string"
+        }
+      }
+    },
+    "MintTokenData": {
+      "type": "object",
+      "required": [
+        "quantity",
+        "quantity_with_fees"
+      ],
+      "properties": {
+        "decimals": {
+          "description": "Number of decimals supported by this asset",
+          "type": "integer"
+        },
+        "id": {
+          "description": "[DEPRECATED] Internal Immutable X Token ID",
+          "type": "string"
+        },
+        "quantity": {
+          "description": "Quantity of this asset - inclusive of fees for buy order in v1 API and exclusive of fees in v3 API",
+          "type": "string"
+        },
+        "quantity_with_fees": {
+          "description": "Quantity of this asset with the sum of all fees applied to the asset",
+          "type": "string"
+        },
+        "symbol": {
+          "description": "Symbol of a token",
+          "type": "string"
+        },
+        "token_address": {
+          "description": "Address of ERC721/ERC20 contract",
+          "type": "string"
+        },
+        "token_id": {
+          "description": "ERC721 Token ID",
+          "type": "string"
         }
       }
     },
@@ -11794,6 +11847,24 @@
       ],
       "x-go-gen-location": "models"
     },
+    "mintTokenDataOAIGen": {
+      "description": "Token details of this asset",
+      "allOf": [
+        {
+          "$ref": "#/definitions/MintTokenData"
+        }
+      ],
+      "x-go-gen-location": "models"
+    },
+    "mintTokenOAIGen": {
+      "description": "Details of the asset which has been minted",
+      "allOf": [
+        {
+          "$ref": "#/definitions/MintToken"
+        }
+      ],
+      "x-go-gen-location": "models"
+    },
     "nftprimarytransaction.CreateAPIRequest": {
       "type": "object",
       "properties": {
@@ -13998,87 +14069,6 @@
     }
   ],
   "x-components": {
-    "responses": {
-      "BadRequest": {
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/definitions/APIError"
-            }
-          }
-        },
-        "description": "Bad Request (400)"
-      },
-      "ForbiddenRequest": {
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/definitions/APIError"
-            }
-          }
-        },
-        "description": "Forbidden (403)"
-      },
-      "InternalServerError": {
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/definitions/APIError"
-            }
-          }
-        },
-        "description": "Internal Server Error (500)"
-      },
-      "NotFound": {
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/definitions/APIError"
-            }
-          }
-        },
-        "description": "The specified resource was not found (404)"
-      },
-      "NotImplementedError": {
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/definitions/APIError"
-            }
-          }
-        },
-        "description": "Not Implemented Error (501)"
-      },
-      "TooManyRequests": {
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/definitions/APIError"
-            }
-          }
-        },
-        "description": "Too Many Requests (429)"
-      },
-      "UnauthorisedRequest": {
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/definitions/APIError"
-            }
-          }
-        },
-        "description": "Unauthorised Request (401)"
-      },
-      "UnprocessableEntity": {
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/definitions/APIError"
-            }
-          }
-        },
-        "description": "Unprocessable Entity (422)"
-      }
-    }
+    "responses": {}
   }
 }

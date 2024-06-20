@@ -1,29 +1,74 @@
-import { MenuItem } from '@biom3/react';
-import { SignedOrderProduct } from '../types';
+import {
+  Heading, MenuItem, MenuItemSize, SxProps,
+} from '@biom3/react';
+import { SaleItem } from '@imtbl/checkout-sdk';
+import { useTranslation } from 'react-i18next';
+import { calculateCryptoToFiat, tokenValueFormat } from 'lib/utils';
+import { ReactElement } from 'react';
+import { TokenImage } from 'components/TokenImage/TokenImage';
+import { OrderQuotePricing, FundingBalance } from '../types';
 
-export interface OrderItemProps {
-  item: SignedOrderProduct;
+export interface OrderItemProps<
+  RC extends ReactElement | undefined = undefined,
+> {
+  item: SaleItem;
+  balance: FundingBalance;
+  pricing: OrderQuotePricing | undefined;
+  conversions: Map<string, number>;
+  size?: MenuItemSize;
+  rc?: RC;
+  sx?: SxProps;
 }
 
-const CURRENCY_IMAGE_URL = {
-  eth: 'https://design-system.immutable.com/hosted-for-ds/currency-icons/currency--eth.svg',
-  usdc: 'https://design-system.immutable.com/hosted-for-ds/currency-icons/currency--usdc.svg',
-};
+export function OrderItem<RC extends ReactElement | undefined = undefined>({
+  item,
+  balance,
+  pricing,
+  conversions,
+  size,
+  sx,
+  rc = <span />,
+}: OrderItemProps<RC>) {
+  const { t } = useTranslation();
 
-export function OrderItem(props: OrderItemProps) {
-  const { item } = props;
-  const currencyIcon = CURRENCY_IMAGE_URL[item.currency.toLowerCase()] || CURRENCY_IMAGE_URL.eth;
+  const { token } = balance.fundingItem;
+  const amount = pricing?.amount || 0;
+
+  const fiatAmount = calculateCryptoToFiat(
+    amount.toString(),
+    token.symbol,
+    conversions,
+  );
 
   return (
-    <MenuItem emphasized size="small">
-      <MenuItem.FramedImage imageUrl={item.image} />
+    <MenuItem
+      rc={rc}
+      emphasized
+      size={size || 'medium'}
+      key={item.name}
+      sx={{
+        pointerEvents: 'none',
+        mb: 'base.spacing.x1',
+        ...sx,
+      }}
+    >
+      <MenuItem.FramedImage
+        use={<TokenImage src={item.image} name={item.name} defaultImage={item.image} />}
+      />
       <MenuItem.Label>{item.name}</MenuItem.Label>
-      <MenuItem.Caption>{item.description}</MenuItem.Caption>
-      {item.amount && (
+      <MenuItem.Caption>
+        {t('views.ORDER_SUMMARY.orderItem.quantity', { qty: item.qty })}
+      </MenuItem.Caption>
+      {amount > 0 && (
         <MenuItem.PriceDisplay
-          fiatAmount={item.amount.toString()}
-          price={`${item.currency} ${item.amount}`}
-          currencyImageUrl={currencyIcon}
+          use={<Heading size="xSmall" />}
+          price={t('views.ORDER_SUMMARY.currency.price', {
+            symbol: token.symbol,
+            amount: tokenValueFormat(amount),
+          })}
+          fiatAmount={t('views.ORDER_SUMMARY.currency.fiat', {
+            amount: fiatAmount,
+          })}
         />
       )}
     </MenuItem>

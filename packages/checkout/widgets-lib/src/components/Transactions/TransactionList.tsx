@@ -12,7 +12,7 @@ import { AXELAR_SCAN_URL } from 'lib';
 import { Transaction, TransactionStatus } from 'lib/clients';
 import { CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext';
 import { calculateCryptoToFiat, getTokenImageByAddress, isNativeToken } from 'lib/utils';
-import { formatUnits } from 'ethers/lib/utils';
+import { utils } from 'ethers';
 import { useTranslation } from 'react-i18next';
 import { TransactionItem } from './TransactionItem';
 import { KnownNetworkMap } from './transactionsType';
@@ -41,6 +41,7 @@ export function TransactionList({
   const { cryptoFiatState } = useContext(CryptoFiatContext);
   const { t } = useTranslation();
   const [link, setLink] = useState('');
+  const { environment } = checkout.config;
 
   useEffect(() => {
     if (!checkout) return;
@@ -80,19 +81,20 @@ export function TransactionList({
             const hash = transaction.blockchain_metadata.transaction_hash;
             const tokens = knownTokenMap[transaction.details.from_chain];
             const token = tokens[transaction.details.from_token_address.toLowerCase()];
-            const amount = formatUnits(transaction.details.amount, token.decimals);
+            const amount = utils.formatUnits(transaction.details.amount, token.decimals);
             const fiat = calculateCryptoToFiat(amount, token.symbol, cryptoFiatState.conversions);
 
             if (transaction.details.current_status.status === TransactionStatus.WITHDRAWAL_PENDING) {
               return (
                 <TransactionItemWithdrawPending
                   key={hash}
-                  label={token.name}
+                  label={token.symbol}
                   transaction={transaction}
                   fiatAmount={`${t('views.TRANSACTIONS.fiatPricePrefix')}${fiat}`}
                   amount={amount}
                   icon={getTransactionItemIcon(transaction)}
                   defaultTokenImage={defaultTokenImage}
+                  environment={environment}
                 />
               );
             }
@@ -100,13 +102,14 @@ export function TransactionList({
             return (
               <TransactionItem
                 key={hash}
-                label={token.name}
+                label={token.symbol}
                 details={{ text: t('views.TRANSACTIONS.status.inProgress.stepInfo'), link, hash }}
                 transaction={transaction}
                 fiatAmount={`${t('views.TRANSACTIONS.fiatPricePrefix')}${fiat}`}
                 amount={amount}
                 icon={getTransactionItemIcon(transaction)}
                 defaultTokenImage={defaultTokenImage}
+                environment={environment}
               />
             );
           })}

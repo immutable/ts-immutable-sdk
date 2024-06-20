@@ -15,6 +15,9 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import { AssetVerificationStatus } from './asset-verification-status';
+// May contain unused imports in some cases
+// @ts-ignore
 import { Chain } from './chain';
 
 /**
@@ -66,10 +69,18 @@ export interface Token {
      */
     'name': string | null;
     /**
+     * 
+     * @type {AssetVerificationStatus}
+     * @memberof Token
+     */
+    'verification_status': AssetVerificationStatus;
+    /**
      * When the collection was last updated
      * @type {string}
      * @memberof Token
      */
     'updated_at': string;
 }
+
+
 

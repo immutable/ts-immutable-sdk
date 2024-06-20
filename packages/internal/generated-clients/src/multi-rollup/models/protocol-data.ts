@@ -21,7 +21,7 @@
  */
 export interface ProtocolData {
     /**
-     * Seaport order type
+     * Seaport order type. Orders containing ERC721 tokens will need to pass in the order type as FULL_RESTRICTED while orders with ERC1155 tokens will need to pass in the order_type as PARTIAL_RESTRICTED
      * @type {string}
      * @memberof ProtocolData
      */
@@ -53,7 +53,8 @@ export interface ProtocolData {
 }
 
 export const ProtocolDataOrderTypeEnum = {
-    FullRestricted: 'FULL_RESTRICTED'
+    FullRestricted: 'FULL_RESTRICTED',
+    PartialRestricted: 'PARTIAL_RESTRICTED'
 } as const;
 
 export type ProtocolDataOrderTypeEnum = typeof ProtocolDataOrderTypeEnum[keyof typeof ProtocolDataOrderTypeEnum];

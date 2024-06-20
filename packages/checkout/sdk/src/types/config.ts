@@ -130,7 +130,7 @@ export type ConnectConfig = {
     /** List for sorting injected wallets via wallet rdns */
     priorityWalletRdns: string[];
     /** List for blocking injected wallets via wallet rdns */
-    blacklistWalletRdns: string[];
+    blocklistWalletRdns: string[];
   }
 };
 

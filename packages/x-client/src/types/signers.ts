@@ -13,11 +13,18 @@ export interface StarkSigner {
    * @returns the signed prefixed-message
    */
   signMessage(message: string): Promise<string>;
+
   /**
    * Get the Signer address
    * @returns the Signer's checksum address
    */
   getAddress(): string | Promise<string>;
+
+  /**
+   * Get the Y-coordinate of the public key
+   * @returns the Y-coordinate of the public key
+   */
+  getYCoordinate(): Promise<string>;
 }
 
 /**

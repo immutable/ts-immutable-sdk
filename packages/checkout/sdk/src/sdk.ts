@@ -11,13 +11,17 @@ import * as provider from './provider';
 import * as wallet from './wallet';
 import * as network from './network';
 import * as transaction from './transaction';
+import { handleProviderError } from './transaction';
 import * as gasEstimatorService from './gasEstimate';
 import * as buy from './smartCheckout/buy';
 import * as cancel from './smartCheckout/cancel';
 import * as sell from './smartCheckout/sell';
 import * as smartCheckout from './smartCheckout';
 import {
+  AddNetworkParams,
   BuyParams,
+  BuyResult,
+  CancelResult,
   ChainId,
   CheckConnectionParams,
   CheckConnectionResult,
@@ -26,6 +30,11 @@ import {
   ConnectResult,
   CreateProviderParams,
   CreateProviderResult,
+  EIP6963ProviderDetail,
+  FiatRampParams,
+  GasEstimateBridgeToL2Result,
+  GasEstimateParams,
+  GasEstimateSwapResult,
   GetAllBalancesParams,
   GetAllBalancesResult,
   GetBalanceParams,
@@ -35,28 +44,21 @@ import {
   GetNetworkParams,
   GetTokenAllowListParams,
   GetTokenAllowListResult,
+  GetTokenInfoParams,
   GetWalletAllowListParams,
   GetWalletAllowListResult,
   NetworkInfo,
+  OnRampProviderFees,
+  SellResult,
   SendTransactionParams,
   SendTransactionResult,
+  SmartCheckoutParams,
+  SmartCheckoutResult,
   SwitchNetworkParams,
   SwitchNetworkResult,
-  ValidateProviderOptions,
-  GasEstimateParams,
-  GasEstimateSwapResult,
-  GasEstimateBridgeToL2Result,
-  SmartCheckoutParams,
   TokenFilterTypes,
-  OnRampProviderFees,
-  FiatRampParams,
-  SmartCheckoutResult,
-  CancelResult,
-  BuyResult,
-  SellResult,
   TokenInfo,
-  GetTokenInfoParams,
-  AddNetworkParams,
+  ValidateProviderOptions,
 } from './types';
 import { CheckoutConfiguration } from './config';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
@@ -73,6 +75,7 @@ import { isMatchingAddress } from './utils/utils';
 import { WidgetConfiguration } from './widgets/definitions/configurations';
 import { SemanticVersion } from './widgets/definitions/types';
 import { validateAndBuildVersion } from './widgets/version';
+import { InjectedProvidersManager } from './provider/injectedProvidersManager';
 
 const SANDBOX_CONFIGURATION = {
   baseConfig: {
@@ -99,15 +102,22 @@ export class Checkout {
    * Constructs a new instance of the CheckoutModule class.
    * @param {CheckoutModuleConfiguration} [config=SANDBOX_CONFIGURATION] - The configuration object for the CheckoutModule.
    */
-  constructor(
-    config: CheckoutModuleConfiguration = SANDBOX_CONFIGURATION,
-  ) {
+  constructor(config: CheckoutModuleConfiguration = SANDBOX_CONFIGURATION) {
     this.httpClient = new HttpClient(config);
     this.config = new CheckoutConfiguration(config, this.httpClient);
     this.fiatRampService = new FiatRampService(this.config);
-    this.readOnlyProviders = new Map<ChainId, ethers.providers.JsonRpcProvider>();
-    this.availability = availabilityService(this.config.isDevelopment, this.config.isProduction);
+    this.readOnlyProviders = new Map<
+    ChainId,
+    ethers.providers.JsonRpcProvider
+    >();
+    this.availability = availabilityService(
+      this.config.isDevelopment,
+      this.config.isProduction,
+    );
     this.passport = config.passport;
+
+    // Initialise injected providers via EIP-6963
+    InjectedProvidersManager.getInstance().initialise();
 
     track('checkout_sdk', 'initialised');
   }
@@ -116,7 +126,9 @@ export class Checkout {
    * Loads the widgets bundle and initiate the widgets factory.
    * @param {WidgetsInit} init - The initialisation parameters for loading the widgets bundle and applying configuration
    */
-  public async widgets(init: WidgetsInit): Promise<ImmutableCheckoutWidgets.WidgetsFactory> {
+  public async widgets(
+    init: WidgetsInit,
+  ): Promise<ImmutableCheckoutWidgets.WidgetsFactory> {
     const checkout = this;
 
     // Preload the configurations
@@ -140,43 +152,61 @@ export class Checkout {
   ) {
     const checkout = this;
 
-    const factory = new Promise<ImmutableCheckoutWidgets.WidgetsFactory>((resolve, reject) => {
-      try {
-        const scriptId = 'immutable-checkout-widgets-bundle';
-        const validVersion = validateAndBuildVersion(version);
+    const factory = new Promise<ImmutableCheckoutWidgets.WidgetsFactory>(
+      (resolve, reject) => {
+        try {
+          const scriptId = 'immutable-checkout-widgets-bundle';
+          const validVersion = validateAndBuildVersion(version);
 
-        // Prevent the script to be loaded more than once
-        // by checking the presence of the script and its version.
-        const initScript = document.getElementById(scriptId) as HTMLScriptElement;
-        if (initScript) {
-          if (typeof ImmutableCheckoutWidgets !== 'undefined') {
-            resolve(new ImmutableCheckoutWidgets.WidgetsFactory(checkout, config));
-          } else {
+          // Prevent the script to be loaded more than once
+          // by checking the presence of the script and its version.
+          const initScript = document.getElementById(
+            scriptId,
+          ) as HTMLScriptElement;
+          if (initScript) {
+            if (typeof ImmutableCheckoutWidgets !== 'undefined') {
+              resolve(
+                new ImmutableCheckoutWidgets.WidgetsFactory(checkout, config),
+              );
+            } else {
+              reject(
+                new CheckoutError(
+                  'Failed to find ImmutableCheckoutWidgets script',
+                  CheckoutErrorType.WIDGETS_SCRIPT_LOAD_ERROR,
+                ),
+              );
+            }
+          }
+
+          const tag = document.createElement('script');
+
+          tag.addEventListener('load', () => {
+            if (typeof ImmutableCheckoutWidgets !== 'undefined') {
+              resolve(
+                new ImmutableCheckoutWidgets.WidgetsFactory(checkout, config),
+              );
+            } else {
+              reject(
+                new CheckoutError(
+                  'Failed to find ImmutableCheckoutWidgets script',
+                  CheckoutErrorType.WIDGETS_SCRIPT_LOAD_ERROR,
+                ),
+              );
+            }
+          });
+
+          tag.addEventListener('error', (err) => {
             reject(
               new CheckoutError(
-                'Failed to find ImmutableCheckoutWidgets script',
+                'Failed to load widgets script',
                 CheckoutErrorType.WIDGETS_SCRIPT_LOAD_ERROR,
+                { error: err },
               ),
             );
-          }
-        }
+          });
 
-        const tag = document.createElement('script');
-
-        tag.addEventListener('load', () => {
-          if (typeof ImmutableCheckoutWidgets !== 'undefined') {
-            resolve(new ImmutableCheckoutWidgets.WidgetsFactory(checkout, config));
-          } else {
-            reject(
-              new CheckoutError(
-                'Failed to find ImmutableCheckoutWidgets script',
-                CheckoutErrorType.WIDGETS_SCRIPT_LOAD_ERROR,
-              ),
-            );
-          }
-        });
-
-        tag.addEventListener('error', (err) => {
+          loadUnresolvedBundle(tag, scriptId, validVersion);
+        } catch (err: any) {
           reject(
             new CheckoutError(
               'Failed to load widgets script',
@@ -184,19 +214,9 @@ export class Checkout {
               { error: err },
             ),
           );
-        });
-
-        loadUnresolvedBundle(tag, scriptId, validVersion);
-      } catch (err: any) {
-        reject(
-          new CheckoutError(
-            'Failed to load widgets script',
-            CheckoutErrorType.WIDGETS_SCRIPT_LOAD_ERROR,
-            { error: err },
-          ),
-        );
-      }
-    });
+        }
+      },
+    );
 
     return factory;
   }
@@ -211,14 +231,18 @@ export class Checkout {
 
       // WebpackIgnore comment required to prevent webpack modifying the import statement and
       // breaking the dynamic import in certain applications integrating checkout
-      const checkoutWidgetsModule = await import(/* webpackIgnore: true */ cdnUrl);
+      const checkoutWidgetsModule = await import(
+        /* webpackIgnore: true */ cdnUrl
+      );
 
       if (checkoutWidgetsModule && checkoutWidgetsModule.WidgetsFactory) {
         return new checkoutWidgetsModule.WidgetsFactory(checkout, config);
       }
     } catch (err: any) {
       // eslint-disable-next-line no-console
-      console.warn(`Failed to resolve checkout widgets module, falling back to UMD bundle. Error: ${err.message}`);
+      console.warn(
+        `Failed to resolve checkout widgets module, falling back to UMD bundle. Error: ${err.message}`,
+      );
     }
 
     // Fallback to UMD bundle if esm bundle fails to load
@@ -240,6 +264,34 @@ export class Checkout {
   }
 
   /**
+   * Returns a list of EIP-6963 injected providers and their metadata.
+   */
+  public getInjectedProviders(): readonly EIP6963ProviderDetail[] {
+    return InjectedProvidersManager.getInstance().getProviders();
+  }
+
+  /**
+   * Finds an injected provider by its RDNS.
+   * @param {rdns: string} args - The parameters for finding the injected provider.
+   * @returns {EIP6963ProviderDetail | undefined} - The found provider and metadata or undefined.
+   */
+  public findInjectedProvider(args: {
+    rdns: string;
+  }): EIP6963ProviderDetail | undefined {
+    return InjectedProvidersManager.getInstance().findProvider(args);
+  }
+
+  /**
+   * Subscribes to changes in the injected providers.
+   * @param listener - The listener to be called when the injected providers change.
+   */
+  public onInjectedProvidersChange(
+    listener: (providers: EIP6963ProviderDetail[]) => void,
+  ) {
+    return InjectedProvidersManager.getInstance().subscribe(listener);
+  }
+
+  /**
    * Checks if a wallet is connected to the specified provider.
    * @param {CheckConnectionParams} params - The parameters for checking the wallet connection.
    * @returns {Promise<CheckConnectionResult>} - A promise that resolves to the result of the check.
@@ -250,7 +302,10 @@ export class Checkout {
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
-      { allowMistmatchedChainId: true, allowUnsupportedProvider: true } as ValidateProviderOptions,
+      {
+        allowMistmatchedChainId: true,
+        allowUnsupportedProvider: true,
+      } as ValidateProviderOptions,
     );
     return connect.checkIsWalletConnected(web3Provider);
   }
@@ -261,9 +316,7 @@ export class Checkout {
    * @returns {Promise<ConnectResult>} A promise that resolves to an object containing the provider and network information.
    * @throws {Error} If the provider is not valid or if there is an error connecting to the network.
    */
-  public async connect(
-    params: ConnectParams,
-  ): Promise<ConnectResult> {
+  public async connect(params: ConnectParams): Promise<ConnectResult> {
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
@@ -273,7 +326,10 @@ export class Checkout {
       } as ValidateProviderOptions,
     );
 
-    if (params.requestWalletPermissions && !(web3Provider.provider as any)?.isPassport) {
+    if (
+      params.requestWalletPermissions
+      && !(web3Provider.provider as any)?.isPassport
+    ) {
       await connect.requestPermissions(web3Provider);
     } else {
       await connect.connectSite(web3Provider);
@@ -287,9 +343,7 @@ export class Checkout {
    * @param {AddNetworkParams} params - The parameters for adding the network.
    * @returns {Promise<any>} - A promise that resolves to the result of adding the network.
    */
-  public async addNetwork(
-    params: AddNetworkParams,
-  ): Promise<any> {
+  public async addNetwork(params: AddNetworkParams): Promise<any> {
     const addNetworkRes = await network.addNetworkToWallet(
       this.config.networkMap,
       params.provider,
@@ -331,13 +385,8 @@ export class Checkout {
    * @param {GetTokenInfoParams} params - The parameters for retrieving the token information.
    * @returns {Promise<TokenInfo>} - A promise that resolves to the token info request.
    */
-  public async getTokenInfo(
-    params: GetTokenInfoParams,
-  ): Promise<TokenInfo> {
-    return await tokens.getERC20TokenInfo(
-      params.provider,
-      params.tokenAddress,
-    );
+  public async getTokenInfo(params: GetTokenInfoParams): Promise<TokenInfo> {
+    return await tokens.getERC20TokenInfo(params.provider, params.tokenAddress);
   }
 
   /**
@@ -345,9 +394,7 @@ export class Checkout {
    * @param {GetBalanceParams} params - The parameters for retrieving the balance.
    * @returns {Promise<GetBalanceResult>} - A promise that resolves to the balance result.
    */
-  public async getBalance(
-    params: GetBalanceParams,
-  ): Promise<GetBalanceResult> {
+  public async getBalance(params: GetBalanceParams): Promise<GetBalanceResult> {
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
@@ -436,13 +483,36 @@ export class Checkout {
   }
 
   /**
+   * Wraps a Web3Provider call to validate the provider and handle errors.
+   * @param {Web3Provider} web3Provider - The provider to connect to the network.
+   * @param {(web3Provider: Web3Provider) => Promise<T>)} block - The block executing the provider call.
+   * @returns {Promise<T>} Returns the result of the provided block param.
+   */
+  public async providerCall<T>(
+    web3Provider: Web3Provider,
+    block: (web3Provider: Web3Provider) => Promise<T>,
+  ): Promise<T> {
+    const validatedProvider = await provider.validateProvider(
+      this.config,
+      web3Provider,
+      {
+        allowUnsupportedProvider: true,
+        allowMistmatchedChainId: true,
+      } as ValidateProviderOptions,
+    );
+    try {
+      return await block(validatedProvider);
+    } catch (err: any) {
+      throw handleProviderError(err);
+    }
+  }
+
+  /**
    * Retrieves network information using the specified provider.
    * @param {GetNetworkParams} params - The parameters for retrieving network information.
    * @returns {Promise<NetworkInfo>} A promise that resolves to the network information.
    */
-  public async getNetworkInfo(
-    params: GetNetworkParams,
-  ): Promise<NetworkInfo> {
+  public async getNetworkInfo(params: GetNetworkParams): Promise<NetworkInfo> {
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
@@ -457,13 +527,13 @@ export class Checkout {
   /**
    * Determines the requirements for performing a buy.
    * @param {BuyParams} params - The parameters for the buy.
-  */
-  public async buy(
-    params: BuyParams,
-  ): Promise<BuyResult> {
+   */
+  public async buy(params: BuyParams): Promise<BuyResult> {
     if (params.orders.length > 1) {
       // eslint-disable-next-line no-console
-      console.warn('This endpoint currently only processes the first order in the array.');
+      console.warn(
+        'This endpoint currently only processes the first order in the array.',
+      );
     }
 
     const web3Provider = await provider.validateProvider(
@@ -471,7 +541,12 @@ export class Checkout {
       params.provider,
     );
 
-    return await buy.buy(this.config, web3Provider, params.orders, params.overrides);
+    return await buy.buy(
+      this.config,
+      web3Provider,
+      params.orders,
+      params.overrides,
+    );
   }
 
   /**
@@ -479,13 +554,13 @@ export class Checkout {
    * @param {SellParams} params - The parameters for the sell.
    * Only currently actions the first order in the array until we support batch processing.
    * Only currently actions the first fee in the fees array of each order until we support multiple fees.
-  */
-  public async sell(
-    params: SellParams,
-  ): Promise<SellResult> {
+   */
+  public async sell(params: SellParams): Promise<SellResult> {
     if (params.orders.length > 1) {
       // eslint-disable-next-line no-console
-      console.warn('This endpoint currently only processes the first order in the array.');
+      console.warn(
+        'This endpoint currently only processes the first order in the array.',
+      );
     }
 
     const web3Provider = await provider.validateProvider(
@@ -493,29 +568,30 @@ export class Checkout {
       params.provider,
     );
 
-    return await sell.sell(
-      this.config,
-      web3Provider,
-      params.orders,
-    );
+    return await sell.sell(this.config, web3Provider, params.orders);
   }
 
   /**
    * Cancels a sell.
    * @param {CancelParams} params - The parameters for the cancel.
    */
-  public async cancel(
-    params: CancelParams,
-  ): Promise<CancelResult> {
+  public async cancel(params: CancelParams): Promise<CancelResult> {
     // eslint-disable-next-line no-console
-    console.warn('This endpoint currently only processes the first order in the array.');
+    console.warn(
+      'This endpoint currently only processes the first order in the array.',
+    );
 
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
     );
 
-    return await cancel.cancel(this.config, web3Provider, params.orderIds, params.overrides);
+    return await cancel.cancel(
+      this.config,
+      web3Provider,
+      params.orderIds,
+      params.overrides,
+    );
   }
 
   /**
@@ -532,7 +608,10 @@ export class Checkout {
 
     let itemRequirements = [];
     try {
-      itemRequirements = await getItemRequirementsFromRequirements(web3Provider, params.itemRequirements);
+      itemRequirements = await getItemRequirementsFromRequirements(
+        web3Provider,
+        params.itemRequirements,
+      );
     } catch (err: any) {
       throw new CheckoutError(
         'Failed to map item requirements',
@@ -546,6 +625,10 @@ export class Checkout {
       web3Provider,
       itemRequirements,
       params.transactionOrGasAmount,
+      params.routingOptions,
+      params.onComplete,
+      params.onFundingRoute,
+      params.fundingRouteFullAmount,
     );
   }
 
@@ -554,9 +637,7 @@ export class Checkout {
    * @param {Web3Provider} web3Provider - The object to check.
    * @returns {boolean} - True if the object is a Web3 provider, false otherwise.
    */
-  static isWeb3Provider(
-    web3Provider: Web3Provider,
-  ) {
+  static isWeb3Provider(web3Provider: Web3Provider) {
     return provider.isWeb3Provider(web3Provider);
   }
 
@@ -598,13 +679,17 @@ export class Checkout {
       email = userInfo?.email;
     }
 
-    const tokenList = await tokens.getTokenAllowList(this.config, { type: TokenFilterTypes.ONRAMP });
+    const tokenList = await tokens.getTokenAllowList(this.config, {
+      type: TokenFilterTypes.ONRAMP,
+    });
     const token = tokenList.tokens?.find((t) => isMatchingAddress(t.address, params.tokenAddress));
     if (token) {
       tokenAmount = params.tokenAmount;
       tokenSymbol = token.symbol;
     }
-    const allowedTokens = tokenList?.tokens?.filter((t) => t.symbol).map((t) => t.symbol);
+    const allowedTokens = tokenList?.tokens
+      ?.filter((t) => t.symbol)
+      .map((t) => t.symbol);
 
     return await this.fiatRampService.createWidgetUrl({
       exchangeType: params.exchangeType,

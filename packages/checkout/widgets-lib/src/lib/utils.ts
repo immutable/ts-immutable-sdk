@@ -10,6 +10,10 @@ import {
   NATIVE,
 } from './constants';
 
+export const tokenSymbolNameOverrides = {
+  timx: 'imx',
+};
+
 export const sortTokensByAmount = (
   config: CheckoutConfiguration,
   tokens: GetBalanceResult[],
@@ -58,26 +62,27 @@ export const sortNetworksCompareFn = (
   return 1;
 };
 
-export const formatFiatString = (amount: number) => {
-  const factor = 10 ** 2;
-  return (Math.round(amount * factor) / factor).toFixed(2);
+export const formatFiatString = (amount: number, decimals: number = 2): string => {
+  const factor = 10 ** decimals;
+  return (Math.round(amount * factor) / factor).toFixed(decimals);
 };
 
 export const calculateCryptoToFiat = (
   amount: string,
   symbol: string,
   conversions: Map<string, number>,
+  zeroString: string = '0.00',
+  maxDecimals: number = 2,
 ): string => {
-  const zeroString = '0.00';
-
   if (!amount) return zeroString;
 
-  const conversion = conversions.get(symbol.toLowerCase());
+  const name = tokenSymbolNameOverrides[symbol.toLowerCase()] || symbol.toLowerCase();
+  const conversion = conversions.get(name);
   if (!conversion) return zeroString;
 
   const parsedAmount = parseFloat(amount);
   if (parseFloat(amount) === 0 || Number.isNaN(parsedAmount)) return zeroString;
-  return formatFiatString(parsedAmount * conversion);
+  return formatFiatString(parsedAmount * conversion, maxDecimals);
 };
 
 export const formatZeroAmount = (
@@ -149,6 +154,10 @@ export function getRemoteImage(environment: Environment | undefined, path: strin
   return `${CHECKOUT_CDN_BASE_URL[environment ?? Environment.PRODUCTION]}/v1/blob/img${path}`;
 }
 
+export function getChainImage(environment: Environment | undefined, chainId: ChainId) {
+  return getRemoteImage(environment, `/chains/${chainId}.png`);
+}
+
 export function getEthTokenImage(environment: Environment | undefined) {
   return getRemoteImage(environment, '/tokens/eth.svg');
 }
@@ -168,4 +177,16 @@ export function getDefaultTokenImage(
   return theme === WidgetTheme.LIGHT
     ? getRemoteImage(environment, '/tokens/defaultonlight.svg')
     : getRemoteImage(environment, '/tokens/defaultondark.svg');
+}
+
+export function abbreviateWalletAddress(address: string, separator = '.....', firstChars = 5, lastChars = 4): string {
+  // first 5 characters, ellipses, and the last 4 characters
+  // e.g. 0x1234567890abcdef => 0x123.....cdef
+  const firstPart = address.slice(0, firstChars);
+  const lastPart = address.slice(-lastChars);
+  return `${firstPart}${separator}${lastPart}`;
+}
+
+export function compareStr(a: string, b: string): boolean {
+  return a.toLowerCase() === b.toLowerCase();
 }

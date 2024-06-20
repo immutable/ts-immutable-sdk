@@ -7,7 +7,7 @@ import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import {
-  FundWithSmartCheckoutSubViews,
+  OrderSummarySubViews,
   SaleWidgetViews,
 } from '../../../context/view-context/SaleViewContextTypes';
 import {
@@ -20,10 +20,8 @@ import { PaymentOptions } from '../components/PaymentOptions';
 import { useSaleContext } from '../context/SaleContextProvider';
 import { useSaleEvent } from '../hooks/useSaleEvents';
 import { SaleErrorTypes, SignPaymentTypes } from '../types';
-import { useInsufficientBalance } from '../hooks/useInsufficientBalance';
 
 export function PaymentMethods() {
-  useInsufficientBalance();
   const { t } = useTranslation();
   const { viewDispatch } = useContext(ViewContext);
   const {
@@ -31,23 +29,26 @@ export function PaymentMethods() {
     goToErrorView,
     paymentMethod,
     setPaymentMethod,
-    disabledPaymentTypes,
     invalidParameters,
+    disabledPaymentTypes,
+    hideExcludedPaymentTypes,
   } = useSaleContext();
   const { sendPageView, sendCloseEvent, sendSelectedPaymentMethod } = useSaleEvent();
 
-  const handleOptionClick = (type: SalePaymentTypes) => setPaymentMethod(type);
+  const handleOptionClick = (type: SalePaymentTypes) => {
+    setPaymentMethod(type);
+  };
 
   useEffect(() => {
     if (paymentMethod) {
-      sendSelectedPaymentMethod(paymentMethod, SaleWidgetViews.PAYMENT_METHODS);
+      sendSelectedPaymentMethod(paymentMethod, SaleWidgetViews.PAYMENT_METHODS); // checkoutPrimarySalePaymentMethods_SelectMenuItem
     }
 
     if (
       paymentMethod
       && [SalePaymentTypes.DEBIT, SalePaymentTypes.CREDIT].includes(paymentMethod)
     ) {
-      sign(SignPaymentTypes.FIAT, () => {
+      sign(SignPaymentTypes.FIAT, undefined, () => {
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,
@@ -74,15 +75,15 @@ export function PaymentMethods() {
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
-            type: SaleWidgetViews.FUND_WITH_SMART_CHECKOUT,
-            subView: FundWithSmartCheckoutSubViews.INIT,
+            type: SaleWidgetViews.ORDER_SUMMARY,
+            subView: OrderSummarySubViews.INIT,
           },
         },
       });
     }
   }, [paymentMethod]);
 
-  useEffect(() => sendPageView(SaleWidgetViews.PAYMENT_METHODS), []);
+  useEffect(() => sendPageView(SaleWidgetViews.PAYMENT_METHODS), []); // checkoutPrimarySalePaymentMethodsViewed
   useEffect(() => {
     if (!invalidParameters) return;
     goToErrorView(SaleErrorTypes.INVALID_PARAMETERS);
@@ -93,7 +94,7 @@ export function PaymentMethods() {
       testId="payment-methods"
       header={(
         <HeaderNavigation
-          onCloseButtonClick={() => sendCloseEvent(SaleWidgetViews.PAYMENT_METHODS)}
+          onCloseButtonClick={() => sendCloseEvent(SaleWidgetViews.PAYMENT_METHODS)} // checkoutPrimarySalePaymentMethods_CloseButtonPressed
         />
       )}
       footer={<FooterLogo />}
@@ -117,6 +118,7 @@ export function PaymentMethods() {
         </Heading>
         <Box sx={{ paddingX: 'base.spacing.x2' }}>
           <PaymentOptions
+            hideDisabledOptions={hideExcludedPaymentTypes}
             disabledOptions={disabledPaymentTypes}
             onClick={handleOptionClick}
           />

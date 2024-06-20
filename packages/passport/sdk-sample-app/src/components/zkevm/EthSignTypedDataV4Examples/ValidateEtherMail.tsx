@@ -8,7 +8,7 @@ import WorkflowButton from '@/components/WorkflowButton';
 import { RequestExampleProps } from '@/types';
 import { TypedDataPayload } from '@imtbl/passport';
 import { getEtherMailTypedPayload } from './etherMailTypedPayload';
-import { isSignatureValid } from './isSignatureValid';
+import { isValidTypedDataSignature } from './isValidTypedDataSignature';
 
 function ValidateEtherMail({ disabled }: RequestExampleProps) {
   const [address, setAddress] = useState<string>('');
@@ -53,7 +53,12 @@ function ValidateEtherMail({ disabled }: RequestExampleProps) {
         return;
       }
 
-      const isValid = await isSignatureValid(address, etherMailTypedPayload, signature, zkEvmProvider);
+      const isValid = await isValidTypedDataSignature(
+        address,
+        JSON.stringify(etherMailTypedPayload),
+        signature,
+        zkEvmProvider,
+      );
 
       setIsValidSignature(isValid);
       setSignatureValidationMessage(isValid ? 'Signature is valid' : 'Signature is invalid');

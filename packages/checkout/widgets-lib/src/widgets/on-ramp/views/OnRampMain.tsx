@@ -48,11 +48,10 @@ export function OnRampMain({
 
   const { track } = useAnalytics();
 
-  const trackSegmentEvents = async (event: TransakEventData, walletAddress: string, email?: string) => {
+  const trackSegmentEvents = async (event: TransakEventData, walletAddress: string) => {
     const miscProps = {
       userId: walletAddress.toLowerCase(),
       isPassportWallet: isPassport,
-      email,
     };
     switch (event.event_id) {
       case TransakEvents.TRANSAK_WIDGET_OPEN:
@@ -207,14 +206,6 @@ export function OnRampMain({
       userWalletAddress = await provider!.getSigner().getAddress();
     })();
 
-    let userEmail;
-    (async () => {
-      if (passport) {
-        const userProfile = await passport.getUserInfo();
-        userEmail = userProfile?.email;
-      }
-    })();
-
     const domIframe:HTMLIFrameElement = document.getElementById(transakIframeId) as HTMLIFrameElement;
 
     if (!domIframe) return;
@@ -225,7 +216,7 @@ export function OnRampMain({
       const host = url.parse(event.origin)?.host?.toLowerCase();
       if (event.source === domIframe.contentWindow
         && host && TRANSAK_ORIGIN.includes(host)) {
-        trackSegmentEvents(event.data, userWalletAddress, userEmail);
+        trackSegmentEvents(event.data, userWalletAddress);
         transakEventHandler(event.data);
       }
     };

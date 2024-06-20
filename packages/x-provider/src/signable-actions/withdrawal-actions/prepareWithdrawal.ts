@@ -19,22 +19,22 @@ export type PrepareWithdrawalWorkflowParams = TokenAmount & {
 
 export async function prepareWithdrawalAction(
   params: PrepareWithdrawalWorkflowParams,
+  withdrawalsApi: imx.WithdrawalsApi,
 ): Promise<imx.CreateWithdrawalResponse> {
   const {
     signers: { ethSigner, starkSigner },
-    type,
-    config,
   } = params;
   await validateChain(ethSigner, params.config);
-  const withdrawalsApi = new imx.WithdrawalsApi(config.apiConfiguration);
-  const withdrawalAmount = type === 'ERC721' ? '1' : params.amount;
-  const signableWithdrawalResult = await withdrawalsApi.getSignableWithdrawal({
-    getSignableWithdrawalRequest: {
-      user: await ethSigner.getAddress(),
-      token: convertToSignableToken(params),
-      amount: withdrawalAmount,
+  const withdrawalAmount = params.type === 'ERC721' ? '1' : params.amount;
+  const signableWithdrawalResult = await withdrawalsApi.getSignableWithdrawalV2(
+    {
+      getSignableWithdrawalRequest: {
+        user: await ethSigner.getAddress(),
+        token: convertToSignableToken(params),
+        amount: withdrawalAmount,
+      },
     },
-  });
+  );
 
   const { signable_message: signableMessage, payload_hash: payloadHash } = signableWithdrawalResult.data;
 
@@ -45,12 +45,25 @@ export async function prepareWithdrawalAction(
     ethSigner,
   );
 
-  const prepareWithdrawalResponse = await withdrawalsApi.createWithdrawal({
-    createWithdrawalRequest: {
-      stark_key: assertIsDefined(signableWithdrawalResult.data.stark_key),
+  const prepareWithdrawalResponse = await withdrawalsApi.createWithdrawalV2({
+    createWithdrawalRequestV2: {
+      sender_stark_key: assertIsDefined(
+        signableWithdrawalResult.data.sender_stark_key,
+      ),
+      sender_vault_id: assertIsDefined(
+        signableWithdrawalResult.data.sender_vault_id,
+      ),
+      receiver_stark_key: assertIsDefined(
+        signableWithdrawalResult.data.receiver_stark_key,
+      ),
+      receiver_vault_id: assertIsDefined(
+        signableWithdrawalResult.data.receiver_vault_id,
+      ),
       amount: withdrawalAmount,
       asset_id: assertIsDefined(signableWithdrawalResult.data.asset_id),
-      vault_id: assertIsDefined(signableWithdrawalResult.data.vault_id),
+      expiration_timestamp: assertIsDefined(
+        signableWithdrawalResult.data.expiration_timestamp,
+      ),
       nonce: assertIsDefined(signableWithdrawalResult.data.nonce),
       stark_signature: starkSignature,
     },

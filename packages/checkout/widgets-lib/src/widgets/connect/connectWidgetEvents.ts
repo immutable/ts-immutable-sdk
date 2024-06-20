@@ -4,14 +4,18 @@ import {
   ConnectEventType,
   WalletProviderName,
   WidgetType,
+  WalletConnectManager,
+  EIP6963ProviderInfo,
 } from '@imtbl/checkout-sdk';
 
 import { Web3Provider } from '@ethersproject/providers';
+import EthereumProvider from '@walletconnect/ethereum-provider';
 
 export function sendConnectSuccessEvent(
   eventTarget: Window | EventTarget,
   provider: Web3Provider,
   walletProviderName?: WalletProviderName,
+  walletProviderInfo?: EIP6963ProviderInfo,
 ) {
   const successEvent = new CustomEvent<WidgetEvent<WidgetType.CONNECT, ConnectEventType.SUCCESS>>(
     IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
@@ -21,6 +25,7 @@ export function sendConnectSuccessEvent(
         data: {
           provider,
           walletProviderName,
+          walletProviderInfo,
         },
       },
     },
@@ -60,4 +65,26 @@ export function sendConnectFailedEvent(eventTarget: Window | EventTarget, reason
   // eslint-disable-next-line no-console
   console.log('failed event:', eventTarget, failedEvent);
   if (eventTarget !== undefined) eventTarget.dispatchEvent(failedEvent);
+}
+
+export function sendWalletConnectProviderUpdatedEvent(
+  eventTarget: Window | EventTarget,
+  ethereumProvider: EthereumProvider | null,
+  walletConnectManager: WalletConnectManager,
+) {
+  const successEvent = new CustomEvent<
+  WidgetEvent<WidgetType.CONNECT, ConnectEventType.WALLETCONNECT_PROVIDER_UPDATED>
+  >(
+    IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
+    {
+      detail: {
+        type: ConnectEventType.WALLETCONNECT_PROVIDER_UPDATED,
+        data: {
+          ethereumProvider,
+          walletConnectManager,
+        },
+      },
+    },
+  );
+  if (eventTarget !== undefined) eventTarget.dispatchEvent(successEvent);
 }

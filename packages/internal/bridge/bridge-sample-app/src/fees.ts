@@ -31,7 +31,7 @@ async function getBridgeFees() {
 
   const depositReq: BridgeFeeRequest = {
     action: BridgeFeeActions.DEPOSIT,
-    gasMultiplier: 1.1,
+    gasMultiplier: 'auto',
     sourceChainId: bridgeConfig.bridgeInstance.rootChainID,
     destinationChainId: bridgeConfig.bridgeInstance.childChainID,
   }
@@ -44,7 +44,7 @@ async function getBridgeFees() {
 
   const withdrawReq: BridgeFeeRequest = {
     action: BridgeFeeActions.WITHDRAW,
-    gasMultiplier: 1.1,
+    gasMultiplier: 'auto',
     sourceChainId: bridgeConfig.bridgeInstance.childChainID,
     destinationChainId: bridgeConfig.bridgeInstance.rootChainID,
   }

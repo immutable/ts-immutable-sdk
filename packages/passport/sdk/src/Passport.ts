@@ -6,10 +6,9 @@ import {
   MultiRollupApiClients,
 } from '@imtbl/generated-clients';
 import { IMXClient } from '@imtbl/x-client';
-import { ChainName } from 'network/chains';
 import { Environment } from '@imtbl/config';
 
-import { setPassportClientId, identify, track } from '@imtbl/metrics';
+import { identify, setPassportClientId, track } from '@imtbl/metrics';
 
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
@@ -29,6 +28,7 @@ import { Provider } from './zkEvm/types';
 import TypedEventEmitter from './utils/typedEventEmitter';
 import GuardianClient from './guardian';
 import logger from './utils/logger';
+import { announceProvider, passportProviderInfo } from './zkEvm/provider/eip6963';
 
 const buildImxClientConfig = (passportModuleConfiguration: PassportModuleConfiguration) => {
   if (passportModuleConfiguration.overrides) {
@@ -122,7 +122,7 @@ export class Passport {
     this.guardianClient = privateVars.guardianClient;
 
     setPassportClientId(passportModuleConfiguration.clientId);
-    track('passport', 'initialised');
+    track('passport', 'initialise');
   }
 
   /**
@@ -137,8 +137,12 @@ export class Passport {
     return this.passportImxProviderFactory.getProvider();
   }
 
-  public connectEvm(): Provider {
-    return new ZkEvmProvider({
+  public connectEvm(options: {
+    announceProvider: boolean
+  } = {
+    announceProvider: true,
+  }): Provider {
+    const provider = new ZkEvmProvider({
       passportEventEmitter: this.passportEventEmitter,
       authManager: this.authManager,
       magicAdapter: this.magicAdapter,
@@ -146,6 +150,15 @@ export class Passport {
       multiRollupApiClients: this.multiRollupApiClients,
       guardianClient: this.guardianClient,
     });
+
+    if (options?.announceProvider) {
+      announceProvider({
+        info: passportProviderInfo,
+        provider,
+      });
+    }
+
+    return provider;
   }
 
   /**
@@ -223,15 +236,17 @@ export class Passport {
   }
 
   public async logout(): Promise<void> {
-    try {
-      await this.confirmationScreen.logout();
-    } catch (err) {
-      logger.warn('Failed to logout from confirmation screen', err);
+    if (this.config.oidcConfiguration.logoutMode === 'silent') {
+      await Promise.allSettled([
+        this.authManager.logout(),
+        this.magicAdapter.logout(),
+      ]);
+    } else {
+      // We need to ensure that the Magic wallet is logged out BEFORE redirecting
+      await this.magicAdapter.logout();
+      await this.authManager.logout();
     }
-    await Promise.allSettled([
-      this.authManager.logout(),
-      this.magicAdapter.logout(),
-    ]);
+
     this.passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
   }
 
@@ -278,13 +293,7 @@ export class Passport {
       return [];
     }
     const headers = { Authorization: `Bearer ${user.accessToken}` };
-    const linkedAddressesResult = await this.multiRollupApiClients.passportApi.getLinkedAddresses(
-      {
-        chainName: ChainName.ETHEREUM,
-        userId: user?.profile.sub,
-      },
-      { headers },
-    );
-    return linkedAddressesResult.data.linked_addresses;
+    const getUserInfoResult = await this.multiRollupApiClients.passportProfileApi.getUserInfo({ headers });
+    return getUserInfoResult.data.linked_addresses;
   }
 }

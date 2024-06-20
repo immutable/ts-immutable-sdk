@@ -1,6 +1,7 @@
 import { ModuleConfiguration } from '@imtbl/config';
 import { ImmutableApiClient, ImmutableApiClientFactory } from './api-client';
 import {
+  getConfiguredProvider,
   getOrderbookConfig,
   OrderbookModuleConfiguration,
   OrderbookOverrides,
@@ -12,6 +13,7 @@ import {
   mapFromOpenApiTrade,
 } from './openapi/mapper';
 import { Seaport } from './seaport';
+import { getBulkSeaportOrderSignatures } from './seaport/components';
 import { SeaportLibFactory } from './seaport/seaport-lib-factory';
 import {
   ActionType,
@@ -30,6 +32,8 @@ import {
   OrderStatusName,
   PrepareCancelOrdersResponse,
   PrepareListingParams,
+  PrepareBulkListingsParams,
+  PrepareBulkListingsResponse,
   PrepareListingResponse,
   SignablePurpose,
   TradeResult,
@@ -48,12 +52,19 @@ export class Orderbook {
   private orderbookConfig: OrderbookModuleConfiguration;
 
   constructor(config: ModuleConfiguration<OrderbookOverrides>) {
-    const obConfig = getOrderbookConfig(config.baseConfig.environment);
+    const obConfig = getOrderbookConfig(config);
 
     const finalConfig: OrderbookModuleConfiguration = {
       ...obConfig,
       ...config.overrides,
     } as OrderbookModuleConfiguration;
+
+    if (config.overrides?.jsonRpcProviderUrl) {
+      finalConfig.provider = getConfiguredProvider(
+        config.overrides?.jsonRpcProviderUrl!,
+        config.baseConfig.rateLimitingKey,
+      );
+    }
 
     if (!finalConfig) {
       throw new Error(
@@ -72,6 +83,7 @@ export class Orderbook {
       apiEndpoint,
       chainName,
       this.orderbookConfig.seaportContractAddress,
+      config.baseConfig.rateLimitingKey,
     ).create();
 
     const seaportLibFactory = new SeaportLibFactory(
@@ -83,6 +95,7 @@ export class Orderbook {
       this.orderbookConfig.provider,
       this.orderbookConfig.seaportContractAddress,
       this.orderbookConfig.zoneContractAddress,
+      config.baseConfig.rateLimitingKey,
     );
   }
 
@@ -151,6 +164,105 @@ export class Orderbook {
   }
 
   /**
+   * Get required transactions and messages for signing to facilitate creating bulk listings.
+   * Once the transactions are submitted and the message signed, call the completeListings method
+   * provided in the return type with the signature. This method supports up to 20 listing creations
+   * at a time. It can also be used for individual listings to simplify integration code paths.
+   * @param {PrepareBulkListingsParams} prepareBulkListingsParams - Details about the listings
+   * to be created.
+   * @return {PrepareBulkListingsResponse} PrepareListingResponse includes
+   * any unsigned approval transactions, the typed bulk order message for signing and
+   * the createListings method that can be called with the signature to create the listings.
+   */
+  async prepareBulkListings(
+    {
+      makerAddress,
+      listingParams,
+    }: PrepareBulkListingsParams,
+  ): Promise<PrepareBulkListingsResponse> {
+    // Limit bulk listing creation to 20 orders to prevent API and order evaluation spam
+    if (listingParams.length > 20) {
+      throw new Error('Bulk listing creation is limited to 20 orders');
+    }
+
+    // In the event of a single order, delegate to prepareListing as the signature is more
+    // gas efficient
+    if (listingParams.length === 1) {
+      const prepareListingResponse = await this.seaport.prepareSeaportOrder(
+        makerAddress,
+        listingParams[0].sell,
+        listingParams[0].buy,
+        new Date(),
+        listingParams[0].orderExpiry || new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 2),
+      );
+
+      return {
+        actions: prepareListingResponse.actions,
+        completeListings: async (signature: string) => {
+          const createListingResult = await this.createListing({
+            makerFees: listingParams[0].makerFees,
+            orderComponents: prepareListingResponse.orderComponents,
+            orderHash: prepareListingResponse.orderHash,
+            orderSignature: signature,
+          });
+
+          return {
+            result: [{
+              success: true,
+              orderHash: prepareListingResponse.orderHash,
+              order: createListingResult.result,
+            }],
+          };
+        },
+      };
+    }
+
+    const { actions, preparedListings } = await this.seaport.prepareBulkSeaportOrders(
+      makerAddress,
+      listingParams.map((orderParam) => ({
+        listingItem: orderParam.sell,
+        considerationItem: orderParam.buy,
+        orderStart: new Date(),
+        orderExpiry: orderParam.orderExpiry || new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 2),
+      })),
+    );
+
+    return {
+      actions,
+      completeListings: async (bulkOrderSignature: string) => {
+        const orderComponents = preparedListings.map((orderParam) => orderParam.orderComponents);
+        const signatures = getBulkSeaportOrderSignatures(
+          bulkOrderSignature,
+          orderComponents,
+        );
+
+        const createOrdersApiListingResponse = await Promise.all(
+          orderComponents.map((orderComponent, i) => {
+            const sig = signatures[i];
+            const listing = preparedListings[i];
+            const listingParam = listingParams[i];
+            return this.apiClient.createListing({
+              orderComponents: orderComponent,
+              orderHash: listing.orderHash,
+              orderSignature: sig,
+              makerFees: listingParam.makerFees,
+            // Swallow failed creations - this gets mapped in the response to the caller as failed
+            }).catch(() => undefined);
+          }),
+        );
+
+        return {
+          result: createOrdersApiListingResponse.map((apiListingResponse, i) => ({
+            success: !!apiListingResponse,
+            orderHash: preparedListings[i].orderHash,
+            order: apiListingResponse ? mapFromOpenApiOrder(apiListingResponse.result) : undefined,
+          })),
+        };
+      },
+    };
+  }
+
+  /**
    * Get required transactions and messages for signing prior to creating a listing
    * through the createListing method
    * @param {PrepareListingParams} prepareListingParams - Details about the listing to be created.
@@ -199,12 +311,15 @@ export class Orderbook {
    * @param {string} listingId - The listingId to fulfil.
    * @param {string} takerAddress - The address of the account fulfilling the order.
    * @param {FeeValue[]} takerFees - Taker ecosystem fees to be paid.
+   * @param {string} amountToFill - Amount of the order to fill, defaults to sell item amount.
+   *                                Only applies to ERC1155 orders
    * @return {FulfillOrderResponse} Approval and fulfilment transactions.
    */
   async fulfillOrder(
     listingId: string,
     takerAddress: string,
     takerFees: FeeValue[],
+    amountToFill?: string,
   ): Promise<FulfillOrderResponse> {
     const fulfillmentDataRes = await this.apiClient.fulfillmentData([
       {
@@ -236,9 +351,18 @@ export class Orderbook {
       );
     }
 
-    return this.seaport.fulfillOrder(orderResult, takerAddress, extraData);
+    return this.seaport.fulfillOrder(orderResult, takerAddress, extraData, amountToFill);
   }
 
+  /**
+   * Get unsigned transactions that can be submitted to fulfil multiple open orders. If approval
+   * transactions exist, they must be signed and submitted to the chain before the fulfilment
+   * transaction can be submitted or it will be reverted.
+   * @param {Array<FulfillmentListing>} listings - The details of the listings to fulfil, amounts
+   *                                               to fill and taker ecosystem fees to be paid.
+   * @param {string} takerAddress - The address of the account fulfilling the order.
+   * @return {FulfillBulkOrdersResponse} Approval and fulfilment transactions.
+   */
   async fulfillBulkOrders(
     listings: Array<FulfillmentListing>,
     takerAddress: string,
@@ -257,9 +381,24 @@ export class Orderbook {
     );
 
     try {
+      const fulfillableOrdersWithUnits = fulfillmentDataRes.result.fulfillable_orders
+        .map((fulfillmentData) => {
+        // Find the listing that corresponds to the order for the units
+          const listing = listings.find((l) => l.listingId === fulfillmentData.order.id);
+          if (!listing) {
+            throw new Error(`Could not find listing for order ${fulfillmentData.order.id}`);
+          }
+
+          return {
+            extraData: fulfillmentData.extra_data,
+            order: fulfillmentData.order,
+            unitsToFill: listing.amountToFill,
+          };
+        });
+
       return {
         ...(await this.seaport.fulfillBulkOrders(
-          fulfillmentDataRes.result.fulfillable_orders,
+          fulfillableOrdersWithUnits,
           takerAddress,
         )),
         fulfillableOrders: fulfillmentDataRes.result.fulfillable_orders.map(

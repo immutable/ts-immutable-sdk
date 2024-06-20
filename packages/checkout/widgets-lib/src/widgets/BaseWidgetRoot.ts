@@ -16,7 +16,6 @@ import { Web3Provider } from '@ethersproject/providers';
 import i18next from 'i18next';
 import { StrongCheckoutWidgetsConfig, withDefaultWidgetConfigs } from '../lib/withDefaultWidgetConfig';
 import { addProviderListenersForWidgetRoot, baseWidgetProviderEvent } from '../lib';
-import { InjectedProvidersManager } from '../lib/provider';
 
 export abstract class Base<T extends WidgetType> implements Widget<T> {
   protected checkout: Checkout;
@@ -51,7 +50,14 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
     }
     this.setupProviderUpdatedListener();
     this.setupDisconnectProviderListener();
-    InjectedProvidersManager.getInstance().initialise();
+    this.setLanguage(props.config?.language);
+  }
+
+  private async setLanguage(language?: string) {
+    if (language === null || language === undefined) return;
+    await i18next.changeLanguage(language);
+    // eslint-disable-next-line no-console
+    console.log('Language changed:', language);
   }
 
   unmount() {
@@ -89,6 +95,7 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
       this.reactRoot = createRoot(this.widgetElement);
     }
 
+    this.setLanguage(params?.language);
     this.render();
   }
 
@@ -105,13 +112,7 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
       console.warn('Updating a widget provider through the update() method is not supported yet');
     }
 
-    if (props.config?.language) {
-      i18next.changeLanguage(props.config.language).then(() => {
-        // eslint-disable-next-line no-console
-        console.log('Language changed:', props.config?.language);
-      });
-    }
-
+    this.setLanguage(props.config?.language);
     this.render();
   }
 

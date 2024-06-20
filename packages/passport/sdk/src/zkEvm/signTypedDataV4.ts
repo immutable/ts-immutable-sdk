@@ -1,8 +1,9 @@
 import { StaticJsonRpcProvider } from '@ethersproject/providers';
-import { Signer } from '@ethersproject/abstract-signer';
 import { BigNumber } from 'ethers';
 import GuardianClient from 'guardian';
-import { getSignedTypedData } from './walletHelpers';
+import { Signer } from '@ethersproject/abstract-signer';
+import { Flow } from '@imtbl/metrics';
+import { signAndPackTypedData } from './walletHelpers';
 import { TypedDataPayload } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { RelayerClient } from './relayerClient';
@@ -14,6 +15,7 @@ export type SignTypedDataV4Params = {
   method: string;
   params: Array<any>;
   guardianClient: GuardianClient;
+  flow: Flow;
 };
 
 const REQUIRED_TYPED_DATA_PROPERTIES = ['types', 'domain', 'primaryType', 'message'];
@@ -69,20 +71,33 @@ export const signTypedDataV4 = async ({
   rpcProvider,
   relayerClient,
   guardianClient,
-}: SignTypedDataV4Params): Promise<string> => guardianClient
-  .withConfirmationScreen({ width: 480, height: 720 })(async () => {
-    const fromAddress: string = params[0];
-    const typedDataParam: string | object = params[1];
+  flow,
+}: SignTypedDataV4Params): Promise<string> => {
+  const fromAddress: string = params[0];
+  const typedDataParam: string | object = params[1];
 
-    if (!fromAddress || !typedDataParam) {
-      throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `${method} requires an address and a typed data JSON`);
-    }
+  if (!fromAddress || !typedDataParam) {
+    throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, `${method} requires an address and a typed data JSON`);
+  }
 
-    const { chainId } = await rpcProvider.detectNetwork();
-    const typedData = transformTypedData(typedDataParam, chainId);
+  const { chainId } = await rpcProvider.detectNetwork();
+  const typedData = transformTypedData(typedDataParam, chainId);
+  flow.addEvent('endDetectNetwork');
 
-    await guardianClient.validateMessage({ chainID: String(chainId), payload: typedData });
-    const relayerSignature = await relayerClient.imSignTypedData(fromAddress, typedData);
+  await guardianClient.evaluateEIP712Message({ chainID: String(chainId), payload: typedData });
+  flow.addEvent('endValidateMessage');
 
-    return getSignedTypedData(typedData, relayerSignature, BigNumber.from(chainId), fromAddress, ethSigner);
-  });
+  const relayerSignature = await relayerClient.imSignTypedData(fromAddress, typedData);
+  flow.addEvent('endRelayerSignTypedData');
+
+  const signature = await signAndPackTypedData(
+    typedData,
+    relayerSignature,
+    BigNumber.from(chainId),
+    fromAddress,
+    ethSigner,
+  );
+  flow.addEvent('getSignedTypedData');
+
+  return signature;
+};

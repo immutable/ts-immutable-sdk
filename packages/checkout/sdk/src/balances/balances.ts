@@ -190,6 +190,7 @@ export const getIndexerBalance = async (
 
     const tokenData = item.token || {};
 
+    if (item.value == null) return;
     const balance = BigNumber.from(item.value);
 
     let decimals = parseInt(tokenData.decimals, 10);
@@ -248,6 +249,32 @@ export const getBalances = async (
   return { balances };
 };
 
+const getTokenBalances = async (
+  config: CheckoutConfiguration,
+  web3Provider: Web3Provider | undefined,
+  walletAddress: string | undefined,
+  chainId: ChainId,
+  filterTokens: TokenInfo[],
+): Promise<GetAllBalancesResult> => {
+  if (!web3Provider) {
+    throw new CheckoutError(
+      'indexer is disabled for this chain, you must provide a provider.',
+      CheckoutErrorType.MISSING_PARAMS,
+    );
+  }
+
+  // This fallback to use ERC20s calls which is a best effort solution
+  // Fails in fetching data from the RCP calls might result in some
+  // missing data.
+  let address = walletAddress;
+  if (!address) address = await web3Provider?.getSigner().getAddress();
+  return await measureAsyncExecution<GetBalancesResult>(
+    config,
+    `Time to fetch balances using RPC for ${chainId}`,
+    getBalances(config, web3Provider, address, filterTokens),
+  );
+};
+
 export const getAllBalances = async (
   config: CheckoutConfiguration,
   web3Provider: Web3Provider | undefined,
@@ -301,27 +328,22 @@ export const getAllBalances = async (
     // is done.
     const isL1Chain = getL1ChainId(config) === chainId;
     if (!address) address = await web3Provider?.getSigner().getAddress();
-    return await measureAsyncExecution<GetAllBalancesResult>(
-      config,
-      `Time to fetch balances using blockscout for ${chainId}`,
-      getIndexerBalance(config, address!, chainId, isL1Chain ? tokens : undefined),
-    );
+    try {
+      return await measureAsyncExecution<GetAllBalancesResult>(
+        config,
+        `Time to fetch balances using blockscout for ${chainId}`,
+        getIndexerBalance(config, address!, chainId, isL1Chain ? tokens : undefined),
+      );
+    } catch (error) {
+      // Blockscout rate limiting, fallback to RPC node
+      if ((error as CheckoutError).type === CheckoutErrorType.GET_INDEXER_BALANCE_ERROR
+        && (error as CheckoutError).data?.error?.code === HttpStatusCode.TooManyRequests) {
+        return getTokenBalances(config, web3Provider, walletAddress, chainId, tokens);
+      }
+      throw error;
+    }
   }
 
-  if (!web3Provider) {
-    throw new CheckoutError(
-      'indexer is disabled for this chain, you must provide a provider.',
-      CheckoutErrorType.MISSING_PARAMS,
-    );
-  }
-
-  // This fallback to use ERC20s calls which is a best effort solution
-  // Fails in fetching data from the RCP calls might result in some
-  // missing data.
-  address ||= await web3Provider.getSigner().getAddress();
-  return await measureAsyncExecution<GetBalancesResult>(
-    config,
-    `Time to fetch balances using RPC for ${chainId}`,
-    getBalances(config, web3Provider, address, tokens),
-  );
+  // Blockscout not supported, fallback to RPC node
+  return getTokenBalances(config, web3Provider, walletAddress, chainId, tokens);
 };

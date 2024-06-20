@@ -56,8 +56,13 @@ export function UnableToConnectDrawer({
           }}
         >
           <CloudImage
-            imageUrl={walletErrorYellowUrl}
             sx={{ paddingTop: 'base.spacing.x4', paddingBottom: 'base.spacing.x9' }}
+            use={(
+              <img
+                src={walletErrorYellowUrl}
+                alt={t('drawers.walletConnectionError.unableToConnect.heading')}
+              />
+            )}
           />
           <ButtCon
             icon="Close"

@@ -3,10 +3,16 @@
     "CONNECT_WALLET": {
       "body": {
         "heading": "Connect a wallet",
-        "content": "You'll need to connect or create a digital wallet to buy, sell, trade and store your coins and collectibles."
+        "content": "You'll need to connect or create a digital wallet to buy, sell, trade and store your tokens and collectibles."
       },
       "walletSelection": {
         "heading": "Choose a wallet"
+      },
+      "nonPassportDrawer": {
+        "heading": "Non-Passport users will need IMX for gas.",
+        "body1": "We recommend using <layerswapLink>Layerswap</layerswapLink> to bridge funds onto Immutable zkEVM, with refuel switched on so you receive some IMX.",
+        "body2": "Alternatively, pay and play easily with a gas free Immutable Passport.",
+        "buttonText": "Proceed anyway"
       }
     },
     "CONNECT_SUCCESS": {
@@ -81,13 +87,13 @@
         "heading": "Network"
       },
       "totalTokenBalance": {
-        "heading": "Coins",
+        "heading": "Tokens",
         "totalHeading": "Value"
       },
       "tokenBalancesList": {
         "noTokensFound": "No tokens found"
       },
-      "addCoins": "Add coins"
+      "addCoins": "Add tokens"
     },
     "SETTINGS": {
       "header": {
@@ -95,41 +101,49 @@
       },
       "disconnectButton": {
         "label": "Disconnect Wallet"
+      },
+      "walletAddress": {
+        "label": "Wallet Address"
+      },
+      "transferAssetsL1Warning": {
+        "heading": "Do not send assets to Passport on Ethereum",
+        "body": "Passport does not yet exist on Ethereum, so your funds will get lost there. Only transfer on Immutable zkEVM or Immutable X. "
       }
     },
     "COIN_INFO": {
       "metamask": {
-        "heading": "Coins and collectibles are native to networks",
-        "body": "You can switch networks to add coins or move them from one network to another"
+        "heading": "Tokens and collectibles are native to networks",
+        "body": "You can switch networks to add tokens or move them from one network to another"
       },
       "passport": {
-        "heading": "Coins and collectibles are native to networks",
-        "body1": "This network is called Immutable zkEVM. If you have other coins in your Passport and can’t see them here, they might be on another network. ",
+        "heading": "Tokens and collectibles are native to networks",
+        "body1": "This network is called Immutable zkEVM. If you have other tokens in your Passport and can’t see them here, they might be on another network. ",
         "body2": " for more info.",
         "linkText": "Visit our FAQs"
       }
     },
     "SWAP": {
       "header": {
-        "title": "Swap coins"
+        "title": "Swap tokens"
       },
       "content": {
         "title": "What would you like to swap?",
-        "fiatPricePrefix": "~ USD",
+        "fiatPricePrefix": "≈ USD",
         "availableBalancePrefix": "Available"
       },
       "swapForm": {
         "from": {
           "label": "From",
           "inputPlaceholder": "0",
-          "selectorTitle": "What would you like to swap from?"
+          "selectorTitle": "What are you swapping from?"
         },
         "to": {
           "label": "To",
           "inputPlaceholder": "0",
-          "selectorTitle": "What would you like to swap to?"
+          "selectorTitle": "What are you swapping to?"
         },
-        "buttonText": "Swap"
+        "buttonText": "Swap",
+        "conversionRate": "1 {{fromSymbol}} ≈ {{rate}} {{toSymbol}}, inclusive of {{fee}}% fee"
       },
       "fees": {
         "title": "Fees total"
@@ -137,8 +151,8 @@
       "validation": {
         "noAmountInputted": "Please input amount",
         "insufficientBalance": "Insufficient balance",
-        "noFromTokenSelected": "Select a coin to swap",
-        "noToTokenSelected": "Select a coin to receive"
+        "noFromTokenSelected": "Select a token to swap",
+        "noToTokenSelected": "Select a token to receive"
       },
       "success": {
         "text": "Success",
@@ -191,7 +205,7 @@
     },
     "ONRAMP": {
       "header": {
-        "title": "Add coins"
+        "title": "Add tokens"
       },
       "initialLoadingText": "Taking you to Transak",
       "IN_PROGRESS_LOADING": {
@@ -207,7 +221,7 @@
         }
       },
       "SUCCESS": {
-        "text": "Coins are on the way",
+        "text": "Tokens are on the way",
         "actionText": "Done"
       },
       "FAIL": {
@@ -217,27 +231,82 @@
     },
     "TOP_UP_VIEW": {
       "header": {
-        "title": "How would you like to add coins?"
+        "title": "How would you like to add tokens?"
       },
       "topUpOptions": {
         "onramp": {
-          "heading": "Buy",
-          "caption": "With card, Google pay or Apple pay available.",
+          "heading": "Buy tokens"
+        },
+        "debit": {
+          "heading": "Buy with Debit Card",
+          "caption": "The recommended way to buy tokens",
+          "subcaption": "Fees ",
+          "disabledCaption": ""
+        },
+        "credit": {
+          "heading": "Buy with Credit Card",
+          "caption": "Not recommended due to failures & charges",
           "subcaption": "Fees ",
           "disabledCaption": ""
         },
         "swap": {
-          "heading": "Swap",
-          "caption": "With the coins I have in my balance.",
+          "heading": "Swap tokens on this network",
+          "caption": "Immutable zkEVM only",
           "subcaption": "Fees",
           "disabledCaption": "Not available in your region"
         },
         "bridge": {
-          "heading": "Move",
-          "caption": "The coins I have in another wallet or network.",
+          "heading": "Transfer tokens from another wallet",
+          "caption": "Immutable zkEVM only",
+          "subcaption": "Fees ",
+          "disabledCaption": ""
+        },
+        "advanced": {
+          "heading": "Bridge tokens from another network",
+          "caption": "Multiple network and CEX options available",
           "subcaption": "Fees ",
           "disabledCaption": ""
         }
+      }
+    },
+    "ORDER_SUMMARY": {
+      "loading": {
+        "balances": "Crunching numbers"
+      },
+      "currency": {
+        "fiat": "≈ USD ${{amount}}",
+        "price": "{{symbol}} {{amount}}"
+      },
+      "orderItem": {
+        "quantity": "Quantity x{{qty}}"
+      },
+      "coinsDrawer": {
+        "header": "Pay with...",
+        "caption1": "Tokens",
+        "caption2": "Balance",
+        "divider": "More options",
+        "stepType": {
+          "SWAP": "Swap {{symbol}} ≈ {{amount}}",
+          "ONRAMP": "Buy {{symbol}} ≈ {{amount}}",
+          "BRIDGE": "Move {{symbol}} ≈ {{amount}}",
+          "SUFFICIENT": "Pay {{symbol}} {{amount}}",
+          "delta": {
+            "SWAP": "Swap {{symbol}} ≈ {{amount}}",
+            "ONRAMP": "Buy {{symbol}} ≈ {{amount}}",
+            "BRIDGE": "Move {{symbol}} ≈ {{amount}}",
+            "SUFFICIENT": "Pay {{symbol}} {{amount}}"
+          }
+        },
+        "fee": "Swap fee ~ {{symbol}} {{amount}}"
+      },
+      "orderReview": {
+        "heading": "Payment summary",
+        "continue": "Proceed",
+        "payWith": {
+          "SWAP": "Swap & Pay with {{symbol}}",
+          "SUFFICIENT": "Pay with {{symbol}}"
+        },
+        "balance": "Balance {{amount}}"
       }
     },
     "FUND_WITH_SMART_CHECKOUT": {
@@ -253,7 +322,7 @@
       },
       "fundingRouteSelect": {
         "heading": "Pay with your",
-        "noRoutesAvailable": "Insufficient coin balance. Please proceed with card instead.",
+        "noRoutesAvailable": "Insufficient token balance. Please proceed with card instead.",
         "continue": "Continue",
         "payWithCardInstead": "No thanks, I'll pay with card",
         "payWithCard": "Pay with card"
@@ -265,23 +334,23 @@
       },
       "options": {
         "crypto": {
-          "heading": "Coins",
-          "caption": "The fastest way to pay, if you have coins in your balance.",
+          "heading": "Tokens",
+          "caption": "Pay with the tokens in your wallet, or buy tokens with card",
           "disabledCaption": "Currently not available for this purchase"
         },
         "debit": {
           "heading": "Debit Card",
           "caption": "The recommended way to pay with card.",
-          "disabledCaption": "Currently working on improving this payment method for larger purchases"
+          "disabledCaption": "Unavailable for your selection. We recommend adding tokens"
         },
         "credit": {
           "heading": "Credit Card",
           "caption": "Not recommended since transactions may be blocked by your bank.",
-          "disabledCaption": "Currently working on improving this payment method for larger purchases"
+          "disabledCaption": "Unavailable for your selection. We recommend adding tokens"
         }
       },
       "topUp": {
-        "heading": "You’ll need to add some coins",
+        "heading": "You’ll need to add some tokens",
         "subheading": {
           "both": "Add {{erc20.value}} {{erc20.symbol}} and {{native.value}} {{native.symbol}} to cover this purchase plus gas.",
           "erc20": "Add {{erc20.value}} {{erc20.symbol}} to your balance through one of the following options.",
@@ -295,12 +364,17 @@
         "processing1": "Initialising payment",
         "processing2": "Securing your assets",
         "processing3": "Finalising payment"
+      },
+      "creditCardWarningDrawer": {
+        "heading": "We recommend debit over credit",
+        "body": "Most banks will charge cash advance fees or block the transaction altogether when using credit card on these types of purchases.",
+        "ctaButton": "Try anyway"
       }
     },
     "PAY_WITH_COINS": {
       "header": {
         "heading": "Pay with your",
-        "caption": "Using the coins balance in your wallet"
+        "caption": "Using the token balance in your wallet"
       },
       "button": {
         "buyNow": "Buy now"
@@ -354,12 +428,7 @@
           "primaryAction": "I've fixed this, Try again",
           "secondaryAction": "Cancel"
         },
-        "SMART_CHECKOUT_ERROR": {
-          "description": "Unable to check your wallets balance. Please try again.",
-          "primaryAction": "Try again",
-          "secondaryAction": "Cancel"
-        },
-        "SMART_CHECKOUT_EXECUTE_ERROR": {
+        "FUNDING_ROUTE_EXECUTE_ERROR": {
           "description": "Sorry, something went wrong while moving funds. Please try again.",
           "primaryAction": "Try again",
           "secondaryAction": "Cancel"
@@ -391,7 +460,8 @@
       "toFormInput": {
         "heading": "To",
         "selectDefaultText": "Select wallet and network",
-        "walletSelectorHeading": "To wallet"
+        "walletSelectorHeading": "To wallet",
+        "networkSelectorHeading": "To network"
       },
       "submitButton": {
         "text": "Next"
@@ -399,15 +469,15 @@
     },
     "BRIDGE_FORM": {
       "header": {
-        "title": "Move coins"
+        "title": "Move tokens"
       },
       "fees": {
         "title": "Gas Fee",
-        "fiatPricePrefix": "~ USD $"
+        "fiatPricePrefix": "≈ USD $"
       },
       "content": {
         "title": "How much would you like to move?",
-        "fiatPricePrefix": "~ USD",
+        "fiatPricePrefix": "≈ USD",
         "availableBalancePrefix": "Available"
       },
       "bridgeForm": {
@@ -420,7 +490,7 @@
       "validation": {
         "noAmountInputted": "Please input amount",
         "insufficientBalance": "Insufficient balance",
-        "noTokenSelected": "Select a coin to move"
+        "noTokenSelected": "Select a token to move"
       }
     },
     "BRIDGE_REVIEW": {
@@ -439,7 +509,7 @@
       "submitButton": {
         "buttonText": "Confirm move"
       },
-      "fiatPricePrefix": "~ USD $"
+      "fiatPricePrefix": "≈ USD $"
     },
     "BRIDGE_FAILURE": {
       "bridgeFailureText": {
@@ -463,7 +533,8 @@
     "IN_PROGRESS": {
       "heading": "Move in progress",
       "body1": "Your funds have been sent, with less than 20 mins remaining until they're received. You can return and view progress by clicking on the rocket icon.",
-      "body2": "You can close this window."
+      "body2": "You can close this window.",
+      "transferHeading": "Funds transferred"
     },
     "TRANSACTIONS": {
       "layoutHeading": "In progress",
@@ -472,7 +543,7 @@
         "withdrawalPending": {
           "actionButtonText": "Proceed",
           "withdrawalDelayText": "This move has been paused, please return ",
-          "withdrawalReadyText": "Action required to receive your coins",
+          "withdrawalReadyText": "Action required to receive your tokens",
           "caption": "Paused"
         },
         "inProgress": {
@@ -497,7 +568,7 @@
       "changeWallet": {
         "buttonText": "Change wallet"
       },
-      "fiatPricePrefix": "~ USD $",
+      "fiatPricePrefix": "≈ USD $",
       "support": {
         "body1": "Need help?",
         "body2": " Contact ",
@@ -514,7 +585,7 @@
     },
     "CLAIM_WITHDRAWAL": {
       "content": {
-        "heading": "Follow the prompts to receive your coins on ",
+        "heading": "Follow the prompts to receive your tokens on ",
         "body": "You’ll be asked to pay a small gas fee to claim your withdrawal.",
         "body2": "Destination wallet address: "
       },
@@ -567,17 +638,21 @@
       "total": "Total fees",
       "fees": {
         "fiatPricePrefix": "USD $",
-        "gasFeeSwap": {
-          "label": "Gas fee swap"
-        },
         "gasFeeMove": {
-          "label": "Gas fee move"
+          "label": "Gas fee"
         },
-        "gasFeeApproval": {
-          "label": "Gas fee approval"
+        "approvalFee": {
+          "label": "Approval fee"
+        },
+        "swapGasFee": {
+          "label": "Gas fee"
+        },
+        "swapSecondaryFee": {
+          "label": "{{amount}} Swap fee (factored into quote)"
         },
         "serviceFee": {
-          "label": "Service fee"
+          "depositLabel": "zkEVM gas fees",
+          "withdrawLabel": "Ethereum gas fees"
         }
       }
     },
@@ -595,9 +670,9 @@
     },
     "coinSelector": {
       "option": {
-        "fiatPricePrefix": "~ USD $"
+        "fiatPricePrefix": "≈ USD $"
       },
-      "noCoins": "You have no available coins to select in your wallet."
+      "noCoins": "You have no available tokens to select in your wallet."
     },
     "notEnoughGas": {
       "content": {
@@ -606,7 +681,7 @@
       },
       "buttons": {
         "adjustAmount": "Adjust amount",
-        "addMoreImx": "Add IMX coins",
+        "addMoreImx": "Add IMX tokens",
         "copyAddress": "Copy wallet address",
         "cancel": "Dismiss"
       }
@@ -614,17 +689,17 @@
     "notEnoughImx": {
       "content": {
         "noImx": {
-          "heading": "You'll need IMX coins to swap",
-          "body": "Swap fees are paid in IMX coins, so you'll need to add this before you can swap"
+          "heading": "You'll need IMX tokens to swap",
+          "body": "Swap fees are paid in IMX tokens, so you'll need to add this before you can swap"
         },
         "insufficientImx": {
-          "heading": "You'll need more IMX coins",
-          "body": "In order to cover the fees for the amount specified, you'll need to add more IMX coins"
+          "heading": "You'll need more IMX tokens",
+          "body": "In order to cover the fees for the amount specified, you'll need to add more IMX tokens"
         }
       },
       "buttons": {
         "adjustAmount": "Adjust amount",
-        "addMoreImx": "Add IMX coins",
+        "addMoreImx": "Add IMX tokens",
         "cancel": "Dismiss"
       }
     },
@@ -641,8 +716,8 @@
       }
     },
     "unableToSwap": {
-      "heading": "Unable to swap this coin",
-      "body": "This coin pairing isn't available to swap right now. Try another selection.",
+      "heading": "Unable to swap this token",
+      "body": "This token pairing isn't available to swap right now. Try another selection.",
       "buttons": {
         "cancel": "Dismiss"
       }

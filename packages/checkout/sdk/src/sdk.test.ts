@@ -5,7 +5,11 @@ import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
 import { BigNumber, ethers } from 'ethers';
 import { Passport, UserProfile } from '@imtbl/passport';
-import { getNetworkAllowList, getNetworkInfo, switchWalletNetwork } from './network';
+import {
+  getNetworkAllowList,
+  getNetworkInfo,
+  switchWalletNetwork,
+} from './network';
 
 import { Checkout } from './sdk';
 import {
@@ -27,12 +31,17 @@ import {
   GetTokenAllowListResult,
   TokenInfo,
   BuyToken,
+  ERC721SellToken,
 } from './types';
 import { getAllBalances, getBalance, getERC20Balance } from './balances';
 import { sendTransaction } from './transaction';
 import { gasEstimator } from './gasEstimate';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
-import { checkIsWalletConnected, connectSite, requestPermissions } from './connect';
+import {
+  checkIsWalletConnected,
+  connectSite,
+  requestPermissions,
+} from './connect';
 import * as network from './network';
 import { createProvider, isWeb3Provider, validateProvider } from './provider';
 import { getERC20TokenInfo, getTokenAllowList } from './tokens';
@@ -222,7 +231,9 @@ describe('Connect', () => {
     };
 
     (validateProvider as jest.Mock).mockResolvedValue(provider);
-    (switchWalletNetwork as jest.Mock).mockResolvedValue(switchWalletNetworkResult);
+    (switchWalletNetwork as jest.Mock).mockResolvedValue(
+      switchWalletNetworkResult,
+    );
 
     const checkout = new Checkout({
       baseConfig: { environment: Environment.SANDBOX },
@@ -238,7 +249,11 @@ describe('Connect', () => {
     });
 
     expect(switchWalletNetwork).toBeCalledTimes(1);
-    expect(switchWalletNetwork).toBeCalledWith(checkout.config, provider, ChainId.IMTBL_ZKEVM_TESTNET);
+    expect(switchWalletNetwork).toBeCalledWith(
+      checkout.config,
+      provider,
+      ChainId.IMTBL_ZKEVM_TESTNET,
+    );
     expect(result).toEqual(switchWalletNetworkResult);
   });
 
@@ -344,7 +359,9 @@ describe('Connect', () => {
     };
 
     (validateProvider as jest.Mock).mockResolvedValue(provider);
-    (checkIsWalletConnected as jest.Mock).mockResolvedValue(checkIsWalletConnectedResult);
+    (checkIsWalletConnected as jest.Mock).mockResolvedValue(
+      checkIsWalletConnectedResult,
+    );
 
     const checkout = new Checkout({
       baseConfig: { environment: Environment.SANDBOX },
@@ -362,8 +379,7 @@ describe('Connect', () => {
   it('should call getAllBalances function', async () => {
     const provider = new Web3Provider(providerMock, ChainId.ETHEREUM);
     const getAllBalancesResult = {
-      balances:
-      [
+      balances: [
         {
           balance: BigNumber.from('1'),
           formattedBalance: '1',
@@ -414,7 +430,9 @@ describe('Connect', () => {
         },
       ],
     };
-    (getNetworkAllowList as jest.Mock).mockResolvedValue(getNetworkAllowListResult);
+    (getNetworkAllowList as jest.Mock).mockResolvedValue(
+      getNetworkAllowListResult,
+    );
 
     const checkout = new Checkout({
       baseConfig: { environment: Environment.SANDBOX },
@@ -425,7 +443,9 @@ describe('Connect', () => {
     });
 
     expect(getNetworkAllowList).toBeCalledTimes(1);
-    expect(getNetworkAllowList).toBeCalledWith(checkout.config, { type: NetworkFilterTypes.ALL });
+    expect(getNetworkAllowList).toBeCalledWith(checkout.config, {
+      type: NetworkFilterTypes.ALL,
+    });
     expect(result).toEqual(getNetworkAllowListResult);
   });
 
@@ -451,13 +471,10 @@ describe('Connect', () => {
     });
 
     expect(getTokenAllowList).toBeCalledTimes(1);
-    expect(getTokenAllowList).toBeCalledWith(
-      checkout.config,
-      {
-        type: TokenFilterTypes.ALL,
-        chainId: ChainId.ETHEREUM,
-      },
-    );
+    expect(getTokenAllowList).toBeCalledWith(checkout.config, {
+      type: TokenFilterTypes.ALL,
+      chainId: ChainId.ETHEREUM,
+    });
     expect(result).toEqual(getTokenAllowListResult);
   });
 
@@ -542,7 +559,12 @@ describe('Connect', () => {
     });
 
     expect(buy).toBeCalledTimes(1);
-    expect(buy).toBeCalledWith(checkout.config, provider, [{ id: '1', takerFees: [] }], undefined);
+    expect(buy).toBeCalledWith(
+      checkout.config,
+      provider,
+      [{ id: '1', takerFees: [] }],
+      undefined,
+    );
   });
 
   it('should call sell function', async () => {
@@ -556,22 +578,25 @@ describe('Connect', () => {
       baseConfig: { environment: Environment.SANDBOX },
     });
 
-    const orders = [{
-      sellToken: {
-        id: '0',
-        collectionAddress: '0xERC721',
+    const orders = [
+      {
+        sellToken: {
+          type: ItemType.ERC721,
+          id: '0',
+          collectionAddress: '0xERC721',
+        } as ERC721SellToken,
+        buyToken: {
+          type: ItemType.NATIVE,
+          amount: '10',
+        } as BuyToken,
+        makerFees: [
+          {
+            amount: { percentageDecimal: 0.025 },
+            recipient: '0x222',
+          },
+        ],
       },
-      buyToken: {
-        type: ItemType.NATIVE,
-        amount: '10',
-      } as BuyToken,
-      makerFees: [
-        {
-          amount: { percentageDecimal: 0.025 },
-          recipient: '0x222',
-        },
-      ],
-    }];
+    ];
 
     await checkout.sell({
       provider,
@@ -579,11 +604,7 @@ describe('Connect', () => {
     });
 
     expect(sell).toBeCalledTimes(1);
-    expect(sell).toBeCalledWith(
-      checkout.config,
-      provider,
-      orders,
-    );
+    expect(sell).toBeCalledWith(checkout.config, provider, orders);
   });
 
   it('should call cancel function', async () => {
@@ -641,15 +662,24 @@ describe('Connect', () => {
       params.provider,
       params.itemRequirements,
       params.transactionOrGasAmount,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
     );
   });
 
   it('should throw error for smartCheckout function if cannot get itemRequirements', async () => {
-    const provider = new Web3Provider(providerMock, ChainId.IMTBL_ZKEVM_TESTNET);
+    const provider = new Web3Provider(
+      providerMock,
+      ChainId.IMTBL_ZKEVM_TESTNET,
+    );
     const smartCheckoutResult = {};
 
     (validateProvider as jest.Mock).mockResolvedValue(provider);
-    (getItemRequirementsFromRequirements as jest.Mock).mockRejectedValue(new Error('Unable to get decimals'));
+    (getItemRequirementsFromRequirements as jest.Mock).mockRejectedValue(
+      new Error('Unable to get decimals'),
+    );
     (smartCheckout as jest.Mock).mockResolvedValue(smartCheckoutResult);
 
     const checkout = new Checkout({
@@ -658,12 +688,14 @@ describe('Connect', () => {
 
     const params: SmartCheckoutParams = {
       provider,
-      itemRequirements: [{
-        type: ItemType.ERC20,
-        tokenAddress: '0xNOADDRESS',
-        spenderAddress: '0xSPENDER',
-        amount: '1.5',
-      }],
+      itemRequirements: [
+        {
+          type: ItemType.ERC20,
+          tokenAddress: '0xNOADDRESS',
+          spenderAddress: '0xSPENDER',
+          amount: '1.5',
+        },
+      ],
       transactionOrGasAmount: {
         type: TransactionOrGasType.GAS,
         gasToken: {
@@ -677,7 +709,7 @@ describe('Connect', () => {
     let errType;
     try {
       await checkout.smartCheckout(params);
-    } catch (err:any) {
+    } catch (err: any) {
       errMessage = err.message;
       errType = err.type;
     }
@@ -688,7 +720,9 @@ describe('Connect', () => {
 
   it('should call isWeb3Provider', async () => {
     (isWeb3Provider as jest.Mock).mockResolvedValue(true);
-    const result = await Checkout.isWeb3Provider(new Web3Provider(providerMock, ChainId.ETHEREUM));
+    const result = await Checkout.isWeb3Provider(
+      new Web3Provider(providerMock, ChainId.ETHEREUM),
+    );
     expect(result).toBeTruthy();
   });
 
@@ -699,11 +733,20 @@ describe('Connect', () => {
     let networkInfoResult: NetworkInfo;
     let getTokenAllowListResult: GetTokenAllowListResult;
 
-    const defaultWidgetUrl = 'https://global-stg.transak.com?apiKey=41ad2da7-ed5a-4d89-a90b-c751865effc2'
-      + '&network=immutablezkevm&defaultPaymentMethod=credit_debit_card&disablePaymentMethods='
-      + 'sepa_bank_transfer,gbp_bank_transfer,pm_cash_app,pm_jwire,pm_paymaya,pm_bpi,pm_ubp,pm_grabpay,'
-      + 'pm_shopeepay,pm_gcash,pm_pix,pm_astropay,pm_pse,inr_bank_transfer&productsAvailed=buy'
-      + '&exchangeScreenTitle=Buy&themeColor=0D0D0D';
+    const defaultURL = 'https://global-stg.transak.com';
+    const defaultParams = {
+      apiKey: '41ad2da7-ed5a-4d89-a90b-c751865effc2',
+      network: 'immutablezkevm',
+      defaultPaymentMethod: 'credit_debit_card',
+      disablePaymentMethods: '',
+      productsAvailed: 'buy',
+      exchangeScreenTitle: 'Buy',
+      themeColor: '0D0D0D',
+    };
+
+    const defaultWidgetUrl = `${defaultURL}?${new URLSearchParams(
+      defaultParams,
+    ).toString()}`;
 
     beforeEach(() => {
       createWidgetUrlMock = jest.fn().mockResolvedValue(defaultWidgetUrl);
@@ -735,7 +778,9 @@ describe('Connect', () => {
       getTokenAllowListResult = {
         tokens: [],
       };
-      (getTokenAllowList as jest.Mock).mockResolvedValue(getTokenAllowListResult);
+      (getTokenAllowList as jest.Mock).mockResolvedValue(
+        getTokenAllowListResult,
+      );
 
       checkout = new Checkout({
         baseConfig: { environment: Environment.PRODUCTION },
@@ -785,7 +830,9 @@ describe('Connect', () => {
           },
         ],
       } as GetTokenAllowListResult;
-      (getTokenAllowList as jest.Mock).mockResolvedValue(getTokenAllowListResult);
+      (getTokenAllowList as jest.Mock).mockResolvedValue(
+        getTokenAllowListResult,
+      );
 
       const params: FiatRampParams = {
         exchangeType: ExchangeType.ONRAMP,
@@ -830,7 +877,9 @@ describe('Connect', () => {
           },
         ],
       } as GetTokenAllowListResult;
-      (getTokenAllowList as jest.Mock).mockResolvedValue(getTokenAllowListResult);
+      (getTokenAllowList as jest.Mock).mockResolvedValue(
+        getTokenAllowListResult,
+      );
 
       const params: FiatRampParams = {
         exchangeType: ExchangeType.ONRAMP,

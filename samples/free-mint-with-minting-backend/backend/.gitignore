@@ -1,0 +1,6 @@
+.env
+/node_modules
+.DS_Store
+prisma/allowList.db
+prisma/allowList.db-journal
+/logs
