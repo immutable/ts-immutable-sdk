@@ -333,21 +333,27 @@ export class ZkEvmProvider implements Provider {
         return utils.hexlify(chainId);
       }
       // Pass through methods
-      case 'eth_getBalance': {
+      case 'eth_getBalance':
+      case 'eth_getCode':
+      case 'eth_getTransactionCount': {
         const [address, blockNumber] = request.params || [];
         return this.#rpcProvider.send(request.method, [address, blockNumber || 'latest']);
       }
-      case 'eth_gasPrice':
-      case 'eth_getCode':
-      case 'eth_getStorageAt':
-      case 'eth_estimateGas':
+      case 'eth_getStorageAt': {
+        const [address, storageSlot, blockNumber] = request.params || [];
+        return this.#rpcProvider.send(request.method, [address, storageSlot, blockNumber || 'latest']);
+      }
       case 'eth_call':
+      case 'eth_estimateGas': {
+        const [transaction, blockNumber] = request.params || [];
+        return this.#rpcProvider.send(request.method, [transaction, blockNumber || 'latest']);
+      }
+      case 'eth_gasPrice':
       case 'eth_blockNumber':
       case 'eth_getBlockByHash':
       case 'eth_getBlockByNumber':
       case 'eth_getTransactionByHash':
-      case 'eth_getTransactionReceipt':
-      case 'eth_getTransactionCount': {
+      case 'eth_getTransactionReceipt': {
         return this.#rpcProvider.send(request.method, request.params || []);
       }
       default: {

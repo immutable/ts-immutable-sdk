@@ -314,7 +314,7 @@ describe('ZkEvmProvider', () => {
       { requestArgument: { method: 'eth_getCode', params: ['0x123', '0x1'] }, returnValue: '0x' },
       { requestArgument: { method: 'eth_gasPrice', params: [] }, returnValue: '0x2' },
       { requestArgument: { method: 'eth_estimateGas', params: [{ to: '0x1', value: 0 }, '0x1'] }, returnValue: '0x3' },
-      { requestArgument: { method: 'eth_call', params: [[{ to: '0x1', value: 0 }], '0x1'] }, returnValue: '0x' },
+      { requestArgument: { method: 'eth_call', params: [{ to: '0x1', value: 0 }, '0x1'] }, returnValue: '0x' },
       { requestArgument: { method: 'eth_blockNumber', params: [] }, returnValue: '0x4' },
       {
         requestArgument: { method: 'eth_getBlockByHash', params: ['0x1', false] },
@@ -470,6 +470,51 @@ describe('ZkEvmProvider', () => {
         await provider.request({ method: 'eth_getBalance', params: ['0x1'] });
 
         expect(sendMock).toBeCalledWith('eth_getBalance', ['0x1', 'latest']);
+      });
+    });
+
+    describe('eth_getCode', () => {
+      it('defaults the `blockNumber` argument to `latest` if not provided', async () => {
+        const provider = getProvider();
+        await provider.request({ method: 'eth_getCode', params: ['0x1'] });
+
+        expect(sendMock).toBeCalledWith('eth_getCode', ['0x1', 'latest']);
+      });
+    });
+
+    describe('eth_getTransactionCount', () => {
+      it('defaults the `blockNumber` argument to `latest` if not provided', async () => {
+        const provider = getProvider();
+        await provider.request({ method: 'eth_getTransactionCount', params: ['0x1'] });
+
+        expect(sendMock).toBeCalledWith('eth_getTransactionCount', ['0x1', 'latest']);
+      });
+    });
+
+    describe('eth_getStorageAt', () => {
+      it('defaults the `blockNumber` argument to `latest` if not provided', async () => {
+        const provider = getProvider();
+        await provider.request({ method: 'eth_getStorageAt', params: ['0x1', '0x2'] });
+
+        expect(sendMock).toBeCalledWith('eth_getStorageAt', ['0x1', '0x2', 'latest']);
+      });
+    });
+
+    describe('eth_call', () => {
+      it('defaults the `blockNumber` argument to `latest` if not provided', async () => {
+        const provider = getProvider();
+        await provider.request({ method: 'eth_call', params: [{ to: '0x1' }] });
+
+        expect(sendMock).toBeCalledWith('eth_call', [{ to: '0x1' }, 'latest']);
+      });
+    });
+
+    describe('eth_estimateGas', () => {
+      it('defaults the `blockNumber` argument to `latest` if not provided', async () => {
+        const provider = getProvider();
+        await provider.request({ method: 'eth_estimateGas', params: [{ to: '0x1' }] });
+
+        expect(sendMock).toBeCalledWith('eth_estimateGas', [{ to: '0x1' }, 'latest']);
       });
     });
   });
