@@ -368,17 +368,17 @@
       "handover": {
         "initial": "Preparing Order",
         "approve": {
-          "before": "Waiting for you to approve access to your coins",
+          "before": "Please approve your tokens",
           "beforeWithCta": {
-            "heading": "[APPROVE ]We’ll need you to approve this in your wallet",
+            "heading": "Waiting for approval",
             "ctaButton": "Open wallet"
           },
           "after": "Coins ready for item purchase"
         },
         "execute": {
-          "before": "Waiting for you to confirm in your wallet",
+          "before": "Waiting for confirmation in your wallet",
           "beforeWithCta": {
-            "heading": "[EXECUTE] We’ll need you to confirm this in your wallet",
+            "heading": "Please confirm this purchase",
             "ctaButton": "Open wallet"
           },
           "after": "Processing purchase"

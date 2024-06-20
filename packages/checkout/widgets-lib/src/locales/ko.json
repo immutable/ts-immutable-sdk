@@ -348,17 +348,17 @@
       "handover": {
         "initial": "주문 준비 중",
         "approve": {
-          "before": "코인에 대한 액세스 승인을 기다리고 있습니다",
+          "before": "토큰을 승인해 주세요",
           "beforeWithCta": {
-            "heading": "[승인] 이 작업을 승인하려면 지갑에서 확인이 필요합니다",
+            "heading": "승인을 기다리고 있습니다",
             "ctaButton": "지갑 열기"
           },
-          "after": "아이템 구매를 위한 코인이 준비되었습니다"
+          "after": "코인이 아이템 구매 준비가 되었습니다"
         },
         "execute": {
           "before": "지갑에서 확인을 기다리고 있습니다",
           "beforeWithCta": {
-            "heading": "[실행] 이 작업을 지갑에서 확인해야 합니다",
+            "heading": "이 구매를 확인해 주세요",
             "ctaButton": "지갑 열기"
           },
           "after": "구매 처리 중"

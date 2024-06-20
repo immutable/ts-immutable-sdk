@@ -346,22 +346,22 @@
         "processing3": "正在完成支付"
       },
       "handover": {
-        "initial": "准备订单",
+        "initial": "准备订单中",
         "approve": {
-          "before": "等待您批准对您的币的访问",
+          "before": "请批准您的代币",
           "beforeWithCta": {
-            "heading": "[批准] 我们需要您在钱包中批准此操作",
+            "heading": "等待批准",
             "ctaButton": "打开钱包"
           },
-          "after": "币已准备好购买物品"
+          "after": "代币已准备好购买物品"
         },
         "execute": {
-          "before": "等待您在钱包中确认",
+          "before": "等待您的钱包确认",
           "beforeWithCta": {
-            "heading": "[执行] 我们需要您在钱包中确认此操作",
+            "heading": "请确认此次购买",
             "ctaButton": "打开钱包"
           },
-          "after": "处理购买中"
+          "after": "处理中"
         },
         "success": "购买完成",
         "error": {

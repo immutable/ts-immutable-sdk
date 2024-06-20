@@ -353,22 +353,22 @@
         "processing3": "支払いを完了中"
       },
       "handover": {
-        "initial": "注文準備中",
+        "initial": "注文を準備中",
         "approve": {
-          "before": "コインへのアクセスを承認するのを待っています",
+          "before": "トークンを承認してください",
           "beforeWithCta": {
-            "heading": "[承認] ウォレットでこれを承認する必要があります",
+            "heading": "承認を待っています",
             "ctaButton": "ウォレットを開く"
           },
-          "after": "アイテム購入のためのコインが準備できました"
+          "after": "コインはアイテム購入の準備ができています"
         },
         "execute": {
-          "before": "ウォレットで確認するのを待っています",
+          "before": "ウォレットで確認を待っています",
           "beforeWithCta": {
-            "heading": "[実行] ウォレットでこれを確認する必要があります",
+            "heading": "この購入を確認してください",
             "ctaButton": "ウォレットを開く"
           },
-          "after": "購入処理中"
+          "after": "購入を処理中"
         },
         "success": "購入完了",
         "error": {

@@ -42,46 +42,46 @@ export function HandoverContent({
         </Body>
       </Box>
 
-      {primaryButtonText && onPrimaryButtonClick && (
-        <Box
-          sx={{
-            paddingX: 'base.spacing.x4',
-            paddingBottom: 'base.spacing.x2',
-          }}
-        >
-          <Button
+      <Box>
+        {primaryButtonText && onPrimaryButtonClick && (
+          <Box
             sx={{
-              width: '100%',
+              paddingBottom: 'base.spacing.x2',
             }}
-            variant="primary"
-            size="large"
-            testId="handover-primary-button"
-            onClick={onPrimaryButtonClick}
           >
-            {primaryButtonText}
-          </Button>
-        </Box>
-      )}
-      {secondaryButtonText && onSecondaryButtonClick && (
-        <Box
-          sx={{
-            paddingX: 'base.spacing.x4',
-            paddingBottom: 'base.spacing.x4',
-          }}
-        >
-          <Button
+            <Button
+              sx={{
+                width: '100%',
+              }}
+              variant="primary"
+              size="large"
+              testId="handover-primary-button"
+              onClick={onPrimaryButtonClick}
+            >
+              {primaryButtonText}
+            </Button>
+          </Box>
+        )}
+        {secondaryButtonText && onSecondaryButtonClick && (
+          <Box
             sx={{
-              width: '100%',
+              paddingBottom: 'base.spacing.x4',
             }}
-            variant="tertiary"
-            size="large"
-            testId="handover-secondary-button"
-            onClick={onSecondaryButtonClick}
           >
-            {secondaryButtonText}
-          </Button>
-        </Box>
-      )}
+            <Button
+              sx={{
+                width: '100%',
+              }}
+              variant="tertiary"
+              size="large"
+              testId="handover-secondary-button"
+              onClick={onSecondaryButtonClick}
+            >
+              {secondaryButtonText}
+            </Button>
+          </Box>
+        )}
+      </Box>
     </Box>
   );
 }
