@@ -242,10 +242,18 @@ export function ApproveTransaction({ bridgeTransaction }: ApproveTransactionProp
         provider: from.web3Provider,
         transaction: transaction.unsignedTx,
       });
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: BridgeWidgetViews.IN_PROGRESS,
+            transactionHash: sendResult.transactionResponse.hash,
+            isTransfer: false,
+          },
+        },
+      });
 
-      setLoading(true);
       const receipt = await sendResult.transactionResponse.wait();
-
       if (receipt.status === 0) {
         viewDispatch({
           payload: {
@@ -256,19 +264,7 @@ export function ApproveTransaction({ bridgeTransaction }: ApproveTransactionProp
             },
           },
         });
-        return;
       }
-
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: BridgeWidgetViews.IN_PROGRESS,
-            transactionHash: receipt.transactionHash,
-            isTransfer: false,
-          },
-        },
-      });
     } catch (error: any) {
       if (error.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
         setRejectedBridge(true);
