@@ -213,7 +213,7 @@ export class ZkEvmProvider implements Provider {
           flow.addEvent('error', { errorMessage });
           throw error;
         } finally {
-          flow.end();
+          flow.addEvent('End');
         }
       }
       case 'eth_sendTransaction': {
@@ -247,7 +247,7 @@ export class ZkEvmProvider implements Provider {
           flow.addEvent('error', { errorMessage });
           throw error;
         } finally {
-          flow.end();
+          flow.addEvent('End');
         }
       }
       case 'eth_accounts': {
@@ -319,7 +319,7 @@ export class ZkEvmProvider implements Provider {
           flow.addEvent('error', { errorMessage });
           throw error;
         } finally {
-          flow.end();
+          flow.addEvent('End');
         }
       }
       case 'eth_chainId': {

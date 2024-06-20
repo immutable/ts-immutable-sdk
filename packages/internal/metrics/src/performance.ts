@@ -1,21 +1,22 @@
 import { errorBoundary } from 'utils/errorBoundary';
+import { v4 as uuid } from 'uuid';
 import { track, TrackProperties } from './track';
 
-type PerformanceEventProperties =
-  | (TrackProperties & {
-    duration?: never;
-  });
+type PerformanceEventProperties = TrackProperties & {
+  duration?: never;
+};
 
 export type Flow = {
   details: {
     moduleName: string;
     flowName: string;
     flowId: string;
-    flowStartTime: number;
   };
-  addEvent: (eventName: string, properties?: PerformanceEventProperties) => void;
+  addEvent: (
+    eventName: string,
+    properties?: PerformanceEventProperties,
+  ) => void;
   addFlowProperties: (properties: PerformanceEventProperties) => void;
-  end: (endProperties?: PerformanceEventProperties) => void;
 };
 
 /**
@@ -38,7 +39,7 @@ export const trackDuration = (
   properties?: PerformanceEventProperties,
 ) => track(moduleName, eventName, {
   ...(properties || {}),
-  duration,
+  duration: Math.round(duration),
 });
 
 // Time Tracking Functions
@@ -63,19 +64,19 @@ const mergeProperties = (...args: (Record<string, any> | undefined)[]) => {
   return finalProperties;
 };
 
+// Used the get the name of the event
 const getEventName = (flowName: string, eventName: string) => `${flowName}_${eventName}`;
 
 // Generate a random uuid
-const generateFlowId = () => {
-  const s4 = () => Math.floor((1 + Math.random()) * 0x10000)
-    .toString(16)
-    .substring(1);
-  return `${s4()}${s4()}-${s4()}-${s4()}-${s4()}-${s4()}${s4()}${s4()}`;
-};
+const generateFlowId = () => uuid();
 
 type FlowEventProperties = PerformanceEventProperties & {
   flowId?: never;
-  flowStartTime?: never;
+  flowName?: never;
+  flowCurrentEvent?: never;
+  flowPreviousEvent?: never;
+  flowEventHistory?: never;
+  flowCurrentStep?: never;
 };
 
 const trackFlowFn = (
@@ -84,22 +85,28 @@ const trackFlowFn = (
   properties?: FlowEventProperties,
 ): Flow => {
   // Track the start of the flow
-  const flowStartEventName = getEventName(flowName, 'start');
   const flowId = generateFlowId();
-  const startTime = performance.now();
-  const flowStartTime = Math.round(startTime + performance.timeOrigin);
-
   let flowProperties = mergeProperties(properties, {
     flowId,
-    flowStartTime,
+    flowName,
   }) as FlowEventProperties;
-  trackDuration(moduleName, flowStartEventName, 0, flowProperties);
 
+  // Flow Senkey items, default to empty values
+  let flowPreviousEvent: string = '';
+  let flowPreviousTimestamp: number = 0;
+  const flowEventHistory: string[] = [];
+  let flowCurrentStep = 0;
+
+  const mergeFlowProperties = (...args: (TrackProperties | undefined)[]) => mergeProperties(...args, {
+    // Don't want to allow overwriting the flowId or flowName
+    flowId,
+    flowName,
+  }) as FlowEventProperties;
+
+  // Function to add global properties to the flow
+  // These properties will be sent along with all subsequent events in the flow
   const addFlowProperties = (newProperties: FlowEventProperties) => {
-    flowProperties = mergeProperties(flowProperties, newProperties, {
-      flowId,
-      flowStartTime,
-    }) as FlowEventProperties;
+    flowProperties = mergeFlowProperties(flowProperties, newProperties);
   };
 
   const addEvent = (
@@ -108,38 +115,45 @@ const trackFlowFn = (
   ) => {
     const event = getEventName(flowName, eventName);
 
-    // Calculate time since start
-    const duration = Math.round(performance.now() - startTime);
+    const currentTime = performance.now();
+    flowEventHistory.push(eventName);
+    flowCurrentStep += 1;
+
+    // Calculate time since previous event
+    let duration = 0;
+
+    // If not the first event in flow, calculate the duration
+    if (flowPreviousTimestamp !== 0) {
+      duration = currentTime - flowPreviousTimestamp;
+    }
+
     // Always send the details of the startFlow props with all events in the flow
-    const mergedProps = mergeProperties(flowProperties, eventProperties, {
-      flowId,
-      flowStartTime,
-      duration,
-    }) as FlowEventProperties;
+    // Allow flow properties to be overwritten by event properties
+    // Always end with properties that shouldn't be overwritten
+    const mergedProps = mergeFlowProperties(flowProperties, eventProperties, {
+      flowCurrentEvent: eventName,
+      flowPreviousEvent,
+      flowEventHistory,
+      flowCurrentStep,
+    });
     trackDuration(moduleName, event, duration, mergedProps);
+
+    // Update the previous event and timestamp
+    flowPreviousEvent = eventName;
+    flowPreviousTimestamp = currentTime;
   };
 
-  const end = (endProperties?: FlowEventProperties) => {
-    // Track the end of the flow
-    const flowEndEventName = getEventName(flowName, 'end');
-    const duration = Math.round(performance.now() - startTime);
-    const mergedProps = mergeProperties(flowProperties, endProperties, {
-      flowId,
-      flowStartTime,
-    }) as FlowEventProperties;
-    trackDuration(moduleName, flowEndEventName, duration, mergedProps);
-  };
+  // Start tracking now with Start Event
+  addEvent('Start');
 
   return {
     details: {
       moduleName,
       flowName,
       flowId,
-      flowStartTime,
     },
     addEvent: errorBoundary(addEvent),
     addFlowProperties: errorBoundary(addFlowProperties),
-    end: errorBoundary(end),
   };
 };
 
@@ -152,15 +166,14 @@ const trackFlowFn = (
  *
  * @example
  * ```ts
- * const flow = trackFlow("passport", "performTransaction", { transationType: "transfer" });
+ * const flow = trackFlow("passport", "Perform Transaction", { transationType: "transfer" });
  * // Do something...
- * flow.addEvent("clickItem");
+ * flow.addEvent("Click Item");
  * // Do something...
  * flow.addFlowProperties({ item: "item1" });
- * flow.addEvent("guardianCheck", {"invisible": "true"});
+ * flow.addEvent("Guardian Check", {"invisible": "true"});
  * // Do something...
  * flow.addEvent("guardianCheckComplete");
- * flow.end();
  * ```
  */
 export const trackFlow = errorBoundary(trackFlowFn);
