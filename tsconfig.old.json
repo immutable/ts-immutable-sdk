@@ -1,23 +1,23 @@
 {
   "compilerOptions": {
-    "baseUrl": "./src",
-    "outDir": "../../sdk/dist/esm/config",
-    "rootDirs": ["src"],
     "target": "es2022",
     "module": "esnext",
     "moduleResolution": "node",
-    // "noEmit": true,
+    "noEmit": true,
     "allowJs": false,
     "removeComments": false,
     "strict": true,
     "forceConsistentCasingInFileNames": false,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "declaration": true,
+    "declaration": false,
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "composite": true
+    "outDir": "./sdk/dist/next"
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist"]
+  "ts-node": {
+    "compilerOptions": {
+      "module": "commonjs"
+    }
+  }
 }

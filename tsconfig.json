@@ -1,22 +1,63 @@
 {
   "compilerOptions": {
-    "target": "es2022",
+    "rootDirs": ["packages"],
     "module": "esnext",
-    "moduleResolution": "node",
-    "noEmit": true,
-    "allowJs": false,
-    "removeComments": false,
+    "target": "es2022",
+    "lib": ["dom", "dom.iterable", "esnext"],
     "strict": true,
-    "forceConsistentCasingInFileNames": false,
-    "allowSyntheticDefaultImports": true,
+    "allowJs": true,
+    "jsx": "react-jsx",
+    "moduleResolution": "node",
     "esModuleInterop": true,
-    "declaration": false,
+    "skipLibCheck": true,
+    "declaration": true,
+    "declarationDir": "sdk/dist/esm/types",
+    // "noImplicitAny": false,
     "resolveJsonModule": true,
-    "skipLibCheck": true
-  },
-  "ts-node": {
-    "compilerOptions": {
-      "module": "commonjs"
+    "jsxImportSource": "@emotion/react",
+    "experimentalDecorators": true,
+    "outDir": "sdk/dist/esm",
+    "paths": {
+      "@imtbl/metrics": ["./packages/internal/metrics/src"],
+      "@imtbl/blockchain-data": ["./packages/blockchain-data/sdk/src"],
+      "@imtbl/checkout-sdk": ["./packages/checkout/sdk/src"],
+      "@imtbl/checkout-sdk-sample-app": ["./packages/checkout/sdk-sample-app/src"],
+      "@imtbl/checkout-widgets": ["./packages/checkout/widgets-lib/src"],
+      "@imtbl/checkout-widgets-sample-app": ["./packages/checkout/widgets-sample-app/src"],
+      "@imtbl/config": ["./packages/config/src"],
+      "@imtbl/game-bridge": ["./packages/game-bridge/src"],
+      "bridge-sample-app": ["./packages/internal/bridge/bridge-sample-app/src"],
+      "@imtbl/bridge-sdk": ["./packages/internal/bridge/sdk/src"],
+      "@imtbl/cryptofiat": ["./packages/internal/cryptofiat/src"],
+      "@imtbl/dex-sdk": ["./packages/internal/dex/sdk/src"],
+      "sdk-sample-app": ["./packages/internal/dex/sdk-sample-app/src"],
+      "factory-sample-app": ["./packages/internal/factory/factory-sample-app/src"],
+      "@imtbl/factory-sdk": ["./packages/internal/factory/sdk/src"],
+      "@imtbl/generated-clients": ["./packages/internal/generated-clients/src"],
+      "@imtbl/guardian": ["./packages/internal/guardian/src"],
+      "@imtbl/toolkit": ["./packages/internal/toolkit/src"],
+      "@imtbl/version-check": ["./packages/internal/version-check/src"],
+      "@imtbl/minting-backend": ["./packages/minting-backend/sdk/src"],
+      "@imtbl/orderbook": ["./packages/orderbook/src"],
+      "@imtbl/passport": ["./packages/passport/sdk/src"],
+      "@imtbl/passport-sdk-sample-app": ["./packages/passport/sdk-sample-app/src"],
+      "@imtbl/webhook": ["./packages/webhook/sdk/src"],
+      "@imtbl/x-client": ["./packages/x-client/src"],
+      "@imtbl/x-provider": ["./packages/x-provider/src"],
+      "x-provider-sample-app": ["./packages/x-provider/src/sample-app/src"],
+
     }
-  }
+  },
+  "include": ["packages"],
+  "exclude": [
+    "**/node_modules",
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "**/*sample*",
+    "**/*example*",
+    "**/*e2e*",
+    "**/*demo*",
+    "**/test/**/*",
+    "**/dist/**/*"
+  ]
 }
