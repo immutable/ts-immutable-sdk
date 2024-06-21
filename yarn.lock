@@ -3782,6 +3782,7 @@ __metadata:
     "@typescript-eslint/parser": ^5.57.1
     bootstrap: ^5.2.3
     bootstrap-icons: ^1.10.3
+    concurrently: ^8.2.2
     embla-carousel-react: ^8.1.5
     eslint: ^8.40.0
     eslint-config-next: 13.3.1
@@ -3823,7 +3824,6 @@ __metadata:
     "@typescript-eslint/eslint-plugin": ^5.57.1
     "@typescript-eslint/parser": ^5.57.1
     axios: ^1.6.5
-    concurrently: ^8.2.2
     cross-fetch: ^3.1.6
     eslint: ^8.40.0
     ethers: ^5.7.2
