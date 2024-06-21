@@ -72,6 +72,7 @@ ExecuteNextTransactionTextsConfig
 };
 
 export function PayWithCoins() {
+  const handoverAdded = useRef(false);
   const processing = useRef(false);
 
   const { t } = useTranslation();
@@ -117,6 +118,9 @@ export function PayWithCoins() {
   }, [signResponse, environment]);
 
   const executeUserInitiatedTransaction = useCallback(() => {
+    if (handoverAdded.current) return;
+    handoverAdded.current = true;
+
     const transaction = filteredTransactions[currentTransactionIndex];
 
     const config = executeNextTransactionTexts[transaction.methodCall];
@@ -172,38 +176,24 @@ export function PayWithCoins() {
 
   useEffect(() => sendPageView(SaleWidgetViews.PAY_WITH_COINS), []); // checkoutPrimarySalePayWithCoinsViewed
 
-  // Once getting a response from the sign method, start executing transactions
   useEffect(() => {
-    if (
-      signResponse !== undefined
-      && filteredTransactions.length !== 0
-      && processing.current === false
-    ) {
+    if (!provider || filteredTransactions.length === 0) return;
+
+    if (isPassportProvider(provider)) {
+      if (currentTransactionIndex < filteredTransactions.length) {
+        executeUserInitiatedTransaction();
+      }
+    }
+  }, [filteredTransactions, currentTransactionIndex, provider]);
+
+  useEffect(() => {
+    if (!signResponse || !provider || processing.current) return;
+
+    if (!isPassportProvider(provider)) {
       processing.current = true;
-
-      if (isPassportProvider(provider)) {
-        executeUserInitiatedTransaction();
-      } else {
-        executeAllTransactions();
-      }
+      executeAllTransactions();
     }
-  }, [signResponse, filteredTransactions, provider]);
-
-  useEffect(() => {
-    if (!isPassportProvider(provider)) return;
-
-    if (
-      currentTransactionIndex < filteredTransactions.length
-      && !executeResponse?.done
-    ) {
-      try {
-        executeUserInitiatedTransaction();
-      } catch (error) {
-        closeHandover(HandoverTarget.GLOBAL);
-        goToErrorView(SaleErrorTypes.SERVICE_BREAKDOWN, { error });
-      }
-    }
-  }, [currentTransactionIndex, filteredTransactions, executeResponse]);
+  }, [signResponse, provider]);
 
   useEffect(() => {
     if (executeResponse?.done) {
@@ -227,10 +217,8 @@ export function PayWithCoins() {
         ),
         onClose: () => sendCloseEvent(SaleWidgetViews.SALE_SUCCESS), // checkoutPrimarySaleSaleSuccess_CloseButtonPressed
       });
-
-      sendSuccessEvent();
     }
-  }, [executeResponse, signResponse, provider, environment, signTokenIds]);
+  }, [executeResponse]);
 
   return null;
 }

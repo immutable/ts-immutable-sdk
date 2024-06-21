@@ -447,10 +447,10 @@ export const useSignOrder = (input: SignOrderInput) => {
       );
 
       if (success) {
+        setTransactionIndex();
+
         if (currentTransactionIndex === filteredTransactions.length - 1) {
           setExecuteDone();
-        } else {
-          setTransactionIndex();
         }
 
         if (onTxnStep) {
