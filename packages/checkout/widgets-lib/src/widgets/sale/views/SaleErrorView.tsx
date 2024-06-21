@@ -1,5 +1,5 @@
 import { BaseTokens } from '@biom3/design-tokens';
-import { useContext, useEffect, useRef } from 'react';
+import { useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HandoverTarget } from 'context/handover-context/HandoverContext';
 import { useHandover } from 'lib/hooks/useHandover';
@@ -8,6 +8,7 @@ import { getRemoteImage } from 'lib/utils';
 import { ViewActions, ViewContext } from 'context/view-context/ViewContext';
 import { SaleWidgetViews } from 'context/view-context/SaleViewContextTypes';
 import { isPassportProvider } from 'lib/provider';
+import { useMount } from 'hooks/useMount';
 import { StatusType } from '../../../components/Status/StatusType';
 import { SaleErrorTypes } from '../types';
 import { useSaleContext } from '../context/SaleContextProvider';
@@ -36,8 +37,6 @@ export function SaleErrorView({
   blockExplorerLink,
   errorType,
 }: SaleErrorViewProps) {
-  const initialHandoverDone = useRef(false);
-
   const { t } = useTranslation();
   const {
     goBackToPaymentMethods,
@@ -223,17 +222,19 @@ export function SaleErrorView({
     };
   };
 
-  useEffect(() => {
-    if (initialHandoverDone.current || !environment || !errorType) return;
+  useMount(
+    () => {
+      if (!environment || !errorType) return;
 
-    addHandover({
-      animationUrl: getRemoteImage(environment, '/handover.riv'),
-      animationName: 'Start',
-      children: <HandoverContent {...getErrorViewProps()} />,
-    });
-
-    initialHandoverDone.current = true;
-  }, [errorType, environment]);
+      addHandover({
+        animationUrl: getRemoteImage(environment, '/handover.riv'),
+        animationName: 'Start',
+        children: <HandoverContent {...getErrorViewProps()} />,
+      });
+    },
+    () => Boolean(environment && errorType),
+    [errorType, environment],
+  );
 
   return null;
 }
