@@ -210,7 +210,7 @@ export class TokenBridge {
     if (!isNativeTokenBridgeFeeRequest(req)) {
       if (isValidDeposit(direction, this.config.bridgeInstance)) {
         approvalFee = calculateGasFee(feeData, BridgeMethodsGasLimit.APPROVE_TOKEN);
-      } else if (isWithdrawWrappedIMX(req.token, direction, this.config.bridgeInstance)) {
+      } else if ('token' in req && isWithdrawWrappedIMX(req.token, direction, this.config.bridgeInstance)) {
         // On child chain, only WIMX requires approval.
         approvalFee = calculateGasFee(feeData, BridgeMethodsGasLimit.APPROVE_TOKEN);
       }
