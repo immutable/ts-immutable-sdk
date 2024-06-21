@@ -1,8 +1,8 @@
-import { FactoryConfiguration } from 'config';
-import { PRESETS } from 'constants/presets';
-import { FactoryError, FactoryErrorType, withFactoryError } from 'errors';
 import { ethers } from 'ethers';
-import { GetPresetsRequest, GetPresetsResponse } from 'types';
+import { FactoryConfiguration } from './config';
+import { PRESETS } from './constants/presets';
+import { FactoryError, FactoryErrorType, withFactoryError } from './errors';
+import { GetPresetsRequest, GetPresetsResponse } from './types';
 
 /**
  * Represents a factory

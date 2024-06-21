@@ -14,11 +14,11 @@ import {
 } from '@imtbl/checkout-sdk';
 
 import { BigNumber } from 'ethers';
-import { getTokenImageByAddress, isNativeToken } from 'lib/utils';
 import { Environment } from '@imtbl/config';
 import { Web3Provider } from '@ethersproject/providers';
-import { isGasFree } from 'lib/provider';
 import { SwapFees } from '@imtbl/checkout-sdk/dist/types';
+import { getTokenImageByAddress, isNativeToken } from '../../../lib/utils';
+import { isGasFree } from '../../../lib/provider';
 import {
   OrderQuoteCurrency,
   FundingBalance,
@@ -137,7 +137,7 @@ export const getFundingBalances = (
   if (
     smartCheckoutResult.sufficient === false
     && smartCheckoutResult?.router?.routingOutcome.type
-      === RoutingOutcomeType.ROUTES_FOUND
+    === RoutingOutcomeType.ROUTES_FOUND
   ) {
     return getAlternativeFundingSteps(
       smartCheckoutResult.router.routingOutcome.fundingRoutes,
@@ -150,13 +150,13 @@ export const getFundingBalances = (
 
 export const getFnToSortFundingBalancesByPriority = (baseSymbol?: string) => (a: FundingBalance, b: FundingBalance) => {
   const aIsBase = a.fundingItem
-      && a.fundingItem.token
-      && a.fundingItem.token.symbol === baseSymbol
+    && a.fundingItem.token
+    && a.fundingItem.token.symbol === baseSymbol
     ? -1
     : 0;
   const bIsBase = b.fundingItem
-      && b.fundingItem.token
-      && b.fundingItem.token.symbol === baseSymbol
+    && b.fundingItem.token
+    && b.fundingItem.token.symbol === baseSymbol
     ? -1
     : 0;
 
@@ -166,7 +166,7 @@ export const getFnToSortFundingBalancesByPriority = (baseSymbol?: string) => (a:
 
   if (
     a.type === FundingBalanceType.SUFFICIENT
-      && b.type === FundingBalanceType.SUFFICIENT
+    && b.type === FundingBalanceType.SUFFICIENT
   ) {
     return 0;
   }

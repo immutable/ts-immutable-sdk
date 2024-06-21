@@ -1,6 +1,6 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { ChainNotSupportedError, InvalidConfigurationError } from 'errors';
-import { isValidNonZeroAddress } from 'lib';
+import { ChainNotSupportedError, InvalidConfigurationError } from '../errors';
+import { isValidNonZeroAddress } from '../lib';
 import { ExchangeContracts, ExchangeModuleConfiguration, ExchangeOverrides, SecondaryFee, Chain } from '../types';
 import {
   IMMUTABLE_TESTNET_CHAIN_ID,

@@ -1,4 +1,5 @@
 import { CryptoFiat, CryptoFiatConfiguration } from '@imtbl/cryptofiat';
+import { Environment } from '@imtbl/config';
 import {
   CryptoFiatActions,
   FiatSymbols,
@@ -14,7 +15,11 @@ describe('CryptoFiatContext', () => {
   it('should update state with cryptoFiat when reducer called with SET_CRYPTO_FIAT action', () => {
     const setCryptoFiatPayload: SetCryptoFiatPayload = {
       type: CryptoFiatActions.SET_CRYPTO_FIAT,
-      cryptoFiat: new CryptoFiat(new CryptoFiatConfiguration({})),
+      cryptoFiat: new CryptoFiat(new CryptoFiatConfiguration({
+        baseConfig: {
+          environment: Environment.SANDBOX,
+        },
+      })),
     };
 
     expect(initialCryptoFiatState.cryptoFiat).toBeNull();

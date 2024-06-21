@@ -235,7 +235,7 @@ export default class GuardianClient {
   }
 
   private async handleEIP712MessageEvaluation(
-    { chainID, payload }:GuardianEIP712MessageEvaluationParams,
+    { chainID, payload }: GuardianEIP712MessageEvaluationParams,
   ): Promise<guardian.MessageEvaluationResponse> {
     try {
       const user = await this.authManager.getUserZkEvm();

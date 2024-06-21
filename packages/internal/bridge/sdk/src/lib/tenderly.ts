@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import axios, { AxiosResponse } from 'axios';
-import { BridgeError, BridgeErrorType } from 'errors';
-import { TenderlySimulation } from 'types/tenderly';
+import { BridgeError, BridgeErrorType } from '../errors';
+import { TenderlySimulation } from '../types/tenderly';
 import { getTenderlyEndpoint } from './utils';
 
 // In the Tenderly API, state objects are mapping of contract address -> "stateDiff" -> slot -> value
@@ -61,7 +61,7 @@ export async function submitTenderlySimulations(
   simulations: Array<TenderlySimulation>,
   stateObjects?: StateObject[],
 ): Promise<Array<number>> {
-  let axiosResponse:AxiosResponse;
+  let axiosResponse: AxiosResponse;
   const tenderlyAPI = getTenderlyEndpoint(chainId);
   const state_objects = stateObjects ? unwrapStateObjects(stateObjects) : undefined;
   try {

@@ -13,7 +13,7 @@ import { cy } from 'local-cypress';
 import { Environment } from '@imtbl/config';
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
-import { BalanceInfo } from 'widgets/wallet/functions/tokenBalances';
+import { BalanceInfo } from '../../functions/tokenBalances';
 import { WalletState } from '../../context/WalletContext';
 import { BalanceItem } from './BalanceItem';
 import { cyIntercept, cySmartGet } from '../../../../lib/testUtils';

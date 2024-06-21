@@ -3,10 +3,10 @@ import {
   Drawer, Box, Button, Heading, CloudImage,
 } from '@biom3/react';
 import { useCallback, useState } from 'react';
-import { ETH_TOKEN_SYMBOL } from 'lib';
 import { Environment } from '@imtbl/config';
-import { getRemoteImage } from 'lib/utils';
 import { useTranslation } from 'react-i18next';
+import { ETH_TOKEN_SYMBOL } from '../../lib';
+import { getRemoteImage } from '../../lib/utils';
 import {
   containerStyles,
   headingTextStyles,

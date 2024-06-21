@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
 import { describe, it } from 'local-cypress';
 import { mount } from 'cypress/react18';
-import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
 import { WidgetTheme } from '@imtbl/checkout-sdk';
 import { ButtCon } from '@biom3/react';
+import { ViewContextTestComponent } from '../../context/view-context/test-components/ViewContextTestComponent';
 import { cySmartGet } from '../../lib/testUtils';
 import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from './HeaderNavigation';

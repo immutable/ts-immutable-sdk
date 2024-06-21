@@ -1,6 +1,6 @@
 import { describe, it } from 'local-cypress';
 import { mount } from 'cypress/react18';
-import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
+import { ViewContextTestComponent } from '../../context/view-context/test-components/ViewContextTestComponent';
 import { cySmartGet } from '../../lib/testUtils';
 import { StatusView } from './StatusView';
 import { StatusType } from './StatusType';

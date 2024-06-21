@@ -1,6 +1,6 @@
 import { Provider } from '@ethersproject/providers';
-import { BridgeErrorType, withBridgeError } from 'errors';
 import { Contract } from 'ethers';
+import { BridgeErrorType, withBridgeError } from '../errors';
 
 export async function createContract(address: string, iface: any, provider: Provider) {
   return await withBridgeError<Contract>(

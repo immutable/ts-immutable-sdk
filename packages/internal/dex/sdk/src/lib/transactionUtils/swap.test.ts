@@ -24,10 +24,10 @@ import {
   expectToBeString,
 } from 'test/utils';
 import { Pool, Route } from '@uniswap/v3-sdk';
-import { Fees } from 'lib/fees';
-import { erc20ToUniswapToken, newAmount } from 'lib';
-import { QuoteResult } from 'lib/getQuotesForRoutes';
-import { Coin, ERC20 } from 'types';
+import { Fees } from '../fees';
+import { erc20ToUniswapToken, newAmount } from '../utils';
+import { QuoteResult } from '../getQuotesForRoutes';
+import { Coin, ERC20 } from '../../types';
 import { getSwap, adjustQuoteWithFees } from './swap';
 
 const gasEstimate = BigNumber.from(0);

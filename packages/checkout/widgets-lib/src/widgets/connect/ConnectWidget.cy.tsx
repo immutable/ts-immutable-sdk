@@ -10,7 +10,7 @@ import { mount } from 'cypress/react18';
 import { Environment } from '@imtbl/config';
 import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import { Passport } from '@imtbl/passport';
-import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
+import { ViewContextTestComponent } from '../../context/view-context/test-components/ViewContextTestComponent';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import ConnectWidget from './ConnectWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';

@@ -1,10 +1,10 @@
-import { Coin, CoinAmount, ERC20, Native } from 'types';
+import { Coin, CoinAmount, ERC20, Native } from '../types';
 import { newAmount } from './utils';
 
 export const canUnwrapToken = (token: Coin): token is Native => token.type === 'native';
 
 export class NativeTokenService {
-  constructor(readonly nativeToken: Native, readonly wrappedToken: ERC20) {}
+  constructor(readonly nativeToken: Native, readonly wrappedToken: ERC20) { }
 
   wrapAmount(amount: CoinAmount<Native>): CoinAmount<ERC20> {
     return newAmount(amount.value, this.wrappedToken);

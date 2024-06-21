@@ -7,7 +7,7 @@ import { mount } from 'cypress/react18';
 import { BigNumber } from 'ethers';
 import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
-import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
+import { ViewContextTestComponent } from '../../../context/view-context/test-components/ViewContextTestComponent';
 import { WalletBalances } from './WalletBalances';
 import { WalletContext, WalletState } from '../context/WalletContext';
 import { cyIntercept, cySmartGet } from '../../../lib/testUtils';

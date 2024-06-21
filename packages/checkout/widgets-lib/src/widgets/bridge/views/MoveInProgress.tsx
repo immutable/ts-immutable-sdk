@@ -1,10 +1,10 @@
 import { useContext, useEffect } from 'react';
-import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { useTranslation } from 'react-i18next';
-import { ButtonNavigationStyles } from 'components/Header/HeaderStyles';
-import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
-import { ViewActions, ViewContext } from 'context/view-context/ViewContext';
 import { Badge, ButtCon } from '@biom3/react';
+import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { ButtonNavigationStyles } from '../../../components/Header/HeaderStyles';
+import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
+import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { RocketHero } from '../../../components/Hero/RocketHero';

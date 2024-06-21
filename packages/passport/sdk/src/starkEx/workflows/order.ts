@@ -4,7 +4,7 @@ import {
   UnsignedOrderRequest,
 } from '@imtbl/x-client';
 import { convertToSignableToken } from '@imtbl/toolkit';
-import { PassportErrorType, withPassportError } from 'errors/passportError';
+import { PassportErrorType, withPassportError } from '../../errors/passportError';
 import { UserImx } from '../../types';
 import GuardianClient from '../../guardian';
 

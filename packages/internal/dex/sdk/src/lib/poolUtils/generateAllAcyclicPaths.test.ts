@@ -1,6 +1,6 @@
 import { FeeAmount, Pool, TickMath } from '@uniswap/v3-sdk';
 import { Token } from '@uniswap/sdk-core';
-import { uniswapTokenToERC20 } from 'lib/utils';
+import { uniswapTokenToERC20 } from '../utils';
 import { generateAllAcyclicPaths } from '../router';
 
 const token0 = new Token(
@@ -255,8 +255,8 @@ describe('generateAllAcyclicPaths', () => {
         //    token0 -> token1 -> token3 (2 pools)
         expect(
           route.pools.length === 4
-            || route.pools.length === 3
-            || route.pools.length === 2,
+          || route.pools.length === 3
+          || route.pools.length === 2,
         );
         if (route.pools.length === 4) {
           expect(route.pools[0].token0).toBe(token0);

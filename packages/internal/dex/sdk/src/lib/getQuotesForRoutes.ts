@@ -1,7 +1,7 @@
 import { Route, SwapQuoter } from '@uniswap/v3-sdk';
 import { TradeType, Token } from '@uniswap/sdk-core';
 import { BigNumber, utils } from 'ethers';
-import { CoinAmount, ERC20 } from 'types';
+import { CoinAmount, ERC20 } from '../types';
 import {
   newAmount, quoteReturnMapping, toCurrencyAmount, uniswapTokenToERC20,
 } from './utils';

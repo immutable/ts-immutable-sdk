@@ -1,9 +1,9 @@
 import { Box, SxProps } from '@biom3/react';
 import { SaleItem } from '@imtbl/checkout-sdk';
-import { listVariants, listItemVariants } from 'lib/animation/listAnimation';
 
 import { motion } from 'framer-motion';
 import { ReactNode } from 'react';
+import { listVariants, listItemVariants } from '../../../lib/animation/listAnimation';
 import { OrderItem } from './OrderItem';
 import { OrderQuoteProduct, FundingBalance } from '../types';
 import { getPricingBySymbol } from '../utils/pricing';
