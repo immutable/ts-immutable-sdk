@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { getRemoteImage } from 'lib/utils';
+import { getRemoteRive } from 'lib/utils';
 import { useHandover } from 'lib/hooks/useHandover';
 import { useTranslation } from 'react-i18next';
 import { HandoverTarget } from 'context/handover-context/HandoverContext';
@@ -13,6 +13,17 @@ export enum TransactionMethod {
   EXECUTE = 'execute(address multicallSigner, bytes32 reference, address[] targets, bytes[] data, uint256 deadline, bytes signature)',
 }
 
+export const getRiveAnimationName = (transactionMethod: TransactionMethod) => {
+  switch (transactionMethod) {
+    case TransactionMethod.APPROVE:
+      return '/access-coins.riv';
+    case TransactionMethod.EXECUTE:
+      return '/purchasing-items.riv';
+    default:
+      return '';
+  }
+};
+
 export function useHandoverSteps(environment: Environment) {
   const { t } = useTranslation();
   const { addHandover } = useHandover({
@@ -25,7 +36,10 @@ export function useHandoverSteps(environment: Environment) {
       switch (key) {
         case `${TransactionMethod.APPROVE}-${ExecuteTransactionStep.AFTER}`:
           addHandover({
-            animationUrl: getRemoteImage(environment, '/approve-handover.riv'),
+            animationUrl: getRemoteRive(
+              environment,
+              getRiveAnimationName(TransactionMethod.APPROVE),
+            ),
             animationName: 'Processing',
             children: (
               <Heading>
@@ -37,8 +51,11 @@ export function useHandoverSteps(environment: Environment) {
 
         case `${TransactionMethod.EXECUTE}-${ExecuteTransactionStep.AFTER}`:
           addHandover({
-            animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
-            animationName: 'Handover',
+            animationUrl: getRemoteRive(
+              environment,
+              getRiveAnimationName(TransactionMethod.EXECUTE),
+            ),
+            animationName: 'Processing',
             children: (
               <Heading>
                 {t('views.PAYMENT_METHODS.handover.execute.after')}
@@ -59,8 +76,11 @@ export function useHandoverSteps(environment: Environment) {
       switch (key) {
         case `${TransactionMethod.APPROVE}-${ExecuteTransactionStep.BEFORE}`:
           addHandover({
-            animationUrl: getRemoteImage(environment, '/approve-handover.riv'),
-            animationName: 'Start',
+            animationUrl: getRemoteRive(
+              environment,
+              getRiveAnimationName(TransactionMethod.APPROVE),
+            ),
+            animationName: 'Processing',
             children: (
               <Heading>
                 {t('views.PAYMENT_METHODS.handover.approve.before')}
@@ -70,7 +90,10 @@ export function useHandoverSteps(environment: Environment) {
           break;
         case `${TransactionMethod.APPROVE}-${ExecuteTransactionStep.AFTER}`:
           addHandover({
-            animationUrl: getRemoteImage(environment, '/approve-handover.riv'),
+            animationUrl: getRemoteRive(
+              environment,
+              getRiveAnimationName(TransactionMethod.APPROVE),
+            ),
             animationName: 'Processing',
             children: (
               <Heading>
@@ -81,8 +104,11 @@ export function useHandoverSteps(environment: Environment) {
           break;
         case `${TransactionMethod.EXECUTE}-${ExecuteTransactionStep.BEFORE}`:
           addHandover({
-            animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
-            animationName: 'Start',
+            animationUrl: getRemoteRive(
+              environment,
+              getRiveAnimationName(TransactionMethod.EXECUTE),
+            ),
+            animationName: 'Processing',
             children: (
               <Heading>
                 {t('views.PAYMENT_METHODS.handover.execute.before')}
@@ -94,8 +120,11 @@ export function useHandoverSteps(environment: Environment) {
         case `${TransactionMethod.EXECUTE}-${ExecuteTransactionStep.AFTER}`:
           addHandover({
             duration: 2000,
-            animationUrl: getRemoteImage(environment, '/execute-handover.riv'),
-            animationName: 'Handover',
+            animationUrl: getRemoteRive(
+              environment,
+              getRiveAnimationName(TransactionMethod.EXECUTE),
+            ),
+            animationName: 'Processing',
             children: (
               <Heading>
                 {t('views.PAYMENT_METHODS.handover.execute.after')}

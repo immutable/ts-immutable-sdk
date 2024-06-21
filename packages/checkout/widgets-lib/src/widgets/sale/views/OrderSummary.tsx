@@ -7,7 +7,7 @@ import {
   ViewContext,
 } from 'context/view-context/ViewContext';
 import { SalePaymentTypes } from '@imtbl/checkout-sdk';
-import { getRemoteImage } from 'lib/utils';
+import { getRemoteRive } from 'lib/utils';
 import { useHandover } from 'lib/hooks/useHandover';
 import { HandoverTarget } from 'context/handover-context/HandoverContext';
 import {
@@ -31,6 +31,10 @@ import {
 import { FundingRouteExecute } from '../components/FundingRouteExecute/FundingRouteExecute';
 import { useSaleEvent } from '../hooks/useSaleEvents';
 import { LoadingHandover } from './LoadingHandover';
+import {
+  TransactionMethod,
+  getRiveAnimationName,
+} from '../hooks/useHandoverSteps';
 
 type OrderSummaryProps = {
   subView: OrderSummarySubViews;
@@ -76,7 +80,10 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
 
   const onProceedToBuy = (fundingBalance: FundingBalance) => {
     addHandover({
-      animationUrl: getRemoteImage(environment, '/handover.riv'),
+      animationUrl: getRemoteRive(
+        environment,
+        getRiveAnimationName(TransactionMethod.APPROVE),
+      ),
       animationName: 'Start',
       children: (
         <Heading sx={{ px: 'base.spacing.x6' }}>
@@ -199,7 +206,11 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
       {subView === OrderSummarySubViews.INIT && (
         <LoadingHandover
           text={t('views.ORDER_SUMMARY.loading.balances')}
-          environment={environment}
+          animationUrl={getRemoteRive(
+            environment,
+            getRiveAnimationName(TransactionMethod.APPROVE),
+          )}
+          animationName="Processing"
         />
       )}
       {subView === OrderSummarySubViews.REVIEW_ORDER && (

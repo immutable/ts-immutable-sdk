@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { HandoverTarget } from 'context/handover-context/HandoverContext';
 import { useHandover } from 'lib/hooks/useHandover';
 import { HandoverContent } from 'components/Handover/HandoverContent';
-import { getRemoteImage } from 'lib/utils';
+import { getRemoteRive } from 'lib/utils';
 import { ViewActions, ViewContext } from 'context/view-context/ViewContext';
 import { SaleWidgetViews } from 'context/view-context/SaleViewContextTypes';
 import { isPassportProvider } from 'lib/provider';
@@ -15,7 +15,11 @@ import { useSaleContext } from '../context/SaleContextProvider';
 import { sendSaleWidgetCloseEvent } from '../SaleWidgetEvents';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { useSaleEvent } from '../hooks/useSaleEvents';
-import { useHandoverSteps } from '../hooks/useHandoverSteps';
+import {
+  TransactionMethod,
+  getRiveAnimationName,
+  useHandoverSteps,
+} from '../hooks/useHandoverSteps';
 
 interface ErrorHandlerConfig {
   onActionClick?: () => void;
@@ -227,7 +231,10 @@ export function SaleErrorView({
       if (!environment || !errorType) return;
 
       addHandover({
-        animationUrl: getRemoteImage(environment, '/handover.riv'),
+        animationUrl: getRemoteRive(
+          environment,
+          getRiveAnimationName(TransactionMethod.EXECUTE),
+        ),
         animationName: 'Start',
         children: <HandoverContent {...getErrorViewProps()} />,
       });

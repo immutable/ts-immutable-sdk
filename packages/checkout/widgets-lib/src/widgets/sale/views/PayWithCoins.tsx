@@ -2,7 +2,7 @@ import { useHandover } from 'lib/hooks/useHandover';
 import { HandoverTarget } from 'context/handover-context/HandoverContext';
 import { useTranslation } from 'react-i18next';
 import { useCallback, useEffect, useRef } from 'react';
-import { getRemoteImage } from 'lib/utils';
+import { getRemoteRive } from 'lib/utils';
 import { Heading } from '@biom3/react';
 import { SaleWidgetViews } from 'context/view-context/SaleViewContextTypes';
 import { isPassportProvider } from 'lib/provider';
@@ -11,7 +11,11 @@ import { HandoverContent } from 'components/Handover/HandoverContent';
 import { useSaleContext } from '../context/SaleContextProvider';
 import { ExecuteTransactionStep, SaleErrorTypes } from '../types';
 import { useSaleEvent } from '../hooks/useSaleEvents';
-import { TransactionMethod, useHandoverSteps } from '../hooks/useHandoverSteps';
+import {
+  TransactionMethod,
+  getRiveAnimationName,
+  useHandoverSteps,
+} from '../hooks/useHandoverSteps';
 
 interface StepConfig {
   headingTextKey: string;
@@ -35,18 +39,18 @@ ExecuteNextTransactionTextsConfig
       ctaButtonTextKey:
         'views.PAYMENT_METHODS.handover.approve.beforeWithCta.ctaButton',
 
-      animationUrl: '/approve-handover.riv',
+      animationUrl: getRiveAnimationName(TransactionMethod.APPROVE),
       animationName: 'Start',
     },
     [ExecuteTransactionStep.PENDING]: {
       headingTextKey: 'views.PAYMENT_METHODS.handover.approve.pending',
-      animationUrl: '/approve-handover.riv',
-      animationName: 'Processing',
+      animationUrl: getRiveAnimationName(TransactionMethod.APPROVE),
+      animationName: 'Waiting',
     },
     [ExecuteTransactionStep.AFTER]: {
       headingTextKey: 'views.PAYMENT_METHODS.handover.approve.after',
-      animationUrl: '/approve-handover.riv',
-      animationName: 'Handover',
+      animationUrl: getRiveAnimationName(TransactionMethod.APPROVE),
+      animationName: 'Processing',
     },
   },
   [TransactionMethod.EXECUTE]: {
@@ -55,18 +59,18 @@ ExecuteNextTransactionTextsConfig
         'views.PAYMENT_METHODS.handover.execute.beforeWithCta.heading',
       ctaButtonTextKey:
         'views.PAYMENT_METHODS.handover.execute.beforeWithCta.ctaButton',
-      animationUrl: '/execute-handover.riv',
+      animationUrl: getRiveAnimationName(TransactionMethod.EXECUTE),
       animationName: 'Start',
     },
     [ExecuteTransactionStep.PENDING]: {
       headingTextKey: 'views.PAYMENT_METHODS.handover.execute.pending',
-      animationUrl: '/execute-handover.riv',
-      animationName: 'Processing',
+      animationUrl: getRiveAnimationName(TransactionMethod.EXECUTE),
+      animationName: 'Waiting',
     },
     [ExecuteTransactionStep.AFTER]: {
       headingTextKey: 'views.PAYMENT_METHODS.handover.execute.after',
-      animationUrl: '/execute-handover.riv',
-      animationName: 'Handover',
+      animationUrl: getRiveAnimationName(TransactionMethod.EXECUTE),
+      animationName: 'Processing',
     },
   },
 };
@@ -132,7 +136,7 @@ export function PayWithCoins() {
 
     const handleTransaction = () => {
       addHandover({
-        animationUrl: getRemoteImage(environment, config.pending.animationUrl),
+        animationUrl: getRemoteRive(environment, config.pending.animationUrl),
         animationName: config.pending.animationName,
         children: <Heading>{headingTextPending}</Heading>,
       });
@@ -157,7 +161,7 @@ export function PayWithCoins() {
     };
 
     addHandover({
-      animationUrl: getRemoteImage(environment, config.before.animationUrl),
+      animationUrl: getRemoteRive(environment, config.before.animationUrl),
       animationName: config.before.animationName,
       children: (
         <HandoverContent
@@ -208,8 +212,11 @@ export function PayWithCoins() {
 
       addHandover({
         duration: 2000,
-        animationUrl: getRemoteImage(environment, '/handover.riv'),
-        animationName: 'Success',
+        animationUrl: getRemoteRive(
+          environment,
+          getRiveAnimationName(TransactionMethod.EXECUTE),
+        ),
+        animationName: 'Completed',
         children: (
           <Heading sx={{ px: 'base.spacing.x6' }}>
             {t('views.PAYMENT_METHODS.handover.success')}
