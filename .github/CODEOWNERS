@@ -4,7 +4,6 @@
 /sdk @immutable/sdk
 /packages/x-client @immutable/sdk
 /packages/config @immutable/sdk
-/packages/internal/version-check @immutable/sdk
 /packages/internal/metrics @immutable/sdk
 /packages/internal/generated-clients @immutable/sdk
 /packages/internal/generated-clients/src/blockchain-data @immutable/assets

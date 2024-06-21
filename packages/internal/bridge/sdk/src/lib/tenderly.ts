@@ -5,13 +5,20 @@ import { BridgeError, BridgeErrorType } from '../errors';
 import { TenderlySimulation } from '../types/tenderly';
 import { getTenderlyEndpoint } from './utils';
 
-// TODO generate a type for these state objects. Readability could be improved from the double nested Record
+// In the Tenderly API, state objects are mapping of contract address -> "stateDiff" -> slot -> value
+// We can make a type that is like: { contract address, {storageSlot: value} }, since the "stateDiff" key is always the same
+export type StateObject = {
+  contractAddress: string;
+  stateDiff: StateDiff;
+};
+
+export type StateDiff = {
+  storageSlot: string;
+  value: string;
+};
+
 /**
- * Submits tenderly simulations, returning an array of gas usage estimates
- * @param chainId ID of network to estimate transactions on
- * @param simulations Array of TenderlySimulation objects (transactions) to estimate gas usage for
- * @param state_objects A double-nested record which can be used to change the state of smart contracts in the simulation.
- * @returns Array of gas usage estimates.
+ * We want to convert a StateObject type to the following format (Record<string, Record<string, Record<string, string>>>):
  * @example An example of a state object that changes the state at slot 0xe1b959...2585e to 1 at address 0xe43215...8E31:
  *  {
  *    "0xe432150cce91c13a887f7D836923d5597adD8E31": {
@@ -22,13 +29,41 @@ import { getTenderlyEndpoint } from './utils';
  *    }
  *  }
  */
+export function unwrapStateObjects(
+  stateObjects: StateObject[],
+): Record<string, Record<string, Record<string, string>>> {
+  const unwrappedStateObjects: Record<string, Record<string, Record<string, string>>> = {};
+
+  stateObjects.forEach((stateObject) => {
+    const { contractAddress, stateDiff } = stateObject;
+    const { storageSlot, value } = stateDiff;
+    if (unwrappedStateObjects[contractAddress] === undefined) {
+      unwrappedStateObjects[contractAddress] = {
+        stateDiff: {},
+      };
+    }
+    unwrappedStateObjects[contractAddress].stateDiff[storageSlot] = value;
+  });
+
+  return unwrappedStateObjects;
+}
+
+/**
+ * Submits tenderly simulations, returning an array of gas usage estimates
+ * @param chainId ID of network to estimate transactions on
+ * @param simulations Array of TenderlySimulation objects (transactions) to estimate gas usage for
+ * @param stateObjects An array of `StateObject`s. Each `StateObject` represents one smart contract state change.
+ *                     These `StateObject`s get unwrapped into Tenderly's required format.
+ * @returns Array of gas usage estimates.
+ */
 export async function submitTenderlySimulations(
   chainId: string,
   simulations: Array<TenderlySimulation>,
-  state_objects?: Record<string, Record<string, Record<string, string>>>,
+  stateObjects?: StateObject[],
 ): Promise<Array<number>> {
   let axiosResponse: AxiosResponse;
   const tenderlyAPI = getTenderlyEndpoint(chainId);
+  const state_objects = stateObjects ? unwrapStateObjects(stateObjects) : undefined;
   try {
     axiosResponse = await axios.post(
       tenderlyAPI,
