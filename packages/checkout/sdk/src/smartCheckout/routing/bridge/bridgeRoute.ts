@@ -9,6 +9,7 @@ import {
   BridgeFees,
   TokenInfo,
   FeeType,
+  Fee,
 } from '../../../types';
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../../config';
 import {
@@ -42,7 +43,7 @@ const constructFees = (
   token?: TokenInfo,
 ): BridgeFees => {
   const bridgeFeeDecimals = token?.decimals ?? DEFAULT_TOKEN_DECIMALS;
-  const bridgeFees = [];
+  const bridgeFees: Fee[] = [];
 
   if (bridgeFee.gt(0)) {
     bridgeFees.push({

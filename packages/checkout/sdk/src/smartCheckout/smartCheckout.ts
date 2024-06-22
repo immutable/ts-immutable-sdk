@@ -130,7 +130,7 @@ export const smartCheckout = async (
   );
 
   // Skip gas calculation if transactionOrGasAmount is not provided
-  let gasItem = null;
+  let gasItem: ItemRequirement | null = null;
   if (transactionOrGasAmount) {
     gasItem = await measureAsyncExecution<ItemRequirement | null>(
       config,

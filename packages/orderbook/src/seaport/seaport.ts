@@ -67,7 +67,7 @@ export class Seaport {
 
     const network = await this.provider.getNetwork();
     const listingActions: Action[] = approvalActions.map((approvalAction) => ({
-      type: ActionType.TRANSACTION,
+      type: ActionType.TRANSACTION as const,
       purpose: TransactionPurpose.APPROVAL,
       buildTransaction: prepareTransaction(
         approvalAction.transactionMethods,
@@ -355,7 +355,7 @@ export class Seaport {
         consideration: [
           {
             token:
-                considerationItem.type === 'ERC20' ? considerationItem.contractAddress : undefined,
+              considerationItem.type === 'ERC20' ? considerationItem.contractAddress : undefined,
             amount: considerationItem.amount,
             recipient: offerer,
           },

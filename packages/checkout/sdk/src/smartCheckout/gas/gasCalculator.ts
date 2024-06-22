@@ -47,7 +47,7 @@ export const gasCalculator = async (
   insufficientItems: (InsufficientERC20 | InsufficientERC721 | InsufficientERC1155)[],
   transactionOrGas: FulfillmentTransaction | GasAmount,
 ): Promise<ItemRequirement | null> => {
-  const estimateGasPromises = [];
+  const estimateGasPromises: Promise<BigNumber>[] = [];
   let totalGas = BigNumber.from(0);
 
   // Get all the gas estimate promises for the approval transactions

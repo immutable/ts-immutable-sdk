@@ -31,3 +31,11 @@ export interface EIP6963AnnounceProviderEvent extends CustomEvent<EIP6963Provide
 export interface EIP6963RequestProviderEvent extends Event {
   type: 'eip6963:requestProvider'
 }
+
+// Extending WindowEventMap to include the custom event
+declare global {
+  interface WindowEventMap {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    'eip6963:announceProvider': EIP6963AnnounceProviderEvent;
+  }
+}

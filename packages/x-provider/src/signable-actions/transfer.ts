@@ -112,7 +112,16 @@ export async function batchTransfer({
 
   const ethSignature = await signRaw(signableMessage, ethSigner);
 
-  const requests = [];
+  const requests: {
+    sender_vault_id: number;
+    receiver_stark_key: string;
+    receiver_vault_id: number;
+    asset_id: string;
+    amount: string;
+    nonce: number;
+    expiration_timestamp: number;
+    stark_signature: string;
+  }[] = [];
   for (const resp of signableResult.data.signable_responses) {
     // TODO: remove once fixed
     // eslint-disable-next-line no-await-in-loop

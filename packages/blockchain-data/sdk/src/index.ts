@@ -15,6 +15,6 @@ export {
   Types,
   APIError,
   BlockchainData,
-  BlockchainDataModuleConfiguration,
-  ActivityType,
+  type BlockchainDataModuleConfiguration,
+  type ActivityType,
 };

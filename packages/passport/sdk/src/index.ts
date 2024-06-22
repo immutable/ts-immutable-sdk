@@ -1,14 +1,14 @@
 export { PassportError } from './errors/passportError';
 export { Passport } from './Passport';
 export {
-  RequestArguments,
-  JsonRpcRequestPayload,
-  JsonRpcResponsePayload,
-  JsonRpcRequestCallback,
-  Provider,
+  type RequestArguments,
+  type JsonRpcRequestPayload,
+  type JsonRpcResponsePayload,
+  type JsonRpcRequestCallback,
+  type Provider,
   ProviderEvent,
-  AccountsChangedEvent,
-  TypedDataPayload,
+  type AccountsChangedEvent,
+  type TypedDataPayload,
 } from './zkEvm/types';
 export {
   JsonRpcError,
@@ -16,9 +16,9 @@ export {
   RpcErrorCode,
 } from './zkEvm/JsonRpcError';
 export {
-  UserProfile,
-  PassportOverrides,
-  PassportModuleConfiguration,
-  DeviceConnectResponse,
-  DeviceTokenResponse,
+  type UserProfile,
+  type PassportOverrides,
+  type PassportModuleConfiguration,
+  type DeviceConnectResponse,
+  type DeviceTokenResponse,
 } from './types';

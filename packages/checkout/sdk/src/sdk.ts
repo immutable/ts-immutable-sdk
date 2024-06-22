@@ -47,6 +47,7 @@ import {
   GetTokenInfoParams,
   GetWalletAllowListParams,
   GetWalletAllowListResult,
+  ItemRequirement,
   NetworkInfo,
   OnRampProviderFees,
   SellResult,
@@ -606,7 +607,7 @@ export class Checkout {
       params.provider,
     );
 
-    let itemRequirements = [];
+    let itemRequirements: ItemRequirement[] = [];
     try {
       itemRequirements = await getItemRequirementsFromRequirements(
         web3Provider,

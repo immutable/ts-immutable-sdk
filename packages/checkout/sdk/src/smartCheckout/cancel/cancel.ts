@@ -1,6 +1,6 @@
 import { TransactionResponse, Web3Provider } from '@ethersproject/providers';
 import { PopulatedTransaction } from 'ethers';
-import { CancelOrdersOnChainResponse, Orderbook } from '@imtbl/orderbook';
+import { CancelOrdersOnChainResponse, FailedOrderCancellation, Orderbook } from '@imtbl/orderbook';
 import { CheckoutConfiguration } from '../../config';
 import { CheckoutError, CheckoutErrorType } from '../../errors';
 import * as instance from '../../instance';
@@ -116,9 +116,9 @@ const gaslessCancel = async (
     );
     const { result } = await orderbook.cancelOrders(orderIds, address, signedMessage);
 
-    const successfulCancellations = [];
-    const failedCancellations = [];
-    const pendingCancellations = [];
+    const successfulCancellations: { orderId: string; }[] = [];
+    const failedCancellations: { orderId: string; reason: FailedOrderCancellation.reason_code; }[] = [];
+    const pendingCancellations: { orderId: string; }[] = [];
 
     for (const success of result.successful_cancellations) {
       successfulCancellations.push({
