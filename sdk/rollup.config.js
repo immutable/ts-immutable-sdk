@@ -36,6 +36,7 @@ const getFilesToBuild = () => {
   return [...files, ...returnModules];
 };
 
+
 const buildBundles = () => {
   const filesToBuild = getFilesToBuild();
   // generate a single object that contains all the files under input
@@ -68,6 +69,19 @@ const buildBundles = () => {
           preventAssignment: true,
           __SDK_VERSION__: pkg.version,
         }),
+        dts({
+          respectExternal: true,
+        }),
+      ],
+      external: ['pg'] 
+    },
+    {
+      input: types,
+      output: {
+        dir: 'dist',
+        format: 'es',
+      },
+      plugins: [
         dts({
           respectExternal: true,
         }),
