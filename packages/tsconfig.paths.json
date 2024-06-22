@@ -3,7 +3,6 @@
     "paths": {
       "@imtbl/blockchain-data": ["./blockchain-data/sdk/src"],
       "@imtbl/checkout-sdk": ["./checkout/sdk/src"],
-      "@imtbl/checkout-sdk-sample-app": ["./checkout/sdk-sample-app/src"],
       "@imtbl/checkout-widgets": ["./checkout/widgets-lib/src"],
       "@imtbl/checkout-widgets-sample-app": ["./checkout/widgets-sample-app/src"],
       "@imtbl/config": ["./config/src"],
@@ -21,7 +20,8 @@
       "@imtbl/passport": ["./passport/sdk/src"],
       "@imtbl/webhook": ["./webhook/sdk/src"],
       "@imtbl/x-client": ["./x-client/src"],
-      "@imtbl/x-provider": ["./x-provider/src"]
+      "@imtbl/x-provider": ["./x-provider/src"],
+      "@imtbl/*": ["./*/src", "./*/sdk/src", "./internal/*/sdk/src", "./internal/*/src"],
     }
   }
 }
