@@ -1,5 +1,5 @@
 import { BigNumber, providers } from 'ethers';
-import { newAmount } from '../utils';
+import { newAmount } from '../index';
 import { CoinAmount, Native } from '../../types';
 import { AVERAGE_SECONDARY_FEE_EXTRA_GAS } from '../../constants';
 

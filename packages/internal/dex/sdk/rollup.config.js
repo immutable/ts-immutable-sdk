@@ -9,6 +9,7 @@ export default {
   plugins: [
     json(),
     typescript({
+      paths: {},
       exclude: ['**/ABIs/*', '**/*.test.*', '**/utils/testUtils.ts'],
     }),
   ],

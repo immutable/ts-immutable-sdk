@@ -1,6 +1,6 @@
 {
+  "extends": "../../../tsconfig.paths.json",
   "compilerOptions": {
-    "baseUrl": "./src",
     "outDir": "./dist",
     "rootDirs": [
       "src"
@@ -19,7 +19,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "declaration": true
+    "declaration": true,
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]

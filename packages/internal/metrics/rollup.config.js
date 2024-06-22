@@ -7,6 +7,6 @@ export default {
     format: 'es',
   },
   plugins: [
-    typescript(),
+    typescript({ paths: {}}),
   ],
 };

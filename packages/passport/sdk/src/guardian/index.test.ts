@@ -1,8 +1,8 @@
-import { ConfirmationScreen } from 'confirmation';
 import * as guardian from '@imtbl/guardian';
 import { TransactionRequest } from '@ethersproject/providers';
 import { ImmutableConfiguration } from '@imtbl/config';
-import AuthManager from 'authManager';
+import { ConfirmationScreen } from '../confirmation';
+import AuthManager from '../authManager';
 import GuardianClient from './index';
 import { mockUser, mockUserImx, mockUserZkEvm } from '../test/mocks';
 import { JsonRpcError, RpcErrorCode } from '../zkEvm/JsonRpcError';
@@ -17,7 +17,7 @@ describe('Guardian', () => {
 
   let mockGetTransactionByID: jest.Mock;
   let mockEvaluateTransaction: jest.Mock;
-  let mockEvaluateMessage : jest.Mock;
+  let mockEvaluateMessage: jest.Mock;
   let mockEvaluateErc191Message: jest.Mock;
   let getUserImxMock: jest.Mock;
   let getUserZkEvmMock: jest.Mock;

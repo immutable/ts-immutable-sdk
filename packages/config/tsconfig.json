@@ -1,6 +1,6 @@
 {
+  "extends": "../tsconfig.paths.json",
   "compilerOptions": {
-    "baseUrl": "./src",
     "outDir": "./dist",
     "rootDirs": ["src"],
     "target": "es2022",
@@ -15,7 +15,7 @@
     "esModuleInterop": true,
     "declaration": true,
     "resolveJsonModule": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]

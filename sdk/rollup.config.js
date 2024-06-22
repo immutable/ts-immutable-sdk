@@ -98,7 +98,7 @@ export default [
       }),
       json(),
       commonJs(),
-      typescript(),
+      typescript({ paths: {}}),
       replace({
         exclude: 'node_modules/**',
         preventAssignment: true,
@@ -130,7 +130,7 @@ export default [
         include: ['../node_modules/ethers-v6/**', '../node_modules/@opensea/seaport-js/**'],
         plugins: ['@babel/plugin-transform-class-properties', '@babel/plugin-transform-private-methods'],
       }),
-      typescript(),
+      typescript({ paths: {}}),
       replace({
         // Can't exclude node_modules here because some dependencies use process.env.NODE_ENV
         // this breaks in browsers

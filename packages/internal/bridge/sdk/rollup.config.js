@@ -12,7 +12,7 @@ export default [{
       json(),
       commonjs(),
       nodeResolve(),
-      typescript(),
+      typescript({ paths: {}}),
     ],
   },
   {
@@ -24,7 +24,7 @@ export default [{
       json(),
       commonjs(),
       nodeResolve({ browser: true }), 
-      typescript(),
+      typescript({ paths: {}}),
     ],
   }
 ];

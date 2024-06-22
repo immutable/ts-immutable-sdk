@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { TenderlySimulation } from 'types/tenderly';
+import { TenderlySimulation } from '../types/tenderly';
 import { StateObject, submitTenderlySimulations, unwrapStateObjects } from './tenderly';
 import { getTenderlyEndpoint } from './utils';
 
@@ -70,7 +70,7 @@ describe('Tenderly Utils', () => {
     it('should submit tenderly simulation and return a 1-length array of numbers', async () => {
       const chainId = '123'; // 123 will fallback to dev
       const apiEndpoint = getTenderlyEndpoint(chainId);
-      const simulations:TenderlySimulation[] = [
+      const simulations: TenderlySimulation[] = [
         { from: '0x123', to: '0x456' },
       ];
 
@@ -104,7 +104,7 @@ describe('Tenderly Utils', () => {
     it('should submit multiple tenderly simulations and return multi-length array of numbers', async () => {
       const chainId = '123'; // 123 will fallback to dev
       const apiEndpoint = getTenderlyEndpoint(chainId);
-      const simulations:TenderlySimulation[] = [
+      const simulations: TenderlySimulation[] = [
         { from: '0x123', to: '0x456' },
         { from: '0x456', to: '0x789' },
       ];
@@ -144,7 +144,7 @@ describe('Tenderly Utils', () => {
     it('Uses the provided state overide objects', async () => {
       const chainId = '123'; // 123 will fallback to dev
       const apiEndpoint = getTenderlyEndpoint(chainId);
-      const simulations:TenderlySimulation[] = [
+      const simulations: TenderlySimulation[] = [
         { from: '0x123', to: '0x456' },
         { from: '0x456', to: '0x789' },
       ];
@@ -192,7 +192,7 @@ describe('Tenderly Utils', () => {
     it('should throw an error if the response contains an error', async () => {
       const chainId = '123'; // 123 will fallback to dev
       const apiEndpoint = getTenderlyEndpoint(chainId);
-      const simulations:TenderlySimulation[] = [
+      const simulations: TenderlySimulation[] = [
         { from: '0x123', to: '0x456' },
       ];
 
@@ -221,7 +221,7 @@ describe('Tenderly Utils', () => {
     it('should throw an error if the response length does not match the number of simulations', async () => {
       const chainId = '123'; // 123 will fallback to dev
       const apiEndpoint = getTenderlyEndpoint(chainId);
-      const simulations:TenderlySimulation[] = [
+      const simulations: TenderlySimulation[] = [
         { from: '0x123', to: '0x456' },
       ];
 
@@ -260,7 +260,7 @@ describe('Tenderly Utils', () => {
     it('should throw an error if the response contains an error for a single simulation', async () => {
       const chainId = '123'; // 123 will fallback to dev
       const apiEndpoint = getTenderlyEndpoint(chainId);
-      const simulations:TenderlySimulation[] = [
+      const simulations: TenderlySimulation[] = [
         { from: '0x123', to: '0x456' },
       ];
 
@@ -297,7 +297,7 @@ describe('Tenderly Utils', () => {
     it('should throw an error if the response contains an error for one of multiple simulations', async () => {
       const chainId = '123'; // 123 will fallback to dev
       const apiEndpoint = getTenderlyEndpoint(chainId);
-      const simulations:TenderlySimulation[] = [
+      const simulations: TenderlySimulation[] = [
         { from: '0x123', to: '0x456' },
         { from: '0x456', to: '0x789' },
       ];
@@ -339,7 +339,7 @@ describe('Tenderly Utils', () => {
     it('should throw an error if one of the responses is missing gasUsed', async () => {
       const chainId = '123'; // 123 will fallback to dev
       const apiEndpoint = getTenderlyEndpoint(chainId);
-      const simulations:TenderlySimulation[] = [
+      const simulations: TenderlySimulation[] = [
         { from: '0x123', to: '0x456' },
       ];
 

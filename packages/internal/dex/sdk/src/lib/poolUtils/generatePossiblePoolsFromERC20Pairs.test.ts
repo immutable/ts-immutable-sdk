@@ -1,4 +1,4 @@
-import { ERC20 } from 'types';
+import { ERC20 } from '../../types';
 import { ERC20Pair } from './generateERC20Pairs';
 import { generatePossiblePoolsFromERC20Pair } from './generatePossiblePoolsFromERC20Pairs';
 import {

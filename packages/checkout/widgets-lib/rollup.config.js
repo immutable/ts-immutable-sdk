@@ -15,7 +15,7 @@ const defaultPlugins = [
     preventAssignment: true,
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || PRODUCTION),
   }),
-  typescript(),
+  typescript({ paths: {}}),
 ]
 
 const productionPlugins = [

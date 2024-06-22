@@ -1,4 +1,4 @@
-import { Order } from 'openapi/sdk';
+import { Order } from '../openapi/sdk';
 
 export function determineFillableUnits(order: Order, amountToFill?: string): string | undefined {
   if (order.sell[0].type === 'ERC1155' && !amountToFill) {
@@ -13,7 +13,7 @@ export function determineFillableUnits(order: Order, amountToFill?: string): str
     // calculate the remaining amount to fill
     // remaining = ((denominator - numerator) * originalOfferAmt) / denominator
     const remaining = ((BigInt(denominator) - BigInt(numerator)) * BigInt(originalOfferAmt))
-        / BigInt(denominator);
+      / BigInt(denominator);
 
     return remaining.toString();
   }
