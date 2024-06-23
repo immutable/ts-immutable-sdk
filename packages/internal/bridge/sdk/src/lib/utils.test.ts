@@ -1,11 +1,11 @@
+import { BigNumber } from 'ethers';
 import {
   ETH_MAINNET_TO_ZKEVM_MAINNET, ETH_SEPOLIA_CHAIN_ID, ETH_SEPOLIA_TO_ZKEVM_TESTNET, childWIMXs, rootIMXs,
-} from 'constants/bridges';
+} from '../constants/bridges';
 import {
   BridgeDirection,
   BridgeFeeActions, BridgeInstance, FungibleToken, WithdrawERC20FeeRequest,
-} from 'types';
-import { BigNumber } from 'ethers';
+} from '../types';
 import {
   exportedForTesting, isValidDeposit, isValidWithdraw, isWithdrawNativeIMX, isWithdrawWrappedIMX,
 } from './utils';

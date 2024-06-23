@@ -1,6 +1,6 @@
 import { Wallet } from 'ethers';
 import { Environment } from '@imtbl/config';
-import { OrderStatusName } from 'openapi/sdk';
+import { OrderStatusName } from '../openapi/sdk';
 import { Orderbook } from '../orderbook';
 import { getLocalhostProvider } from './helpers/provider';
 import { getOffererWallet } from './helpers/signers';

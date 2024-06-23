@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { TenderlySimulation } from 'types/tenderly';
+import { TenderlySimulation } from '../types/tenderly';
 import { StateObject, submitTenderlySimulations, unwrapStateObjects } from './tenderly';
 import { getTenderlyEndpoint } from './utils';
 
