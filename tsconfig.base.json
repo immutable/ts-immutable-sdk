@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "@imtbl/blockchain-data": ["./packages/blockchain-data/sdk/src/index.ts"],
+      "@imtbl/checkout-sdk": ["./packages/checkout/sdk/src/index.ts"],
+      "@imtbl/checkout-widgets": ["./packages/checkout/widgets-lib/src/index.ts"],
+      "@imtbl/checkout-widgets-sample-app": ["./packages/checkout/widgets-sample-app/src/index.ts"],
+      "@imtbl/config": ["./packages/config/src/index.ts"],
+      "@imtbl/game-bridge": ["./packages/game-bridge/src/index.ts"],
+      "@imtbl/bridge-sdk": ["./packages/internal/bridge/sdk/src/index.ts"],
+      "@imtbl/cryptofiat": ["./packages/internal/cryptofiat/src/index.ts"],
+      "@imtbl/dex-sdk": ["./packages/internal/dex/sdk/src/index.ts"],
+      "@imtbl/factory-sdk": ["./packages/internal/factory/sdk/src/index.ts"],
+      "@imtbl/generated-clients": ["./packages/internal/generated-clients/src/index.ts"],
+      "@imtbl/guardian": ["./packages/internal/guardian/src/index.ts"],
+      "@imtbl/metrics": ["./packages/internal/metrics/src/index.ts"],
+      "@imtbl/toolkit": ["./packages/internal/toolkit/src/index.ts"],
+      "@imtbl/minting-backend": ["./packages/minting-backend/sdk/src/index.ts"],
+      "@imtbl/orderbook": ["./packages/orderbook/src/index.ts"],
+      "@imtbl/passport": ["./packages/passport/sdk/src/index.ts"],
+      "@imtbl/webhook": ["./packages/webhook/sdk/src/index.ts"],
+      "@imtbl/x-client": ["./packages/x-client/src/index.ts"],
+      "@imtbl/x-provider": ["./packages/x-provider/src/index.ts"],
+      "@imtbl/*": ["./packages/*/src/index.ts", "./packages/*/sdk/src/index.ts", "./packages/internal/*/sdk/src/index.ts", "./packages/internal/*/src/index.ts"],
+    }
+  }
+}
