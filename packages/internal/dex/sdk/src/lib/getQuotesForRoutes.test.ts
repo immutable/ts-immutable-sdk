@@ -3,7 +3,7 @@ import {
 } from '@uniswap/v3-sdk';
 import { TradeType } from '@uniswap/sdk-core';
 import { BigNumber, utils } from 'ethers';
-import { ProviderCallError } from 'errors';
+import { ProviderCallError } from '../errors';
 import { getQuotesForRoutes, Provider } from './getQuotesForRoutes';
 import {
   IMX_TEST_TOKEN,
