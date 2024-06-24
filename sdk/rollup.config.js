@@ -68,7 +68,8 @@ const buildBundles = () => {
           exclude: 'node_modules/**',
           preventAssignment: true,
           __SDK_VERSION__: pkg.version,
-        })
+        }),
+        terser(),
       ],
       external: ['pg'] 
     },
