@@ -1,10 +1,10 @@
 import { TradeType } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
-import { Fees } from 'lib/fees';
-import { QuoteResult } from 'lib/getQuotesForRoutes';
-import { NativeTokenService, canUnwrapToken } from 'lib/nativeTokenService';
-import { newAmount } from 'lib/utils';
-import { Coin, CoinAmount, ERC20 } from 'types';
+import { Fees } from '../fees';
+import { QuoteResult } from '../getQuotesForRoutes';
+import { NativeTokenService, canUnwrapToken } from '../nativeTokenService';
+import { newAmount } from '../utils';
+import { Coin, CoinAmount, ERC20 } from '../../types';
 import { slippageToFraction } from './slippage';
 
 export function getQuoteAmountFromTradeType(routerQuote: QuoteResult): CoinAmount<ERC20> {

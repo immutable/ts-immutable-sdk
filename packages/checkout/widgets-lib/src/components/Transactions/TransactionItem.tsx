@@ -5,11 +5,11 @@ import {
   MenuItem,
   Link,
 } from '@biom3/react';
-import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
-import { Transaction } from 'lib/clients/checkoutApiType';
 import { MouseEvent, useMemo } from 'react';
-import { TokenImage } from 'components/TokenImage/TokenImage';
 import { Environment } from '@imtbl/config';
+import { UserJourney, useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { Transaction } from '../../lib/clients/checkoutApiType';
+import { TokenImage } from '../TokenImage/TokenImage';
 import { containerStyles } from './transactionItemStyles';
 import { TransactionDetails } from './TransactionDetails';
 

@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import dotenv from 'dotenv';
-import { OrderbookModuleConfiguration } from 'config';
+import { OrderbookModuleConfiguration } from '../../config';
 import { getLocalhostProvider } from './provider';
 
 dotenv.config();

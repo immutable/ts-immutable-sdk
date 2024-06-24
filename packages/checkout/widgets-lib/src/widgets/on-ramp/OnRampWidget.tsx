@@ -2,8 +2,8 @@ import {
   useContext, useEffect, useMemo, useReducer, useState,
 } from 'react';
 import { IMTBLWidgetEvents, OnRampWidgetParams } from '@imtbl/checkout-sdk';
-import { UserJourney } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { useTranslation } from 'react-i18next';
+import { UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { NATIVE } from '../../lib';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {

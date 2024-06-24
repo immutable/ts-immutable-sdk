@@ -7,12 +7,12 @@ import {
   WidgetTheme,
   WidgetType,
 } from '@imtbl/checkout-sdk';
-import { Base } from 'widgets/BaseWidgetRoot';
-import { isValidWalletProvider, isValidAmount, isValidAddress } from 'lib/validations/widgetValidators';
-import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
-import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
-import { LoadingView } from 'views/loading/LoadingView';
-import { HandoverProvider } from 'context/handover-context/HandoverProvider';
+import { Base } from '../BaseWidgetRoot';
+import { isValidWalletProvider, isValidAmount, isValidAddress } from '../../lib/validations/widgetValidators';
+import { ThemeProvider } from '../../components/ThemeProvider/ThemeProvider';
+import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
+import { LoadingView } from '../../views/loading/LoadingView';
+import { HandoverProvider } from '../../context/handover-context/HandoverProvider';
 import i18n from '../../i18n';
 
 const BridgeWidget = React.lazy(() => import('./BridgeWidget'));

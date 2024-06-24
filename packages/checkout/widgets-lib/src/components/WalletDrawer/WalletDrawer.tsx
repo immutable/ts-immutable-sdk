@@ -1,8 +1,8 @@
 import { Drawer, Select } from '@biom3/react';
-import { FormControlWrapper } from 'components/FormComponents/FormControlWrapper/FormControlWrapper';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { EIP1193Provider, EIP6963ProviderDetail } from '@imtbl/checkout-sdk';
+import { FormControlWrapper } from '../FormComponents/FormControlWrapper/FormControlWrapper';
 import { WalletItem } from './WalletItem';
 import { walletItemListStyles } from './WalletDrawerStyles';
 import { WalletConnectItem } from './WalletConnectItem';

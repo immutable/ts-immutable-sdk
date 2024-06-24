@@ -8,14 +8,14 @@ import {
   WidgetTheme,
   WidgetType,
 } from '@imtbl/checkout-sdk';
-import { Base } from 'widgets/BaseWidgetRoot';
-import { ConnectLoader, ConnectLoaderParams } from 'components/ConnectLoader/ConnectLoader';
-import { getL1ChainId, getL2ChainId } from 'lib';
-import { isValidAddress, isValidAmount } from 'lib/validations/widgetValidators';
-import { ThemeProvider } from 'components/ThemeProvider/ThemeProvider';
-import { CustomAnalyticsProvider } from 'context/analytics-provider/CustomAnalyticsProvider';
-import { LoadingView } from 'views/loading/LoadingView';
-import { HandoverProvider } from 'context/handover-context/HandoverProvider';
+import { Base } from '../BaseWidgetRoot';
+import { ConnectLoader, ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
+import { getL1ChainId, getL2ChainId } from '../../lib';
+import { isValidAddress, isValidAmount } from '../../lib/validations/widgetValidators';
+import { ThemeProvider } from '../../components/ThemeProvider/ThemeProvider';
+import { CustomAnalyticsProvider } from '../../context/analytics-provider/CustomAnalyticsProvider';
+import { LoadingView } from '../../views/loading/LoadingView';
+import { HandoverProvider } from '../../context/handover-context/HandoverProvider';
 import { sendOnRampWidgetCloseEvent } from './OnRampWidgetEvents';
 import i18n from '../../i18n';
 

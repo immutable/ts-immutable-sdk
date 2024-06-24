@@ -8,13 +8,13 @@ import {
 } from '@biom3/react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { listVariants, listItemVariants } from 'lib/animation/listAnimation';
 import {
   SalePaymentTypes,
   TransactionRequirement,
   WidgetTheme,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
+import { listVariants, listItemVariants } from '../../../lib/animation/listAnimation';
 import { CoinsDrawerItem } from './CoinsDrawerItem';
 import { FundingBalance } from '../types';
 import { PaymentOptions } from './PaymentOptions';

@@ -1,4 +1,4 @@
-import { PopupOverlayOptions } from 'types';
+import { PopupOverlayOptions } from '../types';
 import { PASSPORT_OVERLAY_CLOSE_ID, PASSPORT_OVERLAY_TRY_AGAIN_ID } from './constants';
 import { addLink, getBlockedOverlay, getGenericOverlay } from './elements';
 

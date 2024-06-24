@@ -1,5 +1,5 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { ProviderConfiguration } from 'config';
+import { ProviderConfiguration } from '../config';
 import { MetaMaskIMXProvider } from './metaMaskWrapper';
 import { connect } from './metaMask';
 import {

@@ -5,7 +5,7 @@ import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { Environment } from '@imtbl/config';
 import { Web3Provider } from '@ethersproject/providers';
-import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
+import { ViewContextTestComponent } from '../../context/view-context/test-components/ViewContextTestComponent';
 import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { ConnectLoader, ConnectLoaderParams } from './ConnectLoader';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';

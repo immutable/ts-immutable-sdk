@@ -1,18 +1,66 @@
 # Generated API Clients
 
-Internal package containing generated clients for Immutable APIs.
+> ❗ DO NOT EXPOSE GENERATED API CLIENTS DIRECTLY TO THE PUBLIC
 
-This package only contains mostly generated code, and is intended to provide the building blocks for the public interfaces that live within other external packages in this monorepo.
+## Table of Contents
 
-> ❗ DO NOTE EXPOSE GENERATED API CLIENTS DIRECTLY TO THE PUBLIC
+- [Pre-requisites](#pre-requisites)
+- [Quick Start Guide](#quick-start-guide)
+- [About](#about)
+- [Usage](#usage)
+  - [Immutable X](#immutable-x)
+  - [Immutable Multi-Rollup](#immutable-multi-rollup)
+  - [Regenerate Clients](#regenerate-clients)
+  - [Regenerate Blockchain Data Types](#regenerate-blockchain-data-types)
+  - [View generators](#view-generators)
 
-## Usage
+### Pre-requisites
+
+Install dependencies for the workspace
+
+```bash
+yarn install
+```
+
+### Quick Start Guide
+
+All commands below need to be run in the context of the `generated-clients` package where this README is located. Read more about context [here](../../../README.md#context).
+
+Running in `dev` mode:
+  
+```bash
+yarn dev
+```
+
+Building to `dist` directory with javascript output:
+  
+```bash
+yarn build
+```
+
+Running all tests:
+
+```bash
+yarn test
+```
+
+Typechecking:
+
+```bash
+yarn typecheck
+```
+
+### About
+
+Generated-clients is an internal package containing generated clients for Immutable APIs. This package contains mostly generated code, and is intended to provide the building blocks for the public interfaces that live within other external packages in this monorepo.
+
+### Usage
 
 The generated clients are exposed via the `ImxApiClients` and `MultiRollupApiClients` classes. These classes inject the SDK version into the request headers, and provide a single point of configuration for the API clients.
 
 It's recommended to use the `ImxApiClients` and `MultiRollupApiClients` classes instead of the generated clients directly.
 
-### Immutable X
+#### Immutable X
 
 ```typescript
 import { ImxApiClients, imxApiConfig } from '@imtbl/generated-clients';
@@ -20,13 +68,10 @@ import { ImxApiClients, imxApiConfig } from '@imtbl/generated-clients';
 const imxApiClients = new ImxApiClients(imxApiConfig.getSandbox());
 ```
 
-### Immutable Multi-Rollup
+#### Immutable Multi-Rollup
 
 ```typescript
-import {
-  MultiRollupApiClients,
-  multiRollupConfig,
-} from '@imtbl/generated-clients';
+import { MultiRollupApiClients, multiRollupConfig } from '@imtbl/generated-clients';
 
 const mrApiClients = new MultiRollupApiClients(multiRollupConfig.sandbox);
 ```
@@ -45,27 +90,27 @@ const config = createConfig({
 const assetsApi = new imx.AssetsApi(config);
 ```
 
-## Regenerate Clients
+#### Regenerate Clients
 
-The following commands should be run from the root of the `packages/internal/generated-clients` directory.
+All commands below need to be run in the `generated-clients` package folder where this README is located.
 
-Run the following command to regenerate the StarkEx clients:
+Regenerate the StarkEx clients:
 
 ```bash
 make generate-imx-openapi
 ```
 
-Run the following command to regenerate the Immutable multi-rollup clients:
+Regenerate the Immutable multi-rollup clients:
 
 ```bash
 make generate-mr-openapi
 ```
 
-## Regenerate Blockchain Data Types
+#### Regenerate Blockchain Data Types
 
-The following commands should be run from the root of the `packages/internal/generated-clients` directory.
+All commands below need to be run in the `generated-clients` package folder where this README is located.
 
-Run the following command to pull in the latest OpenApi spec:
+Pull in the latest OpenApi spec:
 
 ```bash
 make get-mr-openapi
@@ -75,10 +120,19 @@ make generate-blockchain-data-types
 Note - You will need to manually remove the models and domain files not relevant to the Blockchain Data package from the `blockchain-data` folder, in order
 for other teams types not to bleed into our Blockchain Data Types namespace.
 
-## View generators
+#### View generators
 
-To inspect underlying generator files, run:
+To run the `view-generators` yarn command, you will need to have the java runtime installed. The yarn command will need to be run in the `generated-clients` package folder where this README is located.
 
 ```bash
-openapi-generator author template -g typescript-axios -o src/templates
+# Install java runtime on Mac
+brew install java
+```
+
+Note that version 7.0.1 for the openapi-generator-cli should be used to match the version used for the commands in the `Makefile`. This is set by default in the `openapitools.json` file.
+
+Inspect the underlying generator files:
+
+```bash
+yarn view-generators
 ```

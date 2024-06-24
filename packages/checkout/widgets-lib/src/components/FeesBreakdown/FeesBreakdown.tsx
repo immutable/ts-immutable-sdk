@@ -1,9 +1,9 @@
 import {
   Drawer, Box, Divider, MenuItem,
 } from '@biom3/react';
-import { formatZeroAmount, tokenValueFormat } from 'lib/utils';
 import { useTranslation } from 'react-i18next';
-import { FormattedFee } from 'widgets/swap/functions/swapFees';
+import { formatZeroAmount, tokenValueFormat } from '../../lib/utils';
+import { FormattedFee } from '../../widgets/swap/functions/swapFees';
 import { feeItemContainerStyles, feeItemLoadingStyles, feesBreakdownContentStyles } from './FeesBreakdownStyles';
 import { FeeItem } from './FeeItem';
 import { FooterLogo } from '../Footer/FooterLogo';

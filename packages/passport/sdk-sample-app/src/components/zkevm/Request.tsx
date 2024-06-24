@@ -86,6 +86,7 @@ const EthereumMethods: EthereumMethod[] = [
     name: 'eth_estimateGas',
     params: [
       { name: 'transaction', type: EthereumParamType.object },
+      { name: 'blockNumber/tag', default: 'latest' },
     ],
   },
   {
@@ -127,6 +128,7 @@ const EthereumMethods: EthereumMethod[] = [
     name: 'eth_getTransactionCount',
     params: [
       { name: 'address' },
+      { name: 'blockNumber/tag', default: 'latest' },
     ],
   },
 ];

@@ -6,7 +6,7 @@ import {
   IMTBLWidgetEvents, TokenFilterTypes, TokenInfo, WidgetTheme,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
-import { TokenImage } from 'components/TokenImage/TokenImage';
+import { TokenImage } from '../../../../components/TokenImage/TokenImage';
 import { ShowMenuItem } from './BalanceItemStyles';
 import { BalanceInfo } from '../../functions/tokenBalances';
 import { WalletContext } from '../../context/WalletContext';

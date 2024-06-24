@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { compareStr } from 'lib/utils';
+import { compareStr } from '../../../lib/utils';
 import { OrderQuote } from '../types';
 
 export type OrderQuoteApiResponse = {

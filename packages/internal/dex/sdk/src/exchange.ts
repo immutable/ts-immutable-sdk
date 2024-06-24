@@ -1,14 +1,14 @@
 import { BigNumber, ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
 import assert from 'assert';
-import { DuplicateAddressesError, InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError } from 'errors';
-import { calculateGasFee, fetchGasPrice } from 'lib/transactionUtils/gas';
-import { getApproval, prepareApproval } from 'lib/transactionUtils/approval';
-import { getOurQuoteReqAmount, prepareUserQuote } from 'lib/transactionUtils/getQuote';
-import { Fees } from 'lib/fees';
-import { Multicall__factory, ImmutableSwapProxy__factory, WIMX__factory } from 'contracts/types';
-import { NativeTokenService } from 'lib/nativeTokenService';
-import { IMX_UNWRAP_GAS_COST, IMX_WRAP_GAS_COST } from 'constants/wrapping';
+import { DuplicateAddressesError, InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError } from './errors';
+import { calculateGasFee, fetchGasPrice } from './lib/transactionUtils/gas';
+import { getApproval, prepareApproval } from './lib/transactionUtils/approval';
+import { getOurQuoteReqAmount, prepareUserQuote } from './lib/transactionUtils/getQuote';
+import { Fees } from './lib/fees';
+import { Multicall__factory, ImmutableSwapProxy__factory, WIMX__factory } from './contracts/types';
+import { NativeTokenService } from './lib/nativeTokenService';
+import { IMX_UNWRAP_GAS_COST, IMX_WRAP_GAS_COST } from './constants/wrapping';
 import { DEFAULT_MAX_HOPS, DEFAULT_SLIPPAGE, MAX_MAX_HOPS, MIN_MAX_HOPS } from './constants';
 import { Router } from './lib/router';
 import {
@@ -160,7 +160,7 @@ export class Exchange {
     tokenAmount: BigNumber,
     wimxInterface: ethers.utils.Interface,
     gasPrice: CoinAmount<Native> | null,
-  ) : Promise<WrapUnwrapTransactionDetails> {
+  ): Promise<WrapUnwrapTransactionDetails> {
     const calldata = wimxInterface.encodeFunctionData('withdraw', [tokenAmount]);
     const gasEstimate = ethers.BigNumber.from(IMX_UNWRAP_GAS_COST);
 
@@ -186,7 +186,7 @@ export class Exchange {
     tokenAmount: BigNumber,
     wimxInterface: ethers.utils.Interface,
     gasPrice: CoinAmount<Native> | null,
-  ) : WrapUnwrapTransactionDetails {
+  ): WrapUnwrapTransactionDetails {
     const calldata = wimxInterface.encodeFunctionData('deposit');
     const gasEstimate = ethers.BigNumber.from(IMX_WRAP_GAS_COST);
 

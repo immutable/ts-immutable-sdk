@@ -6,8 +6,8 @@ import {
 } from 'react';
 import { WidgetTheme } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
-import { ConnectLoaderContext } from 'context/connect-loader-context/ConnectLoaderContext';
 import { Environment } from '@imtbl/config';
+import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { QuickswapFooter } from '../../../components/Footer/QuickswapFooter';

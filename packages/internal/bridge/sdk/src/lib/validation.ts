@@ -1,9 +1,9 @@
 import { ethers } from 'ethers';
 import {
   BridgeBundledTxRequest, BridgeFeeActions, BridgeFeeRequest, FungibleToken,
-} from 'types';
-import { NATIVE } from 'constants/bridges';
-import { createContract } from 'contracts/createContract';
+} from '../types';
+import { NATIVE } from '../constants/bridges';
+import { createContract } from '../contracts/createContract';
 import { BridgeConfiguration } from '../config';
 import { BridgeError, BridgeErrorType, withBridgeError } from '../errors';
 import {

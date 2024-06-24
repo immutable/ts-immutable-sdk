@@ -7,7 +7,7 @@ import {
   ProtocolData,
   TradeResult,
   CancelOrdersResult,
-} from 'openapi/sdk';
+} from '../openapi/sdk';
 import {
   CreateListingParams,
   FeeType,
@@ -24,7 +24,7 @@ export class ImmutableApiClient {
     private readonly orderbookService: OrdersService,
     private readonly chainName: string,
     private readonly seaportAddress: string,
-  ) {}
+  ) { }
 
   async fulfillmentData(
     requests: Array<FulfillmentDataRequest>,
@@ -98,7 +98,7 @@ export class ImmutableApiClient {
     }
 
     if (Number(orderComponents.offer[0].itemType) !== ItemType.ERC721
-        && Number(orderComponents.offer[0].itemType) !== ItemType.ERC1155) {
+      && Number(orderComponents.offer[0].itemType) !== ItemType.ERC1155) {
       throw new Error('Only ERC721 / ERC1155 tokens can be listed');
     }
 
@@ -118,7 +118,7 @@ export class ImmutableApiClient {
           {
             type:
               Number(orderComponents.consideration[0].itemType)
-              === ItemType.NATIVE
+                === ItemType.NATIVE
                 ? 'NATIVE'
                 : 'ERC20',
             amount: orderComponents.consideration[0].startAmount,

@@ -11,7 +11,7 @@ import React, {
   useMemo,
   useReducer,
 } from 'react';
-import { ErrorView } from 'views/error/ErrorView';
+import { ErrorView } from '../../views/error/ErrorView';
 import {
   ConnectLoaderActions,
   ConnectLoaderContext,

@@ -1,7 +1,7 @@
 import 'cross-fetch/polyfill';
 import { RequestHandler, rest } from 'msw';
 import { SetupServer, setupServer } from 'msw/node';
-import { ChainName } from 'network/chains';
+import { ChainName } from '../../network/chains';
 import { RelayerTransactionRequest } from '../../zkEvm/relayerClient';
 import { JsonRpcRequestPayload } from '../../zkEvm/types';
 import { chainId, chainIdHex, mockUserZkEvm } from '../../test/mocks';

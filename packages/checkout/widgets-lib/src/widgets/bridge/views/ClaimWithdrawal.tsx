@@ -5,19 +5,19 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
 import { useTranslation } from 'react-i18next';
-import { Transaction } from 'lib/clients';
-import { getChainNameById } from 'lib/chains';
-import { WITHDRAWAL_CLAIM_GAS_LIMIT, getL1ChainId } from 'lib';
-import { isPassportProvider } from 'lib/provider';
 import { WalletProviderName } from '@imtbl/checkout-sdk';
-import { isNativeToken } from 'lib/utils';
 import { BigNumber } from 'ethers';
 import { FlowRateWithdrawResponse } from '@imtbl/bridge-sdk';
-import { NotEnoughEthToWithdraw } from 'components/Transactions/NotEnoughEthToWithdraw';
 import { FeeData } from '@ethersproject/providers';
-import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
+import { UserJourney, useAnalytics } from '../../../context/analytics-provider/SegmentAnalyticsProvider';
+import { Transaction } from '../../../lib/clients';
+import { getChainNameById } from '../../../lib/chains';
+import { WITHDRAWAL_CLAIM_GAS_LIMIT, getL1ChainId } from '../../../lib';
+import { isPassportProvider } from '../../../lib/provider';
+import { isNativeToken } from '../../../lib/utils';
+import { NotEnoughEthToWithdraw } from '../../../components/Transactions/NotEnoughEthToWithdraw';
+import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';

@@ -1,6 +1,6 @@
 import { BigNumber, providers } from 'ethers';
-import { newAmount } from 'lib';
-import { CoinAmount, Native } from 'types';
+import { newAmount } from '../utils';
+import { CoinAmount, Native } from '../../types';
 import { AVERAGE_SECONDARY_FEE_EXTRA_GAS } from '../../constants';
 
 type FeeData = {
