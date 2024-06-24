@@ -2,8 +2,8 @@ import { JsonRpcProvider, JsonRpcBatchProvider } from '@ethersproject/providers'
 import { Contract } from '@ethersproject/contracts';
 import { BigNumber } from '@ethersproject/bignumber';
 import { ethers } from 'ethers';
-import { ERC20__factory, WIMX__factory } from 'contracts/types';
 import { SwapRouter, PaymentsExtended } from '@uniswap/router-sdk';
+import { ERC20__factory, WIMX__factory } from './contracts/types';
 import { newAmount } from './lib/utils';
 import { AVERAGE_SECONDARY_FEE_EXTRA_GAS } from './constants';
 import { SecondaryFee } from './types';

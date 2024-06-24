@@ -1,4 +1,4 @@
-import { Order } from 'openapi/sdk';
+import { Order } from '../openapi/sdk';
 
 export function determineFillableUnits(order: Order, amountToFill?: string): string | undefined {
   if (order.sell[0].type === 'ERC1155' && !amountToFill) {

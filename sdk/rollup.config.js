@@ -36,52 +36,58 @@ const getFilesToBuild = () => {
   return [...files, ...returnModules];
 };
 
-const getFileBuild = (inputFilename) => [
-  {
-    input: `./src/${inputFilename}.ts`,
-    output: {
-      dir: 'dist',
-      format: 'es',
-    },
-    plugins: [
-      nodeResolve({
-        resolveOnly: getPackages(),
-      }),
-      json(),
-      commonJs(),
-      typescript({
-        declaration: true,
-        declarationDir: './dist/types',
-      }),
-      replace({
-        exclude: 'node_modules/**',
-        preventAssignment: true,
-        __SDK_VERSION__: pkg.version,
-      }),
-    ],
-  },
-  {
-    input: `./dist/types/${inputFilename}.d.ts`,
-    output: {
-      file: `./dist/${inputFilename}.d.ts`,
-      format: 'es',
-    },
-    plugins: [
-      dts({
-        respectExternal: true,
-      }),
-    ],
-    external: ['pg'] 
-  },
-];
 
 const buildBundles = () => {
-  const modules = [];
   const filesToBuild = getFilesToBuild();
-  for (const file of filesToBuild) {
-    modules.push(...getFileBuild(file));
-  }
-  return modules;
+  // generate a single object that contains all the files under input
+  const [inputs, types] = filesToBuild.reduce((acc, f) => {
+    return [
+      {...acc[0], [f] : `./src/${f}.ts`},
+      {...acc[1], [f] : `./dist/types/${f}.d.ts`},
+    ];
+  }, [{}, {}])
+
+  return [
+    {
+      input: inputs,
+      output: {
+        dir: 'dist',
+        format: 'es',
+      },
+      plugins: [
+        nodeResolve({
+          resolveOnly: getPackages(),
+        }),
+        json(),
+        commonJs(),
+        typescript({
+          declaration: true,
+          declarationDir: './dist/types',
+        }),
+        replace({
+          exclude: 'node_modules/**',
+          preventAssignment: true,
+          __SDK_VERSION__: pkg.version,
+        }),
+        terser(),
+      ],
+      external: ['pg'] 
+    },
+    {
+      input: types,
+      output: {
+        dir: 'dist',
+        format: 'es',
+      },
+      plugins: [
+        dts({
+          respectExternal: true,
+        }),
+      ],
+      external: ['pg'] 
+    },
+  ]
+
 };
 
 export default [
