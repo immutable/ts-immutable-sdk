@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Fee, Order, ProtocolData } from 'openapi/sdk';
+import { Fee, Order, ProtocolData } from '../openapi/sdk';
 import { determineFillableUnits } from './fillable-units';
 
 describe('determineFillableUnits', () => {
