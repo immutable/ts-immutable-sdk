@@ -1,4 +1,6 @@
 import { BigNumberish, BytesLike } from 'ethers';
+import { Flow } from '@imtbl/metrics';
+import { Environment } from '@imtbl/config';
 import { JsonRpcError } from './JsonRpcError';
 
 export enum RelayerTransactionStatus {
@@ -104,12 +106,21 @@ export type Provider = {
 
 export enum ProviderEvent {
   ACCOUNTS_CHANGED = 'accountsChanged',
+  ACCOUNTS_REQUESTED = 'accountRequested',
 }
 
 export type AccountsChangedEvent = Array<string>;
+export type AccountRequestedEvent = {
+  environment: Environment;
+  sendTransaction: (params: Array<any>, flow: Flow) => Promise<string>;
+  walletAddress: string;
+  passportClient: string;
+  flow?: Flow;
+};
 
 export interface ProviderEventMap extends Record<string, any> {
   [ProviderEvent.ACCOUNTS_CHANGED]: [AccountsChangedEvent];
+  [ProviderEvent.ACCOUNTS_REQUESTED]: [AccountRequestedEvent];
 }
 
 /**
@@ -133,6 +144,7 @@ export interface EIP6963ProviderInfo {
 /**
  * Event type to announce an EIP-1193 Provider.
  */
-export interface EIP6963AnnounceProviderEvent extends CustomEvent<EIP6963ProviderDetail> {
-  type: 'eip6963:announceProvider'
+export interface EIP6963AnnounceProviderEvent
+  extends CustomEvent<EIP6963ProviderDetail> {
+  type: 'eip6963:announceProvider';
 }
