@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": "./src",
     "outDir": "./dist",
     "target": "es2022",
     "lib": ["dom", "dom.iterable", "esnext"],

@@ -1,5 +1,5 @@
-import { buildBlock, expectToBeDefined, formatAmount, NATIVE_TEST_TOKEN } from 'test/utils';
 import { BigNumber, providers } from 'ethers';
+import { buildBlock, expectToBeDefined, formatAmount, NATIVE_TEST_TOKEN } from '../../test/utils';
 import { newAmount } from '../utils';
 import { IMMUTABLE_TESTNET_RPC_URL, IMMUTABLE_TESTNET_CHAIN_ID } from '../../constants/chains';
 import { calculateGasFee, fetchGasPrice } from './gas';

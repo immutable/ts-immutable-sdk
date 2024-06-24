@@ -1,5 +1,6 @@
 import { BigNumber, utils } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
+import { Pool, Route } from '@uniswap/v3-sdk';
 import {
   FUN_TEST_TOKEN,
   IMX_TEST_TOKEN,
@@ -22,8 +23,7 @@ import {
   decodeMulticallExactInputWithFees,
   decodeMulticallExactOutputWithFees,
   expectToBeString,
-} from 'test/utils';
-import { Pool, Route } from '@uniswap/v3-sdk';
+} from '../../test/utils';
 import { Fees } from '../fees';
 import { erc20ToUniswapToken, newAmount } from '../utils';
 import { QuoteResult } from '../getQuotesForRoutes';
