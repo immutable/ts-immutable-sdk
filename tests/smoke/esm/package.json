@@ -7,6 +7,6 @@
   },
   "description": "Node ESM smoke test",
   "dependencies": {
-    "@imtbl/sdk": "1.43.0"
+    "@imtbl/sdk": "file:../../../sdk"
   }
 }
