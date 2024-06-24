@@ -3,8 +3,8 @@ name: Smoke Test
 on:
   workflow_run:
     workflows: ["Build SDK"]
-    types:
-      - completed
+    # types:
+    #   - completed
   # pull_request:
   #   branches:
   #     - main
