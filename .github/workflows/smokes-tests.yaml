@@ -12,6 +12,10 @@ on:
   #   branches:
   #     - main
 
+permissions:
+  contents: read
+  actions: write
+
 jobs:
   smokeTestEsm:
     name: Smoke Test ESM
