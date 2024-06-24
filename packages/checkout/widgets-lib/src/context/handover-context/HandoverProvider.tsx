@@ -85,7 +85,6 @@ export function HandoverProvider({ children }: HandoverProviderProps) {
               ...prev,
               [handoverId]: false,
             }));
-            processQueue(handoverId, autoClose);
           }, effectiveDuration);
         } else {
           delete updatedQueue[handoverId];

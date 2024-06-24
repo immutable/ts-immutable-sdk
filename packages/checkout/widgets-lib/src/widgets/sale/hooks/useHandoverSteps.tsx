@@ -81,13 +81,14 @@ export function useHandoverSteps(environment: Environment) {
       switch (key) {
         case `${TransactionMethod.APPROVE}-${ExecuteTransactionStep.AFTER}`:
           addHandover({
+            duration: 2000,
             animationUrl: getRemoteRive(
               environment,
               getRiveAnimationName(TransactionMethod.APPROVE),
             ),
             inputValue:
               transactionRiveAnimations[TransactionMethod.APPROVE].inputValues
-                .processing,
+                .completed,
             children: (
               <Heading>
                 {t('views.PAYMENT_METHODS.handover.approve.after')}

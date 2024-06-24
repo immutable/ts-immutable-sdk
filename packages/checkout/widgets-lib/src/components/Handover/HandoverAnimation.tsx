@@ -28,19 +28,14 @@ export function HandoverAnimation({
   const input = useStateMachineInput(rive, STATE_MACHINE_NAME, INPUT_NAME);
 
   useEffect(() => {
-    if (rive) {
+    if (rive && input) {
       console.log('@@@', rive.contents);
       console.log('@@@ url', url);
       console.log('@@@ inputValue', inputValue);
 
-      if (input && input.value !== undefined) {
-        input.value = inputValue;
-      } else {
-        // eslint-disable-next-line no-console
-        console.warn('Input value does not exist or is not ready yet.');
-      }
+      input.value = inputValue;
     }
-  }, [rive, inputValue, url]);
+  }, [rive, inputValue, url, input]);
 
   return (
     <Box
