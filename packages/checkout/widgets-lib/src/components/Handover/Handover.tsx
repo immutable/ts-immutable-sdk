@@ -63,8 +63,9 @@ export function Handover({ id, children }: { id: string, children?: React.ReactN
         >
           {handover?.animationUrl && handover?.animationUrl.length > 0 && (
             <HandoverAnimation
+              key={handover.animationUrl}
               url={handover.animationUrl}
-              animationName={handover.animationName}
+              inputValue={handover.inputValue}
             />
           )}
           <Stack
