@@ -10,7 +10,7 @@ on:
 
 jobs:
   smokeTestEsm:
-    name: Build
+    name: Smoke Test ESM
     runs-on: ubuntu-latest-4-cores
     env:
       NODE_OPTIONS: --max-old-space-size=14366
