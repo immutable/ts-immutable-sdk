@@ -12,6 +12,7 @@ import { useSaleContext } from '../context/SaleContextProvider';
 import { ExecuteTransactionStep, SaleErrorTypes } from '../types';
 import { useSaleEvent } from '../hooks/useSaleEvents';
 import {
+  StateMachineInput,
   TransactionMethod,
   getRiveAnimationName,
   useHandoverSteps,
@@ -20,7 +21,7 @@ import {
 interface StepConfig {
   headingTextKey: string;
   animationUrl: string;
-  animationName: string;
+  inputValue: number;
   ctaButtonTextKey?: string;
 }
 
@@ -40,17 +41,17 @@ ExecuteNextTransactionTextsConfig
         'views.PAYMENT_METHODS.handover.approve.beforeWithCta.ctaButton',
 
       animationUrl: getRiveAnimationName(TransactionMethod.APPROVE),
-      animationName: 'Start',
+      inputValue: StateMachineInput.WAITING,
     },
     [ExecuteTransactionStep.PENDING]: {
       headingTextKey: 'views.PAYMENT_METHODS.handover.approve.pending',
       animationUrl: getRiveAnimationName(TransactionMethod.APPROVE),
-      animationName: 'Waiting',
+      inputValue: StateMachineInput.PROCESSING,
     },
     [ExecuteTransactionStep.AFTER]: {
       headingTextKey: 'views.PAYMENT_METHODS.handover.approve.after',
       animationUrl: getRiveAnimationName(TransactionMethod.APPROVE),
-      animationName: 'Processing',
+      inputValue: StateMachineInput.COMPLETED,
     },
   },
   [TransactionMethod.EXECUTE]: {
@@ -60,24 +61,24 @@ ExecuteNextTransactionTextsConfig
       ctaButtonTextKey:
         'views.PAYMENT_METHODS.handover.execute.beforeWithCta.ctaButton',
       animationUrl: getRiveAnimationName(TransactionMethod.EXECUTE),
-      animationName: 'Start',
+      inputValue: StateMachineInput.START,
     },
     [ExecuteTransactionStep.PENDING]: {
       headingTextKey: 'views.PAYMENT_METHODS.handover.execute.pending',
       animationUrl: getRiveAnimationName(TransactionMethod.EXECUTE),
-      animationName: 'Waiting',
+      inputValue: StateMachineInput.WAITING,
     },
     [ExecuteTransactionStep.AFTER]: {
       headingTextKey: 'views.PAYMENT_METHODS.handover.execute.after',
       animationUrl: getRiveAnimationName(TransactionMethod.EXECUTE),
-      animationName: 'Processing',
+      inputValue: StateMachineInput.PROCESSING,
     },
   },
 };
 
 export function PayWithCoins() {
-  const handoverAdded = useRef(false);
   const processing = useRef(false);
+  const prevTransactionIndexRef = useRef<number | null>(null);
 
   const { t } = useTranslation();
   const {
@@ -122,9 +123,7 @@ export function PayWithCoins() {
   }, [signResponse, environment]);
 
   const executeUserInitiatedTransaction = useCallback(() => {
-    if (handoverAdded.current) return;
-    handoverAdded.current = true;
-
+    console.log('@@@ executeUserInitiatedTransaction');
     const transaction = filteredTransactions[currentTransactionIndex];
 
     const config = executeNextTransactionTexts[transaction.methodCall];
@@ -137,7 +136,7 @@ export function PayWithCoins() {
     const handleTransaction = () => {
       addHandover({
         animationUrl: getRemoteRive(environment, config.pending.animationUrl),
-        animationName: config.pending.animationName,
+        inputValue: config.pending.inputValue,
         children: <Heading>{headingTextPending}</Heading>,
       });
 
@@ -162,7 +161,7 @@ export function PayWithCoins() {
 
     addHandover({
       animationUrl: getRemoteRive(environment, config.before.animationUrl),
-      animationName: config.before.animationName,
+      inputValue: config.before.inputValue,
       children: (
         <HandoverContent
           headingText={headingTextBefore}
@@ -181,10 +180,16 @@ export function PayWithCoins() {
   useEffect(() => sendPageView(SaleWidgetViews.PAY_WITH_COINS), []); // checkoutPrimarySalePayWithCoinsViewed
 
   useEffect(() => {
+    console.log('currentTransactionIndex', currentTransactionIndex);
+    console.log('filteredTransactions', filteredTransactions);
     if (!provider || filteredTransactions.length === 0) return;
 
     if (isPassportProvider(provider)) {
-      if (currentTransactionIndex < filteredTransactions.length) {
+      if (
+        currentTransactionIndex < filteredTransactions.length
+        && prevTransactionIndexRef.current !== currentTransactionIndex
+      ) {
+        prevTransactionIndexRef.current = currentTransactionIndex;
         executeUserInitiatedTransaction();
       }
     }
@@ -216,7 +221,7 @@ export function PayWithCoins() {
           environment,
           getRiveAnimationName(TransactionMethod.EXECUTE),
         ),
-        animationName: 'Completed',
+        inputValue: StateMachineInput.COMPLETED,
         children: (
           <Heading sx={{ px: 'base.spacing.x6' }}>
             {t('views.PAYMENT_METHODS.handover.success')}

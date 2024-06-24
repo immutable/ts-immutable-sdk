@@ -7,13 +7,13 @@ export interface LoadingHandoverProps {
   text: string;
   duration?: number;
   animationUrl: string;
-  animationName: string;
+  inputValue?: number;
 }
 export function LoadingHandover({
   text,
   duration,
   animationUrl,
-  animationName,
+  inputValue = 0,
 }: LoadingHandoverProps) {
   const { addHandover } = useHandover({
     id: HandoverTarget.GLOBAL,
@@ -23,7 +23,7 @@ export function LoadingHandover({
     addHandover({
       duration,
       animationUrl,
-      animationName,
+      inputValue,
       children: <Heading sx={{ px: 'base.spacing.x6' }}>{text}</Heading>,
     });
   });

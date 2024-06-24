@@ -7,36 +7,40 @@ import {
   useStateMachineInput,
 } from '@rive-app/react-canvas-lite';
 
-export function HandoverAnimation({ url, animationName }: { url: string, animationName?: string }) {
+export function HandoverAnimation({
+  url,
+  inputValue = 0,
+}: {
+  url: string;
+  inputValue?: number;
+}) {
+  const STATE_MACHINE_NAME = 'State';
+  const INPUT_NAME = 'mode';
+
   const riveParams = {
     src: url,
     autoplay: true,
     layout: new Layout({ fit: Fit.Contain }),
-    stateMachines: 'State',
+    stateMachines: STATE_MACHINE_NAME,
   };
+
   const { rive, RiveComponent } = useRive(riveParams);
-  useStateMachineInput(rive, 'State', 'mode', 0);
+  const input = useStateMachineInput(rive, STATE_MACHINE_NAME, INPUT_NAME);
 
   useEffect(() => {
     if (rive) {
-      // TODO: hook into animation complete event to auto close handover
-      // rive.on(EventType.RiveEvent, (event) => {
-      //   console.log('Handover event', event);
-      // });
-      // rive.on(EventType.Stop, (event) => {
-      //   console.log('Handover animation complete', event);
-      // });
+      console.log('@@@', rive.contents);
+      console.log('@@@ url', url);
+      console.log('@@@ inputValue', inputValue);
 
-      if (animationName) {
-        if (rive.animationNames.includes(animationName)) {
-          rive.play(animationName);
-        } else {
-          // eslint-disable-next-line no-console
-          console.warn('Handover animation not found', animationName);
-        }
+      if (input && input.value !== undefined) {
+        input.value = inputValue;
+      } else {
+        // eslint-disable-next-line no-console
+        console.warn('Input value does not exist or is not ready yet.');
       }
     }
-  }, [rive, animationName]);
+  }, [rive, inputValue, url]);
 
   return (
     <Box

@@ -55,51 +55,55 @@ export function HandoverProvider({ children }: HandoverProviderProps) {
     [setHandovers],
   );
 
-  const processQueue = useCallback((handoverId: HandoverTarget, autoClose: boolean = false) => {
-    if (handoverBusy[handoverId as HandoverTarget]) return;
+  const processQueue = useCallback(
+    (handoverId: HandoverTarget, autoClose: boolean = false) => {
+      if (handoverBusy[handoverId as HandoverTarget]) return;
 
-    const updatedQueue = { ...handoverQueue };
-    const queuedContent = updatedQueue[handoverId] ?? [];
-    if (queuedContent.length > 0) {
-      const nextHandoverContent = queuedContent.shift();
+      const updatedQueue = { ...handoverQueue };
+      const queuedContent = updatedQueue[handoverId] ?? [];
+      if (queuedContent.length > 0) {
+        const nextHandoverContent = queuedContent.shift();
 
-      // Use the next handover content from the queue
-      if (nextHandoverContent) {
-        setHandovers((prev) => ({
-          ...prev,
-          [handoverId]: nextHandoverContent,
-        }));
+        // Use the next handover content from the queue
+        if (nextHandoverContent) {
+          setHandovers((prev) => ({
+            ...prev,
+            [handoverId]: nextHandoverContent,
+          }));
 
-        // Allow for fixed duration handover content
-        const contentDuration = nextHandoverContent.duration ?? 0;
-        const effectiveDuration = Math.max(contentDuration, MINIMUM_DURATION);
+          // Allow for fixed duration handover content
+          const contentDuration = nextHandoverContent.duration ?? 0;
+          const effectiveDuration = Math.max(contentDuration, MINIMUM_DURATION);
 
-        setHandoverBusy((prev) => ({
-          ...prev,
-          [handoverId]: true,
-        }));
-        setTimeout(() => {
-          // Mark as not busy so it can be shuffled as required
           setHandoverBusy((prev) => ({
             ...prev,
-            [handoverId]: false,
+            [handoverId]: true,
           }));
-        }, effectiveDuration);
+          setTimeout(() => {
+            // Mark as not busy so it can be shuffled as required
+            setHandoverBusy((prev) => ({
+              ...prev,
+              [handoverId]: false,
+            }));
+            processQueue(handoverId, autoClose);
+          }, effectiveDuration);
+        } else {
+          delete updatedQueue[handoverId];
+          if (autoClose) {
+            closeHandover(handoverId);
+          }
+          setHandoverQueue(updatedQueue);
+        }
       } else {
-        delete updatedQueue[handoverId];
-        if (autoClose) {
+        // If the queue is empty and the current handover has a duration, safe to close
+        const currentHandover = handovers[handoverId];
+        if (currentHandover?.duration && currentHandover.duration > 0) {
           closeHandover(handoverId);
         }
-        setHandoverQueue(updatedQueue);
       }
-    } else {
-      // If the queue is empty and the current handover has a duration, safe to close
-      const currentHandover = handovers[handoverId];
-      if (currentHandover?.duration && currentHandover.duration > 0) {
-        closeHandover(handoverId);
-      }
-    }
-  }, [handoverQueue, handoverBusy, handovers]);
+    },
+    [handoverQueue, handoverBusy, handovers, closeHandover],
+  );
 
   const addHandover = (
     handoverContent: HandoverContent,

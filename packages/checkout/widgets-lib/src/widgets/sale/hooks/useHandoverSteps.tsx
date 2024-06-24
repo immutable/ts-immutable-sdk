@@ -13,15 +13,60 @@ export enum TransactionMethod {
   EXECUTE = 'execute(address multicallSigner, bytes32 reference, address[] targets, bytes[] data, uint256 deadline, bytes signature)',
 }
 
+type TransactionRiveAnimationsConfig = {
+  url: string;
+  stateMachine: string;
+  input: string;
+  inputValues: Record<string, StateMachineInput>;
+};
+
 export const getRiveAnimationName = (transactionMethod: TransactionMethod) => {
   switch (transactionMethod) {
     case TransactionMethod.APPROVE:
-      return '/access-coins.riv';
+      return '/access_coins.riv';
     case TransactionMethod.EXECUTE:
-      return '/purchasing-items.riv';
+      return '/purchasing_items.riv';
     default:
       return '';
   }
+};
+
+export enum StateMachineInput {
+  START = 0,
+  WAITING = 1,
+  PROCESSING = 2,
+  COMPLETED = 3,
+  ERROR = 4,
+}
+
+export const transactionRiveAnimations: Record<
+TransactionMethod,
+TransactionRiveAnimationsConfig
+> = {
+  [TransactionMethod.APPROVE]: {
+    url: getRiveAnimationName(TransactionMethod.APPROVE),
+    stateMachine: 'State',
+    input: 'mode',
+    inputValues: {
+      start: StateMachineInput.START,
+      waiting: StateMachineInput.WAITING,
+      processing: StateMachineInput.PROCESSING,
+      completed: StateMachineInput.COMPLETED,
+      error: StateMachineInput.ERROR,
+    },
+  },
+  [TransactionMethod.EXECUTE]: {
+    url: getRiveAnimationName(TransactionMethod.EXECUTE),
+    stateMachine: 'State',
+    input: 'mode',
+    inputValues: {
+      start: StateMachineInput.START,
+      waiting: StateMachineInput.WAITING,
+      processing: StateMachineInput.PROCESSING,
+      completed: StateMachineInput.COMPLETED,
+      error: StateMachineInput.ERROR,
+    },
+  },
 };
 
 export function useHandoverSteps(environment: Environment) {
@@ -40,7 +85,9 @@ export function useHandoverSteps(environment: Environment) {
               environment,
               getRiveAnimationName(TransactionMethod.APPROVE),
             ),
-            animationName: 'Processing',
+            inputValue:
+              transactionRiveAnimations[TransactionMethod.APPROVE].inputValues
+                .processing,
             children: (
               <Heading>
                 {t('views.PAYMENT_METHODS.handover.approve.after')}
@@ -55,7 +102,9 @@ export function useHandoverSteps(environment: Environment) {
               environment,
               getRiveAnimationName(TransactionMethod.EXECUTE),
             ),
-            animationName: 'Processing',
+            inputValue:
+              transactionRiveAnimations[TransactionMethod.EXECUTE].inputValues
+                .processing,
             children: (
               <Heading>
                 {t('views.PAYMENT_METHODS.handover.execute.after')}
@@ -80,7 +129,9 @@ export function useHandoverSteps(environment: Environment) {
               environment,
               getRiveAnimationName(TransactionMethod.APPROVE),
             ),
-            animationName: 'Processing',
+            inputValue:
+              transactionRiveAnimations[TransactionMethod.APPROVE].inputValues
+                .processing,
             children: (
               <Heading>
                 {t('views.PAYMENT_METHODS.handover.approve.before')}
@@ -94,7 +145,9 @@ export function useHandoverSteps(environment: Environment) {
               environment,
               getRiveAnimationName(TransactionMethod.APPROVE),
             ),
-            animationName: 'Processing',
+            inputValue:
+              transactionRiveAnimations[TransactionMethod.APPROVE].inputValues
+                .processing,
             children: (
               <Heading>
                 {t('views.PAYMENT_METHODS.handover.approve.after')}
@@ -108,7 +161,9 @@ export function useHandoverSteps(environment: Environment) {
               environment,
               getRiveAnimationName(TransactionMethod.EXECUTE),
             ),
-            animationName: 'Processing',
+            inputValue:
+              transactionRiveAnimations[TransactionMethod.EXECUTE].inputValues
+                .processing,
             children: (
               <Heading>
                 {t('views.PAYMENT_METHODS.handover.execute.before')}
@@ -124,7 +179,9 @@ export function useHandoverSteps(environment: Environment) {
               environment,
               getRiveAnimationName(TransactionMethod.EXECUTE),
             ),
-            animationName: 'Processing',
+            inputValue:
+              transactionRiveAnimations[TransactionMethod.EXECUTE].inputValues
+                .processing,
             children: (
               <Heading>
                 {t('views.PAYMENT_METHODS.handover.execute.after')}

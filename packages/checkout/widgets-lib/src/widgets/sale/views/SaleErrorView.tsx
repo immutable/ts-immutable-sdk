@@ -16,6 +16,7 @@ import { sendSaleWidgetCloseEvent } from '../SaleWidgetEvents';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { useSaleEvent } from '../hooks/useSaleEvents';
 import {
+  StateMachineInput,
   TransactionMethod,
   getRiveAnimationName,
   useHandoverSteps,
@@ -233,9 +234,9 @@ export function SaleErrorView({
       addHandover({
         animationUrl: getRemoteRive(
           environment,
-          getRiveAnimationName(TransactionMethod.EXECUTE),
+          getRiveAnimationName(TransactionMethod.APPROVE),
         ),
-        animationName: 'Start',
+        inputValue: StateMachineInput.ERROR,
         children: <HandoverContent {...getErrorViewProps()} />,
       });
     },

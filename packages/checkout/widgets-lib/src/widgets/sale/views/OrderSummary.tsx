@@ -34,6 +34,7 @@ import { LoadingHandover } from './LoadingHandover';
 import {
   TransactionMethod,
   getRiveAnimationName,
+  transactionRiveAnimations,
 } from '../hooks/useHandoverSteps';
 
 type OrderSummaryProps = {
@@ -84,7 +85,8 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
         environment,
         getRiveAnimationName(TransactionMethod.APPROVE),
       ),
-      animationName: 'Start',
+      inputValue:
+        transactionRiveAnimations[TransactionMethod.APPROVE].inputValues.start,
       children: (
         <Heading sx={{ px: 'base.spacing.x6' }}>
           {t('views.PAYMENT_METHODS.handover.initial')}
@@ -206,11 +208,8 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
       {subView === OrderSummarySubViews.INIT && (
         <LoadingHandover
           text={t('views.ORDER_SUMMARY.loading.balances')}
-          animationUrl={getRemoteRive(
-            environment,
-            getRiveAnimationName(TransactionMethod.APPROVE),
-          )}
-          animationName="Processing"
+          animationUrl={getRemoteRive(environment, '/preparing_order.riv')}
+          inputValue={0}
         />
       )}
       {subView === OrderSummarySubViews.REVIEW_ORDER && (
