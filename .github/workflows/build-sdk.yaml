@@ -1,0 +1,33 @@
+name: Build SDK
+
+on:
+  pull_request:
+  merge_group:
+
+jobs:
+  buildCacheSdk:
+    name: Build and Cache SDK
+    runs-on: ubuntu-latest-4-cores
+    env:
+      NODE_OPTIONS: --max-old-space-size=14366
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: ".nvmrc"
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Build
+        run: yarn build
+
+      - name: Cache build artifacts
+        uses: actions/cache@v2
+        with:
+          path: ./sdk
+          key: ${{ runner.os }}-build-${{ github.sha }}

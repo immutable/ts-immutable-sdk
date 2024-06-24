@@ -1,12 +1,16 @@
 name: Smoke Test
 
 on:
-  pull_request:
-    branches:
-      - main
-  merge_group:
-    branches:
-      - main
+  workflow_run:
+    workflows: ["Build SDK"]
+    types:
+      - completed
+  # pull_request:
+  #   branches:
+  #     - main
+  # merge_group:
+  #   branches:
+  #     - main
 
 jobs:
   smokeTestEsm:
@@ -25,11 +29,17 @@ jobs:
           registry-url: https://registry.npmjs.org/
           cache: "yarn"
 
-      - name: Install root dependencies
-        run: yarn install --immutable
+      - name: Restore build artifacts cache
+        uses: actions/cache@v2
+        with:
+          path: ./sdk/dist
+          key: ${{ runner.os }}-build-${{ github.sha }}
 
-      - name: Build
-        run: yarn build
+      # - name: Install root dependencies
+      #   run: yarn install --immutable
+
+      # - name: Build
+      #   run: yarn build
 
       - name: Install functional tests dependencies
         run: cd tests/smoke/esm && yarn install --no-immutable
