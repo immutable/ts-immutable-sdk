@@ -1,12 +1,17 @@
 name: Smoke Test
 
 on:
-  pull_request:
-    branches:
-      - main
-  merge_group:
-    branches:
-      - main
+  # trigger when "Build and Cache SDK" workflow completes
+  workflow_run:
+    workflows: ["Build and Cache SDK"]
+    types:
+      - completed
+  # pull_request:
+  #   branches:
+  #     - main
+  # merge_group:
+  #   branches:
+  #     - main
 
 jobs:
   smokeTestEsm:
@@ -25,10 +30,28 @@ jobs:
           registry-url: https://registry.npmjs.org/
           cache: "yarn"
 
+      - name: Restore cached node_module artifacts
+        id: restore-deps
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
+
       - name: Install root dependencies
+        if: steps.restore-deps.outputs.cache-hit != 'true'
         run: yarn install --immutable
 
+      - name: Restore build artifacts
+        id: restore-build
+        uses: actions/cache@v2
+        with:
+          path: |
+            ./sdk
+            ./packages
+          key: ${{ runner.os }}-build-cache-${{ github.sha }}
+
       - name: Build
+        if: steps.restore-build.outputs.cache-hit != 'true'
         run: yarn build
 
       - name: Install functional tests dependencies
