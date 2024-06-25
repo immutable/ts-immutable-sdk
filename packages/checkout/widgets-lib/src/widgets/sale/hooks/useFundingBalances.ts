@@ -1,6 +1,6 @@
 import { useContext, useRef, useState } from 'react';
 import { TransactionRequirement } from '@imtbl/checkout-sdk';
-import { CryptoFiatContext } from 'context/crypto-fiat-context/CryptoFiatContext';
+import { CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { fetchFundingBalances } from '../functions/fetchFundingBalances';
 import { FundingBalance, FundingBalanceResult } from '../types';
 import { useSaleContext } from '../context/SaleContextProvider';

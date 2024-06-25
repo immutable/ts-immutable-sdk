@@ -9,8 +9,8 @@ import {
 import { useTranslation } from 'react-i18next';
 import {
   calculateCryptoToFiat, tokenValueFormat,
-} from 'lib/utils';
-import { TokenImage } from 'components/TokenImage/TokenImage';
+} from '../../../lib/utils';
+import { TokenImage } from '../../../components/TokenImage/TokenImage';
 import { FundingBalance } from '../types';
 import { useSaleContext } from '../context/SaleContextProvider';
 

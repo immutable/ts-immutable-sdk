@@ -1,5 +1,5 @@
 import { FundingItem, SalePaymentToken } from '@imtbl/checkout-sdk';
-import { calculateCryptoToFiat } from 'lib/utils';
+import { calculateCryptoToFiat } from '../../../lib/utils';
 
 export const getPaymentTokenDetails = (
   fundingItem: FundingItem,

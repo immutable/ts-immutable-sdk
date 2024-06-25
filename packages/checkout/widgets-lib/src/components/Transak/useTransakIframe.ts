@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Environment } from '@imtbl/config';
 
-import { sanitizeToLatin1 } from 'widgets/sale/functions/utils';
+import { sanitizeToLatin1 } from '../../widgets/sale/functions/utils';
 import { TransakNFTData } from './TransakTypes';
 
 export type TransakWidgetType = 'on-ramp' | 'nft-checkout';

@@ -1,7 +1,7 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import axios from 'axios';
-import { CryptoFiatConfiguration } from 'config';
-import { CryptoFiatConvertParams, CryptoFiatConvertReturn } from 'types';
+import { CryptoFiatConfiguration } from './config';
+import { CryptoFiatConvertParams, CryptoFiatConvertReturn } from './types';
 
 const CHECKOUT_API_BASE_URL = {
   [Environment.SANDBOX]: 'https://checkout-api.sandbox.immutable.com',

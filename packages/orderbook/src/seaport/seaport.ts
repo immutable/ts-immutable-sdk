@@ -9,7 +9,7 @@ import type {
   OrderUseCase,
 } from '@opensea/seaport-js/lib/types';
 import { providers } from 'ethers';
-import { mapFromOpenApiOrder } from 'openapi/mapper';
+import { mapFromOpenApiOrder } from '../openapi/mapper';
 import {
   Action,
   ActionType,
@@ -45,7 +45,7 @@ export class Seaport {
     private seaportContractAddress: string,
     private zoneContractAddress: string,
     private rateLimitingKey?: string,
-  ) {}
+  ) { }
 
   async prepareBulkSeaportOrders(
     offerer: string,

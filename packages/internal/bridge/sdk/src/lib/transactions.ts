@@ -1,6 +1,6 @@
-import { NATIVE } from 'constants/bridges';
-import { withBridgeError, BridgeErrorType } from 'errors';
 import { BigNumber, Contract, utils } from 'ethers';
+import { NATIVE } from '../constants/bridges';
+import { withBridgeError, BridgeErrorType } from '../errors';
 
 /**
  * @param sender Bridge depositer/withdrawer

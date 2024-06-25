@@ -1,15 +1,8 @@
 import { Box, Heading } from '@biom3/react';
 import { useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  SharedViews,
-  ViewActions,
-  ViewContext,
-} from 'context/view-context/ViewContext';
 import { SalePaymentTypes } from '@imtbl/checkout-sdk';
-import { getRemoteRive } from 'lib/utils';
-import { useHandover } from 'lib/hooks/useHandover';
-import { HandoverTarget } from 'context/handover-context/HandoverContext';
+
 import {
   OrderSummarySubViews,
   SaleWidgetViews,
@@ -36,6 +29,10 @@ import {
   getRiveAnimationName,
   transactionRiveAnimations,
 } from '../hooks/useHandoverSteps';
+import { HandoverTarget } from '../../../context/handover-context/HandoverContext';
+import { ViewContext, ViewActions, SharedViews } from '../../../context/view-context/ViewContext';
+import { useHandover } from '../../../lib/hooks/useHandover';
+import { getRemoteRive } from '../../../lib/utils';
 
 type OrderSummaryProps = {
   subView: OrderSummarySubViews;

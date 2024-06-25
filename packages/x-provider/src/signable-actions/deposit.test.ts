@@ -1,6 +1,6 @@
 import { TokenAmount } from '@imtbl/x-client';
-import { ProviderConfiguration } from 'config';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
+import { ProviderConfiguration } from '../config';
 import { deposit } from './deposit';
 import * as depositActions from './deposit-actions';
 import { Signers } from './types';

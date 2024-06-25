@@ -2,15 +2,15 @@ import {
   Box, Button, EllipsizedText, FramedImage, Logo,
 } from '@biom3/react';
 import { useContext, useEffect, useState } from 'react';
-import { BridgeContext } from 'widgets/bridge/context/BridgeContext';
-import { isWalletConnectProvider } from 'lib/provider';
+import { useTranslation } from 'react-i18next';
+import { BridgeContext } from '../../widgets/bridge/context/BridgeContext';
+import { isWalletConnectProvider } from '../../lib/provider';
 import {
   UserJourney,
   useAnalytics,
-} from 'context/analytics-provider/SegmentAnalyticsProvider';
-import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
-import { useTranslation } from 'react-i18next';
-import { useWalletConnect } from 'lib/hooks/useWalletConnect';
+} from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
+import { useWalletConnect } from '../../lib/hooks/useWalletConnect';
 import {
   headingStyles, rawImageStyle, wcStickerLogoStyles, wcWalletLogoStyles, wcWalletLogoWrapperStyles,
 } from './ChangeWalletStyles';

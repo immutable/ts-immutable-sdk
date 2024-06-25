@@ -8,14 +8,14 @@ import {
   tenderlyAPIEndpoints,
   childWIMXs,
   NATIVE,
-} from 'constants/bridges';
+} from '../constants/bridges';
 import {
   BridgeDirection,
   BridgeFeeActions, BridgeFeeRequest, BridgeInstance, FungibleToken,
-} from 'types';
+} from '../types';
 
-function getAddresses(source:string, addresses:Record<string, string>) {
-  let address:string;
+function getAddresses(source: string, addresses: Record<string, string>) {
+  let address: string;
   if (source === ETH_MAINNET_TO_ZKEVM_MAINNET.rootChainID
     || source === ETH_MAINNET_TO_ZKEVM_MAINNET.childChainID) {
     address = addresses.mainnet;
@@ -60,11 +60,11 @@ export function getAxelarGateway(source: string) {
   return getAddresses(source, axelarGateways);
 }
 
-export function getAxelarEndpoint(source:string) {
+export function getAxelarEndpoint(source: string) {
   return getAddresses(source, axelarAPIEndpoints);
 }
 
-export function getTenderlyEndpoint(source:string) {
+export function getTenderlyEndpoint(source: string) {
   return getAddresses(source, tenderlyAPIEndpoints);
 }
 

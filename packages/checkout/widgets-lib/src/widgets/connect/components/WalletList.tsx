@@ -18,8 +18,8 @@ import {
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Web3Provider } from '@ethersproject/providers';
-import { UnableToConnectDrawer } from 'components/UnableToConnectDrawer/UnableToConnectDrawer';
-import { ChangedYourMindDrawer } from 'components/ChangedYourMindDrawer/ChangedYourMindDrawer';
+import { UnableToConnectDrawer } from '../../../components/UnableToConnectDrawer/UnableToConnectDrawer';
+import { ChangedYourMindDrawer } from '../../../components/ChangedYourMindDrawer/ChangedYourMindDrawer';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { ConnectActions, ConnectContext } from '../context/ConnectContext';
 import { WalletItem } from './WalletItem';

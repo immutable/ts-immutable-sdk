@@ -1,43 +1,43 @@
-import { HeaderNavigation } from 'components/Header/HeaderNavigation';
-import { SimpleLayout } from 'components/SimpleLayout/SimpleLayout';
-import { FooterLogo } from 'components/Footer/FooterLogo';
 import {
   useCallback, useContext, useEffect, useMemo, useState,
 } from 'react';
-import { EventTargetContext } from 'context/event-target-context/EventTargetContext';
 import { Box } from '@biom3/react';
-import {
-  connectToProvider,
-  isPassportProvider,
-} from 'lib/provider';
 import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import {
   TokenFilterTypes,
   TokenInfo, WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
+import { Environment } from '@imtbl/config';
+import { useTranslation } from 'react-i18next';
+import { HeaderNavigation } from '../Header/HeaderNavigation';
+import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
+import { FooterLogo } from '../Footer/FooterLogo';
+import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
+import {
+  connectToProvider,
+  isPassportProvider,
+} from '../../lib/provider';
 import {
   DEFAULT_TRANSACTIONS_RETRY_POLICY,
   getL1ChainId,
   getL2ChainId,
-} from 'lib';
-import { CheckoutApi, Transaction, TransactionType } from 'lib/clients';
-import { Environment } from '@imtbl/config';
-import { retry } from 'lib/retry';
-import { getChainSlugById } from 'lib/chains';
+} from '../../lib';
+import { CheckoutApi, Transaction, TransactionType } from '../../lib/clients';
+import { retry } from '../../lib/retry';
+import { getChainSlugById } from '../../lib/chains';
 import {
   CryptoFiatActions,
   CryptoFiatContext,
-} from 'context/crypto-fiat-context/CryptoFiatContext';
+} from '../../context/crypto-fiat-context/CryptoFiatContext';
 import {
   UserJourney,
   useAnalytics,
-} from 'context/analytics-provider/SegmentAnalyticsProvider';
-import { useTranslation } from 'react-i18next';
+} from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import {
   BridgeActions,
   BridgeContext,
-} from 'widgets/bridge/context/BridgeContext';
-import { WalletDrawer } from 'components/WalletDrawer/WalletDrawer';
+} from '../../widgets/bridge/context/BridgeContext';
+import { WalletDrawer } from '../WalletDrawer/WalletDrawer';
 import { sendBridgeWidgetCloseEvent } from '../../widgets/bridge/BridgeWidgetEvents';
 import { Shimmer } from './Shimmer';
 import {

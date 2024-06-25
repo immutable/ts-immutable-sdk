@@ -1,15 +1,14 @@
 import { Trade, toHex, encodeRouteToPath, Route } from '@uniswap/v3-sdk';
 import { PaymentsExtended, SwapRouter } from '@uniswap/router-sdk';
 import * as Uniswap from '@uniswap/sdk-core';
-import { Fees } from 'lib/fees';
-import { isNative, toCurrencyAmount, toPublicAmount } from 'lib/utils';
-import { QuoteResult } from 'lib/getQuotesForRoutes';
-import { NativeTokenService, canUnwrapToken } from 'lib/nativeTokenService';
-import { Coin, CoinAmount, Native } from 'types';
-import { IImmutableSwapProxy, ImmutableSwapProxyInterface } from 'contracts/types/ImmutableSwapProxy';
-import { ImmutableSwapProxy__factory } from 'contracts/types';
 import { utils } from 'ethers';
-import { SecondaryFee, TransactionDetails } from '../../types';
+import { Fees } from '../fees';
+import { isNative, toCurrencyAmount, toPublicAmount } from '../utils';
+import { QuoteResult } from '../getQuotesForRoutes';
+import { NativeTokenService, canUnwrapToken } from '../nativeTokenService';
+import { Coin, CoinAmount, Native, SecondaryFee, TransactionDetails } from '../../types';
+import { IImmutableSwapProxy, ImmutableSwapProxyInterface } from '../../contracts/types/ImmutableSwapProxy';
+import { ImmutableSwapProxy__factory } from '../../contracts/types';
 import { calculateGasFee } from './gas';
 import { slippageToFraction } from './slippage';
 

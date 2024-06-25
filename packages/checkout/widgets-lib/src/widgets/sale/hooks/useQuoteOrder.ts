@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Environment } from '@imtbl/config';
 import { SaleItem } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
-import { compareStr } from 'lib/utils';
+import { compareStr } from '../../../lib/utils';
 import { PRIMARY_SALES_API_BASE_URL } from '../utils/config';
 
 import { OrderQuote, OrderQuoteCurrency, SaleErrorTypes } from '../types';

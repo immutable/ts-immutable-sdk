@@ -1,7 +1,7 @@
 import { BigNumber, ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
 import { Pool, Route } from '@uniswap/v3-sdk';
-import { Fees } from 'lib/fees';
+import { Fees } from '../fees';
 import {
   newAmountFromString,
   expectERC20,
@@ -11,9 +11,9 @@ import {
   makeAddr,
   WIMX_TEST_TOKEN,
   expectNative,
-} from 'test/utils';
-import { QuoteResult } from 'lib/getQuotesForRoutes';
-import { erc20ToUniswapToken } from 'lib/utils';
+} from '../../test/utils';
+import { QuoteResult } from '../getQuotesForRoutes';
+import { erc20ToUniswapToken } from '../utils';
 import { applySlippage, getOurQuoteReqAmount, prepareUserQuote } from './getQuote';
 
 const DEFAULT_SLIPPAGE = 0.1;

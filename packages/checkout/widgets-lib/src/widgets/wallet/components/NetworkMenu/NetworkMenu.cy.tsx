@@ -6,7 +6,7 @@ import {
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
-import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
+import { ViewContextTestComponent } from '../../../../context/view-context/test-components/ViewContextTestComponent';
 import { WalletContext, WalletState } from '../../context/WalletContext';
 import { cyIntercept, cySmartGet } from '../../../../lib/testUtils';
 import { NetworkMenu } from './NetworkMenu';

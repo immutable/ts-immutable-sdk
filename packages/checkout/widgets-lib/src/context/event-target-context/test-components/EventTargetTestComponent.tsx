@@ -1,5 +1,5 @@
 import React, { useMemo, useReducer } from 'react';
-import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
+import { ViewContextTestComponent } from '../../view-context/test-components/ViewContextTestComponent';
 import {
   EventTargetState,
   initialEventTargetState,

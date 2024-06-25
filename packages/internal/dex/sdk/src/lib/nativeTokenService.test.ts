@@ -5,7 +5,7 @@ import {
   FUN_TEST_TOKEN,
   nativeTokenService,
   newAmountFromString,
-} from 'test/utils';
+} from '../test/utils';
 import { canUnwrapToken } from './nativeTokenService';
 
 describe('NativeTokenService', () => {

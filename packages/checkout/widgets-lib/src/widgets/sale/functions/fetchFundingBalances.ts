@@ -1,7 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { Checkout, TransactionRequirement } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
-import { compareStr } from 'lib/utils';
+import { compareStr } from '../../../lib/utils';
 import {
   OrderQuoteCurrency,
   FundingBalance,

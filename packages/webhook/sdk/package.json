@@ -25,6 +25,9 @@
     "typechain": "^8.1.1",
     "typescript": "^4.9.5"
   },
+  "files": [
+    "dist"
+  ],
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
   "license": "Apache-2.0",
   "main": "dist/index.js",
@@ -39,9 +42,6 @@
     "test:e2e": "jest --runInBand --testMatch \"**/?(*.)+(e2e).[jt]s?(x)\"",
     "typecheck": "tsc --noEmit --jsx preserve"
   },
-  "files": [
-    "dist"
-  ],
   "type": "module",
   "types": "dist/index.d.ts"
 }

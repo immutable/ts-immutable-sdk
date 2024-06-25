@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Environment } from '@imtbl/config';
-import { getDefaultTokenImage } from 'lib/utils';
 import { WidgetTheme } from '@imtbl/checkout-sdk';
+import { getDefaultTokenImage } from '../../lib/utils';
 
 type ImageProps = {
   name?: string;

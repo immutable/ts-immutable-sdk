@@ -1,6 +1,6 @@
 import { mount } from 'cypress/react18';
 import { describe } from 'local-cypress';
-import { ViewContextTestComponent } from 'context/view-context/test-components/ViewContextTestComponent';
+import { ViewContextTestComponent } from '../../../context/view-context/test-components/ViewContextTestComponent';
 import { cySmartGet } from '../../../lib/testUtils';
 import { TextInputForm } from './TextInputForm';
 

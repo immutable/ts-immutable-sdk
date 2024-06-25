@@ -7,14 +7,14 @@ import {
   Icon,
   MenuItem,
 } from '@biom3/react';
-import { UserJourney, useAnalytics } from 'context/analytics-provider/SegmentAnalyticsProvider';
-import { Transaction, TransactionStatus } from 'lib/clients/checkoutApiType';
 import { useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BridgeWidgetViews } from 'context/view-context/BridgeViewContextTypes';
-import { ViewActions, ViewContext } from 'context/view-context/ViewContext';
-import { TokenImage } from 'components/TokenImage/TokenImage';
 import { Environment } from '@imtbl/config';
+import { UserJourney, useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { Transaction, TransactionStatus } from '../../lib/clients/checkoutApiType';
+import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
+import { ViewActions, ViewContext } from '../../context/view-context/ViewContext';
+import { TokenImage } from '../TokenImage/TokenImage';
 import { actionsContainerStyles, actionsLayoutStyles, containerStyles } from './transactionItemStyles';
 import { TransactionDetails } from './TransactionDetails';
 

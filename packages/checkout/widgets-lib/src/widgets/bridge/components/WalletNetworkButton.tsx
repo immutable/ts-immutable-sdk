@@ -2,11 +2,11 @@ import {
   Body, Box, Button, FramedImage, Heading, Logo,
 } from '@biom3/react';
 import { ChainId, EIP6963ProviderDetail, WalletProviderRdns } from '@imtbl/checkout-sdk';
-import { getChainNameById } from 'lib/chains';
-import { Web3Provider } from '@ethersproject/providers';
 import { useEffect, useMemo, useState } from 'react';
-import { useWalletConnect } from 'lib/hooks/useWalletConnect';
 import { Environment } from '@imtbl/config';
+import { Web3Provider } from '@ethersproject/providers';
+import { getChainNameById } from '../../../lib/chains';
+import { useWalletConnect } from '../../../lib/hooks/useWalletConnect';
 import {
   networkButtonStyles,
   walletButtonOuterStyles,
