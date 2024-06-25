@@ -1,11 +1,12 @@
 import { useCallback } from 'react';
-import { getRemoteRive } from 'lib/utils';
-import { useHandover } from 'lib/hooks/useHandover';
+
 import { useTranslation } from 'react-i18next';
-import { HandoverTarget } from 'context/handover-context/HandoverContext';
 import { Heading } from '@biom3/react';
 import { Environment } from '@imtbl/config';
 import { ExecuteTransactionStep } from '../types';
+import { useHandover } from '../../../lib/hooks/useHandover';
+import { HandoverTarget } from '../../../context/handover-context/HandoverContext';
+import { getRemoteRive } from '../../../lib/utils';
 
 export enum TransactionMethod {
   APPROVE = 'approve(address spender,uint256 amount)',

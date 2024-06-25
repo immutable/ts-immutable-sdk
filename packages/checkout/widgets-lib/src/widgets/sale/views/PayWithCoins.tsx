@@ -1,12 +1,6 @@
-import { useHandover } from 'lib/hooks/useHandover';
-import { HandoverTarget } from 'context/handover-context/HandoverContext';
 import { useTranslation } from 'react-i18next';
 import { useCallback, useEffect, useRef } from 'react';
-import { getRemoteRive } from 'lib/utils';
 import { Heading } from '@biom3/react';
-import { SaleWidgetViews } from 'context/view-context/SaleViewContextTypes';
-import { isPassportProvider } from 'lib/provider';
-import { HandoverContent } from 'components/Handover/HandoverContent';
 
 import { useSaleContext } from '../context/SaleContextProvider';
 import { ExecuteTransactionStep, SaleErrorTypes } from '../types';
@@ -17,6 +11,12 @@ import {
   getRiveAnimationName,
   useHandoverSteps,
 } from '../hooks/useHandoverSteps';
+import { useHandover } from '../../../lib/hooks/useHandover';
+import { HandoverTarget } from '../../../context/handover-context/HandoverContext';
+import { HandoverContent } from '../../../components/Handover/HandoverContent';
+import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
+import { isPassportProvider } from '../../../lib/provider';
+import { getRemoteRive } from '../../../lib/utils';
 
 interface StepConfig {
   headingTextKey: string;

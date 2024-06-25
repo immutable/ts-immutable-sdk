@@ -1,7 +1,7 @@
 import { Heading } from '@biom3/react';
-import { useHandover } from 'lib/hooks/useHandover';
-import { HandoverTarget } from 'context/handover-context/HandoverContext';
-import { useMount } from 'hooks/useMount';
+import { useHandover } from '../../../lib/hooks/useHandover';
+import { HandoverTarget } from '../../../context/handover-context/HandoverContext';
+import { useMount } from '../../../hooks/useMount';
 
 export interface LoadingHandoverProps {
   text: string;
