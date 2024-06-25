@@ -226,7 +226,7 @@ export const signERC191Message = async (
   walletAddress: string,
 ): Promise<string> => {
   // Generate digest
-  const digest = utils.keccak256(utils.toUtf8Bytes(payload));
+  const digest = utils.hashMessage(payload);
 
   // Generate subDigest
   const subDigest = encodeMessageSubDigest(chainId, walletAddress, digest);

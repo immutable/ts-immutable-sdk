@@ -1,11 +1,6 @@
 import { Provider } from '@imtbl/passport';
-import { ethers } from 'ethers';
+import { utils } from 'ethers';
 import { isValidSignature } from '@/components/zkevm/SignatureValidation/utils';
-
-const encodeMessageDigest = (payload: string) => {
-  const hash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(payload));
-  return ethers.utils.arrayify(hash);
-};
 
 export const isValidERC191Signature = async (
   address: string,
@@ -13,6 +8,7 @@ export const isValidERC191Signature = async (
   signature: string,
   zkEvmProvider: Provider,
 ) => {
-  const digest = encodeMessageDigest(payload);
+  const digest = utils.hashMessage(payload);
+
   return isValidSignature(address, digest, signature, zkEvmProvider);
 };
