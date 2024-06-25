@@ -29,13 +29,13 @@ jobs:
           path: node_modules
           key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
 
-      - name: Build
-        run: yarn build
+      # - name: Build
+      #   run: yarn build
 
-      - name: Cache build artifacts
-        uses: actions/cache@v2
-        with:
-          path: |
-            ./sdk
-            ./packages
-          key: ${{ runner.os }}-build-cache-${{ github.sha }}
+      # - name: Cache build artifacts
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: |
+      #       ./sdk
+      #       ./packages
+      #     key: ${{ runner.os }}-build-cache-${{ github.sha }}
