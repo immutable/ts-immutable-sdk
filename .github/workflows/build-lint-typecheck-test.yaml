@@ -71,7 +71,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: ${{ runner.os }}-node-modules-
 
       - name: Restore cached build artifacts
@@ -103,7 +103,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: ${{ runner.os }}-node-modules-
 
       - name: Restore cached build artifacts
@@ -137,7 +137,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: ${{ runner.os }}-node-modules-
 
       - name: Restore cached build artifacts
@@ -186,7 +186,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: ${{ runner.os }}-node-modules-
 
       - name: Get reviewing teams
@@ -239,7 +239,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: ${{ runner.os }}-node-modules-
 
       - name: Lint
