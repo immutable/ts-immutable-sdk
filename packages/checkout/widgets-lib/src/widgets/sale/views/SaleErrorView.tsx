@@ -1,14 +1,7 @@
 import { BaseTokens } from '@biom3/design-tokens';
 import { useContext } from 'react';
 import { useTranslation } from 'react-i18next';
-import { HandoverTarget } from 'context/handover-context/HandoverContext';
-import { useHandover } from 'lib/hooks/useHandover';
-import { HandoverContent } from 'components/Handover/HandoverContent';
-import { getRemoteRive } from 'lib/utils';
-import { ViewActions, ViewContext } from 'context/view-context/ViewContext';
-import { SaleWidgetViews } from 'context/view-context/SaleViewContextTypes';
-import { isPassportProvider } from 'lib/provider';
-import { useMount } from 'hooks/useMount';
+
 import { StatusType } from '../../../components/Status/StatusType';
 import { SaleErrorTypes } from '../types';
 import { useSaleContext } from '../context/SaleContextProvider';
@@ -21,6 +14,17 @@ import {
   getRiveAnimationName,
   useHandoverSteps,
 } from '../hooks/useHandoverSteps';
+import {
+  ViewActions,
+  ViewContext,
+} from '../../../context/view-context/ViewContext';
+import { getRemoteRive } from '../../../lib/utils';
+import { HandoverContent } from '../../../components/Handover/HandoverContent';
+import { useMount } from '../../../hooks/useMount';
+import { useHandover } from '../../../lib/hooks/useHandover';
+import { HandoverTarget } from '../../../context/handover-context/HandoverContext';
+import { isPassportProvider } from '../../../lib/provider';
+import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 
 interface ErrorHandlerConfig {
   onActionClick?: () => void;
