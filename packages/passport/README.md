@@ -39,8 +39,9 @@ yarn dev
 # Context: passport-sdk-sample-app in ./sdk-sample-app
 yarn dev
 
-# Alternatively, you can run both commands in one terminal via the below
-yarn workspace @imtbl/passport-sdk-sample-app dev & yarn workspace @imtbl/passport dev
+# Alternatively, you can run both commands in one terminal via the below concurrent yarn script
+# Context: passport-sdk-sample-app in ./sdk-sample-app
+yarn dev-with-sdk
 ```
 
 Building to the `./sdk/dist` directory:
