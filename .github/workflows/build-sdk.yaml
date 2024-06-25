@@ -50,7 +50,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             await github.actions.createWorkflowDispatch({
-              owner: "${{ github.actor }}",
+              owner: 'immutable',
               repo: 'ts-immutable-sdk',
               workflow_file: '.github/workflows/smoke-test.yaml',
               ref: 'main'
