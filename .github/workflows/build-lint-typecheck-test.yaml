@@ -32,7 +32,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
 
       - name: Check Single Package Version Policy
         run: yarn syncpack:check
@@ -43,7 +43,9 @@ jobs:
       - name: Cache build artifacts
         uses: actions/cache@v2
         with:
-          path: ./sdk
+          path: |
+            ./sdk
+            ./packages
           key: ${{ runner.os }}-build-${{ github.sha }}
 
       # - name: Typecheck
@@ -71,13 +73,15 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
           restore-keys: ${{ runner.os }}-node-modules-
 
       - name: Restore cached build artifacts
         uses: actions/cache@v2
         with:
-          path: ./sdk
+          path: |
+            ./sdk
+            ./packages
           key: ${{ runner.os }}-build-${{ github.sha }}
           restore-keys: ${{ runner.os }}-build-
 
@@ -103,13 +107,15 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
           restore-keys: ${{ runner.os }}-node-modules-
 
       - name: Restore cached build artifacts
         uses: actions/cache@v2
         with:
-          path: ./sdk
+          path: |
+            ./sdk
+            ./packages
           key: ${{ runner.os }}-build-${{ github.sha }}
           restore-keys: ${{ runner.os }}-build-
 
@@ -137,13 +143,15 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
           restore-keys: ${{ runner.os }}-node-modules-
 
       - name: Restore cached build artifacts
         uses: actions/cache@v2
         with:
-          path: ./sdk
+          path: |
+            ./sdk
+            ./packages
           key: ${{ runner.os }}-build-${{ github.sha }}
           restore-keys: ${{ runner.os }}-build-
 
@@ -186,7 +194,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
           restore-keys: ${{ runner.os }}-node-modules-
 
       - name: Get reviewing teams
@@ -197,7 +205,9 @@ jobs:
         if: ${{ contains(steps.reviewer-teams.outputs.teams, 'Wallets') && !contains(github.event.pull_request.title, 'SKIP-CY') }}
         uses: actions/cache@v2
         with:
-          path: ./sdk
+          path: |
+            ./sdk
+            ./packages
           key: ${{ runner.os }}-build-${{ github.sha }}
           restore-keys: ${{ runner.os }}-build-
 
@@ -239,7 +249,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
           restore-keys: ${{ runner.os }}-node-modules-
 
       - name: Lint
