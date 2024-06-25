@@ -2,16 +2,17 @@ name: Smoke Test
 
 on:
   # trigger when "Build and Cache SDK" workflow completes
-  workflow_run:
-    workflows: ["Build and Cache SDK"]
-    types:
-      - completed
+  # workflow_run:
+  #   workflows: ["Build and Cache SDK"]
+  #   types:
+  #     - completed
   # pull_request:
   #   branches:
   #     - main
   # merge_group:
   #   branches:
   #     - main
+  workflow_dispatch:
 
 jobs:
   smokeTestEsm:
