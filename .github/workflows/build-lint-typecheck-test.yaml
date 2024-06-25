@@ -16,10 +16,10 @@ jobs:
       NODE_OPTIONS: --max-old-space-size=14366
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Use Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version-file: ".nvmrc"
           registry-url: https://registry.npmjs.org/
@@ -29,7 +29,7 @@ jobs:
         run: yarn install --immutable
 
       - name: Cache node_modules
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
@@ -41,7 +41,7 @@ jobs:
         run: yarn build
 
       - name: Cache build artifacts
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: |
             ./sdk
@@ -60,24 +60,24 @@ jobs:
     needs: build
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Use Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version-file: ".nvmrc"
           registry-url: https://registry.npmjs.org/
           cache: "yarn"
 
       - name: Restore cached node_modules
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: ${{ runner.os }}-node-modules-
 
       - name: Restore cached build artifacts
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: |
             ./sdk
@@ -94,24 +94,24 @@ jobs:
     needs: build
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Use Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version-file: ".nvmrc"
           registry-url: https://registry.npmjs.org/
           cache: "yarn"
 
       - name: Restore cached node_modules
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: ${{ runner.os }}-node-modules-
 
       - name: Restore cached build artifacts
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: |
             ./sdk
@@ -130,24 +130,24 @@ jobs:
       NODE_OPTIONS: --max-old-space-size=14366
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Use Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
           registry-url: https://registry.npmjs.org/
           cache: "yarn"
 
       - name: Restore cached node_modules
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: ${{ runner.os }}-node-modules-
 
       - name: Restore cached build artifacts
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: |
             ./sdk
@@ -181,17 +181,17 @@ jobs:
       NODE_OPTIONS: --max-old-space-size=14366
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Use Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version-file: ".nvmrc"
           registry-url: https://registry.npmjs.org/
           cache: "yarn"
 
       - name: Restore cached node_modules
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
@@ -203,7 +203,7 @@ jobs:
 
       - name: Restore cached build artifacts
         if: ${{ contains(steps.reviewer-teams.outputs.teams, 'Wallets') && !contains(github.event.pull_request.title, 'SKIP-CY') }}
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: |
             ./sdk
@@ -236,17 +236,17 @@ jobs:
     needs: build
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Use Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version-file: ".nvmrc"
           registry-url: https://registry.npmjs.org/
           cache: "yarn"
 
       - name: Restore cached node_modules
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
