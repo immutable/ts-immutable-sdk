@@ -8,9 +8,9 @@ import WorkflowButton from '@/components/WorkflowButton';
 import { RequestExampleProps } from '@/types';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { usePassportProvider } from '@/context/PassportProvider';
-import { getCreateListingPayload } from './SeaportCreateListingExample';
+import { getCreateERC1155ListingPayload } from './SeaportCreateListingExample';
 
-function SeaportCreateListingDefault({ disabled, handleExampleSubmitted }: RequestExampleProps) {
+function SeaportCreateERC1155ListingDefault({ disabled, handleExampleSubmitted }: RequestExampleProps) {
   const { orderbookClient } = useImmutableProvider();
   const { zkEvmProvider } = usePassportProvider();
 
@@ -31,7 +31,7 @@ function SeaportCreateListingDefault({ disabled, handleExampleSubmitted }: Reque
         });
         const chainIdHex = await zkEvmProvider.request({ method: 'eth_chainId' });
         const chainId = parseInt(chainIdHex, 16);
-        const data = getCreateListingPayload({ seaportContractAddress, walletAddress: address, chainId });
+        const data = getCreateERC1155ListingPayload({ seaportContractAddress, walletAddress: address, chainId });
         setParams([address, data]);
       }
     };
@@ -49,8 +49,8 @@ function SeaportCreateListingDefault({ disabled, handleExampleSubmitted }: Reque
   }, [handleExampleSubmitted, params]);
 
   return (
-    <Accordion.Item eventKey="4">
-      <Accordion.Header>Seaport Create Listing (Hardcoded example)</Accordion.Header>
+    <Accordion.Item eventKey="5">
+      <Accordion.Header>Seaport Create Listing - ERC1155 order (Hardcoded example)</Accordion.Header>
       <Accordion.Body>
         <Alert variant="warning">
           Note: This method only returns a signed message, it does not submit an order to the orderbook.
@@ -82,4 +82,4 @@ function SeaportCreateListingDefault({ disabled, handleExampleSubmitted }: Reque
   );
 }
 
-export default SeaportCreateListingDefault;
+export default SeaportCreateERC1155ListingDefault;
