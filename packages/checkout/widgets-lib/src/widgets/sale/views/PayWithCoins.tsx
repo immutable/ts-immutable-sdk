@@ -123,7 +123,6 @@ export function PayWithCoins() {
   }, [signResponse, environment]);
 
   const executeUserInitiatedTransaction = useCallback(() => {
-    console.log('@@@ executeUserInitiatedTransaction');
     const transaction = filteredTransactions[currentTransactionIndex];
 
     const config = executeNextTransactionTexts[transaction.methodCall];
@@ -180,8 +179,6 @@ export function PayWithCoins() {
   useEffect(() => sendPageView(SaleWidgetViews.PAY_WITH_COINS), []); // checkoutPrimarySalePayWithCoinsViewed
 
   useEffect(() => {
-    console.log('currentTransactionIndex', currentTransactionIndex);
-    console.log('filteredTransactions', filteredTransactions);
     if (!provider || filteredTransactions.length === 0) return;
 
     if (isPassportProvider(provider)) {

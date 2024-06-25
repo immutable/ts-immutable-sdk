@@ -29,13 +29,9 @@ export function HandoverAnimation({
 
   useEffect(() => {
     if (rive && input) {
-      console.log('@@@', rive.contents);
-      console.log('@@@ url', url);
-      console.log('@@@ inputValue', inputValue);
-
       input.value = inputValue;
     }
-  }, [rive, inputValue, url, input]);
+  }, [rive, input, inputValue]);
 
   return (
     <Box
