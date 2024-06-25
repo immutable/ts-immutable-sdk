@@ -52,6 +52,6 @@ jobs:
             await github.actions.createWorkflowDispatch({
               owner: 'immutable',
               repo: 'ts-immutable-sdk',
-              workflow_file: '.github/workflows/smoke-test.yaml',
+              workflow_file: '.github/workflows/smokes-tests.yaml',
               ref: 'main'
             })
