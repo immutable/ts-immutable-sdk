@@ -25,14 +25,17 @@ jobs:
           registry-url: https://registry.npmjs.org/
           cache: "yarn"
 
-      - name: Install dependencies
-        run: yarn install --immutable
-
-      - name: Cache node_modules
+      # this step will also try to cache the node_modules at the end of the workflow run
+      - name: Restore cached node_modules
+        id: restore-cache-node_modules
         uses: actions/cache@v4
         with:
           path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
+
+      - name: Install dependencies
+        if: steps.restore-cache-node_modules.outputs.cache-hit != 'true' 
+        run: yarn install --immutable
 
       - name: Check Single Package Version Policy
         run: yarn syncpack:check
@@ -67,8 +70,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: ${{ runner.os }}-node-modules-
+          key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
 
       - name: Restore cached build artifacts
         uses: actions/cache@v4
@@ -77,7 +79,6 @@ jobs:
             ./sdk
             ./packages
           key: ${{ runner.os }}-build-${{ github.sha }}
-          restore-keys: ${{ runner.os }}-build-
 
       - name: Build passport sample app
         run: yarn workspace @imtbl/passport-sdk-sample-app build
@@ -101,8 +102,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: ${{ runner.os }}-node-modules-
+          key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
 
       - name: Restore cached build artifacts
         uses: actions/cache@v4
@@ -111,7 +111,6 @@ jobs:
             ./sdk
             ./packages
           key: ${{ runner.os }}-build-${{ github.sha }}
-          restore-keys: ${{ runner.os }}-build-
 
       - name: Typecheck
         run: yarn typecheck
@@ -137,8 +136,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: ${{ runner.os }}-node-modules-
+          key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
 
       - name: Restore cached build artifacts
         uses: actions/cache@v4
@@ -147,7 +145,6 @@ jobs:
             ./sdk
             ./packages
           key: ${{ runner.os }}-build-${{ github.sha }}
-          restore-keys: ${{ runner.os }}-build-
 
       - name: Test
         run: yarn test
@@ -188,8 +185,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: ${{ runner.os }}-node-modules-
+          key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
 
       - name: Get reviewing teams
         id: reviewer-teams
@@ -203,7 +199,6 @@ jobs:
             ./sdk
             ./packages
           key: ${{ runner.os }}-build-${{ github.sha }}
-          restore-keys: ${{ runner.os }}-build-
 
       - name: Checkout-widgets cypress tests
         if: ${{ contains(steps.reviewer-teams.outputs.teams, 'Wallets') && !contains(github.event.pull_request.title, 'SKIP-CY') }}
@@ -243,8 +238,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: ${{ runner.os }}-node-modules-
+          key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
 
       - name: Lint
         run: yarn lint

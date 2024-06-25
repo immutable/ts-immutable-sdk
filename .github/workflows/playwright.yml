@@ -12,13 +12,25 @@ jobs:
     container:
       image: mcr.microsoft.com/playwright:v1.40.0-jammy
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Checkout
+        uses: actions/checkout@v4
+  
+      - name: Use Node.js
+        uses: actions/setup-node@v4
         with:
           node-version-file: samples/apps/ts-immutable-sample/.nvmrc
+          cache: 'yarn'
 
+      - name: Restore cached node_modules
+        id: restore-cache-node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
+  
       - name: Install root dependencies
-        run: npm install -g yarn && yarn install --immutable
+        if: steps.restore-cache-node_modules.outputs.cache-hit != 'true' 
+        run: yarn install --immutable
 
       - name: Build SDK
         run: yarn build
