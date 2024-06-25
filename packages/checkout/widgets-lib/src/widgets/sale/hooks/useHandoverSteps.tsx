@@ -133,7 +133,7 @@ export function useHandoverSteps(environment: Environment) {
             ),
             inputValue:
               transactionRiveAnimations[TransactionMethod.APPROVE].inputValues
-                .processing,
+                .waiting,
             children: (
               <Heading>
                 {t('views.PAYMENT_METHODS.handover.approve.before')}
@@ -149,7 +149,7 @@ export function useHandoverSteps(environment: Environment) {
             ),
             inputValue:
               transactionRiveAnimations[TransactionMethod.APPROVE].inputValues
-                .processing,
+                .completed,
             children: (
               <Heading>
                 {t('views.PAYMENT_METHODS.handover.approve.after')}
@@ -165,7 +165,7 @@ export function useHandoverSteps(environment: Environment) {
             ),
             inputValue:
               transactionRiveAnimations[TransactionMethod.EXECUTE].inputValues
-                .processing,
+                .waiting,
             children: (
               <Heading>
                 {t('views.PAYMENT_METHODS.handover.execute.before')}
