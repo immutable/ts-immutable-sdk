@@ -49,8 +49,8 @@ jobs:
       # - name: Typecheck
       #   run: yarn typecheck
 
-      - name: Build passport sample app
-        run: yarn workspace @imtbl/passport-sdk-sample-app build
+      # - name: Build passport sample app
+      #   run: yarn workspace @imtbl/passport-sdk-sample-app build
 
   build-passport:
     name: Build Passport Sample App
@@ -63,7 +63,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: lts/*
+          node-version-file: ".nvmrc"
           registry-url: https://registry.npmjs.org/
           cache: "yarn"
 
@@ -95,7 +95,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: lts/*
+          node-version-file: ".nvmrc"
           registry-url: https://registry.npmjs.org/
           cache: "yarn"
 
@@ -178,7 +178,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: lts/*
+          node-version-file: ".nvmrc"
           registry-url: https://registry.npmjs.org/
           cache: "yarn"
 
@@ -231,7 +231,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: lts/*
+          node-version-file: ".nvmrc"
           registry-url: https://registry.npmjs.org/
           cache: "yarn"
 
