@@ -48,12 +48,6 @@ jobs:
             ./packages
           key: ${{ runner.os }}-build-${{ github.sha }}
 
-      # - name: Typecheck
-      #   run: yarn typecheck
-
-      # - name: Build passport sample app
-      #   run: yarn workspace @imtbl/passport-sdk-sample-app build
-
   build-passport:
     name: Build Passport Sample App
     runs-on: ubuntu-latest-4-cores
