@@ -16,17 +16,23 @@ jobs:
       NODE_OPTIONS: --max-old-space-size=14366
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Use Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: lts/*
+          node-version-file: ".nvmrc"
           registry-url: https://registry.npmjs.org/
           cache: "yarn"
 
       - name: Install dependencies
         run: yarn install --immutable
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
 
       - name: Check Single Package Version Policy
         run: yarn syncpack:check
@@ -34,33 +40,114 @@ jobs:
       - name: Build
         run: yarn build
 
-      - name: Typecheck
-        run: yarn typecheck
+      - name: Cache build artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            ./sdk
+            ./packages
+          key: ${{ runner.os }}-build-${{ github.sha }}
+
+  build-passport:
+    name: Build Passport Sample App
+    runs-on: ubuntu-latest-4-cores
+    needs: build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          registry-url: https://registry.npmjs.org/
+          cache: "yarn"
+
+      - name: Restore cached node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: ${{ runner.os }}-node-modules-
+
+      - name: Restore cached build artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            ./sdk
+            ./packages
+          key: ${{ runner.os }}-build-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-build-
 
       - name: Build passport sample app
         run: yarn workspace @imtbl/passport-sdk-sample-app build
+  
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-latest-4-cores
+    needs: build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          registry-url: https://registry.npmjs.org/
+          cache: "yarn"
+
+      - name: Restore cached node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: ${{ runner.os }}-node-modules-
+
+      - name: Restore cached build artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            ./sdk
+            ./packages
+          key: ${{ runner.os }}-build-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-build-
+
+      - name: Typecheck
+        run: yarn typecheck
 
   test:
     name: Test
     runs-on: ubuntu-latest-8-cores
+    needs: build
     env:
       NODE_OPTIONS: --max-old-space-size=14366
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Use Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
           registry-url: https://registry.npmjs.org/
           cache: "yarn"
 
-      - name: Install dependencies
-        run: yarn install --immutable
+      - name: Restore cached node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: ${{ runner.os }}-node-modules-
 
-      - name: Build
-        run: yarn build
+      - name: Restore cached build artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            ./sdk
+            ./packages
+          key: ${{ runner.os }}-build-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-build-
 
       - name: Test
         run: yarn test
@@ -83,29 +170,40 @@ jobs:
   cypress:
     name: Cypress
     runs-on: ubuntu-latest-4-cores
+    needs: build
     env:
       NODE_OPTIONS: --max-old-space-size=14366
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Use Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: lts/*
+          node-version-file: ".nvmrc"
           registry-url: https://registry.npmjs.org/
           cache: "yarn"
 
-      - name: Install dependencies
-        run: yarn install --immutable
+      - name: Restore cached node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: ${{ runner.os }}-node-modules-
 
       - name: Get reviewing teams
         id: reviewer-teams
         run: echo "teams=${{ join(github.event.pull_request.requested_teams.*.name, ', ') }}" >> $GITHUB_OUTPUT
 
-      - name: Build
+      - name: Restore cached build artifacts
         if: ${{ contains(steps.reviewer-teams.outputs.teams, 'Wallets') && !contains(github.event.pull_request.title, 'SKIP-CY') }}
-        run: yarn build
+        uses: actions/cache@v4
+        with:
+          path: |
+            ./sdk
+            ./packages
+          key: ${{ runner.os }}-build-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-build-
 
       - name: Checkout-widgets cypress tests
         if: ${{ contains(steps.reviewer-teams.outputs.teams, 'Wallets') && !contains(github.event.pull_request.title, 'SKIP-CY') }}
@@ -129,19 +227,24 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest-4-cores
+    needs: build
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Use Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: lts/*
+          node-version-file: ".nvmrc"
           registry-url: https://registry.npmjs.org/
           cache: "yarn"
 
-      - name: Install dependencies
-        run: yarn install --immutable
+      - name: Restore cached node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: ${{ runner.os }}-node-modules-
 
       - name: Lint
         run: yarn lint
