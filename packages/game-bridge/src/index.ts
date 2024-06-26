@@ -60,7 +60,7 @@ const PASSPORT_FUNCTIONS = {
 const initRequest = 'init';
 const initRequestId = '1';
 
-let passportClient: passport.Passport;
+let passportClient: passport.Passport | null;
 let providerInstance: provider.IMXProvider | null;
 let zkEvmProviderInstance: passport.Provider | null;
 
@@ -102,7 +102,7 @@ const callbackToGame = (data: object) => {
 };
 
 const setProvider = (
-  passportProvider: provider.IMXProvider | null,
+  passportProvider: provider.IMXProvider | null | undefined,
 ): boolean => {
   if (passportProvider !== null && passportProvider !== undefined) {
     providerInstance = passportProvider;
@@ -120,7 +120,7 @@ const getProvider = (): provider.IMXProvider => {
   return providerInstance;
 };
 
-const setZkEvmProvider = (zkEvmProvider: passport.Provider | null): boolean => {
+const setZkEvmProvider = (zkEvmProvider: passport.Provider | null | undefined): boolean => {
   if (zkEvmProvider !== null && zkEvmProvider !== undefined) {
     zkEvmProviderInstance = zkEvmProvider;
     console.log('zkEvm provider set');
@@ -141,6 +141,9 @@ track(moduleName, 'loadedGameBridge', {
   sdkVersionTag,
 });
 
+// 'status' is set to true if:
+// 1. the function executed successfully without throwing an error
+// 2. the response object we expect to return to the game engine is there
 window.callFunction = async (jsonData: string) => {
   // eslint-disable-line no-unused-vars
   console.log(`Call function ${jsonData}`);
@@ -213,11 +216,11 @@ window.callFunction = async (jsonData: string) => {
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success: true,
-          code: response.code,
-          deviceCode: response.deviceCode,
-          url: response.url,
-          interval: response.interval,
+          success: response !== undefined && response !== null,
+          code: response?.code,
+          deviceCode: response?.deviceCode,
+          url: response?.url,
+          interval: response?.interval,
         });
         break;
       }
@@ -236,8 +239,7 @@ window.callFunction = async (jsonData: string) => {
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success: true,
-          result: userInfo !== null,
+          success: userInfo !== null,
         });
         break;
       }
@@ -258,8 +260,7 @@ window.callFunction = async (jsonData: string) => {
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success: true,
-          result: providerSet,
+          success: providerSet,
         });
         break;
       }
@@ -271,7 +272,7 @@ window.callFunction = async (jsonData: string) => {
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success: true,
+          success: response !== undefined && response !== null,
           result: response,
         });
         break;
@@ -282,7 +283,7 @@ window.callFunction = async (jsonData: string) => {
           request.authorizationCode,
           request.state,
         );
-        identify({ passportId: profile.sub });
+        identify({ passportId: profile?.sub });
         track(moduleName, 'performedLoginPkce', {
           timeMs: Date.now() - markStart,
         });
@@ -302,7 +303,7 @@ window.callFunction = async (jsonData: string) => {
         const passportProvider = await passportClient?.connectImx();
         const providerSet = setProvider(passportProvider);
         if (providerSet) {
-          identify({ passportId: profile.sub });
+          identify({ passportId: profile?.sub });
         }
         track(moduleName, 'performedConnectPkce', {
           succeeded: providerSet,
@@ -311,8 +312,7 @@ window.callFunction = async (jsonData: string) => {
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success: true,
-          result: providerSet,
+          success: providerSet,
         });
         break;
       }
@@ -324,7 +324,7 @@ window.callFunction = async (jsonData: string) => {
           request.timeoutMs ?? null,
         );
 
-        identify({ passportId: profile.sub });
+        identify({ passportId: profile?.sub });
         track(moduleName, 'performedLoginConfirmCode', {
           timeMs: Date.now() - markStart,
         });
@@ -348,7 +348,7 @@ window.callFunction = async (jsonData: string) => {
         const providerSet = setProvider(passportProvider);
 
         if (providerSet) {
-          identify({ passportId: profile.sub });
+          identify({ passportId: profile?.sub });
         }
         track(moduleName, 'performedConnectConfirmCode', {
           succeeded: providerSet,
@@ -358,8 +358,7 @@ window.callFunction = async (jsonData: string) => {
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success: true,
-          result: providerSet,
+          success: providerSet,
         });
         break;
       }
@@ -373,7 +372,7 @@ window.callFunction = async (jsonData: string) => {
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success: true,
+          success: deviceFlowEndSessionEndpoint !== undefined && deviceFlowEndSessionEndpoint !== null,
           result: deviceFlowEndSessionEndpoint,
         });
         break;
@@ -386,7 +385,7 @@ window.callFunction = async (jsonData: string) => {
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success: true,
+          success: accessToken !== undefined && accessToken !== null,
           result: accessToken,
         });
         break;
@@ -399,7 +398,7 @@ window.callFunction = async (jsonData: string) => {
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success: true,
+          success: idToken !== undefined && idToken !== null,
           result: idToken,
         });
         break;
@@ -412,7 +411,7 @@ window.callFunction = async (jsonData: string) => {
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success: true,
+          success: userProfile?.email !== undefined && userProfile?.email !== null,
           result: userProfile?.email,
         });
         break;
@@ -425,7 +424,7 @@ window.callFunction = async (jsonData: string) => {
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success: true,
+          success: userProfile?.sub !== undefined && userProfile?.sub !== null,
           result: userProfile?.sub,
         });
         break;
@@ -438,7 +437,7 @@ window.callFunction = async (jsonData: string) => {
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success: true,
+          success: linkedAddresses !== undefined && linkedAddresses !== null,
           result: linkedAddresses,
         });
         break;
@@ -451,7 +450,7 @@ window.callFunction = async (jsonData: string) => {
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success: true,
+          success: address !== undefined && address !== null,
           result: address,
         });
         break;
@@ -478,7 +477,7 @@ window.callFunction = async (jsonData: string) => {
           ...{
             responseFor: fxName,
             requestId,
-            success: true,
+            success: response !== null && response !== undefined,
           },
           ...response,
         });
@@ -494,7 +493,7 @@ window.callFunction = async (jsonData: string) => {
           ...{
             responseFor: fxName,
             requestId,
-            success: true,
+            success: response !== null && response !== undefined,
           },
           ...response,
         });
@@ -512,8 +511,7 @@ window.callFunction = async (jsonData: string) => {
           ...{
             responseFor: fxName,
             requestId,
-            success: true,
-            result: response,
+            success: response !== null && response !== undefined,
           },
           ...response,
         });
@@ -529,8 +527,7 @@ window.callFunction = async (jsonData: string) => {
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success: true,
-          result: providerSet,
+          success: providerSet,
         });
         break;
       }
@@ -546,7 +543,7 @@ window.callFunction = async (jsonData: string) => {
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success: true,
+          success: transactionHash !== null && transactionHash !== undefined,
           result: transactionHash,
         });
         break;
@@ -566,7 +563,7 @@ window.callFunction = async (jsonData: string) => {
           ...{
             responseFor: fxName,
             requestId,
-            success: true,
+            success: response !== null && response !== undefined,
           },
           ...response,
         });
@@ -582,7 +579,7 @@ window.callFunction = async (jsonData: string) => {
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success: true,
+          success: result !== null && result !== undefined,
           accounts: result,
         });
         break;
@@ -599,7 +596,7 @@ window.callFunction = async (jsonData: string) => {
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success: true,
+          success: result !== null && result !== undefined,
           result,
         });
         break;
@@ -617,7 +614,7 @@ window.callFunction = async (jsonData: string) => {
           ...{
             responseFor: fxName,
             requestId,
-            success: true,
+            success: response !== null && response !== undefined,
           },
           ...response,
         });
@@ -648,8 +645,8 @@ window.callFunction = async (jsonData: string) => {
       responseFor: fxName,
       requestId,
       success: false,
-      error: error.message,
-      errorType: error instanceof passport.PassportError ? error.type : null,
+      error: error?.message !== null && error?.message !== undefined ? error.message : 'Error',
+      errorType: error instanceof passport.PassportError ? error?.type : null,
     });
   }
 };
