@@ -101,6 +101,13 @@ const callbackToGame = (data: object) => {
   }
 };
 
+const getPassportClient = (): passport.Passport => {
+  if (passportClient == null) {
+    throw new Error('No Passport client');
+  }
+  return passportClient;
+};
+
 const setProvider = (
   passportProvider: provider.IMXProvider | null | undefined,
 ): boolean => {
@@ -142,8 +149,8 @@ track(moduleName, 'loadedGameBridge', {
 });
 
 // 'status' is set to true if:
-// 1. the function executed successfully without throwing an error
-// 2. the response object we expect to return to the game engine is there
+// 1. the underlying package function executed successfully without throwing an error
+// 2. the object we expect to return is not undefined or null (like HTTP 200 status)
 window.callFunction = async (jsonData: string) => {
   // eslint-disable-line no-unused-vars
   console.log(`Call function ${jsonData}`);
@@ -209,14 +216,14 @@ window.callFunction = async (jsonData: string) => {
         break;
       }
       case PASSPORT_FUNCTIONS.initDeviceFlow: {
-        const response = await passportClient?.loginWithDeviceFlow();
+        const response = await getPassportClient().loginWithDeviceFlow();
         track(moduleName, 'performedInitDeviceFlow', {
           timeMs: Date.now() - markStart,
         });
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success: response !== undefined && response !== null,
+          success: true,
           code: response?.code,
           deviceCode: response?.deviceCode,
           url: response?.url,
@@ -225,7 +232,7 @@ window.callFunction = async (jsonData: string) => {
         break;
       }
       case PASSPORT_FUNCTIONS.relogin: {
-        const userInfo = await passportClient?.login({
+        const userInfo = await getPassportClient().login({
           useCachedSession: true,
         });
         const succeeded = userInfo !== null;
@@ -245,11 +252,11 @@ window.callFunction = async (jsonData: string) => {
       }
       case PASSPORT_FUNCTIONS.reconnect: {
         let providerSet = false;
-        const userInfo = await passportClient?.login({
+        const userInfo = await getPassportClient().login({
           useCachedSession: true,
         });
         if (userInfo) {
-          const passportProvider = await passportClient?.connectImx();
+          const passportProvider = await getPassportClient().connectImx();
           providerSet = setProvider(passportProvider);
           identify({ passportId: userInfo?.sub });
         }
@@ -265,25 +272,25 @@ window.callFunction = async (jsonData: string) => {
         break;
       }
       case PASSPORT_FUNCTIONS.getPKCEAuthUrl: {
-        const response = passportClient?.loginWithPKCEFlow();
+        const url = getPassportClient().loginWithPKCEFlow();
         track(moduleName, 'performedGetPkceAuthUrl', {
           timeMs: Date.now() - markStart,
         });
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success: response !== undefined && response !== null,
-          result: response,
+          success: true,
+          result: url,
         });
         break;
       }
       case PASSPORT_FUNCTIONS.loginPKCE: {
         const request = JSON.parse(data);
-        const profile = await passportClient?.loginWithPKCEFlowCallback(
+        const profile = await getPassportClient().loginWithPKCEFlowCallback(
           request.authorizationCode,
           request.state,
         );
-        identify({ passportId: profile?.sub });
+        identify({ passportId: profile.sub });
         track(moduleName, 'performedLoginPkce', {
           timeMs: Date.now() - markStart,
         });
@@ -296,14 +303,14 @@ window.callFunction = async (jsonData: string) => {
       }
       case PASSPORT_FUNCTIONS.connectPKCE: {
         const request = JSON.parse(data);
-        const profile = await passportClient?.loginWithPKCEFlowCallback(
+        const profile = await getPassportClient().loginWithPKCEFlowCallback(
           request.authorizationCode,
           request.state,
         );
-        const passportProvider = await passportClient?.connectImx();
+        const passportProvider = await getPassportClient().connectImx();
         const providerSet = setProvider(passportProvider);
         if (providerSet) {
-          identify({ passportId: profile?.sub });
+          identify({ passportId: profile.sub });
         }
         track(moduleName, 'performedConnectPkce', {
           succeeded: providerSet,
@@ -318,13 +325,13 @@ window.callFunction = async (jsonData: string) => {
       }
       case PASSPORT_FUNCTIONS.loginConfirmCode: {
         const request = JSON.parse(data);
-        const profile = await passportClient?.loginWithDeviceFlowCallback(
+        const profile = await getPassportClient().loginWithDeviceFlowCallback(
           request.deviceCode,
           request.interval,
           request.timeoutMs ?? null,
         );
 
-        identify({ passportId: profile?.sub });
+        identify({ passportId: profile.sub });
         track(moduleName, 'performedLoginConfirmCode', {
           timeMs: Date.now() - markStart,
         });
@@ -338,17 +345,17 @@ window.callFunction = async (jsonData: string) => {
       }
       case PASSPORT_FUNCTIONS.connectConfirmCode: {
         const request = JSON.parse(data);
-        const profile = await passportClient?.loginWithDeviceFlowCallback(
+        const profile = await getPassportClient().loginWithDeviceFlowCallback(
           request.deviceCode,
           request.interval,
           request.timeoutMs ?? null,
         );
 
-        const passportProvider = await passportClient?.connectImx();
+        const passportProvider = await getPassportClient().connectImx();
         const providerSet = setProvider(passportProvider);
 
         if (providerSet) {
-          identify({ passportId: profile?.sub });
+          identify({ passportId: profile.sub });
         }
         track(moduleName, 'performedConnectConfirmCode', {
           succeeded: providerSet,
@@ -363,7 +370,7 @@ window.callFunction = async (jsonData: string) => {
         break;
       }
       case PASSPORT_FUNCTIONS.logout: {
-        const deviceFlowEndSessionEndpoint = await passportClient?.logoutDeviceFlow();
+        const deviceFlowEndSessionEndpoint = await getPassportClient().logoutDeviceFlow();
         providerInstance = null;
         zkEvmProviderInstance = null;
         track(moduleName, 'performedGetLogoutUrl', {
@@ -372,72 +379,80 @@ window.callFunction = async (jsonData: string) => {
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success: deviceFlowEndSessionEndpoint !== undefined && deviceFlowEndSessionEndpoint !== null,
+          success: true,
           result: deviceFlowEndSessionEndpoint,
         });
         break;
       }
       case PASSPORT_FUNCTIONS.getAccessToken: {
-        const accessToken = await passportClient?.getAccessToken();
+        const accessToken = await getPassportClient().getAccessToken();
+        const success = accessToken !== undefined;
         track(moduleName, 'performedGetAccessToken', {
           timeMs: Date.now() - markStart,
         });
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success: accessToken !== undefined && accessToken !== null,
+          success,
           result: accessToken,
+          error: !success ? 'No access token' : undefined,
         });
         break;
       }
       case PASSPORT_FUNCTIONS.getIdToken: {
-        const idToken = await passportClient?.getIdToken();
+        const idToken = await getPassportClient().getIdToken();
+        const success = idToken !== undefined;
         track(moduleName, 'performedGetIdToken', {
           timeMs: Date.now() - markStart,
         });
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success: idToken !== undefined && idToken !== null,
+          success,
           result: idToken,
+          error: !success ? 'No ID token' : undefined,
         });
         break;
       }
       case PASSPORT_FUNCTIONS.getEmail: {
-        const userProfile = await passportClient?.getUserInfo();
+        const userProfile = await getPassportClient().getUserInfo();
+        const success = userProfile?.email !== undefined;
         track(moduleName, 'performedGetEmail', {
           timeMs: Date.now() - markStart,
         });
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success: userProfile?.email !== undefined && userProfile?.email !== null,
+          success,
           result: userProfile?.email,
+          error: !success ? 'No email' : undefined,
         });
         break;
       }
       case PASSPORT_FUNCTIONS.getPassportId: {
-        const userProfile = await passportClient?.getUserInfo();
+        const userProfile = await getPassportClient().getUserInfo();
+        const success = userProfile?.sub !== undefined;
         track(moduleName, 'performedGetPassportId', {
           timeMs: Date.now() - markStart,
         });
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success: userProfile?.sub !== undefined && userProfile?.sub !== null,
+          success,
           result: userProfile?.sub,
+          error: !success ? 'No Passport ID' : undefined,
         });
         break;
       }
       case PASSPORT_FUNCTIONS.getLinkedAddresses: {
-        const linkedAddresses = await passportClient?.getLinkedAddresses();
+        const linkedAddresses = await getPassportClient().getLinkedAddresses();
         track(moduleName, 'performedGetLinkedAddresses', {
           timeMs: Date.now() - markStart,
         });
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success: linkedAddresses !== undefined && linkedAddresses !== null,
+          success: true,
           result: linkedAddresses,
         });
         break;
@@ -450,7 +465,7 @@ window.callFunction = async (jsonData: string) => {
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success: address !== undefined && address !== null,
+          success: true,
           result: address,
         });
         break;
@@ -477,7 +492,7 @@ window.callFunction = async (jsonData: string) => {
           ...{
             responseFor: fxName,
             requestId,
-            success: response !== null && response !== undefined,
+            success: true,
           },
           ...response,
         });
@@ -493,7 +508,7 @@ window.callFunction = async (jsonData: string) => {
           ...{
             responseFor: fxName,
             requestId,
-            success: response !== null && response !== undefined,
+            success: true,
           },
           ...response,
         });
@@ -511,14 +526,14 @@ window.callFunction = async (jsonData: string) => {
           ...{
             responseFor: fxName,
             requestId,
-            success: response !== null && response !== undefined,
+            success: true,
           },
           ...response,
         });
         break;
       }
       case PASSPORT_FUNCTIONS.zkEvm.connectEvm: {
-        const zkEvmProvider = passportClient?.connectEvm();
+        const zkEvmProvider = getPassportClient().connectEvm();
         const providerSet = setZkEvmProvider(zkEvmProvider);
         track(moduleName, 'performedZkevmConnectEvm', {
           succeeded: providerSet,
@@ -537,14 +552,16 @@ window.callFunction = async (jsonData: string) => {
           method: 'eth_sendTransaction',
           params: [transaction],
         });
+        const success = transactionHash !== null && transactionHash !== undefined;
         track(moduleName, 'performedZkevmSendTransaction', {
           timeMs: Date.now() - markStart,
         });
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success: transactionHash !== null && transactionHash !== undefined,
+          success,
           result: transactionHash,
+          error: !success ? 'Failed to send transaction' : undefined,
         });
         break;
       }
@@ -563,7 +580,7 @@ window.callFunction = async (jsonData: string) => {
           ...{
             responseFor: fxName,
             requestId,
-            success: response !== null && response !== undefined,
+            success: true,
           },
           ...response,
         });
@@ -573,14 +590,16 @@ window.callFunction = async (jsonData: string) => {
         const result = await getZkEvmProvider().request({
           method: 'eth_requestAccounts',
         });
+        const success = result !== null && result !== undefined;
         track(moduleName, 'performedZkevmRequestAccounts', {
           timeMs: Date.now() - markStart,
         });
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success: result !== null && result !== undefined,
+          success,
           accounts: result,
+          error: !success ? 'Failed to request accounts' : undefined,
         });
         break;
       }
@@ -590,14 +609,16 @@ window.callFunction = async (jsonData: string) => {
           method: 'eth_getBalance',
           params: [request.address, request.blockNumberOrTag],
         });
+        const success = result !== null && result !== undefined;
         track(moduleName, 'performedZkevmGetBalance', {
           timeMs: Date.now() - markStart,
         });
         callbackToGame({
           responseFor: fxName,
           requestId,
-          success: result !== null && result !== undefined,
+          success,
           result,
+          error: !success ? 'Failed to get balance' : undefined,
         });
         break;
       }
@@ -607,6 +628,7 @@ window.callFunction = async (jsonData: string) => {
           method: 'eth_getTransactionReceipt',
           params: [request.txHash],
         });
+        const success = response !== null && response !== undefined;
         track(moduleName, 'performedZkevmGetTransactionReceipt', {
           timeMs: Date.now() - markStart,
         });
@@ -614,7 +636,8 @@ window.callFunction = async (jsonData: string) => {
           ...{
             responseFor: fxName,
             requestId,
-            success: response !== null && response !== undefined,
+            success,
+            error: !success ? 'Failed to get transaction receipt' : undefined,
           },
           ...response,
         });
