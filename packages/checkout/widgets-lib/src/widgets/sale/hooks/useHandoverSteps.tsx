@@ -80,6 +80,23 @@ export function useHandoverSteps(environment: Environment) {
     (method: string, step: ExecuteTransactionStep) => {
       const key = `${method}-${step}`;
       switch (key) {
+        case `${TransactionMethod.APPROVE}-${ExecuteTransactionStep.BEFORE}`:
+          addHandover({
+            animationUrl: getRemoteRive(
+              environment,
+              getRiveAnimationName(TransactionMethod.APPROVE),
+            ),
+            inputValue:
+              transactionRiveAnimations[TransactionMethod.APPROVE].inputValues
+                .processing,
+            children: (
+              <Heading>
+                {t('views.PAYMENT_METHODS.handover.approve.pending')}
+              </Heading>
+            ),
+          });
+          break;
+
         case `${TransactionMethod.APPROVE}-${ExecuteTransactionStep.AFTER}`:
           addHandover({
             duration: 2000,
@@ -93,6 +110,23 @@ export function useHandoverSteps(environment: Environment) {
             children: (
               <Heading>
                 {t('views.PAYMENT_METHODS.handover.approve.after')}
+              </Heading>
+            ),
+          });
+          break;
+
+        case `${TransactionMethod.EXECUTE}-${ExecuteTransactionStep.BEFORE}`:
+          addHandover({
+            animationUrl: getRemoteRive(
+              environment,
+              getRiveAnimationName(TransactionMethod.EXECUTE),
+            ),
+            inputValue:
+              transactionRiveAnimations[TransactionMethod.EXECUTE].inputValues
+                .waiting,
+            children: (
+              <Heading>
+                {t('views.PAYMENT_METHODS.handover.execute.pending')}
               </Heading>
             ),
           });

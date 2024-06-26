@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { Heading } from '@biom3/react';
 
 import { useSaleContext } from '../context/SaleContextProvider';
-import { ExecuteTransactionStep, SaleErrorTypes } from '../types';
+import { SaleErrorTypes } from '../types';
 import { useSaleEvent } from '../hooks/useSaleEvents';
 import {
   StateMachineInput,
@@ -25,54 +25,26 @@ interface StepConfig {
   ctaButtonTextKey?: string;
 }
 
-type ExecuteNextTransactionTextsConfig = {
-  [key in ExecuteTransactionStep]: StepConfig;
-};
-
-const executeNextTransactionTexts: Record<
+const initateExecuteNextTransactionHandover: Record<
 TransactionMethod,
-ExecuteNextTransactionTextsConfig
+StepConfig
 > = {
   [TransactionMethod.APPROVE]: {
-    [ExecuteTransactionStep.BEFORE]: {
-      headingTextKey:
-        'views.PAYMENT_METHODS.handover.approve.beforeWithCta.heading',
-      ctaButtonTextKey:
-        'views.PAYMENT_METHODS.handover.approve.beforeWithCta.ctaButton',
+    headingTextKey:
+      'views.PAYMENT_METHODS.handover.approve.beforeWithCta.heading',
+    ctaButtonTextKey:
+      'views.PAYMENT_METHODS.handover.approve.beforeWithCta.ctaButton',
 
-      animationUrl: getRiveAnimationName(TransactionMethod.APPROVE),
-      inputValue: StateMachineInput.WAITING,
-    },
-    [ExecuteTransactionStep.PENDING]: {
-      headingTextKey: 'views.PAYMENT_METHODS.handover.approve.pending',
-      animationUrl: getRiveAnimationName(TransactionMethod.APPROVE),
-      inputValue: StateMachineInput.PROCESSING,
-    },
-    [ExecuteTransactionStep.AFTER]: {
-      headingTextKey: 'views.PAYMENT_METHODS.handover.approve.after',
-      animationUrl: getRiveAnimationName(TransactionMethod.APPROVE),
-      inputValue: StateMachineInput.COMPLETED,
-    },
+    animationUrl: getRiveAnimationName(TransactionMethod.APPROVE),
+    inputValue: StateMachineInput.WAITING,
   },
   [TransactionMethod.EXECUTE]: {
-    [ExecuteTransactionStep.BEFORE]: {
-      headingTextKey:
-        'views.PAYMENT_METHODS.handover.execute.beforeWithCta.heading',
-      ctaButtonTextKey:
-        'views.PAYMENT_METHODS.handover.execute.beforeWithCta.ctaButton',
-      animationUrl: getRiveAnimationName(TransactionMethod.EXECUTE),
-      inputValue: StateMachineInput.START,
-    },
-    [ExecuteTransactionStep.PENDING]: {
-      headingTextKey: 'views.PAYMENT_METHODS.handover.execute.pending',
-      animationUrl: getRiveAnimationName(TransactionMethod.EXECUTE),
-      inputValue: StateMachineInput.WAITING,
-    },
-    [ExecuteTransactionStep.AFTER]: {
-      headingTextKey: 'views.PAYMENT_METHODS.handover.execute.after',
-      animationUrl: getRiveAnimationName(TransactionMethod.EXECUTE),
-      inputValue: StateMachineInput.PROCESSING,
-    },
+    headingTextKey:
+      'views.PAYMENT_METHODS.handover.execute.beforeWithCta.heading',
+    ctaButtonTextKey:
+      'views.PAYMENT_METHODS.handover.execute.beforeWithCta.ctaButton',
+    animationUrl: getRiveAnimationName(TransactionMethod.EXECUTE),
+    inputValue: StateMachineInput.START,
   },
 };
 
@@ -125,20 +97,12 @@ export function PayWithCoins() {
   const executeUserInitiatedTransaction = useCallback(() => {
     const transaction = filteredTransactions[currentTransactionIndex];
 
-    const config = executeNextTransactionTexts[transaction.methodCall];
+    const config = initateExecuteNextTransactionHandover[transaction.methodCall];
 
-    const headingTextBefore = t(config.before.headingTextKey) || '';
-    const ctaButtonTextBefore = t(config.before.ctaButtonTextKey) || '';
-
-    const headingTextPending = t(config.pending.headingTextKey) || '';
+    const headingTextBefore = t(config.headingTextKey) || '';
+    const ctaButtonTextBefore = t(config.ctaButtonTextKey) || '';
 
     const handleTransaction = () => {
-      addHandover({
-        animationUrl: getRemoteRive(environment, config.pending.animationUrl),
-        inputValue: config.pending.inputValue,
-        children: <Heading>{headingTextPending}</Heading>,
-      });
-
       try {
         executeNextTransaction(
           (txn) => {
@@ -159,8 +123,8 @@ export function PayWithCoins() {
     };
 
     addHandover({
-      animationUrl: getRemoteRive(environment, config.before.animationUrl),
-      inputValue: config.before.inputValue,
+      animationUrl: getRemoteRive(environment, config.animationUrl),
+      inputValue: config.inputValue,
       children: (
         <HandoverContent
           headingText={headingTextBefore}
