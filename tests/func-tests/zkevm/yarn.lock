@@ -1105,7 +1105,7 @@ __metadata:
 
 "@imtbl/sdk@file:../../../sdk::locator=func-tests-imx%40workspace%3A.":
   version: 0.0.0
-  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=27c191&locator=func-tests-imx%40workspace%3A."
+  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=8b5ee2&locator=func-tests-imx%40workspace%3A."
   dependencies:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
@@ -1121,7 +1121,7 @@ __metadata:
     "@jest/globals": ^29.5.0
     "@magic-ext/oidc": 4.2.0
     "@metamask/detect-provider": ^2.0.0
-    "@opensea/seaport-js": 4.0.2
+    "@opensea/seaport-js": 4.0.3
     "@rive-app/react-canvas-lite": ^4.9.0
     "@stdlib/number-float64-base-normalize": 0.0.8
     "@uniswap/router-sdk": ^1.4.0
@@ -1146,6 +1146,7 @@ __metadata:
     jwt-decode: ^3.1.2
     lru-memorise: 0.3.0
     magic-sdk: ^21.2.0
+    merkletreejs: ^0.3.11
     oidc-client-ts: 2.4.0
     os-browserify: ^0.3.0
     pako: ^2.1.0
@@ -1162,7 +1163,7 @@ __metadata:
       optional: true
     prisma:
       optional: true
-  checksum: ece1b9f5eb071b687eb942e1885e5718dbec44ec6bd656b1dd7bffcee58f30f46d4dbc48ee0149a00d4b99ddb20af07c990f92e435b914e3ce39764bfba8072c
+  checksum: ac8ed34c340f70e54e3d4a0ca9f7369473a6088ab9689693128362d6cd25da10e5c8f40b17857d2d40437ff4d5e7af8e349360b10f83df7b193056db048f4bd8
   languageName: node
   linkType: hard
 
@@ -2375,13 +2376,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opensea/seaport-js@npm:4.0.2":
-  version: 4.0.2
-  resolution: "@opensea/seaport-js@npm:4.0.2"
+"@opensea/seaport-js@npm:4.0.3":
+  version: 4.0.3
+  resolution: "@opensea/seaport-js@npm:4.0.3"
   dependencies:
     ethers: ^6.9.0
     merkletreejs: ^0.3.11
-  checksum: dd156947e85fe98ed8ad22064132dd65a7b3dd4feb0197c29c6325c6a776b50cf62cb3e0030d3fe23f76bd49b0f16fbe54e757d1049a1f917bc3318f3b30ecc0
+  checksum: 63fe127f4b968137db1227f9c417af1e009dc1ba58ced87e6734720221b39dee2004ef56dfa77580994f1b3fcd6da4e3befb33b75b621fb53cf92bb28ce3233b
   languageName: node
   linkType: hard
 
