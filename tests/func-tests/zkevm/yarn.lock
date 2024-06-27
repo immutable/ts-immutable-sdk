@@ -1105,7 +1105,7 @@ __metadata:
 
 "@imtbl/sdk@file:../../../sdk::locator=func-tests-imx%40workspace%3A.":
   version: 0.0.0
-  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=8b5ee2&locator=func-tests-imx%40workspace%3A."
+  resolution: "@imtbl/sdk@file:../../../sdk#../../../sdk::hash=add824&locator=func-tests-imx%40workspace%3A."
   dependencies:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
@@ -1139,6 +1139,7 @@ __metadata:
     ethereumjs-wallet: ^1.0.2
     ethers: ^5.7.2
     ethers-v6: "npm:ethers@6.11.1"
+    events: ^3.3.0
     global-const: ^0.1.2
     https-browserify: ^1.0.0
     i18next: ^23.7.6
@@ -1163,7 +1164,7 @@ __metadata:
       optional: true
     prisma:
       optional: true
-  checksum: ac8ed34c340f70e54e3d4a0ca9f7369473a6088ab9689693128362d6cd25da10e5c8f40b17857d2d40437ff4d5e7af8e349360b10f83df7b193056db048f4bd8
+  checksum: 06785b7e9ae03a433a430b63a6dc1de1644eaf4109dcb8583a4a66824d8c00a473a1eaa06f6556ca9e165d7dee63dd73db92219b384f6ae178a8ad71a117cf0f
   languageName: node
   linkType: hard
 

@@ -15,18 +15,38 @@ const imxForApproval = 0.03 * 1e18;
 const imxForFulfillment = 0.08 * 1e18;
 const listingPrice = 0.0001 * 1e18;
 
+// Workaround to retry banker on-chain actions which can race with test runs on other PRs
+// eslint-disable-next-line consistent-return
+async function withBankerRetry(func: () => Promise<void>, retries = 5): Promise<void> {
+  // 1 block baseline wait
+  const waitTime = 2_000;
+
+  // jitter between block * retry count
+  const jitter = Math.random() * waitTime * retries;
+
+  try {
+    await func();
+  } catch {
+    // eslint-disable-next-line no-promise-executor-return
+    await new Promise((resolve) => setTimeout(resolve, waitTime + jitter));
+    return withBankerRetry(func, retries + 1);
+  }
+}
+
 export const givenIHaveAFundedOffererAccount = (
   given: DefineStepFunction,
   banker: Wallet,
   offerer: Wallet,
 ) => {
   given(/^I have a funded offerer account$/, async () => {
-    const fundingTx = await banker.sendTransaction({
-      to: offerer.address,
-      value: `${imxForApproval}`,
-      ...GAS_OVERRIDES,
+    await withBankerRetry(async () => {
+      const fundingTx = await banker.sendTransaction({
+        to: offerer.address,
+        value: `${imxForApproval}`,
+        ...GAS_OVERRIDES,
+      });
+      await fundingTx.wait(1);
     });
-    await fundingTx.wait(1);
   });
 };
 
@@ -41,9 +61,12 @@ export const andTheOffererAccountHasERC721Token = (
     const testToken = await connectToTestERC721Token(banker, contractAddress);
     for (const tokenId of tokenIds) {
       // eslint-disable-next-line no-await-in-loop
-      const mintTx = await testToken.mint(offerer.address, tokenId, GAS_OVERRIDES);
-      // eslint-disable-next-line no-await-in-loop
-      await mintTx.wait(1);
+      await withBankerRetry(async () => {
+        // eslint-disable-next-line no-await-in-loop
+        const mintTx = await testToken.mint(offerer.address, tokenId, GAS_OVERRIDES);
+        // eslint-disable-next-line no-await-in-loop
+        await mintTx.wait(1);
+      });
     }
   });
 };
@@ -56,9 +79,11 @@ export const andTheOffererAccountHasERC1155Tokens = (
   tokenId: string,
 ) => {
   and(/^the offerer account has (\d+) ERC1155 tokens$/, async (amount) => {
-    const testToken = await connectToTestERC1155Token(banker, contractAddress);
-    const mintTx = await testToken.safeMint(offerer.address, tokenId, amount, '0x', GAS_OVERRIDES);
-    await mintTx.wait(1);
+    await withBankerRetry(async () => {
+      const testToken = await connectToTestERC1155Token(banker, contractAddress);
+      const mintTx = await testToken.safeMint(offerer.address, tokenId, amount, '0x', GAS_OVERRIDES);
+      await mintTx.wait(1);
+    });
   });
 };
 
@@ -68,13 +93,15 @@ export const andIHaveAFundedFulfillerAccount = (
   fulfiller: Wallet,
 ) => {
   and(/^I have a funded fulfiller account$/, async () => {
-    const fundingTx = await banker.sendTransaction({
-      to: fulfiller.address,
-      value: `${(listingPrice + imxForFulfillment)}`,
-      ...GAS_OVERRIDES,
-    });
+    await withBankerRetry(async () => {
+      const fundingTx = await banker.sendTransaction({
+        to: fulfiller.address,
+        value: `${(listingPrice + imxForFulfillment)}`,
+        ...GAS_OVERRIDES,
+      });
 
-    await fundingTx.wait(1);
+      await fundingTx.wait(1);
+    });
   });
 };
 
