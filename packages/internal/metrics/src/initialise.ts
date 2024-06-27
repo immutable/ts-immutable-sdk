@@ -1,4 +1,5 @@
 import { isNode } from './utils/browser';
+import { setClockSkew } from './utils/clock';
 import { Detail } from './utils/constants';
 import { post } from './utils/request';
 import { flattenProperties, getDetail, storeDetail } from './utils/state';
@@ -75,6 +76,7 @@ const getRuntimeDetails = (): RuntimeDetails => {
 
 type InitialiseResponse = {
   runtimeId: string;
+  sTime: string;
 };
 
 let initialised = false;
@@ -98,8 +100,9 @@ export const initialise = async () => {
     const response = await post<InitialiseResponse>('/v1/sdk/initialise', body);
 
     // Get runtimeId and store it
-    const { runtimeId } = response;
+    const { runtimeId, sTime } = response;
     storeDetail(Detail.RUNTIME_ID, runtimeId);
+    setClockSkew(sTime);
   } catch (error) {
     initialised = false;
   }
