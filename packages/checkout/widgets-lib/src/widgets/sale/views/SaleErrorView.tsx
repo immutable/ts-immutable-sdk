@@ -1,6 +1,4 @@
-import {
-  useState, useEffect, useContext, useRef,
-} from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { BaseTokens } from '@biom3/design-tokens';
 import { useTranslation } from 'react-i18next';
 import { StatusType } from '../../../components/Status/StatusType';
@@ -46,8 +44,6 @@ export function SaleErrorView({
   blockExplorerLink,
   errorType,
 }: SaleErrorViewProps) {
-  const mounted = useRef(false);
-
   const { t } = useTranslation();
   const {
     goBackToPaymentMethods,
@@ -241,9 +237,7 @@ export function SaleErrorView({
   };
 
   useEffect(() => {
-    if (!environment || !currentErrorType || mounted.current) return;
-
-    mounted.current = true;
+    if (!environment || !currentErrorType) return;
 
     addHandover({
       animationUrl: getRemoteRive(
