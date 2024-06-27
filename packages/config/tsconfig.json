@@ -16,6 +16,9 @@
     "declaration": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
+    "paths": {
+      "@imtbl/metrics": ["../internal/metrics/src/index.ts"]
+    }
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]

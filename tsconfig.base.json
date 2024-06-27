@@ -21,7 +21,7 @@
       "@imtbl/webhook": ["./packages/webhook/sdk/src/index.ts"],
       "@imtbl/x-client": ["./packages/x-client/src/index.ts"],
       "@imtbl/x-provider": ["./packages/x-provider/src/index.ts"],
-      "@imtbl/*": ["./packages/*/src/index.ts", "./packages/*/sdk/src/index.ts", "./packages/internal/*/sdk/src/index.ts", "./packages/internal/*/src/index.ts"],
+      "@imtbl/*": ["./packages/*/src/index.ts", "./packages/*/sdk/src/index.ts", "./packages/internal/*/sdk/src/index.ts", "./packages/internal/*/src/index.ts"]
     }
   }
 }
