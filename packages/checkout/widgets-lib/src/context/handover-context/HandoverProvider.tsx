@@ -108,6 +108,7 @@ export function HandoverProvider({ children }: HandoverProviderProps) {
     handoverContent: HandoverContent,
     handoverId: HandoverTarget = HandoverTarget.GLOBAL,
   ) => {
+    console.log('@@@Adding handover', handoverContent, handoverId);
     // Add the handover content to the queue / ensure no mutation of the queue
     setHandoverQueue((prevQueue) => {
       const updatedQueue = { ...prevQueue };
