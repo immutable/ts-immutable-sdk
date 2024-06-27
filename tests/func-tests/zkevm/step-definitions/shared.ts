@@ -17,19 +17,23 @@ const listingPrice = 0.0001 * 1e18;
 
 // Workaround to retry banker on-chain actions which can race with test runs on other PRs
 // eslint-disable-next-line consistent-return
-async function withBankerRetry(func: () => Promise<void>, retries = 5): Promise<void> {
-  // 1 block baseline wait
-  const waitTime = 2_000;
-
-  // jitter between block * retry count
-  const jitter = Math.random() * waitTime * retries;
-
+async function withBankerRetry(func: () => Promise<void>, attempt = 1): Promise<void> {
   try {
     await func();
-  } catch {
+  } catch (e) {
+    if (attempt > 5) {
+      throw e;
+    }
+
+    // 1 block baseline wait
+    const waitTime = 2_000;
+
+    // jitter between block * retry count
+    const jitter = Math.random() * waitTime * attempt;
+
     // eslint-disable-next-line no-promise-executor-return
     await new Promise((resolve) => setTimeout(resolve, waitTime + jitter));
-    return withBankerRetry(func, retries + 1);
+    return withBankerRetry(func, attempt + 1);
   }
 }
 
