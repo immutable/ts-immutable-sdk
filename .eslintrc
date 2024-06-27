@@ -16,6 +16,9 @@
     "tsconfigRootDir": "."
   },
   "rules": {
+    "import/no-internal-modules": [ "error", {
+      "forbid": [ "@imtbl/**/src/!(index)", "@imtbl/**/dist/*", "@imtbl/**/dist", "@imtbl/**/src" ]
+    } ],
     "@typescript-eslint/naming-convention": [
       "error",
       {
