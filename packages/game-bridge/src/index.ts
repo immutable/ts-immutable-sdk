@@ -224,10 +224,10 @@ window.callFunction = async (jsonData: string) => {
           responseFor: fxName,
           requestId,
           success: true,
-          code: response?.code,
-          deviceCode: response?.deviceCode,
-          url: response?.url,
-          interval: response?.interval,
+          code: response.code,
+          deviceCode: response.deviceCode,
+          url: response.url,
+          interval: response.interval,
         });
         break;
       }
@@ -247,6 +247,7 @@ window.callFunction = async (jsonData: string) => {
           responseFor: fxName,
           requestId,
           success: userInfo !== null,
+          error: userInfo === null ? 'Failed to re-login' : undefined,
         });
         break;
       }
@@ -268,6 +269,7 @@ window.callFunction = async (jsonData: string) => {
           responseFor: fxName,
           requestId,
           success: providerSet,
+          error: !providerSet ? 'Failed to reconnect' : undefined,
         });
         break;
       }
@@ -320,6 +322,7 @@ window.callFunction = async (jsonData: string) => {
           responseFor: fxName,
           requestId,
           success: providerSet,
+          error: !providerSet ? 'Failed to connect via PKCE' : undefined,
         });
         break;
       }
@@ -366,6 +369,7 @@ window.callFunction = async (jsonData: string) => {
           responseFor: fxName,
           requestId,
           success: providerSet,
+          error: !providerSet ? 'Failed to connect' : undefined,
         });
         break;
       }
@@ -543,6 +547,7 @@ window.callFunction = async (jsonData: string) => {
           responseFor: fxName,
           requestId,
           success: providerSet,
+          error: !providerSet ? 'Failed to connect to EVM' : undefined,
         });
         break;
       }
