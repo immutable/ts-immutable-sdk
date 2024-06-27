@@ -85,12 +85,14 @@ export const initialise = async () => {
   try {
     const runtimeDetails = flattenProperties(getRuntimeDetails());
     const existingRuntimeId = getDetail(Detail.RUNTIME_ID);
+    const existingIdentity = getDetail(Detail.IDENTITY);
 
     const body = {
       version: 1,
       data: {
         runtimeDetails,
         runtimeId: existingRuntimeId,
+        uId: existingIdentity,
       },
     };
     const response = await post<InitialiseResponse>('/v1/sdk/initialise', body);

@@ -1,17 +1,24 @@
-import { ModuleConfiguration } from '@imtbl/config';
-import {
-  EthSigner,
-  IMXClient,
-  StarkSigner,
-} from '@imtbl/x-client';
+import { Environment, ModuleConfiguration } from '@imtbl/config';
+import { EthSigner, IMXClient, StarkSigner } from '@imtbl/x-client';
 import { ImxApiClients } from '@imtbl/generated-clients';
+import { Flow } from '@imtbl/metrics';
 
 export enum PassportEvents {
   LOGGED_OUT = 'loggedOut',
+  ACCOUNTS_REQUESTED = 'accountsRequested',
 }
+
+export type AccountsRequestedEvent = {
+  environment: Environment;
+  sendTransaction: (params: Array<any>, flow: Flow) => Promise<string>;
+  walletAddress: string;
+  passportClient: string;
+  flow?: Flow;
+};
 
 export interface PassportEventMap extends Record<string, any> {
   [PassportEvents.LOGGED_OUT]: [];
+  [PassportEvents.ACCOUNTS_REQUESTED]: [AccountsRequestedEvent];
 }
 
 export type UserProfile = {
@@ -74,7 +81,8 @@ export interface PopupOverlayOptions {
   disableBlockedPopupOverlay?: boolean;
 }
 
-export interface PassportModuleConfiguration extends ModuleConfiguration<PassportOverrides>,
+export interface PassportModuleConfiguration
+  extends ModuleConfiguration<PassportOverrides>,
   OidcConfiguration {
   /**
    * This flag indicates that Passport is being used in a cross-sdk bridge scenario
@@ -142,11 +150,11 @@ export type DeviceErrorResponse = {
 };
 
 export type PKCEData = {
-  state: string,
-  verifier: string
+  state: string;
+  verifier: string;
 };
 
 export type IMXSigners = {
-  starkSigner: StarkSigner,
+  starkSigner: StarkSigner;
   ethSigner: EthSigner;
 };

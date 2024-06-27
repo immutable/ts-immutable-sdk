@@ -2,7 +2,9 @@ import { StaticJsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { Signer } from '@ethersproject/abstract-signer';
 import { utils } from 'ethers';
-import { identify, trackFlow } from '@imtbl/metrics';
+import {
+  Flow, identify, trackError, trackFlow,
+} from '@imtbl/metrics';
 import {
   JsonRpcRequestCallback,
   JsonRpcRequestPayload,
@@ -17,10 +19,7 @@ import MagicAdapter from '../magicAdapter';
 import TypedEventEmitter from '../utils/typedEventEmitter';
 import { PassportConfiguration } from '../config';
 import {
-  PassportEventMap,
-  PassportEvents,
-  User,
-  UserZkEvm,
+  PassportEventMap, PassportEvents, User, UserZkEvm,
 } from '../types';
 import { RelayerClient } from './relayerClient';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
@@ -29,12 +28,13 @@ import { sendTransaction } from './sendTransaction';
 import GuardianClient from '../guardian';
 import { signTypedDataV4 } from './signTypedDataV4';
 import { personalSign } from './personalSign';
+import { trackSessionActivity } from './sessionActivity/sessionActivity';
 
 export type ZkEvmProviderInput = {
   authManager: AuthManager;
-  magicAdapter: MagicAdapter,
-  config: PassportConfiguration,
-  multiRollupApiClients: MultiRollupApiClients,
+  magicAdapter: MagicAdapter;
+  config: PassportConfiguration;
+  multiRollupApiClients: MultiRollupApiClients;
   passportEventEmitter: TypedEventEmitter<PassportEventMap>;
   guardianClient: GuardianClient;
 };
@@ -46,7 +46,15 @@ export class ZkEvmProvider implements Provider {
 
   readonly #config: PassportConfiguration;
 
-  readonly #eventEmitter: TypedEventEmitter<ProviderEventMap>;
+  /**
+   * intended to emit EIP-1193 events
+   */
+  readonly #providerEventEmitter: TypedEventEmitter<ProviderEventMap>;
+
+  /**
+   * intended to emit internal Passport events
+   */
+  readonly #passportEventEmitter: TypedEventEmitter<ProviderEventMap>;
 
   readonly #guardianClient: GuardianClient;
 
@@ -84,6 +92,7 @@ export class ZkEvmProvider implements Provider {
     this.#magicAdapter = magicAdapter;
     this.#config = config;
     this.#guardianClient = guardianClient;
+    this.#passportEventEmitter = passportEventEmitter;
 
     if (config.crossSdkBridgeEnabled) {
       // StaticJsonRpcProvider by default sets the referrer as "client".
@@ -103,9 +112,13 @@ export class ZkEvmProvider implements Provider {
     });
 
     this.#multiRollupApiClients = multiRollupApiClients;
-    this.#eventEmitter = new TypedEventEmitter<ProviderEventMap>();
+    this.#providerEventEmitter = new TypedEventEmitter<ProviderEventMap>();
 
     passportEventEmitter.on(PassportEvents.LOGGED_OUT, this.#handleLogout);
+    passportEventEmitter.on(
+      PassportEvents.ACCOUNTS_REQUESTED,
+      trackSessionActivity,
+    );
   }
 
   #handleLogout = () => {
@@ -115,7 +128,7 @@ export class ZkEvmProvider implements Provider {
     this.#zkEvmAddress = undefined;
 
     if (shouldEmitAccountsChanged) {
-      this.#eventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, []);
+      this.#providerEventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, []);
     }
   };
 
@@ -164,67 +177,101 @@ export class ZkEvmProvider implements Provider {
     return ethSigner;
   }
 
+  async #callSessionActivity() {
+    const sendTransactionClosure = async (params: Array<any>, flow: Flow) => {
+      const ethSigner = await this.#getSigner();
+      return await sendTransaction({
+        params,
+        ethSigner,
+        guardianClient: this.#guardianClient,
+        rpcProvider: this.#rpcProvider,
+        relayerClient: this.#relayerClient,
+        zkevmAddress: this.#zkEvmAddress!,
+        flow,
+      });
+    };
+    this.#passportEventEmitter.emit(PassportEvents.ACCOUNTS_REQUESTED, {
+      environment: this.#config.baseConfig.environment,
+      sendTransaction: sendTransactionClosure,
+      walletAddress: this.#zkEvmAddress || '',
+      passportClient: this.#config.oidcConfiguration.clientId,
+    });
+  }
+
   async #performRequest(request: RequestArguments): Promise<any> {
+    // This is required for sending session activity events
+
     switch (request.method) {
       case 'eth_requestAccounts': {
-        if (this.#zkEvmAddress) {
-          return [this.#zkEvmAddress];
-        }
+        const requestAccounts = async () => {
+          if (this.#zkEvmAddress) {
+            return [this.#zkEvmAddress];
+          }
 
-        const flow = trackFlow('passport', 'ethRequestAccounts');
+          const flow = trackFlow('passport', 'ethRequestAccounts');
 
-        try {
-          const user = await this.#authManager.getUserOrLogin();
-          flow.addEvent('endGetUserOrLogin');
+          try {
+            const user = await this.#authManager.getUserOrLogin();
+            flow.addEvent('endGetUserOrLogin');
 
-          this.#initialiseEthSigner(user);
+            this.#initialiseEthSigner(user);
 
-          if (!isZkEvmUser(user)) {
-            flow.addEvent('startUserRegistration');
+            if (!isZkEvmUser(user)) {
+              flow.addEvent('startUserRegistration');
 
-            const ethSigner = await this.#getSigner();
-            flow.addEvent('ethSignerResolved');
+              const ethSigner = await this.#getSigner();
+              flow.addEvent('ethSignerResolved');
 
-            this.#zkEvmAddress = await registerZkEvmUser({
-              ethSigner,
-              authManager: this.#authManager,
-              multiRollupApiClients: this.#multiRollupApiClients,
-              accessToken: user.accessToken,
-              rpcProvider: this.#rpcProvider,
-              flow,
+              this.#zkEvmAddress = await registerZkEvmUser({
+                ethSigner,
+                authManager: this.#authManager,
+                multiRollupApiClients: this.#multiRollupApiClients,
+                accessToken: user.accessToken,
+                rpcProvider: this.#rpcProvider,
+                flow,
+              });
+              flow.addEvent('endUserRegistration');
+            } else {
+              this.#zkEvmAddress = user.zkEvm.ethAddress;
+            }
+
+            this.#providerEventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [
+              this.#zkEvmAddress,
+            ]);
+            identify({
+              passportId: user.profile.sub,
             });
-            flow.addEvent('endUserRegistration');
-          } else {
-            this.#zkEvmAddress = user.zkEvm.ethAddress;
+            return [this.#zkEvmAddress];
+          } catch (error) {
+            if (error instanceof Error) {
+              trackError('passport', 'ethRequestAccounts', error);
+            }
+            flow.addEvent('errored');
+            throw error;
+          } finally {
+            flow.addEvent('End');
           }
+        };
 
-          this.#eventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [this.#zkEvmAddress]);
-          identify({
-            passportId: user.profile.sub,
-          });
-
-          return [this.#zkEvmAddress];
-        } catch (error) {
-          let errorMessage = 'Unknown error';
-          if (error instanceof Error) {
-            errorMessage = error.message;
-          }
-
-          flow.addEvent('error', { errorMessage });
-          throw error;
-        } finally {
-          flow.end();
-        }
+        const addresses = await requestAccounts();
+        this.#callSessionActivity();
+        return addresses;
       }
       case 'eth_sendTransaction': {
         if (!this.#zkEvmAddress) {
-          throw new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
+          throw new JsonRpcError(
+            ProviderErrorCode.UNAUTHORIZED,
+            'Unauthorised - call eth_requestAccounts first',
+          );
         }
 
         const flow = trackFlow('passport', 'ethSendTransaction');
 
         try {
-          return await this.#guardianClient.withConfirmationScreen({ width: 480, height: 720 })(async () => {
+          return await this.#guardianClient.withConfirmationScreen({
+            width: 480,
+            height: 720,
+          })(async () => {
             const ethSigner = await this.#getSigner();
             flow.addEvent('endGetSigner');
 
@@ -239,15 +286,13 @@ export class ZkEvmProvider implements Provider {
             });
           });
         } catch (error) {
-          let errorMessage = 'Unknown error';
           if (error instanceof Error) {
-            errorMessage = error.message;
+            trackError('passport', 'eth_sendTransaction', error);
           }
-
-          flow.addEvent('error', { errorMessage });
+          flow.addEvent('errored');
           throw error;
         } finally {
-          flow.end();
+          flow.addEvent('End');
         }
       }
       case 'eth_accounts': {
@@ -255,13 +300,19 @@ export class ZkEvmProvider implements Provider {
       }
       case 'personal_sign': {
         if (!this.#zkEvmAddress) {
-          throw new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
+          throw new JsonRpcError(
+            ProviderErrorCode.UNAUTHORIZED,
+            'Unauthorised - call eth_requestAccounts first',
+          );
         }
 
         const flow = trackFlow('passport', 'personalSign');
 
         try {
-          return await this.#guardianClient.withConfirmationScreen({ width: 480, height: 720 })(async () => {
+          return await this.#guardianClient.withConfirmationScreen({
+            width: 480,
+            height: 720,
+          })(async () => {
             const ethSigner = await this.#getSigner();
             flow.addEvent('endGetSigner');
 
@@ -276,27 +327,31 @@ export class ZkEvmProvider implements Provider {
             });
           });
         } catch (error) {
-          let errorMessage = 'Unknown error';
           if (error instanceof Error) {
-            errorMessage = error.message;
+            trackError('passport', 'personal_sign', error);
           }
-
-          flow.addEvent('error', { errorMessage });
+          flow.addEvent('errored');
           throw error;
         } finally {
-          flow.end();
+          flow.addEvent('End');
         }
       }
       case 'eth_signTypedData':
       case 'eth_signTypedData_v4': {
         if (!this.#zkEvmAddress) {
-          throw new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
+          throw new JsonRpcError(
+            ProviderErrorCode.UNAUTHORIZED,
+            'Unauthorised - call eth_requestAccounts first',
+          );
         }
 
         const flow = trackFlow('passport', 'ethSignTypedDataV4');
 
         try {
-          return await this.#guardianClient.withConfirmationScreen({ width: 480, height: 720 })(async () => {
+          return await this.#guardianClient.withConfirmationScreen({
+            width: 480,
+            height: 720,
+          })(async () => {
             const ethSigner = await this.#getSigner();
             flow.addEvent('endGetSigner');
 
@@ -311,15 +366,13 @@ export class ZkEvmProvider implements Provider {
             });
           });
         } catch (error) {
-          let errorMessage = 'Unknown error';
           if (error instanceof Error) {
-            errorMessage = error.message;
+            trackError('passport', 'eth_signTypedData', error);
           }
-
-          flow.addEvent('error', { errorMessage });
+          flow.addEvent('errored');
           throw error;
         } finally {
-          flow.end();
+          flow.addEvent('End');
         }
       }
       case 'eth_chainId': {
@@ -337,16 +390,26 @@ export class ZkEvmProvider implements Provider {
       case 'eth_getCode':
       case 'eth_getTransactionCount': {
         const [address, blockNumber] = request.params || [];
-        return this.#rpcProvider.send(request.method, [address, blockNumber || 'latest']);
+        return this.#rpcProvider.send(request.method, [
+          address,
+          blockNumber || 'latest',
+        ]);
       }
       case 'eth_getStorageAt': {
         const [address, storageSlot, blockNumber] = request.params || [];
-        return this.#rpcProvider.send(request.method, [address, storageSlot, blockNumber || 'latest']);
+        return this.#rpcProvider.send(request.method, [
+          address,
+          storageSlot,
+          blockNumber || 'latest',
+        ]);
       }
       case 'eth_call':
       case 'eth_estimateGas': {
         const [transaction, blockNumber] = request.params || [];
-        return this.#rpcProvider.send(request.method, [transaction, blockNumber || 'latest']);
+        return this.#rpcProvider.send(request.method, [
+          transaction,
+          blockNumber || 'latest',
+        ]);
       }
       case 'eth_gasPrice':
       case 'eth_blockNumber':
@@ -357,12 +420,17 @@ export class ZkEvmProvider implements Provider {
         return this.#rpcProvider.send(request.method, request.params || []);
       }
       default: {
-        throw new JsonRpcError(ProviderErrorCode.UNSUPPORTED_METHOD, 'Method not supported');
+        throw new JsonRpcError(
+          ProviderErrorCode.UNSUPPORTED_METHOD,
+          'Method not supported',
+        );
       }
     }
   }
 
-  async #performJsonRpcRequest(request: JsonRpcRequestPayload): Promise<JsonRpcResponsePayload> {
+  async #performJsonRpcRequest(
+    request: JsonRpcRequestPayload,
+  ): Promise<JsonRpcResponsePayload> {
     const { id, jsonrpc } = request;
     try {
       const result = await this.#performRequest(request);
@@ -376,9 +444,15 @@ export class ZkEvmProvider implements Provider {
       if (error instanceof JsonRpcError) {
         jsonRpcError = error;
       } else if (error instanceof Error) {
-        jsonRpcError = new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, error.message);
+        jsonRpcError = new JsonRpcError(
+          RpcErrorCode.INTERNAL_ERROR,
+          error.message,
+        );
       } else {
-        jsonRpcError = new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, 'Internal error');
+        jsonRpcError = new JsonRpcError(
+          RpcErrorCode.INTERNAL_ERROR,
+          'Internal error',
+        );
       }
 
       return {
@@ -389,9 +463,7 @@ export class ZkEvmProvider implements Provider {
     }
   }
 
-  public async request(
-    request: RequestArguments,
-  ): Promise<any> {
+  public async request(request: RequestArguments): Promise<any> {
     try {
       return this.#performRequest(request);
     } catch (error: unknown) {
@@ -415,17 +487,21 @@ export class ZkEvmProvider implements Provider {
     }
 
     if (Array.isArray(request)) {
-      Promise.all(request.map(this.#performJsonRpcRequest)).then((result) => {
-        callback(null, result);
-      }).catch((error: JsonRpcError) => {
-        callback(error, []);
-      });
+      Promise.all(request.map(this.#performJsonRpcRequest))
+        .then((result) => {
+          callback(null, result);
+        })
+        .catch((error: JsonRpcError) => {
+          callback(error, []);
+        });
     } else {
-      this.#performJsonRpcRequest(request).then((result) => {
-        callback(null, result);
-      }).catch((error: JsonRpcError) => {
-        callback(error, null);
-      });
+      this.#performJsonRpcRequest(request)
+        .then((result) => {
+          callback(null, result);
+        })
+        .catch((error: JsonRpcError) => {
+          callback(error, null);
+        });
     }
   }
 
@@ -437,17 +513,23 @@ export class ZkEvmProvider implements Provider {
     // Web3 >= 1.0.0-beta.38 calls `send` with method and parameters.
     if (typeof request === 'string') {
       if (typeof callbackOrParams === 'function') {
-        return this.sendAsync({
-          method: request,
-          params: [],
-        }, callbackOrParams);
+        return this.sendAsync(
+          {
+            method: request,
+            params: [],
+          },
+          callbackOrParams,
+        );
       }
 
       if (callback) {
-        return this.sendAsync({
-          method: request,
-          params: Array.isArray(callbackOrParams) ? callbackOrParams : [],
-        }, callback);
+        return this.sendAsync(
+          {
+            method: request,
+            params: Array.isArray(callbackOrParams) ? callbackOrParams : [],
+          },
+          callback,
+        );
       }
 
       return this.request({
@@ -469,10 +551,13 @@ export class ZkEvmProvider implements Provider {
   }
 
   public on(event: string, listener: (...args: any[]) => void): void {
-    this.#eventEmitter.on(event, listener);
+    this.#providerEventEmitter.on(event, listener);
   }
 
-  public removeListener(event: string, listener: (...args: any[]) => void): void {
-    this.#eventEmitter.removeListener(event, listener);
+  public removeListener(
+    event: string,
+    listener: (...args: any[]) => void,
+  ): void {
+    this.#providerEventEmitter.removeListener(event, listener);
   }
 }
