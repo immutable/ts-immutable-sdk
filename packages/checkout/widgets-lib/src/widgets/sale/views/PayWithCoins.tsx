@@ -89,6 +89,7 @@ export function PayWithCoins() {
       (error, txns) => {
         const details = { transactionId: signResponse?.transactionId };
         sendFailedEvent(error.toString(), error, txns, undefined, details); // checkoutPrimarySalePaymentMethods_FailEventFailed
+        goToErrorView(error.type, error.data);
       },
       onTxnStepExecuteAll,
     );

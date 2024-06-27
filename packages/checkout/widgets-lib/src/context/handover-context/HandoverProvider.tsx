@@ -48,9 +48,6 @@ export function HandoverProvider({ children }: HandoverProviderProps) {
         if (handoverContent?.onClose) {
           handoverContent.onClose();
         }
-
-        console.log('@@@Closing handover', handoverId);
-
         return newHandovers;
       });
     },
@@ -59,7 +56,6 @@ export function HandoverProvider({ children }: HandoverProviderProps) {
 
   const processQueue = useCallback(
     (handoverId: HandoverTarget, autoClose: boolean = false) => {
-      console.log('@@@Processing queue for', handoverId);
       if (handoverBusy[handoverId]) return;
 
       const updatedQueue = { ...handoverQueue };
@@ -86,8 +82,6 @@ export function HandoverProvider({ children }: HandoverProviderProps) {
               ...prev,
               [handoverId]: false,
             }));
-            console.log('@@@Timeout complete for', handoverId);
-            processQueue(handoverId, autoClose);
           }, effectiveDuration);
         } else {
           delete updatedQueue[handoverId];
@@ -110,7 +104,6 @@ export function HandoverProvider({ children }: HandoverProviderProps) {
     handoverContent: HandoverContent,
     handoverId: HandoverTarget = HandoverTarget.GLOBAL,
   ) => {
-    console.log('@@@Adding handover', handoverContent, handoverId);
     setHandoverQueue((prevQueue) => {
       const updatedQueue = { ...prevQueue };
       const queuedContent = [...(updatedQueue[handoverId] ?? [])];
@@ -121,7 +114,6 @@ export function HandoverProvider({ children }: HandoverProviderProps) {
   };
 
   useEffect(() => {
-    console.log('@@@useEffect triggered for handoverQueue');
     Object.keys(handoverQueue).forEach((handoverId) => {
       processQueue(handoverId as HandoverTarget);
     });

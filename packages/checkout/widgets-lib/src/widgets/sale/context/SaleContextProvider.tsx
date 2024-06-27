@@ -323,11 +323,6 @@ export function SaleContextProvider(props: {
     [[paymentMethod, executeResponse, tokenIds]],
   );
 
-  // useEffect(() => {
-  //   if (!signError) return;
-  //   goToErrorView(signError.type, signError.data);
-  // }, [signError]);
-
   useEffect(() => {
     if (!orderQuoteError) return;
     goToErrorView(orderQuoteError.type, orderQuoteError.data);
