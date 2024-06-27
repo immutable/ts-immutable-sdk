@@ -1,7 +1,8 @@
+import {
+  useState, useEffect, useContext, useRef,
+} from 'react';
 import { BaseTokens } from '@biom3/design-tokens';
-import { useContext } from 'react';
 import { useTranslation } from 'react-i18next';
-
 import { StatusType } from '../../../components/Status/StatusType';
 import { SaleErrorTypes } from '../types';
 import { useSaleContext } from '../context/SaleContextProvider';
@@ -20,7 +21,6 @@ import {
 } from '../../../context/view-context/ViewContext';
 import { getRemoteRive } from '../../../lib/utils';
 import { HandoverContent } from '../../../components/Handover/HandoverContent';
-import { useMount } from '../../../hooks/useMount';
 import { useHandover } from '../../../lib/hooks/useHandover';
 import { HandoverTarget } from '../../../context/handover-context/HandoverContext';
 import { isPassportProvider } from '../../../lib/provider';
@@ -49,7 +49,6 @@ export function SaleErrorView({
   const { t } = useTranslation();
   const {
     goBackToPaymentMethods,
-    goToErrorView,
     executeNextTransaction,
     signResponse,
     environment,
@@ -65,6 +64,9 @@ export function SaleErrorView({
   });
 
   const { onTxnStepExecuteNextTransaction } = useHandoverSteps(environment);
+  const [currentErrorType, setCurrentErrorType] = useState<
+  SaleErrorTypes | undefined
+  >(errorType);
 
   const closeWidget = () => {
     sendSaleWidgetCloseEvent(eventTarget);
@@ -88,12 +90,13 @@ export function SaleErrorView({
           const details = {
             transactionId: signResponse?.transactionId,
           };
-          sendFailedEvent(err.toString(), err, txns, undefined, details); // checkoutPrimarySalePaymentMethods_FailEventFailed
+          sendFailedEvent(err.toString(), err, txns, undefined, details);
+          setCurrentErrorType(SaleErrorTypes.TRANSACTION_FAILED);
         },
         onTxnStepExecuteNextTransaction,
       );
     } catch (error) {
-      goToErrorView(SaleErrorTypes.SERVICE_BREAKDOWN, { error });
+      setCurrentErrorType(SaleErrorTypes.SERVICE_BREAKDOWN);
     }
   };
 
@@ -216,37 +219,44 @@ export function SaleErrorView({
   };
 
   const getErrorViewProps = () => {
-    const handlers = errorHandlersConfig[errorType || SaleErrorTypes.DEFAULT] || {};
-    const secondaryButtonText = errorType === SaleErrorTypes.TRANSACTION_FAILED && transactionHash
-      ? t(`views.SALE_FAIL.errors.${errorType}.secondaryAction`)
+    const handlers = errorHandlersConfig[currentErrorType || SaleErrorTypes.DEFAULT] || {};
+    const secondaryButtonText = currentErrorType === SaleErrorTypes.TRANSACTION_FAILED && transactionHash
+      ? t(`views.SALE_FAIL.errors.${currentErrorType}.secondaryAction`)
       : t(`views.SALE_FAIL.errors.${SaleErrorTypes.DEFAULT}.secondaryAction`);
 
     return {
       headingText: t('views.PAYMENT_METHODS.handover.error.heading'),
-      subheadingText: t(`views.SALE_FAIL.errors.${errorType}.description`),
-      primaryButtonText: t(`views.SALE_FAIL.errors.${errorType}.primaryAction`),
+      subheadingText: t(
+        `views.SALE_FAIL.errors.${currentErrorType}.description`,
+      ),
+      primaryButtonText: t(
+        `views.SALE_FAIL.errors.${currentErrorType}.primaryAction`,
+      ),
       onPrimaryButtonClick: handlers?.onActionClick,
       secondaryButtonText,
       onSecondaryButtonClick: handlers?.onSecondaryActionClick,
     };
   };
 
-  useMount(
-    () => {
-      if (!environment || !errorType) return;
+  const isFirstRender = useRef(true);
 
-      addHandover({
-        animationUrl: getRemoteRive(
-          environment,
-          getRiveAnimationName(TransactionMethod.APPROVE),
-        ),
-        inputValue: StateMachineInput.ERROR,
-        children: <HandoverContent {...getErrorViewProps()} />,
-      });
-    },
-    () => Boolean(environment && errorType),
-    [errorType, environment],
-  );
+  useEffect(() => {
+    if (!environment || !currentErrorType) return;
+
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
+    addHandover({
+      animationUrl: getRemoteRive(
+        environment,
+        getRiveAnimationName(TransactionMethod.APPROVE),
+      ),
+      inputValue: StateMachineInput.ERROR,
+      children: <HandoverContent {...getErrorViewProps()} />,
+    });
+  }, [currentErrorType, environment]);
 
   return null;
 }

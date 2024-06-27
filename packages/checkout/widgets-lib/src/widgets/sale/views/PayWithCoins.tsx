@@ -76,7 +76,7 @@ export function PayWithCoins() {
 
   const { onTxnStepExecuteNextTransaction, onTxnStepExecuteAll } = useHandoverSteps(environment);
 
-  const { addHandover, closeHandover } = useHandover({
+  const { addHandover } = useHandover({
     id: HandoverTarget.GLOBAL,
   });
 
@@ -117,7 +117,6 @@ export function PayWithCoins() {
           onTxnStepExecuteNextTransaction,
         );
       } catch (error) {
-        closeHandover(HandoverTarget.GLOBAL);
         goToErrorView(SaleErrorTypes.SERVICE_BREAKDOWN, { error });
       }
     };
