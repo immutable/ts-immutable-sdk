@@ -80,6 +80,7 @@ export function HandoverProvider({ children }: HandoverProviderProps) {
             ...prev,
             [handoverId]: true,
           }));
+
           setTimeout(() => {
             setHandoverBusy((prev) => ({
               ...prev,

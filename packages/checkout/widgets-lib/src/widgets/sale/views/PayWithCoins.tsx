@@ -169,13 +169,6 @@ export function PayWithCoins() {
     if (executeResponse?.done) {
       const details = { transactionId: signResponse?.transactionId };
 
-      sendSuccessEvent(
-        SaleWidgetViews.SALE_SUCCESS,
-        executeResponse?.transactions,
-        signTokenIds,
-        details,
-      ); // checkoutPrimarySaleSaleSuccess_SuccessEventSucceeded
-
       addHandover({
         duration: 2000,
         animationUrl: getRemoteRive(
@@ -188,7 +181,15 @@ export function PayWithCoins() {
             {t('views.PAYMENT_METHODS.handover.success')}
           </Heading>
         ),
-        onClose: () => sendCloseEvent(SaleWidgetViews.SALE_SUCCESS), // checkoutPrimarySaleSaleSuccess_CloseButtonPressed
+        onClose: () => {
+          sendSuccessEvent(
+            SaleWidgetViews.SALE_SUCCESS,
+            executeResponse?.transactions,
+            signTokenIds,
+            details,
+          ); // checkoutPrimarySaleSaleSuccess_SuccessEventSucceeded
+          sendCloseEvent(SaleWidgetViews.SALE_SUCCESS); // checkoutPrimarySaleSaleSuccess_CloseButtonPressed
+        },
       });
     }
   }, [executeResponse]);

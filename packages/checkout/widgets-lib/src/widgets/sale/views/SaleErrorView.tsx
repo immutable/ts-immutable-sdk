@@ -46,6 +46,8 @@ export function SaleErrorView({
   blockExplorerLink,
   errorType,
 }: SaleErrorViewProps) {
+  const mounted = useRef(false);
+
   const { t } = useTranslation();
   const {
     goBackToPaymentMethods,
@@ -238,15 +240,10 @@ export function SaleErrorView({
     };
   };
 
-  const isFirstRender = useRef(true);
-
   useEffect(() => {
-    if (!environment || !currentErrorType) return;
+    if (!environment || !currentErrorType || mounted.current) return;
 
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
+    mounted.current = true;
 
     addHandover({
       animationUrl: getRemoteRive(
