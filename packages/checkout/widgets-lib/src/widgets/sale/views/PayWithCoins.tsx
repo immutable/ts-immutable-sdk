@@ -113,6 +113,7 @@ export function PayWithCoins() {
               transactionId: signResponse?.transactionId,
             };
             sendFailedEvent(err.toString(), err, txns, undefined, details); // checkoutPrimarySalePaymentMethods_FailEventFailed
+            goToErrorView(err.type, err.data);
           },
           onTxnStepExecuteNextTransaction,
         );
