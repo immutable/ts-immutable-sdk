@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { Signer } from '@ethersproject/abstract-signer';
 import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
@@ -39,11 +38,13 @@ export const personalSign = async ({
     throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'personal_sign requires the signer to be the from address');
   }
 
-  // Convert message into a string if it's a hex
-  console.log('message', message);
-  console.log('fromAddress', fromAddress);
+  if (typeof window !== 'undefined' && !window.Buffer) {
+    // Use dynamic import to load Buffer
+    const bufferModule = await import('buffer');
+    window.Buffer = bufferModule.Buffer;
+  }
+
   const payload = hexToString(message);
-  console.log('payload - after hexToString', payload);
   const { chainId } = await rpcProvider.detectNetwork();
   flow.addEvent('endDetectNetwork');
   const chainIdBigNumber = BigNumber.from(chainId);
