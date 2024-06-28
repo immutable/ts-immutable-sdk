@@ -147,14 +147,12 @@ export function PayWithCoins() {
   useEffect(() => {
     if (!provider || filteredTransactions.length === 0) return;
 
-    if (isPassportProvider(provider)) {
-      if (
-        currentTransactionIndex < filteredTransactions.length
-        && prevTransactionIndexRef.current !== currentTransactionIndex
-      ) {
-        prevTransactionIndexRef.current = currentTransactionIndex;
-        executeUserInitiatedTransaction();
-      }
+    const hadPendingTransactions = currentTransactionIndex < filteredTransactions.length
+      && prevTransactionIndexRef.current !== currentTransactionIndex;
+
+    if (isPassportProvider(provider) && hadPendingTransactions) {
+      prevTransactionIndexRef.current = currentTransactionIndex;
+      executeUserInitiatedTransaction();
     }
   }, [filteredTransactions, currentTransactionIndex, provider]);
 

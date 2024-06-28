@@ -61,7 +61,7 @@ export function Handover({ id, children }: { id: string, children?: React.ReactN
             right: '0px',
           }}
         >
-          {handover?.animationUrl && handover?.animationUrl.length > 0 && (
+          {handover?.animationUrl?.length && (
             <HandoverAnimation
               key={handover.animationUrl}
               url={handover.animationUrl}

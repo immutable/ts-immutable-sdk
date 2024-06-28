@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import React, {
   useCallback, useEffect, useMemo, useState,
 } from 'react';
@@ -49,9 +48,7 @@ export function HandoverProvider({ children }: HandoverProviderProps) {
 
         delete newHandovers[handoverId];
 
-        if (handoverContent?.onClose) {
-          handoverContent.onClose();
-        }
+        handoverContent?.onClose?.();
         return newHandovers;
       });
     },
@@ -74,7 +71,10 @@ export function HandoverProvider({ children }: HandoverProviderProps) {
           }));
 
           const contentDuration = nextHandoverContent.duration ?? 0;
-          const effectiveDuration = Math.max(contentDuration, HandoverDuration.SHORT);
+          const effectiveDuration = Math.max(
+            contentDuration,
+            HandoverDuration.SHORT,
+          );
 
           setHandoverBusy((prev) => ({
             ...prev,
@@ -96,7 +96,7 @@ export function HandoverProvider({ children }: HandoverProviderProps) {
         }
       } else {
         const currentHandover = handovers[handoverId];
-        if (currentHandover?.duration && currentHandover.duration > 0) {
+        if (currentHandover?.duration) {
           closeHandover(handoverId);
         }
       }

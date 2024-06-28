@@ -7,6 +7,9 @@ import {
   useStateMachineInput,
 } from '@rive-app/react-canvas-lite';
 
+const STATE_MACHINE_NAME = 'State';
+const INPUT_NAME = 'mode';
+
 export function HandoverAnimation({
   url,
   inputValue = 0,
@@ -14,9 +17,6 @@ export function HandoverAnimation({
   url: string;
   inputValue?: number;
 }) {
-  const STATE_MACHINE_NAME = 'State';
-  const INPUT_NAME = 'mode';
-
   const riveParams = {
     src: url,
     autoplay: true,
