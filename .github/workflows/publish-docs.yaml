@@ -16,12 +16,12 @@ jobs:
       GITHUB_USER: ${{ github.actor }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Checkout Docs Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: immutable/docs
           token: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
@@ -44,7 +44,7 @@ jobs:
           git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
           cache: "yarn"
@@ -55,7 +55,15 @@ jobs:
           jq '.version = "${{ env.VERSION }}"' ./package.json > "$tmp" && mv "$tmp" ./package.json
         shell: bash
 
+      - name: Restore cached node_modules
+        id: restore-cache-node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
+
       - name: Install dependencies
+        if: steps.restore-cache-node_modules.outputs.cache-hit != 'true' 
         run: yarn install --immutable
 
       - name: Build

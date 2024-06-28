@@ -1,9 +1,9 @@
 import { JsonRpcProvider, JsonRpcBatchProvider } from '@ethersproject/providers';
 import { Contract } from '@ethersproject/contracts';
 import { BigNumber } from '@ethersproject/bignumber';
+import { constants, utils } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { PaymentsExtended, SwapRouter } from '@uniswap/router-sdk';
-import { constants, utils } from 'ethers';
 import { InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError, NoRoutesAvailableError } from './errors';
 import { ERC20__factory } from './contracts/types/factories/ERC20__factory';
 import { SecondaryFee } from './types';

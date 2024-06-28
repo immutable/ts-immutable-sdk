@@ -528,6 +528,8 @@ export class Checkout {
   /**
    * Determines the requirements for performing a buy.
    * @param {BuyParams} params - The parameters for the buy.
+   * @deprecated Please use orderbook.fulfillOrder or orderbook.fulfillBulkOrders instead. The smartCheckout
+   * method can still be used to ensure the transaction requirements are met before preparing the order fulfillment
    */
   public async buy(params: BuyParams): Promise<BuyResult> {
     if (params.orders.length > 1) {
@@ -555,6 +557,8 @@ export class Checkout {
    * @param {SellParams} params - The parameters for the sell.
    * Only currently actions the first order in the array until we support batch processing.
    * Only currently actions the first fee in the fees array of each order until we support multiple fees.
+   * @deprecated Please use orderbook.prepareListing or orderbook.prepareBulkListing instead. The smartCheckout
+   * method can still be used to ensure the transaction requirements are met before preparing the listing
    */
   public async sell(params: SellParams): Promise<SellResult> {
     if (params.orders.length > 1) {
@@ -575,6 +579,7 @@ export class Checkout {
   /**
    * Cancels a sell.
    * @param {CancelParams} params - The parameters for the cancel.
+   * @deprecated Please use orderbook.prepareOrderCancellations instead.
    */
   public async cancel(params: CancelParams): Promise<CancelResult> {
     // eslint-disable-next-line no-console

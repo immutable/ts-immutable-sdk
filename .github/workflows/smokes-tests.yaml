@@ -1,0 +1,46 @@
+name: Smoke Test
+
+on:
+  pull_request:
+    branches:
+      - main
+  merge_group:
+    branches:
+      - main
+
+jobs:
+  smokeTestEsm:
+    name: Smoke Test ESM
+    runs-on: ubuntu-latest-4-cores
+    env:
+      NODE_OPTIONS: --max-old-space-size=14366
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          registry-url: https://registry.npmjs.org/
+          cache: "yarn"
+
+      - name: Restore cached node_modules
+        id: restore-cache-node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
+
+      - name: Install root dependencies
+        if: steps.restore-cache-node_modules.outputs.cache-hit != 'true' 
+        run: yarn install --immutable
+
+      - name: Build
+        run: yarn build
+
+      - name: Install functional tests dependencies
+        run: cd tests/smoke/esm && yarn install --no-immutable
+
+      - name: Run test
+        run: cd tests/smoke/esm && yarn test

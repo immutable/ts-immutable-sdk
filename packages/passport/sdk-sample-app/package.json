@@ -26,6 +26,7 @@
     "@types/react-dom": "^18.0.11",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
+    "concurrently": "^8.2.2",
     "eslint": "^8.40.0",
     "eslint-config-next": "13.3.1",
     "typescript": "^4.9.5"
@@ -34,6 +35,7 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
+    "dev-with-sdk": "concurrently 'yarn workspace @imtbl/passport-sdk-sample-app dev' 'yarn workspace @imtbl/passport dev'",
     "export": "next export",
     "lint": "eslint ./src --ext .ts --max-warnings=0",
     "start": "next start",

@@ -53,7 +53,7 @@ jobs:
         run: failure("Public releases should be only done from main branch, current branch ${{ github.ref }}")
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           token: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
@@ -67,7 +67,7 @@ jobs:
         run: git fetch --tags
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
           cache: "yarn"
@@ -87,7 +87,15 @@ jobs:
           ./.github/scripts/version-up.sh --${{ env.RELEASE_TYPE }} $upgrade_type --apply $revision_upgrade
         shell: bash
 
+      - name: Restore cached node_modules
+        id: restore-cache-node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
+
       - name: Install dependencies
+        if: steps.restore-cache-node_modules.outputs.cache-hit != 'true' 
         run: yarn install --immutable
 
       - name: Lint
