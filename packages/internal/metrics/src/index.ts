@@ -3,7 +3,7 @@ import * as localStorage from './utils/localStorage';
 
 export { track } from './track';
 export { trackDuration } from './performance';
-export { Flow, trackFlow } from './flow';
+export { type Flow, trackFlow } from './flow';
 export { trackError } from './error';
 export { identify } from './identify';
 export {
