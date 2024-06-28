@@ -883,7 +883,7 @@ export class NftsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof NftsApi
      */
-    public createMintRequest(requestParameters: NftsApiCreateMintRequestRequest, options?: AxiosRequestConfig) {
+    public createMintRequest(requestParameters: NftsApiCreateMintRequestRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<CreateMintRequestResult, any>> {
         return NftsApiFp(this.configuration).createMintRequest(requestParameters.contractAddress, requestParameters.chainName, requestParameters.createMintRequestRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -895,7 +895,7 @@ export class NftsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof NftsApi
      */
-    public getMintRequest(requestParameters: NftsApiGetMintRequestRequest, options?: AxiosRequestConfig) {
+    public getMintRequest(requestParameters: NftsApiGetMintRequestRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<ListMintRequestsResult, any>> {
         return NftsApiFp(this.configuration).getMintRequest(requestParameters.contractAddress, requestParameters.chainName, requestParameters.referenceId, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -907,7 +907,7 @@ export class NftsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof NftsApi
      */
-    public getNFT(requestParameters: NftsApiGetNFTRequest, options?: AxiosRequestConfig) {
+    public getNFT(requestParameters: NftsApiGetNFTRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<GetNFTResult, any>> {
         return NftsApiFp(this.configuration).getNFT(requestParameters.contractAddress, requestParameters.tokenId, requestParameters.chainName, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -919,7 +919,7 @@ export class NftsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof NftsApi
      */
-    public listAllNFTs(requestParameters: NftsApiListAllNFTsRequest, options?: AxiosRequestConfig) {
+    public listAllNFTs(requestParameters: NftsApiListAllNFTsRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<ListNFTsResult, any>> {
         return NftsApiFp(this.configuration).listAllNFTs(requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -931,7 +931,7 @@ export class NftsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof NftsApi
      */
-    public listMintRequests(requestParameters: NftsApiListMintRequestsRequest, options?: AxiosRequestConfig) {
+    public listMintRequests(requestParameters: NftsApiListMintRequestsRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<ListMintRequestsResult, any>> {
         return NftsApiFp(this.configuration).listMintRequests(requestParameters.contractAddress, requestParameters.chainName, requestParameters.pageCursor, requestParameters.pageSize, requestParameters.status, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -943,7 +943,7 @@ export class NftsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof NftsApi
      */
-    public listNFTs(requestParameters: NftsApiListNFTsRequest, options?: AxiosRequestConfig) {
+    public listNFTs(requestParameters: NftsApiListNFTsRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<ListNFTsResult, any>> {
         return NftsApiFp(this.configuration).listNFTs(requestParameters.contractAddress, requestParameters.chainName, requestParameters.tokenId, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -955,7 +955,7 @@ export class NftsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof NftsApi
      */
-    public listNFTsByAccountAddress(requestParameters: NftsApiListNFTsByAccountAddressRequest, options?: AxiosRequestConfig) {
+    public listNFTsByAccountAddress(requestParameters: NftsApiListNFTsByAccountAddressRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<ListNFTsByOwnerResult, any>> {
         return NftsApiFp(this.configuration).listNFTsByAccountAddress(requestParameters.accountAddress, requestParameters.chainName, requestParameters.contractAddress, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 }

@@ -169,7 +169,7 @@ export class ProjectsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ProjectsApi
      */
-    public getProject(requestParameters: ProjectsApiGetProjectRequest, options?: AxiosRequestConfig) {
+    public getProject(requestParameters: ProjectsApiGetProjectRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<Project, any>> {
         return ProjectsApiFp(this.configuration).getProject(requestParameters.id, requestParameters.iMXSignature, requestParameters.iMXTimestamp, options).then((request) => request(this.axios, this.basePath));
     }
 }

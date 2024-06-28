@@ -703,7 +703,7 @@ export class CollectionsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof CollectionsApi
      */
-    public createCollection(requestParameters: CollectionsApiCreateCollectionRequest, options?: AxiosRequestConfig) {
+    public createCollection(requestParameters: CollectionsApiCreateCollectionRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<Collection, any>> {
         return CollectionsApiFp(this.configuration).createCollection(requestParameters.iMXSignature, requestParameters.iMXTimestamp, requestParameters.createCollectionRequest, requestParameters.xImmutableApiKey, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -715,7 +715,7 @@ export class CollectionsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof CollectionsApi
      */
-    public getCollection(requestParameters: CollectionsApiGetCollectionRequest, options?: AxiosRequestConfig) {
+    public getCollection(requestParameters: CollectionsApiGetCollectionRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<Collection, any>> {
         return CollectionsApiFp(this.configuration).getCollection(requestParameters.address, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -727,7 +727,7 @@ export class CollectionsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof CollectionsApi
      */
-    public listCollectionFilters(requestParameters: CollectionsApiListCollectionFiltersRequest, options?: AxiosRequestConfig) {
+    public listCollectionFilters(requestParameters: CollectionsApiListCollectionFiltersRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<CollectionFilter[], any>> {
         return CollectionsApiFp(this.configuration).listCollectionFilters(requestParameters.address, requestParameters.pageSize, requestParameters.nextPageToken, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -739,7 +739,7 @@ export class CollectionsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof CollectionsApi
      */
-    public listCollections(requestParameters: CollectionsApiListCollectionsRequest = {}, options?: AxiosRequestConfig) {
+    public listCollections(requestParameters: CollectionsApiListCollectionsRequest = {}, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<ListCollectionsResponse, any>> {
         return CollectionsApiFp(this.configuration).listCollections(requestParameters.pageSize, requestParameters.cursor, requestParameters.orderBy, requestParameters.direction, requestParameters.blacklist, requestParameters.whitelist, requestParameters.keyword, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -751,7 +751,7 @@ export class CollectionsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof CollectionsApi
      */
-    public summarizeCollections(requestParameters: CollectionsApiSummarizeCollectionsRequest, options?: AxiosRequestConfig) {
+    public summarizeCollections(requestParameters: CollectionsApiSummarizeCollectionsRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<ApiSummarizeCollectionsResponse, any>> {
         return CollectionsApiFp(this.configuration).summarizeCollections(requestParameters.user, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -763,7 +763,7 @@ export class CollectionsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof CollectionsApi
      */
-    public updateCollection(requestParameters: CollectionsApiUpdateCollectionRequest, options?: AxiosRequestConfig) {
+    public updateCollection(requestParameters: CollectionsApiUpdateCollectionRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<Collection, any>> {
         return CollectionsApiFp(this.configuration).updateCollection(requestParameters.address, requestParameters.iMXSignature, requestParameters.iMXTimestamp, requestParameters.updateCollectionRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }

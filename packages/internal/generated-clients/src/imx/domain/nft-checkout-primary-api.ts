@@ -585,7 +585,7 @@ export class NftCheckoutPrimaryApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof NftCheckoutPrimaryApi
      */
-    public createNftPrimary(requestParameters: NftCheckoutPrimaryApiCreateNftPrimaryRequest, options?: AxiosRequestConfig) {
+    public createNftPrimary(requestParameters: NftCheckoutPrimaryApiCreateNftPrimaryRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<NftprimarytransactionCreateResponse, any>> {
         return NftCheckoutPrimaryApiFp(this.configuration).createNftPrimary(requestParameters.createAPIRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -597,7 +597,7 @@ export class NftCheckoutPrimaryApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof NftCheckoutPrimaryApi
      */
-    public getCurrenciesNFTCheckoutPrimary(requestParameters: NftCheckoutPrimaryApiGetCurrenciesNFTCheckoutPrimaryRequest = {}, options?: AxiosRequestConfig) {
+    public getCurrenciesNFTCheckoutPrimary(requestParameters: NftCheckoutPrimaryApiGetCurrenciesNFTCheckoutPrimaryRequest = {}, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<CurrencyWithLimits, any>> {
         return NftCheckoutPrimaryApiFp(this.configuration).getCurrenciesNFTCheckoutPrimary(requestParameters.provider, requestParameters.includeLimits, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -609,7 +609,7 @@ export class NftCheckoutPrimaryApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof NftCheckoutPrimaryApi
      */
-    public getNftPrimaryTransaction(requestParameters: NftCheckoutPrimaryApiGetNftPrimaryTransactionRequest, options?: AxiosRequestConfig) {
+    public getNftPrimaryTransaction(requestParameters: NftCheckoutPrimaryApiGetNftPrimaryTransactionRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<NftprimarytransactionGetResponse, any>> {
         return NftCheckoutPrimaryApiFp(this.configuration).getNftPrimaryTransaction(requestParameters.transactionId, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -621,7 +621,7 @@ export class NftCheckoutPrimaryApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof NftCheckoutPrimaryApi
      */
-    public getNftPrimaryTransactions(requestParameters: NftCheckoutPrimaryApiGetNftPrimaryTransactionsRequest = {}, options?: AxiosRequestConfig) {
+    public getNftPrimaryTransactions(requestParameters: NftCheckoutPrimaryApiGetNftPrimaryTransactionsRequest = {}, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<NftprimarytransactionListTransactionsResponse, any>> {
         return NftCheckoutPrimaryApiFp(this.configuration).getNftPrimaryTransactions(requestParameters.pageSize, requestParameters.cursor, requestParameters.orderBy, requestParameters.direction, requestParameters.transactionId, requestParameters.contractAddress, requestParameters.sellerWalletAddress, requestParameters.userWalletAddress, requestParameters.status, requestParameters.provider, requestParameters.mintId, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -633,7 +633,7 @@ export class NftCheckoutPrimaryApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof NftCheckoutPrimaryApi
      */
-    public registerNftPrimarySalesContract(requestParameters: NftCheckoutPrimaryApiRegisterNftPrimarySalesContractRequest, options?: AxiosRequestConfig) {
+    public registerNftPrimarySalesContract(requestParameters: NftCheckoutPrimaryApiRegisterNftPrimarySalesContractRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<ContractCreateResponse, any>> {
         return NftCheckoutPrimaryApiFp(this.configuration).registerNftPrimarySalesContract(requestParameters.createAPIRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }

@@ -659,7 +659,7 @@ export class PrimarySalesApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof PrimarySalesApi
      */
-    public acceptPrimarySale(requestParameters: PrimarySalesApiAcceptPrimarySaleRequest, options?: AxiosRequestConfig) {
+    public acceptPrimarySale(requestParameters: PrimarySalesApiAcceptPrimarySaleRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<AcceptPrimarySaleOKBody, any>> {
         return PrimarySalesApiFp(this.configuration).acceptPrimarySale(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -671,7 +671,7 @@ export class PrimarySalesApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof PrimarySalesApi
      */
-    public createPrimarySale(requestParameters: PrimarySalesApiCreatePrimarySaleRequest = {}, options?: AxiosRequestConfig) {
+    public createPrimarySale(requestParameters: PrimarySalesApiCreatePrimarySaleRequest = {}, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<CreatePrimarySaleCreatedBody, any>> {
         return PrimarySalesApiFp(this.configuration).createPrimarySale(requestParameters.body, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -683,7 +683,7 @@ export class PrimarySalesApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof PrimarySalesApi
      */
-    public getPrimarySale(requestParameters: PrimarySalesApiGetPrimarySaleRequest, options?: AxiosRequestConfig) {
+    public getPrimarySale(requestParameters: PrimarySalesApiGetPrimarySaleRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<GetPrimarySaleOKBody, any>> {
         return PrimarySalesApiFp(this.configuration).getPrimarySale(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -695,7 +695,7 @@ export class PrimarySalesApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof PrimarySalesApi
      */
-    public rejectPrimarySale(requestParameters: PrimarySalesApiRejectPrimarySaleRequest, options?: AxiosRequestConfig) {
+    public rejectPrimarySale(requestParameters: PrimarySalesApiRejectPrimarySaleRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<RejectPrimarySaleOKBody, any>> {
         return PrimarySalesApiFp(this.configuration).rejectPrimarySale(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -707,7 +707,7 @@ export class PrimarySalesApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof PrimarySalesApi
      */
-    public signableAcceptPrimarySale(requestParameters: PrimarySalesApiSignableAcceptPrimarySaleRequest, options?: AxiosRequestConfig) {
+    public signableAcceptPrimarySale(requestParameters: PrimarySalesApiSignableAcceptPrimarySaleRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<SignableAcceptPrimarySaleOKBody, any>> {
         return PrimarySalesApiFp(this.configuration).signableAcceptPrimarySale(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -719,7 +719,7 @@ export class PrimarySalesApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof PrimarySalesApi
      */
-    public signableCreatePrimarySale(requestParameters: PrimarySalesApiSignableCreatePrimarySaleRequest = {}, options?: AxiosRequestConfig) {
+    public signableCreatePrimarySale(requestParameters: PrimarySalesApiSignableCreatePrimarySaleRequest = {}, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<SignableCreatePrimarySaleOKBody, any>> {
         return PrimarySalesApiFp(this.configuration).signableCreatePrimarySale(requestParameters.body, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -731,7 +731,7 @@ export class PrimarySalesApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof PrimarySalesApi
      */
-    public signableRejectPrimarySale(requestParameters: PrimarySalesApiSignableRejectPrimarySaleRequest, options?: AxiosRequestConfig) {
+    public signableRejectPrimarySale(requestParameters: PrimarySalesApiSignableRejectPrimarySaleRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<SignableRejectPrimarySaleOKBody, any>> {
         return PrimarySalesApiFp(this.configuration).signableRejectPrimarySale(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
     }
 }

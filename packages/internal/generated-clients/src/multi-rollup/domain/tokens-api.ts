@@ -14,7 +14,7 @@
 
 
 import type { Configuration } from '../configuration';
-import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
@@ -281,7 +281,7 @@ export class TokensApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof TokensApi
      */
-    public getERC20Token(requestParameters: TokensApiGetERC20TokenRequest, options?: AxiosRequestConfig) {
+    public getERC20Token(requestParameters: TokensApiGetERC20TokenRequest, options?: AxiosRequestConfig): Promise<AxiosResponse<GetTokenResult, any>> {
         return TokensApiFp(this.configuration).getERC20Token(requestParameters.contractAddress, requestParameters.chainName, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -293,7 +293,7 @@ export class TokensApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof TokensApi
      */
-    public listERC20Tokens(requestParameters: TokensApiListERC20TokensRequest, options?: AxiosRequestConfig) {
+    public listERC20Tokens(requestParameters: TokensApiListERC20TokensRequest, options?: AxiosRequestConfig): Promise<AxiosResponse<ListTokensResult, any>> {
         return TokensApiFp(this.configuration).listERC20Tokens(requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.verificationStatus, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 }

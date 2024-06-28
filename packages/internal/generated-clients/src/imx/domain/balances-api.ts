@@ -277,7 +277,7 @@ export class BalancesApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof BalancesApi
      */
-    public getBalance(requestParameters: BalancesApiGetBalanceRequest, options?: AxiosRequestConfig) {
+    public getBalance(requestParameters: BalancesApiGetBalanceRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<Balance, any>> {
         return BalancesApiFp(this.configuration).getBalance(requestParameters.owner, requestParameters.address, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -289,7 +289,7 @@ export class BalancesApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof BalancesApi
      */
-    public listBalances(requestParameters: BalancesApiListBalancesRequest, options?: AxiosRequestConfig) {
+    public listBalances(requestParameters: BalancesApiListBalancesRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<ListBalancesResponse, any>> {
         return BalancesApiFp(this.configuration).listBalances(requestParameters.owner, requestParameters.pageSize, requestParameters.cursor, requestParameters.orderBy, requestParameters.direction, options).then((request) => request(this.axios, this.basePath));
     }
 }

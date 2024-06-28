@@ -439,7 +439,7 @@ export class NftOwnersApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof NftOwnersApi
      */
-    public listAllNFTOwners(requestParameters: NftOwnersApiListAllNFTOwnersRequest, options?: AxiosRequestConfig) {
+    public listAllNFTOwners(requestParameters: NftOwnersApiListAllNFTOwnersRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<ListNFTOwnersResult, any>> {
         return NftOwnersApiFp(this.configuration).listAllNFTOwners(requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -451,7 +451,7 @@ export class NftOwnersApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof NftOwnersApi
      */
-    public listNFTOwners(requestParameters: NftOwnersApiListNFTOwnersRequest, options?: AxiosRequestConfig) {
+    public listNFTOwners(requestParameters: NftOwnersApiListNFTOwnersRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<ListNFTOwnersResult, any>> {
         return NftOwnersApiFp(this.configuration).listNFTOwners(requestParameters.contractAddress, requestParameters.tokenId, requestParameters.chainName, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -463,7 +463,7 @@ export class NftOwnersApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof NftOwnersApi
      */
-    public listOwnersByContractAddress(requestParameters: NftOwnersApiListOwnersByContractAddressRequest, options?: AxiosRequestConfig) {
+    public listOwnersByContractAddress(requestParameters: NftOwnersApiListOwnersByContractAddressRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<ListCollectionOwnersResult, any>> {
         return NftOwnersApiFp(this.configuration).listOwnersByContractAddress(requestParameters.contractAddress, requestParameters.chainName, requestParameters.accountAddress, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 }

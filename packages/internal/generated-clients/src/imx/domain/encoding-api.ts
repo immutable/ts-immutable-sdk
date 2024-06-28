@@ -152,7 +152,7 @@ export class EncodingApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof EncodingApi
      */
-    public encodeAsset(requestParameters: EncodingApiEncodeAssetRequest, options?: AxiosRequestConfig) {
+    public encodeAsset(requestParameters: EncodingApiEncodeAssetRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<EncodeAssetResponse, any>> {
         return EncodingApiFp(this.configuration).encodeAsset(requestParameters.assetType, requestParameters.encodeAssetRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }

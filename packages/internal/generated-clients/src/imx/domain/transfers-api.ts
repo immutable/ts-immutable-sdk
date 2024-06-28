@@ -817,7 +817,7 @@ export class TransfersApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof TransfersApi
      */
-    public createTransfer(requestParameters: TransfersApiCreateTransferRequest, options?: AxiosRequestConfig) {
+    public createTransfer(requestParameters: TransfersApiCreateTransferRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<CreateTransferResponseV2, any>> {
         return TransfersApiFp(this.configuration).createTransfer(requestParameters.createTransferRequestV2, requestParameters.xImxEthAddress, requestParameters.xImxEthSignature, requestParameters.authorization, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -829,7 +829,7 @@ export class TransfersApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof TransfersApi
      */
-    public createTransferV1(requestParameters: TransfersApiCreateTransferV1Request, options?: AxiosRequestConfig) {
+    public createTransferV1(requestParameters: TransfersApiCreateTransferV1Request, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<CreateTransferResponseV1, any>> {
         return TransfersApiFp(this.configuration).createTransferV1(requestParameters.createTransferRequest, requestParameters.xImxEthAddress, requestParameters.xImxEthSignature, requestParameters.authorization, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -841,7 +841,7 @@ export class TransfersApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof TransfersApi
      */
-    public getSignableTransfer(requestParameters: TransfersApiGetSignableTransferRequest, options?: AxiosRequestConfig) {
+    public getSignableTransfer(requestParameters: TransfersApiGetSignableTransferRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<GetSignableTransferResponseV2, any>> {
         return TransfersApiFp(this.configuration).getSignableTransfer(requestParameters.getSignableTransferRequestV2, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -853,7 +853,7 @@ export class TransfersApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof TransfersApi
      */
-    public getSignableTransferV1(requestParameters: TransfersApiGetSignableTransferV1Request, options?: AxiosRequestConfig) {
+    public getSignableTransferV1(requestParameters: TransfersApiGetSignableTransferV1Request, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<GetSignableTransferResponseV1, any>> {
         return TransfersApiFp(this.configuration).getSignableTransferV1(requestParameters.getSignableTransferRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -865,7 +865,7 @@ export class TransfersApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof TransfersApi
      */
-    public getTransfer(requestParameters: TransfersApiGetTransferRequest, options?: AxiosRequestConfig) {
+    public getTransfer(requestParameters: TransfersApiGetTransferRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<Transfer, any>> {
         return TransfersApiFp(this.configuration).getTransfer(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -877,7 +877,7 @@ export class TransfersApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof TransfersApi
      */
-    public listTransfers(requestParameters: TransfersApiListTransfersRequest = {}, options?: AxiosRequestConfig) {
+    public listTransfers(requestParameters: TransfersApiListTransfersRequest = {}, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<ListTransfersResponse, any>> {
         return TransfersApiFp(this.configuration).listTransfers(requestParameters.pageSize, requestParameters.cursor, requestParameters.orderBy, requestParameters.direction, requestParameters.user, requestParameters.receiver, requestParameters.status, requestParameters.minTimestamp, requestParameters.maxTimestamp, requestParameters.tokenType, requestParameters.tokenId, requestParameters.assetId, requestParameters.tokenAddress, requestParameters.tokenName, requestParameters.minQuantity, requestParameters.maxQuantity, requestParameters.metadata, options).then((request) => request(this.axios, this.basePath));
     }
 }

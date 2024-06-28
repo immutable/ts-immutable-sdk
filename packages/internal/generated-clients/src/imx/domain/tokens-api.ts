@@ -277,7 +277,7 @@ export class TokensApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof TokensApi
      */
-    public getToken(requestParameters: TokensApiGetTokenRequest, options?: AxiosRequestConfig) {
+    public getToken(requestParameters: TokensApiGetTokenRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<TokenDetails, any>> {
         return TokensApiFp(this.configuration).getToken(requestParameters.address, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -289,7 +289,7 @@ export class TokensApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof TokensApi
      */
-    public listTokens(requestParameters: TokensApiListTokensRequest = {}, options?: AxiosRequestConfig) {
+    public listTokens(requestParameters: TokensApiListTokensRequest = {}, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<ListTokensResponse, any>> {
         return TokensApiFp(this.configuration).listTokens(requestParameters.pageSize, requestParameters.cursor, requestParameters.orderBy, requestParameters.direction, requestParameters.address, requestParameters.symbols, options).then((request) => request(this.axios, this.basePath));
     }
 }

@@ -125,7 +125,7 @@ export class PassportProfileApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof PassportProfileApi
      */
-    public getUserInfo(options?: AxiosRequestConfig) {
+    public getUserInfo(options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<UserInfo, any>> {
         return PassportProfileApiFp(this.configuration).getUserInfo(options).then((request) => request(this.axios, this.basePath));
     }
 }

@@ -492,7 +492,7 @@ export class DepositsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DepositsApi
      */
-    public getDeposit(requestParameters: DepositsApiGetDepositRequest, options?: AxiosRequestConfig) {
+    public getDeposit(requestParameters: DepositsApiGetDepositRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<Deposit, any>> {
         return DepositsApiFp(this.configuration).getDeposit(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -504,7 +504,7 @@ export class DepositsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DepositsApi
      */
-    public getSignableDeposit(requestParameters: DepositsApiGetSignableDepositRequest, options?: AxiosRequestConfig) {
+    public getSignableDeposit(requestParameters: DepositsApiGetSignableDepositRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<GetSignableDepositResponse, any>> {
         return DepositsApiFp(this.configuration).getSignableDeposit(requestParameters.getSignableDepositRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -516,7 +516,7 @@ export class DepositsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DepositsApi
      */
-    public listDeposits(requestParameters: DepositsApiListDepositsRequest = {}, options?: AxiosRequestConfig) {
+    public listDeposits(requestParameters: DepositsApiListDepositsRequest = {}, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<ListDepositsResponse, any>> {
         return DepositsApiFp(this.configuration).listDeposits(requestParameters.pageSize, requestParameters.cursor, requestParameters.orderBy, requestParameters.direction, requestParameters.user, requestParameters.status, requestParameters.minTimestamp, requestParameters.maxTimestamp, requestParameters.tokenType, requestParameters.tokenId, requestParameters.assetId, requestParameters.tokenAddress, requestParameters.tokenName, requestParameters.minQuantity, requestParameters.maxQuantity, requestParameters.metadata, options).then((request) => request(this.axios, this.basePath));
     }
 }

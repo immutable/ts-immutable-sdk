@@ -520,7 +520,7 @@ export class PassportApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof PassportApi
      */
-    public createCounterfactualAddressV2(requestParameters: PassportApiCreateCounterfactualAddressV2Request, options?: AxiosRequestConfig) {
+    public createCounterfactualAddressV2(requestParameters: PassportApiCreateCounterfactualAddressV2Request, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<CreateCounterfactualAddressRes, any>> {
         return PassportApiFp(this.configuration).createCounterfactualAddressV2(requestParameters.chainName, requestParameters.createCounterfactualAddressRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -533,7 +533,7 @@ export class PassportApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof PassportApi
      */
-    public getLinkedAddresses(requestParameters: PassportApiGetLinkedAddressesRequest, options?: AxiosRequestConfig) {
+    public getLinkedAddresses(requestParameters: PassportApiGetLinkedAddressesRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<GetLinkedAddressesRes, any>> {
         return PassportApiFp(this.configuration).getLinkedAddresses(requestParameters.userId, requestParameters.chainName, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -546,7 +546,7 @@ export class PassportApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof PassportApi
      */
-    public getLinkedAddressesDeprecated(requestParameters: PassportApiGetLinkedAddressesDeprecatedRequest, options?: AxiosRequestConfig) {
+    public getLinkedAddressesDeprecated(requestParameters: PassportApiGetLinkedAddressesDeprecatedRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<GetLinkedAddressesResDeprecated, any>> {
         return PassportApiFp(this.configuration).getLinkedAddressesDeprecated(requestParameters.userId, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -558,7 +558,7 @@ export class PassportApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof PassportApi
      */
-    public getTransactionMetadata(requestParameters: PassportApiGetTransactionMetadataRequest, options?: AxiosRequestConfig) {
+    public getTransactionMetadata(requestParameters: PassportApiGetTransactionMetadataRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<GetTransactionMetadataRes, any>> {
         return PassportApiFp(this.configuration).getTransactionMetadata(requestParameters.chainName, requestParameters.getTransactionMetadataRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -570,7 +570,7 @@ export class PassportApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof PassportApi
      */
-    public getTypedDataMetadata(requestParameters: PassportApiGetTypedDataMetadataRequest, options?: AxiosRequestConfig) {
+    public getTypedDataMetadata(requestParameters: PassportApiGetTypedDataMetadataRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<GetTypedDataMetadataRes, any>> {
         return PassportApiFp(this.configuration).getTypedDataMetadata(requestParameters.chainName, requestParameters.getTypedDataMetadataRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }

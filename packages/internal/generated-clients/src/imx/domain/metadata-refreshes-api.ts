@@ -590,7 +590,7 @@ export class MetadataRefreshesApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MetadataRefreshesApi
      */
-    public getAListOfMetadataRefreshes(requestParameters: MetadataRefreshesApiGetAListOfMetadataRefreshesRequest, options?: AxiosRequestConfig) {
+    public getAListOfMetadataRefreshes(requestParameters: MetadataRefreshesApiGetAListOfMetadataRefreshesRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<GetMetadataRefreshes, any>> {
         return MetadataRefreshesApiFp(this.configuration).getAListOfMetadataRefreshes(requestParameters.xImxEthSignature, requestParameters.xImxEthTimestamp, requestParameters.xImxEthAddress, requestParameters.pageSize, requestParameters.cursor, requestParameters.collectionAddress, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -601,7 +601,7 @@ export class MetadataRefreshesApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MetadataRefreshesApi
      */
-    public getMetadataRefreshErrors(requestParameters: MetadataRefreshesApiGetMetadataRefreshErrorsRequest, options?: AxiosRequestConfig) {
+    public getMetadataRefreshErrors(requestParameters: MetadataRefreshesApiGetMetadataRefreshErrorsRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<GetMetadataRefreshErrorsResponse, any>> {
         return MetadataRefreshesApiFp(this.configuration).getMetadataRefreshErrors(requestParameters.refreshId, requestParameters.xImxEthSignature, requestParameters.xImxEthTimestamp, requestParameters.xImxEthAddress, requestParameters.pageSize, requestParameters.cursor, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -612,7 +612,7 @@ export class MetadataRefreshesApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MetadataRefreshesApi
      */
-    public getMetadataRefreshResults(requestParameters: MetadataRefreshesApiGetMetadataRefreshResultsRequest, options?: AxiosRequestConfig) {
+    public getMetadataRefreshResults(requestParameters: MetadataRefreshesApiGetMetadataRefreshResultsRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<GetMetadataRefreshResponse, any>> {
         return MetadataRefreshesApiFp(this.configuration).getMetadataRefreshResults(requestParameters.refreshId, requestParameters.xImxEthSignature, requestParameters.xImxEthTimestamp, requestParameters.xImxEthAddress, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -623,7 +623,7 @@ export class MetadataRefreshesApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MetadataRefreshesApi
      */
-    public requestAMetadataRefresh(requestParameters: MetadataRefreshesApiRequestAMetadataRefreshRequest, options?: AxiosRequestConfig) {
+    public requestAMetadataRefresh(requestParameters: MetadataRefreshesApiRequestAMetadataRefreshRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<CreateMetadataRefreshResponse, any>> {
         return MetadataRefreshesApiFp(this.configuration).requestAMetadataRefresh(requestParameters.xImxEthSignature, requestParameters.xImxEthTimestamp, requestParameters.xImxEthAddress, requestParameters.createMetadataRefreshRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }

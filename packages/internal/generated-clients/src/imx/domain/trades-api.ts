@@ -541,7 +541,7 @@ export class TradesApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof TradesApi
      */
-    public createTradeV3(requestParameters: TradesApiCreateTradeV3Request, options?: AxiosRequestConfig) {
+    public createTradeV3(requestParameters: TradesApiCreateTradeV3Request, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<CreateTradeResponse, any>> {
         return TradesApiFp(this.configuration).createTradeV3(requestParameters.createTradeRequest, requestParameters.xImxEthAddress, requestParameters.xImxEthSignature, requestParameters.authorization, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -553,7 +553,7 @@ export class TradesApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof TradesApi
      */
-    public getSignableTrade(requestParameters: TradesApiGetSignableTradeRequest, options?: AxiosRequestConfig) {
+    public getSignableTrade(requestParameters: TradesApiGetSignableTradeRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<GetSignableTradeResponse, any>> {
         return TradesApiFp(this.configuration).getSignableTrade(requestParameters.getSignableTradeRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -565,7 +565,7 @@ export class TradesApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof TradesApi
      */
-    public getTradeV3(requestParameters: TradesApiGetTradeV3Request, options?: AxiosRequestConfig) {
+    public getTradeV3(requestParameters: TradesApiGetTradeV3Request, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<Trade, any>> {
         return TradesApiFp(this.configuration).getTradeV3(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -577,7 +577,7 @@ export class TradesApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof TradesApi
      */
-    public listTradesV3(requestParameters: TradesApiListTradesV3Request = {}, options?: AxiosRequestConfig) {
+    public listTradesV3(requestParameters: TradesApiListTradesV3Request = {}, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<ListTradesResponse, any>> {
         return TradesApiFp(this.configuration).listTradesV3(requestParameters.partyATokenType, requestParameters.partyATokenAddress, requestParameters.partyBTokenType, requestParameters.partyBTokenAddress, requestParameters.partyBTokenId, requestParameters.pageSize, requestParameters.cursor, requestParameters.orderBy, requestParameters.direction, requestParameters.minTimestamp, requestParameters.maxTimestamp, options).then((request) => request(this.axios, this.basePath));
     }
 }

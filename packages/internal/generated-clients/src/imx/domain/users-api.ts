@@ -538,7 +538,7 @@ export class UsersApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof UsersApi
      */
-    public getSignableRegistration(requestParameters: UsersApiGetSignableRegistrationRequest, options?: AxiosRequestConfig) {
+    public getSignableRegistration(requestParameters: UsersApiGetSignableRegistrationRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<GetSignableRegistrationResponse, any>> {
         return UsersApiFp(this.configuration).getSignableRegistration(requestParameters.getSignableRegistrationRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -550,7 +550,7 @@ export class UsersApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof UsersApi
      */
-    public getSignableRegistrationOffchain(requestParameters: UsersApiGetSignableRegistrationOffchainRequest, options?: AxiosRequestConfig) {
+    public getSignableRegistrationOffchain(requestParameters: UsersApiGetSignableRegistrationOffchainRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<GetSignableRegistrationOffchainResponse, any>> {
         return UsersApiFp(this.configuration).getSignableRegistrationOffchain(requestParameters.getSignableRegistrationRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -562,7 +562,7 @@ export class UsersApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof UsersApi
      */
-    public getUsers(requestParameters: UsersApiGetUsersRequest, options?: AxiosRequestConfig) {
+    public getUsers(requestParameters: UsersApiGetUsersRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<GetUsersApiResponse, any>> {
         return UsersApiFp(this.configuration).getUsers(requestParameters.user, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -574,7 +574,7 @@ export class UsersApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof UsersApi
      */
-    public registerPassportUser(requestParameters: UsersApiRegisterPassportUserRequest, options?: AxiosRequestConfig) {
+    public registerPassportUser(requestParameters: UsersApiRegisterPassportUserRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<RegisterPassportUserResult, any>> {
         return UsersApiFp(this.configuration).registerPassportUser(requestParameters.authorization, requestParameters.registerPassportUserRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -586,7 +586,7 @@ export class UsersApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof UsersApi
      */
-    public registerPassportUserV2(requestParameters: UsersApiRegisterPassportUserV2Request, options?: AxiosRequestConfig) {
+    public registerPassportUserV2(requestParameters: UsersApiRegisterPassportUserV2Request, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<RegisterPassportUserResult, any>> {
         return UsersApiFp(this.configuration).registerPassportUserV2(requestParameters.authorization, requestParameters.registerPassportUserRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -598,7 +598,7 @@ export class UsersApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof UsersApi
      */
-    public registerUser(requestParameters: UsersApiRegisterUserRequest, options?: AxiosRequestConfig) {
+    public registerUser(requestParameters: UsersApiRegisterUserRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<RegisterUserResponse, any>> {
         return UsersApiFp(this.configuration).registerUser(requestParameters.registerUserRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }

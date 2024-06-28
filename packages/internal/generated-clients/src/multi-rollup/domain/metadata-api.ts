@@ -608,7 +608,7 @@ export class MetadataApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MetadataApi
      */
-    public getMetadata(requestParameters: MetadataApiGetMetadataRequest, options?: AxiosRequestConfig) {
+    public getMetadata(requestParameters: MetadataApiGetMetadataRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<GetMetadataResult, any>> {
         return MetadataApiFp(this.configuration).getMetadata(requestParameters.chainName, requestParameters.contractAddress, requestParameters.metadataId, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -620,7 +620,7 @@ export class MetadataApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MetadataApi
      */
-    public listMetadata(requestParameters: MetadataApiListMetadataRequest, options?: AxiosRequestConfig) {
+    public listMetadata(requestParameters: MetadataApiListMetadataRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<ListMetadataResult, any>> {
         return MetadataApiFp(this.configuration).listMetadata(requestParameters.chainName, requestParameters.contractAddress, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -632,7 +632,7 @@ export class MetadataApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MetadataApi
      */
-    public listMetadataForChain(requestParameters: MetadataApiListMetadataForChainRequest, options?: AxiosRequestConfig) {
+    public listMetadataForChain(requestParameters: MetadataApiListMetadataForChainRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<ListMetadataResult, any>> {
         return MetadataApiFp(this.configuration).listMetadataForChain(requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -644,7 +644,7 @@ export class MetadataApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MetadataApi
      */
-    public refreshMetadataByID(requestParameters: MetadataApiRefreshMetadataByIDRequest, options?: AxiosRequestConfig) {
+    public refreshMetadataByID(requestParameters: MetadataApiRefreshMetadataByIDRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<MetadataRefreshRateLimitResult, any>> {
         return MetadataApiFp(this.configuration).refreshMetadataByID(requestParameters.chainName, requestParameters.contractAddress, requestParameters.refreshMetadataByIDRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -656,7 +656,7 @@ export class MetadataApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MetadataApi
      */
-    public refreshNFTMetadataByTokenID(requestParameters: MetadataApiRefreshNFTMetadataByTokenIDRequest, options?: AxiosRequestConfig) {
+    public refreshNFTMetadataByTokenID(requestParameters: MetadataApiRefreshNFTMetadataByTokenIDRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<MetadataRefreshRateLimitResult, any>> {
         return MetadataApiFp(this.configuration).refreshNFTMetadataByTokenID(requestParameters.contractAddress, requestParameters.chainName, requestParameters.refreshNFTMetadataByTokenIDRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }

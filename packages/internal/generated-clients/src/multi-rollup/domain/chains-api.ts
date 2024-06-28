@@ -156,7 +156,7 @@ export class ChainsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ChainsApi
      */
-    public listChains(requestParameters: ChainsApiListChainsRequest = {}, options?: AxiosRequestConfig) {
+    public listChains(requestParameters: ChainsApiListChainsRequest = {}, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<ListChainsResult, any>> {
         return ChainsApiFp(this.configuration).listChains(requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 }

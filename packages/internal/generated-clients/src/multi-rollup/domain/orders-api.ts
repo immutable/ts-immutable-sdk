@@ -884,7 +884,7 @@ export class OrdersApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof OrdersApi
      */
-    public cancelOrders(requestParameters: OrdersApiCancelOrdersRequest, options?: AxiosRequestConfig) {
+    public cancelOrders(requestParameters: OrdersApiCancelOrdersRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<CancelOrdersResult, any>> {
         return OrdersApiFp(this.configuration).cancelOrders(requestParameters.chainName, requestParameters.cancelOrdersRequestBody, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -896,7 +896,7 @@ export class OrdersApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof OrdersApi
      */
-    public createListing(requestParameters: OrdersApiCreateListingRequest, options?: AxiosRequestConfig) {
+    public createListing(requestParameters: OrdersApiCreateListingRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<ListingResult, any>> {
         return OrdersApiFp(this.configuration).createListing(requestParameters.chainName, requestParameters.createListingRequestBody, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -908,7 +908,7 @@ export class OrdersApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof OrdersApi
      */
-    public fulfillmentData(requestParameters: OrdersApiFulfillmentDataRequest, options?: AxiosRequestConfig) {
+    public fulfillmentData(requestParameters: OrdersApiFulfillmentDataRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<FulfillmentData200Response, any>> {
         return OrdersApiFp(this.configuration).fulfillmentData(requestParameters.chainName, requestParameters.fulfillmentDataRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -920,7 +920,7 @@ export class OrdersApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof OrdersApi
      */
-    public getListing(requestParameters: OrdersApiGetListingRequest, options?: AxiosRequestConfig) {
+    public getListing(requestParameters: OrdersApiGetListingRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<ListingResult, any>> {
         return OrdersApiFp(this.configuration).getListing(requestParameters.chainName, requestParameters.listingId, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -932,7 +932,7 @@ export class OrdersApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof OrdersApi
      */
-    public getTrade(requestParameters: OrdersApiGetTradeRequest, options?: AxiosRequestConfig) {
+    public getTrade(requestParameters: OrdersApiGetTradeRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<TradeResult, any>> {
         return OrdersApiFp(this.configuration).getTrade(requestParameters.chainName, requestParameters.tradeId, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -944,7 +944,7 @@ export class OrdersApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof OrdersApi
      */
-    public listListings(requestParameters: OrdersApiListListingsRequest, options?: AxiosRequestConfig) {
+    public listListings(requestParameters: OrdersApiListListingsRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<ListListingsResult, any>> {
         return OrdersApiFp(this.configuration).listListings(requestParameters.chainName, requestParameters.status, requestParameters.sellItemContractAddress, requestParameters.buyItemType, requestParameters.buyItemContractAddress, requestParameters.accountAddress, requestParameters.sellItemMetadataId, requestParameters.sellItemTokenId, requestParameters.fromUpdatedAt, requestParameters.pageSize, requestParameters.sortBy, requestParameters.sortDirection, requestParameters.pageCursor, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -956,7 +956,7 @@ export class OrdersApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof OrdersApi
      */
-    public listTrades(requestParameters: OrdersApiListTradesRequest, options?: AxiosRequestConfig) {
+    public listTrades(requestParameters: OrdersApiListTradesRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<ListTradeResult, any>> {
         return OrdersApiFp(this.configuration).listTrades(requestParameters.chainName, requestParameters.accountAddress, requestParameters.fromIndexedAt, requestParameters.pageSize, requestParameters.sortBy, requestParameters.sortDirection, requestParameters.pageCursor, options).then((request) => request(this.axios, this.basePath));
     }
 }

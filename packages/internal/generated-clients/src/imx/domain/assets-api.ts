@@ -446,7 +446,7 @@ export class AssetsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof AssetsApi
      */
-    public getAsset(requestParameters: AssetsApiGetAssetRequest, options?: AxiosRequestConfig) {
+    public getAsset(requestParameters: AssetsApiGetAssetRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<Asset, any>> {
         return AssetsApiFp(this.configuration).getAsset(requestParameters.tokenAddress, requestParameters.tokenId, requestParameters.includeFees, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -458,7 +458,7 @@ export class AssetsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof AssetsApi
      */
-    public listAssets(requestParameters: AssetsApiListAssetsRequest = {}, options?: AxiosRequestConfig) {
+    public listAssets(requestParameters: AssetsApiListAssetsRequest = {}, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<ListAssetsResponse, any>> {
         return AssetsApiFp(this.configuration).listAssets(requestParameters.pageSize, requestParameters.cursor, requestParameters.orderBy, requestParameters.direction, requestParameters.user, requestParameters.status, requestParameters.name, requestParameters.metadata, requestParameters.sellOrders, requestParameters.buyOrders, requestParameters.includeFees, requestParameters.collection, requestParameters.updatedMinTimestamp, requestParameters.updatedMaxTimestamp, requestParameters.auxiliaryFeePercentages, requestParameters.auxiliaryFeeRecipients, options).then((request) => request(this.axios, this.basePath));
     }
 }

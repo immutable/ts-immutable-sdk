@@ -564,7 +564,7 @@ export class MintsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MintsApi
      */
-    public getMint(requestParameters: MintsApiGetMintRequest, options?: AxiosRequestConfig) {
+    public getMint(requestParameters: MintsApiGetMintRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<Mint[], any>> {
         return MintsApiFp(this.configuration).getMint(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -576,7 +576,7 @@ export class MintsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MintsApi
      */
-    public getMintableTokenDetailsByClientTokenId(requestParameters: MintsApiGetMintableTokenDetailsByClientTokenIdRequest, options?: AxiosRequestConfig) {
+    public getMintableTokenDetailsByClientTokenId(requestParameters: MintsApiGetMintableTokenDetailsByClientTokenIdRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<MintableTokenDetails, any>> {
         return MintsApiFp(this.configuration).getMintableTokenDetailsByClientTokenId(requestParameters.tokenAddress, requestParameters.tokenId, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -588,7 +588,7 @@ export class MintsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MintsApi
      */
-    public listMints(requestParameters: MintsApiListMintsRequest = {}, options?: AxiosRequestConfig) {
+    public listMints(requestParameters: MintsApiListMintsRequest = {}, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<ListMintsResponse, any>> {
         return MintsApiFp(this.configuration).listMints(requestParameters.pageSize, requestParameters.cursor, requestParameters.orderBy, requestParameters.direction, requestParameters.user, requestParameters.status, requestParameters.minTimestamp, requestParameters.maxTimestamp, requestParameters.tokenType, requestParameters.tokenId, requestParameters.tokenName, requestParameters.tokenAddress, requestParameters.minQuantity, requestParameters.maxQuantity, requestParameters.metadata, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -600,7 +600,7 @@ export class MintsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MintsApi
      */
-    public mintTokens(requestParameters: MintsApiMintTokensRequest, options?: AxiosRequestConfig) {
+    public mintTokens(requestParameters: MintsApiMintTokensRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<MintTokensResponse, any>> {
         return MintsApiFp(this.configuration).mintTokens(requestParameters.mintTokensRequestV2, options).then((request) => request(this.axios, this.basePath));
     }
 }

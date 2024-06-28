@@ -471,7 +471,7 @@ export class ActivitiesApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ActivitiesApi
      */
-    public getActivity(requestParameters: ActivitiesApiGetActivityRequest, options?: AxiosRequestConfig) {
+    public getActivity(requestParameters: ActivitiesApiGetActivityRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<GetActivityResult, any>> {
         return ActivitiesApiFp(this.configuration).getActivity(requestParameters.chainName, requestParameters.activityId, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -483,7 +483,7 @@ export class ActivitiesApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ActivitiesApi
      */
-    public listActivities(requestParameters: ActivitiesApiListActivitiesRequest, options?: AxiosRequestConfig) {
+    public listActivities(requestParameters: ActivitiesApiListActivitiesRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<ListActivitiesResult, any>> {
         return ActivitiesApiFp(this.configuration).listActivities(requestParameters.chainName, requestParameters.contractAddress, requestParameters.tokenId, requestParameters.accountAddress, requestParameters.activityType, requestParameters.transactionHash, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -495,7 +495,7 @@ export class ActivitiesApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ActivitiesApi
      */
-    public listActivityHistory(requestParameters: ActivitiesApiListActivityHistoryRequest, options?: AxiosRequestConfig) {
+    public listActivityHistory(requestParameters: ActivitiesApiListActivityHistoryRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<ListActivitiesResult, any>> {
         return ActivitiesApiFp(this.configuration).listActivityHistory(requestParameters.chainName, requestParameters.fromUpdatedAt, requestParameters.toUpdatedAt, requestParameters.contractAddress, requestParameters.activityType, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 }

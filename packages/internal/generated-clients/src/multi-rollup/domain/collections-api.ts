@@ -511,7 +511,7 @@ export class CollectionsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof CollectionsApi
      */
-    public getCollection(requestParameters: CollectionsApiGetCollectionRequest, options?: AxiosRequestConfig) {
+    public getCollection(requestParameters: CollectionsApiGetCollectionRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<GetCollectionResult, any>> {
         return CollectionsApiFp(this.configuration).getCollection(requestParameters.contractAddress, requestParameters.chainName, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -523,7 +523,7 @@ export class CollectionsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof CollectionsApi
      */
-    public listCollections(requestParameters: CollectionsApiListCollectionsRequest, options?: AxiosRequestConfig) {
+    public listCollections(requestParameters: CollectionsApiListCollectionsRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<ListCollectionsResult, any>> {
         return CollectionsApiFp(this.configuration).listCollections(requestParameters.chainName, requestParameters.contractAddress, requestParameters.verificationStatus, requestParameters.fromUpdatedAt, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -535,7 +535,7 @@ export class CollectionsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof CollectionsApi
      */
-    public listCollectionsByNFTOwner(requestParameters: CollectionsApiListCollectionsByNFTOwnerRequest, options?: AxiosRequestConfig) {
+    public listCollectionsByNFTOwner(requestParameters: CollectionsApiListCollectionsByNFTOwnerRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<ListCollectionsResult, any>> {
         return CollectionsApiFp(this.configuration).listCollectionsByNFTOwner(requestParameters.accountAddress, requestParameters.chainName, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -547,7 +547,7 @@ export class CollectionsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof CollectionsApi
      */
-    public refreshCollectionMetadata(requestParameters: CollectionsApiRefreshCollectionMetadataRequest, options?: AxiosRequestConfig) {
+    public refreshCollectionMetadata(requestParameters: CollectionsApiRefreshCollectionMetadataRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<RefreshCollectionMetadataResult, any>> {
         return CollectionsApiFp(this.configuration).refreshCollectionMetadata(requestParameters.contractAddress, requestParameters.chainName, requestParameters.refreshCollectionMetadataRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }

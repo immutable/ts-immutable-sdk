@@ -1040,7 +1040,7 @@ export class OrdersApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof OrdersApi
      */
-    public cancelOrderV3(requestParameters: OrdersApiCancelOrderV3Request, options?: AxiosRequestConfig) {
+    public cancelOrderV3(requestParameters: OrdersApiCancelOrderV3Request, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<CancelOrderResponse, any>> {
         return OrdersApiFp(this.configuration).cancelOrderV3(requestParameters.id, requestParameters.cancelOrderRequest, requestParameters.xImxEthAddress, requestParameters.xImxEthSignature, requestParameters.authorization, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -1052,7 +1052,7 @@ export class OrdersApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof OrdersApi
      */
-    public createOrderV3(requestParameters: OrdersApiCreateOrderV3Request, options?: AxiosRequestConfig) {
+    public createOrderV3(requestParameters: OrdersApiCreateOrderV3Request, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<CreateOrderResponse, any>> {
         return OrdersApiFp(this.configuration).createOrderV3(requestParameters.createOrderRequest, requestParameters.xImxEthAddress, requestParameters.xImxEthSignature, requestParameters.authorization, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -1064,7 +1064,7 @@ export class OrdersApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof OrdersApi
      */
-    public getOrderV3(requestParameters: OrdersApiGetOrderV3Request, options?: AxiosRequestConfig) {
+    public getOrderV3(requestParameters: OrdersApiGetOrderV3Request, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<OrderV3, any>> {
         return OrdersApiFp(this.configuration).getOrderV3(requestParameters.id, requestParameters.includeFees, requestParameters.auxiliaryFeePercentages, requestParameters.auxiliaryFeeRecipients, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -1076,7 +1076,7 @@ export class OrdersApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof OrdersApi
      */
-    public getSignableCancelOrderV3(requestParameters: OrdersApiGetSignableCancelOrderV3Request, options?: AxiosRequestConfig) {
+    public getSignableCancelOrderV3(requestParameters: OrdersApiGetSignableCancelOrderV3Request, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<GetSignableCancelOrderResponse, any>> {
         return OrdersApiFp(this.configuration).getSignableCancelOrderV3(requestParameters.getSignableCancelOrderRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -1088,7 +1088,7 @@ export class OrdersApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof OrdersApi
      */
-    public getSignableOrder(requestParameters: OrdersApiGetSignableOrderRequest, options?: AxiosRequestConfig) {
+    public getSignableOrder(requestParameters: OrdersApiGetSignableOrderRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<GetSignableOrderResponse, any>> {
         return OrdersApiFp(this.configuration).getSignableOrder(requestParameters.getSignableOrderRequestV3, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -1100,7 +1100,7 @@ export class OrdersApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof OrdersApi
      */
-    public listOrdersV3(requestParameters: OrdersApiListOrdersV3Request = {}, options?: AxiosRequestConfig) {
+    public listOrdersV3(requestParameters: OrdersApiListOrdersV3Request = {}, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<ListOrdersResponseV3, any>> {
         return OrdersApiFp(this.configuration).listOrdersV3(requestParameters.pageSize, requestParameters.cursor, requestParameters.orderBy, requestParameters.direction, requestParameters.user, requestParameters.status, requestParameters.minTimestamp, requestParameters.maxTimestamp, requestParameters.updatedMinTimestamp, requestParameters.updatedMaxTimestamp, requestParameters.buyTokenType, requestParameters.buyTokenId, requestParameters.buyAssetId, requestParameters.buyTokenAddress, requestParameters.buyTokenName, requestParameters.buyMinQuantity, requestParameters.buyMaxQuantity, requestParameters.buyMetadata, requestParameters.sellTokenType, requestParameters.sellTokenId, requestParameters.sellAssetId, requestParameters.sellTokenAddress, requestParameters.sellTokenName, requestParameters.sellMinQuantity, requestParameters.sellMaxQuantity, requestParameters.sellMetadata, requestParameters.auxiliaryFeePercentages, requestParameters.auxiliaryFeeRecipients, requestParameters.includeFees, options).then((request) => request(this.axios, this.basePath));
     }
 }

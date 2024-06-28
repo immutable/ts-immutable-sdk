@@ -40,10 +40,10 @@ export const createConfig = ({
  * @returns an ImmutableAPIConfiguration
  */
 export const imxApiConfig = {
-  getProduction: () => createConfig({
+  getProduction: (): APIConfiguration => createConfig({
     basePath: 'https://api.x.immutable.com',
   }),
-  getSandbox: () => createConfig({
+  getSandbox: (): APIConfiguration => createConfig({
     basePath: 'https://api.sandbox.x.immutable.com',
   }),
 };

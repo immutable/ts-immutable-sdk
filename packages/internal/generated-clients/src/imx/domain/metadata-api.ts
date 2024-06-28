@@ -388,7 +388,7 @@ export class MetadataApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MetadataApi
      */
-    public addMetadataSchemaToCollection(requestParameters: MetadataApiAddMetadataSchemaToCollectionRequest, options?: AxiosRequestConfig) {
+    public addMetadataSchemaToCollection(requestParameters: MetadataApiAddMetadataSchemaToCollectionRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<SuccessResponse, any>> {
         return MetadataApiFp(this.configuration).addMetadataSchemaToCollection(requestParameters.address, requestParameters.iMXSignature, requestParameters.iMXTimestamp, requestParameters.addMetadataSchemaToCollectionRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -400,7 +400,7 @@ export class MetadataApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MetadataApi
      */
-    public getMetadataSchema(requestParameters: MetadataApiGetMetadataSchemaRequest, options?: AxiosRequestConfig) {
+    public getMetadataSchema(requestParameters: MetadataApiGetMetadataSchemaRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<MetadataSchemaProperty[], any>> {
         return MetadataApiFp(this.configuration).getMetadataSchema(requestParameters.address, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -412,7 +412,7 @@ export class MetadataApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MetadataApi
      */
-    public updateMetadataSchemaByName(requestParameters: MetadataApiUpdateMetadataSchemaByNameRequest, options?: AxiosRequestConfig) {
+    public updateMetadataSchemaByName(requestParameters: MetadataApiUpdateMetadataSchemaByNameRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<SuccessResponse, any>> {
         return MetadataApiFp(this.configuration).updateMetadataSchemaByName(requestParameters.address, requestParameters.name, requestParameters.iMXSignature, requestParameters.iMXTimestamp, requestParameters.metadataSchemaRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }

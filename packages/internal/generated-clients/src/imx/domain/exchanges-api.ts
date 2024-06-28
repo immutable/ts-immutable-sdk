@@ -614,7 +614,7 @@ export class ExchangesApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ExchangesApi
      */
-    public createExchange(requestParameters: ExchangesApiCreateExchangeRequest, options?: AxiosRequestConfig) {
+    public createExchange(requestParameters: ExchangesApiCreateExchangeRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<ExchangeCreateExchangeAndURLResponse, any>> {
         return ExchangesApiFp(this.configuration).createExchange(requestParameters.createExchangeAPIRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -626,7 +626,7 @@ export class ExchangesApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ExchangesApi
      */
-    public createExchangeTransfer(requestParameters: ExchangesApiCreateExchangeTransferRequest, options?: AxiosRequestConfig) {
+    public createExchangeTransfer(requestParameters: ExchangesApiCreateExchangeTransferRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<CreateTransferResponseV1, any>> {
         return ExchangesApiFp(this.configuration).createExchangeTransfer(requestParameters.id, requestParameters.createTransferRequest, requestParameters.xImxEthAddress, requestParameters.xImxEthSignature, requestParameters.authorization, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -638,7 +638,7 @@ export class ExchangesApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ExchangesApi
      */
-    public getExchange(requestParameters: ExchangesApiGetExchangeRequest, options?: AxiosRequestConfig) {
+    public getExchange(requestParameters: ExchangesApiGetExchangeRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<Exchange, any>> {
         return ExchangesApiFp(this.configuration).getExchange(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -650,7 +650,7 @@ export class ExchangesApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ExchangesApi
      */
-    public getExchangeSignableTransfer(requestParameters: ExchangesApiGetExchangeSignableTransferRequest, options?: AxiosRequestConfig) {
+    public getExchangeSignableTransfer(requestParameters: ExchangesApiGetExchangeSignableTransferRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<GetSignableTransferResponseV1, any>> {
         return ExchangesApiFp(this.configuration).getExchangeSignableTransfer(requestParameters.id, requestParameters.getSignableTransferRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -662,7 +662,7 @@ export class ExchangesApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ExchangesApi
      */
-    public getExchanges(requestParameters: ExchangesApiGetExchangesRequest = {}, options?: AxiosRequestConfig) {
+    public getExchanges(requestParameters: ExchangesApiGetExchangesRequest = {}, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<GetTransactionsResponse, any>> {
         return ExchangesApiFp(this.configuration).getExchanges(requestParameters.pageSize, requestParameters.cursor, requestParameters.orderBy, requestParameters.direction, requestParameters.id, requestParameters.walletAddress, requestParameters.status, requestParameters.provider, requestParameters.transferId, options).then((request) => request(this.axios, this.basePath));
     }
 }

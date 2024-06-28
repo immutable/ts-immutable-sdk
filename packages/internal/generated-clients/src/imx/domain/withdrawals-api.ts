@@ -805,7 +805,7 @@ export class WithdrawalsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof WithdrawalsApi
      */
-    public createWithdrawal(requestParameters: WithdrawalsApiCreateWithdrawalRequest, options?: AxiosRequestConfig) {
+    public createWithdrawal(requestParameters: WithdrawalsApiCreateWithdrawalRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<CreateWithdrawalResponse, any>> {
         return WithdrawalsApiFp(this.configuration).createWithdrawal(requestParameters.xImxEthAddress, requestParameters.xImxEthSignature, requestParameters.createWithdrawalRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -817,7 +817,7 @@ export class WithdrawalsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof WithdrawalsApi
      */
-    public createWithdrawalV2(requestParameters: WithdrawalsApiCreateWithdrawalV2Request, options?: AxiosRequestConfig) {
+    public createWithdrawalV2(requestParameters: WithdrawalsApiCreateWithdrawalV2Request, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<CreateWithdrawalResponse, any>> {
         return WithdrawalsApiFp(this.configuration).createWithdrawalV2(requestParameters.xImxEthAddress, requestParameters.xImxEthSignature, requestParameters.createWithdrawalRequestV2, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -829,7 +829,7 @@ export class WithdrawalsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof WithdrawalsApi
      */
-    public getSignableWithdrawal(requestParameters: WithdrawalsApiGetSignableWithdrawalRequest, options?: AxiosRequestConfig) {
+    public getSignableWithdrawal(requestParameters: WithdrawalsApiGetSignableWithdrawalRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<GetSignableWithdrawalResponse, any>> {
         return WithdrawalsApiFp(this.configuration).getSignableWithdrawal(requestParameters.getSignableWithdrawalRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -841,7 +841,7 @@ export class WithdrawalsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof WithdrawalsApi
      */
-    public getSignableWithdrawalV2(requestParameters: WithdrawalsApiGetSignableWithdrawalV2Request, options?: AxiosRequestConfig) {
+    public getSignableWithdrawalV2(requestParameters: WithdrawalsApiGetSignableWithdrawalV2Request, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<GetSignableWithdrawalResponseV2, any>> {
         return WithdrawalsApiFp(this.configuration).getSignableWithdrawalV2(requestParameters.getSignableWithdrawalRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -853,7 +853,7 @@ export class WithdrawalsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof WithdrawalsApi
      */
-    public getWithdrawal(requestParameters: WithdrawalsApiGetWithdrawalRequest, options?: AxiosRequestConfig) {
+    public getWithdrawal(requestParameters: WithdrawalsApiGetWithdrawalRequest, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<Withdrawal, any>> {
         return WithdrawalsApiFp(this.configuration).getWithdrawal(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -865,7 +865,7 @@ export class WithdrawalsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof WithdrawalsApi
      */
-    public listWithdrawals(requestParameters: WithdrawalsApiListWithdrawalsRequest = {}, options?: AxiosRequestConfig) {
+    public listWithdrawals(requestParameters: WithdrawalsApiListWithdrawalsRequest = {}, options?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<ListWithdrawalsResponse, any>> {
         return WithdrawalsApiFp(this.configuration).listWithdrawals(requestParameters.withdrawnToWallet, requestParameters.rollupStatus, requestParameters.pageSize, requestParameters.cursor, requestParameters.orderBy, requestParameters.direction, requestParameters.user, requestParameters.status, requestParameters.minTimestamp, requestParameters.maxTimestamp, requestParameters.tokenType, requestParameters.tokenId, requestParameters.assetId, requestParameters.tokenAddress, requestParameters.tokenName, requestParameters.minQuantity, requestParameters.maxQuantity, requestParameters.metadata, options).then((request) => request(this.axios, this.basePath));
     }
 }
