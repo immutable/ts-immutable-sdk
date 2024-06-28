@@ -12,7 +12,7 @@ import {
   FulfillOrderResponse,
   OrderStatusName,
 } from '@imtbl/orderbook';
-import { GetTokenResult } from '@imtbl/generated-clients/dist/multi-rollup';
+import { mr } from '@imtbl/generated-clients';
 import { track } from '@imtbl/metrics';
 import * as instance from '../../instance';
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../../config';
@@ -158,7 +158,7 @@ export const buy = async (
 
   const buyToken = order.result.buy[0];
   if (buyToken.type === 'ERC20') {
-    const token = await measureAsyncExecution<GetTokenResult>(
+    const token = await measureAsyncExecution<mr.GetTokenResult>(
       config,
       'Time to get decimals of token contract for the buy token',
       blockchainClient.getToken({ contractAddress: buyToken.contractAddress, chainName: orderChainName }),
