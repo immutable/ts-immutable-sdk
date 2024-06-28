@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { Signer } from '@ethersproject/abstract-signer';
 import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
@@ -39,7 +40,9 @@ export const personalSign = async ({
   }
 
   // Convert message into a string if it's a hex
+  console.log('message', message);
   const payload = hexToString(message);
+  console.log('payload - after hexToString', payload);
   const { chainId } = await rpcProvider.detectNetwork();
   flow.addEvent('endDetectNetwork');
   const chainIdBigNumber = BigNumber.from(chainId);

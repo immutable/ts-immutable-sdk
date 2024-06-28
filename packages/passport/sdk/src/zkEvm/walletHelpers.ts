@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import {
   BigNumber,
   BigNumberish,
@@ -225,13 +226,21 @@ export const signERC191Message = async (
   signer: Signer,
   walletAddress: string,
 ): Promise<string> => {
+  console.log('signERC191Message', payload, walletAddress);
+
   // Generate digest
   const digest = utils.hashMessage(payload);
+
+  console.log('digest', digest);
 
   // Generate subDigest
   const subDigest = encodeMessageSubDigest(chainId, walletAddress, digest);
   const subDigestHash = utils.keccak256(subDigest);
   const subDigestHashArray = utils.arrayify(subDigestHash);
+
+  console.log('subDigest', subDigest);
+  console.log('subDigestHash', subDigestHash);
+  console.log('subDigestHashArray', subDigestHashArray);
 
   return signer.signMessage(subDigestHashArray);
 };
