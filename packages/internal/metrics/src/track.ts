@@ -13,6 +13,7 @@ import {
   getGlobalisedCachedFunction,
   getGlobalisedValue,
 } from './utils/globalise';
+import { getCorrectedTime } from './utils/clock';
 
 export const POLLING_FREQUENCY = 5000;
 
@@ -44,7 +45,7 @@ const trackFn = (
 ): void => {
   const event = {
     event: `${moduleName}.${eventName}`,
-    time: new Date().toISOString(),
+    time: getCorrectedTime(),
     ...(properties && { properties: flattenProperties(properties) }),
   };
   addEvent(event);
