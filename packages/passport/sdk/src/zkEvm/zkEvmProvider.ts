@@ -316,6 +316,12 @@ export class ZkEvmProvider implements Provider {
             const ethSigner = await this.#getSigner();
             flow.addEvent('endGetSigner');
 
+            // eslint-disable-next-line no-console
+            console.log('request', request);
+
+            // eslint-disable-next-line no-console
+            console.log('request.params', request.params);
+
             return await personalSign({
               params: request.params || [],
               ethSigner,

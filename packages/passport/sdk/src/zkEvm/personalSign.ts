@@ -41,6 +41,7 @@ export const personalSign = async ({
 
   // Convert message into a string if it's a hex
   console.log('message', message);
+  console.log('fromAddress', fromAddress);
   const payload = hexToString(message);
   console.log('payload - after hexToString', payload);
   const { chainId } = await rpcProvider.detectNetwork();
