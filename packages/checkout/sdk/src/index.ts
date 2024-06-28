@@ -39,6 +39,8 @@ export {
   WalletFilterTypes,
   WalletProviderName,
   WalletProviderRdns,
+  TelemetryConfig,
+  SwapFees,
 } from './types';
 
 export type {
