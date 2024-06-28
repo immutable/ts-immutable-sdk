@@ -24,7 +24,7 @@
     "rollup": "^3.17.2",
     "ts-mockito": "^2.6.1",
     "typechain": "^8.1.1",
-    "typescript": "^4.9.5"
+    "typescript": "^5.5.2"
   },
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
   "license": "Apache-2.0",

@@ -3343,7 +3343,7 @@ __metadata:
     rollup: ^3.17.2
     ts-mockito: ^2.6.1
     typechain: ^8.1.1
-    typescript: ^4.9.5
+    typescript: ^5.5.2
   languageName: unknown
   linkType: soft
 
@@ -3371,7 +3371,7 @@ __metadata:
     rollup: ^3.17.2
     ts-node: ^10.9.1
     typechain: ^8.1.1
-    typescript: ^4.9.5
+    typescript: ^5.5.2
   languageName: unknown
   linkType: soft
 
@@ -3406,7 +3406,7 @@ __metadata:
     react-router-dom: ^6.11.0
     react-scripts: 5.0.1
     stream-browserify: ^3.0.0
-    typescript: ^4.9.5
+    typescript: ^5.5.2
     web-vitals: ^2.1.4
   languageName: unknown
   linkType: soft
@@ -3447,7 +3447,7 @@ __metadata:
     text-encoding: ^0.7.0
     typedoc: ^0.24.8
     typedoc-plugin-markdown: ^3.15.2
-    typescript: ^4.9.5
+    typescript: ^5.5.2
     uuid: ^8.3.2
   languageName: unknown
   linkType: soft
@@ -3476,7 +3476,7 @@ __metadata:
     react: ^18.2.0
     react-dom: ^18.2.0
     react-router-dom: ^6.11.0
-    typescript: ^4.9.5
+    typescript: ^5.5.2
     vite: ^5.0.12
     vite-plugin-node-polyfills: ^0.16.0
     web-vitals: ^2.1.4
@@ -3536,7 +3536,7 @@ __metadata:
     stream-browserify: ^3.0.0
     stream-http: ^3.2.0
     ts-jest: ^29.1.0
-    typescript: ^4.9.5
+    typescript: ^5.5.2
     url: ^0.11.0
     web-vitals: ^2.1.4
   languageName: unknown
@@ -3560,7 +3560,7 @@ __metadata:
     prettier: ^2.8.7
     rollup: ^3.17.2
     ts-node: ^10.9.1
-    typescript: ^4.9.5
+    typescript: ^5.5.2
   languageName: unknown
   linkType: soft
 
@@ -3586,7 +3586,7 @@ __metadata:
     prettier: ^2.8.7
     rollup: ^3.17.2
     ts-node: ^10.9.1
-    typescript: ^4.9.5
+    typescript: ^5.5.2
   languageName: unknown
   linkType: soft
 
@@ -3611,7 +3611,7 @@ __metadata:
     rollup: ^3.17.2
     ts-node: ^10.9.1
     typechain: ^8.1.1
-    typescript: ^4.9.5
+    typescript: ^5.5.2
   languageName: unknown
   linkType: soft
 
@@ -3636,7 +3636,7 @@ __metadata:
     rollup: ^3.17.2
     ts-node: ^10.9.1
     typechain: ^8.1.1
-    typescript: ^4.9.5
+    typescript: ^5.5.2
   languageName: unknown
   linkType: soft
 
@@ -3682,7 +3682,7 @@ __metadata:
     rollup: ^3.17.2
     ts-node: ^10.9.1
     typechain: ^8.1.1
-    typescript: ^4.9.5
+    typescript: ^5.5.2
   languageName: unknown
   linkType: soft
 
@@ -3701,7 +3701,7 @@ __metadata:
     lru-memorise: 0.3.0
     rollup: ^3.17.2
     ts-jest: ^29.1.0
-    typescript: ^4.9.5
+    typescript: ^5.5.2
   languageName: unknown
   linkType: soft
 
@@ -3728,7 +3728,7 @@ __metadata:
     rollup: ^3.17.2
     testcontainers: ^10.9.0
     ts-mockito: ^2.6.1
-    typescript: ^4.9.5
+    typescript: ^5.5.2
   dependenciesMeta:
     pg:
       optional: true
@@ -3759,7 +3759,7 @@ __metadata:
     rollup: ^3.17.2
     ts-mockito: ^2.6.1
     typechain: ^8.1.1
-    typescript: ^4.9.5
+    typescript: ^5.5.2
   languageName: unknown
   linkType: soft
 
@@ -3792,7 +3792,7 @@ __metadata:
     react: ^18.2.0
     react-bootstrap: ^2.7.2
     react-dom: ^18.2.0
-    typescript: ^4.9.5
+    typescript: ^5.5.2
   languageName: unknown
   linkType: soft
 
@@ -3838,7 +3838,7 @@ __metadata:
     prettier: ^2.8.7
     rollup: ^3.17.2
     ts-node: ^10.9.1
-    typescript: ^4.9.5
+    typescript: ^5.5.2
     uuid: ^8.3.2
   languageName: unknown
   linkType: soft
@@ -3938,7 +3938,7 @@ __metadata:
     sns-validator: ^0.3.5
     stream-browserify: ^3.0.0
     stream-http: ^3.2.0
-    typescript: ^4.9.5
+    typescript: ^5.5.2
     url: ^0.11.0
     uuid: ^8.3.2
   dependenciesMeta:
@@ -3981,7 +3981,7 @@ __metadata:
     prettier: ^2.8.7
     rollup: ^3.17.2
     ts-node: ^10.9.1
-    typescript: ^4.9.5
+    typescript: ^5.5.2
   languageName: unknown
   linkType: soft
 
@@ -4005,7 +4005,7 @@ __metadata:
     sns-validator: ^0.3.5
     ts-mockito: ^2.6.1
     typechain: ^8.1.1
-    typescript: ^4.9.5
+    typescript: ^5.5.2
   languageName: unknown
   linkType: soft
 
@@ -4034,7 +4034,7 @@ __metadata:
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
     rollup: ^3.17.2
-    typescript: ^4.9.5
+    typescript: ^5.5.2
   languageName: unknown
   linkType: soft
 
@@ -4068,7 +4068,7 @@ __metadata:
     prettier: ^2.8.7
     rollup: ^3.17.2
     ts-node: ^10.9.1
-    typescript: ^4.9.5
+    typescript: ^5.5.2
   languageName: unknown
   linkType: soft
 
@@ -12738,7 +12738,7 @@ __metadata:
     eslint-config-next: 13.3.1
     ethers: ^5.7.2
     ts-node: ^10.9.1
-    typescript: ^4.9.5
+    typescript: ^5.5.2
   languageName: unknown
   linkType: soft
 
@@ -17014,7 +17014,7 @@ __metadata:
     eslint-config-next: 13.3.1
     ethers: ^5.7.2
     ts-node: ^10.9.1
-    typescript: ^4.9.5
+    typescript: ^5.5.2
   languageName: unknown
   linkType: soft
 
@@ -26930,7 +26930,7 @@ __metadata:
     react: ^18.2.0
     react-dom: ^18.2.0
     tailwindcss: 3.3.2
-    typescript: ^4.9.5
+    typescript: ^5.5.2
   languageName: unknown
   linkType: soft
 
@@ -29321,16 +29321,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^4.9.5":
-  version: 4.9.5
-  resolution: "typescript@npm:4.9.5"
-  bin:
-    tsc: bin/tsc
-    tsserver: bin/tsserver
-  checksum: ee000bc26848147ad423b581bd250075662a354d84f0e06eb76d3b892328d8d4440b7487b5a83e851b12b255f55d71835b008a66cbf8f255a11e4400159237db
-  languageName: node
-  linkType: hard
-
 "typescript@npm:^5.5.2":
   version: 5.5.2
   resolution: "typescript@npm:5.5.2"
@@ -29338,16 +29328,6 @@ __metadata:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: 9c5a7982dadcb2d38d129c575dd38645ae11588ae0d4a12852fb04482bbc5a1660b2371e48fd5b33b6b605cc57cefe777670054546856945a05e77bd22c8c2cd
-  languageName: node
-  linkType: hard
-
-"typescript@patch:typescript@^4.9.5#~builtin<compat/typescript>":
-  version: 4.9.5
-  resolution: "typescript@patch:typescript@npm%3A4.9.5#~builtin<compat/typescript>::version=4.9.5&hash=289587"
-  bin:
-    tsc: bin/tsc
-    tsserver: bin/tsserver
-  checksum: 1f8f3b6aaea19f0f67cba79057674ba580438a7db55057eb89cc06950483c5d632115c14077f6663ea76fd09fce3c190e6414bb98582ec80aa5a4eaf345d5b68
   languageName: node
   linkType: hard
 
@@ -31097,7 +31077,7 @@ __metadata:
     react-dom: ^18.2.0
     react-scripts: 5.0.1
     stream-browserify: ^3.0.0
-    typescript: ^4.9.5
+    typescript: ^5.5.2
     web-vitals: ^2.1.4
   languageName: unknown
   linkType: soft
