@@ -8,18 +8,18 @@ export const hexToString = (hex: string) => {
 
   try {
     const stripped = utils.stripZeros(utils.arrayify(hex));
-    const uint8Array = new Uint8Array(stripped);
+    const buff = Buffer.from(stripped);
 
     console.log('stripped', stripped);
-    console.log('uint8Array', uint8Array);
+    console.log('buff', buff);
 
-    // Convert Uint8Array to string using TextDecoder
-    const decoder = new TextDecoder();
-    const decodedString = decoder.decode(uint8Array);
+    if (buff.length === 32) {
+      console.log('buff.length === 32', hex);
+    } else {
+      console.log('buff.length !== 32', utils.toUtf8String(stripped));
+    }
 
-    console.log('decodedString', decodedString);
-
-    return stripped.length === 32 ? hex : decodedString;
+    return buff.length === 32 ? hex : utils.toUtf8String(stripped);
   } catch (e) {
     console.log('error from hexToString', e);
     return hex;

@@ -123,6 +123,12 @@ export class Passport {
 
     setPassportClientId(passportModuleConfiguration.clientId);
     track('passport', 'initialise');
+
+    if (typeof window !== 'undefined' && !window.Buffer) {
+      // Define Buffer here for browsers
+      // eslint-disable-next-line global-require
+      window.Buffer = require('buffer').Buffer;
+    }
   }
 
   /**
