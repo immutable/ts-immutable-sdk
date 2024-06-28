@@ -17,6 +17,7 @@ import { HandoverContent } from '../../../components/Handover/HandoverContent';
 import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
 import { isPassportProvider } from '../../../lib/provider';
 import { getRemoteRive } from '../../../lib/utils';
+import { HandoverDuration } from '../../../context/handover-context/HandoverProvider';
 
 interface StepConfig {
   headingTextKey: string;
@@ -171,7 +172,7 @@ export function PayWithCoins() {
       const details = { transactionId: signResponse?.transactionId };
 
       addHandover({
-        duration: 2000,
+        duration: HandoverDuration.MEDIUM,
         animationUrl: getRemoteRive(
           environment,
           getRiveAnimationName(TransactionMethod.EXECUTE),

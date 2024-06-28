@@ -7,6 +7,7 @@ import { ExecuteTransactionStep } from '../types';
 import { useHandover } from '../../../lib/hooks/useHandover';
 import { HandoverTarget } from '../../../context/handover-context/HandoverContext';
 import { getRemoteRive } from '../../../lib/utils';
+import { HandoverDuration } from '../../../context/handover-context/HandoverProvider';
 
 export enum TransactionMethod {
   APPROVE = 'approve(address spender,uint256 amount)',
@@ -99,7 +100,7 @@ export function useHandoverSteps(environment: Environment) {
 
         case `${TransactionMethod.APPROVE}-${ExecuteTransactionStep.AFTER}`:
           addHandover({
-            duration: 2000,
+            duration: HandoverDuration.MEDIUM,
             animationUrl: getRemoteRive(
               environment,
               getRiveAnimationName(TransactionMethod.APPROVE),
@@ -210,7 +211,7 @@ export function useHandoverSteps(environment: Environment) {
 
         case `${TransactionMethod.EXECUTE}-${ExecuteTransactionStep.AFTER}`:
           addHandover({
-            duration: 2000,
+            duration: HandoverDuration.MEDIUM,
             animationUrl: getRemoteRive(
               environment,
               getRiveAnimationName(TransactionMethod.EXECUTE),

@@ -22,7 +22,11 @@ type HandoverQueue = {
   [key in HandoverTarget]?: HandoverContent[];
 };
 
-const MINIMUM_DURATION = 2000; // Minimum duration in milliseconds (2 seconds)
+export enum HandoverDuration {
+  SHORT = 1000, // in milliseconds
+  MEDIUM = 2000,
+  LONG = 3000,
+}
 
 export function HandoverProvider({ children }: HandoverProviderProps) {
   const [handovers, setHandovers] = useState<HandoverState>({});
@@ -70,7 +74,7 @@ export function HandoverProvider({ children }: HandoverProviderProps) {
           }));
 
           const contentDuration = nextHandoverContent.duration ?? 0;
-          const effectiveDuration = Math.max(contentDuration, MINIMUM_DURATION);
+          const effectiveDuration = Math.max(contentDuration, HandoverDuration.SHORT);
 
           setHandoverBusy((prev) => ({
             ...prev,
