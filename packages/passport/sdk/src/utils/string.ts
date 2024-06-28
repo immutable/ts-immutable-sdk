@@ -10,6 +10,9 @@ export const hexToString = (hex: string) => {
     const stripped = utils.stripZeros(utils.arrayify(hex));
     const buff = Buffer.from(stripped);
 
+    console.log('stripped', stripped);
+    console.log('buff', buff);
+
     if (buff.length === 32) {
       console.log('buff.length === 32', hex);
     } else {
@@ -18,6 +21,7 @@ export const hexToString = (hex: string) => {
 
     return buff.length === 32 ? hex : utils.toUtf8String(stripped);
   } catch (e) {
+    console.log('error from hexToString', e);
     return hex;
   }
 };
