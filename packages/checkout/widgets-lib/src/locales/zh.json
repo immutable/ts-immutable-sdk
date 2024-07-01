@@ -345,6 +345,31 @@
         "processing2": "正在保护您的资产",
         "processing3": "正在完成支付"
       },
+      "handover": {
+        "initial": "准备订单中",
+        "approve": {
+          "before": "等待您的钱包批准",
+          "beforeWithCta": {
+            "heading": "请批准您的代币",
+            "ctaButton": "打开钱包"
+          },
+          "pending": "等待批准",
+          "after": "代币已准备好购买物品"
+        },
+        "execute": {
+          "before": "等待您的钱包确认",
+          "beforeWithCta": {
+            "heading": "请确认此次购买",
+            "ctaButton": "打开钱包"
+          },
+          "pending": "等待购买确认",
+          "after": "处理中"
+        },
+        "success": "购买完成",
+        "error": {
+          "heading": "无法完成购买"
+        }
+      },
       "creditCardWarningDrawer": {
         "heading": "我们推荐使用借记卡而非信用卡",
         "body": "在这类购买中使用信用卡时，大多数银行将收取现金预付费用或完全阻止交易。",

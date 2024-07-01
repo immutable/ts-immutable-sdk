@@ -31,6 +31,8 @@ import {
   SignOrderError,
   SignPaymentTypes,
   SignResponse,
+  ExecuteTransactionStep,
+  SignedTransaction,
 } from '../types';
 import { useQuoteOrder, defaultOrderQuote } from '../hooks/useQuoteOrder';
 
@@ -55,15 +57,23 @@ type SaleContextValues = SaleContextProps & {
     tokenAddress?: string,
     callback?: (response: SignResponse | undefined) => void
   ) => Promise<SignResponse | undefined>;
-  execute: (
+  executeAll: (
     signResponse: SignResponse | undefined,
     onTxnSuccess: (txn: ExecutedTransaction) => void,
-    onTxnError: (error: SignOrderError, txns: ExecutedTransaction[]) => void
+    onTxnError: (error: SignOrderError, txns: ExecutedTransaction[]) => void,
+    onTxnStep?: (method: string, step: ExecuteTransactionStep) => void
   ) => Promise<ExecutedTransaction[]>;
+  executeNextTransaction: (
+    onTxnSuccess: (txn: ExecutedTransaction) => void,
+    onTxnError: (error: any, txns: ExecutedTransaction[]) => void,
+    onTxnStep?: (method: string, step: ExecuteTransactionStep) => void
+  ) => Promise<boolean>;
   recipientAddress: string;
   recipientEmail: string;
   signResponse: SignResponse | undefined;
   signError: SignOrderError | undefined;
+  filteredTransactions: SignedTransaction[];
+  currentTransactionIndex: number;
   executeResponse: ExecuteOrderResponse | undefined;
   isPassportWallet: boolean;
   showCreditCardWarning: boolean;
@@ -96,9 +106,12 @@ const SaleContext = createContext<SaleContextValues>({
   recipientAddress: '',
   recipientEmail: '',
   sign: () => Promise.resolve(undefined),
-  execute: () => Promise.resolve([]),
+  executeAll: () => Promise.resolve([]),
+  executeNextTransaction: () => Promise.resolve(false),
   signResponse: undefined,
   signError: undefined,
+  filteredTransactions: [],
+  currentTransactionIndex: 0,
   executeResponse: undefined,
   passport: undefined,
   isPassportWallet: false,
@@ -223,9 +236,12 @@ export function SaleContextProvider(props: {
 
   const {
     sign: signOrder,
-    execute,
+    executeAll,
+    executeNextTransaction,
     signResponse,
     signError,
+    filteredTransactions,
+    currentTransactionIndex,
     executeResponse,
     tokenIds,
   } = useSignOrder({
@@ -308,11 +324,6 @@ export function SaleContextProvider(props: {
   );
 
   useEffect(() => {
-    if (!signError) return;
-    goToErrorView(signError.type, signError.data);
-  }, [signError]);
-
-  useEffect(() => {
     if (!orderQuoteError) return;
     goToErrorView(orderQuoteError.type, orderQuoteError.data);
   }, [orderQuoteError]);
@@ -338,7 +349,10 @@ export function SaleContextProvider(props: {
       sign,
       signResponse,
       signError,
-      execute,
+      filteredTransactions,
+      currentTransactionIndex,
+      executeAll,
+      executeNextTransaction,
       executeResponse,
       environmentId,
       collectionName,
@@ -378,6 +392,8 @@ export function SaleContextProvider(props: {
       recipientEmail,
       signResponse,
       signError,
+      filteredTransactions,
+      currentTransactionIndex,
       executeResponse,
       showCreditCardWarning,
       setShowCreditCardWarning,

@@ -11,6 +11,8 @@ import {
   ExecutedTransaction,
   SaleErrorTypes,
   SignPaymentTypes,
+  SignedTransaction,
+  ExecuteTransactionStep,
 } from '../types';
 import { PRIMARY_SALES_API_BASE_URL } from '../utils/config';
 import { hexToText } from '../functions/utils';
@@ -152,7 +154,11 @@ const toSignResponse = (
 
 export const useSignOrder = (input: SignOrderInput) => {
   const {
-    provider, items, environment, environmentId, waitFulfillmentSettlements,
+    provider,
+    items,
+    environment,
+    environmentId,
+    waitFulfillmentSettlements,
   } = input;
   const [signError, setSignError] = useState<SignOrderError | undefined>(
     undefined,
@@ -165,6 +171,10 @@ export const useSignOrder = (input: SignOrderInput) => {
     transactions: [],
   });
   const [tokenIds, setTokenIds] = useState<string[]>([]);
+  const [currentTransactionIndex, setCurrentTransactionIndex] = useState<number>(0);
+  const [filteredTransactions, setFilteredTransactions] = useState<
+  SignedTransaction[]
+  >([]);
 
   const setExecuteTransactions = (transaction: ExecutedTransaction) => {
     setExecuteResponse((prev) => ({
@@ -174,6 +184,8 @@ export const useSignOrder = (input: SignOrderInput) => {
   };
 
   const setExecuteDone = () => setExecuteResponse((prev) => ({ ...prev, done: true }));
+
+  const setTransactionIndex = () => setCurrentTransactionIndex((prev) => prev + 1);
 
   const setExecuteFailed = () => setExecuteResponse({
     done: false,
@@ -185,7 +197,6 @@ export const useSignOrder = (input: SignOrderInput) => {
       to: string,
       data: string,
       gasLimit: number,
-      method: string,
     ): Promise<[hash: string | undefined, error?: SignOrderError]> => {
       try {
         const signer = provider?.getSigner();
@@ -196,8 +207,6 @@ export const useSignOrder = (input: SignOrderInput) => {
           gasPrice,
           gasLimit,
         });
-
-        setExecuteTransactions({ method, hash: txnResponse?.hash });
 
         if (waitFulfillmentSettlements) {
           await txnResponse?.wait();
@@ -244,7 +253,7 @@ export const useSignOrder = (input: SignOrderInput) => {
         return [undefined, error];
       }
     },
-    [provider],
+    [provider, waitFulfillmentSettlements],
   );
 
   const sign = useCallback(
@@ -254,7 +263,7 @@ export const useSignOrder = (input: SignOrderInput) => {
     ): Promise<SignResponse | undefined> => {
       try {
         const signer = provider?.getSigner();
-        const address = await signer?.getAddress() || '';
+        const address = (await signer?.getAddress()) || '';
 
         const data: SignApiRequest = {
           recipient_address: address,
@@ -313,6 +322,14 @@ export const useSignOrder = (input: SignOrderInput) => {
         setTokenIds(apiTokenIds);
         setSignResponse(responseData);
 
+        if (provider) {
+          const filterTransactions = await filterAllowedTransactions(
+            responseData.transactions,
+            provider,
+          );
+          setFilteredTransactions(filterTransactions);
+        }
+
         return responseData;
       } catch (e: any) {
         setSignError({ type: SaleErrorTypes.DEFAULT, data: { error: e } });
@@ -322,63 +339,139 @@ export const useSignOrder = (input: SignOrderInput) => {
     [items, environmentId, environment, provider],
   );
 
-  const execute = async (
-    signData: SignResponse | undefined,
+  const executeTransaction = async (
+    transaction: SignedTransaction,
     onTxnSuccess: (txn: ExecutedTransaction) => void,
-    onTxnError: (error: SignOrderError, txns: ExecutedTransaction[]) => void,
-  ): Promise<ExecutedTransaction[]> => {
-    if (!signData || !provider) {
-      setSignError({
-        type: SaleErrorTypes.DEFAULT,
-        data: { reason: 'No sign data' },
-      });
-      return [];
+    onTxnError: (error: any, txns: ExecutedTransaction[]) => void,
+  ) => {
+    if (!transaction) {
+      return false;
     }
 
-    let successful = true;
-    const execTransactions: ExecutedTransaction[] = [];
+    const {
+      tokenAddress: to,
+      rawData: data,
+      methodCall: method,
+      gasEstimate,
+    } = transaction;
 
-    const transactions = await filterAllowedTransactions(
-      signData.transactions,
-      provider,
-    );
+    const [hash, txnError] = await sendTransaction(to, data, gasEstimate);
 
-    for (const transaction of transactions) {
-      const {
-        tokenAddress: to,
-        rawData: data,
-        methodCall: method,
-        gasEstimate,
-      } = transaction;
-      // eslint-disable-next-line no-await-in-loop
-      const [hash, txnError] = await sendTransaction(
-        to,
-        data,
-        gasEstimate,
-        method,
-      );
+    if (txnError || !hash) {
+      onTxnError(txnError, executeResponse.transactions);
+      return false;
+    }
 
-      if (txnError) {
-        successful = false;
-        onTxnError(txnError, execTransactions);
-        break;
+    const execTransaction = { method, hash };
+    setExecuteTransactions(execTransaction);
+    onTxnSuccess(execTransaction);
+
+    return true;
+  };
+
+  const executeAll = useCallback(
+    async (
+      signData: SignResponse | undefined,
+      onTxnSuccess: (txn: ExecutedTransaction) => void,
+      onTxnError: (error: any, txns: ExecutedTransaction[]) => void,
+      onTxnStep?: (method: string, step: ExecuteTransactionStep) => void,
+    ): Promise<ExecutedTransaction[]> => {
+      if (!signData || !provider) {
+        setSignError({
+          type: SaleErrorTypes.DEFAULT,
+          data: { reason: 'No sign data' },
+        });
+
+        return [];
       }
 
-      execTransactions.push({ method, hash });
-      onTxnSuccess({ method, hash });
-    }
+      const transactions = await filterAllowedTransactions(
+        signData.transactions,
+        provider,
+      );
 
-    (successful ? setExecuteDone : setExecuteFailed)();
+      let successful = true;
+      for (const transaction of transactions) {
+        if (onTxnStep) {
+          onTxnStep(transaction.methodCall, ExecuteTransactionStep.BEFORE);
+        }
 
-    return execTransactions;
-  };
+        // eslint-disable-next-line no-await-in-loop
+        const success = await executeTransaction(
+          transaction,
+          onTxnSuccess,
+          onTxnError,
+        );
+
+        if (!success) {
+          successful = false;
+          break;
+        }
+
+        if (onTxnStep) {
+          onTxnStep(transaction.methodCall, ExecuteTransactionStep.AFTER);
+        }
+      }
+      (successful ? setExecuteDone : setExecuteFailed)();
+
+      return executeResponse.transactions;
+    },
+    [
+      provider,
+      executeTransaction,
+      setExecuteDone,
+      setExecuteFailed,
+      filterAllowedTransactions,
+      sendTransaction,
+    ],
+  );
+
+  const executeNextTransaction = useCallback(
+    async (
+      onTxnSuccess: (txn: ExecutedTransaction) => void,
+      onTxnError: (error: any, txns: ExecutedTransaction[]) => void,
+      onTxnStep?: (method: string, step: ExecuteTransactionStep) => void,
+    ): Promise<boolean> => {
+      if (!filteredTransactions || executeResponse.done || !provider) return false;
+
+      const transaction = filteredTransactions[currentTransactionIndex];
+
+      if (onTxnStep) {
+        onTxnStep(transaction.methodCall, ExecuteTransactionStep.BEFORE);
+      }
+
+      const success = await executeTransaction(
+        transaction,
+        onTxnSuccess,
+        onTxnError,
+      );
+
+      if (success) {
+        setTransactionIndex();
+
+        if (currentTransactionIndex === filteredTransactions.length - 1) {
+          setExecuteDone();
+        }
+
+        if (onTxnStep) {
+          onTxnStep(transaction.methodCall, ExecuteTransactionStep.AFTER);
+        }
+      }
+
+      return success;
+    },
+    [currentTransactionIndex, provider, filteredTransactions],
+  );
 
   return {
     sign,
     signResponse,
     signError,
-    execute,
+    filteredTransactions,
+    currentTransactionIndex,
+    executeAll,
     executeResponse,
     tokenIds,
+    executeNextTransaction,
   };
 };
