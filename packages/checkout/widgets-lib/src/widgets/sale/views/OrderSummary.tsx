@@ -92,9 +92,6 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
       ),
     });
 
-    // eslint-disable-next-line no-debugger
-    debugger;
-
     const { type, fundingItem } = fundingBalance;
 
     sendProceedToPay(
