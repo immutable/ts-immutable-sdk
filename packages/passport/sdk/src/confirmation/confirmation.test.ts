@@ -13,7 +13,7 @@ let windowSpy: SpyInstance;
 const closeMock = jest.fn();
 const postMessageMock = jest.fn();
 const mockNewWindow = {
-  closed: true, focus: jest.fn(), close: closeMock, location: { href: 'http' }, postMessage: postMessageMock,
+  closed: false, focus: jest.fn(), close: closeMock, location: { href: 'http' }, postMessage: postMessageMock,
 };
 const mockedOpen = jest.fn().mockReturnValue(mockNewWindow);
 const addEventListenerMock = jest.fn();
