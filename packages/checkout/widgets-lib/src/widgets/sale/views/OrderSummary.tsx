@@ -70,6 +70,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
         },
       },
     });
+    closeHandover();
   };
 
   const onFundingRouteExecuted = () => {
@@ -91,6 +92,9 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
       ),
     });
 
+    // eslint-disable-next-line no-debugger
+    debugger;
+
     const { type, fundingItem } = fundingBalance;
 
     sendProceedToPay(
@@ -104,7 +108,6 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
       signAndProceed(fundingItem.token.address);
       return;
     }
-
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
@@ -118,6 +121,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
         },
       },
     });
+    closeHandover();
   };
 
   const {
