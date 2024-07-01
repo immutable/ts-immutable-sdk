@@ -61,6 +61,19 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
   const onPayWithCard = (paymentType: SalePaymentTypes) => goBackToPaymentMethods(paymentType);
 
   const signAndProceed = (tokenAddress?: string) => {
+    addHandover({
+      animationUrl: getRemoteRive(
+        environment,
+        getRiveAnimationName(TransactionMethod.APPROVE),
+      ),
+      inputValue:
+        transactionRiveAnimations[TransactionMethod.APPROVE].inputValues.start,
+      children: (
+        <Heading sx={{ px: 'base.spacing.x6' }}>
+          {t('views.PAYMENT_METHODS.handover.initial')}
+        </Heading>
+      ),
+    });
     sign(SignPaymentTypes.CRYPTO, tokenAddress);
 
     viewDispatch({
@@ -78,20 +91,6 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
   };
 
   const onProceedToBuy = (fundingBalance: FundingBalance) => {
-    addHandover({
-      animationUrl: getRemoteRive(
-        environment,
-        getRiveAnimationName(TransactionMethod.APPROVE),
-      ),
-      inputValue:
-        transactionRiveAnimations[TransactionMethod.APPROVE].inputValues.start,
-      children: (
-        <Heading sx={{ px: 'base.spacing.x6' }}>
-          {t('views.PAYMENT_METHODS.handover.initial')}
-        </Heading>
-      ),
-    });
-
     const { type, fundingItem } = fundingBalance;
 
     sendProceedToPay(
