@@ -35,7 +35,7 @@ describe('string', () => {
     });
 
     it('should return hex if length is 32', () => {
-      const hex = `0x${'12'.repeat(32)}`; // 32 non-zero bytes
+      const hex = `0x${'12'.repeat(32)}`;
       expect(hexToString(hex)).toEqual(hex);
     });
   });
