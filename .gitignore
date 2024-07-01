@@ -27,3 +27,6 @@ yalc.lock
 package-lock.json
 
 docs/
+
+.rollup.cache/
+tsconfig.tsbuildinfo

@@ -18,5 +18,10 @@
     "compilerOptions": {
       "module": "commonjs"
     }
-  }
+  },
+  "references": [
+    { "path": "./packages/blockchain-data/sdk" },
+    { "path": "./packages/config" },
+    { "path": "./packages/internal/metrics" }
+  ]
 }
