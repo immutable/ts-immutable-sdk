@@ -4,8 +4,8 @@ export const hexToString = async (hex: string) => {
   if (!hex) return hex;
 
   try {
+    // Ensures Buffer is available when using the browser bundle of the SDK
     if (typeof window !== 'undefined' && !window.Buffer) {
-      // Use dynamic import to load Buffer
       const bufferModule = await import('buffer');
       window.Buffer = bufferModule.Buffer;
     }

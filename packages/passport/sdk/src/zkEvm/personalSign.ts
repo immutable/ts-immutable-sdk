@@ -38,6 +38,7 @@ export const personalSign = async ({
     throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'personal_sign requires the signer to be the from address');
   }
 
+  // Convert message into a string if it's a hex
   const payload = await hexToString(message);
   const { chainId } = await rpcProvider.detectNetwork();
   flow.addEvent('endDetectNetwork');
