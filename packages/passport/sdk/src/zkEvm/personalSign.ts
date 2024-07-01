@@ -38,13 +38,7 @@ export const personalSign = async ({
     throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'personal_sign requires the signer to be the from address');
   }
 
-  if (typeof window !== 'undefined' && !window.Buffer) {
-    // Use dynamic import to load Buffer
-    const bufferModule = await import('buffer');
-    window.Buffer = bufferModule.Buffer;
-  }
-
-  const payload = hexToString(message);
+  const payload = await hexToString(message);
   const { chainId } = await rpcProvider.detectNetwork();
   flow.addEvent('endDetectNetwork');
   const chainIdBigNumber = BigNumber.from(chainId);
