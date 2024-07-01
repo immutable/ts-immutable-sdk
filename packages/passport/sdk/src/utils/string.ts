@@ -5,7 +5,7 @@ export const hexToString = (hex: string) => {
 
   try {
     const stripped = utils.stripZeros(utils.arrayify(hex));
-    return stripped.length === 32 ? hex : utils.toUtf8String(stripped);
+    return utils.toUtf8String(stripped);
   } catch (e) {
     return hex;
   }
