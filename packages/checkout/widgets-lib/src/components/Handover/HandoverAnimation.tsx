@@ -1,5 +1,5 @@
 import { Box } from '@biom3/react';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import {
   Fit,
   Layout,
@@ -7,36 +7,31 @@ import {
   useStateMachineInput,
 } from '@rive-app/react-canvas-lite';
 
-export function HandoverAnimation({ url, animationName }: { url: string, animationName?: string }) {
+const STATE_MACHINE_NAME = 'State';
+const INPUT_NAME = 'mode';
+
+export function HandoverAnimation({
+  url,
+  inputValue = 0,
+}: {
+  url: string;
+  inputValue?: number;
+}) {
   const riveParams = {
     src: url,
     autoplay: true,
     layout: new Layout({ fit: Fit.Contain }),
-    stateMachines: 'State',
+    stateMachines: STATE_MACHINE_NAME,
   };
+
   const { rive, RiveComponent } = useRive(riveParams);
-  useStateMachineInput(rive, 'State', 'mode', 0);
+  const input = useStateMachineInput(rive, STATE_MACHINE_NAME, INPUT_NAME);
 
   useEffect(() => {
-    if (rive) {
-      // TODO: hook into animation complete event to auto close handover
-      // rive.on(EventType.RiveEvent, (event) => {
-      //   console.log('Handover event', event);
-      // });
-      // rive.on(EventType.Stop, (event) => {
-      //   console.log('Handover animation complete', event);
-      // });
-
-      if (animationName) {
-        if (rive.animationNames.includes(animationName)) {
-          rive.play(animationName);
-        } else {
-          // eslint-disable-next-line no-console
-          console.warn('Handover animation not found', animationName);
-        }
-      }
+    if (rive && input) {
+      input.value = inputValue;
     }
-  }, [rive, animationName]);
+  }, [rive, input, inputValue]);
 
   return (
     <Box

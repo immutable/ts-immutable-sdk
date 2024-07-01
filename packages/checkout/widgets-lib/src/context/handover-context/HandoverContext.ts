@@ -9,9 +9,9 @@ export enum HandoverTarget {
 export type HandoverContent = {
   children?: React.ReactNode;
   animationUrl?: string;
-  animationName?: string;
-  onAnimationComplete?: () => void;
+  inputValue?: number;
   duration?: number; // in milliseconds
+  onClose?: () => void;
 };
 
 export type HandoverLoader = {

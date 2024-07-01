@@ -1,17 +1,12 @@
-import { Box } from '@biom3/react';
+import { Box, Heading } from '@biom3/react';
 import { useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SalePaymentTypes } from '@imtbl/checkout-sdk';
-import {
-  SharedViews,
-  ViewActions,
-  ViewContext,
-} from '../../../context/view-context/ViewContext';
+
 import {
   OrderSummarySubViews,
   SaleWidgetViews,
 } from '../../../context/view-context/SaleViewContextTypes';
-import { LoadingView } from '../../../views/loading/LoadingView';
 import { useSaleContext } from '../context/SaleContextProvider';
 import {
   CryptoFiatActions,
@@ -28,6 +23,16 @@ import {
 } from '../types';
 import { FundingRouteExecute } from '../components/FundingRouteExecute/FundingRouteExecute';
 import { useSaleEvent } from '../hooks/useSaleEvents';
+import { LoadingHandover } from './LoadingHandover';
+import {
+  TransactionMethod,
+  getRiveAnimationName,
+  transactionRiveAnimations,
+} from '../hooks/useHandoverSteps';
+import { HandoverTarget } from '../../../context/handover-context/HandoverContext';
+import { ViewContext, ViewActions, SharedViews } from '../../../context/view-context/ViewContext';
+import { useHandover } from '../../../lib/hooks/useHandover';
+import { getRemoteRive } from '../../../lib/utils';
 
 type OrderSummaryProps = {
   subView: OrderSummarySubViews;
@@ -44,10 +49,14 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
     sign,
     selectedCurrency,
     setPaymentMethod,
+    environment,
   } = useSaleContext();
 
   const { viewDispatch, viewState } = useContext(ViewContext);
   const { cryptoFiatDispatch, cryptoFiatState } = useContext(CryptoFiatContext);
+  const { addHandover, closeHandover } = useHandover({
+    id: HandoverTarget.GLOBAL,
+  });
 
   const onPayWithCard = (paymentType: SalePaymentTypes) => goBackToPaymentMethods(paymentType);
 
@@ -68,6 +77,20 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
   };
 
   const onProceedToBuy = (fundingBalance: FundingBalance) => {
+    addHandover({
+      animationUrl: getRemoteRive(
+        environment,
+        getRiveAnimationName(TransactionMethod.APPROVE),
+      ),
+      inputValue:
+        transactionRiveAnimations[TransactionMethod.APPROVE].inputValues.start,
+      children: (
+        <Heading sx={{ px: 'base.spacing.x6' }}>
+          {t('views.PAYMENT_METHODS.handover.initial')}
+        </Heading>
+      ),
+    });
+
     const { type, fundingItem } = fundingBalance;
 
     sendProceedToPay(
@@ -115,6 +138,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
   useEffect(() => {
     if (fundingBalances.length === 0) return;
 
+    closeHandover();
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
@@ -179,10 +203,10 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
   return (
     <Box>
       {subView === OrderSummarySubViews.INIT && (
-        <LoadingView
-          loadingText={t(
-            'views.ORDER_SUMMARY.loading.balances',
-          )}
+        <LoadingHandover
+          text={t('views.ORDER_SUMMARY.loading.balances')}
+          animationUrl={getRemoteRive(environment, '/preparing_order.riv')}
+          inputValue={0}
         />
       )}
       {subView === OrderSummarySubViews.REVIEW_ORDER && (

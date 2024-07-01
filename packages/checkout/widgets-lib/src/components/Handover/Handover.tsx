@@ -10,6 +10,7 @@ import { HandoverAnimation } from './HandoverAnimation';
 const contentAnimation = {
   hidden: { y: 8, opacity: 0 },
   show: (i) => ({
+    height: '100%',
     y: 0,
     opacity: 1,
     transition: {
@@ -36,7 +37,7 @@ export function Handover({ id, children }: { id: string, children?: React.ReactN
   return (
     <>
       {children}
-      {(loader && (
+      {loader && (
         <LoadingOverlay visible>
           <LoadingOverlay.Content>
             <LoadingOverlay.Content.LoopingText
@@ -45,8 +46,8 @@ export function Handover({ id, children }: { id: string, children?: React.ReactN
             />
           </LoadingOverlay.Content>
         </LoadingOverlay>
-      ))}
-      {(handover && (renderChildren || handover.animationUrl) && (
+      )}
+      {handover && (renderChildren || handover.animationUrl) && (
         <Stack
           sx={{
             backgroundColor: 'base.color.neutral.1000',
@@ -60,11 +61,16 @@ export function Handover({ id, children }: { id: string, children?: React.ReactN
             right: '0px',
           }}
         >
-          {(handover?.animationUrl && handover?.animationUrl.length > 0 && (
-            <HandoverAnimation url={handover.animationUrl} animationName={handover.animationName} />
-          ))}
+          {handover?.animationUrl?.length && (
+            <HandoverAnimation
+              key={handover.animationUrl}
+              url={handover.animationUrl}
+              inputValue={handover.inputValue}
+            />
+          )}
           <Stack
             sx={{
+              height: '100%',
               px: 'base.spacing.x6',
               py: 'base.spacing.x10',
               textAlign: 'center',
@@ -88,7 +94,7 @@ export function Handover({ id, children }: { id: string, children?: React.ReactN
             </AnimatePresence>
           </Stack>
         </Stack>
-      ))}
+      )}
     </>
   );
 }

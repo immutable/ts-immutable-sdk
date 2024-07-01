@@ -345,6 +345,31 @@
         "processing2": "자산 보호 중",
         "processing3": "결제 완료 중"
       },
+      "handover": {
+        "initial": "주문 준비 중",
+        "approve": {
+          "before": "지갑에서 승인을 기다리고 있습니다",
+          "beforeWithCta": {
+            "heading": "토큰을 승인해 주세요",
+            "ctaButton": "지갑 열기"
+          },
+          "pending": "승인을 기다리고 있습니다",
+          "after": "토큰이 아이템 구매 준비되었습니다"
+        },
+        "execute": {
+          "before": "지갑에서 확인을 기다리고 있습니다",
+          "beforeWithCta": {
+            "heading": "이 구매를 확인해 주세요",
+            "ctaButton": "지갑 열기"
+          },
+          "pending": "구매 확인을 기다리고 있습니다",
+          "after": "구매 처리 중"
+        },
+        "success": "구매 완료",
+        "error": {
+          "heading": "구매를 완료할 수 없습니다"
+        }
+      },
       "creditCardWarningDrawer": {
         "heading": "신용카드보다는 체크카드 사용을 권장합니다",
         "body": "이런 종류의 구매에 신용카드를 사용할 경우 대부분의 은행에서 현금 서비스 수수료를 부과하거나 거래를 전체적으로 차단할 수 있습니다.",
