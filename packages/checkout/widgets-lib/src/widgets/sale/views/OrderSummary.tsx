@@ -62,6 +62,8 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
 
   const signAndProceed = (tokenAddress?: string) => {
     sign(SignPaymentTypes.CRYPTO, tokenAddress);
+
+    closeHandover();
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
@@ -70,7 +72,6 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
         },
       },
     });
-    closeHandover();
   };
 
   const onFundingRouteExecuted = () => {
@@ -105,6 +106,8 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
       signAndProceed(fundingItem.token.address);
       return;
     }
+
+    closeHandover();
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
@@ -118,7 +121,6 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
         },
       },
     });
-    closeHandover();
   };
 
   const {
@@ -165,6 +167,8 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
         smartCheckoutResult.transactionRequirements,
       );
       setPaymentMethod(undefined);
+
+      closeHandover();
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
