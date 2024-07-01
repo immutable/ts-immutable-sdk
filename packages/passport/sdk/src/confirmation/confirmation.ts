@@ -256,7 +256,6 @@ export default class ConfirmationScreen {
         width: this.popupOptions?.width || CONFIRMATION_WINDOW_WIDTH,
         height: this.popupOptions?.height || CONFIRMATION_WINDOW_HEIGHT,
       });
-
       this.timer = setInterval(timerCallback, CONFIRMATION_WINDOW_CLOSED_POLLING_DURATION);
     } catch { /* Empty */ }
   }
