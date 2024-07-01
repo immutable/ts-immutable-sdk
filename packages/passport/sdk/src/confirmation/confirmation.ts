@@ -1,4 +1,6 @@
 import { TransactionApprovalRequestChainTypeEnum } from '@imtbl/guardian';
+import { trackError } from '@imtbl/metrics';
+
 import {
   ConfirmationResult,
   PASSPORT_EVENT_TYPE,
@@ -180,8 +182,10 @@ export default class ConfirmationScreen {
         height: popupOptions?.height || CONFIRMATION_WINDOW_HEIGHT,
       });
       this.overlay = new Overlay(this.config.popupOverlayOptions);
-    } catch (e) {
+    } catch (error) {
       // If an error is thrown here then the popup is blocked
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      trackError('passport', 'PassportLoginPopupDenied', new Error(errorMessage));
       this.overlay = new Overlay(this.config.popupOverlayOptions, true);
     }
 
@@ -252,7 +256,8 @@ export default class ConfirmationScreen {
         width: this.popupOptions?.width || CONFIRMATION_WINDOW_WIDTH,
         height: this.popupOptions?.height || CONFIRMATION_WINDOW_HEIGHT,
       });
+
       this.timer = setInterval(timerCallback, CONFIRMATION_WINDOW_CLOSED_POLLING_DURATION);
-    } catch { /* Empty */ }
+    } catch { /* Catch */ }
   }
 }
