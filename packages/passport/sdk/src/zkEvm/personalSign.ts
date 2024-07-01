@@ -39,7 +39,7 @@ export const personalSign = async ({
   }
 
   // Convert message into a string if it's a hex
-  const payload = await hexToString(message);
+  const payload = hexToString(message);
   const { chainId } = await rpcProvider.detectNetwork();
   flow.addEvent('endDetectNetwork');
   const chainIdBigNumber = BigNumber.from(chainId);
