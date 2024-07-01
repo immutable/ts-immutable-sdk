@@ -1,11 +1,12 @@
 {
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDirs": ["src"],
+    "rootDir": "./src",
+    // "rootDirs": ["src"],
     "target": "es2022",
     "module": "esnext",
     "moduleResolution": "node",
-    "noEmit": true,
+    "noEmit": false,
     "allowJs": false,
     "removeComments": false,
     "strict": true,
@@ -17,5 +18,9 @@
     "skipLibCheck": true
   },
   "include": ["src"],
-  "exclude": ["node_modules", "dist", "node_modules/elliptic"]
+  "exclude": ["node_modules", "dist", "node_modules/elliptic"],
+  "references": [
+    { "path": "../internal/generated-clients" },
+    { "path": "../config" },
+  ]
 }
