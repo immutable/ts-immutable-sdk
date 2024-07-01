@@ -32,7 +32,7 @@ export const openPopupCenter = ({
       left=${left}
      `,
   );
-  if (!newWindow || newWindow.closed) {
+  if (!newWindow) {
     throw new Error('Failed to open confirmation screen');
   }
 
