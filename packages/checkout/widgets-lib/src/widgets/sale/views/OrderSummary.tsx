@@ -106,6 +106,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
       return;
     }
 
+    closeHandover();
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
