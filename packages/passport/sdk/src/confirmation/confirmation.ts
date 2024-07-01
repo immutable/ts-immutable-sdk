@@ -258,6 +258,6 @@ export default class ConfirmationScreen {
       });
 
       this.timer = setInterval(timerCallback, CONFIRMATION_WINDOW_CLOSED_POLLING_DURATION);
-    } catch { /* Catch */ }
+    } catch { /* Empty */ }
   }
 }
