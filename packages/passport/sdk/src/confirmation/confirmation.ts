@@ -185,7 +185,7 @@ export default class ConfirmationScreen {
     } catch (error) {
       // If an error is thrown here then the popup is blocked
       const errorMessage = error instanceof Error ? error.message : String(error);
-      trackError('passport', 'PassportLoginPopupDenied', new Error(errorMessage));
+      trackError('passport', 'confirmationPopupDenied', new Error(errorMessage));
       this.overlay = new Overlay(this.config.popupOverlayOptions, true);
     }
 
