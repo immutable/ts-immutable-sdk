@@ -56,16 +56,17 @@ jobs:
           ref: "${{ env.TS_SDK_TAG }}"
           fetch-depth: 0
 
-      - name: Check SDK Team Membership
-        id: check_team
-        run: |
-          ./.github/scripts/check-team-membership.sh "${{ github.actor }}" "${{ env.GH_TOKEN }}"
-          source "$GITHUB_ENV"
-          echo "${{ github.actor }} is a member of the SDK team: $IS_MEMBER"
-          if [[ "$IS_MEMBER" != "true" ]]; then
-            echo "Not a member of the SDK team, exiting workflow"
-            exit 1
-          fi
+      # uncomment when the script it merged and tagged
+      # - name: Check SDK Team Membership
+      #   id: check_team
+      #   run: |
+      #     ./.github/scripts/check-team-membership.sh "${{ github.actor }}" "${{ env.GH_TOKEN }}"
+      #     source "$GITHUB_ENV"
+      #     echo "${{ github.actor }} is a member of the SDK team: $IS_MEMBER"
+      #     if [[ "$IS_MEMBER" != "true" ]]; then
+      #       echo "Not a member of the SDK team, exiting workflow"
+      #       exit 1
+      #     fi
 
       - name: Use Node.js
         uses: actions/setup-node@v4
