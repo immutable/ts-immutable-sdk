@@ -105,7 +105,13 @@ jobs:
       - name: Checkout SDK Repository
         uses: actions/checkout@v4
         with:
+          token: ${{ env.GH_TOKEN }}
           ref: "${{ env.TS_SDK_TAG }}"
+
+      - name: Setup Github
+        run: |
+          git config --global user.name "${GITHUB_ACTOR}"
+          git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
 
       - name: Restore Cached Build Artifacts
         id: restore-cache-game-bridge-build
@@ -139,8 +145,6 @@ jobs:
         # if: ${{ github.event.inputs.dry_run == false }}
         run: |
           cd unity-immutable-sdk
-          git config --global user.name "${GITHUB_ACTOR}"
-          git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
           git add src/Packages/Passport/Runtime/Resources/index.html
           git commit -m "chore: update game bridge to ${{ env.TS_SDK_TAG }}"
           git push -u origin "update-game-bridge-${{ env.TS_SDK_TAG }}"
