@@ -38,6 +38,7 @@ env:
 jobs:
   build-game-bridge:
     name: Build Game Bridge
+    if: false
     runs-on: ubuntu-latest-4-cores
     env:
     #   # TS_SDK_TAG: ${{ github.event.inputs.ts_sdk_tag }}
@@ -97,7 +98,7 @@ jobs:
 
   create-unity-pr:
     name: Create Unity PR
-    needs: build-game-bridge
+    # needs: build-game-bridge
     # if: ${{ github.event.inputs.game_engine == 'Unity' || github.event.inputs.game_engine == 'Both' }}
     runs-on: ubuntu-latest-4-cores
     # env:
