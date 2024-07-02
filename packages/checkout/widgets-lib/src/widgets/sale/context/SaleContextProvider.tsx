@@ -324,6 +324,11 @@ export function SaleContextProvider(props: {
   );
 
   useEffect(() => {
+    if (!signError) return;
+    goToErrorView(signError.type, signError.data);
+  }, [signError]);
+
+  useEffect(() => {
     if (!orderQuoteError) return;
     goToErrorView(orderQuoteError.type, orderQuoteError.data);
   }, [orderQuoteError]);
