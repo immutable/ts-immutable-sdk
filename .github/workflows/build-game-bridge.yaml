@@ -101,8 +101,8 @@ jobs:
     # needs: build-game-bridge
     # if: ${{ github.event.inputs.game_engine == 'Unity' || github.event.inputs.game_engine == 'Both' }}
     runs-on: ubuntu-latest-4-cores
-    # env:
-    #   GH_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout SDK Repository
         uses: actions/checkout@v4
