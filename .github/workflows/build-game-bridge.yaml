@@ -144,7 +144,7 @@ jobs:
           git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
           git add src/Packages/Passport/Runtime/Resources/index.html
           git commit -m "chore: update game bridge to ${{ env.TS_SDK_TAG }}"
-          git push
+          git push -u origin "update-game-bridge-${{ env.TS_SDK_TAG }}"
           cd ..
 
       - name: Create PR
