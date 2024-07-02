@@ -23,6 +23,7 @@
     "husky": "^8.0.3",
     "lint-staged": "^13.2.0",
     "node-gyp": "^9.3.1",
+    "nx": "19.3.2",
     "release-it": "^16.1.3",
     "syncpack": "^9.8.4",
     "typedoc": "^0.24.8",
@@ -62,7 +63,8 @@
     "test:checkout:sdk:coverage": "wsrun -p @imtbl/checkout-sdk --exclude-missing -e test:coverage",
     "test:samples": "cd samples/apps/ts-immutable-sample && yarn test && yarn test:e2e",
     "test:vpn": "RUN_VPN_TESTS=1 wsrun --exclude-missing -e test",
-    "typecheck": "wsrun --exclude-missing typecheck"
+    "typecheck": "wsrun --exclude-missing typecheck",
+    "w": "nx watch --all -- node ./build-dependents.js \\$NX_PROJECT_NAME"
   },
   "workspaces": {
     "packages": [
