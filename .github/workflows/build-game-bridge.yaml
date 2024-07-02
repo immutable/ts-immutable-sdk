@@ -134,7 +134,7 @@ jobs:
           cd ..
 
       - name: Copy Game Bridge Build
-        run: cp -r ./packages/game-bridge/dist/unity/index.html src/Packages/Passport/Runtime/Resources/index.html
+        run: cp -r ./packages/game-bridge/dist/unity/index.html ./unity-immutable-sdk/src/Packages/Passport/Runtime/Resources/index.html
 
       - name: Commit and Push Changes
         # if: ${{ github.event.inputs.dry_run == false }}
