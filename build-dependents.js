@@ -44,7 +44,7 @@ try {
   console.log('dependents:', dependentsArray);
 
   // Run the build command for all dependents using nx run-many
-  const command = `nx run-many --target=build --projects=${dependentsArray.join(',')}`;
+  const command = `nx run-many --target=build --projects=${dependentsArray.join(',')} --parallel=5`;
   console.log(`Running command: ${command}`);
   execSync(command, { stdio: 'inherit' });
 
