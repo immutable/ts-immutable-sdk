@@ -38,7 +38,7 @@ env:
 jobs:
   build-game-bridge:
     name: Build Game Bridge
-    # if: false
+    if: false
     runs-on: ubuntu-latest-4-cores
     env:
     #   # TS_SDK_TAG: ${{ github.event.inputs.ts_sdk_tag }}
@@ -145,6 +145,7 @@ jobs:
         # if: ${{ github.event.inputs.dry_run == false }}
         run: |
           cd unity-immutable-sdk
+          git checkout -b "update-game-bridge-${{ env.TS_SDK_TAG }}"
           git add src/Packages/Passport/Runtime/Resources/index.html
           git commit -m "chore: update game bridge to ${{ env.TS_SDK_TAG }}"
           git push -u origin "update-game-bridge-${{ env.TS_SDK_TAG }}"
