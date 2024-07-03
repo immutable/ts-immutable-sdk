@@ -145,6 +145,7 @@ jobs:
         # if: ${{ github.event.inputs.dry_run == false }}
         run: |
           cd unity-immutable-sdk
+          git branch -D "update-game-bridge-${{ env.TS_SDK_TAG }}"  # Force delete the local branch
           git checkout -b "update-game-bridge-${{ env.TS_SDK_TAG }}"
           git add src/Packages/Passport/Runtime/Resources/index.html
           git commit -m "chore: update game bridge to ${{ env.TS_SDK_TAG }}"
