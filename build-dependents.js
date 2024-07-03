@@ -10,14 +10,15 @@ const projectName = process.argv[2];
 
 function findDependents(depGraph, projectName, visited = new Set()) {
   const dependencies = depGraph.graph.dependencies;
-  const dependents = [];
+  const dependents = new Set();
 
   Object.keys(dependencies).forEach(key => {
     if (dependencies[key].some(dep => dep.target === projectName)) {
       if (!visited.has(key)) {
         visited.add(key);
-        dependents.push(key);
-        dependents.push(...findDependents(depGraph, key, visited));
+        dependents.add(key);
+        const nestedDependents = findDependents(depGraph, key, visited);
+        nestedDependents.forEach(dep => dependents.add(dep));
       }
     }
   });
@@ -25,44 +26,27 @@ function findDependents(depGraph, projectName, visited = new Set()) {
   return dependents;
 }
 
-function removeRedundantDependents(dependents, depGraph) {
-  const result = new Set(dependents);
-  dependents.forEach(dependent => {
-    if (depGraph.graph.dependencies[dependent]) {
-      depGraph.graph.dependencies[dependent].forEach(dep => {
-        if (result.has(dep.target)) {
-          result.delete(dep.target);
-        }
-      });
-    }
-  });
-  return Array.from(result);
-}
-
 try {
-  // Generate the dependency graph JSON
-  execSync('nx dep-graph --file=dep-graph.json', { stdio: 'inherit' });
-
   // Read and parse the dependency graph JSON
   const depGraph = JSON.parse(fs.readFileSync('dep-graph.json', 'utf-8'));
 
   // Find all projects that depend on the specified project recursively
-  const allDependents = findDependents(depGraph, projectName);
-  const uniqueDependents = removeRedundantDependents(allDependents, depGraph);
+  const dependents = findDependents(depGraph, projectName);
 
-  if (uniqueDependents.length === 0) {
+  if (dependents.size === 0) {
     console.log(`No dependent projects found for ${projectName}.`);
     process.exit(0);
   }
 
-  console.log(uniqueDependents);
+  // Convert the Set to an Array
+  const dependentsArray = Array.from(dependents).filter(d => d !== '@imtbl/sdk' && !d.includes('sample'));
 
-  // Build the dependent projects
-  uniqueDependents.forEach(dependent => {
-    console.log(`Building ${dependent}...`);
-    execSync(`nx run ${dependent}:build`, { stdio: 'inherit' });
-    console.log(`${dependent} has been built.`);
-  });
+  console.log('dependents:', dependentsArray);
+
+  // Run the build command for all dependents using nx run-many
+  const command = `nx run-many --target=build --projects=${dependentsArray.join(',')}`;
+  console.log(`Running command: ${command}`);
+  execSync(command, { stdio: 'inherit' });
 
   console.log('All dependent projects built successfully.');
 } catch (error) {
