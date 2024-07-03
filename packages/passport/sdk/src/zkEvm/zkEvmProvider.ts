@@ -76,8 +76,6 @@ export class ZkEvmProvider implements Provider {
 
   #signerInitialisationError: unknown | undefined;
 
-  #zkEvmAddress?: string;
-
   public readonly isPassport: boolean = true;
 
   constructor({
@@ -122,14 +120,8 @@ export class ZkEvmProvider implements Provider {
   }
 
   #handleLogout = () => {
-    const shouldEmitAccountsChanged = !!this.#zkEvmAddress;
-
     this.#ethSigner = undefined;
-    this.#zkEvmAddress = undefined;
-
-    if (shouldEmitAccountsChanged) {
-      this.#providerEventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, []);
-    }
+    this.#providerEventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, []);
   };
 
   /**
@@ -152,6 +144,7 @@ export class ZkEvmProvider implements Provider {
       return web3Provider.getSigner();
     };
 
+    this.#signerInitialisationError = undefined;
     // eslint-disable-next-line no-async-promise-executor
     this.#ethSigner = new Promise(async (resolve) => {
       try {
@@ -177,7 +170,7 @@ export class ZkEvmProvider implements Provider {
     return ethSigner;
   }
 
-  async #callSessionActivity() {
+  async #callSessionActivity(zkEvmAddress: string) {
     const sendTransactionClosure = async (params: Array<any>, flow: Flow) => {
       const ethSigner = await this.#getSigner();
       return await sendTransaction({
@@ -186,16 +179,26 @@ export class ZkEvmProvider implements Provider {
         guardianClient: this.#guardianClient,
         rpcProvider: this.#rpcProvider,
         relayerClient: this.#relayerClient,
-        zkevmAddress: this.#zkEvmAddress!,
+        zkevmAddress: zkEvmAddress,
         flow,
       });
     };
     this.#passportEventEmitter.emit(PassportEvents.ACCOUNTS_REQUESTED, {
       environment: this.#config.baseConfig.environment,
       sendTransaction: sendTransactionClosure,
-      walletAddress: this.#zkEvmAddress || '',
+      walletAddress: zkEvmAddress,
       passportClient: this.#config.oidcConfiguration.clientId,
     });
+  }
+
+  // Used to get the registered zkEvm address from the User session
+  async #getZkEvmAddress() {
+    try {
+      const user = await this.#authManager.getUser();
+      return user && isZkEvmUser(user) ? user.zkEvm.ethAddress : undefined;
+    } catch (_) {
+      return undefined;
+    }
   }
 
   async #performRequest(request: RequestArguments): Promise<any> {
@@ -204,9 +207,8 @@ export class ZkEvmProvider implements Provider {
     switch (request.method) {
       case 'eth_requestAccounts': {
         const requestAccounts = async () => {
-          if (this.#zkEvmAddress) {
-            return [this.#zkEvmAddress];
-          }
+          const zkEvmAddress = await this.#getZkEvmAddress();
+          if (zkEvmAddress) return [zkEvmAddress];
 
           const flow = trackFlow('passport', 'ethRequestAccounts');
 
@@ -216,13 +218,15 @@ export class ZkEvmProvider implements Provider {
 
             this.#initialiseEthSigner(user);
 
+            let userZkEvmEthAddress;
+
             if (!isZkEvmUser(user)) {
               flow.addEvent('startUserRegistration');
 
               const ethSigner = await this.#getSigner();
               flow.addEvent('ethSignerResolved');
 
-              this.#zkEvmAddress = await registerZkEvmUser({
+              userZkEvmEthAddress = await registerZkEvmUser({
                 ethSigner,
                 authManager: this.#authManager,
                 multiRollupApiClients: this.#multiRollupApiClients,
@@ -232,16 +236,16 @@ export class ZkEvmProvider implements Provider {
               });
               flow.addEvent('endUserRegistration');
             } else {
-              this.#zkEvmAddress = user.zkEvm.ethAddress;
+              userZkEvmEthAddress = user.zkEvm.ethAddress;
             }
 
             this.#providerEventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [
-              this.#zkEvmAddress,
+              userZkEvmEthAddress,
             ]);
             identify({
               passportId: user.profile.sub,
             });
-            return [this.#zkEvmAddress];
+            return [userZkEvmEthAddress];
           } catch (error) {
             if (error instanceof Error) {
               trackError('passport', 'ethRequestAccounts', error);
@@ -254,11 +258,13 @@ export class ZkEvmProvider implements Provider {
         };
 
         const addresses = await requestAccounts();
-        this.#callSessionActivity();
+        const [zkEvmAddress] = addresses;
+        this.#callSessionActivity(zkEvmAddress);
         return addresses;
       }
       case 'eth_sendTransaction': {
-        if (!this.#zkEvmAddress) {
+        const zkEvmAddress = await this.#getZkEvmAddress();
+        if (!zkEvmAddress) {
           throw new JsonRpcError(
             ProviderErrorCode.UNAUTHORIZED,
             'Unauthorised - call eth_requestAccounts first',
@@ -281,7 +287,7 @@ export class ZkEvmProvider implements Provider {
               guardianClient: this.#guardianClient,
               rpcProvider: this.#rpcProvider,
               relayerClient: this.#relayerClient,
-              zkevmAddress: this.#zkEvmAddress!,
+              zkevmAddress: zkEvmAddress,
               flow,
             });
           });
@@ -296,10 +302,12 @@ export class ZkEvmProvider implements Provider {
         }
       }
       case 'eth_accounts': {
-        return this.#zkEvmAddress ? [this.#zkEvmAddress] : [];
+        const zkEvmAddress = await this.#getZkEvmAddress();
+        return zkEvmAddress ? [zkEvmAddress] : [];
       }
       case 'personal_sign': {
-        if (!this.#zkEvmAddress) {
+        const zkEvmAddress = await this.#getZkEvmAddress();
+        if (!zkEvmAddress) {
           throw new JsonRpcError(
             ProviderErrorCode.UNAUTHORIZED,
             'Unauthorised - call eth_requestAccounts first',
@@ -319,7 +327,7 @@ export class ZkEvmProvider implements Provider {
             return await personalSign({
               params: request.params || [],
               ethSigner,
-              zkEvmAddress: this.#zkEvmAddress!,
+              zkEvmAddress,
               rpcProvider: this.#rpcProvider,
               guardianClient: this.#guardianClient,
               relayerClient: this.#relayerClient,
@@ -338,7 +346,8 @@ export class ZkEvmProvider implements Provider {
       }
       case 'eth_signTypedData':
       case 'eth_signTypedData_v4': {
-        if (!this.#zkEvmAddress) {
+        const zkEvmAddress = await this.#getZkEvmAddress();
+        if (!zkEvmAddress) {
           throw new JsonRpcError(
             ProviderErrorCode.UNAUTHORIZED,
             'Unauthorised - call eth_requestAccounts first',
