@@ -100,7 +100,7 @@ const watchPaths = workspaces
     const workspacePath = workspace.split('@workspace:')[1].concat('/dist');
 
     // Assuming the script is run from the package directory, make paths relative to it
-    const relativePath = path.relative(fixedMainWorkspacePath, workspacePath);
+    const relativePath = path.relative(mainWorkspacePath, workspacePath);
     return relativePath;
   });
 
@@ -140,8 +140,9 @@ workspaces.forEach((workspace) => {
   }
 });
 
+// eslint-disable-next-line max-len
 const tsupCommand = `yarn workspace ${packageName} tsup --watch src --watch ${watchPaths.join(' --watch ')}`;
-
+console.log(tsupCommand);
 fs.writeFileSync(path.join(fixedMainWorkspacePath, lockFileName), '');
 
 const [command, ...args] = tsupCommand.split(/\s+/);
