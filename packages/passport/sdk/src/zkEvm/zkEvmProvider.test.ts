@@ -27,6 +27,7 @@ describe('ZkEvmProvider', () => {
   const ethSigner = {};
   const authManager = {
     getUserOrLogin: jest.fn().mockResolvedValue(mockUserZkEvm),
+    getUser: jest.fn().mockResolvedValue(mockUserZkEvm),
   };
   const magicAdapter = {
     login: jest.fn(),
@@ -63,7 +64,7 @@ describe('ZkEvmProvider', () => {
 
   describe('eth_requestAccounts', () => {
     it('should return the ethAddress if already logged in', async () => {
-      authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
+      authManager.getUser.mockReturnValue(mockUserZkEvm);
       const provider = getProvider();
 
       const resultOne = await provider.request({ method: 'eth_requestAccounts', params: [] });
@@ -71,8 +72,8 @@ describe('ZkEvmProvider', () => {
 
       expect(resultOne).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
       expect(resultTwo).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
-      expect(authManager.getUserOrLogin).toBeCalledTimes(1);
-      expect(identify).toHaveBeenCalledTimes(1);
+      expect(authManager.getUser).toBeCalledTimes(2);
+      expect(identify).toHaveBeenCalledTimes(0);
     });
 
     it('should emit accountsChanged event and identify user when user logs in', async () => {
@@ -93,6 +94,7 @@ describe('ZkEvmProvider', () => {
 
     it('should throw an error if the signer initialisation fails', async () => {
       authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
+      authManager.getUser.mockReturnValue(mockUserZkEvm);
       (Web3Provider as unknown as jest.Mock).mockImplementation(() => ({
         getSigner: () => {
           throw new Error('Something went wrong');
@@ -128,6 +130,7 @@ describe('ZkEvmProvider', () => {
 
     it('should open a confirmation screen', async () => {
       authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
+      authManager.getUser.mockReturnValue(mockUserZkEvm);
       const provider = getProvider();
       await provider.request({ method: 'eth_requestAccounts' });
       await provider.request({ method: 'eth_sendTransaction', params: [transaction] });
@@ -138,6 +141,7 @@ describe('ZkEvmProvider', () => {
     it('should call sendTransaction with the correct params', async () => {
       const transactionHash = '0x789';
       authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
+      authManager.getUser.mockReturnValue(mockUserZkEvm);
       (sendTransaction as jest.Mock).mockResolvedValue(transactionHash);
 
       const provider = getProvider();
@@ -177,6 +181,7 @@ describe('ZkEvmProvider', () => {
     it('should call eth_signTypedData_v4 with the correct params', async () => {
       const signature = '0x123';
       authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
+      authManager.getUser.mockReturnValue(mockUserZkEvm);
       (signTypedDataV4 as jest.Mock).mockResolvedValue(signature);
 
       const provider = getProvider();
@@ -200,6 +205,7 @@ describe('ZkEvmProvider', () => {
 
     it('should open a confirmation screen', async () => {
       authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
+      authManager.getUser.mockReturnValue(mockUserZkEvm);
       const provider = getProvider();
       await provider.request({ method: 'eth_requestAccounts' });
       await provider.request({ method: 'eth_signTypedData_v4', params: [address, typedDataPayload] });

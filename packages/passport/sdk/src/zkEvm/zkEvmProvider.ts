@@ -137,24 +137,23 @@ export class ZkEvmProvider implements Provider {
    *
    */
   #initialiseEthSigner(user: User) {
-    const generateSigner = async (): Promise<Signer> => {
-      const magicRpcProvider = await this.#magicAdapter.login(user.idToken!);
-      const web3Provider = new Web3Provider(magicRpcProvider);
-
-      return web3Provider.getSigner();
-    };
-
     this.#signerInitialisationError = undefined;
     // eslint-disable-next-line no-async-promise-executor
     this.#ethSigner = new Promise(async (resolve) => {
       try {
-        resolve(await generateSigner());
+        resolve(await this.#getSignerFromUser(user));
       } catch (err) {
         // Capture and store the initialization error
         this.#signerInitialisationError = err;
         resolve(undefined);
       }
     });
+  }
+
+  async #getSignerFromUser(user: User): Promise<Signer> {
+    const magicRpcProvider = await this.#magicAdapter.login(user.idToken!);
+    const web3Provider = new Web3Provider(magicRpcProvider);
+    return web3Provider.getSigner();
   }
 
   async #getSigner(): Promise<Signer> {
@@ -195,7 +194,11 @@ export class ZkEvmProvider implements Provider {
   async #getZkEvmAddress() {
     try {
       const user = await this.#authManager.getUser();
-      return user && isZkEvmUser(user) ? user.zkEvm.ethAddress : undefined;
+      if (user && isZkEvmUser(user)) {
+        this.#ethSigner = this.#getSignerFromUser(user);
+        return user.zkEvm.ethAddress;
+      }
+      return undefined;
     } catch (_) {
       return undefined;
     }
