@@ -15,6 +15,7 @@ export type TransakNFTCheckoutParams = {
   walletAddress: string;
   email: string;
   partnerOrderId?: string;
+  excludeFiatCurrencies?: string[];
 };
 
 type UseTransakIframeProps = {
@@ -62,6 +63,7 @@ export const useTransakIframe = (props: UseTransakIframeProps) => {
         nftData: nfts,
         estimatedGasLimit,
         cryptoCurrencyCode,
+        excludeFiatCurrencies,
         ...restWidgetParams
       } = transakParams;
 
@@ -111,6 +113,10 @@ export const useTransakIframe = (props: UseTransakIframeProps) => {
         themeColor: '0D0D0D',
         ...restWidgetParams,
       });
+
+      if (excludeFiatCurrencies) {
+        queryParams.append('excludeFiatCurrencies', excludeFiatCurrencies.join(','));
+      }
 
       return `${baseWidgetUrl}${queryParams.toString()}`;
     } catch {
