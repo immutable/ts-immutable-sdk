@@ -195,7 +195,7 @@ export class ZkEvmProvider implements Provider {
     try {
       const user = await this.#authManager.getUser();
       if (user && isZkEvmUser(user)) {
-        this.#ethSigner = this.#getSignerFromUser(user);
+        this.#initialiseEthSigner(user);
         return user.zkEvm.ethAddress;
       }
       return undefined;

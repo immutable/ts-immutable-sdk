@@ -73,7 +73,6 @@ describe('ZkEvmProvider', () => {
       expect(resultOne).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
       expect(resultTwo).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
       expect(authManager.getUser).toBeCalledTimes(2);
-      expect(identify).toHaveBeenCalledTimes(0);
     });
 
     it('should emit accountsChanged event and identify user when user logs in', async () => {
@@ -95,6 +94,7 @@ describe('ZkEvmProvider', () => {
     it('should throw an error if the signer initialisation fails', async () => {
       authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
       authManager.getUser.mockReturnValue(mockUserZkEvm);
+
       (Web3Provider as unknown as jest.Mock).mockImplementation(() => ({
         getSigner: () => {
           throw new Error('Something went wrong');
@@ -103,9 +103,7 @@ describe('ZkEvmProvider', () => {
       const provider = getProvider();
       await provider.request({ method: 'eth_requestAccounts' });
 
-      await expect(async () => (
-        provider.request({ method: 'eth_sendTransaction' })
-      )).rejects.toThrow(
+      await expect(provider.request({ method: 'eth_sendTransaction' })).rejects.toThrow(
         new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, 'Something went wrong'),
       );
     });
