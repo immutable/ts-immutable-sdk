@@ -1,5 +1,5 @@
 # Workflow to manually trigger a build of the game bridge with the selected SDK tag
-# and create a PR with the changes to the game SDK repository
+# and create a PR with the changes to the game SDK repository.
 
 name: Build Game Bridge 
 
