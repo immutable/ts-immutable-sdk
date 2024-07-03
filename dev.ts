@@ -46,7 +46,7 @@ const workspaceLocked = (workspacePath: string) => {
 
 // Function to run the "dev" script in a workspace
 const runDevScript = (workspace: Workspace) => {
-  const workspacePath = workspace.split('@workspace:')[1];
+  const workspacePath = path.join(__dirname, workspace.split('@workspace:')[1]);
   // if lockfile exists and the pid in the lockfile name is still running, skip running the dev script
   if (workspaceLocked(workspacePath)) {
     return;
@@ -87,10 +87,12 @@ if (!mainWorkspacePath) {
   process.exit(1);
 }
 
+const fixedMainWorkspacePath = path.join(__dirname, mainWorkspacePath);
+
 const watchPaths = workspaces
   .filter((workspace) => !workspace.includes(packageName))
   .map((workspace) => {
-    if (!mainWorkspacePath) {
+    if (!fixedMainWorkspacePath) {
       console.error(`Could not find path for ${packageName}`);
       process.exit(1);
     }
@@ -98,14 +100,13 @@ const watchPaths = workspaces
     const workspacePath = workspace.split('@workspace:')[1].concat('/dist');
 
     // Assuming the script is run from the package directory, make paths relative to it
-    const relativePath = path.relative(mainWorkspacePath, workspacePath);
+    const relativePath = path.relative(fixedMainWorkspacePath, workspacePath);
     return relativePath;
   });
 
-// Function to remove the lock file
 const removeLockFile = () => {
   workspaces.forEach((workspace) => {
-    const workspacePath = workspace.split('@workspace:')[1];
+    const workspacePath = path.join(__dirname, workspace.split('@workspace:')[1]);
     const lockFilePath = path.join(workspacePath, lockFileName);
 
     if (fs.existsSync(lockFilePath)) {
@@ -114,25 +115,21 @@ const removeLockFile = () => {
   });
 };
 
-// Listen for exit signals and remove the lock file
 process.on('SIGINT', () => {
-  console.log('Received SIGINT. Exiting...');
   removeLockFile();
   process.exit(0);
 });
 
 process.on('SIGTERM', () => {
-  console.log('Received SIGTERM. Exiting...');
   removeLockFile();
   process.exit(0);
 });
 
 process.on('close', () => {
-  // This will not catch SIGINT/SIGTERM on Windows but is here as a catch-all
   removeLockFile();
 });
 
-if (workspaceLocked(mainWorkspacePath)) {
+if (workspaceLocked(fixedMainWorkspacePath)) {
   console.error(`A lock file and running dev process exists for ${packageName}. Exiting...`);
   process.exit(1);
 }
@@ -145,7 +142,7 @@ workspaces.forEach((workspace) => {
 
 const tsupCommand = `yarn workspace ${packageName} tsup --watch src --watch ${watchPaths.join(' --watch ')}`;
 
-fs.writeFileSync(path.join(mainWorkspacePath, lockFileName), '');
+fs.writeFileSync(path.join(fixedMainWorkspacePath, lockFileName), '');
 
 const [command, ...args] = tsupCommand.split(/\s+/);
 const tsupProcess = spawn(command, args, { stdio: 'inherit' });
