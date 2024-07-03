@@ -131,6 +131,7 @@ export class Sale extends Base<WidgetType.SALE> {
                     environmentId={this.parameters.environmentId!}
                     collectionName={this.parameters.collectionName!}
                     excludePaymentTypes={this.parameters.excludePaymentTypes!}
+                    excludeFiatCurrencies={this.parameters.excludeFiatCurrencies!}
                     preferredCurrency={this.parameters.preferredCurrency!}
                     hideExcludedPaymentTypes={
                       this.properties?.config?.hideExcludedPaymentTypes ?? false

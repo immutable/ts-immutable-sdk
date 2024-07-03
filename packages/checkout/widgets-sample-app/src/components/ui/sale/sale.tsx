@@ -78,8 +78,8 @@ const useParams = () => {
     .get("excludePaymentTypes")
     ?.split(",") as SalePaymentTypes[];
 
-  const preferredCurrency =
-    (urlParams.get("preferredCurrency") as string) ?? undefined;
+  const preferredCurrency = (urlParams.get("preferredCurrency") as string) ?? undefined;
+  const excludeFiatCurrencies = (urlParams.get("excludeFiatCurrencies") as string) ?? undefined;
   const hideExcludedPaymentTypes = Boolean(
     urlParams.get("hideExcludedPaymentTypes")
   );
@@ -91,6 +91,7 @@ const useParams = () => {
     excludePaymentTypes,
     preferredCurrency,
     hideExcludedPaymentTypes,
+    excludeFiatCurrencies: excludeFiatCurrencies?.split(","),
   };
 };
 
@@ -131,6 +132,7 @@ export function SaleUI() {
     excludePaymentTypes,
     preferredCurrency,
     hideExcludedPaymentTypes,
+    excludeFiatCurrencies,
   } = params;
   const [passportConfig, setPassportConfig] = useState(
     JSON.stringify(defaultPassportConfig, null, 2)
@@ -199,6 +201,7 @@ export function SaleUI() {
       collectionName,
       items: defaultItems,
       excludePaymentTypes,
+      excludeFiatCurrencies,
       preferredCurrency,
     });
     saleWidget.addListener(SaleEventType.CLOSE_WIDGET, () => {
@@ -302,6 +305,7 @@ export function SaleUI() {
             items: defaultItems,
             excludePaymentTypes,
             preferredCurrency,
+            excludeFiatCurrencies,
           })
         }
       >
