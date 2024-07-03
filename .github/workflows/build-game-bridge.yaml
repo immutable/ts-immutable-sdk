@@ -28,7 +28,7 @@ on:
 
 env:
   # TS_SDK_TAG: ${{ github.event.inputs.ts_sdk_tag }}
-  TS_SDK_TAG: "1.45.2"
+  TS_SDK_TAG: "1.45.0"
   # GAME_ENGINE: ${{ github.event.inputs.game_engine }}
   GAME_ENGINE: "Unity"
   # DRY_RUN: ${{ github.event.inputs.dry_run }}
@@ -38,7 +38,7 @@ env:
 jobs:
   build-game-bridge:
     name: Build Game Bridge
-    if: false
+    # if: false
     runs-on: ubuntu-latest-4-cores
     env:
     #   # TS_SDK_TAG: ${{ github.event.inputs.ts_sdk_tag }}
@@ -98,7 +98,7 @@ jobs:
 
   create-unity-pr:
     name: Create Unity PR
-    # needs: build-game-bridge
+    needs: build-game-bridge
     # if: ${{ github.event.inputs.game_engine == 'Unity' || github.event.inputs.game_engine == 'Both' }}
     runs-on: ubuntu-latest-4-cores
     steps:
@@ -131,6 +131,8 @@ jobs:
           token: ${{ env.GH_TOKEN }}
           path: unity-immutable-sdk
           ref: main
+          clean: true
+          fetch-depth: 0
 
       - name: Change Unity Branch
         run: |
@@ -145,7 +147,6 @@ jobs:
         # if: ${{ github.event.inputs.dry_run == false }}
         run: |
           cd unity-immutable-sdk
-          git branch -D "update-game-bridge-${{ env.TS_SDK_TAG }}"  # Force delete the local branch
           git checkout -b "update-game-bridge-${{ env.TS_SDK_TAG }}"
           git add src/Packages/Passport/Runtime/Resources/index.html
           git commit -m "chore: update game bridge to ${{ env.TS_SDK_TAG }}"
