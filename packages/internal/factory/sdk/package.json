@@ -38,7 +38,7 @@
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
-    "build": "NODE_ENV=production rollup --config rollup.config.js",
+    "build": "swc src -d dist --strip-leading-paths --ignore '**/*.test.*'",
     "dev": "rollup --config rollup.config.js -w",
     "lint": "eslint ./src --ext .ts --max-warnings=0",
     "lint:fix": "cd ../../../ && yarn wsrun -p @imtbl/factory-sdk -c lint --fix",
@@ -47,5 +47,5 @@
   },
   "source": "src/index.ts",
   "type": "module",
-  "types": "dist/index.d.ts"
+  "types": "src"
 }
