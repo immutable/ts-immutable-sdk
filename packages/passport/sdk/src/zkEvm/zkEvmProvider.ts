@@ -137,23 +137,24 @@ export class ZkEvmProvider implements Provider {
    *
    */
   #initialiseEthSigner(user: User) {
+    const generateSigner = async (): Promise<Signer> => {
+      const magicRpcProvider = await this.#magicAdapter.login(user.idToken!);
+      const web3Provider = new Web3Provider(magicRpcProvider);
+
+      return web3Provider.getSigner();
+    };
+
     this.#signerInitialisationError = undefined;
     // eslint-disable-next-line no-async-promise-executor
     this.#ethSigner = new Promise(async (resolve) => {
       try {
-        resolve(await this.#getSignerFromUser(user));
+        resolve(await generateSigner());
       } catch (err) {
         // Capture and store the initialization error
         this.#signerInitialisationError = err;
         resolve(undefined);
       }
     });
-  }
-
-  async #getSignerFromUser(user: User): Promise<Signer> {
-    const magicRpcProvider = await this.#magicAdapter.login(user.idToken!);
-    const web3Provider = new Web3Provider(magicRpcProvider);
-    return web3Provider.getSigner();
   }
 
   async #getSigner(): Promise<Signer> {
