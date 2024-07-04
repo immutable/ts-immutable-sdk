@@ -25,7 +25,7 @@
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
-    "build": "tsup --dts",
+    "build": "tsup & tsc --noEmit false --declaration --emitDeclarationOnly",
     "dev": "tsup --watch",
     "dev:all": "ts-node ../../../dev.ts @imtbl/generated-clients",
     "prepare": "wsrun -r build",

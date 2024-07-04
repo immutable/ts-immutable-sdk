@@ -42,7 +42,7 @@
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
-    "build": "tsup --dts",
+    "build": "tsup & tsc --noEmit false --declaration --emitDeclarationOnly",
     "dev": "tsup --watch",
     "dev:all": "ts-node ../../dev.ts @imtbl/x-client",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
