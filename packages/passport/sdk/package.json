@@ -59,7 +59,7 @@
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
-    "build": "NODE_ENV=production tsup",
+    "build": "NODE_ENV=production tsup --dts",
     "build:all": "yarn workspaces foreach --parallel --recursive --topological-dev --jobs unlimited --verbose run build",
     "dev": "tsup --watch",
     "dev:all": "ts-node ../../../dev.ts @imtbl/passport",
