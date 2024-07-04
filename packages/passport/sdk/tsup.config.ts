@@ -4,6 +4,6 @@ export default defineConfig({
   entry: ['src/index.ts'],
   outDir: 'dist',
   format: ['esm'],
-  target: 'es2022',
-  clean: true,
+  target: ['es2022'],
+  external: ['axios'],
 });

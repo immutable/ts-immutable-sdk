@@ -1,3 +1,4 @@
+/* eslint-disable no-control-regex */
 /* eslint-disable no-console */
 /* eslint-disable no-continue */
 
@@ -48,9 +49,7 @@ const workspaceLocked = (workspacePath: string) => {
 const runDevScript = (workspace: Workspace) => {
   const workspacePath = path.join(__dirname, workspace.split('@workspace:')[1]);
   // if lockfile exists and the pid in the lockfile name is still running, skip running the dev script
-  if (workspaceLocked(workspacePath)) {
-    return;
-  }
+  if (workspaceLocked(workspacePath)) return;
 
   const lockFilePath = path.join(workspacePath, lockFileName);
 
@@ -68,12 +67,12 @@ const runDevScript = (workspace: Workspace) => {
   });
 };
 
-const workspaces = (execSync('yarn workspace @imtbl/passport info --dependents --name-only')
+const workspaces = (execSync(`yarn workspace ${packageName} info --dependents --name-only --recursive`)
   .toString()
   .trim()
   .split('\n')
-  .filter((line) => line.includes('@imtbl')))
-  .map((line) => line.split('─ ')[1].trim() as Workspace);
+  .filter((line) => line.includes('@imtbl') && !line.includes('@npm')))
+  .map((line) => line.split('─ ')[1].trim().replace(/\x1B\[[0-9;]*m/g, '') as Workspace);
 
 if (!workspaces.some((workspace) => workspace.split('@workspace')[0] === packageName)) {
   console.error(`No workspaces found for package ${packageName}`);
@@ -140,9 +139,8 @@ workspaces.forEach((workspace) => {
   }
 });
 
-// eslint-disable-next-line max-len
 const tsupCommand = `yarn workspace ${packageName} tsup --watch src --watch ${watchPaths.join(' --watch ')}`;
-console.log(tsupCommand);
+
 fs.writeFileSync(path.join(fixedMainWorkspacePath, lockFileName), '');
 
 const [command, ...args] = tsupCommand.split(/\s+/);

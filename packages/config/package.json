@@ -8,7 +8,6 @@
     "@imtbl/metrics": "0.0.0"
   },
   "devDependencies": {
-    "@rollup/plugin-typescript": "^11.0.0",
     "@swc/core": "^1.3.36",
     "@swc/jest": "^0.2.24",
     "@types/jest": "^29.4.3",
@@ -19,8 +18,8 @@
     "jest": "^29.4.3",
     "jest-environment-jsdom": "^29.4.3",
     "prettier": "^2.8.7",
-    "rollup": "^3.17.2",
     "ts-node": "^10.9.1",
+    "tsup": "^8.1.0",
     "typescript": "^4.9.5"
   },
   "engines": {
@@ -35,13 +34,14 @@
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
-    "build": "NODE_ENV=production rollup --config rollup.config.js",
-    "dev": "rollup --config rollup.config.js -w",
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "dev:all": "ts-node ../../dev.ts @imtbl/config",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "test": "jest",
     "test:watch": "jest --watch",
     "typecheck": "tsc --noEmit --jsx preserve"
   },
   "type": "module",
-  "types": "dist/index.d.ts"
+  "types": "src"
 }
