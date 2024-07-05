@@ -24,6 +24,8 @@ export type SaleWidgetParams = {
   language?: WidgetLanguage;
   /** The disabled payment types */
   excludePaymentTypes?: SalePaymentTypes[];
+  /** Fiat currencies excluded from on-ramp */
+  excludeFiatCurrencies?: string[];
   /** Preferred currency, replacing the backend's base currency */
   preferredCurrency?: string;
 };

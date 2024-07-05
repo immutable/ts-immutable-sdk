@@ -32,6 +32,7 @@ export function WithCard(props: WithCardProps) {
     goToErrorView,
     environment,
     orderQuote,
+    excludeFiatCurrencies,
   } = useSaleContext();
   const executeTxn = signResponse?.transactions.find((txn) => txn.methodCall.startsWith('execute'));
 
@@ -69,6 +70,7 @@ export function WithCard(props: WithCardProps) {
       cryptoCurrencyCode={signResponse.order.currency.name}
       estimatedGasLimit={executeTxn.gasEstimate}
       partnerOrderId={executeTxn.params.reference}
+      excludeFiatCurrencies={excludeFiatCurrencies}
       onInit={onInit}
       onOpen={onOpen}
       onOrderCreated={onOrderCreated}
