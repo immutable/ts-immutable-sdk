@@ -9,6 +9,9 @@ const { getItem, setItem } = metricsUtils.localStorage;
 const SESSION_ACTIVITY_COUNT_KEY = 'sessionActivitySendCount';
 const SESSION_ACTIVITY_DAY_KEY = 'sessionActivityDate';
 
+console.log('--------qwerreqwqwerrewq---------');
+console.log(getItem);
+
 // Maintain a few local counters for session activity
 let checkCount = 0;
 let sendCount = 0;

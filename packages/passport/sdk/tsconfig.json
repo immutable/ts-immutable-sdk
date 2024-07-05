@@ -14,8 +14,7 @@
     "esModuleInterop": true,
     "declaration": true,
     "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "isolatedModules": true
+    "skipLibCheck": true
   },
   "include": ["src", "src/types.ts"],
   "exclude": [

@@ -123,6 +123,11 @@ if (workspaceLocked(fixedMainWorkspacePath)) {
   process.exit(1);
 }
 
+execSync(`yarn workspace ${packageName} build:all`, {
+  cwd: __dirname,
+  stdio: 'inherit',
+});
+
 workspaces.forEach((workspace) => {
   if (!workspace.includes(packageName)) {
     runDevScript(workspace);
@@ -148,12 +153,8 @@ tscProcess.on('error', (error) => console.error(`Spawn error: ${error}`));
 childProcesses.push(tsupProcess, tscProcess);
 
 const handleClose = () => {
-  childProcesses.forEach((child) => {
-    child.kill();
-  });
-
+  childProcesses.forEach((child) => child.kill());
   removeLockFile();
-
   process.exit(0);
 };
 

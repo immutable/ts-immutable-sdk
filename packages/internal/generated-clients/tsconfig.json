@@ -12,10 +12,9 @@
     "forceConsistentCasingInFileNames": false,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "declaration": false,
+    "declaration": true,
     "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "isolatedModules": true
+    "skipLibCheck": true
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]
