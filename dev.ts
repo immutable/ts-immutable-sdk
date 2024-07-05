@@ -123,9 +123,6 @@ if (workspaceLocked(fixedMainWorkspacePath)) {
   process.exit(1);
 }
 
-// Clear the terminal output and start fresh
-process.stdout.write('\x1bc');
-
 workspaces.forEach((workspace) => {
   if (!workspace.includes(packageName)) {
     runDevScript(workspace);
