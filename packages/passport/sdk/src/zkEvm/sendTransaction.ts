@@ -23,7 +23,7 @@ export type EthSendTransactionParams = {
   rpcProvider: StaticJsonRpcProvider;
   guardianClient: GuardianClient;
   relayerClient: RelayerClient;
-  zkevmAddress: string,
+  zkEvmAddress: string,
   params: Array<any>;
   flow: Flow;
 };
@@ -99,7 +99,7 @@ export const sendTransaction = async ({
   rpcProvider,
   relayerClient,
   guardianClient,
-  zkevmAddress,
+  zkEvmAddress,
   flow,
 }: EthSendTransactionParams): Promise<string> => {
   const { chainId } = await rpcProvider.detectNetwork();
@@ -111,7 +111,7 @@ export const sendTransaction = async ({
     params[0],
     rpcProvider,
     relayerClient,
-    zkevmAddress,
+    zkEvmAddress,
   );
   flow.addEvent('endBuildMetaTransactions');
 
@@ -134,7 +134,7 @@ export const sendTransaction = async ({
     metaTransactions,
     nonce,
     chainIdBigNumber,
-    zkevmAddress,
+    zkEvmAddress,
     ethSigner,
   );
   getSignedMetaTransactionsPromise.then(() => flow.addEvent('endGetSignedMetaTransactions'));
@@ -144,7 +144,7 @@ export const sendTransaction = async ({
     getSignedMetaTransactionsPromise,
   ]);
 
-  const relayerId = await relayerClient.ethSendTransaction(zkevmAddress, signedTransactions);
+  const relayerId = await relayerClient.ethSendTransaction(zkEvmAddress, signedTransactions);
   flow.addEvent('endRelayerSendTransaction');
 
   const retrieveRelayerTransaction = async () => {

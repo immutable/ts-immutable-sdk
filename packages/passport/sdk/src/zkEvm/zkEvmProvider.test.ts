@@ -161,7 +161,7 @@ describe('ZkEvmProvider', () => {
         ethSigner,
         rpcProvider: expect.any(Object),
         relayerClient: expect.any(RelayerClient),
-        zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
+        zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
         flow: expect.any(Object),
       });
     });

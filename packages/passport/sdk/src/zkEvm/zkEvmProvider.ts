@@ -188,7 +188,7 @@ export class ZkEvmProvider implements Provider {
         guardianClient: this.#guardianClient,
         rpcProvider: this.#rpcProvider,
         relayerClient: this.#relayerClient,
-        zkevmAddress: zkEvmAddress,
+        zkEvmAddress,
         flow,
       });
     };
@@ -299,7 +299,7 @@ export class ZkEvmProvider implements Provider {
               guardianClient: this.#guardianClient,
               rpcProvider: this.#rpcProvider,
               relayerClient: this.#relayerClient,
-              zkevmAddress: zkEvmAddress,
+              zkEvmAddress,
               flow,
             });
           });
