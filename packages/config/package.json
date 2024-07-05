@@ -36,12 +36,12 @@
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "NODE_ENV=production rollup --config rollup.config.js",
-    "dev": "rollup --config rollup.config.js -w",
+    "dev": "swc src -d dist --strip-leading-paths --ignore '**/*.test.*'",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "test": "jest",
     "test:watch": "jest --watch",
     "typecheck": "tsc --noEmit --jsx preserve"
   },
   "type": "module",
-  "types": "dist/index.d.ts"
+  "types": "src"
 }

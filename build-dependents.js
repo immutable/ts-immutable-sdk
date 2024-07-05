@@ -1,55 +1,37 @@
 const { execSync } = require('child_process');
 const fs = require('fs');
 
-if (process.argv.length < 3) {
-  console.error('Please provide a project name.');
+if (process.argv.length < 4) {
+  console.error('Please provide a changed project name and the current project.');
   process.exit(1);
 }
 
-const projectName = process.argv[2];
-
-function findDependents(depGraph, projectName, visited = new Set()) {
-  const dependencies = depGraph.graph.dependencies;
-  const dependents = new Set();
-
-  Object.keys(dependencies).forEach(key => {
-    if (dependencies[key].some(dep => dep.target === projectName)) {
-      if (!visited.has(key)) {
-        visited.add(key);
-        dependents.add(key);
-        const nestedDependents = findDependents(depGraph, key, visited);
-        nestedDependents.forEach(dep => dependents.add(dep));
-      }
-    }
-  });
-
-  return dependents;
-}
+const changedProject = process.argv[2];
+const currentProject = process.argv[3];
 
 try {
+  // Generate the focused dependency graph JSON
+  execSync(`nx graph --file=dep-graph.json --focus=${currentProject}`, { stdio: 'inherit' });
+
   // Read and parse the dependency graph JSON
   const depGraph = JSON.parse(fs.readFileSync('dep-graph.json', 'utf-8'));
 
-  // Find all projects that depend on the specified project recursively
-  const dependents = findDependents(depGraph, projectName);
+  // Check if the changed project is in the dependencies of the current project
+  const dependencies = depGraph.graph.dependencies[currentProject] || [];
+  const isDependent = dependencies.some((dep) => dep.target === changedProject);
 
-  if (dependents.size === 0) {
-    console.log(`No dependent projects found for ${projectName}.`);
-    process.exit(0);
+  if (isDependent || changedProject === currentProject) {
+    // Rebuild the current project
+    const command = `nx run-many --target=dev --projects=${currentProject} --parallel=5`;
+
+    console.log(`Running command: ${command}`);
+    execSync(command, { stdio: 'inherit' });
+
+    console.log(`Rebuilt the ${currentProject} project successfully.`);
+  } else {
+    console.log(`No need to build anything as changes to ${changedProject} do not affect ${currentProject}.`);
   }
-
-  // Convert the Set to an Array
-  const dependentsArray = Array.from(dependents).filter(d => d !== '@imtbl/sdk' && !d.includes('sample'));
-
-  console.log('dependents:', dependentsArray);
-
-  // Run the build command for all dependents using nx run-many
-  const command = `nx run-many --target=build --projects=${dependentsArray.join(',')} --parallel=5`;
-  console.log(`Running command: ${command}`);
-  execSync(command, { stdio: 'inherit' });
-
-  console.log('All dependent projects built successfully.');
 } catch (error) {
-  console.error('Error building dependent projects:', error);
+  console.error('Error rebuilding projects:', error);
   process.exit(1);
 }

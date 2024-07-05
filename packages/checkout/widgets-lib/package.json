@@ -82,7 +82,7 @@
     "build:analyse": "yarn build --plugin visualizer",
     "build:local": "yarn clean && yarn build && mkdir -p ../widgets-sample-app/public/lib/js && cp dist/*.js ../widgets-sample-app/public/lib/js/",
     "clean": "rm -rf ./dist",
-    "dev": "NODE_ENV=development rollup --config rollup.config.js",
+    "dev": "swc src -d dist --strip-leading-paths --ignore '**/*.test.*'",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix",
     "start": "yarn clean && NODE_ENV=development rollup --config rollup.config.js --watch",
@@ -93,5 +93,5 @@
     "typecheck": "tsc --noEmit"
   },
   "type": "module",
-  "types": "dist/index.d.ts"
+  "types": "src"
 }
