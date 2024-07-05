@@ -10,6 +10,8 @@ type Workspace = `@imtbl/${string}@workspace:${string}`;
 
 const lockFileName = `dev-mode-${process.pid}.lock`;
 
+const childProcesses: ReturnType<typeof spawn>[] = [];
+
 const packageName = process.argv[2];
 if (!packageName) {
   console.error('Please specify a package name, e.g., @imtbl/passport');
@@ -59,6 +61,8 @@ const runDevScript = (workspace: Workspace) => {
     shell: true, // Use shell to interpret the command correctly on all platforms
   });
 
+  childProcesses.push(devProcess);
+
   // Write the PID of the dev process to the lock file
   fs.writeFileSync(lockFilePath, '');
 
@@ -96,7 +100,7 @@ const watchPaths = workspaces
       process.exit(1);
     }
 
-    const workspacePath = workspace.split('@workspace:')[1].concat('/dist');
+    const workspacePath = workspace.split('@workspace:')[1].concat('/dist/index.js');
 
     // Assuming the script is run from the package directory, make paths relative to it
     const relativePath = path.relative(mainWorkspacePath, workspacePath);
@@ -114,24 +118,13 @@ const removeLockFile = () => {
   });
 };
 
-process.on('SIGINT', () => {
-  removeLockFile();
-  process.exit(0);
-});
-
-process.on('SIGTERM', () => {
-  removeLockFile();
-  process.exit(0);
-});
-
-process.on('close', () => {
-  removeLockFile();
-});
-
 if (workspaceLocked(fixedMainWorkspacePath)) {
   console.error(`A lock file and running dev process exists for ${packageName}. Exiting...`);
   process.exit(1);
 }
+
+// Clear the terminal output and start fresh
+process.stdout.write('\x1bc');
 
 workspaces.forEach((workspace) => {
   if (!workspace.includes(packageName)) {
@@ -140,12 +133,33 @@ workspaces.forEach((workspace) => {
 });
 
 const tsupCommand = `yarn workspace ${packageName} tsup --watch src --watch ${watchPaths.join(' --watch ')}`;
+// eslint-disable-next-line max-len
+const tscCommand = `yarn workspace ${packageName} tsc --watch --noEmit false --declaration --emitDeclarationOnly --preserveWatchOutput`;
 
 fs.writeFileSync(path.join(fixedMainWorkspacePath, lockFileName), '');
 
 const [command, ...args] = tsupCommand.split(/\s+/);
 const tsupProcess = spawn(command, args, { stdio: 'inherit' });
 
-tsupProcess.on('error', (error) => {
-  console.error(`Spawn error: ${error}`);
-});
+tsupProcess.on('error', (error) => console.error(`Spawn error: ${error}`));
+
+const [tscCommandName, ...tscArgs] = tscCommand.split(/\s+/);
+const tscProcess = spawn(tscCommandName, tscArgs, { stdio: 'inherit' });
+
+tscProcess.on('error', (error) => console.error(`Spawn error: ${error}`));
+
+childProcesses.push(tsupProcess, tscProcess);
+
+const handleClose = () => {
+  childProcesses.forEach((child) => {
+    child.kill();
+  });
+
+  removeLockFile();
+
+  process.exit(0);
+};
+
+process.on('SIGINT', handleClose);
+process.on('SIGTERM', handleClose);
+process.on('close', handleClose);
