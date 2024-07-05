@@ -11,7 +11,8 @@ const config: Config = {
     '@imtbl/x-client': '<rootDir>../../x-client/src',
     '@imtbl/toolkit': '<rootDir>../../internal/toolkit/src',
   },
-  testEnvironment: 'jsdom',
+  resolver: "./resolver.ts",
+  testEnvironment: "./jest.custom.env.ts",
   transform: {
     '^.+\\.(t|j)sx?$': '@swc/jest',
   },

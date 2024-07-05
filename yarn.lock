@@ -3825,6 +3825,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": ^5.57.1
     "@typescript-eslint/parser": ^5.57.1
     axios: ^1.6.5
+    browser-resolve: ^2.0.0
     cross-fetch: ^3.1.6
     eslint: ^8.40.0
     ethers: ^5.7.2
