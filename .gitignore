@@ -32,3 +32,4 @@ docs/
 
 .nx/cache
 .nx/workspace-data
+dep-graph.json
