@@ -112,6 +112,15 @@ export class ZkEvmProvider implements Provider {
     this.#multiRollupApiClients = multiRollupApiClients;
     this.#providerEventEmitter = new TypedEventEmitter<ProviderEventMap>();
 
+    // Automatically connect an existing user session to Passport
+    this.#authManager.getUser().then((user) => {
+      if (user && isZkEvmUser(user)) {
+        this.#initialiseEthSigner(user);
+      }
+    }).catch(() => {
+      // User does not exist, don't initialise an eth signer
+    });
+
     passportEventEmitter.on(PassportEvents.LOGGED_OUT, this.#handleLogout);
     passportEventEmitter.on(
       PassportEvents.ACCOUNTS_REQUESTED,
@@ -196,11 +205,10 @@ export class ZkEvmProvider implements Provider {
     try {
       const user = await this.#authManager.getUser();
       if (user && isZkEvmUser(user)) {
-        this.#initialiseEthSigner(user);
         return user.zkEvm.ethAddress;
       }
       return undefined;
-    } catch (_) {
+    } catch {
       return undefined;
     }
   }
