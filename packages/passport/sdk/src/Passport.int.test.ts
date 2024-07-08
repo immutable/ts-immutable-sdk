@@ -76,6 +76,7 @@ describe('Passport', () => {
   const mockSigninPopup = jest.fn();
   const mockSigninSilent = jest.fn();
   const mockGetUser = jest.fn();
+  // const mockGetSigner = jest.fn();
   const mockLoginWithOidc = jest.fn();
   const mockMagicRequest = jest.fn();
 
@@ -96,6 +97,9 @@ describe('Passport', () => {
       rpcProvider: { request: mockMagicRequest },
       preload: jest.fn(),
     }));
+    // (Web3Provider as unknown as jest.Mock).mockImplementation(() => ({
+    //   getSigner: mockGetSigner,
+    // }));
   });
 
   afterEach(() => {
@@ -181,6 +185,38 @@ describe('Passport', () => {
 
           expect(accounts).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
           expect(mockGetUser).toHaveBeenCalledTimes(2);
+        });
+
+        it('ethSigner is initialised even if user exists', async () => {
+          mockGetUser.mockResolvedValueOnce(Promise.resolve(null));
+          mockSigninPopup.mockResolvedValue(mockOidcUserZkevm);
+          mockSigninSilent.mockResolvedValueOnce(mockOidcUserZkevm);
+          // mockGetSigner.mockImplementation(() => { });
+
+          const passport = new Passport({
+            baseConfig: new ImmutableConfiguration({
+              environment: Environment.SANDBOX,
+            }),
+            audience: 'platform_api',
+            clientId,
+            redirectUri,
+            logoutRedirectUri,
+            scope: 'openid offline_access profile email transact',
+          });
+
+          // user doesn't exist, so wont set signer when provider is instantiated
+          const zkEvmProvider = passport.connectEvm();
+
+          // logs user in
+          await passport.login();
+
+          // user already exists, so return zkevm address
+          mockGetUser.mockResolvedValue(Promise.resolve(mockOidcUserZkevm));
+          const accounts = await zkEvmProvider.request({
+            method: 'eth_requestAccounts',
+          });
+
+          expect(accounts).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
         });
       });
 

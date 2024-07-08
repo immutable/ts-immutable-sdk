@@ -121,6 +121,7 @@ export class ZkEvmProvider implements Provider {
       // User does not exist, don't initialise an eth signer
     });
 
+    passportEventEmitter.on(PassportEvents.LOGGED_IN, this.#initialiseEthSignerOnLogin);
     passportEventEmitter.on(PassportEvents.LOGGED_OUT, this.#handleLogout);
     passportEventEmitter.on(
       PassportEvents.ACCOUNTS_REQUESTED,
@@ -131,6 +132,10 @@ export class ZkEvmProvider implements Provider {
   #handleLogout = () => {
     this.#ethSigner = undefined;
     this.#providerEventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, []);
+  };
+
+  #initialiseEthSignerOnLogin = (user: User) => {
+    if (isZkEvmUser(user)) this.#initialiseEthSigner(user);
   };
 
   /**
