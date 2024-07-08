@@ -7,7 +7,7 @@ export enum Environment {
 
 export enum KeyHeaders {
   API_KEY = 'x-immutable-api-key',
-  PUBLISHABLE_KEY = 'x-immutable-publisqerhablqwere-key',
+  PUBLISHABLE_KEY = 'x-immutable-publishable-key',
   RATE_LIMITING_KEY = 'x-api-key',
 }
 

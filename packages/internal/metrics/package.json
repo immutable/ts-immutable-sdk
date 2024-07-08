@@ -10,8 +10,6 @@
     "lru-memorise": "0.3.0"
   },
   "devDependencies": {
-    "@swc/cli": "^0.3.14",
-    "@swc/core": "^1.3.36",
     "@swc/jest": "^0.2.24",
     "@types/jest": "^29.4.3",
     "concurrently": "^8.2.2",
@@ -35,6 +33,7 @@
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "tsup & tsc --noEmit false --declaration --emitDeclarationOnly",
+    "build:all": "yarn workspaces foreach --parallel --recursive --topological-dev --jobs unlimited --verbose run build",
     "dev": "concurrently --raw 'tsup --watch' 'tsc --watch --noEmit false --declaration --emitDeclarationOnly --preserveWatchOutput'",
     "dev:all": "ts-node ../../../dev.ts @imtbl/metrics",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
