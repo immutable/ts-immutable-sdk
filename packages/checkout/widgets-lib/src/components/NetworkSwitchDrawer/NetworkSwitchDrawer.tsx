@@ -110,6 +110,7 @@ export function NetworkSwitchDrawer({
       >
         <AspectRatioImage
           aspectRatio="21:9"
+          sx={{ width: '100%' }}
           use={(
             <img
               src={showEthImage ? ethImageUrl : zkevmImageUrl}
