@@ -43,12 +43,12 @@ export function NetworkSwitchDrawer({
 
   const ethImageUrl = getRemoteImage(
     checkout.config.environment ?? Environment.PRODUCTION,
-    '/switchnetworkethereum.png',
+    '/switchnetworkethereum.svg',
   );
 
   const zkevmImageUrl = getRemoteImage(
     checkout.config.environment ?? Environment.PRODUCTION,
-    '/switchnetworkzkevm.png',
+    '/switchnetworkzkevm.svg',
   );
 
   const targetChainName = getChainNameById(targetChainId);
