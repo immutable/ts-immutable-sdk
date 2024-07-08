@@ -1,9 +1,9 @@
 import {
-  AspectRatioImage,
   Body,
   Box,
   ButtCon,
   Button,
+  CloudImage,
   Drawer,
   Heading,
 } from '@biom3/react';
@@ -108,9 +108,7 @@ export function NetworkSwitchDrawer({
         alignItems: 'center',
       }}
       >
-        <AspectRatioImage
-          aspectRatio="21:9"
-          sx={{ width: '100%' }}
+        <CloudImage
           use={(
             <img
               src={showEthImage ? ethImageUrl : zkevmImageUrl}
