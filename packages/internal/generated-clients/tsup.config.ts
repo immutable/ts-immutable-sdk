@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
-  entry: ['src/**/*.ts', '!src/**/*.test.*'],
+  entry: ['src/index.ts'],
   outDir: 'dist',
   format: ['esm'],
   target: 'es2022',
@@ -9,5 +9,5 @@ export default defineConfig({
   splitting: true,
   treeshake: true,
   silent: true,
-  bundle: false,
+  bundle: true,
 });
