@@ -10,6 +10,7 @@
     "lru-memorise": "0.3.0"
   },
   "devDependencies": {
+    "@imtbl/eslint-plugin-imtbl": "^0.0.0",
     "@swc/jest": "^0.2.24",
     "@types/jest": "^29.4.3",
     "concurrently": "^8.2.2",
@@ -40,6 +41,6 @@
     "test": "jest",
     "typecheck": "tsc --noEmit --jsx preserve"
   },
-  "type": "module",
+  "type": "commonjs",
   "types": "dist/index.d.ts"
 }

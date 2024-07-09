@@ -27,7 +27,7 @@
     "syncpack": "^9.8.4",
     "typedoc": "^0.24.8",
     "wsrun": "^5.2.4"
-},
+  },
   "engines": {
     "node": ">=20.11.0"
   },
@@ -81,6 +81,7 @@
       "packages/internal/dex/sdk",
       "packages/internal/dex/sdk-sample-app",
       "packages/internal/bridge/sdk",
+      "packages/internal/eslint-rules",
       "packages/internal/factory/sdk",
       "packages/internal/factory/factory-sample-app",
       "packages/internal/generated-clients",

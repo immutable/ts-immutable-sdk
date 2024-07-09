@@ -1,0 +1,14 @@
+{
+  "name": "@imtbl/eslint-plugin-imtbl",
+  "description": "Custom eslint rules in the Typescript SDK",
+  "version": "0.0.0",
+  "author": "Immutable",
+  "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
+  "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
+  "license": "Apache-2.0",
+  "main": "eslint-plugin-imtbl.js",
+  "private": true,
+  "repository": "immutable/ts-immutable-sdk.git",
+  "type": "commonjs",
+  "packageManager": "yarn@3.6.1"
+}

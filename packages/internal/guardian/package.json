@@ -8,6 +8,7 @@
     "axios": "^1.6.5"
   },
   "devDependencies": {
+    "@imtbl/eslint-plugin-imtbl": "^0.0.0",
     "@swc/core": "^1.3.36",
     "@swc/jest": "^0.2.24",
     "@typechain/ethers-v5": "^10.2.0",
@@ -40,7 +41,8 @@
     "build": "tsup & tsc --noEmit false --declaration --emitDeclarationOnly",
     "build:all": "yarn workspaces foreach --parallel --recursive --topological-dev --jobs unlimited --verbose run build",
     "dev": "concurrently --raw 'tsup --watch' 'tsc --watch --noEmit false --declaration --emitDeclarationOnly --preserveWatchOutput'",
-    "dev:all": "ts-node ../../../dev.ts @imtbl/guardian"
+    "dev:all": "ts-node ../../../dev.ts @imtbl/guardian",
+    "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0"
   },
   "type": "module",
   "types": "dist/index.d.ts"

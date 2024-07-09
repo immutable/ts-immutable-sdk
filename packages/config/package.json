@@ -8,6 +8,7 @@
     "@imtbl/metrics": "0.0.0"
   },
   "devDependencies": {
+    "@imtbl/eslint-plugin-imtbl": "^0.0.0",
     "@swc/core": "^1.3.36",
     "@swc/jest": "^0.2.24",
     "@types/jest": "^29.4.3",
