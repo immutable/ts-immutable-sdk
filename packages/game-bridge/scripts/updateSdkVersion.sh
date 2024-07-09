@@ -36,7 +36,7 @@ fi
 # example valid version: 1.2.3
 # or: 1.2.3-alpha 
 # or: 1.2.3-alpha.1
-if [[ ! $TS_SDK_TAG =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+)?$ ]];
+if [[ ! $TS_SDK_TAG =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+)?$ ]]; then
   echo "Current tag is not a valid version. Exiting..."
   exit 1
 fi
