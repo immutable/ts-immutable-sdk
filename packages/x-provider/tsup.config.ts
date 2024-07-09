@@ -6,6 +6,6 @@ export default defineConfig({
   format: ['esm'],
   target: 'es2022',
   external: ['axios'],
-  silent: true,
+  silent: false,
   bundle: true,
 });

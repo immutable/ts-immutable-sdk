@@ -9,6 +9,9 @@
   "main": "eslint-plugin-imtbl.js",
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
+  "scripts": {
+    "build": ""
+  },
   "type": "commonjs",
   "packageManager": "yarn@3.6.1"
 }

@@ -50,7 +50,7 @@
   "scripts": {
     "build": "tsup & tsc --noEmit false --declaration --emitDeclarationOnly",
     "build:all": "yarn workspaces foreach --parallel --recursive --topological-dev --jobs unlimited --verbose run build",
-    "dev": "concurrently --raw 'tsup --watch' 'tsc --watch --noEmit false --declaration --emitDeclarationOnly --preserveWatchOutput'",
+    "dev": "concurrently --raw 'tsup --watch --silent' 'tsc --watch --noEmit false --declaration --emitDeclarationOnly --preserveWatchOutput'",
     "dev:all": "ts-node ../../dev.ts @imtbl/x-provider",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "prepare": "wsrun -r build",

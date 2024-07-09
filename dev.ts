@@ -134,7 +134,7 @@ workspaces.forEach((workspace) => {
   }
 });
 
-const tsupCommand = `yarn workspace ${packageName} tsup --watch src --watch ${watchPaths.join(' --watch ')}`;
+const tsupCommand = `yarn workspace ${packageName} tsup --watch --silent src --watch ${watchPaths.join(' --watch ')}`;
 // eslint-disable-next-line max-len
 const tscCommand = `yarn workspace ${packageName} tsc --watch --noEmit false --declaration --emitDeclarationOnly --preserveWatchOutput`;
 
