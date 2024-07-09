@@ -4,50 +4,38 @@
 name: Build Game Bridge 
 
 on:
-  push:
-  # workflow_dispatch:
-  #   inputs:
-  #     ts_sdk_tag:
-  #       type: string
-  #       description: TS SDK Tag
-  #       required: true
-  #     game_engine:
-  #       type: choice
-  #       description: Upgrade Type
-  #       options:
-  #         - Unity
-  #         # - Unreal
-  #         - Both
-  #       required: true
-  #       default: Unity
-  #     dry_run:
-  #       type: boolean
-  #       description: "(Optional) Dry run"
-  #       required: false
-  #       default: false
+  workflow_dispatch:
+    inputs:
+      ts_sdk_tag:
+        type: string
+        description: TS SDK version tag
+        required: true
+      game_engine:
+        type: choice
+        description: Game SDK to update
+        options:
+          - Unity
+          # - Unreal
+          # - Both
+        required: true
+        default: Unity
+      dry_run:
+        type: boolean
+        description: "(Optional) Dry run"
+        required: false
+        default: false
 
 env:
-  # TS_SDK_TAG: ${{ github.event.inputs.ts_sdk_tag }}
-  TS_SDK_TAG: "1.45.3-alpha.2"
-  # GAME_ENGINE: ${{ github.event.inputs.game_engine }}
-  GAME_ENGINE: "Unity"
-  # DRY_RUN: ${{ github.event.inputs.dry_run }}
-  DRY_RUN: true
+  TS_SDK_TAG: ${{ github.event.inputs.ts_sdk_tag }}
+  GAME_ENGINE: ${{ github.event.inputs.game_engine }}
+  DRY_RUN: ${{ github.event.inputs.dry_run }}
   GH_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
 
 jobs:
   build-game-bridge:
     name: Build Game Bridge
-    # if: false
     runs-on: ubuntu-latest-4-cores
     env:
-    #   # TS_SDK_TAG: ${{ github.event.inputs.ts_sdk_tag }}
-    #   TS_SDK_TAG: "1.45.1"
-    #   # GAME_ENGINE: ${{ github.event.inputs.game_engine }}
-    #   GAME_ENGINE: "Unity"
-    #   # DRY_RUN: ${{ github.event.inputs.dry_run }}
-    #   DRY_RUN: true
-    #   GH_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
       NODE_OPTIONS: --max-old-space-size=14366
     steps:
       - name: Checkout SDK Repository
@@ -93,6 +81,13 @@ jobs:
       - name: Build Game Bridge
         run: cd packages/game-bridge && yarn build
 
+      # make artifacs avilable for download
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: game-bridge-artifacts
+          path: ./packages/game-bridge/dist
+
       - name: Cache build artifacts
         uses: actions/cache@v4
         with:
@@ -102,7 +97,7 @@ jobs:
   create-unity-pr:
     name: Create Unity PR
     needs: build-game-bridge
-    # if: ${{ github.event.inputs.game_engine == 'Unity' || github.event.inputs.game_engine == 'Both' }}
+    if: ${{ github.event.inputs.game_engine == 'Unity' || github.event.inputs.game_engine == 'Both' }}
     runs-on: ubuntu-latest-4-cores
     steps:
       - name: Checkout SDK Repository
@@ -146,17 +141,29 @@ jobs:
       - name: Copy Game Bridge Build
         run: cp -r ./packages/game-bridge/dist/unity/index.html ./unity-immutable-sdk/src/Packages/Passport/Runtime/Resources/index.html
 
-      - name: Commit and Push Changes
-        # if: ${{ github.event.inputs.dry_run == false }}
+      - name: Commit Changes
         run: |
           cd unity-immutable-sdk
           git add src/Packages/Passport/Runtime/Resources/index.html
           git commit -m "chore: update game bridge to ${{ env.TS_SDK_TAG }}"
+          cd ..
+
+      - name: and Push Changes
+        if: ${{ github.event.inputs.dry_run == false }}
+        run: |
+          cd unity-immutable-sdk
           git push -u origin "chore/update-game-bridge-${{ env.TS_SDK_TAG }}"
           cd ..
 
+      - name: Create PR (Dry Run)
+        if: ${{ github.event.inputs.dry_run == true }}
+        run: |
+          cd unity-immutable-sdk
+          echo "gh pr create --base main --head chore/update-game-bridge-${{ env.TS_SDK_TAG }} --title 'chore: update game bridge to ${{ env.TS_SDK_TAG }}' --body 'This PR updates the game bridge to ${{ env.TS_SDK_TAG }}'"
+          cd ..
+
       - name: Create PR
-        # if: ${{ github.event.inputs.dry_run == false }}
+        if: ${{ github.event.inputs.dry_run == false }}
         run: |
           cd unity-immutable-sdk
           gh pr create --base main --head "chore/update-game-bridge-${{ env.TS_SDK_TAG }}" --title "chore: update game bridge to ${{ env.TS_SDK_TAG }}" --body "This PR updates the game bridge to ${{ env.TS_SDK_TAG }}"
