@@ -2,7 +2,7 @@
 /* eslint-disable max-len */
 import { imx } from '@imtbl/generated-clients';
 
-export { TransactionResponse } from '@ethersproject/providers';
+export type { TransactionResponse } from '@ethersproject/providers';
 
 /**
  * Need to specifically export the classes and interfaces from the generated
