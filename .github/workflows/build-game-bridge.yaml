@@ -159,7 +159,7 @@ jobs:
         if: ${{ github.event.inputs.dry_run == true }}
         run: |
           cd unity-immutable-sdk
-          echo "gh pr create --base main --head chore/update-game-bridge-${{ env.TS_SDK_TAG }} --title 'chore: update game bridge to ${{ env.TS_SDK_TAG }}' --body 'This PR updates the game bridge to ${{ env.TS_SDK_TAG }}'"
+          echo "gh pr create --base main --head chore/update-game-bridge-${{ env.TS_SDK_TAG }} --title 'chore: update game bridge to ${{ env.TS_SDK_TAG }}' --body 'Update game bridge (build from ts-immutable-sdk version [${{ env.TS_SDK_TAG }}](https://github.com/immutable/ts-immutable-sdk/releases/tag/${{ env.TS_SDK_TAG }}))'"
           cd ..
 
       - name: Create PR
