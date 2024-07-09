@@ -5,7 +5,7 @@
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "devDependencies": {
-    "@imtbl/eslint-plugin-imtbl": "^0.0.0",
+    "@imtbl/eslint-plugin-imtbl": "0.0.0",
     "@openapitools/openapi-generator-cli": "^2.13.4",
     "concurrently": "^8.2.2",
     "eslint": "^8.40.0",
