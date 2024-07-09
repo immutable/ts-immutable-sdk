@@ -20,15 +20,6 @@ do
   fi
 done
 
-# pull down latest tags
-# git fetch --tags
-
-# get latest git tag
-# TS_SDK_TAG=$(git tag -l --sort=-v:refname | grep -v '\-alpha' | head -n 1)
-
-# get the current tag
-# CURRENT_TAG=$(git describe --tags --abbrev=0)
-
 # check the TS_SDK_TAG environment variable is set
 if [ -z "$TS_SDK_TAG" ]; then
   echo "TS_SDK_TAG environment variable not found. Exiting..."
@@ -42,16 +33,13 @@ if [ -z "$TS_SDK_HASH" ]; then
 fi
 
 # use regex to check the current tag is a valid version
-if [[ ! $TS_SDK_TAG =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+# example valid version: 1.2.3
+# or: 1.2.3-alpha 
+# or: 1.2.3-alpha.1
+if [[ ! $TS_SDK_TAG =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+)?$ ]];
   echo "Current tag is not a valid version. Exiting..."
   exit 1
 fi
-
-# get commit hash for the current tag
-# CURRENT_TAG_COMMIT=$(git rev-list -n 1 $CURRENT_TAG)
-
-# get latest commit hash
-# LATEST_COMMIT=$(git rev-parse HEAD)
 
 # update variables in output files
 for FILE_PATH in "${FILE_PATHS[@]}"
