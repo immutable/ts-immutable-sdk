@@ -41,6 +41,6 @@
     "test": "jest",
     "typecheck": "tsc --noEmit --jsx preserve"
   },
-  "type": "commonjs",
+  "type": "module",
   "types": "dist/index.d.ts"
 }
