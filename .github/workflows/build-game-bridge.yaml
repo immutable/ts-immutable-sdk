@@ -28,7 +28,7 @@ on:
 
 env:
   # TS_SDK_TAG: ${{ github.event.inputs.ts_sdk_tag }}
-  TS_SDK_TAG: "1.44.1"
+  TS_SDK_TAG: "1.44.0"
   # GAME_ENGINE: ${{ github.event.inputs.game_engine }}
   GAME_ENGINE: "Unity"
   # DRY_RUN: ${{ github.event.inputs.dry_run }}
@@ -152,7 +152,7 @@ jobs:
           cd unity-immutable-sdk
           git add src/Packages/Passport/Runtime/Resources/index.html
           git commit -m "chore: update game bridge to ${{ env.TS_SDK_TAG }}"
-          git push -u origin "update-game-bridge-${{ env.TS_SDK_TAG }}"
+          git push -u origin "chore/update-game-bridge-${{ env.TS_SDK_TAG }}"
           cd ..
 
       - name: Create PR
