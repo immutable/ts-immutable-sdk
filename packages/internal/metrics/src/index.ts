@@ -1,5 +1,5 @@
 // Exporting utils
-import { getItem, setItem, deleteItem } from './utils/localStorage';
+import * as localStorage from './utils/localStorage';
 
 export { track } from './track';
 export { trackDuration } from './performance';
@@ -16,9 +16,5 @@ export {
 } from './details';
 
 export const utils = {
-  localStorage: {
-    getItem,
-    setItem,
-    deleteItem,
-  },
+  localStorage: { ...localStorage },
 };

@@ -5,13 +5,15 @@ module.exports = {
   meta: {
     type: 'problem',
     docs: {
-      description: 'disallow exporting namespace imports directly or as part of an object',
+      description: 'disallow exporting namespace imports directly or as part of an object, including direct namespace exports like export * as name from \'module\'',
       category: 'Possible Errors',
       recommended: true,
     },
     schema: [], // No options
+    fixable: 'code', // Indicate that this rule supports automatic fixing
     messages: {
       namespaceExport: 'Exporting namespace imports directly or as part of an object may lead to issues with esbuild. Please refactor to avoid this pattern.',
+      directNamespaceExport: 'Direct namespace exports like export * as name from \'module\' are disallowed due to potential issues with esbuild.',
     },
   },
   create(context) {
@@ -34,15 +36,12 @@ module.exports = {
       ExportNamedDeclaration(node) {
         if (node.declaration && node.declaration.declarations) {
           node.declaration.declarations.forEach((declarator) => {
-            // Direct export of namespace import or variable initialized with namespace import
             if (declarator.init && declarator.init.type === 'Identifier' && (namespaceImports.has(declarator.init.name) || variableMappings.has(declarator.init.name))) {
               context.report({
                 node: declarator,
                 messageId: 'namespaceExport',
               });
-            }
-            // Export of an object that includes namespace import or variable initialized with namespace import
-            else if (declarator.init && declarator.init.type === 'ObjectExpression') {
+            } else if (declarator.init && declarator.init.type === 'ObjectExpression') {
               declarator.init.properties.forEach((property) => {
                 if (property.value && property.value.type === 'Identifier' && (namespaceImports.has(property.value.name) || variableMappings.has(property.value.name))) {
                   context.report({
@@ -52,6 +51,22 @@ module.exports = {
                 }
               });
             }
+          });
+        }
+      },
+      ExportAllDeclaration(node) {
+        if (node.exported) {
+          context.report({
+            node,
+            messageId: 'directNamespaceExport',
+            fix(fixer) {
+              const importDeclaration = `import * as ${node.exported.name}Import from '${node.source.value}';\n`;
+              const exportDeclaration = `export const ${node.exported.name} = { ...${node.exported.name}Import };\n`; // Added newline here
+              const rangeToRemove = [node.range[0], node.range[1] + 1]; // +1 to include the semicolon
+              return [
+                fixer.replaceTextRange(rangeToRemove, `${importDeclaration}${exportDeclaration}\n`), // Added newline here
+              ];
+            },
           });
         }
       },

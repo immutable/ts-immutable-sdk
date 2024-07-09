@@ -1,7 +1,11 @@
+import * as ContractsImport from './exportContracts';
+
 export * from './config';
 export { IMXClient, ImmutableX } from './IMXClient';
 export * from './exportUtils';
-export * as Contracts from './exportContracts';
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const Contracts = { ...ContractsImport };
+
 export * from './types';
 /**
  * aliased exports to maintain backwards compatibility
