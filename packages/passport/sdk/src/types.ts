@@ -5,6 +5,7 @@ import { Flow } from '@imtbl/metrics';
 
 export enum PassportEvents {
   LOGGED_OUT = 'loggedOut',
+  LOGGED_IN = 'loggedIn',
   ACCOUNTS_REQUESTED = 'accountsRequested',
 }
 
@@ -18,6 +19,7 @@ export type AccountsRequestedEvent = {
 
 export interface PassportEventMap extends Record<string, any> {
   [PassportEvents.LOGGED_OUT]: [];
+  [PassportEvents.LOGGED_IN]: [User];
   [PassportEvents.ACCOUNTS_REQUESTED]: [AccountsRequestedEvent];
 }
 
