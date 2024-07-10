@@ -160,14 +160,14 @@ jobs:
           cd ..
 
       - name: Create PR (Dry Run)
-        if: ${{ env.dry_run == 'true' }}
+        if: ${{ env.DRY_RUN == 'true' }}
         run: |
           cd unity-immutable-sdk
           echo "gh pr create --base main --head chore/update-game-bridge-${{ env.TS_SDK_TAG }} --title 'chore: update game bridge to ${{ env.TS_SDK_TAG }}' --body 'Update game bridge (build from ts-immutable-sdk version [${{ env.TS_SDK_TAG }}](https://github.com/immutable/ts-immutable-sdk/releases/tag/${{ env.TS_SDK_TAG }}))'"
           cd ..
 
       - name: Create PR
-        if: ${{ env.dry_run == 'false' }}
+        if: ${{ env.DRY_RUN == 'false' }}
         run: |
           cd unity-immutable-sdk
           gh pr create --base main --head "chore/update-game-bridge-${{ env.TS_SDK_TAG }}" --title "chore: update game bridge to ${{ env.TS_SDK_TAG }}" --body "Update game bridge (build from ts-immutable-sdk version [${{ env.TS_SDK_TAG }}](https://github.com/immutable/ts-immutable-sdk/releases/tag/${{ env.TS_SDK_TAG }}))"
