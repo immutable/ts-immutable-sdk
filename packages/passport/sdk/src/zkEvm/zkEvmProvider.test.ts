@@ -63,6 +63,12 @@ describe('ZkEvmProvider', () => {
   };
 
   describe('eth_requestAccounts', () => {
+    it('constructor tries to automatically connect existing user session when provider is instantiated', async () => {
+      authManager.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
+      getProvider();
+      expect(authManager.getUser).toHaveBeenCalledTimes(1);
+    });
+
     it('should return the ethAddress if already logged in', async () => {
       authManager.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
       const provider = getProvider();

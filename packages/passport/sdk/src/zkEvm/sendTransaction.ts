@@ -18,7 +18,7 @@ import GuardianClient, { convertBigNumberishToString } from '../guardian';
 const MAX_TRANSACTION_HASH_RETRIEVAL_RETRIES = 30;
 const TRANSACTION_HASH_RETRIEVAL_WAIT = 1000;
 
-export type EthSendTransactionParams = {
+type EthSendTransactionParams = {
   ethSigner: Signer;
   rpcProvider: StaticJsonRpcProvider;
   guardianClient: GuardianClient;
