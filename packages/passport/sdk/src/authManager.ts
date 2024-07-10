@@ -16,7 +16,6 @@ import logger from './utils/logger';
 import { isTokenExpired } from './utils/token';
 import { PassportError, PassportErrorType, withPassportError } from './errors/passportError';
 import {
-  PassportMetadata,
   User,
   DeviceCodeResponse,
   DeviceConnectResponse,
@@ -28,9 +27,12 @@ import {
   isUserZkEvm,
   UserImx,
   isUserImx,
+  PassportEventMap,
+  PassportEvents,
 } from './types';
 import { PassportConfiguration } from './config';
 import Overlay from './overlay';
+import TypedEventEmitter from './utils/typedEventEmitter';
 
 const formUrlEncodedHeader = {
   headers: {
@@ -102,6 +104,8 @@ export default class AuthManager {
 
   private readonly config: PassportConfiguration;
 
+  private readonly passportEventEmitter: TypedEventEmitter<PassportEventMap>;
+
   private readonly logoutMode: Exclude<OidcConfiguration['logoutMode'], undefined>;
 
   /**
@@ -109,19 +113,20 @@ export default class AuthManager {
    */
   private refreshingPromise: Promise<User | null> | null = null;
 
-  constructor(config: PassportConfiguration) {
+  constructor(config: PassportConfiguration, passportEventEmitter: TypedEventEmitter<PassportEventMap>) {
     this.config = config;
+    this.passportEventEmitter = passportEventEmitter;
     this.userManager = new UserManager(getAuthConfiguration(config));
     this.deviceCredentialsManager = new DeviceCredentialsManager();
     this.logoutMode = config.oidcConfiguration.logoutMode || 'redirect';
   }
 
   private static mapOidcUserToDomainModel = (oidcUser: OidcUser): User => {
-    let passport: PassportMetadata | undefined;
-    if (oidcUser.id_token) {
-      passport = jwt_decode<IdTokenPayload>(oidcUser.id_token)?.passport;
+    if (!oidcUser.id_token) {
+      throw new Error('Failed to obtain ID token');
     }
 
+    const passport = jwt_decode<IdTokenPayload>(oidcUser.id_token)?.passport;
     const user: User = {
       expired: oidcUser.expired,
       idToken: oidcUser.id_token,
@@ -196,7 +201,9 @@ export default class AuthManager {
       return new Promise((resolve, reject) => {
         signinPopup()
           .then((oidcUser) => {
-            resolve(AuthManager.mapOidcUserToDomainModel(oidcUser));
+            const user = AuthManager.mapOidcUserToDomainModel(oidcUser);
+            this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
+            resolve(user);
           })
           .catch((error: unknown) => {
             // Reject with the error if it is not caused by a blocked popup
@@ -217,7 +224,9 @@ export default class AuthManager {
                     popupHasBeenOpened = true;
                     const oidcUser = await signinPopup();
                     overlay.remove();
-                    resolve(AuthManager.mapOidcUserToDomainModel(oidcUser));
+                    const user = AuthManager.mapOidcUserToDomainModel(oidcUser);
+                    this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
+                    resolve(user);
                   } else {
                     // The popup has already been opened. By calling `window.open` with the same target as the
                     // previously opened popup, no new window will be opened. Instead, the existing popup
@@ -304,6 +313,7 @@ export default class AuthManager {
           const oidcUser = AuthManager.mapDeviceTokenResponseToOidcUser(tokenResponse);
           const user = AuthManager.mapOidcUserToDomainModel(oidcUser);
           await this.userManager.storeUser(oidcUser);
+          this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
 
           return user;
         } catch (error) {
@@ -388,6 +398,7 @@ export default class AuthManager {
       const oidcUser = AuthManager.mapDeviceTokenResponseToOidcUser(tokenResponse);
       const user = AuthManager.mapOidcUserToDomainModel(oidcUser);
       await this.userManager.storeUser(oidcUser);
+      this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
 
       return user;
     }, PassportErrorType.AUTHENTICATION_ERROR);

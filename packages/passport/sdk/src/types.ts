@@ -30,7 +30,7 @@ export type UserProfile = {
 };
 
 export type User = {
-  idToken?: string;
+  idToken: string;
   accessToken: string;
   refreshToken?: string;
   profile: UserProfile;
