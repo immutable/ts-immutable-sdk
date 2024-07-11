@@ -355,9 +355,7 @@ window.callFunction = async (jsonData: string) => {
         );
 
         identify({ passportId: profile.sub });
-        track(moduleName, 'performedLoginConfirmCode', {
-          timeMs: Date.now() - markStart,
-        });
+        trackDuration(moduleName, 'performedLoginConfirmCode', mt(markStart));
 
         callbackToGame({
           responseFor: fxName,
