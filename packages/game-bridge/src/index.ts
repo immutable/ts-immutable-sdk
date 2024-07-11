@@ -406,15 +406,17 @@ window.callFunction = async (jsonData: string) => {
       case PASSPORT_FUNCTIONS.getAccessToken: {
         const accessToken = await getPassportClient().getAccessToken();
         const success = accessToken !== undefined;
-        track(moduleName, 'performedGetAccessToken', {
-          timeMs: Date.now() - markStart,
-        });
+
+        if (!success) {
+          throw new Error('No access token');
+        }
+
+        trackDuration(moduleName, 'performedGetAccessToken', mt(markStart));
         callbackToGame({
           responseFor: fxName,
           requestId,
           success,
           result: accessToken,
-          error: !success ? 'No access token' : undefined,
         });
         break;
       }
