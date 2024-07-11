@@ -423,15 +423,17 @@ window.callFunction = async (jsonData: string) => {
       case PASSPORT_FUNCTIONS.getIdToken: {
         const idToken = await getPassportClient().getIdToken();
         const success = idToken !== undefined;
-        track(moduleName, 'performedGetIdToken', {
-          timeMs: Date.now() - markStart,
-        });
+
+        if (!success) {
+          throw new Error('No ID token');
+        }
+
+        trackDuration(moduleName, 'performedGetIdToken', mt(markStart));
         callbackToGame({
           responseFor: fxName,
           requestId,
           success,
           result: idToken,
-          error: !success ? 'No ID token' : undefined,
         });
         break;
       }
