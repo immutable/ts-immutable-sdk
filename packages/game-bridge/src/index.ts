@@ -440,15 +440,17 @@ window.callFunction = async (jsonData: string) => {
       case PASSPORT_FUNCTIONS.getEmail: {
         const userProfile = await getPassportClient().getUserInfo();
         const success = userProfile?.email !== undefined;
-        track(moduleName, 'performedGetEmail', {
-          timeMs: Date.now() - markStart,
-        });
+
+        if (!success) {
+          throw new Error('No email');
+        }
+
+        trackDuration(moduleName, 'performedGetEmail', mt(markStart));
         callbackToGame({
           responseFor: fxName,
           requestId,
           success,
           result: userProfile?.email,
-          error: !success ? 'No email' : undefined,
         });
         break;
       }
