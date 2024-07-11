@@ -394,9 +394,7 @@ window.callFunction = async (jsonData: string) => {
         const deviceFlowEndSessionEndpoint = await getPassportClient().logoutDeviceFlow();
         providerInstance = null;
         zkEvmProviderInstance = null;
-        track(moduleName, 'performedGetLogoutUrl', {
-          timeMs: Date.now() - markStart,
-        });
+        trackDuration(moduleName, 'performedGetLogoutUrl', mt(markStart));
         callbackToGame({
           responseFor: fxName,
           requestId,
