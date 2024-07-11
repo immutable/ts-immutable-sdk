@@ -63,6 +63,7 @@
     "react-app-rewired": "^2.2.1",
     "react-scripts": "5.0.1",
     "rollup": "^3.17.2",
+    "rollup-plugin-polyfill-node": "^0.12.0",
     "rollup-plugin-svg": "^2.0.0",
     "rollup-plugin-visualizer": "^5.12.0",
     "ts-jest": "^29.1.0",
