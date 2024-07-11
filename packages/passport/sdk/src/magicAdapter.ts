@@ -1,4 +1,4 @@
-import { SDKBase, InstanceWithExtensions } from '@magic-sdk/provider';
+import { InstanceWithExtensions, SDKBase } from '@magic-sdk/provider';
 import { Magic } from 'magic-sdk';
 import { OpenIdExtension } from '@magic-ext/oidc';
 import { ethers } from 'ethers';
@@ -73,11 +73,20 @@ export default class MagicAdapter {
    */
   private initialiseSigner(user: User) {
     const generateSigner = async (): Promise<Signer> => {
+      const startTime = performance.now();
+
       const magicClient = await this.magicClient;
       await magicClient.openid.loginWithOIDC({
         jwt: user.idToken,
         providerId: this.config.magicProviderId,
       });
+
+      trackDuration(
+        'passport',
+        'magicLogin',
+        Math.round(performance.now() - startTime),
+      );
+
       const web3Provider = new Web3Provider(magicClient.rpcProvider as unknown as ethers.providers.ExternalProvider);
       return web3Provider.getSigner();
     };
@@ -104,29 +113,30 @@ export default class MagicAdapter {
   }
 
   async getSigner(): Promise<Signer> {
-    // TODO: Add timing tracking and error handling from original login method
-    const ethSigner = await this.magicSigner;
-    // Throw the stored error if the signers failed to initialise
-    if (typeof ethSigner === 'undefined') {
-      if (typeof this.magicSignerInitialisationError !== 'undefined') {
-        throw this.magicSignerInitialisationError;
+    return withPassportError<Signer>(async () => {
+      const ethSigner = await this.magicSigner;
+      // Throw the stored error if the signers failed to initialise
+      if (typeof ethSigner === 'undefined') {
+        if (typeof this.magicSignerInitialisationError !== 'undefined') {
+          throw this.magicSignerInitialisationError;
+        }
+        throw new Error('Signer failed to initialise');
       }
-      throw new Error('Signer failed to initialise');
-    }
 
-    const magicClient = await this.magicClient;
-    const isLoggedIn = await magicClient.user.isLoggedIn();
-    if (isLoggedIn) {
-      return ethSigner;
-    }
+      const magicClient = await this.magicClient;
+      const isLoggedIn = await magicClient.user.isLoggedIn();
+      if (isLoggedIn) {
+        return ethSigner;
+      }
 
-    const user = await this.authManager.getUser();
-    if (!user) {
-      throw new Error('User not logged in');
-    }
+      const user = await this.authManager.getUser();
+      if (!user) {
+        throw new Error('User not logged in');
+      }
 
-    this.initialiseSigner(user);
-    return await this.getSigner();
+      this.initialiseSigner(user);
+      return await this.getSigner();
+    }, PassportErrorType.WALLET_CONNECTION_ERROR);
   }
 
   // TODO: Remove login method
