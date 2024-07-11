@@ -2,7 +2,7 @@ import { memorise } from 'lru-memorise';
 import { getGlobalisedValue as globalise } from 'global-const';
 
 const GLOBALISE_KEY = 'imtbl__metrics';
-const MEMORISE_TIMEFRAME = 5000;
+const MEMORISE_TIMEFRAME = 1000;
 const MEMORISE_MAX = 1000;
 
 export const getGlobalisedValue = <T>(key: string, value: T): T => globalise<T>(GLOBALISE_KEY, key, value);
