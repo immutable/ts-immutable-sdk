@@ -375,19 +375,18 @@ window.callFunction = async (jsonData: string) => {
         const passportProvider = await getPassportClient().connectImx();
         const providerSet = setProvider(passportProvider);
 
-        if (providerSet) {
-          identify({ passportId: profile.sub });
+        if (!providerSet) {
+          throw new Error('Failed to connect via confirm code');
         }
-        track(moduleName, 'performedConnectConfirmCode', {
-          succeeded: providerSet,
-          timeMs: Date.now() - markStart,
-        });
 
+        identify({ passportId: profile.sub });
+        trackDuration(moduleName, 'performedConnectConfirmCode', mt(markStart), {
+          succeeded: providerSet,
+        });
         callbackToGame({
           responseFor: fxName,
           requestId,
           success: providerSet,
-          error: !providerSet ? 'Failed to connect' : undefined,
         });
         break;
       }
