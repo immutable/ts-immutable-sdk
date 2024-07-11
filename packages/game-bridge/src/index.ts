@@ -163,6 +163,11 @@ const getZkEvmProvider = (): passport.Provider => {
   return zkEvmProviderInstance;
 };
 
+/**
+ * @name markTime
+ */
+const mt = (start: number) => Date.now() - start;
+
 track(moduleName, 'loadedGameBridge', {
   sdkVersionTag,
 });
@@ -204,9 +209,7 @@ window.callFunction = async (jsonData: string) => {
             crossSdkBridgeEnabled: true,
           };
           passportClient = new passport.Passport(passportConfig);
-          track(moduleName, 'initialisedPassport', {
-            timeMs: Date.now() - markStart,
-          });
+          trackDuration(moduleName, 'initialisedPassport', mt(markStart));
         }
         callbackToGame({
           responseFor: fxName,
@@ -228,17 +231,14 @@ window.callFunction = async (jsonData: string) => {
         };
         console.log(`Version check: ${JSON.stringify(versionCheckParams)}`);
 
-        track(moduleName, 'completedInitGameBridge', {
+        trackDuration(moduleName, 'completedInitGameBridge', mt(markStart), {
           ...versionCheckParams,
-          timeMs: Date.now() - markStart,
         });
         break;
       }
       case PASSPORT_FUNCTIONS.initDeviceFlow: {
         const response = await getPassportClient().loginWithDeviceFlow();
-        track(moduleName, 'performedInitDeviceFlow', {
-          timeMs: Date.now() - markStart,
-        });
+        trackDuration(moduleName, 'performedInitDeviceFlow', mt(markStart));
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -255,18 +255,19 @@ window.callFunction = async (jsonData: string) => {
           useCachedSession: true,
         });
         const succeeded = userInfo !== null;
-        if (succeeded) {
-          identify({ passportId: userInfo?.sub });
+
+        if (!succeeded) {
+          throw new Error('Failed to re-login');
         }
-        track(moduleName, 'performedRelogin', {
+
+        identify({ passportId: userInfo?.sub });
+        trackDuration(moduleName, 'performedRelogin', mt(markStart), {
           succeeded,
-          timeMs: Date.now() - markStart,
         });
         callbackToGame({
           responseFor: fxName,
           requestId,
           success: userInfo !== null,
-          error: userInfo === null ? 'Failed to re-login' : undefined,
         });
         break;
       }
@@ -280,15 +281,18 @@ window.callFunction = async (jsonData: string) => {
           providerSet = setProvider(passportProvider);
           identify({ passportId: userInfo?.sub });
         }
-        track(moduleName, 'performedReconnect', {
+
+        if (!providerSet) {
+          throw new Error('Failed to reconnect');
+        }
+
+        trackDuration(moduleName, 'performedReconnect', mt(markStart), {
           succeeded: userInfo !== null,
-          timeMs: Date.now() - markStart,
         });
         callbackToGame({
           responseFor: fxName,
           requestId,
           success: providerSet,
-          error: !providerSet ? 'Failed to reconnect' : undefined,
         });
         break;
       }
@@ -694,13 +698,17 @@ window.callFunction = async (jsonData: string) => {
       ? error?.type
       : undefined;
 
-    trackError(moduleName, fxName, wrappedError, { fxName, requestId, errorType });
-    trackDuration(
-      moduleName,
-      'failedCallFunction',
-      Date.now() - markStart,
-      { fxName, requestId, error: wrappedError.message },
-    );
+    trackError(moduleName, fxName, wrappedError, {
+      fxName,
+      requestId,
+      errorType,
+    });
+    trackDuration(moduleName, 'failedCallFunction', mt(markStart), {
+      fxName,
+      requestId,
+      error: wrappedError.message,
+    });
+
     console.log(error);
     callbackToGame({
       responseFor: fxName,
