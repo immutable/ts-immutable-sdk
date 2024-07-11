@@ -101,9 +101,11 @@ const callbackToGame = (data: CallbackToGameData) => {
   const message = JSON.stringify(data);
   console.log(`callbackToGame: ${message}`);
   console.log(message);
-  if (window.ue !== undefined) {
+  if (typeof window.ue !== 'undefined') {
     if (typeof window.ue.jsconnector === 'undefined') {
-      console.error('Unreal JSConnector not defined');
+      const unrealError = 'Unreal JSConnector not defined';
+      console.error(unrealError);
+      throw new Error(unrealError);
     } else {
       window.ue.jsconnector.sendtogame(message);
     }
@@ -114,9 +116,9 @@ const callbackToGame = (data: CallbackToGameData) => {
   } else if (window.Unity !== 'undefined') {
     window.Unity.call(message);
   } else {
-    console.error(
-      'No available game callbacks to call from ImmutableSDK game-bridge',
-    );
+    const gameBridgeError = 'No available game callbacks to call from ImmutableSDK game-bridge';
+    console.error(gameBridgeError);
+    throw new Error(gameBridgeError);
   }
 };
 
