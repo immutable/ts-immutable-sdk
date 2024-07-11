@@ -2,7 +2,12 @@
 import * as passport from '@imtbl/passport';
 import * as config from '@imtbl/config';
 import * as provider from '@imtbl/x-provider';
-import { track, trackError, identify } from '@imtbl/metrics';
+import {
+  track,
+  trackError,
+  trackDuration,
+  identify,
+} from '@imtbl/metrics';
 import { providers } from 'ethers';
 
 /* eslint-disable no-undef */
@@ -96,16 +101,6 @@ const callbackToGame = (data: CallbackToGameData) => {
   const message = JSON.stringify(data);
   console.log(`callbackToGame: ${message}`);
   console.log(message);
-
-  if (data.error && data.error !== undefined) {
-    trackError(
-      moduleName,
-      data.responseFor,
-      new Error(data.error),
-      { requestId: data.requestId },
-    );
-  }
-
   if (window.ue !== undefined) {
     if (typeof window.ue.jsconnector === 'undefined') {
       console.error('Unreal JSConnector not defined');
@@ -687,11 +682,25 @@ window.callFunction = async (jsonData: string) => {
         break;
     }
   } catch (error: any) {
-    track(moduleName, 'failedCallFunction', {
-      function: fxName,
-      error: error.message,
-      timeMs: Date.now() - markStart,
-    });
+    let wrappedError;
+
+    if (!(error instanceof Error)) {
+      wrappedError = new Error(error);
+    } else {
+      wrappedError = error;
+    }
+
+    const errorType = error instanceof passport.PassportError
+      ? error?.type
+      : undefined;
+
+    trackError(moduleName, fxName, wrappedError, { fxName, requestId, errorType });
+    trackDuration(
+      moduleName,
+      'failedCallFunction',
+      Date.now() - markStart,
+      { fxName, requestId, error: wrappedError.message },
+    );
     console.log(error);
     callbackToGame({
       responseFor: fxName,
