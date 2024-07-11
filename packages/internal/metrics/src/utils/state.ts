@@ -1,10 +1,31 @@
 import { getItem, setItem } from './localStorage';
 import { Detail } from './constants';
+import { errorBoundary } from './errorBoundary';
+import { getGlobalisedValue } from './globalise';
 
 export enum Store {
   EVENTS = 'metrics-events',
   RUNTIME = 'metrics-runtime',
 }
+
+let localStorageEnabled = true;
+
+const useLocalStorageFn = (use: boolean = true) => {
+  localStorageEnabled = use;
+};
+
+export const useLocalStorage = errorBoundary(
+  getGlobalisedValue('useLocalStorage', useLocalStorageFn),
+);
+
+const saveToLocalStorage = (key: Store, payload: any) => {
+  if (!localStorageEnabled) return false;
+  return setItem(key, payload);
+};
+const getFromLocalStorage = (key: Store) => {
+  if (!localStorageEnabled) return undefined;
+  return getItem(key);
+};
 
 // In memory storage for events and other data
 let EVENT_STORE: any[];
@@ -12,8 +33,8 @@ let RUNTIME_DETAILS: Record<string, string>;
 
 // Initialise store and runtime
 const initialise = () => {
-  EVENT_STORE = getItem(Store.EVENTS) || [];
-  RUNTIME_DETAILS = getItem(Store.RUNTIME) || {};
+  EVENT_STORE = getFromLocalStorage(Store.EVENTS) || [];
+  RUNTIME_DETAILS = getFromLocalStorage(Store.RUNTIME) || {};
 };
 initialise();
 
@@ -23,7 +44,7 @@ export const storeDetail = (key: Detail, value: string) => {
     ...RUNTIME_DETAILS,
     [key]: value,
   };
-  setItem(Store.RUNTIME, RUNTIME_DETAILS);
+  saveToLocalStorage(Store.RUNTIME, RUNTIME_DETAILS);
 };
 export const getDetail = (key: Detail) => {
   // Handle the scenario where detail is a falsy value
@@ -40,18 +61,15 @@ export const getEvents = () => EVENT_STORE;
 
 export const addEvent = (event: any) => {
   EVENT_STORE.push(event);
-  setItem(Store.EVENTS, EVENT_STORE);
+  saveToLocalStorage(Store.EVENTS, EVENT_STORE);
 };
 
 export const removeSentEvents = (numberOfEvents: number) => {
   EVENT_STORE = EVENT_STORE.slice(numberOfEvents);
-  setItem(Store.EVENTS, EVENT_STORE);
+  saveToLocalStorage(Store.EVENTS, EVENT_STORE);
 };
 
-type TrackProperties = Record<
-string,
-string | number | boolean | undefined
->;
+type TrackProperties = Record<string, string | number | boolean | undefined>;
 
 export const flattenProperties = (properties: TrackProperties) => {
   const propertyMap: [string, string][] = [];

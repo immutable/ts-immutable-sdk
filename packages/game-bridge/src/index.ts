@@ -2,7 +2,7 @@
 import * as passport from '@imtbl/passport';
 import * as config from '@imtbl/config';
 import * as provider from '@imtbl/x-provider';
-import { track, identify } from '@imtbl/metrics';
+import { track, identify, utils as metricsUtils } from '@imtbl/metrics';
 import { providers } from 'ethers';
 
 /* eslint-disable no-undef */
@@ -16,6 +16,8 @@ const keyData = 'data';
 
 const trackFunction = 'track';
 const moduleName = 'gameBridge';
+
+metricsUtils.useLocalStorage(false);
 
 // version check placeholders
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

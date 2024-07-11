@@ -1,5 +1,6 @@
 // Exporting utils
 import * as localStorage from './utils/localStorage';
+import { useLocalStorage } from './utils/state';
 
 export { track } from './track';
 export { trackDuration } from './performance';
@@ -15,4 +16,5 @@ export {
 } from './details';
 export const utils = {
   localStorage,
+  useLocalStorage,
 };
