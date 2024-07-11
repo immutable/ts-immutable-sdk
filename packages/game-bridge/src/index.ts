@@ -298,9 +298,7 @@ window.callFunction = async (jsonData: string) => {
       }
       case PASSPORT_FUNCTIONS.getPKCEAuthUrl: {
         const url = getPassportClient().loginWithPKCEFlow();
-        track(moduleName, 'performedGetPkceAuthUrl', {
-          timeMs: Date.now() - markStart,
-        });
+        trackDuration(moduleName, 'performedGetPkceAuthUrl', mt(markStart));
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -316,9 +314,7 @@ window.callFunction = async (jsonData: string) => {
           request.state,
         );
         identify({ passportId: profile.sub });
-        track(moduleName, 'performedLoginPkce', {
-          timeMs: Date.now() - markStart,
-        });
+        trackDuration(moduleName, 'performedLoginPkce', mt(markStart));
         callbackToGame({
           responseFor: fxName,
           requestId,
