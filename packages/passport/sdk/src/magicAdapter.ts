@@ -30,7 +30,7 @@ export default class MagicAdapter {
   constructor(
     config: PassportConfiguration,
     authManager: AuthManager,
-    passportEventEmitter:TypedEventEmitter<PassportEventMap>,
+    passportEventEmitter: TypedEventEmitter<PassportEventMap>,
   ) {
     this.config = config;
     this.authManager = authManager;

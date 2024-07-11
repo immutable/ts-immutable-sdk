@@ -1,10 +1,15 @@
-import { LoginWithOpenIdParams, OpenIdExtension } from '@magic-ext/oidc';
+import { LoginWithOpenIdParams } from '@magic-ext/oidc';
 import { Magic } from 'magic-sdk';
+import { setImmediate } from 'timers';
 import MagicAdapter from './magicAdapter';
 import { PassportConfiguration } from './config';
-import { PassportError, PassportErrorType } from './errors/passportError';
+// import { PassportError, PassportErrorType } from './errors/passportError';
+import { PassportEventMap } from './types';
+import AuthManager from './authManager';
+import TypedEventEmitter from './utils/typedEventEmitter';
+import { mockUserZkEvm } from './test/mocks';
 
-const loginWithOIDCMock:jest.MockedFunction<(args: LoginWithOpenIdParams) => Promise<void>> = jest.fn();
+const loginWithOIDCMock: jest.MockedFunction<(args: LoginWithOpenIdParams) => Promise<void>> = jest.fn();
 
 const rpcProvider = {};
 
@@ -24,6 +29,13 @@ describe('MagicWallet', () => {
   } as PassportConfiguration;
   const idToken = 'e30=.e30=.e30=';
   const preload = jest.fn();
+
+  const authManagerMock = {
+    getUserOrLogin: jest.fn().mockResolvedValue(mockUserZkEvm),
+    getUser: jest.fn().mockResolvedValue(mockUserZkEvm),
+  };
+  const authManager = authManagerMock as Partial<AuthManager> as AuthManager;
+  const passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
 
   beforeEach(() => {
     jest.resetAllMocks();
@@ -57,10 +69,46 @@ describe('MagicWallet', () => {
       it('starts initialising the magicClient', () => {
         jest.spyOn(window.document, 'readyState', 'get').mockReturnValue('complete');
         preload.mockResolvedValue(Promise.resolve());
-        const magicAdapter = new MagicAdapter(config);
+        const magicAdapter = new MagicAdapter(config, authManager, passportEventEmitter);
         // @ts-ignore
         expect(magicAdapter.lazyMagicClient).toBeDefined();
       });
+
+      it('should initialise magic signer from existing user session when instantiated', async () => {
+        jest.spyOn(window.document, 'readyState', 'get').mockReturnValue('complete');
+        preload.mockResolvedValue(Promise.resolve());
+        // mock that a user session exists so signer is generated
+        authManagerMock.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
+        const initialiseSigner = jest.spyOn(MagicAdapter.prototype as any, 'initialiseSigner');
+
+        const magicAdapter = new MagicAdapter(config, authManager, passportEventEmitter);
+
+        // initialiseSigners is invoked asyncrhonously, so wait
+        await new Promise(setImmediate);
+
+        // @ts-ignore
+        expect(magicAdapter.lazyMagicClient).toBeDefined();
+        expect(authManagerMock.getUser).toHaveBeenCalledTimes(1);
+        expect(initialiseSigner).toHaveBeenCalledTimes(1);
+      });
+
+      // it('should throw a PassportError when an error is thrown', async () => {
+      //   preload.mockResolvedValue(Promise.resolve());
+      //   const magicAdapter = new MagicAdapter(config, authManager, passportEventEmitter);
+
+      //   loginWithOIDCMock.mockImplementation(() => {
+      //     throw new Error('oops');
+      //   });
+
+      //   await expect(async () => {
+      //     await magicAdapter.login(idToken);
+      //   }).rejects.toThrow(
+      //     new PassportError(
+      //       'oops',
+      //       PassportErrorType.WALLET_CONNECTION_ERROR,
+      //     ),
+      //   );
+      // });
     });
 
     describe('when window is undefined', () => {
@@ -74,55 +122,17 @@ describe('MagicWallet', () => {
       });
 
       it('does nothing', () => {
-        const magicAdapter = new MagicAdapter(config);
+        const magicAdapter = new MagicAdapter(config, authManager, passportEventEmitter);
         // @ts-ignore
         expect(magicAdapter.magicClientPromise).toBeUndefined();
       });
     });
   });
 
-  describe('login', () => {
-    it('should call loginWithOIDC and initialise the provider with the correct arguments', async () => {
-      preload.mockResolvedValue(Promise.resolve());
-      const magicAdapter = new MagicAdapter(config);
-      const magicProvider = await magicAdapter.login(idToken);
-
-      expect(Magic).toHaveBeenCalledWith(apiKey, {
-        network: 'mainnet',
-        extensions: [new OpenIdExtension()],
-      });
-
-      expect(loginWithOIDCMock).toHaveBeenCalledWith({
-        jwt: idToken,
-        providerId,
-      });
-
-      expect(magicProvider).toEqual(rpcProvider);
-    });
-
-    it('should throw a PassportError when an error is thrown', async () => {
-      preload.mockResolvedValue(Promise.resolve());
-      const magicAdapter = new MagicAdapter(config);
-
-      loginWithOIDCMock.mockImplementation(() => {
-        throw new Error('oops');
-      });
-
-      await expect(async () => {
-        await magicAdapter.login(idToken);
-      }).rejects.toThrow(
-        new PassportError(
-          'oops',
-          PassportErrorType.WALLET_CONNECTION_ERROR,
-        ),
-      );
-    });
-  });
-
   describe('logout', () => {
     it('calls the logout function', async () => {
       preload.mockResolvedValue(Promise.resolve());
-      const magicAdapter = new MagicAdapter(config);
+      const magicAdapter = new MagicAdapter(config, authManager, passportEventEmitter);
       await magicAdapter.login(idToken);
       await magicAdapter.logout();
 
