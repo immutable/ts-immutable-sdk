@@ -457,23 +457,23 @@ window.callFunction = async (jsonData: string) => {
       case PASSPORT_FUNCTIONS.getPassportId: {
         const userProfile = await getPassportClient().getUserInfo();
         const success = userProfile?.sub !== undefined;
-        track(moduleName, 'performedGetPassportId', {
-          timeMs: Date.now() - markStart,
-        });
+
+        if (!success) {
+          throw new Error('No Passport ID');
+        }
+
+        trackDuration(moduleName, 'performedGetPassportId', mt(markStart));
         callbackToGame({
           responseFor: fxName,
           requestId,
           success,
           result: userProfile?.sub,
-          error: !success ? 'No Passport ID' : undefined,
         });
         break;
       }
       case PASSPORT_FUNCTIONS.getLinkedAddresses: {
         const linkedAddresses = await getPassportClient().getLinkedAddresses();
-        track(moduleName, 'performedGetLinkedAddresses', {
-          timeMs: Date.now() - markStart,
-        });
+        trackDuration(moduleName, 'performedGetLinkedAddresses', mt(markStart));
         callbackToGame({
           responseFor: fxName,
           requestId,
