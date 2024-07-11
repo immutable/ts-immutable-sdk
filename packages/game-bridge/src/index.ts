@@ -484,9 +484,7 @@ window.callFunction = async (jsonData: string) => {
       }
       case PASSPORT_FUNCTIONS.imx.getAddress: {
         const address = await getProvider().getAddress();
-        track(moduleName, 'performedImxGetAddress', {
-          timeMs: Date.now() - markStart,
-        });
+        trackDuration(moduleName, 'performedImxGetAddress', mt(markStart));
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -497,9 +495,7 @@ window.callFunction = async (jsonData: string) => {
       }
       case PASSPORT_FUNCTIONS.imx.isRegisteredOffchain: {
         const registered = await getProvider().isRegisteredOffchain();
-        track(moduleName, 'performedImxIsRegisteredOffchain', {
-          timeMs: Date.now() - markStart,
-        });
+        trackDuration(moduleName, 'performedImxIsRegisteredOffchain', mt(markStart));
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -510,9 +506,7 @@ window.callFunction = async (jsonData: string) => {
       }
       case PASSPORT_FUNCTIONS.imx.registerOffchain: {
         const response = await getProvider().registerOffchain();
-        track(moduleName, 'performedImxRegisterOffchain', {
-          timeMs: Date.now() - markStart,
-        });
+        trackDuration(moduleName, 'performedImxRegisterOffchain', mt(markStart));
         callbackToGame({
           ...{
             responseFor: fxName,
@@ -526,9 +520,7 @@ window.callFunction = async (jsonData: string) => {
       case PASSPORT_FUNCTIONS.imx.transfer: {
         const unsignedTransferRequest = JSON.parse(data);
         const response = await getProvider().transfer(unsignedTransferRequest);
-        track(moduleName, 'performedImxTransfer', {
-          timeMs: Date.now() - markStart,
-        });
+        trackDuration(moduleName, 'performedImxTransfer', mt(markStart));
         callbackToGame({
           ...{
             responseFor: fxName,
@@ -544,9 +536,7 @@ window.callFunction = async (jsonData: string) => {
         const response = await getProvider().batchNftTransfer(
           nftTransferDetails,
         );
-        track(moduleName, 'performedImxBatchNftTransfer', {
-          timeMs: Date.now() - markStart,
-        });
+        trackDuration(moduleName, 'performedImxBatchNftTransfer', mt(markStart));
         callbackToGame({
           ...{
             responseFor: fxName,
