@@ -330,18 +330,19 @@ window.callFunction = async (jsonData: string) => {
         );
         const passportProvider = await getPassportClient().connectImx();
         const providerSet = setProvider(passportProvider);
-        if (providerSet) {
-          identify({ passportId: profile.sub });
+
+        if (!providerSet) {
+          throw new Error('Failed to connect via PKCE');
         }
-        track(moduleName, 'performedConnectPkce', {
+
+        identify({ passportId: profile.sub });
+        trackDuration(moduleName, 'performedConnectPkce', mt(markStart), {
           succeeded: providerSet,
-          timeMs: Date.now() - markStart,
         });
         callbackToGame({
           responseFor: fxName,
           requestId,
           success: providerSet,
-          error: !providerSet ? 'Failed to connect via PKCE' : undefined,
         });
         break;
       }
