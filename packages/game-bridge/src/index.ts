@@ -550,15 +550,18 @@ window.callFunction = async (jsonData: string) => {
       case PASSPORT_FUNCTIONS.zkEvm.connectEvm: {
         const zkEvmProvider = getPassportClient().connectEvm();
         const providerSet = setZkEvmProvider(zkEvmProvider);
-        track(moduleName, 'performedZkevmConnectEvm', {
+
+        if (!providerSet) {
+          throw new Error('Failed to connect to EVM');
+        }
+
+        trackDuration(moduleName, 'performedZkevmConnectEvm', mt(markStart), {
           succeeded: providerSet,
-          timeMs: Date.now() - markStart,
         });
         callbackToGame({
           responseFor: fxName,
           requestId,
           success: providerSet,
-          error: !providerSet ? 'Failed to connect to EVM' : undefined,
         });
         break;
       }
@@ -569,15 +572,17 @@ window.callFunction = async (jsonData: string) => {
           params: [transaction],
         });
         const success = transactionHash !== null && transactionHash !== undefined;
-        track(moduleName, 'performedZkevmSendTransaction', {
-          timeMs: Date.now() - markStart,
-        });
+
+        if (!success) {
+          throw new Error('Failed to send transaction');
+        }
+
+        trackDuration(moduleName, 'performedZkevmSendTransaction', mt(markStart));
         callbackToGame({
           responseFor: fxName,
           requestId,
           success,
           result: transactionHash,
-          error: !success ? 'Failed to send transaction' : undefined,
         });
         break;
       }
@@ -589,9 +594,7 @@ window.callFunction = async (jsonData: string) => {
 
         const tx = await signer.sendTransaction(transaction);
         const response = await tx.wait();
-        track(moduleName, 'performedZkevmSendTransactionWithConfirmation', {
-          timeMs: Date.now() - markStart,
-        });
+        trackDuration(moduleName, 'performedZkevmSendTransactionWithConfirmation', mt(markStart));
         callbackToGame({
           ...{
             responseFor: fxName,
@@ -607,15 +610,17 @@ window.callFunction = async (jsonData: string) => {
           method: 'eth_requestAccounts',
         });
         const success = result !== null && result !== undefined;
-        track(moduleName, 'performedZkevmRequestAccounts', {
-          timeMs: Date.now() - markStart,
-        });
+
+        if (!success) {
+          throw new Error('Failed to request accounts');
+        }
+
+        trackDuration(moduleName, 'performedZkevmRequestAccounts', mt(markStart));
         callbackToGame({
           responseFor: fxName,
           requestId,
           success,
           accounts: result,
-          error: !success ? 'Failed to request accounts' : undefined,
         });
         break;
       }
@@ -626,9 +631,12 @@ window.callFunction = async (jsonData: string) => {
           params: [request.address, request.blockNumberOrTag],
         });
         const success = result !== null && result !== undefined;
-        track(moduleName, 'performedZkevmGetBalance', {
-          timeMs: Date.now() - markStart,
-        });
+
+        if (!success) {
+          throw new Error('Failed to get balance');
+        }
+
+        trackDuration(moduleName, 'performedZkevmGetBalance', mt(markStart));
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -645,9 +653,12 @@ window.callFunction = async (jsonData: string) => {
           params: [request.txHash],
         });
         const success = response !== null && response !== undefined;
-        track(moduleName, 'performedZkevmGetTransactionReceipt', {
-          timeMs: Date.now() - markStart,
-        });
+
+        if (!success) {
+          throw new Error('Failed to get transaction receipt');
+        }
+
+        trackDuration(moduleName, 'performedZkevmGetTransactionReceipt', mt(markStart));
         callbackToGame({
           ...{
             responseFor: fxName,
