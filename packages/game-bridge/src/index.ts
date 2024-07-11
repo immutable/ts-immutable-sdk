@@ -2,7 +2,7 @@
 import * as passport from '@imtbl/passport';
 import * as config from '@imtbl/config';
 import * as provider from '@imtbl/x-provider';
-import { track, identify } from '@imtbl/metrics';
+import { track, trackError, identify } from '@imtbl/metrics';
 import { providers } from 'ethers';
 
 /* eslint-disable no-undef */
@@ -78,11 +78,35 @@ declare function blu_event(event: string, data: string): void;
 // eslint-disable-next-line @typescript-eslint/naming-convention
 declare function UnityPostMessage(message: string): void;
 
-const callbackToGame = (data: object) => {
+interface CallbackToGameData {
+  responseFor: string;
+  requestId: string;
+  success: boolean;
+  error?: string;
+  errorType?: string | null;
+  code?: string;
+  deviceCode?: string;
+  url?: string;
+  interval?: number;
+  result?: any;
+  accounts?: string[];
+}
+
+const callbackToGame = (data: CallbackToGameData) => {
   const message = JSON.stringify(data);
   console.log(`callbackToGame: ${message}`);
   console.log(message);
-  if (typeof window.ue !== 'undefined') {
+
+  if (data.error && data.error !== undefined) {
+    trackError(
+      moduleName,
+      data.responseFor,
+      new Error(data.error),
+      { requestId: data.requestId },
+    );
+  }
+
+  if (window.ue !== undefined) {
     if (typeof window.ue.jsconnector === 'undefined') {
       console.error('Unreal JSConnector not defined');
     } else {
