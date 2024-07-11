@@ -66,6 +66,7 @@ export class PassportImxProvider implements IMXProvider {
 
   private signerInitialisationError: unknown | undefined;
 
+  // TODO: Remove initialiseSigner logic
   constructor({
     authManager,
     immutableXClient,

@@ -35,7 +35,7 @@ export default class MagicAdapter {
     this.config = config;
     this.authManager = authManager;
 
-    passportEventEmitter.on(PassportEvents.LOGGED_IN, this.initialiseSigner);
+    passportEventEmitter.on(PassportEvents.LOGGED_IN, this.initialiseSigner.bind(this));
     // Automatically connect an existing user session to Passport
     this.authManager.getUser().then((user) => {
       if (user) {
@@ -45,7 +45,7 @@ export default class MagicAdapter {
       // User does not exist, don't initialise an eth signer
     });
 
-    // passportEventEmitter.on(PassportEvents.LOGGED_IN, initialiseMagicSigner);
+    // TODO: Add logout callback AND test logout functionality
     // passportEventEmitter.on(PassportEvents.LOGGED_OUT, clearMagicSigner);
 
     if (typeof window !== 'undefined') {
@@ -131,7 +131,7 @@ export default class MagicAdapter {
 
       const user = await this.authManager.getUser();
       if (!user) {
-        throw new Error('User not logged in');
+        throw new Error('Cannot initialise signer without user');
       }
 
       this.initialiseSigner(user);
