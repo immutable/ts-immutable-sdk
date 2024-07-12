@@ -49,6 +49,15 @@ jobs:
       - name: Build
         run: yarn build
 
+      # This step will only run if the build step fails
+      - name: Upload NX log on failure
+        if: failure()
+        uses: actions/upload-artifact@v2
+        with:
+          name: nx-logs
+          path: |
+            .nx/workspace-data/d/daemon.log
+
       - name: Cache build artifacts
         uses: actions/cache@v4
         with:
