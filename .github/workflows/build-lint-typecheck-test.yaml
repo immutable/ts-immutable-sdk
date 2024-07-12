@@ -43,6 +43,9 @@ jobs:
       - name: Check Single Package Version Policy
         run: yarn syncpack:check
 
+      - name: Clear NX Cache
+        run: yarn nx reset
+
       - name: Build
         run: yarn build
 
