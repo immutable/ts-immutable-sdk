@@ -43,19 +43,8 @@ jobs:
       - name: Check Single Package Version Policy
         run: yarn syncpack:check
 
-      - name: Clear NX Cache
-        run: yarn nx reset
-
       - name: Build
         run: yarn build
-
-      # This step will only run if the build step fails
-      - name: Upload NX log on failure
-        if: failure()
-        uses: actions/upload-artifact@v2
-        with:
-          name: nx-logs
-          path: .nx
 
       - name: Cache build artifacts
         uses: actions/cache@v4
