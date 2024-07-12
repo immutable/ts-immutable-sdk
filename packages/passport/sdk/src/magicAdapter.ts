@@ -112,7 +112,7 @@ export default class MagicAdapter {
     return this.lazyMagicClient;
   }
 
-  async getSigner(): Promise<Signer> {
+  public async getSigner(): Promise<Signer> {
     return withPassportError<Signer>(async () => {
       const ethSigner = await this.magicSigner;
       // Throw the stored error if the signers failed to initialise
@@ -139,30 +139,7 @@ export default class MagicAdapter {
     }, PassportErrorType.WALLET_CONNECTION_ERROR);
   }
 
-  // TODO: Remove login method
-  async login(
-    idToken: string,
-  ): Promise<ethers.providers.ExternalProvider> {
-    return withPassportError<ethers.providers.ExternalProvider>(async () => {
-      const startTime = performance.now();
-
-      const magicClient = await this.magicClient;
-      await magicClient.openid.loginWithOIDC({
-        jwt: idToken,
-        providerId: this.config.magicProviderId,
-      });
-
-      trackDuration(
-        'passport',
-        'magicLogin',
-        Math.round(performance.now() - startTime),
-      );
-
-      return magicClient.rpcProvider as unknown as ethers.providers.ExternalProvider;
-    }, PassportErrorType.WALLET_CONNECTION_ERROR);
-  }
-
-  async logout() {
+  public async logout() {
     const magicClient = await this.magicClient;
     if (magicClient.user) {
       await magicClient.user.logout();

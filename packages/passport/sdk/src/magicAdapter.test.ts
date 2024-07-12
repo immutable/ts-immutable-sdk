@@ -1,13 +1,14 @@
 import { LoginWithOpenIdParams } from '@magic-ext/oidc';
 import { Magic } from 'magic-sdk';
 import { setImmediate } from 'timers';
+import { Web3Provider } from '@ethersproject/providers';
 import MagicAdapter from './magicAdapter';
 import { PassportConfiguration } from './config';
-// import { PassportError, PassportErrorType } from './errors/passportError';
 import { PassportEventMap } from './types';
 import AuthManager from './authManager';
 import TypedEventEmitter from './utils/typedEventEmitter';
 import { mockUserZkEvm } from './test/mocks';
+import { PassportError, PassportErrorType } from './errors/passportError';
 
 const loginWithOIDCMock: jest.MockedFunction<(args: LoginWithOpenIdParams) => Promise<void>> = jest.fn();
 
@@ -15,6 +16,7 @@ const rpcProvider = {};
 
 const logoutMock = jest.fn();
 
+jest.mock('@ethersproject/providers');
 jest.mock('magic-sdk');
 jest.mock('@magic-ext/oidc', () => ({
   OpenIdExtension: jest.fn(),
@@ -27,7 +29,6 @@ describe('MagicWallet', () => {
     magicPublishableApiKey: apiKey,
     magicProviderId: providerId,
   } as PassportConfiguration;
-  const idToken = 'e30=.e30=.e30=';
   const preload = jest.fn();
 
   const authManagerMock = {
@@ -49,6 +50,9 @@ describe('MagicWallet', () => {
       rpcProvider,
       preload,
     }));
+    (Web3Provider as unknown as jest.Mock).mockImplementation(() => ({
+      getSigner: jest.fn().mockImplementation(() => { }),
+    }));
   });
 
   describe('constructor', () => {
@@ -67,6 +71,7 @@ describe('MagicWallet', () => {
         (window as any).document = originalDocument;
       });
       it('starts initialising the magicClient', () => {
+        authManagerMock.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
         jest.spyOn(window.document, 'readyState', 'get').mockReturnValue('complete');
         preload.mockResolvedValue(Promise.resolve());
         const magicAdapter = new MagicAdapter(config, authManager, passportEventEmitter);
@@ -83,7 +88,7 @@ describe('MagicWallet', () => {
 
         const magicAdapter = new MagicAdapter(config, authManager, passportEventEmitter);
 
-        // initialiseSigners is invoked asyncrhonously, so wait
+        // initialiseSigners is invoked asynchronously, so wait
         await new Promise(setImmediate);
 
         // @ts-ignore
@@ -92,23 +97,35 @@ describe('MagicWallet', () => {
         expect(initialiseSigner).toHaveBeenCalledTimes(1);
       });
 
-      // it('should throw a PassportError when an error is thrown', async () => {
-      //   preload.mockResolvedValue(Promise.resolve());
-      //   const magicAdapter = new MagicAdapter(config, authManager, passportEventEmitter);
+      it('should throw a PassportError when signer initialisation fails', async () => {
+        jest.spyOn(window.document, 'readyState', 'get').mockReturnValue('complete');
+        preload.mockResolvedValue(Promise.resolve());
 
-      //   loginWithOIDCMock.mockImplementation(() => {
-      //     throw new Error('oops');
-      //   });
+        // mock that a user session exists so signer is generated
+        authManagerMock.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
+        const initialiseSigner = jest.spyOn(MagicAdapter.prototype as any, 'initialiseSigner');
+        (Web3Provider as unknown as jest.Mock).mockImplementation(() => ({
+          getSigner: () => {
+            throw new Error('Something went wrong');
+          },
+        }));
 
-      //   await expect(async () => {
-      //     await magicAdapter.login(idToken);
-      //   }).rejects.toThrow(
-      //     new PassportError(
-      //       'oops',
-      //       PassportErrorType.WALLET_CONNECTION_ERROR,
-      //     ),
-      //   );
-      // });
+        const magicAdapter = new MagicAdapter(config, authManager, passportEventEmitter);
+
+        // initialiseSigners is invoked asynchronously, so wait
+        await new Promise(setImmediate);
+
+        // @ts-ignore
+        expect(magicAdapter.lazyMagicClient).toBeDefined();
+        expect(authManagerMock.getUser).toHaveBeenCalledTimes(1);
+        expect(initialiseSigner).toHaveBeenCalledTimes(1);
+        await expect(magicAdapter.getSigner()).rejects.toThrow(
+          new PassportError(
+            'Something went wrong',
+            PassportErrorType.WALLET_CONNECTION_ERROR,
+          ),
+        );
+      });
     });
 
     describe('when window is undefined', () => {
@@ -122,6 +139,7 @@ describe('MagicWallet', () => {
       });
 
       it('does nothing', () => {
+        authManagerMock.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
         const magicAdapter = new MagicAdapter(config, authManager, passportEventEmitter);
         // @ts-ignore
         expect(magicAdapter.magicClientPromise).toBeUndefined();
@@ -131,9 +149,9 @@ describe('MagicWallet', () => {
 
   describe('logout', () => {
     it('calls the logout function', async () => {
+      authManagerMock.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
       preload.mockResolvedValue(Promise.resolve());
       const magicAdapter = new MagicAdapter(config, authManager, passportEventEmitter);
-      await magicAdapter.login(idToken);
       await magicAdapter.logout();
 
       expect(logoutMock).toHaveBeenCalled();

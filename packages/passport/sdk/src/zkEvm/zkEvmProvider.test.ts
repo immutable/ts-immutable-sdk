@@ -1,10 +1,10 @@
-import { StaticJsonRpcProvider, Web3Provider } from '@ethersproject/providers';
+import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import { identify, trackFlow } from '@imtbl/metrics';
 import { utils } from 'ethers';
 import AuthManager from '../authManager';
 import { ZkEvmProvider, ZkEvmProviderInput } from './zkEvmProvider';
 import { sendTransaction } from './sendTransaction';
-import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
+import { JsonRpcError, ProviderErrorCode } from './JsonRpcError';
 import GuardianClient from '../guardian';
 import { RelayerClient } from './relayerClient';
 import { Provider, RequestArguments } from './types';
@@ -24,14 +24,13 @@ jest.mock('./signTypedDataV4');
 describe('ZkEvmProvider', () => {
   let passportEventEmitter: TypedEventEmitter<PassportEventMap>;
   const config = testConfig;
-  const ethSigner = {};
   const authManager = {
     getUserOrLogin: jest.fn().mockResolvedValue(mockUserZkEvm),
     getUser: jest.fn().mockResolvedValue(mockUserZkEvm),
   };
   const magicAdapter = {
-    login: jest.fn(),
-  } as Partial<MagicAdapter> as MagicAdapter;
+    getSigner: jest.fn().mockResolvedValue({}),
+  };
   const guardianClient = {
     withConfirmationScreen: jest.fn().mockImplementation(() => (task: () => void) => task()),
   } as unknown as GuardianClient;
@@ -39,9 +38,6 @@ describe('ZkEvmProvider', () => {
   beforeEach(() => {
     passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
     jest.resetAllMocks();
-    (Web3Provider as unknown as jest.Mock).mockImplementation(() => ({
-      getSigner: jest.fn().mockImplementation(() => ethSigner),
-    }));
     (trackFlow as unknown as jest.Mock).mockImplementation(() => ({
       addEvent: jest.fn(),
       end: jest.fn(),
@@ -56,19 +52,13 @@ describe('ZkEvmProvider', () => {
       authManager: authManager as Partial<AuthManager> as AuthManager,
       passportEventEmitter,
       guardianClient,
-      magicAdapter,
+      magicAdapter: magicAdapter as Partial<MagicAdapter> as MagicAdapter,
     } as Partial<ZkEvmProviderInput>;
 
     return new ZkEvmProvider(constructorParameters as ZkEvmProviderInput);
   };
 
   describe('eth_requestAccounts', () => {
-    it('constructor tries to automatically connect existing user session when provider is instantiated', async () => {
-      authManager.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
-      getProvider();
-      expect(authManager.getUser).toHaveBeenCalledTimes(1);
-    });
-
     it('should return the ethAddress if already logged in', async () => {
       authManager.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
       const provider = getProvider();
@@ -78,7 +68,7 @@ describe('ZkEvmProvider', () => {
 
       expect(resultOne).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
       expect(resultTwo).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
-      expect(authManager.getUser).toBeCalledTimes(3);
+      expect(authManager.getUser).toBeCalledTimes(2);
     });
 
     it('should emit accountsChanged event and identify user when user logs in', async () => {
@@ -97,23 +87,6 @@ describe('ZkEvmProvider', () => {
       expect(identify).toHaveBeenCalledWith({
         passportId: mockUserZkEvm.profile.sub,
       });
-    });
-
-    it('should throw an error if the signer initialisation fails', async () => {
-      authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
-      authManager.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
-
-      (Web3Provider as unknown as jest.Mock).mockImplementation(() => ({
-        getSigner: () => {
-          throw new Error('Something went wrong');
-        },
-      }));
-      const provider = getProvider();
-      await provider.request({ method: 'eth_requestAccounts' });
-
-      await expect(provider.request({ method: 'eth_sendTransaction' })).rejects.toThrow(
-        new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, 'Something went wrong'),
-      );
     });
   });
 
@@ -164,7 +137,6 @@ describe('ZkEvmProvider', () => {
       expect(sendTransaction).toHaveBeenCalledWith({
         params: [transaction],
         guardianClient,
-        ethSigner,
         rpcProvider: expect.any(Object),
         relayerClient: expect.any(RelayerClient),
         zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
@@ -207,7 +179,6 @@ describe('ZkEvmProvider', () => {
         method: 'eth_signTypedData_v4',
         params: [address, typedDataPayload],
         guardianClient,
-        ethSigner,
         rpcProvider: expect.any(Object),
         relayerClient: expect.any(RelayerClient),
         flow: expect.any(Object),
