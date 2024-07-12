@@ -139,29 +139,6 @@ export default class MagicAdapter {
     }, PassportErrorType.WALLET_CONNECTION_ERROR);
   }
 
-  // TODO: Remove login method
-  async login(
-    idToken: string,
-  ): Promise<ethers.providers.ExternalProvider> {
-    return withPassportError<ethers.providers.ExternalProvider>(async () => {
-      const startTime = performance.now();
-
-      const magicClient = await this.magicClient;
-      await magicClient.openid.loginWithOIDC({
-        jwt: idToken,
-        providerId: this.config.magicProviderId,
-      });
-
-      trackDuration(
-        'passport',
-        'magicLogin',
-        Math.round(performance.now() - startTime),
-      );
-
-      return magicClient.rpcProvider as unknown as ethers.providers.ExternalProvider;
-    }, PassportErrorType.WALLET_CONNECTION_ERROR);
-  }
-
   async logout() {
     const magicClient = await this.magicClient;
     if (magicClient.user) {
