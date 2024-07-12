@@ -55,8 +55,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: nx-logs
-          path: |
-            .nx/workspace-data/d/daemon.log
+          path: .nx
 
       - name: Cache build artifacts
         uses: actions/cache@v4
