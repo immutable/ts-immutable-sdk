@@ -87,7 +87,7 @@ interface CallbackToGameData {
   responseFor: string;
   requestId: string;
   success: boolean;
-  error?: string;
+  error: string | null;
   errorType?: string | null;
   code?: string;
   deviceCode?: string;
@@ -217,6 +217,7 @@ window.callFunction = async (jsonData: string) => {
           responseFor: fxName,
           requestId,
           success: true,
+          error: null,
         });
 
         // version check
@@ -245,6 +246,7 @@ window.callFunction = async (jsonData: string) => {
           responseFor: fxName,
           requestId,
           success: true,
+          error: null,
           code: response.code,
           deviceCode: response.deviceCode,
           url: response.url,
@@ -270,6 +272,7 @@ window.callFunction = async (jsonData: string) => {
           responseFor: fxName,
           requestId,
           success: userInfo !== null,
+          error: null,
         });
         break;
       }
@@ -295,6 +298,7 @@ window.callFunction = async (jsonData: string) => {
           responseFor: fxName,
           requestId,
           success: providerSet,
+          error: null,
         });
         break;
       }
@@ -305,6 +309,7 @@ window.callFunction = async (jsonData: string) => {
           responseFor: fxName,
           requestId,
           success: true,
+          error: null,
           result: url,
         });
         break;
@@ -321,6 +326,7 @@ window.callFunction = async (jsonData: string) => {
           responseFor: fxName,
           requestId,
           success: true,
+          error: null,
         });
         break;
       }
@@ -345,6 +351,7 @@ window.callFunction = async (jsonData: string) => {
           responseFor: fxName,
           requestId,
           success: providerSet,
+          error: null,
         });
         break;
       }
@@ -363,6 +370,7 @@ window.callFunction = async (jsonData: string) => {
           responseFor: fxName,
           requestId,
           success: true,
+          error: null,
         });
         break;
       }
@@ -389,6 +397,7 @@ window.callFunction = async (jsonData: string) => {
           responseFor: fxName,
           requestId,
           success: providerSet,
+          error: null,
         });
         break;
       }
@@ -401,6 +410,7 @@ window.callFunction = async (jsonData: string) => {
           responseFor: fxName,
           requestId,
           success: true,
+          error: null,
           result: deviceFlowEndSessionEndpoint,
         });
         break;
@@ -418,6 +428,7 @@ window.callFunction = async (jsonData: string) => {
           responseFor: fxName,
           requestId,
           success,
+          error: null,
           result: accessToken,
         });
         break;
@@ -435,6 +446,7 @@ window.callFunction = async (jsonData: string) => {
           responseFor: fxName,
           requestId,
           success,
+          error: null,
           result: idToken,
         });
         break;
@@ -452,6 +464,7 @@ window.callFunction = async (jsonData: string) => {
           responseFor: fxName,
           requestId,
           success,
+          error: null,
           result: userProfile?.email,
         });
         break;
@@ -469,6 +482,7 @@ window.callFunction = async (jsonData: string) => {
           responseFor: fxName,
           requestId,
           success,
+          error: null,
           result: userProfile?.sub,
         });
         break;
@@ -480,6 +494,7 @@ window.callFunction = async (jsonData: string) => {
           responseFor: fxName,
           requestId,
           success: true,
+          error: null,
           result: linkedAddresses,
         });
         break;
@@ -491,6 +506,7 @@ window.callFunction = async (jsonData: string) => {
           responseFor: fxName,
           requestId,
           success: true,
+          error: null,
           result: address,
         });
         break;
@@ -502,6 +518,7 @@ window.callFunction = async (jsonData: string) => {
           responseFor: fxName,
           requestId,
           success: true,
+          error: null,
           result: registered,
         });
         break;
@@ -514,6 +531,7 @@ window.callFunction = async (jsonData: string) => {
             responseFor: fxName,
             requestId,
             success: true,
+            error: null,
           },
           ...response,
         });
@@ -528,6 +546,7 @@ window.callFunction = async (jsonData: string) => {
             responseFor: fxName,
             requestId,
             success: true,
+            error: null,
           },
           ...response,
         });
@@ -544,6 +563,7 @@ window.callFunction = async (jsonData: string) => {
             responseFor: fxName,
             requestId,
             success: true,
+            error: null,
           },
           ...response,
         });
@@ -564,6 +584,7 @@ window.callFunction = async (jsonData: string) => {
           responseFor: fxName,
           requestId,
           success: providerSet,
+          error: null,
         });
         break;
       }
@@ -584,6 +605,7 @@ window.callFunction = async (jsonData: string) => {
           responseFor: fxName,
           requestId,
           success,
+          error: null,
           result: transactionHash,
         });
         break;
@@ -602,6 +624,7 @@ window.callFunction = async (jsonData: string) => {
             responseFor: fxName,
             requestId,
             success: true,
+            error: null,
           },
           ...response,
         });
@@ -622,6 +645,7 @@ window.callFunction = async (jsonData: string) => {
           responseFor: fxName,
           requestId,
           success,
+          error: null,
           accounts: result,
         });
         break;
@@ -643,8 +667,8 @@ window.callFunction = async (jsonData: string) => {
           responseFor: fxName,
           requestId,
           success,
+          error: null,
           result,
-          error: !success ? 'Failed to get balance' : undefined,
         });
         break;
       }
@@ -666,7 +690,7 @@ window.callFunction = async (jsonData: string) => {
             responseFor: fxName,
             requestId,
             success,
-            error: !success ? 'Failed to get transaction receipt' : undefined,
+            error: null,
           },
           ...response,
         });
@@ -680,6 +704,7 @@ window.callFunction = async (jsonData: string) => {
           responseFor: fxName,
           requestId,
           success: true,
+          error: null,
         });
         break;
       }
@@ -728,6 +753,7 @@ function onLoadHandler() {
     responseFor: initRequest,
     requestId: initRequestId,
     success: true,
+    error: null,
   });
 }
 
