@@ -2,19 +2,24 @@
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "targetDefaults": {
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": ["{projectRoot}/dist"],
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "{projectRoot}/dist"
+      ],
       "cache": true
     }
   },
   "parallel": 5,
   "defaultBase": "main",
   "plugins": [
-  {
+    {
       "plugin": "@nx/rollup/plugin",
       "options": {
         "buildTargetName": "rollup:build"
       }
     }
-  ]
+  ],
+  "nxCloudAccessToken": "Mzg3ZGY1MWUtYmYyNy00ZmE4LTkyNDAtYjYxZmJmYmE4NWQ3fHJlYWQ="
 }
