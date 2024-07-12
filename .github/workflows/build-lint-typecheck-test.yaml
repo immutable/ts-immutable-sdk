@@ -47,7 +47,7 @@ jobs:
         run: yarn nx reset
 
       - name: Build
-        run: NODE_OPTIONS=--max-old-space-size=14366 yarn nx run-many --target=build --projects=@imtbl/sdk,@imtbl/checkout-widgets --verbose
+        run: yarn build
 
       # This step will only run if the build step fails
       - name: Upload NX log on failure
