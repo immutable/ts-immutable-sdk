@@ -125,9 +125,7 @@ export default class MagicAdapter {
 
       const magicClient = await this.magicClient;
       const isLoggedIn = await magicClient.user.isLoggedIn();
-      if (isLoggedIn) {
-        return ethSigner;
-      }
+      if (isLoggedIn) return ethSigner;
 
       const user = await this.authManager.getUser();
       if (!user) {
