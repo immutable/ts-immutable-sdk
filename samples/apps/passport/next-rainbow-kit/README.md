@@ -16,13 +16,14 @@ Create a Passport application on Immutable Hub by following [these simple steps]
 
 **Step 2**
 
-Update `PUBLISHABLE_KEY` and `CLIENT_ID` in `src/app/passport.ts`
+Copy `.env.example` to `.env` and set the `NEXT_PUBLIC_PASSPORT_CLIENT_ID` and `NEXT_PUBLIC_IMMUTABLE_PUBLISHABLE_KEY`
 
-```typescript
-// Immutable Publishable Key (you will find it in the Immutable Hub in the `API Keys` section)
-const PUBLISHABLE_KEY = 'PUBLISHABLE_KEY';
-// Hub Publishable Key (you will find it in the `Passport` section)
-const CLIENT_ID = 'CLIENT_ID'; 
+```sh
+# Passport Client ID (you will find it in the Immutable Hub in the `Passport` section of your project)
+NEXT_PUBLIC_PASSPORT_CLIENT_ID=PASSPORT_CLIENT_ID
+
+# Immutable Publishable Key (you will find it in the Immutable Hub in the `API Keys` section of your project)
+NEXT_PUBLIC_IMMUTABLE_PUBLISHABLE_KEY=IMMUTABLE_PUBLISHABLE_KEY
 ```
 
 **Step 3**
