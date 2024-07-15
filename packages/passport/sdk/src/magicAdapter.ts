@@ -108,14 +108,13 @@ export default class MagicAdapter {
     if (!this.lazyMagicClient) {
       throw new Error('Cannot perform this action outside of the browser');
     }
-
     return this.lazyMagicClient;
   }
 
   public async getSigner(): Promise<Signer> {
     return withPassportError<Signer>(async () => {
-      const ethSigner = await this.magicSigner;
-      // Throw the stored error if the signers failed to initialise
+      let ethSigner = await this.magicSigner;
+
       if (typeof ethSigner === 'undefined') {
         if (typeof this.magicSignerInitialisationError !== 'undefined') {
           throw this.magicSignerInitialisationError;
@@ -123,17 +122,30 @@ export default class MagicAdapter {
         throw new Error('Signer failed to initialise');
       }
 
+      // Check that magic wallet user is logged in
       const magicClient = await this.magicClient;
       const isLoggedIn = await magicClient.user.isLoggedIn();
       if (isLoggedIn) return ethSigner;
 
+      // If not logged in, relog magic wallet and initialise the signer
       const user = await this.authManager.getUser();
       if (!user) {
         throw new Error('Cannot initialise signer without user');
       }
-
       this.initialiseSigner(user);
-      return await this.getSigner();
+
+      // Re-fetch the signer after initialising
+      ethSigner = await this.magicSigner;
+
+      if (typeof ethSigner === 'undefined') {
+        if (typeof this.magicSignerInitialisationError !== 'undefined') {
+          throw this.magicSignerInitialisationError;
+        }
+        throw new Error('Signer failed to initialise');
+      }
+
+      // We know the magic wallet is logged in and there is a user logged in, so return the ethSigner
+      return ethSigner;
     }, PassportErrorType.WALLET_CONNECTION_ERROR);
   }
 

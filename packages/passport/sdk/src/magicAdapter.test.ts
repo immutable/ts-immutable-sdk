@@ -13,8 +13,10 @@ import { PassportError, PassportErrorType } from './errors/passportError';
 const loginWithOIDCMock: jest.MockedFunction<(args: LoginWithOpenIdParams) => Promise<void>> = jest.fn();
 
 const rpcProvider = {};
+const ethSigner = {};
 
 const logoutMock = jest.fn();
+const isMagicLoggedInMock = jest.fn();
 
 jest.mock('@ethersproject/providers');
 jest.mock('magic-sdk');
@@ -46,6 +48,7 @@ describe('MagicWallet', () => {
       },
       user: {
         logout: logoutMock,
+        isLoggedIn: isMagicLoggedInMock,
       },
       rpcProvider,
       preload,
@@ -71,7 +74,7 @@ describe('MagicWallet', () => {
         (window as any).document = originalDocument;
       });
       it('starts initialising the magicClient', () => {
-        authManagerMock.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
+        authManagerMock.getUser.mockResolvedValue(mockUserZkEvm);
         jest.spyOn(window.document, 'readyState', 'get').mockReturnValue('complete');
         preload.mockResolvedValue(Promise.resolve());
         const magicAdapter = new MagicAdapter(config, authManager, passportEventEmitter);
@@ -80,10 +83,12 @@ describe('MagicWallet', () => {
       });
 
       it('should initialise magic signer from existing user session when instantiated', async () => {
-        jest.spyOn(window.document, 'readyState', 'get').mockReturnValue('complete');
-        preload.mockResolvedValue(Promise.resolve());
         // mock that a user session exists so signer is generated
-        authManagerMock.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
+        authManagerMock.getUser.mockResolvedValue(mockUserZkEvm);
+        isMagicLoggedInMock.mockResolvedValue(true);
+        (Web3Provider as unknown as jest.Mock).mockImplementation(() => ({
+          getSigner: jest.fn().mockResolvedValue(ethSigner),
+        }));
         const initialiseSigner = jest.spyOn(MagicAdapter.prototype as any, 'initialiseSigner');
 
         const magicAdapter = new MagicAdapter(config, authManager, passportEventEmitter);
@@ -95,6 +100,33 @@ describe('MagicWallet', () => {
         expect(magicAdapter.lazyMagicClient).toBeDefined();
         expect(authManagerMock.getUser).toHaveBeenCalledTimes(1);
         expect(initialiseSigner).toHaveBeenCalledTimes(1);
+        expect(await magicAdapter.getSigner()).toBe(ethSigner);
+      });
+
+      it('should re-initialise magic signer if magic user is not logged in', async () => {
+        (Web3Provider as unknown as jest.Mock).mockImplementation(() => ({
+          getSigner: jest.fn().mockResolvedValue(ethSigner),
+        }));
+        authManagerMock.getUser.mockResolvedValue(mockUserZkEvm);
+        const initialiseSigner = jest.spyOn(MagicAdapter.prototype as any, 'initialiseSigner');
+        const getSigner = jest.spyOn(MagicAdapter.prototype as any, 'getSigner');
+
+        const magicAdapter = new MagicAdapter(config, authManager, passportEventEmitter);
+        // initialiseSigners is invoked asynchronously, so wait
+        await new Promise(setImmediate);
+
+        // @ts-ignore
+        expect(magicAdapter.lazyMagicClient).toBeDefined();
+        expect(authManagerMock.getUser).toHaveBeenCalledTimes(1);
+        // initial execution via constructor
+        expect(initialiseSigner).toHaveBeenCalledTimes(1);
+
+        // mock magic user is not logged in originally, but mock the relog
+        isMagicLoggedInMock.mockResolvedValueOnce(false).mockResolvedValueOnce(true);
+
+        expect(await magicAdapter.getSigner()).toBe(ethSigner);
+        expect(initialiseSigner).toHaveBeenCalledTimes(2);
+        expect(getSigner).toHaveBeenCalledTimes(1);
       });
 
       it('should throw a PassportError when signer initialisation fails', async () => {
@@ -102,7 +134,7 @@ describe('MagicWallet', () => {
         preload.mockResolvedValue(Promise.resolve());
 
         // mock that a user session exists so signer is generated
-        authManagerMock.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
+        authManagerMock.getUser.mockResolvedValue(mockUserZkEvm);
         const initialiseSigner = jest.spyOn(MagicAdapter.prototype as any, 'initialiseSigner');
         (Web3Provider as unknown as jest.Mock).mockImplementation(() => ({
           getSigner: () => {
@@ -139,7 +171,7 @@ describe('MagicWallet', () => {
       });
 
       it('does nothing', () => {
-        authManagerMock.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
+        authManagerMock.getUser.mockResolvedValue(mockUserZkEvm);
         const magicAdapter = new MagicAdapter(config, authManager, passportEventEmitter);
         // @ts-ignore
         expect(magicAdapter.magicClientPromise).toBeUndefined();
@@ -149,7 +181,7 @@ describe('MagicWallet', () => {
 
   describe('logout', () => {
     it('calls the logout function', async () => {
-      authManagerMock.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
+      authManagerMock.getUser.mockResolvedValue(mockUserZkEvm);
       preload.mockResolvedValue(Promise.resolve());
       const magicAdapter = new MagicAdapter(config, authManager, passportEventEmitter);
       await magicAdapter.logout();
