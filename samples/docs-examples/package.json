@@ -1,0 +1,8 @@
+{
+  "name": "docs-examples",
+  "packageManager": "yarn@3.6.1",
+  "dependencies": {
+    "@imtbl/contracts": "^2.2.7",
+    "viem": "^2.17.4"
+  }
+}
