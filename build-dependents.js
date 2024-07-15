@@ -22,7 +22,7 @@ try {
 
   if (isDependent || changedProject === currentProject) {
     // Rebuild the current project
-    const command = `nx run-many --target=dev --projects=${currentProject} --parallel=5`;
+    const command = `nx run-many --target=d --projects=${currentProject} --parallel=5`;
 
     console.log(`Running command: ${command}`);
     execSync(command, { stdio: 'inherit' });

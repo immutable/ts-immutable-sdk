@@ -18,7 +18,7 @@
   },
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "d":  "next dev",
     "lint": "eslint ./src --ext .ts --max-warnings=0",
     "setup": "cd ../../../../ && yarn build:onlysdk",
     "start": "next start"

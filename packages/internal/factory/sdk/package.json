@@ -39,7 +39,7 @@
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "NODE_ENV=production rollup --config rollup.config.js",
-    "dev": "swc src -d dist --strip-leading-paths --ignore '**/*.test.*'",
+    "d":  "swc src -d dist --strip-leading-paths --ignore '**/*.test.*'",
     "lint": "eslint ./src --ext .ts --max-warnings=0",
     "lint:fix": "cd ../../../ && yarn wsrun -p @imtbl/factory-sdk -c lint --fix",
     "test": "jest test",
@@ -47,5 +47,5 @@
   },
   "source": "src/index.ts",
   "type": "module",
-  "types": "src"
+  "types": "dist/index.d.ts"
 }
