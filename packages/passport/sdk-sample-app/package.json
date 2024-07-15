@@ -34,7 +34,7 @@
   "private": true,
   "scripts": {
     "build": "next build",
-    "d":  "next dev",
+    "d": "next dev",
     "dev-with-sdk": "concurrently 'yarn workspace @imtbl/passport-sdk-sample-app dev' 'yarn workspace @imtbl/passport dev'",
     "export": "next export",
     "lint": "eslint ./src --ext .ts --max-warnings=0",

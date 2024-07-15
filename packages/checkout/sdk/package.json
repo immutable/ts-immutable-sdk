@@ -53,7 +53,7 @@
   "scripts": {
     "build": "rollup --config rollup.config.js",
     "build:dev": "CHECKOUT_DEV_MODE=true yarn build",
-    "d":  "swc src -d dist --strip-leading-paths --ignore '**/*.test.*'",
+    "d": "swc src -d dist --strip-leading-paths --ignore '**/*.test.*'",
     "docs": "typedoc --plugin typedoc-plugin-markdown --skipErrorChecking --disableSources --out docs src/index.ts",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix",
