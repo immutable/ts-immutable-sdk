@@ -82,7 +82,7 @@ Most packages in the workspace have their own README file that provides specific
 
 NOTE: Some packages may have additional commands or require different setup steps, for example in a certain package the development mode may be started with `yarn start:dev` instead of `yarn start`, or `yarn dev`. For the steps below we will be assuming defaults.
 
-### Development
+### Development watch mode
 
 Build a package and start watch mode for a package:
 
@@ -94,7 +94,7 @@ e.g. for @imtbl/passport package
 ```bash
 yarn w @imtbl/passport
 ```
-Changes on any packages that `@imtbl/passport` depends on will re-build passport package.
+Changes in any packages that `@imtbl/passport` depends on will re-build passport package.
 
 
 ### Running Tests
