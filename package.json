@@ -65,8 +65,7 @@
     "test:examples": "cd examples/ts-immutable-sample && yarn test && yarn test:e2e",
     "test:vpn": "RUN_VPN_TESTS=1 wsrun --exclude-missing -e test",
     "typecheck": "wsrun --exclude-missing typecheck",
-    "dev": "./dev.sh",
-    "wall": "nx watch --all -- node ./build-dependents-all.js \\$NX_PROJECT_NAME"
+    "dev": "./dev.sh"
   },
   "workspaces": {
     "packages": [
