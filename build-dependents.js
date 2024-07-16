@@ -10,6 +10,7 @@ const changedProject = process.argv[2];
 const currentProject = process.argv[3];
 
 try {
+  console.log('changedProject:', changedProject);
   // Generate the focused dependency graph JSON
   execSync(`nx graph --file=dep-graph.json --focus=${currentProject}`, { stdio: 'inherit' });
 
