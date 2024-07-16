@@ -36,6 +36,9 @@ export function PaymentOptions(props: PaymentOptionsProps) {
     ),
     [paymentOptions, disabledOptions, hideDisabledOptions],
   );
+  if (options.length === 1) {
+    onClick(options[1]);
+  }
 
   return (
     <Box
