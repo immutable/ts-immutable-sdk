@@ -1,9 +1,9 @@
 import {
-  AspectRatioImage,
   Body,
   Box,
   ButtCon,
   Button,
+  CloudImage,
   Drawer,
   Heading,
 } from '@biom3/react';
@@ -43,12 +43,12 @@ export function NetworkSwitchDrawer({
 
   const ethImageUrl = getRemoteImage(
     checkout.config.environment ?? Environment.PRODUCTION,
-    '/switchnetworkethereum.png',
+    '/switchnetworkethereum.svg',
   );
 
   const zkevmImageUrl = getRemoteImage(
     checkout.config.environment ?? Environment.PRODUCTION,
-    '/switchnetworkzkevm.png',
+    '/switchnetworkzkevm.svg',
   );
 
   const targetChainName = getChainNameById(targetChainId);
@@ -108,8 +108,7 @@ export function NetworkSwitchDrawer({
         alignItems: 'center',
       }}
       >
-        <AspectRatioImage
-          aspectRatio="21:9"
+        <CloudImage
           use={(
             <img
               src={showEthImage ? ethImageUrl : zkevmImageUrl}
