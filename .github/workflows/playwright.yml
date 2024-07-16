@@ -14,11 +14,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-  
+
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: samples/apps/ts-immutable-sample/.nvmrc
+          node-version-file: examples/ts-immutable-sample/.nvmrc
           cache: 'yarn'
 
       - name: Restore cached node_modules
@@ -27,26 +27,26 @@ jobs:
         with:
           path: node_modules
           key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
-  
+
       - name: Install root dependencies
-        if: steps.restore-cache-node_modules.outputs.cache-hit != 'true' 
+        if: steps.restore-cache-node_modules.outputs.cache-hit != 'true'
         run: yarn install --immutable
 
       - name: Build SDK
         run: yarn build
 
       - name: Install sample apps dependencies
-        run: cd samples/apps/ts-immutable-sample && yarn install --no-immutable
+        run: cd examples/ts-immutable-sample && yarn install --no-immutable
 
       - name: Run Unit tests
-        run: cd samples/apps/ts-immutable-sample && yarn test
+        run: cd examples/ts-immutable-sample && yarn test
 
       - name: Run Playwright tests
         env:
           # Required for Firefox to run
           # https://github.com/microsoft/playwright/issues/6500#issuecomment-838515115
           HOME: /root
-        working-directory: samples/apps/ts-immutable-sample
+        working-directory: examples/ts-immutable-sample
         run: yarn playwright test
       - uses: actions/upload-artifact@v3
         if: always()
