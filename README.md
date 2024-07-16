@@ -40,7 +40,7 @@ The need for a Typescript SDK arises from the challenges developers face when ma
   - [X-Client](#x-client)
   - [X-Provider](#x-provider)
 - [Contribution Guides](#contribution-guides)
-- [Samples](#samples)
+- [Examples](#examples)
 
 # Getting Started
 
@@ -291,6 +291,6 @@ Internal maintainers' guide is available at Immutable's wiki [Typescript SDK Int
 - In the .github/CODEOWNERS file add your github team to the corresponding subfolder that your team will be responsible for.
 - [Example from GitHub](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners#example-of-a-codeowners-file)
 
-# Samples
+# Examples
 
-The Typescript SDK also provides multiple sample frontend/backend applications in the root `samples` directory. These samples are meant to demonstrate how to use the SDK in a real-world application for external users and provide a base for building custom applications. Each sample has its own README file that provides additional information surrounding that sample app. 
+The Typescript SDK also provides multiple sample frontend/backend applications in the root `examples` directory. These examples are meant to demonstrate how to use the SDK in a real-world application for external users and provide a base for building custom applications. Each sample has its own README file that provides additional information surrounding that example app. 
