@@ -83,21 +83,28 @@ declare function blu_event(event: string, data: string): void;
 // eslint-disable-next-line @typescript-eslint/naming-convention
 declare function UnityPostMessage(message: string): void;
 
-interface CallbackToGameData {
+// Type for common callback data
+type CommonCallbackData = {
   responseFor: string;
   requestId: string;
   success: boolean;
   error: string | null;
   errorType?: string | null;
-  code?: string;
-  deviceCode?: string;
-  url?: string;
-  interval?: number;
   result?: any;
   accounts?: string[];
-}
+};
 
-const callbackToGame = (data: CallbackToGameData) => {
+// Type for callback data specific to initDeviceFlow
+type InitDeviceFlowCallbackData = CommonCallbackData & {
+  code: string;
+  deviceCode: string;
+  url: string;
+  interval: number;
+};
+
+type CallbackData = CommonCallbackData | InitDeviceFlowCallbackData;
+
+const callbackToGame = (data: CallbackData) => {
   const message = JSON.stringify(data);
   console.log(`callbackToGame: ${message}`);
   console.log(message);
