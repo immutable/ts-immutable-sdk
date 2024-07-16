@@ -18,7 +18,7 @@ import MagicAdapter from '../magicAdapter';
 import TypedEventEmitter from '../utils/typedEventEmitter';
 import { PassportConfiguration } from '../config';
 import {
-  PassportEventMap, PassportEvents, User, UserZkEvm,
+  isUserZkEvm, PassportEventMap, PassportEvents, UserZkEvm,
 } from '../types';
 import { RelayerClient } from './relayerClient';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
@@ -37,8 +37,6 @@ export type ZkEvmProviderInput = {
   passportEventEmitter: TypedEventEmitter<PassportEventMap>;
   guardianClient: GuardianClient;
 };
-
-const isZkEvmUser = (user: User): user is UserZkEvm => 'zkEvm' in user;
 
 export class ZkEvmProvider implements Provider {
   readonly #authManager: AuthManager;
@@ -133,17 +131,22 @@ export class ZkEvmProvider implements Provider {
     });
   }
 
-  // Used to get the registered zkEvm address from the User session
-  async #getZkEvmAddress() {
+  async #getZkEvmUser(): Promise<UserZkEvm | undefined> {
     try {
       const user = await this.#authManager.getUser();
-      if (user && isZkEvmUser(user)) {
-        return user.zkEvm.ethAddress;
+      if (user && isUserZkEvm(user)) {
+        return user;
       }
       return undefined;
     } catch {
       return undefined;
     }
+  }
+
+  // Used to get the registered zkEvm address from the User session
+  async #getZkEvmAddress() {
+    const user = await this.#getZkEvmUser();
+    return user ? user.zkEvm.ethAddress : undefined;
   }
 
   async #performRequest(request: RequestArguments): Promise<any> {
@@ -152,8 +155,11 @@ export class ZkEvmProvider implements Provider {
     switch (request.method) {
       case 'eth_requestAccounts': {
         const requestAccounts = async () => {
-          const zkEvmAddress = await this.#getZkEvmAddress();
-          if (zkEvmAddress) return [zkEvmAddress];
+          const zkEvmUser = await this.#getZkEvmUser();
+          if (zkEvmUser) {
+            this.#passportEventEmitter.emit(PassportEvents.LOGGED_IN, zkEvmUser);
+            return [zkEvmUser.zkEvm.ethAddress];
+          }
 
           const flow = trackFlow('passport', 'ethRequestAccounts');
 
@@ -163,7 +169,7 @@ export class ZkEvmProvider implements Provider {
 
             let userZkEvmEthAddress;
 
-            if (!isZkEvmUser(user)) {
+            if (!isUserZkEvm(user)) {
               flow.addEvent('startUserRegistration');
 
               const ethSigner = await this.#magicAdapter.getSigner();

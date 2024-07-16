@@ -36,14 +36,6 @@ export default class MagicAdapter {
     this.authManager = authManager;
 
     passportEventEmitter.on(PassportEvents.LOGGED_IN, this.initialiseSigner.bind(this));
-    // Automatically connect an existing user session to Passport
-    this.authManager.getUser().then((user) => {
-      if (user) {
-        this.initialiseSigner(user);
-      }
-    }).catch(() => {
-      // User does not exist, don't initialise an eth signer
-    });
 
     // TODO: Add logout callback AND test logout functionality
     // passportEventEmitter.on(PassportEvents.LOGGED_OUT, clearMagicSigner);
@@ -113,39 +105,53 @@ export default class MagicAdapter {
 
   public async getSigner(): Promise<Signer> {
     return withPassportError<Signer>(async () => {
-      let ethSigner = await this.magicSigner;
-
-      if (typeof ethSigner === 'undefined') {
-        if (typeof this.magicSignerInitialisationError !== 'undefined') {
-          throw this.magicSignerInitialisationError;
-        }
-        throw new Error('Signer failed to initialise');
-      }
-
-      // Check that magic wallet user is logged in
+      // getSigner may be called without `initialiseSigner` being called when the user is pulled from localStorage
       const magicClient = await this.magicClient;
       const isLoggedIn = await magicClient.user.isLoggedIn();
-      if (isLoggedIn) return ethSigner;
+      if (!this.magicSigner || !isLoggedIn) {
+        const user = await this.authManager.getUser();
+        if (!user) {
+          throw new Error('Cannot initialise signer without user');
+        }
 
-      // If not logged in, relog magic wallet and initialise the signer
-      const user = await this.authManager.getUser();
-      if (!user) {
-        throw new Error('Cannot initialise signer without user');
+        this.initialiseSigner(user);
       }
-      this.initialiseSigner(user);
 
-      // Re-fetch the signer after initialising
-      ethSigner = await this.magicSigner;
+      const ethSigner = await this.magicSigner;
 
       if (typeof ethSigner === 'undefined') {
         if (typeof this.magicSignerInitialisationError !== 'undefined') {
           throw this.magicSignerInitialisationError;
         }
         throw new Error('Signer failed to initialise');
+      } else {
+        return ethSigner;
       }
-
-      // We know the magic wallet is logged in and there is a user logged in, so return the ethSigner
-      return ethSigner;
+      //
+      // // Check that magic wallet user is logged in
+      // const magicClient = await this.magicClient;
+      // const isLoggedIn = await magicClient.user.isLoggedIn();
+      // if (isLoggedIn) return ethSigner;
+      //
+      // // If not logged in, relog magic wallet and initialise the signer
+      // const user = await this.authManager.getUser();
+      // if (!user) {
+      //   throw new Error('Cannot initialise signer without user');
+      // }
+      // this.initialiseSigner(user);
+      //
+      // // Re-fetch the signer after initialising
+      // ethSigner = await this.magicSigner;
+      //
+      // if (typeof ethSigner === 'undefined') {
+      //   if (typeof this.magicSignerInitialisationError !== 'undefined') {
+      //     throw this.magicSignerInitialisationError;
+      //   }
+      //   throw new Error('Signer failed to initialise');
+      // }
+      //
+      // // We know the magic wallet is logged in and there is a user logged in, so return the ethSigner
+      // return ethSigner;
     }, PassportErrorType.WALLET_CONNECTION_ERROR);
   }
 

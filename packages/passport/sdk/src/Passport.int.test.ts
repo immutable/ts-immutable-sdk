@@ -77,6 +77,7 @@ describe('Passport', () => {
   const mockGetUser = jest.fn();
   const mockLoginWithOidc = jest.fn();
   const mockMagicRequest = jest.fn();
+  const mockIsMagicLoggedIn = jest.fn();
 
   beforeEach(() => {
     jest.resetAllMocks();
@@ -94,6 +95,7 @@ describe('Passport', () => {
       openid: { loginWithOIDC: mockLoginWithOidc },
       rpcProvider: { request: mockMagicRequest },
       preload: jest.fn(),
+      user: { isLoggedIn: mockIsMagicLoggedIn },
     }));
   });
 
@@ -179,7 +181,7 @@ describe('Passport', () => {
           });
 
           expect(accounts).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
-          expect(mockGetUser).toHaveBeenCalledTimes(2);
+          expect(mockGetUser).toHaveBeenCalledTimes(1);
         });
       });
 
@@ -202,6 +204,7 @@ describe('Passport', () => {
         it('registers the user and returns the ether key', async () => {
           mockSigninPopup.mockResolvedValue(mockOidcUser);
           mockSigninSilent.mockResolvedValueOnce(mockOidcUserZkevm);
+          mockIsMagicLoggedIn.mockResolvedValue(true);
           useMswHandlers([
             mswHandlers.rpcProvider.success,
             mswHandlers.counterfactualAddress.success,
@@ -215,15 +218,16 @@ describe('Passport', () => {
           });
 
           expect(accounts).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
-          expect(mockGetUser).toHaveBeenCalledTimes(3);
+          expect(mockGetUser).toHaveBeenCalledTimes(2);
         });
 
         describe('when the registration request fails', () => {
           it('throws an error', async () => {
             mockSigninPopup.mockResolvedValue(mockOidcUser);
             mockGetUser.mockResolvedValueOnce(null);
-            mockGetUser.mockResolvedValueOnce(mockOidcUser);
+            mockGetUser.mockResolvedValueOnce(null);
             mockSigninSilent.mockResolvedValue(mockOidcUser);
+            mockGetUser.mockResolvedValueOnce(mockOidcUser);
             useMswHandlers([
               mswHandlers.counterfactualAddress.internalServerError,
               mswHandlers.api.chains.success,
