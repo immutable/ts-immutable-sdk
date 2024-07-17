@@ -338,7 +338,7 @@ describe('Passport', () => {
         await passport.login();
 
         mockGetUser.mockResolvedValue(Promise.resolve(mockOidcUserZkevm));
-        console.log(accounts);
+
         expect(accounts).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
 
         const transaction: TransactionRequest = {
