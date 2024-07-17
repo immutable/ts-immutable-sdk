@@ -5,7 +5,7 @@ import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
 import { Passport } from './Passport';
 import { PassportImxProvider, PassportImxProviderFactory } from './starkEx';
-import { OidcConfiguration } from './types';
+import { OidcConfiguration, UserProfile } from './types';
 import { mockUser, mockLinkedAddresses, mockUserImx } from './test/mocks';
 import { announceProvider, passportProviderInfo } from './zkEvm/provider/eip6963';
 import { ZkEvmProvider } from './zkEvm';
@@ -156,9 +156,11 @@ describe('Passport', () => {
 
   describe('connectEvm', () => {
     it('should execute connectEvm without error and return the provider', async () => {
-      const provider = await passport.connectEvm();
+      // #doc connect-evm
+      const passportProvider = await passport.connectEvm();
+      // #enddoc connect-evm
 
-      expect(provider).toBeInstanceOf(ZkEvmProvider);
+      expect(passportProvider).toBeInstanceOf(ZkEvmProvider);
       expect(ZkEvmProvider).toHaveBeenCalled();
     });
 
@@ -314,7 +316,9 @@ describe('Passport', () => {
   describe('login', () => {
     it('should login silently if there is a user', async () => {
       getUserMock.mockReturnValue(mockUserImx);
-      const user = await passport.login();
+      // #doc auth-users-without-wallet
+      const user: UserProfile | null = await passport.login();
+      // #enddoc auth-users-without-wallet
 
       expect(getUserMock).toBeCalledTimes(1);
       expect(authLoginMock).toBeCalledTimes(0);

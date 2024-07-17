@@ -327,16 +327,18 @@ describe('Passport', () => {
         });
 
         // user isn't logged in, so wont set signer when provider is instantiated
-        const zkEvmProvider = passport.connectEvm();
+        // #doc request-accounts
+        const provider = passport.connectEvm();
+        const accounts = await provider.request({
+          method: 'eth_requestAccounts',
+        });
+        // #enddoc request-accounts
 
         // user logs in, ethSigner is initialised
         await passport.login();
 
         mockGetUser.mockResolvedValue(Promise.resolve(mockOidcUserZkevm));
-        const accounts = await zkEvmProvider.request({
-          method: 'eth_requestAccounts',
-        });
-
+        console.log(accounts);
         expect(accounts).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
 
         const transaction: TransactionRequest = {
@@ -344,7 +346,7 @@ describe('Passport', () => {
           value: '5000000000000000',
           data: '0x00',
         };
-        const result = await zkEvmProvider.request({
+        const result = await provider.request({
           method: 'eth_sendTransaction',
           params: [transaction],
         });
