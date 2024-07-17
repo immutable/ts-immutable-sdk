@@ -87,12 +87,12 @@ NOTE: Some packages may have additional commands or require different setup step
 Build a package and start watch mode for a package:
 
 ```bash
-yarn w YOUR_PACKAGE_NAME
+yarn dev YOUR_PACKAGE_NAME
 ```
 
 e.g. for @imtbl/passport package
 ```bash
-yarn w @imtbl/passport
+yarn dev @imtbl/passport
 ```
 Changes in any packages that `@imtbl/passport` depends on will re-build passport package.
 
