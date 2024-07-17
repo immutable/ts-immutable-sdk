@@ -81,6 +81,7 @@
       "packages/internal/dex/sdk",
       "packages/internal/dex/sdk-sample-app",
       "packages/internal/bridge/sdk",
+      "packages/internal/eslint-rules",
       "packages/internal/factory/sdk",
       "packages/internal/factory/factory-sample-app",
       "packages/internal/generated-clients",

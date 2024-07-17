@@ -5,7 +5,9 @@
     "project": "./tsconfig.json",
     "tsconfigRootDir": "."
   },
+  "plugins": ["@imtbl/imtbl"],
   "rules": {
+    "@imtbl/imtbl/no-namespace-export": "error",
     "@typescript-eslint/naming-convention": [
       "error",
       {

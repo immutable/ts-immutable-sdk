@@ -1,4 +1,7 @@
+import * as workflowsImport from './workflows';
+
 export * from './getStarkSigner';
 export * from './passportImxProvider';
-export * as workflows from './workflows';
+export const workflows = { ...workflowsImport };
+
 export * from './passportImxProviderFactory';
