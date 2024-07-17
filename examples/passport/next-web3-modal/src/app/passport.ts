@@ -1,16 +1,17 @@
 import { config, passport } from '@imtbl/sdk';
 
-const PUBLISHABLE_KEY = 'PUBLISHABLE_KEY';
-const CLIENT_ID = 'CLIENT_ID';
-
 export const passportInstance = new passport.Passport({
   baseConfig: {
-    environment: config.Environment.PRODUCTION,
-    publishableKey: PUBLISHABLE_KEY,
+    environment: config.Environment.PRODUCTION, // or config.Environment.SANDBOX
+    publishableKey: '<YOUR_PUBLISHABLE_KEY>', // replace with your publishable API key from Hub
   },
-  clientId: CLIENT_ID,
-  redirectUri: 'http://localhost:3000/redirect',
-  logoutRedirectUri: 'http://localhost:3000/logout',
+  clientId: '<YOUR_CLIENT_ID>', // replace with your client ID from Hub
+  redirectUri: 'http://localhost:3000/redirect', // replace with one of your redirect URIs from Hub
+  logoutRedirectUri: 'http://localhost:3000/logout', // replace with one of your logout URIs from Hub
   audience: 'platform_api',
   scope: 'openid offline_access email transact',
+  popupOverlayOptions: {
+    disableGenericPopupOverlay: false, // Set to true to disable the generic pop-up overlay
+    disableBlockedPopupOverlay: false, // Set to true to disable the blocked pop-up overlay
+  }
 });
