@@ -101,7 +101,9 @@ export const initialise = async () => {
 
     // Get runtimeId and store it
     const { runtimeId, sTime } = response;
-    storeDetail(Detail.RUNTIME_ID, runtimeId);
+    if (!existingRuntimeId) {
+      storeDetail(Detail.RUNTIME_ID, runtimeId);
+    }
     setClockSkew(sTime);
   } catch (error) {
     initialised = false;
