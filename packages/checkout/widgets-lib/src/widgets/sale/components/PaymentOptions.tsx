@@ -2,7 +2,7 @@ import { Box, MenuItemSize } from '@biom3/react';
 
 import { SalePaymentTypes } from '@imtbl/checkout-sdk';
 import { motion } from 'framer-motion';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { listItemVariants, listVariants } from '../../../lib/animation/listAnimation';
 import { PaymentOption } from './PaymentOption';
 
@@ -36,9 +36,12 @@ export function PaymentOptions(props: PaymentOptionsProps) {
     ),
     [paymentOptions, disabledOptions, hideDisabledOptions],
   );
-  if (options.length === 1) {
-    onClick(options[1]);
-  }
+
+  useEffect(() => {
+    if (options.length === 1) {
+      onClick(options[0]);
+    }
+  }, [options, onClick]);
 
   return (
     <Box
