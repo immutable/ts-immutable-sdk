@@ -30,7 +30,7 @@ npx create-next-app@latest
 ```
 
 use the default options
-
+```
 ✔ What is your project named?wallets-with-nextjs-with-ethersjs
 ✔ Would you like to use TypeScript? … Yes
 ✔ Would you like to use ESLint? … Yes
@@ -38,6 +38,7 @@ use the default options
 ✔ Would you like to use `src/` directory? … Yes
 ✔ Would you like to use App Router? (recommended) … Yes
 ✔ Would you like to customize the default import alias (@/*)? No
+```
 
 create empty `yarn.lock` file in project folder
 
