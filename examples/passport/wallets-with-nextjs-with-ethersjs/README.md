@@ -62,15 +62,23 @@ yarn add ethers@^5.7.2
 
 add the `next.config.mjs` file to your gitignore so you don't commit the environment variables.
 
+delete the `next.config.mjs` file and commit the changes.
+
+create a new `next.config.mjs` and it will be ignored by github
+
 add environment variables to the next.config.mjs file and populate any API keys and secrets e.g.
 
 ```
+/** @type {import('next').NextConfig} */
 const nextConfig = {
     env: {
-        PUBLISHABLE_KEY: "ABC",
-        CLIENT_ID: "XYZ",
+        PUBLISHABLE_KEY: "pk_imapik-test-5ss4GpFy-n@$$Ye3LSox",
+        CLIENT_ID: "K846H940Uxokhz1aDb034QwBclYnAH24",
     }
 };
+
+export default nextConfig;
+
 ```
 
 
