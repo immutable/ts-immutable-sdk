@@ -53,11 +53,22 @@ install dependencies
 yarn install
 ```
 
-install immutable sdk and any other dependencies your example needs e.g.
+install `@imtbl/sdk` and any other dependencies your example needs e.g.
 
 ```
 yarn add @imtbl/sdk
 yarn add ethers@^5.7.2
+```
+
+add environment variables to the next.config.mjs file and populate any API keys and secrets e.g.
+
+```
+const nextConfig = {
+    env: {
+        PUBLISHABLE_KEY: "ABC",
+        CLIENT_ID: "XYZ",
+    }
+};
 ```
 
 start the project with hot reloading
