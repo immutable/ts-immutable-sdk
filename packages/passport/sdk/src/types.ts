@@ -160,3 +160,12 @@ export type IMXSigners = {
   starkSigner: StarkSigner;
   ethSigner: EthSigner;
 };
+
+export type LinkWalletV2Response = {
+  address: string;
+  type: string;
+  created_at: string;
+  updated_at: string;
+  name?: string;
+  clientName: string;
+};
