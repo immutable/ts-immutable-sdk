@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { Stack } from 'react-bootstrap';
 import { useStatusProvider } from '@/context/StatusProvider';
 import { usePassportProvider } from '@/context/PassportProvider';
 import CardStack from '@/components/CardStack';
 import WorkflowButton from '@/components/WorkflowButton';
+import LinkWallet from '@/components/LinkWallet';
 
 function PassportMethods() {
+  const [showLinkWallet, setShowLinkWallet] = useState<boolean>(false);
   const { isLoading } = useStatusProvider();
   const {
     logout,
@@ -14,7 +16,19 @@ function PassportMethods() {
     getAccessToken,
     getUserInfo,
     getLinkedAddresses,
+    linkWalletV2,
   } = usePassportProvider();
+
+  const handleLinkWalletClick = () => setShowLinkWallet(true);
+  const handleLinkWalletSubmit = useCallback(async (
+    type: string,
+    walletAddress: string,
+    signature: string,
+    nonce: string,
+  ) => {
+    await linkWalletV2(type, walletAddress, signature, nonce);
+    setShowLinkWallet(false);
+  }, [linkWalletV2]);
 
   return (
     <CardStack title="Passport Methods">
@@ -55,7 +69,20 @@ function PassportMethods() {
         >
           Get Linked Addresses
         </WorkflowButton>
+        <WorkflowButton
+          disabled={isLoading}
+          onClick={handleLinkWalletClick}
+        >
+          Link Wallet
+        </WorkflowButton>
       </Stack>
+      {showLinkWallet && (
+        <LinkWallet
+          showModal={showLinkWallet}
+          setShowModal={setShowLinkWallet}
+          onSubmit={handleLinkWalletSubmit}
+        />
+      )}
     </CardStack>
   );
 }
