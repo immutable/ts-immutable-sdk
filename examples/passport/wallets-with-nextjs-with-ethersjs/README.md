@@ -58,7 +58,7 @@ install immutable sdk and any other dependencies your example needs e.g.
 ```
 yarn add @imtbl/sdk
 yarn add ethers@^5.7.2
-``
+```
 
 start the project with hot reloading
 
