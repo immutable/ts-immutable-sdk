@@ -1,21 +1,18 @@
 import { IMXProvider } from '@imtbl/x-provider';
 import {
-  createConfig,
-  ImxApiClients,
-  imxApiConfig,
-  MultiRollupApiClients,
+  createConfig, ImxApiClients, imxApiConfig, MultiRollupApiClients,
 } from '@imtbl/generated-clients';
 import { IMXClient } from '@imtbl/x-client';
 import { Environment } from '@imtbl/config';
 
 import { identify, setPassportClientId, track } from '@imtbl/metrics';
-
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
 import { PassportImxProviderFactory } from './starkEx';
 import { PassportConfiguration } from './config';
 import {
   DeviceConnectResponse,
+  LinkWalletV2Response,
   PassportEventMap,
   PassportEvents,
   PassportModuleConfiguration,
@@ -29,6 +26,7 @@ import TypedEventEmitter from './utils/typedEventEmitter';
 import GuardianClient from './guardian';
 import logger from './utils/logger';
 import { announceProvider, passportProviderInfo } from './zkEvm/provider/eip6963';
+import { PassportError, PassportErrorType } from './errors/passportError';
 
 const buildImxClientConfig = (passportModuleConfiguration: PassportModuleConfiguration) => {
   if (passportModuleConfiguration.overrides) {
@@ -298,5 +296,32 @@ export class Passport {
     const headers = { Authorization: `Bearer ${user.accessToken}` };
     const getUserInfoResult = await this.multiRollupApiClients.passportProfileApi.getUserInfo({ headers });
     return getUserInfoResult.data.linked_addresses;
+  }
+
+  public async linkExternalWallet(
+    type: string,
+    walletAddress: string,
+    signature: string,
+    nonce: string,
+  ): Promise<LinkWalletV2Response> {
+    track('passport', 'linkWallet', { type });
+    const user = await this.authManager.getUser();
+    if (!user) {
+      throw new PassportError('User is not logged in', PassportErrorType.NOT_LOGGED_IN_ERROR);
+    }
+    const headers = { Authorization: `Bearer ${user.accessToken}` };
+    const linkWalletV2Request = {
+      type,
+      wallet_address: walletAddress,
+      signature,
+      nonce,
+    };
+    const linkWalletV2Result = await this.multiRollupApiClients
+      .passportProfileApi
+      .linkWalletV2(
+        { linkWalletV2Request },
+        { headers },
+      );
+    return linkWalletV2Result.data;
   }
 }
