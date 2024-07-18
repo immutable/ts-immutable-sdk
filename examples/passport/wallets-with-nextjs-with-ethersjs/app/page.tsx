@@ -1,18 +1,16 @@
 'use client';
-
+ 
 import { Web3Provider } from '@ethersproject/providers';
 import { config, passport } from '@imtbl/sdk';
-import { useEffect } from 'react';
-
 
 export default function Home() {
 
   const passportInstance = new passport.Passport({
     baseConfig: {
       environment: config.Environment.SANDBOX,
-      publishableKey: 'XXX', // replace with your publishable API key from Hub
+      publishableKey: process.env.PUBLISHABLE_KEY ?? "", // replace with your publishable API key from Hub
     },
-    clientId: 'XXX', // replace with your client ID from Hub
+    clientId: process.env.CLIENT_ID ?? "", // replace with your client ID from Hub
     redirectUri: 'http://localhost:3000/redirect', // replace with one of your redirect URIs from Hub
     logoutRedirectUri: 'http://localhost:3000/logout', // replace with one of your logout URIs from Hub
     audience: 'platform_api',
