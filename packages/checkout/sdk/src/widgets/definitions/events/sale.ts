@@ -1,4 +1,3 @@
-import { FundingBalance } from '@imtbl/checkout-widgets/src/widgets/sale/types';
 import { TokenInfo } from '../../../types';
 
 /**
@@ -89,7 +88,7 @@ export type SalePaymentMethod = {
  */
 export type SalePaymentToken = {
   /** Chosen payment token */
-  settlementType: FundingBalance['type'];
+  settlementType: string;
   type: string;
   token: TokenInfo;
   amount: string;
