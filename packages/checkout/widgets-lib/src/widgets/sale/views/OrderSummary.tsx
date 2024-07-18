@@ -95,7 +95,7 @@ export function OrderSummary({ subView }: OrderSummaryProps) {
 
     sendProceedToPay(
       SaleWidgetViews.ORDER_SUMMARY,
-      fundingItem,
+      fundingBalance,
       cryptoFiatState.conversions,
     );
     // checkoutPrimarySaleProceedToPay
