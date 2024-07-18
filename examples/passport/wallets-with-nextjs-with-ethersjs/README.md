@@ -60,6 +60,8 @@ yarn add @imtbl/sdk
 yarn add ethers@^5.7.2
 ```
 
+add the `next.config.mjs` file to your gitignore so you don't commit the environment variables.
+
 add environment variables to the next.config.mjs file and populate any API keys and secrets e.g.
 
 ```
@@ -70,6 +72,7 @@ const nextConfig = {
     }
 };
 ```
+
 
 start the project with hot reloading
 
