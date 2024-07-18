@@ -18,15 +18,15 @@
 import { ImmutableVerificationStatusEnum } from './immutable-verification-status-enum';
 // May contain unused imports in some cases
 // @ts-ignore
-import { SeaportERC20Item } from './seaport-erc20-item';
+import { SeaportERC1155Item } from './seaport-erc1155-item';
 // May contain unused imports in some cases
 // @ts-ignore
-import { SeaportNativeItem } from './seaport-native-item';
+import { SeaportERC721Item } from './seaport-erc721-item';
 
 /**
- * @type SeaportAdvancedOrderBuy
+ * @type SeaportAdvancedOrderSell
  * @export
  */
-export type SeaportAdvancedOrderBuy = SeaportERC20Item | SeaportNativeItem;
+export type SeaportAdvancedOrderSell = SeaportERC1155Item | SeaportERC721Item;
 
 

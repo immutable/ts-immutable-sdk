@@ -22,13 +22,21 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 // @ts-ignore
+import { APIError400 } from '../models';
+// @ts-ignore
 import { APIError401 } from '../models';
+// @ts-ignore
+import { APIError403 } from '../models';
 // @ts-ignore
 import { APIError500 } from '../models';
 // @ts-ignore
 import { BasicAPIError } from '../models';
 // @ts-ignore
+import { LinkWalletV2Request } from '../models';
+// @ts-ignore
 import { UserInfo } from '../models';
+// @ts-ignore
+import { Wallet } from '../models';
 /**
  * PassportProfileApi - axios parameter creator
  * @export
@@ -69,6 +77,44 @@ export const PassportProfileApiAxiosParamCreator = function (configuration?: Con
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Link an external EOA wallet to an Immutable Passport account by providing an EIP-712 signature.
+         * @summary Link wallet v2
+         * @param {LinkWalletV2Request} [linkWalletV2Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        linkWalletV2: async (linkWalletV2Request?: LinkWalletV2Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/passport-profile/v2/linked-wallets`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(linkWalletV2Request, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -87,6 +133,17 @@ export const PassportProfileApiFp = function(configuration?: Configuration) {
          */
         async getUserInfo(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserInfo>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getUserInfo(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Link an external EOA wallet to an Immutable Passport account by providing an EIP-712 signature.
+         * @summary Link wallet v2
+         * @param {LinkWalletV2Request} [linkWalletV2Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async linkWalletV2(linkWalletV2Request?: LinkWalletV2Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Wallet>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.linkWalletV2(linkWalletV2Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -108,8 +165,32 @@ export const PassportProfileApiFactory = function (configuration?: Configuration
         getUserInfo(options?: AxiosRequestConfig): AxiosPromise<UserInfo> {
             return localVarFp.getUserInfo(options).then((request) => request(axios, basePath));
         },
+        /**
+         * Link an external EOA wallet to an Immutable Passport account by providing an EIP-712 signature.
+         * @summary Link wallet v2
+         * @param {PassportProfileApiLinkWalletV2Request} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        linkWalletV2(requestParameters: PassportProfileApiLinkWalletV2Request = {}, options?: AxiosRequestConfig): AxiosPromise<Wallet> {
+            return localVarFp.linkWalletV2(requestParameters.linkWalletV2Request, options).then((request) => request(axios, basePath));
+        },
     };
 };
+
+/**
+ * Request parameters for linkWalletV2 operation in PassportProfileApi.
+ * @export
+ * @interface PassportProfileApiLinkWalletV2Request
+ */
+export interface PassportProfileApiLinkWalletV2Request {
+    /**
+     * 
+     * @type {LinkWalletV2Request}
+     * @memberof PassportProfileApiLinkWalletV2
+     */
+    readonly linkWalletV2Request?: LinkWalletV2Request
+}
 
 /**
  * PassportProfileApi - object-oriented interface
@@ -127,6 +208,18 @@ export class PassportProfileApi extends BaseAPI {
      */
     public getUserInfo(options?: AxiosRequestConfig) {
         return PassportProfileApiFp(this.configuration).getUserInfo(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Link an external EOA wallet to an Immutable Passport account by providing an EIP-712 signature.
+     * @summary Link wallet v2
+     * @param {PassportProfileApiLinkWalletV2Request} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PassportProfileApi
+     */
+    public linkWalletV2(requestParameters: PassportProfileApiLinkWalletV2Request = {}, options?: AxiosRequestConfig) {
+        return PassportProfileApiFp(this.configuration).linkWalletV2(requestParameters.linkWalletV2Request, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
