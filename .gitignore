@@ -34,4 +34,3 @@ docs/
 .nx/workspace-data
 nx-cloud.env
 dep-graph.json
-examples/passport/wallets-with-nextjs-with-ethersjs/next.config.mjs
