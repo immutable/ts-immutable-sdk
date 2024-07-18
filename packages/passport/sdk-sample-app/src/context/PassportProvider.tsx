@@ -114,6 +114,7 @@ export function PassportProvider({
   const linkWalletV2 = useCallback(async (type: string, walletAddress: string, signature: string, nonce: string) => {
     setIsLoading(true);
     const linkedWallet = await passportClient.linkExternalWallet(type, walletAddress, signature, nonce);
+    addMessage('Link Wallet', linkedWallet);
     setIsLoading(false);
 
     return linkedWallet;

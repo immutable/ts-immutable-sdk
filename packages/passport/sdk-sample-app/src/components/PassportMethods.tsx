@@ -19,7 +19,15 @@ function PassportMethods() {
     linkWalletV2,
   } = usePassportProvider();
 
-  const handleLinkWalletClick = () => setShowLinkWallet(true);
+  const handleLinkWalletClick = async () => {
+    const userInfo = await getUserInfo();
+    if (userInfo) {
+      setShowLinkWallet(true);
+    } else {
+      console.error('Error checking login status');
+    }
+  };
+  
   const handleLinkWalletSubmit = useCallback(async (
     type: string,
     walletAddress: string,
