@@ -35,7 +35,7 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "dev-with-sdk": "concurrently 'yarn dev' 'yarn --cwd ../../../ dev @imtbl/passport'",
+    "dev-with-sdk": "concurrently 'yarn dev' 'yarn run --top-level dev @imtbl/passport'",
     "export": "next export",
     "lint": "eslint ./src --ext .ts --max-warnings=0",
     "start": "next start",
