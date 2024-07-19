@@ -121,7 +121,7 @@ export function PassportProvider({
       addMessage('Link wallet failed', e.message);
     }
     setIsLoading(false);
-    return null;
+    return undefined;
   }, [passportClient, setIsLoading, addMessage]);
 
   const logout = useCallback(async () => {
