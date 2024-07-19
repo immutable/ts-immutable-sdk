@@ -16,6 +16,7 @@ export {
   RpcErrorCode,
 } from './zkEvm/JsonRpcError';
 export {
+  LinkedWallet,
   UserProfile,
   PassportOverrides,
   PassportModuleConfiguration,
