@@ -26,7 +26,7 @@ create the nextjs project
 
 ```
 cd examples/passport
-npx create-next-app@latest
+yarn dlx create-next-app@latest
 ```
 
 use the default options
@@ -40,7 +40,7 @@ use the default options
 ✔ Would you like to customize the default import alias (@/*)? No
 ```
 
-create empty `yarn.lock` file in project folder
+create empty `yarn.lock` file in project folder //can remove
 
 ```
 cd wallets-with-nextjs-with-ethersjs
@@ -57,30 +57,19 @@ install `@imtbl/sdk` and any other dependencies your example needs e.g.
 
 ```
 yarn add @imtbl/sdk
-yarn add ethers@^5.7.2
+yarn add @ethersproject/providers@^5.7.2
 ```
 
-add the `next.config.mjs` file to your gitignore so you don't commit the environment variables.
+create a `.env` file in the root of the example.
 
-delete the `next.config.mjs` file and commit the changes.
-
-create a new `next.config.mjs` and it will be ignored by github
-
-add environment variables to the next.config.mjs file and populate any API keys and secrets e.g.
+add environment variables to the `.env` file and populate any API keys and secrets e.g.
 
 ```
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-    env: {
-        PUBLISHABLE_KEY: "pk_imapik-test-5ss4GpFy-n@$$Ye3LSox",
-        CLIENT_ID: "K846H940Uxokhz1aDb034QwBclYnAH24",
-    }
-};
-
-export default nextConfig;
-
+NEXT_PUBLIC_PUBLISHABLE_KEY="ABC"
+NEXT_PUBLIC_CLIENT_ID="XYZ"
 ```
 
+note: variables must be prefixed with `NEXT_PUBLIC_` to be piped into the browser env.
 
 start the project with hot reloading
 
