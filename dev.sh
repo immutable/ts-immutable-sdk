@@ -22,7 +22,7 @@ else
 fi
 
 if echo "$PACKAGE_NAME" | grep -q "sample"; then
-  echo -e "You are targetting a sample app. Dev mode only supports SDK packages. \nPlease run development script in your sample app instead."
+  echo -e "You are targeting a sample app. Dev mode only supports SDK packages. \nPlease run development script in your sample app instead."
   exit 1
 fi
 
