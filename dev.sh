@@ -6,7 +6,7 @@ if [ -z "$1" ]; then
   echo ""
   echo "Fetching package list..."
   # This command might change based on your nx setup. It assumes you can list projects like this.
-  nx show projects | grep @ | sort | awk '{print NR-1 " " $1}' > /tmp/nx_projects
+  nx show projects | grep @ | grep -v sample-app | sort | awk '{print NR-1 " " $1}' > /tmp/nx_projects
   cat /tmp/nx_projects
   echo ""
   echo "Enter the number of the project you want to select:"
@@ -19,6 +19,11 @@ if [ -z "$1" ]; then
   PACKAGE_NAME=$project_name
 else
   PACKAGE_NAME=$1
+fi
+
+if echo "$PACKAGE_NAME" | grep -q "sample"; then
+  echo -e "You are targetting a sample app. Dev mode only supports to be published SDK packages. \nPlease run development script in your sample app instead."
+  exit 1
 fi
 
 # Run nx commands with the selected or provided package name

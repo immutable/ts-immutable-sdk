@@ -31,9 +31,8 @@ yarn dev
 Running the Passport SDK Sample App with the Passport SDK supporting hot reloading:
 
 ```bash
-# Run the Passport SDK first
-# Context: passport in ./sdk
-yarn dev
+# Run dev mode at root
+yarn dev @imtbl/passport
 
 # Run the Passport SDK Sample App in a new terminal
 # Context: passport-sdk-sample-app in ./sdk-sample-app
@@ -74,24 +73,27 @@ Typechecking:
 yarn typecheck
 ```
 
-### About 
+### About
 
 Passport is a blockchain-based identity and wallet system that caters to the needs of Web3 games. It offers a persistent identity that accompanies users across Web3 games, ensuring a consistent configuration across all applications.
 
 Passport also comes equipped with a non-custodial wallet as a default option for each user, ensuring a transaction experience comparable to web2 standards.
 
-The Passport sample application is a simple NextJS web app that provides a basic UI for many of the features in the Passport SDK. It can also be used to locally test any changes to the SDK. 
+The Passport sample application is a simple NextJS web app that provides a basic UI for many of the features in the Passport SDK. It can also be used to locally test any changes to the SDK.
 
 [Read more about the Passport SDK here](../../README.md#passport)
 
 ### Sample App Usage
 
 #### IMX workflows
+
 For all IMX workflows, you are required to log in with Passport before you can interact. You can do this with the dedicated `Login` button in the `Passport Methods` group, or be prompted when you first click the `Connect` button in the `IMX Workflow` group. if this is your first time setting up Passport, you will need to click the `Register User` button before interacting with any of the other workflows.
 
 #### ZkEvm workflows
-All ZkEvm workflows except `eth_requestAccounts` and `eth_sendTransaction` do not require you to be logged in and can be executed without having a connected Passport wallet. Specifically for `eth_sendTransaction` however, you must call `eth_requestAccounts` first. 
+
+All ZkEvm workflows except `eth_requestAccounts` and `eth_sendTransaction` do not require you to be logged in and can be executed without having a connected Passport wallet. Specifically for `eth_sendTransaction` however, you must call `eth_requestAccounts` first.
 Some function calls, such as `eth_gasPrice` and `eth_getBalance` will return a value prefixed by `0x` - these are in hexidecimal format and must be converted to base 10 if you are looking for the actual number.
 
 #### Logging out
+
 The sample app will keep authentication tokens in local storage and attempt to silently re-authenticate you if they are expired. If you wish to clear your authentication token in order to change accounts or environments, you can use the `Logout` button under `Passport Methods`.
