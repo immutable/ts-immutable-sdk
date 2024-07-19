@@ -161,6 +161,13 @@ export type IMXSigners = {
   ethSigner: EthSigner;
 };
 
+export type LinkWalletParams = {
+  type: string;
+  walletAddress: string;
+  signature: string;
+  nonce: string;
+};
+
 export type LinkedWallet = {
   address: string;
   type: string;

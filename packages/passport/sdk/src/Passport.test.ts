@@ -375,7 +375,9 @@ describe('Passport', () => {
       getUserMock.mockReturnValue(mockUser);
       linkExternalWalletMock.mockReturnValue(mockLinkedWallet);
 
-      const result = await passport.linkExternalWallet('type', 'address', 'signature', 'nonce');
+      const result = await passport.linkExternalWallet({
+        type: 'type', walletAddress: 'address', signature: 'signature', nonce: 'nonce',
+      });
 
       expect(result).toEqual(mockLinkedWallet.data);
     });
@@ -383,7 +385,9 @@ describe('Passport', () => {
     it('should throw error if user is not logged in', async () => {
       getUserMock.mockReturnValue(null);
 
-      await expect(passport.linkExternalWallet('type', 'address', 'signature', 'nonce')).rejects.toThrowError();
+      await expect(passport.linkExternalWallet({
+        type: 'type', walletAddress: 'address', signature: 'signature', nonce: 'nonce',
+      })).rejects.toThrowError();
     });
   });
 });

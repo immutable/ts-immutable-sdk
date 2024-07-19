@@ -34,7 +34,9 @@ function PassportMethods() {
     signature: string,
     nonce: string,
   ) => {
-    await linkWallet(type, walletAddress, signature, nonce);
+    await linkWallet({
+      type, walletAddress, signature, nonce,
+    });
     setShowLinkWallet(false);
   }, [linkWallet]);
 

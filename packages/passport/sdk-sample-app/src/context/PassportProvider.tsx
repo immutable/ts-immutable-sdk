@@ -2,7 +2,12 @@ import React, {
   createContext, useCallback, useContext, useMemo, useState,
 } from 'react';
 import { IMXProvider } from '@imtbl/x-provider';
-import { LinkedWallet, Provider, UserProfile } from '@imtbl/passport';
+import {
+  LinkWalletParams,
+  LinkedWallet,
+  Provider,
+  UserProfile,
+} from '@imtbl/passport';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { useStatusProvider } from '@/context/StatusProvider';
 
@@ -17,12 +22,7 @@ const PassportContext = createContext<{
   getAccessToken: () => Promise<string | undefined>;
   getUserInfo: () => Promise<UserProfile | undefined>;
   getLinkedAddresses: () => Promise<string[] | undefined>;
-  linkWallet: (
-    type: string,
-    walletAddress: string,
-    signature: string,
-    nonce: string
-  ) => Promise<LinkedWallet | undefined>;
+  linkWallet: (params: LinkWalletParams) => Promise<LinkedWallet | undefined>;
 }>({
       imxProvider: undefined,
       zkEvmProvider: undefined,
@@ -111,10 +111,10 @@ export function PassportProvider({
     return linkedAddresses;
   }, [passportClient, setIsLoading, addMessage]);
 
-  const linkWallet = useCallback(async (type: string, walletAddress: string, signature: string, nonce: string) => {
+  const linkWallet = useCallback(async (params: LinkWalletParams) => {
     setIsLoading(true);
     try {
-      const linkedWallet = await passportClient.linkExternalWallet(type, walletAddress, signature, nonce);
+      const linkedWallet = await passportClient.linkExternalWallet(params);
       addMessage('Link Wallet', linkedWallet);
       return linkedWallet;
     } catch (e: any) {

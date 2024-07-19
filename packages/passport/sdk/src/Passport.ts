@@ -12,7 +12,7 @@ import { PassportImxProviderFactory } from './starkEx';
 import { PassportConfiguration } from './config';
 import {
   DeviceConnectResponse,
-  LinkedWallet,
+  LinkedWallet, LinkWalletParams,
   PassportEventMap,
   PassportEvents,
   PassportModuleConfiguration,
@@ -298,23 +298,18 @@ export class Passport {
     return getUserInfoResult.data.linked_addresses;
   }
 
-  public async linkExternalWallet(
-    type: string,
-    walletAddress: string,
-    signature: string,
-    nonce: string,
-  ): Promise<LinkedWallet> {
-    track('passport', 'linkWallet', { type });
+  public async linkExternalWallet(params: LinkWalletParams): Promise<LinkedWallet> {
+    track('passport', 'linkWallet', { type: params.type });
     const user = await this.authManager.getUser();
     if (!user) {
       throw new PassportError('User is not logged in', PassportErrorType.NOT_LOGGED_IN_ERROR);
     }
     const headers = { Authorization: `Bearer ${user.accessToken}` };
     const linkWalletV2Request = {
-      type,
-      wallet_address: walletAddress,
-      signature,
-      nonce,
+      type: params.type,
+      wallet_address: params.walletAddress,
+      signature: params.signature,
+      nonce: params.nonce,
     };
     const linkWalletV2Result = await this.multiRollupApiClients
       .passportProfileApi
