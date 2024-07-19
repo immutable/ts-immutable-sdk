@@ -45,17 +45,16 @@ jobs:
           ref: "${{ env.TS_SDK_TAG }}"
           fetch-depth: 0
 
-      # uncomment when the script it merged and tagged
-      # - name: Check SDK Team Membership
-      #   id: check_team
-      #   run: |
-      #     ./.github/scripts/check-team-membership.sh "${{ github.actor }}" "${{ env.GH_TOKEN }}"
-      #     source "$GITHUB_ENV"
-      #     echo "${{ github.actor }} is a member of the SDK team: $IS_MEMBER"
-      #     if [[ "$IS_MEMBER" != "true" ]]; then
-      #       echo "Not a member of the SDK team, exiting workflow"
-      #       exit 1
-      #     fi
+      - name: Check SDK Team Membership
+        id: allowed_actors_check
+        # only allow SDK team members to run this workflow
+        # ["ckailash", "CodeSchwert", "wdinau", "shineli1984", "nattb8", "YermekG", "zaidarain1"]
+        if: ${{ contains(fromJson(env.SDK_TEAM_MEMBERS), github.triggering_actor) }}
+        run: echo "ALLOWED_ACTOR=true" >> $GITHUB_OUTPUT
+
+      - name: Allowed Actors Filter
+        if: ${{ steps.allowed_actors_check.outputs.ALLOWED_ACTOR != 'true' }}
+        run: exit 1
 
       - name: Use Node.js
         uses: actions/setup-node@v4
@@ -97,7 +96,7 @@ jobs:
   create-unity-pr:
     name: Create Unity PR
     needs: build-game-bridge
-    # if: ${{ github.event.inputs.game_engine == 'Unity' || github.event.inputs.game_engine == 'Both' }}
+    if: ${{ github.event.inputs.game_engine == 'Unity' || github.event.inputs.game_engine == 'Both' }}
     runs-on: ubuntu-latest-4-cores
     steps:
       - name: Checkout SDK Repository

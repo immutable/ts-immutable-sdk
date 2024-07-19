@@ -6,7 +6,9 @@
 # - TS_SDK_HASH: The git hash of the tag
 
 set -e
-set -x
+if [ -n "$CI" ]; then
+  set -x
+fi
 
 # The files to update
 FILE_PATHS=("./dist/unity/index.html" "./dist/unreal/index.js" "./dist/unreal/index.js.map")
@@ -20,26 +22,52 @@ do
   fi
 done
 
-# check the TS_SDK_TAG environment variable is set
-if [ -z "$TS_SDK_TAG" ]; then
-  echo "TS_SDK_TAG environment variable not found. Exiting..."
-  exit 1
+# Check if running in a CI environment
+if [ -n "$CI" ]; then
+  # Check if TS_SDK_TAG environment variable is set
+  if [ -z "$TS_SDK_TAG" ]; then
+      echo "TS_SDK_TAG environment variable not found. Exiting..."
+      exit 1
+  fi
+
+  # Check if TS_SDK_HASH environment variable is set
+  if [ -z "$TS_SDK_HASH" ]; then
+      echo "TS_SDK_HASH environment variable not found. Exiting..."
+      exit 1
+  fi
+
+  # use regex to check the current tag is a valid version
+  # example valid version: 1.2.3
+  # or: 1.2.3-alpha 
+  # or: 1.2.3-alpha.1
+  if [[ ! $TS_SDK_TAG =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?$ ]]; then
+    echo "Current tag is not a valid version. Exiting..."
+    exit 1
+  fi
 fi
 
-# check the TS_SDK_HASH environment variable is set
-if [ -z "$TS_SDK_HASH" ]; then
-  echo "TS_SDK_HASH environment variable not found. Exiting..."
-  exit 1
+# if running locally, set the environment variables
+if [ ! -n "$CI" ]; then
+  export TS_SDK_TAG=$(git describe --tags --abbrev=0)
+  export TS_SDK_HASH=$(git rev-parse $TS_SDK_TAG)
+
+  # get the hash of the current HEAD
+  export TS_SDK_LOCAL_HEAD_HASH=$(git rev-parse HEAD)
+
+  # check the hash matches the has from the tag
+  if [ "$TS_SDK_HASH" != "$TS_SDK_LOCAL_HEAD_HASH" ]; then
+    # warn the user that the current tag does not match the current HEAD
+    # but continue with the update
+    echo "[!!!WARNING!!!]"
+    echo "[!!!WARNING!!!]"
+    echo "[!!!WARNING!!!] The current tag does not match the current HEAD. Do not commit this game brige to the Game SDK repos..."
+    echo "[!!!WARNING!!!]"
+    echo "[!!!WARNING!!!]"
+  fi
 fi
 
-# use regex to check the current tag is a valid version
-# example valid version: 1.2.3
-# or: 1.2.3-alpha 
-# or: 1.2.3-alpha.1
-if [[ ! $TS_SDK_TAG =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?$ ]]; then
-  echo "Current tag is not a valid version. Exiting..."
-  exit 1
-fi
+echo "Updating __SDK_VERSION__ to $TS_SDK_TAG"
+echo "Updating __SDK_VERSION_SHA__ to $TS_SDK_HASH"
 
 # update variables in output files
 for FILE_PATH in "${FILE_PATHS[@]}"
