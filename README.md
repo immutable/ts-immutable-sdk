@@ -82,38 +82,20 @@ Most packages in the workspace have their own README file that provides specific
 
 NOTE: Some packages may have additional commands or require different setup steps, for example in a certain package the development mode may be started with `yarn start:dev` instead of `yarn start`, or `yarn dev`. For the steps below we will be assuming defaults.
 
-### Development Mode
+### Development watch mode
 
-Development mode allows you to run a package in a local development environment. This is useful for testing changes and new features before deploying them to production. Any changes made will be reflected in real-time on save, so you can see the effects of your changes immediately. These are propogated in real time to the sample app, if it is running, for that SDK too.
-
-Development mode for sdk packages will tend to use rollup and its watch mode to rebuild the package on file changes. This build output, stored in the dist folder of the sdk package, is what is exposed to any other packages that depend on it, including the sample app.
-
-To run a package in development mode, you can use the following command in the context of that package:
+Build a package and start watch mode for a package:
 
 ```bash
-# Context: Specified package
-yarn start
+yarn dev YOUR_PACKAGE_NAME
 ```
 
-Some packages also come with a sample app that you can run in development mode. To run the sample app, you first need to run the SDK it depends on in development mode, and then run the sample app development mode in a seperate terminal. For example, to run the `checkout-sdk-sample-app` located at `/packages/checkout/sdk-sample-app`, you can use the following commands:
-
+e.g. for @imtbl/passport package
 ```bash
-yarn workspace @imtbl/checkout-sdk start
-
-# Or from the root of the monorepo
-cd packages/checkout/sdk
-yarn start
+yarn dev @imtbl/passport
 ```
+Changes in any packages that `@imtbl/passport` depends on will re-build passport package.
 
-Then, in a separate terminal:
-
-```bash
-yarn workspace @imtbl/checkout-sdk-sample-app start
-
-# Or from the root of the monorepo
-cd packages/checkout/sdk-sample-app
-yarn start
-```
 
 ### Running Tests
 

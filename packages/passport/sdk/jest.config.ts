@@ -6,6 +6,7 @@ const config: Config = {
   moduleDirectories: ['node_modules', 'src'],
   moduleNameMapper: {
     '@imtbl/config': '<rootDir>../../config/src',
+    '@imtbl/metrics': '<rootDir>../../internal/metrics/src',
     '@imtbl/generated-clients': '<rootDir>../../internal/generated-clients/src',
     '@imtbl/guardian': '<rootDir>../../internal/guardian/src',
     '@imtbl/x-client': '<rootDir>../../x-client/src',
