@@ -7,6 +7,6 @@ import { useEffect } from 'react';
 
 export default function Logout() {
 
-  return (<h1>Redirect</h1>);
+  return (<h1>Logout</h1>);
 
 }
