@@ -85,10 +85,9 @@ export function OrderReview({
   const onSelect = (selectedIndex: number) => {
     setSelectedCurrencyIndex(selectedIndex);
 
-    const { fundingItem } = fundingBalances[selectedIndex];
     sendSelectedPaymentToken(
       OrderSummarySubViews.REVIEW_ORDER,
-      fundingItem,
+      fundingBalances[selectedIndex],
       conversions,
     );
     // checkoutPrimarySalePaymentTokenSelected
@@ -134,7 +133,7 @@ export function OrderReview({
   // Trigger page loaded event
   useMount(
     () => {
-      const tokens = fundingBalances.map(({ fundingItem }) => getPaymentTokenDetails(fundingItem, conversions));
+      const tokens = fundingBalances.map((fb) => getPaymentTokenDetails(fb, conversions));
       sendPageView(SaleWidgetViews.ORDER_SUMMARY, {
         subView: OrderSummarySubViews.REVIEW_ORDER,
         tokens,
