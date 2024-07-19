@@ -8,7 +8,7 @@ import LinkWallet from '@/components/LinkWallet';
 
 function PassportMethods() {
   const [showLinkWallet, setShowLinkWallet] = useState<boolean>(false);
-  const { isLoading, addMessage } = useStatusProvider();
+  const { isLoading } = useStatusProvider();
   const {
     logout,
     login,
