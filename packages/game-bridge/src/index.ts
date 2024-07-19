@@ -91,7 +91,6 @@ type CommonCallbackData = {
   error: string | null;
   errorType?: string | null;
   result?: any;
-  accounts?: string[];
 };
 
 // Type for callback data specific to initDeviceFlow
@@ -102,7 +101,11 @@ type InitDeviceFlowCallbackData = CommonCallbackData & {
   interval: number;
 };
 
-type CallbackData = CommonCallbackData | InitDeviceFlowCallbackData;
+type RequestAccountsCallbackData = CommonCallbackData & {
+  accounts: string[];
+};
+
+type CallbackData = CommonCallbackData | InitDeviceFlowCallbackData | RequestAccountsCallbackData;
 
 const callbackToGame = (data: CallbackData) => {
   const message = JSON.stringify(data);
@@ -742,7 +745,7 @@ window.callFunction = async (jsonData: string) => {
       error: wrappedError.message,
     });
 
-    console.log(error);
+    console.log('callFunction error', error);
     callbackToGame({
       responseFor: fxName,
       requestId,
