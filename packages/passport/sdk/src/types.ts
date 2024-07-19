@@ -161,7 +161,7 @@ export type IMXSigners = {
   ethSigner: EthSigner;
 };
 
-export type LinkWalletV2Response = {
+export type LinkedWallet = {
   address: string;
   type: string;
   created_at: string;

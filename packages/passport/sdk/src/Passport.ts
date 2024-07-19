@@ -12,7 +12,7 @@ import { PassportImxProviderFactory } from './starkEx';
 import { PassportConfiguration } from './config';
 import {
   DeviceConnectResponse,
-  LinkWalletV2Response,
+  LinkedWallet,
   PassportEventMap,
   PassportEvents,
   PassportModuleConfiguration,
@@ -303,7 +303,7 @@ export class Passport {
     walletAddress: string,
     signature: string,
     nonce: string,
-  ): Promise<LinkWalletV2Response> {
+  ): Promise<LinkedWallet> {
     track('passport', 'linkWallet', { type });
     const user = await this.authManager.getUser();
     if (!user) {
@@ -322,6 +322,6 @@ export class Passport {
         { linkWalletV2Request },
         { headers },
       );
-    return linkWalletV2Result.data;
+    return { ...linkWalletV2Result.data };
   }
 }

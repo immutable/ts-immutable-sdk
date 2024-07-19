@@ -2,7 +2,7 @@ import React, {
   createContext, useCallback, useContext, useMemo, useState,
 } from 'react';
 import { IMXProvider } from '@imtbl/x-provider';
-import { LinkWalletV2Response, Provider, UserProfile } from '@imtbl/passport';
+import { LinkedWallet, Provider, UserProfile } from '@imtbl/passport';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { useStatusProvider } from '@/context/StatusProvider';
 
@@ -17,12 +17,12 @@ const PassportContext = createContext<{
   getAccessToken: () => Promise<string | undefined>;
   getUserInfo: () => Promise<UserProfile | undefined>;
   getLinkedAddresses: () => Promise<string[] | undefined>;
-  linkWalletV2: (
+  linkWallet: (
     type: string,
     walletAddress: string,
     signature: string,
     nonce: string
-  ) => Promise<LinkWalletV2Response | undefined>;
+  ) => Promise<LinkedWallet | undefined>;
 }>({
       imxProvider: undefined,
       zkEvmProvider: undefined,
@@ -34,7 +34,7 @@ const PassportContext = createContext<{
       getAccessToken: () => Promise.resolve(undefined),
       getUserInfo: () => Promise.resolve(undefined),
       getLinkedAddresses: () => Promise.resolve(undefined),
-      linkWalletV2: () => Promise.resolve(undefined),
+      linkWallet: () => Promise.resolve(undefined),
     });
 
 export function PassportProvider({
@@ -111,13 +111,17 @@ export function PassportProvider({
     return linkedAddresses;
   }, [passportClient, setIsLoading, addMessage]);
 
-  const linkWalletV2 = useCallback(async (type: string, walletAddress: string, signature: string, nonce: string) => {
+  const linkWallet = useCallback(async (type: string, walletAddress: string, signature: string, nonce: string) => {
     setIsLoading(true);
-    const linkedWallet = await passportClient.linkExternalWallet(type, walletAddress, signature, nonce);
-    addMessage('Link Wallet', linkedWallet);
+    try {
+      const linkedWallet = await passportClient.linkExternalWallet(type, walletAddress, signature, nonce);
+      addMessage('Link Wallet', linkedWallet);
+      return linkedWallet;
+    } catch (e: any) {
+      addMessage('Link wallet failed', e.message);
+    }
     setIsLoading(false);
-
-    return linkedWallet;
+    return null;
   }, [passportClient, setIsLoading, addMessage]);
 
   const logout = useCallback(async () => {
@@ -158,7 +162,7 @@ export function PassportProvider({
     getAccessToken,
     getUserInfo,
     getLinkedAddresses,
-    linkWalletV2,
+    linkWallet,
   }), [
     imxProvider,
     zkEvmProvider,
@@ -170,7 +174,7 @@ export function PassportProvider({
     getAccessToken,
     getUserInfo,
     getLinkedAddresses,
-    linkWalletV2,
+    linkWallet,
   ]);
 
   return (
@@ -192,7 +196,7 @@ export function usePassportProvider() {
     getAccessToken,
     getUserInfo,
     getLinkedAddresses,
-    linkWalletV2,
+    linkWallet,
   } = useContext(PassportContext);
   return {
     imxProvider,
@@ -205,6 +209,6 @@ export function usePassportProvider() {
     getAccessToken,
     getUserInfo,
     getLinkedAddresses,
-    linkWalletV2,
+    linkWallet,
   };
 }

@@ -4,7 +4,6 @@ import {
 } from 'react-bootstrap';
 import { ModalProps } from '@/types';
 import { Heading } from '@biom3/react';
-import { generateNonce } from 'siwe';
 
 function LinkWallet({ showModal, setShowModal, onSubmit }: ModalProps & {
   onSubmit: (type: string, walletAddress: string, signature: string, nonce: string) => void;
@@ -12,6 +11,7 @@ function LinkWallet({ showModal, setShowModal, onSubmit }: ModalProps & {
   const [type, setType] = useState<string>('');
   const [walletAddress, setWalletAddress] = useState<string>('');
   const [signature, setSignature] = useState<string>('');
+  const [nonce, setNonce] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isInvalid, setInvalid] = useState<boolean | undefined>(undefined);
 
@@ -37,7 +37,6 @@ function LinkWallet({ showModal, setShowModal, onSubmit }: ModalProps & {
       setInvalid(false);
       setIsSubmitting(true);
       try {
-        const nonce = generateNonce();
         await onSubmit(type, walletAddress, signature, nonce);
       } catch (err) {
         console.error('Error linking wallet:', err);
@@ -105,6 +104,21 @@ function LinkWallet({ showModal, setShowModal, onSubmit }: ModalProps & {
             />
             <Form.Control.Feedback type="invalid">
               Signature is required
+            </Form.Control.Feedback>
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>
+              Nonce
+              <span style={{ color: 'red' }}> *</span>
+            </Form.Label>
+            <Form.Control
+              required
+              type="text"
+              value={nonce}
+              onChange={(e) => setNonce(e.target.value)}
+            />
+            <Form.Control.Feedback type="invalid">
+              Nonce is required
             </Form.Control.Feedback>
           </Form.Group>
           <Stack direction="horizontal" gap={3}>

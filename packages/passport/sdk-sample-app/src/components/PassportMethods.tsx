@@ -8,7 +8,7 @@ import LinkWallet from '@/components/LinkWallet';
 
 function PassportMethods() {
   const [showLinkWallet, setShowLinkWallet] = useState<boolean>(false);
-  const { isLoading } = useStatusProvider();
+  const { isLoading, addMessage } = useStatusProvider();
   const {
     logout,
     login,
@@ -16,7 +16,7 @@ function PassportMethods() {
     getAccessToken,
     getUserInfo,
     getLinkedAddresses,
-    linkWalletV2,
+    linkWallet,
   } = usePassportProvider();
 
   const handleLinkWalletClick = async () => {
@@ -27,16 +27,16 @@ function PassportMethods() {
       console.error('Error checking login status');
     }
   };
-  
+
   const handleLinkWalletSubmit = useCallback(async (
     type: string,
     walletAddress: string,
     signature: string,
     nonce: string,
   ) => {
-    await linkWalletV2(type, walletAddress, signature, nonce);
+    await linkWallet(type, walletAddress, signature, nonce);
     setShowLinkWallet(false);
-  }, [linkWalletV2]);
+  }, [linkWallet]);
 
   return (
     <CardStack title="Passport Methods">
