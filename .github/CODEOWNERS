@@ -21,4 +21,4 @@
 /packages/minting-backend @shineli1984
 /packages/webhook @shineli1984
 /packages/game-bridge @immutable/sdk
-/samples @immutable/sdk
+/examples @immutable/sdk

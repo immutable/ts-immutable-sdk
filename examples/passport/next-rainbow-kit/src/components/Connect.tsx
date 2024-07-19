@@ -1,3 +1,4 @@
+import '@rainbow-me/rainbowkit/styles.css';
 import { passportInstance } from '@/app/passport';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useState } from 'react';

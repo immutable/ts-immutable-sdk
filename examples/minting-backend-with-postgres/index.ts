@@ -1,3 +1,4 @@
+// #doc setup-postgres
 import Fastify, { FastifyReply, FastifyRequest } from 'fastify'
 import { mintingBackend, config } from '@imtbl/sdk';
 import { Pool } from 'pg';
@@ -28,7 +29,9 @@ const minting = new mintingBackend.MintingBackendModule({
   persistence: mintingPersistence,
   logger: console,
 });
+// #enddoc setup-postgres
 
+// #doc mint-request
 interface MintRequest {
   mintTo: string;
 }
@@ -55,14 +58,17 @@ fastify.post('/mint', async (request: FastifyRequest<{ Body: MintRequest }>, rep
   });
   reply.send({});
 });
+// #enddoc mint-request
 
+// #doc webhook
 const url = "/api/process_webhook_event" // Set this url on the wbehook config screen in hub.immutable.com
 fastify.post(url, async (request: FastifyRequest<any>, reply: any) => {
   await minting.processMint(request.body as any);
   reply.send({ status: "ok" });
 });
+// #enddoc webhook
 
-
+// #doc start-server
 /**
  * Run the server!
  */
@@ -79,3 +85,4 @@ const start = async () => {
   }
 }
 start();
+// #enddoc start-server

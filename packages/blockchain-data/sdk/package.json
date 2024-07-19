@@ -34,7 +34,7 @@
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "NODE_ENV=production rollup --config rollup.config.js",
-    "dev": "rollup --config rollup.config.js -w",
+    "d": "swc src -d dist --strip-leading-paths --ignore '**/*.test.*'",
     "generate-types": "typechain --target=ethers-v5 --out-dir=src/typechain/types 'abi/*.json'",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "test": "jest",
