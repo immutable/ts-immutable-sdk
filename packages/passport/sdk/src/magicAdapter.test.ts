@@ -4,7 +4,7 @@ import MagicAdapter from './magicAdapter';
 import { PassportConfiguration } from './config';
 import { PassportError, PassportErrorType } from './errors/passportError';
 
-const loginWithOIDCMock:jest.MockedFunction<(args: LoginWithOpenIdParams) => Promise<void>> = jest.fn();
+const loginWithOIDCMock: jest.MockedFunction<(args: LoginWithOpenIdParams) => Promise<void>> = jest.fn();
 
 const rpcProvider = {};
 
@@ -23,7 +23,6 @@ describe('MagicWallet', () => {
     magicProviderId: providerId,
   } as PassportConfiguration;
   const idToken = 'e30=.e30=.e30=';
-  const preload = jest.fn();
 
   beforeEach(() => {
     jest.resetAllMocks();
@@ -35,7 +34,6 @@ describe('MagicWallet', () => {
         logout: logoutMock,
       },
       rpcProvider,
-      preload,
     }));
   });
 
@@ -56,7 +54,6 @@ describe('MagicWallet', () => {
       });
       it('starts initialising the magicClient', () => {
         jest.spyOn(window.document, 'readyState', 'get').mockReturnValue('complete');
-        preload.mockResolvedValue(Promise.resolve());
         const magicAdapter = new MagicAdapter(config);
         // @ts-ignore
         expect(magicAdapter.lazyMagicClient).toBeDefined();
@@ -83,13 +80,13 @@ describe('MagicWallet', () => {
 
   describe('login', () => {
     it('should call loginWithOIDC and initialise the provider with the correct arguments', async () => {
-      preload.mockResolvedValue(Promise.resolve());
       const magicAdapter = new MagicAdapter(config);
       const magicProvider = await magicAdapter.login(idToken);
 
       expect(Magic).toHaveBeenCalledWith(apiKey, {
         network: 'mainnet',
         extensions: [new OpenIdExtension()],
+        deferPreload: true,
       });
 
       expect(loginWithOIDCMock).toHaveBeenCalledWith({
@@ -101,7 +98,6 @@ describe('MagicWallet', () => {
     });
 
     it('should throw a PassportError when an error is thrown', async () => {
-      preload.mockResolvedValue(Promise.resolve());
       const magicAdapter = new MagicAdapter(config);
 
       loginWithOIDCMock.mockImplementation(() => {
@@ -121,7 +117,6 @@ describe('MagicWallet', () => {
 
   describe('logout', () => {
     it('calls the logout function', async () => {
-      preload.mockResolvedValue(Promise.resolve());
       const magicAdapter = new MagicAdapter(config);
       await magicAdapter.login(idToken);
       await magicAdapter.logout();
