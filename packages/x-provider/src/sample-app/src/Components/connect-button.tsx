@@ -13,7 +13,7 @@ export const ConnectButton = () => {
         baseConfig: new ImmutableConfiguration({
           environment: Environment.PRODUCTION,
         }),
-        overrides: {},
+        overrides: undefined,
       })
     );
 
