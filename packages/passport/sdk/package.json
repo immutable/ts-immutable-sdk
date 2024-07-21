@@ -21,6 +21,7 @@
     "ethers": "^5.7.2",
     "events": "^3.3.0",
     "jwt-decode": "^3.1.2",
+    "localforage": "^1.10.0",
     "magic-sdk": "^21.2.0",
     "oidc-client-ts": "2.4.0",
     "uuid": "^8.3.2"
