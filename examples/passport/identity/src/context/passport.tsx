@@ -6,15 +6,19 @@ import { ethers } from "ethers";
 
 type PassportContextType = {
   passportInstance?: passport.Passport,
+  passportSilentInstance?: passport.Passport,
   login?: () => void,
   logout?: () => void,
+  logoutSilent?: () => void,
   loginWithoutWallet?: () => void,
   loginWithEthersjs?: () => void,
+  getIdToken?: () => void,
+  getAccessToken?: () => void,
 }
 
 const PassportContext = createContext<PassportContextType>({});
 
-export const PassportProvider = ({ children }: {
+export const PassportProvider = ({children}: {
   children: ReactNode;
 }) => {
 
@@ -34,11 +38,24 @@ export const PassportProvider = ({ children }: {
     }
   });
 
+  const passportSilentInstance = new passport.Passport({
+    baseConfig: {
+      environment: config.Environment.SANDBOX, // or config.Environment.SANDBOX
+      publishableKey: process.env.NEXT_PUBLIC_PUBLISHABLE_KEY || '<YOUR_PUBLISHABLE_KEY>', // replace with your publishable API key from Hub
+    },
+    clientId: process.env.NEXT_PUBLIC_CLIENT_ID || '<YOUR_CLIENT_ID>', // replace with your client ID from Hub
+    redirectUri: 'http://localhost:3000/redirect', // replace with one of your redirect URIs from Hub
+    logoutRedirectUri: 'http://localhost:3000/silent-logout', // replace with one of your logout URIs from Hub
+    logoutMode: 'silent',
+    audience: 'platform_api',
+    scope: 'openid offline_access email transact',
+  });
+
   const login = useCallback(async () => {
     if (!passportInstance) return;
     // #doc passport-evm-login
     const provider = passportInstance.connectEvm();
-    const accounts = await provider.request({ method: "eth_requestAccounts" });
+    const accounts = await provider.request({method: "eth_requestAccounts"});
     // #enddoc passport-evm-login
     window.alert('accounts: ' + accounts);
   }, [passportInstance])
@@ -49,6 +66,14 @@ export const PassportProvider = ({ children }: {
     await passportInstance.logout();
     // #enddoc passport-logout
   }, [passportInstance])
+
+  const logoutSilent = useCallback(async () => {
+    if (!passportSilentInstance) return;
+    const passport = passportSilentInstance;
+    // #doc passport-silent-logout
+    await passport.logout();
+    // #enddoc passport-silent-logout
+  }, [passportSilentInstance])
 
   const loginWithoutWallet = useCallback(async () => {
     if (!passportInstance) return;
@@ -70,11 +95,37 @@ export const PassportProvider = ({ children }: {
 
     const signer = web3Provider.getSigner();
 
-    window.alert('accounts: ' + accounts + ' signer: '+ JSON.stringify(signer));
+    window.alert('accounts: ' + accounts + ' signer: ' + JSON.stringify(signer));
+  }, [passportInstance])
+
+  const getIdToken = useCallback(async () => {
+    if (!passportInstance) return;
+    // #doc passport-get-id-token
+    const idToken = await passportInstance.getIdToken();
+    // #enddoc passport-get-id-token
+    window.alert('idToken: ' + idToken);
+  }, [passportInstance])
+
+  const getAccessToken = useCallback(async () => {
+    if (!passportInstance) return;
+    // #doc passport-get-access-token
+    const accessToken = await passportInstance.getAccessToken();
+    // #enddoc passport-get-access-token
+    window.alert('accessToken: ' + accessToken);
   }, [passportInstance])
 
   return (
-    <PassportContext.Provider value={{passportInstance, login, logout, loginWithoutWallet, loginWithEthersjs}}>
+    <PassportContext.Provider value={{
+      passportInstance,
+      passportSilentInstance,
+      login,
+      logout,
+      logoutSilent,
+      loginWithoutWallet,
+      loginWithEthersjs,
+      getIdToken,
+      getAccessToken
+    }}>
       {children}
     </PassportContext.Provider>
   )
