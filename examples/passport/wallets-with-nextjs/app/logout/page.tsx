@@ -1,8 +1,12 @@
 'use client';
 
+import { Web3Provider } from '@ethersproject/providers';
+import { config, passport } from '@imtbl/sdk';
+import { useEffect } from 'react';
+
+
 export default function Logout() {
 
-  // render the view for after the logout is complete
   return (<>
   <h1>Logged out</h1>
     <a href="/">Return to Examples</a>
