@@ -1,6 +1,6 @@
 import { useAccount, useDisconnect, useEnsAvatar, useEnsName } from 'wagmi'
 import { passportInstance } from '../page';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export function Account() {
   const { address } = useAccount()
@@ -14,12 +14,13 @@ export function Account() {
   const passportLogout = async () => {
     // disable button while loading
     setLoadingState(true)
-    // disconnect Passport from Wagmi
-    disconnect()
     // logout from Passport
     await passportInstance.logout()
+    // disconnect Wagmi from Passport
+    disconnect()
   }
 
+  // render the view to show the connected accounts and logout
   return (
     <div>   
       <button onClick={() => passportLogout()} disabled={loading}>Passport Logout</button>
