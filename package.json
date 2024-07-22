@@ -23,6 +23,7 @@
     "eslint-plugin-react-refresh": "latest",
     "http-server": "^14.1.1",
     "husky": "^8.0.3",
+    "jest": "^29.4.1",
     "lint-staged": "^13.2.0",
     "node-gyp": "^9.3.1",
     "nx": "19.3.2",
@@ -60,8 +61,7 @@
     "syncpack:check": "yarn syncpack list-mismatches",
     "syncpack:fix": "yarn syncpack fix-mismatches",
     "syncpack:format": "yarn syncpack format",
-    "test": "nx run-many -t test --parallel=5",
-    "test:checkout:sdk:coverage": "wsrun -p @imtbl/checkout-sdk --exclude-missing -e test:coverage",
+    "test": "nx affected -t test --parallel=5",
     "test:examples": "cd examples/ts-immutable-sample && yarn test && yarn test:e2e",
     "test:vpn": "RUN_VPN_TESTS=1 wsrun --exclude-missing -e test",
     "typecheck": "wsrun --exclude-missing typecheck"

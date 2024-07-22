@@ -61,7 +61,6 @@
     "start:dev": "CHECKOUT_DEV_MODE=true yarn start",
     "start:local": "CHECKOUT_LOCAL_MODE=true yarn start",
     "test": "jest test",
-    "test:coverage": "jest --coverage",
     "test:watch": "jest test --watch",
     "typecheck": "tsc --noEmit"
   },

@@ -150,14 +150,11 @@ jobs:
           key: ${{ runner.os }}-build-${{ github.sha }}
 
       - name: Test
-        run: yarn test
+        run: yarn test --coverage
 
       - name: Get reviewing teams
         id: reviewer-teams
         run: echo "teams=${{ join(github.event.pull_request.requested_teams.*.name, ', ') }}" >> $GITHUB_OUTPUT
-
-      - name: Checkout SDK test coverage
-        run: yarn test:checkout:sdk:coverage
 
       - name: Upload Checkout SDK test coverage artifacts
         uses: actions/upload-artifact@v2
