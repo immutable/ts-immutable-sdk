@@ -46,7 +46,7 @@ export default function ConnectWithEtherJS() {
      await passportInstance.logout()
   }
 
-  // render the view to login and show the connected accounts
+  // render the view to login/logout and show the connected accounts
   return (<>
     <h1>Passport Wallet - Connect with EtherJS</h1>
     {accountsState.length == 0 && 
