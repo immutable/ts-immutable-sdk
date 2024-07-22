@@ -7,10 +7,16 @@ import { Passport } from './Passport';
 import { PassportImxProvider, PassportImxProviderFactory } from './starkEx';
 import { OidcConfiguration, UserProfile } from './types';
 import {
-  mockLinkedAddresses, mockLinkedWallet, mockUser, mockUserImx,
+  mockAxiosError,
+  mockLinkedAddresses,
+  mockLinkedWallet,
+  mockUser,
+  mockUserImx,
+  mockUserZkEvm,
 } from './test/mocks';
 import { announceProvider, passportProviderInfo } from './zkEvm/provider/eip6963';
 import { ZkEvmProvider } from './zkEvm';
+import { PassportError, PassportErrorType } from './errors/passportError';
 
 jest.mock('./authManager');
 jest.mock('./magicAdapter');
@@ -371,13 +377,18 @@ describe('Passport', () => {
   });
 
   describe('linkExternalWallet', () => {
+    const linkWalletParams = {
+      type: 'MetaMask',
+      walletAddress: '0xd8da6bf26964af9d7eed9e03e53415d37aa96045',
+      signature: 'signature123',
+      nonce: 'nonce123',
+    };
+
     it('should link external wallet when user is logged in', async () => {
-      getUserMock.mockReturnValue(mockUser);
+      getUserMock.mockReturnValue(mockUserZkEvm);
       linkExternalWalletMock.mockReturnValue(mockLinkedWallet);
 
-      const result = await passport.linkExternalWallet({
-        type: 'type', walletAddress: 'address', signature: 'signature', nonce: 'nonce',
-      });
+      const result = await passport.linkExternalWallet(linkWalletParams);
 
       expect(result).toEqual(mockLinkedWallet.data);
     });
@@ -385,9 +396,26 @@ describe('Passport', () => {
     it('should throw error if user is not logged in', async () => {
       getUserMock.mockReturnValue(null);
 
-      await expect(passport.linkExternalWallet({
-        type: 'type', walletAddress: 'address', signature: 'signature', nonce: 'nonce',
-      })).rejects.toThrowError();
+      await expect(passport.linkExternalWallet(linkWalletParams)).rejects.toThrow(
+        new PassportError('User is not logged in', PassportErrorType.NOT_LOGGED_IN_ERROR),
+      );
+    });
+
+    it('should throw error if user is not registered with IMX or ZkEvm', async () => {
+      getUserMock.mockReturnValue(mockUser);
+
+      await expect(passport.linkExternalWallet(linkWalletParams)).rejects.toThrow(
+        new PassportError('User has not been registered', PassportErrorType.USER_NOT_REGISTERED_ERROR),
+      );
+    });
+
+    it('should handle errors from the linkWalletV2 API call', async () => {
+      getUserMock.mockReturnValue(mockUserImx);
+      linkExternalWalletMock.mockRejectedValue(mockAxiosError);
+
+      await expect(passport.linkExternalWallet(linkWalletParams)).rejects.toThrow(
+        new PassportError('API error occurred', PassportErrorType.WALLET_LINKING_ERROR),
+      );
     });
   });
 });

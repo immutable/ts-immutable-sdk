@@ -82,3 +82,13 @@ export const mockLinkedWallet = {
     clientName: 'Passport Dashboard',
   },
 };
+
+export const mockAxiosError = {
+  isAxiosError: true,
+  response: {
+    data: {
+      code: 'api_error',
+      message: 'API error occurred',
+    },
+  },
+};

@@ -12,7 +12,10 @@ import { PassportImxProviderFactory } from './starkEx';
 import { PassportConfiguration } from './config';
 import {
   DeviceConnectResponse,
-  LinkedWallet, LinkWalletParams,
+  isUserImx,
+  isUserZkEvm,
+  LinkedWallet,
+  LinkWalletParams,
   PassportEventMap,
   PassportEvents,
   PassportModuleConfiguration,
@@ -26,7 +29,7 @@ import TypedEventEmitter from './utils/typedEventEmitter';
 import GuardianClient from './guardian';
 import logger from './utils/logger';
 import { announceProvider, passportProviderInfo } from './zkEvm/provider/eip6963';
-import { PassportError, PassportErrorType } from './errors/passportError';
+import { PassportError, PassportErrorType, withPassportError } from './errors/passportError';
 
 const buildImxClientConfig = (passportModuleConfiguration: PassportModuleConfiguration) => {
   if (passportModuleConfiguration.overrides) {
@@ -300,10 +303,18 @@ export class Passport {
 
   public async linkExternalWallet(params: LinkWalletParams): Promise<LinkedWallet> {
     track('passport', 'linkWallet', { type: params.type });
+
     const user = await this.authManager.getUser();
     if (!user) {
       throw new PassportError('User is not logged in', PassportErrorType.NOT_LOGGED_IN_ERROR);
     }
+
+    const isRegisteredWithIMX = isUserImx(user);
+    const isRegisteredWithZkEvm = isUserZkEvm(user);
+    if (!isRegisteredWithIMX && !isRegisteredWithZkEvm) {
+      throw new PassportError('User has not been registered', PassportErrorType.USER_NOT_REGISTERED_ERROR);
+    }
+
     const headers = { Authorization: `Bearer ${user.accessToken}` };
     const linkWalletV2Request = {
       type: params.type,
@@ -311,12 +322,13 @@ export class Passport {
       signature: params.signature,
       nonce: params.nonce,
     };
-    const linkWalletV2Result = await this.multiRollupApiClients
-      .passportProfileApi
-      .linkWalletV2(
+
+    return await withPassportError(async () => {
+      const linkWalletV2Result = await this.multiRollupApiClients.passportProfileApi.linkWalletV2(
         { linkWalletV2Request },
         { headers },
       );
-    return { ...linkWalletV2Result.data };
+      return { ...linkWalletV2Result.data };
+    }, PassportErrorType.WALLET_LINKING_ERROR);
   }
 }
