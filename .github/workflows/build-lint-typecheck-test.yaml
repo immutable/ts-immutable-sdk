@@ -157,11 +157,9 @@ jobs:
         run: echo "teams=${{ join(github.event.pull_request.requested_teams.*.name, ', ') }}" >> $GITHUB_OUTPUT
 
       - name: Checkout SDK test coverage
-        if: ${{ contains(steps.reviewer-teams.outputs.teams, 'Commerce')}}
         run: yarn test:checkout:sdk:coverage
 
       - name: Upload Checkout SDK test coverage artifacts
-        if: ${{ contains(steps.reviewer-teams.outputs.teams, 'Commerce')}}
         uses: actions/upload-artifact@v2
         with:
           name: checkout-sdk-coverage-report
@@ -195,7 +193,6 @@ jobs:
         run: echo "teams=${{ join(github.event.pull_request.requested_teams.*.name, ', ') }}" >> $GITHUB_OUTPUT
 
       - name: Restore cached build artifacts
-        if: ${{ contains(steps.reviewer-teams.outputs.teams, 'Commerce') && !contains(github.event.pull_request.title, 'SKIP-CY') }}
         uses: actions/cache@v4
         with:
           path: |
@@ -204,12 +201,10 @@ jobs:
           key: ${{ runner.os }}-build-${{ github.sha }}
 
       - name: Checkout-widgets cypress tests
-        if: ${{ contains(steps.reviewer-teams.outputs.teams, 'Commerce') && !contains(github.event.pull_request.title, 'SKIP-CY') }}
         working-directory: ./packages/checkout/widgets-lib
         run: yarn test:checkout:cypress
 
       - name: Upload cypress videos artifacts
-        if: ${{ contains(steps.reviewer-teams.outputs.teams, 'Commerce') && !contains(github.event.pull_request.title, 'SKIP-CY') }}
         uses: actions/upload-artifact@v2
         with:
           name: checkout-widgets-cypress-videos
