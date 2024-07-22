@@ -29,7 +29,9 @@ import TypedEventEmitter from './utils/typedEventEmitter';
 import GuardianClient from './guardian';
 import logger from './utils/logger';
 import { announceProvider, passportProviderInfo } from './zkEvm/provider/eip6963';
-import { PassportError, PassportErrorType, withPassportError } from './errors/passportError';
+import {
+  isAPIError, PassportError, PassportErrorType, withPassportError,
+} from './errors/passportError';
 
 const buildImxClientConfig = (passportModuleConfiguration: PassportModuleConfiguration) => {
   if (passportModuleConfiguration.overrides) {
@@ -311,7 +313,7 @@ export class Passport {
 
     const isRegisteredWithIMX = isUserImx(user);
     const isRegisteredWithZkEvm = isUserZkEvm(user);
-    if (!isRegisteredWithIMX && !isRegisteredWithZkEvm) {
+    if (!isRegisteredWithIMX || !isRegisteredWithZkEvm) {
       throw new PassportError('User has not been registered', PassportErrorType.USER_NOT_REGISTERED_ERROR);
     }
 
@@ -324,11 +326,31 @@ export class Passport {
     };
 
     return await withPassportError(async () => {
-      const linkWalletV2Result = await this.multiRollupApiClients.passportProfileApi.linkWalletV2(
-        { linkWalletV2Request },
-        { headers },
-      );
+      const linkWalletV2Result = await this.multiRollupApiClients
+        .passportProfileApi.linkWalletV2({ linkWalletV2Request }, { headers });
+
+      // Throw PassportError for Bad Request.
+      if (linkWalletV2Result.status === 400) {
+        if (isAPIError(linkWalletV2Result.data)) {
+          const { code, message } = linkWalletV2Result.data;
+          switch (code) {
+            case 'ALREADY_LINKED':
+              throw new PassportError(message, PassportErrorType.LINK_WALLET_ALREADY_LINKED_ERROR);
+            case 'MAX_WALLETS_LINKED':
+              throw new PassportError(message, PassportErrorType.LINK_WALLET_MAX_WALLETS_LINKED_ERROR);
+            case 'DUPLICATE_NONCE':
+              throw new PassportError(message, PassportErrorType.LINK_WALLET_DUPLICATE_NONCE_ERROR);
+            case 'VALIDATION_ERROR':
+              throw new PassportError(message, PassportErrorType.LINK_WALLET_VALIDATION_ERROR);
+            default:
+              throw new PassportError(message, PassportErrorType.LINK_WALLET_GENERIC_ERROR);
+          }
+        } else {
+          // Handle unexpected bad request with a generic error message
+          throw new PassportError('LINK_WALLET error', PassportErrorType.LINK_WALLET_GENERIC_ERROR);
+        }
+      }
       return { ...linkWalletV2Result.data };
-    }, PassportErrorType.WALLET_LINKING_ERROR);
+    }, PassportErrorType.LINK_WALLET_GENERIC_ERROR);
   }
 }
