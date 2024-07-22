@@ -1,12 +1,10 @@
 name: Build wallets with nextjs passport example
 
 on:
-  push:
-    paths:
-      - 'examples/passport/wallets-with-nextjs'
   pull_request:
-    paths:
-      - 'examples/passport/wallets-with-nextjs'
+    branches: [main]
+  merge_group:
+    branches: [main]
 
 jobs:
   build:
@@ -21,7 +19,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: "../../.nvmrc"
+          node-version-file: ".nvmrc"
           registry-url: https://registry.npmjs.org/
           cache: "yarn"
 
