@@ -2,7 +2,12 @@
 import * as passport from '@imtbl/passport';
 import * as config from '@imtbl/config';
 import * as provider from '@imtbl/x-provider';
-import { track, identify } from '@imtbl/metrics';
+import {
+  track,
+  trackError,
+  trackDuration,
+  identify,
+} from '@imtbl/metrics';
 import { providers } from 'ethers';
 
 /* eslint-disable no-undef */
@@ -78,13 +83,39 @@ declare function blu_event(event: string, data: string): void;
 // eslint-disable-next-line @typescript-eslint/naming-convention
 declare function UnityPostMessage(message: string): void;
 
-const callbackToGame = (data: object) => {
+// Type for common callback data
+type CommonCallbackData = {
+  responseFor: string;
+  requestId: string;
+  success: boolean;
+  error: string | null;
+  errorType?: string | null;
+  result?: any;
+};
+
+// Type for callback data specific to initDeviceFlow
+type InitDeviceFlowCallbackData = CommonCallbackData & {
+  code: string;
+  deviceCode: string;
+  url: string;
+  interval: number;
+};
+
+type RequestAccountsCallbackData = CommonCallbackData & {
+  accounts: string[];
+};
+
+type CallbackData = CommonCallbackData | InitDeviceFlowCallbackData | RequestAccountsCallbackData;
+
+const callbackToGame = (data: CallbackData) => {
   const message = JSON.stringify(data);
   console.log(`callbackToGame: ${message}`);
   console.log(message);
   if (typeof window.ue !== 'undefined') {
     if (typeof window.ue.jsconnector === 'undefined') {
-      console.error('Unreal JSConnector not defined');
+      const unrealError = 'Unreal JSConnector not defined';
+      console.error(unrealError);
+      throw new Error(unrealError);
     } else {
       window.ue.jsconnector.sendtogame(message);
     }
@@ -95,9 +126,9 @@ const callbackToGame = (data: object) => {
   } else if (window.Unity !== 'undefined') {
     window.Unity.call(message);
   } else {
-    console.error(
-      'No available game callbacks to call from ImmutableSDK game-bridge',
-    );
+    const gameBridgeError = 'No available game callbacks to call from ImmutableSDK game-bridge';
+    console.error(gameBridgeError);
+    throw new Error(gameBridgeError);
   }
 };
 
@@ -144,6 +175,11 @@ const getZkEvmProvider = (): passport.Provider => {
   return zkEvmProviderInstance;
 };
 
+/**
+ * @name markTime
+ */
+const mt = (start: number) => Date.now() - start;
+
 track(moduleName, 'loadedGameBridge', {
   sdkVersionTag,
 });
@@ -185,14 +221,13 @@ window.callFunction = async (jsonData: string) => {
             crossSdkBridgeEnabled: true,
           };
           passportClient = new passport.Passport(passportConfig);
-          track(moduleName, 'initialisedPassport', {
-            timeMs: Date.now() - markStart,
-          });
+          trackDuration(moduleName, 'initialisedPassport', mt(markStart));
         }
         callbackToGame({
           responseFor: fxName,
           requestId,
           success: true,
+          error: null,
         });
 
         // version check
@@ -209,21 +244,19 @@ window.callFunction = async (jsonData: string) => {
         };
         console.log(`Version check: ${JSON.stringify(versionCheckParams)}`);
 
-        track(moduleName, 'completedInitGameBridge', {
+        trackDuration(moduleName, 'completedInitGameBridge', mt(markStart), {
           ...versionCheckParams,
-          timeMs: Date.now() - markStart,
         });
         break;
       }
       case PASSPORT_FUNCTIONS.initDeviceFlow: {
         const response = await getPassportClient().loginWithDeviceFlow();
-        track(moduleName, 'performedInitDeviceFlow', {
-          timeMs: Date.now() - markStart,
-        });
+        trackDuration(moduleName, 'performedInitDeviceFlow', mt(markStart));
         callbackToGame({
           responseFor: fxName,
           requestId,
           success: true,
+          error: null,
           code: response.code,
           deviceCode: response.deviceCode,
           url: response.url,
@@ -236,18 +269,20 @@ window.callFunction = async (jsonData: string) => {
           useCachedSession: true,
         });
         const succeeded = userInfo !== null;
-        if (succeeded) {
-          identify({ passportId: userInfo?.sub });
+
+        if (!succeeded) {
+          throw new Error('Failed to re-login');
         }
-        track(moduleName, 'performedRelogin', {
+
+        identify({ passportId: userInfo?.sub });
+        trackDuration(moduleName, 'performedRelogin', mt(markStart), {
           succeeded,
-          timeMs: Date.now() - markStart,
         });
         callbackToGame({
           responseFor: fxName,
           requestId,
           success: userInfo !== null,
-          error: userInfo === null ? 'Failed to re-login' : undefined,
+          error: null,
         });
         break;
       }
@@ -261,27 +296,30 @@ window.callFunction = async (jsonData: string) => {
           providerSet = setProvider(passportProvider);
           identify({ passportId: userInfo?.sub });
         }
-        track(moduleName, 'performedReconnect', {
+
+        if (!providerSet) {
+          throw new Error('Failed to reconnect');
+        }
+
+        trackDuration(moduleName, 'performedReconnect', mt(markStart), {
           succeeded: userInfo !== null,
-          timeMs: Date.now() - markStart,
         });
         callbackToGame({
           responseFor: fxName,
           requestId,
           success: providerSet,
-          error: !providerSet ? 'Failed to reconnect' : undefined,
+          error: null,
         });
         break;
       }
       case PASSPORT_FUNCTIONS.getPKCEAuthUrl: {
         const url = getPassportClient().loginWithPKCEFlow();
-        track(moduleName, 'performedGetPkceAuthUrl', {
-          timeMs: Date.now() - markStart,
-        });
+        trackDuration(moduleName, 'performedGetPkceAuthUrl', mt(markStart));
         callbackToGame({
           responseFor: fxName,
           requestId,
           success: true,
+          error: null,
           result: url,
         });
         break;
@@ -293,13 +331,12 @@ window.callFunction = async (jsonData: string) => {
           request.state,
         );
         identify({ passportId: profile.sub });
-        track(moduleName, 'performedLoginPkce', {
-          timeMs: Date.now() - markStart,
-        });
+        trackDuration(moduleName, 'performedLoginPkce', mt(markStart));
         callbackToGame({
           responseFor: fxName,
           requestId,
           success: true,
+          error: null,
         });
         break;
       }
@@ -311,18 +348,20 @@ window.callFunction = async (jsonData: string) => {
         );
         const passportProvider = await getPassportClient().connectImx();
         const providerSet = setProvider(passportProvider);
-        if (providerSet) {
-          identify({ passportId: profile.sub });
+
+        if (!providerSet) {
+          throw new Error('Failed to connect via PKCE');
         }
-        track(moduleName, 'performedConnectPkce', {
+
+        identify({ passportId: profile.sub });
+        trackDuration(moduleName, 'performedConnectPkce', mt(markStart), {
           succeeded: providerSet,
-          timeMs: Date.now() - markStart,
         });
         callbackToGame({
           responseFor: fxName,
           requestId,
           success: providerSet,
-          error: !providerSet ? 'Failed to connect via PKCE' : undefined,
+          error: null,
         });
         break;
       }
@@ -335,14 +374,13 @@ window.callFunction = async (jsonData: string) => {
         );
 
         identify({ passportId: profile.sub });
-        track(moduleName, 'performedLoginConfirmCode', {
-          timeMs: Date.now() - markStart,
-        });
+        trackDuration(moduleName, 'performedLoginConfirmCode', mt(markStart));
 
         callbackToGame({
           responseFor: fxName,
           requestId,
           success: true,
+          error: null,
         });
         break;
       }
@@ -357,19 +395,19 @@ window.callFunction = async (jsonData: string) => {
         const passportProvider = await getPassportClient().connectImx();
         const providerSet = setProvider(passportProvider);
 
-        if (providerSet) {
-          identify({ passportId: profile.sub });
+        if (!providerSet) {
+          throw new Error('Failed to connect via confirm code');
         }
-        track(moduleName, 'performedConnectConfirmCode', {
-          succeeded: providerSet,
-          timeMs: Date.now() - markStart,
-        });
 
+        identify({ passportId: profile.sub });
+        trackDuration(moduleName, 'performedConnectConfirmCode', mt(markStart), {
+          succeeded: providerSet,
+        });
         callbackToGame({
           responseFor: fxName,
           requestId,
           success: providerSet,
-          error: !providerSet ? 'Failed to connect' : undefined,
+          error: null,
         });
         break;
       }
@@ -377,13 +415,12 @@ window.callFunction = async (jsonData: string) => {
         const deviceFlowEndSessionEndpoint = await getPassportClient().logoutDeviceFlow();
         providerInstance = null;
         zkEvmProviderInstance = null;
-        track(moduleName, 'performedGetLogoutUrl', {
-          timeMs: Date.now() - markStart,
-        });
+        trackDuration(moduleName, 'performedGetLogoutUrl', mt(markStart));
         callbackToGame({
           responseFor: fxName,
           requestId,
           success: true,
+          error: null,
           result: deviceFlowEndSessionEndpoint,
         });
         break;
@@ -391,112 +428,120 @@ window.callFunction = async (jsonData: string) => {
       case PASSPORT_FUNCTIONS.getAccessToken: {
         const accessToken = await getPassportClient().getAccessToken();
         const success = accessToken !== undefined;
-        track(moduleName, 'performedGetAccessToken', {
-          timeMs: Date.now() - markStart,
-        });
+
+        if (!success) {
+          throw new Error('No access token');
+        }
+
+        trackDuration(moduleName, 'performedGetAccessToken', mt(markStart));
         callbackToGame({
           responseFor: fxName,
           requestId,
           success,
+          error: null,
           result: accessToken,
-          error: !success ? 'No access token' : undefined,
         });
         break;
       }
       case PASSPORT_FUNCTIONS.getIdToken: {
         const idToken = await getPassportClient().getIdToken();
         const success = idToken !== undefined;
-        track(moduleName, 'performedGetIdToken', {
-          timeMs: Date.now() - markStart,
-        });
+
+        if (!success) {
+          throw new Error('No ID token');
+        }
+
+        trackDuration(moduleName, 'performedGetIdToken', mt(markStart));
         callbackToGame({
           responseFor: fxName,
           requestId,
           success,
+          error: null,
           result: idToken,
-          error: !success ? 'No ID token' : undefined,
         });
         break;
       }
       case PASSPORT_FUNCTIONS.getEmail: {
         const userProfile = await getPassportClient().getUserInfo();
         const success = userProfile?.email !== undefined;
-        track(moduleName, 'performedGetEmail', {
-          timeMs: Date.now() - markStart,
-        });
+
+        if (!success) {
+          throw new Error('No email');
+        }
+
+        trackDuration(moduleName, 'performedGetEmail', mt(markStart));
         callbackToGame({
           responseFor: fxName,
           requestId,
           success,
+          error: null,
           result: userProfile?.email,
-          error: !success ? 'No email' : undefined,
         });
         break;
       }
       case PASSPORT_FUNCTIONS.getPassportId: {
         const userProfile = await getPassportClient().getUserInfo();
         const success = userProfile?.sub !== undefined;
-        track(moduleName, 'performedGetPassportId', {
-          timeMs: Date.now() - markStart,
-        });
+
+        if (!success) {
+          throw new Error('No Passport ID');
+        }
+
+        trackDuration(moduleName, 'performedGetPassportId', mt(markStart));
         callbackToGame({
           responseFor: fxName,
           requestId,
           success,
+          error: null,
           result: userProfile?.sub,
-          error: !success ? 'No Passport ID' : undefined,
         });
         break;
       }
       case PASSPORT_FUNCTIONS.getLinkedAddresses: {
         const linkedAddresses = await getPassportClient().getLinkedAddresses();
-        track(moduleName, 'performedGetLinkedAddresses', {
-          timeMs: Date.now() - markStart,
-        });
+        trackDuration(moduleName, 'performedGetLinkedAddresses', mt(markStart));
         callbackToGame({
           responseFor: fxName,
           requestId,
           success: true,
+          error: null,
           result: linkedAddresses,
         });
         break;
       }
       case PASSPORT_FUNCTIONS.imx.getAddress: {
         const address = await getProvider().getAddress();
-        track(moduleName, 'performedImxGetAddress', {
-          timeMs: Date.now() - markStart,
-        });
+        trackDuration(moduleName, 'performedImxGetAddress', mt(markStart));
         callbackToGame({
           responseFor: fxName,
           requestId,
           success: true,
+          error: null,
           result: address,
         });
         break;
       }
       case PASSPORT_FUNCTIONS.imx.isRegisteredOffchain: {
         const registered = await getProvider().isRegisteredOffchain();
-        track(moduleName, 'performedImxIsRegisteredOffchain', {
-          timeMs: Date.now() - markStart,
-        });
+        trackDuration(moduleName, 'performedImxIsRegisteredOffchain', mt(markStart));
         callbackToGame({
           responseFor: fxName,
           requestId,
           success: true,
+          error: null,
           result: registered,
         });
         break;
       }
       case PASSPORT_FUNCTIONS.imx.registerOffchain: {
         const response = await getProvider().registerOffchain();
-        track(moduleName, 'performedImxRegisterOffchain', {
-          timeMs: Date.now() - markStart,
-        });
+        trackDuration(moduleName, 'performedImxRegisterOffchain', mt(markStart));
         callbackToGame({
           ...{
             responseFor: fxName,
             requestId,
             success: true,
+            error: null,
           },
           ...response,
         });
@@ -505,14 +550,13 @@ window.callFunction = async (jsonData: string) => {
       case PASSPORT_FUNCTIONS.imx.transfer: {
         const unsignedTransferRequest = JSON.parse(data);
         const response = await getProvider().transfer(unsignedTransferRequest);
-        track(moduleName, 'performedImxTransfer', {
-          timeMs: Date.now() - markStart,
-        });
+        trackDuration(moduleName, 'performedImxTransfer', mt(markStart));
         callbackToGame({
           ...{
             responseFor: fxName,
             requestId,
             success: true,
+            error: null,
           },
           ...response,
         });
@@ -523,14 +567,13 @@ window.callFunction = async (jsonData: string) => {
         const response = await getProvider().batchNftTransfer(
           nftTransferDetails,
         );
-        track(moduleName, 'performedImxBatchNftTransfer', {
-          timeMs: Date.now() - markStart,
-        });
+        trackDuration(moduleName, 'performedImxBatchNftTransfer', mt(markStart));
         callbackToGame({
           ...{
             responseFor: fxName,
             requestId,
             success: true,
+            error: null,
           },
           ...response,
         });
@@ -539,15 +582,19 @@ window.callFunction = async (jsonData: string) => {
       case PASSPORT_FUNCTIONS.zkEvm.connectEvm: {
         const zkEvmProvider = getPassportClient().connectEvm();
         const providerSet = setZkEvmProvider(zkEvmProvider);
-        track(moduleName, 'performedZkevmConnectEvm', {
+
+        if (!providerSet) {
+          throw new Error('Failed to connect to EVM');
+        }
+
+        trackDuration(moduleName, 'performedZkevmConnectEvm', mt(markStart), {
           succeeded: providerSet,
-          timeMs: Date.now() - markStart,
         });
         callbackToGame({
           responseFor: fxName,
           requestId,
           success: providerSet,
-          error: !providerSet ? 'Failed to connect to EVM' : undefined,
+          error: null,
         });
         break;
       }
@@ -558,15 +605,18 @@ window.callFunction = async (jsonData: string) => {
           params: [transaction],
         });
         const success = transactionHash !== null && transactionHash !== undefined;
-        track(moduleName, 'performedZkevmSendTransaction', {
-          timeMs: Date.now() - markStart,
-        });
+
+        if (!success) {
+          throw new Error('Failed to send transaction');
+        }
+
+        trackDuration(moduleName, 'performedZkevmSendTransaction', mt(markStart));
         callbackToGame({
           responseFor: fxName,
           requestId,
           success,
+          error: null,
           result: transactionHash,
-          error: !success ? 'Failed to send transaction' : undefined,
         });
         break;
       }
@@ -578,14 +628,13 @@ window.callFunction = async (jsonData: string) => {
 
         const tx = await signer.sendTransaction(transaction);
         const response = await tx.wait();
-        track(moduleName, 'performedZkevmSendTransactionWithConfirmation', {
-          timeMs: Date.now() - markStart,
-        });
+        trackDuration(moduleName, 'performedZkevmSendTransactionWithConfirmation', mt(markStart));
         callbackToGame({
           ...{
             responseFor: fxName,
             requestId,
             success: true,
+            error: null,
           },
           ...response,
         });
@@ -596,15 +645,18 @@ window.callFunction = async (jsonData: string) => {
           method: 'eth_requestAccounts',
         });
         const success = result !== null && result !== undefined;
-        track(moduleName, 'performedZkevmRequestAccounts', {
-          timeMs: Date.now() - markStart,
-        });
+
+        if (!success) {
+          throw new Error('Failed to request accounts');
+        }
+
+        trackDuration(moduleName, 'performedZkevmRequestAccounts', mt(markStart));
         callbackToGame({
           responseFor: fxName,
           requestId,
           success,
+          error: null,
           accounts: result,
-          error: !success ? 'Failed to request accounts' : undefined,
         });
         break;
       }
@@ -615,15 +667,18 @@ window.callFunction = async (jsonData: string) => {
           params: [request.address, request.blockNumberOrTag],
         });
         const success = result !== null && result !== undefined;
-        track(moduleName, 'performedZkevmGetBalance', {
-          timeMs: Date.now() - markStart,
-        });
+
+        if (!success) {
+          throw new Error('Failed to get balance');
+        }
+
+        trackDuration(moduleName, 'performedZkevmGetBalance', mt(markStart));
         callbackToGame({
           responseFor: fxName,
           requestId,
           success,
+          error: null,
           result,
-          error: !success ? 'Failed to get balance' : undefined,
         });
         break;
       }
@@ -634,15 +689,18 @@ window.callFunction = async (jsonData: string) => {
           params: [request.txHash],
         });
         const success = response !== null && response !== undefined;
-        track(moduleName, 'performedZkevmGetTransactionReceipt', {
-          timeMs: Date.now() - markStart,
-        });
+
+        if (!success) {
+          throw new Error('Failed to get transaction receipt');
+        }
+
+        trackDuration(moduleName, 'performedZkevmGetTransactionReceipt', mt(markStart));
         callbackToGame({
           ...{
             responseFor: fxName,
             requestId,
             success,
-            error: !success ? 'Failed to get transaction receipt' : undefined,
+            error: null,
           },
           ...response,
         });
@@ -656,6 +714,7 @@ window.callFunction = async (jsonData: string) => {
           responseFor: fxName,
           requestId,
           success: true,
+          error: null,
         });
         break;
       }
@@ -663,12 +722,30 @@ window.callFunction = async (jsonData: string) => {
         break;
     }
   } catch (error: any) {
-    track(moduleName, 'failedCallFunction', {
-      function: fxName,
-      error: error.message,
-      timeMs: Date.now() - markStart,
+    let wrappedError;
+
+    if (!(error instanceof Error)) {
+      wrappedError = new Error(error);
+    } else {
+      wrappedError = error;
+    }
+
+    const errorType = error instanceof passport.PassportError
+      ? error?.type
+      : undefined;
+
+    trackError(moduleName, fxName, wrappedError, {
+      fxName,
+      requestId,
+      errorType,
     });
-    console.log(error);
+    trackDuration(moduleName, 'failedCallFunction', mt(markStart), {
+      fxName,
+      requestId,
+      error: wrappedError.message,
+    });
+
+    console.log('callFunction error', error);
     callbackToGame({
       responseFor: fxName,
       requestId,
@@ -686,6 +763,7 @@ function onLoadHandler() {
     responseFor: initRequest,
     requestId: initRequestId,
     success: true,
+    error: null,
   });
 }
 

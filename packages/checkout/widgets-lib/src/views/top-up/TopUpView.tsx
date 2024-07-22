@@ -272,7 +272,7 @@ export function TopUpView({
 
     localTrack('AdvancedOptions', { ...data, widgetEvent });
 
-    window.open(`${toolkitBaseUrl}/faster-bridge/`, '_blank');
+    window.open(`${toolkitBaseUrl}/squid-bridge/`, '_blank');
   };
 
   const renderFees = (txt: string): ReactNode => (

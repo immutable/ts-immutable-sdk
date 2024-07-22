@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import { StandardAnalyticsActions } from '@imtbl/react-analytics';
-import { FundingItem, SalePaymentTypes } from '@imtbl/checkout-sdk';
+import { SalePaymentTypes } from '@imtbl/checkout-sdk';
 import {
   UserJourney,
   useAnalytics,
@@ -16,7 +16,7 @@ import {
   sendSalePaymentTokenEvent,
 } from '../SaleWidgetEvents';
 import { SaleWidgetViews } from '../../../context/view-context/SaleViewContextTypes';
-import { ExecutedTransaction } from '../types';
+import { ExecutedTransaction, FundingBalance } from '../types';
 import { useSaleContext } from '../context/SaleContextProvider';
 import { toPascalCase, toStringifyTransactions } from '../functions/utils';
 import { getPaymentTokenDetails } from '../utils/analytics';
@@ -148,10 +148,10 @@ export const useSaleEvent = () => {
 
   const sendSelectedPaymentToken = (
     screen: string,
-    fundingItem: FundingItem,
+    fundingBalance: FundingBalance,
     conversions: Map<string, number>,
   ) => {
-    const details = getPaymentTokenDetails(fundingItem, conversions);
+    const details = getPaymentTokenDetails(fundingBalance, conversions);
     track({
       ...commonProps,
       screen: toPascalCase(screen),
@@ -190,7 +190,7 @@ export const useSaleEvent = () => {
 
   const sendProceedToPay = (
     screen: string,
-    fundingItem: FundingItem,
+    fundingBalance: FundingBalance,
     conversions: Map<string, number>,
     controlType: AnalyticsControlTypes = 'Button',
     action: StandardAnalyticsActions = 'Pressed',
@@ -203,7 +203,7 @@ export const useSaleEvent = () => {
       action,
       extras: {
         ...userProps,
-        ...getPaymentTokenDetails(fundingItem, conversions),
+        ...getPaymentTokenDetails(fundingBalance, conversions),
       },
     });
   };

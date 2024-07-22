@@ -44,6 +44,7 @@
     "i18next": "^23.7.6",
     "i18next-browser-languagedetector": "^7.2.0",
     "jwt-decode": "^3.1.2",
+    "localforage": "^1.10.0",
     "lru-memorise": "0.3.0",
     "magic-sdk": "^21.2.0",
     "merkletreejs": "^0.3.11",
@@ -154,7 +155,7 @@
     "@openzeppelin/contracts": "3.4.2-solc-0.7"
   },
   "scripts": {
-    "build": "yarn packageList && yarn updateDependencies && yarn regenModules && rm -rf dist && NODE_ENV=production node --max-old-space-size=8192 ../node_modules/rollup/dist/bin/rollup --config rollup.config.js && rm -rf dist/types",
+    "build": "yarn updateDependencies && yarn regenModules && rm -rf dist && NODE_ENV=production node --max-old-space-size=8192 ../node_modules/rollup/dist/bin/rollup --config rollup.config.js && rm -rf dist/types",
     "build:only": "rm -rf dist && NODE_ENV=production node --max-old-space-size=8192 ../node_modules/rollup/dist/bin/rollup --config rollup.config.js && rm -rf dist/types",
     "copyBrowserBundles": "node scripts/copyBrowserBundles.js",
     "generateIndex": "node scripts/generateIndex.js",

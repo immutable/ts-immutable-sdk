@@ -11,6 +11,7 @@ import axios from 'axios';
 import * as crypto from 'crypto';
 import jwt_decode from 'jwt-decode';
 import { getDetail, Detail } from '@imtbl/metrics';
+import localForage from 'localforage';
 import DeviceCredentialsManager from './storage/device_credentials_manager';
 import logger from './utils/logger';
 import { isTokenExpired } from './utils/token';
@@ -32,6 +33,7 @@ import {
 import { PassportConfiguration } from './config';
 import Overlay from './overlay';
 import TypedEventEmitter from './utils/typedEventEmitter';
+import { LocalForageAsyncStorage } from './storage/LocalForageAsyncStorage';
 
 const formUrlEncodedHeader = {
   headers: {
@@ -45,7 +47,14 @@ const authorizeEndpoint = '/authorize';
 const getAuthConfiguration = (config: PassportConfiguration): UserManagerSettings => {
   const { authenticationDomain, oidcConfiguration } = config;
 
-  const store = typeof window !== 'undefined' ? window.localStorage : new InMemoryWebStorage();
+  let store;
+  if (config.crossSdkBridgeEnabled) {
+    store = new LocalForageAsyncStorage('ImmutableSDKPassport', localForage.INDEXEDDB);
+  } else if (typeof window !== 'undefined') {
+    store = window.localStorage;
+  } else {
+    store = new InMemoryWebStorage();
+  }
   const userStore = new WebStorageStateStore({ store });
 
   const endSessionEndpoint = new URL(logoutEndpoint, authenticationDomain.replace(/^(?:https?:\/\/)?(.*)/, 'https://$1'));

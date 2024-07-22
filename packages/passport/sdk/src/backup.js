@@ -1,0 +1,535 @@
+import { Magic } from 'magic-sdk';
+import { UserManager } from 'oidc-client-ts';
+import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
+import { Environment, ImmutableConfiguration } from '@imtbl/config';
+import { IMXClient } from '@imtbl/x-client';
+import encode from 'jwt-encode';
+import { setImmediate } from 'timers';
+import { Signer } from 'ethers';
+import { OidcConfiguration } from './types';
+import { mockValidIdToken } from './utils/token.test';
+import { buildPrivateVars, Passport } from './Passport';
+import { RequestArguments } from './zkEvm/types';
+import {
+  closeMswWorker,
+  useMswHandlers,
+  resetMswHandlers,
+  transactionHash,
+  mswHandlers,
+} from './mocks/zkEvm/msw';
+import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './zkEvm/JsonRpcError';
+import GuardianClient from './guardian';
+import { chainIdHex, mockUserZkEvm } from './test/mocks';
+import { packSignatures, signERC191Message } from './zkEvm/walletHelpers';
+
+jest.mock('./guardian');
+jest.mock('magic-sdk');
+jest.mock('./zkEvm/walletHelpers');
+jest.mock('oidc-client-ts');
+jest.mock('@imtbl/x-client');
+
+const authenticationDomain = 'example.com';
+const redirectUri = 'example.com';
+const logoutRedirectUri = 'example.com';
+const clientId = 'clientId123';
+const mockOidcUser = {
+  profile: {
+    sub: 'sub123',
+    email: 'test@example.com',
+    nickname: 'test',
+  },
+  expired: false,
+  id_token: mockValidIdToken,
+  access_token: 'accessToken123',
+  refresh_token: 'refreshToken123',
+};
+
+const mockOidcUserZkevm = {
+  ...mockOidcUser,
+  id_token: encode({
+    passport: {
+      zkevm_eth_address: mockUserZkEvm.zkEvm.ethAddress,
+      zkevm_user_admin_address: mockUserZkEvm.zkEvm.userAdminAddress,
+    },
+  }, 'secret'),
+};
+
+const oidcConfiguration: OidcConfiguration = {
+  clientId,
+  redirectUri,
+  logoutRedirectUri,
+};
+
+const getZkEvmProvider = () => {
+  const passport = new Passport({
+    baseConfig: new ImmutableConfiguration({
+      environment: Environment.SANDBOX,
+    }),
+    audience: 'platform_api',
+    clientId,
+    redirectUri,
+    logoutRedirectUri,
+    scope: 'openid offline_access profile email transact',
+  });
+
+  return passport.connectEvm();
+};
+const eoaSignature = '02011b1d383526a2815d26550eb314b5d7e05513273300439b63b94e127c13e1bae9f3f24ab42717c7ae2e25fb82e7fd24afc320690413ca6581c798f91cce8296bd21f4f35a4b33b882a5401499f829481d8ed8d3de23741b0103';
+const packedSignatures = '0x000202011b1d383526a2815d26550eb314b5d7e0551327330043c4d07715346a7d5517ecbc32304fc1ccdcd52fea386c94c3b58b90410f20cd1d5c6db8fa1f03c34e82dce78c3445ce38583e0b0689c69b8fbedbc33d3a2e45431b01030001d25acf5eef26fb627f91e02ebd111580030ab8fb0a55567ac8cc66c34de7ae98185125a76adc6ee2fea042c7fce9c85a41e790ce3529f93dfec281bf56620ef21b02';
+
+describe('Passport', () => {
+  const mockSigninPopup = jest.fn();
+  const mockSigninSilent = jest.fn();
+  const mockGetUser = jest.fn();
+  const mockLoginWithOidc = jest.fn();
+
+  // const mockGetSigner = { getAddress: jest.fn() } as unknown as Signer;
+
+  const mockMagicRequest = jest.fn();
+  const mockIsMagicLoggedIn = jest.fn();
+
+  beforeEach(() => {
+    jest.resetAllMocks();
+
+    // Wallet helper mocks
+    (packSignatures as jest.Mock).mockReturnValue(packedSignatures);
+    (signERC191Message as jest.Mock).mockResolvedValue(eoaSignature);
+
+    (UserManager as jest.Mock).mockImplementation(() => ({
+      signinPopup: mockSigninPopup,
+      signinSilent: mockSigninSilent,
+      getUser: mockGetUser,
+    }));
+    (GuardianClient as jest.Mock).mockImplementation(() => ({
+      validateEVMTransaction: jest.fn().mockResolvedValue(undefined),
+      evaluateERC191Message: jest.fn(),
+      withConfirmationScreen: () => (task: () => void) => task(),
+    }));
+    // (Web3Provider as unknown as jest.Mock).mockImplementation(() => ({
+    //   getSigner: mockGetSigner,
+    // }));
+    (Magic as jest.Mock).mockImplementation(() => ({
+      openid: { loginWithOIDC: mockLoginWithOidc },
+      rpcProvider: { request: mockMagicRequest },
+      user: { isLoggedIn: mockIsMagicLoggedIn },
+      preload: jest.fn(),
+    }));
+  });
+
+  afterEach(() => {
+    resetMswHandlers();
+  });
+
+  afterAll(async () => {
+    closeMswWorker();
+  });
+
+  describe('buildPrivateVars', () => {
+    describe('when the env is prod', () => {
+      it('sets the prod x URL as the basePath on imxApiClients', () => {
+        const baseConfig = new ImmutableConfiguration({ environment: Environment.PRODUCTION });
+
+        const privateVars = buildPrivateVars({
+          baseConfig,
+          ...oidcConfiguration,
+        });
+
+        expect(privateVars.passportImxProviderFactory.imxApiClients.config.basePath).toEqual('https://api.x.immutable.com');
+      });
+    });
+
+    describe('when the env is sandbox', () => {
+      it('sets the sandbox x URL as the basePath on imxApiClients', () => {
+        const baseConfig = new ImmutableConfiguration({ environment: Environment.SANDBOX });
+
+        const privateVars = buildPrivateVars({
+          baseConfig,
+          ...oidcConfiguration,
+        });
+
+        expect(privateVars.passportImxProviderFactory.imxApiClients.config.basePath).toEqual('https://api.sandbox.x.immutable.com');
+      });
+    });
+
+    describe('when overrides are provided', () => {
+      it('sets imxPublicApiDomain as the basePath on imxApiClients', async () => {
+        const baseConfig = new ImmutableConfiguration({ environment: Environment.SANDBOX });
+        const immutableXClient = new IMXClient({ baseConfig });
+        const overrides = {
+          authenticationDomain,
+          imxPublicApiDomain: 'guardianDomain123',
+          magicProviderId: 'providerId123',
+          magicPublishableApiKey: 'publishableKey123',
+          passportDomain: 'customDomain123',
+          relayerUrl: 'relayerUrl123',
+          zkEvmRpcUrl: 'zkEvmRpcUrl123',
+          indexerMrBasePath: 'indexerMrBasePath123',
+          orderBookMrBasePath: 'orderBookMrBasePath123',
+          passportMrBasePath: 'passportMrBasePath123',
+          immutableXClient,
+        };
+
+        const { passportImxProviderFactory } = buildPrivateVars({
+          baseConfig,
+          overrides,
+          ...oidcConfiguration,
+        });
+
+        expect(passportImxProviderFactory.imxApiClients.config.basePath).toEqual(overrides.imxPublicApiDomain);
+      });
+    });
+  });
+
+  describe('zkEvm', () => {
+    const magicWalletAddress = '0x3082e7c88f1c8b4e24be4a75dee018ad362d84d4';
+
+    describe('ethSigner initialisation', () => {
+      it('should connect user automatically and personal_sign', async () => {
+        useMswHandlers([
+          mswHandlers.counterfactualAddress.success,
+          mswHandlers.rpcProvider.success,
+          mswHandlers.relayer.success,
+          mswHandlers.guardian.evaluateTransaction.success,
+        ]);
+
+        mockMagicRequest.mockImplementation(({ method }: RequestArguments) => {
+          switch (method) {
+            case 'eth_accounts': {
+              return Promise.resolve([magicWalletAddress]);
+            }
+            default: {
+              throw new Error(`Unexpected method: ${method}`);
+            }
+          }
+        });
+
+        mockIsMagicLoggedIn.mockResolvedValue(true);
+        mockGetUser.mockResolvedValue(mockOidcUserZkevm);
+
+        const zkEvmProvider = getZkEvmProvider();
+
+        const signature = await zkEvmProvider.request({
+          method: 'personal_sign',
+          params: ['message', mockUserZkEvm.zkEvm.ethAddress],
+        });
+        expect(signature).toEqual(packedSignatures);
+      });
+
+      it('should prompt eth_requestAccounts if new user attempts to eth_sendTransaction after login/provider initialise', async () => {
+        const transferToAddress = '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC';
+
+        mockIsMagicLoggedIn.mockResolvedValue(true);
+        mockGetUser.mockResolvedValueOnce(null);
+        mockSigninPopup.mockResolvedValue(mockOidcUser);
+        mockSigninSilent.mockResolvedValueOnce(mockOidcUser);
+
+        const passport = new Passport({
+          baseConfig: new ImmutableConfiguration({
+            environment: Environment.SANDBOX,
+          }),
+          audience: 'platform_api',
+          clientId,
+          redirectUri,
+          logoutRedirectUri,
+          scope: 'openid offline_access profile email transact',
+        });
+
+        const zkEvmProvider = passport.connectEvm();
+        await passport.login();
+
+        mockGetUser.mockResolvedValue(mockOidcUser);
+
+        const transaction: TransactionRequest = {
+          to: transferToAddress,
+          value: '5000000000000000',
+          data: '0x00',
+        };
+
+        await expect(zkEvmProvider.request({
+          method: 'eth_sendTransaction',
+          params: [transaction],
+        })).rejects.toThrow(
+          new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first'),
+        );
+      });
+
+      it('should successfully eth_sendTransaction if registered user logs in after initialising zkEvmProvider', async () => {
+        const transferToAddress = '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC';
+
+        mockSigninPopup.mockResolvedValue(mockOidcUserZkevm);
+        mockSigninSilent.mockResolvedValueOnce(mockOidcUserZkevm);
+
+        useMswHandlers([
+          mswHandlers.counterfactualAddress.success,
+          mswHandlers.rpcProvider.success,
+          mswHandlers.relayer.success,
+          mswHandlers.guardian.evaluateTransaction.success,
+        ]);
+
+        mockMagicRequest.mockImplementation(({ method }: RequestArguments) => {
+          switch (method) {
+            case 'eth_chainId': {
+              return Promise.resolve(chainIdHex);
+            }
+            case 'eth_accounts': {
+              return Promise.resolve([magicWalletAddress]);
+            }
+            case 'personal_sign': {
+              return Promise.resolve('0x6b168cf5d90189eaa51d02ff3fa8ffc8956b1ea20fdd34280f521b1acca092305b9ace24e643fe64a30c528323065f5b77e1fb4045bd330aad01e7b9a07591f91b');
+            }
+            default: {
+              throw new Error(`Unexpected method: ${method}`);
+            }
+          }
+        });
+
+        const passport = new Passport({
+          baseConfig: new ImmutableConfiguration({
+            environment: Environment.SANDBOX,
+          }),
+          audience: 'platform_api',
+          clientId,
+          redirectUri,
+          logoutRedirectUri,
+          scope: 'openid offline_access profile email transact',
+        });
+
+        mockIsMagicLoggedIn.mockResolvedValue(true);
+
+        const zkEvmProvider = passport.connectEvm();
+        await passport.login();
+
+        mockGetUser.mockResolvedValue(mockOidcUserZkevm);
+
+        const transaction: TransactionRequest = {
+          to: transferToAddress,
+          value: '5000000000000000',
+          data: '0x00',
+        };
+        const result = await zkEvmProvider.request({
+          method: 'eth_sendTransaction',
+          params: [transaction],
+        });
+
+        expect(result).toEqual(transactionHash);
+      });
+    });
+
+    describe('eth_requestAccounts', () => {
+      describe('when the user has registered before', () => {
+        it('returns the users ether key', async () => {
+          mockGetUser.mockResolvedValue(mockOidcUserZkevm);
+          useMswHandlers([
+            mswHandlers.rpcProvider.success,
+          ]);
+
+          const zkEvmProvider = getZkEvmProvider();
+
+          const accounts = await zkEvmProvider.request({
+            method: 'eth_requestAccounts',
+          });
+
+          expect(accounts).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
+          expect(mockGetUser).toHaveBeenCalledTimes(1);
+        });
+      });
+
+      describe('when the user is logging in for the first time', () => {
+        beforeEach(() => {
+          mockMagicRequest.mockImplementationOnce(({ method }: RequestArguments) => {
+            expect(method).toEqual('eth_accounts');
+            return Promise.resolve([magicWalletAddress]);
+          });
+          mockMagicRequest.mockImplementationOnce(({ method }: RequestArguments) => {
+            expect(method).toEqual('eth_accounts');
+            return Promise.resolve([magicWalletAddress]);
+          });
+          mockMagicRequest.mockImplementationOnce(({ method }: RequestArguments) => {
+            expect(method).toEqual('personal_sign');
+            return Promise.resolve('0x05107ba1d76d8a5ba3415df36eb5af65f4c670778eed257f5704edcb03802cfc662f66b76e5aa032c2305e61ce77ed858bc9850f8c945ab6c3cb6fec796aae421c');
+          });
+        });
+
+        it('registers the user and returns the ether key', async () => {
+          mockSigninPopup.mockResolvedValue(mockOidcUser);
+          mockSigninSilent.mockResolvedValueOnce(mockOidcUserZkevm);
+          mockIsMagicLoggedIn.mockResolvedValue(true);
+          useMswHandlers([
+            mswHandlers.rpcProvider.success,
+            mswHandlers.counterfactualAddress.success,
+            mswHandlers.api.chains.success,
+          ]);
+
+          const zkEvmProvider = getZkEvmProvider();
+
+          const accounts = await zkEvmProvider.request({
+            method: 'eth_requestAccounts',
+          });
+          expect(accounts).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
+        });
+
+        describe('when the registration request fails', () => {
+          it('throws an error', async () => {
+            mockSigninPopup.mockResolvedValue(mockOidcUser);
+            mockGetUser.mockResolvedValueOnce(null);
+            mockGetUser.mockResolvedValueOnce(null);
+            mockSigninSilent.mockResolvedValue(mockOidcUser);
+            mockGetUser.mockResolvedValueOnce(mockOidcUser);
+            useMswHandlers([
+              mswHandlers.counterfactualAddress.internalServerError,
+              mswHandlers.api.chains.success,
+            ]);
+
+            const zkEvmProvider = getZkEvmProvider();
+
+            await expect(async () => zkEvmProvider.request({
+              method: 'eth_requestAccounts',
+            })).rejects.toEqual(new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, 'Failed to create counterfactual address: AxiosError: Request failed with status code 500'));
+          });
+        });
+      });
+    });
+
+    describe('eth_sendTransaction', () => {
+      it('successfully initialises the zkEvm provider and sends a transaction', async () => {
+        const transferToAddress = '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC';
+
+        useMswHandlers([
+          mswHandlers.counterfactualAddress.success,
+          mswHandlers.rpcProvider.success,
+          mswHandlers.relayer.success,
+          mswHandlers.guardian.evaluateTransaction.success,
+        ]);
+        mockMagicRequest.mockImplementation(({ method }: RequestArguments) => {
+          switch (method) {
+            case 'eth_chainId': {
+              return Promise.resolve(chainIdHex);
+            }
+            case 'eth_accounts': {
+              return Promise.resolve([magicWalletAddress]);
+            }
+            case 'personal_sign': {
+              return Promise.resolve('0x6b168cf5d90189eaa51d02ff3fa8ffc8956b1ea20fdd34280f521b1acca092305b9ace24e643fe64a30c528323065f5b77e1fb4045bd330aad01e7b9a07591f91b');
+            }
+            default: {
+              throw new Error(`Unexpected method: ${method}`);
+            }
+          }
+        });
+        mockGetUser.mockResolvedValue(mockOidcUserZkevm);
+
+        const zkEvmProvider = getZkEvmProvider();
+        await zkEvmProvider.request({
+          method: 'eth_requestAccounts',
+        });
+        const transaction: TransactionRequest = {
+          to: transferToAddress,
+          value: '5000000000000000',
+          data: '0x00',
+        };
+        const result = await zkEvmProvider.request({
+          method: 'eth_sendTransaction',
+          params: [transaction],
+        });
+
+        expect(result).toEqual(transactionHash);
+        expect(mockGetUser).toHaveBeenCalledTimes(6);
+      });
+
+      it('ethSigner is initialised if user logs in after connectEvm', async () => {
+        const transferToAddress = '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC';
+
+        useMswHandlers([
+          mswHandlers.counterfactualAddress.success,
+          mswHandlers.rpcProvider.success,
+          mswHandlers.relayer.success,
+          mswHandlers.guardian.evaluateTransaction.success,
+        ]);
+        mockMagicRequest.mockImplementation(({ method }: RequestArguments) => {
+          switch (method) {
+            case 'eth_chainId': {
+              return Promise.resolve(chainIdHex);
+            }
+            case 'eth_accounts': {
+              return Promise.resolve([magicWalletAddress]);
+            }
+            case 'personal_sign': {
+              return Promise.resolve('0x6b168cf5d90189eaa51d02ff3fa8ffc8956b1ea20fdd34280f521b1acca092305b9ace24e643fe64a30c528323065f5b77e1fb4045bd330aad01e7b9a07591f91b');
+            }
+            default: {
+              throw new Error(`Unexpected method: ${method}`);
+            }
+          }
+        });
+        mockGetUser.mockResolvedValueOnce(Promise.resolve(null));
+        mockSigninPopup.mockResolvedValue(mockOidcUserZkevm);
+        mockSigninSilent.mockResolvedValueOnce(mockOidcUserZkevm);
+
+        const passport = new Passport({
+          baseConfig: new ImmutableConfiguration({
+            environment: Environment.SANDBOX,
+          }),
+          audience: 'platform_api',
+          clientId,
+          redirectUri,
+          logoutRedirectUri,
+          scope: 'openid offline_access profile email transact',
+        });
+
+        // user isn't logged in, so wont set signer when provider is instantiated
+        const zkEvmProvider = passport.connectEvm();
+
+        // user logs in, ethSigner is initialised
+        await passport.login();
+
+        mockGetUser.mockResolvedValue(Promise.resolve(mockOidcUserZkevm));
+        const accounts = await zkEvmProvider.request({
+          method: 'eth_requestAccounts',
+        });
+
+        expect(accounts).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
+
+        const transaction: TransactionRequest = {
+          to: transferToAddress,
+          value: '5000000000000000',
+          data: '0x00',
+        };
+        const result = await zkEvmProvider.request({
+          method: 'eth_sendTransaction',
+          params: [transaction],
+        });
+
+        expect(result).toEqual(transactionHash);
+      });
+    });
+
+    describe('eth_accounts', () => {
+      it('returns no addresses if the user is not logged in', async () => {
+        const zkEvmProvider = getZkEvmProvider();
+        const accounts = await zkEvmProvider.request({
+          method: 'eth_accounts',
+        });
+        expect(accounts).toEqual([]);
+      });
+
+      it('returns the user\'s ether key if the user is logged in', async () => {
+        mockGetUser.mockResolvedValue(mockOidcUserZkevm);
+        useMswHandlers([
+          mswHandlers.rpcProvider.success,
+        ]);
+
+        const zkEvmProvider = getZkEvmProvider();
+
+        const loggedInAccounts = await zkEvmProvider.request({
+          method: 'eth_requestAccounts',
+        });
+
+        const accounts = await zkEvmProvider.request({
+          method: 'eth_accounts',
+        });
+
+        expect(accounts).toEqual(loggedInAccounts);
+      });
+    });
+  });
+});
