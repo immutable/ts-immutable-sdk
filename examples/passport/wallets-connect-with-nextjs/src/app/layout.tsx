@@ -9,8 +9,6 @@ export const metadata: Metadata = {
   description: 'Examples of how to connect wallets to Passport with NextJS',
 };
 
-const test = 'qewr'
-
 export default function RootLayout({
   children,
 }: Readonly<{
