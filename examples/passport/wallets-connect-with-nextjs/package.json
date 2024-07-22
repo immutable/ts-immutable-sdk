@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "playwright install && playwright test"
+    "test": "playwright install --with-deps && playwright test"
   },
   "dependencies": {
     "@ethersproject/providers": "^5.7.2",
