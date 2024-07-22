@@ -204,7 +204,6 @@ describe('Passport', () => {
         it('registers the user and returns the ether key', async () => {
           mockSigninPopup.mockResolvedValue(mockOidcUser);
           mockSigninSilent.mockResolvedValueOnce(mockOidcUserZkevm);
-          mockIsMagicLoggedIn.mockResolvedValue(true);
           useMswHandlers([
             mswHandlers.rpcProvider.success,
             mswHandlers.counterfactualAddress.success,
@@ -212,6 +211,8 @@ describe('Passport', () => {
           ]);
 
           const zkEvmProvider = getZkEvmProvider();
+
+          mockIsMagicLoggedIn.mockResolvedValue(true);
 
           const accounts = await zkEvmProvider.request({
             method: 'eth_requestAccounts',

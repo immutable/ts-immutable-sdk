@@ -28,7 +28,6 @@ import {
   UserImx,
   isUserImx,
   PassportEventMap,
-  PassportEvents,
 } from './types';
 import { PassportConfiguration } from './config';
 import Overlay from './overlay';
@@ -202,7 +201,6 @@ export default class AuthManager {
         signinPopup()
           .then((oidcUser) => {
             const user = AuthManager.mapOidcUserToDomainModel(oidcUser);
-            this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
             resolve(user);
           })
           .catch((error: unknown) => {
@@ -225,7 +223,6 @@ export default class AuthManager {
                     const oidcUser = await signinPopup();
                     overlay.remove();
                     const user = AuthManager.mapOidcUserToDomainModel(oidcUser);
-                    this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
                     resolve(user);
                   } else {
                     // The popup has already been opened. By calling `window.open` with the same target as the
@@ -313,8 +310,6 @@ export default class AuthManager {
           const oidcUser = AuthManager.mapDeviceTokenResponseToOidcUser(tokenResponse);
           const user = AuthManager.mapOidcUserToDomainModel(oidcUser);
           await this.userManager.storeUser(oidcUser);
-          this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
-
           return user;
         } catch (error) {
           if (axios.isAxiosError(error)) {
@@ -398,7 +393,6 @@ export default class AuthManager {
       const oidcUser = AuthManager.mapDeviceTokenResponseToOidcUser(tokenResponse);
       const user = AuthManager.mapOidcUserToDomainModel(oidcUser);
       await this.userManager.storeUser(oidcUser);
-      this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
 
       return user;
     }, PassportErrorType.AUTHENTICATION_ERROR);

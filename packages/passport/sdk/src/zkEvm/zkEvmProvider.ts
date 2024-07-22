@@ -157,7 +157,7 @@ export class ZkEvmProvider implements Provider {
         const requestAccounts = async () => {
           const zkEvmUser = await this.#getZkEvmUser();
           if (zkEvmUser) {
-            this.#passportEventEmitter.emit(PassportEvents.LOGGED_IN, zkEvmUser);
+            this.#magicAdapter.initialiseSigner(zkEvmUser);
             return [zkEvmUser.zkEvm.ethAddress];
           }
 
@@ -165,6 +165,9 @@ export class ZkEvmProvider implements Provider {
 
           try {
             const user = await this.#authManager.getUserOrLogin();
+
+            this.#magicAdapter.initialiseSigner(user);
+
             flow.addEvent('endGetUserOrLogin');
 
             let userZkEvmEthAddress;
@@ -212,13 +215,15 @@ export class ZkEvmProvider implements Provider {
         return addresses;
       }
       case 'eth_sendTransaction': {
-        const zkEvmAddress = await this.#getZkEvmAddress();
-        if (!zkEvmAddress) {
+        const zkEvmUser = await this.#getZkEvmUser();
+        if (!zkEvmUser) {
           throw new JsonRpcError(
             ProviderErrorCode.UNAUTHORIZED,
             'Unauthorised - call eth_requestAccounts first',
           );
         }
+
+        this.#magicAdapter.initialiseSigner(zkEvmUser);
 
         const flow = trackFlow('passport', 'ethSendTransaction');
 
@@ -236,7 +241,7 @@ export class ZkEvmProvider implements Provider {
               guardianClient: this.#guardianClient,
               rpcProvider: this.#rpcProvider,
               relayerClient: this.#relayerClient,
-              zkEvmAddress,
+              zkEvmAddress: zkEvmUser.zkEvm.ethAddress,
               flow,
             });
           });
@@ -255,13 +260,15 @@ export class ZkEvmProvider implements Provider {
         return zkEvmAddress ? [zkEvmAddress] : [];
       }
       case 'personal_sign': {
-        const zkEvmAddress = await this.#getZkEvmAddress();
-        if (!zkEvmAddress) {
+        const zkEvmUser = await this.#getZkEvmUser();
+        if (!zkEvmUser) {
           throw new JsonRpcError(
             ProviderErrorCode.UNAUTHORIZED,
             'Unauthorised - call eth_requestAccounts first',
           );
         }
+
+        this.#magicAdapter.initialiseSigner(zkEvmUser);
 
         const flow = trackFlow('passport', 'personalSign');
 
@@ -276,7 +283,7 @@ export class ZkEvmProvider implements Provider {
             return await personalSign({
               params: request.params || [],
               ethSigner,
-              zkEvmAddress,
+              zkEvmAddress: zkEvmUser.zkEvm.ethAddress,
               rpcProvider: this.#rpcProvider,
               guardianClient: this.#guardianClient,
               relayerClient: this.#relayerClient,
@@ -295,13 +302,15 @@ export class ZkEvmProvider implements Provider {
       }
       case 'eth_signTypedData':
       case 'eth_signTypedData_v4': {
-        const zkEvmAddress = await this.#getZkEvmAddress();
-        if (!zkEvmAddress) {
+        const zkEvmUser = await this.#getZkEvmUser();
+        if (!zkEvmUser) {
           throw new JsonRpcError(
             ProviderErrorCode.UNAUTHORIZED,
             'Unauthorised - call eth_requestAccounts first',
           );
         }
+
+        this.#magicAdapter.initialiseSigner(zkEvmUser);
 
         const flow = trackFlow('passport', 'ethSignTypedDataV4');
 
