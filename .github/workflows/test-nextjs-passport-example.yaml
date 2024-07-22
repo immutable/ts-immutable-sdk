@@ -2,9 +2,9 @@ name: Build wallets with nextjs passport example
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, EXC-21-passport-wallets-examples]
   merge_group:
-    branches: [main]
+    branches: [main, EXC-21-passport-wallets-examples]
 
 jobs:
   build:
