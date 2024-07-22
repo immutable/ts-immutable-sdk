@@ -169,7 +169,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
               checkout={checkout}
               provider={provider}
               showOnrampOption={config.isOnRampEnabled}
-              showSwapOption={config.isSwapEnabled}
+              showSwapOption={false}
               showBridgeOption={config.isBridgeEnabled}
               onCloseButtonClick={() => sendSaleWidgetCloseEvent(eventTarget)}
               onBackButtonClick={() => {

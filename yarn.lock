@@ -2250,7 +2250,6 @@ __metadata:
     "@biom3/design-tokens": ~0.4.0
     buffer: ^6.0.3
     csstype: ^3.1.2
-    localforage: ^1.10.0
     lodash.debounce: ^4.0.8
     lodash.get: ^4.4.2
     lodash.isequal: ^4.5.0
@@ -3833,6 +3832,7 @@ __metadata:
     jest-environment-jsdom: ^29.4.3
     jwt-decode: ^3.1.2
     jwt-encode: ^1.0.1
+    localforage: ^1.10.0
     magic-sdk: ^21.2.0
     msw: ^1.2.2
     oidc-client-ts: 2.4.0
@@ -3923,6 +3923,7 @@ __metadata:
     i18next: ^23.7.6
     i18next-browser-languagedetector: ^7.2.0
     jwt-decode: ^3.1.2
+    localforage: ^1.10.0
     lru-memorise: 0.3.0
     magic-sdk: ^21.2.0
     merkletreejs: ^0.3.11
