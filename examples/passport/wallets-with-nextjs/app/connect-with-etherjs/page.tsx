@@ -7,12 +7,15 @@ import { ethers } from 'ethers';
 import { ProviderEvent } from '@imtbl/sdk/passport';
 import { passportInstance } from '../page';
 
-
 export default function Connect() {
   
+  // setup the accounts state
   const [accountsState, setAccountsState] = useState<any>([]);
 
-  const passportProvider = passportInstance.connectEvm() // EIP-6963
+  // fetch the Passport provider from the Passport instance
+  const passportProvider = passportInstance.connectEvm()
+
+  // create the Web3Provider using the Passport provider
   const web3Provider = new ethers.providers.Web3Provider(passportProvider);
 
   const passportLogin = async () => {
@@ -24,16 +27,18 @@ export default function Connect() {
     }
   }
 
-  // the ACCOUNTS_CHANGED event can be subscribed to
+  // listen to the ACCOUNTS_CHANGED event and update the accounts state when it changes
   passportProvider.on(ProviderEvent.ACCOUNTS_CHANGED, (accounts: string[]) => {
     setAccountsState(accounts);
   });
 
+  // reset the accounts state when logout is called
   const passportLogout = async () => {
-    await passportInstance.logout()
     setAccountsState([])
+    await passportInstance.logout()
   }
 
+  // render the view to login and show the connected accounts
   return (<>
     <h1>Passport Wallet - Connect Wallet with EtherJS</h1>
     {accountsState.length == 0 && 
