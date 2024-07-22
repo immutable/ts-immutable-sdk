@@ -40,13 +40,6 @@ use the default options
 ✔ Would you like to customize the default import alias (@/*)? No
 ```
 
-create empty `yarn.lock` file in project folder //can remove
-
-```
-cd wallets-with-nextjs-with-ethersjs
-touch yarn.lock
-```
-
 install dependencies
 
 ```
