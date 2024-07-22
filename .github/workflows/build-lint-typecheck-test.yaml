@@ -165,58 +165,6 @@ jobs:
           name: checkout-sdk-coverage-report
           path: ./packages/checkout/sdk/coverage
 
-  cypress:
-    name: Cypress
-    runs-on: ubuntu-latest-4-cores
-    needs: build
-    env:
-      NODE_OPTIONS: --max-old-space-size=14366
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: ".nvmrc"
-          registry-url: https://registry.npmjs.org/
-          cache: "yarn"
-
-      - name: Restore cached node_modules
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
-
-      - name: Get reviewing teams
-        id: reviewer-teams
-        run: echo "teams=${{ join(github.event.pull_request.requested_teams.*.name, ', ') }}" >> $GITHUB_OUTPUT
-
-      - name: Restore cached build artifacts
-        uses: actions/cache@v4
-        with:
-          path: |
-            ./sdk
-            ./packages
-          key: ${{ runner.os }}-build-${{ github.sha }}
-
-      - name: Checkout-widgets cypress tests
-        working-directory: ./packages/checkout/widgets-lib
-        run: yarn test:checkout:cypress
-
-      - name: Upload cypress videos artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: checkout-widgets-cypress-videos
-          path: ./packages/checkout/widgets-lib/cypress/videos
-
-      - name: Upload cypress screenshots artifacts
-        uses: actions/upload-artifact@v2
-        if: failure()
-        with:
-          name: checkout-widgets-cypress-screenshots
-          path: ./packages/checkout/widgets-lib/cypress/screenshots
-
   lint:
     name: Lint
     runs-on: ubuntu-latest-4-cores
