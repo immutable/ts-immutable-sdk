@@ -4,6 +4,7 @@ import { JsonRpcSigner, Web3Provider } from '@ethersproject/providers';
 import { config, passport } from '@imtbl/sdk';
 import { useCallback, useEffect, useState } from 'react';
 import { ethers } from 'ethers';
+import { ProviderEvent } from '@imtbl/sdk/passport';
 
 export const passportInstance = new passport.Passport({
   baseConfig: {
@@ -38,6 +39,10 @@ export default function Home() {
   // @NOTE to use the eth_requestAccounts to trigger login 
   // then connect to the wallet and unlock it
 
+  passportProvider.on(ProviderEvent.ACCOUNTS_CHANGED, (accounts: string[]) => {
+    setAccountsState(accounts);
+  });
+
   const passportLogout = async () => {
     await passportInstance.logout()
     setAccountsState([])
@@ -45,8 +50,8 @@ export default function Home() {
 
   console.log('accountsState', accountsState)
 
-  return (<><h1>TEST</h1>
-  <button onClick={passportLogin}>passport login</button>
-  <button onClick={passportLogout}>passport logout</button>
+  return (<>
+    <h1>Passport Wallet Examples</h1>
+    <a href="/connect-with-etherjs">Connect Wallet with EtherJS</a>
   </>);
 }
