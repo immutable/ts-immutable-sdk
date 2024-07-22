@@ -1,3 +1,8 @@
 {
-  "extends": ["next/core-web-vitals", "next"]
+  "extends": ["next/core-web-vitals", "next"],
+  "settings": {
+    "next": {
+      "rootDir": "examples/passport/wallets-with-nextjs"
+    }
+  }
 }
