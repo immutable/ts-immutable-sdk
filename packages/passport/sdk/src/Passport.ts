@@ -313,7 +313,7 @@ export class Passport {
 
     const isRegisteredWithIMX = isUserImx(user);
     const isRegisteredWithZkEvm = isUserZkEvm(user);
-    if (!isRegisteredWithIMX || !isRegisteredWithZkEvm) {
+    if (!isRegisteredWithIMX && !isRegisteredWithZkEvm) {
       throw new PassportError('User has not been registered', PassportErrorType.USER_NOT_REGISTERED_ERROR);
     }
 

@@ -90,5 +90,15 @@ export const mockAxiosError = {
       code: 'api_error',
       message: 'API error occurred',
     },
+    status: 500,
+  },
+};
+export const mockPassportBadRequest = {
+  response: {
+    data: {
+      code: 'ALREADY_LINKED',
+      message: 'Already linked',
+    },
+    status: 400,
   },
 };

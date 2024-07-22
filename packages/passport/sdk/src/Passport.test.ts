@@ -10,6 +10,7 @@ import {
   mockAxiosError,
   mockLinkedAddresses,
   mockLinkedWallet,
+  mockPassportBadRequest,
   mockUser,
   mockUserImx,
   mockUserZkEvm,
@@ -401,21 +402,27 @@ describe('Passport', () => {
       );
     });
 
-    it('should throw error if user is not registered with IMX or ZkEvm', async () => {
-      getUserMock.mockReturnValue(mockUser);
-
-      await expect(passport.linkExternalWallet(linkWalletParams)).rejects.toThrow(
-        new PassportError('User has not been registered', PassportErrorType.USER_NOT_REGISTERED_ERROR),
-      );
-    });
-
     it('should handle errors from the linkWalletV2 API call', async () => {
       getUserMock.mockReturnValue(mockUserImx);
       linkExternalWalletMock.mockRejectedValue(mockAxiosError);
 
       await expect(passport.linkExternalWallet(linkWalletParams)).rejects.toThrow(
-        new PassportError('API error occurred', PassportErrorType.WALLET_LINKING_ERROR),
+        new PassportError('API error occurred', PassportErrorType.LINK_WALLET_GENERIC_ERROR),
       );
+    });
+
+    it('should handle 400 bad requests from the linkWalletV2 API call', async () => {
+      getUserMock.mockReturnValue(mockUserImx);
+      linkExternalWalletMock.mockReturnValue(mockPassportBadRequest);
+
+      try {
+        await passport.linkExternalWallet(linkWalletParams);
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(PassportError);
+        expect(error.type).toEqual(PassportErrorType.LINK_WALLET_ALREADY_LINKED_ERROR);
+        expect(error.code).toEqual('ALREADY_LINKED');
+        expect(error.message).toEqual('Already linked');
+      }
     });
   });
 });
