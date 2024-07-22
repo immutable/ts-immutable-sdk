@@ -30,6 +30,7 @@ env:
   GAME_ENGINE: ${{ github.event.inputs.game_engine }}
   DRY_RUN: ${{ github.event.inputs.dry_run }}
   GH_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
+  SDK_TEAM_MEMBERS: ${{ secrets.SDK_TEAM_MEMBERS }}
 
 jobs:
   build-game-bridge:
