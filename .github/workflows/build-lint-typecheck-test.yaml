@@ -89,7 +89,6 @@ jobs:
   typecheck:
     name: Typecheck
     runs-on: ubuntu-latest-4-cores
-    needs: build
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -113,13 +112,8 @@ jobs:
           path: node_modules
           key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
 
-      - name: Restore cached build artifacts
-        uses: actions/cache@v4
-        with:
-          path: |
-            ./sdk
-            ./packages
-          key: ${{ runner.os }}-build-${{ github.sha }}
+      - name: install depdenencies
+        run: yarn install --immutable
 
       - name: Typecheck
         run: yarn typecheck
@@ -168,7 +162,6 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest-4-cores
-    needs: build
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -191,6 +184,9 @@ jobs:
         with:
           path: node_modules
           key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
+
+      - name: install depdenencies
+        run: yarn install --immutable
 
       - name: Lint
         run: yarn lint
