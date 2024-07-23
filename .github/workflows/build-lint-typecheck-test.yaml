@@ -153,6 +153,12 @@ jobs:
       - name: Test
         run: yarn test --configuration=ci
 
+      - name: Upload Checkout SDK test coverage artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverages
+          path: ./packages/**/coverage/*
+
   lint:
     name: Lint
     runs-on: ubuntu-latest-4-cores
