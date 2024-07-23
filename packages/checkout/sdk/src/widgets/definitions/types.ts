@@ -34,6 +34,7 @@ import {
   WalletDisconnect,
   WalletEventType,
   WalletNetworkSwitch,
+  CheckoutEventType,
 } from './events';
 import {
   BridgeWidgetParams,
@@ -41,6 +42,7 @@ import {
   SwapWidgetParams,
   WalletWidgetParams,
   OnRampWidgetParams,
+  CheckoutWidgetParams,
 } from './parameters';
 import { SaleWidgetParams } from './parameters/sale';
 import {
@@ -50,6 +52,7 @@ import {
   SaleWidgetConfiguration,
   SwapWidgetConfiguration,
   WalletWidgetConfiguration,
+  CheckoutWidgetConfiguration,
 } from './configurations';
 import { WidgetTheme } from './configurations/theme';
 
@@ -63,6 +66,7 @@ export enum WidgetType {
   BRIDGE = 'bridge',
   ONRAMP = 'onramp',
   SALE = 'sale',
+  CHECKOUT = 'checkout',
 }
 
 /**
@@ -79,7 +83,8 @@ export type WidgetConfigurations = {
   [WidgetType.SWAP]: SwapWidgetConfiguration,
   [WidgetType.BRIDGE]: BridgeWidgetConfiguration,
   [WidgetType.ONRAMP]: OnrampWidgetConfiguration,
-  [WidgetType.SALE]: SaleWidgetConfiguration
+  [WidgetType.SALE]: SaleWidgetConfiguration,
+  [WidgetType.CHECKOUT]: CheckoutWidgetConfiguration,
 };
 
 // Mapping each widget type to their parameters
@@ -89,7 +94,8 @@ export type WidgetParameters = {
   [WidgetType.SWAP]: SwapWidgetParams,
   [WidgetType.BRIDGE]: BridgeWidgetParams,
   [WidgetType.ONRAMP]: OnRampWidgetParams,
-  [WidgetType.SALE]: SaleWidgetParams
+  [WidgetType.SALE]: SaleWidgetParams,
+  [WidgetType.CHECKOUT]: CheckoutWidgetParams,
 };
 
 /**
@@ -101,7 +107,8 @@ export type WidgetEventTypes = {
   [WidgetType.SWAP]: SwapEventType | OrchestrationEventType,
   [WidgetType.BRIDGE]: BridgeEventType | OrchestrationEventType,
   [WidgetType.ONRAMP]: OnRampEventType | OrchestrationEventType,
-  [WidgetType.SALE]: SaleEventType | OrchestrationEventType
+  [WidgetType.SALE]: SaleEventType | OrchestrationEventType,
+  [WidgetType.CHECKOUT]: CheckoutEventType | OrchestrationEventType,
 };
 
 // Mapping of Orchestration events to their payloads
@@ -168,7 +175,10 @@ export type WidgetEventData = {
     [SaleEventType.REQUEST_BRIDGE]: {},
     [SaleEventType.REQUEST_SWAP]: {},
     [SaleEventType.REQUEST_ONRAMP]: {},
-  } & OrchestrationMapping & ProviderEventMapping
+  } & OrchestrationMapping & ProviderEventMapping,
+
+  [WidgetType.CHECKOUT]: {
+  } & OrchestrationMapping & ProviderEventMapping,
 };
 
 /**
