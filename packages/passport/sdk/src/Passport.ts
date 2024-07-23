@@ -333,8 +333,7 @@ export class Passport {
     } catch (error) {
       trackError('passport', 'linkWallet', error as Error);
 
-      if (isAxiosError(error) && error.response?.data && isAPIError(error.response.data)
-        && error.response.status !== 200) {
+      if (isAxiosError(error) && error.response?.data && isAPIError(error.response.data)) {
         const { code, message } = error.response.data;
 
         switch (code) {
