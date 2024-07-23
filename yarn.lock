@@ -15351,6 +15351,27 @@ __metadata:
   languageName: node
   linkType: hard
 
+"dex-sample-app@workspace:packages/internal/dex/sdk-sample-app":
+  version: 0.0.0-use.local
+  resolution: "dex-sample-app@workspace:packages/internal/dex/sdk-sample-app"
+  dependencies:
+    "@imtbl/dex-sdk": 0.0.0
+    "@types/node": ^18.14.2
+    "@types/react": ^18.0.28
+    "@types/react-dom": ^18.0.11
+    autoprefixer: 10.4.14
+    concurrently: ^8.2.2
+    eslint: ^8.40.0
+    ethers: ^5.7.2
+    next: 13.3.1
+    postcss: 8.4.31
+    react: ^18.2.0
+    react-dom: ^18.2.0
+    tailwindcss: 3.3.2
+    typescript: ^4.9.5
+  languageName: unknown
+  linkType: soft
+
 "didyoumean@npm:^1.2.2":
   version: 1.2.2
   resolution: "didyoumean@npm:1.2.2"
@@ -27547,26 +27568,6 @@ __metadata:
   checksum: b7c7d1a68d6ca946f2fbb0778e0c4ec63c65501b54023b2af7d7e9f48fdb6c6580d6f7675cd53bda5944c5ebc057560d5a6365079752546865defb3b79dea454
   languageName: node
   linkType: hard
-
-"sdk-sample-app@workspace:packages/internal/dex/sdk-sample-app":
-  version: 0.0.0-use.local
-  resolution: "sdk-sample-app@workspace:packages/internal/dex/sdk-sample-app"
-  dependencies:
-    "@imtbl/dex-sdk": 0.0.0
-    "@types/node": ^18.14.2
-    "@types/react": ^18.0.28
-    "@types/react-dom": ^18.0.11
-    autoprefixer: 10.4.14
-    eslint: ^8.40.0
-    ethers: ^5.7.2
-    next: 13.3.1
-    postcss: 8.4.31
-    react: ^18.2.0
-    react-dom: ^18.2.0
-    tailwindcss: 3.3.2
-    typescript: ^4.9.5
-  languageName: unknown
-  linkType: soft
 
 "secp256k1@npm:^4.0.1":
   version: 4.0.3

@@ -141,7 +141,6 @@ jobs:
           cache: "yarn"
 
       - name: Restore cached node_modules
-        id: restore-cache-node_modules
         uses: actions/cache@v4
         with:
           path: node_modules

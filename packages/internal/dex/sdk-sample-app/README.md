@@ -4,15 +4,7 @@ This sample app demonstrates retrieving a swap transaction, displaying swap deta
 
 ## Getting Started
 
-First, run the setup:
-
-**Note**: There may be some errors in the terminal, that's ok! You can ignore these.
-
-```bash
-yarn setup
-```
-
-Second, create a file called `.env.local` in the `sdk-sample-app` directory. Add the following environment variables:
+Create a file called `.env.local` in the `sdk-sample-app` directory. Add the following environment variables:
 
 - Contracts:
 
@@ -39,7 +31,7 @@ NEXT_PUBLIC_CHAIN_ID=
 Run the development server:
 
 ```bash
-yarn dev
+yarn dev # this starts a webserver and also watches & builds changes in @imtbl/dex package.
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
