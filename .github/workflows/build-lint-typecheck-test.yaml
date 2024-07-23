@@ -147,7 +147,7 @@ jobs:
       #   run: git diff --name-only --no-renames --relative "main" "HEAD"
 
       - name: Test
-        run: yarn dlx nx affected -t test --parallel=5 --configuration=ci
+        run: yarn test --configuration=ci
 
       # - name: Get reviewing teams
       #   id: reviewer-teams
