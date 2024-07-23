@@ -243,7 +243,7 @@ export class ZkEvmProvider implements Provider {
         }
       }
       case 'eth_accounts': {
-        const zkEvmAddress = zkEvmUser?.zkEvm.ethAddress;
+        const zkEvmAddress = zkEvmUser?.zkEvm?.ethAddress;
         return zkEvmAddress ? [zkEvmAddress] : [];
       }
       case 'personal_sign': {
