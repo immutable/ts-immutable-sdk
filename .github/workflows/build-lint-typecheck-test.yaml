@@ -20,8 +20,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Use Node.js
         uses: actions/setup-node@v4
@@ -123,12 +121,13 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest-8-cores
-    needs: build
     env:
       NODE_OPTIONS: --max-old-space-size=14366
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Use Node.js
         uses: actions/setup-node@v4
@@ -142,14 +141,6 @@ jobs:
         with:
           path: node_modules
           key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
-
-      - name: Restore cached build artifacts
-        uses: actions/cache@v4
-        with:
-          path: |
-            ./sdk
-            ./packages
-          key: ${{ runner.os }}-build-${{ github.sha }}
 
       - name: Test
         run: yarn test --configuration=ci
