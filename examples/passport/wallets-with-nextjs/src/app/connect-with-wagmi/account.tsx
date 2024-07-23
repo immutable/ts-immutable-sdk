@@ -1,5 +1,5 @@
 import { useAccount, useDisconnect, useEnsAvatar, useEnsName } from 'wagmi'
-import { passportInstance } from '../page';
+import { passportInstance } from '../utils';
 import { useEffect, useState } from 'react';
 
 export function Account() {
