@@ -63,7 +63,7 @@
     "test": "nx affected -t test --parallel=5",
     "test:examples": "cd examples/ts-immutable-sample && yarn test && yarn test:e2e",
     "test:vpn": "RUN_VPN_TESTS=1 wsrun --exclude-missing -e test",
-    "typecheck": "wsrun --exclude-missing typecheck"
+    "typecheck": "nx affected -t typecheck --parallel=5"
   },
   "workspaces": {
     "packages": [
