@@ -192,6 +192,7 @@ export class Passport {
       identify({
         passportId: user.profile.sub,
       });
+      this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
     }
 
     return user ? user.profile : null;
@@ -217,6 +218,7 @@ export class Passport {
       interval,
       timeoutMs,
     );
+    this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
     return user.profile;
   }
 
@@ -232,6 +234,7 @@ export class Passport {
       authorizationCode,
       state,
     );
+    this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
     return user.profile;
   }
 

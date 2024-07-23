@@ -40,7 +40,7 @@ The need for a Typescript SDK arises from the challenges developers face when ma
   - [X-Client](#x-client)
   - [X-Provider](#x-provider)
 - [Contribution Guides](#contribution-guides)
-- [Samples](#samples)
+- [Examples](#examples)
 
 # Getting Started
 
@@ -82,38 +82,20 @@ Most packages in the workspace have their own README file that provides specific
 
 NOTE: Some packages may have additional commands or require different setup steps, for example in a certain package the development mode may be started with `yarn start:dev` instead of `yarn start`, or `yarn dev`. For the steps below we will be assuming defaults.
 
-### Development Mode
+### Development watch mode
 
-Development mode allows you to run a package in a local development environment. This is useful for testing changes and new features before deploying them to production. Any changes made will be reflected in real-time on save, so you can see the effects of your changes immediately. These are propogated in real time to the sample app, if it is running, for that SDK too.
-
-Development mode for sdk packages will tend to use rollup and its watch mode to rebuild the package on file changes. This build output, stored in the dist folder of the sdk package, is what is exposed to any other packages that depend on it, including the sample app.
-
-To run a package in development mode, you can use the following command in the context of that package:
+Build a package and start watch mode for a package:
 
 ```bash
-# Context: Specified package
-yarn start
+yarn dev YOUR_PACKAGE_NAME
 ```
 
-Some packages also come with a sample app that you can run in development mode. To run the sample app, you first need to run the SDK it depends on in development mode, and then run the sample app development mode in a seperate terminal. For example, to run the `checkout-sdk-sample-app` located at `/packages/checkout/sdk-sample-app`, you can use the following commands:
-
+e.g. for @imtbl/passport package
 ```bash
-yarn workspace @imtbl/checkout-sdk start
-
-# Or from the root of the monorepo
-cd packages/checkout/sdk
-yarn start
+yarn dev @imtbl/passport
 ```
+Changes in any packages that `@imtbl/passport` depends on will re-build passport package.
 
-Then, in a separate terminal:
-
-```bash
-yarn workspace @imtbl/checkout-sdk-sample-app start
-
-# Or from the root of the monorepo
-cd packages/checkout/sdk-sample-app
-yarn start
-```
 
 ### Running Tests
 
@@ -309,6 +291,6 @@ Internal maintainers' guide is available at Immutable's wiki [Typescript SDK Int
 - In the .github/CODEOWNERS file add your github team to the corresponding subfolder that your team will be responsible for.
 - [Example from GitHub](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners#example-of-a-codeowners-file)
 
-# Samples
+# Examples
 
-The Typescript SDK also provides multiple sample frontend/backend applications in the root `samples` directory. These samples are meant to demonstrate how to use the SDK in a real-world application for external users and provide a base for building custom applications. Each sample has its own README file that provides additional information surrounding that sample app. 
+The Typescript SDK also provides multiple sample frontend/backend applications in the root `examples` directory. These examples are meant to demonstrate how to use the SDK in a real-world application for external users and provide a base for building custom applications. Each sample has its own README file that provides additional information surrounding that example app. 

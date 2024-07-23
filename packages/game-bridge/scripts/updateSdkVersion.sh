@@ -1,7 +1,14 @@
 #!/bin/bash
 
+# This script is used to update the SDK version in the output files
+# It is run as part of the build process and expects the following environment variables to be set:
+# - TS_SDK_TAG: The tag of the SDK
+# - TS_SDK_HASH: The git hash of the tag
+
 set -e
-set -x
+if [ -n "$CI" ]; then
+  set -x
+fi
 
 # The files to update
 FILE_PATHS=("./dist/unity/index.html" "./dist/unreal/index.js" "./dist/unreal/index.js.map")
@@ -15,28 +22,61 @@ do
   fi
 done
 
-# pull down latest tags
-git fetch --tags
+# Check if running in a CI environment
+if [ -n "$CI" ]; then
+  # Check if TS_SDK_TAG environment variable is set
+  if [ -z "$TS_SDK_TAG" ]; then
+      echo "TS_SDK_TAG environment variable not found. Exiting..."
+      exit 1
+  fi
 
-# get latest git tag
-LATEST_TAG=$(git tag -l --sort=-v:refname | grep -v '\-alpha' | head -n 1)
+  # Check if TS_SDK_HASH environment variable is set
+  if [ -z "$TS_SDK_HASH" ]; then
+      echo "TS_SDK_HASH environment variable not found. Exiting..."
+      exit 1
+  fi
 
-if [ -z "$LATEST_TAG" ]; then
-  echo "No tags found. Exiting..."
-  exit 1
+  # use regex to check the current tag is a valid version
+  # example valid version: 1.2.3
+  # or: 1.2.3-alpha 
+  # or: 1.2.3-alpha.1
+  if [[ ! $TS_SDK_TAG =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?$ ]]; then
+    echo "Current tag is not a valid version. Exiting..."
+    exit 1
+  fi
 fi
 
-# get latest commit hash
-LATEST_COMMIT=$(git rev-parse HEAD)
+# if running locally, set the environment variables
+if [ ! -n "$CI" ]; then
+  export TS_SDK_TAG=$(git describe --tags --abbrev=0)
+  export TS_SDK_HASH=$(git rev-parse $TS_SDK_TAG)
+
+  # get the hash of the current HEAD
+  export TS_SDK_LOCAL_HEAD_HASH=$(git rev-parse HEAD)
+
+  # check the hash matches the has from the tag
+  if [ "$TS_SDK_HASH" != "$TS_SDK_LOCAL_HEAD_HASH" ]; then
+    # warn the user that the current tag does not match the current HEAD
+    # but continue with the update
+    echo "[!!!WARNING!!!]"
+    echo "[!!!WARNING!!!]"
+    echo "[!!!WARNING!!!] The current tag does not match the current HEAD. Do not commit this game brige to the Game SDK repos..."
+    echo "[!!!WARNING!!!]"
+    echo "[!!!WARNING!!!]"
+  fi
+fi
+
+echo "Updating __SDK_VERSION__ to $TS_SDK_TAG"
+echo "Updating __SDK_VERSION_SHA__ to $TS_SDK_HASH"
 
 # update variables in output files
 for FILE_PATH in "${FILE_PATHS[@]}"
 do
   if [[ "$OSTYPE" == "darwin"* ]]; then
-    sed -i '' "s/__SDK_VERSION__/${LATEST_TAG}/g" $FILE_PATH
-    sed -i '' "s/__SDK_VERSION_SHA__/${LATEST_COMMIT}/g" $FILE_PATH
+    sed -i '' "s/__SDK_VERSION__/${TS_SDK_TAG}/g" $FILE_PATH
+    sed -i '' "s/__SDK_VERSION_SHA__/${TS_SDK_HASH}/g" $FILE_PATH
   else
-    sed -i "s/__SDK_VERSION__/${LATEST_TAG}/g" $FILE_PATH
-    sed -i "s/__SDK_VERSION_SHA__/${LATEST_COMMIT}/g" $FILE_PATH
+    sed -i "s/__SDK_VERSION__/${TS_SDK_TAG}/g" $FILE_PATH
+    sed -i "s/__SDK_VERSION_SHA__/${TS_SDK_HASH}/g" $FILE_PATH
   fi
 done

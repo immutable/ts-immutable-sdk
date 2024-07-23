@@ -39,7 +39,7 @@ import { EventTargetContext } from '../../context/event-target-context/EventTarg
 import { OrderSummary } from './views/OrderSummary';
 import { CreditCardWarningDrawer } from './components/CreditCardWarningDrawer';
 
-type OptionalWidgetParams = Pick<SaleWidgetParams, 'excludePaymentTypes'>;
+type OptionalWidgetParams = Pick<SaleWidgetParams, 'excludePaymentTypes' | 'excludeFiatCurrencies'>;
 type RequiredWidgetParams = Required<
 Omit<SaleWidgetParams, 'walletProviderName'>
 >;
@@ -61,6 +61,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
     environmentId,
     collectionName,
     excludePaymentTypes,
+    excludeFiatCurrencies,
     preferredCurrency,
     hideExcludedPaymentTypes,
     waitFulfillmentSettlements = true,
@@ -128,6 +129,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
           passport: checkout?.passport,
           collectionName,
           excludePaymentTypes,
+          excludeFiatCurrencies,
           preferredCurrency,
           waitFulfillmentSettlements,
           hideExcludedPaymentTypes,
@@ -167,7 +169,7 @@ export default function SaleWidget(props: SaleWidgetProps) {
               checkout={checkout}
               provider={provider}
               showOnrampOption={config.isOnRampEnabled}
-              showSwapOption={config.isSwapEnabled}
+              showSwapOption={false}
               showBridgeOption={config.isBridgeEnabled}
               onCloseButtonClick={() => sendSaleWidgetCloseEvent(eventTarget)}
               onBackButtonClick={() => {

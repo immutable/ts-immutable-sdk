@@ -46,6 +46,7 @@ type SaleContextProps = {
   checkout: ConnectLoaderState['checkout'];
   passport?: Passport;
   excludePaymentTypes: SalePaymentTypes[];
+  excludeFiatCurrencies?: string[];
   preferredCurrency?: string;
   waitFulfillmentSettlements: boolean;
   hideExcludedPaymentTypes: boolean;
@@ -157,6 +158,7 @@ export function SaleContextProvider(props: {
       passport,
       collectionName,
       excludePaymentTypes,
+      excludeFiatCurrencies,
       preferredCurrency,
       waitFulfillmentSettlements,
       hideExcludedPaymentTypes,
@@ -380,6 +382,7 @@ export function SaleContextProvider(props: {
       orderQuote,
       signTokenIds: tokenIds,
       excludePaymentTypes,
+      excludeFiatCurrencies,
       selectedCurrency,
       waitFulfillmentSettlements,
       hideExcludedPaymentTypes,
@@ -413,6 +416,7 @@ export function SaleContextProvider(props: {
       orderQuote,
       tokenIds,
       excludePaymentTypes,
+      excludeFiatCurrencies,
       selectedCurrency,
       waitFulfillmentSettlements,
       hideExcludedPaymentTypes,
