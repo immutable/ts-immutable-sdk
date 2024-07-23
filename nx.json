@@ -14,7 +14,10 @@
       "cache": true
     },
     "test": {
-      "cache": true
+      "cache": true,
+      "dependsOn": [
+        "build"
+      ]
     },
     "build": {
       "dependsOn": [

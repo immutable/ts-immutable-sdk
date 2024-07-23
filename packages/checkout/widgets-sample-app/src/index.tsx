@@ -11,6 +11,7 @@ import OnRampUI from "./components/ui/on-ramp/onRamp";
 import { PassportLoginCallback } from './components/ui/marketplace-orchestrator/PassportLoginCallback';
 import { Marketplace } from './components/ui/marketplace-orchestrator';
 import { SaleUI } from './components/ui/sale/sale';
+import CheckoutUI from './components/ui/checkout/checkout';
 
 const router = createBrowserRouter([
   {
@@ -40,6 +41,10 @@ const router = createBrowserRouter([
   {
     path: '/sale',
     element: <SaleUI />,
+  },
+  {
+    path: '/checkout',
+    element: <CheckoutUI />,
   },
   {
     path: '/marketplace-orchestrator',

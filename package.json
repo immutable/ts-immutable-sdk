@@ -49,23 +49,23 @@
   "scripts": {
     "build": "yarn workspace @imtbl/sdk updateDependencies && NODE_OPTIONS=--max-old-space-size=14366 nx run-many --target=build --projects=@imtbl/sdk,@imtbl/checkout-widgets && yarn syncpack:format && yarn wsrun -p @imtbl/sdk -a -m copyBrowserBundles",
     "build:onlysdk": "NODE_OPTIONS=--max-old-space-size=14366 nx run-many --target=build --projects=@imtbl/sdk && yarn syncpack:format",
+    "dev": "./dev.sh",
     "docs:build": "typedoc",
     "docs:serve": "http-server ./docs --cors -p 8080 -c-1",
-    "lint": "wsrun --exclude-missing -e lint --no-error-on-unmatched-pattern",
-    "lint:ci": "./lint-ci.sh",
+    "lint": "nx run-many -t lint --parallel=5 --no-error-on-unmatched-pattern",
+    "nx": "nx",
     "postinstall": "husky install; ./.husky/install_gitleaks.sh",
     "release": "release-it",
     "scan:secrets": "./.husky/run_gitleaks.sh",
     "syncpack:check": "yarn syncpack list-mismatches",
     "syncpack:fix": "yarn syncpack fix-mismatches",
     "syncpack:format": "yarn syncpack format",
-    "test": "wsrun --exclude-missing -e test",
+    "test": "nx run-many -t test --parallel=5",
     "test:checkout:cypress": "wsrun -p @imtbl/checkout-widgets-lib --exclude-missing -e test:cypress",
     "test:checkout:sdk:coverage": "wsrun -p @imtbl/checkout-sdk --exclude-missing -e test:coverage",
     "test:examples": "cd examples/ts-immutable-sample && yarn test && yarn test:e2e",
     "test:vpn": "RUN_VPN_TESTS=1 wsrun --exclude-missing -e test",
-    "typecheck": "wsrun --exclude-missing typecheck",
-    "dev": "./dev.sh"
+    "typecheck": "wsrun --exclude-missing typecheck"
   },
   "workspaces": {
     "packages": [
