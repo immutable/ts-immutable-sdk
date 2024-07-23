@@ -14,6 +14,7 @@ type PassportContextType = {
   loginWithEthersjs?: () => void;
   getIdToken?: () => void;
   getAccessToken?: () => void;
+  getLinkedAddresses?: () => void;
 };
 
 const PassportContext = createContext<PassportContextType>({});
@@ -114,6 +115,14 @@ export const PassportProvider = ({ children }: { children: ReactNode }) => {
     window.alert("accessToken: " + accessToken);
   }, [passportInstance]);
 
+  const getLinkedAddresses = useCallback(async () => {
+    if (!passportInstance) return;
+    // #doc passport-get-linked-addresses
+    const linkedAddresses = await passportInstance.getLinkedAddresses();
+    // #enddoc passport-get-linked-addresses
+    window.alert("linkedAddresses: " + linkedAddresses);
+  }, [passportInstance]);
+
   return (
     <PassportContext.Provider
       value={{
@@ -126,6 +135,7 @@ export const PassportProvider = ({ children }: { children: ReactNode }) => {
         loginWithEthersjs,
         getIdToken,
         getAccessToken,
+        getLinkedAddresses,
       }}
     >
       {children}
