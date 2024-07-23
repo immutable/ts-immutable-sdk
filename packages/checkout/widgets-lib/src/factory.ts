@@ -21,6 +21,7 @@ import {
   DEFAULT_THEME,
 } from './lib';
 import './i18n';
+import { CheckoutWidgetRoot } from './widgets/checkout/CheckoutWidgetRoot';
 
 export class WidgetsFactory implements IWidgetsFactory {
   private sdk: Checkout;
@@ -91,6 +92,12 @@ export class WidgetsFactory implements IWidgetsFactory {
           config: { ...this.widgetConfig, ...(config) },
           provider,
         }) as Widget<WidgetType.SALE> as Widget<T>;
+      }
+      case WidgetType.CHECKOUT: {
+        return new CheckoutWidgetRoot(this.sdk, {
+          config: { ...this.widgetConfig, ...(config) },
+          provider,
+        }) as Widget<WidgetType.CHECKOUT> as Widget<T>;
       }
       default:
         throw new Error('widget type not supported');
