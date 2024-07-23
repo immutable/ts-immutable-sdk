@@ -15,6 +15,7 @@ type PassportContextType = {
   getIdToken?: () => void;
   getAccessToken?: () => void;
   getLinkedAddresses?: () => void;
+  getUserInfo?: () => void;
 };
 
 const PassportContext = createContext<PassportContextType>({});
@@ -123,6 +124,14 @@ export const PassportProvider = ({ children }: { children: ReactNode }) => {
     window.alert("linkedAddresses: " + linkedAddresses);
   }, [passportInstance]);
 
+  const getUserInfo = useCallback(async () => {
+    if (!passportInstance) return;
+    // #doc passport-get-user-info
+    const userProfile = await passportInstance.getUserInfo();
+    // #enddoc passport-get-user-info
+    window.alert("userProfile: " + JSON.stringify(userProfile));
+  }, [passportInstance]);
+
   return (
     <PassportContext.Provider
       value={{
@@ -136,6 +145,7 @@ export const PassportProvider = ({ children }: { children: ReactNode }) => {
         getIdToken,
         getAccessToken,
         getLinkedAddresses,
+        getUserInfo,
       }}
     >
       {children}
