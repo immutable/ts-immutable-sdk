@@ -13,18 +13,24 @@ export default function ConnectWithEtherJS() {
   // setup the loading state to enable/disable buttons when loading
   const [loading, setLoadingState] = useState<boolean>(false);
 
+  // #doc passport-wallets-nextjs-connect-etherjs-create
   // fetch the Passport provider from the Passport instance
   const passportProvider = passportInstance.connectEvm()
 
   // create the Web3Provider using the Passport provider
   const web3Provider = new ethers.providers.Web3Provider(passportProvider);
+  // #enddoc passport-wallets-nextjs-connect-etherjs-create
 
   const passportLogin = async () => {
     if (web3Provider.provider.request) {
       // disable button while loading
       setLoadingState(true)
+      
+      // #doc passport-wallets-nextjs-connect-etherjs-request
       // calling eth_requestAccounts triggers the Passport login flow
       const accounts = await web3Provider.provider.request({ method: "eth_requestAccounts" });
+      // #enddoc passport-wallets-nextjs-connect-etherjs-request
+
       // once logged in Passport is connected to the wallet and ready to transact
       setAccountsState(accounts)
       // enable button when loading has finished

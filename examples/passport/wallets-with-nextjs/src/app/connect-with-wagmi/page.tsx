@@ -3,15 +3,13 @@
 import { http, createConfig, WagmiProvider, useAccount } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { immutableZkEvmTestnet } from 'wagmi/chains';
-import { ProviderEvent } from '@imtbl/sdk/passport';
-import { passportInstance } from '../page';
 import { WalletOptions } from './wallet-options';
 import { Account } from './account';
 import { injected } from 'wagmi/connectors';
+import { passportInstance } from '../page';
 
-const queryClient = new QueryClient()
-
-// create the Wagmi config
+// #doc passport-wallets-nextjs-connect-wagmi-config
+// create the Wagmi config for Immutable zkEVM Testnet
 export const config = createConfig({
   chains: [immutableZkEvmTestnet],
   connectors: [injected()],
@@ -19,21 +17,29 @@ export const config = createConfig({
     [immutableZkEvmTestnet.id]: http(),
   },
 });
+// #enddoc passport-wallets-nextjs-connect-wagmi-config
 
-// show login options or the logged in account details
+// #doc passport-wallets-nextjs-connect-wagmi-connect-component
+// show wallet options for login or the logged in account details
+// depending on whether the account is connected or not
 function ConnectWallet() {
   const { isConnected } = useAccount()
   if (isConnected) return <Account />
   return <WalletOptions />
 }
+// #enddoc passport-wallets-nextjs-connect-wagmi-connect-component
+
+// #doc passport-wallets-nextjs-connect-wagmi-provider
+// initialise the QueryClient for the Provider
+const queryClient = new QueryClient()
 
 export default function ConnectWithWagmi() {
 
-  // fetch the Passport provider from the Passport instance
   // calling connectEVM() makes Passport available as an option to Wagmi
   const passportProvider = passportInstance.connectEvm()
 
-  // render the view to login/logout and show the connected accounts
+  // render the ConnectWallet component
+  // wrapping it in the Wagami and QueryClient Providers
   return (<>
     <h1>Passport Wallet - Connect with Wagmi</h1>
     <WagmiProvider config={config}>
@@ -46,3 +52,4 @@ export default function ConnectWithWagmi() {
     </p>
   </>);
 }
+// #enddoc passport-wallets-nextjs-connect-wagmi-provider

@@ -11,13 +11,14 @@ export function Account() {
   // setup the loading state to enable/disable buttons when loading
   const [loading, setLoadingState] = useState<boolean>(false);
 
+  // #doc passport-wallets-nextjs-connect-wagmi-disconnect
   const passportLogout = async () => {
     // disable button while loading
     setLoadingState(true)
-    // logout from Passport
-    await passportInstance.logout()
     // disconnect Wagmi from Passport
     disconnect()
+    // logout from Passport
+    await passportInstance.logout()
   }
 
   // render the view to show the connected accounts and logout
@@ -31,4 +32,5 @@ export function Account() {
       }
     </div>
   )
+  // #enddoc passport-wallets-nextjs-connect-wagmi-disconnect
 }
