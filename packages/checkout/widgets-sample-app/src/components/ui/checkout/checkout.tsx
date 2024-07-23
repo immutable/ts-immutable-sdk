@@ -1,4 +1,4 @@
-import { Checkout, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
+import { Checkout, WidgetLanguage, WidgetTheme, WidgetType } from '@imtbl/checkout-sdk';
 import { WidgetsFactory } from '@imtbl/checkout-widgets';
 import { useEffect, useMemo } from 'react';
 import { Environment } from '@imtbl/config';
@@ -24,7 +24,18 @@ function CheckoutUI() {
       <button onClick={mount}>Mount</button>
       <button onClick={() => update(WidgetTheme.LIGHT)}>Light theme</button>
       <button onClick={() => update(WidgetTheme.DARK)}>Dark theme</button>
-
+      <select
+        onChange={(e) =>
+          checkoutWidget.update({
+            config: { language: e.target.value as WidgetLanguage },
+          })
+        }
+      >
+        <option value="en">EN</option>
+        <option value="ja">JA</option>
+        <option value="ko">KO</option>
+        <option value="zh">ZH</option>
+      </select>
     </div>
   );
 }

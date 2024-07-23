@@ -40,50 +40,49 @@ export class CheckoutWidgetRoot extends Base<WidgetType.CHECKOUT> {
   }
 
   protected getValidatedParameters(params: CheckoutWidgetParams): CheckoutWidgetParams {
-    const validatedParams = params;
-
-    return validatedParams;
+    return params;
   }
 
   protected render() {
     if (!this.reactRoot) return;
     const { t } = i18n;
+    const config = this.strongConfig();
+
     const connectLoaderParams: ConnectLoaderParams = {
       targetChainId: this.checkout.config.isProduction
         ? ChainId.IMTBL_ZKEVM_MAINNET
         : ChainId.IMTBL_ZKEVM_TESTNET,
-      // walletProviderName: this.parameters?.walletProviderName,
       web3Provider: this.web3Provider,
       checkout: this.checkout,
       allowedChains: [getL1ChainId(this.checkout.config), getL2ChainId(this.checkout.config)],
     };
 
     this.reactRoot.render(
-      <React.StrictMode>
-        <CustomAnalyticsProvider checkout={this.checkout}>
-          <ThemeProvider id="checkout-container" config={this.strongConfig()}>
-            <HandoverProvider>
-              <ConnectLoader
-                widgetConfig={this.strongConfig()}
-                params={connectLoaderParams}
-                closeEvent={() => { }}
-              >
-                <Suspense
-                  fallback={
-                    <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
+      <CustomAnalyticsProvider checkout={this.checkout}>
+        <ThemeProvider id="checkout-container" config={this.strongConfig()}>
+          <HandoverProvider>
+            <ConnectLoader
+              widgetConfig={this.strongConfig()}
+              params={connectLoaderParams}
+              closeEvent={() => { }}
+            >
+              <Suspense
+                fallback={
+                  <LoadingView loadingText={t('views.LOADING_VIEW.text')} />
                   }
-                >
-                  <CheckoutWidget
-                    config={this.strongConfig()}
-                    flow={CheckoutFlowType.WALLET}
-                    showDisconnectButton
-                  />
-                </Suspense>
-              </ConnectLoader>
-            </HandoverProvider>
-          </ThemeProvider>
-        </CustomAnalyticsProvider>
-      </React.StrictMode>,
+              >
+                {/* TODO: pass on params */}
+                <CheckoutWidget
+                  config={config}
+                  flow={CheckoutFlowType.WALLET}
+                  showDisconnectButton
+                  language={this.parameters.language}
+                />
+              </Suspense>
+            </ConnectLoader>
+          </HandoverProvider>
+        </ThemeProvider>
+      </CustomAnalyticsProvider>,
     );
   }
 }

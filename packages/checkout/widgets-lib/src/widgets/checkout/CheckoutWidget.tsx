@@ -1,6 +1,6 @@
 import { Environment } from '@imtbl/config';
 import { CheckoutFlowType, CheckoutWidgetParams } from '@imtbl/checkout-sdk';
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Box } from '@biom3/react';
 import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
@@ -38,17 +38,30 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
   const { environment } = config;
 
   const { connectLoaderState: { checkout } } = useContext(ConnectLoaderContext);
+  const publishableKey = checkout?.config.publishableKey;
+
+  const [iframeURL, setIframeURL] = useState<string>();
+
+  useEffect(() => {
+    if (!publishableKey || !language) return;
+
+    const url = getIframeURL(
+      flow,
+      environment,
+      publishableKey,
+      language,
+    );
+
+    setIframeURL(url);
+  }, [publishableKey, language]);
 
   // TODO:
   // on iframe load error, go to error view 500
   // on iframe loading, show loading view, requires iframe to trigger an initialised event
 
-  const iframeURL = getIframeURL(
-    flow,
-    environment,
-    checkout?.config.publishableKey!,
-    language!,
-  );
+  if (!iframeURL) {
+    return null;
+  }
 
   return (
     <Box
