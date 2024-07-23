@@ -313,7 +313,7 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async listAllNFTOwners(
-    request: mr.NftOwnersApiListNFTOwnersRequest,
+    request: mr.NftOwnersApiListAllNFTOwnersRequest,
   ): Promise<mr.ListNFTOwnersResult> {
     return await this.nftOwners
       .listAllNFTOwners(request)
