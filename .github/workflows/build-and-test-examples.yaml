@@ -35,7 +35,7 @@ jobs:
         run: |
           while IFS= read -r dir; do
             echo "Installing dependencies for $dir"
-            (cd "$dir" && yarn install)
+            (cd "$dir" && yarn install --no-immutable)
           done < project-dirs.txt
         
       - name: Build Projects
