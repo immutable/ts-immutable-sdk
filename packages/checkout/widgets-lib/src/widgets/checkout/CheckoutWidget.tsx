@@ -1,18 +1,19 @@
 import { Environment } from '@imtbl/config';
-import { CheckoutFlowType, CheckoutWidgetParams } from '@imtbl/checkout-sdk';
-import { useContext, useEffect, useState } from 'react';
+import { CheckoutFlowType, CheckoutWidgetParams, Checkout } from '@imtbl/checkout-sdk';
+import { useEffect, useState } from 'react';
 import { Box } from '@biom3/react';
-import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { CHECKOUT_APP_URL } from '../../lib/constants';
 
 export type CheckoutWidgetInputs = CheckoutWidgetParams & {
+  checkout: Checkout;
   config: StrongCheckoutWidgetsConfig;
 };
 
 const getQueryParamsByFlow = (flow: CheckoutFlowType) => `?flow=${flow}`;
 
 const getIframeURL = (
+
   flow: CheckoutFlowType,
   environment: Environment,
   publishableKey: string,
@@ -34,11 +35,12 @@ const getIframeURL = (
 };
 
 export default function CheckoutWidget(props: CheckoutWidgetInputs) {
-  const { config, language, flow } = props;
-  const { environment } = config;
+  const {
+    config, language, flow, checkout,
+  } = props;
 
-  const { connectLoaderState: { checkout } } = useContext(ConnectLoaderContext);
-  const publishableKey = checkout?.config.publishableKey;
+  const { environment } = config;
+  const { publishableKey } = checkout.config;
 
   const [iframeURL, setIframeURL] = useState<string>();
 
