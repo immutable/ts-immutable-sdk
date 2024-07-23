@@ -6,7 +6,7 @@ import { immutableZkEvmTestnet } from 'wagmi/chains';
 import { WalletOptions } from './wallet-options';
 import { Account } from './account';
 import { injected } from 'wagmi/connectors';
-import { passportInstance } from '../page';
+import { passportInstance } from '../utils';
 
 // #doc passport-wallets-nextjs-connect-wagmi-config
 // create the Wagmi config for Immutable zkEVM Testnet

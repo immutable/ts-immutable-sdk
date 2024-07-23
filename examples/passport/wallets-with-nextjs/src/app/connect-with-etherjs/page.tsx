@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { ethers } from 'ethers';
 import { ProviderEvent } from '@imtbl/sdk/passport';
-import { passportInstance } from '../page';
+import { passportInstance } from '../utils';
 
 export default function ConnectWithEtherJS() {
   

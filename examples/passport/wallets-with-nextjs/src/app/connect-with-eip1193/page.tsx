@@ -2,7 +2,7 @@
  
 import { useState } from 'react';
 import { ProviderEvent } from '@imtbl/sdk/passport';
-import { passportInstance } from '../page';
+import { passportInstance } from '../utils';
 
 export default function ConnectWithEtherJS() {
   

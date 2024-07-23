@@ -1,6 +1,6 @@
 'use client';
 
-import { passportInstance } from '../page';
+import { passportInstance } from '../utils';
 
 export default function Redirect() {
 
