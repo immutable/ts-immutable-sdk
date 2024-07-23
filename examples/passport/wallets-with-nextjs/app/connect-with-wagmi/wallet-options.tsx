@@ -12,7 +12,6 @@ export function WalletOptions() {
   // setup the filtered connectors state
   const [filteredConnectors, setFilteredConnectors] = useState<Connector[]>([])
 
-  
   useEffect(() => {
     if (!connectors) return
     //filter the connects to show only Passport
