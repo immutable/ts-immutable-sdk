@@ -45,5 +45,10 @@ jobs:
         run: |
           while IFS= read -r dir; do
             echo "Processing $dir"
-            (cd "$dir" && yarn install --immutable && yarn build && yarn test)
+            (cd "$dir" && yarn install --immutable && yarn build)
+            if jq -e '.scripts.test' "$dir/package.json" > /dev/null; then
+              (cd "$dir" && yarn test)
+            else
+              echo "No test script found in $dir/package.json, skipping tests."
+            fi
           done < project-dirs.txt
