@@ -1,8 +1,8 @@
 import { createContext } from 'react';
-import { provider, config } from '@imtbl/sdk';
+import { x, config } from '@imtbl/sdk';
 
 export interface AppState {
-  metaMaskIMXProvider: provider.MetaMaskIMXProvider | null;
+  metaMaskIMXProvider: x.MetaMaskIMXProvider | null;
   address: string;
   signedMessage: string;
   env: string;
@@ -51,7 +51,7 @@ export interface SetEnvironment {
 
 export interface MetaMaskIMXProviderConnected {
   type: Actions.MetaMaskIMXProviderConnected;
-  metaMaskIMXProvider: provider.MetaMaskIMXProvider;
+  metaMaskIMXProvider: x.MetaMaskIMXProvider;
   address: string;
 }
 
