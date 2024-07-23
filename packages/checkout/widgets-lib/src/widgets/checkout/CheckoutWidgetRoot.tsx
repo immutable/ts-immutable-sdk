@@ -5,7 +5,6 @@ import {
   WidgetProperties,
   WidgetTheme,
   WidgetType,
-  CheckoutFlowType,
 } from '@imtbl/checkout-sdk';
 import React, { Suspense } from 'react';
 import { ThemeProvider } from '../../components/ThemeProvider/ThemeProvider';
@@ -30,7 +29,7 @@ export class CheckoutWidgetRoot extends Base<WidgetType.CHECKOUT> {
       if (config.theme === WidgetTheme.LIGHT) validatedConfig.theme = WidgetTheme.LIGHT;
       else validatedConfig.theme = WidgetTheme.DARK;
     }
-
+    console.log('CONFIG', config);
     return {
       config: validatedConfig,
     };
@@ -56,11 +55,9 @@ export class CheckoutWidgetRoot extends Base<WidgetType.CHECKOUT> {
             >
               {/* TODO: pass on params */}
               <CheckoutWidget
-                config={config}
                 checkout={this.checkout}
-                flow={CheckoutFlowType.WALLET}
-                showDisconnectButton
-                language={this.parameters.language}
+                config={config}
+                params={this.parameters}
               />
             </Suspense>
           </HandoverProvider>

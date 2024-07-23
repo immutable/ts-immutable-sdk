@@ -5,15 +5,15 @@ import { Box } from '@biom3/react';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { CHECKOUT_APP_URL } from '../../lib/constants';
 
-export type CheckoutWidgetInputs = CheckoutWidgetParams & {
+export type CheckoutWidgetInputs = {
   checkout: Checkout;
   config: StrongCheckoutWidgetsConfig;
+  params: CheckoutWidgetParams;
 };
 
 const getQueryParamsByFlow = (flow: CheckoutFlowType) => `?flow=${flow}`;
 
 const getIframeURL = (
-
   flow: CheckoutFlowType,
   environment: Environment,
   publishableKey: string,
@@ -35,10 +35,8 @@ const getIframeURL = (
 };
 
 export default function CheckoutWidget(props: CheckoutWidgetInputs) {
-  const {
-    config, language, flow, checkout,
-  } = props;
-
+  const { config, checkout, params } = props;
+  const { language, flow } = params;
   const { environment } = config;
   const { publishableKey } = checkout.config;
 
