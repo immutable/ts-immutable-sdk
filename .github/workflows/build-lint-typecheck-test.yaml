@@ -141,7 +141,7 @@ jobs:
           cache: "yarn"
 
       - name: install depdenencies
-        run: yarn install --immutable --prefer-offline
+        run: yarn install --immutable-cache
 
       - name: Test
         run: yarn test --configuration=ci
