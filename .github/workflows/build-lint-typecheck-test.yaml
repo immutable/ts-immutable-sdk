@@ -143,6 +143,8 @@ jobs:
       #     path: node_modules
       #     key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
 
+      - name: install depdenencies
+        run: yarn install --immutable
       # - name: debug
       #   run: git diff --name-only --no-renames --relative "main" "HEAD"
 
