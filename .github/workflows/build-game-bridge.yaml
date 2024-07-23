@@ -4,37 +4,33 @@
 name: Build Game Bridge 
 
 on:
-  # workflow_dispatch:
-  #   inputs:
-  #     ts_sdk_tag:
-  #       type: string
-  #       description: TS SDK version tag
-  #       required: true
-  #     game_engine:
-  #       type: choice
-  #       description: Game SDK to update
-  #       options:
-  #         - Unity
-  #         - Unreal
-  #         - Both
-  #       required: true
-  #       default: Unity
-  #     dry_run:
-  #       type: boolean
-  #       description: "(Optional) Dry run"
-  #       required: false
-  #       default: false
-  push:
+  workflow_dispatch:
+    inputs:
+      ts_sdk_tag:
+        type: string
+        description: TS SDK version tag
+        required: true
+      game_engine:
+        type: choice
+        description: Game SDK to update
+        options:
+          - Unity
+          - Unreal
+          - Both
+        required: true
+        default: Unity
+      dry_run:
+        type: boolean
+        description: "(Optional) Dry run"
+        required: false
+        default: false
 
 env:
-  # TS_SDK_TAG: ${{ github.event.inputs.ts_sdk_tag }}
-  # GAME_ENGINE: ${{ github.event.inputs.game_engine }}
-  # DRY_RUN: ${{ github.event.inputs.dry_run }}
+  TS_SDK_TAG: ${{ github.event.inputs.ts_sdk_tag }}
+  GAME_ENGINE: ${{ github.event.inputs.game_engine }}
+  DRY_RUN: ${{ github.event.inputs.dry_run }}
   GH_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
   SDK_TEAM_MEMBERS: ${{ secrets.SDK_TEAM_MEMBERS }}
-  TS_SDK_TAG: "1.45.10"
-  GAME_ENGINE: Unreal
-  DRY_RUN: "false"
 
 jobs:
   build-game-bridge:
@@ -176,7 +172,7 @@ jobs:
   create-unreal-pr:
     name: Create Unreal PR
     needs: build-game-bridge
-    # if: ${{ github.event.inputs.game_engine == 'Unreal' || github.event.inputs.game_engine == 'Both' }}
+    if: ${{ github.event.inputs.game_engine == 'Unreal' || github.event.inputs.game_engine == 'Both' }}
     runs-on: ubuntu-latest-4-cores
     steps:
       - name: Checkout SDK Repository
