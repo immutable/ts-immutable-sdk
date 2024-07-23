@@ -1,7 +1,19 @@
 # Passport Wallets with Next JS
 
-This example shows how to connect Passport to the wallet in NextJS. Examples include
+To run this example you can 
 
-- Connecting with EtherJS Web3Provider
-- Connecting with EIP-1193 Provider
-- Connecting with Wagmi
+```
+cd examples/passport/wallets-with-nextjs
+yarn install
+yarn dev
+```
+
+browse to `http://localhost:3000` to see the full list of examples.
+
+Available examples include:
+
+- Connecting with EtherJS Web3Provider `http://localhost:3000/connect-with-etherjs`
+
+- Connecting with EIP-1193 Provider `http://localhost:3000/connect-with-eip1193`
+
+- Connecting with Wagmi `http://localhost:3000/connect-with-wagmi`
