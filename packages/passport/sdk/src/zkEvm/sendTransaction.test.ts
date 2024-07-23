@@ -86,7 +86,7 @@ describe('sendTransaction', () => {
         ethSigner,
         rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,
-        zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
+        zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
         guardianClient: guardianClient as unknown as GuardianClient,
         flow: flow as unknown as Flow,
       });
@@ -103,7 +103,7 @@ describe('sendTransaction', () => {
         ethSigner,
         rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,
-        zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
+        zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
         guardianClient: guardianClient as unknown as GuardianClient,
         flow: flow as unknown as Flow,
       });
@@ -131,7 +131,7 @@ describe('sendTransaction', () => {
         ethSigner,
         rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,
-        zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
+        zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
         guardianClient: guardianClient as unknown as GuardianClient,
         flow: flow as unknown as Flow,
       });
@@ -167,7 +167,7 @@ describe('sendTransaction', () => {
         ethSigner,
         rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
         relayerClient: relayerClient as unknown as RelayerClient,
-        zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
+        zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
         guardianClient: guardianClient as unknown as GuardianClient,
         flow: flow as unknown as Flow,
       });
@@ -217,7 +217,7 @@ describe('sendTransaction', () => {
           ethSigner,
           rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
           relayerClient: relayerClient as unknown as RelayerClient,
-          zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
+          zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
           guardianClient: guardianClient as unknown as GuardianClient,
           flow: flow as unknown as Flow,
         }),
@@ -245,7 +245,7 @@ describe('sendTransaction', () => {
           ethSigner,
           rpcProvider: rpcProvider as unknown as StaticJsonRpcProvider,
           relayerClient: relayerClient as unknown as RelayerClient,
-          zkevmAddress: mockUserZkEvm.zkEvm.ethAddress,
+          zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
           guardianClient: guardianClient as unknown as GuardianClient,
           flow: flow as unknown as Flow,
         }),

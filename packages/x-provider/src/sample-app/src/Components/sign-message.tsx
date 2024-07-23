@@ -8,7 +8,7 @@ import {
   Heading,
 } from '@biom3/react';
 import { ChangeEvent, useContext, useState } from 'react';
-import { provider } from '@imtbl/sdk';
+import { x } from '@imtbl/sdk';
 
 export const SignMessage = () => {
   const { state, dispatch } = useContext(AppCtx);
@@ -34,7 +34,7 @@ export const SignMessage = () => {
   };
 
   const sign = async () => {
-    const signedMessage = await provider.MetaMaskIMXProvider.signMessage(signMessage);
+    const signedMessage = await x.MetaMaskIMXProvider.signMessage(signMessage);
     dispatch({
       payload: {
         type: Actions.MetaMaskIMXProviderSignMessage,
