@@ -29,7 +29,6 @@ export class CheckoutWidgetRoot extends Base<WidgetType.CHECKOUT> {
       if (config.theme === WidgetTheme.LIGHT) validatedConfig.theme = WidgetTheme.LIGHT;
       else validatedConfig.theme = WidgetTheme.DARK;
     }
-    console.log('CONFIG', config);
     return {
       config: validatedConfig,
     };
