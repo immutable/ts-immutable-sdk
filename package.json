@@ -52,7 +52,7 @@
     "dev": "./dev.sh",
     "docs:build": "typedoc",
     "docs:serve": "http-server ./docs --cors -p 8080 -c-1",
-    "lint": "nx run-many -t lint --parallel=5 --no-error-on-unmatched-pattern",
+    "lint": "nx affected -t lint --parallel=5 --no-error-on-unmatched-pattern",
     "nx": "nx",
     "postinstall": "husky install; ./.husky/install_gitleaks.sh",
     "release": "release-it",
