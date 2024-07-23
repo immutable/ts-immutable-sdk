@@ -81,24 +81,20 @@ export const mockLinkedWallet = {
     name: 'Test',
     clientName: 'Passport Dashboard',
   },
+  status: 200,
 };
 
-export const mockAxiosError = {
-  isAxiosError: true,
-  response: {
-    data: {
-      code: 'api_error',
-      message: 'API error occurred',
-    },
-    status: 500,
+export const mockApiError = {
+  data: {
+    code: 'api_error',
+    message: 'API error occurred',
   },
+  status: 500,
 };
 export const mockPassportBadRequest = {
-  response: {
-    data: {
-      code: 'ALREADY_LINKED',
-      message: 'Already linked',
-    },
-    status: 400,
+  data: {
+    code: 'ALREADY_LINKED',
+    message: 'Already linked',
   },
+  status: 400,
 };

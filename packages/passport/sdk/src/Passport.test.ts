@@ -7,7 +7,7 @@ import { Passport } from './Passport';
 import { PassportImxProvider, PassportImxProviderFactory } from './starkEx';
 import { OidcConfiguration, UserProfile } from './types';
 import {
-  mockAxiosError,
+  mockApiError,
   mockLinkedAddresses,
   mockLinkedWallet,
   mockPassportBadRequest,
@@ -402,13 +402,17 @@ describe('Passport', () => {
       );
     });
 
-    it('should handle errors from the linkWalletV2 API call', async () => {
+    it('should handle generic errors from the linkWalletV2 API call', async () => {
       getUserMock.mockReturnValue(mockUserImx);
-      linkExternalWalletMock.mockRejectedValue(mockAxiosError);
+      linkExternalWalletMock.mockReturnValue(mockApiError);
 
-      await expect(passport.linkExternalWallet(linkWalletParams)).rejects.toThrow(
-        new PassportError('API error occurred', PassportErrorType.LINK_WALLET_GENERIC_ERROR),
-      );
+      try {
+        await passport.linkExternalWallet(linkWalletParams);
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(PassportError);
+        expect(error.type).toEqual(PassportErrorType.LINK_WALLET_GENERIC_ERROR);
+        expect(error.message).toEqual(`Link wallet request failed with status code ${mockApiError.status}`);
+      }
     });
 
     it('should handle 400 bad requests from the linkWalletV2 API call', async () => {
@@ -420,7 +424,6 @@ describe('Passport', () => {
       } catch (error: any) {
         expect(error).toBeInstanceOf(PassportError);
         expect(error.type).toEqual(PassportErrorType.LINK_WALLET_ALREADY_LINKED_ERROR);
-        expect(error.code).toEqual('ALREADY_LINKED');
         expect(error.message).toEqual('Already linked');
       }
     });

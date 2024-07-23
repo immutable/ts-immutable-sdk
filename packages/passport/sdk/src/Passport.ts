@@ -29,9 +29,7 @@ import TypedEventEmitter from './utils/typedEventEmitter';
 import GuardianClient from './guardian';
 import logger from './utils/logger';
 import { announceProvider, passportProviderInfo } from './zkEvm/provider/eip6963';
-import {
-  isAPIError, PassportError, PassportErrorType, withPassportError,
-} from './errors/passportError';
+import { isAPIError, PassportError, PassportErrorType } from './errors/passportError';
 
 const buildImxClientConfig = (passportModuleConfiguration: PassportModuleConfiguration) => {
   if (passportModuleConfiguration.overrides) {
@@ -325,32 +323,34 @@ export class Passport {
       nonce: params.nonce,
     };
 
-    return await withPassportError(async () => {
-      const linkWalletV2Result = await this.multiRollupApiClients
-        .passportProfileApi.linkWalletV2({ linkWalletV2Request }, { headers });
+    const linkWalletV2Result = await this.multiRollupApiClients
+      .passportProfileApi.linkWalletV2({ linkWalletV2Request }, { headers });
 
-      // Throw PassportError for Bad Request.
-      if (linkWalletV2Result.status === 400) {
-        if (isAPIError(linkWalletV2Result.data)) {
-          const { code, message } = linkWalletV2Result.data;
-          switch (code) {
-            case 'ALREADY_LINKED':
-              throw new PassportError(message, PassportErrorType.LINK_WALLET_ALREADY_LINKED_ERROR);
-            case 'MAX_WALLETS_LINKED':
-              throw new PassportError(message, PassportErrorType.LINK_WALLET_MAX_WALLETS_LINKED_ERROR);
-            case 'DUPLICATE_NONCE':
-              throw new PassportError(message, PassportErrorType.LINK_WALLET_DUPLICATE_NONCE_ERROR);
-            case 'VALIDATION_ERROR':
-              throw new PassportError(message, PassportErrorType.LINK_WALLET_VALIDATION_ERROR);
-            default:
-              throw new PassportError(message, PassportErrorType.LINK_WALLET_GENERIC_ERROR);
-          }
-        } else {
-          // Handle unexpected bad request with a generic error message
-          throw new PassportError('LINK_WALLET error', PassportErrorType.LINK_WALLET_GENERIC_ERROR);
-        }
-      }
+    if (linkWalletV2Result.status === 200) {
       return { ...linkWalletV2Result.data };
-    }, PassportErrorType.LINK_WALLET_GENERIC_ERROR);
+    }
+
+    if (linkWalletV2Result.status === 400 && isAPIError(linkWalletV2Result.data)) {
+      const { code, message } = linkWalletV2Result.data;
+
+      switch (code) {
+        case 'ALREADY_LINKED':
+          throw new PassportError(message, PassportErrorType.LINK_WALLET_ALREADY_LINKED_ERROR);
+        case 'MAX_WALLETS_LINKED':
+          throw new PassportError(message, PassportErrorType.LINK_WALLET_MAX_WALLETS_LINKED_ERROR);
+        case 'DUPLICATE_NONCE':
+          throw new PassportError(message, PassportErrorType.LINK_WALLET_DUPLICATE_NONCE_ERROR);
+        case 'VALIDATION_ERROR':
+          throw new PassportError(message, PassportErrorType.LINK_WALLET_VALIDATION_ERROR);
+        default:
+          throw new PassportError(message, PassportErrorType.LINK_WALLET_GENERIC_ERROR);
+      }
+    } else {
+      // Handle unexpected error with a generic error message
+      throw new PassportError(
+        `Link wallet request failed with status code ${linkWalletV2Result.status}`,
+        PassportErrorType.LINK_WALLET_GENERIC_ERROR,
+      );
+    }
   }
 }
