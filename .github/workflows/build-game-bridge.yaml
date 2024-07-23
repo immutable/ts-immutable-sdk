@@ -32,9 +32,9 @@ env:
   # DRY_RUN: ${{ github.event.inputs.dry_run }}
   GH_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
   SDK_TEAM_MEMBERS: ${{ secrets.SDK_TEAM_MEMBERS }}
-  TS_SDK_TAG: "1.45.9"
+  TS_SDK_TAG: "1.45.10"
   GAME_ENGINE: Unreal
-  DRY_RUN: "true"
+  DRY_RUN: "false"
 
 jobs:
   build-game-bridge:
