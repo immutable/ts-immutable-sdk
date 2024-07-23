@@ -85,16 +85,20 @@ export const mockLinkedWallet = {
 };
 
 export const mockApiError = {
-  data: {
-    code: 'api_error',
-    message: 'API error occurred',
+  response: {
+    data: {
+      code: 'api_error',
+      message: 'API error occurred',
+    },
+    status: 500,
   },
-  status: 500,
 };
 export const mockPassportBadRequest = {
-  data: {
-    code: 'ALREADY_LINKED',
-    message: 'Already linked',
+  response: {
+    data: {
+      code: 'ALREADY_LINKED',
+      message: 'Already linked',
+    },
+    status: 400,
   },
-  status: 400,
 };

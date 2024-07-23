@@ -3,10 +3,7 @@ import React, {
 } from 'react';
 import { IMXProvider } from '@imtbl/x-provider';
 import {
-  LinkWalletParams,
-  LinkedWallet,
-  Provider,
-  UserProfile,
+  LinkedWallet, LinkWalletParams, Provider, UserProfile,
 } from '@imtbl/passport';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { useStatusProvider } from '@/context/StatusProvider';
@@ -113,15 +110,15 @@ export function PassportProvider({
 
   const linkWallet = useCallback(async (params: LinkWalletParams) => {
     setIsLoading(true);
+    let linkedWallet;
     try {
-      const linkedWallet = await passportClient.linkExternalWallet(params);
+      linkedWallet = await passportClient.linkExternalWallet(params);
       addMessage('Link Wallet', linkedWallet);
-      return linkedWallet;
     } catch (e: any) {
-      addMessage('Link wallet failed', e.message);
+      addMessage(`Link wallet failed: message: ${e.message} type: ${e.type}`);
     }
     setIsLoading(false);
-    return undefined;
+    return linkedWallet || undefined;
   }, [passportClient, setIsLoading, addMessage]);
 
   const logout = useCallback(async () => {

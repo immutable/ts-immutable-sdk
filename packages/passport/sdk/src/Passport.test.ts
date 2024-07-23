@@ -1,6 +1,7 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { IMXClient } from '@imtbl/x-client';
 import { ImxApiClients, imxApiConfig, MultiRollupApiClients } from '@imtbl/generated-clients';
+import { trackError } from '@imtbl/metrics';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
 import { Passport } from './Passport';
@@ -26,6 +27,7 @@ jest.mock('./confirmation');
 jest.mock('./zkEvm');
 jest.mock('./zkEvm/provider/eip6963');
 jest.mock('@imtbl/generated-clients');
+jest.mock('@imtbl/metrics');
 
 const oidcConfiguration: OidcConfiguration = {
   clientId: '11111',
@@ -411,7 +413,7 @@ describe('Passport', () => {
       } catch (error: any) {
         expect(error).toBeInstanceOf(PassportError);
         expect(error.type).toEqual(PassportErrorType.LINK_WALLET_GENERIC_ERROR);
-        expect(error.message).toEqual(`Link wallet request failed with status code ${mockApiError.status}`);
+        expect(error.message).toEqual(`Link wallet request failed with status code ${mockApiError.response.status}`);
       }
     });
 
@@ -425,6 +427,21 @@ describe('Passport', () => {
         expect(error).toBeInstanceOf(PassportError);
         expect(error.type).toEqual(PassportErrorType.LINK_WALLET_ALREADY_LINKED_ERROR);
         expect(error.message).toEqual('Already linked');
+      }
+    });
+
+    it('should call track error function if an error occurs', async () => {
+      getUserMock.mockReturnValue(mockUserImx);
+      linkExternalWalletMock.mockReturnValue(mockPassportBadRequest);
+
+      try {
+        await passport.linkExternalWallet(linkWalletParams);
+      } catch (error) {
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          'linkWallet',
+          error,
+        );
       }
     });
   });
