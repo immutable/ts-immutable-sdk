@@ -6,6 +6,7 @@ import {
   WidgetProperties,
   WidgetTheme,
   WidgetType,
+  CheckoutFlowType,
 } from '@imtbl/checkout-sdk';
 import React, { Suspense } from 'react';
 import { ConnectLoader, ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
@@ -46,7 +47,6 @@ export class CheckoutWidgetRoot extends Base<WidgetType.CHECKOUT> {
 
   protected render() {
     if (!this.reactRoot) return;
-
     const { t } = i18n;
     const connectLoaderParams: ConnectLoaderParams = {
       targetChainId: this.checkout.config.isProduction
@@ -75,6 +75,8 @@ export class CheckoutWidgetRoot extends Base<WidgetType.CHECKOUT> {
                 >
                   <CheckoutWidget
                     config={this.strongConfig()}
+                    flow={CheckoutFlowType.WALLET}
+                    showDisconnectButton
                   />
                 </Suspense>
               </ConnectLoader>
