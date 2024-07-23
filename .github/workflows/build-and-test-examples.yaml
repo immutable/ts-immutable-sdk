@@ -2,11 +2,9 @@ name: Build and test all example apps
 
 on:
   pull_request:
-    # Temp, remove EXC-21-passport-wallets-examples when done
-    branches: [main, EXC-21-passport-wallets-examples]
+    branches: [main]
   merge_group:
-    # Temp, remove EXC-21-passport-wallets-examples when done
-    branches: [main, EXC-21-passport-wallets-examples]
+    branches: [main]
 
 jobs:
   build:
@@ -25,17 +23,6 @@ jobs:
           registry-url: https://registry.npmjs.org/
           cache: "yarn"
 
-      # - name: Install Dependencies
-      #   run: yarn install --immutable
-      #   working-directory: ./examples/passport/wallets-with-nextjs
-    
-      # - name: Build
-      #   run: yarn build
-      #   working-directory: ./examples/passport/wallets-with-nextjs
-      
-      # - name: Test
-      #   run: yarn test
-      #   working-directory: ./examples/passport/wallets-with-nextjs
       - name: Find all projects
         id: find-projects
         run: |
