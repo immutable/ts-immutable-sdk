@@ -89,10 +89,15 @@ jobs:
   typecheck:
     name: Typecheck
     runs-on: ubuntu-latest-4-cores
-    needs: build
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - name: Derive appropriate SHAs for base and head for `nx affected` commands
+        uses: nrwl/nx-set-shas@v3
 
       - name: Use Node.js
         uses: actions/setup-node@v4
@@ -107,13 +112,8 @@ jobs:
           path: node_modules
           key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
 
-      - name: Restore cached build artifacts
-        uses: actions/cache@v4
-        with:
-          path: |
-            ./sdk
-            ./packages
-          key: ${{ runner.os }}-build-${{ github.sha }}
+      - name: install depdenencies
+        run: yarn install --immutable
 
       - name: Typecheck
         run: yarn typecheck
@@ -152,23 +152,24 @@ jobs:
       - name: Test
         run: yarn test --configuration=ci
 
-      # - name: Get reviewing teams
-      #   id: reviewer-teams
-      #   run: echo "teams=${{ join(github.event.pull_request.requested_teams.*.name, ', ') }}" >> $GITHUB_OUTPUT
-
-      # - name: Upload Checkout SDK test coverage artifacts
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: checkout-sdk-coverage-report
-      #     path: ./packages/checkout/sdk/coverage
+      - name: Upload Checkout SDK test coverage artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverages
+          path: ./packages/**/coverage/*
 
   lint:
     name: Lint
     runs-on: ubuntu-latest-4-cores
-    needs: build
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - name: Derive appropriate SHAs for base and head for `nx affected` commands
+        uses: nrwl/nx-set-shas@v3
 
       - name: Use Node.js
         uses: actions/setup-node@v4
@@ -182,6 +183,9 @@ jobs:
         with:
           path: node_modules
           key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
+
+      - name: install depdenencies
+        run: yarn install --immutable
 
       - name: Lint
         run: yarn lint
