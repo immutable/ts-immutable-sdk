@@ -140,16 +140,8 @@ jobs:
           registry-url: https://registry.npmjs.org/
           cache: "yarn"
 
-      # - name: Restore cached node_modules
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: node_modules
-      #     key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
-
       - name: install depdenencies
-        run: yarn install --immutable
-      # - name: debug
-      #   run: git diff --name-only --no-renames --relative "main" "HEAD"
+        run: yarn install --immutable --prefer-offline
 
       - name: Test
         run: yarn test --configuration=ci
