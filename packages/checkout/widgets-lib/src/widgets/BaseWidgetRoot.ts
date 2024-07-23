@@ -64,7 +64,9 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
   unmount() {
     // We want to keep the properties (config and provider) across mounts
     // Clear the parameters on unmount as we don't want to keep them across mounts
-    this.parameters = this.getValidatedParameters({});
+    this.parameters = this.getValidatedParameters(
+      { language: 'en' } as WidgetParameters[T],
+    );
 
     this.reactRoot?.unmount();
     document.getElementById(this.targetId as string)?.replaceChildren();
