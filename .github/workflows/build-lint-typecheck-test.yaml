@@ -142,6 +142,9 @@ jobs:
           path: node_modules
           key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
 
+      - name: debug
+        run: git diff --name-only --no-renames --relative "main" "HEAD"
+
       - name: Test
         run: yarn dlx nx affected -t test --parallel=5 --configuration=ci
 
