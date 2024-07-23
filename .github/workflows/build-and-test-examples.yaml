@@ -1,0 +1,49 @@
+name: Build and test all example apps
+
+on:
+  pull_request:
+    # Temp, remove EXC-21-passport-wallets-examples when done
+    branches: [main, EXC-21-passport-wallets-examples]
+  merge_group:
+    # Temp, remove EXC-21-passport-wallets-examples when done
+    branches: [main, EXC-21-passport-wallets-examples]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest-4-cores
+    env:
+      NODE_OPTIONS: --max-old-space-size=14366
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          registry-url: https://registry.npmjs.org/
+          cache: "yarn"
+
+      # - name: Install Dependencies
+      #   run: yarn install --immutable
+      #   working-directory: ./examples/passport/wallets-with-nextjs
+    
+      # - name: Build
+      #   run: yarn build
+      #   working-directory: ./examples/passport/wallets-with-nextjs
+      
+      # - name: Test
+      #   run: yarn test
+      #   working-directory: ./examples/passport/wallets-with-nextjs
+      - name: Find all projects
+        id: find-projects
+        run: |
+          find ./examples -name 'package.json' -exec dirname {} \; > project-dirs.txt
+
+      - name: Install, Build, and Test
+        run: |
+          while IFS= read -r dir; do
+            echo "Processing $dir"
+            (cd "$dir" && yarn install --immutable && yarn build && yarn test)
+          done < project-dirs.txt
