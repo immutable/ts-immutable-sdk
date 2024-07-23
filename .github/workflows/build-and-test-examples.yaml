@@ -28,11 +28,24 @@ jobs:
         run: |
           find ./examples/passport -name 'node_modules' -prune -o -name 'package.json' -exec dirname {} \; > project-dirs.txt
           
-      - name: Install, Build, and Test
+          - name: Install Dependencies
+          run: |
+            while IFS= read -r dir; do
+              echo "Installing dependencies for $dir"
+              (cd "$dir" && yarn install)
+            done < project-dirs.txt
+        
+      - name: Build Projects
         run: |
           while IFS= read -r dir; do
-            echo "Processing $dir"
-            (cd "$dir" && yarn install && yarn build)
+            echo "Building $dir"
+            (cd "$dir" && yarn build)
+          done < project-dirs.txt
+        
+      - name: Run Tests
+        run: |
+          while IFS= read -r dir; do
+            echo "Testing $dir"
             if jq -e '.scripts.test' "$dir/package.json" > /dev/null; then
               (cd "$dir" && yarn test)
             else
