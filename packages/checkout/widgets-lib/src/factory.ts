@@ -8,6 +8,7 @@ import {
   WidgetConfigurations,
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
+import { Environment } from '@imtbl/config';
 import { Connect } from './widgets/connect/ConnectWidgetRoot';
 import { Swap } from './widgets/swap/SwapWidgetRoot';
 import { OnRamp } from './widgets/on-ramp/OnRampWidgetRoot';
@@ -94,10 +95,13 @@ export class WidgetsFactory implements IWidgetsFactory {
         }) as Widget<WidgetType.SALE> as Widget<T>;
       }
       case WidgetType.CHECKOUT: {
-        return new CheckoutWidgetRoot(this.sdk, {
-          config: { ...this.widgetConfig, ...(config) },
-          provider,
-        }) as Widget<WidgetType.CHECKOUT> as Widget<T>;
+        if (this.sdk.config.environment === Environment.SANDBOX) {
+          return new CheckoutWidgetRoot(this.sdk, {
+            config: { ...this.widgetConfig, ...(config) },
+            provider,
+          }) as Widget<WidgetType.CHECKOUT> as Widget<T>;
+        }
+        throw new Error('Checkout widget is not supported in production');
       }
       default:
         throw new Error('widget type not supported');
