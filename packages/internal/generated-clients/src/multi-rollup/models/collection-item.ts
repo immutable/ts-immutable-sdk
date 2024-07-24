@@ -16,6 +16,9 @@
 // May contain unused imports in some cases
 // @ts-ignore
 import { Network } from './network';
+// May contain unused imports in some cases
+// @ts-ignore
+import { TokenType } from './token-type';
 
 /**
  * Item in a collection
@@ -65,6 +68,18 @@ export interface CollectionItem {
      * @memberof CollectionItem
      */
     'owner': string;
+    /**
+     * Balance
+     * @type {string}
+     * @memberof CollectionItem
+     */
+    'balance': string;
+    /**
+     * 
+     * @type {TokenType}
+     * @memberof CollectionItem
+     */
+    'token_type': TokenType;
 }
 
 

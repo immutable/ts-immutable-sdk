@@ -18,7 +18,7 @@
 import { SeaportAdvancedOrderBuy } from './seaport-advanced-order-buy';
 // May contain unused imports in some cases
 // @ts-ignore
-import { SeaportERC721Item } from './seaport-erc721-item';
+import { SeaportAdvancedOrderSell } from './seaport-advanced-order-sell';
 // May contain unused imports in some cases
 // @ts-ignore
 import { SeaportFee } from './seaport-fee';
@@ -37,10 +37,10 @@ export interface SeaportAdvancedOrder {
     'buy': SeaportAdvancedOrderBuy;
     /**
      * 
-     * @type {SeaportERC721Item}
+     * @type {SeaportAdvancedOrderSell}
      * @memberof SeaportAdvancedOrder
      */
-    'sell': SeaportERC721Item;
+    'sell': SeaportAdvancedOrderSell;
     /**
      * 
      * @type {Array<SeaportFee>}

@@ -15,6 +15,9 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import { ImmutableVerificationStatusEnum } from './immutable-verification-status-enum';
+// May contain unused imports in some cases
+// @ts-ignore
 import { SeaportERC20Item } from './seaport-erc20-item';
 // May contain unused imports in some cases
 // @ts-ignore
