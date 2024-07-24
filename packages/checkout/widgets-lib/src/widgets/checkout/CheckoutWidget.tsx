@@ -1,41 +1,14 @@
-import { Environment } from '@imtbl/config';
-import {
-  CheckoutFlowType,
-  CheckoutWidgetParams,
-  Checkout,
-} from '@imtbl/checkout-sdk';
 import { useEffect, useState } from 'react';
 import { Box } from '@biom3/react';
+import { CheckoutWidgetParams, Checkout } from '@imtbl/checkout-sdk';
+
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { CHECKOUT_APP_URL } from '../../lib/constants';
+import { getIframeURL } from './functions/iframeParams';
 
 export type CheckoutWidgetInputs = {
   checkout: Checkout;
   config: StrongCheckoutWidgetsConfig;
   params: CheckoutWidgetParams;
-};
-
-const getIframeURL = (
-  params: CheckoutWidgetInputs['params'],
-  environment: Environment,
-  publishableKey: string,
-): string => {
-  const { language, flow, ...restParams } = params;
-  // environment, flow, params, configs
-  const baseUrl = CHECKOUT_APP_URL[environment];
-
-  const queryParams = new URLSearchParams(
-    restParams as Record<string, string>,
-  ).toString();
-
-  switch (flow) {
-    case CheckoutFlowType.CONNECT:
-      return `${baseUrl}/${publishableKey}/${language}/connect?${queryParams}`;
-    case CheckoutFlowType.WALLET:
-      return `${baseUrl}/${publishableKey}/${language}/wallet?${queryParams}`;
-    default:
-      return baseUrl;
-  }
 };
 
 export default function CheckoutWidget(props: CheckoutWidgetInputs) {
