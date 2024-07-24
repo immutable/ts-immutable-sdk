@@ -13,11 +13,8 @@ export function WalletOptions() {
 
   useEffect(() => {
     if (!connectors) return
-    // #doc passport-wallets-nextjs-connect-wagmi-filter
     //filter the available connectors to show only Passport
-    const filteredConnectors = (connectors.filter((connector) => connector.name.includes('Immutable Passport')))
-    // #enddoc passport-wallets-nextjs-connect-wagmi-filter
-    setFilteredConnectors(filteredConnectors)
+    setFilteredConnectors(connectors.filter((connector) => connector.name.includes('Immutable Passport')))
     // enable button when loading has finished
     setLoadingState(false)
   }, [connectors])
