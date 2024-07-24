@@ -99,7 +99,7 @@ describe('MagicWallet', () => {
         // mock magic user is not logged in originally, but mock the relog
         isMagicLoggedInMock.mockResolvedValueOnce(false).mockResolvedValueOnce(true);
 
-        expect(await magicAdapter.getSigner(mockUserZkEvm)).toBe(ethSigner);
+        expect(await magicAdapter.getSigner()).toBe(ethSigner);
         expect(initialiseSigner).toHaveBeenCalledTimes(1);
         expect(getSigner).toHaveBeenCalledTimes(1);
       });
@@ -120,7 +120,7 @@ describe('MagicWallet', () => {
 
         // @ts-ignore
         expect(magicAdapter.lazyMagicClient).toBeDefined();
-        await expect(magicAdapter.getSigner(mockUserZkEvm)).rejects.toThrow(
+        await expect(magicAdapter.getSigner()).rejects.toThrow(
           new PassportError(
             'Something went wrong',
             PassportErrorType.WALLET_CONNECTION_ERROR,
