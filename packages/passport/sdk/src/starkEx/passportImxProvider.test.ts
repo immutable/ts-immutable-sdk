@@ -1,5 +1,4 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { Web3Provider } from '@ethersproject/providers';
 import {
   imx,
   ImxApiClients,
@@ -56,13 +55,8 @@ describe('PassportImxProvider', () => {
     getYCoordinate: jest.fn(),
   } as StarkSigner;
 
-  const mockEthSigner = {
-    signMessage: jest.fn(),
-    getAddress: jest.fn(),
-  };
-
   const magicAdapterMock = {
-    login: jest.fn(),
+    getSigner: jest.fn(),
   };
 
   const mockGuardianClient = {
@@ -70,22 +64,18 @@ describe('PassportImxProvider', () => {
     withConfirmationScreenTask: () => (task: () => any) => task,
   };
 
-  const getSignerMock = jest.fn();
-
   let passportEventEmitter: TypedEventEmitter<PassportEventMap>;
 
   const imxApiClients = new ImxApiClients({} as any);
 
   beforeEach(() => {
     jest.restoreAllMocks();
-    getSignerMock.mockReturnValue(mockEthSigner);
     (registerPassportStarkEx as jest.Mock).mockResolvedValue(null);
     passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
     mockAuthManager.getUser.mockResolvedValue(mockUserImx);
 
     // Signers
-    magicAdapterMock.login.mockResolvedValue({ getSigner: getSignerMock });
-    (Web3Provider as unknown as jest.Mock).mockReturnValue({ getSigner: getSignerMock });
+    magicAdapterMock.getSigner.mockResolvedValue({});
     (getStarkSigner as jest.Mock).mockResolvedValue(mockStarkSigner);
 
     passportImxProvider = new PassportImxProvider({
@@ -99,21 +89,16 @@ describe('PassportImxProvider', () => {
   });
 
   describe('async signer initialisation', () => {
-    it('initialises the eth and stark signers correctly', async () => {
-      // The promise is created in the constructor but not awaited until a method is called
-      await passportImxProvider.getAddress();
+    it('initialises the eth and stark signers correctly on method call', async () => {
+      mockAuthManager.getUser.mockResolvedValue(mockUserImx);
 
-      expect(magicAdapterMock.login).toHaveBeenCalledWith(mockUserImx.idToken);
-      expect(getStarkSigner).toHaveBeenCalledWith(mockEthSigner);
-    });
+      const getSignerSpy = jest.spyOn(magicAdapterMock, 'getSigner');
+      const returnValue = {} as imx.CreateTransferResponseV1;
+      const request = {} as UnsignedExchangeTransferRequest;
 
-    it('initialises the eth and stark signers only once', async () => {
-      await passportImxProvider.getAddress();
-      await passportImxProvider.getAddress();
-      await passportImxProvider.getAddress();
-
-      expect(magicAdapterMock.login).toHaveBeenCalledTimes(1);
-      expect(getStarkSigner).toHaveBeenCalledTimes(1);
+      (exchangeTransfer as jest.Mock).mockResolvedValue(returnValue);
+      await passportImxProvider.exchangeTransfer(request);
+      expect(getSignerSpy).toBeCalled();
     });
 
     it('re-throws the initialisation error when a method is called', async () => {
@@ -122,8 +107,7 @@ describe('PassportImxProvider', () => {
 
       mockAuthManager.getUser.mockResolvedValue(mockUserImx);
       // Signers
-      magicAdapterMock.login.mockResolvedValue({});
-      (getStarkSigner as jest.Mock).mockRejectedValue(new Error('error'));
+      magicAdapterMock.getSigner.mockRejectedValue(new Error('Signer failed to initialise'));
 
       const pp = new PassportImxProvider({
         authManager: mockAuthManager as unknown as AuthManager,
@@ -134,7 +118,7 @@ describe('PassportImxProvider', () => {
         imxApiClients: new ImxApiClients({} as any),
       });
 
-      await expect(pp.registerOffchain()).rejects.toThrow(new Error('error'));
+      await expect(pp.registerOffchain()).rejects.toThrow(new Error('Signer failed to initialise'));
     });
   });
 
@@ -342,15 +326,12 @@ describe('PassportImxProvider', () => {
 
   describe('registerOffChain', () => {
     it('should register the user and update the provider instance user', async () => {
-      const magicProviderMock = {};
-
       mockAuthManager.login.mockResolvedValue(mockUser);
-      magicAdapterMock.login.mockResolvedValue(magicProviderMock);
       mockAuthManager.forceUserRefresh.mockResolvedValue({ ...mockUser, imx: { ethAddress: '', starkAddress: '', userAdminAddress: '' } });
       await passportImxProvider.registerOffchain();
 
       expect(registerPassportStarkEx).toHaveBeenCalledWith({
-        ethSigner: mockEthSigner,
+        ethSigner: {},
         starkSigner: mockStarkSigner,
         imxApiClients: new ImxApiClients({} as any),
       }, mockUserImx.accessToken);
