@@ -16743,6 +16743,14 @@ __metadata:
   languageName: node
   linkType: hard
 
+"esm-sdk@workspace:tests/smoke/esm":
+  version: 0.0.0-use.local
+  resolution: "esm-sdk@workspace:tests/smoke/esm"
+  dependencies:
+    "@imtbl/sdk": 0.0.0
+  languageName: unknown
+  linkType: soft
+
 "espree@npm:^9.6.0":
   version: 9.6.1
   resolution: "espree@npm:9.6.1"
