@@ -219,61 +219,55 @@ export class ZkEvmProvider implements Provider {
 
     switch (request.method) {
       case 'eth_requestAccounts': {
-        const requestAccounts = async () => {
-          const zkEvmAddress = await this.#getZkEvmAddress();
-          if (zkEvmAddress) return [zkEvmAddress];
+        const zkEvmAddress = await this.#getZkEvmAddress();
+        if (zkEvmAddress) return [zkEvmAddress];
 
-          const flow = trackFlow('passport', 'ethRequestAccounts');
+        const flow = trackFlow('passport', 'ethRequestAccounts');
 
-          try {
-            const user = await this.#authManager.getUserOrLogin();
-            flow.addEvent('endGetUserOrLogin');
+        try {
+          const user = await this.#authManager.getUserOrLogin();
+          flow.addEvent('endGetUserOrLogin');
 
-            this.#initialiseEthSigner(user);
+          this.#initialiseEthSigner(user);
 
-            let userZkEvmEthAddress;
+          let userZkEvmEthAddress;
 
-            if (!isZkEvmUser(user)) {
-              flow.addEvent('startUserRegistration');
+          if (!isZkEvmUser(user)) {
+            flow.addEvent('startUserRegistration');
 
-              const ethSigner = await this.#getSigner();
-              flow.addEvent('ethSignerResolved');
+            const ethSigner = await this.#getSigner();
+            flow.addEvent('ethSignerResolved');
 
-              userZkEvmEthAddress = await registerZkEvmUser({
-                ethSigner,
-                authManager: this.#authManager,
-                multiRollupApiClients: this.#multiRollupApiClients,
-                accessToken: user.accessToken,
-                rpcProvider: this.#rpcProvider,
-                flow,
-              });
-              flow.addEvent('endUserRegistration');
-            } else {
-              userZkEvmEthAddress = user.zkEvm.ethAddress;
-            }
-
-            this.#providerEventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [
-              userZkEvmEthAddress,
-            ]);
-            identify({
-              passportId: user.profile.sub,
+            userZkEvmEthAddress = await registerZkEvmUser({
+              ethSigner,
+              authManager: this.#authManager,
+              multiRollupApiClients: this.#multiRollupApiClients,
+              accessToken: user.accessToken,
+              rpcProvider: this.#rpcProvider,
+              flow,
             });
-            return [userZkEvmEthAddress];
-          } catch (error) {
-            if (error instanceof Error) {
-              trackError('passport', 'ethRequestAccounts', error);
-            }
-            flow.addEvent('errored');
-            throw error;
-          } finally {
-            flow.addEvent('End');
+            flow.addEvent('endUserRegistration');
+          } else {
+            userZkEvmEthAddress = user.zkEvm.ethAddress;
           }
-        };
 
-        const addresses = await requestAccounts();
-        const [zkEvmAddress] = addresses;
-        this.#callSessionActivity(zkEvmAddress);
-        return addresses;
+          this.#providerEventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [
+            userZkEvmEthAddress,
+          ]);
+          identify({
+            passportId: user.profile.sub,
+          });
+          this.#callSessionActivity(userZkEvmEthAddress);
+          return [userZkEvmEthAddress];
+        } catch (error) {
+          if (error instanceof Error) {
+            trackError('passport', 'ethRequestAccounts', error);
+          }
+          flow.addEvent('errored');
+          throw error;
+        } finally {
+          flow.addEvent('End');
+        }
       }
       case 'eth_sendTransaction': {
         const zkEvmAddress = await this.#getZkEvmAddress();
