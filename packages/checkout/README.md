@@ -145,18 +145,6 @@ Running changed jest tests on save in watch mode:
 yarn test:watch
 ```
 
-Running cypress tests headless:
-
-```bash
-yarn test:cypress
-```
-
-Running cypress tests:
-
-```bash
-yarn test:cypress:open
-```
-
 Linting:
 
 ```bash
