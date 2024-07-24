@@ -92,6 +92,8 @@ It's very simple, you just add a code block with the reference to the file and t
 ```js reference=examples/passport/wallets-with-nextjs/src/app/connect-with-etherjs/page.tsx#passport-wallets-nextjs-connect-etherjs-create title="Connect Passport to Immutable zkEVM and create the Provider"
 ```
 
+All snippets should have a title. Don't be shy adding extra context before or after the snippet explaining any key points which are necessary.
+
 ## Comments
 
 All examples should be heavily commented and the comments should make sense in the context the snippet is appearing in the docs site.
