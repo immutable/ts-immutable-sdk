@@ -141,6 +141,9 @@ export type {
   TransactionRequirement,
   WalletFilter,
   WalletInfo,
+  PostMessageHandler,
+  PostMessageHandlerConfiguration,
+  PostMessageHandlerEventType,
 } from './types';
 
 export type { ErrorType } from './errors';
