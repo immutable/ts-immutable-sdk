@@ -1,3 +1,4 @@
+import { useEffect, useMemo } from "react";
 import {
   Checkout,
   CheckoutFlowType,
@@ -6,9 +7,9 @@ import {
   WidgetType,
   WalletProviderName
 } from "@imtbl/checkout-sdk";
-import { WidgetsFactory } from "@imtbl/checkout-widgets";
-import { useMemo } from "react";
 import { Environment } from "@imtbl/config";
+import { WidgetsFactory } from "@imtbl/checkout-widgets";
+import { passport } from '../marketplace-orchestrator/passport';
 
 function CheckoutUI() {
   const checkout = useMemo(
@@ -30,9 +31,14 @@ function CheckoutUI() {
   const unmount = () => {
     checkoutWidget.unmount();
   };
+
   const update = (theme: WidgetTheme) => {
     checkoutWidget.update({ config: { theme } });
   };
+
+  useEffect(() => {
+    passport.connectEvm();
+  }, []);
 
   return (
     <div>
