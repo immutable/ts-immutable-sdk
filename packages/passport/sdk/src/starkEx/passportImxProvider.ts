@@ -95,12 +95,12 @@ export class PassportImxProvider implements IMXProvider {
       const magicSigner = await this.magicAdapter.getSigner();
       this.lazyStarkSigner = await getStarkSigner(magicSigner);
     }
-
     return this.lazyStarkSigner;
   }
 
-  // TODO: Add comments to this fn to explain why we're not initially awaiting getStarkSigner
   async #getRegisteredImxUserAndStarkSigner(): Promise<{ user: UserImx, starkSigner: StarkSigner }> {
+    // We are not awaiting the stark signer initialise here as Magic takes 3-5s to login
+    // By the time the user is registered, the stark signer will be ready
     const starkSignerPromise = this.#getStarkSigner();
     const user = await this.#getAuthenticatedUser();
 

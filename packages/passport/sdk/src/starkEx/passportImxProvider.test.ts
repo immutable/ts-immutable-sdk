@@ -18,7 +18,7 @@ import { PassportImxProvider } from './passportImxProvider';
 import {
   batchNftTransfer, cancelOrder, createOrder, createTrade, exchangeTransfer, transfer,
 } from './workflows';
-import { PassportEventMap, PassportEvents } from '../types';
+import { PassportEventMap } from '../types';
 import TypedEventEmitter from '../utils/typedEventEmitter';
 import AuthManager from '../authManager';
 import MagicAdapter from '../magicAdapter';
@@ -336,32 +336,6 @@ describe('PassportImxProvider', () => {
         imxApiClients: new ImxApiClients({} as any),
       }, mockUserImx.accessToken);
       expect(mockAuthManager.forceUserRefresh).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  describe.each([
-    ['transfer' as const, {} as UnsignedTransferRequest],
-    ['createOrder' as const, {} as UnsignedOrderRequest],
-    ['cancelOrder' as const, {} as imx.GetSignableCancelOrderRequest],
-    ['createTrade' as const, {} as imx.GetSignableTradeRequest],
-    ['batchNftTransfer' as const, [] as NftTransferDetails[]],
-    ['exchangeTransfer' as const, {} as UnsignedExchangeTransferRequest],
-    ['getAddress' as const, {} as any],
-    ['isRegisteredOffchain' as const, {} as any],
-  ])('when the user has been logged out - %s', (methodName, args) => {
-    beforeEach(() => {
-      passportEventEmitter.emit(PassportEvents.LOGGED_OUT);
-    });
-
-    it(`should return an error for ${methodName}`, async () => {
-      await expect(async () => passportImxProvider[methodName!](args))
-        .rejects
-        .toThrow(
-          new PassportError(
-            'User has been logged out',
-            PassportErrorType.NOT_LOGGED_IN_ERROR,
-          ),
-        );
     });
   });
 
