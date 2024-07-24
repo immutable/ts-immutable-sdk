@@ -1,6 +1,6 @@
 import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
-import { utils } from 'ethers';
+import { Signer, utils } from 'ethers';
 import {
   Flow, identify, trackError, trackFlow,
 } from '@imtbl/metrics';
@@ -110,7 +110,7 @@ export class ZkEvmProvider implements Provider {
     this.#providerEventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, []);
   };
 
-  async #callSessionActivity(zkEvmAddress: string, user: User | null) {
+  async #callSessionActivity(zkEvmAddress: string, user: User) {
     const sendTransactionClosure = async (params: Array<any>, flow: Flow) => {
       const ethSigner = await this.#magicAdapter.getSigner(user);
       return await sendTransaction({
@@ -142,19 +142,24 @@ export class ZkEvmProvider implements Provider {
   async #performRequest(request: RequestArguments): Promise<any> {
     // This is required for sending session activity events
 
-    // Get user from local storage and initialise signer for all RPC calls
-    const user = await this.#authManager.getUser();
+    // Get user from local storage
+    let user = await this.#authManager.getUser();
     const zkEvmUser = this.#getZkEvmUser(user);
-    const magicSigner = this.#magicAdapter.getSigner(user); // preemptively load the magic signer
+
+    // Initialise signer for all RPC calls if registered user exists
+    let magicSigner: Promise<Signer>;
+    if (zkEvmUser) {
+      magicSigner = this.#magicAdapter.getSigner(zkEvmUser);
+    }
 
     switch (request.method) {
       case 'eth_requestAccounts': {
         const requestAccounts = async () => {
+          const flow = trackFlow('passport', 'ethRequestAccounts');
+
           if (zkEvmUser) {
             return [zkEvmUser.zkEvm.ethAddress];
           }
-
-          const flow = trackFlow('passport', 'ethRequestAccounts');
 
           try {
             const loggedInUser = await this.#authManager.getUserOrLogin();
@@ -176,9 +181,11 @@ export class ZkEvmProvider implements Provider {
                 rpcProvider: this.#rpcProvider,
                 flow,
               });
+              user = loggedInUser;
               flow.addEvent('endUserRegistration');
             } else {
               userZkEvmEthAddress = loggedInUser.zkEvm.ethAddress;
+              user = loggedInUser;
             }
 
             this.#providerEventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [
@@ -201,7 +208,7 @@ export class ZkEvmProvider implements Provider {
 
         const addresses = await requestAccounts();
         const [zkEvmAddress] = addresses;
-        this.#callSessionActivity(zkEvmAddress, user);
+        this.#callSessionActivity(zkEvmAddress, user as User);
         return addresses;
       }
       case 'eth_sendTransaction': {

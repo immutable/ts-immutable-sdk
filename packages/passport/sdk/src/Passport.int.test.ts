@@ -212,6 +212,7 @@ describe('Passport', () => {
 
           const zkEvmProvider = getZkEvmProvider();
 
+          mockGetUser.mockResolvedValue(mockOidcUser);
           mockIsMagicLoggedIn.mockResolvedValue(true);
 
           const accounts = await zkEvmProvider.request({
@@ -288,80 +289,14 @@ describe('Passport', () => {
         });
 
         expect(result).toEqual(transactionHash);
-        expect(mockGetUser).toHaveBeenCalledTimes(6);
-      });
-
-      it('ethSigner is initialised if user logs in after connectEvm', async () => {
-        const transferToAddress = '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC';
-
-        useMswHandlers([
-          mswHandlers.counterfactualAddress.success,
-          mswHandlers.rpcProvider.success,
-          mswHandlers.relayer.success,
-          mswHandlers.guardian.evaluateTransaction.success,
-        ]);
-        mockMagicRequest.mockImplementation(({ method }: RequestArguments) => {
-          switch (method) {
-            case 'eth_chainId': {
-              return Promise.resolve(chainIdHex);
-            }
-            case 'eth_accounts': {
-              return Promise.resolve([magicWalletAddress]);
-            }
-            case 'personal_sign': {
-              return Promise.resolve('0x6b168cf5d90189eaa51d02ff3fa8ffc8956b1ea20fdd34280f521b1acca092305b9ace24e643fe64a30c528323065f5b77e1fb4045bd330aad01e7b9a07591f91b');
-            }
-            default: {
-              throw new Error(`Unexpected method: ${method}`);
-            }
-          }
-        });
-        mockGetUser.mockResolvedValueOnce(Promise.resolve(null));
-        mockSigninPopup.mockResolvedValue(mockOidcUserZkevm);
-        mockSigninSilent.mockResolvedValueOnce(mockOidcUserZkevm);
-
-        const passport = new Passport({
-          baseConfig: new ImmutableConfiguration({
-            environment: Environment.SANDBOX,
-          }),
-          audience: 'platform_api',
-          clientId,
-          redirectUri,
-          logoutRedirectUri,
-          scope: 'openid offline_access profile email transact',
-        });
-
-        // user isn't logged in, so wont set signer when provider is instantiated
-        // #doc request-accounts
-        const provider = passport.connectEvm();
-        const accounts = await provider.request({
-          method: 'eth_requestAccounts',
-        });
-        // #enddoc request-accounts
-
-        // user logs in, ethSigner is initialised
-        await passport.login();
-
-        mockGetUser.mockResolvedValue(Promise.resolve(mockOidcUserZkevm));
-
-        expect(accounts).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
-
-        const transaction: TransactionRequest = {
-          to: transferToAddress,
-          value: '5000000000000000',
-          data: '0x00',
-        };
-        const result = await provider.request({
-          method: 'eth_sendTransaction',
-          params: [transaction],
-        });
-
-        expect(result).toEqual(transactionHash);
+        expect(mockGetUser).toHaveBeenCalledTimes(5);
       });
     });
 
     describe('eth_accounts', () => {
       it('returns no addresses if the user is not logged in', async () => {
+        mockGetUser.mockResolvedValue(null);
+
         const zkEvmProvider = getZkEvmProvider();
         const accounts = await zkEvmProvider.request({
           method: 'eth_accounts',

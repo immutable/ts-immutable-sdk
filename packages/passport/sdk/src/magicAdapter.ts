@@ -64,13 +64,13 @@ export default class MagicAdapter {
    * @see #getSigner
    *
    */
-  initialiseSigner(user: User | null) {
-    const generateSigner = async (u: User): Promise<Signer> => {
+  initialiseSigner(user: User) {
+    const generateSigner = async (): Promise<Signer> => {
       const startTime = performance.now();
 
       const magicClient = await this.magicClient;
       await magicClient.openid.loginWithOIDC({
-        jwt: u.idToken,
+        jwt: user.idToken,
         providerId: this.config.magicProviderId,
       });
 
@@ -84,21 +84,11 @@ export default class MagicAdapter {
       return web3Provider.getSigner();
     };
 
-    const getUser = async (initialUser: User | null): Promise<User> => {
-      if (initialUser) return initialUser;
-
-      // Attempt to refetch user
-      const newUser = await this.authManager.getUser();
-      if (!newUser) throw new Error('Cannot initialise signer without user');
-      return newUser;
-    };
-
     this.magicSignerInitialisationError = undefined;
     // eslint-disable-next-line no-async-promise-executor
     this.magicSigner = new Promise(async (resolve) => {
       try {
-        const userForSigner = await getUser(user);
-        resolve(await generateSigner(userForSigner));
+        resolve(await generateSigner());
       } catch (err) {
         // Capture and store the initialization error
         this.magicSignerInitialisationError = err;
@@ -114,7 +104,7 @@ export default class MagicAdapter {
     return this.lazyMagicClient;
   }
 
-  public async getSigner(user: User | null): Promise<Signer> {
+  public async getSigner(user: User): Promise<Signer> {
     return withPassportError<Signer>(async () => {
       const magicClient = await this.magicClient;
       const isLoggedIn = await magicClient.user.isLoggedIn();
