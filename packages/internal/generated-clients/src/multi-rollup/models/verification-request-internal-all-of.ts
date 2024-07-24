@@ -15,19 +15,21 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { RefreshMetadataByTokenID } from './refresh-metadata-by-token-id';
+import { OrganisationTier } from './organisation-tier';
 
 /**
  * 
  * @export
- * @interface RefreshNFTMetadataByTokenIDRequest
+ * @interface VerificationRequestInternalAllOf
  */
-export interface RefreshNFTMetadataByTokenIDRequest {
+export interface VerificationRequestInternalAllOf {
     /**
-     * List of nft metadata to be refreshed. Total size of the list should not exceed 228 KiB
-     * @type {Array<RefreshMetadataByTokenID>}
-     * @memberof RefreshNFTMetadataByTokenIDRequest
+     * 
+     * @type {OrganisationTier}
+     * @memberof VerificationRequestInternalAllOf
      */
-    'nft_metadata': Array<RefreshMetadataByTokenID>;
+    'org_tier': OrganisationTier | null;
 }
+
+
 

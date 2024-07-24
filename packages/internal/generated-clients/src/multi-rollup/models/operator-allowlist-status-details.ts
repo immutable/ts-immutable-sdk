@@ -15,18 +15,16 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { ImmutableVerificationStatusEnum } from './immutable-verification-status-enum';
+import { OperatorAllowlistStatusRequested } from './operator-allowlist-status-requested';
 // May contain unused imports in some cases
 // @ts-ignore
-import { SeaportERC20Item } from './seaport-erc20-item';
-// May contain unused imports in some cases
-// @ts-ignore
-import { SeaportNativeItem } from './seaport-native-item';
+import { OperatorAllowlistStatusUpdated } from './operator-allowlist-status-updated';
 
 /**
- * @type SeaportAdvancedOrderBuy
+ * @type OperatorAllowlistStatusDetails
+ * The operator allowlist status details
  * @export
  */
-export type SeaportAdvancedOrderBuy = SeaportERC20Item | SeaportNativeItem;
+export type OperatorAllowlistStatusDetails = OperatorAllowlistStatusRequested | OperatorAllowlistStatusUpdated;
 
 

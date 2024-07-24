@@ -45,6 +45,18 @@ export interface Token {
      */
     'root_contract_address': string | null;
     /**
+     * The id of the root chain for a bridged token
+     * @type {string}
+     * @memberof Token
+     */
+    'root_chain_id'?: string | null;
+    /**
+     * The name of the bridge, for bridged tokens only
+     * @type {string}
+     * @memberof Token
+     */
+    'bridge_used'?: string | null;
+    /**
      * The symbol of token
      * @type {string}
      * @memberof Token

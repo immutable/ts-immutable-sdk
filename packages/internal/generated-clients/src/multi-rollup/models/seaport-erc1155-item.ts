@@ -20,57 +20,63 @@ import { ImmutableVerificationStatusEnum } from './immutable-verification-status
 /**
  * 
  * @export
- * @interface SeaportERC721Item
+ * @interface SeaportERC1155Item
  */
-export interface SeaportERC721Item {
+export interface SeaportERC1155Item {
     /**
-     * Token type user is offering, which in this case is ERC721
+     * Token type user is offering, which in this case is ERC1155
      * @type {string}
-     * @memberof SeaportERC721Item
+     * @memberof SeaportERC1155Item
      */
-    'type': SeaportERC721ItemTypeEnum;
+    'type': SeaportERC1155ItemTypeEnum;
     /**
-     * Address of ERC721 token
+     * Address of ERC1155 token
      * @type {string}
-     * @memberof SeaportERC721Item
+     * @memberof SeaportERC1155Item
      */
     'contract_address': string;
     /**
      * The name of the collection
      * @type {string}
-     * @memberof SeaportERC721Item
+     * @memberof SeaportERC1155Item
      */
     'contract_name'?: string | null;
     /**
-     * The URL of the NFT
+     * The URL of the asset
      * @type {string}
-     * @memberof SeaportERC721Item
+     * @memberof SeaportERC1155Item
      */
     'image_url'?: string;
     /**
-     * The name of the NFT
+     * The name of the asset
      * @type {string}
-     * @memberof SeaportERC721Item
+     * @memberof SeaportERC1155Item
      */
     'name'?: string | null;
     /**
-     * ID of ERC721 token
+     * ID of ERC1155 token
      * @type {string}
-     * @memberof SeaportERC721Item
+     * @memberof SeaportERC1155Item
      */
     'token_id': string;
     /**
+     * A string representing the total units of an ERC1155 token which the user is selling
+     * @type {string}
+     * @memberof SeaportERC1155Item
+     */
+    'amount': string;
+    /**
      * 
      * @type {ImmutableVerificationStatusEnum}
-     * @memberof SeaportERC721Item
+     * @memberof SeaportERC1155Item
      */
     'immutable_verification_status': ImmutableVerificationStatusEnum;
 }
 
-export const SeaportERC721ItemTypeEnum = {
-    Erc721: 'ERC721'
+export const SeaportERC1155ItemTypeEnum = {
+    Erc1155: 'ERC1155'
 } as const;
 
-export type SeaportERC721ItemTypeEnum = typeof SeaportERC721ItemTypeEnum[keyof typeof SeaportERC721ItemTypeEnum];
+export type SeaportERC1155ItemTypeEnum = typeof SeaportERC1155ItemTypeEnum[keyof typeof SeaportERC1155ItemTypeEnum];
 
 
