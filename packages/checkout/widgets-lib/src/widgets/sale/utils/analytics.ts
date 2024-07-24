@@ -8,7 +8,7 @@ export const getPaymentTokenDetails = (
 ): SalePaymentToken => {
   const { fundingItem } = fundingBalance;
   return ({
-    settlementType: fundingBalance.type,
+    settlementType: `${fundingBalance.type}`,
     type: fundingItem.type,
     token: fundingItem.token,
     amount: fundingItem.fundsRequired.formattedAmount,

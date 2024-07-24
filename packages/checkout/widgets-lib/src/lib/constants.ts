@@ -115,3 +115,12 @@ export const IMAGE_RESIZER_URL = {
 };
 
 export const WITHDRAWAL_CLAIM_GAS_LIMIT = 91000;
+
+/**
+ * URL for Checkout App based on the environment.
+ */
+export const CHECKOUT_APP_URL = {
+  [ENV_DEVELOPMENT]: 'https://checkout.dev.immutable.com',
+  [Environment.SANDBOX]: 'https://checkout.sandbox.immutable.com',
+  [Environment.PRODUCTION]: 'https://checkout.immutable.com',
+};
