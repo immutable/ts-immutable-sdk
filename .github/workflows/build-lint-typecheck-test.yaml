@@ -12,70 +12,12 @@ env:
   NX_CLOUD_ACCESS_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_NX_TOKEN }}
 
 jobs:
-  # build:
-  #   name: Build
-  #   runs-on: ubuntu-latest-4-cores
-  #   env:
-  #     NODE_OPTIONS: --max-old-space-size=14366
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
-
-  #     - name: Use Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version-file: ".nvmrc"
-  #         registry-url: https://registry.npmjs.org/
-  #         cache: "yarn"
-
-  #     # this step will also try to cache the node_modules at the end of the workflow run
-  #     - name: Restore cached node_modules
-  #       id: restore-cache-node_modules
-  #       uses: actions/cache@v4
-  #       with:
-  #         path: node_modules
-  #         key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
-
-  #     - name: Install dependencies
-  #       if: steps.restore-cache-node_modules.outputs.cache-hit != 'true'
-  #       run: yarn install --immutable
-
-  #     - name: Check Single Package Version Policy
-  #       run: yarn syncpack:check
-
-  #     - name: Build
-  #       run: yarn build
-
   typecheck:
     name: Typecheck
     runs-on: ubuntu-latest-4-cores
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-          fetch-depth: 0
-
-      - name: Derive appropriate SHAs for base and head for `nx affected` commands
-        uses: nrwl/nx-set-shas@v3
-
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: ".nvmrc"
-          registry-url: https://registry.npmjs.org/
-          cache: "yarn"
-
-      - name: Restore cached node_modules
-        id: restore-cache-node_modules
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
-
-      - name: install depdenencies
-        if: steps.restore-cache-node_modules.outputs.cache-hit != 'true'
-        run: yarn install --immutable
+      - name: setup
+        uses: ./actions/pr-setup
 
       - name: Typecheck
         run: yarn typecheck
@@ -86,32 +28,8 @@ jobs:
     env:
       NODE_OPTIONS: --max-old-space-size=14366
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-          fetch-depth: 0
-
-      - name: Derive appropriate SHAs for base and head for `nx affected` commands
-        uses: nrwl/nx-set-shas@v3
-
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-          registry-url: https://registry.npmjs.org/
-          cache: "yarn"
-
-      - name: Restore cached node_modules
-        id: restore-cache-node_modules
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
-
-      - name: install depdenencies
-        if: steps.restore-cache-node_modules.outputs.cache-hit != 'true'
-        run: yarn install --immutable
+      - name: setup
+        uses: ./actions/pr-setup
 
       - name: Test
         run: yarn test --configuration=ci
@@ -126,32 +44,8 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest-4-cores
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-          fetch-depth: 0
-
-      - name: Derive appropriate SHAs for base and head for `nx affected` commands
-        uses: nrwl/nx-set-shas@v3
-
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: ".nvmrc"
-          registry-url: https://registry.npmjs.org/
-          cache: "yarn"
-
-      - name: Restore cached node_modules
-        id: restore-cache-node_modules
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
-
-      - name: install depdenencies
-        if: steps.restore-cache-node_modules.outputs.cache-hit != 'true'
-        run: yarn install --immutable
+      - name: setup
+        uses: ./actions/pr-setup
 
       - name: Lint
         run: yarn lint
