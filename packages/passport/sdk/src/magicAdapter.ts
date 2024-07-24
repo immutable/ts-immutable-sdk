@@ -104,12 +104,14 @@ export default class MagicAdapter {
     return this.lazyMagicClient;
   }
 
-  public async getSigner(user: User): Promise<Signer> {
+  public async getSigner(): Promise<Signer> {
     return withPassportError<Signer>(async () => {
       const magicClient = await this.magicClient;
       const isLoggedIn = await magicClient.user.isLoggedIn();
       if (!this.magicSigner || !isLoggedIn) {
-        this.initialiseSigner(user);
+        const u = await this.authManager.getUser();
+        if (u) this.initialiseSigner(u);
+        else throw new Error('Signer failed to initialise without user');
       }
 
       // Re-fetch the signer after initialising

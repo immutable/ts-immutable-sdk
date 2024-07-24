@@ -110,9 +110,9 @@ export class ZkEvmProvider implements Provider {
     this.#providerEventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, []);
   };
 
-  async #callSessionActivity(zkEvmAddress: string, user: User) {
+  async #callSessionActivity(zkEvmAddress: string) {
     const sendTransactionClosure = async (params: Array<any>, flow: Flow) => {
-      const ethSigner = await this.#magicAdapter.getSigner(user);
+      const ethSigner = await this.#magicAdapter.getSigner();
       return await sendTransaction({
         params,
         ethSigner,
@@ -143,13 +143,13 @@ export class ZkEvmProvider implements Provider {
     // This is required for sending session activity events
 
     // Get user from local storage
-    let user = await this.#authManager.getUser();
+    const user = await this.#authManager.getUser();
     const zkEvmUser = this.#getZkEvmUser(user);
 
     // Initialise signer for all RPC calls if registered user exists
     let magicSigner: Promise<Signer>;
     if (zkEvmUser) {
-      magicSigner = this.#magicAdapter.getSigner(zkEvmUser);
+      magicSigner = this.#magicAdapter.getSigner();
     }
 
     switch (request.method) {
@@ -170,7 +170,7 @@ export class ZkEvmProvider implements Provider {
             if (!isUserZkEvm(loggedInUser)) {
               flow.addEvent('startUserRegistration');
 
-              const ethSigner = await this.#magicAdapter.getSigner(loggedInUser);
+              const ethSigner = await this.#magicAdapter.getSigner();
               flow.addEvent('ethSignerResolved');
 
               userZkEvmEthAddress = await registerZkEvmUser({
@@ -181,11 +181,9 @@ export class ZkEvmProvider implements Provider {
                 rpcProvider: this.#rpcProvider,
                 flow,
               });
-              user = loggedInUser;
               flow.addEvent('endUserRegistration');
             } else {
               userZkEvmEthAddress = loggedInUser.zkEvm.ethAddress;
-              user = loggedInUser;
             }
 
             this.#providerEventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [
@@ -208,7 +206,7 @@ export class ZkEvmProvider implements Provider {
 
         const addresses = await requestAccounts();
         const [zkEvmAddress] = addresses;
-        this.#callSessionActivity(zkEvmAddress, user as User);
+        this.#callSessionActivity(zkEvmAddress);
         return addresses;
       }
       case 'eth_sendTransaction': {

@@ -181,7 +181,6 @@ describe('Passport', () => {
           });
 
           expect(accounts).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
-          expect(mockGetUser).toHaveBeenCalledTimes(1);
         });
       });
 
@@ -220,7 +219,6 @@ describe('Passport', () => {
           });
 
           expect(accounts).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
-          expect(mockGetUser).toHaveBeenCalledTimes(2);
         });
 
         describe('when the registration request fails', () => {
@@ -289,7 +287,6 @@ describe('Passport', () => {
         });
 
         expect(result).toEqual(transactionHash);
-        expect(mockGetUser).toHaveBeenCalledTimes(5);
       });
     });
 
