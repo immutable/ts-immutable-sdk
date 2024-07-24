@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest-4-cores
     steps:
       - name: setup
-        uses: ../actions/pr-setup
+        uses: ./.github/actions/pr-setup
 
       - name: Typecheck
         run: yarn typecheck
@@ -29,7 +29,7 @@ jobs:
       NODE_OPTIONS: --max-old-space-size=14366
     steps:
       - name: setup
-        uses: ../actions/pr-setup
+        uses: ./.github/actions/pr-setup
 
       - name: Test
         run: yarn test --configuration=ci
@@ -45,7 +45,7 @@ jobs:
     runs-on: ubuntu-latest-4-cores
     steps:
       - name: setup
-        uses: ../actions/pr-setup
+        uses: ./.github/actions/pr-setup
 
       - name: Lint
         run: yarn lint
