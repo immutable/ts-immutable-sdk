@@ -28,8 +28,6 @@ const getIframeURL = (
     restParams as Record<string, string>,
   ).toString();
 
-  console.log('🐛 ~ queryParams:', queryParams);
-
   switch (flow) {
     case CheckoutFlowType.CONNECT:
       return `${baseUrl}/${publishableKey}/${language}/connect?${queryParams}`;
