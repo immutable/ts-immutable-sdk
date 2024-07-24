@@ -40,11 +40,12 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
 
   constructor(sdk: Checkout, props: WidgetProperties<T>) {
     const validatedProps = this.getValidatedProperties(props);
-    this.parameters = {};
+    this.parameters = { language: 'en' } as WidgetParameters[T];
 
     this.checkout = sdk;
     this.properties = validatedProps;
     this.web3Provider = props?.provider;
+
     if (this.web3Provider) {
       addProviderListenersForWidgetRoot(this.web3Provider);
     }
@@ -63,7 +64,9 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
   unmount() {
     // We want to keep the properties (config and provider) across mounts
     // Clear the parameters on unmount as we don't want to keep them across mounts
-    this.parameters = this.getValidatedParameters({});
+    this.parameters = this.getValidatedParameters(
+      { language: 'en' } as WidgetParameters[T],
+    );
 
     this.reactRoot?.unmount();
     document.getElementById(this.targetId as string)?.replaceChildren();
@@ -112,7 +115,13 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
       console.warn('Updating a widget provider through the update() method is not supported yet');
     }
 
-    this.setLanguage(props.config?.language);
+    const language = props.config?.language;
+    this.setLanguage(language);
+    this.parameters = this.getValidatedParameters({
+      ...(this.parameters ?? {}),
+      ...(language ? { language } : {}),
+    });
+
     this.render();
   }
 

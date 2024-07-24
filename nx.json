@@ -2,30 +2,30 @@
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "targetDefaults": {
     "d": {
-      "dependsOn": [
-        "^d"
-      ],
-      "outputs": [
-        "{projectRoot}/dist"
-      ],
+      "dependsOn": ["^d"],
+      "outputs": ["{projectRoot}/dist"],
       "cache": true
     },
     "lint": {
       "cache": true
     },
+    "typecheck": {
+      "cache": true,
+      "dependsOn": ["build"]
+    },
     "test": {
       "cache": true,
-      "dependsOn": [
-        "build"
-      ]
+      "dependsOn": ["build"],
+      "outputs": ["{projectRoot}/coverage"],
+      "configurations": {
+        "ci": {
+          "codeCoverage": true
+        }
+      }
     },
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "{projectRoot}/dist"
-      ],
+      "dependsOn": ["^build"],
+      "outputs": ["{projectRoot}/dist"],
       "cache": true
     }
   },

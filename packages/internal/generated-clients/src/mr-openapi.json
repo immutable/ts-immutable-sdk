@@ -61,6 +61,10 @@
       "x-displayName": "verification"
     },
     {
+      "name": "operatorallowlist",
+      "x-displayName": "operatorallowlist"
+    },
+    {
       "name": "listings",
       "description": "Listings Endpoints",
       "x-displayName": "listings"
@@ -1211,6 +1215,20 @@
             "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
           },
           {
+            "name": "token_id",
+            "in": "query",
+            "required": false,
+            "description": "List of token IDs to filter by",
+            "schema": {
+              "type": "array",
+              "maxItems": 30,
+              "items": {
+                "type": "string",
+                "example": "1"
+              }
+            }
+          },
+          {
             "name": "from_updated_at",
             "in": "query",
             "description": "Datetime to use as the oldest updated timestamp",
@@ -2320,7 +2338,7 @@
           {
             "name": "sort_by",
             "in": "query",
-            "description": "Order field to sort by",
+            "description": "Order field to sort by. `buy_item_amount` sorts by per token price, for example if 5 ERC-1155s are on sale for 10eth, it’s sorted as 2eth for `buy_item_amount`.",
             "required": false,
             "schema": {
               "type": "string",
@@ -2589,6 +2607,17 @@
             "schema": {
               "type": "string",
               "description": "Account address to filter trades by (includes buy and sell wallet address)",
+              "example": "0x784578949A4A50DeA641Fb15dd2B11C72E76919a",
+              "pattern": "^0x[a-fA-F0-9]{40}$"
+            }
+          },
+          {
+            "name": "sell_item_contract_address",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Sell item contract address to filter by",
               "example": "0x784578949A4A50DeA641Fb15dd2B11C72E76919a",
               "pattern": "^0x[a-fA-F0-9]{40}$"
             }
@@ -3290,6 +3319,84 @@
         }
       }
     },
+    "/passport-profile/v2/linked-wallets": {
+      "post": {
+        "tags": [
+          "passport profile"
+        ],
+        "summary": "Link wallet v2",
+        "description": "Link an external EOA wallet to an Immutable Passport account by providing an EIP-712 signature.",
+        "operationId": "link-wallet-v2",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LinkWalletV2Request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Wallet"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": [
+              "openid"
+            ]
+          }
+        ]
+      }
+    },
     "/passport-profile/v1/user/info": {
       "get": {
         "summary": "Get all info for a Passport user",
@@ -3620,6 +3727,15 @@
           "withdrawal"
         ]
       },
+      "OperatorAllowlistAdminAction": {
+        "description": "The action an admin can take on an operator allowlist request",
+        "example": "approve",
+        "type": "string",
+        "enum": [
+          "approve",
+          "reject"
+        ]
+      },
       "ActivityNFT": {
         "type": "object",
         "properties": {
@@ -3637,9 +3753,10 @@
             "example": "1"
           },
           "amount": {
-            "description": "The amount of tokens exchanged",
+            "description": "(deprecated - will never be filled, use amount on Activity instead) The amount of tokens exchanged",
             "type": "string",
-            "example": "1"
+            "example": "1",
+            "deprecated": true
           }
         },
         "required": [
@@ -4315,7 +4432,7 @@
       },
       "RefreshMetadataByIDRequest": {
         "type": "object",
-        "description": "Request body for refreshing metadata by id",
+        "description": "Request body for refreshing metadata by id. Total size of this list should not exceed 228 KiB",
         "properties": {
           "metadata": {
             "type": "array",
@@ -4971,7 +5088,7 @@
       },
       "NFTMetadataRequest": {
         "type": "object",
-        "description": "The NFT metadata",
+        "description": "The NFT metadata. Total size of this object should not exceed 16 KiB",
         "properties": {
           "name": {
             "type": "string",
@@ -5024,7 +5141,7 @@
         "properties": {
           "nft_metadata": {
             "type": "array",
-            "description": "List of nft metadata to be refreshed",
+            "description": "List of nft metadata to be refreshed. Total size of the list should not exceed 228 KiB",
             "maxItems": 250,
             "minItems": 1,
             "items": {
@@ -5051,6 +5168,18 @@
             "type": "string",
             "description": "The address of root token contract",
             "example": "0x43e60b30d5bec48c0f5890e3d1e9f1b1296bb4aa",
+            "nullable": true
+          },
+          "root_chain_id": {
+            "type": "string",
+            "description": "The id of the root chain for a bridged token",
+            "example": "eip155:1",
+            "nullable": true
+          },
+          "bridge_used": {
+            "type": "string",
+            "description": "The name of the bridge, for bridged tokens only",
+            "example": "axelar",
             "nullable": true
           },
           "symbol": {
@@ -5225,7 +5354,27 @@
           "assets"
         ]
       },
+      "VerificationRequestInternal": {
+        "description": "The verification request (internal)",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/VerificationRequest"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "org_tier": {
+                "$ref": "#/components/schemas/OrganisationTier"
+              }
+            },
+            "required": [
+              "org_tier"
+            ]
+          }
+        ]
+      },
       "VerificationRequest": {
+        "description": "The verification request",
         "type": "object",
         "properties": {
           "id": {
@@ -5247,12 +5396,6 @@
             "nullable": true,
             "type": "string",
             "example": "Immutable"
-          },
-          "project_name": {
-            "description": "The name of the project associated with this contract",
-            "nullable": true,
-            "type": "string",
-            "example": "Immutable project name"
           },
           "name": {
             "type": "string",
@@ -5299,7 +5442,6 @@
           "symbol",
           "description",
           "contract_type",
-          "project_name",
           "org_name",
           "org_id",
           "requester_email",
@@ -5313,6 +5455,18 @@
           "ERC20",
           "ERC721",
           "ERC1155"
+        ]
+      },
+      "OrganisationTier": {
+        "description": "The tier of the organisation",
+        "type": "string",
+        "nullable": true,
+        "enum": [
+          "common",
+          "uncommon",
+          "rare",
+          "epic",
+          "legendary"
         ]
       },
       "MintAsset": {
@@ -5488,6 +5642,127 @@
           "pending",
           "succeeded",
           "failed"
+        ]
+      },
+      "OperatorAllowlistStatus": {
+        "description": "The status of a contract on the operator allowlist",
+        "example": "requested",
+        "type": "string",
+        "enum": [
+          "requested",
+          "approved",
+          "rejected",
+          "removed",
+          "added"
+        ]
+      },
+      "OperatorAllowlistStatusDetails": {
+        "description": "The operator allowlist status details",
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/OperatorAllowlistStatusRequested"
+          },
+          {
+            "$ref": "#/components/schemas/OperatorAllowlistStatusUpdated"
+          }
+        ]
+      },
+      "OperatorAllowlistStatusRequested": {
+        "type": "object",
+        "description": "The request details",
+        "properties": {
+          "purpose": {
+            "description": "Reason this contract needs to be added",
+            "type": "string",
+            "example": "Custom crafting contract"
+          },
+          "is_settlement_contract": {
+            "description": "Attestation of whether this contract is a settlement contract",
+            "type": "boolean",
+            "example": false
+          }
+        },
+        "required": [
+          "purpose",
+          "is_settlement_contract"
+        ]
+      },
+      "OperatorAllowlistStatusUpdated": {
+        "type": "object",
+        "description": "The update details",
+        "properties": {
+          "reason": {
+            "description": "Why this action was performed",
+            "type": "string",
+            "example": "Contract meets expectations"
+          }
+        },
+        "required": [
+          "reason"
+        ]
+      },
+      "OperatorAllowlistContractStatusInternal": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/OperatorAllowlistContractStatus"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "org_name": {
+                "description": "The name of the organisation associated with this contract",
+                "nullable": true,
+                "type": "string",
+                "example": "Immutable"
+              },
+              "org_tier": {
+                "$ref": "#/components/schemas/OrganisationTier"
+              }
+            },
+            "required": [
+              "org_name",
+              "org_tier"
+            ]
+          }
+        ]
+      },
+      "OperatorAllowlistContractStatus": {
+        "type": "object",
+        "properties": {
+          "chain": {
+            "$ref": "#/components/schemas/Chain"
+          },
+          "contract_address": {
+            "type": "string",
+            "description": "The address of the contract",
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          },
+          "status": {
+            "$ref": "#/components/schemas/OperatorAllowlistStatus"
+          },
+          "details": {
+            "$ref": "#/components/schemas/OperatorAllowlistStatusDetails"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2022-08-16T17:43:26.991388Z",
+            "description": "When the contract status was created"
+          },
+          "created_by": {
+            "type": "string",
+            "format": "email",
+            "description": "Who created the status",
+            "example": "user@immutable.com"
+          }
+        },
+        "required": [
+          "chain",
+          "contract_address",
+          "status",
+          "details",
+          "created_at",
+          "created_by"
         ]
       },
       "BasicAPIError": {
@@ -6869,10 +7144,11 @@
           },
           "cancellation_type": {
             "type": "string",
-            "description": "Whether the cancellation was done on-chain or off-chain",
+            "description": "Whether the cancellation was done on-chain or off-chain or as a result of an underfunded account",
             "enum": [
               "ON_CHAIN",
-              "OFF_CHAIN"
+              "OFF_CHAIN",
+              "UNDERFUNDED"
             ],
             "example": "ON_CHAIN"
           }
@@ -7227,6 +7503,15 @@
           }
         }
       },
+      "ImmutableVerificationStatusEnum": {
+        "type": "string",
+        "enum": [
+          "verified",
+          "unverified",
+          "spam",
+          "inactive"
+        ]
+      },
       "ERC721ApproveMetadata": {
         "type": "object",
         "required": [
@@ -7237,7 +7522,9 @@
           "asset_name",
           "is_smart_contract",
           "is_contract_verified",
-          "contract_name"
+          "contract_name",
+          "token_id",
+          "immutable_verification_status"
         ],
         "properties": {
           "transaction_type": {
@@ -7274,6 +7561,14 @@
           "contract_name": {
             "type": "string",
             "description": "Smart Contract Name"
+          },
+          "token_id": {
+            "type": "string",
+            "description": "ID of the ERC721",
+            "example": "1"
+          },
+          "immutable_verification_status": {
+            "$ref": "#/components/schemas/ImmutableVerificationStatusEnum"
           }
         }
       },
@@ -7285,6 +7580,7 @@
           "amount",
           "decimals",
           "symbol",
+          "immutable_verification_status",
           "image_url"
         ],
         "properties": {
@@ -7304,6 +7600,9 @@
             "type": "string",
             "description": "A string representing the amount of tokens to transfer",
             "example": "10000000000000000"
+          },
+          "immutable_verification_status": {
+            "$ref": "#/components/schemas/ImmutableVerificationStatusEnum"
           },
           "decimals": {
             "type": "integer",
@@ -7326,6 +7625,7 @@
         "type": "object",
         "required": [
           "transaction_type",
+          "immutable_verification_status",
           "from_address",
           "to_address",
           "amount",
@@ -7356,6 +7656,9 @@
             "description": "A string representing the amount of tokens to transfer",
             "example": "10000000000000000"
           },
+          "immutable_verification_status": {
+            "$ref": "#/components/schemas/ImmutableVerificationStatusEnum"
+          },
           "decimals": {
             "type": "integer",
             "description": "The token decimals",
@@ -7382,7 +7685,9 @@
           "spender",
           "is_smart_contract",
           "is_contract_verified",
-          "contract_name"
+          "immutable_verification_status",
+          "contract_name",
+          "image_url"
         ],
         "properties": {
           "transaction_type": {
@@ -7391,6 +7696,9 @@
             "enum": [
               "ERC20_APPROVE"
             ]
+          },
+          "immutable_verification_status": {
+            "$ref": "#/components/schemas/ImmutableVerificationStatusEnum"
           },
           "amount": {
             "type": "string",
@@ -7415,6 +7723,10 @@
           "contract_name": {
             "type": "string",
             "description": "Smart Contract Name"
+          },
+          "image_url": {
+            "type": "string",
+            "example": "https://example.com/erc20.jpg"
           }
         }
       },
@@ -7426,7 +7738,8 @@
           "collection_image",
           "is_smart_contract",
           "is_contract_verified",
-          "contract_name"
+          "contract_name",
+          "immutable_verification_status"
         ],
         "properties": {
           "transaction_type": {
@@ -7456,6 +7769,9 @@
           "contract_name": {
             "type": "string",
             "description": "Smart Contract Name"
+          },
+          "immutable_verification_status": {
+            "$ref": "#/components/schemas/ImmutableVerificationStatusEnum"
           }
         }
       },
@@ -7468,7 +7784,8 @@
           "collection_name",
           "token_id",
           "asset_name",
-          "asset_image"
+          "asset_image",
+          "immutable_verification_status"
         ],
         "properties": {
           "transaction_type": {
@@ -7506,6 +7823,9 @@
             "type": "string",
             "description": "The image of the ERC721",
             "example": "https://some-url"
+          },
+          "immutable_verification_status": {
+            "$ref": "#/components/schemas/ImmutableVerificationStatusEnum"
           }
         }
       },
@@ -7515,7 +7835,8 @@
           "transaction_type",
           "from_address",
           "collection_name",
-          "items"
+          "items",
+          "immutable_verification_status"
         ],
         "properties": {
           "transaction_type": {
@@ -7541,6 +7862,9 @@
             "items": {
               "$ref": "#/components/schemas/ERC721SafeTransferFromBatchItem"
             }
+          },
+          "immutable_verification_status": {
+            "$ref": "#/components/schemas/ImmutableVerificationStatusEnum"
           }
         }
       },
@@ -7680,7 +8004,15 @@
             ]
           },
           "sell": {
-            "$ref": "#/components/schemas/SeaportERC721Item"
+            "type": "object",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SeaportERC1155Item"
+              },
+              {
+                "$ref": "#/components/schemas/SeaportERC721Item"
+              }
+            ]
           },
           "fees": {
             "type": "array",
@@ -7763,13 +8095,19 @@
             "type": "integer",
             "description": "The decimal of this erc20 item",
             "example": 18
+          },
+          "immutable_verification_status": {
+            "type": "string",
+            "description": "The Immutable verification status of this collection",
+            "$ref": "#/components/schemas/ImmutableVerificationStatusEnum"
           }
         },
         "required": [
           "type",
           "contract_address",
           "amount",
-          "decimals"
+          "decimals",
+          "immutable_verification_status"
         ]
       },
       "SeaportERC721Item": {
@@ -7811,6 +8149,11 @@
             "description": "ID of ERC721 token",
             "example": "1",
             "pattern": "\\d+"
+          },
+          "immutable_verification_status": {
+            "type": "string",
+            "description": "The Immutable verification status of this collection",
+            "$ref": "#/components/schemas/ImmutableVerificationStatusEnum"
           }
         },
         "example": [
@@ -7819,13 +8162,85 @@
             "contract_address": "0x87c07c927eba711cbc55ec628a670acd48d0b525",
             "contract_name": "Guild of Guardians Heroes",
             "name": "Bestowing Saint",
-            "token_id": "1"
+            "token_id": "1",
+            "immutable_verification_status": "verified"
           }
         ],
         "required": [
           "type",
           "contract_address",
-          "token_id"
+          "token_id",
+          "immutable_verification_status"
+        ]
+      },
+      "SeaportERC1155Item": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Token type user is offering, which in this case is ERC1155",
+            "example": "ERC1155",
+            "enum": [
+              "ERC1155"
+            ]
+          },
+          "contract_address": {
+            "type": "string",
+            "description": "Address of ERC1155 token",
+            "example": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+            "pattern": "^0x[a-fA-F0-9]{40}$"
+          },
+          "contract_name": {
+            "type": "string",
+            "nullable": true,
+            "description": "The name of the collection",
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          },
+          "image_url": {
+            "type": "string",
+            "description": "The URL of the asset",
+            "example": "https://example.com/nft.jpeg"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "example": "Sword",
+            "description": "The name of the asset"
+          },
+          "token_id": {
+            "type": "string",
+            "description": "ID of ERC1155 token",
+            "example": "1",
+            "pattern": "\\d+"
+          },
+          "amount": {
+            "type": "string",
+            "description": "A string representing the total units of an ERC1155 token which the user is selling",
+            "example": "100"
+          },
+          "immutable_verification_status": {
+            "type": "string",
+            "description": "The Immutable verification status of this collection",
+            "$ref": "#/components/schemas/ImmutableVerificationStatusEnum"
+          }
+        },
+        "example": [
+          {
+            "type": "ERC1155",
+            "contract_address": "0x87c07c927eba711cbc55ec628a670acd48d0b525",
+            "contract_name": "Guild of Guardians Heroes",
+            "name": "Bestowing Saint",
+            "token_id": "1",
+            "amount": "100",
+            "immutable_verification_status": "verified"
+          }
+        ],
+        "required": [
+          "type",
+          "contract_address",
+          "token_id",
+          "amount",
+          "immutable_verification_status"
         ]
       },
       "SeaportFee": {
@@ -7918,7 +8333,15 @@
             ]
           },
           "sell": {
-            "$ref": "#/components/schemas/SeaportERC721Item"
+            "type": "object",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SeaportERC721Item"
+              },
+              {
+                "$ref": "#/components/schemas/SeaportERC1155Item"
+              }
+            ]
           },
           "fees": {
             "type": "array",
@@ -8090,6 +8513,15 @@
         "type": "string",
         "example": 0
       },
+      "TokenType": {
+        "description": "Contract type for token (ERC721/ERC1155)",
+        "type": "string",
+        "example": "ERC721",
+        "enum": [
+          "ERC721",
+          "ERC1155"
+        ]
+      },
       "Network": {
         "description": "Network",
         "type": "string",
@@ -8126,7 +8558,8 @@
           "network",
           "name",
           "contract_address",
-          "balance"
+          "balance",
+          "token_type"
         ],
         "properties": {
           "network": {
@@ -8153,6 +8586,9 @@
             "items": {
               "$ref": "#/components/schemas/EthAddress"
             }
+          },
+          "token_type": {
+            "$ref": "#/components/schemas/TokenType"
           }
         }
       },
@@ -8169,7 +8605,9 @@
         "required": [
           "network",
           "token_id",
-          "owner"
+          "owner",
+          "balance",
+          "token_type"
         ],
         "properties": {
           "network": {
@@ -8192,6 +8630,12 @@
           },
           "owner": {
             "$ref": "#/components/schemas/EthAddress"
+          },
+          "balance": {
+            "$ref": "#/components/schemas/Balance"
+          },
+          "token_type": {
+            "$ref": "#/components/schemas/TokenType"
           }
         }
       },
@@ -8200,10 +8644,81 @@
         "type": "string",
         "example": "MetaMask"
       },
+      "Wallet": {
+        "description": "Linked wallet",
+        "type": "object",
+        "required": [
+          "address",
+          "type",
+          "created_at",
+          "updated_at",
+          "clientName"
+        ],
+        "properties": {
+          "address": {
+            "$ref": "#/components/schemas/EthAddress"
+          },
+          "type": {
+            "$ref": "#/components/schemas/WalletType"
+          },
+          "created_at": {
+            "$ref": "#/components/schemas/CreatedAt"
+          },
+          "updated_at": {
+            "$ref": "#/components/schemas/CreatedAt"
+          },
+          "name": {
+            "$ref": "#/components/schemas/Name"
+          },
+          "clientName": {
+            "type": "string",
+            "description": "Name of client that linked the wallet",
+            "example": "Passport Dashboard"
+          }
+        }
+      },
       "Signature": {
         "description": "Signature",
         "type": "string",
         "example": "0x..."
+      },
+      "LinkWalletV2Request": {
+        "description": "Link wallet V2 request",
+        "type": "object",
+        "required": [
+          "type",
+          "wallet_address",
+          "signature",
+          "nonce"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "This should be the EIP-6963 rdns value, if you're unable to get the rdns value you can provide \"External\". If using WalletConnect then provide \"WalletConnect\".",
+            "example": "io.metamask",
+            "maxLength": 32,
+            "not": {
+              "enum": [
+                "Passport",
+                "com.immutable.passport"
+              ]
+            }
+          },
+          "wallet_address": {
+            "description": "The address of the external wallet being linked to Passport",
+            "type": "string",
+            "example": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+            "pattern": "^0x[a-fA-F0-9]{40}$"
+          },
+          "signature": {
+            "description": "The EIP-712 signature",
+            "type": "string"
+          },
+          "nonce": {
+            "description": "A unique identifier for the signature",
+            "type": "string"
+          }
+        }
       },
       "PageResponse": {
         "description": "Response page",
@@ -8263,6 +8778,7 @@
         "tokens",
         "demopage",
         "verification",
+        "operatorallowlist",
         "listings",
         "orders",
         "passport",

@@ -13,6 +13,9 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import { ImmutableVerificationStatusEnum } from './immutable-verification-status-enum';
 
 /**
  * 
@@ -56,6 +59,12 @@ export interface NFTSetApprovalForAllMetadata {
      * @memberof NFTSetApprovalForAllMetadata
      */
     'contract_name': string;
+    /**
+     * 
+     * @type {ImmutableVerificationStatusEnum}
+     * @memberof NFTSetApprovalForAllMetadata
+     */
+    'immutable_verification_status': ImmutableVerificationStatusEnum;
 }
 
 export const NFTSetApprovalForAllMetadataTransactionTypeEnum = {

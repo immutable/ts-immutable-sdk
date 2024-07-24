@@ -2,7 +2,9 @@ import React, {
   createContext, useCallback, useContext, useMemo, useState,
 } from 'react';
 import { IMXProvider } from '@imtbl/x-provider';
-import { Provider, UserProfile } from '@imtbl/passport';
+import {
+  LinkedWallet, LinkWalletParams, Provider, UserProfile,
+} from '@imtbl/passport';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { useStatusProvider } from '@/context/StatusProvider';
 
@@ -17,6 +19,7 @@ const PassportContext = createContext<{
   getAccessToken: () => Promise<string | undefined>;
   getUserInfo: () => Promise<UserProfile | undefined>;
   getLinkedAddresses: () => Promise<string[] | undefined>;
+  linkWallet: (params: LinkWalletParams) => Promise<LinkedWallet | undefined>;
 }>({
       imxProvider: undefined,
       zkEvmProvider: undefined,
@@ -28,6 +31,7 @@ const PassportContext = createContext<{
       getAccessToken: () => Promise.resolve(undefined),
       getUserInfo: () => Promise.resolve(undefined),
       getLinkedAddresses: () => Promise.resolve(undefined),
+      linkWallet: () => Promise.resolve(undefined),
     });
 
 export function PassportProvider({
@@ -104,6 +108,19 @@ export function PassportProvider({
     return linkedAddresses;
   }, [passportClient, setIsLoading, addMessage]);
 
+  const linkWallet = useCallback(async (params: LinkWalletParams) => {
+    setIsLoading(true);
+    let linkedWallet;
+    try {
+      linkedWallet = await passportClient.linkExternalWallet(params);
+      addMessage('Link Wallet', linkedWallet);
+    } catch (e: any) {
+      addMessage(`Link wallet failed: message: ${e.message} type: ${e.type}`);
+    }
+    setIsLoading(false);
+    return linkedWallet || undefined;
+  }, [passportClient, setIsLoading, addMessage]);
+
   const logout = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -142,6 +159,7 @@ export function PassportProvider({
     getAccessToken,
     getUserInfo,
     getLinkedAddresses,
+    linkWallet,
   }), [
     imxProvider,
     zkEvmProvider,
@@ -153,6 +171,7 @@ export function PassportProvider({
     getAccessToken,
     getUserInfo,
     getLinkedAddresses,
+    linkWallet,
   ]);
 
   return (
@@ -174,6 +193,7 @@ export function usePassportProvider() {
     getAccessToken,
     getUserInfo,
     getLinkedAddresses,
+    linkWallet,
   } = useContext(PassportContext);
   return {
     imxProvider,
@@ -186,5 +206,6 @@ export function usePassportProvider() {
     getAccessToken,
     getUserInfo,
     getLinkedAddresses,
+    linkWallet,
   };
 }
