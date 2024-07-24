@@ -333,28 +333,40 @@ export class Passport {
     } catch (error) {
       trackError('passport', 'linkWallet', error as Error);
 
-      if (isAxiosError(error) && error.response?.data && isAPIError(error.response.data)) {
-        const { code, message } = error.response.data;
+      if (isAxiosError(error) && error.response) {
+        if (error.response.data && isAPIError(error.response.data)) {
+          const { code, message } = error.response.data;
 
-        switch (code) {
-          case 'ALREADY_LINKED':
-            throw new PassportError(message, PassportErrorType.LINK_WALLET_ALREADY_LINKED_ERROR);
-          case 'MAX_WALLETS_LINKED':
-            throw new PassportError(message, PassportErrorType.LINK_WALLET_MAX_WALLETS_LINKED_ERROR);
-          case 'DUPLICATE_NONCE':
-            throw new PassportError(message, PassportErrorType.LINK_WALLET_DUPLICATE_NONCE_ERROR);
-          case 'VALIDATION_ERROR':
-            throw new PassportError(message, PassportErrorType.LINK_WALLET_VALIDATION_ERROR);
-          default:
-            throw new PassportError(message, PassportErrorType.LINK_WALLET_GENERIC_ERROR);
+          switch (code) {
+            case 'ALREADY_LINKED':
+              throw new PassportError(message, PassportErrorType.LINK_WALLET_ALREADY_LINKED_ERROR);
+            case 'MAX_WALLETS_LINKED':
+              throw new PassportError(message, PassportErrorType.LINK_WALLET_MAX_WALLETS_LINKED_ERROR);
+            case 'DUPLICATE_NONCE':
+              throw new PassportError(message, PassportErrorType.LINK_WALLET_DUPLICATE_NONCE_ERROR);
+            case 'VALIDATION_ERROR':
+              throw new PassportError(message, PassportErrorType.LINK_WALLET_VALIDATION_ERROR);
+            default:
+              throw new PassportError(message, PassportErrorType.LINK_WALLET_GENERIC_ERROR);
+          }
+        } else if (error.response.status) {
+          // Handle unexpected error with a generic error message
+          throw new PassportError(
+            `Link wallet request failed with status code ${error.response.status}`,
+            PassportErrorType.LINK_WALLET_GENERIC_ERROR,
+          );
         }
-      } else {
-        // Handle unexpected error with a generic error message
-        throw new PassportError(
-          `Link wallet request failed with status code ${(error as any).response.status}`,
-          PassportErrorType.LINK_WALLET_GENERIC_ERROR,
-        );
       }
+
+      let message: string = 'Link wallet request failed';
+      if (error instanceof Error) {
+        message += `: ${error.message}`;
+      }
+
+      throw new PassportError(
+        message,
+        PassportErrorType.LINK_WALLET_GENERIC_ERROR,
+      );
     }
   }
 }
