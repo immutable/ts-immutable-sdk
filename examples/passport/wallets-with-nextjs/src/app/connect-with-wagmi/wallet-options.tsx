@@ -1,28 +1,24 @@
 import { useState, useEffect } from 'react'
 import { Connector, useConnect } from 'wagmi'
-
 export function WalletOptions() {
 
   // get the available connectors and the connect function from Wagmi
   const { connectors, connect } = useConnect()
+    
+  // setup the filtered connectors state
+  const [filteredConnectors, setFilteredConnectors] = useState<Connector[]>([])
   
   // setup the loading state to enable/disable buttons when loading
   const [loading, setLoadingState] = useState<boolean>(true);
-  
-  // setup the filtered connectors state
-  const [filteredConnectors, setFilteredConnectors] = useState<Connector[]>([])
 
   useEffect(() => {
     if (!connectors) return
-    // #doc passport-wallets-nextjs-connect-wagmi-filter
-    //filter the connects to show only Passport
+    //filter the available connectors to show only Passport
     setFilteredConnectors(connectors.filter((connector) => connector.name.includes('Immutable Passport')))
-    // #enddoc passport-wallets-nextjs-connect-wagmi-filter
     // enable button when loading has finished
     setLoadingState(false)
   }, [connectors])
 
-  // #doc passport-wallets-nextjs-connect-wagmi-connect
   function passportLogin(connector:Connector) {
     // disable button while loading
     setLoadingState(true)
@@ -39,6 +35,5 @@ export function WalletOptions() {
     ))}
     {loading && <p>Loading...</p>}
   </>)
-  // #enddoc passport-wallets-nextjs-connect-wagmi-connect
   
 }

@@ -87,8 +87,6 @@
     "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix",
     "start": "yarn clean && NODE_ENV=development rollup --config rollup.config.js --watch",
     "test": "jest test --passWithNoTests",
-    "test:cypress": "NODE_ENV=test cypress run --component --headless",
-    "test:cypress:open": "NODE_ENV=test cypress open --component --browser electron",
     "test:watch": "jest test --passWithNoTests --watch",
     "typecheck": "tsc --noEmit"
   },

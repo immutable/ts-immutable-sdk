@@ -1,6 +1,6 @@
 import { useAccount, useDisconnect, useEnsAvatar, useEnsName } from 'wagmi'
-import { passportInstance } from '../page';
-import { useEffect, useState } from 'react';
+import { passportInstance } from '../utils';
+import { useState } from 'react';
 
 export function Account() {
   const { address } = useAccount()
@@ -11,7 +11,6 @@ export function Account() {
   // setup the loading state to enable/disable buttons when loading
   const [loading, setLoadingState] = useState<boolean>(false);
 
-  // #doc passport-wallets-nextjs-connect-wagmi-disconnect
   const passportLogout = async () => {
     // disable button while loading
     setLoadingState(true)
@@ -32,5 +31,4 @@ export function Account() {
       }
     </div>
   )
-  // #enddoc passport-wallets-nextjs-connect-wagmi-disconnect
 }

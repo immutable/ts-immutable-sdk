@@ -13,6 +13,9 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import { ImmutableVerificationStatusEnum } from './immutable-verification-status-enum';
 
 /**
  * 
@@ -26,6 +29,12 @@ export interface ERC20ApproveMetadata {
      * @memberof ERC20ApproveMetadata
      */
     'transaction_type': ERC20ApproveMetadataTransactionTypeEnum;
+    /**
+     * 
+     * @type {ImmutableVerificationStatusEnum}
+     * @memberof ERC20ApproveMetadata
+     */
+    'immutable_verification_status': ImmutableVerificationStatusEnum;
     /**
      * Requested approval amount
      * @type {string}
@@ -62,6 +71,12 @@ export interface ERC20ApproveMetadata {
      * @memberof ERC20ApproveMetadata
      */
     'contract_name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ERC20ApproveMetadata
+     */
+    'image_url': string;
 }
 
 export const ERC20ApproveMetadataTransactionTypeEnum = {

@@ -24,7 +24,7 @@ import { VerificationRequestContractType } from './verification-request-contract
 import { VerificationRequestStatus } from './verification-request-status';
 
 /**
- * 
+ * The verification request
  * @export
  * @interface VerificationRequest
  */
@@ -53,12 +53,6 @@ export interface VerificationRequest {
      * @memberof VerificationRequest
      */
     'org_name': string | null;
-    /**
-     * The name of the project associated with this contract
-     * @type {string}
-     * @memberof VerificationRequest
-     */
-    'project_name': string | null;
     /**
      * The name of the collection
      * @type {string}
