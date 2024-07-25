@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { WidgetLanguage } from '../configurations';
+import { WidgetLanguage, WidgetTheme } from '../configurations';
 import { ConnectWidgetParams } from './connect';
 import { BridgeWidgetParams } from './bridge';
 import { WalletWidgetParams } from './wallet';
@@ -51,4 +51,5 @@ export type CheckoutWidgetFlowParams =
 export type CheckoutWidgetParams = {
   /** The language to use for the checkout widget */
   language?: WidgetLanguage;
+  theme?: WidgetTheme;
 } & CheckoutWidgetFlowParams;
