@@ -1,4 +1,8 @@
-import { CheckoutFlowType, CheckoutWidgetParams } from '@imtbl/checkout-sdk';
+import {
+  CheckoutFlowType,
+  CheckoutWidgetConfiguration,
+  CheckoutWidgetParams,
+} from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 
 import { CHECKOUT_APP_URL } from '../../../lib/constants';
@@ -12,18 +16,29 @@ const toQueryString = (params: Record<string, unknown>): string => {
 };
 
 // TODO: Can be removed after updating params across widgets
-const getIframeParams = (params: CheckoutWidgetParams): string => {
-  const { flow, language, ...restParams } = params;
+const getIframeParams = (
+  params: CheckoutWidgetParams,
+  config: CheckoutWidgetConfiguration,
+): string => {
+  const { flow } = params;
+  const commonConfig = {
+    theme: config.theme,
+    language: params.language || config.language,
+  };
 
   switch (flow) {
     case CheckoutFlowType.CONNECT:
       return toQueryString({
+        ...commonConfig,
+        ...(config.connect || {}),
         chainId: params.targetChainId,
         walletRdns: params.targetWalletRdns,
         blocklistWalletRdns: params.blocklistWalletRdns,
       });
     case CheckoutFlowType.WALLET:
       return toQueryString({
+        ...commonConfig,
+        ...(config.wallet || {}),
         // FIMXE: Add connection params
         // chainId:
         // walletRdns:
@@ -34,6 +49,8 @@ const getIframeParams = (params: CheckoutWidgetParams): string => {
       });
     case CheckoutFlowType.SWAP:
       return toQueryString({
+        ...commonConfig,
+        ...(config.swap || {}),
         // FIMXE: Add connection params
         // chainId:
         // walletRdns:
@@ -47,6 +64,8 @@ const getIframeParams = (params: CheckoutWidgetParams): string => {
       });
     case CheckoutFlowType.BRIDGE:
       return toQueryString({
+        ...commonConfig,
+        ...(config.bridge || {}),
         // FIMXE: Add bridge params
         // fromChainId:
         // toChainId:
@@ -60,6 +79,8 @@ const getIframeParams = (params: CheckoutWidgetParams): string => {
       });
     case CheckoutFlowType.ONRAMP:
       return toQueryString({
+        ...commonConfig,
+        ...(config.onRamp || {}),
         // FIMXE: Add connection params
         // chainId:
         // walletRdns:
@@ -72,6 +93,8 @@ const getIframeParams = (params: CheckoutWidgetParams): string => {
       });
     case CheckoutFlowType.SALE:
       return toQueryString({
+        ...commonConfig,
+        ...(config.sale || {}),
         // FIMXE: Add connection params
         // chainId:
         // walletRdns:
@@ -90,19 +113,20 @@ const getIframeParams = (params: CheckoutWidgetParams): string => {
         excludeFiatCurrencies: params.excludeFiatCurrencies,
       });
     default:
-      return toQueryString(restParams);
+      return '';
   }
 };
 
 export const getIframeURL = (
   params: CheckoutWidgetParams,
+  config: CheckoutWidgetConfiguration,
   environment: Environment,
   publishableKey: string,
 ): string => {
   const { language, flow } = params;
 
   const baseUrl = CHECKOUT_APP_URL[environment];
-  const queryParams = getIframeParams(params);
+  const queryParams = getIframeParams(params, config);
 
   return `${baseUrl}/${publishableKey}/${language}/${flow}?${queryParams}`;
 };
