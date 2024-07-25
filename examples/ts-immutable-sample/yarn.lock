@@ -475,8 +475,8 @@ __metadata:
   linkType: hard
 
 "@biom3/react@npm:^0.24.1":
-  version: 0.24.16
-  resolution: "@biom3/react@npm:0.24.16"
+  version: 0.24.20
+  resolution: "@biom3/react@npm:0.24.20"
   dependencies:
     "@biom3/design-tokens": ~0.4.2
     buffer: ^6.0.3
@@ -497,7 +497,7 @@ __metadata:
     framer-motion: ^10.12.12
     react: ^18.2.0
     react-dom: ^18.2.0
-  checksum: 80719485b589ba89925adb04acfb52fbb4737d462b5c726ad6e50bcfd9bda8a90fea3a1ae36766745181c2a86baaef7737e5cf184ae13f167c089dfe39f4b71c
+  checksum: a2cf59149d4e15c97772bcc3de4f38b10b903dba6fda948f1faba1bbb53fe86c2f9e73adb43ba4a3f2eefeb0770d652d76f47fc11f00df7587cb846f779c601d
   languageName: node
   linkType: hard
 
@@ -1012,7 +1012,7 @@ __metadata:
 
 "@imtbl/sdk@file:../../sdk::locator=ts-immutable-sample%40workspace%3A.":
   version: 0.0.0
-  resolution: "@imtbl/sdk@file:../../sdk#../../sdk::hash=4d3453&locator=ts-immutable-sample%40workspace%3A."
+  resolution: "@imtbl/sdk@file:../../sdk#../../sdk::hash=1c59fc&locator=ts-immutable-sample%40workspace%3A."
   dependencies:
     "@0xsequence/abi": ^1.4.3
     "@0xsequence/core": ^1.4.3
@@ -1052,6 +1052,7 @@ __metadata:
     i18next: ^23.7.6
     i18next-browser-languagedetector: ^7.2.0
     jwt-decode: ^3.1.2
+    localforage: ^1.10.0
     lru-memorise: 0.3.0
     magic-sdk: ^21.2.0
     merkletreejs: ^0.3.11
@@ -1071,7 +1072,7 @@ __metadata:
       optional: true
     prisma:
       optional: true
-  checksum: b54172036c45e867a9e66e9d9e876fb3ba1e3dc5814c37d34f82c08a95cbcb9f82c36e71542ad8cf1ad0cf0ed8815e5d92566b75997daaf9be6525d0a75feb78
+  checksum: 732cfbecf931c732adc7f0dee563f95c9390e57d30f1cc3a98cbc966bb92cac19a8a533b81149880a408f40a7ca21d5602b12c3eba7eccdf8b16d1a8f8c27b43
   languageName: node
   linkType: hard
 
@@ -2775,49 +2776,49 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@prisma/debug@npm:5.16.2":
-  version: 5.16.2
-  resolution: "@prisma/debug@npm:5.16.2"
-  checksum: 5c5c1b194933c0af9de02cc02b06d6df823472f98fc9d1c66a1c4ea90863844ab610f293f9fd7485ffdc14e72f0a34e3758a16b84d58e40304bcfc4422117636
+"@prisma/debug@npm:5.17.0":
+  version: 5.17.0
+  resolution: "@prisma/debug@npm:5.17.0"
+  checksum: 2546dc6e94d4b1b95fb78ade1a6c33fc6fed73cb8ffcd00c54a7d70a46d50f5612f892d2760b244ad5a5b5f921b6f6fcf0f32430f34b5cceef4fd7a6dbf9e451
   languageName: node
   linkType: hard
 
-"@prisma/engines-version@npm:5.16.0-24.34ace0eb2704183d2c05b60b52fba5c43c13f303":
-  version: 5.16.0-24.34ace0eb2704183d2c05b60b52fba5c43c13f303
-  resolution: "@prisma/engines-version@npm:5.16.0-24.34ace0eb2704183d2c05b60b52fba5c43c13f303"
-  checksum: 4dd4916ada32c4b19e624b87f1b8651d5bfd1b98991f3c9676c2b838d4de4d48eb6de7f4d54a4d1258f28539a8aee4c1c2b8634f4baa0e9289076868a228197b
+"@prisma/engines-version@npm:5.17.0-31.393aa359c9ad4a4bb28630fb5613f9c281cde053":
+  version: 5.17.0-31.393aa359c9ad4a4bb28630fb5613f9c281cde053
+  resolution: "@prisma/engines-version@npm:5.17.0-31.393aa359c9ad4a4bb28630fb5613f9c281cde053"
+  checksum: 199c11fa2ea12d43654e9a081a14dc7bc1d7f2bba015b05ab009896e789cfe8cb57043051fec7b0600b45e2926278e99608fc336f86125f557318ff227391415
   languageName: node
   linkType: hard
 
-"@prisma/engines@npm:5.16.2":
-  version: 5.16.2
-  resolution: "@prisma/engines@npm:5.16.2"
+"@prisma/engines@npm:5.17.0":
+  version: 5.17.0
+  resolution: "@prisma/engines@npm:5.17.0"
   dependencies:
-    "@prisma/debug": 5.16.2
-    "@prisma/engines-version": 5.16.0-24.34ace0eb2704183d2c05b60b52fba5c43c13f303
-    "@prisma/fetch-engine": 5.16.2
-    "@prisma/get-platform": 5.16.2
-  checksum: b736366d18f602db601d06bf97c68880c3b21d176a98c6489d7cc0c5737342dad7443c76c80e386a731bbe8e54495bb915d79154cf4f2c6583af3077cdfb66ec
+    "@prisma/debug": 5.17.0
+    "@prisma/engines-version": 5.17.0-31.393aa359c9ad4a4bb28630fb5613f9c281cde053
+    "@prisma/fetch-engine": 5.17.0
+    "@prisma/get-platform": 5.17.0
+  checksum: cafd67dbbfc48fe6d2a0151c9243b89e43a9b5592edc14e98173db514ea5fd325e32b3c3a3f3b13f61853989bba99e12e3f7d9400089fc865b3b64889b3b69aa
   languageName: node
   linkType: hard
 
-"@prisma/fetch-engine@npm:5.16.2":
-  version: 5.16.2
-  resolution: "@prisma/fetch-engine@npm:5.16.2"
+"@prisma/fetch-engine@npm:5.17.0":
+  version: 5.17.0
+  resolution: "@prisma/fetch-engine@npm:5.17.0"
   dependencies:
-    "@prisma/debug": 5.16.2
-    "@prisma/engines-version": 5.16.0-24.34ace0eb2704183d2c05b60b52fba5c43c13f303
-    "@prisma/get-platform": 5.16.2
-  checksum: 4dcab9c6eb52f733f4c3c9b804f1a0584c342d3ed647611fdb4c56c4552a86688ff08a30286abbf81f11f4db324a95d90b31699707cc84d2f9e9fc3ae217913a
+    "@prisma/debug": 5.17.0
+    "@prisma/engines-version": 5.17.0-31.393aa359c9ad4a4bb28630fb5613f9c281cde053
+    "@prisma/get-platform": 5.17.0
+  checksum: 537bc69c0183de9c205d83a4a1de7ab59e17c210dbb1352af23c5974242c37f9bc46402ab75b0249bdebd01a863b820052f2a32cd4ded56ab0b5be4aab74b910
   languageName: node
   linkType: hard
 
-"@prisma/get-platform@npm:5.16.2":
-  version: 5.16.2
-  resolution: "@prisma/get-platform@npm:5.16.2"
+"@prisma/get-platform@npm:5.17.0":
+  version: 5.17.0
+  resolution: "@prisma/get-platform@npm:5.17.0"
   dependencies:
-    "@prisma/debug": 5.16.2
-  checksum: a591107563f66617fe0f7ff1945104c3ce340c99b809ffd2852f25df3776cbc7ac5c598e3b1f14ed72500551ea593f17fb7554c9043ccbc40960bac40c7b7aa1
+    "@prisma/debug": 5.17.0
+  checksum: ce097f6303f47c01dee768dc4903d3bae2f534f3d2fd5c42741d65537121689eae1e58501d6f7fb3a6f4b3e8277d083d0011d9d04868aac6d39dbe3835f0e6f2
   languageName: node
   linkType: hard
 
@@ -11578,13 +11579,13 @@ __metadata:
   linkType: hard
 
 "prisma@npm:^5.13.0":
-  version: 5.16.2
-  resolution: "prisma@npm:5.16.2"
+  version: 5.17.0
+  resolution: "prisma@npm:5.17.0"
   dependencies:
-    "@prisma/engines": 5.16.2
+    "@prisma/engines": 5.17.0
   bin:
     prisma: build/index.js
-  checksum: 68a75874fd8c066d4cc454e533cb7a575064498048100fd802a0c909e5c7b50eb0919e09033256b331e6ba0f320e76743653efe7ad31a7b3415b768e15772014
+  checksum: f8e232c8b51a6d1f95857aec8726cf74e63518ccff03568ff1eb9e9d754a7f853a0fb6e8f485d06435547aa90806f67314dd66fdd9d28b242e210e3138a3f5af
   languageName: node
   linkType: hard
 
@@ -12779,8 +12780,8 @@ __metadata:
   linkType: hard
 
 "tar@npm:^6.1.11, tar@npm:^6.1.2":
-  version: 6.2.0
-  resolution: "tar@npm:6.2.0"
+  version: 6.2.1
+  resolution: "tar@npm:6.2.1"
   dependencies:
     chownr: ^2.0.0
     fs-minipass: ^2.0.0
@@ -12788,7 +12789,7 @@ __metadata:
     minizlib: ^2.1.1
     mkdirp: ^1.0.3
     yallist: ^4.0.0
-  checksum: db4d9fe74a2082c3a5016630092c54c8375ff3b280186938cfd104f2e089c4fd9bad58688ef6be9cf186a889671bf355c7cda38f09bbf60604b281715ca57f5c
+  checksum: f1322768c9741a25356c11373bce918483f40fa9a25c69c59410c8a1247632487edef5fe76c5f12ac51a6356d2f1829e96d2bc34098668a2fc34d76050ac2b6c
   languageName: node
   linkType: hard
 
