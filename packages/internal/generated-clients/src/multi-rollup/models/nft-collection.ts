@@ -16,6 +16,9 @@
 // May contain unused imports in some cases
 // @ts-ignore
 import { Network } from './network';
+// May contain unused imports in some cases
+// @ts-ignore
+import { TokenType } from './token-type';
 
 /**
  * Collection
@@ -65,6 +68,12 @@ export interface NftCollection {
      * @memberof NftCollection
      */
     'owners'?: Array<string>;
+    /**
+     * 
+     * @type {TokenType}
+     * @memberof NftCollection
+     */
+    'token_type': TokenType;
 }
 
 

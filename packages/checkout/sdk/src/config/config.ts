@@ -71,6 +71,8 @@ export class CheckoutConfiguration {
 
   readonly networkMap: NetworkMap;
 
+  readonly publishableKey: string;
+
   constructor(config: CheckoutModuleConfiguration, httpClient: HttpClient) {
     if (!Object.values(Environment).includes(config.baseConfig.environment)) {
       throw new CheckoutConfigurationError(
@@ -85,6 +87,7 @@ export class CheckoutConfiguration {
     this.isOnRampEnabled = config.onRamp?.enable ?? DEFAULT_ON_RAMP_ENABLED;
     this.isSwapEnabled = config.swap?.enable ?? DEFAULT_SWAP_ENABLED;
     this.isBridgeEnabled = config.bridge?.enable ?? DEFAULT_BRIDGE_ENABLED;
+    this.publishableKey = config.publishableKey ?? '<no-publishable-key>';
 
     this.networkMap = networkMap(
       this.isProduction,

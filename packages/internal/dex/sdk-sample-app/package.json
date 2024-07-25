@@ -1,5 +1,5 @@
 {
-  "name": "sdk-sample-app",
+  "name": "dex-sample-app",
   "version": "0.1.0",
   "devDependencies": {
     "@imtbl/dex-sdk": "0.0.0",
@@ -7,6 +7,7 @@
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
     "autoprefixer": "10.4.14",
+    "concurrently": "^8.2.2",
     "eslint": "^8.40.0",
     "ethers": "^5.7.2",
     "next": "13.3.1",
@@ -18,9 +19,8 @@
   },
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "concurrently 'next dev' 'yarn run --top-level dev @imtbl/dex-sdk'",
     "lint": "eslint ./src --ext .ts --max-warnings=0",
-    "setup": "cd ../../../../ && yarn build:onlysdk",
     "start": "next start"
   }
 }
