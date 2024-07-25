@@ -88,6 +88,7 @@ export type SalePaymentMethod = {
  */
 export type SalePaymentToken = {
   /** Chosen payment token */
+  settlementType: string;
   type: string;
   token: TokenInfo;
   amount: string;

@@ -6,3 +6,4 @@ export * from './sale';
 export * from './bridge';
 export * from './orchestration';
 export * from './onramp';
+export * from './checkout';

@@ -4,7 +4,6 @@ import {
   Checkout,
   WalletProviderName,
   CheckoutErrorType,
-
 } from '@imtbl/checkout-sdk';
 import React, {
   useEffect,

@@ -90,9 +90,11 @@ describe('ZkEvmProvider', () => {
 
       provider.on('accountsChanged', onAccountsChanged);
 
-      const result = await provider.request({ method: 'eth_requestAccounts' });
+      // #doc eth_request-accounts
+      const accounts = await provider.request({ method: 'eth_requestAccounts' });
+      // #enddoc eth_request-accounts
 
-      expect(result).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
+      expect(accounts).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
       expect(onAccountsChanged).toHaveBeenCalledWith([mockUserZkEvm.zkEvm.ethAddress]);
       expect(identify).toHaveBeenCalledWith({
         passportId: mockUserZkEvm.profile.sub,
