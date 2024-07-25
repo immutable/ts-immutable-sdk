@@ -1,14 +1,24 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { IMXClient } from '@imtbl/x-client';
-import { ImxApiClients, MultiRollupApiClients, imxApiConfig } from '@imtbl/generated-clients';
+import { ImxApiClients, imxApiConfig, MultiRollupApiClients } from '@imtbl/generated-clients';
+import { trackError } from '@imtbl/metrics';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
 import { Passport } from './Passport';
 import { PassportImxProvider, PassportImxProviderFactory } from './starkEx';
 import { OidcConfiguration, UserProfile } from './types';
-import { mockUser, mockLinkedAddresses, mockUserImx } from './test/mocks';
+import {
+  mockApiError,
+  mockLinkedAddresses,
+  mockLinkedWallet,
+  mockPassportBadRequest,
+  mockUser,
+  mockUserImx,
+  mockUserZkEvm,
+} from './test/mocks';
 import { announceProvider, passportProviderInfo } from './zkEvm/provider/eip6963';
 import { ZkEvmProvider } from './zkEvm';
+import { PassportError, PassportErrorType } from './errors/passportError';
 
 jest.mock('./authManager');
 jest.mock('./magicAdapter');
@@ -17,6 +27,7 @@ jest.mock('./confirmation');
 jest.mock('./zkEvm');
 jest.mock('./zkEvm/provider/eip6963');
 jest.mock('@imtbl/generated-clients');
+jest.mock('@imtbl/metrics');
 
 const oidcConfiguration: OidcConfiguration = {
   clientId: '11111',
@@ -40,6 +51,7 @@ describe('Passport', () => {
   let getProviderMock: jest.Mock;
   let getProviderSilentMock: jest.Mock;
   let getLinkedAddressesMock: jest.Mock;
+  let linkExternalWalletMock: jest.Mock;
 
   beforeEach(() => {
     authLoginMock = jest.fn().mockReturnValue(mockUser);
@@ -54,6 +66,7 @@ describe('Passport', () => {
     getProviderMock = jest.fn();
     getProviderSilentMock = jest.fn();
     getLinkedAddressesMock = jest.fn();
+    linkExternalWalletMock = jest.fn();
     (AuthManager as unknown as jest.Mock).mockReturnValue({
       login: authLoginMock,
       loginCallback: loginCallbackMock,
@@ -74,6 +87,7 @@ describe('Passport', () => {
     (MultiRollupApiClients as jest.Mock).mockReturnValue({
       passportProfileApi: {
         getUserInfo: getLinkedAddressesMock,
+        linkWalletV2: linkExternalWalletMock,
       },
     });
     passport = new Passport({
@@ -362,6 +376,73 @@ describe('Passport', () => {
       await expect(passport.login({ useCachedSession: true })).rejects.toThrow(error);
       expect(getUserMock).toBeCalledTimes(1);
       expect(authLoginMock).toBeCalledTimes(0);
+    });
+  });
+
+  describe('linkExternalWallet', () => {
+    const linkWalletParams = {
+      type: 'MetaMask',
+      walletAddress: '0xd8da6bf26964af9d7eed9e03e53415d37aa96045',
+      signature: 'signature123',
+      nonce: 'nonce123',
+    };
+
+    it('should link external wallet when user is logged in', async () => {
+      getUserMock.mockReturnValue(mockUserZkEvm);
+      linkExternalWalletMock.mockReturnValue(mockLinkedWallet);
+
+      const result = await passport.linkExternalWallet(linkWalletParams);
+
+      expect(result).toEqual(mockLinkedWallet.data);
+    });
+
+    it('should throw error if user is not logged in', async () => {
+      getUserMock.mockReturnValue(null);
+
+      await expect(passport.linkExternalWallet(linkWalletParams)).rejects.toThrow(
+        new PassportError('User is not logged in', PassportErrorType.NOT_LOGGED_IN_ERROR),
+      );
+    });
+
+    it('should handle generic errors from the linkWalletV2 API call', async () => {
+      getUserMock.mockReturnValue(mockUserImx);
+      linkExternalWalletMock.mockReturnValue(mockApiError);
+
+      try {
+        await passport.linkExternalWallet(linkWalletParams);
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(PassportError);
+        expect(error.type).toEqual(PassportErrorType.LINK_WALLET_GENERIC_ERROR);
+        expect(error.message).toEqual(`Link wallet request failed with status code ${mockApiError.response.status}`);
+      }
+    });
+
+    it('should handle 400 bad requests from the linkWalletV2 API call', async () => {
+      getUserMock.mockReturnValue(mockUserImx);
+      linkExternalWalletMock.mockReturnValue(mockPassportBadRequest);
+
+      try {
+        await passport.linkExternalWallet(linkWalletParams);
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(PassportError);
+        expect(error.type).toEqual(PassportErrorType.LINK_WALLET_ALREADY_LINKED_ERROR);
+        expect(error.message).toEqual('Already linked');
+      }
+    });
+
+    it('should call track error function if an error occurs', async () => {
+      getUserMock.mockReturnValue(mockUserImx);
+      linkExternalWalletMock.mockReturnValue(mockPassportBadRequest);
+
+      try {
+        await passport.linkExternalWallet(linkWalletParams);
+      } catch (error) {
+        expect(trackError).toHaveBeenCalledWith(
+          'passport',
+          'linkWallet',
+          error,
+        );
+      }
     });
   });
 });

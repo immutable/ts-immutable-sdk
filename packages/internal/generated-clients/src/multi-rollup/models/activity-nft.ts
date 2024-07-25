@@ -42,9 +42,10 @@ export interface ActivityNFT {
      */
     'token_id': string;
     /**
-     * The amount of tokens exchanged
+     * (deprecated - will never be filled, use amount on Activity instead) The amount of tokens exchanged
      * @type {string}
      * @memberof ActivityNFT
+     * @deprecated
      */
     'amount': string;
 }

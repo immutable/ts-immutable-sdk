@@ -15,24 +15,28 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { SeaportCreateListingMetadata } from './seaport-create-listing-metadata';
+import { Chain } from './chain';
 // May contain unused imports in some cases
 // @ts-ignore
-import { SeaportCreateListingMetadataBuy } from './seaport-create-listing-metadata-buy';
+import { OrganisationTier } from './organisation-tier';
 // May contain unused imports in some cases
 // @ts-ignore
-import { SeaportCreateListingMetadataSell } from './seaport-create-listing-metadata-sell';
+import { VerificationRequest } from './verification-request';
 // May contain unused imports in some cases
 // @ts-ignore
-import { SeaportFee } from './seaport-fee';
+import { VerificationRequestContractType } from './verification-request-contract-type';
 // May contain unused imports in some cases
 // @ts-ignore
-import { UnknownTypedDataMetadata } from './unknown-typed-data-metadata';
+import { VerificationRequestInternalAllOf } from './verification-request-internal-all-of';
+// May contain unused imports in some cases
+// @ts-ignore
+import { VerificationRequestStatus } from './verification-request-status';
 
 /**
- * @type GetTypedDataMetadataRes
+ * @type VerificationRequestInternal
+ * The verification request (internal)
  * @export
  */
-export type GetTypedDataMetadataRes = SeaportCreateListingMetadata | UnknownTypedDataMetadata;
+export type VerificationRequestInternal = VerificationRequest & VerificationRequestInternalAllOf;
 
 
