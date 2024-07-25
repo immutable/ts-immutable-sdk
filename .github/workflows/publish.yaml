@@ -95,7 +95,7 @@ jobs:
           key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
 
       - name: Install dependencies
-        if: steps.restore-cache-node_modules.outputs.cache-hit != 'true' 
+        if: steps.restore-cache-node_modules.outputs.cache-hit != 'true'
         run: yarn install --immutable
 
       - name: Lint
@@ -115,7 +115,9 @@ jobs:
           jq '.version = "${{steps.version.outputs.NEXT_VERSION}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
 
       - name: Build
-        run: export NODE_OPTIONS=--max-old-space-size=6144 && RELEASE_TYPE=${{ env.RELEASE_TYPE }} yarn build
+        run: |
+          export NODE_OPTIONS=--max-old-space-size=6144 && RELEASE_TYPE=${{ env.RELEASE_TYPE }} yarn build
+          ls -l ./sdk/dist
 
       - name: Typecheck
         run: yarn typecheck
