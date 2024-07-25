@@ -1,5 +1,5 @@
-name: "PR Setup"
-description: "Do necessary setup for jobs in PR workflow"
+name: "Setup"
+description: "Do necessary setup"
 
 runs:
   using: "composite"

@@ -22,7 +22,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
       - name: setup
-        uses: ./.github/actions/pr-setup
+        uses: ./.github/actions/setup
 
       - name: Typecheck
         run: yarn typecheck
@@ -39,7 +39,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
       - name: setup
-        uses: ./.github/actions/pr-setup
+        uses: ./.github/actions/setup
 
       - name: Test
         run: yarn test --configuration=ci
@@ -59,8 +59,8 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
-      - name: setup
-        uses: ./.github/actions/pr-setup
+      - name: Setup
+        uses: ./.github/actions/setup
 
       - name: Lint
         run: yarn lint

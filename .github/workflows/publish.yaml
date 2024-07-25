@@ -29,6 +29,7 @@ on:
   push:
     branches:
       - main
+      - clean-up
 
 env:
   RELEASE_TYPE: ${{ github.event.inputs.release_type || 'alpha' }}
@@ -58,6 +59,9 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
 
+      - name: Setup
+        uses: ./.github/actions/setup
+
       - name: Setup Github
         run: |
           git config user.name "platform-sa"
@@ -65,12 +69,6 @@ jobs:
 
       - name: Get tags
         run: git fetch --tags
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-          cache: "yarn"
 
       - name: Workout next version string
         run: |
@@ -86,20 +84,6 @@ jobs:
           echo revision_upgrade=$revision_upgrade
           ./.github/scripts/version-up.sh --${{ env.RELEASE_TYPE }} $upgrade_type --apply $revision_upgrade
         shell: bash
-
-      - name: Restore cached node_modules
-        id: restore-cache-node_modules
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
-
-      - name: Derive appropriate SHAs for base and head for `nx affected` commands
-        uses: nrwl/nx-set-shas@v3
-
-      - name: Install dependencies
-        if: steps.restore-cache-node_modules.outputs.cache-hit != 'true'
-        run: yarn install --immutable
 
       - name: Lint
         run: yarn lint
