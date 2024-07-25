@@ -40,14 +40,15 @@
     "*": "yarn scan:secrets",
     "*.{js,jsx,ts,tsx}": "eslint"
   },
-  "packageManager": "yarn@3.6.1",
+  "packageManager": "yarn@4.3.1",
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "resolutions": {
     "responselike": "^2.0.0"
   },
   "scripts": {
-    "build": "yarn workspace @imtbl/sdk updateDependencies && NODE_OPTIONS=--max-old-space-size=14366 nx run-many --target=build --projects=@imtbl/sdk,@imtbl/checkout-widgets --skip-nx-cache && yarn syncpack:format && yarn wsrun -p @imtbl/sdk -a -m copyBrowserBundles",
+    "build": "yarn workspace @imtbl/sdk updateDependencies && NODE_OPTIONS=--max-old-space-size=14366 nx run-many --target=build --projects=@imtbl/sdk,@imtbl/checkout-widgets && yarn syncpack:format && yarn wsrun -p @imtbl/sdk -a -m copyBrowserBundles",
+    "build:examples": "yarn workspaces foreach -A --include='examples/**' run build",
     "build:onlysdk": "NODE_OPTIONS=--max-old-space-size=14366 nx run-many --target=build --projects=@imtbl/sdk && yarn syncpack:format",
     "dev": "./dev.sh",
     "docs:build": "typedoc",
@@ -61,7 +62,7 @@
     "syncpack:fix": "yarn syncpack fix-mismatches",
     "syncpack:format": "yarn syncpack format",
     "test": "nx affected -t test --parallel=5",
-    "test:examples": "cd examples/ts-immutable-sample && yarn test && yarn test:e2e",
+    "test:examples": "yarn workspaces foreach -A --include='examples/**' run test && yarn workspaces foreach -A --include='examples/**' run test:e2e",
     "test:vpn": "RUN_VPN_TESTS=1 wsrun --exclude-missing -e test",
     "typecheck": "nx affected -t typecheck --parallel=5"
   },
@@ -94,10 +95,7 @@
       "packages/blockchain-data/sdk",
       "packages/game-bridge",
       "packages/webhook/sdk",
-      "packages/minting-backend/sdk"
-    ],
-    "nohoist": [
-      "samples/**",
+      "packages/minting-backend/sdk",
       "examples/**"
     ]
   }
