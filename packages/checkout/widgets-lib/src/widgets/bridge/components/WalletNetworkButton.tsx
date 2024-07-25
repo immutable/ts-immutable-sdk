@@ -1,5 +1,5 @@
 import {
-  Body, Box, Button, FramedImage, Heading, Logo,
+  Body, Box, Button, FramedImage, Heading, Logo, useTheme,
 } from '@biom3/react';
 import { ChainId, EIP6963ProviderDetail, WalletProviderRdns } from '@imtbl/checkout-sdk';
 import { useEffect, useMemo, useState } from 'react';
@@ -74,6 +74,7 @@ export function WalletNetworkButton({
       }
     }
   }, [isWalletConnectEnabled, walletProvider, getWalletLogoUrl, getWalletName]);
+  const { base } = useTheme();
 
   return (
     <Box
@@ -85,6 +86,7 @@ export function WalletNetworkButton({
         <>
           <FramedImage
             imageUrl={walletLogoUrl}
+            relativeImageSizeInLayout={base.icon.size[500]}
             alt="walletconnect"
             sx={wcWalletLogoStyles}
           />
