@@ -18,7 +18,7 @@
 import { SeaportCreateListingMetadataBuy } from './seaport-create-listing-metadata-buy';
 // May contain unused imports in some cases
 // @ts-ignore
-import { SeaportERC721Item } from './seaport-erc721-item';
+import { SeaportCreateListingMetadataSell } from './seaport-create-listing-metadata-sell';
 // May contain unused imports in some cases
 // @ts-ignore
 import { SeaportFee } from './seaport-fee';
@@ -43,10 +43,10 @@ export interface SeaportCreateListingMetadata {
     'buy': SeaportCreateListingMetadataBuy;
     /**
      * 
-     * @type {SeaportERC721Item}
+     * @type {SeaportCreateListingMetadataSell}
      * @memberof SeaportCreateListingMetadata
      */
-    'sell': SeaportERC721Item;
+    'sell': SeaportCreateListingMetadataSell;
     /**
      * 
      * @type {Array<SeaportFee>}
