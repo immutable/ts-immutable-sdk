@@ -2234,22 +2234,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/design-tokens@npm:^0.4.0, @biom3/design-tokens@npm:~0.4.0":
-  version: 0.4.0
-  resolution: "@biom3/design-tokens@npm:0.4.0"
+"@biom3/design-tokens@npm:^0.4.2, @biom3/design-tokens@npm:~0.4.2":
+  version: 0.4.2
+  resolution: "@biom3/design-tokens@npm:0.4.2"
   dependencies:
     lodash.get: ^4.4.2
-  checksum: 09a76130a18d337cf039dd59f9c8c834b1fdb16fe572b92d6e8851f27b197fb923c6da784558c11208743b3e8688fea3fb6c7b4b7bd5a741234764abf96b46d4
+  checksum: feae1a9193ca25bb1e27041d6684155e5e3935d5b4876318c207cd73dc0c9ec31b126e54fc97bd02f9f663213a2accc1a7361a95b4d61a135e02f06ceb7659b7
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.24.1":
-  version: 0.24.1
-  resolution: "@biom3/react@npm:0.24.1"
+"@biom3/react@npm:^0.25.0":
+  version: 0.25.0
+  resolution: "@biom3/react@npm:0.25.0"
   dependencies:
-    "@biom3/design-tokens": ~0.4.0
+    "@biom3/design-tokens": ~0.4.2
     buffer: ^6.0.3
     csstype: ^3.1.2
+    hls.js: ^1.5.11
+    localforage: ^1.10.0
     lodash.debounce: ^4.0.8
     lodash.get: ^4.4.2
     lodash.isequal: ^4.5.0
@@ -2264,7 +2266,7 @@ __metadata:
     framer-motion: ^10.12.12
     react: ^18.2.0
     react-dom: ^18.2.0
-  checksum: 3d875341933714e10e7c472dceb26a91f96488d29bf0ac120cd76eac5db3864191d4cdca1c9a3b5737b53ce2db655d51d8b2971c05b280a258c1838592ea7a91
+  checksum: 7758e5c903a3bad821aeb360083e2880753b5b1ad5359e182a29ee3cd05d6fb843964fb11f8f4c7f684d4f52e4b8427a13e13dc937461be056b7eb904f9f70d5
   languageName: node
   linkType: hard
 
@@ -3378,7 +3380,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-sdk-sample-app@workspace:packages/checkout/sdk-sample-app"
   dependencies:
-    "@biom3/react": ^0.24.1
+    "@biom3/react": ^0.25.0
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
@@ -3455,8 +3457,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-widgets-sample-app@workspace:packages/checkout/widgets-sample-app"
   dependencies:
-    "@biom3/design-tokens": ^0.4.0
-    "@biom3/react": ^0.24.1
+    "@biom3/design-tokens": ^0.4.2
+    "@biom3/react": ^0.25.0
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
@@ -3486,8 +3488,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-widgets@workspace:packages/checkout/widgets-lib"
   dependencies:
-    "@biom3/design-tokens": ^0.4.0
-    "@biom3/react": ^0.24.1
+    "@biom3/design-tokens": ^0.4.2
+    "@biom3/react": ^0.25.0
     "@ethersproject/providers": ^5.7.2
     "@imtbl/bridge-sdk": 0.0.0
     "@imtbl/checkout-sdk": 0.0.0
@@ -3767,8 +3769,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/passport-sdk-sample-app@workspace:packages/passport/sdk-sample-app"
   dependencies:
-    "@biom3/design-tokens": ^0.4.0
-    "@biom3/react": ^0.24.1
+    "@biom3/design-tokens": ^0.4.2
+    "@biom3/react": ^0.25.0
     "@imtbl/config": 0.0.0
     "@imtbl/passport": 0.0.0
     "@imtbl/x-client": 0.0.0
@@ -3863,8 +3865,8 @@ __metadata:
     "@babel/core": ^7.21.0
     "@babel/plugin-transform-class-properties": ^7.24.1
     "@babel/plugin-transform-private-methods": ^7.24.1
-    "@biom3/design-tokens": ^0.4.0
-    "@biom3/react": ^0.24.1
+    "@biom3/design-tokens": ^0.4.2
+    "@biom3/react": ^0.25.0
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
     "@ethersproject/keccak256": ^5.7.0
@@ -18733,6 +18735,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"hls.js@npm:^1.5.11":
+  version: 1.5.13
+  resolution: "hls.js@npm:1.5.13"
+  checksum: 534b48b18638fefe7788fd31d92b0b4e3820271b470fbd18c29cd46d51e6381b6f011d732f6196d4cda3148c81d8cb7740e1d1d0f2da0031e808b468198142f3
+  languageName: node
+  linkType: hard
+
 "hmac-drbg@npm:^1.0.1":
   version: 1.0.1
   resolution: "hmac-drbg@npm:1.0.1"
@@ -31798,7 +31807,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "x-provider-sample-app@workspace:packages/x-provider/src/sample-app"
   dependencies:
-    "@biom3/react": ^0.24.1
+    "@biom3/react": ^0.25.0
     "@imtbl/sdk": 0.0.0
     "@svgr/webpack": ^8.0.1
     "@testing-library/jest-dom": ^5.16.5
