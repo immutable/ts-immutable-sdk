@@ -25,7 +25,13 @@ function CheckoutUI() {
   const checkoutWidget = useMemo(
     () =>
       factory.create(WidgetType.CHECKOUT, {
-        config: { wallet: { showNetworkMenu: false } },
+        config: {
+          theme: WidgetTheme.LIGHT,
+          wallet: { showNetworkMenu: false },
+          sale: {
+            hideExcludedPaymentTypes: true,
+          },
+        },
       }),
     [checkout]
   );
@@ -134,11 +140,12 @@ function CheckoutUI() {
       <button onClick={() => update(WidgetTheme.LIGHT)}>Light theme</button>
       <button onClick={() => update(WidgetTheme.DARK)}>Dark theme</button>
       <select
-        onChange={(e) =>
+        onChange={(e) => {
+          console.log("change language");
           checkoutWidget.update({
             config: { language: e.target.value as WidgetLanguage },
-          })
-        }
+          });
+        }}
       >
         <option value="en">EN</option>
         <option value="ja">JA</option>

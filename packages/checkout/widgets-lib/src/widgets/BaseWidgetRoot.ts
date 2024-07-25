@@ -14,8 +14,14 @@ import {
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import i18next from 'i18next';
-import { StrongCheckoutWidgetsConfig, withDefaultWidgetConfigs } from '../lib/withDefaultWidgetConfig';
-import { addProviderListenersForWidgetRoot, baseWidgetProviderEvent } from '../lib';
+import {
+  StrongCheckoutWidgetsConfig,
+  withDefaultWidgetConfigs,
+} from '../lib/withDefaultWidgetConfig';
+import {
+  addProviderListenersForWidgetRoot,
+  baseWidgetProviderEvent,
+} from '../lib';
 
 export abstract class Base<T extends WidgetType> implements Widget<T> {
   protected checkout: Checkout;
@@ -32,7 +38,10 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
 
   protected web3Provider: Web3Provider | undefined;
 
-  protected eventHandlers: Map<keyof WidgetEventData[T], Function> = new Map<keyof WidgetEventData[T], Function>();
+  protected eventHandlers: Map<keyof WidgetEventData[T], Function> = new Map<
+  keyof WidgetEventData[T],
+  Function
+  >();
 
   protected eventHandlersFunction?: (event: any) => void;
 
@@ -40,7 +49,7 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
 
   constructor(sdk: Checkout, props: WidgetProperties<T>) {
     const validatedProps = this.getValidatedProperties(props);
-    this.parameters = { language: 'en' } as WidgetParameters[T];
+    this.parameters = {} as WidgetParameters[T];
 
     this.checkout = sdk;
     this.properties = validatedProps;
@@ -64,9 +73,7 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
   unmount() {
     // We want to keep the properties (config and provider) across mounts
     // Clear the parameters on unmount as we don't want to keep them across mounts
-    this.parameters = this.getValidatedParameters(
-      { language: 'en' } as WidgetParameters[T],
-    );
+    this.parameters = this.getValidatedParameters({} as WidgetParameters[T]);
 
     this.reactRoot?.unmount();
     document.getElementById(this.targetId as string)?.replaceChildren();
@@ -112,7 +119,9 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
 
     if (props.provider) {
       // eslint-disable-next-line no-console
-      console.warn('Updating a widget provider through the update() method is not supported yet');
+      console.warn(
+        'Updating a widget provider through the update() method is not supported yet',
+      );
     }
 
     const language = props.config?.language;
@@ -126,12 +135,18 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
   }
 
   // eslint-disable-next-line max-len
-  addListener<KEventName extends keyof WidgetEventData[T]>(type: KEventName, callback: (data: WidgetEventData[T][KEventName]) => void): void {
+  addListener<KEventName extends keyof WidgetEventData[T]>(
+    type: KEventName,
+    callback: (data: WidgetEventData[T][KEventName]) => void,
+  ): void {
     this.eventHandlers.set(type, callback);
 
     if (this.eventHandlersFunction) {
       window.removeEventListener(this.eventTopic, this.eventHandlersFunction);
-      window.removeEventListener(IMTBLWidgetEvents.IMTBL_WIDGETS_PROVIDER, this.eventHandlersFunction);
+      window.removeEventListener(
+        IMTBLWidgetEvents.IMTBL_WIDGETS_PROVIDER,
+        this.eventHandlersFunction,
+      );
     }
 
     this.eventHandlersFunction = (event: any) => {
@@ -140,15 +155,23 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
     };
 
     window.addEventListener(this.eventTopic, this.eventHandlersFunction);
-    window.addEventListener(IMTBLWidgetEvents.IMTBL_WIDGETS_PROVIDER, this.eventHandlersFunction);
+    window.addEventListener(
+      IMTBLWidgetEvents.IMTBL_WIDGETS_PROVIDER,
+      this.eventHandlersFunction,
+    );
   }
 
-  removeListener<KEventName extends keyof WidgetEventData[T]>(type: KEventName): void {
+  removeListener<KEventName extends keyof WidgetEventData[T]>(
+    type: KEventName,
+  ): void {
     this.eventHandlers.delete(type);
 
     if (this.eventHandlersFunction) {
       window.removeEventListener(this.eventTopic, this.eventHandlersFunction);
-      window.removeEventListener(IMTBLWidgetEvents.IMTBL_WIDGETS_PROVIDER, this.eventHandlersFunction);
+      window.removeEventListener(
+        IMTBLWidgetEvents.IMTBL_WIDGETS_PROVIDER,
+        this.eventHandlersFunction,
+      );
     }
 
     if (this.eventHandlers.size <= 0) return;
@@ -159,7 +182,10 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
     };
 
     window.addEventListener(this.eventTopic, this.eventHandlersFunction);
-    window.addEventListener(IMTBLWidgetEvents.IMTBL_WIDGETS_PROVIDER, this.eventHandlersFunction);
+    window.addEventListener(
+      IMTBLWidgetEvents.IMTBL_WIDGETS_PROVIDER,
+      this.eventHandlersFunction,
+    );
   }
 
   protected strongConfig(): StrongCheckoutWidgetsConfig {
@@ -201,7 +227,9 @@ export abstract class Base<T extends WidgetType> implements Widget<T> {
   private handleEIP1193ProviderEvents(widgetRoot: Base<T>) {
     if (widgetRoot.web3Provider) {
       // eslint-disable-next-line no-param-reassign
-      widgetRoot.web3Provider = new Web3Provider(widgetRoot.web3Provider!.provider);
+      widgetRoot.web3Provider = new Web3Provider(
+        widgetRoot.web3Provider!.provider,
+      );
     }
     widgetRoot.render();
   }
