@@ -23,7 +23,6 @@ const getIframeParams = (
   const { flow } = params;
   const commonConfig = {
     theme: config.theme,
-    language: params.language || config.language,
   };
 
   switch (flow) {
@@ -123,7 +122,9 @@ export const getIframeURL = (
   environment: Environment,
   publishableKey: string,
 ): string => {
-  const { language, flow } = params;
+  const { flow } = params;
+
+  const language = params.language || config.language;
 
   const baseUrl = CHECKOUT_APP_URL[environment];
   const queryParams = getIframeParams(params, config);

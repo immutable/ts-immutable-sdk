@@ -17,12 +17,11 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
   const [iframeURL, setIframeURL] = useState<string>();
 
   useEffect(() => {
-    if (!publishableKey || !params.language) return;
+    if (!publishableKey) return;
 
     const url = getIframeURL(params, config, environment, publishableKey);
-
     setIframeURL(url);
-  }, [publishableKey, params]);
+  }, [params, config, environment, publishableKey]);
 
   // TODO:
   // on iframe load error, go to error view 500
