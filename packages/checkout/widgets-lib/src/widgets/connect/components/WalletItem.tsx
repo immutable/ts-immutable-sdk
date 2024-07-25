@@ -51,7 +51,7 @@ export function WalletItem<
       sx={{
         marginBottom: 'base.spacing.x1',
         position: 'relative',
-        lineClamp: 3,
+
       }}
     >
       <RawImage
@@ -62,7 +62,14 @@ export function WalletItem<
           left: 'base.spacing.x3',
         }}
       />
-      <MenuItem.Label size="medium" sx={offsetStyles}>
+      <MenuItem.Label
+        size="medium"
+        sx={{
+          ...offsetStyles,
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          WebkitLineClamp: 3,
+        }}
+      >
         {((recommended && isSmallScreenMode) && (
           <Badge
             variant="guidance"
@@ -71,6 +78,7 @@ export function WalletItem<
             sx={{
               display: 'inline-flex',
               marginBottom: 'base.spacing.x1',
+
             }}
           />
         ))}
