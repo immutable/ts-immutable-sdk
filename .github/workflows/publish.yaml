@@ -94,6 +94,9 @@ jobs:
           path: node_modules
           key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
 
+      - name: Derive appropriate SHAs for base and head for `nx affected` commands
+        uses: nrwl/nx-set-shas@v3
+
       - name: Install dependencies
         if: steps.restore-cache-node_modules.outputs.cache-hit != 'true'
         run: yarn install --immutable
@@ -117,7 +120,7 @@ jobs:
       - name: Build
         run: |
           export NODE_OPTIONS=--max-old-space-size=6144 && RELEASE_TYPE=${{ env.RELEASE_TYPE }} yarn build
-          ls -l ./sdk/dist
+          ls -l ./sdk/dist/browser/checkout || echo 1
 
       - name: Typecheck
         run: yarn typecheck
