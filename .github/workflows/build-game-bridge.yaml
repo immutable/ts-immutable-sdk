@@ -215,13 +215,13 @@ jobs:
 
       - name: Copy Game Bridge Build
         # TODO: Update this to copy the correct file 
-        run: cp -r ./packages/game-bridge/dist/unreal/index.js ./unreal-immutable-sdk/Content/PackagedResources/index.js
+        run: cp -r ./packages/game-bridge/dist/unreal/index.js ./unreal-immutable-sdk/Web/index.js
 
       - name: Commit Changes
         # TODO: Update this to copy the correct file 
         run: |
           cd unreal-immutable-sdk
-          git add Content/PackagedResources/index.js
+          git add Web/index.js
           git commit -m "chore: update game bridge to ${{ env.TS_SDK_TAG }}"
           cd ..
 
