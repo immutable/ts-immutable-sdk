@@ -1,35 +1,10 @@
 'use client';
-import { createConfig, http, useAccount, WagmiProvider } from 'wagmi';
+import { WagmiProvider } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { immutableZkEvmTestnet } from 'wagmi/chains';
-import { ProviderEvent } from '@imtbl/sdk/passport';
-import { WalletOptions } from './wallet-options';
-import { Account } from './account';
-import { injected } from 'wagmi/connectors';
 import { passportInstance } from '../utils';
+import { config } from './config';
+import { ConnectWallet } from './connect';
 
-// #doc passport-wallets-nextjs-connect-wagmi-config
-// create the Wagmi config for Immutable zkEVM Testnet
-const config = createConfig({
-  chains: [immutableZkEvmTestnet],
-  connectors: [injected()],
-  transports: {
-    [immutableZkEvmTestnet.id]: http(),
-  },
-});
-// #enddoc passport-wallets-nextjs-connect-wagmi-config
-
-// #doc passport-wallets-nextjs-connect-wagmi-connect-component
-// show wallet options for login or the logged in account details
-// depending on whether the account is connected or not
-function ConnectWallet() {
-  const { isConnected } = useAccount()
-  if (isConnected) return <Account />
-  return <WalletOptions />
-}
-// #enddoc passport-wallets-nextjs-connect-wagmi-connect-component
-
-// #doc passport-wallets-nextjs-connect-wagmi-provider
 // initialise the QueryClient for the Provider
 const queryClient = new QueryClient();
 
