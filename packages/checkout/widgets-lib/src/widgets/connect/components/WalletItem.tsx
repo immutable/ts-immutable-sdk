@@ -51,6 +51,7 @@ export function WalletItem<
       sx={{
         marginBottom: 'base.spacing.x1',
         position: 'relative',
+        lineClamp: 3,
       }}
     >
       <RawImage
