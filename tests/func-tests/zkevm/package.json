@@ -1,5 +1,5 @@
 {
-  "name": "func-tests-imx",
+  "name": "func-tests-zkevm",
   "packageManager": "yarn@3.6.1",
   "devDependencies": {
     "@swc/jest": "^0.2.29",
@@ -14,15 +14,15 @@
   },
   "scripts": {
     "compile": "npx hardhat compile",
-    "test": "yarn compile && jest",
-    "test:ci": "yarn compile && TAGS=\"not @skip and not @slow\" jest",
+    "func-test": "yarn compile && jest",
+    "func-test:ci": "yarn compile && TAGS=\"not @skip and not @slow\" jest",
     "postinstall": "cd ../../.. && husky install",
     "prepack": "pinst --disable",
     "postpack": "pinst --enable"
   },
   "dependencies": {
     "@imtbl/contracts": "2.2.6",
-    "@imtbl/sdk": "file:../../../sdk",
+    "@imtbl/sdk": "0.0.0",
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.0",
     "@nomicfoundation/hardhat-toolbox": "^2.0.2",
     "@nomicfoundation/hardhat-verify": "^2.0.0",

@@ -13,8 +13,8 @@
     "typescript": "^5.3.2"
   },
   "scripts": {
-    "test": "jest",
-    "test:ci": "TAGS=\"not @skip and not @slow\" jest",
+    "func-test": "jest",
+    "func-test:ci": "TAGS=\"not @skip and not @slow\" jest",
     "postinstall": "cd ../../.. && husky install",
     "prepack": "pinst --disable",
     "postpack": "pinst --enable"
@@ -23,7 +23,7 @@
     "@ethersproject/providers": "^5.7.2",
     "@ethersproject/units": "^5.7.0",
     "@ethersproject/wallet": "^5.7.0",
-    "@imtbl/sdk": "file:../../../sdk",
+    "@imtbl/sdk": "0.0.0",
     "dotenv": "^16.3.1"
   },
   "resolutions": {
