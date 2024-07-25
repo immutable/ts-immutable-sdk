@@ -105,6 +105,7 @@ jobs:
         run: |
           export NODE_OPTIONS=--max-old-space-size=6144 && RELEASE_TYPE=${{ env.RELEASE_TYPE }} yarn build
           ls -l ./sdk/dist/browser/checkout || echo 1
+          [ -d "./sdk/dist/browser/checkout" ] || { echo "Error: Directory does not exist." && exit 1; }
 
       - name: Typecheck
         run: yarn typecheck

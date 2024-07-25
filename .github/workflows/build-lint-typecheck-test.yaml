@@ -59,7 +59,7 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
-      - name: Setup
+      - name: setup
         uses: ./.github/actions/setup
 
       - name: Lint
