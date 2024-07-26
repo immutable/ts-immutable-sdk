@@ -47,7 +47,7 @@ jobs:
           # https://github.com/microsoft/playwright/issues/6500#issuecomment-838515115
           HOME: /root
         working-directory: examples/ts-immutable-sample
-        run: yarn playwright test
+        run: yarn playwright install && yarn playwright test
       - uses: actions/upload-artifact@v3
         if: always()
         with:
