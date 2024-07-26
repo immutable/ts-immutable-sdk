@@ -19,8 +19,8 @@ jobs:
       - name: setup
         uses: ./.github/actions/pr-setup
         
-      - name: Build Projects
-        run: yarn build:examples
+      - name: Build Passport Example Projects
+        run: yarn build:passport-examples
         
-      - name: Run Tests
-        run: yarn test:examples
+      - name: Run Passport Example Tests
+        run: yarn test:passport-examples
