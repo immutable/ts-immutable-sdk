@@ -50,7 +50,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
       - name: setup
-        uses: ./.github/actions/pr-setup
+        uses: ./.github/actions/setup
       - name: Build
         run: yarn nx affected --target=build --parallel=5
 
