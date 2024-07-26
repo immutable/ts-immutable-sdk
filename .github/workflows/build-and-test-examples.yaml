@@ -21,6 +21,18 @@ jobs:
         
       - name: Build Passport Example Projects
         run: yarn build:passport-examples
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest-4-cores
+    env:
+      NODE_OPTIONS: --max-old-space-size=14366
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: setup
+        uses: ./.github/actions/pr-setup
         
       - name: Run Passport Example Tests
         run: yarn test:passport-examples
