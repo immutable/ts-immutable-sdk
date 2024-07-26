@@ -16,23 +16,23 @@ export default function ConnectWithEtherJS() {
   // setup the signed state to show messages on success or failure
   const [signed, setSignedState] = useState<string>("(not signed)");
 
-  // #doc passport-wallets-nextjs-connect-etherjs-create
+  // #doc passport-wallets-nextjs-connect-erc191-create
   // fetch the Passport provider from the Passport instance
   const passportProvider = passportInstance.connectEvm()
 
   // create the Web3Provider using the Passport provider
   const web3Provider = new ethers.providers.Web3Provider(passportProvider);
-  // #enddoc passport-wallets-nextjs-connect-etherjs-create
+  // #enddoc passport-wallets-nextjs-connect-erc191-create
 
   const passportLogin = async () => {
     if (web3Provider.provider.request) {
       // disable button while loading
       setLoadingState(true)
       
-      // #doc passport-wallets-nextjs-connect-etherjs-request
+      // #doc passport-wallets-nextjs-connect-erc191-request
       // calling eth_requestAccounts triggers the Passport login flow
       const accounts = await web3Provider.provider.request({ method: "eth_requestAccounts" });
-      // #enddoc passport-wallets-nextjs-connect-etherjs-request
+      // #enddoc passport-wallets-nextjs-connect-erc191-request
 
       // once logged in Passport is connected to the wallet and ready to transact
       setAccountsState(accounts)
@@ -50,24 +50,37 @@ export default function ConnectWithEtherJS() {
      await passportInstance.logout()
   }
 
+  // #doc passport-wallets-nextjs-connect-erc191-signmessage
   const signMessage = async () => {
+    // set signed state message to pending in the view
     setSignedState('pending signature')
+
+    // fetch the signer from the Web3provider
     const signer = web3Provider.getSigner();
 
+    // Create the message to be signed
     // Please note there is a 500 character limit for the message
     const message = "this is a personal sign message";
 
     let signature: string;
     try {
+      // attempt to sign the message, this brings up the passport popup
       signature = await signer.signMessage(message);
+      
+      // if successful update the signed message to successful in the view
       setSignedState('user successfully signed message')
     } catch (error: any) {
       // Handle user denying signature
       if (error.code === -32003) {
+        // if the user declined update the signed message to declined in the view
         setSignedState('user declined to sign')
+      } else {
+        // if something else went wrong, update the generic error with message in the view
+        setSignedState(`something went wrong - ${error.message}`)
       }
     }
   }
+  // #enddoc passport-wallets-nextjs-connect-erc191-signmessage
 
   // render the view to login/logout and show the connected accounts and sign message
   return (<>

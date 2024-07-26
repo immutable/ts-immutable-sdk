@@ -16,23 +16,23 @@ export default function ConnectWithEtherJS() {
   // setup the signed state to show messages on success or failure
   const [signed, setSignedState] = useState<string>("(not signed)");
 
-  // #doc passport-wallets-nextjs-connect-etherjs-create
+  // #doc passport-wallets-nextjs-sign-eip712-create
   // fetch the Passport provider from the Passport instance
   const passportProvider = passportInstance.connectEvm()
 
   // create the Web3Provider using the Passport provider
   const web3Provider = new ethers.providers.Web3Provider(passportProvider);
-  // #enddoc passport-wallets-nextjs-connect-etherjs-create
+  // #enddoc passport-wallets-nextjs-sign-eip712-create
 
   const passportLogin = async () => {
     if (web3Provider.provider.request) {
       // disable button while loading
       setLoadingState(true)
       
-      // #doc passport-wallets-nextjs-connect-etherjs-request
+      // #doc passport-wallets-nextjs-sign-eip712-request
       // calling eth_requestAccounts triggers the Passport login flow
       const accounts = await web3Provider.provider.request({ method: "eth_requestAccounts" });
-      // #enddoc passport-wallets-nextjs-connect-etherjs-request
+      // #enddoc passport-wallets-nextjs-sign-eip712-request
 
       // once logged in Passport is connected to the wallet and ready to transact
       setAccountsState(accounts)
@@ -50,10 +50,18 @@ export default function ConnectWithEtherJS() {
      await passportInstance.logout()
   }
 
+  // #doc passport-wallets-nextjs-sign-eip712-signmessage
   const signMessage = async () => {
+    // set signed state message to pending in the view
     setSignedState('pending signature')
+
+    // fetch the signer from the Web3provider
     const signer = web3Provider.getSigner();
-    const chainId = 13371; // zkEVM mainnet
+
+    // set the chainId
+    const chainId = 13478; // zkEVM testnet
+
+    // set the sender address
     const address = await signer.getAddress();
 
     // Define our "domain separator" to ensure user signatures are unique across apps/chains
@@ -64,6 +72,7 @@ export default function ConnectWithEtherJS() {
         verifyingContract: address,
     };
 
+    // setup the types for displaying the message in the signing window
     const types = {
         Person: [
             { name: 'name', type: 'string' },
@@ -76,6 +85,7 @@ export default function ConnectWithEtherJS() {
         ]
     };
 
+    // setup the message to be signed
     const message = {
         from: {
             name: 'Cow',
@@ -90,16 +100,23 @@ export default function ConnectWithEtherJS() {
 
     let signature: string;
     try {
+        // attempt to sign the message, this brings up the passport popup
         signature = await signer._signTypedData(domain, types, message);
+        
+        // if successful update the signed message to successful in the view
         setSignedState('user successfully signed message')
     } catch (error: any) {
         // Handle user denying signature
         if (error.code === 4001){
+          // if the user declined update the signed message to declined in the view
           setSignedState('user declined to sign')
+        } else {
+          // if something else went wrong, update the generic error with message in the view
+          setSignedState(`something went wrong - ${error.message}`)
         }
     }
-
   }
+  // #enddoc passport-wallets-nextjs-sign-eip712-signmessage
 
   // render the view to login/logout and show the connected accounts and sign message
   return (<>
