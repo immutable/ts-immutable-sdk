@@ -16,23 +16,39 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: setup
-        uses: ./.github/actions/pr-setup
-        
-      - name: Build Passport Example Projects
-        run: yarn build:passport-examples
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          registry-url: https://registry.npmjs.org/
+          cache: "yarn"
 
-  test:
-    name: Test
-    runs-on: ubuntu-latest-4-cores
-    env:
-      NODE_OPTIONS: --max-old-space-size=14366
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Find all projects
+        id: find-projects
+        run: |
+          find ./examples/passport -name 'node_modules' -prune -o -name 'package.json' -exec dirname {} \; > project-dirs.txt
+          
+      - name: Install Dependencies
+        run: |
+          while IFS= read -r dir; do
+            echo "Installing dependencies for $dir"
+            (cd "$dir" && yarn install --no-immutable)
+          done < project-dirs.txt
 
-      - name: setup
-        uses: ./.github/actions/pr-setup
-        
-      - name: Run Passport Example Tests
-        run: yarn test:passport-examples
+      - name: Build Projects
+        run: |
+          while IFS= read -r dir; do
+            echo "Building $dir"
+            (cd "$dir" && yarn build)
+          done < project-dirs.txt
+
+      - name: Run Tests
+        run: |
+          while IFS= read -r dir; do
+            echo "Testing $dir"
+            if jq -e '.scripts.test' "$dir/package.json" > /dev/null; then
+              (cd "$dir" && yarn test)
+            else
+              echo "No test script found in $dir/package.json, skipping tests."
+            fi
+          done < project-dirs.txt

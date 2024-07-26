@@ -5,7 +5,7 @@ export const passportInstance = new passport.Passport({
     environment: config.Environment.PRODUCTION,
     publishableKey: process.env.NEXT_PUBLIC_IMMUTABLE_PUBLISHABLE_KEY,
   },
-  clientId: process.env.NEXT_PUBLIC_PASSPORT_CLIENT_ID ?? 'CLIENT_ID',
+  clientId: process.env.NEXT_PUBLIC_PASSPORT_CLIENT_ID ?? '',
   redirectUri: 'http://localhost:3000/redirect',
   logoutRedirectUri: 'http://localhost:3000/logout',
   audience: 'platform_api',

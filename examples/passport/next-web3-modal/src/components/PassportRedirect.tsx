@@ -1,16 +1,17 @@
-import { passport } from '@imtbl/sdk';
-import { useEffect } from 'react';
+import { passport } from '@imtbl/sdk'
+import { useEffect } from 'react'
 
 function PassportRedirect({
-  passportInstance,
+  passportInstance
 }: { passportInstance: passport.Passport }) {
+  
   useEffect(() => {
     passportInstance.loginCallback();
-  }, [passportInstance]);
+  }, [passportInstance])
 
   return (
     <div>Loading...</div>
-  );
+  )
 }
 
-export default PassportRedirect;
+export default PassportRedirect

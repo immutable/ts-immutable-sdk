@@ -40,7 +40,7 @@
     "*": "yarn scan:secrets",
     "*.{js,jsx,ts,tsx}": "eslint"
   },
-  "packageManager": "yarn@4.3.1",
+  "packageManager": "yarn@3.6.1",
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "resolutions": {
@@ -49,7 +49,6 @@
   "scripts": {
     "build": "yarn workspace @imtbl/sdk updateDependencies && NODE_OPTIONS=--max-old-space-size=14366 nx run-many --target=build --projects=@imtbl/sdk,@imtbl/checkout-widgets --skip-nx-cache && yarn syncpack:format && yarn wsrun -p @imtbl/sdk -a -m copyBrowserBundles",
     "build:onlysdk": "NODE_OPTIONS=--max-old-space-size=14366 nx run-many --target=build --projects=@imtbl/sdk && yarn syncpack:format",
-    "build:passport-examples": "yarn workspaces foreach -A --include='examples/passport/**' run build",
     "dev": "./dev.sh",
     "docs:build": "typedoc",
     "docs:serve": "http-server ./docs --cors -p 8080 -c-1",
@@ -62,7 +61,7 @@
     "syncpack:fix": "yarn syncpack fix-mismatches",
     "syncpack:format": "yarn syncpack format",
     "test": "nx affected -t test --parallel=5",
-    "test:passport-examples": "yarn workspaces foreach -A --include='examples/passport/**' run test && yarn workspaces foreach -A --include='examples/passport/**' run test:e2e",
+    "test:examples": "cd examples/ts-immutable-sample && yarn test && yarn test:e2e",
     "test:vpn": "RUN_VPN_TESTS=1 wsrun --exclude-missing -e test",
     "typecheck": "nx affected -t typecheck --parallel=5"
   },
@@ -95,8 +94,11 @@
       "packages/blockchain-data/sdk",
       "packages/game-bridge",
       "packages/webhook/sdk",
-      "packages/minting-backend/sdk",
-      "examples/passport/**"
+      "packages/minting-backend/sdk"
+    ],
+    "nohoist": [
+      "samples/**",
+      "examples/**"
     ]
   }
 }

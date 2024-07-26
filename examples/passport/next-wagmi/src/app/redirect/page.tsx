@@ -1,8 +1,8 @@
 'use client';
 
-import PassportRedirect from '@/components/PassportRedirect';
 import { passportInstance } from '../passport';
+import PassportRedirect from '@/components/PassportRedirect';
 
 export default function Page() {
-  return <PassportRedirect passportInstance={passportInstance} />;
+  return <PassportRedirect passportInstance={passportInstance} />
 }

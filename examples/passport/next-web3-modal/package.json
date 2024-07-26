@@ -1,6 +1,13 @@
 {
-  "name": "next-web3-modal",
+  "name": "next-wagmi",
   "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
   "dependencies": {
     "@imtbl/sdk": "^1.35.0",
     "@tanstack/react-query": "^5.37.1",
@@ -18,12 +25,5 @@
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
     "typescript": "^5"
-  },
-  "private": true,
-  "scripts": {
-    "build": "next build",
-    "dev": "next dev",
-    "lint": "eslint src --ext .js,.jsx,.ts,.tsx",
-    "start": "next start"
   }
 }

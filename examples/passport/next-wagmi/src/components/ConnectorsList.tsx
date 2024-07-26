@@ -1,6 +1,32 @@
 import { useEffect, useState } from 'react';
 import { Connector, useChainId, useConnect } from 'wagmi';
 
+export function ConnectorsList() {
+  const chainId = useChainId();
+  const { connectors, connect } = useConnect();
+
+  const [filteredConnectors, setFilteredConnectors] = useState<Connector[]>([])
+
+  useEffect(() => {
+    if (!connectors) return
+    setFilteredConnectors(connectors.filter((connector) => !connector.name.includes('Injected')))
+  }, [connectors])
+
+  return (
+    <div className="buttons">
+      {
+        filteredConnectors.map((connector) => (
+          <ConnectorButton
+            key={connector.uid}
+            connector={connector}
+            onClick={() => connect({ connector, chainId })}
+          />
+        ))
+      }
+    </div>
+  );
+}
+
 function ConnectorButton({
   connector,
   onClick,
@@ -25,31 +51,5 @@ function ConnectorButton({
     >
       {connector.name}
     </button>
-  );
-}
-
-export function ConnectorsList() {
-  const chainId = useChainId();
-  const { connectors, connect } = useConnect();
-
-  const [filteredConnectors, setFilteredConnectors] = useState<Connector[]>([]);
-
-  useEffect(() => {
-    if (!connectors) return;
-    setFilteredConnectors(connectors.filter((connector) => !connector.name.includes('Injected')));
-  }, [connectors]);
-
-  return (
-    <div className="buttons">
-      {
-        filteredConnectors.map((connector) => (
-          <ConnectorButton
-            key={connector.uid}
-            connector={connector}
-            onClick={() => connect({ connector, chainId })}
-          />
-        ))
-      }
-    </div>
   );
 }

@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useDisconnect } from 'wagmi';
 
 export function Connect() {
-  const { disconnect } = useDisconnect();
+  const { disconnect } = useDisconnect()
   const [disconnectTxt, setDisconnectTxt] = useState('Disconnect');
 
   return (
@@ -13,31 +13,31 @@ export function Connect() {
       {({
         account,
         chain,
+        openAccountModal,
         openChainModal,
         openConnectModal,
         authenticationStatus,
         mounted,
       }) => {
-        console.log(account);
+        console.log(account)
         // Note: If your app doesn't use authentication, you
         // can remove all 'authenticationStatus' checks
         const ready = mounted && authenticationStatus !== 'loading';
-        const connected = ready
-          && account
-          && chain
-          && (!authenticationStatus || authenticationStatus === 'authenticated');
+        const connected =
+          ready &&
+          account &&
+          chain &&
+          (!authenticationStatus || authenticationStatus === 'authenticated');
         return (
           <div
-            aria-hidden={!ready ? true : undefined}
-            style={
-    !ready
-      ? {
-        opacity: 0,
-        pointerEvents: 'none',
-        userSelect: 'none',
-      }
-      : undefined
-  }
+            {...(!ready && {
+              'aria-hidden': true,
+              'style': {
+                opacity: 0,
+                pointerEvents: 'none',
+                userSelect: 'none',
+              },
+            })}
           >
             {(() => {
               if (!connected) {
@@ -62,38 +62,33 @@ export function Connect() {
                     type="button"
                   >
                     {chain.hasIcon && (
-                    <div
-                      style={{
-                        background: chain.iconBackground,
-                        width: 12,
-                        height: 12,
-                        borderRadius: 999,
-                        overflow: 'hidden',
-                        marginRight: 4,
-                      }}
-                    >
-                      {chain.iconUrl && (
-                      <img
-                        alt={chain.name ?? 'Chain icon'}
-                        src={chain.iconUrl}
-                        style={{ width: 12, height: 12 }}
-                      />
-                      )}
-                    </div>
+                      <div
+                        style={{
+                          background: chain.iconBackground,
+                          width: 12,
+                          height: 12,
+                          borderRadius: 999,
+                          overflow: 'hidden',
+                          marginRight: 4,
+                        }}
+                      >
+                        {chain.iconUrl && (
+                          <img
+                            alt={chain.name ?? 'Chain icon'}
+                            src={chain.iconUrl}
+                            style={{ width: 12, height: 12 }}
+                          />
+                        )}
+                      </div>
                     )}
                     {chain.name}
                   </button>
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      setDisconnectTxt('Disconnecting ...');
-                      const userinfo = await passportInstance.getUserInfo();
-                      if (userinfo) await passportInstance.logout();
-                      disconnect();
-                    }}
-                  >
-                    {disconnectTxt}
-                  </button>
+                  <button onClick={async () => {
+                    setDisconnectTxt('Disconnecting ...')
+                    const userinfo = await passportInstance.getUserInfo()
+                    if (userinfo) await passportInstance.logout()
+                    disconnect()
+                  }}>{disconnectTxt}</button>
                 </div>
               );
             })()}
@@ -102,4 +97,4 @@ export function Connect() {
       }}
     </ConnectButton.Custom>
   );
-}
+};

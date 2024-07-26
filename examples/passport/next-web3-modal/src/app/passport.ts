@@ -13,5 +13,5 @@ export const passportInstance = new passport.Passport({
   popupOverlayOptions: {
     disableGenericPopupOverlay: false, // Set to true to disable the generic pop-up overlay
     disableBlockedPopupOverlay: false, // Set to true to disable the blocked pop-up overlay
-  },
+  }
 });
