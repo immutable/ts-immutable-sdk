@@ -62,7 +62,7 @@ function CheckoutUI() {
           onClick={() => {
             checkoutWidget.mount("checkout", {
               flow: CheckoutFlowType.CONNECT,
-              blocklistWalletRdns: ["io.metamask"],
+              // blocklistWalletRdns: ["io.metamask"],
             });
           }}
         >
@@ -127,7 +127,7 @@ function CheckoutUI() {
                 },
               ],
               environmentId: "4dfc4bec-1867-49aa-ad35-d8a13b206c94",
-              collectionName: "Metalcoree",
+              collectionName: "Lootboxes",
               excludePaymentTypes: [SalePaymentTypes.CREDIT],
               preferredCurrency: "USDC",
             });

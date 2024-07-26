@@ -1,6 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Box } from '@biom3/react';
-import { CheckoutWidgetParams, Checkout, CheckoutWidgetConfiguration } from '@imtbl/checkout-sdk';
+import {
+  CheckoutWidgetParams,
+  Checkout,
+  CheckoutWidgetConfiguration,
+} from '@imtbl/checkout-sdk';
 
 import { getIframeURL } from './functions/iframeParams';
 
@@ -14,14 +18,21 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
   const { config, checkout, params } = props;
   const { environment, publishableKey } = checkout.config;
 
-  const [iframeURL, setIframeURL] = useState<string>();
+  const [targetOrigin, iframeURL] = useMemo(() => {
+    if (!publishableKey) return ['', ''];
+    return getIframeURL(params, config, environment, publishableKey);
+  }, [params, config, environment, publishableKey]);
+
+  const handleIframeEvents = (event: MessageEvent) => {
+    if (event.origin === targetOrigin) {
+      console.info('🍎 Ack 🍎', event.data); // eslint-disable-line
+    }
+  };
 
   useEffect(() => {
-    if (!publishableKey) return;
-
-    const url = getIframeURL(params, config, environment, publishableKey);
-    setIframeURL(url);
-  }, [params, config, environment, publishableKey]);
+    window.addEventListener('message', handleIframeEvents);
+    return () => window.removeEventListener('message', handleIframeEvents);
+  }, []);
 
   // TODO:
   // on iframe load error, go to error view 500
