@@ -28,14 +28,16 @@ export function Connect() {
           && (!authenticationStatus || authenticationStatus === 'authenticated');
         return (
           <div
-            {...(!ready && {
-              'aria-hidden': true,
-              style: {
-                opacity: 0,
-                pointerEvents: 'none',
-                userSelect: 'none',
-              },
-            })}
+            aria-hidden={!ready ? true : undefined}
+            style={
+    !ready
+      ? {
+        opacity: 0,
+        pointerEvents: 'none',
+        userSelect: 'none',
+      }
+      : undefined
+  }
           >
             {(() => {
               if (!connected) {
@@ -60,33 +62,35 @@ export function Connect() {
                     type="button"
                   >
                     {chain.hasIcon && (
-                      <div
-                        style={{
-                          background: chain.iconBackground,
-                          width: 12,
-                          height: 12,
-                          borderRadius: 999,
-                          overflow: 'hidden',
-                          marginRight: 4,
-                        }}
-                      >
-                        {chain.iconUrl && (
-                          <img
-                            alt={chain.name ?? 'Chain icon'}
-                            src={chain.iconUrl}
-                            style={{ width: 12, height: 12 }}
-                          />
-                        )}
-                      </div>
+                    <div
+                      style={{
+                        background: chain.iconBackground,
+                        width: 12,
+                        height: 12,
+                        borderRadius: 999,
+                        overflow: 'hidden',
+                        marginRight: 4,
+                      }}
+                    >
+                      {chain.iconUrl && (
+                      <img
+                        alt={chain.name ?? 'Chain icon'}
+                        src={chain.iconUrl}
+                        style={{ width: 12, height: 12 }}
+                      />
+                      )}
+                    </div>
                     )}
                     {chain.name}
                   </button>
-                  <button type='button' onClick={async () => {
-                    setDisconnectTxt('Disconnecting ...');
-                    const userinfo = await passportInstance.getUserInfo();
-                    if (userinfo) await passportInstance.logout();
-                    disconnect();
-                  }}
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setDisconnectTxt('Disconnecting ...');
+                      const userinfo = await passportInstance.getUserInfo();
+                      if (userinfo) await passportInstance.logout();
+                      disconnect();
+                    }}
                   >
                     {disconnectTxt}
                   </button>
