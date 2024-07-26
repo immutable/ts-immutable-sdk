@@ -2,7 +2,6 @@
  
 import { useState } from 'react';
 import { ethers } from 'ethers';
-import { ProviderEvent } from '@imtbl/sdk/passport';
 import { passportInstance } from '../utils';
 
 export default function ConnectWithEtherJS() {
@@ -13,8 +12,8 @@ export default function ConnectWithEtherJS() {
   // setup the loading state to enable/disable buttons when loading
   const [loading, setLoadingState] = useState<boolean>(false);
 
-  // setup the signed state to show messages on success or failure
-  const [signed, setSignedState] = useState<string>("(not signed)");
+  // setup the signed state to show messages on success or failure of signing
+  const [signedStateMessage, setSignedMessageState] = useState<string>("(not signed)");
 
   // #doc passport-wallets-nextjs-sign-erc191-create
   // fetch the Passport provider from the Passport instance
@@ -53,7 +52,7 @@ export default function ConnectWithEtherJS() {
   // #doc passport-wallets-nextjs-sign-erc191-signmessage
   const signMessage = async () => {
     // set signed state message to pending in the view
-    setSignedState('pending signature')
+    setSignedMessageState('pending signature')
 
     // fetch the signer from the Web3provider
     const signer = web3Provider.getSigner();
@@ -68,15 +67,15 @@ export default function ConnectWithEtherJS() {
       signature = await signer.signMessage(message);
       
       // if successful update the signed message to successful in the view
-      setSignedState('user successfully signed message')
+      setSignedMessageState('user successfully signed message')
     } catch (error: any) {
       // Handle user denying signature
       if (error.code === -32003) {
         // if the user declined update the signed message to declined in the view
-        setSignedState('user declined to sign')
+        setSignedMessageState('user declined to sign')
       } else {
         // if something else went wrong, update the generic error with message in the view
-        setSignedState(`something went wrong - ${error.message}`)
+        setSignedMessageState(`something went wrong - ${error.message}`)
       }
     }
   }
@@ -92,7 +91,7 @@ export default function ConnectWithEtherJS() {
         <p>
           <button onClick={signMessage} disabled={loading}>Sign Message</button>
         </p>
-        <p>Message Signed: {signed}</p>
+        <p>Message Signed: {signedStateMessage}</p>
         <p>
           <button onClick={passportLogout} disabled={loading}>Passport Logout</button>
         </p>

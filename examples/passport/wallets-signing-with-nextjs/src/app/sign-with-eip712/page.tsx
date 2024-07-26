@@ -59,7 +59,7 @@ export default function ConnectWithEtherJS() {
     const signer = web3Provider.getSigner();
 
     // set the chainId
-    const chainId = 13478; // zkEVM testnet
+    const chainId = 13473; // zkEVM testnet
 
     // set the sender address
     const address = await signer.getAddress();
