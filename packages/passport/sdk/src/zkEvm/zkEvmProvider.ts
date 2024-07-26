@@ -143,13 +143,19 @@ export class ZkEvmProvider implements Provider {
     // This is required for sending session activity events
 
     // Get user from local storage
-    const user = await this.#authManager.getUser();
-    const zkEvmUser = this.#getZkEvmUser(user);
-
-    // Initialise signer for all RPC calls if registered user exists
+    let zkEvmUser: UserZkEvm | undefined;
     let magicSigner: Promise<Signer>;
-    if (zkEvmUser) {
-      magicSigner = this.#magicAdapter.getSigner();
+
+    try {
+      const user = await this.#authManager.getUser();
+      zkEvmUser = this.#getZkEvmUser(user);
+
+      // Initialise signer for all RPC calls if registered user exists
+      if (zkEvmUser) {
+        magicSigner = this.#magicAdapter.getSigner();
+      }
+    } catch (e) {
+      // Fail silently so that the request method can handle the error independently
     }
 
     switch (request.method) {
