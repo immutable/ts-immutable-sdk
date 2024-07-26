@@ -1,30 +1,27 @@
 import { useEffect, useState } from 'react';
 import { Box } from '@biom3/react';
-import { CheckoutWidgetParams, Checkout } from '@imtbl/checkout-sdk';
+import { CheckoutWidgetParams, Checkout, CheckoutWidgetConfiguration } from '@imtbl/checkout-sdk';
 
-import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { getIframeURL } from './functions/iframeParams';
 
 export type CheckoutWidgetInputs = {
   checkout: Checkout;
-  config: StrongCheckoutWidgetsConfig;
   params: CheckoutWidgetParams;
+  config: CheckoutWidgetConfiguration;
 };
 
 export default function CheckoutWidget(props: CheckoutWidgetInputs) {
   const { config, checkout, params } = props;
-  const { environment } = config;
-  const { publishableKey } = checkout.config;
+  const { environment, publishableKey } = checkout.config;
 
   const [iframeURL, setIframeURL] = useState<string>();
 
   useEffect(() => {
-    if (!publishableKey || !params.language) return;
+    if (!publishableKey) return;
 
-    const url = getIframeURL(params, environment, publishableKey);
-
+    const url = getIframeURL(params, config, environment, publishableKey);
     setIframeURL(url);
-  }, [publishableKey, params]);
+  }, [params, config, environment, publishableKey]);
 
   // TODO:
   // on iframe load error, go to error view 500
@@ -36,7 +33,7 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
 
   return (
     <Box
-      rc={<iframe src={iframeURL} title="checkout" />}
+      rc={<iframe id="checkout-app" src={iframeURL} title="checkout" />}
       sx={{
         w: '100%',
         h: '100%',

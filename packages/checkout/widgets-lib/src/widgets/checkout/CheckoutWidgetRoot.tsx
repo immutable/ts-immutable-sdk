@@ -47,7 +47,7 @@ export class CheckoutWidgetRoot extends Base<WidgetType.CHECKOUT> {
   protected render() {
     if (!this.reactRoot) return;
     const { t } = i18n;
-    const config = this.strongConfig();
+    const config = this.properties.config || {};
 
     this.reactRoot.render(
       <CustomAnalyticsProvider checkout={this.checkout}>

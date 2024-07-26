@@ -1,21 +1,24 @@
 import { IMXProvider } from '@imtbl/x-provider';
 import {
-  createConfig,
-  ImxApiClients,
-  imxApiConfig,
-  MultiRollupApiClients,
+  createConfig, ImxApiClients, imxApiConfig, MultiRollupApiClients,
 } from '@imtbl/generated-clients';
 import { IMXClient } from '@imtbl/x-client';
 import { Environment } from '@imtbl/config';
 
-import { identify, setPassportClientId, track } from '@imtbl/metrics';
-
+import {
+  identify, setPassportClientId, track, trackError,
+} from '@imtbl/metrics';
+import { isAxiosError } from 'axios';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
 import { PassportImxProviderFactory } from './starkEx';
 import { PassportConfiguration } from './config';
 import {
   DeviceConnectResponse,
+  isUserImx,
+  isUserZkEvm,
+  LinkedWallet,
+  LinkWalletParams,
   PassportEventMap,
   PassportEvents,
   PassportModuleConfiguration,
@@ -29,6 +32,7 @@ import TypedEventEmitter from './utils/typedEventEmitter';
 import GuardianClient from './guardian';
 import logger from './utils/logger';
 import { announceProvider, passportProviderInfo } from './zkEvm/provider/eip6963';
+import { isAPIError, PassportError, PassportErrorType } from './errors/passportError';
 
 const buildImxClientConfig = (passportModuleConfiguration: PassportModuleConfiguration) => {
   if (passportModuleConfiguration.overrides) {
@@ -298,5 +302,71 @@ export class Passport {
     const headers = { Authorization: `Bearer ${user.accessToken}` };
     const getUserInfoResult = await this.multiRollupApiClients.passportProfileApi.getUserInfo({ headers });
     return getUserInfoResult.data.linked_addresses;
+  }
+
+  public async linkExternalWallet(params: LinkWalletParams): Promise<LinkedWallet> {
+    track('passport', 'linkWallet', { type: params.type });
+
+    const user = await this.authManager.getUser();
+    if (!user) {
+      throw new PassportError('User is not logged in', PassportErrorType.NOT_LOGGED_IN_ERROR);
+    }
+
+    const isRegisteredWithIMX = isUserImx(user);
+    const isRegisteredWithZkEvm = isUserZkEvm(user);
+    if (!isRegisteredWithIMX && !isRegisteredWithZkEvm) {
+      throw new PassportError('User has not been registered', PassportErrorType.USER_NOT_REGISTERED_ERROR);
+    }
+
+    const headers = { Authorization: `Bearer ${user.accessToken}` };
+    const linkWalletV2Request = {
+      type: params.type,
+      wallet_address: params.walletAddress,
+      signature: params.signature,
+      nonce: params.nonce,
+    };
+
+    try {
+      const linkWalletV2Result = await this.multiRollupApiClients
+        .passportProfileApi.linkWalletV2({ linkWalletV2Request }, { headers });
+      return { ...linkWalletV2Result.data };
+    } catch (error) {
+      trackError('passport', 'linkWallet', error as Error);
+
+      if (isAxiosError(error) && error.response) {
+        if (error.response.data && isAPIError(error.response.data)) {
+          const { code, message } = error.response.data;
+
+          switch (code) {
+            case 'ALREADY_LINKED':
+              throw new PassportError(message, PassportErrorType.LINK_WALLET_ALREADY_LINKED_ERROR);
+            case 'MAX_WALLETS_LINKED':
+              throw new PassportError(message, PassportErrorType.LINK_WALLET_MAX_WALLETS_LINKED_ERROR);
+            case 'DUPLICATE_NONCE':
+              throw new PassportError(message, PassportErrorType.LINK_WALLET_DUPLICATE_NONCE_ERROR);
+            case 'VALIDATION_ERROR':
+              throw new PassportError(message, PassportErrorType.LINK_WALLET_VALIDATION_ERROR);
+            default:
+              throw new PassportError(message, PassportErrorType.LINK_WALLET_GENERIC_ERROR);
+          }
+        } else if (error.response.status) {
+          // Handle unexpected error with a generic error message
+          throw new PassportError(
+            `Link wallet request failed with status code ${error.response.status}`,
+            PassportErrorType.LINK_WALLET_GENERIC_ERROR,
+          );
+        }
+      }
+
+      let message: string = 'Link wallet request failed';
+      if (error instanceof Error) {
+        message += `: ${error.message}`;
+      }
+
+      throw new PassportError(
+        message,
+        PassportErrorType.LINK_WALLET_GENERIC_ERROR,
+      );
+    }
   }
 }
