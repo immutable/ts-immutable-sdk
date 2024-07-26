@@ -1,14 +1,6 @@
 {
   "name": "wallets-connect-with-nextjs",
   "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "test": "playwright install --with-deps && playwright test"
-  },
   "dependencies": {
     "@ethersproject/providers": "^5.7.2",
     "@imtbl/sdk": "latest",
@@ -29,5 +21,13 @@
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
+  },
+  "private": true,
+  "scripts": {
+    "build": "next build",
+    "dev": "next dev",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "start": "next start",
+    "test": "playwright install --with-deps && playwright test"
   }
 }

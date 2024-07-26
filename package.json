@@ -48,8 +48,8 @@
   },
   "scripts": {
     "build": "yarn workspace @imtbl/sdk updateDependencies && NODE_OPTIONS=--max-old-space-size=14366 nx run-many --target=build --projects=@imtbl/sdk,@imtbl/checkout-widgets --skip-nx-cache && yarn syncpack:format && yarn wsrun -p @imtbl/sdk -a -m copyBrowserBundles",
-    "build:passport-examples": "yarn workspaces foreach -A --include='examples/passport/**' run build",
     "build:onlysdk": "NODE_OPTIONS=--max-old-space-size=14366 nx run-many --target=build --projects=@imtbl/sdk && yarn syncpack:format",
+    "build:passport-examples": "yarn workspaces foreach -A --include='examples/passport/**' run build",
     "dev": "./dev.sh",
     "docs:build": "typedoc",
     "docs:serve": "http-server ./docs --cors -p 8080 -c-1",

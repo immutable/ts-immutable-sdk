@@ -1,13 +1,6 @@
 {
   "name": "vite-wagmi",
-  "private": true,
   "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
-  },
   "dependencies": {
     "@tanstack/react-query": "^5.32.1",
     "buffer": "^6.0.3",
@@ -25,5 +18,12 @@
     "typescript": "^5.0.2",
     "vite": "^5.3.4",
     "vite-plugin-node-polyfills": "^0.22.0"
-  }
+  },
+  "private": true,
+  "scripts": {
+    "build": "tsc && vite build",
+    "dev": "vite",
+    "preview": "vite preview"
+  },
+  "type": "module"
 }

@@ -1,4 +1,4 @@
-name: Build and test all example apps
+name: Build and test all passport examples
 
 on:
   pull_request:
