@@ -7,7 +7,7 @@ export default function Page() {
   const { push } = useRouter();
 
   useEffect(() => {
-     push('/');
+    push('/');
   }, [push]);
   return <p />;
-};
+}
