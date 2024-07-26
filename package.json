@@ -97,10 +97,8 @@
       "packages/webhook/sdk",
       "packages/minting-backend/sdk",
       "examples/**",
-      "!examples/ts-immutable-sample"
-    ],
-    "nohoist": [
-      "examples/ts-immutable-sample"
+      "!examples/ts-immutable-sample",
+      "!examples/free-mint-with-minting-backend/frontend"
     ]
   }
 }
