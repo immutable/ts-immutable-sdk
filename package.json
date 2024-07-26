@@ -96,13 +96,7 @@
       "packages/game-bridge",
       "packages/webhook/sdk",
       "packages/minting-backend/sdk",
-      "examples/**",
-      "!examples/ts-immutable-sample",
-      "!examples/free-mint-with-minting-backend/frontend"
-    ],
-    "nohoist": [
-      "examples/ts-immutable-sample",
-      "examples/free-mint-with-minting-backend/frontend"
+      "examples/passport/**"
     ]
   }
 }
