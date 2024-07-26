@@ -9,6 +9,7 @@ import { ConnectWallet } from './connect';
 const queryClient = new QueryClient();
 
 export default function ConnectWithWagmi() {
+
   // calling connectEVM() makes Passport available as an option to Wagmi
   passportInstance.connectEvm();
 
