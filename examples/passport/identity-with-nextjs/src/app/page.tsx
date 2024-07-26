@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { usePassport } from "@/context/passport";
+import { usePassport } from '@/context/passport';
 
 export default function Home() {
   const {
@@ -22,54 +22,63 @@ export default function Home() {
         <button
           className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
           onClick={login}
+          type="button"
         >
           Login
         </button>
         <button
           className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
           onClick={loginWithoutWallet}
+          type="button"
         >
           Login Without Wallet
         </button>
         <button
           className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
           onClick={loginWithEthersjs}
+          type="button"
         >
           Login With Ethers.js
         </button>
         <button
           className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
           onClick={logout}
+          type="button"
         >
           Logout in Redirect mode
         </button>
         <button
           className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
           onClick={logoutSilent}
+          type="button"
         >
           Logout in Silent mode
         </button>
         <button
           className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
           onClick={getIdToken}
+          type="button"
         >
           Get ID Token
         </button>
         <button
           className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
           onClick={getAccessToken}
+          type="button"
         >
           Get Access Token
         </button>
         <button
           className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
           onClick={getLinkedAddresses}
+          type="button"
         >
           Get Linked Addresses
         </button>
         <button
           className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
           onClick={getUserInfo}
+          type="button"
         >
           Get User Info
         </button>

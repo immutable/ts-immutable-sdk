@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { usePassport } from "@/context/passport";
+import { useEffect } from 'react';
+import { usePassport } from '@/context/passport';
 
 export default function Page() {
   const { passportSilentInstance } = usePassport();
@@ -10,7 +10,7 @@ export default function Page() {
     if (passportSilentInstance) {
       const passport = passportSilentInstance;
       // #doc passport-silent-logout-callback
-      passport.logoutSilentCallback("http://localhost:3000");
+      passport.logoutSilentCallback('http://localhost:3000');
       // #enddoc passport-silent-logout-callback
     }
   }, [passportSilentInstance]);
