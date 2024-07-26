@@ -35267,9 +35267,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"wallets-with-nextjs@workspace:examples/passport/wallets-with-nextjs":
+"wallets-connect-with-nextjs@workspace:examples/passport/wallets-connect-with-nextjs":
   version: 0.0.0-use.local
-  resolution: "wallets-with-nextjs@workspace:examples/passport/wallets-with-nextjs"
+  resolution: "wallets-connect-with-nextjs@workspace:examples/passport/wallets-connect-with-nextjs"
   dependencies:
     "@ethersproject/providers": "npm:^5.7.2"
     "@imtbl/sdk": "npm:latest"
