@@ -1,13 +1,13 @@
 'use client';
 
-import { usePassport } from "@/context/passport";
-import { useEffect } from "react";
+import { usePassport } from '@/context/passport';
+import { useEffect } from 'react';
 
 export default function Redirect() {
   const { passportInstance } = usePassport();
 
   useEffect(() => {
-    if(passportInstance) {
+    if (passportInstance) {
       // #doc passport-login-callback
       passportInstance.loginCallback();
       // #enddoc passport-login-callback
