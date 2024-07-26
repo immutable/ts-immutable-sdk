@@ -94,7 +94,10 @@
       "packages/blockchain-data/sdk",
       "packages/game-bridge",
       "packages/webhook/sdk",
-      "packages/minting-backend/sdk"
+      "packages/minting-backend/sdk",
+      "tests/smoke/esm",
+      "tests/func-tests/imx",
+      "tests/func-tests/zkevm"
     ],
     "nohoist": [
       "samples/**",
