@@ -99,6 +99,10 @@
       "examples/**",
       "!examples/ts-immutable-sample",
       "!examples/free-mint-with-minting-backend/frontend"
+    ],
+    "nohoist": [
+      "examples/ts-immutable-sample",
+      "examples/free-mint-with-minting-backend/frontend"
     ]
   }
 }
