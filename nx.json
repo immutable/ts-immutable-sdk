@@ -30,6 +30,6 @@
     }
   },
   "defaultBase": "main",
-  "parallel": 5,
+  "parallel": 6,
   "nxCloudAccessToken": "Mzg3ZGY1MWUtYmYyNy00ZmE4LTkyNDAtYjYxZmJmYmE4NWQ3fHJlYWQ="
 }
