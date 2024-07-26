@@ -11880,9 +11880,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"wallets-with-nextjs-with-ethersjs@workspace:.":
+"wallets-connect-with-nextjs@workspace:.":
   version: 0.0.0-use.local
-  resolution: "wallets-with-nextjs-with-ethersjs@workspace:."
+  resolution: "wallets-connect-with-nextjs@workspace:."
   dependencies:
     "@ethersproject/providers": ^5.7.2
     "@imtbl/sdk": latest
