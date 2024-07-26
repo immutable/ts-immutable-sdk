@@ -1,4 +1,4 @@
-name: Build and test all passport examples
+name: Build lint and test all passport examples
 
 on:
   pull_request:
@@ -52,3 +52,14 @@ jobs:
               echo "No test script found in $dir/package.json, skipping tests."
             fi
           done < project-dirs.txt
+
+      - name: Lint Projects
+        run: |
+          while IFS= read -r dir; do
+            echo "Linting $dir"
+            if jq -e '.scripts.test' "$dir/package.json" > /dev/null; then
+              (cd "$dir" && yarn lint)
+            else
+              echo "No lint script found in $dir/package.json, skipping linting."
+            fi
+          done < project-dirs.txt   
