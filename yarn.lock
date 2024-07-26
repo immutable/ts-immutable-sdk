@@ -18908,9 +18908,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"esm-sdk@workspace:tests/smoke/esm":
+"esm-sdk-test@workspace:tests/smoke/esm":
   version: 0.0.0-use.local
-  resolution: "esm-sdk@workspace:tests/smoke/esm"
+  resolution: "esm-sdk-test@workspace:tests/smoke/esm"
   dependencies:
     "@imtbl/sdk": 0.0.0
   languageName: unknown

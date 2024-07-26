@@ -29,7 +29,6 @@ on:
   push:
     branches:
       - main
-      - clean-up
 
 env:
   RELEASE_TYPE: ${{ github.event.inputs.release_type || 'alpha' }}

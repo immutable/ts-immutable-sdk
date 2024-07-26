@@ -1,5 +1,5 @@
 {
-  "name": "esm-sdk",
+  "name": "esm-sdk-test",
   "description": "Node ESM smoke test",
   "version": "1.0.0",
   "dependencies": {
@@ -8,6 +8,6 @@
   "main": "index.js",
   "scripts": {
     "build": "echo 1",
-    "test": "node index.mjs"
+    "smoke-test": "node index.mjs"
   }
 }

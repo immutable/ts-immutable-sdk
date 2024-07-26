@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@imtbl/sdk": "^1.35.0",
+    "@imtbl/sdk": "latest",
     "@tanstack/react-query": "^5.37.1",
     "connectkit": "^1.7.3",
     "next": "14.2.3",

@@ -12892,7 +12892,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "ts-immutable-sample@workspace:."
   dependencies:
-    "@imtbl/sdk": "file:../../../sdk"
+    "@imtbl/sdk": "latest"
     "@parcel/core": ^2.10.3
     "@playwright/test": ^1.40.0
     "@swc/core": ^1.3.96
