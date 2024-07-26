@@ -22,5 +22,6 @@ runs:
         key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
 
     - name: install depdenencies
+      if: steps.restore-cache-node_modules.outputs.cache-hit != 'true'
       shell: bash
       run: yarn install --immutable
