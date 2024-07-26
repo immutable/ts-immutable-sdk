@@ -1,5 +1,5 @@
-import { ConnectKitButton } from "connectkit";
+import { ConnectKitButton } from 'connectkit';
 
 export function Connect() {
-  return <ConnectKitButton />
-};
+  return <ConnectKitButton />;
+}

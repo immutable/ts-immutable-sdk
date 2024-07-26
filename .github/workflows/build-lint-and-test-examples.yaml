@@ -26,8 +26,8 @@ jobs:
       - name: Find all projects
         id: find-projects
         run: |
-          find ./examples/passport -name 'node_modules' -prune -o -name 'package.json' -exec dirname {} \; > project-dirs.txt
-          
+          find ./examples/passport -name 'node_modules' -prune -o -name '.next' -prune -o -name 'package.json' -exec dirname {} \; > project-dirs.txt          
+      
       - name: Install Dependencies
         run: |
           while IFS= read -r dir; do
