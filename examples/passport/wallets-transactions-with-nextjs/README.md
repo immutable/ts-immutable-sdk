@@ -1,4 +1,4 @@
-This is an example of [Setup Passport Identity](https://docs.immutable.com/products/zkEVM/passport/setup).
+This is an example of [Sending transactions](https://docs.immutable.com/products/zkEVM/passport/wallet/transactions).
 
 ## Getting Started
 
