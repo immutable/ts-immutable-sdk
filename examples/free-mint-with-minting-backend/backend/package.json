@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 0",
+    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "ts-node-dev --respawn --transpile-only src/server.ts",
     "updatemints": "ts-node src/utils/updateMintStatus.ts",
     "retrymints": "ts-node src/utils/mintFailsAndMissing.ts"
