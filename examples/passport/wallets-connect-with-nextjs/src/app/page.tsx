@@ -1,7 +1,7 @@
 export default function Home() {
   
   return (<>
-    <h1>Passport Wallet Examples</h1>
+    <h1>Passport Wallets Connect Examples</h1>
     <p>
       <a href="/connect-with-etherjs">Connect Wallet with EtherJS</a>
     </p>
