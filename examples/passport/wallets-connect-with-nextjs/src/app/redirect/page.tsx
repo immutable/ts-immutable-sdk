@@ -3,7 +3,6 @@
 import { passportInstance } from '../utils';
 
 export default function Redirect() {
-
   // call the loginCallback function after the login is complete
   passportInstance.loginCallback();
 
