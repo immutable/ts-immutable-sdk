@@ -5298,7 +5298,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/sdk@npm:^1.30.0, @imtbl/sdk@npm:^1.35.0, @imtbl/sdk@npm:^1.39.5-alpha, @imtbl/sdk@npm:^1.45.10, @imtbl/sdk@npm:latest":
+"@imtbl/sdk@npm:^1.30.0, @imtbl/sdk@npm:^1.35.0, @imtbl/sdk@npm:^1.39.5-alpha, @imtbl/sdk@npm:latest":
   version: 1.46.0
   resolution: "@imtbl/sdk@npm:1.46.0"
   dependencies:
@@ -41076,7 +41076,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "vite-wagmi@workspace:examples/passport/vite-wagmi"
   dependencies:
-    "@imtbl/sdk": "npm:^1.45.10"
+    "@imtbl/sdk": "npm:^1.30.0"
     "@tanstack/react-query": "npm:^5.32.1"
     "@types/react": "npm:^18.2.18"
     "@types/react-dom": "npm:^18.2.7"
