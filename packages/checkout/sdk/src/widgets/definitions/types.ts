@@ -131,54 +131,62 @@ type ProviderEventMapping = {
 */
 export type WidgetEventData = {
   [WidgetType.CONNECT]: {
-    [ConnectEventType.SUCCESS]: ConnectionSuccess,
-    [ConnectEventType.FAILURE]: ConnectionFailed,
-    [ConnectEventType.CLOSE_WIDGET]: {},
-    [ConnectEventType.WALLETCONNECT_PROVIDER_UPDATED]: WalletConnectProviderChanged,
-  } & OrchestrationMapping & ProviderEventMapping,
+    [ConnectEventType.SUCCESS]: ConnectionSuccess;
+    [ConnectEventType.FAILURE]: ConnectionFailed;
+    [ConnectEventType.CLOSE_WIDGET]: {};
+    [ConnectEventType.WALLETCONNECT_PROVIDER_UPDATED]: WalletConnectProviderChanged;
+  } & OrchestrationMapping &
+  ProviderEventMapping;
 
   [WidgetType.WALLET]: {
-    [WalletEventType.NETWORK_SWITCH]: WalletNetworkSwitch
-    [WalletEventType.DISCONNECT_WALLET]: WalletDisconnect
-    [WalletEventType.CLOSE_WIDGET]: {}
-  } & OrchestrationMapping & ProviderEventMapping,
+    [WalletEventType.NETWORK_SWITCH]: WalletNetworkSwitch;
+    [WalletEventType.DISCONNECT_WALLET]: WalletDisconnect;
+    [WalletEventType.CLOSE_WIDGET]: {};
+  } & OrchestrationMapping &
+  ProviderEventMapping;
 
   [WidgetType.SWAP]: {
-    [SwapEventType.SUCCESS]: SwapSuccess,
-    [SwapEventType.FAILURE]: SwapFailed,
-    [SwapEventType.REJECTED]: SwapRejected,
-    [SwapEventType.CLOSE_WIDGET]: {},
-  } & OrchestrationMapping & ProviderEventMapping
+    [SwapEventType.SUCCESS]: SwapSuccess;
+    [SwapEventType.FAILURE]: SwapFailed;
+    [SwapEventType.REJECTED]: SwapRejected;
+    [SwapEventType.CLOSE_WIDGET]: {};
+  } & OrchestrationMapping &
+  ProviderEventMapping;
 
   [WidgetType.BRIDGE]: {
-    [BridgeEventType.TRANSACTION_SENT]: BridgeTransactionSent,
-    [BridgeEventType.FAILURE]: BridgeFailed,
-    [BridgeEventType.CLOSE_WIDGET]: {}
-    [BridgeEventType.CLAIM_WITHDRAWAL_SUCCESS]: BridgeClaimWithdrawalSuccess
-    [BridgeEventType.CLAIM_WITHDRAWAL_FAILURE]: BridgeClaimWithdrawalFailed
-  } & OrchestrationMapping & ProviderEventMapping,
+    [BridgeEventType.TRANSACTION_SENT]: BridgeTransactionSent;
+    [BridgeEventType.FAILURE]: BridgeFailed;
+    [BridgeEventType.CLOSE_WIDGET]: {};
+    [BridgeEventType.CLAIM_WITHDRAWAL_SUCCESS]: BridgeClaimWithdrawalSuccess;
+    [BridgeEventType.CLAIM_WITHDRAWAL_FAILURE]: BridgeClaimWithdrawalFailed;
+  } & OrchestrationMapping &
+  ProviderEventMapping;
 
   [WidgetType.ONRAMP]: {
-    [OnRampEventType.SUCCESS]: OnRampSuccess,
-    [OnRampEventType.FAILURE]: OnRampFailed,
-    [OnRampEventType.CLOSE_WIDGET]: {},
-  } & OrchestrationMapping & ProviderEventMapping,
+    [OnRampEventType.SUCCESS]: OnRampSuccess;
+    [OnRampEventType.FAILURE]: OnRampFailed;
+    [OnRampEventType.CLOSE_WIDGET]: {};
+  } & OrchestrationMapping &
+  ProviderEventMapping;
 
   [WidgetType.SALE]: {
-    [SaleEventType.SUCCESS]: SaleSuccess,
-    [SaleEventType.FAILURE]: SaleFailed,
-    [SaleEventType.REJECTED]: any,
-    [SaleEventType.CLOSE_WIDGET]: {},
-    [SaleEventType.TRANSACTION_SUCCESS]: SaleTransactionSuccess,
-    [SaleEventType.PAYMENT_METHOD]: SalePaymentMethod,
-    [SaleEventType.PAYMENT_TOKEN]: SalePaymentToken,
-    [SaleEventType.REQUEST_BRIDGE]: {},
-    [SaleEventType.REQUEST_SWAP]: {},
-    [SaleEventType.REQUEST_ONRAMP]: {},
-  } & OrchestrationMapping & ProviderEventMapping,
-
+    [SaleEventType.SUCCESS]: SaleSuccess;
+    [SaleEventType.FAILURE]: SaleFailed;
+    [SaleEventType.REJECTED]: any;
+    [SaleEventType.CLOSE_WIDGET]: {};
+    [SaleEventType.TRANSACTION_SUCCESS]: SaleTransactionSuccess;
+    [SaleEventType.PAYMENT_METHOD]: SalePaymentMethod;
+    [SaleEventType.PAYMENT_TOKEN]: SalePaymentToken;
+    [SaleEventType.REQUEST_BRIDGE]: {};
+    [SaleEventType.REQUEST_SWAP]: {};
+    [SaleEventType.REQUEST_ONRAMP]: {};
+  } & OrchestrationMapping &
+  ProviderEventMapping;
   [WidgetType.CHECKOUT]: {
-  } & OrchestrationMapping & ProviderEventMapping,
+    [CheckoutEventType.CHECKOUT_APP_READY]: {};
+    [CheckoutEventType.CHECKOUT_APP_EVENT]: Record<string, unknown>;
+  } & OrchestrationMapping &
+  ProviderEventMapping;
 };
 
 /**

@@ -7,6 +7,7 @@ import {
   WidgetType,
   WalletProviderName,
   SalePaymentTypes,
+  CheckoutEventType
 } from "@imtbl/checkout-sdk";
 import { Environment } from "@imtbl/config";
 import { WidgetsFactory } from "@imtbl/checkout-widgets";
@@ -47,6 +48,19 @@ function CheckoutUI() {
   useEffect(() => {
     passport.connectEvm();
   }, []);
+  
+  useEffect(() => {
+    if (!checkoutWidget) return;
+
+    checkoutWidget.addListener(CheckoutEventType.CHECKOUT_APP_READY, (data) => {
+      console.log('----------> CHECKOUT_APP_READY', data);
+    });
+
+    checkoutWidget.addListener(CheckoutEventType.CHECKOUT_APP_EVENT, (data) => {
+      console.log('----------> CHECKOUT_APP_EVENT', data);
+    });
+
+  }, [checkoutWidget  ]);
 
   return (
     <div>
