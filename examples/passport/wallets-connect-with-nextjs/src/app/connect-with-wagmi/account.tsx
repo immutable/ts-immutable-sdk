@@ -25,7 +25,7 @@ export function Account() {
   // render the view to show the connected accounts and logout
   return (
     <div>
-      <button onClick={() => passportLogout()} disabled={loading}>Passport Logout</button>
+      <button onClick={() => passportLogout()} disabled={loading} type='button'>Passport Logout</button>
       {ensAvatar && <img alt="ENS Avatar" src={ensAvatar} />}
       {loading
         ? <p>Loading...</p>

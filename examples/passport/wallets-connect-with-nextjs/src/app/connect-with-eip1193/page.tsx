@@ -51,9 +51,9 @@ export default function ConnectWithEtherJS() {
     <>
       <h1>Passport Wallet - Connect with EIP-1193</h1>
       {accountsState.length == 0
-      && <button onClick={passportLogin} disabled={loading}>Passport Login</button>}
+      && <button onClick={passportLogin} disabled={loading} type='button'>Passport Login</button>}
       {accountsState.length >= 1
-      && <button onClick={passportLogout} disabled={loading}>Passport Logout</button>}
+      && <button onClick={passportLogout} disabled={loading} type='button'>Passport Logout</button>}
       {loading
         ? <p>Loading...</p>
         : (
