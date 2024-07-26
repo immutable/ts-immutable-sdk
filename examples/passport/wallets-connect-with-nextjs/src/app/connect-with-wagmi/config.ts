@@ -4,9 +4,9 @@ import { injected } from "wagmi/connectors";
 
 // create the Wagmi config for Immutable zkEVM Testnet
 export const config = createConfig({
-    chains: [immutableZkEvmTestnet],
-    connectors: [injected()],
-    transports: {
-      [immutableZkEvmTestnet.id]: http(),
-    },
-  });
+  chains: [immutableZkEvmTestnet],
+  connectors: [injected()],
+  transports: {
+    [immutableZkEvmTestnet.id]: http(),
+  },
+});
