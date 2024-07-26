@@ -18,4 +18,3 @@ export * from './wallet';
 export * from './provider';
 export * from './smartCheckout';
 export * from './fiatRamp';
-export * from './postMessageHandler';

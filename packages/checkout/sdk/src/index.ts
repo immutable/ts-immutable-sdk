@@ -141,10 +141,13 @@ export type {
   TransactionRequirement,
   WalletFilter,
   WalletInfo,
+} from './types';
+
+export {
   PostMessageHandler,
   PostMessageHandlerConfiguration,
   PostMessageHandlerEventType,
-} from './types';
+} from './postMessageHandler';
 
 export type { ErrorType } from './errors';
 
