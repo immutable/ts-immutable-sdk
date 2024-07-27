@@ -10,7 +10,8 @@
       "cache": true
     },
     "typecheck": {
-      "cache": true
+      "cache": true,
+      "dependsOn": ["build"]
     },
     "test": {
       "cache": true,
@@ -29,6 +30,6 @@
     }
   },
   "defaultBase": "main",
-  "parallel": 6,
+  "parallel": 7,
   "nxCloudAccessToken": "Mzg3ZGY1MWUtYmYyNy00ZmE4LTkyNDAtYjYxZmJmYmE4NWQ3fHJlYWQ="
 }
