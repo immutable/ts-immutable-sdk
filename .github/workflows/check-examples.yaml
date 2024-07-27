@@ -29,7 +29,7 @@ jobs:
       - name: setup
         uses: ./.github/actions/pr-setup
 
-      - name: Build
+      - name: Lint
         run: yarn workspaces foreach -A --include='examples/**' run lint
 
   test:
@@ -42,7 +42,7 @@ jobs:
       - name: setup
         uses: ./.github/actions/pr-setup
 
-      - name: Build
+      - name: Test
         run: yarn workspaces foreach -A --include='examples/**' run test
   e2e:
     name: E2E examples
@@ -54,5 +54,25 @@ jobs:
       - name: setup
         uses: ./.github/actions/pr-setup
 
-      - name: Build
+      - name: Cache Playwright browsers
+        uses: actions/cache@v3
+        id: cache-playwright-browsers
+        with:
+          path: ~/.cache/ms-playwright/
+          key: ${{ runner.OS }}-playwright-browsers-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-playwright-browsers-
+
+      - name: Install Playwright Browsers
+        if: steps.cache-playwright-browsers.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps
+
+      - name: E2E
         run: yarn workspaces foreach -A --include='examples/**' run e2e
+        env:
+          NEXT_PUBLIC_PUBLISHABLE_KEY: "pk_imapik-test-5ss4GpFy-n@$$Ye3LSox"
+          NEXT_PUBLIC_CLIENT_ID: "K846H940Uxokhz1aDb034QwBclYnAH24"
+          # add to github secrets, I don't have access
+#          NEXT_PUBLIC_PUBLISHABLE_KEY: ${{ secrets.PUBLISHABLE_KEY }}
+#          NEXT_PUBLIC_CLIENT_ID: ${{ secrets.CLIENT_ID }}
+
