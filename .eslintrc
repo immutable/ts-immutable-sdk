@@ -22,6 +22,7 @@
       "error",
       { "code": 120, "ignoreComments": true, "ignoreTrailingComments": true }
     ],
+    "react/button-has-type": ["off"],
     "no-restricted-syntax": [
       "error",
       "ForInStatement",

@@ -96,7 +96,8 @@
       "packages/webhook/sdk",
       "packages/minting-backend/sdk",
       "examples/passport/identity-with-nextjs",
-      "examples/passport/wallets-connect-with-nextjs"
+      "examples/passport/wallets-connect-with-nextjs",
+      "examples/passport/wallets-transactions-with-nextjs"
     ],
     "nohoist": [
       "samples/**",
