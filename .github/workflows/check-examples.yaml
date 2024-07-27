@@ -17,7 +17,7 @@ jobs:
         uses: ./.github/actions/pr-setup
 
       - name: Build
-        run: yarn workspaces foreach -Apt --include='examples/**' run build
+        run: yarn workspaces foreach -Ap --include='examples/**' run build
 
   lint:
     name: Lint examples
@@ -30,7 +30,7 @@ jobs:
         uses: ./.github/actions/pr-setup
 
       - name: Lint
-        run: yarn workspaces foreach -Apt --include='examples/**' run lint
+        run: yarn workspaces foreach -Ap --include='examples/**' run lint
 
   test:
     name: Test examples
@@ -43,7 +43,7 @@ jobs:
         uses: ./.github/actions/pr-setup
 
       - name: Test
-        run: yarn workspaces foreach -Apt --include='examples/**' run test
+        run: yarn workspaces foreach -Ap --include='examples/**' run test
   e2e:
     name: E2E examples
     runs-on: ubuntu-latest-4-cores
@@ -68,7 +68,7 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: E2E
-        run: yarn workspaces foreach -Apt --include='examples/**' run e2e
+        run: yarn workspaces foreach -Ap --include='examples/**' run e2e
         env:
           NEXT_PUBLIC_PUBLISHABLE_KEY: "pk_imapik-test-5ss4GpFy-n@$$Ye3LSox"
           NEXT_PUBLIC_CLIENT_ID: "K846H940Uxokhz1aDb034QwBclYnAH24"
