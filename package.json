@@ -100,8 +100,9 @@
       "examples/passport/wallets-signing-with-nextjs",
       "examples/passport/wallets-transactions-with-nextjs"
     ],
-    "installConfig": {
-      "hoistingLimits": "workspaces"
-    }
+    "installConfig": [
+      "samples/**",
+      "examples/**"
+    ]
   }
 }
