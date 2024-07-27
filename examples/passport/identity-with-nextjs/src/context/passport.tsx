@@ -1,7 +1,7 @@
 'use client';
 
 import {
-  createContext, ReactNode, useCallback, useContext,
+  createContext, ReactNode, useCallback, useContext, useMemo,
 } from 'react';
 import { config, passport } from '@imtbl/sdk';
 import { ethers } from 'ethers';
@@ -134,21 +134,23 @@ export function PassportProvider({ children }: { children: ReactNode }) {
     window.alert(`userProfile: ${JSON.stringify(userProfile)}`);
   }, [passportInstance]);
 
+  const methods = useMemo(() => ({
+    passportInstance,
+    passportSilentInstance,
+    login,
+    logout,
+    logoutSilent,
+    loginWithoutWallet,
+    loginWithEthersjs,
+    getIdToken,
+    getAccessToken,
+    getLinkedAddresses,
+    getUserInfo,
+  }), []);
+
   return (
     <PassportContext.Provider
-      value={{
-        passportInstance,
-        passportSilentInstance,
-        login,
-        logout,
-        logoutSilent,
-        loginWithoutWallet,
-        loginWithEthersjs,
-        getIdToken,
-        getAccessToken,
-        getLinkedAddresses,
-        getUserInfo,
-      }}
+      value={methods}
     >
       {children}
     </PassportContext.Provider>
