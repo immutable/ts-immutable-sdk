@@ -40,7 +40,7 @@
     "*": "yarn scan:secrets",
     "*.{js,jsx,ts,tsx}": "eslint"
   },
-  "packageManager": "yarn@3.6.1",
+  "packageManager": "yarn@4.3.1",
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "resolutions": {
@@ -94,7 +94,8 @@
       "packages/blockchain-data/sdk",
       "packages/game-bridge",
       "packages/webhook/sdk",
-      "packages/minting-backend/sdk"
+      "packages/minting-backend/sdk",
+      "examples/passport/identity-with-nextjs"
     ],
     "nohoist": [
       "samples/**",
