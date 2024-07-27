@@ -60,10 +60,9 @@ export default function ConnectWithEtherJS() {
     // Please note there is a 500 character limit for the message
     const message = 'this is a personal sign message';
 
-    let signature: string;
     try {
       // attempt to sign the message, this brings up the passport popup
-      signature = await signer.signMessage(message);
+      await signer.signMessage(message);
 
       // if successful update the signed message to successful in the view
       setSignedMessageState('user successfully signed message');
@@ -84,7 +83,7 @@ export default function ConnectWithEtherJS() {
   return (
     <>
       <h1>Passport Wallets - Sign ERC-191 message</h1>
-      {accountsState.length == 0
+      {accountsState.length === 0
       && <button onClick={passportLogin} disabled={loading}>Passport Login</button>}
       {accountsState.length >= 1 && (
       <>
