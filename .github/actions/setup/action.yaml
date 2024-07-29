@@ -18,11 +18,10 @@ runs:
       id: restore-cache-node_modules
       uses: actions/cache@v4
       with:
-        path: node_modules
-        key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
+        path: ["**/node_modules", ".yarn/install-state.gz"]
+        key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}-1
 
-    - name: install depdenencies
-      # if: steps.restore-cache-node_modules.outputs.cache-hit != 'true'
+    - name: install dependencies
+      if: steps.restore-cache-node_modules.outputs.cache-hit != 'true'
       shell: bash
-      run: |
-        yarn install --immutable
+      run: yarn install --immutable
