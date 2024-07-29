@@ -1,0 +1,74 @@
+name: Build lint and test all passport examples
+
+on:
+  pull_request:
+    branches: [main]
+  merge_group:
+    branches: [main]
+    
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest-4-cores
+    env:
+      NODE_OPTIONS: --max-old-space-size=14366
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          registry-url: https://registry.npmjs.org/
+          cache: "yarn"
+
+      - name: setup
+        uses: ./.github/actions/pr-setup
+
+      - name: Build passport examples
+        run: yarn build:examples:passport
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest-4-cores
+    env:
+      NODE_OPTIONS: --max-old-space-size=14366
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          registry-url: https://registry.npmjs.org/
+          cache: "yarn"
+
+      - name: setup
+        uses: ./.github/actions/pr-setup
+
+      - name: Lint passport examples
+        run: yarn lint:examples:passport
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest-4-cores
+    env:
+      NODE_OPTIONS: --max-old-space-size=14366
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          registry-url: https://registry.npmjs.org/
+          cache: "yarn"
+
+      - name: setup
+        uses: ./.github/actions/pr-setup
+
+      - name: Test passport examples
+        run: yarn test:examples:passport
