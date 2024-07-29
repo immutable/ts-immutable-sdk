@@ -49,7 +49,7 @@ note: variables must be prefixed with `NEXT_PUBLIC_` to be piped into the browse
 start the project with hot reloading
 
 ```
-yarn next
+yarn dev
 ```
 
 check `http://localhost:3000/` in the browser to confirm it compiled and ran
@@ -60,15 +60,24 @@ delete the any unused imports in `src/app/page.tsx`
 
 delete the contents of the return statement in `src/app/page.tsx` and replace with `<></>`
 
+update the title and description in `src/app/layout.tsx` to match the examples in your app e.g.
+
+```
+export const metadata: Metadata = {
+  title: "Passport Wallets Connect",
+  description: "Examples of how to connect wallets to Passport with NextJS",
+};
+```
+
 create a home page for your example app with links to all the examples in `src/app/page.tsx`
 
-e.g. `examples/passport/wallets-with-nextjs/src/app/page.tsx`
+e.g. `examples/passport/wallets-connect-with-nextjs/src/app/page.tsx`
 
 create a route for each example using the naming convention `<feature>-with-<library>` e.g. `wallets-with-etherjs`
 
 start building your examplesin the `page.tsx` in each of your example's route folders
 
-e.g. `examples/passport/wallets-with-nextjs/src/app/connect-with-etherjs/page.tsx`
+e.g. `examples/passport/wallets-connect-with-nextjs/src/app/connect-with-etherjs/page.tsx`
 
 
 ## Creating Code Snippets
@@ -87,12 +96,22 @@ const passportProvider = passportInstance.connectEvm()
 
 ## Using Code Snippets in the Docs site
 
-It's very simple, you just add a code block with the reference to the file and tag you want to pull in e.g.
+It's very simple, you just add a code block with the reference to the file you want to display e.g.
 
-```js reference=examples/passport/wallets-with-nextjs/src/app/connect-with-etherjs/page.tsx#passport-wallets-nextjs-connect-etherjs-create title="Connect Passport to Immutable zkEVM and create the Provider"
+````
+```js reference=examples/passport/wallets-connect-with-nextjs/src/app/connect-with-etherjs/page.tsx title="Connect Passport to Immutable zkEVM and create the Provider"
 ```
+````
 
-All snippets should have a title. Don't be shy adding extra context before or after the snippet explaining any key points which are necessary.
+Or if you only want to display part of the file, add the `#` label of the snippt you want to display e.g.
+
+````
+```js reference=examples/passport/wallets-connect-with-nextjs/src/app/connect-with-etherjs/page.tsx#passport-wallets-nextjs-connect-etherjs-create title="Connect Passport to Immutable zkEVM and create the Provider"
+```
+````
+
+
+All snippets should have a title, usually this can just be the file name the snippet comes from. Don't be shy adding extra context before or after the snippet explaining any key points which are necessary.
 
 ## Comments
 
