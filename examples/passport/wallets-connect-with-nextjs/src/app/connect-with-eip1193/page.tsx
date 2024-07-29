@@ -49,8 +49,8 @@ export default function ConnectWithEtherJS() {
   // render the view to login/logout and show the connected accounts
   return (
     <>
-      <h1>Passport Wallet - Connect with EtherJS</h1>
-      {accountsState.length == 0
+      <h1>Passport Wallet - Connect with EIP-1193</h1>
+      {accountsState.length === 0
       && <button onClick={passportLogin} disabled={loading}>Passport Login</button>}
       {accountsState.length >= 1
       && <button onClick={passportLogout} disabled={loading}>Passport Logout</button>}

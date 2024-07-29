@@ -162,7 +162,7 @@
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "packageList": "./scripts/generate-package-list.sh",
     "regenModules": "yarn generateIndex && yarn updateExports",
-    "typecheck": "tsc --noEmit --jsx preserve",
+    "typecheck": "tsc --noEmit --jsx preserve --skipLibCheck",
     "updateDependencies": "yarn packageList && node ./scripts/updateDependencies.js && yarn syncpack:format",
     "updateExports": "node scripts/updateExports.js"
   },

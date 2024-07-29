@@ -5,8 +5,8 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Immutable Passport Example',
-  description: 'Wallets',
+  title: 'Passport Wallets Connect',
+  description: 'Examples of how to connect wallets to Passport with NextJS',
 };
 
 export default function RootLayout({

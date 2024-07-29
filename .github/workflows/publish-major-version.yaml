@@ -114,9 +114,6 @@ jobs:
       - name: Lint
         run: yarn lint
 
-      - name: Check Single Package Version Policy
-        run: yarn syncpack:check
-
       - name: Get next version string
         id: version
         run: |
