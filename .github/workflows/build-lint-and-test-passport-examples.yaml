@@ -16,13 +16,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: ".nvmrc"
-          registry-url: https://registry.npmjs.org/
-          cache: "yarn"
-
       - name: setup
         uses: ./.github/actions/pr-setup
 
@@ -38,13 +31,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: ".nvmrc"
-          registry-url: https://registry.npmjs.org/
-          cache: "yarn"
-
       - name: setup
         uses: ./.github/actions/pr-setup
 
@@ -59,13 +45,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: ".nvmrc"
-          registry-url: https://registry.npmjs.org/
-          cache: "yarn"
 
       - name: setup
         uses: ./.github/actions/pr-setup
