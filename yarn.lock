@@ -2467,12 +2467,39 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/design-tokens@npm:^0.4.2, @biom3/design-tokens@npm:~0.4.2":
+"@biom3/design-tokens@npm:^0.4.0, @biom3/design-tokens@npm:^0.4.2, @biom3/design-tokens@npm:~0.4.2":
   version: 0.4.2
   resolution: "@biom3/design-tokens@npm:0.4.2"
   dependencies:
     lodash.get: ^4.4.2
   checksum: feae1a9193ca25bb1e27041d6684155e5e3935d5b4876318c207cd73dc0c9ec31b126e54fc97bd02f9f663213a2accc1a7361a95b4d61a135e02f06ceb7659b7
+  languageName: node
+  linkType: hard
+
+"@biom3/react@npm:^0.24.1":
+  version: 0.24.20
+  resolution: "@biom3/react@npm:0.24.20"
+  dependencies:
+    "@biom3/design-tokens": ~0.4.2
+    buffer: ^6.0.3
+    csstype: ^3.1.2
+    hls.js: ^1.5.11
+    localforage: ^1.10.0
+    lodash.debounce: ^4.0.8
+    lodash.get: ^4.4.2
+    lodash.isequal: ^4.5.0
+    lodash.throttle: ^4.1.1
+    react-is: ^18.2.0
+    react-keyed-flatten-children: ^3.0.0
+    ts-deepmerge: ^6.2.0
+  peerDependencies:
+    "@emotion/react": ^11.11.4
+    "@rive-app/react-canvas-lite": ^4.9.0
+    embla-carousel-react: ^8.0.4
+    framer-motion: ^10.12.12
+    react: ^18.2.0
+    react-dom: ^18.2.0
+  checksum: a2cf59149d4e15c97772bcc3de4f38b10b903dba6fda948f1faba1bbb53fe86c2f9e73adb43ba4a3f2eefeb0770d652d76f47fc11f00df7587cb846f779c601d
   languageName: node
   linkType: hard
 
