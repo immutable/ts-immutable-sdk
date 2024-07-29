@@ -101,7 +101,8 @@
     ],
     "nohoist": [
       "samples/**",
-      "examples/**"
+      "examples/**",
+      "tests/**"
     ]
   }
 }
