@@ -2,7 +2,51 @@
 
 Important information on how to create examples, pull them through to the docs site and ensure they are covered by tests in the CI CD pipeline.
 
-## Create a New Example
+
+## Example Scope
+
+When creating an example app it should contain only examples about one particular feature to prevent overloading the example. If there are multiple ways to use the feature then it is okay to include those in one sample app.
+
+For example;
+
+the app in `examples/passport/wallets-connect-with-nextjs` show how to connect passport in the nextjs framework. It contains a default route that has links to each of the examples. Inside there are three routes, one for each way to connect (EIP-1193, EtherJS and Wagmi). These are okay to be part of one sample app since they show how to use one feature but using 3 different libraries.
+
+If you want to show a different feature e.g signing with passport, you should create a new example app. Even though it also requires passport to connect you should not add the signing example to the connect example app.
+
+## Folder structure
+
+Each product should have its own folder inside examples, and the examples for that product should be flatly arranged inside that folder, do not nest the examples deeper than this.
+
+Each example app folder inside the product folder be named as `<feature>-with-<framework>`
+
+Then if your example has multiple routes because there are multiple ways to use that feature e.g. you need to show how to use the feature using multiple libraries, then you should name your routes `<feature>-with<library>`.
+
+eg.
+
+```
+examples
+├── passport
+│   ├── wallets-connect-with-nextjs
+│   │   └── src
+│   │       └── app
+│   │           ├── page.tsx
+│   │           ├── connect-with-eip1193
+│   │           ├── connect-with-etherjs
+│   │           └── connect-with-wagmi
+│   └── wallets-signing-with-nextjs
+│   │   └── src
+│   │       └── app
+│   │           ├── page.tsx
+│   │           ├── sign-with-eip712
+│   │           └── sign-with-erc191
+│   └── ...
+├── checkout
+│   └── ...
+```
+
+If you need to create a new example follow the steps below;
+
+## Creating a New Example
 
 create the nextjs project
 
@@ -103,15 +147,45 @@ It's very simple, you just add a code block with the reference to the file you w
 ```
 ````
 
-Or if you only want to display part of the file, add the `#` label of the snippt you want to display e.g.
+Or if you only want to display part of the file, add the `#` label of the snippet you want to display e.g.
 
 ````
 ```js reference=examples/passport/wallets-connect-with-nextjs/src/app/connect-with-etherjs/page.tsx#passport-wallets-nextjs-connect-etherjs-create title="Connect Passport to Immutable zkEVM and create the Provider"
 ```
 ````
 
-
 All snippets should have a title, usually this can just be the file name the snippet comes from. Don't be shy adding extra context before or after the snippet explaining any key points which are necessary.
+
+## Development process
+
+Since the docs site by default is pulling the code examples from the main branch of `ts-immutable-sdk` they will not be available until they are merged. To get around this and view the snippets in the docs site before you merge the example to main you can point the docs site to use the branch you are working on in the sdk repo while you work on them.
+
+Create a branch for your example in `ts-immutable-sdk` repo and a branch for your code snippets in `docs` repo.
+
+Create your example in your `ts-immutable-sdk` branch and push it up to GitHub.
+
+In your `docs` branch modify the file `/src/remark/import-code.mjs`
+
+Update the `BRANCH` constant from `main` to your branch name e.g.
+
+```
+const BRANCH = 'DVR-193-passport-signing-example';
+```
+
+Now your docs branch will be pulling the code examples from your branch in `ts-immutable-sdk` and you can use them locally in your `docs` branch to make sure they make sense in the page.
+
+Once you're happy with your examples, make the PR for your `ts-immutable-sdk` and get it merged into main. 
+
+Then change the `BRANCH` constant back to `main` in the `/src/remark/import-code.mjs` file.
+
+Now your examples are merged they will appear locally in your `docs` branch from main on `ts-immutable-sdk` and you can make any other updates you need to give the code examples context in the docs site.
+
+Create your PR for your `docs` branch and get it merged into main. 
+
+### WARNING
+
+Do **NOT** merge your `docs` branch to main without pointing the code import back to the main branch on `ts-immutable-sdk` or it will break things when the branch is deleted and new code examples merged to main will not show in the docs site.
+
 
 ## Comments
 
@@ -120,3 +194,5 @@ All examples should be heavily commented and the comments should make sense in t
 ## Tests
 
 All examples should be covered by e2e tests to ensure they successfully do the action the code sample is showing in the docs site.
+
+More info on e2e tests coming soon.
