@@ -5,7 +5,7 @@ on:
     branches: [main]
   merge_group:
     branches: [main]
-    
+
 jobs:
   build:
     name: Build
@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: setup
-        uses: ./.github/actions/pr-setup
+        uses: ./.github/actions/setup
 
       - name: Build passport examples
         run: yarn build:examples:passport
@@ -32,7 +32,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: setup
-        uses: ./.github/actions/pr-setup
+        uses: ./.github/actions/setup
 
       - name: Lint passport examples
         run: yarn lint:examples:passport
@@ -47,7 +47,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: setup
-        uses: ./.github/actions/pr-setup
+        uses: ./.github/actions/setup
 
       - name: Test passport examples
         run: yarn test:examples:passport
