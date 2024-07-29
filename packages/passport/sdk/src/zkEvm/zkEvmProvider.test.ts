@@ -1,10 +1,10 @@
-import { StaticJsonRpcProvider, Web3Provider } from '@ethersproject/providers';
+import { StaticJsonRpcProvider } from '@ethersproject/providers';
 import { identify, trackFlow } from '@imtbl/metrics';
 import { utils } from 'ethers';
 import AuthManager from '../authManager';
 import { ZkEvmProvider, ZkEvmProviderInput } from './zkEvmProvider';
 import { sendTransaction } from './sendTransaction';
-import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
+import { JsonRpcError, ProviderErrorCode } from './JsonRpcError';
 import GuardianClient from '../guardian';
 import { RelayerClient } from './relayerClient';
 import { Provider, RequestArguments } from './types';
@@ -24,14 +24,14 @@ jest.mock('./signTypedDataV4');
 describe('ZkEvmProvider', () => {
   let passportEventEmitter: TypedEventEmitter<PassportEventMap>;
   const config = testConfig;
-  const ethSigner = {};
   const authManager = {
     getUserOrLogin: jest.fn().mockResolvedValue(mockUserZkEvm),
     getUser: jest.fn().mockResolvedValue(mockUserZkEvm),
   };
   const magicAdapter = {
-    login: jest.fn(),
-  } as Partial<MagicAdapter> as MagicAdapter;
+    getSigner: jest.fn().mockResolvedValue({}),
+    initialiseSigner: jest.fn().mockResolvedValue({}),
+  };
   const guardianClient = {
     withConfirmationScreen: jest.fn().mockImplementation(() => (task: () => void) => task()),
   } as unknown as GuardianClient;
@@ -39,9 +39,6 @@ describe('ZkEvmProvider', () => {
   beforeEach(() => {
     passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
     jest.resetAllMocks();
-    (Web3Provider as unknown as jest.Mock).mockImplementation(() => ({
-      getSigner: jest.fn().mockImplementation(() => ethSigner),
-    }));
     (trackFlow as unknown as jest.Mock).mockImplementation(() => ({
       addEvent: jest.fn(),
       end: jest.fn(),
@@ -56,21 +53,15 @@ describe('ZkEvmProvider', () => {
       authManager: authManager as Partial<AuthManager> as AuthManager,
       passportEventEmitter,
       guardianClient,
-      magicAdapter,
+      magicAdapter: magicAdapter as Partial<MagicAdapter> as MagicAdapter,
     } as Partial<ZkEvmProviderInput>;
 
     return new ZkEvmProvider(constructorParameters as ZkEvmProviderInput);
   };
 
   describe('eth_requestAccounts', () => {
-    it('constructor tries to automatically connect existing user session when provider is instantiated', async () => {
-      authManager.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
-      getProvider();
-      expect(authManager.getUser).toHaveBeenCalledTimes(1);
-    });
-
     it('should return the ethAddress if already logged in', async () => {
-      authManager.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
+      authManager.getUser.mockResolvedValue(mockUserZkEvm);
       const provider = getProvider();
 
       const resultOne = await provider.request({ method: 'eth_requestAccounts', params: [] });
@@ -78,13 +69,13 @@ describe('ZkEvmProvider', () => {
 
       expect(resultOne).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
       expect(resultTwo).toEqual([mockUserZkEvm.zkEvm.ethAddress]);
-      expect(authManager.getUser).toBeCalledTimes(3);
+      expect(authManager.getUser).toBeCalledTimes(2);
     });
 
     it('should emit accountsChanged event and identify user when user logs in', async () => {
-      authManager.getUser.mockReturnValue(Promise.resolve(null));
+      authManager.getUser.mockResolvedValue(null);
 
-      authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
+      authManager.getUserOrLogin.mockResolvedValue(mockUserZkEvm);
       const provider = getProvider();
       const onAccountsChanged = jest.fn();
 
@@ -100,23 +91,6 @@ describe('ZkEvmProvider', () => {
         passportId: mockUserZkEvm.profile.sub,
       });
     });
-
-    it('should throw an error if the signer initialisation fails', async () => {
-      authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
-      authManager.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
-
-      (Web3Provider as unknown as jest.Mock).mockImplementation(() => ({
-        getSigner: () => {
-          throw new Error('Something went wrong');
-        },
-      }));
-      const provider = getProvider();
-      await provider.request({ method: 'eth_requestAccounts' });
-
-      await expect(provider.request({ method: 'eth_sendTransaction' })).rejects.toThrow(
-        new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, 'Something went wrong'),
-      );
-    });
   });
 
   describe('eth_sendTransaction', () => {
@@ -127,7 +101,7 @@ describe('ZkEvmProvider', () => {
     };
 
     it('should throw an error if the user is not logged in', async () => {
-      authManager.getUser.mockReturnValue(Promise.resolve(null));
+      authManager.getUser.mockResolvedValue(null);
 
       const provider = getProvider();
 
@@ -139,8 +113,8 @@ describe('ZkEvmProvider', () => {
     });
 
     it('should open a confirmation screen', async () => {
-      authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
-      authManager.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
+      authManager.getUserOrLogin.mockResolvedValue(mockUserZkEvm);
+      authManager.getUser.mockResolvedValue(mockUserZkEvm);
 
       const provider = getProvider();
       await provider.request({ method: 'eth_requestAccounts' });
@@ -151,8 +125,8 @@ describe('ZkEvmProvider', () => {
 
     it('should call sendTransaction with the correct params', async () => {
       const transactionHash = '0x789';
-      authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
-      authManager.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
+      authManager.getUserOrLogin.mockResolvedValue(mockUserZkEvm);
+      authManager.getUser.mockResolvedValue(mockUserZkEvm);
       (sendTransaction as jest.Mock).mockResolvedValue(transactionHash);
 
       const provider = getProvider();
@@ -166,7 +140,6 @@ describe('ZkEvmProvider', () => {
       expect(sendTransaction).toHaveBeenCalledWith({
         params: [transaction],
         guardianClient,
-        ethSigner,
         rpcProvider: expect.any(Object),
         relayerClient: expect.any(RelayerClient),
         zkEvmAddress: mockUserZkEvm.zkEvm.ethAddress,
@@ -180,7 +153,7 @@ describe('ZkEvmProvider', () => {
     const typedDataPayload = '{}';
 
     it('should throw an error if the user is not logged in', async () => {
-      authManager.getUser.mockReturnValue(Promise.resolve(null));
+      authManager.getUser.mockResolvedValue(null);
 
       const provider = getProvider();
 
@@ -193,8 +166,8 @@ describe('ZkEvmProvider', () => {
 
     it('should call eth_signTypedData_v4 with the correct params', async () => {
       const signature = '0x123';
-      authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
-      authManager.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
+      authManager.getUserOrLogin.mockResolvedValue(mockUserZkEvm);
+      authManager.getUser.mockResolvedValue(mockUserZkEvm);
       (signTypedDataV4 as jest.Mock).mockResolvedValue(signature);
 
       const provider = getProvider();
@@ -209,7 +182,6 @@ describe('ZkEvmProvider', () => {
         method: 'eth_signTypedData_v4',
         params: [address, typedDataPayload],
         guardianClient,
-        ethSigner,
         rpcProvider: expect.any(Object),
         relayerClient: expect.any(RelayerClient),
         flow: expect.any(Object),
@@ -217,8 +189,8 @@ describe('ZkEvmProvider', () => {
     });
 
     it('should open a confirmation screen', async () => {
-      authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
-      authManager.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
+      authManager.getUserOrLogin.mockResolvedValue(mockUserZkEvm);
+      authManager.getUser.mockResolvedValue(mockUserZkEvm);
       const provider = getProvider();
       await provider.request({ method: 'eth_requestAccounts' });
       await provider.request({ method: 'eth_signTypedData_v4', params: [address, typedDataPayload] });
@@ -229,7 +201,7 @@ describe('ZkEvmProvider', () => {
 
   describe('isPassport', () => {
     it('should be set to true', () => {
-      authManager.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
+      authManager.getUser.mockResolvedValue(mockUserZkEvm);
 
       const provider = getProvider();
 
@@ -243,8 +215,8 @@ describe('ZkEvmProvider', () => {
 
     describe('and eth_sendTransaction is called', () => {
       it('throws an unauthorized error', async () => {
-        authManager.getUser.mockReturnValue(Promise.resolve(null));
-        authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
+        authManager.getUser.mockResolvedValue(null);
+        authManager.getUserOrLogin.mockResolvedValue(mockUserZkEvm);
 
         const provider = getProvider();
         await provider.request({ method: 'eth_requestAccounts' });
@@ -258,8 +230,8 @@ describe('ZkEvmProvider', () => {
 
     describe('and eth_signTypedDataV4 is called', () => {
       it('throws an unauthorized error', async () => {
-        authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
-        authManager.getUser.mockReturnValue(Promise.resolve(null));
+        authManager.getUserOrLogin.mockResolvedValue(mockUserZkEvm);
+        authManager.getUser.mockResolvedValue(null);
 
         const provider = getProvider();
         await provider.request({ method: 'eth_requestAccounts' });
@@ -273,8 +245,8 @@ describe('ZkEvmProvider', () => {
 
     describe('and eth_accounts is called', () => {
       it('returns an empty array', async () => {
-        authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
-        authManager.getUser.mockReturnValue(Promise.resolve(null));
+        authManager.getUserOrLogin.mockResolvedValue(mockUserZkEvm);
+        authManager.getUser.mockResolvedValue(null);
 
         const provider = getProvider();
         await provider.request({ method: 'eth_requestAccounts' });
@@ -286,8 +258,8 @@ describe('ZkEvmProvider', () => {
     });
 
     it('should emit accountsChanged', async () => {
-      authManager.getUserOrLogin.mockReturnValue(mockUserZkEvm);
-      authManager.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
+      authManager.getUserOrLogin.mockResolvedValue(mockUserZkEvm);
+      authManager.getUser.mockResolvedValue(mockUserZkEvm);
 
       const provider = getProvider();
       await provider.request({ method: 'eth_requestAccounts' });
@@ -315,7 +287,7 @@ describe('ZkEvmProvider', () => {
     });
 
     it('should call detectNetwork', async () => {
-      authManager.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
+      authManager.getUser.mockResolvedValue(mockUserZkEvm);
 
       detectNetworkMock.mockResolvedValueOnce({ chainId });
 
@@ -478,7 +450,7 @@ describe('ZkEvmProvider', () => {
     });
 
     it.each(passthroughMethods)('should passthrough %s to the rpcProvider', async ({ requestArgument, returnValue }) => {
-      authManager.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
+      authManager.getUser.mockResolvedValue(mockUserZkEvm);
 
       sendMock.mockResolvedValueOnce(returnValue);
 
@@ -496,7 +468,7 @@ describe('ZkEvmProvider', () => {
 
     describe('eth_getBalance', () => {
       it('defaults the `blockNumber` argument to `latest` if not provided', async () => {
-        authManager.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
+        authManager.getUser.mockResolvedValue(mockUserZkEvm);
 
         const provider = getProvider();
         await provider.request({ method: 'eth_getBalance', params: ['0x1'] });
@@ -507,7 +479,7 @@ describe('ZkEvmProvider', () => {
 
     describe('eth_getCode', () => {
       it('defaults the `blockNumber` argument to `latest` if not provided', async () => {
-        authManager.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
+        authManager.getUser.mockResolvedValue(mockUserZkEvm);
 
         const provider = getProvider();
         await provider.request({ method: 'eth_getCode', params: ['0x1'] });
@@ -518,7 +490,7 @@ describe('ZkEvmProvider', () => {
 
     describe('eth_getTransactionCount', () => {
       it('defaults the `blockNumber` argument to `latest` if not provided', async () => {
-        authManager.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
+        authManager.getUser.mockResolvedValue(mockUserZkEvm);
 
         const provider = getProvider();
         await provider.request({ method: 'eth_getTransactionCount', params: ['0x1'] });
@@ -529,7 +501,7 @@ describe('ZkEvmProvider', () => {
 
     describe('eth_getStorageAt', () => {
       it('defaults the `blockNumber` argument to `latest` if not provided', async () => {
-        authManager.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
+        authManager.getUser.mockResolvedValue(mockUserZkEvm);
 
         const provider = getProvider();
         await provider.request({ method: 'eth_getStorageAt', params: ['0x1', '0x2'] });
@@ -540,7 +512,7 @@ describe('ZkEvmProvider', () => {
 
     describe('eth_call', () => {
       it('defaults the `blockNumber` argument to `latest` if not provided', async () => {
-        authManager.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
+        authManager.getUser.mockResolvedValue(mockUserZkEvm);
 
         const provider = getProvider();
         await provider.request({ method: 'eth_call', params: [{ to: '0x1' }] });
@@ -551,7 +523,7 @@ describe('ZkEvmProvider', () => {
 
     describe('eth_estimateGas', () => {
       it('defaults the `blockNumber` argument to `latest` if not provided', async () => {
-        authManager.getUser.mockReturnValue(Promise.resolve(mockUserZkEvm));
+        authManager.getUser.mockResolvedValue(mockUserZkEvm);
 
         const provider = getProvider();
         await provider.request({ method: 'eth_estimateGas', params: [{ to: '0x1' }] });

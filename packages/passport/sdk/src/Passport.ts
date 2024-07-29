@@ -53,11 +53,12 @@ const buildImxApiClients = (passportModuleConfiguration: PassportModuleConfigura
 
 export const buildPrivateVars = (passportModuleConfiguration: PassportModuleConfiguration) => {
   const config = new PassportConfiguration(passportModuleConfiguration);
-  const authManager = new AuthManager(config);
-  const magicAdapter = new MagicAdapter(config);
+  const passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
+
+  const authManager = new AuthManager(config, passportEventEmitter);
+  const magicAdapter = new MagicAdapter(config, authManager, passportEventEmitter);
   const confirmationScreen = new ConfirmationScreen(config);
   const multiRollupApiClients = new MultiRollupApiClients(config.multiRollupConfig);
-  const passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
 
   const immutableXClient = passportModuleConfiguration.overrides
     ? passportModuleConfiguration.overrides.immutableXClient
@@ -196,7 +197,6 @@ export class Passport {
       identify({
         passportId: user.profile.sub,
       });
-      this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
     }
 
     return user ? user.profile : null;
@@ -222,7 +222,6 @@ export class Passport {
       interval,
       timeoutMs,
     );
-    this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
     return user.profile;
   }
 
@@ -238,7 +237,6 @@ export class Passport {
       authorizationCode,
       state,
     );
-    this.passportEventEmitter.emit(PassportEvents.LOGGED_IN, user);
     return user.profile;
   }
 

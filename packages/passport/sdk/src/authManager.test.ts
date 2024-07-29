@@ -7,7 +7,8 @@ import { PassportError, PassportErrorType } from './errors/passportError';
 import { PassportConfiguration } from './config';
 import { mockUser, mockUserImx, mockUserZkEvm } from './test/mocks';
 import { isTokenExpired } from './utils/token';
-import { isUserZkEvm, PassportModuleConfiguration } from './types';
+import { isUserZkEvm, PassportEventMap, PassportModuleConfiguration } from './types';
+import TypedEventEmitter from './utils/typedEventEmitter';
 
 jest.mock('jwt-decode');
 jest.mock('oidc-client-ts', () => ({
@@ -81,6 +82,8 @@ const mockErrorMsg = 'NONO';
 describe('AuthManager', () => {
   afterEach(jest.resetAllMocks);
 
+  const passportEventEmitter = new TypedEventEmitter<PassportEventMap>();
+
   let authManager: AuthManager;
   let mockSigninPopup: jest.Mock;
   let mockSigninPopupCallback: jest.Mock;
@@ -115,13 +118,13 @@ describe('AuthManager', () => {
       append: mockOverlayAppend,
       remove: mockOverlayRemove,
     });
-    authManager = new AuthManager(getConfig());
+    authManager = new AuthManager(getConfig(), passportEventEmitter);
   });
 
   describe('constructor', () => {
     it('should initialise AuthManager with the correct default configuration', () => {
       const config = getConfig();
-      const am = new AuthManager(config);
+      const am = new AuthManager(config, passportEventEmitter);
       expect(am).toBeDefined();
       expect(UserManager).toBeCalledWith({
         authority: config.authenticationDomain,
@@ -147,7 +150,7 @@ describe('AuthManager', () => {
         const configWithAudience = getConfig({
           audience: 'audience',
         });
-        const am = new AuthManager(configWithAudience);
+        const am = new AuthManager(configWithAudience, passportEventEmitter);
         expect(am).toBeDefined();
         expect(UserManager).toBeCalledWith(expect.objectContaining({
           extraQueryParams: {
@@ -160,7 +163,7 @@ describe('AuthManager', () => {
     describe('when a logoutRedirectUri is specified', () => {
       it('should set the endSessionEndpoint `returnTo` and `client_id` query string params', () => {
         const configWithLogoutRedirectUri = getConfig({ logoutRedirectUri });
-        const am = new AuthManager(configWithLogoutRedirectUri);
+        const am = new AuthManager(configWithLogoutRedirectUri, passportEventEmitter);
 
         const uri = new URL(logoutEndpoint, `https://${authenticationDomain}`);
         uri.searchParams.append('client_id', clientId);
@@ -274,7 +277,7 @@ describe('AuthManager', () => {
             disableBlockedPopupOverlay: false,
           },
         });
-        const am = new AuthManager(configWithPopupOverlayOptions);
+        const am = new AuthManager(configWithPopupOverlayOptions, passportEventEmitter);
 
         mockSigninPopup.mockReturnValue(mockOidcUser);
         // Simulate `tryAgainOnClick` being called so that the `login()` promise can resolve
@@ -374,7 +377,7 @@ describe('AuthManager', () => {
       const configuration = getConfig({
         logoutMode: 'redirect',
       });
-      const manager = new AuthManager(configuration);
+      const manager = new AuthManager(configuration, passportEventEmitter);
 
       await manager.logout();
 
@@ -385,7 +388,7 @@ describe('AuthManager', () => {
       const configuration = getConfig({
         logoutMode: undefined,
       });
-      const manager = new AuthManager(configuration);
+      const manager = new AuthManager(configuration, passportEventEmitter);
 
       await manager.logout();
 
@@ -396,7 +399,7 @@ describe('AuthManager', () => {
       const configuration = getConfig({
         logoutMode: 'silent',
       });
-      const manager = new AuthManager(configuration);
+      const manager = new AuthManager(configuration, passportEventEmitter);
 
       await manager.logout();
 
@@ -407,7 +410,7 @@ describe('AuthManager', () => {
       const configuration = getConfig({
         logoutMode: 'redirect',
       });
-      const manager = new AuthManager(configuration);
+      const manager = new AuthManager(configuration, passportEventEmitter);
 
       mockSignoutRedirect.mockRejectedValue(new Error(mockErrorMsg));
 
@@ -578,7 +581,7 @@ describe('AuthManager', () => {
         it('should set the endSessionEndpoint `returnTo` and `client_id` query string params', async () => {
           mockGetUser.mockReturnValue(mockOidcUser);
 
-          const am = new AuthManager(getConfig({ logoutRedirectUri }));
+          const am = new AuthManager(getConfig({ logoutRedirectUri }), passportEventEmitter);
           const result = await am.getDeviceFlowEndSessionEndpoint();
           const uri = new URL(result);
 
@@ -593,7 +596,7 @@ describe('AuthManager', () => {
         it('should return the endSessionEndpoint without a `returnTo` or `client_id` query string params', async () => {
           mockGetUser.mockReturnValue(mockOidcUser);
 
-          const am = new AuthManager(getConfig());
+          const am = new AuthManager(getConfig(), passportEventEmitter);
           const result = await am.getDeviceFlowEndSessionEndpoint();
           const uri = new URL(result);
 
