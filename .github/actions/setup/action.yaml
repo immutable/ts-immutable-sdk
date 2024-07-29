@@ -1,5 +1,5 @@
 name: "Setup"
-description: "Do necessary setup"
+description: "Do necessary setup for NX, node, yarn cache and deps install"
 
 runs:
   using: "composite"
