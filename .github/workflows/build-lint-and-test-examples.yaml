@@ -1,4 +1,4 @@
-name: Build lint and test all passport examples
+name: Build lint and test all examples
 
 on:
   pull_request:
@@ -19,8 +19,8 @@ jobs:
       - name: setup
         uses: ./.github/actions/setup
 
-      - name: Build passport examples
-        run: yarn build:examples:passport
+      - name: Build examples
+        run: yarn build:examples
 
   lint:
     name: Lint
@@ -34,8 +34,8 @@ jobs:
       - name: setup
         uses: ./.github/actions/setup
 
-      - name: Lint passport examples
-        run: yarn lint:examples:passport
+      - name: Lint examples
+        run: yarn lint:examples
 
   test:
     name: Test
@@ -49,5 +49,5 @@ jobs:
       - name: setup
         uses: ./.github/actions/setup
 
-      - name: Test passport examples
-        run: yarn test:examples:passport
+      - name: Test examples
+        run: yarn test:examples
