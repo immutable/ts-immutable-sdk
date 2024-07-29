@@ -12,6 +12,21 @@ env:
   NX_CLOUD_ACCESS_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_NX_TOKEN }}
 
 jobs:
+  syncpack:
+    name: Syncpack
+    runs-on: ubuntu-latest-4-cores
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+      - name: setup
+        uses: ./.github/actions/pr-setup
+
+      - name: Syncpack
+        run: yarn syncpack:check
+
   typecheck:
     name: Typecheck
     runs-on: ubuntu-latest-4-cores
