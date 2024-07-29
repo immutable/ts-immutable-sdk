@@ -19,9 +19,10 @@
     "no-plusplus": ["off"],
     "max-classes-per-file": ["off"],
     "max-len": [
-      "error",
+      "error", 
       { "code": 120, "ignoreComments": true, "ignoreTrailingComments": true }
-    ],
+    ],    
+    "react/button-has-type": ["off"],
     "no-restricted-syntax": [
       "error",
       "ForInStatement",
@@ -30,5 +31,14 @@
     ],
     "import/no-extraneous-dependencies": ["off"],
     "@typescript-eslint/return-await": ["off"]
-  }
+  },
+  "overrides": [
+    {
+      "files": ["./examples/passport/**"],
+      "rules": {
+        "@typescript-eslint/no-unused-vars": "warn",
+        "no-underscore-dangle": "warn"
+      }
+    }
+  ]
 }
