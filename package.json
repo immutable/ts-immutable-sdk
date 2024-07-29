@@ -97,10 +97,6 @@
       "packages/minting-backend/sdk",
       "examples/passport/identity-with-nextjs",
       "examples/passport/wallets-connect-with-nextjs"
-    ],
-    "nohoist": [
-      "samples/**",
-      "examples/**"
     ]
   }
 }
