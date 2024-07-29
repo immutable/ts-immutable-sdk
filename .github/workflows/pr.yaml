@@ -52,7 +52,7 @@ jobs:
       - name: setup
         uses: ./.github/actions/setup
       - name: Build
-        run: yarn nx affected --target=build --parallel=5 --exclude=@imtbl/checkout-widgets-sample-app
+        run: yarn build
 
   typecheck:
     name: Typecheck
