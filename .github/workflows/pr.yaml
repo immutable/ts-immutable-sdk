@@ -52,7 +52,7 @@ jobs:
       - name: setup
         uses: ./.github/actions/setup
       - name: Build
-        run: yarn build
+        run: yarn nx affected --target=build --parallel=5
 
   typecheck:
     name: Typecheck
@@ -140,7 +140,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: test
-        run: yarn nx run func-tests-imx:func-test:ci
+        run: yarn workspace func-tests-imx ci
 
   func-test-zkevm:
     name: zkevm func tests
@@ -166,7 +166,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: test
-        run: yarn nx run func-tests-zkevm:func-test:ci
+        run: yarn workspace func-tests-zkevm test:ci
 
   smoke-test:
     name: smoke test
@@ -183,4 +183,4 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: test
-        run: yarn nx affected --target=smoke-test --parallel=5
+        run: yarn workspace esm-sdk-test test

@@ -33,8 +33,8 @@
   "packageManager": "yarn@3.6.1",
   "scripts": {
     "compile": "npx hardhat compile",
-    "func-test": "yarn compile && jest",
-    "func-test:ci": "yarn compile && TAGS=\"not @skip and not @slow\" jest",
+    "test": "yarn compile && jest",
+    "test:ci": "yarn compile && TAGS=\"not @skip and not @slow\" jest",
     "postinstall": "cd ../../.. && husky install",
     "postpack": "pinst --enable",
     "prepack": "pinst --disable"
