@@ -7,6 +7,6 @@
   },
   "main": "index.js",
   "scripts": {
-    "test": "node index.mjs"
+    "smoke-test": "node index.mjs"
   }
 }

@@ -22,7 +22,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
       - name: setup
-        uses: ./.github/actions/pr-setup
+        uses: ./.github/actions/setup
 
       - name: Syncpack
         run: yarn syncpack:check
@@ -155,7 +155,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: test
-        run: yarn workspace func-tests-imx ci
+        run: yarn nx run func-tests-imx:func-test:ci
 
   func-test-zkevm:
     name: zkevm func tests
@@ -181,7 +181,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: test
-        run: yarn workspace func-tests-zkevm test:ci
+        run: yarn nx run func-tests-zkevm:func-test:ci
 
   smoke-test:
     name: smoke test
@@ -198,4 +198,4 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: test
-        run: yarn workspace esm-sdk-test test
+        run: yarn nx run esm-sdk-test:smoke-test
