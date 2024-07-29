@@ -24,4 +24,7 @@ runs:
     - name: install depdenencies
       if: steps.restore-cache-node_modules.outputs.cache-hit != 'true'
       shell: bash
-      run: yarn install --immutable
+      run: |
+        yarn install --immutable
+        ls -l packages/checkout/widgets-sample-app/node_modules/vite/bin
+        
