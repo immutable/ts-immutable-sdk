@@ -11118,13 +11118,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/mocha@npm:>=9.1.0":
-  version: 10.0.7
-  resolution: "@types/mocha@npm:10.0.7"
-  checksum: 5e411ed8aa19228e322b2fb0075c4d822322fb157d1adfc8620a798748035d430dc16421bdc7d7f84f118481b8c8c63ec86b95757a8acc926ddc3d737fbffc3a
-  languageName: node
-  linkType: hard
-
 "@types/ms@npm:*":
   version: 0.7.31
   resolution: "@types/ms@npm:0.7.31"
@@ -20448,7 +20441,6 @@ __metadata:
     "@typechain/ethers-v6": ^0.5.0
     "@typechain/hardhat": ^9.0.0
     "@types/chai": ^4.2.0
-    "@types/mocha": ">=9.1.0"
     "@types/node": ^20.10.1
     chai: ^4.2.0
     dotenv: ^16.3.1

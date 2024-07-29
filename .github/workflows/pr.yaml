@@ -139,7 +139,7 @@ jobs:
       - name: setup
         uses: ./.github/actions/setup
 
-      - name: SDK Level Test
+      - name: test
         run: yarn nx run func-tests-imx:func-test:ci
 
   func-test-zkevm:
@@ -170,11 +170,11 @@ jobs:
       - name: setup
         uses: ./.github/actions/setup
 
-      - name: SDK Level Test
+      - name: test
         run: yarn nx run func-tests-zkevm:func-test:ci
 
   smoke-test:
-    name: SDK Level Test
+    name: smoke test
     runs-on: ubuntu-latest-4-cores
     needs:
       - build
@@ -187,5 +187,5 @@ jobs:
       - name: setup
         uses: ./.github/actions/setup
 
-      - name: SDK Level Test
+      - name: test
         run: yarn nx affected --target=smoke-test --parallel=5
