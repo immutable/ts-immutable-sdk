@@ -560,19 +560,7 @@ window.callFunction = async (jsonData: string) => {
       }
       case PASSPORT_FUNCTIONS.imx.transfer: {
         const unsignedTransferRequest = JSON.parse(data);
-
-        // throw new Error('Transfer is not supported in this version');
-
-        // const response = await getProvider().transfer(unsignedTransferRequest);
-        let response;
-        for (let i = 0; i < 50; i++) {
-          // eslint-disable-next-line no-await-in-loop
-          response = await getProvider().transfer(unsignedTransferRequest);
-          console.log(`transfer ${i}::response`, response);
-        }
-
-        console.log('PASSPORT_FUNCTIONS.imx.transfer::response', response);
-
+        const response = await getProvider().transfer(unsignedTransferRequest);
         trackDuration(moduleName, 'performedImxTransfer', mt(markStart), {
           requestId,
           transferRequest: JSON.stringify(unsignedTransferRequest),
@@ -761,7 +749,8 @@ window.callFunction = async (jsonData: string) => {
         break;
     }
   } catch (error: any) {
-    console.log('!!!!callFunction error!!!!', error);
+    console.log(`Error in callFunction: ${error}`);
+
     let wrappedError;
 
     if (!(error instanceof Error)) {
@@ -786,7 +775,8 @@ window.callFunction = async (jsonData: string) => {
       error: wrappedError.message,
     });
 
-    console.log('callFunction error', error);
+    console.log('callFunction::error', wrappedError);
+    console.log('callFunction::errorType', errorType);
     callbackToGame({
       responseFor: fxName,
       requestId,
