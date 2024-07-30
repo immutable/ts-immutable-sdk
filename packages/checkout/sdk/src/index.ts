@@ -143,6 +143,13 @@ export type {
   WalletInfo,
 } from './types';
 
+export {
+  PostMessageHandler,
+  PostMessageHandlerConfiguration,
+  PostMessageHandlerEventType,
+  PostMessageData,
+} from './postMessageHandler';
+
 export type { ErrorType } from './errors';
 
 export { CheckoutErrorType } from './errors';

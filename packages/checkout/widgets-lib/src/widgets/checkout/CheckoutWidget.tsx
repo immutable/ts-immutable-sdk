@@ -1,6 +1,22 @@
-import { useEffect, useState } from 'react';
-import { Box } from '@biom3/react';
-import { CheckoutWidgetParams, Checkout, CheckoutWidgetConfiguration } from '@imtbl/checkout-sdk';
+import {
+  Checkout,
+  CheckoutWidgetConfiguration,
+  CheckoutWidgetParams,
+  WalletProviderName,
+} from '@imtbl/checkout-sdk';
+import {
+  useEffect,
+  useMemo,
+  useReducer,
+} from 'react';
+import {
+  CheckoutActions,
+  checkoutReducer,
+  initialCheckoutState,
+} from './context/CheckoutContext';
+import { CheckoutContextProvider } from './context/CheckoutContextProvider';
+import { CheckoutAppIframe } from './views/CheckoutAppIframe';
+// import { CHECKOUT_APP_URL } from '../../lib/constants';
 
 import { getIframeURL } from './functions/iframeParams';
 
@@ -14,32 +30,53 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
   const { config, checkout, params } = props;
   const { environment, publishableKey } = checkout.config;
 
-  const [iframeURL, setIframeURL] = useState<string>();
+  const [checkoutState, checkoutDispatch] = useReducer(checkoutReducer, initialCheckoutState);
+  const checkoutReducerValues = useMemo(
+    () => ({ checkoutState, checkoutDispatch }),
+    [checkoutState, checkoutDispatch],
+  );
 
   useEffect(() => {
     if (!publishableKey) return;
 
-    const url = getIframeURL(params, config, environment, publishableKey);
-    setIframeURL(url);
+    const iframeUrl = getIframeURL(params, config, environment, publishableKey);
+
+    checkoutDispatch({
+      payload: {
+        type: CheckoutActions.SET_IFRAME_URL,
+        iframeUrl,
+      },
+    });
   }, [params, config, environment, publishableKey]);
 
-  // TODO:
-  // on iframe load error, go to error view 500
-  // on iframe loading, show loading view, requires iframe to trigger an initialised event
+  useEffect(() => {
+    checkoutDispatch({
+      payload: {
+        type: CheckoutActions.SET_CHECKOUT,
+        checkout,
+      },
+    });
 
-  if (!iframeURL) {
-    return null;
-  }
+    const connectProvider = async () => {
+      const createProviderResult = await checkout.createProvider({ walletProviderName: WalletProviderName.METAMASK });
+
+      const connectResult = await checkout.connect({ provider: createProviderResult.provider });
+
+      checkoutDispatch({
+        payload: {
+          type: CheckoutActions.SET_PROVIDER,
+          provider: connectResult.provider,
+        },
+      });
+    };
+
+    connectProvider();
+  }, [checkout]);
 
   return (
-    <Box
-      rc={<iframe id="checkout-app" src={iframeURL} title="checkout" />}
-      sx={{
-        w: '100%',
-        h: '100%',
-        border: 'none',
-        boxShadow: 'none',
-      }}
-    />
+    <CheckoutContextProvider values={checkoutReducerValues}>
+      CheckoutWidgetComponent
+      <CheckoutAppIframe />
+    </CheckoutContextProvider>
   );
 }

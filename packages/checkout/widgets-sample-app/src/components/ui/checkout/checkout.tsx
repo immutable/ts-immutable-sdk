@@ -62,7 +62,7 @@ function CheckoutUI() {
           onClick={() => {
             checkoutWidget.mount("checkout", {
               flow: CheckoutFlowType.CONNECT,
-              blocklistWalletRdns: ["io.metamask"],
+              blocklistWalletRdns: [],
             });
           }}
         >

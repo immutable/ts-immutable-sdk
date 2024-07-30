@@ -126,6 +126,7 @@ export const getIframeURL = (
 
   const language = params.language || config.language;
 
+  // const baseUrl = 'http://localhost:3001';
   const baseUrl = CHECKOUT_APP_URL[environment];
   const queryParams = getIframeParams(params, config);
 
