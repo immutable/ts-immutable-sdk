@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This script is used to update the SDK version in the output files
+# This script is used to update the SDK version in the output files in main branch
 # It is run as part of the build process and expects the following environment variables to be set:
 # - TS_SDK_TAG: The tag of the SDK
 # - TS_SDK_HASH: The git hash of the tag
@@ -24,6 +24,17 @@ done
 
 # Check if running in a CI environment
 if [ -n "$CI" ]; then
+  # Get the current branch name
+  current_branch=$(git rev-parse --abbrev-ref HEAD)
+
+  # Check if the current branch is "main"
+  if [ "$current_branch" == "main" ]; then
+      echo "You are on the main branch. Continuing..."
+  else
+      echo "You are not on the main branch. Exiting..."
+      exit 0
+  fi
+
   # Check if TS_SDK_TAG environment variable is set
   if [ -z "$TS_SDK_TAG" ]; then
       echo "TS_SDK_TAG environment variable not found. Exiting..."
