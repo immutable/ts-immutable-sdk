@@ -61,7 +61,6 @@ export const useCheckoutContext = () => {
     const error = new Error(
       'useCheckoutContext must be used within a <ImtblProvider />',
     );
-    console.log(error);
     throw error;
   }
 
