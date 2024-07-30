@@ -10,6 +10,7 @@ import {
   CheckoutState,
 } from './CheckoutContext';
 import { ProviderRelay } from './ProviderRelay';
+import { CHECKOUT_APP_URL } from '../../../lib';
 
 type CheckoutContextProviderProps = {
   values: {
@@ -19,23 +20,22 @@ type CheckoutContextProviderProps = {
 };
 export function CheckoutContextProvider({ values, children }: CheckoutContextProviderProps) {
   const { checkoutState, checkoutDispatch } = values;
-
+  const { checkout } = checkoutState;
   const { provider, checkoutAppIframe, postMessageHandler } = checkoutState;
 
   useEffect(() => {
-    if (!checkoutAppIframe) return;
+    if (!checkoutAppIframe || !checkout) return;
 
     checkoutDispatch({
       payload: {
         type: CheckoutActions.SET_POST_MESSAGE_HANDLER,
         postMessageHandler: new PostMessageHandler({
-          // TODO get the target origin from config
-          targetOrigin: 'http://localhost:3001',
+          targetOrigin: CHECKOUT_APP_URL[checkout.config.environment],
           eventTarget: checkoutAppIframe,
         }),
       },
     });
-  }, [checkoutAppIframe]);
+  }, [checkoutAppIframe, checkout]);
 
   useEffect(() => {
     if (!provider || !postMessageHandler) return;
