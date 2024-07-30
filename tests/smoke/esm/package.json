@@ -1,12 +1,12 @@
 {
-  "name": "esm-sdk",
+  "name": "esm-sdk-test",
+  "description": "Node ESM smoke test",
   "version": "1.0.0",
+  "dependencies": {
+    "@imtbl/sdk": "0.0.0"
+  },
   "main": "index.js",
   "scripts": {
-    "test": "node index.mjs"
-  },
-  "description": "Node ESM smoke test",
-  "dependencies": {
-    "@imtbl/sdk": "file:../../../sdk"
+    "smoke-test": "node index.mjs"
   }
 }

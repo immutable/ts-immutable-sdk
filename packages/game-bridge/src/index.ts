@@ -68,6 +68,7 @@ const initRequestId = '1';
 let passportClient: passport.Passport | null;
 let providerInstance: provider.IMXProvider | null;
 let zkEvmProviderInstance: passport.Provider | null;
+let versionInfo: VersionInfo | null;
 
 declare global {
   interface Window {
@@ -106,6 +107,17 @@ type RequestAccountsCallbackData = CommonCallbackData & {
 };
 
 type CallbackData = CommonCallbackData | InitDeviceFlowCallbackData | RequestAccountsCallbackData;
+
+type VersionInfo = {
+  gameBridgeTag: string;
+  gameBridgeSha: string;
+  engine: string;
+  engineVersion: string;
+  engineSdkVersion: string;
+  platform: string;
+  platformVersion: string;
+  deviceModel: string;
+};
 
 const callbackToGame = (data: CallbackData) => {
   const message = JSON.stringify(data);
@@ -231,7 +243,7 @@ window.callFunction = async (jsonData: string) => {
 
         // version check
         const { engineVersion } = request;
-        const versionCheckParams = {
+        versionInfo = {
           gameBridgeTag: sdkVersionTag,
           gameBridgeSha: sdkVersionSha,
           engine: engineVersion.engine,
@@ -241,10 +253,10 @@ window.callFunction = async (jsonData: string) => {
           platformVersion: engineVersion.platformVersion,
           deviceModel: engineVersion.deviceModel ?? 'N/A',
         };
-        console.log(`Version check: ${JSON.stringify(versionCheckParams)}`);
+        console.log(`Version check: ${JSON.stringify(versionInfo)}`);
 
         trackDuration(moduleName, 'completedInitGameBridge', mt(markStart), {
-          ...versionCheckParams,
+          ...versionInfo,
         });
         break;
       }
@@ -766,6 +778,7 @@ window.callFunction = async (jsonData: string) => {
       fxName,
       requestId,
       errorType,
+      ...versionInfo,
     });
     trackDuration(moduleName, 'failedCallFunction', mt(markStart), {
       fxName,

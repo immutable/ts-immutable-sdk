@@ -1,7 +1,7 @@
 # Workflow to manually trigger a build of the game bridge with the selected SDK tag
 # and create a PR with the changes to the game SDK repository.
 
-name: Build Game Bridge 
+name: Build Game Bridge
 
 on:
   workflow_dispatch:
@@ -57,36 +57,14 @@ jobs:
         if: ${{ steps.allowed_actors_check.outputs.ALLOWED_ACTOR != 'true' }}
         run: exit 1
 
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: ".nvmrc"
-          registry-url: https://registry.npmjs.org/
-          cache: "yarn"
-
-      - name: Restore cached node_modules
-        id: restore-cache-node_modules
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
-
-      - name: Install dependencies
-        if: steps.restore-cache-node_modules.outputs.cache-hit != 'true' 
-        run: yarn install --immutable
+      - name: setup
+        uses: ./.github/actions/setup
 
       - name: Set TS SDK hash
         run: echo "TS_SDK_HASH=$(git rev-parse HEAD)" >> $GITHUB_ENV
 
       - name: Build Game Bridge
-        run: cd packages/game-bridge && yarn build
-
-      # make artifacs avilable for download
-      - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: game-bridge-artifacts
-          path: ./packages/game-bridge/dist
+        run: yarn nx run @imtbl/game-bridge:build
 
       - name: Cache build artifacts
         uses: actions/cache@v4
@@ -119,7 +97,7 @@ jobs:
           key: ${{ runner.os }}-game-bridge-build-${{ env.TS_SDK_TAG }}
 
       - name: Check Cache Restore
-        if: steps.restore-cache-game-bridge-build.outputs.cache-hit != 'true' 
+        if: steps.restore-cache-game-bridge-build.outputs.cache-hit != 'true'
         run: echo "Game Bridge build cache not restored, exiting" && exit 1
 
       - name: Checkout Unity SDK Repo
