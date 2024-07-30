@@ -47,7 +47,7 @@
     "responselike": "^2.0.0"
   },
   "scripts": {
-    "build": "yarn workspace @imtbl/sdk updateDependencies && NODE_OPTIONS=--max-old-space-size=14366 nx run-many --target=build --projects=@imtbl/sdk && yarn syncpack:format && yarn wsrun -p @imtbl/sdk -a -m copyBrowserBundles",
+    "build": "yarn workspace @imtbl/sdk updateDependencies && NODE_OPTIONS=--max-old-space-size=14366 nx run-many --target=build --projects=@imtbl/sdk --skip-nx-cache && yarn syncpack:format && yarn wsrun -p @imtbl/sdk -a -m copyBrowserBundles",
     "build:examples": "yarn workspaces foreach -Apt --include='@examples/**' run build",
     "build:onlysdk": "NODE_OPTIONS=--max-old-space-size=14366 nx run-many --target=build --projects=@imtbl/sdk && yarn syncpack:format",
     "dev": "./dev.sh",
