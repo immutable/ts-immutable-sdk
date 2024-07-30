@@ -155,7 +155,7 @@
     "@openzeppelin/contracts": "3.4.2-solc-0.7"
   },
   "scripts": {
-    "build": "yarn updateDependencies && yarn regenModules && rm -rf dist && NODE_ENV=production node --max-old-space-size=14366 ../node_modules/rollup/dist/bin/rollup --config rollup.config.js && rm -rf dist/types && yarn syncpack:format && yarn copyBrowserBundles",
+    "build": "yarn updateDependencies && yarn regenModules && rm -rf dist && NODE_ENV=production node --max-old-space-size=14366 ../node_modules/rollup/dist/bin/rollup --config rollup.config.js && rm -rf dist/types && yarn copyBrowserBundles",
     "build:only": "rm -rf dist && NODE_ENV=production node --max-old-space-size=8192 ../node_modules/rollup/dist/bin/rollup --config rollup.config.js && rm -rf dist/types",
     "copyBrowserBundles": "node scripts/copyBrowserBundles.js",
     "generateIndex": "node scripts/generateIndex.js",
