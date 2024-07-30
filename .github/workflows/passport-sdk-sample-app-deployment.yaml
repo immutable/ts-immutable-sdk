@@ -26,37 +26,18 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
-
-      - name: Cache node modules
-        uses: actions/cache@v3
-        id: yarn-cache
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-
-      - name: Install dependencies
-        run: yarn install --immutable
+      - name: setup
+        uses: ./.github/actions/setup
 
       - name: Update SDK version
         run: yarn workspace @imtbl/passport-sdk-sample-app update-sdk-version
 
-      - name: Build
-        run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build
-
-      - name: Build Passport sample app
-        run: yarn workspace @imtbl/passport-sdk-sample-app build
-
       - name: Export Passport sample app
-        run: yarn workspace @imtbl/passport-sdk-sample-app export
+        run: yarn nx run @imtbl/passport-sdk-sample-app:export
 
       - name: Upload to S3
         run: |
