@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Checkout,
   CheckoutFlowType,
@@ -7,19 +6,17 @@ import {
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import {
-  useContext,
   useEffect,
   useMemo,
   useReducer,
 } from 'react';
-import { Box } from '@biom3/react';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
-  CheckoutActions, CheckoutContext,
+  CheckoutActions,
   checkoutReducer,
   initialCheckoutState,
 } from './context/CheckoutContext';
-import { CheckoutContextProvider, useCheckoutContext } from './context/CheckoutContextProvider';
+import { CheckoutContextProvider } from './context/CheckoutContextProvider';
 import { CheckoutAppIframe } from './views/CheckoutAppIframe';
 // import { CHECKOUT_APP_URL } from '../../lib/constants';
 
@@ -35,6 +32,7 @@ const getIframeURL = (
   publishableKey: string,
 ): string => {
   const { language, flow, ...restParams } = params;
+  // TODO get baseUrl from config/params
   // environment, flow, params, configs
   // const baseUrl = CHECKOUT_APP_URL[environment];
   const baseUrl = 'http://localhost:3001';
@@ -42,8 +40,6 @@ const getIframeURL = (
   const queryParams = new URLSearchParams(
     restParams as Record<string, string>,
   ).toString();
-
-  console.log('🐛 ~ queryParams:', queryParams);
 
   switch (flow) {
     case CheckoutFlowType.CONNECT:
@@ -59,7 +55,6 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
   const { config, checkout, params } = props;
   const { environment } = config;
   const { publishableKey } = checkout.config;
-  // const [checkoutState, checkoutDispatch] = useCheckoutContext();
 
   const [checkoutState, checkoutDispatch] = useReducer(checkoutReducer, initialCheckoutState);
   const checkoutReducerValues = useMemo(
@@ -71,10 +66,6 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
     if (!publishableKey || !params.language) return;
 
     const iframeUrl = getIframeURL(params, environment, publishableKey);
-
-    // setIframeURL(iframeUrl);
-
-    console.log('@@@@ CheckoutWidget iframeUrl', iframeUrl);
 
     checkoutDispatch({
       payload: {
@@ -93,7 +84,6 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
     });
 
     const connectProvider = async () => {
-      console.log('@@@@@ connectProvider()');
       const createProviderResult = await checkout.createProvider({ walletProviderName: WalletProviderName.METAMASK });
 
       const connectResult = await checkout.connect({ provider: createProviderResult.provider });
@@ -109,31 +99,7 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
     connectProvider();
   }, [checkout]);
 
-  // const onIframeLoad = () => {
-  //   if (!iframeRef.current?.contentWindow) return;
-
-  //   const postMessageHandler = new PostMessageHandler({
-  //     targetOrigin: iframeURL!,
-  //     eventTarget: iframeRef.current.contentWindow,
-  //   });
-
-  //   // postMessageHandler.
-
-  //   //  register providerRelay with it
-  // };
-
-  // TODO:
-  // on iframe load error, go to error view 500
-  // on iframe loading, show loading view, requires iframe to trigger an initialised event
-
-  // if (!iframeURL) {
-  //   return null;
-  // }
-
   return (
-    // <Box>
-    //   Hello World
-    // </Box>
     <CheckoutContextProvider values={checkoutReducerValues}>
       CheckoutWidgetComponent
       <CheckoutAppIframe />
