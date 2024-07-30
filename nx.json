@@ -35,6 +35,13 @@
       "dependsOn": ["^build"],
       "outputs": ["{projectRoot}/dist"],
       "cache": true
+    },
+    "export": {
+      "dependsOn": [
+        "build"
+      ],
+      "outputs": ["{projectRoot}/out"],
+      "cache": true
     }
   },
   "defaultBase": "main",

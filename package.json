@@ -103,7 +103,6 @@
       "examples/passport/**"
     ],
     "nohoist": [
-      "samples/**",
       "examples/**",
       "tests/**"
     ]
