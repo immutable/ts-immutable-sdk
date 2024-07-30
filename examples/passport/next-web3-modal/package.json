@@ -2,7 +2,7 @@
   "name": "@examples/next-web3-modal",
   "version": "0.1.0",
   "dependencies": {
-    "@imtbl/sdk": "^1.35.0",
+    "@imtbl/sdk": "latest",
     "@tanstack/react-query": "^5.37.1",
     "@web3modal/wagmi": "^4.1.11",
     "next": "14.2.3",

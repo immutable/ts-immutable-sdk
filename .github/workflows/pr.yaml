@@ -1,0 +1,201 @@
+name: PR
+
+on:
+  pull_request:
+    branches:
+      - main
+  merge_group:
+    branches:
+      - main
+
+env:
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_NX_TOKEN }}
+
+jobs:
+  syncpack:
+    name: Syncpack
+    runs-on: ubuntu-latest-4-cores
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+      - name: setup
+        uses: ./.github/actions/setup
+
+      - name: Syncpack
+        run: yarn syncpack:check
+
+  detect:
+    name: Detect Node engine version change
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get Node engine version from package.json
+        id: get_package_json_node_engine_version
+        run: |
+          node_engine_major_version=$(jq -r '.engines.node' ./sdk/package.json | sed 's/^>=//' | cut -d. -f1)
+          echo "::set-output name=node_engine_major_version::$node_engine_major_version"
+
+      - name: Get Node.js version from .nvmrc
+        id: get_nvmrc_node_version
+        run: echo "::set-output name=nvmrc_node_version::$(head -n 1 .nvmrc | cut -d. -f1)"
+
+      - name: Check Node.js engine version change
+        run: |
+          package_version_major=$(echo "${{ steps.get_package_json_node_engine_version.outputs.node_engine_major_version }}")
+          nvmrc_version_major=$(echo "${{ steps.get_nvmrc_node_version.outputs.nvmrc_node_version }}")
+          if [ "$package_version_major" != "$nvmrc_version_major" ]; then
+            echo "Node.js engine version has changed"
+            exit 1
+          else
+            echo "Node.js engine version has not changed"
+          fi
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest-8-cores
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+      - name: setup
+        uses: ./.github/actions/setup
+      - name: Build
+        run: yarn nx affected --target=build --parallel=5 --exclude=@imtbl/checkout-widgets-sample-app
+
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-latest-4-cores
+    needs:
+      - build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+      - name: setup
+        uses: ./.github/actions/setup
+
+      - name: Typecheck
+        run: yarn typecheck
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest-8-cores
+    needs:
+      - build
+    env:
+      NODE_OPTIONS: --max-old-space-size=14366
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+      - name: setup
+        uses: ./.github/actions/setup
+
+      - name: Test
+        run: yarn test --configuration=ci
+
+      - name: Upload SDK test coverage artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverages
+          path: ./packages/**/coverage/*
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest-4-cores
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+      - name: setup
+        uses: ./.github/actions/setup
+
+      - name: Lint
+        run: yarn lint
+
+  func-test-imx:
+    name: imx func tests
+    runs-on: ubuntu-latest-4-cores
+    needs:
+      - build
+    env:
+      NETWORK: sepolia
+      TEST_ALCHEMY_API_KEY: ${{ secrets.TEST_ALCHEMY_API_KEY }}
+      PUBLIC_API_URL: "https://api.sandbox.x.immutable.com/v1"
+      TEST_STARK_CONTRACT_ADDRESS: "0x2d5C349fD8464DA06a3f90b4B0E9195F3d1b7F98"
+      TEST_REGISTRATION_CONTRACT_ADDRESS: "0xDbA6129C02E69405622fAdc3d5A7f8d23eac3b97"
+      TEST_TOKEN_ADDRESS: "0xfA5539fBEd27887EEbb2515672D80412D1A3ADa3"
+      TEST_WALLET1_PRIVATE_KEY: ${{ secrets.TEST_WALLET1_PRIVATE_KEY }}
+      TEST_WALLET1_STARK_PRIVATE_KEY: ${{ secrets.TEST_WALLET1_STARK_PRIVATE_KEY }}
+      TEST_WALLET2_PRIVATE_KEY: ${{ secrets.TEST_WALLET2_PRIVATE_KEY }}
+      TEST_WALLET2_STARK_PRIVATE_KEY: ${{ secrets.TEST_WALLET2_STARK_PRIVATE_KEY }}
+      TEST_WALLET_BANKER_PRIVATE_KEY: ${{ secrets.TEST_WALLET_BANKER_PRIVATE_KEY }}
+      TEST_WALLET_BANKER_STARK_PRIVATE_KEY: ${{ secrets.TEST_WALLET_BANKER_STARK_PRIVATE_KEY }}
+      TEST_STARKEX_BATCH_SIZE: 500
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+      - name: setup
+        uses: ./.github/actions/setup
+
+      - name: test
+        run: yarn nx run func-tests-imx:func-test:ci
+
+  func-test-zkevm:
+    name: zkevm func tests
+    runs-on: ubuntu-latest-4-cores
+    needs:
+      - build
+    env:
+      ZKEVM_ORDERBOOK_BANKER: ${{ secrets.ZKEVM_ORDERBOOK_BANKER }}
+      ZKEVM_ORDERBOOK_ERC721: "0xBE8B131f39825282Ace9eFf99C0Bb14972417b49"
+      ZKEVM_ORDERBOOK_ERC1155: "0x2efB9B7810B1d1520c0822aa20F1889ABd2c2146"
+      SEAPORT_CONTRACT_ADDRESS: "0x7d117aA8BD6D31c4fa91722f246388f38ab1942c"
+      ZONE_CONTRACT_ADDRESS: "0x1004f9615E79462c711Ff05a386BdbA91a7628C3"
+      ZKEVM_RPC_ENDPOINT: "https://rpc.testnet.immutable.com"
+      ORDERBOOK_MR_API_URL: "https://api.sandbox.immutable.com"
+      ZKEVM_CHAIN_NAME: "imtbl-zkevm-testnet"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+      - name: setup
+        uses: ./.github/actions/setup
+
+      - name: test
+        run: yarn nx run func-tests-zkevm:func-test:ci
+
+  smoke-test:
+    name: smoke test
+    runs-on: ubuntu-latest-4-cores
+    needs:
+      - build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+      - name: setup
+        uses: ./.github/actions/setup
+
+      - name: test
+        run: yarn nx run esm-sdk-test:smoke-test

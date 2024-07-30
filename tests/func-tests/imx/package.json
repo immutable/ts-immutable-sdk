@@ -1,6 +1,12 @@
 {
   "name": "func-tests-imx",
-  "packageManager": "yarn@3.6.1",
+  "dependencies": {
+    "@ethersproject/providers": "^5.7.2",
+    "@ethersproject/units": "^5.7.0",
+    "@ethersproject/wallet": "^5.7.0",
+    "@imtbl/sdk": "0.0.0",
+    "dotenv": "^16.3.1"
+  },
   "devDependencies": {
     "@swc/jest": "^0.2.29",
     "@types/node": "^20.10.1",
@@ -12,21 +18,15 @@
     "ts-node": "^10.9.1",
     "typescript": "^5.3.2"
   },
-  "scripts": {
-    "test": "jest",
-    "test:ci": "TAGS=\"not @skip and not @slow\" jest",
-    "postinstall": "cd ../../.. && husky install",
-    "prepack": "pinst --disable",
-    "postpack": "pinst --enable"
-  },
-  "dependencies": {
-    "@ethersproject/providers": "^5.7.2",
-    "@ethersproject/units": "^5.7.0",
-    "@ethersproject/wallet": "^5.7.0",
-    "@imtbl/sdk": "file:../../../sdk",
-    "dotenv": "^16.3.1"
-  },
+  "packageManager": "yarn@3.6.1",
   "resolutions": {
     "@openzeppelin/contracts": "3.4.2-solc-0.7"
+  },
+  "scripts": {
+    "func-test": "jest",
+    "func-test:ci": "TAGS=\"not @skip and not @slow\" jest",
+    "postinstall": "cd ../../.. && husky install",
+    "postpack": "pinst --enable",
+    "prepack": "pinst --disable"
   }
 }

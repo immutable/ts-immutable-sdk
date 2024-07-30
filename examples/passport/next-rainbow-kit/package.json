@@ -2,7 +2,7 @@
   "name": "@examples/next-rainbow-kit",
   "version": "0.1.0",
   "dependencies": {
-    "@imtbl/sdk": "^1.35.0",
+    "@imtbl/sdk": "latest",
     "@rainbow-me/rainbowkit": "^2.0.7",
     "@tanstack/react-query": "^5.37.1",
     "next": "14.2.3",
