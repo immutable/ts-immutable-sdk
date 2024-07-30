@@ -130,7 +130,6 @@ export const getIframeURL = (
   publishableKey: string,
 ) => {
   const { flow } = params;
-
   const language = params.language || config.language;
 
   const baseURL = CHECKOUT_APP_URL[environment];

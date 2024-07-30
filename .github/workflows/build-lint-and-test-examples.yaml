@@ -1,0 +1,53 @@
+name: Build lint and test all examples
+
+on:
+  pull_request:
+    branches: [main]
+  merge_group:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest-4-cores
+    env:
+      NODE_OPTIONS: --max-old-space-size=14366
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: setup
+        uses: ./.github/actions/setup
+
+      - name: Build examples
+        run: yarn build:examples
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest-4-cores
+    env:
+      NODE_OPTIONS: --max-old-space-size=14366
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: setup
+        uses: ./.github/actions/setup
+
+      - name: Lint examples
+        run: yarn lint:examples
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest-4-cores
+    env:
+      NODE_OPTIONS: --max-old-space-size=14366
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: setup
+        uses: ./.github/actions/setup
+
+      - name: Test examples
+        run: yarn test:examples

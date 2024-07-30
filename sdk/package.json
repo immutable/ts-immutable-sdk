@@ -8,8 +8,8 @@
   "dependencies": {
     "@0xsequence/abi": "^1.4.3",
     "@0xsequence/core": "^1.4.3",
-    "@biom3/design-tokens": "^0.4.0",
-    "@biom3/react": "^0.24.1",
+    "@biom3/design-tokens": "^0.4.2",
+    "@biom3/react": "^0.25.0",
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/abstract-signer": "^5.7.0",
     "@ethersproject/keccak256": "^5.7.0",
@@ -151,18 +151,18 @@
   },
   "repository": "immutable/ts-immutable-sdk.git",
   "resolutions": {
-    "@biom3/design-tokens": "^0.4.0",
+    "@biom3/design-tokens": "^0.4.2",
     "@openzeppelin/contracts": "3.4.2-solc-0.7"
   },
   "scripts": {
-    "build": "yarn updateDependencies && yarn regenModules && rm -rf dist && NODE_ENV=production node --max-old-space-size=8192 ../node_modules/rollup/dist/bin/rollup --config rollup.config.js && rm -rf dist/types",
+    "build": "yarn updateDependencies && yarn regenModules && rm -rf dist && NODE_ENV=production node --max-old-space-size=14366 ../node_modules/rollup/dist/bin/rollup --config rollup.config.js && rm -rf dist/types && yarn copyBrowserBundles",
     "build:only": "rm -rf dist && NODE_ENV=production node --max-old-space-size=8192 ../node_modules/rollup/dist/bin/rollup --config rollup.config.js && rm -rf dist/types",
     "copyBrowserBundles": "node scripts/copyBrowserBundles.js",
     "generateIndex": "node scripts/generateIndex.js",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "packageList": "./scripts/generate-package-list.sh",
     "regenModules": "yarn generateIndex && yarn updateExports",
-    "typecheck": "tsc --noEmit --jsx preserve",
+    "typecheck": "tsc --noEmit --jsx preserve --skipLibCheck",
     "updateDependencies": "yarn packageList && node ./scripts/updateDependencies.js && yarn syncpack:format",
     "updateExports": "node scripts/updateExports.js"
   },

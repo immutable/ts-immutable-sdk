@@ -121,7 +121,7 @@ export default function ConnectWithEtherJS() {
   return (
     <>
       <h1>Passport Wallets - Sign EIP-712 message</h1>
-      {accountsState.length == 0
+      {accountsState.length === 0
       && <button onClick={passportLogin} disabled={loading}>Passport Login</button>}
       {accountsState.length >= 1 && (
       <>

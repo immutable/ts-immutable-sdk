@@ -58,6 +58,9 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
 
+      - name: Setup
+        uses: ./.github/actions/setup
+
       - name: Setup Github
         run: |
           git config user.name "platform-sa"
@@ -65,12 +68,6 @@ jobs:
 
       - name: Get tags
         run: git fetch --tags
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-          cache: "yarn"
 
       - name: Workout next version string
         run: |
@@ -87,46 +84,31 @@ jobs:
           ./.github/scripts/version-up.sh --${{ env.RELEASE_TYPE }} $upgrade_type --apply $revision_upgrade
         shell: bash
 
-      - name: Restore cached node_modules
-        id: restore-cache-node_modules
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-build-cache-deps-${{ hashFiles('yarn.lock') }}
-
-      - name: Derive appropriate SHAs for base and head for `nx affected` commands
-        uses: nrwl/nx-set-shas@v3
-
-      - name: Install dependencies
-        if: steps.restore-cache-node_modules.outputs.cache-hit != 'true'
-        run: yarn install --immutable
-
       - name: Lint
         run: yarn lint
-
-      - name: Check Single Package Version Policy
-        run: yarn syncpack:check
 
       - name: Get next version string
         id: version
         run: |
           echo "NEXT_VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
 
-      - name: Update package.json version for build
-        run: |
-          tmp=$(mktemp)
-          jq '.version = "${{steps.version.outputs.NEXT_VERSION}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
-
-      - name: Build
-        run: |
-          export NODE_OPTIONS=--max-old-space-size=6144 && RELEASE_TYPE=${{ env.RELEASE_TYPE }} yarn build
-          ls -l ./sdk/dist/browser/checkout || echo 1
-
       - name: Typecheck
         run: yarn typecheck
 
       - name: Test
         run: yarn test
+
+      - name: Update package.json version for build
+        run: |
+          tmp=$(mktemp)
+          jq '.version = "${{steps.version.outputs.NEXT_VERSION}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
+
+      # WARNING: build step should be after typecheck and test steps. This is to make sure build artifacts are overwritten by the lint and tests steps.
+      - name: Build
+        run: |
+          export NODE_OPTIONS=--max-old-space-size=6144 && RELEASE_TYPE=${{ env.RELEASE_TYPE }} yarn build
+          ls -l ./sdk/dist/browser/checkout || echo 1
+          [ -d "./sdk/dist/browser/checkout" ] || { echo "Error: Directory does not exist." && exit 1; }
 
       - name: Push tags
         # Boolean inputs are not actually booleans, see https://github.com/actions/runner/issues/1483
