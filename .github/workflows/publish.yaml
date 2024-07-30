@@ -109,6 +109,9 @@ jobs:
       - name: Test
         run: yarn test
 
+      - name: copy browser bundle
+        run: yarn copyBrowserBundles
+
       - name: Push tags
         # Boolean inputs are not actually booleans, see https://github.com/actions/runner/issues/1483
         if: (env.DRY_RUN) == 'false'
