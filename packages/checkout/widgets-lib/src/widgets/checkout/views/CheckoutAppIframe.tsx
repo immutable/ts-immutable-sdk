@@ -1,5 +1,4 @@
 import { Box } from '@biom3/react';
-import { PostMessageHandler } from '@imtbl/checkout-sdk';
 import {
   useRef,
 } from 'react';
@@ -24,14 +23,10 @@ export function CheckoutAppIframe() {
       return;
     }
 
-    // TODO get targetOrigin from config/params
     checkoutDispatch({
       payload: {
-        type: CheckoutActions.SET_POST_MESSAGE_HANDLER,
-        postMessageHandler: new PostMessageHandler({
-          targetOrigin: 'http://localhost:3001',
-          eventTarget: iframeRef.current.contentWindow,
-        }),
+        type: CheckoutActions.SET_CHECKOUT_APP_IFRAME,
+        checkoutAppIframe: iframeRef.current.contentWindow,
       },
     });
   };
