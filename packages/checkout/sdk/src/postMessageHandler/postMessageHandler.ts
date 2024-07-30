@@ -3,12 +3,12 @@ export type PostMessageHandlerConfiguration = {
   eventTarget: MinimalEventTargetInterface;
   eventSource?: MinimalEventSourceInterface;
 };
-
+// todo put these in a types file
 export enum PostMessageHandlerEventType {
   PROVIDER_RELAY = 'PROVIDER_RELAY',
 }
 
-type PostMessageData = {
+export type PostMessageData = {
   type: PostMessageHandlerEventType;
   payload: any;
 };

@@ -147,6 +147,7 @@ export {
   PostMessageHandler,
   PostMessageHandlerConfiguration,
   PostMessageHandlerEventType,
+  PostMessageData,
 } from './postMessageHandler';
 
 export type { ErrorType } from './errors';
