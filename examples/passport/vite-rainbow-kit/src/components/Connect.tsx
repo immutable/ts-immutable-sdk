@@ -12,7 +12,6 @@ export function Connect() {
       {({
         account,
         chain,
-        openAccountModal,
         openChainModal,
         openConnectModal,
         authenticationStatus,

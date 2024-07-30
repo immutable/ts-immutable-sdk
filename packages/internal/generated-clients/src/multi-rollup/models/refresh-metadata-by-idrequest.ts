@@ -18,7 +18,7 @@
 import { RefreshMetadataByID } from './refresh-metadata-by-id';
 
 /**
- * Request body for refreshing metadata by id
+ * Request body for refreshing metadata by id. Total size of this list should not exceed 228 KiB
  * @export
  * @interface RefreshMetadataByIDRequest
  */

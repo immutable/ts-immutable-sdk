@@ -61,7 +61,14 @@ export function WalletItem<
           left: 'base.spacing.x3',
         }}
       />
-      <MenuItem.Label size="medium" sx={offsetStyles}>
+      <MenuItem.Label
+        size="medium"
+        sx={{
+          ...offsetStyles,
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          WebkitLineClamp: 3,
+        }}
+      >
         {((recommended && isSmallScreenMode) && (
           <Badge
             variant="guidance"

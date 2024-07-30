@@ -1,16 +1,14 @@
 import {
   Checkout,
-  CheckoutFlowType,
+  CheckoutWidgetConfiguration,
   CheckoutWidgetParams,
   WalletProviderName,
 } from '@imtbl/checkout-sdk';
-import { Environment } from '@imtbl/config';
 import {
   useEffect,
   useMemo,
   useReducer,
 } from 'react';
-import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
   CheckoutActions,
   checkoutReducer,
@@ -20,41 +18,17 @@ import { CheckoutContextProvider } from './context/CheckoutContextProvider';
 import { CheckoutAppIframe } from './views/CheckoutAppIframe';
 // import { CHECKOUT_APP_URL } from '../../lib/constants';
 
+import { getIframeURL } from './functions/iframeParams';
+
 export type CheckoutWidgetInputs = {
   checkout: Checkout;
-  config: StrongCheckoutWidgetsConfig;
   params: CheckoutWidgetParams;
-};
-
-const getIframeURL = (
-  params: CheckoutWidgetInputs['params'],
-  environment: Environment,
-  publishableKey: string,
-): string => {
-  const { language, flow, ...restParams } = params;
-  // TODO get baseUrl from config/params
-  // environment, flow, params, configs
-  // const baseUrl = CHECKOUT_APP_URL[environment];
-  const baseUrl = 'http://localhost:3001';
-
-  const queryParams = new URLSearchParams(
-    restParams as Record<string, string>,
-  ).toString();
-
-  switch (flow) {
-    case CheckoutFlowType.CONNECT:
-      return `${baseUrl}/${publishableKey}/${language}/connect?${queryParams}`;
-    case CheckoutFlowType.WALLET:
-      return `${baseUrl}/${publishableKey}/${language}/wallet?${queryParams}`;
-    default:
-      return baseUrl;
-  }
+  config: CheckoutWidgetConfiguration;
 };
 
 export default function CheckoutWidget(props: CheckoutWidgetInputs) {
   const { config, checkout, params } = props;
-  const { environment } = config;
-  const { publishableKey } = checkout.config;
+  const { environment, publishableKey } = checkout.config;
 
   const [checkoutState, checkoutDispatch] = useReducer(checkoutReducer, initialCheckoutState);
   const checkoutReducerValues = useMemo(
@@ -63,9 +37,9 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
   );
 
   useEffect(() => {
-    if (!publishableKey || !params.language) return;
+    if (!publishableKey) return;
 
-    const iframeUrl = getIframeURL(params, environment, publishableKey);
+    const iframeUrl = getIframeURL(params, config, environment, publishableKey);
 
     checkoutDispatch({
       payload: {
@@ -73,7 +47,7 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
         iframeUrl,
       },
     });
-  }, [publishableKey, params]);
+  }, [params, config, environment, publishableKey]);
 
   useEffect(() => {
     checkoutDispatch({

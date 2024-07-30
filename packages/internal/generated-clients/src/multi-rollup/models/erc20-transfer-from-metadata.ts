@@ -13,6 +13,9 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import { ImmutableVerificationStatusEnum } from './immutable-verification-status-enum';
 
 /**
  * 
@@ -44,6 +47,12 @@ export interface ERC20TransferFromMetadata {
      * @memberof ERC20TransferFromMetadata
      */
     'amount': string;
+    /**
+     * 
+     * @type {ImmutableVerificationStatusEnum}
+     * @memberof ERC20TransferFromMetadata
+     */
+    'immutable_verification_status': ImmutableVerificationStatusEnum;
     /**
      * The token decimals
      * @type {number}

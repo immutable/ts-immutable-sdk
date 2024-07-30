@@ -6,7 +6,6 @@
     "rollup.config.*",
     "node_modules/",
     "dist/",
-    "examples/",
     "**sample-app**/",
     "**playground**/"
   ],
@@ -16,67 +15,14 @@
     "tsconfigRootDir": "."
   },
   "rules": {
-    "@typescript-eslint/naming-convention": [
-      "error",
-      {
-        "selector": "default",
-        "format": ["camelCase"]
-      },
-      {
-        "selector": "objectLiteralProperty",
-        "format": ["camelCase"]
-      },
-      {
-        "selector": "variable",
-        "format": ["camelCase", "UPPER_CASE"]
-      },
-      {
-        "selector": "variable",
-        "types": ["function"],
-        "format": ["camelCase"]
-      },
-      {
-        "selector": "function",
-        "format": ["camelCase"]
-      },
-      {
-        "selector": "parameter",
-        "format": ["camelCase"],
-        "leadingUnderscore": "allow"
-      },
-      {
-        "selector": "class",
-        "format": ["PascalCase"]
-      },
-      {
-        "selector": "enum",
-        "format": ["PascalCase"]
-      },
-      {
-        "selector": "enumMember",
-        "format": ["UPPER_CASE"]
-      },
-      {
-        "selector": "memberLike",
-        "modifiers": ["private"],
-        "format": ["camelCase", "UPPER_CASE"]
-      },
-      {
-        "selector": "typeLike",
-        "format": ["PascalCase"]
-      },
-      {
-        "selector": "typeProperty",
-        "format": ["camelCase"]
-      }
-    ],
     "import/prefer-default-export": ["off"],
     "no-plusplus": ["off"],
     "max-classes-per-file": ["off"],
     "max-len": [
-      "error",
+      "error", 
       { "code": 120, "ignoreComments": true, "ignoreTrailingComments": true }
-    ],
+    ],    
+    "react/button-has-type": ["off"],
     "no-restricted-syntax": [
       "error",
       "ForInStatement",
@@ -85,5 +31,14 @@
     ],
     "import/no-extraneous-dependencies": ["off"],
     "@typescript-eslint/return-await": ["off"]
-  }
+  },
+  "overrides": [
+    {
+      "files": ["./examples/passport/**"],
+      "rules": {
+        "@typescript-eslint/no-unused-vars": "warn",
+        "no-underscore-dangle": "warn"
+      }
+    }
+  ]
 }
