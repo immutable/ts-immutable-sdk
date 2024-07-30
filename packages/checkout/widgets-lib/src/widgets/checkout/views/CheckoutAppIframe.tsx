@@ -1,7 +1,5 @@
 import { Box } from '@biom3/react';
-import {
-  useRef,
-} from 'react';
+import { useRef } from 'react';
 import { CheckoutActions } from '../context/CheckoutContext';
 import { useCheckoutContext } from '../context/CheckoutContextProvider';
 
@@ -13,9 +11,7 @@ export interface LoadingHandoverProps {
 }
 export function CheckoutAppIframe() {
   const [checkoutState, checkoutDispatch] = useCheckoutContext();
-  const {
-    iframeUrl,
-  } = checkoutState;
+  const { iframeUrl } = checkoutState;
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const onIframeLoad = () => {
@@ -39,10 +35,11 @@ export function CheckoutAppIframe() {
     <Box
       rc={(
         <iframe
-          ref={iframeRef}
-          onLoad={onIframeLoad}
-          src={iframeUrl}
+          id="checkout-app"
           title="checkout"
+          ref={iframeRef}
+          src={iframeUrl}
+          onLoad={onIframeLoad}
         />
       )}
       sx={{
