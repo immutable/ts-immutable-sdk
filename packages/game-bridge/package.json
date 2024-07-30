@@ -14,8 +14,6 @@
     "parcel": "^2.8.3"
   },
   "scripts": {
-    "build": "yarn build:sdk && parcel build --no-cache --no-scope-hoist --no-optimize && yarn updateSdkVersion",
-    "build:sdk": "cd ../.. && yarn build",
     "d": "swc src -d dist --strip-leading-paths --ignore '**/*.test.*'",
     "build": "parcel build --no-cache --no-scope-hoist --no-optimize  && yarn updateSdkVersion",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
