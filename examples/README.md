@@ -130,7 +130,7 @@ In your examples find the parts of the code you want to use as code snippets and
 
 Labels only have to be unique in the file, but they should be verbose so it makes it easy to know what they are e.g. 
 
-e.g. `<product>-<feature>-<framework>-<example>-<library>-<tag>
+e.g. `<product>-<feature>-<framework>-<example>-<library>-<tag>`
 
 ```
 // #doc passport-wallets-nextjs-connect-eip1193-create
