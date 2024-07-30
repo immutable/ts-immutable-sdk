@@ -40,8 +40,8 @@ fi
   echo "major: $major minor: $minor patch: $patch"
   # Update versions in the browserBundle docs (https://docs.immutable.com/docs/x/sdks/typescript/#browser-bundle)
   FILES=(
-    docs/main/zkEVM/sdks/typescript/_zkevmtypescript.mdx
-    docs/main/sdks/typescript/_starkextypescript.mdx
+    docs/main/sdks/zkEVM/typescript/_zkevmtypescript.mdx
+    docs/main/x/sdks/typescript/_starkextypescript.mdx
   )
   for FILE in "${FILES[@]}"
   do
