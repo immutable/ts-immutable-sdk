@@ -16,7 +16,7 @@ export const isAddressSanctioned = async (
       isSanctioned = true;
     }
   } catch (error) {
-    // Keep isAddressSanctioned as false
+    return false;
   }
 
   return isSanctioned;
