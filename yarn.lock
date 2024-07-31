@@ -4078,6 +4078,7 @@ __metadata:
   dependencies:
     "@ethersproject/providers": ^5.7.2
     "@imtbl/sdk": latest
+    "@playwright/test": ^1.45.3
     "@tanstack/react-query": ^5.51.11
     "@types/node": ^20
     "@types/react": ^18.0.28
@@ -8806,7 +8807,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@playwright/test@npm:^1.45.2":
+"@playwright/test@npm:^1.45.2, @playwright/test@npm:^1.45.3":
   version: 1.45.3
   resolution: "@playwright/test@npm:1.45.3"
   dependencies:
