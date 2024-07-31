@@ -55,7 +55,10 @@ export const withPassportError = async <T>(
     }
 
     const passportError = new PassportError(errorMessage, customErrorType);
-    trackError('passport', customEventName || '', passportError);
+
+    if (customEventName) {
+      trackError('passport', customEventName, passportError);
+    }
 
     throw passportError;
   }
