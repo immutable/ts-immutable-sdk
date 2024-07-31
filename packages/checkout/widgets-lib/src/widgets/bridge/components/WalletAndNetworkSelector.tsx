@@ -11,7 +11,9 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { ChainId, WalletProviderName, WalletProviderRdns } from '@imtbl/checkout-sdk';
+import {
+  ChainId, isAddressSanctioned, WalletProviderName, WalletProviderRdns,
+} from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { useTranslation } from 'react-i18next';
 import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
@@ -207,10 +209,8 @@ export function WalletAndNetworkSelector() {
       const web3Provider = new Web3Provider(event.provider as any);
       const connectedProvider = await connectToProvider(checkout, web3Provider, changeAccount);
 
-      // cm-793 here
-      const providerAddress = (await connectedProvider.getSigner().getAddress()).toLowerCase();
-      // todo call sanction API
-      if (providerAddress) {
+      // CM-793 Check for sanctioned address
+      if (await isAddressSanctioned(await connectedProvider.getSigner().getAddress(), checkout.config.environment)) {
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,
@@ -339,10 +339,8 @@ export function WalletAndNetworkSelector() {
         const web3Provider = new Web3Provider(event.provider as any);
         const connectedProvider = await connectToProvider(checkout, web3Provider, false);
 
-        // cm-793 here
-        const providerAddress = (await connectedProvider.getSigner().getAddress()).toLowerCase();
-        // todo call sanction API
-        if (providerAddress) {
+        // CM-793 Check for sanctioned address
+        if (await isAddressSanctioned(await connectedProvider.getSigner().getAddress(), checkout.config.environment)) {
           viewDispatch({
             payload: {
               type: ViewActions.UPDATE_VIEW,
