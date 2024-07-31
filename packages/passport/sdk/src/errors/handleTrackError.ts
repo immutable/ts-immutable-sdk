@@ -7,4 +7,4 @@ export const handleError = (method: string, error: unknown) => {
 
   trackError('passport', method, wrappedError);
   return error;
-}
+};
