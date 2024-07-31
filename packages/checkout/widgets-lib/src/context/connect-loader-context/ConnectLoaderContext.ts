@@ -10,6 +10,7 @@ export enum ConnectionStatus {
   CONNECTED_WITH_NETWORK = 'CONNECTED_WITH_NETWORK',
   ERROR = 'ERROR',
   LOADING = 'LOADING',
+  CONNECTED_WITH_SANCTIONED_ADDRESS = 'CONNECTED_WITH_SANCTIONED_ADDRESS',
 }
 
 export interface ConnectLoaderState {
@@ -61,7 +62,7 @@ export interface SetProviderPayload {
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const ConnectLoaderContext = createContext<ConnectLoaderContextState>({
   connectLoaderState: initialConnectLoaderState,
-  connectLoaderDispatch: () => {},
+  connectLoaderDispatch: () => { },
 });
 
 export type Reducer<S, A> = (prevState: S, action: A) => S;

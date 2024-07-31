@@ -2,15 +2,15 @@ import { Web3Provider } from '@ethersproject/providers';
 import {
   ChainId,
   Checkout,
-  WalletProviderName,
   CheckoutErrorType,
+  WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import React, {
   useEffect,
   useMemo,
   useReducer,
 } from 'react';
-import { ErrorView } from '../../views/error/ErrorView';
+import { useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import {
   ConnectLoaderActions,
   ConnectLoaderContext,
@@ -18,12 +18,14 @@ import {
   connectLoaderReducer,
   initialConnectLoaderState,
 } from '../../context/connect-loader-context/ConnectLoaderContext';
+import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
+import { identifyUser } from '../../lib/analytics/identifyUser';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { ErrorView } from '../../views/error/ErrorView';
+import { ServiceType } from '../../views/error/serviceTypes';
+import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
 import { LoadingView } from '../../views/loading/LoadingView';
 import ConnectWidget from '../../widgets/connect/ConnectWidget';
-import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
-import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
-import { identifyUser } from '../../lib/analytics/identifyUser';
 
 export interface ConnectLoaderProps {
   children?: React.ReactNode;
@@ -174,6 +176,19 @@ export function ConnectLoader({
         const isConnected = (await isWalletConnected(web3Provider!));
         if (!isConnected) return;
 
+        // CM-793 Check for sanctions
+        const address = (await web3Provider!.getSigner().getAddress()).toLowerCase();
+        // todo call sanction API
+        if (address) {
+          connectLoaderDispatch({
+            payload: {
+              type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
+              connectionStatus: ConnectionStatus.CONNECTED_WITH_SANCTIONED_ADDRESS,
+            },
+          });
+          return;
+        }
+
         try {
           const currentNetworkInfo = await checkout.getNetworkInfo({ provider: web3Provider! });
 
@@ -229,38 +244,44 @@ export function ConnectLoader({
   return (
     <>
       {(connectionStatus === ConnectionStatus.LOADING) && (
-      <LoadingView loadingText="Loading" />
+        <LoadingView loadingText="Loading" />
       )}
       <ConnectLoaderContext.Provider value={connectLoaderReducerValues}>
         {(connectionStatus === ConnectionStatus.NOT_CONNECTED_NO_PROVIDER
-        || connectionStatus === ConnectionStatus.NOT_CONNECTED
-        || connectionStatus === ConnectionStatus.CONNECTED_WRONG_NETWORK) && (
-          <ConnectWidget
-            config={widgetConfig}
-            targetChainId={targetChainId}
-            web3Provider={provider}
-            checkout={checkout}
-            deepLink={deepLink}
-            sendCloseEventOverride={closeEvent}
-            allowedChains={allowedChains}
-          />
+          || connectionStatus === ConnectionStatus.NOT_CONNECTED
+          || connectionStatus === ConnectionStatus.CONNECTED_WRONG_NETWORK) && (
+            <ConnectWidget
+              config={widgetConfig}
+              targetChainId={targetChainId}
+              web3Provider={provider}
+              checkout={checkout}
+              deepLink={deepLink}
+              sendCloseEventOverride={closeEvent}
+              allowedChains={allowedChains}
+            />
         )}
         {/* If the user has connected then render the widget */}
         {connectionStatus === ConnectionStatus.CONNECTED_WITH_NETWORK && (children)}
       </ConnectLoaderContext.Provider>
       {connectionStatus === ConnectionStatus.ERROR && (
-      <ErrorView
-        onCloseClick={closeEvent}
-        onActionClick={() => {
-          connectLoaderDispatch({
-            payload: {
-              type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
-              connectionStatus: ConnectionStatus.NOT_CONNECTED,
-            },
-          });
-        }}
-        actionText="Try Again"
-      />
+        <ErrorView
+          onCloseClick={closeEvent}
+          onActionClick={() => {
+            connectLoaderDispatch({
+              payload: {
+                type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
+                connectionStatus: ConnectionStatus.NOT_CONNECTED,
+              },
+            });
+          }}
+          actionText="Try Again"
+        />
+      )}
+      {connectionStatus === ConnectionStatus.CONNECTED_WITH_SANCTIONED_ADDRESS && (
+        <ServiceUnavailableErrorView
+          service={ServiceType.SANCTION}
+          onCloseClick={closeEvent}
+        />
       )}
     </>
   );
