@@ -2,15 +2,15 @@ import { Web3Provider } from '@ethersproject/providers';
 import {
   ChainId,
   Checkout,
-  CheckoutErrorType,
   WalletProviderName,
+  CheckoutErrorType,
 } from '@imtbl/checkout-sdk';
 import React, {
   useEffect,
   useMemo,
   useReducer,
 } from 'react';
-import { useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { ErrorView } from '../../views/error/ErrorView';
 import {
   ConnectLoaderActions,
   ConnectLoaderContext,
@@ -18,15 +18,12 @@ import {
   connectLoaderReducer,
   initialConnectLoaderState,
 } from '../../context/connect-loader-context/ConnectLoaderContext';
-import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
-import { identifyUser } from '../../lib/analytics/identifyUser';
-import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { ErrorView } from '../../views/error/ErrorView';
-import { ServiceType } from '../../views/error/serviceTypes';
-import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
 import { LoadingView } from '../../views/loading/LoadingView';
 import ConnectWidget from '../../widgets/connect/ConnectWidget';
-import { CHECKOUT_CDN_BASE_URL } from '../../lib';
+import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { identifyUser } from '../../lib/analytics/identifyUser';
 
 export interface ConnectLoaderProps {
   children?: React.ReactNode;
@@ -151,13 +148,6 @@ export function ConnectLoader({
     return true;
   };
 
-  const checkIfAddressIsSanctioned = async (address, environment) => {
-    const response = await fetch(
-      `${CHECKOUT_CDN_BASE_URL[environment]}/v1/address/check/${address}`,
-    );
-    return response.json();
-  };
-
   useEffect(() => {
     if (window === undefined) {
       // eslint-disable-next-line no-console
@@ -183,28 +173,6 @@ export function ConnectLoader({
         // This will bypass the wallet list screen
         const isConnected = (await isWalletConnected(web3Provider!));
         if (!isConnected) return;
-
-        // CM-793 Check for sanctions
-        const address = (await web3Provider!.getSigner().getAddress()).toLowerCase();
-        // todo call sanction API
-        const sanctionsCheck = await checkIfAddressIsSanctioned(
-          address,
-          checkout.config.environment,
-        );
-
-        if (sanctionsCheck && sanctionsCheck.identifications.length > 0) {
-          // TODO: redirect to sanctions view
-        }
-
-        if (address) {
-          connectLoaderDispatch({
-            payload: {
-              type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
-              connectionStatus: ConnectionStatus.CONNECTED_WITH_SANCTIONED_ADDRESS,
-            },
-          });
-          return;
-        }
 
         try {
           const currentNetworkInfo = await checkout.getNetworkInfo({ provider: web3Provider! });
@@ -292,12 +260,6 @@ export function ConnectLoader({
             });
           }}
           actionText="Try Again"
-        />
-      )}
-      {connectionStatus === ConnectionStatus.CONNECTED_WITH_SANCTIONED_ADDRESS && (
-        <ServiceUnavailableErrorView
-          service={ServiceType.SANCTION}
-          onCloseClick={closeEvent}
         />
       )}
     </>
