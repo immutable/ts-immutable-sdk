@@ -24,7 +24,7 @@ import {
 } from '../../../lib/provider';
 import { getL1ChainId, getL2ChainId } from '../../../lib';
 import { getChainNameById } from '../../../lib/chains';
-import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { abbreviateAddress } from '../../../lib/addressUtils';
 import {
   useAnalytics,
@@ -206,6 +206,23 @@ export function WalletAndNetworkSelector() {
       }
       const web3Provider = new Web3Provider(event.provider as any);
       const connectedProvider = await connectToProvider(checkout, web3Provider, changeAccount);
+
+      // cm-793 here
+      const providerAddress = (await connectedProvider.getSigner().getAddress()).toLowerCase();
+      // todo call sanction API
+      if (providerAddress) {
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: {
+              type: SharedViews.SANCTIONED_ADDRESS_ERROR_VIEW,
+              error: new Error('Sanctioned address'),
+            },
+          },
+        });
+        return;
+      }
+
       await handleFromWalletConnectionSuccess(connectedProvider);
     },
     [checkout],
@@ -321,6 +338,22 @@ export function WalletAndNetworkSelector() {
         setToWallet(event);
         const web3Provider = new Web3Provider(event.provider as any);
         const connectedProvider = await connectToProvider(checkout, web3Provider, false);
+
+        // cm-793 here
+        const providerAddress = (await connectedProvider.getSigner().getAddress()).toLowerCase();
+        // todo call sanction API
+        if (providerAddress) {
+          viewDispatch({
+            payload: {
+              type: ViewActions.UPDATE_VIEW,
+              view: {
+                type: SharedViews.SANCTIONED_ADDRESS_ERROR_VIEW,
+                error: new Error('Sanctioned address'),
+              },
+            },
+          });
+          return;
+        }
 
         if (isWalletConnectProvider(connectedProvider)) {
           handleWalletConnectToWalletConnection(connectedProvider);
