@@ -24,6 +24,7 @@ import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewCon
 import { ConnectActions, ConnectContext } from '../context/ConnectContext';
 import { WalletItem } from './WalletItem';
 import {
+  SharedViews,
   ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
@@ -168,6 +169,23 @@ export function WalletList(props: WalletListProps) {
             provider: web3Provider,
             requestWalletPermissions: changeAccount,
           });
+
+          // CM-793 Check for sanctions
+          const address = (await connectResult.provider.getSigner().getAddress()).toLowerCase();
+          console.log('@@@@@@ SANCTION', address);
+          // todo call sanction API
+          if (address) {
+            viewDispatch({
+              payload: {
+                type: ViewActions.UPDATE_VIEW,
+                view: {
+                  type: SharedViews.SANCTIONED_ADDRESS_ERROR_VIEW,
+                  error: new Error('Sanctioned address'),
+                },
+              },
+            });
+            return;
+          }
 
           // Set up EIP-1193 provider event listeners for widget root instances
           addProviderListenersForWidgetRoot(connectResult.provider);
