@@ -4,6 +4,7 @@ import {
   ChainId,
   CheckoutErrorType,
   EIP6963ProviderDetail,
+  isAddressSanctioned,
   WalletProviderName,
   WalletProviderRdns,
 } from '@imtbl/checkout-sdk';
@@ -170,11 +171,11 @@ export function WalletList(props: WalletListProps) {
             requestWalletPermissions: changeAccount,
           });
 
-          // CM-793 Check for sanctions
-          const address = (await connectResult.provider.getSigner().getAddress()).toLowerCase();
-          console.log('@@@@@@ SANCTION', address);
-          // todo call sanction API
-          if (address) {
+          // CM-793 Check for sanctioned address
+          if (await isAddressSanctioned(
+            await connectResult.provider.getSigner().getAddress(),
+            checkout.config.environment,
+          )) {
             viewDispatch({
               payload: {
                 type: ViewActions.UPDATE_VIEW,
