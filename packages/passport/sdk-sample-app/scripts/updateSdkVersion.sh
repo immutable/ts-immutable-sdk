@@ -1,5 +1,7 @@
+#!/bin/bash
+
 if [[ "$OSTYPE" == "darwin"* ]]; then
-sed -i '' "s/__SDK_VERSION__/$(git describe --tags --abbrev=0)/g" $1
+find $1 -type f -name "*.js" -exec sed -i '' "s/__SDK_VERISON__/$(git describe --tags --abbrev=0)/g" {} +;
 else
-sed -i "s/__SDK_VERSION__/$(git describe --tags --abbrev=0)/g" $1
+find $1 -type f -name "*.js" -exec sed -i "s/__SDK_VERISON__/$(git describe --tags --abbrev=0)/g" {} +;
 fi
