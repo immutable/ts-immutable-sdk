@@ -34,7 +34,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Export Passport sample app
-        run: yarn nx run @imtbl/passport-sdk-sample-app:export
+        run: yarn nx run @imtbl/passport-sdk-sample-app:export --skip-nx-cache
 
       - name: Update SDK version
         run: yarn workspace @imtbl/passport-sdk-sample-app update-sdk-version
