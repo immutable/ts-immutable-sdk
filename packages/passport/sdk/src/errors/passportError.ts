@@ -41,6 +41,7 @@ export class PassportError extends Error {
 export const withPassportError = async <T>(
   fn: () => Promise<T>,
   customErrorType: PassportErrorType,
+  customEventName?: string,
 ): Promise<T> => {
   try {
     return await fn();
@@ -54,7 +55,7 @@ export const withPassportError = async <T>(
     }
 
     const passportError = new PassportError(errorMessage, customErrorType);
-    trackError('passport', customErrorType, passportError);
+    trackError('passport', customEventName || '', passportError);
 
     throw passportError;
   }

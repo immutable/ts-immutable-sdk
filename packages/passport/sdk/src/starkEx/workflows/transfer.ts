@@ -93,9 +93,9 @@ export async function transfer({
         transfer_id: responseData.transfer_id,
       };
     } catch (error) {
-      throw handleError('transfer', error);
+      throw handleError('imxTransfer', error);
     }
-  }, PassportErrorType.TRANSFER_ERROR);
+  }, PassportErrorType.TRANSFER_ERROR, 'imxTransfer');
 }
 
 export async function batchNftTransfer({
@@ -168,7 +168,7 @@ export async function batchNftTransfer({
         transfer_ids: response?.data.transfer_ids,
       };
     } catch (error) {
-      throw handleError('batchNftTransfer', error);
+      throw handleError('imxBatchNftTransfer', error);
     }
-  }, PassportErrorType.TRANSFER_ERROR);
+  }, PassportErrorType.TRANSFER_ERROR, 'imxBatchNftTransfer');
 }
