@@ -26,6 +26,7 @@ import { ServiceType } from '../../views/error/serviceTypes';
 import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
 import { LoadingView } from '../../views/loading/LoadingView';
 import ConnectWidget from '../../widgets/connect/ConnectWidget';
+import { CHECKOUT_CDN_BASE_URL } from '../../lib';
 
 export interface ConnectLoaderProps {
   children?: React.ReactNode;
@@ -150,6 +151,13 @@ export function ConnectLoader({
     return true;
   };
 
+  const checkIfAddressIsSanctioned = async (address, environment) => {
+    const response = await fetch(
+      `${CHECKOUT_CDN_BASE_URL[environment]}/v1/address/check/${address}`,
+    );
+    return response.json();
+  };
+
   useEffect(() => {
     if (window === undefined) {
       // eslint-disable-next-line no-console
@@ -179,6 +187,15 @@ export function ConnectLoader({
         // CM-793 Check for sanctions
         const address = (await web3Provider!.getSigner().getAddress()).toLowerCase();
         // todo call sanction API
+        const sanctionsCheck = await checkIfAddressIsSanctioned(
+          address,
+          checkout.config.environment,
+        );
+
+        if (sanctionsCheck && sanctionsCheck.identifications.length > 0) {
+          // TODO: redirect to sanctions view
+        }
+
         if (address) {
           connectLoaderDispatch({
             payload: {
