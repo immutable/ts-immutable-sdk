@@ -29,8 +29,6 @@ export enum CheckoutEventType {
   USER_ACTION = 'USER_ACTION',
 }
 
-export type CheckoutEmptyEvent = {};
-
 export type CheckoutProviderUpdatedEvent = {
   /** The connected provider. */
   provider: Web3Provider;
