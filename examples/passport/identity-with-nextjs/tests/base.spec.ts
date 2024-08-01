@@ -6,9 +6,7 @@ test.beforeEach(async ({ page }) => {
 
 test.describe("home page", () => {
   test("has title and heading", async ({ page }) => {
-    await expect(page).toHaveTitle("Passport Send Transaction Examples");
-    await expect(page.getByRole("heading", { name: "Send Transaction" })).toBeVisible();
+    await expect(page).toHaveTitle("Passport Identity Examples");
+    await expect(page.getByRole("heading", { name: "Passport Identity Examples" })).toBeVisible();
   });
 });
-
-

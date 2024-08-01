@@ -38,7 +38,7 @@ export default function Home() {
           onClick={loginWithEthersjs}
           type="button"
         >
-          Login With Ethers.js
+          Login With EtherJS
         </button>
         <button
           className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
