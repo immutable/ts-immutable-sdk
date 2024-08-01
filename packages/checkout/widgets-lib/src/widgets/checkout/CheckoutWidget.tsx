@@ -70,8 +70,6 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
       };
     }>,
   ) => {
-    console.log('🐛 ~ event:', event);
-
     const { type } = event.data;
     if (event.origin !== targetOrigin) return;
     if (!widgetEventsList.includes(type)) return;
