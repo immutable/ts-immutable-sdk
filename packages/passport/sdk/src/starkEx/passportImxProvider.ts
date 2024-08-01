@@ -143,6 +143,7 @@ export class PassportImxProvider implements IMXProvider {
     // Throw the stored error if the signers failed to initialise
     if (typeof signers === 'undefined') {
       if (typeof this.signerInitialisationError !== 'undefined') {
+        // eslint-disable-next-line @typescript-eslint/no-throw-literal
         throw this.signerInitialisationError;
       }
       throw new Error('Signers failed to initialise');
