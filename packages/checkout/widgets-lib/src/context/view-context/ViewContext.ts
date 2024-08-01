@@ -12,14 +12,12 @@ export enum SharedViews {
   ERROR_VIEW = 'ERROR_VIEW',
   SERVICE_UNAVAILABLE_ERROR_VIEW = 'SERVICE_UNAVAILABLE_ERROR_VIEW',
   TOP_UP_VIEW = 'TOP_UP_VIEW',
-  SANCTIONED_ADDRESS_ERROR_VIEW = 'SANCTIONED_ADDRESS_ERROR_VIEW',
 }
 
 export type SharedView =
   LoadingView
   | ErrorView
   | ServiceUnavailableErrorView
-  | SanctionedAddressErrorView
   | TopUpView;
 
 interface LoadingView extends ViewType {
@@ -32,13 +30,8 @@ export interface ErrorView extends ViewType {
   tryAgain?: () => Promise<any>
 }
 
-export interface ServiceUnavailableErrorView extends ViewType {
+interface ServiceUnavailableErrorView extends ViewType {
   type: SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW;
-  error: Error;
-}
-
-interface SanctionedAddressErrorView extends ViewType {
-  type: SharedViews.SANCTIONED_ADDRESS_ERROR_VIEW;
   error: Error;
 }
 

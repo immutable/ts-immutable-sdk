@@ -71,11 +71,11 @@
     "SERVICE_UNAVAILABLE_ERROR_VIEW": {
       "heading": {
         "swap": "귀하의 지역에서는 스왑이 가능하지 않습니다",
-        "sanction": "이 서비스는 귀하의 지역에서 이용할 수 없습니다"
+        "generic": "이 서비스는 귀하의 지역에서 이용할 수 없습니다"
       },
       "body": {
         "swap": "자세한 정보는 <quickswapLink>Quickswap</quickswapLink> 웹사이트를 참조하십시오.",
-        "sanction": "추가 지원이 필요하시면 <immutableSupport>Immutable</immutableSupport> 지원 페이지를 방문하세요."
+        "generic": "추가 지원이 필요하시면 <immutableSupport>Immutable</immutableSupport> 지원 페이지를 방문하세요."
       }
     },
     "LOADING_VIEW": {

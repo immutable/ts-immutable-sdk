@@ -259,9 +259,9 @@ export default function ConnectWidget({
                 onCloseClick={() => sendCloseEvent()}
               />
             )}
-          {view.type === SharedViews.SANCTIONED_ADDRESS_ERROR_VIEW && (
+          {view.type === SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW && (
             <ServiceUnavailableErrorView
-              service={ServiceType.SANCTION}
+              service={ServiceType.GENERIC}
               onCloseClick={sendCloseEvent}
             />
           )}

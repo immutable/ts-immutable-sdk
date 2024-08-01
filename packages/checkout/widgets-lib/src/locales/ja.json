@@ -75,11 +75,11 @@
     "SERVICE_UNAVAILABLE_ERROR_VIEW": {
       "heading": {
         "swap": "お住まいの地域では交換が利用できません",
-        "sanction": "このサービスはお住まいの地域では利用できません"
+        "generic": "このサービスはお住まいの地域では利用できません"
       },
       "body": {
         "swap": "<quickswapLink>Quickswap</quickswapLink>のウェブサイトで詳細情報をご覧ください。",
-        "sanction": "詳しいサポートについては、<immutableSupport>Immutable</immutableSupport>サポートページをご覧ください."
+        "generic": "詳しいサポートについては、<immutableSupport>Immutable</immutableSupport>サポートページをご覧ください."
       }
     },
     "LOADING_VIEW": {

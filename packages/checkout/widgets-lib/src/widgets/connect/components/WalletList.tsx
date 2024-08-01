@@ -180,7 +180,7 @@ export function WalletList(props: WalletListProps) {
               payload: {
                 type: ViewActions.UPDATE_VIEW,
                 view: {
-                  type: SharedViews.SANCTIONED_ADDRESS_ERROR_VIEW,
+                  type: SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW,
                   error: new Error('Sanctioned address'),
                 },
               },
