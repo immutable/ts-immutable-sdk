@@ -143,6 +143,15 @@ export type {
   WalletInfo,
 } from './types';
 
+export {
+  PostMessageHandler,
+  PostMessageHandlerConfiguration,
+  PostMessageHandlerEventType,
+  PostMessageData,
+} from './postMessageHandler';
+
+export { isAddressSanctioned } from './sanctions';
+
 export type { ErrorType } from './errors';
 
 export { CheckoutErrorType } from './errors';

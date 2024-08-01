@@ -35,6 +35,10 @@ import {
   WalletEventType,
   WalletNetworkSwitch,
   CheckoutEventType,
+  CheckoutProviderUpdatedEvent,
+  CheckoutSuccessEvent,
+  CheckoutFailureEvent,
+  CheckoutUserActionEvent,
 } from './events';
 import {
   BridgeWidgetParams,
@@ -78,107 +82,120 @@ export type WidgetProperties<T extends WidgetType> = {
 };
 
 export type WidgetConfigurations = {
-  [WidgetType.CONNECT]: ConnectWidgetConfiguration,
-  [WidgetType.WALLET]: WalletWidgetConfiguration,
-  [WidgetType.SWAP]: SwapWidgetConfiguration,
-  [WidgetType.BRIDGE]: BridgeWidgetConfiguration,
-  [WidgetType.ONRAMP]: OnrampWidgetConfiguration,
-  [WidgetType.SALE]: SaleWidgetConfiguration,
-  [WidgetType.CHECKOUT]: CheckoutWidgetConfiguration,
+  [WidgetType.CONNECT]: ConnectWidgetConfiguration;
+  [WidgetType.WALLET]: WalletWidgetConfiguration;
+  [WidgetType.SWAP]: SwapWidgetConfiguration;
+  [WidgetType.BRIDGE]: BridgeWidgetConfiguration;
+  [WidgetType.ONRAMP]: OnrampWidgetConfiguration;
+  [WidgetType.SALE]: SaleWidgetConfiguration;
+  [WidgetType.CHECKOUT]: CheckoutWidgetConfiguration;
 };
 
 // Mapping each widget type to their parameters
 export type WidgetParameters = {
-  [WidgetType.CONNECT]: ConnectWidgetParams,
-  [WidgetType.WALLET]: WalletWidgetParams,
-  [WidgetType.SWAP]: SwapWidgetParams,
-  [WidgetType.BRIDGE]: BridgeWidgetParams,
-  [WidgetType.ONRAMP]: OnRampWidgetParams,
-  [WidgetType.SALE]: SaleWidgetParams,
-  [WidgetType.CHECKOUT]: CheckoutWidgetParams,
+  [WidgetType.CONNECT]: ConnectWidgetParams;
+  [WidgetType.WALLET]: WalletWidgetParams;
+  [WidgetType.SWAP]: SwapWidgetParams;
+  [WidgetType.BRIDGE]: BridgeWidgetParams;
+  [WidgetType.ONRAMP]: OnRampWidgetParams;
+  [WidgetType.SALE]: SaleWidgetParams;
+  [WidgetType.CHECKOUT]: CheckoutWidgetParams;
 };
 
 /**
  * Represents all the possible event types that are emitted by the widgets.
  */
 export type WidgetEventTypes = {
-  [WidgetType.CONNECT]: ConnectEventType | OrchestrationEventType,
-  [WidgetType.WALLET]: WalletEventType | OrchestrationEventType,
-  [WidgetType.SWAP]: SwapEventType | OrchestrationEventType,
-  [WidgetType.BRIDGE]: BridgeEventType | OrchestrationEventType,
-  [WidgetType.ONRAMP]: OnRampEventType | OrchestrationEventType,
-  [WidgetType.SALE]: SaleEventType | OrchestrationEventType,
-  [WidgetType.CHECKOUT]: CheckoutEventType | OrchestrationEventType,
+  [WidgetType.CONNECT]: ConnectEventType | OrchestrationEventType;
+  [WidgetType.WALLET]: WalletEventType | OrchestrationEventType;
+  [WidgetType.SWAP]: SwapEventType | OrchestrationEventType;
+  [WidgetType.BRIDGE]: BridgeEventType | OrchestrationEventType;
+  [WidgetType.ONRAMP]: OnRampEventType | OrchestrationEventType;
+  [WidgetType.SALE]: SaleEventType | OrchestrationEventType;
+  [WidgetType.CHECKOUT]: CheckoutEventType | OrchestrationEventType;
 };
 
 // Mapping of Orchestration events to their payloads
 type OrchestrationMapping = {
-  [OrchestrationEventType.REQUEST_CONNECT]: RequestConnectEvent,
-  [OrchestrationEventType.REQUEST_WALLET]: RequestWalletEvent,
-  [OrchestrationEventType.REQUEST_SWAP]: RequestSwapEvent,
-  [OrchestrationEventType.REQUEST_BRIDGE]: RequestBridgeEvent,
-  [OrchestrationEventType.REQUEST_ONRAMP]: RequestOnrampEvent,
+  [OrchestrationEventType.REQUEST_CONNECT]: RequestConnectEvent;
+  [OrchestrationEventType.REQUEST_WALLET]: RequestWalletEvent;
+  [OrchestrationEventType.REQUEST_SWAP]: RequestSwapEvent;
+  [OrchestrationEventType.REQUEST_BRIDGE]: RequestBridgeEvent;
+  [OrchestrationEventType.REQUEST_ONRAMP]: RequestOnrampEvent;
 };
 
 type ProviderEventMapping = {
-  [ProviderEventType.PROVIDER_UPDATED]: ProviderUpdated
+  [ProviderEventType.PROVIDER_UPDATED]: ProviderUpdated;
 };
 
 /**
  * Mapping of widget type, to each of it's events and then each event's payload
  * Update this whenever a new event is created and used by a widget
  * Each widget also has all of the orchestration events
-*/
+ */
 export type WidgetEventData = {
   [WidgetType.CONNECT]: {
-    [ConnectEventType.SUCCESS]: ConnectionSuccess,
-    [ConnectEventType.FAILURE]: ConnectionFailed,
-    [ConnectEventType.CLOSE_WIDGET]: {},
-    [ConnectEventType.WALLETCONNECT_PROVIDER_UPDATED]: WalletConnectProviderChanged,
-  } & OrchestrationMapping & ProviderEventMapping,
+    [ConnectEventType.SUCCESS]: ConnectionSuccess;
+    [ConnectEventType.FAILURE]: ConnectionFailed;
+    [ConnectEventType.CLOSE_WIDGET]: {};
+    [ConnectEventType.WALLETCONNECT_PROVIDER_UPDATED]: WalletConnectProviderChanged;
+  } & OrchestrationMapping &
+  ProviderEventMapping;
 
   [WidgetType.WALLET]: {
-    [WalletEventType.NETWORK_SWITCH]: WalletNetworkSwitch
-    [WalletEventType.DISCONNECT_WALLET]: WalletDisconnect
-    [WalletEventType.CLOSE_WIDGET]: {}
-  } & OrchestrationMapping & ProviderEventMapping,
+    [WalletEventType.NETWORK_SWITCH]: WalletNetworkSwitch;
+    [WalletEventType.DISCONNECT_WALLET]: WalletDisconnect;
+    [WalletEventType.CLOSE_WIDGET]: {};
+  } & OrchestrationMapping &
+  ProviderEventMapping;
 
   [WidgetType.SWAP]: {
-    [SwapEventType.SUCCESS]: SwapSuccess,
-    [SwapEventType.FAILURE]: SwapFailed,
-    [SwapEventType.REJECTED]: SwapRejected,
-    [SwapEventType.CLOSE_WIDGET]: {},
-  } & OrchestrationMapping & ProviderEventMapping
+    [SwapEventType.SUCCESS]: SwapSuccess;
+    [SwapEventType.FAILURE]: SwapFailed;
+    [SwapEventType.REJECTED]: SwapRejected;
+    [SwapEventType.CLOSE_WIDGET]: {};
+  } & OrchestrationMapping &
+  ProviderEventMapping;
 
   [WidgetType.BRIDGE]: {
-    [BridgeEventType.TRANSACTION_SENT]: BridgeTransactionSent,
-    [BridgeEventType.FAILURE]: BridgeFailed,
-    [BridgeEventType.CLOSE_WIDGET]: {}
-    [BridgeEventType.CLAIM_WITHDRAWAL_SUCCESS]: BridgeClaimWithdrawalSuccess
-    [BridgeEventType.CLAIM_WITHDRAWAL_FAILURE]: BridgeClaimWithdrawalFailed
-  } & OrchestrationMapping & ProviderEventMapping,
+    [BridgeEventType.TRANSACTION_SENT]: BridgeTransactionSent;
+    [BridgeEventType.FAILURE]: BridgeFailed;
+    [BridgeEventType.CLOSE_WIDGET]: {};
+    [BridgeEventType.CLAIM_WITHDRAWAL_SUCCESS]: BridgeClaimWithdrawalSuccess;
+    [BridgeEventType.CLAIM_WITHDRAWAL_FAILURE]: BridgeClaimWithdrawalFailed;
+  } & OrchestrationMapping &
+  ProviderEventMapping;
 
   [WidgetType.ONRAMP]: {
-    [OnRampEventType.SUCCESS]: OnRampSuccess,
-    [OnRampEventType.FAILURE]: OnRampFailed,
-    [OnRampEventType.CLOSE_WIDGET]: {},
-  } & OrchestrationMapping & ProviderEventMapping,
+    [OnRampEventType.SUCCESS]: OnRampSuccess;
+    [OnRampEventType.FAILURE]: OnRampFailed;
+    [OnRampEventType.CLOSE_WIDGET]: {};
+  } & OrchestrationMapping &
+  ProviderEventMapping;
 
   [WidgetType.SALE]: {
-    [SaleEventType.SUCCESS]: SaleSuccess,
-    [SaleEventType.FAILURE]: SaleFailed,
-    [SaleEventType.REJECTED]: any,
-    [SaleEventType.CLOSE_WIDGET]: {},
-    [SaleEventType.TRANSACTION_SUCCESS]: SaleTransactionSuccess,
-    [SaleEventType.PAYMENT_METHOD]: SalePaymentMethod,
-    [SaleEventType.PAYMENT_TOKEN]: SalePaymentToken,
-    [SaleEventType.REQUEST_BRIDGE]: {},
-    [SaleEventType.REQUEST_SWAP]: {},
-    [SaleEventType.REQUEST_ONRAMP]: {},
-  } & OrchestrationMapping & ProviderEventMapping,
+    [SaleEventType.SUCCESS]: SaleSuccess;
+    [SaleEventType.FAILURE]: SaleFailed;
+    [SaleEventType.REJECTED]: any;
+    [SaleEventType.CLOSE_WIDGET]: {};
+    [SaleEventType.TRANSACTION_SUCCESS]: SaleTransactionSuccess;
+    [SaleEventType.PAYMENT_METHOD]: SalePaymentMethod;
+    [SaleEventType.PAYMENT_TOKEN]: SalePaymentToken;
+    [SaleEventType.REQUEST_BRIDGE]: {};
+    [SaleEventType.REQUEST_SWAP]: {};
+    [SaleEventType.REQUEST_ONRAMP]: {};
+  } & OrchestrationMapping &
+  ProviderEventMapping;
 
   [WidgetType.CHECKOUT]: {
-  } & OrchestrationMapping & ProviderEventMapping,
+    [CheckoutEventType.INITIALISED]: CheckoutWidgetParams;
+    [CheckoutEventType.PROVIDER_UPDATED]: CheckoutProviderUpdatedEvent;
+    [CheckoutEventType.CLOSE]: {};
+    [CheckoutEventType.SUCCESS]: CheckoutSuccessEvent;
+    [CheckoutEventType.FAILURE]: CheckoutFailureEvent;
+    [CheckoutEventType.DISCONNECTED]: {};
+    [CheckoutEventType.USER_ACTION]: CheckoutUserActionEvent;
+  };
 };
 
 /**
@@ -191,8 +208,11 @@ export type WidgetEventData = {
  * @property {KEventName} type - The type of the event.
  * @property {WidgetEventData[T][KEventName]} data - The data associated with the widget event.
  */
-export type WidgetEvent<T extends WidgetType, KEventName extends keyof WidgetEventData[T]> = {
-  type: KEventName,
+export type WidgetEvent<
+  T extends WidgetType,
+  KEventName extends keyof WidgetEventData[T],
+> = {
+  type: KEventName;
   data: WidgetEventData[T][KEventName];
 };
 
@@ -202,12 +222,13 @@ export type WidgetEvent<T extends WidgetType, KEventName extends keyof WidgetEve
  * @property {KEventName} type
  * @property {OrchestrationMapping[KEventName]} data
  */
-export type OrchestrationEvent<KEventName extends keyof OrchestrationMapping> = {
-  /** The type of the event. */
-  type: KEventName,
-  /** The data associated with the event. */
-  data: OrchestrationMapping[KEventName];
-};
+export type OrchestrationEvent<KEventName extends keyof OrchestrationMapping> =
+  {
+    /** The type of the event. */
+    type: KEventName;
+    /** The data associated with the event. */
+    data: OrchestrationMapping[KEventName];
+  };
 
 /**
  * Represents an event emitted by a widget.
@@ -217,7 +238,7 @@ export type OrchestrationEvent<KEventName extends keyof OrchestrationMapping> = 
  */
 export type ProviderEvent<KEventName extends keyof ProviderEventMapping> = {
   /** The type of the event. */
-  type: KEventName,
+  type: KEventName;
   /** The data associated with the event. */
   data: ProviderEventMapping[KEventName];
 };
@@ -254,20 +275,25 @@ export interface Widget<T extends WidgetType> {
    * Update the widget properties
    * @param props Widget specific properties including configuration
    */
-  update(props: WidgetProperties<T>): void
+  update(props: WidgetProperties<T>): void;
   /**
    * Add a listener for a widget event.
    * @param event Widget specific event name.
    * @param callback function to execute when the event is received.
    */
   // eslint-disable-next-line max-len
-  addListener<KEventName extends keyof WidgetEventData[T]>(type: KEventName, callback: (data: WidgetEventData[T][KEventName]) => void): void
+  addListener<KEventName extends keyof WidgetEventData[T]>(
+    type: KEventName,
+    callback: (data: WidgetEventData[T][KEventName]) => void
+  ): void;
 
   /**
    * Removes an event listener for a widget event.
    * @param type Widget specific event name.
    */
-  removeListener<KEventName extends keyof WidgetEventData[T]>(type: KEventName): void;
+  removeListener<KEventName extends keyof WidgetEventData[T]>(
+    type: KEventName
+  ): void;
 }
 
 /**

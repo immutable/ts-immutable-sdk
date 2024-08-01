@@ -10,6 +10,13 @@ import { CHECKOUT_APP_URL } from '../../../lib/constants';
 const toQueryString = (params: Record<string, unknown>): string => {
   const sanitizedParams = Object.entries(params)
     .filter(([, value]) => value !== undefined)
+    .map(([key, value]) => {
+      const safeValue = Array.isArray(value) || typeof value === 'object'
+        ? JSON.stringify(value)
+        : value;
+
+      return [key, safeValue];
+    })
     .map(([key, value]) => [key, value] as [string, string]);
 
   return new URLSearchParams(sanitizedParams).toString();
@@ -121,13 +128,14 @@ export const getIframeURL = (
   config: CheckoutWidgetConfiguration,
   environment: Environment,
   publishableKey: string,
-): string => {
+) => {
   const { flow } = params;
-
   const language = params.language || config.language;
 
-  const baseUrl = CHECKOUT_APP_URL[environment];
+  const baseURL = CHECKOUT_APP_URL[environment];
   const queryParams = getIframeParams(params, config);
 
-  return `${baseUrl}/${publishableKey}/${language}/${flow}?${queryParams}`;
+  const iframeURL = `${baseURL}/${publishableKey}/${language}/${flow}?${queryParams}`;
+
+  return [baseURL, iframeURL];
 };

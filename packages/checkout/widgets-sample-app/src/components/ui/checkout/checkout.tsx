@@ -7,6 +7,7 @@ import {
   WidgetType,
   WalletProviderName,
   SalePaymentTypes,
+  CheckoutEventType
 } from "@imtbl/checkout-sdk";
 import { Environment } from "@imtbl/config";
 import { WidgetsFactory } from "@imtbl/checkout-widgets";
@@ -47,6 +48,19 @@ function CheckoutUI() {
   useEffect(() => {
     passport.connectEvm();
   }, []);
+  
+  useEffect(() => {
+    if (!checkoutWidget) return;
+
+    checkoutWidget.addListener(CheckoutEventType.INITIALISED, (data) => {
+      console.log('----------> INITIALISED', data);
+    });
+
+    checkoutWidget.addListener(CheckoutEventType.USER_ACTION, (data) => {
+      console.log('----------> USER_ACTION', data);
+    });
+
+  }, [checkoutWidget  ]);
 
   return (
     <div>
@@ -62,7 +76,7 @@ function CheckoutUI() {
           onClick={() => {
             checkoutWidget.mount("checkout", {
               flow: CheckoutFlowType.CONNECT,
-              blocklistWalletRdns: ["io.metamask"],
+              // blocklistWalletRdns: ["io.metamask"],
             });
           }}
         >
@@ -127,7 +141,7 @@ function CheckoutUI() {
                 },
               ],
               environmentId: "4dfc4bec-1867-49aa-ad35-d8a13b206c94",
-              collectionName: "Metalcoree",
+              collectionName: "Lootboxes",
               excludePaymentTypes: [SalePaymentTypes.CREDIT],
               preferredCurrency: "USDC",
             });

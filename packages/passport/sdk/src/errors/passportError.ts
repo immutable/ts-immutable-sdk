@@ -1,5 +1,6 @@
 import { isAxiosError } from 'axios';
 import { imx } from '@imtbl/generated-clients';
+import { trackError } from '@imtbl/metrics';
 
 export enum PassportErrorType {
   AUTHENTICATION_ERROR = 'AUTHENTICATION_ERROR',
@@ -40,6 +41,7 @@ export class PassportError extends Error {
 export const withPassportError = async <T>(
   fn: () => Promise<T>,
   customErrorType: PassportErrorType,
+  customEventName?: string,
 ): Promise<T> => {
   try {
     return await fn();
@@ -52,6 +54,12 @@ export const withPassportError = async <T>(
       errorMessage = (error as Error).message;
     }
 
-    throw new PassportError(errorMessage, customErrorType);
+    const passportError = new PassportError(errorMessage, customErrorType);
+
+    if (customEventName) {
+      trackError('passport', customEventName, passportError);
+    }
+
+    throw passportError;
   }
 };

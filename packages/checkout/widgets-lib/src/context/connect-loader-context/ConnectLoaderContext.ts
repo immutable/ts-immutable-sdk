@@ -61,7 +61,7 @@ export interface SetProviderPayload {
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const ConnectLoaderContext = createContext<ConnectLoaderContextState>({
   connectLoaderState: initialConnectLoaderState,
-  connectLoaderDispatch: () => {},
+  connectLoaderDispatch: () => { },
 });
 
 export type Reducer<S, A> = (prevState: S, action: A) => S;
