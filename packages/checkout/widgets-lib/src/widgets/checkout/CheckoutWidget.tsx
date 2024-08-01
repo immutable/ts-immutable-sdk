@@ -74,14 +74,12 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
     if (event.origin !== targetOrigin) return;
     if (!widgetEventsList.includes(type)) return;
 
-    console.log('🍎 Ack 🍎', event.data); // eslint-disable-line
-
     const { detail } = event.data;
 
     switch (type) {
       case IMTBLWidgetEvents.IMTBL_CHECKOUT_WIDGET_EVENT:
         switch (detail.type) {
-          case CheckoutEventType.CHECKOUT_APP_READY:
+          case CheckoutEventType.INITIALISED:
             sendCheckoutReadyEvent(eventTarget);
             break;
           default:

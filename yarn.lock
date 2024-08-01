@@ -116,7 +116,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/code-frame@npm:^7.0.0, @babel/code-frame@npm:^7.10.4, @babel/code-frame@npm:^7.12.13, @babel/code-frame@npm:^7.16.0, @babel/code-frame@npm:^7.18.6, @babel/code-frame@npm:^7.22.5, @babel/code-frame@npm:^7.8.3":
+"@babel/code-frame@npm:^7.0.0, @babel/code-frame@npm:^7.10.4, @babel/code-frame@npm:^7.12.13, @babel/code-frame@npm:^7.16.0, @babel/code-frame@npm:^7.22.5, @babel/code-frame@npm:^7.8.3":
   version: 7.22.5
   resolution: "@babel/code-frame@npm:7.22.5"
   dependencies:
@@ -3874,7 +3874,7 @@ __metadata:
     react: ^18.2.0
     react-dom: ^18.2.0
     tailwindcss: ^3.4.6
-    typescript: ^5
+    typescript: ^5.5.4
   languageName: unknown
   linkType: soft
 
@@ -3893,7 +3893,7 @@ __metadata:
     next: 14.2.3
     react: ^18.2.0
     react-dom: ^18.2.0
-    typescript: ^5
+    typescript: ^5.5.4
     viem: 2.x
     wagmi: ^2.9.2
   languageName: unknown
@@ -3914,7 +3914,7 @@ __metadata:
     next: 14.2.3
     react: ^18.2.0
     react-dom: ^18.2.0
-    typescript: ^5
+    typescript: ^5.5.4
     viem: 2.x
     wagmi: ^2.9.2
   languageName: unknown
@@ -3934,7 +3934,7 @@ __metadata:
     next: 14.2.3
     react: ^18.2.0
     react-dom: ^18.2.0
-    typescript: ^5
+    typescript: ^5.5.4
     viem: 2.x
     wagmi: ^2.9.2
   languageName: unknown
@@ -3955,7 +3955,7 @@ __metadata:
     next: 14.2.3
     react: ^18.2.0
     react-dom: ^18.2.0
-    typescript: ^5
+    typescript: ^5.5.4
     viem: 2.x
     wagmi: ^2.9.2
   languageName: unknown
@@ -3975,7 +3975,7 @@ __metadata:
     react: ^18.2.0
     react-dom: ^18.2.0
     react-router-dom: ^6.23.0
-    typescript: ^5.0.2
+    typescript: ^5.5.4
     viem: 2.x
     vite: ^5.3.5
     vite-plugin-node-polyfills: ^0.22.0
@@ -3997,7 +3997,7 @@ __metadata:
     react: ^18.2.0
     react-dom: ^18.2.0
     react-router-dom: ^6.23.0
-    typescript: ^5.0.2
+    typescript: ^5.5.4
     viem: 2.x
     vite: ^5.3.5
     vite-plugin-node-polyfills: ^0.22.0
@@ -4018,7 +4018,7 @@ __metadata:
     react: ^18.2.0
     react-dom: ^18.2.0
     react-router-dom: ^6.23.0
-    typescript: ^5.0.2
+    typescript: ^5.5.4
     viem: 2.x
     vite: ^5.3.5
     vite-plugin-node-polyfills: ^0.22.0
@@ -4040,7 +4040,7 @@ __metadata:
     react: ^18.2.0
     react-dom: ^18.2.0
     react-router-dom: ^6.23.0
-    typescript: ^5.0.2
+    typescript: ^5.5.4
     viem: ^2.10.5
     vite: ^5.3.5
     vite-plugin-node-polyfills: ^0.22.0
@@ -4067,7 +4067,7 @@ __metadata:
     react: ^18.2.0
     react-dom: ^18.2.0
     tailwindcss: ^3.4.1
-    typescript: ^5
+    typescript: ^5.5.4
     wagmi: ^2.11.3
   languageName: unknown
   linkType: soft
@@ -4090,7 +4090,7 @@ __metadata:
     react: ^18.2.0
     react-dom: ^18.2.0
     tailwindcss: ^3.4.1
-    typescript: ^5
+    typescript: ^5.5.4
     wagmi: ^2.11.3
   languageName: unknown
   linkType: soft
@@ -4111,7 +4111,7 @@ __metadata:
     react: ^18.2.0
     react-dom: ^18.2.0
     tailwindcss: ^3.4.6
-    typescript: ^5
+    typescript: ^5.5.4
   languageName: unknown
   linkType: soft
 
@@ -4180,7 +4180,7 @@ __metadata:
     "@ethersproject/providers": ^5.7.2
     "@imtbl/config": 0.0.0
     "@imtbl/generated-clients": 0.0.0
-    "@rollup/plugin-typescript": ^11.0.0
+    "@rollup/plugin-typescript": ^11.1.6
     "@swc/core": ^1.3.36
     "@swc/jest": ^0.2.24
     "@typechain/ethers-v5": ^10.2.0
@@ -4191,10 +4191,10 @@ __metadata:
     ethers: ^5.7.2
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
-    rollup: ^3.17.2
+    rollup: ^4.19.1
     ts-mockito: ^2.6.1
     typechain: ^8.1.1
-    typescript: ^4.9.5
+    typescript: ^5.5.4
   languageName: unknown
   linkType: soft
 
@@ -4205,11 +4205,11 @@ __metadata:
     "@ethersproject/providers": ^5.7.2
     "@imtbl/config": 0.0.0
     "@jest/globals": ^29.5.0
-    "@rollup/plugin-commonjs": ^24.0.1
-    "@rollup/plugin-json": ^6.0.0
-    "@rollup/plugin-node-resolve": ^15.0.2
-    "@rollup/plugin-replace": ^5.0.2
-    "@rollup/plugin-typescript": ^11.0.0
+    "@rollup/plugin-commonjs": ^26.0.1
+    "@rollup/plugin-json": ^6.1.0
+    "@rollup/plugin-node-resolve": ^15.2.3
+    "@rollup/plugin-replace": ^5.0.7
+    "@rollup/plugin-typescript": ^11.1.6
     "@swc/core": ^1.3.36
     "@swc/jest": ^0.2.24
     "@typechain/ethers-v5": ^10.2.0
@@ -4219,10 +4219,10 @@ __metadata:
     ethers: ^5.7.2
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
-    rollup: ^3.17.2
+    rollup: ^4.19.1
     ts-node: ^10.9.1
     typechain: ^8.1.1
-    typescript: ^4.9.5
+    typescript: ^5.5.4
   languageName: unknown
   linkType: soft
 
@@ -4257,7 +4257,7 @@ __metadata:
     react-router-dom: ^6.11.0
     react-scripts: 5.0.1
     stream-browserify: ^3.0.0
-    typescript: ^4.9.5
+    typescript: ^5.5.4
     web-vitals: ^2.1.4
   languageName: unknown
   linkType: soft
@@ -4279,12 +4279,12 @@ __metadata:
     "@metamask/detect-provider": ^2.0.0
     "@parcel/packager-ts": ^2.8.3
     "@parcel/transformer-typescript-types": ^2.8.3
-    "@rollup/plugin-commonjs": ^24.0.1
-    "@rollup/plugin-json": ^6.0.0
-    "@rollup/plugin-node-resolve": ^15.0.2
-    "@rollup/plugin-replace": ^5.0.2
-    "@rollup/plugin-terser": ^0.4.3
-    "@rollup/plugin-typescript": ^11.0.0
+    "@rollup/plugin-commonjs": ^26.0.1
+    "@rollup/plugin-json": ^6.1.0
+    "@rollup/plugin-node-resolve": ^15.2.3
+    "@rollup/plugin-replace": ^5.0.7
+    "@rollup/plugin-terser": ^0.4.4
+    "@rollup/plugin-typescript": ^11.1.6
     "@types/uuid": ^8.3.4
     axios: ^1.6.5
     babel-jest: ^29.5.0
@@ -4292,13 +4292,13 @@ __metadata:
     ethers: ^5.7.2
     jest: ^29.4.3
     parcel: ^2.8.3
-    rollup: ^3.17.2
-    rollup-plugin-dts: ^5.3.0
-    rollup-plugin-polyfill-node: ^0.12.0
+    rollup: ^4.19.1
+    rollup-plugin-dts: ^6.1.1
+    rollup-plugin-polyfill-node: ^0.13.0
     text-encoding: ^0.7.0
     typedoc: ^0.24.8
     typedoc-plugin-markdown: ^3.15.2
-    typescript: ^4.9.5
+    typescript: ^5.5.4
     uuid: ^8.3.2
   languageName: unknown
   linkType: soft
@@ -4327,7 +4327,7 @@ __metadata:
     react: ^18.2.0
     react-dom: ^18.2.0
     react-router-dom: ^6.11.0
-    typescript: ^4.9.5
+    typescript: ^5.5.4
     vite: ^5.0.12
     vite-plugin-node-polyfills: ^0.16.0
     web-vitals: ^2.1.4
@@ -4349,12 +4349,12 @@ __metadata:
     "@imtbl/passport": 0.0.0
     "@imtbl/react-analytics": 0.2.1-alpha
     "@rive-app/react-canvas-lite": ^4.9.0
-    "@rollup/plugin-commonjs": ^24.0.1
-    "@rollup/plugin-json": ^6.0.0
-    "@rollup/plugin-node-resolve": ^15.0.2
-    "@rollup/plugin-replace": ^5.0.2
-    "@rollup/plugin-terser": ^0.4.3
-    "@rollup/plugin-typescript": ^11.0.0
+    "@rollup/plugin-commonjs": ^26.0.1
+    "@rollup/plugin-json": ^6.1.0
+    "@rollup/plugin-node-resolve": ^15.2.3
+    "@rollup/plugin-replace": ^5.0.7
+    "@rollup/plugin-terser": ^0.4.4
+    "@rollup/plugin-typescript": ^11.1.6
     "@svgr/webpack": ^8.0.1
     "@testing-library/jest-dom": ^5.16.5
     "@testing-library/react": ^13.4.0
@@ -4381,13 +4381,13 @@ __metadata:
     react-app-rewired: ^2.2.1
     react-i18next: ^13.5.0
     react-scripts: 5.0.1
-    rollup: ^3.17.2
+    rollup: ^4.19.1
     rollup-plugin-svg: ^2.0.0
     rollup-plugin-visualizer: ^5.12.0
     stream-browserify: ^3.0.0
     stream-http: ^3.2.0
     ts-jest: ^29.1.0
-    typescript: ^4.9.5
+    typescript: ^5.5.4
     url: ^0.11.0
     web-vitals: ^2.1.4
   languageName: unknown
@@ -4398,7 +4398,7 @@ __metadata:
   resolution: "@imtbl/config@workspace:packages/config"
   dependencies:
     "@imtbl/metrics": 0.0.0
-    "@rollup/plugin-typescript": ^11.0.0
+    "@rollup/plugin-typescript": ^11.1.6
     "@swc/core": ^1.3.36
     "@swc/jest": ^0.2.24
     "@types/jest": ^29.4.3
@@ -4409,9 +4409,9 @@ __metadata:
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
     prettier: ^2.8.7
-    rollup: ^3.17.2
+    rollup: ^4.19.1
     ts-node: ^10.9.1
-    typescript: ^4.9.5
+    typescript: ^5.5.4
   languageName: unknown
   linkType: soft
 
@@ -4439,7 +4439,7 @@ __metadata:
   dependencies:
     "@imtbl/config": 0.0.0
     "@jest/globals": ^29.5.0
-    "@rollup/plugin-typescript": ^11.0.0
+    "@rollup/plugin-typescript": ^11.1.6
     "@swc/core": ^1.3.36
     "@swc/jest": ^0.2.24
     "@types/jest": ^29.4.3
@@ -4453,9 +4453,9 @@ __metadata:
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
     prettier: ^2.8.7
-    rollup: ^3.17.2
+    rollup: ^4.19.1
     ts-node: ^10.9.1
-    typescript: ^4.9.5
+    typescript: ^5.5.4
   languageName: unknown
   linkType: soft
 
@@ -4464,7 +4464,7 @@ __metadata:
   resolution: "@imtbl/dex-sdk@workspace:packages/internal/dex/sdk"
   dependencies:
     "@imtbl/config": 0.0.0
-    "@rollup/plugin-json": ^6.0.0
+    "@rollup/plugin-json": ^6.1.0
     "@swc/core": ^1.3.36
     "@swc/jest": ^0.2.24
     "@typechain/ethers-v5": ^10.2.0
@@ -4477,10 +4477,10 @@ __metadata:
     ethers: ^5.7.2
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
-    rollup: ^3.17.2
+    rollup: ^4.19.1
     ts-node: ^10.9.1
     typechain: ^8.1.1
-    typescript: ^4.9.5
+    typescript: ^5.5.4
   languageName: unknown
   linkType: soft
 
@@ -4490,10 +4490,10 @@ __metadata:
   dependencies:
     "@imtbl/config": 0.0.0
     "@jest/globals": ^29.5.0
-    "@rollup/plugin-commonjs": ^24.0.1
-    "@rollup/plugin-json": ^6.0.0
-    "@rollup/plugin-node-resolve": ^15.0.2
-    "@rollup/plugin-typescript": ^11.0.0
+    "@rollup/plugin-commonjs": ^26.0.1
+    "@rollup/plugin-json": ^6.1.0
+    "@rollup/plugin-node-resolve": ^15.2.3
+    "@rollup/plugin-typescript": ^11.1.6
     "@swc/core": ^1.3.36
     "@swc/jest": ^0.2.24
     "@typechain/ethers-v5": ^10.2.0
@@ -4502,10 +4502,10 @@ __metadata:
     ethers: ^5.7.2
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
-    rollup: ^3.17.2
+    rollup: ^4.19.1
     ts-node: ^10.9.1
     typechain: ^8.1.1
-    typescript: ^4.9.5
+    typescript: ^5.5.4
   languageName: unknown
   linkType: soft
 
@@ -4530,8 +4530,8 @@ __metadata:
   dependencies:
     "@openapitools/openapi-generator-cli": ^2.13.4
     jest: ^29.4.3
-    rollup: ^3.17.2
-    typescript: ^4.9.5
+    rollup: ^4.19.1
+    typescript: ^5.5.4
   languageName: unknown
   linkType: soft
 
@@ -4539,7 +4539,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/guardian@workspace:packages/internal/guardian"
   dependencies:
-    "@rollup/plugin-json": ^6.0.0
+    "@rollup/plugin-json": ^6.1.0
     "@swc/core": ^1.3.36
     "@swc/jest": ^0.2.24
     "@typechain/ethers-v5": ^10.2.0
@@ -4549,10 +4549,10 @@ __metadata:
     eslint: ^8.40.0
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
-    rollup: ^3.17.2
+    rollup: ^4.19.1
     ts-node: ^10.9.1
     typechain: ^8.1.1
-    typescript: ^4.9.5
+    typescript: ^5.5.4
   languageName: unknown
   linkType: soft
 
@@ -4560,7 +4560,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/metrics@workspace:packages/internal/metrics"
   dependencies:
-    "@rollup/plugin-typescript": ^11.0.0
+    "@rollup/plugin-typescript": ^11.1.6
     "@swc/jest": ^0.2.24
     "@types/jest": ^29.4.3
     axios: ^1.6.5
@@ -4569,9 +4569,9 @@ __metadata:
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
     lru-memorise: 0.3.0
-    rollup: ^3.17.2
+    rollup: ^4.19.1
     ts-jest: ^29.1.0
-    typescript: ^4.9.5
+    typescript: ^5.5.4
   languageName: unknown
   linkType: soft
 
@@ -4583,7 +4583,7 @@ __metadata:
     "@imtbl/config": 0.0.0
     "@imtbl/metrics": 0.0.0
     "@imtbl/webhook": 0.0.0
-    "@rollup/plugin-typescript": ^11.0.0
+    "@rollup/plugin-typescript": ^11.1.6
     "@swc/core": ^1.3.36
     "@swc/jest": ^0.2.24
     "@testcontainers/postgresql": ^10.9.0
@@ -4595,10 +4595,10 @@ __metadata:
     jest-environment-jsdom: ^29.4.3
     pg: ^8.11.5
     prisma: ^5.13.0
-    rollup: ^3.17.2
+    rollup: ^4.19.1
     testcontainers: ^10.9.0
     ts-mockito: ^2.6.1
-    typescript: ^4.9.5
+    typescript: ^5.5.4
   dependenciesMeta:
     pg:
       optional: true
@@ -4613,7 +4613,7 @@ __metadata:
   dependencies:
     "@imtbl/config": 0.0.0
     "@opensea/seaport-js": 4.0.3
-    "@rollup/plugin-typescript": ^11.0.0
+    "@rollup/plugin-typescript": ^11.1.6
     "@swc/jest": ^0.2.24
     "@typechain/ethers-v5": ^10.2.0
     "@types/jest": ^29.4.3
@@ -4626,10 +4626,10 @@ __metadata:
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
     merkletreejs: ^0.3.11
-    rollup: ^3.17.2
+    rollup: ^4.19.1
     ts-mockito: ^2.6.1
     typechain: ^8.1.1
-    typescript: ^4.9.5
+    typescript: ^5.5.4
   languageName: unknown
   linkType: soft
 
@@ -4664,7 +4664,7 @@ __metadata:
     react: ^18.2.0
     react-bootstrap: ^2.7.2
     react-dom: ^18.2.0
-    typescript: ^4.9.5
+    typescript: ^5.5.4
   languageName: unknown
   linkType: soft
 
@@ -4684,7 +4684,7 @@ __metadata:
     "@imtbl/x-provider": 0.0.0
     "@magic-ext/oidc": 4.2.0
     "@metamask/detect-provider": ^2.0.0
-    "@rollup/plugin-typescript": ^11.0.0
+    "@rollup/plugin-typescript": ^11.1.6
     "@swc/core": ^1.3.36
     "@swc/jest": ^0.2.24
     "@types/axios": ^0.14.0
@@ -4709,9 +4709,9 @@ __metadata:
     msw: ^1.2.2
     oidc-client-ts: 2.4.0
     prettier: ^2.8.7
-    rollup: ^3.17.2
+    rollup: ^4.19.1
     ts-node: ^10.9.1
-    typescript: ^4.9.5
+    typescript: ^5.5.4
     uuid: ^8.3.2
   languageName: unknown
   linkType: soft
@@ -4763,12 +4763,12 @@ __metadata:
     "@opensea/seaport-js": 4.0.3
     "@rive-app/react-canvas-lite": ^4.9.0
     "@rollup/plugin-babel": ^6.0.4
-    "@rollup/plugin-commonjs": ^24.0.1
-    "@rollup/plugin-json": ^6.0.0
-    "@rollup/plugin-node-resolve": ^15.0.2
-    "@rollup/plugin-replace": ^5.0.2
-    "@rollup/plugin-terser": ^0.4.3
-    "@rollup/plugin-typescript": ^11.0.0
+    "@rollup/plugin-commonjs": ^26.0.1
+    "@rollup/plugin-json": ^6.1.0
+    "@rollup/plugin-node-resolve": ^15.2.3
+    "@rollup/plugin-replace": ^5.0.7
+    "@rollup/plugin-terser": ^0.4.4
+    "@rollup/plugin-typescript": ^11.1.6
     "@stdlib/number-float64-base-normalize": 0.0.8
     "@uniswap/router-sdk": ^1.4.0
     "@uniswap/sdk-core": ^3.0.1
@@ -4805,14 +4805,14 @@ __metadata:
     pg: ^8.11.5
     prisma: ^5.13.0
     react-i18next: ^13.5.0
-    rollup: ^3.17.2
-    rollup-plugin-dts: ^5.3.0
-    rollup-plugin-polyfill-node: ^0.12.0
+    rollup: ^4.19.1
+    rollup-plugin-dts: ^6.1.1
+    rollup-plugin-polyfill-node: ^0.13.0
     semver: ^7.4.0
     sns-validator: ^0.3.5
     stream-browserify: ^3.0.0
     stream-http: ^3.2.0
-    typescript: ^4.9.5
+    typescript: ^5.5.4
     url: ^0.11.0
     uuid: ^8.3.2
   dependenciesMeta:
@@ -4899,7 +4899,7 @@ __metadata:
     "@imtbl/x-client": 0.0.0
     "@magic-ext/oidc": 4.2.0
     "@metamask/detect-provider": ^2.0.0
-    "@rollup/plugin-typescript": ^11.0.0
+    "@rollup/plugin-typescript": ^11.1.6
     "@swc/core": ^1.3.36
     "@swc/jest": ^0.2.24
     "@types/axios": ^0.14.0
@@ -4919,9 +4919,9 @@ __metadata:
     magic-sdk: ^21.2.0
     oidc-client-ts: 2.4.0
     prettier: ^2.8.7
-    rollup: ^3.17.2
+    rollup: ^4.19.1
     ts-node: ^10.9.1
-    typescript: ^4.9.5
+    typescript: ^5.5.4
   languageName: unknown
   linkType: soft
 
@@ -4931,7 +4931,7 @@ __metadata:
   dependencies:
     "@imtbl/config": 0.0.0
     "@imtbl/generated-clients": 0.0.0
-    "@rollup/plugin-typescript": ^11.0.0
+    "@rollup/plugin-typescript": ^11.1.6
     "@swc/core": ^1.3.36
     "@swc/jest": ^0.2.24
     "@typechain/ethers-v5": ^10.2.0
@@ -4941,11 +4941,11 @@ __metadata:
     eslint: ^8.40.0
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
-    rollup: ^3.17.2
+    rollup: ^4.19.1
     sns-validator: ^0.3.5
     ts-mockito: ^2.6.1
     typechain: ^8.1.1
-    typescript: ^4.9.5
+    typescript: ^5.5.4
   languageName: unknown
   linkType: soft
 
@@ -4961,7 +4961,7 @@ __metadata:
     "@ethersproject/wallet": ^5.7.0
     "@imtbl/config": 0.0.0
     "@imtbl/generated-clients": 0.0.0
-    "@rollup/plugin-typescript": ^11.0.0
+    "@rollup/plugin-typescript": ^11.1.6
     "@swc/jest": ^0.2.24
     "@types/jest": ^29.4.3
     axios: ^1.6.5
@@ -4973,8 +4973,8 @@ __metadata:
     ethers: ^5.7.2
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
-    rollup: ^3.17.2
-    typescript: ^4.9.5
+    rollup: ^4.19.1
+    typescript: ^5.5.4
   languageName: unknown
   linkType: soft
 
@@ -4988,7 +4988,7 @@ __metadata:
     "@imtbl/x-client": 0.0.0
     "@magic-ext/oidc": 4.2.0
     "@metamask/detect-provider": ^2.0.0
-    "@rollup/plugin-typescript": ^11.0.0
+    "@rollup/plugin-typescript": ^11.1.6
     "@swc/core": ^1.3.36
     "@swc/jest": ^0.2.24
     "@types/axios": ^0.14.0
@@ -5006,9 +5006,9 @@ __metadata:
     magic-sdk: ^21.2.0
     oidc-client-ts: 2.4.0
     prettier: ^2.8.7
-    rollup: ^3.17.2
+    rollup: ^4.19.1
     ts-node: ^10.9.1
-    typescript: ^4.9.5
+    typescript: ^5.5.4
   languageName: unknown
   linkType: soft
 
@@ -6061,10 +6061,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jridgewell/sourcemap-codec@npm:^1.4.10, @jridgewell/sourcemap-codec@npm:^1.4.13, @jridgewell/sourcemap-codec@npm:^1.4.14, @jridgewell/sourcemap-codec@npm:^1.4.15":
+"@jridgewell/sourcemap-codec@npm:^1.4.10, @jridgewell/sourcemap-codec@npm:^1.4.14, @jridgewell/sourcemap-codec@npm:^1.4.15":
   version: 1.4.15
   resolution: "@jridgewell/sourcemap-codec@npm:1.4.15"
   checksum: b881c7e503db3fc7f3c1f35a1dd2655a188cc51a3612d76efc8a6eb74728bef5606e6758ee77423e564092b4a518aba569bbb21c9bac5ab7a35b0c6ae7e344c8
+  languageName: node
+  linkType: hard
+
+"@jridgewell/sourcemap-codec@npm:^1.5.0":
+  version: 1.5.0
+  resolution: "@jridgewell/sourcemap-codec@npm:1.5.0"
+  checksum: 05df4f2538b3b0f998ea4c1cd34574d0feba216fa5d4ccaef0187d12abf82eafe6021cec8b49f9bb4d90f2ba4582ccc581e72986a5fcf4176ae0cfeb04cf52ec
   languageName: node
   linkType: hard
 
@@ -9164,42 +9171,26 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rollup/plugin-commonjs@npm:^24.0.1":
-  version: 24.1.0
-  resolution: "@rollup/plugin-commonjs@npm:24.1.0"
+"@rollup/plugin-commonjs@npm:^26.0.1":
+  version: 26.0.1
+  resolution: "@rollup/plugin-commonjs@npm:26.0.1"
   dependencies:
     "@rollup/pluginutils": ^5.0.1
     commondir: ^1.0.1
     estree-walker: ^2.0.2
-    glob: ^8.0.3
+    glob: ^10.4.1
     is-reference: 1.2.1
-    magic-string: ^0.27.0
+    magic-string: ^0.30.3
   peerDependencies:
-    rollup: ^2.68.0||^3.0.0
+    rollup: ^2.68.0||^3.0.0||^4.0.0
   peerDependenciesMeta:
     rollup:
       optional: true
-  checksum: 42faafc9bc8e04d75c86bb50d693ebb9c5eee19bf9ab3c09780b872547d12ff5ea85cfec7da75f5176d0aa4b5233101f667f44b85b331450a7bb14c95180852e
+  checksum: 88d1349cc2cda4ad6193cce901356e4c14a830497fc01c91f38c94a871b203ffe657b29c9a98cd16787e3a6a8b45169dd0b471cb36d26d645478a177c958779a
   languageName: node
   linkType: hard
 
-"@rollup/plugin-inject@npm:^5.0.1":
-  version: 5.0.3
-  resolution: "@rollup/plugin-inject@npm:5.0.3"
-  dependencies:
-    "@rollup/pluginutils": ^5.0.1
-    estree-walker: ^2.0.2
-    magic-string: ^0.27.0
-  peerDependencies:
-    rollup: ^1.20.0||^2.0.0||^3.0.0
-  peerDependenciesMeta:
-    rollup:
-      optional: true
-  checksum: d8458b11af3447710ce200fe2886faff07bb054e1269a4f06f5f3c1a1b83019b6ce7761badfa116ca96fbb9c49f16b94ad02d1a72c2fb64dc68cb7dd81331cb7
-  languageName: node
-  linkType: hard
-
-"@rollup/plugin-inject@npm:^5.0.5":
+"@rollup/plugin-inject@npm:^5.0.4, @rollup/plugin-inject@npm:^5.0.5":
   version: 5.0.5
   resolution: "@rollup/plugin-inject@npm:5.0.5"
   dependencies:
@@ -9215,17 +9206,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rollup/plugin-json@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "@rollup/plugin-json@npm:6.0.0"
+"@rollup/plugin-json@npm:^6.1.0":
+  version: 6.1.0
+  resolution: "@rollup/plugin-json@npm:6.1.0"
   dependencies:
-    "@rollup/pluginutils": ^5.0.1
+    "@rollup/pluginutils": ^5.1.0
   peerDependencies:
-    rollup: ^1.20.0||^2.0.0||^3.0.0
+    rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
   peerDependenciesMeta:
     rollup:
       optional: true
-  checksum: 77cfc941edaf77a5307977704ffaba706d83bea66f265b2b68f14be2a0af6d08b0fb1b04fdd773146c84cc70938ff64b00ae946808fd6ac057058af824d78128
+  checksum: cc018d20c80242a2b8b44fae61a968049cf31bb8406218187cc7cda35747616594e79452dd65722e7da6dd825b392e90d4599d43cd4461a02fefa2865945164e
   languageName: node
   linkType: hard
 
@@ -9245,9 +9236,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rollup/plugin-node-resolve@npm:^15.0.2":
-  version: 15.1.0
-  resolution: "@rollup/plugin-node-resolve@npm:15.1.0"
+"@rollup/plugin-node-resolve@npm:^15.2.3":
+  version: 15.2.3
+  resolution: "@rollup/plugin-node-resolve@npm:15.2.3"
   dependencies:
     "@rollup/pluginutils": ^5.0.1
     "@types/resolve": 1.20.2
@@ -9256,11 +9247,11 @@ __metadata:
     is-module: ^1.0.0
     resolve: ^1.22.1
   peerDependencies:
-    rollup: ^2.78.0||^3.0.0
+    rollup: ^2.78.0||^3.0.0||^4.0.0
   peerDependenciesMeta:
     rollup:
       optional: true
-  checksum: 83617cdbb90cb780251e8b16dc1671e35bde90b8d4d30e008aefe706b5b643057f6299bdd3226b2a30bf5e4f807a880169de3faa47b9f2ba38d39f294f85f951
+  checksum: 730f32c2f8fdddff07cf0fca86a5dac7c475605fb96930197a868c066e62eb6388c557545e4f7d99b7a283411754c9fbf98944ab086b6074e04fc1292e234aa8
   languageName: node
   linkType: hard
 
@@ -9276,45 +9267,45 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rollup/plugin-replace@npm:^5.0.2":
-  version: 5.0.2
-  resolution: "@rollup/plugin-replace@npm:5.0.2"
+"@rollup/plugin-replace@npm:^5.0.7":
+  version: 5.0.7
+  resolution: "@rollup/plugin-replace@npm:5.0.7"
   dependencies:
     "@rollup/pluginutils": ^5.0.1
-    magic-string: ^0.27.0
+    magic-string: ^0.30.3
   peerDependencies:
-    rollup: ^1.20.0||^2.0.0||^3.0.0
+    rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
   peerDependenciesMeta:
     rollup:
       optional: true
-  checksum: 3a91b5fa2ce5acfe67c1faf8d479585da30f398f29499cf8a2d2153c899af0b2ef0363012db0e6edc2ebbb3d9fad6dd7ad591c9d977c1ae2ca3256b52e86d950
+  checksum: 67985e3f4056b92a5f6847b9ddf5b8e9aaecefa0e20b96751dcd63c3ca1f907dadad2940f270867dab2e24bc27da6b0e82f0ce6bb20309aa3465869a9d2e3f13
   languageName: node
   linkType: hard
 
-"@rollup/plugin-terser@npm:^0.4.3":
-  version: 0.4.3
-  resolution: "@rollup/plugin-terser@npm:0.4.3"
+"@rollup/plugin-terser@npm:^0.4.4":
+  version: 0.4.4
+  resolution: "@rollup/plugin-terser@npm:0.4.4"
   dependencies:
     serialize-javascript: ^6.0.1
     smob: ^1.0.0
     terser: ^5.17.4
   peerDependencies:
-    rollup: ^2.x || ^3.x
+    rollup: ^2.0.0||^3.0.0||^4.0.0
   peerDependenciesMeta:
     rollup:
       optional: true
-  checksum: 0d697e816f32e9609c48defbda6f3ed90548126fbf673451cfde2c576a7511073cd25d45a9669f179d0b89485e62f56cabeb65428c2232469ab6057ae5dc7709
+  checksum: 5472f659fbb7034488df91eb01ecd2ddf6d2cf203d049aa486139225ad5566254c6ec24aad1f5d1167e35f480212ede5160df9cc80e149a28874f78ed6a7fd9a
   languageName: node
   linkType: hard
 
-"@rollup/plugin-typescript@npm:^11.0.0":
-  version: 11.1.2
-  resolution: "@rollup/plugin-typescript@npm:11.1.2"
+"@rollup/plugin-typescript@npm:^11.1.6":
+  version: 11.1.6
+  resolution: "@rollup/plugin-typescript@npm:11.1.6"
   dependencies:
-    "@rollup/pluginutils": ^5.0.1
+    "@rollup/pluginutils": ^5.1.0
     resolve: ^1.22.1
   peerDependencies:
-    rollup: ^2.14.0||^3.0.0
+    rollup: ^2.14.0||^3.0.0||^4.0.0
     tslib: "*"
     typescript: ">=3.7.0"
   peerDependenciesMeta:
@@ -9322,7 +9313,7 @@ __metadata:
       optional: true
     tslib:
       optional: true
-  checksum: f4655a35e08639574e86dbce578b76468ee8627e4a3d8a46b7e0703d5d98c39a9bda9aa7144510aae11c5d8ce9c3b065e7f3e52dd31fbc6780015dd7802e01f7
+  checksum: 3f5b981f4d9c9501be1f16396f7b6d4ae584cb1b61e9f0bed66f98245fb77f249caea2b9b5f222f933b46fd9043c1f2664a7445aefa386c1ffbb4f0b80fc6004
   languageName: node
   linkType: hard
 
@@ -9355,9 +9346,32 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@rollup/pluginutils@npm:^5.1.0":
+  version: 5.1.0
+  resolution: "@rollup/pluginutils@npm:5.1.0"
+  dependencies:
+    "@types/estree": ^1.0.0
+    estree-walker: ^2.0.2
+    picomatch: ^2.3.1
+  peerDependencies:
+    rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
+  peerDependenciesMeta:
+    rollup:
+      optional: true
+  checksum: 3cc5a6d91452a6eabbfd1ae79b4dd1f1e809d2eecda6e175deb784e75b0911f47e9ecce73f8dd315d6a8b3f362582c91d3c0f66908b6ced69345b3cbe28f8ce8
+  languageName: node
+  linkType: hard
+
 "@rollup/rollup-android-arm-eabi@npm:4.13.0":
   version: 4.13.0
   resolution: "@rollup/rollup-android-arm-eabi@npm:4.13.0"
+  conditions: os=android & cpu=arm
+  languageName: node
+  linkType: hard
+
+"@rollup/rollup-android-arm-eabi@npm:4.19.1":
+  version: 4.19.1
+  resolution: "@rollup/rollup-android-arm-eabi@npm:4.19.1"
   conditions: os=android & cpu=arm
   languageName: node
   linkType: hard
@@ -9369,9 +9383,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@rollup/rollup-android-arm64@npm:4.19.1":
+  version: 4.19.1
+  resolution: "@rollup/rollup-android-arm64@npm:4.19.1"
+  conditions: os=android & cpu=arm64
+  languageName: node
+  linkType: hard
+
 "@rollup/rollup-darwin-arm64@npm:4.13.0":
   version: 4.13.0
   resolution: "@rollup/rollup-darwin-arm64@npm:4.13.0"
+  conditions: os=darwin & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@rollup/rollup-darwin-arm64@npm:4.19.1":
+  version: 4.19.1
+  resolution: "@rollup/rollup-darwin-arm64@npm:4.19.1"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
@@ -9383,6 +9411,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@rollup/rollup-darwin-x64@npm:4.19.1":
+  version: 4.19.1
+  resolution: "@rollup/rollup-darwin-x64@npm:4.19.1"
+  conditions: os=darwin & cpu=x64
+  languageName: node
+  linkType: hard
+
 "@rollup/rollup-linux-arm-gnueabihf@npm:4.13.0":
   version: 4.13.0
   resolution: "@rollup/rollup-linux-arm-gnueabihf@npm:4.13.0"
@@ -9390,9 +9425,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@rollup/rollup-linux-arm-gnueabihf@npm:4.19.1":
+  version: 4.19.1
+  resolution: "@rollup/rollup-linux-arm-gnueabihf@npm:4.19.1"
+  conditions: os=linux & cpu=arm & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@rollup/rollup-linux-arm-musleabihf@npm:4.19.1":
+  version: 4.19.1
+  resolution: "@rollup/rollup-linux-arm-musleabihf@npm:4.19.1"
+  conditions: os=linux & cpu=arm & libc=musl
+  languageName: node
+  linkType: hard
+
 "@rollup/rollup-linux-arm64-gnu@npm:4.13.0":
   version: 4.13.0
   resolution: "@rollup/rollup-linux-arm64-gnu@npm:4.13.0"
+  conditions: os=linux & cpu=arm64 & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@rollup/rollup-linux-arm64-gnu@npm:4.19.1":
+  version: 4.19.1
+  resolution: "@rollup/rollup-linux-arm64-gnu@npm:4.19.1"
   conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
@@ -9404,6 +9460,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@rollup/rollup-linux-arm64-musl@npm:4.19.1":
+  version: 4.19.1
+  resolution: "@rollup/rollup-linux-arm64-musl@npm:4.19.1"
+  conditions: os=linux & cpu=arm64 & libc=musl
+  languageName: node
+  linkType: hard
+
+"@rollup/rollup-linux-powerpc64le-gnu@npm:4.19.1":
+  version: 4.19.1
+  resolution: "@rollup/rollup-linux-powerpc64le-gnu@npm:4.19.1"
+  conditions: os=linux & cpu=ppc64 & libc=glibc
+  languageName: node
+  linkType: hard
+
 "@rollup/rollup-linux-riscv64-gnu@npm:4.13.0":
   version: 4.13.0
   resolution: "@rollup/rollup-linux-riscv64-gnu@npm:4.13.0"
@@ -9411,9 +9481,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@rollup/rollup-linux-riscv64-gnu@npm:4.19.1":
+  version: 4.19.1
+  resolution: "@rollup/rollup-linux-riscv64-gnu@npm:4.19.1"
+  conditions: os=linux & cpu=riscv64 & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@rollup/rollup-linux-s390x-gnu@npm:4.19.1":
+  version: 4.19.1
+  resolution: "@rollup/rollup-linux-s390x-gnu@npm:4.19.1"
+  conditions: os=linux & cpu=s390x & libc=glibc
+  languageName: node
+  linkType: hard
+
 "@rollup/rollup-linux-x64-gnu@npm:4.13.0":
   version: 4.13.0
   resolution: "@rollup/rollup-linux-x64-gnu@npm:4.13.0"
+  conditions: os=linux & cpu=x64 & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@rollup/rollup-linux-x64-gnu@npm:4.19.1":
+  version: 4.19.1
+  resolution: "@rollup/rollup-linux-x64-gnu@npm:4.19.1"
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
@@ -9425,9 +9516,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@rollup/rollup-linux-x64-musl@npm:4.19.1":
+  version: 4.19.1
+  resolution: "@rollup/rollup-linux-x64-musl@npm:4.19.1"
+  conditions: os=linux & cpu=x64 & libc=musl
+  languageName: node
+  linkType: hard
+
 "@rollup/rollup-win32-arm64-msvc@npm:4.13.0":
   version: 4.13.0
   resolution: "@rollup/rollup-win32-arm64-msvc@npm:4.13.0"
+  conditions: os=win32 & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@rollup/rollup-win32-arm64-msvc@npm:4.19.1":
+  version: 4.19.1
+  resolution: "@rollup/rollup-win32-arm64-msvc@npm:4.19.1"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
@@ -9439,9 +9544,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@rollup/rollup-win32-ia32-msvc@npm:4.19.1":
+  version: 4.19.1
+  resolution: "@rollup/rollup-win32-ia32-msvc@npm:4.19.1"
+  conditions: os=win32 & cpu=ia32
+  languageName: node
+  linkType: hard
+
 "@rollup/rollup-win32-x64-msvc@npm:4.13.0":
   version: 4.13.0
   resolution: "@rollup/rollup-win32-x64-msvc@npm:4.13.0"
+  conditions: os=win32 & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@rollup/rollup-win32-x64-msvc@npm:4.19.1":
+  version: 4.19.1
+  resolution: "@rollup/rollup-win32-x64-msvc@npm:4.19.1"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
@@ -16686,7 +16805,7 @@ __metadata:
     eslint-config-next: 13.3.1
     ethers: ^5.7.2
     ts-node: ^10.9.1
-    typescript: ^4.9.5
+    typescript: ^5.5.4
   languageName: unknown
   linkType: soft
 
@@ -19616,7 +19735,7 @@ __metadata:
     react: ^18.2.0
     react-dom: ^18.2.0
     tailwindcss: 3.3.2
-    typescript: ^4.9.5
+    typescript: ^5.5.4
   languageName: unknown
   linkType: soft
 
@@ -22431,7 +22550,7 @@ __metadata:
     eslint-config-next: 13.3.1
     ethers: ^5.7.2
     ts-node: ^10.9.1
-    typescript: ^4.9.5
+    typescript: ^5.5.4
   languageName: unknown
   linkType: soft
 
@@ -23231,7 +23350,7 @@ __metadata:
     pinst: ^3.0.0
     ts-jest: ^29.1.1
     ts-node: ^10.9.1
-    typescript: ^5.3.2
+    typescript: ^5.5.4
   languageName: unknown
   linkType: soft
 
@@ -23264,7 +23383,7 @@ __metadata:
     solidity-coverage: ^0.8.1
     ts-jest: ^29.1.1
     ts-node: ^10.9.2
-    typescript: ^5.3.2
+    typescript: ^5.5.4
   languageName: unknown
   linkType: soft
 
@@ -23676,7 +23795,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"glob@npm:8.1.0, glob@npm:^8.0.3, glob@npm:^8.1.0":
+"glob@npm:8.1.0, glob@npm:^8.1.0":
   version: 8.1.0
   resolution: "glob@npm:8.1.0"
   dependencies:
@@ -23701,6 +23820,22 @@ __metadata:
   bin:
     glob: dist/cjs/src/bin.js
   checksum: 29190d3291f422da0cb40b77a72fc8d2c51a36524e99b8bf412548b7676a6627489528b57250429612b6eec2e6fe7826d328451d3e694a9d15e575389308ec53
+  languageName: node
+  linkType: hard
+
+"glob@npm:^10.4.1":
+  version: 10.4.5
+  resolution: "glob@npm:10.4.5"
+  dependencies:
+    foreground-child: ^3.1.0
+    jackspeak: ^3.1.2
+    minimatch: ^9.0.4
+    minipass: ^7.1.2
+    package-json-from-dist: ^1.0.0
+    path-scurry: ^1.11.1
+  bin:
+    glob: dist/esm/bin.mjs
+  checksum: 0bc725de5e4862f9f387fd0f2b274baf16850dcd2714502ccf471ee401803997983e2c05590cb65f9675a3c6f2a58e7a53f9e365704108c6ad3cbf1d60934c4a
   languageName: node
   linkType: hard
 
@@ -26112,6 +26247,19 @@ __metadata:
     "@pkgjs/parseargs":
       optional: true
   checksum: 57d43ad11eadc98cdfe7496612f6bbb5255ea69fe51ea431162db302c2a11011642f50cfad57288bd0aea78384a0612b16e131944ad8ecd09d619041c8531b54
+  languageName: node
+  linkType: hard
+
+"jackspeak@npm:^3.1.2":
+  version: 3.4.3
+  resolution: "jackspeak@npm:3.4.3"
+  dependencies:
+    "@isaacs/cliui": ^8.0.2
+    "@pkgjs/parseargs": ^0.11.0
+  dependenciesMeta:
+    "@pkgjs/parseargs":
+      optional: true
+  checksum: be31027fc72e7cc726206b9f560395604b82e0fddb46c4cbf9f97d049bcef607491a5afc0699612eaa4213ca5be8fd3e1e7cd187b3040988b65c9489838a7c00
   languageName: node
   linkType: hard
 
@@ -29255,6 +29403,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lru-cache@npm:^10.2.0":
+  version: 10.4.3
+  resolution: "lru-cache@npm:10.4.3"
+  checksum: 6476138d2125387a6d20f100608c2583d415a4f64a0fecf30c9e2dda976614f09cad4baa0842447bd37dd459a7bd27f57d9d8f8ce558805abd487c583f3d774a
+  languageName: node
+  linkType: hard
+
 "lru-cache@npm:^4.0.1":
   version: 4.1.5
   resolution: "lru-cache@npm:4.1.5"
@@ -29357,21 +29512,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"magic-string@npm:^0.27.0":
-  version: 0.27.0
-  resolution: "magic-string@npm:0.27.0"
+"magic-string@npm:^0.30.10":
+  version: 0.30.11
+  resolution: "magic-string@npm:0.30.11"
   dependencies:
-    "@jridgewell/sourcemap-codec": ^1.4.13
-  checksum: 273faaa50baadb7a2df6e442eac34ad611304fc08fe16e24fe2e472fd944bfcb73ffb50d2dc972dc04e92784222002af46868cb9698b1be181c81830fd95a13e
-  languageName: node
-  linkType: hard
-
-"magic-string@npm:^0.30.0":
-  version: 0.30.1
-  resolution: "magic-string@npm:0.30.1"
-  dependencies:
-    "@jridgewell/sourcemap-codec": ^1.4.15
-  checksum: 7bc7e4493e32a77068f3753bf8652d4ab44142122eb7fb9fa871af83bef2cd2c57518a6769701cd5d0379bd624a13bc8c72ca25ac5655b27e5a61adf1fd38db2
+    "@jridgewell/sourcemap-codec": ^1.5.0
+  checksum: e041649453c9a3f31d2e731fc10e38604d50e20d3585cd48bc7713a6e2e1a3ad3012105929ca15750d59d0a3f1904405e4b95a23b7e69dc256db3c277a73a3ca
   languageName: node
   linkType: hard
 
@@ -29782,7 +29928,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"minimatch@npm:^9.0.3":
+"minimatch@npm:^9.0.3, minimatch@npm:^9.0.4":
   version: 9.0.5
   resolution: "minimatch@npm:9.0.5"
   dependencies:
@@ -29869,6 +30015,13 @@ __metadata:
   version: 7.0.2
   resolution: "minipass@npm:7.0.2"
   checksum: 46776de732eb7cef2c7404a15fb28c41f5c54a22be50d47b03c605bf21f5c18d61a173c0a20b49a97e7a65f78d887245066410642551e45fffe04e9ac9e325bc
+  languageName: node
+  linkType: hard
+
+"minipass@npm:^7.1.2":
+  version: 7.1.2
+  resolution: "minipass@npm:7.1.2"
+  checksum: 2bfd325b95c555f2b4d2814d49325691c7bee937d753814861b0b49d5edcda55cbbf22b6b6a60bb91eddac8668771f03c5ff647dcd9d0f798e9548b9cdc46ee3
   languageName: node
   linkType: hard
 
@@ -31661,6 +31814,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"package-json-from-dist@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "package-json-from-dist@npm:1.0.0"
+  checksum: ac706ec856a5a03f5261e4e48fa974f24feb044d51f84f8332e2af0af04fbdbdd5bbbfb9cbbe354190409bc8307c83a9e38c6672c3c8855f709afb0006a009ea
+  languageName: node
+  linkType: hard
+
 "package-json@npm:^8.1.0":
   version: 8.1.1
   resolution: "package-json@npm:8.1.1"
@@ -31906,6 +32066,16 @@ __metadata:
     lru-cache: ^9.1.1 || ^10.0.0
     minipass: ^5.0.0 || ^6.0.2 || ^7.0.0
   checksum: e2557cff3a8fb8bc07afdd6ab163a92587884f9969b05bbbaf6fe7379348bfb09af9ed292af12ed32398b15fb443e81692047b786d1eeb6d898a51eb17ed7d90
+  languageName: node
+  linkType: hard
+
+"path-scurry@npm:^1.11.1":
+  version: 1.11.1
+  resolution: "path-scurry@npm:1.11.1"
+  dependencies:
+    lru-cache: ^10.2.0
+    minipass: ^5.0.0 || ^6.0.2 || ^7.0.0
+  checksum: 890d5abcd593a7912dcce7cf7c6bf7a0b5648e3dee6caf0712c126ca0a65c7f3d7b9d769072a4d1baf370f61ce493ab5b038d59988688e0c5f3f646ee3c69023
   languageName: node
   linkType: hard
 
@@ -35189,30 +35359,30 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rollup-plugin-dts@npm:^5.3.0":
-  version: 5.3.0
-  resolution: "rollup-plugin-dts@npm:5.3.0"
+"rollup-plugin-dts@npm:^6.1.1":
+  version: 6.1.1
+  resolution: "rollup-plugin-dts@npm:6.1.1"
   dependencies:
-    "@babel/code-frame": ^7.18.6
-    magic-string: ^0.30.0
+    "@babel/code-frame": ^7.24.2
+    magic-string: ^0.30.10
   peerDependencies:
-    rollup: ^3.0.0
-    typescript: ^4.1 || ^5.0
+    rollup: ^3.29.4 || ^4
+    typescript: ^4.5 || ^5.0
   dependenciesMeta:
     "@babel/code-frame":
       optional: true
-  checksum: ba3a6065598586c52af60211877a234b8c829b8a7ecd6e6b426e52ec4dc2c8c8ac6e1fb9f47db6afd91858be0dcb09fd3d312c865e972fb72ae8c9ee00eb1d36
+  checksum: e69da1a286570f5a8d990651a613b2063543a71ad3b3471a97e74ea328125ebee77a74b2c800031f8dcccdc92da0d086f833724d13a2c863a2cbdf7e8fc20329
   languageName: node
   linkType: hard
 
-"rollup-plugin-polyfill-node@npm:^0.12.0":
-  version: 0.12.0
-  resolution: "rollup-plugin-polyfill-node@npm:0.12.0"
+"rollup-plugin-polyfill-node@npm:^0.13.0":
+  version: 0.13.0
+  resolution: "rollup-plugin-polyfill-node@npm:0.13.0"
   dependencies:
-    "@rollup/plugin-inject": ^5.0.1
+    "@rollup/plugin-inject": ^5.0.4
   peerDependencies:
-    rollup: ^1.20.0 || ^2.0.0 || ^3.0.0
-  checksum: d5cf7fcd15795cb3fc0c005c04b1ad30b776202591ae6d316654a2e0388861f8c0950234f4979eaae6024f3da37f08a3d83cc94cb625fbe3984b68a1184f7165
+    rollup: ^1.20.0 || ^2.0.0 || ^3.0.0 || ^4.0.0
+  checksum: 73c5b9086955afa108c940c13205fab4cece149d020a3faa696c5711bbb391d11aecd4c913ad2cc5ac24f9d43a4969ad8d087d085dd8d423dece45b6be4039bb
   languageName: node
   linkType: hard
 
@@ -35282,20 +35452,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rollup@npm:^3.17.2":
-  version: 3.26.3
-  resolution: "rollup@npm:3.26.3"
-  dependencies:
-    fsevents: ~2.3.2
-  dependenciesMeta:
-    fsevents:
-      optional: true
-  bin:
-    rollup: dist/bin/rollup
-  checksum: e6a765b2b7af709170344cc804392936613e06b6bdab46a04d264368d154bdadaaaf77de39e6e656bf728a060d7b4867d81e2464d791c0f37dd5b21aa9c7a6df
-  languageName: node
-  linkType: hard
-
 "rollup@npm:^4.13.0":
   version: 4.13.0
   resolution: "rollup@npm:4.13.0"
@@ -35347,6 +35503,69 @@ __metadata:
   bin:
     rollup: dist/bin/rollup
   checksum: c2c35bee0a71ceb0df37c170c2b73a500bf9ebdffb747487d77831348603d50dcfcdd9d0a937362d3a87edda559c9d1e017fba2d75f05f0c594634d9b8dde9a4
+  languageName: node
+  linkType: hard
+
+"rollup@npm:^4.19.1":
+  version: 4.19.1
+  resolution: "rollup@npm:4.19.1"
+  dependencies:
+    "@rollup/rollup-android-arm-eabi": 4.19.1
+    "@rollup/rollup-android-arm64": 4.19.1
+    "@rollup/rollup-darwin-arm64": 4.19.1
+    "@rollup/rollup-darwin-x64": 4.19.1
+    "@rollup/rollup-linux-arm-gnueabihf": 4.19.1
+    "@rollup/rollup-linux-arm-musleabihf": 4.19.1
+    "@rollup/rollup-linux-arm64-gnu": 4.19.1
+    "@rollup/rollup-linux-arm64-musl": 4.19.1
+    "@rollup/rollup-linux-powerpc64le-gnu": 4.19.1
+    "@rollup/rollup-linux-riscv64-gnu": 4.19.1
+    "@rollup/rollup-linux-s390x-gnu": 4.19.1
+    "@rollup/rollup-linux-x64-gnu": 4.19.1
+    "@rollup/rollup-linux-x64-musl": 4.19.1
+    "@rollup/rollup-win32-arm64-msvc": 4.19.1
+    "@rollup/rollup-win32-ia32-msvc": 4.19.1
+    "@rollup/rollup-win32-x64-msvc": 4.19.1
+    "@types/estree": 1.0.5
+    fsevents: ~2.3.2
+  dependenciesMeta:
+    "@rollup/rollup-android-arm-eabi":
+      optional: true
+    "@rollup/rollup-android-arm64":
+      optional: true
+    "@rollup/rollup-darwin-arm64":
+      optional: true
+    "@rollup/rollup-darwin-x64":
+      optional: true
+    "@rollup/rollup-linux-arm-gnueabihf":
+      optional: true
+    "@rollup/rollup-linux-arm-musleabihf":
+      optional: true
+    "@rollup/rollup-linux-arm64-gnu":
+      optional: true
+    "@rollup/rollup-linux-arm64-musl":
+      optional: true
+    "@rollup/rollup-linux-powerpc64le-gnu":
+      optional: true
+    "@rollup/rollup-linux-riscv64-gnu":
+      optional: true
+    "@rollup/rollup-linux-s390x-gnu":
+      optional: true
+    "@rollup/rollup-linux-x64-gnu":
+      optional: true
+    "@rollup/rollup-linux-x64-musl":
+      optional: true
+    "@rollup/rollup-win32-arm64-msvc":
+      optional: true
+    "@rollup/rollup-win32-ia32-msvc":
+      optional: true
+    "@rollup/rollup-win32-x64-msvc":
+      optional: true
+    fsevents:
+      optional: true
+  bin:
+    rollup: dist/bin/rollup
+  checksum: b431700a5248563c0e1d03521b8262aad9adc46007159b2792569ff56e5b11cbaa555809b90765f291484dad726f2250270112943bcbd8a067608804d96fa3d5
   languageName: node
   linkType: hard
 
@@ -35668,7 +35887,7 @@ __metadata:
   resolution: "seaport-core@https://github.com/immutable/seaport-core.git#commit=0633350ec34f21fcede657ff812f11cf7d19144e"
   dependencies:
     seaport-types: ^0.0.1
-  checksum: d8adba0d54106c6fe9370f0775fadef2198e5eab440b36919d1f917705ce2f0a7028e4da021b6df049aa3ca35d7e673a28b78a731130f0ff9fdf7a8bd32e3b94
+  checksum: 392bce86bbfc4f7c00b65575b238825f4c696bddf5af08be7aa496862e63879375387fd4400f6e900ffee08d65c1f75cf3adad9c6c41ddcf7a3b0389cd73c3c7
   languageName: node
   linkType: hard
 
@@ -35712,7 +35931,7 @@ __metadata:
     seaport-sol: ^1.5.0
     seaport-types: ^0.0.1
     solady: ^0.0.84
-  checksum: a77e141e4ab5d2c4bb190a38fbb6cda3011fdf5f350b250fbeb4d82ae81cf917a966a2dcb8d9e4fd1bed29e5510ede9b15941b0ac77aeb4272dab94c9f51e7ff
+  checksum: f31a7443a50fa1c35ec03ea031743d1d10896653ae443fa15ab8e6f5b4a2ca43f6743d523ae4e1f14df867451e5b2b2130b0bfa58a1085b0bcae3fceb8dfdc9b
   languageName: node
   linkType: hard
 
@@ -39009,17 +39228,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^4.9.5":
-  version: 4.9.5
-  resolution: "typescript@npm:4.9.5"
-  bin:
-    tsc: bin/tsc
-    tsserver: bin/tsserver
-  checksum: ee000bc26848147ad423b581bd250075662a354d84f0e06eb76d3b892328d8d4440b7487b5a83e851b12b255f55d71835b008a66cbf8f255a11e4400159237db
-  languageName: node
-  linkType: hard
-
-"typescript@npm:^5, typescript@npm:^5.0.2, typescript@npm:^5.3.2":
+"typescript@npm:^5.5.4":
   version: 5.5.4
   resolution: "typescript@npm:5.5.4"
   bin:
@@ -39029,17 +39238,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@^4.9.5#~builtin<compat/typescript>":
-  version: 4.9.5
-  resolution: "typescript@patch:typescript@npm%3A4.9.5#~builtin<compat/typescript>::version=4.9.5&hash=289587"
-  bin:
-    tsc: bin/tsc
-    tsserver: bin/tsserver
-  checksum: 1f8f3b6aaea19f0f67cba79057674ba580438a7db55057eb89cc06950483c5d632115c14077f6663ea76fd09fce3c190e6414bb98582ec80aa5a4eaf345d5b68
-  languageName: node
-  linkType: hard
-
-"typescript@patch:typescript@^5#~builtin<compat/typescript>, typescript@patch:typescript@^5.0.2#~builtin<compat/typescript>, typescript@patch:typescript@^5.3.2#~builtin<compat/typescript>":
+"typescript@patch:typescript@^5.5.4#~builtin<compat/typescript>":
   version: 5.5.4
   resolution: "typescript@patch:typescript@npm%3A5.5.4#~builtin<compat/typescript>::version=5.5.4&hash=14eedb"
   bin:
@@ -41132,7 +41331,7 @@ __metadata:
     react-dom: ^18.2.0
     react-scripts: 5.0.1
     stream-browserify: ^3.0.0
-    typescript: ^4.9.5
+    typescript: ^5.5.4
     web-vitals: ^2.1.4
   languageName: unknown
   linkType: soft
