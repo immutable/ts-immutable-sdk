@@ -6,17 +6,17 @@ export default function Home() {
           <a 
             className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
             href="/connect-with-eip1193">
-              Connect Wallet with EIP-1193
+              Connect with EIP-1193
           </a>
           <a 
             className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
             href="/connect-with-etherjs">
-              Connect Wallet with EtherJS
+              Connect with EtherJS
           </a>      
           <a 
             className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
             href="/connect-with-wagmi">
-              Connect Wallet with Wagmi
+              Connect with Wagmi
           </a>
       </div>
     </div>

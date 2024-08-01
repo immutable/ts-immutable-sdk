@@ -5,7 +5,7 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Passport Wallets Connect',
+  title: 'Passport Connect Examples',
   description: 'Examples of how to connect wallets to Passport with NextJS',
 };
 
