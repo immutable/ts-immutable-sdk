@@ -12,7 +12,7 @@ export enum CheckoutFlowType {
   WALLET = 'wallet',
   SWAP = 'swap',
   BRIDGE = 'bridge',
-  ONRAMP = 'on-ramp',
+  ONRAMP = 'onramp',
   SALE = 'sale',
 }
 

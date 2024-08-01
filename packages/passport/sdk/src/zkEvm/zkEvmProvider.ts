@@ -172,6 +172,7 @@ export class ZkEvmProvider implements Provider {
     // Throw the stored error if the signers failed to initialise
     if (typeof ethSigner === 'undefined') {
       if (typeof this.#signerInitialisationError !== 'undefined') {
+        // eslint-disable-next-line @typescript-eslint/no-throw-literal
         throw this.#signerInitialisationError;
       }
       throw new Error('Signer failed to initialise');
