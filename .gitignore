@@ -29,3 +29,4 @@ docs/
 .nx/workspace-data
 nx-cloud.env
 dep-graph.json
+examples/**/.env
