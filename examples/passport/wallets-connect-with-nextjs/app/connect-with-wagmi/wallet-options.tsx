@@ -30,12 +30,13 @@ export function WalletOptions() {
   return (
     <>
       {filteredConnectors.map((connector) => (
-        <button 
+        <button
           className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
-          key={connector.uid} 
-          type="button" 
+          key={connector.uid}
+          type="button"
           onClick={() => passportLogin(connector)}
-          disabled={loading}>
+          disabled={loading}
+        >
           {connector.name}
         </button>
       ))}

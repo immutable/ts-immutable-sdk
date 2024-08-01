@@ -25,10 +25,10 @@ export async function sendTransaction(passportInstance: passport.Passport) {
     tx = await contract.safeTransferFrom(userAddress, toAddress, tokenId);
   } catch (error: any) {
     // Handle user denying signature
-    if (error.code === 4001) { 
-      console.error('user denied signature')
+    if (error.code === 4001) {
+      console.error('user denied signature');
     } else {
-      console.error('something went wrong: ', error.message)
+      console.error('something went wrong: ', error.message);
     }
   }
 

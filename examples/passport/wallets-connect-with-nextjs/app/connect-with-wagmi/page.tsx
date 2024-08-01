@@ -20,12 +20,12 @@ export default function ConnectWithWagmi() {
 
       <h1 className="text-3xl font-bold mb-8">Passport Connect with Wagmi</h1>
       <WagmiProvider config={config}>
-              <QueryClientProvider client={queryClient}>
-                <ConnectWallet />
-              </QueryClientProvider>
-            </WagmiProvider>
+        <QueryClientProvider client={queryClient}>
+          <ConnectWallet />
+        </QueryClientProvider>
+      </WagmiProvider>
       <br />
-      <a href="/" className='underline'>Return to Examples</a>
+      <a href="/" className="underline">Return to Examples</a>
     </div>
   );
 }

@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { ethers } from 'ethers';
-import { ProviderEvent } from '@imtbl/sdk/passport';
 import { passportInstance } from '../utils';
 
 export default function ConnectWithEtherJS() {
@@ -97,10 +96,9 @@ export default function ConnectWithEtherJS() {
       contents: 'Hello, Bob!',
     };
 
-    let signature: string;
     try {
       // attempt to sign the message, this brings up the passport popup
-      signature = await signer._signTypedData(domain, types, message);
+      await signer._signTypedData(domain, types, message);
 
       // if successful update the signed message to successful in the view
       setSignedMessageState('user successfully signed message');
@@ -119,19 +117,28 @@ export default function ConnectWithEtherJS() {
 
   // render the view to login/logout and show the connected accounts and sign message
   return (
-     <div className="flex flex-col items-center justify-center min-h-screen p-8">
+    <div className="flex flex-col items-center justify-center min-h-screen p-8">
       <h1 className="text-3xl font-bold mb-8">Passport Sign EIP-712 Message</h1>
       {accountsState.length === 0
-      && <button
-      className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800" 
-      onClick={passportLogin} disabled={loading}>Passport Login</button>}
+      && (
+      <button
+        className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
+        onClick={passportLogin}
+        disabled={loading}
+      >
+        Passport Login
+      </button>
+      )}
       {accountsState.length >= 1 && (
       <>
         <p>
-          <button 
+          <button
             className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
-
-          onClick={signMessage} disabled={loading}>Sign Message</button>
+            onClick={signMessage}
+            disabled={loading}
+          >
+            Sign Message
+          </button>
         </p>
         <br />
         <p>
@@ -140,9 +147,13 @@ export default function ConnectWithEtherJS() {
         </p>
         <br />
         <p>
-          <button 
+          <button
             className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
-            onClick={passportLogout} disabled={loading}>Passport Logout</button>
+            onClick={passportLogout}
+            disabled={loading}
+          >
+            Passport Logout
+          </button>
         </p>
       </>
       )}
@@ -155,8 +166,8 @@ export default function ConnectWithEtherJS() {
             {accountsState.length >= 1 ? accountsState : '(not connected)'}
           </p>
         )}
-        <br />
-      <a href="/" className='underline'>Return to Examples</a>
-    </div>    
+      <br />
+      <a href="/" className="underline">Return to Examples</a>
+    </div>
   );
 }
