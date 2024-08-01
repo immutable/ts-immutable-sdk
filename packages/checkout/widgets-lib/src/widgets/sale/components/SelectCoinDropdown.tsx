@@ -1,6 +1,5 @@
 import {
   Button,
-  Heading,
   MenuItem,
   ShimmerCircle,
   Stack,
@@ -86,7 +85,7 @@ export function SelectCoinDropdown({
             symbol: token.symbol,
           })}
         </MenuItem.Label>
-        <MenuItem.Caption rc={<Heading size="xSmall" />}>
+        <MenuItem.Caption>
           {`${t('views.ORDER_SUMMARY.orderReview.balance', {
             amount: prettyFormatNumber(
               tokenValueFormat(userBalance.formattedBalance),
@@ -103,7 +102,6 @@ export function SelectCoinDropdown({
         </MenuItem.Caption>
         {priceDisplay && (
           <MenuItem.PriceDisplay
-            use={<Heading size="xSmall" />}
             fiatAmount={
               fiatAmount
                 ? t('views.ORDER_SUMMARY.currency.fiat', { amount: fiatAmount })
