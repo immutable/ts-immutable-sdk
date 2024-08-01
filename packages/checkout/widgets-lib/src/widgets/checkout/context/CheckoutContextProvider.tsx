@@ -38,13 +38,17 @@ export function CheckoutContextProvider({ values, children }: CheckoutContextPro
   }, [checkoutAppIframe, checkout]);
 
   useEffect(() => {
-    if (!provider || !postMessageHandler) return;
+    if (!provider || !postMessageHandler) return undefined;
     checkoutDispatch({
       payload: {
         type: CheckoutActions.SET_PROVIDER_RELAY,
         providerRelay: new ProviderRelay(postMessageHandler, provider),
       },
     });
+
+    return () => {
+      postMessageHandler?.destroy();
+    };
   }, [provider, postMessageHandler]);
 
   return (
