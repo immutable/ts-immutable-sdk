@@ -44,6 +44,10 @@ export function ServiceUnavailableErrorView({
               size="small"
               rc={<a target="_blank" href="https://quickswap.exchange" rel="noreferrer" />}
             />,
+            immutableSupport: <Link
+              size="small"
+              rc={<a target="_blank" href="https://support.immutable.com/" rel="noreferrer" />}
+            />,
           }}
         />
       </SimpleTextBody>
@@ -59,41 +63,41 @@ export function ServiceUnavailableErrorView({
       >
 
         {primaryActionText && onPrimaryButtonClick && (
-        <Box
-          sx={{
-            paddingX: 'base.spacing.x4',
-            paddingBottom: 'base.spacing.x2',
-          }}
-        >
-          <Button
-            sx={{ width: '100%' }}
-            testId="primary-action-button"
-            variant="primary"
-            size="large"
-            onClick={onPrimaryButtonClick}
+          <Box
+            sx={{
+              paddingX: 'base.spacing.x4',
+              paddingBottom: 'base.spacing.x2',
+            }}
           >
-            {primaryActionText}
-          </Button>
-        </Box>
+            <Button
+              sx={{ width: '100%' }}
+              testId="primary-action-button"
+              variant="primary"
+              size="large"
+              onClick={onPrimaryButtonClick}
+            >
+              {primaryActionText}
+            </Button>
+          </Box>
         )}
 
         {secondaryActionText && onSecondaryButtonClick && (
-        <Box
-          sx={{
-            paddingX: 'base.spacing.x4',
-            paddingBottom: 'base.spacing.x2',
-          }}
-        >
-          <Button
-            sx={{ width: '100%' }}
-            testId="secondary-action-button"
-            variant="secondary"
-            size="large"
-            onClick={onSecondaryButtonClick}
+          <Box
+            sx={{
+              paddingX: 'base.spacing.x4',
+              paddingBottom: 'base.spacing.x2',
+            }}
           >
-            {secondaryActionText}
-          </Button>
-        </Box>
+            <Button
+              sx={{ width: '100%' }}
+              testId="secondary-action-button"
+              variant="secondary"
+              size="large"
+              onClick={onSecondaryButtonClick}
+            >
+              {secondaryActionText}
+            </Button>
+          </Box>
         )}
       </Box>
     </SimpleLayout>

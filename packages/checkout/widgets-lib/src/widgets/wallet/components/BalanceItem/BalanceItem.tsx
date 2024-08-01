@@ -1,4 +1,4 @@
-import { Heading, MenuItem } from '@biom3/react';
+import { MenuItem } from '@biom3/react';
 import {
   useContext, useEffect, useMemo, useState,
 } from 'react';
@@ -105,7 +105,6 @@ export function BalanceItem({
       <MenuItem.Caption>{balanceInfo.description}</MenuItem.Caption>
       <MenuItem.PriceDisplay
         testId={`balance-item-${balanceInfo.symbol}`}
-        use={<Heading size="xSmall" />}
         price={tokenValueFormat(balanceInfo.balance)}
         fiatAmount={fiatAmount}
       />

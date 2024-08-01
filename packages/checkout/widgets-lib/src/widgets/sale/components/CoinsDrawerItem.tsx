@@ -1,6 +1,5 @@
 import {
   Box,
-  Heading,
   MenuItem,
   MenuItemSize,
   prettyFormatNumber,
@@ -78,7 +77,6 @@ export function CoinsDrawerItem<
         )}
       />
       <MenuItem.PriceDisplay
-        use={<Heading size="xSmall" />}
         fiatAmount={
           fiatAmount
             ? t('views.ORDER_SUMMARY.currency.fiat', { amount: fiatAmount })
