@@ -229,38 +229,38 @@ export function ConnectLoader({
   return (
     <>
       {(connectionStatus === ConnectionStatus.LOADING) && (
-      <LoadingView loadingText="Loading" />
+        <LoadingView loadingText="Loading" />
       )}
       <ConnectLoaderContext.Provider value={connectLoaderReducerValues}>
         {(connectionStatus === ConnectionStatus.NOT_CONNECTED_NO_PROVIDER
-        || connectionStatus === ConnectionStatus.NOT_CONNECTED
-        || connectionStatus === ConnectionStatus.CONNECTED_WRONG_NETWORK) && (
-          <ConnectWidget
-            config={widgetConfig}
-            targetChainId={targetChainId}
-            web3Provider={provider}
-            checkout={checkout}
-            deepLink={deepLink}
-            sendCloseEventOverride={closeEvent}
-            allowedChains={allowedChains}
-          />
+          || connectionStatus === ConnectionStatus.NOT_CONNECTED
+          || connectionStatus === ConnectionStatus.CONNECTED_WRONG_NETWORK) && (
+            <ConnectWidget
+              config={widgetConfig}
+              targetChainId={targetChainId}
+              web3Provider={provider}
+              checkout={checkout}
+              deepLink={deepLink}
+              sendCloseEventOverride={closeEvent}
+              allowedChains={allowedChains}
+            />
         )}
         {/* If the user has connected then render the widget */}
         {connectionStatus === ConnectionStatus.CONNECTED_WITH_NETWORK && (children)}
       </ConnectLoaderContext.Provider>
       {connectionStatus === ConnectionStatus.ERROR && (
-      <ErrorView
-        onCloseClick={closeEvent}
-        onActionClick={() => {
-          connectLoaderDispatch({
-            payload: {
-              type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
-              connectionStatus: ConnectionStatus.NOT_CONNECTED,
-            },
-          });
-        }}
-        actionText="Try Again"
-      />
+        <ErrorView
+          onCloseClick={closeEvent}
+          onActionClick={() => {
+            connectLoaderDispatch({
+              payload: {
+                type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
+                connectionStatus: ConnectionStatus.NOT_CONNECTED,
+              },
+            });
+          }}
+          actionText="Try Again"
+        />
       )}
     </>
   );
