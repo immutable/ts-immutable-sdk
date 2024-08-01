@@ -29,6 +29,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 env:
   RELEASE_TYPE: ${{ github.event.inputs.release_type || 'alpha' }}
