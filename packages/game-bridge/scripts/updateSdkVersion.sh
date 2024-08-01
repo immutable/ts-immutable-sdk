@@ -6,9 +6,7 @@
 # - TS_SDK_HASH: The git hash of the tag
 
 set -e
-if [ -n "$CI" ]; then
-  set -x
-fi
+set -x
 
 # The files to update
 FILE_PATHS=("./dist/unity/index.html" "./dist/unreal/index.js" "./dist/unreal/index.js.map")
@@ -22,8 +20,26 @@ do
   fi
 done
 
-# Check if running in a CI environment
-if [ -n "$CI" ]; then
+# if running locally, set the environment variables
+if [ -z "$CI" ]; then
+  export TS_SDK_TAG=$(git describe --tags --abbrev=0)
+  export TS_SDK_HASH=$(git rev-parse $TS_SDK_TAG)
+
+  # get the hash of the current HEAD
+  export TS_SDK_LOCAL_HEAD_HASH=$(git rev-parse HEAD)
+
+  # check the hash matches the has from the tag
+  if [ "$TS_SDK_HASH" != "$TS_SDK_LOCAL_HEAD_HASH" ]; then
+    # warn the user that the current tag does not match the current HEAD
+    # but continue with the update
+    echo "[!!!WARNING!!!]"
+    echo "[!!!WARNING!!!]"
+    echo "[!!!WARNING!!!] The current tag does not match the current HEAD. Do not commit this game brige to the Game SDK repos..."
+    echo "[!!!WARNING!!!]"
+    echo "[!!!WARNING!!!]"
+  fi
+else
+  echo "Update SDK version in CI / non-locally" 
   # Get the current branch name
   current_branch=$(git rev-parse --abbrev-ref HEAD)
 
@@ -54,26 +70,6 @@ if [ -n "$CI" ]; then
   if [[ ! $TS_SDK_TAG =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?$ ]]; then
     echo "Current tag is not a valid version. Exiting..."
     exit 1
-  fi
-fi
-
-# if running locally, set the environment variables
-if [ ! -n "$CI" ]; then
-  export TS_SDK_TAG=$(git describe --tags --abbrev=0)
-  export TS_SDK_HASH=$(git rev-parse $TS_SDK_TAG)
-
-  # get the hash of the current HEAD
-  export TS_SDK_LOCAL_HEAD_HASH=$(git rev-parse HEAD)
-
-  # check the hash matches the has from the tag
-  if [ "$TS_SDK_HASH" != "$TS_SDK_LOCAL_HEAD_HASH" ]; then
-    # warn the user that the current tag does not match the current HEAD
-    # but continue with the update
-    echo "[!!!WARNING!!!]"
-    echo "[!!!WARNING!!!]"
-    echo "[!!!WARNING!!!] The current tag does not match the current HEAD. Do not commit this game brige to the Game SDK repos..."
-    echo "[!!!WARNING!!!]"
-    echo "[!!!WARNING!!!]"
   fi
 fi
 

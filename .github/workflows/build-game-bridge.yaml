@@ -31,6 +31,7 @@ env:
   DRY_RUN: ${{ github.event.inputs.dry_run }}
   GH_TOKEN: ${{ secrets.TS_IMMUTABLE_SDK_GITHUB_TOKEN }}
   SDK_TEAM_MEMBERS: ${{ secrets.SDK_TEAM_MEMBERS }}
+  CI: ${{ github.env.CI }}
 
 jobs:
   build-game-bridge:
@@ -64,13 +65,18 @@ jobs:
         run: echo "TS_SDK_HASH=$(git rev-parse HEAD)" >> $GITHUB_ENV
 
       - name: Build Game Bridge
-        run: yarn nx run @imtbl/game-bridge:build
+        run: yarn nx run @imtbl/game-bridge:build --skip-nx-cache
 
       - name: Cache build artifacts
         uses: actions/cache@v4
         with:
           path: ./packages/game-bridge/dist
           key: "${{ runner.os }}-game-bridge-build-${{ env.TS_SDK_TAG }}"
+
+      - name: Upload Game Bridge Build
+        uses: actions/upload-artifact@v4
+        with:
+          path: ./packages/game-bridge/dist
 
   create-unity-pr:
     name: Create Unity PR
@@ -192,11 +198,9 @@ jobs:
           cd ..
 
       - name: Copy Game Bridge Build
-        # TODO: Update this to copy the correct file 
         run: cp -r ./packages/game-bridge/dist/unreal/index.js ./unreal-immutable-sdk/Web/index.js
 
       - name: Commit Changes
-        # TODO: Update this to copy the correct file 
         run: |
           cd unreal-immutable-sdk
           git add Web/index.js
