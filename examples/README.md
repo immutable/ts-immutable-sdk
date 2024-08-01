@@ -99,6 +99,15 @@ NEXT_PUBLIC_CLIENT_ID="XYZ"
 
 note: variables must be prefixed with `NEXT_PUBLIC_` to be piped into the browser env.
 
+Update the readme with any instructions required to run the app, and include what required env variables there are with any instructions on what to populate there.
+
+```
+## Required Environment Variables
+
+- NEXT_PUBLIC_PUBLISHABLE_KEY // replace with your publishable API key from Hub
+- NEXT_PUBLIC_CLIENT_ID // replace with your client ID from Hub
+```
+
 start the project with hot reloading
 
 ```
@@ -202,7 +211,7 @@ All examples should be heavily commented and the comments should make sense in t
 
 ## Tests
 
-All examples should be covered by e2e tests to ensure they successfully do the action the code sample is showing in the docs site.
+All examples should be covered by basic e2e tests to ensure they at least render the examples. Ideally they would also have e2e tests that prove the functionality that you're trying to show works. Depending on what you're doing in the examples, it may be difficult to e2e test certain things e.g. logging in with Passport. For this reason, testing of functionality with e2e testing is recommended if practical, but not required.
 
 Install `@playwright/test` as a dev dependency for the e2e tests.
 
@@ -247,7 +256,7 @@ export default defineConfig({
 
 Create a `tests` directory in the root of the example app and start adding tests.
 
-Example tests can be found in `/examples/passport/wallets-signing-with-nextjs/tests/`
+Example of the base level of testing required can be found in `/examples/passport/wallets-signing-with-nextjs/tests/base.spec.ts`
 
 Add the test runner to the scripts in your package.json
 

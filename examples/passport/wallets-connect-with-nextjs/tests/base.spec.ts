@@ -38,23 +38,6 @@ test.describe("connect wallet with eip1193", () => {
     await expect(page.getByText("Connected Account:")).toBeVisible();
     await expect(page.getByRole("link", { name: "Return to Examples" })).toBeVisible();
   });
-
-
-  test.only("can login to passport", async ({ page }) => {
-    await page.click("text=Connect with EIP-1193");  
-
-    await expect(page.getByRole("heading", { name: "Passport Connect with EIP-1193" })).toBeVisible();
-
-    // Wait for page to hydrate the button onclick javascript
-    await page.waitForTimeout(3000);
-
-    const popupPromise = page.waitForEvent('popup');
-
-    await page.getByRole("button", { name: "Passport Login" }).click();
-    
-    const popup = await popupPromise;
-    await popup.getByRole('textbox', { name: 'address' }).fill('0x1234567890123456789012345678901234567890');
-  });
 });
 
 test.describe("connect wallet with wagmi", () => {
