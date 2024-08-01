@@ -71,12 +71,11 @@
     "SERVICE_UNAVAILABLE_ERROR_VIEW": {
       "heading": {
         "swap": "Swapping is not available in your region",
-        "sanction": "Wallet is sanction placeholder copy"
+        "sanction": "This service is not available in your region"
       },
       "body": {
         "swap": "Please refer to <quickswapLink>Quickswap’s</quickswapLink> website for further information.",
-        "sanction": "Please refer to PLACEHOLDER COPY for more information"
-
+        "sanction": "For further assistance visit the <immutableSupport>Immutable</immutableSupport> support page."
       }
     },
     "LOADING_VIEW": {

@@ -70,10 +70,12 @@
     },
     "SERVICE_UNAVAILABLE_ERROR_VIEW": {
       "heading": {
-        "swap": "您所在的地区不支持兑换"
+        "swap": "您所在的地区不支持兑换",
+        "sanction": "该服务在您的地区不可用"
       },
       "body": {
-        "swap": "请参考<quickswapLink>Quickswap</quickswapLink>的网站了解更多信息。"
+        "swap": "请参考<quickswapLink>Quickswap</quickswapLink>的网站了解更多信息。",
+        "sanction": "如需进一步帮助，请访问<immutableSupport>Immutable</immutableSupport>支持页面。"
       }
     },
     "LOADING_VIEW": {
