@@ -70,6 +70,8 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
       };
     }>,
   ) => {
+    console.log('🐛 ~ event:', event);
+
     const { type } = event.data;
     if (event.origin !== targetOrigin) return;
     if (!widgetEventsList.includes(type)) return;
@@ -79,7 +81,7 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
     switch (type) {
       case IMTBLWidgetEvents.IMTBL_CHECKOUT_WIDGET_EVENT:
         switch (detail.type) {
-          case CheckoutEventType.CHECKOUT_APP_READY:
+          case CheckoutEventType.INITIALISED:
             sendCheckoutReadyEvent(eventTarget);
             break;
           default:

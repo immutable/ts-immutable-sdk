@@ -7,11 +7,11 @@ import {
 
 export const sendCheckoutReadyEvent = (eventTarget: Window | EventTarget) => {
   const event = new CustomEvent<
-  WidgetEvent<WidgetType.CHECKOUT, CheckoutEventType.CHECKOUT_APP_READY>
+  WidgetEvent<WidgetType.CHECKOUT, CheckoutEventType.INITIALISED>
   >(IMTBLWidgetEvents.IMTBL_CHECKOUT_WIDGET_EVENT, {
     detail: {
-      type: CheckoutEventType.CHECKOUT_APP_READY,
-      data: {},
+      type: CheckoutEventType.INITIALISED,
+      data: {} as any,
     },
   });
   // eslint-disable-next-line no-console
@@ -24,11 +24,11 @@ export const sendCheckoutEvent = (
   data: Record<string, unknown>,
 ) => {
   const event = new CustomEvent<
-  WidgetEvent<WidgetType.CHECKOUT, CheckoutEventType.CHECKOUT_APP_EVENT>
+  WidgetEvent<WidgetType.CHECKOUT, CheckoutEventType.USER_ACTION>
   >(IMTBLWidgetEvents.IMTBL_CHECKOUT_WIDGET_EVENT, {
     detail: {
-      type: CheckoutEventType.CHECKOUT_APP_EVENT,
-      data,
+      type: CheckoutEventType.USER_ACTION,
+      data: data as any,
     },
   });
   // eslint-disable-next-line no-console
