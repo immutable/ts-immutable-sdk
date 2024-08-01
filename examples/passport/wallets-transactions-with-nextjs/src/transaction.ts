@@ -8,7 +8,7 @@ export async function sendTransaction(passportInstance: passport.Passport) {
 
   const [userAddress] = await provider.request({ method: 'eth_requestAccounts' });
   const toAddress = process.env.NEXT_PUBLIC_TO_ADDRESS ?? '0x000';
-  const erc721Address = process.env.NEXT_PUBLIC_TO_ADDRESS ?? '0x000';
+  const erc721Address = process.env.NEXT_PUBLIC_ERC721_ADDRESS ?? '0x000';
   const tokenId = process.env.NEXT_PUBLIC_TOKEN_ID ?? '0';
 
   // The Application Binary Interface (ABI) of a contract provides instructions for
@@ -25,7 +25,11 @@ export async function sendTransaction(passportInstance: passport.Passport) {
     tx = await contract.safeTransferFrom(userAddress, toAddress, tokenId);
   } catch (error: any) {
     // Handle user denying signature
-    if (error.code === 4001) { /* empty */ }
+    if (error.code === 4001) { 
+      console.error('user denied signature')
+    } else {
+      console.error('something went wrong: ', error.message)
+    }
   }
 
   // Wait for the transaction to complete

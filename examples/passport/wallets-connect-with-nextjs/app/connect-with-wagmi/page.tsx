@@ -16,16 +16,16 @@ export default function ConnectWithWagmi() {
   // render the ConnectWallet component
   // wrapping it in the Wagami and QueryClient Providers
   return (
-    <>
-      <h1>Passport Wallet - Connect with Wagmi</h1>
+    <div className="flex flex-col items-center justify-center min-h-screen p-8">
+
+      <h1 className="text-3xl font-bold mb-8">Passport Connect with Wagmi</h1>
       <WagmiProvider config={config}>
-        <QueryClientProvider client={queryClient}>
-          <ConnectWallet />
-        </QueryClientProvider>
-      </WagmiProvider>
-      <p>
-        <a href="/">Return to Examples</a>
-      </p>
-    </>
+              <QueryClientProvider client={queryClient}>
+                <ConnectWallet />
+              </QueryClientProvider>
+            </WagmiProvider>
+      <br />
+      <a href="/" className='underline'>Return to Examples</a>
+    </div>
   );
 }

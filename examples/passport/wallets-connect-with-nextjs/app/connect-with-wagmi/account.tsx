@@ -24,9 +24,12 @@ export function Account() {
 
   // render the view to show the connected accounts and logout
   return (
-    <div>
-      <button onClick={() => passportLogout()} disabled={loading} type="button">Passport Logout</button>
+    <>
+      <button 
+        className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
+        onClick={() => passportLogout()} disabled={loading} type="button">Passport Logout</button>
       {ensAvatar && <img alt="ENS Avatar" src={ensAvatar} />}
+      <br />
       {loading
         ? <p>Loading...</p>
         : (
@@ -35,6 +38,6 @@ export function Account() {
             {address && <span>{ensName ? `${ensName} (${address})` : address}</span>}
           </p>
         )}
-    </div>
+    </>
   );
 }
