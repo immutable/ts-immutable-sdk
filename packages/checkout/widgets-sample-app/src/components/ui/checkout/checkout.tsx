@@ -52,12 +52,12 @@ function CheckoutUI() {
   useEffect(() => {
     if (!checkoutWidget) return;
 
-    checkoutWidget.addListener(CheckoutEventType.CHECKOUT_APP_READY, (data) => {
-      console.log('----------> CHECKOUT_APP_READY', data);
+    checkoutWidget.addListener(CheckoutEventType.INITIALISED, (data) => {
+      console.log('----------> INITIALISED', data);
     });
 
-    checkoutWidget.addListener(CheckoutEventType.CHECKOUT_APP_EVENT, (data) => {
-      console.log('----------> CHECKOUT_APP_EVENT', data);
+    checkoutWidget.addListener(CheckoutEventType.USER_ACTION, (data) => {
+      console.log('----------> USER_ACTION', data);
     });
 
   }, [checkoutWidget  ]);
