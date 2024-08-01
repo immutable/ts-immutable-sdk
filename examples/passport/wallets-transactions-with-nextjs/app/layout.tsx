@@ -6,7 +6,8 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Passport Identity example',
+  title: 'Passport Send Transaction Examples',
+  description: 'Examples of how to Send Transactions using Passport with NextJS',
 };
 export default function RootLayout({
   children,

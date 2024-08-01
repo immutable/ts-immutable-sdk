@@ -7,8 +7,10 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Passport Identity example',
+  title: 'Passport Identity Examples',
+  description: 'Examples of how to use Passport\'s Identity features with NextJS',
 };
+
 export default function RootLayout({
   children,
 }: Readonly<{

@@ -6,7 +6,7 @@ test.beforeEach(async ({ page }) => {
 
 test.describe("home page", () => {
   test("has title, heading and link", async ({ page }) => {
-    await expect(page).toHaveTitle("Passport Message Signing");
+    await expect(page).toHaveTitle("Passport Message Signing Examples");
 
     await expect(page.getByRole("heading", { name: "Passport Message Signing Examples" })).toBeVisible();
 
