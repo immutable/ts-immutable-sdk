@@ -1,6 +1,6 @@
 import { ReactElement } from 'react';
 import {
-  Heading, MenuItem, MenuItemSize, SxProps,
+  MenuItem, MenuItemSize, SxProps,
 } from '@biom3/react';
 import { SaleItem } from '@imtbl/checkout-sdk';
 import { useTranslation } from 'react-i18next';
@@ -61,7 +61,6 @@ export function OrderItem<RC extends ReactElement | undefined = undefined>({
       </MenuItem.Caption>
       {amount > 0 && (
         <MenuItem.PriceDisplay
-          use={<Heading size="xSmall" />}
           price={t('views.ORDER_SUMMARY.currency.price', {
             symbol: token.symbol,
             amount: tokenValueFormat(amount),
