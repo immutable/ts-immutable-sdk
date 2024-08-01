@@ -79,9 +79,18 @@ yarn add @imtbl/sdk
 yarn add @ethersproject/providers@^5.7.2
 ```
 
-create a `.env` file in the root of the example.
+create a `.env.example` file in the root of the example. This will be committed to git so don't fill in the values
 
-add environment variables to the `.env` file and populate any API keys and secrets e.g.
+add a template for any environment variables you need to the `.env.example` file e.g.
+
+```
+NEXT_PUBLIC_PUBLISHABLE_KEY=
+NEXT_PUBLIC_CLIENT_ID=
+```
+
+copy the `.env.example` file to `.env` in the root of the example. The `.env` file should be automatically ignored by git.
+
+populate any API keys and secrets e.g.
 
 ```
 NEXT_PUBLIC_PUBLISHABLE_KEY="ABC"

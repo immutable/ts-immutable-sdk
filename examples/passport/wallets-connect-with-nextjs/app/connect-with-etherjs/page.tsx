@@ -53,12 +53,17 @@ export default function ConnectWithEtherJS() {
 
   // render the view to login/logout and show the connected accounts
   return (
-    <>
-      <h1>Passport Wallet - Connect with EtherJS</h1>
+    <div className="flex flex-col items-center justify-center min-h-screen p-8">
+      <h1 className="text-3xl font-bold mb-8">Passport Connect with EtherJS</h1>
       {accountsState.length === 0
-      && <button onClick={passportLogin} disabled={loading} type="button">Passport Login</button>}
+      && <button 
+      className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
+      onClick={passportLogin} disabled={loading}>Passport Login</button>}
       {accountsState.length >= 1
-      && <button onClick={passportLogout} disabled={loading} type="button">Passport Logout</button>}
+      && <button 
+      className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
+      onClick={passportLogout} disabled={loading}>Passport Logout</button>}
+      <br />
       {loading
         ? <p>Loading...</p>
         : (
@@ -67,9 +72,8 @@ export default function ConnectWithEtherJS() {
             {accountsState.length >= 1 ? accountsState : '(not connected)'}
           </p>
         )}
-      <p>
-        <a href="/">Return to Examples</a>
-      </p>
-    </>
+        <br />
+      <a href="/" className='underline'>Return to Examples</a>
+    </div>
   );
 }
