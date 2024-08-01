@@ -5,7 +5,7 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Passport Wallets Signing',
+  title: 'Passport Message Signing',
   description: 'Examples of how to sign messages using Passport with NextJS',
 };
 

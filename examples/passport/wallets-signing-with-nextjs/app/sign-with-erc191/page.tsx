@@ -83,7 +83,7 @@ export default function ConnectWithEtherJS() {
   // render the view to login/logout and show the connected accounts and sign message
   return (
    <div className="flex flex-col items-center justify-center min-h-screen p-8">
-      <h1 className="text-3xl font-bold mb-8">Passport Sign ERC-191</h1>
+      <h1 className="text-3xl font-bold mb-8">Passport Sign ERC-191 Message</h1>
       {accountsState.length === 0
       && <button
       className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800" 
