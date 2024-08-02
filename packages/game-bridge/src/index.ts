@@ -775,8 +775,8 @@ window.callFunction = async (jsonData: string) => {
       error: wrappedError.message,
     });
 
-    console.log('callFunction::error', wrappedError);
-    console.log('callFunction::errorType', errorType);
+    console.log('callFunction error', wrappedError);
+    console.log('callFunction errorType', errorType);
     callbackToGame({
       responseFor: fxName,
       requestId,
