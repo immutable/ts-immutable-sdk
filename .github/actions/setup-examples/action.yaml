@@ -6,4 +6,5 @@ runs:
   using: "composite"
   steps:
     - name: Prepare examples
+      shell: bash
       run: yarn prepare:examples
