@@ -23,14 +23,6 @@
         }
       }
     },
-    "smoke-test": {
-      "cache": true,
-      "dependsOn": ["^build"]
-    },
-    "func-test:ci": {
-      "cache": true,
-      "dependsOn": ["^build"]
-    },
     "build": {
       "dependsOn": ["^build"],
       "outputs": ["{projectRoot}/dist"],
