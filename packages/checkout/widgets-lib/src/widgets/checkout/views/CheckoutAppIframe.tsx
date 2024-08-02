@@ -1,7 +1,14 @@
 import { Box } from '@biom3/react';
-import { useRef } from 'react';
+import { useContext, useEffect, useRef } from 'react';
+import {
+  CheckoutEventType,
+  IMTBLWidgetEvents,
+  PostMessageHandlerEventType,
+} from '@imtbl/checkout-sdk';
 import { CheckoutActions } from '../context/CheckoutContext';
 import { useCheckoutContext } from '../context/CheckoutContextProvider';
+import { sendCheckoutEvent } from '../CheckoutWidgetEvents';
+import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 
 export interface LoadingHandoverProps {
   text: string;
@@ -11,8 +18,12 @@ export interface LoadingHandoverProps {
 }
 export function CheckoutAppIframe() {
   const [checkoutState, checkoutDispatch] = useCheckoutContext();
-  const { iframeUrl } = checkoutState;
+  const { iframeUrl, postMessageHandler } = checkoutState;
   const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  const {
+    eventTargetState: { eventTarget },
+  } = useContext(EventTargetContext);
 
   const onIframeLoad = () => {
     if (!iframeRef.current?.contentWindow) {
@@ -26,6 +37,26 @@ export function CheckoutAppIframe() {
       },
     });
   };
+
+  useEffect(() => {
+    if (postMessageHandler === undefined) return () => {};
+
+    postMessageHandler.addEventHandler(
+      PostMessageHandlerEventType.WIDGET_EVENT,
+      (event: {
+        type: IMTBLWidgetEvents;
+        detail: {
+          type: CheckoutEventType;
+          data: Record<string, unknown>;
+        };
+      }) => {
+        sendCheckoutEvent(eventTarget, event.detail);
+      },
+    );
+    return () => {
+      postMessageHandler.destroy();
+    };
+  }, [postMessageHandler]);
 
   if (!iframeUrl) {
     return null;
