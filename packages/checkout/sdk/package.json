@@ -39,7 +39,7 @@
     "rollup-plugin-polyfill-node": "^0.13.0",
     "text-encoding": "^0.7.0",
     "typedoc": "^0.26.5",
-    "typedoc-plugin-markdown": "^3.15.2",
+    "typedoc-plugin-markdown": "^4.2.3",
     "typescript": "^5.5.4"
   },
   "homepage": "https://github.com/immutable/ts-immutable-sdk",
