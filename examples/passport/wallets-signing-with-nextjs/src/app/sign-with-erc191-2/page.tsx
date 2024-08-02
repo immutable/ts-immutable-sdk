@@ -5,6 +5,7 @@ import { ethers } from "ethers";
 import { passportInstance } from "../utils";
 
 export default async function PersonalSignWithERC191() {
+  // #doc passport-wallets-personal-sign-erc191
   // fetch the Passport provider from the Passport instance
   const passportProvider = passportInstance.connectEvm();
 
@@ -26,6 +27,7 @@ export default async function PersonalSignWithERC191() {
   });
 
   console.log(signature); // 0x...
+  // #enddoc passport-wallets-personal-sign-erc191
 
   return (
     <>
