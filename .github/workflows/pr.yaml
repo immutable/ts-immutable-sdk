@@ -209,7 +209,7 @@ jobs:
       - name: test
         run: |
           yarn prepare:tests
-          yarn nx run @tests/func-tests-imx:func-test:ci
+          yarn workspace @tests/func-tests-imx func-test:ci
 
   func-test-zkevm:
     name: zkevm func tests
@@ -236,4 +236,4 @@ jobs:
       - name: test
         run: |
           yarn prepare:tests 
-          yarn nx run @tests/func-tests-zkevm:func-test:ci
+          yarn workspace @tests/func-tests-zkevm func-test:ci
