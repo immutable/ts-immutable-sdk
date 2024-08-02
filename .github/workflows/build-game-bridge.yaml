@@ -67,6 +67,9 @@ jobs:
       - name: Build Game Bridge
         run: yarn nx run @imtbl/game-bridge:build --skip-nx-cache
 
+      - name: Update Version Strings
+        run: cd packages/game-bridge && ./scripts/updateSdkVersion.sh
+
       # - name: Check Unity Version String Updated
       #   if: ${{ github.event.inputs.game_engine == 'Unity' || github.event.inputs.game_engine == 'Both' }}
       #   run: |
