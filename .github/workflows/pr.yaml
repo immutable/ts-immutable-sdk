@@ -140,7 +140,6 @@ jobs:
       - name: Build examples
         run: |
           yarn prepare:examples
-          yarn workspaces foreach -Aptv --include='@examples/**' exec cat package.json
           yarn build:examples
 
   lint-examples:
