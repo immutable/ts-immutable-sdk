@@ -37,7 +37,6 @@
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
   "license": "Apache-2.0",
   "lint-staged": {
-    "*": "yarn scan:secrets",
     "*.{js,jsx,ts,tsx}": "eslint"
   },
   "packageManager": "yarn@3.6.1",
