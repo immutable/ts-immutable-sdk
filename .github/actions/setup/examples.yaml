@@ -1,0 +1,9 @@
+
+name: "Examples setup"
+description: "Do necessary setup for examples"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Prepare examples
+      run: yarn prepare:examples

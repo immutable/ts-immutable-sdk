@@ -137,10 +137,11 @@ jobs:
       - name: setup
         uses: ./.github/actions/setup
 
+      - name: Setup examples
+        uses: ./.github/actions/examples.yaml
+
       - name: Build examples
-        run: |
-          yarn prepare:examples
-          yarn build:examples
+        run: yarn build:examples
 
   lint-examples:
     name: Lint Examples
@@ -155,10 +156,11 @@ jobs:
       - name: setup
         uses: ./.github/actions/setup
 
-      - name: Lint examples        
-        run: |
-          yarn prepare:examples
-          yarn lint:examples
+      - name: Setup examples
+        uses: ./.github/actions/examples.yaml
+
+      - name: Lint examples
+        run: yarn lint:examples
 
   test-examples:
     name: Test Examples
@@ -173,10 +175,11 @@ jobs:
       - name: setup
         uses: ./.github/actions/setup
 
-      - name: Test examples        
-        run: |
-          yarn prepare:examples
-          yarn test:examples
+      - name: Setup examples
+        uses: ./.github/actions/examples.yaml
+
+      - name: Test examples
+        run: yarn test:examples
       
 
   func-test-imx:
@@ -206,10 +209,11 @@ jobs:
       - name: setup
         uses: ./.github/actions/setup
 
+      - name: Setup tests
+        uses: ./.github/actions/tests.yaml
+
       - name: test
-        run: |
-          yarn prepare:tests
-          yarn workspace @tests/func-tests-imx func-test:ci
+        run: yarn workspace @tests/func-tests-imx func-test:ci
 
   func-test-zkevm:
     name: zkevm func tests
@@ -230,10 +234,12 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
+
       - name: setup
         uses: ./.github/actions/setup
 
+      - name: Setup tests
+        uses: ./.github/actions/tests.yaml
+
       - name: test
-        run: |
-          yarn prepare:tests 
-          yarn workspace @tests/func-tests-zkevm func-test:ci
+        run: yarn workspace @tests/func-tests-zkevm func-test:ci
