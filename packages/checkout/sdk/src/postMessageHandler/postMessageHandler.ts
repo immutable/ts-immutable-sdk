@@ -6,7 +6,7 @@ export type PostMessageHandlerConfiguration = {
 // todo put these in a types file
 export enum PostMessageHandlerEventType {
   PROVIDER_RELAY = 'PROVIDER_RELAY',
-  EIP_6963 = 'EIP_6963',
+  EIP_6963_EVENT = 'IMTBL_EIP_6963_EVENT',
 }
 
 export type PostMessageProviderRelayData = any;
