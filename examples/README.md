@@ -211,8 +211,6 @@ All examples should be heavily commented and the comments should make sense in t
 
 ## Tests
 
-All examples need to lint and build without failing. If you have lint issues, run `yarn lint --fix` from the root of your example to fix and/or see the problems.
-
 All examples should be covered by basic e2e tests to ensure they at least render the examples. Ideally they would also have e2e tests that prove the functionality that you're trying to show works. Depending on what you're doing in the examples, it may be difficult to e2e test certain things e.g. logging in with Passport. For this reason, testing of functionality with e2e testing is recommended if practical, but not required.
 
 Install `@playwright/test` as a dev dependency for the e2e tests.
@@ -255,6 +253,8 @@ export default defineConfig({
   },
 });
 ```
+
+Make sure you update the localhost urls `http://localhost:3000` in the above example to be the correct port for your local environment.
 
 Create a `tests` directory in the root of the example app and start adding tests.
 
