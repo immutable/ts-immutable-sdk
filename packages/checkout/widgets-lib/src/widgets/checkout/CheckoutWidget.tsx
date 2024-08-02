@@ -24,7 +24,7 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
   const { config, checkout, params } = props;
   const { environment, publishableKey } = checkout.config;
 
-  const [iframeUrl] = useMemo(() => {
+  const [, iframeUrl] = useMemo(() => {
     if (!publishableKey) return ['', ''];
     return getIframeURL(params, config, environment, publishableKey);
   }, [params, config, environment, publishableKey]);
