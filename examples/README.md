@@ -1,3 +1,7 @@
+## Introduction
+
+- TOC
+
 ## Contribution Guidelines
 
 Important information on how to create examples, pull them through to the docs site and ensure they are covered by tests in the CI CD pipeline.
@@ -119,12 +123,24 @@ e.g. `examples/passport/wallets-connect-with-nextjs/src/app/page.tsx`
 
 create a route for each example using the naming convention `<feature>-with-<library>` e.g. `wallets-with-etherjs`
 
-start building your examplesin the `page.tsx` in each of your example's route folders
+start building your examples in the `page.tsx` in each of your example's route folders
 
 e.g. `examples/passport/wallets-connect-with-nextjs/src/app/connect-with-etherjs/page.tsx`
 
+## Add to and Existing Example
+
+create new route folder with page.tsx
+
+add route to home page
+
+add any packages you require
+
+yarn install
+
 
 ## Creating Code Snippets
+
+In `ts-immutable-sdk`
 
 In your examples find the parts of the code you want to use as code snippets and wrap them in the `#doc` and `#enddoc` comments while providing a unique label.
 
@@ -138,23 +154,26 @@ const passportProvider = passportInstance.connectEvm()
 // #enddoc passport-wallets-nextjs-connect-eip1193-create
 ```
 
+make sure to commit and push the labels so they can be used locally
+
 ## Using Code Snippets in the Docs site
 
-It's very simple, you just add a code block with the reference to the file you want to display e.g.
+It's very simple, you just add a code block with the reference to the file and label you want to display e.g.
 
 ````
-```js reference=examples/passport/wallets-connect-with-nextjs/src/app/connect-with-etherjs/page.tsx title="Connect Passport to Immutable zkEVM and create the Provider"
+```tsx reference=examples/passport/wallets-connect-with-nextjs/src/app/connect-with-etherjs/page.tsx#passport-wallets-nextjs-connect-etherjs-create title="Connect Passport to Immutable zkEVM and create the Provider"
+```
+````
+Or if you want to display the whole file dont include a `#` label reference
+
+````
+```tsx reference=examples/passport/wallets-connect-with-nextjs/src/app/connect-with-etherjs/page.tsx title="Connect Passport to Immutable zkEVM and create the Provider"
 ```
 ````
 
-Or if you only want to display part of the file, add the `#` label of the snippet you want to display e.g.
-
-````
-```js reference=examples/passport/wallets-connect-with-nextjs/src/app/connect-with-etherjs/page.tsx#passport-wallets-nextjs-connect-etherjs-create title="Connect Passport to Immutable zkEVM and create the Provider"
-```
-````
 
 All snippets should have a title, usually this can just be the file name the snippet comes from. Don't be shy adding extra context before or after the snippet explaining any key points which are necessary.
+
 
 ## Development process
 
@@ -173,6 +192,7 @@ const BRANCH = 'DVR-193-passport-signing-example';
 ```
 
 Now your docs branch will be pulling the code examples from your branch in `ts-immutable-sdk` and you can use them locally in your `docs` branch to make sure they make sense in the page.
+
 
 Once you're happy with your examples, make the PR for your `ts-immutable-sdk` and get it merged into main. 
 
@@ -196,3 +216,16 @@ All examples should be heavily commented and the comments should make sense in t
 All examples should be covered by e2e tests to ensure they successfully do the action the code sample is showing in the docs site.
 
 More info on e2e tests coming soon.
+
+
+
+notes:
+
+- compile list of whats done and needs doing for the passport section
+- re-order the readme to bring the development process up higher
+- combine the section of how to make snippets into the development process
+- make it clearer when what actions are in the docs vs sdk repos
+- add instructions for adding to an existing example
+- Make hierarchy clearer in the readme
+- add table of contents and introduction
+- add some check on the docs CICD to make sure it's pointing to main not custom branch
