@@ -138,7 +138,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Setup examples
-        uses: ./.github/actions/examples.yaml
+        uses: ./.github/actions/setup-examples
 
       - name: Build examples
         run: yarn build:examples
@@ -157,7 +157,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Setup examples
-        uses: ./.github/actions/examples.yaml
+        uses: ./.github/actions/setup-examples
 
       - name: Lint examples
         run: yarn lint:examples
@@ -176,7 +176,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Setup examples
-        uses: ./.github/actions/examples.yaml
+        uses: ./.github/actions/setup-examples
 
       - name: Test examples
         run: yarn test:examples
@@ -210,7 +210,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Setup tests
-        uses: ./.github/actions/tests.yaml
+        uses: ./.github/actions/setup-tests
 
       - name: test
         run: yarn workspace @tests/func-tests-imx func-test:ci
@@ -239,7 +239,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Setup tests
-        uses: ./.github/actions/tests.yaml
+        uses: ./.github/actions/setup-tests
 
       - name: test
         run: yarn workspace @tests/func-tests-zkevm func-test:ci
