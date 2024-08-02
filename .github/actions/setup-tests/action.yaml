@@ -1,0 +1,9 @@
+name: "Tests setup"
+description: "Do necessary setup for tests"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Prepare tests
+      shell: bash
+      run: yarn prepare:tests
