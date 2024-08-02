@@ -8,6 +8,9 @@ export default function Home() {
       <p>
         <a href="/sign-with-erc191">Sign message with ERC-191</a>
       </p>
+      <p>
+        <a href="/sign-with-erc191-2">Personal sign with ERC-191</a>
+      </p>
     </>
   );
 }

@@ -1,6 +1,6 @@
 # Passport Wallets with Next JS
 
-To run this example you can 
+To run this example you can run:
 
 ```
 cd examples/passport/wallets-connect-with-nextjs
@@ -10,10 +10,7 @@ yarn dev
 
 browse to `http://localhost:3000` to see the full list of examples.
 
-Available examples include:
+## Required Environment Variables
 
-- Connecting with EtherJS Web3Provider `http://localhost:3000/connect-with-etherjs`
-
-- Connecting with EIP-1193 Provider `http://localhost:3000/connect-with-eip1193`
-
-- Connecting with Wagmi `http://localhost:3000/connect-with-wagmi`
+- NEXT_PUBLIC_PUBLISHABLE_KEY // replace with your publishable API key from Hub
+- NEXT_PUBLIC_CLIENT_ID // replace with your client ID from Hub
