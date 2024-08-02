@@ -23,14 +23,8 @@ export type PostMessageData = {
 };
 
 export interface MinimalEventSourceInterface {
-  addEventListener(
-    eventType: 'message',
-    handler: (message: MessageEvent) => void
-  ): void;
-  removeEventListener(
-    eventType: 'message',
-    handler: (message: MessageEvent) => void
-  ): void;
+  addEventListener(eventType: 'message', handler: (message: MessageEvent) => void): void;
+  removeEventListener(eventType: 'message', handler: (message: MessageEvent) => void): void;
 }
 
 export interface MinimalEventTargetInterface {
@@ -65,10 +59,7 @@ export class PostMessageHandler {
     this.eventTarget.postMessage(message, this.targetOrigin);
   }
 
-  public addEventHandler(
-    type: PostMessageHandlerEventType,
-    handler: (data: any) => void,
-  ): void {
+  public addEventHandler(type: PostMessageHandlerEventType, handler: (data: any) => void): void {
     this.eventHandlers.set(type, handler);
   }
 
