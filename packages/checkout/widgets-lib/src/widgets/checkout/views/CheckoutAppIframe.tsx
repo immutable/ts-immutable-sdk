@@ -4,6 +4,8 @@ import {
   CheckoutEventType,
   IMTBLWidgetEvents,
   PostMessageHandlerEventType,
+  WidgetEventData,
+  WidgetType,
 } from '@imtbl/checkout-sdk';
 import { CheckoutActions } from '../context/CheckoutContext';
 import { useCheckoutContext } from '../context/CheckoutContextProvider';
@@ -44,10 +46,10 @@ export function CheckoutAppIframe() {
     postMessageHandler.addEventHandler(
       PostMessageHandlerEventType.WIDGET_EVENT,
       (event: {
-        type: IMTBLWidgetEvents;
+        type: IMTBLWidgetEvents.IMTBL_CHECKOUT_WIDGET_EVENT;
         detail: {
           type: CheckoutEventType;
-          data: Record<string, unknown>;
+          data: WidgetEventData[WidgetType.CHECKOUT][keyof WidgetEventData[WidgetType.CHECKOUT]]
         };
       }) => {
         sendCheckoutEvent(eventTarget, event.detail);
