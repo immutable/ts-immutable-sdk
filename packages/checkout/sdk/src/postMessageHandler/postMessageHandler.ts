@@ -5,7 +5,7 @@ export type PostMessageHandlerConfiguration = {
 };
 // todo put these in a types file
 export enum PostMessageHandlerEventType {
-  PROVIDER_RELAY = 'PROVIDER_RELAY',
+  PROVIDER_RELAY = 'IMTBL_PROVIDER_RELAY',
   WIDGET_EVENT = 'IMTBL_CHECKOUT_WIDGET_EVENT',
 }
 
