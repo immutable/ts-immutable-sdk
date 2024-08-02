@@ -38,7 +38,7 @@
     "rollup-plugin-dts": "^6.1.1",
     "rollup-plugin-polyfill-node": "^0.13.0",
     "text-encoding": "^0.7.0",
-    "typedoc": "^0.24.8",
+    "typedoc": "^0.26.5",
     "typedoc-plugin-markdown": "^3.15.2",
     "typescript": "^5.5.4"
   },
