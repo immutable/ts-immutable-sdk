@@ -57,7 +57,8 @@
     "lint:examples": "yarn workspaces foreach -Apt --include='@examples/**' run lint",
     "nx": "nx",
     "postinstall": "husky install; ./.husky/install_gitleaks.sh",
-    "prepare:examples": "cd sdk && yarn dlx yalc publish && yarn workspaces foreach -Apt --include='@examples/**' exec yarn dlx yalc add @imtbl/sdk",
+    "prepare:examples": "yarn yalc:sdk:publish && yarn workspaces foreach -Apt --include='@examples/**' exec yarn dlx yalc add @imtbl/sdk",
+    "prepare:tests": "yarn yalc:sdk:publish && yarn workspaces foreach -Apt --include='@tests/**' exec yarn dlx yalc add @imtbl/sdk",
     "release": "release-it",
     "scan:secrets": "./.husky/run_gitleaks.sh",
     "syncpack:check": "yarn syncpack list-mismatches",
@@ -66,7 +67,8 @@
     "test": "nx affected -t test --parallel=5",
     "test:examples": "yarn workspaces foreach -Apt --include='@examples/**' run test",
     "test:vpn": "RUN_VPN_TESTS=1 wsrun --exclude-missing -e test",
-    "typecheck": "nx affected -t typecheck --parallel=5"
+    "typecheck": "nx affected -t typecheck --parallel=5",
+    "yalc:sdk:publish": "yarn workspace @imtbl/sdk exec yarn dlx yalc publish"
   },
   "workspaces": {
     "packages": [
@@ -98,9 +100,7 @@
       "packages/game-bridge",
       "packages/webhook/sdk",
       "packages/minting-backend/sdk",
-      "tests/smoke/esm",
-      "tests/func-tests/imx",
-      "tests/func-tests/zkevm",
+      "tests/**",
       "examples/passport/**"
     ],
     "nohoist": [

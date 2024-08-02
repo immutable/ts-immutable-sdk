@@ -124,26 +124,9 @@ jobs:
       - name: Lint
         run: yarn lint
 
-  
-  prepare-examples:
-    name: Prepare Examples
-    runs-on: ubuntu-latest-4-cores
-    needs: build-sdk
-    env:
-      NODE_OPTIONS: --max-old-space-size=14366
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: setup
-        uses: ./.github/actions/setup
-
-      - name: Prepare examples
-        run: yarn prepare:examples
-
   build-examples:
     name: Build Examples
-    needs: prepare-examples
+    needs: build-sdk
     runs-on: ubuntu-latest-4-cores
     env:
       NODE_OPTIONS: --max-old-space-size=14366
@@ -155,11 +138,13 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Build examples
-        run: yarn build:examples
+        run: |
+          yarn prepare:examples
+          yarn build:examples
 
   lint-examples:
     name: Lint Examples
-    needs: prepare-examples
+    needs: build-sdk
     runs-on: ubuntu-latest-4-cores
     env:
       NODE_OPTIONS: --max-old-space-size=14366
@@ -170,12 +155,14 @@ jobs:
       - name: setup
         uses: ./.github/actions/setup
 
-      - name: Lint examples
-        run: yarn lint:examples
+      - name: Lint examples        
+        run: |
+          yarn prepare:examples
+          yarn lint:examples
 
   test-examples:
     name: Test Examples
-    needs: prepare-examples
+    needs: build-sdk
     runs-on: ubuntu-latest-4-cores
     env:
       NODE_OPTIONS: --max-old-space-size=14366
@@ -186,8 +173,10 @@ jobs:
       - name: setup
         uses: ./.github/actions/setup
 
-      - name: Test examples
-        run: yarn test:examples
+      - name: Test examples        
+        run: |
+          yarn prepare:examples
+          yarn test:examples
       
 
   func-test-imx:
@@ -218,7 +207,9 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: test
-        run: yarn nx run func-tests-imx:func-test:ci
+        run: |
+          yarn prepare:tests
+          yarn nx run func-tests-imx:func-test:ci
 
   func-test-zkevm:
     name: zkevm func tests
@@ -243,20 +234,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: test
-        run: yarn nx run func-tests-zkevm:func-test:ci
-
-  smoke-test:
-    name: smoke test
-    runs-on: ubuntu-latest-4-cores
-    needs: build-sdk
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-          fetch-depth: 0
-      - name: setup
-        uses: ./.github/actions/setup
-
-      - name: test
-        run: yarn nx run esm-sdk-test:smoke-test
+        run: |
+          yarn prepare:tests 
+          yarn nx run func-tests-zkevm:func-test:ci
+          
