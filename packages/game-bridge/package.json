@@ -14,7 +14,8 @@
     "parcel": "^2.8.3"
   },
   "scripts": {
-    "build": "parcel build --no-cache --no-scope-hoist && yarn updateSdkVersion",
+    "build": "parcel build --no-cache --no-scope-hoist --no-optimize",
+    "build:local": "parcel build --no-cache --no-scope-hoist --no-optimize && yarn updateSdkVersion",
     "d": "swc src -d dist --strip-leading-paths --ignore '**/*.test.*'",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "start": "parcel",
