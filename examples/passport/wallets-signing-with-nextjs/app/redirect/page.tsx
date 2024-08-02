@@ -1,18 +1,13 @@
 'use client';
 
-import { usePassport } from '@/context/passport';
 import { useEffect } from 'react';
+import { passportInstance } from '../utils';
 
 export default function Redirect() {
-  const { passportInstance } = usePassport();
-
   useEffect(() => {
-    if (passportInstance) {
-      // #doc passport-login-callback
-      passportInstance.loginCallback();
-      // #enddoc passport-login-callback
-    }
-  }, [passportInstance]);
+    // call the loginCallback function after the login is complete
+    passportInstance.loginCallback();
+  }, []);
 
   // render the view for the login popup after the login is complete
   return (
