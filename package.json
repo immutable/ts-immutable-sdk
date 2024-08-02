@@ -57,6 +57,7 @@
     "lint:examples": "yarn workspaces foreach -Apt --include='@examples/**' run lint",
     "nx": "nx",
     "postinstall": "husky install; ./.husky/install_gitleaks.sh",
+    "prepare:examples": "cd sdk && yarn dlx yalc publish && yarn workspaces foreach -Apt --include='@examples/**' exec yarn dlx yalc add @imtbl/sdk",
     "release": "release-it",
     "scan:secrets": "./.husky/run_gitleaks.sh",
     "syncpack:check": "yarn syncpack list-mismatches",
