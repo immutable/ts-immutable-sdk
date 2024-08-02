@@ -55,8 +55,8 @@ jobs:
             echo "Node.js engine version has not changed"
           fi
 
-  build:
-    name: Build
+  build-sdk:
+    name: Build SDK
     runs-on: ubuntu-latest-8-cores
     steps:
       - name: Checkout code
@@ -69,11 +69,10 @@ jobs:
       - name: Build
         run: yarn nx affected --target=build --parallel=5 --exclude=@imtbl/checkout-widgets-sample-app
 
-  typecheck:
-    name: Typecheck
+  typecheck-sdk:
+    name: Typecheck SDK
     runs-on: ubuntu-latest-4-cores
-    needs:
-      - build
+    needs: build-sdk
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -86,11 +85,10 @@ jobs:
       - name: Typecheck
         run: yarn typecheck
 
-  test:
-    name: Test
+  test-sdk:
+    name: Test SDK
     runs-on: ubuntu-latest-8-cores
-    needs:
-      - build
+    needs: build-sdk
     env:
       NODE_OPTIONS: --max-old-space-size=14366
     steps:
@@ -111,8 +109,8 @@ jobs:
           name: coverages
           path: ./packages/**/coverage/*
 
-  lint:
-    name: Lint
+  lint-sdk:
+    name: Lint SDK
     runs-on: ubuntu-latest-4-cores
     steps:
       - name: Checkout code
@@ -126,11 +124,68 @@ jobs:
       - name: Lint
         run: yarn lint
 
+  build-examples:
+    name: Build Examples
+    needs: build-sdk
+    runs-on: ubuntu-latest-4-cores
+    env:
+      NODE_OPTIONS: --max-old-space-size=14366
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: setup
+        uses: ./.github/actions/setup
+
+      - name: Setup examples
+        uses: ./.github/actions/setup-examples
+
+      - name: Build examples
+        run: yarn build:examples
+
+  lint-examples:
+    name: Lint Examples
+    needs: build-sdk
+    runs-on: ubuntu-latest-4-cores
+    env:
+      NODE_OPTIONS: --max-old-space-size=14366
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: setup
+        uses: ./.github/actions/setup
+
+      - name: Setup examples
+        uses: ./.github/actions/setup-examples
+
+      - name: Lint examples
+        run: yarn lint:examples
+
+  test-examples:
+    name: Test Examples
+    needs: build-sdk
+    runs-on: ubuntu-latest-4-cores
+    env:
+      NODE_OPTIONS: --max-old-space-size=14366
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: setup
+        uses: ./.github/actions/setup
+
+      - name: Setup examples
+        uses: ./.github/actions/setup-examples
+
+      - name: Test examples
+        run: yarn test:examples
+      
+
   func-test-imx:
     name: imx func tests
     runs-on: ubuntu-latest-4-cores
-    needs:
-      - build
+    needs: build-sdk
     env:
       NETWORK: sepolia
       TEST_ALCHEMY_API_KEY: ${{ secrets.TEST_ALCHEMY_API_KEY }}
@@ -154,14 +209,16 @@ jobs:
       - name: setup
         uses: ./.github/actions/setup
 
+      - name: Setup tests
+        uses: ./.github/actions/setup-tests
+
       - name: test
-        run: yarn nx run func-tests-imx:func-test:ci
+        run: yarn workspace @tests/func-tests-imx func-test:ci
 
   func-test-zkevm:
     name: zkevm func tests
     runs-on: ubuntu-latest-4-cores
-    needs:
-      - build
+    needs: build-sdk
     env:
       ZKEVM_ORDERBOOK_BANKER: ${{ secrets.ZKEVM_ORDERBOOK_BANKER }}
       ZKEVM_ORDERBOOK_ERC721: "0xBE8B131f39825282Ace9eFf99C0Bb14972417b49"
@@ -177,25 +234,12 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
+
       - name: setup
         uses: ./.github/actions/setup
 
-      - name: test
-        run: yarn nx run func-tests-zkevm:func-test:ci
-
-  smoke-test:
-    name: smoke test
-    runs-on: ubuntu-latest-4-cores
-    needs:
-      - build
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-          fetch-depth: 0
-      - name: setup
-        uses: ./.github/actions/setup
+      - name: Setup tests
+        uses: ./.github/actions/setup-tests
 
       - name: test
-        run: yarn nx run esm-sdk-test:smoke-test
+        run: yarn workspace @tests/func-tests-zkevm func-test:ci
