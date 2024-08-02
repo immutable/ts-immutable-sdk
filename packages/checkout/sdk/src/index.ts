@@ -150,6 +150,8 @@ export {
   PostMessageData,
 } from './postMessageHandler';
 
+export { isAddressSanctioned } from './sanctions';
+
 export type { ErrorType } from './errors';
 
 export { CheckoutErrorType } from './errors';

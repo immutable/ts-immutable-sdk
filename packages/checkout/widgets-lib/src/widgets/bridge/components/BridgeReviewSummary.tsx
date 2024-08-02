@@ -436,7 +436,6 @@ export function BridgeReviewSummary() {
         </MenuItem.Label>
         <MenuItem.Caption />
         <MenuItem.PriceDisplay
-          use={<Heading size="xSmall" weight="light" />}
           price={displayAmount ?? '-'}
           fiatAmount={`${t(
             'views.BRIDGE_REVIEW.fiatPricePrefix',

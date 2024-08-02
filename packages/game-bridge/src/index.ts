@@ -122,7 +122,6 @@ type VersionInfo = {
 const callbackToGame = (data: CallbackData) => {
   const message = JSON.stringify(data);
   console.log(`callbackToGame: ${message}`);
-  console.log(message);
   if (typeof window.ue !== 'undefined') {
     if (typeof window.ue.jsconnector === 'undefined') {
       const unrealError = 'Unreal JSConnector not defined';
@@ -562,7 +561,11 @@ window.callFunction = async (jsonData: string) => {
       case PASSPORT_FUNCTIONS.imx.transfer: {
         const unsignedTransferRequest = JSON.parse(data);
         const response = await getProvider().transfer(unsignedTransferRequest);
-        trackDuration(moduleName, 'performedImxTransfer', mt(markStart));
+        trackDuration(moduleName, 'performedImxTransfer', mt(markStart), {
+          requestId,
+          transferRequest: JSON.stringify(unsignedTransferRequest),
+          transferResponse: JSON.stringify(response),
+        });
         callbackToGame({
           ...{
             responseFor: fxName,
@@ -579,7 +582,11 @@ window.callFunction = async (jsonData: string) => {
         const response = await getProvider().batchNftTransfer(
           nftTransferDetails,
         );
-        trackDuration(moduleName, 'performedImxBatchNftTransfer', mt(markStart));
+        trackDuration(moduleName, 'performedImxBatchNftTransfer', mt(markStart), {
+          requestId,
+          transferRequest: JSON.stringify(nftTransferDetails),
+          transferResponse: JSON.stringify(response),
+        });
         callbackToGame({
           ...{
             responseFor: fxName,
@@ -622,7 +629,11 @@ window.callFunction = async (jsonData: string) => {
           throw new Error('Failed to send transaction');
         }
 
-        trackDuration(moduleName, 'performedZkevmSendTransaction', mt(markStart));
+        trackDuration(moduleName, 'performedZkevmSendTransaction', mt(markStart), {
+          requestId,
+          transactionRequest: JSON.stringify(transaction),
+          transactionResponse: transactionHash,
+        });
         callbackToGame({
           responseFor: fxName,
           requestId,
@@ -640,7 +651,11 @@ window.callFunction = async (jsonData: string) => {
 
         const tx = await signer.sendTransaction(transaction);
         const response = await tx.wait();
-        trackDuration(moduleName, 'performedZkevmSendTransactionWithConfirmation', mt(markStart));
+        trackDuration(moduleName, 'performedZkevmSendTransactionWithConfirmation', mt(markStart), {
+          requestId,
+          transactionRequest: JSON.stringify(transaction),
+          transactionResponse: JSON.stringify(response),
+        });
         callbackToGame({
           ...{
             responseFor: fxName,
@@ -734,6 +749,8 @@ window.callFunction = async (jsonData: string) => {
         break;
     }
   } catch (error: any) {
+    console.log(`Error in callFunction: ${error}`);
+
     let wrappedError;
 
     if (!(error instanceof Error)) {
@@ -758,7 +775,8 @@ window.callFunction = async (jsonData: string) => {
       error: wrappedError.message,
     });
 
-    console.log('callFunction error', error);
+    console.log('callFunction error', wrappedError);
+    console.log('callFunction errorType', errorType);
     callbackToGame({
       responseFor: fxName,
       requestId,
@@ -768,6 +786,14 @@ window.callFunction = async (jsonData: string) => {
     });
   }
 };
+
+window.addEventListener('offline', () => {
+  console.log('gameBridge offline');
+});
+
+window.addEventListener('online', () => {
+  console.log('gameBridge online');
+});
 
 function onLoadHandler() {
   // File loaded

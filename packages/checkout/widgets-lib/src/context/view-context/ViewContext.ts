@@ -15,10 +15,10 @@ export enum SharedViews {
 }
 
 export type SharedView =
-LoadingView
-| ErrorView
-| ServiceUnavailableErrorView
-| TopUpView;
+  LoadingView
+  | ErrorView
+  | ServiceUnavailableErrorView
+  | TopUpView;
 
 interface LoadingView extends ViewType {
   type: SharedViews.LOADING_VIEW
@@ -30,7 +30,7 @@ export interface ErrorView extends ViewType {
   tryAgain?: () => Promise<any>
 }
 
-export interface ServiceUnavailableErrorView extends ViewType {
+interface ServiceUnavailableErrorView extends ViewType {
   type: SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW;
   error: Error;
 }
@@ -96,7 +96,7 @@ export interface GoBackToPayload {
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const ViewContext = createContext<ViewContextState>({
   viewState: initialViewState,
-  viewDispatch: () => {},
+  viewDispatch: () => { },
 });
 
 ViewContext.displayName = 'ViewContext'; // help with debugging Context in browser
@@ -118,7 +118,7 @@ export const viewReducer: Reducer<ViewState, ViewAction> = (
       const { history } = state;
       if (
         history.length === 0
-      || history[history.length - 1].type !== view.type
+        || history[history.length - 1].type !== view.type
       ) {
         // currentViewData should only be set on the current view before updating
         if (currentViewData) {
