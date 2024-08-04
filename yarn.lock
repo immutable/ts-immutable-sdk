@@ -3863,6 +3863,7 @@ __metadata:
   resolution: "@examples/identity-with-nextjs@workspace:examples/passport/identity-with-nextjs"
   dependencies:
     "@imtbl/sdk": latest
+    "@playwright/test": ^1.45.3
     "@types/node": ^20
     "@types/react": ^18.0.28
     "@types/react-dom": ^18.0.11
@@ -4078,6 +4079,7 @@ __metadata:
   dependencies:
     "@ethersproject/providers": ^5.7.2
     "@imtbl/sdk": latest
+    "@playwright/test": ^1.45.3
     "@tanstack/react-query": ^5.51.11
     "@types/node": ^20
     "@types/react": ^18.0.28
@@ -4100,6 +4102,7 @@ __metadata:
   resolution: "@examples/wallets-transactions-with-nextjs@workspace:examples/passport/wallets-transactions-with-nextjs"
   dependencies:
     "@imtbl/sdk": latest
+    "@playwright/test": ^1.45.3
     "@types/node": ^20
     "@types/react": ^18.0.28
     "@types/react-dom": ^18.0.11
@@ -8813,7 +8816,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@playwright/test@npm:^1.45.2":
+"@playwright/test@npm:^1.45.2, @playwright/test@npm:^1.45.3":
   version: 1.45.3
   resolution: "@playwright/test@npm:1.45.3"
   dependencies:

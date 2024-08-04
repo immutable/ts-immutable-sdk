@@ -79,9 +79,18 @@ yarn add @imtbl/sdk
 yarn add @ethersproject/providers@^5.7.2
 ```
 
-create a `.env` file in the root of the example.
+create a `.env.example` file in the root of the example. This will be committed to git so don't fill in the values
 
-add environment variables to the `.env` file and populate any API keys and secrets e.g.
+add a template for any environment variables you need to the `.env.example` file e.g.
+
+```
+NEXT_PUBLIC_PUBLISHABLE_KEY=
+NEXT_PUBLIC_CLIENT_ID=
+```
+
+copy the `.env.example` file to `.env` in the root of the example. The `.env` file should be automatically ignored by git.
+
+populate any API keys and secrets e.g.
 
 ```
 NEXT_PUBLIC_PUBLISHABLE_KEY="ABC"
@@ -89,6 +98,15 @@ NEXT_PUBLIC_CLIENT_ID="XYZ"
 ```
 
 note: variables must be prefixed with `NEXT_PUBLIC_` to be piped into the browser env.
+
+Update the readme with any instructions required to run the app, and include what required env variables there are with any instructions on what to populate there.
+
+```
+## Required Environment Variables
+
+- NEXT_PUBLIC_PUBLISHABLE_KEY // replace with your publishable API key from Hub
+- NEXT_PUBLIC_CLIENT_ID // replace with your client ID from Hub
+```
 
 start the project with hot reloading
 
@@ -193,6 +211,59 @@ All examples should be heavily commented and the comments should make sense in t
 
 ## Tests
 
-All examples should be covered by e2e tests to ensure they successfully do the action the code sample is showing in the docs site.
+All examples should be covered by basic e2e tests to ensure they at least render the examples. Ideally they would also have e2e tests that prove the functionality that you're trying to show works. Depending on what you're doing in the examples, it may be difficult to e2e test certain things e.g. logging in with Passport. For this reason, testing of functionality with e2e testing is recommended if practical, but not required.
 
-More info on e2e tests coming soon.
+Install `@playwright/test` as a dev dependency for the e2e tests.
+
+```
+yarn add -D @playwright/test
+```
+
+Create a `playwright.config.ts` file in the root of the example app and add this configuration;
+
+```
+import { defineConfig, devices } from "@playwright/test";
+
+export default defineConfig({
+  testDir: "./tests",
+  fullyParallel: true,
+  forbidOnly: !!process.env.CI,
+  retries: process.env.CI ? 2 : 0,
+  workers: process.env.CI ? 1 : undefined,
+  reporter: "html",
+
+  use: {
+    baseURL: "http://localhost:3000",
+    trace: "on-first-retry",
+  },
+
+  projects: [
+    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
+    { name: "firefox", use: { ...devices["Desktop Firefox"] } },
+    { name: "webkit", use: { ...devices["Desktop Safari"] } },
+
+    { name: "Mobile Chrome", use: { ...devices["Pixel 5"] } },
+    { name: "Mobile Safari", use: { ...devices["iPhone 12"] } },
+  ],
+
+  webServer: {
+    command: "yarn dev",
+    url: "http://localhost:3000",
+    reuseExistingServer: !process.env.CI,
+  },
+});
+```
+
+Make sure you update the localhost urls `http://localhost:3000` in the above example to be the correct port for your local environment.
+
+Create a `tests` directory in the root of the example app and start adding tests.
+
+Example of the base level of testing required can be found in `/examples/passport/wallets-signing-with-nextjs/tests/base.spec.ts`
+
+Add the test runner to the scripts in your package.json
+
+```
+"test": "playwright install --with-deps && playwright test"
+```
+
+Run your tests with `yarn test`
