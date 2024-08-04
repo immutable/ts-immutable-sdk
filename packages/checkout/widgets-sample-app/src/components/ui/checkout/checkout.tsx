@@ -7,7 +7,7 @@ import {
   WidgetType,
   WalletProviderName,
   SalePaymentTypes,
-  CheckoutEventType
+  CheckoutEventType,
 } from "@imtbl/checkout-sdk";
 import { Environment } from "@imtbl/config";
 import { WidgetsFactory } from "@imtbl/checkout-widgets";
@@ -16,11 +16,18 @@ import { Box } from "@biom3/react";
 
 function CheckoutUI() {
   const checkout = useMemo(
-    () => new Checkout({ baseConfig: { environment: Environment.SANDBOX } }),
+    () =>
+      new Checkout({
+        baseConfig: {
+          environment: Environment.SANDBOX,
+        },
+        publishableKey: "pk_imapik-test-gaDU8iOIIn-mLBc@Vvpm",
+      }),
     []
   );
   const factory = useMemo(
-    () => new WidgetsFactory(checkout, { theme: WidgetTheme.DARK }),
+    () =>
+      new WidgetsFactory(checkout, { theme: WidgetTheme.DARK, language: "en" }),
     [checkout]
   );
   const checkoutWidget = useMemo(
@@ -48,19 +55,18 @@ function CheckoutUI() {
   useEffect(() => {
     passport.connectEvm();
   }, []);
-  
+
   useEffect(() => {
     if (!checkoutWidget) return;
 
     checkoutWidget.addListener(CheckoutEventType.INITIALISED, (data) => {
-      console.log('----------> INITIALISED', data);
+      console.log("----------> INITIALISED", data);
     });
 
     checkoutWidget.addListener(CheckoutEventType.USER_ACTION, (data) => {
-      console.log('----------> USER_ACTION', data);
+      console.log("----------> USER_ACTION", data);
     });
-
-  }, [checkoutWidget  ]);
+  }, [checkoutWidget]);
 
   return (
     <div>
