@@ -29,3 +29,6 @@ docs/
 .nx/workspace-data
 nx-cloud.env
 dep-graph.json
+examples/**/.env
+examples/**/playwright-report/
+examples/**/test-results/

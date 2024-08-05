@@ -20,3 +20,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 - NEXT_PUBLIC_PUBLISHABLE_KEY // replace with your publishable API key from Hub
 - NEXT_PUBLIC_CLIENT_ID // replace with your client ID from Hub
+
+- NEXT_PUBLIC_TO_ADDRESS // replace with address you want to send the NFT to
+- NEXT_PUBLIC_ERC721_ADDRESS // replace with the address of a testnet collection you've created with Immutable Hub
+- NEXT_PUBLIC_TOKEN_ID // replace with token id of the token you want to send
