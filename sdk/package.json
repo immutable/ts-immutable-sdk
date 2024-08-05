@@ -84,10 +84,10 @@
     "@rollup/plugin-typescript": "^11.1.6",
     "@yarnpkg/cli": "3.5.0",
     "@yarnpkg/core": "3.5.0",
+    "dts-bundle-generator": "^9.5.1",
     "eslint": "^8.40.0",
     "glob": "^10.2.3",
     "rollup": "^4.19.1",
-    "rollup-plugin-dts": "^6.1.1",
     "rollup-plugin-polyfill-node": "^0.13.0",
     "semver": "^7.4.0",
     "typescript": "^5.5.4"
@@ -155,8 +155,9 @@
     "@openzeppelin/contracts": "3.4.2-solc-0.7"
   },
   "scripts": {
-    "build": "yarn updateDependencies && yarn regenModules && rm -rf dist && NODE_ENV=production node --max-old-space-size=14366 ../node_modules/rollup/dist/bin/rollup --config rollup.config.js && rm -rf dist/types && yarn copyBrowserBundles",
+    "build": "yarn updateDependencies && yarn regenModules && rm -rf dist && NODE_ENV=production node --max-old-space-size=14366 ../node_modules/rollup/dist/bin/rollup --config rollup.config.js && yarn bundleTypes && yarn copyBrowserBundles",
     "build:only": "rm -rf dist && NODE_ENV=production node --max-old-space-size=8192 ../node_modules/rollup/dist/bin/rollup --config rollup.config.js && rm -rf dist/types",
+    "bundleTypes": "dts-bundle-generator dist/types/index.d.ts --out-file=dist/index.d.ts --external-inlines ethers --export-referenced-types false --inline-declare-externals --inline-declare-global && rm -rf dist/types",
     "copyBrowserBundles": "node scripts/copyBrowserBundles.js",
     "generateIndex": "node scripts/generateIndex.js",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",

@@ -3,7 +3,6 @@ import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { readFileSync } from 'fs';
 import commonJs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
-import dts from 'rollup-plugin-dts';
 import replace from '@rollup/plugin-replace';
 import pkg from './package.json' assert { type: 'json' };
 import moduleReleases from './module-release.json' assert { type: 'json' };
@@ -11,21 +10,12 @@ import terser from '@rollup/plugin-terser';
 import nodePolyfills from 'rollup-plugin-polyfill-node';
 import babel from '@rollup/plugin-babel';
 
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-
-// Convert the import.meta.url to a file path
-const __filename = fileURLToPath(import.meta.url);
-// Get the directory name of the current module
-const __dirname = dirname(__filename);
-const projectRoot = __dirname;
-
 // RELEASE_TYPE environment variable is set by the CI/CD pipeline
 const releaseType = process.env.RELEASE_TYPE || 'alpha';
 
 const packages = JSON.parse(
-  readFileSync(join(projectRoot, 'workspace-packages.json'), { encoding: 'utf8' }
-));
+  readFileSync('./workspace-packages.json', { encoding: 'utf8' })
+);
 
 const getPackages = () => packages.map((pkg) => pkg.name);
 
@@ -45,52 +35,42 @@ const getFilesToBuild = () => {
   return [...files, ...returnModules];
 };
 
-const getFileBuild = (inputFilename) => [
-  {
-    input: `./src/${inputFilename}.ts`,
-    output: {
-      dir: 'dist',
-      format: 'es',
-    },
-    plugins: [
-      nodeResolve({
-        resolveOnly: getPackages(),
-      }),
-      json(),
-      commonJs(),
-      typescript({
-        declaration: true,
-        declarationDir: './dist/types',
-      }),
-      replace({
-        exclude: 'node_modules/**',
-        preventAssignment: true,
-        __SDK_VERSION__: pkg.version,
-      }),
-    ],
-  },
-  {
-    input: `./dist/types/${inputFilename}.d.ts`,
-    output: {
-      file: `./dist/${inputFilename}.d.ts`,
-      format: 'es',
-    },
-    plugins: [
-      dts({
-        respectExternal: true,
-      }),
-    ],
-    external: ['pg'] 
-  },
-];
 
 const buildBundles = () => {
-  const modules = [];
   const filesToBuild = getFilesToBuild();
-  for (const file of filesToBuild) {
-    modules.push(...getFileBuild(file));
-  }
-  return modules;
+  // generate a single object that contains all the files under input
+  const [inputs, types] = filesToBuild.reduce((acc, f) => {
+    return [
+      {...acc[0], [f] : `./src/${f}.ts`},
+      {...acc[1], [f] : `./dist/types/${f}.d.ts`},
+    ];
+  }, [{}, {}])
+
+  return {
+      input: inputs,
+      output: {
+        dir: 'dist',
+        format: 'es',
+      },
+      plugins: [
+        nodeResolve({
+          resolveOnly: getPackages(),
+        }),
+        json(),
+        commonJs(),
+        typescript({
+          declaration: true,
+          declarationDir: './dist/types',
+        }),
+        replace({
+          exclude: 'node_modules/**',
+          preventAssignment: true,
+          __SDK_VERSION__: pkg.version,
+        }),
+        terser(),
+      ],
+      external: ['pg'] 
+    }
 };
 
 export default [
@@ -155,5 +135,5 @@ export default [
   },
 
   // Export ES Modules
-  ...buildBundles(),
+  buildBundles(),
 ];
