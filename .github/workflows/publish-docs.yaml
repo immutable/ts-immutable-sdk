@@ -35,12 +35,17 @@ jobs:
     name: Publish SDK Reference Docs
     runs-on: ubuntu-latest
     needs: AlphaCheck
-    if: ${{ needs.AlphaCheck.outputs.is_alpha != 'true' }}
+    if: ${{ needs.AlphaCheck.outputs.is_alpha == 'false' }}
     env:
       SDK_PUBLISH_SLACK_WEBHOOK: ${{ secrets.SDK_PUBLISH_SLACK_WEBHOOK }}
       NETLIFY_BUILD_HOOK: ${{ secrets.NETLIFY_BUILD_HOOK }}
       GITHUB_USER: ${{ github.actor }}
+      IS_ALPHA: ${{ needs.AlphaCheck.outputs.is_alpha }}
     steps:
+      - name: Is Alpha Version
+        run: |
+          echo "Is Alpha Version: ${{ env.IS_ALPHA }}"
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
