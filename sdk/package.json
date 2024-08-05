@@ -157,7 +157,7 @@
   "scripts": {
     "build": "yarn updateDependencies && yarn regenModules && rm -rf dist && NODE_ENV=production node --max-old-space-size=14366 ../node_modules/rollup/dist/bin/rollup --config rollup.config.js && yarn bundleTypes && yarn copyBrowserBundles",
     "build:only": "rm -rf dist && NODE_ENV=production node --max-old-space-size=8192 ../node_modules/rollup/dist/bin/rollup --config rollup.config.js && rm -rf dist/types",
-    "bundleTypes": "dts-bundle-generator dist/types/index.d.ts --out-file=dist/index.d.ts --external-inlines ethers --export-referenced-types false --inline-declare-externals --inline-declare-global && rm -rf dist/types",
+    "bundleTypes": "dts-bundle-generator --config ./dts-generator.config.cjs && rm -rf dist/types",
     "copyBrowserBundles": "node scripts/copyBrowserBundles.js",
     "generateIndex": "node scripts/generateIndex.js",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
