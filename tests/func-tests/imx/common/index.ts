@@ -95,6 +95,8 @@ export function getProvider(
   network: string,
   alchemyKey: string,
 ): JsonRpcProvider {
+  console.log(env.network);
+
   if (network !== 'sepolia') {
     return new AlchemyProvider(network, alchemyKey);
   }
