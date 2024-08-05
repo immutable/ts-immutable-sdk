@@ -10,12 +10,21 @@ import terser from '@rollup/plugin-terser';
 import nodePolyfills from 'rollup-plugin-polyfill-node';
 import babel from '@rollup/plugin-babel';
 
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+// Convert the import.meta.url to a file path
+const __filename = fileURLToPath(import.meta.url);
+// Get the directory name of the current module
+const __dirname = dirname(__filename);
+const projectRoot = __dirname;
+
 // RELEASE_TYPE environment variable is set by the CI/CD pipeline
 const releaseType = process.env.RELEASE_TYPE || 'alpha';
 
 const packages = JSON.parse(
-  readFileSync('./workspace-packages.json', { encoding: 'utf8' })
-);
+  readFileSync(join(projectRoot, 'workspace-packages.json'), { encoding: 'utf8' }
+));
 
 const getPackages = () => packages.map((pkg) => pkg.name);
 
@@ -67,7 +76,6 @@ const buildBundles = () => {
           preventAssignment: true,
           __SDK_VERSION__: pkg.version,
         }),
-        terser(),
       ],
       external: ['pg'] 
     }
