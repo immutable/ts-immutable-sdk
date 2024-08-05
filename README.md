@@ -196,7 +196,7 @@ The following is a list of packages included in the Typescript SDK:
 
 ### Blockchain Data
 
-The Blockchain Data SDK provides a set of wrapper functions for interacting with the Immutable Blockhain Data APIs. It provides a simple and easy-to-use interface for querying blockchain data, such as assets, orders, and trades. 
+The Blockchain Data SDK provides a set of wrapper functions for interacting with the Immutable Blockchain Data APIs. It provides a simple and easy-to-use interface for querying blockchain data, such as assets, orders, and trades. 
 
 The Blockchain Data SDK package is built using TypeScript and Rollup. The package is exposed to the SDK package that is published to NPM.
 
