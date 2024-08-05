@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import React, {
-  ReactNode, createContext, useEffect, useMemo,
+  DependencyList,
+  createContext, useContext, useEffect, useMemo,
+  useState,
 } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import { Passport } from '../Passport';
@@ -12,7 +14,7 @@ export const PassportContext = createContext<PassportContextType>(null);
 
 type PassportProviderProps = {
   config: PassportModuleConfiguration;
-  children: ReactNode;
+  children: React.ReactNode;
 };
 
 export function PassportProvider({ children, config }: PassportProviderProps) {
@@ -25,7 +27,7 @@ export function PassportProvider({ children, config }: PassportProviderProps) {
 }
 
 export function usePassport() {
-  const c = React.useContext(PassportContext);
+  const c = useContext(PassportContext);
   if (!c) {
     throw new Error('usePassport must be used within a PassportProvider');
   }
@@ -35,11 +37,11 @@ export function usePassport() {
 // eslint-disable-next-line @typescript-eslint/comma-dangle
 const useEffectAsync = <T,>(
   effect: Promise<T>,
-  deps: React.DependencyList,
+  deps: DependencyList,
 ) => {
-  const [data, setData] = React.useState<T | null>();
-  const [loading, setLoading] = React.useState(false);
-  const [error, setError] = React.useState<Error | null>(null);
+  const [data, setData] = useState<T | null>();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     setLoading(true);
