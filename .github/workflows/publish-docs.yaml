@@ -21,7 +21,8 @@ jobs:
       - name: Check alpha version
         id: alpha_check
         run: |
-          if $(git describe --tags --abbrev=0) | grep -q "alpha"; then
+          VERSION=$(git describe --tags --abbrev=0)
+          if echo "$VERSION" | grep -q "alpha"; then
             echo "Skipping docs generation for alpha version"
             echo "is_alpha=true" >> $GITHUB_ENV
             exit 0
