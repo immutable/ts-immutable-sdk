@@ -10,7 +10,7 @@ yarn install
 
 ### Quick Start Guide
 
-All commands below need to be run in the context of the `blockhain-data` package. Read more about context [here](../../../README.md#context).
+All commands below need to be run in the context of the `blockchain-data` package. Read more about context [here](../../../README.md#context).
 
 Running in `dev` mode:
   
