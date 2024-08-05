@@ -15,7 +15,8 @@
     "esModuleInterop": true,
     "declaration": true,
     "resolveJsonModule": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "jsxImportSource": "@emotion/react"
   },
   "include": ["src", "src/types.ts"],
   "exclude": [

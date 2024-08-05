@@ -80,7 +80,7 @@ const getFileBuild = (inputFilename) => [
         respectExternal: true,
       }),
     ],
-    external: ['pg'] 
+    external: ['pg', 'react']
   },
 ];
 
