@@ -5,7 +5,7 @@ import { IMXError } from '../types/errors';
 /**
  * [Formats an error in the IMXError shape](https://axios-http.com/docs/handling_errors)
  * @param error - The Error object thrown by the request
- * @returns IMXError
+ * @returns {@link IMXError} - The formatted error
  */
 export function formatError(error: unknown): IMXError {
   if (axios.isAxiosError(error) && error.response) {
