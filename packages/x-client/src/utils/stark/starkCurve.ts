@@ -145,7 +145,7 @@ export function grindKey(keySeed: BN) {
   return key.umod(starkEcOrder).toString('hex');
 }
 
-// Check if the hash value of the the given PrivateKey falls above the starkEcOrder limit.
+// Check if the hash value of the given PrivateKey falls above the starkEcOrder limit.
 // This function is only serving the context of DX-2184, used to determine if we need to validate the generated key
 // against the one recorded in IMX servers.
 export function checkIfHashedKeyIsAboveLimit(keySeed: BN) {

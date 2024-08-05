@@ -1,7 +1,5 @@
 /* eslint-disable react/jsx-no-constructed-context-values */
-import React, {
-  useContext, useMemo, useEffect, useReducer, useCallback,
-} from 'react';
+import { Web3Provider } from '@ethersproject/providers';
 import {
   ChainId,
   Checkout,
@@ -12,9 +10,38 @@ import {
   getPassportProviderDetail,
   WalletConnectManager as IWalletConnectManager,
 } from '@imtbl/checkout-sdk';
-import { Web3Provider } from '@ethersproject/providers';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+} from 'react';
 import { useTranslation } from 'react-i18next';
+import { ConnectLoaderSuccess } from '../../components/ConnectLoader/ConnectLoaderSuccess';
+import { StatusType } from '../../components/Status/StatusType';
+import { StatusView } from '../../components/Status/StatusView';
+import { useAnalytics, UserJourney } from '../../context/analytics-provider/SegmentAnalyticsProvider';
+import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
+import { ConnectWidgetView, ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
+import {
+  initialViewState,
+  SharedViews,
+  ViewActions,
+  ViewContext,
+  viewReducer,
+} from '../../context/view-context/ViewContext';
+import { addProviderListenersForWidgetRoot, sendProviderUpdatedEvent } from '../../lib';
+import { identifyUser } from '../../lib/analytics/identifyUser';
+import { useWalletConnect } from '../../lib/hooks/useWalletConnect';
+import { isMetaMaskProvider, isPassportProvider, isWalletConnectProvider } from '../../lib/provider';
 import { isL1EthChainId, isZkEvmChainId } from '../../lib/utils';
+import { WalletConnectManager, walletConnectProviderInfo } from '../../lib/walletConnect';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { ErrorView } from '../../views/error/ErrorView';
+import { ServiceType } from '../../views/error/serviceTypes';
+import { ServiceUnavailableErrorView } from '../../views/error/ServiceUnavailableErrorView';
+import { LoadingView } from '../../views/loading/LoadingView';
 import {
   sendCloseWidgetEvent,
   sendConnectFailedEvent,
@@ -27,30 +54,9 @@ import {
   connectReducer,
   initialConnectState,
 } from './context/ConnectContext';
-import { ConnectWidgetView, ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import { ConnectWallet } from './views/ConnectWallet';
-import { SwitchNetworkZkEVM } from './views/SwitchNetworkZkEVM';
-import { LoadingView } from '../../views/loading/LoadingView';
-import { ConnectLoaderSuccess } from '../../components/ConnectLoader/ConnectLoaderSuccess';
-import {
-  viewReducer,
-  initialViewState,
-  ViewActions,
-  ViewContext,
-  SharedViews,
-} from '../../context/view-context/ViewContext';
-import { StatusType } from '../../components/Status/StatusType';
-import { StatusView } from '../../components/Status/StatusView';
-import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { addProviderListenersForWidgetRoot, sendProviderUpdatedEvent } from '../../lib';
 import { SwitchNetworkEth } from './views/SwitchNetworkEth';
-import { ErrorView } from '../../views/error/ErrorView';
-import { EventTargetContext } from '../../context/event-target-context/EventTargetContext';
-import { UserJourney, useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
-import { identifyUser } from '../../lib/analytics/identifyUser';
-import { isMetaMaskProvider, isPassportProvider, isWalletConnectProvider } from '../../lib/provider';
-import { WalletConnectManager, walletConnectProviderInfo } from '../../lib/walletConnect';
-import { useWalletConnect } from '../../lib/hooks/useWalletConnect';
+import { SwitchNetworkZkEVM } from './views/SwitchNetworkZkEVM';
 
 export type ConnectWidgetInputs = ConnectWidgetParams & {
   config: StrongCheckoutWidgetsConfig
@@ -253,6 +259,12 @@ export default function ConnectWidget({
                 onCloseClick={() => sendCloseEvent()}
               />
             )}
+          {view.type === SharedViews.SERVICE_UNAVAILABLE_ERROR_VIEW && (
+            <ServiceUnavailableErrorView
+              service={ServiceType.GENERIC}
+              onCloseClick={sendCloseEvent}
+            />
+          )}
         </>
       </ConnectContext.Provider>
     </ViewContext.Provider>

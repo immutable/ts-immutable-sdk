@@ -7,7 +7,10 @@ import {
   WidgetType,
   WalletProviderName,
   SalePaymentTypes,
-  CheckoutEventType
+  CheckoutEventType,
+  CheckoutSuccessEventType,
+  CheckoutFailureEventType,
+  CheckoutUserActionEventType,
 } from "@imtbl/checkout-sdk";
 import { Environment } from "@imtbl/config";
 import { WidgetsFactory } from "@imtbl/checkout-widgets";
@@ -16,11 +19,18 @@ import { Box } from "@biom3/react";
 
 function CheckoutUI() {
   const checkout = useMemo(
-    () => new Checkout({ baseConfig: { environment: Environment.SANDBOX } }),
+    () =>
+      new Checkout({
+        baseConfig: {
+          environment: Environment.SANDBOX,
+        },
+        publishableKey: "pk_imapik-test-gaDU8iOIIn-mLBc@Vvpm",
+      }),
     []
   );
   const factory = useMemo(
-    () => new WidgetsFactory(checkout, { theme: WidgetTheme.DARK }),
+    () =>
+      new WidgetsFactory(checkout, { theme: WidgetTheme.DARK, language: "en" }),
     [checkout]
   );
   const checkoutWidget = useMemo(
@@ -48,19 +58,111 @@ function CheckoutUI() {
   useEffect(() => {
     passport.connectEvm();
   }, []);
-  
+
   useEffect(() => {
     if (!checkoutWidget) return;
 
-    checkoutWidget.addListener(CheckoutEventType.CHECKOUT_APP_READY, (data) => {
-      console.log('----------> CHECKOUT_APP_READY', data);
+    checkoutWidget.addListener(CheckoutEventType.INITIALISED, (data) => {
+      console.log("----------> INITIALISED", data);
     });
 
-    checkoutWidget.addListener(CheckoutEventType.CHECKOUT_APP_EVENT, (data) => {
-      console.log('----------> CHECKOUT_APP_EVENT', data);
+    checkoutWidget.addListener(CheckoutEventType.PROVIDER_UPDATED, (data) => {
+      console.log("----------> PROVIDER_UPDATED", data);
     });
 
-  }, [checkoutWidget  ]);
+    checkoutWidget.addListener(CheckoutEventType.CLOSE, (data) => {
+      console.log("----------> CLOSE", data);
+    });
+
+    checkoutWidget.addListener(CheckoutEventType.SUCCESS, (data) => {
+      if (
+        data.flow === CheckoutFlowType.SALE &&
+        data.type === CheckoutSuccessEventType.SALE_SUCCESS
+      ) {
+        console.log("----------> SUCCESS SALE_SUCESS", data);
+      }
+      if (
+        data.flow === CheckoutFlowType.SALE &&
+        data.type === CheckoutSuccessEventType.SALE_TRANSACTION_SUCCESS
+      ) {
+        console.log("----------> SUCCESS SALE_TRANSACTION_SUCCESS", data);
+      }
+      if (data.flow === CheckoutFlowType.ONRAMP) {
+        console.log("----------> SUCCESS ONRAMP", data);
+      }
+      if (
+        data.flow === CheckoutFlowType.BRIDGE &&
+        data.type === CheckoutSuccessEventType.BRIDGE_SUCCESS
+      ) {
+        console.log("----------> SUCCESS BRIDGE_SUCCESS", data);
+      }
+      if (
+        data.flow === CheckoutFlowType.BRIDGE &&
+        data.type === CheckoutSuccessEventType.BRIDGE_CLAIM_WITHDRAWAL_SUCCESS
+      ) {
+        console.log(
+          "----------> SUCCESS BRIDGE_CLAIM_WITHDRAWAL_SUCCESS",
+          data.data
+        );
+      }
+
+      console.log("----------> SUCCESS", data);
+    });
+
+    checkoutWidget.addListener(CheckoutEventType.FAILURE, (data) => {
+      if (
+        data.flow === CheckoutFlowType.BRIDGE &&
+        data.type === CheckoutFailureEventType.BRIDGE_FAILED
+      ) {
+        console.log("----------> FAILURE BRIDGE_FAILED", data);
+      }
+      if (
+        data.flow === CheckoutFlowType.BRIDGE &&
+        data.type === CheckoutFailureEventType.BRIDGE_CLAIM_WITHDRAWAL_FAILED
+      ) {
+        console.log(
+          "----------> FAILURE BRIDGE_CLAIM_WITHDRAWAL_FAILED",
+          data.data
+        );
+      }
+      if (data.flow === CheckoutFlowType.CONNECT) {
+        console.log("----------> FAILURE CONNECT", data);
+      }
+      if (data.flow === CheckoutFlowType.ONRAMP) {
+        console.log("----------> FAILURE ONRAMP", data);
+      }
+      if (data.flow === CheckoutFlowType.SWAP) {
+        console.log("----------> FAILURE SWAP", data);
+      }
+      if (data.flow === CheckoutFlowType.SALE) {
+        console.log("----------> FAILURE SALE", data);
+      }
+      console.log("----------> FAILURE", data);
+    });
+
+    checkoutWidget.addListener(CheckoutEventType.DISCONNECTED, (data) => {
+      console.log("----------> DISCONNECTED", data);
+    });
+
+    checkoutWidget.addListener(CheckoutEventType.USER_ACTION, (data) => {
+      if (
+        data.flow === CheckoutFlowType.SALE &&
+        data.type === CheckoutUserActionEventType.PAYMENT_METHOD_SELECTED
+      ) {
+        console.log("----------> USER_ACTION PAYMENT_METHOD_SELECTED", data);
+      }
+      if (
+        data.flow === CheckoutFlowType.SALE &&
+        data.type === CheckoutUserActionEventType.PAYMENT_TOKEN_SELECTED
+      ) {
+        console.log("----------> USER_ACTION PAYMENT_TOKEN_SELECTED", data);
+      }
+      if (data.flow === CheckoutFlowType.WALLET) {
+        console.log("----------> USER_ACTION WALLET", data);
+      }
+      console.log("----------> USER_ACTION", data);
+    });
+  }, [checkoutWidget]);
 
   return (
     <div>

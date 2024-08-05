@@ -90,7 +90,7 @@ export async function transfer({
       time: responseData.time,
       transfer_id: responseData.transfer_id,
     };
-  }, PassportErrorType.TRANSFER_ERROR);
+  }, PassportErrorType.TRANSFER_ERROR, 'imxTransfer');
 }
 
 export async function batchNftTransfer({
@@ -161,5 +161,5 @@ export async function batchNftTransfer({
     return {
       transfer_ids: response?.data.transfer_ids,
     };
-  }, PassportErrorType.TRANSFER_ERROR);
+  }, PassportErrorType.TRANSFER_ERROR, 'imxBatchNftTransfer');
 }
