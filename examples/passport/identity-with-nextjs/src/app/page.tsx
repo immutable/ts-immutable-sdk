@@ -18,7 +18,7 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8">
       <h1 className="text-3xl font-bold mb-8">Passport Identity Examples</h1>
-      <div className="space-x-4 space-y-4 max-w-screen-lg w-full">
+      <div className="grid grid-cols-1 gap-4 text-center">
         <button
           className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"
           onClick={login}
@@ -38,7 +38,7 @@ export default function Home() {
           onClick={loginWithEthersjs}
           type="button"
         >
-          Login With Ethers.js
+          Login With EtherJS
         </button>
         <button
           className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800"

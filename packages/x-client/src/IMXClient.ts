@@ -145,7 +145,7 @@ export class IMXClient {
    * Get details of a Deposit with the given ID
    * @param request - the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the requested Deposit
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public getDeposit(request: DepositsApiGetDepositRequest) {
     return this.depositsApi
@@ -160,7 +160,7 @@ export class IMXClient {
    * Get a list of Deposits
    * @param request - optional object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the requested list of Deposits
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public listDeposits(request?: DepositsApiListDepositsRequest) {
     return this.depositsApi
@@ -175,7 +175,7 @@ export class IMXClient {
    * Get Stark keys for a registered User
    * @param ethAddress - the eth address of the User
    * @returns a promise that resolves with the requested User
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public getUser(ethAddress: string) {
     return this.usersApi
@@ -190,7 +190,7 @@ export class IMXClient {
    * Get details of an Asset
    * @param request - the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the requested Asset
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public getAsset(request: AssetsApiGetAssetRequest) {
     return this.assetApi
@@ -205,7 +205,7 @@ export class IMXClient {
    * Get a list of Assets
    * @param request - optional object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the requested list of Assets
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public listAssets(request?: AssetsApiListAssetsRequest) {
     return this.assetApi
@@ -221,7 +221,7 @@ export class IMXClient {
    * @param ethSigner - the L1 signer
    * @param request - the request object to be provided in the API request
    * @returns a promise that resolves with the created Collection
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public createCollection(
     ethSigner: EthSigner,
@@ -239,7 +239,7 @@ export class IMXClient {
    * Get details of a Collection at the given address
    * @param request - the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the requested Collection
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public getCollection(request: CollectionsApiGetCollectionRequest) {
     return this.collectionApi
@@ -254,7 +254,7 @@ export class IMXClient {
    * Get a list of Collection filters
    * @param request - the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the requested list of Collection Filters
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public listCollectionFilters(
     request: CollectionsApiListCollectionFiltersRequest,
@@ -271,7 +271,7 @@ export class IMXClient {
    * Get a list of Collections
    * @param request - optional object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the requested list of Collections
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public listCollections(request?: CollectionsApiListCollectionsRequest) {
     return this.collectionApi
@@ -288,7 +288,7 @@ export class IMXClient {
    * @param collectionAddress - the Collection contract address
    * @param request - the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the updated Collection
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public updateCollection(
     ethSigner: EthSigner,
@@ -309,7 +309,7 @@ export class IMXClient {
    * @param collectionAddress - the Collection contract address
    * @param request - the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the SuccessResponse if successful
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public addMetadataSchemaToCollection(
     ethSigner: EthSigner,
@@ -328,7 +328,7 @@ export class IMXClient {
    * Get Metadata schema
    * @param request - the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the requested Metadata schema
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public getMetadataSchema(request: MetadataApiGetMetadataSchemaRequest) {
     return this.metadataApi
@@ -346,7 +346,7 @@ export class IMXClient {
    * @param name - the Metadata schema name
    * @param request - the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the SuccessResponse if successful
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public updateMetadataSchemaByName(
     ethSigner: EthSigner,
@@ -369,7 +369,7 @@ export class IMXClient {
    * @param pageSize - the page size of the result
    * @param cursor - the cursor
    * @returns a promise that resolves with the requested metadata refreshes
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public listMetadataRefreshes(
     ethSigner: EthSigner,
@@ -392,7 +392,7 @@ export class IMXClient {
    * @param pageSize - the page size of the result
    * @param cursor - the cursor
    * @returns a promise that resolves with the requested metadata refresh errors
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public getMetadataRefreshErrors(
     ethSigner: EthSigner,
@@ -413,7 +413,7 @@ export class IMXClient {
    * @param ethSigner - the L1 signer
    * @param refreshId - the metadata refresh ID
    * @returns a promise that resolves with the requested metadata refresh results
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public getMetadataRefreshResults(ethSigner: EthSigner, refreshId: string) {
     return this.workflows
@@ -429,7 +429,7 @@ export class IMXClient {
    * @param ethSigner - the L1 signer
    * @param request the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the requested metadata refresh
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public createMetadataRefresh(
     ethSigner: EthSigner,
@@ -448,7 +448,7 @@ export class IMXClient {
    * @param ethSigner - the L1 signer
    * @param id - the Project ID
    * @returns a promise that resolves with the requested Project
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public async getProject(ethSigner: EthSigner, id: string) {
     return this.workflows
@@ -463,7 +463,7 @@ export class IMXClient {
    * Get the token Balances of the User
    * @param request - the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the requested Balance
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public getBalance(request: BalancesApiGetBalanceRequest) {
     return this.balanceApi
@@ -478,7 +478,7 @@ export class IMXClient {
    * Get a list of Balances for given User
    * @param request the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the requested list of Balances
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public listBalances(request: BalancesApiListBalancesRequest) {
     return this.balanceApi
@@ -493,7 +493,7 @@ export class IMXClient {
    * Get details of a Mint with the given ID
    * @param request the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the requested Mint
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public getMint(request: MintsApiGetMintRequest) {
     return this.mintsApi
@@ -508,7 +508,7 @@ export class IMXClient {
    * Get a list of Mints
    * @param request optional object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the requested list of Mints
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public listMints(request?: MintsApiListMintsRequest) {
     return this.mintsApi
@@ -524,7 +524,7 @@ export class IMXClient {
    * @param ethSigner - the L1 signer
    * @param request - the request object to be provided in the API request
    * @returns a promise that resolves with the minted tokens
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public mint(ethSigner: EthSigner, request: UnsignedMintRequest) {
     return this.workflows.mint(ethSigner, request);
@@ -534,7 +534,7 @@ export class IMXClient {
    * Get a list of Withdrawals
    * @param request - optional object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the requested list of Withdrawals
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public listWithdrawals(request?: WithdrawalsApiListWithdrawalsRequest) {
     return this.withdrawalsApi
@@ -549,7 +549,7 @@ export class IMXClient {
    * Get details of Withdrawal with the given ID
    * @param request - the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the requested Withdrawal
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public getWithdrawal(request: WithdrawalsApiGetWithdrawalRequest) {
     return this.withdrawalsApi
@@ -564,7 +564,7 @@ export class IMXClient {
    * Get details of an Order with the given ID
    * @param request - the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the requested Order
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public getOrder(request: OrdersApiGetOrderV3Request) {
     return this.ordersApi
@@ -579,7 +579,7 @@ export class IMXClient {
    * Get a list of Orders
    * @param request - optional object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the requested list of Orders
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public listOrders(request?: OrdersApiListOrdersV3Request) {
     return this.ordersApi
@@ -594,7 +594,7 @@ export class IMXClient {
    * Get details of a Trade with the given ID
    * @param request - the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the requested Trade
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public getTrade(request: TradesApiGetTradeV3Request) {
     return this.tradesApi
@@ -609,7 +609,7 @@ export class IMXClient {
    * Get a list of Trades
    * @param request - optional object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the requested list of Trades
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public listTrades(request?: TradesApiListTradesV3Request) {
     return this.tradesApi
@@ -624,7 +624,7 @@ export class IMXClient {
    * Get details of a Token
    * @param request - the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the requested Token
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public getToken(request: TokensApiGetTokenRequest) {
     return this.tokensApi
@@ -639,7 +639,7 @@ export class IMXClient {
    * Get a list of Tokens
    * @param request - optional object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the requested list of Tokens
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public listTokens(request?: TokensApiListTokensRequest) {
     return this.tokensApi
@@ -654,7 +654,7 @@ export class IMXClient {
    * Get details of a Transfer with the given ID
    * @param request - the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the requested Transfer
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public getTransfer(request: TransfersApiGetTransferRequest) {
     return this.transfersApi
@@ -669,7 +669,7 @@ export class IMXClient {
    * Get a list of Transfers
    * @param request - optional object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the requested list of Transfers
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public listTransfers(request?: TransfersApiListTransfersRequest) {
     return this.transfersApi
@@ -684,7 +684,7 @@ export class IMXClient {
    * Create a new Exchange transaction
    * @param request - the request object to be provided in the API request
    * @returns a promise that resolves with the created Exchange Transaction
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public createExchange(request: ExchangesApiCreateExchangeRequest) {
     return this.exchangeApi.createExchange(request)
@@ -698,7 +698,7 @@ export class IMXClient {
    * Get an Exchange transaction
    * @param request - the request object to be provided in the API request
    * @returns a promise that resolves with the Exchange Transaction
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public getExchange(request: ExchangesApiGetExchangeRequest) {
     return this.exchangeApi.getExchange(request)
@@ -712,7 +712,7 @@ export class IMXClient {
    * Get Exchange transactions
    * @param request - the request object to be provided in the API request
    * @returns a promise that resolves with Exchange Transactions
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public getExchanges(request: ExchangesApiGetExchangesRequest) {
     return this.exchangeApi.getExchanges(request)
@@ -727,7 +727,7 @@ export class IMXClient {
    * @param walletConnection - the pair of Eth/Stark signers
    * @param request - the request object to be provided in the API request
    * @returns a promise that resolves with the created Exchange Transfer
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public exchangeTransfer(
     walletConnection: WalletConnection,
@@ -740,7 +740,7 @@ export class IMXClient {
    * Create a new nft primary transaction
    * @param request - the request object to be provided in the API request
    * @returns a promise that resolves with the created nft primary Transaction
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public createNftPrimary(
     request: NftCheckoutPrimaryApiCreateNftPrimaryRequest,
@@ -756,7 +756,7 @@ export class IMXClient {
    * Get nft primary supported currencies and their limits
    * @param request - the request object to be provided in the API request
    * @returns a promise that resolves with nft primary Currencies
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public getCurrenciesNFTCheckoutPrimary(
     request: NftCheckoutPrimaryApiGetCurrenciesNFTCheckoutPrimaryRequest,
@@ -773,7 +773,7 @@ export class IMXClient {
    * Get nft primary transaction by transaction id
    * @param request - the request object to be provided in the API request
    * @returns a promise that resolves with nft primary transaction
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public getNftPrimaryTransaction(
     request: NftCheckoutPrimaryApiGetNftPrimaryTransactionRequest,
@@ -790,7 +790,7 @@ export class IMXClient {
    * Get list of nft primary transactions
    * @param request - the request object to be provided in the API request
    * @returns a promise that resolves with nft primary transaction
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public getNftPrimaryTransactions(
     request: NftCheckoutPrimaryApiGetNftPrimaryTransactionsRequest,
@@ -808,7 +808,7 @@ export class IMXClient {
    * @param walletConnection - the pair of L1/L2 signers
    * @param request - the request object to be provided in the API request
    * @returns a promise that resolves with the created Trade
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public createPrimarySale(
     walletConnection: WalletConnection,
@@ -826,7 +826,7 @@ export class IMXClient {
    * @param ethSigner - eth signer matching the 'studio_ether_key' of the primary sale
    * @param primarySaleId - id of the primary sale accepting
    * @returns a promise that resolves with the created Trade
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public acceptPrimarySale(ethSigner: EthSigner, primarySaleId: number) {
     return this.workflows
@@ -841,7 +841,7 @@ export class IMXClient {
    * @param ethSigner - eth signer matching the 'studio_ether_key' of the primary sale
    * @param primarySaleId - id of the primary sale to be rejected
    * @returns a promise that resolves with the rejected PrimarySale
-   * @throws {@link index.IMXError}
+   * @throws {@link IMXError}
    */
   public rejectPrimarySale(ethSigner: EthSigner, primarySaleId: number) {
     return this.workflows
