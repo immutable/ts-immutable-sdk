@@ -7,14 +7,45 @@ on:
       - completed
 
 jobs:
+  AlphaCheck:
+    name: Check if SDK version is alpha
+    runs-on: ubuntu-latest
+    outputs:
+      is_alpha: ${{ steps.alpha_check.outputs.is_alpha }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check alpha version
+        id: alpha_check
+        run: |
+          VERSION=$(git describe --tags --abbrev=0)
+          if echo "$VERSION" | grep -q "alpha"; then
+            echo "Skipping docs generation for alpha version"
+            echo "is_alpha=true" >> $GITHUB_ENV
+            exit 0
+          else
+            echo "is_alpha=false" >> $GITHUB_ENV
+          fi
+        shell: bash
+
   PublishDocs:
     name: Publish SDK Reference Docs
     runs-on: ubuntu-latest
+    needs: AlphaCheck
+    if: ${{ needs.AlphaCheck.outputs.is_alpha == 'false' }}
     env:
       SDK_PUBLISH_SLACK_WEBHOOK: ${{ secrets.SDK_PUBLISH_SLACK_WEBHOOK }}
       NETLIFY_BUILD_HOOK: ${{ secrets.NETLIFY_BUILD_HOOK }}
       GITHUB_USER: ${{ github.actor }}
+      IS_ALPHA: ${{ needs.AlphaCheck.outputs.is_alpha }}
     steps:
+      - name: Is Alpha Version
+        run: |
+          echo "Is Alpha Version: ${{ env.IS_ALPHA }}"
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
