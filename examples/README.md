@@ -263,7 +263,7 @@ Example of the base level of testing required can be found in `/examples/passpor
 Add the test runner to the scripts in your package.json
 
 ```
-"test": "playwright install --with-deps && playwright test"
+"test": "playwright test"
 ```
 
 Run your tests with `yarn test`
