@@ -46,7 +46,7 @@ const getFilesToBuild = () => {
 };
 
 
-const buildTypes = () => {
+const buildJS = () => {
   const filesToBuild = getFilesToBuild();
   // generate a single object that contains all the files under input
   const [inputs] = filesToBuild.reduce((acc, f) => {
@@ -81,7 +81,7 @@ const buildTypes = () => {
     }
 };
 
-const getFileBuild = (inputFilename) => [
+const getTypesBuild = (inputFilename) => [
   {
     input: `./dist/types/${inputFilename}.d.ts`,
     output: {
@@ -97,19 +97,14 @@ const getFileBuild = (inputFilename) => [
   },
 ];
 
-const buildFiles = () => {
+const buildTypes = () => {
   const modules = [];
   const filesToBuild = getFilesToBuild();
   for (const file of filesToBuild) {
-    modules.push(...getFileBuild(file));
+    modules.push(...getTypesBuild(file));
   }
   return modules;
 };
-
-// console.log('buildTypes')
-// console.log(buildTypes())
-// console.log('buildFiles')
-// console.log(buildFiles())
 
 export default [
   // Main build entry
@@ -173,6 +168,6 @@ export default [
   },
 
   // Export ES Modules
-  buildTypes(),
-  ...buildFiles(),
+  buildJS(),
+  ...buildTypes(),
 ];
