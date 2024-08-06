@@ -1,51 +1,27 @@
+import { WindowPostMessageStream } from '@metamask/post-message-stream';
+import { PostMessageHandlerEventType, PostMessagePayload } from './postMessageEventTypes';
+
 export type PostMessageHandlerConfiguration = {
   targetOrigin: string;
-  eventTarget: MinimalEventTargetInterface;
-  eventSource?: MinimalEventSourceInterface;
+  eventTarget: WindowProxy;
+  eventSource?: WindowProxy;
 };
-// todo put these in a types file
-export enum PostMessageHandlerEventType {
-  PROVIDER_RELAY = 'IMTBL_PROVIDER_RELAY',
-  EIP_6963_EVENT = 'IMTBL_EIP_6963_EVENT',
-  WIDGET_EVENT = 'IMTBL_CHECKOUT_WIDGET_EVENT',
-}
-
-export type PostMessageProviderRelayData = any;
-
-export type PostMessageEIP6963Data = any;
-
-export type PostMessagePayaload =
-  | PostMessageProviderRelayData
-  | PostMessageEIP6963Data;
 
 export type PostMessageData = {
   type: PostMessageHandlerEventType;
-  payload: PostMessagePayaload;
+  payload: PostMessagePayload;
 };
 
-export interface MinimalEventSourceInterface {
-  addEventListener(
-    eventType: 'message',
-    handler: (message: MessageEvent) => void
-  ): void;
-  removeEventListener(
-    eventType: 'message',
-    handler: (message: MessageEvent) => void
-  ): void;
-}
-
-export interface MinimalEventTargetInterface {
-  postMessage(message: any, targetOrigin?: string): void;
-}
-
 export class PostMessageHandler {
-  private eventHandlers: Map<PostMessageHandlerEventType, (data: any) => void> = new Map();
+  private subscribers: Array<(message: PostMessageData) => void> = [];
 
   private targetOrigin!: string;
 
-  private eventTarget!: MinimalEventTargetInterface;
+  private eventTarget!: WindowProxy;
 
-  private eventSource!: MinimalEventSourceInterface;
+  private eventSource!: WindowProxy;
+
+  private messageStream!: WindowPostMessageStream;
 
   constructor({
     targetOrigin,
@@ -56,41 +32,43 @@ export class PostMessageHandler {
     this.targetOrigin = targetOrigin;
     this.eventSource = eventSource;
     this.eventTarget = eventTarget;
-    this.eventHandlers = new Map();
 
-    this.eventSource.addEventListener('message', this.handleMessage);
+    this.messageStream = new WindowPostMessageStream({
+      name: 'handler',
+      target: 'target',
+      targetOrigin: this.targetOrigin,
+      targetWindow: this.eventTarget,
+    });
+
+    (this.messageStream as any).on('data', this.handleMessage);
   }
 
-  public sendMessage(type: PostMessageHandlerEventType, payload: any) {
+  public send(type: PostMessageHandlerEventType, payload: any) {
     const message: PostMessageData = { type, payload };
-    this.eventTarget.postMessage(message, this.targetOrigin);
+    (this.messageStream as any).write(message);
   }
 
-  public addEventHandler(
-    type: PostMessageHandlerEventType,
-    handler: (data: any) => void,
-  ): void {
-    this.eventHandlers.set(type, handler);
+  public subscribe(handler: (message: PostMessageData) => void): () => void {
+    this.subscribers.push(handler);
+
+    return () => {
+      this.unsubscribe(handler);
+    };
   }
 
-  public removeEventHandler(type: PostMessageHandlerEventType): void {
-    this.eventHandlers.delete(type);
-  }
-
-  private handleMessage(event: MessageEvent) {
-    if (event.origin !== this.targetOrigin) {
-      return;
+  private unsubscribe(handler: (message: PostMessageData) => void): void {
+    const index = this.subscribers.indexOf(handler);
+    if (index !== -1) {
+      this.subscribers.splice(index, 1);
     }
+  }
 
-    const message: PostMessageData = event.data;
-
-    const handler = this.eventHandlers.get(message.type);
-    if (handler) {
-      handler(message.payload);
-    }
+  private handleMessage(data: any) {
+    const message: PostMessageData = data;
+    this.subscribers.forEach((handler) => handler(message));
   }
 
   public destroy() {
-    this.eventSource.removeEventListener('message', this.handleMessage);
+    (this.messageStream as any).destroy();
   }
 }
