@@ -27,6 +27,7 @@ export interface LoadingHandoverProps {
 export function CheckoutAppIframe() {
   const { t } = useTranslation();
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [loadingError, setLoadingError] = useState<boolean>(false);
   const [initialised, setInitialised] = useState<boolean>(false);
   const [
@@ -76,20 +77,21 @@ export function CheckoutAppIframe() {
       // check if the widget has been initialised
       if (event.detail.type === CheckoutEventType.INITIALISED) {
         setInitialised(true);
+        clearTimeout(timeoutRef.current!);
       }
     });
 
     // check if loaded correctly
-    const timeoutId = setTimeout(() => {
+    timeoutRef.current = setTimeout(() => {
       if (!initialised) {
         setLoadingError(true);
-        clearTimeout(timeoutId);
+        clearTimeout(timeoutRef.current!);
       }
     }, IFRAME_INIT_TIMEOUT_MS);
 
     return () => {
       postMessageHandler.destroy();
-      clearTimeout(timeoutId);
+      clearTimeout(timeoutRef.current!);
     };
   }, [postMessageHandler]);
 
