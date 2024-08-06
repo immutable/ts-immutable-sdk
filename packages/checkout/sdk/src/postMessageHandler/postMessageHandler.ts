@@ -1,5 +1,7 @@
-import { WindowPostMessageStream } from '@metamask/post-message-stream';
-import { PostMessageHandlerEventType, PostMessagePayload } from './postMessageEventTypes';
+import {
+  PostMessageHandlerEventType,
+  PostMessagePayload,
+} from './postMessageEventTypes';
 
 export type PostMessageHandlerConfiguration = {
   targetOrigin: string;
@@ -21,31 +23,21 @@ export class PostMessageHandler {
 
   private eventSource!: WindowProxy;
 
-  private messageStream!: WindowPostMessageStream;
-
   constructor({
     targetOrigin,
     eventTarget,
     eventSource = window,
   }: PostMessageHandlerConfiguration) {
-    this.handleMessage = this.handleMessage.bind(this);
     this.targetOrigin = targetOrigin;
     this.eventSource = eventSource;
     this.eventTarget = eventTarget;
 
-    this.messageStream = new WindowPostMessageStream({
-      name: 'handler',
-      target: 'target',
-      targetOrigin: this.targetOrigin,
-      targetWindow: this.eventTarget,
-    });
-
-    (this.messageStream as any).on('data', this.handleMessage);
+    this.eventSource.addEventListener('message', this.handleMessage);
   }
 
   public send(type: PostMessageHandlerEventType, payload: any) {
     const message: PostMessageData = { type, payload };
-    (this.messageStream as any).write(message);
+    this.eventTarget.postMessage(message, this.targetOrigin);
   }
 
   public subscribe(handler: (message: PostMessageData) => void): () => void {
@@ -63,12 +55,15 @@ export class PostMessageHandler {
     }
   }
 
-  private handleMessage(data: any) {
-    const message: PostMessageData = data;
+  private handleMessage(event: MessageEvent) {
+    if (event.origin !== this.targetOrigin) return;
+
+    const message: PostMessageData = event.data;
+
     this.subscribers.forEach((handler) => handler(message));
   }
 
   public destroy() {
-    (this.messageStream as any).destroy();
+    this.eventSource.removeEventListener('message', this.handleMessage);
   }
 }

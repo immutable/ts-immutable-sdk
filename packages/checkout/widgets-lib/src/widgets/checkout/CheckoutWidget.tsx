@@ -23,7 +23,7 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
   const { config, checkout, params } = props;
   const { environment, publishableKey } = checkout.config;
 
-  const [, iframeUrl] = useMemo(() => {
+  const [, iframeURL] = useMemo(() => {
     if (!publishableKey) return ['', ''];
     return getIframeURL(params, config, environment, publishableKey);
   }, [params, config, environment, publishableKey]);
@@ -34,22 +34,22 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
   );
   const checkoutReducerValues = useMemo(
     () => ({
-      checkoutState: { ...checkoutState, iframeUrl, checkout },
+      checkoutState: { ...checkoutState, iframeURL, checkout },
       checkoutDispatch,
     }),
-    [checkoutState, checkoutDispatch, iframeUrl, checkout],
+    [checkoutState, checkoutDispatch, iframeURL, checkout],
   );
 
   useEffect(() => {
-    if (iframeUrl === undefined) return;
+    if (iframeURL === undefined) return;
 
     checkoutDispatch({
       payload: {
         type: CheckoutActions.SET_IFRAME_URL,
-        iframeUrl,
+        iframeURL,
       },
     });
-  }, [iframeUrl]);
+  }, [iframeURL]);
 
   return (
     <CheckoutContextProvider values={checkoutReducerValues}>

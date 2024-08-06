@@ -25,21 +25,17 @@ export function CheckoutContextProvider({
   const {
     checkout,
     provider,
-    checkoutAppIframe,
+    iframeContentWindow,
     postMessageHandler,
-    iframeUrl,
+    iframeURL,
   } = checkoutState;
 
   useEffect(() => {
-    if (!checkoutAppIframe || !checkout || !iframeUrl) return;
+    if (!iframeContentWindow || !checkout || !iframeURL) return;
 
     const postMessageHandlerInstance = new PostMessageHandler({
-      targetOrigin: new URL(iframeUrl).origin,
-      eventTarget: checkoutAppIframe,
-    });
-
-    postMessageHandlerInstance.sendMessage('PROVIDER_RELAY' as any, {
-      mounted: 'checkout',
+      targetOrigin: new URL(iframeURL).origin,
+      eventTarget: iframeContentWindow,
     });
 
     checkoutDispatch({
@@ -48,7 +44,7 @@ export function CheckoutContextProvider({
         postMessageHandler: postMessageHandlerInstance,
       },
     });
-  }, [checkoutAppIframe, checkout, iframeUrl]);
+  }, [iframeContentWindow, checkout, iframeURL]);
 
   useEffect(() => {
     if (!provider || !postMessageHandler) return undefined;
