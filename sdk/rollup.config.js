@@ -3,6 +3,7 @@ import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { readFileSync } from 'fs';
 import commonJs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
+import dts from 'rollup-plugin-dts';
 import replace from '@rollup/plugin-replace';
 import pkg from './package.json' assert { type: 'json' };
 import moduleReleases from './module-release.json' assert { type: 'json' };
@@ -45,17 +46,16 @@ const getFilesToBuild = () => {
 };
 
 
-const buildBundles = () => {
+const buildTypes = () => {
   const filesToBuild = getFilesToBuild();
   // generate a single object that contains all the files under input
-  const [inputs, types] = filesToBuild.reduce((acc, f) => {
-    return [
-      {...acc[0], [f] : `./src/${f}.ts`},
-      {...acc[1], [f] : `./dist/types/${f}.d.ts`},
-    ];
-  }, [{}, {}])
+  const [inputs] = filesToBuild.reduce((acc, f) => {
+    return [{...acc[0], [f] : `./src/${f}.ts`}]
+  }, [{}])
 
-  return {
+  console.log(inputs)
+
+  return  {
       input: inputs,
       output: {
         dir: 'dist',
@@ -80,6 +80,36 @@ const buildBundles = () => {
       external: ['pg'] 
     }
 };
+
+const getFileBuild = (inputFilename) => [
+  {
+    input: `./dist/types/${inputFilename}.d.ts`,
+    output: {
+      file: `./dist/${inputFilename}.d.ts`,
+      format: 'es',
+    },
+    plugins: [
+      dts({
+        respectExternal: true,
+      }),
+    ],
+    external: ['pg'] 
+  },
+];
+
+const buildFiles = () => {
+  const modules = [];
+  const filesToBuild = getFilesToBuild();
+  for (const file of filesToBuild) {
+    modules.push(...getFileBuild(file));
+  }
+  return modules;
+};
+
+// console.log('buildTypes')
+// console.log(buildTypes())
+// console.log('buildFiles')
+// console.log(buildFiles())
 
 export default [
   // Main build entry
@@ -143,5 +173,6 @@ export default [
   },
 
   // Export ES Modules
-  buildBundles(),
+  buildTypes(),
+  ...buildFiles(),
 ];

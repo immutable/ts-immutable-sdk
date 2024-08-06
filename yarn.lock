@@ -4784,7 +4784,6 @@ __metadata:
     bn.js: ^5.2.1
     buffer: ^6.0.3
     crypto-browserify: ^3.12.0
-    dts-bundle-generator: ^9.5.1
     elliptic: ^6.5.4
     enc-utils: ^3.0.0
     eslint: ^8.40.0
@@ -4809,6 +4808,7 @@ __metadata:
     prisma: ^5.13.0
     react-i18next: ^13.5.0
     rollup: ^4.19.1
+    rollup-plugin-dts: ^6.1.1
     rollup-plugin-polyfill-node: ^0.13.0
     semver: ^7.4.0
     sns-validator: ^0.3.5
@@ -4824,6 +4824,138 @@ __metadata:
       optional: true
   languageName: unknown
   linkType: soft
+
+"@imtbl/sdk@file:.yalc/@imtbl/sdk::locator=%40tests%2Ffunc-tests-imx%40workspace%3Atests%2Ffunc-tests%2Fimx":
+  version: 0.0.0
+  resolution: "@imtbl/sdk@file:.yalc/@imtbl/sdk#.yalc/@imtbl/sdk::hash=f5ccf0&locator=%40tests%2Ffunc-tests-imx%40workspace%3Atests%2Ffunc-tests%2Fimx"
+  dependencies:
+    "@0xsequence/abi": ^1.4.3
+    "@0xsequence/core": ^1.4.3
+    "@biom3/design-tokens": ^0.4.2
+    "@biom3/react": ^0.25.0
+    "@ethersproject/abi": ^5.7.0
+    "@ethersproject/abstract-signer": ^5.7.0
+    "@ethersproject/keccak256": ^5.7.0
+    "@ethersproject/providers": ^5.7.2
+    "@ethersproject/strings": ^5.7.0
+    "@ethersproject/wallet": ^5.7.0
+    "@imtbl/react-analytics": 0.2.1-alpha
+    "@jest/globals": ^29.5.0
+    "@magic-ext/oidc": 4.2.0
+    "@metamask/detect-provider": ^2.0.0
+    "@opensea/seaport-js": 4.0.3
+    "@rive-app/react-canvas-lite": ^4.9.0
+    "@stdlib/number-float64-base-normalize": 0.0.8
+    "@uniswap/router-sdk": ^1.4.0
+    "@uniswap/sdk-core": ^3.0.1
+    "@uniswap/v3-sdk": ^3.9.0
+    "@walletconnect/ethereum-provider": ^2.11.1
+    "@walletconnect/modal": ^2.6.2
+    assert: ^2.0.0
+    axios: ^1.6.5
+    bn.js: ^5.2.1
+    buffer: ^6.0.3
+    crypto-browserify: ^3.12.0
+    elliptic: ^6.5.4
+    enc-utils: ^3.0.0
+    ethereumjs-wallet: ^1.0.2
+    ethers: ^5.7.2
+    ethers-v6: "npm:ethers@6.11.1"
+    events: ^3.3.0
+    global-const: ^0.1.2
+    https-browserify: ^1.0.0
+    i18next: ^23.7.6
+    i18next-browser-languagedetector: ^7.2.0
+    jwt-decode: ^3.1.2
+    localforage: ^1.10.0
+    lru-memorise: 0.3.0
+    magic-sdk: ^21.2.0
+    merkletreejs: ^0.3.11
+    oidc-client-ts: 2.4.0
+    os-browserify: ^0.3.0
+    pako: ^2.1.0
+    pg: ^8.11.5
+    prisma: ^5.13.0
+    react-i18next: ^13.5.0
+    sns-validator: ^0.3.5
+    stream-browserify: ^3.0.0
+    stream-http: ^3.2.0
+    url: ^0.11.0
+    uuid: ^8.3.2
+  dependenciesMeta:
+    pg:
+      optional: true
+    prisma:
+      optional: true
+  checksum: 4c2104166356ec97bc17445713742023b65f011b61fad29e1801318a8a8a493593d734a2c058cfc2861e2c7d5705f6514196befb283b77cf02a61af0e459627e
+  languageName: node
+  linkType: hard
+
+"@imtbl/sdk@file:.yalc/@imtbl/sdk::locator=%40tests%2Ffunc-tests-zkevm%40workspace%3Atests%2Ffunc-tests%2Fzkevm":
+  version: 0.0.0
+  resolution: "@imtbl/sdk@file:.yalc/@imtbl/sdk#.yalc/@imtbl/sdk::hash=f5ccf0&locator=%40tests%2Ffunc-tests-zkevm%40workspace%3Atests%2Ffunc-tests%2Fzkevm"
+  dependencies:
+    "@0xsequence/abi": ^1.4.3
+    "@0xsequence/core": ^1.4.3
+    "@biom3/design-tokens": ^0.4.2
+    "@biom3/react": ^0.25.0
+    "@ethersproject/abi": ^5.7.0
+    "@ethersproject/abstract-signer": ^5.7.0
+    "@ethersproject/keccak256": ^5.7.0
+    "@ethersproject/providers": ^5.7.2
+    "@ethersproject/strings": ^5.7.0
+    "@ethersproject/wallet": ^5.7.0
+    "@imtbl/react-analytics": 0.2.1-alpha
+    "@jest/globals": ^29.5.0
+    "@magic-ext/oidc": 4.2.0
+    "@metamask/detect-provider": ^2.0.0
+    "@opensea/seaport-js": 4.0.3
+    "@rive-app/react-canvas-lite": ^4.9.0
+    "@stdlib/number-float64-base-normalize": 0.0.8
+    "@uniswap/router-sdk": ^1.4.0
+    "@uniswap/sdk-core": ^3.0.1
+    "@uniswap/v3-sdk": ^3.9.0
+    "@walletconnect/ethereum-provider": ^2.11.1
+    "@walletconnect/modal": ^2.6.2
+    assert: ^2.0.0
+    axios: ^1.6.5
+    bn.js: ^5.2.1
+    buffer: ^6.0.3
+    crypto-browserify: ^3.12.0
+    elliptic: ^6.5.4
+    enc-utils: ^3.0.0
+    ethereumjs-wallet: ^1.0.2
+    ethers: ^5.7.2
+    ethers-v6: "npm:ethers@6.11.1"
+    events: ^3.3.0
+    global-const: ^0.1.2
+    https-browserify: ^1.0.0
+    i18next: ^23.7.6
+    i18next-browser-languagedetector: ^7.2.0
+    jwt-decode: ^3.1.2
+    localforage: ^1.10.0
+    lru-memorise: 0.3.0
+    magic-sdk: ^21.2.0
+    merkletreejs: ^0.3.11
+    oidc-client-ts: 2.4.0
+    os-browserify: ^0.3.0
+    pako: ^2.1.0
+    pg: ^8.11.5
+    prisma: ^5.13.0
+    react-i18next: ^13.5.0
+    sns-validator: ^0.3.5
+    stream-browserify: ^3.0.0
+    stream-http: ^3.2.0
+    url: ^0.11.0
+    uuid: ^8.3.2
+  dependenciesMeta:
+    pg:
+      optional: true
+    prisma:
+      optional: true
+  checksum: 4c2104166356ec97bc17445713742023b65f011b61fad29e1801318a8a8a493593d734a2c058cfc2861e2c7d5705f6514196befb283b77cf02a61af0e459627e
+  languageName: node
+  linkType: hard
 
 "@imtbl/sdk@npm:latest":
   version: 1.46.5
@@ -6067,6 +6199,13 @@ __metadata:
   version: 1.4.15
   resolution: "@jridgewell/sourcemap-codec@npm:1.4.15"
   checksum: b881c7e503db3fc7f3c1f35a1dd2655a188cc51a3612d76efc8a6eb74728bef5606e6758ee77423e564092b4a518aba569bbb21c9bac5ab7a35b0c6ae7e344c8
+  languageName: node
+  linkType: hard
+
+"@jridgewell/sourcemap-codec@npm:^1.5.0":
+  version: 1.5.0
+  resolution: "@jridgewell/sourcemap-codec@npm:1.5.0"
+  checksum: 05df4f2538b3b0f998ea4c1cd34574d0feba216fa5d4ccaef0187d12abf82eafe6021cec8b49f9bb4d90f2ba4582ccc581e72986a5fcf4176ae0cfeb04cf52ec
   languageName: node
   linkType: hard
 
@@ -11926,7 +12065,7 @@ __metadata:
     "@ethersproject/providers": ^5.7.2
     "@ethersproject/units": ^5.7.0
     "@ethersproject/wallet": ^5.7.0
-    "@imtbl/sdk": 0.0.0
+    "@imtbl/sdk": "file:.yalc/@imtbl/sdk"
     "@swc/jest": ^0.2.29
     "@types/node": ^20.10.1
     dotenv: ^16.3.1
@@ -11945,7 +12084,7 @@ __metadata:
   resolution: "@tests/func-tests-zkevm@workspace:tests/func-tests/zkevm"
   dependencies:
     "@imtbl/contracts": 2.2.6
-    "@imtbl/sdk": 0.0.0
+    "@imtbl/sdk": "file:.yalc/@imtbl/sdk"
     "@nomicfoundation/hardhat-chai-matchers": ^1.0.0
     "@nomicfoundation/hardhat-toolbox": ^2.0.2
     "@nomicfoundation/hardhat-verify": ^2.0.0
@@ -20206,18 +20345,6 @@ __metadata:
   version: 3.1.2
   resolution: "dset@npm:3.1.2"
   checksum: 4f8066f517aa0a70af688c66e9a0a5590f0aada76f6edc7ba9ddb309e27d3a6d65c0a2e31ab2a84005d4c791e5327773cdde59b8ab169050330a0dc283663e87
-  languageName: node
-  linkType: hard
-
-"dts-bundle-generator@npm:^9.5.1":
-  version: 9.5.1
-  resolution: "dts-bundle-generator@npm:9.5.1"
-  dependencies:
-    typescript: ">=5.0.2"
-    yargs: ^17.6.0
-  bin:
-    dts-bundle-generator: dist/bin/dts-bundle-generator.js
-  checksum: e67b0a3d7e2e53035aa3940d15ae9d6e5a9894dc885c74c9b3118ca588076f24d4c817bfb267aa6b72ad86fc903adad5cfb5c1c79a55b2660ed7edceb4a6494f
   languageName: node
   linkType: hard
 
@@ -29520,6 +29647,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"magic-string@npm:^0.30.10":
+  version: 0.30.11
+  resolution: "magic-string@npm:0.30.11"
+  dependencies:
+    "@jridgewell/sourcemap-codec": ^1.5.0
+  checksum: e041649453c9a3f31d2e731fc10e38604d50e20d3585cd48bc7713a6e2e1a3ad3012105929ca15750d59d0a3f1904405e4b95a23b7e69dc256db3c277a73a3ca
+  languageName: node
+  linkType: hard
+
 "magic-string@npm:^0.30.3":
   version: 0.30.5
   resolution: "magic-string@npm:0.30.5"
@@ -35379,6 +35515,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"rollup-plugin-dts@npm:^6.1.1":
+  version: 6.1.1
+  resolution: "rollup-plugin-dts@npm:6.1.1"
+  dependencies:
+    "@babel/code-frame": ^7.24.2
+    magic-string: ^0.30.10
+  peerDependencies:
+    rollup: ^3.29.4 || ^4
+    typescript: ^4.5 || ^5.0
+  dependenciesMeta:
+    "@babel/code-frame":
+      optional: true
+  checksum: e69da1a286570f5a8d990651a613b2063543a71ad3b3471a97e74ea328125ebee77a74b2c800031f8dcccdc92da0d086f833724d13a2c863a2cbdf7e8fc20329
+  languageName: node
+  linkType: hard
+
 "rollup-plugin-polyfill-node@npm:^0.13.0":
   version: 0.13.0
   resolution: "rollup-plugin-polyfill-node@npm:0.13.0"
@@ -39229,7 +39381,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:>=5.0.2, typescript@npm:^5.5.4":
+"typescript@npm:^5.5.4":
   version: 5.5.4
   resolution: "typescript@npm:5.5.4"
   bin:
@@ -39239,7 +39391,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@>=5.0.2#~builtin<compat/typescript>, typescript@patch:typescript@^5.5.4#~builtin<compat/typescript>":
+"typescript@patch:typescript@^5.5.4#~builtin<compat/typescript>":
   version: 5.5.4
   resolution: "typescript@patch:typescript@npm%3A5.5.4#~builtin<compat/typescript>::version=5.5.4&hash=14eedb"
   bin:
@@ -41587,7 +41739,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yargs@npm:^17.3.1, yargs@npm:^17.5.1, yargs@npm:^17.6.0, yargs@npm:^17.6.2, yargs@npm:^17.7.2":
+"yargs@npm:^17.3.1, yargs@npm:^17.5.1, yargs@npm:^17.6.2, yargs@npm:^17.7.2":
   version: 17.7.2
   resolution: "yargs@npm:17.7.2"
   dependencies:
