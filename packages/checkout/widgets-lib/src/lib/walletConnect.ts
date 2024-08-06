@@ -54,7 +54,7 @@ const lightThemeVariables = {
   '--wcm-overlay-background-color': 'rgba(255, 255, 255, 0.1)',
 };
 
-// Whitelisted wallet ids on WalletConnect explorer API
+// Whitelisted wallet ids on WalletConnect explorer (https://explorer.walletconnect.com/)
 const metamaskId = 'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96';
 const frontierId = '85db431492aa2e8672e93f4ea7acf10c88b97b867b0d373107af63dc4880f041';
 const ledgerLiveId = '19177a98252e07ddfc9af2083ba8e07ef627cb6103467ffebb3f8f4205fd7927';
