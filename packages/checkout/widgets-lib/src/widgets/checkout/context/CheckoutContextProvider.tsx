@@ -1,7 +1,6 @@
 import { PostMessageHandler } from '@imtbl/checkout-sdk';
 import {
-  Dispatch,
-  ReactNode, useContext, useEffect,
+  Dispatch, ReactNode, useContext, useEffect,
 } from 'react';
 import {
   CheckoutAction,
@@ -10,32 +9,46 @@ import {
   CheckoutState,
 } from './CheckoutContext';
 import { ProviderRelay } from './ProviderRelay';
-import { CHECKOUT_APP_URL } from '../../../lib';
 
 type CheckoutContextProviderProps = {
   values: {
-    checkoutState: CheckoutState,
-    checkoutDispatch: Dispatch<CheckoutAction>,
-  }, children: ReactNode
+    checkoutState: CheckoutState;
+    checkoutDispatch: Dispatch<CheckoutAction>;
+  };
+  children: ReactNode;
 };
-export function CheckoutContextProvider({ values, children }: CheckoutContextProviderProps) {
+export function CheckoutContextProvider({
+  values,
+  children,
+}: CheckoutContextProviderProps) {
   const { checkoutState, checkoutDispatch } = values;
-  const { checkout } = checkoutState;
-  const { provider, checkoutAppIframe, postMessageHandler } = checkoutState;
+  const {
+    checkout,
+    provider,
+    checkoutAppIframe,
+    postMessageHandler,
+    iframeUrl,
+  } = checkoutState;
 
   useEffect(() => {
-    if (!checkoutAppIframe || !checkout) return;
+    if (!checkoutAppIframe || !checkout || !iframeUrl) return;
+
+    const postMessageHandlerInstance = new PostMessageHandler({
+      targetOrigin: new URL(iframeUrl).origin,
+      eventTarget: checkoutAppIframe,
+    });
+
+    postMessageHandlerInstance.sendMessage('PROVIDER_RELAY' as any, {
+      mounted: 'checkout',
+    });
 
     checkoutDispatch({
       payload: {
         type: CheckoutActions.SET_POST_MESSAGE_HANDLER,
-        postMessageHandler: new PostMessageHandler({
-          targetOrigin: CHECKOUT_APP_URL[checkout.config.environment],
-          eventTarget: checkoutAppIframe,
-        }),
+        postMessageHandler: postMessageHandlerInstance,
       },
     });
-  }, [checkoutAppIframe, checkout]);
+  }, [checkoutAppIframe, checkout, iframeUrl]);
 
   useEffect(() => {
     if (!provider || !postMessageHandler) return undefined;
@@ -55,7 +68,6 @@ export function CheckoutContextProvider({ values, children }: CheckoutContextPro
     <CheckoutContext.Provider value={values}>
       {children}
     </CheckoutContext.Provider>
-
   );
 }
 
