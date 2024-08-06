@@ -198,12 +198,12 @@ export class Orderbook {
 
       return {
         actions: prepareListingResponse.actions,
-        completeListings: async (signature: string) => {
+        completeListings: async (signature: string | string[]) => {
           const createListingResult = await this.createListing({
             makerFees: listingParams[0].makerFees,
             orderComponents: prepareListingResponse.orderComponents,
             orderHash: prepareListingResponse.orderHash,
-            orderSignature: signature,
+            orderSignature: typeof signature === 'string' ? signature : signature[0],
           });
 
           return {
@@ -212,6 +212,48 @@ export class Orderbook {
               orderHash: prepareListingResponse.orderHash,
               order: createListingResult.result,
             }],
+          };
+        },
+      };
+    }
+
+    // TODO: Check the code at the address
+    const isSmartContractWallet = true
+    if (isSmartContractWallet) {
+      const prepareListingResponses = await Promise.all(listingParams.map(l => this.seaport.prepareSeaportOrder(
+        makerAddress,
+        l.sell,
+        l.buy,
+        new Date(),
+        l.orderExpiry || new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 2),
+      )));
+
+      return {
+        // Consider: Get fancy and try remove duplicate approval actions
+        actions: prepareListingResponses.flatMap(r => r.actions),
+        completeListings: async (signatures: string | string[]) => {
+          if (typeof signatures === 'string') {
+            throw new Error('need a signature per order on this')
+          }
+
+          const createListingsApiResponses = await Promise.all(
+            prepareListingResponses.map((prepareListingResponse, i) => {
+              const signature = signatures[i];
+              return this.apiClient.createListing({
+                makerFees: listingParams[i].makerFees,
+                orderComponents: prepareListingResponse.orderComponents,
+                orderHash: prepareListingResponse.orderHash,
+                orderSignature: signature,
+              }).catch(() => undefined);
+            }),
+          );
+
+          return {
+            result: createListingsApiResponses.map((apiListingResponse, i) => ({
+              success: !!apiListingResponse,
+              orderHash: prepareListingResponses[i].orderHash,
+              order: apiListingResponse ? mapFromOpenApiOrder(apiListingResponse.result) : undefined,
+            })),
           };
         },
       };
@@ -229,7 +271,7 @@ export class Orderbook {
 
     return {
       actions,
-      completeListings: async (bulkOrderSignature: string) => {
+      completeListings: async (bulkOrderSignature: string | string[]) => {
         const orderComponents = preparedListings.map((orderParam) => orderParam.orderComponents);
         const signatures = getBulkSeaportOrderSignatures(
           bulkOrderSignature,
