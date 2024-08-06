@@ -26,11 +26,11 @@ jobs:
           VERSION=$(git describe --tags --abbrev=0)
           if echo "$VERSION" | grep -q "alpha"; then
             echo "Skipping docs generation for alpha version"
-            echo "is_alpha=true" >> $GITHUB_ENV
+            echo "is_alpha=true" >> $GITHUB_OUTPUT
             exit 0
           else
             echo "Generating docs for non-alpha version"
-            echo "is_alpha=false" >> $GITHUB_ENV
+            echo "is_alpha=false" >> $GITHUB_OUTPUT
           fi
         shell: bash
 
@@ -47,6 +47,7 @@ jobs:
     steps:
       - name: Is Alpha Version
         run: |
+          echo "Is Alpha Version: ${{ needs.AlphaCheck.outputs.is_alpha }}"
           echo "Is Alpha Version: ${{ env.IS_ALPHA }}"
 
       - name: Check Public Release Branch
