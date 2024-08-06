@@ -175,11 +175,11 @@ jobs:
       - name: setup
         uses: ./.github/actions/setup
 
-      - name: Setup playwright
-        uses: ./.github/actions/setup-playwright
-
       - name: Setup examples
         uses: ./.github/actions/setup-examples
+
+      - name: Setup playwright
+        uses: ./.github/actions/setup-playwright
 
       - name: Test examples
         run: yarn test:examples
