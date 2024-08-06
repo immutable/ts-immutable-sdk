@@ -63,7 +63,7 @@
     "syncpack:fix": "yarn syncpack fix-mismatches",
     "syncpack:format": "yarn syncpack format",
     "test": "nx affected -t test --parallel=5",
-    "test:examples": "yarn workspaces foreach -Apt --include='@examples/**' run test",
+    "test:examples": "yarn workspaces foreach -At --include='@examples/**' run test",
     "test:vpn": "RUN_VPN_TESTS=1 wsrun --exclude-missing -e test",
     "typecheck": "nx affected -t typecheck --parallel=5",
     "yalc:sdk:publish": "yarn workspace @imtbl/sdk exec yarn dlx yalc publish"
