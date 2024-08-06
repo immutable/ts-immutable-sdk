@@ -38,10 +38,6 @@ export function CheckoutContextProvider({
       eventTarget: checkoutAppIframe,
     });
 
-    postMessageHandlerInstance.sendMessage('PROVIDER_RELAY' as any, {
-      mounted: 'checkout',
-    });
-
     checkoutDispatch({
       payload: {
         type: CheckoutActions.SET_POST_MESSAGE_HANDLER,
