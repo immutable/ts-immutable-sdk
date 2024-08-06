@@ -1,9 +1,8 @@
-import { useEffect, useMemo, useReducer } from 'react';
+import { useMemo, useReducer } from 'react';
 import {
   Checkout,
   CheckoutWidgetConfiguration,
   CheckoutWidgetParams,
-  // WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import {
   // CheckoutActions,
@@ -40,27 +39,6 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
     }),
     [checkoutState, checkoutDispatch, iframeURL, checkout],
   );
-
-  useEffect(() => {
-    // const connectProvider = async () => {
-    //   const createProviderResult = await checkout.createProvider({
-    //     walletProviderName: WalletProviderName.METAMASK,
-    //   });
-
-    //   const connectResult = await checkout.connect({
-    //     provider: createProviderResult.provider,
-    //   });
-
-    //   checkoutDispatch({
-    //     payload: {
-    //       type: CheckoutActions.SET_PROVIDER,
-    //       provider: connectResult.provider,
-    //     },
-    //   });
-    // };
-
-    // connectProvider();
-  }, [checkout]);
 
   return (
     <CheckoutContextProvider values={checkoutReducerValues}>

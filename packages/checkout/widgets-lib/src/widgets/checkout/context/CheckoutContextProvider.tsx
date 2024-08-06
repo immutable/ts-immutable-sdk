@@ -38,6 +38,10 @@ export function CheckoutContextProvider({
       eventTarget: iframeContentWindow,
     });
 
+    postMessageHandlerInstance.setLogger((...args: any[]) => {
+      console.log('🔔 PARENT – ', ...args);
+    });
+
     checkoutDispatch({
       payload: {
         type: CheckoutActions.SET_POST_MESSAGE_HANDLER,
