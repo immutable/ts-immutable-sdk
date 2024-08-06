@@ -53,8 +53,6 @@ const buildJS = () => {
     return [{...acc[0], [f] : `./src/${f}.ts`}]
   }, [{}])
 
-  console.log(inputs)
-
   return  {
       input: inputs,
       output: {
