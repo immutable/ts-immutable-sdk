@@ -38,8 +38,9 @@ export function CheckoutContextProvider({
       eventTarget: iframeContentWindow,
     });
 
+    // TODO: remove logger after done with development
     postMessageHandlerInstance.setLogger((...args: any[]) => {
-      console.log('🔔 PARENT – ', ...args);
+      console.log('🔔 PARENT – ', ...args); // eslint-disable-line
     });
 
     checkoutDispatch({
