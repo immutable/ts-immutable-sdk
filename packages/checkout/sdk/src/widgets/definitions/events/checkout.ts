@@ -1,6 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { CheckoutFlowType } from '../parameters/checkout';
-import { ConnectionFailed } from './connect';
+import { ConnectionFailed, ConnectionSuccess } from './connect';
 import {
   SaleFailed,
   SalePaymentMethod,
@@ -16,7 +16,7 @@ import {
   BridgeFailed,
   BridgeTransactionSent,
 } from './bridge';
-import { SwapFailed, SwapSuccess } from './swap';
+import { SwapFailed, SwapRejected, SwapSuccess } from './swap';
 import { WalletNetworkSwitch } from './wallet';
 
 export enum CheckoutEventType {
@@ -39,6 +39,8 @@ export enum CheckoutSuccessEventType {
 export enum CheckoutFailureEventType {
   BRIDGE_FAILED = 'BRIDGE_FAILED',
   BRIDGE_CLAIM_WITHDRAWAL_FAILED = 'BRIDGE_CLAIM_WITHDRAWAL_FAILED',
+  SWAP_FAILED = 'SWAP_FAILED',
+  SWAP_REJECTED = 'SWAP_REJECTED',
 }
 
 export enum CheckoutUserActionEventType {
@@ -89,7 +91,13 @@ export type CheckoutSwapSuccessEvent = {
   data: SwapSuccess;
 }; // FIMXE: TransactionSent
 
+export type CheckoutConnectSuccessEvent = {
+  flow: CheckoutFlowType.CONNECT;
+  data: ConnectionSuccess;
+};
+
 export type CheckoutSuccessEvent =
+  | CheckoutConnectSuccessEvent
   | CheckoutBridgeSuccessEvent
   | CheckoutBridgeClaimWithdrawalSuccessEvent
   | CheckoutOnRampSuccessEvent
@@ -121,7 +129,14 @@ export type CheckoutOnRampFailureEvent = {
 
 export type CheckoutSwapFailureEvent = {
   flow: CheckoutFlowType.SWAP;
+  type: CheckoutFailureEventType.SWAP_FAILED;
   data: SwapFailed;
+}; // FIMXE: Error
+
+export type CheckoutSwapRejectedEvent = {
+  flow: CheckoutFlowType.SWAP;
+  type: CheckoutFailureEventType.SWAP_REJECTED;
+  data: SwapRejected;
 }; // FIMXE: Error
 
 export type CheckoutSaleFailureEvent = {
@@ -135,6 +150,7 @@ export type CheckoutFailureEvent =
   | CheckoutConnectFailureEvent
   | CheckoutOnRampFailureEvent
   | CheckoutSwapFailureEvent
+  | CheckoutSwapRejectedEvent
   | CheckoutSaleFailureEvent;
 
 export type CheckoutPaymentMethodSelectedEvent = {
