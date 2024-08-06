@@ -3,9 +3,10 @@ import {
   Checkout,
   CheckoutWidgetConfiguration,
   CheckoutWidgetParams,
+  // WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import {
-  CheckoutActions,
+  // CheckoutActions,
   checkoutReducer,
   initialCheckoutState,
 } from './context/CheckoutContext';
@@ -41,15 +42,25 @@ export default function CheckoutWidget(props: CheckoutWidgetInputs) {
   );
 
   useEffect(() => {
-    if (iframeURL === undefined) return;
+    // const connectProvider = async () => {
+    //   const createProviderResult = await checkout.createProvider({
+    //     walletProviderName: WalletProviderName.METAMASK,
+    //   });
 
-    checkoutDispatch({
-      payload: {
-        type: CheckoutActions.SET_IFRAME_URL,
-        iframeURL,
-      },
-    });
-  }, [iframeURL]);
+    //   const connectResult = await checkout.connect({
+    //     provider: createProviderResult.provider,
+    //   });
+
+    //   checkoutDispatch({
+    //     payload: {
+    //       type: CheckoutActions.SET_PROVIDER,
+    //       provider: connectResult.provider,
+    //     },
+    //   });
+    // };
+
+    // connectProvider();
+  }, [checkout]);
 
   return (
     <CheckoutContextProvider values={checkoutReducerValues}>

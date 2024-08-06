@@ -28,6 +28,14 @@ export class PostMessageHandler {
     eventTarget,
     eventSource = window,
   }: PostMessageHandlerConfiguration) {
+    if (targetOrigin === undefined) {
+      throw new Error('targetOrigin is required');
+    }
+
+    if (eventTarget === undefined) {
+      throw new Error('eventTarget is required');
+    }
+
     this.targetOrigin = targetOrigin;
     this.eventSource = eventSource;
     this.eventTarget = eventTarget;
@@ -55,13 +63,13 @@ export class PostMessageHandler {
     }
   }
 
-  private handleMessage(event: MessageEvent) {
+  private handleMessage = (event: MessageEvent) => {
     if (event.origin !== this.targetOrigin) return;
 
     const message: PostMessageData = event.data;
 
     this.subscribers.forEach((handler) => handler(message));
-  }
+  };
 
   public destroy() {
     this.eventSource.removeEventListener('message', this.handleMessage);

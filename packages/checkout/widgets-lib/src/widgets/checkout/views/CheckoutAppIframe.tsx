@@ -63,7 +63,7 @@ export function CheckoutAppIframe() {
   }, [postMessageHandler]);
 
   if (!iframeURL) {
-    return null;
+    return 'no iframe url';
   }
 
   return (
