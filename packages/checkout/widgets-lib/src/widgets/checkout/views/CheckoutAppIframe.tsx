@@ -15,6 +15,8 @@ import { useCheckoutContext } from '../context/CheckoutContextProvider';
 import { sendCheckoutEvent } from '../CheckoutWidgetEvents';
 import { EventTargetContext } from '../../../context/event-target-context/EventTargetContext';
 import { LoadingView } from '../../../views/loading/LoadingView';
+import { ErrorView } from '../../../views/error/ErrorView';
+import { IFRAME_INIT_TIMEOUT_MS } from '../utils/config';
 
 export interface LoadingHandoverProps {
   text: string;
@@ -25,13 +27,14 @@ export interface LoadingHandoverProps {
 export function CheckoutAppIframe() {
   const { t } = useTranslation();
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [loadingError] = useState<boolean>(false);
+  const [loadingError, setLoadingError] = useState<boolean>(false);
+  const [initialised, setInitialised] = useState<boolean>(false);
   const [
     { iframeURL, postMessageHandler, iframeContentWindow },
     checkoutDispatch,
   ] = useCheckoutContext();
 
-  const loading = !iframeURL || !iframeContentWindow;
+  const loading = !iframeURL || !iframeContentWindow || !initialised;
 
   const {
     eventTargetState: { eventTarget },
@@ -49,15 +52,12 @@ export function CheckoutAppIframe() {
         iframeContentWindow: iframe.contentWindow,
       },
     });
-
-    // TODO:
-    // subscribe to post message initialised event
-    // if not sent after timeout, setLoadingError(true)
   };
 
   useEffect(() => {
     if (!postMessageHandler) return undefined;
 
+    // subscribe to widget events
     postMessageHandler.subscribe(({ type, payload }) => {
       // FIXME: improve typing
       const event: {
@@ -70,16 +70,45 @@ export function CheckoutAppIframe() {
 
       if (type !== PostMessageHandlerEventType.WIDGET_EVENT) return;
 
+      // forward events
       sendCheckoutEvent(eventTarget, event.detail);
+
+      // check if the widget has been initialised
+      if (event.detail.type === CheckoutEventType.INITIALISED) {
+        setInitialised(true);
+      }
     });
+
+    // check if loaded correctly
+    const timeoutId = setTimeout(() => {
+      if (!initialised) {
+        setLoadingError(true);
+        clearTimeout(timeoutId);
+      }
+    }, IFRAME_INIT_TIMEOUT_MS);
+
     return () => {
       postMessageHandler.destroy();
+      clearTimeout(timeoutId);
     };
   }, [postMessageHandler]);
 
   if (loadingError) {
-    // TODO: Return error view
-    return 'Error loading iframe';
+    return (
+      <ErrorView
+        onCloseClick={() => {
+          sendCheckoutEvent(eventTarget, {
+            type: CheckoutEventType.CLOSE,
+            data: {},
+          });
+        }}
+        onActionClick={() => {
+          setLoadingError(false);
+          iframeContentWindow?.location.reload();
+        }}
+        actionText={t('views.ERROR_VIEW.actionText')}
+      />
+    );
   }
 
   return (
