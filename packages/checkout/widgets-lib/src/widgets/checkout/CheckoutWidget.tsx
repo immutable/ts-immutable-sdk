@@ -5,7 +5,6 @@ import {
   CheckoutWidgetParams,
 } from '@imtbl/checkout-sdk';
 import {
-  // CheckoutActions,
   checkoutReducer,
   initialCheckoutState,
 } from './context/CheckoutContext';
