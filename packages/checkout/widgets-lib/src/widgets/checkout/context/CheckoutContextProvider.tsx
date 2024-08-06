@@ -25,17 +25,22 @@ export function CheckoutContextProvider({
   const {
     checkout,
     provider,
-    checkoutAppIframe,
+    iframeContentWindow,
     postMessageHandler,
-    iframeUrl,
+    iframeURL,
   } = checkoutState;
 
   useEffect(() => {
-    if (!checkoutAppIframe || !checkout || !iframeUrl) return;
+    if (!iframeContentWindow || !checkout || !iframeURL) return;
 
     const postMessageHandlerInstance = new PostMessageHandler({
-      targetOrigin: new URL(iframeUrl).origin,
-      eventTarget: checkoutAppIframe,
+      targetOrigin: new URL(iframeURL).origin,
+      eventTarget: iframeContentWindow,
+    });
+
+    // TODO: remove logger after done with development
+    postMessageHandlerInstance.setLogger((...args: any[]) => {
+      console.log('🔔 PARENT – ', ...args); // eslint-disable-line
     });
 
     checkoutDispatch({
@@ -44,7 +49,7 @@ export function CheckoutContextProvider({
         postMessageHandler: postMessageHandlerInstance,
       },
     });
-  }, [checkoutAppIframe, checkout, iframeUrl]);
+  }, [iframeContentWindow, checkout, iframeURL]);
 
   useEffect(() => {
     if (!provider || !postMessageHandler) return undefined;
