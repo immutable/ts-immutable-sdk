@@ -1,4 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
+import { useTranslation } from 'react-i18next';
 import {
   ChainId,
   Checkout,
@@ -24,6 +25,7 @@ import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContex
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { useAnalytics } from '../../context/analytics-provider/SegmentAnalyticsProvider';
 import { identifyUser } from '../../lib/analytics/identifyUser';
+
 
 export interface ConnectLoaderProps {
   children?: React.ReactNode;
@@ -53,6 +55,8 @@ export function ConnectLoader({
     allowedChains,
     web3Provider,
   } = params;
+
+  const { t } = useTranslation();
 
   const [connectLoaderState, connectLoaderDispatch] = useReducer(
     connectLoaderReducer,
@@ -259,7 +263,7 @@ export function ConnectLoader({
               },
             });
           }}
-          actionText="Try Again"
+          actionText={t('views.ERROR_VIEW.actionText')}
         />
       )}
     </>
