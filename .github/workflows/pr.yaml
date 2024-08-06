@@ -127,7 +127,7 @@ jobs:
   build-examples:
     name: Build Examples
     needs: build-sdk
-    runs-on: ubuntu-latest-4-cores
+    runs-on: ubuntu-latest-8-cores
     env:
       NODE_OPTIONS: --max-old-space-size=14366
     steps:
@@ -165,7 +165,7 @@ jobs:
   test-examples:
     name: Test Examples
     needs: build-sdk
-    runs-on: ubuntu-latest-4-cores
+    runs-on: ubuntu-latest-8-cores
     env:
       NODE_OPTIONS: --max-old-space-size=14366
     steps:
@@ -177,6 +177,9 @@ jobs:
 
       - name: Setup examples
         uses: ./.github/actions/setup-examples
+
+      - name: Setup playwright
+        uses: ./.github/actions/setup-playwright
 
       - name: Test examples
         run: yarn test:examples
@@ -217,7 +220,7 @@ jobs:
 
   func-test-zkevm:
     name: zkevm func tests
-    runs-on: ubuntu-latest-4-cores
+    runs-on: ubuntu-latest-8-cores
     needs: build-sdk
     env:
       ZKEVM_ORDERBOOK_BANKER: ${{ secrets.ZKEVM_ORDERBOOK_BANKER }}

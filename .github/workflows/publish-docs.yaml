@@ -87,12 +87,6 @@ jobs:
           node-version-file: .nvmrc
           cache: "yarn"
 
-      - name: Update SDK package.json version
-        run: |
-          tmp=$(mktemp)
-          jq '.version = "${{ env.VERSION }}"' ./package.json > "$tmp" && mv "$tmp" ./package.json
-        shell: bash
-
       - name: Restore cached node_modules
         id: restore-cache-node_modules
         uses: actions/cache@v4
@@ -106,6 +100,12 @@ jobs:
 
       - name: Build
         run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build
+
+      - name: Update SDK package.json version
+        run: |
+          tmp=$(mktemp)
+          jq '.version = "${{ env.VERSION }}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
+        shell: bash
 
       - name: Build SDK Docs
         run: yarn docs:build

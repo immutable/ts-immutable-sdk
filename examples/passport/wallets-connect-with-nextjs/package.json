@@ -28,6 +28,6 @@
     "dev": "next dev",
     "lint": "eslint app --ext .js,.jsx,.ts,.tsx",
     "start": "next start",
-    "test": "playwright install --with-deps && playwright test"
+    "test": "playwright test"
   }
 }
