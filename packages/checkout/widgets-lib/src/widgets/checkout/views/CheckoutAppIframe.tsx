@@ -20,7 +20,7 @@ export interface LoadingHandoverProps {
 }
 export function CheckoutAppIframe() {
   const [checkoutState, checkoutDispatch] = useCheckoutContext();
-  const { iframeUrl, postMessageHandler } = checkoutState;
+  const { iframeURL, postMessageHandler } = checkoutState;
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const {
@@ -35,33 +35,35 @@ export function CheckoutAppIframe() {
     checkoutDispatch({
       payload: {
         type: CheckoutActions.SET_CHECKOUT_APP_IFRAME,
-        checkoutAppIframe: iframeRef.current.contentWindow,
+        iframeContentWindow: iframeRef.current.contentWindow,
       },
     });
   };
 
   useEffect(() => {
-    if (postMessageHandler === undefined) return () => {};
+    if (!postMessageHandler) return undefined;
 
-    postMessageHandler.addEventHandler(
-      PostMessageHandlerEventType.WIDGET_EVENT,
-      (event: {
+    postMessageHandler.subscribe(({ type, payload }) => {
+      // FIXME: improve typing
+      const event: {
         type: IMTBLWidgetEvents.IMTBL_CHECKOUT_WIDGET_EVENT;
         detail: {
           type: CheckoutEventType;
-          data: WidgetEventData[WidgetType.CHECKOUT][keyof WidgetEventData[WidgetType.CHECKOUT]]
+          data: WidgetEventData[WidgetType.CHECKOUT][keyof WidgetEventData[WidgetType.CHECKOUT]];
         };
-      }) => {
-        sendCheckoutEvent(eventTarget, event.detail);
-      },
-    );
+      } = payload as any;
+
+      if (type !== PostMessageHandlerEventType.WIDGET_EVENT) return;
+
+      sendCheckoutEvent(eventTarget, event.detail);
+    });
     return () => {
       postMessageHandler.destroy();
     };
   }, [postMessageHandler]);
 
-  if (!iframeUrl) {
-    return null;
+  if (!iframeURL) {
+    return 'no iframe url';
   }
 
   return (
@@ -71,7 +73,7 @@ export function CheckoutAppIframe() {
           id="checkout-app"
           title="checkout"
           ref={iframeRef}
-          src={iframeUrl}
+          src={iframeURL}
           onLoad={onIframeLoad}
         />
       )}

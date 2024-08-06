@@ -57,6 +57,12 @@ function CheckoutUI() {
 
   useEffect(() => {
     passport.connectEvm();
+    checkoutWidget.mount("checkout", {
+      flow: CheckoutFlowType.SWAP,
+      amount: "0.1",
+      fromTokenAddress: "0x3B2d8A1931736Fc321C24864BceEe981B11c3c57", // usdc
+      toTokenAddress: "native",
+    });
   }, []);
 
   useEffect(() => {

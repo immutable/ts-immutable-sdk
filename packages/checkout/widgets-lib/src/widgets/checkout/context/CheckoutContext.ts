@@ -10,8 +10,8 @@ export interface CheckoutState {
   checkout: Checkout | null;
   provider: Web3Provider | undefined;
   passport: Passport | undefined;
-  iframeUrl: string | undefined;
-  checkoutAppIframe: Window | undefined;
+  iframeURL: string | undefined;
+  iframeContentWindow: Window | undefined;
   postMessageHandler: PostMessageHandler | undefined;
   providerRelay: ProviderRelay | undefined;
   walletProviderName: WalletProviderName | null;
@@ -23,8 +23,8 @@ export const initialCheckoutState: CheckoutState = {
   checkout: null,
   provider: undefined,
   passport: undefined,
-  iframeUrl: undefined,
-  checkoutAppIframe: undefined,
+  iframeURL: undefined,
+  iframeContentWindow: undefined,
   postMessageHandler: undefined,
   providerRelay: undefined,
   walletProviderInfo: null,
@@ -44,9 +44,9 @@ export interface CheckoutAction {
 type ActionPayload =
   | SetCheckoutPayload
   | SetProviderPayload
-  | SetIframeUrlPayload
+  | SetIframeURLPayload
   | SetPostMessageHandlerPayload
-  | SetCheckoutAppIframePayload
+  | SetIframeContentWindowPayload
   | SetProviderRelayPayload
   | SetPassportPayload
   | SetProviderNamePayload
@@ -74,14 +74,14 @@ export interface SetProviderPayload {
   provider: Web3Provider;
 }
 
-export interface SetIframeUrlPayload {
+export interface SetIframeURLPayload {
   type: CheckoutActions.SET_IFRAME_URL;
-  iframeUrl: string;
+  iframeURL: string;
 }
 
-export interface SetCheckoutAppIframePayload {
+export interface SetIframeContentWindowPayload {
   type: CheckoutActions.SET_CHECKOUT_APP_IFRAME;
-  checkoutAppIframe: Window;
+  iframeContentWindow: Window;
 }
 
 export interface SetPostMessageHandlerPayload {
@@ -142,12 +142,12 @@ export const checkoutReducer: Reducer<CheckoutState, CheckoutAction> = (
     case CheckoutActions.SET_IFRAME_URL:
       return {
         ...state,
-        iframeUrl: action.payload.iframeUrl,
+        iframeURL: action.payload.iframeURL,
       };
     case CheckoutActions.SET_CHECKOUT_APP_IFRAME:
       return {
         ...state,
-        checkoutAppIframe: action.payload.checkoutAppIframe,
+        iframeContentWindow: action.payload.iframeContentWindow,
       };
     case CheckoutActions.SET_POST_MESSAGE_HANDLER:
       return {
