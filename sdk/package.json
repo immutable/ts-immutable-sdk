@@ -164,7 +164,8 @@
     "regenModules": "yarn generateIndex && yarn updateExports",
     "typecheck": "tsc --noEmit --jsx preserve",
     "updateDependencies": "yarn packageList && node ./scripts/updateDependencies.js && yarn syncpack:format",
-    "updateExports": "node scripts/updateExports.js"
+    "updateExports": "node scripts/updateExports.js",
+    "d": "swc src -d dist --strip-leading-paths --ignore '**/*.test.*'"
   },
   "type": "module",
   "types": "./dist/index.d.ts"

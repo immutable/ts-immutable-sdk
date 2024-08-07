@@ -26,15 +26,10 @@ export {
 } from './types';
 
 export {
-  PassportContext,
   PassportProvider,
   useAccessToken,
   useIdToken,
   useLinkedAddresses,
-  useLoginWithEthersjs,
-  useLogin,
-  useLoginWithoutWallet,
-  useLogout,
   usePassport,
   useUserInfo,
 } from './react/PassportContext';

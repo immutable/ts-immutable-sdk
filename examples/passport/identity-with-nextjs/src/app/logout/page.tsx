@@ -12,6 +12,13 @@ export default function Logout() {
         >
           Return to examples
         </a>
+        <b> OR </b>
+        <a
+          className="underline"
+          href="/use-context"
+        >
+          Return to examples using <pre>passport.PassportProvider</pre>
+        </a>
       </div>
     </div>
   );
