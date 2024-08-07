@@ -202,12 +202,12 @@ export class Orderbook {
 
       return {
         actions: prepareListingResponse.actions,
-        completeListings: async (signature: string | string[]) => {
+        completeListings: async (signatures: string[]) => {
           const createListingResult = await this.createListing({
             makerFees: listingParams[0].makerFees,
             orderComponents: prepareListingResponse.orderComponents,
             orderHash: prepareListingResponse.orderHash,
-            orderSignature: typeof signature === 'string' ? signature : signature[0],
+            orderSignature: signatures[0],
           });
 
           return {
@@ -233,10 +233,13 @@ export class Orderbook {
         l.orderExpiry || new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 2),
       )));
 
+      const pendingApproval: string[] = [];
+      const dedupedActions: Action[] = [];
+
       return {
         actions: prepareListingResponses.flatMap((r) => {
-          const pendingApproval: string[] = [];
-          const dedupedActions: Action[] = [];
+          // de-dupe approval transactions to ensure every contract has
+          // a maximum of 1 approval transaction
           r.actions.forEach((action) => {
             if (action.type === ActionType.TRANSACTION) {
               // Assuming only a single item is on offer per listing
@@ -253,18 +256,14 @@ export class Orderbook {
         }),
         completeListings: async (signatures: string[]) => {
           const createListingsApiResponses = await Promise.all(
-            prepareListingResponses.map(async (prepareListingResponse, i) => {
+            prepareListingResponses.map((prepareListingResponse, i) => {
               const signature = signatures[i];
-              try {
-                return await this.apiClient.createListing({
-                  makerFees: listingParams[i].makerFees,
-                  orderComponents: prepareListingResponse.orderComponents,
-                  orderHash: prepareListingResponse.orderHash,
-                  orderSignature: signature,
-                });
-              } catch {
-                return undefined;
-              }
+              return this.apiClient.createListing({
+                makerFees: listingParams[i].makerFees,
+                orderComponents: prepareListingResponse.orderComponents,
+                orderHash: prepareListingResponse.orderHash,
+                orderSignature: signature,
+              }).catch(() => undefined);
             }),
           );
 
