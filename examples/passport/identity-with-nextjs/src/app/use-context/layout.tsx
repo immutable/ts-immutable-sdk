@@ -9,6 +9,8 @@ export default function Layout({
   children: ReactNode;
 }>) {
   return (
+    // #doc passport-provider-react-element
     <PassportProvider>{children}</PassportProvider>
+    // #enddoc passport-provider-react-element
   );
 }

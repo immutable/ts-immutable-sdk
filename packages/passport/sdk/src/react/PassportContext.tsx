@@ -5,15 +5,15 @@ import React, {
 } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import { Passport } from '../Passport';
-import { PassportModuleConfiguration } from '../types';
+import { PassportModuleConfiguration, UserProfile } from '../types';
 
 type PassportContextType = {
   passportInstance: Passport;
   isLoggedIn: boolean;
   login: () => Promise<string[]>;
-  logout: () => void;
-  loginWithoutWallet: () => void;
-  loginWithEthersjs: () => void;
+  logout: () => Promise<void>;
+  loginWithoutWallet: () => Promise<UserProfile | null>;
+  loginWithEthersjs: () => Promise<string[]>;
   isLoading: boolean;
 };
 
@@ -56,17 +56,19 @@ export function PassportProvider({ children, config }: PassportProviderProps) {
     },
     loginWithoutWallet: async () => {
       setIsLoading(true);
-      await passportInstance.login();
+      const profile = await passportInstance.login();
       setLoggedIn(true);
       setIsLoading(false);
+      return profile;
     },
     loginWithEthersjs: async () => {
       setIsLoading(true);
       // eslint-disable-next-line new-cap
       const provider = new Web3Provider(passportInstance.connectEvm());
-      await provider.send('eth_requestAccounts', []);
+      const accounts = await provider.send('eth_requestAccounts', []);
       setLoggedIn(true);
       setIsLoading(false);
+      return accounts;
     },
   }), [config, isLoggedIn]);
 
@@ -109,7 +111,7 @@ export function useIdToken() {
   };
   useEffect(getIdToken, [passportInstance, isLoggedIn]);
   return {
-    idToken, isLoading: isLoading || loading, error, getIdToken,
+    idToken, isLoading: isLoading || loading, error, refetch: getIdToken,
   };
 }
 
@@ -137,7 +139,7 @@ export function useAccessToken() {
   };
   useEffect(getAccessToken, [passportInstance, isLoggedIn]);
   return {
-    accessToken, isLoading: isLoading || loading, error, getAccessToken,
+    accessToken, isLoading: isLoading || loading, error, refetch: getAccessToken,
   };
 }
 
@@ -165,7 +167,7 @@ export function useLinkedAddresses() {
   };
   useEffect(getLinkedAddresses, [passportInstance, isLoggedIn]);
   return {
-    linkedAddresses, isLoading: isLoading || loading, error, getLinkedAddresses,
+    linkedAddresses, isLoading: isLoading || loading, error, refetch: getLinkedAddresses,
   };
 }
 
@@ -193,6 +195,6 @@ export function useUserInfo() {
   };
   useEffect(getUserInfo, [passportInstance, isLoggedIn]);
   return {
-    userInfo, isLoading: isLoading || loading, error, getUserInfo,
+    userInfo, isLoading: isLoading || loading, error, refetch: getUserInfo,
   };
 }

@@ -1,6 +1,7 @@
 import { config, passport } from "@imtbl/sdk";
 import { ReactNode } from "react";
 
+// #doc passport-provider-react
 export const PassportProvider = ({ children }: { children: ReactNode }) => (
   <passport.PassportProvider
     config={{
@@ -19,3 +20,4 @@ export const PassportProvider = ({ children }: { children: ReactNode }) => (
     {children}
   </passport.PassportProvider>
 );
+// #enddoc passport-provider-react
