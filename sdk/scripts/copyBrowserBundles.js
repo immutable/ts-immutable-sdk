@@ -1,7 +1,7 @@
 import fs from 'fs';
 import * as glob from 'glob';
 import path from 'path';
-import pkg from '../package.json';
+import pkg from '../package.json' assert { type: 'json' };
 
 const dirname = path.dirname(new URL(import.meta.url).pathname);
 
