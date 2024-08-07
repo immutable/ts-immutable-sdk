@@ -1,11 +1,13 @@
 // TODO ProviderRelay should live in a different folder
 
 import { Web3Provider } from '@ethersproject/providers';
-import { PostMessageHandler, PostMessageHandlerEventType } from '@imtbl/checkout-sdk';
+import {
+  PostMessageData,
+  PostMessageHandler,
+  PostMessageHandlerEventType,
+} from '@imtbl/checkout-sdk';
 
 export class ProviderRelay {
-  // TODO maybe make this a singleton instance? only want one at a time
-
   private provider: Web3Provider;
 
   private postMessageHandler: PostMessageHandler;
@@ -14,22 +16,30 @@ export class ProviderRelay {
     this.provider = provider;
     this.postMessageHandler = postMessageHandler;
 
-    postMessageHandler.addEventHandler(PostMessageHandlerEventType.PROVIDER_RELAY, this.onMessage);
+    postMessageHandler.subscribe(this.onMessage);
   }
 
-  private onMessage = (payload: any) => {
-    if (this.provider.provider.request) {
-      this.provider.provider
-        .request({ method: payload.method, params: payload.params })
-        .then((resp) => {
-          const formattedResponse = {
-            id: payload.id,
-            jsonrpc: '2.0',
-            result: resp,
-          };
+  private onMessage = ({ type, payload }: PostMessageData) => {
+    if (type !== PostMessageHandlerEventType.PROVIDER_RELAY) return;
 
-          this.postMessageHandler.sendMessage(PostMessageHandlerEventType.PROVIDER_RELAY, formattedResponse);
-        });
+    if (!this.provider.provider.request) {
+      throw new Error('Provider does not support request method');
     }
+
+    this.provider.provider
+      .request({ method: payload.method, params: payload.params })
+      .then((resp) => {
+        const formattedResponse = {
+          id: payload.id,
+          jsonrpc: '2.0',
+          result: resp,
+        };
+
+        // Relay the response back to proxied provider
+        this.postMessageHandler.send(
+          PostMessageHandlerEventType.PROVIDER_RELAY,
+          formattedResponse,
+        );
+      });
   };
 }
