@@ -70,25 +70,35 @@ jobs:
       - name: Update Version Strings
         run: cd packages/game-bridge && ./scripts/updateSdkVersion.sh
 
-      # - name: Check Unity Version String Updated
-      #   if: ${{ github.event.inputs.game_engine == 'Unity' || github.event.inputs.game_engine == 'Both' }}
-      #   run: |
-      #     UNITY_ARTIFACT_PATH="./packages/game-bridge/dist/unity/index.html"
-      #     UNITY_VERSION_STRING_COUNT=$(cat $UNITY_ARTIFACT_PATH | grep -c -o "ts-immutable-sdk-${{ env.TS_SDK_TAG }}")
-      #     if [ "$UNITY_VERSION_STRING_COUNT" -eq 0 ]; then
-      #         echo "Error: Updated version string not found in $UNITY_ARTIFACT_PATH"
-      #         exit 1
-      #     fi
+      - name: Check Unity Version String Updated
+        if: ${{ github.event.inputs.game_engine == 'Unity' || github.event.inputs.game_engine == 'Both' }}
+        run: |
+          UNITY_ARTIFACT_PATH="./packages/game-bridge/dist/unity/index.html"
+          if [ ! -f "$UNITY_ARTIFACT_PATH" ]; then
+            echo "Error: Unity artifact file not found at $UNITY_ARTIFACT_PATH"
+            exit 1
+          fi
+          UNITY_VERSION_STRING_COUNT=$(grep -c -o "ts-immutable-sdk-${{ env.TS_SDK_TAG }}" "$UNITY_ARTIFACT_PATH" || true)
+          if [ "$UNITY_VERSION_STRING_COUNT" -eq 0 ]; then
+            echo "Error: Updated version string not found in $UNITY_ARTIFACT_PATH"
+            exit 1
+          fi
+          echo "Unity version string updated successfully"
 
-      # - name: Check Unreal Version String Updated
-      #   if: ${{ github.event.inputs.game_engine == 'Unreal' || github.event.inputs.game_engine == 'Both' }}
-      #   run: |
-      #     UNREAL_ARTIFACT_PATH="./packages/game-bridge/dist/unreal/index.js"
-      #     UNREAL_VERSION_STRING_COUNT=$(cat $UNREAL_ARTIFACT_PATH | grep -c -o "ts-immutable-sdk-${{ env.TS_SDK_TAG }}")
-      #     if [ "$UNREAL_VERSION_STRING_COUNT" -eq 0 ]; then
-      #         echo "Error: Updated version string not found in $UNREAL_ARTIFACT_PATH"
-      #         exit 1
-      #     fi
+      - name: Check Unreal Version String Updated
+        if: ${{ github.event.inputs.game_engine == 'Unreal' || github.event.inputs.game_engine == 'Both' }}
+        run: |
+          UNREAL_ARTIFACT_PATH="./packages/game-bridge/dist/unreal/index.js"
+          if [ ! -f "$UNREAL_ARTIFACT_PATH" ]; then
+            echo "Error: Unreal artifact file not found at $UNREAL_ARTIFACT_PATH"
+            exit 1
+          fi
+          UNREAL_VERSION_STRING_COUNT=$(grep -c -o "ts-immutable-sdk-${{ env.TS_SDK_TAG }}" "$UNREAL_ARTIFACT_PATH" || true)
+          if [ "$UNREAL_VERSION_STRING_COUNT" -eq 0 ]; then
+            echo "Error: Updated version string not found in $UNREAL_ARTIFACT_PATH"
+            exit 1
+          fi
+          echo "Unreal version string updated successfully"
 
       - name: Cache build artifacts
         uses: actions/cache@v4
