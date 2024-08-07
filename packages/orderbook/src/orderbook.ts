@@ -1,4 +1,5 @@
 import { ModuleConfiguration } from '@imtbl/config';
+import { track } from '@imtbl/metrics';
 import { ImmutableApiClient, ImmutableApiClientFactory } from './api-client';
 import {
   getConfiguredProvider,
@@ -36,7 +37,7 @@ import {
   PrepareBulkListingsResponse,
   PrepareListingResponse,
   SignablePurpose,
-  TradeResult,
+  TradeResult, Action,
 } from './types';
 
 /**
@@ -222,6 +223,7 @@ export class Orderbook {
 
     const isSmartContractWallet: boolean = await this.orderbookConfig.provider.getCode(makerAddress) !== '0x';
     if (isSmartContractWallet) {
+      track('orderbookmr', 'bulkListings', { walletType: 'Passport', makerAddress, listingsCount: listingParams.length });
       // eslint-disable-next-line max-len
       const prepareListingResponses = await Promise.all(listingParams.map((l) => this.seaport.prepareSeaportOrder(
         makerAddress,
@@ -232,8 +234,23 @@ export class Orderbook {
       )));
 
       return {
-        // Consider: Get fancy and try remove duplicate approval actions
-        actions: prepareListingResponses.flatMap((r) => r.actions),
+        actions: prepareListingResponses.flatMap((r) => {
+          const pendingApproval: string[] = [];
+          const dedupedActions: Action[] = [];
+          r.actions.forEach((action) => {
+            if (action.type === ActionType.TRANSACTION) {
+              // Assuming only a single item is on offer per listing
+              const contractAddress = r.orderComponents.offer[0].token;
+              if (!pendingApproval.includes(contractAddress)) {
+                pendingApproval.push(contractAddress);
+                dedupedActions.push(action);
+              }
+            } else {
+              dedupedActions.push(action);
+            }
+          });
+          return dedupedActions;
+        }),
         completeListings: async (signatures: string[]) => {
           const createListingsApiResponses = await Promise.all(
             prepareListingResponses.map(async (prepareListingResponse, i) => {
@@ -263,6 +280,7 @@ export class Orderbook {
       };
     }
 
+    track('orderbookmr', 'bulkListings', { walletType: 'EOA', makerAddress, listingsCount: listingParams.length });
     const { actions, preparedListings } = await this.seaport.prepareBulkSeaportOrders(
       makerAddress,
       listingParams.map((orderParam) => ({
