@@ -17,7 +17,9 @@ export default function Logout() {
           className="underline"
           href="/use-context"
         >
-          Return to examples using <pre>passport.PassportProvider</pre>
+          Return to examples using
+          {' '}
+          <pre>passport.PassportProvider</pre>
         </a>
       </div>
     </div>
