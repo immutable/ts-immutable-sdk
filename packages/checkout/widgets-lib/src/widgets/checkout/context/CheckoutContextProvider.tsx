@@ -40,7 +40,7 @@ export function CheckoutContextProvider({
 
     // TODO: remove logger after done with development
     postMessageHandlerInstance.setLogger((...args: any[]) => {
-      console.log('🔔 PARENT – ', ...args); // eslint-disable-line
+      console.log("🔔 PARENT – ", ...args); // eslint-disable-line
     });
 
     checkoutDispatch({
