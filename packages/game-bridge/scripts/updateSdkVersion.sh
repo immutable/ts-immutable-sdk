@@ -6,10 +6,13 @@
 # - TS_SDK_HASH: The git hash of the tag
 
 set -e
-set -x
+# Enable debug mode (set -x) only in CI environment
+if [ -n "$CI" ]; then
+  set -x
+fi
 
 # The files to update
-FILE_PATHS=("./dist/unity/index.html" "./dist/unreal/index.js" "./dist/unreal/index.js.map")
+FILE_PATHS=("./dist/unity/index.html" "./dist/unreal/index.js")
 
 # check files exist
 for FILE_PATH in "${FILE_PATHS[@]}"
@@ -41,15 +44,15 @@ if [ -z "$CI" ]; then
 else
   echo "Update SDK version in CI / non-locally" 
   # Get the current branch name
-  current_branch=$(git rev-parse --abbrev-ref HEAD)
+  current_branch=${GITHUB_REF#refs/heads/}
 
-  # # Check if the current branch is "main"
-  # if [ "$current_branch" == "main" ]; then
-  #     echo "You are on the main branch. Continuing..."
-  # else
-  #     echo "You are not on the main branch. Exiting..."
-  #     exit 1
-  # fi
+  # Check if the current branch is "main"
+  if [ "$current_branch" == "main" ]; then
+      echo "You are on the main branch. Continuing..."
+  else
+      echo "You are not on the main branch. Exiting..."
+      exit 1
+  fi
 
   # Check if TS_SDK_TAG environment variable is set
   if [ -z "$TS_SDK_TAG" ]; then
