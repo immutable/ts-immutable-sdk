@@ -51,6 +51,7 @@
     "oidc-client-ts": "2.4.0",
     "os-browserify": "^0.3.0",
     "pako": "^2.1.0",
+    "pino-pretty": "^11.2.2",
     "react-i18next": "^13.5.0",
     "sns-validator": "^0.3.5",
     "stream-browserify": "^3.0.0",
