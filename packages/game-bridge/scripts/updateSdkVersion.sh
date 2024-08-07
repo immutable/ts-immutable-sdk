@@ -46,6 +46,11 @@ else
   # Get the current branch name
   current_branch=${GITHUB_REF#refs/heads/}
 
+  # If current_branch is empty, fall back to git command
+  if [ -z "$current_branch" ]; then
+    current_branch=$(git rev-parse --abbrev-ref HEAD)
+  fi
+
   # Check if the current branch is "main"
   if [ "$current_branch" == "main" ]; then
       echo "You are on the main branch. Continuing..."
